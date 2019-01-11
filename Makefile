@@ -9,7 +9,7 @@ FILENAME = release
 endif
 
 ifeq ($(JAPANESE), 1)
-CFLAGS += -DJAPANESE
+CXXFLAGS += -DJAPANESE
 endif
 
 CXXFLAGS += `sdl2-config --cflags`
