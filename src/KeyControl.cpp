@@ -1,5 +1,4 @@
 #include "KeyControl.h"
-
 int gKey;
 int gKeyTrg;
 

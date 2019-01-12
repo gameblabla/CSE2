@@ -10,6 +10,7 @@
 #include <SDL_filesystem.h>
 #include <SDL_events.h>
 
+#include "Input.h"
 #include "Config.h"
 #include "KeyControl.h"
 
@@ -83,5 +84,232 @@ int main(int argc, char *argv[])
 		gKeyDown = KEY_DOWN;
 	}
 	
+	//Set gamepad inputs
+	for (int i = 0; i < 8; i++)
+	{
+		switch (config.joystick_button[i])
+		{
+			case 1:
+				gJoystickButtonTable[i] = gKeyJump;
+				break;
+				
+			case 2:
+				gJoystickButtonTable[i] = gKeyShot;
+				break;
+				
+			case 3:
+				gJoystickButtonTable[i] = gKeyArms;
+				break;
+				
+			case 6:
+				gJoystickButtonTable[i] = gKeyArmsRev;
+				break;
+				
+			case 4:
+				gJoystickButtonTable[i] = gKeyItem;
+				break;
+				
+			case 5:
+				gJoystickButtonTable[i] = gKeyMap;
+				break;
+				
+			default:
+				continue;
+		}
+	}
+	
 	return 0;
+}
+
+
+
+
+bool SystemTask()
+{
+	SDL_Event event;
+	while (SDL_PollEvent(&event))
+	{
+		switch (event.type)
+		{
+			case SDL_QUIT:
+				return false;
+				break;
+			
+			case SDL_KEYDOWN:
+				switch (event.key.keysym.scancode)
+				{
+					case SDL_SCANCODE_ESCAPE:
+						gKey |= KEY_ESCAPE;
+						break;
+						
+					case SDL_SCANCODE_W:
+						gKey |= KEY_MAP;
+						break;
+						
+					case SDL_SCANCODE_LEFT:
+						gKey |= KEY_LEFT;
+						break;
+						
+					case SDL_SCANCODE_RIGHT:
+						gKey |= KEY_RIGHT;
+						break;
+						
+					case SDL_SCANCODE_UP:
+						gKey |= KEY_UP;
+						break;
+						
+					case SDL_SCANCODE_DOWN:
+						gKey |= KEY_DOWN;
+						break;
+						
+					case SDL_SCANCODE_X:
+						gKey |= KEY_X;
+						break;
+						
+					case SDL_SCANCODE_Z:
+						gKey |= KEY_Z;
+						break;
+						
+					case SDL_SCANCODE_S:
+						gKey |= KEY_ARMS;
+						break;
+						
+					case SDL_SCANCODE_A:
+						gKey |= KEY_ARMSREV;
+						break;
+					
+					case SDL_SCANCODE_RSHIFT:
+					case SDL_SCANCODE_LSHIFT:
+						gKey |= KEY_SHIFT;
+						break;
+						
+					case SDL_SCANCODE_F1:
+						gKey |= KEY_F1;
+						break;
+						
+					case SDL_SCANCODE_F2:
+						gKey |= KEY_F2;
+						break;
+						
+					case SDL_SCANCODE_Q:
+						gKey |= KEY_ITEM;
+						break;
+						
+					case SDL_SCANCODE_COMMA:
+						gKey |= KEY_ALT_LEFT;
+						break;
+						
+					case SDL_SCANCODE_PERIOD:
+						gKey |= KEY_ALT_DOWN;
+						break;
+						
+					case SDL_SCANCODE_SLASH:
+						gKey |= KEY_ALT_RIGHT;
+						break;
+						
+					case SDL_SCANCODE_L:
+						gKey |= KEY_ALT_UP;
+						break;
+						
+					case SDL_SCANCODE_EQUALS:
+						gKey |= KEY_PLUS;
+						break;
+						
+					case SDL_SCANCODE_F5:
+						gbUseJoystick = false;
+						break;
+						
+					default:
+						return true;
+				}
+				break;
+				
+			case SDL_KEYUP:
+				switch (event.key.keysym.scancode)
+				{
+					case SDL_SCANCODE_ESCAPE:
+						gKey &= ~KEY_ESCAPE;
+						break;
+						
+					case SDL_SCANCODE_W:
+						gKey &= ~KEY_MAP;
+						break;
+						
+					case SDL_SCANCODE_LEFT:
+						gKey &= ~KEY_LEFT;
+						break;
+						
+					case SDL_SCANCODE_RIGHT:
+						gKey &= ~KEY_RIGHT;
+						break;
+						
+					case SDL_SCANCODE_UP:
+						gKey &= ~KEY_UP;
+						break;
+						
+					case SDL_SCANCODE_DOWN:
+						gKey &= ~KEY_DOWN;
+						break;
+						
+					case SDL_SCANCODE_X:
+						gKey &= ~KEY_X;
+						break;
+						
+					case SDL_SCANCODE_Z:
+						gKey &= ~KEY_Z;
+						break;
+						
+					case SDL_SCANCODE_S:
+						gKey &= ~KEY_ARMS;
+						break;
+						
+					case SDL_SCANCODE_A:
+						gKey &= ~KEY_ARMSREV;
+						break;
+					
+					case SDL_SCANCODE_RSHIFT:
+					case SDL_SCANCODE_LSHIFT:
+						gKey &= ~KEY_SHIFT;
+						break;
+						
+					case SDL_SCANCODE_F1:
+						gKey &= ~KEY_F1;
+						break;
+						
+					case SDL_SCANCODE_F2:
+						gKey &= ~KEY_F2;
+						break;
+						
+					case SDL_SCANCODE_Q:
+						gKey &= ~KEY_ITEM;
+						break;
+						
+					case SDL_SCANCODE_COMMA:
+						gKey &= ~KEY_ALT_LEFT;
+						break;
+						
+					case SDL_SCANCODE_PERIOD:
+						gKey &= ~KEY_ALT_DOWN;
+						break;
+						
+					case SDL_SCANCODE_SLASH:
+						gKey &= ~KEY_ALT_RIGHT;
+						break;
+						
+					case SDL_SCANCODE_L:
+						gKey &= ~KEY_ALT_UP;
+						break;
+						
+					case SDL_SCANCODE_EQUALS:
+						gKey &= ~KEY_PLUS;
+						break;
+						
+					default:
+						return true;
+				}
+				break;
+		}
+	}
+	
+	return true;
 }

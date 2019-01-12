@@ -1,6 +1,11 @@
 # Prerequisites
 *.d
 
+# Misc
+/obj
+Config.dat
+Profile.dat
+
 # Compiled Object files
 *.slo
 *.lo

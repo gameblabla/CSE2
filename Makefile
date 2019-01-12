@@ -11,6 +11,9 @@ endif
 ifeq ($(JAPANESE), 1)
 CXXFLAGS += -DJAPANESE
 endif
+ifeq ($(FIX_BUGS), 1)
+CXXFLAGS += -DFIX_BUGS
+endif
 
 CXXFLAGS += `sdl2-config --cflags`
 LIBS += `sdl2-config --static-libs`
@@ -18,6 +21,7 @@ LIBS += `sdl2-config --static-libs`
 # For an accurate result to the original's code, compile in alphabetical order
 SOURCES = \
 	Config \
+	Input \
 	KeyControl \
 	Main \
 
