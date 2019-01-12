@@ -4,11 +4,8 @@
 #include <stdint.h>
 #include <string>
 
-#include <SDL_main.h>
-#include <SDL_render.h>
-#include <SDL_keyboard.h>
-#include <SDL_filesystem.h>
-#include <SDL_events.h>
+#include <SDL.h>
+#include "WindowsWrapper.h"
 
 #include "Input.h"
 #include "Config.h"
@@ -16,6 +13,19 @@
 
 char gModulePath[PATH_LENGTH];
 char gDataPath[PATH_LENGTH];
+
+int gJoystickButtonTable[8];
+
+int gWindowWidth;
+int gWindowHeight;
+SDL_Window *gWindow;
+SDL_Renderer *gRenderer;
+
+bool gbUseJoystick;
+bool bFullscreen;
+bool bFps;
+
+bool bActive;
 
 int main(int argc, char *argv[])
 {
@@ -28,104 +38,226 @@ int main(int argc, char *argv[])
 	strcpy(gDataPath, gModulePath);
 	memcpy(&gDataPath[strlen(gDataPath)], "/data", 6); //Pixel didn't use a strcat
 	
-	//Load configuration
-	CONFIG config;
-	
-	if (!LoadConfigData(&config))
-		DefaultConfigData(&config);
-	
-	//Apply keybinds
-	//Swap X and Z buttons
-	if (config.attack_button_mode)
+	//Initialize SDL
+	if (SDL_Init(SDL_INIT_VIDEO) >= 0)
 	{
-		if (config.attack_button_mode == 1)
+		//Load configuration
+		CONFIG config;
+		
+		if (!LoadConfigData(&config))
+			DefaultConfigData(&config);
+		
+		//Apply keybinds
+		//Swap X and Z buttons
+		if (config.attack_button_mode)
 		{
-			gKeyJump = KEY_X;
-			gKeyShot = KEY_Z;
+			if (config.attack_button_mode == 1)
+			{
+				gKeyJump = KEY_X;
+				gKeyShot = KEY_Z;
+			}
 		}
-	}
-	else
-	{
-		gKeyJump = KEY_Z;
-		gKeyShot = KEY_X;
-	}
-	
-	//Swap Okay and Cancel buttons
-	if (config.ok_button_mode)
-	{
-		if (config.ok_button_mode == 1)
+		else
 		{
-			gKeyOk = gKeyShot;
-			gKeyCancel = gKeyJump;
+			gKeyJump = KEY_Z;
+			gKeyShot = KEY_X;
 		}
-	}
-	else
-	{
-		gKeyOk = gKeyJump;
-		gKeyCancel = gKeyShot;
-	}
-	
-	//Alternate movement keys
-	if (config.move_button_mode)
-	{
-		if (config.move_button_mode == 1)
+		
+		//Swap Okay and Cancel buttons
+		if (config.ok_button_mode)
 		{
-			gKeyLeft = KEY_ALT_LEFT;
-			gKeyUp = KEY_ALT_UP;
-			gKeyRight = KEY_ALT_RIGHT;
-			gKeyDown = KEY_ALT_DOWN;
+			if (config.ok_button_mode == 1)
+			{
+				gKeyOk = gKeyShot;
+				gKeyCancel = gKeyJump;
+			}
 		}
-	}
-	else
-	{
-		gKeyLeft = KEY_LEFT;
-		gKeyUp = KEY_UP;
-		gKeyRight = KEY_RIGHT;
-		gKeyDown = KEY_DOWN;
-	}
-	
-	//Set gamepad inputs
-	for (int i = 0; i < 8; i++)
-	{
-		switch (config.joystick_button[i])
+		else
+		{
+			gKeyOk = gKeyJump;
+			gKeyCancel = gKeyShot;
+		}
+		
+		//Alternate movement keys
+		if (config.move_button_mode)
+		{
+			if (config.move_button_mode == 1)
+			{
+				gKeyLeft = KEY_ALT_LEFT;
+				gKeyUp = KEY_ALT_UP;
+				gKeyRight = KEY_ALT_RIGHT;
+				gKeyDown = KEY_ALT_DOWN;
+			}
+		}
+		else
+		{
+			gKeyLeft = KEY_LEFT;
+			gKeyUp = KEY_UP;
+			gKeyRight = KEY_RIGHT;
+			gKeyDown = KEY_DOWN;
+		}
+		
+		//Set gamepad inputs
+		for (int i = 0; i < 8; i++)
+		{
+			switch (config.joystick_button[i])
+			{
+				case 1:
+					gJoystickButtonTable[i] = gKeyJump;
+					break;
+					
+				case 2:
+					gJoystickButtonTable[i] = gKeyShot;
+					break;
+					
+				case 3:
+					gJoystickButtonTable[i] = gKeyArms;
+					break;
+					
+				case 6:
+					gJoystickButtonTable[i] = gKeyArmsRev;
+					break;
+					
+				case 4:
+					gJoystickButtonTable[i] = gKeyItem;
+					break;
+					
+				case 5:
+					gJoystickButtonTable[i] = gKeyMap;
+					break;
+					
+				default:
+					continue;
+			}
+		}
+		
+		RECT unused_rect = {0, 0, 320, 240};
+		
+		//Get window dimensions and colour depth
+		int windowScale;
+		int colourDepth = 16;
+		
+		switch (config.display_mode)
 		{
 			case 1:
-				gJoystickButtonTable[i] = gKeyJump;
-				break;
-				
 			case 2:
-				gJoystickButtonTable[i] = gKeyShot;
+				//Set window dimensions
+				if (config.display_mode == 1)
+				{
+					gWindowWidth = 320;
+					gWindowHeight = 240;
+					windowScale = 1;
+				}
+				else
+				{
+					gWindowWidth = 640;
+					gWindowHeight = 480;
+					windowScale = 2;
+				}
 				break;
-				
+			
+			case 0:
 			case 3:
-				gJoystickButtonTable[i] = gKeyArms;
-				break;
-				
-			case 6:
-				gJoystickButtonTable[i] = gKeyArmsRev;
-				break;
-				
 			case 4:
-				gJoystickButtonTable[i] = gKeyItem;
-				break;
+				//Set window dimensions
+				gWindowWidth = 640;
+				gWindowHeight = 480;
+				windowScale = 2;
 				
-			case 5:
-				gJoystickButtonTable[i] = gKeyMap;
-				break;
+				//Set colour depth
+				if (config.display_mode)
+				{
+					if (config.display_mode == 3)
+						colourDepth = 24;
+					else if (config.display_mode == 4)
+						colourDepth = 32;
+				}
+				else
+					colourDepth = 16;
 				
-			default:
-				continue;
+				bFullscreen = true;
+				SDL_ShowCursor(0);
+				break;
 		}
+		
+		#ifdef JAPANESE
+		const char *windowTitle = "洞窟物語エンジン";
+		#else
+		const char *windowTitle = "Cave Story Engine ~ Doukutsu Monogatari Enjin";
+		#endif
+		
+		gWindow = SDL_CreateWindow(windowTitle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, gWindowWidth, gWindowHeight, bFullscreen ? SDL_WINDOW_FULLSCREEN : 0);
+		
+		if (gWindow)
+		{
+			StartDirectDraw(window, windowScale);
+		}
+	}
+	else
+	{
+		return -1;
 	}
 	
 	return 0;
 }
 
+void InactiveWindow()
+{
+	if (bActive)
+	{
+		bActive = false;
+		//StopOrganyaMusic();
+		//SleepNoise();
+	}
+	
+	//PlaySoundObject(7, 0);
+}
 
+void ActiveWindow()
+{
+	if (!bActive)
+	{
+		bActive = true;
+		//StopOrganyaMusic();
+		//PlayOrganyaMusic();
+		//ResetNoise();
+	}
 
+	//PlaySoundObject(7, -1);
+}
+
+void JoystickProc()
+{
+	JOYSTICK_STATUS status;
+	
+	if (GetJoystickStatus(&status))
+	{
+		//Set movement buttons
+		if (status.bLeft)
+			gKey |= gKeyLeft;
+		if (status.bRight)
+			gKey |= gKeyRight;
+		if (status.bUp)
+			gKey |= gKeyUp;
+		if (status.bDown)
+			gKey |= gKeyDown;
+		
+		//Clear previously held buttons
+		for (int i = 0; i < 8; i++)
+			gKey &= ~gJoystickButtonTable[i];
+			
+		//Set held buttons
+		for (int i = 0; i < 8; i++)
+		{
+			if (status.bButton[i])
+				gKey |= gJoystickButtonTable[i];
+		}
+	}
+}
 
 bool SystemTask()
 {
+	//Handle window events
 	SDL_Event event;
 	while (SDL_PollEvent(&event))
 	{
@@ -134,88 +266,108 @@ bool SystemTask()
 			case SDL_QUIT:
 				return false;
 				break;
+				
+			case SDL_WINDOWEVENT:
+				switch (event.window.event)
+				{
+					case SDL_WINDOWEVENT_FOCUS_GAINED:
+						ActiveWindow();
+						break;
+						
+					case SDL_WINDOWEVENT_FOCUS_LOST:
+						InactiveWindow();
+						break;
+					
+					default:
+						break;
+				}
+				break;
 			
 			case SDL_KEYDOWN:
-				switch (event.key.keysym.scancode)
+				switch (event.key.keysym.sym)
 				{
-					case SDL_SCANCODE_ESCAPE:
+					case SDLK_ESCAPE:
 						gKey |= KEY_ESCAPE;
 						break;
 						
-					case SDL_SCANCODE_W:
+					case SDLK_w:
 						gKey |= KEY_MAP;
 						break;
 						
-					case SDL_SCANCODE_LEFT:
+					case SDLK_LEFT:
 						gKey |= KEY_LEFT;
 						break;
 						
-					case SDL_SCANCODE_RIGHT:
+					case SDLK_RIGHT:
 						gKey |= KEY_RIGHT;
 						break;
 						
-					case SDL_SCANCODE_UP:
+					case SDLK_UP:
 						gKey |= KEY_UP;
 						break;
 						
-					case SDL_SCANCODE_DOWN:
+					case SDLK_DOWN:
 						gKey |= KEY_DOWN;
 						break;
 						
-					case SDL_SCANCODE_X:
+					case SDLK_x:
 						gKey |= KEY_X;
 						break;
 						
-					case SDL_SCANCODE_Z:
+					case SDLK_z:
 						gKey |= KEY_Z;
 						break;
 						
-					case SDL_SCANCODE_S:
+					case SDLK_s:
 						gKey |= KEY_ARMS;
 						break;
 						
-					case SDL_SCANCODE_A:
+					case SDLK_a:
 						gKey |= KEY_ARMSREV;
 						break;
 					
-					case SDL_SCANCODE_RSHIFT:
-					case SDL_SCANCODE_LSHIFT:
+					case SDLK_RSHIFT:
+					case SDLK_LSHIFT:
 						gKey |= KEY_SHIFT;
 						break;
 						
-					case SDL_SCANCODE_F1:
+					case SDLK_F1:
 						gKey |= KEY_F1;
 						break;
 						
-					case SDL_SCANCODE_F2:
+					case SDLK_F2:
 						gKey |= KEY_F2;
 						break;
 						
-					case SDL_SCANCODE_Q:
+					case SDLK_q:
 						gKey |= KEY_ITEM;
 						break;
 						
-					case SDL_SCANCODE_COMMA:
+					case SDLK_COMMA:
 						gKey |= KEY_ALT_LEFT;
 						break;
 						
-					case SDL_SCANCODE_PERIOD:
+					case SDLK_PERIOD:
 						gKey |= KEY_ALT_DOWN;
 						break;
 						
-					case SDL_SCANCODE_SLASH:
+					case SDLK_SLASH:
 						gKey |= KEY_ALT_RIGHT;
 						break;
 						
-					case SDL_SCANCODE_L:
+					case SDLK_l:
 						gKey |= KEY_ALT_UP;
 						break;
 						
-					case SDL_SCANCODE_EQUALS:
+				#ifdef FIX_BUGS //BUG FIX: Pixel intended for the second alternate up key to be the plus key, Japanese keyboards have the plus key where the semi-colon key is, causing errors on other keyboard layouts)
+					case SDLK_PLUS:
+				#else
+					case SDLK_SEMICOLON:
+				#endif
 						gKey |= KEY_PLUS;
 						break;
 						
-					case SDL_SCANCODE_F5:
+					case SDLK_F5:
 						gbUseJoystick = false;
 						break;
 						
@@ -227,80 +379,84 @@ bool SystemTask()
 			case SDL_KEYUP:
 				switch (event.key.keysym.scancode)
 				{
-					case SDL_SCANCODE_ESCAPE:
+					case SDLK_ESCAPE:
 						gKey &= ~KEY_ESCAPE;
 						break;
 						
-					case SDL_SCANCODE_W:
+					case SDLK_w:
 						gKey &= ~KEY_MAP;
 						break;
 						
-					case SDL_SCANCODE_LEFT:
+					case SDLK_LEFT:
 						gKey &= ~KEY_LEFT;
 						break;
 						
-					case SDL_SCANCODE_RIGHT:
+					case SDLK_RIGHT:
 						gKey &= ~KEY_RIGHT;
 						break;
 						
-					case SDL_SCANCODE_UP:
+					case SDLK_UP:
 						gKey &= ~KEY_UP;
 						break;
 						
-					case SDL_SCANCODE_DOWN:
+					case SDLK_DOWN:
 						gKey &= ~KEY_DOWN;
 						break;
 						
-					case SDL_SCANCODE_X:
+					case SDLK_x:
 						gKey &= ~KEY_X;
 						break;
 						
-					case SDL_SCANCODE_Z:
+					case SDLK_z:
 						gKey &= ~KEY_Z;
 						break;
 						
-					case SDL_SCANCODE_S:
+					case SDLK_s:
 						gKey &= ~KEY_ARMS;
 						break;
 						
-					case SDL_SCANCODE_A:
+					case SDLK_a:
 						gKey &= ~KEY_ARMSREV;
 						break;
 					
-					case SDL_SCANCODE_RSHIFT:
-					case SDL_SCANCODE_LSHIFT:
+					case SDLK_RSHIFT:
+					case SDLK_LSHIFT:
 						gKey &= ~KEY_SHIFT;
 						break;
 						
-					case SDL_SCANCODE_F1:
+					case SDLK_F1:
 						gKey &= ~KEY_F1;
 						break;
 						
-					case SDL_SCANCODE_F2:
+					case SDLK_F2:
 						gKey &= ~KEY_F2;
 						break;
 						
-					case SDL_SCANCODE_Q:
+					case SDLK_q:
 						gKey &= ~KEY_ITEM;
 						break;
 						
-					case SDL_SCANCODE_COMMA:
+					case SDLK_COMMA:
 						gKey &= ~KEY_ALT_LEFT;
 						break;
 						
-					case SDL_SCANCODE_PERIOD:
+					case SDLK_PERIOD:
 						gKey &= ~KEY_ALT_DOWN;
 						break;
 						
-					case SDL_SCANCODE_SLASH:
+					case SDLK_SLASH:
 						gKey &= ~KEY_ALT_RIGHT;
 						break;
 						
-					case SDL_SCANCODE_L:
+					case SDLK_l:
 						gKey &= ~KEY_ALT_UP;
 						break;
 						
-					case SDL_SCANCODE_EQUALS:
+					#ifdef FIX_BUGS //BUG FIX: Pixel intended for the second alternate up key to be the plus key, Japanese keyboards have the plus key where the semi-colon key is, causing errors on other keyboard layouts)
+						case SDLK_PLUS:
+					#else
+						case SDLK_SEMICOLON:
+					#endif
 						gKey &= ~KEY_PLUS;
 						break;
 						
@@ -310,6 +466,10 @@ bool SystemTask()
 				break;
 		}
 	}
+	
+	//Run joystick code
+	if (gbUseJoystick)
+		JoystickProc();
 	
 	return true;
 }

@@ -1,12 +1,9 @@
 #include "Types.h"
 #include <stdint.h>
-#include <SDL_gamepad.h>
+#include <SDL_gamecontroller.h>
 #include "Input.h"
 
 #define JOYSTICK_DEADZONE 0x2000
-
-bool gbUseJoystick;
-int gJoystickButtonTable[8];
 
 SDL_GameController *joystick; //This may be a name that was given by Simon, but it fits the rest of Pixel's names so it's fine.
 
@@ -38,7 +35,7 @@ bool InitDirectInput()
 	return true;
 }
 
-signed int GetJoystickStatus(JOYSTICK_STATUS *pStatus)
+bool GetJoystickStatus(JOYSTICK_STATUS *pStatus)
 {
 	//Clear status
 	memset(pStatus, 0, sizeof(JOYSTICK_STATUS));
@@ -49,20 +46,21 @@ signed int GetJoystickStatus(JOYSTICK_STATUS *pStatus)
 		int32_t y = SDL_GameControllerGetAxis(joystick, SDL_CONTROLLER_AXIS_LEFTY);
 		pStatus->bLeft = x <= -JOYSTICK_DEADZONE;
 		pStatus->bRight = x >= JOYSTICK_DEADZONE;
-		pStatus->bUp = v2 <= -JOYSTICK_DEADZONE;
-		pStatus->bDown = v2 >= JOYSTICK_DEADZONE;
+		pStatus->bUp = y <= -JOYSTICK_DEADZONE;
+		pStatus->bDown = y >= JOYSTICK_DEADZONE;
 		
-		int numButtons = SDL_GameControllerNumButtons(joystick);
+		int numButtons = SDL_JoystickNumButtons(SDL_GameControllerGetJoystick(joystick));
 		if (numButtons > 32)
 			numButtons = 32;
 		
 		for (int button = 0; button < numButtons; button++)
-			pStatus->bButton[button] = SDL_GameControllerGetButton(joystick, button) != 0;
+			pStatus->bButton[button] = SDL_GameControllerGetButton(joystick, (SDL_GameControllerButton)button) != 0;
 	}
-	return 1;
+	
+	return true;
 }
 
-signed int ResetJoystickStatus()
+bool ResetJoystickStatus()
 {
-	return 1;
+	return true;
 }

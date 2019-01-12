@@ -21,6 +21,7 @@ LIBS += `sdl2-config --static-libs`
 # For an accurate result to the original's code, compile in alphabetical order
 SOURCES = \
 	Config \
+	Draw \
 	Input \
 	KeyControl \
 	Main \

@@ -10,3 +10,8 @@ struct JOYSTICK_STATUS
 	bool bDown;
 	bool bButton[32];
 };
+
+void ReleaseDirectInput();
+bool InitDirectInput();
+bool GetJoystickStatus(JOYSTICK_STATUS *pStatus);
+bool ResetJoystickStatus();
