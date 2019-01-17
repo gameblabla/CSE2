@@ -104,7 +104,7 @@ bool MakeSurface(const char *name, int surf_no)
 	}
 	
 	//Make sure surface has color key on
-	SDL_SetColorKey(surface, SDL_TRUE, 0x000000);
+	SDL_SetColorKey(surface, SDL_TRUE, SDL_MapRGB(surface->format, 0, 0, 0));
 	
 	//Get texture from surface
 	SDL_Texture *texture = SDL_CreateTextureFromSurface(gRenderer, surface);
@@ -136,7 +136,8 @@ bool MakeSurface(const char *name, int surf_no)
 	surf[surf_no].texture = textureAccessible;
 	surf[surf_no].scale = true;
 	
-	//Free surface
+	//Free surface and texture
+	SDL_DestroyTexture(texture);
 	SDL_FreeSurface(surface);
 	
 	printf(" ^ Successfully loaded\n");
@@ -329,8 +330,13 @@ void CortBox2(RECT *rect, uint32_t col, int surf_no)
 	
 	SDL_SetRenderTarget(gRenderer, surf[surf_no].texture);
 	
+	const unsigned char col_red = col & 0xFF0000 >> 16;
+	const unsigned char col_green = col & 0x00FF00 >> 8;
+	const unsigned char col_blue = col & 0x0000FF;
+	const unsigned char col_alpha = (col_red || col_green || col_blue) ? 0xFF : 0;
+
 	//Set colour and draw
-	SDL_SetRenderDrawColor(gRenderer, col & 0xFF0000 >> 16, col & 0x00FF00 >> 8, col & 0x0000FF, 0xFF);
+	SDL_SetRenderDrawColor(gRenderer, col_red, col_green, col_blue, col_alpha);
 	SDL_RenderFillRect(gRenderer, &destRect);
 	
 	//Stop targetting surface
