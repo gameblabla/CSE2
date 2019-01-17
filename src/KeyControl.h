@@ -48,3 +48,5 @@ extern int gKeyLeft;
 extern int gKeyUp;
 extern int gKeyRight;
 extern int gKeyDown;
+
+void GetTrg();

@@ -1,7 +1,12 @@
 #include "Types.h"
+#include "CommonDefines.h"
 #include <stdint.h>
+
 #include <SDL_gamecontroller.h>
+#include "WindowsWrapper.h"
+
 #include "Input.h"
+#include "Tags.h"
 
 #define JOYSTICK_DEADZONE 0x2000
 
@@ -19,6 +24,11 @@ void ReleaseDirectInput()
 
 bool InitDirectInput()
 {
+	//Load mappings
+	char path[PATH_LENGTH];
+	sprintf(path, "%s/%s", gDataPath, "gamecontrollerdb.txt");
+	SDL_GameControllerAddMappingsFromFile(path);
+	
 	//Open first available joystick
 	for (int i = 0; i < SDL_NumJoysticks(); ++i)
 	{
@@ -55,9 +65,11 @@ bool GetJoystickStatus(JOYSTICK_STATUS *pStatus)
 		
 		for (int button = 0; button < numButtons; button++)
 			pStatus->bButton[button] = SDL_GameControllerGetButton(joystick, (SDL_GameControllerButton)button) != 0;
+		
+		return true;
 	}
 	
-	return true;
+	return false;
 }
 
 bool ResetJoystickStatus()

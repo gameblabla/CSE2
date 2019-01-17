@@ -7,9 +7,12 @@
 #include <SDL.h>
 #include "WindowsWrapper.h"
 
+#include "Draw.h"
 #include "Input.h"
+#include "Game.h"
 #include "Config.h"
 #include "KeyControl.h"
+#include "Triangle.h"
 
 char gModulePath[PATH_LENGTH];
 char gDataPath[PATH_LENGTH];
@@ -18,6 +21,7 @@ int gJoystickButtonTable[8];
 
 int gWindowWidth;
 int gWindowHeight;
+int gWindowScale;
 SDL_Window *gWindow;
 SDL_Renderer *gRenderer;
 
@@ -26,6 +30,12 @@ bool bFullscreen;
 bool bFps;
 
 bool bActive;
+
+#ifdef JAPANESE
+const char *lpWindowName = "洞窟物語エンジン";
+#else
+const char *lpWindowName = "Cave Story Engine ~ Doukutsu Monogatari Enjin";
+#endif
 
 int main(int argc, char *argv[])
 {
@@ -39,7 +49,7 @@ int main(int argc, char *argv[])
 	memcpy(&gDataPath[strlen(gDataPath)], "/data", 6); //Pixel didn't use a strcat
 	
 	//Initialize SDL
-	if (SDL_Init(SDL_INIT_VIDEO) >= 0)
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS | SDL_INIT_GAMECONTROLLER) >= 0)
 	{
 		//Load configuration
 		CONFIG config;
@@ -134,7 +144,6 @@ int main(int argc, char *argv[])
 		RECT unused_rect = {0, 0, 320, 240};
 		
 		//Get window dimensions and colour depth
-		int windowScale;
 		int colourDepth = 16;
 		
 		switch (config.display_mode)
@@ -144,15 +153,15 @@ int main(int argc, char *argv[])
 				//Set window dimensions
 				if (config.display_mode == 1)
 				{
-					gWindowWidth = 320;
-					gWindowHeight = 240;
-					windowScale = 1;
+					gWindowWidth = WINDOW_WIDTH;
+					gWindowHeight = WINDOW_HEIGHT;
+					gWindowScale = 1;
 				}
 				else
 				{
-					gWindowWidth = 640;
-					gWindowHeight = 480;
-					windowScale = 2;
+					gWindowWidth = WINDOW_WIDTH * 2;
+					gWindowHeight = WINDOW_HEIGHT * 2;
+					gWindowScale = 2;
 				}
 				break;
 			
@@ -160,9 +169,9 @@ int main(int argc, char *argv[])
 			case 3:
 			case 4:
 				//Set window dimensions
-				gWindowWidth = 640;
-				gWindowHeight = 480;
-				windowScale = 2;
+				gWindowWidth = WINDOW_WIDTH * 2;
+				gWindowHeight = WINDOW_HEIGHT * 2;
+				gWindowScale = 2;
 				
 				//Set colour depth
 				if (config.display_mode)
@@ -180,17 +189,52 @@ int main(int argc, char *argv[])
 				break;
 		}
 		
-		#ifdef JAPANESE
-		const char *windowTitle = "洞窟物語エンジン";
-		#else
-		const char *windowTitle = "Cave Story Engine ~ Doukutsu Monogatari Enjin";
-		#endif
-		
-		gWindow = SDL_CreateWindow(windowTitle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, gWindowWidth, gWindowHeight, bFullscreen ? SDL_WINDOW_FULLSCREEN : 0);
+		//Create window
+		gWindow = SDL_CreateWindow(lpWindowName, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, gWindowWidth, gWindowHeight, bFullscreen ? SDL_WINDOW_FULLSCREEN : 0);
 		
 		if (gWindow)
 		{
-			StartDirectDraw(window, windowScale);
+			//Initialize rendering
+			StartDirectDraw();
+			
+			//Set rects
+			RECT loading_rect = {0, 0, 64, 8};
+			RECT clip_rect = {0, 0, gWindowWidth, gWindowHeight};
+			
+			//Load the "LOADING" text
+			MakeSurface_File("Loading", SURFACE_ID_LOADING);
+			
+			//Draw loading screen
+			CortBox(&clip_rect, 0x000000);
+			PutBitmap3(&clip_rect, (WINDOW_WIDTH - 64) / 2, (WINDOW_HEIGHT - 8) / 2, &loading_rect, SURFACE_ID_LOADING);
+			
+			//Draw to screen
+			if (Flip_SystemTask())
+			{
+				//Initialize sound
+				//InitDirectSound();
+				
+				//Initialize joystick
+				if (config.bJoystick && InitDirectInput())
+				{
+					ResetJoystickStatus();
+					gbUseJoystick = true;
+				}
+				
+				//Initialize stuff
+				InitTextObject();
+				InitTriangleTable();
+				
+				//Run game code
+				Game();
+				
+				//End stuff
+				//EndDirectSound();
+				EndTextObject();
+				EndDirectDraw();
+				
+				SDL_Quit();
+			}
 		}
 	}
 	else
@@ -232,6 +276,9 @@ void JoystickProc()
 	
 	if (GetJoystickStatus(&status))
 	{
+		//Clear held buttons
+		gKey &= (KEY_ESCAPE | KEY_F2 | KEY_F1);
+		
 		//Set movement buttons
 		if (status.bLeft)
 			gKey |= gKeyLeft;
@@ -242,10 +289,6 @@ void JoystickProc()
 		if (status.bDown)
 			gKey |= gKeyDown;
 		
-		//Clear previously held buttons
-		for (int i = 0; i < 8; i++)
-			gKey &= ~gJoystickButtonTable[i];
-			
 		//Set held buttons
 		for (int i = 0; i < 8; i++)
 		{
@@ -258,9 +301,13 @@ void JoystickProc()
 bool SystemTask()
 {
 	//Handle window events
-	SDL_Event event;
-	while (SDL_PollEvent(&event))
+	bool focusGained = true;
+	
+	while (SDL_PollEvent(nullptr) || !focusGained)
 	{
+		SDL_Event event;
+		SDL_WaitEvent(&event);
+		
 		switch (event.type)
 		{
 			case SDL_QUIT:
@@ -271,10 +318,12 @@ bool SystemTask()
 				switch (event.window.event)
 				{
 					case SDL_WINDOWEVENT_FOCUS_GAINED:
+						focusGained = true;
 						ActiveWindow();
 						break;
 						
 					case SDL_WINDOWEVENT_FOCUS_LOST:
+						focusGained = false;
 						InactiveWindow();
 						break;
 					
@@ -372,12 +421,12 @@ bool SystemTask()
 						break;
 						
 					default:
-						return true;
+						break;
 				}
 				break;
 				
 			case SDL_KEYUP:
-				switch (event.key.keysym.scancode)
+				switch (event.key.keysym.sym)
 				{
 					case SDLK_ESCAPE:
 						gKey &= ~KEY_ESCAPE;
@@ -461,7 +510,7 @@ bool SystemTask()
 						break;
 						
 					default:
-						return true;
+						break;
 				}
 				break;
 		}

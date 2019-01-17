@@ -1,7 +1,7 @@
 RELEASE = 0
 
 ifeq ($(RELEASE), 0)
-CXXFLAGS := -O0 -g -static
+CXXFLAGS := -O0 -g -static -mconsole
 FILENAME = debug
 else
 CXXFLAGS := -O3 -s -static
@@ -16,15 +16,24 @@ CXXFLAGS += -DFIX_BUGS
 endif
 
 CXXFLAGS += `sdl2-config --cflags`
-LIBS += `sdl2-config --static-libs`
+LIBS += `sdl2-config --static-libs` -lSDL2_ttf -lfreetype -lharfbuzz -lfreetype -lbz2 -lpng -lz -lgraphite2 -lRpcrt4 -lDwrite -lusp10
 
 # For an accurate result to the original's code, compile in alphabetical order
 SOURCES = \
 	Config \
 	Draw \
+	Ending \
+	Flags \
+	Game \
+	Generic \
+	GenericLoad \
 	Input \
 	KeyControl \
 	Main \
+	Map \
+	NpcTbl \
+	TextScr \
+	Triangle \
 
 OBJECTS = $(addprefix obj/$(FILENAME)/, $(addsuffix .o, $(SOURCES)))
 

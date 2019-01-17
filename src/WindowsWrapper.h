@@ -1,6 +1,7 @@
 #pragma once
-#include "CommonDefines.h"
-#include "Draw.h"
+struct RECT
+{
+	int left, top, right, bottom;
+};
 
-extern char gModulePath[PATH_LENGTH];
-extern char gDataPath[PATH_LENGTH];
+bool SystemTask();

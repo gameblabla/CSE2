@@ -1,5 +1,2 @@
 #pragma once
-struct RECT
-{
-	int left, right, top, bottom;
-};
+//This was originally some sort of POSIX standard thing? leftover from the linux port
