@@ -265,7 +265,7 @@ int ModeTitle()
 			ChangeMusic(mus_Safety);
 			break;
 		default:
-			ChangeMusic(mus_Geothermal);//mus_CaveStory);
+			ChangeMusic(mus_CaveStory);
 			break;
 	}
 	
