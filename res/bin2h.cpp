@@ -1,3 +1,6 @@
+//Bin2h by Cucky
+//Converts files to the .h's expected by Cave Story Engine for resources.
+
 #include <stdio.h>
 #include <string>
 #include <string.h>
@@ -12,15 +15,15 @@ int main(int argc, char *argv[])
 	{
 		std::string filename = argv[1];
 
-		// Remove directory if present.
-		// Do this before extension removal incase directory has a period character.
+		//Remove directory if present.
+		//Do this before extension removal incase directory has a period character.
 		const size_t last_slash_idx = filename.find_last_of("\\/");
 		if (std::string::npos != last_slash_idx)
 		{
 			filename.erase(0, last_slash_idx + 1);
 		}
 
-		// Remove extension if present.
+		//Remove extension if present.
 		const size_t period_idx = filename.rfind('.');
 		if (std::string::npos != period_idx)
 		{
