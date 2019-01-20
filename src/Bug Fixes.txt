@@ -1,2 +1,2 @@
-Main.cpp : main(int, char**)
+Main.cpp : void SystemTask()
 	Pixel intended for the second alternate up key to be the plus key, Japanese keyboards have the plus key where the semi-colon key is, causing errors on other keyboard layouts)
