@@ -26,3 +26,4 @@ struct NPC_TABLE
 extern NPC_TABLE *gNpcTable;
 
 bool LoadNpcTable(const char *path);
+void ReleaseNpcTable();

@@ -41,6 +41,13 @@ bool LoadNpcTable(const char *path)
 		fp->read(fp, &gNpcTable[i].hit, 4, 1);
 	for (size_t i = 0; i < npcCount; i++) //view
 		fp->read(fp, &gNpcTable[i].view, 4, 1);
-	
+		
+	SDL_RWclose(fp);	
 	return true;
+}
+
+void ReleaseNpcTable()
+{
+	if (gNpcTable)
+		free(gNpcTable);
 }

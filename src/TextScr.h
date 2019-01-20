@@ -57,3 +57,4 @@ struct TEXT_SCRIPT
 bool InitTextScript2();
 void EndTextScript();
 void EncryptionBinaryData2(uint8_t *pData, int size);
+bool LoadTextScript_Stage(char *name);

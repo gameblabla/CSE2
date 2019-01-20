@@ -191,6 +191,7 @@ bool StartCreditScript()
 	
 	//Clear casts
 	memset(Strip, 0, sizeof(Strip));
+	SDL_RWclose(fp);
 	return true;
 }
 

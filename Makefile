@@ -20,9 +20,11 @@ LIBS += `sdl2-config --static-libs` -lSDL2_ttf -lfreetype -lharfbuzz -lfreetype 
 
 # For an accurate result to the original's code, compile in alphabetical order
 SOURCES = \
+	Back \
 	Config \
 	Draw \
 	Ending \
+	Escape \
 	Flags \
 	Game \
 	Generic \
@@ -31,7 +33,14 @@ SOURCES = \
 	KeyControl \
 	Main \
 	Map \
+	MapName \
+	NpChar \
 	NpcTbl \
+	Organya \
+	PixTone \
+	Profile \
+	Sound \
+	Stage \
 	TextScr \
 	Triangle \
 

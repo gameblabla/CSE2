@@ -9,6 +9,8 @@
 
 #include "Draw.h"
 #include "Input.h"
+#include "Organya.h"
+#include "Sound.h"
 #include "Game.h"
 #include "Config.h"
 #include "KeyControl.h"
@@ -32,9 +34,9 @@ bool bFps;
 bool bActive;
 
 #ifdef JAPANESE
-const char *lpWindowName = "洞窟物語エンジン";
+const char *lpWindowName = "洞窟物語エンジン2";
 #else
-const char *lpWindowName = "Cave Story Engine ~ Doukutsu Monogatari Enjin";
+const char *lpWindowName = "Cave Story Engine 2 ~ Doukutsu Monogatari Enjin 2";
 #endif
 
 int main(int argc, char *argv[])
@@ -212,7 +214,7 @@ int main(int argc, char *argv[])
 			if (Flip_SystemTask())
 			{
 				//Initialize sound
-				//InitDirectSound();
+				InitDirectSound();
 				
 				//Initialize joystick
 				if (config.bJoystick && InitDirectInput())
@@ -229,7 +231,7 @@ int main(int argc, char *argv[])
 				Game();
 				
 				//End stuff
-				//EndDirectSound();
+				EndDirectSound();
 				EndTextObject();
 				EndDirectDraw();
 				
@@ -250,11 +252,11 @@ void InactiveWindow()
 	if (bActive)
 	{
 		bActive = false;
-		//StopOrganyaMusic();
+		StopOrganyaMusic();
 		//SleepNoise();
 	}
 	
-	//PlaySoundObject(7, 0);
+	PlaySoundObject(7, 0);
 }
 
 void ActiveWindow()
@@ -262,12 +264,12 @@ void ActiveWindow()
 	if (!bActive)
 	{
 		bActive = true;
-		//StopOrganyaMusic();
-		//PlayOrganyaMusic();
+		StopOrganyaMusic();
+		PlayOrganyaMusic();
 		//ResetNoise();
 	}
 
-	//PlaySoundObject(7, -1);
+	PlaySoundObject(7, -1);
 }
 
 void JoystickProc()

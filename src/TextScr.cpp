@@ -1,8 +1,10 @@
 #include <stdint.h>
 #include <string>
 
+#include "CommonDefines.h"
 #include "TextScr.h"
 #include "Draw.h"
+#include "Tags.h"
 #include "Game.h"
 
 #define TSC_BUFFER_SIZE 0x5000
@@ -60,4 +62,43 @@ void EncryptionBinaryData2(uint8_t *pData, int size)
 		if ( i != half )
 			pData[i] += val1;
 	}
+}
+
+//Load stage .tsc
+bool LoadTextScript_Stage(char *name)
+{
+	//Open Head.tsc
+	char path[PATH_LENGTH];
+	sprintf(path, "%s/%s", gDataPath, "Head.tsc");
+	
+	SDL_RWops *fp = SDL_RWFromFile(path, "rb");
+	if (!fp)
+		return false;
+	
+	//Read Head.tsc
+	int head_size = SDL_RWsize(fp);
+	
+	fp->read(fp, gTS.data, 1, head_size);
+	EncryptionBinaryData2((uint8_t*)gTS.data, head_size);
+	gTS.data[head_size] = 0;
+	SDL_RWclose(fp);
+	
+	//Open stage's .tsc
+	sprintf(path, "%s/%s", gDataPath, name);
+	
+	fp = SDL_RWFromFile(path, "rb");
+	if (!fp)
+		return false;
+	
+	//Read stage's tsc
+	int body_size = SDL_RWsize(fp);
+	fp->read(fp, &gTS.data[head_size], 1, body_size);
+	EncryptionBinaryData2((uint8_t*)&gTS.data[head_size], body_size);
+	gTS.data[head_size + body_size] = 0;
+	SDL_RWclose(fp);
+	
+	//Set parameters
+	gTS.size = head_size + body_size;
+	strcpy(gTS.path, name);
+	return true;
 }
