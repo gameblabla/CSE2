@@ -15,6 +15,7 @@
 #include "Config.h"
 #include "KeyControl.h"
 #include "Triangle.h"
+#include "Resource.h"
 
 char gModulePath[PATH_LENGTH];
 char gDataPath[PATH_LENGTH];
@@ -198,6 +199,20 @@ int main(int argc, char *argv[])
 		{
 			//Initialize rendering
 			StartDirectDraw();
+			
+			//Load icon
+			SDL_RWops *fp = FindResource("ICON4");
+			
+			if (fp)
+			{
+				SDL_Surface *iconSurf = SDL_LoadBMP_RW(fp, 1);
+				SDL_SetWindowIcon(gWindow, iconSurf);
+				SDL_FreeSurface(iconSurf);
+			}
+			else
+			{
+				printf("Failed to load icon");
+			}
 			
 			//Set rects
 			RECT loading_rect = {0, 0, 64, 8};

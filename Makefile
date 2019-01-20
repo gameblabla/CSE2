@@ -39,6 +39,7 @@ SOURCES = \
 	Organya \
 	PixTone \
 	Profile \
+	Resource \
 	Sound \
 	Stage \
 	TextScr \

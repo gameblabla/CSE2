@@ -75,12 +75,18 @@ SOUNDBUFFER::~SOUNDBUFFER()
 
 void SOUNDBUFFER::Release()
 {
+	if (this == NULL)
+		return;
+	
 	//TODO: find a better and more stable(?) way to handle this function
 	delete this;
 }
 
 void SOUNDBUFFER::Lock(uint8_t **outBuffer, size_t *outSize)
 {
+	if (this == NULL)
+		return;
+	
 	SDL_LockAudioDevice(audioDevice);
 
 	if (outBuffer != nullptr)
@@ -92,11 +98,17 @@ void SOUNDBUFFER::Lock(uint8_t **outBuffer, size_t *outSize)
 
 void SOUNDBUFFER::Unlock()
 {
+	if (this == NULL)
+		return;
+	
 	SDL_UnlockAudioDevice(audioDevice);
 }
 
 void SOUNDBUFFER::SetCurrentPosition(uint32_t dwNewPosition)
 {
+	if (this == NULL)
+		return;
+	
 	SDL_LockAudioDevice(audioDevice);
 	samplePosition = dwNewPosition;
 	SDL_UnlockAudioDevice(audioDevice);
@@ -104,6 +116,9 @@ void SOUNDBUFFER::SetCurrentPosition(uint32_t dwNewPosition)
 
 void SOUNDBUFFER::SetFrequency(uint32_t dwFrequency)
 {
+	if (this == NULL)
+		return;
+	
 	SDL_LockAudioDevice(audioDevice);
 	frequency = (double)dwFrequency;
 	SDL_UnlockAudioDevice(audioDevice);
@@ -118,6 +133,9 @@ float MillibelToVolume(int32_t lVolume)
 
 void SOUNDBUFFER::SetVolume(int32_t lVolume)
 {
+	if (this == NULL)
+		return;
+	
 	SDL_LockAudioDevice(audioDevice);
 	volume = MillibelToVolume(lVolume);
 	SDL_UnlockAudioDevice(audioDevice);
@@ -125,6 +143,9 @@ void SOUNDBUFFER::SetVolume(int32_t lVolume)
 
 void SOUNDBUFFER::SetPan(int32_t lPan)
 {
+	if (this == NULL)
+		return;
+	
 	SDL_LockAudioDevice(audioDevice);
 	volume_l = MillibelToVolume(-lPan);
 	volume_r = MillibelToVolume(lPan);
@@ -133,6 +154,9 @@ void SOUNDBUFFER::SetPan(int32_t lPan)
 
 void SOUNDBUFFER::Play(bool bLooping)
 {
+	if (this == NULL)
+		return;
+	
 	SDL_LockAudioDevice(audioDevice);
 	playing = true;
 	looping = bLooping;
@@ -141,6 +165,9 @@ void SOUNDBUFFER::Play(bool bLooping)
 
 void SOUNDBUFFER::Stop()
 {
+	if (this == NULL)
+		return;
+	
 	SDL_LockAudioDevice(audioDevice);
 	playing = false;
 	SDL_UnlockAudioDevice(audioDevice);
@@ -148,6 +175,9 @@ void SOUNDBUFFER::Stop()
 
 void SOUNDBUFFER::Mix(float *buffer, int len)
 {
+	if (this == NULL)
+		return;
+	
 	if (!playing) //This sound buffer isn't playing
 		return;
 	

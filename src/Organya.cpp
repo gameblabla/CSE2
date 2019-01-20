@@ -9,6 +9,7 @@
 #include "CommonDefines.h"
 #include "Tags.h"
 #include "Organya.h"
+#include "Resource.h"
 #include "Sound.h"
 
 #define PANDUMMY 0xFF
@@ -160,7 +161,7 @@ void ChangeOrganVolume(int no, int32_t volume, int8_t track)
 
 void PlayOrganObject(uint8_t key, int mode, int8_t track, int32_t freq)
 {
-	if(lpORGANBUFFER[track][key/12][key_twin[track]] != NULL)
+	if (lpORGANBUFFER[track][key/12][key_twin[track]] != NULL)
 	{
 		switch(mode)
 		{
@@ -237,13 +238,10 @@ bool InitWaveData100()
 	if (wave_data == NULL)
 		wave_data = (int8_t*)malloc(100 * 0x100);
     
-	char path[PATH_LENGTH];
-	sprintf(path, "%s/WAVE100.bin", gDataPath);
-	
-	SDL_RWops *fp = SDL_RWFromFile(path, "rb");
+	SDL_RWops *fp = FindResource("WAVE100");
 	if (!fp)
 	{
-		printf("Failed to open %s\n", path);
+		printf("Failed to open WAVE100\n");
 		return false;
 	}
 	
@@ -264,7 +262,11 @@ bool DeleteWaveData100()
 bool MakeOrganyaWave(int8_t track, int8_t wave_no)
 {
 	if(wave_no > 99)
+	{
+		printf("WARNING: track %d has out-of-range wave_no %d\n", track, wave_no);
 		return false;
+	}
+	
 	ReleaseOrganyaObject(track);
 	MakeSoundObject8(&wave_data[wave_no * 0x100], track);	
 	return true;
@@ -391,7 +393,7 @@ void SetPlayPointer(int32_t x)
 }
 
 //Load organya file
-void LoadOrganya(char *name)
+void LoadOrganya(const char *name)
 {
 	//Unload previous things
 	OrganyaReleaseNote();
@@ -406,13 +408,12 @@ void LoadOrganya(char *name)
 	memset(now_leng, 0, sizeof(now_leng));
 
 	//Open file
-	char path[PATH_LENGTH];
-	sprintf(path, "%s/Org/%s.org", gDataPath, name);
-	SDL_RWops *fp = SDL_RWFromFile(path, "rb");
+	printf("Loading org %s\n", name);
+	SDL_RWops *fp = FindResource(name);
 
 	if (!fp)
 	{
-		printf("Failed to open.org\nSDL Error: %s\n", SDL_GetError());
+		printf("Failed to open %s\n", name);
 		return;
 	}
 
@@ -431,14 +432,14 @@ void LoadOrganya(char *name)
 		printf("Failed to open.org, invalid version %s", pass_check);
 		return;
 	}
-
+	
 	//Set song information
 	info.wait = SDL_ReadLE16(fp);
 	info.line = SDL_ReadU8(fp);
 	info.dot = SDL_ReadU8(fp);
 	info.repeat_x = SDL_ReadLE32(fp);
 	info.end_x = SDL_ReadLE32(fp);
-
+	
 	for (int i = 0; i < 16; i++) {
 		info.tdata[i].freq = SDL_ReadLE16(fp);
 		info.tdata[i].wave_no = SDL_ReadU8(fp);
@@ -559,6 +560,11 @@ void StopOrganyaMusic()
 	memset(old_key, 255, sizeof(old_key));
     memset(key_on, 0, sizeof(key_on));
     memset(key_twin, 0, sizeof(key_twin));
+}
+
+void SetOrganyaFadeout()
+{
+	bFadeout = true;
 }
 
 //Org timer

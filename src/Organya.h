@@ -39,12 +39,13 @@ struct MUSICINFO {
 bool MakeOrganyaWave(int8_t track, int8_t wave_no);
 void OrganyaPlayData();
 void SetPlayPointer(int32_t x);
-void LoadOrganya(char *name);
+void LoadOrganya(const char *name);
 void SetOrganyaPosition(unsigned int x);
 unsigned int GetOrganyaPosition();
 void PlayOrganyaMusic();
 bool ChangeOrganyaVolume(signed int volume);
 void StopOrganyaMusic();
+void SetOrganyaFadeout();
 void OrganyaStartTimer(unsigned int wait);
 void OrganyaEndTimer();
 void StartOrganya();

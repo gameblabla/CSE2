@@ -144,48 +144,48 @@ bool TransferStage(int no, int w, int x, int y)
 //Music
 const char *gMusicTable[42] =
 {
-	"xxxx",
-	"wanpaku",
-	"anzen",
-	"gameover",
-	"gravity",
-	"weed",
-	"mdown2",
-	"fireeye",
-	"vivi",
-	"mura",
-	"fanfale1",
-	"ginsuke",
-	"cemetery",
-	"plant",
-	"kodou",
-	"fanfale3",
-	"fanfale2",
-	"dr",
-	"escape",
-	"jenka",
-	"maze",
-	"access",
-	"ironh",
-	"grand",
-	"curly",
-	"oside",
-	"requiem",
-	"wanpak2",
-	"quiet",
-	"lastcave",
-	"balcony",
-	"lastbtl",
-	"lastbt3",
-	"ending",
-	"zonbie",
-	"breakdown",
-	"hell",
-	"jenka2",
-	"marine",
-	"ballos",
-	"toroko",
-	"white"
+	"XXXX",
+	"WANPAKU",
+	"ANZEN",
+	"GAMEOVER",
+	"GRAVITY",
+	"WEED",
+	"MDOWN2",
+	"FIREEYE",
+	"VIVI",
+	"MURA",
+	"FANFALE1",
+	"GINSUKE",
+	"CEMETERY",
+	"PLANT",
+	"KODOU",
+	"FANFALE3",
+	"FANFALE2",
+	"DR",
+	"ESCAPE",
+	"JENKA",
+	"MAZE",
+	"ACCESS",
+	"IRONH",
+	"GRAND",
+	"CURLY",
+	"OSIDE",
+	"REQUIEM",
+	"WANPAK2",
+	"QUIET",
+	"LASTCAVE",
+	"BALCONY",
+	"LASTBTL",
+	"LASTBT3",
+	"ENDING",
+	"ZONBIE",
+	"BDOWN",
+	"HELL",
+	"JENKA2",
+	"MARINE",
+	"BALLOS",
+	"TOROKO",
+	"WHITE"
 };
 
 unsigned int gOldPos;
@@ -200,9 +200,7 @@ void ChangeMusic(int no)
     StopOrganyaMusic();
 	
 	//Load .org
-	char *name = (char*)malloc(strlen(gMusicTable[no]) + 1);
-	strcpy(name, gMusicTable[no]);
-    LoadOrganya(name);
+	LoadOrganya(gMusicTable[no]);
 	
 	//Reset position, volume, and then play the song
     ChangeOrganyaVolume(100);
@@ -217,9 +215,7 @@ void ReCallMusic()
 	StopOrganyaMusic();
 	
 	//Load .org that was playing before
-	char *name = (char*)malloc(strlen(gMusicTable[gOldNo]) + 1);
-	strcpy(name, gMusicTable[gOldNo]);
-	LoadOrganya(name);
+	LoadOrganya(gMusicTable[gOldNo]);
 	
 	//Reset position, volume, and then play the song
 	SetOrganyaPosition(gOldPos);

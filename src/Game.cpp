@@ -15,6 +15,7 @@
 #include "Map.h"
 #include "MapName.h"
 #include "Sound.h"
+#include "Organya.h"
 #include "Profile.h"
 #include "Back.h"
 #include "KeyControl.h"
@@ -432,8 +433,8 @@ bool Game()
 			
 			EndMapData();
 			EndTextScript();
-			ReleaseNpcTable();
 			ReleaseStageTable();
+			ReleaseNpcTable();
 			ReleaseCreditScript();
 		}
 		else

@@ -121,8 +121,8 @@ void PutIllust()
 void ReloadIllust(int a)
 {
 	char name[16];
-	sprintf(name, "Credit/Credit%02ld", a);
-	ReloadBitmap_File(name, SURFACE_ID_CREDITS_IMAGE);
+	sprintf(name, "CREDIT%02ld", a);
+	ReloadBitmap_Resource(name, SURFACE_ID_CREDITS_IMAGE);
 }
 
 //Initialize and release credits

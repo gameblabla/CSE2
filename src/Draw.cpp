@@ -12,6 +12,7 @@
 
 #include "Draw.h"
 #include "Tags.h"
+#include "Resource.h"
 
 RECT grcGame = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 RECT grcFull = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
@@ -81,7 +82,7 @@ void ReleaseSurface(int s)
 	}
 }
 
-bool MakeSurface(const char *name, int surf_no)
+bool MakeSurface(SDL_RWops *fp, int surf_no)
 {
 	//Check if surf_no can be used
 	if (surf_no > SURFACE_ID_MAX)
@@ -96,7 +97,7 @@ bool MakeSurface(const char *name, int surf_no)
 	}
 	
 	//Load surface from file
-	SDL_Surface *surface = SDL_LoadBMP(name);
+	SDL_Surface *surface = SDL_LoadBMP_RW(fp, 1);
 	if (!surface)
 	{
 		printf("Couldn't load bitmap for surface id %d\nSDL Error: %s\n", surf_no, SDL_GetError());
@@ -147,19 +148,44 @@ bool MakeSurface(const char *name, int surf_no)
 bool MakeSurface_File(const char *name, int surf_no)
 {
 	char path[PATH_LENGTH];
+	SDL_RWops *fp;
 	
 	//Attempt to load PBM
 	sprintf(path, "%s/%s.pbm", gDataPath, name);
-	printf("Loading surface (as .pbm) from %s for surface id %d\n", path, surf_no);
-	if (MakeSurface(path, surf_no))
-		return true;
+	fp = SDL_RWFromFile(path, "rb");
+	if (fp)
+	{
+		printf("Loading surface (as .pbm) from %s for surface id %d\n", path, surf_no);
+		if (MakeSurface(fp, surf_no))
+			return true;
+	}
 	
 	//Attempt to load BMP
 	sprintf(path, "%s/%s.bmp", gDataPath, name);
-	printf("Loading surface (as .bmp) from %s for surface id %d\n", path, surf_no);
-	if (MakeSurface(path, surf_no))
-		return true;
+	fp = SDL_RWFromFile(path, "rb");
+	if (fp)
+	{
+		printf("Loading surface (as .bmp) from %s for surface id %d\n", path, surf_no);
+		if (MakeSurface(fp, surf_no))
+			return true;
+	}
 	
+	printf("Failed to open file %s\n", name);
+	return false;
+}
+
+bool MakeSurface_Resource(const char *res, int surf_no)
+{
+	SDL_RWops *fp = FindResource(res);
+	
+	if (fp)
+	{
+		printf("Loading surface from resource %s for surface id %d\n", res, surf_no);
+		if (MakeSurface(fp, surf_no))
+			return true;
+	}
+	
+	printf("Failed to open resource %s\n", res);
 	return false;
 }
 
@@ -167,6 +193,12 @@ bool ReloadBitmap_File(const char *name, int surf_no)
 {
 	ReleaseSurface(surf_no);
 	return MakeSurface_File(name, surf_no);
+}
+
+bool ReloadBitmap_Resource(const char *res, int surf_no)
+{
+	ReleaseSurface(surf_no);
+	return MakeSurface_Resource(res, surf_no);
 }
 
 bool MakeSurface_Generic(int bxsize, int bysize, int surf_no)
