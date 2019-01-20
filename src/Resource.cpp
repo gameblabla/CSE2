@@ -47,25 +47,25 @@
 #include "Resource/ORG/XXXX.h"
 #include "Resource/ORG/ZONBIE.h"
 #include "Resource/WAVE/WAVE100.h"
-#include "Resource/Bitmap/CREDIT01.h"
-#include "Resource/Bitmap/CREDIT02.h"
-#include "Resource/Bitmap/CREDIT03.h"
-#include "Resource/Bitmap/CREDIT04.h"
-#include "Resource/Bitmap/CREDIT05.h"
-#include "Resource/Bitmap/CREDIT06.h"
-#include "Resource/Bitmap/CREDIT07.h"
-#include "Resource/Bitmap/CREDIT08.h"
-#include "Resource/Bitmap/CREDIT09.h"
-#include "Resource/Bitmap/CREDIT10.h"
-#include "Resource/Bitmap/CREDIT11.h"
-#include "Resource/Bitmap/CREDIT12.h"
-#include "Resource/Bitmap/CREDIT14.h"
-#include "Resource/Bitmap/CREDIT15.h"
-#include "Resource/Bitmap/CREDIT16.h"
-#include "Resource/Bitmap/CREDIT17.h"
-#include "Resource/Bitmap/CREDIT18.h"
-#include "Resource/Bitmap/PIXEL.h"
-#include "Resource/Icon/ICON4.h"
+#include "Resource/BITMAP/CREDIT01.bmp.h"
+#include "Resource/BITMAP/CREDIT02.bmp.h"
+#include "Resource/BITMAP/CREDIT03.bmp.h"
+#include "Resource/BITMAP/CREDIT04.bmp.h"
+#include "Resource/BITMAP/CREDIT05.bmp.h"
+#include "Resource/BITMAP/CREDIT06.bmp.h"
+#include "Resource/BITMAP/CREDIT07.bmp.h"
+#include "Resource/BITMAP/CREDIT08.bmp.h"
+#include "Resource/BITMAP/CREDIT09.bmp.h"
+#include "Resource/BITMAP/CREDIT10.bmp.h"
+#include "Resource/BITMAP/CREDIT11.bmp.h"
+#include "Resource/BITMAP/CREDIT12.bmp.h"
+#include "Resource/BITMAP/CREDIT14.bmp.h"
+#include "Resource/BITMAP/CREDIT15.bmp.h"
+#include "Resource/BITMAP/CREDIT16.bmp.h"
+#include "Resource/BITMAP/CREDIT17.bmp.h"
+#include "Resource/BITMAP/CREDIT18.bmp.h"
+#include "Resource/BITMAP/PIXEL.bmp.h"
+#include "Resource/ICON/4.bmp.h"
 
 const unsigned char* GetResource(const char *name, size_t *size)
 {
@@ -383,8 +383,8 @@ const unsigned char* GetResource(const char *name, size_t *size)
 	//ICON
 	if (!strcmp(name, "ICON4"))
 	{
-		*size = sizeof(rICON4);
-		return rICON4;
+		*size = sizeof(r4);
+		return r4;
 	}
 	return NULL;
 }
