@@ -16,4 +16,5 @@ make (RELEASE=1 for release build)
 
 
 JAPANESE=1 to enable certain Japanese differences
+
 FIX_BUGS=1 to fix certain bugs (see src/Bug Fixes.txt)
