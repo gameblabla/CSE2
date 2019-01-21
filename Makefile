@@ -133,10 +133,10 @@ src/Resource/%.h: res/% obj/bin2h.exe
 	@echo Converting $<
 	@obj/bin2h.exe $< $@
 
-obj/bin2h.exe: res/bin2h.cpp
+obj/bin2h.exe: res/bin2h.c
 	@mkdir -p $(@D)
 	@echo Compiling $^
-	@g++ -O3 -s -static $^ -o $@
+	@gcc -O3 -s -static $^ -o $@
 
 clean:
 	@rm -rf build obj
