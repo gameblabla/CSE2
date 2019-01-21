@@ -206,8 +206,13 @@ int main(int argc, char *argv[])
 			if (fp)
 			{
 				SDL_Surface *iconSurf = SDL_LoadBMP_RW(fp, 1);
-				SDL_SetWindowIcon(gWindow, iconSurf);
+				SDL_Surface *iconConverted = SDL_ConvertSurfaceFormat(iconSurf, SDL_PIXELFORMAT_RGB888, 0);
 				SDL_FreeSurface(iconSurf);
+				SDL_Surface *iconSurfUpscaled = SDL_CreateRGBSurfaceWithFormat(0, 256, 256, 0, SDL_PIXELFORMAT_RGB888);
+				SDL_LowerBlitScaled(iconConverted, NULL, iconSurfUpscaled, NULL);
+				SDL_FreeSurface(iconConverted);
+				SDL_SetWindowIcon(gWindow, iconSurfUpscaled);
+				SDL_FreeSurface(iconSurfUpscaled);
 			}
 			else
 			{
