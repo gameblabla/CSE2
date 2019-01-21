@@ -17,6 +17,7 @@ struct NOTELIST {
 struct TRACKDATA {
 	uint16_t freq; //Frequency (1000 is default)
 	uint8_t wave_no; //Waveform No.
+	int8_t pipi;
 	uint16_t note_num; //Number of notes
 
 	NOTELIST *note_p;
@@ -36,7 +37,7 @@ struct MUSICINFO {
 	TRACKDATA tdata[16];
 };
 
-bool MakeOrganyaWave(int8_t track, int8_t wave_no);
+bool MakeOrganyaWave(int8_t track, int8_t wave_no, int8_t pipi);
 void OrganyaPlayData();
 void SetPlayPointer(int32_t x);
 void LoadOrganya(const char *name);

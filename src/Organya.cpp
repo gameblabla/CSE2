@@ -38,8 +38,19 @@ bool OrganyaNoteAlloc(uint16_t alloc)
 		info.tdata[j].note_p = new NOTELIST[alloc];
 		
 		if(info.tdata[j].note_p == NULL)
+		{
+			for(int i = 0; i < MAXTRACK; i++)
+			{
+				if(info.tdata[i].note_p != NULL)
+				{
+					delete[] info.tdata[i].note_p;
+					info.tdata[j].note_p = NULL;	// Uses j instead of i
+				}
+			}
+
 			return false;
-		
+		}
+
 		for(int i = 0; i < alloc; i++)
 		{
 			(info.tdata[j].note_p + i)->from = NULL;
@@ -52,9 +63,11 @@ bool OrganyaNoteAlloc(uint16_t alloc)
 	}
 	
 	for(int j = 0; j < MAXMELODY; j++)
-		MakeOrganyaWave(j, info.tdata[j].wave_no);
+		MakeOrganyaWave(j, info.tdata[j].wave_no, info.tdata[j].pipi);
 	//for(int j = 0; j < MAXDRAM; j++)
 	//	InitDramObject(j);
+
+	//this->track = 0;
 
 	return true;
 }
@@ -64,7 +77,10 @@ void OrganyaReleaseNote()
 	for(int i = 0; i < MAXTRACK; i++)
 	{
 		if(info.tdata[i].note_p != NULL)
-			delete info.tdata[i].note_p;
+		{
+			delete info.tdata[i].note_p;	// should be delete[]
+			info.tdata[i].note_p = NULL;
+		}
 	}
 }
 
@@ -86,20 +102,20 @@ OCTWAVE oct_wave[8] = {
 	{   8,128, 32 }, //7 Oct
 };
 
-bool MakeSoundObject8(int8_t *wavep, int8_t track)
+bool MakeSoundObject8(int8_t *wavep, int8_t track, int8_t pipi)
 {
 	for (int j = 0; j < 8; j++)
 	{
 		for (int k = 0; k < 2; k++)
 		{
 			size_t wave_size = oct_wave[j].wave_size;
-			size_t data_size = wave_size;
+			size_t data_size = pipi ? wave_size * oct_wave[j].oct_size : wave_size;
 			
 			//Create sound buffer
 			lpORGANBUFFER[track][j][k] = new SOUNDBUFFER(data_size);
 			
 			//Get wave data
-			uint8_t *wp = (uint8_t*)malloc(data_size);
+			uint8_t *wp = new uint8_t[data_size];
 			uint8_t *wp_sub = wp;
 			size_t wav_tp = 0;
 			
@@ -122,6 +138,8 @@ bool MakeSoundObject8(int8_t *wavep, int8_t track)
 			lpORGANBUFFER[track][j][k]->Lock(&buf, NULL);
 			memcpy(buf, wp, data_size);
 			lpORGANBUFFER[track][j][k]->Unlock();
+			lpORGANBUFFER[track][j][k]->SetCurrentPosition(0);
+			delete[] wp;
 		}
 	}
 	
@@ -129,14 +147,14 @@ bool MakeSoundObject8(int8_t *wavep, int8_t track)
 }
 
 //Playing melody tracks
-double freq_tbl[12] = { 261.62556530060, 277.18263097687, 293.66476791741, 311.12698372208, 329.62755691287, 349.22823143300, 369.99442271163, 391.99543598175, 415.30469757995, 440.00000000000, 466.16376151809, 493.88330125612 };
+short freq_tbl[12] = { 262,277,294,311,330,349,370,392,415,440,466,494 };
 
 void ChangeOrganFrequency(uint8_t key, uint8_t track, int32_t a)
 {
 	for (int j = 0; j < 8; j++)
 	{
 		for (int i = 0; i < 2; i++) {
-			double tmpDouble = (((double)oct_wave[j].wave_size * freq_tbl[key]) * (double)oct_wave[j].oct_par) / 8.00f + ((double)a - 1000.0f);
+			int64_t tmpDouble = ((oct_wave[j].wave_size * freq_tbl[key]) * oct_wave[j].oct_par) / 8 + (a - 1000);
 			lpORGANBUFFER[track][j][i]->SetFrequency(tmpDouble);
 		}
 	}
@@ -166,8 +184,11 @@ void PlayOrganObject(uint8_t key, int mode, int8_t track, int32_t freq)
 		switch(mode)
 		{
 			case 0:
-				lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]]->Stop();
-				lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]]->SetCurrentPosition(0);
+				if (old_key[track] != 0xFF)
+				{
+					lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]]->Stop();
+					lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]]->SetCurrentPosition(0);
+				}
 				break;
 			
 			case 1:
@@ -231,35 +252,25 @@ void ReleaseOrganyaObject(int8_t track)
 }
 
 //Handling WAVE100
-int8_t *wave_data = NULL;
+int8_t wave_data[100][0x100];
 
 bool InitWaveData100()
 {
-	if (wave_data == NULL)
-		wave_data = (int8_t*)malloc(100 * 0x100);
-    
 	SDL_RWops *fp = FindResource("WAVE100");
-	if (!fp)
+	if (fp == NULL)
 	{
 		printf("Failed to open WAVE100\n");
 		return false;
 	}
-	
-	for (int i = 0; i < 100 * 0x100; i++)
-		wave_data[i] = SDL_ReadU8(fp);
-	
+
+	fp->read(fp, wave_data, 1, 100 * 0x100);
+
 	SDL_RWclose(fp);
 	return true;
 }
 
-bool DeleteWaveData100()
-{
-	free(wave_data);
-	return true;
-}
-
 //Create org wave
-bool MakeOrganyaWave(int8_t track, int8_t wave_no)
+bool MakeOrganyaWave(int8_t track, int8_t wave_no, int8_t pipi)
 {
 	if(wave_no > 99)
 	{
@@ -268,7 +279,7 @@ bool MakeOrganyaWave(int8_t track, int8_t wave_no)
 	}
 	
 	ReleaseOrganyaObject(track);
-	MakeSoundObject8(&wave_data[wave_no * 0x100], track);	
+	MakeSoundObject8(wave_data[wave_no], track, pipi);
 	return true;
 }
 
@@ -443,7 +454,8 @@ void LoadOrganya(const char *name)
 	for (int i = 0; i < 16; i++) {
 		info.tdata[i].freq = SDL_ReadLE16(fp);
 		info.tdata[i].wave_no = SDL_ReadU8(fp);
-		SDL_ReadU8(fp);
+		const int8_t pipi = SDL_ReadU8(fp);
+		info.tdata[i].pipi = ver == 1 ? 0 : pipi;
 		info.tdata[i].note_num = SDL_ReadLE16(fp);
 	}
 
@@ -510,7 +522,7 @@ void LoadOrganya(const char *name)
 
 	//Create waves
 	for (int j = 0; j < 8; j++)
-		MakeOrganyaWave(j, info.tdata[j].wave_no);
+		MakeOrganyaWave(j, info.tdata[j].wave_no, info.tdata[j].pipi);
 
 	//Reset position
 	SetPlayPointer(0);
@@ -558,8 +570,8 @@ void StopOrganyaMusic()
 		PlayOrganObject(0, 2, i, 0);
 	
 	memset(old_key, 255, sizeof(old_key));
-    memset(key_on, 0, sizeof(key_on));
-    memset(key_twin, 0, sizeof(key_twin));
+	memset(key_on, 0, sizeof(key_on));
+	memset(key_twin, 0, sizeof(key_twin));
 }
 
 void SetOrganyaFadeout()
@@ -631,7 +643,6 @@ void EndOrganya()
 	
 	//Release everything related to org
 	OrganyaReleaseNote();
-	DeleteWaveData100();
 	
 	for (int i = 0; i < MAXMELODY; i++)
 		ReleaseOrganyaObject(i);
