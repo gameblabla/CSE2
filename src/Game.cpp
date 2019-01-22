@@ -9,6 +9,7 @@
 #include "Generic.h"
 #include "GenericLoad.h"
 #include "TextScr.h"
+#include "Fade.h"
 #include "Flags.h"
 #include "Escape.h"
 #include "Stage.h"
@@ -85,13 +86,13 @@ int ModeOpening()
 	//InitNpChar();
 	//InitCaret();
 	//InitStar();
-	//InitFade();
+	InitFade();
 	//InitFlash();
 	//InitBossLife();
 	ChangeMusic(0);
 	TransferStage(72, 100, 3, 3);
 	//SetFrameTargetMyChar(16);
-	//SetFadeMask();
+	SetFadeMask();
 	
 	//Reset cliprect and flags
 	grcGame.left = 0;
@@ -109,7 +110,7 @@ int ModeOpening()
 		GetTrg();
 		
 		//Escape menu
-		if (gKey & 0x8000)
+		if (gKey & KEY_ESCAPE)
 		{
 			int escRet = Call_Escape();
 			if (escRet == 0)
@@ -119,7 +120,7 @@ int ModeOpening()
 		}
 		
 		//Skip intro if OK is pressed
-		if ( gKey & gKeyOk )
+		if (gKey & gKeyOk)
 			break;
 		
 		//Update everything
@@ -135,7 +136,7 @@ int ModeOpening()
 		//HitBossBullet();
 		//ActCaret();
 		//MoveFrame3();
-		//ProcFade();
+		ProcFade();
 		
 		//Draw everything
 		CortBox(&grcFull, 0x000000);
@@ -151,7 +152,7 @@ int ModeOpening()
 		PutStage_Front(frame_x, frame_y);
 		//PutFront(frame_x, frame_y);
 		//PutCaret(frame_x, frame_y);
-		//PutFade();
+		PutFade();
 		
 		//Update Text Script
 		//int tscRet = TextScriptProc();
@@ -159,7 +160,7 @@ int ModeOpening()
 		//	return 0;
 		//if (tscRet == 2)
 		//	return 1;
-		
+	
 		PutMapName(false);
 		//PutTextScript();
 		//PutFramePerSecound();
@@ -299,7 +300,7 @@ int ModeTitle()
 				break;
 		}
 		
-		if (gKey & 0x8000)
+		if (gKey & KEY_ESCAPE)
 		{
 			int escRet = Call_Escape();
 			if (escRet == 0)

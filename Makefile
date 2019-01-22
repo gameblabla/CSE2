@@ -25,6 +25,7 @@ SOURCES = \
 	Draw \
 	Ending \
 	Escape \
+	Fade \
 	Flags \
 	Game \
 	Generic \

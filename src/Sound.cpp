@@ -10,7 +10,7 @@
 #include "PixTone.h"
 
 #define FREQUENCY 44100
-#define STREAM_SIZE (FREQUENCY / 100)
+#define STREAM_SIZE (FREQUENCY / 200)
 
 #define clamp(x, y, z) ((x > z) ? z : (x < y) ? y : x)
 
