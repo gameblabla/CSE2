@@ -2,6 +2,25 @@
 #include <stdint.h>
 #include "WindowsWrapper.h"
 
+enum NPC_flags
+{
+	npc_solidSoft = 0x1, //Pushes quote out
+	npc_ignore44 = 0x2, //Ignores tile 44 (No NPC)
+	npc_invulnerable = 0x4, //Can't get hit
+	npc_ignoreSolid = 0x8, //Doesn't collide with anything
+	npc_bouncy = 0x10, //Quote bounces on the top
+	npc_shootable = 0x20, //Can be shot
+	npc_solidHard = 0x40, //Essentially acts as level tiles
+	npc_rearTop = 0x80, //Rear and top don't hurt
+	npc_eventTouch = 0x100, //Run event when touched
+	npc_eventDie = 0x200, //Run event when killed
+	npc_appearSet = 0x800, //Only appear when flag is set
+	npc_altDir = 0x1000, //Spawn facing to the right (or however the npc interprets the direction as)
+	npc_interact = 0x2000, //Run event when interacted with
+	npc_hideSet = 0x4000, //Hide when flag is set
+	npc_showDamage = 0x8000, //Show #Damage taken
+};
+
 struct NPCHAR
 {
 	uint8_t cond;
@@ -40,4 +59,19 @@ struct NPCHAR
 	NPCHAR *pNpc;
 };
 
+struct EVENT
+{
+  int16_t x;
+  int16_t y;
+  int16_t code_flag;
+  int16_t code_event;
+  int16_t code_char;
+  uint16_t bits;
+};
+
+void InitNpChar();
 bool LoadEvent(char *path_event);
+void SetNpChar(int code_char, int x, int y, int xm, int ym, int dir, NPCHAR *npc, int start_index);
+void SetDestroyNpChar(int x, int y, int w, int num);
+void SetDestroyNpCharUp(int x, int y, int w, int num);
+void SetExpObjects(int x, int y, int exp);

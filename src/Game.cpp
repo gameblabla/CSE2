@@ -6,6 +6,7 @@
 
 #include "Tags.h"
 #include "NpcTbl.h"
+#include "NpChar.h"
 #include "Generic.h"
 #include "GenericLoad.h"
 #include "TextScr.h"
@@ -84,7 +85,7 @@ void PutNumber4(int x, int y, int value, bool bZero)
 
 int ModeOpening()
 {
-	//InitNpChar();
+	InitNpChar();
 	//InitCaret();
 	//InitStar();
 	InitFade();

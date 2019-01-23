@@ -1,7 +1,18 @@
 #pragma once
 struct RECT
 {
-	int left, top, right, bottom;
+	union
+	{
+		int left;
+		int front;
+	};
+	int top;
+	union
+	{
+		int right;
+		int back;
+	};
+	int bottom;
 };
 
 bool SystemTask();
