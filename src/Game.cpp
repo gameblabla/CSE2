@@ -14,6 +14,7 @@
 #include "Escape.h"
 #include "Stage.h"
 #include "Map.h"
+#include "Main.h"
 #include "MapName.h"
 #include "Sound.h"
 #include "Organya.h"
@@ -163,7 +164,7 @@ int ModeOpening()
 	
 		PutMapName(false);
 		//PutTextScript();
-		//PutFramePerSecound();
+		PutFramePerSecound();
 		
 		if (!Flip_SystemTask())
 			return 0;
@@ -175,7 +176,7 @@ int ModeOpening()
 	while (SDL_GetTicks() < wait + 500)
 	{
 		CortBox(&grcGame, 0x000000);
-		//PutFramePerSecound();
+		PutFramePerSecound();
 		if (!Flip_SystemTask())
 			return 0;
 	}
@@ -327,10 +328,10 @@ int ModeTitle()
 		CortBox(&grcGame, 0x202020);
 		
 		//Draw version
-		int v1, v2, v3, v4;
 		PutBitmap3(&grcGame, 100, 216, &rcVersion, SURFACE_ID_TEXT_BOX);
 		PutBitmap3(&grcGame, 156, 216, &rcPeriod, SURFACE_ID_TEXT_BOX);
 		
+		int v1, v2, v3, v4;
 		GetCompileVersion(&v1, &v2, &v3, &v4);
 		PutNumber4(140, 216, v1, 0);
 		PutNumber4(156, 216, v2, 0);
@@ -385,7 +386,7 @@ int ModeTitle()
 		//if (time_counter)
 		//	PutTimeCounter(16, 8);
 	
-		//PutFramePerSecound();
+		PutFramePerSecound();
 		
 		if (!Flip_SystemTask())
 			return 0;
@@ -399,7 +400,7 @@ int ModeTitle()
 	while (SDL_GetTicks() < wait + 1000)
 	{
 		CortBox(&grcGame, 0);
-		//PutFramePerSecound();
+		PutFramePerSecound();
 		if (!Flip_SystemTask())
 			return 0;
 	}

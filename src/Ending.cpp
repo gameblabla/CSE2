@@ -8,6 +8,8 @@
 #include "Generic.h"
 #include "Ending.h"
 #include "Flags.h"
+#include "Organya.h"
+#include "Stage.h"
 #include "Draw.h"
 #include "TextScr.h"
 
@@ -273,7 +275,7 @@ void ActionCredit_Read()
 				
 			case '~': //Start fading out music
 				++Credit.offset;
-				//SetOrganyaFadeout();
+				SetOrganyaFadeout();
 				return;
 				
 			case 'f': //Flag jump
@@ -326,7 +328,7 @@ void ActionCredit_Read()
 			case '!': //Change music
 				a = GetScriptNumber(&Credit.pData[++Credit.offset]);
 				Credit.offset += 4;
-				//ChangeMusic(a);
+				ChangeMusic(a);
 				return;
 		}
 		

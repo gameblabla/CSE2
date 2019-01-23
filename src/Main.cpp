@@ -12,6 +12,8 @@
 #include "Organya.h"
 #include "Sound.h"
 #include "Game.h"
+#include "Generic.h"
+#include "Main.h"
 #include "Config.h"
 #include "KeyControl.h"
 #include "Triangle.h"
@@ -28,17 +30,50 @@ int gWindowScale;
 SDL_Window *gWindow;
 SDL_Renderer *gRenderer;
 
-bool gbUseJoystick;
-bool bFullscreen;
-bool bFps;
+bool gbUseJoystick = false;
+bool bFullscreen = false;
+bool bFps = false;
 
-bool bActive;
+bool bActive = true;
 
 #ifdef JAPANESE
 const char *lpWindowName = "洞窟物語エンジン2";
 #else
 const char *lpWindowName = "Cave Story Engine 2 ~ Doukutsu Monogatari Enjin 2";
 #endif
+
+void PutFramePerSecound()
+{
+	if (bFps)
+		PutNumber4(WINDOW_WIDTH - 40, 8, GetFramePerSecound(), false);
+}
+
+int GetFramePerSecound()
+{
+	unsigned int current_tick;
+	static bool need_new_base_tick = true;
+	static int frames_this_second;
+	static int current_frame;
+	static int base_tick;
+
+	if (need_new_base_tick)
+	{
+		base_tick = SDL_GetTicks();
+		need_new_base_tick = false;
+	}
+	
+	current_tick = SDL_GetTicks();
+	++current_frame;
+	
+	if ( base_tick + 1000 <= current_tick )
+	{
+		base_tick += 1000;
+		frames_this_second = current_frame;
+		current_frame = 0;
+	}
+	
+	return frames_this_second;
+}
 
 int main(int argc, char *argv[])
 {
@@ -199,6 +234,10 @@ int main(int argc, char *argv[])
 		{
 			//Initialize rendering
 			StartDirectDraw();
+			
+			//Check debug things
+			if (CheckFileExists("fps"))
+				bFps = true;
 			
 			//Load icon
 			SDL_RWops *fp = FindResource("ICON4");

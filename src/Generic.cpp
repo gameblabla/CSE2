@@ -1,4 +1,8 @@
 #include <stdint.h>
+#include <stdio.h>
+
+#include "CommonDefines.h"
+#include "Tags.h"
 
 bool GetCompileVersion(int *v1, int *v2, int *v3, int *v4)
 {
@@ -7,6 +11,21 @@ bool GetCompileVersion(int *v1, int *v2, int *v3, int *v4)
 	*v3 = 0;
 	*v4 = 6;
 	return true;
+}
+
+bool CheckFileExists(const char *name)
+{
+	char path[PATH_LENGTH];
+	sprintf(path, "%s\\%s", gModulePath, name);
+	
+	FILE *file = fopen(path, "rb");
+	if (file)
+	{
+		fclose(file);
+		return true;
+	}
+	
+	return false;
 }
 
 bool IsShiftJIS(uint8_t c)

@@ -65,6 +65,7 @@
 #include "Resource/BITMAP/CREDIT17.bmp.h"
 #include "Resource/BITMAP/CREDIT18.bmp.h"
 #include "Resource/BITMAP/PIXEL.bmp.h"
+#include "Resource/BITMAP/PIXEL_JP.bmp.h"
 #include "Resource/ICON/4.bmp.h"
 
 const unsigned char* GetResource(const char *name, size_t *size)
@@ -378,6 +379,11 @@ const unsigned char* GetResource(const char *name, size_t *size)
 	{
 		*size = sizeof(rPIXEL);
 		return rPIXEL;
+	}
+	if (!strcmp(name, "PIXEL_JP"))
+	{
+		*size = sizeof(rPIXEL_JP);
+		return rPIXEL_JP;
 	}
 	
 	//ICON
