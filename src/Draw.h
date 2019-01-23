@@ -46,7 +46,6 @@ enum Surface_Ids
 struct SURFACE
 {
 	SDL_Texture *texture;
-	bool scale;
 };
 
 extern SURFACE surf[SURFACE_ID_MAX];

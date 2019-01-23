@@ -119,7 +119,7 @@ bool MakeSurface(SDL_RWops *fp, int surf_no)
 	int w, h;
 	SDL_QueryTexture(texture, NULL, NULL, &w, &h);
 
-	SDL_Texture *textureAccessible = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, w, h);
+	SDL_Texture *textureAccessible = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, w * gWindowScale, h * gWindowScale);
 	
 	if (!textureAccessible)
 	{
@@ -135,7 +135,6 @@ bool MakeSurface(SDL_RWops *fp, int surf_no)
 	
 	//Set surface's metadata
 	surf[surf_no].texture = textureAccessible;
-	surf[surf_no].scale = true;
 	
 	//Free surface and texture
 	SDL_DestroyTexture(texture);
@@ -216,9 +215,6 @@ bool MakeSurface_Generic(int bxsize, int bysize, int surf_no)
 	}
 	
 	SDL_SetTextureBlendMode(surf[surf_no].texture, SDL_BLENDMODE_BLEND);
-	
-	//Set metadata
-	surf[surf_no].scale = false;
 	return true;
 }
 
@@ -258,13 +254,11 @@ void PutBitmap3(RECT *rcView, int x, int y, RECT *rect, int surf_no) //Transpare
 	//Get SDL_Rects
 	SDL_Rect clipRect = RectToSDLRect(rcView);
 	
-	int scale = surf[surf_no].scale ? 1 : gWindowScale;
 	SDL_Rect frameRect = RectToSDLRect(rect);
-	frameRect = {frameRect.x * scale, frameRect.y * scale, frameRect.w * scale, frameRect.h * scale};
+	frameRect = {frameRect.x * gWindowScale, frameRect.y * gWindowScale, frameRect.w * gWindowScale, frameRect.h * gWindowScale};
 	
 	//Get dest rect
-	scale = surf[surf_no].scale ? gWindowScale : 1;
-	SDL_Rect destRect = {x * gWindowScale, y * gWindowScale, frameRect.w * scale, frameRect.h * scale};
+	SDL_Rect destRect = {x * gWindowScale, y * gWindowScale, frameRect.w, frameRect.h};
 	
 	//Set cliprect
 	clipRect = {clipRect.x * gWindowScale, clipRect.y * gWindowScale, clipRect.w * gWindowScale, clipRect.h * gWindowScale};
@@ -283,13 +277,11 @@ void PutBitmap4(RECT *rcView, int x, int y, RECT *rect, int surf_no) //No Transp
 	//Get SDL_Rects
 	SDL_Rect clipRect = RectToSDLRect(rcView);
 	
-	int scale = surf[surf_no].scale ? 1 : gWindowScale;
 	SDL_Rect frameRect = RectToSDLRect(rect);
-	frameRect = {frameRect.x * scale, frameRect.y * scale, frameRect.w * scale, frameRect.h * scale};
+	frameRect = {frameRect.x * gWindowScale, frameRect.y * gWindowScale, frameRect.w * gWindowScale, frameRect.h * gWindowScale};
 	
 	//Get dest rect
-	scale = surf[surf_no].scale ? gWindowScale : 1;
-	SDL_Rect destRect = {x * gWindowScale, y * gWindowScale, frameRect.w * scale, frameRect.h * scale};
+	SDL_Rect destRect = {x * gWindowScale, y * gWindowScale, frameRect.w, frameRect.h};
 	
 	//Set cliprect
 	clipRect = {clipRect.x * gWindowScale, clipRect.y * gWindowScale, clipRect.w * gWindowScale, clipRect.h * gWindowScale};
@@ -315,7 +307,7 @@ void PutBitmap4(RECT *rcView, int x, int y, RECT *rect, int surf_no) //No Transp
 void Surface2Surface(int x, int y, RECT *rect, int to, int from)
 {
 	//Get rects
-	SDL_Rect rcSet = {x, y, x + rect->right - rect->left, y + rect->bottom - rect->top};
+	SDL_Rect rcSet = {x * gWindowScale, y * gWindowScale, (x + rect->right - rect->left) * gWindowScale, (y + rect->bottom - rect->top) * gWindowScale};
 	SDL_Rect frameRect = RectToSDLRect(rect);
 	frameRect = {frameRect.x * gWindowScale, frameRect.y * gWindowScale, frameRect.w * gWindowScale, frameRect.h * gWindowScale};
 	
