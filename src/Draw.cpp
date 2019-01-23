@@ -206,7 +206,7 @@ bool MakeSurface_Generic(int bxsize, int bysize, int surf_no)
 	ReleaseSurface(surf_no);
 	
 	//Create surface
-	surf[surf_no].texture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, bxsize * gWindowScale, bysize * gWindowScale);
+	surf[surf_no].texture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, bxsize * gWindowScale, bysize * gWindowScale);
 	
 	if (!surf[surf_no].texture)
 	{
@@ -231,7 +231,7 @@ void BackupSurface(int surf_no, RECT *rect)
 	SDL_GetRendererOutputSize(gRenderer, &w, &h);
 
 	//Get texture of what's currently rendered on screen
-	SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormat(SDL_TEXTUREACCESS_TARGET, w, h, 0, SDL_PIXELFORMAT_RGB888);
+	SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormat(0, w, h, 0, SDL_PIXELFORMAT_RGBA32);
 	SDL_RenderReadPixels(gRenderer, nullptr, SDL_PIXELFORMAT_RGBA32, surface->pixels, surface->pitch);
 
 	SDL_Texture *screenTexture = SDL_CreateTextureFromSurface(gRenderer, surface);
@@ -247,6 +247,8 @@ void BackupSurface(int surf_no, RECT *rect)
 	SDL_SetRenderTarget(gRenderer, surf[surf_no].texture);
 	SDL_RenderCopy(gRenderer, screenTexture, &frameRect, &destRect);
 	SDL_SetRenderTarget(gRenderer, NULL);
+
+	SDL_DestroyTexture(screenTexture);
 }
 
 void PutBitmap3(RECT *rcView, int x, int y, RECT *rect, int surf_no) //Transparency
