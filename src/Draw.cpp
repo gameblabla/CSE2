@@ -7,10 +7,11 @@
 #include <SDL_render.h>
 #include <SDL_rwops.h>
 #include <SDL_timer.h>
-#include <SDL_ttf.h>
+
 #include "WindowsWrapper.h"
 
 #include "Draw.h"
+#include "Font.h"
 #include "Tags.h"
 #include "Resource.h"
 
@@ -19,8 +20,7 @@ RECT grcFull = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
 SURFACE surf[SURFACE_ID_MAX];
 
-TTF_Font *gFont;
-double gFontXStretch; //This is something normally done by DirectX, but... well... we're not using DirectX.
+FontObject *gFont;
 
 #define FRAMERATE 20
 
@@ -206,7 +206,7 @@ bool MakeSurface_Generic(int bxsize, int bysize, int surf_no)
 	ReleaseSurface(surf_no);
 	
 	//Create surface
-	surf[surf_no].texture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, bxsize * gWindowScale, bysize * gWindowScale);
+	surf[surf_no].texture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, bxsize * gWindowScale, bysize * gWindowScale);
 	
 	if (!surf[surf_no].texture)
 	{
@@ -231,7 +231,7 @@ void BackupSurface(int surf_no, RECT *rect)
 	SDL_GetRendererOutputSize(gRenderer, &w, &h);
 
 	//Get texture of what's currently rendered on screen
-	SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormat(SDL_TEXTUREACCESS_TARGET, w, h, 0, SDL_PIXELFORMAT_RGB888);
+	SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormat(0, w, h, 0, SDL_PIXELFORMAT_RGBA32);
 	SDL_RenderReadPixels(gRenderer, nullptr, SDL_PIXELFORMAT_RGBA32, surface->pixels, surface->pitch);
 
 	SDL_Texture *screenTexture = SDL_CreateTextureFromSurface(gRenderer, surface);
@@ -247,6 +247,8 @@ void BackupSurface(int surf_no, RECT *rect)
 	SDL_SetRenderTarget(gRenderer, surf[surf_no].texture);
 	SDL_RenderCopy(gRenderer, screenTexture, &frameRect, &destRect);
 	SDL_SetRenderTarget(gRenderer, NULL);
+
+	SDL_DestroyTexture(screenTexture);
 }
 
 void PutBitmap3(RECT *rcView, int x, int y, RECT *rect, int surf_no) //Transparency
@@ -369,140 +371,43 @@ void CortBox2(RECT *rect, uint32_t col, int surf_no)
 
 void InitTextObject()
 {
-	//Initialize SDL_TTF
-	if(!TTF_WasInit() && TTF_Init() < 0)
-	{
-		printf("TTF_Init: %s\n", TTF_GetError());
-		return;
-	}
-	
-	//If font already exists, delete
-	if (gFont)
-		TTF_CloseFont(gFont);
-	
 	//Get font size
 	unsigned int fontWidth, fontHeight;
 	if (gWindowScale == 1)
 	{
-		fontWidth = 5;
-		fontHeight = 10;
+		fontWidth = 6;
+		fontHeight = 12;
 	}
 	else
 	{
 		fontWidth = 5 * gWindowScale;
-		fontHeight = 8 * gWindowScale + (gWindowScale >> 1);
+		fontHeight = 10 * gWindowScale;
 	}
 	
 	//Open Font.ttf
 	char path[PATH_LENGTH];
-	sprintf(path, "%s/Font.ttf", gDataPath);
-	
-	gFont = TTF_OpenFont(path, fontHeight);
-	if(!gFont)
-	{
-		printf("TTF_OpenFont: %s\n", TTF_GetError());
-		return;
-	}
-	
-	//Get the average width of the font, and make it so the average width is the font width above.
-	char string[0xE1];
-	for (int i = 0; i < 0xE0; i++)
-		string[i] = i + 0x20;
-	string[0xE1] = 0;
-	
-	int width, height;
-	if (TTF_SizeText(gFont, string, &width, &height))
-	{
-		printf("TTF_SizeText: %s\n", TTF_GetError());
-		return;
-	}
-	
-	gFontXStretch = (double)fontWidth / ((double)width / (double)0xE0);
+#ifdef JAPANESE
+	sprintf(path, "%s/msgothic.ttc", gDataPath);
+#else
+	sprintf(path, "%s/cour.ttf", gDataPath);
+#endif
+
+	gFont = LoadFont(fontWidth, fontHeight, path);
 }
 
 void PutText(int x, int y, const char *text, uint32_t color)
 {
-	SDL_Color textColor = {(uint8_t)((color & 0xFF0000) >> 16), (uint8_t)((color & 0xFF00) >> 8), (uint8_t)(color & 0xFF)};
-	SDL_Color backColor = {0, 0, 0};
-	
-	//Draw text
-	SDL_Surface *textSurface = TTF_RenderText_Shaded(gFont, text, textColor, backColor);
-	
-	if (!textSurface)
-	{
-		printf("TTF_RenderText_Shaded: %s\n", TTF_GetError());
-		return;
-	}
-	
-	SDL_SetColorKey(textSurface, SDL_TRUE, 0x000000);
-	
-	//Convert to texture
-	SDL_Texture *textTexture = SDL_CreateTextureFromSurface(gRenderer, textSurface);
-	
-	if (!textTexture)
-	{
-		printf("Failed to convert SDL_Surface to SDL_Texture to draw text: %s\nTTF Error: %s\n", text, TTF_GetError());
-		return;
-	}
-	
-	//Draw to screen
-	SDL_Rect destRect = {x * gWindowScale, y * gWindowScale, (int)(textSurface->w * gFontXStretch), textSurface->h};
-	SDL_RenderCopy(gRenderer, textTexture, NULL, &destRect);
-	
-	//Destroy surface and texture
-	SDL_FreeSurface(textSurface);
-	SDL_DestroyTexture(textTexture);
+	DrawText(gFont, gRenderer, NULL, x * gWindowScale, y * gWindowScale, color, text, strlen(text));
 }
 
 void PutText2(int x, int y, const char *text, uint32_t color, int surf_no)
 {
-	SDL_Color textColor = {(uint8_t)((color & 0xFF0000) >> 16), (uint8_t)((color & 0xFF00) >> 8), (uint8_t)(color & 0xFF)};
-	SDL_Color backColor = {0, 0, 0};
-	
-	//Draw text
-	SDL_Surface *textSurface = TTF_RenderText_Shaded(gFont, text, textColor, backColor);
-	
-	if (!textSurface)
-	{
-		printf("TTF_RenderText_Shaded: %s\n", TTF_GetError());
-		return;
-	}
-	
-	SDL_SetColorKey(textSurface, SDL_TRUE, 0x000000);
-	
-	//Convert to texture
-	SDL_Texture *textTexture = SDL_CreateTextureFromSurface(gRenderer, textSurface);
-	
-	if (!textTexture)
-	{
-		printf("Failed to convert SDL_Surface to SDL_Texture to draw text: %s\nTTF Error: %s\n", text, TTF_GetError());
-		return;
-	}
-	
-	//Target surface
-	if (!surf[surf_no].texture)
-	{
-		printf("Tried to draw text to surface %s, which doesn't exist\n", surf_no);
-		return;
-	}
-	
-	SDL_SetRenderTarget(gRenderer, surf[surf_no].texture);
-	
-	//Draw to screen
-	SDL_Rect destRect = {x * gWindowScale, y * gWindowScale, (int)(textSurface->w * gFontXStretch), textSurface->h};
-	SDL_RenderCopy(gRenderer, textTexture, NULL, &destRect);
-	
-	//Destroy surface and texture
-	SDL_FreeSurface(textSurface);
-	SDL_DestroyTexture(textTexture);
-	
-	//Stop targetting surface
-	SDL_SetRenderTarget(gRenderer, NULL);
+	DrawText(gFont, gRenderer, surf[surf_no].texture, x * gWindowScale, y * gWindowScale, color, text, strlen(text));
 }
 
 void EndTextObject()
 {
 	//Destroy font
-	TTF_CloseFont(gFont);
+	UnloadFont(gFont);
 	gFont = nullptr;
 }
