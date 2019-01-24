@@ -15,8 +15,8 @@ ifeq ($(FIX_BUGS), 1)
 CXXFLAGS += -DFIX_BUGS
 endif
 
-CXXFLAGS += `sdl2-config --cflags`
-LIBS += `sdl2-config --static-libs` -lSDL2_ttf -lfreetype -lharfbuzz -lfreetype -lbz2 -lpng -lz -lgraphite2 -lRpcrt4 -lDwrite -lusp10
+CXXFLAGS += `sdl2-config --cflags` `pkg-config freetype2 --cflags`
+LIBS += `sdl2-config --static-libs` -lfreetype -lharfbuzz -lfreetype -lbz2 -lpng -lz -lgraphite2 -lRpcrt4 -lDwrite -lusp10 -liconv
 
 # For an accurate result to the original's code, compile in alphabetical order
 SOURCES = \
@@ -27,6 +27,7 @@ SOURCES = \
 	Escape \
 	Fade \
 	Flags \
+	Font \
 	Game \
 	Generic \
 	GenericLoad \

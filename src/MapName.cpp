@@ -16,7 +16,7 @@ void ReadyMapName(char *str)
 	
 	//Handle "Studio Pixel presents" text in the intro
 	#ifdef JAPANESE
-	char presentText[24] = "é–‹ç™ºå®¤Pixel presents\x00\x01\x01\x01";
+	char presentText[24] = "ŠJ”­ŽºPixel presents";
 	#else
 	char presentText[24] = "  Studio Pixel presents";
 	#endif
