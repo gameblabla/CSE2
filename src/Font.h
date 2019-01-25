@@ -1,11 +1,6 @@
 #pragma once
 
-#include <stdbool.h>
-
-#include <iconv.h>
-
-#include <ft2build.h>
-#include FT_FREETYPE_H
+#include <stddef.h>
 
 #include "SDL.h"
 
