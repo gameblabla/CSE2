@@ -316,7 +316,7 @@ void Surface2Surface(int x, int y, RECT *rect, int to, int from)
 	//Target surface
 	if (!surf[to].texture)
 	{
-		printf("Tried to draw to surface %s, which doesn't exist\n", to);
+		printf("Tried to draw to surface %d, which doesn't exist\n", to);
 		return;
 	}
 	
@@ -350,7 +350,7 @@ void CortBox2(RECT *rect, uint32_t col, int surf_no)
 	//Target surface
 	if (!surf[surf_no].texture)
 	{
-		printf("Tried to draw a rectangle to surface %s, which doesn't exist\n", surf_no);
+		printf("Tried to draw a rectangle to surface %d, which doesn't exist\n", surf_no);
 		return;
 	}
 	

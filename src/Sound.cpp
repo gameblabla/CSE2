@@ -31,6 +31,7 @@ SOUNDBUFFER::SOUNDBUFFER(size_t bufSize)
 	
 	playing = false;
 	looping = false;
+	looped = false;
 	
 	frequency = 0.0;
 	volume = 1.0;
@@ -274,7 +275,7 @@ bool InitDirectSound()
 	uint8_t *buf = nullptr;
 	size_t len;
 		
-	for (size_t n = 0; n < SOUND_NO; n++)
+	for (unsigned int n = 0; n < SOUND_NO; n++)
 	{
 		sprintf(path, "%2.2X.pxt", n);
 		
