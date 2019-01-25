@@ -286,7 +286,7 @@ void ActionCredit_Read()
 				Credit.offset += 4;
 				
 				//If flag is set
-				if ((uint8_t)GetNPCFlag(a))
+				if (GetNPCFlag(a))
 				{
 					//Jump to label
 					while ( Credit.offset < Credit.size )

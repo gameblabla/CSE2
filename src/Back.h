@@ -14,3 +14,6 @@ struct BACK
 extern int gWaterY;
 
 bool InitBack(char *fName, int type);
+void ActBack();
+void PutBack(int fx, int fy);
+void PutFront(int fx, int fy);

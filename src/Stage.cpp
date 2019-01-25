@@ -7,8 +7,11 @@
 #include "CommonDefines.h"
 #include "Map.h"
 #include "MapName.h"
+#include "MyChar.h"
 #include "Draw.h"
 #include "Tags.h"
+#include "Frame.h"
+#include "Caret.h"
 #include "NpChar.h"
 #include "TextScr.h"
 #include "Organya.h"
@@ -65,7 +68,7 @@ void ReleaseStageTable()
 bool TransferStage(int no, int w, int x, int y)
 {
 	//Move character
-	//SetMyCharPosition(x << 13, y << 13);
+	SetMyCharPosition(x << 13, y << 13);
 	
 	bool bError = false;
 	bool result;
@@ -127,11 +130,11 @@ bool TransferStage(int no, int w, int x, int y)
 		ReadyMapName(gTMT[no].name);
 		
 		//StartTextScript(w);
-		//SetFrameMyChar();
+		SetFrameMyChar();
 		//ClearBullet();
-		//InitCaret();
+		InitCaret();
 		//ClearValueView();
-		//ResetQuake();
+		ResetQuake();
 		//InitBossChar(gTMT[no].boss_no);
 		//ResetFlash();
 		gStageNo = no;

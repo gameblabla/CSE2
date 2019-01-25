@@ -1,5 +1,6 @@
 #pragma once
 #include <stdint.h>
+#include "NpChar.h"
 
 struct NPC_TBL_RECT
 {
@@ -27,3 +28,7 @@ extern NPC_TABLE *gNpcTable;
 
 bool LoadNpcTable(const char *path);
 void ReleaseNpcTable();
+
+//NPC Function table
+typedef void (*NPCFUNCTION)(NPCHAR*);
+extern NPCFUNCTION gpNpcFuncTbl[];

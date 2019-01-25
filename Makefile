@@ -1,16 +1,24 @@
 RELEASE = 0
 
-ifeq ($(RELEASE), 0)
-CXXFLAGS := -O0 -g -static -mconsole
-FILENAME = debug
+ifeq ($(JAPANESE), 1)
+	ifeq ($(RELEASE), 0)
+	CXXFLAGS := -DJAPANESE -O0 -g -static -mconsole
+	FILENAME := debugjp
+	else
+	CXXFLAGS := -DJAPANESE -O3 -s -static
+	FILENAME := releasejp
+	endif
+
 else
-CXXFLAGS := -O3 -s -static
-FILENAME = release
+	ifeq ($(RELEASE), 0)
+	CXXFLAGS := -O0 -g -static -mconsole
+	FILENAME := debug
+	else
+	CXXFLAGS := -O3 -s -static
+	FILENAME := release
+	endif
 endif
 
-ifeq ($(JAPANESE), 1)
-CXXFLAGS += -DJAPANESE
-endif
 ifeq ($(FIX_BUGS), 1)
 CXXFLAGS += -DFIX_BUGS
 endif
@@ -21,6 +29,7 @@ LIBS += `sdl2-config --static-libs` -lfreetype -lharfbuzz -lfreetype -lbz2 -lpng
 # For an accurate result to the original's code, compile in alphabetical order
 SOURCES = \
 	Back \
+	Caret \
 	Config \
 	Draw \
 	Ending \
@@ -28,6 +37,7 @@ SOURCES = \
 	Fade \
 	Flags \
 	Font \
+	Frame \
 	Game \
 	Generic \
 	GenericLoad \
@@ -36,6 +46,7 @@ SOURCES = \
 	Main \
 	Map \
 	MapName \
+	MyChar \
 	NpChar \
 	NpcTbl \
 	Organya \

@@ -11,9 +11,12 @@
 #include "GenericLoad.h"
 #include "TextScr.h"
 #include "Fade.h"
+#include "Frame.h"
 #include "Flags.h"
 #include "Escape.h"
 #include "Stage.h"
+#include "MyChar.h"
+#include "Caret.h"
 #include "Map.h"
 #include "Main.h"
 #include "MapName.h"
@@ -86,14 +89,14 @@ void PutNumber4(int x, int y, int value, bool bZero)
 int ModeOpening()
 {
 	InitNpChar();
-	//InitCaret();
+	InitCaret();
 	//InitStar();
 	InitFade();
 	//InitFlash();
 	//InitBossLife();
 	ChangeMusic(0);
 	TransferStage(72, 100, 3, 3);
-	//SetFrameTargetMyChar(16);
+	SetFrameTargetMyChar(16);
 	SetFadeMask();
 	
 	//Reset cliprect and flags
@@ -126,9 +129,9 @@ int ModeOpening()
 			break;
 		
 		//Update everything
-		//ActNpChar();
+		ActNpChar();
 		//ActBossChar();
-		//ActBack();
+		ActBack();
 		//ResetMyCharFlag();
 		//HitMyCharMap();
 		//HitMyCharNpChar();
@@ -137,24 +140,23 @@ int ModeOpening()
 		//HitBossMap();
 		//HitBossBullet();
 		//ActCaret();
-		//MoveFrame3();
+		MoveFrame3();
 		ProcFade();
 		
 		//Draw everything
 		CortBox(&grcFull, 0x000000);
 		
-		int frame_x = 0;
-		int frame_y = 0;
-		//GetFramePosition(&frame_x, &frame_y);
-		//PutBack(frame_x, frame_y);
+		int frame_x, frame_y;
+		GetFramePosition(&frame_x, &frame_y);
+		PutBack(frame_x, frame_y);
 		PutStage_Back(frame_x, frame_y);
 		//PutBossChar(frame_x, frame_y);
-		//PutNpChar(frame_x, frame_y);
+		PutNpChar(frame_x, frame_y);
 		PutMapDataVector(frame_x, frame_y);
 		PutStage_Front(frame_x, frame_y);
-		//PutFront(frame_x, frame_y);
+		PutFront(frame_x, frame_y);
 		//PutCaret(frame_x, frame_y);
-		PutFade();
+		//PutFade();
 		
 		//Update Text Script
 		//int tscRet = TextScriptProc();
@@ -229,7 +231,7 @@ int ModeTitle()
 	rcSu[3] = {48, 16, 64, 32};
 	
 	//Reset everything
-	//InitCaret();
+	InitCaret();
 	//InitStar();
 	//CutNoise();
 	

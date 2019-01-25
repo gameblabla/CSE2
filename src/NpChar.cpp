@@ -9,8 +9,7 @@
 #include "Game.h"
 #include "Flags.h"
 #include "NpcTbl.h"
-
-#define NPC_MAX 0x200
+#include "Draw.h"
 
 NPCHAR gNPC[NPC_MAX];
 
@@ -203,6 +202,139 @@ void SetExpObjects(int x, int y, int exp)
 			gNPC[n].y = y;
 			gNPC[n].bits = gNpcTable[gNPC[n].code_char].bits;
 			gNPC[n].exp = sub_exp;
+		}
+	}
+}
+
+bool SetBulletObject(int x, int y, int val)
+{
+	int tamakazu_ari[10];
+
+	int t = 0;
+	memset(tamakazu_ari, 0, sizeof(tamakazu_ari));
+	for (int n = 0; n < 8; n++)
+	{
+		int code = 0; //gArmsData[n].code;
+		if (code == 5)
+			tamakazu_ari[t++] = 0;
+		else if (code == 10)
+			tamakazu_ari[t++] = 1;
+		else
+			tamakazu_ari[t] = 0;
+	}
+	
+	if (!t)
+		return false;
+	
+	int n = Random(1, 10 * t);
+	int bullet_no = tamakazu_ari[n % t];
+	for (n = 0x100; n < NPC_MAX; n++)
+	{
+		if (!gNPC[n].cond)
+		{
+			memset(&gNPC[n], 0, sizeof(NPCHAR));
+			gNPC[n].cond |= 0x80u;
+			gNPC[n].direct = 0;
+			gNPC[n].code_event = bullet_no;
+			gNPC[n].code_char = 86;
+			gNPC[n].x = x;
+			gNPC[n].y = y;
+			gNPC[n].bits = gNpcTable[gNPC[n].code_char].bits;
+			gNPC[n].exp = val;
+			SetUniqueParameter(&gNPC[n]);
+			return true;
+		}
+	}
+	
+	return false;
+}
+
+bool SetLifeObject(int x, int y, int val)
+{
+	for (int n = 0x100; n < NPC_MAX; n++)
+	{
+		if (!gNPC[n].cond)
+		{
+			memset(&gNPC[n], 0, sizeof(NPCHAR));
+			gNPC[n].cond |= 0x80u;
+			gNPC[n].direct = 0;
+			gNPC[n].code_char = 87;
+			gNPC[n].x = x;
+			gNPC[n].y = y;
+			gNPC[n].bits = gNpcTable[gNPC[n].code_char].bits;
+			gNPC[n].exp = val;
+			SetUniqueParameter(&gNPC[n]);
+			return true;
+		}
+	}
+	
+	return false;
+}
+
+void VanishNpChar(NPCHAR *npc)
+{
+	int x = npc->x;
+	int y = npc->y;
+	memset(npc, 0, sizeof(NPCHAR));
+	npc->count1 = 0;
+	npc->x = x;
+	npc->y = y;
+	npc->cond |= 0x80u;
+	npc->direct = 0;
+	npc->code_char = 3;
+	npc->bits = gNpcTable[npc->code_char].bits;
+	npc->exp = gNpcTable[npc->code_char].exp;
+	SetUniqueParameter(npc);
+}
+
+void PutNpChar(int fx, int fy)
+{
+	for (int n = 0; n < NPC_MAX; n++)
+	{
+		if (gNPC[n].cond & 0x80)
+		{
+			int8_t a;
+			
+			if (gNPC[n].shock)
+			{
+				a = 2 * ((gNPC[n].shock >> 1) & 1) - 1;
+			}
+			else
+			{
+				a = 0;
+				if (gNPC[n].bits & npc_showDamage && gNPC[n].damage_view)
+				{
+					//SetValueView(&gNPC[n].x, &gNPC[n].y, gNPC[n].damage_view);
+					gNPC[n].damage_view = 0;
+				}
+			}
+			
+			int side;
+			if (gNPC[n].direct)
+				side = gNPC[n].view.back;
+			else
+				side = gNPC[n].view.front;
+			
+			PutBitmap3(
+				&grcGame,
+				(gNPC[n].x - side) / 0x200 - fx / 0x200 + a,
+				(gNPC[n].y - gNPC[n].view.top) / 0x200 - fy / 0x200,
+				&gNPC[n].rect,
+				gNPC[n].surf);
+		}
+	}
+}
+
+void ActNpChar()
+{
+	for (int i = 0; i < NPC_MAX; i++)
+	{
+		if (gNPC[i].cond & 0x80)
+		{
+			if (gpNpcFuncTbl[gNPC[i].code_char] != nullptr)
+				gpNpcFuncTbl[gNPC[i].code_char](&gNPC[i]);
+			if (gNPC[i].shock)
+				--gNPC[i].shock;
 		}
 	}
 }
