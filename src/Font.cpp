@@ -21,6 +21,18 @@
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
 
+typedef struct FontObject
+{
+	FT_Library library;
+	FT_Face face;
+#ifndef DISABLE_FONT_ANTIALIASING
+	bool lcd_mode;
+#endif
+#ifdef JAPANESE
+	iconv_t conv;
+#endif
+} FontObject;
+
 static unsigned long UTF8ToCode(const unsigned char *string, unsigned int *bytes_read)
 {
 	unsigned int length;
@@ -176,21 +188,17 @@ void DrawText(FontObject *font_object, SDL_Renderer *renderer, SDL_Texture *text
 			{
 				for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)converted.width / 3, surface_width); ++ix)
 				{
-					unsigned char (*font_buffer)[converted.pitch / 3][3] = (unsigned char (*)[converted.pitch / 3][3])converted.buffer;
+					const unsigned char (*font_buffer)[converted.pitch / 3][3] = (unsigned char (*)[converted.pitch / 3][3])converted.buffer;
 
-					unsigned char *font_pixel = font_buffer[iy][ix];
+					const unsigned char *font_pixel = font_buffer[iy][ix];
 					unsigned char *surface_pixel = surface_buffer[letter_y + iy][letter_x + ix];
 
 					if (font_pixel[0] || font_pixel[1] || font_pixel[2])
 					{
 						for (unsigned int j = 0; j < 3; ++j)
 						{
-							unsigned char colour_accumulator = surface_pixel[j];
-
-							colour_accumulator = ((colours[j] * font_pixel[j]) / 0xFF) + ((colour_accumulator * (0xFF - font_pixel[j])) / 0xFF);	// Alpha blending
-							colour_accumulator = 255.0 * pow((colour_accumulator / 255.0), 1.0 / 1.8);						// Gamma correction
-
-							surface_pixel[j] = colour_accumulator;
+							const double alpha = pow((font_pixel[j] / 255.0), 1.0 / 1.8);			// Gamma correction
+							surface_pixel[j] = (colours[j] * alpha) + (surface_pixel[j] * (1.0 - alpha));	// Alpha blending
 						}
 
 						surface_pixel[3] = 0xFF;
@@ -203,8 +211,7 @@ void DrawText(FontObject *font_object, SDL_Renderer *renderer, SDL_Texture *text
 				{
 					unsigned char (*font_buffer)[converted.pitch] = (unsigned char (*)[converted.pitch])converted.buffer;
 
-					const double raw_alpha = (double)font_buffer[iy][ix] / (converted.num_grays - 1);
-					const double alpha = pow(raw_alpha, 1.0 / 1.8);			// Gamma-corrected
+					const double alpha = pow((double)font_buffer[iy][ix] / (converted.num_grays - 1), 1.0 / 1.8);			// Gamma-corrected
 
 					unsigned char *surface_pixel = surface_buffer[letter_y + iy][letter_x + ix];
 
