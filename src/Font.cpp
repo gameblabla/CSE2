@@ -4,7 +4,9 @@
 #include <stddef.h>
 #include <stdlib.h>
 
+#ifdef JAPANESE
 #include <iconv.h>
+#endif
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -38,25 +40,47 @@ static unsigned long UTF8ToCode(const unsigned char *string, unsigned int *bytes
 	unsigned int length;
 	unsigned long charcode;
 
-	if ((string[0] & 0x80) == 0)
+	unsigned int zero_bit = 0;
+	for (unsigned char lead_byte = string[0]; zero_bit < 5 && (lead_byte & 0x80); ++zero_bit, lead_byte <<= 1);
+
+	switch (zero_bit)
 	{
-		length = 1;
-		charcode = string[0] & 0x7F;
-	}
-	else if ((string[0] & 0xE0) == 0xC0)
-	{
-		length = 2;
-		charcode = ((string[0] & ~0xE0) << 6) | (string[1] & 0x3F);
-	}
-	else if ((string[0] & 0xF0) == 0xE0)
-	{
-		length = 3;
-		charcode = ((string[0] & ~0xF0) << (6 * 2)) | ((string[1] & 0x3F) << 6) | (string[2] & 0x3F);
-	}
-	else //if (string[0] & 0xF8 == 0xF0)
-	{
-		length = 4;
-		charcode = ((string[0] & ~0xF8) << (6 * 3)) | ((string[1] & 0x3F) << (6 * 2)) | ((string[2] & 0x3F) << 6) | (string[3] & 0x3F);
+		case 0:
+			// Single-byte character
+			length = 1;
+			charcode = string[0];
+			break;
+
+		case 2:
+		case 3:
+		case 4:
+			length = zero_bit;
+			charcode = string[0] & (1 << (8 - zero_bit)) - 1;
+
+			for (unsigned int i = 1; i < zero_bit; ++i)
+			{
+				if ((string[i] & 0xC0) == 0x80)
+				{
+					charcode <<= 6;
+					charcode |= string[i] & ~0xC0;
+				}
+				else
+				{
+					// Error: Invalid continuation byte
+					length = 1;
+					charcode = 0xFFFD;
+					break;
+				}
+			}
+
+			break;
+
+		default:
+			// Error: Invalid lead byte
+			length = 1;
+			charcode = 0xFFFD;
+			break;
+
 	}
 
 	if (bytes_read)

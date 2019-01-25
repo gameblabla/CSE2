@@ -123,7 +123,7 @@ void PutIllust()
 void ReloadIllust(int a)
 {
 	char name[16];
-	sprintf(name, "CREDIT%02ld", a);
+	sprintf(name, "CREDIT%02d", a);
 	ReloadBitmap_Resource(name, SURFACE_ID_CREDITS_IMAGE);
 }
 

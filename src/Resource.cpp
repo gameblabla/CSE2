@@ -64,8 +64,11 @@
 #include "Resource/BITMAP/CREDIT16.bmp.h"
 #include "Resource/BITMAP/CREDIT17.bmp.h"
 #include "Resource/BITMAP/CREDIT18.bmp.h"
-#include "Resource/BITMAP/PIXEL.bmp.h"
+#ifdef JAPANESE
 #include "Resource/BITMAP/PIXEL_JP.bmp.h"
+#else
+#include "Resource/BITMAP/PIXEL.bmp.h"
+#endif
 #include "Resource/ICON/4.bmp.h"
 
 const unsigned char* GetResource(const char *name, size_t *size)
@@ -377,13 +380,13 @@ const unsigned char* GetResource(const char *name, size_t *size)
 	}
 	if (!strcmp(name, "PIXEL"))
 	{
-		*size = sizeof(rPIXEL);
-		return rPIXEL;
-	}
-	if (!strcmp(name, "PIXEL_JP"))
-	{
+#ifdef JAPANESE
 		*size = sizeof(rPIXEL_JP);
 		return rPIXEL_JP;
+#else
+		*size = sizeof(rPIXEL);
+		return rPIXEL;
+#endif
 	}
 	
 	//ICON
