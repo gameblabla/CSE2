@@ -156,7 +156,7 @@ int ModeOpening()
 		PutStage_Front(frame_x, frame_y);
 		PutFront(frame_x, frame_y);
 		//PutCaret(frame_x, frame_y);
-		//PutFade();
+		PutFade();
 		
 		//Update Text Script
 		//int tscRet = TextScriptProc();
