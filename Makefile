@@ -1,21 +1,19 @@
 RELEASE = 0
 
+ifeq ($(RELEASE), 0)
+CXXFLAGS := -O0 -g -static -mconsole
+FILENAME := debug
+else
+CXXFLAGS := -O3 -s -static
+FILENAME := release
+endif
+
 ifeq ($(JAPANESE), 1)
+CXXFLAGS += -DJAPANESE
 	ifeq ($(RELEASE), 0)
-	CXXFLAGS := -DJAPANESE -O0 -g -static -mconsole
 	FILENAME := debugjp
 	else
-	CXXFLAGS := -DJAPANESE -O3 -s -static
 	FILENAME := releasejp
-	endif
-
-else
-	ifeq ($(RELEASE), 0)
-	CXXFLAGS := -O0 -g -static -mconsole
-	FILENAME := debug
-	else
-	CXXFLAGS := -O3 -s -static
-	FILENAME := release
 	endif
 endif
 
@@ -76,8 +74,6 @@ RESOURCES = \
 	BITMAP/CREDIT16.bmp \
 	BITMAP/CREDIT17.bmp \
 	BITMAP/CREDIT18.bmp \
-	BITMAP/PIXEL.bmp \
-	BITMAP/PIXEL_JP.bmp \
 	ICON/4.bmp \
 	ORG/ACCESS \
 	ORG/ANZEN \
@@ -122,6 +118,12 @@ RESOURCES = \
 	ORG/XXXX \
 	ORG/ZONBIE \
 	WAVE/WAVE100
+
+ifeq ($(JAPANESE), 1)
+	RESOURCES += BITMAP/PIXEL_JP.bmp
+else
+	RESOURCES += BITMAP/PIXEL.bmp
+endif
 
 OBJECTS = $(addprefix obj/$(FILENAME)/, $(addsuffix .o, $(SOURCES)))
 

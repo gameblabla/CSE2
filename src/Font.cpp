@@ -4,7 +4,9 @@
 #include <stddef.h>
 #include <stdlib.h>
 
+#ifdef JAPANESE
 #include <iconv.h>
+#endif
 
 #include <ft2build.h>
 #include FT_FREETYPE_H

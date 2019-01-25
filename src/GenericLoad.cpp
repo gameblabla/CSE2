@@ -3,11 +3,7 @@
 
 bool LoadGenericData()
 {
-#ifdef JAPANESE
-	MakeSurface_Resource("PIXEL_JP", 1);
-#else
 	MakeSurface_Resource("PIXEL", 1);
-#endif
 	
 	bool bError = false;
 	if (!MakeSurface_File("MyChar", 16))
