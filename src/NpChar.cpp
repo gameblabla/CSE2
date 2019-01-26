@@ -43,23 +43,23 @@ bool LoadEvent(char *path_event)
 {
 	char path[PATH_LENGTH];
 	sprintf(path, "%s/%s", gDataPath, path_event);
-	
+
 	SDL_RWops *fp = SDL_RWFromFile(path, "rb");
 	if (!fp)
 		return false;
-	
+
 	//Read "PXE" check
 	char code[4];
 	fp->read(fp, code, 1, 4);
 	if (memcmp(code, gPassPixEve, 3))
 		return false;
-	
-	//Get amount of npcs
+
+	//Get amount of NPCs
 	int count = SDL_ReadLE32(fp);
-	
-	//Load npcs
+
+	//Load NPCs
 	memset(gNPC, 0, sizeof(gNPC));
-	
+
 	int n = 170;
 	for (int i = 0; i < count; i++)
 	{
@@ -71,7 +71,7 @@ bool LoadEvent(char *path_event)
 		eve.code_event = SDL_ReadLE16(fp);
 		eve.code_char = SDL_ReadLE16(fp);
 		eve.bits = SDL_ReadLE16(fp);
-		
+
 		//Set NPC parameters
 		if (eve.bits & npc_altDir)
 			gNPC[n].direct = 2;
@@ -86,7 +86,7 @@ bool LoadEvent(char *path_event)
 		gNPC[n].bits |= gNpcTable[gNPC[n].code_char].bits;
 		gNPC[n].exp = gNpcTable[gNPC[n].code_char].exp;
 		SetUniqueParameter(&gNPC[n]);
-		
+
 		//Check flags
 		if (gNPC[n].bits & npc_appearSet)
 		{
@@ -102,11 +102,11 @@ bool LoadEvent(char *path_event)
 		{
 			gNPC[n].cond = 0x80;
 		}
-		
+
 		//Increase index
 		n++;
 	}
-	
+
 	return true;
 }
 
@@ -144,7 +144,7 @@ void SetDestroyNpChar(int x, int y, int w, int num)
 		int offset_y = Random(-wa, wa) << 9;
 		SetNpChar(4, x + offset_x, offset_y + y, 0, 0, 0, NULL, 0x100);
 	}
-	
+
 	//Flash effect
 	//SetCaret(x, y, 12, 0);
 }
@@ -159,7 +159,7 @@ void SetDestroyNpCharUp(int x, int y, int w, int num)
 		int offset_y = Random(-wa, wa) << 9;
 		SetNpChar(4, x + offset_x, offset_y + y, 0, 0, 1, NULL, 0x100);
 	}
-	
+
 	//Flash effect
 	//SetCaret(x, y, 12, 0);
 }
@@ -171,7 +171,7 @@ void SetExpObjects(int x, int y, int exp)
 		if (!gNPC[n].cond)
 		{
 			memset(&gNPC[n], 0, sizeof(NPCHAR));
-			
+
 			int sub_exp = 0;
 			if (exp < 20)
 			{
@@ -194,7 +194,7 @@ void SetExpObjects(int x, int y, int exp)
 				exp -= 20;
 				sub_exp = 20;
 			}
-			
+
 			gNPC[n].cond |= 0x80u;
 			gNPC[n].direct = 0;
 			gNPC[n].code_char = 1;
@@ -222,10 +222,10 @@ bool SetBulletObject(int x, int y, int val)
 		else
 			tamakazu_ari[t] = 0;
 	}
-	
+
 	if (!t)
 		return false;
-	
+
 	int n = Random(1, 10 * t);
 	int bullet_no = tamakazu_ari[n % t];
 	for (n = 0x100; n < NPC_MAX; n++)
@@ -245,7 +245,7 @@ bool SetBulletObject(int x, int y, int val)
 			return true;
 		}
 	}
-	
+
 	return false;
 }
 
@@ -267,7 +267,7 @@ bool SetLifeObject(int x, int y, int val)
 			return true;
 		}
 	}
-	
+
 	return false;
 }
 
@@ -294,7 +294,7 @@ void PutNpChar(int fx, int fy)
 		if (gNPC[n].cond & 0x80)
 		{
 			int8_t a;
-			
+
 			if (gNPC[n].shock)
 			{
 				a = 2 * ((gNPC[n].shock >> 1) & 1) - 1;
@@ -308,13 +308,13 @@ void PutNpChar(int fx, int fy)
 					gNPC[n].damage_view = 0;
 				}
 			}
-			
+
 			int side;
 			if (gNPC[n].direct)
 				side = gNPC[n].view.back;
 			else
 				side = gNPC[n].view.front;
-			
+
 			PutBitmap3(
 				&grcGame,
 				(gNPC[n].x - side) / 0x200 - fx / 0x200 + a,
