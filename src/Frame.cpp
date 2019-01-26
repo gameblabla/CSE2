@@ -23,9 +23,9 @@ void MoveFrame3()
 	if (gFrame.y <= -0x200)
 		gFrame.y = 0;
 	
-	if (gFrame.x > ((((map_w - 1) << 4) - WINDOW_WIDTH)) << 9);
+	if (gFrame.x > ((((map_w - 1) << 4) - WINDOW_WIDTH)) << 9)
 		gFrame.x = (((map_w - 1) << 4) - WINDOW_WIDTH) << 9;
-	if (gFrame.y > ((((map_l - 1) << 4) - WINDOW_HEIGHT)) << 9);
+	if (gFrame.y > ((((map_l - 1) << 4) - WINDOW_HEIGHT)) << 9)
 		gFrame.y = (((map_l - 1) << 4) - WINDOW_HEIGHT) << 9;
 
 	//Quake
@@ -74,9 +74,9 @@ void SetFramePosition(int fx, int fy)
 	if (gFrame.y <= -0x200)
 		gFrame.y = 0;
 
-	if (gFrame.x > ((((map_w - 1) << 4) - WINDOW_WIDTH)) << 9);
+	if (gFrame.x > ((((map_w - 1) << 4) - WINDOW_WIDTH)) << 9)
 		gFrame.x = (((map_w - 1) << 4) - WINDOW_WIDTH) << 9;
-	if (gFrame.y > ((((map_l - 1) << 4) - WINDOW_HEIGHT)) << 9);
+	if (gFrame.y > ((((map_l - 1) << 4) - WINDOW_HEIGHT)) << 9)
 		gFrame.y = (((map_l - 1) << 4) - WINDOW_HEIGHT) << 9;
 }
 
@@ -89,25 +89,25 @@ void SetFrameMyChar()
 	int16_t map_w, map_l;
 	GetMapData(0, &map_w, &map_l);
 	
-	gFrame.x = mc_x - 81920;
-	gFrame.y = mc_y - 61440;
+	gFrame.x = mc_x - (WINDOW_WIDTH << 9);
+	gFrame.y = mc_y - (WINDOW_HEIGHT << 9);
 	
 	//Keep in bounds
 	if (gFrame.x <= -0x200)
 		gFrame.x = 0;
 	if (gFrame.y <= -0x200)
 		gFrame.y = 0;
-
-	if (gFrame.x > ((((map_w - 1) << 4) - WINDOW_WIDTH)) << 9);
+	
+	if (gFrame.x > ((((map_w - 1) << 4) - WINDOW_WIDTH)) << 9)
 		gFrame.x = (((map_w - 1) << 4) - WINDOW_WIDTH) << 9;
-	if (gFrame.y > ((((map_l - 1) << 4) - WINDOW_HEIGHT)) << 9);
+	if (gFrame.y > ((((map_l - 1) << 4) - WINDOW_HEIGHT)) << 9)
 		gFrame.y = (((map_l - 1) << 4) - WINDOW_HEIGHT) << 9;
 }
 
 void SetFrameTargetMyChar(int wait)
 {
-	gFrame.tgt_x = &gMC.x;
-	gFrame.tgt_y = &gMC.y;
+	gFrame.tgt_x = &gMC.tgt_x;
+	gFrame.tgt_y = &gMC.tgt_y;
 	gFrame.wait = wait;
 }
 

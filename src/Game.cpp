@@ -7,6 +7,7 @@
 #include "Tags.h"
 #include "NpcTbl.h"
 #include "NpChar.h"
+#include "NpcHit.h"
 #include "Generic.h"
 #include "GenericLoad.h"
 #include "TextScr.h"
@@ -16,6 +17,7 @@
 #include "Escape.h"
 #include "Stage.h"
 #include "MyChar.h"
+#include "MycHit.h"
 #include "Caret.h"
 #include "Map.h"
 #include "Main.h"
@@ -132,11 +134,11 @@ int ModeOpening()
 		ActNpChar();
 		//ActBossChar();
 		ActBack();
-		//ResetMyCharFlag();
-		//HitMyCharMap();
+		ResetMyCharFlag();
+		HitMyCharMap();
 		//HitMyCharNpChar();
 		//HitMyCharBoss();
-		//HitNpCharMap();
+		HitNpCharMap();
 		//HitBossMap();
 		//HitBossBullet();
 		//ActCaret();
@@ -321,7 +323,7 @@ int ModeTitle()
 		}
 		
 		//Update carets
-		//ActCaret();
+		ActCaret();
 		
 		//Animate character cursor
 		if ( ++anime >= 40 )
@@ -384,7 +386,7 @@ int ModeTitle()
 		PutBitmap3(&grcGame, 116, char_y, &char_rc, char_surf);
 		
 		//Draw carets
-		//PutCaret(0, 0);
+		PutCaret(0, 0);
 		
 		//if (time_counter)
 		//	PutTimeCounter(16, 8);
@@ -406,6 +408,124 @@ int ModeTitle()
 		PutFramePerSecound();
 		if (!Flip_SystemTask())
 			return 0;
+	}
+	
+	return 3;
+}
+
+int ModeAction()
+{
+	int frame_x = 0;
+	int frame_y = 0;
+	
+	bool swPlay = true;
+	
+	//Reset stuff
+	gCounter = 0;
+	grcGame.left = 0;
+	g_GameFlags = 3;
+	
+	//Initialize everything
+	InitMyChar();
+	InitNpChar();
+	//InitBullet();
+	InitCaret();
+	//InitStar();
+	InitFade();
+	//InitFlash();
+	//ClearArmsData();
+	//ClearItemData();
+	//ClearPermitStage();
+	//StartMapping();
+	InitFlags();
+	//InitBossLife();
+	
+	TransferStage(2, 94, 5, 6);
+	ChangeMusic(mus_MischievousRobot);
+	SetFrameTargetMyChar(16);
+	SetFrameMyChar();
+	
+	while (true)
+	{
+		//Get pressed keys
+		GetTrg();
+		
+		//Escape menu
+		if (gKey & KEY_ESCAPE)
+		{
+			int escRet = Call_Escape();
+			if (escRet == 0)
+				return 0;
+			if (escRet == 2)
+				return 1;
+		}
+		
+		if (swPlay & 1 && g_GameFlags & 1)
+		{
+			if (g_GameFlags & 2)
+				ActMyChar(true);
+			else
+				ActMyChar(false);
+			
+			//ActStar();
+			ActNpChar();
+			//ActBossChar();
+			//ActValueView();
+			ActBack();
+			ResetMyCharFlag();
+			HitMyCharMap();
+			//HitMyCharNpChar();
+			//HitMyCharBoss();
+			HitNpCharMap();
+			//HitBossMap();
+			//HitBulletMap();
+			//HitNpCharBullet();
+			//HitBossBullet();
+			//if (g_GameFlags & 2)
+			//	ShootBullet();
+			//ActBullet();
+			ActCaret();
+			MoveFrame3();
+			//ActFlash(frame_x, frame_y);
+			
+			if (g_GameFlags & 2)
+				AnimationMyChar(true);
+			else
+				AnimationMyChar(false);
+		}
+		
+		if (g_GameFlags & 8)
+		{
+			ActionCredit();
+			ActionIllust();
+			ActionStripper();
+		}
+		
+		ProcFade();
+		CortBox(&grcFull, 0x000020);
+		GetFramePosition(&frame_x, &frame_y);
+		PutBack(frame_x, frame_y);
+		PutStage_Back(frame_x, frame_y);
+		//PutBossChar(frame_x, frame_y);
+		PutNpChar(frame_x, frame_y);
+		//PutBullet(frame_x, frame_y);
+		PutMyChar(frame_x, frame_y);
+		//PutStar(frame_x, frame_y);
+		PutMapDataVector(frame_x, frame_y);
+		PutStage_Front(frame_x, frame_y);
+		PutFront(frame_x, frame_y);
+		//PutFlash();
+		PutCaret(frame_x, frame_y);
+		//PutValueView(frame_x, frame_y);
+		//PutBossLife();
+		PutFade();
+		
+		PutMapName(false);
+		
+		PutFramePerSecound();
+        if (!Flip_SystemTask())
+          break;
+        ++gCounter;
 	}
 	
 	return 0;
@@ -432,8 +552,8 @@ bool Game()
 					mode = ModeOpening();
 				if (mode == 2)
 					mode = ModeTitle();
-				//if (mode == 3)
-				//	mode = ModeAction();
+				if (mode == 3)
+					mode = ModeAction();
 			}
 			
 			EndMapData();

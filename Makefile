@@ -45,7 +45,10 @@ SOURCES = \
 	Map \
 	MapName \
 	MyChar \
+	MycHit \
+	NpcAct000 \
 	NpChar \
+	NpcHit \
 	NpcTbl \
 	Organya \
 	PixTone \

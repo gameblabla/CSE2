@@ -3,6 +3,7 @@
 #include <SDL_rwops.h>
 
 #include "NpcTbl.h"
+#include "NpcAct.h"
 
 NPC_TABLE *gNpcTable;
 
@@ -55,12 +56,12 @@ void ReleaseNpcTable()
 //Npc function table
 NPCFUNCTION gpNpcFuncTbl[] =
 {
-	nullptr,
-	nullptr,
-	nullptr,
-	nullptr,
-	nullptr,
-	nullptr,
+	&ActNpc000,
+	&ActNpc001,
+	&ActNpc002,
+	&ActNpc003,
+	&ActNpc004,
+	&ActNpc005,
 	nullptr,
 	nullptr,
 	nullptr,

@@ -132,8 +132,8 @@ bool ChangeMapParts(int x, int y, uint8_t no)
 void PutStage_Back(int fx, int fy)
 {
 	//Get range to draw
-	int num_x = WINDOW_WIDTH / 2 + 1;
-	int num_y = WINDOW_HEIGHT / 2 + 1;
+	int num_x = (WINDOW_WIDTH >> 4) + 1;
+	int num_y = (WINDOW_HEIGHT >> 4) + 1;
 	int put_x = (fx / 0x200 + 8) / 16;
 	int put_y = (fy / 0x200 + 8) / 16;
 	
@@ -165,8 +165,8 @@ void PutStage_Front(int fx, int fy)
 	RECT rcSnack = {256, 48, 272, 64};
 	
 	//Get range to draw
-	int num_x = WINDOW_WIDTH / 2 + 1;
-	int num_y = WINDOW_HEIGHT / 2 + 1;
+	int num_x = (WINDOW_WIDTH >> 4) + 1;
+	int num_y = (WINDOW_HEIGHT >> 4) + 1;
 	int put_x = (fx / 0x200 + 8) / 16;
 	int put_y = (fy / 0x200 + 8) / 16;
 	
@@ -199,8 +199,8 @@ void PutStage_Front(int fx, int fy)
 void PutMapDataVector(int fx, int fy)
 {
 	//Get range to draw
-	int num_x = WINDOW_WIDTH / 2 + 1;
-	int num_y = WINDOW_HEIGHT / 2 + 1;
+	int num_x = (WINDOW_WIDTH >> 4) + 1;
+	int num_y = (WINDOW_HEIGHT >> 4) + 1;
 	int put_x = (fx / 0x200 + 8) / 16;
 	int put_y = (fy / 0x200 + 8) / 16;
 	

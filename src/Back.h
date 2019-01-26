@@ -11,6 +11,7 @@ struct BACK
 	int fx;
 };
 
+extern BACK gBack;
 extern int gWaterY;
 
 bool InitBack(char *fName, int type);
