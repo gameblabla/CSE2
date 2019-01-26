@@ -5,6 +5,8 @@
 /obj
 Config.dat
 Profile.dat
+build.7z
+build.zip
 
 # Compiled Object files
 *.slo

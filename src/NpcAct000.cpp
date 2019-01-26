@@ -484,3 +484,129 @@ void ActNpc005(NPCHAR *npc)
 	else
 		npc->rect = rcLeft[npc->ani_no];
 }
+
+//Beetle (Goes left and right, Egg Corridor)
+void ActNpc006(NPCHAR *npc)
+{
+	RECT rcLeft[5];
+	RECT rcRight[5];
+	
+	rcLeft[0] = {0, 80, 16, 96};
+	rcLeft[1] = {16, 80, 32, 96};
+	rcLeft[2] = {32, 80, 48, 96};
+	rcLeft[3] = {48, 80, 64, 96};
+	rcLeft[4] = {64, 80, 80, 96};
+	
+	rcRight[0] = {0, 96, 16, 112};
+	rcRight[1] = {16, 96, 32, 112};
+	rcRight[2] = {32, 96, 48, 112};
+	rcRight[3] = {48, 96, 64, 112};
+	rcRight[4] = {64, 96, 80, 112};
+	
+	switch (npc->act_no)
+	{
+		case 0: //Init
+			npc->act_no = 1;
+			
+			if (npc->direct)
+				npc->act_no = 3;
+			else
+				npc->act_no = 1;
+			break;
+		
+		case 1:
+			//Accelerate to the left
+			npc->xm -= 0x10;
+			if (npc->xm < -0x400)
+				npc->xm = -0x400;
+			
+			//Move
+			if (npc->shock)
+				npc->x += npc->xm / 2;
+			else
+				npc->x += npc->xm;
+			
+			//Animate
+			if (++npc->ani_wait > 1)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+			
+			if ( npc->ani_no > 2 )
+				npc->ani_no = 1;
+			
+			//Stop when hitting a wall
+			if (npc->flag & 1)
+			{
+				npc->act_no = 2;
+				npc->act_wait = 0;
+				npc->ani_no = 0;
+				npc->xm = 0;
+				npc->direct = 2;
+			}
+			break;
+			
+		case 2:
+			//Wait 60 frames then move to the right
+			if (++npc->act_wait > 60)
+			{
+				npc->act_no = 3;
+				npc->ani_wait = 0;
+				npc->ani_no = 1;
+			}
+			break;
+			
+		case 3:
+			//Accelerate to the right
+			npc->xm += 0x10;
+			if (npc->xm > 0x400)
+				npc->xm = 0x400;
+			
+			//Move
+			if (npc->shock)
+				npc->x += npc->xm / 2;
+			else
+				npc->x += npc->xm;
+			
+			//Animate
+			if (++npc->ani_wait > 1)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+			
+			if ( npc->ani_no > 2 )
+				npc->ani_no = 1;
+			
+			//Stop when hitting a wall
+			if (npc->flag & 4)
+			{
+				npc->act_no = 4;
+				npc->act_wait = 0;
+				npc->ani_no = 0;
+				npc->xm = 0;
+				npc->direct = 0;
+			}
+			break;
+		
+		case 4:
+			//Wait 60 frames then move to the left
+			if (++npc->act_wait > 60)
+			{
+				npc->act_no = 1;
+				npc->ani_wait = 0;
+				npc->ani_no = 1;
+			}
+			break;
+			
+		default:
+			break;
+	}
+	
+	//Set framerect
+	if (npc->direct)
+		npc->rect = rcRight[npc->ani_no];
+	else
+		npc->rect = rcLeft[npc->ani_no];
+}
