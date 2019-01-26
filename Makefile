@@ -1,19 +1,18 @@
-RELEASE = 0
-
-ifeq ($(RELEASE), 0)
-CXXFLAGS := -O0 -g -static -mconsole
-FILENAME := debug
-else
-CXXFLAGS := -O3 -s -static
+ifeq ($(RELEASE), 1)
+CXXFLAGS := -O3 -s
 FILENAME := release
+else
+CXXFLAGS := -O0 -g -mconsole
+FILENAME := debug
 endif
 
 ifeq ($(JAPANESE), 1)
 CXXFLAGS += -DJAPANESE
-	ifeq ($(RELEASE), 0)
-	FILENAME := debugjp
-	else
+LIBS += -liconv
+	ifeq ($(RELEASE), 1)
 	FILENAME := releasejp
+	else
+	FILENAME := debugjp
 	endif
 endif
 
@@ -22,7 +21,12 @@ CXXFLAGS += -DFIX_BUGS
 endif
 
 CXXFLAGS += `sdl2-config --cflags` `pkg-config freetype2 --cflags`
-LIBS += `sdl2-config --static-libs` -lfreetype -lharfbuzz -lfreetype -lbz2 -lpng -lz -lgraphite2 -lRpcrt4 -lDwrite -lusp10 -liconv
+LIBS += `sdl2-config --static-libs` `pkg-config freetype2 --libs`
+
+ifeq ($(STATIC), 1)
+CXXFLAGS += -static
+LIBS += -lharfbuzz -lfreetype -lbz2 -lpng -lz -lgraphite2 -lRpcrt4 -lDwrite -lusp10
+endif
 
 # For an accurate result to the original's code, compile in alphabetical order
 SOURCES = \
@@ -130,9 +134,9 @@ endif
 
 OBJECTS = $(addprefix obj/$(FILENAME)/, $(addsuffix .o, $(SOURCES)))
 
-all: build/$(FILENAME).exe
+all: build/$(FILENAME)
 
-build/$(FILENAME).exe: $(OBJECTS)
+build/$(FILENAME): $(OBJECTS)
 	@mkdir -p $(@D)
 	@g++ $(CXXFLAGS) $^ -o $@ $(LIBS)
 	@echo Finished compiling: $@
@@ -147,12 +151,12 @@ obj/$(FILENAME)/Resource.o: src/Resource.cpp $(addprefix src/Resource/, $(addsuf
 	@echo Compiling $<
 	@g++ $(CXXFLAGS) $< -o $@ -c
 
-src/Resource/%.h: res/% obj/bin2h.exe
+src/Resource/%.h: res/% obj/bin2h
 	@mkdir -p $(@D)
 	@echo Converting $<
-	@obj/bin2h.exe $< $@
+	@obj/bin2h $< $@
 
-obj/bin2h.exe: res/bin2h.c
+obj/bin2h: res/bin2h.c
 	@mkdir -p $(@D)
 	@echo Compiling $^
 	@gcc -O3 -s -static $^ -o $@
