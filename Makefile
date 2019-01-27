@@ -54,6 +54,7 @@ SOURCES = \
 	MapName \
 	MyChar \
 	MycHit \
+	MycParam \
 	NpcAct000 \
 	NpChar \
 	NpcHit \
@@ -65,7 +66,8 @@ SOURCES = \
 	Sound \
 	Stage \
 	TextScr \
-	Triangle
+	Triangle \
+	ValueView
 
 RESOURCES = \
 	BITMAP/CREDIT01.bmp \

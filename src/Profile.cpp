@@ -10,6 +10,7 @@
 #include "Flags.h"
 #include "MyChar.h"
 #include "Frame.h"
+#include "ValueView.h"
 #include "Stage.h"
 #include "Game.h"
 
@@ -57,7 +58,7 @@ bool InitializeGame()
 	SetFrameTargetMyChar(16);
 	//InitBossLife();
 	//CutNoise();
-	//ClearValueView();
+	ClearValueView();
 	//gCurlyShoot_wait = 0;
 	SetFadeMask();
 	SetFrameTargetMyChar(16);

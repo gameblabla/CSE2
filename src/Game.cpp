@@ -27,6 +27,7 @@
 #include "Profile.h"
 #include "Back.h"
 #include "KeyControl.h"
+#include "ValueView.h"
 #include "Draw.h"
 #include "Ending.h"
 
@@ -467,7 +468,7 @@ int ModeAction()
 				//ActStar();
 				ActNpChar();
 				//ActBossChar();
-				//ActValueView();
+				ActValueView();
 				ActBack();
 				ResetMyCharFlag();
 				HitMyCharMap();
@@ -513,7 +514,7 @@ int ModeAction()
 			PutFront(frame_x, frame_y);
 			//PutFlash();
 			PutCaret(frame_x, frame_y);
-			//PutValueView(frame_x, frame_y);
+			PutValueView(frame_x, frame_y);
 			//PutBossLife();
 			PutFade();
 			

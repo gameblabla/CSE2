@@ -216,7 +216,7 @@ bool LoadPxt(char *name, uint8_t **buf, size_t *length)
 	fclose(fp);
 
 	//Get size
-	size_t size;
+	size_t size = 0;
 	for (int i = 0; i < 4; i++)
 	{
 		if (lineNumbers[i][1] > size)

@@ -15,6 +15,7 @@
 #include "NpChar.h"
 #include "TextScr.h"
 #include "Organya.h"
+#include "ValueView.h"
 #include "Back.h"
 #include "Stage.h"
 
@@ -132,7 +133,7 @@ bool TransferStage(int no, int w, int x, int y)
 		SetFrameMyChar();
 		//ClearBullet();
 		InitCaret();
-		//ClearValueView();
+		ClearValueView();
 		ResetQuake();
 		//InitBossChar(gTMT[no].boss_no);
 		//ResetFlash();

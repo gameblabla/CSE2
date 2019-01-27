@@ -4,6 +4,7 @@
 #include "WindowsWrapper.h"
 
 #include "MyChar.h"
+#include "MycParam.h"
 #include "NpChar.h"
 #include "Draw.h"
 #include "Sound.h"
@@ -584,8 +585,8 @@ void ActMyChar_Normal(bool bKey)
 			gMC.sprash = 0;
 		
 		//Spike damage
-		//if (gMC.flag & 0x400)
-		//	DamageMyChar(10);
+		if (gMC.flag & 0x400)
+			DamageMyChar(10);
 		
 		//Camera
 		if (gMC.direct)

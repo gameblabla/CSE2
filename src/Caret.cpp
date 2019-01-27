@@ -58,9 +58,6 @@ void ActCaret01(CARET *crt)
 		crt->rect = rcLeft[crt->ani_no];
 }
 
-
-
-
 void ActCaret09(CARET *crt)
 {
 	if (++crt->ani_wait <= 4)
@@ -72,6 +69,47 @@ void ActCaret09(CARET *crt)
 		crt->rect = {48, 64, 64, 80};
 	else
 		crt->rect = {0, 80, 16, 96};
+}
+
+void ActCaret13(CARET *crt)
+{
+	RECT rcLeft[2];
+	rcLeft[0] = {56, 24, 64, 32};
+	rcLeft[1] = {0, 0, 0, 0};
+	
+	if (!crt->act_no)
+	{
+		crt->act_no = 1;
+		
+		switch (crt->direct)
+		{
+			case 0:
+				crt->xm = Random(-0x600, 0x600);
+				crt->ym = Random(-0x200, 0x200);
+				break;
+				
+			case 1:
+				crt->ym = -0x200 * Random(1, 3);
+				break;
+		}
+	}
+	
+	if (!crt->direct)
+	{
+		crt->xm = 4 * crt->xm / 5;
+		crt->ym = 4 * crt->ym / 5;
+	}
+	
+	crt->x += crt->xm;
+	crt->y += crt->ym;
+	
+	if (++crt->ani_wait > 20)
+		crt->cond = 0;
+
+	crt->rect = rcLeft[crt->ani_wait / 2 % 2];
+	
+	if (crt->direct == 5)
+		crt->x -= 0x800;
 }
 
 //Tables
@@ -113,7 +151,7 @@ CARETFUNCTION gpCaretFuncTbl[] =
 	nullptr, //&ActCaret10,
 	nullptr, //&ActCaret11,
 	nullptr, //&ActCaret12,
-	nullptr, //&ActCaret13,
+	&ActCaret13,
 	nullptr, //&ActCaret14,
 	nullptr, //&ActCaret15,
 	nullptr, //&ActCaret16,
