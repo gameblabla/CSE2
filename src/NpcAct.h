@@ -7,5 +7,9 @@ void ActNpc004(NPCHAR *npc);
 void ActNpc005(NPCHAR *npc);
 void ActNpc006(NPCHAR *npc);
 
+void ActNpc015(NPCHAR *npc);
 void ActNpc016(NPCHAR *npc);
 void ActNpc017(NPCHAR *npc);
+void ActNpc018(NPCHAR *npc);
+
+void ActNpc021(NPCHAR *npc);

@@ -55,6 +55,7 @@ SOURCES = \
 	MyChar \
 	MycHit \
 	NpcAct000 \
+	NpcAct020 \
 	NpChar \
 	NpcHit \
 	NpcTbl \

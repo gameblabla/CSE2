@@ -615,6 +615,63 @@ void ActNpc006(NPCHAR *npc)
 		npc->rect = rcLeft[npc->ani_no];
 }
 
+//Chest (closed)
+void ActNpc015(NPCHAR *npc)
+{
+	RECT rcLeft[3];
+
+	rcLeft[0] = {240, 0, 256, 16};
+	rcLeft[1] = {256, 0, 272, 16};
+	rcLeft[2] = {272, 0, 288, 16};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->bits |= 0x2000u;
+
+			if (npc->direct == 2)
+			{
+				npc->ym = -0x200;
+
+				for (int i = 0; i < 4; ++i)
+					SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+			}
+
+			// Fallthrough
+		case 1:
+			npc->ani_no = 0;
+
+			if (Random(0, 30) == 0)
+				npc->act_no = 2;
+
+			break;
+
+		case 2:
+			if (++npc->ani_wait > 1)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no > 2)
+			{
+				npc->ani_no = 0;
+				npc->act_no = 1;
+			}
+
+			break;
+	}
+
+	npc->ym += 0x40;
+	if (npc->ym > 0x5FF)
+		npc->ym = 0x5FF;
+
+	npc->y += npc->ym;
+
+	npc->rect = rcLeft[npc->ani_no];
+}
+
 //Save point
 void ActNpc016(NPCHAR *npc)
 {
@@ -747,4 +804,32 @@ void ActNpc017(NPCHAR *npc)
 		npc->ym = 0x5FF;
 
 	npc->y += npc->ym;
+}
+
+// Door
+void ActNpc018(NPCHAR *npc)
+{
+	RECT rect[2];
+
+	rect[0] = {224, 16, 240, 40};
+	rect[1] = {192, 112, 208, 136};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			if (npc->direct == 0)
+				npc->rect = rect[0];
+			else
+				npc->rect = rect[1];
+
+			break;
+
+		case 1:
+			for (int i = 0; i < 4; ++i)
+				SetNpChar(4, npc->x, npc->y, Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+
+			npc->act_no = 0;
+			npc->rect = rect[0];
+			break;
+	}
 }
