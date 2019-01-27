@@ -614,3 +614,222 @@ void ActNpc006(NPCHAR *npc)
 	else
 		npc->rect = rcLeft[npc->ani_no];
 }
+
+//Chest (closed)
+void ActNpc015(NPCHAR *npc)
+{
+	RECT rcLeft[3];
+
+	rcLeft[0] = {240, 0, 256, 16};
+	rcLeft[1] = {256, 0, 272, 16};
+	rcLeft[2] = {272, 0, 288, 16};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->bits |= 0x2000u;
+
+			if (npc->direct == 2)
+			{
+				npc->ym = -0x200;
+
+				for (int i = 0; i < 4; ++i)
+					SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+			}
+
+			// Fallthrough
+		case 1:
+			npc->ani_no = 0;
+
+			if (Random(0, 30) == 0)
+				npc->act_no = 2;
+
+			break;
+
+		case 2:
+			if (++npc->ani_wait > 1)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no > 2)
+			{
+				npc->ani_no = 0;
+				npc->act_no = 1;
+			}
+
+			break;
+	}
+
+	npc->ym += 0x40;
+	if (npc->ym > 0x5FF)
+		npc->ym = 0x5FF;
+
+	npc->y += npc->ym;
+
+	npc->rect = rcLeft[npc->ani_no];
+}
+
+//Save point
+void ActNpc016(NPCHAR *npc)
+{
+	RECT rects[8];
+
+	rects[0] = {96, 16, 112, 32};
+	rects[1] = {112, 16, 128, 32};
+	rects[2] = {128, 16, 144, 32};
+	rects[3] = {144, 16, 160, 32};
+	rects[4] = {160, 16, 176, 32};
+	rects[5] = {176, 16, 192, 32};
+	rects[6] = {192, 16, 208, 32};
+	rects[7] = {208, 16, 224, 32};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->bits |= 0x2000u;
+			npc->act_no = 1;
+
+			if (npc->direct == 2)
+			{
+				npc->bits &= ~0x2000u;
+				npc->ym = -0x200;
+
+				for (int i = 0; i < 4; ++i)
+					SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+			}
+
+			// Fallthrough
+		case 1:
+			if (npc->flag & 8)
+				npc->bits |= 0x2000u;
+
+			break;
+	}
+
+	if ( ++npc->ani_wait > 2 )
+	{
+		npc->ani_wait = 0;
+		++npc->ani_no;
+	}
+
+	if ( npc->ani_no > 7 )
+		npc->ani_no = 0;
+
+	npc->ym += 0x40;
+	if ( npc->ym > 0x5FF )
+		npc->ym = 0x5FF;
+
+	npc->y += npc->ym;
+
+	npc->rect = rects[npc->ani_no];
+}
+
+// Health refill
+void ActNpc017(NPCHAR *npc)
+{
+	RECT rect[2];
+
+	rect[0] = {288, 0, 304, 16};
+	rect[1] = {304, 0, 320, 16};
+
+	int aa;
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+
+			if (npc->direct == 2)
+			{
+				npc->ym = -512;
+
+				for (int a = 0; a < 4; ++a)
+					SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+			}
+
+			// Fallthrough
+		case 1:
+			aa = Random(0, 30);
+
+			if (aa >= 10)
+			{
+				if (aa >= 25)
+					npc->act_no = 4;
+				else
+					npc->act_no = 3;
+			}
+			else
+			{
+				npc->act_no = 2;
+			}
+
+			npc->act_wait = Random(0x10, 0x40);
+			npc->ani_wait = 0;
+			break;
+
+		case 2:
+			npc->rect = rect[0];
+
+			if (--npc->act_wait == 0)
+				npc->act_no = 1;
+
+			break;
+
+		case 3:
+			if (++npc->ani_wait % 2)
+				npc->rect = rect[0];
+			else
+				npc->rect = rect[1];
+
+			if (--npc->act_wait == 0)
+				npc->act_no = 1;
+
+			break;
+
+		case 4:
+			npc->rect = rect[1];
+
+			if (--npc->act_wait == 0)
+				npc->act_no = 1;
+
+			break;
+	}
+
+	npc->ym += 0x40;
+
+	if (npc->ym > 0x5FF)
+		npc->ym = 0x5FF;
+
+	npc->y += npc->ym;
+}
+
+// Door
+void ActNpc018(NPCHAR *npc)
+{
+	RECT rect[2];
+
+	rect[0] = {224, 16, 240, 40};
+	rect[1] = {192, 112, 208, 136};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			if (npc->direct == 0)
+				npc->rect = rect[0];
+			else
+				npc->rect = rect[1];
+
+			break;
+
+		case 1:
+			for (int i = 0; i < 4; ++i)
+				SetNpChar(4, npc->x, npc->y, Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+
+			npc->act_no = 0;
+			npc->rect = rect[0];
+			break;
+	}
+}
