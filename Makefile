@@ -2,7 +2,7 @@ ifeq ($(RELEASE), 1)
 CXXFLAGS := -O3 -s
 FILENAME := release
 else
-CXXFLAGS := -O0 -g -mconsole
+CXXFLAGS := -O0 -g
 FILENAME := debug
 endif
 
@@ -18,6 +18,10 @@ endif
 
 ifeq ($(FIX_BUGS), 1)
 CXXFLAGS += -DFIX_BUGS
+endif
+
+ifeq ($(CONSOLE), 1)
+CXXFLAGS += -mconsole
 endif
 
 CXXFLAGS += `sdl2-config --cflags` `pkg-config freetype2 --cflags`

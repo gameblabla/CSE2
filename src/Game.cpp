@@ -161,14 +161,14 @@ int ModeOpening()
 		PutFade();
 		
 		//Update Text Script
-		//int tscRet = TextScriptProc();
-		//if (tscRet == 0)
-		//	return 0;
-		//if (tscRet == 2)
-		//	return 1;
+		int tscRet = TextScriptProc();
+		if (tscRet == 0)
+			return 0;
+		if (tscRet == 2)
+			return 1;
 	
 		PutMapName(false);
-		//PutTextScript();
+		PutTextScript();
 		PutFramePerSecound();
 		
 		if (!Flip_SystemTask())
@@ -440,92 +440,107 @@ int ModeAction()
 	InitFlags();
 	//InitBossLife();
 	
-	TransferStage(2, 94, 5, 6);
-	ChangeMusic(mus_MischievousRobot);
-	SetFrameTargetMyChar(16);
-	SetFrameMyChar();
-	
-	while (true)
+	if ((bContinue && LoadProfile(NULL)) || InitializeGame())
 	{
-		//Get pressed keys
-		GetTrg();
-		
-		//Escape menu
-		if (gKey & KEY_ESCAPE)
+		while (true)
 		{
-			int escRet = Call_Escape();
-			if (escRet == 0)
-				return 0;
-			if (escRet == 2)
-				return 1;
-		}
-		
-		if (swPlay & 1 && g_GameFlags & 1)
-		{
-			if (g_GameFlags & 2)
-				ActMyChar(true);
-			else
-				ActMyChar(false);
+			//Get pressed keys
+			GetTrg();
 			
-			//ActStar();
-			ActNpChar();
-			//ActBossChar();
-			//ActValueView();
-			ActBack();
-			ResetMyCharFlag();
-			HitMyCharMap();
-			//HitMyCharNpChar();
-			//HitMyCharBoss();
-			HitNpCharMap();
-			//HitBossMap();
-			//HitBulletMap();
-			//HitNpCharBullet();
-			//HitBossBullet();
-			//if (g_GameFlags & 2)
-			//	ShootBullet();
-			//ActBullet();
-			ActCaret();
-			MoveFrame3();
-			//ActFlash(frame_x, frame_y);
+			//Escape menu
+			if (gKey & KEY_ESCAPE)
+			{
+				int escRet = Call_Escape();
+				if (escRet == 0)
+					return 0;
+				if (escRet == 2)
+					return 1;
+			}
 			
-			if (g_GameFlags & 2)
-				AnimationMyChar(true);
-			else
-				AnimationMyChar(false);
+			if (swPlay & 1 && g_GameFlags & 1)
+			{
+				if (g_GameFlags & 2)
+					ActMyChar(true);
+				else
+					ActMyChar(false);
+				
+				//ActStar();
+				ActNpChar();
+				//ActBossChar();
+				//ActValueView();
+				ActBack();
+				ResetMyCharFlag();
+				HitMyCharMap();
+				//HitMyCharNpChar();
+				//HitMyCharBoss();
+				HitNpCharMap();
+				//HitBossMap();
+				//HitBulletMap();
+				//HitNpCharBullet();
+				//HitBossBullet();
+				//if (g_GameFlags & 2)
+				//	ShootBullet();
+				//ActBullet();
+				ActCaret();
+				MoveFrame3();
+				//ActFlash(frame_x, frame_y);
+				
+				if (g_GameFlags & 2)
+					AnimationMyChar(true);
+				else
+					AnimationMyChar(false);
+			}
+			
+			if (g_GameFlags & 8)
+			{
+				ActionCredit();
+				ActionIllust();
+				ActionStripper();
+			}
+			
+			ProcFade();
+			CortBox(&grcFull, 0x000020);
+			GetFramePosition(&frame_x, &frame_y);
+			PutBack(frame_x, frame_y);
+			PutStage_Back(frame_x, frame_y);
+			//PutBossChar(frame_x, frame_y);
+			PutNpChar(frame_x, frame_y);
+			//PutBullet(frame_x, frame_y);
+			PutMyChar(frame_x, frame_y);
+			//PutStar(frame_x, frame_y);
+			PutMapDataVector(frame_x, frame_y);
+			PutStage_Front(frame_x, frame_y);
+			PutFront(frame_x, frame_y);
+			//PutFlash();
+			PutCaret(frame_x, frame_y);
+			//PutValueView(frame_x, frame_y);
+			//PutBossLife();
+			PutFade();
+			
+			if (swPlay & 1)
+			{
+				int tscRet = TextScriptProc();
+				if (tscRet == 0)
+					return 0;
+				if (tscRet == 2)
+					return 1;
+			}
+			
+			PutMapName(false);
+			
+			if (g_GameFlags & 8)
+			{
+			  PutIllust();
+			  PutStripper();
+			}
+			
+			PutTextScript();
+			
+			PutFramePerSecound();
+			if (!Flip_SystemTask())
+			  break;
+			++gCounter;
 		}
-		
-		if (g_GameFlags & 8)
-		{
-			ActionCredit();
-			ActionIllust();
-			ActionStripper();
-		}
-		
-		ProcFade();
-		CortBox(&grcFull, 0x000020);
-		GetFramePosition(&frame_x, &frame_y);
-		PutBack(frame_x, frame_y);
-		PutStage_Back(frame_x, frame_y);
-		//PutBossChar(frame_x, frame_y);
-		PutNpChar(frame_x, frame_y);
-		//PutBullet(frame_x, frame_y);
-		PutMyChar(frame_x, frame_y);
-		//PutStar(frame_x, frame_y);
-		PutMapDataVector(frame_x, frame_y);
-		PutStage_Front(frame_x, frame_y);
-		PutFront(frame_x, frame_y);
-		//PutFlash();
-		PutCaret(frame_x, frame_y);
-		//PutValueView(frame_x, frame_y);
-		//PutBossLife();
-		PutFade();
-		
-		PutMapName(false);
-		
-		PutFramePerSecound();
-        if (!Flip_SystemTask())
-          break;
-        ++gCounter;
 	}
 	
 	return 0;

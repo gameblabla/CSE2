@@ -129,7 +129,7 @@ bool TransferStage(int no, int w, int x, int y)
 		//Load map name
 		ReadyMapName(gTMT[no].name);
 		
-		//StartTextScript(w);
+		StartTextScript(w);
 		SetFrameMyChar();
 		//ClearBullet();
 		InitCaret();

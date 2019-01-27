@@ -19,8 +19,8 @@ struct TEXT_SCRIPT
 	char flags;
 	
 	//Current positions (read position in buffer, x position in line)
-	int p_read;
-	int p_write;
+	unsigned int p_read;
+	unsigned int p_write;
 	
 	//Current line to write to
 	int line;
@@ -47,7 +47,7 @@ struct TEXT_SCRIPT
 	//Text rect
 	RECT rcText;
 	
-	//???
+	//..?
 	int offsetY;
 	
 	//NOD cursor blink
@@ -57,4 +57,9 @@ struct TEXT_SCRIPT
 bool InitTextScript2();
 void EndTextScript();
 void EncryptionBinaryData2(uint8_t *pData, int size);
+bool LoadTextScript2(char *name);
 bool LoadTextScript_Stage(char *name);
+void GetTextScriptPath(char *path);
+bool StartTextScript(int no);
+void PutTextScript();
+int TextScriptProc();
