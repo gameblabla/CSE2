@@ -6,8 +6,10 @@
 #include "CommonDefines.h"
 #include "Tags.h"
 #include "NpChar.h"
+#include "MyChar.h"
 #include "Game.h"
 #include "Flags.h"
+#include "Sound.h"
 #include "NpcTbl.h"
 #include "Draw.h"
 
@@ -337,4 +339,265 @@ void ActNpChar()
 				--gNPC[i].shock;
 		}
 	}
+}
+
+void ChangeNpCharByEvent(int code_event, int code_char, int dir)
+{
+	for (int n = 0; n < NPC_MAX; n++)
+	{
+		if ((gNPC[n].cond & 0x80u) && gNPC[n].code_event == code_event)
+		{
+			gNPC[n].bits &= (npc_eventTouch | npc_eventDie | 0x400 | npc_appearSet | npc_altDir | npc_interact | npc_hideSet);
+			gNPC[n].code_char = code_char;
+			gNPC[n].bits |= gNpcTable[gNPC[n].code_char].bits;
+			gNPC[n].exp = gNpcTable[gNPC[n].code_char].exp;
+			SetUniqueParameter(&gNPC[n]);
+			gNPC[n].cond |= 0x80u;
+			gNPC[n].act_no = 0;
+			gNPC[n].act_wait = 0;
+			gNPC[n].count1 = 0;
+			gNPC[n].count2 = 0;
+			gNPC[n].ani_no = 0;
+			gNPC[n].ani_wait = 0;
+			gNPC[n].xm = 0;
+			gNPC[n].ym = 0;
+			
+			if (dir != 5)
+			{
+				if (dir == 4)
+				{
+					if (gNPC[n].x >= gMC.x)
+						gNPC[n].direct = 0;
+					else
+						gNPC[n].direct = 2;
+				}
+				else
+				{
+					gNPC[n].direct = dir;
+				}
+			}
+			
+			if (gpNpcFuncTbl[code_char] != nullptr)
+				gpNpcFuncTbl[code_char](&gNPC[n]);
+		}
+	}
+}
+
+void ChangeCheckableNpCharByEvent(int code_event, int code_char, int dir)
+{
+	for (int n = 0; n < NPC_MAX; n++)
+	{
+		if ((gNPC[n].cond & 0x80u) != 0 && gNPC[n].code_event == code_event)
+		{
+			gNPC[n].bits &= (npc_eventTouch | npc_eventDie | 0x400 | npc_appearSet | npc_altDir | npc_interact | npc_hideSet);
+			gNPC[n].bits |= npc_interact;
+			gNPC[n].code_char = code_char;
+			gNPC[n].bits |= gNpcTable[gNPC[n].code_char].bits;
+			gNPC[n].exp = gNpcTable[gNPC[n].code_char].exp;
+			SetUniqueParameter(&gNPC[n]);
+			gNPC[n].cond |= 0x80u;
+			gNPC[n].act_no = 0;
+			gNPC[n].act_wait = 0;
+			gNPC[n].count1 = 0;
+			gNPC[n].count2 = 0;
+			gNPC[n].ani_no = 0;
+			gNPC[n].ani_wait = 0;
+			gNPC[n].xm = 0;
+			gNPC[n].ym = 0;
+			
+			if (dir != 5)
+			{
+				if (dir == 4)
+				{
+					if (gNPC[n].x >= gMC.x)
+						gNPC[n].direct = 0;
+					else
+						gNPC[n].direct = 2;
+				}
+				else
+				{
+					gNPC[n].direct = dir;
+				}
+			}
+			
+			if (gpNpcFuncTbl[code_char] != nullptr)
+				gpNpcFuncTbl[code_char](&gNPC[n]);
+		}
+	}
+}
+
+void SetNpCharActionNo(int code_event, int act_no, int dir)
+{
+	for (int n = 0; n < NPC_MAX; n++)
+	{
+		if ((gNPC[n].cond & 0x80) && gNPC[n].code_event == code_event)
+		{
+			gNPC[n].act_no = act_no;
+			
+			if (dir != 5)
+			{
+				if (dir == 4)
+				{
+					if (gNPC[n].x >= gMC.x)
+						gNPC[n].direct = 0;
+					else
+						gNPC[n].direct = 2;
+				}
+				else
+				{
+					gNPC[n].direct = dir;
+				}
+			}
+			break;
+		}
+	}
+}
+
+void MoveNpChar(int code_event, int x, int y, int dir)
+{
+	for (int n = 0; n < NPC_MAX; n++)
+	{
+		if ((gNPC[n].cond & 0x80) && gNPC[n].code_event == code_event)
+		{
+			gNPC[n].x = x;
+			gNPC[n].y = y;
+			
+			if (dir != 5)
+			{
+				if (dir == 4)
+				{
+					if (gNPC[n].x >= gMC.x)
+						gNPC[n].direct = 0;
+					else
+						gNPC[n].direct = 2;
+				}
+				else
+				{
+					gNPC[n].direct = dir;
+				}
+			}
+			break;
+		}
+	}
+}
+
+void BackStepMyChar(int code_event)
+{
+	gMC.cond &= ~1;
+	gMC.ym = -0x200;
+	
+	if (code_event)
+	{
+		if (code_event == 2)
+		{
+			gMC.direct = 2;
+			gMC.xm = -0x200;
+		}
+		else
+		{
+			for (int n = 0; n < NPC_MAX; n++)
+			{
+				if ((gNPC[n].cond & 0x80) && gNPC[n].code_event == code_event)
+				{
+					if (gNPC[n].x >= gMC.x)
+					{
+						gMC.direct = 2;
+						gMC.xm = -0x200;
+					}
+					else
+					{
+						gMC.direct = 0;
+						gMC.xm = 0x200;
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		gMC.direct = 0;
+		gMC.xm = 0x200;
+	}
+}
+
+void DeleteNpCharEvent(int code)
+{
+	for (int i = 0; i < NPC_MAX; i++)
+	{
+		if ((gNPC[i].cond & 0x80) && gNPC[i].code_event == code)
+		{
+			gNPC[i].cond = 0;
+			SetNPCFlag(gNPC[i].code_flag);
+		}
+	}
+}
+
+void DeleteNpCharCode(int code, bool bSmoke)
+{
+	for (int n = 0; n < NPC_MAX; n++)
+	{
+		if ((gNPC[n].cond & 0x80) && gNPC[n].code_char == code)
+		{
+			gNPC[n].cond = 0;
+			SetNPCFlag(gNPC[n].code_flag);
+			
+			if (bSmoke)
+			{
+				PlaySoundObject(gNPC[n].destroy_voice, 1);
+				
+				switch (gNPC[n].size)
+				{
+					case 2:
+						SetDestroyNpChar(gNPC[n].x, gNPC[n].y, gNPC[n].view.back, 8);
+						break;
+					case 3:
+						SetDestroyNpChar(gNPC[n].x, gNPC[n].y, gNPC[n].view.back, 16);
+						break;
+					case 1:
+						SetDestroyNpChar(gNPC[n].x, gNPC[n].y, gNPC[n].view.back, 4);
+						break;
+				}
+			}
+		}
+	}
+}
+
+void GetNpCharPosition(int *x, int *y, int i)
+{
+  *x = gNPC[i].x;
+  *y = gNPC[i].y;
+}
+
+bool IsNpCharCode(int code)
+{
+	for (int i = 0; i < NPC_MAX; i++)
+	{
+		if ((gNPC[i].cond & 0x80) && gNPC[i].code_char == code)
+			return true;
+	}
+	
+	return false;
+}
+
+bool GetNpCharAlive(int code_event)
+{
+	for (int i = 0; i < NPC_MAX; i++)
+	{
+		if ((gNPC[i].cond & 0x80) && gNPC[i].code_event == code_event)
+			return true;
+	}
+	
+	return false;
+}
+
+int CountAliveNpChar()
+{
+	int count = 0;
+	for (int n = 0; n < NPC_MAX; ++n)
+	{
+		if (gNPC[n].cond & 0x80)
+			++count;
+	}
+	
+	return count;
 }

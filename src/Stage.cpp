@@ -71,7 +71,6 @@ bool TransferStage(int no, int w, int x, int y)
 	SetMyCharPosition(x << 13, y << 13);
 	
 	bool bError = false;
-	bool result;
 	
 	//Get path
 	char path_dir[20];

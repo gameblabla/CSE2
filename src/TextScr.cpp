@@ -1,7 +1,6 @@
 #include <stdint.h>
 #include <string>
 
-#include <SDL_messagebox.h>
 #include "WindowsWrapper.h"
 
 #include "CommonDefines.h"
@@ -410,6 +409,61 @@ void PutTextScript()
 			rect.bottom = rect.top + 11;
 			CortBox(&rect, 0xFFFFFE);
 		}
+		
+		//Draw GIT
+		RECT rcItemBox1 = {0, 0, 72, 16};
+		RECT rcItemBox2 = {0, 8, 72, 24};
+		RECT rcItemBox3 = {240, 0, 244, 8};
+		RECT rcItemBox4 = {240, 8, 244, 16};
+		RECT rcItemBox5 = {240, 16, 244, 24};
+		
+		if (gTS.item)
+		{
+			PutBitmap3(&grcFull, (WINDOW_WIDTH - 80) / 2, WINDOW_HEIGHT - 112, &rcItemBox1, 26);
+			PutBitmap3(&grcFull, (WINDOW_WIDTH - 80) / 2, WINDOW_HEIGHT - 96, &rcItemBox2, 26);
+			PutBitmap3(&grcFull, (WINDOW_WIDTH + 64) / 2, WINDOW_HEIGHT - 112, &rcItemBox3, 26);
+			PutBitmap3(&grcFull, (WINDOW_WIDTH + 64) / 2, WINDOW_HEIGHT - 104, &rcItemBox4, 26);
+			PutBitmap3(&grcFull, (WINDOW_WIDTH + 64) / 2, WINDOW_HEIGHT - 96, &rcItemBox4, 26);
+			PutBitmap3(&grcFull, (WINDOW_WIDTH + 64) / 2, WINDOW_HEIGHT - 88, &rcItemBox5, 26);
+			
+			if (gTS.item_y < WINDOW_HEIGHT - 104)
+				++gTS.item_y;
+			
+			RECT rect;
+			if (gTS.item >= 1000)
+			{
+				rect.left = 32 * ((gTS.item - 1000) % 8);
+				rect.right = 32 * ((gTS.item - 1000) % 8) + 32;
+				rect.top = 16 * ((gTS.item - 1000) / 8);
+				rect.bottom = 16 * ((gTS.item - 1000) / 8) + 16;
+				PutBitmap3(&grcFull, (WINDOW_WIDTH - 40) / 2, gTS.item_y, &rect, 8);
+			}
+			else
+			{
+				rect.left = 16 * (gTS.item % 16);
+				rect.right = 16 * (gTS.item % 16) + 16;
+				rect.top = 16 * (gTS.item / 16);
+				rect.bottom = 16 * (gTS.item / 16) + 16;
+				PutBitmap3(&grcFull, (WINDOW_WIDTH - 24) / 2, gTS.item_y, &rect, 12);
+			}
+		}
+		
+		//Draw Yes / No selection
+		RECT rect_yesno = {152, 48, 244, 80};
+		RECT rect_cur = {112, 88, 128, 104};
+		
+		if (gTS.mode == 6 )
+		{
+			int i;
+			if (gTS.wait > 1)
+				i = WINDOW_HEIGHT - 96;
+			else
+				i = WINDOW_HEIGHT - 88 - gTS.wait * 4;
+			
+			PutBitmap3(&grcFull, (WINDOW_WIDTH + 112) / 2, i, &rect_yesno, 26);
+			if (gTS.wait == 16)
+				PutBitmap3(&grcFull, 41 * gTS.select + (WINDOW_WIDTH + 102) / 2, 154, &rect_cur, 26);
+		}
 	}
 }
 
@@ -559,6 +613,23 @@ int TextScriptProc()
 						if (!TransferStage(z, w, x, y))
 							return 0;
 					}
+					else if (IS_COMMAND('M','O','V'))
+					{
+						int x = GetTextScriptNo(gTS.p_read + 4);
+						int y = GetTextScriptNo(gTS.p_read + 9);
+						SetMyCharPosition(x << 13, y << 13);
+						gTS.p_read += 13;
+					}
+					else if (IS_COMMAND('H','M','C'))
+					{
+						ShowMyChar(false);
+						gTS.p_read += 4;
+					}
+					else if (IS_COMMAND('S','M','C'))
+					{
+						ShowMyChar(true);
+						gTS.p_read += 4;
+					}
 					else if (IS_COMMAND('F','L','+'))
 					{
 						int z = GetTextScriptNo(gTS.p_read + 4);
@@ -666,6 +737,26 @@ int TextScriptProc()
 						gTS.p_read += 4;
 						gTS.flags |= 0x40;
 					}
+					else if (IS_COMMAND('C','L','O'))
+					{
+						gTS.flags &= ~0x33;
+						gTS.p_read += 4;
+					}
+					else if (IS_COMMAND('E','V','E'))
+					{
+						int z = GetTextScriptNo(gTS.p_read + 4);
+						JumpTextScript(z);
+					}
+					else if (IS_COMMAND('Y','N','J'))
+					{
+						gTS.next_event = GetTextScriptNo(gTS.p_read + 4);
+						gTS.p_read += 8;
+						gTS.mode = 6;
+						PlaySoundObject(5, 1);
+						gTS.wait = 0;
+						gTS.select = 0;
+						bExit = true;
+					}
 					else if (IS_COMMAND('F','L','J'))
 					{
 						int x = GetTextScriptNo(gTS.p_read + 4);
@@ -728,6 +819,87 @@ int TextScriptProc()
 					{
 						ReCallMusic();
 						gTS.p_read += 4;
+					}
+					else if (IS_COMMAND('D','N','P'))
+					{
+						int z = GetTextScriptNo(gTS.p_read + 4);
+						DeleteNpCharEvent(z);
+						gTS.p_read += 8;
+					}
+					else if (IS_COMMAND('D','N','A'))
+					{
+						int z = GetTextScriptNo(gTS.p_read + 4);
+						DeleteNpCharCode(z, 1);
+						gTS.p_read += 8;
+					}
+					else if (IS_COMMAND('C','N','P'))
+					{
+						int x = GetTextScriptNo(gTS.p_read + 4);
+						int y = GetTextScriptNo(gTS.p_read + 9);
+						int z = GetTextScriptNo(gTS.p_read + 14);
+						ChangeNpCharByEvent(x, y, z);
+						gTS.p_read += 18;
+					}
+					else if (IS_COMMAND('A','N','P'))
+					{
+						int x = GetTextScriptNo(gTS.p_read + 4);
+						int y = GetTextScriptNo(gTS.p_read + 9);
+						int z = GetTextScriptNo(gTS.p_read + 14);
+						SetNpCharActionNo(x, y, z);
+						gTS.p_read += 18;
+					}
+					else if (IS_COMMAND('I','N','P'))
+					{
+						int x = GetTextScriptNo(gTS.p_read + 4);
+						int y = GetTextScriptNo(gTS.p_read + 9);
+						int z = GetTextScriptNo(gTS.p_read + 14);
+						ChangeCheckableNpCharByEvent(x, y, z);
+						gTS.p_read += 18;
+					}
+					else if (IS_COMMAND('S','N','P'))
+					{
+						int w = GetTextScriptNo(gTS.p_read + 4);
+						int x = GetTextScriptNo(gTS.p_read + 9);
+						int y = GetTextScriptNo(gTS.p_read + 14);
+						int z = GetTextScriptNo(gTS.p_read + 19);
+						SetNpChar(w, x << 13, y << 13, 0, 0, z, 0, 0x100);
+						gTS.p_read += 23;
+					}
+					else if (IS_COMMAND('M','N','P'))
+					{
+						int w = GetTextScriptNo(gTS.p_read + 4);
+						int x = GetTextScriptNo(gTS.p_read + 9);
+						int y = GetTextScriptNo(gTS.p_read + 14);
+						int z = GetTextScriptNo(gTS.p_read + 19);
+						MoveNpChar(w, x << 13, y << 13, z);
+						gTS.p_read += 23;
+					}
+					else if (IS_COMMAND('F','A','C'))
+					{
+						int z = GetTextScriptNo(gTS.p_read + 4);
+						if (gTS.face != z)
+						{
+							gTS.face = z;
+							gTS.face_x = (gTS.rcText.left - 48) << 9;
+						}
+						gTS.p_read += 8;
+					}
+					else if (IS_COMMAND('F','A','C'))
+					{
+						int z = GetTextScriptNo(gTS.p_read + 4);
+						if (gTS.face != z)
+						{
+							gTS.face = z;
+							gTS.face_x = (gTS.rcText.left - 48) << 9;
+						}
+						gTS.p_read += 8;
+					}
+					else if (IS_COMMAND('G','I','T'))
+					{
+						int z = GetTextScriptNo(gTS.p_read + 4);
+						gTS.item = z;
+						gTS.item_y = WINDOW_HEIGHT - 112;
+						gTS.p_read += 8;
 					}
 					else
 					{

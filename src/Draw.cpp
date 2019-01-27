@@ -130,7 +130,10 @@ bool MakeSurface(SDL_RWops *fp, int surf_no)
 	SDL_SetTextureBlendMode(textureAccessible, SDL_BLENDMODE_BLEND);
 	
 	SDL_SetRenderTarget(gRenderer, textureAccessible);
+	SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 0);
+	SDL_RenderClear(gRenderer);
 	SDL_RenderCopy(gRenderer, texture, NULL, NULL);
+	SDL_RenderPresent(gRenderer);
 	SDL_SetRenderTarget(gRenderer, NULL);
 	
 	//Set surface's metadata

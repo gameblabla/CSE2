@@ -170,7 +170,7 @@ int JudgeHitMyCharTriangleC(int x, int y)
 		&& gMC.y + gMC.hit.bottom > (2 * y - 1) << 12)
 	{
 		//Clip
-		gMC.y = (y << 13) - (-0x2000 * x + gMC.x) / 2 - 0x800 + gMC.hit.top;
+		gMC.y = (y << 13) + (-0x2000 * x + gMC.x) / 2 - 0x800 + gMC.hit.top;
 		
 		//Halt momentum
 		if (!(gMC.cond & 2) && gMC.ym < -0x200)
