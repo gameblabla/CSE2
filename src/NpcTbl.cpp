@@ -72,7 +72,7 @@ NPCFUNCTION gpNpcFuncTbl[] =
 	nullptr,
 	nullptr,
 	nullptr,
-	nullptr,
+	&ActNpc016,
 	nullptr,
 	nullptr,
 	nullptr,
