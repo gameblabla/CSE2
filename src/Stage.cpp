@@ -197,19 +197,22 @@ int gMusicNo;
 
 void ChangeMusic(int no)
 {
-	//Stop and keep track of old song
-	gOldPos = GetOrganyaPosition();
-    gOldNo = gMusicNo;
-    StopOrganyaMusic();
-	
-	//Load .org
-	LoadOrganya(gMusicTable[no]);
-	
-	//Reset position, volume, and then play the song
-    ChangeOrganyaVolume(100);
-    SetOrganyaPosition(0);
-    PlayOrganyaMusic();
-    gMusicNo = no;
+	if (!no || no != gMusicNo)
+	{
+		//Stop and keep track of old song
+		gOldPos = GetOrganyaPosition();
+		gOldNo = gMusicNo;
+		StopOrganyaMusic();
+		
+		//Load .org
+		LoadOrganya(gMusicTable[no]);
+		
+		//Reset position, volume, and then play the song
+		ChangeOrganyaVolume(100);
+		SetOrganyaPosition(0);
+		PlayOrganyaMusic();
+		gMusicNo = no;
+	}
 }
 
 void ReCallMusic()

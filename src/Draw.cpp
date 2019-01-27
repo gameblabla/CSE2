@@ -309,7 +309,7 @@ void PutBitmap4(RECT *rcView, int x, int y, RECT *rect, int surf_no) //No Transp
 void Surface2Surface(int x, int y, RECT *rect, int to, int from)
 {
 	//Get rects
-	SDL_Rect rcSet = {x * gWindowScale, y * gWindowScale, (x + rect->right - rect->left) * gWindowScale, (y + rect->bottom - rect->top) * gWindowScale};
+	SDL_Rect rcSet = {x * gWindowScale, y * gWindowScale, (rect->right - rect->left) * gWindowScale, (rect->bottom - rect->top) * gWindowScale};
 	SDL_Rect frameRect = RectToSDLRect(rect);
 	frameRect = {frameRect.x * gWindowScale, frameRect.y * gWindowScale, frameRect.w * gWindowScale, frameRect.h * gWindowScale};
 	

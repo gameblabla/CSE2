@@ -19,6 +19,8 @@
 #include "Organya.h"
 #include "Game.h"
 
+#define IS_COMMAND(c1, c2, c3) gTS.data[gTS.p_read + 1] == c1 && gTS.data[gTS.p_read + 2] == c2 && gTS.data[gTS.p_read + 3] == c3
+
 #define TSC_BUFFER_SIZE 0x5000
 
 TEXT_SCRIPT gTS;
@@ -540,9 +542,7 @@ int TextScriptProc()
 				}
 				else
 				{
-					if (gTS.data[gTS.p_read + 1] == 'E' &&
-						gTS.data[gTS.p_read + 2] == 'N' &&
-						gTS.data[gTS.p_read + 3] == 'D')
+					if (IS_COMMAND('E','N','D'))
 					{
 						gTS.mode = 0;
 						gMC.cond &= ~1;
@@ -550,9 +550,7 @@ int TextScriptProc()
 						gTS.face = 0;
 						bExit = true;
 					}
-					else if (gTS.data[gTS.p_read + 1] == 'T' &&
-							 gTS.data[gTS.p_read + 2] == 'R' &&
-							 gTS.data[gTS.p_read + 3] == 'A')
+					else if (IS_COMMAND('T','R','A'))
 					{
 						int z = GetTextScriptNo(gTS.p_read + 4);
 						int w = GetTextScriptNo(gTS.p_read + 9);
@@ -561,41 +559,31 @@ int TextScriptProc()
 						if (!TransferStage(z, w, x, y))
 							return 0;
 					}
-					else if (gTS.data[gTS.p_read + 1] == 'F' &&
-							 gTS.data[gTS.p_read + 2] == 'L' &&
-							 gTS.data[gTS.p_read + 3] == '+')
+					else if (IS_COMMAND('F','L','+'))
 					{
 						int z = GetTextScriptNo(gTS.p_read + 4);
 						SetNPCFlag(z);
 						gTS.p_read += 8;
 					}
-					else if (gTS.data[gTS.p_read + 1] == 'F' &&
-							 gTS.data[gTS.p_read + 2] == 'L' &&
-							 gTS.data[gTS.p_read + 3] == '-')
+					else if (IS_COMMAND('F','L','-'))
 					{
 						int z = GetTextScriptNo(gTS.p_read + 4);
 						CutNPCFlag(z);
 						gTS.p_read += 8;
 					}
-					else if (gTS.data[gTS.p_read + 1] == 'S' &&
-							 gTS.data[gTS.p_read + 2] == 'K' &&
-							 gTS.data[gTS.p_read + 3] == '+')
+					else if (IS_COMMAND('S','K','+'))
 					{
 						int z = GetTextScriptNo(gTS.p_read + 4);
 						SetSkipFlag(z);
 						gTS.p_read += 8;
 					}
-					else if (gTS.data[gTS.p_read + 1] == 'S' &&
-							 gTS.data[gTS.p_read + 2] == 'K' &&
-							 gTS.data[gTS.p_read + 3] == '-')
+					else if (IS_COMMAND('S','K','-'))
 					{
 						int z = GetTextScriptNo(gTS.p_read + 4);
 						CutSkipFlag(z);
 						gTS.p_read += 8;
 					}
-					else if (gTS.data[gTS.p_read + 1] == 'K' &&
-							 gTS.data[gTS.p_read + 2] == 'E' &&
-							 gTS.data[gTS.p_read + 3] == 'Y')
+					else if (IS_COMMAND('K','E','Y'))
 					{
 						g_GameFlags &= ~2;
 						g_GameFlags |= 1;
@@ -603,39 +591,29 @@ int TextScriptProc()
 						gMC.shock = 0;
 						gTS.p_read += 4;
 					}
-					else if (gTS.data[gTS.p_read + 1] == 'P' &&
-							 gTS.data[gTS.p_read + 2] == 'R' &&
-							 gTS.data[gTS.p_read + 3] == 'I')
+					else if (IS_COMMAND('P','R','I'))
 					{
 						g_GameFlags &= ~3;
 						gMC.shock = 0;
 						gTS.p_read += 4;
 					}
-					else if (gTS.data[gTS.p_read + 1] == 'F' &&
-							 gTS.data[gTS.p_read + 2] == 'R' &&
-							 gTS.data[gTS.p_read + 3] == 'E')
+					else if (IS_COMMAND('F','R','E'))
 					{
 						g_GameFlags |= 3;
 						gTS.p_read += 4;
 					}
-					else if (gTS.data[gTS.p_read + 1] == 'N' &&
-							 gTS.data[gTS.p_read + 2] == 'O' &&
-							 gTS.data[gTS.p_read + 3] == 'D')
+					else if (IS_COMMAND('N','O','D'))
 					{
 						gTS.mode = 2;
 						gTS.p_read += 4;
 						bExit = true;
 					}
-					else if (gTS.data[gTS.p_read + 1] == 'C' &&
-							 gTS.data[gTS.p_read + 2] == 'L' &&
-							 gTS.data[gTS.p_read + 3] == 'R')
+					else if (IS_COMMAND('C','L','R'))
 					{
 						ClearTextLine();
 						gTS.p_read += 4;
 					}
-					else if (gTS.data[gTS.p_read + 1] == 'M' &&
-							 gTS.data[gTS.p_read + 2] == 'S' &&
-							 gTS.data[gTS.p_read + 3] == 'G')
+					else if (IS_COMMAND('M','S','G'))
 					{
 						ClearTextLine();
 						gTS.flags |= 0x03;
@@ -645,9 +623,7 @@ int TextScriptProc()
 						gTS.p_read += 4;
 						bExit = true;
 					}
-					else if (gTS.data[gTS.p_read + 1] == 'M' &&
-							 gTS.data[gTS.p_read + 2] == 'S' &&
-							 gTS.data[gTS.p_read + 3] == '2')
+					else if (IS_COMMAND('M','S','2'))
 					{
 						ClearTextLine();
 						gTS.flags |= 0x21;
@@ -658,9 +634,7 @@ int TextScriptProc()
 						gTS.p_read += 4;
 						bExit = true;
 					}
-					else if (gTS.data[gTS.p_read + 1] == 'M' &&
-							 gTS.data[gTS.p_read + 2] == 'S' &&
-							 gTS.data[gTS.p_read + 3] == '3')
+					else if (IS_COMMAND('M','S','3'))
 					{
 						ClearTextLine();
 						gTS.flags |= 0x23;
@@ -670,39 +644,29 @@ int TextScriptProc()
 						gTS.p_read += 4;
 						bExit = true;
 					}
-					else if (gTS.data[gTS.p_read + 1] == 'W' &&
-							 gTS.data[gTS.p_read + 2] == 'A' &&
-							 gTS.data[gTS.p_read + 3] == 'I')
+					else if (IS_COMMAND('W','A','I'))
 					{
 						gTS.mode = 4;
 						gTS.wait_next = GetTextScriptNo(gTS.p_read + 4);
 						gTS.p_read += 8;
 						bExit = true;
 					}
-					else if (gTS.data[gTS.p_read + 1] == 'T' &&
-							 gTS.data[gTS.p_read + 2] == 'U' &&
-							 gTS.data[gTS.p_read + 3] == 'R')
+					else if (IS_COMMAND('T','U','R'))
 					{
 						gTS.p_read += 4;
 						gTS.flags |= 0x10;
 					}
-					else if (gTS.data[gTS.p_read + 1] == 'S' &&
-							 gTS.data[gTS.p_read + 2] == 'A' &&
-							 gTS.data[gTS.p_read + 3] == 'T')
+					else if (IS_COMMAND('S','A','T'))
 					{
 						gTS.p_read += 4;
 						gTS.flags |= 0x40;
 					}
-					else if (gTS.data[gTS.p_read + 1] == 'C' &&
-							 gTS.data[gTS.p_read + 2] == 'A' &&
-							 gTS.data[gTS.p_read + 3] == 'T')
+					else if (IS_COMMAND('C','A','T'))
 					{
 						gTS.p_read += 4;
 						gTS.flags |= 0x40;
 					}
-					else if (gTS.data[gTS.p_read + 1] == 'F' &&
-							 gTS.data[gTS.p_read + 2] == 'L' &&
-							 gTS.data[gTS.p_read + 3] == 'J')
+					else if (IS_COMMAND('F','L','J'))
 					{
 						int x = GetTextScriptNo(gTS.p_read + 4);
 						int z = GetTextScriptNo(gTS.p_read + 9);
@@ -712,9 +676,7 @@ int TextScriptProc()
 						else
 							gTS.p_read += 13;
 					}
-					else if (gTS.data[gTS.p_read + 1] == 'S' &&
-							 gTS.data[gTS.p_read + 2] == 'K' &&
-							 gTS.data[gTS.p_read + 3] == 'J')
+					else if (IS_COMMAND('S','K','J'))
 					{
 						int x = GetTextScriptNo(gTS.p_read + 4);
 						int z = GetTextScriptNo(gTS.p_read + 9);
@@ -724,9 +686,7 @@ int TextScriptProc()
 						else
 							gTS.p_read += 13;
 					}
-					else if (gTS.data[gTS.p_read + 1] == 'F' &&
-							 gTS.data[gTS.p_read + 2] == 'A' &&
-							 gTS.data[gTS.p_read + 3] == 'I')
+					else if (IS_COMMAND('F','A','I'))
 					{
 						int z = GetTextScriptNo(gTS.p_read + 4);
 						StartFadeIn(z);
@@ -734,9 +694,7 @@ int TextScriptProc()
 						gTS.p_read += 8;
 						bExit = true;
 					}
-					else if (gTS.data[gTS.p_read + 1] == 'F' &&
-							 gTS.data[gTS.p_read + 2] == 'A' &&
-							 gTS.data[gTS.p_read + 3] == 'O')
+					else if (IS_COMMAND('F','A','O'))
 					{
 						int z = GetTextScriptNo(gTS.p_read + 4);
 						StartFadeOut(z);
@@ -744,31 +702,29 @@ int TextScriptProc()
 						gTS.p_read += 8;
 						bExit = true;
 					}
-					else if (gTS.data[gTS.p_read + 1] == 'M' &&
-							 gTS.data[gTS.p_read + 2] == 'N' &&
-							 gTS.data[gTS.p_read + 3] == 'A')
+					else if (IS_COMMAND('M','N','A'))
 					{
 						StartMapName();
 						gTS.p_read += 4;
 					}
-					else if (gTS.data[gTS.p_read + 1] == 'C' &&
-							 gTS.data[gTS.p_read + 2] == 'M' &&
-							 gTS.data[gTS.p_read + 3] == 'U')
+					else if (IS_COMMAND('S','O','U'))
+					{
+						int z = GetTextScriptNo(gTS.p_read + 4);
+						PlaySoundObject(z, 1);
+						gTS.p_read += 8;
+					}
+					else if (IS_COMMAND('C','M','U'))
 					{
 						int z = GetTextScriptNo(gTS.p_read + 4);
 						ChangeMusic(z);
 						gTS.p_read += 8;
 					}
-					else if (gTS.data[gTS.p_read + 1] == 'F' &&
-							 gTS.data[gTS.p_read + 2] == 'M' &&
-							 gTS.data[gTS.p_read + 3] == 'U')
+					else if (IS_COMMAND('F','M','U'))
 					{
 						SetOrganyaFadeout();
 						gTS.p_read += 4;
 					}
-					else if (gTS.data[gTS.p_read + 1] == 'R' &&
-							 gTS.data[gTS.p_read + 2] == 'M' &&
-							 gTS.data[gTS.p_read + 3] == 'U')
+					else if (IS_COMMAND('R','M','U'))
 					{
 						ReCallMusic();
 						gTS.p_read += 4;

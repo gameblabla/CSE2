@@ -89,8 +89,8 @@ void SetFrameMyChar()
 	int16_t map_w, map_l;
 	GetMapData(0, &map_w, &map_l);
 	
-	gFrame.x = mc_x - (WINDOW_WIDTH << 9);
-	gFrame.y = mc_y - (WINDOW_HEIGHT << 9);
+	gFrame.x = mc_x - (WINDOW_WIDTH << 8);
+	gFrame.y = mc_y - (WINDOW_HEIGHT << 8);
 	
 	//Keep in bounds
 	if (gFrame.x <= -0x200)

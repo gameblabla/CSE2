@@ -4,6 +4,7 @@
 
 #include "Caret.h"
 #include "Draw.h"
+#include "Game.h"
 
 #define CARET_MAX 0x40
 CARET gCrt[CARET_MAX];
@@ -16,6 +17,61 @@ void InitCaret()
 void ActCaret00(CARET *crt)
 {
 	;
+}
+
+void ActCaret01(CARET *crt)
+{
+	RECT rcLeft[4];
+	RECT rcRight[4];
+	
+	rcLeft[0] = {0, 64, 8, 72};
+	rcLeft[1] = {8, 64, 16, 72};
+	rcLeft[2] = {16, 64, 24, 72};
+	rcLeft[3] = {24, 64, 32, 72};
+	
+	rcRight[0] = {64, 24, 72, 32};
+	rcRight[1] = {72, 24, 80, 32};
+	rcRight[2] = {80, 24, 88, 32};
+	rcRight[3] = {88, 24, 92, 32};
+	
+	if (!crt->act_no)
+	{
+		crt->act_no = 1;
+		crt->xm = Random(-0x400, 0x400);
+		crt->ym = Random(-0x400, 0);
+	}
+	
+	crt->ym += 0x40;
+	crt->x += crt->xm;
+	crt->y += crt->ym;
+	
+	if (++crt->ani_wait > 5)
+	{
+		crt->ani_wait = 0;
+		if (++crt->ani_no > 3)
+			crt->cond = 0;
+	}
+	
+	if (crt->direct)
+		crt->rect = rcRight[crt->ani_no];
+	else
+		crt->rect = rcLeft[crt->ani_no];
+}
+
+
+
+
+void ActCaret09(CARET *crt)
+{
+	if (++crt->ani_wait <= 4)
+		crt->y -= 0x800;
+	if (crt->ani_wait == 32 )
+		crt->cond = 0;
+	
+	if (crt->direct)
+		crt->rect = {48, 64, 64, 80};
+	else
+		crt->rect = {0, 80, 16, 96};
 }
 
 //Tables
@@ -45,7 +101,7 @@ typedef void (*CARETFUNCTION)(CARET*);
 CARETFUNCTION gpCaretFuncTbl[] =
 {
 	&ActCaret00,
-	nullptr, //&ActCaret01,
+	&ActCaret01,
 	nullptr, //&ActCaret02,
 	nullptr, //&ActCaret03,
 	nullptr, //&ActCaret04,
@@ -53,7 +109,7 @@ CARETFUNCTION gpCaretFuncTbl[] =
 	nullptr, //&ActCaret04,
 	nullptr, //&ActCaret07,
 	nullptr, //&ActCaret08,
-	nullptr, //&ActCaret09,
+	&ActCaret09,
 	nullptr, //&ActCaret10,
 	nullptr, //&ActCaret11,
 	nullptr, //&ActCaret12,
@@ -61,15 +117,18 @@ CARETFUNCTION gpCaretFuncTbl[] =
 	nullptr, //&ActCaret14,
 	nullptr, //&ActCaret15,
 	nullptr, //&ActCaret16,
-	nullptr //&ActCaret17
+	nullptr, //&ActCaret17
 };
 
 void ActCaret()
 {
 	for (int i = 0; i < CARET_MAX; i++)
 	{
-		if (gCrt[i].cond & 0x80 && gpCaretFuncTbl[gCrt[i].code] != nullptr)
+		if ((gCrt[i].cond & 0x80) && gpCaretFuncTbl[gCrt[i].code] != nullptr)
+		{
+			printf("ActCaret%02d\n", gCrt[i].code);
 			gpCaretFuncTbl[gCrt[i].code](&gCrt[i]);
+		}
 	}
 }
 
@@ -93,7 +152,7 @@ void SetCaret(int x, int y, int code, int dir)
 {
 	for (int c = 0; c < CARET_MAX; c++)
 	{
-		if (gCrt[c].cond)
+		if (!gCrt[c].cond)
 		{
 			memset(&gCrt[c], 0, sizeof(CARET));
 			gCrt[c].cond = 0x80;

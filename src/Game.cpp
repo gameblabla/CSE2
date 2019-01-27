@@ -136,12 +136,12 @@ int ModeOpening()
 		ActBack();
 		ResetMyCharFlag();
 		HitMyCharMap();
-		//HitMyCharNpChar();
+		HitMyCharNpChar();
 		//HitMyCharBoss();
 		HitNpCharMap();
 		//HitBossMap();
 		//HitBossBullet();
-		//ActCaret();
+		ActCaret();
 		MoveFrame3();
 		ProcFade();
 		
@@ -157,7 +157,7 @@ int ModeOpening()
 		PutMapDataVector(frame_x, frame_y);
 		PutStage_Front(frame_x, frame_y);
 		PutFront(frame_x, frame_y);
-		//PutCaret(frame_x, frame_y);
+		PutCaret(frame_x, frame_y);
 		PutFade();
 		
 		//Update Text Script
@@ -471,7 +471,7 @@ int ModeAction()
 				ActBack();
 				ResetMyCharFlag();
 				HitMyCharMap();
-				//HitMyCharNpChar();
+				HitMyCharNpChar();
 				//HitMyCharBoss();
 				HitNpCharMap();
 				//HitBossMap();
