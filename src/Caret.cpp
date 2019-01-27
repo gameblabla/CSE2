@@ -125,10 +125,7 @@ void ActCaret()
 	for (int i = 0; i < CARET_MAX; i++)
 	{
 		if ((gCrt[i].cond & 0x80) && gpCaretFuncTbl[gCrt[i].code] != nullptr)
-		{
-			printf("ActCaret%02d\n", gCrt[i].code);
 			gpCaretFuncTbl[gCrt[i].code](&gCrt[i]);
-		}
 	}
 }
 
