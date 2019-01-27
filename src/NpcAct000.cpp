@@ -669,3 +669,82 @@ void ActNpc016(NPCHAR *npc)
 
 	npc->rect = rects[npc->ani_no];
 }
+
+// Health refill
+void ActNpc017(NPCHAR *npc)
+{
+	RECT rect[2];
+
+	rect[0] = {288, 0, 304, 16};
+	rect[1] = {304, 0, 320, 16};
+
+	int aa;
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+
+			if (npc->direct == 2)
+			{
+				npc->ym = -512;
+
+				for (int a = 0; a < 4; ++a)
+					SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+			}
+
+			// Fallthrough
+		case 1:
+			aa = Random(0, 30);
+
+			if (aa >= 10)
+			{
+				if (aa >= 25)
+					npc->act_no = 4;
+				else
+					npc->act_no = 3;
+			}
+			else
+			{
+				npc->act_no = 2;
+			}
+
+			npc->act_wait = Random(0x10, 0x40);
+			npc->ani_wait = 0;
+			break;
+
+		case 2:
+			npc->rect = rect[0];
+
+			if (--npc->act_wait == 0)
+				npc->act_no = 1;
+
+			break;
+
+		case 3:
+			if (++npc->ani_wait % 2)
+				npc->rect = rect[0];
+			else
+				npc->rect = rect[1];
+
+			if (--npc->act_wait == 0)
+				npc->act_no = 1;
+
+			break;
+
+		case 4:
+			npc->rect = rect[1];
+
+			if (--npc->act_wait == 0)
+				npc->act_no = 1;
+
+			break;
+	}
+
+	npc->ym += 0x40;
+
+	if (npc->ym > 0x5FF)
+		npc->ym = 0x5FF;
+
+	npc->y += npc->ym;
+}

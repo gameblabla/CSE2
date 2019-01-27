@@ -8,3 +8,4 @@ void ActNpc005(NPCHAR *npc);
 void ActNpc006(NPCHAR *npc);
 
 void ActNpc016(NPCHAR *npc);
+void ActNpc017(NPCHAR *npc);
