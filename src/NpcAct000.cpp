@@ -15,12 +15,15 @@ void ActNpc000(NPCHAR *npc)
 	RECT rect[1];
 	rect[0] = {0x00, 0x00, 0x10, 0x10};
 
-	if (!npc->act_no)
+	switch (npc->act_no)
 	{
-		npc->act_no = 1;
+		case 0:
+			npc->act_no = 1;
 
-		if (npc->direct == 2)
-			npc->y += 0x2000;
+			if (npc->direct == 2)
+				npc->y += 0x2000;
+
+			break;
 	}
 
 	npc->rect = rect[0];
