@@ -375,8 +375,8 @@ void CortBox2(RECT *rect, uint32_t col, int surf_no)
 	
 	SDL_SetRenderTarget(gRenderer, surf[surf_no].texture);
 	
-	const unsigned char col_red = col & 0xFF0000 >> 16;
-	const unsigned char col_green = col & 0x00FF00 >> 8;
+	const unsigned char col_red = (col & 0xFF0000) >> 16;
+	const unsigned char col_green = (col & 0x00FF00) >> 8;
 	const unsigned char col_blue = col & 0x0000FF;
 	const unsigned char col_alpha = (col_red || col_green || col_blue) ? 0xFF : 0;
 
