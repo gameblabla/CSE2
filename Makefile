@@ -61,6 +61,8 @@ SOURCES = \
 	NpcAct040 \
 	NpcAct060 \
 	NpcAct200 \
+	NpcAct280 \
+	NpcAct300 \
 	NpcAct340 \
 	NpChar \
 	NpcHit \
