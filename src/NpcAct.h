@@ -13,3 +13,5 @@ void ActNpc017(NPCHAR *npc);
 void ActNpc018(NPCHAR *npc);
 
 void ActNpc021(NPCHAR *npc);
+
+void ActNpc032(NPCHAR *npc);

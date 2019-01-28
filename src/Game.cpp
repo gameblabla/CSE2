@@ -10,6 +10,7 @@
 #include "NpcHit.h"
 #include "Generic.h"
 #include "GenericLoad.h"
+#include "ArmsItem.h"
 #include "TextScr.h"
 #include "Fade.h"
 #include "Frame.h"
@@ -25,6 +26,7 @@
 #include "Sound.h"
 #include "Organya.h"
 #include "Profile.h"
+#include "MycParam.h"
 #include "Back.h"
 #include "KeyControl.h"
 #include "ValueView.h"
@@ -278,15 +280,10 @@ int ModeTitle()
 			break;
 	}
 	
-	//Reset cliprect, flags, and give the player the booster 0.8?
+	//Reset cliprect, flags, and give the player the nikumaru counter
 	grcGame.left = 0;
 	g_GameFlags = 0;
-	
-	/*
-	v0 = unk_81C8598;
-	BYTE1(v0) |= 1u;
-	unk_81C8598 = v0;
-	*/
+	gMC.equip & 0x100;
 	
 	//Start loop
 	int wait = 0;
@@ -434,8 +431,8 @@ int ModeAction()
 	//InitStar();
 	InitFade();
 	//InitFlash();
-	//ClearArmsData();
-	//ClearItemData();
+	ClearArmsData();
+	ClearItemData();
 	//ClearPermitStage();
 	//StartMapping();
 	InitFlags();
@@ -518,6 +515,41 @@ int ModeAction()
 			//PutBossLife();
 			PutFade();
 			
+			if (!(g_GameFlags & 4))
+			{
+				//Open inventory
+				if (gKeyTrg & gKeyItem)
+				{
+					BackupSurface(10, &grcGame);
+					
+					int campRet = CampLoop();
+					if (campRet == 0)
+						return 0;
+					if (campRet == 2)
+						return 1;
+					gMC.cond &= ~1;
+				}
+				/*
+				else if ( unk_81C8598 & 2 && gKeyTrg & gKeyMap )
+				{
+				BackupSurface(10, &grcGame);
+				v3 = MiniMapLoop();
+				if ( !v3 )
+				return 0;
+				if ( v3 == 2 )
+				return 1;
+				}
+				*/
+			}
+			
+			if (g_GameFlags & 2)
+			{
+				if (gKeyTrg & gKeyArms)
+					RotationArms();
+				else if (gKeyTrg & gKeyArmsRev)
+					RotationArmsRev();
+			}
+
 			if (swPlay & 1)
 			{
 				int tscRet = TextScriptProc();
@@ -528,6 +560,14 @@ int ModeAction()
 			}
 			
 			PutMapName(false);
+			
+			if (g_GameFlags & 2)
+			{
+				PutMyLife(true);
+				PutArmsEnergy(true);
+				PutMyAir((WINDOW_WIDTH - 80) / 2, (WINDOW_HEIGHT - 32) / 2);
+				PutActiveArmsList();
+			}
 			
 			if (g_GameFlags & 8)
 			{

@@ -243,14 +243,30 @@ void BackupSurface(int surf_no, RECT *rect)
 	SDL_FreeSurface(surface);
 	
 	//Get rects
-	SDL_Rect frameRect = {0, 0, frameRect.w, frameRect.h};
-	SDL_Rect destRect = RectToSDLRect(rect);
+	SDL_Rect frameRect = RectToSDLRect(rect);
+	frameRect = {frameRect.x * gWindowScale, frameRect.y * gWindowScale, frameRect.w * gWindowScale, frameRect.h * gWindowScale};
 	
-	//Draw texture onto surface
-	SDL_SetRenderTarget(gRenderer, surf[surf_no].texture);
-	SDL_RenderCopy(gRenderer, screenTexture, &frameRect, &destRect);
+	SDL_Texture *textureAccessible = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, frameRect.w, frameRect.h);
+	
+	if (!textureAccessible)
+	{
+		printf("Failed to create real texture for surface id %d\nSDL Error: %s\n", surf_no, SDL_GetError());
+		return;
+	}
+	
+	SDL_SetTextureBlendMode(textureAccessible, SDL_BLENDMODE_BLEND);
+	
+	SDL_SetRenderTarget(gRenderer, textureAccessible);
+	SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 0);
+	SDL_RenderClear(gRenderer);
+	SDL_RenderCopy(gRenderer, screenTexture, &frameRect, NULL);
+	SDL_RenderPresent(gRenderer);
 	SDL_SetRenderTarget(gRenderer, NULL);
-
+	
+	//Set surface's metadata
+	surf[surf_no].texture = textureAccessible;
+	
+	//Free stuff
 	SDL_DestroyTexture(screenTexture);
 }
 

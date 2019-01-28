@@ -5,10 +5,14 @@
 
 #include "MyChar.h"
 #include "MycParam.h"
+#include "ArmsItem.h"
 #include "NpChar.h"
 #include "Draw.h"
 #include "Sound.h"
+#include "ValueView.h"
 #include "KeyControl.h"
+#include "TextScr.h"
+#include "Flags.h"
 #include "Game.h"
 #include "Caret.h"
 
@@ -147,9 +151,9 @@ void PutMyChar(int fx, int fy)
 	if ((gMC.cond & 0x80u) && !(gMC.cond & 2))
 	{
 		//Draw weapon
-		gMC.rect_arms.left = 24 * 0;//(gArmsData[gSelectedArms].code % 13);
+		gMC.rect_arms.left = 24 * (gArmsData[gSelectedArms].code % 13);
 		gMC.rect_arms.right = gMC.rect_arms.left + 24;
-		gMC.rect_arms.top = 96 * 0;//(gArmsData[gSelectedArms].code / 13);
+		gMC.rect_arms.top = 96 * (gArmsData[gSelectedArms].code / 13);
 		gMC.rect_arms.bottom = gMC.rect_arms.top + 16;
 		
 		if (gMC.direct == 2)
@@ -183,14 +187,14 @@ void PutMyChar(int fx, int fy)
 			PutBitmap3(
 				&grcGame,
 				(gMC.x - gMC.view.left) / 0x200 - fx / 0x200,
-				arms_offset_y + (gMC.y - gMC.view.top) / 0x200 - fy / 0x200,
+				(gMC.y - gMC.view.top) / 0x200 - fy / 0x200 + arms_offset_y,
 				&gMC.rect_arms,
 				11);
 		else
 			PutBitmap3(
 				&grcGame,
 				(gMC.x - gMC.view.left) / 0x200 - fx / 0x200 - 8,
-				arms_offset_y + (gMC.y - gMC.view.top) / 0x200 - fy / 0x200,
+				(gMC.y - gMC.view.top) / 0x200 - fy / 0x200 + arms_offset_y,
 				&gMC.rect_arms,
 				11);
 		
@@ -633,47 +637,50 @@ void ActMyChar_Normal(bool bKey)
 
 void AirProcess()
 {
-	/*
-	if ( unk_81C8598 & 0x10 )
+	if (gMC.equip & 0x10)
 	{
-	unk_81C8624 = 1000;
-	unk_81C8628 = 0;
+		gMC.air = 1000;
+		gMC.air_get = 0;
 	}
 	else
 	{
-	if ( gMC.flag & 0x100 )
-	{
-	if ( --unk_81C8624 <= 0 )
-	{
-	if ( (unsigned __int8)GetNPCFlag(4000) )
-	{
-	StartTextScript(1100);
+		if (gMC.flag & 0x100)
+		{
+			if (--gMC.air <= 0)
+			{
+				if (GetNPCFlag(4000))
+				{
+					//Core cutscene
+					StartTextScript(1100);
+				}
+				else
+				{
+					//Drown
+					StartTextScript(41);
+					
+					if (gMC.direct)
+						SetCaret(gMC.x, gMC.y, 8, 2);
+					else
+						SetCaret(gMC.x, gMC.y, 8, 0);
+					
+					gMC.cond &= ~0x80;
+				}
+			}
+		}
+		else
+		{
+			gMC.air = 1000;
+		}
+		
+		if ( gMC.flag & 0x100 )
+		{
+			gMC.air_get = 60;
+		}
+		else if (gMC.air_get)
+		{
+			--gMC.air_get;
+		}
 	}
-	else
-	{
-	StartTextScript(41);
-	if ( dir )
-	SetCaret(x, y, 8, 2);
-	else
-	SetCaret(x, y, 8, 0);
-	gMC.cond &= 0x7Fu;
-	}
-	}
-	}
-	else
-	{
-	unk_81C8624 = 1000;
-	}
-	if ( gMC.flag & 0x100 )
-	{
-	unk_81C8628 = 60;
-	}
-	else if ( unk_81C8628 )
-	{
-	--unk_81C8628;
-	}
-	}
-	*/
 }
 
 void ActMyChar(bool bKey)
@@ -689,7 +696,7 @@ void ActMyChar(bool bKey)
 		}
 		else if (gMC.exp_count)
 		{
-			//SetValueView(&x, &y, gMC.exp_count);
+			SetValueView(&gMC.x, &gMC.y, gMC.exp_count);
 			gMC.exp_count = 0;
 		}
 		

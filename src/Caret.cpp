@@ -58,6 +58,14 @@ void ActCaret01(CARET *crt)
 		crt->rect = rcLeft[crt->ani_no];
 }
 
+void ActCaret08(CARET *crt)
+{
+	if (crt->direct)
+		crt->rect = {32, 80, 48, 96};
+	else
+		crt->rect = {16, 80, 32, 96};
+}
+
 void ActCaret09(CARET *crt)
 {
 	if (++crt->ani_wait <= 4)
@@ -138,20 +146,20 @@ CARET_TABLE gCaretTable[18] =
 typedef void (*CARETFUNCTION)(CARET*);
 CARETFUNCTION gpCaretFuncTbl[] =
 {
-	&ActCaret00,
-	&ActCaret01,
+	ActCaret00,
+	ActCaret01,
 	nullptr, //&ActCaret02,
 	nullptr, //&ActCaret03,
 	nullptr, //&ActCaret04,
 	nullptr, //&ActCaret05,
 	nullptr, //&ActCaret04,
 	nullptr, //&ActCaret07,
-	nullptr, //&ActCaret08,
-	&ActCaret09,
+	ActCaret08,
+	ActCaret09,
 	nullptr, //&ActCaret10,
 	nullptr, //&ActCaret11,
 	nullptr, //&ActCaret12,
-	&ActCaret13,
+	ActCaret13,
 	nullptr, //&ActCaret14,
 	nullptr, //&ActCaret15,
 	nullptr, //&ActCaret16,

@@ -27,3 +27,22 @@ void ActNpc021(NPCHAR *npc)
 
 	npc->rect = rect[0];
 }
+
+//Life capsule
+void ActNpc032(NPCHAR *npc)
+{
+	RECT rect[2];
+	rect[0] = {32, 96, 48, 112};
+	rect[1] = {48, 96, 64, 112};
+	
+	if (++npc->ani_wait > 2)
+	{
+		npc->ani_wait = 0;
+		++npc->ani_no;
+	}
+	
+	if (npc->ani_no > 1)
+		npc->ani_no = 0;
+	
+	npc->rect = rect[npc->ani_no];
+}

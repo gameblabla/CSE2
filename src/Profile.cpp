@@ -7,6 +7,7 @@
 #include "Tags.h"
 #include "Profile.h"
 #include "Fade.h"
+#include "ArmsItem.h"
 #include "Flags.h"
 #include "MyChar.h"
 #include "Frame.h"
@@ -43,11 +44,11 @@ bool LoadProfile(char *name)
 bool InitializeGame()
 {
 	InitMyChar();
-	//gSelectedArms = 0;
-	//gSelectedItem = 0;
+	gSelectedArms = 0;
+	gSelectedItem = 0;
 	gCounter = 0;
-	//ClearArmsData();
-	//ClearItemData();
+	ClearArmsData();
+	ClearItemData();
 	//ClearPermitStage();
 	//StartMapping();
 	InitFlags();

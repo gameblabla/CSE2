@@ -34,6 +34,7 @@ endif
 
 # For an accurate result to the original's code, compile in alphabetical order
 SOURCES = \
+	ArmsItem \
 	Back \
 	Caret \
 	Config \

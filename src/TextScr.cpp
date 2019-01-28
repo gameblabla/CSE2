@@ -7,10 +7,13 @@
 #include "TextScr.h"
 #include "Draw.h"
 #include "Tags.h"
+#include "ArmsItem.h"
 #include "MyChar.h"
 #include "Fade.h"
 #include "Stage.h"
+#include "MycParam.h"
 #include "Flags.h"
+#include "Profile.h"
 #include "MapName.h"
 #include "KeyControl.h"
 #include "NpChar.h"
@@ -489,6 +492,7 @@ int TextScriptProc()
 			gTS.wait = 0;
 			
 			//Parsing time
+			int w, x, y, z;
 			bExit = false;
 			
 			while (!bExit)
@@ -510,7 +514,7 @@ int TextScriptProc()
 					else if (gTS.flags & 0x10)
 					{
 						//SAT/CAT/TUR printing
-						int x;
+						x;
 						for (x = gTS.p_read; ; x++)
 						{
 							//Break if reaches command, or new-line
@@ -604,19 +608,65 @@ int TextScriptProc()
 						gTS.face = 0;
 						bExit = true;
 					}
+					else if (IS_COMMAND('L','I','+'))
+					{
+						x = GetTextScriptNo(gTS.p_read + 4);
+						AddLifeMyChar(x);
+						gTS.p_read += 8;
+					}
+					else if (IS_COMMAND('M','L','+'))
+					{
+						z = GetTextScriptNo(gTS.p_read + 4);
+						AddMaxLifeMyChar(z);
+						gTS.p_read += 8;
+					}
+					else if (IS_COMMAND('A','E','+'))
+					{
+						FullArmsEnergy();
+						gTS.p_read += 4;
+					}
+					else if (IS_COMMAND('I','T','+'))
+					{
+						x = GetTextScriptNo(gTS.p_read + 4);
+						PlaySoundObject(38, 1);
+						AddItemData(x);
+						gTS.p_read += 8;
+					}
+					else if (IS_COMMAND('I','T','-'))
+					{
+						z = GetTextScriptNo(gTS.p_read + 4);
+						SubItemData(z);
+						gTS.p_read += 8;
+					}
+					else if (IS_COMMAND('A','M','+'))
+					{
+						w = GetTextScriptNo(gTS.p_read + 4);
+						x = GetTextScriptNo(gTS.p_read + 9);
+						gNumberTextScript[0] = x;
+						gNumberTextScript[1] = z;
+						PlaySoundObject(38, 1);
+						AddArmsData(w, x);
+						gTS.p_read += 13;
+					}
+					else if (IS_COMMAND('A','M','-'))
+					{
+						z = GetTextScriptNo(gTS.p_read + 4);
+						SubArmsData(z);
+						gTS.p_read += 8;
+					}
 					else if (IS_COMMAND('T','R','A'))
 					{
-						int z = GetTextScriptNo(gTS.p_read + 4);
-						int w = GetTextScriptNo(gTS.p_read + 9);
-						int x = GetTextScriptNo(gTS.p_read + 14);
-						int y = GetTextScriptNo(gTS.p_read + 19);
+						z = GetTextScriptNo(gTS.p_read + 4);
+						w = GetTextScriptNo(gTS.p_read + 9);
+						x = GetTextScriptNo(gTS.p_read + 14);
+						y = GetTextScriptNo(gTS.p_read + 19);
 						if (!TransferStage(z, w, x, y))
 							return 0;
 					}
 					else if (IS_COMMAND('M','O','V'))
 					{
-						int x = GetTextScriptNo(gTS.p_read + 4);
-						int y = GetTextScriptNo(gTS.p_read + 9);
+						x = GetTextScriptNo(gTS.p_read + 4);
+						y = GetTextScriptNo(gTS.p_read + 9);
 						SetMyCharPosition(x << 13, y << 13);
 						gTS.p_read += 13;
 					}
@@ -632,25 +682,25 @@ int TextScriptProc()
 					}
 					else if (IS_COMMAND('F','L','+'))
 					{
-						int z = GetTextScriptNo(gTS.p_read + 4);
+						z = GetTextScriptNo(gTS.p_read + 4);
 						SetNPCFlag(z);
 						gTS.p_read += 8;
 					}
 					else if (IS_COMMAND('F','L','-'))
 					{
-						int z = GetTextScriptNo(gTS.p_read + 4);
+						z = GetTextScriptNo(gTS.p_read + 4);
 						CutNPCFlag(z);
 						gTS.p_read += 8;
 					}
 					else if (IS_COMMAND('S','K','+'))
 					{
-						int z = GetTextScriptNo(gTS.p_read + 4);
+						z = GetTextScriptNo(gTS.p_read + 4);
 						SetSkipFlag(z);
 						gTS.p_read += 8;
 					}
 					else if (IS_COMMAND('S','K','-'))
 					{
-						int z = GetTextScriptNo(gTS.p_read + 4);
+						z = GetTextScriptNo(gTS.p_read + 4);
 						CutSkipFlag(z);
 						gTS.p_read += 8;
 					}
@@ -744,7 +794,7 @@ int TextScriptProc()
 					}
 					else if (IS_COMMAND('E','V','E'))
 					{
-						int z = GetTextScriptNo(gTS.p_read + 4);
+						z = GetTextScriptNo(gTS.p_read + 4);
 						JumpTextScript(z);
 					}
 					else if (IS_COMMAND('Y','N','J'))
@@ -759,8 +809,8 @@ int TextScriptProc()
 					}
 					else if (IS_COMMAND('F','L','J'))
 					{
-						int x = GetTextScriptNo(gTS.p_read + 4);
-						int z = GetTextScriptNo(gTS.p_read + 9);
+						x = GetTextScriptNo(gTS.p_read + 4);
+						z = GetTextScriptNo(gTS.p_read + 9);
 						
 						if (GetNPCFlag(x))
 							JumpTextScript(z);
@@ -769,8 +819,8 @@ int TextScriptProc()
 					}
 					else if (IS_COMMAND('S','K','J'))
 					{
-						int x = GetTextScriptNo(gTS.p_read + 4);
-						int z = GetTextScriptNo(gTS.p_read + 9);
+						x = GetTextScriptNo(gTS.p_read + 4);
+						z = GetTextScriptNo(gTS.p_read + 9);
 						
 						if (GetSkipFlag(x))
 							JumpTextScript(z);
@@ -779,7 +829,7 @@ int TextScriptProc()
 					}
 					else if (IS_COMMAND('F','A','I'))
 					{
-						int z = GetTextScriptNo(gTS.p_read + 4);
+						z = GetTextScriptNo(gTS.p_read + 4);
 						StartFadeIn(z);
 						gTS.mode = 5;
 						gTS.p_read += 8;
@@ -787,7 +837,7 @@ int TextScriptProc()
 					}
 					else if (IS_COMMAND('F','A','O'))
 					{
-						int z = GetTextScriptNo(gTS.p_read + 4);
+						z = GetTextScriptNo(gTS.p_read + 4);
 						StartFadeOut(z);
 						gTS.mode = 5;
 						gTS.p_read += 8;
@@ -800,13 +850,13 @@ int TextScriptProc()
 					}
 					else if (IS_COMMAND('S','O','U'))
 					{
-						int z = GetTextScriptNo(gTS.p_read + 4);
+						z = GetTextScriptNo(gTS.p_read + 4);
 						PlaySoundObject(z, 1);
 						gTS.p_read += 8;
 					}
 					else if (IS_COMMAND('C','M','U'))
 					{
-						int z = GetTextScriptNo(gTS.p_read + 4);
+						z = GetTextScriptNo(gTS.p_read + 4);
 						ChangeMusic(z);
 						gTS.p_read += 8;
 					}
@@ -822,61 +872,76 @@ int TextScriptProc()
 					}
 					else if (IS_COMMAND('D','N','P'))
 					{
-						int z = GetTextScriptNo(gTS.p_read + 4);
+						z = GetTextScriptNo(gTS.p_read + 4);
 						DeleteNpCharEvent(z);
 						gTS.p_read += 8;
 					}
 					else if (IS_COMMAND('D','N','A'))
 					{
-						int z = GetTextScriptNo(gTS.p_read + 4);
+						z = GetTextScriptNo(gTS.p_read + 4);
 						DeleteNpCharCode(z, 1);
 						gTS.p_read += 8;
 					}
 					else if (IS_COMMAND('C','N','P'))
 					{
-						int x = GetTextScriptNo(gTS.p_read + 4);
-						int y = GetTextScriptNo(gTS.p_read + 9);
-						int z = GetTextScriptNo(gTS.p_read + 14);
+						x = GetTextScriptNo(gTS.p_read + 4);
+						y = GetTextScriptNo(gTS.p_read + 9);
+						z = GetTextScriptNo(gTS.p_read + 14);
 						ChangeNpCharByEvent(x, y, z);
 						gTS.p_read += 18;
 					}
 					else if (IS_COMMAND('A','N','P'))
 					{
-						int x = GetTextScriptNo(gTS.p_read + 4);
-						int y = GetTextScriptNo(gTS.p_read + 9);
-						int z = GetTextScriptNo(gTS.p_read + 14);
+						x = GetTextScriptNo(gTS.p_read + 4);
+						y = GetTextScriptNo(gTS.p_read + 9);
+						z = GetTextScriptNo(gTS.p_read + 14);
 						SetNpCharActionNo(x, y, z);
 						gTS.p_read += 18;
 					}
 					else if (IS_COMMAND('I','N','P'))
 					{
-						int x = GetTextScriptNo(gTS.p_read + 4);
-						int y = GetTextScriptNo(gTS.p_read + 9);
-						int z = GetTextScriptNo(gTS.p_read + 14);
+						x = GetTextScriptNo(gTS.p_read + 4);
+						y = GetTextScriptNo(gTS.p_read + 9);
+						z = GetTextScriptNo(gTS.p_read + 14);
 						ChangeCheckableNpCharByEvent(x, y, z);
 						gTS.p_read += 18;
 					}
 					else if (IS_COMMAND('S','N','P'))
 					{
-						int w = GetTextScriptNo(gTS.p_read + 4);
-						int x = GetTextScriptNo(gTS.p_read + 9);
-						int y = GetTextScriptNo(gTS.p_read + 14);
-						int z = GetTextScriptNo(gTS.p_read + 19);
+						w = GetTextScriptNo(gTS.p_read + 4);
+						x = GetTextScriptNo(gTS.p_read + 9);
+						y = GetTextScriptNo(gTS.p_read + 14);
+						z = GetTextScriptNo(gTS.p_read + 19);
 						SetNpChar(w, x << 13, y << 13, 0, 0, z, 0, 0x100);
 						gTS.p_read += 23;
 					}
 					else if (IS_COMMAND('M','N','P'))
 					{
-						int w = GetTextScriptNo(gTS.p_read + 4);
-						int x = GetTextScriptNo(gTS.p_read + 9);
-						int y = GetTextScriptNo(gTS.p_read + 14);
-						int z = GetTextScriptNo(gTS.p_read + 19);
+						w = GetTextScriptNo(gTS.p_read + 4);
+						x = GetTextScriptNo(gTS.p_read + 9);
+						y = GetTextScriptNo(gTS.p_read + 14);
+						z = GetTextScriptNo(gTS.p_read + 19);
 						MoveNpChar(w, x << 13, y << 13, z);
 						gTS.p_read += 23;
 					}
+					else if (IS_COMMAND('I','N','I'))
+					{
+						InitializeGame();
+						gTS.p_read += 4;
+					}
+					else if (IS_COMMAND('S','V','P'))
+					{
+						SaveProfile(NULL);
+						gTS.p_read += 4;
+					}
+					else if (IS_COMMAND('L','D','P'))
+					{
+						if (!LoadProfile(NULL))
+							InitializeGame();
+					}
 					else if (IS_COMMAND('F','A','C'))
 					{
-						int z = GetTextScriptNo(gTS.p_read + 4);
+						z = GetTextScriptNo(gTS.p_read + 4);
 						if (gTS.face != z)
 						{
 							gTS.face = z;
@@ -886,7 +951,7 @@ int TextScriptProc()
 					}
 					else if (IS_COMMAND('F','A','C'))
 					{
-						int z = GetTextScriptNo(gTS.p_read + 4);
+						z = GetTextScriptNo(gTS.p_read + 4);
 						if (gTS.face != z)
 						{
 							gTS.face = z;
@@ -896,10 +961,14 @@ int TextScriptProc()
 					}
 					else if (IS_COMMAND('G','I','T'))
 					{
-						int z = GetTextScriptNo(gTS.p_read + 4);
+						z = GetTextScriptNo(gTS.p_read + 4);
 						gTS.item = z;
 						gTS.item_y = WINDOW_HEIGHT - 112;
 						gTS.p_read += 8;
+					}
+					else if (IS_COMMAND('E','S','C'))
+					{
+						return 2;
 					}
 					else
 					{

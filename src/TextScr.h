@@ -61,5 +61,6 @@ bool LoadTextScript2(char *name);
 bool LoadTextScript_Stage(char *name);
 void GetTextScriptPath(char *path);
 bool StartTextScript(int no);
+void StopTextScript();
 void PutTextScript();
 int TextScriptProc();
