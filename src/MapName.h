@@ -6,7 +6,7 @@ struct MAP_NAME
 	char name[0x20];
 };
 
-void ReadyMapName(char *str);
+void ReadyMapName(const char *str);
 void PutMapName(bool bMini);
 void StartMapName();
 void RestoreMapName();
