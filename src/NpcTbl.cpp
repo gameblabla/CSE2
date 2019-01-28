@@ -92,8 +92,6 @@ NPCFUNCTION gpNpcFuncTbl[361] =
 	nullptr,
 	nullptr,
 	nullptr,
-	ActNpc032,
-	nullptr,
 	nullptr,
 	ActNpc037,
 	nullptr,
