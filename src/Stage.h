@@ -12,8 +12,6 @@ struct STAGE_TABLE
 	char name[0x20];
 };
 
-bool InitStageTable();
-void ReleaseStageTable();
 bool TransferStage(int no, int w, int x, int y);
 void ChangeMusic(int no);
 void ReCallMusic();

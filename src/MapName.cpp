@@ -8,7 +8,7 @@
 MAP_NAME gMapName;
 RECT rc = { 0, 0, 160, 12 };
 
-void ReadyMapName(char *str)
+void ReadyMapName(const char *str)
 {
 	//Reset map name flags
 	gMapName.flag = 0;

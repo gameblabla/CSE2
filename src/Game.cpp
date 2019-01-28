@@ -594,7 +594,7 @@ bool Game()
 		char path[PATH_LENGTH];
 		sprintf(path, "%s/npc.tbl", gDataPath);
 		
-		if (LoadNpcTable(path) && InitStageTable())
+		if (LoadNpcTable(path))
 		{
 			InitTextScript2();
 			InitSkipFlags();
@@ -614,7 +614,6 @@ bool Game()
 			
 			EndMapData();
 			EndTextScript();
-			ReleaseStageTable();
 			ReleaseNpcTable();
 			ReleaseCreditScript();
 		}
