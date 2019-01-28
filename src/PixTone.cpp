@@ -152,7 +152,7 @@ bool MakePixelWaveData(const std::vector<double>& pxtData, uint8_t *data)
 		const int v2 = (int)(uint64_t)pitchOffset % 256;
 
 		//Input data
-		data[i] = envelopeTable[(unsigned __int64)((long double)(i << 8) / pxtData[1])]
+		data[i] = envelopeTable[(uint64_t)((long double)(i << 8) / pxtData[1])]
 			* (pxtData[4]
 				* gWaveModelTable[(size_t)pxtData[2]][a]
 				/ 0x40
@@ -167,7 +167,7 @@ bool MakePixelWaveData(const std::vector<double>& pxtData, uint8_t *data)
 		long double newMainOffset;
 		if (gWaveModelTable[(size_t)pxtData[6]][v2] >= 0)
 			newMainOffset = (mainFreq * 2)
-			* (long double)gWaveModelTable[(size_t)pxtData[6]][(signed int)(unsigned __int64)pitchOffset % 256]
+			* (long double)gWaveModelTable[(size_t)pxtData[6]][(signed int)(uint64_t)pitchOffset % 256]
 			* pxtData[8]
 			/ 64.0
 			/ 64.0
