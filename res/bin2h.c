@@ -8,6 +8,8 @@
 
 int main(int argc, char *argv[])
 {
+	int result = 0;
+
 	if (argc > 2)
 	{
 		char *last_forward_slash = strrchr(argv[1], '/');
@@ -29,10 +31,12 @@ int main(int argc, char *argv[])
 		if (in_file == NULL)
 		{
 			printf("Couldn't open '%s'\n", argv[1]);
+			result = 1;
 		}
 		else if (out_file == NULL)
 		{
 			printf("Couldn't open '%s'\n", argv[2]);
+			result = 1;
 		}
 		else
 		{
@@ -64,4 +68,10 @@ int main(int argc, char *argv[])
 
 		free(filename);
 	}
+	else
+	{
+		result = 1;
+	}
+
+	return result;
 }
