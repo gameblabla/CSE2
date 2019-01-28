@@ -8,6 +8,7 @@
 #include "Sound.h"
 #include "Back.h"
 #include "Triangle.h"
+#include "Caret.h"
 
 //Computer
 void ActNpc020(NPCHAR *npc)
@@ -107,6 +108,66 @@ void ActNpc023(NPCHAR *npc)
 	npc->rect = rect[npc->ani_no];
 }
 
+//Gunsmith
+void ActNpc030(NPCHAR *npc)
+{
+	RECT rc[3];
+
+	rc[0] = {48, 0, 64, 16};
+	rc[1] = {48, 16, 64, 32};
+	rc[2] = {0, 32, 16, 48};
+
+	if (npc->direct != 0)
+	{
+		switch (npc->act_no)
+		{
+			case 0:
+				npc->act_no = 1;
+				npc->y += 0x2000;
+				npc->ani_no = 2;
+				break;
+		}
+
+		if (++npc->act_wait > 100)
+		{
+			npc->act_wait = 0;
+			SetCaret(npc->x, npc->y - 0x400, 5, 0);
+		}
+	}
+	else
+	{
+		switch (npc->act_no)
+		{
+			case 0:
+				npc->act_no = 1;
+				npc->ani_no = 0;
+				npc->ani_wait = 0;
+				// Fallthrough
+
+			case 1:
+				if (Random(0, 120) == 10)
+				{
+					npc->act_no = 2;
+					npc->act_wait = 0;
+					npc->ani_no = 1;
+				}
+
+				break;
+
+			case 2:
+				if (++npc->act_wait > 8)
+				{
+					npc->act_no = 1;
+					npc->ani_no = 0;
+				}
+
+				break;
+		}
+	}
+
+	npc->rect = rc[npc->ani_no];
+}
+
 //Life capsule
 void ActNpc032(NPCHAR *npc)
 {
@@ -141,6 +202,26 @@ void ActNpc032(NPCHAR *npc)
 	}
 
 	if ( npc->ani_no > 1 )
+		npc->ani_no = 0;
+
+	npc->rect = rect[npc->ani_no];
+}
+
+//Signpost
+void ActNpc037(NPCHAR *npc)
+{
+	RECT rect[2];
+
+	rect[0] = {192, 64, 208, 80};
+	rect[1] = {208, 64, 224, 80};
+
+	if (++npc->ani_wait > 1)
+	{
+		npc->ani_wait = 0;
+		++npc->ani_no;
+	}
+
+	if (npc->ani_no > 1)
 		npc->ani_no = 0;
 
 	npc->rect = rect[npc->ani_no];

@@ -60,6 +60,7 @@ SOURCES = \
 	NpcAct020 \
 	NpcAct040 \
 	NpcAct060 \
+	NpcAct100 \
 	NpcAct200 \
 	NpcAct280 \
 	NpcAct300 \
