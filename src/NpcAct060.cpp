@@ -8,6 +8,75 @@
 #include "Sound.h"
 #include "Back.h"
 #include "Triangle.h"
+#include "Map.h"
+
+//Kazuma at computer
+void ActNpc062(NPCHAR *npc)
+{
+	RECT rcLeft[3];
+
+	rcLeft[0] = {272, 192, 288, 216};
+	rcLeft[1] = {288, 192, 304, 216};
+	rcLeft[2] = {304, 192, 320, 216};
+
+	switch ( npc->act_no )
+	{
+		case 0:
+			npc->x -= 0x800;
+			npc->y += 0x2000;
+			npc->act_no = 1;
+			npc->ani_no = 0;
+			npc->ani_wait = 0;
+			// Fallthrough
+
+		case 1:
+			if (++npc->ani_wait > 2)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no > 1)
+				npc->ani_no = 0;
+
+			if (Random(0, 80) == 1)
+			{
+				npc->act_no = 2;
+				npc->act_wait = 0;
+				npc->ani_no = 1;
+			}
+
+			if (Random(0, 120) == 10)
+			{
+				npc->act_no = 3;
+				npc->act_wait = 0;
+				npc->ani_no = 2;
+			}
+
+			break;
+
+		case 2:
+			if (++npc->act_wait > 40)
+			{
+				npc->act_no = 3;
+				npc->act_wait = 0;
+				npc->ani_no = 2;
+			}
+
+			break;
+
+		case 3:
+			if (++npc->act_wait > 80)
+			{
+				npc->act_no = 1;
+				npc->ani_no = 0;
+			}
+
+			break;
+	}
+
+	npc->rect = rcLeft[npc->ani_no];
+}
 
 //First Cave Critter
 void ActNpc064(NPCHAR *npc)
@@ -116,7 +185,6 @@ void ActNpc064(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-
 //First Cave Bat
 void ActNpc065(NPCHAR *npc)
 {
@@ -188,4 +256,47 @@ void ActNpc065(NPCHAR *npc)
 	else
 		npc->rect = rect_right[npc->ani_no];
 }
-	
+
+//Water droplet
+void ActNpc073(NPCHAR *npc)
+{
+	RECT rect[5];
+
+	rect[0] = {72, 16, 74, 18};
+	rect[1] = {74, 16, 76, 18};
+	rect[2] = {76, 16, 78, 18};
+	rect[3] = {78, 16, 80, 18};
+	rect[4] = {80, 16, 82, 18};
+
+	npc->ym += 0x20;
+	npc->ani_no = Random(0, 4);
+
+	if (npc->ym > 0x5FF)
+		npc->ym = 0x5FF;
+
+	npc->x += npc->xm;
+	npc->y += npc->ym;
+
+	npc->rect = rect[npc->ani_no];
+
+	if (npc->direct == 2)
+	{
+		npc->rect.top += 2;
+		npc->rect.bottom += 2;
+	}
+
+	if (++npc->act_wait > 10)
+	{
+		if (npc->flag & 1)
+			npc->cond = 0;
+		if (npc->flag & 4)
+			npc->cond = 0;
+		if (npc->flag & 8)
+			npc->cond = 0;
+		if (npc->flag & 0x100)
+			npc->cond = 0;
+	}
+
+	if (npc->y > gMap.length * 0x10 * 0x200)
+		npc->cond = 0;
+}

@@ -21,4 +21,3 @@ void ActNpc211(NPCHAR *npc)
 
 	npc->rect = rects[npc->code_event];
 }
-	

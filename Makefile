@@ -58,8 +58,10 @@ SOURCES = \
 	MycParam \
 	NpcAct000 \
 	NpcAct020 \
+	NpcAct040 \
 	NpcAct060 \
 	NpcAct200 \
+	NpcAct340 \
 	NpChar \
 	NpcHit \
 	NpcTbl \

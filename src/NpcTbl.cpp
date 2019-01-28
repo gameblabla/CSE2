@@ -54,7 +54,7 @@ void ReleaseNpcTable()
 }
 
 //Npc function table
-NPCFUNCTION gpNpcFuncTbl[] =
+NPCFUNCTION gpNpcFuncTbl[361] =
 {
 	ActNpc000,
 	ActNpc001,
@@ -78,6 +78,8 @@ NPCFUNCTION gpNpcFuncTbl[] =
 	nullptr,
 	ActNpc020,
 	ActNpc021,
+	ActNpc022,
+	ActNpc023,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -93,6 +95,7 @@ NPCFUNCTION gpNpcFuncTbl[] =
 	nullptr,
 	nullptr,
 	nullptr,
+	ActNpc039,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -112,13 +115,10 @@ NPCFUNCTION gpNpcFuncTbl[] =
 	nullptr,
 	nullptr,
 	nullptr,
+	ActNpc059,
 	nullptr,
 	nullptr,
-	nullptr,
-	nullptr,
-	nullptr,
-	nullptr,
-	nullptr,
+	ActNpc062,
 	nullptr,
 	ActNpc064,
 	ActNpc065,
@@ -129,7 +129,7 @@ NPCFUNCTION gpNpcFuncTbl[] =
 	nullptr,
 	nullptr,
 	nullptr,
-	nullptr,
+	ActNpc073,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -415,5 +415,6 @@ NPCFUNCTION gpNpcFuncTbl[] =
 	nullptr,
 	nullptr,
 	nullptr,
+	ActNpc359,
 	nullptr,
 };
