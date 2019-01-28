@@ -1,4 +1,7 @@
+#pragma once
+
 #include "NpChar.h"
+
 void ActNpc000(NPCHAR *npc);
 void ActNpc001(NPCHAR *npc);
 void ActNpc002(NPCHAR *npc);
@@ -12,6 +15,12 @@ void ActNpc016(NPCHAR *npc);
 void ActNpc017(NPCHAR *npc);
 void ActNpc018(NPCHAR *npc);
 
+void ActNpc020(NPCHAR *npc);
 void ActNpc021(NPCHAR *npc);
 
 void ActNpc032(NPCHAR *npc);
+
+void ActNpc064(NPCHAR *npc);
+void ActNpc065(NPCHAR *npc);
+
+void ActNpc211(NPCHAR *npc);

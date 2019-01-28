@@ -1,5 +1,7 @@
 #include "WindowsWrapper.h"
 
+#include "NpcAct.h"
+
 #include "MyChar.h"
 #include "NpChar.h"
 #include "Game.h"
