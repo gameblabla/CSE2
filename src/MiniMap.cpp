@@ -101,7 +101,7 @@ int MiniMapLoop()
 		
 		PutFramePerSecound();
 		if (!Flip_SystemTask())
-		return 0;
+			return 0;
 	}
 	
 	RECT rcMiniMap = {0, 0, gMap.width, gMap.length};
@@ -145,30 +145,32 @@ int MiniMapLoop()
 		if (!Flip_SystemTask())
 			return 0;
 	}
-	/*
-	for ( f = 8; f >= -1; --f )
-	{
-	GetTrg();
-	if ( gKey & 0x8000 )
-	{
-	v3 = Call_Escape(gscreen);
-	if ( !v3 )
-	return 0;
-	if ( v3 == 2 )
-	return 2;
-	}
-	PutBitmap4(&grcGame, 0, 0, &grcGame, 10);
-	rcView.left = 160 - f * gMap.width / 16;
-	rcView.right = f * gMap.width / 16 + 160;
-	rcView.top = 120 - f * gMap.length / 16;
-	rcView.bottom = f * gMap.length / 16 + 120;
-	PutMapName(1);
-	CortBox(&rcView, 0);
-	PutFramePerSecound();
-	if ( !Flip_SystemTask(gscreen) )
-	return 0;
-	}
-	*/
 	
+	for (int f = 8; f >= -1; --f)
+	{
+		GetTrg();
+
+		if (gKey & KEY_ESCAPE)
+		{
+			int escRet = Call_Escape();
+			if (escRet == 0)
+				return 0;
+			if (escRet == 2)
+				return 2;
+		}
+
+		PutBitmap4(&grcGame, 0, 0, &grcGame, 10);
+		rcView.left = 160 - f * gMap.width / 16;
+		rcView.right = f * gMap.width / 16 + 160;
+		rcView.top = 120 - f * gMap.length / 16;
+		rcView.bottom = f * gMap.length / 16 + 120;
+		PutMapName(true);
+		CortBox(&rcView, 0);
+
+		PutFramePerSecound();
+		if (!Flip_SystemTask())
+			return 0;
+	}
+
 	return 1;
 }
