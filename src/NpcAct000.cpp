@@ -620,6 +620,188 @@ void ActNpc006(NPCHAR *npc)
 		npc->rect = rcLeft[npc->ani_no];
 }
 
+//Basil
+void ActNpc007(NPCHAR *npc)
+{
+	RECT rcLeft[3];
+	RECT rcRight[3];
+
+	rcLeft[0] = {256, 64, 288, 80};
+	rcLeft[1] = {256, 80, 288, 96};
+	rcLeft[2] = {256, 96, 288, 112};
+
+	rcRight[0] = {288, 64, 320, 80};
+	rcRight[1] = {288, 80, 320, 96};
+	rcRight[2] = {288, 96, 320, 112};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->x = gMC.x;
+
+			if (npc->direct == 0)
+				npc->act_no = 1;
+			else
+				npc->act_no = 2;
+
+			break;
+
+		case 1:
+			npc->xm -= 0x40;
+
+			if (npc->x < gMC.x - 0x18000)
+				npc->act_no = 2;
+
+			if (npc->flag & 1)
+			{
+				npc->xm = 0;
+				npc->act_no = 2;
+			}
+
+			break;
+
+		case 2:
+			npc->xm += 0x40;
+
+			if (npc->x > gMC.x + 0x18000)
+				npc->act_no = 1;
+
+			if (npc->flag & 4)
+			{
+				npc->xm = 0;
+				npc->act_no = 1;
+			}
+
+			break;
+	}
+
+	if (npc->xm >= 0)
+		npc->direct = 2;
+	else
+		npc->direct = 0;
+
+	if (npc->xm > 0x5FF)
+		npc->xm = 0x5FF;
+	if (npc->xm < -0x5FF)
+		npc->xm = -0x5FF;
+
+	npc->x += npc->xm;
+
+	if (++npc->ani_wait > 1)
+	{
+		npc->ani_wait = 0;
+		++npc->ani_no;
+	}
+
+	if (npc->ani_no > 2)
+		npc->ani_no = 0;
+
+	if (npc->direct == 0)
+		npc->rect = rcLeft[npc->ani_no];
+	else
+		npc->rect = rcRight[npc->ani_no];
+}
+
+//Beetle (Follows you, Egg Corridor)
+void ActNpc008(NPCHAR *npc)
+{
+	RECT rcLeft[2];
+	RECT rcRight[2];
+
+	rcLeft[0] = {80, 80, 96, 96};
+	rcLeft[1] = {96, 80, 112, 96};
+
+	rcRight[0] = {80, 96, 96, 112};
+	rcRight[1] = {96, 96, 112, 112};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			if (gMC.x >= npc->x + 0x2000 || gMC.x <= npc->x - 0x2000)
+			{
+				npc->bits &= ~0x20;
+				npc->rect.right = 0;
+				npc->damage = 0;
+				npc->xm = 0;
+				npc->ym = 0;
+				return;
+			}
+
+			npc->bits |= 0x20;
+			npc->ym = -0x100;
+			npc->tgt_y = npc->y;
+			npc->act_no = 1;
+			npc->damage = 2;
+
+			if (npc->direct == 0)
+			{
+				npc->x = gMC.x + 0x20000;
+				npc->xm = -0x2FF;
+			}
+			else
+			{
+				npc->x = gMC.x - 0x20000;
+				npc->xm = 0x2FF;
+			}
+
+			break;
+
+		case 1:
+			if (npc->x <= gMC.x)
+			{
+				npc->direct = 2;
+				npc->xm += 0x10;
+			}
+			else
+			{
+				npc->direct = 0;
+				npc->xm -= 0x10;
+			}
+
+			if (npc->xm > 0x2FF)
+				npc->xm = 0x2FF;
+			if (npc->xm < -0x2FF)
+				npc->xm = -0x2FF;
+
+			if (npc->y >= npc->tgt_y)
+				npc->ym -= 8;
+			else
+				npc->ym += 8;
+
+			if (npc->ym > 0x100)
+				npc->ym = 0x100;
+			if (npc->ym < -0x100)
+				npc->ym = -0x100;
+
+			if (npc->shock)
+			{
+				npc->x += npc->xm / 2;
+				npc->y += npc->ym / 2;
+			}
+			else
+			{
+				npc->x += npc->xm;
+				npc->y += npc->ym;
+			}
+
+			break;
+	}
+
+	if (++npc->ani_wait > 1)
+	{
+		npc->ani_wait = 0;
+		++npc->ani_no;
+	}
+
+	if (npc->ani_no > 1)
+		npc->ani_no = 0;
+
+	if (npc->direct == 0)
+		npc->rect = rcLeft[npc->ani_no];
+	else
+		npc->rect = rcRight[npc->ani_no];
+}
+
 //Chest (closed)
 void ActNpc015(NPCHAR *npc)
 {

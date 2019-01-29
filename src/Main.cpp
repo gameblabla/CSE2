@@ -284,7 +284,7 @@ int main(int argc, char *argv[])
 				}
 				
 				//Initialize stuff
-				InitTextObject();
+				InitTextObject(config.font_name);
 				InitTriangleTable();
 				
 				//Run game code

@@ -9,6 +9,16 @@
 #include "Back.h"
 #include "Triangle.h"
 
+//Red petals
+void ActNpc116(NPCHAR *npc)
+{
+	RECT rc[1];
+
+	rc[0] = {272, 184, 320, 200};
+
+	npc->rect = rc[0];
+}
+
 //Table and chair
 void ActNpc119(NPCHAR *npc)
 {

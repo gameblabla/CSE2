@@ -16,6 +16,9 @@
 
 NPCHAR gNPC[NPC_MAX];
 
+int gSuperXpos;
+int gSuperYpos;
+
 const char *gPassPixEve = "PXE\0";
 
 void InitNpChar()

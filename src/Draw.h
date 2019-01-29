@@ -66,7 +66,7 @@ void PutBitmap4(RECT *rcView, int x, int y, RECT *rect, int surf_no);
 void Surface2Surface(int x, int y, RECT *rect, int to, int from);
 void CortBox(RECT *rect, uint32_t col);
 void CortBox2(RECT *rect, uint32_t col, int surf_no);
-void InitTextObject();
+void InitTextObject(const char *font_name);
 void PutText(int x, int y, const char *text, uint32_t color);
 void PutText2(int x, int y, const char *text, uint32_t color, int surf_no);
 void EndTextObject();

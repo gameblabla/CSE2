@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
 
 			setvbuf(out_file, NULL, _IOFBF, 0x10000);
 
-			fprintf(out_file, "#pragma once\n\nconst unsigned char r%s[0x%X] = {\n\t", filename, in_file_size);
+			fprintf(out_file, "#pragma once\n\nconst unsigned char r%s[0x%lX] = {\n\t", filename, in_file_size);
 
 			for (long i = 0; i < in_file_size - 1; ++i)
 			{

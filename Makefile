@@ -20,8 +20,12 @@ ifeq ($(FIX_BUGS), 1)
 CXXFLAGS += -DFIX_BUGS
 endif
 
-ifeq ($(CONSOLE), 1)
-CXXFLAGS += -mconsole
+ifeq ($(WINDOWS), 1)
+	ifeq ($(CONSOLE), 1)
+	CXXFLAGS += -mconsole
+	endif
+CXXFLAGS += -DWINDOWS
+LIBS += -lkernel32
 endif
 
 CXXFLAGS += `sdl2-config --cflags` `pkg-config freetype2 --cflags`
@@ -61,7 +65,10 @@ SOURCES = \
 	NpcAct020 \
 	NpcAct040 \
 	NpcAct060 \
+	NpcAct080 \
 	NpcAct100 \
+	NpcAct120 \
+	NpcAct140 \
 	NpcAct200 \
 	NpcAct280 \
 	NpcAct300 \
