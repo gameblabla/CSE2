@@ -294,7 +294,28 @@ void ActNpc042(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-// H/V Trigger
+//Chalkboard
+void ActNpc043(NPCHAR *npc)
+{
+	RECT rcLeft[1];
+	RECT rcRight[1];
+
+	rcLeft[0] = {128, 80, 168, 112};
+	rcRight[0] = {168, 80, 208, 112};
+
+	if (npc->act_no == 0)
+	{
+		npc->act_no = 1;
+		npc->y -= 0x2000;
+	}
+
+	if (npc->direct == 0)
+		npc->rect = rcLeft[0];
+	else
+		npc->rect = rcRight[0];
+}
+
+//H/V Trigger
 void ActNpc046(NPCHAR *npc)
 {
 	RECT rect[1];
