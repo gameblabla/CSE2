@@ -383,6 +383,42 @@ void ActNpc037(NPCHAR *npc)
 	npc->rect = rect[npc->ani_no];
 }
 
+//Fireplace
+void ActNpc038(NPCHAR *npc)
+{
+	RECT rect[4];
+
+	rect[0] = {128, 64, 144, 80};
+	rect[1] = {144, 64, 160, 80};
+	rect[2] = {160, 64, 176, 80};
+	rect[3] = {176, 64, 192, 80};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			if (++npc->ani_wait > 3)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no > 3)
+				npc->ani_no = 0;
+
+			npc->rect = rect[npc->ani_no];
+			break;
+
+		case 10:
+			npc->act_no = 11;
+			SetDestroyNpChar(npc->x, npc->y, npc->view.back, 8);
+			// Fallthrough
+		case 11:
+			npc->rect.left = 0;
+			npc->rect.right = 0;
+			break;
+	}
+}
+
 //Save sign
 void ActNpc039(NPCHAR *npc)
 {
