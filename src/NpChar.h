@@ -73,6 +73,9 @@ struct EVENT
 
 extern NPCHAR gNPC[NPC_MAX];
 
+extern int gSuperXpos;
+extern int gSuperYpos;
+
 void InitNpChar();
 bool LoadEvent(char *path_event);
 void SetNpChar(int code_char, int x, int y, int xm, int ym, int dir, NPCHAR *npc, int start_index);
