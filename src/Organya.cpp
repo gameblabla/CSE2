@@ -78,7 +78,11 @@ void OrganyaReleaseNote()
 	{
 		if(info.tdata[i].note_p != NULL)
 		{
+#ifdef FIX_BUGS
+			delete[] info.tdata[i].note_p;
+#else
 			delete info.tdata[i].note_p;	// should be delete[]
+#endif
 			info.tdata[i].note_p = NULL;
 		}
 	}
