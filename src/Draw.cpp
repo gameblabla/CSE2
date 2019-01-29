@@ -4,6 +4,18 @@
 #include <stdio.h>
 #include <stdint.h>
 
+#ifdef WINDOWS
+#define RECT WINRECT
+#define FindResource WinFindResource	// All these damn name collisions...
+#define DrawText WinDrawText
+#define LoadFont WinLoadFont
+#include <windows.h>
+#undef LoadFont
+#undef DrawText
+#undef FindResource
+#undef RECT
+#endif
+
 #include <SDL_render.h>
 #include <SDL_rwops.h>
 #include <SDL_timer.h>
@@ -388,7 +400,54 @@ void CortBox2(RECT *rect, uint32_t col, int surf_no)
 	SDL_SetRenderTarget(gRenderer, NULL);
 }
 
-void InitTextObject()
+#ifdef WINDOWS
+static unsigned char* GetFontFromWindows(size_t *data_size, const char *font_name, unsigned int fontWidth, unsigned int fontHeight)
+{
+	unsigned char* buffer = NULL;
+
+#ifdef JAPANESE
+	const DWORD charset = SHIFTJIS_CHARSET;
+#else
+	const DWORD charset = DEFAULT_CHARSET;
+#endif
+
+	HFONT hfont = CreateFontA(fontHeight, fontWidth, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, charset, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH | FF_DONTCARE, font_name);
+
+	if (hfont == NULL)
+		hfont = CreateFontA(fontHeight, fontWidth, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, charset, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH | FF_DONTCARE, NULL);
+
+	if (hfont != NULL)
+	{
+		HDC hdc = CreateCompatibleDC(NULL);
+
+		if (hdc != NULL)
+		{
+			SelectObject(hdc, hfont);
+			const DWORD size = GetFontData(hdc, 0, 0, NULL, 0);
+
+			if (size != GDI_ERROR)
+			{
+				buffer = new unsigned char[size];
+
+				if (data_size != NULL)
+					*data_size = size;
+
+				if (GetFontData(hdc, 0, 0, buffer, size) != size)
+				{
+					delete[] buffer;
+					buffer = NULL;
+				}
+			}
+
+			DeleteDC(hdc);
+		}
+	}
+
+	return buffer;
+}
+#endif
+
+void InitTextObject(const char *font_name)
 {
 	//Get font size
 	unsigned int fontWidth, fontHeight;
@@ -403,6 +462,24 @@ void InitTextObject()
 		fontHeight = 10 * gWindowScale;
 	}
 	
+#ifdef WINDOWS
+	// Actually use the font Config.dat specifies
+	size_t data_size;
+	unsigned char *data = GetFontFromWindows(&data_size, font_name, fontWidth, fontHeight);
+
+	if (data != NULL)
+	{
+		gFont = LoadFontFromData(data, data_size, fontWidth, fontHeight);
+
+		delete[] data;
+
+		if (gFont)
+			return;
+	}
+#endif
+	// Fall back on the built-in fonts
+	(void)font_name;
+
 	//Open Font.ttf
 	char path[PATH_LENGTH];
 #ifdef JAPANESE
@@ -411,7 +488,7 @@ void InitTextObject()
 	sprintf(path, "%s/cour.ttf", gDataPath);
 #endif
 
-	gFont = LoadFont(fontWidth, fontHeight, path);
+	gFont = LoadFont(path, fontWidth, fontHeight);
 }
 
 void PutText(int x, int y, const char *text, uint32_t color)
