@@ -284,7 +284,7 @@ int ModeTitle()
 	//Reset cliprect, flags, and give the player the nikumaru counter
 	grcGame.left = 0;
 	g_GameFlags = 0;
-	gMC.equip & 0x100;
+	gMC.equip |= 0x100;
 	
 	//Start loop
 	int wait = 0;
