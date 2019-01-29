@@ -11,6 +11,7 @@
 #include "MyChar.h"
 #include "Fade.h"
 #include "Stage.h"
+#include "Frame.h"
 #include "MycParam.h"
 #include "Flags.h"
 #include "Profile.h"
@@ -839,6 +840,33 @@ int TextScriptProc()
 						else
 							gTS.p_read += 13;
 					}
+					else if (IS_COMMAND('S','S','S'))
+					{
+						x = GetTextScriptNo(gTS.p_read + 4);
+						SetNoise(1, x);
+						gTS.p_read += 8;
+					}
+					else if (IS_COMMAND('C','S','S'))
+					{
+						CutNoise();
+						gTS.p_read += 4;
+					}
+					else if (IS_COMMAND('S','P','S'))
+					{
+						SetNoise(2, x);
+						gTS.p_read += 8;
+					}
+					else if (IS_COMMAND('C','P','S'))
+					{
+						CutNoise();
+						gTS.p_read += 4;
+					}
+					else if (IS_COMMAND('Q','U','A'))
+					{
+						z = GetTextScriptNo(gTS.p_read + 4);
+						SetQuake(z);
+						gTS.p_read += 8;
+					}
 					else if (IS_COMMAND('F','A','I'))
 					{
 						z = GetTextScriptNo(gTS.p_read + 4);
@@ -859,6 +887,19 @@ int TextScriptProc()
 					{
 						StartMapName();
 						gTS.p_read += 4;
+					}
+					else if (IS_COMMAND('F','O','M'))
+					{
+						z = GetTextScriptNo(gTS.p_read + 4);
+						SetFrameTargetMyChar(z);
+						gTS.p_read += 8;
+					}
+					else if (IS_COMMAND('F','O','N'))
+					{
+						x = GetTextScriptNo(gTS.p_read + 4);
+						y = GetTextScriptNo(gTS.p_read + 9);
+						SetFrameTargetNpChar(x, y);
+						gTS.p_read += 13;
 					}
 					else if (IS_COMMAND('S','O','U'))
 					{

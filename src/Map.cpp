@@ -206,7 +206,7 @@ void PutMapDataVector(int fx, int fy)
 	
 	//Animate the wind
 	static int count = 0;
-	count++;
+	count += 2;
 	
 	for (int j = put_y; put_y + num_y > j; j++)
 	{

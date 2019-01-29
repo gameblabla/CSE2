@@ -21,11 +21,12 @@ CXXFLAGS += -DFIX_BUGS
 endif
 
 ifeq ($(WINDOWS), 1)
-	ifeq ($(CONSOLE), 1)
+	CXXFLAGS += -DWINDOWS
+	LIBS += -lkernel32
+endif
+
+ifeq ($(CONSOLE), 1)
 	CXXFLAGS += -mconsole
-	endif
-CXXFLAGS += -DWINDOWS
-LIBS += -lkernel32
 endif
 
 CXXFLAGS += `sdl2-config --cflags` `pkg-config freetype2 --cflags`

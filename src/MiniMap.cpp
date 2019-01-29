@@ -160,10 +160,7 @@ int MiniMapLoop()
 		}
 
 		PutBitmap4(&grcGame, 0, 0, &grcGame, 10);
-		rcView.left = 160 - f * gMap.width / 16;
-		rcView.right = f * gMap.width / 16 + 160;
-		rcView.top = 120 - f * gMap.length / 16;
-		rcView.bottom = f * gMap.length / 16 + 120;
+		rcView = {(WINDOW_WIDTH / 2) - f * gMap.width / 16, (WINDOW_HEIGHT / 2) - f * gMap.length / 16, (WINDOW_WIDTH / 2) + f * gMap.width / 16, (WINDOW_HEIGHT / 2) + f * gMap.length / 16};
 		PutMapName(true);
 		CortBox(&rcView, 0);
 
