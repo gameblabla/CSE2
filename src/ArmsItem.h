@@ -26,7 +26,7 @@ extern ITEM gItemData[ITEM_MAX];
 extern int gSelectedArms;
 extern int gSelectedItem;
 extern int gCampTitleY;
-extern int gCampActive;
+extern bool gCampActive;
 
 void ClearArmsData();
 void ClearItemData();

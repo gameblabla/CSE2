@@ -6,6 +6,7 @@
 #include "CommonDefines.h"
 #include "Tags.h"
 #include "NpChar.h"
+#include "Caret.h"
 #include "MyChar.h"
 #include "Game.h"
 #include "Flags.h"
@@ -148,7 +149,7 @@ void SetDestroyNpChar(int x, int y, int w, int num)
 	}
 
 	//Flash effect
-	//SetCaret(x, y, 12, 0);
+	SetCaret(x, y, 12, 0);
 }
 
 void SetDestroyNpCharUp(int x, int y, int w, int num)
@@ -163,7 +164,7 @@ void SetDestroyNpCharUp(int x, int y, int w, int num)
 	}
 
 	//Flash effect
-	//SetCaret(x, y, 12, 0);
+	SetCaret(x, y, 12, 0);
 }
 
 void SetExpObjects(int x, int y, int exp)

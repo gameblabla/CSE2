@@ -638,6 +638,18 @@ int TextScriptProc()
 						SubItemData(z);
 						gTS.p_read += 8;
 					}
+					else if (IS_COMMAND('E','Q','+'))
+					{
+						z = GetTextScriptNo(gTS.p_read + 4);
+						EquipItem(z, true);
+						gTS.p_read += 8;
+					}
+					else if (IS_COMMAND('E','Q','-'))
+					{
+						z = GetTextScriptNo(gTS.p_read + 4);
+						EquipItem(z, false);
+						gTS.p_read += 8;
+					}
 					else if (IS_COMMAND('A','M','+'))
 					{
 						w = GetTextScriptNo(gTS.p_read + 4);

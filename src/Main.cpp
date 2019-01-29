@@ -13,6 +13,7 @@
 #include "Sound.h"
 #include "Game.h"
 #include "Generic.h"
+#include "MyChar.h"
 #include "Main.h"
 #include "Config.h"
 #include "KeyControl.h"
@@ -312,7 +313,7 @@ void InactiveWindow()
 	{
 		bActive = false;
 		StopOrganyaMusic();
-		//SleepNoise();
+		SleepNoise();
 	}
 	
 	PlaySoundObject(7, 0);
@@ -325,7 +326,7 @@ void ActiveWindow()
 		bActive = true;
 		StopOrganyaMusic();
 		PlayOrganyaMusic();
-		//ResetNoise();
+		ResetNoise();
 	}
 
 	PlaySoundObject(7, -1);

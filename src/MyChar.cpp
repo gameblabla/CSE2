@@ -18,6 +18,9 @@
 
 MYCHAR gMC;
 
+int noise_no;
+unsigned int noise_freq;
+
 void InitMyChar()
 {
 	memset(&gMC, 0, sizeof(MYCHAR));
@@ -569,7 +572,7 @@ void ActMyChar_Normal(bool bKey)
 				if (gMC.xm > 0x200 || gMC.xm < -0x200)
 				{
 					for (int a = 0; a < 8; a++)
-						SetNpChar(73, gMC.x + (Random(-8, 8) << 9), gMC.y, gMC.xm + Random(-0x200, 0x200), gMC.ym + Random(-0x200, 0x80), dir, 0, 0);
+						SetNpChar(73, gMC.x + (Random(-8, 8) << 9), gMC.y, gMC.xm + Random(-0x200, 0x200), Random(-0x200, 0x80), dir, 0, 0);
 					
 					PlaySoundObject(56, 1);
 				}
@@ -744,4 +747,120 @@ void MoveMyChar(int x, int y)
 {
 	gMC.x = x;
 	gMC.y = y;
+}
+
+void ZeroMyCharXMove()
+{
+  gMC.xm = 0;
+}
+
+int GetUnitMyChar()
+{
+	return gMC.unit;
+}
+
+void SetMyCharDirect(uint8_t dir)
+{
+	switch (dir)
+	{
+		case 3:
+			gMC.cond |= 1;
+			break;
+			
+		default:
+			gMC.cond &= ~1;
+			
+			if (dir < 10)
+			{
+				gMC.direct = dir;
+				break;
+			}
+			
+			for (int i = 0; i < NPC_MAX; i++)
+			{
+				if (gNPC[i].code_event == dir)
+				{
+					if (gMC.x <= gNPC[i].x)
+						gMC.direct = 2;
+					else
+						gMC.direct = 0;
+					break;
+				}
+			}
+			break;
+	}
+	
+	gMC.xm = 0;
+	AnimationMyChar(false);
+}
+
+void ChangeMyUnit(uint8_t a)
+{
+	gMC.unit = a;
+}
+
+void PitMyChar()
+{
+	gMC.y += 0x4000;
+}
+
+void EquipItem(int flag, bool b)
+{
+	if (b)
+		gMC.equip |= flag;
+	else
+		gMC.equip &= ~flag;
+}
+
+void ResetCheck()
+{
+	gMC.cond &= ~1;
+}
+
+void SetNoise(int no, int freq)
+{
+	noise_freq = freq;
+	noise_no = no;
+	
+	if (no == 1)
+	{
+		ChangeSoundFrequency(40, noise_freq);
+		ChangeSoundFrequency(41, noise_freq + 100);
+		PlaySoundObject(40, -1);
+		PlaySoundObject(41, -1);
+	}
+	else if (no == 2)
+	{
+		PlaySoundObject(58, -1);
+	}
+}
+
+void CutNoise()
+{
+	noise_no = 0;
+	PlaySoundObject(40, 0);
+	PlaySoundObject(41, 0);
+	PlaySoundObject(58, 0);
+}
+
+void ResetNoise()
+{
+	if (noise_no == 1)
+	{
+		ChangeSoundFrequency(40, noise_freq);
+		ChangeSoundFrequency(41, noise_freq + 100);
+		PlaySoundObject(40, -1);
+		PlaySoundObject(41, -1);
+	}
+	else if (noise_no == 2)
+	{
+		PlaySoundObject(58, -1);
+	}
+}
+
+void SleepNoise()
+{
+	PlaySoundObject(40, 0);
+	PlaySoundObject(41, 0);
+	PlaySoundObject(58, 0);
 }

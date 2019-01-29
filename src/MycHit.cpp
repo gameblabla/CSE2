@@ -770,7 +770,7 @@ void HitMyCharNpChar()
 				if (hit && gNPC[i].code_char == 1)
 				{
 					PlaySoundObject(14, 1);
-					//AddExpMyChar(gNPC[i].exp);
+					AddExpMyChar(gNPC[i].exp);
 					gNPC[i].cond = 0;
 				}
 				

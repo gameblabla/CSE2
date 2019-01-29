@@ -53,6 +53,7 @@ SOURCES = \
 	Main \
 	Map \
 	MapName \
+	MiniMap \
 	MyChar \
 	MycHit \
 	MycParam \

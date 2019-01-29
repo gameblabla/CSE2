@@ -141,6 +141,42 @@ void DamageMyChar(int damage)
 	}
 }
 
+void ZeroArmsEnergy_All()
+{
+	for (int a = 0; a < ARMS_MAX; a++)
+	{
+		gArmsData[a].level = 1;
+		gArmsData[a].exp = 0;
+	}
+}
+
+void AddBulletMyChar(int no, int val)
+{
+	//Missile Launcher
+	for (int a = 0; a < ARMS_MAX; a++)
+	{
+		if (gArmsData[a].code == 5)
+		{
+			gArmsData[a].num += val;
+			if (gArmsData[a].num > gArmsData[a].max_num)
+				gArmsData[a].num = gArmsData[a].max_num;
+			break;
+		}
+	}
+	
+	//Super Missile Launcher
+	for (int a = 0; a < ARMS_MAX; a++)
+	{
+		if (gArmsData[a].code == 10)
+		{
+			gArmsData[a].num += val;
+			if (gArmsData[a].num > gArmsData[a].max_num)
+				gArmsData[a].num = gArmsData[a].max_num;
+			break;
+		}
+	}
+}
+
 void AddLifeMyChar(int x)
 {
 	gMC.life += x;

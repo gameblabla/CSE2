@@ -8,6 +8,7 @@
 #include "NpcTbl.h"
 #include "NpChar.h"
 #include "NpcHit.h"
+#include "MiniMap.h"
 #include "Generic.h"
 #include "GenericLoad.h"
 #include "ArmsItem.h"
@@ -108,7 +109,7 @@ int ModeOpening()
 	grcGame.left = 0;
 	g_GameFlags = 3;
 	
-	//CutNoise();
+	CutNoise();
 	
 	int wait = 0;
 	while (wait < 500)
@@ -238,7 +239,7 @@ int ModeTitle()
 	//Reset everything
 	InitCaret();
 	//InitStar();
-	//CutNoise();
+	CutNoise();
 	
 	//Create variables
 	int anime = 0;
@@ -527,19 +528,19 @@ int ModeAction()
 						return 0;
 					if (campRet == 2)
 						return 1;
+					
 					gMC.cond &= ~1;
 				}
-				/*
-				else if ( unk_81C8598 & 2 && gKeyTrg & gKeyMap )
+				else if (gMC.equip & 2 && gKeyTrg & gKeyMap)
 				{
-				BackupSurface(10, &grcGame);
-				v3 = MiniMapLoop();
-				if ( !v3 )
-				return 0;
-				if ( v3 == 2 )
-				return 1;
+					BackupSurface(10, &grcGame);
+					
+					int miniRet = MiniMapLoop();
+					if (miniRet == 0)
+						return 0;
+					if (miniRet == 2)
+						return 1;
 				}
-				*/
 			}
 			
 			if (g_GameFlags & 2)
