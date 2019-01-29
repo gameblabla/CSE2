@@ -21,15 +21,13 @@ void WriteMiniMapLine(int line)
 	for (int x = 0; x < gMap.width; x++)
 	{
 		uint8_t a = GetAttribute(x, line);
-		
-		printf("x: %d y: %d a: %d\n", x, line, a);
-		
+				
 		switch (a)
 		{
 			case 0:
 				Surface2Surface(x, line, &rcLevel[0], 9, 26);
 				break;
-				
+
 			case 68:
 			case 1:
 			case 64:
@@ -106,7 +104,7 @@ int MiniMapLoop()
 		return 0;
 	}
 	
-	RECT rcMiniMap = {0, gMap.width, 0, gMap.length};
+	RECT rcMiniMap = {0, 0, gMap.width, gMap.length};
 	rcView.right = --rcView.left + gMap.width + 2;
 	rcView.bottom = --rcView.top + gMap.length + 2;
 	CortBox2(&rcMiniMap, 0, 9);
