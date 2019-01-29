@@ -108,6 +108,166 @@ void ActNpc023(NPCHAR *npc)
 	npc->rect = rect[npc->ani_no];
 }
 
+// Egg Corridor lift
+void ActNpc025(NPCHAR *npc)
+{
+	RECT rcLeft[2];
+
+	rcLeft[0] = {256, 64, 288, 80};
+	rcLeft[1] = {256, 80, 288, 96};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->ani_no = 0;
+			npc->ani_wait = 0;
+			npc->x += 0x1000;
+			// Fallthrough
+		case 1:
+			if (++npc->act_wait > 150)
+			{
+				npc->act_wait = 0;
+				++npc->act_no;
+			}
+
+			break;
+
+		case 2:
+			if (++npc->act_wait > 0x40)
+			{
+				npc->act_wait = 0;
+				++npc->act_no;
+			}
+			else
+			{
+				npc->y -= 0x200;
+			}
+
+			break;
+
+		case 3:
+			if (++npc->act_wait > 150)
+			{
+				npc->act_wait = 0;
+				++npc->act_no;
+			}
+
+			break;
+
+		case 4:
+			if (++npc->act_wait > 0x40)
+			{
+				npc->act_wait = 0;
+				++npc->act_no;
+			}
+			else
+			{
+				npc->y -= 0x200;
+			}
+
+			break;
+
+		case 5:
+			if (++npc->act_wait > 150)
+			{
+				npc->act_wait = 0;
+				++npc->act_no;
+			}
+
+			break;
+
+		case 6:
+			if (++npc->act_wait > 0x40)
+			{
+				npc->act_wait = 0;
+				++npc->act_no;
+			}
+			else
+			{
+				npc->y += 0x200;
+			}
+
+			break;
+
+		case 7:
+			if (++npc->act_wait > 150)
+			{
+				npc->act_wait = 0;
+				++npc->act_no;
+			}
+
+			break;
+
+		case 8:
+			if (++npc->act_wait > 0x40)
+			{
+				npc->act_wait = 0;
+				npc->act_no = 1;
+			}
+			else
+			{
+				npc->y += 0x200;
+			}
+
+			break;
+	}
+
+	switch ( npc->act_no )
+	{
+		case 2:
+		case 4:
+		case 6:
+		case 8:
+			if (++npc->ani_wait > 1)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no > 1)
+				npc->ani_no = 0;
+
+			break;
+	}
+
+	npc->rect = rcLeft[npc->ani_no];
+}
+
+//Cthulhu
+void ActNpc029(NPCHAR *npc)
+{
+	RECT rcLeft[2];
+	RECT rcRight[2];
+
+	rcLeft[0] = {0, 192, 16, 216};
+	rcLeft[1] = {16, 192, 32, 216};
+
+	rcRight[0] = {0, 216, 16, 240};
+	rcRight[1] = {16, 216, 32, 240};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->ani_no = 0;
+			npc->ani_wait = 0;
+			// Fallthrough
+		case 1:
+			if (npc->x - 0x6000 < gMC.x && npc->x + 0x6000 > gMC.x && npc->y - 0x6000 < gMC.y && npc->y + 0x2000 > gMC.y)
+				npc->ani_no = 1;
+			else
+				npc->ani_no = 0;
+
+			break;
+	}
+
+	if (npc->direct == 0)
+		npc->rect = rcLeft[npc->ani_no];
+	else
+		npc->rect = rcRight[npc->ani_no];
+}
+
 //Gunsmith
 void ActNpc030(NPCHAR *npc)
 {
@@ -186,6 +346,21 @@ void ActNpc032(NPCHAR *npc)
 		npc->ani_no = 0;
 
 	npc->rect = rect[npc->ani_no];
+}
+
+// Bed
+void ActNpc034(NPCHAR *npc)
+{
+	RECT rcLeft[1];
+	RECT rcRight[1];
+
+	rcLeft[0] = {192, 48, 224, 64};
+	rcRight[0] = {192, 184, 224, 200};
+
+	if (npc->direct == 0)
+		npc->rect = rcLeft[0];
+	else
+		npc->rect = rcRight[0];
 }
 
 //Signpost
