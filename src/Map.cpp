@@ -8,6 +8,7 @@
 #include "Map.h"
 #include "Tags.h"
 #include "Draw.h"
+#include "NpChar.h"
 
 #define PXM_BUFFER_SIZE 0x4B000
 
@@ -121,11 +122,11 @@ void ShiftMapParts(int x, int y)
 
 bool ChangeMapParts(int x, int y, uint8_t no)
 {
-	if ( gMap.data[y * gMap.width + x] == no )
+	if (gMap.data[y * gMap.width + x] == no)
 		return false;
 	gMap.data[y * gMap.width + x] = no;
-	//for (int i = 0; i <= 2; ++i )
-	//	SetNpChar(4, x << 13, y << 13, 0, 0, 0, 0, 0);
+	for (int i = 0; i < 3; i++)
+		SetNpChar(4, x << 13, y << 13, 0, 0, 0, 0, 0);
 	return true;
 }
 

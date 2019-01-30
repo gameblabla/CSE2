@@ -41,6 +41,8 @@ endif
 SOURCES = \
 	ArmsItem \
 	Back \
+	BulHit \
+	Bullet \
 	Caret \
 	Config \
 	Draw \
@@ -81,6 +83,7 @@ SOURCES = \
 	PixTone \
 	Profile \
 	Resource \
+	Shoot \
 	Sound \
 	Stage \
 	TextScr \

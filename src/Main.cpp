@@ -127,6 +127,13 @@ int main(int argc, char *argv[])
 			gKeyCancel = gKeyShot;
 		}
 		
+		//Swap left and right weapon switch keys
+		if (CheckFileExists("s_reverse"))
+		{
+			gKeyArms = KEY_ARMSREV;
+			gKeyArmsRev = KEY_ARMS;
+		}
+		
 		//Alternate movement keys
 		if (config.move_button_mode)
 		{
@@ -229,6 +236,10 @@ int main(int argc, char *argv[])
 		}
 		
 		//Create window
+		#ifdef WINDOWS
+		SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl"); //This fixes textures unloading in fullscreen
+		#endif
+		
 		gWindow = SDL_CreateWindow(lpWindowName, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, gWindowWidth, gWindowHeight, bFullscreen ? SDL_WINDOW_FULLSCREEN : 0);
 		
 		if (gWindow)

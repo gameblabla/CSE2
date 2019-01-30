@@ -97,7 +97,7 @@ const unsigned char* GetResource(const char *name, size_t *size)
 	if (!strcmp(name, "BDOWN"))
 	{
 		*size = sizeof(rBDOWN);
-		return rACCESS;
+		return rBDOWN;
 	}
 	if (!strcmp(name, "CEMETERY"))
 	{

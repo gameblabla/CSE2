@@ -58,6 +58,108 @@ void ActCaret01(CARET *crt)
 		crt->rect = rcLeft[crt->ani_no];
 }
 
+void ActCaret02(CARET *crt)
+{
+	RECT rect_right[4];
+	RECT rect_left[4];
+	RECT rect_up[3];
+	rect_left[0].left = 0;
+	rect_left[0].top = 32;
+	rect_left[0].right = 16;
+	rect_left[0].bottom = 48;
+	rect_left[1].left = 16;
+	rect_left[1].top = 32;
+	rect_left[1].right = 32;
+	rect_left[1].bottom = 48;
+	rect_left[2].left = 32;
+	rect_left[2].top = 32;
+	rect_left[2].right = 48;
+	rect_left[2].bottom = 48;
+	rect_left[3].left = 48;
+	rect_left[3].top = 32;
+	rect_left[3].right = 64;
+	rect_left[3].bottom = 48;
+	rect_right[0].left = 176;
+	rect_right[0].top = 0;
+	rect_right[0].right = 192;
+	rect_right[0].bottom = 16;
+	rect_right[1].left = 192;
+	rect_right[1].top = 0;
+	rect_right[1].right = 208;
+	rect_right[1].bottom = 16;
+	rect_right[2].left = 208;
+	rect_right[2].top = 0;
+	rect_right[2].right = 224;
+	rect_right[2].bottom = 16;
+	rect_right[3].left = 224;
+	rect_right[3].top = 0;
+	rect_right[3].right = 240;
+	rect_right[3].bottom = 16;
+	rect_up[0].left = 0;
+	rect_up[0].top = 32;
+	rect_up[0].right = 16;
+	rect_up[0].bottom = 48;
+	rect_up[1].left = 32;
+	rect_up[1].top = 32;
+	rect_up[1].right = 48;
+	rect_up[1].bottom = 48;
+	rect_up[2].left = 16;
+	rect_up[2].top = 32;
+	rect_up[2].right = 32;
+	rect_up[2].bottom = 48;
+
+	switch (crt->direct)
+	{
+		case 0:
+			crt->ym -= 0x10;
+			crt->y += crt->ym;
+			if (++crt->ani_wait > 5)
+			{
+				crt->ani_wait = 0;
+				++crt->ani_no;
+			}
+			if ( crt->ani_no > 3 )
+				crt->cond = 0;
+			crt->rect = rect_left[crt->ani_no];
+			break;
+			
+		case 1:
+			crt->rect = rect_up[++crt->ani_wait / 2 % 3];
+			if (crt->ani_wait > 24)
+				crt->cond = 0;
+			break;
+			
+		case 2:
+			if ( ++crt->ani_wait > 2 )
+			{
+				crt->ani_wait = 0;
+				++crt->ani_no;
+			}
+			if ( crt->ani_no > 3 )
+				crt->cond = 0;
+			crt->rect = rect_right[crt->ani_no];
+			break;
+	}
+}
+
+void ActCaret03(CARET *crt)
+{
+	RECT rect[4];
+	rect[0] = {0, 48, 16, 64};
+	rect[1] = {16, 48, 32, 64};
+	rect[2] = {32, 48, 48, 64};
+	rect[3] = {48, 48, 64, 64};
+	
+	if (++crt->ani_wait > 2)
+	{
+		crt->ani_wait = 0;
+		if (++crt->ani_no > 3)
+			crt->cond = 0;
+	}
+	
+	crt->rect = rect[crt->ani_no];
+}
+
 void ActCaret08(CARET *crt)
 {
 	if (crt->direct)
@@ -148,22 +250,22 @@ CARETFUNCTION gpCaretFuncTbl[] =
 {
 	ActCaret00,
 	ActCaret01,
-	nullptr, //&ActCaret02,
-	nullptr, //&ActCaret03,
-	nullptr, //&ActCaret04,
-	nullptr, //&ActCaret05,
-	nullptr, //&ActCaret04,
-	nullptr, //&ActCaret07,
+	ActCaret02,
+	ActCaret03,
+	nullptr, //ActCaret04,
+	nullptr, //ActCaret05,
+	nullptr, //ActCaret04,
+	nullptr, //ActCaret07,
 	ActCaret08,
 	ActCaret09,
-	nullptr, //&ActCaret10,
-	nullptr, //&ActCaret11,
-	nullptr, //&ActCaret12,
+	nullptr, //ActCaret10,
+	nullptr, //ActCaret11,
+	nullptr, //ActCaret12,
 	ActCaret13,
-	nullptr, //&ActCaret14,
-	nullptr, //&ActCaret15,
-	nullptr, //&ActCaret16,
-	nullptr, //&ActCaret17
+	nullptr, //ActCaret14,
+	nullptr, //ActCaret15,
+	nullptr, //ActCaret16,
+	nullptr, //ActCaret17,
 };
 
 void ActCaret()

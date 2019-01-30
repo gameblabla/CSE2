@@ -67,7 +67,7 @@ bool Flip_SystemTask()
 bool StartDirectDraw()
 {
 	//Create renderer
-	gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED);
+	gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_TARGETTEXTURE);
 	return true;
 }
 
@@ -145,7 +145,6 @@ bool MakeSurface(SDL_RWops *fp, int surf_no)
 	SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 0);
 	SDL_RenderClear(gRenderer);
 	SDL_RenderCopy(gRenderer, texture, NULL, NULL);
-	SDL_RenderPresent(gRenderer);
 	SDL_SetRenderTarget(gRenderer, NULL);
 	
 	//Set surface's metadata
@@ -272,7 +271,6 @@ void BackupSurface(int surf_no, RECT *rect)
 	SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 0);
 	SDL_RenderClear(gRenderer);
 	SDL_RenderCopy(gRenderer, screenTexture, &frameRect, NULL);
-	SDL_RenderPresent(gRenderer);
 	SDL_SetRenderTarget(gRenderer, NULL);
 	
 	//Set surface's metadata

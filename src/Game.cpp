@@ -13,6 +13,9 @@
 #include "GenericLoad.h"
 #include "ArmsItem.h"
 #include "TextScr.h"
+#include "Bullet.h"
+#include "BulHit.h"
+#include "Shoot.h"
 #include "Fade.h"
 #include "Frame.h"
 #include "Flags.h"
@@ -427,7 +430,7 @@ int ModeAction()
 	//Initialize everything
 	InitMyChar();
 	InitNpChar();
-	//InitBullet();
+	InitBullet();
 	InitCaret();
 	//InitStar();
 	InitFade();
@@ -474,12 +477,12 @@ int ModeAction()
 				//HitMyCharBoss();
 				HitNpCharMap();
 				//HitBossMap();
-				//HitBulletMap();
+				HitBulletMap();
 				//HitNpCharBullet();
 				//HitBossBullet();
-				//if (g_GameFlags & 2)
-				//	ShootBullet();
-				//ActBullet();
+				if (g_GameFlags & 2)
+					ShootBullet();
+				ActBullet();
 				ActCaret();
 				MoveFrame3();
 				//ActFlash(frame_x, frame_y);
@@ -504,7 +507,7 @@ int ModeAction()
 			PutStage_Back(frame_x, frame_y);
 			//PutBossChar(frame_x, frame_y);
 			PutNpChar(frame_x, frame_y);
-			//PutBullet(frame_x, frame_y);
+			PutBullet(frame_x, frame_y);
 			PutMyChar(frame_x, frame_y);
 			//PutStar(frame_x, frame_y);
 			PutMapDataVector(frame_x, frame_y);
