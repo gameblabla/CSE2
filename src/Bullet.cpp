@@ -160,6 +160,7 @@ void SetBullet(int no, int x, int y, int dir)
 			gBul[i].view.bottom = gBulTbl[no].view.bottom << 9;
 			gBul[i].x = x;
 			gBul[i].y = y;
+			break;
 		}
 	}
 }

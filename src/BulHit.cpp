@@ -32,7 +32,6 @@ int JudgeHitBulletBlock(int x, int y, BULLET *bul)
 	{
 		if (!(bul->bbits & 0x40))
 			bul->cond = 0;
-		printf("%d\n", bul->cond);
 		SetCaret(bul->x, bul->y, 2, 0);
 		PlaySoundObject(12, 1);
 		for (int i = 0; i < 4; i++)
