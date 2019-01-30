@@ -199,7 +199,7 @@ void SOUNDBUFFER::Mix(float *buffer, int len)
 		float sampleA = (float)sample1 + ((float)sample2 - (float)sample1) * subPos;
 		
 		//Convert sample to float32
-		float sampleConvert = (sampleA - 128.0) / 256.0;
+		float sampleConvert = (sampleA - 128.0) / 128.0;
 		
 		//Mix
 		buffer[sample * 2] += sampleConvert * volume * volume_l;
