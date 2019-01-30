@@ -151,6 +151,142 @@ int JudgeHitBulletBlock2(int x, int y, uint8_t *atrb, BULLET *bul)
 	return hit;
 }
 
+int JudgeHitBulletTriangleA(int x, int y, BULLET *bul)
+{
+	int hit = 0;
+	if (bul->x < (2 * x + 1) << 12
+		&& bul->x > (2 * x - 1) << 12
+		&& bul->y - 0x400 < (y << 13) - (-0x2000 * x + bul->x) / 2 + 0x800
+		&& bul->y + 0x400 > (2 * y - 1) << 12)
+	{
+		if (bul->bbits & 8)
+			bul->y = (y << 13) - (-0x2000 * x + bul->x) / 2 + 0xC00;
+		else
+			Vanish(bul);
+		hit = 0x82;
+	}
+	return hit;
+}
+
+int JudgeHitBulletTriangleB(int x, int y, BULLET *bul)
+{
+	int hit = 0;
+	if (bul->x < (2 * x + 1) << 12
+		&& bul->x > (2 * x - 1) << 12
+		&& bul->y - 0x400 < (y << 13) - (-0x2000 * x + bul->x) / 2 - 0x800
+		&& bul->y + 0x400 > (2 * y - 1) << 12)
+	{
+		if (bul->bbits & 8)
+			bul->y = (y << 13) - (-0x2000 * x + bul->x) / 2 - 0x400;
+		else
+			Vanish(bul);
+		hit = 0x82;
+	}
+	return hit;
+}
+
+int JudgeHitBulletTriangleC(int x, int y, BULLET *bul)
+{
+	int hit = 0;
+	if (bul->x < (2 * x + 1) << 12
+		&& bul->x > (2 * x - 1) << 12
+		&& bul->y - 0x400 < (y << 13) + (-0x2000 * x + bul->x) / 2 - 0x800
+		&& bul->y + 0x400 > (2 * y - 1) << 12)
+	{
+		if (bul->bbits & 8)
+			bul->y = (y << 13) + (-0x2000 * x + bul->x) / 2 - 0x400;
+		else
+			Vanish(bul);
+		hit = 0x82;
+	}
+	return hit;
+}
+
+int JudgeHitBulletTriangleD(int x, int y, BULLET *bul)
+{
+	int hit = 0;
+	if (bul->x < (2 * x + 1) << 12
+		&& bul->x > (2 * x - 1) << 12
+		&& bul->y - 0x400 < (y << 13) + (-0x2000 * x + bul->x) / 2 + 0x800
+		&& bul->y + 0x400 > (2 * y - 1) << 12)
+	{
+		if (bul->bbits & 8)
+			bul->y = (y << 13) + (-0x2000 * x + bul->x) / 2 + 0xC00;
+		else
+			Vanish(bul);
+		hit = 0x82;
+	}
+	return hit;
+}
+
+int JudgeHitBulletTriangleE(int x, int y, BULLET *bul)
+{
+	int hit = 0;
+	if (bul->x < (2 * x + 1) << 12
+		&& bul->x - 0x200 > (2 * x - 1) << 12
+		&& bul->y + 0x400 > (y << 13) + (-0x2000 * x + bul->x) / 2 - 0x800
+		&& bul->y - 0x400 < (2 * y + 1) << 12 )
+	{
+		if (bul->bbits & 8)
+			bul->y = (y << 13) + (-0x2000 * x + bul->x) / 2 - 0xC00;
+		else
+			Vanish(bul);
+		hit = 0x28;
+	}
+	return hit;
+}
+
+int JudgeHitBulletTriangleF(int x, int y, BULLET *bul)
+{
+	int hit = 0;
+	if (bul->x < (2 * x + 1) << 12
+		&& bul->x > (2 * x - 1) << 12
+		&& bul->y + 0x400 > (y << 13) + (-0x2000 * x + bul->x) / 2 + 0x800
+		&& bul->y - 0x400 < (2 * y + 1) << 12)
+	{
+		if (bul->bbits & 8)
+			bul->y = (y << 13) + (-0x2000 * x + bul->x) / 2 + 0x400;
+		else
+			Vanish(bul);
+		hit = 0x28;
+	}
+	return hit;
+}
+
+int JudgeHitBulletTriangleG(int x, int y, BULLET *bul)
+{
+	int hit = 0;
+	if (bul->x < (2 * x + 1) << 12
+		&& bul->x > (2 * x - 1) << 12
+		&& bul->y + 0x400 > (y << 13) - (-0x2000 * x + bul->x) / 2 + 0x800
+		&& bul->y - 0x400 < (2 * y + 1) << 12)
+	{
+		if (bul->bbits & 8)
+			bul->y = (y << 13) - (-0x2000 * x + bul->x) / 2 + 0x400;
+		else
+			Vanish(bul);
+		hit = 0x18;
+	}
+	return hit;
+}
+
+int JudgeHitBulletTriangleH(int x, int y, BULLET *bul)
+{
+	int hit = 0;
+	if (bul->x < (2 * x + 1) << 12
+		&& bul->x > (2 * x - 1) << 12
+		&& bul->y + 0x400 > (y << 13) - (-0x2000 * x + bul->x) / 2 - 0x800
+		&& bul->y - 0x400 < (2 * y + 1) << 12 )
+	{
+		if (bul->bbits & 8)
+			bul->y = (y << 13) - (-0x2000 * x + bul->x) / 2 - 0xC00;
+		else
+			Vanish(bul);
+		hit = 0x18;
+	}
+	return hit;
+}
+
 void HitBulletMap()
 {
 	for (int i = 0; i < BULLET_MAX; i++)
@@ -196,7 +332,6 @@ void HitBulletMap()
 							case 0x64:
 								gBul[i].flag |= JudgeHitBulletBlock(x + offx[j], y + offy[j], &gBul[i]);
 								break;
-						/*
 							case 0x50:
 							case 0x70:
 								gBul[i].flag |= JudgeHitBulletTriangleA(x + offx[j], y + offy[j], &gBul[i]);
@@ -229,7 +364,6 @@ void HitBulletMap()
 							case 0x77:
 								gBul[i].flag |= JudgeHitBulletTriangleH(x + offx[j], y + offy[j], &gBul[i]);
 								break;
-						*/
 							default:
 								break;
 						}
