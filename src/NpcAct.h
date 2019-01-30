@@ -21,9 +21,10 @@ void ActNpc020(NPCHAR *npc);
 void ActNpc021(NPCHAR *npc);
 void ActNpc022(NPCHAR *npc);
 void ActNpc023(NPCHAR *npc);
-
+void ActNpc024(NPCHAR *npc);
 void ActNpc025(NPCHAR *npc);
 
+void ActNpc028(NPCHAR *npc);
 void ActNpc029(NPCHAR *npc);
 void ActNpc030(NPCHAR *npc);
 
