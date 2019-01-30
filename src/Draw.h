@@ -45,6 +45,9 @@ enum Surface_Ids
 
 struct SURFACE
 {
+	bool in_use;
+	bool needs_updating;
+	SDL_Surface *surface;
 	SDL_Texture *texture;
 };
 
