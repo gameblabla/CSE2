@@ -661,6 +661,142 @@ void ActNpc065(NPCHAR *npc)
 }
 
 //Sparkle
+void ActNpc069(NPCHAR *npc)
+{
+	RECT rcLeft[6];
+	RECT rcRight[6];
+
+	rcLeft[0] = {48, 0, 64, 16};
+	rcLeft[1] = {64, 0, 80, 16};
+	rcLeft[2] = {80, 0, 96, 16};
+	rcLeft[3] = {96, 0, 112, 16};
+	rcLeft[4] = {48, 0, 64, 16};
+	rcLeft[5] = {112, 0, 128, 16};
+
+	rcRight[0] = {48, 16, 64, 32};
+	rcRight[1] = {64, 16, 80, 32};
+	rcRight[2] = {80, 16, 96, 32};
+	rcRight[3] = {96, 16, 112, 32};
+	rcRight[4] = {48, 16, 64, 32};
+	rcRight[5] = {112, 16, 128, 32};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->ani_no = 0;
+			npc->ani_wait = 0;
+			npc->xm = 0;
+			// Fallthrough
+		case 1:
+			if (Random(0, 100) == 1)
+			{
+				npc->act_no = 2;
+				npc->act_wait = 0;
+				npc->ani_no = 1;
+			}
+			else
+			{
+				if (Random(0, 150) == 1)
+				{
+					if (npc->direct == 0)
+						npc->direct = 2;
+					else
+						npc->direct = 0;
+				}
+
+				if (Random(0, 150) == 1)
+				{
+					npc->act_no = 3;
+					npc->act_wait = 50;
+					npc->ani_no = 0;
+				}
+			}
+
+			break;
+
+		case 2:
+			if (++npc->act_wait > 8)
+			{
+				npc->act_no = 1;
+				npc->ani_no = 0;
+			}
+
+			break;
+
+		case 3:
+			npc->act_no = 4;
+			npc->ani_no = 2;
+			npc->ani_wait = 0;
+			// Fallthrough
+		case 4:
+			if (--npc->act_wait == 0)
+				npc->act_no = 0;
+
+			if (++npc->ani_wait > 2)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no > 4)
+				npc->ani_no = 2;
+
+			if (npc->flag & 1)
+			{
+				npc->direct = 2;
+				npc->xm = 0x200;
+			}
+
+			if (npc->flag & 4)
+			{
+				npc->direct = 0;
+				npc->xm = -0x200;
+			}
+
+			if (npc->direct == 0)
+				npc->xm = -0x100u;
+			else
+				npc->xm = 0x100;
+
+			break;
+
+		case 5:
+			if (npc->flag & 8)
+				npc->act_no = 0;
+
+			break;
+	}
+
+	switch (npc->act_no)
+	{
+		case 1:
+		case 2:
+		case 4:
+			if (npc->shock)
+			{
+				npc->ym = -0x200;
+				npc->ani_no = 5;
+				npc->act_no = 5;
+			}
+
+			break;
+	}
+
+	npc->ym += 0x40;
+	if (npc->ym > 0x5FF)
+		npc->ym = 0x5FF;
+
+	npc->x += npc->xm;
+	npc->y += npc->ym;
+
+	if (npc->direct == 0)
+		npc->rect = rcLeft[npc->ani_no];
+	else
+		npc->rect = rcRight[npc->ani_no];
+}
+
+//Sparkle
 void ActNpc070(NPCHAR *npc)
 {
 	RECT rect[4];
