@@ -478,7 +478,7 @@ int ModeAction()
 				HitNpCharMap();
 				//HitBossMap();
 				HitBulletMap();
-				//HitNpCharBullet();
+				HitNpCharBullet();
 				//HitBossBullet();
 				if (g_GameFlags & 2)
 					ShootBullet();

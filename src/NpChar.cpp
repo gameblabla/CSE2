@@ -9,8 +9,10 @@
 #include "Caret.h"
 #include "MyChar.h"
 #include "Game.h"
+#include "ArmsItem.h"
 #include "Flags.h"
 #include "Sound.h"
+#include "ValueView.h"
 #include "NpcTbl.h"
 #include "Draw.h"
 
@@ -172,43 +174,51 @@ void SetDestroyNpCharUp(int x, int y, int w, int num)
 
 void SetExpObjects(int x, int y, int exp)
 {
+	int sub_exp;
 	for (int n = 0x100; exp; SetUniqueParameter(&gNPC[n]))
 	{
-		if (!gNPC[n].cond)
+		while (true)
 		{
-			memset(&gNPC[n], 0, sizeof(NPCHAR));
+			bool v3 = n < NPC_MAX && gNPC[n].cond;
+			if (!v3)
+				break;
+			++n;
+		}
+		
+		if (n == NPC_MAX)
+			break;
+		
+		memset(&gNPC[n], 0, sizeof(NPCHAR));
 
-			int sub_exp = 0;
-			if (exp < 20)
+		if (exp < 20)
+		{
+			if (exp < 5)
 			{
-				if (exp < 5)
+				if (exp > 0)
 				{
-					if (exp > 0)
-					{
-						--exp;
-						sub_exp = 1;
-					}
-				}
-				else
-				{
-					exp -= 5;
-					sub_exp = 5;
+					--exp;
+					sub_exp = 1;
 				}
 			}
 			else
 			{
-				exp -= 20;
-				sub_exp = 20;
+				exp -= 5;
+				sub_exp = 5;
 			}
-
-			gNPC[n].cond |= 0x80u;
-			gNPC[n].direct = 0;
-			gNPC[n].code_char = 1;
-			gNPC[n].x = x;
-			gNPC[n].y = y;
-			gNPC[n].bits = gNpcTable[gNPC[n].code_char].bits;
-			gNPC[n].exp = sub_exp;
 		}
+		else
+		{
+			exp -= 20;
+			sub_exp = 20;
+		}
+
+		gNPC[n].cond |= 0x80u;
+		gNPC[n].direct = 0;
+		gNPC[n].code_char = 1;
+		gNPC[n].x = x;
+		gNPC[n].y = y;
+		gNPC[n].bits = gNpcTable[gNPC[n].code_char].bits;
+		gNPC[n].exp = sub_exp;
 	}
 }
 
@@ -220,7 +230,7 @@ bool SetBulletObject(int x, int y, int val)
 	memset(tamakazu_ari, 0, sizeof(tamakazu_ari));
 	for (int n = 0; n < 8; n++)
 	{
-		int code = 0; //gArmsData[n].code;
+		int code = gArmsData[n].code;
 		if (code == 5)
 			tamakazu_ari[t++] = 0;
 		else if (code == 10)
@@ -310,7 +320,7 @@ void PutNpChar(int fx, int fy)
 				a = 0;
 				if (gNPC[n].bits & npc_showDamage && gNPC[n].damage_view)
 				{
-					//SetValueView(&gNPC[n].x, &gNPC[n].y, gNPC[n].damage_view);
+					SetValueView(&gNPC[n].x, &gNPC[n].y, gNPC[n].damage_view);
 					gNPC[n].damage_view = 0;
 				}
 			}

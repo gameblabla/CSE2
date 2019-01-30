@@ -4,6 +4,7 @@
 
 #include "Caret.h"
 #include "Draw.h"
+#include "Triangle.h"
 #include "Game.h"
 
 #define CARET_MAX 0x40
@@ -181,6 +182,38 @@ void ActCaret09(CARET *crt)
 		crt->rect = {0, 80, 16, 96};
 }
 
+void ActCaret11(CARET *crt)
+{
+	if (!crt->act_no)
+	{
+		crt->act_no = 1;
+		uint8_t deg = Random(0, 0xFF);
+		crt->xm = 2 * GetCos(deg);
+		crt->ym = 2 * GetSin(deg);
+	}
+	
+	crt->x += crt->xm;
+	crt->y += crt->ym;
+	
+	RECT rcRight[7];
+	rcRight[0] = {56, 8, 64, 16};
+	rcRight[1] = {64, 8, 72, 16};
+	rcRight[2] = {72, 8, 80, 16};
+	rcRight[3] = {80, 8, 88, 16};
+	rcRight[4] = {88, 8, 96, 16};
+	rcRight[5] = {96, 8, 104, 16};
+	rcRight[6] = {104, 8, 112, 16};
+
+	if (++crt->ani_wait > 2)
+	{
+		crt->ani_wait = 0;
+		if (++crt->ani_no > 6)
+			crt->cond = 0;
+	}
+	
+	crt->rect = rcRight[crt->ani_no];
+}
+
 void ActCaret13(CARET *crt)
 {
 	RECT rcLeft[2];
@@ -259,7 +292,7 @@ CARETFUNCTION gpCaretFuncTbl[] =
 	ActCaret08,
 	ActCaret09,
 	nullptr, //ActCaret10,
-	nullptr, //ActCaret11,
+	ActCaret11,
 	nullptr, //ActCaret12,
 	ActCaret13,
 	nullptr, //ActCaret14,

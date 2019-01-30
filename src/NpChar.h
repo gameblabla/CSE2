@@ -83,6 +83,7 @@ void SetDestroyNpChar(int x, int y, int w, int num);
 void SetDestroyNpCharUp(int x, int y, int w, int num);
 void SetExpObjects(int x, int y, int exp);
 bool SetBulletObject(int x, int y, int val);
+bool SetLifeObject(int x, int y, int val);
 void VanishNpChar(NPCHAR *npc);
 void PutNpChar(int fx, int fy);
 void ActNpChar();
