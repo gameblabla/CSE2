@@ -129,7 +129,7 @@ float MillibelToVolume(int32_t lVolume)
 {
 	//Volume is in hundredths of decibels, from 0 to -10000
 	lVolume = clamp(lVolume, (decltype(lVolume))-10000, (decltype(lVolume))0);
-	return pow(10.0f, lVolume / 2000.0f);
+	return pow(10.0, lVolume / 2000.0);
 }
 
 void SOUNDBUFFER::SetVolume(int32_t lVolume)
@@ -174,36 +174,32 @@ void SOUNDBUFFER::Stop()
 	SDL_UnlockAudioDevice(audioDevice);
 }
 
-void SOUNDBUFFER::Mix(float *buffer, int len)
+void SOUNDBUFFER::Mix(float (*buffer)[2], size_t samples)
 {
 	if (this == NULL)
 		return;
 	
 	if (!playing) //This sound buffer isn't playing
 		return;
-	
-	size_t samples = len / (sizeof(float) * 2);
-	
+
 	for (size_t sample = 0; sample < samples; sample++)
 	{
-		double freqPosition = (frequency / (double)FREQUENCY); //This is added to position at the end
+		const double freqPosition = frequency / FREQUENCY; //This is added to position at the end
 		
 		//Get the in-between sample this is (linear interpolation)
-		uint8_t sample1 = ((looped || ((size_t)samplePosition) >= 1) ? data[(size_t)samplePosition] : 0x80);
-		uint8_t sample2 = 0x80;
-		if (looping || (((size_t)samplePosition) + 1) < size)
-			sample2 = data[(((size_t)samplePosition) + 1) % size];
+		const float sample1 = ((looped || ((size_t)samplePosition) >= 1) ? data[(size_t)samplePosition] : 0x80);
+		const float sample2 = ((looping || (((size_t)samplePosition) + 1) < size) ? data[(((size_t)samplePosition) + 1) % size] : 0x80);
 		
 		//Interpolate sample
-		float subPos = std::fmod(samplePosition, 1.0);
-		float sampleA = (float)sample1 + ((float)sample2 - (float)sample1) * subPos;
+		const float subPos = std::fmod(samplePosition, 1.0);
+		const float sampleA = sample1 + (sample2 - sample1) * subPos;
 		
 		//Convert sample to float32
-		float sampleConvert = (sampleA - 128.0) / 128.0;
+		const float sampleConvert = (sampleA - 128.0f) / 128.0f;
 		
 		//Mix
-		buffer[sample * 2] += sampleConvert * volume * volume_l;
-		buffer[sample * 2 + 1] += sampleConvert * volume * volume_r;
+		buffer[sample][0] += sampleConvert * volume * volume_l;
+		buffer[sample][1] += sampleConvert * volume * volume_r;
 		
 		//Increment position
 		samplePosition += freqPosition;
@@ -229,14 +225,19 @@ void SOUNDBUFFER::Mix(float *buffer, int len)
 //Sound mixer
 void AudioCallback(void *userdata, uint8_t *stream, int len)
 {
+	float (*buffer)[2] = (float(*)[2])stream;
+	const size_t samples = len / (sizeof(float) * 2);
+
 	//Clear stream
-	memset(stream, 0, len);
+	for (size_t sample = 0; sample < samples; ++sample)
+	{
+		buffer[sample][0] = 0.0f;
+		buffer[sample][1] = 0.0f;
+	}
 	
 	//Mix sounds to primary buffer
 	for (SOUNDBUFFER *sound = soundBuffers; sound != nullptr; sound = sound->next)
-	{
-		sound->Mix((float*)stream, len);
-	}
+		sound->Mix(buffer, samples);
 }
 
 //Sound things
