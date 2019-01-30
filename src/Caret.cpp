@@ -182,6 +182,38 @@ void ActCaret09(CARET *crt)
 		crt->rect = {0, 80, 16, 96};
 }
 
+void ActCaret10(CARET *crt)
+{
+	RECT rcLeft[2];
+	RECT rcRight[2];
+	rcLeft[0] = {0, 0, 56, 16};
+	rcLeft[1] = {0, 16, 56, 32};
+	rcRight[0] = {0, 96, 56, 112};
+	rcRight[1] = {0, 112, 56, 128};
+	
+	++crt->ani_wait;
+	
+	if (crt->direct)
+	{
+		if (crt->ani_wait < 20)
+			crt->y -= 0x200;
+		if (crt->ani_wait == 80)
+		crt->cond = 0;
+	}
+	else
+	{
+		if (crt->ani_wait < 20)
+			crt->y -= 0x400;
+		if (crt->ani_wait == 80)
+			crt->cond = 0;
+	}
+	
+	if (crt->direct)
+		crt->rect = rcRight[crt->ani_wait / 2 % 2];
+	else
+		crt->rect = rcLeft[crt->ani_wait / 2 % 2];
+}
+
 void ActCaret11(CARET *crt)
 {
 	if (!crt->act_no)
@@ -291,7 +323,7 @@ CARETFUNCTION gpCaretFuncTbl[] =
 	nullptr, //ActCaret07,
 	ActCaret08,
 	ActCaret09,
-	nullptr, //ActCaret10,
+	ActCaret10,
 	ActCaret11,
 	nullptr, //ActCaret12,
 	ActCaret13,

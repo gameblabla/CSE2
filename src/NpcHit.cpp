@@ -505,6 +505,9 @@ void HitNpCharBullet()
 									PlaySoundObject(gNPC[n].hit_voice, 1);
 									gNPC[n].shock = 16;
 								}
+								
+								if (gNPC[n].bits & npc_showDamage)
+									gNPC[n].damage_view -= gBul[b].damage;
 							}
 							else
 							{
