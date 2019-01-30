@@ -197,7 +197,7 @@ void ActNpc024(NPCHAR *npc)
 				npc->act_no = 4;
 				npc->ani_no = 3;
 				npc->act_wait = 0;
-				npc->act_wait = 0;
+				npc->act_wait = 0;	// lol duplicate line
 			}
 
 			break;
@@ -487,7 +487,7 @@ void ActNpc028(NPCHAR *npc)
 					npc->direct = 2;
 
 				if (npc->direct == 0)
-					npc->xm = -0x100u;
+					npc->xm = -0x100;
 				else
 					npc->xm = 0x100;
 			}
@@ -501,7 +501,7 @@ void ActNpc028(NPCHAR *npc)
 				npc->act_no = 4;
 				npc->ani_no = 3;
 				npc->act_wait = 0;
-				npc->act_wait = 0;
+				npc->act_wait = 0;	// lol duplicate line
 			}
 
 			break;
