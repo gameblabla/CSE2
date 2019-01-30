@@ -175,20 +175,12 @@ FontObject* LoadFont(const char *font_filename, unsigned int cell_width, unsigne
 	return font_object;
 }
 
-void DrawText(FontObject *font_object, SDL_Renderer *renderer, SDL_Texture *texture, int x, int y, unsigned long colour, const char *string, size_t string_length)
+void DrawText(FontObject *font_object, SDL_Surface *surface, int x, int y, unsigned long colour, const char *string, size_t string_length)
 {
 	if (font_object != NULL)
 	{
 		const unsigned char colours[3] = {(unsigned char)(colour >> 16), (unsigned char)(colour >> 8), (unsigned char)colour};
 
-		SDL_Texture *old_render_target = SDL_GetRenderTarget(renderer);
-		SDL_SetRenderTarget(renderer, texture);
-
-		int surface_width, surface_height;
-		SDL_GetRendererOutputSize(renderer, &surface_width, &surface_height);
-
-		SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormat(0, surface_width, surface_height, 0, SDL_PIXELFORMAT_RGBA32);
-		SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_RGBA32, surface->pixels, surface->pitch);
 		unsigned char (*surface_buffer)[surface->pitch / 4][4] = (unsigned char (*)[surface->pitch / 4][4])surface->pixels;
 
 		FT_Face face = font_object->face;
@@ -238,11 +230,11 @@ void DrawText(FontObject *font_object, SDL_Renderer *renderer, SDL_Texture *text
 			const int letter_x = x + pen_x + face->glyph->bitmap_left;
 			const int letter_y = y + ((FT_MulFix(face->ascender, face->size->metrics.y_scale) + (64 - 1)) / 64) - (face->glyph->metrics.horiBearingY / 64);
 
-			for (int iy = MAX(-letter_y, 0); letter_y + iy < MIN(letter_y + converted.rows, surface_height); ++iy)
+			for (int iy = MAX(-letter_y, 0); letter_y + iy < MIN(letter_y + converted.rows, surface->h); ++iy)
 			{
 				if (face->glyph->bitmap.pixel_mode == FT_PIXEL_MODE_LCD)
 				{
-					for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)converted.width / 3, surface_width); ++ix)
+					for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)converted.width / 3, surface->w); ++ix)
 					{
 						const unsigned char (*font_buffer)[converted.pitch / 3][3] = (unsigned char (*)[converted.pitch / 3][3])converted.buffer;
 
@@ -263,7 +255,7 @@ void DrawText(FontObject *font_object, SDL_Renderer *renderer, SDL_Texture *text
 				}
 				else if (face->glyph->bitmap.pixel_mode == FT_PIXEL_MODE_GRAY)
 				{
-					for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)converted.width, surface_width); ++ix)
+					for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)converted.width, surface->w); ++ix)
 					{
 						unsigned char (*font_buffer)[converted.pitch] = (unsigned char (*)[converted.pitch])converted.buffer;
 
@@ -282,7 +274,7 @@ void DrawText(FontObject *font_object, SDL_Renderer *renderer, SDL_Texture *text
 				}
 				else if (face->glyph->bitmap.pixel_mode == FT_PIXEL_MODE_MONO)
 				{
-					for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)converted.width, surface_width); ++ix)
+					for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)converted.width, surface->w); ++ix)
 					{
 						unsigned char (*font_buffer)[converted.pitch] = (unsigned char (*)[converted.pitch])converted.buffer;
 
@@ -303,12 +295,6 @@ void DrawText(FontObject *font_object, SDL_Renderer *renderer, SDL_Texture *text
 
 			pen_x += face->glyph->advance.x / 64;
 		}
-
-		SDL_Texture *screen_texture = SDL_CreateTextureFromSurface(renderer, surface);
-		SDL_FreeSurface(surface);
-		SDL_RenderCopy(renderer, screen_texture, NULL, NULL);
-		SDL_DestroyTexture(screen_texture);
-		SDL_SetRenderTarget(renderer, old_render_target);
 	}
 }
 
