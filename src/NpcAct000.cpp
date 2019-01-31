@@ -9,6 +9,7 @@
 #include "Back.h"
 #include "Triangle.h"
 #include "Frame.h"
+#include "Map.h"
 
 //Null
 void ActNpc000(NPCHAR *npc)
@@ -801,6 +802,334 @@ void ActNpc008(NPCHAR *npc)
 		npc->rect = rcLeft[npc->ani_no];
 	else
 		npc->rect = rcRight[npc->ani_no];
+}
+
+//Balrog (cutscene)
+void ActNpc012(NPCHAR *npc)
+{
+	switch (npc->act_no)
+	{
+		case 0:
+			if (npc->direct == 4)
+			{
+				if (gMC.x < npc->x)
+					npc->direct = 0;
+				else
+					npc->direct = 2;
+			}
+
+			npc->act_no = 1;
+			npc->ani_no = 0;
+			// Fallthrough
+		case 1:
+			if (Random(0, 100) == 0)
+			{
+				npc->act_no = 2;
+				npc->act_wait = 0;
+				npc->ani_no = 1;
+			}
+
+			break;
+
+		case 2:
+			if (++npc->act_wait > 16)
+			{
+				npc->act_no = 1;
+				npc->ani_no = 0;
+			}
+
+			break;
+
+		case 10:
+			if (npc->direct == 4)
+			{
+				if (gMC.x < npc->x)
+					npc->direct = 0;
+				else
+					npc->direct = 2;
+			}
+
+			npc->act_no = 11;
+			npc->ani_no = 2;
+			npc->act_wait = 0;
+			npc->tgt_x = 0;
+			// Fallthrough
+		case 11:
+			if (++npc->act_wait > 30)
+			{
+				npc->act_no = 12;
+				npc->act_wait = 0;
+				npc->ani_no = 3;
+				npc->ym = -0x800;
+				npc->bits |= 8;
+			}
+
+			break;
+
+		case 12:
+			if (npc->flag & 5)
+				npc->xm = 0;
+
+			if (npc->y < 0)
+			{
+				npc->code_char = 0;
+				PlaySoundObject(26, 1);
+				SetQuake(30);
+			}
+
+			break;
+
+		case 20:
+			if (npc->direct == 4)
+			{
+				if (gMC.x < npc->x)
+					npc->direct = 0;
+				else
+					npc->direct = 2;
+			}
+
+			npc->act_no = 21;
+			npc->ani_no = 5;
+			npc->act_wait = 0;
+			npc->count1 = 0;
+
+			for (int i = 0; i < 4; ++i)
+				SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+
+			PlaySoundObject(72, 1);
+			// Fallthrough
+		case 21:
+			npc->tgt_x = 1;
+
+			if (npc->flag & 8)
+				++npc->act_wait;
+
+			if (++npc->count1 / 2 % 2)
+				npc->x += 0x200;
+			else
+				npc->x -= 0x200;
+
+			if (npc->act_wait > 100)
+			{
+				npc->act_no = 11;
+				npc->act_wait = 0;
+				npc->ani_no = 2;
+			}
+
+			npc->ym += 0x20;
+			if (npc->ym > 0x5FF)
+				npc->ym = 0x5FF;
+
+			break;
+
+		case 30:
+			npc->ani_no = 4;
+
+			if (++npc->act_wait > 100)
+			{
+				npc->act_no = 0;
+				npc->ani_no = 0;
+			}
+
+			break;
+
+		case 40:
+			if (npc->direct == 4)
+			{
+				if (gMC.x < npc->x)
+					npc->direct = 0;
+				else
+					npc->direct = 2;
+			}
+
+			npc->act_no = 41;
+			npc->act_wait = 0;
+			npc->ani_no = 5;
+			// Fallthrough
+		case 41:
+			if (++npc->ani_wait / 2 % 2)
+				npc->ani_no = 5;
+			else
+				npc->ani_no = 6;
+
+			break;
+
+		case 42:
+			if (npc->direct == 4)
+			{
+				if (gMC.x < npc->x)
+					npc->direct = 0;
+				else
+					npc->direct = 2;
+			}
+
+			npc->act_no = 43;
+			npc->act_wait = 0;
+			npc->ani_no = 6;
+			// Fallthrough
+		case 43:
+			if (++npc->ani_wait / 2 % 2)
+				npc->ani_no = 7;
+			else
+				npc->ani_no = 6;
+
+			break;
+
+		case 50:
+			npc->ani_no = 8;
+			npc->xm = 0;
+			break;
+
+		case 60:
+			npc->act_no = 61;
+			npc->ani_no = 9;
+			npc->ani_wait = 0;
+			// Fallthrough
+		case 61:
+			if (++npc->ani_wait > 3)
+			{
+				npc->ani_wait = 0;
+
+				if (++npc->ani_no == 10 || npc->ani_no == 11)
+					PlaySoundObject(23, 1);
+			}
+
+			if (npc->ani_no > 12)
+				npc->ani_no = 9;
+
+			if (npc->direct == 0)
+				npc->xm = -0x200;
+			else
+				npc->xm = 0x200;
+
+			break;
+
+		case 70:
+			npc->act_no = 71;
+			npc->act_wait = 64;
+			PlaySoundObject(29, 1);
+			npc->ani_no = 13;
+			// Fallthrough
+		case 71:
+			if (--npc->act_wait == 0)
+				npc->cond = 0;
+
+			break;
+
+		case 80:
+			npc->count1 = 0;
+			npc->act_no = 81;
+			// Fallthrough
+		case 81:
+			if (++npc->count1 / 2 % 2)
+				npc->x += 0x200;
+			else
+				npc->x -= 0x200;
+
+			npc->ani_no = 5;
+			npc->xm = 0;
+			npc->ym += 0x20;
+
+			break;
+
+		case 100:
+			npc->act_no = 101;
+			npc->act_wait = 0;
+			npc->ani_no = 2;
+			// Fallthrough
+		case 101:
+			if (++npc->act_wait > 20)
+			{
+				npc->act_no = 102;
+				npc->act_wait = 0;
+				npc->ani_no = 3;
+				npc->ym = -0x800;
+				npc->bits |= 8;
+				DeleteNpCharCode(150, 0);
+				DeleteNpCharCode(117, 0);
+				SetNpChar(355, 0, 0, 0, 0, 0, npc, 0x100);
+				SetNpChar(355, 0, 0, 0, 0, 1, npc, 0x100);
+			}
+
+			break;
+
+		case 102:
+		{
+			int x = npc->x / 0x200 / 0x10;
+			int y = npc->y / 0x200 / 0x10;
+
+			if (y >= 0 && y < 35 && ChangeMapParts(x, y, 0))
+			{
+				ChangeMapParts(x - 1, y, 0);
+				ChangeMapParts(x + 1, y, 0);
+				PlaySoundObject(44, 1);
+				SetQuake2(10);
+			}
+
+			if (npc->y < -0x4000)
+			{
+				npc->code_char = 0;
+				SetQuake(30);
+			}
+
+			break;
+		}
+	}
+
+	if (npc->tgt_x && Random(0, 10) == 0)
+		SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+
+	if (npc->ym > 0x5FF)
+		npc->ym = 0x5FF;
+
+	npc->x += npc->xm;
+	npc->y += npc->ym;
+
+	RECT rect_left[14];
+	RECT rect_right[14];
+
+	rect_left[0] = {0, 0, 40, 24};
+	rect_left[1] = {160, 0, 200, 24};
+	rect_left[2] = {80, 0, 120, 24};
+	rect_left[3] = {120, 0, 160, 24};
+	rect_left[4] = {240, 0, 280, 24};
+	rect_left[5] = {200, 0, 240, 24};
+	rect_left[6] = {280, 0, 320, 24};
+	rect_left[7] = {0, 0, 0, 0};
+	rect_left[8] = {80, 48, 120, 72};
+	rect_left[9] = {0, 48, 40, 72};
+	rect_left[10] = {0, 0, 40, 24};
+	rect_left[11] = {40, 48, 80, 72};
+	rect_left[12] = {0, 0, 40, 24};
+	rect_left[13] = {280, 0, 320, 24};
+
+	rect_right[0] = {0, 24, 40, 48};
+	rect_right[1] = {160, 24, 200, 48};
+	rect_right[2] = {80, 24, 120, 48};
+	rect_right[3] = {120, 24, 160, 48};
+	rect_right[4] = {240, 24, 280, 48};
+	rect_right[5] = {200, 24, 240, 48};
+	rect_right[6] = {280, 24, 320, 48};
+	rect_right[7] = {0, 0, 0, 0};
+	rect_right[8] = {80, 72, 120, 96};
+	rect_right[9] = {0, 72, 40, 96};
+	rect_right[10] = {0, 24, 40, 48};
+	rect_right[11] = {40, 72, 80, 96};
+	rect_right[12] = {0, 24, 40, 48};
+	rect_right[13] = {280, 24, 320, 48};
+
+	if (npc->direct == 0)
+		npc->rect = rect_left[npc->ani_no];
+	else
+		npc->rect = rect_right[npc->ani_no];
+
+	if (npc->act_no == 71)
+	{
+		npc->rect.bottom = npc->rect.top + npc->act_wait / 2;
+
+		if (npc->act_wait % 2)
+			++npc->rect.left;
+	}
 }
 
 //Chest (closed)
