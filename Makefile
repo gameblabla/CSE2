@@ -89,6 +89,7 @@ SOURCES = \
 	Shoot \
 	Sound \
 	Stage \
+	SelStage \
 	TextScr \
 	Triangle \
 	ValueView
