@@ -15,6 +15,7 @@
 #include "Stage.h"
 #include "Game.h"
 #include "BossLife.h"
+#include "SelStage.h"
 
 const char *gDefaultName = "Profile.dat";
 const char *gProfileCode = "Do041220";
@@ -147,7 +148,7 @@ bool InitializeGame()
 	gCounter = 0;
 	ClearArmsData();
 	ClearItemData();
-	//ClearPermitStage();
+	ClearPermitStage();
 	//StartMapping();
 	InitFlags();
 	if (!TransferStage(13, 200, 10, 8))

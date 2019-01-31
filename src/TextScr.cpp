@@ -24,6 +24,7 @@
 #include "Game.h"
 #include "Map.h"
 #include "BossLife.h"
+#include "SelStage.h"
 
 #define IS_COMMAND(c1, c2, c3) gTS.data[gTS.p_read + 1] == c1 && gTS.data[gTS.p_read + 2] == c2 && gTS.data[gTS.p_read + 3] == c3
 
@@ -85,7 +86,7 @@ void EncryptionBinaryData2(uint8_t *pData, int size)
 }
 
 //Load generic .tsc
-bool LoadTextScript2(char *name)
+bool LoadTextScript2(const char *name)
 {
 	//Get path
 	char path[260];
@@ -670,6 +671,13 @@ int TextScriptProc()
 						SubArmsData(z);
 						gTS.p_read += 8;
 					}
+					else if (IS_COMMAND('P','S','+'))
+					{
+						x = GetTextScriptNo(gTS.p_read + 4);
+						y = GetTextScriptNo(gTS.p_read + 9);
+						AddPermitStage(x, y);
+						gTS.p_read += 13;
+					}
 					else if (IS_COMMAND('T','R','A'))
 					{
 						z = GetTextScriptNo(gTS.p_read + 4);
@@ -941,6 +949,19 @@ int TextScriptProc()
 					{
 						ReCallMusic();
 						gTS.p_read += 4;
+					}
+					else if (IS_COMMAND('S','L','P'))
+					{
+						bExit = true;
+
+						int selRet = StageSelectLoop(&z);
+						if (selRet == 0)
+							return 0;
+						if (selRet == 2)
+							return 2;
+
+						JumpTextScript(z);
+						g_GameFlags &= ~3;
 					}
 					else if (IS_COMMAND('D','N','P'))
 					{

@@ -38,6 +38,7 @@
 #include "Ending.h"
 #include "Flash.h"
 #include "BossLife.h"
+#include "SelStage.h"
 
 int g_GameFlags;
 int gCounter;
@@ -439,7 +440,7 @@ int ModeAction()
 	InitFlash();
 	ClearArmsData();
 	ClearItemData();
-	//ClearPermitStage();
+	ClearPermitStage();
 	//StartMapping();
 	InitFlags();
 	InitBossLife();
