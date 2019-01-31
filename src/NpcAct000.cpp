@@ -5,7 +5,9 @@
 #include "MyChar.h"
 #include "NpChar.h"
 #include "Game.h"
+#include "Map.h"
 #include "Sound.h"
+#include "Frame.h"
 #include "Back.h"
 #include "Triangle.h"
 #include "Frame.h"
@@ -1342,7 +1344,7 @@ void ActNpc018(NPCHAR *npc)
 			break;
 
 		case 1:
-			for (int i = 0; i < 4; ++i)
+			for (int i = 0; i < 4; i++)
 				SetNpChar(4, npc->x, npc->y, Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
 
 			npc->act_no = 0;

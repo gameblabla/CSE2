@@ -15,6 +15,7 @@
 #include "MycParam.h"
 #include "Flags.h"
 #include "Profile.h"
+#include "Map.h"
 #include "MapName.h"
 #include "KeyControl.h"
 #include "NpChar.h"
@@ -787,6 +788,12 @@ int TextScriptProc()
 						gTS.p_read += 8;
 						bExit = true;
 					}
+					else if (IS_COMMAND('W','A','S'))
+					{
+						gTS.mode = 7;
+						gTS.p_read += 4;
+						bExit = true;
+					}
 					else if (IS_COMMAND('T','U','R'))
 					{
 						gTS.p_read += 4;
@@ -980,6 +987,22 @@ int TextScriptProc()
 						SetNpChar(w, x << 13, y << 13, 0, 0, z, 0, 0x100);
 						gTS.p_read += 23;
 					}
+					else if (IS_COMMAND('M','N','P'))
+					{
+						w = GetTextScriptNo(gTS.p_read + 4);
+						x = GetTextScriptNo(gTS.p_read + 9);
+						y = GetTextScriptNo(gTS.p_read + 14);
+						z = GetTextScriptNo(gTS.p_read + 19);
+						MoveNpChar(w, x << 13, y << 13, z);
+						gTS.p_read += 23;
+					}
+					else if (IS_COMMAND('S','M','P'))
+					{
+						x = GetTextScriptNo(gTS.p_read + 4);
+						y = GetTextScriptNo(gTS.p_read + 9);
+						ShiftMapParts(x, y);
+						gTS.p_read += 13;
+					}
 					else if (IS_COMMAND('C','M','P'))
 					{
 						x = GetTextScriptNo(gTS.p_read + 4);
@@ -1011,14 +1034,10 @@ int TextScriptProc()
 						BackStepMyChar(z);
 						gTS.p_read += 8;
 					}
-					else if (IS_COMMAND('M','N','P'))
+					else if (IS_COMMAND('M','M','0'))
 					{
-						w = GetTextScriptNo(gTS.p_read + 4);
-						x = GetTextScriptNo(gTS.p_read + 9);
-						y = GetTextScriptNo(gTS.p_read + 14);
-						z = GetTextScriptNo(gTS.p_read + 19);
-						MoveNpChar(w, x << 13, y << 13, z);
-						gTS.p_read += 23;
+						ZeroMyCharXMove();
+						gTS.p_read += 4;
 					}
 					else if (IS_COMMAND('I','N','I'))
 					{

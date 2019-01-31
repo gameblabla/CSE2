@@ -151,7 +151,7 @@ void ShowMyChar(bool bShow)
 
 void PutMyChar(int fx, int fy)
 {
-	if ((gMC.cond & 0x80u) && !(gMC.cond & 2))
+	if ((gMC.cond & 0x80) && !(gMC.cond & 2))
 	{
 		//Draw weapon
 		gMC.rect_arms.left = 24 * (gArmsData[gSelectedArms].code % 13);
