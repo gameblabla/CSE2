@@ -1,5 +1,7 @@
 #include "CommonDefines.h"
 #include "Draw.h"
+#include "Sound.h"
+#include "PixTone.h"
 
 bool LoadGenericData()
 {
@@ -51,6 +53,34 @@ bool LoadGenericData()
 		MakeSurface_Generic(320, 240, SURFACE_ID_LEVEL_SPRITESET_1);
 		MakeSurface_Generic(320, 240, SURFACE_ID_LEVEL_SPRITESET_2);
 		MakeSurface_Generic(WINDOW_WIDTH, 240, SURFACE_ID_CREDIT_CAST);
+		
+		char path[0x100];
+		uint8_t *buf = nullptr;
+		size_t len;
+			
+		for (unsigned int n = 0; n < SOUND_NO; n++)
+		{
+			sprintf(path, "%2.2X.pxt", n);
+			
+			if (LoadPxt(path, &buf, &len))
+			{
+				lpSECONDARYBUFFER[n] = new SOUNDBUFFER(len);
+				
+				uint8_t *sBuf;
+				size_t sLen;
+				lpSECONDARYBUFFER[n]->Lock(&sBuf, &sLen);
+				memcpy(sBuf, buf, sLen);
+				lpSECONDARYBUFFER[n]->Unlock();
+				lpSECONDARYBUFFER[n]->SetFrequency(22050);
+			}
+			
+			//Free buffer, we're done with it
+			if (buf)
+			{
+				free(buf);
+				buf = nullptr;
+			}
+		}
 		return true;
 	}
 }

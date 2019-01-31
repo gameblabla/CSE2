@@ -10,6 +10,7 @@
 #include "PixTone.h"
 
 int8_t gWaveModelTable[6][0x100];
+bool wave_tables_made;
 
 void MakeWaveTables()
 {
@@ -72,6 +73,13 @@ double fgetv(FILE *fp) // Load a numeric value from text file; one per line.
 
 bool MakePixelWaveData(const std::vector<double>& pxtData, uint8_t *data)
 {
+	//Make wave tables if not created already
+	if (!wave_tables_made)
+	{
+		MakeWaveTables();
+		wave_tables_made = true;
+	}
+	
 	//Get some envelope stuff
 	char envelopeTable[0x100];
 	memset(envelopeTable, 0, sizeof(envelopeTable));
