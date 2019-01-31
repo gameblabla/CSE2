@@ -440,7 +440,7 @@ int ModeAction()
 	ClearArmsData();
 	ClearItemData();
 	//ClearPermitStage();
-	//StartMapping();
+	StartMapping();
 	InitFlags();
 	InitBossLife();
 	

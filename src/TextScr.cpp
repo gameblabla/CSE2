@@ -16,6 +16,7 @@
 #include "Flags.h"
 #include "Profile.h"
 #include "Map.h"
+#include "MiniMap.h"
 #include "MapName.h"
 #include "KeyControl.h"
 #include "NpChar.h"
@@ -670,6 +671,18 @@ int TextScriptProc()
 						SubArmsData(z);
 						gTS.p_read += 8;
 					}
+					else if (IS_COMMAND('M','P','+'))
+					{
+						x = GetTextScriptNo(gTS.p_read + 4);
+						SetMapping(x);
+						gTS.p_read += 8;
+					}
+					else if (IS_COMMAND('U','N','I'))
+					{
+						z = GetTextScriptNo(gTS.p_read + 4);
+						ChangeMyUnit(z);
+						gTS.p_read += 8;
+					}
 					else if (IS_COMMAND('T','R','A'))
 					{
 						z = GetTextScriptNo(gTS.p_read + 4);
@@ -859,6 +872,41 @@ int TextScriptProc()
 						else
 							gTS.p_read += 13;
 					}
+					else if (IS_COMMAND('U','N','J'))
+					{
+						x = GetTextScriptNo(gTS.p_read + 4);
+						z = GetTextScriptNo(gTS.p_read + 9);
+						if (GetUnitMyChar() == x)
+							JumpTextScript(z);
+						else
+							gTS.p_read += 13;
+					}
+					else if (IS_COMMAND('E','C','J'))
+					{
+						x = GetTextScriptNo(gTS.p_read + 4);
+						z = GetTextScriptNo(gTS.p_read + 9);
+						if (GetNpCharAlive(x))
+							JumpTextScript(z);
+						else
+							gTS.p_read += 13;
+					}
+					else if (IS_COMMAND('E','C','J'))
+					{
+						x = GetTextScriptNo(gTS.p_read + 4);
+						z = GetTextScriptNo(gTS.p_read + 9);
+						if (IsNpCharCode(x))
+							JumpTextScript(z);
+						else
+							gTS.p_read += 13;
+					}
+					else if (IS_COMMAND('M','P','J'))
+					{
+						x = GetTextScriptNo(gTS.p_read + 4);
+						if (IsMapping())
+							JumpTextScript(x);
+						else
+							gTS.p_read += 8;
+					}
 					else if (IS_COMMAND('S','S','S'))
 					{
 						x = GetTextScriptNo(gTS.p_read + 4);
@@ -941,6 +989,17 @@ int TextScriptProc()
 					{
 						ReCallMusic();
 						gTS.p_read += 4;
+					}
+					else if (IS_COMMAND('M','L','P'))
+					{
+						gTS.p_read += 4;
+						bExit = true;
+						
+						int tscRet = MiniMapLoop();
+						if (tscRet == 0)
+							return 0;
+						if (tscRet == 2)
+							return 2;
 					}
 					else if (IS_COMMAND('D','N','P'))
 					{
