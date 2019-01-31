@@ -9,7 +9,23 @@
 #include "Back.h"
 #include "Triangle.h"
 
-// Sue
+//Busted Door
+void ActNpc041(NPCHAR *npc)
+{
+	RECT rect[1];
+
+	rect[0] = {0, 80, 48, 112};
+
+	if (npc->act_no == 0)
+	{
+		++npc->act_no;
+		npc->y -= 0x2000;	// Move a tile up
+	}
+
+	npc->rect = rect[0];
+}
+
+//Sue
 void ActNpc042(NPCHAR *npc)
 {
 	RECT rcLeft[13];

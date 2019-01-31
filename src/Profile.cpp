@@ -14,6 +14,7 @@
 #include "ValueView.h"
 #include "Stage.h"
 #include "Game.h"
+#include "BossLife.h"
 
 const char *gDefaultName = "Profile.dat";
 const char *gProfileCode = "Do041220";
@@ -130,7 +131,7 @@ bool LoadProfile(char *name)
 	ClearFade();
 	SetFrameMyChar();
 	SetFrameTargetMyChar(16);
-	//InitBossLife();
+	InitBossLife();
 	CutNoise();
 	//InitStar();
 	ClearValueView();
@@ -154,7 +155,7 @@ bool InitializeGame()
 	ClearFade();
 	SetFrameMyChar();
 	SetFrameTargetMyChar(16);
-	//InitBossLife();
+	InitBossLife();
 	CutNoise();
 	ClearValueView();
 	//gCurlyShoot_wait = 0;

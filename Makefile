@@ -41,6 +41,7 @@ endif
 SOURCES = \
 	ArmsItem \
 	Back \
+	BossLife \
 	BulHit \
 	Bullet \
 	Caret \
@@ -50,6 +51,7 @@ SOURCES = \
 	Escape \
 	Fade \
 	Flags \
+	Flash \
 	Font \
 	Frame \
 	Game \
