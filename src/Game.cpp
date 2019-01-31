@@ -36,6 +36,7 @@
 #include "ValueView.h"
 #include "Draw.h"
 #include "Ending.h"
+#include "Flash.h"
 
 int g_GameFlags;
 int gCounter;
@@ -101,7 +102,7 @@ int ModeOpening()
 	InitCaret();
 	//InitStar();
 	InitFade();
-	//InitFlash();
+	InitFlash();
 	//InitBossLife();
 	ChangeMusic(0);
 	TransferStage(72, 100, 3, 3);
@@ -434,7 +435,7 @@ int ModeAction()
 	InitCaret();
 	//InitStar();
 	InitFade();
-	//InitFlash();
+	InitFlash();
 	ClearArmsData();
 	ClearItemData();
 	//ClearPermitStage();
@@ -485,7 +486,7 @@ int ModeAction()
 				ActBullet();
 				ActCaret();
 				MoveFrame3();
-				//ActFlash(frame_x, frame_y);
+				ActFlash(frame_x, frame_y);
 				
 				if (g_GameFlags & 2)
 					AnimationMyChar(true);
@@ -513,7 +514,7 @@ int ModeAction()
 			PutMapDataVector(frame_x, frame_y);
 			PutStage_Front(frame_x, frame_y);
 			PutFront(frame_x, frame_y);
-			//PutFlash();
+			PutFlash();
 			PutCaret(frame_x, frame_y);
 			PutValueView(frame_x, frame_y);
 			//PutBossLife();

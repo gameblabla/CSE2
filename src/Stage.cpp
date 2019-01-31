@@ -18,6 +18,7 @@
 #include "ValueView.h"
 #include "Back.h"
 #include "Stage.h"
+#include "Flash.h"
 
 #ifdef JAPANESE
 #define STAGE_ENTRY(parts, map, bkType, back, npc, boss, boss_no, name_en, name_jp) {parts, map, bkType, back, npc, boss, boss_no, name_jp}
@@ -195,7 +196,7 @@ bool TransferStage(int no, int w, int x, int y)
 		ClearValueView();
 		ResetQuake();
 		//InitBossChar(gTMT[no].boss_no);
-		//ResetFlash();
+		ResetFlash();
 		gStageNo = no;
 		return true;
 	}

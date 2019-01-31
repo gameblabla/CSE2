@@ -50,6 +50,7 @@ SOURCES = \
 	Escape \
 	Fade \
 	Flags \
+	Flash \
 	Font \
 	Frame \
 	Game \

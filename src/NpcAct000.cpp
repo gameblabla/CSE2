@@ -8,6 +8,7 @@
 #include "Sound.h"
 #include "Back.h"
 #include "Triangle.h"
+#include "Frame.h"
 
 //Null
 void ActNpc000(NPCHAR *npc)
@@ -1019,4 +1020,92 @@ void ActNpc018(NPCHAR *npc)
 			npc->rect = rect[0];
 			break;
 	}
+}
+
+// Balrog (burst)
+void ActNpc019(NPCHAR *npc)
+{
+	switch (npc->act_no)
+	{
+		case 0:
+			for (int i = 0; i < 0x10; ++i)
+				SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+
+			npc->y += 0x1400;
+			npc->act_no = 1;
+			npc->ani_no = 3;
+			npc->ym = -0x100;
+			PlaySoundObject(12, 1);
+			PlaySoundObject(26, 1);
+			SetQuake(30);
+			// Fallthrough
+		case 1:
+			npc->ym += 0x10;
+
+			if (npc->ym > 0 && npc->flag & 8)
+			{
+				npc->act_no = 2;
+				npc->ani_no = 2;
+				npc->act_wait = 0;
+				PlaySoundObject(26, 1);
+				SetQuake(30);
+			}
+
+			break;
+
+		case 2:
+			if (++npc->act_wait > 0x10)
+			{
+				npc->act_no = 3;
+				npc->ani_no = 0;
+				npc->ani_wait = 0;
+			}
+
+			break;
+
+		case 3:
+			if (Random(0, 100) == 0)
+			{
+				npc->act_no = 4;
+				npc->act_wait = 0;
+				npc->ani_no = 1;
+			}
+
+			break;
+
+		case 4:
+			if (++npc->act_wait > 0x10)
+			{
+				npc->act_no = 3;
+				npc->ani_no = 0;
+			}
+
+			break;
+	}
+
+	if (npc->ym > 0x5FF)
+		npc->ym = 0x5FF;
+	if (npc->ym < -0x5FF)
+		npc->ym = -0x5FF;
+
+	npc->x += npc->xm;
+	npc->y += npc->ym;
+
+	RECT rect_left[4];
+	RECT rect_right[4];
+
+	rect_left[0] = {0, 0, 40, 24};
+	rect_left[1] = {160, 0, 200, 24};
+	rect_left[2] = {80, 0, 120, 24};
+	rect_left[3] = {120, 0, 160, 24};
+
+	rect_right[0] = {0, 24, 40, 48};
+	rect_right[1] = {160, 24, 200, 48};
+	rect_right[2] = {80, 24, 120, 48};
+	rect_right[3] = {120, 24, 160, 48};
+
+	if (npc->direct == 0)
+		npc->rect = rect_left[npc->ani_no];
+	else
+		npc->rect = rect_right[npc->ani_no];
 }
