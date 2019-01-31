@@ -37,6 +37,7 @@
 #include "Draw.h"
 #include "Ending.h"
 #include "Flash.h"
+#include "BossLife.h"
 
 int g_GameFlags;
 int gCounter;
@@ -103,7 +104,7 @@ int ModeOpening()
 	//InitStar();
 	InitFade();
 	InitFlash();
-	//InitBossLife();
+	InitBossLife();
 	ChangeMusic(0);
 	TransferStage(72, 100, 3, 3);
 	SetFrameTargetMyChar(16);
@@ -441,7 +442,7 @@ int ModeAction()
 	//ClearPermitStage();
 	//StartMapping();
 	InitFlags();
-	//InitBossLife();
+	InitBossLife();
 	
 	if ((bContinue && LoadProfile(NULL)) || InitializeGame())
 	{
@@ -517,7 +518,7 @@ int ModeAction()
 			PutFlash();
 			PutCaret(frame_x, frame_y);
 			PutValueView(frame_x, frame_y);
-			//PutBossLife();
+			PutBossLife();
 			PutFade();
 			
 			if (!(g_GameFlags & 4))

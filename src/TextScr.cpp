@@ -21,6 +21,8 @@
 #include "Sound.h"
 #include "Organya.h"
 #include "Game.h"
+#include "Map.h"
+#include "BossLife.h"
 
 #define IS_COMMAND(c1, c2, c3) gTS.data[gTS.p_read + 1] == c1 && gTS.data[gTS.p_read + 2] == c2 && gTS.data[gTS.p_read + 3] == c3
 
@@ -840,6 +842,16 @@ int TextScriptProc()
 						else
 							gTS.p_read += 13;
 					}
+					else if (IS_COMMAND('I','T','J'))
+					{
+						x = GetTextScriptNo(gTS.p_read + 4);
+						z = GetTextScriptNo(gTS.p_read + 9);
+
+						if (CheckItem(x))
+							JumpTextScript(z);
+						else
+							gTS.p_read += 13;
+					}
 					else if (IS_COMMAND('S','S','S'))
 					{
 						x = GetTextScriptNo(gTS.p_read + 4);
@@ -967,6 +979,37 @@ int TextScriptProc()
 						z = GetTextScriptNo(gTS.p_read + 19);
 						SetNpChar(w, x << 13, y << 13, 0, 0, z, 0, 0x100);
 						gTS.p_read += 23;
+					}
+					else if (IS_COMMAND('C','M','P'))
+					{
+						x = GetTextScriptNo(gTS.p_read + 4);
+						y = GetTextScriptNo(gTS.p_read + 9);
+						z = GetTextScriptNo(gTS.p_read + 14);
+						ChangeMapParts(x, y, z);
+						gTS.p_read += 18;
+					}
+					else if (IS_COMMAND('B','S','L'))
+					{
+						z = GetTextScriptNo(gTS.p_read + 4);
+
+						if (z)
+							StartBossLife(z);
+						else
+							StartBossLife2();
+
+						gTS.p_read += 8;
+					}
+					else if (IS_COMMAND('M','Y','D'))
+					{
+						z = GetTextScriptNo(gTS.p_read + 4);
+						SetMyCharDirect(z);
+						gTS.p_read += 8;
+					}
+					else if (IS_COMMAND('M','Y','B'))
+					{
+						z = GetTextScriptNo(gTS.p_read + 4);
+						BackStepMyChar(z);
+						gTS.p_read += 8;
 					}
 					else if (IS_COMMAND('M','N','P'))
 					{
