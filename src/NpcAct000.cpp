@@ -802,6 +802,43 @@ void ActNpc008(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
+//Balrog (cutscene)
+void ActNpc012(NPCHAR *npc)
+{
+	RECT rect_left[14];
+	RECT rect_right[14];
+	
+	rect_left[0] = {0, 0, 40, 24};
+	rect_left[1] = {160, 0, 200, 24};
+	rect_left[2] = {80, 0, 120, 24};
+	rect_left[3] = {120, 0, 160, 24};
+	rect_left[4] = {240, 0, 280, 24};
+	rect_left[5] = {200, 0, 240, 24};
+	rect_left[6] = {280, 0, 320, 24};
+	rect_left[7] = {0, 0, 0, 0};
+	rect_left[8] = {80, 48, 120, 72};
+	rect_left[9] = {0, 48, 40, 72};
+	rect_left[10] = {0, 0, 40, 24};
+	rect_left[11] = {40, 48, 80, 72};
+	rect_left[12] = {0, 0, 40, 24};
+	rect_left[13] = {280, 0, 320, 24};
+	
+	rect_right[0] = {0, 24, 40, 48};
+	rect_right[1] = {160, 24, 200, 48};
+	rect_right[2] = {80, 24, 120, 48};
+	rect_right[3] = {120, 24, 160, 48};
+	rect_right[4] = {240, 24, 280, 48};
+	rect_right[5] = {200, 24, 240, 48};
+	rect_right[6] = {280, 24, 320, 48};
+	rect_right[7] = {0, 0, 0, 0};
+	rect_right[8] = {80, 72, 120, 96};
+	rect_right[9] = {0, 72, 40, 96};
+	rect_right[10] = {0, 24, 40, 48};
+	rect_right[11] = {40, 72, 80, 96};
+	rect_right[12] = {0, 24, 40, 48};
+	rect_right[13] = {280, 24, 320, 48};
+}
+
 //Chest (closed)
 void ActNpc015(NPCHAR *npc)
 {

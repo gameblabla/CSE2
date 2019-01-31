@@ -785,6 +785,12 @@ int TextScriptProc()
 						gTS.p_read += 8;
 						bExit = true;
 					}
+					else if (IS_COMMAND('W','A','S'))
+					{
+						gTS.mode = 7;
+						gTS.p_read += 4;
+						bExit = true;
+					}
 					else if (IS_COMMAND('T','U','R'))
 					{
 						gTS.p_read += 4;
@@ -976,6 +982,23 @@ int TextScriptProc()
 						z = GetTextScriptNo(gTS.p_read + 19);
 						MoveNpChar(w, x << 13, y << 13, z);
 						gTS.p_read += 23;
+					}
+					else if (IS_COMMAND('M','Y','D'))
+					{
+						z = GetTextScriptNo(gTS.p_read + 4);
+						SetMyCharDirect(z);
+						gTS.p_read += 8;
+					}
+					else if (IS_COMMAND('M','Y','B'))
+					{
+						z = GetTextScriptNo(gTS.p_read + 4);
+						BackStepMyChar(z);
+						gTS.p_read += 8;
+					}
+					else if (IS_COMMAND('M','M','0'))
+					{
+						ZeroMyCharXMove();
+						gTS.p_read += 4;
 					}
 					else if (IS_COMMAND('I','N','I'))
 					{

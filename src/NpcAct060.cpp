@@ -481,6 +481,136 @@ void ActNpc062(NPCHAR *npc)
 	npc->rect = rcLeft[npc->ani_no];
 }
 
+//Toroko with stick
+void ActNpc063(NPCHAR *npc)
+{
+	RECT rcRight[6];
+	RECT rcLeft[6];
+
+	rcLeft[0] = {64, 64, 80, 80};
+	rcLeft[1] = {80, 64, 96, 80};
+	rcLeft[2] = {64, 64, 80, 80};
+	rcLeft[3] = {96, 64, 112, 80};
+	rcLeft[4] = {112, 64, 128, 80};
+	rcLeft[5] = {128, 64, 144, 80};	
+	
+	rcRight[0] = {64, 80, 80, 96};
+	rcRight[1] = {80, 80, 96, 96};
+	rcRight[2] = {64, 80, 80, 96};
+	rcRight[3] = {96, 80, 112, 96};
+	rcRight[4] = {112, 80, 128, 96};
+	rcRight[5] = {128, 80, 144, 96};
+	
+	switch ( npc->act_no )
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->act_wait = 0;
+			npc->ani_wait = 0;
+			npc->ym = -1024;
+		case 1:
+			if (npc->ym > 0)
+				npc->bits &= ~npc_ignoreSolid;
+			
+			if (++npc->ani_wait > 2)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+			
+			if (npc->ani_no > 3)
+				npc->ani_no = 0;
+			
+			if (npc->direct)
+				npc->xm = 0x100;
+			else
+				npc->xm = -0x100;
+			
+			if (npc->act_wait != 0 && npc->flag & 8)
+				npc->act_no = 2;
+			npc->act_wait++;
+			break;
+		case 2:
+			npc->act_no = 3;
+			npc->act_wait = 0;
+			npc->ani_no = 0;
+			npc->ani_wait = 0;
+		case 3:
+			if (++npc->ani_wait > 2)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+			
+			if (npc->ani_no > 3)
+				npc->ani_no = 0;
+			
+			if (++npc->act_wait > 50)
+			{
+				npc->act_wait = 40;
+				npc->xm = -npc->xm;
+				if (npc->direct)
+					npc->direct = 0;
+				else
+					npc->direct = 2;
+			}
+			
+			if (npc->act_wait > 35)
+				npc->bits |= npc_shootable;
+			
+			if (npc->direct)
+				npc->xm += 0x40;
+			else
+				npc->xm -= 0x40;
+			
+			if (npc->shock)
+			{
+				npc->act_no = 4;
+				npc->ani_no = 4;
+				npc->ym = -0x400;
+				npc->bits &= ~npc_shootable;
+				npc->damage = 0;
+			}
+			break;
+		case 4:
+			if (npc->direct)
+				npc->xm = 0x100;
+			else
+				npc->xm = -0x100;
+			
+			if (npc->act_wait != 0 && npc->flag & 8)
+			{
+				npc->act_no = 5;
+				npc->bits |= npc_interact;
+			}
+			npc->act_wait++;
+			break;
+		case 5:
+			npc->xm = 0;
+			npc->ani_no = 5;
+			break;
+		default:
+			break;
+	}
+	
+	npc->ym += 0x40;
+	
+	if (npc->xm > 0x400)
+		npc->xm = 0x400;
+	if (npc->xm < -0x400)
+		npc->xm = -0x400;
+	if (npc->ym > 0x5FF)
+		npc->ym = 0x5FF;
+	
+	npc->x += npc->xm;
+	npc->y += npc->ym;
+	
+	if (npc->direct)
+		npc->rect = rcRight[npc->ani_no];
+	else
+		npc->rect = rcLeft[npc->ani_no];
+}
+
 //First Cave Critter
 void ActNpc064(NPCHAR *npc)
 {

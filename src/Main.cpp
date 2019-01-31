@@ -9,6 +9,7 @@
 
 #include "Draw.h"
 #include "Input.h"
+#include "Profile.h"
 #include "Organya.h"
 #include "Sound.h"
 #include "Game.h"
@@ -399,6 +400,11 @@ bool SystemTask()
 					default:
 						break;
 				}
+				break;
+				
+			case SDL_DROPFILE:
+				LoadProfile(event.drop.file);
+				SDL_free(event.drop.file);
 				break;
 			
 			case SDL_KEYDOWN:
