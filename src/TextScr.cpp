@@ -15,6 +15,7 @@
 #include "MycParam.h"
 #include "Flags.h"
 #include "Profile.h"
+#include "Map.h"
 #include "MapName.h"
 #include "KeyControl.h"
 #include "NpChar.h"
@@ -982,6 +983,21 @@ int TextScriptProc()
 						z = GetTextScriptNo(gTS.p_read + 19);
 						MoveNpChar(w, x << 13, y << 13, z);
 						gTS.p_read += 23;
+					}
+					else if (IS_COMMAND('S','M','P'))
+					{
+						x = GetTextScriptNo(gTS.p_read + 4);
+						y = GetTextScriptNo(gTS.p_read + 9);
+						ShiftMapParts(x, y);
+						gTS.p_read += 13;
+					}
+					else if (IS_COMMAND('C','M','P'))
+					{
+						x = GetTextScriptNo(gTS.p_read + 4);
+						y = GetTextScriptNo(gTS.p_read + 9);
+						z = GetTextScriptNo(gTS.p_read + 14);
+						ChangeMapParts(x, y, z);
+						gTS.p_read += 18;
 					}
 					else if (IS_COMMAND('M','Y','D'))
 					{

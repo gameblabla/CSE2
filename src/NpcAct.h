@@ -12,11 +12,13 @@ void ActNpc006(NPCHAR *npc);
 void ActNpc007(NPCHAR *npc);
 void ActNpc008(NPCHAR *npc);
 
+void ActNpc012(NPCHAR *npc);
+
 void ActNpc015(NPCHAR *npc);
 void ActNpc016(NPCHAR *npc);
 void ActNpc017(NPCHAR *npc);
 void ActNpc018(NPCHAR *npc);
-
+void ActNpc019(NPCHAR *npc);
 void ActNpc020(NPCHAR *npc);
 void ActNpc021(NPCHAR *npc);
 void ActNpc022(NPCHAR *npc);
