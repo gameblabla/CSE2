@@ -246,6 +246,22 @@ void ActCaret11(CARET *crt)
 	crt->rect = rcRight[crt->ani_no];
 }
 
+void ActCaret12(CARET *crt)
+{
+	RECT rcLeft[2];
+	rcLeft[0] = {112, 0, 144, 32};
+	rcLeft[1] = {144, 0, 176, 32};
+	
+	if (++crt->ani_wait > 2)
+	{
+		crt->ani_wait = 0;
+		if (++crt->ani_no > 1)
+		  crt->cond = 0;
+	}
+	
+	crt->rect = rcLeft[crt->ani_no];
+}
+
 void ActCaret13(CARET *crt)
 {
 	RECT rcLeft[2];
@@ -325,7 +341,7 @@ CARETFUNCTION gpCaretFuncTbl[] =
 	ActCaret09,
 	ActCaret10,
 	ActCaret11,
-	nullptr, //ActCaret12,
+	ActCaret12,
 	ActCaret13,
 	nullptr, //ActCaret14,
 	nullptr, //ActCaret15,
