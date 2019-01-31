@@ -9,6 +9,7 @@
 #include "Fade.h"
 #include "ArmsItem.h"
 #include "Flags.h"
+#include "MiniMap.h"
 #include "MyChar.h"
 #include "Frame.h"
 #include "ValueView.h"
@@ -101,7 +102,7 @@ bool LoadProfile(char *name)
 	memcpy(gArmsData, profile.arms, sizeof(gArmsData));
 	memcpy(gItemData, profile.items, sizeof(gItemData));
 	//memcpy(gPermitStage, profile.permitstage, 0x40u);
-	//memcpy(gMapping, profile.permit_mapping, 0x80u);
+	memcpy(gMapping, profile.permit_mapping, 0x80);
 	memcpy(gFlagNPC, profile.flags, 1000);
 	
 	//Load stage
@@ -149,7 +150,7 @@ bool InitializeGame()
 	ClearArmsData();
 	ClearItemData();
 	ClearPermitStage();
-	//StartMapping();
+	StartMapping();
 	InitFlags();
 	if (!TransferStage(13, 200, 10, 8))
 		return false;

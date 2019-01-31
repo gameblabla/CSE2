@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #include "WindowsWrapper.h"
 
 #include "CommonDefines.h"
@@ -7,8 +9,11 @@
 #include "Game.h"
 #include "KeyControl.h"
 #include "Map.h"
+#include "Stage.h"
 #include "MyChar.h"
 #include "Main.h"
+
+int8_t gMapping[0x80];
 
 void WriteMiniMapLine(int line)
 {
@@ -170,4 +175,19 @@ int MiniMapLoop()
 	}
 
 	return 1;
+}
+
+bool IsMapping()
+{
+	return gMapping[gStageNo] != 0;
+}
+
+void StartMapping()
+{
+	memset(gMapping, 0, 0x80u);
+}
+
+void SetMapping(int a)
+{
+	gMapping[a] = 1;
 }
