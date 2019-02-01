@@ -77,8 +77,11 @@ void ActNpc084(NPCHAR *npc);
 void ActNpc085(NPCHAR *npc);
 void ActNpc086(NPCHAR *npc);
 void ActNpc087(NPCHAR *npc);
-
+void ActNpc088(NPCHAR *npc);
+void ActNpc089(NPCHAR *npc);
+void ActNpc090(NPCHAR *npc);
 void ActNpc091(NPCHAR *npc);
+void ActNpc092(NPCHAR *npc);
 
 void ActNpc116(NPCHAR *npc);
 
