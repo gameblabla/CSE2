@@ -9,17 +9,17 @@ void InitTriangleTable()
 	//Sine
 	for (int i = 0; i < 0x100; ++i )
 	{
-		float v0 = (float)i * 6.2831998 / 256.0;
+		float v0 = i * 6.2831998 / 256.0;
 		gSin[i] = (int)(sinf(v0) * 512.0);
 	}
 	
 	//Tangent
-	for (int ia = 0; ia < 0x21; ++ia )
+	for (int i = 0; i < 0x21; ++i )
 	{
-		float a = (float)ia * 6.2831855 / 256.0;
+		float a = i * 6.2831855 / 256.0;
 		float v2 = sinf(a);
 		float b = v2 / cosf(a);
-		gTan[ia] = (int16_t)(b * 8192.0);
+		gTan[i] = (int16_t)(b * 8192.0);
 	}
 }
 

@@ -1,3 +1,5 @@
+#include "Flags.h"
+
 #include <cstring>
 #include <stdint.h>
 
