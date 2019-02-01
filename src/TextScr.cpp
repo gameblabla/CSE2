@@ -678,6 +678,7 @@ int TextScriptProc()
 						y = GetTextScriptNo(gTS.p_read + 9);
 						AddPermitStage(x, y);
 						gTS.p_read += 13;
+					}
 					else if (IS_COMMAND('M','P','+'))
 					{
 						x = GetTextScriptNo(gTS.p_read + 4);

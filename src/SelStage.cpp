@@ -10,11 +10,7 @@
 #include "Sound.h"
 #include "WindowsWrapper.h"
 
-static struct
-{
-	int index;
-	int event;
-} gPermitStage[8];
+PERMIT_STAGE gPermitStage[8];
 
 static int gSelectedStage;
 static int gStageSelectTitleY;

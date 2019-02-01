@@ -1,6 +1,7 @@
 #pragma once
 #include <stdint.h>
 #include "ArmsItem.h"
+#include "SelStage.h"
 
 struct PROFILE
 {
@@ -21,7 +22,7 @@ struct PROFILE
 	int counter;
 	ARMS arms[8];
 	ITEM items[32];
-	char permitstage[8][8];
+	PERMIT_STAGE permitstage[8];
 	char permit_mapping[0x80];
 	char FLAG[4];
 	uint8_t flags[1000];
