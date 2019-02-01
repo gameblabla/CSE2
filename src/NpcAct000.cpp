@@ -1385,13 +1385,6 @@ void ActNpc013(NPCHAR *npc)
 //Santa's Key
 void ActNpc014(NPCHAR *npc)
 {
-	int v2; // ST0C_4@5
-	int v3; // ST08_4@5
-	int v4; // eax@5
-	RECT *v5; // eax@12
-	RECT *v6; // ecx@12
-	signed int i; // [sp+4h] [bp-34h]@3
-
 	RECT rect[3];
 
 	rect[0] = {192, 0, 208, 16};
@@ -1406,7 +1399,7 @@ void ActNpc014(NPCHAR *npc)
 		{
 			npc->ym = -0x200;
 
-			for (i = 0; i < 4; ++i)
+			for (int i = 0; i < 4; ++i)
 				SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
 		}
 	}
