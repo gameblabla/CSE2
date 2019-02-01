@@ -447,16 +447,18 @@ void InitTextObject(const char *font_name)
 {
 	//Get font size
 	unsigned int fontWidth, fontHeight;
-	if (gWindowScale == 1)
+
+	// The original did this, but Windows would downscale it to 5/10 anyway.
+/*	if (gWindowScale == 1)
 	{
 		fontWidth = 6;
 		fontHeight = 12;
 	}
 	else
-	{
+	{*/
 		fontWidth = 5 * gWindowScale;
 		fontHeight = 10 * gWindowScale;
-	}
+//	}
 	
 #ifdef WINDOWS
 	// Actually use the font Config.dat specifies

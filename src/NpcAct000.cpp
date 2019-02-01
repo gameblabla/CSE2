@@ -12,6 +12,7 @@
 #include "Triangle.h"
 #include "Frame.h"
 #include "Map.h"
+#include "Caret.h"
 
 //Null
 void ActNpc000(NPCHAR *npc)
@@ -806,6 +807,231 @@ void ActNpc008(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
+//Balrog (drop-in)
+void ActNpc009(NPCHAR *npc)
+{
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->ani_no = 2;
+			// Fallthrough
+		case 1:
+			npc->ym += 0x20;
+
+			if (npc->count1 >= 40)
+			{
+				npc->bits &= ~8;
+				npc->bits |= 1;
+			}
+			else
+			{
+				++npc->count1;
+			}
+
+			if (npc->flag & 8)
+			{
+				for (int i = 0; i < 4; ++i)
+					SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+
+				npc->act_no = 2;
+				npc->ani_no = 1;
+				npc->act_wait = 0;
+				PlaySoundObject(26, 1);
+				SetQuake(30);
+			}
+
+			break;
+
+		case 2:
+			if (++npc->act_wait > 16)
+			{
+				npc->act_no = 3;
+				npc->ani_no = 0;
+				npc->ani_wait = 0;
+			}
+
+			break;
+	}
+
+	if (npc->ym > 0x5FF)
+		npc->ym = 0x5FF;
+	if (npc->ym < -0x5FF)
+		npc->ym = -0x5FF;
+
+	npc->x += npc->xm;
+	npc->y += npc->ym;
+
+	RECT rect_left[3];
+	RECT rect_right[3];
+
+	rect_left[0] = {0, 0, 40, 24};
+	rect_left[1] = {80, 0, 120, 24};
+	rect_left[2] = {120, 0, 160, 24};
+
+	rect_right[0] = {0, 24, 40, 48};
+	rect_right[1] = {80, 24, 120, 48};
+	rect_right[2] = {120, 24, 160, 48};
+
+	if (npc->direct == 0)
+		npc->rect = rect_left[npc->ani_no];
+	else
+		npc->rect = rect_right[npc->ani_no];
+}
+
+//Balrog (shooting) (super-secret version from prototype)
+void ActNpc010(NPCHAR *npc)
+{
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			// Fallthrough
+		case 1:
+			if (++npc->act_wait > 12)
+			{
+				npc->act_no = 2;
+				npc->act_wait = 0;
+				npc->count1 = 3;
+				npc->ani_no = 1;
+			}
+
+			break;
+
+		case 2:
+			if (++npc->act_wait > 16)
+			{
+				--npc->count1;
+				npc->act_wait = 0;
+
+				unsigned char deg = GetArktan(npc->x - gMC.x, npc->y + 0x800 - gMC.y);
+				deg += Random(-0x10, 0x10);
+				int ym = GetSin(deg);
+				int xm = GetCos(deg);
+				SetNpChar(11, npc->x, npc->y + 0x800, xm, ym, 0, 0, 0x100);
+
+				PlaySoundObject(39, 1);
+
+				if (npc->count1 == 0)
+				{
+					npc->act_no = 3;
+					npc->act_wait = 0;
+				}
+			}
+
+			break;
+
+		case 3:
+			if (++npc->act_wait > 3)
+			{
+				npc->act_no = 4;
+				npc->act_wait = 0;
+				npc->xm = (gMC.x - npc->x) / 100;
+				npc->ym = -0x600;
+				npc->ani_no = 3;
+			}
+
+			break;
+
+		case 4:
+			if (npc->flag & 5)
+				npc->xm = 0;
+
+			if (gMC.y > npc->y + 0x2000)
+				npc->damage = 5;
+			else
+				npc->damage = 0;
+
+			if (npc->flag & 8)
+			{
+				npc->act_no = 5;
+				npc->act_wait = 0;
+				npc->ani_no = 2;
+				PlaySoundObject(26, 1);
+				SetQuake(30);
+				npc->damage = 0;
+			}
+
+			break;
+
+		case 5:
+			npc->xm = 0;
+
+			if (++npc->act_wait > 3)
+			{
+				npc->act_no = 1;
+				npc->act_wait = 0;
+			}
+
+			break;
+	}
+
+	npc->ym += 0x20;
+	if (npc->ym > 0x5FF)
+		npc->ym = 0x5FF;
+
+	npc->x += npc->xm;
+	npc->y += npc->ym;
+
+	RECT rect_left[4];
+	RECT rect_right[4];
+
+	rect_left[0] = {0, 0, 40, 24};
+	rect_left[1] = {40, 0, 80, 24};
+	rect_left[2] = {80, 0, 120, 24};
+	rect_left[3] = {120, 0, 160, 24};
+
+	rect_right[0] = {0, 24, 40, 48};
+	rect_right[1] = {40, 24, 80, 48};
+	rect_right[2] = {80, 24, 120, 48};
+	rect_right[3] = {120, 24, 160, 48};
+
+	if (gMC.x > npc->x)
+		npc->direct = 2;
+	else
+		npc->direct = 0;
+
+	if (npc->direct == 0)
+		npc->rect = rect_left[npc->ani_no];
+	else
+		npc->rect = rect_right[npc->ani_no];
+}
+
+//Proto-Balrog's projectile
+void ActNpc011(NPCHAR *npc)
+{
+	if (npc->flag & 0xFF)
+	{
+		npc->cond = 0;
+		SetCaret(npc->x, npc->y, 2, 0);
+	}
+
+	npc->y += npc->ym;
+	npc->x += npc->xm;
+
+	RECT rect_left[3];
+
+	rect_left[0] = {208, 104, 224, 120};
+	rect_left[1] = {224, 104, 240, 120};
+	rect_left[2] = {240, 104, 256, 120};
+
+	if (++npc->ani_wait > 1)
+	{
+		npc->ani_wait = 0;
+
+		if (++npc->ani_no > 2)
+			npc->ani_no = 0;
+	}
+
+	npc->rect = rect_left[npc->ani_no];
+
+	if (++npc->count1 > 150)
+	{
+		SetCaret(npc->x, npc->y, 2, 0);
+		npc->cond = 0;
+	}
+}
+
 //Balrog (cutscene)
 void ActNpc012(NPCHAR *npc)
 {
@@ -1132,6 +1358,68 @@ void ActNpc012(NPCHAR *npc)
 		if (npc->act_wait % 2)
 			++npc->rect.left;
 	}
+}
+
+//Forcefield
+void ActNpc013(NPCHAR *npc)
+{
+	RECT rect[4];
+
+	rect[0] = {128, 0, 144, 16};
+	rect[1] = {144, 0, 160, 16};
+	rect[2] = {160, 0, 176, 16};
+	rect[3] = {176, 0, 192, 16};
+
+	if (++npc->ani_wait > 0)
+	{
+		npc->ani_wait = 0;
+		++npc->ani_no;
+	}
+
+	if (npc->ani_no > 3)
+		npc->ani_no = 0;
+
+	npc->rect = rect[npc->ani_no];
+}
+
+//Santa's Key
+void ActNpc014(NPCHAR *npc)
+{
+	RECT rect[3];
+
+	rect[0] = {192, 0, 208, 16};
+	rect[1] = {208, 0, 224, 16};
+	rect[2] = {224, 0, 240, 16};
+
+	if (npc->act_no == 0)
+	{
+		npc->act_no = 1;
+
+		if (npc->direct == 2)
+		{
+			npc->ym = -0x200;
+
+			for (int i = 0; i < 4; ++i)
+				SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+		}
+	}
+
+	if (++npc->ani_wait > 1)
+	{
+		npc->ani_wait = 0;
+		++npc->ani_no;
+	}
+
+	if (npc->ani_no > 2)
+		npc->ani_no = 0;
+
+	npc->ym += 0x40;
+	if (npc->ym > 0x5FF)
+		npc->ym = 0x5FF;
+
+	npc->y += npc->ym;
+
+	npc->rect = rect[npc->ani_no];
 }
 
 //Chest (closed)
