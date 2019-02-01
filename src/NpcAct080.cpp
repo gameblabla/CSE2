@@ -9,6 +9,7 @@
 #include "Back.h"
 #include "Triangle.h"
 #include "Caret.h"
+#include "Flash.h"
 
 //Gravekeeper
 void ActNpc080(NPCHAR *npc)
@@ -295,6 +296,209 @@ void ActNpc081(NPCHAR *npc)
 
 	npc->x += npc->xm;
 	npc->y += npc->ym;
+
+	if (npc->direct == 0)
+		npc->rect = rcLeft[npc->ani_no];
+	else
+		npc->rect = rcRight[npc->ani_no];
+}
+
+//Misery (standing)
+void ActNpc082(NPCHAR *npc)
+{
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->ani_no = 2;
+			// Fallthrough
+		case 1:
+			if (Random(0, 120) == 10)
+			{
+				npc->act_no = 2;
+				npc->act_wait = 0;
+				npc->ani_no = 3;
+			}
+
+			break;
+
+		case 2:
+			if (++npc->act_wait > 8)
+			{
+				npc->act_no = 1;
+				npc->ani_no = 2;
+			}
+
+			break;
+
+		case 15:
+			npc->act_no = 16;
+			npc->act_wait = 0;
+			npc->ani_no = 4;
+			// Fallthrough
+		case 16:
+			if (++npc->act_wait == 30)
+			{
+				PlaySoundObject(21, 1);
+				SetNpChar(66, npc->x, npc->y - 0x2000, 0, 0, 0, npc, 0);
+			}
+
+			if (npc->act_wait == 50)
+				npc->act_no = 14;
+
+			break;
+
+		case 20:
+			npc->act_no = 21;
+			npc->ani_no = 0;
+			npc->ym = 0;
+			npc->bits |= 8;
+			// Fallthrough
+		case 21:
+			npc->ym -= 0x20;
+
+			if (npc->y < -0x1000)
+				npc->cond = 0;
+
+			break;
+
+		case 25:
+			npc->act_no = 26;
+			npc->act_wait = 0;
+			npc->ani_no = 5;
+			npc->ani_wait = 0;
+			// Fallthrough
+		case 26:
+			if (++npc->ani_no > 7)
+				npc->ani_no = 5;
+
+			if (++npc->act_wait == 30)
+			{
+				PlaySoundObject(101, 1);
+				SetFlash(0, 0, 2);
+				npc->act_no = 27;
+				npc->ani_no = 7;
+			}
+
+			break;
+
+		case 27:
+			if (++npc->act_wait == 50)
+			{
+				npc->act_no = 0;
+				npc->ani_no = 0;
+			}
+
+			break;
+
+		case 30:
+			npc->act_no = 31;
+			npc->ani_no = 3;
+			npc->ani_wait = 0;
+			// Fallthrough
+		case 31:
+			if (++npc->ani_wait > 10)
+			{
+				npc->act_no = 32;
+				npc->ani_no = 4;
+				npc->ani_wait = 0;
+			}
+
+			break;
+
+		case 32:
+			if (++npc->ani_wait > 100)
+			{
+				npc->act_no = 1;
+				npc->ani_no = 2;
+			}
+
+			break;
+
+		case 40:
+			npc->act_no = 41;
+			npc->act_wait = 0;
+			// Fallthrough
+		case 41:
+			npc->ani_no = 4;
+
+			switch (++npc->act_wait)
+			{
+				case 30:
+				case 40:
+				case 50:
+					SetNpChar(11, npc->x + 0x1000, npc->y - 0x1000, 0x600, Random(-0x200, 0), 0, 0, 0x100);
+					PlaySoundObject(33, 1);
+					break;
+			}
+
+			if (npc->act_wait > 50)
+				npc->act_no = 0;
+
+			break;
+
+		case 50:
+			npc->ani_no = 8;
+			break;
+	}
+
+	npc->x += npc->xm;
+	npc->y += npc->ym;
+
+	RECT rcLeft[9];
+	RECT rcRight[9];
+
+	rcLeft[0] = {80, 0, 96, 16};
+	rcLeft[1] = {96, 0, 112, 16};
+	rcLeft[2] = {112, 0, 128, 16};
+	rcLeft[3] = {128, 0, 144, 16};
+	rcLeft[4] = {144, 0, 160, 16};
+	rcLeft[5] = {160, 0, 176, 16};
+	rcLeft[6] = {176, 0, 192, 16};
+	rcLeft[7] = {144, 0, 160, 16};
+	rcLeft[8] = {208, 64, 224, 80};
+
+	rcRight[0] = {80, 16, 96, 32};
+	rcRight[1] = {96, 16, 112, 32};
+	rcRight[2] = {112, 16, 128, 32};
+	rcRight[3] = {128, 16, 144, 32};
+	rcRight[4] = {144, 16, 160, 32};
+	rcRight[5] = {160, 16, 176, 32};
+	rcRight[6] = {176, 16, 192, 32};
+	rcRight[7] = {144, 16, 160, 32};
+	rcRight[8] = {208, 80, 224, 96};
+
+	if (npc->act_no == 11)
+	{
+		if (npc->ani_wait)
+		{
+			--npc->ani_wait;
+			npc->ani_no = 1;
+		}
+		else
+		{
+			if (Random(0, 100) == 1)
+				npc->ani_wait = 30;
+
+			npc->ani_no = 0;
+		}
+	}
+
+	if (npc->act_no == 14)
+	{
+		if (npc->ani_wait)
+		{
+			--npc->ani_wait;
+			npc->ani_no = 3;
+		}
+		else
+		{
+			if (Random(0, 100) == 1)
+				npc->ani_wait = 30;
+
+			npc->ani_no = 2;
+		}
+	}
 
 	if (npc->direct == 0)
 		npc->rect = rcLeft[npc->ani_no];
@@ -649,4 +853,20 @@ void ActNpc087(NPCHAR *npc)
 
 	if (npc->count1 > 547)
 		npc->rect = rcLast[0];
+}
+
+// Cage
+void ActNpc091(NPCHAR *npc)
+{
+	RECT rect[1];
+
+	rect[0] = {96, 88, 128, 112};
+
+	if (npc->act_no == 0)
+	{
+		++npc->act_no;
+		npc->y += 0x10 * 0x200;
+	}
+
+	npc->rect = rect[0];
 }
