@@ -1,6 +1,8 @@
 #include "Bullet.h"
 #include "Draw.h"
 #include "Caret.h"
+#include "NpChar.h"
+#include "Game.h"
 
 BULLET_TABLE gBulTbl[46] =
 {
@@ -264,6 +266,96 @@ void ActBullet_PoleStar(BULLET *bul, int level)
 	}
 }
 
+void ActBullet_MachineGun(BULLET *bul, int level)
+{
+	RECT rect1[4];
+	RECT rect2[4];
+	RECT rect3[4];
+	
+	rect1[0] = {64, 0, 80, 16};
+	rect1[1] = {80, 0, 96, 16};
+	rect1[2] = {96, 0, 112, 16};
+	rect1[3] = {112, 0, 128, 16};
+	rect2[0] = {64, 16, 80, 32};
+	rect2[1] = {80, 16, 96, 32};
+	rect2[2] = {96, 16, 112, 32};
+	rect2[3] = {112, 16, 128, 32};
+	rect3[0] = {64, 32, 80, 48};
+	rect3[1] = {80, 32, 96, 48};
+	rect3[2] = {96, 32, 112, 48};
+	rect3[3] = {112, 32, 128, 48};
+	
+	if (++bul->count1 <= bul->life_count)
+	{
+		if (bul->act_no)
+		{
+			bul->x += bul->xm;
+			bul->y += bul->ym;
+			
+			switch ( level )
+			{
+				case 1:
+					bul->rect = rect1[bul->direct];
+					break;
+				case 2:
+					bul->rect = rect2[bul->direct];
+					if (bul->direct != 1 && bul->direct != 3)
+						SetNpChar(127, bul->x, bul->y, 0, 0, 0, 0, 256);
+					else
+						SetNpChar(127, bul->x, bul->y, 0, 0, 1, 0, 256);
+					break;
+				case 3:
+					bul->rect = rect3[bul->direct];
+					SetNpChar(128, bul->x, bul->y, 0, 0, bul->direct, 0, 256);
+					break;
+			}
+		}
+		else
+		{
+			int move;
+			switch (level)
+			{
+				case 1:
+					move = 0x1000;
+					break;
+				case 2:
+					move = 0x1000;
+					break;
+				case 3:
+					move = 0x1000;
+					break;
+			}
+			
+			bul->act_no = 1;
+			
+			switch (bul->direct)
+			{
+				case 0:
+					bul->xm = -move;
+					bul->ym = Random(-0xAA, 0xAA);
+					break;
+				case 1:
+					bul->xm = Random(-0xAA, 0xAA);
+					bul->ym = -move;
+					break;
+				case 2:
+					bul->xm = move;
+					bul->ym = Random(-0xAA, 0xAA);
+					break;
+				case 3:
+					bul->xm = Random(-0xAA, 0xAA);
+					bul->ym = move;
+					break;
+			}
+		}
+	}
+	else
+	{
+		bul->cond = 0;
+		SetCaret(bul->x, bul->y, 3, 0);
+	}
+}
+
 void ActBullet()
 {
 	for (int i = 0; i < BULLET_MAX; i++)
@@ -282,6 +374,15 @@ void ActBullet()
 						break;
 					case 6:
 						ActBullet_PoleStar(&gBul[i], 3);
+						break;
+					case 10:
+						ActBullet_MachineGun(&gBul[i], 1);
+						break;
+					case 11:
+						ActBullet_MachineGun(&gBul[i], 2);
+						break;
+					case 12:
+						ActBullet_MachineGun(&gBul[i], 3);
 						break;
 				}
 			}

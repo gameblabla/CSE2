@@ -41,7 +41,9 @@ endif
 SOURCES = \
 	ArmsItem \
 	Back \
+	Boss \
 	BossLife \
+	BossOhm \
 	BulHit \
 	Bullet \
 	Caret \

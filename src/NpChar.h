@@ -72,7 +72,9 @@ struct EVENT
 };
 
 extern NPCHAR gNPC[NPC_MAX];
-
+extern int gCurlyShoot_wait;
+extern int gCurlyShoot_x;
+extern int gCurlyShoot_y;
 extern int gSuperXpos;
 extern int gSuperYpos;
 

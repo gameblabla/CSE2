@@ -17,7 +17,9 @@
 #include "Draw.h"
 
 NPCHAR gNPC[NPC_MAX];
-
+int gCurlyShoot_wait;
+int gCurlyShoot_x;
+int gCurlyShoot_y;
 int gSuperXpos;
 int gSuperYpos;
 

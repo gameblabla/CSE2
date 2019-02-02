@@ -10,6 +10,7 @@
 #include "NpcHit.h"
 #include "MiniMap.h"
 #include "Generic.h"
+#include "Boss.h"
 #include "GenericLoad.h"
 #include "ArmsItem.h"
 #include "TextScr.h"
@@ -142,15 +143,15 @@ int ModeOpening()
 		
 		//Update everything
 		ActNpChar();
-		//ActBossChar();
+		ActBossChar();
 		ActBack();
 		ResetMyCharFlag();
 		HitMyCharMap();
 		HitMyCharNpChar();
-		//HitMyCharBoss();
+		HitMyCharBoss();
 		HitNpCharMap();
-		//HitBossMap();
-		//HitBossBullet();
+		HitBossMap();
+		HitBossBullet();
 		ActCaret();
 		MoveFrame3();
 		ProcFade();
@@ -162,7 +163,7 @@ int ModeOpening()
 		GetFramePosition(&frame_x, &frame_y);
 		PutBack(frame_x, frame_y);
 		PutStage_Back(frame_x, frame_y);
-		//PutBossChar(frame_x, frame_y);
+		PutBossChar(frame_x, frame_y);
 		PutNpChar(frame_x, frame_y);
 		PutMapDataVector(frame_x, frame_y);
 		PutStage_Front(frame_x, frame_y);
@@ -471,18 +472,18 @@ int ModeAction()
 				
 				//ActStar();
 				ActNpChar();
-				//ActBossChar();
+				ActBossChar();
 				ActValueView();
 				ActBack();
 				ResetMyCharFlag();
 				HitMyCharMap();
 				HitMyCharNpChar();
-				//HitMyCharBoss();
+				HitMyCharBoss();
 				HitNpCharMap();
-				//HitBossMap();
+				HitBossMap();
 				HitBulletMap();
 				HitNpCharBullet();
-				//HitBossBullet();
+				HitBossBullet();
 				if (g_GameFlags & 2)
 					ShootBullet();
 				ActBullet();
@@ -508,7 +509,7 @@ int ModeAction()
 			GetFramePosition(&frame_x, &frame_y);
 			PutBack(frame_x, frame_y);
 			PutStage_Back(frame_x, frame_y);
-			//PutBossChar(frame_x, frame_y);
+			PutBossChar(frame_x, frame_y);
 			PutNpChar(frame_x, frame_y);
 			PutBullet(frame_x, frame_y);
 			PutMyChar(frame_x, frame_y);

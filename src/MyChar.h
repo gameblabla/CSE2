@@ -40,9 +40,9 @@ struct MYCHAR
 	int lifeBr_count;
 	int air;
 	int air_get;
-	char sprash;
-	char ques;
-	char boost_sw;
+	int8_t sprash;
+	int8_t ques;
+	int8_t boost_sw;
 	int boost_cnt;
 };
 

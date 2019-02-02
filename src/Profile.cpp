@@ -11,6 +11,7 @@
 #include "Flags.h"
 #include "MiniMap.h"
 #include "MyChar.h"
+#include "NpChar.h"
 #include "Frame.h"
 #include "SelStage.h"
 #include "ValueView.h"
@@ -39,7 +40,8 @@ bool SaveProfile(char *name)
 {
 	//Get path
 	char path[PATH_LENGTH];
-	if ( name )
+	
+	if (name)
 		sprintf(path, "%s/%s", gModulePath, name);
 	else
 		sprintf(path, "%s/%s", gModulePath, gDefaultName);
@@ -115,9 +117,9 @@ bool SaveProfile(char *name)
 
 bool LoadProfile(char *name)
 {
+	//Get path
 	char path[PATH_LENGTH];
 	
-	//Get path
 	if (name)
 		strcpy(path, name);
 	else
@@ -215,7 +217,7 @@ bool LoadProfile(char *name)
 	CutNoise();
 	//InitStar();
 	ClearValueView();
-	//gCurlyShoot_wait = 0;
+	gCurlyShoot_wait = 0;
 	return true;
 }
 
@@ -238,7 +240,7 @@ bool InitializeGame()
 	InitBossLife();
 	CutNoise();
 	ClearValueView();
-	//gCurlyShoot_wait = 0;
+	gCurlyShoot_wait = 0;
 	SetFadeMask();
 	SetFrameTargetMyChar(16);
 	return true;

@@ -2,6 +2,7 @@
 
 #include "Draw.h"
 #include "NpChar.h"
+#include "Boss.h"
 #include "WindowsWrapper.h"
 
 static struct
@@ -37,11 +38,10 @@ bool StartBossLife(int code_event)
 
 bool StartBossLife2(void)
 {
-	// TODO uncomment me when Boss.cpp is done!
-//	gBL.flag = true;
-//	gBL.max = gBoss[0].life;
-//	gBL.br = gBoss[0].life;
-//	gBL.pLife = &gBoss[0].life;
+	gBL.flag = true;
+	gBL.max = gBoss[0].life;
+	gBL.br = gBoss[0].life;
+	gBL.pLife = &gBoss[0].life;
 	return true;
 }
 

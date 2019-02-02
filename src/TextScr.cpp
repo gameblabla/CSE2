@@ -17,6 +17,7 @@
 #include "Profile.h"
 #include "Map.h"
 #include "MiniMap.h"
+#include "Boss.h"
 #include "MapName.h"
 #include "KeyControl.h"
 #include "NpChar.h"
@@ -1032,6 +1033,12 @@ int TextScriptProc()
 					{
 						z = GetTextScriptNo(gTS.p_read + 4);
 						DeleteNpCharCode(z, 1);
+						gTS.p_read += 8;
+					}
+					else if (IS_COMMAND('B','O','A'))
+					{
+						z = GetTextScriptNo(gTS.p_read + 4);
+						SetBossCharActNo(z);
 						gTS.p_read += 8;
 					}
 					else if (IS_COMMAND('C','N','P'))

@@ -7,6 +7,7 @@
 #include "Map.h"
 #include "Sound.h"
 #include "Caret.h"
+#include "Boss.h"
 #include "Back.h"
 #include "Game.h"
 #include "TextScr.h"
@@ -434,6 +435,11 @@ void HitMyCharMap()
 				gMC.flag |= JudgeHitMyCharBlock(x + offx[i], y + offy[i]);
 				break;
 				
+			//Spikes
+			case 0x42u:
+				gMC.flag |= JudgeHitMyCharDamage(x + offx[i], y + offy[i]);
+				break;
+				
 			//Slopes
 			case 0x50:
 				gMC.flag |= JudgeHitMyCharTriangleA(x + offx[i], y + offy[i]);
@@ -477,7 +483,7 @@ void HitMyCharMap()
 				gMC.flag |= JudgeHitMyCharWater(x + offx[i], y + offy[i]);
 				break;
 			
-			//Spikes
+			//Water spikes
 			case 0x62:
 				gMC.flag |= JudgeHitMyCharDamageW(x + offx[i], y + offy[i]);
 				break;
@@ -777,7 +783,7 @@ void HitMyCharNpChar()
 				if (hit && gNPC[i].code_char == 86)
 				{
 					PlaySoundObject(42, 1);
-					//AddBulletMyChar(gNPC[i].code_event, gNPC[i].exp);
+					AddBulletMyChar(gNPC[i].code_event, gNPC[i].exp);
 					gNPC[i].cond = 0;
 				}
 				
@@ -823,6 +829,62 @@ void HitMyCharNpChar()
 		}
 		
 		//Create question mark when NPC hasn't been interacted with
+		if (gMC.ques)
+			SetCaret(gMC.x, gMC.y, 9, 0);
+	}
+}
+
+void HitMyCharBoss()
+{
+	if ((gMC.cond & 0x80) && !(gMC.cond & 2))
+	{
+		for (int b = 0; b < BOSS_MAX; b++)
+		{
+			if (gBoss[b].cond & 0x80)
+			{
+				int hit;
+				if (gBoss[b].bits & npc_solidSoft)
+				{
+					hit = JudgeHitMyCharNPC(&gBoss[b]);
+					gMC.flag |= hit;
+				}
+				else if (gBoss[b].bits & npc_solidHard)
+				{
+					hit = JudgeHitMyCharNPC4(&gBoss[b]);
+					gMC.flag |= hit;
+				}
+				else
+				{
+					hit = JudgeHitMyCharNPC3(&gBoss[b]);
+				}
+				
+				if (!(g_GameFlags & 4) && hit && gBoss[b].bits & npc_eventTouch)
+				{
+					StartTextScript(gBoss[b].code_event);
+					gMC.ques = 0;
+				}
+				
+				if (gBoss[b].bits & npc_rearTop)
+				{
+					if (hit & 4 && gBoss[b].xm < 0)
+						DamageMyChar(gBoss[b].damage);
+					if (hit & 1 && gBoss[b].xm > 0)
+						DamageMyChar(gBoss[b].damage);
+				}
+				else if (hit && gBoss[b].damage && !(g_GameFlags & 4))
+				{
+					DamageMyChar(gBoss[b].damage);
+				}
+				
+				if (!(g_GameFlags & 4) && hit && (gMC.cond & 1) && gBoss[b].bits & npc_interact)
+				{
+					StartTextScript(gBoss[b].code_event);
+					gMC.xm = 0;
+					gMC.ques = 0;
+				}
+			}
+		}
+		
 		if (gMC.ques)
 			SetCaret(gMC.x, gMC.y, 9, 0);
 	}

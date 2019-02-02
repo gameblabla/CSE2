@@ -5,6 +5,7 @@
 #include "MyChar.h"
 #include "NpChar.h"
 #include "Game.h"
+#include "Caret.h"
 #include "Sound.h"
 #include "Back.h"
 #include "Triangle.h"
@@ -355,6 +356,66 @@ void ActNpc046(NPCHAR *npc)
 	}
 
 	npc->rect = rect[0];
+}
+
+//Omega projectiles
+void ActNpc048(NPCHAR *npc)
+{
+	if (npc->flag & 1 && npc->xm < 0)
+	{
+		npc->xm = -npc->xm;
+	}
+	else if (npc->flag & 4 && npc->xm > 0)
+	{
+		npc->xm = -npc->xm;
+	}
+	else if (npc->flag & 8)
+	{
+		if (++npc->count1 <= 2 && npc->direct != 2)
+		{
+			npc->ym = -0x100;
+		}
+		else
+		{
+			VanishNpChar(npc);
+			SetCaret(npc->x, npc->y, 2, 0);
+		}
+	}
+	
+	if (npc->direct == 2)
+	{
+		npc->bits &= ~npc_shootable;
+		npc->bits |= npc_invulnerable;
+	}
+	
+	npc->ym += 5;
+	npc->y += npc->ym;
+	npc->x += npc->xm;
+	
+	RECT rcLeft[2];
+	RECT rcRight[2];
+	rcLeft[0] = {288, 88, 304, 104};
+	rcLeft[1] = {304, 88, 320, 104};
+	rcRight[0] = {288, 104, 304, 120};
+	rcRight[1] = {304, 104, 320, 120};
+	
+	if (++npc->ani_wait > 2)
+	{
+		npc->ani_wait = 0;
+		if (++npc->ani_no > 1)
+			npc->ani_no = 0;
+	}
+	
+	if (++npc->act_wait > 750)
+	{
+		SetCaret(npc->x, npc->y, 2, 0);
+		npc->cond = 0;
+	}
+	
+	if (npc->direct)
+		npc->rect = rcRight[npc->ani_no];
+	else
+		npc->rect = rcLeft[npc->ani_no];
 }
 
 //Basu (Egg Corridor)

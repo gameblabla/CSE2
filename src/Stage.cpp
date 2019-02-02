@@ -8,6 +8,7 @@
 #include "Map.h"
 #include "MapName.h"
 #include "MyChar.h"
+#include "Boss.h"
 #include "Draw.h"
 #include "Tags.h"
 #include "Frame.h"
@@ -195,7 +196,7 @@ bool TransferStage(int no, int w, int x, int y)
 		InitCaret();
 		ClearValueView();
 		ResetQuake();
-		//InitBossChar(gTMT[no].boss_no);
+		InitBossChar(gTMT[no].boss_no);
 		ResetFlash();
 		gStageNo = no;
 		return true;
