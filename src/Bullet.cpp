@@ -571,9 +571,9 @@ void ActBullet_Missile(BULLET *bul, int level)
 						break;
 				}
 
-				unsigned int inc;
+				static unsigned int inc;
 				
-				switch (++inc % 3u)
+				switch (++inc % 3)
 				{
 					case 0:
 						bul->ani_no = 0x80;
