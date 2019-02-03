@@ -161,25 +161,122 @@ void ActCaret03(CARET *crt)
 	crt->rect = rect[crt->ani_no];
 }
 
+void ActCaret04(CARET *crt)
+{
+	RECT rect[9];
+
+	rect[0] = {64, 32, 80, 48};
+	rect[1] = {80, 32, 96, 48};
+	rect[2] = {96, 32, 112, 48};
+	rect[3] = {64, 48, 80, 64};
+	rect[4] = {80, 48, 96, 64};
+	rect[5] = {96, 48, 112, 64};
+	rect[6] = {64, 64, 80, 80};
+	rect[7] = {80, 64, 96, 80};
+	rect[8] = {96, 64, 112, 80};
+
+	if (++crt->ani_wait > 1)
+	{
+		crt->ani_wait = 0;
+
+		if (++crt->ani_no > 2)
+			crt->cond = 0;
+	}
+
+	crt->rect = rect[crt->ani_no + 3 * crt->direct];
+}
+
+void ActCaret05(CARET *crt)
+{
+	RECT rect[7];
+
+	rect[0] = {32, 64, 40, 72};
+	rect[1] = {32, 72, 40, 80};
+	rect[2] = {40, 64, 48, 72};
+	rect[3] = {40, 72, 48, 80};
+	rect[4] = {40, 64, 48, 72};
+	rect[5] = {40, 72, 48, 80};
+	rect[6] = {40, 64, 48, 72};
+
+	if (++crt->ani_wait > 4)
+	{
+		crt->ani_wait = 0;
+		++crt->ani_no;
+	}
+
+	if ( crt->ani_no > 6 )
+		crt->cond = 0;
+
+	crt->x += 0x80;
+	crt->y -= 0x80;
+
+	crt->rect = rect[crt->ani_no];
+}
+
+void ActCaret07(CARET *crt)
+{
+	RECT rcLeft[7];
+
+	rcLeft[0] = {56, 0, 64, 8};
+	rcLeft[1] = {64, 0, 72, 8};
+	rcLeft[2] = {72, 0, 80, 8};
+	rcLeft[3] = {80, 0, 88, 8};
+	rcLeft[4] = {88, 0, 96, 8};
+	rcLeft[5] = {96, 0, 104, 8};
+	rcLeft[6] = {104, 0, 112, 8};
+
+	if (++crt->ani_wait > 1)
+	{
+		crt->ani_wait = 0;
+
+		if (++crt->ani_no > 6)
+			crt->cond = 0;
+	}
+
+	crt->rect = rcLeft[crt->ani_no];
+
+	switch (crt->direct)
+	{
+		case 0:
+			crt->x -= 0x400;
+			break;
+		case 1:
+			crt->y -= 0x400;
+			break;
+		case 2:
+			crt->x += 0x400;
+			break;
+		case 3:
+			crt->y += 0x400;
+			break;
+	}
+}
+
 void ActCaret08(CARET *crt)
 {
-	if (crt->direct)
-		crt->rect = {32, 80, 48, 96};
+	RECT rcLeft = {16, 80, 32, 96};
+	RECT rcRight = {32, 80, 48, 96};
+
+	if (crt->direct == 0)
+		crt->rect = rcLeft;
 	else
-		crt->rect = {16, 80, 32, 96};
+		crt->rect = rcRight;
 }
 
 void ActCaret09(CARET *crt)
 {
+	RECT rcLeft = {0, 80, 16, 96};
+	RECT rcRight = {48, 64, 64, 80};
+
 	if (++crt->ani_wait <= 4)
 		crt->y -= 0x800;
 	if (crt->ani_wait == 32 )
 		crt->cond = 0;
 	
-	if (crt->direct)
-		crt->rect = {48, 64, 64, 80};
+	if (crt->direct == 0)
+		crt->rect = rcLeft;
 	else
-		crt->rect = {0, 80, 16, 96};
+		crt->rect = rcRight;
 }
 
 void ActCaret10(CARET *crt)
@@ -303,6 +400,79 @@ void ActCaret13(CARET *crt)
 		crt->x -= 0x800;
 }
 
+void ActCaret14(CARET *crt)
+{
+	RECT rect[5];
+
+	rect[0] = {0, 96, 40, 136};
+	rect[1] = {40, 96, 80, 136};
+	rect[2] = {80, 96, 120, 136};
+	rect[3] = {120, 96, 160, 136};
+	rect[4] = {160, 96, 200, 136};
+
+	if (++crt->ani_wait > 1)
+	{
+		crt->ani_wait = 0;
+
+		if (++crt->ani_no > 4)
+			crt->cond = 0;
+	}
+
+	crt->rect = rect[crt->ani_no];
+}
+
+void ActCaret15(CARET *crt)
+{
+	RECT rcLeft[4];
+
+	rcLeft[0] = {0, 72, 8, 80};
+	rcLeft[1] = {8, 72, 16, 80};
+	rcLeft[2] = {16, 72, 24, 80};
+	rcLeft[3] = {24, 72, 32, 80};
+
+	if (++crt->ani_wait > 2)
+	{
+		crt->ani_wait = 0;
+
+		if (++crt->ani_no > 3)
+			crt->cond = 0;
+	}
+
+	crt->rect = rcLeft[crt->ani_no];
+}
+
+void ActCaret16(CARET *crt)
+{
+	RECT rcLeft[2];
+
+	rcLeft[0] = {104, 96, 144, 104};
+	rcLeft[1] = {104, 104, 144, 112};
+
+	if (++crt->ani_wait < 10)
+		crt->y -= 0x400;
+
+	if (crt->ani_wait == 40)
+		crt->cond = 0;
+
+	crt->rect = rcLeft[crt->ani_wait / 2 % 2];
+}
+
+void ActCaret17(CARET *crt)
+{
+	RECT rcLeft[2];
+
+	rcLeft[0] = {0, 144, 144, 152};
+	rcLeft[1] = {0, 0, 0, 0};
+
+	if (++crt->ani_wait >= 40)
+		crt->ani_wait = 0;
+
+	if (crt->ani_wait < 30)
+		crt->rect = rcLeft[0];
+	else
+		crt->rect = rcLeft[1];
+}
+
 //Tables
 CARET_TABLE gCaretTable[18] =
 {
@@ -333,27 +503,27 @@ CARETFUNCTION gpCaretFuncTbl[] =
 	ActCaret01,
 	ActCaret02,
 	ActCaret03,
-	nullptr, //ActCaret04,
-	nullptr, //ActCaret05,
-	nullptr, //ActCaret04,
-	nullptr, //ActCaret07,
+	ActCaret04,
+	ActCaret05,
+	ActCaret04,
+	ActCaret07,
 	ActCaret08,
 	ActCaret09,
 	ActCaret10,
 	ActCaret11,
 	ActCaret12,
 	ActCaret13,
-	nullptr, //ActCaret14,
-	nullptr, //ActCaret15,
-	nullptr, //ActCaret16,
-	nullptr, //ActCaret17,
+	ActCaret14,
+	ActCaret15,
+	ActCaret16,
+	ActCaret17,
 };
 
 void ActCaret()
 {
 	for (int i = 0; i < CARET_MAX; i++)
 	{
-		if ((gCrt[i].cond & 0x80) && gpCaretFuncTbl[gCrt[i].code] != nullptr)
+		if (gCrt[i].cond & 0x80)
 			gpCaretFuncTbl[gCrt[i].code](&gCrt[i]);
 	}
 }
