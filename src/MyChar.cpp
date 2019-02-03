@@ -14,6 +14,7 @@
 #include "TextScr.h"
 #include "Flags.h"
 #include "Game.h"
+#include "Star.h"
 #include "Caret.h"
 
 MYCHAR gMC;
@@ -740,7 +741,7 @@ void SetMyCharPosition(int x, int y)
 	gMC.xm = 0;
 	gMC.ym = 0;
 	gMC.cond &= ~1;
-	//InitStar();
+	InitStar();
 }
 
 void MoveMyChar(int x, int y)

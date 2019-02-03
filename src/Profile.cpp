@@ -11,6 +11,7 @@
 #include "Flags.h"
 #include "MiniMap.h"
 #include "MyChar.h"
+#include "Star.h"
 #include "NpChar.h"
 #include "Frame.h"
 #include "SelStage.h"
@@ -215,7 +216,7 @@ bool LoadProfile(char *name)
 	SetFrameTargetMyChar(16);
 	InitBossLife();
 	CutNoise();
-	//InitStar();
+	InitStar();
 	ClearValueView();
 	gCurlyShoot_wait = 0;
 	return true;

@@ -17,6 +17,7 @@
 #include "Bullet.h"
 #include "BulHit.h"
 #include "Shoot.h"
+#include "Star.h"
 #include "Fade.h"
 #include "Frame.h"
 #include "Flags.h"
@@ -103,7 +104,7 @@ int ModeOpening()
 {
 	InitNpChar();
 	InitCaret();
-	//InitStar();
+	InitStar();
 	InitFade();
 	InitFlash();
 	InitBossLife();
@@ -245,7 +246,7 @@ int ModeTitle()
 	
 	//Reset everything
 	InitCaret();
-	//InitStar();
+	InitStar();
 	CutNoise();
 	
 	//Create variables
@@ -436,7 +437,7 @@ int ModeAction()
 	InitNpChar();
 	InitBullet();
 	InitCaret();
-	//InitStar();
+	InitStar();
 	InitFade();
 	InitFlash();
 	ClearArmsData();
@@ -470,7 +471,7 @@ int ModeAction()
 				else
 					ActMyChar(false);
 				
-				//ActStar();
+				ActStar();
 				ActNpChar();
 				ActBossChar();
 				ActValueView();
@@ -513,7 +514,7 @@ int ModeAction()
 			PutNpChar(frame_x, frame_y);
 			PutBullet(frame_x, frame_y);
 			PutMyChar(frame_x, frame_y);
-			//PutStar(frame_x, frame_y);
+			PutStar(frame_x, frame_y);
 			PutMapDataVector(frame_x, frame_y);
 			PutStage_Front(frame_x, frame_y);
 			PutFront(frame_x, frame_y);
