@@ -1018,6 +1018,12 @@ void ActBullet_SuperBom(BULLET *bul, int level)
 	}
 }
 
+void ActBullet_Star(BULLET *bul)
+{
+	if (++bul->count1 > bul->life_count)
+		bul->cond = 0;
+}
+
 void ActBullet()
 {
 	for (int i = 0; i < BULLET_MAX; i++)
@@ -1092,7 +1098,11 @@ void ActBullet()
 					case 33:
 						ActBullet_SuperBom(&gBul[i], 3);
 						break;
-
+					case 45:
+						ActBullet_Star(&gBul[i]);
+						break;
+					default:
+						continue;
 				}
 			}
 			else

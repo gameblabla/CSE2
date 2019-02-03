@@ -8,6 +8,7 @@
 #include "Map.h"
 #include "MapName.h"
 #include "MyChar.h"
+#include "Bullet.h"
 #include "Boss.h"
 #include "Draw.h"
 #include "Tags.h"
@@ -192,7 +193,7 @@ bool TransferStage(int no, int w, int x, int y)
 		
 		StartTextScript(w);
 		SetFrameMyChar();
-		//ClearBullet();
+		ClearBullet();
 		InitCaret();
 		ClearValueView();
 		ResetQuake();
