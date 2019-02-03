@@ -91,6 +91,7 @@ SOURCES = \
 	Shoot \
 	Sound \
 	Stage \
+	Star \
 	SelStage \
 	TextScr \
 	Triangle \
