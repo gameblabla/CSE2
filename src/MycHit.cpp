@@ -436,7 +436,7 @@ void HitMyCharMap()
 				break;
 				
 			//Spikes
-			case 0x42u:
+			case 0x42:
 				gMC.flag |= JudgeHitMyCharDamage(x + offx[i], y + offy[i]);
 				break;
 				

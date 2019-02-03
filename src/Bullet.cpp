@@ -2,6 +2,8 @@
 #include "Draw.h"
 #include "Caret.h"
 #include "NpChar.h"
+#include "MyChar.h"
+#include "Sound.h"
 #include "Game.h"
 
 BULLET_TABLE gBulTbl[46] =
@@ -266,6 +268,141 @@ void ActBullet_PoleStar(BULLET *bul, int level)
 	}
 }
 
+void ActBullet_FireBall(BULLET *bul, int level)
+{
+	if (++bul->count1 <= bul->life_count)
+	{
+		bool bBreak = false;
+		if (bul->flag & 2 && bul->flag & 8)
+			bBreak = true;
+		if (bul->flag & 1 && bul->flag & 4)
+			bBreak = true;
+	
+		if (!bul->direct && bul->flag & 1)
+			bul->direct = 2;
+		if (bul->direct == 2 && bul->flag & 4)
+			bul->direct = 0;
+		
+		if (bBreak)
+		{
+			bul->cond = 0;
+			SetCaret(bul->x, bul->y, 2, 0);
+			PlaySoundObject(28, 1);
+		}
+		else
+		{
+			if (bul->act_no)
+			{
+				if (bul->flag & 8)
+					bul->ym = -0x400;
+				else if (bul->flag & 1)
+					bul->xm = 0x400;
+				else if (bul->flag & 4)
+					bul->xm = -0x400;
+				
+				bul->ym += 85;
+				if (bul->ym >= 0x400)
+					bul->ym = 0x400;
+				
+				bul->x += bul->xm;
+				bul->y += bul->ym;
+				
+				if (bul->flag & 0xD)
+					PlaySoundObject(34, 1);
+			}
+			else
+			{
+				bul->act_no = 1;
+				
+				switch (bul->direct)
+				{
+					case 0:
+						bul->xm = -0x400;
+						break;
+					case 1:
+						bul->xm = gMC.xm;
+						
+						if (gMC.xm >= 0)
+							bul->direct = 2;
+						else
+							bul->direct = 0;
+						
+						if (gMC.direct)
+							bul->xm += 0x80;
+						else
+							bul->xm -= 0x80;
+						
+						bul->ym = -0x5FF;
+						break;
+					case 2:
+						bul->xm = 0x400;
+						break;
+					case 3:
+						bul->xm = gMC.xm;
+						if (gMC.xm >= 0)
+							bul->direct = 2;
+						else
+							bul->direct = 0;
+						bul->ym = 0x5FF;
+						break;
+				}
+			}
+
+			RECT rect_left1[4];
+			RECT rect_right1[4];
+			RECT rect_left2[3];
+			RECT rect_right2[3];
+			rect_left1[0] = {128, 0, 144, 16};
+			rect_left1[1] = {144, 0, 160, 16};
+			rect_left1[2] = {160, 0, 176, 16};
+			rect_left1[3] = {176, 0, 192, 16};
+			rect_right1[0] = {128, 16, 144, 32};
+			rect_right1[1] = {144, 16, 160, 32};
+			rect_right1[2] = {160, 16, 176, 32};
+			rect_right1[3] = {176, 16, 192, 32};
+			rect_left2[0] = {192, 16, 208, 32};
+			rect_left2[1] = {208, 16, 224, 32};
+			rect_left2[2] = {224, 16, 240, 32};
+			rect_right2[0] = {224, 16, 240, 32};
+			rect_right2[1] = {208, 16, 224, 32};
+			rect_right2[2] = {192, 16, 208, 32};
+			
+			bul->ani_no++;
+			
+			if (level == 1)
+			{
+				if (bul->ani_no > 3)
+					bul->ani_no = 0;
+				
+				if (bul->direct)
+					bul->rect = rect_right1[bul->ani_no];
+				else
+					bul->rect = rect_left1[bul->ani_no];
+			}
+			else
+			{
+				if (bul->ani_no > 2)
+					bul->ani_no = 0;
+				
+				if (bul->direct)
+					bul->rect = rect_right2[bul->ani_no];
+				else
+					bul->rect = rect_left2[bul->ani_no];
+				
+				if (level == 2)
+					SetNpChar(129, bul->x, bul->y, 0, -0x200, bul->ani_no, 0, 0x100);
+				else
+					SetNpChar(129, bul->x, bul->y, 0, -0x200, bul->ani_no + 3, 0, 0x100);
+			}
+		}
+	}
+	else
+	{
+		bul->cond = 0;
+		SetCaret(bul->x, bul->y, 3, 0);
+	}
+}
+
 void ActBullet_MachineGun(BULLET *bul, int level)
 {
 	RECT rect1[4];
@@ -356,6 +493,100 @@ void ActBullet_MachineGun(BULLET *bul, int level)
 	}
 }
 
+void ActBullet_Missile(BULLET *bul, int level)
+{
+	if (++bul->count1 > bul->life_count)
+	{
+		bul->cond = 0;
+		SetCaret(bul->x, bul->y, 3, 0);
+		return;
+	}
+	
+	bool bHit = false;
+	if (bul->life != 10)
+		bHit = true;
+	if (!bul->direct && bul->flag & 1)
+		bHit = true;
+	if (bul->direct == 2 && bul->flag & 4)
+		bHit = true;
+	if (bul->direct == 1 && bul->flag & 2)
+		bHit = true;
+	if (bul->direct == 3 && bul->flag & 8)
+		bHit = true;
+	if (bul->direct == 0 && bul->flag & 0x80)
+		bHit = true;
+	if (bul->direct == 0 && bul->flag & 0x20)
+		bHit = true;
+	if (bul->direct == 2 && bul->flag & 0x40)
+		bHit = true;
+	if (bul->direct == 2 && bul->flag & 0x10)
+		bHit = true;
+	
+	if (bHit)
+	{
+		SetBullet(15 + level, bul->x, bul->y, 0);
+		bul->cond = 0;
+	}
+	
+	switch (bul->act_no)
+	{
+		case 0:
+			bul->act_no = 1;
+			
+			switch (bul->direct)
+			{
+				
+			}
+			
+	}
+}
+
+void ActBullet_Bom(BULLET *bul, int level)
+{
+	switch (bul->act_no)
+	{
+		case 0:
+			bul->act_no = 1;
+			
+			switch ( level )
+			{
+				case 2:
+					bul->act_wait = 15;
+					break;
+				case 3:
+					bul->act_wait = 5;
+					break;
+				case 1:
+					bul->act_wait = 10;
+					break;
+			}
+			
+			PlaySoundObject(44, 1);
+			
+		case 1:
+			if (level == 1)
+			{
+				if (!(bul->act_wait % 3))
+					SetDestroyNpCharUp(bul->x + (Random(-16, 16) << 9), bul->y + (Random(-16, 16) << 9), bul->enemyXL, 2);
+			}
+			else if (level == 2)
+			{
+				if (!(bul->act_wait % 3))
+					SetDestroyNpCharUp(bul->x + (Random(-32, 32) << 9), bul->y + (Random(-32, 32) << 9), bul->enemyXL, 2);
+			}
+			else if (level == 3)
+			{
+				if (!(bul->act_wait % 3))
+					SetDestroyNpCharUp(bul->x + (Random(-40, 40) << 9), bul->y + (Random(-40, 40) << 9), bul->enemyXL, 2);
+			}
+			
+			if (--bul->act_wait < 0)
+				bul->cond = 0;
+			break;
+	}
+	
+}
+
 void ActBullet()
 {
 	for (int i = 0; i < BULLET_MAX; i++)
@@ -375,6 +606,15 @@ void ActBullet()
 					case 6:
 						ActBullet_PoleStar(&gBul[i], 3);
 						break;
+					case 7:
+						ActBullet_FireBall(&gBul[i], 1);
+						break;
+					case 8:
+						ActBullet_FireBall(&gBul[i], 2);
+						break;
+					case 9:
+						ActBullet_FireBall(&gBul[i], 3);
+						break;
 					case 10:
 						ActBullet_MachineGun(&gBul[i], 1);
 						break;
@@ -383,6 +623,24 @@ void ActBullet()
 						break;
 					case 12:
 						ActBullet_MachineGun(&gBul[i], 3);
+						break;
+					case 13:
+						ActBullet_Missile(&gBul[i], 1);
+						break;
+					case 14:
+						ActBullet_Missile(&gBul[i], 2);
+						break;
+					case 15:
+						ActBullet_Missile(&gBul[i], 3);
+						break;
+					case 16:
+						ActBullet_Bom(&gBul[i], 1);
+						break;
+					case 17:
+						ActBullet_Bom(&gBul[i], 2);
+						break;
+					case 18:
+						ActBullet_Bom(&gBul[i], 3);
 						break;
 				}
 			}
