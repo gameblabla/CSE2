@@ -501,11 +501,12 @@ void ActBullet_Missile(BULLET *bul, int level)
 		SetCaret(bul->x, bul->y, 3, 0);
 		return;
 	}
-	
+
 	bool bHit = false;
+
 	if (bul->life != 10)
 		bHit = true;
-	if (!bul->direct && bul->flag & 1)
+	if (bul->direct == 0 && bul->flag & 1)
 		bHit = true;
 	if (bul->direct == 2 && bul->flag & 4)
 		bHit = true;
@@ -521,23 +522,182 @@ void ActBullet_Missile(BULLET *bul, int level)
 		bHit = true;
 	if (bul->direct == 2 && bul->flag & 0x10)
 		bHit = true;
-	
+
 	if (bHit)
 	{
-		SetBullet(15 + level, bul->x, bul->y, 0);
+		SetBullet(level + 15, bul->x, bul->y, 0);
 		bul->cond = 0;
 	}
-	
+
 	switch (bul->act_no)
 	{
 		case 0:
 			bul->act_no = 1;
-			
+
 			switch (bul->direct)
 			{
-				
+				case 0:
+				case 2:
+					bul->tgt_y = bul->y;
+					break;
+				case 1:
+				case 3:
+					bul->tgt_x = bul->x;
+					break;
 			}
-			
+
+			if (level == 3)
+			{
+				switch (bul->direct)
+				{
+					case 0:
+					case 2:
+						if (gMC.y < bul->y)
+							bul->ym = 0x100;
+						else
+							bul->ym = -0x100;
+
+						bul->xm = Random(-0x200, 0x200);
+						break;
+
+					case 1:
+					case 3:
+						if (gMC.x < bul->x)
+							bul->xm = 0x100;
+						else
+							bul->xm = -0x100;
+
+						bul->ym = Random(-0x200, 0x200);
+						break;
+				}
+
+				unsigned int inc;
+				
+				switch (++inc % 3u)
+				{
+					case 0:
+						bul->ani_no = 0x80;
+						break;
+					case 1:
+						bul->ani_no = 0x40;
+						break;
+					case 2:
+						bul->ani_no = 0x33;
+						break;
+				}
+			}
+			else
+			{
+				bul->ani_no = 0x80;
+			}
+			// Fallthrough
+		case 1:
+			switch (bul->direct)
+			{
+				case 0:
+					bul->xm -= bul->ani_no;
+					break;
+				case 1:
+					bul->ym -= bul->ani_no;
+					break;
+				case 2:
+					bul->xm += bul->ani_no;
+					break;
+				case 3:
+					bul->ym += bul->ani_no;
+					break;
+			}
+
+			if (level == 3)
+			{
+				switch (bul->direct)
+				{
+					case 0:
+					case 2:
+						if (bul->tgt_y > bul->y)
+							bul->ym += 0x20;
+						else
+							bul->ym -= 0x20;
+
+						break;
+
+					case 1:
+					case 3:
+						if (bul->tgt_x > bul->x)
+							bul->xm += 0x20;
+						else
+							bul->xm -= 0x20;
+						break;
+				}
+			}
+
+			if (bul->xm < -0xA00)
+				bul->xm = -0xA00;
+			if (bul->xm > 0xA00)
+				bul->xm = 0xA00;
+
+			if (bul->ym < -0xA00)
+				bul->ym = -0xA00;
+			if (bul->ym > 0xA00)
+				bul->ym = 0xA00;
+
+			bul->x += bul->xm;
+			bul->y += bul->ym;
+
+			break;
+	}
+
+	if (++bul->count2 > 2)
+	{
+		bul->count2 = 0;
+
+		switch (bul->direct)
+		{
+			case 0:
+				SetCaret(bul->x + 0x1000, bul->y, 7, 2);
+				break;
+			case 1:
+				SetCaret(bul->x, bul->y + 0x1000, 7, 3);
+				break;
+			case 2:
+				SetCaret(bul->x - 0x1000, bul->y, 7, 0);
+				break;
+			case 3:
+				SetCaret(bul->x, bul->y - 0x1000, 7, 1);
+				break;
+		}
+	}
+
+	RECT rect1[4];
+	RECT rect2[4];
+	RECT rect3[4];
+
+	rect1[0] = {0, 0, 16, 16};
+	rect1[1] = {16, 0, 32, 16};
+	rect1[2] = {32, 0, 48, 16};
+	rect1[3] = {48, 0, 64, 16};
+
+	rect2[0] = {0, 16, 16, 32};
+	rect2[1] = {16, 16, 32, 32};
+	rect2[2] = {32, 16, 48, 32};
+	rect2[3] = {48, 16, 64, 32};
+
+	rect3[0] = {0, 32, 16, 48};
+	rect3[1] = {16, 32, 32, 48};
+	rect3[2] = {32, 32, 48, 48};
+	rect3[3] = {48, 32, 64, 48};
+
+	switch (level)
+	{
+		case 1:
+			bul->rect = rect1[bul->direct];
+			break;
+		case 2:
+			bul->rect = rect2[bul->direct];
+			break;
+		case 3:
+			bul->rect = rect3[bul->direct];
+			break;
 	}
 }
 
