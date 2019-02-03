@@ -40,7 +40,7 @@ void ActNpc034(NPCHAR *npc);
 void ActNpc037(NPCHAR *npc);
 void ActNpc038(NPCHAR *npc);
 void ActNpc039(NPCHAR *npc);
-
+void ActNpc040(NPCHAR *npc);
 void ActNpc041(NPCHAR *npc);
 void ActNpc042(NPCHAR *npc);
 void ActNpc043(NPCHAR *npc);

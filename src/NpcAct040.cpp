@@ -10,6 +10,86 @@
 #include "Back.h"
 #include "Triangle.h"
 
+//Santa
+void ActNpc040(NPCHAR *npc)
+{
+	RECT rcLeft[7];
+	RECT rcRight[7];
+	
+	rcLeft[0] = {0, 32, 16, 48};
+	rcLeft[1] = {16, 32, 32, 48};
+	rcLeft[2] = {32, 32, 48, 48};
+	rcLeft[3] = {0, 32, 16, 48};
+	rcLeft[4] = {48, 32, 64, 48};
+	rcLeft[5] = {0, 32, 16, 48};
+	rcLeft[6] = {64, 32, 80, 48};
+	
+	rcRight[0] = {0, 48, 16, 64};
+	rcRight[1] = {16, 48, 32, 64};
+	rcRight[2] = {32, 48, 48, 64};
+	rcRight[3] = {0, 48, 16, 64};
+	rcRight[4] = {48, 48, 64, 64};
+	rcRight[5] = {0, 48, 16, 64};
+	rcRight[6] = {64, 48, 80, 64};
+	
+	switch ( npc->act_no )
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->ani_no = 0;
+			npc->ani_wait = 0;
+		case 1:
+			if (Random(0, 120) == 10)
+			{
+				npc->act_no = 2;
+				npc->act_wait = 0;
+				npc->ani_no = 1;
+			}
+			if (npc->x - 0x4000 < gMC.x && npc->x + 0x4000 > gMC.x && npc->y - 0x4000 < gMC.y && npc->y + 0x2000 > gMC.y)
+			{
+				if (npc->x <= gMC.x)
+					npc->direct = 2;
+				else
+					npc->direct = 0;
+			}
+			break;
+		case 2:
+			if (++npc->act_wait > 8)
+			{
+				npc->act_no = 1;
+				npc->ani_no = 0;
+			}
+			break;
+		case 3:
+			npc->act_no = 4;
+			npc->ani_no = 2;
+			npc->ani_wait = 0;
+		case 4:
+			if (++npc->ani_wait > 4)
+			{
+				npc->ani_wait = 0;
+				npc->ani_no++;
+			}
+			if (npc->ani_no > 5)
+				npc->ani_no = 2;
+			if (npc->direct)
+				npc->x += 0x200;
+			else
+				npc->x -= 0x200;
+			break;
+		case 5:
+			npc->ani_no = 6;
+			break;
+		default:
+			break;
+	}
+	
+	if (npc->direct)
+		npc->rect = rcRight[npc->ani_no];
+	else
+		npc->rect = rcLeft[npc->ani_no];
+}
+
 //Busted Door
 void ActNpc041(NPCHAR *npc)
 {
