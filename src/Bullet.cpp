@@ -744,7 +744,25 @@ void ActBullet_Bom(BULLET *bul, int level)
 				bul->cond = 0;
 			break;
 	}
-	
+
+	if (level == 1)
+	{
+		 if (bul->act_wait % 3 == 0)
+			SetDestroyNpCharUp(bul->x + (Random(-16, 16) * 0x200), bul->y + (Random(-16, 16) * 0x200), bul->enemyXL, 2);
+	}
+	else if (level == 2)
+	{
+		if (bul->act_wait % 3 == 0)
+			SetDestroyNpCharUp(bul->x + (Random(-32, 32) * 0x200), bul->y + (Random(-32, 32) * 0x200), bul->enemyXL, 2);
+	}
+	else if (level == 3)
+	{
+		if (bul->act_wait % 3 == 0)
+			SetDestroyNpCharUp(bul->x + (Random(-40, 40) * 0x200), bul->y + (Random(-40, 40) * 0x200), bul->enemyXL, 2);
+	}
+
+	if (--bul->act_wait < 0)
+		bul->cond = 0;
 }
 
 void ActBullet()
