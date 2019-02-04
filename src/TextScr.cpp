@@ -899,7 +899,7 @@ int TextScriptProc()
 						else
 							gTS.p_read += 13;
 					}
-					else if (IS_COMMAND('E','C','J'))
+					else if (IS_COMMAND('N','C','J'))
 					{
 						x = GetTextScriptNo(gTS.p_read + 4);
 						z = GetTextScriptNo(gTS.p_read + 9);
