@@ -963,7 +963,7 @@ void ActNpc032(NPCHAR *npc)
 	npc->rect = rect[npc->ani_no];
 }
 
-// Bed
+//Bed
 void ActNpc034(NPCHAR *npc)
 {
 	RECT rcLeft[1];
@@ -976,6 +976,81 @@ void ActNpc034(NPCHAR *npc)
 		npc->rect = rcLeft[0];
 	else
 		npc->rect = rcRight[0];
+}
+
+//Mannan
+void ActNpc035(NPCHAR *npc)
+{
+	if (npc->act_no < 3 && npc->life < 90)
+	{
+		PlaySoundObject(71, 1);
+		SetDestroyNpChar(npc->x, npc->y, npc->view.back, 8);
+		SetExpObjects(npc->x, npc->y, npc->exp);
+		npc->act_no = 3;
+		npc->act_wait = 0;
+		npc->ani_no = 2;
+		npc->bits &= ~0x20;
+		npc->damage = 0;
+	}
+
+	switch (npc->act_no)
+	{
+		case 0:
+		case 1:
+			if (npc->shock)
+			{
+				if (npc->direct)
+					SetNpChar(103, npc->x + 0x1000, npc->y + 0x1000, 0, 0, npc->direct, 0, 0x100);
+				else
+					SetNpChar(103, npc->x - 0x1000, npc->y + 0x1000, 0, 0, npc->direct, 0, 0x100);
+
+				npc->ani_no = 1;
+				npc->act_no = 2;
+				npc->act_wait = 0;
+			}
+
+			break;
+
+		case 2:
+			if (++npc->act_wait > 20)
+			{
+				npc->act_wait = 0;
+				npc->act_no = 1;
+				npc->ani_no = 0;
+			}
+
+			break;
+
+		case 3:
+			if (++npc->act_wait == 50 || npc->act_wait == 60)
+				npc->ani_no = 3;
+
+			if (npc->act_wait == 53 || npc->act_wait == 63)
+				npc->ani_no = 2;
+
+			if (npc->act_wait > 100)
+				npc->act_no = 4;
+
+			break;
+	}
+
+	RECT rcLeft[4];
+	RECT rcRight[4];
+
+	rcLeft[0] = {96, 64, 120, 96};
+	rcLeft[1] = {120, 64, 144, 96};
+	rcLeft[2] = {144, 64, 168, 96};
+	rcLeft[3] = {168, 64, 192, 96};
+
+	rcRight[0] = {96, 96, 120, 128};
+	rcRight[1] = {120, 96, 144, 128};
+	rcRight[2] = {144, 96, 168, 128};
+	rcRight[3] = {168, 96, 192, 128};
+
+	if (npc->direct == 0)
+		npc->rect = rcLeft[npc->ani_no];
+	else
+		npc->rect = rcRight[npc->ani_no];
 }
 
 //Signpost
