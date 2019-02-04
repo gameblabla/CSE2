@@ -5,6 +5,7 @@
 #include "MyChar.h"
 #include "Sound.h"
 #include "Game.h"
+#include "KeyControl.h"
 
 BULLET_TABLE gBulTbl[46] =
 {
@@ -765,6 +766,331 @@ void ActBullet_Bom(BULLET *bul, int level)
 		bul->cond = 0;
 }
 
+void ActBullet_Bubblin1(BULLET *bul)
+{
+	if (bul->flag & 0x2FF)
+	{
+		bul->cond = 0;
+		SetCaret(bul->x, bul->y, 2, 0);
+	}
+	else
+	{
+		if (bul->act_no == 0)
+		{
+			bul->act_no = 1;
+
+			switch (bul->direct)
+			{
+				case 0:
+					bul->xm = -0x600;
+					break;
+				case 2:
+					bul->xm = 0x600;
+					break;
+				case 1:
+					bul->ym = -0x600;
+					break;
+				case 3:
+					bul->ym = 0x600;
+					break;
+			}
+		}
+
+		switch (bul->direct)
+		{
+			case 0:
+				bul->xm += 42;
+				break;
+			case 2:
+				bul->xm -= 42;
+				break;
+			case 1:
+				bul->ym += 42;
+				break;
+			case 3:
+				bul->ym -= 42;
+				break;
+		}
+
+		bul->x += bul->xm;
+		bul->y += bul->ym;
+
+		if (++bul->act_wait > 40)
+		{
+			bul->cond = 0;
+			SetCaret(bul->x, bul->y, 15, 0);
+		}
+
+		RECT rect[4];
+
+		rect[0] = {192, 0, 200, 8};
+		rect[1] = {200, 0, 208, 8};
+		rect[2] = {208, 0, 216, 8};
+		rect[3] = {216, 0, 224, 8};
+
+		if (++bul->ani_wait > 3)
+		{
+			bul->ani_wait = 0;
+			++bul->ani_no;
+		}
+
+		if (bul->ani_no > 3)
+			bul->ani_no = 3;
+
+		bul->rect = rect[bul->ani_no];
+	}
+}
+
+void ActBullet_Bubblin2(BULLET *bul)
+{
+	bool bDelete = false;
+
+	if (bul->direct == 0 && bul->flag & 1)
+		bDelete = true;
+	if (bul->direct == 2 && bul->flag & 4)
+		bDelete = true;
+	if (bul->direct == 1 && bul->flag & 2)
+		bDelete = true;
+	if (bul->direct == 3 && bul->flag & 8)
+		bDelete = true;
+
+	if (bDelete)
+	{
+		bul->cond = 0;
+		SetCaret(bul->x, bul->y, 2, 0);
+	}
+	else
+	{
+		if (bul->act_no == 0)
+		{
+			bul->act_no = 1;
+
+			switch (bul->direct)
+			{
+				case 0:
+					bul->xm = -0x600;
+					bul->ym = Random(-0x100, 0x100);
+					break;
+				case 2:
+					bul->xm = 0x600;
+					bul->ym = Random(-0x100, 0x100);
+					break;
+				case 1:
+					bul->ym = -0x600;
+					bul->xm = Random(-0x100, 0x100);
+					break;
+				case 3:
+					bul->ym = 0x600;
+					bul->xm = Random(-0x100, 0x100);
+					break;
+			}
+		}
+
+		switch (bul->direct)
+		{
+			case 0:
+				bul->xm += 0x10;
+				break;
+			case 2:
+				bul->xm -= 0x10;
+				break;
+			case 1:
+				bul->ym += 0x10;
+				break;
+			case 3:
+				bul->ym -= 0x10;
+				break;
+		}
+
+		bul->x += bul->xm;
+		bul->y += bul->ym;
+
+		if (++bul->act_wait > 60)
+		{
+			bul->cond = 0;
+			SetCaret(bul->x, bul->y, 15, 0);
+		}
+
+		RECT rect[4];
+
+		rect[0] = {192, 8, 200, 16};
+		rect[1] = {200, 8, 208, 16};
+		rect[2] = {208, 8, 216, 16};
+		rect[3] = {216, 8, 224, 16};
+
+		if (++bul->ani_wait > 3)
+		{
+			bul->ani_wait = 0;
+			++bul->ani_no;
+		}
+
+		if (bul->ani_no > 3)
+			bul->ani_no = 3;
+
+		bul->rect = rect[bul->ani_no];
+	}
+}
+
+void ActBullet_Bubblin3(BULLET *bul)
+{
+	if (++bul->act_wait <= 100 && gKey & gKeyShot)
+	{
+		if (bul->act_no == 0)
+		{
+			bul->act_no = 1;
+
+			switch (bul->direct)
+			{
+				case 0:
+					bul->xm = Random(-0x400, -0x200);
+					bul->ym = (Random(-4, 4) * 0x200) / 2;
+					break;
+				case 2u:
+					bul->xm = Random(0x200, 0x400);
+					bul->ym = (Random(-4, 4) * 0x200) / 2;
+					break;
+				case 1u:
+					bul->ym = Random(-0x400, -0x200);
+					bul->xm = (Random(-4, 4) * 0x200) / 2;
+					break;
+				case 3u:
+					bul->ym = Random(0x80, 0x100);
+					bul->xm = (Random(-4, 4) * 0x200) / 2;
+					break;
+			}
+		}
+
+		if (gMC.x > bul->x)
+			bul->xm += 0x20;
+		if (gMC.x < bul->x)
+			bul->xm -= 0x20;
+
+		if (gMC.y > bul->y)
+			bul->ym += 0x20;
+		if (gMC.y < bul->y)
+			bul->ym -= 0x20;
+
+		if (bul->xm < 0 && bul->flag & 1)
+			bul->xm = 0x400;
+		if (bul->xm > 0 && bul->flag & 4)
+			bul->xm = -0x400;
+
+		if (bul->ym < 0 && bul->flag & 2)
+			bul->ym = 0x400;
+		if (bul->ym > 0 && bul->flag & 8)
+			bul->ym = -0x400;
+
+		bul->x += bul->xm;
+		bul->y += bul->ym;
+
+		RECT rect[4];
+
+		rect[0] = {240, 16, 248, 24};
+		rect[1] = {248, 16, 256, 24};
+		rect[2] = {240, 24, 248, 32};
+		rect[3] = {248, 24, 256, 32};
+
+		if (++bul->ani_wait > 3)
+		{
+			bul->ani_wait = 0;
+			++bul->ani_no;
+		}
+
+		if (bul->ani_no > 3)
+			bul->ani_no = 3;
+
+		bul->rect = rect[bul->ani_no];
+	}
+	else
+	{
+		bul->cond = 0;
+		SetCaret(bul->x, bul->y, 2, 0);
+		PlaySoundObject(100, 1);
+
+		if (gMC.up)
+			SetBullet(22, bul->x, bul->y, 1);
+		else if (gMC.down)
+			SetBullet(22, bul->x, bul->y, 3);
+		else
+			SetBullet(22, bul->x, bul->y, gMC.direct);
+	}
+}
+
+void ActBullet_Spine(BULLET *bul)
+{
+	if (++bul->count1 > bul->life_count || bul->flag & 8)
+	{
+		bul->cond = 0;
+		SetCaret(bul->x, bul->y, 3, 0);
+	}
+	else
+	{
+		if (bul->act_no)
+		{
+			bul->x += bul->xm;
+			bul->y += bul->ym;
+		}
+		else
+		{
+			bul->act_no = 1;
+
+			switch (bul->direct)
+			{
+				case 0:
+					bul->xm = (-0x200 * Random(10, 16)) / 2;
+					break;
+				case 1:
+					bul->ym = (-0x200 * Random(10, 16)) / 2;
+					break;
+				case 2:
+					bul->xm = (Random(10, 16) * 0x200) / 2;
+					break;
+				case 3:
+					bul->ym = (Random(10, 16) * 0x200) / 2;
+					break;
+			}
+		}
+
+		if (++bul->ani_wait > 1)
+		{
+			bul->ani_wait = 0;
+			++bul->ani_no;
+		}
+
+		if (bul->ani_no > 1)
+			bul->ani_no = 0;
+
+		RECT rcLeft[2];
+		RECT rcRight[2];
+		RECT rcDown[2];
+
+		rcLeft[0] = {224, 0, 232, 8};
+		rcLeft[1] = {232, 0, 240, 8};
+
+		rcRight[0] = {224, 0, 232, 8};
+		rcRight[1] = {232, 0, 240, 8};
+
+		rcDown[0] = {224, 8, 232, 16};
+		rcDown[1] = {232, 8, 240, 16};
+
+		switch (bul->direct)
+		{
+			case 0:
+				bul->rect = rcLeft[bul->ani_no];
+				break;
+			case 1:
+				bul->rect = rcDown[bul->ani_no];
+				break;
+			case 2:
+				bul->rect = rcRight[bul->ani_no];
+				break;
+			case 3:
+				bul->rect = rcDown[bul->ani_no];
+				break;
+		}
+	}
+}
+
 void ActBullet_SuperMissile(BULLET *bul, int level)
 {
 	if (++bul->count1 > bul->life_count)
@@ -1078,6 +1404,18 @@ void ActBullet()
 						break;
 					case 18:
 						ActBullet_Bom(&gBul[i], 3);
+						break;
+					case 19:
+						ActBullet_Bubblin1(&gBul[i]);
+						break;
+					case 20:
+						ActBullet_Bubblin2(&gBul[i]);
+						break;
+					case 21:
+						ActBullet_Bubblin3(&gBul[i]);
+						break;
+					case 22:
+						ActBullet_Spine(&gBul[i]);
 						break;
 					// TODO everything else
 					case 28:
