@@ -1273,6 +1273,191 @@ void ActNpc116(NPCHAR *npc)
 	npc->rect = rc[0];
 }
 
+//Curly
+void ActNpc117(NPCHAR *npc)
+{
+	RECT rcLeft[10];
+	RECT rcRight[10];
+
+	rcLeft[0] = {0, 96, 16, 112};
+	rcLeft[1] = {16, 96, 32, 112};
+	rcLeft[2] = {0, 96, 16, 112};
+	rcLeft[3] = {32, 96, 48, 112};
+	rcLeft[4] = {0, 96, 16, 112};
+	rcLeft[5] = {176, 96, 192, 112};
+	rcLeft[6] = {112, 96, 128, 112};
+	rcLeft[7] = {160, 96, 176, 112};
+	rcLeft[8] = {144, 96, 160, 112};
+	rcLeft[9] = {48, 96, 64, 112};
+
+	rcRight[0] = {0, 112, 16, 128};
+	rcRight[1] = {16, 112, 32, 128};
+	rcRight[2] = {0, 112, 16, 128};
+	rcRight[3] = {32, 112, 48, 128};
+	rcRight[4] = {0, 112, 16, 128};
+	rcRight[5] = {176, 112, 192, 128};
+	rcRight[6] = {112, 112, 128, 128};
+	rcRight[7] = {160, 112, 176, 128};
+	rcRight[8] = {144, 112, 160, 128};
+	rcRight[9] = {48, 112, 64, 128};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			if (npc->direct == 4)
+			{
+				if (gMC.x < npc->x)
+					npc->direct = 0;
+				else
+					npc->direct = 2;
+			}
+
+			npc->act_no = 1;
+			npc->ani_no = 0;
+			npc->ani_wait = 0;
+			// Fallthrough
+		case 1:
+			npc->xm = 0;
+			npc->ym += 0x40;
+			break;
+
+		case 3:
+			npc->act_no = 4;
+			npc->ani_no = 1;
+			npc->ani_wait = 0;
+			// Fallthrough
+		case 4:
+			if (++npc->ani_wait > 4)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no > 4)
+				npc->ani_no = 1;
+
+			npc->ym += 0x40;
+
+			if (npc->direct == 0)
+				npc->xm = -0x200;
+			else
+				npc->xm = 0x200;
+
+			break;
+
+		case 5:
+			npc->act_no = 6;
+			npc->ani_no = 5;
+			SetDestroyNpChar(npc->x, npc->y, npc->view.back, 8);
+			break;
+
+		case 6:
+			npc->ani_no = 5;
+			break;
+
+		case 10:
+			npc->act_no = 11;
+			npc->ani_no = 1;
+			npc->ani_wait = 0;
+
+			if (gMC.x < npc->x)
+				npc->direct = 0;
+			else
+				npc->direct = 2;
+
+			// Fallthrough
+		case 11:
+			if (++npc->ani_wait > 4)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no > 4)
+				npc->ani_no = 1;
+
+			if (npc->direct == 0)
+				npc->x -= 0x200;
+			else
+				npc->x += 0x200;
+
+			if (gMC.x < npc->x + 0x2800 && gMC.x > npc->x - 0x2800)
+				npc->act_no = 0;
+
+			break;
+
+		case 20:
+			npc->xm = 0;
+			npc->ani_no = 6;
+			break;
+
+		case 21:
+			npc->xm = 0;
+			npc->ani_no = 9;
+			break;
+
+		case 30:
+			npc->act_no = 31;
+			npc->act_wait = 0;
+			npc->ym = -0x400u;
+			// Fallthrough
+		case 31:
+			npc->ani_no = 7;
+
+			if (npc->direct == 0)
+				npc->xm = 0x200;
+			else
+				npc->xm = -0x200u;
+
+			npc->ym += 0x40;
+
+			if (npc->act_wait++ && npc->flag & 8)
+				npc->act_no = 32;
+
+			break;
+
+		case 32:
+			npc->ym += 0x40;
+			npc->ani_no = 8;
+			npc->xm = 0;
+			break;
+
+		case 70:
+			npc->act_no = 71;
+			npc->act_wait = 0;
+			npc->ani_no = 1;
+			npc->ani_wait = 0;
+			// Fallthrough
+		case 71:
+			if (npc->direct == 0)
+				npc->x += 0x100;
+			else
+				npc->x -= 0x100;
+
+			if (++npc->ani_wait > 8)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no > 4)
+				npc->ani_no = 1;
+
+			break;
+	}
+
+	if (npc->ym > 0x5FF)
+		npc->ym = 0x5FF;
+
+	npc->x += npc->xm;
+	npc->y += npc->ym;
+
+	if (npc->direct == 0)
+		npc->rect = rcLeft[npc->ani_no];
+	else
+		npc->rect = rcRight[npc->ani_no];
+}
+
 //Table and chair
 void ActNpc119(NPCHAR *npc)
 {

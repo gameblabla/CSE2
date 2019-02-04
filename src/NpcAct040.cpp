@@ -565,6 +565,121 @@ void ActNpc055(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
+//Beetle (Sand Zone)
+void ActNpc056(NPCHAR *npc)
+{
+	RECT rcLeft[3];
+	RECT rcRight[3];
+
+	rcLeft[0] = {0, 144, 16, 160};
+	rcLeft[1] = {16, 144, 32, 160};
+	rcLeft[2] = {32, 144, 48, 160};
+
+	rcRight[0] = {0, 160, 16, 176};
+	rcRight[1] = {16, 160, 32, 176};
+	rcRight[2] = {32, 160, 48, 176};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+
+			if (npc->direct == 0)
+				npc->act_no = 1;
+			else
+				npc->act_no = 3;
+
+			break;
+
+		case 1:
+			npc->xm -= 0x10;
+
+			if (npc->xm < -0x400)
+				npc->xm = -0x400u;
+
+			if (npc->shock)
+				npc->x += npc->xm / 2;
+			else
+				npc->x += npc->xm;
+
+			if (++npc->ani_wait > 1)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no > 2)
+				npc->ani_no = 1;
+
+			if (npc->flag & 1)
+			{
+				npc->act_no = 2;
+				npc->act_wait = 0;
+				npc->ani_no = 0;
+				npc->xm = 0;
+				npc->direct = 2;
+			}
+
+			break;
+
+		case 2:
+			if (npc->x < gMC.x && npc->x > gMC.x - 0x20000 && npc->y < gMC.y + 0x1000 && npc->y > gMC.y - 0x1000)
+			{
+				npc->act_no = 3;
+				npc->ani_wait = 0;
+				npc->ani_no = 1;
+			}
+
+			break;
+
+		case 3:
+			npc->xm += 0x10;
+
+			if (npc->xm > 0x400)
+				npc->xm = 0x400;
+
+			if (npc->shock)
+				npc->x += npc->xm / 2;
+			else
+				npc->x += npc->xm;
+
+			if (++npc->ani_wait > 1)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no > 2)
+				npc->ani_no = 1;
+
+			if (npc->flag & 4)
+			{
+				npc->act_no = 4;
+				npc->act_wait = 0;
+				npc->ani_no = 0;
+				npc->xm = 0;
+				npc->direct = 0;
+			}
+
+			break;
+
+		case 4:
+			if (npc->x < gMC.x + 0x20000 && npc->x > gMC.x && npc->y < gMC.y + 0x1000 && npc->y > gMC.y - 0x1000)
+			{
+				npc->act_no = 1;
+				npc->ani_wait = 0;
+				npc->ani_no = 1;
+			}
+
+			break;
+	}
+
+	if (npc->direct == 0)
+		npc->rect = rcLeft[npc->ani_no];
+	else
+		npc->rect = rcRight[npc->ani_no];
+}
+
 //Basu (Egg Corridor)
 void ActNpc058(NPCHAR *npc)
 {

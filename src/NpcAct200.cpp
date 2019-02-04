@@ -21,3 +21,18 @@ void ActNpc211(NPCHAR *npc)
 
 	npc->rect = rects[npc->code_event];
 }
+
+//Smoke generator
+void ActNpc219(NPCHAR *npc)
+{
+	RECT rc[1];
+
+	rc[0] = {0, 0, 0, 0};
+
+	if ( npc->direct )
+		SetNpChar(199, npc->x + (Random(-0xA0, 0xA0) * 0x200), npc->y + (Random(-0x80, 0x80) * 0x200), 0, 0, 2, 0, 0x100);
+	else if (Random(0, 40) == 1)
+		SetNpChar(4, npc->x + (Random(-20, 20) * 0x200), npc->y, 0, -0x200, 0, 0, 0x100);
+
+	npc->rect = rc[1];
+}
