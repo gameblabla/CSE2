@@ -963,6 +963,46 @@ void ActNpc032(NPCHAR *npc)
 	npc->rect = rect[npc->ani_no];
 }
 
+//Balrog bouncing projectile
+void ActNpc033(NPCHAR *npc)
+{
+	if (npc->flag & 5)
+	{
+		SetCaret(npc->x, npc->y, 2, 0);
+		npc->cond = 0;
+	}
+	else if (npc->flag & 8)
+	{
+		npc->ym = -0x400;
+	}
+
+	npc->ym += 0x2A;
+
+	npc->y += npc->ym;
+	npc->x += npc->xm;
+
+	RECT rect_left[2];
+
+	rect_left[0] = {240, 64, 256, 80};
+	rect_left[1] = {240, 80, 256, 96};
+
+	if (++npc->ani_wait > 2)
+	{
+		npc->ani_wait = 0;
+
+		if (++npc->ani_no > 1)
+			npc->ani_no = 0;
+	}
+
+	npc->rect = rect_left[npc->ani_no];
+
+	if (++npc->act_wait > 250)
+	{
+		SetCaret(npc->x, npc->y, 2, 0);
+		npc->cond = 0;
+	}
+}
+
 //Bed
 void ActNpc034(NPCHAR *npc)
 {
@@ -1051,6 +1091,185 @@ void ActNpc035(NPCHAR *npc)
 		npc->rect = rcLeft[npc->ani_no];
 	else
 		npc->rect = rcRight[npc->ani_no];
+}
+
+//Balrog (hover)
+void ActNpc036(NPCHAR *npc)
+{
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			// Fallthrough
+		case 1:
+			if (++npc->act_wait > 12)
+			{
+				npc->act_no = 2;
+				npc->act_wait = 0;
+				npc->count1 = 3;
+				npc->ani_no = 1;
+			}
+
+			break;
+
+		case 2:
+			if (++npc->act_wait > 16)
+			{
+				--npc->count1;
+				npc->act_wait = 0;
+
+				const unsigned char deg = GetArktan(npc->x - gMC.x, npc->y + 0x800 - gMC.y) + Random(-16, 16);
+				const int ym = GetSin(deg);
+				const int xm = GetCos(deg);
+
+				SetNpChar(11, npc->x, npc->y + 0x800, xm, ym, 0, 0, 0x100);
+				PlaySoundObject(39, 1);
+
+				if (npc->count1 == 0)
+				{
+					npc->act_no = 3;
+					npc->act_wait = 0;
+				}
+			}
+
+			break;
+
+		case 3:
+			if (++npc->act_wait > 3)
+			{
+				npc->act_no = 4;
+				npc->act_wait = 0;
+				npc->xm = (gMC.x - npc->x) / 100;
+				npc->ym = -0x600;
+				npc->ani_no = 3;
+			}
+
+			break;
+
+		case 4:
+			if (npc->ym > -0x200)
+			{
+				if (npc->life > 60)
+				{
+					npc->act_no = 5;
+					npc->ani_no = 4;
+					npc->ani_wait = 0;
+					npc->act_wait = 0;
+					npc->tgt_y = npc->y;
+				}
+				else
+				{
+					npc->act_no = 6;
+				}
+			}
+
+			break;
+
+		case 5:
+			if (++npc->ani_wait > 1)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no > 5)
+			{
+				npc->ani_no = 4;
+				PlaySoundObject(47, 1);
+			}
+
+			if (++npc->act_wait > 100)
+			{
+				npc->act_no = 6;
+				npc->ani_no = 3;
+			}
+
+			if (npc->y < npc->tgt_y)
+				npc->ym += 0x40;
+			else
+				npc->ym -= 0x40;
+
+			if (npc->ym < -0x200)
+				npc->ym = -0x200;
+			if (npc->ym > 0x200)
+				npc->ym = 0x200;
+
+			break;
+
+		case 6:
+			if (gMC.y > npc->y + 0x2000)
+				npc->damage = 10;
+			else
+				npc->damage = 0;
+
+			if (npc->flag & 8)
+			{
+				npc->act_no = 7;
+				npc->act_wait = 0;
+				npc->ani_no = 2;
+				PlaySoundObject(26, 1);
+				PlaySoundObject(25, 1);
+				SetQuake(30);
+				npc->damage = 0;
+
+				for (int i = 0; i < 8; ++i)
+					SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+
+				for (int i = 0; i < 8; ++i)
+					SetNpChar(33, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-0x400, 0x400), Random(-0x400, 0), 0, 0, 0x100);
+			}
+
+			break;
+
+		case 7:
+			npc->xm = 0;
+
+			if (++npc->act_wait > 3)
+			{
+				npc->act_no = 1;
+				npc->act_wait = 0;
+			}
+
+			break;
+	}
+
+	if (npc->act_no != 5)
+	{
+		npc->ym += 0x33;
+
+		if (gMC.x > npc->x)
+			npc->direct = 2;
+		else
+			npc->direct = 0;
+	}
+
+	if (npc->ym > 0x5FF)
+		npc->ym = 0x5FF;
+
+	npc->x += npc->xm;
+	npc->y += npc->ym;
+
+	RECT rect_left[6];
+	RECT rect_right[6];
+
+	rect_left[0] = {0, 0, 40, 24};
+	rect_left[1] = {40, 0, 80, 24};
+	rect_left[2] = {80, 0, 120, 24};
+	rect_left[3] = {120, 0, 160, 24};
+	rect_left[4] = {160, 48, 200, 72};
+	rect_left[5] = {200, 48, 240, 72};
+
+	rect_right[0] = {0, 24, 40, 48};
+	rect_right[1] = {40, 24, 80, 48};
+	rect_right[2] = {80, 24, 120, 48};
+	rect_right[3] = {120, 24, 160, 48};
+	rect_right[4] = {160, 72, 200, 96};
+	rect_right[5] = {200, 72, 240, 96};
+
+	if (npc->direct == 0)
+		npc->rect = rect_left[npc->ani_no];
+	else
+		npc->rect = rect_right[npc->ani_no];
 }
 
 //Signpost

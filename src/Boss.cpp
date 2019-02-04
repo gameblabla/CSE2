@@ -4,6 +4,7 @@
 #include "WindowsWrapper.h"
 
 #include "Boss.h"
+#include "BossFrog.h"
 #include "BossOhm.h"
 #include "NpChar.h"
 #include "MyChar.h"
@@ -184,16 +185,16 @@ void ActBossChar_0()
 
 BOSSFUNCTION gpBossFuncTbl[10] =
 {
-	&ActBossChar_0,
-	&ActBossChar_Omega,
-	nullptr, //&ActBossChar_Frog,
-	nullptr, //&ActBossChar_MonstX,
-	nullptr, //&ActBossChar_Core,
-	nullptr, //&ActBossChar_Ironhead,
-	nullptr, //&ActBossChar_Twin,
-	nullptr, //&ActBossChar_Undead,
-	nullptr, //&ActBossChar_Press,
-	nullptr, //&ActBossChar_Ballos
+	ActBossChar_0,
+	ActBossChar_Omega,
+	ActBossChar_Frog,
+	nullptr, //ActBossChar_MonstX,
+	nullptr, //ActBossChar_Core,
+	nullptr, //ActBossChar_Ironhead,
+	nullptr, //ActBossChar_Twin,
+	nullptr, //ActBossChar_Undead,
+	nullptr, //ActBossChar_Press,
+	nullptr, //ActBossChar_Ballos
 };
 
 void ActBossChar()
