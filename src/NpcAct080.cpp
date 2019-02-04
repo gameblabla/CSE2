@@ -1303,3 +1303,231 @@ void ActNpc092(NPCHAR *npc)
 
 	npc->rect = rcLeft[npc->ani_no];
 }
+
+//Chaco
+void ActNpc093(NPCHAR *npc)
+{
+	RECT rcLeft[7];
+	RECT rcRight[7];
+
+	rcLeft[0] = {128, 0, 144, 16};
+	rcLeft[1] = {144, 0, 160, 16};
+	rcLeft[2] = {160, 0, 176, 16};
+	rcLeft[3] = {128, 0, 144, 16};
+	rcLeft[4] = {176, 0, 192, 16};
+	rcLeft[5] = {128, 0, 144, 16};
+	rcLeft[6] = {32, 32, 48, 48};
+
+	rcRight[0] = {128, 16, 144, 32};
+	rcRight[1] = {144, 16, 160, 32};
+	rcRight[2] = {160, 16, 176, 32};
+	rcRight[3] = {128, 16, 144, 32};
+	rcRight[4] = {176, 16, 192, 32};
+	rcRight[5] = {128, 16, 144, 32};
+	rcRight[6] = {32, 32, 48, 48};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->ani_no = 0;
+			npc->ani_wait = 0;
+			// Fallthrough
+		case 1:
+			if (Random(0, 120) == 10)
+			{
+				npc->act_no = 2;
+				npc->act_wait = 0;
+				npc->ani_no = 1;
+			}
+
+			if (gMC.x > npc->x - 0x4000 && gMC.x < npc->x + 0x4000 && gMC.y > npc->y - 0x4000 && gMC.y < npc->y + 0x2000)
+			{
+				if (gMC.x < npc->x)
+					npc->direct = 0;
+				else
+					npc->direct = 2;
+			}
+
+			break;
+
+		case 2:
+			if (++npc->act_wait > 8)
+			{
+				npc->act_no = 1;
+				npc->ani_no = 0;
+			}
+
+			break;
+
+		case 3:
+			npc->act_no = 4;
+			npc->ani_no = 2;
+			npc->ani_wait = 0;
+			// Fallthrough
+		case 4:
+			if (++npc->ani_wait > 4)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no > 5)
+				npc->ani_no = 2;
+
+			if (npc->direct == 0)
+				npc->x -= 0x200;
+			else
+				npc->x += 0x200;
+
+			break;
+
+		case 10:
+			npc->ani_no = 6;
+
+			if (++npc->act_wait > 200)
+			{
+				npc->act_wait = 0;
+				SetCaret(npc->x, npc->y, 5, 0);
+			}
+
+			break;
+	}
+
+	if (npc->direct == 0)
+		npc->rect = rcLeft[npc->ani_no];
+	else
+		npc->rect = rcRight[npc->ani_no];
+}
+
+//Jelly
+void ActNpc095(NPCHAR *npc)
+{
+	RECT rcLeft[4];
+	RECT rcRight[4];
+
+	rcLeft[0] = {208, 64, 224, 80};
+	rcLeft[1] = {224, 64, 240, 80};
+	rcLeft[2] = {240, 64, 256, 80};
+	rcLeft[3] = {256, 64, 272, 80};
+
+	rcRight[0] = {208, 80, 224, 96};
+	rcRight[1] = {224, 80, 240, 96};
+	rcRight[2] = {240, 80, 256, 96};
+	rcRight[3] = {256, 80, 272, 96};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->act_wait = Random(0, 50);
+			npc->tgt_y = npc->y;
+			npc->tgt_x = npc->x;
+
+			if (npc->direct == 0)
+				npc->xm = 0x200;
+			else
+				npc->xm = -0x200;
+			// Fallthrough
+		case 1:
+			if (--npc->act_wait > 0)
+				break;
+
+			npc->act_no = 10;
+			// Fallthrough
+		case 10:
+			if (++npc->act_wait > 10)
+			{
+				npc->act_wait = 0;
+				npc->ani_wait = 0;
+				npc->act_no = 11;
+			}
+
+			break;
+
+		case 11:
+			if (++npc->ani_wait > 5)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no == 2)
+			{
+				if (npc->direct == 0)
+					npc->xm -= 0x100;
+				else
+					npc->xm += 0x100;
+
+				npc->ym -= 0x200;
+			}
+
+			if (npc->ani_no > 2)
+			{
+				npc->act_no = 12;
+				npc->ani_no = 3;
+			}
+
+			break;
+
+		case 12:
+			++npc->act_wait;
+
+			if (npc->y > npc->tgt_y && npc->act_wait > 10)
+			{
+				npc->act_wait = 0;
+				npc->act_no = 10;
+				npc->ani_no = 0;
+			}
+
+			break;
+	}
+
+	if (npc->x > npc->tgt_x)
+		npc->direct = 0;
+	else
+		npc->direct = 2;
+
+	if (npc->flag & 1)
+	{
+		npc->count1 = 50;
+		npc->direct = 2;
+	}
+
+	if (npc->flag & 4)
+	{
+		npc->count1 = 50;
+		npc->direct = 0;
+	}
+
+	npc->ym += 0x20;
+
+	if (npc->flag & 8)
+		npc->ym = -0x400;
+
+	if (npc->xm > 0x100)
+		npc->xm = 0x100;
+	if (npc->xm < -0x100)
+		npc->xm = -0x100;
+
+	if (npc->ym > 0x200)
+		npc->ym = 0x200;
+	if (npc->ym < -0x200)
+		npc->ym = -0x200;
+
+	if (npc->shock)
+	{
+		npc->x += npc->xm / 2;
+		npc->y += npc->ym / 2;
+	}
+	else
+	{
+		npc->x += npc->xm;
+		npc->y += npc->ym;
+	}
+
+	if (npc->direct == 0)
+		npc->rect = rcLeft[npc->ani_no];
+	else
+		npc->rect = rcRight[npc->ani_no];
+}

@@ -413,6 +413,131 @@ void ActNpc025(NPCHAR *npc)
 	npc->rect = rcLeft[npc->ani_no];
 }
 
+//Bat (Grasstown, flying)
+void ActNpc026(NPCHAR *npc)
+{
+	unsigned char deg;
+
+	switch (npc->act_no)
+	{
+		case 0:
+			deg = Random(0, 0xFF);
+			npc->xm = GetCos(deg);
+			npc->tgt_x = npc->x + 8 * GetCos(deg + 0x40);
+			deg = Random(0, 0xFF);
+			npc->ym = GetSin(deg);
+			npc->tgt_y = npc->y + 8 * GetSin(deg + 0x40);
+			npc->act_no = 1;
+			npc->count1 = 120;
+			// Fallthrough
+		case 1:
+			if (gMC.x < npc->x)
+				npc->direct = 0;
+			else
+				npc->direct = 2;
+
+			if (npc->tgt_x < npc->x)
+				npc->xm -= 0x10;
+			if (npc->tgt_x > npc->x)
+				npc->xm += 0x10;
+
+			if (npc->tgt_y < npc->y)
+				npc->ym -= 0x10;
+			if (npc->tgt_y > npc->y)
+				npc->ym += 0x10;
+
+			if (npc->xm > 0x200)
+				npc->xm = 0x200;
+			if (npc->xm < -0x200)
+				npc->xm = -0x200;
+
+			if (npc->ym > 0x200)
+				npc->ym = 0x200;
+			if (npc->ym < -0x200)
+				npc->ym = -0x200;
+
+			if (npc->count1 < 120)
+			{
+				++npc->count1;
+			}
+			else
+			{
+				if (gMC.x > npc->x - 0x1000 && gMC.x < npc->x + 0x1000 && gMC.y > npc->y && gMC.y < npc->y + 0xC000)
+				{
+					npc->xm /= 2;
+					npc->ym = 0;
+					npc->act_no = 3;
+					npc->bits &= ~8;
+				}
+			}
+
+			break;
+
+		case 3:
+			npc->ym += 0x40;
+			if (npc->ym > 0x5FF)
+				npc->ym = 0x5FF;
+
+			if (npc->flag & 8)
+			{
+				npc->ym = 0;
+				npc->xm *= 2;
+				npc->count1 = 0;
+				npc->act_no = 1;
+				npc->bits |= 8;
+			}
+
+			break;
+	}
+
+	npc->x += npc->xm;
+	npc->y += npc->ym;
+
+	RECT rect_left[4];
+	RECT rect_right[4];
+
+	rect_left[0] = {32, 80, 48, 96};
+	rect_left[1] = {48, 80, 64, 96};
+	rect_left[2] = {64, 80, 80, 96};
+	rect_left[3] = {80, 80, 96, 96};
+
+	rect_right[0] = {32, 96, 48, 112};
+	rect_right[1] = {48, 96, 64, 112};
+	rect_right[2] = {64, 96, 80, 112};
+	rect_right[3] = {80, 96, 96, 112};
+
+	if (npc->act_no == 3)
+	{
+		npc->ani_no = 3;
+	}
+	else
+	{
+		if (++npc->ani_wait > 1)
+		{
+			npc->ani_wait = 0;
+			++npc->ani_no;
+		}
+
+		if (npc->ani_no > 2)
+			npc->ani_no = 0;
+	}
+
+	if (npc->direct == 0)
+		npc->rect = rect_left[npc->ani_no];
+	else
+		npc->rect = rect_right[npc->ani_no];
+}
+
+//Death trap
+void ActNpc027(NPCHAR *npc)
+{
+	RECT rcLeft[1];
+
+	rcLeft[0] = {96, 64, 128, 88};
+
+	npc->rect = rcLeft[npc->ani_no];
+}
+
 //Flying Critter (Grasstown)
 void ActNpc028(NPCHAR *npc)
 {
@@ -685,6 +810,137 @@ void ActNpc030(NPCHAR *npc)
 	}
 
 	npc->rect = rc[npc->ani_no];
+}
+
+//Bat (Grasstown, hanging)
+void ActNpc031(NPCHAR *npc)
+{
+	RECT rcLeft[5];
+	RECT rcRight[5];
+
+	rcLeft[0] = {0, 80, 16, 96};
+	rcLeft[1] = {16, 80, 32, 96};
+	rcLeft[2] = {32, 80, 48, 96};
+	rcLeft[3] = {48, 80, 64, 96};
+	rcLeft[4] = {64, 80, 80, 96};
+
+	rcRight[0] = {0, 96, 16, 112};
+	rcRight[1] = {16, 96, 32, 112};
+	rcRight[2] = {32, 96, 48, 112};
+	rcRight[3] = {48, 96, 64, 112};
+	rcRight[4] = {64, 96, 80, 112};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			// Fallthrough
+		case 1:
+			if (Random(0, 120) == 10)
+			{
+				npc->act_no = 2;
+				npc->act_wait = 0;
+				npc->ani_no = 1;
+			}
+
+			if (gMC.x > npc->x - 0x1000 && gMC.x < npc->x + 0x1000 && gMC.y > npc->y - 0x1000 && gMC.y < npc->y + 0xC000)
+			{
+				npc->ani_no = 0;
+				npc->act_no = 3;
+			}
+
+			break;
+
+		case 2:
+			if (++npc->act_wait > 8)
+			{
+				npc->act_no = 1;
+				npc->ani_no = 0;
+			}
+
+			break;
+
+		case 3:
+			npc->ani_no = 0;
+
+			if (npc->shock || gMC.x < npc->x - 0x2800 || gMC.x > npc->x + 0x2800)
+			{
+				npc->ani_no = 1;
+				npc->ani_wait = 0;
+				npc->act_no = 4;
+				npc->act_wait = 0;
+			}
+
+			break;
+
+		case 4:
+			npc->ym += 0x20;
+			if (npc->ym > 0x5FF)
+				npc->ym = 0x5FF;
+
+			if ((++npc->act_wait >= 20 || npc->flag & 8) && (npc->flag & 8 || npc->y > gMC.y - 0x2000))
+			{
+				npc->ani_wait = 0;
+				npc->ani_no = 2;
+				npc->act_no = 5;
+				npc->tgt_y = npc->y;
+
+				if (npc->flag & 8)
+					npc->ym = -0x200;
+			}
+
+			break;
+
+		case 5:
+			if (++npc->ani_wait > 1)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no > 4)
+				npc->ani_no = 2;
+
+			if (gMC.x < npc->x)
+				npc->direct = 0;
+			else
+				npc->direct = 2;
+
+			if (gMC.x < npc->x)
+				npc->xm -= 0x10;
+			if (gMC.x > npc->x)
+				npc->xm += 0x10;
+
+			if (npc->tgt_y < npc->y)
+				npc->ym -= 0x10;
+			if (npc->tgt_y > npc->y)
+				npc->ym += 0x10;
+
+			if (npc->xm > 0x200)
+				npc->xm = 0x200;
+			if (npc->xm < -0x200)
+				npc->xm = -0x200;
+
+			if (npc->ym > 0x200)
+				npc->ym = 0x200;
+			if (npc->ym < -0x200)
+				npc->ym = -0x200;
+
+			if (npc->flag & 8)
+				npc->ym = -0x200;
+			if (npc->flag & 2)
+				npc->ym = 0x200;
+
+			break;
+	}
+
+	npc->x += npc->xm;
+	npc->y += npc->ym;
+
+	if (npc->direct == 0)
+		npc->rect = rcLeft[npc->ani_no];
+	else
+		npc->rect = rcRight[npc->ani_no];
 }
 
 //Life capsule
