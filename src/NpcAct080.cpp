@@ -11,6 +11,7 @@
 #include "Caret.h"
 #include "Flash.h"
 #include "Frame.h"
+#include "CommonDefines.h"
 
 //Gravekeeper
 void ActNpc080(NPCHAR *npc)
@@ -1530,4 +1531,198 @@ void ActNpc095(NPCHAR *npc)
 		npc->rect = rcLeft[npc->ani_no];
 	else
 		npc->rect = rcRight[npc->ani_no];
+}
+
+//Fan (left)
+void ActNpc096(NPCHAR *npc)
+{
+	RECT rc[3];
+
+	rc[0] = {272, 120, 288, 136};
+	rc[1] = {288, 120, 304, 136};
+	rc[2] = {304, 120, 320, 136};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			if ( npc->direct == 2 )
+				npc->act_no = 2;
+			else
+				npc->ani_no = 1;
+
+			// Fallthrough
+		case 1:
+			npc->ani_no = 0;
+			break;
+
+		case 2:
+			if (++npc->ani_wait > 0)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no > 2)
+				npc->ani_no = 0;
+
+			if (gMC.x > npc->x - (WINDOW_WIDTH * 0x200) && gMC.x < npc->x + (WINDOW_WIDTH * 0x200) && gMC.y > npc->y - (WINDOW_HEIGHT * 0x200) && gMC.y < npc->y + (WINDOW_HEIGHT * 0x200))
+			{
+				if (Random(0, 5) == 1)
+					SetNpChar(199, npc->x, npc->y + (Random(-8, 8) * 0x200), 0, 0, 0, 0, 0x100);
+			}
+
+			if (gMC.y < npc->y + 0x1000 && gMC.y > npc->y - 0x1000 && gMC.x < npc->x && gMC.x > npc->x - 0xC000)
+			{
+				gMC.xm -= 0x88;
+				gMC.cond |= 0x20;
+			}
+
+			break;
+	}
+
+	npc->rect = rc[npc->ani_no];
+}
+
+//Fan (up)
+void ActNpc097(NPCHAR *npc)
+{
+	RECT rc[3];
+
+	rc[0] = {272, 136, 288, 152};
+	rc[1] = {288, 136, 304, 152};
+	rc[2] = {304, 136, 320, 152};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			if (npc->direct == 2)
+				npc->act_no = 2;
+			else
+				npc->ani_no = 1;
+
+			// Fallthrough
+		case 1:
+			npc->ani_no = 0;
+			break;
+
+		case 2:
+			if (++npc->ani_wait > 0)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no > 2)
+				npc->ani_no = 0;
+
+			if (gMC.x > npc->x - (WINDOW_WIDTH * 0x200) && gMC.x < npc->x + (WINDOW_WIDTH * 0x200) && gMC.y > npc->y - (WINDOW_HEIGHT * 0x200) && gMC.y < npc->y + (WINDOW_HEIGHT * 0x200))
+			{
+				if (Random(0, 5) == 1)
+					SetNpChar(199, npc->x + (Random(-8, 8) * 0x200), npc->y, 0, 0, 1, 0, 0x100);
+			}
+
+			if (gMC.x < npc->x + 0x1000 && gMC.x > npc->x - 0x1000 && gMC.y < npc->y && gMC.y > npc->y - 0xC000)
+				gMC.ym -= 0x88;
+
+			break;
+	}
+
+	npc->rect = rc[npc->ani_no];
+}
+
+//Fan (right)
+void ActNpc098(NPCHAR *npc)
+{
+	RECT rc[3];
+
+	rc[0] = {272, 152, 288, 168};
+	rc[1] = {288, 152, 304, 168};
+	rc[2] = {304, 152, 320, 168};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			if (npc->direct == 2)
+				npc->act_no = 2;
+			else
+				npc->ani_no = 1;
+
+			// Fallthrough
+		case 1:
+			npc->ani_no = 0;
+			break;
+
+		case 2:
+			if (++npc->ani_wait > 0)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no > 2)
+				npc->ani_no = 0;
+
+			if (gMC.x > npc->x - (WINDOW_WIDTH * 0x200) && gMC.x < npc->x + (WINDOW_WIDTH * 0x200) && gMC.y > npc->y - (WINDOW_HEIGHT * 0x200) && gMC.y < npc->y + (WINDOW_HEIGHT * 0x200))
+			{
+				if (Random(0, 5) == 1)
+					SetNpChar(199, npc->x, npc->y + (Random(-8, 8) * 0x200), 0, 0, 2, 0, 0x100);
+			}
+
+			if (gMC.y < npc->y + 0x1000 && gMC.y > npc->y - 0x1000 && gMC.x < npc->x + 0xC000 && gMC.x > npc->x)
+			{
+				gMC.xm += 0x88;
+				gMC.cond |= 0x20;
+			}
+
+			break;
+	}
+
+	npc->rect = rc[npc->ani_no];
+}
+
+//Fan (down)
+void ActNpc099(NPCHAR *npc)
+{
+	RECT rc[3];
+
+	rc[0] = {272, 168, 288, 184};
+	rc[1] = {288, 168, 304, 184};
+	rc[2] = {304, 168, 320, 184};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			if (npc->direct == 2)
+				npc->act_no = 2;
+			else
+				npc->ani_no = 1;
+
+			// Fallthrough
+		case 1:
+			npc->ani_no = 0;
+			break;
+
+		case 2:
+			if (++npc->ani_wait > 0)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no > 2)
+				npc->ani_no = 0;
+
+			if (gMC.x > npc->x - (WINDOW_WIDTH * 0x200) && gMC.x < npc->x + (WINDOW_WIDTH * 0x200) && gMC.y > npc->y - (WINDOW_HEIGHT * 0x200) && gMC.y < npc->y + (WINDOW_HEIGHT * 0x200))
+			{
+				if (Random(0, 5) == 1)
+					SetNpChar(199, npc->x + (Random(-8, 8) * 0x200), npc->y, 0, 0, 3, 0, 0x100);
+			}
+
+			if (gMC.x < npc->x + 0x1000 && gMC.x > npc->x - 0x1000 && gMC.y < npc->y + 0xC000 && gMC.y > npc->y)
+				gMC.ym += 0x88;
+
+			break;
+	}
+
+	npc->rect = rc[npc->ani_no];
 }

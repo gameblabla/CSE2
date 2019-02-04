@@ -88,6 +88,10 @@ void ActNpc092(NPCHAR *npc);
 void ActNpc093(NPCHAR *npc);
 
 void ActNpc095(NPCHAR *npc);
+void ActNpc096(NPCHAR *npc);
+void ActNpc097(NPCHAR *npc);
+void ActNpc098(NPCHAR *npc);
+void ActNpc099(NPCHAR *npc);
 
 void ActNpc111(NPCHAR *npc);
 void ActNpc112(NPCHAR *npc);
