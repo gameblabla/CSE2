@@ -1401,6 +1401,155 @@ void ActNpc093(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
+//Kulala
+void ActNpc094(NPCHAR *npc)
+{
+	RECT rect[5];
+
+	rect[0] = {272, 0, 320, 24};
+	rect[1] = {272, 24, 320, 48};
+	rect[2] = {272, 48, 320, 72};
+	rect[3] = {272, 72, 320, 96};
+	rect[4] = {272, 96, 320, 120};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->ani_no = 4;
+
+			if (npc->shock)
+			{
+				npc->ani_no = 0;
+				npc->act_no = 10;
+				npc->act_wait = 0;
+			}
+
+			break;
+
+		case 10:
+			npc->bits |= 0x20;
+			npc->bits &= ~4;
+
+			if (++npc->act_wait > 40)
+			{
+				npc->act_wait = 0;
+				npc->ani_wait = 0;
+				npc->act_no = 11;
+			}
+
+			break;
+
+		case 11:
+			if (++npc->ani_wait > 5)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no > 2)
+			{
+				npc->act_no = 12;
+				npc->ani_no = 3;
+			}
+
+			break;
+
+		case 12:
+			npc->ym = -0x155;
+
+			if (++npc->act_wait > 20)
+			{
+				npc->act_wait = 0;
+				npc->act_no = 10;
+				npc->ani_no = 0;
+			}
+
+			break;
+
+		case 20:
+			npc->xm /= 2;
+			npc->ym += 0x20;
+
+			if (npc->shock == 0)
+			{
+				npc->act_wait = 30;
+				npc->act_no = 10;
+				npc->ani_no = 0;
+			}
+
+			break;
+	}
+
+	if (npc->shock)
+	{
+		if (++npc->count2 > 12)
+		{
+			npc->act_no = 20;
+			npc->ani_no = 4;
+			npc->bits &= ~0x20;
+			npc->bits |= 4;
+		}
+	}
+	else
+	{
+		npc->count2 = 0;
+	}
+
+	if (npc->act_no >= 10)
+	{
+		if (npc->flag & 1)
+		{
+			npc->count1 = 50;
+			npc->direct = 2;
+		}
+
+		if (npc->flag & 4)
+		{
+			npc->count1 = 50;
+			npc->direct = 0;
+		}
+
+		if (npc->count1)
+		{
+			--npc->count1;
+
+			if (npc->direct == 0)
+				npc->xm -= 0x80;
+			else
+				npc->xm += 0x80;
+		}
+		else
+		{
+			npc->count1 = 50;
+
+			if (gMC.x < npc->x)
+				npc->direct = 0;
+			else
+				npc->direct = 2;
+		}
+
+		npc->ym += 0x10;
+
+		if (npc->flag & 8)
+			npc->ym = -0x400;
+	}
+
+	if (npc->xm > 0x100)
+		npc->xm = 0x100;
+	if (npc->xm < -0x100)
+		npc->xm = -0x100;
+
+	if (npc->ym > 0x300)
+		npc->ym = 0x300;
+	if (npc->ym < -0x300)
+		npc->ym = -0x300;
+
+	npc->x += npc->xm;
+	npc->y += npc->ym;
+
+	npc->rect = rect[npc->ani_no];
+}
+
 //Jelly
 void ActNpc095(NPCHAR *npc)
 {
