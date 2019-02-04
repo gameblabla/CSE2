@@ -9,6 +9,7 @@
 #include "Back.h"
 #include "Triangle.h"
 #include "Frame.h"
+#include "Caret.h"
 
 //Grate
 void ActNpc100(NPCHAR *npc)
@@ -479,6 +480,42 @@ void ActNpc107(NPCHAR *npc)
 	npc->rect = rcPoweron[npc->ani_no];
 }
 
+//Balfrog projectile
+void ActNpc108(NPCHAR *npc)
+{
+	if (npc->flag & 0xFF)
+	{
+		SetCaret(npc->x, npc->y, 2, 0);
+		npc->cond = 0;
+	}
+
+	npc->y += npc->ym;
+	npc->x += npc->xm;
+
+	RECT rect_left[3];
+
+	rect_left[0] = {96, 48, 112, 64};
+	rect_left[1] = {112, 48, 128, 64};
+	rect_left[2] = {128, 48, 144, 64};
+
+	if (++npc->ani_wait > 1)
+	{
+		npc->ani_wait = 0;
+		++npc->ani_no;
+	}
+
+	if (npc->ani_no > 2)
+		npc->ani_no = 0;
+
+	npc->rect = rect_left[npc->ani_no];
+
+	if (++npc->count1 > 300)
+	{
+		SetCaret(npc->x, npc->y, 2, 0);
+		npc->cond = 0;
+	}
+}
+
 //Malco (broken)
 void ActNpc109(NPCHAR *npc)
 {
@@ -541,6 +578,163 @@ void ActNpc109(NPCHAR *npc)
 	if (npc->ym > 0x5FF)
 		npc->ym = 0x5FF;
 
+	npc->y += npc->ym;
+
+	if (npc->direct == 0)
+		npc->rect = rcLeft[npc->ani_no];
+	else
+		npc->rect = rcRight[npc->ani_no];
+}
+
+//Puchi
+void ActNpc110(NPCHAR *npc)
+{
+	RECT rcLeft[3];
+	RECT rcRight[3];
+
+	rcLeft[0] = {96, 128, 112, 144};
+	rcLeft[1] = {112, 128, 128, 144};
+	rcLeft[2] = {128, 128, 144, 144};
+
+	rcRight[0] = {96, 144, 112, 160};
+	rcRight[1] = {112, 144, 128, 160};
+	rcRight[2] = {128, 144, 144, 160};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->act_wait = 0;
+			npc->xm = 0;
+			npc->ym = 0;
+
+			if (npc->direct == 4)
+			{
+				if (Random(0, 1) != 0)
+					npc->direct = 0;
+				else
+					npc->direct = 2;
+
+				npc->bits |= 8;
+				npc->ani_no = 2;
+				npc->act_no = 3;
+
+				break;
+			}
+			else
+			{
+				npc->bits &= ~8;
+			}
+			// Fallthrough
+		case 1:
+			++npc->act_wait;
+
+			if (Random(0, 50) == 1)
+			{
+				npc->act_no = 2;
+				npc->act_wait = 0;
+				npc->ani_no = 0;
+				npc->ani_wait = 0;
+			}
+
+			break;
+
+		case 2:
+			++npc->act_wait;
+
+			if (++npc->ani_wait > 2)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no > 1)
+				npc->ani_no = 0;
+
+			if (npc->act_wait > 18)
+			{
+				npc->act_no = 1;
+				npc->act_no = 1;
+			}
+
+			break;
+
+		case 3:
+			if (++npc->act_wait > 40)
+				npc->bits &= ~8;
+
+			if (npc->flag & 8)
+			{
+				npc->act_no = 0;
+				npc->ani_no = 0;
+				npc->act_wait = 0;
+			}
+
+			break;
+
+		case 10:
+			npc->act_no = 11;
+			// Fallthrough
+		case 11:
+			if (npc->flag & 1 && npc->xm < 0)
+			{
+				npc->xm = -npc->xm;
+				npc->direct = 2;
+			}
+
+			if (npc->flag & 4 && npc->xm > 0)
+			{
+				npc->xm = -npc->xm;
+				npc->direct = 0;
+			}
+
+			if (npc->flag & 8)
+			{
+				npc->act_no = 0;
+				npc->ani_no = 0;
+				npc->act_wait = 0;
+			}
+
+			break;
+	}
+
+	bool bJump = false;
+
+	if (npc->act_no < 10 && npc->act_no != 3 && npc->act_wait > 10)
+	{
+		if (npc->shock)
+			bJump = true;
+
+		if (npc->x >= gMC.x - 0x14000 && npc->x <= gMC.x + 0x14000 && npc->y >= gMC.y - 0x8000 && npc->y <= gMC.y + 0x8000)
+		{
+			if (Random(0, 50) == 2)
+				bJump = true;
+		}
+	}
+
+	if (bJump)
+	{
+		if (gMC.x > npc->x)
+			npc->direct = 2;
+		else
+			npc->direct = 0;
+
+		npc->act_no = 10;
+		npc->ani_no = 2;
+		npc->ym = -0x2FF;
+		PlaySoundObject(6, 1);
+
+		if (npc->direct == 0)
+			npc->xm = -0x100u;
+		else
+			npc->xm = 0x100;
+	}
+
+	npc->ym += 0x80;
+	if (npc->ym > 0x5FF)
+		npc->ym = 0x5FF;
+
+	npc->x += npc->xm;
 	npc->y += npc->ym;
 
 	if (npc->direct == 0)
@@ -707,6 +901,136 @@ void ActNpc112(NPCHAR *npc)
 		npc->rect.bottom = npc->rect.top + npc->act_wait / 4;
 
 		if ( npc->act_wait / 2 % 2 )
+			++npc->rect.left;
+	}
+}
+
+//Professor Booster
+void ActNpc113(NPCHAR *npc)
+{
+	RECT rcLeft[7];
+	RECT rcRight[7];
+
+	rcLeft[0] = {224, 0, 240, 16};
+	rcLeft[1] = {240, 0, 256, 16};
+	rcLeft[2] = {256, 0, 272, 16};
+	rcLeft[3] = {224, 0, 240, 16};
+	rcLeft[4] = {272, 0, 288, 16};
+	rcLeft[5] = {224, 0, 240, 16};
+	rcLeft[6] = {288, 0, 304, 16};
+
+	rcRight[0] = {224, 16, 240, 32};
+	rcRight[1] = {240, 16, 256, 32};
+	rcRight[2] = {256, 16, 272, 32};
+	rcRight[3] = {224, 16, 240, 32};
+	rcRight[4] = {272, 16, 288, 32};
+	rcRight[5] = {224, 16, 240, 32};
+	rcRight[6] = {288, 16, 304, 32};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->ani_no = 0;
+			npc->ani_wait = 0;
+			// Fallthrough
+		case 1:
+			if (Random(0, 120) == 10)
+			{
+				npc->act_no = 2;
+				npc->act_wait = 0;
+				npc->ani_no = 1;
+			}
+
+			break;
+
+		case 2:
+			if (++npc->act_wait > 8)
+			{
+				npc->act_no = 1;
+				npc->ani_no = 0;
+			}
+
+			break;
+
+		case 3:
+			npc->act_no = 4;
+			npc->ani_no = 2;
+			npc->ani_wait = 0;
+			// Fallthrough
+		case 4:
+			if (++npc->ani_wait > 4)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no > 5)
+				npc->ani_no = 2;
+
+			if (npc->direct == 0)
+				npc->x -= 0x200;
+			else
+				npc->x += 0x200;
+
+			break;
+
+		case 5:
+			npc->ani_no = 6;
+			break;
+
+		case 30:
+			npc->act_no = 31;
+			npc->ani_no = 0;
+			npc->ani_wait = 0;
+			npc->hit.bottom = 0x2000;
+			npc->x -= 0x2000;
+			npc->y += 0x1000;
+			PlaySoundObject(29, 1);
+			// Fallthrough
+		case 31:
+			if (++npc->act_wait == 64)
+			{
+				npc->act_no = 32;
+				npc->act_wait = 0;
+			}
+
+			break;
+
+		case 32:
+			if (++npc->act_wait > 20)
+			{
+				npc->act_no = 33;
+				npc->ani_no = 1;
+				npc->hit.bottom = 0x1000;
+			}
+
+			break;
+
+		case 33:
+			if (npc->flag & 8)
+			{
+				npc->act_no = 34;
+				npc->act_wait = 0;
+				npc->ani_no = 0;
+			}
+
+			break;
+	}
+
+	npc->ym += 0x40;
+	npc->y += npc->ym;
+
+	if (npc->direct == 0)
+		npc->rect = rcLeft[npc->ani_no];
+	else
+		npc->rect = rcRight[npc->ani_no];
+
+	if (npc->act_no == 31)
+	{
+		npc->rect.bottom = npc->rect.top + npc->act_wait / 4;
+
+		if (npc->act_wait / 2 % 2)
 			++npc->rect.left;
 	}
 }

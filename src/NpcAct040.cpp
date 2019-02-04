@@ -498,19 +498,76 @@ void ActNpc048(NPCHAR *npc)
 		npc->rect = rcLeft[npc->ani_no];
 }
 
+//Cairn
+void ActNpc055(NPCHAR *npc)
+{
+	RECT rcLeft[6];
+	RECT rcRight[6];
+
+	rcLeft[0] = {192, 192, 208, 216};
+	rcLeft[1] = {208, 192, 224, 216};
+	rcLeft[2] = {192, 192, 208, 216};
+	rcLeft[3] = {224, 192, 240, 216};
+	rcLeft[4] = {192, 192, 208, 216};
+	rcLeft[5] = {240, 192, 256, 216};
+
+	rcRight[0] = {192, 216, 208, 240};
+	rcRight[1] = {208, 216, 224, 240};
+	rcRight[2] = {192, 216, 208, 240};
+	rcRight[3] = {224, 216, 240, 240};
+	rcRight[4] = {192, 216, 208, 240};
+	rcRight[5] = {240, 216, 256, 240};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->ani_no = 0;
+			npc->ani_wait = 0;
+			break;
+
+		case 3:
+			npc->act_no = 4;
+			npc->ani_no = 1;
+			npc->ani_wait = 0;
+			// Fallthrough
+		case 4:
+			if (++npc->ani_wait > 4)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no > 4)
+				npc->ani_no = 1;
+
+			if (npc->direct == 0)
+				npc->x -= 0x200;
+			else
+				npc->x += 0x200;
+
+			break;
+
+		case 5:
+			npc->ani_no = 5;
+			break;
+	}
+
+	npc->ym += 0x20;
+	if (npc->ym > 0x5FF)
+		npc->ym = 0x5FF;
+
+	npc->y += npc->ym;
+
+	if (npc->direct == 0)
+		npc->rect = rcLeft[npc->ani_no];
+	else
+		npc->rect = rcRight[npc->ani_no];
+}
+
 //Basu (Egg Corridor)
 void ActNpc058(NPCHAR *npc)
 {
-	unsigned __int8 v1; // ST2F_1@42
-	char v2; // ST2F_1@42
-	int a5; // ST24_4@42
-	int a4; // ST28_4@42
-	RECT *v5; // edx@54
-	RECT *v6; // eax@54
-	RECT *v7; // edx@55
-	RECT *v8; // eax@55
-	int routine; // [sp+0h] [bp-70h]@1
-
 	RECT rcLeft[3];
 	RECT rcRight[3];
 
