@@ -145,9 +145,9 @@ static void FlushSurface(int surf_no)
 	unsigned char (*src_pixels)[surf[surf_no].surface->pitch / 4][4] = (unsigned char (*)[surf[surf_no].surface->pitch/ 4][4])surf[surf_no].surface->pixels;
 	unsigned char (*dst_pixels)[pitch / 4][4] = (unsigned char (*)[pitch/ 4][4])raw_pixels;
 
-	for (unsigned int h = 0; h < surf[surf_no].surface->h; ++h)
+	for (int h = 0; h < surf[surf_no].surface->h; ++h)
 	{
-		for (unsigned int w = 0; w < surf[surf_no].surface->w; ++w)
+		for (int w = 0; w < surf[surf_no].surface->w; ++w)
 		{
 			dst_pixels[h][w][0] = src_pixels[h][w][0];
 			dst_pixels[h][w][1] = src_pixels[h][w][1];

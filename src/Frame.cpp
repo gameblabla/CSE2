@@ -6,6 +6,7 @@
 #include "NpChar.h"
 #include "Game.h"
 #include "CommonDefines.h"
+#include "Boss.h"
 
 FRAME gFrame;
 
@@ -127,8 +128,8 @@ void SetFrameTargetNpChar(int event, int wait)
 
 void SetFrameTargetBoss(int no, int wait)
 {
-	//gFrame.tgt_x = &gBoss[no].x;
-	//gFrame.tgt_y = &gBoss[no].y;
+	gFrame.tgt_x = &gBoss[no].x;
+	gFrame.tgt_y = &gBoss[no].y;
 	gFrame.wait = wait;
 }
 

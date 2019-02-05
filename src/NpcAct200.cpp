@@ -34,5 +34,5 @@ void ActNpc219(NPCHAR *npc)
 	else if (Random(0, 40) == 1)
 		SetNpChar(4, npc->x + (Random(-20, 20) * 0x200), npc->y, 0, -0x200, 0, 0, 0x100);
 
-	npc->rect = rc[1];
+	npc->rect = rc[0];
 }

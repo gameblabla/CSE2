@@ -915,7 +915,7 @@ void ActBullet_Bom(BULLET *bul, int level)
 			}
 			
 			PlaySoundObject(44, 1);
-			
+			// Fallthrough
 		case 1:
 			if (level == 1)
 			{

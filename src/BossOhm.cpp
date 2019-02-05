@@ -51,6 +51,7 @@ void ActBoss01_34()
 		{
 			case 0:
 				gBoss[i].act_no = 1;
+				// Fallthrough
 			case 1:
 				if (i == 3)
 					gBoss[i].x = gBoss[0].x - 0x2000;
@@ -150,6 +151,7 @@ void ActBossChar_Omega()
 		gBoss[0].act_no = 30;
 		gBoss[0].act_wait = 0;
 		gBoss[0].ani_no = 0;
+		// Fallthrough
 	case 30:
 		SetQuake(2);
 		gBoss[0].y -= 0x200;

@@ -19,7 +19,7 @@ bool LoadNpcTable(const char *path)
 
 	const size_t tblSize = SDL_RWsize(fp);
 
-	const int npcCount = tblSize / 0x18;
+	const size_t npcCount = tblSize / 0x18;
 	gNpcTable = (NPC_TABLE*)malloc(npcCount * sizeof(NPC_TABLE));
 
 	for (size_t i = 0; i < npcCount; i++) //bits

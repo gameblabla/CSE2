@@ -793,6 +793,7 @@ void ActNpc150(NPCHAR *npc)
 			for (int i = 0; i < 4; i++)
 				SetNpChar(4, npc->x, npc->y, Random(-0x155, 0x155), Random(-0x600, 0), 0, 0, 0x100);
 			PlaySoundObject(71, 1);
+			// Fallthrough
 		case 11:
 			npc->ani_no = 2;
 			break;
@@ -800,6 +801,7 @@ void ActNpc150(NPCHAR *npc)
 			npc->act_no = 21;
 			npc->act_wait = 64;
 			PlaySoundObject(29, 1);
+			// Fallthrough
 		case 21:
 			if (!--npc->act_wait)
 				npc->cond = 0;
@@ -808,6 +810,7 @@ void ActNpc150(NPCHAR *npc)
 			npc->act_no = 51;
 			npc->ani_no = 3;
 			npc->ani_wait = 0;
+			// Fallthrough
 		case 51:
 			if (++npc->ani_wait > 4)
 			{
@@ -827,6 +830,7 @@ void ActNpc150(NPCHAR *npc)
 			npc->ani_no = 7;
 			npc->tgt_x = npc->x;
 			npc->tgt_y = npc->y;
+			// Fallthrough
 		case 61:
 			npc->tgt_y += 0x100;
 			npc->x = npc->tgt_x + (Random(-1, 1) << 9);
@@ -837,6 +841,7 @@ void ActNpc150(NPCHAR *npc)
 			npc->act_wait = 0;
 			npc->ani_no = 3;
 			npc->ani_wait = 0;
+			// Fallthrough
 		case 0x47:
 			if ( npc->direct )
 				npc->x -= 0x100;
@@ -859,6 +864,7 @@ void ActNpc150(NPCHAR *npc)
 			npc->act_no = 101;
 			npc->ani_no = 3;
 			npc->ani_wait = 0;
+			// Fallthrough
 		case 101:
 			npc->ym += 0x40;
 			if (npc->ym > 0x5FF)

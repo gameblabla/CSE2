@@ -521,7 +521,6 @@ int TextScriptProc()
 					else if (gTS.flags & 0x10)
 					{
 						//SAT/CAT/TUR printing
-						x;
 						for (x = gTS.p_read; ; x++)
 						{
 							//Break if reaches command, or new-line

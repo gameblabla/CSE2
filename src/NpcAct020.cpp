@@ -52,7 +52,7 @@ void ActNpc021(NPCHAR *npc)
 			break;
 	}
 
-	RECT rect[0];
+	RECT rect[1];
 
 	rect[0]	= {224, 40, 240, 48};
 

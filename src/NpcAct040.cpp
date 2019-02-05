@@ -39,6 +39,7 @@ void ActNpc040(NPCHAR *npc)
 			npc->act_no = 1;
 			npc->ani_no = 0;
 			npc->ani_wait = 0;
+			// Fallthrough
 		case 1:
 			if (Random(0, 120) == 10)
 			{
@@ -65,6 +66,7 @@ void ActNpc040(NPCHAR *npc)
 			npc->act_no = 4;
 			npc->ani_no = 2;
 			npc->ani_wait = 0;
+			// Fallthrough
 		case 4:
 			if (++npc->ani_wait > 4)
 			{
