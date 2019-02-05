@@ -169,6 +169,198 @@ void SetBullet(int no, int x, int y, int dir)
 	}
 }
 
+void ActBullet_Frontia1(BULLET *bul)
+{
+	if (++bul->count1 > bul->life_count)
+	{
+		bul->cond = 0;
+		SetCaret(bul->x, bul->y, 3, 0);
+	}
+	else
+	{
+		if (bul->act_no)
+		{
+			bul->x += bul->xm;
+			bul->y += bul->ym;
+		}
+		else
+		{
+			bul->ani_no = Random(0, 2);
+			bul->act_no = 1;
+
+			switch (bul->direct)
+			{
+				case 0:
+					bul->xm = -0x600;
+					break;
+				case 1:
+					bul->ym = -0x600;
+					break;
+				case 2:
+					bul->xm = 0x600;
+					break;
+				case 3:
+					bul->ym = 0x600;
+					break;
+			}
+		}
+
+		if (++bul->ani_wait > 0)
+		{
+			bul->ani_wait = 0;
+			++bul->ani_no;
+		}
+
+		if (bul->ani_no > 3)
+			bul->ani_no = 0;
+
+		RECT rcLeft[4];
+		RECT rcRight[4];
+
+		rcLeft[0] = {136, 80, 152, 80};
+		rcLeft[1] = {120, 80, 136, 96};
+		rcLeft[2] = {136, 64, 152, 80};
+		rcLeft[3] = {120, 64, 136, 80};
+
+		rcRight[0] = {120, 64, 136, 80};
+		rcRight[1] = {136, 64, 152, 80};
+		rcRight[2] = {120, 80, 136, 96};
+		rcRight[3] = {136, 80, 152, 80};
+
+		if (bul->direct == 0)
+			bul->rect = rcLeft[bul->ani_no];
+		else
+			bul->rect = rcRight[bul->ani_no];
+	}
+}
+
+void ActBullet_Frontia2(BULLET *bul, int level)
+{
+	if (++bul->count1 > bul->life_count)
+	{
+		bul->cond = 0;
+		SetCaret(bul->x, bul->y, 3, 0);
+	}
+	else
+	{
+		if (bul->act_no)
+		{
+			switch (bul->direct)
+			{
+				case 0:
+					bul->xm -= 0x80;
+					break;
+				case 1:
+					bul->ym -= 0x80;
+					break;
+				case 2:
+					bul->xm += 0x80;
+					break;
+				case 3:
+					bul->ym += 0x80;
+					break;
+			}
+
+			switch (bul->direct)
+			{
+				case 0:
+				case 2:
+					if (bul->count1 % 5 == 2)
+					{
+						if (bul->ym < 0)
+							bul->ym = 0x400;
+						else
+							bul->ym = -0x400;
+					}
+
+					break;
+
+				case 1u:
+				case 3u:
+					if (bul->count1 % 5 == 2)
+					{
+						if (bul->xm < 0)
+							bul->xm = 0x400;
+						else
+							bul->xm = -0x400u;
+					}
+
+					break;
+			}
+
+			bul->x += bul->xm;
+			bul->y += bul->ym;
+		}
+		else
+		{
+			bul->ani_no = Random(0, 2);
+			bul->act_no = 1;
+
+			switch (bul->direct)
+			{
+				case 0:
+					bul->xm = -0x200;
+					break;
+				case 1:
+					bul->ym = -0x200;
+					break;
+				case 2:
+					bul->xm = 0x200;
+					break;
+				case 3:
+					bul->ym = 0x200;
+					break;
+			}
+
+			static unsigned int inc;
+			++inc;
+
+			switch (bul->direct)
+			{
+				case 0:
+				case 2:
+					if (inc % 2)
+						bul->ym = 0x400;
+					else
+						bul->ym = -0x400;
+
+					break;
+
+				case 1:
+				case 3:
+					if (inc % 2)
+						bul->xm = -0x400;
+					else
+						bul->xm = 0x400;
+
+					break;
+			}
+		}
+
+		if ( ++bul->ani_wait > 0 )
+		{
+			bul->ani_wait = 0;
+			++bul->ani_no;
+		}
+
+		if ( bul->ani_no > 2 )
+			bul->ani_no = 0;
+
+		RECT rect[3];
+
+		rect[0] = {192, 16, 208, 32};
+		rect[1] = {208, 16, 224, 32};
+		rect[2] = {224, 16, 240, 32};
+
+		bul->rect = rect[bul->ani_no];
+
+		if (level == 2)
+			SetNpChar(129, bul->x, bul->y, 0, -0x200, bul->ani_no, 0, 0x100);
+		else
+			SetNpChar(129, bul->x, bul->y, 0, -0x200, bul->ani_no + 3, 0, 0x100);
+	}
+}
+
 void ActBullet_PoleStar(BULLET *bul, int level)
 {
 	if (++bul->count1 <= bul->life_count)
@@ -1091,6 +1283,332 @@ void ActBullet_Spine(BULLET *bul)
 	}
 }
 
+void ActBullet_Sword1(BULLET *bul)
+{
+	if (++bul->count1 > bul->life_count)
+	{
+		bul->cond = 0;
+		SetCaret(bul->x, bul->y, 3, 0);
+	}
+	else
+	{
+		if (bul->count1 == 3)
+			bul->bbits &= ~4;
+
+		if (bul->count1 % 5 == 1)
+			PlaySoundObject(34, 1);
+
+		if (bul->act_no)
+		{
+			bul->x += bul->xm;
+			bul->y += bul->ym;
+		}
+		else
+		{
+			bul->act_no = 1;
+
+			switch (bul->direct)
+			{
+				case 0:
+					bul->xm = -0x800;
+					break;
+				case 1:
+					bul->ym = -0x800;
+					break;
+				case 2:
+					bul->xm = 0x800;
+					break;
+				case 3:
+					bul->ym = 0x800;
+					break;
+			}
+		}
+
+		RECT rcLeft[4];
+		RECT rcRight[4];
+
+		rcLeft[0] = {0, 48, 16, 64};
+		rcLeft[1] = {16, 48, 32, 64};
+		rcLeft[2] = {32, 48, 48, 64};
+		rcLeft[3] = {48, 48, 64, 64};
+
+		rcRight[0] = {64, 48, 80, 64};
+		rcRight[1] = {80, 48, 96, 64};
+		rcRight[2] = {96, 48, 112, 64};
+		rcRight[3] = {112, 48, 128, 64};
+
+		if (++bul->ani_wait > 1)
+		{
+			bul->ani_wait = 0;
+			++bul->ani_no;
+		}
+
+		if (bul->ani_no > 3)
+			bul->ani_no = 0;
+
+		if (bul->direct == 0)
+			bul->rect = rcLeft[bul->ani_no];
+		else
+			bul->rect = rcRight[bul->ani_no];
+	}
+}
+
+void ActBullet_Sword2(BULLET *bul)
+{
+	if (++bul->count1 > bul->life_count)
+	{
+		bul->cond = 0;
+		SetCaret(bul->x, bul->y, 3, 0);
+	}
+	else
+	{
+		if (bul->count1 == 3)
+			bul->bbits &= ~4;
+
+		if (bul->count1 % 7 == 1)
+			PlaySoundObject(106, 1);
+
+		if (bul->act_no)
+		{
+			bul->x += bul->xm;
+			bul->y += bul->ym;
+		}
+		else
+		{
+			bul->act_no = 1;
+
+			switch (bul->direct)
+			{
+				case 0:
+					bul->xm = -0x800;
+					break;
+				case 1:
+					bul->ym = -0x800;
+					break;
+				case 2:
+					bul->xm = 0x800;
+					break;
+				case 3:
+					bul->ym = 0x800;
+					break;
+			}
+		}
+
+		RECT rcLeft[4];
+		RECT rcRight[4];
+
+		rcLeft[0] = {160, 48, 184, 72};
+		rcLeft[1] = {184, 48, 208, 72};
+		rcLeft[2] = {208, 48, 232, 72};
+		rcLeft[3] = {232, 48, 256, 72};
+
+		rcRight[0] = {160, 72, 184, 96};
+		rcRight[1] = {184, 72, 208, 96};
+		rcRight[2] = {208, 72, 232, 96};
+		rcRight[3] = {232, 72, 256, 96};
+
+		if (++bul->ani_wait > 1)
+		{
+			bul->ani_wait = 0;
+			++bul->ani_no;
+		}
+
+		if (bul->ani_no > 3)
+			bul->ani_no = 0;
+
+		if (bul->direct == 0)
+			bul->rect = rcLeft[bul->ani_no];
+		else
+			bul->rect = rcRight[bul->ani_no];
+	}
+}
+
+void ActBullet_Sword3(BULLET *bul)
+{
+	RECT rcLeft[2];
+	RECT rcUp[2];
+	RECT rcDown[2];
+	RECT rcRight[2];
+
+	rcLeft[0] = {272, 0, 296, 24};
+	rcLeft[1] = {296, 0, 320, 24};
+
+	rcUp[0] = {272, 48, 296, 72};
+	rcUp[1] = {296, 0, 320, 24};
+
+	rcRight[0] = {272, 24, 296, 48};
+	rcRight[1] = {296, 24, 320, 48};
+
+	rcDown[0] = {296, 48, 320, 72};
+	rcDown[1] = {296, 24, 320, 48};
+
+	switch (bul->act_no)
+	{
+		case 0:
+			bul->act_no = 1;
+			bul->xm = 0;
+			bul->ym = 0;
+			// Fallthrough
+		case 1:
+			switch (bul->direct)
+			{
+				case 0:
+					bul->xm = -0x800;
+					break;
+				case 1:
+					bul->ym = -0x800;
+					break;
+				case 2:
+					bul->xm = 0x800;
+					break;
+				case 3:
+					bul->ym = 0x800;
+					break;
+			}
+
+			if (bul->life != 100)
+			{
+				bul->act_no = 2;
+				bul->ani_no = 1;
+				bul->damage = -1;
+				bul->act_wait = 0;
+			}
+
+			if (++bul->act_wait % 4 == 1)
+			{
+				PlaySoundObject(106, 1);
+
+				if (++bul->count1 % 2)
+					SetBullet(23, bul->x, bul->y, 0);
+				else
+					SetBullet(23, bul->x, bul->y, 2);
+			}
+
+			if ( ++bul->count1 == 5 )
+				bul->bbits &= ~4u;
+
+			if (bul->count1 > bul->life_count)
+			{
+				bul->cond = 0;
+				SetCaret(bul->x, bul->y, 3, 0);
+				return;
+			}
+
+			break;
+
+		case 2:
+			bul->xm = 0;
+			bul->ym = 0;
+			++bul->act_wait;
+
+			if (Random(-1, 1) == 0)
+			{
+				PlaySoundObject(106, 1);
+
+				if (Random(0, 1) % 2)
+					SetBullet(23, bul->x + (Random(-0x40, 0x40) * 0x200), bul->y + (Random(-0x40, 0x40) * 0x200), 0);
+				else
+					SetBullet(23, bul->x + (Random(-0x40, 0x40) * 0x200), bul->y + (Random(-0x40, 0x40) * 0x200), 2);
+			}
+
+			if (bul->act_wait > 50)
+				bul->cond = 0;
+	}
+
+	bul->x += bul->xm;
+	bul->y += bul->ym;
+
+	switch (bul->direct)
+	{
+		case 0:
+			bul->rect = rcLeft[bul->ani_no];
+			break;
+		case 1:
+			bul->rect = rcUp[bul->ani_no];
+			break;
+		case 2:
+			bul->rect = rcRight[bul->ani_no];
+			break;
+		case 3:
+			bul->rect = rcDown[bul->ani_no];
+			break;
+	}
+
+	if (bul->act_wait % 2)
+		bul->rect.right = 0;
+}
+
+void ActBullet_Edge(BULLET *bul)
+{
+	RECT rcLeft[5];
+	RECT rcRight[5];
+
+	switch (bul->act_no)
+	{
+		case 0:
+			bul->act_no = 1;
+			bul->y -= 0x1800;
+
+			if (bul->direct == 0)
+				bul->x += 0x2000;
+			else
+				bul->x -= 0x2000;
+			// Fallthrough
+		case 1:
+			if (++bul->ani_wait > 2)
+			{
+				bul->ani_wait = 0;
+				++bul->ani_no;
+			}
+
+			if (bul->direct == 0)
+				bul->x -= 0x400;
+			else
+				bul->x += 0x400;
+
+			bul->y += 0x400;
+
+			if (bul->ani_no == 1)
+				bul->damage = 2;
+			else
+				bul->damage = 1;
+
+			if (bul->ani_no > 4)
+				bul->cond = 0;
+
+			break;
+	}
+
+	rcLeft[0] = {0, 64, 24, 88};
+	rcLeft[1] = {24, 64, 48, 88};
+	rcLeft[2] = {48, 64, 72, 88};
+	rcLeft[3] = {72, 64, 96, 88};
+	rcLeft[4] = {96, 64, 120, 88};
+
+	rcRight[0] = {0, 88, 24, 112};
+	rcRight[1] = {24, 88, 48, 112};
+	rcRight[2] = {48, 88, 72, 112};
+	rcRight[3] = {72, 88, 96, 112};
+	rcRight[4] = {96, 88, 120, 112};
+
+	if (bul->direct == 0)
+		bul->rect = rcLeft[bul->ani_no];
+	else
+		bul->rect = rcRight[bul->ani_no];
+}
+
+void ActBullet_Drop(BULLET *bul)
+{
+	RECT rc[1];
+
+	rc[0] = {0, 0, 0, 0};
+
+	if (++bul->act_wait > 2)
+		bul->cond = 0;
+
+	bul->rect = rc[0];
+}
+
 void ActBullet_SuperMissile(BULLET *bul, int level)
 {
 	if (++bul->count1 > bul->life_count)
@@ -1344,6 +1862,313 @@ void ActBullet_SuperBom(BULLET *bul, int level)
 	}
 }
 
+void ActBullet_Nemesis(BULLET *bul, int level)
+{
+	if (++bul->count1 > bul->life_count)
+	{
+		bul->cond = 0;
+		SetCaret(bul->x, bul->y, 3, 0);
+	}
+	else
+	{
+		if (bul->act_no)
+		{
+			if (level == 1 && bul->count1 % 4 == 1)
+			{
+				switch (bul->direct)
+				{
+					case 0:
+						SetNpChar(4, bul->x, bul->y, -0x200, Random(-0x200, 0x200), 2, 0, 0x100);
+						break;
+					case 1:
+						SetNpChar(4, bul->x, bul->y, Random(-0x200, 0x200), -0x200, 2, 0, 0x100);
+						break;
+					case 2:
+						SetNpChar(4, bul->x, bul->y, 0x200, Random(-0x200, 0x200), 2, 0, 0x100);
+						break;
+					case 3:
+						SetNpChar(4, bul->x, bul->y, Random(-0x200, 0x200), 0x200, 2, 0, 0x100);
+						break;
+				}
+			}
+
+			bul->x += bul->xm;
+			bul->y += bul->ym;
+		}
+		else
+		{
+			bul->act_no = 1;
+			bul->count1 = 0;
+
+			switch (bul->direct)
+			{
+				case 0:
+					bul->xm = -0x1000;
+					break;
+				case 1:
+					bul->ym = -0x1000;
+					break;
+				case 2:
+					bul->xm = 0x1000;
+					break;
+				case 3:
+					bul->ym = 0x1000;
+					break;
+			}
+
+			if (level == 3)
+			{
+				bul->xm /= 3;
+				bul->ym /= 3;
+			}
+		}
+
+		if (++bul->ani_no > 1)
+			bul->ani_no = 0;
+
+		RECT rcL[2];
+		RECT rcU[2];
+		RECT rcR[2];
+		RECT rcD[2];
+
+		rcL[0] = {0, 112, 32, 128};
+		rcL[1] = {0, 128, 32, 144};
+
+		rcU[0] = {32, 112, 48, 144};
+		rcU[1] = {48, 112, 64, 144};
+
+		rcR[0] = {64, 112, 96, 128};
+		rcR[1] = {64, 128, 96, 144};
+
+		rcD[0] = {96, 112, 112, 144};
+		rcD[1] = {112, 112, 128, 144};
+
+		switch (bul->direct)
+		{
+			case 0:
+				bul->rect = rcL[bul->ani_no];
+				break;
+			case 1:
+				bul->rect = rcU[bul->ani_no];
+				break;
+			case 2:
+				bul->rect = rcR[bul->ani_no];
+				break;
+			case 3:
+				bul->rect = rcD[bul->ani_no];
+				break;
+		}
+
+		bul->rect.top += 32 * ((level - 1) / 2);
+		bul->rect.bottom += 32 * ((level - 1) / 2);
+		bul->rect.left += (level - 1) % 2 << 7;
+		bul->rect.right += (level - 1) % 2 << 7;
+	}
+}
+
+void ActBullet_Spur(BULLET *bul, int level)
+{
+	if (++bul->count1 > bul->life_count)
+	{
+		bul->cond = 0;
+		SetCaret(bul->x, bul->y, 3, 0);
+	}
+	else
+	{
+		if (bul->damage && bul->life != 100)
+			bul->damage = 0;
+
+		if (bul->act_no)
+		{
+			bul->x += bul->xm;
+			bul->y += bul->ym;
+		}
+		else
+		{
+			bul->act_no = 1;
+
+			switch (bul->direct)
+			{
+				case 0:
+					bul->xm = -0x1000;
+					break;
+				case 1:
+					bul->ym = -0x1000;
+					break;
+				case 2:
+					bul->xm = 0x1000;
+					break;
+				case 3:
+					bul->ym = 0x1000;
+					break;
+			}
+
+			if (level == 1)
+			{
+				switch (bul->direct)
+				{
+					case 0:
+						bul->enemyYL = 0x400;
+						break;
+					case 1:
+						bul->enemyXL = 0x400;
+						break;
+					case 2:
+						bul->enemyYL = 0x400;
+						break;
+					case 3:
+						bul->enemyXL = 0x400;
+						break;
+				}
+			}
+			else if (level == 2)
+			{
+				switch (bul->direct)
+				{
+					case 0:
+						bul->enemyYL = 0x800;
+						break;
+					case 1:
+						bul->enemyXL = 0x800;
+						break;
+					case 2:
+						bul->enemyYL = 0x800;
+						break;
+					case 3:
+						bul->enemyXL = 0x800;
+						break;
+				}
+			}
+		}
+
+		RECT rect1[2];
+		RECT rect2[2];
+		RECT rect3[2];
+
+		rect1[0] = {128, 32, 144, 48};
+		rect1[1] = {144, 32, 160, 48};
+
+		rect2[0] = {160, 32, 176, 48};
+		rect2[1] = {176, 32, 192, 48};
+
+		rect3[0] = {128, 48, 144, 64};
+		rect3[1] = {144, 48, 160, 64};
+
+		bul->damage = bul->life;
+
+		switch (level)
+		{
+			case 1:
+				if (bul->direct == 1 || bul->direct == 3)
+					bul->rect = rect1[1];
+				else
+					bul->rect = rect1[0];
+
+				break;
+
+			case 2:
+				if (bul->direct == 1 || bul->direct == 3)
+					bul->rect = rect2[1];
+				else
+					bul->rect = rect2[0];
+
+				break;
+
+			case 3:
+				if (bul->direct == 1 || bul->direct == 3)
+					bul->rect = rect3[1];
+				else
+					bul->rect = rect3[0];
+
+				break;
+		}
+
+		SetBullet(level + 39, bul->x, bul->y, bul->direct);
+	}
+}
+
+void ActBullet_SpurTail(BULLET *bul, int level)
+{
+	if ( ++bul->count1 > 20 )
+		bul->ani_no = bul->count1 - 20;
+	if ( bul->ani_no > 2 )
+		bul->cond = 0;
+	if ( bul->damage && bul->life != 100 )
+		bul->damage = 0;
+
+	RECT rc_h_lv1[3];
+	RECT rc_v_lv1[3];
+	RECT rc_h_lv2[3];
+	RECT rc_v_lv2[3];
+	RECT rc_h_lv3[3];
+	RECT rc_v_lv3[3];
+
+	rc_h_lv1[0] = {192, 32, 200, 40};
+	rc_h_lv1[1] = {200, 32, 208, 40};
+	rc_h_lv1[2] = {208, 32, 216, 40};
+
+	rc_v_lv1[0] = {192, 40, 200, 48};
+	rc_v_lv1[1] = {200, 40, 208, 48};
+	rc_v_lv1[2] = {208, 40, 216, 48};
+
+	rc_h_lv2[0] = {216, 32, 224, 40};
+	rc_h_lv2[1] = {224, 32, 232, 40};
+	rc_h_lv2[2] = {232, 32, 240, 40};
+
+	rc_v_lv2[0] = {216, 40, 224, 48};
+	rc_v_lv2[1] = {224, 40, 232, 48};
+	rc_v_lv2[2] = {232, 40, 240, 48};
+
+	rc_h_lv3[0] = {240, 32, 248, 40};
+	rc_h_lv3[1] = {248, 32, 256, 40};
+	rc_h_lv3[2] = {256, 32, 264, 40};
+
+	rc_v_lv3[0] = {240, 32, 248, 40};
+	rc_v_lv3[1] = {248, 32, 256, 40};
+	rc_v_lv3[2] = {256, 32, 264, 40};
+
+	switch (level)
+	{
+		case 1:
+			if (bul->direct == 0 || bul->direct == 2)
+				bul->rect = rc_h_lv1[bul->ani_no];
+			else
+				bul->rect = rc_v_lv1[bul->ani_no];
+
+			break;
+
+		case 2:
+			if (bul->direct == 0 || bul->direct == 2)
+				bul->rect = rc_h_lv2[bul->ani_no];
+			else
+				bul->rect = rc_v_lv2[bul->ani_no];
+
+			break;
+
+		case 3:
+			if (bul->direct == 0 || bul->direct == 2)
+				bul->rect = rc_h_lv3[bul->ani_no];
+			else
+				bul->rect = rc_v_lv3[bul->ani_no];
+
+			break;
+	}
+}
+
+void ActBullet_EnemyClear(BULLET *bul)
+{
+	if (++bul->count1 > bul->life_count)
+	{
+		bul->cond = 0;
+	}
+	else
+	{
+		bul->damage = 10000;
+		bul->enemyXL = 0xC8000;
+		bul->enemyYL = 0xC8000;
+	}
+}
+
 void ActBullet_Star(BULLET *bul)
 {
 	if (++bul->count1 > bul->life_count)
@@ -1360,6 +2185,15 @@ void ActBullet()
 			{
 				switch (gBul[i].code_bullet)
 				{
+					case 1:
+						ActBullet_Frontia1(&gBul[i]);
+						break;
+					case 2:
+						ActBullet_Frontia2(&gBul[i], 2);
+						break;
+					case 3:
+						ActBullet_Frontia2(&gBul[i], 3);
+						break;
 					case 4:
 						ActBullet_PoleStar(&gBul[i], 1);
 						break;
@@ -1417,7 +2251,21 @@ void ActBullet()
 					case 22:
 						ActBullet_Spine(&gBul[i]);
 						break;
-					// TODO everything else
+					case 23:
+						ActBullet_Edge(&gBul[i]);
+						break;
+					case 24:
+						ActBullet_Drop(&gBul[i]);
+						break;
+					case 25:
+						ActBullet_Sword1(&gBul[i]);
+						break;
+					case 26:
+						ActBullet_Sword2(&gBul[i]);
+						break;
+					case 27:
+						ActBullet_Sword3(&gBul[i]);
+						break;
 					case 28:
 						ActBullet_SuperMissile(&gBul[i], 1);
 						break;
@@ -1435,6 +2283,39 @@ void ActBullet()
 						break;
 					case 33:
 						ActBullet_SuperBom(&gBul[i], 3);
+						break;
+					case 34:
+						ActBullet_Nemesis(&gBul[i], 1);
+						break;
+					case 35:
+						ActBullet_Nemesis(&gBul[i], 2);
+						break;
+					case 36:
+						ActBullet_Nemesis(&gBul[i], 3);
+						break;
+					case 37:
+						ActBullet_Spur(&gBul[i], 1);
+						break;
+					case 38:
+						ActBullet_Spur(&gBul[i], 2);
+						break;
+					case 39:
+						ActBullet_Spur(&gBul[i], 3);
+						break;
+					case 40:
+						ActBullet_SpurTail(&gBul[i], 1);
+						break;
+					case 41:
+						ActBullet_SpurTail(&gBul[i], 2);
+						break;
+					case 42:
+						ActBullet_SpurTail(&gBul[i], 3);
+						break;
+					case 43:
+						ActBullet_Nemesis(&gBul[i], 1);
+						break;
+					case 44:
+						ActBullet_EnemyClear(&gBul[i]);
 						break;
 					case 45:
 						ActBullet_Star(&gBul[i]);

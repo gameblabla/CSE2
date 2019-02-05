@@ -9,6 +9,7 @@
 #include "Sound.h"
 #include "Main.h"
 #include "Game.h"
+#include "Shoot.h"
 
 int gArmsEnergyX = 16;
 
@@ -457,7 +458,7 @@ int RotationArms()
 	if (!arms_num)
 		return 0;
 	
-	//ResetSpurCharge();
+	ResetSpurCharge();
 	
 	++gSelectedArms;
 	while (gSelectedArms < arms_num && !gArmsData[gSelectedArms].code)
@@ -479,7 +480,7 @@ int RotationArmsRev()
 	if (!arms_num)
 		return 0;
 	
-	//ResetSpurCharge();
+	ResetSpurCharge();
 	
 	if (--gSelectedArms < 0)
 		gSelectedArms = arms_num - 1;
