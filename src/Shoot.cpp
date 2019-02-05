@@ -886,7 +886,7 @@ void ShootBullet_Spur(int level)
 		bMax = false;
 	}
 
-	if (gKey & gKeyShot == 0)
+	if (!(gKey & gKeyShot))
 		ZeroExpMyChar();
 
 	switch (level)
