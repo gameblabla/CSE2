@@ -10,6 +10,7 @@
 #include "Triangle.h"
 #include "Frame.h"
 #include "Caret.h"
+#include "Bullet.h"
 
 //Grate
 void ActNpc100(NPCHAR *npc)
@@ -1451,6 +1452,206 @@ void ActNpc117(NPCHAR *npc)
 
 	npc->x += npc->xm;
 	npc->y += npc->ym;
+
+	if (npc->direct == 0)
+		npc->rect = rcLeft[npc->ani_no];
+	else
+		npc->rect = rcRight[npc->ani_no];
+}
+
+//Curly (boss)
+void ActNpc118(NPCHAR *npc)
+{
+	RECT rcLeft[9];
+	RECT rcRight[9];
+
+	rcLeft[0] = {0, 32, 32, 56};
+	rcLeft[1] = {32, 32, 64, 56};
+	rcLeft[2] = {64, 32, 96, 56};
+	rcLeft[3] = {96, 32, 128, 56};
+	rcLeft[4] = {0, 32, 32, 56};
+	rcLeft[5] = {128, 32, 160, 56};
+	rcLeft[6] = {0, 32, 32, 56};
+	rcLeft[7] = {0, 32, 32, 56};
+	rcLeft[8] = {160, 32, 192, 56};
+
+	rcRight[0] = {0, 56, 32, 80};
+	rcRight[1] = {32, 56, 64, 80};
+	rcRight[2] = {64, 56, 96, 80};
+	rcRight[3] = {96, 56, 128, 80};
+	rcRight[4] = {0, 56, 32, 80};
+	rcRight[5] = {128, 56, 160, 80};
+	rcRight[6] = {0, 56, 32, 80};
+	rcRight[7] = {0, 56, 32, 80};
+	rcRight[8] = {160, 56, 192, 80};
+
+	bool bUpper = false;
+
+	if (npc->direct == 0 && gMC.x > npc->x)
+		bUpper = true;
+	if ( npc->direct == 2 && gMC.x < npc->x)
+		bUpper = true;
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->ani_no = 0;
+			npc->ani_wait = 0;
+			break;
+
+		case 10:
+			npc->act_no = 11;
+			npc->act_wait = Random(50, 100);
+			npc->ani_no = 0;
+
+			if (gMC.x < npc->x)
+				npc->direct = 0;
+			else
+				npc->direct = 2;
+
+			npc->bits |= 0x20u;
+			npc->bits &= ~4u;
+			// Fallthrough
+		case 11:
+			if (npc->act_wait)
+				--npc->act_wait;
+			else
+				npc->act_no = 13;
+
+			break;
+
+		case 13:
+			npc->act_no = 14;
+			npc->ani_no = 3;
+			npc->act_wait = Random(50, 100);
+
+			if (gMC.x < npc->x)
+				npc->direct = 0;
+			else
+				npc->direct = 2;
+			// Fallthrough
+		case 14:
+			if (++npc->ani_wait > 2)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no > 6)
+				npc->ani_no = 3;
+
+			if (npc->direct == 0)
+				npc->xm -= 0x40;
+			else
+				npc->xm += 0x40;
+
+			if (npc->act_wait)
+			{
+				--npc->act_wait;
+			}
+			else
+			{
+				npc->bits |= 0x20u;
+				npc->act_no = 20;
+				npc->act_wait = 0;
+				PlaySoundObject(103, 1);
+			}
+
+			break;
+
+		case 20:
+			if (gMC.x < npc->x)
+				npc->direct = 0;
+			else
+				npc->direct = 2;
+
+			npc->xm = 8 * npc->xm / 9;
+
+			if (++npc->ani_no > 1)
+				npc->ani_no = 0;
+
+			if (++npc->act_wait > 50)
+			{
+				npc->act_no = 21;
+				npc->act_wait = 0;
+			}
+
+			break;
+
+		case 21:
+			if (++npc->act_wait % 4 == 1)
+			{
+				if (npc->direct == 0)
+				{
+					if (bUpper)
+					{
+						npc->ani_no = 2;
+						SetNpChar(123, npc->x, npc->y - 0x1000, 0, 0, 1, 0, 0x100);
+					}
+					else
+					{
+						npc->ani_no = 0;
+						SetNpChar(123, npc->x - 0x1000, npc->y + 0x800, 0, 0, 0, 0, 0x100);
+						npc->x += 0x200;
+					}
+				}
+				else
+				{
+					if (bUpper)
+					{
+						npc->ani_no = 2;
+						SetNpChar(123, npc->x, npc->y - 0x1000, 0, 0, 1, 0, 0x100);
+					}
+					else
+					{
+						npc->ani_no = 0;
+						SetNpChar(123, npc->x + 0x1000, npc->y + 0x800, 0, 0, 2, 0, 0x100);
+						npc->x -= 0x200;
+					}
+				}
+			}
+
+			if (npc->act_wait > 30)
+				npc->act_no = 10;
+
+			break;
+
+		case 30:
+			if (++npc->ani_no > 8)
+				npc->ani_no = 7;
+
+			if (++npc->act_wait > 30)
+			{
+				npc->act_no = 10;
+				npc->ani_no = 0;
+			}
+
+			break;
+	}
+
+	if (npc->act_no > 10 && npc->act_no < 30 && CountArmsBullet(6))
+	{
+		npc->act_wait = 0;
+		npc->act_no = 30;
+		npc->ani_no = 7;
+		npc->bits &= ~0x20;
+		npc->bits |= 4;
+		npc->xm = 0;
+	}
+
+	npc->ym += 0x20;
+
+	if (npc->xm > 0x1FF)
+		npc->xm = 0x1FF;
+	if (npc->xm < -0x1FF)
+		npc->xm = -0x1FF;
+
+	if (npc->ym > 0x5FF)
+		npc->ym = 0x5FF;
+
+	npc->y += npc->ym;
+	npc->x += npc->xm;
 
 	if (npc->direct == 0)
 		npc->rect = rcLeft[npc->ani_no];

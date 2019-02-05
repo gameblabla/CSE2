@@ -114,8 +114,12 @@ void ActNpc114(NPCHAR *npc);
 void ActNpc115(NPCHAR *npc);
 void ActNpc116(NPCHAR *npc);
 void ActNpc117(NPCHAR *npc);
-
+void ActNpc118(NPCHAR *npc);
 void ActNpc119(NPCHAR *npc);
+void ActNpc120(NPCHAR *npc);
+void ActNpc121(NPCHAR *npc);
+void ActNpc122(NPCHAR *npc);
+void ActNpc123(NPCHAR *npc);
 
 void ActNpc125(NPCHAR *npc);
 
