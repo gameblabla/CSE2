@@ -42,6 +42,7 @@ SOURCES = \
 	ArmsItem \
 	Back \
 	Boss \
+	BossFrog \
 	BossLife \
 	BossOhm \
 	BulHit \
@@ -76,6 +77,7 @@ SOURCES = \
 	NpcAct100 \
 	NpcAct120 \
 	NpcAct140 \
+	NpcAct180 \
 	NpcAct200 \
 	NpcAct260 \
 	NpcAct280 \
