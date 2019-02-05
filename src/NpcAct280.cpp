@@ -8,6 +8,13 @@
 #include "Sound.h"
 #include "Back.h"
 #include "Triangle.h"
+#include "Frame.h"
+
+//Quake
+void ActNpc292(NPCHAR *npc)
+{
+	SetQuake(10);
+}
 
 //Doctor (opening)
 void ActNpc298(NPCHAR *npc)
