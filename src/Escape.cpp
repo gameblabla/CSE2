@@ -1,6 +1,7 @@
-#include "Escape.h"
-
 #include "WindowsWrapper.h"
+
+#include "CommonDefines.h"
+#include "Escape.h"
 #include "Draw.h"
 #include "KeyControl.h"
 #include "Main.h"
@@ -9,7 +10,7 @@ int Call_Escape()
 {
 	RECT rc = {0, 128, 208, 144};
 	
-	do
+	while (Flip_SystemTask())
 	{
 		//Get pressed keys
 		GetTrg();
@@ -32,10 +33,9 @@ int Call_Escape()
 		
 		//Draw screen
 		CortBox(&grcFull, 0x000000);
-		PutBitmap3(&grcFull, 56, 112, &rc, 26);
+		PutBitmap3(&grcFull, (WINDOW_WIDTH - 208) / 2, (WINDOW_HEIGHT - 16) / 2, &rc, 26);
 		PutFramePerSecound();
 	}
-	while (Flip_SystemTask());
 	
 	//Quit if window is closed
 	gKeyTrg = 0;
