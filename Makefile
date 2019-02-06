@@ -1,18 +1,18 @@
 ifeq ($(RELEASE), 1)
 CXXFLAGS := -O3 -s
-FILENAME := release
+FILENAME ?= release
 else
 CXXFLAGS := -O0 -g
-FILENAME := debug
+FILENAME ?= debug
 endif
 
 ifeq ($(JAPANESE), 1)
 CXXFLAGS += -DJAPANESE
 LIBS += -liconv
 	ifeq ($(RELEASE), 1)
-	FILENAME := releasejp
+	FILENAME ?= releasejp
 	else
-	FILENAME := debugjp
+	FILENAME ?= debugjp
 	endif
 endif
 
@@ -21,12 +21,11 @@ CXXFLAGS += -DFIX_BUGS
 endif
 
 ifeq ($(WINDOWS), 1)
+	ifeq ($(CONSOLE), 1)
+		CXXFLAGS += -mconsole
+	endif
 	CXXFLAGS += -DWINDOWS
 	LIBS += -lkernel32
-endif
-
-ifeq ($(CONSOLE), 1)
-	CXXFLAGS += -mconsole
 endif
 
 CXXFLAGS += `sdl2-config --cflags` `pkg-config freetype2 --cflags`
