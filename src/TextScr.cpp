@@ -473,7 +473,7 @@ void PutTextScript()
 			
 			PutBitmap3(&grcFull, (WINDOW_WIDTH + 112) / 2, i, &rect_yesno, 26);
 			if (gTS.wait == 16)
-				PutBitmap3(&grcFull, 41 * gTS.select + (WINDOW_WIDTH + 102) / 2, 154, &rect_cur, 26);
+				PutBitmap3(&grcFull, 41 * gTS.select + (WINDOW_WIDTH + 102) / 2, WINDOW_HEIGHT - 86, &rect_cur, 26);
 		}
 	}
 }
