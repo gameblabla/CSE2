@@ -1694,3 +1694,127 @@ void ActNpc156(NPCHAR *npc)
 		npc->cond = 0;
 	}
 }
+
+//Moving block (vertical)
+void ActNpc157(NPCHAR *npc)
+{
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->x += 0x1000;
+			npc->y += 0x1000;
+
+			if (npc->direct == 0)
+				npc->act_no = 10;
+			else
+				npc->act_no = 20;
+
+			npc->xm = 0;
+			npc->ym = 0;
+			npc->bits |= 0x40;
+			break;
+
+		case 10:
+			npc->bits &= ~0x80;
+			npc->damage = 0;
+
+			if (gMC.y < npc->y + 0x3200 && gMC.y > npc->y - 0x32000 && gMC.x < npc->x + 0x3200 && gMC.x > npc->x - 0x3200)
+			{
+				npc->act_no = 11;
+				npc->act_wait = 0;
+			}
+
+			break;
+
+		case 11:
+			if (++npc->act_wait % 10 == 6)
+				PlaySoundObject(107, 1);
+
+			if (npc->flag & 2)
+			{
+				npc->ym = 0;
+				npc->direct = 2;
+				npc->act_no = 20;
+				SetQuake(10);
+				PlaySoundObject(26, 1);
+
+				for (int i = 0; i < 4; ++i)
+					SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y - 0x2000, Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+			}
+			else
+			{
+				if (gMC.flag & 2)
+				{
+					npc->bits |= 0x80;
+					npc->damage = 100;
+				}
+				else
+				{
+					npc->bits &= ~0x80;
+					npc->damage = 0;
+				}
+
+				npc->ym -= 0x20;
+			}
+
+			break;
+
+		case 20:
+			npc->bits &= ~0x80;
+			npc->damage = 0;
+
+			if (gMC.y > npc->y - 0x3200 && gMC.y < npc->y + 0x32000 && gMC.x < npc->x + 0x3200 && gMC.x > npc->x - 0x3200)
+			{
+				npc->act_no = 21;
+				npc->act_wait = 0;
+			}
+
+			break;
+
+		case 21:
+			if (++npc->act_wait % 10 == 6)
+				PlaySoundObject(107, 1);
+
+			if (npc->flag & 8)
+			{
+				npc->ym = 0;
+				npc->direct = 0;
+				npc->act_no = 10;
+				SetQuake(10);
+				PlaySoundObject(26, 1);
+
+				for (int i = 0; i < 4; ++i)
+					SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + 0x2000, Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+			}
+			else
+			{
+				if (gMC.flag & 8)
+				{
+					npc->bits |= 0x80;
+					npc->damage = 100;
+				}
+				else
+				{
+					npc->bits &= ~0x80;
+					npc->damage = 0;
+				}
+
+				npc->ym += 0x20;
+			}
+
+			break;
+	}
+
+	if (npc->ym > 0x200)
+		npc->ym = 0x200;
+	if (npc->ym < -0x200)
+		npc->ym = -0x200;
+
+	npc->y += npc->ym;
+
+	RECT rect[1];
+
+	rect[0] = {16, 0, 48, 32};
+
+	npc->rect = rect[0];
+}
