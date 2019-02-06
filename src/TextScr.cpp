@@ -673,6 +673,14 @@ int TextScriptProc()
 						SubArmsData(z);
 						gTS.p_read += 8;
 					}
+					else if (IS_COMMAND('T','A','M'))
+					{
+						x = GetTextScriptNo(gTS.p_read + 4);
+						y = GetTextScriptNo(gTS.p_read + 9);
+						z = GetTextScriptNo(gTS.p_read + 14);
+						TradeArms(x, y, z);
+						gTS.p_read += 18;
+					}
 					else if (IS_COMMAND('P','S','+'))
 					{
 						x = GetTextScriptNo(gTS.p_read + 4);
