@@ -4,7 +4,7 @@
 # Misc
 /obj
 Config.dat
-Profile.dat
+*rofile.dat
 build.7z
 build.zip
 
