@@ -1,7 +1,8 @@
-#include "Flash.h"
-
-#include "Draw.h"
 #include "WindowsWrapper.h"
+
+#include "Flash.h"
+#include "Draw.h"
+#include "CommonDefines.h"
 
 static struct
 {
@@ -50,26 +51,26 @@ void ActFlash_Explosion(int flx, int fly)
 			right = 0;
 		if (left < 0)
 			left = 0;
-		if (top > 320)
-			top = 320;
-		if (bottom > 240)
-			bottom = 240;
+		if (top > WINDOW_WIDTH)
+			top = WINDOW_WIDTH;
+		if (bottom > WINDOW_HEIGHT)
+			bottom = WINDOW_HEIGHT;
 
 		flash.rect1.left = right;
 		flash.rect1.right = top;
 		flash.rect1.top = 0;
-		flash.rect1.bottom = 240;
+		flash.rect1.bottom = WINDOW_HEIGHT;
 
 		flash.rect2.left = 0;
-		flash.rect2.right = 320;
+		flash.rect2.right = WINDOW_WIDTH;
 		flash.rect2.top = left;
 		flash.rect2.bottom = bottom;
 
-		if (flash.width > 0xA0000)
+		if (flash.width > (WINDOW_WIDTH << 11))
 		{
 			flash.act_no = 1;
 			flash.cnt = 0;
-			flash.width = 0x1E000;
+			flash.width = (WINDOW_HEIGHT << 9);
 		}
 	}
 	else if (flash.act_no == 1)
@@ -84,8 +85,8 @@ void ActFlash_Explosion(int flx, int fly)
 			top = 0;
 
 		int bottom = (flash.width + flash.y - fly) / 0x200;
-		if (bottom > 240)
-			bottom = 240;
+		if (bottom > WINDOW_HEIGHT)
+			bottom = WINDOW_HEIGHT;
 
 		flash.rect1.left = 0;
 		flash.rect1.right = 0;
@@ -95,7 +96,7 @@ void ActFlash_Explosion(int flx, int fly)
 		flash.rect2.top = top;
 		flash.rect2.bottom = bottom;
 		flash.rect2.left = 0;
-		flash.rect2.right = 320;
+		flash.rect2.right = WINDOW_WIDTH;
 	}
 }
 
@@ -111,9 +112,9 @@ void ActFlash_Flash(void)
 	if (flash.cnt / 2 % 2)
 	{
 		flash.rect2.top = 0;
-		flash.rect2.bottom = 240;
+		flash.rect2.bottom = WINDOW_HEIGHT;
 		flash.rect2.left = 0;
-		flash.rect2.right = 320;
+		flash.rect2.right = WINDOW_WIDTH;
 	}
 	else
 	{

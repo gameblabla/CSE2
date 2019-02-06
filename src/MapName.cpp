@@ -46,12 +46,12 @@ void PutMapName(bool bMini)
 		//Map system
 		RECT rcBack = {0, 7, WINDOW_WIDTH, 24};
 		CortBox(&rcBack, 0x000000);
-		PutBitmap3(&grcGame, 74, 10, &rc, SURFACE_ID_ROOM_NAME);
+		PutBitmap3(&grcGame, (WINDOW_WIDTH - 172) / 2, 10, &rc, SURFACE_ID_ROOM_NAME);
 	}
 	else if (gMapName.flag)
 	{
 		//MNA
-		PutBitmap3(&grcGame, 74, 80, &rc, SURFACE_ID_ROOM_NAME);
+		PutBitmap3(&grcGame, (WINDOW_WIDTH - 172) / 2, (WINDOW_HEIGHT - 80) / 2, &rc, SURFACE_ID_ROOM_NAME);
 		if (++gMapName.wait > 160)
 			gMapName.flag = 0;
 	}

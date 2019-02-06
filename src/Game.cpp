@@ -340,21 +340,21 @@ int ModeTitle()
 		CortBox(&grcGame, 0x202020);
 		
 		//Draw version
-		PutBitmap3(&grcGame, 100, 216, &rcVersion, SURFACE_ID_TEXT_BOX);
-		PutBitmap3(&grcGame, 156, 216, &rcPeriod, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&grcGame, (WINDOW_WIDTH - 120) / 2, WINDOW_HEIGHT - 24, &rcVersion, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&grcGame, (WINDOW_WIDTH - 8) / 2, WINDOW_HEIGHT - 24, &rcPeriod, SURFACE_ID_TEXT_BOX);
 		
 		int v1, v2, v3, v4;
 		GetCompileVersion(&v1, &v2, &v3, &v4);
-		PutNumber4(140, 216, v1, 0);
-		PutNumber4(156, 216, v2, 0);
-		PutNumber4(172, 216, v3, 0);
-		PutNumber4(188, 216, v4, 0);
+		PutNumber4((WINDOW_WIDTH - 40) / 2, WINDOW_HEIGHT - 24, v1, 0);
+		PutNumber4((WINDOW_WIDTH - 8) / 2, WINDOW_HEIGHT - 24, v2, 0);
+		PutNumber4((WINDOW_WIDTH + 24) / 2, WINDOW_HEIGHT - 24, v3, 0);
+		PutNumber4((WINDOW_WIDTH + 56) / 2, WINDOW_HEIGHT - 24, v4, 0);
 		
 		//Draw main title
-		PutBitmap3(&grcGame, 88, 40, &rcTitle, 0);
-		PutBitmap3(&grcGame, 136, 128, &rcNew, 0);
-		PutBitmap3(&grcGame, 136, 148, &rcContinue, 0);
-		PutBitmap3(&grcGame, 80, 192, &rcPixel, 1);
+		PutBitmap3(&grcGame, (WINDOW_WIDTH - 144) / 2, 40, &rcTitle, 0);
+		PutBitmap3(&grcGame, (WINDOW_WIDTH - 48) / 2, (WINDOW_HEIGHT + 16) / 2, &rcNew, 0);
+		PutBitmap3(&grcGame, (WINDOW_WIDTH - 48) / 2, (WINDOW_HEIGHT + 56) / 2, &rcContinue, 0);
+		PutBitmap3(&grcGame, (WINDOW_WIDTH - 160) / 2, WINDOW_HEIGHT - 48, &rcPixel, 1);
 		
 		//Draw character cursor
 		RECT char_rc;
@@ -386,11 +386,11 @@ int ModeTitle()
 		
 		int char_y;
 		if (bContinue == 1)
-			char_y = 147;
+			char_y = (WINDOW_HEIGHT + 54) / 2;
 		else
-			char_y = 127;
+			char_y = (WINDOW_HEIGHT + 14) / 2;
 		
-		PutBitmap3(&grcGame, 116, char_y, &char_rc, char_surf);
+		PutBitmap3(&grcGame, (WINDOW_WIDTH - 88) / 2, char_y, &char_rc, char_surf);
 		
 		//Draw carets
 		PutCaret(0, 0);

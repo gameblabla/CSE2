@@ -1,9 +1,10 @@
-#include "BossLife.h"
+#include "WindowsWrapper.h"
 
+#include "CommonDefines.h"
+#include "BossLife.h"
 #include "Draw.h"
 #include "NpChar.h"
 #include "Boss.h"
-#include "WindowsWrapper.h"
 
 static struct
 {
@@ -70,11 +71,11 @@ void PutBossLife(void)
 	
 			rcBr.right = 198 * gBL.br / gBL.max;
 
-			PutBitmap3(&grcGame, 32, 220, &rcBox1, SURFACE_ID_TEXT_BOX);
-			PutBitmap3(&grcGame, 32, 228, &rcBox2, SURFACE_ID_TEXT_BOX);
-			PutBitmap3(&grcGame, 72, 224, &rcBr, SURFACE_ID_TEXT_BOX);
-			PutBitmap3(&grcGame, 72, 224, &rcLife, SURFACE_ID_TEXT_BOX);
-			PutBitmap3(&grcGame, 40, 224, &rcText, SURFACE_ID_TEXT_BOX);
+			PutBitmap3(&grcGame, (WINDOW_WIDTH - 256) / 2, WINDOW_HEIGHT - 20, &rcBox1, SURFACE_ID_TEXT_BOX);
+			PutBitmap3(&grcGame, (WINDOW_WIDTH - 256) / 2, WINDOW_HEIGHT - 12, &rcBox2, SURFACE_ID_TEXT_BOX);
+			PutBitmap3(&grcGame, (WINDOW_WIDTH - 176) / 2, WINDOW_HEIGHT - 16, &rcBr, SURFACE_ID_TEXT_BOX);
+			PutBitmap3(&grcGame, (WINDOW_WIDTH - 176) / 2, WINDOW_HEIGHT - 16, &rcLife, SURFACE_ID_TEXT_BOX);
+			PutBitmap3(&grcGame, (WINDOW_WIDTH - 240) / 2, WINDOW_HEIGHT - 16, &rcText, SURFACE_ID_TEXT_BOX);
 		}
 		else
 		{

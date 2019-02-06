@@ -10,6 +10,8 @@ struct FRAME
 	int quake2;
 };
 
+extern FRAME gFrame;
+
 void MoveFrame3();
 void GetFramePosition(int *fx, int *fy);
 void SetFramePosition(int fx, int fy);

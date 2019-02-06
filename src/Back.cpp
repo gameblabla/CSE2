@@ -3,7 +3,11 @@
 
 #include "Tags.h"
 #include "Back.h"
+#include "Frame.h"
+#include "Game.h"
 #include "Draw.h"
+#include "Stage.h"
+#include "Map.h"
 
 BACK gBack;
 int gWaterY;
@@ -156,5 +160,49 @@ void PutFront(int fx, int fy)
 				}
 			}
 		}
+	}
+	
+	//Draw black bars
+	if (!(g_GameFlags & 8)) //Detect if credits are running
+	{
+		const bool fromFocus = (gStageNo == 31); //Get if we should only draw around a 320x240 area of the focus point
+		
+		//Get borders
+		const int barLeft = fromFocus ? (*gFrame.tgt_x - (320 << 8)) : -0x1000;
+		const int barTop = fromFocus ? (*gFrame.tgt_y - (240 << 8)) : -0x1000;
+		
+		const int barRight = fromFocus ? (*gFrame.tgt_x + (320 << 8)) : (gMap.width << 13) - 0x1000;
+		const int barBottom = fromFocus ? (*gFrame.tgt_y + (240 << 8)) : (gMap.length << 13) - 0x1000;
+		
+		//Draw bars
+		RECT barRect;
+		
+		//Left
+		barRect.left = 0;
+		barRect.top = 0;
+		barRect.right = (barLeft - gFrame.x) >> 9;
+		barRect.bottom = WINDOW_HEIGHT;
+		CortBox(&barRect, 0x000000);
+		
+		//Top
+		barRect.left = 0;
+		barRect.top = 0;
+		barRect.right = WINDOW_WIDTH;
+		barRect.bottom = (barTop - gFrame.y) >> 9;
+		CortBox(&barRect, 0x000000);
+		
+		//Right
+		barRect.left = (barRight - gFrame.x) >> 9;
+		barRect.top = 0;
+		barRect.right = WINDOW_WIDTH;
+		barRect.bottom = WINDOW_HEIGHT;
+		CortBox(&barRect, 0x000000);
+		
+		//Bottom
+		barRect.left = 0;
+		barRect.top = (barBottom - gFrame.y) >> 9;
+		barRect.right = WINDOW_WIDTH;
+		barRect.bottom = WINDOW_HEIGHT;
+		CortBox(&barRect, 0x000000);
 	}
 }
