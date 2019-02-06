@@ -541,6 +541,160 @@ void ActNpc183(NPCHAR *npc)
 	}
 }
 
+//Fuzz Core
+void ActNpc187(NPCHAR *npc)
+{
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->tgt_x = npc->x;
+			npc->tgt_y = npc->y;
+			npc->count1 = 120;
+			npc->act_wait = Random(0, 50);
+
+			for (int i = 0; i < 5; ++i)
+				SetNpChar(188, 0, 0, 0, 0, 51 * i, npc, 0x100);
+			// Fallthrough
+		case 1:
+			if (++npc->act_wait >= 50)
+			{
+				npc->act_wait = 0;
+				npc->act_no = 2;
+				npc->ym = 0x300;
+			}
+
+			break;
+
+		case 2:
+			npc->count1 += 4;
+
+			if (gMC.x < npc->x)
+				npc->direct = 0;
+			else
+				npc->direct = 2;
+
+			if (npc->tgt_y < npc->y)
+				npc->ym -= 0x10;
+			if (npc->tgt_y > npc->y)
+				npc->ym += 0x10;
+
+			if (npc->ym > 0x355)
+				npc->ym = 0x355;
+			if (npc->ym < -0x355)
+				npc->ym = -0x355;
+
+			break;
+	}
+
+	npc->x += npc->xm;
+	npc->y += npc->ym;
+
+	RECT rect_left[2];
+	RECT rect_right[2];
+
+	rect_left[0] = {224, 104, 256, 136};
+	rect_left[1] = {256, 104, 288, 136};
+
+	rect_right[0] = {224, 136, 256, 168};
+	rect_right[1] = {256, 136, 288, 168};
+
+	if (++npc->ani_wait > 2)
+	{
+		npc->ani_wait = 0;
+		++npc->ani_no;
+	}
+
+	if (npc->ani_no > 1)
+		npc->ani_no = 0;
+
+	if (npc->direct == 0)
+		npc->rect = rect_left[npc->ani_no];
+	else
+		npc->rect = rect_right[npc->ani_no];
+}
+
+//Fuzz
+void ActNpc188(NPCHAR *npc)
+{
+	RECT rect_left[2];
+	RECT rect_right[2];
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->count1 = npc->direct;
+			// Fallthrough
+		case 1:
+			if (npc->pNpc->code_char == 187 && npc->pNpc->cond & 0x80)
+			{
+				const unsigned char deg = npc->count1 + npc->pNpc->count1;
+				npc->x = npc->pNpc->x + 20 * GetSin(deg);
+				npc->y = npc->pNpc->y + 0x20 * GetCos(deg);
+			}
+			else
+			{
+				npc->xm = Random(-0x200, 0x200);
+				npc->ym = Random(-0x200, 0x200);
+				npc->act_no = 10;
+			}
+
+			break;
+
+		case 10:
+			if (gMC.x < npc->x)
+				npc->xm -= 0x20;
+			else
+				npc->xm += 0x20;
+
+			if (gMC.y < npc->y)
+				npc->ym -= 0x20;
+			else
+				npc->ym += 0x20;
+
+			if (npc->xm > 0x800)
+				npc->xm = 0x800;
+			if (npc->xm < -0x800)
+				npc->xm = -0x800;
+
+			if (npc->ym > 0x200)
+				npc->ym = 0x200;
+			if (npc->ym < -0x200)
+				npc->ym = -0x200;
+
+			npc->x += npc->xm;
+			npc->y += npc->ym;
+
+			break;
+	}
+
+	if (gMC.x < npc->x)
+		npc->direct = 0;
+	else
+		npc->direct = 2;
+
+	if (++npc->ani_wait > 2)
+	{
+		npc->ani_wait = 0;
+		++npc->ani_no;
+	}
+
+	if (npc->ani_no > 1)
+		npc->ani_no = 0;
+
+	rect_left[0] = {288, 104, 304, 120};
+	rect_left[1] = {304, 104, 320, 120};
+
+	rect_right[0] = {288, 120, 304, 136};
+	rect_right[1] = {304, 120, 320, 136};
+
+	if (npc->direct == 0)
+		npc->rect = rect_left[npc->ani_no];
+	else
+		npc->rect = rect_right[npc->ani_no];
+}
+
 //Scooter
 void ActNpc192(NPCHAR *npc)
 {
