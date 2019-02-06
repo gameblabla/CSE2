@@ -267,8 +267,8 @@ void PutCampObject()
 	int y;
 	PutBitmap3(&rcView, (WINDOW_WIDTH - 244) / 2, (WINDOW_HEIGHT - 224) / 2, &rcBoxTop, 26);
 	for (y = 1; y < 18; y++)
-		PutBitmap3(&rcView, (WINDOW_WIDTH - 244) / 2, (WINDOW_HEIGHT - 224) / 2 * (y + 1), &rcBoxBody, 26);
-	PutBitmap3(&rcView, (WINDOW_WIDTH - 244) / 2, (WINDOW_HEIGHT - 224) / 2 * (y + 1), &rcBoxBottom, 26);
+		PutBitmap3(&rcView, (WINDOW_WIDTH - 244) / 2, ((WINDOW_HEIGHT - 240) / 2) + (8 * (y + 1)), &rcBoxBody, 26);
+	PutBitmap3(&rcView, (WINDOW_WIDTH - 244) / 2, ((WINDOW_HEIGHT - 240) / 2) + (8 * (y + 1)), &rcBoxBottom, 26);
 	
 	//Move titles
 	if (gCampTitleY > (WINDOW_HEIGHT - 208) / 2)
@@ -283,9 +283,9 @@ void PutCampObject()
 	++flash;
 	
 	if (gCampActive)
-		PutBitmap3(&rcView, 40 * gSelectedArms + (WINDOW_WIDTH - 224) / 2, 24, &rcCur1[1], 26);
+		PutBitmap3(&rcView, 40 * gSelectedArms + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT / 2) - 96, &rcCur1[1], 26);
 	else
-		PutBitmap3(&rcView, 40 * gSelectedArms + (WINDOW_WIDTH - 224) / 2, 24, &rcCur1[(flash >> 1) & 1], 26);
+		PutBitmap3(&rcView, 40 * gSelectedArms + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT / 2) - 96, &rcCur1[(flash >> 1) & 1], 26);
 	
 	//Draw arms
 	for (int i = 0; i < ARMS_MAX && gArmsData[i].code; i++)
