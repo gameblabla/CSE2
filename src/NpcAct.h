@@ -197,6 +197,8 @@ void ActNpc300(NPCHAR *npc);
 
 void ActNpc302(NPCHAR *npc);
 
+void ActNpc334(NPCHAR *npc);
+
 void ActNpc355(NPCHAR *npc);
 
 void ActNpc359(NPCHAR *npc);

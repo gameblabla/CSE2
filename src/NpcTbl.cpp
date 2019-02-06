@@ -390,7 +390,7 @@ NPCFUNCTION gpNpcFuncTbl[361] =
 	nullptr,
 	nullptr,
 	nullptr,
-	nullptr,
+	ActNpc334,
 	nullptr,
 	nullptr,
 	nullptr,
