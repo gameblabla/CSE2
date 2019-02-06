@@ -123,7 +123,7 @@ bool MakeSoundObject8(int8_t *wavep, int8_t track, int8_t pipi)
 			uint8_t *wp_sub = wp;
 			size_t wav_tp = 0;
 			
-			for (int i = 0; i < data_size; i++)
+			for (size_t i = 0; i < data_size; i++)
 			{
 				uint8_t work = *(wavep+wav_tp);
 				work += 0x80;

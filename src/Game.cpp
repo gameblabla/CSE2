@@ -92,7 +92,7 @@ void PutNumber4(int x, int y, int value, bool bZero)
 		}
 		
 		//Draw digit
-		if ( bZero && offset == 2 || sw != 0 || offset == 3 )
+		if ((bZero && offset == 2) || sw != 0 || offset == 3 )
 			PutBitmap3(&rcClient, x + 8 * offset, y, &rect[a], SURFACE_ID_TEXT_BOX);
 		
 		//Go to next digit
@@ -119,7 +119,7 @@ int ModeOpening()
 	
 	CutNoise();
 	
-	int wait = 0;
+	unsigned int wait = 0;
 	while (wait < 500)
 	{
 		//Increase timer
@@ -295,7 +295,7 @@ int ModeTitle()
 	gMC.equip |= 0x100;
 	
 	//Start loop
-	int wait = 0;
+	unsigned int wait = 0;
 	
 	while (true)
 	{

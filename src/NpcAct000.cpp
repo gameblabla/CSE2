@@ -414,7 +414,7 @@ void ActNpc005(NPCHAR *npc)
 		case 0: //Init
 			npc->y += 0x600;
 			npc->act_no = 1;
-
+			// Fallthrough
 		case 1: //Waiting
 			//Look at player
 			if (npc->x <= gMC.x)

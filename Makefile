@@ -45,6 +45,7 @@ SOURCES = \
 	BossFrog \
 	BossLife \
 	BossOhm \
+	BossX \
 	BulHit \
 	Bullet \
 	Caret \
@@ -77,11 +78,13 @@ SOURCES = \
 	NpcAct100 \
 	NpcAct120 \
 	NpcAct140 \
+	NpcAct160 \
 	NpcAct180 \
 	NpcAct200 \
 	NpcAct260 \
 	NpcAct280 \
 	NpcAct300 \
+	NpcAct320 \
 	NpcAct340 \
 	NpChar \
 	NpcHit \

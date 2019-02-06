@@ -21,7 +21,7 @@ void SetValueView(int *px, int *py, int value)
 	int i;
 	
 	//TODO: Boi I'm reaaaally boutta getcho pickle chin aah boi, egg head like collard greens head ass boi, ol' hell dat bell dirt aaah boi stank ah boi afro head ass, lip gloss chin ah boi ugly ahhh boi *snort* uglaaaa
-	for (i = 0; i < VALUEVIEW_MAX && (!gVV[i].flag || gVV[i].px != px || (gVV[i].value >= 0 || value >= 0) && (gVV[i].value <= 0 || value <= 0)); i++);
+	for (i = 0; i < VALUEVIEW_MAX && (!gVV[i].flag || gVV[i].px != px || ((gVV[i].value >= 0 || value >= 0) && (gVV[i].value <= 0 || value <= 0))); i++);
 	
 	int index;
 	if (i == VALUEVIEW_MAX)

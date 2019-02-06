@@ -27,6 +27,7 @@
 #include "Map.h"
 #include "BossLife.h"
 #include "SelStage.h"
+#include "Flash.h"
 
 #define IS_COMMAND(c1, c2, c3) gTS.data[gTS.p_read + 1] == c1 && gTS.data[gTS.p_read + 2] == c2 && gTS.data[gTS.p_read + 3] == c3
 
@@ -472,7 +473,7 @@ void PutTextScript()
 			
 			PutBitmap3(&grcFull, (WINDOW_WIDTH + 112) / 2, i, &rect_yesno, 26);
 			if (gTS.wait == 16)
-				PutBitmap3(&grcFull, 41 * gTS.select + (WINDOW_WIDTH + 102) / 2, 154, &rect_cur, 26);
+				PutBitmap3(&grcFull, 41 * gTS.select + (WINDOW_WIDTH + 102) / 2, WINDOW_HEIGHT - 86, &rect_cur, 26);
 		}
 	}
 }
@@ -521,7 +522,6 @@ int TextScriptProc()
 					else if (gTS.flags & 0x10)
 					{
 						//SAT/CAT/TUR printing
-						x;
 						for (x = gTS.p_read; ; x++)
 						{
 							//Break if reaches command, or new-line
@@ -672,6 +672,14 @@ int TextScriptProc()
 						z = GetTextScriptNo(gTS.p_read + 4);
 						SubArmsData(z);
 						gTS.p_read += 8;
+					}
+					else if (IS_COMMAND('T','A','M'))
+					{
+						x = GetTextScriptNo(gTS.p_read + 4);
+						y = GetTextScriptNo(gTS.p_read + 9);
+						z = GetTextScriptNo(gTS.p_read + 14);
+						TradeArms(x, y, z);
+						gTS.p_read += 18;
 					}
 					else if (IS_COMMAND('P','S','+'))
 					{
@@ -943,6 +951,11 @@ int TextScriptProc()
 						SetQuake(z);
 						gTS.p_read += 8;
 					}
+					else if (IS_COMMAND('F','L','A'))
+					{
+						SetFlash(0, 0, 2);
+						gTS.p_read += 4;
+					}
 					else if (IS_COMMAND('F','A','I'))
 					{
 						z = GetTextScriptNo(gTS.p_read + 4);
@@ -975,6 +988,13 @@ int TextScriptProc()
 						x = GetTextScriptNo(gTS.p_read + 4);
 						y = GetTextScriptNo(gTS.p_read + 9);
 						SetFrameTargetNpChar(x, y);
+						gTS.p_read += 13;
+					}
+					else if (IS_COMMAND('F','O','B'))
+					{
+						x = GetTextScriptNo(gTS.p_read + 4);
+						y = GetTextScriptNo(gTS.p_read + 9);
+						SetFrameTargetBoss(x, y);
 						gTS.p_read += 13;
 					}
 					else if (IS_COMMAND('S','O','U'))

@@ -17,7 +17,7 @@ void InitCaret()
 
 void ActCaret00(CARET *crt)
 {
-	;
+	(void)crt;
 }
 
 void ActCaret01(CARET *crt)

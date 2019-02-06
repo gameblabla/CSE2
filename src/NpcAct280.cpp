@@ -13,6 +13,8 @@
 //Quake
 void ActNpc292(NPCHAR *npc)
 {
+	(void)npc;
+
 	SetQuake(10);
 }
 

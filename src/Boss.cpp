@@ -6,6 +6,7 @@
 #include "Boss.h"
 #include "BossFrog.h"
 #include "BossOhm.h"
+#include "BossX.h"
 #include "NpChar.h"
 #include "MyChar.h"
 #include "Sound.h"
@@ -188,7 +189,7 @@ BOSSFUNCTION gpBossFuncTbl[10] =
 	ActBossChar_0,
 	ActBossChar_Omega,
 	ActBossChar_Frog,
-	nullptr, //ActBossChar_MonstX,
+	ActBossChar_MonstX,
 	nullptr, //ActBossChar_Core,
 	nullptr, //ActBossChar_Ironhead,
 	nullptr, //ActBossChar_Twin,
