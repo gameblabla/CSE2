@@ -11,6 +11,7 @@
 #include "Frame.h"
 #include "Caret.h"
 #include "MycParam.h"
+#include "CommonDefines.h"
 
 //Puu Black
 void ActNpc160(NPCHAR *npc)
@@ -923,7 +924,7 @@ void ActNpc173(NPCHAR *npc)
 	rcRight[2] = {48, 152, 72, 176};
 	rcRight[3] = {72, 152, 96, 176};
 
-	if (npc->x <= gMC.x + 0x28000 && npc->x >= gMC.x - 0x28000 && npc->y <= gMC.y + 0x1E000 && npc->y >= gMC.y - 0x1E000)
+	if (npc->x <= gMC.x + (WINDOW_WIDTH * 0x200) && npc->x >= gMC.x - (WINDOW_WIDTH * 0x200) && npc->y <= gMC.y + (WINDOW_HEIGHT * 0x200) && npc->y >= gMC.y - (WINDOW_HEIGHT * 0x200))
 	{
 		switch (npc->act_no)
 		{

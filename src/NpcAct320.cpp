@@ -37,7 +37,7 @@ void ActNpc334(NPCHAR *npc)
 				npc->y = gMC.y - 0x400;
 			}
 			// Fallthrough
-		case 1:
+		case 10:
 			if (++npc->act_wait / 8 & 1)
 				npc->ani_no = 0;
 			else
