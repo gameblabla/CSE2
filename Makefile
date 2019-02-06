@@ -45,6 +45,7 @@ SOURCES = \
 	BossFrog \
 	BossLife \
 	BossOhm \
+	BossX \
 	BulHit \
 	Bullet \
 	Caret \

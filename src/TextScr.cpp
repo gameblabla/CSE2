@@ -27,6 +27,7 @@
 #include "Map.h"
 #include "BossLife.h"
 #include "SelStage.h"
+#include "Flash.h"
 
 #define IS_COMMAND(c1, c2, c3) gTS.data[gTS.p_read + 1] == c1 && gTS.data[gTS.p_read + 2] == c2 && gTS.data[gTS.p_read + 3] == c3
 
@@ -942,6 +943,11 @@ int TextScriptProc()
 						SetQuake(z);
 						gTS.p_read += 8;
 					}
+					else if (IS_COMMAND('F','L','A'))
+					{
+						SetFlash(0, 0, 2);
+						gTS.p_read += 4;
+					}
 					else if (IS_COMMAND('F','A','I'))
 					{
 						z = GetTextScriptNo(gTS.p_read + 4);
@@ -974,6 +980,13 @@ int TextScriptProc()
 						x = GetTextScriptNo(gTS.p_read + 4);
 						y = GetTextScriptNo(gTS.p_read + 9);
 						SetFrameTargetNpChar(x, y);
+						gTS.p_read += 13;
+					}
+					else if (IS_COMMAND('F','O','B'))
+					{
+						x = GetTextScriptNo(gTS.p_read + 4);
+						y = GetTextScriptNo(gTS.p_read + 9);
+						SetFrameTargetBoss(x, y);
 						gTS.p_read += 13;
 					}
 					else if (IS_COMMAND('S','O','U'))
