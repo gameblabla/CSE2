@@ -12,6 +12,7 @@
 #include "Frame.h"
 #include "Flash.h"
 #include "Bullet.h"
+#include "CommonDefines.h"
 
 //Toroko (frenzied)
 void ActNpc140(NPCHAR *npc)
@@ -1337,7 +1338,7 @@ static const RECT grcKitR[21] = {
 //Gaudi
 void ActNpc153(NPCHAR *npc)
 {
-	if (npc->x <= gMC.x + 0x28000 && npc->x >= gMC.x - 0x28000 && npc->y <= gMC.y + 0x1E000 && npc->y >= gMC.y - 0x1E000)
+	if (npc->x <= gMC.x + (WINDOW_WIDTH * 0x200) && npc->x >= gMC.x - (WINDOW_WIDTH * 0x200) && npc->y <= gMC.y + (WINDOW_HEIGHT * 0x200) && npc->y >= gMC.y - (WINDOW_HEIGHT * 0x200))
 	{
 		switch (npc->act_no)
 		{
@@ -1566,7 +1567,7 @@ void ActNpc154(NPCHAR *npc)
 //Gaudi (flying)
 void ActNpc155(NPCHAR *npc)
 {
-	if (npc->x > gMC.x + 0x28000 || npc->x < gMC.x - 0x28000 || npc->y > gMC.y + 0x1E000 || npc->y < gMC.y - 0x1E000)
+	if (npc->x > gMC.x + (WINDOW_WIDTH * 0x200) || npc->x < gMC.x - (WINDOW_WIDTH * 0x200) || npc->y > gMC.y + (WINDOW_HEIGHT * 0x200) || npc->y < gMC.y - (WINDOW_HEIGHT * 0x200))
 		return;
 
 	unsigned char deg;
