@@ -12,6 +12,7 @@
 #include "Caret.h"
 #include "MycParam.h"
 #include "CommonDefines.h"
+#include "NpcHit.h"
 
 //Puu Black
 void ActNpc160(NPCHAR *npc)
@@ -908,6 +909,134 @@ void ActNpc170(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
+//Fire Whirrr
+void ActNpc171(NPCHAR *npc)
+{
+	RECT rcLeft[2];
+	RECT rcRight[2];
+
+	rcLeft[0] = {120, 48, 152, 80};
+	rcLeft[1] = {152, 48, 184, 80};
+
+	rcRight[0] = {184, 48, 216, 80};
+	rcRight[1] = {216, 48, 248, 80};
+
+	if (gMC.x < npc->x)
+		npc->direct = 0;
+	else
+		npc->direct = 2;
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->act_wait = Random(0, 50);
+			npc->tgt_y = npc->y;
+			// Fallthrough
+		case 1:
+			if (npc->act_wait)
+			{
+				--npc->act_wait;
+			}
+			else
+			{
+				npc->act_no = 10;
+				npc->ym = 0x200;
+			}
+			// Fallthrough
+		case 10:
+			if (++npc->ani_wait > 0)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no > 1)
+				npc->ani_no = 0;
+
+			if (npc->tgt_y > npc->y)
+				npc->ym += 0x10;
+			else
+				npc->ym -= 0x10;
+
+			if (npc->ym > 0x200)
+				npc->ym = 0x200;
+			if (npc->ym < -0x200)
+				npc->ym = -0x200;
+
+			npc->y += npc->ym;
+
+			if (npc->direct == 0)
+			{
+				if (gMC.y < npc->y + 0xA000 && gMC.y > npc->y - 0xA000 && gMC.x < npc->x && gMC.x > npc->x - 0x14000)
+					++npc->count1;
+			}
+			else
+			{
+				if (gMC.y < npc->y + 0xA000 && gMC.y > npc->y - 0xA000 && gMC.x < npc->x + 0x14000 && gMC.x > npc->x)
+					++npc->count1;
+			}
+
+			if (npc->count1 > 20)
+			{
+				SetNpChar(172, npc->x, npc->y, 0, 0, npc->direct, 0, 0x100);
+				npc->count1 = -100;
+				gCurlyShoot_wait = Random(80, 100);
+				gCurlyShoot_x = npc->x;
+				gCurlyShoot_y = npc->y;
+			}
+
+			break;
+	}
+
+	if (npc->direct == 0)
+		npc->rect = rcLeft[npc->ani_no];
+	else
+		npc->rect = rcRight[npc->ani_no];
+}
+
+//Fire Whirr projectile
+void ActNpc172(NPCHAR *npc)
+{
+	RECT rect[3];
+
+	rect[0] = {248, 48, 264, 80};
+	rect[1] = {264, 48, 280, 80};
+	rect[2] = {280, 48, 296, 80};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			// Fallthrough
+		case 1:
+			if (++npc->ani_wait > 1)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no > 2)
+				npc->ani_no = 0;
+
+			if (npc->direct == 0)
+				npc->x -= 0x200;
+			else
+				npc->x += 0x200;
+
+			if (npc->flag & 1 || npc->flag & 4)
+			{
+				SetCaret(npc->x, npc->y, 2, 0);
+				VanishNpChar(npc);
+				return;
+			}
+
+			break;
+	}
+
+	npc->rect = rect[npc->ani_no];
+}
+
 //Gaudi (armoured)
 void ActNpc173(NPCHAR *npc)
 {
@@ -1151,4 +1280,49 @@ void ActNpc174(NPCHAR *npc)
 		npc->ani_no = 0;
 
 	npc->rect = rect_left[npc->ani_no];
+}
+
+//Gaudi egg
+void ActNpc175(NPCHAR *npc)
+{
+	RECT rcLeft[2];
+	RECT rcRight[2];
+
+	rcLeft[0] = {168, 80, 192, 104};
+	rcLeft[1] = {192, 80, 216, 104};
+
+	rcRight[0] = {216, 80, 240, 104};
+	rcRight[1] = {240, 80, 264, 104};
+
+	if (npc->act_no < 3 && npc->life < 90)
+	{
+		LoseNpChar(npc, 0);
+		npc->act_no = 10;
+		npc->ani_no = 1;
+		npc->bits &= ~0x20;
+		npc->damage = 0;
+	}
+
+	if (npc->act_no == 0)
+	{
+		npc->ani_no = 0;
+		npc->act_no = 1;
+	}
+
+	if (npc->direct == 0)
+		npc->ym += 0x20;
+	else
+		npc->ym -= 0x20;
+
+	if (npc->ym < -0x5FF)
+		npc->ym = -0x5FF;
+	if (npc->ym > 0x5FF)
+		npc->ym = 0x5FF;
+
+	npc->y += npc->ym;
+
+	if (npc->direct == 0)
+		npc->rect = rcLeft[npc->ani_no];
+	else
+		npc->rect = rcRight[npc->ani_no];
 }

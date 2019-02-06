@@ -173,9 +173,11 @@ void ActNpc167(NPCHAR *npc);
 void ActNpc168(NPCHAR *npc);
 void ActNpc169(NPCHAR *npc);
 void ActNpc170(NPCHAR *npc);
-
+void ActNpc171(NPCHAR *npc);
+void ActNpc172(NPCHAR *npc);
 void ActNpc173(NPCHAR *npc);
 void ActNpc174(NPCHAR *npc);
+void ActNpc175(NPCHAR *npc);
 
 void ActNpc192(NPCHAR *npc);
 void ActNpc193(NPCHAR *npc);
