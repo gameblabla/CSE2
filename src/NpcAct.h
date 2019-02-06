@@ -155,8 +155,14 @@ void ActNpc149(NPCHAR *npc);
 void ActNpc150(NPCHAR *npc);
 void ActNpc151(NPCHAR *npc);
 
+void ActNpc153(NPCHAR *npc);
+void ActNpc154(NPCHAR *npc);
+void ActNpc155(NPCHAR *npc);
+void ActNpc156(NPCHAR *npc);
+
 void ActNpc192(NPCHAR *npc);
 void ActNpc193(NPCHAR *npc);
+void ActNpc194(NPCHAR *npc);
 
 void ActNpc199(NPCHAR *npc);
 

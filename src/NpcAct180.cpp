@@ -129,6 +129,22 @@ void ActNpc193(NPCHAR *npc)
 	npc->rect = rc[0];
 }
 
+//Blue robot (broken)
+void ActNpc194(NPCHAR *npc)
+{
+	RECT rc[1];
+
+	rc[0] = {192, 120, 224, 128};
+
+	if (npc->act_no == 0)
+	{
+		npc->act_no = 1;
+		npc->y += 0x800;
+	}
+
+	npc->rect = rc[0];
+}
+
 //Water/wind particles
 void ActNpc199(NPCHAR *npc)
 {
