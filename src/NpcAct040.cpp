@@ -623,6 +623,7 @@ void ActNpc045(NPCHAR *npc)
 			npc->ym2 = npc->ym;
 			// Fallthrough
 		case 1:
+		case 2:
 			if ( ++npc->ani_no > 2 )
 				npc->ani_no = 1;
 
