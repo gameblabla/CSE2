@@ -9,6 +9,7 @@
 #include "Back.h"
 #include "Triangle.h"
 #include "Frame.h"
+#include "Caret.h"
 
 //Puu Black
 void ActNpc160(NPCHAR *npc)
@@ -465,4 +466,297 @@ void ActNpc166(NPCHAR *npc)
 	}
 
 	npc->rect = rcLeft[npc->ani_no];
+}
+
+//Professor Booster (falling)
+void ActNpc167(NPCHAR *npc)
+{
+	RECT rect[3];
+
+	rect[0] = {304, 0, 320, 16};
+	rect[1] = {304, 16, 320, 32};
+	rect[2] = {0, 0, 0, 0};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->ani_no = 1;
+			break;
+		case 10:
+			npc->ani_no = 0;
+
+			npc->ym += 0x40;
+			if (npc->ym > 0x5FF)
+				npc->ym = 0x5FF;
+
+			npc->y += npc->ym;
+			break;
+		case 20:
+			npc->act_no = 21;
+			npc->act_wait = 0;
+			npc->ani_no = 0;
+			PlaySoundObject(29, 1);
+			// Fallthrough
+		case 21:
+			if (++npc->ani_no > 2)
+				npc->ani_no = 1;
+
+			if (++npc->act_wait > 100)
+			{
+				for (int i = 0; i < 4; ++i)
+					SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+
+				npc->cond = 0;
+			}
+
+			break;
+	}
+
+	npc->rect = rect[npc->ani_no];
+}
+
+//Gaudi (armoured)
+void ActNpc173(NPCHAR *npc)
+{
+	RECT rcLeft[4];
+	RECT rcRight[4];
+
+	rcLeft[0] = {0, 128, 24, 152};
+	rcLeft[1] = {24, 128, 48, 152};
+	rcLeft[2] = {48, 128, 72, 152};
+	rcLeft[3] = {72, 128, 96, 152};
+
+	rcRight[0] = {0, 152, 24, 176};
+	rcRight[1] = {24, 152, 48, 176};
+	rcRight[2] = {48, 152, 72, 176};
+	rcRight[3] = {72, 152, 96, 176};
+
+	if (npc->x <= gMC.x + 0x28000 && npc->x >= gMC.x - 0x28000 && npc->y <= gMC.y + 0x1E000 && npc->y >= gMC.y - 0x1E000)
+	{
+		switch (npc->act_no)
+		{
+			case 0:
+				npc->tgt_x = npc->x;
+				npc->act_no = 1;
+				// Fallthrough
+			case 1:
+				npc->ani_no = 0;
+				npc->xm = 0;
+
+				if (npc->act_wait < 5)
+				{
+					++npc->act_wait;
+				}
+				else
+				{
+					if (gMC.x > npc->x - 0x18000 && gMC.x < npc->x + 0x18000 && gMC.y > npc->y - 0x14000 && gMC.y < npc->y + 0x14000)
+					{
+						npc->act_no = 10;
+						npc->act_wait = 0;
+						npc->ani_no = 1;
+					}
+				}
+
+				break;
+
+			case 10:
+				if (++npc->act_wait > 3)
+				{
+					if (++npc->count1 == 3)
+					{
+						PlaySoundObject(30, 1);
+						npc->count1 = 0;
+						npc->act_no = 25;
+						npc->act_wait = 0;
+						npc->ani_no = 2;
+						npc->ym = -0x600;
+
+						if (npc->tgt_x > npc->x)
+							npc->xm = 0x80;
+						else
+							npc->xm = -0x80;
+					}
+					else
+					{
+						PlaySoundObject(30, 1);
+						npc->act_no = 20;
+						npc->ani_no = 2;
+						npc->ym = -0x200;
+
+						if (npc->tgt_x > npc->x)
+							npc->xm = 0x200;
+						else
+							npc->xm = -0x200;
+					}
+				}
+
+				break;
+
+			case 20:
+				++npc->act_wait;
+
+				if (npc->flag & 8)
+				{
+					PlaySoundObject(23, 1);
+					npc->ani_no = 1;
+					npc->act_no = 30;
+					npc->act_wait = 0;
+				}
+
+				break;
+
+			case 25:
+				if (++npc->act_wait == 30 || npc->act_wait == 40)
+				{
+					const unsigned char deg = GetArktan(npc->x - gMC.x, npc->y - gMC.y) + Random(-6, 6);
+					const int ym = 3 * GetSin(deg);
+					const int xm = 3 * GetCos(deg);
+					SetNpChar(174, npc->x, npc->y, xm, ym, 0, 0, 0x100);
+
+					PlaySoundObject(39, 1);
+					npc->ani_no = 3;
+
+					gCurlyShoot_wait = Random(80, 100);
+					gCurlyShoot_x = npc->x;
+					gCurlyShoot_y = npc->y;
+				}
+
+				if (npc->act_wait == 35 || npc->act_wait == 45)
+					npc->ani_no = 2;
+
+				if (npc->flag & 8)
+				{
+					PlaySoundObject(23, 1);
+					npc->ani_no = 1;
+					npc->act_no = 30;
+					npc->act_wait = 0;
+				}
+
+				break;
+
+			case 30:
+				npc->xm = 7 * npc->xm / 8;
+
+				if (++npc->act_wait > 3)
+				{
+					npc->ani_no = 0;
+					npc->act_no = 1;
+					npc->act_wait = 0;
+				}
+
+				break;
+		}
+
+		npc->ym += 51;
+
+		if (gMC.x < npc->x)
+			npc->direct = 0;
+		else
+			npc->direct = 2;
+
+		if (npc->ym > 0x5FF)
+			npc->ym = 0x5FF;
+		if ( npc->ym < -0x5FFu )
+			npc->ym = 0x5FF;
+
+		npc->x += npc->xm;
+		npc->y += npc->ym;
+
+		if (npc->direct == 0)
+			npc->rect = rcLeft[npc->ani_no];
+		else
+			npc->rect = rcRight[npc->ani_no];
+
+		if (npc->life <= 985)
+		{
+			SetDestroyNpChar(npc->x, npc->y, 0, 2);
+			npc->code_char = 154;
+			npc->act_no = 0;
+		}
+	}
+}
+
+//Armoured-Gaudi projectile
+void ActNpc174(NPCHAR *npc)
+{
+	RECT rect_left[3];
+
+	bool bHit;
+	switch (npc->act_no)
+	{
+		case 0:
+			if (npc->direct == 2)
+				npc->act_no = 2;
+			// Fallthrough
+		case 1:
+			npc->x += npc->xm;
+			npc->y += npc->ym;
+
+			bHit = false;
+
+			if (npc->flag & 1)
+			{
+				bHit = true;
+				npc->xm = 0x200;
+			}
+
+			if (npc->flag & 4)
+			{
+				bHit = true;
+				npc->xm = -0x200;
+			}
+
+			if (npc->flag & 2)
+			{
+				bHit = true;
+				npc->ym = 0x200;
+			}
+
+			if (npc->flag & 8)
+			{
+				bHit = true;
+				npc->ym = -0x200;
+			}
+
+			if (bHit)
+			{
+				npc->act_no = 2;
+				++npc->count1;
+				PlaySoundObject(31, 1);
+			}
+
+			break;
+
+		case 2:
+			npc->ym += 0x40;
+
+			npc->x += npc->xm;
+			npc->y += npc->ym;
+
+			if (npc->flag & 8)
+			{
+				if (++npc->count1 > 1)
+				{
+					SetCaret(npc->x, npc->y, 2, 0);
+					npc->cond = 0;
+				}
+			}
+
+			break;
+	}
+
+	if (npc->ym > 0x5FF)
+		npc->ym = 0x5FF;
+	if (npc->ym < -0x5FF)
+		npc->ym = -0x5FF;
+
+	rect_left[0] = {120, 80, 136, 96};
+	rect_left[1] = {136, 80, 152, 96};
+	rect_left[2] = {152, 80, 168, 96};
+
+	if (++npc->ani_no > 2)
+		npc->ani_no = 0;
+
+	npc->rect = rect_left[npc->ani_no];
 }

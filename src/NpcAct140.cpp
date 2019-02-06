@@ -1818,3 +1818,130 @@ void ActNpc157(NPCHAR *npc)
 
 	npc->rect = rect[0];
 }
+
+//Fish Missile
+void ActNpc158(NPCHAR *npc)
+{
+	RECT rect[8];
+
+	rect[0] = {0, 224, 16, 240};
+	rect[1] = {16, 224, 32, 240};
+	rect[2] = {32, 224, 48, 240};
+	rect[3] = {48, 224, 64, 240};
+	rect[4] = {64, 224, 80, 240};
+	rect[5] = {80, 224, 96, 240};
+	rect[6] = {96, 224, 112, 240};
+	rect[7] = {112, 224, 128, 240};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+
+			switch (npc->direct)
+			{
+				case 0:
+					npc->count1 = 0xA0;
+					break;
+				case 1:
+					npc->count1 = 0xE0;
+					break;
+				case 2:
+					npc->count1 = 0x20;
+					break;
+				case 3:
+					npc->count1 = 0x60;
+					break;
+			}
+			// Fallthrough
+		case 1:
+			npc->xm = 2 * GetCos(npc->count1);
+			npc->ym = 2 * GetSin(npc->count1);
+			npc->y += npc->ym;
+			npc->x += npc->xm;
+			const int dir = GetArktan(npc->x - gMC.x, npc->y - gMC.y);
+
+			if (dir < npc->count1)
+			{
+				if (npc->count1 - dir < 0x80)
+					--npc->count1;
+				else
+					++npc->count1;
+			}
+			else
+			{
+				if (dir - npc->count1 < 0x80)
+					++npc->count1;
+				else
+					--npc->count1;
+			}
+
+			if (npc->count1 > 0xFF)
+				npc->count1 -= 0x100;
+			if (npc->count1 < 0)
+				npc->count1 += 0x100;
+
+			break;
+	}
+
+	if (++npc->ani_wait > 2)
+	{
+		npc->ani_wait = 0;
+		SetCaret(npc->x, npc->y, 7, 4);
+	}
+
+	npc->ani_no = (npc->count1 + 0x10) / 0x20;
+
+	if (npc->ani_no > 7)
+		npc->ani_no = 7;
+
+	npc->rect = rect[npc->ani_no];
+}
+
+//Monster X (defeated)
+void ActNpc159(NPCHAR *npc)
+{
+	RECT rect[1];
+
+	rect[0] = {144, 128, 192, 200};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+
+			for (int i = 0; i < 8; ++i)
+				SetNpChar(4, npc->x + (Random(-16, 16) * 0x200), npc->y + (Random(-16, 16) * 0x200), Random(-341, 341), Random(-341, 341), 0, 0, 0x100);
+			// Fallthrough
+		case 1:
+			if (++npc->act_wait > 50)
+			{
+				npc->act_no = 2;
+				npc->xm = -0x100;
+			}
+
+			if (npc->act_wait / 2 % 2)
+				npc->x += 0x200;
+			else
+				npc->x -= 0x200;
+
+			break;
+
+		case 2:
+			++npc->act_wait;
+			npc->ym += 0x40;
+
+			if (npc->y > 0x50000)
+				npc->cond = 0;
+
+			break;
+	}
+
+	npc->y += npc->ym;
+	npc->x += npc->xm;
+
+	npc->rect = rect[0];
+
+	if (npc->act_wait % 8 == 1)
+		SetNpChar(4, npc->x + (Random(-16, 16) * 0x200), npc->y + (Random(-16, 16) * 0x200), Random(-341, 341), Random(-341, 341), 0, 0, 0x100);
+}
