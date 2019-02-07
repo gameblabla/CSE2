@@ -99,3 +99,110 @@ void ActNpc302(NPCHAR *npc)
 			break;
 	}
 }
+
+//Stumpy
+void ActNpc308(NPCHAR *npc)
+{
+	RECT rcLeft[2];
+	RECT rcRight[2];
+
+	rcLeft[0] = {128, 112, 144, 128};
+	rcLeft[1] = {144, 112, 160, 128};
+
+	rcRight[0] = {128, 128, 144, 144};
+	rcRight[1] = {144, 128, 160, 144};
+
+	unsigned char deg;
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			// Fallthrough
+		case 1:
+			if (gMC.x < npc->x + 0x1E000 && gMC.x > npc->x - 0x1E000 && gMC.y < npc->y + 0x18000 && gMC.y > npc->y - 0x18000)
+				npc->act_no = 10;
+
+			break;
+
+		case 10:
+			npc->act_no = 11;
+			npc->act_wait = 0;
+			npc->xm2 = 0;
+			npc->ym2 = 0;
+
+			if (gMC.x < npc->x)
+				npc->direct = 0;
+			else
+				npc->direct = 2;
+			// Fallthrough
+		case 11:
+			if (++npc->act_wait > 50)
+				npc->act_no = 20;
+
+			++npc->ani_wait;
+
+			if (npc->act_wait > 1)
+			{
+				npc->ani_wait = 0;
+
+				if (++npc->ani_no > 1)
+					npc->ani_no = 0;
+			}
+
+			if (gMC.x > npc->x + 0x28000 || gMC.x < npc->x - 0x28000 || gMC.y > npc->y + 0x1E000 || gMC.y < npc->y - 0x1E000)
+				npc->act_no = 0;
+
+			break;
+
+		case 20:
+			npc->act_no = 21;
+			npc->act_wait = 0;
+
+			deg = GetArktan(npc->x - gMC.x, npc->y - gMC.y) + Random(-3, 3);
+			npc->ym2 = 2 * GetSin(deg);
+			npc->xm2 = 2 * GetCos(deg);
+
+			if (npc->xm2 < 0)
+				npc->direct = 0;
+			else
+				npc->direct = 2;
+			// Fallthrough
+		case 21:
+			if (npc->xm2 < 0 && npc->flag & 1)
+			{
+				npc->direct = 2;
+				npc->xm2 = -npc->xm2;
+			}
+
+			if (npc->xm2 > 0 && npc->flag & 4)
+			{
+				npc->direct = 0;
+				npc->xm2 = -npc->xm2;
+			}
+
+			if (npc->ym2 < 0 && npc->flag & 2)
+				npc->ym2 = -npc->ym2;
+			if (npc->ym2 > 0 && npc->flag & 8)
+				npc->ym2 = -npc->ym2;
+
+			if (npc->flag & 0x100)
+				npc->ym2 = -0x200;
+
+			npc->x += npc->xm2;
+			npc->y += npc->ym2;
+
+			if (++npc->act_wait > 50)
+				npc->act_no = 10;
+
+			if (++npc->ani_no > 1)
+				npc->ani_no = 0;
+
+			break;
+	}
+
+	if (npc->direct == 0)
+		npc->rect = rcLeft[npc->ani_no];
+	else
+		npc->rect = rcRight[npc->ani_no];
+}

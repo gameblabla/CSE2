@@ -9,6 +9,7 @@
 #include "Sound.h"
 #include "Back.h"
 #include "Triangle.h"
+#include "Flags.h"
 
 //Hoppy
 void ActNpc347(NPCHAR *npc)
@@ -112,6 +113,59 @@ void ActNpc349(NPCHAR *npc)
 	}
 
 	npc->rect = rect;
+}
+
+//Statue (shootable)
+void ActNpc351(NPCHAR *npc)
+{
+	RECT rc[9];
+
+	rc[0] = {0, 96, 32, 136};
+	rc[1] = {32, 96, 64, 136};
+	rc[2] = {64, 96, 96, 136};
+	rc[3] = {96, 96, 128, 136};
+	rc[4] = {128, 96, 160, 136};
+	rc[5] = {0, 176, 32, 216};
+	rc[6] = {32, 176, 64, 216};
+	rc[7] = {64, 176, 96, 216};
+	rc[8] = {96, 176, 128, 216};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->ani_no = npc->direct / 10;
+			npc->x += 0x1000;
+			npc->y += 0x1800;
+			break;
+
+		case 10:
+			if (GetNPCFlag(npc->code_flag))
+			{
+				npc->act_no = 20;
+			}
+			else
+			{
+				npc->act_no = 11;
+				npc->bits |= 0x20;
+			}
+			// Fallthrough
+		case 11:
+			if (npc->life <= 900)
+			{
+				SetNpChar(351, npc->x - 0x1000, npc->y - 0x1800, 0, 0, 10 * (npc->ani_no + 4), 0, 0);
+				npc->cond |= 8;
+			}
+
+			break;
+
+		case 20:
+			npc->ani_no += 4;
+			npc->act_no = 1;
+			break;
+	}
+
+	npc->rect = rc[npc->ani_no];
 }
 
 //Quote and Curly on Balrog's back

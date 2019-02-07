@@ -231,11 +231,25 @@ void ActNpc225(NPCHAR *npc);
 void ActNpc226(NPCHAR *npc);
 void ActNpc227(NPCHAR *npc);
 void ActNpc228(NPCHAR *npc);
+void ActNpc229(NPCHAR *npc);
+void ActNpc230(NPCHAR *npc);
+void ActNpc231(NPCHAR *npc);
+void ActNpc232(NPCHAR *npc);
+void ActNpc233(NPCHAR *npc);
+void ActNpc234(NPCHAR *npc);
+void ActNpc235(NPCHAR *npc);
+void ActNpc236(NPCHAR *npc);
+void ActNpc237(NPCHAR *npc);
+void ActNpc238(NPCHAR *npc);
+void ActNpc239(NPCHAR *npc);
+void ActNpc240(NPCHAR *npc);
 
 void ActNpc259(NPCHAR *npc);
 
 void ActNpc271(NPCHAR *npc);
 void ActNpc272(NPCHAR *npc);
+void ActNpc273(NPCHAR *npc);
+void ActNpc274(NPCHAR *npc);
 
 void ActNpc278(NPCHAR *npc);
 
@@ -247,13 +261,18 @@ void ActNpc300(NPCHAR *npc);
 
 void ActNpc302(NPCHAR *npc);
 
+void ActNpc308(NPCHAR *npc);
+
 void ActNpc334(NPCHAR *npc);
 void ActNpc335(NPCHAR *npc);
 void ActNpc336(NPCHAR *npc);
+void ActNpc337(NPCHAR *npc);
 
 void ActNpc347(NPCHAR *npc);
 
 void ActNpc349(NPCHAR *npc);
+
+void ActNpc351(NPCHAR *npc);
 
 void ActNpc355(NPCHAR *npc);
 
