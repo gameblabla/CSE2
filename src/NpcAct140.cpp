@@ -1287,6 +1287,18 @@ void ActNpc151(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
+//Shutter stuck
+void ActNpc152(NPCHAR *npc)
+{
+	if (!npc->act_no)
+	{
+		if (npc->direct == 2)
+			npc->y += 0x2000;
+		npc->act_no = 1;
+	}
+	npc->rect = {0, 0, 0, 0};
+}
+
 static const RECT grcKitL[21] = {
 	{0, 0, 24, 24},
 	{24, 0, 48, 24},

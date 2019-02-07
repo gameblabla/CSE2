@@ -4,6 +4,7 @@
 #include "Flags.h"
 #include "Caret.h"
 #include "Game.h"
+#include "Back.h"
 #include "Bullet.h"
 #include "MyChar.h"
 #include "TextScr.h"
@@ -404,6 +405,9 @@ void HitNpCharMap()
 						break;
 				}
 			}
+			
+			if (gNPC[i].y > gWaterY + 0x800)
+				gNPC[i].flag |= 0x100;
 		}
 	}
 }

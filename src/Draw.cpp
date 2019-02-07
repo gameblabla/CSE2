@@ -295,7 +295,11 @@ bool ReloadBitmap_Resource(const char *res, int surf_no)
 
 SDL_Rect RectToSDLRect(RECT *rect)
 {
-	SDL_Rect SDLRect = { rect->left, rect->top, rect->right - rect->left, rect->bottom - rect->top};
+	SDL_Rect SDLRect = {rect->left, rect->top, rect->right - rect->left, rect->bottom - rect->top};
+	if (SDLRect.w < 0)
+		SDLRect.w = 0;
+	if (SDLRect.h < 0)
+		SDLRect.h = 0;
 	return SDLRect;
 }
 

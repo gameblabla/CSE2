@@ -138,7 +138,7 @@ void PutFront(int fx, int fy)
 	if (gBack.type == 3)
 	{
 		int x_1 = fx / 0x4000;
-		int x_2 = fx / 0x4000 + 11;
+		int x_2 = fx / 0x4000 + (((WINDOW_WIDTH + 31) >> 5) + 1);
 		int y_1 = 0;
 		int y_2 = 32;
 		
@@ -149,7 +149,7 @@ void PutFront(int fx, int fy)
 			if (ypos >= -32)
 			{
 				if (ypos > WINDOW_HEIGHT)
-					return;
+					break;
 				
 				for (int x = x_1; x < x_2; x++)
 				{

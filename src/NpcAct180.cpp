@@ -9,6 +9,7 @@
 #include "Back.h"
 #include "Triangle.h"
 #include "Caret.h"
+#include "Frame.h"
 #include "Bullet.h"
 #include "Flags.h"
 
@@ -541,6 +542,168 @@ void ActNpc183(NPCHAR *npc)
 	}
 }
 
+//Shutter Big
+void ActNpc184(NPCHAR *npc)
+{
+	RECT rc[4];
+	rc[0] = {0, 64, 32, 96};
+	rc[1] = {32, 64, 64, 96};
+	rc[2] = {64, 64, 96, 96};
+	rc[3] = {32, 64, 64, 96};
+	
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->x += 0x1000;
+			npc->y += 0x1000;
+			break;
+		case 10:
+			npc->act_no = 11;
+			npc->ani_no = 1;
+			npc->act_wait = 0;
+			npc->bits |= npc_ignoreSolid;
+		case 11:
+			switch (npc->direct)
+			{
+				case 0:
+					npc->x -= 0x80;
+					break;
+				case 1:
+					npc->y -= 0x80;
+					break;
+				case 2:
+					npc->x += 0x80;
+					break;
+				case 3:
+					npc->y += 0x80;
+					break;
+			}
+			if (!(++npc->act_wait & 7))
+				PlaySoundObject(26, 1);
+			SetQuake(20);
+			break;
+		case 20:
+			for (int i = 0; i < 4; i++)
+				SetNpChar(4, npc->x + (Random(-12, 12) << 9), npc->y + 0x2000, Random(-0x155, 0x155), Random(-0x600, 0), 0, 0, 0x100);
+			npc->act_no = 1;
+			break;
+		default:
+		break;
+	}
+	
+	if (++npc->ani_wait > 10)
+	{
+		npc->ani_wait = 0;
+		++npc->ani_no;
+	}
+	
+	if (npc->ani_no > 3)
+		npc->ani_no = 0;
+	
+	npc->rect = rc[npc->ani_no];
+}
+
+//Shutter Small
+void ActNpc185(NPCHAR *npc)
+{
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->y += 0x1000;
+			break;
+		case 10:
+			npc->act_no = 11;
+			npc->ani_no = 1;
+			npc->act_wait = 0;
+			npc->bits |= npc_ignoreSolid;
+			//Fallthrough
+		case 11:
+			switch (npc->direct)
+			{
+				case 0:
+					npc->x -= 0x80;
+					break;
+				case 1:
+					npc->y -= 0x80;
+					break;
+				case 2:
+					npc->x += 0x80;
+					break;
+				case 3:
+					npc->y += 0x80;
+					break;
+			}
+			++npc->act_wait;
+			break;
+		case 0x14:
+			npc->y -= 0x3000;
+			npc->act_no = 1;
+			break;
+		default:
+			break;
+	}
+	npc->rect.left = 96;
+	npc->rect.top = 64;
+	npc->rect.right = 112;
+	npc->rect.bottom = 96;
+}
+
+//Lift block
+void ActNpc186(NPCHAR *npc)
+{
+	RECT rc[4];
+	rc[0] = {48, 48, 64, 64};
+	rc[1] = {64, 48, 80, 64};
+	rc[2] = {80, 48, 96, 64};
+	rc[3] = {64, 48, 80, 64};
+	
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			//Fallthrough
+		case 1:
+			break;
+		case 10:
+			npc->act_no = 11;
+			npc->ani_no = 1;
+			npc->act_wait = 0;
+			npc->bits |= 8;
+			//Fallthrough
+		case 11:
+			switch (npc->direct)
+			{
+				case 0:
+					npc->x -= 0x80;
+					break;
+				case 1:
+					npc->y -= 0x80;
+					break;
+				case 2:
+					npc->x += 0x80;
+					break;
+				case 3:
+					npc->y += 0x80;
+					break;
+			}
+			++npc->act_wait;
+			break;
+	}
+	
+	if (++npc->ani_wait > 10)
+	{
+		npc->ani_wait = 0;
+		++npc->ani_no;
+	}
+	
+	if (npc->ani_no > 3)
+		npc->ani_no = 0;
+	
+	npc->rect = rc[npc->ani_no];
+}
+
 //Fuzz Core
 void ActNpc187(NPCHAR *npc)
 {
@@ -695,6 +858,117 @@ void ActNpc188(NPCHAR *npc)
 		npc->rect = rect_right[npc->ani_no];
 }
 
+//Broken robot
+void ActNpc190(NPCHAR *npc)
+{
+	RECT rect[2];
+	rect[0] = {192, 32, 208, 48};
+	rect[1] = {208, 32, 224, 48};
+	
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->ani_no = 0;
+			break;
+		case 10:
+			PlaySoundObject(72, 1);
+			for (int i = 0; i < 8; i++)
+				SetNpChar(4, npc->x, npc->y + (Random(-8, 8) << 9), Random(-8, -2) << 9, Random(-3, 3) << 9, 0, 0, 0x100);
+			npc->cond = 0;
+			break;
+		case 20:
+			if (++npc->ani_wait > 10)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+			if (npc->ani_no > 1)
+				npc->ani_no = 0;
+			break;
+	}
+	
+	npc->rect = rect[npc->ani_no];
+}
+
+//Water level
+void ActNpc191(NPCHAR *npc)
+{
+	int v1; // edx
+	int v2; // edx
+	int v3; // edx
+	int v4; // edx
+
+	switch ( npc->act_no )
+	{
+		case 0:
+			npc->act_no = 10;
+			npc->tgt_y = npc->y;
+			npc->ym = 512;
+			//Fallthrough
+		case 10:
+			if (npc->y >= npc->tgt_y)
+				npc->ym -= 4;
+			else
+				npc->ym += 4;
+			if (npc->ym < -0x100)
+				npc->ym = -0x100;
+			if (npc->ym > 0x100)
+				npc->ym = 0x100;
+			npc->y += npc->ym;
+			break;
+		case 20:
+			npc->act_no = 21;
+			npc->act_wait = 0;
+			//Fallthrough
+		case 21:
+			if (npc->y >= npc->tgt_y)
+				npc->ym -= 4;
+			else
+				npc->ym += 4;
+			if (npc->ym < -0x200)
+				npc->ym = -0x200;
+			if (npc->ym > 0x200)
+				npc->ym = 0x200;
+			npc->y += npc->ym;
+			if (++npc->act_wait > 1000)
+				npc->act_no = 22;
+			break;
+		case 22:
+			if (npc->y >= 0)
+				npc->ym -= 4;
+			else
+				npc->ym += 4;
+			if (npc->ym < -0x200)
+				npc->ym = -0x200;
+			if (npc->ym > 0x200)
+				npc->ym = 0x200;
+			npc->y += npc->ym;
+			if (npc->y < 0x8000 || gSuperYpos)
+			{
+				npc->act_no = 21;
+				npc->act_wait = 0;
+			}
+			break;
+		case 30:
+			if (npc->y >= 0)
+				npc->ym -= 4;
+			else
+				npc->ym += 4;
+			if (npc->ym < -0x200)
+				npc->ym = -0x200;
+			if (npc->ym > 0x100)
+				npc->ym = 0x100;
+			npc->y += npc->ym;
+			break;
+		default:
+			break;
+	}
+	
+	gWaterY = npc->y;
+	npc->rect.right = 0;
+	npc->rect.bottom = 0;
+}
+
 //Scooter
 void ActNpc192(NPCHAR *npc)
 {
@@ -828,6 +1102,12 @@ void ActNpc194(NPCHAR *npc)
 	}
 
 	npc->rect = rc[0];
+}
+
+//Grate
+void ActNpc195(NPCHAR *npc)
+{
+	npc->rect = {112, 64, 128, 80};
 }
 
 //Water/wind particles
