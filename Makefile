@@ -46,6 +46,7 @@ SOURCES = \
 	BossIronH \
 	BossLife \
 	BossOhm \
+	BossTwinD \
 	BossX \
 	BulHit \
 	Bullet \
@@ -82,6 +83,7 @@ SOURCES = \
 	NpcAct160 \
 	NpcAct180 \
 	NpcAct200 \
+	NpcAct220 \
 	NpcAct240 \
 	NpcAct260 \
 	NpcAct280 \

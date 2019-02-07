@@ -10,6 +10,110 @@
 #include "Back.h"
 #include "Triangle.h"
 
+//Hoppy
+void ActNpc347(NPCHAR *npc)
+{
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			// Fallthrough
+		case 1:
+			npc->ani_no = 0;
+
+			if (gMC.y < npc->y + 0x10000 && gMC.y > npc->y - 0x10000)
+			{
+				npc->act_no = 10;
+				npc->act_wait = 0;
+				npc->ani_no = 1;
+			}
+
+			break;
+
+		case 10:
+			if (++npc->act_wait == 4)
+				npc->ani_no = 2;
+
+			if (npc->act_wait > 12)
+			{
+				npc->act_no = 12;
+				npc->xm = 0x700;
+				PlaySoundObject(6, 1);
+				npc->ani_no = 3;
+			}
+
+			break;
+
+		case 12:
+			if (gMC.y < npc->y)
+				npc->ym = -0xAAu;
+			else
+				npc->ym = 0xAA;
+
+			if (npc->flag & 1)
+			{
+				npc->act_no = 13;
+				npc->act_wait = 0;
+				npc->ani_no = 2;
+				npc->xm = 0;
+				npc->ym = 0;
+			}
+			else
+			{
+				npc->xm -= 42;
+
+				if (npc->xm < -0x5FF)
+					npc->xm = -0x5FF;
+
+				npc->x += npc->xm;
+				npc->y += npc->ym;
+			}
+
+			break;
+
+		case 13:
+			++npc->act_wait;
+
+			if (++npc->act_wait == 2)
+				npc->ani_no = 1;
+
+			if (npc->act_wait == 6)
+				npc->ani_no = 0;
+
+			if (npc->act_wait > 16)
+				npc->act_no = 1;
+
+			break;
+	}
+
+	RECT rc[4];
+
+	rc[0] = {256, 48, 272, 64};
+	rc[1] = {272, 48, 288, 64};
+	rc[2] = {288, 48, 304, 64};
+	rc[3] = {304, 48, 320, 64};
+
+	npc->rect = rc[npc->ani_no];
+}
+
+//Statue
+void ActNpc349(NPCHAR *npc)
+{
+	RECT rect = {0, 0, 16, 16};
+
+	if (npc->act_no == 0)
+	{
+		npc->act_no = 1;
+
+		if (npc->direct == 0)
+			npc->x += 0x1000;
+		if (npc->direct == 2)
+			npc->y += 0x2000;
+	}
+
+	npc->rect = rect;
+}
+
 //Quote and Curly on Balrog's back
 void ActNpc355(NPCHAR *npc)
 {
