@@ -202,7 +202,17 @@ void ActNpc196(NPCHAR *npc);
 void ActNpc197(NPCHAR *npc);
 void ActNpc198(NPCHAR *npc);
 void ActNpc199(NPCHAR *npc);
-
+void ActNpc200(NPCHAR *npc);
+void ActNpc201(NPCHAR *npc);
+void ActNpc202(NPCHAR *npc);
+void ActNpc203(NPCHAR *npc);
+void ActNpc204(NPCHAR *npc);
+void ActNpc205(NPCHAR *npc);
+void ActNpc206(NPCHAR *npc);
+void ActNpc207(NPCHAR *npc);
+void ActNpc208(NPCHAR *npc);
+void ActNpc209(NPCHAR *npc);
+void ActNpc210(NPCHAR *npc);
 void ActNpc211(NPCHAR *npc);
 
 void ActNpc218(NPCHAR *npc);
