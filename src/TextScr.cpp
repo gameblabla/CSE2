@@ -1198,6 +1198,12 @@ int TextScriptProc()
 						gTS.item_y = WINDOW_HEIGHT - 112;
 						gTS.p_read += 8;
 					}
+					else if (IS_COMMAND('N','U','M'))
+					{
+						z = GetTextScriptNo(gTS.p_read + 4);
+						SetNumberTextScript(z);
+						gTS.p_read += 8;
+					}
 					else if (IS_COMMAND('E','S','C'))
 					{
 						return 2;
