@@ -858,6 +858,72 @@ void ActNpc188(NPCHAR *npc)
 		npc->rect = rect_right[npc->ani_no];
 }
 
+//Unused homing flame object (possibly related to the Core?)
+void ActNpc189(NPCHAR *npc)
+{
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->xm = -0x40;
+			// Fallthrough
+		case 1:
+			npc->y += npc->ym;
+
+			if (++npc->act_wait > 0x100)
+				npc->act_no = 10;
+
+			break;
+
+		case 10:
+			if (gMC.x < npc->x)
+				npc->xm -= 8;
+			else
+				npc->xm += 8;
+
+			if (gMC.y < npc->y)
+				npc->ym -= 8;
+			else
+				npc->ym += 8;
+
+			if (npc->xm > 0x400)
+				npc->xm = 0x400;
+			if (npc->xm < -0x400)
+				npc->xm = -0x400;
+
+			if (npc->ym > 0x400)
+				npc->ym = 0x400;
+			if (npc->ym < -0x400)
+				npc->ym = -0x400;
+
+			npc->x += npc->xm;
+			npc->y += npc->ym;
+			break;
+	}
+
+	if (gMC.x < npc->x)
+		npc->direct = 0;
+	else
+		npc->direct = 2;
+
+	if (++npc->ani_wait > 2)
+	{
+		npc->ani_wait = 0;
+		++npc->ani_no;
+	}
+
+	if (npc->ani_no > 2)
+		npc->ani_no = 0;
+
+	RECT rect[3];
+
+	rect[0] = {224, 184, 232, 200};
+	rect[1] = {232, 184, 240, 200};
+	rect[2] = {240, 184, 248, 200};
+
+	npc->rect = rect[npc->ani_no];
+}
+
 //Broken robot
 void ActNpc190(NPCHAR *npc)
 {

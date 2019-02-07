@@ -22,6 +22,32 @@ void ActNpc211(NPCHAR *npc)
 	npc->rect = rects[npc->code_event];
 }
 
+// Core giant energy ball projectile
+void ActNpc218(NPCHAR *npc)
+{
+	RECT rc[2];
+
+	rc[0] = {256, 120, 288, 152};
+	rc[1] = {288, 120, 320, 152};
+
+	npc->x += npc->xm;
+	npc->y += npc->ym;
+
+	if (++npc->act_wait > 200)
+		npc->cond = 0;
+
+	if (++npc->ani_wait > 2)
+	{
+		npc->ani_wait = 0;
+		++npc->ani_no;
+	}
+
+	if (npc->ani_no > 1)
+		npc->ani_no = 0;
+
+	npc->rect = rc[npc->ani_no];
+}
+
 //Smoke generator
 void ActNpc219(NPCHAR *npc)
 {

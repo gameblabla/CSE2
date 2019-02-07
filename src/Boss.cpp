@@ -4,6 +4,7 @@
 #include "WindowsWrapper.h"
 
 #include "Boss.h"
+#include "BossAlmo1.h"
 #include "BossFrog.h"
 #include "BossOhm.h"
 #include "BossX.h"
@@ -190,7 +191,7 @@ BOSSFUNCTION gpBossFuncTbl[10] =
 	ActBossChar_Omega,
 	ActBossChar_Frog,
 	ActBossChar_MonstX,
-	nullptr, //ActBossChar_Core,
+	ActBossChar_Core,
 	nullptr, //ActBossChar_Ironhead,
 	nullptr, //ActBossChar_Twin,
 	nullptr, //ActBossChar_Undead,
