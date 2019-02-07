@@ -639,6 +639,131 @@ void ActMyChar_Normal(bool bKey)
 	}
 }
 
+void ActMyChar_Stream(bool bKey)
+{
+	gMC.up = false;
+	gMC.down = false;
+
+	if (bKey)
+	{
+		if (gKey & (gKeyRight | gKeyLeft))
+		{
+			if (gKey & gKeyLeft)
+				gMC.xm -= 0x100;
+
+			if (gKey & gKeyRight)
+				gMC.xm += 0x100;
+		}
+		else if (gMC.xm > 0x7F || gMC.xm < -0x7F)
+		{
+			if (gMC.xm > 0)
+				gMC.xm -= 0x80;
+			else if (gMC.xm < 0)
+				gMC.xm += 0x80;
+		}
+		else
+		{
+			gMC.xm = 0;
+		}
+
+		if (gKey & (gKeyDown | gKeyUp))
+		{
+			if (gKey & gKeyUp)
+				gMC.ym -= 0x100;
+
+			if (gKey & gKeyDown)
+				gMC.ym += 0x100;
+		}
+		else if (gMC.ym > 0x7F || gMC.ym < -0x7F)
+		{
+			if (gMC.ym > 0)
+				gMC.ym -= 0x80;
+			else if (gMC.ym < 0)
+				gMC.ym += 0x80;
+		}
+		else
+		{
+			gMC.ym = 0;
+		}
+	}
+	else
+	{
+		if (gMC.xm > 0x7F || gMC.xm < -0x3F)
+		{
+			if (gMC.xm > 0)
+				gMC.xm -= 0x80;
+			else if (gMC.xm < 0)
+				gMC.xm += 0x80;
+		}
+		else
+		{
+			gMC.xm = 0;
+		}
+
+		if (gMC.ym > 0x7F || gMC.ym < -0x3F)
+		{
+			if (gMC.ym > 0)
+				gMC.ym -= 0x80;
+			else if (gMC.ym < 0)
+				gMC.ym += 0x80;
+		}
+		else
+		{
+			gMC.ym = 0;
+		}
+	}
+
+	if (gMC.ym < -0x200 && gMC.flag & 2)
+		SetCaret(gMC.x, gMC.y - gMC.hit.top, 13, 5);
+	if (gMC.ym > 0x200 && gMC.flag & 8)
+		SetCaret(gMC.x, gMC.hit.bottom + gMC.y, 13, 5);
+
+	if (gMC.xm > 0x400)
+		gMC.xm = 0x400;
+	if (gMC.xm < -0x400)
+		gMC.xm = -0x400;
+
+	if (gMC.ym > 0x400)
+		gMC.ym = 0x400;
+	if (gMC.ym < -0x400)
+		gMC.ym = -0x400;
+
+	if ((gKey & (gKeyUp | gKeyLeft)) == (gKeyLeft | gKeyUp))
+	{
+		if (gMC.xm < -780)
+			gMC.xm = -780;
+		if (gMC.ym < -780)
+			gMC.ym = -780;
+	}
+
+	if ((gKey & (gKeyUp | gKeyRight)) == (gKeyRight | gKeyUp))
+	{
+		if (gMC.xm > 780)
+			gMC.xm = 780;
+		if (gMC.ym < -780)
+			gMC.ym = -780;
+	}
+
+	if ((gKey & (gKeyDown | gKeyLeft)) == (gKeyLeft | gKeyDown))
+	{
+		if (gMC.xm < -780)
+			gMC.xm = -780;
+		if (gMC.ym > 780)
+			gMC.ym = 780;
+	}
+
+	if ((gKey & (gKeyDown | gKeyRight)) == (gKeyRight | gKeyDown))
+	{
+		if (gMC.xm > 780)
+			gMC.xm = 780;
+		if (gMC.ym > 780)
+			gMC.ym = 780;
+	}
+
+	gMC.x += gMC.xm;
+	gMC.y += gMC.ym;
+}
+
 void AirProcess()
 {
 	if (gMC.equip & 0x10)
@@ -713,7 +838,7 @@ void ActMyChar(bool bKey)
 				break;
 			
 			case 1:
-				//ActMyChar_Stream(bKey);
+				ActMyChar_Stream(bKey);
 				break;
 			
 			default:

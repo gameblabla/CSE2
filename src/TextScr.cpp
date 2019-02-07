@@ -889,6 +889,16 @@ int TextScriptProc()
 						else
 							gTS.p_read += 13;
 					}
+					else if (IS_COMMAND('A','M','J'))
+					{
+						x = GetTextScriptNo(gTS.p_read + 4);
+						z = GetTextScriptNo(gTS.p_read + 9);
+
+						if (CheckArms(x))
+							JumpTextScript(z);
+						else
+							gTS.p_read += 13;
+					}
 					else if (IS_COMMAND('U','N','J'))
 					{
 						x = GetTextScriptNo(gTS.p_read + 4);
@@ -1186,6 +1196,12 @@ int TextScriptProc()
 						z = GetTextScriptNo(gTS.p_read + 4);
 						gTS.item = z;
 						gTS.item_y = WINDOW_HEIGHT - 112;
+						gTS.p_read += 8;
+					}
+					else if (IS_COMMAND('N','U','M'))
+					{
+						z = GetTextScriptNo(gTS.p_read + 4);
+						SetNumberTextScript(z);
 						gTS.p_read += 8;
 					}
 					else if (IS_COMMAND('E','S','C'))

@@ -1517,3 +1517,89 @@ void ActNpc177(NPCHAR *npc)
 
 	npc->rect = rc[npc->ani_no];
 }
+
+//Core blade projectile
+void ActNpc178(NPCHAR *npc)
+{
+	if (npc->flag & 0xFF)
+	{
+		SetCaret(npc->x, npc->y, 2, 0);
+		npc->cond = 0;
+	}
+
+	if (npc->flag & 0x100)
+	{
+		npc->y += npc->ym / 2;
+		npc->x += npc->xm / 2;
+	}
+	else
+	{
+		npc->y += npc->ym;
+		npc->x += npc->xm;
+	}
+
+	RECT rect_left[3];
+
+	rect_left[0] = {0, 224, 16, 240};
+	rect_left[1] = {16, 224, 32, 240};
+	rect_left[2] = {32, 224, 48, 240};
+
+	if (++npc->ani_wait > 1)
+	{
+		npc->ani_wait = 0;
+		++npc->ani_no;
+	}
+
+	if (npc->ani_no > 2)
+		npc->ani_no = 0;
+
+	npc->rect = rect_left[npc->ani_no];
+
+	if (++npc->count1 > 150)
+	{
+		VanishNpChar(npc);
+		SetCaret(npc->x, npc->y, 2, 0);
+	}
+}
+
+//Core wisp projectile
+void ActNpc179(NPCHAR *npc)
+{
+	if (npc->flag & 0xFF)
+	{
+		npc->cond = 0;
+		SetCaret(npc->x, npc->y, 2, 0);
+	}
+
+	npc->xm -= 0x20;
+	npc->ym = 0;
+
+	if (npc->xm < -0x400)
+		npc->xm = -0x400;
+
+	npc->y += npc->ym;
+	npc->x += npc->xm;
+
+	RECT rect_left[3];
+
+	rect_left[0] = {48, 224, 72, 240};
+	rect_left[1] = {72, 224, 96, 240};
+	rect_left[2] = {96, 224, 120, 240};
+
+	if (++npc->ani_wait > 1)
+	{
+		npc->ani_wait = 0;
+		++npc->ani_no;
+	}
+
+	if (npc->ani_no > 2)
+		npc->ani_no = 0;
+
+	npc->rect = rect_left[npc->ani_no];
+
+	if (++npc->count1 > 300)
+	{
+		VanishNpChar(npc);
+		SetCaret(npc->x, npc->y, 2, 0);
+	}
+}

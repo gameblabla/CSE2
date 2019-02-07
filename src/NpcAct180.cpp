@@ -12,6 +12,7 @@
 #include "Frame.h"
 #include "Bullet.h"
 #include "Flags.h"
+#include "NpcHit.h"
 
 //Curly AI
 void ActNpc180(NPCHAR *npc)
@@ -858,6 +859,72 @@ void ActNpc188(NPCHAR *npc)
 		npc->rect = rect_right[npc->ani_no];
 }
 
+//Unused homing flame object (possibly related to the Core?)
+void ActNpc189(NPCHAR *npc)
+{
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->xm = -0x40;
+			// Fallthrough
+		case 1:
+			npc->y += npc->ym;
+
+			if (++npc->act_wait > 0x100)
+				npc->act_no = 10;
+
+			break;
+
+		case 10:
+			if (gMC.x < npc->x)
+				npc->xm -= 8;
+			else
+				npc->xm += 8;
+
+			if (gMC.y < npc->y)
+				npc->ym -= 8;
+			else
+				npc->ym += 8;
+
+			if (npc->xm > 0x400)
+				npc->xm = 0x400;
+			if (npc->xm < -0x400)
+				npc->xm = -0x400;
+
+			if (npc->ym > 0x400)
+				npc->ym = 0x400;
+			if (npc->ym < -0x400)
+				npc->ym = -0x400;
+
+			npc->x += npc->xm;
+			npc->y += npc->ym;
+			break;
+	}
+
+	if (gMC.x < npc->x)
+		npc->direct = 0;
+	else
+		npc->direct = 2;
+
+	if (++npc->ani_wait > 2)
+	{
+		npc->ani_wait = 0;
+		++npc->ani_no;
+	}
+
+	if (npc->ani_no > 2)
+		npc->ani_no = 0;
+
+	RECT rect[3];
+
+	rect[0] = {224, 184, 232, 200};
+	rect[1] = {232, 184, 240, 200};
+	rect[2] = {240, 184, 248, 200};
+
+	npc->rect = rect[npc->ani_no];
+}
+
 //Broken robot
 void ActNpc190(NPCHAR *npc)
 {
@@ -1107,7 +1174,143 @@ void ActNpc194(NPCHAR *npc)
 //Grate
 void ActNpc195(NPCHAR *npc)
 {
-	npc->rect = {112, 64, 128, 80};
+	RECT rc = {112, 64, 128, 80};
+	npc->rect = rc;
+}
+
+//Ironhead motion wall
+void ActNpc196(NPCHAR *npc)
+{
+	RECT rcLeft = {112, 64, 144, 80};
+	RECT rcRight = {112, 80, 144, 96};
+
+	npc->x -= 0xC00;
+
+	if (npc->x <= 0x26000)
+		npc->x += 0x2C000;
+
+	if (npc->direct == 0)
+		npc->rect = rcLeft;
+	else
+		npc->rect = rcRight;
+}
+
+//Porcupine Fish
+void ActNpc197(NPCHAR *npc)
+{
+	RECT rc[4];
+
+	rc[0] = {0, 0, 16, 16};
+	rc[1] = {16, 0, 32, 16};
+	rc[2] = {32, 0, 48, 16};
+	rc[3] = {48, 0, 64, 16};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 10;
+			npc->ani_wait = 0;
+			npc->ym = Random(-0x200, 0x200);
+			npc->xm = 0x800;
+			// Fallthrough
+		case 10:
+			if (++npc->ani_wait > 2)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no > 1)
+				npc->ani_no = 0;
+
+			if (npc->xm < 0)
+			{
+				npc->damage = 3;
+				npc->act_no = 20;
+			}
+
+			break;
+
+		case 20:
+			npc->damage = 3;
+
+			if (++npc->ani_wait > 0)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no > 3)
+				npc->ani_no = 2;
+
+			if (npc->x < 0x6000)
+			{
+				npc->destroy_voice = 0;
+				LoseNpChar(npc, 1);
+			}
+
+			break;
+	}
+
+	if (npc->flag & 2)
+		npc->ym = 0x200;
+	if (npc->flag & 8)
+		npc->ym = -0x200;
+
+	npc->xm -= 12;
+
+	npc->x += npc->xm;
+	npc->y += npc->ym;
+
+	npc->rect = rc[npc->ani_no];
+}
+
+//Ironhead projectile
+void ActNpc198(NPCHAR *npc)
+{
+	RECT rcRight[3];
+
+	rcRight[0] = {208, 48, 224, 72};
+	rcRight[1] = {224, 48, 240, 72};
+	rcRight[2] = {240, 48, 256, 72};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			if (++npc->act_wait > 20)
+			{
+				npc->act_no = 1;
+				npc->xm = 0;
+				npc->ym = 0;
+				npc->count1 = 0;
+			}
+
+			break;
+
+		case 1:
+			npc->xm += 0x20;
+			break;
+	}
+
+	if (++npc->ani_wait > 0)
+	{
+		npc->ani_wait = 0;
+		++npc->ani_no;
+	}
+
+	if (npc->ani_no > 2)
+		npc->ani_no = 0;
+
+	npc->x += npc->xm;
+	npc->y += npc->ym;
+
+	npc->rect = rcRight[npc->ani_no];
+
+	if (++npc->count1 > 100)
+		npc->cond = 0;
+
+	if (npc->count1 % 4 == 1)
+		PlaySoundObject(46, 1);
 }
 
 //Water/wind particles
