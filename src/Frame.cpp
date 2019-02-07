@@ -43,7 +43,6 @@ void MoveFrame3()
 	}
 	else
 	{
-		
 		gFrame.y = (((map_l - 1) << 4) - WINDOW_HEIGHT) << 8;
 	}
 
