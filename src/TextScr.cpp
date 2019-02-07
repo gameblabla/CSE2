@@ -889,6 +889,16 @@ int TextScriptProc()
 						else
 							gTS.p_read += 13;
 					}
+					else if (IS_COMMAND('A','M','J'))
+					{
+						x = GetTextScriptNo(gTS.p_read + 4);
+						z = GetTextScriptNo(gTS.p_read + 9);
+
+						if (CheckArms(x))
+							JumpTextScript(z);
+						else
+							gTS.p_read += 13;
+					}
 					else if (IS_COMMAND('U','N','J'))
 					{
 						x = GetTextScriptNo(gTS.p_read + 4);

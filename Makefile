@@ -43,6 +43,7 @@ SOURCES = \
 	Boss \
 	BossAlmo1 \
 	BossFrog \
+	BossIronH \
 	BossLife \
 	BossOhm \
 	BossX \

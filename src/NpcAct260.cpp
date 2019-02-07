@@ -8,6 +8,103 @@
 #include "Sound.h"
 #include "Back.h"
 #include "Triangle.h"
+#include "Caret.h"
+#include "Map.h"
+
+// Ironhead block
+void ActNpc271(NPCHAR *npc)
+{
+	if (npc->xm < 0 && npc->x < -0x2000)
+	{
+		VanishNpChar(npc);
+	}
+	else
+	{
+		if (npc->xm > 0 && npc->x > (gMap.width + 1) * 0x2000)
+		{
+			VanishNpChar(npc);
+		}
+		else
+		{
+			if (npc->act_no == 0)
+			{
+				npc->act_no = 1;
+				int a = Random(0, 9);
+
+				if (a == 9)
+				{
+					npc->rect.left = 0;
+					npc->rect.right = 0x20;
+					npc->rect.top = 0x40;
+					npc->rect.bottom = 0x60;
+					npc->view.front = 0x2000;
+					npc->view.back = 0x2000;
+					npc->view.top = 0x2000;
+					npc->view.bottom = 0x2000;
+					npc->hit.front = 0x1800;
+					npc->hit.back = 0x1800;
+					npc->hit.top = 0x1800;
+					npc->hit.bottom = 0x1800;
+				}
+				else
+				{
+					npc->rect.left = 16 * (a % 3 + 7);
+					npc->rect.top = 16 * (a / 3);
+					npc->rect.right = npc->rect.left + 16;
+					npc->rect.bottom = npc->rect.top + 16;
+				}
+
+				if (npc->direct == 0)
+					npc->xm = -2 * Random(0x100, 0x200);
+				else
+					npc->xm = 2 * Random(0x100, 0x200);
+
+				npc->ym = Random(-0x200, 0x200);
+			}
+
+			if (npc->ym < 0 && npc->y - npc->hit.top <= 0xFFF)
+			{
+				npc->ym = -npc->ym;
+				SetCaret(npc->x, npc->y - 0x1000, 13, 0);
+				SetCaret(npc->x, npc->y - 0x1000, 13, 0);
+			}
+
+			if (npc->ym > 0 && npc->y + npc->hit.bottom > 0x1D000)
+			{
+				npc->ym = -npc->ym;
+				SetCaret(npc->x, npc->y + 0x1000, 13, 0);
+				SetCaret(npc->x, npc->y + 0x1000, 13, 0);
+			}
+
+			npc->x += npc->xm;
+			npc->y += npc->ym;
+		}
+	}
+}
+
+// Ironhead block generator
+void ActNpc272(NPCHAR *npc)
+{
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->act_wait = Random(0, 200);
+			// Fallthrough
+		case 1:
+			if (npc->act_wait)
+			{
+				--npc->act_wait;
+			}
+			else
+			{
+				npc->act_no = 0;
+				SetNpChar(271, npc->x, npc->y + (Random(-32, 32) * 0x200), 0, 0, npc->direct, 0, 0x100);
+			}
+
+			break;
+	}
+}
 
 //Little family
 void ActNpc278(NPCHAR *npc)
