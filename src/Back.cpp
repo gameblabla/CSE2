@@ -167,12 +167,18 @@ void PutFront(int fx, int fy)
 	{
 		const bool fromFocus = (gStageNo == 31); //Get if we should only draw around a 320x240 area of the focus point
 		
-		//Get borders
-		const int barLeft = fromFocus ? (*gFrame.tgt_x - (320 << 8)) : -0x1000;
-		const int barTop = fromFocus ? (*gFrame.tgt_y - (240 << 8)) : -0x1000;
+		//Get focus rect
+		int focusX = gFrame.x + (WINDOW_WIDTH << 8) - (320 << 8);
+		int focusY = gFrame.y + (WINDOW_HEIGHT << 8) - (240 << 8);
+		int focusR = focusX + (320 << 9);
+		int focusB = focusY + (240 << 9);
 		
-		const int barRight = fromFocus ? (*gFrame.tgt_x + (320 << 8)) : (gMap.width << 13) - 0x1000;
-		const int barBottom = fromFocus ? (*gFrame.tgt_y + (240 << 8)) : (gMap.length << 13) - 0x1000;
+		//Get borders
+		const int barLeft = fromFocus ? focusX : -0x1000;
+		const int barTop = fromFocus ? focusY : -0x1000;
+		
+		const int barRight = fromFocus ? focusR : (gMap.width << 13) - 0x1000;
+		const int barBottom = fromFocus ? focusB : (gMap.length << 13) - 0x1000;
 		
 		//Draw bars
 		RECT barRect;
