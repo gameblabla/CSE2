@@ -12,4 +12,5 @@ void JudgeHitNpCharTriangleG(NPCHAR *npc, int x, int y);
 void JudgeHitNpCharTriangleH(NPCHAR *npc, int x, int y);
 void JudgeHitNpCharWater(NPCHAR *npc, int x, int y);
 void HitNpCharMap();
+void LoseNpChar(NPCHAR *npc, bool bVanish);
 void HitNpCharBullet();
