@@ -1193,6 +1193,167 @@ void ActNpc255(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
+//Doctor (facing away)
+void ActNpc256(NPCHAR *npc)
+{
+	RECT rcLeft[6];
+
+	rcLeft[0] = {48, 160, 72, 192};
+	rcLeft[1] = {72, 160, 96, 192};
+	rcLeft[2] = {0, 128, 24, 160};
+	rcLeft[3] = {24, 128, 48, 160};
+	rcLeft[4] = {0, 160, 24, 192};
+	rcLeft[5] = {24, 160, 48, 192};
+
+	switch ( npc->act_no )
+	{
+		case 0:
+			gSuperXpos = 0;
+			npc->act_no = 1;
+			npc->y -= 0x1000;
+			// Fallthrough
+		case 1:
+			npc->ani_no = 0;
+			break;
+
+		case 10:
+			npc->act_no = 11;
+			npc->ani_wait = 0;
+			npc->ani_no = 0;
+			npc->count1 = 0;
+			// Fallthrough
+		case 11:
+			if (++npc->ani_wait > 5)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no > 1)
+			{
+				npc->ani_no = 0;
+				++npc->count1;
+			}
+
+			if (npc->count1 > 5)
+				npc->act_no = 1;
+
+			break;
+
+		case 20:
+			npc->act_no = 21;
+			// Fallthrough
+		case 21:
+			npc->ani_no = 2;
+			break;
+
+		case 40:
+			npc->act_no = 41;
+			SetNpChar(257, npc->x - 0x1C00, npc->y - 0x2000, 0, 0, 0, 0, 0x100);
+			SetNpChar(257, npc->x - 0x1C00, npc->y - 0x2000, 0, 0, 2, 0, 0xAA);
+			// Fallthrough
+		case 41:
+			npc->ani_no = 4;
+			break;
+
+		case 50:
+			npc->act_no = 51;
+			npc->ani_wait = 0;
+			npc->ani_no = 4;
+			npc->count1 = 0;
+			// Fallthrough
+		case 51:
+			if (++npc->ani_wait > 5)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no > 5)
+			{
+				npc->ani_no = 4;
+				++npc->count1;
+			}
+
+			if (npc->count1 > 5)
+				npc->act_no = 41;
+
+			break;
+	}
+
+	npc->rect = rcLeft[npc->ani_no];
+}
+
+//Red crystal
+void ActNpc257(NPCHAR *npc)
+{
+	RECT rc[3];
+
+	rc[0] = {176, 32, 184, 48};
+	rc[1] = {184, 32, 192, 48};
+	rc[2] = {0, 0, 0, 0};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			// Fallthrough
+		case 1:
+			if (gSuperXpos)
+				npc->act_no = 10;
+
+			break;
+
+		case 10:
+			if (npc->x < gSuperXpos)
+				npc->xm += 0x55;
+			if (npc->x > gSuperXpos)
+				npc->xm -= 0x55;
+
+			if (npc->y < gSuperYpos)
+				npc->ym += 0x55;
+			if (npc->y > gSuperYpos)
+				npc->ym -= 0x55;
+
+			if (npc->xm > 0x400)
+				npc->xm = 0x400;
+			if (npc->xm < -0x400)
+				npc->xm = -0x400;
+
+			if (npc->ym > 0x400)
+				npc->ym = 0x400;
+			if (npc->ym < -0x400)
+				npc->ym = -0x400;
+
+			npc->x += npc->xm;
+			npc->y += npc->ym;
+			break;
+	}
+
+	if (++npc->ani_wait > 3)
+	{
+		npc->ani_wait = 0;
+		++npc->ani_no;
+	}
+
+	if (npc->ani_no > 1)
+		npc->ani_no = 0;
+
+	if (npc->direct == 0 && npc->xm > 0)
+		npc->ani_no = 2;
+	if (npc->direct == 2 && npc->xm < 0)
+		npc->ani_no = 2;
+
+	npc->rect = rc[npc->ani_no];
+}
+
+//Mimiga (sleeping)
+void ActNpc258(NPCHAR *npc)
+{
+	RECT rc = {48, 32, 64, 48};
+	npc->rect = rc;
+}
+
 //Curly (carried and unconcious)
 void ActNpc259(NPCHAR *npc)
 {
