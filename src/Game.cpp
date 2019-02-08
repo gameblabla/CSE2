@@ -114,7 +114,7 @@ int ModeOpening()
 	SetFadeMask();
 	
 	//Reset cliprect and flags
-	grcGame.left = 0;
+	grcGame = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 	g_GameFlags = 3;
 	
 	CutNoise();
@@ -290,7 +290,7 @@ int ModeTitle()
 	}
 	
 	//Reset cliprect, flags, and give the player the nikumaru counter
-	grcGame.left = 0;
+	grcGame = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 	g_GameFlags = 0;
 	gMC.equip |= 0x100;
 	
