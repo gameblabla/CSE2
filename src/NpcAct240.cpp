@@ -488,6 +488,571 @@ void ActNpc246(NPCHAR *npc)
 	npc->rect = rcLeft[npc->ani_no];
 }
 
+//Misery (boss)
+void ActNpc247(NPCHAR *npc)
+{
+	RECT rcLeft[9];
+	RECT rcRight[9];
+
+	rcLeft[0] = {0, 0, 16, 16};
+	rcLeft[1] = {16, 0, 32, 16};
+	rcLeft[2] = {32, 0, 48, 16};
+	rcLeft[3] = {48, 0, 64, 16};
+	rcLeft[4] = {64, 0, 80, 16};
+	rcLeft[5] = {80, 0, 96, 16};
+	rcLeft[6] = {96, 0, 112, 16};
+	rcLeft[7] = {0, 0, 0, 0};
+	rcLeft[8] = {112, 0, 128, 16};
+
+	rcRight[0] = {0, 16, 16, 32};
+	rcRight[1] = {16, 16, 32, 32};
+	rcRight[2] = {32, 16, 48, 32};
+	rcRight[3] = {48, 16, 64, 32};
+	rcRight[4] = {64, 16, 80, 32};
+	rcRight[5] = {80, 16, 96, 32};
+	rcRight[6] = {96, 16, 112, 32};
+	rcRight[7] = {0, 0, 0, 0};
+	rcRight[8] = {112, 16, 128, 32};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->y += 0xC00;
+			npc->tgt_y = 0x8000;
+			// Fallthrough
+		case 1:
+			if (Random(0, 120) == 10)
+			{
+				npc->act_no = 2;
+				npc->act_wait = 0;
+				npc->ani_no = 1;
+			}
+
+			break;
+
+		case 2:
+			if (++npc->act_wait > 8)
+			{
+				npc->act_no = 1;
+				npc->ani_no = 0;
+			}
+
+			break;
+
+		case 20:
+			npc->xm = 0;
+			npc->ym += 0x40;
+
+			if (npc->flag & 8)
+			{
+				npc->act_no = 21;
+				npc->ani_no = 2;
+			}
+
+			break;
+
+		case 21:
+			if (Random(0, 120) == 10)
+			{
+				npc->act_no = 22;
+				npc->act_wait = 0;
+				npc->ani_no = 3;
+			}
+
+			break;
+
+		case 22:
+			if (++npc->act_wait > 8)
+			{
+				npc->act_no = 21;
+				npc->ani_no = 2;
+			}
+
+			break;
+
+		case 100:
+			npc->act_no = 101;
+			npc->act_wait = 0;
+			npc->ani_no = 0;
+			npc->xm = 0;
+			npc->bits |= 0x20;
+			npc->count2 = npc->life;
+			// Fallthrough
+		case 101:
+			if (gMC.x < npc->x)
+				npc->direct = 0;
+			else
+				npc->direct = 2;
+
+			if (npc->tgt_y > npc->y)
+				npc->ym += 0x20;
+			else
+				npc->ym -= 0x20;
+
+			if (npc->ym < -0x200)
+				npc->ym = -0x200;
+			if (npc->ym > 0x200)
+				npc->ym = 0x200;
+
+			if (++npc->act_wait > 200 || npc->life <= npc->count2 - 80)
+			{
+				npc->act_wait = 0;
+				npc->act_no = 110;
+			}
+
+			break;
+
+		case 110:
+			npc->act_no = 111;
+			npc->act_wait = 0;
+			npc->xm = 0;
+			npc->ym = 0;
+			npc->bits &= ~0x20;
+			// Fallthrough
+		case 111:
+			if (++npc->act_wait % 2)
+				npc->ani_no = 5;
+			else
+				npc->ani_no = 6;
+
+			if (npc->act_wait > 30)
+			{
+				npc->act_wait = 0;
+
+				if (++npc->count1 % 3)
+					npc->act_no = 112;
+				else
+					npc->act_no = 113;
+
+				npc->ani_no = 4;
+			}
+
+			break;
+
+		case 112:
+			if (++npc->act_wait % 6 == 0)
+			{
+				const unsigned char deg = GetArktan(npc->x - gMC.x, npc->y - gMC.y) + Random(-4, 4);
+				const int ym = 4 * GetSin(deg);
+				const int xm = 4 * GetCos(deg);
+				SetNpChar(248, npc->x, npc->y + 0x800, xm, ym, 0, 0, 0x100);
+				PlaySoundObject(34, 1);
+			}
+
+			if (npc->act_wait > 30)
+			{
+				npc->act_wait = 0;
+				npc->act_no = 150;
+			}
+
+			break;
+
+		case 113:
+			if (++npc->act_wait == 10)
+				SetNpChar(279, gMC.x, gMC.y - 0x8000, 0, 0, 1, 0, 0x100);
+
+			if (npc->act_wait > 30)
+			{
+				npc->act_wait = 0;
+				npc->act_no = 150;
+			}
+
+			break;
+
+		case 150:
+			npc->act_no = 151;
+			npc->act_wait = 0;
+			npc->ani_no = 7;
+			SetNpChar(249, npc->x, npc->y, 0, 0, 0, 0, 0x100);
+			SetNpChar(249, npc->x, npc->y, 0, 0, 2, 0, 0x100);
+			npc->tgt_x = Random(9, 31) * 0x2000;
+			npc->tgt_y = Random(5, 7) * 0x2000;
+			PlaySoundObject(29, 1);
+			// Fallthrough
+		case 151:
+			if (++npc->act_wait == 42)
+			{
+				SetNpChar(249, npc->tgt_x + 0x2000, npc->tgt_y, 0, 0, 0, 0, 0x100);
+				SetNpChar(249, npc->tgt_x - 0x2000, npc->tgt_y, 0, 0, 2, 0, 0x100);
+			}
+
+			if (npc->act_wait > 50)
+			{
+				npc->act_wait = 0;
+				npc->ym = -0x200;
+				npc->bits |= 0x20;
+				npc->x = npc->tgt_x;
+				npc->y = npc->tgt_y;
+
+				if (npc->life < 340)
+				{
+					SetNpChar(252, 0, 0, 0, 0, 0, npc, 0x100);
+					SetNpChar(252, 0, 0, 0, 0, 0x80, npc, 0x100);
+				}
+
+				if (npc->life < 180)
+				{
+					SetNpChar(252, 0, 0, 0, 0, 0x40, npc, 0x100);
+					SetNpChar(252, 0, 0, 0, 0, 0xC0, npc, 0x100);
+				}
+
+				if (gMC.x < npc->x - 0xE000 || gMC.x > npc->x + 0xE000)
+					npc->act_no = 160;
+				else
+					npc->act_no = 100;
+			}
+
+			break;
+
+		case 160:
+			npc->act_no = 161;
+			npc->act_wait = 0;
+			npc->ani_no = 4;
+
+			if (gMC.x < npc->x)
+				npc->direct = 0;
+			else
+				npc->direct = 2;
+			// Fallthrough
+		case 161:
+			if (npc->tgt_y > npc->y)
+				npc->ym += 0x20;
+			else
+				npc->ym -= 0x20;
+
+			if (npc->ym < -0x200)
+				npc->ym = -0x200;
+			if (npc->ym > 0x200)
+				npc->ym = 0x200;
+
+			if (++npc->act_wait % 24 == 0)
+			{
+				SetNpChar(250, npc->x, npc->y + 0x800, 0, 0, 0, 0, 0x100);
+				PlaySoundObject(34, 1);
+			}
+
+			if (npc->act_wait > 72)
+			{
+				npc->act_wait = 0;
+				npc->act_no = 100;
+			}
+
+			break;
+
+		case 1000:
+			npc->bits &= ~0x20;
+			npc->act_no = 1001;
+			npc->act_wait = 0;
+			npc->ani_no = 4;
+			npc->tgt_x = npc->x;
+			npc->tgt_y = npc->y;
+			npc->xm = 0;
+			npc->ym = 0;
+			DeleteNpCharCode(252, 1);
+			SetNpChar(4, npc->x, npc->y, 0, 0, 0, 0, 0x100);
+			SetNpChar(4, npc->x, npc->y, 0, 0, 0, 0, 0x100);
+			SetNpChar(4, npc->x, npc->y, 0, 0, 0, 0, 0x100);
+			// Fallthrough
+		case 1001:
+			if (++npc->act_wait / 2 % 2)
+				npc->x = npc->tgt_x + 0x200;
+			else
+				npc->x = npc->tgt_x;
+
+			break;
+
+		case 1010:
+			npc->ym += 0x10;
+
+			if (npc->flag & 8)
+			{
+				npc->act_no = 1020;
+				npc->ani_no = 8;
+			}
+
+			break;
+	}
+
+	if (npc->xm < -0x200)
+		npc->xm = -0x200;
+	if (npc->xm > 0x200)
+		npc->xm = 0x200;
+
+	if (npc->ym < -0x400)
+		npc->ym = -0x400;
+	if (npc->ym > 0x400)
+		npc->ym = 0x400;
+
+	npc->x += npc->xm;
+	npc->y += npc->ym;
+
+	if (npc->direct == 0)
+		npc->rect = rcLeft[npc->ani_no];
+	else
+		npc->rect = rcRight[npc->ani_no];
+}
+
+//Boss Misery (vanishing)
+void ActNpc248(NPCHAR *npc)
+{
+	if (npc->flag & 0xFF)
+	{
+		npc->cond = 0;
+		SetCaret(npc->x, npc->y, 2, 0);
+	}
+
+	npc->y += npc->ym;
+	npc->x += npc->xm;
+
+	RECT rect_left[3];
+
+	rect_left[0] = {0, 48, 16, 64};
+	rect_left[1] = {16, 48, 32, 64};
+	rect_left[2] = {32, 48, 48, 64};
+
+	if (++npc->ani_wait > 1)
+	{
+		npc->ani_wait = 0;
+
+		if (++npc->ani_no > 2)
+			npc->ani_no = 0;
+	}
+
+	npc->rect = rect_left[npc->ani_no];
+
+	if (++npc->count1 > 300)
+	{
+		npc->cond = 0;
+		SetCaret(npc->x, npc->y, 2, 0);
+	}
+}
+
+//Boss Misery energy shot
+void ActNpc249(NPCHAR *npc)
+{
+	RECT rc[2];
+
+	rc[0] = {48, 48, 64, 64};
+	rc[1] = {64, 48, 80, 64};
+
+	if (++npc->act_wait > 8)
+		npc->cond = 0;
+
+	if (npc->direct == 0)
+	{
+		npc->rect = rc[0];
+		npc->x -= 1024;
+	}
+	else
+	{
+		npc->rect = rc[1];
+		npc->x += 1024;
+	}
+}
+
+//Boss Misery lightning ball
+void ActNpc250(NPCHAR *npc)
+{
+	RECT rc[3];
+
+	rc[0] = {0, 32, 16, 48};
+	rc[1] = {16, 32, 32, 48};
+	rc[2] = {32, 32, 48, 48};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->tgt_y = npc->y;
+			npc->xm = 0;
+			npc->ym = -0x200;
+			// Fallthrough
+		case 1:
+			if (gMC.x > npc->x)
+				npc->xm += 0x10;
+			else
+				npc->xm -= 0x10;
+
+			if (npc->tgt_y > npc->y)
+				npc->ym += 0x20;
+			else
+				npc->ym -= 0x20;
+
+			if (npc->xm > 0x200)
+				npc->xm = 0x200;
+			if (npc->xm < -0x200)
+				npc->xm = -0x200;
+
+			if (npc->ym > 0x200)
+				npc->ym = 0x200;
+			if (npc->ym < -0x200)
+				npc->ym = -0x200;
+
+			npc->x += npc->xm;
+			npc->y += npc->ym;
+
+			if (++npc->ani_wait > 2)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no > 1)
+				npc->ani_no = 0;
+
+			if (gMC.x > npc->x - 0x1000 && gMC.x < npc->x + 0x1000 && gMC.y > npc->y)
+				npc->act_no = 10;
+
+			break;
+
+		case 10:
+			npc->act_no = 11;
+			npc->act_wait = 0;
+			// Fallthrough
+		case 11:
+			if (++npc->act_wait > 10)
+			{
+				SetNpChar(251, npc->x, npc->y, 0, 0, 0, 0, 0x100);
+				PlaySoundObject(101, 1);
+				npc->cond = 0;
+				return;
+			}
+
+			if (npc->act_wait / 2 % 2)
+				npc->ani_no = 2;
+			else
+				npc->ani_no = 1;
+	}
+
+	npc->rect = rc[npc->ani_no];
+}
+
+//Boss Misery lightning
+void ActNpc251(NPCHAR *npc)
+{
+	RECT rc[2];
+
+	rc[0] = {80, 32, 96, 64};
+	rc[1] = {96, 32, 112, 64};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			// Fallthrough
+		case 1:
+			if (++npc->ani_no > 1)
+				npc->ani_no = 0;
+
+			npc->y += 0x1000;
+
+			if (npc->flag & 0xFF)
+			{
+				SetDestroyNpChar(npc->x, npc->y, npc->view.back, 3);
+				npc->cond = 0;
+			}
+
+			break;
+	}
+
+	npc->rect = rc[npc->ani_no];
+}
+
+//Boss Misery bats
+void ActNpc252(NPCHAR *npc)
+{
+	RECT rcLeft[4];
+	RECT rcRight[4];
+
+	rcLeft[0] = {48, 32, 64, 48};
+	rcLeft[1] = {112, 32, 128, 48};
+	rcLeft[2] = {128, 32, 144, 48};
+	rcLeft[3] = {144, 32, 160, 48};
+
+	rcRight[0] = {48, 32, 64, 48};
+	rcRight[1] = {112, 48, 128, 64};
+	rcRight[2] = {128, 48, 144, 64};
+	rcRight[3] = {144, 48, 160, 64};
+
+	unsigned char deg;
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->act_wait = 0;
+			npc->count1 = npc->direct;
+			// Fallthrough
+		case 1:
+			npc->count1 += 2;
+			npc->count1 &= 0xFF;
+
+			deg = npc->count1;
+
+			if ( npc->act_wait < 192 )
+				++npc->act_wait;
+
+			npc->x = npc->pNpc->x + npc->act_wait * GetCos(deg) / 4;
+			npc->y = npc->pNpc->y + npc->act_wait * GetSin(deg) / 4;
+
+			if (npc->pNpc->act_no == 151)
+			{
+				npc->act_no = 10;
+				npc->ani_no = 0;
+			}
+
+			break;
+
+		case 10:
+			npc->act_no = 11;
+			npc->bits |= 0x20;
+			npc->bits &= ~4;
+			npc->bits &= ~8;
+
+			deg = GetArktan(npc->x - gMC.x, npc->y - gMC.y);
+			deg += Random(-3, 3);
+			npc->xm = GetCos(deg);
+			npc->ym = GetSin(deg);
+
+			npc->ani_no = 1;
+			npc->ani_wait = 0;
+
+			if (gMC.x < npc->x)
+				npc->direct = 0;
+			else
+				npc->direct = 2;
+			// Fallthrough
+		case 11:
+			npc->x += npc->xm;
+			npc->y += npc->ym;
+
+			if (npc->flag & 0xFF)
+			{
+				SetNpChar(4, npc->x, npc->y, 0, 0, 0, 0, 0x100);
+				SetNpChar(4, npc->x, npc->y, 0, 0, 0, 0, 0x100);
+				SetNpChar(4, npc->x, npc->y, 0, 0, 0, 0, 0x100);
+				npc->cond = 0;
+			}
+
+			if (++npc->ani_wait > 4)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no > 3)
+				npc->ani_no = 1;
+
+			break;
+	}
+
+	if (npc->direct == 0)
+		npc->rect = rcLeft[npc->ani_no];
+	else
+		npc->rect = rcRight[npc->ani_no];
+}
+
 //EXP capsule
 void ActNpc253(NPCHAR *npc)
 {

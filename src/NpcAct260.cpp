@@ -12,6 +12,205 @@
 #include "Map.h"
 #include "Frame.h"
 
+//Igor (enemy)
+void ActNpc268(NPCHAR *npc)
+{
+	RECT rcLeft[10];
+	RECT rcRight[10];
+
+	rcLeft[0] = {0, 0, 40, 40};
+	rcLeft[1] = {40, 0, 80, 40};
+	rcLeft[2] = {80, 0, 120, 40};
+	rcLeft[3] = {0, 0, 40, 40};
+	rcLeft[4] = {120, 0, 160, 40};
+	rcLeft[5] = {0, 0, 40, 40};
+	rcLeft[6] = {40, 80, 80, 120};
+	rcLeft[7] = {0, 80, 40, 120};
+	rcLeft[8] = {240, 0, 280, 40};
+	rcLeft[9] = {280, 0, 320, 40};
+
+	rcRight[0] = {0, 40, 40, 80};
+	rcRight[1] = {40, 40, 80, 80};
+	rcRight[2] = {80, 40, 120, 80};
+	rcRight[3] = {0, 40, 40, 80};
+	rcRight[4] = {120, 40, 160, 80};
+	rcRight[5] = {0, 40, 40, 80};
+	rcRight[6] = {160, 80, 200, 120};
+	rcRight[7] = {120, 80, 160, 120};
+	rcRight[8] = {240, 40, 280, 80};
+	rcRight[9] = {280, 40, 320, 80};
+
+	if (npc->x < gMC.x - 0x28000 || npc->x > gMC.x + 0x28000 || npc->y < gMC.y - 0x1E000 || npc->y > gMC.y + 0x1E000)
+		npc->act_no = 1;
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->y += 0x1000;
+			// Fallthrough
+		case 1:
+			if (++npc->ani_wait > 20)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no > 1)
+				npc->ani_no = 0;
+
+			if (npc->x < gMC.x + 0xE000 && npc->x > gMC.x - 0xE000 && npc->x < gMC.x + 0x6000 && npc->x > gMC.x - 0xE000)
+				npc->act_no = 10;
+
+			if (npc->shock)
+				npc->act_no = 10;
+
+			break;
+
+		case 10:
+			npc->act_no = 11;
+			npc->act_wait = 0;
+			npc->ani_no = 0;
+			npc->ani_wait = 0;
+
+			if (gMC.x < npc->x)
+				npc->direct = 0;
+			else
+				npc->direct = 2;
+			// Fallthrough
+		case 11:
+			if (npc->direct == 0)
+				npc->xm = -0x200;
+			else
+				npc->xm = 0x200;
+
+			if (npc->x < gMC.x + 0x8000 && npc->x > gMC.x - 0x8000)
+			{
+				npc->act_no = 20;
+				npc->act_wait = 0;
+			}
+
+			if (npc->xm < 0 && npc->flag & 1)
+			{
+				npc->act_no = 20;
+				npc->act_wait = 0;
+			}
+
+			if (npc->xm > 0 && npc->flag & 4)
+			{
+				npc->act_no = 20;
+				npc->act_wait = 0;
+			}
+
+			if (++npc->ani_wait > 4)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no > 5)
+				npc->ani_no = 2;
+
+			break;
+
+		case 20:
+			npc->xm = 0;
+			npc->ani_no = 6;
+
+			if (++npc->act_wait > 10)
+			{
+				npc->act_no = 30;
+				npc->ym = -0x5FF;
+
+				if (npc->direct == 0)
+					npc->xm = -0x200;
+				else
+					npc->xm = 0x200;
+
+				PlaySoundObject(108, 1);
+			}
+
+			break;
+
+		case 30:
+			npc->ani_no = 7;
+
+			if (npc->flag & 8)
+			{
+				npc->act_no = 40;
+				npc->act_wait = 0;
+				SetQuake(20);
+				PlaySoundObject(26, 1);
+			}
+
+			break;
+
+		case 40:
+			npc->xm = 0;
+			npc->ani_no = 6;
+
+			if (++npc->act_wait > 30)
+				npc->act_no = 50;
+
+			break;
+
+		case 50:
+			npc->act_no = 51;
+			npc->act_wait = 0;
+
+			if (gMC.x < npc->x)
+				npc->direct = 0;
+			else
+				npc->direct = 2;
+			// Fallthrough
+		case 51:
+			if (++npc->act_wait > 30 && npc->act_wait % 4 == 1)
+			{
+				unsigned char deg;
+
+				if (npc->direct == 0)
+					deg = -120;
+				else
+					deg = -8;
+
+				deg += Random(-0x10, 0x10);
+				const int ym = 5 * GetSin(deg);
+				const int xm = 5 * GetCos(deg);
+				SetNpChar(11, npc->x, npc->y + 0x800, xm, ym, 0, 0, 0x100);
+				PlaySoundObject(12, 1);
+			}
+
+			if (npc->act_wait < 50 && npc->act_wait / 2 % 2)
+				npc->ani_no = 9;
+			else
+				npc->ani_no = 8;
+
+			if (npc->act_wait > 82)
+			{
+				npc->act_no = 10;
+
+				if (gMC.x < npc->x)
+					npc->direct = 0;
+				else
+					npc->direct = 2;
+			}
+
+			break;
+	}
+
+	npc->ym += 0x33;
+	if (npc->ym > 0x5FF)
+		npc->ym = 0x5FF;
+
+	npc->x += npc->xm;
+	npc->y += npc->ym;
+
+	if (npc->direct == 0)
+		npc->rect = rcLeft[npc->ani_no];
+	else
+		npc->rect = rcRight[npc->ani_no];
+}
+
 // Ironhead block
 void ActNpc271(NPCHAR *npc)
 {
