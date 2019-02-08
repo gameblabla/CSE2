@@ -14,6 +14,7 @@
 #include "Frame.h"
 #include "MycParam.h"
 #include "Flags.h"
+#include "Ending.h"
 #include "Profile.h"
 #include "Map.h"
 #include "MiniMap.h"
@@ -1208,6 +1209,23 @@ int TextScriptProc()
 						z = GetTextScriptNo(gTS.p_read + 4);
 						SetNumberTextScript(z);
 						gTS.p_read += 8;
+					}
+					else if (IS_COMMAND('C','R','E'))
+					{
+						g_GameFlags |= 8;
+						StartCreditScript();
+						gTS.p_read += 4;
+					}
+					else if (IS_COMMAND('S','I','L'))
+					{
+						z = GetTextScriptNo(gTS.p_read + 4);
+						SetCreditIllust(z);
+						gTS.p_read += 8;
+					}
+					else if (IS_COMMAND('C','I','L'))
+					{
+						CutCreditIllust();
+						gTS.p_read += 4;
 					}
 					else if (IS_COMMAND('E','S','C'))
 					{

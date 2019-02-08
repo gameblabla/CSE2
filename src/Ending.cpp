@@ -40,14 +40,14 @@ void PutStripper()
 		{
 			//Draw text
 			RECT rc = {0, 16 * s, 320, 16 * s + 16};
-			PutBitmap3(&grcFull, Strip[s].x / 0x200, Strip[s].y / 0x200, &rc, SURFACE_ID_CREDIT_CAST);
+			PutBitmap3(&grcFull, (Strip[s].x + ((WINDOW_WIDTH - 320) << 8)) / 0x200, Strip[s].y / 0x200, &rc, SURFACE_ID_CREDIT_CAST);
 			
 			//Draw character
 			rc.left = 24 * (Strip[s].cast % 13);
 			rc.right = rc.left + 24;
 			rc.top = 24 * (Strip[s].cast / 13);
 			rc.bottom = rc.top + 24;
-			PutBitmap3(&grcFull, Strip[s].x / 0x200 - 24, Strip[s].y / 0x200 - 8, &rc, SURFACE_ID_CASTS);
+			PutBitmap3(&grcFull, (Strip[s].x + ((WINDOW_WIDTH - 320) << 8)) / 0x200 - 24, Strip[s].y / 0x200 - 8, &rc, SURFACE_ID_CASTS);
 		}
 	}
 }
@@ -116,7 +116,8 @@ void ActionIllust()
 void PutIllust()
 {
 	RECT rcIllust = {0, 0, 160, 240};
-	PutBitmap3(&grcFull, Illust.x / 0x200, 0, &rcIllust, SURFACE_ID_CREDITS_IMAGE);
+	RECT rcClip = {(WINDOW_WIDTH - 320) / 2, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
+	PutBitmap3(&rcClip, (Illust.x + ((WINDOW_WIDTH - 320) << 8)) / 0x200, (WINDOW_HEIGHT - 240) / 2, &rcIllust, SURFACE_ID_CREDITS_IMAGE);
 }
 
 //Load illustration
@@ -183,7 +184,10 @@ bool StartCreditScript()
 	Illust.act_no = 0;
 	
 	//Modify cliprect
-	grcGame.left = 160;
+	grcGame.left = WINDOW_WIDTH / 2;
+	grcGame.right = ((WINDOW_WIDTH - 320) / 2) + 320;
+	grcGame.top = (WINDOW_HEIGHT - 240) / 2;
+	grcGame.bottom = ((WINDOW_HEIGHT - 240) / 2) + 240;
 	
 	//Reload casts
 	if (!ReloadBitmap_File("casts", SURFACE_ID_CASTS))
