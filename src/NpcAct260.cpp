@@ -10,6 +10,7 @@
 #include "Triangle.h"
 #include "Caret.h"
 #include "Map.h"
+#include "Frame.h"
 
 // Ironhead block
 void ActNpc271(NPCHAR *npc)
@@ -326,6 +327,244 @@ void ActNpc275(NPCHAR *npc)
 	npc->y += npc->ym;
 
 	npc->rect = rcRight[npc->ani_no];
+}
+
+//Red Demon
+void ActNpc276(NPCHAR *npc)
+{
+	RECT rcLeft[9];
+	RECT rcRight[9];
+
+	rcLeft[0] = {0, 64, 32, 104};
+	rcLeft[1] = {32, 64, 64, 104};
+	rcLeft[2] = {64, 64, 96, 104};
+	rcLeft[3] = {96, 64, 128, 104};
+	rcLeft[4] = {128, 64, 160, 104};
+	rcLeft[5] = {160, 64, 192, 104};
+	rcLeft[6] = {192, 64, 224, 104};
+	rcLeft[7] = {224, 64, 256, 104};
+	rcLeft[8] = {256, 64, 288, 104};
+
+	rcRight[0] = {0, 104, 32, 144};
+	rcRight[1] = {32, 104, 64, 144};
+	rcRight[2] = {64, 104, 96, 144};
+	rcRight[3] = {96, 104, 128, 144};
+	rcRight[4] = {128, 104, 160, 144};
+	rcRight[5] = {160, 104, 192, 144};
+	rcRight[6] = {192, 104, 224, 144};
+	rcRight[7] = {224, 104, 256, 144};
+	rcRight[8] = {256, 104, 288, 144};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->y -= 0x1000;
+			// Fallthrough
+		case 1:
+			npc->xm = 0;
+			npc->act_no = 2;
+			npc->ani_no = 0;
+			// Fallthrough
+		case 2:
+			if (gMC.x < npc->x)
+				npc->direct = 0;
+			else
+				npc->direct = 2;
+
+			if (++npc->ani_wait > 20)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no > 1)
+				npc->ani_no = 0;
+
+			if (npc->shock)
+				npc->act_no = 10;
+
+			break;
+
+		case 10:
+			npc->act_no = 11;
+			npc->act_wait = 0;
+			npc->ani_no = 3;
+			npc->bits |= 0x20u;
+			// Fallthrough
+		case 11:
+			switch (++npc->act_wait)
+			{
+				case 30:
+				case 40:
+				case 50:
+				{
+					npc->ani_no = 4;
+					const unsigned char deg = GetArktan(npc->x - gMC.x, npc->y - gMC.y);
+					const int ym = 4 * GetSin(deg);
+					const int xm = 4 * GetCos(deg);
+					SetNpChar(277, npc->x, npc->y, xm, ym, 0, 0, 0x100);
+					PlaySoundObject(39, 1);
+					break;
+				}
+				case 34:
+				case 44:
+				case 54:
+				{
+					npc->ani_no = 3;
+					break;
+				}
+			}
+
+			if (npc->act_wait > 60)
+			{
+				npc->act_no = 20;
+				npc->act_wait = 0;
+				npc->ani_no = 2;
+			}
+
+			break;
+
+		case 20:
+			if (++npc->act_wait > 20)
+			{
+				npc->act_no = 21;
+				npc->act_wait = 0;
+				npc->ani_no = 5;
+				npc->ym = -0x5FF;
+				if (gMC.x > npc->x)
+					npc->xm = 0x100;
+				else
+					npc->xm = -0x100;
+			}
+
+			break;
+
+		case 21:
+			switch (++npc->act_wait)
+			{
+				case 30:
+				case 40:
+				case 50:
+				{
+					npc->ani_no = 6;
+					const unsigned char deg = GetArktan(npc->x - gMC.x, npc->y - 0x1400 - gMC.y);
+					const int ym = 4 * GetSin(deg);
+					const int xm = 4 * GetCos(deg);
+					SetNpChar(277, npc->x, npc->y - 0x1400, xm, ym, 0, 0, 0x100);
+					PlaySoundObject(39, 1);
+					break;
+				}
+				case 34:
+				case 44:
+				{
+					npc->ani_no = 5;
+					break;
+				}
+			}
+
+			if (npc->act_wait > 53)
+				npc->ani_no = 7;
+
+			if (npc->flag & 8)
+			{
+				npc->act_no = 22;
+				npc->act_wait = 0;
+				npc->ani_no = 2;
+				SetQuake(10);
+				PlaySoundObject(26, 1);
+			}
+
+			break;
+
+		case 22:
+			npc->xm /= 2;
+
+			if (++npc->act_wait > 22)
+				npc->act_no = 10;
+
+			break;
+
+		case 50:
+			npc->bits &= ~0x20;
+			npc->damage = 0;
+
+			if (npc->flag & 8)
+			{
+				npc->act_no = 51;
+				npc->ani_no = 2;
+				SetQuake(10);
+				SetExpObjects(npc->x, npc->y, 19);
+				SetDestroyNpChar(npc->x, npc->y, npc->view.back, 8);
+				PlaySoundObject(72, 1);
+			}
+
+			break;
+
+		case 51:
+			npc->xm = 7 * npc->xm / 8;
+			npc->ani_no = 8;
+			break;
+	}
+
+	npc->ym += 0x20;
+	if (npc->ym > 0x5FF)
+		npc->ym = 0x5FF;
+
+	npc->x += npc->xm;
+	npc->y += npc->ym;
+
+	if (npc->act_no < 50)
+	{
+		if (gMC.x > npc->x)
+			npc->direct = 2;
+		else
+			npc->direct = 0;
+	}
+
+	if (npc->direct == 0)
+		npc->rect = rcLeft[npc->ani_no];
+	else
+		npc->rect = rcRight[npc->ani_no];
+}
+
+//Red Demon projectile
+void ActNpc277(NPCHAR *npc)
+{
+	RECT rc[3];
+
+	rc[0] = {128, 0, 152, 24};
+	rc[1] = {152, 0, 176, 24};
+	rc[2] = {176, 0, 200, 24};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			// Fallthrough
+		case 1:
+			npc->x += npc->xm;
+			npc->y += npc->ym;
+
+			if (npc->flag & 0xFF)
+			{
+				SetNpChar(4, npc->x, npc->y, 0, 0, 0, 0, 0x100);
+				SetNpChar(4, npc->x, npc->y, 0, 0, 0, 0, 0x100);
+				SetNpChar(4, npc->x, npc->y, 0, 0, 0, 0, 0x100);
+				VanishNpChar(npc);
+				return;
+			}
+
+			if (++npc->act_wait % 5 == 0)
+				PlaySoundObject(110, 1);
+
+			if (++npc->ani_no > 2)
+				npc->ani_no = 0;
+
+			break;
+	}
+
+	npc->rect = rc[npc->ani_no];
 }
 
 //Little family
