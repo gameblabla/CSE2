@@ -1,14 +1,14 @@
-#include "WindowsWrapper.h"
-
 #include "Flash.h"
-#include "Draw.h"
+
 #include "CommonDefines.h"
+#include "Draw.h"
+#include "WindowsWrapper.h"
 
 static struct
 {
 	int mode;
 	int act_no;
-	bool flag;
+	BOOL flag;
 	int cnt;
 	int width;
 	int x;
@@ -27,7 +27,7 @@ void InitFlash(void)
 void SetFlash(int x, int y, int mode)
 {
 	flash.act_no = 0;
-	flash.flag = true;
+	flash.flag = TRUE;
 	flash.x = x;
 	flash.y = y;
 	flash.mode = mode;
@@ -37,66 +37,72 @@ void SetFlash(int x, int y, int mode)
 
 void ActFlash_Explosion(int flx, int fly)
 {
-	if (flash.act_no == 0)
+	int left, right, top, bottom;
+
+	switch (flash.act_no)
 	{
-		flash.cnt += 0x200;
-		flash.width += flash.cnt;
+		case 0:
+			flash.cnt += 0x200;
+			flash.width += flash.cnt;
 
-		int right = (flash.x - flx - flash.width) / 0x200;
-		int left = (flash.y - fly - flash.width) / 0x200;
-		int top = (flash.width + flash.x - flx) / 0x200;
-		int bottom = (flash.width + flash.y - fly) / 0x200;
+			right = (flash.x - flx - flash.width) / 0x200;
+			left = (flash.y - fly - flash.width) / 0x200;
+			top = (flash.x - flx + flash.width) / 0x200;
+			bottom = (flash.y - fly + flash.width) / 0x200;
 
-		if (right < 0)
-			right = 0;
-		if (left < 0)
-			left = 0;
-		if (top > WINDOW_WIDTH)
-			top = WINDOW_WIDTH;
-		if (bottom > WINDOW_HEIGHT)
-			bottom = WINDOW_HEIGHT;
+			if (right < 0)
+				right = 0;
+			if (left < 0)
+				left = 0;
+			if (top > WINDOW_WIDTH)
+				top = WINDOW_WIDTH;
+			if (bottom > WINDOW_HEIGHT)
+				bottom = WINDOW_HEIGHT;
 
-		flash.rect1.left = right;
-		flash.rect1.right = top;
-		flash.rect1.top = 0;
-		flash.rect1.bottom = WINDOW_HEIGHT;
+			flash.rect1.left = right;
+			flash.rect1.right = top;
+			flash.rect1.top = 0;
+			flash.rect1.bottom = WINDOW_HEIGHT;
 
-		flash.rect2.left = 0;
-		flash.rect2.right = WINDOW_WIDTH;
-		flash.rect2.top = left;
-		flash.rect2.bottom = bottom;
+			flash.rect2.left = 0;
+			flash.rect2.right = WINDOW_WIDTH;
+			flash.rect2.top = left;
+			flash.rect2.bottom = bottom;
 
-		if (flash.width > (WINDOW_WIDTH << 11))
-		{
-			flash.act_no = 1;
-			flash.cnt = 0;
-			flash.width = (WINDOW_HEIGHT << 9);
-		}
-	}
-	else if (flash.act_no == 1)
-	{
-		flash.width -= flash.width / 8;
+			if (flash.width > (WINDOW_WIDTH << 11))
+			{
+				flash.act_no = 1;
+				flash.cnt = 0;
+				flash.width = (WINDOW_HEIGHT << 9);
+			}
 
-		if ((flash.width / 0x100) == 0)
-			flash.flag = false;
+			break;
 
-		int top = (flash.y - fly - flash.width) / 0x200;
-		if (top < 0)
-			top = 0;
+		case 1:
+			flash.width -= flash.width / 8;
 
-		int bottom = (flash.width + flash.y - fly) / 0x200;
-		if (bottom > WINDOW_HEIGHT)
-			bottom = WINDOW_HEIGHT;
+			if ((flash.width / 0x100) == 0)
+				flash.flag = FALSE;
 
-		flash.rect1.left = 0;
-		flash.rect1.right = 0;
-		flash.rect1.top = 0;
-		flash.rect1.bottom = 0;
+			top = (flash.y - fly - flash.width) / 0x200;
+			if (top < 0)
+				top = 0;
 
-		flash.rect2.top = top;
-		flash.rect2.bottom = bottom;
-		flash.rect2.left = 0;
-		flash.rect2.right = WINDOW_WIDTH;
+			bottom = (flash.y - fly + flash.width) / 0x200;
+			if (bottom > WINDOW_HEIGHT)
+				bottom = WINDOW_HEIGHT;
+
+			flash.rect1.left = 0;
+			flash.rect1.right = 0;
+			flash.rect1.top = 0;
+			flash.rect1.bottom = 0;
+
+			flash.rect2.top = top;
+			flash.rect2.bottom = bottom;
+			flash.rect2.left = 0;
+			flash.rect2.right = WINDOW_WIDTH;
+
+			break;
 	}
 }
 
@@ -125,23 +131,36 @@ void ActFlash_Flash(void)
 	}
 
 	if (flash.cnt > 20)
-		flash.flag = false;
+		flash.flag = FALSE;
 }
 
 void ActFlash(int flx, int fly)
 {
-	if (flash.flag)
+	if (flash.flag == FALSE)
 	{
-		if (flash.mode == 1)
-			ActFlash_Explosion(flx, fly);
-		else if (flash.mode == 2)
-			ActFlash_Flash();
+		// Do nothing
+	}
+	else
+	{
+		switch (flash.mode)
+		{
+			case 1:
+				ActFlash_Explosion(flx, fly);
+				break;
+			case 2:
+				ActFlash_Flash();
+				break;
+		}
 	}
 }
 
 void PutFlash(void)
 {
-	if (flash.flag)
+	if (flash.flag == FALSE)
+	{
+		// Do nothing
+	}
+	else
 	{
 		CortBox(&flash.rect1, gFlashColor);
 		CortBox(&flash.rect2, gFlashColor);
@@ -150,5 +169,5 @@ void PutFlash(void)
 
 void ResetFlash(void)
 {
-	flash.flag = false;
+	flash.flag = FALSE;
 }
