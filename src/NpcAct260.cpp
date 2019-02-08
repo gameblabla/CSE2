@@ -106,6 +106,228 @@ void ActNpc272(NPCHAR *npc)
 	}
 }
 
+//Droll projectile
+void ActNpc273(NPCHAR *npc)
+{
+	RECT rc[3];
+
+	rc[0] = {248, 40, 272, 64};
+	rc[1] = {272, 40, 296, 64};
+	rc[2] = {296, 40, 320, 64};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			// Fallthrough
+		case 1:
+			npc->x += npc->xm;
+			npc->y += npc->ym;
+
+			if (npc->flag & 0xFF)
+			{
+				SetNpChar(4, npc->x, npc->y, 0, 0, 0, 0, 0x100);
+				SetNpChar(4, npc->x, npc->y, 0, 0, 0, 0, 0x100);
+				SetNpChar(4, npc->x, npc->y, 0, 0, 0, 0, 0x100);
+				VanishNpChar(npc);
+				return;
+			}
+
+			if (++npc->act_wait % 5 == 0)
+				PlaySoundObject(110, 1);
+
+			if (++npc->ani_no > 2)
+				npc->ani_no = 0;
+
+			break;
+	}
+
+	npc->rect = rc[npc->ani_no];
+}
+
+//Droll
+void ActNpc274(NPCHAR *npc)
+{
+	RECT rcLeft[6];
+	RECT rcRight[6];
+
+	rcLeft[0] = {0, 0, 32, 40};
+	rcLeft[1] = {32, 0, 64, 40};
+	rcLeft[2] = {64, 0, 96, 40};
+	rcLeft[3] = {64, 80, 96, 120};
+	rcLeft[4] = {96, 80, 128, 120};
+	rcLeft[5] = {96, 0, 128, 40};
+
+	rcRight[0] = {0, 40, 32, 80};
+	rcRight[1] = {32, 40, 64, 80};
+	rcRight[2] = {64, 40, 96, 80};
+	rcRight[3] = {64, 120, 96, 160};
+	rcRight[4] = {96, 120, 128, 160};
+	rcRight[5] = {96, 40, 128, 80};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->y -= 0x1000;
+			npc->tgt_x = npc->x;
+			// Fallthrough
+		case 1:
+			npc->xm = 0;
+			npc->act_no = 2;
+			npc->ani_no = 0;
+			// Fallthrough
+		case 2:
+			if (gMC.x < npc->x)
+				npc->direct = 0;
+			else
+				npc->direct = 2;
+
+			if (++npc->ani_wait > 40)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no > 1)
+				npc->ani_no = 0;
+
+			if (npc->shock)
+				npc->act_no = 10;
+
+			break;
+
+		case 10:
+			npc->act_no = 11;
+			npc->ani_no = 2;
+			npc->act_wait = 0;
+			// Fallthrough
+		case 11:
+			if (++npc->act_wait > 10)
+			{
+				npc->act_no = 12;
+				npc->ani_no = 3;
+				npc->ym = -0x600u;
+				npc->count1 = 0;
+
+				if (npc->tgt_x > npc->x)
+					npc->xm = 0x200;
+				else
+					npc->xm = -0x200;
+			}
+
+			break;
+
+		case 12:
+			if (npc->ym > 0)
+			{
+				npc->ani_no = 4;
+
+				if (npc->count1 == 0)
+				{
+					++npc->count1;
+					const unsigned char deg = GetArktan(npc->x - gMC.x, npc->y - 0x1400 - gMC.y);
+					const int ym = 4 * GetSin(deg);
+					const int xm = 4 * GetCos(deg);
+					SetNpChar(273, npc->x, npc->y - 0x1400, xm, ym, 0, 0, 0x100);
+					PlaySoundObject(39, 1);
+				}
+			}
+
+			if (npc->ym > 0x200)
+				npc->ani_no = 5;
+
+			if (npc->flag & 8)
+			{
+				npc->ani_no = 2;
+				npc->act_no = 13;
+				npc->act_wait = 0;
+				npc->xm = 0;
+			}
+
+			break;
+
+		case 13:
+			npc->xm /= 2;
+
+			if (++npc->act_wait > 10)
+				npc->act_no = 1;
+
+			break;
+	}
+
+	npc->ym += 0x55;
+	if (npc->ym > 0x5FF)
+		npc->ym = 0x5FF;
+
+	npc->x += npc->xm;
+	npc->y += npc->ym;
+
+	if (npc->direct == 0)
+		npc->rect = rcLeft[npc->ani_no];
+	else
+		npc->rect = rcRight[npc->ani_no];
+}
+
+//Puppy (plantation)
+void ActNpc275(NPCHAR *npc)
+{
+	RECT rcRight[4];
+
+	rcRight[0] = {272, 80, 288, 96};
+	rcRight[1] = {288, 80, 304, 96};
+	rcRight[2] = {272, 80, 288, 96};
+	rcRight[3] = {304, 80, 320, 96};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->ani_no = 0;
+			npc->ani_wait = 0;
+			// Fallthrough
+		case 1:
+			if (Random(0, 120) == 10)
+			{
+				npc->act_no = 2;
+				npc->act_wait = 0;
+				npc->ani_no = 1;
+			}
+
+			if (gMC.x > npc->x - 0x8000 && gMC.x < npc->x + 0x8000 && gMC.y > npc->y - 0x4000 && gMC.y < npc->y + 0x2000)
+			{
+				if (++npc->ani_wait > 3)
+				{
+					npc->ani_wait = 0;
+					++npc->ani_no;
+				}
+
+				if (npc->ani_no > 3)
+					npc->ani_no = 2;
+			}
+
+			break;
+
+		case 2:
+			if (++npc->act_wait > 8)
+			{
+				npc->act_no = 1;
+				npc->ani_no = 0;
+			}
+
+			break;
+	}
+
+	npc->ym += 0x40;
+	if (npc->ym > 0x5FF)
+		npc->ym = 0x5FF;
+
+	npc->x += npc->xm;
+	npc->y += npc->ym;
+
+	npc->rect = rcRight[npc->ani_no];
+}
+
 //Little family
 void ActNpc278(NPCHAR *npc)
 {

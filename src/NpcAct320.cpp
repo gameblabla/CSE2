@@ -129,3 +129,45 @@ void ActNpc336(NPCHAR *npc)
 			break;
 	}
 }
+
+//Numhachi
+void ActNpc337(NPCHAR *npc)
+{
+	RECT rcLeft[2];
+
+	rcLeft[0] = {256, 112, 288, 152};
+	rcLeft[1] = {288, 112, 320, 152};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->y -= 0x1000;
+			// Fallthrough
+		case 1:
+			npc->xm = 0;
+			npc->act_no = 2;
+			npc->ani_no = 0;
+			// Fallthrough
+		case 2:
+			if (++npc->ani_wait > 50)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no > 1)
+				npc->ani_no = 0;
+
+			break;
+	}
+
+	npc->ym += 0x40;
+	if (npc->ym > 0x5FF)
+		npc->ym = 0x5FF;
+
+	npc->x += npc->xm;
+	npc->y += npc->ym;
+
+	npc->rect = rcLeft[npc->ani_no];
+}

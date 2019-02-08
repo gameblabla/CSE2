@@ -674,6 +674,11 @@ int TextScriptProc()
 						SubArmsData(z);
 						gTS.p_read += 8;
 					}
+					else if (IS_COMMAND('Z','A','M'))
+					{
+						ZeroArmsEnergy_All();
+						gTS.p_read += 4;
+					}
 					else if (IS_COMMAND('T','A','M'))
 					{
 						x = GetTextScriptNo(gTS.p_read + 4);
