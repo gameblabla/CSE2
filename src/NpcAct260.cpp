@@ -269,6 +269,65 @@ void ActNpc274(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
+//Puppy (plantation)
+void ActNpc275(NPCHAR *npc)
+{
+	RECT rcRight[4];
+
+	rcRight[0] = {272, 80, 288, 96};
+	rcRight[1] = {288, 80, 304, 96};
+	rcRight[2] = {272, 80, 288, 96};
+	rcRight[3] = {304, 80, 320, 96};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->ani_no = 0;
+			npc->ani_wait = 0;
+			// Fallthrough
+		case 1:
+			if (Random(0, 120) == 10)
+			{
+				npc->act_no = 2;
+				npc->act_wait = 0;
+				npc->ani_no = 1;
+			}
+
+			if (gMC.x > npc->x - 0x8000 && gMC.x < npc->x + 0x8000 && gMC.y > npc->y - 0x4000 && gMC.y < npc->y + 0x2000)
+			{
+				if (++npc->ani_wait > 3)
+				{
+					npc->ani_wait = 0;
+					++npc->ani_no;
+				}
+
+				if (npc->ani_no > 3)
+					npc->ani_no = 2;
+			}
+
+			break;
+
+		case 2:
+			if (++npc->act_wait > 8)
+			{
+				npc->act_no = 1;
+				npc->ani_no = 0;
+			}
+
+			break;
+	}
+
+	npc->ym += 0x40;
+	if (npc->ym > 0x5FF)
+		npc->ym = 0x5FF;
+
+	npc->x += npc->xm;
+	npc->y += npc->ym;
+
+	npc->rect = rcRight[npc->ani_no];
+}
+
 //Little family
 void ActNpc278(NPCHAR *npc)
 {

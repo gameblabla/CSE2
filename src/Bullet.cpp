@@ -2331,3 +2331,35 @@ void ActBullet()
 		}
 	}
 }
+
+bool IsActiveSomeBullet(void)
+{
+	for (int i = 0; i < 0x40; ++i)
+	{
+		if (gBul[i].cond & 0x80)
+		{
+			switch (gBul[i].code_bullet)
+			{
+				case 0xD:
+				case 0xE:
+				case 0xF:
+				case 0x10:
+				case 0x11:
+				case 0x12:
+				case 0x17:
+				case 0x19:
+				case 0x1A:
+				case 0x1B:
+				case 0x1C:
+				case 0x1D:
+				case 0x1E:
+				case 0x1F:
+				case 0x20:
+				case 0x21:
+					return true;
+			}
+		}
+	}
+
+	return false;
+}
