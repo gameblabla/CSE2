@@ -103,6 +103,212 @@ void ActNpc302(NPCHAR *npc)
 	}
 }
 
+//Curly's machine gun
+void ActNpc303(NPCHAR *npc)
+{
+	RECT rcLeft[2];
+	RECT rcRight[2];
+
+	rcLeft[0] = {216, 152, 232, 168};
+	rcLeft[1] = {232, 152, 248, 168};
+	rcRight[0] = {216, 168, 232, 184};
+	rcRight[1] = {232, 168, 248, 184};
+	
+	if (npc->pNpc)
+	{
+		//Set position
+		if (npc->pNpc->direct)
+		{
+			npc->direct = 2;
+			npc->x = npc->pNpc->x + 0x1000;
+		}
+		else
+		{
+			npc->direct = 0;
+			npc->x = npc->pNpc->x - 0x1000;
+		}
+		npc->y = npc->pNpc->y;
+		
+		//Animation
+		npc->ani_no = 0;
+		if (npc->pNpc->ani_no == 3 || npc->pNpc->ani_no == 5)
+			npc->y -= 0x200;
+		
+		//Set framerect
+		if (npc->direct)
+			npc->rect = rcRight[npc->ani_no];
+		else
+			npc->rect = rcLeft[npc->ani_no];
+	}
+}
+
+//Gaudi in hospital
+void ActNpc304(NPCHAR *npc)
+{
+	RECT rc[4];
+	rc[0] = {0, 176, 24, 192};
+	rc[1] = {24, 176, 48, 192};
+	rc[2] = {48, 176, 72, 192};
+	rc[3] = {72, 176, 96, 192};
+	
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->y += 5120;
+			//Fallthrough
+		case 1:
+			npc->ani_no = 0;
+			break;
+		case 10:
+			npc->ani_no = 1;
+			break;
+		case 20:
+			npc->act_no = 21;
+			npc->ani_no = 2;
+			//Fallthrough
+		case 21:
+			if (++npc->ani_wait > 10)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+			
+			if (npc->ani_no > 3)
+				npc->ani_no = 2;
+			break;
+		default:
+			break;
+	}
+	
+	npc->rect = rc[npc->ani_no];
+}
+
+//Small puppy
+void ActNpc305(NPCHAR *npc)
+{
+	RECT rcLeft[2];
+	RECT rcRight[2];
+
+	rcLeft[0] = {160, 144, 176, 160};
+	rcLeft[1] = {176, 144, 192, 160};
+	rcRight[0] = {160, 160, 176, 176};
+	rcRight[1] = {176, 160, 192, 176};
+	
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->y -= 0x2000;
+			npc->ani_wait = Random(0, 6);
+			//Fallthrough
+			
+		case 1:
+			if (++npc->ani_wait > 6)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+			
+			if (npc->ani_no > 1)
+				npc->ani_no = 0;
+			break;
+	}
+	
+	if (npc->direct)
+		npc->rect = rcRight[npc->ani_no];
+	else
+		npc->rect = rcLeft[npc->ani_no];
+}
+
+//Balrog (nurse)
+void ActNpc306(NPCHAR *npc)
+{
+	RECT rcLeft[2];
+	RECT rcRight[2];
+	rcLeft[0] = {240, 96, 280, 128};
+	rcLeft[1] = {280, 96, 320, 128};
+	rcRight[0] = {160, 152, 200, 184};
+	rcRight[1] = {200, 152, 240, 184};
+	
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->ani_no = 0;
+			npc->ani_wait = 0;
+			npc->y += 0x800;
+			//Fallthrough
+		case 1:
+			if (Random(0, 120) == 10)
+			{
+				npc->act_no = 2;
+				npc->act_wait = 0;
+				npc->ani_no = 1;
+			}
+			break;
+		case 2:
+			if (++npc->act_wait > 8)
+			{
+				npc->act_no = 1;
+				npc->ani_no = 0;
+			}
+			break;
+	}
+	
+	if (npc->direct)
+		npc->rect = rcRight[npc->ani_no];
+	else
+		npc->rect = rcLeft[npc->ani_no];
+}
+
+//Caged Santa
+void ActNpc307(NPCHAR *npc)
+{
+	RECT rcLeft[2];
+	RECT rcRight[2];
+	rcLeft[0] = {0, 32, 16, 48};
+	rcLeft[1] = {16, 32, 32, 48};
+	rcRight[0] = {0, 48, 16, 64};
+	rcRight[1] = {16, 48, 32, 64};
+	
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->x += 0x200;
+			npc->y -= 0x400;
+			npc->act_no = 1;
+			npc->ani_no = 0;
+			npc->ani_wait = 0;
+			//Fallthrough
+		case 1:
+			if (Random(0, 160) == 1)
+			{
+				npc->act_no = 2;
+				npc->act_wait = 0;
+				npc->ani_no = 1;
+			}
+			break;
+		case 2:
+			if (++npc->act_wait > 12)
+			{
+				npc->act_no = 1;
+				npc->ani_no = 0;
+			}
+			break;
+	}
+	
+	if (gMC.x >= npc->x)
+		npc->direct = 2;
+	else
+		npc->direct = 0;
+	
+	if (npc->direct)
+		npc->rect = rcRight[npc->ani_no];
+	else
+		npc->rect = rcLeft[npc->ani_no];
+}
+
 //Stumpy
 void ActNpc308(NPCHAR *npc)
 {
