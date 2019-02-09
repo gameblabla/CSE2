@@ -26,6 +26,12 @@ struct ILLUSTRATION
 	int x;
 };
 
+struct ISLAND_SPRITE
+{
+	int x;
+	int y;
+};
+
 void ActionStripper();
 void PutStripper();
 void SetStripper(int x, int y, char *text, int cast);
@@ -39,3 +45,4 @@ bool StartCreditScript();
 void ActionCredit();
 void SetCreditIllust(int a);
 void CutCreditIllust();
+int Scene_DownIsland(int mode);
