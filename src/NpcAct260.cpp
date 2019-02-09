@@ -2101,3 +2101,105 @@ void ActNpc278(NPCHAR *npc)
 			break;
 	}
 }
+
+//Falling block (large)
+void ActNpc279(NPCHAR *npc)
+{
+	RECT rc[2];
+
+	rc[0] = {0, 16, 32, 48};
+	rc[1] = {16, 0, 32, 16};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			switch (npc->direct)
+			{
+				case 0:
+					npc->act_no = 100;
+					npc->bits |= 4;
+					npc->ani_no = 0;
+					break;
+				case 1:
+					npc->ani_no = 0;
+					npc->act_no = 10;
+					break;
+				case 2:
+					npc->act_no = 100;
+					npc->bits |= 4;
+					npc->ani_no = 1;
+					npc->view.back = 0x1000;
+					npc->view.front = 0x1000;
+					npc->view.top = 0x1000;
+					npc->view.bottom = 0x1000;
+					npc->hit.back = 0x1000;
+					npc->hit.front = 0x1000;
+					npc->hit.top = 0x1000;
+					npc->hit.bottom = 0x1000;
+					break;
+			}
+
+			if (npc->direct != 1)
+				break;
+			// Fallthrough
+		case 10:
+			npc->act_no = 11;
+			npc->act_wait = 16;
+			// Fallthrough
+		case 11:
+			npc->act_wait -= 2;
+
+			if (npc->act_wait <= 0)
+			{
+				npc->act_no = 100;
+				npc->bits |= 4;
+			}
+
+			break;
+
+		case 100:
+			npc->ym += 0x40;
+			if (npc->ym > 0x700)
+				npc->ym = 0x700;
+
+			if (npc->y > 0x10000)
+				npc->bits &= ~8;
+
+			if (npc->flag & 8)
+			{
+				npc->ym = -0x200;
+				npc->act_no = 110;
+				npc->bits |= 8;
+				PlaySoundObject(26, 1);
+				SetQuake(10);
+
+				for (int i = 0; i < 4; ++i)
+					SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + 0x2000, Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+			}
+
+			break;
+
+		case 110:
+			npc->ym += 0x40;
+
+			if (npc->y > (gMap.length + 2) * 0x2000)
+				npc->cond = 0;
+
+			break;
+	}
+
+	if (gMC.y > npc->y)
+		npc->damage = 10;
+	else
+		npc->damage = 0;
+
+	npc->y += npc->ym;
+	npc->rect = rc[npc->ani_no];
+
+	if (npc->act_no == 11)
+	{
+		npc->rect.top += npc->act_wait;
+		npc->rect.bottom -= npc->act_wait;
+		npc->view.top = (16 - npc->act_wait) * 0x200;
+	}
+}

@@ -35,6 +35,73 @@ void ActNpc300(NPCHAR *npc)
 	npc->rect = rc[0];
 }
 
+//Fish missile (Misery)
+void ActNpc301(NPCHAR *npc)
+{
+	RECT rect[8];
+
+	rect[0] = {144, 0, 160, 16};
+	rect[1] = {160, 0, 176, 16};
+	rect[2] = {176, 0, 192, 16};
+	rect[3] = {192, 0, 208, 16};
+	rect[4] = {144, 16, 160, 32};
+	rect[5] = {160, 16, 176, 32};
+	rect[6] = {176, 16, 192, 32};
+	rect[7] = {192, 16, 208, 32};
+
+	int dir;
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->count1 = npc->direct;
+			// Fallthrough
+		case 1:
+			npc->xm = 2 * GetCos(npc->count1);
+			npc->ym = 2 * GetSin(npc->count1);
+
+			npc->y += npc->ym;
+			npc->x += npc->xm;
+
+			dir = GetArktan(npc->x - gMC.x, npc->y - gMC.y);
+
+			if (dir < npc->count1)
+			{
+				if (npc->count1 - dir < 0x80)
+					--npc->count1;
+				else
+					++npc->count1;
+			}
+			else
+			{
+				if (dir - npc->count1 < 0x80)
+					++npc->count1;
+				else
+					--npc->count1;
+			}
+
+			if (npc->count1 > 0xFF)
+				npc->count1 -= 0x100;
+			if (npc->count1 < 0)
+				npc->count1 += 0x100;
+
+			break;
+	}
+
+	if (++npc->ani_wait > 2)
+	{
+		npc->ani_wait = 0;
+		SetCaret(npc->x, npc->y, 7, 4);
+	}
+
+	npc->ani_no = (npc->count1 + 0x10) / 0x20;
+	if (npc->ani_no > 7)
+		npc->ani_no = 7;
+
+	npc->rect = rect[npc->ani_no];
+}
+
 //Camera focus marker
 void ActNpc302(NPCHAR *npc)
 {
