@@ -28,6 +28,7 @@
 #include "Caret.h"
 #include "Map.h"
 #include "Main.h"
+#include "MycParam.h"
 #include "MapName.h"
 #include "Sound.h"
 #include "Organya.h"
@@ -258,7 +259,7 @@ int ModeTitle()
 	bContinue = IsProfile();
 	
 	//Set character
-	time_counter = 0;//LoadTimeCounter();
+	time_counter = LoadTimeCounter();
 	
 	if (time_counter && time_counter < 18000)
 		char_type = 1;
@@ -395,8 +396,8 @@ int ModeTitle()
 		//Draw carets
 		PutCaret(0, 0);
 		
-		//if (time_counter)
-		//	PutTimeCounter(16, 8);
+		if (time_counter)
+			PutTimeCounter(16, 8);
 	
 		PutFramePerSecound();
 		
@@ -569,6 +570,7 @@ int ModeAction()
 			}
 			
 			PutMapName(false);
+			PutTimeCounter(16, 8);
 			
 			if (g_GameFlags & 2)
 			{

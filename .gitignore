@@ -3,8 +3,8 @@
 
 # Misc
 /obj
-Config.dat
-*rofile.dat
+*.dat
+*.rec
 build.7z
 build.zip
 

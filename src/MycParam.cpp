@@ -3,6 +3,7 @@
 #include "MycParam.h"
 #include "NpChar.h"
 #include "CommonDefines.h"
+#include "Tags.h"
 #include "ArmsItem.h"
 #include "ValueView.h"
 #include "TextScr.h"
@@ -27,6 +28,8 @@ ARMS_LEVEL gArmsLevelTable[14] =
 	{{1,  1,  1}},
 	{{40, 60, 200}}
 };
+
+int time_count;
 
 void AddExpMyChar(int x)
 {
@@ -339,5 +342,92 @@ void PutMyAir(int x, int y)
 			PutBitmap3(&grcGame, x, y, &rcAir[1], 26);
 		else
 			PutBitmap3(&grcGame, x, y, &rcAir[0], 26);
+	}
+}
+
+void PutTimeCounter(int x, int y)
+{
+	RECT rcTime[3];
+	rcTime[0] = {112, 104, 120, 112};
+	rcTime[1] = {120, 104, 128, 112};
+	rcTime[2] = {128, 104, 160, 112};
+	
+	if (gMC.equip & 0x100)
+	{
+		//Draw clock and increase time
+		if (g_GameFlags & 2)
+		{
+			if (time_count < 300000)
+				++time_count;
+			
+			if (time_count % 30 <= 10)
+				PutBitmap3(&grcGame, x, y, &rcTime[1], 26);
+			else
+				PutBitmap3(&grcGame, x, y, &rcTime[0], 26);
+		}
+		else
+		{
+			PutBitmap3(&grcGame, x, y, &rcTime[0], 26);
+		}
+		
+		//Draw time
+		PutNumber4(x,		y, time_count / 3000,		false);
+		PutNumber4(x + 20,	y, time_count / 50 % 60,	true);
+		PutNumber4(x + 32,	y, time_count / 5 % 10,		false);
+		PutBitmap3(&grcGame, x + 30, y, &rcTime[2], 26);
+	}
+	else
+	{
+		time_count = 0;
+	}
+}
+
+int LoadTimeCounter()
+{
+	//Open file
+	char path[PATH_LENGTH];
+	sprintf(path, "%s/290.rec", gModulePath);
+	
+	SDL_RWops *fp = SDL_RWFromFile(path, "rb");
+	if (!fp)
+		return 0;
+	
+	REC rec;
+	
+	//Read data
+	rec.counter[0] = SDL_ReadLE32(fp);
+	rec.counter[1] = SDL_ReadLE32(fp);
+	rec.counter[2] = SDL_ReadLE32(fp);
+	rec.counter[3] = SDL_ReadLE32(fp);
+	rec.random[0] = SDL_ReadU8(fp);
+	rec.random[1] = SDL_ReadU8(fp);
+	rec.random[2] = SDL_ReadU8(fp);
+	rec.random[3] = SDL_ReadU8(fp);
+	SDL_RWclose(fp);
+	
+	//HACK: this swaps the random values to correspond to the correct bytes
+	*((uint32_t*)rec.random) = SDL_SwapLE32(*((uint32_t*)rec.random));
+	
+	//Decode from checksum
+	uint8_t *p;
+	for (int i = 0; i < 4; i++)
+	{
+		p = (uint8_t*)&rec.counter[i];
+		p[0] -= rec.random[i];
+		p[1] -= rec.random[i];
+		p[2] -= rec.random[i];
+		p[3] -= rec.random[i] >> 1;
+	}
+	
+	//Verify checksum's result
+	if (rec.counter[0] == rec.counter[1] && rec.counter[0] == rec.counter[2])
+	{
+		time_count = rec.counter[0];
+		return rec.counter[0];
+	}
+	else
+	{
+		time_count = 0;
+		return 0;
 	}
 }
