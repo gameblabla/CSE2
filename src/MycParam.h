@@ -26,5 +26,5 @@ void PutActiveArmsList();
 void PutMyLife(bool flash);
 void PutMyAir(int x, int y);
 void PutTimeCounter(int x, int y);
-
+bool SaveTimeCounter();
 int LoadTimeCounter();
