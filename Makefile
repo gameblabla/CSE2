@@ -1,20 +1,22 @@
 ifeq ($(RELEASE), 1)
 CXXFLAGS := -O3 -s
-FILENAME ?= release
+FILENAME_DEF = release
 else
 CXXFLAGS := -O0 -g
-FILENAME ?= debug
+FILENAME_DEF = debug
 endif
 
 ifeq ($(JAPANESE), 1)
 CXXFLAGS += -DJAPANESE
 LIBS += -liconv
 	ifeq ($(RELEASE), 1)
-	FILENAME ?= releasejp
+	FILENAME_DEF = releasejp
 	else
-	FILENAME ?= debugjp
+	FILENAME_DEF = debugjp
 	endif
 endif
+
+FILENAME ?= FILENAME_DEF
 
 ifeq ($(FIX_BUGS), 1)
 CXXFLAGS += -DFIX_BUGS
