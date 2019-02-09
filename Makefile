@@ -16,7 +16,7 @@ LIBS += -liconv
 	endif
 endif
 
-FILENAME ?= FILENAME_DEF
+FILENAME ?= $(FILENAME_DEF)
 
 ifeq ($(FIX_BUGS), 1)
 CXXFLAGS += -DFIX_BUGS
