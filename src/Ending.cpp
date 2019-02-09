@@ -11,19 +11,22 @@
 #include "KeyControl.h"
 #include "Escape.h"
 #include "Organya.h"
+#include "MycParam.h"
 #include "Main.h"
 #include "Stage.h"
 #include "Draw.h"
 #include "TextScr.h"
 
+#define MAX_STRIP 0x10
+
 CREDIT Credit;
-STRIP Strip[16];
+STRIP Strip[MAX_STRIP];
 ILLUSTRATION Illust;
 
 //Update casts
 void ActionStripper()
 {
-	for (int s = 0; s < 16; s++)
+	for (int s = 0; s < MAX_STRIP; s++)
 	{
 		//Move up
 		if (Strip[s].flag & 0x80 && Credit.mode)
@@ -37,7 +40,7 @@ void ActionStripper()
 //Draw casts
 void PutStripper()
 {
-	for (int s = 0; s < 16; s++)
+	for (int s = 0; s < MAX_STRIP; s++)
 	{
 		if (Strip[s].flag & 0x80)
 		{
@@ -58,7 +61,7 @@ void PutStripper()
 //Create a cast object
 void SetStripper(int x, int y, char *text, int cast)
 {
-	for (int s = 0; s < 16; s++)
+	for (int s = 0; s < MAX_STRIP; s++)
 	{
 		if (!(Strip[s].flag & 0x80))
 		{
@@ -81,7 +84,7 @@ void SetStripper(int x, int y, char *text, int cast)
 //Regenerate cast text
 void RestoreStripper()
 {
-	for (int s = 0; s < 16; s++)
+	for (int s = 0; s < MAX_STRIP; s++)
 	{
 		if (Strip[s].flag & 0x80)
 		{
@@ -436,7 +439,7 @@ int Scene_DownIsland(int mode)
 		PutBitmap3(&rc_frame, 80 + (WINDOW_WIDTH - 320) / 2, 80 + (WINDOW_HEIGHT - 240) / 2, &rc_sky, 21);
 		PutBitmap3(&rc_frame, sprite.x / 0x200 - 20 + (WINDOW_WIDTH - 320) / 2, sprite.y / 512 - 12 + (WINDOW_HEIGHT - 240) / 2, &rc_sprite, 21);
 		PutBitmap3(&rc_frame, 80 + (WINDOW_WIDTH - 320) / 2, 128 + (WINDOW_HEIGHT - 240) / 2, &rc_ground, 21);
-		//PutTimeCounter(16, 8);
+		PutTimeCounter(16, 8);
 		
 		PutFramePerSecound();
 		if (!Flip_SystemTask())
