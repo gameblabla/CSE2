@@ -610,6 +610,242 @@ void ActNpc329(NPCHAR *npc)
 		npc->rect = {64, 0, 80, 16};
 }
 
+//Rolling
+void ActNpc330(NPCHAR *npc)
+{
+	RECT rc[3];
+
+	rc[0] = {144, 136, 160, 152};
+	rc[1] = {160, 136, 176, 152};
+	rc[2] = {176, 136, 192, 152};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			ChangeMapParts(npc->x / 0x2000, npc->y / 0x2000, 0);
+
+			if (npc->direct == 0)
+				npc->act_no = 10;
+			else
+				npc->act_no = 30;
+
+			break;
+
+		case 10:
+			npc->xm -= 0x40;
+			npc->ym = 0;
+
+			if (npc->flag & 1)
+				npc->act_no = 20;
+
+			break;
+
+		case 20:
+			npc->xm = 0;
+			npc->ym -= 0x40;
+
+			if (npc->flag & 2)
+				npc->act_no = 30;
+
+			break;
+
+		case 30:
+			npc->xm += 0x40;
+			npc->ym = 0;
+
+			if (npc->flag & 4)
+				npc->act_no = 40;
+
+			break;
+
+		case 40:
+			npc->xm = 0;
+			npc->ym += 0x40;
+
+			if (npc->flag & 8)
+				npc->act_no = 10;
+
+			break;
+	}
+
+	if (npc->xm < -0x400)
+		npc->xm = -0x400;
+	if (npc->xm > 0x400)
+		npc->xm = 0x400;
+
+	if (npc->ym < -0x400)
+		npc->ym = -0x400;
+	if (npc->ym > 0x400)
+		npc->ym = 0x400;
+
+	npc->x += npc->xm;
+	npc->y += npc->ym;
+
+	if (++npc->ani_wait > 1)
+	{
+		npc->ani_wait = 0;
+		++npc->ani_no;
+	}
+
+	if (npc->ani_no > 2)
+		npc->ani_no = 0;
+
+	npc->rect = rc[npc->ani_no];
+}
+
+//Ballos bone projectile
+void ActNpc331(NPCHAR *npc)
+{
+	RECT rc[4];
+
+	rc[0] = {288, 80, 304, 96};
+	rc[1] = {304, 80, 320, 96};
+	rc[2] = {288, 96, 304, 112};
+	rc[3] = {304, 96, 320, 112};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			// Fallthrough
+		case 1:
+			if (npc->flag & 8)
+			{
+				npc->ym = -0x200;
+				npc->act_no = 10;
+			}
+
+			break;
+
+		case 10:
+			if (npc->flag & 8)
+			{
+				npc->cond = 0;
+				SetCaret(npc->x, npc->y, 2, 0);
+			}
+
+			break;
+	}
+
+	npc->ym += 0x40;
+	if (npc->ym > 0x5FF)
+		npc->ym = 0x5FF;
+
+	npc->y += npc->ym;
+	npc->x += npc->xm;
+
+	if (++npc->ani_wait > 3)
+	{
+		npc->ani_wait = 0;
+
+		if (npc->direct == 0)
+			++npc->ani_no;
+		else
+			--npc->ani_no;
+
+		if (npc->ani_no < 0)
+			npc->ani_no += 4;
+		if (npc->ani_no > 3)
+			npc->ani_no -= 4;
+	}
+
+	npc->rect = rc[npc->ani_no];
+}
+
+//Ballos shockwave
+void ActNpc332(NPCHAR *npc)
+{
+	RECT rc[3];
+
+	rc[0] = {144, 96, 168, 120};
+	rc[1] = {168, 96, 192, 120};
+	rc[2] = {192, 96, 216, 120};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			PlaySoundObject(44, 1);
+			npc->act_no = 1;
+
+			if (npc->direct == 0)
+				npc->xm = -0x400;
+			else
+				npc->xm = 0x400;
+			// Fallthrough
+		case 1:
+			if (++npc->ani_wait > 1)
+			{
+				npc->ani_wait = 0;
+
+				if (++npc->ani_no > 2)
+					npc->ani_no = 0;
+			}
+
+			if (++npc->act_wait % 6 == 1)
+			{
+				if (npc->direct == 0)
+				{
+					const int xm = (Random(-0x10, -4) * 0x200) / 8;
+					SetNpChar(331, npc->x, npc->y, xm, -0x400, 0, 0, 0x100);
+				}
+				else
+				{
+					const int xm = (Random(4, 0x10) * 0x200) / 8;
+					SetNpChar(331, npc->x, npc->y, xm, -0x400, 0, 0, 0x100);
+				}
+
+				PlaySoundObject(12, 1);
+			}
+
+			break;
+	}
+
+	if (npc->flag & 1)
+		npc->cond = 0;
+	if (npc->flag & 4)
+		npc->cond = 0;
+
+	npc->x += npc->xm;
+
+	npc->rect = rc[npc->ani_no];
+}
+
+//Ballos lightning
+void ActNpc333(NPCHAR *npc)
+{
+	RECT rc[2];
+
+	rc[0] = {80, 120, 104, 144};
+	rc[1] = {104, 120, 128, 144};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->tgt_x = npc->x;
+			npc->tgt_y = npc->y;
+			PlaySoundObject(103, 1);
+			npc->y = gMC.y;
+			// Fallthrough
+		case 1:
+			if (++npc->act_wait / 2 & 1)
+				npc->ani_no = 0;
+			else
+				npc->ani_no = 1;
+
+			if (npc->direct == 0 && npc->act_wait == 20)
+				SetNpChar(146, npc->tgt_x, npc->tgt_y, 0, 0, 0, 0, 0x100);
+
+			if (npc->act_wait > 40)
+				npc->cond = 0;
+
+			break;
+
+	}
+
+	npc->rect = rc[npc->ani_no];
+}
+
 //Sweat
 void ActNpc334(NPCHAR *npc)
 {
@@ -771,4 +1007,94 @@ void ActNpc337(NPCHAR *npc)
 	npc->y += npc->ym;
 
 	npc->rect = rcLeft[npc->ani_no];
+}
+
+//Green Devil
+void ActNpc338(NPCHAR *npc)
+{
+	RECT rcLeft[2];
+	RECT rcRight[2];
+
+	rcLeft[0] = {288, 0, 304, 16};
+	rcLeft[1] = {304, 0, 320, 16};
+
+	rcRight[0] = {288, 16, 304, 32};
+	rcRight[1] = {304, 16, 320, 32};
+
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->view.top = 0x1000;
+			npc->view.bottom = 0x1000;
+			npc->damage = 3;
+			npc->bits |= 0x20;
+			npc->tgt_y = npc->y;
+			npc->ym = (Random(-10, 10) * 0x200) / 2;
+			// Fallthrough
+		case 1:
+			if (++npc->ani_wait > 2)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no > 1)
+				npc->ani_no = 0;
+
+			if (npc->tgt_y > npc->y)
+				npc->ym += 0x80;
+			else
+				npc->ym -= 0x80;
+
+			if (npc->direct == 0)
+				npc->xm -= 0x20;
+			else
+				npc->xm += 0x20;
+
+			if (npc->xm > 0x400)
+				npc->xm = 0x400;
+			if (npc->xm < -0x400)
+				npc->xm = -0x400;
+
+			if (npc->x < 0 || npc->y < 0 || npc->x > gMap.width * 0x2000 || npc->y > gMap.length * 0x2000)
+			{
+				VanishNpChar(npc);
+				return;
+			}
+
+			break;
+	}
+
+	npc->x += npc->xm;
+	npc->y += npc->ym;
+
+	if (npc->direct == 0)
+		npc->rect = rcLeft[npc->ani_no];
+	else
+		npc->rect = rcRight[npc->ani_no];
+}
+
+//Green Devil generator
+void ActNpc339(NPCHAR *npc)
+{
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->act_no = 1;
+			npc->act_wait = Random(0, 40);
+			// Fallthrough
+		case 1:
+			if (npc->act_wait)
+			{
+				--npc->act_wait;
+			}
+			else
+			{
+				npc->act_no = 0;
+				SetNpChar(338, npc->x, npc->y + (Random(-0x10, 0x10) * 0x200), 0, 0, npc->direct, 0, 0x100);
+			}
+
+			break;
+	}	
 }
