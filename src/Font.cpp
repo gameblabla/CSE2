@@ -58,7 +58,7 @@ static unsigned long UTF8ToCode(const unsigned char *string, unsigned int *bytes
 		case 3:
 		case 4:
 			length = zero_bit;
-			charcode = (string[0] & (1 << (8 - zero_bit))) - 1;
+			charcode = string[0] & ((1 << (8 - zero_bit))) - 1;
 
 			for (unsigned int i = 1; i < zero_bit; ++i)
 			{
