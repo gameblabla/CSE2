@@ -8,7 +8,10 @@
 #include "Generic.h"
 #include "Ending.h"
 #include "Flags.h"
+#include "KeyControl.h"
+#include "Escape.h"
 #include "Organya.h"
+#include "Main.h"
 #include "Stage.h"
 #include "Draw.h"
 #include "TextScr.h"
@@ -368,4 +371,77 @@ void SetCreditIllust(int a)
 void CutCreditIllust()
 {
 	Illust.act_no = 2;
+}
+
+//Scene of the island falling
+int Scene_DownIsland(int mode)
+{
+	RECT rc_sprite;
+	RECT rc_ground;
+	RECT rc_sky;
+	RECT rc_frame;
+	ISLAND_SPRITE sprite;
+
+	rc_frame = {(WINDOW_WIDTH - 160) / 2, (WINDOW_HEIGHT - 80) / 2, (WINDOW_WIDTH + 160) / 2, (WINDOW_HEIGHT + 80) / 2};
+	rc_sky = {0, 0, 160, 80};
+	rc_ground = {160, 48, 320, 80};
+	rc_sprite = {160, 0, 200, 24};
+	sprite.x = 0x15000;
+	sprite.y = 0x8000;
+	
+	for (int wait = 0; wait < 900; wait++)
+	{
+		GetTrg();
+		
+		if (gKey & 0x8000)
+		{
+			int escRet = Call_Escape();
+			if (escRet == 0)
+				return 0;
+			if (escRet == 2)
+				return 2;
+		}
+		
+		switch (mode)
+		{
+			case 0:
+				sprite.y += 0x33;
+				break;
+				
+			case 1:
+				if (wait >= 350)
+				{
+					if (wait >= 500)
+					{
+						if (wait >= 600)
+						{
+							if (wait == 750)
+								wait = 900;
+						}
+						else
+						{
+							sprite.y += 0xC;
+						}
+					}
+					else
+					{
+						sprite.y += 0x19;
+					}
+				}
+				break;
+		}
+		
+		
+		CortBox(&grcFull, 0);
+		PutBitmap3(&rc_frame, 80 + (WINDOW_WIDTH - 320) / 2, 80 + (WINDOW_HEIGHT - 240) / 2, &rc_sky, 21);
+		PutBitmap3(&rc_frame, sprite.x / 0x200 - 20 + (WINDOW_WIDTH - 320) / 2, sprite.y / 512 - 12 + (WINDOW_HEIGHT - 240) / 2, &rc_sprite, 21);
+		PutBitmap3(&rc_frame, 80 + (WINDOW_WIDTH - 320) / 2, 128 + (WINDOW_HEIGHT - 240) / 2, &rc_ground, 21);
+		//PutTimeCounter(16, 8);
+		
+		PutFramePerSecound();
+		if (!Flip_SystemTask())
+			return 0;
+	}
+	
+	return 1;
 }

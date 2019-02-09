@@ -1227,6 +1227,17 @@ int TextScriptProc()
 						CutCreditIllust();
 						gTS.p_read += 4;
 					}
+					else if (IS_COMMAND('X','X','1'))
+					{
+						bExit = true;
+						z = GetTextScriptNo(gTS.p_read + 4);
+						int islRet = Scene_DownIsland(z);
+						if (islRet == 0)
+							return 0;
+						if (islRet == 2)
+							return 2;
+						gTS.p_read += 8;
+					}
 					else if (IS_COMMAND('E','S','C'))
 					{
 						return 2;
