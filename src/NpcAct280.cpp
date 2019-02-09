@@ -1507,10 +1507,10 @@ void ActNpc295(NPCHAR *npc)
 					npc->view.back = 0x2800;
 					npc->view.front = 0x2800;
 					break;
-				default:
-					break;
 			}
-			//Fallthrough
+
+			break;
+
 		case 1:
 			npc->x += npc->xm;
 			npc->y += npc->ym;
@@ -1530,7 +1530,7 @@ void ActNpc296(NPCHAR *npc)
 	if (++npc->act_wait > 16)
 	{
 		npc->act_wait = Random(0, 16);
-		int dir = Random(0, 100) % 4;
+		int dir = Random(0, 100) & 3;
 		
 		int pri;
 		if (npc->direct)
@@ -1551,7 +1551,7 @@ void ActNpc296(NPCHAR *npc)
 					break;
 			}
 			
-			SetNpChar(295, npc->x, npc->y + (Random(-7, 7) << 13), 0, 0, dir + 4, 0, pri);
+			SetNpChar(295, npc->x, npc->y + (Random(-7, 7) * 0x2000), 0, 0, dir + 4, 0, pri);
 		}
 		else
 		{
@@ -1571,7 +1571,7 @@ void ActNpc296(NPCHAR *npc)
 					break;
 			}
 			
-			SetNpChar(295, npc->x + (Random(-10, 10) << 13), npc->y, 0, 0, dir, 0, pri);
+			SetNpChar(295, npc->x + (Random(-10, 10) * 0x2000), npc->y, 0, 0, dir, 0, pri);
 		}
 	}
 }
