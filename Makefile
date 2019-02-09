@@ -49,6 +49,7 @@ SOURCES = \
 	BossIronH \
 	BossLife \
 	BossOhm \
+	BossPress \
 	BossTwinD \
 	BossX \
 	BulHit \
