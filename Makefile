@@ -44,6 +44,7 @@ SOURCES = \
 	Back \
 	Boss \
 	BossAlmo1 \
+	BossAlmo2 \
 	BossFrog \
 	BossIronH \
 	BossLife \
