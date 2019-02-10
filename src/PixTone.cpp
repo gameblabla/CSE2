@@ -46,9 +46,9 @@ void MakeWaveTables()
 		gWaveModelTable[4][i] = -0x40;
 
 	/* White noise wave */
-	srand(0);
+	rep_srand(0);
 	for (int i = 0; i < 0x100; i++)
-		gWaveModelTable[5][i] = (int8_t)rand() / 2;
+		gWaveModelTable[5][i] = (int8_t)rep_rand() / 2;
 }
 
 //Loading .pxt files

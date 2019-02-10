@@ -1,9 +1,6 @@
 #pragma once
-
-#define rand _rand
-#define srand _srand
-int _rand();
-void _srand(unsigned int seed);
+int rep_rand();
+void rep_srand(unsigned int seed);
 
 typedef int BOOL;
 
