@@ -69,7 +69,11 @@
 #else
 #include "Resource/BITMAP/PIXEL.bmp.h"
 #endif
-#include "Resource/ICON/4.bmp.h"
+#ifndef WINDOWS
+#include "Resource/ICON/ICON_MINI.bmp.h"
+#endif
+#include "Resource/CURSOR/CURSOR_IKA.bmp.h"
+#include "Resource/CURSOR/CURSOR_NORMAL.bmp.h"
 
 const unsigned char* GetResource(const char *name, size_t *size)
 {
@@ -389,11 +393,25 @@ const unsigned char* GetResource(const char *name, size_t *size)
 #endif
 	}
 	
+#ifndef WINDOWS
 	//ICON
-	if (!strcmp(name, "ICON4"))
+	if (!strcmp(name, "ICON_MINI"))
 	{
-		*size = sizeof(r4);
-		return r4;
+		*size = sizeof(rICON_MINI);
+		return rICON_MINI;
+	}
+#endif
+
+	//CURSOR
+	if (!strcmp(name, "CURSOR_NORMAL"))
+	{
+		*size = sizeof(rCURSOR_NORMAL);
+		return rCURSOR_NORMAL;
+	}
+	if (!strcmp(name, "CURSOR_IKA"))
+	{
+		*size = sizeof(rCURSOR_IKA);
+		return rCURSOR_IKA;
 	}
 	return NULL;
 }
