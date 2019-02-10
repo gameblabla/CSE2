@@ -108,7 +108,7 @@ void ActStar()
 	}
 }
 
-void __cdecl PutStar(int fx, int fy)
+void PutStar(int fx, int fy)
 {
 	RECT rc[3];
 	rc[0] = {192, 0, 200, 8};
