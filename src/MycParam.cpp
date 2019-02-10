@@ -408,15 +408,11 @@ bool SaveTimeCounter()
 		rec.random[3] = SDL_ReadU8(fp);
 		SDL_RWclose(fp);
 
-		//Decode from checksum
-		for (int i = 0; i < 4; i++)
-		{
-			uint8_t *p = (uint8_t*)&rec.counter[i];
-			p[0] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[0]) : (rec.random[0] >> 1);
-			p[1] -= rec.random[0];
-			p[2] -= rec.random[0];
-			p[3] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[0] >> 1) : (rec.random[0]);
-		}
+		uint8_t *p = (uint8_t*)&rec.counter[0];
+		p[0] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[0]) : (rec.random[0] >> 1);
+		p[1] -= rec.random[0];
+		p[2] -= rec.random[0];
+		p[3] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[0] >> 1) : (rec.random[0]);
 		
 		//If this is faster than our new time, quit
 		if (rec.counter[0] < time_count)
