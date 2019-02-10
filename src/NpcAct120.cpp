@@ -66,13 +66,15 @@ void ActNpc121(NPCHAR *npc)
 
 		npc->rect = rect[npc->ani_no];
 	}
-
-	npc->rect = rect[2];
-
-	if (++npc->act_wait > 100)
+	else
 	{
-		npc->act_wait = 0;
-		SetCaret(npc->x, npc->y, 5, 0);
+		npc->rect = rect[2];
+
+		if (++npc->act_wait > 100)
+		{
+			npc->act_wait = 0;
+			SetCaret(npc->x, npc->y, 5, 0);
+		}
 	}
 }
 
