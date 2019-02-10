@@ -2,6 +2,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "PixTone.h"
+
 class SOUNDBUFFER
 {
 	public:
@@ -95,3 +97,4 @@ void PlaySoundObject(int no, int mode);
 void ChangeSoundFrequency(int no, uint32_t rate);
 void ChangeSoundVolume(int no, int32_t volume);
 void ChangeSoundPan(int no, int32_t pan);
+size_t MakePixToneObject(const PIXTONEPARAMETER *ptp, int ptp_num, int no);
