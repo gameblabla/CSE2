@@ -56,7 +56,7 @@ void MakeWaveTables(void)
 	// White noise wave
 	srand(0);
 	for (i = 0; i < 256; ++i)
-		gWaveModelTable[5][i] = (char)(rand() & 0xFF) / 2;
+		gWaveModelTable[5][i] = (char)(rep_rand() & 0xFF) / 2;
 }
 
 BOOL MakePixelWaveData(const PIXTONEPARAMETER *ptp, unsigned char *pData)
