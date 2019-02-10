@@ -5,6 +5,8 @@
 #include <cstring>
 #include <math.h>
 
+#include "WindowsWrapper.h"
+
 #include "CommonDefines.h"
 #include "Tags.h"
 #include "PixTone.h"

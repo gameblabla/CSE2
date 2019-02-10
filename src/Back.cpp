@@ -52,6 +52,7 @@ void ActBack()
 void PutBack(int fx, int fy)
 {
 	RECT rect = {0, 0, gBack.partsW, gBack.partsH};
+	RECT rcSkyFiller = {106, 0, 255, 88};
 	
 	switch (gBack.type)
 	{
@@ -90,63 +91,63 @@ void PutBack(int fx, int fy)
 		case 6:
 		case 7:
 			//Sky
+			for (int y = 0; y < WINDOW_HEIGHT - 240 + 88; y += 88)
+			{
+				for (int x = -((y * 54) % 149); x < WINDOW_WIDTH; x += 149)
+				{
+					PutBitmap4(&grcGame, x, y, &rcSkyFiller, SURFACE_ID_LEVEL_BACKGROUND);
+				}
+			}
+			
 			rect.top = 0;
 			rect.bottom = 88;
 			rect.left = 0;
 			rect.right = 320;
-			PutBitmap4(&grcGame, (WINDOW_WIDTH - 320) / 2, 0, &rect, SURFACE_ID_LEVEL_BACKGROUND);
-			
-			rect.left = 106;
-			rect.right = 255;
-			for (int i = 0; i < ((WINDOW_WIDTH + 329) / 320); i++)
-			{
-				PutBitmap4(&grcGame, (WINDOW_WIDTH - 320) / 2 - (149 * (i + 1)), 0, &rect, SURFACE_ID_LEVEL_BACKGROUND);
-				PutBitmap4(&grcGame, (WINDOW_WIDTH - 320) / 2 + 320 + (149 * i), 0, &rect, SURFACE_ID_LEVEL_BACKGROUND);
-			}
-			
+			PutBitmap4(&grcGame, (WINDOW_WIDTH - 320) / 2, WINDOW_HEIGHT - 240, &rect, SURFACE_ID_LEVEL_BACKGROUND);
+
 			//Cloud layer 1
 			rect.top = 88;
 			rect.bottom = 123;
 			rect.left = gBack.fx / 2;
 			rect.right = 320;
-			PutBitmap4(&grcGame, 0, 88, &rect, SURFACE_ID_LEVEL_BACKGROUND);
+			PutBitmap4(&grcGame, 0, 88 + (WINDOW_HEIGHT - 240), &rect, SURFACE_ID_LEVEL_BACKGROUND);
 			
 			rect.left = 0;
 			for (int i = 0; i < ((WINDOW_WIDTH + 329) / 320) + 1; i++)
-				PutBitmap4(&grcGame, (320 * (i + 1)) - gBack.fx / 2 % 320, 88, &rect, SURFACE_ID_LEVEL_BACKGROUND);
+				PutBitmap4(&grcGame, (320 * (i + 1)) - gBack.fx / 2 % 320, 88 + (WINDOW_HEIGHT - 240), &rect, SURFACE_ID_LEVEL_BACKGROUND);
 			
 			//Cloud layer 2
 			rect.top = 123;
 			rect.bottom = 146;
 			rect.left = gBack.fx % 320;
 			rect.right = 320;
-			PutBitmap4(&grcGame, 0, 123, &rect, SURFACE_ID_LEVEL_BACKGROUND);
+			PutBitmap4(&grcGame, 0, 123 + (WINDOW_HEIGHT - 240), &rect, SURFACE_ID_LEVEL_BACKGROUND);
 			
 			rect.left = 0;
 			for (int i = 0; i < ((WINDOW_WIDTH + 329) / 320) + 1; i++)
-				PutBitmap4(&grcGame, (320 * (i + 1)) - gBack.fx % 320, 123, &rect, SURFACE_ID_LEVEL_BACKGROUND);
+				PutBitmap4(&grcGame, (320 * (i + 1)) - gBack.fx % 320, 123 + (WINDOW_HEIGHT - 240), &rect, SURFACE_ID_LEVEL_BACKGROUND);
 			
 			//Cloud layer 3
 			rect.top = 146;
 			rect.bottom = 176;
 			rect.left = 2 * gBack.fx % 320;
 			rect.right = 320;
-			PutBitmap4(&grcGame, 0, 146, &rect, SURFACE_ID_LEVEL_BACKGROUND);
+			PutBitmap4(&grcGame, 0, 146 + (WINDOW_HEIGHT - 240), &rect, SURFACE_ID_LEVEL_BACKGROUND);
 			
 			rect.left = 0;
 			for (int i = 0; i < ((WINDOW_WIDTH + 329) / 320) + 1; i++)
-				PutBitmap4(&grcGame, (320 * (i + 1)) - 2 * gBack.fx % 320, 146, &rect, SURFACE_ID_LEVEL_BACKGROUND);
+				PutBitmap4(&grcGame, (320 * (i + 1)) - 2 * gBack.fx % 320, 146 + (WINDOW_HEIGHT - 240), &rect, SURFACE_ID_LEVEL_BACKGROUND);
 			
 			//Cloud layer 4
 			rect.top = 176;
 			rect.bottom = 240;
 			rect.left = 4 * gBack.fx % 320;
 			rect.right = 320;
-			PutBitmap4(&grcGame, 0, 176, &rect, SURFACE_ID_LEVEL_BACKGROUND);
+			PutBitmap4(&grcGame, 0, 176 + (WINDOW_HEIGHT - 240), &rect, SURFACE_ID_LEVEL_BACKGROUND);
 			
 			rect.left = 0;
 			for (int i = 0; i < ((WINDOW_WIDTH + 329) / 320) + 1; i++)
-				PutBitmap4(&grcGame, (320 * (i + 1)) - 4 * gBack.fx % 320, 176, &rect, SURFACE_ID_LEVEL_BACKGROUND);
+				PutBitmap4(&grcGame, (320 * (i + 1)) - 4 * gBack.fx % 320, 176 + (WINDOW_HEIGHT - 240), &rect, SURFACE_ID_LEVEL_BACKGROUND);
 			break;
 			
 		default:

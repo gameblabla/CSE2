@@ -100,6 +100,10 @@ void ActionIllust()
 {
 	switch (Illust.act_no)
 	{
+		case 0: //Off-screen to the left
+			Illust.x = -0x14000;
+			break;
+			
 		case 1: //Move in from the left
 			Illust.x += 0x5000;
 			if (Illust.x > 0)
@@ -110,10 +114,6 @@ void ActionIllust()
 			Illust.x -= 0x5000;
 			if (Illust.x < -0x14000)
 				Illust.x = -0x14000;
-			break;
-			
-		case 0: //Off-screen to the left
-			Illust.x = -0x14000;
 			break;
 	}
 }
@@ -137,6 +137,7 @@ void ReloadIllust(int a)
 //Initialize and release credits
 void InitCreditScript()
 {
+	//Clear script state and casts
 	memset(&Credit, 0, sizeof(CREDIT));
 	memset(Strip, 0, sizeof(Strip));
 }
@@ -145,6 +146,7 @@ void ReleaseCreditScript()
 {
 	if (Credit.pData)
 	{
+		//Free script data
 		free(Credit.pData);
 		Credit.pData = NULL;
 	}
@@ -179,7 +181,8 @@ bool StartCreditScript()
 		return false;
 	
 	//Read data
-	fp->read(fp, Credit.pData, 1, Credit.size);
+	SDL_RWread(fp, Credit.pData, 1, Credit.size);
+	SDL_RWclose(fp);
 	EncryptionBinaryData2((uint8_t*)Credit.pData, Credit.size);
 	
 	//Reset credits
@@ -203,14 +206,16 @@ bool StartCreditScript()
 	
 	//Clear casts
 	memset(Strip, 0, sizeof(Strip));
-	SDL_RWclose(fp);
 	return true;
 }
 
 //Get number from text (4 digit)
 int GetScriptNumber(const char *text)
 {
-	return 1000 * *text - 48000 + 100 * text[1] - 4800 + 10 * text[2] - 480 + text[3] - 48;
+	return	1000 * text[0] - 48000 +
+			100 * text[1] - 4800 +
+			10 * text[2] - 480 +
+			text[3] - 48;
 }
 
 //Parse credits
@@ -218,6 +223,7 @@ void ActionCredit_Read()
 {
 	while (Credit.offset < Credit.size)
 	{
+		//Get character
 		uint8_t character = Credit.pData[Credit.offset];
 		
 		int a, b, len;
@@ -352,6 +358,7 @@ void ActionCredit()
 {
 	if (Credit.offset < Credit.size)
 	{
+		//Update script, or if waiting, decrement the wait value
 		if (Credit.mode == 1)
 		{
 			ActionCredit_Read();
@@ -379,23 +386,24 @@ void CutCreditIllust()
 //Scene of the island falling
 int Scene_DownIsland(int mode)
 {
-	RECT rc_sprite;
-	RECT rc_ground;
-	RECT rc_sky;
-	RECT rc_frame;
+	//Setup background
+	RECT rc_frame = {(WINDOW_WIDTH - 160) / 2, (WINDOW_HEIGHT - 80) / 2, (WINDOW_WIDTH + 160) / 2, (WINDOW_HEIGHT + 80) / 2};
+	RECT rc_sky = {0, 0, 160, 80};
+	RECT rc_ground = {160, 48, 320, 80};
+	
+	//Setup island
+	RECT rc_sprite = {160, 0, 200, 24};
+	
 	ISLAND_SPRITE sprite;
-
-	rc_frame = {(WINDOW_WIDTH - 160) / 2, (WINDOW_HEIGHT - 80) / 2, (WINDOW_WIDTH + 160) / 2, (WINDOW_HEIGHT + 80) / 2};
-	rc_sky = {0, 0, 160, 80};
-	rc_ground = {160, 48, 320, 80};
-	rc_sprite = {160, 0, 200, 24};
 	sprite.x = 0x15000;
 	sprite.y = 0x8000;
 	
 	for (int wait = 0; wait < 900; wait++)
 	{
+		//Get pressed keys
 		GetTrg();
 		
+		//Escape menu
 		if (gKey & 0x8000)
 		{
 			int escRet = Call_Escape();
@@ -408,6 +416,7 @@ int Scene_DownIsland(int mode)
 		switch (mode)
 		{
 			case 0:
+				//Move down
 				sprite.y += 0x33;
 				break;
 				
@@ -418,33 +427,38 @@ int Scene_DownIsland(int mode)
 					{
 						if (wait >= 600)
 						{
+							//End scene
 							if (wait == 750)
 								wait = 900;
 						}
 						else
 						{
+							//Move down slow
 							sprite.y += 0xC;
 						}
 					}
 					else
 					{
+						//Move down slower
 						sprite.y += 0x19;
 					}
 				}
 				else
 				{
+					//Move down at normal speed
 					sprite.y += 0x33;
 				}
 				break;
 		}
 		
-		
+		//Draw scene
 		CortBox(&grcFull, 0);
 		PutBitmap3(&rc_frame, 80 + (WINDOW_WIDTH - 320) / 2, 80 + (WINDOW_HEIGHT - 240) / 2, &rc_sky, 21);
 		PutBitmap3(&rc_frame, sprite.x / 0x200 - 20 + (WINDOW_WIDTH - 320) / 2, sprite.y / 512 - 12 + (WINDOW_HEIGHT - 240) / 2, &rc_sprite, 21);
 		PutBitmap3(&rc_frame, 80 + (WINDOW_WIDTH - 320) / 2, 128 + (WINDOW_HEIGHT - 240) / 2, &rc_ground, 21);
 		PutTimeCounter(16, 8);
 		
+		//Draw window
 		PutFramePerSecound();
 		if (!Flip_SystemTask())
 			return 0;
