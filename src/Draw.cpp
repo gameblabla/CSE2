@@ -488,9 +488,9 @@ void InitTextObject(const char *font_name)
 	//Open Font.ttf
 	char path[PATH_LENGTH];
 #ifdef JAPANESE
-	sprintf(path, "%sfont/msgothic.ttc", gModulePath);
+	sprintf(path, "%s/font/msgothic.ttc", gModulePath);
 #else
-	sprintf(path, "%sfont/cour.ttf", gModulePath);
+	sprintf(path, "%s/font/cour.ttf", gModulePath);
 #endif
 
 	gFont = LoadFont(path, fontWidth, fontHeight);
