@@ -10,36 +10,28 @@
 
 #define JOYSTICK_DEADZONE 0x2000
 
-SDL_GameController *joystick; //This may be a name that was given by Simon, but it fits the rest of Pixel's names so it's fine.
+SDL_Joystick *joystick; //This may be a name that was given by Simon, but it fits the rest of Pixel's names so it's fine.
 
 void ReleaseDirectInput()
 {
 	//Close opened joystick (if exists)
 	if (joystick)
 	{
-		SDL_GameControllerClose(joystick);
+		SDL_JoystickClose(joystick);
 		joystick = nullptr;
 	}
 }
 
 bool InitDirectInput()
 {
-	//Load mappings
-	char path[PATH_LENGTH];
-	sprintf(path, "%s/%s", gDataPath, "gamecontrollerdb.txt");
-	SDL_GameControllerAddMappingsFromFile(path);
-	
 	//Open first available joystick
 	for (int i = 0; i < SDL_NumJoysticks(); ++i)
 	{
-		if (SDL_IsGameController(i))
-		{
-			joystick = SDL_GameControllerOpen(i);
+		joystick = SDL_JoystickOpen(i);
 			
-			//Break as soon as a joystick is properly opened
-			if (joystick)
-				break;
-		}
+		//Break as soon as a joystick is properly opened
+		if (joystick)
+			break;
 	}
 	
 	return true;
@@ -52,19 +44,19 @@ bool GetJoystickStatus(JOYSTICK_STATUS *pStatus)
 	
 	if (joystick)
 	{
-		int32_t x = SDL_GameControllerGetAxis(joystick, SDL_CONTROLLER_AXIS_LEFTX);
-		int32_t y = SDL_GameControllerGetAxis(joystick, SDL_CONTROLLER_AXIS_LEFTY);
+		int32_t x = SDL_JoystickGetAxis(joystick, 0);
+		int32_t y = SDL_JoystickGetAxis(joystick, 1);
 		pStatus->bLeft = x <= -JOYSTICK_DEADZONE;
 		pStatus->bRight = x >= JOYSTICK_DEADZONE;
 		pStatus->bUp = y <= -JOYSTICK_DEADZONE;
 		pStatus->bDown = y >= JOYSTICK_DEADZONE;
 		
-		int numButtons = SDL_JoystickNumButtons(SDL_GameControllerGetJoystick(joystick));
+		int numButtons = SDL_JoystickNumButtons(joystick);
 		if (numButtons > 32)
 			numButtons = 32;
 		
 		for (int button = 0; button < numButtons; button++)
-			pStatus->bButton[button] = SDL_GameControllerGetButton(joystick, (SDL_GameControllerButton)button) != 0;
+			pStatus->bButton[button] = SDL_JoystickGetButton(joystick, button) != 0;
 		
 		return true;
 	}
