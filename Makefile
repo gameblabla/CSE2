@@ -45,10 +45,12 @@ SOURCES = \
 	Boss \
 	BossAlmo1 \
 	BossAlmo2 \
+	BossBallos \
 	BossFrog \
 	BossIronH \
 	BossLife \
 	BossOhm \
+	BossPress \
 	BossTwinD \
 	BossX \
 	BulHit \
