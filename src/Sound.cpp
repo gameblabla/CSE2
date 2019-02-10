@@ -294,3 +294,51 @@ void ChangeSoundPan(int no, int32_t pan)
 	if (lpSECONDARYBUFFER[no])
 		lpSECONDARYBUFFER[no]->SetPan(10 * (pan - 256));
 }
+
+size_t MakePixToneObject(const PIXTONEPARAMETER *ptp, int ptp_num, int no)
+{
+	size_t sample_count = 0;
+	for (int i = 0; i < ptp_num; ++i)
+	{
+		if (ptp[i].size > sample_count)
+			sample_count = ptp[i].size;
+	}
+
+	unsigned char *pcm_buffer = (unsigned char*)malloc(sample_count);
+	unsigned char *mixed_pcm_buffer = (unsigned char*)malloc(sample_count);
+	memset(pcm_buffer, 0x80, sample_count);
+	memset(mixed_pcm_buffer, 0x80, sample_count);
+
+	for (int i = 0; i < ptp_num; ++i)
+	{
+		if (!MakePixelWaveData(&ptp[i], pcm_buffer))
+		{
+			free(pcm_buffer);
+			free(mixed_pcm_buffer);
+			return -1;
+		}
+
+		for (int j = 0; j < ptp[i].size; ++j)
+		{
+			if (pcm_buffer[j] + mixed_pcm_buffer[j] - 0x100 < -0x7F)
+				mixed_pcm_buffer[j] = 0;
+			else if (pcm_buffer[j] + mixed_pcm_buffer[j] - 0x100 > 0x7F)
+				mixed_pcm_buffer[j] = -1;
+			else
+				mixed_pcm_buffer[j] += pcm_buffer[j] + -0x80;
+		}
+	}
+
+	lpSECONDARYBUFFER[no] = new SOUNDBUFFER(sample_count);
+
+	unsigned char *buf;
+	lpSECONDARYBUFFER[no]->Lock(&buf, NULL);
+	memcpy(buf, mixed_pcm_buffer, sample_count);
+	lpSECONDARYBUFFER[no]->Unlock();
+	lpSECONDARYBUFFER[no]->SetFrequency(22050);
+
+	free(pcm_buffer);
+	free(mixed_pcm_buffer);
+
+	return sample_count;
+}
