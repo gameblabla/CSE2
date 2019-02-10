@@ -54,7 +54,7 @@ void MakeWaveTables(void)
 		gWaveModelTable[4][i] = -0x40;
 
 	// White noise wave
-	srand(0);
+	rep_srand(0);
 	for (i = 0; i < 256; ++i)
 		gWaveModelTable[5][i] = (char)(rep_rand() & 0xFF) / 2;
 }
