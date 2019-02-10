@@ -22,30 +22,24 @@ void MoveFrame3()
 	const int num_x = ((WINDOW_WIDTH + 0xF) >> 4) + 1;
 	const int num_y = ((WINDOW_HEIGHT + 0xF) >> 4) + 1;
 	
-	if (map_w >= num_x || g_GameFlags & 8)
+	if (map_w >= num_x)
 	{
 		if (gFrame.x <= -0x200)
 			gFrame.x = 0;
 		if (gFrame.x > ((((map_w - 1) << 4) - ((g_GameFlags & 8) ? 320 : WINDOW_WIDTH))) << 9)
 			gFrame.x = (((map_w - 1) << 4) - ((g_GameFlags & 8) ? 320 : WINDOW_WIDTH)) << 9;
-		
-		if (g_GameFlags & 8)
-			gFrame.x -= ((WINDOW_WIDTH - 320) / 2) << 9;
 	}
 	else
 	{
 		gFrame.x = (((map_w - 1) << 4) - WINDOW_WIDTH) << 8;
 	}
 	
-	if (map_l >= num_y || g_GameFlags & 8)
+	if (map_l >= num_y)
 	{
 		if (gFrame.y <= -0x200)
 			gFrame.y = 0;
 		if (gFrame.y > ((((map_l - 1) << 4) - ((g_GameFlags & 8) ? 240 : WINDOW_HEIGHT))) << 9)
 			gFrame.y = (((map_l - 1) << 4) - ((g_GameFlags & 8) ? 240 : WINDOW_HEIGHT)) << 9;
-		
-		if (g_GameFlags & 8)
-			gFrame.y += ((WINDOW_HEIGHT - 240) / 2) << 9;
 	}
 	else
 	{

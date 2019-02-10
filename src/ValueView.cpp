@@ -43,7 +43,7 @@ void SetValueView(int *px, int *py, int value)
 	
 	//Get if negative or not
 	bool minus;
-	if ( value >= 0 )
+	if (value >= 0)
 	{
 		minus = false;
 	}
@@ -85,6 +85,28 @@ void SetValueView(int *px, int *py, int value)
 	gVV[index].rect.right = 40;
 	gVV[index].rect.bottom = 8 * (index + 1);
 	
+	RECT rect[20];
+	rect[0] = {0, 56, 8, 64};
+	rect[1] = {8, 56, 16, 64};
+	rect[2] = {16, 56, 24, 64};
+	rect[3] = {24, 56, 32, 64};
+	rect[4] = {32, 56, 40, 64};
+	rect[5] = {40, 56, 48, 64};
+	rect[6] = {48, 56, 56, 64};
+	rect[7] = {56, 56, 64, 64};
+	rect[8] = {64, 56, 72, 64};
+	rect[9] = {72, 56, 80, 64};
+	rect[10] = {0, 64, 8, 72};
+	rect[11] = {8, 64, 16, 72};
+	rect[12] = {16, 64, 24, 72};
+	rect[13] = {24, 64, 32, 72};
+	rect[14] = {32, 64, 40, 72};
+	rect[15] = {40, 64, 48, 72};
+	rect[16] = {48, 64, 56, 72};
+	rect[17] = {56, 64, 64, 72};
+	rect[18] = {64, 64, 72, 72};
+	rect[19] = {72, 64, 80, 72};
+	
 	//Get digits
 	int dig[4];
 	dig[0] = 1;
@@ -103,7 +125,7 @@ void SetValueView(int *px, int *py, int value)
 		}
 	}
 	
-	int sw = 0;
+	bool sw = false;
 	
 	RECT rcPlus = {32, 48, 40, 56};
 	RECT rcMinus = {40, 48, 48, 56};
@@ -120,15 +142,12 @@ void SetValueView(int *px, int *py, int value)
 	{
 		if (sw || !i || fig[i])
 		{
-			sw = 1;
+			sw = true;
 			
-			RECT rect;
 			if (minus)
-				rect = {fig[i] << 3, 64, (fig[i] + 1) << 3, 72};
-			else
-				rect = {fig[i] << 3, 56, (fig[i] + 1) << 3, 64};
+				fig[i] += 10;
 			
-			Surface2Surface(8 * (4 - i), gVV[index].rect.top, &rect, 29, 26);
+			Surface2Surface(8 * (4 - i), gVV[index].rect.top, &rect[fig[i]], 29, 26);
 		}
 	}
 }

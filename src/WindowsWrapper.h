@@ -1,4 +1,6 @@
 #pragma once
+int rep_rand();
+void rep_srand(unsigned int seed);
 
 typedef int BOOL;
 

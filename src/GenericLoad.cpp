@@ -2,6 +2,7 @@
 #include "Draw.h"
 #include "Sound.h"
 #include "PixTone.h"
+#include "Ending.h"
 
 static const PIXTONEPARAMETER gPtpTable[139] =
 {
@@ -195,7 +196,7 @@ bool LoadGenericData()
 		MakeSurface_Generic(40, 240, 29); //Unknown?
 		MakeSurface_Generic(320, 240, SURFACE_ID_LEVEL_SPRITESET_1);
 		MakeSurface_Generic(320, 240, SURFACE_ID_LEVEL_SPRITESET_2);
-		MakeSurface_Generic(WINDOW_WIDTH, 240, SURFACE_ID_CREDIT_CAST);
+		MakeSurface_Generic(WINDOW_WIDTH, 16 * MAX_STRIP, SURFACE_ID_CREDIT_CAST);
 
 		size_t pixtone_bytes = MakePixToneObject(&gPtpTable[0], 2, 32);
 		pixtone_bytes += MakePixToneObject(&gPtpTable[2], 2, 33);

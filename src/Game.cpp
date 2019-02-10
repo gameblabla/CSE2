@@ -50,7 +50,7 @@ bool bContinue;
 
 int Random(int min, int max)
 {
-	return min + rand() % (max - min + 1);
+	return min + rep_rand() % (max - min + 1);
 }
 
 void PutNumber4(int x, int y, int value, bool bZero)
