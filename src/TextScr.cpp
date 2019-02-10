@@ -706,6 +706,11 @@ int TextScriptProc()
 						ChangeMyUnit(z);
 						gTS.p_read += 8;
 					}
+					else if (IS_COMMAND('S','T','C'))
+					{
+						SaveTimeCounter();
+						gTS.p_read += 4;
+					}
 					else if (IS_COMMAND('T','R','A'))
 					{
 						z = GetTextScriptNo(gTS.p_read + 4);

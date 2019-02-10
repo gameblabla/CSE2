@@ -431,6 +431,10 @@ int Scene_DownIsland(int mode)
 						sprite.y += 0x19;
 					}
 				}
+				else
+				{
+					sprite.y += 0x33;
+				}
 				break;
 		}
 		

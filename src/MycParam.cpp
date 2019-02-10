@@ -382,6 +382,75 @@ void PutTimeCounter(int x, int y)
 	}
 }
 
+bool SaveTimeCounter()
+{
+	REC rec;
+
+	//Quit if player doesn't have the Nikumaru Counter
+	if (!(gMC.equip & 0x100))
+		return true;
+	
+	//Get last time
+	char path[PATH_LENGTH];
+	sprintf(path, "%s/290.rec", gModulePath);
+	
+	SDL_RWops *fp = SDL_RWFromFile(path, "rb");
+	if (fp)
+	{
+		//Read data
+		rec.counter[0] = SDL_ReadLE32(fp);
+		rec.counter[1] = SDL_ReadLE32(fp);
+		rec.counter[2] = SDL_ReadLE32(fp);
+		rec.counter[3] = SDL_ReadLE32(fp);
+		rec.random[0] = SDL_ReadU8(fp);
+		rec.random[1] = SDL_ReadU8(fp);
+		rec.random[2] = SDL_ReadU8(fp);
+		rec.random[3] = SDL_ReadU8(fp);
+		SDL_RWclose(fp);
+
+		//Decode from checksum
+		for (int i = 0; i < 4; i++)
+		{
+			uint8_t *p = (uint8_t*)&rec.counter[i];
+			p[0] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[i]) : (rec.random[i] >> 1);
+			p[1] -= rec.random[i];
+			p[2] -= rec.random[i];
+			p[3] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[i] >> 1) : (rec.random[i]);
+		}
+		
+		//If this is faster than our new time, quit
+		if (rec.counter[0] < time_count)
+			return true;
+	}
+	
+	//Save new time
+	for (int i = 0; i < 4; i++)
+	{
+		rec.counter[i] = time_count;
+		rec.random[i] = Random(0, 250) + i;
+		
+		uint8_t *p = (uint8_t*)&rec.counter[i];
+		p[0] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[i]) : (rec.random[i] >> 1);
+		p[1] -= rec.random[i];
+		p[2] -= rec.random[i];
+		p[3] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[i] >> 1) : (rec.random[i]);
+	}
+	
+	fp = SDL_RWFromFile(path, "wb");
+	if (!fp)
+		return false;
+	SDL_WriteLE32(fp, rec.counter[0]);
+	SDL_WriteLE32(fp, rec.counter[1]);
+	SDL_WriteLE32(fp, rec.counter[2]);
+	SDL_WriteLE32(fp, rec.counter[3]);
+	SDL_WriteU8(fp, rec.random[0]);
+	SDL_WriteU8(fp, rec.random[1]);
+	SDL_WriteU8(fp, rec.random[2]);
+	SDL_WriteU8(fp, rec.random[3]);
+	SDL_RWclose(fp);
+	return true;
+}
+
 int LoadTimeCounter()
 {
 	//Open file
@@ -405,18 +474,14 @@ int LoadTimeCounter()
 	rec.random[3] = SDL_ReadU8(fp);
 	SDL_RWclose(fp);
 	
-	//HACK: this swaps the random values to correspond to the correct bytes
-	*((uint32_t*)rec.random) = SDL_SwapLE32(*((uint32_t*)rec.random));
-	
 	//Decode from checksum
-	uint8_t *p;
 	for (int i = 0; i < 4; i++)
 	{
-		p = (uint8_t*)&rec.counter[i];
-		p[0] -= rec.random[i];
+		uint8_t *p = (uint8_t*)&rec.counter[i];
+		p[0] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[i]) : (rec.random[i] >> 1);
 		p[1] -= rec.random[i];
 		p[2] -= rec.random[i];
-		p[3] -= rec.random[i] >> 1;
+		p[3] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[i] >> 1) : (rec.random[i]);
 	}
 	
 	//Verify checksum's result
