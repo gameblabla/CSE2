@@ -204,7 +204,29 @@ int main(int argc, char *argv[])
 		}
 		
 		RECT unused_rect = {0, 0, 320, 240};
+
+		//Load cursor
+		SDL_RWops *fp = FindResource("CURSOR_NORMAL");
 		
+		if (fp)
+		{
+			SDL_Surface *cursor_surface = SDL_LoadBMP_RW(fp, 1);
+			SDL_SetColorKey(cursor_surface, SDL_TRUE, SDL_MapRGB(cursor_surface->format, 0xFF, 0, 0xFF));	// Pink regions are transparent
+
+			SDL_Cursor *cursor = SDL_CreateColorCursor(cursor_surface, 0, 0);	// Don't worry, the hotspots are accurate to the original files
+
+			if (cursor)
+				SDL_SetCursor(cursor);
+			else
+				printf("Failed to load cursor");
+
+			SDL_FreeSurface(cursor_surface);
+		}
+		else
+		{
+			printf("Failed to load cursor");
+		}
+	
 		//Get window dimensions and colour depth
 		int colourDepth = 16;
 		

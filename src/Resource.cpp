@@ -70,6 +70,8 @@
 #include "Resource/BITMAP/PIXEL.bmp.h"
 #endif
 #include "Resource/ICON/4.bmp.h"
+#include "Resource/CURSOR/CURSOR_IKA.bmp.h"
+#include "Resource/CURSOR/CURSOR_NORMAL.bmp.h"
 
 const unsigned char* GetResource(const char *name, size_t *size)
 {
@@ -394,6 +396,18 @@ const unsigned char* GetResource(const char *name, size_t *size)
 	{
 		*size = sizeof(r4);
 		return r4;
+	}
+	
+	//CURSOR
+	if (!strcmp(name, "CURSOR_NORMAL"))
+	{
+		*size = sizeof(rCURSOR_NORMAL);
+		return rCURSOR_NORMAL;
+	}
+	if (!strcmp(name, "CURSOR_IKA"))
+	{
+		*size = sizeof(rCURSOR_IKA);
+		return rCURSOR_IKA;
 	}
 	return NULL;
 }
