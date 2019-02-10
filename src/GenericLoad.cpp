@@ -53,7 +53,7 @@ bool LoadGenericData()
 		MakeSurface_Generic(40, 240, 29); //Unknown?
 		MakeSurface_Generic(320, 240, SURFACE_ID_LEVEL_SPRITESET_1);
 		MakeSurface_Generic(320, 240, SURFACE_ID_LEVEL_SPRITESET_2);
-		MakeSurface_Generic(WINDOW_WIDTH, 15 * MAX_STRIP, SURFACE_ID_CREDIT_CAST);
+		MakeSurface_Generic(WINDOW_WIDTH, 16 * MAX_STRIP, SURFACE_ID_CREDIT_CAST);
 		
 		char path[0x100];
 		uint8_t *buf = nullptr;

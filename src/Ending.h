@@ -32,7 +32,7 @@ struct ISLAND_SPRITE
 	int y;
 };
 
-#define MAX_STRIP ((WINDOW_HEIGHT + 14) / 15)
+#define MAX_STRIP (WINDOW_HEIGHT / 16) + 1
 
 void ActionStripper();
 void PutStripper();
