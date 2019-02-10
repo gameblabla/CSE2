@@ -102,7 +102,13 @@ int main(int argc, char *argv[])
 	//Get path of the data folder
 	strcpy(gDataPath, gModulePath);
 	memcpy(&gDataPath[strlen(gDataPath)], "/data", 6); //Pixel didn't use a strcat
-	
+
+#ifdef WINDOWS
+		// Set the window icons. See icon.rc.
+		SDL_SetHint(SDL_HINT_WINDOWS_INTRESOURCE_ICON, "101");
+		SDL_SetHint(SDL_HINT_WINDOWS_INTRESOURCE_ICON_SMALL, "102");
+#endif
+
 	//Initialize SDL
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS | SDL_INIT_GAMECONTROLLER) >= 0)
 	{
@@ -226,7 +232,7 @@ int main(int argc, char *argv[])
 		{
 			printf("Failed to load cursor");
 		}
-	
+
 		//Get window dimensions and colour depth
 		int colourDepth = 16;
 		
@@ -285,6 +291,7 @@ int main(int argc, char *argv[])
 			if (CheckFileExists("fps"))
 				bFps = true;
 			
+#ifndef WINDOWS
 			//Load icon
 			SDL_RWops *fp = FindResource("ICON4");
 			
@@ -303,7 +310,8 @@ int main(int argc, char *argv[])
 			{
 				printf("Failed to load icon");
 			}
-			
+#endif
+
 			//Set rects
 			RECT loading_rect = {0, 0, 64, 8};
 			RECT clip_rect = {0, 0, gWindowWidth, gWindowHeight};

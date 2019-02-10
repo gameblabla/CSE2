@@ -131,7 +131,6 @@ RESOURCES = \
 	BITMAP/CREDIT18.bmp \
 	CURSOR/CURSOR_IKA.bmp \
 	CURSOR/CURSOR_NORMAL.bmp \
-	ICON/4.bmp \
 	ORG/ACCESS \
 	ORG/ANZEN \
 	ORG/BALCONY \
@@ -182,7 +181,15 @@ else
 	RESOURCES += BITMAP/PIXEL.bmp
 endif
 
+ifneq ($(WINDOWS), 1)
+	RESOURCES += ICON/4.bmp
+endif
+
 OBJECTS = $(addprefix obj/$(FILENAME)/, $(addsuffix .o, $(SOURCES)))
+
+ifeq ($(WINDOWS), 1)
+OBJECTS += obj/$(FILENAME)/win_icon.o
+endif
 
 all: build/$(FILENAME)
 
@@ -210,6 +217,10 @@ obj/bin2h: res/bin2h.c
 	@mkdir -p $(@D)
 	@echo Compiling $^
 	@gcc -O3 -s -static $^ -o $@
+
+obj/$(FILENAME)/win_icon.o: res/ICON/ICON.rc res/ICON/0.ico res/ICON/ICON_MINI.ico
+	@mkdir -p $(@D)
+	@windres $< $@
 
 clean:
 	@rm -rf build obj
