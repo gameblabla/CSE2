@@ -305,8 +305,7 @@ void ChangeDramVolume(int32_t volume, int8_t track)
 
 void PlayDramObject(unsigned char key, int mode,char track)
 {
-	
-    switch(mode)
+	switch(mode)
 	{
 		case 0:
 			lpDRAMBUFFER[track]->Stop();
@@ -319,7 +318,7 @@ void PlayDramObject(unsigned char key, int mode,char track)
 			lpDRAMBUFFER[track]->Play(false);
 			break;
 		case 2:
-            break;
+			break;
 		case -1:
 			break;
 	}
@@ -341,7 +340,7 @@ void OrganyaPlayData()
 	//Play melody
 	for(int i = 0; i < MAXMELODY; i++)
 	{
-		if (play_np[i] != NULL &&play_p == play_np[i]->x)
+		if (play_np[i] != NULL && play_p == play_np[i]->x)
 		{
 			if(play_np[i]->y != KEYDUMMY)
 			{
@@ -555,7 +554,7 @@ void PlayOrganyaMusic()
 
 bool ChangeOrganyaVolume(signed int volume)
 {
-	if ( volume >= 0 && volume <= 100 )
+	if (volume >= 0 && volume <= 100)
 	{
 		gOrgVolume = volume;
 		return true;
