@@ -21,6 +21,10 @@ Just run 'make' in the base directory, preferably with some of the following opt
 * JAPANESE=1 to enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
 * FIX_BUGS=1 to fix certain bugs (see [src/Bug Fixes.txt](https://github.com/cuckydev/Cave-Story-Engine-2/blob/master/src/Bug%20Fixes.txt))
 
+## Running
+
+In order to run Cave Story Engine 2, you have to get the "data" folder from a vanilla copy of Cave Story. Just copy and paste it into the same folder as the executable.
+
 ## Licensing
 
 Being a decompilation, the majority of the code in this project belongs to Daisuke "Pixel" Amaya - not us. We've yet to agree on a license for our own code.
