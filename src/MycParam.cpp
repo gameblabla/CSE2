@@ -412,10 +412,10 @@ bool SaveTimeCounter()
 		for (int i = 0; i < 4; i++)
 		{
 			uint8_t *p = (uint8_t*)&rec.counter[i];
-			p[0] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[i]) : (rec.random[i] >> 1);
-			p[1] -= rec.random[i];
-			p[2] -= rec.random[i];
-			p[3] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[i] >> 1) : (rec.random[i]);
+			p[0] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[0]) : (rec.random[0] >> 1);
+			p[1] -= rec.random[0];
+			p[2] -= rec.random[0];
+			p[3] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[0] >> 1) : (rec.random[0]);
 		}
 		
 		//If this is faster than our new time, quit
@@ -430,10 +430,10 @@ bool SaveTimeCounter()
 		rec.random[i] = Random(0, 250) + i;
 		
 		uint8_t *p = (uint8_t*)&rec.counter[i];
-		p[0] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[i]) : (rec.random[i] >> 1);
-		p[1] -= rec.random[i];
-		p[2] -= rec.random[i];
-		p[3] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[i] >> 1) : (rec.random[i]);
+		p[0] += (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[i]) : (rec.random[i] >> 1);
+		p[1] += rec.random[i];
+		p[2] += rec.random[i];
+		p[3] += (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[i] >> 1) : (rec.random[i]);
 	}
 	
 	fp = SDL_RWFromFile(path, "wb");
