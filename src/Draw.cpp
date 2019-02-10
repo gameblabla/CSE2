@@ -66,6 +66,8 @@ bool Flip_SystemTask()
 
 static bool IsEnableBitmap(SDL_RWops *fp)
 {
+	return true;
+	/*
 	char str[16];
 	const char *extra_text = "(C)Pixel";
 
@@ -75,6 +77,7 @@ static bool IsEnableBitmap(SDL_RWops *fp)
 	fp->read(fp, str, 1, len);
 	fp->seek(fp, 0, RW_SEEK_SET);
 	return memcmp(str, extra_text, len) == 0;
+	*/
 }
 
 void ReleaseSurface(int s)

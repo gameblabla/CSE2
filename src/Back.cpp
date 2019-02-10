@@ -91,9 +91,12 @@ void PutBack(int fx, int fy)
 		case 6:
 		case 7:
 			//Sky
+			static unsigned int fillNext;
+			fillNext = 0;
 			for (int y = 0; y < WINDOW_HEIGHT - 240 + 88; y += 88)
 			{
-				for (int x = -((y * 54) % 149); x < WINDOW_WIDTH; x += 149)
+				fillNext = ((fillNext) * 214013 + 2531011);
+				for (int x = -(fillNext % 149); x < WINDOW_WIDTH; x += 149)
 				{
 					PutBitmap4(&grcGame, x, y, &rcSkyFiller, SURFACE_ID_LEVEL_BACKGROUND);
 				}

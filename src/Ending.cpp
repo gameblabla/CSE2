@@ -17,8 +17,6 @@
 #include "Draw.h"
 #include "TextScr.h"
 
-#define MAX_STRIP 0x10
-
 CREDIT Credit;
 STRIP Strip[MAX_STRIP];
 ILLUSTRATION Illust;
