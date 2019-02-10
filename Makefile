@@ -182,7 +182,7 @@ else
 endif
 
 ifneq ($(WINDOWS), 1)
-	RESOURCES += ICON/4.bmp
+	RESOURCES += ICON/ICON_MINI.bmp
 endif
 
 OBJECTS = $(addprefix obj/$(FILENAME)/, $(addsuffix .o, $(SOURCES)))

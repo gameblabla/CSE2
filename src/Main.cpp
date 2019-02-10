@@ -104,9 +104,9 @@ int main(int argc, char *argv[])
 	memcpy(&gDataPath[strlen(gDataPath)], "/data", 6); //Pixel didn't use a strcat
 
 #ifdef WINDOWS
-		// Set the window icons. See icon.rc.
-		SDL_SetHint(SDL_HINT_WINDOWS_INTRESOURCE_ICON, "101");
-		SDL_SetHint(SDL_HINT_WINDOWS_INTRESOURCE_ICON_SMALL, "102");
+	// Set the window icons. See res/ICON/ICON.rc.
+	SDL_SetHint(SDL_HINT_WINDOWS_INTRESOURCE_ICON, "101");
+	SDL_SetHint(SDL_HINT_WINDOWS_INTRESOURCE_ICON_SMALL, "102");
 #endif
 
 	//Initialize SDL
@@ -293,7 +293,7 @@ int main(int argc, char *argv[])
 			
 #ifndef WINDOWS
 			//Load icon
-			SDL_RWops *fp = FindResource("ICON4");
+			SDL_RWops *fp = FindResource("ICON_MINI");
 			
 			if (fp)
 			{
