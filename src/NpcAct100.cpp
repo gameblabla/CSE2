@@ -260,9 +260,9 @@ void ActNpc104(NPCHAR *npc)
 	if (bJump)
 	{
 		if (gMC.x > npc->x)
-			npc->direct = 0;
-		else
 			npc->direct = 2;
+		else
+			npc->direct = 0;
 
 		npc->act_no = 10;
 		npc->ani_no = 2;
@@ -272,7 +272,7 @@ void ActNpc104(NPCHAR *npc)
 			PlaySoundObject(30, 1);
 
 		if (npc->direct == 0)
-			npc->xm = -0x200u;
+			npc->xm = -0x200;
 		else
 			npc->xm = 0x200;
 	}
