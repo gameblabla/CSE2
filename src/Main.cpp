@@ -280,7 +280,6 @@ int main(int argc, char *argv[])
 		}
 		
 		//Create window
-		SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
 		gWindow = SDL_CreateWindow(lpWindowName, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, gWindowWidth, gWindowHeight, bFullscreen ? SDL_WINDOW_FULLSCREEN : 0);
 		
 		if (gWindow)
