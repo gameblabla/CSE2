@@ -241,17 +241,9 @@ static bool LoadBitmap_File(const char *name, int surf_no, bool create_surface)
 	fp = SDL_RWFromFile(path, "rb");
 	if (fp)
 	{
-		if (!IsEnableBitmap(fp))
-		{
-			printf("Tried to load bitmap to surface %d, but it's missing the '(C)Pixel' string\n", surf_no);
-		}
-		else
-		{
-
-			printf("Loading surface (as .bmp) from %s for surface id %d\n", path, surf_no);
-			if (LoadBitmap(fp, surf_no, create_surface))
-				return true;
-		}
+		printf("Loading surface (as .bmp) from %s for surface id %d\n", path, surf_no);
+		if (LoadBitmap(fp, surf_no, create_surface))
+			return true;
 	}
 	
 	printf("Failed to open file %s\n", name);
