@@ -6,7 +6,7 @@
 
 #include "WindowsWrapper.h"
 
-static char gWaveModelTable[6][256];
+static signed char gWaveModelTable[6][256];
 
 void MakeWaveTables(void)
 {

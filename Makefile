@@ -8,7 +8,6 @@ endif
 
 ifeq ($(JAPANESE), 1)
 	CXXFLAGS += -DJAPANESE
-	LIBS += -liconv
 	ifeq ($(RELEASE), 1)
 		FILENAME_DEF = releasejp
 	else
@@ -25,6 +24,9 @@ endif
 ifeq ($(WINDOWS), 1)
 	ifeq ($(CONSOLE), 1)
 		CXXFLAGS += -mconsole
+	endif
+	ifeq ($(JAPANESE), 1)
+		LIBS += -liconv
 	endif
 	CXXFLAGS += -DWINDOWS
 	LIBS += -lkernel32
