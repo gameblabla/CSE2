@@ -323,7 +323,7 @@ size_t MakePixToneObject(const PIXTONEPARAMETER *ptp, int ptp_num, int no)
 			if (pcm_buffer[j] + mixed_pcm_buffer[j] - 0x100 < -0x7F)
 				mixed_pcm_buffer[j] = 0;
 			else if (pcm_buffer[j] + mixed_pcm_buffer[j] - 0x100 > 0x7F)
-				mixed_pcm_buffer[j] = -1;
+				mixed_pcm_buffer[j] = 0xFF;
 			else
 				mixed_pcm_buffer[j] += pcm_buffer[j] + -0x80;
 		}

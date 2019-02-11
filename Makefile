@@ -1,14 +1,14 @@
 ifeq ($(RELEASE), 1)
-	CXXFLAGS := -O3 -s
+	CXXFLAGS = -O3 -s
 	FILENAME_DEF = release
 else
-	CXXFLAGS := -O0 -g
+	CXXFLAGS = -O0 -g
 	FILENAME_DEF = debug
 endif
 
 ifeq ($(JAPANESE), 1)
 	CXXFLAGS += -DJAPANESE
-	LIBS += -liconv
+
 	ifeq ($(RELEASE), 1)
 		FILENAME_DEF = releasejp
 	else
@@ -26,16 +26,20 @@ ifeq ($(WINDOWS), 1)
 	ifeq ($(CONSOLE), 1)
 		CXXFLAGS += -mconsole
 	endif
+	ifeq ($(JAPANESE), 1)
+		LIBS += -liconv
+	endif
+
 	CXXFLAGS += -DWINDOWS
 	LIBS += -lkernel32
 endif
 
-CXXFLAGS += `sdl2-config --cflags` `pkg-config freetype2 --cflags`
+CXXFLAGS += `sdl2-config --cflags` `pkg-config freetype2 --cflags` -MMD -MP -MF $@.d
 LIBS += `sdl2-config --static-libs` `pkg-config freetype2 --libs`
 
 ifeq ($(STATIC), 1)
-CXXFLAGS += -static
-LIBS += -lharfbuzz -lfreetype -lbz2 -lpng -lz -lgraphite2 -lRpcrt4 -lDwrite -lusp10
+	CXXFLAGS += -static
+	LIBS += -lharfbuzz -lfreetype -lbz2 -lpng -lz -lgraphite2 -lRpcrt4 -lDwrite -lusp10
 endif
 
 # For an accurate result to the original's code, compile in alphabetical order
@@ -186,27 +190,28 @@ ifneq ($(WINDOWS), 1)
 endif
 
 OBJECTS = $(addprefix obj/$(FILENAME)/, $(addsuffix .o, $(SOURCES)))
+DEPENDENCIES = $(addprefix obj/$(FILENAME)/, $(addsuffix .o.d, $(SOURCES)))
 
 ifeq ($(WINDOWS), 1)
-OBJECTS += obj/$(FILENAME)/win_icon.o
+	OBJECTS += obj/$(FILENAME)/win_icon.o
 endif
 
 all: build/$(FILENAME)
 
 build/$(FILENAME): $(OBJECTS)
 	@mkdir -p $(@D)
-	@g++ $(CXXFLAGS) $^ -o $@ $(LIBS)
+	@$(CXX) $(CXXFLAGS) $^ -o $@ $(LIBS)
 	@echo Finished compiling: $@
 
 obj/$(FILENAME)/%.o: src/%.cpp
 	@mkdir -p $(@D)
-	@echo Compiling $^
-	@g++ $(CXXFLAGS) $^ -o $@ -c
+	@echo Compiling $<
+	@$(CXX) $(CXXFLAGS) $< -o $@ -c
 
 obj/$(FILENAME)/Resource.o: src/Resource.cpp $(addprefix src/Resource/, $(addsuffix .h, $(RESOURCES)))
 	@mkdir -p $(@D)
 	@echo Compiling $<
-	@g++ $(CXXFLAGS) $< -o $@ -c
+	@$(CXX) $(CXXFLAGS) $< -o $@ -c
 
 src/Resource/%.h: res/% obj/bin2h
 	@mkdir -p $(@D)
@@ -216,7 +221,9 @@ src/Resource/%.h: res/% obj/bin2h
 obj/bin2h: res/bin2h.c
 	@mkdir -p $(@D)
 	@echo Compiling $^
-	@gcc -O3 -s -static $^ -o $@
+	@$(CC) -O3 -s -static $^ -o $@
+
+include $(wildcard $(DEPENDENCIES))
 
 obj/$(FILENAME)/win_icon.o: res/ICON/ICON.rc res/ICON/0.ico res/ICON/ICON_MINI.ico
 	@mkdir -p $(@D)
