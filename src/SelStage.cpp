@@ -165,7 +165,12 @@ int StageSelectLoop(int *p_event)
 		if (tscRet == 2)
 			return 2;
 
+#ifdef FIX_BUGS
+		PutBitmap4(&rcView, 0, 0, &rcView, 10);
+#else
+		// The original accidentally drew the screencap with transparency enabled
 		PutBitmap3(&rcView, 0, 0, &rcView, 10);
+#endif
 		PutStageSelectObject();
 		PutTextScript();
 
