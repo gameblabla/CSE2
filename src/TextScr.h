@@ -54,13 +54,13 @@ struct TEXT_SCRIPT
 	uint8_t wait_beam;
 };
 
-bool InitTextScript2();
+BOOL InitTextScript2();
 void EndTextScript();
 void EncryptionBinaryData2(uint8_t *pData, int size);
 bool LoadTextScript2(const char *name);
 bool LoadTextScript_Stage(char *name);
 void GetTextScriptPath(char *path);
-bool StartTextScript(int no);
+BOOL StartTextScript(int no);
 void StopTextScript();
 void PutTextScript();
 int TextScriptProc();
