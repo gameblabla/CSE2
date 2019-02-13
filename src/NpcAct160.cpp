@@ -1178,7 +1178,7 @@ void ActNpc173(NPCHAR *npc)
 
 		if (npc->ym > 0x5FF)
 			npc->ym = 0x5FF;
-		if ( npc->ym < -0x5FFu )
+		if (npc->ym < -0x5FF)
 			npc->ym = 0x5FF;
 
 		npc->x += npc->xm;

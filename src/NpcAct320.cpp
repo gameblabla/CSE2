@@ -515,7 +515,7 @@ void ActNpc326(NPCHAR *npc)
 			npc->act_no = 41;
 			npc->act_wait = 0;
 			npc->ani_no = 0;
-			//Fallthorugh
+			//Fallthrough
 		case 41:
 			if (++npc->act_wait == 30)
 				npc->ani_no = 1;
