@@ -26,14 +26,10 @@ char gDataPath[PATH_LENGTH];
 
 int gJoystickButtonTable[8];
 
-int gWindowWidth;
-int gWindowHeight;
-int gWindowScale;
 SDL_Window *gWindow;
 SDL_Renderer *gRenderer;
 
 bool gbUseJoystick = false;
-bool bFullscreen = false;
 bool bFps = false;
 
 bool bActive = true;
@@ -97,7 +93,7 @@ int main(int argc, char *argv[])
 	//Get executable's path
 	strcpy(gModulePath, SDL_GetBasePath());
 	if (gModulePath[strlen(gModulePath) - 1] == '/' || gModulePath[strlen(gModulePath) - 1] == '\\')
-		gModulePath[strlen(gModulePath) - 1] = 0; //String cannot end in slash or stuff will probably break (original does this through a windows.h provided function)
+		gModulePath[strlen(gModulePath) - 1] = '\0'; //String cannot end in slash or stuff will probably break (original does this through a windows.h provided function)
 	
 	//Get path of the data folder
 	strcpy(gDataPath, gModulePath);
@@ -110,7 +106,7 @@ int main(int argc, char *argv[])
 #endif
 
 	//Initialize SDL
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS | SDL_INIT_GAMECONTROLLER) >= 0)
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_TIMER) >= 0)
 	{
 		//Load configuration
 		CONFIG config;
@@ -234,7 +230,9 @@ int main(int argc, char *argv[])
 		}
 
 		//Get window dimensions and colour depth
-		int colourDepth = 16;
+		int windowWidth;
+		int windowHeight;
+		int colourDepth;
 		
 		switch (config.display_mode)
 		{
@@ -243,50 +241,69 @@ int main(int argc, char *argv[])
 				//Set window dimensions
 				if (config.display_mode == 1)
 				{
-					gWindowWidth = WINDOW_WIDTH;
-					gWindowHeight = WINDOW_HEIGHT;
-					gWindowScale = 1;
+					windowWidth = WINDOW_WIDTH;
+					windowHeight = WINDOW_HEIGHT;
 				}
 				else
 				{
-					gWindowWidth = WINDOW_WIDTH * 2;
-					gWindowHeight = WINDOW_HEIGHT * 2;
-					gWindowScale = 2;
+					windowWidth = WINDOW_WIDTH * 2;
+					windowHeight = WINDOW_HEIGHT * 2;
 				}
+				
+				//Create window
+				gWindow = SDL_CreateWindow(lpWindowName, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, 0);
+				
+				if (gWindow)
+				{
+					if (config.display_mode == 1)
+						StartDirectDraw(0, 0);
+					else
+						StartDirectDraw(1, 0);
+					break;
+				}
+				
 				break;
 			
 			case 0:
 			case 3:
 			case 4:
 				//Set window dimensions
-				gWindowWidth = WINDOW_WIDTH * 2;
-				gWindowHeight = WINDOW_HEIGHT * 2;
-				gWindowScale = 2;
+				windowWidth = WINDOW_WIDTH * 2;
+				windowHeight = WINDOW_HEIGHT * 2;
 				
-				//Set colour depth
-				if (config.display_mode)
+				//Create window
+				gWindow = SDL_CreateWindow(lpWindowName, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, 0);
+				
+				if (gWindow)
 				{
-					if (config.display_mode == 3)
-						colourDepth = 24;
-					else if (config.display_mode == 4)
-						colourDepth = 32;
+					//Set colour depth
+					switch (config.display_mode)
+					{
+						case 0:
+							colourDepth = 16;
+							break;
+						case 3:
+							colourDepth = 24;
+							break;
+						case 4:
+							colourDepth = 32;
+							break;
+					}
+					
+					StartDirectDraw(2, colourDepth);
+					
+					fullscreen = true;
+					SDL_ShowCursor(0);
+					break;
 				}
-				else
-					colourDepth = 16;
-				
-				bFullscreen = true;
-				SDL_ShowCursor(0);
 				break;
 		}
 		
 		//Create window
-		gWindow = SDL_CreateWindow(lpWindowName, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, gWindowWidth, gWindowHeight, bFullscreen ? SDL_WINDOW_FULLSCREEN : 0);
+		
 		
 		if (gWindow)
 		{
-			//Initialize rendering
-			StartDirectDraw();
-			
 			//Check debug things
 			if (CheckFileExists("fps"))
 				bFps = true;
@@ -314,7 +331,7 @@ int main(int argc, char *argv[])
 
 			//Set rects
 			RECT loading_rect = {0, 0, 64, 8};
-			RECT clip_rect = {0, 0, gWindowWidth, gWindowHeight};
+			RECT clip_rect = {0, 0, windowWidth, windowHeight};
 			
 			//Load the "LOADING" text
 			MakeSurface_File("Loading", SURFACE_ID_LOADING);
@@ -347,16 +364,16 @@ int main(int argc, char *argv[])
 				EndDirectSound();
 				EndTextObject();
 				EndDirectDraw();
-				
-				SDL_Quit();
 			}
 		}
 	}
 	else
 	{
+		SDL_Quit();
 		return -1;
 	}
 	
+	SDL_Quit();
 	return 0;
 }
 

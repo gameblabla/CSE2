@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <stdint.h>
 
-#include <SDL_audio.h>
+#include <SDL.h>
 
 #include "Sound.h"
 #include "Organya.h"
@@ -217,6 +217,10 @@ SOUNDBUFFER* lpSECONDARYBUFFER[SOUND_NO];
 
 bool InitDirectSound()
 {
+	//Init sound
+	SDL_InitSubSystem(SDL_INIT_AUDIO);
+	
+	//Open audio device
 	SDL_AudioSpec want, have;
 	
 	//Set specifications we want
@@ -245,6 +249,9 @@ bool InitDirectSound()
 
 void EndDirectSound()
 {
+	//Quit sub-system
+	SDL_QuitSubSystem(SDL_INIT_AUDIO);
+	
 	//Close audio device
 	SDL_CloseAudioDevice(audioDevice);
 	

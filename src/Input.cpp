@@ -2,13 +2,13 @@
 #include "CommonDefines.h"
 #include <stdint.h>
 
-#include <SDL_gamecontroller.h>
+#include <SDL.h>
 #include "WindowsWrapper.h"
 
 #include "Input.h"
 #include "Tags.h"
 
-#define JOYSTICK_DEADZONE 0x2000
+#define JOYSTICK_DEADZONE 10000
 
 SDL_Joystick *joystick; //This may be a name that was given by Simon, but it fits the rest of Pixel's names so it's fine.
 
@@ -17,6 +17,7 @@ void ReleaseDirectInput()
 	//Close opened joystick (if exists)
 	if (joystick)
 	{
+		SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
 		SDL_JoystickClose(joystick);
 		joystick = nullptr;
 	}
@@ -25,7 +26,9 @@ void ReleaseDirectInput()
 bool InitDirectInput()
 {
 	//Open first available joystick
-	for (int i = 0; i < SDL_NumJoysticks(); ++i)
+	SDL_InitSubSystem(SDL_INIT_JOYSTICK);
+	
+	for (int i = 0; i < SDL_NumJoysticks(); i++)
 	{
 		joystick = SDL_JoystickOpen(i);
 			

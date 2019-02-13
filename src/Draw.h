@@ -9,9 +9,8 @@ extern SDL_Renderer *gRenderer;
 extern RECT grcGame;
 extern RECT grcFull;
 
-extern int gWindowWidth;
-extern int gWindowHeight;
-extern int gWindowScale;
+extern int magnification;
+extern bool fullscreen;
 
 enum Surface_Ids
 {
@@ -54,7 +53,7 @@ struct SURFACE
 extern SURFACE surf[SURFACE_ID_MAX];
 
 bool Flip_SystemTask();
-bool StartDirectDraw();
+bool StartDirectDraw(int lMagnification, int lColourDepth);
 void EndDirectDraw();
 void ReleaseSurface(int s);
 bool MakeSurface(SDL_RWops *rw, int surf_no);

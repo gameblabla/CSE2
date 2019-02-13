@@ -959,7 +959,7 @@ int TextScriptProc()
 					else if (IS_COMMAND('S','P','S'))
 					{
 						SetNoise(2, x);
-						gTS.p_read += 8;
+						gTS.p_read += 4;
 					}
 					else if (IS_COMMAND('C','P','S'))
 					{
