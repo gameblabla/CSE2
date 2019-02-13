@@ -234,7 +234,7 @@ static bool LoadBitmap(SDL_RWops *fp, int surf_no, bool create_surface)
 			{
 				if (create_surface == false || MakeSurface_Generic(surface->w, surface->h, surf_no))
 				{
-					if (gWindowScale == 1)
+					if (magnification == 1)
 					{
 						SDL_Rect dst_rect = {0, 0, surface->w, surface->h};
 						SDL_BlitSurface(surface, NULL, surf[surf_no].surface, &dst_rect);
@@ -260,18 +260,18 @@ static bool LoadBitmap(SDL_RWops *fp, int surf_no, bool create_surface)
 							for (int h = 0; h < converted_surface->h; ++h)
 							{
 								const unsigned long *src_row = (unsigned long*)src_pixels[h];
-								unsigned long *dst_row = (unsigned long*)dst_pixels[h * gWindowScale];
+								unsigned long *dst_row = (unsigned long*)dst_pixels[h * magnification];
 
 								for (int w = 0; w < converted_surface->w; ++w)
 								{
 									const unsigned long src_pixel = *src_row++;
 
-									for (int i = 0; i < gWindowScale; ++i)
+									for (int i = 0; i < magnification; ++i)
 										*dst_row++ = src_pixel;
 								}
 
-								for (int i = 1; i < gWindowScale; ++i)
-									memcpy(dst_pixels[(h * gWindowScale) + i], dst_pixels[h * gWindowScale], surf[surf_no].surface->w * sizeof(unsigned long));
+								for (int i = 1; i < magnification; ++i)
+									memcpy(dst_pixels[(h * magnification) + i], dst_pixels[h * magnification], surf[surf_no].surface->w * sizeof(unsigned long));
 							}
 
 							SDL_FreeSurface(converted_surface);
