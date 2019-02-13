@@ -564,6 +564,7 @@ void ActNpc184(NPCHAR *npc)
 			npc->ani_no = 1;
 			npc->act_wait = 0;
 			npc->bits |= npc_ignoreSolid;
+			// Fallthrough
 		case 11:
 			switch (npc->direct)
 			{
@@ -960,11 +961,6 @@ void ActNpc190(NPCHAR *npc)
 //Water level
 void ActNpc191(NPCHAR *npc)
 {
-	int v1; // edx
-	int v2; // edx
-	int v3; // edx
-	int v4; // edx
-
 	switch ( npc->act_no )
 	{
 		case 0:

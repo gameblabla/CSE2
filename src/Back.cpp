@@ -167,11 +167,11 @@ void PutFront(int fx, int fy)
 	if (gBack.type == 3)
 	{
 		int x_1 = fx / 0x4000;
-		int x_2 = fx / 0x4000 + (((WINDOW_WIDTH + 31) >> 5) + 1);
+		int x_2 = x_1 + (((WINDOW_WIDTH + 31) >> 5) + 1);
 		int y_1 = 0;
-		int y_2 = 32;
+		int y_2 = y_1 + 32;
 		
-		for (int y = 0; y < y_2; y++)
+		for (int y = y_1; y < y_2; y++)
 		{
 			int ypos = (y << 14) / 0x200 - fy / 0x200 + gWaterY / 0x200;
 			

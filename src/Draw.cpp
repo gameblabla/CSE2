@@ -187,21 +187,21 @@ static void FlushSurface(int surf_no)
 	int pitch;
 	SDL_LockTexture(surf[surf_no].texture, NULL, (void**)&raw_pixels, &pitch);
 
-	unsigned char (*src_pixels)[surf[surf_no].surface->pitch / 4][4] = (unsigned char (*)[surf[surf_no].surface->pitch/ 4][4])surf[surf_no].surface->pixels;
-	unsigned char (*dst_pixels)[pitch / 4][4] = (unsigned char (*)[pitch/ 4][4])raw_pixels;
-
 	for (int h = 0; h < surf[surf_no].surface->h; ++h)
 	{
 		for (int w = 0; w < surf[surf_no].surface->w; ++w)
 		{
-			dst_pixels[h][w][0] = src_pixels[h][w][0];
-			dst_pixels[h][w][1] = src_pixels[h][w][1];
-			dst_pixels[h][w][2] = src_pixels[h][w][2];
+			unsigned char *src_pixel = (unsigned char*)surf[surf_no].surface->pixels + (h * surf[surf_no].surface->pitch) + (w * 4);
+			unsigned char *dst_pixel = (unsigned char*)raw_pixels + (h * pitch) + (w * 4);
 
-			if (src_pixels[h][w][0] || src_pixels[h][w][1] || src_pixels[h][w][2])	// Colour-key
-				dst_pixels[h][w][3] = 0xFF;
+			dst_pixel[0] = src_pixel[0];
+			dst_pixel[1] = src_pixel[1];
+			dst_pixel[2] = src_pixel[2];
+
+			if (src_pixel[0] || src_pixel[1] || src_pixel[2])	// Colour-key
+				dst_pixel[3] = 0xFF;
 			else
-				dst_pixels[h][w][3] = 0;
+				dst_pixel[3] = 0;
 		}
 	}
 
@@ -254,24 +254,24 @@ static bool LoadBitmap(SDL_RWops *fp, int surf_no, bool create_surface)
 						else
 						{
 							// Upscale the bitmap to the game's native resolution (SDL_BlitScaled is buggy, so we have to do it on our own)
-							const unsigned char (*src_pixels)[converted_surface->pitch] = (unsigned char(*)[converted_surface->pitch])converted_surface->pixels;
-							unsigned char (*dst_pixels)[surf[surf_no].surface->pitch] = (unsigned char(*)[surf[surf_no].surface->pitch])surf[surf_no].surface->pixels;
-
 							for (int h = 0; h < converted_surface->h; ++h)
 							{
-								const unsigned long *src_row = (unsigned long*)src_pixels[h];
-								unsigned long *dst_row = (unsigned long*)dst_pixels[h * magnification];
+								const unsigned char *src_row = (unsigned char*)converted_surface->pixels + h * converted_surface->pitch;
+								unsigned char *dst_row = (unsigned char*)surf[surf_no].surface->pixels + h * surf[surf_no].surface->pitch * magnification;
+
+								const unsigned long *src_ptr = (unsigned long*)src_row;
+								unsigned long *dst_ptr = (unsigned long*)dst_row;
 
 								for (int w = 0; w < converted_surface->w; ++w)
 								{
-									const unsigned long src_pixel = *src_row++;
+									const unsigned long src_pixel = *src_ptr++;
 
 									for (int i = 0; i < magnification; ++i)
-										*dst_row++ = src_pixel;
+										*dst_ptr++ = src_pixel;
 								}
 
 								for (int i = 1; i < magnification; ++i)
-									memcpy(dst_pixels[(h * magnification) + i], dst_pixels[h * magnification], surf[surf_no].surface->w * sizeof(unsigned long));
+									memcpy(dst_row + i * surf[surf_no].surface->pitch, dst_row, surf[surf_no].surface->w * sizeof(unsigned long));
 							}
 
 							SDL_FreeSurface(converted_surface);
