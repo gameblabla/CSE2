@@ -14,12 +14,15 @@ This project currently depends on SDL2 and Freetype2.
 
 ## Building
 
-Just run 'make' in the base directory, preferably with some of the following optional settings:
+The project is currently built 'the Linux way':
+
+Just run 'make' in the base directory, preferably with some of the following settings:
 
 * RELEASE=1 to compile a release build (optimised, stripped, etc.)
 * STATIC=1 to produce a statically-linked executable (good for Windows builds)
 * JAPANESE=1 to enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
 * FIX_BUGS=1 to fix certain bugs (see [src/Bug Fixes.txt](https://github.com/cuckydev/Cave-Story-Engine-2/blob/master/src/Bug%20Fixes.txt))
+* WINDOWS=1 to enable Windows-only features like a unique file/taskbar icon, and system font loading (needed for the font setting in Config.dat to do anything)
 
 ## Running
 

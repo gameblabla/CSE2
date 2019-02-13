@@ -234,20 +234,51 @@ static bool LoadBitmap(SDL_RWops *fp, int surf_no, bool create_surface)
 			{
 				if (create_surface == false || MakeSurface_Generic(surface->w, surface->h, surf_no))
 				{
-					SDL_Surface *converted_surface = SDL_ConvertSurface(surface, surf[surf_no].surface->format, 0);
-
-					if (converted_surface == NULL)
+					if (gWindowScale == 1)
 					{
-						printf("Couldn't convert bitmap to surface format (surface id %d)\nSDL Error: %s\n", surf_no, SDL_GetError());
-					}
-					else
-					{
-						SDL_Rect dst_rect = {0, 0, converted_surface->w * magnification, converted_surface->h * magnification};
-						SDL_BlitScaled(converted_surface, NULL, surf[surf_no].surface, &dst_rect);
-						SDL_FreeSurface(converted_surface);
+						SDL_Rect dst_rect = {0, 0, surface->w, surface->h};
+						SDL_BlitSurface(surface, NULL, surf[surf_no].surface, &dst_rect);
+						SDL_FreeSurface(surface);
 						surf[surf_no].needs_updating = true;
 						printf(" ^ Successfully loaded\n");
 						success = true;
+					}
+					else
+					{
+						SDL_Surface *converted_surface = SDL_ConvertSurface(surface, surf[surf_no].surface->format, 0);
+
+						if (converted_surface == NULL)
+						{
+							printf("Couldn't convert bitmap to surface format (surface id %d)\nSDL Error: %s\n", surf_no, SDL_GetError());
+						}
+						else
+						{
+							// Upscale the bitmap to the game's native resolution (SDL_BlitScaled is buggy, so we have to do it on our own)
+							const unsigned char (*src_pixels)[converted_surface->pitch] = (unsigned char(*)[converted_surface->pitch])converted_surface->pixels;
+							unsigned char (*dst_pixels)[surf[surf_no].surface->pitch] = (unsigned char(*)[surf[surf_no].surface->pitch])surf[surf_no].surface->pixels;
+
+							for (int h = 0; h < converted_surface->h; ++h)
+							{
+								const unsigned long *src_row = (unsigned long*)src_pixels[h];
+								unsigned long *dst_row = (unsigned long*)dst_pixels[h * gWindowScale];
+
+								for (int w = 0; w < converted_surface->w; ++w)
+								{
+									const unsigned long src_pixel = *src_row++;
+
+									for (int i = 0; i < gWindowScale; ++i)
+										*dst_row++ = src_pixel;
+								}
+
+								for (int i = 1; i < gWindowScale; ++i)
+									memcpy(dst_pixels[(h * gWindowScale) + i], dst_pixels[h * gWindowScale], surf[surf_no].surface->w * sizeof(unsigned long));
+							}
+
+							SDL_FreeSurface(converted_surface);
+							surf[surf_no].needs_updating = true;
+							printf(" ^ Successfully loaded\n");
+							success = true;
+						}
 					}
 				}
 
