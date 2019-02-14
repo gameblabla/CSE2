@@ -34,7 +34,7 @@ ifeq ($(WINDOWS), 1)
 	LIBS += -lkernel32
 endif
 
-CXXFLAGS += `sdl2-config --cflags` `pkg-config freetype2 --cflags` -MMD -MP -MF $@.d
+CXXFLAGS += `sdl2-config --cflags` `pkg-config freetype2 --cflags` -MMD -MP -MF $@.d -DLODEPNG_NO_COMPILE_ENCODER -DLODEPNG_NO_COMPILE_DISK -DLODEPNG_NO_COMPILE_ERROR_TEXT -DLODEPNG_NO_COMPILE_CPP
 LIBS += `sdl2-config --static-libs` `pkg-config freetype2 --libs`
 
 ifeq ($(STATIC), 1)
@@ -44,6 +44,7 @@ endif
 
 # For an accurate result to the original's code, compile in alphabetical order
 SOURCES = \
+	lodepng/lodepng \
 	ArmsItem \
 	Back \
 	Boss \
@@ -116,23 +117,23 @@ SOURCES = \
 	ValueView
 
 RESOURCES = \
-	BITMAP/CREDIT01.bmp \
-	BITMAP/CREDIT02.bmp \
-	BITMAP/CREDIT03.bmp \
-	BITMAP/CREDIT04.bmp \
-	BITMAP/CREDIT05.bmp \
-	BITMAP/CREDIT06.bmp \
-	BITMAP/CREDIT07.bmp \
-	BITMAP/CREDIT08.bmp \
-	BITMAP/CREDIT09.bmp \
-	BITMAP/CREDIT10.bmp \
-	BITMAP/CREDIT11.bmp \
-	BITMAP/CREDIT12.bmp \
-	BITMAP/CREDIT14.bmp \
-	BITMAP/CREDIT15.bmp \
-	BITMAP/CREDIT16.bmp \
-	BITMAP/CREDIT17.bmp \
-	BITMAP/CREDIT18.bmp \
+	BITMAP/CREDIT01.png \
+	BITMAP/CREDIT02.png \
+	BITMAP/CREDIT03.png \
+	BITMAP/CREDIT04.png \
+	BITMAP/CREDIT05.png \
+	BITMAP/CREDIT06.png \
+	BITMAP/CREDIT07.png \
+	BITMAP/CREDIT08.png \
+	BITMAP/CREDIT09.png \
+	BITMAP/CREDIT10.png \
+	BITMAP/CREDIT11.png \
+	BITMAP/CREDIT12.png \
+	BITMAP/CREDIT14.png \
+	BITMAP/CREDIT15.png \
+	BITMAP/CREDIT16.png \
+	BITMAP/CREDIT17.png \
+	BITMAP/CREDIT18.png \
 	CURSOR/CURSOR_IKA.bmp \
 	CURSOR/CURSOR_NORMAL.bmp \
 	ORG/ACCESS \
@@ -180,9 +181,9 @@ RESOURCES = \
 	WAVE/WAVE100
 
 ifeq ($(JAPANESE), 1)
-	RESOURCES += BITMAP/PIXEL_JP.bmp
+	RESOURCES += BITMAP/PIXEL_JP.png
 else
-	RESOURCES += BITMAP/PIXEL.bmp
+	RESOURCES += BITMAP/PIXEL.png
 endif
 
 ifneq ($(WINDOWS), 1)

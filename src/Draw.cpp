@@ -20,6 +20,8 @@
 #include <SDL_rwops.h>
 #include <SDL_timer.h>
 
+#include "lodepng/lodepng.h"
+
 #include "WindowsWrapper.h"
 
 #include "Draw.h"
@@ -172,6 +174,7 @@ bool MakeSurface_Generic(int bxsize, int bysize, int surf_no)
 				}
 				else
 				{
+					SDL_SetTextureBlendMode(surf[surf_no].texture, SDL_BLENDMODE_BLEND);
 					surf[surf_no].in_use = true;
 					success = true;
 				}
@@ -198,11 +201,7 @@ static void FlushSurface(int surf_no)
 			dst_pixel[0] = src_pixel[0];
 			dst_pixel[1] = src_pixel[1];
 			dst_pixel[2] = src_pixel[2];
-
-			if (src_pixel[0] || src_pixel[1] || src_pixel[2])	// Colour-key
-				dst_pixel[3] = 0xFF;
-			else
-				dst_pixel[3] = 0;
+			dst_pixel[3] = src_pixel[3];
 		}
 	}
 
@@ -225,7 +224,17 @@ static bool LoadBitmap(SDL_RWops *fp, int surf_no, bool create_surface)
 		}
 		else
 		{
-			SDL_Surface *surface = SDL_LoadBMP_RW(fp, 0);
+			const Sint64 file_size = fp->size(fp);
+			unsigned char *file_buffer = (unsigned char*)malloc(file_size);
+			fp->read(fp, file_buffer, 1, file_size);
+
+			unsigned int bitmap_width, bitmap_height;
+			unsigned char *bitmap_pixels;
+			lodepng_decode32(&bitmap_pixels, &bitmap_width, &bitmap_height, file_buffer, file_size);
+			free(file_buffer);
+
+			SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormatFrom(bitmap_pixels, bitmap_width, bitmap_height, 0, bitmap_width * 4, SDL_PIXELFORMAT_RGBA32);
+			SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_NONE);
 
 			if (surface == NULL)
 			{
@@ -283,6 +292,7 @@ static bool LoadBitmap(SDL_RWops *fp, int surf_no, bool create_surface)
 				}
 
 				SDL_FreeSurface(surface);
+				free(bitmap_pixels);
 			}
 		}
 	}
@@ -296,30 +306,13 @@ static bool LoadBitmap_File(const char *name, int surf_no, bool create_surface)
 {
 	char path[PATH_LENGTH];
 	SDL_RWops *fp;
-	
-	//Attempt to load PBM
-	sprintf(path, "%s/%s.pbm", gDataPath, name);
+
+	//Attempt to load PNG
+	sprintf(path, "%s/%s.png", gDataPath, name);
 	fp = SDL_RWFromFile(path, "rb");
 	if (fp)
 	{
-		if (!IsEnableBitmap(fp))
-		{
-			printf("Tried to load bitmap to surface %d, but it's missing the '(C)Pixel' string\n", surf_no);
-		}
-		else
-		{
-			printf("Loading surface (as .pbm) from %s for surface id %d\n", path, surf_no);
-			if (LoadBitmap(fp, surf_no, create_surface))
-				return true;
-		}
-	}
-	
-	//Attempt to load BMP
-	sprintf(path, "%s/%s.bmp", gDataPath, name);
-	fp = SDL_RWFromFile(path, "rb");
-	if (fp)
-	{
-		printf("Loading surface (as .bmp) from %s for surface id %d\n", path, surf_no);
+		printf("Loading surface (as .png) from %s for surface id %d\n", path, surf_no);
 		if (LoadBitmap(fp, surf_no, create_surface))
 			return true;
 	}
@@ -464,10 +457,11 @@ void CortBox2(RECT *rect, uint32_t col, int surf_no)
 	SDL_Rect destRect = RectToSDLRect(rect);
 	destRect = {destRect.x * magnification, destRect.y * magnification, destRect.w * magnification, destRect.h * magnification};
 
-	const unsigned char col_red = (col & 0xFF0000) >> 16;
-	const unsigned char col_green = (col & 0x00FF00) >> 8;
-	const unsigned char col_blue = col & 0x0000FF;
-	SDL_FillRect(surf[surf_no].surface, &destRect, SDL_MapRGB(surf[surf_no].surface->format, col_red, col_green, col_blue));
+	const unsigned char col_alpha = (col & 0xFF000000) >> 24;
+	const unsigned char col_red = (col & 0x00FF0000) >> 16;
+	const unsigned char col_green = (col & 0x0000FF00) >> 8;
+	const unsigned char col_blue = col & 0x000000FF;
+	SDL_FillRect(surf[surf_no].surface, &destRect, SDL_MapRGBA(surf[surf_no].surface->format, col_red, col_green, col_blue, col_alpha));
 	surf[surf_no].needs_updating = true;
 }
 

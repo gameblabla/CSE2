@@ -1,6 +1,8 @@
 #include <SDL_rwops.h>
 #include "WindowsWrapper.h"
 
+#include "lodepng/lodepng.h"
+
 #include "Tags.h"
 #include "Back.h"
 #include "Frame.h"
@@ -16,16 +18,18 @@ bool InitBack(char *fName, int type)
 {
 	//Get width and height
 	char path[PATH_LENGTH];
-	sprintf(path, "%s/%s.pbm", gDataPath, fName);
+	sprintf(path, "%s/%s.png", gDataPath, fName);
 	
-	SDL_Surface *temp = SDL_LoadBMP(path);
-	if (!temp)
+	SDL_RWops *fp = SDL_RWFromFile(path, "rb");
+
+	if (!fp)
 		return false;
+
+	fp->seek(fp, 0x10, RW_SEEK_SET);
+	gBack.partsW = SDL_ReadBE32(fp);
+	gBack.partsH = SDL_ReadBE32(fp);
 	
-	gBack.partsW = temp->w;
-	gBack.partsH = temp->h;
-	
-	SDL_FreeSurface(temp);
+	fp->close(fp);
 	
 	//Set background stuff and load texture
 	gBack.flag = 1;
