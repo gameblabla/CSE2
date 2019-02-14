@@ -363,21 +363,25 @@ int CampLoop()
 		
 		if (gKeyTrg & KEY_ESCAPE)
 		{
-			int escRet = Call_Escape();
-			if (escRet == 0)
-				return 0;
-			if (escRet == 2)
-				return 1;
+			switch (Call_Escape())
+			{
+				case 0:
+					return 0;
+				case 2:
+					return 2;
+			}
 		}
 		
 		if (g_GameFlags & 2)
 			MoveCampCursor();
 		
-		int tscRet = TextScriptProc();
-		if (tscRet == 0)
-			return 0;
-		if (tscRet == 2)
-			return 2;
+		switch (TextScriptProc())
+		{
+			case 0:
+				return 0;
+			case 2:
+				return 2;
+		}
 		
 		PutBitmap4(&rcView, 0, 0, &rcView, 10);
 		PutCampObject();

@@ -532,11 +532,13 @@ int ModeAction()
 				{
 					BackupSurface(10, &grcGame);
 					
-					int campRet = CampLoop();
-					if (campRet == 0)
-						return 0;
-					if (campRet == 2)
-						return 1;
+					switch (CampLoop())
+					{
+						case 0:
+							return 0;
+						case 2:
+							return 1;
+					}
 					
 					gMC.cond &= ~1;
 				}
@@ -544,11 +546,13 @@ int ModeAction()
 				{
 					BackupSurface(10, &grcGame);
 					
-					int miniRet = MiniMapLoop();
-					if (miniRet == 0)
-						return 0;
-					if (miniRet == 2)
-						return 1;
+					switch (MiniMapLoop())
+					{
+						case 0:
+							return 0;
+						case 2:
+							return 1;
+					}
 				}
 			}
 			
