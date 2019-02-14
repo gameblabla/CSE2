@@ -155,6 +155,7 @@ bool MakeSurface_Generic(int bxsize, int bysize, int surf_no)
 		{
 			//Create surface
 			surf[surf_no].surface = SDL_CreateRGBSurfaceWithFormat(0, bxsize * magnification, bysize * magnification, 0, SDL_PIXELFORMAT_RGBA32);
+			SDL_SetSurfaceBlendMode(surf[surf_no].surface, SDL_BLENDMODE_NONE);
 
 			if (surf[surf_no].surface == NULL)
 			{
@@ -224,7 +225,7 @@ static bool LoadBitmap(SDL_RWops *fp, int surf_no, bool create_surface)
 		}
 		else
 		{
-			SDL_Surface *surface = SDL_LoadBMP_RW(fp, 1);
+			SDL_Surface *surface = SDL_LoadBMP_RW(fp, 0);
 
 			if (surface == NULL)
 			{
@@ -238,7 +239,6 @@ static bool LoadBitmap(SDL_RWops *fp, int surf_no, bool create_surface)
 					{
 						SDL_Rect dst_rect = {0, 0, surface->w, surface->h};
 						SDL_BlitSurface(surface, NULL, surf[surf_no].surface, &dst_rect);
-						SDL_FreeSurface(surface);
 						surf[surf_no].needs_updating = true;
 						printf(" ^ Successfully loaded\n");
 						success = true;
@@ -286,6 +286,8 @@ static bool LoadBitmap(SDL_RWops *fp, int surf_no, bool create_surface)
 			}
 		}
 	}
+
+	fp->close(fp);
 
 	return success;
 }
@@ -379,6 +381,7 @@ void BackupSurface(int surf_no, RECT *rect)
 
 	//Get texture of what's currently rendered on screen
 	SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormat(0, w, h, 0, SDL_PIXELFORMAT_RGBA32);
+	SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_NONE);
 	SDL_RenderReadPixels(gRenderer, NULL, SDL_PIXELFORMAT_RGBA32, surface->pixels, surface->pitch);
 
 	//Get rects
