@@ -388,7 +388,7 @@ void BackupSurface(int surf_no, RECT *rect)
 	SDL_FreeSurface(surface);
 }
 
-static void DrawBitmap(RECT *rcView, int x, int y, RECT *rect, int surf_no, bool transparent)
+static void DrawBitmap(RECT *rcView, int x, int y, RECT *rect, int surf_no)
 {
 	if (surf[surf_no].needs_updating)
 	{
@@ -409,8 +409,6 @@ static void DrawBitmap(RECT *rcView, int x, int y, RECT *rect, int surf_no, bool
 	clipRect = {clipRect.x * magnification, clipRect.y * magnification, clipRect.w * magnification, clipRect.h * magnification};
 	SDL_RenderSetClipRect(gRenderer, &clipRect);
 	
-	SDL_SetTextureBlendMode(surf[surf_no].texture, transparent ? SDL_BLENDMODE_BLEND : SDL_BLENDMODE_NONE);
-
 	//Draw to screen
 	if (SDL_RenderCopy(gRenderer, surf[surf_no].texture, &frameRect, &destRect) < 0)
 		printf("Failed to draw texture %d\nSDL Error: %s\n", surf_no, SDL_GetError());
@@ -421,12 +419,12 @@ static void DrawBitmap(RECT *rcView, int x, int y, RECT *rect, int surf_no, bool
 
 void PutBitmap3(RECT *rcView, int x, int y, RECT *rect, int surf_no) //Transparency
 {
-	DrawBitmap(rcView, x, y, rect, surf_no, true);
+	DrawBitmap(rcView, x, y, rect, surf_no);
 }
 
 void PutBitmap4(RECT *rcView, int x, int y, RECT *rect, int surf_no) //No Transparency
 {
-	DrawBitmap(rcView, x, y, rect, surf_no, false);
+	DrawBitmap(rcView, x, y, rect, surf_no);
 }
 
 void Surface2Surface(int x, int y, RECT *rect, int to, int from)
