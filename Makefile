@@ -65,6 +65,7 @@ SOURCES = \
 	Ending \
 	Escape \
 	Fade \
+	File \
 	Flags \
 	Flash \
 	Font \

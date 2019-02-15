@@ -29,6 +29,7 @@
 #include "BossLife.h"
 #include "SelStage.h"
 #include "Flash.h"
+#include "Generic.h"
 
 #define IS_COMMAND(c1, c2, c3) gTS.data[gTS.p_read + 1] == c1 && gTS.data[gTS.p_read + 2] == c2 && gTS.data[gTS.p_read + 3] == c3
 
@@ -105,16 +106,19 @@ bool LoadTextScript2(const char *name)
 	char path[260];
 	sprintf(path, "%s/%s", gDataPath, name);
 
+	gTS.size = GetFileSizeLong(path);
+	if (gTS.size == -1)
+		return false;
+
 	//Open file
-	SDL_RWops *fp = SDL_RWFromFile(path, "rb");
-	if (!fp)
+	FILE *fp = fopen(path, "rb");
+	if (fp == NULL)
 		return false;
 
 	//Read data
-	gTS.size = SDL_RWsize(fp);
-	fp->read(fp, gTS.data, 1, gTS.size);
+	fread(gTS.data, 1, gTS.size, fp);
 	gTS.data[gTS.size] = 0;
-	fp->close(fp);
+	fclose(fp);
 
 	//Set path
 	strcpy(gTS.path, name);
@@ -131,30 +135,36 @@ bool LoadTextScript_Stage(char *name)
 	char path[PATH_LENGTH];
 	sprintf(path, "%s/%s", gDataPath, "Head.tsc");
 
-	SDL_RWops *fp = SDL_RWFromFile(path, "rb");
-	if (!fp)
+	long head_size = GetFileSizeLong(path);
+	if (head_size == -1)
+		return false;
+
+	FILE *fp = fopen(path, "rb");
+	if (fp == NULL)
 		return false;
 
 	//Read Head.tsc
-	int head_size = SDL_RWsize(fp);
-	fp->read(fp, gTS.data, 1, head_size);
+	fread(gTS.data, 1, head_size, fp);
 	EncryptionBinaryData2((uint8_t*)gTS.data, head_size);
 	gTS.data[head_size] = 0;
-	SDL_RWclose(fp);
+	fclose(fp);
 
 	//Open stage's .tsc
 	sprintf(path, "%s/%s", gDataPath, name);
 
-	fp = SDL_RWFromFile(path, "rb");
-	if (!fp)
+	long body_size = GetFileSizeLong(path);
+	if (body_size == -1)
+		return false;
+
+	fp = fopen(path, "rb");
+	if (fp == NULL)
 		return false;
 
 	//Read stage's tsc
-	int body_size = SDL_RWsize(fp);
-	fp->read(fp, &gTS.data[head_size], 1, body_size);
+	fread(&gTS.data[head_size], 1, body_size, fp);
 	EncryptionBinaryData2((uint8_t*)&gTS.data[head_size], body_size);
 	gTS.data[head_size + body_size] = 0;
-	SDL_RWclose(fp);
+	fclose(fp);
 
 	//Set parameters
 	gTS.size = head_size + body_size;

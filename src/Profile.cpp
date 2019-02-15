@@ -1,6 +1,8 @@
+#include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 
-#include <SDL_rwops.h>
 #include "WindowsWrapper.h"
 
 #include "CommonDefines.h"
@@ -19,7 +21,7 @@
 #include "Stage.h"
 #include "Game.h"
 #include "BossLife.h"
-#include "SelStage.h"
+#include "File.h"
 
 const char *gDefaultName = "Profile.dat";
 const char *gProfileCode = "Do041220";
@@ -29,11 +31,11 @@ bool IsProfile()
 	char path[PATH_LENGTH];
 	sprintf(path, "%s/%s", gModulePath, gDefaultName);
 	
-	SDL_RWops *fp = SDL_RWFromFile(path, "rb");
-	if (!fp)
+	FILE *fp = fopen(path, "rb");
+	if (fp == NULL)
 		return false;
 	
-	SDL_RWclose(fp);
+	fclose(fp);
 	return true;
 }
 
@@ -50,8 +52,8 @@ bool SaveProfile(char *name)
 	//Open file
 	PROFILE profile;
 	
-	SDL_RWops *fp = SDL_RWFromFile(path, "wb");
-	if (!fp)
+	FILE *fp = fopen(path, "wb");
+	if (fp == NULL)
 		return false;
 	
 	//Set up profile
@@ -78,41 +80,41 @@ bool SaveProfile(char *name)
 	memcpy(profile.flags, gFlagNPC, sizeof(profile.flags));
 	
 	//Write to file
-	SDL_RWwrite(fp, profile.code, 8, 1);
-	SDL_WriteLE32(fp, profile.stage);
-	SDL_WriteLE32(fp, profile.music);
-	SDL_WriteLE32(fp, profile.x);
-	SDL_WriteLE32(fp, profile.y);
-	SDL_WriteLE32(fp, profile.direct);
-	SDL_WriteLE16(fp, profile.max_life);
-	SDL_WriteLE16(fp, profile.star);
-	SDL_WriteLE16(fp, profile.life);
-	SDL_WriteLE16(fp, profile.a);
-	SDL_WriteLE32(fp, profile.select_arms);
-	SDL_WriteLE32(fp, profile.select_item);
-	SDL_WriteLE32(fp, profile.equip);
-	SDL_WriteLE32(fp, profile.unit);
-	SDL_WriteLE32(fp, profile.counter);
+	fwrite(profile.code, 8, 1, fp);
+	File_WriteLE32(profile.stage, fp);
+	File_WriteLE32(profile.music, fp);
+	File_WriteLE32(profile.x, fp);
+	File_WriteLE32(profile.y, fp);
+	File_WriteLE32(profile.direct, fp);
+	File_WriteLE16(profile.max_life, fp);
+	File_WriteLE16(profile.star, fp);
+	File_WriteLE16(profile.life, fp);
+	File_WriteLE16(profile.a, fp);
+	File_WriteLE32(profile.select_arms, fp);
+	File_WriteLE32(profile.select_item, fp);
+	File_WriteLE32(profile.equip, fp);
+	File_WriteLE32(profile.unit, fp);
+	File_WriteLE32(profile.counter, fp);
 	for (int arm = 0; arm < 8; arm++)
 	{
-		SDL_WriteLE32(fp, profile.arms[arm].code);
-		SDL_WriteLE32(fp, profile.arms[arm].level);
-		SDL_WriteLE32(fp, profile.arms[arm].exp);
-		SDL_WriteLE32(fp, profile.arms[arm].max_num);
-		SDL_WriteLE32(fp, profile.arms[arm].num);
+		File_WriteLE32(profile.arms[arm].code, fp);
+		File_WriteLE32(profile.arms[arm].level, fp);
+		File_WriteLE32(profile.arms[arm].exp, fp);
+		File_WriteLE32(profile.arms[arm].max_num, fp);
+		File_WriteLE32(profile.arms[arm].num, fp);
 	}
 	for (int item = 0; item < 32; item++)
-		SDL_WriteLE32(fp, profile.items[item].code);
+		File_WriteLE32(profile.items[item].code, fp);
 	for (int stage = 0; stage < 8; stage++)
 	{
-		SDL_WriteLE32(fp, profile.permitstage[stage].index);
-		SDL_WriteLE32(fp, profile.permitstage[stage].event);
+		File_WriteLE32(profile.permitstage[stage].index, fp);
+		File_WriteLE32(profile.permitstage[stage].event, fp);
 	}
-	SDL_RWwrite(fp, profile.permit_mapping, 0x80, 1);
-	SDL_RWwrite(fp, "FLAG", 4, 1);
-	SDL_RWwrite(fp, profile.flags, 1000, 1);
+	fwrite(profile.permit_mapping, 0x80, 1, fp);
+	fwrite("FLAG", 4, 1, fp);
+	fwrite(profile.flags, 1000, 1, fp);
 	
-	SDL_RWclose(fp);
+	fclose(fp);
 	return true;
 }
 
@@ -129,51 +131,51 @@ bool LoadProfile(char *name)
 	//Open file
 	PROFILE profile;
 	
-	SDL_RWops *fp = SDL_RWFromFile(path, "rb");
-	if (!fp)
+	FILE *fp = fopen(path, "rb");
+	if (fp == NULL)
 		return false;
 	
 	//Check header code
-	SDL_RWread(fp, profile.code, 8, 1);
+	fread(profile.code, 8, 1, fp);
 	if (memcmp(profile.code, gProfileCode, 8))
 		return false;
 	
 	//Read data
-	SDL_RWseek(fp, 0, RW_SEEK_SET); //Pixel epic redundant code 😎😎😎
-	SDL_RWread(fp, profile.code, 8, 1);
-	profile.stage = SDL_ReadLE32(fp);
-	profile.music = SDL_ReadLE32(fp);
-	profile.x = SDL_ReadLE32(fp);
-	profile.y = SDL_ReadLE32(fp);
-	profile.direct = SDL_ReadLE32(fp);
-	profile.max_life = SDL_ReadLE16(fp);
-	profile.star = SDL_ReadLE16(fp);
-	profile.life = SDL_ReadLE16(fp);
-	profile.a = SDL_ReadLE16(fp);
-	profile.select_arms = SDL_ReadLE32(fp);
-	profile.select_item = SDL_ReadLE32(fp);
-	profile.equip = SDL_ReadLE32(fp);
-	profile.unit = SDL_ReadLE32(fp);
-	profile.counter = SDL_ReadLE32(fp);
+	fseek(fp, 0, SEEK_SET); //Pixel epic redundant code 😎😎😎
+	fread(profile.code, 8, 1, fp);
+	profile.stage = File_ReadLE32(fp);
+	profile.music = File_ReadLE32(fp);
+	profile.x = File_ReadLE32(fp);
+	profile.y = File_ReadLE32(fp);
+	profile.direct = File_ReadLE32(fp);
+	profile.max_life = File_ReadLE16(fp);
+	profile.star = File_ReadLE16(fp);
+	profile.life = File_ReadLE16(fp);
+	profile.a = File_ReadLE16(fp);
+	profile.select_arms = File_ReadLE32(fp);
+	profile.select_item = File_ReadLE32(fp);
+	profile.equip = File_ReadLE32(fp);
+	profile.unit = File_ReadLE32(fp);
+	profile.counter = File_ReadLE32(fp);
 	for (int arm = 0; arm < 8; arm++)
 	{
-		profile.arms[arm].code = SDL_ReadLE32(fp);
-		profile.arms[arm].level = SDL_ReadLE32(fp);
-		profile.arms[arm].exp = SDL_ReadLE32(fp);
-		profile.arms[arm].max_num = SDL_ReadLE32(fp);
-		profile.arms[arm].num = SDL_ReadLE32(fp);
+		profile.arms[arm].code = File_ReadLE32(fp);
+		profile.arms[arm].level = File_ReadLE32(fp);
+		profile.arms[arm].exp = File_ReadLE32(fp);
+		profile.arms[arm].max_num = File_ReadLE32(fp);
+		profile.arms[arm].num = File_ReadLE32(fp);
 	}
 	for (int item = 0; item < 32; item++)
-		profile.items[item].code = SDL_ReadLE32(fp);
+		profile.items[item].code = File_ReadLE32(fp);
 	for (int stage = 0; stage < 8; stage++)
 	{
-		profile.permitstage[stage].index = SDL_ReadLE32(fp);
-		profile.permitstage[stage].event = SDL_ReadLE32(fp);
+		profile.permitstage[stage].index = File_ReadLE32(fp);
+		profile.permitstage[stage].event = File_ReadLE32(fp);
 	}
-	SDL_RWread(fp, profile.permit_mapping, 0x80, 1);
-	SDL_RWread(fp, profile.FLAG, 4, 1);
-	SDL_RWread(fp, profile.flags, 1000, 1);
-	SDL_RWclose(fp);
+	fread(profile.permit_mapping, 0x80, 1, fp);
+	fread(profile.FLAG, 4, 1, fp);
+	fread(profile.flags, 1000, 1, fp);
+	fclose(fp);
 	
 	//Set things
 	gSelectedArms = profile.select_arms;

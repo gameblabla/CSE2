@@ -1,6 +1,7 @@
+#include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
 
-#include <SDL_rwops.h>
 #include "WindowsWrapper.h"
 
 #include "CommonDefines.h"
@@ -15,6 +16,7 @@
 #include "ValueView.h"
 #include "NpcTbl.h"
 #include "Draw.h"
+#include "File.h"
 
 NPCHAR gNPC[NPC_MAX];
 int gCurlyShoot_wait;
@@ -54,18 +56,24 @@ bool LoadEvent(char *path_event)
 	char path[PATH_LENGTH];
 	sprintf(path, "%s/%s", gDataPath, path_event);
 
-	SDL_RWops *fp = SDL_RWFromFile(path, "rb");
-	if (!fp)
+	FILE *fp = fopen(path, "rb");
+	if (fp == NULL)
 		return false;
 
 	//Read "PXE" check
 	char code[4];
-	fp->read(fp, code, 1, 4);
+	fread(code, 1, 4, fp);
 	if (memcmp(code, gPassPixEve, 3))
+	{
+#ifdef FIX_BUGS
+		// The original game forgot to close the file here
+		fclose(fp);
+#endif
 		return false;
+	}
 
 	//Get amount of NPCs
-	int count = SDL_ReadLE32(fp);
+	int count = File_ReadLE32(fp);
 
 	//Load NPCs
 	memset(gNPC, 0, sizeof(gNPC));
@@ -75,12 +83,12 @@ bool LoadEvent(char *path_event)
 	{
 		//Get data from file
 		EVENT eve;
-		eve.x = SDL_ReadLE16(fp);
-		eve.y = SDL_ReadLE16(fp);
-		eve.code_flag = SDL_ReadLE16(fp);
-		eve.code_event = SDL_ReadLE16(fp);
-		eve.code_char = SDL_ReadLE16(fp);
-		eve.bits = SDL_ReadLE16(fp);
+		eve.x = File_ReadLE16(fp);
+		eve.y = File_ReadLE16(fp);
+		eve.code_flag = File_ReadLE16(fp);
+		eve.code_event = File_ReadLE16(fp);
+		eve.code_char = File_ReadLE16(fp);
+		eve.bits = File_ReadLE16(fp);
 
 		//Set NPC parameters
 		if (eve.bits & npc_altDir)
@@ -117,6 +125,7 @@ bool LoadEvent(char *path_event)
 		n++;
 	}
 
+	fclose(fp);
 	return true;
 }
 

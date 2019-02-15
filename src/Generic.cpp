@@ -13,6 +13,21 @@ bool GetCompileVersion(int *v1, int *v2, int *v3, int *v4)
 	return true;
 }
 
+long GetFileSizeLong(const char *path)
+{
+	long len = -1;
+
+	FILE *fp = fopen(path, "rb");
+	if (fp != NULL)
+	{
+		fseek(fp, 0, SEEK_END);
+		len = ftell(fp);
+		fclose(fp);
+	}
+
+	return len;
+}
+
 bool CheckFileExists(const char *name)
 {
 	char path[PATH_LENGTH];
