@@ -152,6 +152,7 @@ void ActNpc302(NPCHAR *npc)
 						break;
 					}
 				}
+				
 				if (i == 0x200)
 				{
 					npc->cond = 0;
