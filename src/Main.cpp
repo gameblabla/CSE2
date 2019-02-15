@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
 	
 	//Get path of the data folder
 	strcpy(gDataPath, gModulePath);
-	memcpy(&gDataPath[strlen(gDataPath)], "/data", 6); //Pixel didn't use a strcat
+	strcat(gDataPath, "/data");
 
 #ifdef WINDOWS
 	// Set the window icons. See res/ICON/ICON.rc.
