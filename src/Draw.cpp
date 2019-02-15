@@ -305,6 +305,7 @@ static bool LoadBitmap_File(const char *name, int surf_no, bool create_surface)
 		if (!IsEnableBitmap(fp))
 		{
 			printf("Tried to load bitmap to surface %d, but it's missing the '(C)Pixel' string\n", surf_no);
+			fp->close(fp);
 		}
 		else
 		{

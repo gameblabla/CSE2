@@ -20,8 +20,13 @@ bool InitBack(char *fName, int type)
 	
 	SDL_Surface *temp = SDL_LoadBMP(path);
 	if (!temp)
-		return false;
-	
+	{
+		sprintf(path, "%s/%s.bmp", gDataPath, fName);
+		temp = SDL_LoadBMP(path);
+		if (!temp)
+			return false;
+	}
+
 	gBack.partsW = temp->w;
 	gBack.partsH = temp->h;
 	
