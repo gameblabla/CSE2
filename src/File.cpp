@@ -25,8 +25,6 @@ long LoadFileToMemory(const char *file_path, unsigned char **file_buffer)
 				{
 					if (fread(*file_buffer, file_size, 1, file) == 1)
 						returned_size = file_size;
-
-					free(file_buffer);
 				}
 			}
 		}
