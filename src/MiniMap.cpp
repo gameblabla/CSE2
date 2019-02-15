@@ -91,11 +91,13 @@ int MiniMapLoop()
 		
 		if (gKey & KEY_ESCAPE)
 		{
-			int escRet = Call_Escape();
-			if (escRet == 0)
-				return 0;
-			if (escRet == 2)
-				return 2;
+			switch (Call_Escape())
+			{
+				case 0:
+					return 0;
+				case 2:
+					return 2;
+			}
 		}
 		
 		PutBitmap4(&grcGame, 0, 0, &grcGame, 10);
@@ -125,11 +127,13 @@ int MiniMapLoop()
 		
 		if (gKey & KEY_ESCAPE)
 		{
-			int escRet = Call_Escape();
-			if (escRet == 0)
-				return 0;
-			if (escRet == 2)
-				return 2;
+			switch (Call_Escape())
+			{
+				case 0:
+					return 0;
+				case 2:
+					return 2;
+			}
 		}
 		
 		PutBitmap4(&grcGame, 0, 0, &grcGame, 10);
@@ -157,11 +161,13 @@ int MiniMapLoop()
 
 		if (gKey & KEY_ESCAPE)
 		{
-			int escRet = Call_Escape();
-			if (escRet == 0)
-				return 0;
-			if (escRet == 2)
-				return 2;
+			switch (Call_Escape())
+			{
+				case 0:
+					return 0;
+				case 2:
+					return 2;
+			}
 		}
 
 		PutBitmap4(&grcGame, 0, 0, &grcGame, 10);

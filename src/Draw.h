@@ -56,7 +56,6 @@ bool Flip_SystemTask();
 bool StartDirectDraw(int lMagnification, int lColourDepth);
 void EndDirectDraw();
 void ReleaseSurface(int s);
-bool MakeSurface(SDL_RWops *rw, int surf_no);
 bool MakeSurface_File(const char *name, int surf_no);
 bool MakeSurface_Resource(const char *res, int surf_no);
 bool ReloadBitmap_File(const char *name, int surf_no);

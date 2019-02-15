@@ -10,6 +10,7 @@
 #include "Draw.h"
 #include "Stage.h"
 #include "Map.h"
+#include "File.h"
 
 BACK gBack;
 int gWaterY;
@@ -20,16 +21,16 @@ bool InitBack(char *fName, int type)
 	char path[PATH_LENGTH];
 	sprintf(path, "%s/%s.png", gDataPath, fName);
 	
-	SDL_RWops *fp = SDL_RWFromFile(path, "rb");
+	FILE *fp = fopen(path, "rb");
 
 	if (!fp)
 		return false;
 
-	fp->seek(fp, 0x10, RW_SEEK_SET);
-	gBack.partsW = SDL_ReadBE32(fp);
-	gBack.partsH = SDL_ReadBE32(fp);
+	fseek(fp, 0x10, SEEK_SET);
+	gBack.partsW = File_ReadBE32(fp);
+	gBack.partsH = File_ReadBE32(fp);
 	
-	fp->close(fp);
+	fclose(fp);
 	
 	//Set background stuff and load texture
 	gBack.flag = 1;
