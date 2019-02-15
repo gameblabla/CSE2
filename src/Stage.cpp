@@ -22,6 +22,7 @@
 #include "Back.h"
 #include "Stage.h"
 #include "Flash.h"
+#include "File.h"
 
 #ifdef JAPANESE
 #define STAGE_ENTRY(parts, map, bkType, back, npc, boss, boss_no, name_en, name_jp) {parts, map, bkType, back, npc, boss, boss_no, name_jp}
@@ -33,64 +34,46 @@ int gStageNo;
 
 STAGE_TABLE *gTMT;
 
-bool LoadStageTable(char *path)
+bool LoadStageTable(const char *path)
 {
 	bool success = false;
 
-	FILE *file = fopen(path, "rb");
+	unsigned char *file_buffer;
+	const long file_size = LoadFileToMemory(path, &file_buffer);
 
-	if (file != NULL)
+	if (file_size != -1)
 	{
-		if (!fseek(file, 0, SEEK_END))
+		if (file_size % 0xC8)
+			printf("stage.tbl has partial stage entry\n");
+
+		const long entry_count = file_size / 0xE5;
+
+		gTMT = (STAGE_TABLE*)malloc(entry_count * sizeof(STAGE_TABLE));
+
+		if (gTMT != NULL)
 		{
-			const long file_size = ftell(file);
-
-			if (file_size >= 0)
+			for (long i = 0; i < entry_count; ++i)
 			{
-				rewind(file);
-				unsigned char *file_buffer = (unsigned char*)malloc(file_size);
+				unsigned char *entry = file_buffer + i * 0xE5;
 
-				if (file_buffer != NULL)
-				{
-					if (fread(file_buffer, file_size, 1, file) == 1)
-					{
-						if (file_size % 0xC8)
-							printf("stage.tbl has partial stage entry\n");
-
-						const size_t entry_count = file_size / 0xE5;
-
-						gTMT = (STAGE_TABLE*)malloc(entry_count * sizeof(STAGE_TABLE));
-
-						if (gTMT != NULL)
-						{
-							for (unsigned int i = 0; i < entry_count; ++i)
-							{
-								unsigned char *entry = file_buffer + i * 0xE5;
-
-								memcpy(gTMT[i].parts, entry, 0x20);
-								memcpy(gTMT[i].map, entry + 0x20, 0x20);
-								gTMT[i].bkType = (entry[0x40 + 3] << 24) | (entry[0x40 + 2] << 16) | (entry[0x40 + 1] << 8) | entry[0x40];
-								memcpy(gTMT[i].back, entry + 0x44, 0x20);
-								memcpy(gTMT[i].npc, entry + 0x64, 0x20);
-								memcpy(gTMT[i].boss, entry + 0x84, 0x20);
-								gTMT[i].boss_no = entry[0xA4];
+				memcpy(gTMT[i].parts, entry, 0x20);
+				memcpy(gTMT[i].map, entry + 0x20, 0x20);
+				gTMT[i].bkType = (entry[0x40 + 3] << 24) | (entry[0x40 + 2] << 16) | (entry[0x40 + 1] << 8) | entry[0x40];
+				memcpy(gTMT[i].back, entry + 0x44, 0x20);
+				memcpy(gTMT[i].npc, entry + 0x64, 0x20);
+				memcpy(gTMT[i].boss, entry + 0x84, 0x20);
+				gTMT[i].boss_no = entry[0xA4];
 #ifdef JAPANESE
-								memcpy(gTMT[i].name, entry + 0xA5, 0x20);
+				memcpy(gTMT[i].name, entry + 0xA5, 0x20);
 #else
-								memcpy(gTMT[i].name, entry + 0xC5, 0x20);
+				memcpy(gTMT[i].name, entry + 0xC5, 0x20);
 #endif
-							}
-
-							success = true;
-						}
-					}
-
-					free(file_buffer);
-				}
 			}
+
+			success = true;
 		}
 
-		fclose(file);
+		free(file_buffer);
 	}
 
 	if (success == false)
