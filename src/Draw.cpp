@@ -39,12 +39,13 @@ SURFACE surf[SURFACE_ID_MAX];
 
 FontObject *gFont;
 
-#define FRAMERATE 20
-
 bool Flip_SystemTask()
 {
 	while (true)
 	{
+		const unsigned int frameDelays[3] = {17, 16, 17};
+		static unsigned int frame;
+
 		if (!SystemTask())
 			return false;
 
@@ -52,12 +53,12 @@ bool Flip_SystemTask()
 		static uint32_t timePrev;
 		const uint32_t timeNow = SDL_GetTicks();
 
-		if (timeNow >= timePrev + FRAMERATE)
+		if (timeNow >= timePrev + frameDelays[frame % 3])
 		{
 			if (timeNow >= timePrev + 100)
 				timePrev = timeNow;	// If the timer is freakishly out of sync, panic and reset it, instead of spamming frames for who-knows how long
 			else
-				timePrev += FRAMERATE;
+				timePrev += frameDelays[frame++ % 3];
 
 			break;
 		}
