@@ -2,7 +2,7 @@
 
 Cave Story Engine is an in-progress decompilation of Cave Story, ported from DirectX to SDL2.
 
-This branch adds several enhancements such as PNG support, full alpha blending support, externalised resource files, Booster's Lab support, 60FPS, and widescreen.
+This branch adds several enhancements such as PNG support, full alpha blending support, externalised resource files, Booster's Lab support, 60FPS, widescreen, and vastly-improved fullscreen.
 
 ## Dependencies
 
