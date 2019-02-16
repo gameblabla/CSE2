@@ -10,6 +10,7 @@
 #include "Game.h"
 #include "Draw.h"
 #include "Caret.h"
+#include "File.h"
 
 ARMS_LEVEL gArmsLevelTable[14] =
 {
@@ -394,19 +395,19 @@ bool SaveTimeCounter()
 	char path[PATH_LENGTH];
 	sprintf(path, "%s/290.rec", gModulePath);
 	
-	SDL_RWops *fp = SDL_RWFromFile(path, "rb");
+	FILE *fp = fopen(path, "rb");
 	if (fp)
 	{
 		//Read data
-		rec.counter[0] = SDL_ReadLE32(fp);
-		rec.counter[1] = SDL_ReadLE32(fp);
-		rec.counter[2] = SDL_ReadLE32(fp);
-		rec.counter[3] = SDL_ReadLE32(fp);
-		rec.random[0] = SDL_ReadU8(fp);
-		rec.random[1] = SDL_ReadU8(fp);
-		rec.random[2] = SDL_ReadU8(fp);
-		rec.random[3] = SDL_ReadU8(fp);
-		SDL_RWclose(fp);
+		rec.counter[0] = File_ReadLE32(fp);
+		rec.counter[1] = File_ReadLE32(fp);
+		rec.counter[2] = File_ReadLE32(fp);
+		rec.counter[3] = File_ReadLE32(fp);
+		rec.random[0] = fgetc(fp);
+		rec.random[1] = fgetc(fp);
+		rec.random[2] = fgetc(fp);
+		rec.random[3] = fgetc(fp);
+		fclose(fp);
 
 		uint8_t *p = (uint8_t*)&rec.counter[0];
 		p[0] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[0]) : (rec.random[0] >> 1);
@@ -432,18 +433,18 @@ bool SaveTimeCounter()
 		p[3] += (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[i] >> 1) : (rec.random[i]);
 	}
 	
-	fp = SDL_RWFromFile(path, "wb");
-	if (!fp)
+	fp = fopen(path, "wb");
+	if (fp == NULL)
 		return false;
-	SDL_WriteLE32(fp, rec.counter[0]);
-	SDL_WriteLE32(fp, rec.counter[1]);
-	SDL_WriteLE32(fp, rec.counter[2]);
-	SDL_WriteLE32(fp, rec.counter[3]);
-	SDL_WriteU8(fp, rec.random[0]);
-	SDL_WriteU8(fp, rec.random[1]);
-	SDL_WriteU8(fp, rec.random[2]);
-	SDL_WriteU8(fp, rec.random[3]);
-	SDL_RWclose(fp);
+	File_WriteLE32(rec.counter[0], fp);
+	File_WriteLE32(rec.counter[1], fp);
+	File_WriteLE32(rec.counter[2], fp);
+	File_WriteLE32(rec.counter[3], fp);
+	fputc(rec.random[0], fp);
+	fputc(rec.random[1], fp);
+	fputc(rec.random[2], fp);
+	fputc(rec.random[3], fp);
+	fclose(fp);
 	return true;
 }
 
@@ -453,22 +454,22 @@ int LoadTimeCounter()
 	char path[PATH_LENGTH];
 	sprintf(path, "%s/290.rec", gModulePath);
 	
-	SDL_RWops *fp = SDL_RWFromFile(path, "rb");
+	FILE *fp = fopen(path, "rb");
 	if (!fp)
 		return 0;
 	
 	REC rec;
 	
 	//Read data
-	rec.counter[0] = SDL_ReadLE32(fp);
-	rec.counter[1] = SDL_ReadLE32(fp);
-	rec.counter[2] = SDL_ReadLE32(fp);
-	rec.counter[3] = SDL_ReadLE32(fp);
-	rec.random[0] = SDL_ReadU8(fp);
-	rec.random[1] = SDL_ReadU8(fp);
-	rec.random[2] = SDL_ReadU8(fp);
-	rec.random[3] = SDL_ReadU8(fp);
-	SDL_RWclose(fp);
+	rec.counter[0] = File_ReadLE32(fp);
+	rec.counter[1] = File_ReadLE32(fp);
+	rec.counter[2] = File_ReadLE32(fp);
+	rec.counter[3] = File_ReadLE32(fp);
+	rec.random[0] = fgetc(fp);
+	rec.random[1] = fgetc(fp);
+	rec.random[2] = fgetc(fp);
+	rec.random[3] = fgetc(fp);
+	fclose(fp);
 	
 	//Decode from checksum
 	for (int i = 0; i < 4; i++)

@@ -1,5 +1,6 @@
-#include <SDL_rwops.h>
 #include "WindowsWrapper.h"
+
+#include "lodepng/lodepng.h"
 
 #include "Tags.h"
 #include "Back.h"
@@ -8,6 +9,7 @@
 #include "Draw.h"
 #include "Stage.h"
 #include "Map.h"
+#include "File.h"
 
 BACK gBack;
 int gWaterY;
@@ -16,16 +18,18 @@ bool InitBack(char *fName, int type)
 {
 	//Get width and height
 	char path[PATH_LENGTH];
-	sprintf(path, "%s/%s.pbm", gDataPath, fName);
+	sprintf(path, "%s/%s.png", gDataPath, fName);
 	
-	SDL_Surface *temp = SDL_LoadBMP(path);
-	if (!temp)
+	FILE *fp = fopen(path, "rb");
+
+	if (!fp)
 		return false;
+
+	fseek(fp, 0x10, SEEK_SET);
+	gBack.partsW = File_ReadBE32(fp);
+	gBack.partsH = File_ReadBE32(fp);
 	
-	gBack.partsW = temp->w;
-	gBack.partsH = temp->h;
-	
-	SDL_FreeSurface(temp);
+	fclose(fp);
 	
 	//Set background stuff and load texture
 	gBack.flag = 1;

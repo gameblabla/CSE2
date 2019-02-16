@@ -15,6 +15,7 @@ struct STAGE_TABLE
 extern int gStageNo;
 extern int gMusicNo;
 
+bool LoadStageTable(const char *path);
 bool TransferStage(int no, int w, int x, int y);
 void ChangeMusic(int no);
 void ReCallMusic();

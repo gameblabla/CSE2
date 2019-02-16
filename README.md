@@ -1,12 +1,8 @@
-# Cave Story Engine 2
+# Cave Story Engine 2 (Enhanced)
 
 Cave Story Engine is an in-progress decompilation of Cave Story, ported from DirectX to SDL2.
 
-![Screenshot](screenshot.png)
-
-## Disclaimer
-
-Cave Story Engine 2 is based off of the *original freeware release* by Studio Pixel, and is not based off of Nicalis' ports, and contains no extra features included in said ports (graphics, audio, and other changes)
+This branch adds several enhancements such as PNG support, full alpha blending support, externalised resource files, Booster's Lab support, 60FPS, widescreen, and vastly-improved fullscreen.
 
 ## Dependencies
 
@@ -26,7 +22,7 @@ Just run 'make' in the base directory, preferably with some of the following set
 
 ## Running
 
-In order to run Cave Story Engine 2, you have to get the "data" folder from a vanilla copy of Cave Story. Just copy and paste it into the same folder as the executable.
+Because of the modifications made in this branch, a custom data folder is needed. These can be found in the res folder: one for Japanese builds, and one for English.
 
 ## Licensing
 

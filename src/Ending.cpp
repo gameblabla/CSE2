@@ -1,7 +1,6 @@
 #include <stdint.h>
 #include <string>
 
-#include <SDL_rwops.h>
 #include "WindowsWrapper.h"
 
 #include "Tags.h"
@@ -129,7 +128,7 @@ void ReloadIllust(int a)
 {
 	char name[16];
 	sprintf(name, "CREDIT%02d", a);
-	ReloadBitmap_Resource(name, SURFACE_ID_CREDITS_IMAGE);
+	MakeSurface_Resource(name, SURFACE_ID_CREDITS_IMAGE);
 }
 
 //Initialize and release credits
@@ -163,25 +162,31 @@ bool StartCreditScript()
 	//Open file
 	char path[PATH_LENGTH];
 	sprintf(path, "%s/%s", gDataPath, "Credit.tsc");
-	
-	SDL_RWops *fp = SDL_RWFromFile(path, "rb");
-	if (!fp)
+
+	Credit.size = GetFileSizeLong(path);
+	if (Credit.size == -1)
+		return false;
+
+	//Allcoate buffer data
+	Credit.pData = (char*)malloc(Credit.size);
+	if (Credit.pData == NULL)
+		return false;
+
+	FILE *fp = fopen(path, "rb");
+	if (fp == NULL)
 	{
 		printf("Couldn't open %s", path);
 		return false;
 	}
-	
-	//Allcoate buffer data
-	Credit.size = SDL_RWsize(fp);
-	
-	Credit.pData = (char*)malloc(Credit.size);
-	if (!Credit.pData)
-		return false;
-	
+
 	//Read data
-	SDL_RWread(fp, Credit.pData, 1, Credit.size);
-	SDL_RWclose(fp);
+	fread(Credit.pData, 1, Credit.size, fp);
 	EncryptionBinaryData2((uint8_t*)Credit.pData, Credit.size);
+
+#ifdef FIX_BUGS
+	// The original game forgot to close the file
+	fclose(fp);
+#endif
 	
 	//Reset credits
 	Credit.offset = 0;
@@ -192,16 +197,15 @@ bool StartCreditScript()
 	
 	//Modify cliprect
 	grcGame.left = WINDOW_WIDTH / 2;
+	// These three are non-vanilla: for wide/tallscreen support
 	grcGame.right = ((WINDOW_WIDTH - 320) / 2) + 320;
 	grcGame.top = (WINDOW_HEIGHT - 240) / 2;
 	grcGame.bottom = ((WINDOW_HEIGHT - 240) / 2) + 240;
 	
 	//Reload casts
 	if (!ReloadBitmap_File("casts", SURFACE_ID_CASTS))
-	{
 		return false;
-	}
-	
+
 	//Clear casts
 	memset(Strip, 0, sizeof(Strip));
 	return true;

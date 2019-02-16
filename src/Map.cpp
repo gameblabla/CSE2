@@ -1,7 +1,7 @@
+#include <stddef.h>
 #include <stdint.h>
 #include <string>
 
-#include <SDL_rwops.h>
 #include "WindowsWrapper.h"
 
 #include "CommonDefines.h"
@@ -9,6 +9,7 @@
 #include "Tags.h"
 #include "Draw.h"
 #include "NpChar.h"
+#include "File.h"
 
 #define PXM_BUFFER_SIZE 0x4B000
 
@@ -27,39 +28,39 @@ bool LoadMapData2(char *path_map)
 	sprintf(path, "%s/%s", gDataPath, path_map);
 	
 	//Open file
-	SDL_RWops *fp = SDL_RWFromFile(path, "rb");
-	if (!fp)
+	FILE *fp = fopen(path, "rb");
+	if (fp == NULL)
 		return false;
 	
 	//Make sure file begins with "PXM"
 	char check[3];
-	fp->read(fp, check, 1, 3);
+	fread(check, 1, 3, fp);
 	
 	if (!memcmp(check, "PXM", 3))
 	{
 		uint8_t nul;
-		fp->read(fp, &nul, 1, 1);
+		fread(&nul, 1, 1, fp);
 		
 		//Get width and height
-		gMap.width = SDL_ReadLE16(fp);
-		gMap.length = SDL_ReadLE16(fp);
+		gMap.width = File_ReadLE16(fp);
+		gMap.length = File_ReadLE16(fp);
 		
 		if (gMap.data)
 		{
 			//Read tiledata
-			fp->read(fp, gMap.data, 1, gMap.length * gMap.width);
-			SDL_RWclose(fp);
+			fread(gMap.data, 1, gMap.length * gMap.width, fp);
+			fclose(fp);
 			return true;
 		}
 		else
 		{
-			SDL_RWclose(fp);
+			fclose(fp);
 			return false;
 		}
 	}
 	else
 	{
-		SDL_RWclose(fp);
+		fclose(fp);
 		return false;
 	}
 	
@@ -72,13 +73,13 @@ bool LoadAttributeData(char *path_atrb)
 	char path[260];
 	sprintf(path, "%s/%s", gDataPath, path_atrb);
 	
-	SDL_RWops *fp = SDL_RWFromFile(path, "rb");
-	if (!fp)
+	FILE *fp = fopen(path, "rb");
+	if (fp == NULL)
 		return false;
 	
 	//Read data
-	fp->read(fp, gMap.atrb, 1, 0x100);
-	SDL_RWclose(fp);
+	fread(gMap.atrb, 1, 0x100, fp);
+	fclose(fp);
 	return true;
 }
 

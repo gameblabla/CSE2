@@ -1,49 +1,52 @@
-#include <string>
-
-#include <SDL_rwops.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "NpcTbl.h"
 #include "NpcAct.h"
+#include "File.h"
+#include "Generic.h"
 
 NPC_TABLE *gNpcTable;
 
 bool LoadNpcTable(const char *path)
 {
-	SDL_RWops *fp = SDL_RWFromFile(path, "rb");
-
-	if (fp == nullptr)
-	{
-		printf("LoadNpcTable failed\nSDL Error: %s\n", SDL_GetError());
+	const long size = GetFileSizeLong(path);
+	if (size == -1)
 		return false;
-	}
 
-	const size_t tblSize = SDL_RWsize(fp);
+	const long num = size / 0x18;
 
-	const size_t npcCount = tblSize / 0x18;
-	gNpcTable = (NPC_TABLE*)malloc(npcCount * sizeof(NPC_TABLE));
+	gNpcTable = (NPC_TABLE*)malloc(num * sizeof(NPC_TABLE));
+	if (gNpcTable == NULL)
+		return false;
 
-	for (size_t i = 0; i < npcCount; i++) //bits
-		gNpcTable[i].bits = SDL_ReadLE16(fp);
-	for (size_t i = 0; i < npcCount; i++) //life
-		gNpcTable[i].life = SDL_ReadLE16(fp);
-	for (size_t i = 0; i < npcCount; i++) //surf
-		fp->read(fp, &gNpcTable[i].surf, 1, 1);
-	for (size_t i = 0; i < npcCount; i++) //destroy_voice
-		fp->read(fp, &gNpcTable[i].destroy_voice, 1, 1);
-	for (size_t i = 0; i < npcCount; i++) //hit_voice
-		fp->read(fp, &gNpcTable[i].hit_voice, 1, 1);
-	for (size_t i = 0; i < npcCount; i++) //size
-		fp->read(fp, &gNpcTable[i].size, 1, 1);
-	for (size_t i = 0; i < npcCount; i++) //exp
-		gNpcTable[i].exp = SDL_ReadLE32(fp);
-	for (size_t i = 0; i < npcCount; i++) //damage
-		gNpcTable[i].damage = SDL_ReadLE32(fp);
-	for (size_t i = 0; i < npcCount; i++) //hit
-		fp->read(fp, &gNpcTable[i].hit, 4, 1);
-	for (size_t i = 0; i < npcCount; i++) //view
-		fp->read(fp, &gNpcTable[i].view, 4, 1);
+	FILE *fp = fopen(path, "rb");
+	if (fp == NULL)
+		return false;
+
+	for (long n = 0; n < num; n++) //bits
+		gNpcTable[n].bits = File_ReadLE16(fp);
+	for (long n = 0; n < num; n++) //life
+		gNpcTable[n].life = File_ReadLE16(fp);
+	for (long n = 0; n < num; n++) //surf
+		fread(&gNpcTable[n].surf, 1, 1, fp);
+	for (long n = 0; n < num; n++) //destroy_voice
+		fread(&gNpcTable[n].destroy_voice, 1, 1, fp);
+	for (long n = 0; n < num; n++) //hit_voice
+		fread(&gNpcTable[n].hit_voice, 1, 1, fp);
+	for (long n = 0; n < num; n++) //size
+		fread(&gNpcTable[n].size, 1, 1, fp);
+	for (long n = 0; n < num; n++) //exp
+		gNpcTable[n].exp = File_ReadLE32(fp);
+	for (long n = 0; n < num; n++) //damage
+		gNpcTable[n].damage = File_ReadLE32(fp);
+	for (long n = 0; n < num; n++) //hit
+		fread(&gNpcTable[n].hit, 4, 1, fp);
+	for (long n = 0; n < num; n++) //view
+		fread(&gNpcTable[n].view, 4, 1, fp);
 		
-	SDL_RWclose(fp);	
+	fclose(fp);
 	return true;
 }
 

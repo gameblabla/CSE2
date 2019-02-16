@@ -5,11 +5,11 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <SDL_rwops.h>
 #include "WindowsWrapper.h"
 
 #include "Tags.h"
 #include "Config.h"
+#include "File.h"
 
 bool LoadConfigData(CONFIG *conf)
 {
@@ -21,30 +21,30 @@ bool LoadConfigData(CONFIG *conf)
 	sprintf(path, "%s/%s", gModulePath, "Config.dat");
 	
 	//Open file
-	SDL_RWops *fp = SDL_RWFromFile(path, "rb");
-	if (!fp)
+	FILE *fp = fopen(path, "rb");
+	if (fp == NULL)
 		return false;
 	
-	//Read data (we're using SDL_RWops so we can load it with the specific endianness expected)
+	//Read data
 	//Read the version id and font name
-	fp->read(fp, conf->proof, sizeof(conf->proof), 1);
-	fp->read(fp, conf->font_name, sizeof(conf->font_name), 1);
+	fread(conf->proof, sizeof(conf->proof), 1, fp);
+	fread(conf->font_name, sizeof(conf->font_name), 1, fp);
 	
 	//Read control settings
-	conf->move_button_mode = SDL_ReadLE32(fp);
-	conf->attack_button_mode = SDL_ReadLE32(fp);
-	conf->ok_button_mode = SDL_ReadLE32(fp);
+	conf->move_button_mode = File_ReadLE32(fp);
+	conf->attack_button_mode = File_ReadLE32(fp);
+	conf->ok_button_mode = File_ReadLE32(fp);
 	
 	//Read display mode (320x240, 640x480, 24-bit fullscreen, 32-bit fullscreen) TODO: add more things?
-	conf->display_mode = SDL_ReadLE32(fp);
+	conf->display_mode = File_ReadLE32(fp);
 	
 	//Read joystick configuration (if enabled, and mappings)
-	conf->bJoystick = SDL_ReadLE32(fp);
+	conf->bJoystick = File_ReadLE32(fp);
 	for (int button = 0; button < 8; button++)
-		conf->joystick_button[button] = SDL_ReadLE32(fp);
+		conf->joystick_button[button] = File_ReadLE32(fp);
 	
 	//Close file
-	fp->close(fp);
+	fclose(fp);
 	
 	//Check if version is correct, return that it succeeded
 	if (!strcmp(conf->proof, "DOUKUTSU20041206"))

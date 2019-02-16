@@ -608,8 +608,11 @@ bool Game()
 	{
 		char path[PATH_LENGTH];
 		sprintf(path, "%s/npc.tbl", gDataPath);
+
+		char path2[PATH_LENGTH];
+		sprintf(path2, "%s/stage.tbl", gDataPath);
 		
-		if (LoadNpcTable(path))
+		if (LoadNpcTable(path) && LoadStageTable(path2))
 		{
 			InitTextScript2();
 			InitSkipFlags();

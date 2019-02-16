@@ -34,7 +34,7 @@ ifeq ($(WINDOWS), 1)
 	LIBS += -lkernel32
 endif
 
-CXXFLAGS += `sdl2-config --cflags` `pkg-config freetype2 --cflags` -MMD -MP -MF $@.d
+CXXFLAGS += `sdl2-config --cflags` `pkg-config freetype2 --cflags` -MMD -MP -MF $@.d -DLODEPNG_NO_COMPILE_ENCODER -DLODEPNG_NO_COMPILE_ERROR_TEXT -DLODEPNG_NO_COMPILE_CPP
 LIBS += `sdl2-config --static-libs` `pkg-config freetype2 --libs`
 
 ifeq ($(STATIC), 1)
@@ -44,6 +44,7 @@ endif
 
 # For an accurate result to the original's code, compile in alphabetical order
 SOURCES = \
+	lodepng/lodepng \
 	ArmsItem \
 	Back \
 	Boss \
@@ -65,6 +66,7 @@ SOURCES = \
 	Ending \
 	Escape \
 	Fade \
+	File \
 	Flags \
 	Flash \
 	Font \
@@ -116,73 +118,73 @@ SOURCES = \
 	ValueView
 
 RESOURCES = \
-	BITMAP/CREDIT01.bmp \
-	BITMAP/CREDIT02.bmp \
-	BITMAP/CREDIT03.bmp \
-	BITMAP/CREDIT04.bmp \
-	BITMAP/CREDIT05.bmp \
-	BITMAP/CREDIT06.bmp \
-	BITMAP/CREDIT07.bmp \
-	BITMAP/CREDIT08.bmp \
-	BITMAP/CREDIT09.bmp \
-	BITMAP/CREDIT10.bmp \
-	BITMAP/CREDIT11.bmp \
-	BITMAP/CREDIT12.bmp \
-	BITMAP/CREDIT14.bmp \
-	BITMAP/CREDIT15.bmp \
-	BITMAP/CREDIT16.bmp \
-	BITMAP/CREDIT17.bmp \
-	BITMAP/CREDIT18.bmp \
+	BITMAP/CREDIT01.png \
+	BITMAP/CREDIT02.png \
+	BITMAP/CREDIT03.png \
+	BITMAP/CREDIT04.png \
+	BITMAP/CREDIT05.png \
+	BITMAP/CREDIT06.png \
+	BITMAP/CREDIT07.png \
+	BITMAP/CREDIT08.png \
+	BITMAP/CREDIT09.png \
+	BITMAP/CREDIT10.png \
+	BITMAP/CREDIT11.png \
+	BITMAP/CREDIT12.png \
+	BITMAP/CREDIT14.png \
+	BITMAP/CREDIT15.png \
+	BITMAP/CREDIT16.png \
+	BITMAP/CREDIT17.png \
+	BITMAP/CREDIT18.png \
 	CURSOR/CURSOR_IKA.bmp \
 	CURSOR/CURSOR_NORMAL.bmp \
-	ORG/ACCESS \
-	ORG/ANZEN \
-	ORG/BALCONY \
-	ORG/BALLOS \
-	ORG/BDOWN \
-	ORG/CEMETERY \
-	ORG/CURLY \
-	ORG/DR \
-	ORG/ENDING \
-	ORG/ESCAPE \
-	ORG/FANFALE1 \
-	ORG/FANFALE2 \
-	ORG/FANFALE3 \
-	ORG/FIREEYE \
-	ORG/GAMEOVER \
-	ORG/GINSUKE \
-	ORG/GRAND \
-	ORG/GRAVITY \
-	ORG/HELL \
-	ORG/IRONH \
-	ORG/JENKA \
-	ORG/JENKA2 \
-	ORG/KODOU \
-	ORG/LASTBT3 \
-	ORG/LASTBTL \
-	ORG/LASTCAVE \
-	ORG/MARINE \
-	ORG/MAZE \
-	ORG/MDOWN2 \
-	ORG/MURA \
-	ORG/OSIDE \
-	ORG/PLANT \
-	ORG/QUIET \
-	ORG/REQUIEM \
-	ORG/TOROKO \
-	ORG/VIVI \
-	ORG/WANPAK2 \
-	ORG/WANPAKU \
-	ORG/WEED \
-	ORG/WHITE \
-	ORG/XXXX \
-	ORG/ZONBIE \
+	ORG/ACCESS.org \
+	ORG/ANZEN.org \
+	ORG/BALCONY.org \
+	ORG/BALLOS.org \
+	ORG/BDOWN.org \
+	ORG/CEMETERY.org \
+	ORG/CURLY.org \
+	ORG/DR.org \
+	ORG/ENDING.org \
+	ORG/ESCAPE.org \
+	ORG/FANFALE1.org \
+	ORG/FANFALE2.org \
+	ORG/FANFALE3.org \
+	ORG/FIREEYE.org \
+	ORG/GAMEOVER.org \
+	ORG/GINSUKE.org \
+	ORG/GRAND.org \
+	ORG/GRAVITY.org \
+	ORG/HELL.org \
+	ORG/IRONH.org \
+	ORG/JENKA.org \
+	ORG/JENKA2.org \
+	ORG/KODOU.org \
+	ORG/LASTBT3.org \
+	ORG/LASTBTL.org \
+	ORG/LASTCAVE.org \
+	ORG/MARINE.org \
+	ORG/MAZE.org \
+	ORG/MDOWN2.org \
+	ORG/MURA.org \
+	ORG/OSIDE.org \
+	ORG/PLANT.org \
+	ORG/QUIET.org \
+	ORG/REQUIEM.org \
+	ORG/TOROKO.org \
+	ORG/VIVI.org \
+	ORG/WANPAK2.org \
+	ORG/WANPAKU.org \
+	ORG/WEED.org \
+	ORG/WHITE.org \
+	ORG/XXXX.org \
+	ORG/ZONBIE.org \
 	WAVE/WAVE100
 
 ifeq ($(JAPANESE), 1)
-	RESOURCES += BITMAP/PIXEL_JP.bmp
+	RESOURCES += BITMAP/PIXEL_JP.png
 else
-	RESOURCES += BITMAP/PIXEL.bmp
+	RESOURCES += BITMAP/PIXEL.png
 endif
 
 ifneq ($(WINDOWS), 1)
