@@ -1,4 +1,3 @@
-#include <SDL_rwops.h>
 #include "WindowsWrapper.h"
 
 #include "Tags.h"
