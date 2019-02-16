@@ -2,7 +2,6 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <SDL_rwops.h>
 #include "WindowsWrapper.h"
 
 #include "CommonDefines.h"
