@@ -439,6 +439,13 @@ void JoystickProc()
 	}
 }
 
+#define DO_KEY_PRESS(key) \
+	if (event.type == SDL_KEYDOWN) \
+		gKey |= key; \
+	else \
+		gKey &= ~key; \
+	break;
+
 bool SystemTask()
 {
 	//Handle window events
@@ -479,186 +486,145 @@ bool SystemTask()
 				break;
 			
 			case SDL_KEYDOWN:
+			case SDL_KEYUP:
+			#ifdef FIX_BUGS
+				//BUG FIX: Pixel relied on key codes for input, but these differ based on keyboard layout.
+				//This would break the alternate movement keys on typical English keyboards, since the '=' key
+				//is in a completely different place to where it is on a Japanese keyboard.
+				//To solve this, we use scancodes instead, which are based on the physical location of keys,
+				//rather than their meaning.
+				switch (event.key.keysym.scancode)
+				{
+					case SDL_SCANCODE_ESCAPE:
+						DO_KEY_PRESS(KEY_ESCAPE)
+
+					case SDL_SCANCODE_W:
+						DO_KEY_PRESS(KEY_MAP)
+
+					case SDL_SCANCODE_LEFT:
+						DO_KEY_PRESS(KEY_LEFT)
+
+					case SDL_SCANCODE_RIGHT:
+						DO_KEY_PRESS(KEY_RIGHT)
+
+					case SDL_SCANCODE_UP:
+						DO_KEY_PRESS(KEY_UP)
+
+					case SDL_SCANCODE_DOWN:
+						DO_KEY_PRESS(KEY_DOWN)
+
+					case SDL_SCANCODE_X:
+						DO_KEY_PRESS(KEY_X)
+
+					case SDL_SCANCODE_Z:
+						DO_KEY_PRESS(KEY_Z)
+
+					case SDL_SCANCODE_S:
+						DO_KEY_PRESS(KEY_ARMS)
+
+					case SDL_SCANCODE_A:
+						DO_KEY_PRESS(KEY_ARMSREV)
+
+					case SDL_SCANCODE_RSHIFT:
+					case SDL_SCANCODE_LSHIFT:
+						DO_KEY_PRESS(KEY_SHIFT)
+
+					case SDL_SCANCODE_F1:
+						DO_KEY_PRESS(KEY_F1)
+
+					case SDL_SCANCODE_F2:
+						DO_KEY_PRESS(KEY_F2)
+
+					case SDL_SCANCODE_Q:
+						DO_KEY_PRESS(KEY_ITEM)
+
+					case SDL_SCANCODE_COMMA:
+						DO_KEY_PRESS(KEY_ALT_LEFT)
+
+					case SDL_SCANCODE_PERIOD:
+						DO_KEY_PRESS(KEY_ALT_DOWN)
+
+					case SDL_SCANCODE_SLASH:
+						DO_KEY_PRESS(KEY_ALT_RIGHT)
+
+					case SDL_SCANCODE_L:
+						DO_KEY_PRESS(KEY_ALT_UP)
+
+					case SDL_SCANCODE_SEMICOLON:
+						DO_KEY_PRESS(KEY_PLUS)
+						
+					case SDL_SCANCODE_F5:
+						gbUseJoystick = false;
+						break;
+				}
+				break;
+			#else
 				switch (event.key.keysym.sym)
 				{
 					case SDLK_ESCAPE:
-						gKey |= KEY_ESCAPE;
-						break;
-						
+						DO_KEY_PRESS(KEY_ESCAPE)
+
 					case SDLK_w:
-						gKey |= KEY_MAP;
-						break;
-						
+						DO_KEY_PRESS(KEY_MAP)
+
 					case SDLK_LEFT:
-						gKey |= KEY_LEFT;
-						break;
-						
+						DO_KEY_PRESS(KEY_LEFT)
+
 					case SDLK_RIGHT:
-						gKey |= KEY_RIGHT;
-						break;
-						
+						DO_KEY_PRESS(KEY_RIGHT)
+
 					case SDLK_UP:
-						gKey |= KEY_UP;
-						break;
-						
+						DO_KEY_PRESS(KEY_UP)
+
 					case SDLK_DOWN:
-						gKey |= KEY_DOWN;
-						break;
-						
+						DO_KEY_PRESS(KEY_DOWN)
+
 					case SDLK_x:
-						gKey |= KEY_X;
-						break;
-						
+						DO_KEY_PRESS(KEY_X)
+
 					case SDLK_z:
-						gKey |= KEY_Z;
-						break;
-						
+						DO_KEY_PRESS(KEY_Z)
+
 					case SDLK_s:
-						gKey |= KEY_ARMS;
-						break;
-						
+						DO_KEY_PRESS(KEY_ARMS)
+
 					case SDLK_a:
-						gKey |= KEY_ARMSREV;
-						break;
-					
+						DO_KEY_PRESS(KEY_ARMSREV)
+
 					case SDLK_RSHIFT:
 					case SDLK_LSHIFT:
-						gKey |= KEY_SHIFT;
-						break;
-						
+						DO_KEY_PRESS(KEY_SHIFT)
+
 					case SDLK_F1:
-						gKey |= KEY_F1;
-						break;
-						
+						DO_KEY_PRESS(KEY_F1)
+
 					case SDLK_F2:
-						gKey |= KEY_F2;
-						break;
-						
+						DO_KEY_PRESS(KEY_F2)
+
 					case SDLK_q:
-						gKey |= KEY_ITEM;
-						break;
-						
+						DO_KEY_PRESS(KEY_ITEM)
+
 					case SDLK_COMMA:
-						gKey |= KEY_ALT_LEFT;
-						break;
-						
+						DO_KEY_PRESS(KEY_ALT_LEFT)
+
 					case SDLK_PERIOD:
-						gKey |= KEY_ALT_DOWN;
-						break;
-						
+						DO_KEY_PRESS(KEY_ALT_DOWN)
+
 					case SDLK_SLASH:
-						gKey |= KEY_ALT_RIGHT;
-						break;
-						
+						DO_KEY_PRESS(KEY_ALT_RIGHT)
+
 					case SDLK_l:
-						gKey |= KEY_ALT_UP;
-						break;
-						
-				#ifdef FIX_BUGS //BUG FIX: Pixel intended for the second alternate up key to be the plus key, Japanese keyboards have the plus key where the semi-colon key is, causing errors on other keyboard layouts)
-					case SDLK_PLUS:
-				#else
+						DO_KEY_PRESS(KEY_ALT_UP)
+
 					case SDLK_SEMICOLON:
-				#endif
-						gKey |= KEY_PLUS;
-						break;
+						DO_KEY_PRESS(KEY_PLUS)
 						
 					case SDLK_F5:
 						gbUseJoystick = false;
 						break;
-						
-					default:
-						break;
 				}
 				break;
-				
-			case SDL_KEYUP:
-				switch (event.key.keysym.sym)
-				{
-					case SDLK_ESCAPE:
-						gKey &= ~KEY_ESCAPE;
-						break;
-						
-					case SDLK_w:
-						gKey &= ~KEY_MAP;
-						break;
-						
-					case SDLK_LEFT:
-						gKey &= ~KEY_LEFT;
-						break;
-						
-					case SDLK_RIGHT:
-						gKey &= ~KEY_RIGHT;
-						break;
-						
-					case SDLK_UP:
-						gKey &= ~KEY_UP;
-						break;
-						
-					case SDLK_DOWN:
-						gKey &= ~KEY_DOWN;
-						break;
-						
-					case SDLK_x:
-						gKey &= ~KEY_X;
-						break;
-						
-					case SDLK_z:
-						gKey &= ~KEY_Z;
-						break;
-						
-					case SDLK_s:
-						gKey &= ~KEY_ARMS;
-						break;
-						
-					case SDLK_a:
-						gKey &= ~KEY_ARMSREV;
-						break;
-					
-					case SDLK_RSHIFT:
-					case SDLK_LSHIFT:
-						gKey &= ~KEY_SHIFT;
-						break;
-						
-					case SDLK_F1:
-						gKey &= ~KEY_F1;
-						break;
-						
-					case SDLK_F2:
-						gKey &= ~KEY_F2;
-						break;
-						
-					case SDLK_q:
-						gKey &= ~KEY_ITEM;
-						break;
-						
-					case SDLK_COMMA:
-						gKey &= ~KEY_ALT_LEFT;
-						break;
-						
-					case SDLK_PERIOD:
-						gKey &= ~KEY_ALT_DOWN;
-						break;
-						
-					case SDLK_SLASH:
-						gKey &= ~KEY_ALT_RIGHT;
-						break;
-						
-					case SDLK_l:
-						gKey &= ~KEY_ALT_UP;
-						break;
-						
-					#ifdef FIX_BUGS //BUG FIX: Pixel intended for the second alternate up key to be the plus key, Japanese keyboards have the plus key where the semi-colon key is, causing errors on other keyboard layouts)
-						case SDLK_PLUS:
-					#else
-						case SDLK_SEMICOLON:
-					#endif
-						gKey &= ~KEY_PLUS;
-						break;
-						
-					default:
-						break;
-				}
-				break;
+			#endif
 		}
 	}
 	
