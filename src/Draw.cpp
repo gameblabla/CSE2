@@ -111,19 +111,6 @@ void EndDirectDraw()
 		ReleaseSurface(i);
 }
 
-static bool IsEnableBitmap(SDL_RWops *fp)
-{
-	char str[16];
-	const char *extra_text = "(C)Pixel";
-
-	const size_t len = strlen(extra_text);
-
-	fp->seek(fp, -(Sint64)len, RW_SEEK_END);
-	fp->read(fp, str, 1, len);
-	fp->seek(fp, 0, RW_SEEK_SET);
-	return memcmp(str, extra_text, len) == 0;
-}
-
 void ReleaseSurface(int s)
 {
 	//Release the surface we want to release
