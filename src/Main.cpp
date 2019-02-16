@@ -5,6 +5,7 @@
 #include <string>
 
 #include <SDL.h>
+#include "lodepng/lodepng.h"
 #include "WindowsWrapper.h"
 
 #include "Draw.h"
@@ -209,13 +210,14 @@ int main(int argc, char *argv[])
 
 		//Load cursor
 		char path[PATH_LENGTH];
-		sprintf(path, "%s/CURSOR_NORMAL.bmp", gDataPath);
-		SDL_Surface *cursor_surface = SDL_LoadBMP(path);
+		sprintf(path, "%s/CURSOR_NORMAL.png", gDataPath);
+		unsigned int bitmap_width, bitmap_height;
+		unsigned char *bitmap_pixels;
+		lodepng_decode32_file(&bitmap_pixels, &bitmap_width, &bitmap_height, path);
 
-		if (cursor_surface)
+		if (bitmap_pixels)
 		{
-			SDL_SetColorKey(cursor_surface, SDL_TRUE, SDL_MapRGB(cursor_surface->format, 0xFF, 0, 0xFF));	// Pink regions are transparent
-
+			SDL_Surface *cursor_surface = SDL_CreateRGBSurfaceWithFormatFrom(bitmap_pixels, bitmap_width, bitmap_height, 0, bitmap_width * 4, SDL_PIXELFORMAT_RGBA32);
 			SDL_Cursor *cursor = SDL_CreateColorCursor(cursor_surface, 0, 0);	// Don't worry, the hotspots are accurate to the original files
 
 			if (cursor)
@@ -224,6 +226,7 @@ int main(int argc, char *argv[])
 				printf("Failed to load cursor");
 
 			SDL_FreeSurface(cursor_surface);
+			free(bitmap_pixels);
 		}
 		else
 		{
@@ -312,13 +315,17 @@ int main(int argc, char *argv[])
 #ifndef WINDOWS
 			//Load icon
 			char path[PATH_LENGTH];
-			sprintf(path, "%s/ICON_MINI.bmp", gDataPath);
-			SDL_Surface *iconSurf = SDL_LoadBMP(path);
-			
-			if (iconSurf)
+			sprintf(path, "%s/ICON_MINI.png", gDataPath);
+			unsigned int bitmap_width, bitmap_height;
+			unsigned char *bitmap_pixels;
+			lodepng_decode32_file(&bitmap_pixels, &bitmap_width, &bitmap_height, path);
+
+			if (bitmap_pixels)
 			{
+				SDL_Surface *iconSurf = SDL_CreateRGBSurfaceWithFormatFrom(bitmap_pixels, bitmap_width, bitmap_height, 0, bitmap_width * 4, SDL_PIXELFORMAT_RGBA32);
 				SDL_Surface *iconConverted = SDL_ConvertSurfaceFormat(iconSurf, SDL_PIXELFORMAT_RGB888, 0);
 				SDL_FreeSurface(iconSurf);
+				free(bitmap_pixels);
 				SDL_Surface *iconSurfUpscaled = SDL_CreateRGBSurfaceWithFormat(0, 256, 256, 0, SDL_PIXELFORMAT_RGB888);
 				SDL_LowerBlitScaled(iconConverted, NULL, iconSurfUpscaled, NULL);
 				SDL_FreeSurface(iconConverted);
