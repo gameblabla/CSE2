@@ -30,6 +30,7 @@
 #include "Resource.h"
 
 static SDL_Texture *native_res_render_target;
+static bool vsync;
 
 RECT grcGame = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 RECT grcFull = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
@@ -43,29 +44,37 @@ FontObject *gFont;
 
 bool Flip_SystemTask()
 {
-	while (true)
+	if (vsync)
 	{
-		const unsigned int frameDelays[3] = {17, 16, 17};
-		static unsigned int frame;
-
 		if (!SystemTask())
 			return false;
-
-		//Framerate limiter
-		static uint32_t timePrev;
-		const uint32_t timeNow = SDL_GetTicks();
-
-		if (timeNow >= timePrev + frameDelays[frame % 3])
+	}
+	else
+	{
+		while (true)
 		{
-			if (timeNow >= timePrev + 100)
-				timePrev = timeNow;	// If the timer is freakishly out of sync, panic and reset it, instead of spamming frames for who-knows how long
-			else
-				timePrev += frameDelays[frame++ % 3];
+			const unsigned int frameDelays[3] = {17, 16, 17};
+			static unsigned int frame;
 
-			break;
+			if (!SystemTask())
+				return false;
+
+			//Framerate limiter
+			static uint32_t timePrev;
+			const uint32_t timeNow = SDL_GetTicks();
+
+			if (timeNow >= timePrev + frameDelays[frame % 3])
+			{
+				if (timeNow >= timePrev + 100)
+					timePrev = timeNow;	// If the timer is freakishly out of sync, panic and reset it, instead of spamming frames for who-knows how long
+				else
+					timePrev += frameDelays[frame++ % 3];
+
+				break;
+			}
+
+			SDL_Delay(1);
 		}
-
-		SDL_Delay(1);
 	}
 
 	SDL_SetRenderTarget(gRenderer, NULL);
@@ -104,9 +113,14 @@ bool StartDirectDraw(int lMagnification, int lColourDepth)
 {
 	//Initialize rendering
 	SDL_InitSubSystem(SDL_INIT_VIDEO);
-	
+
+	//Check if vsync is possible
+	SDL_DisplayMode display_mode;
+	SDL_GetWindowDisplayMode(gWindow, &display_mode);
+	vsync = display_mode.refresh_rate == 60;
+
 	//Create renderer
-	if (gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE))
+	if (gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE | (vsync ? SDL_RENDERER_PRESENTVSYNC : 0)))
 	{
 		switch (lMagnification)
 		{
