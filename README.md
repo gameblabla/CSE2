@@ -1,6 +1,6 @@
 # Cave Story Engine 2
 
-Cave Story Engine is an in-progress decompilation of Cave Story, ported from DirectX to SDL2.
+Cave Story Engine is a decompilation of Cave Story, ported from DirectX to SDL2.
 
 ![Screenshot](screenshot.png)
 
