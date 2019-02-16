@@ -29,6 +29,8 @@
 #include "Tags.h"
 #include "Resource.h"
 
+static SDL_Texture *native_res_render_target;
+
 RECT grcGame = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 RECT grcFull = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
@@ -66,6 +68,34 @@ bool Flip_SystemTask()
 		SDL_Delay(1);
 	}
 
+	SDL_SetRenderTarget(gRenderer, NULL);
+
+	int renderer_width, renderer_height;
+	SDL_GetRendererOutputSize(gRenderer, &renderer_width, &renderer_height);
+
+	int texture_width, texture_height;
+	SDL_QueryTexture(native_res_render_target, NULL, NULL, &texture_width, &texture_height);
+
+	SDL_Rect dst_rect;
+	if ((float)renderer_width / texture_width < (float)renderer_height / texture_height)
+	{
+		dst_rect.w = renderer_width;
+		dst_rect.h = texture_height * (float)renderer_width / texture_width;
+		dst_rect.x = 0;
+		dst_rect.y = (renderer_height - dst_rect.h) / 2;
+	}
+	else
+	{
+		dst_rect.w = texture_width * (float)renderer_height / texture_height;
+		dst_rect.h = renderer_height;
+		dst_rect.x = (renderer_width - dst_rect.w) / 2;
+		dst_rect.y = 0;
+	}
+
+	SDL_RenderCopy(gRenderer, native_res_render_target, NULL, &dst_rect);
+
+	SDL_SetRenderTarget(gRenderer, native_res_render_target);
+
 	SDL_RenderPresent(gRenderer);
 	return true;
 }
@@ -76,7 +106,7 @@ bool StartDirectDraw(int lMagnification, int lColourDepth)
 	SDL_InitSubSystem(SDL_INIT_VIDEO);
 	
 	//Create renderer
-	if (gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED))
+	if (gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE))
 	{
 		switch (lMagnification)
 		{
@@ -91,12 +121,18 @@ bool StartDirectDraw(int lMagnification, int lColourDepth)
 				break;
 				
 			case 2:
-				magnification = 2;
+				SDL_SetWindowFullscreen(gWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
+				int width, height;
+				SDL_GetRendererOutputSize(gRenderer, &width, &height);
+				magnification = width / WINDOW_WIDTH < height / WINDOW_HEIGHT ? width / WINDOW_WIDTH : height / WINDOW_HEIGHT;
 				fullscreen = true;
-				SDL_SetWindowFullscreen(gWindow, SDL_WINDOW_FULLSCREEN);
 				break;
 		}
-		
+
+		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+		native_res_render_target = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, WINDOW_WIDTH * magnification, WINDOW_HEIGHT * magnification);
+		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+		SDL_SetRenderTarget(gRenderer, native_res_render_target);
 	}
 	
 	return true;
