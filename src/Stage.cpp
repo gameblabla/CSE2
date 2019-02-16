@@ -23,12 +23,6 @@
 #include "Flash.h"
 #include "File.h"
 
-#ifdef JAPANESE
-#define STAGE_ENTRY(parts, map, bkType, back, npc, boss, boss_no, name_en, name_jp) {parts, map, bkType, back, npc, boss, boss_no, name_jp}
-#else
-#define STAGE_ENTRY(parts, map, bkType, back, npc, boss, boss_no, name_en, name_jp) {parts, map, bkType, back, npc, boss, boss_no, name_en}
-#endif
-
 int gStageNo;
 
 STAGE_TABLE *gTMT;
