@@ -1,6 +1,6 @@
 #include <stdint.h>
+#include <stdio.h>
 
-#include <SDL_rwops.h>
 #include <SDL_thread.h>
 #include <SDL_timer.h>
 #include <SDL_events.h>
@@ -11,6 +11,7 @@
 #include "Organya.h"
 #include "Resource.h"
 #include "Sound.h"
+#include "File.h"
 
 #define PANDUMMY 0xFF
 #define VOLDUMMY 0xFF
@@ -260,16 +261,18 @@ int8_t wave_data[100][0x100];
 
 bool InitWaveData100()
 {
-	SDL_RWops *fp = FindResource("WAVE100");
+	char path[PATH_LENGTH];
+	sprintf(path, "%s/WAVE100", gDataPath);
+	FILE *fp = fopen(path, "rb");
 	if (fp == NULL)
 	{
 		printf("Failed to open WAVE100\n");
 		return false;
 	}
 
-	fp->read(fp, wave_data, 1, 100 * 0x100);
+	fread(wave_data, 1, 100 * 0x100, fp);
 
-	SDL_RWclose(fp);
+	fclose(fp);
 	return true;
 }
 
@@ -423,7 +426,10 @@ void LoadOrganya(const char *name)
 
 	//Open file
 	printf("Loading org %s\n", name);
-	SDL_RWops *fp = FindResource(name);
+
+	char path[PATH_LENGTH];
+	sprintf(path, "%s/Org/%s.org", gDataPath, name);
+	FILE *fp = fopen(path, "rb");
 
 	if (!fp)
 	{
@@ -435,7 +441,7 @@ void LoadOrganya(const char *name)
 	uint8_t ver = 0;
 	char pass_check[6];
 
-	SDL_RWread(fp, &pass_check[0], sizeof(char), 6);
+	fread(&pass_check[0], sizeof(char), 6, fp);
 
 	if (!memcmp(pass_check, "Org-01", 6))ver = 1;
 	if (!memcmp(pass_check, "Org-02", 6))ver = 2;
@@ -448,18 +454,18 @@ void LoadOrganya(const char *name)
 	}
 	
 	//Set song information
-	info.wait = SDL_ReadLE16(fp);
-	info.line = SDL_ReadU8(fp);
-	info.dot = SDL_ReadU8(fp);
-	info.repeat_x = SDL_ReadLE32(fp);
-	info.end_x = SDL_ReadLE32(fp);
+	info.wait = File_ReadLE16(fp);
+	info.line = fgetc(fp);
+	info.dot = fgetc(fp);
+	info.repeat_x = File_ReadLE32(fp);
+	info.end_x = File_ReadLE32(fp);
 	
 	for (int i = 0; i < 16; i++) {
-		info.tdata[i].freq = SDL_ReadLE16(fp);
-		info.tdata[i].wave_no = SDL_ReadU8(fp);
-		const int8_t pipi = SDL_ReadU8(fp);
+		info.tdata[i].freq = File_ReadLE16(fp);
+		info.tdata[i].wave_no = fgetc(fp);
+		const int8_t pipi = fgetc(fp);
 		info.tdata[i].pipi = ver == 1 ? 0 : pipi;
-		info.tdata[i].note_num = SDL_ReadLE16(fp);
+		info.tdata[i].note_num = File_ReadLE16(fp);
 	}
 
 	//Load notes
@@ -492,36 +498,36 @@ void LoadOrganya(const char *name)
 		//Set note properties
 		np = info.tdata[j].note_p; //X position
 		for (int i = 0; i < info.tdata[j].note_num; i++) {
-			np->x = SDL_ReadLE32(fp);
+			np->x = File_ReadLE32(fp);
 			np++;
 		}
 
 		np = info.tdata[j].note_p; //Y position
 		for (int i = 0; i < info.tdata[j].note_num; i++) {
-			np->y = SDL_ReadU8(fp);
+			np->y = fgetc(fp);
 			np++;
 		}
 
 		np = info.tdata[j].note_p; //Length
 		for (int i = 0; i < info.tdata[j].note_num; i++) {
-			np->length = SDL_ReadU8(fp);
+			np->length = fgetc(fp);
 			np++;
 		}
 
 		np = info.tdata[j].note_p; //Volume
 		for (int i = 0; i < info.tdata[j].note_num; i++) {
-			np->volume = SDL_ReadU8(fp);
+			np->volume = fgetc(fp);
 			np++;
 		}
 
 		np = info.tdata[j].note_p; //Pan
 		for (int i = 0; i < info.tdata[j].note_num; i++) {
-			np->pan = SDL_ReadU8(fp);
+			np->pan = fgetc(fp);
 			np++;
 		}
 	}
 
-	SDL_RWclose(fp);
+	fclose(fp);
 
 	//Create waves
 	for (int j = 0; j < 8; j++)

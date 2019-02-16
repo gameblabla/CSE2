@@ -208,11 +208,12 @@ int main(int argc, char *argv[])
 		RECT unused_rect = {0, 0, 320, 240};
 
 		//Load cursor
-		SDL_RWops *fp = FindResource("CURSOR_NORMAL");
-		
-		if (fp)
+		char path[PATH_LENGTH];
+		sprintf(path, "%s/CURSOR_NORMAL.bmp", gDataPath);
+		SDL_Surface *cursor_surface = SDL_LoadBMP(path);
+
+		if (cursor_surface)
 		{
-			SDL_Surface *cursor_surface = SDL_LoadBMP_RW(fp, 1);
 			SDL_SetColorKey(cursor_surface, SDL_TRUE, SDL_MapRGB(cursor_surface->format, 0xFF, 0, 0xFF));	// Pink regions are transparent
 
 			SDL_Cursor *cursor = SDL_CreateColorCursor(cursor_surface, 0, 0);	// Don't worry, the hotspots are accurate to the original files
@@ -310,11 +311,12 @@ int main(int argc, char *argv[])
 			
 #ifndef WINDOWS
 			//Load icon
-			SDL_RWops *fp = FindResource("ICON_MINI");
+			char path[PATH_LENGTH];
+			sprintf(path, "%s/ICON_MINI.bmp", gDataPath);
+			SDL_Surface *iconSurf = SDL_LoadBMP(path);
 			
-			if (fp)
+			if (iconSurf)
 			{
-				SDL_Surface *iconSurf = SDL_LoadBMP_RW(fp, 1);
 				SDL_Surface *iconConverted = SDL_ConvertSurfaceFormat(iconSurf, SDL_PIXELFORMAT_RGB888, 0);
 				SDL_FreeSurface(iconSurf);
 				SDL_Surface *iconSurfUpscaled = SDL_CreateRGBSurfaceWithFormat(0, 256, 256, 0, SDL_PIXELFORMAT_RGB888);

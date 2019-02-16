@@ -149,9 +149,9 @@ static const PIXTONEPARAMETER gPtpTable[139] =
 
 bool LoadGenericData()
 {
-	MakeSurface_Resource("PIXEL", 1);
-	
 	bool bError = false;
+	if (!MakeSurface_File("PIXEL", 1))
+		bError = true;
 	if (!MakeSurface_File("MyChar", 16))
 		bError = true;
 	if (!MakeSurface_File("Title", 0))
@@ -178,8 +178,8 @@ bool LoadGenericData()
 		bError = true;
 	if (!MakeSurface_File("Fade", 6))
 		bError = true;
-	
-	MakeSurface_Resource("CREDIT01", 36);
+	if (!MakeSurface_File("CREDIT01", 36))
+		bError = true;
 	
 	if (bError)
 	{
