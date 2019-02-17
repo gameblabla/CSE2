@@ -89,7 +89,7 @@ const STAGE_TABLE gTMT[95] = {
 	STAGE_ENTRY("Cent", "Cent", 1, "bkGreen", "Guest", "Cent", 0, "Plantation", "‘å”_‰€"),
 	STAGE_ENTRY("Jail", "Jail1", 4, "bk0", "Guest", "Cent", 0, "Jail No. 1", "‘æ‚P˜S"),
 	STAGE_ENTRY("Jail", "Momo", 4, "bk0", "Guest", "0", 0, "Hideout", "ƒJƒNƒŒƒK"),
-	STAGE_ENTRY("Jail", "lounge", 4, "bk0", "Guest", "0", 0, "Rest Area", "‹xŒeŠ"),
+	STAGE_ENTRY("Jail", "Lounge", 4, "bk0", "Guest", "0", 0, "Rest Area", "‹xŒeŠ"),
 	STAGE_ENTRY("Store", "CentW", 4, "bk0", "Guest", "Cent", 0, "Teleporter", "“]‘—º"),
 	STAGE_ENTRY("Store", "Jail2", 4, "bk0", "Guest", "Cent", 0, "Jail No. 2", "‘æ‚Q˜S"),
 	STAGE_ENTRY("White", "Blcny1", 7, "bkFog", "Ravil", "Heri", 0, "Balcony", "ƒoƒ‹ƒRƒj["),
