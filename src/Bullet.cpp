@@ -135,7 +135,7 @@ void PutBullet(int fx, int fy)
 					break;
 			}
 			
-			PutBitmap3(&grcGame, x / 0x200 - fx / 0x200, y / 0x200 - fy / 0x200, &gBul[i].rect, 17);
+			PutBitmap3(&grcGame, x / 0x200 - fx / 0x200, y / 0x200 - fy / 0x200, &gBul[i].rect, SURFACE_ID_BULLET);
 		}
 	}
 }

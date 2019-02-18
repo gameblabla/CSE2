@@ -150,35 +150,35 @@ static const PIXTONEPARAMETER gPtpTable[139] =
 bool LoadGenericData()
 {
 	bool bError = false;
-	if (!MakeSurface_File("PIXEL", 1))
+	if (!MakeSurface_File("PIXEL", SURFACE_ID_PIXEL))
 		bError = true;
-	if (!MakeSurface_File("MyChar", 16))
+	if (!MakeSurface_File("MyChar", SURFACE_ID_MY_CHAR))
 		bError = true;
-	if (!MakeSurface_File("Title", 0))
+	if (!MakeSurface_File("Title", SURFACE_ID_TITLE))
 		bError = true;
-	if (!MakeSurface_File("ArmsImage", 12))
+	if (!MakeSurface_File("ArmsImage", SURFACE_ID_ARMS_IMAGE))
 		bError = true;
-	if (!MakeSurface_File("Arms", 11))
+	if (!MakeSurface_File("Arms", SURFACE_ID_ARMS))
 		bError = true;
-	if (!MakeSurface_File("ItemImage", 8))
+	if (!MakeSurface_File("ItemImage", SURFACE_ID_ITEM_IMAGE))
 		bError = true;
-	if (!MakeSurface_File("StageImage", 14))
+	if (!MakeSurface_File("StageImage", SURFACE_ID_STAGE_ITEM))
 		bError = true;
-	if (!MakeSurface_File("Npc/NpcSym", 20))
+	if (!MakeSurface_File("Npc/NpcSym", SURFACE_ID_NPC_SYM))
 		bError = true;
-	if (!MakeSurface_File("Npc/NpcRegu", 23))
+	if (!MakeSurface_File("Npc/NpcRegu", SURFACE_ID_NPC_REGU))
 		bError = true;
-	if (!MakeSurface_File("TextBox", 26))
+	if (!MakeSurface_File("TextBox", SURFACE_ID_TEXT_BOX))
 		bError = true;
-	if (!MakeSurface_File("Caret", 19))
+	if (!MakeSurface_File("Caret", SURFACE_ID_CARET))
 		bError = true;
-	if (!MakeSurface_File("Bullet", 17))
+	if (!MakeSurface_File("Bullet", SURFACE_ID_BULLET))
 		bError = true;
-	if (!MakeSurface_File("Face", 27))
+	if (!MakeSurface_File("Face", SURFACE_ID_FACE))
 		bError = true;
-	if (!MakeSurface_File("Fade", 6))
+	if (!MakeSurface_File("Fade", SURFACE_ID_FADE))
 		bError = true;
-	if (!MakeSurface_File("CREDIT01", 36))
+	if (!MakeSurface_File("CREDIT01", SURFACE_ID_CREDITS_IMAGE))
 		bError = true;
 	
 	if (bError)
@@ -190,10 +190,10 @@ bool LoadGenericData()
 		MakeSurface_Generic(WINDOW_WIDTH, WINDOW_HEIGHT, SURFACE_ID_SCREEN_GRAB);
 		MakeSurface_Generic(WINDOW_WIDTH, WINDOW_HEIGHT, SURFACE_ID_LEVEL_BACKGROUND);
 		MakeSurface_Generic(WINDOW_WIDTH, WINDOW_HEIGHT, SURFACE_ID_MAP);
-		MakeSurface_Generic(WINDOW_WIDTH, WINDOW_HEIGHT, 37); //Unknown?
+		MakeSurface_Generic(WINDOW_WIDTH, WINDOW_HEIGHT, SURFACE_ID_CASTS);
 		MakeSurface_Generic(256, 256, SURFACE_ID_LEVEL_TILESET);
 		MakeSurface_Generic(160, 16, SURFACE_ID_ROOM_NAME);
-		MakeSurface_Generic(40, 240, 29); //Unknown?
+		MakeSurface_Generic(40, 240, SURFACE_ID_VALUE_VIEW);
 		MakeSurface_Generic(320, 240, SURFACE_ID_LEVEL_SPRITESET_1);
 		MakeSurface_Generic(320, 240, SURFACE_ID_LEVEL_SPRITESET_2);
 		MakeSurface_Generic(WINDOW_WIDTH, 16 * MAX_STRIP, SURFACE_ID_CREDIT_CAST);
