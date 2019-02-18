@@ -53,7 +53,7 @@ BOOL InitTextScript2()
 
 	//Create line surfaces
 	for (int i = 0; i < 4; i++)
-		MakeSurface_Generic(gRect_line.right, gRect_line.bottom, i + 30);
+		MakeSurface_Generic(gRect_line.right, gRect_line.bottom, (Surface_Ids)(i + SURFACE_ID_TEXT_LINE1));
 
 	//Clear text
 	memset(text, 0, sizeof(text));
@@ -216,7 +216,7 @@ BOOL StartTextScript(int no)
 	for (int i = 0; i < 4; i++)
 	{
 		gTS.ypos_line[i] = 16 * i;
-		CortBox2(&gRect_line, 0x000000, i + 30);
+		CortBox2(&gRect_line, 0x000000, (Surface_Ids)(i + SURFACE_ID_TEXT_LINE1));
 		memset(&text[i * 0x40], 0, 0x40);
 	}*/
 
@@ -265,7 +265,7 @@ BOOL JumpTextScript(int no)
 	for (int i = 0; i < 4; i++)
 	{
 		gTS.ypos_line[i] = 16 * i;
-		CortBox2(&gRect_line, 0x000000, i + 30);
+		CortBox2(&gRect_line, 0x000000, (Surface_Ids)(i + SURFACE_ID_TEXT_LINE1));
 		memset(&text[i * 0x40], 0, 0x40);
 	}
 
@@ -317,7 +317,7 @@ void CheckNewLine()
 	{
 		gTS.mode = 3;
 		g_GameFlags |= 4;
-		CortBox2(&gRect_line, 0, gTS.line % 4 + 30);
+		CortBox2(&gRect_line, 0, (Surface_Ids)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
 		memset(&text[gTS.line % 4 * 0x40], 0, 0x40);
 	}
 }
@@ -357,7 +357,7 @@ void SetNumberTextScript(int index)
 	str[offset + 1] = 0;
 
 	//Append number to line
-	PutText2(6 * gTS.p_write, 0, str, 0xFFFFFE, gTS.line % 4 + 30);
+	PutText2(6 * gTS.p_write, 0, str, 0xFFFFFE, (Surface_Ids)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
 	strcat(&text[gTS.line % 4 * 0x40], str);
 
 	//Play sound and reset blinking cursor
@@ -385,7 +385,7 @@ void ClearTextLine()
 	for (int i = 0; i < 4; i++)
 	{
 		gTS.ypos_line[i] = 16 * i;
-		CortBox2(&gRect_line, 0x000000, i + 30);
+		CortBox2(&gRect_line, 0x000000, (Surface_Ids)(i + SURFACE_ID_TEXT_LINE1));
 		memset(&text[i * 0x40], 0, 0x40);
 	}
 }
@@ -418,11 +418,11 @@ void PutTextScript()
 		RECT rcFrame2 = {0, 8, 244, 16};
 		RECT rcFrame3 = {0, 16, 244, 24};
 
-		PutBitmap3(&grcFull, WINDOW_WIDTH / 2 - 122, gTS.rcText.top - 10, &rcFrame1, 26);
+		PutBitmap3(&grcFull, WINDOW_WIDTH / 2 - 122, gTS.rcText.top - 10, &rcFrame1, SURFACE_ID_TEXT_BOX);
 		int i;
 		for (i = 1; i < 7; i++)
-			PutBitmap3(&grcFull, WINDOW_WIDTH / 2 - 122, 8 * i + gTS.rcText.top - 10, &rcFrame2, 26);
-		PutBitmap3(&grcFull, WINDOW_WIDTH / 2 - 122, 8 * i + gTS.rcText.top - 10, &rcFrame3, 26);
+			PutBitmap3(&grcFull, WINDOW_WIDTH / 2 - 122, 8 * i + gTS.rcText.top - 10, &rcFrame2, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&grcFull, WINDOW_WIDTH / 2 - 122, 8 * i + gTS.rcText.top - 10, &rcFrame3, SURFACE_ID_TEXT_BOX);
 	}
 
 	//Draw face picture
@@ -434,7 +434,7 @@ void PutTextScript()
 
 	if (gTS.face_x < (TEXT_LEFT * 0x200))
 		gTS.face_x += 0x1000;
-	PutBitmap3(&gTS.rcText, gTS.face_x / 0x200, gTS.rcText.top - 3, &rcFace, 27);
+	PutBitmap3(&gTS.rcText, gTS.face_x / 0x200, gTS.rcText.top - 3, &rcFace, SURFACE_ID_FACE);
 
 	//Draw text
 	int text_offset;
@@ -444,7 +444,7 @@ void PutTextScript()
 		text_offset = 0;
 
 	for (int i = 0; i < 4; i++)
-		PutBitmap3(&gTS.rcText, text_offset + TEXT_LEFT, gTS.offsetY + gTS.ypos_line[i] + gTS.rcText.top, &gRect_line, i + 30);
+		PutBitmap3(&gTS.rcText, text_offset + TEXT_LEFT, gTS.offsetY + gTS.ypos_line[i] + gTS.rcText.top, &gRect_line, (Surface_Ids)(i + SURFACE_ID_TEXT_LINE1));
 
 	//Draw NOD cursor
 	if ((gTS.wait_beam++ % 20 > 12) && gTS.mode == 2)
@@ -466,12 +466,12 @@ void PutTextScript()
 
 	if (gTS.item)
 	{
-		PutBitmap3(&grcFull, (WINDOW_WIDTH - 80) / 2, WINDOW_HEIGHT - 112, &rcItemBox1, 26);
-		PutBitmap3(&grcFull, (WINDOW_WIDTH - 80) / 2, WINDOW_HEIGHT - 96, &rcItemBox2, 26);
-		PutBitmap3(&grcFull, (WINDOW_WIDTH + 64) / 2, WINDOW_HEIGHT - 112, &rcItemBox3, 26);
-		PutBitmap3(&grcFull, (WINDOW_WIDTH + 64) / 2, WINDOW_HEIGHT - 104, &rcItemBox4, 26);
-		PutBitmap3(&grcFull, (WINDOW_WIDTH + 64) / 2, WINDOW_HEIGHT - 96, &rcItemBox4, 26);
-		PutBitmap3(&grcFull, (WINDOW_WIDTH + 64) / 2, WINDOW_HEIGHT - 88, &rcItemBox5, 26);
+		PutBitmap3(&grcFull, (WINDOW_WIDTH - 80) / 2, WINDOW_HEIGHT - 112, &rcItemBox1, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&grcFull, (WINDOW_WIDTH - 80) / 2, WINDOW_HEIGHT - 96, &rcItemBox2, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&grcFull, (WINDOW_WIDTH + 64) / 2, WINDOW_HEIGHT - 112, &rcItemBox3, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&grcFull, (WINDOW_WIDTH + 64) / 2, WINDOW_HEIGHT - 104, &rcItemBox4, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&grcFull, (WINDOW_WIDTH + 64) / 2, WINDOW_HEIGHT - 96, &rcItemBox4, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&grcFull, (WINDOW_WIDTH + 64) / 2, WINDOW_HEIGHT - 88, &rcItemBox5, SURFACE_ID_TEXT_BOX);
 
 		if (gTS.item_y < WINDOW_HEIGHT - 104)
 			++gTS.item_y;
@@ -483,7 +483,7 @@ void PutTextScript()
 			rect.right = rect.left + 16;
 			rect.top = 16 * (gTS.item / 16);
 			rect.bottom = rect.top + 16;
-			PutBitmap3(&grcFull, (WINDOW_WIDTH - 24) / 2, gTS.item_y, &rect, 12);
+			PutBitmap3(&grcFull, (WINDOW_WIDTH - 24) / 2, gTS.item_y, &rect, SURFACE_ID_ARMS_IMAGE);
 		}
 		else
 		{
@@ -491,7 +491,7 @@ void PutTextScript()
 			rect.right = rect.left + 32;
 			rect.top = 16 * ((gTS.item - 1000) / 8);
 			rect.bottom = rect.top + 16;
-			PutBitmap3(&grcFull, (WINDOW_WIDTH - 40) / 2, gTS.item_y, &rect, 8);
+			PutBitmap3(&grcFull, (WINDOW_WIDTH - 40) / 2, gTS.item_y, &rect, SURFACE_ID_ITEM_IMAGE);
 		}
 	}
 
@@ -507,9 +507,9 @@ void PutTextScript()
 		else
 			i = WINDOW_HEIGHT - 96;
 
-		PutBitmap3(&grcFull, (WINDOW_WIDTH + 112) / 2, i, &rect_yesno, 26);
+		PutBitmap3(&grcFull, (WINDOW_WIDTH + 112) / 2, i, &rect_yesno, SURFACE_ID_TEXT_BOX);
 		if (gTS.wait == 16)
-			PutBitmap3(&grcFull, 41 * gTS.select + (WINDOW_WIDTH + 102) / 2, WINDOW_HEIGHT - 86, &rect_cur, 26);
+			PutBitmap3(&grcFull, 41 * gTS.select + (WINDOW_WIDTH + 102) / 2, WINDOW_HEIGHT - 86, &rect_cur, SURFACE_ID_TEXT_BOX);
 	}
 }
 
@@ -1233,7 +1233,7 @@ int TextScriptProc()
 						gTS.p_write = x;
 
 						//Print text
-						PutText2(0, 0, str, 0xFFFFFE, gTS.line % 4 + 30);
+						PutText2(0, 0, str, 0xFFFFFE, (Surface_Ids)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
 						sprintf(&text[gTS.line % 4 * 0x40], str);
 
 						//Check if should move to next line (prevent a memory overflow, come on guys, this isn't a leftover of pixel trying to make text wrapping)
@@ -1263,11 +1263,11 @@ int TextScriptProc()
 						//Print text
 						if (c[0] == '=')
 						{
-							Surface2Surface(6 * gTS.p_write, 2, &rcSymbol, gTS.line % 4 + 30, 26);
+							Surface2Surface(6 * gTS.p_write, 2, &rcSymbol, (Surface_Ids)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1), SURFACE_ID_TEXT_BOX);
 						}
 						else
 						{
-							PutText2(6 * gTS.p_write, 0, c, 0xFFFFFE, gTS.line % 4 + 30);
+							PutText2(6 * gTS.p_write, 0, c, 0xFFFFFE, (Surface_Ids)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
 						}
 
 						strcat(&text[gTS.line % 4 * 0x40], c);

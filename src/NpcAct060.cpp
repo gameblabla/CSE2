@@ -367,7 +367,7 @@ void ActNpc061(NPCHAR *npc)
 					SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
 
 				npc->act_no = 50;
-				npc->surf = 20;
+				npc->surf = SURFACE_ID_NPC_SYM;
 				npc->ani_no = 10;
 			}
 

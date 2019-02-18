@@ -352,14 +352,14 @@ int ModeTitle()
 		PutNumber4((WINDOW_WIDTH + 56) / 2, WINDOW_HEIGHT - 24, v4, 0);
 		
 		//Draw main title
-		PutBitmap3(&grcGame, (WINDOW_WIDTH - 144) / 2, 40, &rcTitle, 0);
-		PutBitmap3(&grcGame, (WINDOW_WIDTH - 48) / 2, (WINDOW_HEIGHT + 16) / 2, &rcNew, 0);
-		PutBitmap3(&grcGame, (WINDOW_WIDTH - 48) / 2, (WINDOW_HEIGHT + 56) / 2, &rcContinue, 0);
-		PutBitmap3(&grcGame, (WINDOW_WIDTH - 160) / 2, WINDOW_HEIGHT - 48, &rcPixel, 1);
+		PutBitmap3(&grcGame, (WINDOW_WIDTH - 144) / 2, 40, &rcTitle, SURFACE_ID_TITLE);
+		PutBitmap3(&grcGame, (WINDOW_WIDTH - 48) / 2, (WINDOW_HEIGHT + 16) / 2, &rcNew, SURFACE_ID_TITLE);
+		PutBitmap3(&grcGame, (WINDOW_WIDTH - 48) / 2, (WINDOW_HEIGHT + 56) / 2, &rcContinue, SURFACE_ID_TITLE);
+		PutBitmap3(&grcGame, (WINDOW_WIDTH - 160) / 2, WINDOW_HEIGHT - 48, &rcPixel, SURFACE_ID_PIXEL);
 		
 		//Draw character cursor
 		RECT char_rc;
-		int char_surf;
+		Surface_Ids char_surf;
 		
 		switch ( char_type )
 		{
@@ -530,7 +530,7 @@ int ModeAction()
 				//Open inventory
 				if (gKeyTrg & gKeyItem)
 				{
-					BackupSurface(10, &grcGame);
+					BackupSurface(SURFACE_ID_SCREEN_GRAB, &grcGame);
 					
 					switch (CampLoop())
 					{
@@ -544,7 +544,7 @@ int ModeAction()
 				}
 				else if (gMC.equip & 2 && gKeyTrg & gKeyMap)
 				{
-					BackupSurface(10, &grcGame);
+					BackupSurface(SURFACE_ID_SCREEN_GRAB, &grcGame);
 					
 					switch (MiniMapLoop())
 					{
