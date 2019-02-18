@@ -1,3 +1,5 @@
+#include "Map.h"
+
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -6,11 +8,10 @@
 #include "WindowsWrapper.h"
 
 #include "CommonDefines.h"
-#include "Map.h"
-#include "Tags.h"
 #include "Draw.h"
-#include "NpChar.h"
 #include "File.h"
+#include "NpChar.h"
+#include "Tags.h"
 
 #define PXM_BUFFER_SIZE 0x4B000
 

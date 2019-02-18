@@ -1,16 +1,16 @@
-#include "WindowsWrapper.h"
-
 #include "NpcAct.h"
 
+#include "WindowsWrapper.h"
+
+#include "Back.h"
+#include "Boss.h"
+#include "Frame.h"
+#include "Game.h"
+#include "Map.h"
 #include "MyChar.h"
 #include "NpChar.h"
-#include "Game.h"
 #include "Sound.h"
-#include "Back.h"
 #include "Triangle.h"
-#include "Frame.h"
-#include "Map.h"
-#include "Boss.h"
 
 //Sue (being teleported by Misery)
 void ActNpc280(NPCHAR *npc)

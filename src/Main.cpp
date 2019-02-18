@@ -1,25 +1,27 @@
+#include "Main.h"
+
 #include <stddef.h>
-#include "Types.h"
-#include "CommonDefines.h"
 #include <stdint.h>
-#include <string>
+#include <string.h>
 
 #include <SDL.h>
+
 #include "WindowsWrapper.h"
 
+#include "CommonDefines.h"
+#include "Config.h"
 #include "Draw.h"
-#include "Input.h"
-#include "Profile.h"
-#include "Organya.h"
-#include "Sound.h"
 #include "Game.h"
 #include "Generic.h"
-#include "MyChar.h"
-#include "Main.h"
-#include "Config.h"
+#include "Input.h"
 #include "KeyControl.h"
-#include "Triangle.h"
+#include "MyChar.h"
+#include "Organya.h"
+#include "Profile.h"
 #include "Resource.h"
+#include "Sound.h"
+#include "Triangle.h"
+#include "Types.h"
 
 // These two are defined in Draw.cpp. This is a bit of a hack.
 extern SDL_Window *gWindow;

@@ -1,4 +1,5 @@
 #pragma once
+
 struct PERMIT_STAGE
 {
 	int index;

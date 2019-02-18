@@ -1,4 +1,5 @@
 #pragma once
+
 enum KEYBIND
 {
 	//The movement keys go in the order of left, right, up and down

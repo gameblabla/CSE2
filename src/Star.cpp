@@ -1,11 +1,13 @@
+#include "Star.h"
+
 #include <string.h>
 
 #include "WindowsWrapper.h"
 
-#include "MyChar.h"
-#include "Draw.h"
 #include "Bullet.h"
+#include "Draw.h"
 #include "Game.h"
+#include "MyChar.h"
 
 static struct
 {

@@ -1,18 +1,18 @@
-#include "WindowsWrapper.h"
-
 #include "NpcAct.h"
 
+#include "WindowsWrapper.h"
+
+#include "Back.h"
+#include "Bullet.h"
+#include "Caret.h"
+#include "Frame.h"
+#include "Game.h"
+#include "KeyControl.h"
+#include "Map.h"
 #include "MyChar.h"
 #include "NpChar.h"
-#include "Game.h"
 #include "Sound.h"
-#include "Back.h"
 #include "Triangle.h"
-#include "Frame.h"
-#include "Map.h"
-#include "Caret.h"
-#include "Bullet.h"
-#include "KeyControl.h"
 
 //Curly (carried, shooting)
 void ActNpc320(NPCHAR *npc)

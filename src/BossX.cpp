@@ -1,5 +1,7 @@
 #include "BossX.h"
 
+#include "WindowsWrapper.h"
+
 #include "Boss.h"
 #include "Flash.h"
 #include "Frame.h"
@@ -8,7 +10,6 @@
 #include "NpChar.h"
 #include "Sound.h"
 #include "Triangle.h"
-#include "WindowsWrapper.h"
 
 static void ActBossChar03_01(NPCHAR *npc)
 {

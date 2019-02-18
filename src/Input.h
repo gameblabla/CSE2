@@ -1,4 +1,5 @@
 #pragma once
+
 extern bool gbUseJoystick;
 extern int gJoystickButtonTable[8];
 

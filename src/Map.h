@@ -1,4 +1,5 @@
 #pragma once
+
 #include <stdint.h>
 
 struct MAP_DATA

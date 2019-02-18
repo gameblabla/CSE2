@@ -1,5 +1,7 @@
 #include "BossAlmo2.h"
 
+#include "WindowsWrapper.h"
+
 #include "Boss.h"
 #include "Flash.h"
 #include "Frame.h"
@@ -9,7 +11,6 @@
 #include "NpChar.h"
 #include "Sound.h"
 #include "Triangle.h"
-#include "WindowsWrapper.h"
 
 static void ActBossCharA_Head(NPCHAR *npc)
 {

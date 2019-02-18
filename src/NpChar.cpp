@@ -1,3 +1,5 @@
+#include "NpChar.h"
+
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -5,19 +7,18 @@
 
 #include "WindowsWrapper.h"
 
-#include "CommonDefines.h"
-#include "Tags.h"
-#include "NpChar.h"
-#include "Caret.h"
-#include "MyChar.h"
-#include "Game.h"
 #include "ArmsItem.h"
-#include "Flags.h"
-#include "Sound.h"
-#include "ValueView.h"
-#include "NpcTbl.h"
+#include "CommonDefines.h"
+#include "Caret.h"
 #include "Draw.h"
 #include "File.h"
+#include "Flags.h"
+#include "Game.h"
+#include "MyChar.h"
+#include "NpcTbl.h"
+#include "Sound.h"
+#include "Tags.h"
+#include "ValueView.h"
 
 NPCHAR gNPC[NPC_MAX];
 int gCurlyShoot_wait;

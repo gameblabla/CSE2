@@ -4,11 +4,11 @@
 
 #include "Draw.h"
 #include "Caret.h"
-#include "NpChar.h"
-#include "MyChar.h"
-#include "Sound.h"
 #include "Game.h"
 #include "KeyControl.h"
+#include "MyChar.h"
+#include "NpChar.h"
+#include "Sound.h"
 
 BULLET_TABLE gBulTbl[46] =
 {

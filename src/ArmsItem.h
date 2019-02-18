@@ -1,4 +1,5 @@
 #pragma once
+
 struct ARMS
 {
 	int code;

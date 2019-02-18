@@ -1,8 +1,10 @@
+#include "GenericLoad.h"
+
 #include "CommonDefines.h"
 #include "Draw.h"
-#include "Sound.h"
-#include "PixTone.h"
 #include "Ending.h"
+#include "PixTone.h"
+#include "Sound.h"
 
 static const PIXTONEPARAMETER gPtpTable[139] =
 {

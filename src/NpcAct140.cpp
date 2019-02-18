@@ -1,18 +1,18 @@
-#include "WindowsWrapper.h"
-
 #include "NpcAct.h"
 
-#include "MyChar.h"
-#include "NpChar.h"
-#include "Game.h"
-#include "Sound.h"
+#include "WindowsWrapper.h"
+
 #include "Back.h"
-#include "Triangle.h"
+#include "Bullet.h"
 #include "Caret.h"
+#include "CommonDefines.h"
 #include "Frame.h"
 #include "Flash.h"
-#include "Bullet.h"
-#include "CommonDefines.h"
+#include "Game.h"
+#include "MyChar.h"
+#include "NpChar.h"
+#include "Sound.h"
+#include "Triangle.h"
 
 //Toroko (frenzied)
 void ActNpc140(NPCHAR *npc)

@@ -5,8 +5,8 @@
 #include "WindowsWrapper.h"
 
 #include "Draw.h"
-#include "Triangle.h"
 #include "Game.h"
+#include "Triangle.h"
 
 #define CARET_MAX 0x40
 CARET gCrt[CARET_MAX];

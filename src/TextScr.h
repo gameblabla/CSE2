@@ -1,6 +1,9 @@
 #pragma once
+
 #include <stdint.h>
+
 #include "WindowsWrapper.h"
+
 #include "CommonDefines.h"
 
 struct TEXT_SCRIPT

@@ -1,21 +1,22 @@
+#include "MyChar.h"
+
 #include <stdint.h>
 #include <string.h>
 
 #include "WindowsWrapper.h"
 
-#include "MyChar.h"
-#include "MycParam.h"
 #include "ArmsItem.h"
-#include "NpChar.h"
+#include "Caret.h"
 #include "Draw.h"
-#include "Sound.h"
-#include "ValueView.h"
-#include "KeyControl.h"
-#include "TextScr.h"
 #include "Flags.h"
 #include "Game.h"
+#include "KeyControl.h"
+#include "MycParam.h"
+#include "NpChar.h"
+#include "Sound.h"
 #include "Star.h"
-#include "Caret.h"
+#include "TextScr.h"
+#include "ValueView.h"
 
 MYCHAR gMC;
 

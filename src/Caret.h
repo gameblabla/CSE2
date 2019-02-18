@@ -1,4 +1,5 @@
 #pragma once
+
 #include "WindowsWrapper.h"
 
 struct CARET_TABLE

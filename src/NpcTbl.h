@@ -1,7 +1,9 @@
 #pragma once
+
 #include <stdint.h>
-#include "NpChar.h"
+
 #include "Draw.h"
+#include "NpChar.h"
 
 struct NPC_TBL_RECT
 {

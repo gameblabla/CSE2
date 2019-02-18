@@ -1,18 +1,20 @@
+#include "MiniMap.h"
+
 #include <stdint.h>
 #include <string.h>
 
 #include "WindowsWrapper.h"
 
 #include "CommonDefines.h"
-#include "MapName.h"
 #include "Draw.h"
 #include "Escape.h"
 #include "Game.h"
 #include "KeyControl.h"
-#include "Map.h"
-#include "Stage.h"
-#include "MyChar.h"
 #include "Main.h"
+#include "Map.h"
+#include "MapName.h"
+#include "MyChar.h"
+#include "Stage.h"
 
 int8_t gMapping[0x80];
 

@@ -1,15 +1,17 @@
+#include "BossOhm.h"
+
 #include <string.h>
 
 #include "WindowsWrapper.h"
 
 #include "Boss.h"
-#include "NpChar.h"
-#include "MyChar.h"
-#include "Sound.h"
-#include "Frame.h"
 #include "Bullet.h"
 #include "Flash.h"
+#include "Frame.h"
 #include "Game.h"
+#include "MyChar.h"
+#include "NpChar.h"
+#include "Sound.h"
 
 void ActBoss01_12()
 {

@@ -2,9 +2,9 @@
 
 #include "WindowsWrapper.h"
 
-#include "ValueView.h"
-#include "Game.h"
 #include "Draw.h"
+#include "Game.h"
+#include "ValueView.h"
 
 #define VALUEVIEW_MAX 0x10
 VALUEVIEW gVV[VALUEVIEW_MAX];

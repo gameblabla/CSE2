@@ -1,5 +1,7 @@
 #include "BossFrog.h"
 
+#include "WindowsWrapper.h"
+
 #include "Boss.h"
 #include "Frame.h"
 #include "Game.h"
@@ -7,7 +9,6 @@
 #include "NpChar.h"
 #include "Sound.h"
 #include "Triangle.h"
-#include "WindowsWrapper.h"
 
 static void ActBossChar02_01(void)
 {

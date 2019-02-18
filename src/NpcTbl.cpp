@@ -1,11 +1,12 @@
+#include "NpcTbl.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "NpcTbl.h"
-#include "NpcAct.h"
 #include "File.h"
 #include "Generic.h"
+#include "NpcAct.h"
 
 NPC_TABLE *gNpcTable;
 

@@ -1,5 +1,7 @@
 #pragma once
+
 #include <stdint.h>
+
 extern uint8_t gFlagNPC[1000];
 extern uint8_t gSkipFlag[0x40];
 

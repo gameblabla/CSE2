@@ -1,4 +1,5 @@
 #pragma once
+
 #include <stdint.h>
 
 //Below are Organya song data structures

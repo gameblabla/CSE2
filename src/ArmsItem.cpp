@@ -1,15 +1,16 @@
+#include "ArmsItem.h"
+
 #include <string.h>
 
 #include "CommonDefines.h"
-#include "TextScr.h"
-#include "ArmsItem.h"
 #include "Draw.h"
-#include "KeyControl.h"
 #include "Escape.h"
-#include "Sound.h"
-#include "Main.h"
 #include "Game.h"
+#include "KeyControl.h"
+#include "Main.h"
 #include "Shoot.h"
+#include "Sound.h"
+#include "TextScr.h"
 
 int gArmsEnergyX = 16;
 
@@ -417,7 +418,7 @@ bool CheckItem(int a)
 
 bool CheckArms(int a)
 {
-  for (int i = 0; i < ARMS_MAX; i++)
+	for (int i = 0; i < ARMS_MAX; i++)
 	{
 		if (gArmsData[i].code == a)
 			return true;
@@ -458,7 +459,7 @@ void FullArmsEnergy()
 int RotationArms()
 {
 	int arms_num;
-	for ( arms_num = 0; gArmsData[arms_num].code != 0; arms_num++);
+	for (arms_num = 0; gArmsData[arms_num].code != 0; arms_num++);
 	if (!arms_num)
 		return 0;
 	

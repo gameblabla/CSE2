@@ -1,4 +1,5 @@
 #pragma once
+
 #include "CommonDefines.h"
 
 extern char gModulePath[PATH_LENGTH];

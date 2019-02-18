@@ -1,11 +1,12 @@
-#include "ArmsItem.h"
-#include "MycParam.h"
 #include "Shoot.h"
-#include "Caret.h"
+
+#include "ArmsItem.h"
 #include "Bullet.h"
-#include "Sound.h"
-#include "MyChar.h"
+#include "Caret.h"
 #include "KeyControl.h"
+#include "MyChar.h"
+#include "MycParam.h"
+#include "Sound.h"
 
 int empty;
 int spur_charge;

@@ -1,15 +1,15 @@
-#include "WindowsWrapper.h"
-
 #include "NpcAct.h"
 
+#include "WindowsWrapper.h"
+
+#include "Back.h"
+#include "Caret.h"
+#include "Game.h"
+#include "Frame.h"
 #include "MyChar.h"
 #include "NpChar.h"
-#include "Game.h"
 #include "Sound.h"
-#include "Back.h"
 #include "Triangle.h"
-#include "Caret.h"
-#include "Frame.h"
 
 //Computer
 void ActNpc020(NPCHAR *npc)

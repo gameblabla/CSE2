@@ -1,18 +1,19 @@
+#include "MycParam.h"
+
 #include "SDL.h"
 
-#include "Sound.h"
-#include "MyChar.h"
-#include "MycParam.h"
-#include "NpChar.h"
-#include "CommonDefines.h"
-#include "Tags.h"
 #include "ArmsItem.h"
-#include "ValueView.h"
-#include "TextScr.h"
-#include "Game.h"
-#include "Draw.h"
+#include "CommonDefines.h"
 #include "Caret.h"
+#include "Draw.h"
+#include "Game.h"
 #include "File.h"
+#include "MyChar.h"
+#include "NpChar.h"
+#include "Sound.h"
+#include "Tags.h"
+#include "TextScr.h"
+#include "ValueView.h"
 
 ARMS_LEVEL gArmsLevelTable[14] =
 {

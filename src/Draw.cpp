@@ -1,8 +1,6 @@
 #include <stddef.h>
-#include "Types.h"
-#include "CommonDefines.h"
-#include <stdio.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #ifdef WINDOWS
 #define RECT WINRECT
@@ -22,10 +20,12 @@
 
 #include "WindowsWrapper.h"
 
+#include "CommonDefines.h"
 #include "Draw.h"
 #include "Font.h"
-#include "Tags.h"
 #include "Resource.h"
+#include "Tags.h"
+#include "Types.h"
 
 struct SURFACE
 {

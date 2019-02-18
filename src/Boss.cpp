@@ -1,9 +1,10 @@
+#include "Boss.h"
+
 #include <stdint.h>
 #include <string.h>
 
 #include "WindowsWrapper.h"
 
-#include "Boss.h"
 #include "BossAlmo1.h"
 #include "BossAlmo2.h"
 #include "BossBallos.h"
@@ -13,16 +14,16 @@
 #include "BossPress.h"
 #include "BossTwinD.h"
 #include "BossX.h"
-#include "NpChar.h"
-#include "MyChar.h"
-#include "Sound.h"
-#include "NpcHit.h"
+#include "Bullet.h"
 #include "Caret.h"
-#include "TextScr.h"
-#include "ValueView.h"
 #include "Draw.h"
 #include "Map.h"
-#include "Bullet.h"
+#include "MyChar.h"
+#include "NpChar.h"
+#include "NpcHit.h"
+#include "Sound.h"
+#include "TextScr.h"
+#include "ValueView.h"
 
 NPCHAR gBoss[BOSS_MAX];
 

@@ -7,17 +7,17 @@
 
 #include "WindowsWrapper.h"
 
-#include "Tags.h"
-#include "Generic.h"
-#include "Flags.h"
-#include "KeyControl.h"
-#include "Escape.h"
-#include "Organya.h"
-#include "MycParam.h"
-#include "Main.h"
-#include "Stage.h"
 #include "Draw.h"
+#include "Escape.h"
+#include "Flags.h"
+#include "Generic.h"
+#include "KeyControl.h"
+#include "Main.h"
+#include "MycParam.h"
+#include "Organya.h"
+#include "Stage.h"
 #include "TextScr.h"
+#include "Tags.h"
 
 CREDIT Credit;
 STRIP Strip[MAX_STRIP];

@@ -1,18 +1,18 @@
-#include "WindowsWrapper.h"
-
 #include "NpcAct.h"
 
-#include "MyChar.h"
-#include "NpChar.h"
-#include "Game.h"
-#include "Sound.h"
+#include "WindowsWrapper.h"
+
 #include "Back.h"
-#include "Triangle.h"
-#include "Frame.h"
 #include "Caret.h"
-#include "MycParam.h"
 #include "CommonDefines.h"
+#include "Frame.h"
+#include "Game.h"
+#include "MyChar.h"
+#include "MycParam.h"
+#include "NpChar.h"
 #include "NpcHit.h"
+#include "Sound.h"
+#include "Triangle.h"
 
 //Puu Black
 void ActNpc160(NPCHAR *npc)

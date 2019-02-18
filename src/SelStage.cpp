@@ -2,13 +2,14 @@
 
 #include <string.h>
 
+#include "WindowsWrapper.h"
+
 #include "Draw.h"
 #include "Escape.h"
 #include "KeyControl.h"
 #include "Main.h"
-#include "TextScr.h"
 #include "Sound.h"
-#include "WindowsWrapper.h"
+#include "TextScr.h"
 
 PERMIT_STAGE gPermitStage[8];
 

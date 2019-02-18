@@ -1,17 +1,17 @@
-#include "WindowsWrapper.h"
-
 #include "NpcAct.h"
 
-#include "MyChar.h"
-#include "NpChar.h"
-#include "Game.h"
-#include "Sound.h"
+#include "WindowsWrapper.h"
+
 #include "Back.h"
-#include "Triangle.h"
 #include "Caret.h"
+#include "CommonDefines.h"
 #include "Flash.h"
 #include "Frame.h"
-#include "CommonDefines.h"
+#include "Game.h"
+#include "MyChar.h"
+#include "NpChar.h"
+#include "Sound.h"
+#include "Triangle.h"
 
 //Gravekeeper
 void ActNpc080(NPCHAR *npc)

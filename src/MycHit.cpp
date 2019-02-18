@@ -1,18 +1,20 @@
+#include "MycHit.h"
+
 #include <stdint.h>
 
 #include "WindowsWrapper.h"
 
-#include "MyChar.h"
-#include "NpChar.h"
-#include "Map.h"
-#include "Sound.h"
-#include "Caret.h"
-#include "Boss.h"
 #include "Back.h"
+#include "Boss.h"
+#include "Caret.h"
 #include "Game.h"
-#include "TextScr.h"
-#include "MycParam.h"
 #include "KeyControl.h"
+#include "Map.h"
+#include "MyChar.h"
+#include "MycParam.h"
+#include "NpChar.h"
+#include "Sound.h"
+#include "TextScr.h"
 
 void ResetMyCharFlag()
 {
