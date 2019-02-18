@@ -294,6 +294,7 @@ void ActNpc002(NPCHAR *npc)
 			if (npc->ani_no > 6)
 			{
 				npc->ani_no = 5;
+				// These three lines are missing in the Linux port. Could this be because it's based on an older version?
 				PlaySoundObject(26, 1);
 				SetNpChar(4, npc->x, npc->y + 0x600, 0, 0, 0, 0, 0x100);
 				SetQuake(8);
