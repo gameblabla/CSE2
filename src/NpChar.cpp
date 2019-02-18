@@ -36,7 +36,7 @@ void InitNpChar()
 void SetUniqueParameter(NPCHAR *npc)
 {
 	int code = npc->code_char;
-	npc->surf = gNpcTable[code].surf;
+	npc->surf = (Surface_Ids)gNpcTable[code].surf;
 	npc->hit_voice = gNpcTable[code].hit_voice;
 	npc->destroy_voice = gNpcTable[code].destroy_voice;
 	npc->damage = gNpcTable[code].damage;
@@ -348,7 +348,7 @@ void PutNpChar(int fx, int fy)
 				(gNPC[n].x - side) / 0x200 - fx / 0x200 + a,
 				(gNPC[n].y - gNPC[n].view.top) / 0x200 - fy / 0x200,
 				&gNPC[n].rect,
-				gNPC[n].surf);
+				(Surface_Ids)gNPC[n].surf);
 		}
 	}
 }
