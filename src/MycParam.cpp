@@ -1,3 +1,5 @@
+#include "SDL.h"
+
 #include "Sound.h"
 #include "MyChar.h"
 #include "MycParam.h"

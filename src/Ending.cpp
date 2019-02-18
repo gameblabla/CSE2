@@ -1,11 +1,14 @@
+#include "Ending.h"
+
 #include <stdint.h>
-#include <string>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "WindowsWrapper.h"
 
 #include "Tags.h"
 #include "Generic.h"
-#include "Ending.h"
 #include "Flags.h"
 #include "KeyControl.h"
 #include "Escape.h"

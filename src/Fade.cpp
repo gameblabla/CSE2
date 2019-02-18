@@ -1,4 +1,4 @@
-#include <string>
+#include <string.h>
 
 #include "WindowsWrapper.h"
 

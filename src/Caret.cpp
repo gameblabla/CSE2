@@ -1,8 +1,9 @@
-#include <string>
+#include "Caret.h"
+
+#include <string.h>
 
 #include "WindowsWrapper.h"
 
-#include "Caret.h"
 #include "Draw.h"
 #include "Triangle.h"
 #include "Game.h"

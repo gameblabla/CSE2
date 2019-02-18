@@ -21,13 +21,14 @@
 #include "Triangle.h"
 #include "Resource.h"
 
+// These two are defined in Draw.cpp. This is a bit of a hack.
+extern SDL_Window *gWindow;
+extern SDL_Renderer *gRenderer;
+
 char gModulePath[PATH_LENGTH];
 char gDataPath[PATH_LENGTH];
 
 int gJoystickButtonTable[8];
-
-SDL_Window *gWindow;
-SDL_Renderer *gRenderer;
 
 bool gbUseJoystick = false;
 bool bFps = false;

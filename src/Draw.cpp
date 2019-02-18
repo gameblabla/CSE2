@@ -27,6 +27,17 @@
 #include "Tags.h"
 #include "Resource.h"
 
+struct SURFACE
+{
+	bool in_use;
+	bool needs_updating;
+	SDL_Surface *surface;
+	SDL_Texture *texture;
+};
+
+SDL_Window *gWindow;
+SDL_Renderer *gRenderer;
+
 RECT grcGame = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 RECT grcFull = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 

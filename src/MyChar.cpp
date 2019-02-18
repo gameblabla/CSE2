@@ -1,5 +1,5 @@
-#include <string>
 #include <stdint.h>
+#include <string.h>
 
 #include "WindowsWrapper.h"
 

@@ -1,10 +1,6 @@
 #pragma once
 #include <stdint.h>
 #include "WindowsWrapper.h"
-#include <SDL_render.h>
-
-extern SDL_Window *gWindow;
-extern SDL_Renderer *gRenderer;
 
 extern RECT grcGame;
 extern RECT grcFull;
@@ -48,13 +44,7 @@ typedef enum Surface_Ids
 	SURFACE_ID_MAX = 40,
 } Surface_Ids;
 
-struct SURFACE
-{
-	bool in_use;
-	bool needs_updating;
-	SDL_Surface *surface;
-	SDL_Texture *texture;
-};
+struct SURFACE;
 
 extern SURFACE surf[SURFACE_ID_MAX];
 

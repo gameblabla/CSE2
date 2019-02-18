@@ -1,12 +1,15 @@
+#include "Back.h"
+
+#include <stdio.h>
 #include "WindowsWrapper.h"
 
 #include "Tags.h"
-#include "Back.h"
 #include "Frame.h"
 #include "Game.h"
 #include "Draw.h"
 #include "Stage.h"
 #include "Map.h"
+#include "File.h"
 
 BACK gBack;
 int gWaterY;
@@ -16,21 +19,48 @@ bool InitBack(char *fName, int type)
 	//Get width and height
 	char path[PATH_LENGTH];
 	sprintf(path, "%s/%s.pbm", gDataPath, fName);
-	
-	SDL_Surface *temp = SDL_LoadBMP(path);
-	if (!temp)
+
+	FILE *fp = fopen(path, "rb");
+	if (fp == NULL)
 	{
 		sprintf(path, "%s/%s.bmp", gDataPath, fName);
-		temp = SDL_LoadBMP(path);
-		if (!temp)
+		fp = fopen(path, "rb");
+		if (fp == NULL)
 			return false;
 	}
 
-	gBack.partsW = temp->w;
-	gBack.partsH = temp->h;
-	
-	SDL_FreeSurface(temp);
-	
+#ifdef FIX_BUGS	// TODO: Maybe we need a 'BETTER_PORTABILITY' flag
+	if (fgetc(fp) != 'B' || fgetc(fp) != 'M')
+	{
+		fclose(fp);
+		return false;
+	}
+
+	fseek(fp, 18, SEEK_SET);
+
+	gBack.partsW = File_ReadLE32(fp);
+	gBack.partsH = File_ReadLE32(fp);
+	fclose(fp);
+#else
+	// This is ridiculously platform-dependant:
+	// It should break on big-endian CPUs, and platforms
+	// where short isn't 16-bit and long isn't 32-bit.
+	short bmp_header_buffer[7];
+	long bmp_header_buffer2[10];
+
+	fread(bmp_header_buffer, 14, 1, fp);
+
+	// Check if this is a valid bitmap file
+	if (bmp_header_buffer[0] != 0x4D42)	// 'MB' (we use hex to prevent a compiler warning)
+		return false;	// The original game forgets to close fp
+
+	fread(bmp_header_buffer2, 40, 1, fp);
+	fclose(fp);
+
+	gBack.partsW = bmp_header_buffer2[1];
+	gBack.partsH = bmp_header_buffer2[2];
+#endif
+
 	//Set background stuff and load texture
 	gBack.flag = 1;
 	if (!ReloadBitmap_File(fName, SURFACE_ID_LEVEL_BACKGROUND))

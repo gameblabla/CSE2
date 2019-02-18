@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <stdint.h>
-#include <string>
+#include <stdlib.h>
+#include <string.h>
 
 #include "WindowsWrapper.h"
 

@@ -1,4 +1,7 @@
 #include "Bullet.h"
+
+#include <string.h>
+
 #include "Draw.h"
 #include "Caret.h"
 #include "NpChar.h"
