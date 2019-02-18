@@ -214,14 +214,14 @@ void ActNpc002(NPCHAR *npc)
 	rcLeft[5] = {128, 0, 160, 24};
 	rcLeft[6] = {160, 0, 192, 24};
 
-	RECT rcUp[7];
-	rcUp[0] = {32, 24, 64, 48};
-	rcUp[1] = {0, 24, 32, 48};
-	rcUp[2] = {32, 24, 64, 48};
-	rcUp[3] = {64, 24, 96, 48};
-	rcUp[4] = {96, 24, 128, 48};
-	rcUp[5] = {128, 24, 160, 48};
-	rcUp[6] = {160, 24, 192, 48};
+	RECT rcRight[7];
+	rcRight[0] = {32, 24, 64, 48};
+	rcRight[1] = {0, 24, 32, 48};
+	rcRight[2] = {32, 24, 64, 48};
+	rcRight[3] = {64, 24, 96, 48};
+	rcRight[4] = {96, 24, 128, 48};
+	rcRight[5] = {128, 24, 160, 48};
+	rcRight[6] = {160, 24, 192, 48};
 
 	//Turn when touching a wall
 	if (npc->flag & 1)
@@ -231,6 +231,28 @@ void ActNpc002(NPCHAR *npc)
 
 	switch (npc->act_no)
 	{
+		case 0: //Walking
+			if (npc->direct)
+				npc->xm = 0x100;
+			else
+				npc->xm = -0x100;
+
+			if (++npc->ani_wait > 8)
+			{
+				npc->ani_wait = 0;
+				++npc->ani_no;
+			}
+
+			if (npc->ani_no > 3)
+				npc->ani_no = 0;
+
+			if (npc->shock)
+			{
+				npc->count1 = 0;
+				npc->act_no = 1;
+				npc->ani_no = 4;
+			}
+			break;
 		case 1: //Shot
 			npc->xm = 7 * npc->xm / 8;
 
@@ -270,28 +292,11 @@ void ActNpc002(NPCHAR *npc)
 			}
 
 			if (npc->ani_no > 6)
+			{
 				npc->ani_no = 5;
-			break;
-		case 0: //Walking
-			if (npc->direct)
-				npc->xm = 0x100;
-			else
-				npc->xm = -0x100;
-
-			if (++npc->ani_wait > 8)
-			{
-				npc->ani_wait = 0;
-				++npc->ani_no;
-			}
-
-			if (npc->ani_no > 3)
-				npc->ani_no = 0;
-
-			if (npc->shock)
-			{
-				npc->count1 = 0;
-				npc->act_no = 1;
-				npc->ani_no = 4;
+				PlaySoundObject(26, 1);
+				SetNpChar(4, npc->x, npc->y + 0x600, 0, 0, 0, 0, 0x100);
+				SetQuake(8);
 			}
 			break;
 	}
@@ -306,10 +311,10 @@ void ActNpc002(NPCHAR *npc)
 	npc->y += npc->ym;
 
 	//Set framerect
-	if (npc->direct)
-		npc->rect = rcUp[npc->ani_no];
-	else
+	if (npc->direct == 0)
 		npc->rect = rcLeft[npc->ani_no];
+	else
+		npc->rect = rcRight[npc->ani_no];
 }
 
 //Dead enemy (make sure damage shown doesn't teleport to a new loaded npc)
