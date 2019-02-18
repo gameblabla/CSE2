@@ -123,9 +123,15 @@ void ActNpc001(NPCHAR *npc)
 		if (npc->x <= 0x9FFF)
 			npc->cond = 0;
 
+#ifdef FIX_BUGS
+		//Limit speed
+		if (npc->xm < -0x5FF)
+			npc->xm = -0x5FF;
+#else
 		//Limit speed (except pixel applied it to the X position)
 		if (npc->x < -0x5FF)
 			npc->x = -0x5FF;
+#endif
 
 		//Bounce off walls
 		if (npc->flag & 1)
