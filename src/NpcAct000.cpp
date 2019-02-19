@@ -240,10 +240,10 @@ void ActNpc002(NPCHAR *npc)
 	switch (npc->act_no)
 	{
 		case 0: //Walking
-			if (npc->direct)
-				npc->xm = 0x100;
-			else
+			if (npc->direct == 0)
 				npc->xm = -0x100;
+			else
+				npc->xm = 0x100;
 
 			if (++npc->ani_wait > 8)
 			{
@@ -282,10 +282,10 @@ void ActNpc002(NPCHAR *npc)
 			}
 			break;
 		case 2: //Charge
-			if (npc->direct)
-				npc->xm = 0x400;
-			else
+			if (npc->direct == 0)
 				npc->xm = -0x400;
+			else
+				npc->xm = 0x400;
 
 			if (++npc->count1 > 200)
 			{
@@ -361,22 +361,12 @@ void ActNpc004(NPCHAR *npc)
 		{80, 128, 96, 144},
 	};
 
-	if (npc->act_no)
-	{
-		//Slight drag
-		npc->xm = 20 * npc->xm / 21;
-		npc->ym = 20 * npc->ym / 21;
-
-		//Move
-		npc->x += npc->xm;
-		npc->y += npc->ym;
-	}
-	else
+	if (npc->act_no == 0)
 	{
 		//Move in random direction at random speed
-		if (!npc->direct || npc->direct == 1)
+		if (npc->direct == 0 || npc->direct == 1)
 		{
-			uint8_t deg = Random(0, 0xFF);
+			const unsigned char deg = Random(0, 0xFF);
 			npc->xm = GetCos(deg) * Random(0x200, 0x5FF) / 0x200;
 			npc->ym = GetSin(deg) * Random(0x200, 0x5FF) / 0x200;
 		}
@@ -385,6 +375,16 @@ void ActNpc004(NPCHAR *npc)
 		npc->ani_no = Random(0, 4);
 		npc->ani_wait = Random(0, 3);
 		npc->act_no = 1;
+	}
+	else
+	{
+		//Slight drag
+		npc->xm = 20 * npc->xm / 21;
+		npc->ym = 20 * npc->ym / 21;
+
+		//Move
+		npc->x += npc->xm;
+		npc->y += npc->ym;
 	}
 
 	//Animate
@@ -395,19 +395,19 @@ void ActNpc004(NPCHAR *npc)
 	}
 
 	//Set framerect
-	if (npc->ani_no < 8)
-	{
-		if (npc->direct == 1)
-			npc->rect = rcUp[npc->ani_no];
-		if (!npc->direct)
-			npc->rect = rcLeft[npc->ani_no];
-		if (npc->direct == 2)
-			npc->rect = rcLeft[npc->ani_no];
-	}
-	else
+	if (npc->ani_no > 7)
 	{
 		//Destroy if over
 		npc->cond = 0;
+	}
+	else
+	{
+		if (npc->direct == 1)
+			npc->rect = rcUp[npc->ani_no];
+		if (npc->direct == 0)
+			npc->rect = rcLeft[npc->ani_no];
+		if (npc->direct == 2)
+			npc->rect = rcLeft[npc->ani_no];
 	}
 }
 
@@ -434,21 +434,22 @@ void ActNpc005(NPCHAR *npc)
 			// Fallthrough
 		case 1: //Waiting
 			//Look at player
-			if (npc->x <= gMC.x)
-				npc->direct = 2;
-			else
+			if (npc->x > gMC.x)
 				npc->direct = 0;
+			else
+				npc->direct = 2;
 
 			//Open eyes near player
-			if (npc->act_wait < 8 || npc->x - 0xE000 >= gMC.x || npc->x + 0xE000 <= gMC.x || npc->y - 0xA000 >= gMC.y || npc->y + 0xA000 <= gMC.y)
+			if (npc->act_wait >= 8 && npc->x - 0xE000 < gMC.x && npc->x + 0xE000 > gMC.x && npc->y - 0xA000 < gMC.y && npc->y + 0xA000 > gMC.y)
 			{
-				if (npc->act_wait < 8)
-					++npc->act_wait;
-				npc->ani_no = 0;
+				npc->ani_no = 1;
 			}
 			else
 			{
-				npc->ani_no = 1;
+				if (npc->act_wait < 8)
+					++npc->act_wait;
+
+				npc->ani_no = 0;
 			}
 
 			//Jump if attacked
@@ -480,10 +481,10 @@ void ActNpc005(NPCHAR *npc)
 				PlaySoundObject(30, 1);
 
 				//Jump in facing direction
-				if (npc->direct)
-					npc->xm = 0x100;
-				else
+				if (npc->direct == 0)
 					npc->xm = -0x100;
+				else
+					npc->xm = 0x100;
 			}
 			break;
 
@@ -510,10 +511,10 @@ void ActNpc005(NPCHAR *npc)
 	npc->y += npc->ym;
 
 	//Set framerect
-	if (npc->direct)
-		npc->rect = rcRight[npc->ani_no];
-	else
+	if (npc->direct == 0)
 		npc->rect = rcLeft[npc->ani_no];
+	else
+		npc->rect = rcRight[npc->ani_no];
 }
 
 //Beetle (Goes left and right, Egg Corridor)
@@ -540,10 +541,10 @@ void ActNpc006(NPCHAR *npc)
 		case 0: //Init
 			npc->act_no = 1;
 			
-			if (npc->direct)
-				npc->act_no = 3;
-			else
+			if (npc->direct == 0)
 				npc->act_no = 1;
+			else
+				npc->act_no = 3;
 			break;
 		
 		case 1:
@@ -565,7 +566,7 @@ void ActNpc006(NPCHAR *npc)
 				++npc->ani_no;
 			}
 			
-			if ( npc->ani_no > 2 )
+			if (npc->ani_no > 2)
 				npc->ani_no = 1;
 			
 			//Stop when hitting a wall
@@ -608,7 +609,7 @@ void ActNpc006(NPCHAR *npc)
 				++npc->ani_no;
 			}
 			
-			if ( npc->ani_no > 2 )
+			if (npc->ani_no > 2)
 				npc->ani_no = 1;
 			
 			//Stop when hitting a wall
@@ -631,16 +632,13 @@ void ActNpc006(NPCHAR *npc)
 				npc->ani_no = 1;
 			}
 			break;
-			
-		default:
-			break;
 	}
 	
 	//Set framerect
-	if (npc->direct)
-		npc->rect = rcRight[npc->ani_no];
-	else
+	if (npc->direct == 0)
 		npc->rect = rcLeft[npc->ani_no];
+	else
+		npc->rect = rcRight[npc->ani_no];
 }
 
 //Basil
@@ -772,15 +770,15 @@ void ActNpc008(NPCHAR *npc)
 			break;
 
 		case 1:
-			if (npc->x <= gMC.x)
-			{
-				npc->direct = 2;
-				npc->xm += 0x10;
-			}
-			else
+			if (npc->x > gMC.x)
 			{
 				npc->direct = 0;
 				npc->xm -= 0x10;
+			}
+			else
+			{
+				npc->direct = 2;
+				npc->xm += 0x10;
 			}
 
 			if (npc->xm > 0x2FF)
@@ -788,10 +786,10 @@ void ActNpc008(NPCHAR *npc)
 			if (npc->xm < -0x2FF)
 				npc->xm = -0x2FF;
 
-			if (npc->y >= npc->tgt_y)
-				npc->ym -= 8;
-			else
+			if (npc->y < npc->tgt_y)
 				npc->ym += 8;
+			else
+				npc->ym -= 8;
 
 			if (npc->ym > 0x100)
 				npc->ym = 0x100;
