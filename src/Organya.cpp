@@ -1,5 +1,6 @@
 #include "Organya.h"
 
+#include <stddef.h>
 #include <stdint.h>
 
 #include <SDL_rwops.h>
@@ -470,14 +471,14 @@ void LoadOrganya(const char *name)
 	for (int j = 0; j < 16; j++) {
 		//The first note from is NULL
 		if (info.tdata[j].note_num == 0) {
-			info.tdata[j].note_list = nullptr;
+			info.tdata[j].note_list = NULL;
 			continue;
 		}
 
 		//Make note list
 		np = info.tdata[j].note_p;
 		info.tdata[j].note_list = info.tdata[j].note_p;
-		np->from = nullptr;
+		np->from = NULL;
 		np->to = (np + 1);
 		np++;
 
@@ -489,7 +490,7 @@ void LoadOrganya(const char *name)
 
 		//The last note to is NULL
 		np--;
-		np->to = nullptr;
+		np->to = NULL;
 
 		//Set note properties
 		np = info.tdata[j].note_p; //X position
@@ -585,7 +586,7 @@ void SetOrganyaFadeout()
 }
 
 //Org timer
-SDL_Thread *OrganyaTimer = nullptr;
+SDL_Thread *OrganyaTimer = NULL;
 bool bEndTimer = false;
 
 int OrganyaPlayTimer(void *ptr)
@@ -631,7 +632,7 @@ void OrganyaEndTimer()
 {
 	bEndTimer = true; //Tell thread to end
 	SDL_WaitThread(OrganyaTimer, NULL); //Wait for thread to end
-	OrganyaTimer = nullptr;
+	OrganyaTimer = NULL;
 }
 
 //Start and end organya

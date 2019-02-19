@@ -602,5 +602,5 @@ void EndTextObject()
 {
 	//Destroy font
 	UnloadFont(gFont);
-	gFont = nullptr;
+	gFont = NULL;
 }
