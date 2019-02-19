@@ -2,6 +2,8 @@
 
 #include <string.h>
 
+#include "WindowsWrapper.h"
+
 #include "CommonDefines.h"
 #include "Draw.h"
 #include "Escape.h"
@@ -19,7 +21,7 @@ ITEM gItemData[ITEM_MAX];
 int gSelectedArms;
 int gSelectedItem;
 int gCampTitleY;
-bool gCampActive;
+BOOL gCampActive;
 
 void ClearArmsData()
 {
@@ -32,106 +34,122 @@ void ClearItemData()
 	memset(gItemData, 0, sizeof(gItemData));
 }
 
-bool AddArmsData(int code, int max_num)
+BOOL AddArmsData(long code, long max_num)
 {
-	for (int i = 0; i < ARMS_MAX; i++)
-	{
-		if (gArmsData[i].code == code || !gArmsData[i].code)
-		{
-			if (!gArmsData[i].code)
-			{
-				memset(&gArmsData[i], 0, sizeof(ARMS));
-				gArmsData[i].level = 1;
-			}
-			
-			gArmsData[i].code = code;
-			gArmsData[i].max_num += max_num;
-			gArmsData[i].num += max_num;
-			if (gArmsData[i].num > gArmsData[i].max_num)
-				gArmsData[i].num = gArmsData[i].max_num;
-			return true;
-		}
-	}
-	
-	return false;
-}
-
-bool SubArmsData(int code)
-{
-	for (int i = 0; i < ARMS_MAX; i++)
+	int i = 0;
+	for (;i < ARMS_MAX;)
 	{
 		if (gArmsData[i].code == code)
-		{
-			//Shift all arms from the right to the left
-			int ia;
-			for (ia = i + 1; ia < ARMS_MAX; ++ia)
-			{
-				gArmsData[ia - 1].code = gArmsData[ia].code;
-				gArmsData[ia - 1].level = gArmsData[ia].level;
-				gArmsData[ia - 1].exp = gArmsData[ia].exp;
-				gArmsData[ia - 1].max_num = gArmsData[ia].max_num;
-				gArmsData[ia - 1].num = gArmsData[ia].num;
-			}
-			
-			gArmsData[ia - 1].code = 0;
-			gSelectedArms = 0;
-			return true;
-		}
+			break;
+
+		if (gArmsData[i].code == 0)
+			break;
+
+		++i;
+	}
+
+	if (i == ARMS_MAX)
+		return FALSE;
+
+	if (gArmsData[i].code == 0)
+	{
+		memset(&gArmsData[i], 0, sizeof(ARMS));
+		gArmsData[i].level = 1;
 	}
 	
-	return false;
+	gArmsData[i].code = code;
+	gArmsData[i].max_num += max_num;
+	gArmsData[i].num += max_num;
+
+	if (gArmsData[i].num > gArmsData[i].max_num)
+		gArmsData[i].num = gArmsData[i].max_num;
+
+	return TRUE;
 }
 
-bool TradeArms(int code1, int code2, int max_num)
+BOOL SubArmsData(long code)
 {
-	for (int i = 0; i < ARMS_MAX; i++)
+	int i = 0;
+	for (;i < ARMS_MAX; ++i)
+		if (gArmsData[i].code == code)
+			break;
+
+#ifdef FIX_BUGS
+	if (i == ARMS_MAX)
+#else
+	if (i == ITEM_MAX)	// Oops
+#endif
+		return FALSE;
+
+	//Shift all arms from the right to the left
+	for (i += 1; i < ARMS_MAX; ++i)
+		gArmsData[i - 1] = gArmsData[i];
+	
+	gArmsData[i - 1].code = 0;
+	gSelectedArms = 0;
+	return TRUE;
+}
+
+BOOL TradeArms(long code1, long code2, long max_num)
+{
+	int i = 0;
+	for (;i < ARMS_MAX;)
 	{
 		if (gArmsData[i].code == code1)
-		{
-			gArmsData[i].level = 1;
-			gArmsData[i].code = code2;
-			gArmsData[i].max_num += max_num;
-			gArmsData[i].num += max_num;
-			gArmsData[i].exp = 0;
-			return true;
-		}
+			break;
+
+		++i;
 	}
-	
-	return false;
+
+	if (i == ARMS_MAX)
+		return FALSE;
+
+	gArmsData[i].level = 1;
+	gArmsData[i].code = code2;
+	gArmsData[i].max_num += max_num;
+	gArmsData[i].num += max_num;
+	gArmsData[i].exp = 0;
+	return TRUE;
 }
 
-bool AddItemData(int code)
+BOOL AddItemData(long code)
 {
-	for (int i = 0; i < ITEM_MAX; i++)
-	{
-		if (gItemData[i].code == code || !gItemData[i].code)
-		{
-			gItemData[i].code = code;
-			return true;
-		}
-	}
-	
-	return false;
-}
-
-bool SubItemData(int code)
-{
-	for (int i = 0; i < ITEM_MAX; i++)
+	int i = 0;
+	for (;i < ITEM_MAX;)
 	{
 		if (gItemData[i].code == code)
-		{
-			//Shift all items from the right to the left
-			int ia;
-			for (ia = i + 1; ia < ITEM_MAX; ++ia)
-				gItemData[ia - 1].code = gItemData[ia].code;
-			
-			gItemData[ia - 1].code = 0;
-			gSelectedItem = 0;
-			return true;
-		}
+			break;
+
+		if (gItemData[i].code == 0)
+			break;
+
+		++i;
 	}
-	
-	return false;
+
+	if (i == ITEM_MAX)
+		return false;
+
+	gItemData[i].code = code;
+	return true;
+}
+
+BOOL SubItemData(long code)
+{
+	int i = 0;
+	for (;i < ITEM_MAX; ++i)
+		if (gItemData[i].code == code)
+			break;
+
+	if (i == ITEM_MAX)
+		return FALSE;
+
+	//Shift all items from the right to the left
+	for (i += 1; i < ITEM_MAX; ++i)
+		gItemData[i - 1] = gItemData[i];
+
+	gItemData[i - 1].code = 0;
+	gSelectedItem = 0;
+	return TRUE;
 }
 
 void MoveCampCursor()
@@ -143,104 +161,107 @@ void MoveCampCursor()
 	while ( gItemData[item_num].code != 0 )
 		++item_num;
 	
-	if (arms_num || item_num)
+	if (arms_num == 0 && item_num == 0)
+		return;
+
+	BOOL bChange = FALSE;
+	if (gCampActive == FALSE)
 	{
-		bool bChange = false;
-		if (gCampActive)
+		if (gKeyTrg & gKeyLeft)
 		{
-			if (gKeyTrg & gKeyLeft)
-			{
-				if (gSelectedItem % 6)
-					--gSelectedItem;
-				else
-					gSelectedItem += 5;
-				
-				bChange = true;
-			}
+			--gSelectedArms;
+			bChange = TRUE;
+		}
+		if (gKeyTrg & gKeyRight)
+		{
+			++gSelectedArms;
+			bChange = TRUE;
+		}
+		if ((gKeyDown | gKeyUp) & gKeyTrg)
+		{
+			if (item_num)
+				gCampActive = TRUE;
+			bChange = TRUE;
+		}
+		
+		if (gSelectedArms < 0)
+			gSelectedArms = arms_num - 1;
+		if (gSelectedArms > arms_num - 1)
+			gSelectedArms = 0;
+	}
+	else
+	{
+		if (gKeyTrg & gKeyLeft)
+		{
+			if (gSelectedItem % 6 == 0)
+				gSelectedItem += 5;
+			else
+				--gSelectedItem;
 			
-			if (gKeyTrg & gKeyRight)
+			bChange = TRUE;
+		}
+		
+		if (gKeyTrg & gKeyRight)
+		{
+			if (gSelectedItem == item_num - 1)
+				gSelectedItem = 6 * (gSelectedItem / 6);
+			else
 			{
-				if (item_num - 1 == gSelectedItem)
-					gSelectedItem = 6 * (gSelectedItem / 6);
-				else if (gSelectedItem % 6 == 5)
+				if (gSelectedItem % 6 == 5)
 					gSelectedItem -= 5;
 				else
 					++gSelectedItem;
-				
-				bChange = true;
 			}
+
+			bChange = TRUE;
+		}
+		
+		if (gKeyTrg & gKeyUp)
+		{
+			if (gSelectedItem / 6 == 0)
+				gCampActive = FALSE;
+			else
+				gSelectedItem -= 6;
 			
-			if (gKeyTrg & gKeyUp)
-			{
-				if (gSelectedItem + 5 > 10)
-					gSelectedItem -= 6;
-				else
-					gCampActive = false;
-				
-				bChange = true;
-			}
+			bChange = TRUE;
+		}
+		
+		if ( gKeyTrg & gKeyDown )
+		{
+			if ( gSelectedItem / 6 == (item_num - 1) / 6 )
+				gCampActive = FALSE;
+			else
+				gSelectedItem += 6;
 			
-			if ( gKeyTrg & gKeyDown )
-			{
-				if ( gSelectedItem / 6 == (item_num - 1) / 6 )
-					gCampActive = false;
-				else
-					gSelectedItem += 6;
-				
-				bChange = true;
-			}
+			bChange = TRUE;
+		}
+		
+		if (gSelectedItem >= item_num)
+			gSelectedItem = item_num - 1;
+		
+		if (gCampActive && gKeyTrg & gKeyOk)
+			StartTextScript(gItemData[gSelectedItem].code + 6000);
+	}
+	
+	if (bChange)
+	{
+		if (gCampActive == FALSE)
+		{
+			PlaySoundObject(4, 1);
 			
-			if (gSelectedItem >= item_num)
-				gSelectedItem = item_num - 1;
-			
-			if (gCampActive && gKeyTrg & gKeyOk)
-				StartTextScript(gItemData[gSelectedItem].code + 6000);
+			if (arms_num)
+				StartTextScript(gArmsData[gSelectedArms].code + 1000);
+			else
+				StartTextScript(1000);
 		}
 		else
 		{
-			if (gKeyTrg & gKeyLeft)
-			{
-				--gSelectedArms;
-				bChange = true;
-			}
-			if (gKeyTrg & gKeyRight)
-			{
-				++gSelectedArms;
-				bChange = true;
-			}
-			if ((gKeyDown | gKeyUp) & gKeyTrg)
-			{
-				if (item_num)
-					gCampActive = true;
-				bChange = true;
-			}
+			PlaySoundObject(1, 1);
 			
-			if (gSelectedArms < 0)
-				gSelectedArms = arms_num - 1;
-			if (arms_num - 1 < gSelectedArms)
-				gSelectedArms = 0;
-		}
-		
-		if (bChange)
-		{
-			if (gCampActive)
-			{
-				PlaySoundObject(1, 1);
-				
-				if (item_num)
-					StartTextScript(gItemData[gSelectedItem].code + 5000);
-				else
-					StartTextScript(5000);
-			}
+			if (item_num)
+				StartTextScript(gItemData[gSelectedItem].code + 5000);
 			else
-			{
-				PlaySoundObject(4, 1);
-				
-				if (arms_num)
-					StartTextScript(gArmsData[gSelectedArms].code + 1000);
-				else
-					StartTextScript(1000);
-			}
+				StartTextScript(5000);
 		}
 	}
 }
@@ -252,12 +273,8 @@ void PutCampObject()
 	RECT rcNone = {80, 48, 96, 56};
 	RECT rcLv = {80, 80, 96, 88};
 	RECT rcView = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
-	RECT rcCur1[2];
-	RECT rcCur2[2];
-	rcCur1[0] = {0, 88, 40, 128};
-	rcCur1[1] = {40, 88, 80, 128};
-	rcCur2[0] = {80, 88, 112, 104};
-	rcCur2[1] = {80, 104, 112, 120};
+	RECT rcCur1[2] = {{0, 88, 40, 128}, {40, 88, 80, 128}};
+	RECT rcCur2[2] = {{80, 88, 112, 104}, {80, 104, 112, 120}};
 	RECT rcTitle1 = {80, 48, 144, 56};
 	RECT rcTitle2 = {80, 56, 144, 64};
 	RECT rcBoxTop = {0, 0, 244, 8};
@@ -280,17 +297,20 @@ void PutCampObject()
 	PutBitmap3(&rcView, (WINDOW_WIDTH - 224) / 2, gCampTitleY + 52, &rcTitle2, SURFACE_ID_TEXT_BOX);
 	
 	//Draw arms cursor
-	static int flash;
+	static unsigned int flash;
 	++flash;
 	
-	if (gCampActive)
-		PutBitmap3(&rcView, 40 * gSelectedArms + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT / 2) - 96, &rcCur1[1], SURFACE_ID_TEXT_BOX);
+	if (gCampActive == FALSE)
+		PutBitmap3(&rcView, 40 * gSelectedArms + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT / 2) - 96, &rcCur1[(flash / 2) % 2], SURFACE_ID_TEXT_BOX);
 	else
-		PutBitmap3(&rcView, 40 * gSelectedArms + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT / 2) - 96, &rcCur1[(flash >> 1) & 1], SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&rcView, 40 * gSelectedArms + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT / 2) - 96, &rcCur1[1], SURFACE_ID_TEXT_BOX);
 	
 	//Draw arms
-	for (int i = 0; i < ARMS_MAX && gArmsData[i].code; i++)
+	for (int i = 0; i < ARMS_MAX; i++)
 	{
+		if (gArmsData[i].code == 0)
+			break;
+
 		RECT rcArms;
 		rcArms.left = 16 * (gArmsData[i].code % 16);
 		rcArms.right = rcArms.left + 16;
@@ -316,13 +336,16 @@ void PutCampObject()
 	}
 	
 	//Draw items cursor
-	if (gCampActive)
-		PutBitmap3(&rcView, 32 * (gSelectedItem % 6) + (WINDOW_WIDTH - 224) / 2, 16 * (gSelectedItem / 6) + (WINDOW_HEIGHT - 88) / 2, &rcCur2[(flash >> 1) & 1], SURFACE_ID_TEXT_BOX);
+	if (gCampActive == TRUE)
+		PutBitmap3(&rcView, 32 * (gSelectedItem % 6) + (WINDOW_WIDTH - 224) / 2, 16 * (gSelectedItem / 6) + (WINDOW_HEIGHT - 88) / 2, &rcCur2[(flash / 2) % 2], SURFACE_ID_TEXT_BOX);
 	else
 		PutBitmap3(&rcView, 32 * (gSelectedItem % 6) + (WINDOW_WIDTH - 224) / 2, 16 * (gSelectedItem / 6) + (WINDOW_HEIGHT - 88) / 2, &rcCur2[1], SURFACE_ID_TEXT_BOX);
 
-	for (int i = 0; i < ITEM_MAX && gItemData[i].code; i++)
+	for (int i = 0; i < ITEM_MAX; i++)
 	{
+		if (gItemData[i].code == 0)
+			break;
+
 		RECT rcItem;
 		rcItem.left = 32 * (gItemData[i].code % 8);
 		rcItem.right = rcItem.left + 32;
@@ -341,24 +364,23 @@ int CampLoop()
 	char old_script_path[PATH_LENGTH];
 	GetTextScriptPath(old_script_path);
 	
-	char name[13];
-	strcpy(name, "ArmsItem.tsc");
-	LoadTextScript2(name);
+	LoadTextScript2("ArmsItem.tsc");
 	
 	gCampTitleY = (WINDOW_HEIGHT - 192) / 2;
 	gCampActive = 0;
 	gSelectedItem = 0;
 	
 	//Run script
-	int arms_num;
-	for (arms_num = 0; gArmsData[arms_num].code != 0; arms_num++);
+	int arms_num = 0;
+	for (;gArmsData[arms_num].code != 0;)
+		++arms_num;
 	
 	if (arms_num)
 		StartTextScript(gArmsData[gSelectedArms].code + 1000);
 	else
 		StartTextScript(gItemData[gSelectedItem].code + 5000);
 	
-	while (true)
+	for (;;)
 	{
 		GetTrg();
 		
@@ -389,108 +411,136 @@ int CampLoop()
 		PutTextScript();
 		PutFramePerSecound();
 		
-		if (!gCampActive && (gKeyItem | gKeyCancel | gKeyOk) & gKeyTrg)
-			break;
-		else if (g_GameFlags & 2 && (gKeyItem | gKeyCancel) & gKeyTrg)
-			break;
-		
+		if (gCampActive)
+		{
+			if (g_GameFlags & 2 && (gKeyCancel | gKeyItem) & gKeyTrg)
+			{
+				StopTextScript();
+				break;
+			}
+		}
+		else
+		{
+			if ((gKeyCancel | gKeyOk | gKeyItem) & gKeyTrg)
+			{
+				StopTextScript();
+				break;
+			}
+		}
+
 		if (!Flip_SystemTask())
 			return 0;
 	}
 	
 	//Resume original script
-	StopTextScript();
 	LoadTextScript_Stage(old_script_path);
 	gArmsEnergyX = 32;
 	return 1;
 }
 
-bool CheckItem(int a)
+BOOL CheckItem(long a)
 {
 	for (int i = 0; i < ITEM_MAX; i++)
 	{
 		if (gItemData[i].code == a)
-			return true;
+			return TRUE;
 	}
 	
-	return false;
+	return FALSE;
 }
 
-bool CheckArms(int a)
+BOOL CheckArms(long a)
 {
 	for (int i = 0; i < ARMS_MAX; i++)
 	{
 		if (gArmsData[i].code == a)
-			return true;
+			return TRUE;
 	}
 	
-	return false;
+	return FALSE;
 }
 
-bool UseArmsEnergy(int num)
+BOOL UseArmsEnergy(long num)
 {
 	if (!gArmsData[gSelectedArms].max_num)
-		return true;
+		return TRUE;
 	if (!gArmsData[gSelectedArms].num)
-		return false;
+		return FALSE;
 	gArmsData[gSelectedArms].num -= num;
 	if (gArmsData[gSelectedArms].num < 0)
 		gArmsData[gSelectedArms].num = 0;
-	return true;
+	return TRUE;
 }
 
-bool ChargeArmsEnergy(int num)
+BOOL ChargeArmsEnergy(long num)
 {
 	gArmsData[gSelectedArms].num += num;
 	if (gArmsData[gSelectedArms].num > gArmsData[gSelectedArms].max_num)
 		gArmsData[gSelectedArms].num = gArmsData[gSelectedArms].max_num;
-	return true;
+	return TRUE;
 }
 
 void FullArmsEnergy()
 {
 	for (int a = 0; a < ARMS_MAX; a++)
 	{
-		if (gArmsData[a].code)
-			gArmsData[a].num = gArmsData[a].max_num;
+		if (gArmsData[a].code == 0)
+			continue;
+
+		gArmsData[a].num = gArmsData[a].max_num;
 	}
 }
 
 int RotationArms()
 {
-	int arms_num;
-	for (arms_num = 0; gArmsData[arms_num].code != 0; arms_num++);
-	if (!arms_num)
+	int arms_num = 0;
+	for (;gArmsData[arms_num].code != 0;)
+		++arms_num;
+
+	if (arms_num == 0)
 		return 0;
-	
+
 	ResetSpurCharge();
-	
+
 	++gSelectedArms;
-	while (gSelectedArms < arms_num && !gArmsData[gSelectedArms].code)
+	while (gSelectedArms < arms_num)
+	{
+		if (gArmsData[gSelectedArms].code)
+			break;
+
 		++gSelectedArms;
-	
+	}
+
 	if (gSelectedArms == arms_num)
 		gSelectedArms = 0;
-	
+
 	gArmsEnergyX = 32;
 	PlaySoundObject(4, 1);
-	
+
 	return gArmsData[gSelectedArms].code;
 }
 
 int RotationArmsRev()
 {
-	int arms_num;
-	for (arms_num = 0; gArmsData[arms_num].code != 0; arms_num++);
-	if (!arms_num)
+	int arms_num = 0;
+	for (;gArmsData[arms_num].code != 0;)
+		++arms_num;
+
+	if (arms_num == 0)
 		return 0;
 	
 	ResetSpurCharge();
 	
 	if (--gSelectedArms < 0)
 		gSelectedArms = arms_num - 1;
-	while (gSelectedArms < arms_num && !gArmsData[gSelectedArms].code)
+
+	while (gSelectedArms < arms_num)
+	{
+		if (gArmsData[gSelectedArms].code)
+			break;
+
 		--gSelectedArms;
+	}
 	
 	gArmsEnergyX = 0;
 	PlaySoundObject(4, 1);

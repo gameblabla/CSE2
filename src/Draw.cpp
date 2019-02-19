@@ -50,12 +50,12 @@ FontObject *gFont;
 
 #define FRAMERATE 20
 
-bool Flip_SystemTask()
+BOOL Flip_SystemTask()
 {
 	while (true)
 	{
 		if (!SystemTask())
-			return false;
+			return FALSE;
 
 		//Framerate limiter
 		static uint32_t timePrev;
@@ -75,7 +75,7 @@ bool Flip_SystemTask()
 	}
 
 	SDL_RenderPresent(gRenderer);
-	return true;
+	return TRUE;
 }
 
 bool StartDirectDraw(int lMagnification, int lColourDepth)
