@@ -2,9 +2,9 @@
 
 #include "WindowsWrapper.h"
 
-#include "ValueView.h"
-#include "Game.h"
 #include "Draw.h"
+#include "Game.h"
+#include "ValueView.h"
 
 #define VALUEVIEW_MAX 0x10
 VALUEVIEW gVV[VALUEVIEW_MAX];
@@ -131,12 +131,12 @@ void SetValueView(int *px, int *py, int value)
 	RECT rcMinus = {40, 48, 48, 56};
 	
 	//Draw value
-	CortBox2(&gVV[index].rect, 0x000000, 29);
+	CortBox2(&gVV[index].rect, 0x000000, SURFACE_ID_VALUE_VIEW);
 	
 	if (minus)
-		Surface2Surface(gVV[index].rect.left, gVV[index].rect.top, &rcMinus, 29, 26);
+		Surface2Surface(gVV[index].rect.left, gVV[index].rect.top, &rcMinus, SURFACE_ID_VALUE_VIEW, SURFACE_ID_TEXT_BOX);
 	else
-		Surface2Surface(gVV[index].rect.left, gVV[index].rect.top, &rcPlus, 29, 26);
+		Surface2Surface(gVV[index].rect.left, gVV[index].rect.top, &rcPlus, SURFACE_ID_VALUE_VIEW, SURFACE_ID_TEXT_BOX);
 	
 	for (int i = 3; i >= 0; i--)
 	{
@@ -181,7 +181,7 @@ void PutValueView(int flx, int fly)
 				(*gVV[v].px) / 0x200 - (gVV[v].rect.right - gVV[v].rect.left) / 2 - flx / 0x200,
 				(*gVV[v].py) / 0x200 + gVV[v].offset_y / 0x200 - 4 - fly / 0x200,
 				&gVV[v].rect,
-				29);
+				SURFACE_ID_VALUE_VIEW);
 		}
 	}
 }

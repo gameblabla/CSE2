@@ -1,10 +1,11 @@
 #include "BossPress.h"
 
+#include "WindowsWrapper.h"
+
 #include "Boss.h"
 #include "Game.h"
 #include "Map.h"
 #include "Sound.h"
-#include "WindowsWrapper.h"
 
 void ActBossChar_Press(void)
 {

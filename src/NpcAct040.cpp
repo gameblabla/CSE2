@@ -1,15 +1,15 @@
-#include "WindowsWrapper.h"
-
 #include "NpcAct.h"
 
+#include "WindowsWrapper.h"
+
+#include "Back.h"
+#include "Caret.h"
+#include "CommonDefines.h"
+#include "Game.h"
 #include "MyChar.h"
 #include "NpChar.h"
-#include "Game.h"
-#include "Caret.h"
 #include "Sound.h"
-#include "Back.h"
 #include "Triangle.h"
-#include "CommonDefines.h"
 
 //Santa
 void ActNpc040(NPCHAR *npc)

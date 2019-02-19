@@ -1,5 +1,7 @@
 #include "BossAlmo1.h"
 
+#include "WindowsWrapper.h"
+
 #include "Boss.h"
 #include "Frame.h"
 #include "Game.h"

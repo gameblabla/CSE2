@@ -2,13 +2,14 @@
 
 #include <string.h>
 
+#include "WindowsWrapper.h"
+
 #include "Draw.h"
 #include "Escape.h"
 #include "KeyControl.h"
 #include "Main.h"
-#include "TextScr.h"
 #include "Sound.h"
-#include "WindowsWrapper.h"
+#include "TextScr.h"
 
 PERMIT_STAGE gPermitStage[8];
 
@@ -138,7 +139,7 @@ int StageSelectLoop(int *p_event)
 	RECT rcView = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
 	gSelectedStage = 0;
-	BackupSurface(10, &grcFull);
+	BackupSurface(SURFACE_ID_SCREEN_GRAB, &grcFull);
 	GetTextScriptPath(old_script_path);
 	LoadTextScript2("StageSelect.tsc");
 	gStageSelectTitleY = (WINDOW_HEIGHT / 2) - 66;
@@ -166,10 +167,10 @@ int StageSelectLoop(int *p_event)
 			return 2;
 
 #ifdef FIX_BUGS
-		PutBitmap4(&rcView, 0, 0, &rcView, 10);
+		PutBitmap4(&rcView, 0, 0, &rcView, SURFACE_ID_SCREEN_GRAB);
 #else
 		// The original accidentally drew the screencap with transparency enabled
-		PutBitmap3(&rcView, 0, 0, &rcView, 10);
+		PutBitmap3(&rcView, 0, 0, &rcView, SURFACE_ID_SCREEN_GRAB);
 #endif
 		PutStageSelectObject();
 		PutTextScript();

@@ -39,7 +39,10 @@ LIBS += `sdl2-config --static-libs` `pkg-config freetype2 --libs`
 
 ifeq ($(STATIC), 1)
 	CXXFLAGS += -static
-	LIBS += -lharfbuzz -lfreetype -lbz2 -lpng -lz -lgraphite2 -lRpcrt4 -lDwrite -lusp10
+	LIBS += -lharfbuzz -lfreetype -lbz2 -lpng -lz -lgraphite2
+	ifeq ($(WINDOWS), 1)
+		LIBS += -lRpcrt4 -lDwrite -lusp10
+	endif
 endif
 
 # For an accurate result to the original's code, compile in alphabetical order
@@ -65,6 +68,7 @@ SOURCES = \
 	Ending \
 	Escape \
 	Fade \
+	File \
 	Flags \
 	Flash \
 	Font \
@@ -135,48 +139,48 @@ RESOURCES = \
 	BITMAP/CREDIT18.bmp \
 	CURSOR/CURSOR_IKA.bmp \
 	CURSOR/CURSOR_NORMAL.bmp \
-	ORG/ACCESS \
-	ORG/ANZEN \
-	ORG/BALCONY \
-	ORG/BALLOS \
-	ORG/BDOWN \
-	ORG/CEMETERY \
-	ORG/CURLY \
-	ORG/DR \
-	ORG/ENDING \
-	ORG/ESCAPE \
-	ORG/FANFALE1 \
-	ORG/FANFALE2 \
-	ORG/FANFALE3 \
-	ORG/FIREEYE \
-	ORG/GAMEOVER \
-	ORG/GINSUKE \
-	ORG/GRAND \
-	ORG/GRAVITY \
-	ORG/HELL \
-	ORG/IRONH \
-	ORG/JENKA \
-	ORG/JENKA2 \
-	ORG/KODOU \
-	ORG/LASTBT3 \
-	ORG/LASTBTL \
-	ORG/LASTCAVE \
-	ORG/MARINE \
-	ORG/MAZE \
-	ORG/MDOWN2 \
-	ORG/MURA \
-	ORG/OSIDE \
-	ORG/PLANT \
-	ORG/QUIET \
-	ORG/REQUIEM \
-	ORG/TOROKO \
-	ORG/VIVI \
-	ORG/WANPAK2 \
-	ORG/WANPAKU \
-	ORG/WEED \
-	ORG/WHITE \
-	ORG/XXXX \
-	ORG/ZONBIE \
+	ORG/ACCESS.org \
+	ORG/ANZEN.org \
+	ORG/BALCONY.org \
+	ORG/BALLOS.org \
+	ORG/BDOWN.org \
+	ORG/CEMETERY.org \
+	ORG/CURLY.org \
+	ORG/DR.org \
+	ORG/ENDING.org \
+	ORG/ESCAPE.org \
+	ORG/FANFALE1.org \
+	ORG/FANFALE2.org \
+	ORG/FANFALE3.org \
+	ORG/FIREEYE.org \
+	ORG/GAMEOVER.org \
+	ORG/GINSUKE.org \
+	ORG/GRAND.org \
+	ORG/GRAVITY.org \
+	ORG/HELL.org \
+	ORG/IRONH.org \
+	ORG/JENKA.org \
+	ORG/JENKA2.org \
+	ORG/KODOU.org \
+	ORG/LASTBT3.org \
+	ORG/LASTBTL.org \
+	ORG/LASTCAVE.org \
+	ORG/MARINE.org \
+	ORG/MAZE.org \
+	ORG/MDOWN2.org \
+	ORG/MURA.org \
+	ORG/OSIDE.org \
+	ORG/PLANT.org \
+	ORG/QUIET.org \
+	ORG/REQUIEM.org \
+	ORG/TOROKO.org \
+	ORG/VIVI.org \
+	ORG/WANPAK2.org \
+	ORG/WANPAKU.org \
+	ORG/WEED.org \
+	ORG/WHITE.org \
+	ORG/XXXX.org \
+	ORG/ZONBIE.org \
 	WAVE/WAVE100
 
 ifeq ($(JAPANESE), 1)

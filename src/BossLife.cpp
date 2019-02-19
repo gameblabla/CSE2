@@ -1,10 +1,11 @@
+#include "BossLife.h"
+
 #include "WindowsWrapper.h"
 
 #include "CommonDefines.h"
-#include "BossLife.h"
+#include "Boss.h"
 #include "Draw.h"
 #include "NpChar.h"
-#include "Boss.h"
 
 static struct
 {

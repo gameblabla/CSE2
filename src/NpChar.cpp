@@ -1,20 +1,24 @@
-#include <stdint.h>
+#include "NpChar.h"
 
-#include <SDL_rwops.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
+
 #include "WindowsWrapper.h"
 
-#include "CommonDefines.h"
-#include "Tags.h"
-#include "NpChar.h"
-#include "Caret.h"
-#include "MyChar.h"
-#include "Game.h"
 #include "ArmsItem.h"
-#include "Flags.h"
-#include "Sound.h"
-#include "ValueView.h"
-#include "NpcTbl.h"
+#include "CommonDefines.h"
+#include "Caret.h"
 #include "Draw.h"
+#include "File.h"
+#include "Flags.h"
+#include "Game.h"
+#include "MyChar.h"
+#include "NpcTbl.h"
+#include "Sound.h"
+#include "Tags.h"
+#include "ValueView.h"
 
 NPCHAR gNPC[NPC_MAX];
 int gCurlyShoot_wait;
@@ -33,7 +37,7 @@ void InitNpChar()
 void SetUniqueParameter(NPCHAR *npc)
 {
 	int code = npc->code_char;
-	npc->surf = gNpcTable[code].surf;
+	npc->surf = (Surface_Ids)gNpcTable[code].surf;
 	npc->hit_voice = gNpcTable[code].hit_voice;
 	npc->destroy_voice = gNpcTable[code].destroy_voice;
 	npc->damage = gNpcTable[code].damage;
@@ -54,18 +58,24 @@ bool LoadEvent(char *path_event)
 	char path[PATH_LENGTH];
 	sprintf(path, "%s/%s", gDataPath, path_event);
 
-	SDL_RWops *fp = SDL_RWFromFile(path, "rb");
-	if (!fp)
+	FILE *fp = fopen(path, "rb");
+	if (fp == NULL)
 		return false;
 
 	//Read "PXE" check
 	char code[4];
-	fp->read(fp, code, 1, 4);
+	fread(code, 1, 4, fp);
 	if (memcmp(code, gPassPixEve, 3))
+	{
+#ifdef FIX_BUGS
+		// The original game forgot to close the file here
+		fclose(fp);
+#endif
 		return false;
+	}
 
 	//Get amount of NPCs
-	int count = SDL_ReadLE32(fp);
+	int count = File_ReadLE32(fp);
 
 	//Load NPCs
 	memset(gNPC, 0, sizeof(gNPC));
@@ -75,12 +85,12 @@ bool LoadEvent(char *path_event)
 	{
 		//Get data from file
 		EVENT eve;
-		eve.x = SDL_ReadLE16(fp);
-		eve.y = SDL_ReadLE16(fp);
-		eve.code_flag = SDL_ReadLE16(fp);
-		eve.code_event = SDL_ReadLE16(fp);
-		eve.code_char = SDL_ReadLE16(fp);
-		eve.bits = SDL_ReadLE16(fp);
+		eve.x = File_ReadLE16(fp);
+		eve.y = File_ReadLE16(fp);
+		eve.code_flag = File_ReadLE16(fp);
+		eve.code_event = File_ReadLE16(fp);
+		eve.code_char = File_ReadLE16(fp);
+		eve.bits = File_ReadLE16(fp);
 
 		//Set NPC parameters
 		if (eve.bits & npc_altDir)
@@ -117,6 +127,7 @@ bool LoadEvent(char *path_event)
 		n++;
 	}
 
+	fclose(fp);
 	return true;
 }
 
@@ -338,7 +349,7 @@ void PutNpChar(int fx, int fy)
 				(gNPC[n].x - side) / 0x200 - fx / 0x200 + a,
 				(gNPC[n].y - gNPC[n].view.top) / 0x200 - fy / 0x200,
 				&gNPC[n].rect,
-				gNPC[n].surf);
+				(Surface_Ids)gNPC[n].surf);
 		}
 	}
 }
@@ -349,8 +360,8 @@ void ActNpChar()
 	{
 		if (gNPC[i].cond & 0x80)
 		{
-			if (gpNpcFuncTbl[gNPC[i].code_char] != nullptr)
-				gpNpcFuncTbl[gNPC[i].code_char](&gNPC[i]);
+			gpNpcFuncTbl[gNPC[i].code_char](&gNPC[i]);
+
 			if (gNPC[i].shock)
 				--gNPC[i].shock;
 		}
@@ -393,8 +404,7 @@ void ChangeNpCharByEvent(int code_event, int code_char, int dir)
 				}
 			}
 			
-			if (gpNpcFuncTbl[code_char] != nullptr)
-				gpNpcFuncTbl[code_char](&gNPC[n]);
+			gpNpcFuncTbl[code_char](&gNPC[n]);
 		}
 	}
 }
@@ -436,8 +446,7 @@ void ChangeCheckableNpCharByEvent(int code_event, int code_char, int dir)
 				}
 			}
 			
-			if (gpNpcFuncTbl[code_char] != nullptr)
-				gpNpcFuncTbl[code_char](&gNPC[n]);
+			gpNpcFuncTbl[code_char](&gNPC[n]);
 		}
 	}
 }

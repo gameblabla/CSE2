@@ -1,14 +1,16 @@
-#include "NpChar.h"
-#include "ValueView.h"
-#include "Sound.h"
-#include "Flags.h"
-#include "Caret.h"
-#include "Game.h"
+#include "NpcHit.h"
+
 #include "Back.h"
 #include "Bullet.h"
-#include "MyChar.h"
-#include "TextScr.h"
+#include "Caret.h"
+#include "Flags.h"
+#include "Game.h"
 #include "Map.h"
+#include "MyChar.h"
+#include "NpChar.h"
+#include "Sound.h"
+#include "TextScr.h"
+#include "ValueView.h"
 
 void JadgeHitNpCharBlock(NPCHAR *npc, int x, int y)
 {

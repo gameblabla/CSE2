@@ -1,16 +1,18 @@
+#include "Organya.h"
+
 #include <stdint.h>
 
 #include <SDL_rwops.h>
 #include <SDL_thread.h>
 #include <SDL_timer.h>
 #include <SDL_events.h>
+
 #include "WindowsWrapper.h"
 
 #include "CommonDefines.h"
-#include "Tags.h"
-#include "Organya.h"
 #include "Resource.h"
 #include "Sound.h"
+#include "Tags.h"
 
 #define PANDUMMY 0xFF
 #define VOLDUMMY 0xFF

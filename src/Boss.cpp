@@ -1,9 +1,10 @@
+#include "Boss.h"
+
 #include <stdint.h>
 #include <string.h>
 
 #include "WindowsWrapper.h"
 
-#include "Boss.h"
 #include "BossAlmo1.h"
 #include "BossAlmo2.h"
 #include "BossBallos.h"
@@ -13,16 +14,16 @@
 #include "BossPress.h"
 #include "BossTwinD.h"
 #include "BossX.h"
-#include "NpChar.h"
-#include "MyChar.h"
-#include "Sound.h"
-#include "NpcHit.h"
+#include "Bullet.h"
 #include "Caret.h"
-#include "TextScr.h"
-#include "ValueView.h"
 #include "Draw.h"
 #include "Map.h"
-#include "Bullet.h"
+#include "MyChar.h"
+#include "NpChar.h"
+#include "NpcHit.h"
+#include "Sound.h"
+#include "TextScr.h"
+#include "ValueView.h"
 
 NPCHAR gBoss[BOSS_MAX];
 
@@ -66,7 +67,7 @@ void PutBossChar(int fx, int fy)
 				(gBoss[b].x - side) / 0x200 - fx / 0x200 + a,
 				(gBoss[b].y - gBoss[b].view.top) / 0x200 - fy / 0x200,
 				&gBoss[b].rect,
-				22);
+				SURFACE_ID_LEVEL_SPRITESET_2);
 		}
 	}
 }
@@ -208,8 +209,7 @@ void ActBossChar()
 {
 	if (gBoss[0].cond & 0x80)
 	{
-		if (gpBossFuncTbl[gBoss[0].code_char] != nullptr)
-			gpBossFuncTbl[gBoss[0].code_char]();
+		gpBossFuncTbl[gBoss[0].code_char]();
 		
 		for (int bos = 0; bos < BOSS_MAX; bos++)
 		{

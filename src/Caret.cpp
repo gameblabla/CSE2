@@ -1,11 +1,12 @@
-#include <string>
+#include "Caret.h"
+
+#include <string.h>
 
 #include "WindowsWrapper.h"
 
-#include "Caret.h"
 #include "Draw.h"
-#include "Triangle.h"
 #include "Game.h"
+#include "Triangle.h"
 
 #define CARET_MAX 0x40
 CARET gCrt[CARET_MAX];
@@ -539,7 +540,7 @@ void PutCaret(int fx, int fy)
 				(gCrt[i].x - gCrt[i].view_left) / 0x200 - fx / 0x200,
 				(gCrt[i].y - gCrt[i].view_top) / 0x200 - fy / 0x200,
 				&gCrt[i].rect,
-				19);
+				SURFACE_ID_CARET);
 		}
 	}
 }

@@ -17,6 +17,8 @@
 
 #include "SDL.h"
 
+#include "File.h"
+
 // Uncomment for that authentic pre-Windows Vista feel
 //#define DISABLE_FONT_ANTIALIASING
 
@@ -156,19 +158,12 @@ FontObject* LoadFont(const char *font_filename, unsigned int cell_width, unsigne
 {
 	FontObject *font_object = NULL;
 
-	FILE *file = fopen(font_filename, "rb");
+	unsigned char *file_buffer;
+	const long file_size = LoadFileToMemory(font_filename, &file_buffer);
 
-	if (file != NULL)
+	if (file_size != -1)
 	{
-		fseek(file, 0, SEEK_END);
-		const size_t file_size = ftell(file);
-		rewind(file);
-		unsigned char *file_buffer = (unsigned char*)malloc(file_size);
-		fread(file_buffer, 1, file_size, file);
-		fclose(file);
-
 		font_object = LoadFontFromData(file_buffer, file_size, cell_width, cell_height);
-
 		free(file_buffer);
 	}
 

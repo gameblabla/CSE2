@@ -1,11 +1,12 @@
 #include "BossIronH.h"
 
+#include "WindowsWrapper.h"
+
 #include "Boss.h"
 #include "Frame.h"
 #include "Game.h"
 #include "MyChar.h"
 #include "Sound.h"
-#include "WindowsWrapper.h"
 
 void ActBossChar_Ironhead(void)
 {

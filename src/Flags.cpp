@@ -1,7 +1,7 @@
 #include "Flags.h"
 
-#include <cstring>
 #include <stdint.h>
+#include <string.h>
 
 uint8_t gFlagNPC[1000];
 uint8_t gSkipFlag[0x40];

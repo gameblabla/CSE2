@@ -1,11 +1,12 @@
-#include <string>
-#include <math.h>
+#include "Sound.h"
+
 #include <algorithm>
+#include <math.h>
 #include <stdint.h>
+#include <string>
 
 #include <SDL.h>
 
-#include "Sound.h"
 #include "Organya.h"
 #include "PixTone.h"
 

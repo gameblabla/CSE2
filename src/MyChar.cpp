@@ -1,21 +1,22 @@
-#include <string>
+#include "MyChar.h"
+
 #include <stdint.h>
+#include <string.h>
 
 #include "WindowsWrapper.h"
 
-#include "MyChar.h"
-#include "MycParam.h"
 #include "ArmsItem.h"
-#include "NpChar.h"
+#include "Caret.h"
 #include "Draw.h"
-#include "Sound.h"
-#include "ValueView.h"
-#include "KeyControl.h"
-#include "TextScr.h"
 #include "Flags.h"
 #include "Game.h"
+#include "KeyControl.h"
+#include "MycParam.h"
+#include "NpChar.h"
+#include "Sound.h"
 #include "Star.h"
-#include "Caret.h"
+#include "TextScr.h"
+#include "ValueView.h"
 
 MYCHAR gMC;
 
@@ -193,14 +194,14 @@ void PutMyChar(int fx, int fy)
 				(gMC.x - gMC.view.left) / 0x200 - fx / 0x200,
 				(gMC.y - gMC.view.top) / 0x200 - fy / 0x200 + arms_offset_y,
 				&gMC.rect_arms,
-				11);
+				SURFACE_ID_ARMS);
 		else
 			PutBitmap3(
 				&grcGame,
 				(gMC.x - gMC.view.left) / 0x200 - fx / 0x200 - 8,
 				(gMC.y - gMC.view.top) / 0x200 - fy / 0x200 + arms_offset_y,
 				&gMC.rect_arms,
-				11);
+				SURFACE_ID_ARMS);
 		
 		if (!((gMC.shock >> 1) & 1))
 		{
@@ -212,7 +213,7 @@ void PutMyChar(int fx, int fy)
 				rect.bottom += 32;
 			}
 			
-			PutBitmap3(&grcGame, (gMC.x - gMC.view.left) / 0x200 - fx / 0x200, (gMC.y - gMC.view.top) / 0x200 - fy / 0x200, &rect, 16);
+			PutBitmap3(&grcGame, (gMC.x - gMC.view.left) / 0x200 - fx / 0x200, (gMC.y - gMC.view.top) / 0x200 - fy / 0x200, &rect, SURFACE_ID_MY_CHAR);
 			
 			//Draw airtank
 			RECT rcBubble[2];
@@ -221,9 +222,9 @@ void PutMyChar(int fx, int fy)
 			
 			++gMC.bubble;
 			if (gMC.equip & 0x10 && gMC.flag & 0x100)
-				PutBitmap3(&grcGame, gMC.x / 0x200 - 12 - fx / 0x200, gMC.y / 0x200 - 12 - fy / 0x200, &rcBubble[(gMC.bubble >> 1) & 1], 19);
+				PutBitmap3(&grcGame, gMC.x / 0x200 - 12 - fx / 0x200, gMC.y / 0x200 - 12 - fy / 0x200, &rcBubble[(gMC.bubble >> 1) & 1], SURFACE_ID_CARET);
 			else if (gMC.unit == 1)
-				PutBitmap3(&grcGame, gMC.x / 0x200 - 12 - fx / 0x200, gMC.y / 0x200 - 12 - fy / 0x200, &rcBubble[(gMC.bubble >> 1) & 1], 19);
+				PutBitmap3(&grcGame, gMC.x / 0x200 - 12 - fx / 0x200, gMC.y / 0x200 - 12 - fy / 0x200, &rcBubble[(gMC.bubble >> 1) & 1], SURFACE_ID_CARET);
 		}
 	}
 }

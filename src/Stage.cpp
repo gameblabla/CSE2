@@ -1,26 +1,27 @@
+#include "Stage.h"
+
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 
-#include <SDL_rwops.h>
 #include "WindowsWrapper.h"
 
+#include "Back.h"
+#include "Boss.h"
+#include "Bullet.h"
+#include "Caret.h"
 #include "CommonDefines.h"
+#include "Draw.h"
+#include "Flash.h"
+#include "Frame.h"
 #include "Map.h"
 #include "MapName.h"
 #include "MyChar.h"
-#include "Bullet.h"
-#include "Boss.h"
-#include "Draw.h"
-#include "Tags.h"
-#include "Frame.h"
-#include "Caret.h"
 #include "NpChar.h"
-#include "TextScr.h"
 #include "Organya.h"
+#include "Tags.h"
+#include "TextScr.h"
 #include "ValueView.h"
-#include "Back.h"
-#include "Stage.h"
-#include "Flash.h"
 
 #ifdef JAPANESE
 #define STAGE_ENTRY(parts, map, bkType, back, npc, boss, boss_no, name_en, name_jp) {parts, map, bkType, back, npc, boss, boss_no, name_jp}
@@ -90,7 +91,7 @@ const STAGE_TABLE gTMT[95] = {
 	STAGE_ENTRY("Cent", "Cent", 1, "bkGreen", "Guest", "Cent", 0, "Plantation", "ëÂî_âÄ"),
 	STAGE_ENTRY("Jail", "Jail1", 4, "bk0", "Guest", "Cent", 0, "Jail No. 1", "ëÊÇPòS"),
 	STAGE_ENTRY("Jail", "Momo", 4, "bk0", "Guest", "0", 0, "Hideout", "ÉJÉNÉåÉK"),
-	STAGE_ENTRY("Jail", "lounge", 4, "bk0", "Guest", "0", 0, "Rest Area", "ãxåeèä"),
+	STAGE_ENTRY("Jail", "Lounge", 4, "bk0", "Guest", "0", 0, "Rest Area", "ãxåeèä"),
 	STAGE_ENTRY("Store", "CentW", 4, "bk0", "Guest", "Cent", 0, "Teleporter", "ì]ëóé∫"),
 	STAGE_ENTRY("Store", "Jail2", 4, "bk0", "Guest", "Cent", 0, "Jail No. 2", "ëÊÇQòS"),
 	STAGE_ENTRY("White", "Blcny1", 7, "bkFog", "Ravil", "Heri", 0, "Balcony", "ÉoÉãÉRÉjÅ["),

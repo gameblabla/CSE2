@@ -1,5 +1,7 @@
-#include <math.h>
+#include "Triangle.h"
+
 #include <stdint.h>
+#include <math.h>
 
 int gSin[0x100];
 int16_t gTan[0x21];

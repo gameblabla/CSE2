@@ -1,17 +1,17 @@
-#include "WindowsWrapper.h"
-
 #include "NpcAct.h"
 
-#include "MyChar.h"
-#include "NpChar.h"
-#include "Game.h"
-#include "Sound.h"
+#include "WindowsWrapper.h"
+
 #include "Back.h"
-#include "Triangle.h"
 #include "Caret.h"
-#include "Map.h"
 #include "Frame.h"
+#include "Game.h"
+#include "Map.h"
+#include "MyChar.h"
 #include "MycParam.h"
+#include "NpChar.h"
+#include "Sound.h"
+#include "Triangle.h"
 
 //Shovel Brigade (caged)
 void ActNpc260(NPCHAR *npc)

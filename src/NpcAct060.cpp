@@ -1,18 +1,18 @@
-#include "WindowsWrapper.h"
-
 #include "NpcAct.h"
 
-#include "MyChar.h"
-#include "NpChar.h"
-#include "Game.h"
-#include "Sound.h"
+#include "WindowsWrapper.h"
+
 #include "Back.h"
-#include "Triangle.h"
-#include "Map.h"
 #include "CommonDefines.h"
-#include "Frame.h"
-#include "MycParam.h"
 #include "Flash.h"
+#include "Frame.h"
+#include "Game.h"
+#include "Map.h"
+#include "MyChar.h"
+#include "MycParam.h"
+#include "NpChar.h"
+#include "Sound.h"
+#include "Triangle.h"
 
 //Toroko
 void ActNpc060(NPCHAR *npc)
@@ -367,7 +367,7 @@ void ActNpc061(NPCHAR *npc)
 					SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
 
 				npc->act_no = 50;
-				npc->surf = 20;
+				npc->surf = SURFACE_ID_NPC_SYM;
 				npc->ani_no = 10;
 			}
 

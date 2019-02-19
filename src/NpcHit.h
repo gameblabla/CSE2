@@ -1,4 +1,5 @@
 #pragma once
+
 #include "NpChar.h"
 
 void JadgeHitNpCharBlock(NPCHAR *npc, int x, int y);

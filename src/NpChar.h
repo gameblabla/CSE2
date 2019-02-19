@@ -1,6 +1,10 @@
 #pragma once
+
 #include <stdint.h>
+
 #include "WindowsWrapper.h"
+
+#include "Draw.h"
 
 #define NPC_MAX 0x200
 
@@ -38,7 +42,7 @@ struct NPCHAR
 	int code_char;
 	int code_flag;
 	int code_event;
-	int surf;
+	Surface_Ids surf;
 	int hit_voice;
 	int destroy_voice;
 	int life;

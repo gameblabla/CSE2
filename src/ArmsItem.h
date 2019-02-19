@@ -1,4 +1,7 @@
 #pragma once
+
+#include "WindowsWrapper.h"
+
 struct ARMS
 {
 	int code;
@@ -26,20 +29,20 @@ extern ITEM gItemData[ITEM_MAX];
 extern int gSelectedArms;
 extern int gSelectedItem;
 extern int gCampTitleY;
-extern bool gCampActive;
+extern BOOL gCampActive;
 
 void ClearArmsData();
 void ClearItemData();
-bool AddArmsData(int code, int max_num);
-bool SubArmsData(int code);
-bool TradeArms(int code1, int code2, int max_num);
-bool AddItemData(int code);
-bool SubItemData(int code);
+BOOL AddArmsData(long code, long max_num);
+BOOL SubArmsData(long code);
+BOOL TradeArms(long code1, long code2, long max_num);
+BOOL AddItemData(long code);
+BOOL SubItemData(long code);
 int CampLoop();
-bool CheckItem(int a);
-bool CheckArms(int a);
-bool UseArmsEnergy(int num);
-bool ChargeArmsEnergy(int num);
+BOOL CheckItem(long a);
+BOOL CheckArms(long a);
+BOOL UseArmsEnergy(long num);
+BOOL ChargeArmsEnergy(long num);
 void FullArmsEnergy();
 int RotationArms();
 int RotationArmsRev();

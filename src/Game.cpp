@@ -1,47 +1,49 @@
-#include <string>
+#include "Game.h"
+
 #include <stdlib.h>
+#include <string.h>
 
 #include <SDL_timer.h>
+
 #include "WindowsWrapper.h"
 
-#include "Tags.h"
-#include "NpcTbl.h"
-#include "NpChar.h"
-#include "NpcHit.h"
-#include "MiniMap.h"
-#include "Generic.h"
-#include "Boss.h"
-#include "GenericLoad.h"
 #include "ArmsItem.h"
-#include "TextScr.h"
-#include "Bullet.h"
-#include "BulHit.h"
-#include "Shoot.h"
-#include "Star.h"
-#include "Fade.h"
-#include "Frame.h"
-#include "Flags.h"
-#include "Escape.h"
-#include "Stage.h"
-#include "MyChar.h"
-#include "MycHit.h"
-#include "Caret.h"
-#include "Map.h"
-#include "Main.h"
-#include "MycParam.h"
-#include "MapName.h"
-#include "Sound.h"
-#include "Organya.h"
-#include "Profile.h"
-#include "MycParam.h"
 #include "Back.h"
-#include "KeyControl.h"
-#include "ValueView.h"
+#include "Boss.h"
+#include "BossLife.h"
+#include "BulHit.h"
+#include "Bullet.h"
+#include "Caret.h"
 #include "Draw.h"
 #include "Ending.h"
+#include "Escape.h"
+#include "Fade.h"
+#include "Flags.h"
 #include "Flash.h"
-#include "BossLife.h"
+#include "Frame.h"
+#include "Generic.h"
+#include "GenericLoad.h"
+#include "KeyControl.h"
+#include "Main.h"
+#include "Map.h"
+#include "MapName.h"
+#include "MiniMap.h"
+#include "MyChar.h"
+#include "MycHit.h"
+#include "MycParam.h"
+#include "NpChar.h"
+#include "NpcHit.h"
+#include "NpcTbl.h"
+#include "Organya.h"
+#include "Profile.h"
 #include "SelStage.h"
+#include "Shoot.h"
+#include "Sound.h"
+#include "Stage.h"
+#include "Star.h"
+#include "Tags.h"
+#include "TextScr.h"
+#include "ValueView.h"
 
 int g_GameFlags;
 int gCounter;
@@ -352,14 +354,14 @@ int ModeTitle()
 		PutNumber4((WINDOW_WIDTH + 56) / 2, WINDOW_HEIGHT - 24, v4, 0);
 		
 		//Draw main title
-		PutBitmap3(&grcGame, (WINDOW_WIDTH - 144) / 2, 40, &rcTitle, 0);
-		PutBitmap3(&grcGame, (WINDOW_WIDTH - 48) / 2, (WINDOW_HEIGHT + 16) / 2, &rcNew, 0);
-		PutBitmap3(&grcGame, (WINDOW_WIDTH - 48) / 2, (WINDOW_HEIGHT + 56) / 2, &rcContinue, 0);
-		PutBitmap3(&grcGame, (WINDOW_WIDTH - 160) / 2, WINDOW_HEIGHT - 48, &rcPixel, 1);
+		PutBitmap3(&grcGame, (WINDOW_WIDTH - 144) / 2, 40, &rcTitle, SURFACE_ID_TITLE);
+		PutBitmap3(&grcGame, (WINDOW_WIDTH - 48) / 2, (WINDOW_HEIGHT + 16) / 2, &rcNew, SURFACE_ID_TITLE);
+		PutBitmap3(&grcGame, (WINDOW_WIDTH - 48) / 2, (WINDOW_HEIGHT + 56) / 2, &rcContinue, SURFACE_ID_TITLE);
+		PutBitmap3(&grcGame, (WINDOW_WIDTH - 160) / 2, WINDOW_HEIGHT - 48, &rcPixel, SURFACE_ID_PIXEL);
 		
 		//Draw character cursor
 		RECT char_rc;
-		int char_surf;
+		Surface_Ids char_surf;
 		
 		switch ( char_type )
 		{
@@ -530,7 +532,7 @@ int ModeAction()
 				//Open inventory
 				if (gKeyTrg & gKeyItem)
 				{
-					BackupSurface(10, &grcGame);
+					BackupSurface(SURFACE_ID_SCREEN_GRAB, &grcGame);
 					
 					switch (CampLoop())
 					{
@@ -544,7 +546,7 @@ int ModeAction()
 				}
 				else if (gMC.equip & 2 && gKeyTrg & gKeyMap)
 				{
-					BackupSurface(10, &grcGame);
+					BackupSurface(SURFACE_ID_SCREEN_GRAB, &grcGame);
 					
 					switch (MiniMapLoop())
 					{

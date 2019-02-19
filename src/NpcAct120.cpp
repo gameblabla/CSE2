@@ -1,17 +1,17 @@
-#include "WindowsWrapper.h"
-
 #include "NpcAct.h"
 
+#include "WindowsWrapper.h"
+
+#include "Back.h"
+#include "Bullet.h"
+#include "Caret.h"
+#include "Frame.h"
+#include "Game.h"
+#include "KeyControl.h"
 #include "MyChar.h"
 #include "NpChar.h"
-#include "Game.h"
 #include "Sound.h"
-#include "Back.h"
 #include "Triangle.h"
-#include "Caret.h"
-#include "KeyControl.h"
-#include "Frame.h"
-#include "Bullet.h"
 
 //Colon (1)
 void ActNpc120(NPCHAR *npc)

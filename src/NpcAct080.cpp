@@ -1,17 +1,17 @@
-#include "WindowsWrapper.h"
-
 #include "NpcAct.h"
 
-#include "MyChar.h"
-#include "NpChar.h"
-#include "Game.h"
-#include "Sound.h"
+#include "WindowsWrapper.h"
+
 #include "Back.h"
-#include "Triangle.h"
 #include "Caret.h"
+#include "CommonDefines.h"
 #include "Flash.h"
 #include "Frame.h"
-#include "CommonDefines.h"
+#include "Game.h"
+#include "MyChar.h"
+#include "NpChar.h"
+#include "Sound.h"
+#include "Triangle.h"
 
 //Gravekeeper
 void ActNpc080(NPCHAR *npc)
@@ -57,7 +57,7 @@ void ActNpc080(NPCHAR *npc)
 				npc->ani_no = 1;
 				npc->ani_wait = 0;
 				npc->act_no = 2;
-				npc->bits &= ~0x20u;
+				npc->bits &= ~0x20;
 			}
 
 			if (gMC.x >= npc->x)
@@ -91,15 +91,15 @@ void ActNpc080(NPCHAR *npc)
 					npc->xm = 0x400;
 			}
 
-			if (gMC.x >= npc->x)
-			{
-				npc->direct = 2;
-				npc->xm = 0x100;
-			}
-			else
+			if (gMC.x < npc->x)
 			{
 				npc->direct = 0;
 				npc->xm = -0x100;
+			}
+			else
+			{
+				npc->direct = 2;
+				npc->xm = 0x100;
 			}
 
 			break;
@@ -150,10 +150,17 @@ void ActNpc080(NPCHAR *npc)
 	if (npc->xm < -0x400)
 		npc->xm = -0x400;
 
+#ifdef FIX_BUGS
+	if (npc->ym > 0x5FF)
+		npc->ym = 0x5FF;
+	if (npc->ym < -0x5FF)
+		npc->ym = -0x5FF;
+#else
 	if (npc->ym > 0x5FF)
 		npc->xm = 0x5FF;
 	if (npc->ym < -0x5FF)
 		npc->xm = -0x5FF;
+#endif
 
 	npc->x += npc->xm;
 	npc->y += npc->ym;

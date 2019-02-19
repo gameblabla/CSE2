@@ -1,11 +1,14 @@
 #include "Bullet.h"
+
+#include <string.h>
+
 #include "Draw.h"
 #include "Caret.h"
-#include "NpChar.h"
-#include "MyChar.h"
-#include "Sound.h"
 #include "Game.h"
 #include "KeyControl.h"
+#include "MyChar.h"
+#include "NpChar.h"
+#include "Sound.h"
 
 BULLET_TABLE gBulTbl[46] =
 {
@@ -135,7 +138,7 @@ void PutBullet(int fx, int fy)
 					break;
 			}
 			
-			PutBitmap3(&grcGame, x / 0x200 - fx / 0x200, y / 0x200 - fy / 0x200, &gBul[i].rect, 17);
+			PutBitmap3(&grcGame, x / 0x200 - fx / 0x200, y / 0x200 - fy / 0x200, &gBul[i].rect, SURFACE_ID_BULLET);
 		}
 	}
 }

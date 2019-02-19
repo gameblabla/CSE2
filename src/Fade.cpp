@@ -1,10 +1,11 @@
-#include <string>
+#include "Fade.h"
+
+#include <string.h>
 
 #include "WindowsWrapper.h"
 
-#include "Fade.h"
-#include "Game.h"
 #include "Draw.h"
+#include "Game.h"
 
 FADE gFade;
 
@@ -283,7 +284,7 @@ void PutFade()
 			{
 				rect.left = 16 * gFade.ani_no[y][x];
 				rect.right = rect.left + 16;
-				PutBitmap3(&grcGame, 16 * x, 16 * y, &rect, 6);
+				PutBitmap3(&grcGame, 16 * x, 16 * y, &rect, SURFACE_ID_FADE);
 			}
 		}
 	}

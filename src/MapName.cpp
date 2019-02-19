@@ -1,8 +1,9 @@
+#include "MapName.h"
+
 #include <stdint.h>
-#include <string>
+#include <string.h>
 
 #include "CommonDefines.h"
-#include "MapName.h"
 #include "Draw.h"
 
 MAP_NAME gMapName;

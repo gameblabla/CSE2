@@ -1,4 +1,5 @@
 #pragma once
+
 #include "CommonDefines.h"
 
 #define FADE_WIDTH	(((WINDOW_WIDTH - 1) >> 4) + 1)

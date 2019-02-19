@@ -1,5 +1,7 @@
 #include "BossBallos.h"
 
+#include "WindowsWrapper.h"
+
 #include "Boss.h"
 #include "Flash.h"
 #include "Frame.h"

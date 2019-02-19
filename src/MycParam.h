@@ -1,5 +1,7 @@
 #pragma once
+
 #include <stdint.h>
+
 struct ARMS_LEVEL
 {
 	int exp[3];

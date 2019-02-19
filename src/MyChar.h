@@ -1,5 +1,7 @@
 #pragma once
+
 #include <stdint.h>
+
 #include "WindowsWrapper.h"
 
 struct MYCHAR
