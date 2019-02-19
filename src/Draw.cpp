@@ -321,15 +321,20 @@ static bool LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, bool create_surface)
 								const unsigned char *src_row = (unsigned char*)converted_surface->pixels + h * converted_surface->pitch;
 								unsigned char *dst_row = (unsigned char*)surf[surf_no].surface->pixels + h * surf[surf_no].surface->pitch * magnification;
 
-								const unsigned long *src_ptr = (unsigned long*)src_row;
-								unsigned long *dst_ptr = (unsigned long*)dst_row;
+								const unsigned char *src_ptr = src_row;
+								unsigned char *dst_ptr = dst_row;
 
 								for (int w = 0; w < converted_surface->w; ++w)
 								{
-									const unsigned long src_pixel = *src_ptr++;
-
 									for (int i = 0; i < magnification; ++i)
-										*dst_ptr++ = src_pixel;
+									{
+										*dst_ptr++ = src_ptr[0];
+										*dst_ptr++ = src_ptr[1];
+										*dst_ptr++ = src_ptr[2];
+										*dst_ptr++ = src_ptr[3];
+									}
+
+									src_ptr += 4;
 								}
 
 								for (int i = 1; i < magnification; ++i)
