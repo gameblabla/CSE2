@@ -360,8 +360,8 @@ void ActNpChar()
 	{
 		if (gNPC[i].cond & 0x80)
 		{
-			if (gpNpcFuncTbl[gNPC[i].code_char] != nullptr)
-				gpNpcFuncTbl[gNPC[i].code_char](&gNPC[i]);
+			gpNpcFuncTbl[gNPC[i].code_char](&gNPC[i]);
+
 			if (gNPC[i].shock)
 				--gNPC[i].shock;
 		}
@@ -404,8 +404,7 @@ void ChangeNpCharByEvent(int code_event, int code_char, int dir)
 				}
 			}
 			
-			if (gpNpcFuncTbl[code_char] != nullptr)
-				gpNpcFuncTbl[code_char](&gNPC[n]);
+			gpNpcFuncTbl[code_char](&gNPC[n]);
 		}
 	}
 }
@@ -447,8 +446,7 @@ void ChangeCheckableNpCharByEvent(int code_event, int code_char, int dir)
 				}
 			}
 			
-			if (gpNpcFuncTbl[code_char] != nullptr)
-				gpNpcFuncTbl[code_char](&gNPC[n]);
+			gpNpcFuncTbl[code_char](&gNPC[n]);
 		}
 	}
 }

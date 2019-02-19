@@ -209,8 +209,7 @@ void ActBossChar()
 {
 	if (gBoss[0].cond & 0x80)
 	{
-		if (gpBossFuncTbl[gBoss[0].code_char] != nullptr)
-			gpBossFuncTbl[gBoss[0].code_char]();
+		gpBossFuncTbl[gBoss[0].code_char]();
 		
 		for (int bos = 0; bos < BOSS_MAX; bos++)
 		{
