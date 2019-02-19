@@ -110,11 +110,11 @@ SOURCES = \
 	PixTone \
 	Profile \
 	Resource \
+	SelStage \
 	Shoot \
 	Sound \
 	Stage \
 	Star \
-	SelStage \
 	TextScr \
 	Triangle \
 	ValueView

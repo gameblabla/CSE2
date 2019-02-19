@@ -152,18 +152,19 @@ void ActNpc160(NPCHAR *npc)
 			break;
 	}
 
-	RECT rect_left[4];
-	RECT rect_right[4];
+	RECT rect_left[4] = {
+		{0, 0, 40, 24},
+		{40, 0, 80, 24},
+		{80, 0, 120, 24},
+		{120, 0, 160, 24},
+	};
 
-	rect_left[0] = {0, 0, 40, 24};
-	rect_left[1] = {40, 0, 80, 24};
-	rect_left[2] = {80, 0, 120, 24};
-	rect_left[3] = {120, 0, 160, 24};
-
-	rect_right[0] = {0, 24, 40, 48};
-	rect_right[1] = {40, 24, 80, 48};
-	rect_right[2] = {80, 24, 120, 48};
-	rect_right[3] = {120, 24, 160, 48};
+	RECT rect_right[4] = {
+		{0, 24, 40, 48},
+		{40, 24, 80, 48},
+		{80, 24, 120, 48},
+		{120, 24, 160, 48},
+	};
 
 	if (npc->direct == 0)
 		npc->rect = rect_left[npc->ani_no];
@@ -174,8 +175,6 @@ void ActNpc160(NPCHAR *npc)
 //Puu Black projectile
 void ActNpc161(NPCHAR *npc)
 {
-	RECT rect[3];
-
 	npc->exp = 0;
 
 	if (gSuperXpos > npc->x)
@@ -217,9 +216,11 @@ void ActNpc161(NPCHAR *npc)
 			npc->ani_no = 1;
 	}
 
-	rect[0] = {0, 48, 16, 64};
-	rect[1] = {16, 48, 32, 64};
-	rect[2] = {32, 48, 48, 64};
+	RECT rect[3] = {
+		{0, 48, 16, 64},
+		{16, 48, 32, 64},
+		{32, 48, 48, 64},
+	};
 
 	npc->rect = rect[npc->ani_no];
 }
@@ -314,14 +315,15 @@ void ActNpc162(NPCHAR *npc)
 //Dr Gero
 void ActNpc163(NPCHAR *npc)
 {
-	RECT rcLeft[2];
-	RECT rcRight[2];
+	RECT rcLeft[2] = {
+		{192, 0, 208, 16},
+		{208, 0, 224, 16},
+	};
 
-	rcLeft[0] = {192, 0, 208, 16};
-	rcLeft[1] = {208, 0, 224, 16};
-
-	rcRight[0] = {192, 16, 208, 32};
-	rcRight[1] = {208, 16, 224, 32};
+	RECT rcRight[2] = {
+		{192, 16, 208, 32},
+		{208, 16, 224, 32},
+	};
 
 	switch (npc->act_no)
 	{
@@ -359,14 +361,15 @@ void ActNpc163(NPCHAR *npc)
 //Nurse Hasumi
 void ActNpc164(NPCHAR *npc)
 {
-	RECT rcLeft[2];
-	RECT rcRight[2];
+	RECT rcLeft[2] = {
+		{224, 0, 240, 16},
+		{240, 0, 256, 16},
+	};
 
-	rcLeft[0] = {224, 0, 240, 16};
-	rcLeft[1] = {240, 0, 256, 16};
-
-	rcRight[0] = {224, 16, 240, 32};
-	rcRight[1] = {240, 16, 256, 32};
+	RECT rcRight[2] = {
+		{224, 16, 240, 32},
+		{240, 16, 256, 32},
+	};
 
 	switch (npc->act_no)
 	{
@@ -404,13 +407,12 @@ void ActNpc164(NPCHAR *npc)
 //Curly (collapsed)
 void ActNpc165(NPCHAR *npc)
 {
-	RECT rcRight[2];
-	RECT rcLeft[1];
+	RECT rcRight[2] = {
+		{192, 96, 208, 112},
+		{208, 96, 224, 112},
+	};
 
-	rcRight[0] = {192, 96, 208, 112};
-	rcRight[1] = {208, 96, 224, 112};
-
-	rcLeft[0] = {144, 96, 160, 112};
+	RECT rcLeft = {144, 96, 160, 112};
 
 	switch (npc->act_no)
 	{
@@ -428,7 +430,7 @@ void ActNpc165(NPCHAR *npc)
 	}
 
 	if (npc->direct == 0)
-		npc->rect = rcLeft[0];
+		npc->rect = rcLeft;
 	else
 		npc->rect = rcRight[npc->ani_no];
 }
@@ -436,10 +438,10 @@ void ActNpc165(NPCHAR *npc)
 //Chaba
 void ActNpc166(NPCHAR *npc)
 {
-	RECT rcLeft[2];
-
-	rcLeft[0] = {144, 104, 184, 128};
-	rcLeft[1] = {184, 104, 224, 128};
+	RECT rcLeft[2] = {
+		{144, 104, 184, 128},
+		{184, 104, 224, 128},
+	};
 
 	switch (npc->act_no)
 	{
@@ -474,11 +476,11 @@ void ActNpc166(NPCHAR *npc)
 //Professor Booster (falling)
 void ActNpc167(NPCHAR *npc)
 {
-	RECT rect[3];
-
-	rect[0] = {304, 0, 320, 16};
-	rect[1] = {304, 16, 320, 32};
-	rect[2] = {0, 0, 0, 0};
+	RECT rect[3] = {
+		{304, 0, 320, 16},
+		{304, 16, 320, 32},
+		{0, 0, 0, 0},
+	};
 
 	switch (npc->act_no)
 	{
@@ -522,9 +524,7 @@ void ActNpc167(NPCHAR *npc)
 //Boulder
 void ActNpc168(NPCHAR *npc)
 {
-	RECT rect[1];
-
-	rect[0] = {264, 56, 320, 96};
+	RECT rect = {264, 56, 320, 96};
 
 	switch (npc->act_no)
 	{
@@ -572,7 +572,7 @@ void ActNpc168(NPCHAR *npc)
 			break;
 	}
 
-	npc->rect = rect[0];
+	npc->rect = rect;
 }
 
 //Balrog (missile)
@@ -791,28 +791,29 @@ void ActNpc169(NPCHAR *npc)
 	npc->x += npc->xm;
 	npc->y += npc->ym;
 
-	RECT rect_left[9];
-	RECT rect_right[9];
+	RECT rect_left[9] = {
+		{0, 0, 40, 24},
+		{0, 48, 40, 72},
+		{0, 0, 40, 24},
+		{40, 48, 80, 72},
+		{0, 0, 40, 24},
+		{80, 48, 120, 72},
+		{120, 48, 160, 72},
+		{120, 0, 160, 24},
+		{80, 0, 120, 24},
+	};
 
-	rect_left[0] = {0, 0, 40, 24};
-	rect_left[1] = {0, 48, 40, 72};
-	rect_left[2] = {0, 0, 40, 24};
-	rect_left[3] = {40, 48, 80, 72};
-	rect_left[4] = {0, 0, 40, 24};
-	rect_left[5] = {80, 48, 120, 72};
-	rect_left[6] = {120, 48, 160, 72};
-	rect_left[7] = {120, 0, 160, 24};
-	rect_left[8] = {80, 0, 120, 24};
-
-	rect_right[0] = {0, 24, 40, 48};
-	rect_right[1] = {0, 72, 40, 96};
-	rect_right[2] = {0, 24, 40, 48};
-	rect_right[3] = {40, 72, 80, 96};
-	rect_right[4] = {0, 24, 40, 48};
-	rect_right[5] = {80, 72, 120, 96};
-	rect_right[6] = {120, 72, 160, 96};
-	rect_right[7] = {120, 24, 160, 48};
-	rect_right[8] = {80, 24, 120, 48};
+	RECT rect_right[9] = {
+		{0, 24, 40, 48},
+		{0, 72, 40, 96},
+		{0, 24, 40, 48},
+		{40, 72, 80, 96},
+		{0, 24, 40, 48},
+		{80, 72, 120, 96},
+		{120, 72, 160, 96},
+		{120, 24, 160, 48},
+		{80, 24, 120, 48},
+	};
 
 	if (npc->direct == 0)
 		npc->rect = rect_left[npc->ani_no];
@@ -823,14 +824,15 @@ void ActNpc169(NPCHAR *npc)
 //Balrog missile
 void ActNpc170(NPCHAR *npc)
 {
-	RECT rcLeft[2];
-	RECT rcRight[2];
+	RECT rcLeft[2] = {
+		{112, 96, 128, 104},
+		{128, 96, 144, 104},
+	};
 
-	rcLeft[0] = {112, 96, 128, 104};
-	rcLeft[1] = {128, 96, 144, 104};
-
-	rcRight[0] = {112, 104, 128, 112};
-	rcRight[1] = {128, 104, 144, 112};
+	RECT rcRight[2] = {
+		{112, 104, 128, 112},
+		{128, 104, 144, 112},
+	};
 
 	bool bHit = false;
 
@@ -912,14 +914,15 @@ void ActNpc170(NPCHAR *npc)
 //Fire Whirrr
 void ActNpc171(NPCHAR *npc)
 {
-	RECT rcLeft[2];
-	RECT rcRight[2];
+	RECT rcLeft[2] = {
+		{120, 48, 152, 80},
+		{152, 48, 184, 80},
+	};
 
-	rcLeft[0] = {120, 48, 152, 80};
-	rcLeft[1] = {152, 48, 184, 80};
-
-	rcRight[0] = {184, 48, 216, 80};
-	rcRight[1] = {216, 48, 248, 80};
+	RECT rcRight[2] = {
+		{184, 48, 216, 80},
+		{216, 48, 248, 80},
+	};
 
 	if (gMC.x < npc->x)
 		npc->direct = 0;
@@ -998,11 +1001,11 @@ void ActNpc171(NPCHAR *npc)
 //Fire Whirr projectile
 void ActNpc172(NPCHAR *npc)
 {
-	RECT rect[3];
-
-	rect[0] = {248, 48, 264, 80};
-	rect[1] = {264, 48, 280, 80};
-	rect[2] = {280, 48, 296, 80};
+	RECT rect[3] = {
+		{248, 48, 264, 80},
+		{264, 48, 280, 80},
+		{280, 48, 296, 80},
+	};
 
 	switch (npc->act_no)
 	{
@@ -1040,18 +1043,19 @@ void ActNpc172(NPCHAR *npc)
 //Gaudi (armoured)
 void ActNpc173(NPCHAR *npc)
 {
-	RECT rcLeft[4];
-	RECT rcRight[4];
+	RECT rcLeft[4] = {
+		{0, 128, 24, 152},
+		{24, 128, 48, 152},
+		{48, 128, 72, 152},
+		{72, 128, 96, 152},
+	};
 
-	rcLeft[0] = {0, 128, 24, 152};
-	rcLeft[1] = {24, 128, 48, 152};
-	rcLeft[2] = {48, 128, 72, 152};
-	rcLeft[3] = {72, 128, 96, 152};
-
-	rcRight[0] = {0, 152, 24, 176};
-	rcRight[1] = {24, 152, 48, 176};
-	rcRight[2] = {48, 152, 72, 176};
-	rcRight[3] = {72, 152, 96, 176};
+	RECT rcRight[4] = {
+		{0, 152, 24, 176},
+		{24, 152, 48, 176},
+		{48, 152, 72, 176},
+		{72, 152, 96, 176},
+	};
 
 	if (npc->x <= gMC.x + (WINDOW_WIDTH * 0x200) && npc->x >= gMC.x - (WINDOW_WIDTH * 0x200) && npc->y <= gMC.y + (WINDOW_HEIGHT * 0x200) && npc->y >= gMC.y - (WINDOW_HEIGHT * 0x200))
 	{
@@ -1201,8 +1205,6 @@ void ActNpc173(NPCHAR *npc)
 //Armoured-Gaudi projectile
 void ActNpc174(NPCHAR *npc)
 {
-	RECT rect_left[3];
-
 	bool bHit;
 	switch (npc->act_no)
 	{
@@ -1272,9 +1274,11 @@ void ActNpc174(NPCHAR *npc)
 	if (npc->ym < -0x5FF)
 		npc->ym = -0x5FF;
 
-	rect_left[0] = {120, 80, 136, 96};
-	rect_left[1] = {136, 80, 152, 96};
-	rect_left[2] = {152, 80, 168, 96};
+	RECT rect_left[3] = {
+		{120, 80, 136, 96},
+		{136, 80, 152, 96},
+		{152, 80, 168, 96},
+	};
 
 	if (++npc->ani_no > 2)
 		npc->ani_no = 0;
@@ -1285,14 +1289,15 @@ void ActNpc174(NPCHAR *npc)
 //Gaudi egg
 void ActNpc175(NPCHAR *npc)
 {
-	RECT rcLeft[2];
-	RECT rcRight[2];
+	RECT rcLeft[2] = {
+		{168, 80, 192, 104},
+		{192, 80, 216, 104},
+	};
 
-	rcLeft[0] = {168, 80, 192, 104};
-	rcLeft[1] = {192, 80, 216, 104};
-
-	rcRight[0] = {216, 80, 240, 104};
-	rcRight[1] = {240, 80, 264, 104};
+	RECT rcRight[2] = {
+		{216, 80, 240, 104},
+		{240, 80, 264, 104},
+	};
 
 	if (npc->act_no < 3 && npc->life < 90)
 	{
@@ -1330,16 +1335,17 @@ void ActNpc175(NPCHAR *npc)
 //BuyoBuyo Base
 void ActNpc176(NPCHAR *npc)
 {
-	RECT rcLeft[3];
-	RECT rcRight[3];
+	RECT rcLeft[3] = {
+		{96, 128, 128, 144},
+		{128, 128, 160, 144},
+		{160, 128, 192, 144},
+	};
 
-	rcLeft[0] = {96, 128, 128, 144};
-	rcLeft[1] = {128, 128, 160, 144};
-	rcLeft[2] = {160, 128, 192, 144};
-
-	rcRight[0] = {96, 144, 128, 160};
-	rcRight[1] = {128, 144, 160, 160};
-	rcRight[2] = {160, 144, 192, 160};
+	RECT rcRight[3] = {
+		{96, 144, 128, 160},
+		{128, 144, 160, 160},
+		{160, 144, 192, 160},
+	};
 
 	if (npc->act_no < 3 && npc->life < 940)
 	{
@@ -1426,10 +1432,10 @@ void ActNpc176(NPCHAR *npc)
 //BuyoBuyo
 void ActNpc177(NPCHAR *npc)
 {
-	RECT rc[2];
-
-	rc[0] = {192, 128, 208, 144};
-	rc[1] = {208, 128, 224, 144};
+	RECT rc[2] = {
+		{192, 128, 208, 144},
+		{208, 128, 224, 144},
+	};
 
 	if (npc->flag & 0xFF)
 	{
@@ -1538,11 +1544,11 @@ void ActNpc178(NPCHAR *npc)
 		npc->x += npc->xm;
 	}
 
-	RECT rect_left[3];
-
-	rect_left[0] = {0, 224, 16, 240};
-	rect_left[1] = {16, 224, 32, 240};
-	rect_left[2] = {32, 224, 48, 240};
+	RECT rect_left[3] = {
+		{0, 224, 16, 240},
+		{16, 224, 32, 240},
+		{32, 224, 48, 240},
+	};
 
 	if (++npc->ani_wait > 1)
 	{
@@ -1580,11 +1586,11 @@ void ActNpc179(NPCHAR *npc)
 	npc->y += npc->ym;
 	npc->x += npc->xm;
 
-	RECT rect_left[3];
-
-	rect_left[0] = {48, 224, 72, 240};
-	rect_left[1] = {72, 224, 96, 240};
-	rect_left[2] = {96, 224, 120, 240};
+	RECT rect_left[3] = {
+		{48, 224, 72, 240},
+		{72, 224, 96, 240},
+		{96, 224, 120, 240},
+	};
 
 	if (++npc->ani_wait > 1)
 	{
