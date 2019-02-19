@@ -1,22 +1,22 @@
+#include "BossOhm.h"
+
 #include <string.h>
 
 #include "WindowsWrapper.h"
 
 #include "Boss.h"
-#include "NpChar.h"
-#include "MyChar.h"
-#include "Sound.h"
-#include "Frame.h"
 #include "Bullet.h"
 #include "Flash.h"
+#include "Frame.h"
 #include "Game.h"
+#include "MyChar.h"
+#include "NpChar.h"
+#include "Sound.h"
 
 void ActBoss01_12()
 {
-	RECT rcLeft[1];
-	RECT rcRight[1];
-	rcLeft[0] = {80, 56, 104, 72};
-	rcRight[0] = {104, 56, 128, 72};
+	RECT rcLeft[1] = {80, 56, 104, 72};
+	RECT rcRight[1] = {104, 56, 128, 72};
 
 	for (int i = 1; i <= 2; i++)
 	{
@@ -37,13 +37,15 @@ void ActBoss01_12()
 
 void ActBoss01_34()
 {
-	RECT rcRight[2];
-	RECT rcLeft[2];
+	RECT rcLeft[2] = {
+		{0, 56, 40, 88},
+		{40, 56, 80, 88},
+	};
 
-	rcLeft[0] = { 0, 56, 40, 88 };
-	rcLeft[1] = { 40, 56, 80, 88 };
-	rcRight[0] = { 0, 88, 40, 120 };
-	rcRight[1] = { 40, 88, 80, 120 };
+	RECT rcRight[2] = {
+		{ 0, 88, 40, 120 },
+		{ 40, 88, 80, 120 },
+	};
 
 	for (int i = 3; i <= 4; i++)
 	{
@@ -77,19 +79,24 @@ void ActBoss01_34()
 
 		gBoss[i].count2 = !((gBoss[i].flag & 8) && gBoss[i].y > gBoss[i].tgt_y);
 
-		if (gBoss[i].direct)
-			gBoss[i].rect = rcRight[gBoss[i].count2];
-		else
+		if (gBoss[i].direct == 0)
 			gBoss[i].rect = rcLeft[gBoss[i].count2];
+		else
+			gBoss[i].rect = rcRight[gBoss[i].count2];
 	}
 }
 
 void ActBoss01_5()
 {
-	if (!gBoss[5].act_no)
+	if (gBoss[5].act_no == 0)
 	{
 		gBoss[5].bits |= npc_solidSoft | npc_ignoreSolid;
-		gBoss[5].hit = { 0x2800, 0x4800, 0x2800, 0x2000 };
+
+		gBoss[5].hit.front = 0x2800;
+		gBoss[5].hit.top = 0x4800;
+		gBoss[5].hit.back = 0x2800;
+		gBoss[5].hit.bottom = 0x2000;
+
 		gBoss[5].act_no = 1;
 	}
 	
@@ -108,14 +115,20 @@ void ActBossChar_Omega()
 		gBoss[0].x = 0x1B6000;
 		gBoss[0].y = 0x20000;
 
-		gBoss[0].view = { 0x5000, 0x5000, 0x5000, 0x2000 };
+		gBoss[0].view.front = 0x5000;
+		gBoss[0].view.top = 0x5000;
+		gBoss[0].view.back = 0x5000;
+		gBoss[0].view.bottom = 0x2000;
 
 		gBoss[0].tgt_x = 0x1B6000;
 		gBoss[0].tgt_y = 0x20000;
 
 		gBoss[0].hit_voice = 52;
 
-		gBoss[0].hit = { 0x1000, 0x3000, 0x1000, 0x2000 };
+		gBoss[0].hit.front = 0x1000;
+		gBoss[0].hit.top = 0x3000;
+		gBoss[0].hit.back = 0x1000;
+		gBoss[0].hit.bottom = 0x2000;
 
 		gBoss[0].bits = (npc_ignoreSolid | npc_eventDie | npc_showDamage);
 		gBoss[0].size = 3;
@@ -124,7 +137,12 @@ void ActBossChar_Omega()
 		gBoss[0].life = 400;
 
 		gBoss[1].cond = 0x80;
-		gBoss[1].view = { 0x1800, 0x1000, 0x1800, 0x1000 };
+
+		gBoss[1].view.front = 0x1800;
+		gBoss[1].view.top = 0x1000;
+		gBoss[1].view.back = 0x1800;
+		gBoss[1].view.bottom = 0x1000;
+
 		gBoss[1].bits = npc_ignoreSolid;
 
 		memcpy(&gBoss[2], &gBoss[1], sizeof(gBoss[2]));
@@ -133,9 +151,19 @@ void ActBossChar_Omega()
 		gBoss[2].direct = 2;
 
 		gBoss[3].cond = 0x80;
-		gBoss[3].view = { 0x3000, 0x2000, 0x2000, 0x2000 };
+
+		gBoss[3].view.front = 0x3000;
+		gBoss[3].view.top = 0x2000;
+		gBoss[3].view.back = 0x2000;
+		gBoss[3].view.bottom = 0x2000;
+
 		gBoss[3].hit_voice = 52;
-		gBoss[3].hit = { 0x1000, 0x1000, 0x1000, 0x1000 };
+
+		gBoss[3].hit.front = 0x1000;
+		gBoss[3].hit.top = 0x1000;
+		gBoss[3].hit.back = 0x1000;
+		gBoss[3].hit.bottom = 0x1000;
+
 		gBoss[3].bits = npc_ignoreSolid;
 
 		gBoss[3].y = gBoss[0].y;
@@ -203,8 +231,8 @@ void ActBossChar_Omega()
 			gBoss[0].act_no = 60;
 			gBoss[0].act_wait = 0;
 			gBoss[0].bits |= npc_shootable;
-			gBoss[0].hit.left = 0x2000;
-			gBoss[0].hit.right = 0x2000;
+			gBoss[0].hit.front = 0x2000;
+			gBoss[0].hit.back = 0x2000;
 		}
 		break;
 
@@ -247,8 +275,8 @@ void ActBossChar_Omega()
 
 			gBoss[0].bits &= ~npc_shootable;
 
-			gBoss[0].hit.left = 0x3000;
-			gBoss[0].hit.right = 0x3000;
+			gBoss[0].hit.front = 0x3000;
+			gBoss[0].hit.back = 0x3000;
 			gBoss[5].hit.top = 0x4800;
 
 			gBoss[0].damage = 0;
@@ -299,8 +327,8 @@ void ActBossChar_Omega()
 		{
 			gBoss[0].act_no = 120;
 			gBoss[0].act_wait = 0;
-			gBoss[0].hit.left = 0x2000;
-			gBoss[0].hit.right = 0x2000;
+			gBoss[0].hit.front = 0x2000;
+			gBoss[0].hit.back = 0x2000;
 		}
 		break;
 
@@ -335,8 +363,8 @@ void ActBossChar_Omega()
 			gBoss[0].act_no = 140;
 			gBoss[0].bits |= npc_shootable;
 
-			gBoss[0].hit.left = 0x2000;
-			gBoss[0].hit.right = 0x2000;
+			gBoss[0].hit.front = 0x2000;
+			gBoss[0].hit.back = 0x2000;
 
 			gBoss[0].ym = -0x5FF;
 
@@ -418,24 +446,12 @@ void ActBossChar_Omega()
 		break;
 	}
 
-	RECT rect[4];
-
-	rect[0].left = 0;
-	rect[0].top = 0;
-	rect[0].right = 80;
-	rect[0].bottom = 56;
-	rect[1].left = 80;
-	rect[1].top = 0;
-	rect[1].right = 160;
-	rect[1].bottom = 56;
-	rect[2].left = 160;
-	rect[2].top = 0;
-	rect[2].right = 240;
-	rect[2].bottom = 56;
-	rect[3].left = 80;
-	rect[3].top = 0;
-	rect[3].right = 160;
-	rect[3].bottom = 56;
+	RECT rect[4] = {
+		{0, 0, 80, 56},
+		{80, 0, 160, 56},
+		{160, 0, 240, 56},
+		{80, 0, 160, 56},
+	};
 
 	gBoss[0].rect = rect[gBoss[0].count2];
 

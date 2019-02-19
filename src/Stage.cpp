@@ -1,27 +1,29 @@
-#include <stdio.h>
+#include "Stage.h"
+
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "WindowsWrapper.h"
 
+#include "Back.h"
+#include "Boss.h"
+#include "Bullet.h"
+#include "Caret.h"
 #include "CommonDefines.h"
+#include "Draw.h"
+#include "File.h"
+#include "Flash.h"
+#include "Frame.h"
 #include "Map.h"
 #include "MapName.h"
 #include "MyChar.h"
-#include "Bullet.h"
-#include "Boss.h"
-#include "Draw.h"
-#include "Tags.h"
-#include "Frame.h"
-#include "Caret.h"
 #include "NpChar.h"
-#include "TextScr.h"
 #include "Organya.h"
+#include "Tags.h"
+#include "TextScr.h"
 #include "ValueView.h"
-#include "Back.h"
-#include "Stage.h"
-#include "Flash.h"
-#include "File.h"
 
 int gStageNo;
 

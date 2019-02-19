@@ -1,5 +1,7 @@
 #include "BossAlmo2.h"
 
+#include "WindowsWrapper.h"
+
 #include "Boss.h"
 #include "Flash.h"
 #include "Frame.h"
@@ -9,16 +11,15 @@
 #include "NpChar.h"
 #include "Sound.h"
 #include "Triangle.h"
-#include "WindowsWrapper.h"
 
 static void ActBossCharA_Head(NPCHAR *npc)
 {
-	RECT rect[4];
-
-	rect[0] = {0, 0, 72, 112};
-	rect[1] = {0, 112, 72, 224};
-	rect[2] = {160, 0, 232, 112};
-	rect[3] = {0, 0, 0, 0};
+	RECT rect[4] = {
+		{0, 0, 72, 112},
+		{0, 112, 72, 224},
+		{160, 0, 232, 112},
+		{0, 0, 0, 0},
+	};
 
 	switch (npc->act_no)
 	{
@@ -60,11 +61,11 @@ static void ActBossCharA_Head(NPCHAR *npc)
 
 static void ActBossCharA_Tail(NPCHAR *npc)
 {
-	RECT rect[3];
-
-	rect[0] = {72, 0, 160, 112};
-	rect[1] = {72, 112, 160, 224};
-	rect[2] = {0, 0, 0, 0};
+	RECT rect[3] = {
+		{72, 0, 160, 112},
+		{72, 112, 160, 224},
+		{0, 0, 0, 0},
+	};
 
 	switch (npc->act_no)
 	{
@@ -106,13 +107,13 @@ static void ActBossCharA_Tail(NPCHAR *npc)
 
 static void ActBossCharA_Face(NPCHAR *npc)
 {
-	RECT rect[5];
-
-	rect[0] = {0, 0, 0, 0};
-	rect[1] = {160, 112, 232, 152};
-	rect[2] = {160, 152, 232, 192};
-	rect[3] = {160, 192, 232, 232};
-	rect[4] = {248, 160, 320, 200};
+	RECT rect[5] = {
+		{0, 0, 0, 0},
+		{160, 112, 232, 152},
+		{160, 152, 232, 192},
+		{160, 192, 232, 232},
+		{248, 160, 320, 200},
+	};
 
 	switch (npc->act_no)
 	{
@@ -171,11 +172,11 @@ static void ActBossCharA_Face(NPCHAR *npc)
 
 static void ActBossCharA_Mini(NPCHAR *npc)
 {
-	RECT rect[3];
-
-	rect[0] = {256, 0, 320, 40};
-	rect[1] = {256, 40, 320, 80};
-	rect[2] = {256, 80, 320, 120};
+	RECT rect[3] = {
+		{256, 0, 320, 40},
+		{256, 40, 320, 80},
+		{256, 80, 320, 120},
+	};
 
 	if (npc->cond)
 	{

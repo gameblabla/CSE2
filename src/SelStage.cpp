@@ -2,13 +2,14 @@
 
 #include <string.h>
 
+#include "WindowsWrapper.h"
+
 #include "Draw.h"
 #include "Escape.h"
 #include "KeyControl.h"
 #include "Main.h"
-#include "TextScr.h"
 #include "Sound.h"
-#include "WindowsWrapper.h"
+#include "TextScr.h"
 
 PERMIT_STAGE gPermitStage[8];
 
@@ -93,14 +94,14 @@ void PutStageSelectObject(void)
 {
 	static unsigned int flash;
 
-	RECT rcView;
-	RECT rcCur[2];
-	RECT rcTitle1;
+	RECT rcView = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
-	rcView = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
-	rcCur[0] = {80, 88, 112, 104};
-	rcCur[1] = {80, 104, 112, 120};
-	rcTitle1 = {80, 64, 144, 72};
+	RECT rcCur[2] = {
+		{80, 88, 112, 104},
+		{80, 104, 112, 120},
+	};
+
+	RECT rcTitle1 = {80, 64, 144, 72};
 
 	if (gStageSelectTitleY > (WINDOW_HEIGHT / 2) - 74)
 		--gStageSelectTitleY;

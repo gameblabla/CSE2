@@ -1,20 +1,21 @@
+#include "Back.h"
+
+#include <stdio.h>
+
 #include "WindowsWrapper.h"
 
-#include "lodepng/lodepng.h"
-
-#include "Tags.h"
-#include "Back.h"
+#include "Draw.h"
+#include "File.h"
 #include "Frame.h"
 #include "Game.h"
-#include "Draw.h"
-#include "Stage.h"
 #include "Map.h"
-#include "File.h"
+#include "Stage.h"
+#include "Tags.h"
 
 BACK gBack;
 int gWaterY;
 
-bool InitBack(char *fName, int type)
+BOOL InitBack(const char *fName, int type)
 {
 	//Get width and height
 	char path[PATH_LENGTH];
@@ -22,8 +23,8 @@ bool InitBack(char *fName, int type)
 	
 	FILE *fp = fopen(path, "rb");
 
-	if (!fp)
-		return false;
+	if (fp == NULL)
+		return FALSE;
 
 	fseek(fp, 0x10, SEEK_SET);
 	gBack.partsW = File_ReadBE32(fp);
@@ -34,22 +35,25 @@ bool InitBack(char *fName, int type)
 	//Set background stuff and load texture
 	gBack.flag = 1;
 	if (!ReloadBitmap_File(fName, SURFACE_ID_LEVEL_BACKGROUND))
-		return false;
+		return FALSE;
 	gBack.type = type;
 	gWaterY = 0x1E0000;
-	return true;
+	return TRUE;
 }
 
 void ActBack()
 {
-	if (gBack.type == 5)
+	switch (gBack.type)
 	{
-		gBack.fx += 0xC00;
-	}
-	else if (gBack.type >= 5 && gBack.type <= 7)
-	{
-		++gBack.fx;
-		gBack.fx %= 640;
+		case 5:
+			gBack.fx += 0xC00;
+			break;
+
+		case 6:
+		case 7:
+			++gBack.fx;
+			gBack.fx %= 640;
+			break;
 	}
 }
 
@@ -164,35 +168,35 @@ void PutBack(int fx, int fy)
 
 void PutFront(int fx, int fy)
 {
-	RECT rcWater[2];
-	rcWater[0] = {0, 0, 32, 16};
-	rcWater[1] = {0, 16, 32, 48};
+	RECT rcWater[2] = {{0, 0, 32, 16}, {0, 16, 32, 48}};
 
-	if (gBack.type == 3)
+	switch (gBack.type)
 	{
-		int x_1 = fx / 0x4000;
-		int x_2 = x_1 + (((WINDOW_WIDTH + 31) >> 5) + 1);
-		int y_1 = 0;
-		int y_2 = y_1 + 32;
-		
-		for (int y = y_1; y < y_2; y++)
-		{
-			int ypos = (y << 14) / 0x200 - fy / 0x200 + gWaterY / 0x200;
+		case 3:
+			int x_1 = fx / 0x4000;
+			int x_2 = x_1 + (((WINDOW_WIDTH + 31) >> 5) + 1);
+			int y_1 = 0;
+			int y_2 = y_1 + 32;
 			
-			if (ypos >= -32)
+			for (int y = y_1; y < y_2; y++)
 			{
+				int ypos = (y * 0x20 * 0x200) / 0x200 - fy / 0x200 + gWaterY / 0x200;
+				
+				if (ypos < -32)
+					break;
+
 				if (ypos > WINDOW_HEIGHT)
 					break;
-				
+					
 				for (int x = x_1; x < x_2; x++)
 				{
-					int xpos = (x << 14) / 0x200 - fx / 0x200;
+					int xpos = (x * 0x20 * 0x200) / 0x200 - fx / 0x200;
 					PutBitmap3(&grcGame, xpos, ypos, &rcWater[1], SURFACE_ID_LEVEL_BACKGROUND);
 					if (!y)
 						PutBitmap3(&grcGame, xpos, ypos, rcWater, SURFACE_ID_LEVEL_BACKGROUND);
 				}
 			}
-		}
+
 	}
 	
 	//Draw black bars

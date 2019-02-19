@@ -1,16 +1,19 @@
-#include "Sound.h"
-#include "MyChar.h"
 #include "MycParam.h"
-#include "NpChar.h"
-#include "CommonDefines.h"
-#include "Tags.h"
+
+#include "SDL.h"
+
 #include "ArmsItem.h"
-#include "ValueView.h"
-#include "TextScr.h"
-#include "Game.h"
-#include "Draw.h"
+#include "CommonDefines.h"
 #include "Caret.h"
+#include "Draw.h"
+#include "Game.h"
 #include "File.h"
+#include "MyChar.h"
+#include "NpChar.h"
+#include "Sound.h"
+#include "Tags.h"
+#include "TextScr.h"
+#include "ValueView.h"
 
 ARMS_LEVEL gArmsLevelTable[14] =
 {
@@ -328,10 +331,11 @@ void PutMyLife(bool flash)
 
 void PutMyAir(int x, int y)
 {
-	RECT rcAir[2];
-	rcAir[0] = {112, 72, 144, 80};
-	rcAir[1] = {112, 80, 144, 88};
-	
+	RECT rcAir[2] = {
+		{112, 72, 144, 80},
+		{112, 80, 144, 88},
+	};
+
 	if (!(gMC.equip & 0x10) && gMC.air_get)
 	{
 		//Draw how much air is left
@@ -348,11 +352,12 @@ void PutMyAir(int x, int y)
 
 void PutTimeCounter(int x, int y)
 {
-	RECT rcTime[3];
-	rcTime[0] = {112, 104, 120, 112};
-	rcTime[1] = {120, 104, 128, 112};
-	rcTime[2] = {128, 104, 160, 112};
-	
+	RECT rcTime[3] = {
+		{112, 104, 120, 112},
+		{120, 104, 128, 112},
+		{128, 104, 160, 112},
+	};
+
 	if (gMC.equip & 0x100)
 	{
 		//Draw clock and increase time

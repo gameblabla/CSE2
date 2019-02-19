@@ -1,4 +1,5 @@
 #pragma once
+
 struct MAP_NAME
 {
 	int flag;

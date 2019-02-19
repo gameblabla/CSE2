@@ -1,7 +1,8 @@
+#include "Escape.h"
+
 #include "WindowsWrapper.h"
 
 #include "CommonDefines.h"
-#include "Escape.h"
 #include "Draw.h"
 #include "KeyControl.h"
 #include "Main.h"

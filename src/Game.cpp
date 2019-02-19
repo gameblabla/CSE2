@@ -1,47 +1,49 @@
-#include <string>
+#include "Game.h"
+
 #include <stdlib.h>
+#include <string.h>
 
 #include <SDL_timer.h>
+
 #include "WindowsWrapper.h"
 
-#include "Tags.h"
-#include "NpcTbl.h"
-#include "NpChar.h"
-#include "NpcHit.h"
-#include "MiniMap.h"
-#include "Generic.h"
-#include "Boss.h"
-#include "GenericLoad.h"
 #include "ArmsItem.h"
-#include "TextScr.h"
-#include "Bullet.h"
-#include "BulHit.h"
-#include "Shoot.h"
-#include "Star.h"
-#include "Fade.h"
-#include "Frame.h"
-#include "Flags.h"
-#include "Escape.h"
-#include "Stage.h"
-#include "MyChar.h"
-#include "MycHit.h"
-#include "Caret.h"
-#include "Map.h"
-#include "Main.h"
-#include "MycParam.h"
-#include "MapName.h"
-#include "Sound.h"
-#include "Organya.h"
-#include "Profile.h"
-#include "MycParam.h"
 #include "Back.h"
-#include "KeyControl.h"
-#include "ValueView.h"
+#include "Boss.h"
+#include "BossLife.h"
+#include "BulHit.h"
+#include "Bullet.h"
+#include "Caret.h"
 #include "Draw.h"
 #include "Ending.h"
+#include "Escape.h"
+#include "Fade.h"
+#include "Flags.h"
 #include "Flash.h"
-#include "BossLife.h"
+#include "Frame.h"
+#include "Generic.h"
+#include "GenericLoad.h"
+#include "KeyControl.h"
+#include "Main.h"
+#include "Map.h"
+#include "MapName.h"
+#include "MiniMap.h"
+#include "MyChar.h"
+#include "MycHit.h"
+#include "MycParam.h"
+#include "NpChar.h"
+#include "NpcHit.h"
+#include "NpcTbl.h"
+#include "Organya.h"
+#include "Profile.h"
 #include "SelStage.h"
+#include "Shoot.h"
+#include "Sound.h"
+#include "Stage.h"
+#include "Star.h"
+#include "Tags.h"
+#include "TextScr.h"
+#include "ValueView.h"
 
 int g_GameFlags;
 int gCounter;
@@ -58,17 +60,18 @@ void PutNumber4(int x, int y, int value, bool bZero)
 	//Define rects
 	RECT rcClient = grcFull;
 	
-	RECT rect[10];
-	rect[0] = {0, 56, 8, 64};
-	rect[1] = {8, 56, 16, 64};
-	rect[2] = {16, 56, 24, 64};
-	rect[3] = {24, 56, 32, 64};
-	rect[4] = {32, 56, 40, 64};
-	rect[5] = {40, 56, 48, 64};
-	rect[6] = {48, 56, 56, 64};
-	rect[7] = {56, 56, 64, 64};
-	rect[8] = {64, 56, 72, 64};
-	rect[9] = {72, 56, 80, 64};
+	RECT rect[10] = {
+		{0, 56, 8, 64},
+		{8, 56, 16, 64},
+		{16, 56, 24, 64},
+		{24, 56, 32, 64},
+		{32, 56, 40, 64},
+		{40, 56, 48, 64},
+		{48, 56, 56, 64},
+		{56, 56, 64, 64},
+		{64, 56, 72, 64},
+		{72, 56, 80, 64},
+	};
 	
 	//Digits
 	int tbl[4] = {1000, 100, 10, 1};
@@ -115,7 +118,12 @@ int ModeOpening()
 	SetFadeMask();
 	
 	//Reset cliprect and flags
-	grcGame = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
+	grcGame.left = 0;
+	//Non-vanilla: these three lines are widescreen-related(?)
+	grcGame.top = 0;
+	grcGame.right = WINDOW_WIDTH;
+	grcGame.bottom = WINDOW_HEIGHT;
+
 	g_GameFlags = 3;
 	
 	CutNoise();
@@ -214,36 +222,40 @@ int ModeTitle()
 	RECT rcPeriod = {152, 88, 208, 96};
 	
 	//Character rects
-	RECT rcMyChar[4];
-	RECT rcCurly[4];
-	RECT rcToroko[4];
-	RECT rcKing[4];
-	RECT rcSu[4];
-	
-	rcMyChar[0] = {0, 16, 16, 32};
-	rcMyChar[1] = {16, 16, 32, 32};
-	rcMyChar[2] = {0, 16, 16, 32};
-	rcMyChar[3] = {32, 16, 48, 32};
+	RECT rcMyChar[4] = {
+		{0, 16, 16, 32},
+		{16, 16, 32, 32},
+		{0, 16, 16, 32},
+		{32, 16, 48, 32},
+	};
 
-	rcCurly[0] = {0, 112, 16, 128};
-	rcCurly[1] = {16, 112, 32, 128};
-	rcCurly[2] = {0, 112, 16, 128};
-	rcCurly[3] = {32, 112, 48, 128};
+	RECT rcCurly[4] = {
+		{0, 112, 16, 128},
+		{16, 112, 32, 128},
+		{0, 112, 16, 128},
+		{32, 112, 48, 128},
+	};
 	
-	rcToroko[0] = {64, 80, 80, 96};
-	rcToroko[1] = {80, 80, 96, 96};
-	rcToroko[2] = {64, 80, 80, 96};
-	rcToroko[3] = {96, 80, 112, 96};
+	RECT rcToroko[4] = {
+		{64, 80, 80, 96},
+		{80, 80, 96, 96},
+		{64, 80, 80, 96},
+		{96, 80, 112, 96},
+	};
 	
-	rcKing[0] = {224, 48, 240, 64};
-	rcKing[1] = {288, 48, 304, 64};
-	rcKing[2] = {224, 48, 240, 64};
-	rcKing[3] = {304, 48, 320, 64};
+	RECT rcKing[4] = {
+		{224, 48, 240, 64},
+		{288, 48, 304, 64},
+		{224, 48, 240, 64},
+		{304, 48, 320, 64},
+	};
 	
-	rcSu[0] = {0, 16, 16, 32};
-	rcSu[1] = {32, 16, 48, 32};
-	rcSu[2] = {0, 16, 16, 32};
-	rcSu[3] = {48, 16, 64, 32};
+	RECT rcSu[4] = {
+		{0, 16, 16, 32},
+		{32, 16, 48, 32},
+		{0, 16, 16, 32},
+		{48, 16, 64, 32},
+	};
 	
 	//Reset everything
 	InitCaret();
@@ -291,7 +303,12 @@ int ModeTitle()
 	}
 	
 	//Reset cliprect, flags, and give the player the nikumaru counter
-	grcGame = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
+	grcGame.left = 0;
+	//Non-vanilla: these three lines are widescreen-related(?)
+	grcGame.top = 0;
+	grcGame.right = WINDOW_WIDTH;
+	grcGame.bottom = WINDOW_HEIGHT;
+
 	g_GameFlags = 0;
 	gMC.equip |= 0x100;
 	

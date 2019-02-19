@@ -1,10 +1,8 @@
 #pragma once
-#include <stdint.h>
-#include "WindowsWrapper.h"
-#include <SDL_render.h>
 
-extern SDL_Window *gWindow;
-extern SDL_Renderer *gRenderer;
+#include <stdint.h>
+
+#include "WindowsWrapper.h"
 
 extern RECT grcGame;
 extern RECT grcFull;
@@ -48,25 +46,19 @@ typedef enum Surface_Ids
 	SURFACE_ID_MAX = 40,
 } Surface_Ids;
 
-struct SURFACE
-{
-	bool in_use;
-	bool needs_updating;
-	SDL_Surface *surface;
-	SDL_Texture *texture;
-};
+struct SURFACE;
 
 extern SURFACE surf[SURFACE_ID_MAX];
 
-bool Flip_SystemTask();
-bool StartDirectDraw(int lMagnification, int lColourDepth);
+BOOL Flip_SystemTask();
+BOOL StartDirectDraw(int lMagnification, int lColourDepth);
 void EndDirectDraw();
 void ReleaseSurface(int s);
-bool MakeSurface_File(const char *name, Surface_Ids surf_no);
-bool MakeSurface_Resource(const char *res, Surface_Ids surf_no);
-bool ReloadBitmap_File(const char *name, Surface_Ids surf_no);
-bool ReloadBitmap_Resource(const char *res, Surface_Ids surf_no);
-bool MakeSurface_Generic(int bxsize, int bysize, Surface_Ids surf_no);
+BOOL MakeSurface_File(const char *name, Surface_Ids surf_no);
+BOOL MakeSurface_Resource(const char *res, Surface_Ids surf_no);
+BOOL ReloadBitmap_File(const char *name, Surface_Ids surf_no);
+BOOL ReloadBitmap_Resource(const char *res, Surface_Ids surf_no);
+BOOL MakeSurface_Generic(int bxsize, int bysize, Surface_Ids surf_no);
 void BackupSurface(Surface_Ids surf_no, RECT *rect);
 void PutBitmap3(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_no);
 void PutBitmap4(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_no);

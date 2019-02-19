@@ -1,5 +1,7 @@
 #include "BossFrog.h"
 
+#include "WindowsWrapper.h"
+
 #include "Boss.h"
 #include "Frame.h"
 #include "Game.h"
@@ -7,7 +9,6 @@
 #include "NpChar.h"
 #include "Sound.h"
 #include "Triangle.h"
-#include "WindowsWrapper.h"
 
 static void ActBossChar02_01(void)
 {
@@ -77,28 +78,29 @@ static void ActBossChar02_02(void)
 
 void ActBossChar_Frog(void)
 {
-	RECT rcLeft[9];
-	RECT rcRight[9];
+	RECT rcLeft[9] = {
+		{0, 0, 0, 0},
+		{0, 48, 80, 112},
+		{0, 112, 80, 176},
+		{0, 176, 80, 240},
+		{160, 48, 240, 112},
+		{160, 112, 240, 200},
+		{200, 0, 240, 24},
+		{80, 0, 120, 24},
+		{120, 0, 160, 24},
+	};
 
-	rcLeft[0] = {0, 0, 0, 0};
-	rcLeft[1] = {0, 48, 80, 112};
-	rcLeft[2] = {0, 112, 80, 176};
-	rcLeft[3] = {0, 176, 80, 240};
-	rcLeft[4] = {160, 48, 240, 112};
-	rcLeft[5] = {160, 112, 240, 200};
-	rcLeft[6] = {200, 0, 240, 24};
-	rcLeft[7] = {80, 0, 120, 24};
-	rcLeft[8] = {120, 0, 160, 24};
-
-	rcRight[0] = {0, 0, 0, 0};
-	rcRight[1] = {80, 48, 160, 112};
-	rcRight[2] = {80, 112, 160, 176};
-	rcRight[3] = {80, 176, 160, 240};
-	rcRight[4] = {240, 48, 320, 112};
-	rcRight[5] = {240, 112, 320, 200};
-	rcRight[6] = {200, 24, 240, 48};
-	rcRight[7] = {80, 24, 120, 48};
-	rcRight[8] = {120, 24, 160, 48};
+	RECT rcRight[9] = {
+		{0, 0, 0, 0},
+		{80, 48, 160, 112},
+		{80, 112, 160, 176},
+		{80, 176, 160, 240},
+		{240, 48, 320, 112},
+		{240, 112, 320, 200},
+		{200, 24, 240, 48},
+		{80, 24, 120, 48},
+		{120, 24, 160, 48},
+	};
 
 	switch (gBoss[0].act_no)
 	{

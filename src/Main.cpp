@@ -1,34 +1,38 @@
+#include "Main.h"
+
 #include <stddef.h>
-#include "Types.h"
-#include "CommonDefines.h"
 #include <stdint.h>
-#include <string>
+#include <string.h>
 
 #include <SDL.h>
+
 #include "lodepng/lodepng.h"
+
 #include "WindowsWrapper.h"
 
+#include "CommonDefines.h"
+#include "Config.h"
 #include "Draw.h"
-#include "Input.h"
-#include "Profile.h"
-#include "Organya.h"
-#include "Sound.h"
 #include "Game.h"
 #include "Generic.h"
-#include "MyChar.h"
-#include "Main.h"
-#include "Config.h"
+#include "Input.h"
 #include "KeyControl.h"
-#include "Triangle.h"
+#include "MyChar.h"
+#include "Organya.h"
+#include "Profile.h"
 #include "Resource.h"
+#include "Sound.h"
+#include "Triangle.h"
+#include "Types.h"
+
+// These two are defined in Draw.cpp. This is a bit of a hack.
+extern SDL_Window *gWindow;
+extern SDL_Renderer *gRenderer;
 
 char gModulePath[PATH_LENGTH];
 char gDataPath[PATH_LENGTH];
 
 int gJoystickButtonTable[8];
-
-SDL_Window *gWindow;
-SDL_Renderer *gRenderer;
 
 bool gbUseJoystick = false;
 bool bFps = false;
@@ -451,7 +455,7 @@ bool SystemTask()
 	//Handle window events
 	bool focusGained = true;
 	
-	while (SDL_PollEvent(nullptr) || !focusGained)
+	while (SDL_PollEvent(NULL) || !focusGained)
 	{
 		SDL_Event event;
 		SDL_WaitEvent(&event);
@@ -555,6 +559,9 @@ bool SystemTask()
 						
 					case SDL_SCANCODE_F5:
 						gbUseJoystick = false;
+						break;
+
+					default:
 						break;
 				}
 				break;

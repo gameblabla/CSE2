@@ -1,12 +1,15 @@
-#include "Types.h"
-#include "CommonDefines.h"
+#include "Input.h"
+
+#include <stddef.h>
 #include <stdint.h>
 
 #include <SDL.h>
+
 #include "WindowsWrapper.h"
 
-#include "Input.h"
+#include "CommonDefines.h"
 #include "Tags.h"
+#include "Types.h"
 
 #define JOYSTICK_DEADZONE 10000
 
@@ -19,7 +22,7 @@ void ReleaseDirectInput()
 	{
 		SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
 		SDL_JoystickClose(joystick);
-		joystick = nullptr;
+		joystick = NULL;
 	}
 }
 

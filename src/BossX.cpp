@@ -1,5 +1,7 @@
 #include "BossX.h"
 
+#include "WindowsWrapper.h"
+
 #include "Boss.h"
 #include "Flash.h"
 #include "Frame.h"
@@ -8,26 +10,26 @@
 #include "NpChar.h"
 #include "Sound.h"
 #include "Triangle.h"
-#include "WindowsWrapper.h"
 
 static void ActBossChar03_01(NPCHAR *npc)
 {
-	RECT rcUp[6];
-	RECT rcDown[6];
+	RECT rcUp[6] = {
+		{0, 0, 72, 32},
+		{0, 32, 72, 64},
+		{72, 0, 144, 32},
+		{144, 0, 216, 32},
+		{72, 32, 144, 64},
+		{144, 32, 216, 64},
+	};
 
-	rcUp[0] = {0, 0, 72, 32};
-	rcUp[1] = {0, 32, 72, 64};
-	rcUp[2] = {72, 0, 144, 32};
-	rcUp[3] = {144, 0, 216, 32};
-	rcUp[4] = {72, 32, 144, 64};
-	rcUp[5] = {144, 32, 216, 64};
-
-	rcDown[0] = {0, 64, 72, 96};
-	rcDown[1] = {0, 96, 72, 128};
-	rcDown[2] = {72, 64, 144, 96};
-	rcDown[3] = {144, 64, 216, 96};
-	rcDown[4] = {72, 96, 144, 128};
-	rcDown[5] = {144, 96, 216, 128};
+	RECT rcDown[6] = {
+		{0, 64, 72, 96},
+		{0, 96, 72, 128},
+		{72, 64, 144, 96},
+		{144, 64, 216, 96},
+		{72, 96, 144, 128},
+		{144, 96, 216, 128},
+	};
 
 	switch (npc->act_no)
 	{
@@ -210,12 +212,12 @@ static void ActBossChar03_01(NPCHAR *npc)
 
 static void ActBossChar03_02(NPCHAR *npc)
 {
-	RECT rect[4];
-
-	rect[0] = {0, 128, 72, 160};
-	rect[1] = {72, 128, 144, 160};
-	rect[2] = {0, 160, 72, 192};
-	rect[3] = {72, 160, 144, 192};
+	RECT rect[4] = {
+		{0, 128, 72, 160},
+		{72, 128, 144, 160},
+		{0, 160, 72, 192},
+		{72, 160, 144, 192},
+	};
 
 	switch (npc->act_no)
 	{
@@ -359,16 +361,16 @@ static void ActBossChar03_03(NPCHAR *npc)
 
 static void ActBossChar03_04(NPCHAR *npc)
 {
-	RECT rect[8];
-
-	rect[0] = {0, 192, 16, 208};
-	rect[1] = {16, 192, 32, 208};
-	rect[2] = {32, 192, 48, 208};
-	rect[3] = {48, 192, 64, 208};
-	rect[4] = {0, 208, 16, 224};
-	rect[5] = {16, 208, 32, 224};
-	rect[6] = {32, 208, 48, 224};
-	rect[7] = {48, 208, 64, 224};
+	RECT rect[8] = {
+		{0, 192, 16, 208},
+		{16, 192, 32, 208},
+		{32, 192, 48, 208},
+		{48, 192, 64, 208},
+		{0, 208, 16, 224},
+		{16, 208, 32, 224},
+		{32, 208, 48, 224},
+		{48, 208, 64, 224},
+	};
 
 	switch (npc->act_no)
 	{
@@ -427,11 +429,11 @@ static void ActBossChar03_04(NPCHAR *npc)
 
 static void ActBossChar03_face(NPCHAR *npc)
 {
-	RECT rect[3];
-
-	rect[0] = {216, 0, 320, 48};
-	rect[1] = {216, 48, 320, 96};
-	rect[2] = {216, 144, 320, 192};
+	RECT rect[3] = {
+		{216, 0, 320, 48},
+		{216, 48, 320, 96},
+		{216, 144, 320, 192},
+	};
 
 	switch (npc->act_no)
 	{

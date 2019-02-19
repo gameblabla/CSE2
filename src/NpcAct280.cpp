@@ -1,28 +1,29 @@
-#include "WindowsWrapper.h"
-
 #include "NpcAct.h"
 
+#include "WindowsWrapper.h"
+
+#include "Back.h"
+#include "Boss.h"
+#include "Frame.h"
+#include "Game.h"
+#include "Map.h"
 #include "MyChar.h"
 #include "NpChar.h"
-#include "Game.h"
 #include "Sound.h"
-#include "Back.h"
 #include "Triangle.h"
-#include "Frame.h"
-#include "Map.h"
-#include "Boss.h"
 
 //Sue (being teleported by Misery)
 void ActNpc280(NPCHAR *npc)
 {
-	RECT rcLeft[2];
-	RECT rcRight[2];
+	RECT rcLeft[2] = {
+		{112, 32, 128, 48},
+		{144, 32, 160, 48},
+	};
 
-	rcLeft[0] = {112, 32, 128, 48};
-	rcLeft[1] = {144, 32, 160, 48};
-
-	rcRight[0] = {112, 48, 128, 64};
-	rcRight[1] = {144, 48, 160, 64};
+	RECT rcRight[2] = {
+		{112, 48, 128, 64},
+		{144, 48, 160, 64},
+	};
 
 	switch (npc->act_no)
 	{
@@ -127,11 +128,11 @@ void ActNpc281(NPCHAR *npc)
 //Mini Undead Core (active)
 void ActNpc282(NPCHAR *npc)
 {
-	RECT tc[3];
-
-	tc[0] = {256, 80, 320, 120};
-	tc[1] = {256, 0, 320, 40};
-	tc[2] = {256, 120, 320, 160};
+	RECT tc[3] = {
+		{256, 80, 320, 120},
+		{256, 0, 320, 40},
+		{256, 120, 320, 160},
+	};
 
 	switch (npc->act_no)
 	{
@@ -201,32 +202,33 @@ void ActNpc282(NPCHAR *npc)
 //Misery (transformed)
 void ActNpc283(NPCHAR *npc)
 {
-	RECT rcLeft[11];
-	RECT rcRight[11];
+	RECT rcLeft[11] = {
+		{0, 64, 32, 96},
+		{32, 64, 64, 96},
+		{64, 64, 96, 96},
+		{96, 64, 128, 96},
+		{128, 64, 160, 96},
+		{160, 64, 192, 96},
+		{192, 64, 224, 96},
+		{224, 64, 256, 96},
+		{0, 0, 0, 0},
+		{256, 64, 288, 96},
+		{288, 64, 320, 96},
+	};
 
-	rcLeft[0] = {0, 64, 32, 96};
-	rcLeft[1] = {32, 64, 64, 96};
-	rcLeft[2] = {64, 64, 96, 96};
-	rcLeft[3] = {96, 64, 128, 96};
-	rcLeft[4] = {128, 64, 160, 96};
-	rcLeft[5] = {160, 64, 192, 96};
-	rcLeft[6] = {192, 64, 224, 96};
-	rcLeft[7] = {224, 64, 256, 96};
-	rcLeft[8] = {0, 0, 0, 0};
-	rcLeft[9] = {256, 64, 288, 96};
-	rcLeft[10] = {288, 64, 320, 96};
-
-	rcRight[0] = {0, 96, 32, 128};
-	rcRight[1] = {32, 96, 64, 128};
-	rcRight[2] = {64, 96, 96, 128};
-	rcRight[3] = {96, 96, 128, 128};
-	rcRight[4] = {128, 96, 160, 128};
-	rcRight[5] = {160, 96, 192, 128};
-	rcRight[6] = {192, 96, 224, 128};
-	rcRight[7] = {224, 96, 256, 128};
-	rcRight[8] = {0, 0, 0, 0};
-	rcRight[9] = {256, 96, 288, 128};
-	rcRight[10] = {288, 96, 320, 128};
+	RECT rcRight[11] = {
+		{0, 96, 32, 128},
+		{32, 96, 64, 128},
+		{64, 96, 96, 128},
+		{96, 96, 128, 128},
+		{128, 96, 160, 128},
+		{160, 96, 192, 128},
+		{192, 96, 224, 128},
+		{224, 96, 256, 128},
+		{0, 0, 0, 0},
+		{256, 96, 288, 128},
+		{288, 96, 320, 128},
+	};
 
 	if (npc->act_no < 100 && (gBoss[0].cond == 0 || npc->life < 400))
 		npc->act_no = 100;
@@ -601,36 +603,37 @@ void ActNpc283(NPCHAR *npc)
 //Sue (transformed)
 void ActNpc284(NPCHAR *npc)
 {
-	RECT rcLeft[13];
-	RECT rcRight[13];
+	RECT rcLeft[13] = {
+		{0, 128, 32, 160},
+		{32, 128, 64, 160},
+		{64, 128, 96, 160},
+		{96, 128, 128, 160},
+		{128, 128, 160, 160},
+		{160, 128, 192, 160},
+		{192, 128, 224, 160},
+		{224, 128, 256, 160},
+		{0, 0, 0, 0},
+		{256, 128, 288, 160},
+		{288, 128, 320, 160},
+		{224, 64, 256, 96},
+		{208, 32, 224, 48},
+	};
 
-	rcLeft[0] = {0, 128, 32, 160};
-	rcLeft[1] = {32, 128, 64, 160};
-	rcLeft[2] = {64, 128, 96, 160};
-	rcLeft[3] = {96, 128, 128, 160};
-	rcLeft[4] = {128, 128, 160, 160};
-	rcLeft[5] = {160, 128, 192, 160};
-	rcLeft[6] = {192, 128, 224, 160};
-	rcLeft[7] = {224, 128, 256, 160};
-	rcLeft[8] = {0, 0, 0, 0};
-	rcLeft[9] = {256, 128, 288, 160};
-	rcLeft[10] = {288, 128, 320, 160};
-	rcLeft[11] = {224, 64, 256, 96};
-	rcLeft[12] = {208, 32, 224, 48};
-
-	rcRight[0] = {0, 160, 32, 192};
-	rcRight[1] = {32, 160, 64, 192};
-	rcRight[2] = {64, 160, 96, 192};
-	rcRight[3] = {96, 160, 128, 192};
-	rcRight[4] = {128, 160, 160, 192};
-	rcRight[5] = {160, 160, 192, 192};
-	rcRight[6] = {192, 160, 224, 192};
-	rcRight[7] = {224, 160, 256, 192};
-	rcRight[8] = {0, 0, 0, 0};
-	rcRight[9] = {256, 160, 288, 192};
-	rcRight[10] = {288, 160, 320, 192};
-	rcRight[11] = {224, 96, 256, 128};
-	rcRight[12] = {208, 48, 224, 64};
+	RECT rcRight[13] = {
+		{0, 160, 32, 192},
+		{32, 160, 64, 192},
+		{64, 160, 96, 192},
+		{96, 160, 128, 192},
+		{128, 160, 160, 192},
+		{160, 160, 192, 192},
+		{192, 160, 224, 192},
+		{224, 160, 256, 192},
+		{0, 0, 0, 0},
+		{256, 160, 288, 192},
+		{288, 160, 320, 192},
+		{224, 96, 256, 128},
+		{208, 48, 224, 64},
+	};
 
 	if (npc->act_no < 100 && (gBoss[0].cond == 0|| npc->life < 500))
 		npc->act_no = 100;
@@ -996,11 +999,11 @@ void ActNpc285(NPCHAR *npc)
 //Undead Core spiral shot trail
 void ActNpc286(NPCHAR *npc)
 {
-	RECT rc[3];
-
-	rc[0] = {232, 120, 248, 136};
-	rc[1] = {232, 136, 248, 152};
-	rc[2] = {232, 152, 248, 168};
+	RECT rc[3] = {
+		{232, 120, 248, 136},
+		{232, 136, 248, 152},
+		{232, 152, 248, 168},
+	};
 
 	if (++npc->ani_wait > 0)
 	{
@@ -1017,15 +1020,15 @@ void ActNpc286(NPCHAR *npc)
 //Orange smoke
 void ActNpc287(NPCHAR *npc)
 {
-	RECT rcLeft[7];
-
-	rcLeft[0] = {0, 224, 16, 240};
-	rcLeft[1] = {16, 224, 32, 240};
-	rcLeft[2] = {32, 224, 48, 240};
-	rcLeft[3] = {48, 224, 64, 240};
-	rcLeft[4] = {64, 224, 80, 240};
-	rcLeft[5] = {80, 224, 96, 240};
-	rcLeft[6] = {96, 224, 112, 240};
+	RECT rcLeft[7] = {
+		{0, 224, 16, 240},
+		{16, 224, 32, 240},
+		{32, 224, 48, 240},
+		{48, 224, 64, 240},
+		{64, 224, 80, 240},
+		{80, 224, 96, 240},
+		{96, 224, 112, 240},
+	};
 
 	if (npc->act_no == 0)
 	{
@@ -1056,13 +1059,13 @@ void ActNpc287(NPCHAR *npc)
 //Undead Core exploding rock
 void ActNpc288(NPCHAR *npc)
 {
-	RECT rc[5];
-
-	rc[0] = {232, 72, 248, 88};
-	rc[1] = {232, 88, 248, 104};
-	rc[2] = {232, 0, 256, 24};
-	rc[3] = {232, 24, 256, 48};
-	rc[4] = {232, 48, 256, 72};
+	RECT rc[5] = {
+		{232, 72, 248, 88},
+		{232, 88, 248, 104},
+		{232, 0, 256, 24},
+		{232, 24, 256, 48},
+		{232, 48, 256, 72},
+	};
 
 	switch (npc->act_no)
 	{
@@ -1145,16 +1148,17 @@ void ActNpc288(NPCHAR *npc)
 //Critter (orange, Misery)
 void ActNpc289(NPCHAR *npc)
 {
-	RECT rcLeft[3];
-	RECT rcRight[3];
+	RECT rcLeft[3] = {
+		{160, 32, 176, 48},
+		{176, 32, 192, 48},
+		{192, 32, 208, 48},
+	};
 
-	rcLeft[0] = {160, 32, 176, 48};
-	rcLeft[1] = {176, 32, 192, 48};
-	rcLeft[2] = {192, 32, 208, 48};
-
-	rcRight[0] = {160, 48, 176, 64};
-	rcRight[1] = {176, 48, 192, 64};
-	rcRight[2] = {192, 48, 208, 64};
+	RECT rcRight[3] = {
+		{160, 48, 176, 64},
+		{176, 48, 192, 64},
+		{192, 48, 208, 64},
+	};
 
 	switch (npc->act_no)
 	{
@@ -1251,16 +1255,17 @@ void ActNpc289(NPCHAR *npc)
 //Bat (Misery)
 void ActNpc290(NPCHAR *npc)
 {
-	RECT rcLeft[3];
-	RECT rcRight[3];
+	RECT rcLeft[3] = {
+		{112, 32, 128, 48},
+		{128, 32, 144, 48},
+		{144, 32, 160, 48},
+	};
 
-	rcLeft[0] = {112, 32, 128, 48};
-	rcLeft[1] = {128, 32, 144, 48};
-	rcLeft[2] = {144, 32, 160, 48};
-
-	rcRight[0] = {112, 48, 128, 64};
-	rcRight[1] = {128, 48, 144, 64};
-	rcRight[2] = {144, 48, 160, 64};
+	RECT rcRight[3] = {
+		{112, 48, 128, 64},
+		{128, 48, 144, 64},
+		{144, 48, 160, 64},
+	};
 
 	switch (npc->act_no)
 	{
@@ -1336,10 +1341,10 @@ void ActNpc290(NPCHAR *npc)
 //Mini Undead Core (inactive)
 void ActNpc291(NPCHAR *npc)
 {
-	RECT tc[2];
-
-	tc[0] = {256, 80, 320, 120};
-	tc[1] = {256, 0, 320, 40};
+	RECT tc[2] = {
+		{256, 80, 320, 120},
+		{256, 0, 320, 40},
+	};
 
 	if (npc->act_no == 0)
 	{
@@ -1366,10 +1371,10 @@ void ActNpc292(NPCHAR *npc)
 //Undead Core giant energy shot
 void ActNpc293(NPCHAR *npc)
 {
-	RECT rect[2];
-
-	rect[0] = {240, 200, 280, 240};
-	rect[1] = {280, 200, 320, 240};
+	RECT rect[2] = {
+		{240, 200, 280, 240},
+		{280, 200, 320, 240},
+	};
 
 	switch (npc->act_no)
 	{
@@ -1454,11 +1459,12 @@ void ActNpc294(NPCHAR *npc)
 //Cloud
 void ActNpc295(NPCHAR *npc)
 {
-	RECT rc[4];
-	rc[0] = {0, 0, 208, 64};
-	rc[1] = {32, 64, 144, 96};
-	rc[2] = {32, 96, 104, 0x80};
-	rc[3] = {104, 96, 144, 0x80};
+	RECT rc[4] = {
+		{0, 0, 208, 64},
+		{32, 64, 144, 96},
+		{32, 96, 104, 0x80},
+		{104, 96, 144, 0x80},
+	};
 	
 	switch (npc->act_no)
 	{
@@ -1579,24 +1585,27 @@ void ActNpc296(NPCHAR *npc)
 //Sue in dragon's mouth
 void ActNpc297(NPCHAR *npc)
 {
+	RECT rc = {112, 48, 0x80, 64};
+
 	npc->x = npc->pNpc->x + 0x2000;
 	npc->y = npc->pNpc->y + 0x1000;
-	npc->rect = {112, 48, 0x80, 64};
+
+	npc->rect = rc;
 }
 
 //Doctor (opening)
 void ActNpc298(NPCHAR *npc)
 {
-	RECT rc[8];
-
-	rc[0] = {72, 0x80, 88, 160};
-	rc[1] = {88, 0x80, 104, 160};
-	rc[2] = {104, 0x80, 120, 160};
-	rc[3] = {72, 0x80, 88, 160};
-	rc[4] = {120, 0x80, 136, 160};
-	rc[5] = {72, 0x80, 88, 160};
-	rc[6] = {104, 160, 120, 192};
-	rc[7] = {120, 160, 136, 192};
+	RECT rc[8] = {
+		{72, 0x80, 88, 160},
+		{88, 0x80, 104, 160},
+		{104, 0x80, 120, 160},
+		{72, 0x80, 88, 160},
+		{120, 0x80, 136, 160},
+		{72, 0x80, 88, 160},
+		{104, 160, 120, 192},
+		{120, 160, 136, 192},
+	};
 
 	switch (npc->act_no)
 	{
@@ -1694,10 +1703,10 @@ void ActNpc298(NPCHAR *npc)
 //Balrog/Misery (opening)
 void ActNpc299(NPCHAR *npc)
 {
-	RECT rc[2];
-
-	rc[0] = {0, 0, 48, 48};
-	rc[1] = {48, 0, 96, 48};
+	RECT rc[2] = {
+		{0, 0, 48, 48},
+		{48, 0, 96, 48},
+	};
 
 	switch (npc->act_no)
 	{

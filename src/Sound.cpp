@@ -1,11 +1,12 @@
-#include <string>
-#include <math.h>
+#include "Sound.h"
+
 #include <algorithm>
+#include <math.h>
 #include <stdint.h>
+#include <string>
 
 #include <SDL.h>
 
-#include "Sound.h"
 #include "Organya.h"
 #include "PixTone.h"
 
@@ -61,7 +62,7 @@ SOUNDBUFFER::~SOUNDBUFFER()
 		delete[] data;
 	
 	//Remove from buffer list
-	for (SOUNDBUFFER **soundBuffer = &soundBuffers; *soundBuffer != nullptr; soundBuffer = &(*soundBuffer)->next)
+	for (SOUNDBUFFER **soundBuffer = &soundBuffers; *soundBuffer != NULL; soundBuffer = &(*soundBuffer)->next)
 	{
 		if (*soundBuffer == this)
 		{
@@ -84,10 +85,10 @@ void SOUNDBUFFER::Lock(uint8_t **outBuffer, size_t *outSize)
 {
 	SDL_LockAudioDevice(audioDevice);
 
-	if (outBuffer != nullptr)
+	if (outBuffer != NULL)
 		*outBuffer = data;
 
-	if (outSize != nullptr)
+	if (outSize != NULL)
 		*outSize = size;
 }
 
@@ -113,7 +114,7 @@ void SOUNDBUFFER::SetFrequency(uint32_t dwFrequency)
 float MillibelToVolume(int32_t lVolume)
 {
 	//Volume is in hundredths of decibels, from 0 to -10000
-	lVolume = clamp(lVolume, (decltype(lVolume))-10000, (decltype(lVolume))0);
+	lVolume = clamp(lVolume, (int32_t)-10000, (int32_t)0);
 	return pow(10.0, lVolume / 2000.0);
 }
 
@@ -208,7 +209,7 @@ void AudioCallback(void *userdata, uint8_t *stream, int len)
 	}
 	
 	//Mix sounds to primary buffer
-	for (SOUNDBUFFER *sound = soundBuffers; sound != nullptr; sound = sound->next)
+	for (SOUNDBUFFER *sound = soundBuffers; sound != NULL; sound = sound->next)
 		sound->Mix(buffer, samples);
 }
 

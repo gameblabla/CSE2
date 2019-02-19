@@ -1,7 +1,9 @@
 #pragma once
+
 #include <stdint.h>
-#include "NpChar.h"
+
 #include "Draw.h"
+#include "NpChar.h"
 
 struct NPC_TBL_RECT
 {
@@ -15,7 +17,7 @@ struct NPC_TABLE
 {
 	uint16_t bits;
 	uint16_t life;
-	Surface_Ids surf;
+	uint8_t surf;
 	uint8_t hit_voice;
 	uint8_t destroy_voice;
 	uint8_t size;

@@ -1,5 +1,7 @@
 #pragma once
+
 #include <stdint.h>
+
 #include "ArmsItem.h"
 #include "SelStage.h"
 

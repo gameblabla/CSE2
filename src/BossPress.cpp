@@ -1,10 +1,11 @@
 #include "BossPress.h"
 
+#include "WindowsWrapper.h"
+
 #include "Boss.h"
 #include "Game.h"
 #include "Map.h"
 #include "Sound.h"
-#include "WindowsWrapper.h"
 
 void ActBossChar_Press(void)
 {
@@ -195,22 +196,23 @@ void ActBossChar_Press(void)
 	gBoss[3].x = gBoss[0].x;
 	gBoss[3].y = gBoss[0].y + 0x5000;
 
-	RECT rc[3];
-	RECT rcDamage[3];
+	RECT rc[3] = {
+		{0, 0, 80, 120},
+		{80, 0, 160, 120},
+		{160, 0, 240, 120},
+	};
 
-	rc[0] = {0, 0, 80, 120};
-	rc[1] = {80, 0, 160, 120};
-	rc[2] = {160, 0, 240, 120};
-
-	rcDamage[0] = {0, 120, 80, 240};
-	rcDamage[1] = {80, 120, 160, 240};
-	rcDamage[2] = {160, 120, 240, 240};
+	RECT rcDamage[3] = {
+		{0, 120, 80, 240},
+		{80, 120, 160, 240},
+		{160, 120, 240, 240},
+	};
 
 	if (gBoss[0].shock)
 	{
 		static unsigned char flash;
 
-		if ((++flash >> 1) & 1)
+		if ((++flash / 2) % 2)
 			gBoss[0].rect = rc[gBoss[0].ani_no];
 		else
 			gBoss[0].rect = rcDamage[gBoss[0].ani_no];

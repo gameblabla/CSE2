@@ -1,15 +1,15 @@
 #include <stddef.h>
-#include "Types.h"
-#include "CommonDefines.h"
-#include <stdio.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "WindowsWrapper.h"
 
-#include "Tags.h"
+#include "CommonDefines.h"
 #include "Config.h"
 #include "File.h"
+#include "Tags.h"
+#include "Types.h"
 
 bool LoadConfigData(CONFIG *conf)
 {

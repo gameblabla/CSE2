@@ -1,25 +1,25 @@
-#include "WindowsWrapper.h"
-
 #include "NpcAct.h"
 
+#include "WindowsWrapper.h"
+
+#include "Back.h"
+#include "Bullet.h"
+#include "Caret.h"
+#include "Frame.h"
+#include "Game.h"
+#include "KeyControl.h"
 #include "MyChar.h"
 #include "NpChar.h"
-#include "Game.h"
 #include "Sound.h"
-#include "Back.h"
 #include "Triangle.h"
-#include "Caret.h"
-#include "KeyControl.h"
-#include "Frame.h"
-#include "Bullet.h"
 
 //Colon (1)
 void ActNpc120(NPCHAR *npc)
 {
-	RECT rect[2];
-
-	rect[0] = {64, 0, 80, 16};
-	rect[1] = {64, 16, 80, 32};
+	RECT rect[2] = {
+		{64, 0, 80, 16},
+		{64, 16, 80, 32},
+	};
 
 	if (npc->direct == 0)
 		npc->rect = rect[0];
@@ -30,11 +30,11 @@ void ActNpc120(NPCHAR *npc)
 //Colon (2)
 void ActNpc121(NPCHAR *npc)
 {
-	RECT rect[3];
-
-	rect[0] = {0, 0, 16, 16};
-	rect[1] = {16, 0, 32, 16};
-	rect[2] = {112, 0, 128, 16};
+	RECT rect[3] = {
+		{0, 0, 16, 16},
+		{16, 0, 32, 16},
+		{112, 0, 128, 16},
+	};
 
 	if (npc->direct == 0)
 	{
@@ -81,30 +81,31 @@ void ActNpc121(NPCHAR *npc)
 //Colon (attacking)
 void ActNpc122(NPCHAR *npc)
 {
-	RECT rcLeft[10];
-	RECT rcRight[10];
+	RECT rcLeft[10] = {
+		{0, 0, 16, 16},
+		{16, 0, 32, 16},
+		{32, 0, 48, 16},
+		{0, 0, 16, 16},
+		{48, 0, 64, 16},
+		{0, 0, 16, 16},
+		{80, 0, 96, 16},
+		{96, 0, 112, 16},
+		{112, 0, 128, 16},
+		{128, 0, 144, 16},
+	};
 
-	rcLeft[0] = {0, 0, 16, 16};
-	rcLeft[1] = {16, 0, 32, 16};
-	rcLeft[2] = {32, 0, 48, 16};
-	rcLeft[3] = {0, 0, 16, 16};
-	rcLeft[4] = {48, 0, 64, 16};
-	rcLeft[5] = {0, 0, 16, 16};
-	rcLeft[6] = {80, 0, 96, 16};
-	rcLeft[7] = {96, 0, 112, 16};
-	rcLeft[8] = {112, 0, 128, 16};
-	rcLeft[9] = {128, 0, 144, 16};
-
-	rcRight[0] = {0, 16, 16, 32};
-	rcRight[1] = {16, 16, 32, 32};
-	rcRight[2] = {32, 16, 48, 32};
-	rcRight[3] = {0, 16, 16, 32};
-	rcRight[4] = {48, 16, 64, 32};
-	rcRight[5] = {0, 16, 16, 32};
-	rcRight[6] = {80, 16, 96, 32};
-	rcRight[7] = {96, 16, 112, 32};
-	rcRight[8] = {112, 16, 128, 32};
-	rcRight[9] = {128, 16, 144, 32};
+	RECT rcRight[10] = {
+		{0, 16, 16, 32},
+		{16, 16, 32, 32},
+		{32, 16, 48, 32},
+		{0, 16, 16, 32},
+		{48, 16, 64, 32},
+		{0, 16, 16, 32},
+		{80, 16, 96, 32},
+		{96, 16, 112, 32},
+		{112, 16, 128, 32},
+		{128, 16, 144, 32},
+	};
 
 	switch (npc->act_no)
 	{
@@ -269,12 +270,12 @@ void ActNpc122(NPCHAR *npc)
 //Curly boss projectile
 void ActNpc123(NPCHAR *npc)
 {
-	RECT rect[4];
-
-	rect[0] = {192, 0, 208, 16};
-	rect[1] = {208, 0, 224, 16};
-	rect[2] = {224, 0, 240, 16};
-	rect[3] = {240, 0, 256, 16};
+	RECT rect[4] = {
+		{192, 0, 208, 16},
+		{208, 0, 224, 16},
+		{224, 0, 240, 16},
+		{240, 0, 256, 16},
+	};
 
 	bool bBreak = false;
 
@@ -347,10 +348,10 @@ void ActNpc123(NPCHAR *npc)
 //Sunstone
 void ActNpc124(NPCHAR *npc)
 {
-	RECT rect[2];
-
-	rect[0] = {160, 0, 192, 32};
-	rect[1] = {192, 0, 224, 32};
+	RECT rect[2] = {
+		{160, 0, 192, 32},
+		{192, 0, 224, 32},
+	};
 
 	switch (npc->act_no)
 	{
@@ -412,10 +413,10 @@ void ActNpc125(NPCHAR *npc)
 		npc->cond = 0;
 	}
 
-	RECT rc[2];
-
-	rc[0] = {0, 96, 16, 112};
-	rc[1] = {16, 96, 32, 112};
+	RECT rc[2] = {
+		{0, 96, 16, 112},
+		{16, 96, 32, 112},
+	};
 
 	if (npc->direct == 0)
 		npc->rect = rc[0];
@@ -426,22 +427,23 @@ void ActNpc125(NPCHAR *npc)
 //Puppy (running)
 void ActNpc126(NPCHAR *npc)
 {
-	RECT rcLeft[6];
-	RECT rcRight[6];
+	RECT rcLeft[6] = {
+		{48, 144, 64, 160},
+		{64, 144, 80, 160},
+		{48, 144, 64, 160},
+		{80, 144, 96, 160},
+		{96, 144, 112, 160},
+		{112, 144, 128, 160},
+	};
 
-	rcLeft[0] = {48, 144, 64, 160};
-	rcLeft[1] = {64, 144, 80, 160};
-	rcLeft[2] = {48, 144, 64, 160};
-	rcLeft[3] = {80, 144, 96, 160};
-	rcLeft[4] = {96, 144, 112, 160};
-	rcLeft[5] = {112, 144, 128, 160};
-
-	rcRight[0] = {48, 160, 64, 176};
-	rcRight[1] = {64, 160, 80, 176};
-	rcRight[2] = {48, 160, 64, 176};
-	rcRight[3] = {80, 160, 96, 176};
-	rcRight[4] = {96, 160, 112, 176};
-	rcRight[5] = {112, 160, 128, 176};
+	RECT rcRight[6] = {
+		{48, 160, 64, 176},
+		{64, 160, 80, 176},
+		{48, 160, 64, 176},
+		{80, 160, 96, 176},
+		{96, 160, 112, 176},
+		{112, 160, 128, 176},
+	};
 
 	switch (npc->act_no)
 	{
@@ -557,15 +559,18 @@ void ActNpc126(NPCHAR *npc)
 //Machine gun trail (Level 2)
 void ActNpc127(NPCHAR *npc)
 {
-	RECT rcV[3];
-	RECT rcH[3];
-	rcV[0] = {112, 48, 128, 64};
-	rcV[1] = {112, 64, 128, 80};
-	rcV[2] = {112, 80, 128, 96};
-	rcH[0] = {64, 80, 80, 96};
-	rcH[1] = {80, 80, 96, 96};
-	rcH[2] = {96, 80, 112, 96};
-	
+	RECT rcV[3] = {
+		{112, 48, 128, 64},
+		{112, 64, 128, 80},
+		{112, 80, 128, 96},
+	};
+
+	RECT rcH[3] = {
+		{64, 80, 80, 96},
+		{80, 80, 96, 96},
+		{96, 80, 112, 96},
+	};
+
 	if (++npc->ani_wait > 0)
 	{
 		npc->ani_wait = 0;
@@ -582,33 +587,39 @@ void ActNpc127(NPCHAR *npc)
 //Machine gun trail (Level 3)
 void ActNpc128(NPCHAR *npc)
 {
-	RECT rcLeft[5];
-	RECT rcRight[5];
-	RECT rcUp[5];
-	RECT rcDown[5];
+	RECT rcLeft[5] = {
+		{0, 0, 0, 0},
+		{176, 16, 184, 32},
+		{184, 16, 192, 32},
+		{192, 16, 200, 32},
+		{200, 16, 208, 32},
+	};
 
-	rcLeft[0] = {0, 0, 0, 0};
-	rcLeft[1] = {176, 16, 184, 32};
-	rcLeft[2] = {184, 16, 192, 32};
-	rcLeft[3] = {192, 16, 200, 32};
-	rcLeft[4] = {200, 16, 208, 32};
-	rcRight[0] = {0, 0, 0, 0};
-	rcRight[1] = {232, 16, 240, 32};
-	rcRight[2] = {224, 16, 232, 32};
-	rcRight[3] = {216, 16, 224, 32};
-	rcRight[4] = {208, 16, 216, 32};
-	rcUp[0] = {0, 0, 0, 0};
-	rcUp[1] = {176, 32, 192, 40};
-	rcUp[2] = {176, 40, 192, 48};
-	rcUp[3] = {192, 32, 208, 40};
-	rcUp[4] = {192, 40, 208, 48};
-	rcDown[0] = {0, 0, 0, 0};
-	rcDown[1] = {208, 32, 224, 40};
-	rcDown[2] = {208, 40, 224, 48};
-	rcDown[3] = {224, 32, 232, 40};
-	rcDown[4] = {224, 40, 232, 48};
+	RECT rcRight[5] = {
+		{0, 0, 0, 0},
+		{232, 16, 240, 32},
+		{224, 16, 232, 32},
+		{216, 16, 224, 32},
+		{208, 16, 216, 32},
+	};
+
+	RECT rcUp[5] = {
+		{0, 0, 0, 0},
+		{176, 32, 192, 40},
+		{176, 40, 192, 48},
+		{192, 32, 208, 40},
+		{192, 40, 208, 48},
+	};
+
+	RECT rcDown[5] = {
+		{0, 0, 0, 0},
+		{208, 32, 224, 40},
+		{208, 40, 224, 48},
+		{224, 32, 232, 40},
+		{224, 40, 232, 48},
+	};
 	
-	if (!npc->act_no)
+	if (npc->act_no == 0)
 	{
 		npc->act_no = 1;
 		
@@ -647,25 +658,26 @@ void ActNpc128(NPCHAR *npc)
 //Fireball trail (Level 2 & 3)
 void ActNpc129(NPCHAR *npc)
 {
-	RECT rect[18];
-	rect[0] = {0x80, 0x30, 0x90, 0x40};
-	rect[1] = {0x90, 0x30, 0xA0, 0x40};
-	rect[2] = {0xA0, 0x30, 0xB0, 0x40};
-	rect[3] = {0x80, 0x40, 0x90, 0x50};
-	rect[4] = {0x90, 0x40, 0xA0, 0x50};
-	rect[5] = {0xA0, 0x40, 0xB0, 0x50};
-	rect[6] = {0x80, 0x50, 0x90, 0x60};
-	rect[7] = {0x90, 0x50, 0xA0, 0x60};
-	rect[8] = {0xA0, 0x50, 0xB0, 0x60};
-	rect[9] = {0xB0, 0x30, 0xC0, 0x40};
-	rect[10] = {0xC0, 0x30, 0xD0, 0x40};
-	rect[11] = {0xD0, 0x30, 0xE0, 0x40};
-	rect[12] = {0xB0, 0x40, 0xC0, 0x50};
-	rect[13] = {0xC0, 0x40, 0xD0, 0x50};
-	rect[14] = {0xD0, 0x40, 0xE0, 0x50};
-	rect[15] = {0xB0, 0x50, 0xC0, 0x60};
-	rect[16] = {0xC0, 0x50, 0xD0, 0x60};
-	rect[17] = {0xD0, 0x50, 0xE0, 0x60};
+	RECT rect[18] = {
+		{0x80, 0x30, 0x90, 0x40},
+		{0x90, 0x30, 0xA0, 0x40},
+		{0xA0, 0x30, 0xB0, 0x40},
+		{0x80, 0x40, 0x90, 0x50},
+		{0x90, 0x40, 0xA0, 0x50},
+		{0xA0, 0x40, 0xB0, 0x50},
+		{0x80, 0x50, 0x90, 0x60},
+		{0x90, 0x50, 0xA0, 0x60},
+		{0xA0, 0x50, 0xB0, 0x60},
+		{0xB0, 0x30, 0xC0, 0x40},
+		{0xC0, 0x30, 0xD0, 0x40},
+		{0xD0, 0x30, 0xE0, 0x40},
+		{0xB0, 0x40, 0xC0, 0x50},
+		{0xC0, 0x40, 0xD0, 0x50},
+		{0xD0, 0x40, 0xE0, 0x50},
+		{0xB0, 0x50, 0xC0, 0x60},
+		{0xC0, 0x50, 0xD0, 0x60},
+		{0xD0, 0x50, 0xE0, 0x60},
+	};
 	
 	if (++npc->ani_wait > 1)
 	{
@@ -682,18 +694,19 @@ void ActNpc129(NPCHAR *npc)
 //Puppy (sitting, wagging tail)
 void ActNpc130(NPCHAR *npc)
 {
-	RECT rcLeft[4];
-	RECT rcRight[4];
+	RECT rcLeft[4] = {
+		{48, 144, 64, 160},
+		{64, 144, 80, 160},
+		{48, 144, 64, 160},
+		{80, 144, 96, 160},
+	};
 
-	rcLeft[0] = {48, 144, 64, 160};
-	rcLeft[1] = {64, 144, 80, 160};
-	rcLeft[2] = {48, 144, 64, 160};
-	rcLeft[3] = {80, 144, 96, 160};
-
-	rcRight[0] = {48, 160, 64, 176};
-	rcRight[1] = {64, 160, 80, 176};
-	rcRight[2] = {48, 160, 64, 176};
-	rcRight[3] = {80, 160, 96, 176};
+	RECT rcRight[4] = {
+		{48, 160, 64, 176},
+		{64, 160, 80, 176},
+		{48, 160, 64, 176},
+		{80, 160, 96, 176},
+	};
 
 	switch (npc->act_no)
 	{
@@ -759,11 +772,8 @@ void ActNpc130(NPCHAR *npc)
 //Puppy (sleeping)
 void ActNpc131(NPCHAR *npc)
 {
-	RECT rcLeft[1];
-	RECT rcRight[1];
-
-	rcLeft[0] = {144, 144, 160, 160};
-	rcRight[0] = {144, 160, 160, 176};
+	RECT rcLeft[1] = {144, 144, 160, 160};
+	RECT rcRight[1] = {144, 160, 160, 176};
 
 	if (++npc->act_wait > 100)
 	{
@@ -780,20 +790,21 @@ void ActNpc131(NPCHAR *npc)
 //Puppy (barking)
 void ActNpc132(NPCHAR *npc)
 {
-	RECT rcLeft[5];
-	RECT rcRight[5];
+	RECT rcLeft[5] = {
+		{48, 144, 64, 160},
+		{64, 144, 80, 160},
+		{96, 144, 112, 160},
+		{96, 144, 112, 160},
+		{128, 144, 144, 160},
+	};
 
-	rcLeft[0] = {48, 144, 64, 160};
-	rcLeft[1] = {64, 144, 80, 160};
-	rcLeft[2] = {96, 144, 112, 160};
-	rcLeft[3] = {96, 144, 112, 160};
-	rcLeft[4] = {128, 144, 144, 160};
-
-	rcRight[0] = {48, 160, 64, 176};
-	rcRight[1] = {64, 160, 80, 176};
-	rcRight[2] = {96, 160, 112, 176};
-	rcRight[3] = {96, 160, 112, 176};
-	rcRight[4] = {128, 160, 144, 176};
+	RECT rcRight[5] = {
+		{48, 160, 64, 176},
+		{64, 160, 80, 176},
+		{96, 160, 112, 176},
+		{96, 160, 112, 176},
+		{128, 160, 144, 176},
+	};
 
 	if (npc->act_no < 100)
 	{
@@ -924,14 +935,15 @@ void ActNpc132(NPCHAR *npc)
 //Jenka
 void ActNpc133(NPCHAR *npc)
 {
-	RECT rcLeft[2];
-	RECT rcRight[2];
+	RECT rcLeft[2] = {
+		{176, 32, 192, 48},
+		{192, 32, 208, 48},
+	};
 
-	rcLeft[0] = {176, 32, 192, 48};
-	rcLeft[1] = {192, 32, 208, 48};
-
-	rcRight[0] = {176, 48, 192, 64};
-	rcRight[1] = {192, 48, 208, 64};
+	RECT rcRight[2] = {
+		{176, 48, 192, 64},
+		{192, 48, 208, 64},
+	};
 
 	switch (npc->act_no)
 	{
@@ -969,16 +981,17 @@ void ActNpc133(NPCHAR *npc)
 //Armadillo
 void ActNpc134(NPCHAR *npc)
 {
-	RECT rcLeft[3];
-	RECT rcRight[3];
+	RECT rcLeft[3] = {
+		{224, 0, 256, 16},
+		{256, 0, 288, 16},
+		{288, 0, 320, 16},
+	};
 
-	rcLeft[0] = {224, 0, 256, 16};
-	rcLeft[1] = {256, 0, 288, 16};
-	rcLeft[2] = {288, 0, 320, 16};
-
-	rcRight[0] = {224, 16, 256, 32};
-	rcRight[1] = {256, 16, 288, 32};
-	rcRight[2] = {288, 16, 320, 32};
+	RECT rcRight[3] = {
+		{224, 16, 256, 32},
+		{256, 16, 288, 32},
+		{288, 16, 320, 32},
+	};
 
 	switch (npc->act_no)
 	{
@@ -1057,14 +1070,15 @@ void ActNpc134(NPCHAR *npc)
 //Skeleton
 void ActNpc135(NPCHAR *npc)
 {
-	RECT rcRight[2];
-	RECT rcLeft[2];
+	RECT rcLeft[2] = {
+		{256, 32, 288, 64},
+		{288, 32, 320, 64},
+	};
 
-	rcLeft[0] = {256, 32, 288, 64};
-	rcLeft[1] = {288, 32, 320, 64};
-
-	rcRight[0] = {256, 64, 288, 96};
-	rcRight[1] = {288, 64, 320, 96};
+	RECT rcRight[2] = {
+		{256, 64, 288, 96},
+		{288, 64, 320, 96},
+	};
 
 	if (gMC.x < npc->x - 0x2C000 || gMC.x > npc->x + 0x2C000 || gMC.y < npc->y - 0x14000 || gMC.y > npc->y + 0x8000)
 		npc->act_no = 0;
@@ -1165,14 +1179,15 @@ void ActNpc135(NPCHAR *npc)
 //Puppy (carried)
 void ActNpc136(NPCHAR *npc)
 {
-	RECT rcLeft[2];
-	RECT rcRight[2];
+	RECT rcLeft[2] = {
+		{48, 144, 64, 160},
+		{64, 144, 80, 160},
+	};
 
-	rcLeft[0] = {48, 144, 64, 160};
-	rcLeft[1] = {64, 144, 80, 160};
-
-	rcRight[0] = {48, 160, 64, 176};
-	rcRight[1] = {64, 160, 80, 176};
+	RECT rcRight[2] = {
+		{48, 160, 64, 176},
+		{64, 160, 80, 176},
+	};
 
 	switch (npc->act_no)
 	{
@@ -1227,21 +1242,16 @@ void ActNpc136(NPCHAR *npc)
 //Large door (frame)
 void ActNpc137(NPCHAR *npc)
 {
-	RECT rc[1];
+	RECT rc = {96, 136, 128, 188};
 
-	rc[0] = {96, 136, 128, 188};
-
-	npc->rect = rc[0];
+	npc->rect = rc;
 }
 
 //Large door (door)
 void ActNpc138(NPCHAR *npc)
 {
-	RECT rcLeft[1];
-	RECT rcRight[1];
-
-	rcLeft[0] = {96, 112, 112, 136};
-	rcRight[0] = {112, 112, 128, 136};
+	RECT rcLeft = {96, 112, 112, 136};
+	RECT rcRight = {112, 112, 128, 136};
 
 	switch (npc->act_no)
 	{
@@ -1250,12 +1260,12 @@ void ActNpc138(NPCHAR *npc)
 
 			if (npc->direct == 0)
 			{
-				npc->rect = rcLeft[0];
+				npc->rect = rcLeft;
 				npc->x += 0x1000;
 			}
 			else
 			{
-				npc->rect = rcRight[0];
+				npc->rect = rcRight;
 				npc->x -= 0x1000;
 			}
 
@@ -1274,13 +1284,13 @@ void ActNpc138(NPCHAR *npc)
 
 			if (npc->direct == 0)
 			{
-				npc->rect = rcLeft[0];
+				npc->rect = rcLeft;
 				npc->rect.left += npc->act_wait / 8;
 			}
 			else
 			{
 				npc->x = npc->tgt_x + ((npc->act_wait / 8) * 0x200);
-				npc->rect = rcRight[0];
+				npc->rect = rcRight;
 				npc->rect.right -= npc->act_wait / 8;
 			}
 
@@ -1294,16 +1304,17 @@ void ActNpc138(NPCHAR *npc)
 //Doctor
 void ActNpc139(NPCHAR *npc)
 {
-	RECT rcLeft[3];
-	RECT rcRight[3];
+	RECT rcLeft[3] = {
+		{0, 128, 24, 160},
+		{24, 128, 48, 160},
+		{48, 128, 72, 160},
+	};
 
-	rcLeft[0] = {0, 128, 24, 160};
-	rcLeft[1] = {24, 128, 48, 160};
-	rcLeft[2] = {48, 128, 72, 160};
-
-	rcRight[0] = {0, 160, 24, 192};
-	rcRight[1] = {24, 160, 48, 192};
-	rcRight[2] = {48, 160, 72, 192};
+	RECT rcRight[3] = {
+		{0, 160, 24, 192},
+		{24, 160, 48, 192},
+		{48, 160, 72, 192},
+	};
 
 	switch (npc->act_no)
 	{

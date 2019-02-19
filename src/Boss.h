@@ -1,4 +1,5 @@
 #pragma once
+
 #include "NpChar.h"
 
 #define BOSS_MAX 20

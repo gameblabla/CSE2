@@ -1,4 +1,5 @@
 #pragma once
+
 extern int g_GameFlags;
 extern int gCounter;
 

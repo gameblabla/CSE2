@@ -1,7 +1,10 @@
+#include "Resource.h"
+
 #include <stdint.h>
 #include <string>
 
 #include <SDL_rwops.h>
+
 #include "WindowsWrapper.h"
 
 const unsigned char* GetResource(const char *name, size_t *size)

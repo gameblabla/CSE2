@@ -1,5 +1,7 @@
 #include "BossTwinD.h"
 
+#include "WindowsWrapper.h"
+
 #include "Boss.h"
 #include "Flash.h"
 #include "Game.h"
@@ -7,20 +9,20 @@
 #include "NpChar.h"
 #include "Sound.h"
 #include "Triangle.h"
-#include "WindowsWrapper.h"
 
 static void ActBossCharT_DragonBody(NPCHAR *npc)
 {
-	RECT rcLeft[3];
-	RECT rcRight[3];
+	RECT rcLeft[3] = {
+		{0, 0, 40, 40},
+		{40, 0, 80, 40},
+		{80, 0, 120, 40},
+	};
 
-	rcLeft[0] = {0, 0, 40, 40};
-	rcLeft[1] = {40, 0, 80, 40};
-	rcLeft[2] = {80, 0, 120, 40};
-
-	rcRight[0] = {0, 40, 40, 80};
-	rcRight[1] = {40, 40, 80, 80};
-	rcRight[2] = {80, 40, 120, 80};
+	RECT rcRight[3] = {
+		{0, 40, 40, 80},
+		{40, 40, 80, 80},
+		{80, 40, 120, 80},
+	};
 
 	unsigned char deg;
 	switch (npc->act_no)
@@ -89,18 +91,19 @@ static void ActBossCharT_DragonBody(NPCHAR *npc)
 
 static void ActBossCharT_DragonHead(NPCHAR *npc)
 {
-	RECT rcLeft[4];
-	RECT rcRight[4];
+	RECT rcLeft[4] = {
+		{0, 80, 40, 112},
+		{40, 80, 80, 112},
+		{80, 80, 120, 112},
+		{120, 80, 160, 112},
+	};
 
-	rcLeft[0] = {0, 80, 40, 112};
-	rcLeft[1] = {40, 80, 80, 112};
-	rcLeft[2] = {80, 80, 120, 112};
-	rcLeft[3] = {120, 80, 160, 112};
-
-	rcRight[0] = {0, 112, 40, 144};
-	rcRight[1] = {40, 112, 80, 144};
-	rcRight[2] = {80, 112, 120, 144};
-	rcRight[3] = {120, 112, 160, 144};
+	RECT rcRight[4] = {
+		{0, 112, 40, 144},
+		{40, 112, 80, 144},
+		{80, 112, 120, 144},
+		{120, 112, 160, 144},
+	};
 
 	switch (npc->act_no)
 	{

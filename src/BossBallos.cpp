@@ -1,5 +1,7 @@
 #include "BossBallos.h"
 
+#include "WindowsWrapper.h"
+
 #include "Boss.h"
 #include "Flash.h"
 #include "Frame.h"
@@ -11,20 +13,21 @@
 
 static void ActBossChar_Eye(NPCHAR *npc)
 {
-	RECT rcLeft[5];
-	RECT rcRight[5];
+	RECT rcLeft[5] = {
+		{272, 0, 296, 16},
+		{272, 16, 296, 32},
+		{272, 32, 296, 48},
+		{0, 0, 0, 0},
+		{240, 16, 264, 32},
+	};
 
-	rcLeft[0] = {272, 0, 296, 16};
-	rcLeft[1] = {272, 16, 296, 32};
-	rcLeft[2] = {272, 32, 296, 48};
-	rcLeft[3] = {0, 0, 0, 0};
-	rcLeft[4] = {240, 16, 264, 32};
-
-	rcRight[0] = {296, 0, 320, 16};
-	rcRight[1] = {296, 16, 320, 32};
-	rcRight[2] = {296, 32, 320, 48};
-	rcRight[3] = {0, 0, 0, 0};
-	rcRight[4] = {240, 32, 264, 48};
+	RECT rcRight[5] = {
+		{296, 0, 320, 16},
+		{296, 16, 320, 32},
+		{296, 32, 320, 48},
+		{0, 0, 0, 0},
+		{240, 32, 264, 48},
+	};
 
 	switch (npc->act_no)
 	{
@@ -101,12 +104,12 @@ static void ActBossChar_Eye(NPCHAR *npc)
 
 static void ActBossChar_Body(NPCHAR *npc)
 {
-	RECT rc[4];
-
-	rc[0] = {0, 0, 120, 120};
-	rc[1] = {120, 0, 240, 120};
-	rc[2] = {0, 120, 120, 240};
-	rc[3] = {120, 120, 240, 240};
+	RECT rc[4] = {
+		{0, 0, 120, 120},
+		{120, 0, 240, 120},
+		{0, 120, 120, 240},
+		{120, 120, 240, 240},
+	};
 
 	npc->x = gBoss[0].x;
 	npc->y = gBoss[0].y;

@@ -1,12 +1,13 @@
+#include "Frame.h"
+
 #include <string.h>
 
-#include "Frame.h"
+#include "Boss.h"
+#include "CommonDefines.h"
+#include "Game.h"
 #include "Map.h"
 #include "MyChar.h"
 #include "NpChar.h"
-#include "Game.h"
-#include "CommonDefines.h"
-#include "Boss.h"
 
 FRAME gFrame;
 

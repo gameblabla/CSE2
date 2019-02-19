@@ -1,10 +1,11 @@
-#include <string>
+#include "Fade.h"
+
+#include <string.h>
 
 #include "WindowsWrapper.h"
 
-#include "Fade.h"
-#include "Game.h"
 #include "Draw.h"
+#include "Game.h"
 
 FADE gFade;
 

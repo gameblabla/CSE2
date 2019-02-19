@@ -34,12 +34,15 @@ ifeq ($(WINDOWS), 1)
 	LIBS += -lkernel32
 endif
 
-CXXFLAGS += `sdl2-config --cflags` `pkg-config freetype2 --cflags` -MMD -MP -MF $@.d -DLODEPNG_NO_COMPILE_ENCODER -DLODEPNG_NO_COMPILE_ERROR_TEXT -DLODEPNG_NO_COMPILE_CPP
+CXXFLAGS += -std=c++98 `sdl2-config --cflags` `pkg-config freetype2 --cflags` -MMD -MP -MF $@.d  -DLODEPNG_NO_COMPILE_ENCODER -DLODEPNG_NO_COMPILE_ERROR_TEXT -DLODEPNG_NO_COMPILE_CPP
 LIBS += `sdl2-config --static-libs` `pkg-config freetype2 --libs`
 
 ifeq ($(STATIC), 1)
 	CXXFLAGS += -static
-	LIBS += -lharfbuzz -lfreetype -lbz2 -lpng -lz -lgraphite2 -lRpcrt4 -lDwrite -lusp10
+	LIBS += -lharfbuzz -lfreetype -lbz2 -lpng -lz -lgraphite2
+	ifeq ($(WINDOWS), 1)
+		LIBS += -lRpcrt4 -lDwrite -lusp10
+	endif
 endif
 
 # For an accurate result to the original's code, compile in alphabetical order
@@ -108,11 +111,11 @@ SOURCES = \
 	PixTone \
 	Profile \
 	Resource \
+	SelStage \
 	Shoot \
 	Sound \
 	Stage \
 	Star \
-	SelStage \
 	TextScr \
 	Triangle \
 	ValueView
