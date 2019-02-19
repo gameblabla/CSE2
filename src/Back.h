@@ -1,5 +1,7 @@
 #pragma once
 
+#include "WindowsWrapper.h"
+
 struct BACK
 {
 	int flag;
@@ -14,7 +16,7 @@ struct BACK
 extern BACK gBack;
 extern int gWaterY;
 
-bool InitBack(char *fName, int type);
+BOOL InitBack(const char *fName, int type);
 void ActBack();
 void PutBack(int fx, int fy);
 void PutFront(int fx, int fy);

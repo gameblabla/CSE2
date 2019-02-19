@@ -78,7 +78,7 @@ BOOL Flip_SystemTask()
 	return TRUE;
 }
 
-bool StartDirectDraw(int lMagnification, int lColourDepth)
+BOOL StartDirectDraw(int lMagnification, int lColourDepth)
 {
 	//Initialize rendering
 	SDL_InitSubSystem(SDL_INIT_VIDEO);
@@ -107,7 +107,7 @@ bool StartDirectDraw(int lMagnification, int lColourDepth)
 		
 	}
 	
-	return true;
+	return TRUE;
 }
 
 void EndDirectDraw()
@@ -144,9 +144,9 @@ void ReleaseSurface(int s)
 	}
 }
 
-bool MakeSurface_Generic(int bxsize, int bysize, Surface_Ids surf_no)
+BOOL MakeSurface_Generic(int bxsize, int bysize, Surface_Ids surf_no)
 {
-	bool success = false;
+	BOOL success = FALSE;
 
 #ifdef FIX_BUGS
 	if (surf_no >= SURFACE_ID_MAX)
@@ -184,7 +184,7 @@ bool MakeSurface_Generic(int bxsize, int bysize, Surface_Ids surf_no)
 				else
 				{
 					surf[surf_no].in_use = true;
-					success = true;
+					success = TRUE;
 				}
 			}
 		}
@@ -303,7 +303,7 @@ static bool LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, bool create_surface)
 	return success;
 }
 
-static bool LoadBitmap_File(const char *name, Surface_Ids surf_no, bool create_surface)
+static BOOL LoadBitmap_File(const char *name, Surface_Ids surf_no, bool create_surface)
 {
 	char path[PATH_LENGTH];
 	SDL_RWops *fp;
@@ -322,7 +322,7 @@ static bool LoadBitmap_File(const char *name, Surface_Ids surf_no, bool create_s
 		{
 			printf("Loading surface (as .pbm) from %s for surface id %d\n", path, surf_no);
 			if (LoadBitmap(fp, surf_no, create_surface))
-				return true;
+				return TRUE;
 		}
 	}
 	
@@ -333,14 +333,14 @@ static bool LoadBitmap_File(const char *name, Surface_Ids surf_no, bool create_s
 	{
 		printf("Loading surface (as .bmp) from %s for surface id %d\n", path, surf_no);
 		if (LoadBitmap(fp, surf_no, create_surface))
-			return true;
+			return TRUE;
 	}
 	
 	printf("Failed to open file %s\n", name);
-	return false;
+	return FALSE;
 }
 
-static bool LoadBitmap_Resource(const char *res, Surface_Ids surf_no, bool create_surface)
+static BOOL LoadBitmap_Resource(const char *res, Surface_Ids surf_no, bool create_surface)
 {
 	SDL_RWops *fp = FindResource(res);
 	
@@ -348,29 +348,29 @@ static bool LoadBitmap_Resource(const char *res, Surface_Ids surf_no, bool creat
 	{
 		printf("Loading surface from resource %s for surface id %d\n", res, surf_no);
 		if (LoadBitmap(fp, surf_no, create_surface))
-			return true;
+			return TRUE;
 	}
 	
 	printf("Failed to open resource %s\n", res);
-	return false;
+	return FALSE;
 }
 
-bool MakeSurface_File(const char *name, Surface_Ids surf_no)
+BOOL MakeSurface_File(const char *name, Surface_Ids surf_no)
 {
 	return LoadBitmap_File(name, surf_no, true);
 }
 
-bool MakeSurface_Resource(const char *res, Surface_Ids surf_no)
+BOOL MakeSurface_Resource(const char *res, Surface_Ids surf_no)
 {
 	return LoadBitmap_Resource(res, surf_no, true);
 }
 
-bool ReloadBitmap_File(const char *name, Surface_Ids surf_no)
+BOOL ReloadBitmap_File(const char *name, Surface_Ids surf_no)
 {
 	return LoadBitmap_File(name, surf_no, false);
 }
 
-bool ReloadBitmap_Resource(const char *res, Surface_Ids surf_no)
+BOOL ReloadBitmap_Resource(const char *res, Surface_Ids surf_no)
 {
 	return LoadBitmap_Resource(res, surf_no, false);
 }
