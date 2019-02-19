@@ -80,11 +80,15 @@ BOOL Flip_SystemTask()
 
 BOOL StartDirectDraw(int lMagnification, int lColourDepth)
 {
+	(void)lColourDepth;
+
 	//Initialize rendering
 	SDL_InitSubSystem(SDL_INIT_VIDEO);
 	
 	//Create renderer
-	if (gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED))
+	gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED);
+
+	if (gRenderer != NULL)
 	{
 		switch (lMagnification)
 		{

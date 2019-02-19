@@ -223,7 +223,7 @@ void DrawText(FontObject *font_object, SDL_Surface *surface, int x, int y, unsig
 			const int letter_x = x + pen_x + face->glyph->bitmap_left;
 			const int letter_y = y + ((FT_MulFix(face->ascender, face->size->metrics.y_scale) - face->glyph->metrics.horiBearingY + (64 / 2)) / 64);
 
-			for (int iy = MAX(-letter_y, 0); letter_y + iy < MIN(letter_y + converted.rows, (unsigned int)surface->h); ++iy)
+			for (int iy = MAX(-letter_y, 0); letter_y + iy < MIN(letter_y + (int)converted.rows, surface->h); ++iy)
 			{
 				if (face->glyph->bitmap.pixel_mode == FT_PIXEL_MODE_LCD)
 				{

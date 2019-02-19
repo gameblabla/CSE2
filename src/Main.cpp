@@ -550,6 +550,9 @@ bool SystemTask()
 					case SDL_SCANCODE_F5:
 						gbUseJoystick = false;
 						break;
+
+					default:
+						break;
 				}
 				break;
 			#else
