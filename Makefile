@@ -34,7 +34,7 @@ ifeq ($(WINDOWS), 1)
 	LIBS += -lkernel32
 endif
 
-CXXFLAGS += -std=c++03 `sdl2-config --cflags` `pkg-config freetype2 --cflags` -MMD -MP -MF $@.d
+CXXFLAGS += -std=c++98 `sdl2-config --cflags` `pkg-config freetype2 --cflags` -MMD -MP -MF $@.d
 LIBS += `sdl2-config --static-libs` `pkg-config freetype2 --libs`
 
 ifeq ($(STATIC), 1)
