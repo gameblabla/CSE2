@@ -112,6 +112,8 @@ BOOL Flip_SystemTask()
 		dst_rect.y = 0;
 	}
 
+	SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+	SDL_RenderClear(gRenderer);
 	SDL_RenderCopy(gRenderer, native_res_render_target, NULL, &dst_rect);
 
 	SDL_SetRenderTarget(gRenderer, native_res_render_target);
