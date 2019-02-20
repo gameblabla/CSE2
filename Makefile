@@ -35,14 +35,16 @@ ifeq ($(WINDOWS), 1)
 endif
 
 CXXFLAGS += -std=c++98 `sdl2-config --cflags` `pkg-config freetype2 --cflags` -MMD -MP -MF $@.d  -DLODEPNG_NO_COMPILE_ENCODER -DLODEPNG_NO_COMPILE_ERROR_TEXT -DLODEPNG_NO_COMPILE_CPP
-LIBS += `sdl2-config --static-libs` `pkg-config freetype2 --libs`
+LIBS += `pkg-config freetype2 --libs`
 
 ifeq ($(STATIC), 1)
-	CXXFLAGS += -static
+	CXXFLAGS += `sdl2-config --static-libs` -static
 	LIBS += -lharfbuzz -lfreetype -lbz2 -lpng -lz -lgraphite2
 	ifeq ($(WINDOWS), 1)
 		LIBS += -lRpcrt4 -lDwrite -lusp10
 	endif
+else
+	CXXFLAGS += `sdl2-config --libs`
 endif
 
 # For an accurate result to the original's code, compile in alphabetical order
