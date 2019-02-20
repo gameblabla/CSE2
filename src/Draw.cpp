@@ -80,11 +80,15 @@ BOOL Flip_SystemTask()
 
 BOOL StartDirectDraw(int lMagnification, int lColourDepth)
 {
+	(void)lColourDepth;
+
 	//Initialize rendering
 	SDL_InitSubSystem(SDL_INIT_VIDEO);
 	
 	//Create renderer
-	if (gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED))
+	gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED);
+
+	if (gRenderer != NULL)
 	{
 		switch (lMagnification)
 		{
@@ -270,15 +274,20 @@ static bool LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, bool create_surface)
 								const unsigned char *src_row = (unsigned char*)converted_surface->pixels + h * converted_surface->pitch;
 								unsigned char *dst_row = (unsigned char*)surf[surf_no].surface->pixels + h * surf[surf_no].surface->pitch * magnification;
 
-								const unsigned long *src_ptr = (unsigned long*)src_row;
-								unsigned long *dst_ptr = (unsigned long*)dst_row;
+								const unsigned char *src_ptr = src_row;
+								unsigned char *dst_ptr = dst_row;
 
 								for (int w = 0; w < converted_surface->w; ++w)
 								{
-									const unsigned long src_pixel = *src_ptr++;
-
 									for (int i = 0; i < magnification; ++i)
-										*dst_ptr++ = src_pixel;
+									{
+										*dst_ptr++ = src_ptr[0];
+										*dst_ptr++ = src_ptr[1];
+										*dst_ptr++ = src_ptr[2];
+										*dst_ptr++ = src_ptr[3];
+									}
+
+									src_ptr += 4;
 								}
 
 								for (int i = 1; i < magnification; ++i)
@@ -375,13 +384,23 @@ BOOL ReloadBitmap_Resource(const char *res, Surface_Ids surf_no)
 	return LoadBitmap_Resource(res, surf_no, false);
 }
 
-SDL_Rect RectToSDLRect(RECT *rect)
+static SDL_Rect RectToSDLRect(RECT *rect)
 {
 	SDL_Rect SDLRect = {rect->left, rect->top, rect->right - rect->left, rect->bottom - rect->top};
 	if (SDLRect.w < 0)
 		SDLRect.w = 0;
 	if (SDLRect.h < 0)
 		SDLRect.h = 0;
+	return SDLRect;
+}
+
+static SDL_Rect RectToSDLRectScaled(RECT *rect)
+{
+	SDL_Rect SDLRect = RectToSDLRect(rect);
+	SDLRect.x *= magnification;
+	SDLRect.y *= magnification;
+	SDLRect.w *= magnification;
+	SDLRect.h *= magnification;
 	return SDLRect;
 }
 
@@ -397,8 +416,7 @@ void BackupSurface(Surface_Ids surf_no, RECT *rect)
 	SDL_RenderReadPixels(gRenderer, NULL, SDL_PIXELFORMAT_RGBA32, surface->pixels, surface->pitch);
 
 	//Get rects
-	SDL_Rect frameRect = RectToSDLRect(rect);
-	frameRect = {frameRect.x * magnification, frameRect.y * magnification, frameRect.w * magnification, frameRect.h * magnification};
+	SDL_Rect frameRect = RectToSDLRectScaled(rect);
 
 	SDL_BlitSurface(surface, &frameRect, surf[surf_no].surface, &frameRect);
 	surf[surf_no].needs_updating = true;
@@ -416,16 +434,14 @@ static void DrawBitmap(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_
 	}
 
 	//Get SDL_Rects
-	SDL_Rect clipRect = RectToSDLRect(rcView);
-	
-	SDL_Rect frameRect = RectToSDLRect(rect);
-	frameRect = {frameRect.x * magnification, frameRect.y * magnification, frameRect.w * magnification, frameRect.h * magnification};
+	SDL_Rect clipRect = RectToSDLRectScaled(rcView);
+
+	SDL_Rect frameRect = RectToSDLRectScaled(rect);
 	
 	//Get dest rect
 	SDL_Rect destRect = {x * magnification, y * magnification, frameRect.w, frameRect.h};
 	
 	//Set cliprect
-	clipRect = {clipRect.x * magnification, clipRect.y * magnification, clipRect.w * magnification, clipRect.h * magnification};
 	SDL_RenderSetClipRect(gRenderer, &clipRect);
 	
 	SDL_SetTextureBlendMode(surf[surf_no].texture, transparent ? SDL_BLENDMODE_BLEND : SDL_BLENDMODE_NONE);
@@ -452,8 +468,7 @@ void Surface2Surface(int x, int y, RECT *rect, int to, int from)
 {
 	//Get rects
 	SDL_Rect rcSet = {x * magnification, y * magnification, (rect->right - rect->left) * magnification, (rect->bottom - rect->top) * magnification};
-	SDL_Rect frameRect = RectToSDLRect(rect);
-	frameRect = {frameRect.x * magnification, frameRect.y * magnification, frameRect.w * magnification, frameRect.h * magnification};
+	SDL_Rect frameRect = RectToSDLRectScaled(rect);
 
 	SDL_BlitSurface(surf[from].surface, &frameRect, surf[to].surface, &rcSet);
 	surf[to].needs_updating = true;
@@ -462,8 +477,7 @@ void Surface2Surface(int x, int y, RECT *rect, int to, int from)
 void CortBox(RECT *rect, uint32_t col)
 {
 	//Get rect
-	SDL_Rect destRect = RectToSDLRect(rect);
-	destRect = {destRect.x * magnification, destRect.y * magnification, destRect.w * magnification, destRect.h * magnification};
+	SDL_Rect destRect = RectToSDLRectScaled(rect);
 	
 	//Set colour and draw
 	SDL_SetRenderDrawColor(gRenderer, (col & 0xFF0000) >> 16, (col & 0x00FF00) >> 8, col & 0x0000FF, 0xFF);
@@ -473,8 +487,7 @@ void CortBox(RECT *rect, uint32_t col)
 void CortBox2(RECT *rect, uint32_t col, Surface_Ids surf_no)
 {
 	//Get rect
-	SDL_Rect destRect = RectToSDLRect(rect);
-	destRect = {destRect.x * magnification, destRect.y * magnification, destRect.w * magnification, destRect.h * magnification};
+	SDL_Rect destRect = RectToSDLRectScaled(rect);
 
 	const unsigned char col_red = (col & 0xFF0000) >> 16;
 	const unsigned char col_green = (col & 0x00FF00) >> 8;
@@ -602,5 +615,5 @@ void EndTextObject()
 {
 	//Destroy font
 	UnloadFont(gFont);
-	gFont = nullptr;
+	gFont = NULL;
 }

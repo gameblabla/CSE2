@@ -445,7 +445,7 @@ bool SystemTask()
 	//Handle window events
 	bool focusGained = true;
 	
-	while (SDL_PollEvent(nullptr) || !focusGained)
+	while (SDL_PollEvent(NULL) || !focusGained)
 	{
 		SDL_Event event;
 		SDL_WaitEvent(&event);
@@ -549,6 +549,9 @@ bool SystemTask()
 						
 					case SDL_SCANCODE_F5:
 						gbUseJoystick = false;
+						break;
+
+					default:
 						break;
 				}
 				break;

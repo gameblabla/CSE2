@@ -15,22 +15,23 @@
 //Dragon Zombie
 void ActNpc200(NPCHAR *npc)
 {
-	RECT rcLeft[6];
-	RECT rcRight[6];
+	RECT rcLeft[6] = {
+		{0, 0, 40, 40},
+		{40, 0, 80, 40},
+		{80, 0, 120, 40},
+		{120, 0, 160, 40},
+		{160, 0, 200, 40},
+		{200, 0, 240, 40},
+	};
 
-	rcLeft[0] = {0, 0, 40, 40};
-	rcLeft[1] = {40, 0, 80, 40};
-	rcLeft[2] = {80, 0, 120, 40};
-	rcLeft[3] = {120, 0, 160, 40};
-	rcLeft[4] = {160, 0, 200, 40};
-	rcLeft[5] = {200, 0, 240, 40};
-
-	rcRight[0] = {0, 40, 40, 80};
-	rcRight[1] = {40, 40, 80, 80};
-	rcRight[2] = {80, 40, 120, 80};
-	rcRight[3] = {120, 40, 160, 80};
-	rcRight[4] = {160, 40, 200, 80};
-	rcRight[5] = {200, 40, 240, 80};
+	RECT rcRight[6] = {
+		{0, 40, 40, 80},
+		{40, 40, 80, 80},
+		{80, 40, 120, 80},
+		{120, 40, 160, 80},
+		{160, 40, 200, 80},
+		{200, 40, 240, 80},
+	};
 
 	if (npc->act_no < 100 && npc->life < 950)
 	{
@@ -132,11 +133,8 @@ void ActNpc200(NPCHAR *npc)
 //Dragon Zombie (dead)
 void ActNpc201(NPCHAR *npc)
 {
-	RECT rcLeft[1];
-	RECT rcRight[1];
-
-	rcLeft[0] = {200, 0, 240, 40};
-	rcRight[0] = {200, 40, 240, 80};
+	RECT rcLeft[1] = {200, 0, 240, 40};
+	RECT rcRight[1] = {200, 40, 240, 80};
 
 	if (npc->direct == 0)
 		npc->rect = rcLeft[npc->ani_no];
@@ -147,8 +145,6 @@ void ActNpc201(NPCHAR *npc)
 //Dragon Zombie projectile
 void ActNpc202(NPCHAR *npc)
 {
-	RECT rect_left[3];
-
 	if (npc->flag & 0xFF)
 	{
 		npc->cond = 0;
@@ -158,9 +154,11 @@ void ActNpc202(NPCHAR *npc)
 	npc->y += npc->ym;
 	npc->x += npc->xm;
 
-	rect_left[0] = {184, 216, 200, 240};
-	rect_left[1] = {200, 216, 216, 240};
-	rect_left[2] = {216, 216, 232, 240};
+	RECT rect_left[3] = {
+		{184, 216, 200, 240},
+		{200, 216, 216, 240},
+		{216, 216, 232, 240},
+	};
 
 	if (++npc->ani_wait > 1)
 	{
@@ -183,16 +181,17 @@ void ActNpc202(NPCHAR *npc)
 //Critter (destroyed Egg Corridor)
 void ActNpc203(NPCHAR *npc)
 {
-	RECT rcLeft[3];
-	RECT rcRight[3];
+	RECT rcLeft[3] = {
+		{0, 80, 16, 96},
+		{16, 80, 32, 96},
+		{32, 80, 48, 96},
+	};
 
-	rcLeft[0] = {0, 80, 16, 96};
-	rcLeft[1] = {16, 80, 32, 96};
-	rcLeft[2] = {32, 80, 48, 96};
-
-	rcRight[0] = {0, 96, 16, 112};
-	rcRight[1] = {16, 96, 32, 112};
-	rcRight[2] = {32, 96, 48, 112};
+	RECT rcRight[3] = {
+		{0, 96, 16, 112},
+		{16, 96, 32, 112},
+		{32, 96, 48, 112},
+	};
 
 	switch (npc->act_no)
 	{
@@ -282,10 +281,10 @@ void ActNpc203(NPCHAR *npc)
 //Falling spike (small)
 void ActNpc204(NPCHAR *npc)
 {
-	RECT rc[2]; // [sp+4h] [bp-20h]@1
-
-	rc[0] = {240, 80, 256, 96};
-	rc[1] = {240, 144, 256, 160};
+	RECT rc[2] = {
+		{240, 80, 256, 96},
+		{240, 144, 256, 160},
+	};
 
 	switch (npc->act_no)
 	{
@@ -338,10 +337,10 @@ void ActNpc204(NPCHAR *npc)
 //Falling spike (large)
 void ActNpc205(NPCHAR *npc)
 {
-	RECT rc[2];
-
-	rc[0] = {112, 80, 128, 112};
-	rc[1] = {128, 80, 144, 112};
+	RECT rc[2] = {
+		{112, 80, 128, 112},
+		{128, 80, 144, 112},
+	};
 
 	switch (npc->act_no)
 	{
@@ -421,8 +420,6 @@ void ActNpc205(NPCHAR *npc)
 //Counter Bomb
 void ActNpc206(NPCHAR *npc)
 {
-	RECT rect_left[3];
-
 	switch (npc->act_no)
 	{
 		case 0:
@@ -513,9 +510,11 @@ void ActNpc206(NPCHAR *npc)
 	npc->x += npc->xm;
 	npc->y += npc->ym;
 
-	rect_left[0] = {80, 80, 120, 120};
-	rect_left[1] = {120, 80, 160, 120};
-	rect_left[2] = {160, 80, 200, 120};
+	RECT rect_left[3] = {
+		{80, 80, 120, 120},
+		{120, 80, 160, 120},
+		{160, 80, 200, 120},
+	};
 
 	if (++npc->ani_wait > 4)
 	{
@@ -532,13 +531,13 @@ void ActNpc206(NPCHAR *npc)
 //Counter Bomb's countdown
 void ActNpc207(NPCHAR *npc)
 {
-	RECT rc[5];
-
-	rc[0] = {0, 144, 16, 160};
-	rc[1] = {16, 144, 32, 160};
-	rc[2] = {32, 144, 48, 160};
-	rc[3] = {48, 144, 64, 160};
-	rc[4] = {64, 144, 80, 160};
+	RECT rc[5] = {
+		{0, 144, 16, 160},
+		{16, 144, 32, 160},
+		{32, 144, 48, 160},
+		{48, 144, 64, 160},
+		{64, 144, 80, 160},
+	};
 
 	switch (npc->act_no)
 	{
@@ -574,16 +573,17 @@ void ActNpc207(NPCHAR *npc)
 //Basu (destroyed Egg Corridor)
 void ActNpc208(NPCHAR *npc)
 {
-	RECT rcLeft[3];
-	RECT rcRight[3];
+	RECT rcLeft[3] = {
+		{248, 80, 272, 104},
+		{272, 80, 296, 104},
+		{296, 80, 320, 104},
+	};
 
-	rcLeft[0] = {248, 80, 272, 104};
-	rcLeft[1] = {272, 80, 296, 104};
-	rcLeft[2] = {296, 80, 320, 104};
-
-	rcRight[0] = {248, 104, 272, 128};
-	rcRight[1] = {272, 104, 296, 128};
-	rcRight[2] = {296, 104, 320, 128};
+	RECT rcRight[3] = {
+		{248, 104, 272, 128},
+		{272, 104, 296, 128},
+		{296, 104, 320, 128},
+	};
 
 	switch (npc->act_no)
 	{
@@ -733,12 +733,12 @@ void ActNpc209(NPCHAR *npc)
 	npc->y += npc->ym;
 	npc->x += npc->xm;
 
-	RECT rect_left[4];
-
-	rect_left[0] = {232, 96, 248, 112};
-	rect_left[1] = {200, 112, 216, 128};
-	rect_left[2] = {216, 112, 232, 128};
-	rect_left[3] = {232, 112, 248, 128};
+	RECT rect_left[4] = {
+		{232, 96, 248, 112},
+		{200, 112, 216, 128},
+		{216, 112, 232, 128},
+		{232, 112, 248, 128},
+	};
 
 	if (++npc->ani_wait > 2)
 	{
@@ -761,14 +761,15 @@ void ActNpc209(NPCHAR *npc)
 //Beetle (destroyed Egg Corridor)
 void ActNpc210(NPCHAR *npc)
 {
-	RECT rcLeft[2];
-	RECT rcRight[2];
+	RECT rcLeft[2] = {
+		{0, 112, 16, 128},
+		{16, 112, 32, 128},
+	};
 
-	rcLeft[0] = {0, 112, 16, 128};
-	rcLeft[1] = {16, 112, 32, 128};
-
-	rcRight[0] = {32, 112, 48, 128};
-	rcRight[1] = {48, 112, 64, 128};
+	RECT rcRight[2] = {
+		{32, 112, 48, 128},
+		{48, 112, 64, 128},
+	};
 
 	switch (npc->act_no)
 	{
@@ -861,12 +862,12 @@ void ActNpc210(NPCHAR *npc)
 //Spikes (small)
 void ActNpc211(NPCHAR *npc)
 {
-	RECT rects[4];
-
-	rects[0] = {256, 200, 272, 216};
-	rects[1] = {272, 200, 288, 216};
-	rects[2] = {288, 200, 304, 216};
-	rects[3] = {304, 200, 320, 216};
+	RECT rects[4] = {
+		{256, 200, 272, 216},
+		{272, 200, 288, 216},
+		{288, 200, 304, 216},
+		{304, 200, 320, 216},
+	};
 
 	npc->rect = rects[npc->code_event];
 }
@@ -874,12 +875,12 @@ void ActNpc211(NPCHAR *npc)
 //Sky Dragon
 void ActNpc212(NPCHAR *npc)
 {
-	RECT rcRight[4];
-
-	rcRight[0] = {160, 152, 200, 192};
-	rcRight[1] = {200, 152, 240, 192};
-	rcRight[2] = {240, 112, 280, 152};
-	rcRight[3] = {280, 112, 320, 152};
+	RECT rcRight[4] = {
+		{160, 152, 200, 192},
+		{200, 152, 240, 192},
+		{240, 112, 280, 152},
+		{280, 112, 320, 152},
+	};
 
 	switch (npc->act_no)
 	{
@@ -985,18 +986,18 @@ void ActNpc212(NPCHAR *npc)
 //Night Spirit
 void ActNpc213(NPCHAR *npc)
 {
-	RECT rect[10];
-
-	rect[0] = {0, 0, 0, 0};
-	rect[1] = {0, 0, 48, 48};
-	rect[2] = {48, 0, 96, 48};
-	rect[3] = {96, 0, 144, 48};
-	rect[4] = {144, 0, 192, 48};
-	rect[5] = {192, 0, 240, 48};
-	rect[6] = {240, 0, 288, 48};
-	rect[7] = {0, 48, 48, 96};
-	rect[8] = {48, 48, 96, 96};
-	rect[9] = {96, 48, 144, 96};
+	RECT rect[10] = {
+		{0, 0, 0, 0},
+		{0, 0, 48, 48},
+		{48, 0, 96, 48},
+		{96, 0, 144, 48},
+		{144, 0, 192, 48},
+		{192, 0, 240, 48},
+		{240, 0, 288, 48},
+		{0, 48, 48, 96},
+		{48, 48, 96, 96},
+		{96, 48, 144, 96},
+	};
 
 	switch (npc->act_no)
 	{
@@ -1151,11 +1152,11 @@ void ActNpc213(NPCHAR *npc)
 //Night Spirit projectile
 void ActNpc214(NPCHAR *npc)
 {
-	RECT rect[3];
-
-	rect[0] = {144, 48, 176, 64};
-	rect[1] = {176, 48, 208, 64};
-	rect[2] = {208, 48, 240, 64};
+	RECT rect[3] = {
+		{144, 48, 176, 64},
+		{176, 48, 208, 64},
+		{208, 48, 240, 64},
+	};
 
 	switch (npc->act_no)
 	{
@@ -1288,13 +1289,13 @@ void ActNpc215(NPCHAR *npc)
 			break;
 	}
 
-	RECT rect[5];
-
-	rect[0] = {0, 0, 0, 0};
-	rect[1] = {0, 96, 48, 128};
-	rect[2] = {48, 96, 96, 128};
-	rect[3] = {96, 96, 144, 128};
-	rect[4] = {144, 96, 192, 128};
+	RECT rect[5] = {
+		{0, 0, 0, 0},
+		{0, 96, 48, 128},
+		{48, 96, 96, 128},
+		{96, 96, 144, 128},
+		{144, 96, 192, 128},
+	};
 
 	npc->rect = rect[npc->ani_no];
 }
@@ -1310,16 +1311,16 @@ void ActNpc216(NPCHAR *npc)
 //Itoh
 void ActNpc217(NPCHAR *npc)
 {
-	RECT rect[8];
-
-	rect[0] = {144, 64, 160, 80};
-	rect[1] = {160, 64, 176, 80};
-	rect[2] = {176, 64, 192, 80};
-	rect[3] = {192, 64, 208, 80};
-	rect[4] = {144, 80, 160, 96};
-	rect[5] = {160, 80, 176, 96};
-	rect[6] = {144, 80, 160, 96};
-	rect[7] = {176, 80, 192, 96};
+	RECT rect[8] = {
+		{144, 64, 160, 80},
+		{160, 64, 176, 80},
+		{176, 64, 192, 80},
+		{192, 64, 208, 80},
+		{144, 80, 160, 96},
+		{160, 80, 176, 96},
+		{144, 80, 160, 96},
+		{176, 80, 192, 96},
+	};
 
 	switch (npc->act_no)
 	{
@@ -1436,10 +1437,10 @@ void ActNpc217(NPCHAR *npc)
 // Core giant energy ball projectile
 void ActNpc218(NPCHAR *npc)
 {
-	RECT rc[2];
-
-	rc[0] = {256, 120, 288, 152};
-	rc[1] = {288, 120, 320, 152};
+	RECT rc[2] = {
+		{256, 120, 288, 152},
+		{288, 120, 320, 152},
+	};
 
 	npc->x += npc->xm;
 	npc->y += npc->ym;
@@ -1462,14 +1463,12 @@ void ActNpc218(NPCHAR *npc)
 //Smoke generator
 void ActNpc219(NPCHAR *npc)
 {
-	RECT rc[1];
+	RECT rc = {0, 0, 0, 0};
 
-	rc[0] = {0, 0, 0, 0};
-
-	if ( npc->direct )
+	if (npc->direct)
 		SetNpChar(199, npc->x + (Random(-0xA0, 0xA0) * 0x200), npc->y + (Random(-0x80, 0x80) * 0x200), 0, 0, 2, 0, 0x100);
 	else if (Random(0, 40) == 1)
 		SetNpChar(4, npc->x + (Random(-20, 20) * 0x200), npc->y, 0, -0x200, 0, 0, 0x100);
 
-	npc->rect = rc[0];
+	npc->rect = rc;
 }

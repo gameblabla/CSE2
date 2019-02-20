@@ -28,8 +28,17 @@ void InitMyChar()
 	memset(&gMC, 0, sizeof(MYCHAR));
 	gMC.cond = 0x80;
 	gMC.direct = 2;
-	gMC.view = {0x1000, 0x1000, 0x1000, 0x1000};
-	gMC.hit = {0xA00, 0x1000, 0xA00, 0x1000};
+
+	gMC.view.back = 0x1000;
+	gMC.view.top = 0x1000;
+	gMC.view.front = 0x1000;
+	gMC.view.bottom = 0x1000;
+
+	gMC.hit.back = 0xA00;
+	gMC.hit.top = 0x1000;
+	gMC.hit.front = 0xA00;
+	gMC.hit.bottom = 0x1000;
+
 	gMC.life = 3;
 	gMC.max_life = 3;
 	gMC.unit = 0;
@@ -37,35 +46,36 @@ void InitMyChar()
 
 void AnimationMyChar(bool bKey)
 {
-	RECT rcLeft[12];
-	RECT rcRight[12];
-	
-	rcLeft[0] = {0, 0, 16, 16};
-	rcLeft[1] = {16, 0, 32, 16};
-	rcLeft[2] = {0, 0, 16, 16};
-	rcLeft[3] = {32, 0, 48, 16};
-	rcLeft[4] = {0, 0, 16, 16};
-	rcLeft[5] = {48, 0, 64, 16};
-	rcLeft[6] = {64, 0, 80, 16};
-	rcLeft[7] = {48, 0, 64, 16};
-	rcLeft[8] = {80, 0, 96, 16};
-	rcLeft[9] = {48, 0, 64, 16};
-	rcLeft[10] = {96, 0, 112, 16};
-	rcLeft[11] = {112, 0, 128, 16};
+	RECT rcLeft[12] = {
+		{0, 0, 16, 16},
+		{16, 0, 32, 16},
+		{0, 0, 16, 16},
+		{32, 0, 48, 16},
+		{0, 0, 16, 16},
+		{48, 0, 64, 16},
+		{64, 0, 80, 16},
+		{48, 0, 64, 16},
+		{80, 0, 96, 16},
+		{48, 0, 64, 16},
+		{96, 0, 112, 16},
+		{112, 0, 128, 16},
+	};
 
-	rcRight[0] = {0, 16, 16, 32};
-	rcRight[1] = {16, 16, 32, 32};
-	rcRight[2] = {0, 16, 16, 32};
-	rcRight[3] = {32, 16, 48, 32};
-	rcRight[4] = {0, 16, 16, 32};
-	rcRight[5] = {48, 16, 64, 32};
-	rcRight[6] = {64, 16, 80, 32};
-	rcRight[7] = {48, 16, 64, 32};
-	rcRight[8] = {80, 16, 96, 32};
-	rcRight[9] = {48, 16, 64, 32};
-	rcRight[10] = {96, 16, 112, 32};
-	rcRight[11] = {112, 16, 128, 32};
-	
+	RECT rcRight[12] = {
+		{0, 16, 16, 32},
+		{16, 16, 32, 32},
+		{0, 16, 16, 32},
+		{32, 16, 48, 32},
+		{0, 16, 16, 32},
+		{48, 16, 64, 32},
+		{64, 16, 80, 32},
+		{48, 16, 64, 32},
+		{80, 16, 96, 32},
+		{48, 16, 64, 32},
+		{96, 16, 112, 32},
+		{112, 16, 128, 32},
+	};
+
 	if (!(gMC.cond & 2))
 	{
 		if (gMC.flag & 8)
@@ -216,9 +226,10 @@ void PutMyChar(int fx, int fy)
 			PutBitmap3(&grcGame, (gMC.x - gMC.view.left) / 0x200 - fx / 0x200, (gMC.y - gMC.view.top) / 0x200 - fy / 0x200, &rect, SURFACE_ID_MY_CHAR);
 			
 			//Draw airtank
-			RECT rcBubble[2];
-			rcBubble[0] = {56, 96, 80, 120};
-			rcBubble[1] = {80, 96, 104, 120};
+			RECT rcBubble[2] = {
+				{56, 96, 80, 120},
+				{80, 96, 104, 120},
+			};
 			
 			++gMC.bubble;
 			if (gMC.equip & 0x10 && gMC.flag & 0x100)

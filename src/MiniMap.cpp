@@ -20,11 +20,12 @@ int8_t gMapping[0x80];
 
 void WriteMiniMapLine(int line)
 {
-	RECT rcLevel[4];
-	rcLevel[0] = {240, 24, 241, 25};
-	rcLevel[1] = {241, 24, 242, 25};
-	rcLevel[2] = {242, 24, 243, 25};
-	rcLevel[3] = {243, 24, 244, 25};
+	RECT rcLevel[4] = {
+		{240, 24, 241, 25},
+		{241, 24, 242, 25},
+		{242, 24, 243, 25},
+		{243, 24, 244, 25},
+	};
 	
 	for (int x = 0; x < gMap.width; x++)
 	{
@@ -105,7 +106,11 @@ int MiniMapLoop()
 		
 		PutBitmap4(&grcGame, 0, 0, &grcGame, SURFACE_ID_SCREEN_GRAB);
 		
-		rcView = {(WINDOW_WIDTH / 2) - f * gMap.width / 16, (WINDOW_HEIGHT / 2) - f * gMap.length / 16, (WINDOW_WIDTH / 2) + f * gMap.width / 16, (WINDOW_HEIGHT / 2) + f * gMap.length / 16};
+		rcView.left = (WINDOW_WIDTH / 2) - f * gMap.width / 16;
+		rcView.right = (WINDOW_WIDTH / 2) + f * gMap.width / 16;
+		rcView.top = (WINDOW_HEIGHT / 2) - f * gMap.length / 16;
+		rcView.bottom = (WINDOW_HEIGHT / 2) + f * gMap.length / 16;
+
 		PutMapName(true);
 		CortBox(&rcView, 0);
 		
@@ -174,7 +179,12 @@ int MiniMapLoop()
 		}
 
 		PutBitmap4(&grcGame, 0, 0, &grcGame, SURFACE_ID_SCREEN_GRAB);
-		rcView = {(WINDOW_WIDTH / 2) - f * gMap.width / 16, (WINDOW_HEIGHT / 2) - f * gMap.length / 16, (WINDOW_WIDTH / 2) + f * gMap.width / 16, (WINDOW_HEIGHT / 2) + f * gMap.length / 16};
+
+		rcView.left = (WINDOW_WIDTH / 2) - f * gMap.width / 16;
+		rcView.right = (WINDOW_WIDTH / 2) + f * gMap.width / 16;
+		rcView.top = (WINDOW_HEIGHT / 2) - f * gMap.length / 16;
+		rcView.bottom = (WINDOW_HEIGHT / 2) + f * gMap.length / 16;
+
 		PutMapName(true);
 		CortBox(&rcView, 0);
 

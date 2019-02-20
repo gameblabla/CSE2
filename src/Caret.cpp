@@ -23,18 +23,19 @@ void ActCaret00(CARET *crt)
 
 void ActCaret01(CARET *crt)
 {
-	RECT rcLeft[4];
-	RECT rcRight[4];
-	
-	rcLeft[0] = {0, 64, 8, 72};
-	rcLeft[1] = {8, 64, 16, 72};
-	rcLeft[2] = {16, 64, 24, 72};
-	rcLeft[3] = {24, 64, 32, 72};
-	
-	rcRight[0] = {64, 24, 72, 32};
-	rcRight[1] = {72, 24, 80, 32};
-	rcRight[2] = {80, 24, 88, 32};
-	rcRight[3] = {88, 24, 92, 32};
+	RECT rcLeft[4] = {
+		{0, 64, 8, 72},
+		{8, 64, 16, 72},
+		{16, 64, 24, 72},
+		{24, 64, 32, 72},
+	};
+
+	RECT rcRight[4] = {
+		{64, 24, 72, 32},
+		{72, 24, 80, 32},
+		{80, 24, 88, 32},
+		{88, 24, 92, 32},
+	};
 	
 	if (!crt->act_no)
 	{
@@ -62,53 +63,25 @@ void ActCaret01(CARET *crt)
 
 void ActCaret02(CARET *crt)
 {
-	RECT rect_right[4];
-	RECT rect_left[4];
-	RECT rect_up[3];
-	rect_left[0].left = 0;
-	rect_left[0].top = 32;
-	rect_left[0].right = 16;
-	rect_left[0].bottom = 48;
-	rect_left[1].left = 16;
-	rect_left[1].top = 32;
-	rect_left[1].right = 32;
-	rect_left[1].bottom = 48;
-	rect_left[2].left = 32;
-	rect_left[2].top = 32;
-	rect_left[2].right = 48;
-	rect_left[2].bottom = 48;
-	rect_left[3].left = 48;
-	rect_left[3].top = 32;
-	rect_left[3].right = 64;
-	rect_left[3].bottom = 48;
-	rect_right[0].left = 176;
-	rect_right[0].top = 0;
-	rect_right[0].right = 192;
-	rect_right[0].bottom = 16;
-	rect_right[1].left = 192;
-	rect_right[1].top = 0;
-	rect_right[1].right = 208;
-	rect_right[1].bottom = 16;
-	rect_right[2].left = 208;
-	rect_right[2].top = 0;
-	rect_right[2].right = 224;
-	rect_right[2].bottom = 16;
-	rect_right[3].left = 224;
-	rect_right[3].top = 0;
-	rect_right[3].right = 240;
-	rect_right[3].bottom = 16;
-	rect_up[0].left = 0;
-	rect_up[0].top = 32;
-	rect_up[0].right = 16;
-	rect_up[0].bottom = 48;
-	rect_up[1].left = 32;
-	rect_up[1].top = 32;
-	rect_up[1].right = 48;
-	rect_up[1].bottom = 48;
-	rect_up[2].left = 16;
-	rect_up[2].top = 32;
-	rect_up[2].right = 32;
-	rect_up[2].bottom = 48;
+	RECT rect_left[4] = {
+		{0, 32, 16, 48},
+		{16, 32, 32, 48},
+		{32, 32, 48, 48},
+		{48, 32, 64, 48},
+	};
+
+	RECT rect_right[4] = {
+		{176, 0, 192, 16},
+		{192, 0, 208, 16},
+		{208, 0, 224, 16},
+		{224, 0, 240, 16},
+	};
+
+	RECT rect_up[3] = {
+		{0, 32, 16, 48},
+		{32, 32, 48, 48},
+		{16, 32, 32, 48},
+	};
 
 	switch (crt->direct)
 	{
@@ -146,11 +119,12 @@ void ActCaret02(CARET *crt)
 
 void ActCaret03(CARET *crt)
 {
-	RECT rect[4];
-	rect[0] = {0, 48, 16, 64};
-	rect[1] = {16, 48, 32, 64};
-	rect[2] = {32, 48, 48, 64};
-	rect[3] = {48, 48, 64, 64};
+	RECT rect[4] = {
+		{0, 48, 16, 64},
+		{16, 48, 32, 64},
+		{32, 48, 48, 64},
+		{48, 48, 64, 64},
+	};
 	
 	if (++crt->ani_wait > 2)
 	{
@@ -164,17 +138,17 @@ void ActCaret03(CARET *crt)
 
 void ActCaret04(CARET *crt)
 {
-	RECT rect[9];
-
-	rect[0] = {64, 32, 80, 48};
-	rect[1] = {80, 32, 96, 48};
-	rect[2] = {96, 32, 112, 48};
-	rect[3] = {64, 48, 80, 64};
-	rect[4] = {80, 48, 96, 64};
-	rect[5] = {96, 48, 112, 64};
-	rect[6] = {64, 64, 80, 80};
-	rect[7] = {80, 64, 96, 80};
-	rect[8] = {96, 64, 112, 80};
+	RECT rect[9] = {
+		{64, 32, 80, 48},
+		{80, 32, 96, 48},
+		{96, 32, 112, 48},
+		{64, 48, 80, 64},
+		{80, 48, 96, 64},
+		{96, 48, 112, 64},
+		{64, 64, 80, 80},
+		{80, 64, 96, 80},
+		{96, 64, 112, 80},
+	};
 
 	if (++crt->ani_wait > 1)
 	{
@@ -189,15 +163,15 @@ void ActCaret04(CARET *crt)
 
 void ActCaret05(CARET *crt)
 {
-	RECT rect[7];
-
-	rect[0] = {32, 64, 40, 72};
-	rect[1] = {32, 72, 40, 80};
-	rect[2] = {40, 64, 48, 72};
-	rect[3] = {40, 72, 48, 80};
-	rect[4] = {40, 64, 48, 72};
-	rect[5] = {40, 72, 48, 80};
-	rect[6] = {40, 64, 48, 72};
+	RECT rect[7] = {
+		{32, 64, 40, 72},
+		{32, 72, 40, 80},
+		{40, 64, 48, 72},
+		{40, 72, 48, 80},
+		{40, 64, 48, 72},
+		{40, 72, 48, 80},
+		{40, 64, 48, 72},
+	};
 
 	if (++crt->ani_wait > 4)
 	{
@@ -216,15 +190,15 @@ void ActCaret05(CARET *crt)
 
 void ActCaret07(CARET *crt)
 {
-	RECT rcLeft[7];
-
-	rcLeft[0] = {56, 0, 64, 8};
-	rcLeft[1] = {64, 0, 72, 8};
-	rcLeft[2] = {72, 0, 80, 8};
-	rcLeft[3] = {80, 0, 88, 8};
-	rcLeft[4] = {88, 0, 96, 8};
-	rcLeft[5] = {96, 0, 104, 8};
-	rcLeft[6] = {104, 0, 112, 8};
+	RECT rcLeft[7] = {
+		{56, 0, 64, 8},
+		{64, 0, 72, 8},
+		{72, 0, 80, 8},
+		{80, 0, 88, 8},
+		{88, 0, 96, 8},
+		{96, 0, 104, 8},
+		{104, 0, 112, 8},
+	};
 
 	if (++crt->ani_wait > 1)
 	{
@@ -282,13 +256,16 @@ void ActCaret09(CARET *crt)
 
 void ActCaret10(CARET *crt)
 {
-	RECT rcLeft[2];
-	RECT rcRight[2];
-	rcLeft[0] = {0, 0, 56, 16};
-	rcLeft[1] = {0, 16, 56, 32};
-	rcRight[0] = {0, 96, 56, 112};
-	rcRight[1] = {0, 112, 56, 128};
-	
+	RECT rcLeft[2] = {
+		{0, 0, 56, 16},
+		{0, 16, 56, 32},
+	};
+
+	RECT rcRight[2] = {
+		{0, 96, 56, 112},
+		{0, 112, 56, 128},
+	};
+
 	++crt->ani_wait;
 	
 	if (crt->direct)
@@ -325,14 +302,15 @@ void ActCaret11(CARET *crt)
 	crt->x += crt->xm;
 	crt->y += crt->ym;
 	
-	RECT rcRight[7];
-	rcRight[0] = {56, 8, 64, 16};
-	rcRight[1] = {64, 8, 72, 16};
-	rcRight[2] = {72, 8, 80, 16};
-	rcRight[3] = {80, 8, 88, 16};
-	rcRight[4] = {88, 8, 96, 16};
-	rcRight[5] = {96, 8, 104, 16};
-	rcRight[6] = {104, 8, 112, 16};
+	RECT rcRight[7] = {
+		{56, 8, 64, 16},
+		{64, 8, 72, 16},
+		{72, 8, 80, 16},
+		{80, 8, 88, 16},
+		{88, 8, 96, 16},
+		{96, 8, 104, 16},
+		{104, 8, 112, 16},
+	};
 
 	if (++crt->ani_wait > 2)
 	{
@@ -346,9 +324,10 @@ void ActCaret11(CARET *crt)
 
 void ActCaret12(CARET *crt)
 {
-	RECT rcLeft[2];
-	rcLeft[0] = {112, 0, 144, 32};
-	rcLeft[1] = {144, 0, 176, 32};
+	RECT rcLeft[2] = {
+		{112, 0, 144, 32},
+		{144, 0, 176, 32},
+	};
 	
 	if (++crt->ani_wait > 2)
 	{
@@ -362,9 +341,10 @@ void ActCaret12(CARET *crt)
 
 void ActCaret13(CARET *crt)
 {
-	RECT rcLeft[2];
-	rcLeft[0] = {56, 24, 64, 32};
-	rcLeft[1] = {0, 0, 0, 0};
+	RECT rcLeft[2] = {
+		{56, 24, 64, 32},
+		{0, 0, 0, 0},
+	};
 	
 	if (!crt->act_no)
 	{
@@ -403,13 +383,13 @@ void ActCaret13(CARET *crt)
 
 void ActCaret14(CARET *crt)
 {
-	RECT rect[5];
-
-	rect[0] = {0, 96, 40, 136};
-	rect[1] = {40, 96, 80, 136};
-	rect[2] = {80, 96, 120, 136};
-	rect[3] = {120, 96, 160, 136};
-	rect[4] = {160, 96, 200, 136};
+	RECT rect[5] = {
+		{0, 96, 40, 136},
+		{40, 96, 80, 136},
+		{80, 96, 120, 136},
+		{120, 96, 160, 136},
+		{160, 96, 200, 136},
+	};
 
 	if (++crt->ani_wait > 1)
 	{
@@ -424,12 +404,12 @@ void ActCaret14(CARET *crt)
 
 void ActCaret15(CARET *crt)
 {
-	RECT rcLeft[4];
-
-	rcLeft[0] = {0, 72, 8, 80};
-	rcLeft[1] = {8, 72, 16, 80};
-	rcLeft[2] = {16, 72, 24, 80};
-	rcLeft[3] = {24, 72, 32, 80};
+	RECT rcLeft[4] = {
+		{0, 72, 8, 80},
+		{8, 72, 16, 80},
+		{16, 72, 24, 80},
+		{24, 72, 32, 80},
+	};
 
 	if (++crt->ani_wait > 2)
 	{
@@ -444,10 +424,10 @@ void ActCaret15(CARET *crt)
 
 void ActCaret16(CARET *crt)
 {
-	RECT rcLeft[2];
-
-	rcLeft[0] = {104, 96, 144, 104};
-	rcLeft[1] = {104, 104, 144, 112};
+	RECT rcLeft[2] = {
+		{104, 96, 144, 104},
+		{104, 104, 144, 112},
+	};
 
 	if (++crt->ani_wait < 10)
 		crt->y -= 0x400;
@@ -460,10 +440,10 @@ void ActCaret16(CARET *crt)
 
 void ActCaret17(CARET *crt)
 {
-	RECT rcLeft[2];
-
-	rcLeft[0] = {0, 144, 144, 152};
-	rcLeft[1] = {0, 0, 0, 0};
+	RECT rcLeft[2] = {
+		{0, 144, 144, 152},
+		{0, 0, 0, 0},
+	};
 
 	if (++crt->ani_wait >= 40)
 		crt->ani_wait = 0;
