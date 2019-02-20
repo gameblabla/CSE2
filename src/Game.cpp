@@ -1,6 +1,7 @@
 #include "Game.h"
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 #include <SDL_timer.h>

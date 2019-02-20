@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 
 #include <SDL_rwops.h>
 #include <SDL_thread.h>
