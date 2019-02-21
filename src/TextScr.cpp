@@ -46,9 +46,17 @@ char text[0x100];
 
 RECT gRect_line = {0, 0, 216, 16};
 
+#ifdef FIX_BUGS
+static unsigned long nod_color;
+#endif
+
 //Initialize and end tsc
 BOOL InitTextScript2()
 {
+#ifdef FIX_BUGS
+	nod_color = GetCortBoxColor(RGB(0xFE, 0xFF, 0xFF));
+#endif
+
 	//Clear flags
 	gTS.mode = 0;
 	g_GameFlags &= ~0x04;
@@ -456,7 +464,18 @@ void PutTextScript()
 		rect.top = gTS.ypos_line[gTS.line % 4] + gTS.rcText.top + gTS.offsetY;
 		rect.right = rect.left + 5;
 		rect.bottom = rect.top + 11;
-		CortBox(&rect, 0xFFFFFE);
+#ifdef FIX_BUGS
+		CortBox(&rect, nod_color);
+
+		// This is how the Linux port fixed this, but it isn't done
+		// the way Pixel would do it (he only calls GetCortBoxColor
+		// once, during init functions, so our fix does it that way
+		// instead).
+		// Also, the red/blue values are swapped for some reason.
+		//CortBox(&rect, GetCortBoxColor(RGB(0xFF, 0xFF, 0xFE));
+#else
+		CortBox(&rect, RGB(0xFE, 0xFF, 0xFF));
+#endif
 	}
 
 	//Draw GIT

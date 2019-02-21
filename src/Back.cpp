@@ -14,9 +14,13 @@
 
 BACK gBack;
 int gWaterY;
+static unsigned long color_black;
 
 BOOL InitBack(const char *fName, int type)
 {
+	// Unused, hilariously
+	color_black = GetCortBoxColor(RGB(0, 0, 0x10));
+
 	//Get width and height
 	char path[PATH_LENGTH];
 	sprintf(path, "%s/%s.pbm", gDataPath, fName);

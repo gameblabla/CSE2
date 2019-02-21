@@ -267,6 +267,7 @@ int ModeTitle()
 	int anime = 0;
 	int char_type = 0;
 	int time_counter = 0;
+	unsigned long back_color = GetCortBoxColor(RGB(0x20, 0x20, 0x20));
 	
 	//Set state
 	bContinue = IsProfile();
@@ -356,7 +357,7 @@ int ModeTitle()
 			anime = 0;
 		
 		//Draw title
-		CortBox(&grcGame, 0x202020);
+		CortBox(&grcGame, back_color);
 		
 		//Draw version
 		PutBitmap3(&grcGame, (WINDOW_WIDTH - 120) / 2, WINDOW_HEIGHT - 24, &rcVersion, SURFACE_ID_TEXT_BOX);
@@ -443,7 +444,9 @@ int ModeAction()
 {
 	int frame_x = 0;
 	int frame_y = 0;
-	
+
+	unsigned long color = GetCortBoxColor(RGB(0, 0, 0x20));
+
 	bool swPlay = true;
 	
 	//Reset stuff
@@ -525,7 +528,7 @@ int ModeAction()
 			}
 			
 			ProcFade();
-			CortBox(&grcFull, 0x000020);
+			CortBox(&grcFull, color);
 			GetFramePosition(&frame_x, &frame_y);
 			PutBack(frame_x, frame_y);
 			PutStage_Back(frame_x, frame_y);
