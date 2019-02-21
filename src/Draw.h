@@ -4,6 +4,10 @@
 
 #include "WindowsWrapper.h"
 
+#ifndef RGB
+#define RGB(r,g,b) ((r) | ((g) << 8) | ((b) << 16))
+#endif
+
 extern RECT grcGame;
 extern RECT grcFull;
 
@@ -63,6 +67,7 @@ void BackupSurface(Surface_Ids surf_no, RECT *rect);
 void PutBitmap3(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_no);
 void PutBitmap4(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_no);
 void Surface2Surface(int x, int y, RECT *rect, int to, int from);
+unsigned long GetCortBoxColor(unsigned long col);
 void CortBox(RECT *rect, uint32_t col);
 void CortBox2(RECT *rect, uint32_t col, Surface_Ids surf_no);
 void InitTextObject(const char *font_name);

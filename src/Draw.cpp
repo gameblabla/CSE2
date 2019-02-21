@@ -474,6 +474,11 @@ void Surface2Surface(int x, int y, RECT *rect, int to, int from)
 	surf[to].needs_updating = true;
 }
 
+unsigned long GetCortBoxColor(unsigned long col)
+{
+	return ((col & 0xFF) << 16) | (col & 0xFF00) | ((col & 0xFF0000) >> 16);
+}
+
 void CortBox(RECT *rect, uint32_t col)
 {
 	//Get rect
