@@ -2,12 +2,26 @@
 
 #include <string.h>
 
+#include "CommonDefines.h"
 #include "WindowsWrapper.h"
 
 #include "Draw.h"
 #include "Game.h"
 
-FADE gFade;
+#define FADE_WIDTH	(((WINDOW_WIDTH - 1) / 16) + 1)
+#define FADE_HEIGHT	(((WINDOW_HEIGHT - 1) / 16) + 1)
+
+struct FADE
+{
+	int mode;
+	BOOL bMask;
+	int count;
+	char ani_no[FADE_HEIGHT][FADE_WIDTH];
+	BOOLEAN flag[FADE_HEIGHT][FADE_WIDTH];
+	char dir;
+};
+
+static FADE gFade;
 static unsigned long mask_color;
 
 void InitFade()
