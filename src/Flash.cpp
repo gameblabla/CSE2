@@ -21,7 +21,7 @@ static unsigned long gFlashColor;
 
 void InitFlash(void)
 {
-	gFlashColor = 0xFEFFFF;
+	gFlashColor = GetCortBoxColor(RGB(0xFF, 0xFF, 0xFE));
 }
 
 void SetFlash(int x, int y, int mode)
@@ -137,34 +137,26 @@ void ActFlash_Flash(void)
 void ActFlash(int flx, int fly)
 {
 	if (flash.flag == FALSE)
+		return;
+
+	switch (flash.mode)
 	{
-		// Do nothing
-	}
-	else
-	{
-		switch (flash.mode)
-		{
-			case 1:
-				ActFlash_Explosion(flx, fly);
-				break;
-			case 2:
-				ActFlash_Flash();
-				break;
-		}
+		case 1:
+			ActFlash_Explosion(flx, fly);
+			break;
+		case 2:
+			ActFlash_Flash();
+			break;
 	}
 }
 
 void PutFlash(void)
 {
 	if (flash.flag == FALSE)
-	{
-		// Do nothing
-	}
-	else
-	{
-		CortBox(&flash.rect1, gFlashColor);
-		CortBox(&flash.rect2, gFlashColor);
-	}
+		return;
+
+	CortBox(&flash.rect1, gFlashColor);
+	CortBox(&flash.rect2, gFlashColor);
 }
 
 void ResetFlash(void)
