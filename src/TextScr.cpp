@@ -54,7 +54,7 @@ static unsigned long nod_color;
 BOOL InitTextScript2()
 {
 #ifdef FIX_BUGS
-	nod_color = GetCortBoxColor(RGB(0xFE, 0xFF, 0xFF));
+	nod_color = GetCortBoxColor(RGB(0xFF, 0xFF, 0xFE));
 #endif
 
 	//Clear flags
@@ -367,7 +367,7 @@ void SetNumberTextScript(int index)
 	str[offset + 1] = 0;
 
 	//Append number to line
-	PutText2(6 * gTS.p_write, 0, str, 0xFFFFFE, (Surface_Ids)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
+	PutText2(6 * gTS.p_write, 0, str, RGB(0xFF, 0xFF, 0xFE), (Surface_Ids)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
 	strcat(&text[gTS.line % 4 * 0x40], str);
 
 	//Play sound and reset blinking cursor
@@ -471,10 +471,9 @@ void PutTextScript()
 		// the way Pixel would do it (he only calls GetCortBoxColor
 		// once, during init functions, so our fix does it that way
 		// instead).
-		// Also, the red/blue values are swapped for some reason.
 		//CortBox(&rect, GetCortBoxColor(RGB(0xFF, 0xFF, 0xFE));
 #else
-		CortBox(&rect, RGB(0xFE, 0xFF, 0xFF));
+		CortBox(&rect, RGB(0xFF, 0xFF, 0xFE));
 #endif
 	}
 
@@ -1254,7 +1253,7 @@ int TextScriptProc()
 						gTS.p_write = x;
 
 						//Print text
-						PutText2(0, 0, str, 0xFFFFFE, (Surface_Ids)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
+						PutText2(0, 0, str, RGB(0xFF, 0xFF, 0xFE), (Surface_Ids)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
 						sprintf(&text[gTS.line % 4 * 0x40], str);
 
 						//Check if should move to next line (prevent a memory overflow, come on guys, this isn't a leftover of pixel trying to make text wrapping)
@@ -1288,7 +1287,7 @@ int TextScriptProc()
 						}
 						else
 						{
-							PutText2(6 * gTS.p_write, 0, c, 0xFFFFFE, (Surface_Ids)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
+							PutText2(6 * gTS.p_write, 0, c, RGB(0xFF, 0xFF, 0xFE), (Surface_Ids)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
 						}
 
 						strcat(&text[gTS.line % 4 * 0x40], c);
