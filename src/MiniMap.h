@@ -2,9 +2,11 @@
 
 #include <stdint.h>
 
-extern int8_t gMapping[0x80];
+#include "WindowsWrapper.h"
+
+extern BOOLEAN gMapping[0x80];
 
 int MiniMapLoop();
-bool IsMapping();
+BOOL IsMapping();
 void StartMapping();
 void SetMapping(int a);

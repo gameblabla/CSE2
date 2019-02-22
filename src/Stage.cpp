@@ -129,12 +129,12 @@ const STAGE_TABLE gTMT[95] = {
 	STAGE_ENTRY("Oside", "Clock", 6, "bkMoon", "Moon", "0", 0, "Clock Room", "ŽžŒv‰®"),
 };
 
-bool TransferStage(int no, int w, int x, int y)
+BOOL TransferStage(int no, int w, int x, int y)
 {
 	//Move character
 	SetMyCharPosition(x << 13, y << 13);
 	
-	bool bError = false;
+	BOOL bError = FALSE;
 	
 	//Get path
 	char path_dir[20];
@@ -144,31 +144,31 @@ bool TransferStage(int no, int w, int x, int y)
 	char path[PATH_LENGTH];
 	sprintf(path, "%s/Prt%s", path_dir, gTMT[no].parts);
 	if (!ReloadBitmap_File(path, SURFACE_ID_LEVEL_TILESET))
-		bError = true;
+		bError = TRUE;
 
 	sprintf(path, "%s/%s.pxa", path_dir, gTMT[no].parts);
 	if (!LoadAttributeData(path))
-		bError = true;
+		bError = TRUE;
 	
 	//Load tilemap
 	sprintf(path, "%s/%s.pxm", path_dir, gTMT[no].map);
 	if (!LoadMapData2(path))
-		bError = true;
+		bError = TRUE;
 
 	//Load NPCs
 	sprintf(path, "%s/%s.pxe", path_dir, gTMT[no].map);
 	if (!LoadEvent(path))
-		bError = true;
+		bError = TRUE;
 
 	//Load script
 	sprintf(path, "%s/%s.tsc", path_dir, gTMT[no].map);
 	if (!LoadTextScript_Stage(path))
-		bError = true;
+		bError = TRUE;
 	
 	//Load background
 	strcpy(path, gTMT[no].back);
 	if (!InitBack(path, gTMT[no].bkType))
-		bError = true;
+		bError = TRUE;
 	
 	//Get path
 	strcpy(path_dir, "Npc");
@@ -176,16 +176,16 @@ bool TransferStage(int no, int w, int x, int y)
 	//Load NPC sprite sheets
 	sprintf(path, "%s/Npc%s", path_dir, gTMT[no].npc);
 	if (!ReloadBitmap_File(path, SURFACE_ID_LEVEL_SPRITESET_1))
-		bError = true;
+		bError = TRUE;
 	
 	sprintf(path, "%s/Npc%s", path_dir, gTMT[no].boss);
 	if (!ReloadBitmap_File(path, SURFACE_ID_LEVEL_SPRITESET_2))
-		bError = true;
+		bError = TRUE;
 	
 	if (bError)
 	{
 		printf("Failed to load stage %d\n", no);
-		return false;
+		return FALSE;
 	}
 	else
 	{
@@ -201,10 +201,10 @@ bool TransferStage(int no, int w, int x, int y)
 		InitBossChar(gTMT[no].boss_no);
 		ResetFlash();
 		gStageNo = no;
-		return true;
+		return TRUE;
 	}
 	
-	return false;
+	return FALSE;
 }
 
 //Music
