@@ -1,10 +1,11 @@
 #include "Flags.h"
 
-#include <stdint.h>
 #include <string.h>
 
-uint8_t gFlagNPC[1000];
-uint8_t gSkipFlag[0x40];
+#include "WindowsWrapper.h"
+
+unsigned char gFlagNPC[1000];
+unsigned char gSkipFlag[0x40];
 
 //Flag inits
 void InitFlags()
@@ -18,33 +19,39 @@ void InitSkipFlags()
 }
 
 //NPC flags
-void SetNPCFlag(int a)
+void SetNPCFlag(long a)
 {
 	gFlagNPC[a / 8] |= 1 << a % 8;
 }
 
-void CutNPCFlag(int a)
+void CutNPCFlag(long a)
 {
 	gFlagNPC[a / 8] &= ~(1 << a % 8);
 }
 
-bool GetNPCFlag(int a)
+BOOL GetNPCFlag(long a)
 {
-	return ((gFlagNPC[a / 8] >> a % 8) & 1) != 0;
+	if (gFlagNPC[a / 8] & (1 << a % 8))
+		return TRUE;
+	else
+		return FALSE;
 }
 
 //Skip flags
-void SetSkipFlag(int a)
+void SetSkipFlag(long a)
 {
 	gSkipFlag[a / 8] |= 1 << a % 8;
 }
 
-void CutSkipFlag(int a)
+void CutSkipFlag(long a)
 {
 	gSkipFlag[a / 8] &= ~(1 << a % 8);
 }
 
-bool GetSkipFlag(int a)
+BOOL GetSkipFlag(long a)
 {
-	return ((gSkipFlag[a / 8] >> a % 8) & 1) != 0;
+	if (gSkipFlag[a / 8] & (1 << a % 8))
+		return TRUE;
+	else
+		return FALSE;
 }

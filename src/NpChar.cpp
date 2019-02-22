@@ -239,9 +239,10 @@ bool SetBulletObject(int x, int y, int val)
 {
 	int tamakazu_ari[10];
 
+	int n;
 	int t = 0;
 	memset(tamakazu_ari, 0, sizeof(tamakazu_ari));
-	for (int n = 0; n < 8; n++)
+	for (n = 0; n < 8; n++)
 	{
 		int code = gArmsData[n].code;
 		if (code == 5)
@@ -255,7 +256,7 @@ bool SetBulletObject(int x, int y, int val)
 	if (!t)
 		return false;
 
-	int n = Random(1, 10 * t);
+	n = Random(1, 10 * t);
 	int bullet_no = tamakazu_ari[n % t];
 	for (n = 0x100; n < NPC_MAX; n++)
 	{

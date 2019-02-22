@@ -36,8 +36,8 @@ void ReadyMapName(const char *str)
 	int len = strlen(gMapName.name);
 	
 	CortBox2(&rc, 0, SURFACE_ID_ROOM_NAME);
-	PutText2((-6 * len + 160) / 2 + 6, 1, gMapName.name, 0x110022, SURFACE_ID_ROOM_NAME);
-	PutText2((-6 * len + 160) / 2 + 6, 0, gMapName.name, 0xFFFFFE, SURFACE_ID_ROOM_NAME);
+	PutText2((-6 * len + 160) / 2 + 6, 1, gMapName.name, RGB(0x11, 0x00, 0x22), SURFACE_ID_ROOM_NAME);
+	PutText2((-6 * len + 160) / 2 + 6, 0, gMapName.name, RGB(0xFF, 0xFF, 0xFE), SURFACE_ID_ROOM_NAME);
 }
 
 void PutMapName(bool bMini)
@@ -69,6 +69,6 @@ void RestoreMapName()
 	int len = strlen(gMapName.name);
 	
 	CortBox2(&rc, 0, SURFACE_ID_ROOM_NAME);
-	PutText2((-6 * len + 160) / 2 + 6, 1, gMapName.name, 0x110022, SURFACE_ID_ROOM_NAME);
-	PutText2((-6 * len + 160) / 2 + 6, 0, gMapName.name, 0xFFFFFE, SURFACE_ID_ROOM_NAME);
+	PutText2((-6 * len + 160) / 2 + 6, 1, gMapName.name, RGB(0x11, 0x00, 0x22), SURFACE_ID_ROOM_NAME);
+	PutText2((-6 * len + 160) / 2 + 6, 0, gMapName.name, RGB(0xFF, 0xFF, 0xFE), SURFACE_ID_ROOM_NAME);
 }

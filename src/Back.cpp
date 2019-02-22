@@ -14,9 +14,13 @@
 
 BACK gBack;
 int gWaterY;
+static unsigned long color_black;
 
 BOOL InitBack(const char *fName, int type)
 {
+	// Unused, hilariously
+	color_black = GetCortBoxColor(RGB(0, 0, 0x10));
+
 	//Get width and height
 	char path[PATH_LENGTH];
 	sprintf(path, "%s/%s.pbm", gDataPath, fName);
@@ -46,8 +50,10 @@ BOOL InitBack(const char *fName, int type)
 	// This is ridiculously platform-dependant:
 	// It should break on big-endian CPUs, and platforms
 	// where short isn't 16-bit and long isn't 32-bit.
-	short bmp_header_buffer[7];
-	long bmp_header_buffer2[10];
+//	short bmp_header_buffer[7];
+//	long bmp_header_buffer2[10];
+	int16_t bmp_header_buffer[7];
+	int32_t bmp_header_buffer2[10];	// We'll need a better solution when we stop using stdint.h
 
 	fread(bmp_header_buffer, 14, 1, fp);
 

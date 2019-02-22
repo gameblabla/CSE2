@@ -291,7 +291,7 @@ static bool LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, bool create_surface)
 								}
 
 								for (int i = 1; i < magnification; ++i)
-									memcpy(dst_row + i * surf[surf_no].surface->pitch, dst_row, surf[surf_no].surface->w * sizeof(unsigned long));
+									memcpy(dst_row + i * surf[surf_no].surface->pitch, dst_row, surf[surf_no].surface->w * 4);
 							}
 
 							SDL_FreeSurface(converted_surface);
@@ -474,13 +474,22 @@ void Surface2Surface(int x, int y, RECT *rect, int to, int from)
 	surf[to].needs_updating = true;
 }
 
+unsigned long GetCortBoxColor(unsigned long col)
+{
+	// This comes in BGR, and goes out BGR
+	return col;
+}
+
 void CortBox(RECT *rect, uint32_t col)
 {
 	//Get rect
 	SDL_Rect destRect = RectToSDLRectScaled(rect);
 	
 	//Set colour and draw
-	SDL_SetRenderDrawColor(gRenderer, (col & 0xFF0000) >> 16, (col & 0x00FF00) >> 8, col & 0x0000FF, 0xFF);
+	const unsigned char col_red = col & 0x0000FF;
+	const unsigned char col_green = (col & 0x00FF00) >> 8;
+	const unsigned char col_blue = (col & 0xFF0000) >> 16;
+	SDL_SetRenderDrawColor(gRenderer, col_red, col_green, col_blue, 0xFF);
 	SDL_RenderFillRect(gRenderer, &destRect);
 }
 
@@ -489,9 +498,10 @@ void CortBox2(RECT *rect, uint32_t col, Surface_Ids surf_no)
 	//Get rect
 	SDL_Rect destRect = RectToSDLRectScaled(rect);
 
-	const unsigned char col_red = (col & 0xFF0000) >> 16;
+	//Set colour and draw
+	const unsigned char col_red = col & 0x0000FF;
 	const unsigned char col_green = (col & 0x00FF00) >> 8;
-	const unsigned char col_blue = col & 0x0000FF;
+	const unsigned char col_blue = (col & 0xFF0000) >> 16;
 	SDL_FillRect(surf[surf_no].surface, &destRect, SDL_MapRGB(surf[surf_no].surface->format, col_red, col_green, col_blue));
 	surf[surf_no].needs_updating = true;
 }
