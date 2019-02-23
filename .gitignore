@@ -38,3 +38,11 @@ build.zip
 *.exe
 *.out
 *.app
+
+# MSVC trash
+msvc2003/CSE2.ncb
+msvc2003/CSE2.suo
+msvc2003/Debug
+msvc2003/Release
+msvc2003/freetype-2.9.1s
+*.aps
