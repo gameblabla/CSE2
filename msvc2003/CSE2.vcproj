@@ -76,6 +76,7 @@
 				PreprocessorDefinitions="WIN32;NDEBUG;WINDOWS"
 				MinimalRebuild="TRUE"
 				RuntimeLibrary="0"
+				AssemblerOutput="4"
 				WarningLevel="3"
 				DebugInformationFormat="3"/>
 			<Tool
