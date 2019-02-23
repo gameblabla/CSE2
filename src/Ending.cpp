@@ -75,7 +75,7 @@ void SetStripper(int x, int y, char *text, int cast)
 			//Draw text
 			RECT rc = {0, 16 * s, 320, 16 * s + 16};
 			CortBox2(&rc, 0, SURFACE_ID_CREDIT_CAST);
-			PutText2(0, 16 * s, text, 0xFFFFFE, SURFACE_ID_CREDIT_CAST);
+			PutText2(0, 16 * s, text, RGB(0xFF, 0xFF, 0xFE), SURFACE_ID_CREDIT_CAST);
 			break;
 		}
 	}
@@ -90,7 +90,7 @@ void RestoreStripper()
 		{
 			RECT rc = {0, 16 * s, 320, 16 * s + 16};
 			CortBox2(&rc, 0, SURFACE_ID_CREDIT_CAST);
-			PutText2(0, rc.top, Strip[s].str, 0xFFFFFE, SURFACE_ID_CREDIT_CAST);
+			PutText2(0, rc.top, Strip[s].str, RGB(0xFF, 0xFF, 0xFE), SURFACE_ID_CREDIT_CAST);
 		}
 	}
 }

@@ -115,7 +115,7 @@ float MillibelToVolume(int32_t lVolume)
 {
 	//Volume is in hundredths of decibels, from 0 to -10000
 	lVolume = clamp(lVolume, (int32_t)-10000, (int32_t)0);
-	return pow(10.0, lVolume / 2000.0);
+	return (float)pow(10.0, lVolume / 2000.0);
 }
 
 void SOUNDBUFFER::SetVolume(int32_t lVolume)
@@ -158,19 +158,19 @@ void SOUNDBUFFER::Mix(float (*buffer)[2], size_t samples)
 		const double freqPosition = frequency / FREQUENCY; //This is added to position at the end
 		
 		//Get the in-between sample this is (linear interpolation)
-		const float sample1 = ((looped || ((size_t)samplePosition) >= 1) ? data[(size_t)samplePosition] : 0x80);
-		const float sample2 = ((looping || (((size_t)samplePosition) + 1) < size) ? data[(((size_t)samplePosition) + 1) % size] : 0x80);
+		const float sample1 = ((looped || ((size_t)samplePosition) >= 1) ? data[(size_t)samplePosition] : 128.0f);
+		const float sample2 = ((looping || (((size_t)samplePosition) + 1) < size) ? data[(((size_t)samplePosition) + 1) % size] : 128.0f);
 		
 		//Interpolate sample
-		const float subPos = std::fmod(samplePosition, 1.0);
+		const float subPos = (float)std::fmod(samplePosition, 1.0);
 		const float sampleA = sample1 + (sample2 - sample1) * subPos;
 		
 		//Convert sample to float32
 		const float sampleConvert = (sampleA - 128.0f) / 128.0f;
 		
 		//Mix
-		buffer[sample][0] += sampleConvert * volume * volume_l;
-		buffer[sample][1] += sampleConvert * volume * volume_r;
+		buffer[sample][0] += (float)(sampleConvert * volume * volume_l);
+		buffer[sample][1] += (float)(sampleConvert * volume * volume_r);
 		
 		//Increment position
 		samplePosition += freqPosition;
@@ -305,7 +305,7 @@ void ChangeSoundPan(int no, int32_t pan)
 
 size_t MakePixToneObject(const PIXTONEPARAMETER *ptp, int ptp_num, int no)
 {
-	size_t sample_count = 0;
+	int sample_count = 0;
 	for (int i = 0; i < ptp_num; ++i)
 	{
 		if (ptp[i].size > sample_count)

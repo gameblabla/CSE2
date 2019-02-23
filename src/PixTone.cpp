@@ -15,7 +15,7 @@ void MakeWaveTables(void)
 	// Sine wave
 	for (i = 0; i < 256; ++i)
 	{
-		gWaveModelTable[0][i] = (sin(i * 6.283184 / 256.0) * 64.0);
+		gWaveModelTable[0][i] = (signed char)(sin(i * 6.283184 / 256.0) * 64.0);
 		a = gWaveModelTable[0][i];
 	}
 
@@ -64,7 +64,7 @@ BOOL MakePixelWaveData(const PIXTONEPARAMETER *ptp, unsigned char *pData)
 	// The Linux port added a cute optimisation here, where MakeWaveTables is only called once during the game's execution
 	MakeWaveTables();
 
-	char envelopeTable[0x100];
+	signed char envelopeTable[0x100];
 	memset(envelopeTable, 0, 0x100);
 
 	int i = 0;
@@ -73,7 +73,7 @@ BOOL MakePixelWaveData(const PIXTONEPARAMETER *ptp, unsigned char *pData)
 	dEnvelope = ptp->initial;
 	while (i < ptp->pointAx)
 	{
-		envelopeTable[i] = dEnvelope;
+		envelopeTable[i] = (signed char)dEnvelope;
 		dEnvelope = ((double)ptp->pointAy - ptp->initial) / ptp->pointAx + dEnvelope;
 		++i;
 	}
@@ -81,7 +81,7 @@ BOOL MakePixelWaveData(const PIXTONEPARAMETER *ptp, unsigned char *pData)
 	dEnvelope = ptp->pointAy;
 	while (i < ptp->pointBx)
 	{
-		envelopeTable[i] = dEnvelope;
+		envelopeTable[i] = (signed char)dEnvelope;
 		dEnvelope = ((double)ptp->pointBy - ptp->pointAy) / (double)(ptp->pointBx - ptp->pointAx) + dEnvelope;
 		++i;
 	}
@@ -89,7 +89,7 @@ BOOL MakePixelWaveData(const PIXTONEPARAMETER *ptp, unsigned char *pData)
 	dEnvelope = ptp->pointBy;
 	while (i < ptp->pointCx)
 	{
-		envelopeTable[i] = dEnvelope;
+		envelopeTable[i] = (signed char)dEnvelope;
 		dEnvelope = ((double)ptp->pointCy - ptp->pointBy) / (double)(ptp->pointCx - ptp->pointBx) + dEnvelope;
 		++i;
 	}
@@ -97,7 +97,7 @@ BOOL MakePixelWaveData(const PIXTONEPARAMETER *ptp, unsigned char *pData)
 	dEnvelope = ptp->pointCy;
 	while (i < 256)
 	{
-		envelopeTable[i] = dEnvelope;
+		envelopeTable[i] = (signed char)dEnvelope;
 		dEnvelope = (double)dEnvelope - ptp->pointCy / (double)(256 - ptp->pointCx);
 		++i;
 	}
@@ -130,7 +130,7 @@ BOOL MakePixelWaveData(const PIXTONEPARAMETER *ptp, unsigned char *pData)
 		const int a = (int)dMain % 256;
 		const int b = (int)dPitch % 256;
 		const int c = (int)dVolume % 256;
-		const int d = (double)(i * 0x100) / ptp->size;
+		const int d = (int)((double)(i * 0x100) / ptp->size);
 		pData[i] = gWaveModelTable[ptp->oMain.model][a]
 			* ptp->oMain.top
 			/ 64

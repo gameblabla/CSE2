@@ -806,7 +806,7 @@ void ActNpc267(NPCHAR *npc)
 
 			if (npc->act_wait > 20 && npc->act_wait % 3 == 1)
 			{
-				const int ym = Random(-0x200u, 0x200);
+				const int ym = Random(-0x200, 0x200);
 				const int xm = 4 * Random(0x100, 0x200);
 
 				if (npc->direct == 0)

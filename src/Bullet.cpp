@@ -286,7 +286,7 @@ void ActBullet_Frontia2(BULLET *bul, int level)
 						if (bul->xm < 0)
 							bul->xm = 0x400;
 						else
-							bul->xm = -0x400u;
+							bul->xm = -0x400;
 					}
 
 					break;

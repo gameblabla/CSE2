@@ -594,26 +594,26 @@ void GetNpCharPosition(int *x, int *y, int i)
   *y = gNPC[i].y;
 }
 
-bool IsNpCharCode(int code)
+BOOL IsNpCharCode(int code)
 {
 	for (int i = 0; i < NPC_MAX; i++)
 	{
 		if ((gNPC[i].cond & 0x80) && gNPC[i].code_char == code)
-			return true;
+			return TRUE;
 	}
 	
-	return false;
+	return FALSE;
 }
 
-bool GetNpCharAlive(int code_event)
+BOOL GetNpCharAlive(int code_event)
 {
 	for (int i = 0; i < NPC_MAX; i++)
 	{
 		if ((gNPC[i].cond & 0x80) && gNPC[i].code_event == code_event)
-			return true;
+			return TRUE;
 	}
 	
-	return false;
+	return FALSE;
 }
 
 int CountAliveNpChar()

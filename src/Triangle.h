@@ -5,4 +5,4 @@
 void InitTriangleTable();
 int GetSin(uint8_t deg);
 int GetCos(uint8_t deg);
-int GetArktan(int x, int y);
+uint8_t GetArktan(int x, int y);

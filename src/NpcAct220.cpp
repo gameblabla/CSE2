@@ -942,7 +942,7 @@ void ActNpc235(NPCHAR *npc)
 				npc->direct = 0;
 
 			if (npc->direct == 0)
-				npc->xm = -0x400u;
+				npc->xm = -0x400;
 			else
 				npc->xm = 0x400;
 

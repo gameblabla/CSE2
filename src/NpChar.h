@@ -101,6 +101,6 @@ void BackStepMyChar(int code_event);
 void DeleteNpCharEvent(int code);
 void DeleteNpCharCode(int code, bool bSmoke);
 void GetNpCharPosition(int *x, int *y, int i);
-bool IsNpCharCode(int code);
-bool GetNpCharAlive(int code_event);
+BOOL IsNpCharCode(int code);
+BOOL GetNpCharAlive(int code_event);
 int CountAliveNpChar();

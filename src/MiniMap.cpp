@@ -16,7 +16,7 @@
 #include "MyChar.h"
 #include "Stage.h"
 
-int8_t gMapping[0x80];
+BOOLEAN gMapping[0x80];
 
 void WriteMiniMapLine(int line)
 {
@@ -196,17 +196,17 @@ int MiniMapLoop()
 	return 1;
 }
 
-bool IsMapping()
+BOOL IsMapping()
 {
-	return gMapping[gStageNo] != 0;
+	return gMapping[gStageNo];
 }
 
 void StartMapping()
 {
-	memset(gMapping, 0, 0x80u);
+	memset(gMapping, FALSE, 0x80);
 }
 
 void SetMapping(int a)
 {
-	gMapping[a] = 1;
+	gMapping[a] = TRUE;
 }

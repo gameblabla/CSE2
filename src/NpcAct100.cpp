@@ -730,7 +730,7 @@ void ActNpc110(NPCHAR *npc)
 		PlaySoundObject(6, 1);
 
 		if (npc->direct == 0)
-			npc->xm = -0x100u;
+			npc->xm = -0x100;
 		else
 			npc->xm = 0x100;
 	}
@@ -1187,7 +1187,7 @@ void ActNpc115(NPCHAR *npc)
 					npc->direct = 2;
 
 				if (npc->direct == 0)
-					npc->xm = -0x200u;
+					npc->xm = -0x200;
 				else
 					npc->xm = 0x200;
 
@@ -1196,7 +1196,7 @@ void ActNpc115(NPCHAR *npc)
 					npc->count1 = 0;
 					npc->ani_no = 4;
 					npc->act_no = 21;
-					npc->ym = -0x400u;
+					npc->ym = -0x400;
 					npc->xm *= 2;
 					npc->damage = 5;
 					PlaySoundObject(102, 1);
@@ -1204,7 +1204,7 @@ void ActNpc115(NPCHAR *npc)
 				else
 				{
 					npc->act_no = 21;
-					npc->ym = -0x400u;
+					npc->ym = -0x400;
 					PlaySoundObject(30, 1);
 				}
 			}

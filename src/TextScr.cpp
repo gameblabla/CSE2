@@ -46,9 +46,17 @@ char text[0x100];
 
 RECT gRect_line = {0, 0, 216, 16};
 
+#ifdef FIX_BUGS
+static unsigned long nod_color;
+#endif
+
 //Initialize and end tsc
 BOOL InitTextScript2()
 {
+#ifdef FIX_BUGS
+	nod_color = GetCortBoxColor(RGB(0xFF, 0xFF, 0xFE));
+#endif
+
 	//Clear flags
 	gTS.mode = 0;
 	g_GameFlags &= ~0x04;
@@ -359,7 +367,7 @@ void SetNumberTextScript(int index)
 	str[offset + 1] = 0;
 
 	//Append number to line
-	PutText2(6 * gTS.p_write, 0, str, 0xFFFFFE, (Surface_Ids)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
+	PutText2(6 * gTS.p_write, 0, str, RGB(0xFF, 0xFF, 0xFE), (Surface_Ids)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
 	strcat(&text[gTS.line % 4 * 0x40], str);
 
 	//Play sound and reset blinking cursor
@@ -456,7 +464,17 @@ void PutTextScript()
 		rect.top = gTS.ypos_line[gTS.line % 4] + gTS.rcText.top + gTS.offsetY;
 		rect.right = rect.left + 5;
 		rect.bottom = rect.top + 11;
-		CortBox(&rect, 0xFFFFFE);
+#ifdef FIX_BUGS
+		CortBox(&rect, nod_color);
+
+		// This is how the Linux port fixed this, but it isn't done
+		// the way Pixel would do it (he only calls GetCortBoxColor
+		// once, during init functions, so our fix does it that way
+		// instead).
+		//CortBox(&rect, GetCortBoxColor(RGB(0xFF, 0xFF, 0xFE));
+#else
+		CortBox(&rect, RGB(0xFF, 0xFF, 0xFE));
+#endif
 	}
 
 	//Draw GIT
@@ -654,7 +672,10 @@ int TextScriptProc()
 						x = GetTextScriptNo(gTS.p_read + 14);
 						y = GetTextScriptNo(gTS.p_read + 19);
 						if (!TransferStage(z, w, x, y))
+						{
+						//	MessageBoxA(hWnd, "âXâeü[âWé¦ôÃé¦ì×é¦é+Ä©ös", "âGâëü[", 0);
 							return 0;
+						}
 					}
 					else if (IS_COMMAND('M','O','V'))
 					{
@@ -1235,7 +1256,7 @@ int TextScriptProc()
 						gTS.p_write = x;
 
 						//Print text
-						PutText2(0, 0, str, 0xFFFFFE, (Surface_Ids)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
+						PutText2(0, 0, str, RGB(0xFF, 0xFF, 0xFE), (Surface_Ids)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
 						sprintf(&text[gTS.line % 4 * 0x40], str);
 
 						//Check if should move to next line (prevent a memory overflow, come on guys, this isn't a leftover of pixel trying to make text wrapping)
@@ -1269,7 +1290,7 @@ int TextScriptProc()
 						}
 						else
 						{
-							PutText2(6 * gTS.p_write, 0, c, 0xFFFFFE, (Surface_Ids)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
+							PutText2(6 * gTS.p_write, 0, c, RGB(0xFF, 0xFF, 0xFE), (Surface_Ids)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
 						}
 
 						strcat(&text[gTS.line % 4 * 0x40], c);

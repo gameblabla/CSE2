@@ -145,7 +145,7 @@ void ActNpc140(NPCHAR *npc)
 				npc->ym = -0x5FF;
 
 				if (npc->direct == 0)
-					npc->xm = -0x200u;
+					npc->xm = -0x200;
 				else
 					npc->xm = 0x200;
 			}
@@ -247,7 +247,7 @@ void ActNpc140(NPCHAR *npc)
 			npc->damage = 0;
 
 			for (int i = 0; i < 8; ++i)
-				SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600u, 0), 0, 0, 0x100);
+				SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
 
 			break;
 
