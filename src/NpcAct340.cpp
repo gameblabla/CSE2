@@ -285,7 +285,7 @@ void ActNpc340(NPCHAR *npc)
 
 				for (int i = 0; i < 8; ++i)
 				{
-					const int x = npc->x + (Random(-0x10u, 0x10) * 0x200);
+					const int x = npc->x + (Random(-0x10, 0x10) * 0x200);
 					SetNpChar(4, x, npc->y + 0x1400, 0, 0, 0, 0, 0x100);
 				}
 
@@ -1122,7 +1122,7 @@ void ActNpc347(NPCHAR *npc)
 
 		case 12:
 			if (gMC.y < npc->y)
-				npc->ym = -0xAAu;
+				npc->ym = -0xAA;
 			else
 				npc->ym = 0xAA;
 

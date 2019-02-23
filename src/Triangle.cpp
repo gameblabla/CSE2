@@ -19,7 +19,7 @@ void InitTriangleTable()
 	//Tangent
 	for (i = 0; i < 0x21; ++i)
 	{
-		float a = i * 6.2831855 / 256.0;
+		float a = (float)(i * 6.2831855 / 256.0);
 		float b = sinf(a) / cosf(a);
 		gTan[i] = (int16_t)(b * 8192.0);
 	}

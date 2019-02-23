@@ -1207,7 +1207,7 @@ void ActNpc068(NPCHAR *npc)
 				gMC.x += 0x800;
 				gMC.y -= 0x1000;
 				gMC.xm = 0x5FF;
-				gMC.ym = -0x200u;
+				gMC.ym = -0x200;
 				gMC.direct = 2;
 				npc->direct = 2;
 			}
@@ -1215,8 +1215,8 @@ void ActNpc068(NPCHAR *npc)
 			{
 				gMC.x -= 0x800;
 				gMC.y -= 0x1000;
-				gMC.xm = -0x5FFu;
-				gMC.ym = -0x200u;
+				gMC.xm = -0x5FF;
+				gMC.ym = -0x200;
 				gMC.direct = 0;
 				npc->direct = 0;
 			}
@@ -1371,7 +1371,7 @@ void ActNpc069(NPCHAR *npc)
 			}
 
 			if (npc->direct == 0)
-				npc->xm = -0x100u;
+				npc->xm = -0x100;
 			else
 				npc->xm = 0x100;
 

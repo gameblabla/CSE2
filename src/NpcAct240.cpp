@@ -85,7 +85,7 @@ void ActNpc240(NPCHAR *npc)
 				npc->direct = 0;
 
 			if (npc->direct == 0)
-				npc->xm = -0x200u;
+				npc->xm = -0x200;
 			else
 				npc->xm = 0x200;
 

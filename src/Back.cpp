@@ -140,7 +140,7 @@ void PutBack(int fx, int fy)
 			for (int y = 0; y < WINDOW_HEIGHT - 240 + 88; y += 88)
 			{
 				fillNext = ((fillNext) * 214013 + 2531011);
-				for (int x = -(fillNext % 149); x < WINDOW_WIDTH; x += 149)
+				for (int x = -(int)(fillNext % 149); x < WINDOW_WIDTH; x += 149)
 				{
 					PutBitmap4(&grcGame, x, y, &rcSkyFiller, SURFACE_ID_LEVEL_BACKGROUND);
 				}

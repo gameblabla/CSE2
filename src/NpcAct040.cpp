@@ -1522,7 +1522,7 @@ void ActNpc056(NPCHAR *npc)
 			npc->xm -= 0x10;
 
 			if (npc->xm < -0x400)
-				npc->xm = -0x400u;
+				npc->xm = -0x400;
 
 			if (npc->shock)
 				npc->x += npc->xm / 2;
@@ -1805,7 +1805,7 @@ void ActNpc058(NPCHAR *npc)
 				if (npc->direct == 0)
 				{
 					npc->x = gMC.x + 0x20000;
-					npc->xm = -0x2FFu;
+					npc->xm = -0x2FF;
 				}
 				else
 				{
