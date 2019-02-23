@@ -5,7 +5,11 @@
 #include "WindowsWrapper.h"
 
 #ifndef RGB
-#define RGB(r,g,b) ((r) | ((g) << 8) | ((b) << 16))
+#define RGB(r,g,b) ((r) | ((g) << 8) | ((b) << 16) | (0xFF << 24))
+#endif
+
+#ifndef RGBA
+#define RGBA(r,g,b,a) ((r) | ((g) << 8) | ((b) << 16) | ((a) << 24))
 #endif
 
 extern RECT grcGame;
