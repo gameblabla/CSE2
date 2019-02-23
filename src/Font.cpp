@@ -174,7 +174,7 @@ void DrawText(FontObject *font_object, SDL_Surface *surface, int x, int y, unsig
 {
 	if (font_object != NULL)
 	{
-		const unsigned char colours[3] = {(unsigned char)(colour >> 16), (unsigned char)(colour >> 8), (unsigned char)colour};
+		const unsigned char colours[3] = {(unsigned char)colour, (unsigned char)(colour >> 8), (unsigned char)(colour >> 16)};
 
 		FT_Face face = font_object->face;
 
