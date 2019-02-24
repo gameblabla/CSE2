@@ -28,11 +28,15 @@ bool UpdateInput()
 	WPAD_ScanPads();
 	uint32_t wpadHeld = WPAD_ButtonsHeld(0);
 	
+	//Clear all keys
+	gKey = 0;
+	
+	//Escape key
 	if (wpadHeld & WPAD_BUTTON_HOME)
 		gKey |= KEY_ESCAPE;
 	
 	//Direction
-	if (!wpadHeld & WPAD_BUTTON_B)
+	if (!(wpadHeld & WPAD_BUTTON_B))
 	{
 		gKey |= (wpadHeld & WPAD_BUTTON_UP)	? gKeyLeft : 0;
 		gKey |= (wpadHeld & WPAD_BUTTON_DOWN)	? gKeyRight : 0;

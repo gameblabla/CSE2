@@ -162,8 +162,6 @@ int main(int argc, char *argv[])
 	//Draw to screen
 	if (Flip_SystemTask())
 	{
-		while (Flip_SystemTask() && !(gKey & KEY_ESCAPE));
-		
 		//Initialize sound
 		InitDirectSound();
 		

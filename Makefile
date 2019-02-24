@@ -78,7 +78,7 @@ SOURCES = \
 OBJECTS = $(addprefix obj/$(FILENAME)/, $(addsuffix .o, $(SOURCES)))
 DEPENDENCIES = $(addprefix obj/$(FILENAME)/, $(addsuffix .o.d, $(SOURCES)))
 
-CXXFLAGS :=	$(MACHDEP) -I$(LIBOGC_INC)
+CXXFLAGS :=	$(MACHDEP) -I$(LIBOGC_INC) -O3
 LDFLAGS :=	-L$(LIBOGC_LIB) $(MACHDEP)
 LIBS :=		-lwiiuse -lbte -lfat -logc -lm
 

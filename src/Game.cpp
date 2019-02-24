@@ -629,26 +629,26 @@ bool Game()
 		if (LoadNpcTable(path))
 		{
 			InitTextScript2();
-			//InitSkipFlags();
-			//InitMapData2();
-			//InitCreditScript();
+			InitSkipFlags();
+			InitMapData2();
+			InitCreditScript();
 			
 			
-			//int mode = 1;
-			//while (mode)
-			//{
-			//	if (mode == 1)
-			//		mode = ModeOpening();
-			//	if (mode == 2)
-			//		mode = ModeTitle();
-			//	if (mode == 3)
-			//		mode = ModeAction();
-			//}
+			int mode = 1;
+			while (mode)
+			{
+				if (mode == 1)
+					mode = ModeOpening();
+				if (mode == 2)
+					mode = ModeTitle();
+				if (mode == 3)
+					mode = ModeAction();
+			}
 			
-			//EndMapData();
+			EndMapData();
 			EndTextScript();
-			//ReleaseNpcTable();
-			//ReleaseCreditScript();
+			ReleaseNpcTable();
+			ReleaseCreditScript();
 		}
 		else
 		{

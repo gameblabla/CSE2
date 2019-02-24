@@ -54,6 +54,9 @@ BOOL Flip_SystemTask()
 	//Update inputs
 	UpdateInput();
 	
+	if (gKey & KEY_ESCAPE)
+		return FALSE;
+	
 	//Write to framebuffer
 	uint32_t *pointer = xfb[currentFramebuffer];
 	
@@ -254,6 +257,31 @@ void BackupSurface(Surface_Ids surf_no, RECT *rect)
 
 static void DrawBitmap(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_no, bool transparent)
 {
+	const unsigned char col_red = 255;
+	const unsigned char col_green = surf_no * 0x20;
+	const unsigned char col_blue = surf_no * 0x50;
+	
+	for (int fx = rect->left; fx < rect->right; fx++)
+	{
+		for (int fy = rect->top; fy < rect->bottom; fy++)
+		{
+			int dx = x + (fx - rect->left);
+			int dy = y + (fy - rect->top);
+			
+			if (dx < rcView->left || y < rcView->top)
+				continue;
+			if (dx < 0 || dy < 0)
+				continue;
+			
+			if (dx >= rcView->right || y >= rcView->bottom)
+				break;
+			if (dx >= WINDOW_WIDTH || dy >= WINDOW_HEIGHT)
+				break;
+			
+			SET_BUFFER_PIXEL(screenBuffer, WINDOW_WIDTH, dx, dy, col_red, col_green, col_blue);
+		}
+	}
+	
 	/*
 	if (surf[surf_no].needs_updating)
 	{
@@ -311,26 +339,20 @@ unsigned long GetCortBoxColor(unsigned long col)
 	return col;
 }
 
-void FixRect(RECT *fixRect, RECT *boundRect)
-{
-	fixRect->left = (fixRect->left < boundRect->left) ? boundRect->left : fixRect->left;
-	fixRect->top = (fixRect->top < boundRect->top) ? boundRect->top : fixRect->top;
-	fixRect->right = (fixRect->right > boundRect->right) ? boundRect->right : fixRect->right;
-	fixRect->bottom = (fixRect->bottom > boundRect->bottom) ? boundRect->bottom : fixRect->bottom;
-}
-
 void CortBox(RECT *rect, uint32_t col)
 {
 	const unsigned char col_red = col & 0x0000FF;
 	const unsigned char col_green = (col & 0x00FF00) >> 8;
 	const unsigned char col_blue = (col & 0xFF0000) >> 16;
 	
-	FixRect(rect, &grcFull); //Prevent segfault
-	
 	for (int x = rect->left; x < rect->right; x++)
 	{
 		for (int y = rect->top; y < rect->bottom; y++)
 		{
+			if (x < 0 || y < 0)
+				continue;
+			if (x >= WINDOW_WIDTH || y >= WINDOW_HEIGHT)
+				break;
 			SET_BUFFER_PIXEL(screenBuffer, WINDOW_WIDTH, x, y, col_red, col_green, col_blue);
 		}
 	}
@@ -344,13 +366,14 @@ void CortBox2(RECT *rect, uint32_t col, Surface_Ids surf_no)
 		const unsigned char col_green = (col & 0x00FF00) >> 8;
 		const unsigned char col_blue = (col & 0xFF0000) >> 16;
 		
-		RECT tempRect = {0, 0, surf[surf_no].w, surf[surf_no].h};
-		FixRect(rect, &tempRect); //Prevent segfault
-		
 		for (int x = rect->left; x < rect->right; x++)
 		{
 			for (int y = rect->top; y < rect->bottom; y++)
 			{
+				if (x < 0 || y < 0)
+					continue;
+				if (x >= surf[surf_no].w || y >= surf[surf_no].h)
+					break;
 				SET_BUFFER_PIXEL(surf[surf_no].data, surf[surf_no].w, x, y, col_red, col_green, col_blue);
 			}
 		}
