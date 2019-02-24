@@ -15,7 +15,7 @@
 //Null
 void ActNpc000(NPCHAR *npc)
 {
-	RECT rect[1] = {0x00, 0x00, 0x10, 0x10};
+	RECT rect = {0x00, 0x00, 0x10, 0x10};
 
 	if (npc->act_no == 0)
 	{
@@ -25,7 +25,7 @@ void ActNpc000(NPCHAR *npc)
 			npc->y += 0x2000;
 	}
 
-	npc->rect = rect[0];
+	npc->rect = rect;
 }
 
 //Experience

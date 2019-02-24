@@ -20,7 +20,7 @@ BOOL LoadAttributeData(const char *path_atrb);
 void EndMapData();
 void ReleasePartsImage();
 void GetMapData(uint8_t **data, int16_t *mw, int16_t *ml);
-int GetAttribute(int x, int y);
+unsigned char GetAttribute(int x, int y);
 void DeleteMapParts(int x, int y);
 void ShiftMapParts(int x, int y);
 BOOL ChangeMapParts(int x, int y, uint8_t no);

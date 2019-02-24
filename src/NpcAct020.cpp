@@ -14,7 +14,7 @@
 //Computer
 void ActNpc020(NPCHAR *npc)
 {
-	RECT rcLeft[1] = {288, 16, 320, 40};
+	RECT rcLeft = {288, 16, 320, 40};
 
 	RECT rcRight[3] = {
 		{288, 40, 320, 64},
@@ -32,7 +32,7 @@ void ActNpc020(NPCHAR *npc)
 		npc->ani_no = 0;
 
 	if (npc->direct == 0)
-		npc->rect = rcLeft[0];
+		npc->rect = rcLeft;
 	else
 		npc->rect = rcRight[npc->ani_no];
 }
@@ -48,9 +48,9 @@ void ActNpc021(NPCHAR *npc)
 			npc->y += 0x2000;
 	}
 
-	RECT rect[1] = {224, 40, 240, 48};
+	RECT rect = {224, 40, 240, 48};
 
-	npc->rect = rect[0];
+	npc->rect = rect;
 }
 
 //Teleporter
@@ -1008,13 +1008,13 @@ void ActNpc033(NPCHAR *npc)
 //Bed
 void ActNpc034(NPCHAR *npc)
 {
-	RECT rcLeft[1] = {192, 48, 224, 64};
-	RECT rcRight[1] = {192, 184, 224, 200};
+	RECT rcLeft = {192, 48, 224, 64};
+	RECT rcRight = {192, 184, 224, 200};
 
 	if (npc->direct == 0)
-		npc->rect = rcLeft[0];
+		npc->rect = rcLeft;
 	else
-		npc->rect = rcRight[0];
+		npc->rect = rcRight;
 }
 
 //Mannan
