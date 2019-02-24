@@ -137,8 +137,8 @@ void ActNpc001(NPCHAR *npc)
 	}
 
 	//Move
-	npc->x += npc->xm;
 	npc->y += npc->ym;
+	npc->x += npc->xm;
 
 	//Get framerects
 	RECT rect[6] = {
@@ -361,12 +361,14 @@ void ActNpc004(NPCHAR *npc)
 		{80, 128, 96, 144},
 	};
 
+	unsigned char deg;
+
 	if (npc->act_no == 0)
 	{
 		//Move in random direction at random speed
 		if (npc->direct == 0 || npc->direct == 1)
 		{
-			const unsigned char deg = Random(0, 0xFF);
+			deg = Random(0, 0xFF);
 			npc->xm = GetCos(deg) * Random(0x200, 0x5FF) / 0x200;
 			npc->ym = GetSin(deg) * Random(0x200, 0x5FF) / 0x200;
 		}
@@ -697,10 +699,10 @@ void ActNpc007(NPCHAR *npc)
 			break;
 	}
 
-	if (npc->xm >= 0)
-		npc->direct = 2;
-	else
+	if (npc->xm < 0)
 		npc->direct = 0;
+	else
+		npc->direct = 2;
 
 	if (npc->xm > 0x5FF)
 		npc->xm = 0x5FF;
@@ -740,7 +742,26 @@ void ActNpc008(NPCHAR *npc)
 	switch (npc->act_no)
 	{
 		case 0:
-			if (gMC.x >= npc->x + 0x2000 || gMC.x <= npc->x - 0x2000)
+			if (gMC.x < npc->x + 0x2000 && gMC.x > npc->x - 0x2000)
+			{
+				npc->bits |= 0x20;
+				npc->ym = -0x100;
+				npc->tgt_y = npc->y;
+				npc->act_no = 1;
+				npc->damage = 2;
+
+				if (npc->direct == 0)
+				{
+					npc->x = gMC.x + 0x20000;
+					npc->xm = -0x2FF;
+				}
+				else
+				{
+					npc->x = gMC.x - 0x20000;
+					npc->xm = 0x2FF;
+				}
+			}
+			else
 			{
 				npc->bits &= ~0x20;
 				npc->rect.right = 0;
@@ -748,23 +769,6 @@ void ActNpc008(NPCHAR *npc)
 				npc->xm = 0;
 				npc->ym = 0;
 				return;
-			}
-
-			npc->bits |= 0x20;
-			npc->ym = -0x100;
-			npc->tgt_y = npc->y;
-			npc->act_no = 1;
-			npc->damage = 2;
-
-			if (npc->direct == 0)
-			{
-				npc->x = gMC.x + 0x20000;
-				npc->xm = -0x2FF;
-			}
-			else
-			{
-				npc->x = gMC.x - 0x20000;
-				npc->xm = 0x2FF;
 			}
 
 			break;
@@ -828,6 +832,8 @@ void ActNpc008(NPCHAR *npc)
 //Balrog (drop-in)
 void ActNpc009(NPCHAR *npc)
 {
+	int i;
+
 	switch (npc->act_no)
 	{
 		case 0:
@@ -837,19 +843,19 @@ void ActNpc009(NPCHAR *npc)
 		case 1:
 			npc->ym += 0x20;
 
-			if (npc->count1 >= 40)
+			if (npc->count1 < 40)
+			{
+				++npc->count1;
+			}
+			else
 			{
 				npc->bits &= ~8;
 				npc->bits |= 1;
 			}
-			else
-			{
-				++npc->count1;
-			}
 
 			if (npc->flag & 8)
 			{
-				for (int i = 0; i < 4; ++i)
+				for (i = 0; i < 4; ++i)
 					SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
 
 				npc->act_no = 2;
@@ -901,6 +907,10 @@ void ActNpc009(NPCHAR *npc)
 //Balrog (shooting) (super-secret version from prototype)
 void ActNpc010(NPCHAR *npc)
 {
+	unsigned char deg;
+	int ym;
+	int xm;
+
 	switch (npc->act_no)
 	{
 		case 0:
@@ -923,10 +933,10 @@ void ActNpc010(NPCHAR *npc)
 				--npc->count1;
 				npc->act_wait = 0;
 
-				unsigned char deg = GetArktan(npc->x - gMC.x, npc->y + 0x800 - gMC.y);
-				deg += Random(-0x10, 0x10);
-				int ym = GetSin(deg);
-				int xm = GetCos(deg);
+				deg = GetArktan(npc->x - gMC.x, npc->y + 0x800 - gMC.y);
+				deg += (unsigned char)Random(-0x10, 0x10);
+				ym = GetSin(deg);
+				xm = GetCos(deg);
 				SetNpChar(11, npc->x, npc->y + 0x800, xm, ym, 0, 0, 0x100);
 
 				PlaySoundObject(39, 1);
@@ -956,7 +966,7 @@ void ActNpc010(NPCHAR *npc)
 			if (npc->flag & 5)
 				npc->xm = 0;
 
-			if (gMC.y > npc->y + 0x2000)
+			if (npc->y + 0x2000 < gMC.y)
 				npc->damage = 5;
 			else
 				npc->damage = 0;
@@ -1006,7 +1016,7 @@ void ActNpc010(NPCHAR *npc)
 		{120, 24, 160, 48},
 	};
 
-	if (gMC.x > npc->x)
+	if (npc->x < gMC.x)
 		npc->direct = 2;
 	else
 		npc->direct = 0;
@@ -1055,12 +1065,16 @@ void ActNpc011(NPCHAR *npc)
 //Balrog (cutscene)
 void ActNpc012(NPCHAR *npc)
 {
+	int i;
+	int x;
+	int y;
+
 	switch (npc->act_no)
 	{
 		case 0:
 			if (npc->direct == 4)
 			{
-				if (gMC.x < npc->x)
+				if (npc->x > gMC.x)
 					npc->direct = 0;
 				else
 					npc->direct = 2;
@@ -1091,7 +1105,7 @@ void ActNpc012(NPCHAR *npc)
 		case 10:
 			if (npc->direct == 4)
 			{
-				if (gMC.x < npc->x)
+				if (npc->x > gMC.x)
 					npc->direct = 0;
 				else
 					npc->direct = 2;
@@ -1130,7 +1144,7 @@ void ActNpc012(NPCHAR *npc)
 		case 20:
 			if (npc->direct == 4)
 			{
-				if (gMC.x < npc->x)
+				if (npc->x > gMC.x)
 					npc->direct = 0;
 				else
 					npc->direct = 2;
@@ -1141,7 +1155,7 @@ void ActNpc012(NPCHAR *npc)
 			npc->act_wait = 0;
 			npc->count1 = 0;
 
-			for (int i = 0; i < 4; ++i)
+			for (i = 0; i < 4; ++i)
 				SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
 
 			PlaySoundObject(72, 1);
@@ -1184,7 +1198,7 @@ void ActNpc012(NPCHAR *npc)
 		case 40:
 			if (npc->direct == 4)
 			{
-				if (gMC.x < npc->x)
+				if (npc->x > gMC.x)
 					npc->direct = 0;
 				else
 					npc->direct = 2;
@@ -1205,7 +1219,7 @@ void ActNpc012(NPCHAR *npc)
 		case 42:
 			if (npc->direct == 4)
 			{
-				if (gMC.x < npc->x)
+				if (npc->x > gMC.x)
 					npc->direct = 0;
 				else
 					npc->direct = 2;
@@ -1303,8 +1317,8 @@ void ActNpc012(NPCHAR *npc)
 
 		case 102:
 		{
-			int x = npc->x / 0x200 / 0x10;
-			int y = npc->y / 0x200 / 0x10;
+			x = npc->x / 0x200 / 0x10;
+			y = npc->y / 0x200 / 0x10;
 
 			if (y >= 0 && y < 35 && ChangeMapParts(x, y, 0))
 			{
@@ -1412,17 +1426,20 @@ void ActNpc014(NPCHAR *npc)
 		{224, 0, 240, 16},
 	};
 
-	if (npc->act_no == 0)
+	switch (npc->act_no)
 	{
-		npc->act_no = 1;
+		case 0:
+			npc->act_no = 1;
 
-		if (npc->direct == 2)
-		{
-			npc->ym = -0x200;
+			if (npc->direct == 2)
+			{
+				npc->ym = -0x200;
 
-			for (int i = 0; i < 4; ++i)
-				SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
-		}
+				for (int i = 0; i < 4; ++i)
+					SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+			}
+
+		break;
 	}
 
 	if (++npc->ani_wait > 1)
@@ -1563,8 +1580,7 @@ void ActNpc017(NPCHAR *npc)
 		{304, 0, 320, 16},
 	};
 
-	int aa;
-
+	int a;
 	switch (npc->act_no)
 	{
 		case 0:
@@ -1572,27 +1588,22 @@ void ActNpc017(NPCHAR *npc)
 
 			if (npc->direct == 2)
 			{
-				npc->ym = -512;
+				npc->ym = -0x200;
 
-				for (int a = 0; a < 4; ++a)
+				for (a = 0; a < 4; ++a)
 					SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
 			}
 
 			// Fallthrough
 		case 1:
-			aa = Random(0, 30);
+			a = Random(0, 30);
 
-			if (aa >= 10)
-			{
-				if (aa >= 25)
-					npc->act_no = 4;
-				else
-					npc->act_no = 3;
-			}
-			else
-			{
+			if (a < 10)
 				npc->act_no = 2;
-			}
+			else if (a < 25)
+				npc->act_no = 3;
+			else
+				npc->act_no = 4;
 
 			npc->act_wait = Random(0x10, 0x40);
 			npc->ani_wait = 0;
@@ -1665,10 +1676,12 @@ void ActNpc018(NPCHAR *npc)
 // Balrog (burst)
 void ActNpc019(NPCHAR *npc)
 {
+	int i;
+
 	switch (npc->act_no)
 	{
 		case 0:
-			for (int i = 0; i < 0x10; ++i)
+			for (i = 0; i < 0x10; ++i)
 				SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
 
 			npc->y += 0x1400;

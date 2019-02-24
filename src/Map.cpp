@@ -17,13 +17,13 @@
 
 MAP_DATA gMap;
 
-bool InitMapData2()
+BOOL InitMapData2()
 {
 	gMap.data = (uint8_t*)malloc(PXM_BUFFER_SIZE);
-	return true;
+	return TRUE;
 }
 
-bool LoadMapData2(char *path_map)
+BOOL LoadMapData2(const char *path_map)
 {
 	//Get path
 	char path[PATH_LENGTH];
@@ -32,7 +32,7 @@ bool LoadMapData2(char *path_map)
 	//Open file
 	FILE *fp = fopen(path, "rb");
 	if (fp == NULL)
-		return false;
+		return FALSE;
 	
 	//Make sure file begins with "PXM"
 	char check[3];
@@ -52,24 +52,24 @@ bool LoadMapData2(char *path_map)
 			//Read tiledata
 			fread(gMap.data, 1, gMap.length * gMap.width, fp);
 			fclose(fp);
-			return true;
+			return TRUE;
 		}
 		else
 		{
 			fclose(fp);
-			return false;
+			return FALSE;
 		}
 	}
 	else
 	{
 		fclose(fp);
-		return false;
+		return FALSE;
 	}
 	
-	return false;
+	return FALSE;
 }
 
-bool LoadAttributeData(char *path_atrb)
+BOOL LoadAttributeData(const char *path_atrb)
 {
 	//Open file
 	char path[260];
@@ -77,12 +77,12 @@ bool LoadAttributeData(char *path_atrb)
 	
 	FILE *fp = fopen(path, "rb");
 	if (fp == NULL)
-		return false;
+		return FALSE;
 	
 	//Read data
 	fread(gMap.atrb, 1, 0x100, fp);
 	fclose(fp);
-	return true;
+	return TRUE;
 }
 
 void EndMapData()
@@ -110,7 +110,7 @@ int GetAttribute(int x, int y)
 {
 	if (x >= 0 && y >= 0 && gMap.width > x && gMap.length > y)
 		return gMap.atrb[gMap.data[y * gMap.width + x]];
-	return false;
+	return 0;
 }
 
 void DeleteMapParts(int x, int y)
@@ -123,14 +123,14 @@ void ShiftMapParts(int x, int y)
 	--gMap.data[y * gMap.width + x];
 }
 
-bool ChangeMapParts(int x, int y, uint8_t no)
+BOOL ChangeMapParts(int x, int y, uint8_t no)
 {
 	if (gMap.data[y * gMap.width + x] == no)
-		return false;
+		return FALSE;
 	gMap.data[y * gMap.width + x] = no;
 	for (int i = 0; i < 3; i++)
 		SetNpChar(4, x << 13, y << 13, 0, 0, 0, 0, 0);
-	return true;
+	return TRUE;
 }
 
 void PutStage_Back(int fx, int fy)
