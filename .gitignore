@@ -6,6 +6,8 @@
 /build/data*
 *.dat
 *.rec
+*.dol
+*.elf
 build.7z
 build.zip
 
