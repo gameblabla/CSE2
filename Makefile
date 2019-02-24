@@ -73,7 +73,8 @@ SOURCES = \
 			Star \
 			TextScr \
 			Triangle \
-			ValueView
+			ValueView \
+			EasyBMP/EasyBMP \
 			
 OBJECTS = $(addprefix obj/$(FILENAME)/, $(addsuffix .o, $(SOURCES)))
 DEPENDENCIES = $(addprefix obj/$(FILENAME)/, $(addsuffix .o.d, $(SOURCES)))

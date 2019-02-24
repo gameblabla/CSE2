@@ -131,6 +131,9 @@ const STAGE_TABLE gTMT[95] = {
 
 bool TransferStage(int no, int w, int x, int y)
 {
+	FILE *errorLog = fopen("sd:/cse2/error.log", "wb");
+	char errorMsg[0x400];
+	
 	//Move character
 	SetMyCharPosition(x << 13, y << 13);
 	
@@ -144,31 +147,55 @@ bool TransferStage(int no, int w, int x, int y)
 	char path[PATH_LENGTH];
 	sprintf(path, "%s/Prt%s", path_dir, gTMT[no].parts);
 	if (!ReloadBitmap_File(path, SURFACE_ID_LEVEL_TILESET))
+	{
+		sprintf(errorMsg, "Couldn't open tileset %s\n", gTMT[no].parts);
+		fwrite(errorMsg, strlen(errorMsg), 1, errorLog);
 		bError = true;
+	}
 
 	sprintf(path, "%s/%s.pxa", path_dir, gTMT[no].parts);
 	if (!LoadAttributeData(path))
+	{
+		sprintf(errorMsg, "Couldn't open tileset attributes %s\n", gTMT[no].parts);
+		fwrite(errorMsg, strlen(errorMsg), 1, errorLog);
 		bError = true;
+	}
 	
 	//Load tilemap
 	sprintf(path, "%s/%s.pxm", path_dir, gTMT[no].map);
 	if (!LoadMapData2(path))
+	{
+		sprintf(errorMsg, "Couldn't open map data %s\n", gTMT[no].map);
+		fwrite(errorMsg, strlen(errorMsg), 1, errorLog);
 		bError = true;
+	}
 
 	//Load NPCs
 	sprintf(path, "%s/%s.pxe", path_dir, gTMT[no].map);
 	if (!LoadEvent(path))
+	{
+		sprintf(errorMsg, "Couldn't open events %s\n", gTMT[no].map);
+		fwrite(errorMsg, strlen(errorMsg), 1, errorLog);
 		bError = true;
+	}
 
 	//Load script
 	sprintf(path, "%s/%s.tsc", path_dir, gTMT[no].map);
 	if (!LoadTextScript_Stage(path))
+	{
+		sprintf(errorMsg, "Couldn't open text script %s\n", gTMT[no].map);
+		fwrite(errorMsg, strlen(errorMsg), 1, errorLog);
 		bError = true;
+	}
 	
 	//Load background
 	strcpy(path, gTMT[no].back);
 	if (!InitBack(path, gTMT[no].bkType))
+	{
+		sprintf(errorMsg, "Couldn't open background %s\n", gTMT[no].back);
+		fwrite(errorMsg, strlen(errorMsg), 1, errorLog);
 		bError = true;
+	}
 	
 	//Get path
 	strcpy(path_dir, "Npc");
@@ -176,11 +203,21 @@ bool TransferStage(int no, int w, int x, int y)
 	//Load NPC sprite sheets
 	sprintf(path, "%s/Npc%s", path_dir, gTMT[no].npc);
 	if (!ReloadBitmap_File(path, SURFACE_ID_LEVEL_SPRITESET_1))
+	{
+		sprintf(errorMsg, "Couldn't open npc sprite sheet %s\n", gTMT[no].npc);
+		fwrite(errorMsg, strlen(errorMsg), 1, errorLog);
 		bError = true;
+	}
 	
 	sprintf(path, "%s/Npc%s", path_dir, gTMT[no].boss);
 	if (!ReloadBitmap_File(path, SURFACE_ID_LEVEL_SPRITESET_2))
+	{
+		sprintf(errorMsg, "Couldn't open boss sprite sheet %s\n", gTMT[no].npc);
+		fwrite(errorMsg, strlen(errorMsg), 1, errorLog);
 		bError = true;
+	}
+	
+	fclose(errorLog);
 	
 	if (bError)
 	{

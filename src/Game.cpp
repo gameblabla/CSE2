@@ -112,7 +112,8 @@ int ModeOpening()
 	InitFlash();
 	InitBossLife();
 	ChangeMusic(0);
-	TransferStage(72, 100, 3, 3);
+	if (!TransferStage(72, 100, 3, 3))
+		return 0;
 	SetFrameTargetMyChar(16);
 	SetFadeMask();
 	
@@ -194,6 +195,7 @@ int ModeOpening()
 		if (!Flip_SystemTask())
 			return 0;
 		
+		CortBox(&grcFull, gCounter * 0x20);
 		++gCounter;
 	}
 	

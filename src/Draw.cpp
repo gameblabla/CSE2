@@ -6,6 +6,8 @@
 
 #include <gccore.h>
 
+#include "EasyBMP/EasyBMP_DataStructures.h"
+#include "EasyBMP/EasyBMP_BMP.h"
 #include "WindowsWrapper.h"
 
 #include "CommonDefines.h"
@@ -53,9 +55,6 @@ BOOL Flip_SystemTask()
 {
 	//Update inputs
 	UpdateInput();
-	
-	if (gKey & KEY_ESCAPE)
-		return FALSE;
 	
 	//Write to framebuffer
 	uint32_t *pointer = xfb[currentFramebuffer];
@@ -154,47 +153,52 @@ BOOL MakeSurface_Generic(int bxsize, int bysize, Surface_Ids surf_no)
 	return TRUE;
 }
 
-static BOOL LoadBitmap_File(const char *name, Surface_Ids surf_no, bool create_surface)
+BOOL LoadBitmap(BMP *bmp, Surface_Ids surf_no, bool create_surface)
 {
-	/*
-	char path[PATH_LENGTH];
-	SDL_RWops *fp;
+	if (create_surface)
+		MakeSurface_Generic(bmp->TellWidth(), bmp->TellHeight(), surf_no);
+	else
+		memset(surf[surf_no].data, 0, surf[surf_no].w * surf[surf_no].h * sizeof(BUFFER_PIXEL));
 	
-	//Attempt to load PBM
-	sprintf(path, "%s/%s.pbm", gDataPath, name);
-	fp = SDL_RWFromFile(path, "rb");
-	if (fp)
+	for (int x = 0; x < bmp->TellWidth(); x++)
 	{
-		if (!IsEnableBitmap(fp))
+		for (int y = 0; y < bmp->TellHeight(); y++)
 		{
-			printf("Tried to load bitmap to surface %d, but it's missing the '(C)Pixel' string\n", surf_no);
-			fp->close(fp);
-		}
-		else
-		{
-			printf("Loading surface (as .pbm) from %s for surface id %d\n", path, surf_no);
-			if (LoadBitmap(fp, surf_no, create_surface))
-				return TRUE;
+			if (x >= surf[surf_no].w || y >= surf[surf_no].h)
+				continue;
+			RGBApixel pixel = bmp->GetPixel(x, y);
+			SET_BUFFER_PIXEL(surf[surf_no].data, surf[surf_no].w, x, y, pixel.Red, pixel.Green, pixel.Blue);
 		}
 	}
 	
-	//Attempt to load BMP
-	sprintf(path, "%s/%s.bmp", gDataPath, name);
-	fp = SDL_RWFromFile(path, "rb");
-	if (fp)
-	{
-		printf("Loading surface (as .bmp) from %s for surface id %d\n", path, surf_no);
-		if (LoadBitmap(fp, surf_no, create_surface))
-			return TRUE;
-	}
-	
-	printf("Failed to open file %s\n", name);
-	return FALSE;
-	*/
 	return TRUE;
 }
 
-static BOOL LoadBitmap_Resource(const char *res, Surface_Ids surf_no, bool create_surface)
+BOOL LoadBitmap_File(const char *name, Surface_Ids surf_no, bool create_surface)
+{
+	BMP *bmp = new BMP;
+	
+	if (bmp)
+	{
+		char pbmPath[PATH_LENGTH];
+		char bmpPath[PATH_LENGTH];
+		sprintf(pbmPath, "%s/%s.pbm", gDataPath, name);
+		sprintf(bmpPath, "%s/%s.bmp", gDataPath, name);
+		
+		if (bmp->ReadFromFile(pbmPath) || bmp->ReadFromFile(bmpPath))
+		{
+			LoadBitmap(bmp, surf_no, create_surface);
+			delete bmp;
+			return TRUE;
+		}
+		
+		delete bmp;
+	}
+	
+	return FALSE;
+}
+
+BOOL LoadBitmap_Resource(const char *res, Surface_Ids surf_no, bool create_surface)
 {
 	/*
 	SDL_RWops *fp = FindResource(res);
@@ -234,81 +238,43 @@ BOOL ReloadBitmap_Resource(const char *res, Surface_Ids surf_no)
 
 void BackupSurface(Surface_Ids surf_no, RECT *rect)
 {
-	/*
-	//Get renderer size
-	int w, h;
-	SDL_GetRendererOutputSize(gRenderer, &w, &h);
-
-	//Get texture of what's currently rendered on screen
-	SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormat(0, w, h, 0, SDL_PIXELFORMAT_RGBA32);
-	SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_NONE);
-	SDL_RenderReadPixels(gRenderer, NULL, SDL_PIXELFORMAT_RGBA32, surface->pixels, surface->pitch);
-
-	//Get rects
-	SDL_Rect frameRect = RectToSDLRectScaled(rect);
-
-	SDL_BlitSurface(surface, &frameRect, surf[surf_no].surface, &frameRect);
-	surf[surf_no].needs_updating = true;
-
-	//Free surface
-	SDL_FreeSurface(surface);
-	*/
+	memset(surf[surf_no].data, 0, surf[surf_no].w * surf[surf_no].h * sizeof(BUFFER_PIXEL));
+	for (int x = 0; x < (surf[surf_no].w < WINDOW_WIDTH) ? surf[surf_no].w : WINDOW_WIDTH; x++)
+	{
+		for (int y = 0; y < (surf[surf_no].h < WINDOW_HEIGHT) ? surf[surf_no].h : WINDOW_HEIGHT; y++)
+		{
+			BUFFER_PIXEL *fromPixel = &screenBuffer[y * WINDOW_WIDTH + x];
+			SET_BUFFER_PIXEL(surf[surf_no].data, surf[surf_no].w, x, y, fromPixel->r, fromPixel->g, fromPixel->b);
+		}
+	}
 }
 
 static void DrawBitmap(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_no, bool transparent)
 {
-	const unsigned char col_red = 255;
-	const unsigned char col_green = surf_no * 0x20;
-	const unsigned char col_blue = surf_no * 0x50;
-	
-	for (int fx = rect->left; fx < rect->right; fx++)
+	if (surf[surf_no].data)
 	{
-		for (int fy = rect->top; fy < rect->bottom; fy++)
+		//Clip our rect
+		RECT renderRect;
+		renderRect.left = (x < rcView->left) ? (rect->left + (rcView->left - x)) : rect->left;
+		renderRect.top = (y < rcView->top) ? (rect->top + (rcView->top - y)) : rect->top;
+		renderRect.right = ((x + rect->right - rect->left) >= rcView->right) ? rect->right - ((x + rect->right - rect->left) - rcView->right) : rect->right;
+		renderRect.bottom = ((y + rect->bottom - rect->top) >= rcView->bottom) ? rect->bottom - ((y + rect->bottom - rect->top) - rcView->bottom) : rect->bottom;
+		
+		//Clip our draw position
+		for (int fx = renderRect.left; fx < renderRect.right; fx++)
 		{
-			int dx = x + (fx - rect->left);
-			int dy = y + (fy - rect->top);
-			
-			if (dx < rcView->left || y < rcView->top)
-				continue;
-			if (dx < 0 || dy < 0)
-				continue;
-			
-			if (dx >= rcView->right || y >= rcView->bottom)
-				break;
-			if (dx >= WINDOW_WIDTH || dy >= WINDOW_HEIGHT)
-				break;
-			
-			SET_BUFFER_PIXEL(screenBuffer, WINDOW_WIDTH, dx, dy, col_red, col_green, col_blue);
+			for (int fy = renderRect.top; fy < renderRect.bottom; fy++)
+			{
+				int dx = x + (fx - rect->left);
+				int dy = y + (fy - rect->top);
+				
+				BUFFER_PIXEL *pixel = &surf[surf_no].data[fy * surf[surf_no].w + fx];
+				if (transparent && pixel->r == 0 && pixel->g == 0 && pixel->b == 0)
+					continue;
+				SET_BUFFER_PIXEL(screenBuffer, WINDOW_WIDTH, dx, dy, pixel->r, pixel->g, pixel->b);
+			}
 		}
 	}
-	
-	/*
-	if (surf[surf_no].needs_updating)
-	{
-		FlushSurface(surf_no);
-		surf[surf_no].needs_updating = false;
-	}
-
-	//Get SDL_Rects
-	SDL_Rect clipRect = RectToSDLRectScaled(rcView);
-
-	SDL_Rect frameRect = RectToSDLRectScaled(rect);
-	
-	//Get dest rect
-	SDL_Rect destRect = {x * magnification, y * magnification, frameRect.w, frameRect.h};
-	
-	//Set cliprect
-	SDL_RenderSetClipRect(gRenderer, &clipRect);
-	
-	SDL_SetTextureBlendMode(surf[surf_no].texture, transparent ? SDL_BLENDMODE_BLEND : SDL_BLENDMODE_NONE);
-
-	//Draw to screen
-	if (SDL_RenderCopy(gRenderer, surf[surf_no].texture, &frameRect, &destRect) < 0)
-		printf("Failed to draw texture %d\nSDL Error: %s\n", surf_no, SDL_GetError());
-	
-	//Undo cliprect
-	SDL_RenderSetClipRect(gRenderer, NULL);
-	*/
 }
 
 void PutBitmap3(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_no) //Transparency
@@ -323,14 +289,27 @@ void PutBitmap4(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_no) //N
 
 void Surface2Surface(int x, int y, RECT *rect, int to, int from)
 {
-	/*
-	//Get rects
-	SDL_Rect rcSet = {x * magnification, y * magnification, (rect->right - rect->left) * magnification, (rect->bottom - rect->top) * magnification};
-	SDL_Rect frameRect = RectToSDLRectScaled(rect);
-
-	SDL_BlitSurface(surf[from].surface, &frameRect, surf[to].surface, &rcSet);
-	surf[to].needs_updating = true;
-	*/
+	if (surf[to].data)
+	{
+		for (int fx = rect->left; fx < rect->right; fx++)
+		{
+			for (int fy = rect->top; fy < rect->bottom; fy++)
+			{
+				int dx = x + (fx - rect->left);
+				int dy = y + (fy - rect->top);
+				
+				if (dx < 0 || dy < 0)
+					continue;
+				if (dx >= surf[to].w || dy >= surf[to].h)
+					continue;
+				
+				BUFFER_PIXEL *pixel = &surf[from].data[fy * surf[from].w + fx];
+				if (pixel->r == 0 && pixel->g == 0 && pixel->b == 0) //Surface2Surface is always color keyed
+					continue;
+				SET_BUFFER_PIXEL(surf[to].data, surf[to].w, dx, dy, pixel->r, pixel->g, pixel->b);
+			}
+		}
+	}
 }
 
 unsigned long GetCortBoxColor(unsigned long col)
@@ -345,14 +324,10 @@ void CortBox(RECT *rect, uint32_t col)
 	const unsigned char col_green = (col & 0x00FF00) >> 8;
 	const unsigned char col_blue = (col & 0xFF0000) >> 16;
 	
-	for (int x = rect->left; x < rect->right; x++)
+	for (int y = (rect->top < 0 ? 0 : rect->top); y < (rect->bottom >= WINDOW_HEIGHT ? WINDOW_HEIGHT - 1 : rect->bottom); y++)
 	{
-		for (int y = rect->top; y < rect->bottom; y++)
+		for (int x = (rect->left < 0 ? 0 : rect->left); x < (rect->right >= WINDOW_WIDTH ? WINDOW_WIDTH - 1 : rect->right); x++)
 		{
-			if (x < 0 || y < 0)
-				continue;
-			if (x >= WINDOW_WIDTH || y >= WINDOW_HEIGHT)
-				break;
 			SET_BUFFER_PIXEL(screenBuffer, WINDOW_WIDTH, x, y, col_red, col_green, col_blue);
 		}
 	}
@@ -366,14 +341,10 @@ void CortBox2(RECT *rect, uint32_t col, Surface_Ids surf_no)
 		const unsigned char col_green = (col & 0x00FF00) >> 8;
 		const unsigned char col_blue = (col & 0xFF0000) >> 16;
 		
-		for (int x = rect->left; x < rect->right; x++)
+		for (int y = (rect->top < 0 ? 0 : rect->top); y < (rect->bottom >= surf[surf_no].h ? surf[surf_no].h - 1 : rect->bottom); y++)
 		{
-			for (int y = rect->top; y < rect->bottom; y++)
+			for (int x = (rect->left < 0 ? 0 : rect->left); x < (rect->right >= surf[surf_no].w ? surf[surf_no].w - 1 : rect->right); x++)
 			{
-				if (x < 0 || y < 0)
-					continue;
-				if (x >= surf[surf_no].w || y >= surf[surf_no].h)
-					break;
 				SET_BUFFER_PIXEL(surf[surf_no].data, surf[surf_no].w, x, y, col_red, col_green, col_blue);
 			}
 		}

@@ -34,7 +34,6 @@ BOOL InitBack(const char *fName, int type)
 			return FALSE;
 	}
 
-#ifdef FIX_BUGS	// TODO: Maybe we need a 'BETTER_PORTABILITY' flag
 	if (fgetc(fp) != 'B' || fgetc(fp) != 'M')
 	{
 		fclose(fp);
@@ -46,27 +45,6 @@ BOOL InitBack(const char *fName, int type)
 	gBack.partsW = File_ReadLE32(fp);
 	gBack.partsH = File_ReadLE32(fp);
 	fclose(fp);
-#else
-	// This is ridiculously platform-dependant:
-	// It should break on big-endian CPUs, and platforms
-	// where short isn't 16-bit and long isn't 32-bit.
-//	short bmp_header_buffer[7];
-//	long bmp_header_buffer2[10];
-	int16_t bmp_header_buffer[7];
-	int32_t bmp_header_buffer2[10];	// We'll need a better solution when we stop using stdint.h
-
-	fread(bmp_header_buffer, 14, 1, fp);
-
-	// Check if this is a valid bitmap file
-	if (bmp_header_buffer[0] != 0x4D42)	// 'MB' (we use hex to prevent a compiler warning)
-		return FALSE;	// The original game forgets to close fp
-
-	fread(bmp_header_buffer2, 40, 1, fp);
-	fclose(fp);
-
-	gBack.partsW = bmp_header_buffer2[1];
-	gBack.partsH = bmp_header_buffer2[2];
-#endif
 
 	//Set background stuff and load texture
 	gBack.flag = 1;
