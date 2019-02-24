@@ -45,35 +45,35 @@ void ActFlash_Explosion(int flx, int fly)
 			flash.cnt += 0x200;
 			flash.width += flash.cnt;
 
-			right = (flash.x - flx - flash.width) / 0x200;
-			left = (flash.y - fly - flash.width) / 0x200;
-			top = (flash.x - flx + flash.width) / 0x200;
+			left = (flash.x - flx - flash.width) / 0x200;
+			top = (flash.y - fly - flash.width) / 0x200;
+			right = (flash.x - flx + flash.width) / 0x200;
 			bottom = (flash.y - fly + flash.width) / 0x200;
 
-			if (right < 0)
-				right = 0;
 			if (left < 0)
 				left = 0;
-			if (top > WINDOW_WIDTH)
-				top = WINDOW_WIDTH;
+			if (top < 0)
+				top = 0;
+			if (right > WINDOW_WIDTH)
+				right = WINDOW_WIDTH;
 			if (bottom > WINDOW_HEIGHT)
 				bottom = WINDOW_HEIGHT;
 
-			flash.rect1.left = right;
-			flash.rect1.right = top;
+			flash.rect1.left = left;
+			flash.rect1.right = right;
 			flash.rect1.top = 0;
 			flash.rect1.bottom = WINDOW_HEIGHT;
 
 			flash.rect2.left = 0;
 			flash.rect2.right = WINDOW_WIDTH;
-			flash.rect2.top = left;
+			flash.rect2.top = top;
 			flash.rect2.bottom = bottom;
 
-			if (flash.width > (WINDOW_WIDTH << 11))
+			if (flash.width > (WINDOW_WIDTH * 0x200 * 4))
 			{
 				flash.act_no = 1;
 				flash.cnt = 0;
-				flash.width = (WINDOW_HEIGHT << 9);
+				flash.width = (WINDOW_HEIGHT * 0x200);
 			}
 
 			break;
