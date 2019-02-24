@@ -46,16 +46,12 @@ char text[0x100];
 
 RECT gRect_line = {0, 0, 216, 16};
 
-#ifdef FIX_BUGS
-static unsigned long nod_color;
-#endif
+static uint32_t nod_color;
 
 //Initialize and end tsc
 BOOL InitTextScript2()
 {
-#ifdef FIX_BUGS
 	nod_color = GetCortBoxColor(RGB(0xFF, 0xFF, 0xFE));
-#endif
 
 	//Clear flags
 	gTS.mode = 0;
@@ -69,7 +65,7 @@ BOOL InitTextScript2()
 	memset(text, 0, sizeof(text));
 
 	//Allocate script buffer
-	gTS.data = (char*)malloc(TSC_BUFFER_SIZE);
+	gTS.data = (int8_t*)malloc(TSC_BUFFER_SIZE);
 
 	if (gTS.data == NULL)
 		return FALSE;

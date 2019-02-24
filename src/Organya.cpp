@@ -3,11 +3,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
-
-#include <SDL_rwops.h>
-#include <SDL_thread.h>
-#include <SDL_timer.h>
-#include <SDL_events.h>
+#include <stdio.h>
 
 #include "WindowsWrapper.h"
 
@@ -264,16 +260,14 @@ int8_t wave_data[100][0x100];
 
 bool InitWaveData100()
 {
-	SDL_RWops *fp = FindResource("WAVE100");
+	const unsigned char* fp = FindResource("WAVE100", NULL);
 	if (fp == NULL)
 	{
 		printf("Failed to open WAVE100\n");
 		return false;
 	}
 
-	fp->read(fp, wave_data, 1, 100 * 0x100);
-
-	SDL_RWclose(fp);
+	memcpy(wave_data, fp, 100 * 0x100);
 	return true;
 }
 
@@ -413,6 +407,7 @@ void SetPlayPointer(int32_t x)
 //Load organya file
 void LoadOrganya(const char *name)
 {
+	/*
 	//Unload previous things
 	OrganyaReleaseNote();
 	memset(&info, 0, sizeof(info));
@@ -536,6 +531,7 @@ void LoadOrganya(const char *name)
 	
 	//Set as loaded
 	info.loaded = true;
+	*/
 }
 
 void SetOrganyaPosition(unsigned int x)
@@ -553,7 +549,7 @@ unsigned int GetOrganyaPosition()
 void PlayOrganyaMusic()
 {
 	//Start timer
-	OrganyaStartTimer(info.wait);
+	//OrganyaStartTimer(info.wait);
 }
 
 bool ChangeOrganyaVolume(signed int volume)
@@ -570,7 +566,7 @@ bool ChangeOrganyaVolume(signed int volume)
 void StopOrganyaMusic()
 {
 	//Stop timer
-	OrganyaEndTimer();
+	//OrganyaEndTimer();
 	
 	//Stop notes
 	for (int i = 0; i < MAXMELODY; i++)
@@ -587,6 +583,7 @@ void SetOrganyaFadeout()
 }
 
 //Org timer
+/*
 SDL_Thread *OrganyaTimer = NULL;
 bool bEndTimer = false;
 
@@ -635,6 +632,7 @@ void OrganyaEndTimer()
 	SDL_WaitThread(OrganyaTimer, NULL); //Wait for thread to end
 	OrganyaTimer = NULL;
 }
+*/
 
 //Start and end organya
 void StartOrganya()
@@ -645,9 +643,6 @@ void StartOrganya()
 
 void EndOrganya()
 {
-	//End timer
-	OrganyaEndTimer();
-	
 	//Release everything related to org
 	OrganyaReleaseNote();
 	

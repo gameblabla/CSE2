@@ -4,8 +4,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <SDL_timer.h>
-
 #include "WindowsWrapper.h"
 
 #include "ArmsItem.h"
@@ -199,8 +197,7 @@ int ModeOpening()
 		++gCounter;
 	}
 	
-	wait = SDL_GetTicks();
-	while (SDL_GetTicks() < wait + 500)
+	for (wait = 0; wait < 500; wait += 20)
 	{
 		CortBox(&grcGame, 0x000000);
 		PutFramePerSecound();
@@ -428,8 +425,7 @@ int ModeTitle()
 	ChangeMusic(0);
 	
 	//Black screen when option is selected
-	wait = SDL_GetTicks();
-	while (SDL_GetTicks() < wait + 1000)
+	for (wait = 0; wait < 1000; wait += 20)
 	{
 		CortBox(&grcGame, 0);
 		PutFramePerSecound();
@@ -633,25 +629,26 @@ bool Game()
 		if (LoadNpcTable(path))
 		{
 			InitTextScript2();
-			InitSkipFlags();
-			InitMapData2();
-			InitCreditScript();
+			//InitSkipFlags();
+			//InitMapData2();
+			//InitCreditScript();
 			
-			int mode = 1;
-			while (mode)
-			{
-				if (mode == 1)
-					mode = ModeOpening();
-				if (mode == 2)
-					mode = ModeTitle();
-				if (mode == 3)
-					mode = ModeAction();
-			}
 			
-			EndMapData();
+			//int mode = 1;
+			//while (mode)
+			//{
+			//	if (mode == 1)
+			//		mode = ModeOpening();
+			//	if (mode == 2)
+			//		mode = ModeTitle();
+			//	if (mode == 3)
+			//		mode = ModeAction();
+			//}
+			
+			//EndMapData();
 			EndTextScript();
-			ReleaseNpcTable();
-			ReleaseCreditScript();
+			//ReleaseNpcTable();
+			//ReleaseCreditScript();
 		}
 		else
 		{

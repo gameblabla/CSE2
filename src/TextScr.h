@@ -13,7 +13,7 @@ struct TEXT_SCRIPT
 	
 	//Script buffer
 	int size;
-	char *data;
+	int8_t *data;
 	
 	//Mode (ex. NOD, WAI)
 	char mode;

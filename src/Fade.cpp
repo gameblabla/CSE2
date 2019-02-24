@@ -1,6 +1,7 @@
 #include "Fade.h"
 
 #include <string.h>
+#include <stdlib.h>
 
 #include "CommonDefines.h"
 #include "WindowsWrapper.h"
@@ -16,8 +17,8 @@ struct FADE
 	int mode;
 	BOOL bMask;
 	int count;
-	char ani_no[FADE_HEIGHT][FADE_WIDTH];
-	BOOLEAN flag[FADE_HEIGHT][FADE_WIDTH];
+	char *ani_no; //char ani_no[FADE_HEIGHT][FADE_WIDTH];
+	BOOLEAN *flag; //BOOLEAN flag[FADE_HEIGHT][FADE_WIDTH];
 	char dir;
 };
 
@@ -26,7 +27,14 @@ static unsigned long mask_color;
 
 void InitFade()
 {
+	free(gFade.ani_no);
+	free(gFade.flag);
+	
 	memset(&gFade, 0, sizeof(FADE));
+	
+	gFade.ani_no = (char*)malloc(FADE_WIDTH * FADE_HEIGHT * sizeof(char));
+	gFade.flag = (BOOLEAN*)malloc(FADE_WIDTH * FADE_HEIGHT * sizeof(BOOLEAN));
+	
 	mask_color = GetCortBoxColor(RGB(0, 0, 0x20));
 }
 
@@ -52,8 +60,8 @@ void StartFadeOut(char dir)
 	{
 		for (int x = 0; x < FADE_WIDTH; x++)
 		{
-			gFade.ani_no[y][x] = 0;
-			gFade.flag[y][x] = FALSE;
+			gFade.ani_no[y * FADE_WIDTH + x] = 0;
+			gFade.flag[y * FADE_WIDTH + x] = FALSE;
 		}
 	}
 }
@@ -72,8 +80,8 @@ void StartFadeIn(char dir)
 	{
 		for (x = 0; x < FADE_WIDTH; x++)
 		{
-			gFade.ani_no[y][x] = 15;
-			gFade.flag[y][x] = FALSE;
+			gFade.ani_no[y * FADE_WIDTH + x] = 15;
+			gFade.flag[y * FADE_WIDTH + x] = FALSE;
 		}
 	}
 
@@ -96,7 +104,7 @@ void ProcFade()
 						for (x = 0; x < FADE_WIDTH; x++)
 						{
 							if ((FADE_WIDTH - 1) - gFade.count == x)
-								gFade.flag[y][x] = TRUE;
+								gFade.flag[y * FADE_WIDTH + x] = TRUE;
 						}
 					}
 					break;
@@ -107,7 +115,7 @@ void ProcFade()
 						for (x = 0; x < FADE_WIDTH; x++)
 						{
 							if (gFade.count == x)
-								gFade.flag[y][x] = TRUE;
+								gFade.flag[y * FADE_WIDTH + x] = TRUE;
 						}
 					}
 					break;
@@ -118,7 +126,7 @@ void ProcFade()
 						for (x = 0; x < FADE_WIDTH; x++)
 						{
 							if ((FADE_HEIGHT - 1) - gFade.count == y)
-								gFade.flag[y][x] = TRUE;
+								gFade.flag[y * FADE_WIDTH + x] = TRUE;
 						}
 					}
 					break;
@@ -129,7 +137,7 @@ void ProcFade()
 						for (x = 0; x < FADE_WIDTH; x++)
 						{
 							if (gFade.count == y)
-								gFade.flag[y][x] = TRUE;
+								gFade.flag[y * FADE_WIDTH + x] = TRUE;
 						}
 					}
 					break;
@@ -140,7 +148,7 @@ void ProcFade()
 						for (x = 0; x < (FADE_WIDTH / 2); x++)
 						{
 							if (gFade.count == x + y)
-								gFade.flag[y][x] = TRUE;
+								gFade.flag[y * FADE_WIDTH + x] = TRUE;
 						}
 					}
 					for (y = 0; y < (FADE_HEIGHT / 2); y++)
@@ -148,7 +156,7 @@ void ProcFade()
 						for (x = (FADE_WIDTH / 2); x < FADE_WIDTH; x++)
 						{
 							if (gFade.count == y + ((FADE_WIDTH - 1) - x))
-								gFade.flag[y][x] = TRUE;
+								gFade.flag[y * FADE_WIDTH + x] = TRUE;
 						}
 					}
 					for (y = (FADE_HEIGHT / 2); y < FADE_HEIGHT; y++)
@@ -156,7 +164,7 @@ void ProcFade()
 						for (x = 0; x < (FADE_WIDTH / 2); x++)
 						{
 							if (gFade.count == x + ((FADE_HEIGHT - 1) - y))
-								gFade.flag[y][x] = TRUE;
+								gFade.flag[y * FADE_WIDTH + x] = TRUE;
 						}
 					}
 					for (y = (FADE_HEIGHT / 2); y < FADE_HEIGHT; y++)
@@ -164,7 +172,7 @@ void ProcFade()
 						for (x = (FADE_WIDTH / 2); x < FADE_WIDTH; x++)
 						{
 							if (gFade.count == ((FADE_WIDTH - 1) - x) + ((FADE_HEIGHT - 1) - y))
-								gFade.flag[y][x] = TRUE;
+								gFade.flag[y * FADE_WIDTH + x] = TRUE;
 						}
 					}
 					break;
@@ -174,8 +182,8 @@ void ProcFade()
 			{
 				for (x = 0; x < FADE_WIDTH; x++)
 				{
-					if (gFade.ani_no[y][x] < 15 && gFade.flag[y][x])
-						++gFade.ani_no[y][x];
+					if (gFade.ani_no[y * FADE_WIDTH + x] < 15 && gFade.flag[y * FADE_WIDTH + x])
+						++gFade.ani_no[y * FADE_WIDTH + x];
 				}
 			}
 			
@@ -198,7 +206,7 @@ void ProcFade()
 						for (x = 0; x < FADE_WIDTH; x++)
 						{
 							if ((FADE_WIDTH - 1) - gFade.count == x)
-								gFade.flag[y][x] = TRUE;
+								gFade.flag[y * FADE_WIDTH + x] = TRUE;
 						}
 					}
 					break;
@@ -209,7 +217,7 @@ void ProcFade()
 						for (x = 0; x < FADE_WIDTH; x++)
 						{
 							if (gFade.count == x)
-								gFade.flag[y][x] = TRUE;
+								gFade.flag[y * FADE_WIDTH + x] = TRUE;
 						}
 					}
 					break;
@@ -220,7 +228,7 @@ void ProcFade()
 						for (x = 0; x < FADE_WIDTH; x++)
 						{
 							if ((FADE_HEIGHT - 1) - gFade.count == y)
-								gFade.flag[y][x] = TRUE;
+								gFade.flag[y * FADE_WIDTH + x] = TRUE;
 						}
 					}
 					break;
@@ -231,7 +239,7 @@ void ProcFade()
 						for (x = 0; x < FADE_WIDTH; x++)
 						{
 							if (gFade.count == y)
-								gFade.flag[y][x] = TRUE;
+								gFade.flag[y * FADE_WIDTH + x] = TRUE;
 						}
 					}
 					break;
@@ -242,7 +250,7 @@ void ProcFade()
 						for (x = 0; x < (FADE_WIDTH / 2); x++)
 						{
 							if ((FADE_WIDTH - 1) - gFade.count == x + y)
-								gFade.flag[y][x] = TRUE;
+								gFade.flag[y * FADE_WIDTH + x] = TRUE;
 						}
 					}
 					for (y = 0; y < (FADE_HEIGHT / 2); y++)
@@ -250,7 +258,7 @@ void ProcFade()
 						for (x = (FADE_WIDTH / 2); x < FADE_WIDTH; x++)
 						{
 							if ((FADE_WIDTH - 1) - gFade.count == y + ((FADE_WIDTH - 1) - x))
-								gFade.flag[y][x] = TRUE;
+								gFade.flag[y * FADE_WIDTH + x] = TRUE;
 						}
 					}
 					for (y = (FADE_HEIGHT / 2); y < FADE_HEIGHT; y++)
@@ -258,7 +266,7 @@ void ProcFade()
 						for (x = 0; x < (FADE_WIDTH / 2); x++)
 						{
 							if ((FADE_WIDTH - 1) - gFade.count == x + ((FADE_HEIGHT - 1) - y))
-								gFade.flag[y][x] = TRUE;
+								gFade.flag[y * FADE_WIDTH + x] = TRUE;
 						}
 					}
 					for (y = (FADE_HEIGHT / 2); y < FADE_HEIGHT; y++)
@@ -266,7 +274,7 @@ void ProcFade()
 						for (x = (FADE_WIDTH / 2); x < FADE_WIDTH; x++)
 						{
 							if ((FADE_WIDTH - 1) - gFade.count == ((FADE_WIDTH - 1) - x) + ((FADE_HEIGHT - 1) - y))
-								gFade.flag[y][x] = TRUE;
+								gFade.flag[y * FADE_WIDTH + x] = TRUE;
 						}
 					}
 					break;
@@ -279,8 +287,8 @@ void ProcFade()
 			{
 				for (x = 0; x < FADE_WIDTH; x++)
 				{
-					if (gFade.ani_no[y][x] > 0 && gFade.flag[y][x])
-						--gFade.ani_no[y][x];
+					if (gFade.ani_no[y * FADE_WIDTH + x] > 0 && gFade.flag[y * FADE_WIDTH + x])
+						--gFade.ani_no[y * FADE_WIDTH + x];
 				}
 			}
 			
@@ -310,7 +318,7 @@ void PutFade()
 	{
 		for (int x = 0; x < FADE_WIDTH; x++)
 		{
-			rect.left = 16 * gFade.ani_no[y][x];
+			rect.left = 16 * gFade.ani_no[y * FADE_WIDTH + x];
 			rect.right = rect.left + 16;
 			PutBitmap3(&grcGame, 16 * x, 16 * y, &rect, SURFACE_ID_FADE);
 		}

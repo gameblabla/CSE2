@@ -1,4 +1,4 @@
-FILENAME := CSE2.elf
+FILENAME := CSE2Wii
 
 include $(DEVKITPPC)/wii_rules
 
@@ -28,7 +28,6 @@ SOURCES = \
 			File \
 			Flags \
 			Flash \
-			Font \
 			Frame \
 			Game \
 			Generic \
@@ -87,12 +86,17 @@ ifeq ($(FIX_BUGS), 1)
 	CXXFLAGS += -DFIX_BUGS
 endif
 
-all: build/$(FILENAME)
+ifeq ($(JAPANESE), 1)
+	CXXFLAGS += -DJAPANESE
+endif
 
-build/$(FILENAME): $(OBJECTS)
+all: build/$(FILENAME).elf
+
+build/$(FILENAME).elf: $(OBJECTS)
 	@mkdir -p $(@D)
 	@$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -o $@ $(LIBS)
 	@echo Finished compiling: $@
+	elf2dol build/$(FILENAME).elf build/boot.dol
 
 obj/$(FILENAME)/%.o: src/%.cpp
 	@mkdir -p $(@D)

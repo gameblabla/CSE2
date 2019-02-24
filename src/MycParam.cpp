@@ -1,7 +1,5 @@
 #include "MycParam.h"
 
-#include "SDL.h"
-
 #include "ArmsItem.h"
 #include "CommonDefines.h"
 #include "Caret.h"
@@ -415,10 +413,10 @@ bool SaveTimeCounter()
 		fclose(fp);
 
 		uint8_t *p = (uint8_t*)&rec.counter[0];
-		p[0] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[0]) : (rec.random[0] >> 1);
+		p[0] -= rec.random[0] >> 1;
 		p[1] -= rec.random[0];
 		p[2] -= rec.random[0];
-		p[3] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[0] >> 1) : (rec.random[0]);
+		p[3] -= rec.random[0];
 		
 		//If this is faster than our new time, quit
 		if (rec.counter[0] < time_count)
@@ -432,15 +430,16 @@ bool SaveTimeCounter()
 		rec.random[i] = Random(0, 250) + i;
 		
 		uint8_t *p = (uint8_t*)&rec.counter[i];
-		p[0] += (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[i]) : (rec.random[i] >> 1);
+		p[0] += rec.random[i] >> 1;
 		p[1] += rec.random[i];
 		p[2] += rec.random[i];
-		p[3] += (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[i] >> 1) : (rec.random[i]);
+		p[3] += rec.random[i];
 	}
 	
 	fp = fopen(path, "wb");
 	if (fp == NULL)
 		return false;
+	
 	File_WriteLE32(rec.counter[0], fp);
 	File_WriteLE32(rec.counter[1], fp);
 	File_WriteLE32(rec.counter[2], fp);
@@ -480,10 +479,10 @@ int LoadTimeCounter()
 	for (int i = 0; i < 4; i++)
 	{
 		uint8_t *p = (uint8_t*)&rec.counter[i];
-		p[0] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[i]) : (rec.random[i] >> 1);
+		p[0] -= rec.random[i] >> 1;
 		p[1] -= rec.random[i];
 		p[2] -= rec.random[i];
-		p[3] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[i] >> 1) : (rec.random[i]);
+		p[3] -= rec.random[i];
 	}
 	
 	//Verify checksum's result

@@ -1,7 +1,5 @@
 #pragma once
-
 #include <stdint.h>
-
 #include "WindowsWrapper.h"
 
 #ifndef RGB
@@ -47,15 +45,26 @@ typedef enum Surface_Ids
 	SURFACE_ID_CREDIT_CAST = 35,
 	SURFACE_ID_CREDITS_IMAGE = 36,
 	SURFACE_ID_CASTS = 37,
-	SURFACE_ID_MAX = 40,
+	SURFACE_ID_FONT = 40,
+	SURFACE_ID_MAX = 41,
 } Surface_Ids;
 
-struct SURFACE;
+struct BUFFER_PIXEL
+{
+	uint8_t r, g, b;
+};
+
+struct SURFACE
+{
+	int w;
+	int h;
+	BUFFER_PIXEL *data;
+};
 
 extern SURFACE surf[SURFACE_ID_MAX];
 
 BOOL Flip_SystemTask();
-BOOL StartDirectDraw(int lMagnification, int lColourDepth);
+BOOL StartDirectDraw();
 void EndDirectDraw();
 void ReleaseSurface(int s);
 BOOL MakeSurface_File(const char *name, Surface_Ids surf_no);
@@ -70,7 +79,7 @@ void Surface2Surface(int x, int y, RECT *rect, int to, int from);
 unsigned long GetCortBoxColor(unsigned long col);
 void CortBox(RECT *rect, uint32_t col);
 void CortBox2(RECT *rect, uint32_t col, Surface_Ids surf_no);
-void InitTextObject(const char *font_name);
+void InitTextObject();
 void PutText(int x, int y, const char *text, uint32_t color);
 void PutText2(int x, int y, const char *text, uint32_t color, Surface_Ids surf_no);
 void EndTextObject();
