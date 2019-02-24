@@ -34,7 +34,7 @@ void ActNpc040(NPCHAR *npc)
 		{64, 48, 80, 64},
 	};
 
-	switch ( npc->act_no )
+	switch (npc->act_no)
 	{
 		case 0:
 			npc->act_no = 1;
@@ -48,21 +48,25 @@ void ActNpc040(NPCHAR *npc)
 				npc->act_wait = 0;
 				npc->ani_no = 1;
 			}
+
 			if (npc->x - 0x4000 < gMC.x && npc->x + 0x4000 > gMC.x && npc->y - 0x4000 < gMC.y && npc->y + 0x2000 > gMC.y)
 			{
-				if (npc->x <= gMC.x)
-					npc->direct = 2;
-				else
+				if (npc->x > gMC.x)
 					npc->direct = 0;
+				else
+					npc->direct = 2;
 			}
 			break;
+
 		case 2:
 			if (++npc->act_wait > 8)
 			{
 				npc->act_no = 1;
 				npc->ani_no = 0;
 			}
+
 			break;
+
 		case 3:
 			npc->act_no = 4;
 			npc->ani_no = 2;
@@ -74,17 +78,19 @@ void ActNpc040(NPCHAR *npc)
 				npc->ani_wait = 0;
 				npc->ani_no++;
 			}
+
 			if (npc->ani_no > 5)
 				npc->ani_no = 2;
-			if (npc->direct)
-				npc->x += 0x200;
-			else
+
+			if (npc->direct == 0)
 				npc->x -= 0x200;
+			else
+				npc->x += 0x200;
+
 			break;
+
 		case 5:
 			npc->ani_no = 6;
-			break;
-		default:
 			break;
 	}
 	
@@ -97,7 +103,7 @@ void ActNpc040(NPCHAR *npc)
 //Busted Door
 void ActNpc041(NPCHAR *npc)
 {
-	RECT rect[1] = {0, 80, 48, 112};
+	RECT rect = {0, 80, 48, 112};
 
 	if (npc->act_no == 0)
 	{
@@ -105,7 +111,7 @@ void ActNpc041(NPCHAR *npc)
 		npc->y -= 0x2000;	// Move a tile up
 	}
 
-	npc->rect = rect[0];
+	npc->rect = rect;
 }
 
 //Sue
@@ -142,6 +148,8 @@ void ActNpc042(NPCHAR *npc)
 		{112, 48, 128, 64},
 		{160, 48, 176, 64},
 	};
+
+	int n;
 
 	switch (npc->act_no)
 	{
@@ -265,17 +273,18 @@ void ActNpc042(NPCHAR *npc)
 			npc->ym = 0;
 			npc->act_no = 14;
 
-			int i;
-			for (i = 0; i < 0x200 && gNPC[i].code_event != 501; ++i);
+			for (n = 0; n < 0x200; ++n)
+				if (gNPC[n].code_event == 501)
+					break;
 
-			if (i == 0x200)
+			if (n == 0x200)
 			{
 				npc->act_no = 0;
 				break;
 			}
 			else
 			{
-				npc->pNpc = &gNPC[i];
+				npc->pNpc = &gNPC[n];
 			}
 			// Fallthrough
 		case 14:
@@ -400,10 +409,12 @@ void ActNpc043(NPCHAR *npc)
 	RECT rcLeft = {128, 80, 168, 112};
 	RECT rcRight = {168, 80, 208, 112};
 
-	if (npc->act_no == 0)
+	switch (npc->act_no)
 	{
-		npc->act_no = 1;
-		npc->y -= 0x2000;
+		case 0:
+			npc->act_no = 1;
+			npc->y -= 0x2000;
+			break;
 	}
 
 	if (npc->direct == 0)
@@ -630,14 +641,14 @@ void ActNpc045(NPCHAR *npc)
 	}
 
 	if (npc->xm2 < 0 && npc->flag & 1)
-		npc->xm2 = -npc->xm2;
+		npc->xm2 *= -1;
 	if (npc->xm2 > 0 && npc->flag & 4)
-		npc->xm2 = -npc->xm2;
+		npc->xm2 *= -1;
 
 	if (npc->ym2 < 0 && npc->flag & 2)
-		npc->ym2 = -npc->ym2;
+		npc->ym2 *= -1;
 	if (npc->ym2 > 0 && npc->flag & 8)
-		npc->ym2 = -npc->ym2;
+		npc->ym2 *= -1;
 
 	if (npc->xm2 > 0x200)
 		npc->xm2 = 0x200;
@@ -672,17 +683,17 @@ void ActNpc046(NPCHAR *npc)
 
 	if (npc->direct == 0)
 	{
-		if (npc->x >= gMC.x)
-			npc->x -= 0x5FF;
-		else
+		if (npc->x < gMC.x)
 			npc->x += 0x5FF;
+		else
+			npc->x -= 0x5FF;
 	}
 	else
 	{
-		if (npc->y >= gMC.y)
-			npc->y -= 0x5FF;
-		else
+		if (npc->y < gMC.y)
 			npc->y += 0x5FF;
+		else
+			npc->y -= 0x5FF;
 	}
 
 	npc->rect = rect;
@@ -711,10 +722,10 @@ void ActNpc047(NPCHAR *npc)
 				PlaySoundObject(102, 1);
 			}
 
-			if (gMC.x > npc->x)
+			if (npc->x < gMC.x)
 				npc->x += 0x400;
 
-			if (gMC.x < npc->x)
+			if (npc->x > gMC.x)
 				npc->x -= 0x400;
 
 			break;
@@ -796,22 +807,22 @@ void ActNpc048(NPCHAR *npc)
 {
 	if (npc->flag & 1 && npc->xm < 0)
 	{
-		npc->xm = -npc->xm;
+		npc->xm *= -1;
 	}
 	else if (npc->flag & 4 && npc->xm > 0)
 	{
-		npc->xm = -npc->xm;
+		npc->xm *= -1;
 	}
 	else if (npc->flag & 8)
 	{
-		if (++npc->count1 <= 2 && npc->direct != 2)
-		{
-			npc->ym = -0x100;
-		}
-		else
+		if (++npc->count1 > 2 || npc->direct == 2)
 		{
 			VanishNpChar(npc);
 			SetCaret(npc->x, npc->y, 2, 0);
+		}
+		else
+		{
+			npc->ym = -0x100;
 		}
 	}
 	
@@ -848,15 +859,19 @@ void ActNpc048(NPCHAR *npc)
 		npc->cond = 0;
 	}
 	
-	if (npc->direct)
-		npc->rect = rcRight[npc->ani_no];
-	else
+	if (npc->direct == 0)
 		npc->rect = rcLeft[npc->ani_no];
+	else
+		npc->rect = rcRight[npc->ani_no];
 }
 
 //Skullhead
 void ActNpc049(NPCHAR *npc)
 {
+	unsigned char deg;
+	int ym;
+	int xm;
+
 	if (npc->act_no >= 10 && npc->pNpc->code_char == 3)
 	{
 		npc->act_no = 3;
@@ -892,19 +907,19 @@ void ActNpc049(NPCHAR *npc)
 				npc->act_no = 3;
 				npc->ani_no = 2;
 
-				if (npc->count2 == 0)
-				{
-					if (npc->direct == 0)
-						npc->xm = -0x100;
-					else
-						npc->xm = 0x100;
-				}
-				else
+				if (npc->count2)
 				{
 					if (npc->direct == 0)
 						npc->xm = -0x200;
 					else
 						npc->xm = 0x200;
+				}
+				else
+				{
+					if (npc->direct == 0)
+						npc->xm = -0x100;
+					else
+						npc->xm = 0x100;
 				}
 			}
 
@@ -933,7 +948,7 @@ void ActNpc049(NPCHAR *npc)
 			}
 			else
 			{
-				if (gMC.x > npc->x - 0x10000 && gMC.x < npc->x + 0x10000 && gMC.y > npc->y - 0xC000 && gMC.y < npc->y + 0xC000)
+				if (npc->x - 0x10000 < gMC.x && npc->x + 0x10000 > gMC.x && npc->y - 0xC000 < gMC.y && npc->y + 0xC000 > gMC.y)
 				{
 					npc->act_no = 11;
 					npc->act_wait = 0;
@@ -946,9 +961,9 @@ void ActNpc049(NPCHAR *npc)
 		case 11:
 			if (++npc->act_wait == 30 || npc->act_wait == 35)
 			{
-				const unsigned char deg = GetArktan(npc->x - gMC.x, npc->y + 0x800 - gMC.y);
-				const int ym = 2 * GetSin(deg);
-				const int xm = 2 * GetCos(deg);
+				deg = GetArktan(npc->x - gMC.x, npc->y + 0x800 - gMC.y);
+				ym = 2 * GetSin(deg);
+				xm = 2 * GetCos(deg);
 				SetNpChar(50, npc->x, npc->y, xm, ym, 0, 0, 0x100);
 				PlaySoundObject(39, 1);
 			}
@@ -1103,11 +1118,16 @@ void ActNpc051(NPCHAR *npc)
 	switch (npc->act_no)
 	{
 		case 0:
-			if (gMC.x > npc->x - (WINDOW_WIDTH * 0x200) && gMC.x < npc->x + (WINDOW_WIDTH * 0x200) && gMC.y > npc->y - (WINDOW_WIDTH * 0x200) && gMC.y < npc->y + (WINDOW_WIDTH * 0x200))
+			if (npc->x - (WINDOW_WIDTH * 0x200) < gMC.x && npc->x + (WINDOW_WIDTH * 0x200) > gMC.x && npc->y - (WINDOW_WIDTH * 0x200) < gMC.y && npc->y + (WINDOW_WIDTH * 0x200) > gMC.y)
 			{
 				npc->tgt_x = npc->x;
 				npc->tgt_y = npc->y;
-				npc->ym = 0x400;
+
+				if (npc->direct == 0)
+					npc->ym = 0x400;
+				else
+					npc->ym = 0x400;
+
 				npc->act_no = 1;
 				SetNpChar(49, 0, 0, 0, 0, 0, npc, 0);
 			}
@@ -1300,7 +1320,7 @@ void ActNpc053(NPCHAR *npc)
 					npc->pNpc->xm += 0x80;
 			}
 
-			deg = npc->xm + npc->pNpc->count2;
+			deg = (unsigned char)npc->xm + (unsigned char)npc->pNpc->count2;
 			npc->x = npc->pNpc->x + npc->count1 * GetCos(deg);
 			npc->y = npc->pNpc->y + npc->count1 * GetSin(deg);
 			npc->direct = npc->pNpc->direct;
@@ -1308,7 +1328,10 @@ void ActNpc053(NPCHAR *npc)
 	}
 
 	npc->direct = npc->pNpc->direct;
-	npc->ani_no = deg < 20 || deg > 108;
+	if (deg >= 20 && deg <= 108)
+		npc->ani_no = 0;
+	else
+		npc->ani_no = 1;
 
 	if (npc->direct == 0)
 		npc->rect = rcLeft[npc->ani_no];
@@ -1370,7 +1393,7 @@ void ActNpc054(NPCHAR *npc)
 				if (++npc->count1 > 8)
 				{
 					npc->direct = 2;
-					npc->xm = -npc->xm;
+					npc->xm *= -1;
 				}
 			}
 			else if (npc->direct == 2 && npc->flag & 4)
@@ -1378,7 +1401,7 @@ void ActNpc054(NPCHAR *npc)
 				if (++npc->count1 > 8)
 				{
 					npc->direct = 0;
-					npc->xm = -npc->xm;
+					npc->xm *= -1;
 				}
 			}
 			else
@@ -1390,7 +1413,7 @@ void ActNpc054(NPCHAR *npc)
 
 		case 2:
 			++npc->act_wait;
-			npc->shock += npc->act_wait;
+			npc->shock += (unsigned char)npc->act_wait;
 
 			if (npc->act_wait > 50)
 			{
@@ -1423,7 +1446,7 @@ void ActNpc054(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Kazuka
+//Kazuma
 void ActNpc055(NPCHAR *npc)
 {
 	RECT rcLeft[6] = {
@@ -1616,11 +1639,13 @@ void ActNpc057(NPCHAR *npc)
 		case 0:
 			deg = Random(0, 0xFF);
 			npc->xm = GetCos(deg);
-			npc->tgt_x = npc->x + 8 * GetCos(deg + 0x40);
+			deg += 0x40;
+			npc->tgt_x = npc->x + 8 * GetCos(deg);
 
 			deg = Random(0, 0xFF);
 			npc->ym = GetSin(deg);
-			npc->tgt_y = npc->y + 8 * GetSin(deg + 0x40);
+			deg += 0x40;
+			npc->tgt_y = npc->y + 8 * GetSin(deg);
 
 			npc->act_no = 1;
 			npc->count1 = 120;
@@ -1782,15 +1807,7 @@ void ActNpc058(NPCHAR *npc)
 	switch (npc->act_no)
 	{
 		case 0:
-			if ( gMC.x >= npc->x + 0x2000 || gMC.x <= npc->x - 0x2000 )
-			{
-				npc->rect.right = 0;
-				npc->damage = 0;
-				npc->xm = 0;
-				npc->ym = 0;
-				npc->bits &= ~0x20;
-			}
-			else
+			if (gMC.x < npc->x + 0x2000 && gMC.x > npc->x - 0x2000)
 			{
 				npc->bits |= 0x20;
 				npc->ym = -0x100;
@@ -1813,19 +1830,27 @@ void ActNpc058(NPCHAR *npc)
 					npc->xm = 0x2FF;
 				}
 			}
+			else
+			{
+				npc->rect.right = 0;
+				npc->damage = 0;
+				npc->xm = 0;
+				npc->ym = 0;
+				npc->bits &= ~0x20;
+			}
 
 			break;
 
 		case 1:
-			if (npc->x <= gMC.x)
-			{
-				npc->direct = 2;
-				npc->xm += 0x10;
-			}
-			else
+			if (npc->x > gMC.x)
 			{
 				npc->direct = 0;
 				npc->xm -= 0x10;
+			}
+			else
+			{
+				npc->direct = 2;
+				npc->xm += 0x10;
 			}
 
 			if (npc->flag & 1)
@@ -1834,10 +1859,10 @@ void ActNpc058(NPCHAR *npc)
 			if (npc->flag & 4)
 				npc->xm = -0x200;
 
-			if (npc->y >= npc->tgt_y)
-				npc->ym -= 8;
-			else
+			if (npc->y < npc->tgt_y)
 				npc->ym += 8;
+			else
+				npc->ym -= 8;
 
 			if (npc->xm > 0x2FF)
 				npc->xm = 0x2FF;
@@ -1871,8 +1896,6 @@ void ActNpc058(NPCHAR *npc)
 				break;
 			}
 
-			// Fallthrough
-		case 2:
 			if (npc->act_no)
 			{
 				if (npc->act_wait < 150)
@@ -1883,9 +1906,9 @@ void ActNpc058(NPCHAR *npc)
 					if ((++npc->count2 % 8) == 0 && npc->x < gMC.x + 0x14000 && npc->x > gMC.x - 0x14000)	// TODO: Maybe do something about this for tallscreen
 					{
 						unsigned char deg = GetArktan(npc->x - gMC.x, npc->y - gMC.y);
-						unsigned char rand_deg = Random(-6, 6) + deg;
-						int ym = 2 * GetSin(rand_deg);
-						int xm = 2 * GetCos(rand_deg);
+						deg += (unsigned char)Random(-6, 6);
+						int ym = 2 * GetSin(deg);
+						int xm = 2 * GetCos(deg);
 						SetNpChar(84, npc->x, npc->y, xm, ym, 0, 0, 0x100);
 						PlaySoundObject(39, 1);
 					}
@@ -1957,11 +1980,11 @@ void ActNpc059(NPCHAR *npc)
 			break;
 
 		case 3:
-			if (npc->x - 0x8000 >= gMC.x || npc->x + 0x8000 <= gMC.x || npc->y - 0x8000 >= gMC.y || npc->y + 0x8000 <= gMC.y)
-			{
-				npc->act_no = 4;
-				npc->ani_wait = 0;
-			}
+			if (npc->x - 0x8000 < gMC.x && npc->x + 0x8000 > gMC.x && npc->y - 0x8000 < gMC.y && npc->y + 0x8000 > gMC.y)
+				break;
+
+			npc->act_no = 4;
+			npc->ani_wait = 0;
 
 			break;
 
