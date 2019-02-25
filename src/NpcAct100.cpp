@@ -1382,6 +1382,7 @@ void ActNpc117(NPCHAR *npc)
 			npc->ani_no = 5;
 			SetDestroyNpChar(npc->x, npc->y, npc->view.back, 8);
 			break;
+			// End of wrong-reg code
 
 		case 6:
 			npc->ani_no = 5;
