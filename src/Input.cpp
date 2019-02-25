@@ -32,7 +32,7 @@ bool UpdateInput()
 	gKey = 0;
 	
 	//Escape key
-	if (wpadHeld & WPAD_BUTTON_HOME)
+	if (wpadHeld & WPAD_BUTTON_HOME || wpadHeld & WPAD_CLASSIC_BUTTON_HOME)
 		gKey |= KEY_ESCAPE;
 	
 	//Direction
@@ -50,6 +50,14 @@ bool UpdateInput()
 	//Jump and shoot
 	gKey |= (wpadHeld & WPAD_BUTTON_2		|| wpadHeld & WPAD_CLASSIC_BUTTON_B)		? gKeyJump : 0;
 	gKey |= (wpadHeld & WPAD_BUTTON_1		|| wpadHeld & WPAD_CLASSIC_BUTTON_Y)		? gKeyShot : 0;
+	gKey |= 								  (wpadHeld & WPAD_CLASSIC_BUTTON_A)		? gKeyJump : 0;
+	gKey |= 								  (wpadHeld & WPAD_CLASSIC_BUTTON_X)		? gKeyShot : 0;
+	
+	//Ok and cancel
+	gKey |= (wpadHeld & WPAD_BUTTON_2		|| wpadHeld & WPAD_CLASSIC_BUTTON_B)		? gKeyOk : 0;
+	gKey |= (wpadHeld & WPAD_BUTTON_1		|| wpadHeld & WPAD_CLASSIC_BUTTON_Y)		? gKeyCancel : 0;
+	gKey |= 								  (wpadHeld & WPAD_CLASSIC_BUTTON_A)		? gKeyOk : 0;
+	gKey |= 								  (wpadHeld & WPAD_CLASSIC_BUTTON_X)		? gKeyCancel : 0;
 	
 	//Inventory and map system key
 	gKey |= (wpadHeld & WPAD_BUTTON_PLUS	|| wpadHeld & WPAD_CLASSIC_BUTTON_PLUS)	? gKeyItem : 0;
@@ -58,11 +66,11 @@ bool UpdateInput()
 	//Weapon switch keys
 	if (wpadHeld & WPAD_BUTTON_B)
 	{
-		gKey |= (wpadHeld & WPAD_BUTTON_UP)	? gKeyArms : 0;
-		gKey |= (wpadHeld & WPAD_BUTTON_DOWN)	? gKeyArmsRev : 0;
+		gKey |= (wpadHeld & WPAD_BUTTON_DOWN)	? gKeyArms : 0;
+		gKey |= (wpadHeld & WPAD_BUTTON_UP)		? gKeyArmsRev : 0;
 	}
 	
-	gKey |= (wpadHeld & WPAD_CLASSIC_BUTTON_FULL_L)	? gKeyArms : 0;
-	gKey |= (wpadHeld & WPAD_CLASSIC_BUTTON_FULL_R)	? gKeyArmsRev : 0;
+	gKey |= (wpadHeld & WPAD_CLASSIC_BUTTON_FULL_R)	? gKeyArms : 0;
+	gKey |= (wpadHeld & WPAD_CLASSIC_BUTTON_FULL_L)	? gKeyArmsRev : 0;
 	return true;
 }

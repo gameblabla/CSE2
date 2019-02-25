@@ -5,11 +5,10 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <gccore.h>
+
 #include "Organya.h"
 #include "PixTone.h"
-
-#define FREQUENCY 44100
-#define STREAM_SIZE (FREQUENCY / 200)
 
 #define clamp(x, y, z) ((x > z) ? z : (x < y) ? y : x)
 

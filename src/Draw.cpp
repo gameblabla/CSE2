@@ -238,13 +238,20 @@ BOOL ReloadBitmap_Resource(const char *res, Surface_Ids surf_no)
 
 void BackupSurface(Surface_Ids surf_no, RECT *rect)
 {
-	memset(surf[surf_no].data, 0, surf[surf_no].w * surf[surf_no].h * sizeof(BUFFER_PIXEL));
-	for (int x = 0; x < (surf[surf_no].w < WINDOW_WIDTH) ? surf[surf_no].w : WINDOW_WIDTH; x++)
+	for (int fx = rect->left; fx < rect->right; fx++)
 	{
-		for (int y = 0; y < (surf[surf_no].h < WINDOW_HEIGHT) ? surf[surf_no].h : WINDOW_HEIGHT; y++)
+		for (int fy = rect->top; fy < rect->bottom; fy++)
 		{
-			BUFFER_PIXEL *fromPixel = &screenBuffer[y * WINDOW_WIDTH + x];
-			SET_BUFFER_PIXEL(surf[surf_no].data, surf[surf_no].w, x, y, fromPixel->r, fromPixel->g, fromPixel->b);
+			int dx = fx - rect->left;
+			int dy = fy - rect->top;
+			
+			if (dx < 0 || dy < 0)
+				continue;
+			if (dx >= surf[surf_no].w || dy >= surf[surf_no].h)
+				continue;
+			
+			BUFFER_PIXEL *fromPixel = &screenBuffer[fy * WINDOW_WIDTH + fx];
+			SET_BUFFER_PIXEL(surf[surf_no].data, surf[surf_no].w, dx, dy, fromPixel->r, fromPixel->g, fromPixel->b);
 		}
 	}
 }
@@ -289,19 +296,21 @@ void PutBitmap4(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_no) //N
 
 void Surface2Surface(int x, int y, RECT *rect, int to, int from)
 {
-	if (surf[to].data)
+	if (surf[from].data && surf[to].data)
 	{
-		for (int fx = rect->left; fx < rect->right; fx++)
+		//Clip our rect
+		RECT renderRect;
+		renderRect.left = (x < 0) ? (rect->left + (0 - x)) : rect->left;
+		renderRect.top = (y < 0) ? (rect->top + (0 - y)) : rect->top;
+		renderRect.right = ((x + rect->right - rect->left) >= surf[to].w) ? rect->right - ((x + rect->right - rect->left) - surf[to].w) : rect->right;
+		renderRect.bottom = ((y + rect->bottom - rect->top) >= surf[to].h) ? rect->bottom - ((y + rect->bottom - rect->top) - surf[to].h) : rect->bottom;
+		
+		for (int fx = renderRect.left; fx < renderRect.right; fx++)
 		{
-			for (int fy = rect->top; fy < rect->bottom; fy++)
+			for (int fy = renderRect.top; fy < renderRect.bottom; fy++)
 			{
 				int dx = x + (fx - rect->left);
 				int dy = y + (fy - rect->top);
-				
-				if (dx < 0 || dy < 0)
-					continue;
-				if (dx >= surf[to].w || dy >= surf[to].h)
-					continue;
 				
 				BUFFER_PIXEL *pixel = &surf[from].data[fy * surf[from].w + fx];
 				if (pixel->r == 0 && pixel->g == 0 && pixel->b == 0) //Surface2Surface is always color keyed
@@ -324,9 +333,9 @@ void CortBox(RECT *rect, uint32_t col)
 	const unsigned char col_green = (col & 0x00FF00) >> 8;
 	const unsigned char col_blue = (col & 0xFF0000) >> 16;
 	
-	for (int y = (rect->top < 0 ? 0 : rect->top); y < (rect->bottom >= WINDOW_HEIGHT ? WINDOW_HEIGHT - 1 : rect->bottom); y++)
+	for (int y = (rect->top < 0 ? 0 : rect->top); y < (rect->bottom >= WINDOW_HEIGHT ? WINDOW_HEIGHT : rect->bottom); y++)
 	{
-		for (int x = (rect->left < 0 ? 0 : rect->left); x < (rect->right >= WINDOW_WIDTH ? WINDOW_WIDTH - 1 : rect->right); x++)
+		for (int x = (rect->left < 0 ? 0 : rect->left); x < (rect->right >= WINDOW_WIDTH ? WINDOW_WIDTH : rect->right); x++)
 		{
 			SET_BUFFER_PIXEL(screenBuffer, WINDOW_WIDTH, x, y, col_red, col_green, col_blue);
 		}
@@ -341,9 +350,9 @@ void CortBox2(RECT *rect, uint32_t col, Surface_Ids surf_no)
 		const unsigned char col_green = (col & 0x00FF00) >> 8;
 		const unsigned char col_blue = (col & 0xFF0000) >> 16;
 		
-		for (int y = (rect->top < 0 ? 0 : rect->top); y < (rect->bottom >= surf[surf_no].h ? surf[surf_no].h - 1 : rect->bottom); y++)
+		for (int y = (rect->top < 0 ? 0 : rect->top); y < (rect->bottom >= surf[surf_no].h ? surf[surf_no].h : rect->bottom); y++)
 		{
-			for (int x = (rect->left < 0 ? 0 : rect->left); x < (rect->right >= surf[surf_no].w ? surf[surf_no].w - 1 : rect->right); x++)
+			for (int x = (rect->left < 0 ? 0 : rect->left); x < (rect->right >= surf[surf_no].w ? surf[surf_no].w : rect->right); x++)
 			{
 				SET_BUFFER_PIXEL(surf[surf_no].data, surf[surf_no].w, x, y, col_red, col_green, col_blue);
 			}
@@ -353,55 +362,98 @@ void CortBox2(RECT *rect, uint32_t col, Surface_Ids surf_no)
 
 void InitTextObject()
 {
-	/*
-	//Get font size
-	unsigned int fontWidth, fontHeight;
-	fontWidth = 5 * magnification;
-	fontHeight = 10 * magnification;
-	
-	//Open Font.ttf
-	char path[PATH_LENGTH];
-#ifdef JAPANESE
-	sprintf(path, "%s/font/msgothic.ttc", gModulePath);
-#else
-	sprintf(path, "%s/font/cour.ttf", gModulePath);
-#endif
-
-	gFont = LoadFont(path, fontWidth, fontHeight);
-	*/
+	MakeSurface_File("Font", SURFACE_ID_FONT);
 }
 
 void PutText(int x, int y, const char *text, uint32_t color)
 {
-	/*
-	int surface_width, surface_height;
-	SDL_GetRendererOutputSize(gRenderer, &surface_width, &surface_height);
-
-	SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormat(0, surface_width, surface_height, 0, SDL_PIXELFORMAT_RGBA32);
-	SDL_RenderReadPixels(gRenderer, NULL, SDL_PIXELFORMAT_RGBA32, surface->pixels, surface->pitch);
-
-	DrawText(gFont, surface, x * magnification, y * magnification, color, text, strlen(text));
-
-	SDL_Texture *screen_texture = SDL_CreateTextureFromSurface(gRenderer, surface);
-	SDL_FreeSurface(surface);
-	SDL_RenderCopy(gRenderer, screen_texture, NULL, NULL);
-	SDL_DestroyTexture(screen_texture);
-	*/
+	RECT rcCharacter;
+	RECT *rcView = &grcFull;
+	RECT *rect = &rcCharacter;
+	RECT renderRect;
+	
+	//Get our surface colour
+	int r = (color & 0xFF0000) >> 16;
+	int g = (color & 0x00FF00) >>  8;
+	int b = (color & 0x0000FF) >>  0;
+	
+	for (int i = 0; i < strlen(text); i++)
+	{
+		rcCharacter.left = (text[i] % 0x20) * 12;
+		rcCharacter.top = (text[i] / 0x20 - 1) * 12;
+		rcCharacter.right = rcCharacter.left + 12;
+		rcCharacter.bottom = rcCharacter.top + 12;
+		
+		if (surf[SURFACE_ID_FONT].data)
+		{
+			//Clip our rect
+			renderRect.left = (x < rcView->left) ? (rect->left + (rcView->left - x)) : rect->left;
+			renderRect.top = (y < rcView->top) ? (rect->top + (rcView->top - y)) : rect->top;
+			renderRect.right = ((x + rect->right - rect->left) >= rcView->right) ? rect->right - ((x + rect->right - rect->left) - rcView->right) : rect->right;
+			renderRect.bottom = ((y + rect->bottom - rect->top) >= rcView->bottom) ? rect->bottom - ((y + rect->bottom - rect->top) - rcView->bottom) : rect->bottom;
+			
+			for (int fx = renderRect.left; fx < renderRect.right; fx++)
+			{
+				for (int fy = renderRect.top; fy < renderRect.bottom; fy++)
+				{
+					int dx = (x + 5 * i) + (fx - rect->left);
+					int dy = y + (fy - rect->top);
+					
+					BUFFER_PIXEL *pixel = &surf[SURFACE_ID_FONT].data[fy * surf[SURFACE_ID_FONT].w + fx];
+					if (pixel->r == 0 && pixel->g == 0 && pixel->b == 0)
+						continue;
+					SET_BUFFER_PIXEL(screenBuffer, WINDOW_WIDTH, dx, dy, r, g, b);
+				}
+			}
+		}
+	}
 }
 
 void PutText2(int x, int y, const char *text, uint32_t color, Surface_Ids surf_no)
 {
-	/*
-	DrawText(gFont, surf[surf_no].surface, x * magnification, y * magnification, color, text, strlen(text));
-	surf[surf_no].needs_updating = true;
-	*/
+	RECT rcCharacter;
+	RECT *rcView = &grcFull;
+	RECT *rect = &rcCharacter;
+	RECT renderRect;
+	
+	//Get our surface colour
+	int r = (color & 0xFF0000) >> 16;
+	int g = (color & 0x00FF00) >>  8;
+	int b = (color & 0x0000FF) >>  0;
+	
+	for (int i = 0; i < strlen(text); i++)
+	{
+		rcCharacter.left = (text[i] % 0x20) * 12;
+		rcCharacter.top = (text[i] / 0x20 - 1) * 12;
+		rcCharacter.right = rcCharacter.left + 12;
+		rcCharacter.bottom = rcCharacter.top + 12;
+		
+		if (surf[SURFACE_ID_FONT].data && surf[surf_no].data)
+		{
+			//Clip our rect
+			renderRect.left = (x < 0) ? (rect->left + (0 - x)) : rect->left;
+			renderRect.top = (y < 0) ? (rect->top + (0 - y)) : rect->top;
+			renderRect.right = ((x + rect->right - rect->left) >= surf[surf_no].w) ? rect->right - ((x + rect->right - rect->left) - surf[surf_no].w) : rect->right;
+			renderRect.bottom = ((y + rect->bottom - rect->top) >= surf[surf_no].h) ? rect->bottom - ((y + rect->bottom - rect->top) - surf[surf_no].h) : rect->bottom;
+			
+			for (int fx = renderRect.left; fx < renderRect.right; fx++)
+			{
+				for (int fy = renderRect.top; fy < renderRect.bottom; fy++)
+				{
+					int dx = (x + 5 * i) + (fx - rect->left);
+					int dy = y + (fy - rect->top);
+					
+					BUFFER_PIXEL *pixel = &surf[SURFACE_ID_FONT].data[fy * surf[SURFACE_ID_FONT].w + fx];
+					if (pixel->r == 0 && pixel->g == 0 && pixel->b == 0) //Surface2Surface is always color keyed
+						continue;
+					SET_BUFFER_PIXEL(surf[surf_no].data, surf[surf_no].w, dx, dy, r, g, b);
+				}
+			}
+		}
+	}
 }
 
 void EndTextObject()
 {
-	/*
-	//Destroy font
-	UnloadFont(gFont);
-	gFont = NULL;
-	*/
+	ReleaseSurface(SURFACE_ID_FONT);
 }

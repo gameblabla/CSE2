@@ -1,6 +1,6 @@
 #pragma once
 
-#include "WindowsWrapper.h"
+//#include "WindowsWrapper.h"
 
 struct PIXTONEPARAMETER2
 {
@@ -27,4 +27,4 @@ struct PIXTONEPARAMETER
 };
 
 void MakeWaveTables(void);
-BOOL MakePixelWaveData(const PIXTONEPARAMETER *ptp, unsigned char *pData);
+int MakePixelWaveData(const PIXTONEPARAMETER *ptp, unsigned char *pData);

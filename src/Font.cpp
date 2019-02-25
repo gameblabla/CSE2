@@ -14,12 +14,10 @@
 #include FT_LCD_FILTER_H
 #include FT_BITMAP_H
 
-#include "SDL.h"
-
 #include "File.h"
 
 // Uncomment for that authentic pre-Windows Vista feel
-//#define DISABLE_FONT_ANTIALIASING
+#define DISABLE_FONT_ANTIALIASING
 
 #undef MIN
 #undef MAX
@@ -169,7 +167,7 @@ FontObject* LoadFont(const char *font_filename, unsigned int cell_width, unsigne
 	return font_object;
 }
 
-void DrawText(FontObject *font_object, SDL_Surface *surface, int x, int y, unsigned long colour, const char *string, size_t string_length)
+void DrawText(FontObject *font_object, BUFFER_PIXEL *surface, unsigned int surface_width, int x, int y, unsigned long colour, const char *string, size_t string_length)
 {
 	if (font_object != NULL)
 	{
@@ -229,17 +227,17 @@ void DrawText(FontObject *font_object, SDL_Surface *surface, int x, int y, unsig
 					for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)converted.width / 3, surface->w); ++ix)
 					{
 						const unsigned char *font_pixel = converted.buffer + iy * converted.pitch + ix * 3;
-						unsigned char *surface_pixel = (unsigned char*)surface->pixels + (letter_y + iy) * surface->pitch + (letter_x + ix) * 4;
+						BUFFER_PIXEL *surface_pixel = &surface[(letter_y + iy) * surface_width + (letter_x + ix)];
 
 						if (font_pixel[0] || font_pixel[1] || font_pixel[2])
 						{
-							for (unsigned int j = 0; j < 3; ++j)
-							{
-								const double alpha = pow((font_pixel[j] / 255.0), 1.0 / 1.8);			// Gamma correction
-								surface_pixel[j] = (colours[j] * alpha) + (surface_pixel[j] * (1.0 - alpha));	// Alpha blending
-							}
-
-							surface_pixel[3] = 0xFF;
+							const double alpha0 = pow((font_pixel[0] / 255.0), 1.0 / 1.8);			// Gamma correction
+							const double alpha1 = pow((font_pixel[1] / 255.0), 1.0 / 1.8);			// Gamma correction
+							const double alpha2 = pow((font_pixel[2] / 255.0), 1.0 / 1.8);			// Gamma correction
+							
+							surface_pixel->r = (colours[0] * alpha0) + (surface_pixel->r * (1.0 - alpha0));	// Alpha blending
+							surface_pixel->g = (colours[1] * alpha1) + (surface_pixel->g * (1.0 - alpha1));	// Alpha blending
+							surface_pixel->b = (colours[2] * alpha2) + (surface_pixel->b * (1.0 - alpha2));	// Alpha blending
 						}
 					}
 				}

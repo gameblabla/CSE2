@@ -3,21 +3,20 @@
 int rep_rand();
 void rep_srand(unsigned int seed);
 
-#ifndef BOOL
-//typedef int BOOL;
-#define BOOL int
-#endif
 #ifndef BOOLEAN
-//typedef unsigned char BOOLEAN;
-#define BOOLEAN unsigned char
+	#define BOOL int
+#endif
+
+#ifndef BOOLEAN
+	#define BOOLEAN unsigned char
 #endif
 
 #ifndef FALSE
-#define FALSE 0
+	#define FALSE 0
 #endif
 
 #ifndef TRUE
-#define TRUE 1
+	#define TRUE 1
 #endif
 
 struct RECT
