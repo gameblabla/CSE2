@@ -17,6 +17,8 @@
 //Puu Black
 void ActNpc160(NPCHAR *npc)
 {
+	int i;
+
 	switch (npc->act_no)
 	{
 		case 0:
@@ -24,7 +26,7 @@ void ActNpc160(NPCHAR *npc)
 			npc->act_no = 1;
 			// Fallthrough
 		case 1:
-			if (gMC.x > npc->x)
+			if (npc->x < gMC.x)
 				npc->direct = 2;
 			else
 				npc->direct = 0;
@@ -50,7 +52,7 @@ void ActNpc160(NPCHAR *npc)
 			{
 				DeleteNpCharCode(161, 1);
 
-				for (int i = 0; i < 4; ++i)
+				for (i = 0; i < 4; ++i)
 					SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
 
 				npc->act_no = 3;
@@ -60,7 +62,7 @@ void ActNpc160(NPCHAR *npc)
 				PlaySoundObject(72, 1);
 			}
 
-			if (gMC.y > npc->y && gMC.flag & 8)
+			if (npc->y < gMC.y && gMC.flag & 8)
 				npc->damage = 20;
 			else
 				npc->damage = 0;
@@ -177,12 +179,12 @@ void ActNpc161(NPCHAR *npc)
 {
 	npc->exp = 0;
 
-	if (gSuperXpos > npc->x)
+	if (npc->x < gSuperXpos)
 		npc->xm += 0x40;
 	else
 		npc->xm -= 0x40;
 
-	if (gSuperYpos > npc->y)
+	if (npc->y < gSuperYpos)
 		npc->ym += 0x40;
 	else
 		npc->ym -= 0x40;
@@ -228,6 +230,8 @@ void ActNpc161(NPCHAR *npc)
 //Puu Black (dead)
 void ActNpc162(NPCHAR *npc)
 {
+	int i;
+
 	RECT rect_left = {40, 0, 80, 24};
 	RECT rect_right = {40, 24, 80, 48};
 	RECT rect_end = {0, 0, 0, 0};
@@ -238,10 +242,10 @@ void ActNpc162(NPCHAR *npc)
 			DeleteNpCharCode(161, 1);
 			PlaySoundObject(72, 1);
 
-			for (int i = 0; i < 10; ++i)
+			for (i = 0; i < 10; ++i)
 				SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-0x600, 0x600), Random(-0x600, 0x600), 0, 0, 0x100);
 
-			if (gMC.x < npc->x)
+			if (npc->x > gMC.x)
 				npc->direct = 0;
 			else
 				npc->direct = 2;
@@ -270,14 +274,7 @@ void ActNpc162(NPCHAR *npc)
 		case 2:
 			SetQuake(2);
 
-			if (++npc->count1 > 240)
-			{
-				npc->rect = rect_end;
-
-				npc->count1 = 0;
-				npc->act_no = 3;
-			}
-			else
+			if (++npc->count1 <= 240)
 			{
 				if (npc->direct == 0)
 					npc->rect = rect_left;
@@ -287,6 +284,13 @@ void ActNpc162(NPCHAR *npc)
 				npc->rect.top += npc->count1 / 8;
 				npc->y = npc->tgt_y + ((npc->count1 / 8) * 0x200);
 				npc->rect.left -= (npc->count1 / 2) % 2;
+			}
+			else
+			{
+				npc->rect = rect_end;
+
+				npc->count1 = 0;
+				npc->act_no = 3;
 			}
 
 			if (npc->count1 % 3 == 2)
@@ -298,11 +302,11 @@ void ActNpc162(NPCHAR *npc)
 			break;
 
 		case 3:
-			if (++npc->count1 >= 60)
-			{
-				DeleteNpCharCode(161, 1);
-				npc->cond = 0;
-			}
+			if (++npc->count1 < 60)
+				break;
+
+			DeleteNpCharCode(161, 1);
+			npc->cond = 0;
 
 			break;
 
@@ -585,18 +589,17 @@ void ActNpc169(NPCHAR *npc)
 			npc->ani_no = 0;
 			npc->act_wait = 30;
 
-			if (gMC.x < npc->x)
+			if (npc->x > gMC.x)
 				npc->direct = 0;
 			else
 				npc->direct = 2;
 			// Fallthrough
 		case 1:
-			if (--npc->act_wait == 0)
-			{
-				npc->act_no = 2;
-				++npc->count1;
-			}
+			if (--npc->act_wait)
+				break;
 
+			npc->act_no = 2;
+			++npc->count1;
 			break;
 
 		case 2:
@@ -623,7 +626,7 @@ void ActNpc169(NPCHAR *npc)
 			else
 				npc->xm += 0x20;
 
-			if (npc->act_wait >= 8 && gMC.x > npc->x - 0x1800 && gMC.x < npc->x + 0x1800 && gMC.y > npc->y - 0x1800 && gMC.y < npc->y + 0x1000)
+			if (npc->act_wait >= 8 && npc->x - 0x1800 < gMC.x && npc->x + 0x1800 > gMC.x && npc->y - 0x1800 < gMC.y && npc->y + 0x1000 > gMC.y)
 			{
 				npc->act_no = 10;
 				npc->ani_no = 5;
@@ -665,13 +668,15 @@ void ActNpc169(NPCHAR *npc)
 						npc->ani_no = 7;
 						npc->ym = -0x5FF;
 					}
+
+					break;
 				}
 			}
 
 			break;
 
 		case 4:
-			if (gMC.x < npc->x)
+			if (npc->x > gMC.x)
 				npc->direct = 0;
 			else
 				npc->direct = 2;
@@ -692,7 +697,7 @@ void ActNpc169(NPCHAR *npc)
 				PlaySoundObject(26, 1);
 			}
 
-			if (npc->act_wait >= 8 && gMC.x > npc->x - 0x1800 && gMC.x < npc->x + 0x1800 && gMC.y > npc->y - 0x1800 && gMC.y < npc->y + 0x1000)
+			if (npc->act_wait >= 8 && npc->x - 0x1800 < gMC.x && npc->x + 0x1800 > gMC.x && npc->y - 0x1800 < gMC.y && npc->y + 0x1000 > gMC.y)
 			{
 				npc->act_no = 10;
 				npc->ani_no = 5;
@@ -705,9 +710,10 @@ void ActNpc169(NPCHAR *npc)
 		case 9:
 			npc->xm = 4 * npc->xm / 5;
 
-			if (npc->xm == 0)
-				npc->act_no = 0;
+			if (npc->xm)
+				break;
 
+			npc->act_no = 0;
 			break;
 
 		case 10:
@@ -716,14 +722,13 @@ void ActNpc169(NPCHAR *npc)
 
 			npc->xm = 4 * npc->xm / 5;
 
-			if (npc->xm == 0)
-			{
-				npc->act_no = 11;
-				npc->act_wait = 0;
-				npc->ani_no = 5;
-				npc->ani_wait = 0;
-			}
+			if (npc->xm)
+				break;
 
+			npc->act_no = 11;
+			npc->act_wait = 0;
+			npc->ani_no = 5;
+			npc->ani_wait = 0;
 			break;
 
 		case 11:
@@ -772,9 +777,10 @@ void ActNpc169(NPCHAR *npc)
 			npc->ani_no = 7;
 			// Fallthrough
 		case 21:
-			if (++npc->act_wait >= 50)
-				npc->act_no = 0;
+			if (++npc->act_wait < 50)
+				break;
 
+			npc->act_no = 0;
 			break;
 	}
 
@@ -834,12 +840,12 @@ void ActNpc170(NPCHAR *npc)
 		{128, 104, 144, 112},
 	};
 
-	bool bHit = false;
+	BOOL bHit = FALSE;
 
 	if (npc->direct == 0 && npc->flag & 1)
-		bHit = true;
+		bHit = TRUE;
 	if (npc->direct == 2 && npc->flag & 4)
-		bHit = true;
+		bHit = TRUE;
 
 	if (bHit)
 	{
@@ -879,16 +885,16 @@ void ActNpc170(NPCHAR *npc)
 					SetCaret(npc->x - 0x1000, npc->y, 7, 0);
 			}
 
-			if (npc->count1 >= 50)
+			if (npc->count1 < 50)
 			{
-				npc->ym = 0;
-			}
-			else
-			{
-				if (gMC.y > npc->y)
+				if (npc->y < gMC.y)
 					npc->ym += 0x20;
 				else
 					npc->ym -= 0x20;
+			}
+			else
+			{
+				npc->ym = 0;
 			}
 
 			if (++npc->ani_no > 1)
@@ -924,7 +930,7 @@ void ActNpc171(NPCHAR *npc)
 		{216, 48, 248, 80},
 	};
 
-	if (gMC.x < npc->x)
+	if (npc->x > gMC.x)
 		npc->direct = 0;
 	else
 		npc->direct = 2;
@@ -957,7 +963,7 @@ void ActNpc171(NPCHAR *npc)
 			if (npc->ani_no > 1)
 				npc->ani_no = 0;
 
-			if (npc->tgt_y > npc->y)
+			if (npc->y < npc->tgt_y)
 				npc->ym += 0x10;
 			else
 				npc->ym -= 0x10;
@@ -1043,6 +1049,10 @@ void ActNpc172(NPCHAR *npc)
 //Gaudi (armoured)
 void ActNpc173(NPCHAR *npc)
 {
+	unsigned char deg;
+	int xm;
+	int ym;
+
 	RECT rcLeft[4] = {
 		{0, 128, 24, 152},
 		{24, 128, 48, 152},
@@ -1057,155 +1067,156 @@ void ActNpc173(NPCHAR *npc)
 		{72, 152, 96, 176},
 	};
 
-	if (npc->x <= gMC.x + (WINDOW_WIDTH * 0x200) && npc->x >= gMC.x - (WINDOW_WIDTH * 0x200) && npc->y <= gMC.y + (WINDOW_HEIGHT * 0x200) && npc->y >= gMC.y - (WINDOW_HEIGHT * 0x200))
-	{
-		switch (npc->act_no)
-		{
-			case 0:
-				npc->tgt_x = npc->x;
-				npc->act_no = 1;
-				// Fallthrough
-			case 1:
-				npc->ani_no = 0;
-				npc->xm = 0;
+	if (npc->x > gMC.x + (WINDOW_WIDTH * 0x200) || npc->x < gMC.x - (WINDOW_WIDTH * 0x200) || npc->y > gMC.y + (WINDOW_HEIGHT * 0x200) || npc->y < gMC.y - (WINDOW_HEIGHT * 0x200))
+		return;
 
-				if (npc->act_wait < 5)
+	switch (npc->act_no)
+	{
+		case 0:
+			npc->tgt_x = npc->x;
+			npc->act_no = 1;
+			// Fallthrough
+		case 1:
+			npc->ani_no = 0;
+			npc->xm = 0;
+
+			if (npc->act_wait < 5)
+			{
+				++npc->act_wait;
+			}
+			else
+			{
+				if (npc->x - 0x18000 < gMC.x && npc->x + 0x18000 > gMC.x && npc->y - 0x14000 < gMC.y && npc->y + 0x14000 > gMC.y)
 				{
-					++npc->act_wait;
+					npc->act_no = 10;
+					npc->act_wait = 0;
+					npc->ani_no = 1;
+				}
+			}
+
+			break;
+
+		case 10:
+			if (++npc->act_wait > 3)
+			{
+				if (++npc->count1 == 3)
+				{
+					PlaySoundObject(30, 1);
+					npc->count1 = 0;
+					npc->act_no = 25;
+					npc->act_wait = 0;
+					npc->ani_no = 2;
+					npc->ym = -0x600;
+
+					if (npc->x < npc->tgt_x)
+						npc->xm = 0x80;
+					else
+						npc->xm = -0x80;
 				}
 				else
 				{
-					if (gMC.x > npc->x - 0x18000 && gMC.x < npc->x + 0x18000 && gMC.y > npc->y - 0x14000 && gMC.y < npc->y + 0x14000)
-					{
-						npc->act_no = 10;
-						npc->act_wait = 0;
-						npc->ani_no = 1;
-					}
-				}
-
-				break;
-
-			case 10:
-				if (++npc->act_wait > 3)
-				{
-					if (++npc->count1 == 3)
-					{
-						PlaySoundObject(30, 1);
-						npc->count1 = 0;
-						npc->act_no = 25;
-						npc->act_wait = 0;
-						npc->ani_no = 2;
-						npc->ym = -0x600;
-
-						if (npc->tgt_x > npc->x)
-							npc->xm = 0x80;
-						else
-							npc->xm = -0x80;
-					}
-					else
-					{
-						PlaySoundObject(30, 1);
-						npc->act_no = 20;
-						npc->ani_no = 2;
-						npc->ym = -0x200;
-
-						if (npc->tgt_x > npc->x)
-							npc->xm = 0x200;
-						else
-							npc->xm = -0x200;
-					}
-				}
-
-				break;
-
-			case 20:
-				++npc->act_wait;
-
-				if (npc->flag & 8)
-				{
-					PlaySoundObject(23, 1);
-					npc->ani_no = 1;
-					npc->act_no = 30;
-					npc->act_wait = 0;
-				}
-
-				break;
-
-			case 25:
-				if (++npc->act_wait == 30 || npc->act_wait == 40)
-				{
-					const unsigned char deg = GetArktan(npc->x - gMC.x, npc->y - gMC.y) + Random(-6, 6);
-					const int ym = 3 * GetSin(deg);
-					const int xm = 3 * GetCos(deg);
-					SetNpChar(174, npc->x, npc->y, xm, ym, 0, 0, 0x100);
-
-					PlaySoundObject(39, 1);
-					npc->ani_no = 3;
-
-					gCurlyShoot_wait = Random(80, 100);
-					gCurlyShoot_x = npc->x;
-					gCurlyShoot_y = npc->y;
-				}
-
-				if (npc->act_wait == 35 || npc->act_wait == 45)
+					PlaySoundObject(30, 1);
+					npc->act_no = 20;
 					npc->ani_no = 2;
+					npc->ym = -0x200;
 
-				if (npc->flag & 8)
-				{
-					PlaySoundObject(23, 1);
-					npc->ani_no = 1;
-					npc->act_no = 30;
-					npc->act_wait = 0;
+					if (npc->x < npc->tgt_x)
+						npc->xm = 0x200;
+					else
+						npc->xm = -0x200;
 				}
+			}
 
-				break;
+			break;
 
-			case 30:
-				npc->xm = 7 * npc->xm / 8;
+		case 20:
+			++npc->act_wait;
 
-				if (++npc->act_wait > 3)
-				{
-					npc->ani_no = 0;
-					npc->act_no = 1;
-					npc->act_wait = 0;
-				}
+			if (npc->flag & 8)
+			{
+				PlaySoundObject(23, 1);
+				npc->ani_no = 1;
+				npc->act_no = 30;
+				npc->act_wait = 0;
+			}
 
-				break;
-		}
+			break;
 
-		npc->ym += 51;
+		case 25:
+			if (++npc->act_wait == 30 || npc->act_wait == 40)
+			{
+				deg = GetArktan(npc->x - gMC.x, npc->y - gMC.y);
+				deg += (unsigned char)Random(-6, 6);
+				ym = 3 * GetSin(deg);
+				xm = 3 * GetCos(deg);
+				SetNpChar(174, npc->x, npc->y, xm, ym, 0, 0, 0x100);
 
-		if (gMC.x < npc->x)
-			npc->direct = 0;
-		else
-			npc->direct = 2;
+				PlaySoundObject(39, 1);
+				npc->ani_no = 3;
 
-		if (npc->ym > 0x5FF)
-			npc->ym = 0x5FF;
-		if (npc->ym < -0x5FF)
-			npc->ym = 0x5FF;
+				gCurlyShoot_wait = Random(80, 100);
+				gCurlyShoot_x = npc->x;
+				gCurlyShoot_y = npc->y;
+			}
 
-		npc->x += npc->xm;
-		npc->y += npc->ym;
+			if (npc->act_wait == 35 || npc->act_wait == 45)
+				npc->ani_no = 2;
 
-		if (npc->direct == 0)
-			npc->rect = rcLeft[npc->ani_no];
-		else
-			npc->rect = rcRight[npc->ani_no];
+			if (npc->flag & 8)
+			{
+				PlaySoundObject(23, 1);
+				npc->ani_no = 1;
+				npc->act_no = 30;
+				npc->act_wait = 0;
+			}
 
-		if (npc->life <= 985)
-		{
-			SetDestroyNpChar(npc->x, npc->y, 0, 2);
-			npc->code_char = 154;
-			npc->act_no = 0;
-		}
+			break;
+
+		case 30:
+			npc->xm = 7 * npc->xm / 8;
+
+			if (++npc->act_wait > 3)
+			{
+				npc->ani_no = 0;
+				npc->act_no = 1;
+				npc->act_wait = 0;
+			}
+
+			break;
+	}
+
+	npc->ym += 51;
+
+	if (gMC.x < npc->x)
+		npc->direct = 0;
+	else
+		npc->direct = 2;
+
+	if (npc->ym > 0x5FF)
+		npc->ym = 0x5FF;
+	if (npc->ym < -0x5FF)
+		npc->ym = 0x5FF;
+
+	npc->x += npc->xm;
+	npc->y += npc->ym;
+
+	if (npc->direct == 0)
+		npc->rect = rcLeft[npc->ani_no];
+	else
+		npc->rect = rcRight[npc->ani_no];
+
+	if (npc->life <= 985)
+	{
+		SetDestroyNpChar(npc->x, npc->y, 0, 2);
+		npc->code_char = 154;
+		npc->act_no = 0;
 	}
 }
 
 //Armoured-Gaudi projectile
 void ActNpc174(NPCHAR *npc)
 {
-	bool bHit;
+	BOOL bHit;
 	switch (npc->act_no)
 	{
 		case 0:
@@ -1216,29 +1227,29 @@ void ActNpc174(NPCHAR *npc)
 			npc->x += npc->xm;
 			npc->y += npc->ym;
 
-			bHit = false;
+			bHit = FALSE;
 
 			if (npc->flag & 1)
 			{
-				bHit = true;
+				bHit = TRUE;
 				npc->xm = 0x200;
 			}
 
 			if (npc->flag & 4)
 			{
-				bHit = true;
+				bHit = TRUE;
 				npc->xm = -0x200;
 			}
 
 			if (npc->flag & 2)
 			{
-				bHit = true;
+				bHit = TRUE;
 				npc->ym = 0x200;
 			}
 
 			if (npc->flag & 8)
 			{
-				bHit = true;
+				bHit = TRUE;
 				npc->ym = -0x200;
 			}
 
@@ -1308,10 +1319,12 @@ void ActNpc175(NPCHAR *npc)
 		npc->damage = 0;
 	}
 
-	if (npc->act_no == 0)
+	switch (npc->act_no)
 	{
-		npc->ani_no = 0;
-		npc->act_no = 1;
+		case 0:
+			npc->ani_no = 0;
+			npc->act_no = 1;
+			break;
 	}
 
 	if (npc->direct == 0)
@@ -1462,24 +1475,24 @@ void ActNpc177(NPCHAR *npc)
 				npc->tgt_x = npc->x;
 				npc->tgt_y = npc->y;
 
-				if (gMC.x < npc->x)
+				if (npc->x > gMC.x)
 					npc->direct = 0;
 				else
 					npc->direct = 2;
 
-				npc->xm = (Random(0, 1) * 0x400) - 0x200;
-				npc->ym = (Random(0, 1) * 0x400) - 0x200;
+				npc->xm = 2 * (0x200 * Random(0, 1) - 0x100);
+				npc->ym = 2 * (0x200 * Random(0, 1) - 0x100);
 			}
 
 			break;
 
 		case 10:
-			if (npc->tgt_x > npc->x)
+			if (npc->x < npc->tgt_x)
 				npc->xm += 0x20;
 			else
 				npc->xm -= 0x20;
 
-			if (npc->tgt_y > npc->y)
+			if (npc->y < npc->tgt_y)
 				npc->ym += 0x20;
 			else
 				npc->ym -= 0x20;

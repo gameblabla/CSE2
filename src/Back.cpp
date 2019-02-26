@@ -33,10 +33,9 @@ BOOL InitBack(const char *fName, int type)
 	fseek(fp, 0x10, SEEK_SET);
 	gBack.partsW = File_ReadBE32(fp);
 	gBack.partsH = File_ReadBE32(fp);
-	
 
 	fclose(fp);
-	
+
 	//Set background stuff and load texture
 	gBack.flag = 1;
 	if (!ReloadBitmap_File(fName, SURFACE_ID_LEVEL_BACKGROUND))
