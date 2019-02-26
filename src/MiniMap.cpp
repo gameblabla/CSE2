@@ -16,10 +16,13 @@
 #include "MyChar.h"
 #include "Stage.h"
 
-BOOLEAN gMapping[0x80];
+char gMapping[0x80];
 
 void WriteMiniMapLine(int line)
 {
+	int x;
+	unsigned char a;
+
 	RECT rcLevel[4] = {
 		{240, 24, 241, 25},
 		{241, 24, 242, 25},
@@ -27,69 +30,63 @@ void WriteMiniMapLine(int line)
 		{243, 24, 244, 25},
 	};
 	
-	for (int x = 0; x < gMap.width; x++)
+	for (x = 0; x < gMap.width; x++)
 	{
-		uint8_t a = GetAttribute(x, line);
-				
-		switch (a)
-		{
-			case 0:
-				Surface2Surface(x, line, &rcLevel[0], 9, 26);
-				break;
+		a = GetAttribute(x, line);
 
-			case 68:
-			case 1:
-			case 64:
-			case 128:
-			case 129:
-			case 130:
-			case 131:
-			case 81:
-			case 82:
-			case 85:
-			case 86:
-			case 2:
-			case 96:
-			case 113:
-			case 114:
-			case 117:
-			case 118:
-			case 160:
-			case 161:
-			case 162:
-			case 163:
-				Surface2Surface(x, line, &rcLevel[1], 9, 26);
-				break;
-				
-			case 67:
-			case 99:
-			case 80:
-			case 83:
-			case 84:
-			case 87:
-			case 112:
-			case 115:
-			case 116:
-			case 119:
-				Surface2Surface(x, line, &rcLevel[2], 9, 26);
-				break;
-				
-			default:
-				Surface2Surface(x, line, &rcLevel[3], 9, 26);
-				break;
-		}
+		// Yup. This really is an if/else chain.
+		// No switch here.
+		if (a == 0)
+			Surface2Surface(x, line, &rcLevel[0], 9, 26);
+		else if (a == 68 ||
+			a == 1 ||
+			a == 64 ||
+			a == 128 ||
+			a == 129 ||
+			a == 130 ||
+			a == 131 ||
+			a == 81 ||
+			a == 82 ||
+			a == 85 ||
+			a == 86 ||
+			a == 2 ||
+			a == 96 ||
+			a == 113 ||
+			a == 114 ||
+			a == 117 ||
+			a == 118 ||
+			a == 160 ||
+			a == 161 ||
+			a == 162 ||
+			a == 163)
+			Surface2Surface(x, line, &rcLevel[1], 9, 26);
+		else if (a == 67 ||
+			a == 99 ||
+			a == 80 ||
+			a == 83 ||
+			a == 84 ||
+			a == 87 ||
+			a == 96 ||	// This is already listed above
+			a == 112 ||
+			a == 115 ||
+			a == 116 ||
+			a == 119)
+			Surface2Surface(x, line, &rcLevel[2], 9, 26);
+		else
+			Surface2Surface(x, line, &rcLevel[3], 9, 26);
 	}
-	return;
 }
 
 int MiniMapLoop()
 {
+	int f;
+
 	RECT my_rect = {0, 57, 1, 58};
 	int my_x = (gMC.x / 0x200 + 8) / 16;
 	int my_y = (gMC.y / 0x200 + 8) / 16;
 	
 	RECT rcView;
-	for (int f = 0; f <= 8; f++)
+	for (f = 0; f <= 8; f++)
 	{
 		GetTrg();
 		
@@ -106,10 +103,10 @@ int MiniMapLoop()
 		
 		PutBitmap4(&grcGame, 0, 0, &grcGame, SURFACE_ID_SCREEN_GRAB);
 		
-		rcView.left = (WINDOW_WIDTH / 2) - f * gMap.width / 16;
-		rcView.right = (WINDOW_WIDTH / 2) + f * gMap.width / 16;
-		rcView.top = (WINDOW_HEIGHT / 2) - f * gMap.length / 16;
-		rcView.bottom = (WINDOW_HEIGHT / 2) + f * gMap.length / 16;
+		rcView.left = (WINDOW_WIDTH / 2) - gMap.width * f / 8 / 2;
+		rcView.right = (WINDOW_WIDTH / 2) + gMap.width * f / 8 / 2;
+		rcView.top = (WINDOW_HEIGHT / 2) - gMap.length * f / 8 / 2;
+		rcView.bottom = (WINDOW_HEIGHT / 2) + gMap.length * f / 8 / 2;
 
 		PutMapName(true);
 		CortBox(&rcView, 0);
@@ -119,7 +116,12 @@ int MiniMapLoop()
 			return 0;
 	}
 	
-	RECT rcMiniMap = {0, 0, gMap.width, gMap.length};
+	RECT rcMiniMap;
+	rcMiniMap.left = 0;
+	rcMiniMap.top = gMap.width;
+	rcMiniMap.right = 0;
+	rcMiniMap.bottom = gMap.length;
+
 	rcView.right = --rcView.left + gMap.width + 2;
 	rcView.bottom = --rcView.top + gMap.length + 2;
 	CortBox2(&rcMiniMap, 0, SURFACE_ID_MAP);
@@ -147,15 +149,22 @@ int MiniMapLoop()
 		PutBitmap4(&grcGame, 0, 0, &grcGame, SURFACE_ID_SCREEN_GRAB);
 		CortBox(&rcView, 0);
 		
-		if (gMap.length > line)
-			WriteMiniMapLine(line++);
-		if (gMap.length > line)
-			WriteMiniMapLine(line++);
+		if (line < gMap.length)
+		{
+			WriteMiniMapLine(line);
+			line++;
+		}
+		if (line < gMap.length)
+		{
+			WriteMiniMapLine(line);
+			line++;
+		}
+
 		PutBitmap3(&grcGame, rcView.left + 1, rcView.top + 1, &rcMiniMap, SURFACE_ID_MAP);
 		
 		PutMapName(true);
 		
-		if ((++my_wait >> 3) & 1)
+		if (++my_wait / 8 % 2)
 			PutBitmap3(&grcGame, my_x + rcView.left + 1, my_y + rcView.top + 1, &my_rect, SURFACE_ID_TEXT_BOX);
 		
 		PutFramePerSecound();
@@ -163,7 +172,7 @@ int MiniMapLoop()
 			return 0;
 	}
 	
-	for (int f = 8; f >= -1; --f)
+	for (f = 8; f >= -1; --f)
 	{
 		GetTrg();
 
@@ -180,10 +189,10 @@ int MiniMapLoop()
 
 		PutBitmap4(&grcGame, 0, 0, &grcGame, SURFACE_ID_SCREEN_GRAB);
 
-		rcView.left = (WINDOW_WIDTH / 2) - f * gMap.width / 16;
-		rcView.right = (WINDOW_WIDTH / 2) + f * gMap.width / 16;
-		rcView.top = (WINDOW_HEIGHT / 2) - f * gMap.length / 16;
-		rcView.bottom = (WINDOW_HEIGHT / 2) + f * gMap.length / 16;
+		rcView.left = (WINDOW_WIDTH / 2) - gMap.width * f / 8 / 2;
+		rcView.right = (WINDOW_WIDTH / 2) + gMap.width * f / 8 / 2;
+		rcView.top = (WINDOW_HEIGHT / 2) - gMap.length * f / 8 / 2;
+		rcView.bottom = (WINDOW_HEIGHT / 2) + gMap.length * f / 8 / 2;
 
 		PutMapName(true);
 		CortBox(&rcView, 0);
@@ -198,7 +207,10 @@ int MiniMapLoop()
 
 BOOL IsMapping()
 {
-	return gMapping[gStageNo];
+	if (gMapping[gStageNo] == FALSE)
+		return FALSE;
+	else
+		return TRUE;
 }
 
 void StartMapping()

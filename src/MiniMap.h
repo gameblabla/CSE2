@@ -4,7 +4,7 @@
 
 #include "WindowsWrapper.h"
 
-extern BOOLEAN gMapping[0x80];
+extern char gMapping[0x80];
 
 int MiniMapLoop();
 BOOL IsMapping();
