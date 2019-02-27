@@ -1180,6 +1180,7 @@ void ActNpc268(NPCHAR *npc)
 			if (npc->ani_no > 1)
 				npc->ani_no = 0;
 
+			// This line makes absolutely no sense
 			if (npc->x < gMC.x + 0xE000 && npc->x > gMC.x - 0xE000 && npc->x < gMC.x + 0x6000 && npc->x > gMC.x - 0xE000)
 				npc->act_no = 10;
 
