@@ -38,6 +38,9 @@ struct MUSICINFO {
 	TRACKDATA tdata[16];
 };
 
+extern unsigned int gOrgTimer;
+extern unsigned int gOrgSamplePerStep;
+
 bool MakeOrganyaWave(int8_t track, int8_t wave_no, int8_t pipi);
 void OrganyaPlayData();
 void SetPlayPointer(int32_t x);

@@ -5,12 +5,16 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "WindowsWrapper.h"
+#include "File.h"
+
+#include <aesndlib.h>
 
 #include "CommonDefines.h"
 #include "Resource.h"
 #include "Sound.h"
 #include "Tags.h"
+
+#include "WindowsWrapper.h"
 
 #define PANDUMMY 0xFF
 #define VOLDUMMY 0xFF
@@ -28,6 +32,9 @@ MUSICINFO info;
 int gTrackVol[MAXTRACK];
 int gOrgVolume = 100;
 bool bFadeout = false;
+
+unsigned int gOrgTimer = 0;
+unsigned int gOrgSamplePerStep = 0;
 
 bool OrganyaNoteAlloc(uint16_t alloc)
 {
@@ -407,7 +414,6 @@ void SetPlayPointer(int32_t x)
 //Load organya file
 void LoadOrganya(const char *name)
 {
-	/*
 	//Unload previous things
 	OrganyaReleaseNote();
 	memset(&info, 0, sizeof(info));
@@ -422,7 +428,21 @@ void LoadOrganya(const char *name)
 
 	//Open file
 	printf("Loading org %s\n", name);
-	SDL_RWops *fp = FindResource(name);
+	
+	size_t resSize;
+	const unsigned char *res = FindResource(name, &resSize);
+	
+	char path[PATH_LENGTH];
+	sprintf(path, "%s/%s.restemp", gDataPath, name);
+	
+	FILE *temp = fopen(path, "wb");
+	if (!temp)
+		return;
+	
+	fwrite(res, resSize, 1, temp);
+	fclose(temp);
+	
+	FILE *fp = fopen(path, "rb");
 
 	if (!fp)
 	{
@@ -434,7 +454,7 @@ void LoadOrganya(const char *name)
 	uint8_t ver = 0;
 	char pass_check[6];
 
-	SDL_RWread(fp, &pass_check[0], sizeof(char), 6);
+	fread(&pass_check[0], sizeof(char), 6, fp);
 
 	if (!memcmp(pass_check, "Org-01", 6))ver = 1;
 	if (!memcmp(pass_check, "Org-02", 6))ver = 2;
@@ -447,18 +467,18 @@ void LoadOrganya(const char *name)
 	}
 	
 	//Set song information
-	info.wait = SDL_ReadLE16(fp);
-	info.line = SDL_ReadU8(fp);
-	info.dot = SDL_ReadU8(fp);
-	info.repeat_x = SDL_ReadLE32(fp);
-	info.end_x = SDL_ReadLE32(fp);
+	info.wait = File_ReadLE16(fp);
+	info.line = File_ReadU8(fp);
+	info.dot = File_ReadU8(fp);
+	info.repeat_x = File_ReadLE32(fp);
+	info.end_x = File_ReadLE32(fp);
 	
 	for (int i = 0; i < 16; i++) {
-		info.tdata[i].freq = SDL_ReadLE16(fp);
-		info.tdata[i].wave_no = SDL_ReadU8(fp);
-		const int8_t pipi = SDL_ReadU8(fp);
+		info.tdata[i].freq = File_ReadLE16(fp);
+		info.tdata[i].wave_no = File_ReadU8(fp);
+		const int8_t pipi = File_ReadU8(fp);
 		info.tdata[i].pipi = ver == 1 ? 0 : pipi;
-		info.tdata[i].note_num = SDL_ReadLE16(fp);
+		info.tdata[i].note_num = File_ReadLE16(fp);
 	}
 
 	//Load notes
@@ -491,36 +511,37 @@ void LoadOrganya(const char *name)
 		//Set note properties
 		np = info.tdata[j].note_p; //X position
 		for (int i = 0; i < info.tdata[j].note_num; i++) {
-			np->x = SDL_ReadLE32(fp);
+			np->x = File_ReadLE32(fp);
 			np++;
 		}
 
 		np = info.tdata[j].note_p; //Y position
 		for (int i = 0; i < info.tdata[j].note_num; i++) {
-			np->y = SDL_ReadU8(fp);
+			np->y = File_ReadU8(fp);
 			np++;
 		}
 
 		np = info.tdata[j].note_p; //Length
 		for (int i = 0; i < info.tdata[j].note_num; i++) {
-			np->length = SDL_ReadU8(fp);
+			np->length = File_ReadU8(fp);
 			np++;
 		}
 
 		np = info.tdata[j].note_p; //Volume
 		for (int i = 0; i < info.tdata[j].note_num; i++) {
-			np->volume = SDL_ReadU8(fp);
+			np->volume = File_ReadU8(fp);
 			np++;
 		}
 
 		np = info.tdata[j].note_p; //Pan
 		for (int i = 0; i < info.tdata[j].note_num; i++) {
-			np->pan = SDL_ReadU8(fp);
+			np->pan = File_ReadU8(fp);
 			np++;
 		}
 	}
 
-	SDL_RWclose(fp);
+	fclose(fp);
+	remove(path);
 
 	//Create waves
 	for (int j = 0; j < 8; j++)
@@ -531,7 +552,6 @@ void LoadOrganya(const char *name)
 	
 	//Set as loaded
 	info.loaded = true;
-	*/
 }
 
 void SetOrganyaPosition(unsigned int x)
@@ -549,7 +569,8 @@ unsigned int GetOrganyaPosition()
 void PlayOrganyaMusic()
 {
 	//Start timer
-	//OrganyaStartTimer(info.wait);
+	gOrgTimer = 0;
+	gOrgSamplePerStep = info.wait * DSP_DEFAULT_FREQ / 1000;
 }
 
 bool ChangeOrganyaVolume(signed int volume)
@@ -566,7 +587,8 @@ bool ChangeOrganyaVolume(signed int volume)
 void StopOrganyaMusic()
 {
 	//Stop timer
-	//OrganyaEndTimer();
+	gOrgTimer = 0;
+	gOrgSamplePerStep = -1;
 	
 	//Stop notes
 	for (int i = 0; i < MAXMELODY; i++)

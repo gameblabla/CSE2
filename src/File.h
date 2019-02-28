@@ -4,6 +4,7 @@
 
 long LoadFileToMemory(const char *file_path, unsigned char **file_buffer);
 
+unsigned char File_ReadU8(FILE *stream);
 unsigned short File_ReadBE16(FILE *stream);
 unsigned long File_ReadBE32(FILE *stream);
 unsigned short File_ReadLE16(FILE *stream);

@@ -81,7 +81,7 @@ DEPENDENCIES = $(addprefix obj/$(FILENAME)/, $(addsuffix .o.d, $(SOURCES)))
 
 CXXFLAGS :=	$(MACHDEP) -I$(LIBOGC_INC) -O3 -s
 LDFLAGS :=	-L$(LIBOGC_LIB) $(MACHDEP)
-LIBS :=		-lwiiuse -lbte -lfat -logc -lm
+LIBS :=		-lwiiuse -lbte -lfat -lm -laesnd -logc
 
 ifeq ($(FIX_BUGS), 1)
 	CXXFLAGS += -DFIX_BUGS

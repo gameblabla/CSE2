@@ -3,6 +3,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <aesndlib.h>
+
 #include "PixTone.h"
 
 class SOUNDBUFFER
@@ -22,6 +24,8 @@ class SOUNDBUFFER
 		void SetPan(int32_t lPan);
 		void Play(bool bLooping);
 		void Stop();
+		
+		void Mix(int16_t *stream, uint32_t samples);
 		
 		SOUNDBUFFER *next;
 	

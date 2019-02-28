@@ -238,6 +238,7 @@ BOOL ReloadBitmap_Resource(const char *res, Surface_Ids surf_no)
 
 void BackupSurface(Surface_Ids surf_no, RECT *rect)
 {
+	/*
 	for (int fx = rect->left; fx < rect->right; fx++)
 	{
 		for (int fy = rect->top; fy < rect->bottom; fy++)
@@ -254,6 +255,7 @@ void BackupSurface(Surface_Ids surf_no, RECT *rect)
 			SET_BUFFER_PIXEL(surf[surf_no].data, surf[surf_no].w, dx, dy, fromPixel->r, fromPixel->g, fromPixel->b);
 		}
 	}
+	*/
 }
 
 static void DrawBitmap(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_no, bool transparent)

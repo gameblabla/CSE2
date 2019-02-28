@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include <gccore.h>
+#include <aesndlib.h>
 
 #include "Organya.h"
 #include "PixTone.h"
@@ -116,11 +117,78 @@ void SOUNDBUFFER::Stop()
 	playing = false;
 }
 
+void SOUNDBUFFER::Mix(int16_t *stream, uint32_t samples)
+{
+	if (!playing) //This sound buffer isn't playing
+		return;
+
+	for (size_t sample = 0; sample < samples; sample++)
+	{
+		const double freqPosition = frequency / DSP_DEFAULT_FREQ; //This is added to position at the end
+		
+		//Get the in-between sample this is (linear interpolation)
+		const uint8_t sampleV = data[(size_t)samplePosition];
+		
+		//Convert sample to int16_t
+		const int16_t sampleConvert = ((int16_t)sampleV - 0x80) << 8;
+		
+		//Mix
+		stream[sample * 2]     += (int16_t)((double)sampleConvert * volume * volume_l);
+		stream[sample * 2 + 1] += (int16_t)((double)sampleConvert * volume * volume_r);
+		
+		//Increment position
+		samplePosition += freqPosition;
+		
+		if (samplePosition >= size)
+		{
+			if (looping)
+			{
+				samplePosition = std::fmod(samplePosition, size);
+				looped = true;
+			}
+			else
+			{
+				samplePosition = 0.0;
+				playing = false;
+				looped = false;
+				break;
+			}
+		}
+	}
+}
+
 //Sound things
 SOUNDBUFFER* lpSECONDARYBUFFER[SOUND_NO];
 
+void StreamCallback(void *audio_buffer, uint32_t len)
+{
+	int16_t *stream = (int16_t*)audio_buffer;
+	uint32_t samples = len / 4;
+	
+	memset(stream, 0, len);
+	
+	//Mix sounds to primary buffer
+	for (SOUNDBUFFER *sound = soundBuffers; sound != NULL; sound = sound->next)
+		sound->Mix(stream, samples);
+	
+	//Play organya
+	gOrgTimer += samples;
+	
+	if (gOrgTimer > gOrgSamplePerStep)
+	{
+		OrganyaPlayData();
+		gOrgTimer %= gOrgSamplePerStep;
+	}
+}
+
 bool InitDirectSound()
 {
+	//Init sound library
+	AESND_Init();
+	
+	//Set-up stream
+	AESND_RegisterAudioCallback(StreamCallback);
+	
 	//Start organya
 	StartOrganya();
 	return true;
