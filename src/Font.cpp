@@ -1,5 +1,6 @@
 #include "Font.h"
 
+#include <math.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -173,7 +174,7 @@ void DrawText(FontObject *font_object, SDL_Surface *surface, int x, int y, unsig
 {
 	if (font_object != NULL)
 	{
-		const unsigned char colours[3] = {(unsigned char)(colour >> 16), (unsigned char)(colour >> 8), (unsigned char)colour};
+		const unsigned char colours[3] = {(unsigned char)colour, (unsigned char)(colour >> 8), (unsigned char)(colour >> 16)};
 
 		FT_Face face = font_object->face;
 
@@ -236,7 +237,7 @@ void DrawText(FontObject *font_object, SDL_Surface *surface, int x, int y, unsig
 							for (unsigned int j = 0; j < 3; ++j)
 							{
 								const double alpha = pow((font_pixel[j] / 255.0), 1.0 / 1.8);			// Gamma correction
-								surface_pixel[j] = (colours[j] * alpha) + (surface_pixel[j] * (1.0 - alpha));	// Alpha blending
+								surface_pixel[j] = (unsigned char)((colours[j] * alpha) + (surface_pixel[j] * (1.0 - alpha)));	// Alpha blending
 							}
 
 							surface_pixel[3] = 0xFF;
@@ -256,7 +257,7 @@ void DrawText(FontObject *font_object, SDL_Surface *surface, int x, int y, unsig
 						if (alpha)
 						{
 							for (unsigned int j = 0; j < 3; ++j)
-								surface_pixel[j] = (colours[j] * alpha) + (surface_pixel[j] * (1.0 - alpha));	// Alpha blending
+								surface_pixel[j] = (unsigned char)((colours[j] * alpha) + (surface_pixel[j] * (1.0 - alpha)));	// Alpha blending
 
 							surface_pixel[3] = 0xFF;
 						}

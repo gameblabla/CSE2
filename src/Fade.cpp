@@ -17,7 +17,7 @@ struct FADE
 	BOOL bMask;
 	int count;
 	char ani_no[FADE_HEIGHT][FADE_WIDTH];
-	BOOLEAN flag[FADE_HEIGHT][FADE_WIDTH];
+	char flag[FADE_HEIGHT][FADE_WIDTH];	// Not a BOOLEAN (those are unsigned)
 	char dir;
 };
 
@@ -269,9 +269,6 @@ void ProcFade()
 								gFade.flag[y][x] = TRUE;
 						}
 					}
-					break;
-					
-				default:
 					break;
 			}
 			

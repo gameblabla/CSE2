@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 
 #include <SDL_rwops.h>
@@ -162,7 +163,7 @@ void ChangeOrganFrequency(uint8_t key, uint8_t track, int32_t a)
 	for (int j = 0; j < 8; j++)
 	{
 		for (int i = 0; i < 2; i++) {
-			int64_t tmpDouble = ((oct_wave[j].wave_size * freq_tbl[key]) * oct_wave[j].oct_par) / 8 + (a - 1000);
+			uint32_t tmpDouble = ((oct_wave[j].wave_size * freq_tbl[key]) * oct_wave[j].oct_par) / 8 + (a - 1000);
 			lpORGANBUFFER[track][j][i]->SetFrequency(tmpDouble);
 		}
 	}
