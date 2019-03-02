@@ -59,13 +59,6 @@ BOOL Flip_SystemTask()
 	//Write to framebuffer
 	uint32_t *pointer = xfb[currentFramebuffer];
 	
-	static uint8_t r = 0;
-	r += 2;
-	static uint8_t g = 0;
-	g += 3;
-	static uint8_t b = 0;
-	b += 4;
-	
 	for (unsigned int y = 0; y < WINDOW_HEIGHT; y++)
 	{
 		for (unsigned int x = 0; x < WINDOW_WIDTH; x += 2)
@@ -260,6 +253,7 @@ void BackupSurface(Surface_Ids surf_no, RECT *rect)
 
 static void DrawBitmap(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_no, bool transparent)
 {
+	/*
 	if (surf[surf_no].data)
 	{
 		//Clip our rect
@@ -284,6 +278,7 @@ static void DrawBitmap(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_
 			}
 		}
 	}
+	*/
 }
 
 void PutBitmap3(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_no) //Transparency
@@ -298,6 +293,7 @@ void PutBitmap4(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_no) //N
 
 void Surface2Surface(int x, int y, RECT *rect, int to, int from)
 {
+	/*
 	if (surf[from].data && surf[to].data)
 	{
 		//Clip our rect
@@ -321,6 +317,7 @@ void Surface2Surface(int x, int y, RECT *rect, int to, int from)
 			}
 		}
 	}
+	*/
 }
 
 unsigned long GetCortBoxColor(unsigned long col)
@@ -331,21 +328,26 @@ unsigned long GetCortBoxColor(unsigned long col)
 
 void CortBox(RECT *rect, uint32_t col)
 {
+	/*
 	const unsigned char col_red = col & 0x0000FF;
 	const unsigned char col_green = (col & 0x00FF00) >> 8;
 	const unsigned char col_blue = (col & 0xFF0000) >> 16;
+	const BUFFER_PIXEL colPixel = {col_red, col_green, col_blue};
 	
 	for (int y = (rect->top < 0 ? 0 : rect->top); y < (rect->bottom >= WINDOW_HEIGHT ? WINDOW_HEIGHT : rect->bottom); y++)
 	{
+		memcpy(screenBuffer, &colPixel, sizeof(BUFFER_PIXEL));
 		for (int x = (rect->left < 0 ? 0 : rect->left); x < (rect->right >= WINDOW_WIDTH ? WINDOW_WIDTH : rect->right); x++)
 		{
 			SET_BUFFER_PIXEL(screenBuffer, WINDOW_WIDTH, x, y, col_red, col_green, col_blue);
 		}
 	}
+	*/
 }
 
 void CortBox2(RECT *rect, uint32_t col, Surface_Ids surf_no)
 {
+	/*
 	if (surf[surf_no].data)
 	{
 		const unsigned char col_red = col & 0x0000FF;
@@ -360,6 +362,7 @@ void CortBox2(RECT *rect, uint32_t col, Surface_Ids surf_no)
 			}
 		}
 	}
+	*/
 }
 
 void InitTextObject()
@@ -369,6 +372,7 @@ void InitTextObject()
 
 void PutText(int x, int y, const char *text, uint32_t color)
 {
+	/*
 	RECT rcCharacter;
 	RECT *rcView = &grcFull;
 	RECT *rect = &rcCharacter;
@@ -409,10 +413,12 @@ void PutText(int x, int y, const char *text, uint32_t color)
 			}
 		}
 	}
+	*/
 }
 
 void PutText2(int x, int y, const char *text, uint32_t color, Surface_Ids surf_no)
 {
+	/*
 	RECT rcCharacter;
 	RECT *rcView = &grcFull;
 	RECT *rect = &rcCharacter;
@@ -453,6 +459,7 @@ void PutText2(int x, int y, const char *text, uint32_t color, Surface_Ids surf_n
 			}
 		}
 	}
+	*/
 }
 
 void EndTextObject()

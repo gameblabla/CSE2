@@ -124,17 +124,17 @@ void SOUNDBUFFER::Mix(int16_t *stream, uint32_t samples)
 
 	for (size_t sample = 0; sample < samples; sample++)
 	{
-		const double freqPosition = frequency / (double)DSP_DEFAULT_FREQ; //This is added to position at the end
+		const double freqPosition = frequency / DSP_DEFAULT_FREQ; //This is added to position at the end
 		
 		//Get the in-between sample this is (linear interpolation)
 		const uint8_t sampleV = data[(size_t)samplePosition];
 		
 		//Convert sample to int16_t
-		const int16_t sampleConvert = (int16_t)(((int8_t)sampleV - 0x80) << 8);
+		const int16_t sampleConvert = ((int16_t)sampleV - 0x80) << 8;
 		
 		//Mix
-		stream[sample * 2] = (int16_t)((double)sampleConvert * volume * volume_l);
-		stream[sample * 2 + 1] = (int16_t)((double)sampleConvert * volume * volume_r);
+		stream[sample * 2]     += (int16_t)((double)sampleConvert * volume * volume_l);
+		stream[sample * 2 + 1] += (int16_t)((double)sampleConvert * volume * volume_r);
 		
 		//Increment position
 		samplePosition += freqPosition;
@@ -143,8 +143,7 @@ void SOUNDBUFFER::Mix(int16_t *stream, uint32_t samples)
 		{
 			if (looping)
 			{
-				while (samplePosition >= size)
-					samplePosition -= size;
+				samplePosition = std::fmod(samplePosition, size);
 				looped = true;
 			}
 			else
@@ -160,8 +159,6 @@ void SOUNDBUFFER::Mix(int16_t *stream, uint32_t samples)
 
 //Sound things
 SOUNDBUFFER* lpSECONDARYBUFFER[SOUND_NO];
-
-#include "Triangle.h"
 
 void StreamCallback(void *audio_buffer, uint32_t len)
 {

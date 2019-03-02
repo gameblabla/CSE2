@@ -3,8 +3,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include <aesndlib.h>
-
 #include "PixTone.h"
 
 class SOUNDBUFFER
