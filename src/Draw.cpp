@@ -101,13 +101,13 @@ BOOL Flip_SystemTask()
 	if ((float)renderer_width / texture_width < (float)renderer_height / texture_height)
 	{
 		dst_rect.w = renderer_width;
-		dst_rect.h = texture_height * (float)renderer_width / texture_width;
+		dst_rect.h = (int)(texture_height * (float)renderer_width / texture_width);
 		dst_rect.x = 0;
 		dst_rect.y = (renderer_height - dst_rect.h) / 2;
 	}
 	else
 	{
-		dst_rect.w = texture_width * (float)renderer_height / texture_height;
+		dst_rect.w = (int)(texture_width * (float)renderer_height / texture_height);
 		dst_rect.h = renderer_height;
 		dst_rect.x = (renderer_width - dst_rect.w) / 2;
 		dst_rect.y = 0;
@@ -280,7 +280,7 @@ static bool LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, bool create_surface)
 		}
 		else
 		{
-			const Sint64 file_size = fp->size(fp);
+			const size_t file_size = (size_t)fp->size(fp);
 			unsigned char *file_buffer = (unsigned char*)malloc(file_size);
 			fp->read(fp, file_buffer, 1, file_size);
 
