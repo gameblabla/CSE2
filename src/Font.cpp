@@ -32,9 +32,6 @@ typedef struct FontObject
 	FT_Library library;
 	FT_Face face;
 	unsigned char *data;
-#ifndef DISABLE_FONT_ANTIALIASING
-	bool lcd_mode;
-#endif
 #ifdef JAPANESE
 	iconv_t conv;
 #endif
@@ -99,10 +96,6 @@ FontObject* LoadFontFromData(const unsigned char *data, size_t data_size, unsign
 	FontObject *font_object = (FontObject*)malloc(sizeof(FontObject));
 
 	FT_Init_FreeType(&font_object->library);
-
-#ifndef DISABLE_FONT_ANTIALIASING
-	font_object->lcd_mode = FT_Library_SetLcdFilter(font_object->library, FT_LCD_FILTER_DEFAULT) != FT_Err_Unimplemented_Feature;
-#endif
 
 	font_object->data = (unsigned char*)malloc(data_size);
 	memcpy(font_object->data, data, data_size);
@@ -211,7 +204,7 @@ void DrawText(FontObject *font_object, SDL_Surface *surface, int x, int y, unsig
 			unsigned int glyph_index = FT_Get_Char_Index(face, val);
 
 #ifndef DISABLE_FONT_ANTIALIASING
-			FT_Load_Glyph(face, glyph_index, FT_LOAD_RENDER | (font_object->lcd_mode ? FT_LOAD_TARGET_LCD : 0));
+			FT_Load_Glyph(face, glyph_index, FT_LOAD_RENDER);
 #else
 			FT_Load_Glyph(face, glyph_index, FT_LOAD_RENDER | FT_LOAD_MONOCHROME);
 #endif
@@ -225,41 +218,24 @@ void DrawText(FontObject *font_object, SDL_Surface *surface, int x, int y, unsig
 
 			for (int iy = MAX(-letter_y, 0); letter_y + iy < MIN(letter_y + (int)converted.rows, surface->h); ++iy)
 			{
-				if (face->glyph->bitmap.pixel_mode == FT_PIXEL_MODE_LCD)
-				{
-					for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)converted.width / 3, surface->w); ++ix)
-					{
-						const unsigned char *font_pixel = converted.buffer + iy * converted.pitch + ix * 3;
-						unsigned char *surface_pixel = (unsigned char*)surface->pixels + (letter_y + iy) * surface->pitch + (letter_x + ix) * 4;
-
-						if (font_pixel[0] || font_pixel[1] || font_pixel[2])
-						{
-							for (unsigned int j = 0; j < 3; ++j)
-							{
-								const double alpha = pow((font_pixel[j] / 255.0), 1.0 / 1.8);			// Gamma correction
-								surface_pixel[j] = (unsigned char)((colours[j] * alpha) + (surface_pixel[j] * (1.0 - alpha)));	// Alpha blending
-							}
-
-							surface_pixel[3] = 0xFF;
-						}
-					}
-				}
-				else if (face->glyph->bitmap.pixel_mode == FT_PIXEL_MODE_GRAY)
+				if (face->glyph->bitmap.pixel_mode == FT_PIXEL_MODE_GRAY)
 				{
 					for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)converted.width, surface->w); ++ix)
 					{
 						const unsigned char font_pixel = converted.buffer[iy * converted.pitch + ix];
 
-						const double alpha = pow((double)font_pixel / (converted.num_grays - 1), 1.0 / 1.8);			// Gamma-corrected
-
 						unsigned char *surface_pixel = (unsigned char*)surface->pixels + (letter_y + iy) * surface->pitch + (letter_x + ix) * 4;
 
-						if (alpha)
+						const double src_alpha = pow((double)font_pixel / (converted.num_grays - 1), 1.0 / 1.8);			// Gamma-corrected
+						const double dst_alpha = surface_pixel[3] / 255.0;
+						const double out_alpha = src_alpha + dst_alpha * (1.0 - src_alpha);
+
+						if (src_alpha)
 						{
 							for (unsigned int j = 0; j < 3; ++j)
-								surface_pixel[j] = (unsigned char)((colours[j] * alpha) + (surface_pixel[j] * (1.0 - alpha)));	// Alpha blending
+								surface_pixel[j] = (unsigned char)(((colours[j] * src_alpha) + (surface_pixel[j] * dst_alpha * (1.0 - src_alpha))));	// Alpha blending
 
-							surface_pixel[3] = 0xFF;
+							surface_pixel[3] = (unsigned char)(out_alpha * 0xFF);
 						}
 					}
 				}
