@@ -1,5 +1,6 @@
 ifeq ($(RELEASE), 1)
-	CXXFLAGS = -O3 -s
+	CXXFLAGS = -O3 -flto
+	LDFLAGS = -s
 	FILENAME_DEF = release
 else
 	CXXFLAGS = -O0 -g
@@ -34,17 +35,13 @@ ifeq ($(WINDOWS), 1)
 	LIBS += -lkernel32
 endif
 
-CXXFLAGS += -std=c++98 `sdl2-config --cflags` `pkg-config freetype2 --cflags` -MMD -MP -MF $@.d  -DLODEPNG_NO_COMPILE_ENCODER -DLODEPNG_NO_COMPILE_ERROR_TEXT -DLODEPNG_NO_COMPILE_CPP
-LIBS += `pkg-config freetype2 --libs`
+CXXFLAGS += -std=c++98 `pkg-config sdl2 --cflags` `pkg-config freetype2 --cflags` -MMD -MP -MF $@.d -DLODEPNG_NO_COMPILE_ENCODER -DLODEPNG_NO_COMPILE_ERROR_TEXT -DLODEPNG_NO_COMPILE_CPP
 
 ifeq ($(STATIC), 1)
-	CXXFLAGS += `sdl2-config --static-libs` -static
-	LIBS += -lharfbuzz -lfreetype -lbz2 -lpng -lz -lgraphite2
-	ifeq ($(WINDOWS), 1)
-		LIBS += -lRpcrt4 -lDwrite -lusp10
-	endif
+	LDFLAGS += -static
+	LIBS += `pkg-config sdl2 --libs --static` `pkg-config freetype2 --libs --static` -lfreetype
 else
-	CXXFLAGS += `sdl2-config --libs`
+	LIBS += `pkg-config sdl2 --libs` `pkg-config freetype2 --libs`
 endif
 
 # For an accurate result to the original's code, compile in alphabetical order
@@ -135,7 +132,8 @@ all: build/$(FILENAME)
 
 build/$(FILENAME): $(OBJECTS)
 	@mkdir -p $(@D)
-	@$(CXX) $(CXXFLAGS) $^ -o $@ $(LIBS)
+	@echo Linking
+	@$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -o $@ $(LIBS)
 	@echo Finished compiling: $@
 
 obj/$(FILENAME)/%.o: src/%.cpp

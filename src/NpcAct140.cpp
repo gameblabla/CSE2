@@ -94,7 +94,7 @@ void ActNpc140(NPCHAR *npc)
 			break;
 
 		case 10:
-			npc->bits = npc->bits;
+			npc->bits = npc->bits;	// Redundant line
 			npc->act_no = 11;
 			npc->ani_no = 0;
 			npc->ani_wait = 0;
@@ -838,7 +838,7 @@ void ActNpc147(NPCHAR *npc)
 				npc->act_no = 4;
 				npc->ani_no = 3;
 				npc->act_wait = 0;
-				npc->act_wait = 0;
+				npc->act_wait = 0;	// Duplicate line
 			}
 
 			break;

@@ -1185,7 +1185,7 @@ void ActNpc193(NPCHAR *npc)
 	{
 		case 0:
 			npc->act_no = 1;
-			npc->y = npc->y;
+			npc->y = npc->y;	// Redundant line
 			npc->x += 0x3000;
 			break;
 	}
