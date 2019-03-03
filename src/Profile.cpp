@@ -139,7 +139,12 @@ bool LoadProfile(char *name)
 	//Check header code
 	fread(profile.code, 8, 1, fp);
 	if (memcmp(profile.code, gProfileCode, 8))
+	{
+#ifdef FIX_BUGS
+		fclose(fp);	// The original game forgets to close the file
+#endif
 		return false;
+	}
 	
 	//Read data
 	fseek(fp, 0, SEEK_SET); //Pixel epic redundant code 😎😎😎
