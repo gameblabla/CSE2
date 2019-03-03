@@ -2,7 +2,9 @@
 #include <stdint.h>
 #include <string.h>
 
+#define BOOL BOOL_OGC
 #include <wiiuse/wpad.h>
+#undef BOOL
 
 #include "WindowsWrapper.h"
 

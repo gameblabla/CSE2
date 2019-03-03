@@ -449,7 +449,7 @@ void ActNpc228(NPCHAR *npc)
 			npc->ani_no = 0;
 			// Fallthrough
 		case 2:
-			if (gMC.x < npc->x)
+			if (npc->x > gMC.x)
 				npc->direct = 0;
 			else
 				npc->direct = 2;
@@ -525,10 +525,12 @@ void ActNpc229(NPCHAR *npc)
 		{0, 112, 48, 128},
 	};
 
-	if (npc->act_no == 0)
+	switch (npc->act_no)
 	{
-		npc->act_no = 1;
-		npc->y -= 0x2000;
+		case 0:
+			npc->act_no = 1;
+			npc->y -= 0x2000;
+			break;
 	}
 
 	if (npc->direct == 0)
@@ -545,11 +547,13 @@ void ActNpc230(NPCHAR *npc)
 		{96, 96, 144, 128},
 	};
 
-	if (npc->act_no == 0)
+	switch (npc->act_no)
 	{
-		npc->act_no = 1;
-		npc->x -= 0x2000;
-		npc->y -= 0x2000;
+		case 0:
+			npc->act_no = 1;
+			npc->x -= 0x2000;
+			npc->y -= 0x2000;
+			break;
 	}
 
 	if (npc->direct == 0)
@@ -561,6 +565,8 @@ void ActNpc230(NPCHAR *npc)
 //Rocket
 void ActNpc231(NPCHAR *npc)
 {
+	int i;
+
 	RECT rc[2] = {
 		{176, 32, 208, 48},
 		{176, 48, 208, 64},
@@ -599,7 +605,7 @@ void ActNpc231(NPCHAR *npc)
 			npc->act_wait = 0;
 			npc->ani_no = 1;
 
-			for (int i = 0; i < 10; ++i)
+			for (i = 0; i < 10; ++i)
 			{
 				SetNpChar(4, npc->x + (Random(-16, 16) * 0x200), npc->y + (Random(-8, 8) * 0x200), 0, 0, 0, 0, 0x100);
 				PlaySoundObject(12, 1);	// Wait, it does this in a loop?
@@ -625,7 +631,7 @@ void ActNpc231(NPCHAR *npc)
 
 				npc->act_no = 15;
 
-				for (int i = 0; i < 6; ++i)
+				for (i = 0; i < 6; ++i)
 				{
 					SetNpChar(4, npc->x + (Random(-16, 16) * 0x200), npc->y + (Random(-8, 8) * 0x200), 0, 0, 0, 0, 0x100);
 					PlaySoundObject(12, 1);
@@ -641,9 +647,9 @@ void ActNpc231(NPCHAR *npc)
 			if (npc->ym < 0)
 			{
 				if (npc->act_wait % 8 == 0)
-					SetCaret(npc->x - 5120, npc->y + 0x1000, 7, 3);
+					SetCaret(npc->x - 0x1400, npc->y + 0x1000, 7, 3);
 				if (npc->act_wait % 8 == 4)
-					SetCaret(npc->x + 5120, npc->y + 0x1000, 7, 3);
+					SetCaret(npc->x + 0x1400, npc->y + 0x1000, 7, 3);
 				if (npc->act_wait % 16 == 1)
 					PlaySoundObject(34, 1);
 			}
@@ -671,6 +677,8 @@ void ActNpc231(NPCHAR *npc)
 //Orangebell
 void ActNpc232(NPCHAR *npc)
 {
+	int i;
+
 	switch (npc->act_no)
 	{
 		case 0:
@@ -679,7 +687,7 @@ void ActNpc232(NPCHAR *npc)
 			npc->tgt_y = npc->y;
 			npc->ym = 0x200;
 
-			for (int i = 0; i < 8; ++i)
+			for (i = 0; i < 8; ++i)
 				SetNpChar(233, npc->x, npc->y, 0, 0, npc->direct, npc, 0x100);
 			// Fallthrough
 		case 1:
@@ -693,7 +701,7 @@ void ActNpc232(NPCHAR *npc)
 			else
 				npc->xm = 0x100;
 
-			if (npc->tgt_y > npc->y)
+			if (npc->y < npc->tgt_y)
 				npc->ym += 8;
 			else
 				npc->ym -= 8;
@@ -765,9 +773,9 @@ void ActNpc233(NPCHAR *npc)
 			if (npc->tgt_x > npc->x)
 				npc->xm += 8;
 
-			if (npc->count2 + npc->tgt_y < npc->y)
+			if (npc->tgt_y + npc->count2 < npc->y)
 				npc->ym -= 0x20;
-			if (npc->count2 + npc->tgt_y > npc->y)
+			if (npc->tgt_y + npc->count2 > npc->y)
 				npc->ym += 0x20;
 
 			if (npc->xm > 0x400)
@@ -786,7 +794,7 @@ void ActNpc233(NPCHAR *npc)
 			}
 			else
 			{
-				if (gMC.x > npc->x - 0x1000 && gMC.x < npc->x + 0x1000 && gMC.y > npc->y && gMC.y < npc->y + 0x16000)
+				if (npc->x - 0x1000 < gMC.x && npc->x + 0x1000 > gMC.x && npc->y < gMC.y && npc->y + 0x16000 > gMC.y)
 				{
 					npc->xm /= 4;
 					npc->ym = 0;
@@ -861,10 +869,12 @@ void ActNpc234(NPCHAR *npc)
 		{144, 112, 192, 128},
 	};
 
-	if (npc->act_no == 0)
+	switch (npc->act_no)
 	{
-		npc->act_no = 1;
-		npc->y += 0x2000;
+		case 0:
+			npc->act_no = 1;
+			npc->y += 0x2000;
+			break;
 	}
 
 	if (npc->direct == 0)
@@ -942,7 +952,7 @@ void ActNpc235(NPCHAR *npc)
 				npc->direct = 0;
 
 			if (npc->direct == 0)
-				npc->xm = -0x400u;
+				npc->xm = -0x400;
 			else
 				npc->xm = 0x400;
 
@@ -1023,7 +1033,7 @@ void ActNpc236(NPCHAR *npc)
 			break;
 
 		case 2:
-			if (gMC.x > npc->x)
+			if (npc->x < gMC.x)
 				npc->direct = 2;
 			else
 				npc->direct = 0;
@@ -1095,7 +1105,7 @@ void ActNpc236(NPCHAR *npc)
 			break;
 	}
 
-	if (npc->tgt_y > npc->y)
+	if (npc->y < npc->tgt_y)
 		npc->ym += 0x10;
 	else
 		npc->ym -= 0x10;
@@ -1116,6 +1126,8 @@ void ActNpc236(NPCHAR *npc)
 //Gunfish projectile
 void ActNpc237(NPCHAR *npc)
 {
+	int i;
+
 	RECT rc = {312, 32, 320, 40};
 
 	switch (npc->act_no)
@@ -1124,21 +1136,22 @@ void ActNpc237(NPCHAR *npc)
 			npc->act_no = 1;
 			// Fallthrough
 		case 1:
-			bool bHit = false;
+			BOOL bHit = FALSE;
 			++npc->act_wait;
 
 			if (npc->flag & 0xFF)
-				bHit = true;
+				bHit = TRUE;
 			if (npc->act_wait > 10 && npc->flag & 0x100)
-				bHit = true;
+				bHit = TRUE;
 
 			if (bHit)
 			{
-				for (int i = 0; i < 5; ++i)
+				for (i = 0; i < 5; ++i)
 					SetCaret(npc->x, npc->y, 1, 0);
 
 				PlaySoundObject(21, 1);
 				npc->cond = 0;
+				return;
 			}
 
 			break;
@@ -1257,22 +1270,25 @@ void ActNpc239(NPCHAR *npc)
 	RECT rcLeft = {192, 48, 256, 80};
 	RECT rcRight = {96, 112, 144, 144};
 
-	if (npc->act_no == 0)
+	switch (npc->act_no)
 	{
-		npc->act_no = 1;
+		case 0:
+			npc->act_no = 1;
 
-		if (npc->direct == 0)
-		{
-			npc->x += 0x1000;
-			npc->y += 0x2000;
-		}
-		else
-		{
-			npc->view.front = 0x3000;
-			npc->view.back = 0x3000;
-			npc->view.top = 0x1000;
-			npc->view.back = 0x3000;
-		}
+			if (npc->direct == 0)
+			{
+				npc->x += 0x1000;
+				npc->y += 0x2000;
+			}
+			else
+			{
+				npc->view.front = 0x3000;
+				npc->view.back = 0x3000;
+				npc->view.top = 0x1000;
+				npc->view.back = 0x3000;
+			}
+
+			break;
 	}
 
 	if (npc->direct == 0)

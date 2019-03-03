@@ -34,6 +34,31 @@ BOOL InitBack(const char *fName, int type)
 			return FALSE;
 	}
 
+#ifdef NONPORTABLE
+	// This is ridiculously platform-dependant:
+	// It should break on big-endian CPUs, and platforms
+	// where short isn't 16-bit and long isn't 32-bit.
+	short bmp_header_buffer[7];
+	long bmp_header_buffer2[10];
+
+	fread(bmp_header_buffer, 14, 1, fp);
+
+	// Check if this is a valid bitmap file
+	if (bmp_header_buffer[0] != 0x4D42)	// 'MB' (we use hex to prevent a compiler warning)
+	{
+#ifdef FIX_BUGS
+		// The original game forgets to close fp
+		fclose(fp);
+#endif
+		return FALSE;
+	}
+
+	fread(bmp_header_buffer2, 40, 1, fp);
+	fclose(fp);
+
+	gBack.partsW = bmp_header_buffer2[1];
+	gBack.partsH = bmp_header_buffer2[2];
+#else
 	if (fgetc(fp) != 'B' || fgetc(fp) != 'M')
 	{
 		fclose(fp);
@@ -45,6 +70,7 @@ BOOL InitBack(const char *fName, int type)
 	gBack.partsW = File_ReadLE32(fp);
 	gBack.partsH = File_ReadLE32(fp);
 	fclose(fp);
+#endif
 
 	//Set background stuff and load texture
 	gBack.flag = 1;
@@ -118,7 +144,7 @@ void PutBack(int fx, int fy)
 			for (int y = 0; y < WINDOW_HEIGHT - 240 + 88; y += 88)
 			{
 				fillNext = ((fillNext) * 214013 + 2531011);
-				for (int x = -(fillNext % 149); x < WINDOW_WIDTH; x += 149)
+				for (int x = -(int)(fillNext % 149); x < WINDOW_WIDTH; x += 149)
 				{
 					PutBitmap4(&grcGame, x, y, &rcSkyFiller, SURFACE_ID_LEVEL_BACKGROUND);
 				}

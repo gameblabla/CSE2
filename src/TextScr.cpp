@@ -668,7 +668,10 @@ int TextScriptProc()
 						x = GetTextScriptNo(gTS.p_read + 14);
 						y = GetTextScriptNo(gTS.p_read + 19);
 						if (!TransferStage(z, w, x, y))
+						{
+						//	MessageBoxA(hWnd, "âXâeü[âWé¦ôÃé¦ì×é¦é+Ä©ös", "âGâëü[", 0);
 							return 0;
+						}
 					}
 					else if (IS_COMMAND('M','O','V'))
 					{

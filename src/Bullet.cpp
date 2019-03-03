@@ -2,6 +2,8 @@
 
 #include <string.h>
 
+#include "WindowsWrapper.h"
+
 #include "Draw.h"
 #include "Caret.h"
 #include "Game.h"
@@ -286,7 +288,7 @@ void ActBullet_Frontia2(BULLET *bul, int level)
 						if (bul->xm < 0)
 							bul->xm = 0x400;
 						else
-							bul->xm = -0x400u;
+							bul->xm = -0x400;
 					}
 
 					break;
@@ -2397,7 +2399,7 @@ void ActBullet()
 	}
 }
 
-bool IsActiveSomeBullet(void)
+BOOL IsActiveSomeBullet(void)
 {
 	for (int i = 0; i < 0x40; ++i)
 	{
@@ -2421,10 +2423,10 @@ bool IsActiveSomeBullet(void)
 				case 0x1F:
 				case 0x20:
 				case 0x21:
-					return true;
+					return TRUE;
 			}
 		}
 	}
 
-	return false;
+	return FALSE;
 }

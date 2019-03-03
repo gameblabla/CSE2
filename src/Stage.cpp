@@ -129,7 +129,7 @@ const STAGE_TABLE gTMT[95] = {
 	STAGE_ENTRY("Oside", "Clock", 6, "bkMoon", "Moon", "0", 0, "Clock Room", "ŽžŒv‰®"),
 };
 
-bool TransferStage(int no, int w, int x, int y)
+BOOL TransferStage(int no, int w, int x, int y)
 {
 	FILE *errorLog = fopen("sd:/cse2/error.log", "wb");
 	char errorMsg[0x400];
@@ -137,7 +137,7 @@ bool TransferStage(int no, int w, int x, int y)
 	//Move character
 	SetMyCharPosition(x << 13, y << 13);
 	
-	bool bError = false;
+	BOOL bError = FALSE;
 	
 	//Get path
 	char path_dir[20];
@@ -150,7 +150,7 @@ bool TransferStage(int no, int w, int x, int y)
 	{
 		sprintf(errorMsg, "Couldn't open tileset %s\n", gTMT[no].parts);
 		fwrite(errorMsg, strlen(errorMsg), 1, errorLog);
-		bError = true;
+		bError = TRUE;
 	}
 
 	sprintf(path, "%s/%s.pxa", path_dir, gTMT[no].parts);
@@ -158,7 +158,7 @@ bool TransferStage(int no, int w, int x, int y)
 	{
 		sprintf(errorMsg, "Couldn't open tileset attributes %s\n", gTMT[no].parts);
 		fwrite(errorMsg, strlen(errorMsg), 1, errorLog);
-		bError = true;
+		bError = TRUE;
 	}
 	
 	//Load tilemap
@@ -167,7 +167,7 @@ bool TransferStage(int no, int w, int x, int y)
 	{
 		sprintf(errorMsg, "Couldn't open map data %s\n", gTMT[no].map);
 		fwrite(errorMsg, strlen(errorMsg), 1, errorLog);
-		bError = true;
+		bError = TRUE;
 	}
 
 	//Load NPCs
@@ -176,7 +176,7 @@ bool TransferStage(int no, int w, int x, int y)
 	{
 		sprintf(errorMsg, "Couldn't open events %s\n", gTMT[no].map);
 		fwrite(errorMsg, strlen(errorMsg), 1, errorLog);
-		bError = true;
+		bError = TRUE;
 	}
 
 	//Load script
@@ -185,7 +185,7 @@ bool TransferStage(int no, int w, int x, int y)
 	{
 		sprintf(errorMsg, "Couldn't open text script %s\n", gTMT[no].map);
 		fwrite(errorMsg, strlen(errorMsg), 1, errorLog);
-		bError = true;
+		bError = TRUE;
 	}
 	
 	//Load background
@@ -194,7 +194,7 @@ bool TransferStage(int no, int w, int x, int y)
 	{
 		sprintf(errorMsg, "Couldn't open background %s\n", gTMT[no].back);
 		fwrite(errorMsg, strlen(errorMsg), 1, errorLog);
-		bError = true;
+		bError = TRUE;
 	}
 	
 	//Get path
@@ -206,7 +206,7 @@ bool TransferStage(int no, int w, int x, int y)
 	{
 		sprintf(errorMsg, "Couldn't open npc sprite sheet %s\n", gTMT[no].npc);
 		fwrite(errorMsg, strlen(errorMsg), 1, errorLog);
-		bError = true;
+		bError = TRUE;
 	}
 	
 	sprintf(path, "%s/Npc%s", path_dir, gTMT[no].boss);
@@ -214,7 +214,7 @@ bool TransferStage(int no, int w, int x, int y)
 	{
 		sprintf(errorMsg, "Couldn't open boss sprite sheet %s\n", gTMT[no].npc);
 		fwrite(errorMsg, strlen(errorMsg), 1, errorLog);
-		bError = true;
+		bError = TRUE;
 	}
 	
 	fclose(errorLog);
@@ -222,7 +222,7 @@ bool TransferStage(int no, int w, int x, int y)
 	if (bError)
 	{
 		printf("Failed to load stage %d\n", no);
-		return false;
+		return FALSE;
 	}
 	else
 	{
@@ -238,10 +238,10 @@ bool TransferStage(int no, int w, int x, int y)
 		InitBossChar(gTMT[no].boss_no);
 		ResetFlash();
 		gStageNo = no;
-		return true;
+		return TRUE;
 	}
 	
-	return false;
+	return FALSE;
 }
 
 //Music

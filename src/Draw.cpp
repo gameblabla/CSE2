@@ -4,7 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define BOOL BOOL_OGC
 #include <gccore.h>
+#undef BOOL
 
 #include "EasyBMP/EasyBMP_DataStructures.h"
 #include "EasyBMP/EasyBMP_BMP.h"

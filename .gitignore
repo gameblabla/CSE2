@@ -40,3 +40,10 @@ build.zip
 *.exe
 *.out
 *.app
+
+# MSVC trash
+msvc2003/CSE2.ncb
+msvc2003/CSE2.suo
+msvc2003/Debug
+msvc2003/Release
+*.aps

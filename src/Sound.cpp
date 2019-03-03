@@ -92,7 +92,7 @@ float MillibelToVolume(int32_t lVolume)
 {
 	//Volume is in hundredths of decibels, from 0 to -10000
 	lVolume = clamp(lVolume, (int32_t)-10000, (int32_t)0);
-	return pow(10.0, lVolume / 2000.0);
+	return (float)pow(10.0, lVolume / 2000.0);
 }
 
 void SOUNDBUFFER::SetVolume(int32_t lVolume)
@@ -246,7 +246,7 @@ void ChangeSoundPan(int no, int32_t pan)
 
 size_t MakePixToneObject(const PIXTONEPARAMETER *ptp, int ptp_num, int no)
 {
-	size_t sample_count = 0;
+	int sample_count = 0;
 	for (int i = 0; i < ptp_num; ++i)
 	{
 		if (ptp[i].size > sample_count)

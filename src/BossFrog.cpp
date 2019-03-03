@@ -187,7 +187,7 @@ void ActBossChar_Frog(void)
 				PlaySoundObject(25, 1);
 
 				if (gBoss->direct == 0)
-					gBoss->xm = -0x200u;
+					gBoss->xm = -0x200;
 				else
 					gBoss->xm = 0x200;
 

@@ -18,7 +18,7 @@ struct FADE
 	BOOL bMask;
 	int count;
 	char *ani_no; //char ani_no[FADE_HEIGHT][FADE_WIDTH];
-	BOOLEAN *flag; //BOOLEAN flag[FADE_HEIGHT][FADE_WIDTH];
+	char *flag; //char flag[FADE_HEIGHT][FADE_WIDTH];	// Not a BOOLEAN (those are unsigned)
 	char dir;
 };
 
@@ -33,7 +33,7 @@ void InitFade()
 	memset(&gFade, 0, sizeof(FADE));
 	
 	gFade.ani_no = (char*)malloc(FADE_WIDTH * FADE_HEIGHT * sizeof(char));
-	gFade.flag = (BOOLEAN*)malloc(FADE_WIDTH * FADE_HEIGHT * sizeof(BOOLEAN));
+	gFade.flag = (char*)malloc(FADE_WIDTH * FADE_HEIGHT * sizeof(char));
 	
 	mask_color = GetCortBoxColor(RGB(0, 0, 0x20));
 }
@@ -277,9 +277,6 @@ void ProcFade()
 								gFade.flag[y * FADE_WIDTH + x] = TRUE;
 						}
 					}
-					break;
-					
-				default:
 					break;
 			}
 			

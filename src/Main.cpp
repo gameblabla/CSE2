@@ -2,9 +2,12 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 
+#define BOOL BOOL_OGC
 #include <fat.h>
+#undef BOOL
 
 #include "WindowsWrapper.h"
 

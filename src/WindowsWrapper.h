@@ -3,13 +3,7 @@
 int rep_rand();
 void rep_srand(unsigned int seed);
 
-#ifndef BOOLEAN
-	#define BOOL int
-#endif
-
-#ifndef BOOLEAN
-	#define BOOLEAN unsigned char
-#endif
+typedef int BOOL;
 
 #ifndef FALSE
 	#define FALSE 0

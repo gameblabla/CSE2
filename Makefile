@@ -95,6 +95,7 @@ all: build/$(FILENAME).elf
 
 build/$(FILENAME).elf: $(OBJECTS)
 	@mkdir -p $(@D)
+	@echo Linking
 	@$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -o $@ $(LIBS)
 	@echo Finished compiling: $@
 	elf2dol build/$(FILENAME).elf build/boot.dol
