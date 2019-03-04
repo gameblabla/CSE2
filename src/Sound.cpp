@@ -13,6 +13,8 @@
 
 #define clamp(x, y, z) ((x > z) ? z : (x < y) ? y : x)
 
+static long mixer_buffer[SND_BUFFERSIZE / 2];
+
 //Keep track of all existing sound buffers
 SOUNDBUFFER *soundBuffers;
 
@@ -117,7 +119,7 @@ void SOUNDBUFFER::Stop()
 	playing = false;
 }
 
-void SOUNDBUFFER::Mix(int16_t *stream, uint32_t samples)
+void SOUNDBUFFER::Mix(long *stream, uint32_t samples)
 {
 	if (!playing) //This sound buffer isn't playing
 		return;
@@ -127,14 +129,19 @@ void SOUNDBUFFER::Mix(int16_t *stream, uint32_t samples)
 		const double freqPosition = frequency / DSP_DEFAULT_FREQ; //This is added to position at the end
 		
 		//Get the in-between sample this is (linear interpolation)
-		const uint8_t sampleV = data[(size_t)samplePosition];
-		
-		//Convert sample to int16_t
-		const int16_t sampleConvert = ((int16_t)sampleV - 0x80) << 8;
-		
+		const uint8_t sample1 = ((looped || ((size_t)samplePosition) >= 1) ? data[(size_t)samplePosition] : 0x80);
+		const uint8_t sample2 = ((looping || (((size_t)samplePosition) + 1) < size) ? data[(((size_t)samplePosition) + 1) % size] : 0x80);
+
+		//Interpolate sample
+		const float subPos = (float)std::fmod(samplePosition, 1.0);
+		const uint8_t sampleA = sample1 + (sample2 - sample1) * subPos;
+
+		//Convert sample to int8_t
+		const int8_t sampleConvert = (sampleA - 0x80);
+
 		//Mix
-		stream[sample * 2]     += (int16_t)((double)sampleConvert * volume * volume_l);
-		stream[sample * 2 + 1] += (int16_t)((double)sampleConvert * volume * volume_r);
+		stream[sample * 2] += (long)(sampleConvert * volume * volume_l);
+		stream[sample * 2 + 1] += (long)(sampleConvert * volume * volume_r);
 		
 		//Increment position
 		samplePosition += freqPosition;
@@ -164,12 +171,16 @@ void StreamCallback(void *audio_buffer, uint32_t len)
 {
 	int16_t *stream = (int16_t*)audio_buffer;
 	uint32_t samples = len / 4;
-	
-	memset(stream, 0, len);
-	
+
+	for (unsigned int i = 0; i < len / 2; ++i)
+		mixer_buffer[i] = 0;
+
 	//Mix sounds to primary buffer
 	for (SOUNDBUFFER *sound = soundBuffers; sound != NULL; sound = sound->next)
-		sound->Mix(stream, samples);
+		sound->Mix(mixer_buffer, samples);
+
+	for (unsigned int i = 0; i < len / 2; ++i)
+		stream[i] = (int16_t)(clamp(mixer_buffer[i], -0xFF, 0xFF) << 8);
 
 	DCFlushRange(audio_buffer, len);
 	
