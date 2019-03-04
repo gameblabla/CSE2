@@ -233,7 +233,6 @@ BOOL ReloadBitmap_Resource(const char *res, Surface_Ids surf_no)
 
 void BackupSurface(Surface_Ids surf_no, RECT *rect)
 {
-	/*
 	for (int fx = rect->left; fx < rect->right; fx++)
 	{
 		for (int fy = rect->top; fy < rect->bottom; fy++)
@@ -250,12 +249,10 @@ void BackupSurface(Surface_Ids surf_no, RECT *rect)
 			SET_BUFFER_PIXEL(surf[surf_no].data, surf[surf_no].w, dx, dy, fromPixel->r, fromPixel->g, fromPixel->b);
 		}
 	}
-	*/
 }
 
 static void DrawBitmap(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_no, bool transparent)
 {
-	/*
 	if (surf[surf_no].data)
 	{
 		//Clip our rect
@@ -280,7 +277,6 @@ static void DrawBitmap(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_
 			}
 		}
 	}
-	*/
 }
 
 void PutBitmap3(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_no) //Transparency
@@ -295,7 +291,6 @@ void PutBitmap4(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_no) //N
 
 void Surface2Surface(int x, int y, RECT *rect, int to, int from)
 {
-	/*
 	if (surf[from].data && surf[to].data)
 	{
 		//Clip our rect
@@ -319,7 +314,6 @@ void Surface2Surface(int x, int y, RECT *rect, int to, int from)
 			}
 		}
 	}
-	*/
 }
 
 unsigned long GetCortBoxColor(unsigned long col)
@@ -330,7 +324,6 @@ unsigned long GetCortBoxColor(unsigned long col)
 
 void CortBox(RECT *rect, uint32_t col)
 {
-	/*
 	const unsigned char col_red = col & 0x0000FF;
 	const unsigned char col_green = (col & 0x00FF00) >> 8;
 	const unsigned char col_blue = (col & 0xFF0000) >> 16;
@@ -344,12 +337,10 @@ void CortBox(RECT *rect, uint32_t col)
 			SET_BUFFER_PIXEL(screenBuffer, WINDOW_WIDTH, x, y, col_red, col_green, col_blue);
 		}
 	}
-	*/
 }
 
 void CortBox2(RECT *rect, uint32_t col, Surface_Ids surf_no)
 {
-	/*
 	if (surf[surf_no].data)
 	{
 		const unsigned char col_red = col & 0x0000FF;
@@ -364,7 +355,6 @@ void CortBox2(RECT *rect, uint32_t col, Surface_Ids surf_no)
 			}
 		}
 	}
-	*/
 }
 
 void InitTextObject()
@@ -374,7 +364,6 @@ void InitTextObject()
 
 void PutText(int x, int y, const char *text, uint32_t color)
 {
-	/*
 	RECT rcCharacter;
 	RECT *rcView = &grcFull;
 	RECT *rect = &rcCharacter;
@@ -415,12 +404,10 @@ void PutText(int x, int y, const char *text, uint32_t color)
 			}
 		}
 	}
-	*/
 }
 
 void PutText2(int x, int y, const char *text, uint32_t color, Surface_Ids surf_no)
 {
-	/*
 	RECT rcCharacter;
 	RECT *rcView = &grcFull;
 	RECT *rect = &rcCharacter;
@@ -461,7 +448,6 @@ void PutText2(int x, int y, const char *text, uint32_t color, Surface_Ids surf_n
 			}
 		}
 	}
-	*/
 }
 
 void EndTextObject()
