@@ -170,6 +170,8 @@ void StreamCallback(void *audio_buffer, uint32_t len)
 	//Mix sounds to primary buffer
 	for (SOUNDBUFFER *sound = soundBuffers; sound != NULL; sound = sound->next)
 		sound->Mix(stream, samples);
+
+	DCFlushRange(audio_buffer, len);
 	
 	//Play organya
 	gOrgTimer += samples;
