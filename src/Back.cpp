@@ -172,32 +172,41 @@ void PutBack(int fx, int fy)
 
 void PutFront(int fx, int fy)
 {
+	int x;
+	int y;
+	int xpos;
+	int ypos;
+	int x_1;
+	int x_2;
+	int y_1;
+	int y_2;
+
 	RECT rcWater[2] = {{0, 0, 32, 16}, {0, 16, 32, 48}};
 
 	switch (gBack.type)
 	{
 		case 3:
-			int x_1 = fx / 0x4000;
-			int x_2 = x_1 + (((WINDOW_WIDTH + 31) >> 5) + 1);
-			int y_1 = 0;
-			int y_2 = y_1 + 32;
+			x_1 = fx / 0x4000;
+			x_2 = x_1 + (((WINDOW_WIDTH + 31) >> 5) + 1);
+			y_1 = 0;
+			y_2 = y_1 + 32;
 			
-			for (int y = y_1; y < y_2; y++)
+			for (y = y_1; y < y_2; y++)
 			{
-				int ypos = (y * 0x20 * 0x200) / 0x200 - fy / 0x200 + gWaterY / 0x200;
+				ypos = (y * 0x20 * 0x200) / 0x200 - fy / 0x200 + gWaterY / 0x200;
 				
 				if (ypos < -32)
-					break;
+					continue;
 
 				if (ypos > WINDOW_HEIGHT)
 					break;
 					
-				for (int x = x_1; x < x_2; x++)
+				for (x = x_1; x < x_2; x++)
 				{
-					int xpos = (x * 0x20 * 0x200) / 0x200 - fx / 0x200;
+					xpos = (x * 0x20 * 0x200) / 0x200 - fx / 0x200;
 					PutBitmap3(&grcGame, xpos, ypos, &rcWater[1], SURFACE_ID_LEVEL_BACKGROUND);
 					if (!y)
-						PutBitmap3(&grcGame, xpos, ypos, rcWater, SURFACE_ID_LEVEL_BACKGROUND);
+						PutBitmap3(&grcGame, xpos, ypos, &rcWater[0], SURFACE_ID_LEVEL_BACKGROUND);
 				}
 			}
 
