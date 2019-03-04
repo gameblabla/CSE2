@@ -41,9 +41,9 @@ YUVColour RGBToYUV(uint8_t red, uint8_t green, uint8_t blue)
 	return yuv;
 }
 
-#define SET_BUFFER_PIXEL(buffer, w, x, y, sr, sg, sb)	buffer[y * w + x].r = sr; \
-														buffer[y * w + x].g = sg; \
-														buffer[y * w + x].b = sb;
+#define SET_BUFFER_PIXEL(buffer, w, x, y, sr, sg, sb)    buffer[y * w + x].r = sr; \
+                                                         buffer[y * w + x].g = sg; \
+                                                         buffer[y * w + x].b = sb;
 
 //Frame-buffers and screen mode
 uint32_t *xfb[2];
