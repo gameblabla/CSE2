@@ -226,16 +226,16 @@ void DrawText(FontObject *font_object, SDL_Surface *surface, int x, int y, unsig
 
 						unsigned char *surface_pixel = (unsigned char*)surface->pixels + (letter_y + iy) * surface->pitch + (letter_x + ix) * 4;
 
-						const double src_alpha = pow((double)font_pixel / (converted.num_grays - 1), 1.0 / 1.8);			// Gamma-corrected
-						const double dst_alpha = surface_pixel[3] / 255.0;
-						const double out_alpha = src_alpha + dst_alpha * (1.0 - src_alpha);
+						const double src_alpha = (double)font_pixel / (converted.num_grays - 1);
 
 						if (src_alpha)
 						{
-							for (unsigned int j = 0; j < 3; ++j)
-								surface_pixel[j] = (unsigned char)(((colours[j] * src_alpha) + (surface_pixel[j] * dst_alpha * (1.0 - src_alpha))));	// Alpha blending
+							const double dst_alpha = surface_pixel[3] / 255.0;
 
-							surface_pixel[3] = (unsigned char)(out_alpha * 0xFF);
+							for (unsigned int j = 0; j < 3; ++j)
+								surface_pixel[j] = (unsigned char)pow(pow(colours[j], 1.8) * src_alpha + pow(surface_pixel[j], 1.8) * dst_alpha * (1.0 - src_alpha), 1.0 / 1.8);			// Gamma-corrected alpha blending
+
+							surface_pixel[3] = (unsigned char)((src_alpha + dst_alpha * (1.0 - src_alpha)) * 255.0);
 						}
 					}
 				}
