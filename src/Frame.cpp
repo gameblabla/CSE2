@@ -16,6 +16,39 @@ void MoveFrame3()
 	int16_t map_w, map_l;
 	GetMapData(0, &map_w, &map_l);
 
+#if WINDOW_WIDTH != 320 || WINDOW_HEIGHT != 240	// TODO - Really need to make this a compiler flag
+	// Widescreen/tallscreen-safe behaviour
+	if (map_w * 0x10 < WINDOW_WIDTH)
+	{
+		gFrame.x = -((WINDOW_WIDTH - map_w * 0x10) * 0x200 / 2);
+	}
+	else
+	{
+		gFrame.x += (*gFrame.tgt_x - (WINDOW_WIDTH * 0x100) - gFrame.x) / gFrame.wait;
+
+		if (gFrame.x / 0x200 < 0)
+			gFrame.x = 0;
+
+		if (gFrame.x > ((map_w - 1) * 0x10 - WINDOW_WIDTH) * 0x200)
+			gFrame.x = ((map_w - 1) * 0x10 - WINDOW_WIDTH) * 0x200;
+	}
+
+	if (map_l * 0x10 < WINDOW_HEIGHT)
+	{
+		gFrame.y = -((WINDOW_HEIGHT - map_l * 0x10) * 0x200 / 2);
+	}
+	else
+	{
+		gFrame.y += (*gFrame.tgt_y - (WINDOW_HEIGHT * 0x100) - gFrame.y) / gFrame.wait;
+
+		if (gFrame.y / 0x200 < 0)
+			gFrame.y = 0;
+
+		if (gFrame.y > ((map_l - 1) * 0x10 - WINDOW_HEIGHT) * 0x200)
+			gFrame.y = ((map_l - 1) * 0x10 - WINDOW_HEIGHT) * 0x200;
+	}
+#else
+	// Vanilla behaviour
 	gFrame.x += (*gFrame.tgt_x - (WINDOW_WIDTH * 0x100) - gFrame.x) / gFrame.wait;
 	gFrame.y += (*gFrame.tgt_y - (WINDOW_HEIGHT * 0x100) - gFrame.y) / gFrame.wait;
 
@@ -28,6 +61,7 @@ void MoveFrame3()
 		gFrame.x = ((map_w - 1) * 0x10 - WINDOW_WIDTH) * 0x200;
 	if (gFrame.y > ((map_l - 1) * 0x10 - WINDOW_HEIGHT) * 0x200)
 		gFrame.y = ((map_l - 1) * 0x10 - WINDOW_HEIGHT) * 0x200;
+#endif
 
 	//Quake
 	if (gFrame.quake2)
