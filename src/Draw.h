@@ -47,7 +47,7 @@ typedef enum Surface_Ids
 	SURFACE_ID_CREDIT_CAST = 35,
 	SURFACE_ID_CREDITS_IMAGE = 36,
 	SURFACE_ID_CASTS = 37,
-	SURFACE_ID_MAX = 40,
+	SURFACE_ID_MAX = 40
 } Surface_Ids;
 
 struct SURFACE;
