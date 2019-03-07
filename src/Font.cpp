@@ -223,63 +223,73 @@ void DrawText(FontObject *font_object, SDL_Surface *surface, int x, int y, unsig
 			const int letter_x = x + pen_x + face->glyph->bitmap_left;
 			const int letter_y = y + ((FT_MulFix(face->ascender, face->size->metrics.y_scale) - face->glyph->metrics.horiBearingY + (64 / 2)) / 64);
 
-			for (int iy = MAX(-letter_y, 0); letter_y + iy < MIN(letter_y + (int)converted.rows, surface->h); ++iy)
+			switch (face->glyph->bitmap.pixel_mode)
 			{
-				if (face->glyph->bitmap.pixel_mode == FT_PIXEL_MODE_LCD)
-				{
-					for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)converted.width / 3, surface->w); ++ix)
+				case FT_PIXEL_MODE_LCD:
+					for (int iy = MAX(-letter_y, 0); letter_y + iy < MIN(letter_y + (int)converted.rows, surface->h); ++iy)
 					{
-						const unsigned char *font_pixel = converted.buffer + iy * converted.pitch + ix * 3;
-						unsigned char *surface_pixel = (unsigned char*)surface->pixels + (letter_y + iy) * surface->pitch + (letter_x + ix) * 4;
-
-						if (font_pixel[0] || font_pixel[1] || font_pixel[2])
+						for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)converted.width / 3, surface->w); ++ix)
 						{
-							for (unsigned int j = 0; j < 3; ++j)
+							const unsigned char *font_pixel = converted.buffer + iy * converted.pitch + ix * 3;
+
+							if (font_pixel[0] || font_pixel[1] || font_pixel[2])
 							{
-								const double alpha = pow((font_pixel[j] / 255.0), 1.0 / 1.8);			// Gamma correction
-								surface_pixel[j] = (unsigned char)((colours[j] * alpha) + (surface_pixel[j] * (1.0 - alpha)));	// Alpha blending
+								unsigned char *surface_pixel = (unsigned char*)surface->pixels + (letter_y + iy) * surface->pitch + (letter_x + ix) * 4;
+
+								for (unsigned int j = 0; j < 3; ++j)
+								{
+									const double alpha = pow((font_pixel[j] / 255.0), 1.0 / 1.8);			// Gamma correction
+									surface_pixel[j] = (unsigned char)((colours[j] * alpha) + (surface_pixel[j] * (1.0 - alpha)));	// Alpha blending
+								}
+
+								surface_pixel[3] = 0xFF;
 							}
-
-							surface_pixel[3] = 0xFF;
 						}
 					}
-				}
-				else if (face->glyph->bitmap.pixel_mode == FT_PIXEL_MODE_GRAY)
-				{
-					for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)converted.width, surface->w); ++ix)
+
+					break;
+
+				case FT_PIXEL_MODE_GRAY:
+					for (int iy = MAX(-letter_y, 0); letter_y + iy < MIN(letter_y + (int)converted.rows, surface->h); ++iy)
 					{
-						const unsigned char font_pixel = converted.buffer[iy * converted.pitch + ix];
-
-						const double alpha = pow((double)font_pixel / (converted.num_grays - 1), 1.0 / 1.8);			// Gamma-corrected
-
-						unsigned char *surface_pixel = (unsigned char*)surface->pixels + (letter_y + iy) * surface->pitch + (letter_x + ix) * 4;
-
-						if (alpha)
+						for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)converted.width, surface->w); ++ix)
 						{
-							for (unsigned int j = 0; j < 3; ++j)
-								surface_pixel[j] = (unsigned char)((colours[j] * alpha) + (surface_pixel[j] * (1.0 - alpha)));	// Alpha blending
+							const unsigned char font_pixel = converted.buffer[iy * converted.pitch + ix];
 
-							surface_pixel[3] = 0xFF;
+							if (font_pixel)
+							{
+								const double alpha = pow((double)font_pixel / (converted.num_grays - 1), 1.0 / 1.8);			// Gamma-corrected
+
+								unsigned char *surface_pixel = (unsigned char*)surface->pixels + (letter_y + iy) * surface->pitch + (letter_x + ix) * 4;
+
+								for (unsigned int j = 0; j < 3; ++j)
+									surface_pixel[j] = (unsigned char)((colours[j] * alpha) + (surface_pixel[j] * (1.0 - alpha)));	// Alpha blending
+
+								surface_pixel[3] = 0xFF;
+							}
 						}
 					}
-				}
-				else if (face->glyph->bitmap.pixel_mode == FT_PIXEL_MODE_MONO)
-				{
-					for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)converted.width, surface->w); ++ix)
+
+					break;
+
+				case FT_PIXEL_MODE_MONO:
+					for (int iy = MAX(-letter_y, 0); letter_y + iy < MIN(letter_y + (int)converted.rows, surface->h); ++iy)
 					{
-						const unsigned char font_pixel = converted.buffer[iy * converted.pitch + ix];
-
-						unsigned char *surface_pixel = (unsigned char*)surface->pixels + (letter_y + iy) * surface->pitch + (letter_x + ix) * 4;
-
-						if (font_pixel)
+						for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)converted.width, surface->w); ++ix)
 						{
-							for (unsigned int j = 0; j < 3; ++j)
-								surface_pixel[j] = colours[j];
+							if (converted.buffer[iy * converted.pitch + ix])
+							{
+								unsigned char *surface_pixel = (unsigned char*)surface->pixels + (letter_y + iy) * surface->pitch + (letter_x + ix) * 4;
 
-							surface_pixel[3] = 0xFF;
+								for (unsigned int j = 0; j < 3; ++j)
+									surface_pixel[j] = colours[j];
+
+								surface_pixel[3] = 0xFF;
+							}
 						}
 					}
-				}
+
+					break;
 			}
 
 			FT_Bitmap_Done(font_object->library, &converted);
