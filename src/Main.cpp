@@ -224,13 +224,13 @@ int main(int argc, char *argv[])
 			if (cursor)
 				SDL_SetCursor(cursor);
 			else
-				printf("Failed to load cursor");
+				printf("Failed to load cursor\n");
 
 			SDL_FreeSurface(cursor_surface);
 		}
 		else
 		{
-			printf("Failed to load cursor");
+			printf("Failed to load cursor\n");
 		}
 
 		//Get window dimensions and colour depth
@@ -329,7 +329,7 @@ int main(int argc, char *argv[])
 			}
 			else
 			{
-				printf("Failed to load icon");
+				printf("Failed to load icon\n");
 			}
 #endif
 
