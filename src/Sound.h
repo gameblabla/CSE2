@@ -86,7 +86,7 @@ enum MUSIC_IDS
 	mus_LivingWaterway = 0x26,
 	mus_SealChamber = 0x27,
 	mus_TorokosTheme = 0x28,
-	mus_White = 0x29,
+	mus_White = 0x29
 };
 
 #define SOUND_NO 0x100

@@ -216,46 +216,51 @@ void DrawText(FontObject *font_object, SDL_Surface *surface, int x, int y, unsig
 			const int letter_x = x + pen_x + face->glyph->bitmap_left;
 			const int letter_y = y + ((FT_MulFix(face->ascender, face->size->metrics.y_scale) - face->glyph->metrics.horiBearingY + (64 / 2)) / 64);
 
-			for (int iy = MAX(-letter_y, 0); letter_y + iy < MIN(letter_y + (int)converted.rows, surface->h); ++iy)
+			switch (face->glyph->bitmap.pixel_mode)
 			{
-				if (face->glyph->bitmap.pixel_mode == FT_PIXEL_MODE_GRAY)
-				{
-					for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)converted.width, surface->w); ++ix)
+				case FT_PIXEL_MODE_GRAY:
+					for (int iy = MAX(-letter_y, 0); letter_y + iy < MIN(letter_y + (int)converted.rows, surface->h); ++iy)
 					{
-						const unsigned char font_pixel = converted.buffer[iy * converted.pitch + ix];
-
-						if (font_pixel)
+						for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)converted.width, surface->w); ++ix)
 						{
-							unsigned char *surface_pixel = (unsigned char*)surface->pixels + (letter_y + iy) * surface->pitch + (letter_x + ix) * 4;
+							const unsigned char font_pixel = converted.buffer[iy * converted.pitch + ix];
 
-							const double src_alpha = pow((double)font_pixel / (converted.num_grays - 1), 1.0 / 1.8);
-							const double dst_alpha = pow(surface_pixel[3] / 255.0, 1.0 / 1.8);
-							const double out_alpha = src_alpha + dst_alpha * (1.0 - src_alpha);
+							if (font_pixel)
+							{
+								unsigned char *surface_pixel = (unsigned char*)surface->pixels + (letter_y + iy) * surface->pitch + (letter_x + ix) * 4;
 
-							for (unsigned int j = 0; j < 3; ++j)
-								surface_pixel[j] = (unsigned char)((colours[j] * src_alpha + surface_pixel[j] * dst_alpha * (1.0 - src_alpha)) / out_alpha);			// Gamma-corrected alpha blending
+								const double src_alpha = pow((double)font_pixel / (converted.num_grays - 1), 1.0 / 1.8);
+								const double dst_alpha = pow(surface_pixel[3] / 255.0, 1.0 / 1.8);
+								const double out_alpha = src_alpha + dst_alpha * (1.0 - src_alpha);
 
-							surface_pixel[3] = (unsigned char)(out_alpha * 255.0);
+								for (unsigned int j = 0; j < 3; ++j)
+									surface_pixel[j] = (unsigned char)((colours[j] * src_alpha + surface_pixel[j] * dst_alpha * (1.0 - src_alpha)) / out_alpha);			// Gamma-corrected alpha blending
+
+								surface_pixel[3] = (unsigned char)(out_alpha * 255.0);
+							}
 						}
 					}
-				}
-				else if (face->glyph->bitmap.pixel_mode == FT_PIXEL_MODE_MONO)
-				{
-					for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)converted.width, surface->w); ++ix)
+
+					break;
+
+				case FT_PIXEL_MODE_MONO:
+					for (int iy = MAX(-letter_y, 0); letter_y + iy < MIN(letter_y + (int)converted.rows, surface->h); ++iy)
 					{
-						const unsigned char font_pixel = converted.buffer[iy * converted.pitch + ix];
-
-						unsigned char *surface_pixel = (unsigned char*)surface->pixels + (letter_y + iy) * surface->pitch + (letter_x + ix) * 4;
-
-						if (font_pixel)
+						for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)converted.width, surface->w); ++ix)
 						{
-							for (unsigned int j = 0; j < 3; ++j)
-								surface_pixel[j] = colours[j];
+							if (converted.buffer[iy * converted.pitch + ix])
+							{
+								unsigned char *surface_pixel = (unsigned char*)surface->pixels + (letter_y + iy) * surface->pitch + (letter_x + ix) * 4;
 
-							surface_pixel[3] = 0xFF;
+								for (unsigned int j = 0; j < 3; ++j)
+									surface_pixel[j] = colours[j];
+
+								surface_pixel[3] = 0xFF;
+							}
 						}
 					}
-				}
+
+					break;
 			}
 
 			FT_Bitmap_Done(font_object->library, &converted);
