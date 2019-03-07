@@ -158,13 +158,11 @@ bool MakeSoundObject8(int8_t *wavep, int8_t track, int8_t pipi)
 //Playing melody tracks
 short freq_tbl[12] = { 262,277,294,311,330,349,370,392,415,440,466,494 };
 
-void ChangeOrganFrequency(uint8_t key, uint8_t track, int32_t a)
+void ChangeOrganFrequency(uint8_t key, int8_t track, int32_t a)
 {
-	for (int j = 0; j < 8; j++)
-	{
+	for (int j = 0; j < 8; j++) {
 		for (int i = 0; i < 2; i++) {
-			uint32_t tmpDouble = ((oct_wave[j].wave_size * freq_tbl[key]) * oct_wave[j].oct_par) / 8 + (a - 1000);
-			lpORGANBUFFER[track][j][i]->SetFrequency(tmpDouble);
+			lpORGANBUFFER[track][j][i]->SetFrequency(((oct_wave[j].wave_size * freq_tbl[key]) * oct_wave[j].oct_par) / 8 + (a - 1000));
 		}
 	}
 }
