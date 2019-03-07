@@ -179,8 +179,8 @@ void PutValueView(int flx, int fly)
 		{
 			PutBitmap3(
 				&grcGame,
-				(*gVV[v].px) / 0x200 - (gVV[v].rect.right - gVV[v].rect.left) / 2 - flx / 0x200,
-				(*gVV[v].py) / 0x200 + gVV[v].offset_y / 0x200 - 4 - fly / 0x200,
+				SubpixelToScreenCoord(*gVV[v].px) - PixelToScreenCoord((gVV[v].rect.right - gVV[v].rect.left) / 2) - SubpixelToScreenCoord(flx),
+				SubpixelToScreenCoord(*gVV[v].py) + SubpixelToScreenCoord(gVV[v].offset_y) - PixelToScreenCoord(4) - SubpixelToScreenCoord(fly),
 				&gVV[v].rect,
 				SURFACE_ID_VALUE_VIEW);
 		}

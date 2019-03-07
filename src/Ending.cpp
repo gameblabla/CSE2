@@ -46,14 +46,14 @@ void PutStripper()
 		{
 			//Draw text
 			RECT rc = {0, 16 * s, 320, 16 * s + 16};
-			PutBitmap3(&grcFull, (Strip[s].x + ((WINDOW_WIDTH - 320) << 8)) / 0x200, Strip[s].y / 0x200, &rc, SURFACE_ID_CREDIT_CAST);
+			PutBitmap3(&grcFull, SubpixelToScreenCoord(Strip[s].x + ((WINDOW_WIDTH - 320) << 8)), SubpixelToScreenCoord(Strip[s].y), &rc, SURFACE_ID_CREDIT_CAST);
 			
 			//Draw character
 			rc.left = 24 * (Strip[s].cast % 13);
 			rc.right = rc.left + 24;
 			rc.top = 24 * (Strip[s].cast / 13);
 			rc.bottom = rc.top + 24;
-			PutBitmap3(&grcFull, (Strip[s].x + ((WINDOW_WIDTH - 320) << 8)) / 0x200 - 24, Strip[s].y / 0x200 - 8, &rc, SURFACE_ID_CASTS);
+			PutBitmap3(&grcFull, SubpixelToScreenCoord(Strip[s].x + ((WINDOW_WIDTH - 320) << 8)) - PixelToScreenCoord(24), SubpixelToScreenCoord(Strip[s].y) - PixelToScreenCoord(8), &rc, SURFACE_ID_CASTS);
 		}
 	}
 }
@@ -123,7 +123,7 @@ void PutIllust()
 {
 	RECT rcIllust = {0, 0, 160, 240};
 	RECT rcClip = {(WINDOW_WIDTH - 320) / 2, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
-	PutBitmap3(&rcClip, (Illust.x + ((WINDOW_WIDTH - 320) << 8)) / 0x200, (WINDOW_HEIGHT - 240) / 2, &rcIllust, SURFACE_ID_CREDITS_IMAGE);
+	PutBitmap3(&rcClip, SubpixelToScreenCoord(Illust.x + ((WINDOW_WIDTH - 320) << 8)), PixelToScreenCoord((WINDOW_HEIGHT - 240) / 2), &rcIllust, SURFACE_ID_CREDITS_IMAGE);
 }
 
 //Load illustration
@@ -458,9 +458,9 @@ int Scene_DownIsland(int mode)
 		
 		//Draw scene
 		CortBox(&grcFull, 0);
-		PutBitmap3(&rc_frame, 80 + (WINDOW_WIDTH - 320) / 2, 80 + (WINDOW_HEIGHT - 240) / 2, &rc_sky, SURFACE_ID_LEVEL_SPRITESET_1);
-		PutBitmap3(&rc_frame, sprite.x / 0x200 - 20 + (WINDOW_WIDTH - 320) / 2, sprite.y / 512 - 12 + (WINDOW_HEIGHT - 240) / 2, &rc_sprite, SURFACE_ID_LEVEL_SPRITESET_1);
-		PutBitmap3(&rc_frame, 80 + (WINDOW_WIDTH - 320) / 2, 128 + (WINDOW_HEIGHT - 240) / 2, &rc_ground, SURFACE_ID_LEVEL_SPRITESET_1);
+		PutBitmap3(&rc_frame, PixelToScreenCoord(80 + (WINDOW_WIDTH - 320) / 2), PixelToScreenCoord(80 + (WINDOW_HEIGHT - 240) / 2), &rc_sky, SURFACE_ID_LEVEL_SPRITESET_1);
+		PutBitmap3(&rc_frame, SubpixelToScreenCoord(sprite.x) - PixelToScreenCoord(20 + (WINDOW_WIDTH - 320) / 2), SubpixelToScreenCoord(sprite.y) - PixelToScreenCoord(12 + (WINDOW_HEIGHT - 240) / 2), &rc_sprite, SURFACE_ID_LEVEL_SPRITESET_1);
+		PutBitmap3(&rc_frame, PixelToScreenCoord(80 + (WINDOW_WIDTH - 320) / 2), PixelToScreenCoord(128 + (WINDOW_HEIGHT - 240) / 2), &rc_ground, SURFACE_ID_LEVEL_SPRITESET_1);
 		PutTimeCounter(16, 8);
 		
 		//Draw window

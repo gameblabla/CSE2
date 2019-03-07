@@ -309,7 +309,7 @@ void PutFade()
 		{
 			rect.left = 16 * gFade.ani_no[y][x];
 			rect.right = rect.left + 16;
-			PutBitmap3(&grcGame, 16 * x, 16 * y, &rect, SURFACE_ID_FADE);
+			PutBitmap3(&grcGame, PixelToScreenCoord(16 * x), PixelToScreenCoord(16 * y), &rect, SURFACE_ID_FADE);
 		}
 	}
 }

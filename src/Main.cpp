@@ -352,7 +352,7 @@ int main(int argc, char *argv[])
 			
 			//Draw loading screen
 			CortBox(&clip_rect, 0x000000);
-			PutBitmap3(&clip_rect, (WINDOW_WIDTH - 64) / 2, (WINDOW_HEIGHT - 8) / 2, &loading_rect, SURFACE_ID_LOADING);
+			PutBitmap3(&clip_rect, PixelToScreenCoord((WINDOW_WIDTH - 64) / 2), PixelToScreenCoord((WINDOW_HEIGHT - 8) / 2), &loading_rect, SURFACE_ID_LOADING);
 			
 			//Draw to screen
 			if (Flip_SystemTask())

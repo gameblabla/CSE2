@@ -34,7 +34,7 @@ int Call_Escape()
 		
 		//Draw screen
 		CortBox(&grcFull, 0x000000);
-		PutBitmap3(&grcFull, (WINDOW_WIDTH - 208) / 2, (WINDOW_HEIGHT - 16) / 2, &rc, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&grcFull, PixelToScreenCoord((WINDOW_WIDTH - 208) / 2), PixelToScreenCoord((WINDOW_HEIGHT - 16) / 2), &rc, SURFACE_ID_TEXT_BOX);
 		PutFramePerSecound();
 
 		if (!Flip_SystemTask())

@@ -25,7 +25,7 @@ void MoveFrame3()
 	
 	if (map_w >= num_x)
 	{
-		if (gFrame.x <= -0x200)
+		if (gFrame.x < 0)
 			gFrame.x = 0;
 		if (gFrame.x > ((((map_w - 1) << 4) - ((g_GameFlags & 8) ? 320 : WINDOW_WIDTH))) << 9)
 			gFrame.x = (((map_w - 1) << 4) - ((g_GameFlags & 8) ? 320 : WINDOW_WIDTH)) << 9;
@@ -37,7 +37,7 @@ void MoveFrame3()
 	
 	if (map_l >= num_y)
 	{
-		if (gFrame.y <= -0x200)
+		if (gFrame.y < 0)
 			gFrame.y = 0;
 		if (gFrame.y > ((((map_l - 1) << 4) - ((g_GameFlags & 8) ? 240 : WINDOW_HEIGHT))) << 9)
 			gFrame.y = (((map_l - 1) << 4) - ((g_GameFlags & 8) ? 240 : WINDOW_HEIGHT)) << 9;
@@ -64,9 +64,9 @@ void MoveFrame3()
 	//Keep in bounds
 	if (map_w >= num_x && map_l >= num_y)
 	{
-		if (gFrame.x <= -0x200)
+		if (gFrame.x < 0)
 			gFrame.x = 0;
-		if (gFrame.y <= -0x200)
+		if (gFrame.y < 0)
 			gFrame.y = 0;
 	}
 }

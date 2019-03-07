@@ -517,8 +517,8 @@ void PutCaret(int fx, int fy)
 		{
 			PutBitmap3(
 				&grcGame,
-				(gCrt[i].x - gCrt[i].view_left) / 0x200 - fx / 0x200,
-				(gCrt[i].y - gCrt[i].view_top) / 0x200 - fy / 0x200,
+				SubpixelToScreenCoord(gCrt[i].x - gCrt[i].view_left) - SubpixelToScreenCoord(fx),
+				SubpixelToScreenCoord(gCrt[i].y - gCrt[i].view_top) - SubpixelToScreenCoord(fy),
 				&gCrt[i].rect,
 				SURFACE_ID_CARET);
 		}

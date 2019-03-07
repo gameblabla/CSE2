@@ -72,11 +72,11 @@ void PutBossLife(void)
 	
 			rcBr.right = 198 * gBL.br / gBL.max;
 
-			PutBitmap3(&grcGame, (WINDOW_WIDTH - 256) / 2, WINDOW_HEIGHT - 20, &rcBox1, SURFACE_ID_TEXT_BOX);
-			PutBitmap3(&grcGame, (WINDOW_WIDTH - 256) / 2, WINDOW_HEIGHT - 12, &rcBox2, SURFACE_ID_TEXT_BOX);
-			PutBitmap3(&grcGame, (WINDOW_WIDTH - 176) / 2, WINDOW_HEIGHT - 16, &rcBr, SURFACE_ID_TEXT_BOX);
-			PutBitmap3(&grcGame, (WINDOW_WIDTH - 176) / 2, WINDOW_HEIGHT - 16, &rcLife, SURFACE_ID_TEXT_BOX);
-			PutBitmap3(&grcGame, (WINDOW_WIDTH - 240) / 2, WINDOW_HEIGHT - 16, &rcText, SURFACE_ID_TEXT_BOX);
+			PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 256) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 20), &rcBox1, SURFACE_ID_TEXT_BOX);
+			PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 256) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 12), &rcBox2, SURFACE_ID_TEXT_BOX);
+			PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 176) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 16), &rcBr, SURFACE_ID_TEXT_BOX);
+			PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 176) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 16), &rcLife, SURFACE_ID_TEXT_BOX);
+			PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 240) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 16), &rcText, SURFACE_ID_TEXT_BOX);
 		}
 		else
 		{

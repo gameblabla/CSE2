@@ -64,8 +64,8 @@ void PutBossChar(int fx, int fy)
 			
 			PutBitmap3(
 				&grcGame,
-				(gBoss[b].x - side) / 0x200 - fx / 0x200 + a,
-				(gBoss[b].y - gBoss[b].view.top) / 0x200 - fy / 0x200,
+				SubpixelToScreenCoord(gBoss[b].x - side) - SubpixelToScreenCoord(fx) + PixelToScreenCoord(a),
+				SubpixelToScreenCoord(gBoss[b].y - gBoss[b].view.top) - SubpixelToScreenCoord(fy),
 				&gBoss[b].rect,
 				SURFACE_ID_LEVEL_SPRITESET_2);
 		}

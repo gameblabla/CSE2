@@ -428,11 +428,11 @@ void PutTextScript()
 		RECT rcFrame2 = {0, 8, 244, 16};
 		RECT rcFrame3 = {0, 16, 244, 24};
 
-		PutBitmap3(&grcFull, WINDOW_WIDTH / 2 - 122, gTS.rcText.top - 10, &rcFrame1, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&grcFull, PixelToScreenCoord(WINDOW_WIDTH / 2 - 122), PixelToScreenCoord(gTS.rcText.top - 10), &rcFrame1, SURFACE_ID_TEXT_BOX);
 		int i;
 		for (i = 1; i < 7; i++)
-			PutBitmap3(&grcFull, WINDOW_WIDTH / 2 - 122, 8 * i + gTS.rcText.top - 10, &rcFrame2, SURFACE_ID_TEXT_BOX);
-		PutBitmap3(&grcFull, WINDOW_WIDTH / 2 - 122, 8 * i + gTS.rcText.top - 10, &rcFrame3, SURFACE_ID_TEXT_BOX);
+			PutBitmap3(&grcFull, PixelToScreenCoord(WINDOW_WIDTH / 2 - 122), PixelToScreenCoord(8 * i + gTS.rcText.top - 10), &rcFrame2, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&grcFull, PixelToScreenCoord(WINDOW_WIDTH / 2 - 122), PixelToScreenCoord(8 * i + gTS.rcText.top - 10), &rcFrame3, SURFACE_ID_TEXT_BOX);
 	}
 
 	//Draw face picture
@@ -444,7 +444,7 @@ void PutTextScript()
 
 	if (gTS.face_x < (TEXT_LEFT * 0x200))
 		gTS.face_x += 0x1000;
-	PutBitmap3(&gTS.rcText, gTS.face_x / 0x200, gTS.rcText.top - 3, &rcFace, SURFACE_ID_FACE);
+	PutBitmap3(&gTS.rcText, SubpixelToScreenCoord(gTS.face_x), PixelToScreenCoord(gTS.rcText.top - 3), &rcFace, SURFACE_ID_FACE);
 
 	//Draw text
 	int text_offset;
@@ -454,7 +454,7 @@ void PutTextScript()
 		text_offset = 0;
 
 	for (int i = 0; i < 4; i++)
-		PutBitmap3(&gTS.rcText, text_offset + TEXT_LEFT, gTS.offsetY + gTS.ypos_line[i] + gTS.rcText.top, &gRect_line, (Surface_Ids)(i + SURFACE_ID_TEXT_LINE1));
+		PutBitmap3(&gTS.rcText, PixelToScreenCoord(text_offset + TEXT_LEFT), PixelToScreenCoord(gTS.offsetY + gTS.ypos_line[i] + gTS.rcText.top), &gRect_line, (Surface_Ids)(i + SURFACE_ID_TEXT_LINE1));
 
 	//Draw NOD cursor
 	if ((gTS.wait_beam++ % 20 > 12) && gTS.mode == 2)
@@ -486,12 +486,12 @@ void PutTextScript()
 
 	if (gTS.item)
 	{
-		PutBitmap3(&grcFull, (WINDOW_WIDTH - 80) / 2, WINDOW_HEIGHT - 112, &rcItemBox1, SURFACE_ID_TEXT_BOX);
-		PutBitmap3(&grcFull, (WINDOW_WIDTH - 80) / 2, WINDOW_HEIGHT - 96, &rcItemBox2, SURFACE_ID_TEXT_BOX);
-		PutBitmap3(&grcFull, (WINDOW_WIDTH + 64) / 2, WINDOW_HEIGHT - 112, &rcItemBox3, SURFACE_ID_TEXT_BOX);
-		PutBitmap3(&grcFull, (WINDOW_WIDTH + 64) / 2, WINDOW_HEIGHT - 104, &rcItemBox4, SURFACE_ID_TEXT_BOX);
-		PutBitmap3(&grcFull, (WINDOW_WIDTH + 64) / 2, WINDOW_HEIGHT - 96, &rcItemBox4, SURFACE_ID_TEXT_BOX);
-		PutBitmap3(&grcFull, (WINDOW_WIDTH + 64) / 2, WINDOW_HEIGHT - 88, &rcItemBox5, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&grcFull, PixelToScreenCoord((WINDOW_WIDTH - 80) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 112), &rcItemBox1, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&grcFull, PixelToScreenCoord((WINDOW_WIDTH - 80) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 96), &rcItemBox2, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&grcFull, PixelToScreenCoord((WINDOW_WIDTH + 64) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 112), &rcItemBox3, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&grcFull, PixelToScreenCoord((WINDOW_WIDTH + 64) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 104), &rcItemBox4, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&grcFull, PixelToScreenCoord((WINDOW_WIDTH + 64) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 96), &rcItemBox4, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&grcFull, PixelToScreenCoord((WINDOW_WIDTH + 64) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 88), &rcItemBox5, SURFACE_ID_TEXT_BOX);
 
 		if (gTS.item_y < WINDOW_HEIGHT - 104)
 			++gTS.item_y;
@@ -503,7 +503,7 @@ void PutTextScript()
 			rect.right = rect.left + 16;
 			rect.top = 16 * (gTS.item / 16);
 			rect.bottom = rect.top + 16;
-			PutBitmap3(&grcFull, (WINDOW_WIDTH - 24) / 2, gTS.item_y, &rect, SURFACE_ID_ARMS_IMAGE);
+			PutBitmap3(&grcFull, PixelToScreenCoord((WINDOW_WIDTH - 24) / 2), PixelToScreenCoord(gTS.item_y), &rect, SURFACE_ID_ARMS_IMAGE);
 		}
 		else
 		{
@@ -511,7 +511,7 @@ void PutTextScript()
 			rect.right = rect.left + 32;
 			rect.top = 16 * ((gTS.item - 1000) / 8);
 			rect.bottom = rect.top + 16;
-			PutBitmap3(&grcFull, (WINDOW_WIDTH - 40) / 2, gTS.item_y, &rect, SURFACE_ID_ITEM_IMAGE);
+			PutBitmap3(&grcFull, PixelToScreenCoord((WINDOW_WIDTH - 40) / 2), PixelToScreenCoord(gTS.item_y), &rect, SURFACE_ID_ITEM_IMAGE);
 		}
 	}
 
@@ -527,9 +527,9 @@ void PutTextScript()
 		else
 			i = WINDOW_HEIGHT - 96;
 
-		PutBitmap3(&grcFull, (WINDOW_WIDTH + 112) / 2, i, &rect_yesno, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&grcFull, PixelToScreenCoord((WINDOW_WIDTH + 112) / 2), PixelToScreenCoord(i), &rect_yesno, SURFACE_ID_TEXT_BOX);
 		if (gTS.wait == 16)
-			PutBitmap3(&grcFull, 41 * gTS.select + (WINDOW_WIDTH + 102) / 2, WINDOW_HEIGHT - 86, &rect_cur, SURFACE_ID_TEXT_BOX);
+			PutBitmap3(&grcFull, PixelToScreenCoord(41 * gTS.select + (WINDOW_WIDTH + 102) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 86), &rect_cur, SURFACE_ID_TEXT_BOX);
 	}
 }
 

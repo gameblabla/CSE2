@@ -472,7 +472,7 @@ static void DrawBitmap(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_
 	SDL_Rect frameRect = RectToSDLRectScaled(rect);
 	
 	//Get dest rect
-	SDL_Rect destRect = {x * magnification, y * magnification, frameRect.w, frameRect.h};
+	SDL_Rect destRect = {x, y, frameRect.w, frameRect.h};
 	
 	//Set cliprect
 	SDL_RenderSetClipRect(gRenderer, &clipRect);
@@ -536,6 +536,16 @@ void CortBox2(RECT *rect, uint32_t col, Surface_Ids surf_no)
 	const unsigned char col_alpha = (col & 0xFF0000) >> 24;
 	SDL_FillRect(surf[surf_no].surface, &destRect, SDL_MapRGBA(surf[surf_no].surface->format, col_red, col_green, col_blue, col_alpha));
 	surf[surf_no].needs_updating = true;
+}
+
+int SubpixelToScreenCoord(int coord)
+{
+	return coord * magnification / 0x200;
+}
+
+int PixelToScreenCoord(int coord)
+{
+	return coord * magnification;
 }
 
 #ifdef WINDOWS

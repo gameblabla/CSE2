@@ -98,7 +98,7 @@ void PutNumber4(int x, int y, int value, bool bZero)
 		
 		//Draw digit
 		if ((bZero && offset == 2) || sw != 0 || offset == 3 )
-			PutBitmap3(&rcClient, x + 8 * offset, y, &rect[a], SURFACE_ID_TEXT_BOX);
+			PutBitmap3(&rcClient, PixelToScreenCoord(x + 8 * offset), PixelToScreenCoord(y), &rect[a], SURFACE_ID_TEXT_BOX);
 		
 		//Go to next digit
 		++offset;
@@ -360,8 +360,8 @@ int ModeTitle()
 		CortBox(&grcGame, back_color);
 		
 		//Draw version
-		PutBitmap3(&grcGame, (WINDOW_WIDTH - 120) / 2, WINDOW_HEIGHT - 24, &rcVersion, SURFACE_ID_TEXT_BOX);
-		PutBitmap3(&grcGame, (WINDOW_WIDTH - 8) / 2, WINDOW_HEIGHT - 24, &rcPeriod, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 120) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 24), &rcVersion, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 8) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 24), &rcPeriod, SURFACE_ID_TEXT_BOX);
 		
 		int v1, v2, v3, v4;
 		GetCompileVersion(&v1, &v2, &v3, &v4);
@@ -371,10 +371,10 @@ int ModeTitle()
 		PutNumber4((WINDOW_WIDTH + 56) / 2, WINDOW_HEIGHT - 24, v4, 0);
 		
 		//Draw main title
-		PutBitmap3(&grcGame, (WINDOW_WIDTH - 144) / 2, 40, &rcTitle, SURFACE_ID_TITLE);
-		PutBitmap3(&grcGame, (WINDOW_WIDTH - 48) / 2, (WINDOW_HEIGHT + 16) / 2, &rcNew, SURFACE_ID_TITLE);
-		PutBitmap3(&grcGame, (WINDOW_WIDTH - 48) / 2, (WINDOW_HEIGHT + 56) / 2, &rcContinue, SURFACE_ID_TITLE);
-		PutBitmap3(&grcGame, (WINDOW_WIDTH - 160) / 2, WINDOW_HEIGHT - 48, &rcPixel, SURFACE_ID_PIXEL);
+		PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 144) / 2), PixelToScreenCoord(40), &rcTitle, SURFACE_ID_TITLE);
+		PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 48) / 2), PixelToScreenCoord((WINDOW_HEIGHT + 16) / 2), &rcNew, SURFACE_ID_TITLE);
+		PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 48) / 2), PixelToScreenCoord((WINDOW_HEIGHT + 56) / 2), &rcContinue, SURFACE_ID_TITLE);
+		PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 160) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 48), &rcPixel, SURFACE_ID_PIXEL);
 		
 		//Draw character cursor
 		RECT char_rc;
@@ -410,7 +410,7 @@ int ModeTitle()
 		else
 			char_y = (WINDOW_HEIGHT + 14) / 2;
 		
-		PutBitmap3(&grcGame, (WINDOW_WIDTH - 88) / 2, char_y, &char_rc, char_surf);
+		PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 88) / 2), PixelToScreenCoord(char_y), &char_rc, char_surf);
 		
 		//Draw carets
 		PutCaret(0, 0);

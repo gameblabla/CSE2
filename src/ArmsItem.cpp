@@ -283,27 +283,27 @@ void PutCampObject()
 	
 	//Draw box
 	int y;
-	PutBitmap3(&rcView, (WINDOW_WIDTH - 244) / 2, (WINDOW_HEIGHT - 224) / 2, &rcBoxTop, SURFACE_ID_TEXT_BOX);
+	PutBitmap3(&rcView, PixelToScreenCoord((WINDOW_WIDTH - 244) / 2), PixelToScreenCoord((WINDOW_HEIGHT - 224) / 2), &rcBoxTop, SURFACE_ID_TEXT_BOX);
 	for (y = 1; y < 18; y++)
-		PutBitmap3(&rcView, (WINDOW_WIDTH - 244) / 2, ((WINDOW_HEIGHT - 240) / 2) + (8 * (y + 1)), &rcBoxBody, SURFACE_ID_TEXT_BOX);
-	PutBitmap3(&rcView, (WINDOW_WIDTH - 244) / 2, ((WINDOW_HEIGHT - 240) / 2) + (8 * (y + 1)), &rcBoxBottom, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&rcView, PixelToScreenCoord((WINDOW_WIDTH - 244) / 2), PixelToScreenCoord(((WINDOW_HEIGHT - 240) / 2) + (8 * (y + 1))), &rcBoxBody, SURFACE_ID_TEXT_BOX);
+	PutBitmap3(&rcView, PixelToScreenCoord((WINDOW_WIDTH - 244) / 2), PixelToScreenCoord(((WINDOW_HEIGHT - 240) / 2) + (8 * (y + 1))), &rcBoxBottom, SURFACE_ID_TEXT_BOX);
 	
 	//Move titles
 	if (gCampTitleY > (WINDOW_HEIGHT - 208) / 2)
 		--gCampTitleY;
 	
 	//Draw titles
-	PutBitmap3(&rcView, (WINDOW_WIDTH - 224) / 2, gCampTitleY, &rcTitle1, SURFACE_ID_TEXT_BOX);
-	PutBitmap3(&rcView, (WINDOW_WIDTH - 224) / 2, gCampTitleY + 52, &rcTitle2, SURFACE_ID_TEXT_BOX);
+	PutBitmap3(&rcView, PixelToScreenCoord((WINDOW_WIDTH - 224) / 2), PixelToScreenCoord(gCampTitleY), &rcTitle1, SURFACE_ID_TEXT_BOX);
+	PutBitmap3(&rcView, PixelToScreenCoord((WINDOW_WIDTH - 224) / 2), PixelToScreenCoord(gCampTitleY + 52), &rcTitle2, SURFACE_ID_TEXT_BOX);
 	
 	//Draw arms cursor
 	static unsigned int flash;
 	++flash;
 	
 	if (gCampActive == FALSE)
-		PutBitmap3(&rcView, 40 * gSelectedArms + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT / 2) - 96, &rcCur1[(flash / 2) % 2], SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&rcView, PixelToScreenCoord(40 * gSelectedArms + (WINDOW_WIDTH - 224) / 2), PixelToScreenCoord((WINDOW_HEIGHT / 2) - 96), &rcCur1[(flash / 2) % 2], SURFACE_ID_TEXT_BOX);
 	else
-		PutBitmap3(&rcView, 40 * gSelectedArms + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT / 2) - 96, &rcCur1[1], SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&rcView, PixelToScreenCoord(40 * gSelectedArms + (WINDOW_WIDTH - 224) / 2), PixelToScreenCoord((WINDOW_HEIGHT / 2) - 96), &rcCur1[1], SURFACE_ID_TEXT_BOX);
 	
 	//Draw arms
 	for (int i = 0; i < ARMS_MAX; i++)
@@ -317,9 +317,9 @@ void PutCampObject()
 		rcArms.top = 16 * (gArmsData[i].code / 16);
 		rcArms.bottom = rcArms.top + 16;
 		
-		PutBitmap3(&rcView, 40 * i + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT - 192) / 2, &rcArms, SURFACE_ID_ARMS_IMAGE);
-		PutBitmap3(&rcView, 40 * i + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT - 128) / 2, &rcPer, SURFACE_ID_TEXT_BOX);
-		PutBitmap3(&rcView, 40 * i + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT - 160) / 2, &rcLv, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&rcView, PixelToScreenCoord(40 * i + (WINDOW_WIDTH - 224) / 2), PixelToScreenCoord((WINDOW_HEIGHT - 192) / 2), &rcArms, SURFACE_ID_ARMS_IMAGE);
+		PutBitmap3(&rcView, PixelToScreenCoord(40 * i + (WINDOW_WIDTH - 224) / 2), PixelToScreenCoord((WINDOW_HEIGHT - 128) / 2), &rcPer, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&rcView, PixelToScreenCoord(40 * i + (WINDOW_WIDTH - 224) / 2), PixelToScreenCoord((WINDOW_HEIGHT - 160) / 2), &rcLv, SURFACE_ID_TEXT_BOX);
 		PutNumber4(40 * i + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT - 160) / 2, gArmsData[i].level, 0);
 		
 		//Draw ammo
@@ -330,16 +330,16 @@ void PutCampObject()
 		}
 		else
 		{
-			PutBitmap3(&rcView, 40 * i + (WINDOW_WIDTH - 192) / 2, (WINDOW_HEIGHT - 144) / 2, &rcNone, SURFACE_ID_TEXT_BOX);
-			PutBitmap3(&rcView, 40 * i + (WINDOW_WIDTH - 192) / 2, (WINDOW_HEIGHT - 128) / 2, &rcNone, SURFACE_ID_TEXT_BOX);
+			PutBitmap3(&rcView, PixelToScreenCoord(40 * i + (WINDOW_WIDTH - 192) / 2), PixelToScreenCoord((WINDOW_HEIGHT - 144) / 2), &rcNone, SURFACE_ID_TEXT_BOX);
+			PutBitmap3(&rcView, PixelToScreenCoord(40 * i + (WINDOW_WIDTH - 192) / 2), PixelToScreenCoord((WINDOW_HEIGHT - 128) / 2), &rcNone, SURFACE_ID_TEXT_BOX);
 		}
 	}
 	
 	//Draw items cursor
 	if (gCampActive == TRUE)
-		PutBitmap3(&rcView, 32 * (gSelectedItem % 6) + (WINDOW_WIDTH - 224) / 2, 16 * (gSelectedItem / 6) + (WINDOW_HEIGHT - 88) / 2, &rcCur2[(flash / 2) % 2], SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&rcView, PixelToScreenCoord(32 * (gSelectedItem % 6) + (WINDOW_WIDTH - 224) / 2), PixelToScreenCoord(16 * (gSelectedItem / 6) + (WINDOW_HEIGHT - 88) / 2), &rcCur2[(flash / 2) % 2], SURFACE_ID_TEXT_BOX);
 	else
-		PutBitmap3(&rcView, 32 * (gSelectedItem % 6) + (WINDOW_WIDTH - 224) / 2, 16 * (gSelectedItem / 6) + (WINDOW_HEIGHT - 88) / 2, &rcCur2[1], SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&rcView, PixelToScreenCoord(32 * (gSelectedItem % 6) + (WINDOW_WIDTH - 224) / 2), PixelToScreenCoord(16 * (gSelectedItem / 6) + (WINDOW_HEIGHT - 88) / 2), &rcCur2[1], SURFACE_ID_TEXT_BOX);
 
 	for (int i = 0; i < ITEM_MAX; i++)
 	{
@@ -352,7 +352,7 @@ void PutCampObject()
 		rcItem.top = 16 * (gItemData[i].code / 8);
 		rcItem.bottom = rcItem.top + 16;
 		
-		PutBitmap3(&rcView, 32 * (i % 6) + (WINDOW_WIDTH - 224) / 2, 16 * (i / 6) + (WINDOW_HEIGHT - 88) / 2, &rcItem, SURFACE_ID_ITEM_IMAGE);
+		PutBitmap3(&rcView, PixelToScreenCoord(32 * (i % 6) + (WINDOW_WIDTH - 224) / 2), PixelToScreenCoord(16 * (i / 6) + (WINDOW_HEIGHT - 88) / 2), &rcItem, SURFACE_ID_ITEM_IMAGE);
 	}
 }
 

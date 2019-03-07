@@ -201,15 +201,15 @@ void PutMyChar(int fx, int fy)
 		if (gMC.direct)
 			PutBitmap3(
 				&grcGame,
-				(gMC.x - gMC.view.left) / 0x200 - fx / 0x200,
-				(gMC.y - gMC.view.top) / 0x200 - fy / 0x200 + arms_offset_y,
+				SubpixelToScreenCoord(gMC.x - gMC.view.left) - SubpixelToScreenCoord(fx),
+				SubpixelToScreenCoord(gMC.y - gMC.view.top) - SubpixelToScreenCoord(fy) + PixelToScreenCoord(arms_offset_y),
 				&gMC.rect_arms,
 				SURFACE_ID_ARMS);
 		else
 			PutBitmap3(
 				&grcGame,
-				(gMC.x - gMC.view.left) / 0x200 - fx / 0x200 - 8,
-				(gMC.y - gMC.view.top) / 0x200 - fy / 0x200 + arms_offset_y,
+				SubpixelToScreenCoord(gMC.x - gMC.view.left) - SubpixelToScreenCoord(fx) - PixelToScreenCoord(8),
+				SubpixelToScreenCoord(gMC.y - gMC.view.top) - SubpixelToScreenCoord(fy) + PixelToScreenCoord(arms_offset_y),
 				&gMC.rect_arms,
 				SURFACE_ID_ARMS);
 		
@@ -223,7 +223,7 @@ void PutMyChar(int fx, int fy)
 				rect.bottom += 32;
 			}
 			
-			PutBitmap3(&grcGame, (gMC.x - gMC.view.left) / 0x200 - fx / 0x200, (gMC.y - gMC.view.top) / 0x200 - fy / 0x200, &rect, SURFACE_ID_MY_CHAR);
+			PutBitmap3(&grcGame, SubpixelToScreenCoord(gMC.x - gMC.view.left) - SubpixelToScreenCoord(fx), SubpixelToScreenCoord(gMC.y - gMC.view.top) - SubpixelToScreenCoord(fy), &rect, SURFACE_ID_MY_CHAR);
 			
 			//Draw airtank
 			RECT rcBubble[2] = {
@@ -233,9 +233,9 @@ void PutMyChar(int fx, int fy)
 			
 			++gMC.bubble;
 			if (gMC.equip & 0x10 && gMC.flag & 0x100)
-				PutBitmap3(&grcGame, gMC.x / 0x200 - 12 - fx / 0x200, gMC.y / 0x200 - 12 - fy / 0x200, &rcBubble[(gMC.bubble >> 1) & 1], SURFACE_ID_CARET);
+				PutBitmap3(&grcGame, SubpixelToScreenCoord(gMC.x) - PixelToScreenCoord(12) - SubpixelToScreenCoord(fx), SubpixelToScreenCoord(gMC.y) - PixelToScreenCoord(12) - SubpixelToScreenCoord(fy), &rcBubble[(gMC.bubble >> 1) & 1], SURFACE_ID_CARET);
 			else if (gMC.unit == 1)
-				PutBitmap3(&grcGame, gMC.x / 0x200 - 12 - fx / 0x200, gMC.y / 0x200 - 12 - fy / 0x200, &rcBubble[(gMC.bubble >> 1) & 1], SURFACE_ID_CARET);
+				PutBitmap3(&grcGame, SubpixelToScreenCoord(gMC.x) - PixelToScreenCoord(12) - SubpixelToScreenCoord(fx), SubpixelToScreenCoord(gMC.y) - PixelToScreenCoord(12) - SubpixelToScreenCoord(fy), &rcBubble[(gMC.bubble >> 1) & 1], SURFACE_ID_CARET);
 		}
 	}
 }

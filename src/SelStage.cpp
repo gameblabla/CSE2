@@ -106,7 +106,7 @@ void PutStageSelectObject(void)
 	if (gStageSelectTitleY > (WINDOW_HEIGHT / 2) - 74)
 		--gStageSelectTitleY;
 
-	PutBitmap3(&rcView, (WINDOW_WIDTH / 2) - 32, gStageSelectTitleY, &rcTitle1, SURFACE_ID_TEXT_BOX);
+	PutBitmap3(&rcView, PixelToScreenCoord((WINDOW_WIDTH / 2) - 32), PixelToScreenCoord(gStageSelectTitleY), &rcTitle1, SURFACE_ID_TEXT_BOX);
 
 	int stage_num;
 	for (stage_num = 0; gPermitStage[stage_num].index; ++stage_num);
@@ -117,7 +117,7 @@ void PutStageSelectObject(void)
 	{
 		int stage_x = (WINDOW_WIDTH - 40 * stage_num) / 2;
 
-		PutBitmap3(&rcView, stage_x + 40 * gSelectedStage, (WINDOW_HEIGHT / 2) - 56, &rcCur[(flash >> 1) % 2], SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&rcView, PixelToScreenCoord(stage_x + 40 * gSelectedStage), PixelToScreenCoord((WINDOW_HEIGHT / 2) - 56), &rcCur[(flash >> 1) % 2], SURFACE_ID_TEXT_BOX);
 
 		for (int i = 0; i < 8 && gPermitStage[i].index; ++i)
 		{
@@ -127,7 +127,7 @@ void PutStageSelectObject(void)
 			rcStage.top = 16 * (gPermitStage[i].index / 8);
 			rcStage.bottom = rcStage.top + 16;
 
-			PutBitmap3(&rcView, stage_x + 40 * i, (WINDOW_HEIGHT / 2) - 56, &rcStage, SURFACE_ID_STAGE_ITEM);
+			PutBitmap3(&rcView, PixelToScreenCoord(stage_x + 40 * i), PixelToScreenCoord((WINDOW_HEIGHT / 2) - 56), &rcStage, SURFACE_ID_STAGE_ITEM);
 		}
 	}
 }

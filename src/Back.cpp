@@ -72,31 +72,31 @@ void PutBack(int fx, int fy)
 			for (int y = 0; y < WINDOW_HEIGHT; y += gBack.partsH)
 			{
 				for (int x = 0; x < WINDOW_WIDTH; x += gBack.partsW)
-					PutBitmap4(&grcGame, x, y, &rect, SURFACE_ID_LEVEL_BACKGROUND);
+					PutBitmap4(&grcGame, PixelToScreenCoord(x), PixelToScreenCoord(y), &rect, SURFACE_ID_LEVEL_BACKGROUND);
 			}
 			break;
 			
 		case 1:
-			for (int y = -(fy / 0x400 % gBack.partsH); y < WINDOW_HEIGHT; y += gBack.partsH)
+			for (int y = -(fy / 2 % (gBack.partsH * 0x200)); y < WINDOW_HEIGHT * 0x200; y += gBack.partsH * 0x200)
 			{
-				for (int x = -(fx / 0x400 % gBack.partsW); x < WINDOW_WIDTH; x += gBack.partsW)
-					PutBitmap4(&grcGame, x, y, &rect, SURFACE_ID_LEVEL_BACKGROUND);
+				for (int x = -(fx / 2 % (gBack.partsW * 0x200)); x < WINDOW_WIDTH * 0x200; x += gBack.partsW * 0x200)
+					PutBitmap4(&grcGame, SubpixelToScreenCoord(x), SubpixelToScreenCoord(y), &rect, SURFACE_ID_LEVEL_BACKGROUND);
 			}
 			break;
 			
 		case 2:
-			for (int y = -(fy / 0x200 % gBack.partsH); y < WINDOW_HEIGHT; y += gBack.partsH)
+			for (int y = -(fy % (gBack.partsH * 0x200)); y < WINDOW_HEIGHT * 0x200; y += gBack.partsH * 0x200)
 			{
-				for (int x = -(fx / 0x200 % gBack.partsW); x < WINDOW_WIDTH; x += gBack.partsW)
-					PutBitmap4(&grcGame, x, y, &rect, SURFACE_ID_LEVEL_BACKGROUND);
+				for (int x = -(fx % (gBack.partsW * 0x200)); x < WINDOW_WIDTH * 0x200; x += gBack.partsW * 0x200)
+					PutBitmap4(&grcGame, SubpixelToScreenCoord(x), SubpixelToScreenCoord(y), &rect, SURFACE_ID_LEVEL_BACKGROUND);
 			}
 			break;
 			
 		case 5:
 			for (int y = -gBack.partsH; y < WINDOW_HEIGHT; y += gBack.partsH)
 			{
-				for (int x = -(gBack.fx / 0x200 % gBack.partsW); x < WINDOW_WIDTH; x += gBack.partsW)
-					PutBitmap4(&grcGame, x, y, &rect, SURFACE_ID_LEVEL_BACKGROUND);
+				for (int x = -(gBack.fx % (gBack.partsW * 0x200)); x < WINDOW_WIDTH * 0x200; x += gBack.partsW * 0x200)
+					PutBitmap4(&grcGame, SubpixelToScreenCoord(x), PixelToScreenCoord(y), &rect, SURFACE_ID_LEVEL_BACKGROUND);
 			}
 			break;
 			
@@ -110,7 +110,7 @@ void PutBack(int fx, int fy)
 				fillNext = ((fillNext) * 214013 + 2531011);
 				for (int x = -(int)(fillNext % 149); x < WINDOW_WIDTH; x += 149)
 				{
-					PutBitmap4(&grcGame, x, y, &rcSkyFiller, SURFACE_ID_LEVEL_BACKGROUND);
+					PutBitmap4(&grcGame, PixelToScreenCoord(x), PixelToScreenCoord(y), &rcSkyFiller, SURFACE_ID_LEVEL_BACKGROUND);
 				}
 			}
 			
@@ -118,51 +118,51 @@ void PutBack(int fx, int fy)
 			rect.bottom = 88;
 			rect.left = 0;
 			rect.right = 320;
-			PutBitmap4(&grcGame, (WINDOW_WIDTH - 320) / 2, WINDOW_HEIGHT - 240, &rect, SURFACE_ID_LEVEL_BACKGROUND);
+			PutBitmap4(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 320) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 240), &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
 			//Cloud layer 1
 			rect.top = 88;
 			rect.bottom = 123;
 			rect.left = gBack.fx / 2;
 			rect.right = 320;
-			PutBitmap4(&grcGame, 0, 88 + (WINDOW_HEIGHT - 240), &rect, SURFACE_ID_LEVEL_BACKGROUND);
+			PutBitmap4(&grcGame, 0, PixelToScreenCoord(88 + (WINDOW_HEIGHT - 240)), &rect, SURFACE_ID_LEVEL_BACKGROUND);
 			
 			rect.left = 0;
 			for (int i = 0; i < ((WINDOW_WIDTH - 1) / 320) + 1; i++)
-				PutBitmap4(&grcGame, (320 * (i + 1)) - gBack.fx / 2 % 320, 88 + (WINDOW_HEIGHT - 240), &rect, SURFACE_ID_LEVEL_BACKGROUND);
+				PutBitmap4(&grcGame, PixelToScreenCoord(320 * (i + 1)) - SubpixelToScreenCoord(gBack.fx * 0x200 / 2 % (320 * 0x200)), PixelToScreenCoord(88 + (WINDOW_HEIGHT - 240)), &rect, SURFACE_ID_LEVEL_BACKGROUND);
 			
 			//Cloud layer 2
 			rect.top = 123;
 			rect.bottom = 146;
 			rect.left = gBack.fx % 320;
 			rect.right = 320;
-			PutBitmap4(&grcGame, 0, 123 + (WINDOW_HEIGHT - 240), &rect, SURFACE_ID_LEVEL_BACKGROUND);
+			PutBitmap4(&grcGame, 0, PixelToScreenCoord(123 + (WINDOW_HEIGHT - 240)), &rect, SURFACE_ID_LEVEL_BACKGROUND);
 			
 			rect.left = 0;
 			for (int i = 0; i < ((WINDOW_WIDTH - 1) / 320) + 1; i++)
-				PutBitmap4(&grcGame, (320 * (i + 1)) - gBack.fx % 320, 123 + (WINDOW_HEIGHT - 240), &rect, SURFACE_ID_LEVEL_BACKGROUND);
+				PutBitmap4(&grcGame, PixelToScreenCoord((320 * (i + 1)) - gBack.fx % 320), PixelToScreenCoord(123 + (WINDOW_HEIGHT - 240)), &rect, SURFACE_ID_LEVEL_BACKGROUND);
 			
 			//Cloud layer 3
 			rect.top = 146;
 			rect.bottom = 176;
 			rect.left = 2 * gBack.fx % 320;
 			rect.right = 320;
-			PutBitmap4(&grcGame, 0, 146 + (WINDOW_HEIGHT - 240), &rect, SURFACE_ID_LEVEL_BACKGROUND);
+			PutBitmap4(&grcGame, 0, PixelToScreenCoord(146 + (WINDOW_HEIGHT - 240)), &rect, SURFACE_ID_LEVEL_BACKGROUND);
 			
 			rect.left = 0;
 			for (int i = 0; i < ((WINDOW_WIDTH - 1) / 320) + 1; i++)
-				PutBitmap4(&grcGame, (320 * (i + 1)) - 2 * gBack.fx % 320, 146 + (WINDOW_HEIGHT - 240), &rect, SURFACE_ID_LEVEL_BACKGROUND);
+				PutBitmap4(&grcGame, PixelToScreenCoord((320 * (i + 1)) - 2 * gBack.fx % 320), PixelToScreenCoord(146 + (WINDOW_HEIGHT - 240)), &rect, SURFACE_ID_LEVEL_BACKGROUND);
 			
 			//Cloud layer 4
 			rect.top = 176;
 			rect.bottom = 240;
 			rect.left = 4 * gBack.fx % 320;
 			rect.right = 320;
-			PutBitmap4(&grcGame, 0, 176 + (WINDOW_HEIGHT - 240), &rect, SURFACE_ID_LEVEL_BACKGROUND);
+			PutBitmap4(&grcGame, 0, PixelToScreenCoord(176 + (WINDOW_HEIGHT - 240)), &rect, SURFACE_ID_LEVEL_BACKGROUND);
 			
 			rect.left = 0;
 			for (int i = 0; i < ((WINDOW_WIDTH - 1) / 320) + 1; i++)
-				PutBitmap4(&grcGame, (320 * (i + 1)) - 4 * gBack.fx % 320, 176 + (WINDOW_HEIGHT - 240), &rect, SURFACE_ID_LEVEL_BACKGROUND);
+				PutBitmap4(&grcGame, PixelToScreenCoord((320 * (i + 1)) - 4 * gBack.fx % 320), PixelToScreenCoord(176 + (WINDOW_HEIGHT - 240)), &rect, SURFACE_ID_LEVEL_BACKGROUND);
 			break;
 			
 		default:
@@ -193,20 +193,20 @@ void PutFront(int fx, int fy)
 			
 			for (y = y_1; y < y_2; y++)
 			{
-				ypos = (y * 0x20 * 0x200) / 0x200 - fy / 0x200 + gWaterY / 0x200;
+				ypos = (y * 0x20 * 0x200) - fy + gWaterY;
 				
-				if (ypos < -32)
+				if (ypos < -32 * 0x200)
 					continue;
 
-				if (ypos > WINDOW_HEIGHT)
+				if (ypos > WINDOW_HEIGHT * 0x200)
 					break;
 					
 				for (x = x_1; x < x_2; x++)
 				{
-					xpos = (x * 0x20 * 0x200) / 0x200 - fx / 0x200;
-					PutBitmap3(&grcGame, xpos, ypos, &rcWater[1], SURFACE_ID_LEVEL_BACKGROUND);
+					xpos = (x * 0x20 * 0x200) - fx;
+					PutBitmap3(&grcGame, SubpixelToScreenCoord(xpos), SubpixelToScreenCoord(ypos), &rcWater[1], SURFACE_ID_LEVEL_BACKGROUND);
 					if (!y)
-						PutBitmap3(&grcGame, xpos, ypos, &rcWater[0], SURFACE_ID_LEVEL_BACKGROUND);
+						PutBitmap3(&grcGame, SubpixelToScreenCoord(xpos), SubpixelToScreenCoord(ypos), &rcWater[0], SURFACE_ID_LEVEL_BACKGROUND);
 				}
 			}
 
