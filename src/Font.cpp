@@ -230,7 +230,7 @@ void DrawText(FontObject *font_object, SDL_Surface *surface, int x, int y, unsig
 								unsigned char *surface_pixel = (unsigned char*)surface->pixels + (letter_y + iy) * surface->pitch + (letter_x + ix) * 4;
 
 								const double src_alpha = pow((double)font_pixel / (converted.num_grays - 1), 1.0 / 1.8);
-								const double dst_alpha = pow(surface_pixel[3] / 255.0, 1.0 / 1.8);
+								const double dst_alpha = surface_pixel[3] / 255.0;
 								const double out_alpha = src_alpha + dst_alpha * (1.0 - src_alpha);
 
 								for (unsigned int j = 0; j < 3; ++j)
