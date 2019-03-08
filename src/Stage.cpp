@@ -33,7 +33,7 @@
 
 int gStageNo;
 
-STAGE_TABLE *gTMT = (STAGE_TABLE[95]){
+static const STAGE_TABLE gTMTDefault[95] = {
 	STAGE_ENTRY("0", "0", 4, "bk0", "Guest", "0", 0, "Null", "無"),
 	STAGE_ENTRY("Pens", "Pens1", 1, "bkBlue", "Guest", "0", 0, "Arthur's House", "アーサーの家"),
 	STAGE_ENTRY("Eggs", "Eggs", 1, "bkGreen", "Eggs1", "Ravil", 0, "Egg Corridor", "タマゴ回廊"),
@@ -130,6 +130,8 @@ STAGE_TABLE *gTMT = (STAGE_TABLE[95]){
 	STAGE_ENTRY("White", "e_Blcn", 7, "bkFog", "Miza", "0", 9, "", ""),
 	STAGE_ENTRY("Oside", "Clock", 6, "bkMoon", "Moon", "0", 0, "Clock Room", "時計屋"),
 };
+
+static const STAGE_TABLE *gTMT = gTMTDefault;
 
 bool LoadStageTable(const char *path)
 {
