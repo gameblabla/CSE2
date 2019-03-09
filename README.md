@@ -1,6 +1,6 @@
 # Cave Story Engine 2
 
-Cave Story Engine is a decompilation of Cave Story, ported from DirectX to SDL2.
+Cave Story Engine 2 is a decompilation of Cave Story, ported from DirectX to SDL2.
 
 ![Screenshot](screenshot.png)
 
@@ -10,7 +10,7 @@ Cave Story Engine 2 is based off of the *original freeware release* by Studio Pi
 
 ## Dependencies
 
-This project currently depends on SDL2 and Freetype2.
+This project currently depends on SDL2 and Freetype.
 
 ## Building
 
