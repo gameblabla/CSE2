@@ -1,4 +1,4 @@
-This is a static build of Freetype 2.9.1, built with MSVC2003.
+This is a static build of FreeType 2.9.1, built with MSVC2003.
 
 Despite the lack of a compatible .sln file, it can be built by running
 'make visualc' in the root of the Freetype source directory while in a
