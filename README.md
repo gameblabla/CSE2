@@ -6,7 +6,7 @@ This branch adds several enhancements such as PNG support, full alpha blending s
 
 ## Dependencies
 
-This project currently depends on SDL2 and Freetype.
+This project currently depends on SDL2 and FreeType. The Japanese build also requires iconv.
 
 ## Building
 
