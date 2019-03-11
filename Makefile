@@ -27,9 +27,6 @@ ifeq ($(WINDOWS), 1)
 	ifeq ($(CONSOLE), 1)
 		CXXFLAGS += -mconsole
 	endif
-	ifeq ($(JAPANESE), 1)
-		LIBS += -liconv
-	endif
 
 	CXXFLAGS += -DWINDOWS
 	LIBS += -lkernel32
