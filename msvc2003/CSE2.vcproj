@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="CSE2"
+	Name="Cave Story Engine 2"
 	ProjectGUID="{6B8CC57F-5656-4C4B-8FCB-B0C326FCB4D4}"
 	RootNamespace="CSE2"
 	Keyword="ManagedCProj">
