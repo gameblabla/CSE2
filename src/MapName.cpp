@@ -33,7 +33,7 @@ void ReadyMapName(const char *str)
 	strcpy(gMapName.name, str);
 	
 	//Draw the text to the surface
-	int len = strlen(gMapName.name);
+	int len = (int)strlen(gMapName.name);
 	
 	CortBox2(&rc, 0, SURFACE_ID_ROOM_NAME);
 	PutText2((-6 * len + 160) / 2 + 6, 1, gMapName.name, RGB(0x11, 0x00, 0x22), SURFACE_ID_ROOM_NAME);
@@ -66,7 +66,7 @@ void StartMapName()
 
 void RestoreMapName()
 {
-	int len = strlen(gMapName.name);
+	int len = (int)strlen(gMapName.name);
 	
 	CortBox2(&rc, 0, SURFACE_ID_ROOM_NAME);
 	PutText2((-6 * len + 160) / 2 + 6, 1, gMapName.name, RGB(0x11, 0x00, 0x22), SURFACE_ID_ROOM_NAME);

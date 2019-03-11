@@ -427,7 +427,7 @@ SDL_RWops* FindResource(const char *name)
 	if (!resource)
 		return NULL;
 	
-	SDL_RWops *fp = SDL_RWFromConstMem(resource, resSize);
+	SDL_RWops *fp = SDL_RWFromConstMem(resource, (int)resSize);
 	
 	if (!fp)
 	{

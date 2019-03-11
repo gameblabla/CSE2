@@ -1707,7 +1707,7 @@ FontObject* LoadFontFromData(const unsigned char *data, size_t data_size, unsign
 	font_object->data = (unsigned char*)malloc(data_size);
 	memcpy(font_object->data, data, data_size);
 
-	FT_Error error = FT_New_Memory_Face(font_object->library, font_object->data, data_size, 0, &font_object->face);
+	FT_Error error = FT_New_Memory_Face(font_object->library, font_object->data, (FT_Long)data_size, 0, &font_object->face);
 
 	if (error)
 	{

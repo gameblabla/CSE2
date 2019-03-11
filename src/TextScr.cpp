@@ -375,7 +375,7 @@ void SetNumberTextScript(int index)
 	gTS.wait_beam = 0;
 
 	//Check if should move to next line (prevent a memory overflow, come on guys, this isn't a leftover of pixel trying to make text wrapping)
-	gTS.p_write += strlen(str);
+	gTS.p_write += (unsigned int)strlen(str);
 
 	if (gTS.p_write >= 35)
 	{
