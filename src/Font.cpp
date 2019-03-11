@@ -1628,8 +1628,7 @@ static unsigned short ShiftJISToUnicode(const unsigned char *string, unsigned in
 			return shiftjis_to_unicode_lookup[string[0]];
 	}
 
-	lookup_index += (string[0] & 0xF) * 0x100;
-	lookup_index += string[1];
+	lookup_index += ((string[0] << 8) | string[1]) & 0xFFF;
 
 	if (bytes_read != NULL)
 		*bytes_read = 2;
