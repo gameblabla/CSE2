@@ -72,7 +72,11 @@
 			ManagedExtensions="FALSE">
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="0"
+				Optimization="3"
+				GlobalOptimizations="TRUE"
+				EnableIntrinsicFunctions="TRUE"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="TRUE"
 				AdditionalIncludeDirectories="&quot;SDL2-2.0.9/include&quot;;&quot;freetype-2.9.1/include&quot;;./"
 				PreprocessorDefinitions="WIN32;NDEBUG;WINDOWS;NONPORTABLE;FIX_BUGS"
 				MinimalRebuild="TRUE"
@@ -122,7 +126,11 @@
 			ManagedExtensions="FALSE">
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="0"
+				Optimization="3"
+				GlobalOptimizations="TRUE"
+				EnableIntrinsicFunctions="TRUE"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="TRUE"
 				AdditionalIncludeDirectories="&quot;SDL2-2.0.9/include&quot;;&quot;freetype-2.9.1/include&quot;;./"
 				PreprocessorDefinitions="WIN32;NDEBUG;WINDOWS;NONPORTABLE;JAPANESE"
 				MinimalRebuild="TRUE"
@@ -297,18 +305,6 @@
 			</File>
 			<File
 				RelativePath="..\src\Font.cpp">
-				<FileConfiguration
-					Name="Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="3"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release (Japanese)|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="3"/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\src\Frame.cpp">
@@ -338,6 +334,18 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="LODEPNG_NO_COMPILE_ENCODER;LODEPNG_NO_COMPILE_ERROR_TEXT;LODEPNG_NO_COMPILE_CPP"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release (Japanese)|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="LODEPNG_NO_COMPILE_ENCODER;LODEPNG_NO_COMPILE_ERROR_TEXT;LODEPNG_NO_COMPILE_CPP"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug (Japanese)|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
 						PreprocessorDefinitions="LODEPNG_NO_COMPILE_ENCODER;LODEPNG_NO_COMPILE_ERROR_TEXT;LODEPNG_NO_COMPILE_CPP"/>
