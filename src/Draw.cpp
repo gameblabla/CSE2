@@ -248,18 +248,7 @@ static void FlushSurface(Surface_Ids surf_no)
 	SDL_LockTexture(surf[surf_no].texture, NULL, (void**)&raw_pixels, &pitch);
 
 	for (int h = 0; h < surf[surf_no].surface->h; ++h)
-	{
-		for (int w = 0; w < surf[surf_no].surface->w; ++w)
-		{
-			unsigned char *src_pixel = (unsigned char*)surf[surf_no].surface->pixels + (h * surf[surf_no].surface->pitch) + (w * 4);
-			unsigned char *dst_pixel = (unsigned char*)raw_pixels + (h * pitch) + (w * 4);
-
-			dst_pixel[0] = src_pixel[0];
-			dst_pixel[1] = src_pixel[1];
-			dst_pixel[2] = src_pixel[2];
-			dst_pixel[3] = src_pixel[3];
-		}
-	}
+		memcpy((unsigned char*)raw_pixels + (h * pitch), (unsigned char*)surf[surf_no].surface->pixels + (h * surf[surf_no].surface->pitch), surf[surf_no].surface->w * 4);
 
 	SDL_UnlockTexture(surf[surf_no].texture);
 }
