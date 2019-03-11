@@ -28,6 +28,7 @@
 				RuntimeLibrary="1"
 				AssemblerOutput="4"
 				WarningLevel="3"
+				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="3"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
@@ -78,6 +79,7 @@
 				RuntimeLibrary="0"
 				AssemblerOutput="4"
 				WarningLevel="3"
+				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="3"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
@@ -127,6 +129,7 @@
 				RuntimeLibrary="0"
 				AssemblerOutput="4"
 				WarningLevel="3"
+				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="3"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
@@ -177,6 +180,7 @@
 				RuntimeLibrary="1"
 				AssemblerOutput="4"
 				WarningLevel="3"
+				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="3"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
@@ -293,6 +297,18 @@
 			</File>
 			<File
 				RelativePath="..\src\Font.cpp">
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="3"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release (Japanese)|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="3"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\src\Frame.cpp">
