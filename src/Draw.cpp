@@ -170,7 +170,7 @@ BOOL MakeSurface_Generic(int bxsize, int bysize, Surface_Ids surf_no)
 		else
 		{
 			//Create surface
-			surf[surf_no].surface = SDL_CreateRGBSurfaceWithFormat(0, bxsize * magnification, bysize * magnification, 0, SDL_PIXELFORMAT_RGBA32);
+			surf[surf_no].surface = SDL_CreateRGBSurfaceWithFormat(0, bxsize * magnification, bysize * magnification, 0, SDL_PIXELFORMAT_RGB24);
 			SDL_SetSurfaceBlendMode(surf[surf_no].surface, SDL_BLENDMODE_NONE);
 
 			if (surf[surf_no].surface == NULL)
@@ -208,7 +208,7 @@ static void FlushSurface(Surface_Ids surf_no)
 	{
 		for (int w = 0; w < surf[surf_no].surface->w; ++w)
 		{
-			unsigned char *src_pixel = (unsigned char*)surf[surf_no].surface->pixels + (h * surf[surf_no].surface->pitch) + (w * 4);
+			unsigned char *src_pixel = (unsigned char*)surf[surf_no].surface->pixels + (h * surf[surf_no].surface->pitch) + (w * 3);
 			unsigned char *dst_pixel = (unsigned char*)raw_pixels + (h * pitch) + (w * 4);
 
 			dst_pixel[0] = src_pixel[0];
@@ -285,14 +285,13 @@ static bool LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, bool create_surface)
 										*dst_ptr++ = src_ptr[0];
 										*dst_ptr++ = src_ptr[1];
 										*dst_ptr++ = src_ptr[2];
-										*dst_ptr++ = src_ptr[3];
 									}
 
-									src_ptr += 4;
+									src_ptr += 3;
 								}
 
 								for (int i = 1; i < magnification; ++i)
-									memcpy(dst_row + i * surf[surf_no].surface->pitch, dst_row, surf[surf_no].surface->w * 4);
+									memcpy(dst_row + i * surf[surf_no].surface->pitch, dst_row, surf[surf_no].surface->w * 3);
 							}
 
 							SDL_FreeSurface(converted_surface);
@@ -412,9 +411,9 @@ void BackupSurface(Surface_Ids surf_no, RECT *rect)
 	SDL_GetRendererOutputSize(gRenderer, &w, &h);
 
 	//Get texture of what's currently rendered on screen
-	SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormat(0, w, h, 0, SDL_PIXELFORMAT_RGBA32);
+	SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormat(0, w, h, 0, SDL_PIXELFORMAT_RGB24);
 	SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_NONE);
-	SDL_RenderReadPixels(gRenderer, NULL, SDL_PIXELFORMAT_RGBA32, surface->pixels, surface->pitch);
+	SDL_RenderReadPixels(gRenderer, NULL, SDL_PIXELFORMAT_RGB24, surface->pixels, surface->pitch);
 
 	//Get rects
 	SDL_Rect frameRect = RectToSDLRectScaled(rect);
@@ -605,8 +604,8 @@ void PutText(int x, int y, const char *text, uint32_t color)
 	int surface_width, surface_height;
 	SDL_GetRendererOutputSize(gRenderer, &surface_width, &surface_height);
 
-	SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormat(0, surface_width, surface_height, 0, SDL_PIXELFORMAT_RGBA32);
-	SDL_RenderReadPixels(gRenderer, NULL, SDL_PIXELFORMAT_RGBA32, surface->pixels, surface->pitch);
+	SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormat(0, surface_width, surface_height, 0, SDL_PIXELFORMAT_RGB24);
+	SDL_RenderReadPixels(gRenderer, NULL, SDL_PIXELFORMAT_RGB24, surface->pixels, surface->pitch);
 
 	DrawText(gFont, surface, x * magnification, y * magnification, color, text, strlen(text));
 
