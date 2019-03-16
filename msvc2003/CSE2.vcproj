@@ -22,7 +22,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;SDL2-2.0.9/include&quot;;&quot;freetype-2.9.1/include&quot;;./"
-				PreprocessorDefinitions="WIN32;_DEBUG;WINDOWS;NONPORTABLE;FIX_BUGS"
+				PreprocessorDefinitions="WIN32;_DEBUG;WINDOWS;NONPORTABLE;FIX_BUGS;LODEPNG_NO_COMPILE_ENCODER;LODEPNG_NO_COMPILE_ERROR_TEXT;LODEPNG_NO_COMPILE_CPP"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="1"
@@ -78,7 +78,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
 				AdditionalIncludeDirectories="&quot;SDL2-2.0.9/include&quot;;&quot;freetype-2.9.1/include&quot;;./"
-				PreprocessorDefinitions="WIN32;NDEBUG;WINDOWS;NONPORTABLE;FIX_BUGS"
+				PreprocessorDefinitions="WIN32;NDEBUG;WINDOWS;NONPORTABLE;FIX_BUGS;LODEPNG_NO_COMPILE_ENCODER;LODEPNG_NO_COMPILE_ERROR_TEXT;LODEPNG_NO_COMPILE_CPP"
 				MinimalRebuild="TRUE"
 				RuntimeLibrary="0"
 				AssemblerOutput="4"
@@ -132,7 +132,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
 				AdditionalIncludeDirectories="&quot;SDL2-2.0.9/include&quot;;&quot;freetype-2.9.1/include&quot;;./"
-				PreprocessorDefinitions="WIN32;NDEBUG;WINDOWS;NONPORTABLE;JAPANESE"
+				PreprocessorDefinitions="WIN32;NDEBUG;WINDOWS;NONPORTABLE;FIX_BUGS;LODEPNG_NO_COMPILE_ENCODER;LODEPNG_NO_COMPILE_ERROR_TEXT;LODEPNG_NO_COMPILE_CPP;JAPANESE"
 				MinimalRebuild="TRUE"
 				RuntimeLibrary="0"
 				AssemblerOutput="4"
@@ -182,7 +182,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;SDL2-2.0.9/include&quot;;&quot;freetype-2.9.1/include&quot;;./"
-				PreprocessorDefinitions="WIN32;_DEBUG;WINDOWS;NONPORTABLE;JAPANESE"
+				PreprocessorDefinitions="WIN32;_DEBUG;WINDOWS;NONPORTABLE;FIX_BUGS;LODEPNG_NO_COMPILE_ENCODER;LODEPNG_NO_COMPILE_ERROR_TEXT;LODEPNG_NO_COMPILE_CPP;JAPANESE"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="1"
@@ -326,30 +326,6 @@
 			</File>
 			<File
 				RelativePath="..\src\lodepng\lodepng.cpp">
-				<FileConfiguration
-					Name="Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						PreprocessorDefinitions="LODEPNG_NO_COMPILE_ENCODER;LODEPNG_NO_COMPILE_ERROR_TEXT;LODEPNG_NO_COMPILE_CPP"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						PreprocessorDefinitions="LODEPNG_NO_COMPILE_ENCODER;LODEPNG_NO_COMPILE_ERROR_TEXT;LODEPNG_NO_COMPILE_CPP"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release (Japanese)|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						PreprocessorDefinitions="LODEPNG_NO_COMPILE_ENCODER;LODEPNG_NO_COMPILE_ERROR_TEXT;LODEPNG_NO_COMPILE_CPP"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug (Japanese)|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						PreprocessorDefinitions="LODEPNG_NO_COMPILE_ENCODER;LODEPNG_NO_COMPILE_ERROR_TEXT;LODEPNG_NO_COMPILE_CPP"/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\src\Main.cpp">
