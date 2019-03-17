@@ -4,7 +4,7 @@
 
 struct VALUEVIEW
 {
-  int flag;
+  BOOL flag;
   int *px;
   int *py;
   int offset_y;
