@@ -23,6 +23,7 @@ Just run 'make' in the base directory, preferably with some of the following set
 * JAPANESE=1 to enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
 * FIX_BUGS=1 to fix certain bugs (see [src/Bug Fixes.txt](src/Bug%20Fixes.txt))
 * WINDOWS=1 to enable Windows-only features like a unique file/taskbar icon, and system font loading (needed for the font setting in Config.dat to do anything)
+* RASPBERRY_PI=1 to enable tweaks to improve performance on Raspberry Pis
 * NONPORTABLE=1 to enable bits of code that aren't portable, but needed for accuracy
 
 Project files for Visual Studio 2003 are also available, in the 'msvc2003' directory.
