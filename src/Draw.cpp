@@ -85,12 +85,22 @@ BOOL StartDirectDraw(int lMagnification, int lColourDepth)
 
 	//Initialize rendering
 	SDL_InitSubSystem(SDL_INIT_VIDEO);
-	
+
+#ifdef RASPBERRY_PI
+	//Force OpenGLES2 on Raspberry Pi
+	SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengles2");
+#endif
+
 	//Create renderer
 	gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED);
 
 	if (gRenderer != NULL)
 	{
+		//Print the name of the renderer SDL2 is using
+		SDL_RendererInfo info;
+		SDL_GetRendererInfo(gRenderer, &info);
+		printf("Renderer: %s\n", info.name);
+
 		switch (lMagnification)
 		{
 			case 0:
