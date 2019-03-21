@@ -142,8 +142,8 @@ bool LoadStageTable(const char *path)
 
 	if (file_size != -1)
 	{
-		if (file_size % 0xC8)
-			printf("stage.tbl has partial stage entry\n");
+		if (file_size % 0xE5)
+			printf("Warning: stage.tbl has an incomplete stage entry at the end\n");
 
 		const long entry_count = file_size / 0xE5;
 
