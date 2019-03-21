@@ -21,7 +21,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;SDL2-2.0.9/include&quot;;&quot;freetype-2.9.1/include&quot;;./"
+				AdditionalIncludeDirectories="&quot;SDL2-2.0.9/include&quot;;&quot;freetype-2.10.0/include&quot;;./"
 				PreprocessorDefinitions="WIN32;_DEBUG;WINDOWS;NONPORTABLE"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="0"
@@ -34,7 +34,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="SDL2-2.0.9/lib/x86/SDL2.lib SDL2-2.0.9/lib/x86/SDL2main.lib freetype-2.9.1/lib/freetype.lib"
+				AdditionalDependencies="SDL2-2.0.9/lib/x86/SDL2.lib SDL2-2.0.9/lib/x86/SDL2main.lib freetype-2.10.0/lib/freetype.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
@@ -73,7 +73,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;SDL2-2.0.9/include&quot;;&quot;freetype-2.9.1/include&quot;;./"
+				AdditionalIncludeDirectories="&quot;SDL2-2.0.9/include&quot;;&quot;freetype-2.10.0/include&quot;;./"
 				PreprocessorDefinitions="WIN32;NDEBUG;WINDOWS;NONPORTABLE"
 				MinimalRebuild="TRUE"
 				RuntimeLibrary="0"
@@ -85,7 +85,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="SDL2-2.0.9/lib/x86/SDL2.lib SDL2-2.0.9/lib/x86/SDL2main.lib freetype-2.9.1/lib/freetype.lib"
+				AdditionalDependencies="SDL2-2.0.9/lib/x86/SDL2.lib SDL2-2.0.9/lib/x86/SDL2main.lib freetype-2.10.0/lib/freetype.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
 				IgnoreAllDefaultLibraries="FALSE"
@@ -123,7 +123,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;SDL2-2.0.9/include&quot;;&quot;freetype-2.9.1/include&quot;;./"
+				AdditionalIncludeDirectories="&quot;SDL2-2.0.9/include&quot;;&quot;freetype-2.10.0/include&quot;;./"
 				PreprocessorDefinitions="WIN32;NDEBUG;WINDOWS;NONPORTABLE;JAPANESE"
 				MinimalRebuild="TRUE"
 				RuntimeLibrary="0"
@@ -135,7 +135,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="SDL2-2.0.9/lib/x86/SDL2.lib SDL2-2.0.9/lib/x86/SDL2main.lib freetype-2.9.1/lib/freetype.lib"
+				AdditionalDependencies="SDL2-2.0.9/lib/x86/SDL2.lib SDL2-2.0.9/lib/x86/SDL2main.lib freetype-2.10.0/lib/freetype.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
 				IgnoreAllDefaultLibraries="FALSE"
@@ -173,7 +173,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;SDL2-2.0.9/include&quot;;&quot;freetype-2.9.1/include&quot;;./"
+				AdditionalIncludeDirectories="&quot;SDL2-2.0.9/include&quot;;&quot;freetype-2.10.0/include&quot;;./"
 				PreprocessorDefinitions="WIN32;_DEBUG;WINDOWS;NONPORTABLE;JAPANESE"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="0"
@@ -186,7 +186,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="SDL2-2.0.9/lib/x86/SDL2.lib SDL2-2.0.9/lib/x86/SDL2main.lib freetype-2.9.1/lib/freetype.lib"
+				AdditionalDependencies="SDL2-2.0.9/lib/x86/SDL2.lib SDL2-2.0.9/lib/x86/SDL2main.lib freetype-2.10.0/lib/freetype.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
