@@ -632,7 +632,7 @@ bool Game()
 		
 		if (LoadNpcTable(path))
 		{
-			sprintf(path, "%s/stage.tbl", gDataPath);
+			sprintf(path, "%s/mrmap.bin", gDataPath);
 			LoadStageTable(path);
 
 			InitTextScript2();

@@ -4,14 +4,14 @@
 
 struct STAGE_TABLE
 {
-	char parts[0x20];
-	char map[0x20];
-	int bkType;
-	char back[0x20];
-	char npc[0x20];
-	char boss[0x20];
+	char parts[0x10];
+	char map[0x10];
+	char bkType;
+	char back[0x10];
+	char npc[0x10];
+	char boss[0x10];
 	char boss_no;
-	char name[0x20];
+	char name[0x22];
 };
 
 extern int gStageNo;

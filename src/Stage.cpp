@@ -140,12 +140,9 @@ bool LoadStageTable(const char *path)
 	unsigned char *file_buffer;
 	const long file_size = LoadFileToMemory(path, &file_buffer);
 
-	if (file_size != -1)
+	if (file_size != -1 && file_size >= 4)
 	{
-		if (file_size % 0xE5)
-			printf("Warning: stage.tbl has an incomplete stage entry at the end\n");
-
-		const long entry_count = file_size / 0xE5;
+		const long entry_count = file_buffer[0] | (file_buffer[1] << 8) | (file_buffer[2] << 16) | (file_buffer[3] << 24);
 
 		STAGE_TABLE *pTMT = (STAGE_TABLE*)malloc(entry_count * sizeof(STAGE_TABLE));
 
@@ -153,20 +150,18 @@ bool LoadStageTable(const char *path)
 		{
 			for (long i = 0; i < entry_count; ++i)
 			{
-				unsigned char *entry = file_buffer + i * 0xE5;
+				// For compatibility with Booster's Lab, we store our stage table in "MOD_KS" format.
+				// This way, BL will load the sprites as PNG files instead of BMP.
+				unsigned char *entry = file_buffer + 4 + i * 0x74;
 
-				memcpy(pTMT[i].parts, entry, 0x20);
-				memcpy(pTMT[i].map, entry + 0x20, 0x20);
-				pTMT[i].bkType = (entry[0x40 + 3] << 24) | (entry[0x40 + 2] << 16) | (entry[0x40 + 1] << 8) | entry[0x40];
-				memcpy(pTMT[i].back, entry + 0x44, 0x20);
-				memcpy(pTMT[i].npc, entry + 0x64, 0x20);
-				memcpy(pTMT[i].boss, entry + 0x84, 0x20);
-				pTMT[i].boss_no = entry[0xA4];
-#ifdef JAPANESE
-				memcpy(pTMT[i].name, entry + 0xA5, 0x20);
-#else
-				memcpy(pTMT[i].name, entry + 0xC5, 0x20);
-#endif
+				memcpy(pTMT[i].parts, entry, 0x10);
+				memcpy(pTMT[i].map, entry + 0x10, 0x10);
+				pTMT[i].bkType = entry[0x20];
+				memcpy(pTMT[i].back, entry + 0x21, 0x10);
+				memcpy(pTMT[i].npc, entry + 0x31, 0x10);
+				memcpy(pTMT[i].boss, entry + 0x41, 0x10);
+				pTMT[i].boss_no = entry[0x51];
+				memcpy(pTMT[i].name, entry + 0x52, 0x22);
 			}
 
 			gTMT = pTMT;
@@ -177,7 +172,7 @@ bool LoadStageTable(const char *path)
 	}
 
 	if (success == false)
-		printf("Failed to load stage.tbl\n");
+		printf("Failed to load mrmap.bin\n");
 
 	return success;
 }
