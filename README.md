@@ -6,7 +6,9 @@ This branch adds several enhancements such as PNG support, full alpha blending s
 
 ## Dependencies
 
-This project currently depends on SDL2 and FreeType.
+* SDL2
+* FreeType
+* pkg-config
 
 ## Building
 

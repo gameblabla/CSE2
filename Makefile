@@ -32,6 +32,10 @@ ifeq ($(WINDOWS), 1)
 	LIBS += -lkernel32
 endif
 
+ifeq ($(RASPBERRY_PI), 1)
+	CXXFLAGS += -DRASPBERRY_PI
+endif
+
 CXXFLAGS += -std=c++98 `pkg-config sdl2 --cflags` `pkg-config freetype2 --cflags` -MMD -MP -MF $@.d -DLODEPNG_NO_COMPILE_ENCODER -DLODEPNG_NO_COMPILE_ERROR_TEXT -DLODEPNG_NO_COMPILE_CPP
 
 ifeq ($(STATIC), 1)
