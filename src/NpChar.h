@@ -24,7 +24,7 @@ enum NPC_flags
 	npc_altDir = 0x1000, //Spawn facing to the right (or however the npc interprets the direction as)
 	npc_interact = 0x2000, //Run event when interacted with
 	npc_hideSet = 0x4000, //Hide when flag is set
-	npc_showDamage = 0x8000, //Show #Damage taken
+	npc_showDamage = 0x8000 //Show #Damage taken
 };
 
 struct NPCHAR

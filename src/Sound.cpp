@@ -11,7 +11,12 @@
 #include "PixTone.h"
 
 #define FREQUENCY 44100
+
+#ifdef RASPBERRY_PI
+#define STREAM_SIZE 0x400
+#else
 #define STREAM_SIZE (FREQUENCY / 200)
+#endif
 
 #define clamp(x, y, z) ((x > z) ? z : (x < y) ? y : x)
 

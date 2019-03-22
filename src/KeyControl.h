@@ -31,7 +31,7 @@ enum KEYBIND
 	KEY_ALT_UP =	0x00180000,
 	//Alt up actually has 2 seperate keys, but they're kind of merged together (and also for some reason the second one is +/=)
 	KEY_L =			0x00080000,
-	KEY_PLUS =		0x00100000,
+	KEY_PLUS =		0x00100000
 };
 
 extern int gKey;

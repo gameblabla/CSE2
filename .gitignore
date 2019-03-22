@@ -9,39 +9,14 @@
 build.7z
 build.zip
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
 # Executables
 *.exe
-*.out
-*.app
 
 # MSVC trash
 msvc2003/CSE2.ncb
 msvc2003/CSE2.suo
 msvc2003/Debug
 msvc2003/Release
+msvc2003/Debug (Japanese)
+msvc2003/Release (Japanese)
 *.aps

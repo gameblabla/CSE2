@@ -118,8 +118,8 @@ int MiniMapLoop()
 	
 	RECT rcMiniMap;
 	rcMiniMap.left = 0;
-	rcMiniMap.top = gMap.width;
-	rcMiniMap.right = 0;
+	rcMiniMap.right = gMap.width;
+	rcMiniMap.top = 0;
 	rcMiniMap.bottom = gMap.length;
 
 	rcView.right = --rcView.left + gMap.width + 2;

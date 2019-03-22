@@ -18,12 +18,27 @@ void ClearValueView()
 
 void SetValueView(int *px, int *py, int value)
 {
-	int i;
-	
-	//TODO: Boi I'm reaaaally boutta getcho pickle chin aah boi, egg head like collard greens head ass boi, ol' hell dat bell dirt aaah boi stank ah boi afro head ass, lip gloss chin ah boi ugly ahhh boi *snort* uglaaaa
-	for (i = 0; i < VALUEVIEW_MAX && (!gVV[i].flag || gVV[i].px != px || ((gVV[i].value >= 0 || value >= 0) && (gVV[i].value <= 0 || value <= 0))); i++);
-	
 	int index;
+	BOOL minus;
+	int v;
+	int width;
+	int dig[4];
+	int fig[4];
+	BOOL sw;
+	int i;
+
+	for (i = 0; i < VALUEVIEW_MAX; i++)
+	{
+		if (gVV[i].flag && gVV[i].px == px)
+		{
+			if (gVV[i].value < 0 && value < 0)
+				break;
+
+			if (gVV[i].value > 0 && value > 0)
+				break;
+		}
+	}
+	
 	if (i == VALUEVIEW_MAX)
 	{
 		index = gVVIndex++;
@@ -42,42 +57,30 @@ void SetValueView(int *px, int *py, int value)
 	}
 	
 	//Get if negative or not
-	bool minus;
-	if (value >= 0)
+	if (value < 0)
 	{
-		minus = false;
+		value *= -1;
+		minus = TRUE;
 	}
 	else
 	{
-		value = -value;
-		minus = true;
+		minus = FALSE;
 	}
 	
 	//Get width
-	int v = value;
-	int width;
+	v = value;
 	
-	if (value < 1000)
-	{
-		if (value < 100)
-		{
-			if (value < 10)
-				width = 16;
-			else
-				width = 24;
-		}
-		else
-		{
-			width = 32;
-		}
-	}
-	else
-	{
+	if (value > 999)
 		width = 40;
-	}
+	else if (value > 99)
+		width = 32;
+	else if (value > 9)
+		width = 24;
+	else
+		width = 16;
 	
 	//Set properties
-	gVV[index].flag = 1;
+	gVV[index].flag = TRUE;
 	gVV[index].px = px;
 	gVV[index].py = py;
 	gVV[index].rect.left = 40 - width;
@@ -109,24 +112,22 @@ void SetValueView(int *px, int *py, int value)
 	};
 	
 	//Get digits
-	int dig[4];
 	dig[0] = 1;
 	dig[1] = 10;
 	dig[2] = 100;
 	dig[3] = 1000;
 	
-	int fig[4];
-	for (int d = 3; d >= 0; d--)
+	for (i = 3; i >= 0; i--)
 	{
-		fig[d] = 0;
-		while (dig[d] <= v)
+		fig[i] = 0;
+		while (v >= dig[i])
 		{
-			v -= dig[d];
-			++fig[d];
+			v -= dig[i];
+			++fig[i];
 		}
 	}
 	
-	bool sw = false;
+	sw = FALSE;
 	
 	RECT rcPlus = {32, 48, 40, 56};
 	RECT rcMinus = {40, 48, 48, 56};
@@ -139,17 +140,17 @@ void SetValueView(int *px, int *py, int value)
 	else
 		Surface2Surface(gVV[index].rect.left, gVV[index].rect.top, &rcPlus, SURFACE_ID_VALUE_VIEW, SURFACE_ID_TEXT_BOX);
 	
-	for (int i = 3; i >= 0; i--)
+	for (i = 3; i >= 0; i--)
 	{
-		if (sw || !i || fig[i])
-		{
-			sw = true;
-			
-			if (minus)
-				fig[i] += 10;
-			
-			Surface2Surface(8 * (4 - i), gVV[index].rect.top, &rect[fig[i]], 29, 26);
-		}
+		if (sw == FALSE && i != 0 && fig[i] == 0)
+			continue;
+
+		sw = TRUE;
+
+		if (minus)
+			fig[i] += 10;
+
+		Surface2Surface((3 - i) * 8 + 8, gVV[index].rect.top, &rect[fig[i]], 29, 26);
 	}
 }
 
@@ -157,32 +158,37 @@ void ActValueView()
 {
 	for (int v = 0; v < VALUEVIEW_MAX; v++)
 	{
-		if (gVV[v].flag)
-		{
-			if (++gVV[v].count < 32)
-				gVV[v].offset_y -= 0x100;
+		if (gVV[v].flag == FALSE)
+			continue;
 
-			if ( gVV[v].count > 72 )
-				++gVV[v].rect.top;
+		if (++gVV[v].count < 32)
+			gVV[v].offset_y -= 0x100;
 
-			if ( gVV[v].count > 80 )
-				gVV[v].flag = 0;
-		}
+		if (gVV[v].count > 72)
+			++gVV[v].rect.top;
+
+		if (gVV[v].count > 80)
+			gVV[v].flag = FALSE;
 	}
 }
 
 void PutValueView(int flx, int fly)
 {
-	for (int v = 0; v < VALUEVIEW_MAX; v++)
+	int v;
+	int offset_x;
+
+	for (v = 0; v < VALUEVIEW_MAX; v++)
 	{
-		if (gVV[v].flag)
-		{
-			PutBitmap3(
-				&grcGame,
-				(*gVV[v].px) / 0x200 - (gVV[v].rect.right - gVV[v].rect.left) / 2 - flx / 0x200,
-				(*gVV[v].py) / 0x200 + gVV[v].offset_y / 0x200 - 4 - fly / 0x200,
-				&gVV[v].rect,
-				SURFACE_ID_VALUE_VIEW);
-		}
+		if (gVV[v].flag == FALSE)
+			continue;
+
+		offset_x = (gVV[v].rect.right - gVV[v].rect.left) / 2;
+
+		PutBitmap3(
+			&grcGame,
+			(*gVV[v].px) / 0x200 - offset_x - flx / 0x200,
+			(*gVV[v].py) / 0x200 + gVV[v].offset_y / 0x200 - 4 - fly / 0x200,
+			&gVV[v].rect,
+			SURFACE_ID_VALUE_VIEW);
 	}
 }
