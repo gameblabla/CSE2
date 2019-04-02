@@ -51,7 +51,7 @@ typedef enum Surface_Ids
 
 struct BUFFER_PIXEL
 {
-	uint8_t r, g, b;
+	uint8_t y, u, v;
 };
 
 struct SURFACE

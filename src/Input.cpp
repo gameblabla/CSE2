@@ -85,6 +85,9 @@ bool UpdateInput()
 	gKey |= (wpadHeld & WPAD_CLASSIC_BUTTON_FULL_L)	? gKeyArmsRev : 0;
 	
 	/* Gamecube controller */
+	if ((padHeld & PAD_BUTTON_START) && (padHeld & PAD_TRIGGER_Z))
+		gKey |= KEY_ESCAPE;
+	
 	//Direction
 	gKey |= (padHeld & PAD_BUTTON_LEFT)		? gKeyLeft : 0;
 	gKey |= (padHeld & PAD_BUTTON_RIGHT)	? gKeyRight : 0;

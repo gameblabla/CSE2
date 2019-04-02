@@ -25,33 +25,52 @@ RECT grcFull = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 SURFACE surf[SURFACE_ID_MAX];
 
 //Some stuff to convert RGB to YUV because the Wii is horrible!!! :D
-typedef struct YUVColour
+BUFFER_PIXEL RGBToYUV(uint8_t red, uint8_t green, uint8_t blue)
 {
-	uint8_t y;
-	uint8_t cb;
-	uint8_t cr;
-} YUVColour;
-
-YUVColour RGBToYUV(uint8_t red, uint8_t green, uint8_t blue)
-{
-	YUVColour yuv;
+	BUFFER_PIXEL yuv;
 	yuv.y = (299 * red + 587 * green + 114 * blue) / 1000;
-	yuv.cb = (-16874 * red - 33126 * green + 50000 * blue + 12800000) / 100000;
-	yuv.cr = (50000 * red - 41869 * green - 8131 * blue + 12800000) / 100000;
+	yuv.u = (-16874 * red - 33126 * green + 50000 * blue + 12800000) / 100000;
+	yuv.v = (50000 * red - 41869 * green - 8131 * blue + 12800000) / 100000;
 	return yuv;
 }
 
-#define SET_BUFFER_PIXEL(buffer, w, x, y, sr, sg, sb)    buffer[y * w + x].r = sr; \
-                                                         buffer[y * w + x].g = sg; \
-                                                         buffer[y * w + x].b = sb;
-
 //Frame-buffers and screen mode
-uint32_t *xfb[2];
-BUFFER_PIXEL *screenBuffer;
+#pragma pack(push)
+#pragma pack(1)
+struct WII_SOFT_BUFFER
+{
+	uint8_t y1, cb, y2, cr;
+};
+#pragma pack(pop)
 
-bool currentFramebuffer;
+uint32_t *xfb[2];
+WII_SOFT_BUFFER *screenBuffer;
+
+bool currentFramebuffer = false;
 GXRModeObj *prefMode;
 
+#define SET_SOFT_PIXEL(tx, ty, pixel) \
+	WII_SOFT_BUFFER *pix = &screenBuffer[(tx >> 1) + ty * WINDOW_WIDTH];							\
+	WII_SOFT_BUFFER *dup = &screenBuffer[((tx >> 1) + ty * WINDOW_WIDTH) + (WINDOW_WIDTH >> 1)];	\
+	if (tx & 0x1)																					\
+	{																								\
+		pix->y2 = dup->y2 = pixel.y;																\
+		pix->cb = dup->cb = (pix->cb + pixel.u) >> 1;												\
+		pix->cr = dup->cr = (pix->cr + pixel.v) >> 1;												\
+	}																								\
+	else																							\
+	{																								\
+		pix->y1 = dup->y1 = pixel.y;																\
+		pix->cb = dup->cb = pixel.u;																\
+		pix->cr = dup->cr = pixel.v;																\
+	}
+	
+
+#define SET_BUFFER_PIXEL(buffer, w, tx, ty, sy, su, sv)	\
+	buffer[ty * w + tx].y = sy;							\
+    buffer[ty * w + tx].u = su;							\
+    buffer[ty * w + tx].v = sv;
+	
 //Draw to screen
 BOOL Flip_SystemTask()
 {
@@ -59,20 +78,7 @@ BOOL Flip_SystemTask()
 	UpdateInput();
 	
 	//Write to framebuffer
-	uint32_t *pointer = xfb[currentFramebuffer];
-	
-	for (unsigned int y = 0; y < WINDOW_HEIGHT; y++)
-	{
-		for (unsigned int x = 0; x < WINDOW_WIDTH; x += 2)
-		{
-			YUVColour colour1 = RGBToYUV(screenBuffer[y * WINDOW_WIDTH + x].r, screenBuffer[y * WINDOW_WIDTH + x].g, screenBuffer[y * WINDOW_WIDTH + x].b);
-			YUVColour colour2 = RGBToYUV(screenBuffer[y * WINDOW_WIDTH + x + 1].r, screenBuffer[y * WINDOW_WIDTH + x + 1].g, screenBuffer[y * WINDOW_WIDTH + x + 1].b);
-			*pointer++ = (colour1.y << 24) | (((colour1.cb + colour2.cb) >> 1) << 16) | (colour2.y << 8) | ((colour1.cr + colour2.cr) >> 1);
-		}
-		
-		memcpy(pointer, pointer - (WINDOW_WIDTH / 2), (WINDOW_WIDTH / 2) * sizeof(*pointer));
-		pointer += WINDOW_WIDTH / 2;
-	}
+	memcpy(xfb[currentFramebuffer], screenBuffer, WINDOW_WIDTH * WINDOW_HEIGHT * sizeof(WII_SOFT_BUFFER));
 	
 	//Flush screen to our television and wait for next frame
 	VIDEO_SetNextFramebuffer(xfb[currentFramebuffer]);
@@ -100,18 +106,17 @@ BOOL StartDirectDraw()
 	xfb[0] = (uint32_t*)MEM_K0_TO_K1(SYS_AllocateFramebuffer(prefMode));
 	xfb[1] = (uint32_t*)MEM_K0_TO_K1(SYS_AllocateFramebuffer(prefMode));
 	
-	//Allocate our personal framebuffer
-	screenBuffer = (BUFFER_PIXEL*)malloc(WINDOW_WIDTH * WINDOW_HEIGHT * sizeof(BUFFER_PIXEL));
+	screenBuffer = (WII_SOFT_BUFFER*)malloc(WINDOW_WIDTH * WINDOW_HEIGHT * sizeof(WII_SOFT_BUFFER));
 	
 	//Setup the video registers with the chosen mode
 	VIDEO_Configure(prefMode);
 	
 	//Tell the VDP where are frame-buffer is
-	VIDEO_SetNextFramebuffer(xfb);
+	VIDEO_SetNextFramebuffer(xfb[0]);
 	
 	//Make the display visible
 	VIDEO_SetBlack(FALSE);
-
+	
 	//Flush to the VDP
 	VIDEO_Flush();
 
@@ -120,13 +125,11 @@ BOOL StartDirectDraw()
 	
 	if (prefMode->viTVMode & VI_NON_INTERLACE)
 		VIDEO_WaitVSync();
-	
 	return TRUE;
 }
 
 void EndDirectDraw()
 {
-	//Free our screenbuffer
 	free(screenBuffer);
 }
 
@@ -162,7 +165,7 @@ BOOL LoadBitmap(BMP *bmp, Surface_Ids surf_no, bool create_surface)
 			if (x >= surf[surf_no].w || y >= surf[surf_no].h)
 				continue;
 			RGBApixel pixel = bmp->GetPixel(x, y);
-			SET_BUFFER_PIXEL(surf[surf_no].data, surf[surf_no].w, x, y, pixel.Red, pixel.Green, pixel.Blue);
+			surf[surf_no].data[y * surf[surf_no].w + x] = RGBToYUV(pixel.Red, pixel.Green, pixel.Blue);
 		}
 	}
 	
@@ -195,19 +198,22 @@ BOOL LoadBitmap_File(const char *name, Surface_Ids surf_no, bool create_surface)
 
 BOOL LoadBitmap_Resource(const char *res, Surface_Ids surf_no, bool create_surface)
 {
-	/*
-	SDL_RWops *fp = FindResource(res);
+	size_t resSize;
+	const unsigned char *resd = FindResource(res, &resSize);
 	
-	if (fp)
-	{
-		printf("Loading surface from resource %s for surface id %d\n", res, surf_no);
-		if (LoadBitmap(fp, surf_no, create_surface))
-			return TRUE;
-	}
+	char path[PATH_LENGTH];
+	sprintf(path, "%s/%s.bmp", gDataPath, res);
 	
-	printf("Failed to open resource %s\n", res);
-	return FALSE;
-	*/
+	FILE *temp = fopen(path, "wb");
+	if (!temp)
+		return FALSE;
+	
+	fwrite(resd, resSize, 1, temp);
+	fclose(temp);
+	
+	LoadBitmap_File(res, surf_no, create_surface);
+	
+	remove(path);
 	return TRUE;
 }
 
@@ -245,8 +251,13 @@ void BackupSurface(Surface_Ids surf_no, RECT *rect)
 			if (dx >= surf[surf_no].w || dy >= surf[surf_no].h)
 				continue;
 			
-			BUFFER_PIXEL *fromPixel = &screenBuffer[fy * WINDOW_WIDTH + fx];
-			SET_BUFFER_PIXEL(surf[surf_no].data, surf[surf_no].w, dx, dy, fromPixel->r, fromPixel->g, fromPixel->b);
+			WII_SOFT_BUFFER *fromPixel = &screenBuffer[fy * WINDOW_WIDTH + (fx >> 1)];
+			uint8_t y;
+			if (fx & 0x1)
+				y = fromPixel->y2;
+			else
+				y = fromPixel->y1;
+			SET_BUFFER_PIXEL(surf[surf_no].data, surf[surf_no].w, dx, dy, y, fromPixel->cb, fromPixel->cr);
 		}
 	}
 }
@@ -270,10 +281,10 @@ static void DrawBitmap(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_
 				int dx = x + (fx - rect->left);
 				int dy = y + (fy - rect->top);
 				
-				BUFFER_PIXEL *pixel = &surf[surf_no].data[fy * surf[surf_no].w + fx];
-				if (transparent && pixel->r == 0 && pixel->g == 0 && pixel->b == 0)
+				BUFFER_PIXEL pixel = surf[surf_no].data[fy * surf[surf_no].w + fx];
+				if (transparent && pixel.y == 0)
 					continue;
-				SET_BUFFER_PIXEL(screenBuffer, WINDOW_WIDTH, dx, dy, pixel->r, pixel->g, pixel->b);
+				SET_SOFT_PIXEL(dx, dy, pixel);
 			}
 		}
 	}
@@ -307,10 +318,10 @@ void Surface2Surface(int x, int y, RECT *rect, int to, int from)
 				int dx = x + (fx - rect->left);
 				int dy = y + (fy - rect->top);
 				
-				BUFFER_PIXEL *pixel = &surf[from].data[fy * surf[from].w + fx];
-				if (pixel->r == 0 && pixel->g == 0 && pixel->b == 0) //Surface2Surface is always color keyed
+				BUFFER_PIXEL pixel = surf[from].data[fy * surf[from].w + fx];
+				if (pixel.y == 0) //Surface2Surface is always color keyed
 					continue;
-				SET_BUFFER_PIXEL(surf[to].data, surf[to].w, dx, dy, pixel->r, pixel->g, pixel->b);
+				SET_BUFFER_PIXEL(surf[to].data, surf[to].w, dx, dy, pixel.y, pixel.u, pixel.v);
 			}
 		}
 	}
@@ -327,14 +338,13 @@ void CortBox(RECT *rect, uint32_t col)
 	const unsigned char col_red = col & 0x0000FF;
 	const unsigned char col_green = (col & 0x00FF00) >> 8;
 	const unsigned char col_blue = (col & 0xFF0000) >> 16;
-	const BUFFER_PIXEL colPixel = {col_red, col_green, col_blue};
+	const BUFFER_PIXEL colPixel = RGBToYUV(col_red, col_green, col_blue);
 	
 	for (int y = (rect->top < 0 ? 0 : rect->top); y < (rect->bottom >= WINDOW_HEIGHT ? WINDOW_HEIGHT : rect->bottom); y++)
 	{
-		memcpy(screenBuffer, &colPixel, sizeof(BUFFER_PIXEL));
 		for (int x = (rect->left < 0 ? 0 : rect->left); x < (rect->right >= WINDOW_WIDTH ? WINDOW_WIDTH : rect->right); x++)
 		{
-			SET_BUFFER_PIXEL(screenBuffer, WINDOW_WIDTH, x, y, col_red, col_green, col_blue);
+			SET_SOFT_PIXEL(x, y, colPixel);
 		}
 	}
 }
@@ -346,12 +356,13 @@ void CortBox2(RECT *rect, uint32_t col, Surface_Ids surf_no)
 		const unsigned char col_red = col & 0x0000FF;
 		const unsigned char col_green = (col & 0x00FF00) >> 8;
 		const unsigned char col_blue = (col & 0xFF0000) >> 16;
+		const BUFFER_PIXEL colPixel = (BUFFER_PIXEL)RGBToYUV(col_red, col_green, col_blue);
 		
 		for (int y = (rect->top < 0 ? 0 : rect->top); y < (rect->bottom >= surf[surf_no].h ? surf[surf_no].h : rect->bottom); y++)
 		{
 			for (int x = (rect->left < 0 ? 0 : rect->left); x < (rect->right >= surf[surf_no].w ? surf[surf_no].w : rect->right); x++)
 			{
-				SET_BUFFER_PIXEL(surf[surf_no].data, surf[surf_no].w, x, y, col_red, col_green, col_blue);
+				SET_BUFFER_PIXEL(surf[surf_no].data, surf[surf_no].w, x, y, colPixel.y, colPixel.u, colPixel.v);
 			}
 		}
 	}
@@ -373,6 +384,7 @@ void PutText(int x, int y, const char *text, uint32_t color)
 	int r = (color & 0xFF0000) >> 16;
 	int g = (color & 0x00FF00) >>  8;
 	int b = (color & 0x0000FF) >>  0;
+	const BUFFER_PIXEL colPixel = (BUFFER_PIXEL)RGBToYUV(r, g, b);
 	
 	for (int i = 0; i < strlen(text); i++)
 	{
@@ -396,10 +408,10 @@ void PutText(int x, int y, const char *text, uint32_t color)
 					int dx = (x + 5 * i) + (fx - rect->left);
 					int dy = y + (fy - rect->top);
 					
-					BUFFER_PIXEL *pixel = &surf[SURFACE_ID_FONT].data[fy * surf[SURFACE_ID_FONT].w + fx];
-					if (pixel->r == 0 && pixel->g == 0 && pixel->b == 0)
+					BUFFER_PIXEL pixel = surf[SURFACE_ID_FONT].data[fy * surf[SURFACE_ID_FONT].w + fx];
+					if (pixel.y == 0)
 						continue;
-					SET_BUFFER_PIXEL(screenBuffer, WINDOW_WIDTH, dx, dy, r, g, b);
+					SET_SOFT_PIXEL(dx, dy, colPixel);
 				}
 			}
 		}
@@ -417,6 +429,7 @@ void PutText2(int x, int y, const char *text, uint32_t color, Surface_Ids surf_n
 	int r = (color & 0xFF0000) >> 16;
 	int g = (color & 0x00FF00) >>  8;
 	int b = (color & 0x0000FF) >>  0;
+	const BUFFER_PIXEL colPixel = (BUFFER_PIXEL)RGBToYUV(r, g, b);
 	
 	for (int i = 0; i < strlen(text); i++)
 	{
@@ -440,10 +453,10 @@ void PutText2(int x, int y, const char *text, uint32_t color, Surface_Ids surf_n
 					int dx = (x + 5 * i) + (fx - rect->left);
 					int dy = y + (fy - rect->top);
 					
-					BUFFER_PIXEL *pixel = &surf[SURFACE_ID_FONT].data[fy * surf[SURFACE_ID_FONT].w + fx];
-					if (pixel->r == 0 && pixel->g == 0 && pixel->b == 0) //Surface2Surface is always color keyed
+					BUFFER_PIXEL pixel = surf[SURFACE_ID_FONT].data[fy * surf[SURFACE_ID_FONT].w + fx];
+					if (pixel.y == 0)
 						continue;
-					SET_BUFFER_PIXEL(surf[surf_no].data, surf[surf_no].w, dx, dy, r, g, b);
+					SET_BUFFER_PIXEL(surf[surf_no].data, surf[surf_no].w, dx, dy, colPixel.y, colPixel.u, colPixel.v);
 				}
 			}
 		}

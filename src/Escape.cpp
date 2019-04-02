@@ -16,7 +16,7 @@ int Call_Escape()
 		//Get pressed keys
 		GetTrg();
 		
-		if (gKeyTrg & KEY_ESCAPE) //Escape is pressed, quit game
+		if (true) //gKeyTrg & KEY_ESCAPE) //Escape is pressed, quit game
 		{
 			gKeyTrg = 0;
 			return 0;
