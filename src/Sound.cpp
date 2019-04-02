@@ -4,6 +4,7 @@
 #include <cmath>
 #include <stdint.h>
 #include <string.h>
+#include <list>
 
 #include <gccore.h>
 #include <aesndlib.h>
@@ -17,6 +18,7 @@ static long mixer_buffer[SND_BUFFERSIZE / 2];
 
 //Keep track of all existing sound buffers
 SOUNDBUFFER *soundBuffers;
+std::list<SOUNDBUFFER*> playingSounds;
 
 //Sound buffer code
 SOUNDBUFFER::SOUNDBUFFER(size_t bufSize)
@@ -110,7 +112,12 @@ void SOUNDBUFFER::SetPan(int32_t lPan)
 
 void SOUNDBUFFER::Play(bool bLooping)
 {
-	playing = true;
+	if (playing == false)
+	{
+		playing = true;
+		playingSounds.push_back(this);
+	}
+	
 	looping = bLooping;
 }
 
@@ -156,9 +163,9 @@ void SOUNDBUFFER::Mix(long *stream, uint32_t samples)
 			else
 			{
 				samplePosition = 0.0;
-				playing = false;
 				looped = false;
-				break;
+				playing = false;
+				return;
 			}
 		}
 	}
@@ -176,11 +183,12 @@ void StreamCallback(void *audio_buffer, uint32_t len)
 		mixer_buffer[i] = 0;
 
 	//Mix sounds to primary buffer
-	for (SOUNDBUFFER *sound = soundBuffers; sound != NULL; sound = sound->next)
-		sound->Mix(mixer_buffer, samples);
+	for (SOUNDBUFFER* n : playingSounds)
+		n->Mix(mixer_buffer, samples);
+	playingSounds.remove_if([](SOUNDBUFFER* n){ return n->playing == false; });
 
 	for (unsigned int i = 0; i < len / 2; ++i)
-		stream[i] = (int16_t)(clamp(mixer_buffer[i], -0xFF, 0xFF) << 8);
+		stream[i] = (int16_t)(clamp(mixer_buffer[i], -0x80, 0x7F) << 8);
 
 	DCFlushRange(audio_buffer, len);
 	

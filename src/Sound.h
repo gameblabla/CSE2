@@ -27,7 +27,7 @@ class SOUNDBUFFER
 		
 		SOUNDBUFFER *next;
 	
-	private:
+	public:
 		uint8_t *data;
 		size_t size;
 		
