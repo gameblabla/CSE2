@@ -183,12 +183,12 @@ void StreamCallback(void *audio_buffer, uint32_t len)
 		mixer_buffer[i] = 0;
 
 	//Mix sounds to primary buffer
+	playingSounds.remove_if([](SOUNDBUFFER* n){ return n->playing == false; });
 	for (SOUNDBUFFER* n : playingSounds)
 		n->Mix(mixer_buffer, samples);
-	playingSounds.remove_if([](SOUNDBUFFER* n){ return n->playing == false; });
 
 	for (unsigned int i = 0; i < len / 2; ++i)
-		stream[i] = (int16_t)(clamp(mixer_buffer[i], -0x80, 0x7F) << 8);
+		stream[i] = (int16_t)(clamp(mixer_buffer[i], -0xFF, 0xFF) << 8);
 
 	DCFlushRange(audio_buffer, len);
 	
