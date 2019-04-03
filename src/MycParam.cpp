@@ -1,3 +1,5 @@
+#include <math.h>
+
 #include "MycParam.h"
 
 #include "ArmsItem.h"
@@ -31,7 +33,7 @@ ARMS_LEVEL gArmsLevelTable[14] =
 	{{40, 60, 200}}
 };
 
-int time_count;
+double time_count;
 
 void AddExpMyChar(int x)
 {
@@ -361,10 +363,10 @@ void PutTimeCounter(int x, int y)
 		//Draw clock and increase time
 		if (g_GameFlags & 2)
 		{
-			if (time_count < 300000)
-				++time_count;
+			if (time_count < 300000.0)
+				time_count += 50.0 / 60.0;
 			
-			if (time_count % 30 <= 10)
+			if (std::fmod(time_count, 30.0) <= 10.0)
 				PutBitmap3(&grcGame, x, y, &rcTime[1], SURFACE_ID_TEXT_BOX);
 			else
 				PutBitmap3(&grcGame, x, y, &rcTime[0], SURFACE_ID_TEXT_BOX);
@@ -375,14 +377,14 @@ void PutTimeCounter(int x, int y)
 		}
 		
 		//Draw time
-		PutNumber4(x,		y, time_count / 3000,		false);
-		PutNumber4(x + 20,	y, time_count / 50 % 60,	true);
-		PutNumber4(x + 32,	y, time_count / 5 % 10,		false);
+		PutNumber4(x,		y, (int)(time_count / 3000.0),					false);
+		PutNumber4(x + 20,	y, (int)(std::fmod(time_count / 50.0, 60.0)),	true);
+		PutNumber4(x + 32,	y, (int)(std::fmod(time_count / 5.0, 10.0)),		false);
 		PutBitmap3(&grcGame, x + 30, y, &rcTime[2], SURFACE_ID_TEXT_BOX);
 	}
 	else
 	{
-		time_count = 0;
+		time_count = 0.0;
 	}
 }
 
@@ -426,7 +428,7 @@ bool SaveTimeCounter()
 	//Save new time
 	for (int i = 0; i < 4; i++)
 	{
-		rec.counter[i] = time_count;
+		rec.counter[i] = (int)time_count;
 		rec.random[i] = Random(0, 250) + i;
 		
 		uint8_t *p = (uint8_t*)&rec.counter[i];
@@ -488,12 +490,12 @@ int LoadTimeCounter()
 	//Verify checksum's result
 	if (rec.counter[0] == rec.counter[1] && rec.counter[0] == rec.counter[2])
 	{
-		time_count = rec.counter[0];
+		time_count = (double)rec.counter[0];
 		return rec.counter[0];
 	}
 	else
 	{
-		time_count = 0;
+		time_count = 0.0;
 		return 0;
 	}
 }
