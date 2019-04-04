@@ -28,9 +28,14 @@ SURFACE surf[SURFACE_ID_MAX];
 BUFFER_PIXEL RGBToYUV(uint8_t red, uint8_t green, uint8_t blue)
 {
 	BUFFER_PIXEL yuv;
+	/*
 	yuv.y = (299 * red + 587 * green + 114 * blue) / 1000;
 	yuv.u = (-16874 * red - 33126 * green + 50000 * blue + 12800000) / 100000;
 	yuv.v = (50000 * red - 41869 * green - 8131 * blue + 12800000) / 100000;
+	*/
+	yuv.y = 16  + (((red << 6) + (red << 1) + (green << 7) + green + (blue << 4) + (blue << 3) + blue) >> 8);
+	yuv.u = 128 + ((-((red << 5) + (red << 2) + (red << 1)) - ((green << 6) + (green << 3) + (green << 1)) + (blue << 7) - (blue << 4)) >> 8);
+	yuv.v = 128 + (((red << 7) - (red << 4) - ((green << 6) + (green << 5) - (green << 1)) - ((blue << 4) + (blue << 1))) >> 8);
 	return yuv;
 }
 
@@ -282,7 +287,7 @@ static void DrawBitmap(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_
 				int dy = y + (fy - rect->top);
 				
 				BUFFER_PIXEL pixel = surf[surf_no].data[fy * surf[surf_no].w + fx];
-				if (transparent && pixel.y == 0)
+				if (transparent && pixel.y <= 16)
 					continue;
 				SET_SOFT_PIXEL(dx, dy, pixel);
 			}
@@ -319,7 +324,7 @@ void Surface2Surface(int x, int y, RECT *rect, int to, int from)
 				int dy = y + (fy - rect->top);
 				
 				BUFFER_PIXEL pixel = surf[from].data[fy * surf[from].w + fx];
-				if (pixel.y == 0) //Surface2Surface is always color keyed
+				if (pixel.y <= 16) //Surface2Surface is always color keyed
 					continue;
 				SET_BUFFER_PIXEL(surf[to].data, surf[to].w, dx, dy, pixel.y, pixel.u, pixel.v);
 			}
@@ -409,7 +414,7 @@ void PutText(int x, int y, const char *text, uint32_t color)
 					int dy = y + (fy - rect->top);
 					
 					BUFFER_PIXEL pixel = surf[SURFACE_ID_FONT].data[fy * surf[SURFACE_ID_FONT].w + fx];
-					if (pixel.y == 0)
+					if (pixel.y <= 16)
 						continue;
 					SET_SOFT_PIXEL(dx, dy, colPixel);
 				}
@@ -454,7 +459,7 @@ void PutText2(int x, int y, const char *text, uint32_t color, Surface_Ids surf_n
 					int dy = y + (fy - rect->top);
 					
 					BUFFER_PIXEL pixel = surf[SURFACE_ID_FONT].data[fy * surf[SURFACE_ID_FONT].w + fx];
-					if (pixel.y == 0)
+					if (pixel.y <= 16)
 						continue;
 					SET_BUFFER_PIXEL(surf[surf_no].data, surf[surf_no].w, dx, dy, colPixel.y, colPixel.u, colPixel.v);
 				}
