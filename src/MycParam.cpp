@@ -366,7 +366,7 @@ void PutTimeCounter(int x, int y)
 			if (time_count < 300000.0)
 				time_count += 50.0 / 60.0;
 			
-			if (std::fmod(time_count, 30.0) <= 10.0)
+			if ((int)time_count % 30 <= 10)
 				PutBitmap3(&grcGame, x, y, &rcTime[1], SURFACE_ID_TEXT_BOX);
 			else
 				PutBitmap3(&grcGame, x, y, &rcTime[0], SURFACE_ID_TEXT_BOX);
@@ -377,9 +377,9 @@ void PutTimeCounter(int x, int y)
 		}
 		
 		//Draw time
-		PutNumber4(x,		y, (int)(time_count / 3000.0),					false);
-		PutNumber4(x + 20,	y, (int)(std::fmod(time_count / 50.0, 60.0)),	true);
-		PutNumber4(x + 32,	y, (int)(std::fmod(time_count / 5.0, 10.0)),		false);
+		PutNumber4(x,		y, (int)time_count / 3000,	false);
+		PutNumber4(x + 20,	y, (int)time_count % 60,	true);
+		PutNumber4(x + 32,	y, (int)time_count % 10,	false);
 		PutBitmap3(&grcGame, x + 30, y, &rcTime[2], SURFACE_ID_TEXT_BOX);
 	}
 	else

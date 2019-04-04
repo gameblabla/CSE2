@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <ogc/lwp_threads.h>
 #include <gccore.h>
 #include <aesndlib.h>
 
@@ -13,7 +14,14 @@
 
 #define clamp(x, y, z) ((x > z) ? z : (x < y) ? y : x)
 
-static long mixer_buffer[SND_BUFFERSIZE / 2];
+uint8_t audio_frame[2][SND_BUFFERSIZE] ATTRIBUTE_ALIGN(32);
+bool audio_index; //NOTE: audio is double-buffered
+
+extern "C"
+{
+void _cpu_context_save_fp(frame_context *);
+void _cpu_context_restore_fp(frame_context *);
+}
 
 //Keep track of all existing sound buffers
 SOUNDBUFFER *soundBuffers;
@@ -119,7 +127,7 @@ void SOUNDBUFFER::Stop()
 	playing = false;
 }
 
-void SOUNDBUFFER::Mix(long *stream, uint32_t samples)
+void SOUNDBUFFER::Mix(int16_t *stream, uint32_t samples)
 {
 	if (!playing) //This sound buffer isn't playing
 		return;
@@ -137,11 +145,11 @@ void SOUNDBUFFER::Mix(long *stream, uint32_t samples)
 		const uint8_t sampleA = sample1 + (sample2 - sample1) * subPos;
 
 		//Convert sample to int8_t
-		const int8_t sampleConvert = (sampleA - 0x80);
+		const int32_t sampleConvert = (sampleA - 0x80) << 8;
 
-		//Mix
-		stream[sample * 2] += (long)(sampleConvert * volume * volume_l);
-		stream[sample * 2 + 1] += (long)(sampleConvert * volume * volume_r);
+		//Mix (NOTE: Wii buffer is interlaced Right Left stereo)
+		stream[sample * 2] = (int16_t)clamp(stream[sample * 2] + sampleConvert * volume * volume_r, -0x7FFF, 0x7FFF);
+		stream[sample * 2 + 1] = (int16_t)clamp(stream[sample * 2 + 1] + sampleConvert * volume * volume_l, -0x7FFF, 0x7FFF);
 		
 		//Increment position
 		samplePosition += freqPosition;
@@ -167,8 +175,19 @@ void SOUNDBUFFER::Mix(long *stream, uint32_t samples)
 //Sound things
 SOUNDBUFFER* lpSECONDARYBUFFER[SOUND_NO];
 
-void StreamCallback(void *audio_buffer, uint32_t len)
+void StreamCallback()
 {
+	//Play organya
+	gOrgTimer += SND_BUFFERSIZE / 4;
+	
+	if (gOrgTimer > gOrgSamplePerStep)
+	{
+		OrganyaPlayData();
+		gOrgTimer %= gOrgSamplePerStep;
+	}
+	
+	//Mix audio
+	/*
 	int16_t *stream = (int16_t*)audio_buffer;
 	uint32_t samples = len / 4;
 
@@ -183,25 +202,30 @@ void StreamCallback(void *audio_buffer, uint32_t len)
 		stream[i] = (int16_t)(clamp(mixer_buffer[i], -0xFF, 0xFF) << 8);
 
 	DCFlushRange(audio_buffer, len);
+	*/
 	
-	//Play organya
-	gOrgTimer += samples;
+	void *out_buffer = audio_frame[audio_index];
 	
-	if (gOrgTimer > gOrgSamplePerStep)
-	{
-		OrganyaPlayData();
-		gOrgTimer %= gOrgSamplePerStep;
-	}
+	memset(out_buffer, 0, SND_BUFFERSIZE);
+	_cpu_context_save_fp(&_thr_executing->context);
+	for (SOUNDBUFFER *sound = soundBuffers; sound != NULL; sound = sound->next)
+		sound->Mix((int16_t*)out_buffer, SND_BUFFERSIZE / 4);
+	_cpu_context_restore_fp(&_thr_executing->context);
+	
+	DCStoreRange(out_buffer, SND_BUFFERSIZE);
+	AUDIO_InitDMA((intptr_t)out_buffer, SND_BUFFERSIZE);
+	audio_index = !audio_index;
 }
 
 bool InitDirectSound()
 {
-	//Init sound library
-	AESND_Init();
-	AESND_Pause(false);
+	//Init sound
+	AUDIO_Init(NULL);
+	AUDIO_StopDMA();
+	AUDIO_SetDSPSampleRate(AI_SAMPLERATE_48KHZ);
 	
-	//Set-up stream
-	AESND_RegisterAudioCallback(StreamCallback);
+	AUDIO_RegisterDMACallback(StreamCallback);
+	AUDIO_StartDMA();
 	
 	//Start organya
 	StartOrganya();

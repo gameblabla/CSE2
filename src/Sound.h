@@ -23,7 +23,7 @@ class SOUNDBUFFER
 		void Play(bool bLooping);
 		void Stop();
 		
-		void Mix(long *stream, uint32_t samples);
+		void Mix(int16_t *stream, uint32_t samples);
 		
 		SOUNDBUFFER *next;
 	
