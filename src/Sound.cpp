@@ -13,6 +13,7 @@
 #include "PixTone.h"
 
 #define clamp(x, y, z) ((x > z) ? z : (x < y) ? y : x)
+#define MIX_BUFFER_SIZE (SND_BUFFERSIZE / 2 * sizeof(long))
 
 uint8_t audio_frame[2][SND_BUFFERSIZE] ATTRIBUTE_ALIGN(32);
 bool audio_index; //NOTE: audio is double-buffered
@@ -127,7 +128,7 @@ void SOUNDBUFFER::Stop()
 	playing = false;
 }
 
-void SOUNDBUFFER::Mix(int16_t *stream, uint32_t samples)
+void SOUNDBUFFER::Mix(long *stream, uint32_t samples)
 {
 	if (!playing) //This sound buffer isn't playing
 		return;
@@ -144,12 +145,12 @@ void SOUNDBUFFER::Mix(int16_t *stream, uint32_t samples)
 		const float subPos = (float)std::fmod(samplePosition, 1.0);
 		const uint8_t sampleA = sample1 + (sample2 - sample1) * subPos;
 
-		//Convert sample to int8_t
-		const int32_t sampleConvert = (sampleA - 0x80) << 8;
+		//Convert sample to int16_t
+		const int16_t sampleConvert = (sampleA - 0x80) << 8;
 
 		//Mix (NOTE: Wii buffer is interlaced Right Left stereo)
-		stream[sample * 2] = (int16_t)clamp(stream[sample * 2] + sampleConvert * volume * volume_r, -0x7FFF, 0x7FFF);
-		stream[sample * 2 + 1] = (int16_t)clamp(stream[sample * 2 + 1] + sampleConvert * volume * volume_l, -0x7FFF, 0x7FFF);
+		stream[sample * 2] += sampleConvert * volume * volume_r;
+		stream[sample * 2 + 1] += sampleConvert * volume * volume_l;
 		
 		//Increment position
 		samplePosition += freqPosition;
@@ -186,32 +187,19 @@ void StreamCallback()
 		gOrgTimer %= gOrgSamplePerStep;
 	}
 	
-	//Mix audio
-	/*
-	int16_t *stream = (int16_t*)audio_buffer;
-	uint32_t samples = len / 4;
+	long mix_buffer[MIX_BUFFER_SIZE];
+	memset(mix_buffer, 0, MIX_BUFFER_SIZE);
 
-	for (unsigned int i = 0; i < len / 2; ++i)
-		mixer_buffer[i] = 0;
-
-	//Mix sounds to primary buffer
-	for (SOUNDBUFFER *sound = soundBuffers; sound != NULL; sound = sound->next)
-		sound->Mix(mixer_buffer, samples);
-
-	for (unsigned int i = 0; i < len / 2; ++i)
-		stream[i] = (int16_t)(clamp(mixer_buffer[i], -0xFF, 0xFF) << 8);
-
-	DCFlushRange(audio_buffer, len);
-	*/
-	
-	void *out_buffer = audio_frame[audio_index];
-	
-	memset(out_buffer, 0, SND_BUFFERSIZE);
 	_cpu_context_save_fp(&_thr_executing->context);
 	for (SOUNDBUFFER *sound = soundBuffers; sound != NULL; sound = sound->next)
-		sound->Mix((int16_t*)out_buffer, SND_BUFFERSIZE / 4);
+		sound->Mix(mix_buffer, SND_BUFFERSIZE / 4);
 	_cpu_context_restore_fp(&_thr_executing->context);
-	
+
+	int16_t *out_buffer = (int16_t*)audio_frame[audio_index];
+
+	for (unsigned int i = 0; i < SND_BUFFERSIZE / 2; ++i)
+		out_buffer[i] = clamp(mix_buffer[i], -0x7FFF, 0x7FFF);
+
 	DCStoreRange(out_buffer, SND_BUFFERSIZE);
 	AUDIO_InitDMA((intptr_t)out_buffer, SND_BUFFERSIZE);
 	audio_index = !audio_index;
