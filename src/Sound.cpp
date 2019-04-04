@@ -7,15 +7,17 @@
 
 #include <ogc/lwp_threads.h>
 #include <gccore.h>
-#include <aesndlib.h>
+#include <ogc/audio.h>
 
 #include "Organya.h"
 #include "PixTone.h"
 
 #define clamp(x, y, z) ((x > z) ? z : (x < y) ? y : x)
-#define MIX_BUFFER_SIZE (SND_BUFFERSIZE / 2 * sizeof(long))
 
-uint8_t audio_frame[2][SND_BUFFERSIZE] ATTRIBUTE_ALIGN(32);
+#define SND_BUFFER_SIZE 4096
+#define MIX_BUFFER_SIZE (SND_BUFFER_SIZE / 2 * sizeof(long))
+
+uint8_t audio_frame[2][SND_BUFFER_SIZE] ATTRIBUTE_ALIGN(32);
 bool audio_index; //NOTE: audio is double-buffered
 
 extern "C"
@@ -135,7 +137,7 @@ void SOUNDBUFFER::Mix(long *stream, uint32_t samples)
 
 	for (size_t sample = 0; sample < samples; sample++)
 	{
-		const double freqPosition = frequency / DSP_DEFAULT_FREQ; //This is added to position at the end
+		const double freqPosition = frequency / 48000 ; //This is added to position at the end
 		
 		//Get the in-between sample this is (linear interpolation)
 		const uint8_t sample1 = ((looped || ((size_t)samplePosition) >= 1) ? data[(size_t)samplePosition] : 0x80);
@@ -179,7 +181,7 @@ SOUNDBUFFER* lpSECONDARYBUFFER[SOUND_NO];
 void StreamCallback()
 {
 	//Play organya
-	gOrgTimer += SND_BUFFERSIZE / 4;
+	gOrgTimer += SND_BUFFER_SIZE / 4;
 	
 	if (gOrgTimer > gOrgSamplePerStep)
 	{
@@ -192,16 +194,16 @@ void StreamCallback()
 
 	_cpu_context_save_fp(&_thr_executing->context);
 	for (SOUNDBUFFER *sound = soundBuffers; sound != NULL; sound = sound->next)
-		sound->Mix(mix_buffer, SND_BUFFERSIZE / 4);
+		sound->Mix(mix_buffer, SND_BUFFER_SIZE / 4);
 	_cpu_context_restore_fp(&_thr_executing->context);
 
 	int16_t *out_buffer = (int16_t*)audio_frame[audio_index];
 
-	for (unsigned int i = 0; i < SND_BUFFERSIZE / 2; ++i)
+	for (unsigned int i = 0; i < SND_BUFFER_SIZE / 2; ++i)
 		out_buffer[i] = clamp(mix_buffer[i], -0x7FFF, 0x7FFF);
 
-	DCStoreRange(out_buffer, SND_BUFFERSIZE);
-	AUDIO_InitDMA((intptr_t)out_buffer, SND_BUFFERSIZE);
+	DCStoreRange(out_buffer, SND_BUFFER_SIZE);
+	AUDIO_InitDMA((intptr_t)out_buffer, SND_BUFFER_SIZE);
 	audio_index = !audio_index;
 }
 
