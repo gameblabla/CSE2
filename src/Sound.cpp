@@ -147,8 +147,8 @@ void SOUNDBUFFER::Mix(long *stream, uint32_t samples)
 		const float subPos = (float)std::fmod(samplePosition, 1.0);
 		const uint8_t sampleA = sample1 + (sample2 - sample1) * subPos;
 
-		//Convert sample to int16_t
-		const int16_t sampleConvert = (sampleA - 0x80) << 8;
+		//Convert sample to signed
+		const int8_t sampleConvert = sampleA - 0x80;
 
 		//Mix (NOTE: Wii buffer is interlaced Right Left stereo)
 		stream[sample * 2] += sampleConvert * volume * volume_r;
@@ -200,7 +200,7 @@ void StreamCallback()
 	int16_t *out_buffer = (int16_t*)audio_frame[audio_index];
 
 	for (unsigned int i = 0; i < SND_BUFFER_SIZE / 2; ++i)
-		out_buffer[i] = clamp(mix_buffer[i], -0x7FFF, 0x7FFF);
+		out_buffer[i] = clamp(mix_buffer[i], -0x7F, 0x7F) << 8;
 
 	DCStoreRange(out_buffer, SND_BUFFER_SIZE);
 	AUDIO_InitDMA((intptr_t)out_buffer, SND_BUFFER_SIZE);
