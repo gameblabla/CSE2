@@ -12,6 +12,7 @@
 
 static void ActBossChar02_01(void)
 {
+	NPCHAR *boss;
 	int minus;
 
 	if (gBoss[0].direct == 0)
@@ -19,65 +20,77 @@ static void ActBossChar02_01(void)
 	else
 		minus = -1;
 
+	boss = &gBoss[1];
+
 	switch (gBoss[0].ani_no)
 	{
 		case 0:
-			gBoss[1].hit_voice = 52;
-			gBoss[1].hit.front = 0x2000;
-			gBoss[1].hit.top = 0x2000;
-			gBoss[1].hit.back = 0x2000;
-			gBoss[1].hit.bottom = 0x2000;
-			gBoss[1].size = 3;
-			gBoss[1].bits = 4;
+			boss->hit_voice = 52;
+			boss->hit.front = 0x2000;
+			boss->hit.top = 0x2000;
+			boss->hit.back = 0x2000;
+			boss->hit.bottom = 0x2000;
+			boss->size = 3;
+			boss->bits = 4;
 			break;
 
 		case 1:
-			gBoss[1].x = gBoss[0].x + -0x3000 * minus;
-			gBoss[1].y = gBoss[0].y - 0x3000;
+			boss->x = gBoss[0].x + -0x3000 * minus;
+			boss->y = gBoss[0].y - 0x3000;
 			break;
 
 		case 2:
-			gBoss[1].x = gBoss[0].x + -0x3000 * minus;
-			gBoss[1].y = gBoss[0].y - 0x2800;
+			boss->x = gBoss[0].x + -0x3000 * minus;
+			boss->y = gBoss[0].y - 0x2800;
 			break;
 
 		case 3:
 		case 4:
-			gBoss[1].x = gBoss[0].x + -0x3000 * minus;
-			gBoss[1].y = gBoss[0].y - 0x2000;
+			boss->x = gBoss[0].x + -0x3000 * minus;
+			boss->y = gBoss[0].y - 0x2000;
 			break;
 
 		case 5:
-			gBoss[1].x = gBoss[0].x + -0x3000 * minus;
-			gBoss[1].y = gBoss[0].y - 0x5600;
+			boss->x = gBoss[0].x + -0x3000 * minus;
+			boss->y = gBoss[0].y - 0x5600;
 			break;
 	}
 }
 
 static void ActBossChar02_02(void)
 {
-	if (gBoss[0].ani_no)
+	NPCHAR *boss = &gBoss[2];
+
+	switch (gBoss[0].ani_no)
 	{
-		if (gBoss[0].ani_no > 0 && gBoss[0].ani_no <= 5)
-		{
-			gBoss[2].x = gBoss[0].x;
-			gBoss[2].y = gBoss[0].y;
-		}
-	}
-	else
-	{
-		gBoss[2].hit_voice = 52;
-		gBoss[2].hit.front = 0x3000;
-		gBoss[2].hit.top = 0x2000;
-		gBoss[2].hit.back = 0x3000;
-		gBoss[2].hit.bottom = 0x2000;
-		gBoss[2].size = 3;
-		gBoss[2].bits = 4;
+		case 0:
+			boss->hit_voice = 52;
+			boss->hit.front = 0x3000;
+			boss->hit.top = 0x2000;
+			boss->hit.back = 0x3000;
+			boss->hit.bottom = 0x2000;
+			boss->size = 3;
+			boss->bits = 4;
+			break;
+
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+		case 5:
+			boss->x = gBoss[0].x;
+			boss->y = gBoss[0].y;
+			break;
 	}
 }
 
 void ActBossChar_Frog(void)
 {
+	int i;
+	unsigned char deg;
+	int ym;
+	int xm;
+
 	RECT rcLeft[9] = {
 		{0, 0, 0, 0},
 		{0, 48, 80, 112},
@@ -102,220 +115,220 @@ void ActBossChar_Frog(void)
 		{120, 24, 160, 48},
 	};
 
-	switch (gBoss[0].act_no)
+	NPCHAR *boss = gBoss;
+
+	switch (boss->act_no)
 	{
 		case 0:
-			gBoss->x = 0xC000;
-			gBoss->y = 0x19000;
-			gBoss->direct = 2;
-			gBoss->view.front = 0x6000;
-			gBoss->view.top = 0x6000;
-			gBoss->view.back = 0x4000;
-			gBoss->view.bottom = 0x2000;
-			gBoss->hit_voice = 52;
-			gBoss->hit.front = 0x3000;
-			gBoss->hit.top = 0x2000;
-			gBoss->hit.back = 0x3000;
-			gBoss->hit.bottom = 0x2000;
-			gBoss->size = 3;
-			gBoss->exp = 1;
-			gBoss->code_event = 1000;
-			gBoss->bits |= 0x8200;
-			gBoss->life = 300;
+			boss->x = 0xC000;
+			boss->y = 0x19000;
+			boss->direct = 2;
+			boss->view.front = 0x6000;
+			boss->view.top = 0x6000;
+			boss->view.back = 0x4000;
+			boss->view.bottom = 0x2000;
+			boss->hit_voice = 52;
+			boss->hit.front = 0x3000;
+			boss->hit.top = 0x2000;
+			boss->hit.back = 0x3000;
+			boss->hit.bottom = 0x2000;
+			boss->size = 3;
+			boss->exp = 1;
+			boss->code_event = 1000;
+			boss->bits |= 0x8200;
+			boss->life = 300;
 			break;
 
 		case 10:
-			gBoss->act_no = 11;
-			gBoss->ani_no = 3;
-			gBoss->cond = 0x80;
-			gBoss->rect = rcRight[0];
+			boss->act_no = 11;
+			boss->ani_no = 3;
+			boss->cond = 0x80;
+			boss->rect = rcRight[0];
 			gBoss[1].cond = -112;
 			gBoss[1].code_event = 1000;
 			gBoss[2].cond = 0x80;
 			gBoss[1].damage = 5;
 			gBoss[2].damage = 5;
 
-			for (int i = 0; i < 8; ++i)
-				SetNpChar(4, gBoss->x + (Random(-12, 12) * 0x200), gBoss->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+			for (i = 0; i < 8; ++i)
+				SetNpChar(4, boss->x + (Random(-12, 12) * 0x200), boss->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
 
 			break;
 
 		case 20:
-			gBoss->act_no = 21;
-			gBoss->act_wait = 0;
+			boss->act_no = 21;
+			boss->act_wait = 0;
 			// Fallthrough
 		case 21:
-			if (++gBoss->act_wait / 2 % 2)
-				gBoss->ani_no = 3;
+			if (++boss->act_wait / 2 % 2)
+				boss->ani_no = 3;
 			else
-				gBoss->ani_no = 0;
+				boss->ani_no = 0;
 
 			break;
 
 		case 100:
-			gBoss->act_no = 101;
-			gBoss->act_wait = 0;
-			gBoss->ani_no = 1;
-			gBoss->xm = 0;
+			boss->act_no = 101;
+			boss->act_wait = 0;
+			boss->ani_no = 1;
+			boss->xm = 0;
 			// Fallthrough
 		case 101:
-			if (++gBoss->act_wait > 50)
+			if (++boss->act_wait > 50)
 			{
-				gBoss->act_no = 102;
-				gBoss->ani_wait = 0;
-				gBoss->ani_no = 2;
+				boss->act_no = 102;
+				boss->ani_wait = 0;
+				boss->ani_no = 2;
 			}
 
 			break;
 
 		case 102:
-			if (++gBoss->ani_wait > 10)
+			if (++boss->ani_wait > 10)
 			{
-				gBoss->act_no = 103;
-				gBoss->ani_wait = 0;
-				gBoss->ani_no = 1;
+				boss->act_no = 103;
+				boss->ani_wait = 0;
+				boss->ani_no = 1;
 			}
 
 			break;
 
 		case 103:
-			if (++gBoss->ani_wait > 4)
+			if (++boss->ani_wait > 4)
 			{
-				gBoss->act_no = 104;
-				gBoss->ani_no = 5;
-				gBoss->ym = -0x400;
+				boss->act_no = 104;
+				boss->ani_no = 5;
+				boss->ym = -0x400;
 				PlaySoundObject(25, 1);
 
-				if (gBoss->direct == 0)
-					gBoss->xm = -0x200;
+				if (boss->direct == 0)
+					boss->xm = -0x200;
 				else
-					gBoss->xm = 0x200;
+					boss->xm = 0x200;
 
-				gBoss->view.top = 0x8000;
-				gBoss->view.bottom = 0x3000;
+				boss->view.top = 0x8000;
+				boss->view.bottom = 0x3000;
 			}
 
 			break;
 
 		case 104:
-			if (gBoss->direct == 0 && gBoss->flag & 1)
+			if (boss->direct == 0 && boss->flag & 1)
 			{
-				gBoss->direct = 2;
-				gBoss->xm = 0x200;
+				boss->direct = 2;
+				boss->xm = 0x200;
 			}
 
-			if (gBoss->direct == 2 && gBoss->flag & 4)
+			if (boss->direct == 2 && boss->flag & 4)
 			{
-				gBoss->direct = 0;
-				gBoss->xm = -0x200;
+				boss->direct = 0;
+				boss->xm = -0x200;
 			}
 
-			if (gBoss->flag & 8)
+			if (boss->flag & 8)
 			{
 				PlaySoundObject(26, 1);
 				SetQuake(30);
-				gBoss->act_no = 100;
-				gBoss->ani_no = 1;
-				gBoss->view.top = 0x6000;
-				gBoss->view.bottom = 0x2000;
+				boss->act_no = 100;
+				boss->ani_no = 1;
+				boss->view.top = 0x6000;
+				boss->view.bottom = 0x2000;
 
-				if (gBoss->direct == 0 && gBoss->x < gMC.x)
+				if (boss->direct == 0 && boss->x < gMC.x)
 				{
-					gBoss->direct = 2;
-					gBoss->act_no = 110;
+					boss->direct = 2;
+					boss->act_no = 110;
 				}
 
-				if (gBoss->direct == 2 && gBoss->x > gMC.x)
+				if (boss->direct == 2 && boss->x > gMC.x)
 				{
-					gBoss->direct = 0;
-					gBoss->act_no = 110;
+					boss->direct = 0;
+					boss->act_no = 110;
 				}
 
 				SetNpChar(110, Random(4, 16) * 0x2000, Random(0, 4) * 0x2000, 0, 0, 4, 0, 0x80);
 
-				for (int i = 0; i < 4; ++i)
-					SetNpChar(4, gBoss->x + (Random(-12, 12) * 0x200), gBoss->y + gBoss->hit.bottom, Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+				for (i = 0; i < 4; ++i)
+					SetNpChar(4, boss->x + (Random(-12, 12) * 0x200), boss->y + boss->hit.bottom, Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
 			}
 
 			break;
 
 		case 110:
-			gBoss->ani_no = 1;
-			gBoss->act_wait = 0;
-			gBoss->act_no = 111;
+			boss->ani_no = 1;
+			boss->act_wait = 0;
+			boss->act_no = 111;
 			// Fallthrough
 		case 111:
-			++gBoss->act_wait;
-			gBoss->xm = 8 * gBoss->xm / 9;
+			++boss->act_wait;
+			boss->xm = 8 * boss->xm / 9;
 
-			if (gBoss->act_wait > 50)
+			if (boss->act_wait > 50)
 			{
-				gBoss->ani_no = 2;
-				gBoss->ani_wait = 0;
-				gBoss->act_no = 112;
+				boss->ani_no = 2;
+				boss->ani_wait = 0;
+				boss->act_no = 112;
 			}
 
 			break;
 
 		case 112:
-			if (++gBoss->ani_wait > 4)
+			if (++boss->ani_wait > 4)
 			{
-				gBoss->act_no = 113;
-				gBoss->act_wait = 0;
-				gBoss->ani_no = 3;
-				gBoss->count1 = 16;
+				boss->act_no = 113;
+				boss->act_wait = 0;
+				boss->ani_no = 3;
+				boss->count1 = 16;
 				gBoss[1].bits |= 0x20;
-				gBoss->tgt_x = gBoss->life;
+				boss->tgt_x = boss->life;
 			}
 
 			break;
 
 		case 113:
-			if (gBoss->shock)
+			if (boss->shock)
 			{
-				if (gBoss->count2++ / 2 % 2)
-					gBoss->ani_no = 4;
+				if (boss->count2++ / 2 % 2)
+					boss->ani_no = 4;
 				else
-					gBoss->ani_no = 3;
+					boss->ani_no = 3;
 			}
 			else
 			{
-				gBoss->count2 = 0;
-				gBoss->ani_no = 3;
+				boss->count2 = 0;
+				boss->ani_no = 3;
 			}
 
-			gBoss->xm = 10 * gBoss->xm / 11;
+			boss->xm = 10 * boss->xm / 11;
 
-			if (++gBoss->act_wait > 16)
+			if (++boss->act_wait > 16)
 			{
-				gBoss->act_wait = 0;
-				--gBoss->count1;
+				boss->act_wait = 0;
+				--boss->count1;
 
-				unsigned char deg;
-
-				if (gBoss->direct == 0)
-					deg = GetArktan(gBoss->x - 0x4000 - gMC.x, gBoss->y - 0x1000 - gMC.y);
+				if (boss->direct == 0)
+					deg = GetArktan(boss->x - 0x4000 - gMC.x, boss->y - 0x1000 - gMC.y);
 				else
-					deg = GetArktan(gBoss->x + 0x4000 - gMC.x, gBoss->y - 0x1000 - gMC.y);
+					deg = GetArktan(boss->x + 0x4000 - gMC.x, boss->y - 0x1000 - gMC.y);
 
-				deg += Random(-16, 16);
+				deg += (unsigned char)Random(-16, 16);
 
-				int ym = GetSin(deg);
-				int xm = GetCos(deg);
+				ym = GetSin(deg);
+				xm = GetCos(deg);
 
-				if (gBoss->direct == 0)
-					SetNpChar(108, gBoss->x - 0x4000, gBoss->y - 0x1000, xm, ym, 0, 0, 0x100);
+				if (boss->direct == 0)
+					SetNpChar(108, boss->x - 0x4000, boss->y - 0x1000, xm, ym, 0, 0, 0x100);
 				else
-					SetNpChar(108, gBoss->x + 0x4000, gBoss->y - 0x1000, xm, ym, 0, 0, 0x100);
+					SetNpChar(108, boss->x + 0x4000, boss->y - 0x1000, xm, ym, 0, 0, 0x100);
 
 				PlaySoundObject(39, 1);
 
-				if (gBoss->count1 == 0 || gBoss->life < gBoss->tgt_x - 90)
+				if (boss->count1 == 0 || boss->life < boss->tgt_x - 90)
 				{
-					gBoss->act_no = 114;
-					gBoss->act_wait = 0;
-					gBoss->ani_no = 2;
-					gBoss->ani_wait = 0;
+					boss->act_no = 114;
+					boss->act_wait = 0;
+					boss->ani_no = 2;
+					boss->ani_wait = 0;
 					gBoss[1].bits &= ~0x20;
 				}
 			}
@@ -323,186 +336,186 @@ void ActBossChar_Frog(void)
 			break;
 
 		case 114:
-			if (++gBoss->ani_wait > 10)
+			if (++boss->ani_wait > 10)
 			{
 				if (++gBoss[1].count1 > 2)
 				{
 					gBoss[1].count1 = 0;
-					gBoss->act_no = 120;
+					boss->act_no = 120;
 				}
 				else
 				{
-					gBoss->act_no = 100;
+					boss->act_no = 100;
 				}
 
-				gBoss->ani_wait = 0;
-				gBoss->ani_no = 1;
+				boss->ani_wait = 0;
+				boss->ani_no = 1;
 			}
 
 			break;
 
 		case 120:
-			gBoss->act_no = 121;
-			gBoss->act_wait = 0;
-			gBoss->ani_no = 1;
-			gBoss->xm = 0;
+			boss->act_no = 121;
+			boss->act_wait = 0;
+			boss->ani_no = 1;
+			boss->xm = 0;
 			// Fallthrough
 		case 121:
-			if (++gBoss->act_wait > 50)
+			if (++boss->act_wait > 50)
 			{
-				gBoss->act_no = 122;
-				gBoss->ani_wait = 0;
-				gBoss->ani_no = 2;
+				boss->act_no = 122;
+				boss->ani_wait = 0;
+				boss->ani_no = 2;
 			}
 
 			break;
 
 		case 122:
-			if (++gBoss->ani_wait > 20)
+			if (++boss->ani_wait > 20)
 			{
-				gBoss->act_no = 123;
-				gBoss->ani_wait = 0;
-				gBoss->ani_no = 1;
+				boss->act_no = 123;
+				boss->ani_wait = 0;
+				boss->ani_no = 1;
 			}
 
 			break;
 
 		case 123:
-			if (++gBoss->ani_wait > 4)
+			if (++boss->ani_wait > 4)
 			{
-				gBoss->act_no = 124;
-				gBoss->ani_no = 5;
-				gBoss->ym = -0xA00;
-				gBoss->view.top = 0x8000;
-				gBoss->view.bottom = 0x3000;
+				boss->act_no = 124;
+				boss->ani_no = 5;
+				boss->ym = -0xA00;
+				boss->view.top = 0x8000;
+				boss->view.bottom = 0x3000;
 				PlaySoundObject(25, 1);
 			}
 
 			break;
 
 		case 124:
-			if (gBoss->flag & 8)
+			if (boss->flag & 8)
 			{
 				PlaySoundObject(26, 1);
 				SetQuake(60);
-				gBoss->act_no = 100;
-				gBoss->ani_no = 1;
-				gBoss->view.top = 0x6000;
-				gBoss->view.bottom = 0x2000;
+				boss->act_no = 100;
+				boss->ani_no = 1;
+				boss->view.top = 0x6000;
+				boss->view.bottom = 0x2000;
 
-				for (int i = 0; i < 2; ++i)
+				for (i = 0; i < 2; ++i)
 					SetNpChar(104, Random(4, 16) * 0x2000, Random(0, 4) * 0x2000, 0, 0, 4, 0, 0x80);
 
-				for (int i = 0; i < 6; ++i)
+				for (i = 0; i < 6; ++i)
 					SetNpChar(110, Random(4, 16) * 0x2000, Random(0, 4) * 0x2000, 0, 0, 4, 0, 0x80);
 
-				for (int i = 0; i < 8; ++i)
-					SetNpChar(4, gBoss->x + (Random(-12, 12) * 0x200), gBoss->y + gBoss->hit.bottom, Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+				for (i = 0; i < 8; ++i)
+					SetNpChar(4, boss->x + (Random(-12, 12) * 0x200), boss->y + boss->hit.bottom, Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
 
-				if (gBoss->direct == 0 && gMC.x > gBoss->x)
+				if (boss->direct == 0 && boss->x < gMC.x)
 				{
-					gBoss->direct = 2;
-					gBoss->act_no = 110;
+					boss->direct = 2;
+					boss->act_no = 110;
 				}
 
-				if ( gBoss->direct == 2 && gMC.x < gBoss->x)
+				if (boss->direct == 2 && boss->x > gMC.x)
 				{
-					gBoss->direct = 0;
-					gBoss->act_no = 110;
+					boss->direct = 0;
+					boss->act_no = 110;
 				}
 			}
 
 			break;
 
 		case 130:
-			gBoss->act_no = 131;
-			gBoss->ani_no = 3;
-			gBoss->act_wait = 0;
-			gBoss->xm = 0;
+			boss->act_no = 131;
+			boss->ani_no = 3;
+			boss->act_wait = 0;
+			boss->xm = 0;
 			PlaySoundObject(72, 1);
 
-			for (int i = 0; i < 8; ++i)
-				SetNpChar(4, gBoss->x + (Random(-12, 12) * 0x200), gBoss->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+			for (i = 0; i < 8; ++i)
+				SetNpChar(4, boss->x + (Random(-12, 12) * 0x200), boss->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
 
 			gBoss[1].cond = 0;
 			gBoss[2].cond = 0;
 			// Fallthrough
 		case 131:
-			if (++gBoss->act_wait % 5 == 0)
-				SetNpChar(4, gBoss->x + (Random(-12, 12) * 0x200), gBoss->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+			if (++boss->act_wait % 5 == 0)
+				SetNpChar(4, boss->x + (Random(-12, 12) * 0x200), boss->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
 
-			if (gBoss->act_wait / 2 % 2)
-				gBoss->x -= 0x200;
+			if (boss->act_wait / 2 % 2)
+				boss->x -= 0x200;
 			else
-				gBoss->x += 0x200;
+				boss->x += 0x200;
 
-			if (gBoss->act_wait > 100)
+			if (boss->act_wait > 100)
 			{
-				gBoss->act_wait = 0;
-				gBoss->act_no = 132;
+				boss->act_wait = 0;
+				boss->act_no = 132;
 			}
 
 			break;
 
 		case 132:
-			if (++gBoss->act_wait / 2 % 2)
+			if (++boss->act_wait / 2 % 2)
 			{
-				gBoss->view.front = 0x2800;
-				gBoss->view.top = 0x1800;
-				gBoss->view.back = 0x2800;
-				gBoss->view.bottom = 0x1800;
-				gBoss->ani_no = 6;
+				boss->view.front = 0x2800;
+				boss->view.top = 0x1800;
+				boss->view.back = 0x2800;
+				boss->view.bottom = 0x1800;
+				boss->ani_no = 6;
 			}
 			else
 			{
-				gBoss->view.front = 0x6000;
-				gBoss->view.top = 0x6000;
-				gBoss->view.back = 0x4000;
-				gBoss->view.bottom = 0x2000;
-				gBoss->ani_no = 3;
+				boss->view.front = 0x6000;
+				boss->view.top = 0x6000;
+				boss->view.back = 0x4000;
+				boss->view.bottom = 0x2000;
+				boss->ani_no = 3;
 			}
 
-			if (gBoss->act_wait % 9 == 0)
-				SetNpChar(4, gBoss->x + (Random(-12, 12) * 0x200), gBoss->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+			if (boss->act_wait % 9 == 0)
+				SetNpChar(4, boss->x + (Random(-12, 12) * 0x200), boss->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
 
-			if (gBoss->act_wait > 150)
+			if (boss->act_wait > 150)
 			{
-				gBoss->act_no = 140;
-				gBoss->hit.bottom = 0x1800;
+				boss->act_no = 140;
+				boss->hit.bottom = 0x1800;
 			}
 
 			break;
 
 		case 140:
-			gBoss->act_no = 141;
+			boss->act_no = 141;
 			// Fallthrough
 		case 141:
-			if (gBoss->flag & 8)
+			if (boss->flag & 8)
 			{
-				gBoss->act_no = 142;
-				gBoss->act_wait = 0;
-				gBoss->ani_no = 7;
+				boss->act_no = 142;
+				boss->act_wait = 0;
+				boss->ani_no = 7;
 			}
 
 			break;
 
 		case 142:
-			if (++gBoss->act_wait > 30)
+			if (++boss->act_wait > 30)
 			{
-				gBoss->ani_no = 8;
-				gBoss->ym = -0xA00;
-				gBoss->bits |= 8;
-				gBoss->act_no = 143;
+				boss->ani_no = 8;
+				boss->ym = -0xA00;
+				boss->bits |= 8;
+				boss->act_no = 143;
 			}
 
 			break;
 
 		case 143:
-			gBoss->ym = -0xA00;
+			boss->ym = -0xA00;
 
-			if (gBoss->y < 0)
+			if (boss->y < 0)
 			{
-				gBoss->cond = 0;
+				boss->cond = 0;
 				PlaySoundObject(26, 1);
 				SetQuake(30);
 			}
@@ -510,17 +523,17 @@ void ActBossChar_Frog(void)
 			break;
 	}
 
-	gBoss->ym += 0x40;
-	if (gBoss->ym > 0x5FF)
-		gBoss->ym = 0x5FF;
+	boss->ym += 0x40;
+	if (boss->ym > 0x5FF)
+		boss->ym = 0x5FF;
 
-	gBoss->x += gBoss->xm;
-	gBoss->y += gBoss->ym;
+	boss->x += boss->xm;
+	boss->y += boss->ym;
 
-	if (gBoss->direct == 0)
-		gBoss->rect = rcLeft[gBoss->ani_no];
+	if (boss->direct == 0)
+		boss->rect = rcLeft[boss->ani_no];
 	else
-		gBoss->rect = rcRight[gBoss->ani_no];
+		boss->rect = rcRight[boss->ani_no];
 
 	ActBossChar02_01();
 	ActBossChar02_02();
