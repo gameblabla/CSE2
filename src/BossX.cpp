@@ -186,15 +186,15 @@ static void ActBossChar03_01(NPCHAR *npc)
 	if ((npc->act_no == 103 || npc->act_no == 203) && npc->act_wait % 4 == 1)
 		PlaySoundObject(111, 1);
 
-	if (npc->act_no < 100 || gMC.y >= npc->y + 0x800 || gMC.y <= npc->y - 0x800)
-	{
-		npc->damage = 0;
-		npc->bits &= ~0x80;
-	}
-	else
+	if (npc->act_no >= 100 && gMC.y < npc->y + 0x800 && gMC.y > npc->y - 0x800)
 	{
 		npc->damage = 10;
 		npc->bits |= 0x80;
+	}
+	else
+	{
+		npc->damage = 0;
+		npc->bits &= ~0x80;
 	}
 
 	if (npc->xm > 0x400)
@@ -212,6 +212,8 @@ static void ActBossChar03_01(NPCHAR *npc)
 
 static void ActBossChar03_02(NPCHAR *npc)
 {
+	int direct;
+
 	RECT rect[4] = {
 		{0, 128, 72, 160},
 		{72, 128, 144, 160},
@@ -219,12 +221,15 @@ static void ActBossChar03_02(NPCHAR *npc)
 		{72, 160, 144, 192},
 	};
 
+	int x;
+	int y;
+
 	switch (npc->act_no)
 	{
 		case 10:
 			npc->act_no = 11;
 			npc->act_wait = 30 * npc->ani_no + 30;
-			break;
+			// Fallthrough
 
 		case 11:
 			if (npc->act_wait)
@@ -233,10 +238,6 @@ static void ActBossChar03_02(NPCHAR *npc)
 			}
 			else
 			{
-				int x;
-				int y;
-				int direct;
-
 				switch (npc->ani_no)
 				{
 					case 0:
@@ -348,19 +349,23 @@ static void ActBossChar03_03(NPCHAR *npc)
 	if (npc->direct == 0)
 	{
 		npc->rect = rcLeft;
-		npc->x = gBoss[0].x - npc->tgt_x - 0x3000;
+		npc->x = gBoss[0].x - 0x3000 - npc->tgt_x;
 		npc->y = gBoss[0].y;
 	}
 	else
 	{
 		npc->rect = rcRight;
-		npc->x = gBoss[0].x + npc->tgt_x + 0x3000;
+		npc->x = gBoss[0].x + 0x3000 + npc->tgt_x;
 		npc->y = gBoss[0].y;
 	}
 }
 
 static void ActBossChar03_04(NPCHAR *npc)
 {
+	unsigned char deg;
+	int ym;
+	int xm;
+
 	RECT rect[8] = {
 		{0, 192, 16, 208},
 		{16, 192, 32, 208},
@@ -385,7 +390,10 @@ static void ActBossChar03_04(NPCHAR *npc)
 			npc->bits |= 0x20;
 			// Fallthrough
 		case 11:
-			npc->ani_no = npc->act_wait < 16 && npc->act_wait / 2 % 2;
+			if (npc->act_wait < 16 && npc->act_wait / 2 % 2)
+				npc->ani_no = 1;
+			else
+				npc->ani_no = 0;
 
 			if (npc->act_wait)
 			{
@@ -393,9 +401,10 @@ static void ActBossChar03_04(NPCHAR *npc)
 			}
 			else
 			{
-				const unsigned char deg = GetArktan(npc->x - gMC.x, npc->y - gMC.y) + Random(-2, 2);
-				const int ym = 3 * GetSin(deg);
-				const int xm = 3 * GetCos(deg);
+				deg = GetArktan(npc->x - gMC.x, npc->y - gMC.y);
+				deg += (unsigned char)Random(-2, 2);
+				ym = 3 * GetSin(deg);
+				xm = 3 * GetCos(deg);
 				SetNpChar(156, npc->x, npc->y, xm, ym, 0, 0, 0x100);
 				PlaySoundObject(39, 1);
 				npc->act_wait = 40;
@@ -429,6 +438,8 @@ static void ActBossChar03_04(NPCHAR *npc)
 
 static void ActBossChar03_face(NPCHAR *npc)
 {
+	static unsigned char flash;
+
 	RECT rect[3] = {
 		{216, 0, 320, 48},
 		{216, 48, 320, 96},
@@ -450,9 +461,7 @@ static void ActBossChar03_face(NPCHAR *npc)
 		case 11:
 			if (gBoss[0].shock)
 			{
-				static unsigned char flash;
-
-				if ((flash++ >> 1) & 1)
+				if (flash++ / 2 % 2)
 					npc->ani_no = 1;
 				else
 					npc->ani_no = 0;
@@ -476,28 +485,32 @@ static void ActBossChar03_face(NPCHAR *npc)
 
 void ActBossChar_MonstX(void)
 {
-	switch (gBoss[0].act_no)
+	int i;
+
+	NPCHAR *npc = gBoss;
+
+	switch (npc->act_no)
 	{
 		case 0:
-			gBoss[0].life = 1;
-			gBoss[0].x = -0x28000;
+			npc->life = 1;
+			npc->x = -0x28000;
 			break;
 
 		case 1:
-			gBoss[0].life = 700;
-			gBoss[0].exp = 1;
-			gBoss[0].act_no = 1;
-			gBoss[0].x = 0x100000;
-			gBoss[0].y = 102400;
-			gBoss[0].hit_voice = 54;
-			gBoss[0].hit.front = 0x3000;
-			gBoss[0].hit.top = 0x3000;
-			gBoss[0].hit.back = 0x3000;
-			gBoss[0].hit.bottom = 0x3000;
-			gBoss[0].bits = 0x8208;
-			gBoss[0].size = 3;
-			gBoss[0].code_event = 1000;
-			gBoss[0].ani_no = 0;
+			npc->life = 700;
+			npc->exp = 1;
+			npc->act_no = 1;
+			npc->x = 0x100000;
+			npc->y = 102400;
+			npc->hit_voice = 54;
+			npc->hit.front = 0x3000;
+			npc->hit.top = 0x3000;
+			npc->hit.back = 0x3000;
+			npc->hit.bottom = 0x3000;
+			npc->bits = 0x8208;
+			npc->size = 3;
+			npc->code_event = 1000;
+			npc->ani_no = 0;
 			gBoss[1].cond = 0x80;
 			gBoss[1].size = 3;
 			gBoss[1].direct = 0;
@@ -510,6 +523,7 @@ void ActBossChar_MonstX(void)
 			gBoss[2].direct = 2;
 			gBoss[3].cond = 0x80;
 			gBoss[3].life = 60;
+			gBoss[3].size = 3;	// Redundant: this get overwriten a few lines later
 			gBoss[3].hit_voice = 54;
 			gBoss[3].destroy_voice = 71;
 			gBoss[3].size = 2;
@@ -601,186 +615,186 @@ void ActBossChar_MonstX(void)
 			gBoss[16].count1 = 12;
 			gBoss[16].ani_no = 3;
 			gBoss[16].bits = 8;
-			gBoss[0].act_no = 2;
+			npc->act_no = 2;
 			break;
 
 		case 10:
-			gBoss[0].act_no = 11;
-			gBoss[0].act_wait = 0;
-			gBoss[0].count1 = 0;
+			npc->act_no = 11;
+			npc->act_wait = 0;
+			npc->count1 = 0;
 			// Fallthrough
 		case 11:
-			if (++gBoss[0].act_wait > 100)
+			if (++npc->act_wait > 100)
 			{
-				gBoss[0].act_wait = 0;
+				npc->act_wait = 0;
 
-				if (gMC.x < gBoss[0].x)
-					gBoss[0].act_no = 100;
+				if (npc->x > gMC.x)
+					npc->act_no = 100;
 				else
-					gBoss[0].act_no = 200;
+					npc->act_no = 200;
 			}
 
 			break;
 
 		case 100:
-			gBoss[0].act_wait = 0;
-			gBoss[0].act_no = 101;
-			++gBoss[0].count1;
+			npc->act_wait = 0;
+			npc->act_no = 101;
+			++npc->count1;
 			// Fallthrough
 		case 101:
-			if (++gBoss[0].act_wait == 4)
+			if (++npc->act_wait == 4)
 				gBoss[9].act_no = 100;
-			if (gBoss[0].act_wait == 8)
+			if (npc->act_wait == 8)
 				gBoss[10].act_no = 100;
-			if (gBoss[0].act_wait == 10)
+			if (npc->act_wait == 10)
 				gBoss[11].act_no = 100;
-			if (gBoss[0].act_wait == 12)
+			if (npc->act_wait == 12)
 				gBoss[12].act_no = 100;
-			if (gBoss[0].act_wait > 120 && gBoss[0].count1 > 2)
-				gBoss[0].act_no = 300;
-			if (gBoss[0].act_wait > 121 && gMC.x > gBoss[0].x)
-				gBoss[0].act_no = 200;
+			if (npc->act_wait > 120 && npc->count1 > 2)
+				npc->act_no = 300;
+			if (npc->act_wait > 121 && gMC.x > npc->x)
+				npc->act_no = 200;
 
 			break;
 
 		case 200:
-			gBoss[0].act_wait = 0;
-			gBoss[0].act_no = 201;
-			++gBoss[0].count1;
+			npc->act_wait = 0;
+			npc->act_no = 201;
+			++npc->count1;
 			// Fallthrough
 		case 201:
-			if (++gBoss[0].act_wait == 4)
+			if (++npc->act_wait == 4)
 				gBoss[9].act_no = 200;
-			if (gBoss[0].act_wait == 8)
+			if (npc->act_wait == 8)
 				gBoss[10].act_no = 200;
-			if (gBoss[0].act_wait == 10)
+			if (npc->act_wait == 10)
 				gBoss[11].act_no = 200;
-			if (gBoss[0].act_wait == 12)
+			if (npc->act_wait == 12)
 				gBoss[12].act_no = 200;
-			if (gBoss[0].act_wait > 120 && gBoss[0].count1 > 2)
-				gBoss[0].act_no = 400;
-			if (gBoss[0].act_wait > 121 && gMC.x < gBoss[0].x)
-				gBoss[0].act_no = 100;
+			if (npc->act_wait > 120 && npc->count1 > 2)
+				npc->act_no = 400;
+			if (npc->act_wait > 121 && gMC.x < npc->x)
+				npc->act_no = 100;
 
 			break;
 
 		case 300:
-			gBoss[0].act_wait = 0;
-			gBoss[0].act_no = 301;
+			npc->act_wait = 0;
+			npc->act_no = 301;
 			// Fallthrough
 		case 301:
-			if (++gBoss[0].act_wait == 4)
+			if (++npc->act_wait == 4)
 				gBoss[9].act_no = 300;
-			if (gBoss[0].act_wait == 8)
+			if (npc->act_wait == 8)
 				gBoss[10].act_no = 300;
-			if (gBoss[0].act_wait == 10)
+			if (npc->act_wait == 10)
 				gBoss[11].act_no = 300;
-			if (gBoss[0].act_wait == 12)
+			if (npc->act_wait == 12)
 				gBoss[12].act_no = 300;
-			if (gBoss[0].act_wait > 50)
+			if (npc->act_wait > 50)
 			{
-				if (gBoss[3].cond || gBoss[4].cond || gBoss[5].cond || gBoss[6].cond)
-					gBoss[0].act_no = 500;
+				if (gBoss[3].cond == 0 && gBoss[4].cond == 0 && gBoss[5].cond == 0 && gBoss[6].cond == 0)
+					npc->act_no = 600;
 				else
-					gBoss[0].act_no = 600;
+					npc->act_no = 500;
 			}
 			break;
 
 		case 400:
-			gBoss[0].act_wait = 0;
-			gBoss[0].act_no = 401;
+			npc->act_wait = 0;
+			npc->act_no = 401;
 			// Fallthrough
 		case 401:
-			if (++gBoss[0].act_wait == 4)
+			if (++npc->act_wait == 4)
 				gBoss[9].act_no = 400;
-			if (gBoss[0].act_wait == 8)
+			if (npc->act_wait == 8)
 				gBoss[10].act_no = 400;
-			if (gBoss[0].act_wait == 10)
+			if (npc->act_wait == 10)
 				gBoss[11].act_no = 400;
-			if (gBoss[0].act_wait == 12)
+			if (npc->act_wait == 12)
 				gBoss[12].act_no = 400;
-			if (gBoss[0].act_wait > 50)
+			if (npc->act_wait > 50)
 			{
-				if (gBoss[3].cond || gBoss[4].cond || gBoss[5].cond || gBoss[6].cond)
-					gBoss[0].act_no = 500;
+				if (gBoss[3].cond == 0 && gBoss[4].cond == 0 && gBoss[5].cond == 0 && gBoss[6].cond == 0)
+					npc->act_no = 600;
 				else
-					gBoss[0].act_no = 600;
+					npc->act_no = 500;
 			}
 
 			break;
 
 		case 500:
-			gBoss[0].act_no = 501;
-			gBoss[0].act_wait = 0;
+			npc->act_no = 501;
+			npc->act_wait = 0;
 			gBoss[1].act_no = 10;
 			gBoss[2].act_no = 10;
 			// Fallthrough
 		case 501:
-			if (++gBoss[0].act_wait > 300)
+			if (++npc->act_wait > 300)
 			{
-				gBoss[0].act_no = 502;
-				gBoss[0].act_wait = 0;
+				npc->act_no = 502;
+				npc->act_wait = 0;
 			}
 
 			if (gBoss[3].cond == 0 && gBoss[4].cond == 0 && gBoss[5].cond == 0 && gBoss[6].cond == 0)
 			{
-				gBoss[0].act_no = 502;
-				gBoss[0].act_wait = 0;
+				npc->act_no = 502;
+				npc->act_wait = 0;
 			}
 
 			break;
 
 		case 502:
-			gBoss[0].act_no = 503;
-			gBoss[0].act_wait = 0;
-			gBoss[0].count1 = 0;
+			npc->act_no = 503;
+			npc->act_wait = 0;
+			npc->count1 = 0;
 			gBoss[1].act_no = 20;
 			gBoss[2].act_no = 20;
 			// Fallthrough
 		case 503:
-			if (++gBoss[0].act_wait > 50)
+			if (++npc->act_wait > 50)
 			{
-				if (gMC.x < gBoss[0].x)
-					gBoss[0].act_no = 100;
+				if (npc->x > gMC.x)
+					npc->act_no = 100;
 				else
-					gBoss[0].act_no = 200;
+					npc->act_no = 200;
 			}
 
 			break;
 
 		case 600:
-			gBoss[0].act_no = 601;
-			gBoss[0].act_wait = 0;
-			gBoss[0].count2 = gBoss[0].life;
+			npc->act_no = 601;
+			npc->act_wait = 0;
+			npc->count2 = npc->life;
 			gBoss[1].act_no = 30;
 			gBoss[2].act_no = 30;
 			// Fallthrough
 		case 601:
-			++gBoss[0].act_wait;
+			++npc->act_wait;
 
-			if (gBoss[0].life < gBoss[0].count2 - 200 || gBoss[0].act_wait > 300)
+			if (npc->life < npc->count2 - 200 || npc->act_wait > 300)
 			{
-				gBoss[0].act_no = 602;
-				gBoss[0].act_wait = 0;
+				npc->act_no = 602;
+				npc->act_wait = 0;
 			}
 
 			break;
 
 		case 602:
-			gBoss[0].act_no = 603;
-			gBoss[0].act_wait = 0;
-			gBoss[0].count1 = 0;
+			npc->act_no = 603;
+			npc->act_wait = 0;
+			npc->count1 = 0;
 			gBoss[1].act_no = 40;
 			gBoss[2].act_no = 40;
-			break;
+			// Fallthrough
 
 		case 603:
-			if (++gBoss[0].act_wait > 50)
+			if (++npc->act_wait > 50)
 			{
-				if (gMC.x < gBoss[0].x)
-					gBoss[0].act_no = 100;
+				if (npc->x > gMC.x)
+					npc->act_no = 100;
 				else
-					gBoss[0].act_no = 200;
+					npc->act_no = 200;
 			}
 
 			break;
@@ -788,16 +802,16 @@ void ActBossChar_MonstX(void)
 		case 1000:
 			SetQuake(2);
 
-			if (++gBoss[0].act_wait % 8 == 0)
+			if (++npc->act_wait % 8 == 0)
 				PlaySoundObject(52, 1);
 
-			SetDestroyNpChar(gBoss[0].x + (Random(-0x48, 0x48) * 0x200), gBoss[0].y + (Random(-0x40, 0x40) * 0x200), 1, 1);
+			SetDestroyNpChar(npc->x + (Random(-0x48, 0x48) * 0x200), npc->y + (Random(-0x40, 0x40) * 0x200), 1, 1);
 
-			if (gBoss[0].act_wait > 100)
+			if (npc->act_wait > 100)
 			{
-				gBoss[0].act_wait = 0;
-				gBoss[0].act_no = 1001;
-				SetFlash(gBoss[0].x, gBoss[0].y, 1);
+				npc->act_wait = 0;
+				npc->act_no = 1001;
+				SetFlash(npc->x, npc->y, 1);
 				PlaySoundObject(35, 1);
 			}
 
@@ -806,13 +820,13 @@ void ActBossChar_MonstX(void)
 		case 1001:
 			SetQuake(40);
 
-			if (++gBoss[0].act_wait > 50)
+			if (++npc->act_wait > 50)
 			{
-				for (int i = 0; i < 20; ++i)
+				for (i = 0; i < 20; ++i)
 					gBoss[i].cond = 0;
 
 				DeleteNpCharCode(158, 1);
-				SetNpChar(159, gBoss[0].x, gBoss[0].y - 0x3000, 0, 0, 0, 0, 0);
+				SetNpChar(159, npc->x, npc->y - 0x3000, 0, 0, 0, 0, 0);
 			}
 
 			break;
@@ -822,7 +836,7 @@ void ActBossChar_MonstX(void)
 	ActBossChar03_01(&gBoss[10]);
 	ActBossChar03_01(&gBoss[11]);
 	ActBossChar03_01(&gBoss[12]);
-	gBoss[0].x += ((gBoss[11].x + gBoss[10].x + gBoss[9].x + gBoss[12].x) / 4 - gBoss[0].x) / 16;
+	npc->x += ((gBoss[11].x + gBoss[10].x + gBoss[9].x + gBoss[12].x) / 4 - npc->x) / 16;
 	ActBossChar03_face(&gBoss[7]);
 	ActBossChar03_02(&gBoss[13]);
 	ActBossChar03_02(&gBoss[14]);
@@ -840,11 +854,11 @@ void ActBossChar_MonstX(void)
 	if (gBoss[6].cond)
 		ActBossChar03_04(&gBoss[6]);
 
-	if (gBoss[0].life == 0 && gBoss[0].act_no < 1000)
+	if (npc->life == 0 && npc->act_no < 1000)
 	{
-		gBoss[0].act_no = 1000;
-		gBoss[0].act_wait = 0;
-		gBoss[0].shock = 0x96;
+		npc->act_no = 1000;
+		npc->act_wait = 0;
+		npc->shock = 0x96;
 		gBoss[9].act_no = 300;
 		gBoss[10].act_no = 300;
 		gBoss[11].act_no = 300;

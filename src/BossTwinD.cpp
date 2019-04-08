@@ -12,6 +12,8 @@
 
 static void ActBossCharT_DragonBody(NPCHAR *npc)
 {
+	unsigned char deg;
+
 	RECT rcLeft[3] = {
 		{0, 0, 40, 40},
 		{40, 0, 80, 40},
@@ -24,17 +26,16 @@ static void ActBossCharT_DragonBody(NPCHAR *npc)
 		{80, 40, 120, 80},
 	};
 
-	unsigned char deg;
 	switch (npc->act_no)
 	{
 		case 0:
-			deg = npc->count1 + (npc->pNpc->count1 / 4);
+			deg = ((npc->pNpc->count1 / 4) + npc->count1) % 0x100;
 			npc->act_no = 10;
-			npc->x += npc->pNpc->x + npc->pNpc->tgt_x * GetCos(deg);
-			npc->y += npc->pNpc->y + npc->pNpc->tgt_y * GetSin(deg);
+			npc->x += npc->pNpc->x + GetCos(deg) * npc->pNpc->tgt_x;
+			npc->y += npc->pNpc->y + GetSin(deg) * npc->pNpc->tgt_y;
 			// Fallthrough
 		case 10:
-			if (gMC.x < npc->x)
+			if (npc->x > gMC.x)
 				npc->direct = 0;
 			else
 				npc->direct = 2;
@@ -42,13 +43,13 @@ static void ActBossCharT_DragonBody(NPCHAR *npc)
 			break;
 
 		case 100:
-			deg = npc->count1 + (npc->pNpc->count1 / 4);
-			npc->tgt_x = npc->pNpc->x + npc->pNpc->tgt_x * GetCos(deg);
-			npc->tgt_y = npc->pNpc->y + npc->pNpc->tgt_y * GetSin(deg);
+			deg = ((npc->pNpc->count1 / 4) + npc->count1) % 0x100;
+			npc->tgt_x = npc->pNpc->x + GetCos(deg) * npc->pNpc->tgt_x;
+			npc->tgt_y = npc->pNpc->y + GetSin(deg) * npc->pNpc->tgt_y;
 			npc->x += (npc->tgt_x - npc->x) / 8;
 			npc->y += (npc->tgt_y - npc->y) / 8;
 
-			if (gMC.x < npc->x)
+			if (npc->x > gMC.x)
 				npc->direct = 0;
 			else
 				npc->direct = 2;
@@ -60,13 +61,13 @@ static void ActBossCharT_DragonBody(NPCHAR *npc)
 			npc->bits &= ~0x20;
 			// Fallthrough
 		case 1001:
-			deg = npc->count1 + (npc->pNpc->count1 / 4);
-			npc->tgt_x = npc->pNpc->x + npc->pNpc->tgt_x * GetCos(deg);
-			npc->tgt_y = npc->pNpc->y + npc->pNpc->tgt_y * GetSin(deg);
+			deg = ((npc->pNpc->count1 / 4) + npc->count1) % 0x100;
+			npc->tgt_x = npc->pNpc->x + GetCos(deg) * npc->pNpc->tgt_x;
+			npc->tgt_y = npc->pNpc->y + GetSin(deg) * npc->pNpc->tgt_y;
 			npc->x += (npc->tgt_x - npc->x) / 8;
 			npc->y += (npc->tgt_y - npc->y) / 8;
 
-			if (npc->pNpc->x < npc->x)
+			if (npc->x > npc->pNpc->x)
 				npc->direct = 0;
 			else
 				npc->direct = 2;
@@ -91,6 +92,10 @@ static void ActBossCharT_DragonBody(NPCHAR *npc)
 
 static void ActBossCharT_DragonHead(NPCHAR *npc)
 {
+	unsigned char deg;
+	int ym;
+	int xm;
+
 	RECT rcLeft[4] = {
 		{0, 80, 40, 112},
 		{40, 80, 80, 112},
@@ -171,9 +176,10 @@ static void ActBossCharT_DragonHead(NPCHAR *npc)
 		case 220:
 			if (++npc->act_wait % 8 == 1)
 			{
-				const unsigned char deg = GetArktan(npc->x - gMC.x, npc->y - gMC.y) + Random(-6, 6);
-				const int ym = GetSin(deg);
-				const int xm = GetCos(deg);
+				deg = GetArktan(npc->x - gMC.x, npc->y - gMC.y);
+				deg += (unsigned char)Random(-6, 6);
+				ym = GetSin(deg);
+				xm = GetCos(deg);
 
 				if (npc->direct == 0)
 					SetNpChar(202, npc->x - 0x1000, npc->y, xm, ym, 0, 0, 0x100);
@@ -215,9 +221,10 @@ static void ActBossCharT_DragonHead(NPCHAR *npc)
 
 			if (npc->act_wait > 20 && npc->act_wait % 32 == 1)
 			{
-				const unsigned char deg = GetArktan(npc->x - gMC.x, npc->y - gMC.y) + Random(-6, 6);
-				const int ym = GetSin(deg);
-				const int xm = GetCos(deg);
+				deg = GetArktan(npc->x - gMC.x, npc->y - gMC.y);
+				deg += (unsigned char)Random(-6, 6);
+				ym = GetSin(deg);
+				xm = GetCos(deg);
 
 				if (npc->direct == 0)
 					SetNpChar(202, npc->x - 0x1000, npc->y, xm, ym, 0, 0, 0x100);
@@ -252,34 +259,37 @@ static void ActBossCharT_DragonHead(NPCHAR *npc)
 
 void ActBossChar_Twin(void)
 {
-	switch (gBoss[0].act_no)
+	NPCHAR *npc = gBoss;
+
+	switch (npc->act_no)
 	{
 		case 0:
-			gBoss[0].cond = 0x80;
-			gBoss[0].direct = 0;
-			gBoss[0].act_no = 10;
-			gBoss[0].exp = 0;
-			gBoss[0].x = 0x14000;
-			gBoss[0].y = 0x10000;
-			gBoss[0].view.front = 0x1000;
-			gBoss[0].view.top = 0x1000;
-			gBoss[0].view.back = 0x10000;
-			gBoss[0].view.bottom = 0x1000;
-			gBoss[0].hit_voice = 54;
-			gBoss[0].hit.front = 0x1000;
-			gBoss[0].hit.top = 0x1000;
-			gBoss[0].hit.back = 0x1000;
-			gBoss[0].hit.bottom = 0x1000;
-			gBoss[0].bits = 8;
-			gBoss[0].bits |= 0x200;
-			gBoss[0].size = 3;
-			gBoss[0].damage = 0;
-			gBoss[0].code_event = 1000;
-			gBoss[0].life = 500;
-			gBoss[0].count2 = Random(700, 1200);
-			gBoss[0].tgt_x = 180;
-			gBoss[0].tgt_y = 61;
+			npc->cond = 0x80;
+			npc->direct = 0;
+			npc->act_no = 10;
+			npc->exp = 0;
+			npc->x = 0x14000;
+			npc->y = 0x10000;
+			npc->view.front = 0x1000;
+			npc->view.top = 0x1000;
+			npc->view.back = 0x10000;
+			npc->view.bottom = 0x1000;
+			npc->hit_voice = 54;
+			npc->hit.front = 0x1000;
+			npc->hit.top = 0x1000;
+			npc->hit.back = 0x1000;
+			npc->hit.bottom = 0x1000;
+			npc->bits = 8;
+			npc->bits |= 0x200;
+			npc->size = 3;
+			npc->damage = 0;
+			npc->code_event = 1000;
+			npc->life = 500;
+			npc->count2 = Random(700, 1200);
+			npc->tgt_x = 180;
+			npc->tgt_y = 61;
 
+			gBoss[2].cond = 0x80;
 			gBoss[2].view.back = 0x2800;
 			gBoss[2].view.front = 0x2800;
 			gBoss[2].view.top = 0x2000;
@@ -290,7 +300,7 @@ void ActBossChar_Twin(void)
 			gBoss[2].hit.bottom = 0x1400;
 			gBoss[2].bits = 12;
 			gBoss[2].pNpc = &gBoss[3];
-			gBoss[2].cond = 0x90;
+			gBoss[2].cond |= 0x10;
 			gBoss[2].damage = 10;
 
 			gBoss[3].cond = 0x80;
@@ -303,7 +313,7 @@ void ActBossChar_Twin(void)
 			gBoss[3].hit.top = 0x400;
 			gBoss[3].hit.bottom = 0x2000;
 			gBoss[3].bits = 8;
-			gBoss[3].pNpc = gBoss;
+			gBoss[3].pNpc = npc;
 			gBoss[3].damage = 10;
 
 			gBoss[4] = gBoss[2];
@@ -314,10 +324,10 @@ void ActBossChar_Twin(void)
 			break;
 
 		case 20:
-			if (--gBoss[0].tgt_x <= 112)
+			if (--npc->tgt_x <= 112)
 			{
-				gBoss[0].act_no = 100;
-				gBoss[0].act_wait = 0;
+				npc->act_no = 100;
+				npc->act_wait = 0;
 				gBoss[2].act_no = 100;
 				gBoss[4].act_no = 100;
 				gBoss[3].act_no = 100;
@@ -327,39 +337,39 @@ void ActBossChar_Twin(void)
 			break;
 
 		case 100:
-			if (++gBoss[0].act_wait < 100)
+			if (++npc->act_wait < 100)
 			{
-				++gBoss[0].count1;
+				++npc->count1;
 			}
 			else
 			{
-				if (gBoss[0].act_wait < 120)
+				if (npc->act_wait < 120)
 				{
-					gBoss[0].count1 += 2;
+					npc->count1 += 2;
 				}
 				else
 				{
-					if (gBoss[0].act_wait < gBoss[0].count2)
+					if (npc->act_wait < npc->count2)
 					{
-						gBoss[0].count1 += 4;
+						npc->count1 += 4;
 					}
 					else
 					{
-						if (gBoss[0].act_wait < gBoss[0].count2 + 40)
+						if (npc->act_wait < npc->count2 + 40)
 						{
-							gBoss[0].count1 += 2;
+							npc->count1 += 2;
 						}
 						else
 						{
-							if (gBoss[0].act_wait < gBoss[0].count2 + 60)
+							if (npc->act_wait < npc->count2 + 60)
 							{
-								++gBoss[0].count1;
+								++npc->count1;
 							}
 							else
 							{
-								gBoss[0].act_wait = 0;
-								gBoss[0].act_no = 110;
-								gBoss[0].count2 = Random(400, 700);
+								npc->act_wait = 0;
+								npc->act_no = 110;
+								npc->count2 = Random(400, 700);
 								break;
 							}
 						}
@@ -367,54 +377,54 @@ void ActBossChar_Twin(void)
 				}
 			}
 
-			if (gBoss[0].count1 > 0x3FF)
-				gBoss[0].count1 -= 0x400;
+			if (npc->count1 > 0x3FF)
+				npc->count1 -= 0x400;
 
 			break;
 
 		case 110:
-			if (++gBoss[0].act_wait < 20)
+			if (++npc->act_wait < 20)
 			{
-				--gBoss[0].count1;
+				--npc->count1;
 			}
 			else
 			{
-				if (gBoss[0].act_wait < 60)
+				if (npc->act_wait < 60)
 				{
-					gBoss[0].count1 -= 2;
+					npc->count1 -= 2;
 				}
 				else
 				{
-					if (gBoss[0].act_wait < gBoss[0].count2)
+					if (npc->act_wait < npc->count2)
 					{
-						gBoss[0].count1 -= 4;
+						npc->count1 -= 4;
 					}
 					else
 					{
-						if (gBoss[0].act_wait < gBoss[0].count2 + 40)
+						if (npc->act_wait < npc->count2 + 40)
 						{
-							gBoss[0].count1 -= 2;
+							npc->count1 -= 2;
 						}
 						else
 						{
-							if (gBoss[0].act_wait < gBoss[0].count2 + 60)
+							if (npc->act_wait < npc->count2 + 60)
 							{
-								--gBoss[0].count1;
+								--npc->count1;
 							}
 							else
 							{
-								if (gBoss[0].life < 300)
+								if (npc->life < 300)
 								{
-									gBoss[0].act_wait = 0;
-									gBoss[0].act_no = 400;
+									npc->act_wait = 0;
+									npc->act_no = 400;
 									gBoss[2].act_no = 400;
 									gBoss[4].act_no = 400;
 								}
 								else
 								{
-									gBoss[0].act_wait = 0;
-									gBoss[0].act_no = 100;
-									gBoss[0].count2 = Random(400, 700);
+									npc->act_wait = 0;
+									npc->act_no = 100;
+									npc->count2 = Random(400, 700);
 								}
 
 								break;
@@ -424,53 +434,53 @@ void ActBossChar_Twin(void)
 				}
 			}
 
-			if (gBoss[0].count1 <= 0)
-				gBoss[0].count1 += 0x400;
+			if (npc->count1 <= 0)
+				npc->count1 += 0x400;
 
 			break;
 
 		case 400:
-			if (++gBoss[0].act_wait > 100)
+			if (++npc->act_wait > 100)
 			{
-				gBoss[0].act_wait = 0;
-				gBoss[0].act_no = 401;
+				npc->act_wait = 0;
+				npc->act_no = 401;
 			}
 
 			break;
 
 		case 401:
-			if (++gBoss[0].act_wait < 100)
+			if (++npc->act_wait < 100)
 			{
-				++gBoss[0].count1;
+				++npc->count1;
 			}
 			else
 			{
-				if (gBoss[0].act_wait < 120)
+				if (npc->act_wait < 120)
 				{
-					gBoss[0].count1 += 2;
+					npc->count1 += 2;
 				}
 				else
 				{
-					if (gBoss[0].act_wait < 500)
+					if (npc->act_wait < 500)
 					{
-						gBoss[0].count1 += 4;
+						npc->count1 += 4;
 					}
 					else
 					{
-						if (gBoss[0].act_wait < 540)
+						if (npc->act_wait < 540)
 						{
-							gBoss[0].count1 += 2;
+							npc->count1 += 2;
 						}
 						else
 						{
-							if (gBoss[0].act_wait < 560)
+							if (npc->act_wait < 560)
 							{
-								++gBoss[0].count1;
+								++npc->count1;
 							}
 							else
 							{
-								gBoss[0].act_no = 100;
-								gBoss[0].act_wait = 0;
+								npc->act_no = 100;
+								npc->act_wait = 0;
 								gBoss[2].act_no = 100;
 								gBoss[4].act_no = 100;
 								break;
@@ -480,48 +490,48 @@ void ActBossChar_Twin(void)
 				}
 			}
 
-			if ( gBoss[0].count1 > 0x3FF )
-				gBoss[0].count1 -= 0x400;
+			if ( npc->count1 > 0x3FF )
+				npc->count1 -= 0x400;
 
 			break;
 
 		case 1000:
-			gBoss[0].act_no = 1001;
-			gBoss[0].act_wait = 0;
+			npc->act_no = 1001;
+			npc->act_wait = 0;
 			gBoss[2].act_no = 1000;
 			gBoss[3].act_no = 1000;
 			gBoss[4].act_no = 1000;
 			gBoss[5].act_no = 1000;
-			SetDestroyNpChar(gBoss[0].x, gBoss[0].y, gBoss[0].view.back, 40);
-			break;
+			SetDestroyNpChar(npc->x, npc->y, npc->view.back, 40);
+			// Fallthrough
 
 		case 1001:
-			if (++gBoss[0].act_wait > 100)
-				gBoss[0].act_no = 1010;
+			if (++npc->act_wait > 100)
+				npc->act_no = 1010;
 
-			SetNpChar(4, gBoss[0].x + (Random(-0x80, 0x80) * 0x200), gBoss[0].y + (Random(-70, 70) * 0x200), 0, 0, 0, 0, 0x100);
+			SetNpChar(4, npc->x + (Random(-0x80, 0x80) * 0x200), npc->y + (Random(-70, 70) * 0x200), 0, 0, 0, 0, 0x100);
 			break;
 
 		case 1010:
-			gBoss[0].count1 += 4;
+			npc->count1 += 4;
 
-			if (gBoss[0].count1 > 0x3FF)
-				gBoss[0].count1 -= 0x400;
+			if (npc->count1 > 0x3FF)
+				npc->count1 -= 0x400;
 
-			if (gBoss[0].tgt_x > 8)
-				--gBoss[0].tgt_x;
-			if (gBoss[0].tgt_y > 0)
-				--gBoss[0].tgt_y;
+			if (npc->tgt_x > 8)
+				--npc->tgt_x;
+			if (npc->tgt_y > 0)
+				--npc->tgt_y;
 
-			if (gBoss[0].tgt_x < -8)
-				++gBoss[0].tgt_x;
-			if (gBoss[0].tgt_y < 0)
-				++gBoss[0].tgt_y;
+			if (npc->tgt_x < -8)
+				++npc->tgt_x;
+			if (npc->tgt_y < 0)
+				++npc->tgt_y;
 
-			if (gBoss[0].tgt_y == 0)
+			if (npc->tgt_y == 0)
 			{
-				gBoss[0].act_no = 1020;
-				gBoss[0].act_wait = 0;
+				npc->act_no = 1020;
+				npc->act_wait = 0;
 				SetFlash(gBoss[0].x, gBoss[0].y, 1);
 				PlaySoundObject(35, 1);
 			}
@@ -550,5 +560,5 @@ void ActBossChar_Twin(void)
 	ActBossCharT_DragonBody(&gBoss[5]);
 
 	RECT rc = {0, 0, 0, 0};
-	gBoss[0].rect = rc;
+	npc->rect = rc;
 }

@@ -3,7 +3,7 @@
 #include "WindowsWrapper.h"
 
 extern unsigned char gFlagNPC[1000];
-extern unsigned char gSkipFlag[0x40];
+extern unsigned char gSkipFlag[8];
 
 void InitFlags();
 void InitSkipFlags();

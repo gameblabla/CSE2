@@ -1,5 +1,7 @@
 #pragma once
 
+#include "WindowsWrapper.h"
+
 struct MAP_NAME
 {
 	int flag;
@@ -8,6 +10,6 @@ struct MAP_NAME
 };
 
 void ReadyMapName(const char *str);
-void PutMapName(bool bMini);
+void PutMapName(BOOL bMini);
 void StartMapName();
 void RestoreMapName();
