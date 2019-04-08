@@ -61,14 +61,26 @@ void MakeWaveTables(void)
 
 BOOL MakePixelWaveData(const PIXTONEPARAMETER *ptp, unsigned char *pData)
 {
+	int i;
+	double dEnvelope;
+	double dPitch;
+	double dMain;
+	double dVolume;
+	double d1;
+	double d2;
+	double d3;
+	int a;
+	int b;
+	int c;
+	int d;
+	signed char envelopeTable[0x100];
+
 	// The Linux port added a cute optimisation here, where MakeWaveTables is only called once during the game's execution
 	MakeWaveTables();
 
-	signed char envelopeTable[0x100];
-	memset(envelopeTable, 0, 0x100);
+	memset(envelopeTable, 0, sizeof(envelopeTable));
 
-	int i = 0;
-	double dEnvelope;
+	i = 0;
 
 	dEnvelope = ptp->initial;
 	while (i < ptp->pointAx)
@@ -102,13 +114,9 @@ BOOL MakePixelWaveData(const PIXTONEPARAMETER *ptp, unsigned char *pData)
 		++i;
 	}
 
-	double dPitch = ptp->oPitch.offset;
-	double dMain = ptp->oMain.offset;
-	double dVolume = ptp->oVolume.offset;
-
-	double d1;
-	double d2;
-	double d3;
+	dPitch = ptp->oPitch.offset;
+	dMain = ptp->oMain.offset;
+	dVolume = ptp->oVolume.offset;
 
 	if (ptp->oMain.num == 0.0)
 		d1 = 0.0;
@@ -127,10 +135,10 @@ BOOL MakePixelWaveData(const PIXTONEPARAMETER *ptp, unsigned char *pData)
 
 	for (i = 0; i < ptp->size; ++i)
 	{
-		const int a = (int)dMain % 256;
-		const int b = (int)dPitch % 256;
-		const int c = (int)dVolume % 256;
-		const int d = (int)((double)(i * 0x100) / ptp->size);
+		a = (int)dMain % 256;
+		b = (int)dPitch % 256;
+		c = (int)dVolume % 256;
+		d = (int)((double)(i * 0x100) / ptp->size);
 		pData[i] = gWaveModelTable[ptp->oMain.model][a]
 			* ptp->oMain.top
 			/ 64
