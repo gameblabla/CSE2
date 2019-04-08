@@ -5,7 +5,7 @@
 #include "WindowsWrapper.h"
 
 unsigned char gFlagNPC[1000];
-unsigned char gSkipFlag[0x40];
+unsigned char gSkipFlag[8];
 
 //Flag inits
 void InitFlags()

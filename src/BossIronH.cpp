@@ -10,161 +10,166 @@
 
 void ActBossChar_Ironhead(void)
 {
-	switch (gBoss[0].act_no)
+	static unsigned char flash;
+	int i;
+
+	NPCHAR *npc = gBoss;
+
+	switch (npc->act_no)
 	{
 		case 0:
-			gBoss[0].cond = 0x80;
-			gBoss[0].exp = 1;
-			gBoss[0].direct = 2;
-			gBoss[0].act_no = 100;
-			gBoss[0].x = 0x14000;
-			gBoss[0].y = 0x10000;
-			gBoss[0].view.front = 0x5000;
-			gBoss[0].view.top = 0x1800;
-			gBoss[0].view.back = 0x3000;
-			gBoss[0].view.bottom = 0x1800;
-			gBoss[0].hit_voice = 54;
-			gBoss[0].hit.front = 0x2000;
-			gBoss[0].hit.top = 0x1400;
-			gBoss[0].hit.back = 0x2000;
-			gBoss[0].hit.bottom = 0x1400;
-			gBoss[0].bits = 0x8228;
-			gBoss[0].size = 3;
-			gBoss[0].damage = 10;
-			gBoss[0].code_event = 1000;
-			gBoss[0].life = 400;
+			npc->cond = 0x80;
+			npc->exp = 1;
+			npc->direct = 2;
+			npc->act_no = 100;
+			npc->x = 0x14000;
+			npc->y = 0x10000;
+			npc->view.front = 0x5000;
+			npc->view.top = 0x1800;
+			npc->view.back = 0x3000;
+			npc->view.bottom = 0x1800;
+			npc->hit_voice = 54;
+			npc->hit.front = 0x2000;
+			npc->hit.top = 0x1400;
+			npc->hit.back = 0x2000;
+			npc->hit.bottom = 0x1400;
+			npc->bits = 0x8228;
+			npc->size = 3;
+			npc->damage = 10;
+			npc->code_event = 1000;
+			npc->life = 400;
 			break;
 
 		case 100:
-			gBoss[0].act_no = 101;
-			gBoss[0].bits &= ~0x20;
-			gBoss[0].act_wait = 0;
+			npc->act_no = 101;
+			npc->bits &= ~0x20;
+			npc->act_wait = 0;
 			// Fallthrough
 		case 101:
-			if (++gBoss[0].act_wait > 50)
+			if (++npc->act_wait > 50)
 			{
-				gBoss[0].act_no = 250;
-				gBoss[0].act_wait = 0;
+				npc->act_no = 250;
+				npc->act_wait = 0;
 			}
 
-			if (gBoss[0].act_wait % 4 == 0)
+			if (npc->act_wait % 4 == 0)
 				SetNpChar(197, Random(15, 18) * 0x2000, Random(2, 13) * 0x2000, 0, 0, 0, 0, 0x100);
 
 			break;
 
 		case 250:
-			gBoss[0].act_no = 251;
+			npc->act_no = 251;
 
-			if (gBoss[0].direct == 2)
+			if (npc->direct == 2)
 			{
-				gBoss[0].x = 0x1E000;
-				gBoss[0].y = gMC.y;
+				npc->x = 0x1E000;
+				npc->y = gMC.y;
 			}
 			else
 			{
-				gBoss[0].x = 0x5A000;
-				gBoss[0].y = Random(2, 13) * 0x2000;
+				npc->x = 0x5A000;
+				npc->y = Random(2, 13) * 0x2000;
 			}
 
-			gBoss[0].tgt_x = gBoss[0].x;
-			gBoss[0].tgt_y = gBoss[0].y;
+			npc->tgt_x = npc->x;
+			npc->tgt_y = npc->y;
 
-			gBoss[0].ym = Random(-0x200, 0x200);
-			gBoss[0].xm = Random(-0x200, 0x200);
+			npc->ym = Random(-0x200, 0x200);
+			npc->xm = Random(-0x200, 0x200);
 
-			gBoss[0].bits |= 0x20;
+			npc->bits |= 0x20;
 			// Fallthrough
 		case 251:
-			if (gBoss[0].direct == 2)
+			if (npc->direct == 2)
 			{
-				gBoss[0].tgt_x += 0x400;
+				npc->tgt_x += 0x400;
 			}
 			else
 			{
-				gBoss[0].tgt_x -= 0x200;
+				npc->tgt_x -= 0x200;
 
-				if (gMC.y > gBoss[0].tgt_y)
-					gBoss[0].tgt_y += 0x200;
+				if (npc->tgt_y < gMC.y)
+					npc->tgt_y += 0x200;
 				else
-					gBoss[0].tgt_y -= 0x200;
+					npc->tgt_y -= 0x200;
 			}
 
-			if (gBoss[0].tgt_x > gBoss[0].x)
-				gBoss[0].xm += 8;
+			if (npc->x < npc->tgt_x)
+				npc->xm += 8;
 			else
-				gBoss[0].xm -= 8;
+				npc->xm -= 8;
 
-			if (gBoss[0].tgt_y > gBoss[0].y)
-				gBoss[0].ym += 8;
+			if (npc->y < npc->tgt_y)
+				npc->ym += 8;
 			else
-				gBoss[0].ym -= 8;
+				npc->ym -= 8;
 
-			if (gBoss[0].ym > 0x200)
-				gBoss[0].ym = 0x200;
-			if (gBoss[0].ym < -0x200)
-				gBoss[0].ym = -0x200;
+			if (npc->ym > 0x200)
+				npc->ym = 0x200;
+			if (npc->ym < -0x200)
+				npc->ym = -0x200;
 
-			gBoss[0].x += gBoss[0].xm;
-			gBoss[0].y += gBoss[0].ym;
+			npc->x += npc->xm;
+			npc->y += npc->ym;
 
-			if (gBoss[0].direct == 2)
+			if (npc->direct == 2)
 			{
-				if (gBoss[0].x > 0x5A000)
+				if (npc->x > 0x5A000)
 				{
-					gBoss[0].direct = 0;
-					gBoss[0].act_no = 100;
+					npc->direct = 0;
+					npc->act_no = 100;
 				}
 			}
 			else
 			{
-				if (gBoss[0].x < 0x22000)
+				if (npc->x < 0x22000)
 				{
-					gBoss[0].direct = 2;
-					gBoss[0].act_no = 100;
+					npc->direct = 2;
+					npc->act_no = 100;
 				}
 			}
 
-			if (gBoss[0].direct == 0 && (++gBoss[0].act_wait == 300 || gBoss[0].act_wait == 310 || gBoss[0].act_wait == 320))
+			if (npc->direct == 0 && (++npc->act_wait == 300 || npc->act_wait == 310 || npc->act_wait == 320))
 			{
 				PlaySoundObject(39, 1);
-				SetNpChar(198, gBoss[0].x + 0x1400, gBoss[0].y + 0x200, Random(-3, 0) * 0x200, Random(-3, 3) * 0x200, 2, 0, 0x100);
+				SetNpChar(198, npc->x + 0x1400, npc->y + 0x200, Random(-3, 0) * 0x200, Random(-3, 3) * 0x200, 2, 0, 0x100);
 			}
 
-			if (++gBoss[0].ani_wait > 2)
+			if (++npc->ani_wait > 2)
 			{
-				gBoss[0].ani_wait = 0;
-				++gBoss[0].ani_no;
+				npc->ani_wait = 0;
+				++npc->ani_no;
 			}
 
-			if (gBoss[0].ani_no > 7)
-				gBoss[0].ani_no = 0;
+			if (npc->ani_no > 7)
+				npc->ani_no = 0;
 
 			break;
 
 		case 1000:
-			gBoss[0].bits &= ~0x20;
-			gBoss[0].ani_no = 8;
-			gBoss[0].damage = 0;
-			gBoss[0].act_no = 1001;
-			gBoss[0].tgt_x = gBoss[0].x;
-			gBoss[0].tgt_y = gBoss[0].y;
+			npc->bits &= ~0x20;
+			npc->ani_no = 8;
+			npc->damage = 0;
+			npc->act_no = 1001;
+			npc->tgt_x = npc->x;
+			npc->tgt_y = npc->y;
 			SetQuake(20);
 
-			for (int i = 0; i < 0x20; ++i)
-				SetNpChar(4, gBoss[0].x + (Random(-0x80, 0x80) * 0x200), gBoss[0].y + (Random(-0x40, 0x40) * 0x200), Random(-0x80, 0x80) * 0x200, Random(-0x80, 0x80) * 0x200, 0, 0, 0x100);
+			for (i = 0; i < 0x20; ++i)
+				SetNpChar(4, npc->x + (Random(-0x80, 0x80) * 0x200), npc->y + (Random(-0x40, 0x40) * 0x200), Random(-0x80, 0x80) * 0x200, Random(-0x80, 0x80) * 0x200, 0, 0, 0x100);
 
 			DeleteNpCharCode(197, 1);
 			DeleteNpCharCode(271, 1);
 			DeleteNpCharCode(272, 1);
 			// Fallthrough
 		case 1001:
-			gBoss[0].tgt_x -= 0x200;
+			npc->tgt_x -= 0x200;
 
-			gBoss[0].x = gBoss[0].tgt_x + (Random(-1, 1) * 0x200);
-			gBoss[0].y = gBoss[0].tgt_y + (Random(-1, 1) * 0x200);
+			npc->x = npc->tgt_x + (Random(-1, 1) * 0x200);
+			npc->y = npc->tgt_y + (Random(-1, 1) * 0x200);
 
-			if (++gBoss[0].act_wait % 4 == 0)
-				SetNpChar(4, gBoss[0].x + (Random(-0x80, 0x80) * 0x200), gBoss[0].y + (Random(-0x40, 0x40) * 0x200), Random(-0x80, 0x80) * 0x200, Random(-0x80, 0x80) * 0x200, 0, 0, 0x100);
+			if (++npc->act_wait % 4 == 0)
+				SetNpChar(4, npc->x + (Random(-0x80, 0x80) * 0x200), npc->y + (Random(-0x40, 0x40) * 0x200), Random(-0x80, 0x80) * 0x200, Random(-0x80, 0x80) * 0x200, 0, 0, 0x100);
 
 			break;
 	}
@@ -193,17 +198,15 @@ void ActBossChar_Ironhead(void)
 		{256, 48, 320, 72},
 	};
 
-	if (gBoss[0].shock)
+	if (npc->shock)
 	{
-		static unsigned char flash;
-
-		if ((++flash >> 1) % 2)
-			gBoss[0].rect = rc[gBoss[0].ani_no];
+		if (++flash / 2 % 2)
+			npc->rect = rc[npc->ani_no];
 		else
-			gBoss[0].rect = rcDamage[gBoss[0].ani_no];
+			npc->rect = rcDamage[npc->ani_no];
 	}
 	else
 	{
-		gBoss[0].rect = rc[gBoss[0].ani_no];
+		npc->rect = rc[npc->ani_no];
 	}
 }

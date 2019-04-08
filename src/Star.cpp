@@ -63,40 +63,44 @@ void ActStar()
 	{
 		if (i)
 		{
-			if (star[i - 1].x >= star[i].x)
-				star[i].xm += 0x80;
-			else
+			if (star[i - 1].x < star[i].x)
 				star[i].xm -= 0x80;
-			
-			if (star[i - 1].y >= star[i].y)
-				star[i].ym += 0xAA;
 			else
+				star[i].xm += 0x80;
+			
+			if (star[i - 1].y < star[i].y)
 				star[i].ym -= 0xAA;
+			else
+				star[i].ym += 0xAA;
 		}
 		else
 		{
-			if (gMC.x >= star[0].x)
-				star[0].xm += 0x80;
+			if (gMC.x < star[i].x)
+				star[i].xm -= 0x80;
 			else
-				star[0].xm -= 0x80;
-			if (gMC.y >= star[0].y)
-				star[0].ym += 0xAA;
+				star[i].xm += 0x80;
+
+			if (gMC.y < star[i].y)
+				star[i].ym -= 0xAA;
 			else
-				star[0].ym -= 0xAA;
+				star[i].ym += 0xAA;
 		}
 		
 		if (star[i].xm > 0xA00)
 			star[i].xm = 0xA00;
 		if (star[i].xm < -0xA00)
 			star[i].xm = -0xA00;
+
 		if (star[i].ym > 0xA00)
 			star[i].ym = 0xA00;
 		if (star[i].ym < -0xA00)
 			star[i].ym = -0xA00;
+
 		if (star[i].xm > 0xA00)
 			star[i].xm = 0xA00;
 		if (star[i].xm < -0xA00)
 			star[i].xm = -0xA00;
+
 		if (star[i].ym > 0xA00)
 			star[i].ym = 0xA00;
 		if (star[i].ym < -0xA00)
@@ -105,7 +109,7 @@ void ActStar()
 		star[i].x += star[i].xm;
 		star[i].y += star[i].ym;
 		
-		if (gMC.star > i && (gMC.equip & 0x80) && (g_GameFlags & 2) && a == i)
+		if (i < gMC.star && (gMC.equip & 0x80) && (g_GameFlags & 2) && a == i)
 			SetBullet(45, star[a].x, star[a].y, 0);
 	}
 }
@@ -118,12 +122,15 @@ void PutStar(int fx, int fy)
 		{192, 16, 200, 24},
 	};
 	
-	if (!(gMC.cond & 2) && (gMC.equip & 0x80))
+	if (gMC.cond & 2)
+		return;
+
+	if ((gMC.equip & 0x80) == 0)
+		return;
+
+	for (int i = 0; i < 3; i++)
 	{
-		for (int i = 0; i < 3; i++)
-		{
-			if (gMC.star > i)
+		if (i < gMC.star)
 				PutBitmap3(&grcGame, SubpixelToScreenCoord(star[i].x) - SubpixelToScreenCoord(fx) - PixelToScreenCoord(4), SubpixelToScreenCoord(star[i].y) - SubpixelToScreenCoord(fy) - PixelToScreenCoord(4), &rc[i], SURFACE_ID_MY_CHAR);
-		}
 	}
 }

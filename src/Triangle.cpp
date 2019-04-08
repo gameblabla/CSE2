@@ -9,6 +9,8 @@ int16_t gTan[0x21];
 void InitTriangleTable()
 {
 	int i;
+	float a;
+	float b;
 
 	//Sine
 	for (i = 0; i < 0x100; ++i)
@@ -19,9 +21,9 @@ void InitTriangleTable()
 	//Tangent
 	for (i = 0; i < 0x21; ++i)
 	{
-		float a = (float)(i * 6.2831855 / 256.0);
-		float b = sinf(a) / cosf(a);
-		gTan[i] = (int16_t)(b * 8192.0);
+		a = (float)(i * 6.2831855f / 256.0f);
+		b = sinf(a) / cosf(a);
+		gTan[i] = (int16_t)(b * 8192.0f);
 	}
 }
 
@@ -63,7 +65,7 @@ uint8_t GetArktan(int x, int y)
 		}
 		else
 		{
-			if (-y < x)
+			if (x > -y)
 			{
 				k = (-y * 0x2000) / x;
 				while (k > gTan[a])

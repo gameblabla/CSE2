@@ -9,7 +9,7 @@
 
 static struct
 {
-	bool flag;
+	BOOL flag;
 	int *pLife;
 	int max;
 	int br;
@@ -18,33 +18,32 @@ static struct
 
 void InitBossLife(void)
 {
-	gBL.flag = false;
+	gBL.flag = FALSE;
 }
 
-bool StartBossLife(int code_event)
+BOOL StartBossLife(int code_event)
 {
-	for (int i = 0; i < 0x200; ++i)
-	{
-		if (gNPC[i].code_event == code_event)
-		{
-			gBL.flag = true;
-			gBL.max = gNPC[i].life;
-			gBL.br = gNPC[i].life;
-			gBL.pLife = &gNPC[i].life;
-			return true;
-		}
-	}
+	int i = 0;
+	while (i < 0x200 && gNPC[i].code_event != code_event)
+		++i;
 
-	return false;
+	if (i == 0x200)
+		return FALSE;
+
+	gBL.flag = TRUE;
+	gBL.max = gNPC[i].life;
+	gBL.br = gNPC[i].life;
+	gBL.pLife = &gNPC[i].life;
+	return TRUE;
 }
 
-bool StartBossLife2(void)
+BOOL StartBossLife2(void)
 {
-	gBL.flag = true;
+	gBL.flag = TRUE;
 	gBL.max = gBoss[0].life;
 	gBL.br = gBoss[0].life;
 	gBL.pLife = &gBoss[0].life;
-	return true;
+	return TRUE;
 }
 
 void PutBossLife(void)
@@ -55,32 +54,33 @@ void PutBossLife(void)
 	RECT rcLife = {0, 24, 0, 32};
 	RECT rcBr = {0, 32, 232, 40};
 
-	if (gBL.flag)
-	{
-		if (*gBL.pLife >= 1)
-		{
-			rcLife.right = 198 * *gBL.pLife / gBL.max;
-	
-			if (gBL.br <= *gBL.pLife)
-			{
-				gBL.count = 0;
-			}
-			else if (++gBL.count > 30)
-			{
-				--gBL.br;
-			}
-	
-			rcBr.right = 198 * gBL.br / gBL.max;
+	if (gBL.flag == FALSE)
+		return;
 
-			PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 256) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 20), &rcBox1, SURFACE_ID_TEXT_BOX);
-			PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 256) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 12), &rcBox2, SURFACE_ID_TEXT_BOX);
-			PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 176) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 16), &rcBr, SURFACE_ID_TEXT_BOX);
-			PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 176) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 16), &rcLife, SURFACE_ID_TEXT_BOX);
-			PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 240) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 16), &rcText, SURFACE_ID_TEXT_BOX);
+	if (*gBL.pLife < 1)
+	{
+		gBL.flag = FALSE;
+	}
+	else
+	{
+		rcLife.right = 198 * *gBL.pLife / gBL.max;
+
+		if (gBL.br > *gBL.pLife)
+		{
+			if (++gBL.count > 30)
+				--gBL.br;
 		}
 		else
 		{
-			gBL.flag = false;
+			gBL.count = 0;
 		}
+
+		rcBr.right = 198 * gBL.br / gBL.max;
+
+		PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 256) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 20), &rcBox1, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 256) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 12), &rcBox2, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 176) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 16), &rcBr, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 176) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 16), &rcLife, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 240) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 16), &rcText, SURFACE_ID_TEXT_BOX);
 	}
 }
