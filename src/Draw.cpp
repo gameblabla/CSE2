@@ -529,10 +529,10 @@ void CortBox2(RECT *rect, uint32_t col, Surface_Ids surf_no)
 	SDL_Rect destRect = RectToSDLRectScaled(rect);
 
 	//Set colour and draw
-	const unsigned char col_red = col & 0x0000FF;
-	const unsigned char col_green = (col & 0x00FF00) >> 8;
-	const unsigned char col_blue = (col & 0xFF0000) >> 16;
-	const unsigned char col_alpha = (col & 0xFF0000) >> 24;
+	const unsigned char col_red = col & 0x000000FF;
+	const unsigned char col_green = (col & 0x0000FF00) >> 8;
+	const unsigned char col_blue = (col & 0x00FF0000) >> 16;
+	const unsigned char col_alpha = (col & 0xFF000000) >> 24;
 	SDL_FillRect(surf[surf_no].surface, &destRect, SDL_MapRGBA(surf[surf_no].surface->format, col_red, col_green, col_blue, col_alpha));
 	surf[surf_no].needs_updating = true;
 }
