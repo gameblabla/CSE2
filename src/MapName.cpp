@@ -18,26 +18,26 @@ void ReadyMapName(const char *str)
 	unsigned char presentText[24] = {
 	#ifdef JAPANESE
 		// "ŠJ”­ŽºPixel presents"
-		0x8A-1,	// ŠJ
-		0x4A-1,
-		0x94-1,	// ”­
-		0xAD-1,
-		0x8E-1,	// Žº
-		0xBA-1,
-		'P'-1,
-		'i'-1,
-		'x'-1,
-		'e'-1,
-		'l'-1,
-		' '-1,
-		'p'-1,
-		'r'-1,
-		'e'-1,
-		's'-1,
-		'e'-1,
-		'n'-1,
-		't'-1,
-		's'-1,
+		0x8A - 1,	// ŠJ
+		0x4A - 1,
+		0x94 - 1,	// ”­
+		0xAD - 1,
+		0x8E - 1,	// Žº
+		0xBA - 1,
+		'P' - 1,
+		'i' - 1,
+		'x' - 1,
+		'e' - 1,
+		'l' - 1,
+		' ' - 1,
+		'p' - 1,
+		'r' - 1,
+		'e' - 1,
+		's' - 1,
+		'e' - 1,
+		'n' - 1,
+		't' - 1,
+		's' - 1,
 	#else
 		// "  Studio Pixel presents"
 		' '-1,
