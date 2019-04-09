@@ -12,21 +12,31 @@ int main(int argc, char *argv[])
 
 	if (argc > 2)
 	{
-		char *last_forward_slash = strrchr(argv[1], '/');
-		char *last_back_slash = strrchr(argv[1], '\\');
+		char *last_forward_slash;
+		char *last_back_slash;
+		char *last_path_seperator;
+		char *filename_pointer;
+		char *dot;
+		size_t filename_length;
+		char *filename;
+		FILE *in_file;
+		FILE *out_file;
 
-		char *last_path_seperator = last_forward_slash > last_back_slash ? last_forward_slash : last_back_slash;
+		last_forward_slash = strrchr(argv[1], '/');
+		last_back_slash = strrchr(argv[1], '\\');
 
-		char *filename_pointer = (last_path_seperator == NULL) ? argv[1] : last_path_seperator + 1;
-		char *dot = strchr(filename_pointer, '.');
-		size_t filename_length = (dot == NULL) ? strlen(filename_pointer) : dot - filename_pointer;
+		last_path_seperator = last_forward_slash > last_back_slash ? last_forward_slash : last_back_slash;
 
-		char *filename = malloc(filename_length + 1);
+		filename_pointer = (last_path_seperator == NULL) ? argv[1] : last_path_seperator + 1;
+		dot = strchr(filename_pointer, '.');
+		filename_length = (dot == NULL) ? strlen(filename_pointer) : dot - filename_pointer;
+
+		filename = malloc(filename_length + 1);
 		memcpy(filename, filename_pointer, filename_length);
 		filename[filename_length] = '\0';
 
-		FILE *in_file = fopen(argv[1], "rb");
-		FILE *out_file = fopen(argv[2], "w");
+		in_file = fopen(argv[1], "rb");
+		out_file = fopen(argv[2], "w");
 
 		if (in_file == NULL)
 		{
@@ -40,19 +50,24 @@ int main(int argc, char *argv[])
 		}
 		else
 		{
+			long in_file_size;
+			unsigned char *in_file_buffer;
+			unsigned char *in_file_pointer;
+			long i;
+
 			fseek(in_file, 0, SEEK_END);
-			const long in_file_size = ftell(in_file);
+			in_file_size = ftell(in_file);
 			rewind(in_file);
-			unsigned char *in_file_buffer = malloc(in_file_size);
+			in_file_buffer = malloc(in_file_size);
 			fread(in_file_buffer, 1, in_file_size, in_file);
 			fclose(in_file);
-			unsigned char *in_file_pointer = in_file_buffer;
+			in_file_pointer = in_file_buffer;
 
 			setvbuf(out_file, NULL, _IOFBF, 0x10000);
 
 			fprintf(out_file, "#pragma once\n\nconst unsigned char r%s[0x%lX] = {\n\t", filename, in_file_size);
 
-			for (long i = 0; i < in_file_size - 1; ++i)
+			for (i = 0; i < in_file_size - 1; ++i)
 			{
 				if (i % 16 == 15)
 					fprintf(out_file, "0x%02X,\n\t", *in_file_pointer++);
