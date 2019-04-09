@@ -226,6 +226,7 @@ if (FIX_BUGS)
 endif()
 
 if (WINDOWS)
+	list(APPEND SOURCES "res/ICON/ICON.rc")
 	add_definitions(-DWINDOWS)
 endif()
 
@@ -266,19 +267,18 @@ if (MSVC)
 		set(FREETYPE_LIBRARIES "${CMAKE_CURRENT_SOURCE_DIR}/msvc/freetype/win32/freetype.lib")
 	endif()
 
-	# Static-link the CRT, so you don't need to lug around 10 different DLLs
-	foreach(flag_var
+	# Static-link the CRT, so we don't need to lug around 10 different DLLs
+	foreach(FLAG_VAR
 			CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
 			CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
-		if(${flag_var} MATCHES "/MD")
-			string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
+		if(${FLAG_VAR} MATCHES "/MD")
+			string(REGEX REPLACE "/MD" "/MT" ${FLAG_VAR} "${${FLAG_VAR}}")
 		endif()
 	endforeach()
 
 	# Work around MSVC2003's lack of stdint.h
 	include(CheckIncludeFiles)
 	check_include_files(stdint.h STDINT_EXISTS)
-
 	if (NOT STDINT_EXISTS)
 		include_directories("${CMAKE_CURRENT_SOURCE_DIR}/msvc/msvc2003")
 	endif()
