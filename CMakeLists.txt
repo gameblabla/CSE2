@@ -1,5 +1,11 @@
 cmake_minimum_required(VERSION 3.13.4)
 
+option(JAPANESE "Enable the Japanese-language build" OFF)
+option(FIX_BUGS "Fix certain bugs (see src/Bug Fixes.txt" OFF)
+option(WINDOWS "Enable Windows-only features like a unique file/taskbar icon, and system font loading (needed for the font setting in Config.dat to do anything)" OFF)
+option(RASPBERRY_PI "Enable tweaks to improve performance on Raspberry Pis" OFF)
+option(NONPORTABLE "Enable bits of code that aren't portable, but are what the original game used" OFF)
+
 # Default to Release build
 if(NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE Release)
@@ -160,7 +166,6 @@ set(RESOURCES
 	BITMAP/CREDIT16.bmp
 	BITMAP/CREDIT17.bmp
 	BITMAP/CREDIT18.bmp
-	BITMAP/PIXEL.bmp
 	CURSOR/CURSOR_IKA.bmp
 	CURSOR/CURSOR_NORMAL.bmp
 	ICON/ICON_MINI.bmp
@@ -209,6 +214,29 @@ set(RESOURCES
 	WAVE/WAVE100
 )
 
+if (JAPANESE)
+	list(APPEND RESOURCES "BITMAP/PIXEL_JP.bmp")
+	add_definitions(-DJAPANESE)
+else()
+	list(APPEND RESOURCES "BITMAP/PIXEL.bmp")
+endif()
+
+if (FIX_BUGS)
+	add_definitions(-DFIX_BUGS)
+endif()
+
+if (WINDOWS)
+	add_definitions(-DWINDOWS)
+endif()
+
+if (RASPBERRY_PI)
+	add_definitions(-DRASPBERRY_PI)
+endif()
+
+if (NONPORTABLE)
+	add_definitions(-DNONPORTABLE)
+endif()
+
 add_executable(bin2h res/bin2h.c)
 
 set(RESOURCE_HEADERS "")
@@ -235,12 +263,7 @@ if (MSVC)
 		set(FREETYPE_LIBRARIES "${CMAKE_CURRENT_SOURCE_DIR}/msvc/freetype/win64/freetype.lib")
 	else()
 		set(SDL2_LIBRARIES "${CMAKE_CURRENT_SOURCE_DIR}/msvc/SDL2/lib/x86/SDL2.lib;${CMAKE_CURRENT_SOURCE_DIR}/msvc/SDL2/lib/x86/SDL2main.lib")
-	#	if (MSVC_VERSION LESS_EQUAL 1310)
-	#		message(STATUS "Using MSVC2003 FreeType library")
-	#		set(FREETYPE_LIBRARIES "${CMAKE_CURRENT_SOURCE_DIR}/msvc/msvc2003/freetype/lib/freetype.lib")
-	#	else()
-			set(FREETYPE_LIBRARIES "${CMAKE_CURRENT_SOURCE_DIR}/msvc/freetype/win32/freetype.lib")
-	#	endif()
+		set(FREETYPE_LIBRARIES "${CMAKE_CURRENT_SOURCE_DIR}/msvc/freetype/win32/freetype.lib")
 	endif()
 
 	# Static-link the CRT, so you don't need to lug around 10 different DLLs
