@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.12)
 
 option(STATIC "Produce a statically-linked executable (good for Windows builds, so you don't need to bundle DLL files)" OFF)
 option(JAPANESE "Enable the Japanese-language build" OFF)
-option(FIX_BUGS "Fix certain bugs (see src/Bug Fixes.txt)" OFF)
+option(FIX_BUGS "Fix certain bugs (see src/Bug Fixes.txt)" ON)
 option(WINDOWS "Enable Windows-only features like a unique file/taskbar icon, and system font loading (needed for the font setting in Config.dat to do anything)" OFF)
 option(RASPBERRY_PI "Enable tweaks to improve performance on Raspberry Pis" OFF)
 option(NONPORTABLE "Enable bits of code that aren't portable, but are what the original game used" OFF)
@@ -25,6 +25,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(SOURCES
+	src/lodepng/lodepng.cpp
+	src/lodepng/lodepng.h
 	src/ArmsItem.cpp
 	src/ArmsItem.h
 	src/Back.cpp
@@ -155,76 +157,11 @@ set(SOURCES
 )
 
 set(RESOURCES
-	BITMAP/CREDIT01.bmp
-	BITMAP/CREDIT02.bmp
-	BITMAP/CREDIT03.bmp
-	BITMAP/CREDIT04.bmp
-	BITMAP/CREDIT05.bmp
-	BITMAP/CREDIT06.bmp
-	BITMAP/CREDIT07.bmp
-	BITMAP/CREDIT08.bmp
-	BITMAP/CREDIT09.bmp
-	BITMAP/CREDIT10.bmp
-	BITMAP/CREDIT11.bmp
-	BITMAP/CREDIT12.bmp
-	BITMAP/CREDIT14.bmp
-	BITMAP/CREDIT15.bmp
-	BITMAP/CREDIT16.bmp
-	BITMAP/CREDIT17.bmp
-	BITMAP/CREDIT18.bmp
-	CURSOR/CURSOR_IKA.bmp
-	CURSOR/CURSOR_NORMAL.bmp
-	ORG/ACCESS.org
-	ORG/ANZEN.org
-	ORG/BALCONY.org
-	ORG/BALLOS.org
-	ORG/BDOWN.org
-	ORG/CEMETERY.org
-	ORG/CURLY.org
-	ORG/DR.org
-	ORG/ENDING.org
-	ORG/ESCAPE.org
-	ORG/FANFALE1.org
-	ORG/FANFALE2.org
-	ORG/FANFALE3.org
-	ORG/FIREEYE.org
-	ORG/GAMEOVER.org
-	ORG/GINSUKE.org
-	ORG/GRAND.org
-	ORG/GRAVITY.org
-	ORG/HELL.org
-	ORG/IRONH.org
-	ORG/JENKA.org
-	ORG/JENKA2.org
-	ORG/KODOU.org
-	ORG/LASTBT3.org
-	ORG/LASTBTL.org
-	ORG/LASTCAVE.org
-	ORG/MARINE.org
-	ORG/MAZE.org
-	ORG/MDOWN2.org
-	ORG/MURA.org
-	ORG/OSIDE.org
-	ORG/PLANT.org
-	ORG/QUIET.org
-	ORG/REQUIEM.org
-	ORG/TOROKO.org
-	ORG/VIVI.org
-	ORG/WANPAK2.org
-	ORG/WANPAKU.org
-	ORG/WEED.org
-	ORG/WHITE.org
-	ORG/XXXX.org
-	ORG/ZONBIE.org
-	WAVE/WAVE100
 )
 
 # Handle options
 if (JAPANESE)
-	list(APPEND RESOURCES "BITMAP/PIXEL_JP.bmp")
 	add_definitions(-DJAPANESE)
-else()
-	list(APPEND RESOURCES "BITMAP/PIXEL.bmp")
 endif()
 
 if (FIX_BUGS)
@@ -234,8 +171,6 @@ endif()
 if (WINDOWS)
 	list(APPEND SOURCES "res/ICON/ICON.rc")
 	add_definitions(-DWINDOWS)
-else()
-	list(APPEND RESOURCES "ICON/ICON_MINI.bmp")
 endif()
 
 if (RASPBERRY_PI)
