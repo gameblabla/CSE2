@@ -473,6 +473,8 @@ void PutTextScript()
 		// instead).
 		//CortBox(&rect, GetCortBoxColor(RGB(0xFF, 0xFF, 0xFE));
 #else
+		// This accidentally uses a BGR value directly, without
+		// running it though GetCortBoxColor first
 		CortBox(&rect, RGB(0xFF, 0xFF, 0xFE));
 #endif
 	}
