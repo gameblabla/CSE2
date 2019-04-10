@@ -226,7 +226,7 @@ src/Resource/%.h: res/% obj/bin2h
 obj/bin2h: res/bin2h.c
 	@mkdir -p $(@D)
 	@echo Compiling $^
-	@$(CC) -O3 -s -static $^ -o $@
+	@$(CC) -O3 -s -std=c90 $^ -o $@
 
 include $(wildcard $(DEPENDENCIES))
 
