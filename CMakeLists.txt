@@ -327,8 +327,12 @@ else()
 
 		target_link_libraries(CSE2 -static)
 	else()
-		find_package(SDL2 REQUIRED)
-		find_package(freetype REQUIRED)
+		# SDL2 has no standard way of being used by cmake, so avoid
+		# that mess entirely and just use pkg-config instead
+		find_package(PkgConfig REQUIRED)
+		pkg_check_modules(SDL2 REQUIRED sdl2)
+
+		find_package(Freetype REQUIRED)
 	endif()
 endif()
 
