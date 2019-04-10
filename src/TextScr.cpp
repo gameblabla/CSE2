@@ -323,7 +323,7 @@ void StopTextScript()
 //Prepare a new line
 void CheckNewLine()
 {
-	if (gTS.ypos_line[gTS.line % 4] == '0')
+	if (gTS.ypos_line[gTS.line % 4] == 48)
 	{
 		gTS.mode = 3;
 		g_GameFlags |= 4;
@@ -473,6 +473,8 @@ void PutTextScript()
 		// instead).
 		//CortBox(&rect, GetCortBoxColor(RGB(0xFF, 0xFF, 0xFE));
 #else
+		// This accidentally uses a BGR value directly, without
+		// running it though GetCortBoxColor first
 		CortBox(&rect, RGB(0xFF, 0xFF, 0xFE));
 #endif
 	}

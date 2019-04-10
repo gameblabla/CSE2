@@ -33,7 +33,7 @@ Just run 'make' in the base directory, preferably with some of the following set
 * RASPBERRY_PI=1 to enable tweaks to improve performance on Raspberry Pis
 * NONPORTABLE=1 to enable bits of code that aren't portable, but are what the original game used
 
-Project files for Visual Studio 2003 are also available, in the 'msvc2003' directory (VS2003 was what Pixel used to compile the original EXE).
+Project files for Visual Studio 2003 are also available, in the 'msvc/msvc2003' directory (VS2003 was what Pixel used to compile the original EXE).
 
 ## Running
 

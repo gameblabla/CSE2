@@ -367,7 +367,7 @@ int CampLoop()
 	LoadTextScript2("ArmsItem.tsc");
 	
 	gCampTitleY = (WINDOW_HEIGHT - 192) / 2;
-	gCampActive = 0;
+	gCampActive = FALSE;
 	gSelectedItem = 0;
 	
 	//Run script
