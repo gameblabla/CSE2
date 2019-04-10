@@ -264,6 +264,15 @@ endforeach()
 
 add_executable(CSE2 ${SOURCES} ${RESOURCE_HEADERS})
 
+if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+	# Enable link-time optimisation if available
+	include(CheckIPOSupported)
+	check_ipo_supported(RESULT result)
+	if (result)
+		set_target_properties(CSE2 PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
+	endif()
+endif()
+
 if (MSVC)
 	if (STATIC)
 		message(WARNING "Static builds are not available for MSVC")
