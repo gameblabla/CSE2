@@ -323,7 +323,7 @@ void StopTextScript()
 //Prepare a new line
 void CheckNewLine()
 {
-	if (gTS.ypos_line[gTS.line % 4] == '0')
+	if (gTS.ypos_line[gTS.line % 4] == 48)
 	{
 		gTS.mode = 3;
 		g_GameFlags |= 4;
