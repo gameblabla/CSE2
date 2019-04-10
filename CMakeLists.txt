@@ -1,7 +1,8 @@
-cmake_minimum_required(VERSION 3.13.4)
+cmake_minimum_required(VERSION 3.12)
 
+option(STATIC "Produce a statically-linked executable (good for Windows builds, so you don't need to bundle DLL files)" OFF)
 option(JAPANESE "Enable the Japanese-language build" OFF)
-option(FIX_BUGS "Fix certain bugs (see src/Bug Fixes.txt" OFF)
+option(FIX_BUGS "Fix certain bugs (see src/Bug Fixes.txt)" OFF)
 option(WINDOWS "Enable Windows-only features like a unique file/taskbar icon, and system font loading (needed for the font setting in Config.dat to do anything)" OFF)
 option(RASPBERRY_PI "Enable tweaks to improve performance on Raspberry Pis" OFF)
 option(NONPORTABLE "Enable bits of code that aren't portable, but are what the original game used" OFF)
@@ -11,12 +12,17 @@ if(NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE Release)
 endif()
 
+project(CSE2 LANGUAGES C CXX)
+
+# Force strict C90
+set(CMAKE_C_STANDARD 90)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)
+
 # Force strict C++98
 set(CMAKE_CXX_STANDARD 98)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-
-project(CSE2 LANGUAGES C CXX)
 
 set(SOURCES
 	src/ArmsItem.cpp
@@ -168,7 +174,6 @@ set(RESOURCES
 	BITMAP/CREDIT18.bmp
 	CURSOR/CURSOR_IKA.bmp
 	CURSOR/CURSOR_NORMAL.bmp
-	ICON/ICON_MINI.bmp
 	ORG/ACCESS.org
 	ORG/ANZEN.org
 	ORG/BALCONY.org
@@ -214,6 +219,7 @@ set(RESOURCES
 	WAVE/WAVE100
 )
 
+# Handle options
 if (JAPANESE)
 	list(APPEND RESOURCES "BITMAP/PIXEL_JP.bmp")
 	add_definitions(-DJAPANESE)
@@ -228,6 +234,8 @@ endif()
 if (WINDOWS)
 	list(APPEND SOURCES "res/ICON/ICON.rc")
 	add_definitions(-DWINDOWS)
+else()
+	list(APPEND RESOURCES "ICON/ICON_MINI.bmp")
 endif()
 
 if (RASPBERRY_PI)
@@ -238,8 +246,8 @@ if (NONPORTABLE)
 	add_definitions(-DNONPORTABLE)
 endif()
 
+# Magic to convert resources to header files
 add_executable(bin2h res/bin2h.c)
-
 set(RESOURCE_HEADERS "")
 foreach(FILENAME IN LISTS RESOURCES)
 	set(IN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/res")
@@ -254,7 +262,17 @@ foreach(FILENAME IN LISTS RESOURCES)
 	list(APPEND RESOURCE_HEADERS "${OUT_DIR}/${FILENAME}.h")
 endforeach()
 
+add_executable(CSE2 ${SOURCES} ${RESOURCE_HEADERS})
+
 if (MSVC)
+	if (STATIC)
+		message(WARNING "Static builds are not available for MSVC")
+	endif()
+
+	set_target_properties(CSE2 PROPERTIES WIN32_EXECUTABLE YES)	# Disable the console window
+
+	# Find dependencies
+
 	# In MSVC we just use our own provided copy of SDL2 and FreeType
 	set(SDL2_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/msvc/SDL2/include")
 	set(FREETYPE_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/msvc/freetype/include")
@@ -283,16 +301,28 @@ if (MSVC)
 		include_directories("${CMAKE_CURRENT_SOURCE_DIR}/msvc/msvc2003")
 	endif()
 else()
-	find_package(SDL2 REQUIRED)
-	find_package(freetype REQUIRED)
+	# Find dependencies
+	if (STATIC)
+		# Fall back on pkg-config, since cmake's static support sucks
+		find_package(PkgConfig REQUIRED)
+
+		pkg_check_modules(SDL2 REQUIRED sdl2)
+		set(SDL2_INCLUDE_DIRS ${SDL2_STATIC_INCLUDE_DIRS})
+		set(SDL2_CFLAGS_OTHER ${SDL2_STATIC_CFLAGS_OTHER})
+		set(SDL2_LIBRARIES ${SDL2_STATIC_LIBRARIES})
+
+		pkg_check_modules(FREETYPE REQUIRED freetype2)
+		set(FREETYPE_INCLUDE_DIRS ${FREETYPE_STATIC_INCLUDE_DIRS})
+		set(FREETYPE_CFLAGS_OTHER ${FREETYPE_STATIC_CFLAGS_OTHER})
+		set(FREETYPE_LIBRARIES ${FREETYPE_STATIC_LIBRARIES})
+
+		target_link_libraries(CSE2 -static)
+	else()
+		find_package(SDL2 REQUIRED)
+		find_package(freetype REQUIRED)
+	endif()
 endif()
 
-include_directories(${SDL2_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS})
-
-if (MSVC)
-	add_executable(CSE2 WIN32 ${SOURCES} ${RESOURCE_HEADERS})	# Disable the console window
-else()
-	add_executable(CSE2 ${SOURCES} ${RESOURCE_HEADERS})
-endif()
-
+target_include_directories(CSE2 PUBLIC ${SDL2_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS})
+target_compile_options(CSE2 PUBLIC ${SDL2_CFLAGS_OTHER} ${FREETYPE_CFLAGS_OTHER})
 target_link_libraries(CSE2 ${SDL2_LIBRARIES} ${FREETYPE_LIBRARIES})

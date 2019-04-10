@@ -1,5 +1,5 @@
-//Bin2h by -C-u-c-k-y- Clownypants
-//Converts files to the .h's expected by Cave Story Engine for resources.
+/*Bin2h by -C-u-c-k-y- Clownypants*/
+/*Converts files to the .h's expected by Cave Story Engine for resources.*/
 
 #include <stddef.h>
 #include <stdio.h>
