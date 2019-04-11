@@ -208,12 +208,14 @@ if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
 	endif()
 endif()
 
+if (WIN32)
+	set_target_properties(CSE2 PROPERTIES WIN32_EXECUTABLE YES)	# Disable the console window
+endif()
+
 if (MSVC)
 	if (STATIC)
 		message(WARNING "Static builds are not available for MSVC")
 	endif()
-
-	set_target_properties(CSE2 PROPERTIES WIN32_EXECUTABLE YES)	# Disable the console window
 
 	# Find dependencies
 
@@ -242,7 +244,7 @@ if (MSVC)
 	include(CheckIncludeFiles)
 	check_include_files(stdint.h STDINT_EXISTS)
 	if (NOT STDINT_EXISTS)
-		include_directories("${CMAKE_CURRENT_SOURCE_DIR}/msvc/msvc2003")
+		target_include_directories(CSE2 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/msvc/msvc2003")
 	endif()
 else()
 	# Find dependencies
@@ -271,6 +273,6 @@ else()
 	endif()
 endif()
 
-target_include_directories(CSE2 PUBLIC ${SDL2_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS})
-target_compile_options(CSE2 PUBLIC ${SDL2_CFLAGS_OTHER} ${FREETYPE_CFLAGS_OTHER})
+target_include_directories(CSE2 PRIVATE ${SDL2_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS})
+target_compile_options(CSE2 PRIVATE ${SDL2_CFLAGS_OTHER} ${FREETYPE_CFLAGS_OTHER})
 target_link_libraries(CSE2 ${SDL2_LIBRARIES} ${FREETYPE_LIBRARIES})
