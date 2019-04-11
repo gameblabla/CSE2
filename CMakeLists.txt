@@ -279,7 +279,7 @@ endif()
 
 if (MSVC)
 	if (STATIC)
-		message(WARNING "Static builds are not available for MSVC")
+		message(STATUS "MSVC static builds only embed the C runtime library: SDL2 and FreeType are still dynamically linked")
 	endif()
 
 	# Find dependencies
@@ -296,14 +296,16 @@ if (MSVC)
 		set(FREETYPE_LIBRARIES "${CMAKE_CURRENT_SOURCE_DIR}/msvc/freetype/win32/freetype.lib")
 	endif()
 
-	# Static-link the CRT, so we don't need to lug around 10 different DLLs
-	foreach(FLAG_VAR
-			CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
-			CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
-		if(${FLAG_VAR} MATCHES "/MD")
-			string(REGEX REPLACE "/MD" "/MT" ${FLAG_VAR} "${${FLAG_VAR}}")
-		endif()
-	endforeach()
+	if(STATIC)
+		# Static-link the CRT, so we don't need to lug around 10 different DLLs
+		foreach(FLAG_VAR
+				CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
+				CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+			if(${FLAG_VAR} MATCHES "/MD")
+				string(REGEX REPLACE "/MD" "/MT" ${FLAG_VAR} "${${FLAG_VAR}}")
+			endif()
+		endforeach()
+	endif()
 
 	# Work around MSVC2003's lack of stdint.h
 	include(CheckIncludeFiles)
