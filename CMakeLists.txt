@@ -273,12 +273,14 @@ if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
 	endif()
 endif()
 
+if (WIN32)
+	set_target_properties(CSE2 PROPERTIES WIN32_EXECUTABLE YES)	# Disable the console window
+endif()
+
 if (MSVC)
 	if (STATIC)
 		message(WARNING "Static builds are not available for MSVC")
 	endif()
-
-	set_target_properties(CSE2 PROPERTIES WIN32_EXECUTABLE YES)	# Disable the console window
 
 	# Find dependencies
 
