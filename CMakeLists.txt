@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 3.12)
 option(STATIC "Produce a statically-linked executable (good for Windows builds, so you don't need to bundle DLL files)" OFF)
 option(JAPANESE "Enable the Japanese-language build" OFF)
 option(FIX_BUGS "Fix certain bugs (see src/Bug Fixes.txt)" OFF)
-option(WINDOWS "Enable Windows-only features like a unique file/taskbar icon, and system font loading (needed for the font setting in Config.dat to do anything)" OFF)
 option(RASPBERRY_PI "Enable tweaks to improve performance on Raspberry Pis" OFF)
 option(NONPORTABLE "Enable bits of code that aren't portable, but are what the original game used" OFF)
 
@@ -231,19 +230,21 @@ if (FIX_BUGS)
 	target_compile_definitions(CSE2 PRIVATE FIX_BUGS)
 endif()
 
-if (WINDOWS)
-	target_sources(CSE2 PRIVATE "res/ICON/ICON.rc")
-	target_compile_definitions(CSE2 PRIVATE WINDOWS)
-else()
-	list(APPEND RESOURCES "ICON/ICON_MINI.bmp")
-endif()
-
 if (RASPBERRY_PI)
 	target_compile_definitions(CSE2 PRIVATE RASPBERRY_PI)
 endif()
 
 if (NONPORTABLE)
 	target_compile_definitions(CSE2 PRIVATE NONPORTABLE)
+endif()
+
+# Make some tweaks if we're targetting Windows
+if (WIN32)
+	target_sources(CSE2 PRIVATE "res/ICON/ICON.rc")
+	target_compile_definitions(CSE2 PRIVATE WINDOWS)
+	set_target_properties(CSE2 PROPERTIES WIN32_EXECUTABLE YES)	# Disable the console window
+else()
+	list(APPEND RESOURCES "ICON/ICON_MINI.bmp")
 endif()
 
 # Magic to convert resources to header files
@@ -268,10 +269,6 @@ if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
 	if (result)
 		set_target_properties(CSE2 PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
 	endif()
-endif()
-
-if (WIN32)
-	set_target_properties(CSE2 PROPERTIES WIN32_EXECUTABLE YES)	# Disable the console window
 endif()
 
 if (MSVC)
