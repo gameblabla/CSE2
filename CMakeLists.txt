@@ -219,31 +219,33 @@ set(RESOURCES
 	WAVE/WAVE100
 )
 
+add_executable(CSE2 ${SOURCES} ${RESOURCE_HEADERS})
+
 # Handle options
 if (JAPANESE)
 	list(APPEND RESOURCES "BITMAP/PIXEL_JP.bmp")
-	add_definitions(-DJAPANESE)
+	target_compile_definitions(CSE2 PRIVATE JAPANESE)
 else()
 	list(APPEND RESOURCES "BITMAP/PIXEL.bmp")
 endif()
 
 if (FIX_BUGS)
-	add_definitions(-DFIX_BUGS)
+	target_compile_definitions(CSE2 PRIVATE FIX_BUGS)
 endif()
 
 if (WINDOWS)
 	list(APPEND SOURCES "res/ICON/ICON.rc")
-	add_definitions(-DWINDOWS)
+	target_compile_definitions(CSE2 PRIVATE WINDOWS)
 else()
 	list(APPEND RESOURCES "ICON/ICON_MINI.bmp")
 endif()
 
 if (RASPBERRY_PI)
-	add_definitions(-DRASPBERRY_PI)
+	target_compile_definitions(CSE2 PRIVATE RASPBERRY_PI)
 endif()
 
 if (NONPORTABLE)
-	add_definitions(-DNONPORTABLE)
+	target_compile_definitions(CSE2 PRIVATE NONPORTABLE)
 endif()
 
 # Magic to convert resources to header files
@@ -261,8 +263,6 @@ foreach(FILENAME IN LISTS RESOURCES)
 		)
 	list(APPEND RESOURCE_HEADERS "${OUT_DIR}/${FILENAME}.h")
 endforeach()
-
-add_executable(CSE2 ${SOURCES} ${RESOURCE_HEADERS})
 
 if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
 	# Enable link-time optimisation if available
