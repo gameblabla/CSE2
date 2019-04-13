@@ -24,7 +24,7 @@ set(CMAKE_CXX_STANDARD 98)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(SOURCES
+add_executable(CSE2
 	src/ArmsItem.cpp
 	src/ArmsItem.h
 	src/Back.cpp
@@ -219,8 +219,6 @@ set(RESOURCES
 	WAVE/WAVE100
 )
 
-add_executable(CSE2 ${SOURCES} ${RESOURCE_HEADERS})
-
 # Handle options
 if (JAPANESE)
 	list(APPEND RESOURCES "BITMAP/PIXEL_JP.bmp")
@@ -234,7 +232,7 @@ if (FIX_BUGS)
 endif()
 
 if (WINDOWS)
-	list(APPEND SOURCES "res/ICON/ICON.rc")
+	target_sources(CSE2 PRIVATE "res/ICON/ICON.rc")
 	target_compile_definitions(CSE2 PRIVATE WINDOWS)
 else()
 	list(APPEND RESOURCES "ICON/ICON_MINI.bmp")
@@ -250,7 +248,6 @@ endif()
 
 # Magic to convert resources to header files
 add_executable(bin2h res/bin2h.c)
-set(RESOURCE_HEADERS "")
 foreach(FILENAME IN LISTS RESOURCES)
 	set(IN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/res")
 	set(OUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/Resource")
@@ -261,7 +258,7 @@ foreach(FILENAME IN LISTS RESOURCES)
 		COMMAND bin2h "${IN_DIR}/${FILENAME}" "${OUT_DIR}/${FILENAME}.h"
 		DEPENDS bin2h "${IN_DIR}/${FILENAME}"
 		)
-	list(APPEND RESOURCE_HEADERS "${OUT_DIR}/${FILENAME}.h")
+	target_sources(CSE2 PRIVATE "${OUT_DIR}/${FILENAME}.h")
 endforeach()
 
 if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -279,7 +276,7 @@ endif()
 
 if (MSVC)
 	if (STATIC)
-		message(STATUS "MSVC static builds only embed the C runtime library: SDL2 and FreeType are still dynamically linked")
+		message(STATUS "STATIC option doesn't affect MSVC builds")
 	endif()
 
 	# Find dependencies
@@ -296,16 +293,14 @@ if (MSVC)
 		set(FREETYPE_LIBRARIES "${CMAKE_CURRENT_SOURCE_DIR}/msvc/freetype/win32/freetype.lib")
 	endif()
 
-	if(STATIC)
-		# Static-link the CRT, so we don't need to lug around 10 different DLLs
-		foreach(FLAG_VAR
-				CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
-				CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
-			if(${FLAG_VAR} MATCHES "/MD")
-				string(REGEX REPLACE "/MD" "/MT" ${FLAG_VAR} "${${FLAG_VAR}}")
-			endif()
-		endforeach()
-	endif()
+	# Static-link the CRT, so we don't need to lug around 10 different DLLs
+	foreach(FLAG_VAR
+			CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
+			CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+		if(${FLAG_VAR} MATCHES "/MD")
+			string(REGEX REPLACE "/MD" "/MT" ${FLAG_VAR} "${${FLAG_VAR}}")
+		endif()
+	endforeach()
 
 	# Work around MSVC2003's lack of stdint.h
 	include(CheckIncludeFiles)
