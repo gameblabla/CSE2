@@ -183,8 +183,6 @@ if (WIN32)
 	target_sources(CSE2 PRIVATE "res/resources/ICON/ICON.rc")
 	target_compile_definitions(CSE2 PRIVATE WINDOWS)
 	set_target_properties(CSE2 PROPERTIES WIN32_EXECUTABLE YES)	# Disable the console window
-else()
-	list(APPEND RESOURCES "ICON/ICON_MINI.bmp")
 endif()
 
 # Magic to convert resources to header files
