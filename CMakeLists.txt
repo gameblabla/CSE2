@@ -220,9 +220,11 @@ set(RESOURCES
 
 # Handle options
 if (JAPANESE)
+	set(FILES_DIR "res/files_jp")
 	list(APPEND RESOURCES "BITMAP/PIXEL_JP.bmp")
 	target_compile_definitions(CSE2 PRIVATE JAPANESE)
 else()
+	set(FILES_DIR "res/files_en")
 	list(APPEND RESOURCES "BITMAP/PIXEL.bmp")
 endif()
 
@@ -240,7 +242,7 @@ endif()
 
 # Make some tweaks if we're targetting Windows
 if (WIN32)
-	target_sources(CSE2 PRIVATE "res/ICON/ICON.rc")
+	target_sources(CSE2 PRIVATE "res/resources/ICON/ICON.rc")
 	target_compile_definitions(CSE2 PRIVATE WINDOWS)
 	set_target_properties(CSE2 PROPERTIES WIN32_EXECUTABLE YES)	# Disable the console window
 else()
@@ -248,9 +250,9 @@ else()
 endif()
 
 # Magic to convert resources to header files
-add_executable(bin2h res/bin2h.c)
+add_executable(bin2h src/misc/bin2h.c)
 foreach(FILENAME IN LISTS RESOURCES)
-	set(IN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/res")
+	set(IN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/res/resources")
 	set(OUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/Resource")
 	get_filename_component(DIRECTORY "${FILENAME}" DIRECTORY)
 	add_custom_command(
@@ -335,3 +337,12 @@ endif()
 target_include_directories(CSE2 PRIVATE ${SDL2_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS})
 target_compile_options(CSE2 PRIVATE ${SDL2_CFLAGS_OTHER} ${FREETYPE_CFLAGS_OTHER})
 target_link_libraries(CSE2 ${SDL2_LIBRARIES} ${FREETYPE_LIBRARIES})
+
+# Set up the output directory
+add_custom_command(TARGET CSE2 PRE_BUILD
+	COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/cavestory")
+
+set_target_properties(CSE2 PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_BINARY_DIR}/cavestory")
+
+add_custom_command(TARGET CSE2 POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/${FILES_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/cavestory")

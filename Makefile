@@ -200,9 +200,19 @@ ifeq ($(WINDOWS), 1)
 	OBJECTS += obj/$(FILENAME)/win_icon.o
 endif
 
-all: build/$(FILENAME)
+all: build
 
-build/$(FILENAME): $(OBJECTS)
+ifeq ($(JAPANESE), 1)
+build: res/files_jp obj/$(FILENAME)/$(FILENAME)
+else
+build: res/files_en obj/$(FILENAME)/$(FILENAME)
+endif
+	@mkdir -p $(@D)
+	@echo "Copying files to 'build'"
+	@cp -r $< $@
+	@cp obj/$(FILENAME)/$(FILENAME) $@
+
+obj/$(FILENAME)/$(FILENAME): $(OBJECTS)
 	@mkdir -p $(@D)
 	@echo Linking
 	@$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -o $@ $(LIBS)
@@ -218,19 +228,19 @@ obj/$(FILENAME)/Resource.o: src/Resource.cpp $(addprefix src/Resource/, $(addsuf
 	@echo Compiling $<
 	@$(CXX) $(CXXFLAGS) $< -o $@ -c
 
-src/Resource/%.h: res/% obj/bin2h
+src/Resource/%.h: res/resources/% obj/bin2h
 	@mkdir -p $(@D)
 	@echo Converting $<
 	@obj/bin2h $< $@
 
-obj/bin2h: res/bin2h.c
+obj/bin2h: src/misc/bin2h.c
 	@mkdir -p $(@D)
 	@echo Compiling $^
 	@$(CC) -O3 -s -std=c90 $^ -o $@
 
 include $(wildcard $(DEPENDENCIES))
 
-obj/$(FILENAME)/win_icon.o: res/ICON/ICON.rc res/ICON/0.ico res/ICON/ICON_MINI.ico
+obj/$(FILENAME)/win_icon.o: res/resources/ICON/ICON.rc res/resources/ICON/0.ico res/resources/ICON/ICON_MINI.ico
 	@mkdir -p $(@D)
 	@windres $< $@
 
