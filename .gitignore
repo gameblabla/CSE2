@@ -3,7 +3,8 @@
 
 # Misc
 /obj
-/build
+/build_en
+/build_jp
 *.dat
 *.rec
 build.7z

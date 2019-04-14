@@ -8,6 +8,8 @@ else
 endif
 
 ifeq ($(JAPANESE), 1)
+	BUILD_DIR = build_jp
+
 	CXXFLAGS += -DJAPANESE
 
 	ifeq ($(RELEASE), 1)
@@ -15,6 +17,8 @@ ifeq ($(JAPANESE), 1)
 	else
 		FILENAME_DEF = debugjp
 	endif
+else
+	BUILD_DIR = build_en
 endif
 
 FILENAME ?= $(FILENAME_DEF)
@@ -200,19 +204,9 @@ ifeq ($(WINDOWS), 1)
 	OBJECTS += obj/$(FILENAME)/win_icon.o
 endif
 
-all: build
+all: $(BUILD_DIR)/$(FILENAME)
 
-ifeq ($(JAPANESE), 1)
-build: res/files_jp obj/$(FILENAME)/$(FILENAME)
-else
-build: res/files_en obj/$(FILENAME)/$(FILENAME)
-endif
-	@mkdir -p $(@D)
-	@echo "Copying files to 'build'"
-	@cp -r $< $@
-	@cp obj/$(FILENAME)/$(FILENAME) $@
-
-obj/$(FILENAME)/$(FILENAME): $(OBJECTS)
+$(BUILD_DIR)/$(FILENAME): $(OBJECTS)
 	@mkdir -p $(@D)
 	@echo Linking
 	@$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -o $@ $(LIBS)
@@ -228,7 +222,7 @@ obj/$(FILENAME)/Resource.o: src/Resource.cpp $(addprefix src/Resource/, $(addsuf
 	@echo Compiling $<
 	@$(CXX) $(CXXFLAGS) $< -o $@ -c
 
-src/Resource/%.h: res/resources/% obj/bin2h
+src/Resource/%.h: res/% obj/bin2h
 	@mkdir -p $(@D)
 	@echo Converting $<
 	@obj/bin2h $< $@
@@ -240,9 +234,10 @@ obj/bin2h: src/misc/bin2h.c
 
 include $(wildcard $(DEPENDENCIES))
 
-obj/$(FILENAME)/win_icon.o: res/resources/ICON/ICON.rc res/resources/ICON/0.ico res/resources/ICON/ICON_MINI.ico
+obj/$(FILENAME)/win_icon.o: res/ICON/ICON.rc res/ICON/0.ico res/ICON/ICON_MINI.ico
 	@mkdir -p $(@D)
 	@windres $< $@
 
+# TODO
 clean:
-	@rm -rf build obj
+	@rm -rf obj
