@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 3.12)
 option(STATIC "Produce a statically-linked executable (good for Windows builds, so you don't need to bundle DLL files)" OFF)
 option(JAPANESE "Enable the Japanese-language build" OFF)
 option(FIX_BUGS "Fix certain bugs (see src/Bug Fixes.txt)" ON)
-option(WINDOWS "Enable Windows-only features like a unique file/taskbar icon, and system font loading (needed for the font setting in Config.dat to do anything)" OFF)
 option(RASPBERRY_PI "Enable tweaks to improve performance on Raspberry Pis" OFF)
 option(NONPORTABLE "Enable bits of code that aren't portable, but are what the original game used" OFF)
 
@@ -24,7 +23,7 @@ set(CMAKE_CXX_STANDARD 98)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(SOURCES
+add_executable(CSE2
 	src/lodepng/lodepng.cpp
 	src/lodepng/lodepng.h
 	src/ArmsItem.cpp
@@ -161,31 +160,37 @@ set(RESOURCES
 
 # Handle options
 if (JAPANESE)
-	add_definitions(-DJAPANESE)
+	set(FILES_DIR "res/files_jp")
+	target_compile_definitions(CSE2 PRIVATE JAPANESE)
+else()
+	set(FILES_DIR "res/files_en")
 endif()
 
 if (FIX_BUGS)
-	add_definitions(-DFIX_BUGS)
-endif()
-
-if (WINDOWS)
-	list(APPEND SOURCES "res/ICON/ICON.rc")
-	add_definitions(-DWINDOWS)
+	target_compile_definitions(CSE2 PRIVATE FIX_BUGS)
 endif()
 
 if (RASPBERRY_PI)
-	add_definitions(-DRASPBERRY_PI)
+	target_compile_definitions(CSE2 PRIVATE RASPBERRY_PI)
 endif()
 
 if (NONPORTABLE)
-	add_definitions(-DNONPORTABLE)
+	target_compile_definitions(CSE2 PRIVATE NONPORTABLE)
+endif()
+
+# Make some tweaks if we're targetting Windows
+if (WIN32)
+	target_sources(CSE2 PRIVATE "res/resources/ICON/ICON.rc")
+	target_compile_definitions(CSE2 PRIVATE WINDOWS)
+	set_target_properties(CSE2 PROPERTIES WIN32_EXECUTABLE YES)	# Disable the console window
+else()
+	list(APPEND RESOURCES "ICON/ICON_MINI.bmp")
 endif()
 
 # Magic to convert resources to header files
-add_executable(bin2h res/bin2h.c)
-set(RESOURCE_HEADERS "")
+add_executable(bin2h src/misc/bin2h.c)
 foreach(FILENAME IN LISTS RESOURCES)
-	set(IN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/res")
+	set(IN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/res/resources")
 	set(OUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/Resource")
 	get_filename_component(DIRECTORY "${FILENAME}" DIRECTORY)
 	add_custom_command(
@@ -194,10 +199,8 @@ foreach(FILENAME IN LISTS RESOURCES)
 		COMMAND bin2h "${IN_DIR}/${FILENAME}" "${OUT_DIR}/${FILENAME}.h"
 		DEPENDS bin2h "${IN_DIR}/${FILENAME}"
 		)
-	list(APPEND RESOURCE_HEADERS "${OUT_DIR}/${FILENAME}.h")
+	target_sources(CSE2 PRIVATE "${OUT_DIR}/${FILENAME}.h")
 endforeach()
-
-add_executable(CSE2 ${SOURCES} ${RESOURCE_HEADERS})
 
 if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
 	# Enable link-time optimisation if available
@@ -208,13 +211,9 @@ if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
 	endif()
 endif()
 
-if (WIN32)
-	set_target_properties(CSE2 PROPERTIES WIN32_EXECUTABLE YES)	# Disable the console window
-endif()
-
 if (MSVC)
 	if (STATIC)
-		message(WARNING "Static builds are not available for MSVC")
+		message(STATUS "STATIC option doesn't affect MSVC builds")
 	endif()
 
 	# Find dependencies
@@ -276,3 +275,12 @@ endif()
 target_include_directories(CSE2 PRIVATE ${SDL2_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS})
 target_compile_options(CSE2 PRIVATE ${SDL2_CFLAGS_OTHER} ${FREETYPE_CFLAGS_OTHER})
 target_link_libraries(CSE2 ${SDL2_LIBRARIES} ${FREETYPE_LIBRARIES})
+
+# Set up the output directory
+add_custom_command(TARGET CSE2 PRE_BUILD
+	COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/cavestory")
+
+set_target_properties(CSE2 PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_BINARY_DIR}/cavestory")
+
+add_custom_command(TARGET CSE2 POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/${FILES_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/cavestory")

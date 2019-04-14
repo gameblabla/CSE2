@@ -3,7 +3,7 @@
 
 # Misc
 /obj
-/build/data*
+/build
 *.dat
 *.rec
 build.7z
@@ -13,10 +13,10 @@ build.zip
 *.exe
 
 # MSVC trash
-msvc2003/CSE2.ncb
-msvc2003/CSE2.suo
-msvc2003/Debug
-msvc2003/Release
-msvc2003/Debug (Japanese)
-msvc2003/Release (Japanese)
+msvc/msvc2003/CSE2.ncb
+msvc/msvc2003/CSE2.suo
+msvc/msvc2003/Debug
+msvc/msvc2003/Release
+msvc/msvc2003/Debug (Japanese)
+msvc/msvc2003/Release (Japanese)
 *.aps
