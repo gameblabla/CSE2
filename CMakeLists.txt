@@ -277,10 +277,18 @@ target_compile_options(CSE2 PRIVATE ${SDL2_CFLAGS_OTHER} ${FREETYPE_CFLAGS_OTHER
 target_link_libraries(CSE2 ${SDL2_LIBRARIES} ${FREETYPE_LIBRARIES})
 
 # Set up the output directory
-add_custom_command(TARGET CSE2 PRE_BUILD
-	COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/cavestory")
 
+# Copy the files to the output directory
+file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/${FILES_DIR}/" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/cavestory")
+
+# Send the Release executable to the directory
 set_target_properties(CSE2 PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_BINARY_DIR}/cavestory")
 
-add_custom_command(TARGET CSE2 POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/${FILES_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/cavestory")
+# On MSVC, copy across SDL2.dll as well
+if (MSVC)
+	if (CMAKE_CL_64)
+		file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/msvc/SDL2/lib/x64/SDL2.dll" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/cavestory")
+	else()
+		file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/msvc/SDL2/lib/x86/SDL2.dll" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/cavestory")
+	endif()
+endif()
