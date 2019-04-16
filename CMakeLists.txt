@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.7.2)
 
+if ((${CMAKE_VERSION} VERSION_EQUAL 3.9) OR (${CMAKE_VERSION} VERSION_GREATER 3.9))
+	cmake_policy(SET CMP0069 NEW)
+endif()
+
 option(STATIC "Produce a statically-linked executable (good for Windows builds, so you don't need to bundle DLL files)" OFF)
 option(JAPANESE "Enable the Japanese-language build" OFF)
 option(FIX_BUGS "Fix certain bugs (see src/Bug Fixes.txt)" OFF)
@@ -263,9 +267,9 @@ foreach(FILENAME IN LISTS RESOURCES)
 endforeach()
 
 if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-	# Enable link-time optimisation if available
-	include(CheckIPOSupported OPTIONAL RESULT_VARIABLE result)
-	if (result)
+	if ((${CMAKE_VERSION} VERSION_EQUAL 3.9) OR (${CMAKE_VERSION} VERSION_GREATER 3.9))
+		# Enable link-time optimisation if available
+		include(CheckIPOSupported)
 		check_ipo_supported(RESULT result)
 		if (result)
 			set_target_properties(CSE2 PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
