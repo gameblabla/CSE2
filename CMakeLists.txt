@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.7.2)
 
 option(STATIC "Produce a statically-linked executable (good for Windows builds, so you don't need to bundle DLL files)" OFF)
 option(JAPANESE "Enable the Japanese-language build" OFF)
@@ -264,10 +264,12 @@ endforeach()
 
 if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
 	# Enable link-time optimisation if available
-	include(CheckIPOSupported)
-	check_ipo_supported(RESULT result)
+	include(CheckIPOSupported OPTIONAL RESULT_VARIABLE result)
 	if (result)
-		set_target_properties(CSE2 PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
+		check_ipo_supported(RESULT result)
+		if (result)
+			set_target_properties(CSE2 PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
+		endif()
 	endif()
 endif()
 
