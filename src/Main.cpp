@@ -21,7 +21,9 @@
 #include "KeyControl.h"
 #include "MyChar.h"
 #include "Organya.h"
+#ifdef EXTRA_MUSIC_FORMATS
 #include "OtherMusicFormats.h"
+#endif
 #include "Profile.h"
 #include "Resource.h"
 #include "Sound.h"
@@ -399,7 +401,9 @@ void InactiveWindow()
 	{
 		bActive = false;
 		StopOrganyaMusic();
+#ifdef EXTRA_MUSIC_FORMATS
 		OtherMusic_Stop();
+#endif
 		SleepNoise();
 	}
 	
@@ -413,7 +417,9 @@ void ActiveWindow()
 		bActive = true;
 		StopOrganyaMusic();
 		PlayOrganyaMusic();
+#ifdef EXTRA_MUSIC_FORMATS
 		OtherMusic_Play();
+#endif
 		ResetNoise();
 	}
 

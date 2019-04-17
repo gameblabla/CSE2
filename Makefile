@@ -1,5 +1,6 @@
 # Defaults
 FIX_BUGS ?= 1
+EXTRA_MUSIC_FORMATS ?= 1
 
 ifeq ($(RELEASE), 1)
 	CXXFLAGS = -O3 -flto
@@ -49,8 +50,6 @@ CFLAGS := $(CXXFLAGS)
 
 CFLAGS += -std=c99
 CXXFLAGS += -std=c++11
-
-CFLAGS += -DUSE_STB_VORBIS -DUSE_DR_FLAC -DUSE_PXTONE
 
 ifeq ($(STATIC), 1)
 	LDFLAGS += -static
@@ -121,7 +120,6 @@ SOURCES = \
 	NpcHit \
 	NpcTbl \
 	Organya \
-	OtherMusicFormats \
 	PixTone \
 	Profile \
 	Resource \
@@ -134,7 +132,9 @@ SOURCES = \
 	Triangle \
 	ValueView
 
+ifeq ($(EXTRA_MUSIC_FORMATS), 1)
 SOURCES += \
+	OtherMusicFormats \
 	audio_lib/decoders/libs/pxtone/pxtnDelay \
 	audio_lib/decoders/libs/pxtone/pxtnDescriptor \
 	audio_lib/decoders/libs/pxtone/pxtnError \
@@ -167,6 +167,9 @@ SOURCES += \
 	audio_lib/decoder \
 	audio_lib/miniaudio \
 	audio_lib/mixer
+
+CFLAGS += -DEXTRA_MUSIC_FORMATS -DUSE_STB_VORBIS -DUSE_DR_FLAC -DUSE_PXTONE
+endif
 
 RESOURCES =
 

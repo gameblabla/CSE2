@@ -5,6 +5,7 @@ option(JAPANESE "Enable the Japanese-language build" OFF)
 option(FIX_BUGS "Fix certain bugs (see src/Bug Fixes.txt)" ON)
 option(RASPBERRY_PI "Enable tweaks to improve performance on Raspberry Pis" OFF)
 option(NONPORTABLE "Enable bits of code that aren't portable, but are what the original game used" OFF)
+option(EXTRA_MUSIC_FORMATS "Enable support for more music formats, including Ogg Vorbis, FLAC, and Pxtone (not to be confused with Pixtone)" ON)
 
 # Default to Release build
 if(NOT CMAKE_BUILD_TYPE)
@@ -130,8 +131,6 @@ add_executable(CSE2
 	src/NpcTbl.h
 	src/Organya.cpp
 	src/Organya.h
-	src/OtherMusicFormats.cpp
-	src/OtherMusicFormats.h
 	src/PixTone.cpp
 	src/PixTone.h
 	src/Profile.cpp
@@ -179,42 +178,46 @@ if (NONPORTABLE)
 	target_compile_definitions(CSE2 PRIVATE NONPORTABLE)
 endif()
 
-target_sources(CSE2 PRIVATE
-	src/audio_lib/decoders/libs/pxtone/pxtnDelay.cpp
-	src/audio_lib/decoders/libs/pxtone/pxtnDescriptor.cpp
-	src/audio_lib/decoders/libs/pxtone/pxtnError.cpp
-	src/audio_lib/decoders/libs/pxtone/pxtnEvelist.cpp
-	src/audio_lib/decoders/libs/pxtone/pxtnMaster.cpp
-	src/audio_lib/decoders/libs/pxtone/pxtnMem.cpp
-	src/audio_lib/decoders/libs/pxtone/pxtnOverDrive.cpp
-	src/audio_lib/decoders/libs/pxtone/pxtnPulse_Frequency.cpp
-	src/audio_lib/decoders/libs/pxtone/pxtnPulse_Noise.cpp
-	src/audio_lib/decoders/libs/pxtone/pxtnPulse_NoiseBuilder.cpp
-	src/audio_lib/decoders/libs/pxtone/pxtnPulse_Oggv.cpp
-	src/audio_lib/decoders/libs/pxtone/pxtnPulse_Oscillator.cpp
-	src/audio_lib/decoders/libs/pxtone/pxtnPulse_PCM.cpp
-	src/audio_lib/decoders/libs/pxtone/pxtnService.cpp
-	src/audio_lib/decoders/libs/pxtone/pxtnService_moo.cpp
-	src/audio_lib/decoders/libs/pxtone/pxtnText.cpp
-	src/audio_lib/decoders/libs/pxtone/pxtnUnit.cpp
-	src/audio_lib/decoders/libs/pxtone/pxtnWoice.cpp
-	src/audio_lib/decoders/libs/pxtone/pxtnWoice_io.cpp
-	src/audio_lib/decoders/libs/pxtone/pxtnWoicePTV.cpp
-	src/audio_lib/decoders/libs/pxtone/pxtoneNoise.cpp
-	src/audio_lib/decoders/libs/pxtone/shim.cpp
-	src/audio_lib/decoders/dr_flac.c
-	src/audio_lib/decoders/memory_file.c
-	src/audio_lib/decoders/misc_utilities.c
-	src/audio_lib/decoders/predecode.c
-	src/audio_lib/decoders/pxtone.c
-	src/audio_lib/decoders/split.c
-	src/audio_lib/decoders/stb_vorbis.c
-	src/audio_lib/decoder.c
-	src/audio_lib/miniaudio.c
-	src/audio_lib/mixer.c
-)
+if (EXTRA_MUSIC_FORMATS)
+	target_sources(CSE2 PRIVATE
+		src/OtherMusicFormats.cpp
+		src/OtherMusicFormats.h
+		src/audio_lib/decoders/libs/pxtone/pxtnDelay.cpp
+		src/audio_lib/decoders/libs/pxtone/pxtnDescriptor.cpp
+		src/audio_lib/decoders/libs/pxtone/pxtnError.cpp
+		src/audio_lib/decoders/libs/pxtone/pxtnEvelist.cpp
+		src/audio_lib/decoders/libs/pxtone/pxtnMaster.cpp
+		src/audio_lib/decoders/libs/pxtone/pxtnMem.cpp
+		src/audio_lib/decoders/libs/pxtone/pxtnOverDrive.cpp
+		src/audio_lib/decoders/libs/pxtone/pxtnPulse_Frequency.cpp
+		src/audio_lib/decoders/libs/pxtone/pxtnPulse_Noise.cpp
+		src/audio_lib/decoders/libs/pxtone/pxtnPulse_NoiseBuilder.cpp
+		src/audio_lib/decoders/libs/pxtone/pxtnPulse_Oggv.cpp
+		src/audio_lib/decoders/libs/pxtone/pxtnPulse_Oscillator.cpp
+		src/audio_lib/decoders/libs/pxtone/pxtnPulse_PCM.cpp
+		src/audio_lib/decoders/libs/pxtone/pxtnService.cpp
+		src/audio_lib/decoders/libs/pxtone/pxtnService_moo.cpp
+		src/audio_lib/decoders/libs/pxtone/pxtnText.cpp
+		src/audio_lib/decoders/libs/pxtone/pxtnUnit.cpp
+		src/audio_lib/decoders/libs/pxtone/pxtnWoice.cpp
+		src/audio_lib/decoders/libs/pxtone/pxtnWoice_io.cpp
+		src/audio_lib/decoders/libs/pxtone/pxtnWoicePTV.cpp
+		src/audio_lib/decoders/libs/pxtone/pxtoneNoise.cpp
+		src/audio_lib/decoders/libs/pxtone/shim.cpp
+		src/audio_lib/decoders/dr_flac.c
+		src/audio_lib/decoders/memory_file.c
+		src/audio_lib/decoders/misc_utilities.c
+		src/audio_lib/decoders/predecode.c
+		src/audio_lib/decoders/pxtone.c
+		src/audio_lib/decoders/split.c
+		src/audio_lib/decoders/stb_vorbis.c
+		src/audio_lib/decoder.c
+		src/audio_lib/miniaudio.c
+		src/audio_lib/mixer.c
+	)
 
-target_compile_definitions(CSE2 PRIVATE USE_STB_VORBIS USE_DR_FLAC USE_PXTONE)
+	target_compile_definitions(CSE2 PRIVATE EXTRA_MUSIC_FORMATS USE_STB_VORBIS USE_DR_FLAC USE_PXTONE)
+endif()
 
 # Make some tweaks if we're targetting Windows
 if (WIN32)

@@ -21,7 +21,9 @@
 #include "MyChar.h"
 #include "NpChar.h"
 #include "Organya.h"
+#ifdef EXTRA_MUSIC_FORMATS
 #include "OtherMusicFormats.h"
+#endif
 #include "Tags.h"
 #include "TextScr.h"
 #include "ValueView.h"
@@ -327,7 +329,9 @@ void ChangeMusic(int no)
 		gOldNo = gMusicNo;
 		StopOrganyaMusic();
 
+#ifdef EXTRA_MUSIC_FORMATS
 		OtherMusic_Stop();
+#endif
 
 		switch (gMusicTable[no].type)
 		{
@@ -341,10 +345,12 @@ void ChangeMusic(int no)
 				PlayOrganyaMusic();
 				break;
 
+#ifdef EXTRA_MUSIC_FORMATS
 			case MUSIC_TYPE_OTHER:
 				OtherMusic_Load(gMusicTable[no].path, gMusicTable[no].loop);
 				OtherMusic_Play();
 				break;
+#endif
 		}
 
 		gMusicNo = no;
@@ -355,7 +361,10 @@ void ReCallMusic()
 {
 	//Stop old song
 	StopOrganyaMusic();
+
+#ifdef EXTRA_MUSIC_FORMATS
 	OtherMusic_Stop();
+#endif
 
 	switch (gMusicTable[gOldNo].type)
 	{
@@ -369,10 +378,12 @@ void ReCallMusic()
 			PlayOrganyaMusic();
 			break;
 
+#ifdef EXTRA_MUSIC_FORMATS
 		case MUSIC_TYPE_OTHER:
 			OtherMusic_LoadPrevious();
 			OtherMusic_Play();
 			break;
+#endif
 	}
 
 	gMusicNo = gOldNo;
