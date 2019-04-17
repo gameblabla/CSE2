@@ -26,7 +26,9 @@
 #include "MyChar.h"
 #include "MycParam.h"
 #include "NpChar.h"
+#ifdef EXTRA_MUSIC_FORMATS
 #include "OtherMusicFormats.h"
+#endif
 #include "Organya.h"
 #include "Profile.h"
 #include "SelStage.h"

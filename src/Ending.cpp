@@ -14,7 +14,9 @@
 #include "KeyControl.h"
 #include "Main.h"
 #include "MycParam.h"
+#ifdef EXTRA_MUSIC_FORMATS
 #include "OtherMusicFormats.h"
+#endif
 #include "Organya.h"
 #include "Stage.h"
 #include "TextScr.h"
