@@ -35,7 +35,6 @@
 #include "NpChar.h"
 #include "NpcHit.h"
 #include "NpcTbl.h"
-#include "Organya.h"
 #include "Profile.h"
 #include "SelStage.h"
 #include "Shoot.h"

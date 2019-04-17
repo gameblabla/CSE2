@@ -26,6 +26,7 @@
 #include "MyChar.h"
 #include "MycParam.h"
 #include "NpChar.h"
+#include "OtherMusicFormats.h"
 #include "Organya.h"
 #include "Profile.h"
 #include "SelStage.h"
@@ -992,6 +993,11 @@ int TextScriptProc()
 					else if (IS_COMMAND('F','M','U'))
 					{
 						SetOrganyaFadeout();
+
+						#ifdef EXTRA_MUSIC_FORMATS
+						OtherMusic_FadeOut();
+						#endif
+
 						gTS.p_read += 4;
 					}
 					else if (IS_COMMAND('R','M','U'))

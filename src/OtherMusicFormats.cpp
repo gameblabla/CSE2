@@ -77,6 +77,11 @@ void OtherMusic_LoadPrevious(void)
 	previous_song.valid = false;
 }
 
+void OtherMusic_FadeOut(void)
+{
+	Mixer_FadeOutSound(song.instance, 5 * 1000);
+}
+
 void OtherMusic_Mix(float (*buffer)[2], unsigned long frames)
 {
 	if (playing)

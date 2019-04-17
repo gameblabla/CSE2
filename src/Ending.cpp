@@ -14,6 +14,7 @@
 #include "KeyControl.h"
 #include "Main.h"
 #include "MycParam.h"
+#include "OtherMusicFormats.h"
 #include "Organya.h"
 #include "Stage.h"
 #include "TextScr.h"
@@ -297,6 +298,9 @@ void ActionCredit_Read()
 			case '~': //Start fading out music
 				++Credit.offset;
 				SetOrganyaFadeout();
+				#ifdef EXTRA_MUSIC_FORMATS
+				OtherMusic_FadeOut();
+				#endif
 				return;
 				
 			case 'f': //Flag jump
