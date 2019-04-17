@@ -1,3 +1,6 @@
+# Defaults
+FIX_BUGS ?= 1
+
 ifeq ($(RELEASE), 1)
 	CXXFLAGS = -O3 -flto
 	LDFLAGS = -s
