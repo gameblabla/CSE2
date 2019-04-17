@@ -160,6 +160,8 @@ add_executable(CSE2
 set(RESOURCES
 )
 
+target_compile_definitions(CSE2 PRIVATE LODEPNG_NO_COMPILE_ENCODER LODEPNG_NO_COMPILE_ERROR_TEXT LODEPNG_NO_COMPILE_CPP)
+
 # Handle options
 if (JAPANESE)
 	target_compile_definitions(CSE2 PRIVATE JAPANESE)
