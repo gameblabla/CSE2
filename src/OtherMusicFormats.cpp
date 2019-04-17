@@ -11,6 +11,7 @@ extern "C" {
 
 typedef struct Song
 {
+	bool valid;
 	Mixer_Sound *sound;
 	Mixer_SoundInstanceID instance;
 } Song;
@@ -41,26 +42,39 @@ void OtherMusic_Stop(void)
 
 void OtherMusic_Load(const char *path, bool loop)
 {
-	if (previous_song.sound)
+	if (previous_song.valid)
+	{
+		Mixer_StopSound(previous_song.instance);
 		Mixer_UnloadSound(previous_song.sound);
+	}
 
-	Mixer_PauseSound(song.instance);
-	previous_song = song;
+	if (song.valid)
+	{
+		Mixer_PauseSound(song.instance);
+		previous_song = song;
+	}
 
 	song.sound = Mixer_LoadSound(path, loop, false);
 	song.instance = Mixer_PlaySound(song.sound);
 	Mixer_UnpauseSound(song.instance);
+	song.valid = true;
 }
 
 void OtherMusic_LoadPrevious(void)
 {
-	if (song.sound)
+	if (song.valid)
+	{
+		Mixer_StopSound(song.instance);
 		Mixer_UnloadSound(song.sound);
+	}
 
-	song = previous_song;
-	Mixer_UnpauseSound(song.instance);
+	if (previous_song.valid)
+	{
+		song = previous_song;
+		Mixer_UnpauseSound(song.instance);
+	}
 
-	previous_song.sound = NULL;
+	previous_song.valid = false;
 }
 
 void OtherMusic_Mix(float (*buffer)[2], unsigned long frames)
