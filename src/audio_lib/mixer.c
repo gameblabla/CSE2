@@ -11,13 +11,11 @@
 #include <pthread.h>
 #endif
 
-#ifdef _MSC_VER
-#include <malloc.h>
-#endif
-
 #include "miniaudio.h"
 
 #include "decoder.h"
+
+#define MIN(a, b) (a < b ? a : b)
 
 typedef struct Channel
 {
@@ -260,14 +258,8 @@ void Mixer_SetSoundVolume(Mixer_SoundInstanceID instance, float volume)
 	MutexUnlock(&mixer_mutex);
 }
 
-void Mixer_GetSamples(void *output_buffer_void, unsigned long frames_to_do)
+void Mixer_GetSamples(float *output_buffer, unsigned long frames_to_do)
 {
-#ifdef _MSC_VER
-	float (*output_buffer)[][output_channel_count] = output_buffer_void;
-#else
-	float (*output_buffer)[frames_to_do][output_channel_count] = output_buffer_void;
-#endif
-
 	memset(output_buffer, 0, frames_to_do * sizeof(float) * output_channel_count);
 
 	MutexLock(&mixer_mutex);
@@ -278,47 +270,52 @@ void Mixer_GetSamples(void *output_buffer_void, unsigned long frames_to_do)
 
 		if (channel->paused == false)
 		{
-#ifdef _MSC_VER
-			float (*read_buffer)[][output_channel_count] = _malloca(frames_to_do * output_channel_count * sizeof(float));
-#else
-			float read_buffer[frames_to_do][output_channel_count];
-#endif
+			unsigned long frames_done = 0;
+			for (unsigned long sub_frames_done; frames_done < frames_to_do; frames_done += sub_frames_done)
+			{
+				float read_buffer[0x1000];
 
-			ma_uint64 frames_read = ma_pcm_converter_read(&channel->dsp, read_buffer, frames_to_do);
+				const unsigned long sub_frames_to_do = MIN(0x1000 / output_channel_count, frames_to_do - frames_done);
+				sub_frames_done = (unsigned long)ma_pcm_converter_read(&channel->dsp, read_buffer, sub_frames_to_do);
 
-			for (ma_uint64 i = 0; i < frames_read; ++i)
-			{	
-				for (unsigned int j = 0; j < output_channel_count; ++j)
-#ifdef _MSC_VER
-					(*output_buffer)[i][j] += (*read_buffer)[i][j] * channel->volume;
-#else
-					(*output_buffer)[i][j] += read_buffer[i][j] * channel->volume;
-#endif
-
-				if (channel->fade_out_counter_max)
+				for (unsigned long i = 0; i < sub_frames_done; ++i)
 				{
-					const float fade_out_volume = channel->fade_counter / (float)channel->fade_out_counter_max;
+					float *frame = &output_buffer[(frames_done + i) * output_channel_count];
 
 					for (unsigned int j = 0; j < output_channel_count; ++j)
-						(*output_buffer)[i][j] *= (fade_out_volume * fade_out_volume);
+						frame[j] += read_buffer[(i * output_channel_count) + j] * channel->volume;
 
-					if (channel->fade_counter)
-						--channel->fade_counter;
+					if (channel->fade_out_counter_max)
+					{
+						const float fade_out_volume = channel->fade_counter / (float)channel->fade_out_counter_max;
+
+						for (unsigned int j = 0; j < output_channel_count; ++j)
+							frame[j] *= (fade_out_volume * fade_out_volume);
+
+						if (channel->fade_counter)
+							--channel->fade_counter;
+					}
+
+					if (channel->fade_in_counter_max)
+					{
+						const float fade_in_volume = (channel->fade_in_counter_max - channel->fade_counter) / (float)channel->fade_in_counter_max;
+
+						for (unsigned int j = 0; j < output_channel_count; ++j)
+							frame[j] *= (fade_in_volume * fade_in_volume);
+
+						if (!--channel->fade_counter)
+							channel->fade_in_counter_max = 0;
+					}
 				}
 
-				if (channel->fade_in_counter_max)
+				if (sub_frames_done < sub_frames_to_do)
 				{
-					const float fade_in_volume = (channel->fade_in_counter_max - channel->fade_counter) / (float)channel->fade_in_counter_max;
-
-					for (unsigned int j = 0; j < output_channel_count; ++j)
-						(*output_buffer)[i][j] *= (fade_in_volume * fade_in_volume);
-
-					if (!--channel->fade_counter)
-						channel->fade_in_counter_max = 0;
+					frames_done += sub_frames_done;
+					break;
 				}
 			}
 
-			if (frames_read < frames_to_do)	// Sound finished
+			if (frames_done < frames_to_do)	// Sound finished
 			{
 				Decoder_Destroy(channel->decoder);
 				*channel_pointer = channel->next;
