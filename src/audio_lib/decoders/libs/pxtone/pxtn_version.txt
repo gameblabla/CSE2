@@ -1,0 +1,5 @@
+pxtone release note.
+
+'17/02/05	修正 pxtnPulse_NoiseBuilder.cpp と pxtnPulse_Noise.cpp に解放し忘れたメモリ。
+		修正 pxtnPulse_PCM::Copy_() コーディングミス if( !create != pxtnOK )。
+'17/01/23

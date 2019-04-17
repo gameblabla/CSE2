@@ -40,7 +40,14 @@ ifeq ($(RASPBERRY_PI), 1)
 	CXXFLAGS += -DRASPBERRY_PI
 endif
 
-CXXFLAGS += -std=c++98 `pkg-config sdl2 --cflags` `pkg-config freetype2 --cflags` -MMD -MP -MF $@.d -DLODEPNG_NO_COMPILE_ENCODER -DLODEPNG_NO_COMPILE_ERROR_TEXT -DLODEPNG_NO_COMPILE_CPP
+CXXFLAGS += `pkg-config sdl2 --cflags` `pkg-config freetype2 --cflags` -MMD -MP -MF $@.d -DLODEPNG_NO_COMPILE_ENCODER -DLODEPNG_NO_COMPILE_ERROR_TEXT -DLODEPNG_NO_COMPILE_CPP
+
+CFLAGS := $(CXXFLAGS)
+
+CFLAGS += -std=c99
+CXXFLAGS += -std=c++11
+
+CFLAGS += -DUSE_STB_VORBIS -DUSE_DR_FLAC -DUSE_PXTONE
 
 ifeq ($(STATIC), 1)
 	LDFLAGS += -static
@@ -49,7 +56,6 @@ else
 	LIBS += `pkg-config sdl2 --libs` `pkg-config freetype2 --libs`
 endif
 
-# For an accurate result to the original's code, compile in alphabetical order
 SOURCES = \
 	lodepng/lodepng \
 	ArmsItem \
@@ -112,6 +118,7 @@ SOURCES = \
 	NpcHit \
 	NpcTbl \
 	Organya \
+	OtherMusicFormats \
 	PixTone \
 	Profile \
 	Resource \
@@ -123,6 +130,40 @@ SOURCES = \
 	TextScr \
 	Triangle \
 	ValueView
+
+SOURCES += \
+	audio_lib/decoders/libs/pxtone/pxtnDelay \
+	audio_lib/decoders/libs/pxtone/pxtnDescriptor \
+	audio_lib/decoders/libs/pxtone/pxtnError \
+	audio_lib/decoders/libs/pxtone/pxtnEvelist \
+	audio_lib/decoders/libs/pxtone/pxtnMaster \
+	audio_lib/decoders/libs/pxtone/pxtnMem \
+	audio_lib/decoders/libs/pxtone/pxtnOverDrive \
+	audio_lib/decoders/libs/pxtone/pxtnPulse_Frequency \
+	audio_lib/decoders/libs/pxtone/pxtnPulse_Noise \
+	audio_lib/decoders/libs/pxtone/pxtnPulse_NoiseBuilder \
+	audio_lib/decoders/libs/pxtone/pxtnPulse_Oggv \
+	audio_lib/decoders/libs/pxtone/pxtnPulse_Oscillator \
+	audio_lib/decoders/libs/pxtone/pxtnPulse_PCM \
+	audio_lib/decoders/libs/pxtone/pxtnService \
+	audio_lib/decoders/libs/pxtone/pxtnService_moo \
+	audio_lib/decoders/libs/pxtone/pxtnText \
+	audio_lib/decoders/libs/pxtone/pxtnUnit \
+	audio_lib/decoders/libs/pxtone/pxtnWoice \
+	audio_lib/decoders/libs/pxtone/pxtnWoice_io \
+	audio_lib/decoders/libs/pxtone/pxtnWoicePTV \
+	audio_lib/decoders/libs/pxtone/pxtoneNoise \
+	audio_lib/decoders/libs/pxtone/shim \
+	audio_lib/decoders/dr_flac \
+	audio_lib/decoders/memory_file \
+	audio_lib/decoders/misc_utilities \
+	audio_lib/decoders/predecode \
+	audio_lib/decoders/pxtone \
+	audio_lib/decoders/split \
+	audio_lib/decoders/stb_vorbis \
+	audio_lib/decoder \
+	audio_lib/miniaudio \
+	audio_lib/mixer
 
 RESOURCES =
 
@@ -140,6 +181,11 @@ $(BUILD_DIR)/$(FILENAME): $(OBJECTS)
 	@echo Linking
 	@$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -o $@ $(LIBS)
 	@echo Finished compiling: $@
+
+obj/$(FILENAME)/%.o: src/%.c
+	@mkdir -p $(@D)
+	@echo Compiling $<
+	@$(CC) $(CFLAGS) $< -o $@ -c
 
 obj/$(FILENAME)/%.o: src/%.cpp
 	@mkdir -p $(@D)

@@ -21,6 +21,7 @@
 #include "MyChar.h"
 #include "NpChar.h"
 #include "Organya.h"
+#include "OtherMusicFormats.h"
 #include "Tags.h"
 #include "TextScr.h"
 #include "ValueView.h"
@@ -255,51 +256,62 @@ BOOL TransferStage(int no, int w, int x, int y)
 	return FALSE;
 }
 
-//Music
-const char *gMusicTable[42] =
+enum
 {
-	"XXXX",
-	"WANPAKU",
-	"ANZEN",
-	"GAMEOVER",
-	"GRAVITY",
-	"WEED",
-	"MDOWN2",
-	"FIREEYE",
-	"VIVI",
-	"MURA",
-	"FANFALE1",
-	"GINSUKE",
-	"CEMETERY",
-	"PLANT",
-	"KODOU",
-	"FANFALE3",
-	"FANFALE2",
-	"DR",
-	"ESCAPE",
-	"JENKA",
-	"MAZE",
-	"ACCESS",
-	"IRONH",
-	"GRAND",
-	"CURLY",
-	"OSIDE",
-	"REQUIEM",
-	"WANPAK2",
-	"QUIET",
-	"LASTCAVE",
-	"BALCONY",
-	"LASTBTL",
-	"LASTBT3",
-	"ENDING",
-	"ZONBIE",
-	"BDOWN",
-	"HELL",
-	"JENKA2",
-	"MARINE",
-	"BALLOS",
-	"TOROKO",
-	"WHITE"
+	MUSIC_TYPE_ORGANYA,
+	MUSIC_TYPE_OTHER
+};
+
+//Music
+const struct
+{
+	const char *path;
+	int type;
+	bool loop;
+} gMusicTable[42] =
+{
+	{"XXXX", MUSIC_TYPE_ORGANYA, true},
+	{"WANPAKU", MUSIC_TYPE_ORGANYA, true},
+	{"ANZEN", MUSIC_TYPE_ORGANYA, true},
+	{"GAMEOVER", MUSIC_TYPE_ORGANYA, false},
+	{"GRAVITY", MUSIC_TYPE_ORGANYA, true},
+	{"WEED", MUSIC_TYPE_ORGANYA, true},
+	{"MDOWN2", MUSIC_TYPE_ORGANYA, true},
+	{"FIREEYE", MUSIC_TYPE_ORGANYA, true},
+	{"VIVI", MUSIC_TYPE_ORGANYA, true},
+	{"MURA", MUSIC_TYPE_ORGANYA, true},
+	{"FANFALE1", MUSIC_TYPE_ORGANYA, false},
+	{"GINSUKE", MUSIC_TYPE_ORGANYA, true},
+	{"CEMETERY", MUSIC_TYPE_ORGANYA, true},
+	{"PLANT", MUSIC_TYPE_ORGANYA, true},
+	{"KODOU", MUSIC_TYPE_ORGANYA, true},
+	{"FANFALE3", MUSIC_TYPE_ORGANYA, false},
+	{"FANFALE2", MUSIC_TYPE_ORGANYA, false},
+	{"DR", MUSIC_TYPE_ORGANYA, true},
+	{"ESCAPE", MUSIC_TYPE_ORGANYA, true},
+	{"JENKA", MUSIC_TYPE_ORGANYA, true},
+	{"MAZE", MUSIC_TYPE_ORGANYA, true},
+	{"ACCESS", MUSIC_TYPE_ORGANYA, true},
+	{"IRONH", MUSIC_TYPE_ORGANYA, true},
+	{"GRAND", MUSIC_TYPE_ORGANYA, true},
+	{"CURLY", MUSIC_TYPE_ORGANYA, true},
+	{"OSIDE", MUSIC_TYPE_ORGANYA, true},
+	{"REQUIEM", MUSIC_TYPE_ORGANYA, true},
+	{"WANPAK2", MUSIC_TYPE_ORGANYA, true},
+	{"QUIET", MUSIC_TYPE_ORGANYA, true},
+	{"LASTCAVE", MUSIC_TYPE_ORGANYA, true},
+	{"BALCONY", MUSIC_TYPE_ORGANYA, true},
+	{"LASTBTL", MUSIC_TYPE_ORGANYA, true},
+	{"LASTBT3", MUSIC_TYPE_ORGANYA, true},
+	{"ENDING", MUSIC_TYPE_ORGANYA, true},
+	{"ZONBIE", MUSIC_TYPE_ORGANYA, true},
+	{"BDOWN", MUSIC_TYPE_ORGANYA, true},
+	{"HELL", MUSIC_TYPE_ORGANYA, true},
+	{"JENKA2", MUSIC_TYPE_ORGANYA, true},
+	{"MARINE", MUSIC_TYPE_ORGANYA, true},
+	{"BALLOS", MUSIC_TYPE_ORGANYA, true},
+	{"TOROKO", MUSIC_TYPE_ORGANYA, false},
+	{"WHITE", MUSIC_TYPE_ORGANYA, true}
 };
 
 unsigned int gOldPos;
@@ -314,14 +326,27 @@ void ChangeMusic(int no)
 		gOldPos = GetOrganyaPosition();
 		gOldNo = gMusicNo;
 		StopOrganyaMusic();
-		
-		//Load .org
-		LoadOrganya(gMusicTable[no]);
-		
-		//Reset position, volume, and then play the song
-		ChangeOrganyaVolume(100);
-		SetOrganyaPosition(0);
-		PlayOrganyaMusic();
+
+		OtherMusic_Stop();
+
+		switch (gMusicTable[no].type)
+		{
+			case MUSIC_TYPE_ORGANYA:
+				//Load .org
+				LoadOrganya(gMusicTable[no].path);
+				
+				//Reset position, volume, and then play the song
+				ChangeOrganyaVolume(100);
+				SetOrganyaPosition(0);
+				PlayOrganyaMusic();
+				break;
+
+			case MUSIC_TYPE_OTHER:
+				OtherMusic_Load(gMusicTable[no].path, gMusicTable[no].loop);
+				OtherMusic_Play();
+				break;
+		}
+
 		gMusicNo = no;
 	}
 }
@@ -330,13 +355,25 @@ void ReCallMusic()
 {
 	//Stop old song
 	StopOrganyaMusic();
-	
-	//Load .org that was playing before
-	LoadOrganya(gMusicTable[gOldNo]);
-	
-	//Reset position, volume, and then play the song
-	SetOrganyaPosition(gOldPos);
-	ChangeOrganyaVolume(100);
-	PlayOrganyaMusic();
+	OtherMusic_Stop();
+
+	switch (gMusicTable[gOldNo].type)
+	{
+		case MUSIC_TYPE_ORGANYA:
+			//Load .org that was playing before
+			LoadOrganya(gMusicTable[gOldNo].path);
+			
+			//Reset position, volume, and then play the song
+			SetOrganyaPosition(gOldPos);
+			ChangeOrganyaVolume(100);
+			PlayOrganyaMusic();
+			break;
+
+		case MUSIC_TYPE_OTHER:
+			OtherMusic_LoadPrevious();
+			OtherMusic_Play();
+			break;
+	}
+
 	gMusicNo = gOldNo;
 }

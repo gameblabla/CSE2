@@ -8,6 +8,7 @@
 #include <SDL.h>
 
 #include "Organya.h"
+#include "OtherMusicFormats.h"
 #include "PixTone.h"
 
 #define FREQUENCY 44100
@@ -216,6 +217,8 @@ void AudioCallback(void *userdata, uint8_t *stream, int len)
 	//Mix sounds to primary buffer
 	for (SOUNDBUFFER *sound = soundBuffers; sound != NULL; sound = sound->next)
 		sound->Mix(buffer, samples);
+
+	OtherMusic_Mix(buffer, samples);
 }
 
 //Sound things
@@ -223,6 +226,8 @@ SOUNDBUFFER* lpSECONDARYBUFFER[SOUND_NO];
 
 bool InitDirectSound()
 {
+	OtherMusic_Init(FREQUENCY, 2);
+
 	//Init sound
 	SDL_InitSubSystem(SDL_INIT_AUDIO);
 	
@@ -263,6 +268,8 @@ void EndDirectSound()
 	
 	//End organya
 	EndOrganya();
+
+	OtherMusic_Deinit();
 }
 
 //Sound effects playing
