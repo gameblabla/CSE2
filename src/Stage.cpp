@@ -347,7 +347,9 @@ void ChangeMusic(int no)
 
 #ifdef EXTRA_MUSIC_FORMATS
 			case MUSIC_TYPE_OTHER:
-				OtherMusic_Load(gMusicTable[no].path, gMusicTable[no].loop);
+				char path[PATH_LENGTH];
+				sprintf(path, "%s/%s", gDataPath, gMusicTable[no].path);
+				OtherMusic_Load(path, gMusicTable[no].loop);
 				OtherMusic_Play();
 				break;
 #endif
