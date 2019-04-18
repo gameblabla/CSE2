@@ -4,10 +4,12 @@ if ((${CMAKE_VERSION} VERSION_EQUAL 3.9) OR (${CMAKE_VERSION} VERSION_GREATER 3.
 	cmake_policy(SET CMP0069 NEW)
 endif()
 
+include(CheckIncludeFile)
+CHECK_INCLUDE_FILE(/opt/vc/include/bcm_host.h RASPBERRY_PI)
+
 option(STATIC "Produce a statically-linked executable (good for Windows builds, so you don't need to bundle DLL files)" OFF)
 option(JAPANESE "Enable the Japanese-language build" OFF)
 option(FIX_BUGS "Fix certain bugs (see src/Bug Fixes.txt)" ON)
-option(RASPBERRY_PI "Enable tweaks to improve performance on Raspberry Pis" OFF)
 option(NONPORTABLE "Enable bits of code that aren't portable, but are what the original game used" OFF)
 option(EXTRA_MUSIC_FORMATS "Enable support for more music formats, including Ogg Vorbis, FLAC, and Pxtone (not to be confused with Pixtone)" ON)
 
