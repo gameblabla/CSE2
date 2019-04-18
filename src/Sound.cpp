@@ -221,7 +221,7 @@ void AudioCallback(void *userdata, uint8_t *stream, int len)
 		sound->Mix(buffer, samples);
 
 #ifdef EXTRA_MUSIC_FORMATS
-	OtherMusic_Mix(buffer, samples);
+	OtherMusic_Mix((float*)buffer, samples);
 #endif
 }
 

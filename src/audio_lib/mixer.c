@@ -273,10 +273,8 @@ void Mixer_SetSoundVolume(Mixer_SoundInstanceID instance, float volume)
 	MutexUnlock(&mixer_mutex);
 }
 
-void Mixer_GetSamples(float *output_buffer, unsigned long frames_to_do)
+void Mixer_MixSamples(float *output_buffer, unsigned long frames_to_do)
 {
-	memset(output_buffer, 0, frames_to_do * sizeof(float) * output_channel_count);
-
 	MutexLock(&mixer_mutex);
 	Channel **channel_pointer = &channel_list_head;
 	while (*channel_pointer != NULL)
@@ -295,17 +293,13 @@ void Mixer_GetSamples(float *output_buffer, unsigned long frames_to_do)
 
 				for (unsigned long i = 0; i < sub_frames_done; ++i)
 				{
-					float *frame = &output_buffer[(frames_done + i) * output_channel_count];
-
-					for (unsigned int j = 0; j < output_channel_count; ++j)
-						frame[j] += read_buffer[(i * output_channel_count) + j] * channel->volume;
+					float volume = channel->volume;
 
 					if (channel->fade_out_counter_max)
 					{
 						const float fade_out_volume = channel->fade_counter / (float)channel->fade_out_counter_max;
 
-						for (unsigned int j = 0; j < output_channel_count; ++j)
-							frame[j] *= (fade_out_volume * fade_out_volume);
+						volume *= (fade_out_volume * fade_out_volume);
 
 						if (channel->fade_counter)
 							--channel->fade_counter;
@@ -315,12 +309,16 @@ void Mixer_GetSamples(float *output_buffer, unsigned long frames_to_do)
 					{
 						const float fade_in_volume = (channel->fade_in_counter_max - channel->fade_counter) / (float)channel->fade_in_counter_max;
 
-						for (unsigned int j = 0; j < output_channel_count; ++j)
-							frame[j] *= (fade_in_volume * fade_in_volume);
+						volume *= (fade_in_volume * fade_in_volume);
 
 						if (!--channel->fade_counter)
 							channel->fade_in_counter_max = 0;
 					}
+
+					float *frame = &output_buffer[(frames_done + i) * output_channel_count];
+
+					for (unsigned int j = 0; j < output_channel_count; ++j)
+						frame[j] += read_buffer[(i * output_channel_count) + j] * volume;
 				}
 
 				if (sub_frames_done < sub_frames_to_do)

@@ -83,27 +83,8 @@ void OtherMusic_FadeOut(void)
 	Mixer_FadeOutSound(song.instance, 5 * 1000);
 }
 
-void OtherMusic_Mix(float (*buffer)[2], unsigned long frames)
+void OtherMusic_Mix(float *buffer, unsigned long frames)
 {
 	if (playing)
-	{
-		unsigned long frames_done_total = 0;
-
-		for (unsigned long frames_done; frames_done_total != frames; frames_done_total += frames_done)
-		{
-			float read_buffer[4096 * 2];
-
-			frames_done = MIN(4096, frames - frames_done_total);
-
-			Mixer_GetSamples(read_buffer, frames_done);
-
-			float *buffer_pointer = buffer[frames_done_total];
-			float *read_buffer_pointer = read_buffer;
-			for (unsigned long i = 0; i < frames_done * 2; ++i)
-				*buffer_pointer++ += *read_buffer_pointer++;
-
-			if (frames_done < frames - frames_done_total)
-				break;
-		}
-	}
+		Mixer_MixSamples(buffer, frames);
 }

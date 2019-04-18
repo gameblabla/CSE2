@@ -9,4 +9,4 @@ void OtherMusic_Stop(void);
 void OtherMusic_Load(const char *path, bool loop);
 void OtherMusic_LoadPrevious(void);
 void OtherMusic_FadeOut(void);
-void OtherMusic_Mix(float (*buffer)[2], unsigned long frames);
+void OtherMusic_Mix(float *buffer, unsigned long frames);

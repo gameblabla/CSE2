@@ -17,4 +17,4 @@ void Mixer_FadeOutSound(Mixer_SoundInstanceID instance, unsigned int duration);
 void Mixer_FadeInSound(Mixer_SoundInstanceID instance, unsigned int duration);
 void Mixer_CancelFade(Mixer_SoundInstanceID instance);
 void Mixer_SetSoundVolume(Mixer_SoundInstanceID instance, float volume);
-void Mixer_GetSamples(float *output_buffer, unsigned long frames_to_do);
+void Mixer_MixSamples(float *output_buffer, unsigned long frames_to_do);
