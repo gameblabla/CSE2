@@ -246,6 +246,21 @@ void Mixer_FadeInSound(Mixer_SoundInstanceID instance, unsigned int duration)
 	MutexUnlock(&mixer_mutex);
 }
 
+void Mixer_CancelFade(Mixer_SoundInstanceID instance)
+{
+	MutexLock(&mixer_mutex);
+
+	Channel *channel = FindChannel(instance);
+
+	if (channel)
+	{
+		channel->fade_in_counter_max = 0;
+		channel->fade_out_counter_max = 0;
+	}
+
+	MutexUnlock(&mixer_mutex);
+}
+
 void Mixer_SetSoundVolume(Mixer_SoundInstanceID instance, float volume)
 {
 	MutexLock(&mixer_mutex);

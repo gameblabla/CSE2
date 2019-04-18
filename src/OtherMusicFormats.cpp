@@ -71,6 +71,7 @@ void OtherMusic_LoadPrevious(void)
 	if (previous_song.valid)
 	{
 		song = previous_song;
+		Mixer_CancelFade(song.instance);
 		Mixer_UnpauseSound(song.instance);
 	}
 
