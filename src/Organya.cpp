@@ -429,9 +429,7 @@ void LoadOrganya(const char *name)
 	//Open file
 	printf("Loading org %s\n", name);
 
-	char path[PATH_LENGTH];
-	sprintf(path, "%s/Org/%s.org", gDataPath, name);
-	FILE *fp = fopen(path, "rb");
+	FILE *fp = fopen(name, "rb");
 
 	if (!fp)
 	{

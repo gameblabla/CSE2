@@ -272,48 +272,48 @@ const struct
 	bool loop;
 } gMusicTable[42] =
 {
-	{"XXXX", MUSIC_TYPE_ORGANYA, true},
-	{"WANPAKU", MUSIC_TYPE_ORGANYA, true},
-	{"ANZEN", MUSIC_TYPE_ORGANYA, true},
-	{"GAMEOVER", MUSIC_TYPE_ORGANYA, false},
-	{"GRAVITY", MUSIC_TYPE_ORGANYA, true},
-	{"WEED", MUSIC_TYPE_ORGANYA, true},
-	{"MDOWN2", MUSIC_TYPE_ORGANYA, true},
-	{"FIREEYE", MUSIC_TYPE_ORGANYA, true},
-	{"VIVI", MUSIC_TYPE_ORGANYA, true},
-	{"MURA", MUSIC_TYPE_ORGANYA, true},
-	{"FANFALE1", MUSIC_TYPE_ORGANYA, false},
-	{"GINSUKE", MUSIC_TYPE_ORGANYA, true},
-	{"CEMETERY", MUSIC_TYPE_ORGANYA, true},
-	{"PLANT", MUSIC_TYPE_ORGANYA, true},
-	{"KODOU", MUSIC_TYPE_ORGANYA, true},
-	{"FANFALE3", MUSIC_TYPE_ORGANYA, false},
-	{"FANFALE2", MUSIC_TYPE_ORGANYA, false},
-	{"DR", MUSIC_TYPE_ORGANYA, true},
-	{"ESCAPE", MUSIC_TYPE_ORGANYA, true},
-	{"JENKA", MUSIC_TYPE_ORGANYA, true},
-	{"MAZE", MUSIC_TYPE_ORGANYA, true},
-	{"ACCESS", MUSIC_TYPE_ORGANYA, true},
-	{"IRONH", MUSIC_TYPE_ORGANYA, true},
-	{"GRAND", MUSIC_TYPE_ORGANYA, true},
-	{"CURLY", MUSIC_TYPE_ORGANYA, true},
-	{"OSIDE", MUSIC_TYPE_ORGANYA, true},
-	{"REQUIEM", MUSIC_TYPE_ORGANYA, true},
-	{"WANPAK2", MUSIC_TYPE_ORGANYA, true},
-	{"QUIET", MUSIC_TYPE_ORGANYA, true},
-	{"LASTCAVE", MUSIC_TYPE_ORGANYA, true},
-	{"BALCONY", MUSIC_TYPE_ORGANYA, true},
-	{"LASTBTL", MUSIC_TYPE_ORGANYA, true},
-	{"LASTBT3", MUSIC_TYPE_ORGANYA, true},
-	{"ENDING", MUSIC_TYPE_ORGANYA, true},
-	{"ZONBIE", MUSIC_TYPE_ORGANYA, true},
-	{"BDOWN", MUSIC_TYPE_ORGANYA, true},
-	{"HELL", MUSIC_TYPE_ORGANYA, true},
-	{"JENKA2", MUSIC_TYPE_ORGANYA, true},
-	{"MARINE", MUSIC_TYPE_ORGANYA, true},
-	{"BALLOS", MUSIC_TYPE_ORGANYA, true},
-	{"TOROKO", MUSIC_TYPE_ORGANYA, false},
-	{"WHITE", MUSIC_TYPE_ORGANYA, true}
+	{"Org/XXXX.org", MUSIC_TYPE_ORGANYA, true},
+	{"Org/WANPAKU.org", MUSIC_TYPE_ORGANYA, true},
+	{"Org/ANZEN.org", MUSIC_TYPE_ORGANYA, true},
+	{"Org/GAMEOVER.org", MUSIC_TYPE_ORGANYA, false},
+	{"Org/GRAVITY.org", MUSIC_TYPE_ORGANYA, true},
+	{"Org/WEED.org", MUSIC_TYPE_ORGANYA, true},
+	{"Org/MDOWN2.org", MUSIC_TYPE_ORGANYA, true},
+	{"Org/FIREEYE.org", MUSIC_TYPE_ORGANYA, true},
+	{"Org/VIVI.org", MUSIC_TYPE_ORGANYA, true},
+	{"Org/MURA.org", MUSIC_TYPE_ORGANYA, true},
+	{"Org/FANFALE1.org", MUSIC_TYPE_ORGANYA, false},
+	{"Org/GINSUKE.org", MUSIC_TYPE_ORGANYA, true},
+	{"Org/CEMETERY.org", MUSIC_TYPE_ORGANYA, true},
+	{"Org/PLANT.org", MUSIC_TYPE_ORGANYA, true},
+	{"Org/KODOU.org", MUSIC_TYPE_ORGANYA, true},
+	{"Org/FANFALE3.org", MUSIC_TYPE_ORGANYA, false},
+	{"Org/FANFALE2.org", MUSIC_TYPE_ORGANYA, false},
+	{"Org/DR.org", MUSIC_TYPE_ORGANYA, true},
+	{"Org/ESCAPE.org", MUSIC_TYPE_ORGANYA, true},
+	{"Org/JENKA.org", MUSIC_TYPE_ORGANYA, true},
+	{"Org/MAZE.org", MUSIC_TYPE_ORGANYA, true},
+	{"Org/ACCESS.org", MUSIC_TYPE_ORGANYA, true},
+	{"Org/IRONH.org", MUSIC_TYPE_ORGANYA, true},
+	{"Org/GRAND.org", MUSIC_TYPE_ORGANYA, true},
+	{"Org/CURLY.org", MUSIC_TYPE_ORGANYA, true},
+	{"Org/OSIDE.org", MUSIC_TYPE_ORGANYA, true},
+	{"Org/REQUIEM.org", MUSIC_TYPE_ORGANYA, true},
+	{"Org/WANPAK2.org", MUSIC_TYPE_ORGANYA, true},
+	{"Org/QUIET.org", MUSIC_TYPE_ORGANYA, true},
+	{"Org/LASTCAVE.org", MUSIC_TYPE_ORGANYA, true},
+	{"Org/BALCONY.org", MUSIC_TYPE_ORGANYA, true},
+	{"Org/LASTBTL.org", MUSIC_TYPE_ORGANYA, true},
+	{"Org/LASTBT3.org", MUSIC_TYPE_ORGANYA, true},
+	{"Org/ENDING.org", MUSIC_TYPE_ORGANYA, true},
+	{"Org/ZONBIE.org", MUSIC_TYPE_ORGANYA, true},
+	{"Org/BDOWN.org", MUSIC_TYPE_ORGANYA, true},
+	{"Org/HELL.org", MUSIC_TYPE_ORGANYA, true},
+	{"Org/JENKA2.org", MUSIC_TYPE_ORGANYA, true},
+	{"Org/MARINE.org", MUSIC_TYPE_ORGANYA, true},
+	{"Org/BALLOS.org", MUSIC_TYPE_ORGANYA, true},
+	{"Org/TOROKO.org", MUSIC_TYPE_ORGANYA, false},
+	{"Org/WHITE.org", MUSIC_TYPE_ORGANYA, true}
 };
 
 unsigned int gOldPos;
@@ -333,11 +333,14 @@ void ChangeMusic(int no)
 		OtherMusic_Stop();
 #endif
 
+		char path[PATH_LENGTH];
+		sprintf(path, "%s/%s", gDataPath, gMusicTable[no].path);
+
 		switch (gMusicTable[no].type)
 		{
 			case MUSIC_TYPE_ORGANYA:
 				//Load .org
-				LoadOrganya(gMusicTable[no].path);
+				LoadOrganya(path);
 				
 				//Reset position, volume, and then play the song
 				ChangeOrganyaVolume(100);
@@ -347,8 +350,6 @@ void ChangeMusic(int no)
 
 #ifdef EXTRA_MUSIC_FORMATS
 			case MUSIC_TYPE_OTHER:
-				char path[PATH_LENGTH];
-				sprintf(path, "%s/%s", gDataPath, gMusicTable[no].path);
 				OtherMusic_Load(path, gMusicTable[no].loop);
 				OtherMusic_Play();
 				break;
