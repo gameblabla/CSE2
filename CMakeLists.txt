@@ -173,9 +173,7 @@ if (FIX_BUGS)
 	target_compile_definitions(CSE2 PRIVATE FIX_BUGS)
 endif()
 
-include(CheckIncludeFile)
-CHECK_INCLUDE_FILE(/opt/vc/include/bcm_host.h RASPBERRY_PI)
-if (RASPBERRY_PI)
+if (EXISTS "/opt/vc/include/bcm_host.h")	# Detect Raspberry Pi
 	target_compile_definitions(CSE2 PRIVATE RASPBERRY_PI)
 endif()
 
