@@ -20,9 +20,9 @@ static Song song;
 static Song previous_song;
 static bool playing;
 
-void OtherMusic_Init(unsigned int sample_rate, unsigned int channel_count)
+void OtherMusic_Init(unsigned int sample_rate)
 {
-	Mixer_Init(sample_rate, channel_count);
+	Mixer_Init(sample_rate, 2);
 }
 
 void OtherMusic_Deinit(void)
@@ -90,17 +90,16 @@ void OtherMusic_Mix(float (*buffer)[2], unsigned long frames)
 
 		for (unsigned long frames_done; frames_done_total != frames; frames_done_total += frames_done)
 		{
-			float read_buffer[4096][2];
+			float read_buffer[4096 * 2];
 
 			frames_done = MIN(4096, frames - frames_done_total);
 
-			Mixer_GetSamples(read_buffer, MIN(4096, frames_done));
+			Mixer_GetSamples(read_buffer, frames_done);
 
-			for (unsigned long i = 0; i < frames_done; ++i)
-			{
-				buffer[frames_done_total + i][0] += read_buffer[i][0];
-				buffer[frames_done_total + i][1] += read_buffer[i][1];
-			}
+			float *buffer_pointer = buffer[frames_done_total];
+			float *read_buffer_pointer = read_buffer;
+			for (unsigned long i = 0; i < frames_done * 2; ++i)
+				*buffer_pointer++ += *read_buffer_pointer++;
 
 			if (frames_done < frames - frames_done_total)
 				break;

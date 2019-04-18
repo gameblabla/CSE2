@@ -2,7 +2,7 @@
 
 #include <stdbool.h>
 
-void OtherMusic_Init(unsigned int sample_rate, unsigned int channel_count);
+void OtherMusic_Init(unsigned int sample_rate);
 void OtherMusic_Deinit(void);
 void OtherMusic_Play(void);
 void OtherMusic_Stop(void);

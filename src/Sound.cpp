@@ -231,7 +231,7 @@ SOUNDBUFFER* lpSECONDARYBUFFER[SOUND_NO];
 bool InitDirectSound()
 {
 #ifdef EXTRA_MUSIC_FORMATS
-	OtherMusic_Init(FREQUENCY, 2);
+	OtherMusic_Init(FREQUENCY);
 #endif
 
 	//Init sound
