@@ -135,11 +135,6 @@ BOOL StartDirectDraw(int lMagnification, int lColourDepth)
 	SDL_GetWindowDisplayMode(gWindow, &display_mode);
 	vsync = display_mode.refresh_rate == 60;
 
-#ifdef RASPBERRY_PI
-	//Force OpenGLES2 on Raspberry Pi
-	SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengles2");
-#endif
-
 	//Create renderer
 	gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE | (vsync ? SDL_RENDERER_PRESENTVSYNC : 0));
 
