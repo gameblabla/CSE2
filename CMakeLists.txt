@@ -4,9 +4,6 @@ if ((${CMAKE_VERSION} VERSION_EQUAL 3.9) OR (${CMAKE_VERSION} VERSION_GREATER 3.
 	cmake_policy(SET CMP0069 NEW)
 endif()
 
-include(CheckIncludeFile)
-CHECK_INCLUDE_FILE(/opt/vc/include/bcm_host.h RASPBERRY_PI)
-
 option(STATIC "Produce a statically-linked executable (good for Windows builds, so you don't need to bundle DLL files)" OFF)
 option(JAPANESE "Enable the Japanese-language build" OFF)
 option(FIX_BUGS "Fix certain bugs (see src/Bug Fixes.txt)" ON)
@@ -176,6 +173,8 @@ if (FIX_BUGS)
 	target_compile_definitions(CSE2 PRIVATE FIX_BUGS)
 endif()
 
+include(CheckIncludeFile)
+CHECK_INCLUDE_FILE(/opt/vc/include/bcm_host.h RASPBERRY_PI)
 if (RASPBERRY_PI)
 	target_compile_definitions(CSE2 PRIVATE RASPBERRY_PI)
 endif()
