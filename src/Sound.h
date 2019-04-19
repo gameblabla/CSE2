@@ -23,7 +23,7 @@ class SOUNDBUFFER
 		void Play(bool bLooping);
 		void Stop();
 		
-		void Mix(float (*buffer)[2], size_t samples);
+		void Mix(float *buffer, size_t frames);
 		
 		SOUNDBUFFER *next;
 	
