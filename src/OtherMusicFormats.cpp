@@ -7,8 +7,6 @@ extern "C" {
 #include "audio_lib/mixer.h"
 }
 
-#define MIN(a, b) (a < b ? a : b)
-
 typedef struct Song
 {
 	bool valid;
