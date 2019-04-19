@@ -44,7 +44,8 @@ ifeq ($(RASPBERRY_PI), 1)
 	CXXFLAGS += -DRASPBERRY_PI
 endif
 
-CXXFLAGS += `pkg-config sdl2 --cflags` `pkg-config freetype2 --cflags` -MMD -MP -MF $@.d -DLODEPNG_NO_COMPILE_ENCODER -DLODEPNG_NO_COMPILE_ERROR_TEXT -DLODEPNG_NO_COMPILE_CPP
+CXXFLAGS += `pkg-config sdl2 --cflags` `pkg-config freetype2 --cflags` -MMD -MP -MF $@.d
+DEFINES += -DLODEPNG_NO_COMPILE_ENCODER -DLODEPNG_NO_COMPILE_ERROR_TEXT -DLODEPNG_NO_COMPILE_CPP
 
 CFLAGS := $(CXXFLAGS)
 
@@ -168,7 +169,7 @@ SOURCES += \
 	audio_lib/miniaudio \
 	audio_lib/mixer
 
-CFLAGS += -DEXTRA_MUSIC_FORMATS -DUSE_STB_VORBIS -DUSE_DR_FLAC -DUSE_PXTONE
+DEFINES += -DEXTRA_MUSIC_FORMATS -DUSE_STB_VORBIS -DUSE_DR_FLAC -DUSE_PXTONE
 endif
 
 RESOURCES =
@@ -191,17 +192,17 @@ $(BUILD_DIR)/$(FILENAME): $(OBJECTS)
 obj/$(FILENAME)/%.o: src/%.c
 	@mkdir -p $(@D)
 	@echo Compiling $<
-	@$(CC) $(CFLAGS) $< -o $@ -c
+	@$(CC) $(CFLAGS) $(DEFINES) $< -o $@ -c
 
 obj/$(FILENAME)/%.o: src/%.cpp
 	@mkdir -p $(@D)
 	@echo Compiling $<
-	@$(CXX) $(CXXFLAGS) $< -o $@ -c
+	@$(CXX) $(CXXFLAGS) $(DEFINES) $< -o $@ -c
 
 obj/$(FILENAME)/Resource.o: src/Resource.cpp $(addprefix src/Resource/, $(addsuffix .h, $(RESOURCES)))
 	@mkdir -p $(@D)
 	@echo Compiling $<
-	@$(CXX) $(CXXFLAGS) $< -o $@ -c
+	@$(CXX) $(CXXFLAGS) $(DEFINES) $< -o $@ -c
 
 src/Resource/%.h: res/% obj/bin2h
 	@mkdir -p $(@D)
