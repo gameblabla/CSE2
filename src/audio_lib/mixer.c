@@ -283,6 +283,8 @@ void Mixer_MixSamples(float *output_buffer, unsigned long frames_to_do)
 
 		if (channel->paused == false)
 		{
+			float *output_buffer_pointer = output_buffer;
+
 			unsigned long frames_done = 0;
 			for (unsigned long sub_frames_done; frames_done < frames_to_do; frames_done += sub_frames_done)
 			{
@@ -290,6 +292,8 @@ void Mixer_MixSamples(float *output_buffer, unsigned long frames_to_do)
 
 				const unsigned long sub_frames_to_do = MIN(0x1000 / output_channel_count, frames_to_do - frames_done);
 				sub_frames_done = (unsigned long)ma_pcm_converter_read(&channel->dsp, read_buffer, sub_frames_to_do);
+
+				float *read_buffer_pointer = read_buffer;
 
 				for (unsigned long i = 0; i < sub_frames_done; ++i)
 				{
@@ -311,14 +315,12 @@ void Mixer_MixSamples(float *output_buffer, unsigned long frames_to_do)
 
 						volume *= (fade_in_volume * fade_in_volume);
 
-						if (!--channel->fade_counter)
+						if (--channel->fade_counter == 0)
 							channel->fade_in_counter_max = 0;
 					}
 
-					float *frame = &output_buffer[(frames_done + i) * output_channel_count];
-
 					for (unsigned int j = 0; j < output_channel_count; ++j)
-						frame[j] += read_buffer[(i * output_channel_count) + j] * volume;
+						*output_buffer_pointer++ += *read_buffer_pointer++ * volume;
 				}
 
 				if (sub_frames_done < sub_frames_to_do)
