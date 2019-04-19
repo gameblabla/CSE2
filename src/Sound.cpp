@@ -156,12 +156,12 @@ void SOUNDBUFFER::Stop()
 	SDL_UnlockAudioDevice(audioDevice);
 }
 
-void SOUNDBUFFER::Mix(float (*buffer)[2], size_t samples)
+void SOUNDBUFFER::Mix(float *buffer, size_t frames)
 {
 	if (!playing) //This sound buffer isn't playing
 		return;
 
-	for (size_t sample = 0; sample < samples; sample++)
+	for (size_t i = 0; i < frames; ++i)
 	{
 		const double freqPosition = frequency / FREQUENCY; //This is added to position at the end
 		
@@ -177,8 +177,8 @@ void SOUNDBUFFER::Mix(float (*buffer)[2], size_t samples)
 		const float sampleConvert = (sampleA - 128.0f) / 128.0f;
 		
 		//Mix
-		buffer[sample][0] += (float)(sampleConvert * volume * volume_l);
-		buffer[sample][1] += (float)(sampleConvert * volume * volume_r);
+		*buffer++ += (float)(sampleConvert * volume * volume_l);
+		*buffer++ += (float)(sampleConvert * volume * volume_r);
 		
 		//Increment position
 		samplePosition += freqPosition;
@@ -202,26 +202,23 @@ void SOUNDBUFFER::Mix(float (*buffer)[2], size_t samples)
 }
 
 //Sound mixer
-void AudioCallback(void *userdata, uint8_t *stream, int len)
+void AudioCallback(void *userdata, Uint8 *stream, int len)
 {
 	(void)userdata;
 
-	float (*buffer)[2] = (float(*)[2])stream;
-	const size_t samples = len / (sizeof(float) * 2);
+	float *buffer = (float*)stream;
+	const size_t frames = len / (sizeof(float) * 2);
 
 	//Clear stream
-	for (size_t sample = 0; sample < samples; ++sample)
-	{
-		buffer[sample][0] = 0.0f;
-		buffer[sample][1] = 0.0f;
-	}
+	for (size_t i = 0; i < frames * 2; ++i)
+		buffer[i] = 0.0f;
 	
 	//Mix sounds to primary buffer
 	for (SOUNDBUFFER *sound = soundBuffers; sound != NULL; sound = sound->next)
-		sound->Mix(buffer, samples);
+		sound->Mix(buffer, frames);
 
 #ifdef EXTRA_MUSIC_FORMATS
-	OtherMusic_Mix((float*)buffer, samples);
+	OtherMusic_Mix((float*)buffer, frames);
 #endif
 }
 
@@ -285,22 +282,21 @@ void PlaySoundObject(int no, int mode)
 {
 	if (lpSECONDARYBUFFER[no])
 	{
-		if (mode == -1)
+		switch (mode)
 		{
-			lpSECONDARYBUFFER[no]->Play(true);
-		}
-		else if ( mode )
-		{
-			if ( mode == 1 )
-			{
+			case 0:
+				lpSECONDARYBUFFER[no]->Stop();
+				break;
+
+			case 1:
 				lpSECONDARYBUFFER[no]->Stop();
 				lpSECONDARYBUFFER[no]->SetCurrentPosition(0);
 				lpSECONDARYBUFFER[no]->Play(false);
-			}
-		}
-		else
-		{
-			lpSECONDARYBUFFER[no]->Stop();
+				break;
+
+			case -1:
+				lpSECONDARYBUFFER[no]->Play(true);
+				break;
 		}
 	}
 }
