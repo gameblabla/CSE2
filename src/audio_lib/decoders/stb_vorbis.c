@@ -39,7 +39,6 @@ typedef struct Decoder_STB_Vorbis
 {
 	DecoderData_STB_Vorbis *data;
 	stb_vorbis *instance;
-	unsigned int channel_count;
 } Decoder_STB_Vorbis;
 
 DecoderData_STB_Vorbis* Decoder_STB_Vorbis_LoadData(const char *file_path, bool loops, LinkedBackend *linked_backend)
@@ -86,7 +85,6 @@ Decoder_STB_Vorbis* Decoder_STB_Vorbis_Create(DecoderData_STB_Vorbis *data, Deco
 			const stb_vorbis_info vorbis_info = stb_vorbis_get_info(instance);
 
 			this->instance = instance;
-			this->channel_count = vorbis_info.channels;
 			this->data = data;
 
 			info->sample_rate = vorbis_info.sample_rate;
@@ -121,7 +119,7 @@ unsigned long Decoder_STB_Vorbis_GetSamples(Decoder_STB_Vorbis *this, void *buff
 
 	for (unsigned long frames_done; frames_done_total != frames_to_do; frames_done_total += frames_done)
 	{
-		frames_done = stb_vorbis_get_samples_float_interleaved(this->instance, this->channel_count, buffer + (frames_done_total * this->channel_count), (frames_to_do - frames_done_total) * this->channel_count);
+		frames_done = stb_vorbis_get_samples_float_interleaved(this->instance, this->instance->channels, buffer + (frames_done_total * this->instance->channels), (frames_to_do - frames_done_total) * this->instance->channels);
 
 		if (frames_done == 0)
 		{
