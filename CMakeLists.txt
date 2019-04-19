@@ -306,6 +306,9 @@ if (MSVC)
 	if (NOT STDINT_EXISTS)
 		target_include_directories(CSE2 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/msvc/msvc2003")
 	endif()
+
+	# Shut up those stupid warnings
+	target_compile_definitions(CSE2 PRIVATE _CRT_SECURE_NO_WARNINGS)
 else()
 	# Find dependencies
 	if (STATIC)
