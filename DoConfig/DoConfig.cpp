@@ -39,6 +39,8 @@ class RadioRow{
 		Fl_Group *label;
 };
 
+static data config = {MAGIC, FONT};
+
 static unsigned long CharsToLong(unsigned char *chars)
 {
 	return (chars[3] << 24) | (chars[2] << 16) | (chars[1] << 8) | chars[0];
@@ -107,7 +109,6 @@ void activatejoy(Fl_Widget*, void*){
 }
 void read_Config(){
 	std::fstream fd;
-	data config = {0};
 	fd.open("Config.dat", std::ios::in | std::ios::binary);
 	fd.read((char*)&config, sizeof(config));
 	fd.close();
@@ -140,11 +141,6 @@ void read_Config(){
 }
 
 void write_Config(Fl_Widget*, void*){
-	std::fstream fd;
-	data config = {0};
-	std::strcpy(config.magic, MAGIC);
-	std::strcpy(config.font, FONT);
-	
 	LongToChars(movegt->value(), config.move);
 	LongToChars(buttonzx->value(), config.attack);
 	LongToChars(okayattack->value(), config.okay);
@@ -154,6 +150,7 @@ void write_Config(Fl_Widget*, void*){
 	for(char i =0;i<8;i++){
 		LongToChars(joyRows[i]->value(), config.buttons[i]);
 	}
+	std::fstream fd;
 	fd.open("Config.dat", std::ios::out | std::ios::binary);
 	fd.write((char*)&config, sizeof(config));
 	fd.close();
