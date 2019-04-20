@@ -61,10 +61,6 @@ Visual Studio .NET 2003 was used by Pixel to create the original `Doukutsu.exe`,
 
 This option is **strictly** for checking the decompilation's accuracy; CMake should be preferred in all other situations.
 
-## Running
-
-In order to run Cave Story Engine 2, you have to get the "data" folder from a vanilla copy of Cave Story. Just copy and paste it into the same folder as the executable.
-
 ## Licensing
 
 Being a decompilation, the majority of the code in this project belongs to Daisuke "Pixel" Amaya - not us. We've yet to agree on a license for our own code.
