@@ -4,7 +4,6 @@ if ((${CMAKE_VERSION} VERSION_EQUAL 3.9) OR (${CMAKE_VERSION} VERSION_GREATER 3.
 	cmake_policy(SET CMP0069 NEW)
 endif()
 
-option(STATIC "Produce a statically-linked executable (good for Windows builds, so you don't need to bundle DLL files)" OFF)
 option(JAPANESE "Enable the Japanese-language build" OFF)
 option(FIX_BUGS "Fix certain bugs (see src/Bug Fixes.txt)" OFF)
 option(NONPORTABLE "Enable bits of code that aren't portable, but are what the original game used" OFF)
@@ -311,31 +310,28 @@ if (MSVC)
 
 	# Shut up those stupid warnings
 	target_compile_definitions(CSE2 PRIVATE _CRT_SECURE_NO_WARNINGS)
+elseif (MSYS)
+	# Fall back on pkg-config, since cmake's static support sucks
+	find_package(PkgConfig REQUIRED)
+
+	pkg_check_modules(SDL2 REQUIRED sdl2)
+	set(SDL2_INCLUDE_DIRS ${SDL2_STATIC_INCLUDE_DIRS})
+	set(SDL2_CFLAGS_OTHER ${SDL2_STATIC_CFLAGS_OTHER})
+	set(SDL2_LIBRARIES ${SDL2_STATIC_LIBRARIES})
+
+	pkg_check_modules(FREETYPE REQUIRED freetype2)
+	set(FREETYPE_INCLUDE_DIRS ${FREETYPE_STATIC_INCLUDE_DIRS})
+	set(FREETYPE_CFLAGS_OTHER ${FREETYPE_STATIC_CFLAGS_OTHER})
+	set(FREETYPE_LIBRARIES ${FREETYPE_STATIC_LIBRARIES})
+
+	target_link_libraries(CSE2 -static)
 else()
-	# Find dependencies
-	if (STATIC)
-		# Fall back on pkg-config, since cmake's static support sucks
-		find_package(PkgConfig REQUIRED)
+	# SDL2 has no standard way of being used by cmake, so avoid
+	# that mess entirely and just use pkg-config instead
+	find_package(PkgConfig REQUIRED)
+	pkg_check_modules(SDL2 REQUIRED sdl2)
 
-		pkg_check_modules(SDL2 REQUIRED sdl2)
-		set(SDL2_INCLUDE_DIRS ${SDL2_STATIC_INCLUDE_DIRS})
-		set(SDL2_CFLAGS_OTHER ${SDL2_STATIC_CFLAGS_OTHER})
-		set(SDL2_LIBRARIES ${SDL2_STATIC_LIBRARIES})
-
-		pkg_check_modules(FREETYPE REQUIRED freetype2)
-		set(FREETYPE_INCLUDE_DIRS ${FREETYPE_STATIC_INCLUDE_DIRS})
-		set(FREETYPE_CFLAGS_OTHER ${FREETYPE_STATIC_CFLAGS_OTHER})
-		set(FREETYPE_LIBRARIES ${FREETYPE_STATIC_LIBRARIES})
-
-		target_link_libraries(CSE2 -static)
-	else()
-		# SDL2 has no standard way of being used by cmake, so avoid
-		# that mess entirely and just use pkg-config instead
-		find_package(PkgConfig REQUIRED)
-		pkg_check_modules(SDL2 REQUIRED sdl2)
-
-		find_package(Freetype REQUIRED)
-	endif()
+	find_package(Freetype REQUIRED)
 endif()
 
 target_include_directories(CSE2 PRIVATE ${SDL2_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS})
