@@ -11,7 +11,9 @@ This branch adds several enhancements including:
 * 60FPS
 * Widescreen
 * Vastly-improved fullscreen
-* Removal of the feature that locks sprites to a 320x240 grid when drawn (can easily be [reenabled](src/Draw.cpp#L540) for stylistic purposes)
+* Removal of the design choice that locks sprites to a 320x240 grid when drawn (can easily be [re-enabled](src/Draw.cpp#L540) for stylistic purposes)
+* Bugfixes enabled by default
+* Support for Ogg Vorbis, FLAC, and Pxtone music formats
 
 ## Dependencies
 
@@ -34,7 +36,6 @@ cmake .. -DCMAKE_BUILD_TYPE=Release
 
 You can also add the following flags:
 * `-DJAPANESE=On` - Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
-* `-DFIX_BUGS=On` - Fix bugs in the game (see [src/Bug Fixes.txt](src/Bug%20Fixes.txt))
 
 Then compile CSE2 with this command:
 
@@ -57,18 +58,6 @@ Run 'make' in the base directory, preferably with some of the following settings
 * `WINDOWS=1` - Enable Windows-only features like a unique file/taskbar icon, and system font loading (needed for the font setting in Config.dat to do anything)
 * `RASPBERRY_PI=1` - Enable tweaks to improve performance on Raspberry Pis
 * `NONPORTABLE=1` - Enable bits of code that aren't portable, but are what the original game used
-
-### Visual Studio .NET 2003
-
-Project files for Visual Studio .NET 2003 are available in the 'msvc/msvc2003' directory.
-
-Visual Studio .NET 2003 was used by Pixel to create the original `Doukutsu.exe`, so these project files allow us to check the accuracy of the decompilation by comparing the generated assembly code to that of the original executable.
-
-This option is **strictly** for checking the decompilation's accuracy; CMake should be preferred in all other situations.
-
-## Running
-
-Because of the modifications made in this branch, a custom data folder is needed. These can be found in the 'res' folder: [one for Japanese builds](res/data_jp), [and one for English](res/data_en).
 
 ## Licensing
 
