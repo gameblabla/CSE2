@@ -14,18 +14,18 @@
 #include "FL/Fl_Choice.H"
 #include "FL/Fl_Check_Button.H"
 
-#define HEADER "DOUKUTSU20041206"
-#define TEXT "Courier New"
+#define MAGIC "DOUKUTSU20041206"
+#define FONT "Courier New"
 
 struct data{
-	char header[32];
-	char text[64];
-	int move;
-	int attack;
-	int okay;
-	int display;
-	int useJoy;
-	int buttons[8];
+	char magic[32];
+	char font[64];
+	unsigned char move[4];
+	unsigned char attack[4];
+	unsigned char okay[4];
+	unsigned char display[4];
+	unsigned char useJoy[4];
+	unsigned char buttons[8][4];
 };
 
 class RadioRow{
@@ -38,6 +38,19 @@ class RadioRow{
 		Fl_Radio_Round_Button *buttons[6];
 		Fl_Group *label;
 };
+
+static unsigned long CharsToLong(unsigned char *chars)
+{
+	return (chars[3] << 24) | (chars[2] << 16) | (chars[1] << 8) | chars[0];
+}
+
+static void LongToChars(unsigned long long_var, unsigned char *chars)
+{
+	chars[0] = long_var & 0xFF;
+	chars[1] = (long_var >> 8) & 0xFF;
+	chars[2] = (long_var >> 16) & 0xFF;
+	chars[3] = (long_var >> 24) & 0xFF;
+}
 
 RadioRow::RadioRow(char offset){
 	char *temp = new char[2];
@@ -94,61 +107,60 @@ void activatejoy(Fl_Widget*, void*){
 }
 void read_Config(){
 	std::fstream fd;
-	data config;
+	data config = {0};
 	fd.open("Config.dat", std::ios::in | std::ios::binary);
-	fd.read((char*)&config, 148);
-	if (config.move == 0){
+	fd.read((char*)&config, sizeof(config));
+	fd.close();
+	if (CharsToLong(config.move) == 0){
 		movear->setonly();
 	} else {
 		movegt->setonly();
 	}
-	if (config.attack == 0){
+	if (CharsToLong(config.attack) == 0){
 		buttonxz->setonly();
 	} else { 
 		buttonzx->setonly();
 	}
-	if (config.okay == 0){
+	if (CharsToLong(config.okay) == 0){
 		okayjump->setonly();
 	}else{
 		okayattack->setonly();
 	}
-	displaychoice->value(config.display);
-	joychoice->value(config.useJoy);
-	if( !config.useJoy ){
+	displaychoice->value(CharsToLong(config.display));
+	joychoice->value(CharsToLong(config.useJoy));
+	if( !CharsToLong(config.useJoy) ){
 		joystuffcontainer->deactivate();
 	}
 	for(char i=0;i<8;i++){
-		if(config.buttons[i]<9 && config.buttons[i]>0){
-			joyRows[i]->value(config.buttons[i] -1);
+		const unsigned long button = CharsToLong(config.buttons[i]);
+		if(button<9 && button>0){
+			joyRows[i]->value(button -1);
 		}
 	}
-	fd.close();
 }
 
 void write_Config(Fl_Widget*, void*){
 	std::fstream fd;
-	data config;
-	std::memset(config.header, '\0', 32);
-	std::memset(config.text, '\0', 64);
-	std::strcpy(config.header, HEADER);
-	std::strcpy(config.text, TEXT);
-	fd.open("Config.dat", std::ios::out | std::ios::binary);
+	data config = {0};
+	std::strcpy(config.magic, MAGIC);
+	std::strcpy(config.font, FONT);
 	
-	config.move = movegt->value();
-	config.attack = buttonzx->value();
-	config.okay = okayattack->value();
+	LongToChars(movegt->value(), config.move);
+	LongToChars(buttonzx->value(), config.attack);
+	LongToChars(okayattack->value(), config.okay);
 	
-	config.display = displaychoice->value();
-	config.useJoy = joychoice->value();
+	LongToChars(displaychoice->value(), config.display);
+	LongToChars(joychoice->value(), config.useJoy);
 	for(char i =0;i<8;i++){
-		config.buttons[i] = joyRows[i]->value();
+		LongToChars(joyRows[i]->value(), config.buttons[i]);
 	}
-	fd.write((char*)&config, 148);
+	fd.open("Config.dat", std::ios::out | std::ios::binary);
+	fd.write((char*)&config, sizeof(config));
 	fd.close();
 	exit(0);
 }
 int main(int argc, char* argv[]){
-	Fl_Window *mainw = new Fl_Window(400, 380, "DoConfigure - Doukutsu Monotagari Settings");
+	Fl_Window *mainw = new Fl_Window(400, 380, "DoConfig - Doukutsu Monogatari Settings");
 	
 	Fl_Group *movegroup = new Fl_Group(10, 10, 185, 50);
 		movegroup->box(FL_THIN_DOWN_BOX);
