@@ -2,6 +2,8 @@
 
 Cave Story Engine 2 is a decompilation of Cave Story, ported from DirectX to SDL2.
 
+![Screenshot](screenshot.png)
+
 This branch adds several enhancements including:
 * PNG support
 * Full alpha blending support
