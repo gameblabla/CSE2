@@ -360,3 +360,64 @@ if (MSVC)
 		COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/msvc/SDL2/lib/${SDL2_DLL_ARCH}/SDL2.dll" "${BUILD_DIRECTORY}/"
 	)
 endif()
+
+# Now for DoConfig
+
+add_executable(DoConfig "DoConfig/DoConfig.cpp" "DoConfig/icon.rc")
+
+set_target_properties(DoConfig PROPERTIES WIN32_EXECUTABLE YES)	# Disable the console window
+
+# Find FLTK
+if (MSVC)
+	# Use local copy
+	target_include_directories(DoConfig PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/msvc/fltk/include")
+
+	if (CMAKE_CL_64)
+		target_link_libraries(DoConfig "${CMAKE_CURRENT_SOURCE_DIR}/msvc/fltk/lib/x64/fltk.lib")
+	else()
+		target_link_libraries(DoConfig "${CMAKE_CURRENT_SOURCE_DIR}/msvc/fltk/lib/x86/fltk.lib")
+
+		# Since the x86 version was built with MSVC2003, we need to enable backwards compatibility on newer compilers
+		if ((MSVC_VERSION EQUAL 1900) OR (MSVC_VERSION GREATER 1900))
+			target_link_libraries(DoConfig "legacy_stdio_definitions.lib")
+		endif()
+	endif()
+
+	# Shut up those stupid warnings
+	target_compile_definitions(DoConfig PRIVATE _CRT_SECURE_NO_WARNINGS)
+elseif (MSYS)
+	target_link_libraries(DoConfig -static)
+
+	# Do crazy nonsense to link the static version
+	find_package(FLTK REQUIRED)
+	target_include_directories(DoConfig PRIVATE ${FLTK_INCLUDE_DIRS})
+
+	if (NOT FLTK_CONFIG_SCRIPT)
+		find_program(FLTK_CONFIG_SCRIPT fltk-config)
+	endif()
+
+	exec_program(bash ARGS ${FLTK_CONFIG_SCRIPT} --ldstaticflags OUTPUT_VARIABLE FLTK_LDSTATICFLAGS)
+	target_link_libraries(DoConfig ${FLTK_LDSTATICFLAGS})
+else()
+	find_package(FLTK REQUIRED)
+	target_include_directories(DoConfig PRIVATE ${FLTK_INCLUDE_DIRS})
+	target_link_libraries(DoConfig ${FLTK_LIBRARIES})
+endif()
+
+set_target_properties(DoConfig PROPERTIES
+	RUNTIME_OUTPUT_DIRECTORY_RELEASE ${BUILD_DIRECTORY}
+	RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${BUILD_DIRECTORY}
+	RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${BUILD_DIRECTORY}
+	RUNTIME_OUTPUT_DIRECTORY_DEBUG ${BUILD_DIRECTORY}
+)
+
+if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+	if ((${CMAKE_VERSION} VERSION_EQUAL 3.9) OR (${CMAKE_VERSION} VERSION_GREATER 3.9))
+		# Enable link-time optimisation if available
+		include(CheckIPOSupported)
+		check_ipo_supported(RESULT result)
+		if (result)
+			set_target_properties(DoConfig PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
+		endif()
+	endif()
+endif()
