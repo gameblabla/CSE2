@@ -1799,6 +1799,8 @@ FontObject* LoadFontFromData(const unsigned char *data, size_t data_size, unsign
 
 	FT_Set_Pixel_Sizes(font_object->face, best_pixel_width, best_pixel_height);
 
+	font_object->glyph_list_head = NULL;
+
 	return font_object;
 }
 
