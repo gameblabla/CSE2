@@ -11,8 +11,6 @@
 #include FT_LCD_FILTER_H
 #include FT_BITMAP_H
 
-#include "SDL.h"
-
 #include "File.h"
 
 // Uncomment for that authentic pre-Windows Vista feel
@@ -1765,7 +1763,7 @@ FontObject* LoadFont(const char *font_filename, unsigned int cell_width, unsigne
 	return font_object;
 }
 
-void DrawText(FontObject *font_object, SDL_Surface *surface, int x, int y, unsigned long colour, const char *string, size_t string_length)
+void DrawText(FontObject *font_object, unsigned char *bitmap_buffer, size_t bitmap_pitch, int bitmap_width, int bitmap_height, int x, int y, unsigned long colour, const char *string, size_t string_length)
 {
 	if (font_object != NULL)
 	{
@@ -1806,20 +1804,20 @@ void DrawText(FontObject *font_object, SDL_Surface *surface, int x, int y, unsig
 			switch (face->glyph->bitmap.pixel_mode)
 			{
 				case FT_PIXEL_MODE_LCD:
-					for (int iy = MAX(-letter_y, 0); letter_y + iy < MIN(letter_y + (int)converted.rows, surface->h); ++iy)
+					for (int iy = MAX(-letter_y, 0); letter_y + iy < MIN(letter_y + (int)converted.rows, bitmap_height); ++iy)
 					{
-						for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)converted.width / 3, surface->w); ++ix)
+						for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)converted.width / 3, bitmap_width); ++ix)
 						{
 							const unsigned char *font_pixel = converted.buffer + iy * converted.pitch + ix * 3;
 
 							if (font_pixel[0] || font_pixel[1] || font_pixel[2])
 							{
-								unsigned char *surface_pixel = (unsigned char*)surface->pixels + (letter_y + iy) * surface->pitch + (letter_x + ix) * 3;
+								unsigned char *bitmap_pixel = bitmap_buffer + (letter_y + iy) * bitmap_pitch + (letter_x + ix) * 3;
 
 								for (unsigned int j = 0; j < 3; ++j)
 								{
 									const double alpha = pow((font_pixel[j] / 255.0), 1.0 / 1.8);			// Gamma correction
-									surface_pixel[j] = (unsigned char)((colours[j] * alpha) + (surface_pixel[j] * (1.0 - alpha)));	// Alpha blending
+									bitmap_pixel[j] = (unsigned char)((colours[j] * alpha) + (bitmap_pixel[j] * (1.0 - alpha)));	// Alpha blending
 								}
 							}
 						}
@@ -1828,9 +1826,9 @@ void DrawText(FontObject *font_object, SDL_Surface *surface, int x, int y, unsig
 					break;
 
 				case FT_PIXEL_MODE_GRAY:
-					for (int iy = MAX(-letter_y, 0); letter_y + iy < MIN(letter_y + (int)converted.rows, surface->h); ++iy)
+					for (int iy = MAX(-letter_y, 0); letter_y + iy < MIN(letter_y + (int)converted.rows, bitmap_height); ++iy)
 					{
-						for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)converted.width, surface->w); ++ix)
+						for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)converted.width, bitmap_width); ++ix)
 						{
 							const unsigned char font_pixel = converted.buffer[iy * converted.pitch + ix];
 
@@ -1838,10 +1836,10 @@ void DrawText(FontObject *font_object, SDL_Surface *surface, int x, int y, unsig
 							{
 								const double alpha = pow((double)font_pixel / (converted.num_grays - 1), 1.0 / 1.8);			// Gamma-corrected
 
-								unsigned char *surface_pixel = (unsigned char*)surface->pixels + (letter_y + iy) * surface->pitch + (letter_x + ix) * 3;
+								unsigned char *bitmap_pixel = bitmap_buffer + (letter_y + iy) * bitmap_pitch + (letter_x + ix) * 3;
 
 								for (unsigned int j = 0; j < 3; ++j)
-									surface_pixel[j] = (unsigned char)((colours[j] * alpha) + (surface_pixel[j] * (1.0 - alpha)));	// Alpha blending
+									bitmap_pixel[j] = (unsigned char)((colours[j] * alpha) + (bitmap_pixel[j] * (1.0 - alpha)));	// Alpha blending
 							}
 						}
 					}
@@ -1849,16 +1847,16 @@ void DrawText(FontObject *font_object, SDL_Surface *surface, int x, int y, unsig
 					break;
 
 				case FT_PIXEL_MODE_MONO:
-					for (int iy = MAX(-letter_y, 0); letter_y + iy < MIN(letter_y + (int)converted.rows, surface->h); ++iy)
+					for (int iy = MAX(-letter_y, 0); letter_y + iy < MIN(letter_y + (int)converted.rows, bitmap_height); ++iy)
 					{
-						for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)converted.width, surface->w); ++ix)
+						for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)converted.width, bitmap_width); ++ix)
 						{
 							if (converted.buffer[iy * converted.pitch + ix])
 							{
-								unsigned char *surface_pixel = (unsigned char*)surface->pixels + (letter_y + iy) * surface->pitch + (letter_x + ix) * 3;
+								unsigned char *bitmap_pixel = bitmap_buffer + (letter_y + iy) * bitmap_pitch + (letter_x + ix) * 3;
 
 								for (unsigned int j = 0; j < 3; ++j)
-									surface_pixel[j] = colours[j];
+									bitmap_pixel[j] = colours[j];
 							}
 						}
 					}

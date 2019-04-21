@@ -15,9 +15,7 @@
 #undef RECT
 #endif
 
-#include <SDL_render.h>
-#include <SDL_rwops.h>
-#include <SDL_timer.h>
+#include "SDL.h"
 
 #include "WindowsWrapper.h"
 
@@ -612,7 +610,7 @@ void PutText(int x, int y, const char *text, uint32_t color)
 	SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormat(0, surface_width, surface_height, 0, SDL_PIXELFORMAT_RGB24);
 	SDL_RenderReadPixels(gRenderer, NULL, SDL_PIXELFORMAT_RGB24, surface->pixels, surface->pitch);
 
-	DrawText(gFont, surface, x * magnification, y * magnification, color, text, strlen(text));
+	DrawText(gFont, (unsigned char*)surface->pixels, surface->pitch, surface->w, surface->h, x * magnification, y * magnification, color, text, strlen(text));
 
 	SDL_Texture *screen_texture = SDL_CreateTextureFromSurface(gRenderer, surface);
 	SDL_FreeSurface(surface);
@@ -622,7 +620,7 @@ void PutText(int x, int y, const char *text, uint32_t color)
 
 void PutText2(int x, int y, const char *text, uint32_t color, Surface_Ids surf_no)
 {
-	DrawText(gFont, surf[surf_no].surface, x * magnification, y * magnification, color, text, strlen(text));
+	DrawText(gFont, (unsigned char*)surf[surf_no].surface->pixels, surf[surf_no].surface->pitch, surf[surf_no].surface->w, surf[surf_no].surface->h, x * magnification, y * magnification, color, text, strlen(text));
 	surf[surf_no].needs_updating = true;
 }
 
