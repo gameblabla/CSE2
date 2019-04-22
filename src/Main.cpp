@@ -219,7 +219,7 @@ int main(int argc, char *argv[])
 
 		//Load cursor
 		char path[PATH_LENGTH];
-		sprintf(path, "%s/CURSOR_NORMAL.png", gDataPath);
+		sprintf(path, "%s/Resource/CURSOR/CURSOR_NORMAL.png", gDataPath);
 		unsigned int bitmap_width, bitmap_height;
 		unsigned char *bitmap_pixels;
 		lodepng_decode32_file(&bitmap_pixels, &bitmap_width, &bitmap_height, path);
@@ -324,7 +324,7 @@ int main(int argc, char *argv[])
 #ifndef WINDOWS
 			//Load icon
 			char path[PATH_LENGTH];
-			sprintf(path, "%s/ICON_MINI.png", gDataPath);
+			sprintf(path, "%s/Resource/ICON/ICON_MINI.png", gDataPath);
 			unsigned int bitmap_width, bitmap_height;
 			unsigned char *bitmap_pixels;
 			lodepng_decode32_file(&bitmap_pixels, &bitmap_width, &bitmap_height, path);

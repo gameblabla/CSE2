@@ -264,7 +264,7 @@ int8_t wave_data[100][0x100];
 bool InitWaveData100()
 {
 	char path[PATH_LENGTH];
-	sprintf(path, "%s/WAVE100", gDataPath);
+	sprintf(path, "%s/Resource/WAVE/WAVE100", gDataPath);
 	FILE *fp = fopen(path, "rb");
 	if (fp == NULL)
 	{

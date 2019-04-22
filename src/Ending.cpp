@@ -132,9 +132,9 @@ void PutIllust()
 //Load illustration
 void ReloadIllust(int a)
 {
-	char name[16];
-	sprintf(name, "CREDIT%02d", a);
-	ReloadBitmap_File(name, SURFACE_ID_CREDITS_IMAGE);
+	char path[PATH_LENGTH];
+	sprintf(path, "Resource/BITMAP/CREDIT%02d", a);
+	ReloadBitmap_File(path, SURFACE_ID_CREDITS_IMAGE);
 }
 
 //Initialize and release credits

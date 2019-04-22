@@ -152,7 +152,7 @@ static const PIXTONEPARAMETER gPtpTable[139] =
 bool LoadGenericData()
 {
 	bool bError = false;
-	if (!MakeSurface_File("PIXEL", SURFACE_ID_PIXEL))
+	if (!MakeSurface_File("Resource/BITMAP/PIXEL", SURFACE_ID_PIXEL))
 		bError = true;
 	if (!MakeSurface_File("MyChar", SURFACE_ID_MY_CHAR))
 		bError = true;
@@ -180,7 +180,7 @@ bool LoadGenericData()
 		bError = true;
 	if (!MakeSurface_File("Fade", SURFACE_ID_FADE))
 		bError = true;
-	if (!MakeSurface_File("CREDIT01", SURFACE_ID_CREDITS_IMAGE))
+	if (!MakeSurface_File("Resource/BITMAP/CREDIT01", SURFACE_ID_CREDITS_IMAGE))
 		bError = true;
 	
 	if (bError)
