@@ -1,3 +1,5 @@
 #pragma once
 
-bool LoadGenericData();
+#include "WindowsWrapper.h"
+
+BOOL LoadGenericData();
