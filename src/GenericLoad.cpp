@@ -1,5 +1,9 @@
 #include "GenericLoad.h"
 
+#include <stdio.h>
+
+#include "WindowsWrapper.h"
+
 #include "CommonDefines.h"
 #include "Draw.h"
 #include "Ending.h"
@@ -149,43 +153,47 @@ static const PIXTONEPARAMETER gPtpTable[139] =
   {1, 1000, {0, 20.0, 0, 0}, {0, 0.0, 0, 0}, {0, 0.0, 0, 0}, 0, 64, 0, 128, 0, 255, 0}
 };
 
-bool LoadGenericData()
+BOOL LoadGenericData()
 {
+	char str[0x40];
+	BOOL bError;
+	int pt_size;
+
 	MakeSurface_Resource("PIXEL", SURFACE_ID_PIXEL);
 	
-	bool bError = false;
+	bError = FALSE;
 	if (!MakeSurface_File("MyChar", SURFACE_ID_MY_CHAR))
-		bError = true;
+		bError = TRUE;
 	if (!MakeSurface_File("Title", SURFACE_ID_TITLE))
-		bError = true;
+		bError = TRUE;
 	if (!MakeSurface_File("ArmsImage", SURFACE_ID_ARMS_IMAGE))
-		bError = true;
+		bError = TRUE;
 	if (!MakeSurface_File("Arms", SURFACE_ID_ARMS))
-		bError = true;
+		bError = TRUE;
 	if (!MakeSurface_File("ItemImage", SURFACE_ID_ITEM_IMAGE))
-		bError = true;
+		bError = TRUE;
 	if (!MakeSurface_File("StageImage", SURFACE_ID_STAGE_ITEM))
-		bError = true;
+		bError = TRUE;
 	if (!MakeSurface_File("Npc/NpcSym", SURFACE_ID_NPC_SYM))
-		bError = true;
+		bError = TRUE;
 	if (!MakeSurface_File("Npc/NpcRegu", SURFACE_ID_NPC_REGU))
-		bError = true;
+		bError = TRUE;
 	if (!MakeSurface_File("TextBox", SURFACE_ID_TEXT_BOX))
-		bError = true;
+		bError = TRUE;
 	if (!MakeSurface_File("Caret", SURFACE_ID_CARET))
-		bError = true;
+		bError = TRUE;
 	if (!MakeSurface_File("Bullet", SURFACE_ID_BULLET))
-		bError = true;
+		bError = TRUE;
 	if (!MakeSurface_File("Face", SURFACE_ID_FACE))
-		bError = true;
+		bError = TRUE;
 	if (!MakeSurface_File("Fade", SURFACE_ID_FADE))
-		bError = true;
+		bError = TRUE;
 	
 	MakeSurface_Resource("CREDIT01", SURFACE_ID_CREDITS_IMAGE);
 	
 	if (bError)
 	{
-		return false;
+		return FALSE;
 	}
 	else
 	{
@@ -200,94 +208,96 @@ bool LoadGenericData()
 		MakeSurface_Generic(320, 240, SURFACE_ID_LEVEL_SPRITESET_2);
 		MakeSurface_Generic(WINDOW_WIDTH, 16 * MAX_STRIP, SURFACE_ID_CREDIT_CAST);
 
-		size_t pixtone_bytes = MakePixToneObject(&gPtpTable[0], 2, 32);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[2], 2, 33);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[4], 2, 34);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[6], 1, 15);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[7], 1, 24);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[8], 1, 23);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[9], 2, 50);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[11], 2, 51);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[33], 1, 1);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[38], 1, 2);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[56], 1, 29);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[61], 1, 43);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[62], 3, 44);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[65], 1, 45);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[66], 1, 46);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[68], 1, 47);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[49], 3, 35);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[52], 3, 39);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[13], 2, 52);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[28], 2, 53);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[15], 2, 70);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[17], 2, 71);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[19], 2, 72);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[30], 1, 5);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[32], 1, 11);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[35], 1, 4);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[46], 2, 25);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[48], 1, 27);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[54], 2, 28);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[39], 1, 14);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[23], 2, 16);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[25], 3, 17);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[34], 1, 18);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[36], 2, 20);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[31], 1, 22);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[41], 2, 26);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[43], 1, 21);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[44], 2, 12);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[57], 2, 38);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[59], 1, 31);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[60], 1, 42);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[69], 1, 48);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[70], 2, 49);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[72], 1, 100);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[73], 3, 101);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[76], 2, 54);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[78], 2, 102);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[80], 2, 103);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[81], 1, 104);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[82], 1, 105);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[83], 2, 106);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[85], 1, 107);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[86], 1, 30);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[87], 1, 108);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[88], 1, 109);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[89], 1, 110);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[90], 1, 111);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[91], 1, 112);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[92], 1, 113);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[93], 2, 114);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[95], 2, 150);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[97], 2, 151);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[99], 1, 152);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[100], 1, 153);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[101], 2, 154);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[111], 2, 155);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[103], 2, 56);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[105], 2, 40);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[105], 2, 41);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[107], 2, 37);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[109], 2, 57);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[113], 3, 115);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[116], 1, 104);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[117], 3, 116);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[120], 2, 58);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[122], 2, 55);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[124], 2, 117);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[126], 1, 59);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[127], 1, 60);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[128], 1, 61);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[129], 2, 62);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[131], 2, 63);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[133], 2, 64);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[135], 1, 65);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[136], 1, 3);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[137], 1, 6);
-		pixtone_bytes += MakePixToneObject(&gPtpTable[138], 1, 7);
-//		sprintf(&v1, "PixTone = %d byte", pixtone_bytes);
-		return true;
+		pt_size = 0;
+		pt_size += MakePixToneObject(&gPtpTable[0], 2, 32);
+		pt_size += MakePixToneObject(&gPtpTable[2], 2, 33);
+		pt_size += MakePixToneObject(&gPtpTable[4], 2, 34);
+		pt_size += MakePixToneObject(&gPtpTable[6], 1, 15);
+		pt_size += MakePixToneObject(&gPtpTable[7], 1, 24);
+		pt_size += MakePixToneObject(&gPtpTable[8], 1, 23);
+		pt_size += MakePixToneObject(&gPtpTable[9], 2, 50);
+		pt_size += MakePixToneObject(&gPtpTable[11], 2, 51);
+		pt_size += MakePixToneObject(&gPtpTable[33], 1, 1);
+		pt_size += MakePixToneObject(&gPtpTable[38], 1, 2);
+		pt_size += MakePixToneObject(&gPtpTable[56], 1, 29);
+		pt_size += MakePixToneObject(&gPtpTable[61], 1, 43);
+		pt_size += MakePixToneObject(&gPtpTable[62], 3, 44);
+		pt_size += MakePixToneObject(&gPtpTable[65], 1, 45);
+		pt_size += MakePixToneObject(&gPtpTable[66], 1, 46);
+		pt_size += MakePixToneObject(&gPtpTable[68], 1, 47);
+		pt_size += MakePixToneObject(&gPtpTable[49], 3, 35);
+		pt_size += MakePixToneObject(&gPtpTable[52], 3, 39);
+		pt_size += MakePixToneObject(&gPtpTable[13], 2, 52);
+		pt_size += MakePixToneObject(&gPtpTable[28], 2, 53);
+		pt_size += MakePixToneObject(&gPtpTable[15], 2, 70);
+		pt_size += MakePixToneObject(&gPtpTable[17], 2, 71);
+		pt_size += MakePixToneObject(&gPtpTable[19], 2, 72);
+		pt_size += MakePixToneObject(&gPtpTable[30], 1, 5);
+		pt_size += MakePixToneObject(&gPtpTable[32], 1, 11);
+		pt_size += MakePixToneObject(&gPtpTable[35], 1, 4);
+		pt_size += MakePixToneObject(&gPtpTable[46], 2, 25);
+		pt_size += MakePixToneObject(&gPtpTable[48], 1, 27);
+		pt_size += MakePixToneObject(&gPtpTable[54], 2, 28);
+		pt_size += MakePixToneObject(&gPtpTable[39], 1, 14);
+		pt_size += MakePixToneObject(&gPtpTable[23], 2, 16);
+		pt_size += MakePixToneObject(&gPtpTable[25], 3, 17);
+		pt_size += MakePixToneObject(&gPtpTable[34], 1, 18);
+		pt_size += MakePixToneObject(&gPtpTable[36], 2, 20);
+		pt_size += MakePixToneObject(&gPtpTable[31], 1, 22);
+		pt_size += MakePixToneObject(&gPtpTable[41], 2, 26);
+		pt_size += MakePixToneObject(&gPtpTable[43], 1, 21);
+		pt_size += MakePixToneObject(&gPtpTable[44], 2, 12);
+		pt_size += MakePixToneObject(&gPtpTable[57], 2, 38);
+		pt_size += MakePixToneObject(&gPtpTable[59], 1, 31);
+		pt_size += MakePixToneObject(&gPtpTable[60], 1, 42);
+		pt_size += MakePixToneObject(&gPtpTable[69], 1, 48);
+		pt_size += MakePixToneObject(&gPtpTable[70], 2, 49);
+		pt_size += MakePixToneObject(&gPtpTable[72], 1, 100);
+		pt_size += MakePixToneObject(&gPtpTable[73], 3, 101);
+		pt_size += MakePixToneObject(&gPtpTable[76], 2, 54);
+		pt_size += MakePixToneObject(&gPtpTable[78], 2, 102);
+		pt_size += MakePixToneObject(&gPtpTable[80], 2, 103);
+		pt_size += MakePixToneObject(&gPtpTable[81], 1, 104);
+		pt_size += MakePixToneObject(&gPtpTable[82], 1, 105);
+		pt_size += MakePixToneObject(&gPtpTable[83], 2, 106);
+		pt_size += MakePixToneObject(&gPtpTable[85], 1, 107);
+		pt_size += MakePixToneObject(&gPtpTable[86], 1, 30);
+		pt_size += MakePixToneObject(&gPtpTable[87], 1, 108);
+		pt_size += MakePixToneObject(&gPtpTable[88], 1, 109);
+		pt_size += MakePixToneObject(&gPtpTable[89], 1, 110);
+		pt_size += MakePixToneObject(&gPtpTable[90], 1, 111);
+		pt_size += MakePixToneObject(&gPtpTable[91], 1, 112);
+		pt_size += MakePixToneObject(&gPtpTable[92], 1, 113);
+		pt_size += MakePixToneObject(&gPtpTable[93], 2, 114);
+		pt_size += MakePixToneObject(&gPtpTable[95], 2, 150);
+		pt_size += MakePixToneObject(&gPtpTable[97], 2, 151);
+		pt_size += MakePixToneObject(&gPtpTable[99], 1, 152);
+		pt_size += MakePixToneObject(&gPtpTable[100], 1, 153);
+		pt_size += MakePixToneObject(&gPtpTable[101], 2, 154);
+		pt_size += MakePixToneObject(&gPtpTable[111], 2, 155);
+		pt_size += MakePixToneObject(&gPtpTable[103], 2, 56);
+		pt_size += MakePixToneObject(&gPtpTable[105], 2, 40);
+		pt_size += MakePixToneObject(&gPtpTable[105], 2, 41);
+		pt_size += MakePixToneObject(&gPtpTable[107], 2, 37);
+		pt_size += MakePixToneObject(&gPtpTable[109], 2, 57);
+		pt_size += MakePixToneObject(&gPtpTable[113], 3, 115);
+		pt_size += MakePixToneObject(&gPtpTable[116], 1, 104);
+		pt_size += MakePixToneObject(&gPtpTable[117], 3, 116);
+		pt_size += MakePixToneObject(&gPtpTable[120], 2, 58);
+		pt_size += MakePixToneObject(&gPtpTable[122], 2, 55);
+		pt_size += MakePixToneObject(&gPtpTable[124], 2, 117);
+		pt_size += MakePixToneObject(&gPtpTable[126], 1, 59);
+		pt_size += MakePixToneObject(&gPtpTable[127], 1, 60);
+		pt_size += MakePixToneObject(&gPtpTable[128], 1, 61);
+		pt_size += MakePixToneObject(&gPtpTable[129], 2, 62);
+		pt_size += MakePixToneObject(&gPtpTable[131], 2, 63);
+		pt_size += MakePixToneObject(&gPtpTable[133], 2, 64);
+		pt_size += MakePixToneObject(&gPtpTable[135], 1, 65);
+		pt_size += MakePixToneObject(&gPtpTable[136], 1, 3);
+		pt_size += MakePixToneObject(&gPtpTable[137], 1, 6);
+		pt_size += MakePixToneObject(&gPtpTable[138], 1, 7);
+		sprintf(str, "PixTone = %d byte", pt_size);
+		// There must have been some kind of console print function here or something
+		return TRUE;
 	}
 }

@@ -304,7 +304,7 @@ void ChangeSoundPan(int no, int32_t pan)
 		lpSECONDARYBUFFER[no]->SetPan(10 * (pan - 256));
 }
 
-size_t MakePixToneObject(const PIXTONEPARAMETER *ptp, int ptp_num, int no)
+int MakePixToneObject(const PIXTONEPARAMETER *ptp, int ptp_num, int no)
 {
 	int sample_count = 0;
 	for (int i = 0; i < ptp_num; ++i)
