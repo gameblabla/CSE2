@@ -1287,7 +1287,7 @@ void ActNpc068(NPCHAR *npc)
 		npc->rect = rect_right[npc->ani_no];
 }
 
-//Sparkle
+//Pignon
 void ActNpc069(NPCHAR *npc)
 {
 	RECT rcLeft[6] = {
