@@ -129,8 +129,15 @@ Decoder_Split* Decoder_Split_Create(DecoderData_Split *data, bool loop, DecoderI
 	{
 		void *subdecoders[2];
 
-		for (unsigned int i = 0; i < (data->is_split ? 2 : 1); ++i)
-			subdecoders[i] = data->backend->Create(data->subdecoder_data[i], loop, info);
+		if (data->is_split)
+		{
+			subdecoders[0] = data->backend->Create(data->subdecoder_data[0], false, info);
+			subdecoders[1] = data->backend->Create(data->subdecoder_data[1], loop, info);
+		}
+		else
+		{
+			subdecoders[0] = data->backend->Create(data->subdecoder_data[0], loop, info);
+		}
 
 		if (subdecoders[0] && (!data->is_split || subdecoders[1]))
 		{
