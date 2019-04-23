@@ -1244,8 +1244,7 @@ int TextScriptProc()
 
 						//MessageBoxA(0, str_0, "ƒGƒ‰[", 0);
 
-						gTS.p_read += 4;
-						return 1;
+						return 0;
 					}
 				}
 				else
