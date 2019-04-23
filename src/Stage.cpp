@@ -364,7 +364,9 @@ void ReCallMusic()
 	{
 		case MUSIC_TYPE_ORGANYA:
 			//Load .org that was playing before
-			LoadOrganya(gMusicTable[gOldNo].path);
+			char path[PATH_LENGTH];
+			sprintf(path, "%s/%s", gDataPath, gMusicTable[gOldNo].path);
+			LoadOrganya(path);
 			
 			//Reset position, volume, and then play the song
 			SetOrganyaPosition(gOldPos);
