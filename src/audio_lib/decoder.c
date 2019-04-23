@@ -49,9 +49,9 @@
 
 #define BACKEND_FUNCTIONS(name) \
 { \
-	(void*(*)(const char*,bool,LinkedBackend*))Decoder_##name##_LoadData, \
+	(void*(*)(const char*,LinkedBackend*))Decoder_##name##_LoadData, \
 	(void(*)(void*))Decoder_##name##_UnloadData, \
-	(void*(*)(void*,DecoderInfo*))Decoder_##name##_Create, \
+	(void*(*)(void*,bool,DecoderInfo*))Decoder_##name##_Create, \
 	(void(*)(void*))Decoder_##name##_Destroy, \
 	(void(*)(void*))Decoder_##name##_Rewind, \
 	(unsigned long(*)(void*,void*,unsigned long))Decoder_##name##_GetSamples \
@@ -111,7 +111,7 @@ static const struct
 #endif
 };
 
-static void* TryOpen(const DecoderBackend *backend, LinkedBackend **out_linked_backend, const char *file_path, bool loop, bool predecode, bool split)
+static void* TryOpen(const DecoderBackend *backend, LinkedBackend **out_linked_backend, const char *file_path, bool predecode, bool split)
 {
 	LinkedBackend *last_backend;
 	LinkedBackend *linked_backend = malloc(sizeof(LinkedBackend));
@@ -138,7 +138,7 @@ static void* TryOpen(const DecoderBackend *backend, LinkedBackend **out_linked_b
 		linked_backend->backend = &backend;
 	}
 
-	void *backend_object = linked_backend->backend->LoadData(file_path, loop, linked_backend->next);
+	void *backend_object = linked_backend->backend->LoadData(file_path, linked_backend->next);
 
 	if (backend_object == NULL)
 	{
@@ -156,7 +156,7 @@ static void* TryOpen(const DecoderBackend *backend, LinkedBackend **out_linked_b
 	return backend_object;
 }
 
-DecoderData* Decoder_LoadData(const char *file_path, bool loop, bool predecode)
+DecoderData* Decoder_LoadData(const char *file_path, bool predecode)
 {
 	void *backend_data = NULL;
 	for (unsigned int i = 0; i < sizeof(backends) / sizeof(backends[0]); ++i)
@@ -171,7 +171,7 @@ DecoderData* Decoder_LoadData(const char *file_path, bool loop, bool predecode)
 				free(extension);
 
 				LinkedBackend *linked_backend = NULL;
-				backend_data = TryOpen(&backends[i].decoder, &linked_backend, file_path, loop, predecode && backends[i].can_be_predecoded, backends[i].can_be_split);
+				backend_data = TryOpen(&backends[i].decoder, &linked_backend, file_path, predecode && backends[i].can_be_predecoded, backends[i].can_be_split);
 
 				DecoderData *this = NULL;
 
@@ -208,13 +208,13 @@ void Decoder_UnloadData(DecoderData *data)
 	}
 }
 
-Decoder* Decoder_Create(DecoderData *data, DecoderInfo *info)
+Decoder* Decoder_Create(DecoderData *data, bool loop, DecoderInfo *info)
 {
 	Decoder *decoder = NULL;
 
 	if (data && data->backend_data)
 	{
-		void *backend_object = data->linked_backend->backend->Create(data->backend_data, info);
+		void *backend_object = data->linked_backend->backend->Create(data->backend_data, loop, info);
 
 		if (backend_object)
 		{

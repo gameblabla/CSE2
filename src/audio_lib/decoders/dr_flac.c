@@ -27,16 +27,16 @@ typedef struct DecoderData_DR_FLAC
 {
 	unsigned char *file_buffer;
 	size_t file_size;
-	bool loops;
 } DecoderData_DR_FLAC;
 
 typedef struct Decoder_DR_FLAC
 {
 	DecoderData_DR_FLAC *data;
 	drflac *instance;
+	bool loops;
 } Decoder_DR_FLAC;
 
-DecoderData_DR_FLAC* Decoder_DR_FLAC_LoadData(const char *file_path, bool loops, LinkedBackend *linked_backend)
+DecoderData_DR_FLAC* Decoder_DR_FLAC_LoadData(const char *file_path, LinkedBackend *linked_backend)
 {
 	(void)linked_backend;
 
@@ -50,7 +50,6 @@ DecoderData_DR_FLAC* Decoder_DR_FLAC_LoadData(const char *file_path, bool loops,
 		data = malloc(sizeof(DecoderData_DR_FLAC));
 		data->file_buffer = file_buffer;
 		data->file_size = file_size;
-		data->loops = loops;
 	}
 
 	return data;
@@ -65,7 +64,7 @@ void Decoder_DR_FLAC_UnloadData(DecoderData_DR_FLAC *data)
 	}
 }
 
-Decoder_DR_FLAC* Decoder_DR_FLAC_Create(DecoderData_DR_FLAC *data, DecoderInfo *info)
+Decoder_DR_FLAC* Decoder_DR_FLAC_Create(DecoderData_DR_FLAC *data, bool loops, DecoderInfo *info)
 {
 	Decoder_DR_FLAC *this = NULL;
 
@@ -79,6 +78,7 @@ Decoder_DR_FLAC* Decoder_DR_FLAC_Create(DecoderData_DR_FLAC *data, DecoderInfo *
 
 			this->instance = instance;
 			this->data = data;
+			this->loops = loops;
 
 			info->sample_rate = instance->sampleRate;
 			info->channel_count = instance->channels;
@@ -116,7 +116,7 @@ unsigned long Decoder_DR_FLAC_GetSamples(Decoder_DR_FLAC *this, void *buffer_voi
 
 		if (frames_done < frames_to_do - frames_done_total)
 		{
-			if (this->data->loops)
+			if (this->loops)
 				Decoder_DR_FLAC_Rewind(this);
 			else
 				break;

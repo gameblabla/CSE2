@@ -32,16 +32,16 @@ typedef struct DecoderData_STB_Vorbis
 {
 	unsigned char *file_buffer;
 	size_t file_size;
-	bool loops;
 } DecoderData_STB_Vorbis;
 
 typedef struct Decoder_STB_Vorbis
 {
 	DecoderData_STB_Vorbis *data;
 	stb_vorbis *instance;
+	bool loops;
 } Decoder_STB_Vorbis;
 
-DecoderData_STB_Vorbis* Decoder_STB_Vorbis_LoadData(const char *file_path, bool loops, LinkedBackend *linked_backend)
+DecoderData_STB_Vorbis* Decoder_STB_Vorbis_LoadData(const char *file_path, LinkedBackend *linked_backend)
 {
 	(void)linked_backend;
 
@@ -55,7 +55,6 @@ DecoderData_STB_Vorbis* Decoder_STB_Vorbis_LoadData(const char *file_path, bool 
 		data = malloc(sizeof(DecoderData_STB_Vorbis));
 		data->file_buffer = file_buffer;
 		data->file_size = file_size;
-		data->loops = loops;
 	}
 
 	return data;
@@ -70,7 +69,7 @@ void Decoder_STB_Vorbis_UnloadData(DecoderData_STB_Vorbis *data)
 	}
 }
 
-Decoder_STB_Vorbis* Decoder_STB_Vorbis_Create(DecoderData_STB_Vorbis *data, DecoderInfo *info)
+Decoder_STB_Vorbis* Decoder_STB_Vorbis_Create(DecoderData_STB_Vorbis *data, bool loops, DecoderInfo *info)
 {
 	Decoder_STB_Vorbis *this = NULL;
 
@@ -86,6 +85,7 @@ Decoder_STB_Vorbis* Decoder_STB_Vorbis_Create(DecoderData_STB_Vorbis *data, Deco
 
 			this->instance = instance;
 			this->data = data;
+			this->loops = loops;
 
 			info->sample_rate = vorbis_info.sample_rate;
 			info->channel_count = vorbis_info.channels;
@@ -123,7 +123,7 @@ unsigned long Decoder_STB_Vorbis_GetSamples(Decoder_STB_Vorbis *this, void *buff
 
 		if (frames_done == 0)
 		{
-			if (this->data->loops)
+			if (this->loops)
 				Decoder_STB_Vorbis_Rewind(this);
 			else
 				break;

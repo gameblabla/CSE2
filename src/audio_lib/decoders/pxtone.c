@@ -19,22 +19,21 @@
 typedef struct DecoderData_Pxtone
 {
 	const char *file_path;
-	bool loop;
 } DecoderData_Pxtone;
 
 typedef struct Decoder_Pxtone
 {
 	DecoderData_Pxtone *data;
 	pxtnService *pxtn;
+	bool loop;
 } Decoder_Pxtone;
 
-DecoderData_Pxtone* Decoder_Pxtone_LoadData(const char *file_path, bool loop, LinkedBackend *linked_backend)
+DecoderData_Pxtone* Decoder_Pxtone_LoadData(const char *file_path, LinkedBackend *linked_backend)
 {
 	(void)linked_backend;
 
 	DecoderData_Pxtone *data = malloc(sizeof(DecoderData_Pxtone));
 	data->file_path = file_path;
-	data->loop = loop;
 
 	return data;
 }
@@ -45,16 +44,17 @@ void Decoder_Pxtone_UnloadData(DecoderData_Pxtone *data)
 		free(data);
 }
 
-Decoder_Pxtone* Decoder_Pxtone_Create(DecoderData_Pxtone *data, DecoderInfo *info)
+Decoder_Pxtone* Decoder_Pxtone_Create(DecoderData_Pxtone *data, bool loop, DecoderInfo *info)
 {
 	Decoder_Pxtone *decoder = NULL;
 
-	pxtnService *pxtn = Pxtone_Open(data->file_path, data->loop, SAMPLE_RATE, CHANNEL_COUNT);
+	pxtnService *pxtn = Pxtone_Open(data->file_path, loop, SAMPLE_RATE, CHANNEL_COUNT);
 	if (pxtn)
 	{
 		decoder = malloc(sizeof(Decoder_Pxtone));
 		decoder->pxtn = pxtn;
 		decoder->data = data;
+		decoder->loop = loop;
 
 		info->sample_rate = SAMPLE_RATE;
 		info->channel_count = CHANNEL_COUNT;
@@ -75,7 +75,7 @@ void Decoder_Pxtone_Destroy(Decoder_Pxtone *decoder)
 
 void Decoder_Pxtone_Rewind(Decoder_Pxtone *decoder)
 {
-	Pxtone_Rewind(decoder->pxtn, decoder->data->loop);
+	Pxtone_Rewind(decoder->pxtn, decoder->loop);
 }
 
 unsigned long Decoder_Pxtone_GetSamples(Decoder_Pxtone *decoder, void *buffer, unsigned long frames_to_do)

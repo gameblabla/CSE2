@@ -26,8 +26,8 @@
 #include "MyChar.h"
 #include "MycParam.h"
 #include "NpChar.h"
-#ifdef EXTRA_MUSIC_FORMATS
-#include "OtherMusicFormats.h"
+#ifdef EXTRA_SOUND_FORMATS
+#include "ExtraSoundFormats.h"
 #endif
 #include "Organya.h"
 #include "Profile.h"
@@ -996,8 +996,8 @@ int TextScriptProc()
 					{
 						SetOrganyaFadeout();
 
-						#ifdef EXTRA_MUSIC_FORMATS
-						OtherMusic_FadeOut();
+						#ifdef EXTRA_SOUND_FORMATS
+						ExtraSound_FadeOutMusic();
 						#endif
 
 						gTS.p_read += 4;

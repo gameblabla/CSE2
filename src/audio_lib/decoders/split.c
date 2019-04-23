@@ -33,7 +33,7 @@ typedef struct Decoder_Split
 	unsigned int size_of_frame;
 } Decoder_Split;
 
-static int LoadFiles(const char *file_path, bool loop, LinkedBackend *linked_backend, void *subdecoder_data[2])
+static int LoadFiles(const char *file_path, LinkedBackend *linked_backend, void *subdecoder_data[2])
 {
 	int result;
 
@@ -42,11 +42,11 @@ static int LoadFiles(const char *file_path, bool loop, LinkedBackend *linked_bac
 
 	// Look for split-file music (Cave Story 3D)
 	char* const intro_file_path = DecoderUtil_sprintfMalloc("%s_intro%s", file_path_no_extension, file_extension);
-	subdecoder_data[0] = linked_backend->backend->LoadData(intro_file_path, false, linked_backend->next);
+	subdecoder_data[0] = linked_backend->backend->LoadData(intro_file_path, linked_backend->next);
 	free(intro_file_path);
 
 	char* const loop_file_path = DecoderUtil_sprintfMalloc("%s_loop%s", file_path_no_extension, file_extension);
-	subdecoder_data[1] = linked_backend->backend->LoadData(loop_file_path, loop, linked_backend->next);
+	subdecoder_data[1] = linked_backend->backend->LoadData(loop_file_path, linked_backend->next);
 	free(loop_file_path);
 
 	if (subdecoder_data[0] == NULL || subdecoder_data[1] == NULL)
@@ -57,7 +57,7 @@ static int LoadFiles(const char *file_path, bool loop, LinkedBackend *linked_bac
 		{
 			// Look for single-file music (Cave Story WiiWare)
 			char* const single_file_path = DecoderUtil_sprintfMalloc("%s%s", file_path_no_extension, file_extension);
-			subdecoder_data[0] = linked_backend->backend->LoadData(single_file_path, loop, linked_backend->next);
+			subdecoder_data[0] = linked_backend->backend->LoadData(single_file_path, linked_backend->next);
 			free(single_file_path);
 
 			if (subdecoder_data[0] == NULL)
@@ -89,12 +89,12 @@ static int LoadFiles(const char *file_path, bool loop, LinkedBackend *linked_bac
 	return result;
 }
 
-DecoderData_Split* Decoder_Split_LoadData(const char *path, bool loop, LinkedBackend *linked_backend)
+DecoderData_Split* Decoder_Split_LoadData(const char *path, LinkedBackend *linked_backend)
 {
 	DecoderData_Split *data = NULL;
 
 	void *subdecoder_data[2];
-	const int split_format = LoadFiles(path, loop, linked_backend, subdecoder_data);
+	const int split_format = LoadFiles(path, linked_backend, subdecoder_data);
 
 	if (split_format != -1)
 	{
@@ -121,7 +121,7 @@ void Decoder_Split_UnloadData(DecoderData_Split *data)
 	}
 }
 
-Decoder_Split* Decoder_Split_Create(DecoderData_Split *data, DecoderInfo *info)
+Decoder_Split* Decoder_Split_Create(DecoderData_Split *data, bool loop, DecoderInfo *info)
 {
 	Decoder_Split *decoder = NULL;
 
@@ -130,7 +130,7 @@ Decoder_Split* Decoder_Split_Create(DecoderData_Split *data, DecoderInfo *info)
 		void *subdecoders[2];
 
 		for (unsigned int i = 0; i < (data->is_split ? 2 : 1); ++i)
-			subdecoders[i] = data->backend->Create(data->subdecoder_data[i], info);
+			subdecoders[i] = data->backend->Create(data->subdecoder_data[i], loop, info);
 
 		if (subdecoders[0] && (!data->is_split || subdecoders[1]))
 		{

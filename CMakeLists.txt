@@ -7,7 +7,7 @@ endif()
 option(JAPANESE "Enable the Japanese-language build" OFF)
 option(FIX_BUGS "Fix certain bugs (see src/Bug Fixes.txt)" ON)
 option(NONPORTABLE "Enable bits of code that aren't portable, but are what the original game used" OFF)
-option(EXTRA_MUSIC_FORMATS "Enable support for more music formats, including Ogg Vorbis, FLAC, and Pxtone (not to be confused with Pixtone)" ON)
+option(EXTRA_SOUND_FORMATS "Enable support for more music/SFX formats, including Ogg Vorbis, FLAC, and Pxtone (not to be confused with Pixtone)" ON)
 
 # Default to Release build
 if(NOT CMAKE_BUILD_TYPE)
@@ -198,10 +198,10 @@ if(NONPORTABLE)
 	target_compile_definitions(CSE2 PRIVATE NONPORTABLE)
 endif()
 
-if (EXTRA_MUSIC_FORMATS)
+if (EXTRA_SOUND_FORMATS)
 	target_sources(CSE2 PRIVATE
-		src/OtherMusicFormats.cpp
-		src/OtherMusicFormats.h
+		src/ExtraSoundFormats.cpp
+		src/ExtraSoundFormats.h
 		src/audio_lib/decoder.c
 		src/audio_lib/decoder.h
 		src/audio_lib/miniaudio.c
@@ -270,7 +270,7 @@ if (EXTRA_MUSIC_FORMATS)
 		src/audio_lib/decoders/libs/pxtone/shim.h
 	)
 
-	target_compile_definitions(CSE2 PRIVATE EXTRA_MUSIC_FORMATS USE_STB_VORBIS USE_DR_FLAC USE_PXTONE)
+	target_compile_definitions(CSE2 PRIVATE EXTRA_SOUND_FORMATS USE_STB_VORBIS USE_DR_FLAC USE_PXTONE)
 endif()
 
 # Make some tweaks if we're targetting Windows

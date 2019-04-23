@@ -39,7 +39,7 @@ cmake .. -DCMAKE_BUILD_TYPE=Release
 You can also add the following flags:
 * `-DJAPANESE=On` - Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
 * `-DFIX_BUGS=On` - Enabled by default - Fix bugs in the game (see [src/Bug Fixes.txt](src/Bug%20Fixes.txt))
-* `-DEXTRA_MUSIC_FORAMTS=On` - Enabled by default - Add support for the Ogg Vorbis, FLAC, and Pxtone music formats
+* `-DEXTRA_SOUND_FORMATS=On` - Enabled by default - Add support for the Ogg Vorbis, FLAC, and Pxtone music/SFX formats
 
 Then compile CSE2 with this command:
 
@@ -62,7 +62,7 @@ Run 'make' in the base directory, preferably with some of the following settings
 * `WINDOWS=1` - Enable Windows-only features like a unique file/taskbar icon, and system font loading (needed for the font setting in Config.dat to do anything)
 * `RASPBERRY_PI=1` - Enable tweaks to improve performance on Raspberry Pis
 * `NONPORTABLE=1` - Enable bits of code that aren't portable, but are what the original game used
-* `EXTRA_MUSIC_FORAMTS=1` - Enabled by default - Add support for the Ogg Vorbis, FLAC, and Pxtone music formats
+* `EXTRA_SOUND_FORMATS=1` - Enabled by default - Add support for the Ogg Vorbis, FLAC, and Pxtone music/SFX formats
 
 ## Licensing
 

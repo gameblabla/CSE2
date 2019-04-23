@@ -1,6 +1,6 @@
 # Defaults
 FIX_BUGS ?= 1
-EXTRA_MUSIC_FORMATS ?= 1
+EXTRA_SOUND_FORMATS ?= 1
 
 ifeq ($(RELEASE), 1)
 	CXXFLAGS = -O3 -flto
@@ -133,9 +133,9 @@ SOURCES = \
 	Triangle \
 	ValueView
 
-ifeq ($(EXTRA_MUSIC_FORMATS), 1)
+ifeq ($(EXTRA_SOUND_FORMATS), 1)
 SOURCES += \
-	OtherMusicFormats \
+	ExtraSoundFormats \
 	audio_lib/decoders/libs/pxtone/pxtnDelay \
 	audio_lib/decoders/libs/pxtone/pxtnDescriptor \
 	audio_lib/decoders/libs/pxtone/pxtnError \
@@ -169,7 +169,7 @@ SOURCES += \
 	audio_lib/miniaudio \
 	audio_lib/mixer
 
-DEFINES += -DEXTRA_MUSIC_FORMATS -DUSE_STB_VORBIS -DUSE_DR_FLAC -DUSE_PXTONE
+DEFINES += -DEXTRA_SOUND_FORMATS -DUSE_STB_VORBIS -DUSE_DR_FLAC -DUSE_PXTONE
 endif
 
 RESOURCES =

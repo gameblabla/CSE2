@@ -113,9 +113,9 @@ void Mixer_Deinit(void)
 	MutexDeinit(&mixer_mutex);
 }
 
-Mixer_Sound* Mixer_LoadSound(const char *file_path, bool loop, bool predecode)
+Mixer_Sound* Mixer_LoadSound(const char *file_path, bool predecode)
 {
-	return (Mixer_Sound*)Decoder_LoadData(file_path, loop, predecode);
+	return (Mixer_Sound*)Decoder_LoadData(file_path, predecode);
 }
 
 void Mixer_UnloadSound(Mixer_Sound *sound)
@@ -123,14 +123,14 @@ void Mixer_UnloadSound(Mixer_Sound *sound)
 	Decoder_UnloadData((DecoderData*)sound);
 }
 
-Mixer_SoundInstanceID Mixer_PlaySound(Mixer_Sound *sound)
+Mixer_SoundInstanceID Mixer_PlaySound(Mixer_Sound *sound, bool loop)
 {
 	static Mixer_SoundInstanceID instance_allocator;
 
 	Mixer_SoundInstanceID instance = 0;
 
 	DecoderInfo info;
-	Decoder *decoder = Decoder_Create((DecoderData*)sound, &info);
+	Decoder *decoder = Decoder_Create((DecoderData*)sound, loop, &info);
 
 	if (decoder)
 	{

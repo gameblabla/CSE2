@@ -8,8 +8,8 @@
 #include <SDL.h>
 
 #include "Organya.h"
-#ifdef EXTRA_MUSIC_FORMATS
-#include "OtherMusicFormats.h"
+#ifdef EXTRA_SOUND_FORMATS
+#include "ExtraSoundFormats.h"
 #endif
 #include "PixTone.h"
 
@@ -217,8 +217,8 @@ void AudioCallback(void *userdata, Uint8 *stream, int len)
 	for (SOUNDBUFFER *sound = soundBuffers; sound != NULL; sound = sound->next)
 		sound->Mix(buffer, frames);
 
-#ifdef EXTRA_MUSIC_FORMATS
-	OtherMusic_Mix((float*)buffer, frames);
+#ifdef EXTRA_SOUND_FORMATS
+	ExtraSound_Mix((float*)buffer, frames);
 #endif
 }
 
@@ -227,8 +227,8 @@ SOUNDBUFFER* lpSECONDARYBUFFER[SOUND_NO];
 
 bool InitDirectSound()
 {
-#ifdef EXTRA_MUSIC_FORMATS
-	OtherMusic_Init(FREQUENCY);
+#ifdef EXTRA_SOUND_FORMATS
+	ExtraSound_Init(FREQUENCY);
 #endif
 
 	//Init sound
@@ -272,8 +272,8 @@ void EndDirectSound()
 	//End organya
 	EndOrganya();
 
-#ifdef EXTRA_MUSIC_FORMATS
-	OtherMusic_Deinit();
+#ifdef EXTRA_SOUND_FORMATS
+	ExtraSound_Deinit();
 #endif
 }
 
@@ -299,6 +299,12 @@ void PlaySoundObject(int no, int mode)
 				break;
 		}
 	}
+#ifdef EXTRA_SOUND_FORMATS
+	else
+	{
+		ExtraSound_PlaySFX(no, mode);
+	}
+#endif
 }
 
 void ChangeSoundFrequency(int no, uint32_t rate)
