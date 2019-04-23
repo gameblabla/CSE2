@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "SDL.h"
+
 #include "WindowsWrapper.h"
 
 #include "ArmsItem.h"
@@ -675,7 +677,13 @@ int TextScriptProc()
 						y = GetTextScriptNo(gTS.p_read + 19);
 						if (!TransferStage(z, w, x, y))
 						{
-						//	MessageBoxA(hWnd, "ﾃ｢Xﾃ｢eﾃｼ[ﾃ｢Wﾃｩﾂｦﾃｴﾃεｩﾂｦﾃｬﾃ療ｩﾂｦﾃｩ+ﾃ�ﾂｩﾃｶs", "ﾃ｢Gﾃ｢ﾃｫﾃｼ[", 0);
+							#ifdef JAPANESE
+							SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", "ステージの読み込みに失敗", NULL);
+							#else
+							SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Failed to load stage", NULL);
+							#endif
+
+							//MessageBoxA(hWnd, "ステージの読み込みに失敗", "エラー", 0);
 							return 0;
 						}
 					}
@@ -1216,7 +1224,18 @@ int TextScriptProc()
 					}
 					else
 					{
-						printf("Unimplemented command: <%c%c%c\n", (char)gTS.data[gTS.p_read + 1], (char)gTS.data[gTS.p_read + 2], (char)gTS.data[gTS.p_read + 3]);
+						char str_0[0x40];
+
+						#ifdef JAPANESE
+						sprintf(str_0, "不明のコード:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);
+						SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", str_0, NULL);
+						#else
+						sprintf(str_0, "Unknown code:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);
+						SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", str_0, NULL);
+						#endif
+
+						//MessageBoxA(0, str_0, "エラー", 0);
+
 						gTS.p_read += 4;
 						return 1;
 					}
