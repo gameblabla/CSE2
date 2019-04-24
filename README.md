@@ -21,7 +21,7 @@ Cave Story Engine 2 is based off of the *original freeware release* by Studio Pi
 
 This project primarily uses CMake, allowing it to be built with a range of compilers.
 
-In this directory, create a directory called 'build', then switch to the command-line (Visual Studio users should open the Developer Command Prompt) and `cd` into it. After that, generate the files for your build system with:
+In this directory, create a directory called 'build', then switch to the command-line (Visual Studio users should open the [Developer Command Prompt](https://docs.microsoft.com/en-us/dotnet/framework/tools/developer-command-prompt-for-vs)) and `cd` into it. After that, generate the files for your build system with:
 
 ```
 cmake .. -DCMAKE_BUILD_TYPE=Release
