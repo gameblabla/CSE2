@@ -411,7 +411,7 @@ elseif(MSYS)
 	target_link_libraries(DoConfig ${FLTK_LDSTATICFLAGS})
 else()
 	find_package(FLTK REQUIRED)
-	target_include_directories(DoConfig PRIVATE ${FLTK_INCLUDE_DIRS})
+	target_include_directories(DoConfig PRIVATE ${FLTK_INCLUDE_DIR})
 	target_link_libraries(DoConfig ${FLTK_LIBRARIES})
 endif()
 
