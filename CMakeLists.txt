@@ -328,19 +328,21 @@ elseif(MSYS)
 	pkg_check_modules(FREETYPE REQUIRED freetype2)
 
 	target_include_directories(CSE2 PRIVATE ${SDL2_STATIC_INCLUDE_DIRS} ${FREETYPE_STATIC_INCLUDE_DIRS})
-	target_compile_options(CSE2 PRIVATE ${SDL2_STATIC_CFLAGS_OTHER} ${FREETYPE_STATIC_CFLAGS_OTHER})
 	target_link_libraries(CSE2 ${SDL2_STATIC_LIBRARIES} ${FREETYPE_STATIC_LIBRARIES})
 else()
-	# SDL2 has no standard way of being used by cmake, so avoid
-	# that mess entirely and just use pkg-config instead
-	find_package(PkgConfig REQUIRED)
-	pkg_check_modules(SDL2 REQUIRED sdl2)
+	find_package(SDL2 REQUIRED)
+	if(TARGET SDL2::SDL2)
+		# CMake-generated config (Arch, vcpkg, Raspbian)
+		target_link_libraries(CSE2 SDL2::SDL2 SDL2::SDL2main)
+	else()
+		# Autotools-generated config (MSYS2)
+		target_include_directories(CSE2 PRIVATE ${SDL2_INCLUDE_DIRS})
+		target_link_libraries(CSE2 ${SDL2_LIBRARIES})
+	endif()
 
 	find_package(Freetype REQUIRED)
-
-	target_include_directories(CSE2 PRIVATE ${SDL2_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS})
-	target_compile_options(CSE2 PRIVATE ${SDL2_CFLAGS_OTHER} ${FREETYPE_CFLAGS_OTHER})
-	target_link_libraries(CSE2 ${SDL2_LIBRARIES} ${FREETYPE_LIBRARIES})
+	target_include_directories(CSE2 PRIVATE ${FREETYPE_INCLUDE_DIRS})
+	target_link_libraries(CSE2 ${FREETYPE_LIBRARIES})
 endif()
 
 # Send executable to the build_en/build_jp directory
