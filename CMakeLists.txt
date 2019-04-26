@@ -15,17 +15,6 @@ endif()
 
 project(CSE2 LANGUAGES C CXX)
 
-if(MSVC)
-	# Static-link the CRT, so we don't need to lug around 10 different DLLs
-	foreach(FLAG_VAR
-			CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
-			CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
-		if(${FLAG_VAR} MATCHES "/MD")
-			string(REGEX REPLACE "/MD" "/MT" ${FLAG_VAR} "${${FLAG_VAR}}")
-		endif()
-	endforeach()
-endif()
-
 ##
 # CSE2
 ##
@@ -365,9 +354,16 @@ if(FLTK_FOUND)
 	target_link_libraries(DoConfig ${FLTK_LIBRARIES})
 else()
 	# Compile it ourselves
-	message(STATUS "Using system FLTK")
+	message(STATUS "Using local FLTK")
+	# Clear this or it will cause an error during FLTK's configuration.
+	# FLTK only appends to it, so the leftover junk gets fed into a bunch
+	# of important functions. THAT was no fun to debug.
+	set(FLTK_LIBRARIES)
 	set(OPTION_BUILD_EXAMPLES OFF)	# Needed to prevent a name collision
 	add_subdirectory(external/fltk EXCLUDE_FROM_ALL)
+	get_target_property(DIRS fltk INCLUDE_DIRECTORIES)	# FLTK doesn't mark its includes as PUBLIC or INTERFACE, so we have to do this stupidity
+	message(STATUS "DIRS is ${DIRS}")
+	target_include_directories(DoConfig PRIVATE ${DIRS})
 	target_link_libraries(DoConfig fltk)
 endif()
 
