@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 #include <stdint.h>
+#include <stdio.h>
 #include <string>
 
 #include <SDL.h>

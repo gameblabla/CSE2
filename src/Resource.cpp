@@ -1,7 +1,8 @@
 #include "Resource.h"
 
 #include <stdint.h>
-#include <string>
+#include <stdio.h>
+#include <string.h>
 
 #include <SDL_rwops.h>
 
