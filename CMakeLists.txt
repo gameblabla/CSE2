@@ -362,7 +362,6 @@ else()
 	set(OPTION_BUILD_EXAMPLES OFF)	# Needed to prevent a name collision
 	add_subdirectory(external/fltk EXCLUDE_FROM_ALL)
 	get_target_property(DIRS fltk INCLUDE_DIRECTORIES)	# FLTK doesn't mark its includes as PUBLIC or INTERFACE, so we have to do this stupidity
-	message(STATUS "DIRS is ${DIRS}")
 	target_include_directories(DoConfig PRIVATE ${DIRS})
 	target_link_libraries(DoConfig fltk)
 endif()
