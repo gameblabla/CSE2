@@ -30,16 +30,18 @@ This branch adds several enhancements including:
 
 This project primarily uses CMake, allowing it to be built with a range of compilers.
 
-In this directory, create a directory called 'build', then switch to the command-line (Visual Studio users should open the Developer Command Prompt) and `cd` into it. After that, generate the files for your build system with:
+In this directory, create a directory called 'build', then switch to the command-line (Visual Studio users should open the [Developer Command Prompt](https://docs.microsoft.com/en-us/dotnet/framework/tools/developer-command-prompt-for-vs)) and `cd` into it. After that, generate the files for your build system with:
 
 ```
 cmake .. -DCMAKE_BUILD_TYPE=Release
 ```
 
 You can also add the following flags:
-* `-DJAPANESE=On` - Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
-* `-DFIX_BUGS=On` - Enabled by default - Fix bugs in the game (see [src/Bug Fixes.txt](src/Bug%20Fixes.txt))
-* `-DEXTRA_SOUND_FORMATS=On` - Enabled by default - Add support for the Ogg Vorbis, FLAC, and Pxtone music/SFX formats
+* `-DJAPANESE=ON` - Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
+* `-DFIX_BUGS=ON` - Enabled by default - Fix bugs in the game (see [src/Bug Fixes.txt](src/Bug%20Fixes.txt))
+* `-DNONPORTABLE=ON` - Enable bits of code that aren't portable, but are what the original game used
+* `-DFORCE_LOCAL_LIBS=ON` - Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones
+* `-DEXTRA_SOUND_FORMATS=ON` - Enabled by default - Add support for the Ogg Vorbis, FLAC, and Pxtone music/SFX formats
 
 Then compile CSE2 with this command:
 

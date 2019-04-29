@@ -7,6 +7,7 @@ endif()
 option(JAPANESE "Enable the Japanese-language build" OFF)
 option(FIX_BUGS "Fix certain bugs (see src/Bug Fixes.txt)" ON)
 option(NONPORTABLE "Enable bits of code that aren't portable, but are what the original game used" OFF)
+option(FORCE_LOCAL_LIBS "Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones" OFF)
 option(EXTRA_SOUND_FORMATS "Enable support for more music/SFX formats, including Ogg Vorbis, FLAC, and Pxtone (not to be confused with Pixtone)" ON)
 
 # Default to Release build
@@ -15,27 +16,6 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 project(CSE2 LANGUAGES C CXX)
-
-# Force strict C99
-set(CMAKE_C_STANDARD 99)
-set(CMAKE_C_STANDARD_REQUIRED ON)
-set(CMAKE_C_EXTENSIONS OFF)
-
-# Force strict C++11
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
-if(MSVC)
-	# Static-link the CRT, so we don't need to lug around 10 different DLLs
-	foreach(FLAG_VAR
-			CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
-			CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
-		if(${FLAG_VAR} MATCHES "/MD")
-			string(REGEX REPLACE "/MD" "/MT" ${FLAG_VAR} "${${FLAG_VAR}}")
-		endif()
-	endforeach()
-endif()
 
 ##
 # CSE2
@@ -282,15 +262,7 @@ endif()
 
 # Make some tweaks if we're using MSVC
 if(MSVC)
-	# Work around MSVC2003's lack of stdint.h
-	include(CheckIncludeFiles)
-	check_include_files(stdint.h STDINT_EXISTS)
-	if(NOT STDINT_EXISTS)
-		target_include_directories(CSE2 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/msvc/msvc2003")
-	endif()
-
-	# Shut up those stupid warnings
-	target_compile_definitions(CSE2 PRIVATE _CRT_SECURE_NO_WARNINGS)
+	target_compile_definitions(CSE2 PRIVATE _CRT_SECURE_NO_WARNINGS)	# Shut up those stupid warnings
 endif()
 
 # Magic to convert resources to header files
@@ -311,6 +283,16 @@ foreach(FILENAME IN LISTS RESOURCES)
 	target_sources(CSE2 PRIVATE "${OUT_DIR}/${FILENAME}.h")
 endforeach()
 
+# Force strict C90
+#set_property(TARGET CSE2 PROPERTY C_STANDARD 90)
+#set_property(TARGET CSE2 PROPERTY C_STANDARD_REQUIRED ON)
+#set_property(TARGET CSE2 PROPERTY C_EXTENSIONS OFF)
+
+# Force strict C++98
+#set_property(TARGET CSE2 PROPERTY CXX_STANDARD 98)
+#set_property(TARGET CSE2 PROPERTY CXX_STANDARD_REQUIRED ON)
+#set_property(TARGET CSE2 PROPERTY CXX_EXTENSIONS OFF)
+
 # Enable link-time optimisation if available
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
 	if((${CMAKE_VERSION} VERSION_EQUAL 3.9) OR (${CMAKE_VERSION} VERSION_GREATER 3.9))
@@ -323,38 +305,41 @@ if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 
 # Find dependencies
-if(MSVC)
-	# In MSVC we just use our own provided copy of SDL2 and FreeType
-	target_include_directories(CSE2 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/msvc/SDL2/include" "${CMAKE_CURRENT_SOURCE_DIR}/msvc/freetype/include")
 
-	if(CMAKE_CL_64)
-		target_link_libraries(CSE2 "${CMAKE_CURRENT_SOURCE_DIR}/msvc/SDL2/lib/x64/SDL2.lib" "${CMAKE_CURRENT_SOURCE_DIR}/msvc/SDL2/lib/x64/SDL2main.lib" "${CMAKE_CURRENT_SOURCE_DIR}/msvc/freetype/win64/freetype.lib")
-	else()
-		target_link_libraries(CSE2 "${CMAKE_CURRENT_SOURCE_DIR}/msvc/SDL2/lib/x86/SDL2.lib" "${CMAKE_CURRENT_SOURCE_DIR}/msvc/SDL2/lib/x86/SDL2main.lib" "${CMAKE_CURRENT_SOURCE_DIR}/msvc/freetype/win32/freetype.lib")
-	endif()
-elseif(MSYS)
-	target_link_libraries(CSE2 -static)
-
-	# Fall back on pkg-config, since cmake's static support sucks
-	find_package(PkgConfig REQUIRED)
-
-	pkg_check_modules(SDL2 REQUIRED sdl2)
-	pkg_check_modules(FREETYPE REQUIRED freetype2)
-
-	target_include_directories(CSE2 PRIVATE ${SDL2_STATIC_INCLUDE_DIRS} ${FREETYPE_STATIC_INCLUDE_DIRS})
-	target_compile_options(CSE2 PRIVATE ${SDL2_STATIC_CFLAGS_OTHER} ${FREETYPE_STATIC_CFLAGS_OTHER})
-	target_link_libraries(CSE2 ${SDL2_STATIC_LIBRARIES} ${FREETYPE_STATIC_LIBRARIES})
+find_package(SDL2)
+if(TARGET SDL2::SDL2 AND NOT FORCE_LOCAL_LIBS)
+	# CMake-generated config (Arch, vcpkg, Raspbian)
+	message(STATUS "Using system SDL2")
+	target_link_libraries(CSE2 SDL2::SDL2 SDL2::SDL2main)
+elseif(SDL2_FOUND AND NOT FORCE_LOCAL_LIBS)
+	# Autotools-generated config (MSYS2)
+	message(STATUS "Using system SDL2")
+	target_include_directories(CSE2 PRIVATE ${SDL2_INCLUDE_DIRS})
+	target_link_libraries(CSE2 ${SDL2_LIBRARIES})
 else()
-	# SDL2 has no standard way of being used by cmake, so avoid
-	# that mess entirely and just use pkg-config instead
-	find_package(PkgConfig REQUIRED)
-	pkg_check_modules(SDL2 REQUIRED sdl2)
+	# Compile it ourselves
+	message(STATUS "Using local SDL2")
+	set(SDL_SHARED_ENABLED_BY_DEFAULT OFF)
+	add_subdirectory(external/SDL2 EXCLUDE_FROM_ALL)
+	target_link_libraries(CSE2 SDL2-static SDL2main)
+endif()
 
-	find_package(Freetype REQUIRED)
-
-	target_include_directories(CSE2 PRIVATE ${SDL2_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS})
-	target_compile_options(CSE2 PRIVATE ${SDL2_CFLAGS_OTHER} ${FREETYPE_CFLAGS_OTHER})
-	target_link_libraries(CSE2 ${SDL2_LIBRARIES} ${FREETYPE_LIBRARIES})
+find_package(Freetype)
+if(FREETYPE_FOUND AND NOT FORCE_LOCAL_LIBS)
+	message(STATUS "Using system FreeType")
+	target_include_directories(CSE2 PRIVATE ${FREETYPE_INCLUDE_DIRS})
+	target_link_libraries(CSE2 ${FREETYPE_LIBRARIES})
+else()
+	# Compile it ourselves
+	message(STATUS "Using local FreeType")
+	if(FORCE_LOCAL_LIBS)
+		set(CMAKE_DISABLE_FIND_PACKAGE_HarfBuzz ON)
+		set(CMAKE_DISABLE_FIND_PACKAGE_ZLIB ON)
+		set(CMAKE_DISABLE_FIND_PACKAGE_PNG ON)
+		set(CMAKE_DISABLE_FIND_PACKAGE_BZip2 ON)
+	endif()
+	add_subdirectory(external/freetype EXCLUDE_FROM_ALL)
+	target_link_libraries(CSE2 freetype)
 endif()
 
 # Send executable to the build_en/build_jp directory
@@ -365,19 +350,6 @@ set_target_properties(CSE2 PROPERTIES
 	RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${BUILD_DIRECTORY}
 	RUNTIME_OUTPUT_DIRECTORY_DEBUG ${BUILD_DIRECTORY}
 )
-
-# Also send across SDL2.dll if using MSVC
-if(MSVC)
-	if(CMAKE_CL_64)
-		set(SDL2_DLL_ARCH "x64")
-	else()
-		set(SDL2_DLL_ARCH "x86")
-	endif()
-
-	add_custom_command(TARGET CSE2 POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/msvc/SDL2/lib/${SDL2_DLL_ARCH}/SDL2.dll" "${BUILD_DIRECTORY}/"
-	)
-endif()
 
 ##
 # DoConfig
@@ -396,37 +368,28 @@ if(MSVC)
 endif()
 
 # Find FLTK
-if(MSVC)
-	# Use local copy
-	target_include_directories(DoConfig PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/msvc/fltk/include")
-
-	if(CMAKE_CL_64)
-		target_link_libraries(DoConfig "${CMAKE_CURRENT_SOURCE_DIR}/msvc/fltk/lib/x64/fltk.lib")
-	else()
-		target_link_libraries(DoConfig "${CMAKE_CURRENT_SOURCE_DIR}/msvc/fltk/lib/x86/fltk.lib")
-
-		# Since the x86 version was built with MSVC2003, we need to enable backwards compatibility on newer compilers
-		if((MSVC_VERSION EQUAL 1900) OR (MSVC_VERSION GREATER 1900))
-			target_link_libraries(DoConfig "legacy_stdio_definitions.lib")
-		endif()
-	endif()
-elseif(MSYS)
-	target_link_libraries(DoConfig -static)
-
-	# Do crazy nonsense to link the static version
-	find_package(FLTK REQUIRED)
-	target_include_directories(DoConfig PRIVATE ${FLTK_INCLUDE_DIRS})
-
-	if(NOT FLTK_CONFIG_SCRIPT)
-		find_program(FLTK_CONFIG_SCRIPT fltk-config)
-	endif()
-
-	exec_program(bash ARGS ${FLTK_CONFIG_SCRIPT} --ldstaticflags OUTPUT_VARIABLE FLTK_LDSTATICFLAGS)
-	target_link_libraries(DoConfig ${FLTK_LDSTATICFLAGS})
-else()
-	find_package(FLTK REQUIRED)
-	target_include_directories(DoConfig PRIVATE ${FLTK_INCLUDE_DIRS})
+find_package(FLTK)
+if(FLTK_FOUND AND NOT FORCE_LOCAL_LIBS)
+	message(STATUS "Using system FLTK")
+	target_include_directories(DoConfig PRIVATE ${FLTK_INCLUDE_DIR})
 	target_link_libraries(DoConfig ${FLTK_LIBRARIES})
+else()
+	# Compile it ourselves
+	message(STATUS "Using local FLTK")
+	# Clear this or it will cause an error during FLTK's configuration.
+	# FLTK only appends to it, so the leftover junk gets fed into a bunch
+	# of important functions. THAT was no fun to debug.
+	set(FLTK_LIBRARIES)
+	set(OPTION_BUILD_EXAMPLES OFF)	# Needed to prevent a name collision
+	if(FORCE_LOCAL_LIBS)
+		set(OPTION_USE_SYSTEM_ZLIB OFF)
+		set(OPTION_USE_SYSTEM_LIBJPEG OFF)
+		set(OPTION_USE_SYSTEM_LIBPNG OFF)
+	endif()
+	add_subdirectory(external/fltk EXCLUDE_FROM_ALL)
+	get_target_property(DIRS fltk INCLUDE_DIRECTORIES)	# FLTK doesn't mark its includes as PUBLIC or INTERFACE, so we have to do this stupidity
+	target_include_directories(DoConfig PRIVATE ${DIRS})
+	target_link_libraries(DoConfig fltk)
 endif()
 
 # Send executable to the build_en/build_jp directory

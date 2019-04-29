@@ -1304,11 +1304,11 @@ int TextScriptProc()
 						if (c[0] & 0x80)
 						{
 							c[1] = gTS.data[gTS.p_read + 1];
-							c[2] = 0;
+							c[2] = '\0';
 						}
 						else
 						{
-							c[1] = 0;
+							c[1] = '\0';
 						}
 
 						//Print text
