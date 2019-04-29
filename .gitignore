@@ -9,7 +9,8 @@ build.7z
 build.zip
 
 # Executables
-*.exe
+build_en/*.exe
+build_jp/*.exe
 
 # MSVC trash
 msvc/msvc2003/CSE2.ncb
