@@ -1,18 +1,19 @@
-# Prerequisites
-*.d
-
 # Misc
 /obj
-*.dat
-*.rec
+build_en/*.dat
+build_en/*.rec
+build_jp/*.dat
+build_jp/*.rec
 build.7z
 build.zip
 msvc2003/devilution/orig.asm
 msvc2003/devilution/compare.asm
 
-# Executables
+# Build output
 build_en/*.exe
+build_en/*.exe.manifest
 build_jp/*.exe
+build_jp/*.exe.manifest
 
 # MSVC trash
 msvc2003/CSE2.ncb
@@ -21,4 +22,3 @@ msvc2003/Debug
 msvc2003/Release
 msvc2003/Debug (Japanese)
 msvc2003/Release (Japanese)
-*.aps
