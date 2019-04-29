@@ -57,7 +57,7 @@ Run 'make' in the base directory, preferably with some of the following settings
 
 ### Visual Studio .NET 2003
 
-Project files for Visual Studio .NET 2003 are available in the 'msvc/msvc2003' directory.
+Project files for Visual Studio .NET 2003 are available in the 'msvc2003' directory.
 
 Visual Studio .NET 2003 was used by Pixel to create the original `Doukutsu.exe`, so these project files allow us to check the accuracy of the decompilation by comparing the generated assembly code to that of the original executable.
 
