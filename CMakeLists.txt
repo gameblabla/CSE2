@@ -7,7 +7,7 @@ endif()
 option(JAPANESE "Enable the Japanese-language build" OFF)
 option(FIX_BUGS "Fix certain bugs (see src/Bug Fixes.txt)" OFF)
 option(NONPORTABLE "Enable bits of code that aren't portable, but are what the original game used" OFF)
-option(FORCE_LOCAL_LIBS "Ignore system libraries, and compile the statically-linked local copies instead" OFF)
+option(FORCE_LOCAL_LIBS "Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones" OFF)
 
 # Default to Release build
 if(NOT CMAKE_BUILD_TYPE)

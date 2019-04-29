@@ -28,8 +28,10 @@ cmake .. -DCMAKE_BUILD_TYPE=Release
 ```
 
 You can also add the following flags:
-* `-DJAPANESE=On` - Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
-* `-DFIX_BUGS=On` - Fix bugs in the game (see [src/Bug Fixes.txt](src/Bug%20Fixes.txt))
+* `-DJAPANESE=ON` - Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
+* `-DFIX_BUGS=ON` - Fix bugs in the game (see [src/Bug Fixes.txt](src/Bug%20Fixes.txt))
+* `-DNONPORTABLE=ON` - Enable bits of code that aren't portable, but are what the original game used
+* `-DFORCE_LOCAL_LIBS=ON` - Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones
 
 Then compile CSE2 with this command:
 
