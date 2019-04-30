@@ -14,7 +14,7 @@ typedef struct MemoryFile
 {
 	unsigned char *data;
 	size_t size;
-	long current_offset;
+	size_t current_offset;
 	bool free_buffer;
 } MemoryFile;
 
@@ -79,7 +79,7 @@ int MemoryFile_fclose(MemoryFile *file)
 
 size_t MemoryFile_fread(void *output, size_t size, size_t count, MemoryFile *file)
 {
-	const unsigned int elements_remaining = (file->size - file->current_offset) / size;
+	const size_t elements_remaining = (file->size - file->current_offset) / size;
 
 	if (count > elements_remaining)
 		count = elements_remaining;
@@ -121,5 +121,5 @@ int MemoryFile_fseek(MemoryFile *file, long offset, int origin)
 
 long MemoryFile_ftell(MemoryFile *file)
 {
-	return file->current_offset;
+	return (long)file->current_offset;	// BAD, C standard! BAD!
 }

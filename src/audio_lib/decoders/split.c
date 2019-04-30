@@ -114,7 +114,7 @@ void Decoder_Split_UnloadData(DecoderData_Split *data)
 {
 	if (data)
 	{
-		for (unsigned int i = 0; i < (data->is_split ? 2 : 1); ++i)
+		for (int i = 0; i < (data->is_split ? 2 : 1); ++i)
 			data->backend->UnloadData(data->subdecoder_data[i]);
 
 		free(data);
@@ -159,7 +159,7 @@ void Decoder_Split_Destroy(Decoder_Split *decoder)
 {
 	if (decoder)
 	{
-		for (unsigned int i = 0; i < (decoder->data->is_split ? 2 : 1); ++i)
+		for (int i = 0; i < (decoder->data->is_split ? 2 : 1); ++i)
 			decoder->data->backend->Destroy(decoder->subdecoders[i]);
 
 		free(decoder);
@@ -171,7 +171,7 @@ void Decoder_Split_Rewind(Decoder_Split *this)
 	this->playing_intro = this->data->is_split;
 	this->current_file = 0;
 
-	for (unsigned int i = 0; i < (this->data->is_split ? 2 : 1); ++i)
+	for (int i = 0; i < (this->data->is_split ? 2 : 1); ++i)
 		this->data->backend->Rewind(this->subdecoders[i]);
 }
 

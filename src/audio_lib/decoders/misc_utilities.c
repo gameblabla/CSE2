@@ -58,7 +58,7 @@ void DecoderUtil_SplitFileExtension(const char *path, char **path_no_extension, 
 	// Output them
 	if (path_no_extension)
 	{
-		const unsigned int size = dot - path;
+		const size_t size = dot - path;
 		*path_no_extension = malloc(size + 1);
 		memcpy(*path_no_extension, path, size);
 		(*path_no_extension)[size] = '\0';
