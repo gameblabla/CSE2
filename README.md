@@ -12,7 +12,6 @@ Cave Story Engine 2 is based off of the *original freeware release* by Studio Pi
 
 * SDL2
 * FreeType
-* pkg-config
 * FLTK
 
 ## Building
@@ -44,6 +43,8 @@ If you're a Visual Studio user, you can open the generated `CSE2.sln` file inste
 Once built, the executables can be found in `build_en` or `build_jp`, depending on the selected language.
 
 ### Makefile (deprecated)
+
+*Note: this requires pkg-config*
 
 Run 'make' in the base directory, preferably with some of the following settings:
 
