@@ -1,23 +1,50 @@
-# Misc
+# Exclude obj direcory (object files for Makefile build)
 /obj
+
+# Exclude .dat and .rec files in build directories (avoid Config.dat, 290.rec and others)
 build_en/*.dat
 build_en/*.rec
 build_jp/*.dat
 build_jp/*.rec
+
+# Exclude some other stuff (some of this should probably be removed at some point)
 build.7z
 build.zip
 msvc2003/devilution/orig.asm
 msvc2003/devilution/compare.asm
 
-# Build output
+# Exclude build output on Linux (exclude normally produced executable files)
+build_en/CSE2
+build_en/DoConfig
+
+# The Makefile outputs "release" and "debug" for the english build
+build_en/release
+build_en/debug
+
+build_jp/CSE2
+build_jp/DoConfig
+
+# The Makefile outputs "releasejp" and "debugjp" for the japanese build
+build_jp/releasejp
+build_jp/debugjp
+
+
+# Exclude executables in the build folder (and .exe.manifest files)
 build_en/*.exe
 build_en/*.exe.manifest
 build_jp/*.exe
 build_jp/*.exe.manifest
 
-# MSVC trash
+# Exclude the (recommended) CMake build directory
+build/*
+
+# Exclude MSVC IntelliSense database
 msvc2003/CSE2.ncb
+
+# Exclude MSVC Solution User Options file
 msvc2003/CSE2.suo
+
+# Exclude MSVC build folders
 msvc2003/Debug
 msvc2003/Release
 msvc2003/Debug (Japanese)
