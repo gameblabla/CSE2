@@ -27,7 +27,7 @@ build_en/*.exe.manifest
 build_jp/*.exe
 build_jp/*.exe.manifest
 
-# Exclude the (recommanded) CMake build directory
+# Exclude the (recommended) CMake build directory
 build/*
 
 # Exclude MSVC IntelliSense database
