@@ -49,3 +49,12 @@ msvc2003/Debug
 msvc2003/Release
 msvc2003/Debug (Japanese)
 msvc2003/Release (Japanese)
+
+# Exclude VS Code folder
+.vscode/*
+
+# Useful for VS Code users
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
