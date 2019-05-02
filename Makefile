@@ -159,6 +159,7 @@ SOURCES += \
 	audio_lib/decoders/libs/pxtone/pxtoneNoise \
 	audio_lib/decoders/libs/pxtone/shim \
 	audio_lib/decoders/dr_flac \
+	audio_lib/decoders/libxmp-lite \
 	audio_lib/decoders/memory_file \
 	audio_lib/decoders/misc_utilities \
 	audio_lib/decoders/predecode \
@@ -169,7 +170,16 @@ SOURCES += \
 	audio_lib/miniaudio \
 	audio_lib/mixer
 
-DEFINES += -DEXTRA_SOUND_FORMATS -DUSE_STB_VORBIS -DUSE_DR_FLAC -DUSE_PXTONE
+DEFINES += -DEXTRA_SOUND_FORMATS -DUSE_STB_VORBIS -DUSE_DR_FLAC -DUSE_PXTONE -DUSE_LIBXMPLITE
+
+CFLAGS += `pkg-config libxmp-lite --cflags`
+CXXFLAGS += `pkg-config libxmp-lite --cflags`
+
+ifeq ($(STATIC), 1)
+	LIBS += `pkg-config libxmp-lite --libs --static` -lfreetype
+else
+	LIBS += `pkg-config libxmp-lite --libs`
+endif
 endif
 
 RESOURCES =

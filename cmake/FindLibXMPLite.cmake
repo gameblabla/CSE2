@@ -4,7 +4,7 @@
 # * LIBXMPLITE_LIBRARIES
 # * libxmp-lite
 
-find_path(LIBXMPLITE_INCLUDE_DIRS xmp.h)
+find_path(LIBXMPLITE_INCLUDE_DIRS xmp.h PATH_SUFFIXES libxmp-lite)
 find_library(LIBXMPLITE_LIBRARIES libxmp-lite)
 mark_as_advanced(CUBEB_INCLUDE_DIRS LIBXMPLITE_LIBRARIES)
 

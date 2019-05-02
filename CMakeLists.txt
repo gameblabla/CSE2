@@ -357,15 +357,17 @@ else()
 	target_link_libraries(CSE2 freetype)
 endif()
 
-find_package(LibXMPLite)
-if(libxmp-lite_FOUND AND NOT FORCE_LOCAL_LIBS)
-	message(STATUS "Using system LibXMPLite")
-	target_link_libraries(CSE2 libxmp-lite)
-else()
-	# Compile it ourselves
-	message(STATUS "Using local LibXMPLite")
-	add_subdirectory(external/libxmp-lite EXCLUDE_FROM_ALL)
-	target_link_libraries(CSE2 libxmp-lite)
+if (EXTRA_SOUND_FORMATS)
+	find_package(LibXMPLite)
+	if(libxmp-lite_FOUND AND NOT FORCE_LOCAL_LIBS)
+		message(STATUS "Using system libxmp-lite")
+		target_link_libraries(CSE2 libxmp-lite)
+	else()
+		# Compile it ourselves
+		message(STATUS "Using local libxmp-lite")
+		add_subdirectory(external/libxmp-lite EXCLUDE_FROM_ALL)
+		target_link_libraries(CSE2 libxmp-lite)
+	endif()
 endif()
 
 # Send executable to the build_en/build_jp directory
