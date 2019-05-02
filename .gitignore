@@ -16,16 +16,18 @@ msvc2003/devilution/compare.asm
 # Exclude build output on Linux (exclude normally produced executable files)
 build_en/CSE2
 build_en/DoConfig
+
+# The Makefile outputs "release" and "debug" for the english build
 build_en/release
 build_en/debug
-build_en/releasejp
-build_en/debugjp
+
 build_jp/CSE2
 build_jp/DoConfig
-build_jp/release
-build_jp/debug
+
+# The Makefile outputs "releasejp" and "debugjp" for the japanese build
 build_jp/releasejp
 build_jp/debugjp
+
 
 # Exclude executables in the build folder (and .exe.manifest files)
 build_en/*.exe
