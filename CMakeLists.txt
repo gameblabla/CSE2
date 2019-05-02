@@ -8,7 +8,11 @@ option(JAPANESE "Enable the Japanese-language build" OFF)
 option(FIX_BUGS "Fix certain bugs (see src/Bug Fixes.txt)" ON)
 option(NONPORTABLE "Enable bits of code that aren't portable, but are what the original game used" OFF)
 option(FORCE_LOCAL_LIBS "Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones" OFF)
-option(EXTRA_SOUND_FORMATS "Enable support for more music/SFX formats, including Ogg Vorbis, FLAC, and Pxtone (not to be confused with Pixtone)" ON)
+option(EXTRA_SOUND_FORMATS "Enable support for more music/SFX formats, including Ogg Vorbis, FLAC, various tracker formats (.it, .xm, .mod, .s3m), and Pxtone (not to be confused with Pixtone)" ON)
+
+list(APPEND CMAKE_MODULE_PATH
+	"${CMAKE_SOURCE_DIR}/cmake"
+)
 
 # Default to Release build
 if(NOT CMAKE_BUILD_TYPE)
@@ -200,6 +204,8 @@ if (EXTRA_SOUND_FORMATS)
 		src/audio_lib/decoders/common.h
 		src/audio_lib/decoders/dr_flac.c
 		src/audio_lib/decoders/dr_flac.h
+		src/audio_lib/decoders/libxmp-lite.c
+		src/audio_lib/decoders/libxmp-lite.h
 		src/audio_lib/decoders/memory_file.c
 		src/audio_lib/decoders/memory_file.h
 		src/audio_lib/decoders/misc_utilities.c
@@ -259,7 +265,7 @@ if (EXTRA_SOUND_FORMATS)
 		src/audio_lib/decoders/libs/pxtone/shim.h
 	)
 
-	target_compile_definitions(CSE2 PRIVATE EXTRA_SOUND_FORMATS USE_STB_VORBIS USE_DR_FLAC USE_PXTONE)
+	target_compile_definitions(CSE2 PRIVATE EXTRA_SOUND_FORMATS USE_STB_VORBIS USE_DR_FLAC USE_PXTONE USE_LIBXMPLITE)
 endif()
 
 # Make some tweaks if we're targetting Windows
@@ -349,6 +355,17 @@ else()
 	endif()
 	add_subdirectory(external/freetype EXCLUDE_FROM_ALL)
 	target_link_libraries(CSE2 freetype)
+endif()
+
+find_package(LibXMPLite)
+if(libxmp-lite_FOUND AND NOT FORCE_LOCAL_LIBS)
+	message(STATUS "Using system LibXMPLite")
+	target_link_libraries(CSE2 libxmp-lite)
+else()
+	# Compile it ourselves
+	message(STATUS "Using local LibXMPLite")
+	add_subdirectory(external/libxmp-lite EXCLUDE_FROM_ALL)
+	target_link_libraries(CSE2 libxmp-lite)
 endif()
 
 # Send executable to the build_en/build_jp directory

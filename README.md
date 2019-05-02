@@ -40,7 +40,7 @@ You can also add the following flags:
 * `-DFIX_BUGS=ON` - Enabled by default - Fix bugs in the game (see [src/Bug Fixes.txt](src/Bug%20Fixes.txt))
 * `-DNONPORTABLE=ON` - Enable bits of code that aren't portable, but are what the original game used
 * `-DFORCE_LOCAL_LIBS=ON` - Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones
-* `-DEXTRA_SOUND_FORMATS=ON` - Enabled by default - Add support for the Ogg Vorbis, FLAC, and Pxtone music/SFX formats
+* `-DEXTRA_SOUND_FORMATS=ON` - Enabled by default - Enable support for more music/SFX formats, including Ogg Vorbis, FLAC, various tracker formats (.it, .xm, .mod, .s3m), and Pxtone (not to be confused with Pixtone)
 
 Then compile CSE2 with this command:
 
@@ -65,7 +65,7 @@ Run 'make' in the base directory, preferably with some of the following settings
 * `WINDOWS=1` - Enable Windows-only features like a unique file/taskbar icon, and system font loading (needed for the font setting in Config.dat to do anything)
 * `RASPBERRY_PI=1` - Enable tweaks to improve performance on Raspberry Pis
 * `NONPORTABLE=1` - Enable bits of code that aren't portable, but are what the original game used
-* `EXTRA_SOUND_FORMATS=1` - Enabled by default - Add support for the Ogg Vorbis, FLAC, and Pxtone music/SFX formats
+* `EXTRA_SOUND_FORMATS=1` - Enabled by default - Enable support for more music/SFX formats, including Ogg Vorbis, FLAC, various tracker formats (.it, .xm, .mod, .s3m), and Pxtone (not to be confused with Pixtone)
 
 ## Licensing
 
