@@ -13,13 +13,11 @@ build.zip
 msvc2003/devilution/orig.asm
 msvc2003/devilution/compare.asm
 
-# Exclude build output on Linux (exclude all files without an extension (executables))
-build_en/*
-!build_en/**/
-!build_en/*.*
-build_jp/*
-!build_jp/**/
-!build_jp/*.*
+# Exclude build output on Linux (exclude normally produced executable files)
+build_en/CSE2
+build_en/DoConfig
+build_jp/CSE2
+build_jp/DoConfig
 
 # Exclude executables in the build folder (and .exe.manifest files)
 build_en/*.exe
