@@ -22,3 +22,12 @@ msvc2003/Debug
 msvc2003/Release
 msvc2003/Debug (Japanese)
 msvc2003/Release (Japanese)
+
+# Exclude VSCode folder
+.vscode/*
+
+# Do not exclude common files that we might actually add in the future (could be used for having build commands or the like)
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
