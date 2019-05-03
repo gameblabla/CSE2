@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string>
+#include <cstring>
 
 #include <SDL.h>
 
