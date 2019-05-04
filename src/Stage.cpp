@@ -328,7 +328,9 @@ void ChangeMusic(int no)
 		gOldPos = GetOrganyaPosition();
 		gOldNo = gMusicNo;
 		StopOrganyaMusic();
+#ifdef EXTRA_SOUND_FORMATS
 		ExtraSound_PauseMusic();
+#endif
 
 		char path[PATH_LENGTH];
 		sprintf(path, "%s/%s", gDataPath, gMusicTable[no].path);
@@ -360,7 +362,9 @@ void ReCallMusic()
 {
 	//Stop old song
 	StopOrganyaMusic();
+#ifdef EXTRA_SOUND_FORMATS
 	ExtraSound_PauseMusic();
+#endif
 
 	switch (gMusicTable[gOldNo].type)
 	{
