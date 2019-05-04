@@ -133,7 +133,7 @@ void PutIllust()
 void ReloadIllust(int a)
 {
 	char path[PATH_LENGTH];
-	sprintf(path, "Resource/BITMAP/CREDIT%02d", a);
+	sprintf(path, "Resource/BITMAP/Credit%02d", a);
 	ReloadBitmap_File(path, SURFACE_ID_CREDITS_IMAGE);
 }
 

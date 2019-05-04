@@ -168,7 +168,7 @@ BOOL LoadGenericData()
 	int pt_size;
 
 	bError = FALSE;
-	if (!MakeSurface_File("Resource/BITMAP/PIXEL", SURFACE_ID_PIXEL))
+	if (!MakeSurface_File("Resource/BITMAP/pixel", SURFACE_ID_PIXEL))
 		bError = TRUE;
 	if (!MakeSurface_File("MyChar", SURFACE_ID_MY_CHAR))
 		bError = TRUE;
@@ -196,7 +196,7 @@ BOOL LoadGenericData()
 		bError = TRUE;
 	if (!MakeSurface_File("Fade", SURFACE_ID_FADE))
 		bError = TRUE;
-	if (!MakeSurface_File("Resource/BITMAP/CREDIT01", SURFACE_ID_CREDITS_IMAGE))
+	if (!MakeSurface_File("Resource/BITMAP/Credit01", SURFACE_ID_CREDITS_IMAGE))
 		bError = TRUE;
 	
 	if (bError)

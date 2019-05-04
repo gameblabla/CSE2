@@ -264,11 +264,11 @@ int8_t wave_data[100][0x100];
 bool InitWaveData100()
 {
 	char path[PATH_LENGTH];
-	sprintf(path, "%s/Resource/WAVE/WAVE100", gDataPath);
+	sprintf(path, "%s/Resource/WAVE/Wave", gDataPath);
 	FILE *fp = fopen(path, "rb");
 	if (fp == NULL)
 	{
-		printf("Failed to open WAVE100\n");
+		printf("Failed to open Wave\n");
 		return false;
 	}
 
