@@ -20,7 +20,7 @@
 #define STREAM_SIZE (FREQUENCY / 200)
 #endif
 
-#define clamp(x, y, z) ((x > z) ? z : (x < y) ? y : x)
+#define clamp(x, y, z) (((x) > (z)) ? (z) : ((x) < (y)) ? (y) : (x))
 
 //Audio device
 SDL_AudioDeviceID audioDevice;
