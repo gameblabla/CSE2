@@ -8,6 +8,7 @@ void ExtraSound_Play(void);
 void ExtraSound_Stop(void);
 void ExtraSound_LoadMusic(const char *path, bool loop);
 void ExtraSound_LoadPreviousMusic(void);
+void ExtraSound_PauseMusic(void);
 void ExtraSound_FadeOutMusic(void);
 void ExtraSound_LoadSFX(const char *path, int id);
 void ExtraSound_PlaySFX(int id, int mode);

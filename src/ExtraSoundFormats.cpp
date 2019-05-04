@@ -116,6 +116,12 @@ void ExtraSound_LoadPreviousMusic(void)
 	previous_song.valid = false;
 }
 
+void ExtraSound_PauseMusic(void)
+{
+	if (song.valid)
+		Mixer_PauseSound(song.instance);
+}
+
 void ExtraSound_FadeOutMusic(void)
 {
 	Mixer_FadeOutSound(song.instance, 5 * 1000);
