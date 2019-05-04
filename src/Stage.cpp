@@ -295,7 +295,7 @@ const struct
 	{"Resource/ORG/Maze.org", MUSIC_TYPE_ORGANYA, true},
 	{"Resource/ORG/Access.org", MUSIC_TYPE_ORGANYA, true},
 	{"Resource/ORG/ironH.org", MUSIC_TYPE_ORGANYA, true},
-	{"Resource/ORG/Grade.org", MUSIC_TYPE_ORGANYA, true},
+	{"Resource/ORG/Grand.org", MUSIC_TYPE_ORGANYA, true},
 	{"Resource/ORG/Curly.org", MUSIC_TYPE_ORGANYA, true},
 	{"Resource/ORG/Oside.org", MUSIC_TYPE_ORGANYA, true},
 	{"Resource/ORG/Requiem.org", MUSIC_TYPE_ORGANYA, true},
