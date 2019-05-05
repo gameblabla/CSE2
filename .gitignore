@@ -1,4 +1,4 @@
-# Exclude obj direcory (object files for Makefile build)
+# Exclude obj directory (object files for Makefile build)
 /obj
 
 # Exclude the converted resource files
@@ -50,7 +50,7 @@ msvc2003/Release (Japanese)
 # Exclude VS Code folder
 .vscode/*
 
-# Useful for VS Code users
+# Include generically useful files for VS Code users
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
