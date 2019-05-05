@@ -16,6 +16,50 @@ name = "PutFront"
 addr = 0x402830
 
 [[func]]
+name = "JudgeHitBulletBlock"
+addr = 0x4029B0
+
+[[func]]
+name = "JudgeHitBulletBlock2"
+addr = 0x402B30
+
+[[func]]
+name = "JudgeHitBulletTriangleA"
+addr = 0x402FC0
+
+[[func]]
+name = "JudgeHitBulletTriangleB"
+addr = 0x4030B0
+
+[[func]]
+name = "JudgeHitBulletTriangleC"
+addr = 0x4031A0
+
+[[func]]
+name = "JudgeHitBulletTriangleD"
+addr = 0x403290
+
+[[func]]
+name = "JudgeHitBulletTriangleE"
+addr = 0x403380
+
+[[func]]
+name = "JudgeHitBulletTriangleF"
+addr = 0x403470
+
+[[func]]
+name = "JudgeHitBulletTriangleG"
+addr = 0x403560
+
+[[func]]
+name = "JudgeHitBulletTriangleH"
+addr = 0x403650
+
+[[func]]
+name = "HitBulletMap"
+addr = 0x403740
+
+[[func]]
 name = "Call_Escape"
 addr = 0x40DD70
 
