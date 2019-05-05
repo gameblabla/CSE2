@@ -7,9 +7,7 @@ build_en/*.rec
 build_jp/*.dat
 build_jp/*.rec
 
-# Exclude some other stuff (some of this should probably be removed at some point)
-build.7z
-build.zip
+# Exclude devilution-comparer assembly output
 msvc2003/devilution/orig.asm
 msvc2003/devilution/compare.asm
 
