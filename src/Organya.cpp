@@ -261,10 +261,10 @@ void ReleaseOrganyaObject(int8_t track)
 //Handling WAVE100
 int8_t wave_data[100][0x100];
 
-bool InitWaveData100()
+BOOL InitWaveData100()
 {
 	char path[PATH_LENGTH];
-	sprintf(path, "%s/Resource/WAVE/Wave", gDataPath);
+	sprintf(path, "%s/Resource/WAVE/Wave.dat", gDataPath);
 	FILE *fp = fopen(path, "rb");
 	if (fp == NULL)
 	{
@@ -411,6 +411,9 @@ void SetPlayPointer(int32_t x)
 	play_p = x;
 }
 
+#define READ_LE16(pointer) pointer[0] | (pointer[1] << 8); pointer += 2;
+#define READ_LE32(pointer) pointer[0] | (pointer[1] << 8) | (pointer[2] << 16) | (pointer[3] << 24); pointer += 4;
+
 //Load organya file
 void LoadOrganya(const char *name)
 {
@@ -449,7 +452,7 @@ void LoadOrganya(const char *name)
 
 	if (!ver)
 	{
-		printf("Failed to open.org, invalid version %s", pass_check);
+		printf("Failed to open .org, invalid version %s", pass_check);
 		return;
 	}
 	

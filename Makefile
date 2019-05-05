@@ -232,4 +232,3 @@ obj/$(FILENAME)/win_icon.o: res/ICON/ICON.rc res/ICON/0.ico res/ICON/ICON_MINI.i
 
 # TODO
 clean:
-	@rm -rf obj

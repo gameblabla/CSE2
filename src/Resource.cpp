@@ -1,33 +1,32 @@
 #include "Resource.h"
 
-#include <stdint.h>
-#include <stdio.h>
+#include <stddef.h>
 #include <string.h>
-
-#include <SDL_rwops.h>
 
 #include "WindowsWrapper.h"
 
-const unsigned char* GetResource(const char *name, size_t *size)
+static const struct
 {
-	return NULL;
-}
+	const char *type;
+	const char *name;
+	const unsigned char *data;
+	size_t size;
+} resources[] = {
 
-SDL_RWops* FindResource(const char *name)
+};
+
+const unsigned char* FindResource(const char *name, const char *type, size_t *size)
 {
-	size_t resSize;
-	const unsigned char* resource = GetResource(name, &resSize);
-	
-	if (!resource)
-		return NULL;
-	
-	SDL_RWops *fp = SDL_RWFromConstMem(resource, (int)resSize);
-	
-	if (!fp)
+	for (unsigned int i = 0; i < sizeof(resources) / sizeof(resources[0]); ++i)
 	{
-		printf("Couldn't open resource %s\nSDL Error: %s\n", name, SDL_GetError());
-		return NULL;
+		if (!strcmp(name, resources[i].name) && !strcmp(type, resources[i].type))
+		{
+			if (size)
+				*size = resources[i].size;
+
+			return resources[i].data;
+		}
 	}
-	
-	return fp;
+
+	return NULL;
 }
