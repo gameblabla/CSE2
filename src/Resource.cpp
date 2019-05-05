@@ -12,7 +12,7 @@ static const struct
 	const unsigned char *data;
 	size_t size;
 } resources[] = {
-
+	0	// Dummy to prevent 'cannot create empty array' build error
 };
 
 const unsigned char* FindResource(const char *name, const char *type, size_t *size)
