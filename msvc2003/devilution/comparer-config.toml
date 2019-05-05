@@ -1795,6 +1795,34 @@ name = "ActNpc360"
 addr = 0x46EA90
 
 [[func]]
+name = "InitBossChar"
+addr = 0x472740
+
+[[func]]
+name = "PutBossChar"
+addr = 0x472770
+
+[[func]]
+name = "SetBossCharActNo"
+addr = 0x472940
+
+[[func]]
+name = "HitBossBullet"
+addr = 0x472950
+
+[[func]]
+name = "ActBossChar_0"
+addr = 0x472FF0
+
+[[func]]
+name = "ActBossChar"
+addr = 0x473000
+
+[[func]]
+name = "HitBossMap"
+addr = 0x473080
+
+[[func]]
 name = "ActBossChar_Core_Face"
 addr = 0x4739B0
 
