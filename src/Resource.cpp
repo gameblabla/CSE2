@@ -3,8 +3,6 @@
 #include <stddef.h>
 #include <string.h>
 
-#include "WindowsWrapper.h"
-
 #include "Resource/ORG/Access.org.h"
 #include "Resource/ORG/Anzen.org.h"
 #include "Resource/ORG/Balcony.org.h"
