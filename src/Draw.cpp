@@ -354,10 +354,13 @@ static BOOL LoadBitmap_File(const char *name, Surface_Ids surf_no, bool create_s
 
 static BOOL LoadBitmap_Resource(const char *res, Surface_Ids surf_no, bool create_surface)
 {
-	SDL_RWops *fp = FindResource(res);
+	size_t size;
+	const unsigned char *data = FindResource(res, "BITMAP", &size);
 	
-	if (fp)
+	if (data)
 	{
+		SDL_RWops *fp = SDL_RWFromConstMem(data, size);
+
 		printf("Loading surface from resource %s for surface id %d\n", res, surf_no);
 		if (LoadBitmap(fp, surf_no, create_surface))
 			return TRUE;

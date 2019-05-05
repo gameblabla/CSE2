@@ -1,10 +1,7 @@
 #include "Resource.h"
 
-#include <stdint.h>
-#include <stdio.h>
+#include <stddef.h>
 #include <string.h>
-
-#include <SDL_rwops.h>
 
 #include "WindowsWrapper.h"
 
@@ -79,362 +76,102 @@
 #include "Resource/CURSOR/CURSOR_IKA.bmp.h"
 #include "Resource/CURSOR/CURSOR_NORMAL.bmp.h"
 
-const unsigned char* GetResource(const char *name, size_t *size)
+static const struct
 {
-	//ORG
-	if (!strcmp(name, "ACCESS"))
-	{
-		*size = sizeof(rAccess);
-		return rAccess;
-	}
-	if (!strcmp(name, "ANZEN"))
-	{
-		*size = sizeof(rAnzen);
-		return rAnzen;
-	}
-	if (!strcmp(name, "BALCONY"))
-	{
-		*size = sizeof(rBalcony);
-		return rBalcony;
-	}
-	if (!strcmp(name, "BALLOS"))
-	{
-		*size = sizeof(rBallos);
-		return rBallos;
-	}
-	if (!strcmp(name, "BDOWN"))
-	{
-		*size = sizeof(rBreakDown);
-		return rBreakDown;
-	}
-	if (!strcmp(name, "CEMETERY"))
-	{
-		*size = sizeof(rCemetery);
-		return rCemetery;
-	}
-	if (!strcmp(name, "CURLY"))
-	{
-		*size = sizeof(rCurly);
-		return rCurly;
-	}
-	if (!strcmp(name, "DR"))
-	{
-		*size = sizeof(rDr);
-		return rDr;
-	}
-	if (!strcmp(name, "ENDING"))
-	{
-		*size = sizeof(rEnding);
-		return rEnding;
-	}
-	if (!strcmp(name, "ESCAPE"))
-	{
-		*size = sizeof(rEscape);
-		return rEscape;
-	}
-	if (!strcmp(name, "FANFALE1"))
-	{
-		*size = sizeof(rFanfale1);
-		return rFanfale1;
-	}
-	if (!strcmp(name, "FANFALE2"))
-	{
-		*size = sizeof(rFanfale2);
-		return rFanfale2;
-	}
-	if (!strcmp(name, "FANFALE3"))
-	{
-		*size = sizeof(rFanfale3);
-		return rFanfale3;
-	}
-	if (!strcmp(name, "FIREEYE"))
-	{
-		*size = sizeof(rFireEye);
-		return rFireEye;
-	}
-	if (!strcmp(name, "GAMEOVER"))
-	{
-		*size = sizeof(rGameover);
-		return rGameover;
-	}
-	if (!strcmp(name, "GINSUKE"))
-	{
-		*size = sizeof(rGinsuke);
-		return rGinsuke;
-	}
-	if (!strcmp(name, "GRAND"))
-	{
-		*size = sizeof(rGrand);
-		return rGrand;
-	}
-	if (!strcmp(name, "GRAVITY"))
-	{
-		*size = sizeof(rGravity);
-		return rGravity;
-	}
-	if (!strcmp(name, "HELL"))
-	{
-		*size = sizeof(rHell);
-		return rHell;
-	}
-	if (!strcmp(name, "IRONH"))
-	{
-		*size = sizeof(rironH);
-		return rironH;
-	}
-	if (!strcmp(name, "JENKA"))
-	{
-		*size = sizeof(rJenka);
-		return rJenka;
-	}
-	if (!strcmp(name, "JENKA2"))
-	{
-		*size = sizeof(rJenka2);
-		return rJenka2;
-	}
-	if (!strcmp(name, "KODOU"))
-	{
-		*size = sizeof(rKodou);
-		return rKodou;
-	}
-	if (!strcmp(name, "LASTBT3"))
-	{
-		*size = sizeof(rLastBtl3);
-		return rLastBtl3;
-	}
-	if (!strcmp(name, "LASTBTL"))
-	{
-		*size = sizeof(rLastBtl);
-		return rLastBtl;
-	}
-	if (!strcmp(name, "LASTCAVE"))
-	{
-		*size = sizeof(rLastCave);
-		return rLastCave;
-	}
-	if (!strcmp(name, "MARINE"))
-	{
-		*size = sizeof(rMarine);
-		return rMarine;
-	}
-	if (!strcmp(name, "MAZE"))
-	{
-		*size = sizeof(rMaze);
-		return rMaze;
-	}
-	if (!strcmp(name, "MDOWN2"))
-	{
-		*size = sizeof(rMDown2);
-		return rMDown2;
-	}
-	if (!strcmp(name, "MURA"))
-	{
-		*size = sizeof(rMura);
-		return rMura;
-	}
-	if (!strcmp(name, "OSIDE"))
-	{
-		*size = sizeof(rOside);
-		return rOside;
-	}
-	if (!strcmp(name, "PLANT"))
-	{
-		*size = sizeof(rPlant);
-		return rPlant;
-	}
-	if (!strcmp(name, "QUIET"))
-	{
-		*size = sizeof(rquiet);
-		return rquiet;
-	}
-	if (!strcmp(name, "REQUIEM"))
-	{
-		*size = sizeof(rRequiem);
-		return rRequiem;
-	}
-	if (!strcmp(name, "TOROKO"))
-	{
-		*size = sizeof(rToroko);
-		return rToroko;
-	}
-	if (!strcmp(name, "VIVI"))
-	{
-		*size = sizeof(rVivi);
-		return rVivi;
-	}
-	if (!strcmp(name, "WANPAK2"))
-	{
-		*size = sizeof(rWanpak2);
-		return rWanpak2;
-	}
-	if (!strcmp(name, "WANPAKU"))
-	{
-		*size = sizeof(rWanpaku);
-		return rWanpaku;
-	}
-	if (!strcmp(name, "WEED"))
-	{
-		*size = sizeof(rWeed);
-		return rWeed;
-	}
-	if (!strcmp(name, "WHITE"))
-	{
-		*size = sizeof(rWhite);
-		return rWhite;
-	}
-	if (!strcmp(name, "XXXX"))
-	{
-		*size = sizeof(rXXXX);
-		return rXXXX;
-	}
-	if (!strcmp(name, "ZONBIE"))
-	{
-		*size = sizeof(rZonbie);
-		return rZonbie;
-	}
-	
-	//WAVE
-	if (!strcmp(name, "WAVE100"))
-	{
-		*size = sizeof(rWave);
-		return rWave;
-	}
-	
-	//Bitmap
-	if (!strcmp(name, "CREDIT01"))
-	{
-		*size = sizeof(rCredit01);
-		return rCredit01;
-	}
-	if (!strcmp(name, "CREDIT02"))
-	{
-		*size = sizeof(rCredit02);
-		return rCredit02;
-	}
-	if (!strcmp(name, "CREDIT03"))
-	{
-		*size = sizeof(rCredit03);
-		return rCredit03;
-	}
-	if (!strcmp(name, "CREDIT04"))
-	{
-		*size = sizeof(rCredit04);
-		return rCredit04;
-	}
-	if (!strcmp(name, "CREDIT05"))
-	{
-		*size = sizeof(rCredit05);
-		return rCredit05;
-	}
-	if (!strcmp(name, "CREDIT06"))
-	{
-		*size = sizeof(rCredit06);
-		return rCredit06;
-	}
-	if (!strcmp(name, "CREDIT07"))
-	{
-		*size = sizeof(rCredit07);
-		return rCredit07;
-	}
-	if (!strcmp(name, "CREDIT08"))
-	{
-		*size = sizeof(rCredit08);
-		return rCredit08;
-	}
-	if (!strcmp(name, "CREDIT09"))
-	{
-		*size = sizeof(rCredit09);
-		return rCredit09;
-	}
-	if (!strcmp(name, "CREDIT10"))
-	{
-		*size = sizeof(rCredit10);
-		return rCredit10;
-	}
-	if (!strcmp(name, "CREDIT11"))
-	{
-		*size = sizeof(rCredit11);
-		return rCredit11;
-	}
-	if (!strcmp(name, "CREDIT12"))
-	{
-		*size = sizeof(rCredit12);
-		return rCredit12;
-	}
-	if (!strcmp(name, "CREDIT14"))
-	{
-		*size = sizeof(rCredit14);
-		return rCredit14;
-	}
-	if (!strcmp(name, "CREDIT15"))
-	{
-		*size = sizeof(rCredit15);
-		return rCredit15;
-	}
-	if (!strcmp(name, "CREDIT16"))
-	{
-		*size = sizeof(rCredit16);
-		return rCredit16;
-	}
-	if (!strcmp(name, "CREDIT17"))
-	{
-		*size = sizeof(rCredit17);
-		return rCredit17;
-	}
-	if (!strcmp(name, "CREDIT18"))
-	{
-		*size = sizeof(rCredit18);
-		return rCredit18;
-	}
-	if (!strcmp(name, "PIXEL"))
-	{
+	const char *type;
+	const char *name;
+	const unsigned char *data;
+	size_t size;
+} resources[] = {
+	{"ORG", "ACCESS", rAccess, sizeof(rAccess)},
+	{"ORG", "ANZEN", rAnzen, sizeof(rAnzen)},
+	{"ORG", "BALCONY", rBalcony, sizeof(rBalcony)},
+	{"ORG", "BALLOS", rBallos, sizeof(rBallos)},
+	{"ORG", "BDOWN", rBreakDown, sizeof(rBreakDown)},
+	{"ORG", "CEMETERY", rCemetery, sizeof(rCemetery)},
+	{"ORG", "CURLY", rCurly, sizeof(rCurly)},
+	{"ORG", "DR", rDr, sizeof(rDr)},
+	{"ORG", "ENDING", rEnding, sizeof(rEnding)},
+	{"ORG", "ESCAPE", rEscape, sizeof(rEscape)},
+	{"ORG", "FANFALE1", rFanfale1, sizeof(rFanfale1)},
+	{"ORG", "FANFALE2", rFanfale2, sizeof(rFanfale2)},
+	{"ORG", "FANFALE3", rFanfale3, sizeof(rFanfale3)},
+	{"ORG", "FIREEYE", rFireEye, sizeof(rFireEye)},
+	{"ORG", "GAMEOVER", rGameover, sizeof(rGameover)},
+	{"ORG", "GINSUKE", rGinsuke, sizeof(rGinsuke)},
+	{"ORG", "GRAND", rGrand, sizeof(rGrand)},
+	{"ORG", "GRAVITY", rGravity, sizeof(rGravity)},
+	{"ORG", "HELL", rHell, sizeof(rHell)},
+	{"ORG", "IRONH", rironH, sizeof(rironH)},
+	{"ORG", "JENKA", rJenka, sizeof(rJenka)},
+	{"ORG", "JENKA2", rJenka2, sizeof(rJenka2)},
+	{"ORG", "KODOU", rKodou, sizeof(rKodou)},
+	{"ORG", "LASTBT3", rLastBtl3, sizeof(rLastBtl3)},
+	{"ORG", "LASTBTL", rLastBtl, sizeof(rLastBtl)},
+	{"ORG", "LASTCAVE", rLastCave, sizeof(rLastCave)},
+	{"ORG", "MARINE", rMarine, sizeof(rMarine)},
+	{"ORG", "MAZE", rMaze, sizeof(rMaze)},
+	{"ORG", "MDOWN2", rMDown2, sizeof(rMDown2)},
+	{"ORG", "MURA", rMura, sizeof(rMura)},
+	{"ORG", "OSIDE", rOside, sizeof(rOside)},
+	{"ORG", "PLANT", rPlant, sizeof(rPlant)},
+	{"ORG", "QUIET", rquiet, sizeof(rquiet)},
+	{"ORG", "REQUIEM", rRequiem, sizeof(rRequiem)},
+	{"ORG", "TOROKO", rToroko, sizeof(rToroko)},
+	{"ORG", "VIVI", rVivi, sizeof(rVivi)},
+	{"ORG", "WANPAK2", rWanpak2, sizeof(rWanpak2)},
+	{"ORG", "WANPAKU", rWanpaku, sizeof(rWanpaku)},
+	{"ORG", "WEED", rWeed, sizeof(rWeed)},
+	{"ORG", "WHITE", rWhite, sizeof(rWhite)},
+	{"ORG", "XXXX", rXXXX, sizeof(rXXXX)},
+	{"ORG", "ZONBIE", rZonbie, sizeof(rZonbie)},
+
+	{"WAVE", "WAVE100", rWave, sizeof(rWave)},
+
+	{"BITMAP", "CREDIT01", rCredit01, sizeof(rCredit01)},
+	{"BITMAP", "CREDIT02", rCredit02, sizeof(rCredit02)},
+	{"BITMAP", "CREDIT03", rCredit03, sizeof(rCredit03)},
+	{"BITMAP", "CREDIT04", rCredit04, sizeof(rCredit04)},
+	{"BITMAP", "CREDIT05", rCredit05, sizeof(rCredit05)},
+	{"BITMAP", "CREDIT06", rCredit06, sizeof(rCredit06)},
+	{"BITMAP", "CREDIT07", rCredit07, sizeof(rCredit07)},
+	{"BITMAP", "CREDIT08", rCredit08, sizeof(rCredit08)},
+	{"BITMAP", "CREDIT09", rCredit09, sizeof(rCredit09)},
+	{"BITMAP", "CREDIT10", rCredit10, sizeof(rCredit10)},
+	{"BITMAP", "CREDIT11", rCredit11, sizeof(rCredit11)},
+	{"BITMAP", "CREDIT12", rCredit12, sizeof(rCredit12)},
+	{"BITMAP", "CREDIT14", rCredit14, sizeof(rCredit14)},
+	{"BITMAP", "CREDIT15", rCredit15, sizeof(rCredit15)},
+	{"BITMAP", "CREDIT16", rCredit16, sizeof(rCredit16)},
+	{"BITMAP", "CREDIT17", rCredit17, sizeof(rCredit17)},
+	{"BITMAP", "CREDIT18", rCredit18, sizeof(rCredit18)},
 #ifdef JAPANESE
-		*size = sizeof(rpixel_jp);
-		return rpixel_jp;
+	{"BITMAP", "PIXEL", rpixel_jp, sizeof(rpixel_jp)},
 #else
-		*size = sizeof(rpixel);
-		return rpixel;
+	{"BITMAP", "PIXEL", rpixel, sizeof(rpixel)},
 #endif
-	}
-	
+
 #ifndef WINDOWS
-	//ICON
-	if (!strcmp(name, "ICON_MINI"))
-	{
-		*size = sizeof(rICON_MINI);
-		return rICON_MINI;
-	}
+	{"ICON", "ICON_MINI", rICON_MINI, sizeof(rICON_MINI)},
 #endif
 
-	//CURSOR
-	if (!strcmp(name, "CURSOR_NORMAL"))
-	{
-		*size = sizeof(rCURSOR_NORMAL);
-		return rCURSOR_NORMAL;
-	}
-	if (!strcmp(name, "CURSOR_IKA"))
-	{
-		*size = sizeof(rCURSOR_IKA);
-		return rCURSOR_IKA;
-	}
-	return NULL;
-}
+	{"CURSOR", "CURSOR_NORMAL", rCURSOR_NORMAL, sizeof(rCURSOR_NORMAL)},
+	{"CURSOR", "CURSOR_IKA", rCURSOR_IKA, sizeof(rCURSOR_IKA)},
 
-SDL_RWops* FindResource(const char *name)
+};
+
+const unsigned char* FindResource(const char *name, const char *type, size_t *size)
 {
-	size_t resSize;
-	const unsigned char* resource = GetResource(name, &resSize);
-	
-	if (!resource)
-		return NULL;
-	
-	SDL_RWops *fp = SDL_RWFromConstMem(resource, (int)resSize);
-	
-	if (!fp)
+	for (unsigned int i = 0; i < sizeof(resources) / sizeof(resources[0]); ++i)
 	{
-		printf("Couldn't open resource %s\nSDL Error: %s\n", name, SDL_GetError());
-		return NULL;
+		if (!strcmp(name, resources[i].name) && !strcmp(type, resources[i].type))
+		{
+			if (size)
+				*size = resources[i].size;
+
+			return resources[i].data;
+		}
 	}
-	
-	return fp;
+
+	return NULL;
 }
