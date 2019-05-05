@@ -10,6 +10,8 @@ Cave Story Engine 2 is based off of the *original freeware release* by Studio Pi
 
 ## Dependencies
 
+*Note: if these are not found, they will be built locally (CMake only)*
+
 * SDL2
 * FreeType
 * FLTK
