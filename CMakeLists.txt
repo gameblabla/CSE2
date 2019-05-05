@@ -255,6 +255,13 @@ if(MSVC)
 	target_compile_definitions(CSE2 PRIVATE _CRT_SECURE_NO_WARNINGS)	# Shut up those stupid warnings
 endif()
 
+# Decide the embedded font
+if(JAPANESE)
+	list(APPEND RESOURCES "FONT/msgothic.ttc")
+elseif(NOT WIN32)
+	list(APPEND RESOURCES "FONT/cour.ttf")
+endif()
+
 # Magic to convert resources to header files
 add_executable(bin2h "src/misc/bin2h.c")
 if(MSVC)

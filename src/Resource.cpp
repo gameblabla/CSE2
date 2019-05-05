@@ -74,6 +74,14 @@
 #include "Resource/CURSOR/CURSOR_IKA.bmp.h"
 #include "Resource/CURSOR/CURSOR_NORMAL.bmp.h"
 
+#ifdef JAPANESE
+#include "Resource/FONT/msgothic.ttc.h"
+#else
+#ifndef WINDOWS
+#include "Resource/FONT/cour.ttf.h"
+#endif
+#endif
+
 static const struct
 {
 	const char *type;
@@ -156,6 +164,13 @@ static const struct
 	{"CURSOR", "CURSOR_NORMAL", rCURSOR_NORMAL, sizeof(rCURSOR_NORMAL)},
 	{"CURSOR", "CURSOR_IKA", rCURSOR_IKA, sizeof(rCURSOR_IKA)},
 
+#ifdef JAPANESE
+	{"FONT", "DEFAULT_FONT", rmsgothic, sizeof(rmsgothic)},
+#else
+#ifndef WINDOWS
+	{"FONT", "DEFAULT_FONT", rcour, sizeof(rcour)},
+#endif
+#endif
 };
 
 const unsigned char* FindResource(const char *name, const char *type, size_t *size)

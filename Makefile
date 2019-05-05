@@ -183,8 +183,13 @@ RESOURCES = \
 
 ifeq ($(JAPANESE), 1)
 	RESOURCES += BITMAP/pixel_jp.bmp
+	RESOURCES += FONT/msgothic.ttc
 else
 	RESOURCES += BITMAP/pixel.bmp
+
+	ifneq ($(WINDOWS), 1)
+		RESOURCES += FONT/cour.ttf
+	endif
 endif
 
 ifneq ($(WINDOWS), 1)
