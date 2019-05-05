@@ -15,13 +15,14 @@ This branch adds several enhancements including:
 * Vastly-improved fullscreen
 * Removal of the design choice that locks sprites to a 320x240 grid when drawn (can easily be [re-enabled](src/Draw.cpp#L540) for stylistic purposes)
 * Bugfixes enabled by default
-* Support for Ogg Vorbis, FLAC, and Pxtone music formats
+* Support for Ogg Vorbis, FLAC, .it, .xm, .mod, .s3m, and Pxtone music/SFX formats
 
 ## Dependencies
 
 * SDL2
 * FreeType
 * FLTK
+* libxmp-lite (only if EXTRA_SOUND_FORMATS is enabled)
 
 ## Building
 
