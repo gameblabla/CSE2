@@ -1,6 +1,9 @@
 # Exclude obj direcory (object files for Makefile build)
 /obj
 
+# Exclude the converted resource files
+src/Resource
+
 # Exclude .dat and .rec files in build directories (avoid Config.dat, 290.rec and others)
 build_en/*.dat
 build_en/*.rec
