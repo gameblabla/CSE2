@@ -24,8 +24,11 @@ if(MSVC)
 endif()
 
 # Find FLTK
-find_package(FLTK)
-if(FLTK_FOUND AND NOT FORCE_LOCAL_LIBS)
+if(NOT FORCE_LOCAL_LIBS)
+	find_package(FLTK)
+endif()
+
+if(FLTK_FOUND)
 	message(STATUS "Using system FLTK")
 	target_include_directories(DoConfig PRIVATE ${FLTK_INCLUDE_DIR})
 	target_link_libraries(DoConfig ${FLTK_LIBRARIES})

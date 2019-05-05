@@ -321,12 +321,15 @@ endif()
 
 # Find dependencies
 
-find_package(SDL2)
-if(TARGET SDL2::SDL2 AND NOT FORCE_LOCAL_LIBS)
+if(NOT FORCE_LOCAL_LIBS)
+	find_package(SDL2)
+endif()
+
+if(TARGET SDL2::SDL2)
 	# CMake-generated config (Arch, vcpkg, Raspbian)
 	message(STATUS "Using system SDL2")
 	target_link_libraries(CSE2 SDL2::SDL2 SDL2::SDL2main)
-elseif(SDL2_FOUND AND NOT FORCE_LOCAL_LIBS)
+elseif(SDL2_FOUND)
 	# Autotools-generated config (MSYS2)
 	message(STATUS "Using system SDL2")
 	target_include_directories(CSE2 PRIVATE ${SDL2_INCLUDE_DIRS})
@@ -339,8 +342,11 @@ else()
 	target_link_libraries(CSE2 SDL2-static SDL2main)
 endif()
 
-find_package(Freetype)
-if(FREETYPE_FOUND AND NOT FORCE_LOCAL_LIBS)
+if(NOT FORCE_LOCAL_LIBS)
+	find_package(Freetype)
+endif()
+
+if(FREETYPE_FOUND)
 	message(STATUS "Using system FreeType")
 	target_include_directories(CSE2 PRIVATE ${FREETYPE_INCLUDE_DIRS})
 	target_link_libraries(CSE2 ${FREETYPE_LIBRARIES})
