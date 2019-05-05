@@ -47,7 +47,7 @@
 #include "Resource/ORG/White.org.h"
 #include "Resource/ORG/XXXX.org.h"
 #include "Resource/ORG/Zonbie.org.h"
-#include "Resource/WAVE/Wave.h"
+#include "Resource/WAVE/Wave.dat.h"
 #include "Resource/BITMAP/Credit01.bmp.h"
 #include "Resource/BITMAP/Credit02.bmp.h"
 #include "Resource/BITMAP/Credit03.bmp.h"

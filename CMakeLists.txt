@@ -221,7 +221,7 @@ set(RESOURCES
 	ORG/White.org
 	ORG/XXXX.org
 	ORG/Zonbie.org
-	WAVE/Wave
+	WAVE/Wave.dat
 )
 
 # Handle options

@@ -185,7 +185,7 @@ RESOURCES = \
 	ORG/White.org \
 	ORG/XXXX.org \
 	ORG/Zonbie.org \
-	WAVE/Wave \
+	WAVE/Wave.dat \
 
 ifeq ($(JAPANESE), 1)
 	RESOURCES += BITMAP/pixel_jp.bmp
