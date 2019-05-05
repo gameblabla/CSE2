@@ -1,0 +1,10 @@
+# Automatically normalize line endings.
+*	text=auto
+
+# MSVC files have to be CRLF
+*.vcproj	text eol=crlf
+*.sln	text eol=crlf
+
+# Do not change external files
+external/**	-text
+DoConfig/fltk/**	-text

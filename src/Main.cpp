@@ -212,10 +212,13 @@ int main(int argc, char *argv[])
 		RECT unused_rect = {0, 0, 320, 240};
 
 		//Load cursor
-		SDL_RWops *fp = FindResource("CURSOR_NORMAL");
+		size_t size;
+		const unsigned char *data = FindResource("CURSOR_NORMAL", "CURSOR", &size);
 		
-		if (fp)
+		if (data)
 		{
+			SDL_RWops *fp = SDL_RWFromConstMem(data, size);
+
 			SDL_Surface *cursor_surface = SDL_LoadBMP_RW(fp, 1);
 			SDL_SetColorKey(cursor_surface, SDL_TRUE, SDL_MapRGB(cursor_surface->format, 0xFF, 0, 0xFF));	// Pink regions are transparent
 
@@ -314,10 +317,12 @@ int main(int argc, char *argv[])
 			
 #ifndef WINDOWS
 			//Load icon
-			SDL_RWops *fp = FindResource("ICON_MINI");
+			size_t size;
+			const unsigned char *data = FindResource("ICON_MINI", "ICON", &size);
 			
-			if (fp)
+			if (data)
 			{
+				SDL_RWops *fp = SDL_RWFromConstMem(data, size);
 				SDL_Surface *iconSurf = SDL_LoadBMP_RW(fp, 1);
 				SDL_Surface *iconConverted = SDL_ConvertSurfaceFormat(iconSurf, SDL_PIXELFORMAT_RGB888, 0);
 				SDL_FreeSurface(iconSurf);

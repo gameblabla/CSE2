@@ -124,73 +124,73 @@ SOURCES = \
 	ValueView
 
 RESOURCES = \
-	BITMAP/CREDIT01.bmp \
-	BITMAP/CREDIT02.bmp \
-	BITMAP/CREDIT03.bmp \
-	BITMAP/CREDIT04.bmp \
-	BITMAP/CREDIT05.bmp \
-	BITMAP/CREDIT06.bmp \
-	BITMAP/CREDIT07.bmp \
-	BITMAP/CREDIT08.bmp \
-	BITMAP/CREDIT09.bmp \
-	BITMAP/CREDIT10.bmp \
-	BITMAP/CREDIT11.bmp \
-	BITMAP/CREDIT12.bmp \
-	BITMAP/CREDIT14.bmp \
-	BITMAP/CREDIT15.bmp \
-	BITMAP/CREDIT16.bmp \
-	BITMAP/CREDIT17.bmp \
-	BITMAP/CREDIT18.bmp \
+	BITMAP/Credit01.bmp \
+	BITMAP/Credit02.bmp \
+	BITMAP/Credit03.bmp \
+	BITMAP/Credit04.bmp \
+	BITMAP/Credit05.bmp \
+	BITMAP/Credit06.bmp \
+	BITMAP/Credit07.bmp \
+	BITMAP/Credit08.bmp \
+	BITMAP/Credit09.bmp \
+	BITMAP/Credit10.bmp \
+	BITMAP/Credit11.bmp \
+	BITMAP/Credit12.bmp \
+	BITMAP/Credit14.bmp \
+	BITMAP/Credit15.bmp \
+	BITMAP/Credit16.bmp \
+	BITMAP/Credit17.bmp \
+	BITMAP/Credit18.bmp \
 	CURSOR/CURSOR_IKA.bmp \
 	CURSOR/CURSOR_NORMAL.bmp \
-	ORG/ACCESS.org \
-	ORG/ANZEN.org \
-	ORG/BALCONY.org \
-	ORG/BALLOS.org \
-	ORG/BDOWN.org \
-	ORG/CEMETERY.org \
-	ORG/CURLY.org \
-	ORG/DR.org \
-	ORG/ENDING.org \
-	ORG/ESCAPE.org \
-	ORG/FANFALE1.org \
-	ORG/FANFALE2.org \
-	ORG/FANFALE3.org \
-	ORG/FIREEYE.org \
-	ORG/GAMEOVER.org \
-	ORG/GINSUKE.org \
-	ORG/GRAND.org \
-	ORG/GRAVITY.org \
-	ORG/HELL.org \
-	ORG/IRONH.org \
-	ORG/JENKA.org \
-	ORG/JENKA2.org \
-	ORG/KODOU.org \
-	ORG/LASTBT3.org \
-	ORG/LASTBTL.org \
-	ORG/LASTCAVE.org \
-	ORG/MARINE.org \
-	ORG/MAZE.org \
-	ORG/MDOWN2.org \
-	ORG/MURA.org \
-	ORG/OSIDE.org \
-	ORG/PLANT.org \
-	ORG/QUIET.org \
-	ORG/REQUIEM.org \
-	ORG/TOROKO.org \
-	ORG/VIVI.org \
-	ORG/WANPAK2.org \
-	ORG/WANPAKU.org \
-	ORG/WEED.org \
-	ORG/WHITE.org \
+	ORG/Access.org \
+	ORG/Anzen.org \
+	ORG/Balcony.org \
+	ORG/Ballos.org \
+	ORG/BreakDown.org \
+	ORG/Cemetery.org \
+	ORG/Curly.org \
+	ORG/Dr.org \
+	ORG/Ending.org \
+	ORG/Escape.org \
+	ORG/Fanfale1.org \
+	ORG/Fanfale2.org \
+	ORG/Fanfale3.org \
+	ORG/FireEye.org \
+	ORG/Gameover.org \
+	ORG/Ginsuke.org \
+	ORG/Grand.org \
+	ORG/Gravity.org \
+	ORG/Hell.org \
+	ORG/ironH.org \
+	ORG/Jenka.org \
+	ORG/Jenka2.org \
+	ORG/Kodou.org \
+	ORG/LastBtl3.org \
+	ORG/LastBtl.org \
+	ORG/LastCave.org \
+	ORG/Marine.org \
+	ORG/Maze.org \
+	ORG/MDown2.org \
+	ORG/Mura.org \
+	ORG/Oside.org \
+	ORG/Plant.org \
+	ORG/quiet.org \
+	ORG/Requiem.org \
+	ORG/Toroko.org \
+	ORG/Vivi.org \
+	ORG/Wanpak2.org \
+	ORG/Wanpaku.org \
+	ORG/Weed.org \
+	ORG/White.org \
 	ORG/XXXX.org \
-	ORG/ZONBIE.org \
-	WAVE/WAVE100
+	ORG/Zonbie.org \
+	WAVE/Wave.dat \
 
 ifeq ($(JAPANESE), 1)
-	RESOURCES += BITMAP/PIXEL_JP.bmp
+	RESOURCES += BITMAP/pixel_jp.bmp
 else
-	RESOURCES += BITMAP/PIXEL.bmp
+	RESOURCES += BITMAP/pixel.bmp
 endif
 
 ifneq ($(WINDOWS), 1)

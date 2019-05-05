@@ -1,5 +1,5 @@
 #pragma once
 
-#include <SDL_rwops.h>
+#include <stddef.h>
 
-SDL_RWops* FindResource(const char *name);
+const unsigned char* FindResource(const char *name, const char *type, size_t *size);
