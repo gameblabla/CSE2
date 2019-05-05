@@ -1,32 +1,29 @@
 # Exclude obj direcory (object files for Makefile build)
 /obj
 
+# Exclude the converted resource files
+src/Resource
+
 # Exclude .dat and .rec files in build directories (avoid Config.dat, 290.rec and others)
 build_en/*.dat
 build_en/*.rec
 build_jp/*.dat
 build_jp/*.rec
 
-# Exclude some other stuff (some of this should probably be removed at some point)
-build.7z
-build.zip
+# Exclude devilution-comparer assembly output
 msvc2003/devilution/orig.asm
 msvc2003/devilution/compare.asm
 
 # Exclude build output on Linux (exclude normally produced executable files)
 build_en/CSE2
+build_en/CSE2d
 build_en/DoConfig
-
-# The Makefile outputs "release" and "debug" for the english build
-build_en/release
-build_en/debug
+build_en/DoConfigd
 
 build_jp/CSE2
+build_jp/CSE2d
 build_jp/DoConfig
-
-# The Makefile outputs "releasejp" and "debugjp" for the japanese build
-build_jp/releasejp
-build_jp/debugjp
+build_jp/DoConfigd
 
 
 # Exclude executables in the build folder (and .exe.manifest files)

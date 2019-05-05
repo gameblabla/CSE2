@@ -3,7 +3,13 @@
 #include <stddef.h>
 #include <string.h>
 
-#include "WindowsWrapper.h"
+#ifdef JAPANESE
+#include "Resource/FONT/msgothic.ttc.h"
+#else
+#ifndef WINDOWS
+#include "Resource/FONT/cour.ttf.h"
+#endif
+#endif
 
 static const struct
 {
@@ -12,7 +18,13 @@ static const struct
 	const unsigned char *data;
 	size_t size;
 } resources[] = {
-	0	// Dummy to prevent 'cannot create empty array' build error
+#ifdef JAPANESE
+	{"FONT", "DEFAULT_FONT", rmsgothic, sizeof(rmsgothic)},
+#else
+#ifndef WINDOWS
+	{"FONT", "DEFAULT_FONT", rcour, sizeof(rcour)},
+#endif
+#endif
 };
 
 const unsigned char* FindResource(const char *name, const char *type, size_t *size)

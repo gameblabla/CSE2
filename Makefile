@@ -184,6 +184,14 @@ endif
 
 RESOURCES =
 
+ifeq ($(JAPANESE), 1)
+	RESOURCES += FONT/msgothic.ttc
+else
+	ifneq ($(WINDOWS), 1)
+		RESOURCES += FONT/cour.ttf
+	endif
+endif
+
 OBJECTS = $(addprefix obj/$(FILENAME)/, $(addsuffix .o, $(SOURCES)))
 DEPENDENCIES = $(addprefix obj/$(FILENAME)/, $(addsuffix .o.d, $(SOURCES)))
 
@@ -232,3 +240,4 @@ obj/$(FILENAME)/win_icon.o: res/ICON/ICON.rc res/ICON/0.ico res/ICON/ICON_MINI.i
 
 # TODO
 clean:
+	@rm -rf obj
