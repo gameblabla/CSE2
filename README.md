@@ -19,6 +19,8 @@ This branch adds several enhancements including:
 
 ## Dependencies
 
+*Note: if these are not found, they will be built locally (CMake only)*
+
 * SDL2
 * FreeType
 * FLTK
