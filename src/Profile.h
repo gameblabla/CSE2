@@ -31,6 +31,6 @@ struct PROFILE
 };
 
 bool IsProfile();
-bool SaveProfile(char *name);
-bool LoadProfile(char *name);
+bool SaveProfile(const char *name);
+bool LoadProfile(const char *name);
 bool InitializeGame();

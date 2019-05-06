@@ -59,7 +59,7 @@ void PutStripper()
 }
 
 //Create a cast object
-void SetStripper(int x, int y, char *text, int cast)
+void SetStripper(int x, int y, const char *text, int cast)
 {
 	for (int s = 0; s < MAX_STRIP; s++)
 	{

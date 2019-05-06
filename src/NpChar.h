@@ -83,7 +83,7 @@ extern int gSuperXpos;
 extern int gSuperYpos;
 
 void InitNpChar();
-bool LoadEvent(char *path_event);
+bool LoadEvent(const char *path_event);
 void SetNpChar(int code_char, int x, int y, int xm, int ym, int dir, NPCHAR *npc, int start_index);
 void SetDestroyNpChar(int x, int y, int w, int num);
 void SetDestroyNpCharUp(int x, int y, int w, int num);
