@@ -555,6 +555,54 @@ name = "MakePixelWaveData"
 addr = 0x41CB10
 
 [[func]]
+name = "ShootBullet_Frontia1"
+addr = 0x41DBD0
+
+[[func]]
+name = "ShootBullet_PoleStar"
+addr = 0x41DE60
+
+[[func]]
+name = "ShootBullet_FireBall"
+addr = 0x41E110
+
+[[func]]
+name = "ShootBullet_Machinegun1"
+addr = 0x41E3D0
+
+[[func]]
+name = "ShootBullet_Missile"
+addr = 0x41E7B0
+
+[[func]]
+name = "ShootBullet_Bubblin1"
+addr = 0x41EFD0
+
+[[func]]
+name = "ShootBullet_Bubblin2"
+addr = 0x41F280
+
+[[func]]
+name = "ShootBullet_Sword"
+addr = 0x41F580
+
+[[func]]
+name = "ShootBullet_Nemesis"
+addr = 0x41F710
+
+[[func]]
+name = "ResetSpurCharge"
+addr = 0x41F9E0
+
+[[func]]
+name = "ShootBullet_Spur"
+addr = 0x41FA10
+
+[[func]]
+name = "ShootBullet"
+addr = 0x41FE70
+
+[[func]]
 name = "PlaySoundObject"
 addr = 0x420640
 

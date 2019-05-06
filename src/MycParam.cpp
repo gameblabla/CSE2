@@ -2,6 +2,8 @@
 
 #include "SDL.h"
 
+#include "WindowsWrapper.h"
+
 #include "ArmsItem.h"
 #include "CommonDefines.h"
 #include "Caret.h"
@@ -92,7 +94,7 @@ void ZeroExpMyChar()
 	gArmsData[gSelectedArms].exp = 0;
 }
 
-bool IsMaxExpMyChar()
+BOOL IsMaxExpMyChar()
 {
 	return gArmsData[gSelectedArms].level == 3
 		&& gArmsData[gSelectedArms].exp >= gArmsLevelTable[gArmsData[gSelectedArms].code].exp[2];
