@@ -547,7 +547,8 @@ void PutCaret(int fx, int fy)
 
 void SetCaret(int x, int y, int code, int dir)
 {
-	for (int c = 0; c < CARET_MAX; c++)
+	int c;
+	for (c = 0; c < CARET_MAX; c++)
 		if (gCrt[c].cond == 0)
 			break;
 
