@@ -60,6 +60,134 @@ name = "HitBulletMap"
 addr = 0x403740
 
 [[func]]
+name = "InitBullet"
+addr = 0x403C00
+
+[[func]]
+name = "CountArmsBullet"
+addr = 0x403C40
+
+[[func]]
+name = "CountBulletNum"
+addr = 0x403CB0
+
+[[func]]
+name = "DeleteBullet"
+addr = 0x403D10
+
+[[func]]
+name = "ClearBullet"
+addr = 0x403D80
+
+[[func]]
+name = "PutBullet"
+addr = 0x403DC0
+
+[[func]]
+name = "SetBullet"
+addr = 0x403F80
+
+[[func]]
+name = "ActBullet_Frontia1"
+addr = 0x404160
+
+[[func]]
+name = "ActBullet_Frontia2"
+addr = 0x4043F0
+
+[[func]]
+name = "ActBullet_PoleStar"
+addr = 0x4047B0
+
+[[func]]
+name = "ActBullet_FireBall"
+addr = 0x404B30
+
+[[func]]
+name = "ActBullet_MachineGun"
+addr = 0x405120
+
+[[func]]
+name = "ActBullet_Missile"
+addr = 0x4055A0
+
+[[func]]
+name = "ActBullet_Bom"
+addr = 0x405D80
+
+[[func]]
+name = "ActBullet_Bubblin1"
+addr = 0x405F30
+
+[[func]]
+name = "ActBullet_Bubblin2"
+addr = 0x406190
+
+[[func]]
+name = "ActBullet_Bubblin3"
+addr = 0x4064D0
+
+[[func]]
+name = "ActBullet_Spine"
+addr = 0x4068B0
+
+[[func]]
+name = "ActBullet_Sword1"
+addr = 0x406BB0
+
+[[func]]
+name = "ActBullet_Sword2"
+addr = 0x406E60
+
+[[func]]
+name = "ActBullet_Sword3"
+addr = 0x407110
+
+[[func]]
+name = "ActBullet_Edge"
+addr = 0x4075E0
+
+[[func]]
+name = "ActBullet_Drop"
+addr = 0x4078A0
+
+[[func]]
+name = "ActBullet_SuperMissile"
+addr = 0x407910
+
+[[func]]
+name = "ActBullet_SuperBom"
+addr = 0x408080
+
+[[func]]
+name = "ActBullet_Nemesis"
+addr = 0x408230
+
+[[func]]
+name = "ActBullet_Spur"
+addr = 0x408710
+
+[[func]]
+name = "ActBullet_SpurTail"
+addr = 0x408AE0
+
+[[func]]
+name = "ActBullet_EnemyClear"
+addr = 0x408F40
+
+[[func]]
+name = "ActBullet_Star"
+addr = 0x408F90
+
+[[func]]
+name = "ActBullet"
+addr = 0x408FC0
+
+[[func]]
+name = "IsActiveSomeBullet"
+addr = 0x4095C0
+
+[[func]]
 name = "Call_Escape"
 addr = 0x40DD70
 
