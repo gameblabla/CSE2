@@ -16,9 +16,7 @@ msvc2003/devilution/compare.asm
 
 # Exclude build output on Linux (exclude normally produced executable files and out files)
 build_en/CSE2
-build_en/CSE2d
 build_en/DoConfig
-build_en/DoConfigd
 *.out
 
 # The Makefile outputs "release" and "debug" for the english build
