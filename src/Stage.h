@@ -10,7 +10,7 @@ struct STAGE_TABLE
 	char back[0x10];
 	char npc[0x10];
 	char boss[0x10];
-	char boss_no;
+	signed char boss_no;
 	char name[0x22];
 };
 
