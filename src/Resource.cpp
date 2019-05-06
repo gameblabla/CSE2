@@ -23,6 +23,8 @@ static const struct
 #else
 #ifndef WINDOWS
 	{"FONT", "DEFAULT_FONT", rcour, sizeof(rcour)},
+#else
+	0	// Dummy entry to prevent 'cannot create empty array' error
 #endif
 #endif
 };
