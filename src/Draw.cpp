@@ -525,9 +525,6 @@ static unsigned char* GetFontFromWindows(size_t *data_size, const char *font_nam
 
 	HFONT hfont = CreateFontA(fontHeight, fontWidth, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, charset, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH | FF_DONTCARE, font_name);
 
-	if (hfont == NULL)
-		hfont = CreateFontA(fontHeight, fontWidth, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, charset, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH | FF_DONTCARE, NULL);
-
 	if (hfont != NULL)
 	{
 		HDC hdc = CreateCompatibleDC(NULL);
@@ -539,14 +536,14 @@ static unsigned char* GetFontFromWindows(size_t *data_size, const char *font_nam
 
 			if (size != GDI_ERROR)
 			{
-				buffer = new unsigned char[size];
+				buffer = (unsigned char*)malloc(size);
 
 				if (data_size != NULL)
 					*data_size = size;
 
 				if (GetFontData(hdc, 0, 0, buffer, size) != size)
 				{
-					delete[] buffer;
+					free(buffer);
 					buffer = NULL;
 				}
 			}
@@ -575,34 +572,40 @@ void InitTextObject(const char *font_name)
 		fontWidth = 5 * magnification;
 		fontHeight = 10 * magnification;
 //	}
-	
+
+	size_t data_size;
 #ifdef WINDOWS
 	// Actually use the font Config.dat specifies
-	size_t data_size;
-	unsigned char *data = GetFontFromWindows(&data_size, font_name, fontWidth, fontHeight);
-
-	if (data != NULL)
+	unsigned char *data;
+	data = GetFontFromWindows(&data_size, font_name, fontWidth, fontHeight);
+	if (data)
 	{
 		gFont = LoadFontFromData(data, data_size, fontWidth, fontHeight);
-
-		delete[] data;
-
-		if (gFont)
-			return;
+		free(data);
 	}
+
+	if (gFont)
+		return;
+
+#ifndef JAPANESE
+	// Fall back on a default font
+	data = GetFontFromWindows(&data_size, "Courier New", fontWidth, fontHeight);
+	if (data)
+	{
+		gFont = LoadFontFromData(data, data_size, fontWidth, fontHeight);
+		free(data);
+	}
+
+	if (gFont)
+		return;
 #endif
-	// Fall back on the built-in fonts
+#endif
+	// Fall back on the built-in font
 	(void)font_name;
+	const unsigned char *res_data = FindResource("DEFAULT_FONT", "FONT", &data_size);
 
-	//Open Font.ttf
-	char path[PATH_LENGTH];
-#ifdef JAPANESE
-	sprintf(path, "%s/font/msgothic.ttc", gModulePath);
-#else
-	sprintf(path, "%s/font/cour.ttf", gModulePath);
-#endif
-
-	gFont = LoadFont(path, fontWidth, fontHeight);
+	if (res_data != NULL)
+		gFont = LoadFontFromData(res_data, data_size, fontWidth, fontHeight);
 }
 
 void PutText(int x, int y, const char *text, uint32_t color)

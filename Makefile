@@ -1,22 +1,16 @@
 ifeq ($(RELEASE), 1)
 	CXXFLAGS = -O3 -flto
 	LDFLAGS = -s
-	FILENAME_DEF = release
+	FILENAME_DEF = CSE2
 else
 	CXXFLAGS = -O0 -g
-	FILENAME_DEF = debug
+	FILENAME_DEF = CSE2d
 endif
 
 ifeq ($(JAPANESE), 1)
 	BUILD_DIR = build_jp
 
 	CXXFLAGS += -DJAPANESE
-
-	ifeq ($(RELEASE), 1)
-		FILENAME_DEF = releasejp
-	else
-		FILENAME_DEF = debugjp
-	endif
 else
 	BUILD_DIR = build_en
 endif
@@ -189,19 +183,24 @@ RESOURCES = \
 
 ifeq ($(JAPANESE), 1)
 	RESOURCES += BITMAP/pixel_jp.bmp
+	RESOURCES += FONT/msgothic.ttc
 else
 	RESOURCES += BITMAP/pixel.bmp
+
+	ifneq ($(WINDOWS), 1)
+		RESOURCES += FONT/cour.ttf
+	endif
 endif
 
 ifneq ($(WINDOWS), 1)
 	RESOURCES += ICON/ICON_MINI.bmp
 endif
 
-OBJECTS = $(addprefix obj/$(FILENAME)/, $(addsuffix .o, $(SOURCES)))
-DEPENDENCIES = $(addprefix obj/$(FILENAME)/, $(addsuffix .o.d, $(SOURCES)))
+OBJECTS = $(addprefix obj/$(BUILD_DIR)/$(FILENAME)/, $(addsuffix .o, $(SOURCES)))
+DEPENDENCIES = $(addprefix obj/$(BUILD_DIR)/$(FILENAME)/, $(addsuffix .o.d, $(SOURCES)))
 
 ifeq ($(WINDOWS), 1)
-	OBJECTS += obj/$(FILENAME)/win_icon.o
+	OBJECTS += obj/$(BUILD_DIR)/$(FILENAME)/win_icon.o
 endif
 
 all: $(BUILD_DIR)/$(FILENAME)
@@ -212,12 +211,12 @@ $(BUILD_DIR)/$(FILENAME): $(OBJECTS)
 	@$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -o $@ $(LIBS)
 	@echo Finished compiling: $@
 
-obj/$(FILENAME)/%.o: src/%.cpp
+obj/$(BUILD_DIR)/$(FILENAME)/%.o: src/%.cpp
 	@mkdir -p $(@D)
 	@echo Compiling $<
 	@$(CXX) $(CXXFLAGS) $< -o $@ -c
 
-obj/$(FILENAME)/Resource.o: src/Resource.cpp $(addprefix src/Resource/, $(addsuffix .h, $(RESOURCES)))
+obj/$(BUILD_DIR)/$(FILENAME)/Resource.o: src/Resource.cpp $(addprefix src/Resource/, $(addsuffix .h, $(RESOURCES)))
 	@mkdir -p $(@D)
 	@echo Compiling $<
 	@$(CXX) $(CXXFLAGS) $< -o $@ -c
@@ -234,7 +233,7 @@ obj/bin2h: src/misc/bin2h.c
 
 include $(wildcard $(DEPENDENCIES))
 
-obj/$(FILENAME)/win_icon.o: res/ICON/ICON.rc res/ICON/0.ico res/ICON/ICON_MINI.ico
+obj/$(BUILD_DIR)/$(FILENAME)/win_icon.o: res/ICON/ICON.rc res/ICON/0.ico res/ICON/ICON_MINI.ico
 	@mkdir -p $(@D)
 	@windres $< $@
 

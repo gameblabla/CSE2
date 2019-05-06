@@ -9,11 +9,6 @@ option(FIX_BUGS "Fix certain bugs (see src/Bug Fixes.txt)" OFF)
 option(NONPORTABLE "Enable bits of code that aren't portable, but are what the original game used" OFF)
 option(FORCE_LOCAL_LIBS "Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones" OFF)
 
-# Default to Release build
-if(NOT CMAKE_BUILD_TYPE)
-	set(CMAKE_BUILD_TYPE Release)
-endif()
-
 project(CSE2 LANGUAGES C CXX)
 
 if(MSVC)
@@ -260,6 +255,13 @@ if(MSVC)
 	target_compile_definitions(CSE2 PRIVATE _CRT_SECURE_NO_WARNINGS)	# Shut up those stupid warnings
 endif()
 
+# Decide the embedded font
+if(JAPANESE)
+	list(APPEND RESOURCES "FONT/msgothic.ttc")
+elseif(NOT WIN32)
+	list(APPEND RESOURCES "FONT/cour.ttf")
+endif()
+
 # Magic to convert resources to header files
 add_executable(bin2h "src/misc/bin2h.c")
 if(MSVC)
@@ -279,14 +281,32 @@ foreach(FILENAME IN LISTS RESOURCES)
 endforeach()
 
 # Force strict C90
-set_property(TARGET CSE2 PROPERTY C_STANDARD 90)
-set_property(TARGET CSE2 PROPERTY C_STANDARD_REQUIRED ON)
-set_property(TARGET CSE2 PROPERTY C_EXTENSIONS OFF)
+set_target_properties(CSE2 PROPERTIES
+	C_STANDARD 90
+	C_STANDARD_REQUIRED ON
+	C_EXTENSIONS OFF
+)
 
 # Force strict C++98
-set_property(TARGET CSE2 PROPERTY CXX_STANDARD 98)
-set_property(TARGET CSE2 PROPERTY CXX_STANDARD_REQUIRED ON)
-set_property(TARGET CSE2 PROPERTY CXX_EXTENSIONS OFF)
+set_target_properties(CSE2 PROPERTIES
+	CXX_STANDARD 98
+	CXX_STANDARD_REQUIRED ON
+	CXX_EXTENSIONS OFF
+)
+
+# Name debug builds "CSE2d", to distinguish them
+set_target_properties(CSE2 PROPERTIES
+	DEBUG_OUTPUT_NAME "CSE2d"
+)
+
+# Send executable to the build_en/build_jp directory
+set_target_properties(CSE2 PROPERTIES
+	RUNTIME_OUTPUT_DIRECTORY ${BUILD_DIRECTORY}
+	RUNTIME_OUTPUT_DIRECTORY_RELEASE ${BUILD_DIRECTORY}
+	RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${BUILD_DIRECTORY}
+	RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${BUILD_DIRECTORY}
+	RUNTIME_OUTPUT_DIRECTORY_DEBUG ${BUILD_DIRECTORY}
+)
 
 # Enable link-time optimisation if available
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -301,12 +321,15 @@ endif()
 
 # Find dependencies
 
-find_package(SDL2)
-if(TARGET SDL2::SDL2 AND NOT FORCE_LOCAL_LIBS)
+if(NOT FORCE_LOCAL_LIBS)
+	find_package(SDL2)
+endif()
+
+if(TARGET SDL2::SDL2)
 	# CMake-generated config (Arch, vcpkg, Raspbian)
 	message(STATUS "Using system SDL2")
 	target_link_libraries(CSE2 SDL2::SDL2 SDL2::SDL2main)
-elseif(SDL2_FOUND AND NOT FORCE_LOCAL_LIBS)
+elseif(SDL2_FOUND)
 	# Autotools-generated config (MSYS2)
 	message(STATUS "Using system SDL2")
 	target_include_directories(CSE2 PRIVATE ${SDL2_INCLUDE_DIRS})
@@ -319,8 +342,11 @@ else()
 	target_link_libraries(CSE2 SDL2-static SDL2main)
 endif()
 
-find_package(Freetype)
-if(FREETYPE_FOUND AND NOT FORCE_LOCAL_LIBS)
+if(NOT FORCE_LOCAL_LIBS)
+	find_package(Freetype)
+endif()
+
+if(FREETYPE_FOUND)
 	message(STATUS "Using system FreeType")
 	target_include_directories(CSE2 PRIVATE ${FREETYPE_INCLUDE_DIRS})
 	target_link_libraries(CSE2 ${FREETYPE_LIBRARIES})
@@ -336,15 +362,6 @@ else()
 	add_subdirectory("external/freetype" EXCLUDE_FROM_ALL)
 	target_link_libraries(CSE2 freetype)
 endif()
-
-# Send executable to the build_en/build_jp directory
-set_target_properties(CSE2 PROPERTIES
-	RUNTIME_OUTPUT_DIRECTORY ${BUILD_DIRECTORY}
-	RUNTIME_OUTPUT_DIRECTORY_RELEASE ${BUILD_DIRECTORY}
-	RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${BUILD_DIRECTORY}
-	RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${BUILD_DIRECTORY}
-	RUNTIME_OUTPUT_DIRECTORY_DEBUG ${BUILD_DIRECTORY}
-)
 
 ##
 # DoConfig
