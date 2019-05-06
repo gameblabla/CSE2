@@ -53,7 +53,7 @@ void SetUniqueParameter(NPCHAR *npc)
 	npc->view.bottom = gNpcTable[code].view.bottom << 9;
 }
 
-bool LoadEvent(char *path_event)
+bool LoadEvent(const char *path_event)
 {
 	char path[PATH_LENGTH];
 	sprintf(path, "%s/%s", gDataPath, path_event);

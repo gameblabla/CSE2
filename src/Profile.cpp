@@ -40,7 +40,7 @@ bool IsProfile()
 	return true;
 }
 
-bool SaveProfile(char *name)
+bool SaveProfile(const char *name)
 {
 	//Get path
 	char path[PATH_LENGTH];
@@ -119,7 +119,7 @@ bool SaveProfile(char *name)
 	return true;
 }
 
-bool LoadProfile(char *name)
+bool LoadProfile(const char *name)
 {
 	//Get path
 	char path[PATH_LENGTH];

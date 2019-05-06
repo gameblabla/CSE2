@@ -37,7 +37,7 @@ struct ISLAND_SPRITE
 
 void ActionStripper();
 void PutStripper();
-void SetStripper(int x, int y, char *text, int cast);
+void SetStripper(int x, int y, const char *text, int cast);
 void RestoreStripper();
 void ActionIllust();
 void PutIllust();

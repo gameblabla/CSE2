@@ -5,8 +5,8 @@
 void InitFade();
 void SetFadeMask();
 void ClearFade();
-void StartFadeOut(char dir);
-void StartFadeIn(char dir);
+void StartFadeOut(signed char dir);
+void StartFadeIn(signed char dir);
 void ProcFade();
 void PutFade();
 BOOL GetFadeActive();

@@ -141,7 +141,7 @@ bool LoadTextScript2(const char *name)
 }
 
 //Load stage .tsc
-bool LoadTextScript_Stage(char *name)
+bool LoadTextScript_Stage(const char *name)
 {
 	//Open Head.tsc
 	char path[PATH_LENGTH];
