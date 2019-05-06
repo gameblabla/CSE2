@@ -188,6 +188,90 @@ name = "IsActiveSomeBullet"
 addr = 0x4095C0
 
 [[func]]
+name = "InitCaret"
+addr = 0x409650
+
+[[func]]
+name = "ActCaret00"
+addr = 0x409670
+
+[[func]]
+name = "ActCaret01"
+addr = 0x409680
+
+[[func]]
+name = "ActCaret02"
+addr = 0x409880
+
+[[func]]
+name = "ActCaret03"
+addr = 0x409B80
+
+[[func]]
+name = "ActCaret04"
+addr = 0x409C70
+
+[[func]]
+name = "ActCaret05"
+addr = 0x409E00
+
+[[func]]
+name = "ActCaret07"
+addr = 0x409F60
+
+[[func]]
+name = "ActCaret08"
+addr = 0x40A120
+
+[[func]]
+name = "ActCaret09"
+addr = 0x40A1B0
+
+[[func]]
+name = "ActCaret10"
+addr = 0x40A280
+
+[[func]]
+name = "ActCaret11"
+addr = 0x40A3F0
+
+[[func]]
+name = "ActCaret12"
+addr = 0x40A5A0
+
+[[func]]
+name = "ActCaret13"
+addr = 0x40A650
+
+[[func]]
+name = "ActCaret14"
+addr = 0x40A7E0
+
+[[func]]
+name = "ActCaret15"
+addr = 0x40A8F0
+
+[[func]]
+name = "ActCaret16"
+addr = 0x40A9E0
+
+[[func]]
+name = "ActCaret17"
+addr = 0x40AAA0
+
+[[func]]
+name = "ActCaret"
+addr = 0x40AB50
+
+[[func]]
+name = "PutCaret"
+addr = 0x40ABC0
+
+[[func]]
+name = "SetCaret"
+addr = 0x40AC90
+
+[[func]]
 name = "Call_Escape"
 addr = 0x40DD70
 
