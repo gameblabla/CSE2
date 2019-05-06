@@ -16,9 +16,9 @@ struct FADE
 	int mode;
 	BOOL bMask;
 	int count;
-	char ani_no[FADE_HEIGHT][FADE_WIDTH];
-	char flag[FADE_HEIGHT][FADE_WIDTH];	// Not a BOOLEAN (those are unsigned)
-	char dir;
+	signed char ani_no[FADE_HEIGHT][FADE_WIDTH];
+	signed char flag[FADE_HEIGHT][FADE_WIDTH];	// Not a BOOLEAN (those are unsigned)
+	signed char dir;
 };
 
 static FADE gFade;
@@ -41,7 +41,7 @@ void ClearFade()
 	gFade.mode = 0;
 }
 
-void StartFadeOut(char dir)
+void StartFadeOut(signed char dir)
 {
 	gFade.mode = 2;
 	gFade.count = 0;
@@ -58,7 +58,7 @@ void StartFadeOut(char dir)
 	}
 }
 
-void StartFadeIn(char dir)
+void StartFadeIn(signed char dir)
 {
 	int x;
 	int y;

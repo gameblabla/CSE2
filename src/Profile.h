@@ -25,7 +25,7 @@ struct PROFILE
 	ARMS arms[8];
 	ITEM items[32];
 	PERMIT_STAGE permitstage[8];
-	char permit_mapping[0x80];
+	signed char permit_mapping[0x80];
 	char FLAG[4];
 	uint8_t flags[1000];
 };
