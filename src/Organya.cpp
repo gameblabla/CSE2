@@ -303,7 +303,7 @@ void ChangeDramVolume(int32_t volume, int8_t track)
 	lpDRAMBUFFER[track]->SetVolume((volume - 0xFF) * 8);
 }
 
-void PlayDramObject(unsigned char key, int mode,char track)
+void PlayDramObject(unsigned char key, int mode, signed char track)
 {
 	switch(mode)
 	{

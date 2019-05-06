@@ -13,6 +13,12 @@ typedef int BOOL;
 #define TRUE 1
 #endif
 
+#define SET_RECT(rect, l, t, r, b) \
+	rect.left = l; \
+	rect.top = t; \
+	rect.right = r; \
+	rect.bottom = b;
+
 struct RECT
 {
 	union

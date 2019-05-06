@@ -16,10 +16,10 @@ struct TEXT_SCRIPT
 	char *data;
 	
 	//Mode (ex. NOD, WAI)
-	char mode;
+	signed char mode;
 	
 	//Flags
-	char flags;
+	signed char flags;
 	
 	//Current positions (read position in buffer, x position in line)
 	unsigned int p_read;
@@ -37,7 +37,7 @@ struct TEXT_SCRIPT
 	int next_event;
 	
 	//Yes/no selected
-	char select;
+	signed char select;
 	
 	//Current face
 	int face;
@@ -61,7 +61,7 @@ BOOL InitTextScript2();
 void EndTextScript();
 void EncryptionBinaryData2(uint8_t *pData, int size);
 bool LoadTextScript2(const char *name);
-bool LoadTextScript_Stage(char *name);
+bool LoadTextScript_Stage(const char *name);
 void GetTextScriptPath(char *path);
 BOOL StartTextScript(int no);
 void StopTextScript();
