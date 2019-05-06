@@ -36,14 +36,14 @@ void InitBossChar(int code)
 
 void PutBossChar(int fx, int fy)
 {
+	char a = 0;
 	for (int b = BOSS_MAX - 1; b >= 0; b--)
 	{
 		if (gBoss[b].cond & 0x80)
 		{
-			int a;
 			if (gBoss[b].shock)
 			{
-				a = 2 * ((gBoss[b].shock >> 1) & 1) - 1;
+				a = 2 * (gBoss[b].shock / 2 % 2) - 1;
 			}
 			else
 			{
@@ -57,10 +57,10 @@ void PutBossChar(int fx, int fy)
 			}
 			
 			int side;
-			if (gBoss[b].direct)
-				side = gBoss[b].view.back;
-			else
+			if (gBoss[b].direct == 0)
 				side = gBoss[b].view.front;
+			else
+				side = gBoss[b].view.back;
 			
 			PutBitmap3(
 				&grcGame,
@@ -79,106 +79,114 @@ void SetBossCharActNo(int a)
 
 void HitBossBullet()
 {
-	for (int bos = 0; bos < BOSS_MAX; bos++)
+	int bos;
+	int bul;
+	int bos_;
+	BOOL bHit;
+
+	for (bos = 0; bos < BOSS_MAX; bos++)
 	{
-		if (gBoss[bos].cond & 0x80)
+		if ((gBoss[bos].cond & 0x80) == 0)
+			continue;
+
+		for (bul = 0; bul < BULLET_MAX; bul++)
 		{
-			for (int bul = 0; bul < BULLET_MAX; bul++)
+			if ((gBul[bul].cond & 0x80) == 0)
+				continue;
+
+			if (gBul[bul].damage == -1)
+				continue;
+
+			//Check if bullet touches boss
+			bHit = FALSE;
+			if (gBoss[bos].bits & npc_shootable
+				&& gBoss[bos].x - gBoss[bos].hit.back < gBul[bul].x + gBul[bul].enemyXL
+				&& gBoss[bos].x + gBoss[bos].hit.back > gBul[bul].x - gBul[bul].enemyXL
+				&& gBoss[bos].y - gBoss[bos].hit.top < gBul[bul].y + gBul[bul].enemyYL
+				&& gBoss[bos].y + gBoss[bos].hit.bottom > gBul[bul].y - gBul[bul].enemyYL)
+				bHit = TRUE;
+			else if (gBoss[bos].bits & npc_invulnerable
+				&& gBoss[bos].x - gBoss[bos].hit.back < gBul[bul].x + gBul[bul].blockXL
+				&& gBoss[bos].x + gBoss[bos].hit.back > gBul[bul].x - gBul[bul].blockXL
+				&& gBoss[bos].y - gBoss[bos].hit.top < gBul[bul].y + gBul[bul].blockYL
+				&& gBoss[bos].y + gBoss[bos].hit.bottom > gBul[bul].y - gBul[bul].blockYL)
+				bHit = TRUE;
+				
+			if (bHit)
 			{
-				if (gBul[bul].cond & 0x80 && gBul[bul].damage != -1)
+				//Damage boss
+				if (gBoss[bos].bits & npc_shootable)
 				{
-					//Check if bullet touches boss
-					bool bHit = false;
-					if (gBoss[bos].bits & npc_shootable
-						&& gBoss[bos].x - gBoss[bos].hit.back < gBul[bul].x + gBul[bul].enemyXL
-						&& gBoss[bos].x + gBoss[bos].hit.back > gBul[bul].x - gBul[bul].enemyXL
-						&& gBoss[bos].y - gBoss[bos].hit.top < gBul[bul].y + gBul[bul].enemyYL
-						&& gBoss[bos].y + gBoss[bos].hit.bottom > gBul[bul].y - gBul[bul].enemyYL)
-						bHit = true;
-					else if (gBoss[bos].bits & npc_invulnerable
-						&& gBoss[bos].x - gBoss[bos].hit.back < gBul[bul].x + gBul[bul].blockXL
-						&& gBoss[bos].x + gBoss[bos].hit.back > gBul[bul].x - gBul[bul].blockXL
-						&& gBoss[bos].y - gBoss[bos].hit.top < gBul[bul].y + gBul[bul].blockYL
-						&& gBoss[bos].y + gBoss[bos].hit.bottom > gBul[bul].y - gBul[bul].blockYL)
-						bHit = true;
-						
-					if (bHit)
+					if (gBoss[bos].cond & 0x10)
+						bos_ = 0;
+					else
+						bos_ = bos;
+					
+					gBoss[bos_].life -= gBul[bul].damage;
+					
+					if (gBoss[bos_].life < 1)
 					{
-						//Damage boss
-						if (gBoss[bos].bits & npc_shootable)
+						gBoss[bos_].life = bos_;
+						
+						if ((gMC.cond & 0x80) && gBoss[bos_].bits & npc_eventDie)
 						{
-							int bos_;
-							if (gBoss[bos].cond & 0x10)
-								bos_ = 0;
-							else
-								bos_ = bos;
-							
-							gBoss[bos_].life -= gBul[bul].damage;
-							
-							if (gBoss[bos_].life > 0)
-							{
-								if (gBoss[bos].shock < 14)
-								{
-									SetCaret(gBul[bul].x, gBul[bul].y, 11, 0);
-									SetCaret(gBul[bul].x, gBul[bul].y, 11, 0);
-									SetCaret(gBul[bul].x, gBul[bul].y, 11, 0);
-									PlaySoundObject(gBoss[bos_].hit_voice, 1);
-								}
-								
-								gBoss[bos].shock = 8;
-								gBoss[bos_].shock = 8;
-								gBoss[bos_].damage_view -= gBul[bul].damage;
-							}
-							else
-							{
-								gBoss[bos_].life = bos_;
-								
-								if ((gMC.cond & 0x80) && gBoss[bos_].bits & npc_eventDie)
-								{
-									StartTextScript(gBoss[bos_].code_event);
-								}
-								else
-								{
-									PlaySoundObject(gBoss[bos_].destroy_voice, 1);
-									
-									switch (gBoss[bos_].size)
-									{
-										case 1:
-											SetDestroyNpChar(gBoss[bos_].x, gBoss[bos_].y, gBoss[bos_].view.back, 4);
-											break;
-										case 2:
-											SetDestroyNpChar(gBoss[bos_].x, gBoss[bos_].y, gBoss[bos_].view.back, 8);
-											break;
-										case 3:
-											SetDestroyNpChar(gBoss[bos_].x, gBoss[bos_].y, gBoss[bos_].view.back, 16);
-											break;
-									}
-									
-									gBoss[bos_].cond = 0;
-								}
-							}
-							
-							if (--gBul[bul].life <= 0)
-								gBul[bul].cond = 0;
-						}
-						else if (gBul[bul].code_bullet != 13
-							&& gBul[bul].code_bullet != 14
-							&& gBul[bul].code_bullet != 15
-							&& gBul[bul].code_bullet != 28
-							&& gBul[bul].code_bullet != 29
-							&& gBul[bul].code_bullet != 30)
-						{
-							if (!(gBul[bul].bbits & 0x10))
-							{
-								SetCaret(gBul[bul].x, gBul[bul].y, 2, 2);
-								PlaySoundObject(31, 1);
-								gBul[bul].cond = 0;
-							}
+							StartTextScript(gBoss[bos_].code_event);
 						}
 						else
 						{
-							gBul[bul].life--;
+							PlaySoundObject(gBoss[bos_].destroy_voice, 1);
+							
+							switch (gBoss[bos_].size)
+							{
+								case 1:
+									SetDestroyNpChar(gBoss[bos_].x, gBoss[bos_].y, gBoss[bos_].view.back, 4);
+									break;
+								case 2:
+									SetDestroyNpChar(gBoss[bos_].x, gBoss[bos_].y, gBoss[bos_].view.back, 8);
+									break;
+								case 3:
+									SetDestroyNpChar(gBoss[bos_].x, gBoss[bos_].y, gBoss[bos_].view.back, 16);
+									break;
+							}
+							
+							gBoss[bos_].cond = 0;
 						}
+					}
+					else
+					{
+						if (gBoss[bos].shock < 14)
+						{
+							SetCaret(gBul[bul].x, gBul[bul].y, 11, 0);
+							SetCaret(gBul[bul].x, gBul[bul].y, 11, 0);
+							SetCaret(gBul[bul].x, gBul[bul].y, 11, 0);
+							PlaySoundObject(gBoss[bos_].hit_voice, 1);
+						}
+						
+						gBoss[bos].shock = 8;
+						gBoss[bos_].shock = 8;
+						gBoss[bos_].damage_view -= gBul[bul].damage;
+					}
+					
+					if (--gBul[bul].life < 1)
+						gBul[bul].cond = 0;
+				}
+				else if (gBul[bul].code_bullet == 13
+					|| gBul[bul].code_bullet == 14
+					|| gBul[bul].code_bullet == 15
+					|| gBul[bul].code_bullet == 28
+					|| gBul[bul].code_bullet == 29
+					|| gBul[bul].code_bullet == 30)
+				{
+					--gBul[bul].life;
+				}
+				else
+				{
+					if (!(gBul[bul].bbits & 0x10))
+					{
+						SetCaret(gBul[bul].x, gBul[bul].y, 2, 2);
+						PlaySoundObject(31, 1);
+						gBul[bul].cond = 0;
+						continue;
 					}
 				}
 			}
@@ -207,15 +215,20 @@ BOSSFUNCTION gpBossFuncTbl[10] =
 
 void ActBossChar()
 {
-	if (gBoss[0].cond & 0x80)
+	int bos;
+	int code_char;
+
+	if ((gBoss[0].cond & 0x80) == 0)
+		return;
+
+	code_char = gBoss[0].code_char;
+
+	gpBossFuncTbl[code_char]();
+	
+	for (bos = 0; bos < BOSS_MAX; bos++)
 	{
-		gpBossFuncTbl[gBoss[0].code_char]();
-		
-		for (int bos = 0; bos < BOSS_MAX; bos++)
-		{
-			if (gBoss[bos].shock)
-				gBoss[bos].shock--;
-		}
+		if (gBoss[bos].shock)
+			gBoss[bos].shock--;
 	}
 }
 
@@ -223,8 +236,12 @@ void HitBossMap()
 {
 	int offx[16];
 	int offy[16];
-	uint8_t atrb[16];
-	
+	unsigned char atrb[16];
+	int b;
+	int j;
+	int x;
+	int y;
+
 	offx[0] = 0;
 	offx[1] = 1;
 	offx[2] = 0;
@@ -259,101 +276,108 @@ void HitBossMap()
 	offy[14] = -1;
 	offy[15] = -1;
 	
-	for (int b = 0; b < BOSS_MAX; b++)
+	for (b = 0; b < BOSS_MAX; b++)
 	{
-		if ((gBoss[b].cond & 0x80) && !(gBoss[b].bits & npc_ignoreSolid))
+		int judg;
+
+		if ((gBoss[b].cond & 0x80) == 0)
+			continue;
+
+		if (gBoss[b].bits & npc_ignoreSolid)
+			continue;
+
+		if (gBoss[b].size >= 3)
 		{
-			int judg;
-			if (gBoss[b].size < 3)
-				judg = 4;
-			else
-				judg = 16;
+			judg = 16;			
+			x = gBoss[b].x / 0x10 / 0x200;
+			y = gBoss[b].y / 0x10 / 0x200;
+		}
+		else
+		{
+			judg = 4;
+			x = gBoss[b].x / 0x10 / 0x200;
+			y = gBoss[b].y / 0x10 / 0x200;
+		}
+	
+		gBoss[b].flag = 0;
+		for (j = 0; j < judg; j++)
+		{
+			atrb[j] = GetAttribute(x + offx[j], y + offy[j]);
 			
-			int x = gBoss[b].x / 0x2000;
-			int y = gBoss[b].y / 0x2000;
-			
-			gBoss[b].flag = 0;
-			for (int j = 0; j < judg; j++)
+			switch (atrb[j])
 			{
-				atrb[j] = GetAttribute(x + offx[j], y + offy[j]);
-				
-				switch (atrb[j])
-				{
-					case 0x02:
-					case 0x60:
-					case 0x61:
-					case 0x64:
-						JadgeHitNpCharBlock(&gBoss[b], x + offx[j], y + offy[j]);
-						JudgeHitNpCharWater(&gBoss[b], x + offx[j], y + offy[j]);
+				case 0x44:
+					if (gBoss[b].bits & npc_ignore44)
 						break;
-					case 0x05:
-					case 0x41:
-					case 0x43:
-						JadgeHitNpCharBlock(&gBoss[b], x + offx[j], y + offy[j]);
-						break;
-					case 0x44:
-						if (!(gBoss[b].bits & npc_ignore44))
-							JadgeHitNpCharBlock(&gBoss[b], x + offx[j], y + offy[j]);
-						break;
-					case 0x50:
-						JudgeHitNpCharTriangleA(&gBoss[b], x + offx[j], y + offy[j]);
-						break;
-					case 0x51:
-						JudgeHitNpCharTriangleB(&gBoss[b], x + offx[j], y + offy[j]);
-						break;
-					case 0x52:
-						JudgeHitNpCharTriangleC(&gBoss[b], x + offx[j], y + offy[j]);
-						break;
-					case 0x53:
-						JudgeHitNpCharTriangleD(&gBoss[b], x + offx[j], y + offy[j]);
-						break;
-					case 0x54:
-						JudgeHitNpCharTriangleE(&gBoss[b], x + offx[j], y + offy[j]);
-						break;
-					case 0x55:
-						JudgeHitNpCharTriangleF(&gBoss[b], x + offx[j], y + offy[j]);
-						break;
-					case 0x56:
-						JudgeHitNpCharTriangleG(&gBoss[b], x + offx[j], y + offy[j]);
-						break;
-					case 0x57:
-						JudgeHitNpCharTriangleH(&gBoss[b], x + offx[j], y + offy[j]);
-						break;
-					case 0x70:
-						JudgeHitNpCharTriangleA(&gBoss[b], x + offx[j], y + offy[j]);
-						JudgeHitNpCharWater(&gBoss[b], x + offx[j], y + offy[j]);
-						break;
-					case 0x71:
-						JudgeHitNpCharTriangleB(&gBoss[b], x + offx[j], y + offy[j]);
-						JudgeHitNpCharWater(&gBoss[b], x + offx[j], y + offy[j]);
-						break;
-					case 0x72:
-						JudgeHitNpCharTriangleC(&gBoss[b], x + offx[j], y + offy[j]);
-						JudgeHitNpCharWater(&gBoss[b], x + offx[j], y + offy[j]);
-						break;
-					case 0x73:
-						JudgeHitNpCharTriangleD(&gBoss[b], x + offx[j], y + offy[j]);
-						JudgeHitNpCharWater(&gBoss[b], x + offx[j], y + offy[j]);
-						break;
-					case 0x74:
-						JudgeHitNpCharTriangleE(&gBoss[b], x + offx[j], y + offy[j]);
-						JudgeHitNpCharWater(&gBoss[b], x + offx[j], y + offy[j]);
-						break;
-					case 0x75:
-						JudgeHitNpCharTriangleF(&gBoss[b], x + offx[j], y + offy[j]);
-						JudgeHitNpCharWater(&gBoss[b], x + offx[j], y + offy[j]);
-						break;
-					case 0x76:
-						JudgeHitNpCharTriangleG(&gBoss[b], x + offx[j], y + offy[j]);
-						JudgeHitNpCharWater(&gBoss[b], x + offx[j], y + offy[j]);
-						break;
-					case 0x77:
-						JudgeHitNpCharTriangleH(&gBoss[b], x + offx[j], y + offy[j]);
-						JudgeHitNpCharWater(&gBoss[b], x + offx[j], y + offy[j]);
-						break;
-					default:
-						continue;
-				}
+					// Fallthrough
+				case 0x05:
+				case 0x41:
+				case 0x43:
+					JadgeHitNpCharBlock(&gBoss[b], x + offx[j], y + offy[j]);
+					break;
+				case 0x50:
+					JudgeHitNpCharTriangleA(&gBoss[b], x + offx[j], y + offy[j]);
+					break;
+				case 0x51:
+					JudgeHitNpCharTriangleB(&gBoss[b], x + offx[j], y + offy[j]);
+					break;
+				case 0x52:
+					JudgeHitNpCharTriangleC(&gBoss[b], x + offx[j], y + offy[j]);
+					break;
+				case 0x53:
+					JudgeHitNpCharTriangleD(&gBoss[b], x + offx[j], y + offy[j]);
+					break;
+				case 0x54:
+					JudgeHitNpCharTriangleE(&gBoss[b], x + offx[j], y + offy[j]);
+					break;
+				case 0x55:
+					JudgeHitNpCharTriangleF(&gBoss[b], x + offx[j], y + offy[j]);
+					break;
+				case 0x56:
+					JudgeHitNpCharTriangleG(&gBoss[b], x + offx[j], y + offy[j]);
+					break;
+				case 0x57:
+					JudgeHitNpCharTriangleH(&gBoss[b], x + offx[j], y + offy[j]);
+					break;
+				case 0x02:
+				case 0x60:
+				case 0x61:
+				case 0x64:
+					JadgeHitNpCharBlock(&gBoss[b], x + offx[j], y + offy[j]);
+					JudgeHitNpCharWater(&gBoss[b], x + offx[j], y + offy[j]);
+					break;
+				case 0x70:
+					JudgeHitNpCharTriangleA(&gBoss[b], x + offx[j], y + offy[j]);
+					JudgeHitNpCharWater(&gBoss[b], x + offx[j], y + offy[j]);
+					break;
+				case 0x71:
+					JudgeHitNpCharTriangleB(&gBoss[b], x + offx[j], y + offy[j]);
+					JudgeHitNpCharWater(&gBoss[b], x + offx[j], y + offy[j]);
+					break;
+				case 0x72:
+					JudgeHitNpCharTriangleC(&gBoss[b], x + offx[j], y + offy[j]);
+					JudgeHitNpCharWater(&gBoss[b], x + offx[j], y + offy[j]);
+					break;
+				case 0x73:
+					JudgeHitNpCharTriangleD(&gBoss[b], x + offx[j], y + offy[j]);
+					JudgeHitNpCharWater(&gBoss[b], x + offx[j], y + offy[j]);
+					break;
+				case 0x74:
+					JudgeHitNpCharTriangleE(&gBoss[b], x + offx[j], y + offy[j]);
+					JudgeHitNpCharWater(&gBoss[b], x + offx[j], y + offy[j]);
+					break;
+				case 0x75:
+					JudgeHitNpCharTriangleF(&gBoss[b], x + offx[j], y + offy[j]);
+					JudgeHitNpCharWater(&gBoss[b], x + offx[j], y + offy[j]);
+					break;
+				case 0x76:
+					JudgeHitNpCharTriangleG(&gBoss[b], x + offx[j], y + offy[j]);
+					JudgeHitNpCharWater(&gBoss[b], x + offx[j], y + offy[j]);
+					break;
+				case 0x77:
+					JudgeHitNpCharTriangleH(&gBoss[b], x + offx[j], y + offy[j]);
+					JudgeHitNpCharWater(&gBoss[b], x + offx[j], y + offy[j]);
+					break;
 			}
 		}
 	}

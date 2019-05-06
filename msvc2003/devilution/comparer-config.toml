@@ -16,6 +16,262 @@ name = "PutFront"
 addr = 0x402830
 
 [[func]]
+name = "JudgeHitBulletBlock"
+addr = 0x4029B0
+
+[[func]]
+name = "JudgeHitBulletBlock2"
+addr = 0x402B30
+
+[[func]]
+name = "JudgeHitBulletTriangleA"
+addr = 0x402FC0
+
+[[func]]
+name = "JudgeHitBulletTriangleB"
+addr = 0x4030B0
+
+[[func]]
+name = "JudgeHitBulletTriangleC"
+addr = 0x4031A0
+
+[[func]]
+name = "JudgeHitBulletTriangleD"
+addr = 0x403290
+
+[[func]]
+name = "JudgeHitBulletTriangleE"
+addr = 0x403380
+
+[[func]]
+name = "JudgeHitBulletTriangleF"
+addr = 0x403470
+
+[[func]]
+name = "JudgeHitBulletTriangleG"
+addr = 0x403560
+
+[[func]]
+name = "JudgeHitBulletTriangleH"
+addr = 0x403650
+
+[[func]]
+name = "HitBulletMap"
+addr = 0x403740
+
+[[func]]
+name = "InitBullet"
+addr = 0x403C00
+
+[[func]]
+name = "CountArmsBullet"
+addr = 0x403C40
+
+[[func]]
+name = "CountBulletNum"
+addr = 0x403CB0
+
+[[func]]
+name = "DeleteBullet"
+addr = 0x403D10
+
+[[func]]
+name = "ClearBullet"
+addr = 0x403D80
+
+[[func]]
+name = "PutBullet"
+addr = 0x403DC0
+
+[[func]]
+name = "SetBullet"
+addr = 0x403F80
+
+[[func]]
+name = "ActBullet_Frontia1"
+addr = 0x404160
+
+[[func]]
+name = "ActBullet_Frontia2"
+addr = 0x4043F0
+
+[[func]]
+name = "ActBullet_PoleStar"
+addr = 0x4047B0
+
+[[func]]
+name = "ActBullet_FireBall"
+addr = 0x404B30
+
+[[func]]
+name = "ActBullet_MachineGun"
+addr = 0x405120
+
+[[func]]
+name = "ActBullet_Missile"
+addr = 0x4055A0
+
+[[func]]
+name = "ActBullet_Bom"
+addr = 0x405D80
+
+[[func]]
+name = "ActBullet_Bubblin1"
+addr = 0x405F30
+
+[[func]]
+name = "ActBullet_Bubblin2"
+addr = 0x406190
+
+[[func]]
+name = "ActBullet_Bubblin3"
+addr = 0x4064D0
+
+[[func]]
+name = "ActBullet_Spine"
+addr = 0x4068B0
+
+[[func]]
+name = "ActBullet_Sword1"
+addr = 0x406BB0
+
+[[func]]
+name = "ActBullet_Sword2"
+addr = 0x406E60
+
+[[func]]
+name = "ActBullet_Sword3"
+addr = 0x407110
+
+[[func]]
+name = "ActBullet_Edge"
+addr = 0x4075E0
+
+[[func]]
+name = "ActBullet_Drop"
+addr = 0x4078A0
+
+[[func]]
+name = "ActBullet_SuperMissile"
+addr = 0x407910
+
+[[func]]
+name = "ActBullet_SuperBom"
+addr = 0x408080
+
+[[func]]
+name = "ActBullet_Nemesis"
+addr = 0x408230
+
+[[func]]
+name = "ActBullet_Spur"
+addr = 0x408710
+
+[[func]]
+name = "ActBullet_SpurTail"
+addr = 0x408AE0
+
+[[func]]
+name = "ActBullet_EnemyClear"
+addr = 0x408F40
+
+[[func]]
+name = "ActBullet_Star"
+addr = 0x408F90
+
+[[func]]
+name = "ActBullet"
+addr = 0x408FC0
+
+[[func]]
+name = "IsActiveSomeBullet"
+addr = 0x4095C0
+
+[[func]]
+name = "InitCaret"
+addr = 0x409650
+
+[[func]]
+name = "ActCaret00"
+addr = 0x409670
+
+[[func]]
+name = "ActCaret01"
+addr = 0x409680
+
+[[func]]
+name = "ActCaret02"
+addr = 0x409880
+
+[[func]]
+name = "ActCaret03"
+addr = 0x409B80
+
+[[func]]
+name = "ActCaret04"
+addr = 0x409C70
+
+[[func]]
+name = "ActCaret05"
+addr = 0x409E00
+
+[[func]]
+name = "ActCaret07"
+addr = 0x409F60
+
+[[func]]
+name = "ActCaret08"
+addr = 0x40A120
+
+[[func]]
+name = "ActCaret09"
+addr = 0x40A1B0
+
+[[func]]
+name = "ActCaret10"
+addr = 0x40A280
+
+[[func]]
+name = "ActCaret11"
+addr = 0x40A3F0
+
+[[func]]
+name = "ActCaret12"
+addr = 0x40A5A0
+
+[[func]]
+name = "ActCaret13"
+addr = 0x40A650
+
+[[func]]
+name = "ActCaret14"
+addr = 0x40A7E0
+
+[[func]]
+name = "ActCaret15"
+addr = 0x40A8F0
+
+[[func]]
+name = "ActCaret16"
+addr = 0x40A9E0
+
+[[func]]
+name = "ActCaret17"
+addr = 0x40AAA0
+
+[[func]]
+name = "ActCaret"
+addr = 0x40AB50
+
+[[func]]
+name = "PutCaret"
+addr = 0x40ABC0
+
+[[func]]
+name = "SetCaret"
+addr = 0x40AC90
+
+[[func]]
 name = "Call_Escape"
 addr = 0x40DD70
 
@@ -297,6 +553,54 @@ addr = 0x41C8F0
 [[func]]
 name = "MakePixelWaveData"
 addr = 0x41CB10
+
+[[func]]
+name = "ShootBullet_Frontia1"
+addr = 0x41DBD0
+
+[[func]]
+name = "ShootBullet_PoleStar"
+addr = 0x41DE60
+
+[[func]]
+name = "ShootBullet_FireBall"
+addr = 0x41E110
+
+[[func]]
+name = "ShootBullet_Machinegun1"
+addr = 0x41E3D0
+
+[[func]]
+name = "ShootBullet_Missile"
+addr = 0x41E7B0
+
+[[func]]
+name = "ShootBullet_Bubblin1"
+addr = 0x41EFD0
+
+[[func]]
+name = "ShootBullet_Bubblin2"
+addr = 0x41F280
+
+[[func]]
+name = "ShootBullet_Sword"
+addr = 0x41F580
+
+[[func]]
+name = "ShootBullet_Nemesis"
+addr = 0x41F710
+
+[[func]]
+name = "ResetSpurCharge"
+addr = 0x41F9E0
+
+[[func]]
+name = "ShootBullet_Spur"
+addr = 0x41FA10
+
+[[func]]
+name = "ShootBullet"
+addr = 0x41FE70
 
 [[func]]
 name = "PlaySoundObject"
@@ -1793,6 +2097,34 @@ addr = 0x46E9E0
 [[func]]
 name = "ActNpc360"
 addr = 0x46EA90
+
+[[func]]
+name = "InitBossChar"
+addr = 0x472740
+
+[[func]]
+name = "PutBossChar"
+addr = 0x472770
+
+[[func]]
+name = "SetBossCharActNo"
+addr = 0x472940
+
+[[func]]
+name = "HitBossBullet"
+addr = 0x472950
+
+[[func]]
+name = "ActBossChar_0"
+addr = 0x472FF0
+
+[[func]]
+name = "ActBossChar"
+addr = 0x473000
+
+[[func]]
+name = "HitBossMap"
+addr = 0x473080
 
 [[func]]
 name = "ActBossChar_Core_Face"
