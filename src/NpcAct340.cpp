@@ -1489,7 +1489,7 @@ void ActNpc352(NPCHAR *npc)
 			npc->ani_no = 0;
 			npc->count1 = npc->direct / 100;
 			npc->direct %= 100;
-			
+
 			//Set surfaces / offset
 			switch (npc->count1)
 			{
@@ -1503,7 +1503,7 @@ void ActNpc352(NPCHAR *npc)
 				default:
 					break;
 			}
-			
+
 			switch (npc->count1)
 			{
 				case 2:
@@ -1515,7 +1515,7 @@ void ActNpc352(NPCHAR *npc)
 				default:
 					break;
 			}
-			
+
 			//Balrog
 			if (npc->count1 == 9)
 			{
@@ -1523,7 +1523,7 @@ void ActNpc352(NPCHAR *npc)
 				npc->view.front = 0x2800;
 				npc->x -= 0x200;
 			}
-			
+
 			//Spawn King's sword
 			if (!npc->count1)
 				SetNpChar(145, 0, 0, 0, 0, 2, npc, 0x100);
@@ -1532,18 +1532,18 @@ void ActNpc352(NPCHAR *npc)
 			npc->ym += 0x40;
 			if (npc->ym > 0x5FF)
 				npc->ym = 0x5FF;
-			
+
 			if (npc->flag & 8)
 			{
 				npc->ym = 0;
 				npc->act_no = 2;
 				npc->ani_no = 1;
 			}
-			
+
 			npc->y += npc->ym;
 			break;
 	}
-	
+
 	RECT rc[28] = {
 		{304, 48, 320, 64},
 		{224, 48, 240, 64},
@@ -1574,7 +1574,7 @@ void ActNpc352(NPCHAR *npc)
 		{48, 16, 64, 32},
 		{48, 0, 64, 16}
 	};
-	
+
 	npc->rect = rc[npc->ani_no + 2 * npc->count1];
 }
 
@@ -1981,6 +1981,6 @@ void ActNpc360(NPCHAR *npc)
 		npc->x -= 0x1000;
 		npc->y -= 0x1000;
 	}
-	
+
 	npc->rect = rc;
 }

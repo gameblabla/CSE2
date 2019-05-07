@@ -17,7 +17,7 @@ void InitTriangleTable()
 	{
 		gSin[i] = (int)(sin(i * 6.2831998 / 256.0) * 512.0);
 	}
-	
+
 	//Tangent
 	for (i = 0; i < 0x21; ++i)
 	{
@@ -118,6 +118,6 @@ uint8_t GetArktan(int x, int y)
 			}
 		}
 	}
-	
+
 	return a;
 }
