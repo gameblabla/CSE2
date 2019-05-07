@@ -87,28 +87,28 @@ void AnimationMyChar(bool bKey)
 			else if (gKey & gKeyUp && (gKeyRight | gKeyLeft) & gKey && bKey)
 			{
 				gMC.cond |= 4;
-				
+
 				if (++gMC.ani_wait > 4)
 				{
 					gMC.ani_wait = 0;
 					if (++gMC.ani_no == 7 || gMC.ani_no == 9)
 						PlaySoundObject(24, 1);
 				}
-				
+
 				if (gMC.ani_no > 9 || gMC.ani_no < 6)
 					gMC.ani_no = 6;
 			}
 			else if ((gKeyRight | gKeyLeft) & gKey && bKey)
 			{
 				gMC.cond |= 4;
-				
+
 				if (++gMC.ani_wait > 4)
 				{
 					gMC.ani_wait = 0;
 					if (++gMC.ani_no == 2 || gMC.ani_no == 4)
 						PlaySoundObject(24, 1);
 				}
-				
+
 				if (gMC.ani_no > 4 || gMC.ani_no < 1)
 					gMC.ani_no = 1;
 			}
@@ -116,7 +116,7 @@ void AnimationMyChar(bool bKey)
 			{
 				if (gMC.cond & 4)
 					PlaySoundObject(24, 1);
-				
+
 				gMC.cond &= ~4;
 				gMC.ani_no = 5;
 			}
@@ -124,7 +124,7 @@ void AnimationMyChar(bool bKey)
 			{
 				if (gMC.cond & 4)
 					PlaySoundObject(24, 1);
-				
+
 				gMC.cond &= ~4;
 				gMC.ani_no = 0;
 			}
@@ -145,7 +145,7 @@ void AnimationMyChar(bool bKey)
 		{
 			gMC.ani_no = 1;
 		}
-		
+
 		if (gMC.direct)
 			gMC.rect = rcRight[gMC.ani_no];
 		else
@@ -170,13 +170,13 @@ void PutMyChar(int fx, int fy)
 		gMC.rect_arms.right = gMC.rect_arms.left + 24;
 		gMC.rect_arms.top = 96 * (gArmsData[gSelectedArms].code / 13);
 		gMC.rect_arms.bottom = gMC.rect_arms.top + 16;
-		
+
 		if (gMC.direct == 2)
 		{
 			gMC.rect_arms.top += 16;
 			gMC.rect_arms.bottom += 16;
 		}
-		
+
 		int arms_offset_y;
 		if (gMC.up)
 		{
@@ -194,10 +194,10 @@ void PutMyChar(int fx, int fy)
 		{
 			arms_offset_y = 0;
 		}
-		
+
 		if (gMC.ani_no == 1 || gMC.ani_no == 3 || gMC.ani_no == 6 || gMC.ani_no == 8)
 			++gMC.rect_arms.top;
-		
+
 		if (gMC.direct)
 			PutBitmap3(
 				&grcGame,
@@ -212,7 +212,7 @@ void PutMyChar(int fx, int fy)
 				SubpixelToScreenCoord(gMC.y - gMC.view.top) - SubpixelToScreenCoord(fy) + PixelToScreenCoord(arms_offset_y),
 				&gMC.rect_arms,
 				SURFACE_ID_ARMS);
-		
+
 		if (!((gMC.shock >> 1) & 1))
 		{
 			//Draw player
@@ -222,15 +222,15 @@ void PutMyChar(int fx, int fy)
 				rect.top += 32;
 				rect.bottom += 32;
 			}
-			
+		
 			PutBitmap3(&grcGame, SubpixelToScreenCoord(gMC.x - gMC.view.left) - SubpixelToScreenCoord(fx), SubpixelToScreenCoord(gMC.y - gMC.view.top) - SubpixelToScreenCoord(fy), &rect, SURFACE_ID_MY_CHAR);
-			
+		
 			//Draw airtank
 			RECT rcBubble[2] = {
 				{56, 96, 80, 120},
 				{80, 96, 104, 120},
 			};
-			
+
 			++gMC.bubble;
 			if (gMC.equip & 0x10 && gMC.flag & 0x100)
 				PutBitmap3(&grcGame, SubpixelToScreenCoord(gMC.x) - PixelToScreenCoord(12) - SubpixelToScreenCoord(fx), SubpixelToScreenCoord(gMC.y) - PixelToScreenCoord(12) - SubpixelToScreenCoord(fy), &rcBubble[(gMC.bubble >> 1) & 1], SURFACE_ID_CARET);
@@ -252,7 +252,7 @@ void ActMyChar_Normal(bool bKey)
 		int dash1;
 		int dash2;
 		int resist;
-		
+
 		if (gMC.flag & 0x100)
 		{
 			max_dash = 0x196;
@@ -273,20 +273,20 @@ void ActMyChar_Normal(bool bKey)
 			dash2 = 0x20;
 			resist = 0x33;
 		}
-		
+
 		//Don't create "?" effect
 		gMC.ques = 0;
-		
+
 		//If can't control player, stop boosting
 		if (!bKey)
 			gMC.boost_sw = 0;
-		
+
 		//Movement on the ground
 		if (gMC.flag & 8 || gMC.flag & 0x10 || gMC.flag & 0x20)
 		{
 			//Stop boosting and refuel
 			gMC.boost_sw = 0;
-			
+
 			if (gMC.equip & 1)
 			{
 				gMC.boost_cnt = 50;
@@ -299,7 +299,7 @@ void ActMyChar_Normal(bool bKey)
 			{
 				gMC.boost_cnt = 0;
 			}
-			
+
 			//Move in direction held
 			if (bKey)
 			{
@@ -311,7 +311,7 @@ void ActMyChar_Normal(bool bKey)
 							gMC.xm -= dash1;
 						if (gKey & gKeyRight && gMC.xm < max_dash)
 							gMC.xm += dash1;
-						
+
 						if (gKey & gKeyLeft)
 							gMC.direct = 0;
 						if (gKey & gKeyRight)
@@ -324,7 +324,7 @@ void ActMyChar_Normal(bool bKey)
 					gMC.ques = 1;
 				}
 			}
-			
+
 			//Friction
 			if (!(gMC.cond & 0x20))
 			{
@@ -358,7 +358,7 @@ void ActMyChar_Normal(bool bKey)
 						if (gMC.ym > 0x100)
 							gMC.ym /= 2;
 					}
-					
+
 					//Booster 2.0
 					if (gMC.equip & 0x20)
 					{
@@ -394,19 +394,19 @@ void ActMyChar_Normal(bool bKey)
 						}
 					}
 				}
-				
+
 				//Move left and right
 				if ( gKey & gKeyLeft && gMC.xm > -max_dash )
 					gMC.xm -= dash2;
 				if ( gKey & gKeyRight && gMC.xm < max_dash )
 					gMC.xm += dash2;
-				
+
 				if ( gKey & gKeyLeft )
 					gMC.direct = 0;
 				if ( gKey & gKeyRight )
 					gMC.direct = 2;
 			}
-			
+
 			//Slow down when stopped boosting (Booster 2.0)
 			if (gMC.equip & 0x20 && gMC.boost_sw && (!(gKey & gKeyJump) || !gMC.boost_cnt))
 			{
@@ -415,19 +415,19 @@ void ActMyChar_Normal(bool bKey)
 				else if (gMC.boost_sw == 2)
 					gMC.ym /= 2;
 			}
-			
+
 			//Stop boosting
 			if (!gMC.boost_cnt || !(gKey & gKeyJump))
 				gMC.boost_sw = 0;
 		}
-		
+
 		//Jumping
 		if ( bKey )
 		{
 			//Look up and down
 			gMC.up = (gKey & gKeyUp) != 0;
 			gMC.down = gKey & gKeyDown && !(gMC.flag & 8);
-			
+
 			if (gKeyTrg & gKeyJump
 				&& (gMC.flag & 8 || gMC.flag & 0x10 || gMC.flag & 0x20)
 				&& !(gMC.flag & 0x2000))
@@ -436,15 +436,15 @@ void ActMyChar_Normal(bool bKey)
 				PlaySoundObject(15, 1);
 			}
 		}
-		
+
 		//Stop interacting when moved
 		if (bKey && (gKeyShot | gKeyJump | gKeyUp | gKeyRight | gKeyLeft) & gKey)
 			gMC.cond &= ~1;
-		
+
 		//Booster losing fuel
 		if (gMC.boost_sw && gMC.boost_cnt)
 			--gMC.boost_cnt;
-		
+
 		//Wind / current forces
 		if (gMC.flag & 0x1000)
 			gMC.xm -= 0x88;
@@ -454,7 +454,7 @@ void ActMyChar_Normal(bool bKey)
 			gMC.xm += 0x88;
 		if (gMC.flag & 0x8000)
 			gMC.ym += 0x55;
-		
+
 		//Booster 2.0 forces and effects
 		if (gMC.equip & 0x20 && gMC.boost_sw)
 		{
@@ -463,13 +463,13 @@ void ActMyChar_Normal(bool bKey)
 				//Go up when going into a wall
 				if (gMC.flag & 5)
 					gMC.ym = -0x100;
-				
+
 				//Move in direction facing
 				if (!gMC.direct)
 					gMC.xm -= 0x20;
 				if (gMC.direct == 2)
 					gMC.xm += 0x20;
-				
+
 				//Boost particles (and sound)
 				if (gKeyTrg & gKeyJump || gMC.boost_cnt % 3 == 1)
 				{
@@ -477,7 +477,7 @@ void ActMyChar_Normal(bool bKey)
 						SetCaret(gMC.x + 0x400, gMC.y + 0x400, 7, 2);
 					if (gMC.direct == 2)
 						SetCaret(gMC.x - 0x400, gMC.y + 0x400, 7, 0);
-					
+
 					PlaySoundObject(113, 1);
 				}
 			}
@@ -485,7 +485,7 @@ void ActMyChar_Normal(bool bKey)
 			{
 				//Move upwards
 				gMC.ym -= 0x20;
-				
+
 				//Boost particles (and sound)
 				if (gKeyTrg & gKeyJump || gMC.boost_cnt % 3 == 1)
 				{
@@ -510,13 +510,13 @@ void ActMyChar_Normal(bool bKey)
 		{
 			//Upwards force
 			gMC.ym -= 0x20;
-			
+
 			if (!(gMC.boost_cnt % 3))
 			{
 				SetCaret(gMC.x, gMC.hit.bottom / 2 + gMC.y, 7, 3);
 				PlaySoundObject(113, 1);
 			}
-			
+
 			//Bounce off of ceiling
 			if (gMC.flag & 2)
 				gMC.ym = 0x200;
@@ -531,7 +531,7 @@ void ActMyChar_Normal(bool bKey)
 		{
 			gMC.ym += gravity1;
 		}
-		
+
 		//Keep player on slopes
 		if (bKey && !(gKeyTrg & gKeyJump))
 		{
@@ -546,7 +546,7 @@ void ActMyChar_Normal(bool bKey)
 			if (gMC.flag & 8 && gMC.flag & 0x20000 && gMC.flag & 0x40000)
 				gMC.ym = 0x400;
 		}
-		
+
 		//Limit speed
 		if (!(gMC.flag & 0x100) || gMC.flag & 0xF000)
 		{
@@ -570,7 +570,7 @@ void ActMyChar_Normal(bool bKey)
 			if (gMC.ym > 0x2FF)
 				gMC.ym = 0x2FF;
 		}
-		
+
 		//Water splashing
 		if (!gMC.sprash && gMC.flag & 0x100)
 		{
@@ -579,14 +579,14 @@ void ActMyChar_Normal(bool bKey)
 				dir = 2;
 			else
 				dir = 0;
-			
+
 			if (gMC.flag & 8 || gMC.ym <= 0x200)
 			{
 				if (gMC.xm > 0x200 || gMC.xm < -0x200)
 				{
 					for (int a = 0; a < 8; a++)
 						SetNpChar(73, gMC.x + (Random(-8, 8) << 9), gMC.y, gMC.xm + Random(-0x200, 0x200), Random(-0x200, 0x80), dir, 0, 0);
-					
+
 					PlaySoundObject(56, 1);
 				}
 			}
@@ -594,20 +594,20 @@ void ActMyChar_Normal(bool bKey)
 			{
 				for (int a = 0; a < 8; a++)
 					SetNpChar(73, gMC.x + (Random(-8, 8) << 9), gMC.y, gMC.xm + Random(-0x200, 0x200), Random(-0x200, 0x80) - gMC.ym / 2, dir, 0, 0);
-				
+
 				PlaySoundObject(56, 1);
 			}
-			
+
 			gMC.sprash = 1;
 		}
-		
+
 		if (!(gMC.flag & 0x100))
 			gMC.sprash = 0;
-		
+
 		//Spike damage
 		if (gMC.flag & 0x400)
 			DamageMyChar(10);
-		
+
 		//Camera
 		if (gMC.direct)
 		{
@@ -640,10 +640,10 @@ void ActMyChar_Normal(bool bKey)
 			if (gMC.index_y < -0x200)
 				gMC.index_y += 0x200;
 		}
-		
+
 		gMC.tgt_x = gMC.x + gMC.index_x;
 		gMC.tgt_y = gMC.y + gMC.index_y;
-		
+
 		//Change position
 		if (gMC.xm > resist || gMC.xm < -resist)
 			gMC.x += gMC.xm;
@@ -798,12 +798,12 @@ void AirProcess()
 				{
 					//Drown
 					StartTextScript(41);
-					
+
 					if (gMC.direct)
 						SetCaret(gMC.x, gMC.y, 8, 2);
 					else
 						SetCaret(gMC.x, gMC.y, 8, 0);
-					
+
 					gMC.cond &= ~0x80;
 				}
 			}
@@ -812,7 +812,7 @@ void AirProcess()
 		{
 			gMC.air = 1000;
 		}
-		
+
 		if ( gMC.flag & 0x100 )
 		{
 			gMC.air_get = 60;
@@ -830,7 +830,7 @@ void ActMyChar(bool bKey)
 	{
 		if (gMC.exp_wait)
 			--gMC.exp_wait;
-		
+
 		if (gMC.shock)
 		{
 			--gMC.shock;
@@ -840,7 +840,7 @@ void ActMyChar(bool bKey)
 			SetValueView(&gMC.x, &gMC.y, gMC.exp_count);
 			gMC.exp_count = 0;
 		}
-		
+
 		switch (gMC.unit)
 		{
 			case 0:
@@ -848,15 +848,15 @@ void ActMyChar(bool bKey)
 					AirProcess();
 				ActMyChar_Normal(bKey);
 				break;
-			
+
 			case 1:
 				ActMyChar_Stream(bKey);
 				break;
-			
+
 			default:
 				break;
 		}
-		
+
 		gMC.cond &= ~0x20;
 	}
 }
@@ -904,16 +904,16 @@ void SetMyCharDirect(uint8_t dir)
 		case 3:
 			gMC.cond |= 1;
 			break;
-			
+
 		default:
 			gMC.cond &= ~1;
-			
+
 			if (dir < 10)
 			{
 				gMC.direct = dir;
 				break;
 			}
-			
+
 			for (int i = 0; i < NPC_MAX; i++)
 			{
 				if (gNPC[i].code_event == dir)
@@ -927,7 +927,7 @@ void SetMyCharDirect(uint8_t dir)
 			}
 			break;
 	}
-	
+
 	gMC.xm = 0;
 	AnimationMyChar(false);
 }
@@ -959,7 +959,7 @@ void SetNoise(int no, int freq)
 {
 	noise_freq = freq;
 	noise_no = no;
-	
+
 	if (no == 1)
 	{
 		ChangeSoundFrequency(40, noise_freq);

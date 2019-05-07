@@ -150,7 +150,7 @@ void ActNpc302(NPCHAR *npc)
 						break;
 					}
 				}
-				
+
 				if (i == 0x200)
 				{
 					npc->cond = 0;
@@ -181,7 +181,7 @@ void ActNpc303(NPCHAR *npc)
 		{216, 168, 232, 184},
 		{232, 168, 248, 184},
 	};
-	
+
 	if (npc->pNpc == NULL)
 		return;
 
@@ -198,12 +198,12 @@ void ActNpc303(NPCHAR *npc)
 	}
 
 	npc->y = npc->pNpc->y;
-	
+
 	//Animation
 	npc->ani_no = 0;
 	if (npc->pNpc->ani_no == 3 || npc->pNpc->ani_no == 5)
 		npc->y -= 0x200;
-	
+
 	//Set framerect
 	if (npc->direct == 0)
 		npc->rect = rcLeft[npc->ani_no];
@@ -220,7 +220,7 @@ void ActNpc304(NPCHAR *npc)
 		{48, 176, 72, 192},
 		{72, 176, 96, 192},
 	};
-	
+
 	switch (npc->act_no)
 	{
 		case 0:
@@ -243,14 +243,14 @@ void ActNpc304(NPCHAR *npc)
 				npc->ani_wait = 0;
 				++npc->ani_no;
 			}
-			
+
 			if (npc->ani_no > 3)
 				npc->ani_no = 2;
 			break;
 		default:
 			break;
 	}
-	
+
 	npc->rect = rc[npc->ani_no];
 }
 
@@ -266,7 +266,7 @@ void ActNpc305(NPCHAR *npc)
 		{160, 160, 176, 176},
 		{176, 160, 192, 176},
 	};
-	
+
 	switch (npc->act_no)
 	{
 		case 0:
@@ -274,19 +274,19 @@ void ActNpc305(NPCHAR *npc)
 			npc->y -= 0x2000;
 			npc->ani_wait = Random(0, 6);
 			//Fallthrough
-			
+
 		case 1:
 			if (++npc->ani_wait > 6)
 			{
 				npc->ani_wait = 0;
 				++npc->ani_no;
 			}
-			
+
 			if (npc->ani_no > 1)
 				npc->ani_no = 0;
 			break;
 	}
-	
+
 	if (npc->direct == 0)
 		npc->rect = rcLeft[npc->ani_no];
 	else
@@ -305,7 +305,7 @@ void ActNpc306(NPCHAR *npc)
 		{160, 152, 200, 184},
 		{200, 152, 240, 184},
 	};
-	
+
 	switch (npc->act_no)
 	{
 		case 0:
@@ -330,7 +330,7 @@ void ActNpc306(NPCHAR *npc)
 			}
 			break;
 	}
-	
+
 	if (npc->direct == 0)
 		npc->rect = rcLeft[npc->ani_no];
 	else
@@ -349,7 +349,7 @@ void ActNpc307(NPCHAR *npc)
 		{0, 48, 16, 64},
 		{16, 48, 32, 64},
 	};
-	
+
 	switch (npc->act_no)
 	{
 		case 0:
@@ -375,12 +375,12 @@ void ActNpc307(NPCHAR *npc)
 			}
 			break;
 	}
-	
+
 	if (gMC.x < npc->x)
 		npc->direct = 0;
 	else
 		npc->direct = 2;
-	
+
 	if (npc->direct == 0)
 		npc->rect = rcLeft[npc->ani_no];
 	else

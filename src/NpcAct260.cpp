@@ -1086,7 +1086,7 @@ void ActNpc267(NPCHAR *npc)
 
 	if (npc->act_no >= 512)
 	{
-		
+
 	}
 	else
 	{
@@ -1095,7 +1095,7 @@ void ActNpc267(NPCHAR *npc)
 			if (npc->act_no != 102 && npc->act_no != 103 && Random(0, 3) == 2)
 				SetNpChar(270, npc->x + (Random(-0x10, 0x10) * 0x200), npc->y + (Random(-8, 4) * 0x200), npc->xm, 0, 3, 0, 0x100);
 		}
-		else 
+		else
 		{
 			SetNpChar(270, npc->x + (Random(-0x10, 0x10) * 0x200), npc->y - (((336 - npc->act_wait) / 8) * 0x200), Random(-0x200, 0x200), 2 * Random(-0x200, 0), 3, 0, 0xAA);
 			SetNpChar(270, npc->x + (Random(-0x10, 0x10) * 0x200), npc->y - ((336 - npc->act_wait) / 8 * 0x200), Random(-0x200, 0x200), 2 * Random(-0x200, 0), 3, 0, 0xAA);
@@ -2130,7 +2130,7 @@ void ActNpc278(NPCHAR *npc)
 	npc->x += npc->xm;
 	npc->y += npc->ym;
 
-	
+
 	switch (npc->code_event)
 	{
 		case 200:

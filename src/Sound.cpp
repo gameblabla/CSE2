@@ -36,28 +36,28 @@ SOUNDBUFFER::SOUNDBUFFER(size_t bufSize)
 {
 	//Lock audio buffer
 	SDL_LockAudioDevice(audioDevice);
-	
+
 	//Set parameters
 	size = bufSize;
-	
+
 	playing = false;
 	looping = false;
 	looped = false;
-	
+
 	frequency = 0.0;
 	volume = 1.0;
 	volume_l = 1.0;
 	volume_r = 1.0;
 	samplePosition = 0.0;
-	
+
 	//Create waveform buffer
 	data = new uint8_t[bufSize];
 	memset(data, 0x80, bufSize);
-	
+
 	//Add to buffer list
 	this->next = soundBuffers;
 	soundBuffers = this;
-	
+
 	//Unlock audio buffer
 	SDL_UnlockAudioDevice(audioDevice);
 }
@@ -66,11 +66,11 @@ SOUNDBUFFER::~SOUNDBUFFER()
 {
 	//Lock audio buffer
 	SDL_LockAudioDevice(audioDevice);
-	
+
 	//Free buffer
 	if (data)
 		delete[] data;
-	
+
 	//Remove from buffer list
 	for (SOUNDBUFFER **soundBuffer = &soundBuffers; *soundBuffer != NULL; soundBuffer = &(*soundBuffer)->next)
 	{
@@ -80,7 +80,7 @@ SOUNDBUFFER::~SOUNDBUFFER()
 			break;
 		}
 	}
-	
+
 	//Unlock audio buffer
 	SDL_UnlockAudioDevice(audioDevice);
 }
@@ -166,25 +166,25 @@ void SOUNDBUFFER::Mix(float *buffer, size_t frames)
 	for (size_t i = 0; i < frames; ++i)
 	{
 		const double freqPosition = frequency / FREQUENCY; //This is added to position at the end
-		
+
 		//Get the in-between sample this is (linear interpolation)
 		const float sample1 = ((looped || ((size_t)samplePosition) >= 1) ? data[(size_t)samplePosition] : 128.0f);
 		const float sample2 = ((looping || (((size_t)samplePosition) + 1) < size) ? data[(((size_t)samplePosition) + 1) % size] : 128.0f);
-		
+
 		//Interpolate sample
 		const float subPos = (float)std::fmod(samplePosition, 1.0);
 		const float sampleA = sample1 + (sample2 - sample1) * subPos;
-		
+
 		//Convert sample to float32
 		const float sampleConvert = (sampleA - 128.0f) / 128.0f;
-		
+
 		//Mix
 		*buffer++ += (float)(sampleConvert * volume * volume_l);
 		*buffer++ += (float)(sampleConvert * volume * volume_r);
-		
+
 		//Increment position
 		samplePosition += freqPosition;
-		
+
 		if (samplePosition >= size)
 		{
 			if (looping)
@@ -214,7 +214,7 @@ void AudioCallback(void *userdata, Uint8 *stream, int len)
 	//Clear stream
 	for (size_t i = 0; i < frames * 2; ++i)
 		buffer[i] = 0.0f;
-	
+
 	//Mix sounds to primary buffer
 	for (SOUNDBUFFER *sound = soundBuffers; sound != NULL; sound = sound->next)
 		sound->Mix(buffer, frames);
@@ -235,10 +235,10 @@ bool InitDirectSound()
 
 	//Init sound
 	SDL_InitSubSystem(SDL_INIT_AUDIO);
-	
+
 	//Open audio device
 	SDL_AudioSpec want, have;
-	
+
 	//Set specifications we want
 	SDL_memset(&want, 0, sizeof(want));
 	want.freq = FREQUENCY;
@@ -248,16 +248,16 @@ bool InitDirectSound()
 	want.callback = AudioCallback;
 
 	audioDevice = SDL_OpenAudioDevice(NULL, 0, &want, &have, 0);
-	
+
 	if (audioDevice == 0)
 	{
 		printf("Failed to open audio device\nSDL Error: %s\n", SDL_GetError());
 		return false;
 	}
-	
+
 	//Unpause audio device
 	SDL_PauseAudioDevice(audioDevice, 0);
-	
+
 	//Start organya
 	StartOrganya();
 	return true;
@@ -267,10 +267,10 @@ void EndDirectSound()
 {
 	//Quit sub-system
 	SDL_QuitSubSystem(SDL_INIT_AUDIO);
-	
+
 	//Close audio device
 	SDL_CloseAudioDevice(audioDevice);
-	
+
 	//End organya
 	EndOrganya();
 

@@ -1475,7 +1475,7 @@ void ActNpc295(NPCHAR *npc)
 		{32, 96, 104, 0x80},
 		{104, 96, 144, 0x80},
 	};
-	
+
 	switch (npc->act_no)
 	{
 		case 0:

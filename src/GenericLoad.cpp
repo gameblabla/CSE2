@@ -198,7 +198,7 @@ BOOL LoadGenericData()
 		bError = TRUE;
 	if (!MakeSurface_File("Resource/BITMAP/Credit01", SURFACE_ID_CREDITS_IMAGE))
 		bError = TRUE;
-	
+
 	if (bError)
 	{
 		return FALSE;

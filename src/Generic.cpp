@@ -34,14 +34,14 @@ bool CheckFileExists(const char *name)
 {
 	char path[PATH_LENGTH];
 	sprintf(path, "%s/%s", gModulePath, name);
-	
+
 	FILE *file = fopen(path, "rb");
 	if (file)
 	{
 		fclose(file);
 		return true;
 	}
-	
+
 	return false;
 }
 

@@ -149,12 +149,12 @@ BOOL StartDirectDraw(int lMagnification, int lColourDepth)
 				magnification = 1;
 				fullscreen = false;
 				break;
-				
+
 			case 1:
 				magnification = 2;
 				fullscreen = false;
 				break;
-				
+
 			case 2:
 				SDL_SetWindowFullscreen(gWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
 				int width, height;
@@ -169,7 +169,7 @@ BOOL StartDirectDraw(int lMagnification, int lColourDepth)
 		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
 		SDL_SetRenderTarget(gRenderer, native_res_render_target);
 	}
-	
+
 	return TRUE;
 }
 
@@ -177,7 +177,7 @@ void EndDirectDraw()
 {
 	//Quit sub-system
 	SDL_QuitSubSystem(SDL_INIT_VIDEO);
-	
+
 	//Release all surfaces
 	for (int i = 0; i < SURFACE_ID_MAX; i++)
 		ReleaseSurface(i);
@@ -369,7 +369,7 @@ static BOOL LoadBitmap_File(const char *name, Surface_Ids surf_no, bool create_s
 		if (LoadBitmap(fp, surf_no, create_surface))
 			return TRUE;
 	}
-	
+
 	printf("Failed to open file %s\n", name);
 	return FALSE;
 }
@@ -378,7 +378,7 @@ static BOOL LoadBitmap_Resource(const char *res, Surface_Ids surf_no, bool creat
 {
 	size_t size;
 	const unsigned char *data = FindResource(res, "BITMAP", &size);
-	
+
 	if (data)
 	{
 		SDL_RWops *fp = SDL_RWFromConstMem(data, size);
@@ -387,7 +387,7 @@ static BOOL LoadBitmap_Resource(const char *res, Surface_Ids surf_no, bool creat
 		if (LoadBitmap(fp, surf_no, create_surface))
 			return TRUE;
 	}
-	
+
 	printf("Failed to open resource %s\n", res);
 	return FALSE;
 }
@@ -465,17 +465,17 @@ static void DrawBitmap(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_
 	SDL_Rect clipRect = RectToSDLRectScaled(rcView);
 
 	SDL_Rect frameRect = RectToSDLRectScaled(rect);
-	
+
 	//Get dest rect
 	SDL_Rect destRect = {x, y, frameRect.w, frameRect.h};
-	
+
 	//Set cliprect
 	SDL_RenderSetClipRect(gRenderer, &clipRect);
-	
+
 	//Draw to screen
 	if (SDL_RenderCopy(gRenderer, surf[surf_no].texture, &frameRect, &destRect) < 0)
 		printf("Failed to draw texture %d\nSDL Error: %s\n", surf_no, SDL_GetError());
-	
+
 	//Undo cliprect
 	SDL_RenderSetClipRect(gRenderer, NULL);
 }
@@ -510,7 +510,7 @@ void CortBox(RECT *rect, uint32_t col)
 {
 	//Get rect
 	SDL_Rect destRect = RectToSDLRectScaled(rect);
-	
+
 	//Set colour and draw
 	const unsigned char col_red = col & 0x0000FF;
 	const unsigned char col_green = (col & 0x00FF00) >> 8;

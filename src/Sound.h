@@ -10,31 +10,31 @@ class SOUNDBUFFER
 	public:
 		SOUNDBUFFER(size_t bufSize);
 		~SOUNDBUFFER();
-		
+
 		void Release();
-		
+
 		void Lock(uint8_t **buffer, size_t *size);
 		void Unlock();
-		
+
 		void SetCurrentPosition(uint32_t dwNewPosition);
 		void SetFrequency(uint32_t dwFrequency);
 		void SetVolume(int32_t lVolume);
 		void SetPan(int32_t lPan);
 		void Play(bool bLooping);
 		void Stop();
-		
+
 		void Mix(float *buffer, size_t frames);
-		
+
 		SOUNDBUFFER *next;
-	
+
 	private:
 		uint8_t *data;
 		size_t size;
-		
+
 		bool playing;
 		bool looping;
 		bool looped;
-		
+
 		double frequency;
 		double volume;
 		double volume_l;

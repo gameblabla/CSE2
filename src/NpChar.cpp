@@ -197,10 +197,10 @@ void SetExpObjects(int x, int y, int exp)
 				break;
 			++n;
 		}
-		
+
 		if (n == NPC_MAX)
 			break;
-		
+
 		memset(&gNPC[n], 0, sizeof(NPCHAR));
 
 		if (exp < 20)
@@ -389,7 +389,7 @@ void ChangeNpCharByEvent(int code_event, int code_char, int dir)
 			gNPC[n].ani_wait = 0;
 			gNPC[n].xm = 0;
 			gNPC[n].ym = 0;
-			
+
 			if (dir != 5)
 			{
 				if (dir == 4)
@@ -404,7 +404,7 @@ void ChangeNpCharByEvent(int code_event, int code_char, int dir)
 					gNPC[n].direct = dir;
 				}
 			}
-			
+
 			gpNpcFuncTbl[code_char](&gNPC[n]);
 		}
 	}
@@ -431,7 +431,7 @@ void ChangeCheckableNpCharByEvent(int code_event, int code_char, int dir)
 			gNPC[n].ani_wait = 0;
 			gNPC[n].xm = 0;
 			gNPC[n].ym = 0;
-			
+
 			if (dir != 5)
 			{
 				if (dir == 4)
@@ -446,7 +446,7 @@ void ChangeCheckableNpCharByEvent(int code_event, int code_char, int dir)
 					gNPC[n].direct = dir;
 				}
 			}
-			
+
 			gpNpcFuncTbl[code_char](&gNPC[n]);
 		}
 	}
@@ -459,7 +459,7 @@ void SetNpCharActionNo(int code_event, int act_no, int dir)
 		if ((gNPC[n].cond & 0x80) && gNPC[n].code_event == code_event)
 		{
 			gNPC[n].act_no = act_no;
-			
+
 			if (dir != 5)
 			{
 				if (dir == 4)
@@ -487,7 +487,7 @@ void MoveNpChar(int code_event, int x, int y, int dir)
 		{
 			gNPC[n].x = x;
 			gNPC[n].y = y;
-			
+
 			if (dir != 5)
 			{
 				if (dir == 4)
@@ -511,7 +511,7 @@ void BackStepMyChar(int code_event)
 {
 	gMC.cond &= ~1;
 	gMC.ym = -0x200;
-	
+
 	if (code_event)
 	{
 		if (code_event == 2)
@@ -566,11 +566,11 @@ void DeleteNpCharCode(int code, bool bSmoke)
 		{
 			gNPC[n].cond = 0;
 			SetNPCFlag(gNPC[n].code_flag);
-			
+
 			if (bSmoke)
 			{
 				PlaySoundObject(gNPC[n].destroy_voice, 1);
-				
+
 				switch (gNPC[n].size)
 				{
 					case 2:
@@ -601,7 +601,7 @@ BOOL IsNpCharCode(int code)
 		if ((gNPC[i].cond & 0x80) && gNPC[i].code_char == code)
 			return TRUE;
 	}
-	
+
 	return FALSE;
 }
 
@@ -612,7 +612,7 @@ BOOL GetNpCharAlive(int code_event)
 		if ((gNPC[i].cond & 0x80) && gNPC[i].code_event == code_event)
 			return TRUE;
 	}
-	
+
 	return FALSE;
 }
 
@@ -624,6 +624,6 @@ int CountAliveNpChar()
 		if (gNPC[n].cond & 0x80)
 			++count;
 	}
-	
+
 	return count;
 }

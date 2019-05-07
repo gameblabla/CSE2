@@ -38,7 +38,7 @@ void SetValueView(int *px, int *py, int value)
 				break;
 		}
 	}
-	
+
 	if (i == VALUEVIEW_MAX)
 	{
 		index = gVVIndex++;
@@ -55,7 +55,7 @@ void SetValueView(int *px, int *py, int value)
 		gVV[index].value += value;
 		value = gVV[index].value;
 	}
-	
+
 	//Get if negative or not
 	if (value < 0)
 	{
@@ -66,10 +66,10 @@ void SetValueView(int *px, int *py, int value)
 	{
 		minus = FALSE;
 	}
-	
+
 	//Get width
 	v = value;
-	
+
 	if (value > 999)
 		width = 40;
 	else if (value > 99)
@@ -78,7 +78,7 @@ void SetValueView(int *px, int *py, int value)
 		width = 24;
 	else
 		width = 16;
-	
+
 	//Set properties
 	gVV[index].flag = TRUE;
 	gVV[index].px = px;
@@ -87,7 +87,7 @@ void SetValueView(int *px, int *py, int value)
 	gVV[index].rect.top = 8 * index;
 	gVV[index].rect.right = 40;
 	gVV[index].rect.bottom = 8 * (index + 1);
-	
+
 	RECT rect[20] = {
 		{0, 56, 8, 64},
 		{8, 56, 16, 64},
@@ -110,13 +110,13 @@ void SetValueView(int *px, int *py, int value)
 		{64, 64, 72, 72},
 		{72, 64, 80, 72},
 	};
-	
+
 	//Get digits
 	dig[0] = 1;
 	dig[1] = 10;
 	dig[2] = 100;
 	dig[3] = 1000;
-	
+
 	for (i = 3; i >= 0; i--)
 	{
 		fig[i] = 0;
@@ -126,20 +126,20 @@ void SetValueView(int *px, int *py, int value)
 			++fig[i];
 		}
 	}
-	
+
 	sw = FALSE;
-	
+
 	RECT rcPlus = {32, 48, 40, 56};
 	RECT rcMinus = {40, 48, 48, 56};
-	
+
 	//Draw value
 	CortBox2(&gVV[index].rect, 0x000000, SURFACE_ID_VALUE_VIEW);
-	
+
 	if (minus)
 		Surface2Surface(gVV[index].rect.left, gVV[index].rect.top, &rcMinus, SURFACE_ID_VALUE_VIEW, SURFACE_ID_TEXT_BOX);
 	else
 		Surface2Surface(gVV[index].rect.left, gVV[index].rect.top, &rcPlus, SURFACE_ID_VALUE_VIEW, SURFACE_ID_TEXT_BOX);
-	
+
 	for (i = 3; i >= 0; i--)
 	{
 		if (sw == FALSE && i != 0 && fig[i] == 0)

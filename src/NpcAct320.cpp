@@ -371,7 +371,7 @@ void ActNpc324(NPCHAR *npc)
 				npc->act_no = 0;
 
 			break;
-	}	
+	}
 }
 
 //Heavy Press lightning
@@ -508,15 +508,15 @@ void ActNpc326(NPCHAR *npc)
 			npc->ym += 0x40;
 			if (npc->ym > 0x5FF)
 				npc->ym = 0x5FF;
-			
+
 			npc->y += npc->ym;
-			
+
 			if (++npc->act_wait > 50)
 			{
 				npc->act_no = 30;
 				npc->act_wait = 0;
 				npc->ani_no = 6;
-				
+
 				if (npc->direct == 0)
 					SetNpChar(327, npc->x, npc->y - 0x2000, 0, 0, 0, npc, 0x100);
 				else
@@ -550,7 +550,7 @@ void ActNpc326(NPCHAR *npc)
 
 			break;
 	}
-	
+
 	RECT rcItoh[8] = {
 		{0, 128, 16, 152},
 		{16, 128, 32, 152},
@@ -572,7 +572,7 @@ void ActNpc326(NPCHAR *npc)
 		{224, 128, 240, 152},
 		{32, 152, 48, 176},
 	};
-	
+
 	if (npc->direct == 0)
 		npc->rect = rcItoh[npc->ani_no];
 	else
@@ -586,15 +586,15 @@ void ActNpc327(NPCHAR *npc)
 		{240, 80, 256, 96},
 		{256, 80, 272, 96},
 	};
-	
+
 	++npc->act_wait;
-	
+
 	switch (npc->act_no)
 	{
 		case 0:
 			if (npc->act_wait < 4)
 				npc->y -= 0x400;
-			
+
 			if (npc->pNpc->ani_no == 7)
 			{
 				npc->ani_no = 1;
@@ -603,7 +603,7 @@ void ActNpc327(NPCHAR *npc)
 				npc->tgt_y = npc->y;
 			}
 			break;
-			
+
 		case 1:
 			if (npc->act_wait < 48)
 			{
@@ -617,10 +617,10 @@ void ActNpc327(NPCHAR *npc)
 			}
 			break;
 	}
-	
+
 	if (npc->act_wait > 70)
 		npc->cond = 0;
-	
+
 	npc->rect = rc[npc->ani_no];
 }
 
@@ -638,7 +638,7 @@ void ActNpc329(NPCHAR *npc)
 		{48, 0, 64, 16},
 		{64, 0, 80, 16},
 	};
-	
+
 	if (++npc->ani_wait / 2 % 2)
 		npc->rect = rc[0];
 	else
@@ -1136,5 +1136,5 @@ void ActNpc339(NPCHAR *npc)
 			}
 
 			break;
-	}	
+	}
 }

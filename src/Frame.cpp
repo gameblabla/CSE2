@@ -121,10 +121,10 @@ void SetFramePosition(int fx, int fy)
 	//Move frame position
 	int16_t map_w, map_l;
 	GetMapData(0, &map_w, &map_l);
-	
+
 	gFrame.x = fx;
 	gFrame.y = fy;
-	
+
 	//Keep in bounds
 	if (gFrame.x < 0)
 		gFrame.x = 0;
@@ -142,19 +142,19 @@ void SetFrameMyChar()
 	//Move frame position
 	int mc_x, mc_y;
 	GetMyCharPosition(&mc_x, &mc_y);
-	
+
 	int16_t map_w, map_l;
 	GetMapData(0, &map_w, &map_l);
-	
+
 	gFrame.x = mc_x - (WINDOW_WIDTH << 8);
 	gFrame.y = mc_y - (WINDOW_HEIGHT << 8);
-	
+
 	//Keep in bounds
 	if (gFrame.x < 0)
 		gFrame.x = 0;
 	if (gFrame.y < 0)
 		gFrame.y = 0;
-	
+
 	if (gFrame.x > ((((map_w - 1) * 0x10) - WINDOW_WIDTH)) * 0x200)
 		gFrame.x = (((map_w - 1) * 0x10) - WINDOW_WIDTH) * 0x200;
 	if (gFrame.y > ((((map_l - 1) * 0x10) - WINDOW_HEIGHT)) * 0x200)

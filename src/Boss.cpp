@@ -48,20 +48,20 @@ void PutBossChar(int fx, int fy)
 			else
 			{
 				a = 0;
-				
+
 				if (gBoss[b].bits & npc_showDamage && gBoss[b].damage_view)
 				{
 					SetValueView(&gBoss[b].x, &gBoss[b].y, gBoss[b].damage_view);
 					gBoss[b].damage_view = 0;
 				}
 			}
-			
+
 			int side;
 			if (gBoss[b].direct == 0)
 				side = gBoss[b].view.front;
 			else
 				side = gBoss[b].view.back;
-			
+
 			PutBitmap3(
 				&grcGame,
 				SubpixelToScreenCoord(gBoss[b].x - side) - SubpixelToScreenCoord(fx) + PixelToScreenCoord(a),
@@ -111,7 +111,7 @@ void HitBossBullet()
 				&& gBoss[bos].y - gBoss[bos].hit.top < gBul[bul].y + gBul[bul].blockYL
 				&& gBoss[bos].y + gBoss[bos].hit.bottom > gBul[bul].y - gBul[bul].blockYL)
 				bHit = TRUE;
-				
+
 			if (bHit)
 			{
 				//Damage boss
@@ -121,13 +121,13 @@ void HitBossBullet()
 						bos_ = 0;
 					else
 						bos_ = bos;
-					
+
 					gBoss[bos_].life -= gBul[bul].damage;
-					
+
 					if (gBoss[bos_].life < 1)
 					{
 						gBoss[bos_].life = bos_;
-						
+
 						if ((gMC.cond & 0x80) && gBoss[bos_].bits & npc_eventDie)
 						{
 							StartTextScript(gBoss[bos_].code_event);
@@ -135,7 +135,7 @@ void HitBossBullet()
 						else
 						{
 							PlaySoundObject(gBoss[bos_].destroy_voice, 1);
-							
+
 							switch (gBoss[bos_].size)
 							{
 								case 1:
@@ -148,7 +148,7 @@ void HitBossBullet()
 									SetDestroyNpChar(gBoss[bos_].x, gBoss[bos_].y, gBoss[bos_].view.back, 16);
 									break;
 							}
-							
+
 							gBoss[bos_].cond = 0;
 						}
 					}
@@ -161,12 +161,12 @@ void HitBossBullet()
 							SetCaret(gBul[bul].x, gBul[bul].y, 11, 0);
 							PlaySoundObject(gBoss[bos_].hit_voice, 1);
 						}
-						
+
 						gBoss[bos].shock = 8;
 						gBoss[bos_].shock = 8;
 						gBoss[bos_].damage_view -= gBul[bul].damage;
 					}
-					
+
 					if (--gBul[bul].life < 1)
 						gBul[bul].cond = 0;
 				}
@@ -224,7 +224,7 @@ void ActBossChar()
 	code_char = gBoss[0].code_char;
 
 	gpBossFuncTbl[code_char]();
-	
+
 	for (bos = 0; bos < BOSS_MAX; bos++)
 	{
 		if (gBoss[bos].shock)
@@ -258,7 +258,7 @@ void HitBossMap()
 	offx[13] = 0;
 	offx[14] = 1;
 	offx[15] = 2;
-	
+
 	offy[0] = 0;
 	offy[1] = 0;
 	offy[2] = 1;
@@ -275,7 +275,7 @@ void HitBossMap()
 	offy[13] = -1;
 	offy[14] = -1;
 	offy[15] = -1;
-	
+
 	for (b = 0; b < BOSS_MAX; b++)
 	{
 		int judg;
@@ -288,7 +288,7 @@ void HitBossMap()
 
 		if (gBoss[b].size >= 3)
 		{
-			judg = 16;			
+			judg = 16;
 			x = gBoss[b].x / 0x10 / 0x200;
 			y = gBoss[b].y / 0x10 / 0x200;
 		}
@@ -298,12 +298,12 @@ void HitBossMap()
 			x = gBoss[b].x / 0x10 / 0x200;
 			y = gBoss[b].y / 0x10 / 0x200;
 		}
-	
+
 		gBoss[b].flag = 0;
 		for (j = 0; j < judg; j++)
 		{
 			atrb[j] = GetAttribute(x + offx[j], y + offy[j]);
-			
+
 			switch (atrb[j])
 			{
 				case 0x44:
