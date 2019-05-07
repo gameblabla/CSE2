@@ -38,8 +38,8 @@ BOOL InitBack(const char *fName, int type)
 	// This is ridiculously platform-dependant:
 	// It should break on big-endian CPUs, and platforms
 	// where short isn't 16-bit and long isn't 32-bit.
-	short bmp_header_buffer[7];
-	long bmp_header_buffer2[10];
+	unsigned short bmp_header_buffer[7];	// These names aren't the original. This ruins the stack frame layout.
+	unsigned long bmp_header_buffer2[10];
 
 	fread(bmp_header_buffer, 14, 1, fp);
 
