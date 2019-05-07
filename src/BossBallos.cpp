@@ -230,7 +230,7 @@ void ActBossChar_Ballos(void)
 				SetQuake2(30);
 				PlaySoundObject(44, 1);
 
-				if ( gMC.y > npc->y + 0x6000 && gMC.x < npc->x + 0x3000 && gMC.x > npc->x - 0x3000 )
+				if (gMC.y > npc->y + 0x6000 && gMC.x < npc->x + 0x3000 && gMC.x > npc->x - 0x3000)
 					DamageMyChar(16);
 
 				for (i = 0; i < 0x10; ++i)
