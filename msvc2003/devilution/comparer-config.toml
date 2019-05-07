@@ -12,6 +12,14 @@ addr = 0x402270
 size = 0x100
 
 [[func]]
+name = "ActBack"
+addr = 0x402370
+
+[[func]]
+name = "PutBack"
+addr = 0x4023D0
+
+[[func]]
 name = "PutFront"
 addr = 0x402830
 
