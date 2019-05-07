@@ -344,7 +344,8 @@ void HitBulletMap()
 
 		if (gBul[i].bbits & 4)
 		{
-			// A "continue" doesn't produce the same assembly, likely because that would jump to the generated "continue" label instead of the "endif" label
+			// Using "continue" here doesn't produce accurate assembly
+			// TODO Figure out what Pixel actually did (it's unlikely he left the brackets empty)
 		}
 		else
 		{

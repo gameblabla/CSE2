@@ -1300,8 +1300,7 @@ void ActBullet_Spine(BULLET *bul)
 			{232, 0, 240, 8},
 		};
 
-		RECT rcDown[2] =
-		{
+		RECT rcDown[2] = {
 			{224, 8, 232, 16},
 			{232, 8, 240, 16},
 		};
