@@ -272,6 +272,14 @@ name = "SetCaret"
 addr = 0x40AC90
 
 [[func]]
+name = "LoadConfigData"
+addr = 0x40AD60
+
+[[func]]
+name = "DefaultConfigData"
+addr = 0x40AE30
+
+[[func]]
 name = "Call_Escape"
 addr = 0x40DD70
 
@@ -605,6 +613,18 @@ addr = 0x41FE70
 [[func]]
 name = "PlaySoundObject"
 addr = 0x420640
+
+[[func]]
+name = "TransferStage"
+addr = 0x420BE0
+
+[[func]]
+name = "ChangeMusic"
+addr = 0x420EE0
+
+[[func]]
+name = "ReCallMusic"
+addr = 0x420F50
 
 [[func]]
 name = "InitStar"

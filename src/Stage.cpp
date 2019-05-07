@@ -153,7 +153,7 @@ bool LoadStageTable(const char *path)
 		{
 			for (long i = 0; i < entry_count; ++i)
 			{
-				// For compatibility with Booster's Lab, we store our stage table in "MOD_KS" format.
+				// For compatibility with Booster's Lab, we store our stage table in "MOD_MR" format.
 				// This way, BL will load the sprites as PNG files instead of BMP.
 				unsigned char *entry = file_buffer + 4 + i * 0x74;
 
@@ -183,7 +183,7 @@ bool LoadStageTable(const char *path)
 BOOL TransferStage(int no, int w, int x, int y)
 {
 	//Move character
-	SetMyCharPosition(x << 13, y << 13);
+	SetMyCharPosition(x * 0x10 * 0x200, y * 0x10 * 0x200);
 
 	BOOL bError = FALSE;
 
@@ -217,7 +217,7 @@ BOOL TransferStage(int no, int w, int x, int y)
 		bError = TRUE;
 
 	//Load background
-	strcpy(path, gTMT[no].back);
+	sprintf(path, "%s", gTMT[no].back);
 	if (!InitBack(path, gTMT[no].bkType))
 		bError = TRUE;
 
@@ -234,28 +234,21 @@ BOOL TransferStage(int no, int w, int x, int y)
 		bError = TRUE;
 
 	if (bError)
-	{
-		printf("Failed to load stage %d\n", no);
 		return FALSE;
-	}
-	else
-	{
-		//Load map name
-		ReadyMapName(gTMT[no].name);
 
-		StartTextScript(w);
-		SetFrameMyChar();
-		ClearBullet();
-		InitCaret();
-		ClearValueView();
-		ResetQuake();
-		InitBossChar(gTMT[no].boss_no);
-		ResetFlash();
-		gStageNo = no;
-		return TRUE;
-	}
+	//Load map name
+	ReadyMapName(gTMT[no].name);
 
-	return FALSE;
+	StartTextScript(w);
+	SetFrameMyChar();
+	ClearBullet();
+	InitCaret();
+	ClearValueView();
+	ResetQuake();
+	InitBossChar(gTMT[no].boss_no);
+	ResetFlash();
+	gStageNo = no;
+	return TRUE;
 }
 
 enum
@@ -322,40 +315,40 @@ int gMusicNo;
 
 void ChangeMusic(int no)
 {
-	if (!no || no != gMusicNo)
+	if (no && no == gMusicNo)
+		return;
+
+	//Stop and keep track of old song
+	gOldPos = GetOrganyaPosition();
+	gOldNo = gMusicNo;
+	StopOrganyaMusic();
+#ifdef EXTRA_SOUND_FORMATS
+	ExtraSound_PauseMusic();
+#endif
+
+	char path[PATH_LENGTH];
+	sprintf(path, "%s/%s", gDataPath, gMusicTable[no].path);
+
+	switch (gMusicTable[no].type)
 	{
-		//Stop and keep track of old song
-		gOldPos = GetOrganyaPosition();
-		gOldNo = gMusicNo;
-		StopOrganyaMusic();
-#ifdef EXTRA_SOUND_FORMATS
-		ExtraSound_PauseMusic();
-#endif
+		case MUSIC_TYPE_ORGANYA:
+			//Load .org
+			LoadOrganya(path);
 
-		char path[PATH_LENGTH];
-		sprintf(path, "%s/%s", gDataPath, gMusicTable[no].path);
-
-		switch (gMusicTable[no].type)
-		{
-			case MUSIC_TYPE_ORGANYA:
-				//Load .org
-				LoadOrganya(path);
-	
-				//Reset position, volume, and then play the song
-				ChangeOrganyaVolume(100);
-				SetOrganyaPosition(0);
-				PlayOrganyaMusic();
-				break;
+			//Reset position, volume, and then play the song
+			ChangeOrganyaVolume(100);
+			SetOrganyaPosition(0);
+			PlayOrganyaMusic();
+			break;
 
 #ifdef EXTRA_SOUND_FORMATS
-			case MUSIC_TYPE_OTHER:
-				ExtraSound_LoadMusic(path, gMusicTable[no].loop);
-				break;
+		case MUSIC_TYPE_OTHER:
+			ExtraSound_LoadMusic(path, gMusicTable[no].loop);
+			break;
 #endif
-		}
-
-		gMusicNo = no;
 	}
+
+	gMusicNo = no;
 }
 
 void ReCallMusic()
