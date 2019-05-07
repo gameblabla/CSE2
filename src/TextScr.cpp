@@ -112,7 +112,7 @@ void EncryptionBinaryData2(uint8_t *pData, int size)
 }
 
 //Load generic .tsc
-bool LoadTextScript2(const char *name)
+BOOL LoadTextScript2(const char *name)
 {
 	//Get path
 	char path[260];
@@ -120,12 +120,12 @@ bool LoadTextScript2(const char *name)
 
 	gTS.size = GetFileSizeLong(path);
 	if (gTS.size == -1)
-		return false;
+		return FALSE;
 
 	//Open file
 	FILE *fp = fopen(path, "rb");
 	if (fp == NULL)
-		return false;
+		return FALSE;
 
 	//Read data
 	fread(gTS.data, 1, gTS.size, fp);
@@ -137,11 +137,11 @@ bool LoadTextScript2(const char *name)
 
 	//Decrypt data
 	EncryptionBinaryData2((uint8_t*)gTS.data, gTS.size);
-	return true;
+	return TRUE;
 }
 
 //Load stage .tsc
-bool LoadTextScript_Stage(const char *name)
+BOOL LoadTextScript_Stage(const char *name)
 {
 	//Open Head.tsc
 	char path[PATH_LENGTH];
@@ -149,11 +149,11 @@ bool LoadTextScript_Stage(const char *name)
 
 	long head_size = GetFileSizeLong(path);
 	if (head_size == -1)
-		return false;
+		return FALSE;
 
 	FILE *fp = fopen(path, "rb");
 	if (fp == NULL)
-		return false;
+		return FALSE;
 
 	//Read Head.tsc
 	fread(gTS.data, 1, head_size, fp);
@@ -166,11 +166,11 @@ bool LoadTextScript_Stage(const char *name)
 
 	long body_size = GetFileSizeLong(path);
 	if (body_size == -1)
-		return false;
+		return FALSE;
 
 	fp = fopen(path, "rb");
 	if (fp == NULL)
-		return false;
+		return FALSE;
 
 	//Read stage's tsc
 	fread(&gTS.data[head_size], 1, body_size, fp);
@@ -181,7 +181,7 @@ bool LoadTextScript_Stage(const char *name)
 	//Set parameters
 	gTS.size = head_size + body_size;
 	strcpy(gTS.path, name);
-	return true;
+	return TRUE;
 }
 
 //Get current path

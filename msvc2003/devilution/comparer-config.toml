@@ -615,6 +615,18 @@ name = "PlaySoundObject"
 addr = 0x420640
 
 [[func]]
+name = "TransferStage"
+addr = 0x420BE0
+
+[[func]]
+name = "ChangeMusic"
+addr = 0x420EE0
+
+[[func]]
+name = "ReCallMusic"
+addr = 0x420F50
+
+[[func]]
 name = "InitStar"
 addr = 0x420FA0
 

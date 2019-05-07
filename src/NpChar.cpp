@@ -53,14 +53,14 @@ void SetUniqueParameter(NPCHAR *npc)
 	npc->view.bottom = gNpcTable[code].view.bottom << 9;
 }
 
-bool LoadEvent(const char *path_event)
+BOOL LoadEvent(const char *path_event)
 {
 	char path[PATH_LENGTH];
 	sprintf(path, "%s/%s", gDataPath, path_event);
 
 	FILE *fp = fopen(path, "rb");
 	if (fp == NULL)
-		return false;
+		return FALSE;
 
 	//Read "PXE" check
 	char code[4];
@@ -71,7 +71,7 @@ bool LoadEvent(const char *path_event)
 		// The original game forgot to close the file here
 		fclose(fp);
 #endif
-		return false;
+		return FALSE;
 	}
 
 	//Get amount of NPCs
@@ -128,7 +128,7 @@ bool LoadEvent(const char *path_event)
 	}
 
 	fclose(fp);
-	return true;
+	return TRUE;
 }
 
 void SetNpChar(int code_char, int x, int y, int xm, int ym, int dir, NPCHAR *npc, int start_index)
@@ -235,7 +235,7 @@ void SetExpObjects(int x, int y, int exp)
 	}
 }
 
-bool SetBulletObject(int x, int y, int val)
+BOOL SetBulletObject(int x, int y, int val)
 {
 	int tamakazu_ari[10];
 
@@ -254,7 +254,7 @@ bool SetBulletObject(int x, int y, int val)
 	}
 
 	if (!t)
-		return false;
+		return FALSE;
 
 	n = Random(1, 10 * t);
 	int bullet_no = tamakazu_ari[n % t];
@@ -272,14 +272,14 @@ bool SetBulletObject(int x, int y, int val)
 			gNPC[n].bits = gNpcTable[gNPC[n].code_char].bits;
 			gNPC[n].exp = val;
 			SetUniqueParameter(&gNPC[n]);
-			return true;
+			return TRUE;
 		}
 	}
 
-	return false;
+	return FALSE;
 }
 
-bool SetLifeObject(int x, int y, int val)
+BOOL SetLifeObject(int x, int y, int val)
 {
 	for (int n = 0x100; n < NPC_MAX; n++)
 	{
@@ -294,11 +294,11 @@ bool SetLifeObject(int x, int y, int val)
 			gNPC[n].bits = gNpcTable[gNPC[n].code_char].bits;
 			gNPC[n].exp = val;
 			SetUniqueParameter(&gNPC[n]);
-			return true;
+			return TRUE;
 		}
 	}
 
-	return false;
+	return FALSE;
 }
 
 void VanishNpChar(NPCHAR *npc)
