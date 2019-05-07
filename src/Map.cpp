@@ -81,7 +81,7 @@ BOOL LoadMapData2(const char *path_map)
 BOOL LoadAttributeData(const char *path_atrb)
 {
 	//Open file
-	char path[260];
+	char path[PATH_LENGTH];
 	sprintf(path, "%s/%s", gDataPath, path_atrb);
 
 	FILE *fp = fopen(path, "rb");
