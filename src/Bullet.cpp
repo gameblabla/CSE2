@@ -222,14 +222,16 @@ void ActBullet_Frontia1(BULLET *bul)
 		if (bul->ani_no > 3)
 			bul->ani_no = 0;
 
-		RECT rcLeft[4] = {
+		RECT rcLeft[4] =
+		{
 			{136, 80, 152, 80},
 			{120, 80, 136, 96},
 			{136, 64, 152, 80},
 			{120, 64, 136, 80},
 		};
 
-		RECT rcRight[4] = {
+		RECT rcRight[4] =
+		{
 			{120, 64, 136, 80},
 			{136, 64, 152, 80},
 			{120, 80, 136, 96},
@@ -346,16 +348,17 @@ void ActBullet_Frontia2(BULLET *bul, int level)
 			bul->y += bul->ym;
 		}
 
-		if ( ++bul->ani_wait > 0 )
+		if (++bul->ani_wait > 0)
 		{
 			bul->ani_wait = 0;
 			++bul->ani_no;
 		}
 
-		if ( bul->ani_no > 2 )
+		if (bul->ani_no > 2)
 			bul->ani_no = 0;
 
-		RECT rect[3] = {
+		RECT rect[3] =
+		{
 			{192, 16, 208, 32},
 			{208, 16, 224, 32},
 			{224, 16, 240, 32},
@@ -387,7 +390,7 @@ void ActBullet_PoleStar(BULLET *bul, int level)
 		{
 			bul->act_no = 1;
 
-			//Set speed
+			// Set speed
 			switch (bul->direct)
 			{
 				case 0:
@@ -404,7 +407,7 @@ void ActBullet_PoleStar(BULLET *bul, int level)
 					break;
 			}
 
-			//Set hitbox
+			// Set hitbox
 			switch (level)
 			{
 				case 1:
@@ -445,7 +448,7 @@ void ActBullet_PoleStar(BULLET *bul, int level)
 		}
 		else
 		{
-			//Move
+			// Move
 			bul->x += bul->xm;
 			bul->y += bul->ym;
 		}
@@ -634,21 +637,24 @@ void ActBullet_MachineGun(BULLET *bul, int level)
 {
 	int move;
 
-	RECT rect1[4] = {
+	RECT rect1[4] =
+	{
 		{64, 0, 80, 16},
 		{80, 0, 96, 16},
 		{96, 0, 112, 16},
 		{112, 0, 128, 16},
 	};
 
-	RECT rect2[4] = {
+	RECT rect2[4] =
+	{
 		{64, 16, 80, 32},
 		{80, 16, 96, 32},
 		{96, 16, 112, 32},
 		{112, 16, 128, 32},
 	};
 
-	RECT rect3[4] = {
+	RECT rect3[4] =
+	{
 		{64, 32, 80, 48},
 		{80, 32, 96, 48},
 		{96, 32, 112, 48},
@@ -904,21 +910,24 @@ void ActBullet_Missile(BULLET *bul, int level)
 		}
 	}
 
-	RECT rect1[4] = {
+	RECT rect1[4] =
+	{
 		{0, 0, 16, 16},
 		{16, 0, 32, 16},
 		{32, 0, 48, 16},
 		{48, 0, 64, 16},
 	};
 
-	RECT rect2[4] = {
+	RECT rect2[4] =
+	{
 		{0, 16, 16, 32},
 		{16, 16, 32, 32},
 		{32, 16, 48, 32},
 		{48, 16, 64, 32},
 	};
 
-	RECT rect3[4] = {
+	RECT rect3[4] =
+	{
 		{0, 32, 16, 48},
 		{16, 32, 32, 48},
 		{32, 32, 48, 48},
@@ -1226,7 +1235,8 @@ void ActBullet_Bubblin3(BULLET *bul)
 		bul->x += bul->xm;
 		bul->y += bul->ym;
 
-		RECT rect[4] = {
+		RECT rect[4] =
+		{
 			{240, 16, 248, 24},
 			{248, 16, 256, 24},
 			{240, 24, 248, 32},
@@ -1290,17 +1300,20 @@ void ActBullet_Spine(BULLET *bul)
 		if (bul->ani_no > 1)
 			bul->ani_no = 0;
 
-		RECT rcLeft[2] = {
+		RECT rcLeft[2] =
+		{
 			{224, 0, 232, 8},
 			{232, 0, 240, 8},
 		};
 
-		RECT rcRight[2] = {
+		RECT rcRight[2] =
+		{
 			{224, 0, 232, 8},
 			{232, 0, 240, 8},
 		};
 
-		RECT rcDown[2] = {
+		RECT rcDown[2] =
+		{
 			{224, 8, 232, 16},
 			{232, 8, 240, 16},
 		};
@@ -1364,14 +1377,16 @@ void ActBullet_Sword1(BULLET *bul)
 			bul->y += bul->ym;
 		}
 
-		RECT rcLeft[4] = {
+		RECT rcLeft[4] =
+		{
 			{0, 48, 16, 64},
 			{16, 48, 32, 64},
 			{32, 48, 48, 64},
 			{48, 48, 64, 64},
 		};
 
-		RECT rcRight[4] = {
+		RECT rcRight[4] =
+		{
 			{64, 48, 80, 64},
 			{80, 48, 96, 64},
 			{96, 48, 112, 64},
@@ -1435,14 +1450,16 @@ void ActBullet_Sword2(BULLET *bul)
 			bul->y += bul->ym;
 		}
 
-		RECT rcLeft[4] = {
+		RECT rcLeft[4] =
+		{
 			{160, 48, 184, 72},
 			{184, 48, 208, 72},
 			{208, 48, 232, 72},
 			{232, 48, 256, 72},
 		};
 
-		RECT rcRight[4] = {
+		RECT rcRight[4] =
+		{
 			{160, 72, 184, 96},
 			{184, 72, 208, 96},
 			{208, 72, 232, 96},
@@ -1467,22 +1484,26 @@ void ActBullet_Sword2(BULLET *bul)
 
 void ActBullet_Sword3(BULLET *bul)
 {
-	RECT rcLeft[2] = {
+	RECT rcLeft[2] =
+	{
 		{272, 0, 296, 24},
 		{296, 0, 320, 24},
 	};
 
-	RECT rcUp[2] = {
+	RECT rcUp[2] =
+	{
 		{272, 48, 296, 72},
 		{296, 0, 320, 24},
 	};
 
-	RECT rcRight[2] = {
+	RECT rcRight[2] =
+	{
 		{272, 24, 296, 48},
 		{296, 24, 320, 48},
 	};
 
-	RECT rcDown[2] = {
+	RECT rcDown[2] =
+	{
 		{296, 48, 320, 72},
 		{296, 24, 320, 48},
 	};
@@ -1621,7 +1642,8 @@ void ActBullet_Edge(BULLET *bul)
 			break;
 	}
 
-	RECT rcLeft[5] = {
+	RECT rcLeft[5] =
+	{
 		{0, 64, 24, 88},
 		{24, 64, 48, 88},
 		{48, 64, 72, 88},
@@ -1629,7 +1651,8 @@ void ActBullet_Edge(BULLET *bul)
 		{96, 64, 120, 88},
 	};
 
-	RECT rcRight[5] = {
+	RECT rcRight[5] =
+	{
 		{0, 88, 24, 112},
 		{24, 88, 48, 112},
 		{48, 88, 72, 112},
@@ -1800,7 +1823,7 @@ void ActBullet_SuperMissile(BULLET *bul, int level)
 
 			if (bul->xm < -0x1400)
 				bul->xm = -0x1400;
-			if (bul->xm > 0x1400 )
+			if (bul->xm > 0x1400)
 				bul->xm = 0x1400;
 
 			if (bul->ym < -0x1400)
@@ -1835,14 +1858,16 @@ void ActBullet_SuperMissile(BULLET *bul, int level)
 		}
 	}
 
-	RECT rect1[4] = {
+	RECT rect1[4] =
+	{
 		{120, 96, 136, 112},
 		{136, 96, 152, 112},
 		{152, 96, 168, 112},
 		{168, 96, 184, 112},
 	};
 
-	RECT rect2[4] = {
+	RECT rect2[4] =
+	{
 		{184, 96, 200, 112},
 		{200, 96, 216, 112},
 		{216, 96, 232, 112},
@@ -1975,22 +2000,26 @@ void ActBullet_Nemesis(BULLET *bul, int level)
 		if (++bul->ani_no > 1)
 			bul->ani_no = 0;
 
-		RECT rcL[2] = {
+		RECT rcL[2] =
+		{
 			{0, 112, 32, 128},
 			{0, 128, 32, 144},
 		};
 
-		RECT rcU[2] = {
+		RECT rcU[2] =
+		{
 			{32, 112, 48, 144},
 			{48, 112, 64, 144},
 		};
 
-		RECT rcR[2] = {
+		RECT rcR[2] =
+		{
 			{64, 112, 96, 128},
 			{64, 128, 96, 144},
 		};
 
-		RECT rcD[2] = {
+		RECT rcD[2] =
+		{
 			{96, 112, 112, 144},
 			{112, 112, 128, 144},
 		};
@@ -2097,17 +2126,20 @@ void ActBullet_Spur(BULLET *bul, int level)
 			bul->y += bul->ym;
 		}
 
-		RECT rect1[2] = {
+		RECT rect1[2] =
+		{
 			{128, 32, 144, 48},
 			{144, 32, 160, 48},
 		};
 
-		RECT rect2[2] = {
+		RECT rect2[2] =
+		{
 			{160, 32, 176, 48},
 			{176, 32, 192, 48},
 		};
 
-		RECT rect3[2] = {
+		RECT rect3[2] =
+		{
 			{128, 48, 144, 64},
 			{144, 48, 160, 64},
 		};
@@ -2147,44 +2179,50 @@ void ActBullet_Spur(BULLET *bul, int level)
 
 void ActBullet_SpurTail(BULLET *bul, int level)
 {
-	if ( ++bul->count1 > 20 )
+	if (++bul->count1 > 20)
 		bul->ani_no = bul->count1 - 20;
-	if ( bul->ani_no > 2 )
+	if (bul->ani_no > 2)
 		bul->cond = 0;
-	if ( bul->damage && bul->life != 100 )
+	if (bul->damage && bul->life != 100)
 		bul->damage = 0;
 
-	RECT rc_h_lv1[3] = {
+	RECT rc_h_lv1[3] =
+	{
 		{192, 32, 200, 40},
 		{200, 32, 208, 40},
 		{208, 32, 216, 40},
 	};
 
-	RECT rc_v_lv1[3] = {
+	RECT rc_v_lv1[3] =
+	{
 		{192, 40, 200, 48},
 		{200, 40, 208, 48},
 		{208, 40, 216, 48},
 	};
 
-	RECT rc_h_lv2[3] = {
+	RECT rc_h_lv2[3] =
+	{
 		{216, 32, 224, 40},
 		{224, 32, 232, 40},
 		{232, 32, 240, 40},
 	};
 
-	RECT rc_v_lv2[3] = {
+	RECT rc_v_lv2[3] =
+	{
 		{216, 40, 224, 48},
 		{224, 40, 232, 48},
 		{232, 40, 240, 48},
 	};
 
-	RECT rc_h_lv3[3] = {
+	RECT rc_h_lv3[3] =
+	{
 		{240, 32, 248, 40},
 		{248, 32, 256, 40},
 		{256, 32, 264, 40},
 	};
 
-	RECT rc_v_lv3[3] = {
+	RECT rc_v_lv3[3] =
+	{
 		{240, 32, 248, 40},
 		{248, 32, 256, 40},
 		{256, 32, 264, 40},
