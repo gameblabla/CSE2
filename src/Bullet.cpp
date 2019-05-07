@@ -346,13 +346,13 @@ void ActBullet_Frontia2(BULLET *bul, int level)
 			bul->y += bul->ym;
 		}
 
-		if ( ++bul->ani_wait > 0 )
+		if (++bul->ani_wait > 0)
 		{
 			bul->ani_wait = 0;
 			++bul->ani_no;
 		}
 
-		if ( bul->ani_no > 2 )
+		if (bul->ani_no > 2)
 			bul->ani_no = 0;
 
 		RECT rect[3] = {
@@ -387,7 +387,7 @@ void ActBullet_PoleStar(BULLET *bul, int level)
 		{
 			bul->act_no = 1;
 
-			//Set speed
+			// Set speed
 			switch (bul->direct)
 			{
 				case 0:
@@ -404,7 +404,7 @@ void ActBullet_PoleStar(BULLET *bul, int level)
 					break;
 			}
 
-			//Set hitbox
+			// Set hitbox
 			switch (level)
 			{
 				case 1:
@@ -445,7 +445,7 @@ void ActBullet_PoleStar(BULLET *bul, int level)
 		}
 		else
 		{
-			//Move
+			// Move
 			bul->x += bul->xm;
 			bul->y += bul->ym;
 		}
@@ -1800,7 +1800,7 @@ void ActBullet_SuperMissile(BULLET *bul, int level)
 
 			if (bul->xm < -0x1400)
 				bul->xm = -0x1400;
-			if (bul->xm > 0x1400 )
+			if (bul->xm > 0x1400)
 				bul->xm = 0x1400;
 
 			if (bul->ym < -0x1400)
@@ -2147,11 +2147,11 @@ void ActBullet_Spur(BULLET *bul, int level)
 
 void ActBullet_SpurTail(BULLET *bul, int level)
 {
-	if ( ++bul->count1 > 20 )
+	if (++bul->count1 > 20)
 		bul->ani_no = bul->count1 - 20;
-	if ( bul->ani_no > 2 )
+	if (bul->ani_no > 2)
 		bul->cond = 0;
-	if ( bul->damage && bul->life != 100 )
+	if (bul->damage && bul->life != 100)
 		bul->damage = 0;
 
 	RECT rc_h_lv1[3] = {
