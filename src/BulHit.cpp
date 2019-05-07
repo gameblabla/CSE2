@@ -28,7 +28,7 @@ int JudgeHitBulletBlock(int x, int y, BULLET *bul)
 	if (bul->x - bul->blockXL < (0x10 * x + 8) * 0x200
 		&& bul->x + bul->blockXL > (0x10 * x - 8) * 0x200
 		&& bul->y - bul->blockYL < (0x10 * y + 8) * 0x200
-		&& bul->y + bul->blockYL> (0x10 * y - 8) * 0x200)
+		&& bul->y + bul->blockYL > (0x10 * y - 8) * 0x200)
 		hit |= 0x200;
 
 	if (hit && (bul->bbits & 0x60) && GetAttribute(x, y) == 0x43)
@@ -81,7 +81,7 @@ int JudgeHitBulletBlock2(int x, int y, uint8_t *atrb, BULLET *bul)
 	workX = (0x10 * x + 8) * 0x200;
 	workY = (0x10 * y + 8) * 0x200;
 
-	//Left wall
+	// Left wall
 	if (block[0] && block[2])
 	{
 		if (bul->x - bul->blockXL < workX)
@@ -98,7 +98,7 @@ int JudgeHitBulletBlock2(int x, int y, uint8_t *atrb, BULLET *bul)
 			hit |= 1;
 	}
 
-	//Right wall
+	// Right wall
 	if (block[1] && block[3])
 	{
 		if (bul->x + bul->blockXL > workX)
@@ -115,7 +115,7 @@ int JudgeHitBulletBlock2(int x, int y, uint8_t *atrb, BULLET *bul)
 			hit |= 4;
 	}
 
-	//Ceiling
+	// Ceiling
 	if (block[0] && block[1])
 	{
 		if (bul->y - bul->blockYL < workY)
@@ -132,7 +132,7 @@ int JudgeHitBulletBlock2(int x, int y, uint8_t *atrb, BULLET *bul)
 			hit |= 2;
 	}
 
-	//Ground
+	// Ground
 	if (block[2] && block[3])
 	{
 		if (bul->y + bul->blockYL > workY)
@@ -149,7 +149,7 @@ int JudgeHitBulletBlock2(int x, int y, uint8_t *atrb, BULLET *bul)
 			hit |= 8;
 	}
 
-	//Clip
+	// Clip
 	if (bul->bbits & 8)
 	{
 		if (hit & 1)
@@ -324,7 +324,7 @@ void HitBulletMap()
 		x = gBul[i].x / 0x10 / 0x200;
 		y = gBul[i].y / 0x10 / 0x200;
 
-		//Get surrounding tiles
+		// Get surrounding tiles
 		offx[0] = 0;
 		offx[1] = 1;
 		offx[2] = 0;
@@ -339,12 +339,13 @@ void HitBulletMap()
 		atrb[2] = GetAttribute(x, y + 1);
 		atrb[3] = GetAttribute(x + 1, y + 1);
 
-		//Clear hit tiles
+		// Clear hit tiles
 		gBul[i].flag = 0;
 
 		if (gBul[i].bbits & 4)
 		{
-			// For some reason a 'continue' just doesn't produce the same assembly
+			// Using "continue" here doesn't produce accurate assembly
+			// TODO Figure out what Pixel actually did (it's unlikely he left the brackets empty)
 		}
 		else
 		{
@@ -401,3 +402,4 @@ void HitBulletMap()
 		}
 	}
 }
+
