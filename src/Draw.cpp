@@ -56,7 +56,7 @@ BOOL Flip_SystemTask()
 		if (!SystemTask())
 			return FALSE;
 
-		//Framerate limiter
+		// Framerate limiter
 		static uint32_t timePrev;
 		const uint32_t timeNow = SDL_GetTicks();
 
@@ -81,15 +81,15 @@ BOOL StartDirectDraw(int lMagnification, int lColourDepth)
 {
 	(void)lColourDepth;
 
-	//Initialize rendering
+	// Initialize rendering
 	SDL_InitSubSystem(SDL_INIT_VIDEO);
 
-	//Create renderer
+	// Create renderer
 	gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED);
 
 	if (gRenderer != NULL)
 	{
-		//Print the name of the renderer SDL2 is using
+		// Print the name of the renderer SDL2 is using
 		SDL_RendererInfo info;
 		SDL_GetRendererInfo(gRenderer, &info);
 		printf("Renderer: %s\n", info.name);
@@ -120,10 +120,10 @@ BOOL StartDirectDraw(int lMagnification, int lColourDepth)
 
 void EndDirectDraw()
 {
-	//Quit sub-system
+	// Quit sub-system
 	SDL_QuitSubSystem(SDL_INIT_VIDEO);
 
-	//Release all surfaces
+	// Release all surfaces
 	for (int i = 0; i < SURFACE_ID_MAX; i++)
 		ReleaseSurface(i);
 }
@@ -143,7 +143,7 @@ static bool IsEnableBitmap(SDL_RWops *fp)
 
 void ReleaseSurface(int s)
 {
-	//Release the surface we want to release
+	// Release the surface we want to release
 	if (surf[s].in_use)
 	{
 		SDL_DestroyTexture(surf[s].texture);
@@ -172,7 +172,7 @@ BOOL MakeSurface_Generic(int bxsize, int bysize, Surface_Ids surf_no)
 		}
 		else
 		{
-			//Create surface
+			// Create surface
 			surf[surf_no].surface = SDL_CreateRGBSurfaceWithFormat(0, bxsize * magnification, bysize * magnification, 0, SDL_PIXELFORMAT_RGB24);
 			SDL_SetSurfaceBlendMode(surf[surf_no].surface, SDL_BLENDMODE_NONE);
 
@@ -320,7 +320,7 @@ static BOOL LoadBitmap_File(const char *name, Surface_Ids surf_no, bool create_s
 	char path[PATH_LENGTH];
 	SDL_RWops *fp;
 
-	//Attempt to load PBM
+	// Attempt to load PBM
 	sprintf(path, "%s/%s.pbm", gDataPath, name);
 	fp = SDL_RWFromFile(path, "rb");
 	if (fp)
@@ -338,7 +338,7 @@ static BOOL LoadBitmap_File(const char *name, Surface_Ids surf_no, bool create_s
 		}
 	}
 
-	//Attempt to load BMP
+	// Attempt to load BMP
 	sprintf(path, "%s/%s.bmp", gDataPath, name);
 	fp = SDL_RWFromFile(path, "rb");
 	if (fp)
@@ -412,22 +412,22 @@ static SDL_Rect RectToSDLRectScaled(RECT *rect)
 
 void BackupSurface(Surface_Ids surf_no, RECT *rect)
 {
-	//Get renderer size
+	// Get renderer size
 	int w, h;
 	SDL_GetRendererOutputSize(gRenderer, &w, &h);
 
-	//Get texture of what's currently rendered on screen
+	// Get texture of what's currently rendered on screen
 	SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormat(0, w, h, 0, SDL_PIXELFORMAT_RGB24);
 	SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_NONE);
 	SDL_RenderReadPixels(gRenderer, NULL, SDL_PIXELFORMAT_RGB24, surface->pixels, surface->pitch);
 
-	//Get rects
+	// Get rects
 	SDL_Rect frameRect = RectToSDLRectScaled(rect);
 
 	SDL_BlitSurface(surface, &frameRect, surf[surf_no].surface, &frameRect);
 	surf[surf_no].needs_updating = true;
 
-	//Free surface
+	// Free surface
 	SDL_FreeSurface(surface);
 }
 
@@ -439,40 +439,39 @@ static void DrawBitmap(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_
 		surf[surf_no].needs_updating = false;
 	}
 
-	//Get SDL_Rects
+	// Get SDL_Rects
 	SDL_Rect clipRect = RectToSDLRectScaled(rcView);
-
 	SDL_Rect frameRect = RectToSDLRectScaled(rect);
 
-	//Get dest rect
+	// Get dest rect
 	SDL_Rect destRect = {x * magnification, y * magnification, frameRect.w, frameRect.h};
 
-	//Set cliprect
+	// Set cliprect
 	SDL_RenderSetClipRect(gRenderer, &clipRect);
 
 	SDL_SetTextureBlendMode(surf[surf_no].texture, transparent ? SDL_BLENDMODE_BLEND : SDL_BLENDMODE_NONE);
 
-	//Draw to screen
+	// Draw to screen
 	if (SDL_RenderCopy(gRenderer, surf[surf_no].texture, &frameRect, &destRect) < 0)
 		printf("Failed to draw texture %d\nSDL Error: %s\n", surf_no, SDL_GetError());
 
-	//Undo cliprect
+	// Undo cliprect
 	SDL_RenderSetClipRect(gRenderer, NULL);
 }
 
-void PutBitmap3(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_no) //Transparency
+void PutBitmap3(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_no) // Transparency
 {
 	DrawBitmap(rcView, x, y, rect, surf_no, true);
 }
 
-void PutBitmap4(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_no) //No Transparency
+void PutBitmap4(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_no) // No Transparency
 {
 	DrawBitmap(rcView, x, y, rect, surf_no, false);
 }
 
 void Surface2Surface(int x, int y, RECT *rect, int to, int from)
 {
-	//Get rects
+	// Get rects
 	SDL_Rect rcSet = {x * magnification, y * magnification, (rect->right - rect->left) * magnification, (rect->bottom - rect->top) * magnification};
 	SDL_Rect frameRect = RectToSDLRectScaled(rect);
 
@@ -488,10 +487,10 @@ unsigned long GetCortBoxColor(unsigned long col)
 
 void CortBox(RECT *rect, uint32_t col)
 {
-	//Get rect
+	// Get rect
 	SDL_Rect destRect = RectToSDLRectScaled(rect);
 
-	//Set colour and draw
+	// Set colour and draw
 	const unsigned char col_red = col & 0x0000FF;
 	const unsigned char col_green = (col & 0x00FF00) >> 8;
 	const unsigned char col_blue = (col & 0xFF0000) >> 16;
@@ -501,10 +500,10 @@ void CortBox(RECT *rect, uint32_t col)
 
 void CortBox2(RECT *rect, uint32_t col, Surface_Ids surf_no)
 {
-	//Get rect
+	// Get rect
 	SDL_Rect destRect = RectToSDLRectScaled(rect);
 
-	//Set colour and draw
+	// Set colour and draw
 	const unsigned char col_red = col & 0x0000FF;
 	const unsigned char col_green = (col & 0x00FF00) >> 8;
 	const unsigned char col_blue = (col & 0xFF0000) >> 16;
@@ -558,7 +557,7 @@ static unsigned char* GetFontFromWindows(size_t *data_size, const char *font_nam
 
 void InitTextObject(const char *font_name)
 {
-	//Get font size
+	// Get font size
 	unsigned int fontWidth, fontHeight;
 
 	// The original did this, but Windows would downscale it to 5/10 anyway.
@@ -568,10 +567,13 @@ void InitTextObject(const char *font_name)
 		fontHeight = 12;
 	}
 	else
-	{*/
+	{
 		fontWidth = 5 * magnification;
 		fontHeight = 10 * magnification;
-//	}
+	}*/
+
+	fontWidth = 5 * magnification;
+	fontHeight = 10 * magnification;
 
 	size_t data_size;
 #ifdef WINDOWS
@@ -632,7 +634,7 @@ void PutText2(int x, int y, const char *text, uint32_t color, Surface_Ids surf_n
 
 void EndTextObject()
 {
-	//Destroy font
+	// Destroy font
 	UnloadFont(gFont);
 	gFont = NULL;
 }

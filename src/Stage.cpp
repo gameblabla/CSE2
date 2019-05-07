@@ -132,7 +132,7 @@ const STAGE_TABLE gTMT[95] = {
 BOOL TransferStage(int no, int w, int x, int y)
 {
 	//Move character
-	SetMyCharPosition(x << 13, y << 13);
+	SetMyCharPosition(x * 0x10 * 0x200, y * 0x10 * 0x200);
 
 	BOOL bError = FALSE;
 
@@ -166,7 +166,7 @@ BOOL TransferStage(int no, int w, int x, int y)
 		bError = TRUE;
 
 	//Load background
-	strcpy(path, gTMT[no].back);
+	sprintf(path, "%s", gTMT[no].back);
 	if (!InitBack(path, gTMT[no].bkType))
 		bError = TRUE;
 
@@ -183,28 +183,21 @@ BOOL TransferStage(int no, int w, int x, int y)
 		bError = TRUE;
 
 	if (bError)
-	{
-		printf("Failed to load stage %d\n", no);
 		return FALSE;
-	}
-	else
-	{
-		//Load map name
-		ReadyMapName(gTMT[no].name);
 
-		StartTextScript(w);
-		SetFrameMyChar();
-		ClearBullet();
-		InitCaret();
-		ClearValueView();
-		ResetQuake();
-		InitBossChar(gTMT[no].boss_no);
-		ResetFlash();
-		gStageNo = no;
-		return TRUE;
-	}
+	//Load map name
+	ReadyMapName(gTMT[no].name);
 
-	return FALSE;
+	StartTextScript(w);
+	SetFrameMyChar();
+	ClearBullet();
+	InitCaret();
+	ClearValueView();
+	ResetQuake();
+	InitBossChar(gTMT[no].boss_no);
+	ResetFlash();
+	gStageNo = no;
+	return TRUE;
 }
 
 //Music
@@ -264,22 +257,22 @@ int gMusicNo;
 
 void ChangeMusic(int no)
 {
-	if (!no || no != gMusicNo)
-	{
-		//Stop and keep track of old song
-		gOldPos = GetOrganyaPosition();
-		gOldNo = gMusicNo;
-		StopOrganyaMusic();
+	if (no && no == gMusicNo)
+		return;
 
-		//Load .org
-		LoadOrganya(gMusicTable[no]);
+	//Stop and keep track of old song
+	gOldPos = GetOrganyaPosition();
+	gOldNo = gMusicNo;
+	StopOrganyaMusic();
 
-		//Reset position, volume, and then play the song
-		ChangeOrganyaVolume(100);
-		SetOrganyaPosition(0);
-		PlayOrganyaMusic();
-		gMusicNo = no;
-	}
+	//Load .org
+	LoadOrganya(gMusicTable[no]);
+
+	//Reset position, volume, and then play the song
+	ChangeOrganyaVolume(100);
+	SetOrganyaPosition(0);
+	PlayOrganyaMusic();
+	gMusicNo = no;
 }
 
 void ReCallMusic()

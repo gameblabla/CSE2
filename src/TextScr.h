@@ -60,8 +60,8 @@ struct TEXT_SCRIPT
 BOOL InitTextScript2();
 void EndTextScript();
 void EncryptionBinaryData2(uint8_t *pData, int size);
-bool LoadTextScript2(const char *name);
-bool LoadTextScript_Stage(const char *name);
+BOOL LoadTextScript2(const char *name);
+BOOL LoadTextScript_Stage(const char *name);
 void GetTextScriptPath(char *path);
 BOOL StartTextScript(int no);
 void StopTextScript();
