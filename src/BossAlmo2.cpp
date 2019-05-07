@@ -14,7 +14,8 @@
 
 static void ActBossCharA_Head(NPCHAR *npc)
 {
-	RECT rect[4] = {
+	RECT rect[4] =
+	{
 		{0, 0, 72, 112},
 		{0, 112, 72, 224},
 		{160, 0, 232, 112},
@@ -61,7 +62,8 @@ static void ActBossCharA_Head(NPCHAR *npc)
 
 static void ActBossCharA_Tail(NPCHAR *npc)
 {
-	RECT rect[3] = {
+	RECT rect[3] =
+	{
 		{72, 0, 160, 112},
 		{72, 112, 160, 224},
 		{0, 0, 0, 0},
@@ -107,7 +109,8 @@ static void ActBossCharA_Tail(NPCHAR *npc)
 
 static void ActBossCharA_Face(NPCHAR *npc)
 {
-	RECT rect[5] = {
+	RECT rect[5] =
+	{
 		{0, 0, 0, 0},
 		{160, 112, 232, 152},
 		{160, 152, 232, 192},
@@ -174,7 +177,8 @@ static void ActBossCharA_Mini(NPCHAR *npc)
 {
 	int deg;
 
-	RECT rect[3] = {
+	RECT rect[3] =
+	{
 		{256, 0, 320, 40},
 		{256, 40, 320, 80},
 		{256, 80, 320, 120},

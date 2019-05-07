@@ -13,7 +13,8 @@
 
 static void ActBossChar_Eye(NPCHAR *npc)
 {
-	RECT rcLeft[5] = {
+	RECT rcLeft[5] =
+	{
 		{272, 0, 296, 16},
 		{272, 16, 296, 32},
 		{272, 32, 296, 48},
@@ -21,7 +22,8 @@ static void ActBossChar_Eye(NPCHAR *npc)
 		{240, 16, 264, 32},
 	};
 
-	RECT rcRight[5] = {
+	RECT rcRight[5] =
+	{
 		{296, 0, 320, 16},
 		{296, 16, 320, 32},
 		{296, 32, 320, 48},
@@ -104,7 +106,8 @@ static void ActBossChar_Eye(NPCHAR *npc)
 
 static void ActBossChar_Body(NPCHAR *npc)
 {
-	RECT rc[4] = {
+	RECT rc[4] =
+	{
 		{0, 0, 120, 120},
 		{120, 0, 240, 120},
 		{0, 120, 120, 240},

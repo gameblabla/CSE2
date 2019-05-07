@@ -206,13 +206,15 @@ void ActBossChar_Press(void)
 	gBoss[3].x = npc->x;
 	gBoss[3].y = npc->y + 0x5000;
 
-	RECT rc[3] = {
+	RECT rc[3] =
+	{
 		{0, 0, 80, 120},
 		{80, 0, 160, 120},
 		{160, 0, 240, 120},
 	};
 
-	RECT rcDamage[3] = {
+	RECT rcDamage[3] =
+	{
 		{0, 120, 80, 240},
 		{80, 120, 160, 240},
 		{160, 120, 240, 240},
