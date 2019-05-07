@@ -573,7 +573,7 @@ void ActNpc184(NPCHAR *npc)
 		{64, 64, 96, 96},
 		{32, 64, 64, 96},
 	};
-	
+
 	switch (npc->act_no)
 	{
 		case 0:
@@ -618,16 +618,16 @@ void ActNpc184(NPCHAR *npc)
 			npc->act_no = 1;
 			break;
 	}
-	
+
 	if (++npc->ani_wait > 10)
 	{
 		npc->ani_wait = 0;
 		++npc->ani_no;
 	}
-	
+
 	if (npc->ani_no > 3)
 		npc->ani_no = 0;
-	
+
 	npc->rect = rc[npc->ani_no];
 }
 
@@ -684,7 +684,7 @@ void ActNpc186(NPCHAR *npc)
 		{80, 48, 96, 64},
 		{64, 48, 80, 64},
 	};
-	
+
 	switch (npc->act_no)
 	{
 		case 0:
@@ -717,16 +717,16 @@ void ActNpc186(NPCHAR *npc)
 			++npc->act_wait;
 			break;
 	}
-	
+
 	if (++npc->ani_wait > 10)
 	{
 		npc->ani_wait = 0;
 		++npc->ani_no;
 	}
-	
+
 	if (npc->ani_no > 3)
 		npc->ani_no = 0;
-	
+
 	npc->rect = rc[npc->ani_no];
 }
 
@@ -962,7 +962,7 @@ void ActNpc190(NPCHAR *npc)
 		{192, 32, 208, 48},
 		{208, 32, 224, 48},
 	};
-	
+
 	switch (npc->act_no)
 	{
 		case 0:
@@ -984,7 +984,7 @@ void ActNpc190(NPCHAR *npc)
 				npc->ani_no = 0;
 			break;
 	}
-	
+
 	npc->rect = rect[npc->ani_no];
 }
 
@@ -1067,7 +1067,7 @@ void ActNpc191(NPCHAR *npc)
 			npc->y += npc->ym;
 			break;
 	}
-	
+
 	gWaterY = npc->y;
 	npc->rect.right = 0;
 	npc->rect.bottom = 0;

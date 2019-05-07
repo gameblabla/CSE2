@@ -99,7 +99,7 @@ void ShootBullet_PoleStar(int level)
 			bul_no = 6;
 			break;
 	}
-	
+
 	if (CountArmsBullet(2) > 1)
 		return;
 
@@ -150,7 +150,7 @@ void ShootBullet_PoleStar(int level)
 					SetCaret(gMC.x + 0x1800, gMC.y + 0x600, 3, 0);
 				}
 			}
-			
+
 			if (level == 3)
 				PlaySoundObject(49, 1);
 			else
@@ -181,7 +181,7 @@ void ShootBullet_FireBall(int level)
 			bul_no = 9;
 			break;
 	}
-	
+
 	if (gKeyTrg & gKeyShot)
 	{
 		if (!UseArmsEnergy(1))
@@ -229,7 +229,7 @@ void ShootBullet_FireBall(int level)
 					SetCaret(gMC.x + 0x1800, gMC.y + 0x400, 3, 0);
 				}
 			}
-			
+
 			PlaySoundObject(34, 1);
 		}
 	}
@@ -254,10 +254,10 @@ void ShootBullet_Machinegun1(int level)
 			bul_no = 12;
 			break;
 	}
-	
+
 	if (!(gKey & gKeyShot))
 		gMC.rensha = 6;
-	
+
 	if (gKey & gKeyShot)
 	{
 		if (++gMC.rensha < 6)
@@ -268,7 +268,7 @@ void ShootBullet_Machinegun1(int level)
 		if (!UseArmsEnergy(1))
 		{
 			PlaySoundObject(37, 1);
-			
+
 			if (empty == 0)
 			{
 				SetCaret(gMC.x, gMC.y, 16, 0);
@@ -283,7 +283,7 @@ void ShootBullet_Machinegun1(int level)
 			{
 				if (level == 3)
 					gMC.ym += 0x100;
-			
+
 				if (gMC.direct == 0)
 				{
 					SetBullet(bul_no, gMC.x - 0x600, gMC.y - 0x1000, 1);
@@ -301,7 +301,7 @@ void ShootBullet_Machinegun1(int level)
 				{
 					if (gMC.ym > 0)
 						gMC.ym /= 2;
-					
+
 					if (gMC.ym > -0x400)
 					{
 						gMC.ym -= 0x200;
@@ -309,7 +309,7 @@ void ShootBullet_Machinegun1(int level)
 							gMC.ym = -0x400;
 					}
 				}
-				
+
 				if (gMC.direct == 0)
 				{
 					SetBullet(bul_no, gMC.x - 0x600, gMC.y + 0x1000, 3);
@@ -334,7 +334,7 @@ void ShootBullet_Machinegun1(int level)
 					SetCaret(gMC.x + 0x1800, gMC.y + 0x600, 3, 0);
 				}
 			}
-			
+
 			if (level == 3)
 				PlaySoundObject(49, 1);
 			else
@@ -344,7 +344,7 @@ void ShootBullet_Machinegun1(int level)
 	else
 	{
 		static int wait = 0;
-		
+
 		++wait;
 		if (gMC.equip & 8)
 		{
@@ -354,7 +354,7 @@ void ShootBullet_Machinegun1(int level)
 				ChargeArmsEnergy(1);
 			}
 		}
-		else 
+		else
 		{
 			if (wait > 4)
 			{
@@ -383,7 +383,7 @@ void ShootBullet_Missile(int level, BOOL bSuper)
 				bul_no = 30;
 				break;
 		}
-		
+
 		switch (level)
 		{
 			case 1:
@@ -413,7 +413,7 @@ void ShootBullet_Missile(int level, BOOL bSuper)
 
 				break;
 		}
-		
+
 	}
 	else
 	{
@@ -429,7 +429,7 @@ void ShootBullet_Missile(int level, BOOL bSuper)
 				bul_no = 15;
 				break;
 		}
-		
+
 		switch (level)
 		{
 			case 1:
@@ -460,7 +460,7 @@ void ShootBullet_Missile(int level, BOOL bSuper)
 				break;
 		}
 	}
-	
+
 	if (gKeyTrg & gKeyShot)
 	{
 		if (level < 3)
@@ -1037,19 +1037,19 @@ void ShootBullet()
 {
 	if (empty)
 		--empty;
-	
+
 	//Only let the player shoot every 4 frames
 	static int soft_rensha;
 	if (soft_rensha)
 		--soft_rensha;
-	
+
 	if (gKeyTrg & gKeyShot)
 	{
 		if (soft_rensha)
 			return;
 		soft_rensha = 4;
 	}
-	
+
 	//Run functions
 	if (gMC.cond & 2)
 		return;

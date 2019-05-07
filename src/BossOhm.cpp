@@ -23,7 +23,7 @@ static void ActBoss01_12()
 	for (i = 1; i < 3; ++i)
 	{
 		gBoss[i].y = (gBoss[0].y + gBoss[i + 2].y - 0x1000) / 2;
-		
+
 		if (gBoss[i].direct == 0)
 		{
 			gBoss[i].x = gBoss[0].x - 0x2000;
