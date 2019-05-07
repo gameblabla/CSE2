@@ -114,8 +114,7 @@ static void ActBossChar_Core_Mini(NPCHAR *npc)
 	int ym;
 	int xm;
 
-	RECT rect[3] =
-	{
+	RECT rect[3] = {
 		{256, 0, 320, 40},
 		{256, 40, 320, 80},
 		{256, 80, 320, 120},
