@@ -83,13 +83,13 @@ extern int gSuperXpos;
 extern int gSuperYpos;
 
 void InitNpChar();
-bool LoadEvent(const char *path_event);
+BOOL LoadEvent(const char *path_event);
 void SetNpChar(int code_char, int x, int y, int xm, int ym, int dir, NPCHAR *npc, int start_index);
 void SetDestroyNpChar(int x, int y, int w, int num);
 void SetDestroyNpCharUp(int x, int y, int w, int num);
 void SetExpObjects(int x, int y, int exp);
-bool SetBulletObject(int x, int y, int val);
-bool SetLifeObject(int x, int y, int val);
+BOOL SetBulletObject(int x, int y, int val);
+BOOL SetLifeObject(int x, int y, int val);
 void VanishNpChar(NPCHAR *npc);
 void PutNpChar(int fx, int fy);
 void ActNpChar();

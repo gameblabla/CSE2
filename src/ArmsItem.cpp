@@ -158,9 +158,9 @@ void MoveCampCursor()
 {
 	int arms_num = 0;
 	int item_num = 0;
-	while ( gArmsData[arms_num].code != 0 )
+	while (gArmsData[arms_num].code != 0)
 		++arms_num;
-	while ( gItemData[item_num].code != 0 )
+	while (gItemData[item_num].code != 0)
 		++item_num;
 
 	if (arms_num == 0 && item_num == 0)
@@ -228,9 +228,9 @@ void MoveCampCursor()
 			bChange = TRUE;
 		}
 
-		if ( gKeyTrg & gKeyDown )
+		if (gKeyTrg & gKeyDown)
 		{
-			if ( gSelectedItem / 6 == (item_num - 1) / 6 )
+			if (gSelectedItem / 6 == (item_num - 1) / 6)
 				gCampActive = FALSE;
 			else
 				gSelectedItem += 6;
@@ -325,7 +325,7 @@ void PutCampObject()
 		PutNumber4(40 * i + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT - 160) / 2, gArmsData[i].level, 0);
 
 		// Draw ammo
-		if ( gArmsData[i].max_num )
+		if (gArmsData[i].max_num)
 		{
 			PutNumber4(40 * i + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT - 144) / 2, gArmsData[i].num, 0);
 			PutNumber4(40 * i + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT - 128) / 2, gArmsData[i].max_num, 0);

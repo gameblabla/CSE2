@@ -490,7 +490,7 @@ void ActBossChar_Twin(void)
 				}
 			}
 
-			if ( npc->count1 > 0x3FF )
+			if (npc->count1 > 0x3FF)
 				npc->count1 -= 0x400;
 
 			break;
