@@ -1115,13 +1115,13 @@ void ActNpc150(NPCHAR *npc)
 		{160, 16, 176, 32},
 		{112, 16, 128, 32},
 	};
-	
+
 	switch (npc->act_no)
 	{
 		case 0:
 			npc->act_no = 1;
 			npc->ani_no = 0;
-			
+
 			if (npc->direct > 10)
 			{
 				npc->x = gMC.x;
@@ -1171,7 +1171,7 @@ void ActNpc150(NPCHAR *npc)
 
 			if (npc->ani_no > 6)
 				npc->ani_no = 3;
-			
+
 			if (npc->direct == 0)
 				npc->x -= 0x200;
 			else
@@ -1202,7 +1202,7 @@ void ActNpc150(NPCHAR *npc)
 				npc->x += 0x100;
 			else
 				npc->x -= 0x100;
-			
+
 			if (++npc->ani_wait > 8)
 			{
 				npc->ani_wait = 0;
@@ -1250,12 +1250,12 @@ void ActNpc150(NPCHAR *npc)
 
 			break;
 	}
-	
+
 	if (npc->direct == 0)
 		npc->rect = rcLeft[npc->ani_no];
 	else
 		npc->rect = rcRight[npc->ani_no];
-	
+
 	if (npc->act_no == 21)
 	{
 		npc->rect.bottom = npc->act_wait / 4 + npc->rect.top;
@@ -1263,7 +1263,7 @@ void ActNpc150(NPCHAR *npc)
 		if (npc->act_wait / 2 % 2)
 			++npc->rect.left;
 	}
-	
+
 	if (gMC.equip & 0x40)
 	{
 		npc->rect.top += 32;

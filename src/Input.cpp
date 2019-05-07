@@ -31,16 +31,16 @@ bool InitDirectInput()
 {
 	//Open first available joystick
 	SDL_InitSubSystem(SDL_INIT_JOYSTICK);
-	
+
 	for (int i = 0; i < SDL_NumJoysticks(); i++)
 	{
 		joystick = SDL_JoystickOpen(i);
-			
+
 		//Break as soon as a joystick is properly opened
 		if (joystick)
 			break;
 	}
-	
+
 	return true;
 }
 
@@ -48,7 +48,7 @@ bool GetJoystickStatus(JOYSTICK_STATUS *pStatus)
 {
 	//Clear status
 	memset(pStatus, 0, sizeof(JOYSTICK_STATUS));
-	
+
 	if (joystick)
 	{
 		int32_t x = SDL_JoystickGetAxis(joystick, 0);
@@ -57,17 +57,17 @@ bool GetJoystickStatus(JOYSTICK_STATUS *pStatus)
 		pStatus->bRight = x >= JOYSTICK_DEADZONE;
 		pStatus->bUp = y <= -JOYSTICK_DEADZONE;
 		pStatus->bDown = y >= JOYSTICK_DEADZONE;
-		
+
 		int numButtons = SDL_JoystickNumButtons(joystick);
 		if (numButtons > 32)
 			numButtons = 32;
-		
+
 		for (int button = 0; button < numButtons; button++)
 			pStatus->bButton[button] = SDL_JoystickGetButton(joystick, button) != 0;
-		
+
 		return true;
 	}
-	
+
 	return false;
 }
 

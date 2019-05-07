@@ -78,7 +78,7 @@ int CountArmsBullet(int arms_code)
 		if (gBul[i].cond & 0x80 && (gBul[i].code_bullet + 2) / 3 == arms_code)
 			++count;
 	}
-	
+
 	return count;
 }
 
@@ -90,7 +90,7 @@ int CountBulletNum(int bullet_code)
 		if (gBul[i].cond & 0x80 && gBul[i].code_bullet == bullet_code)
 			++count;
 	}
-	
+
 	return count;
 }
 
@@ -122,7 +122,7 @@ void PutBullet(int fx, int fy)
 	for (i = 0; i < BULLET_MAX; i++)
 	{
 		if (gBul[i].cond & 0x80)
-		{			
+		{
 			switch (gBul[i].direct)
 			{
 				case 0:
@@ -142,7 +142,7 @@ void PutBullet(int fx, int fy)
 					y = gBul[i].y - gBul[i].view.back;
 					break;
 			}
-			
+
 			PutBitmap3(&grcGame, x / 0x200 - fx / 0x200, y / 0x200 - fy / 0x200, &gBul[i].rect, SURFACE_ID_BULLET);
 		}
 	}
@@ -386,7 +386,7 @@ void ActBullet_PoleStar(BULLET *bul, int level)
 		if (bul->act_no == 0)
 		{
 			bul->act_no = 1;
-			
+
 			//Set speed
 			switch (bul->direct)
 			{
@@ -403,7 +403,7 @@ void ActBullet_PoleStar(BULLET *bul, int level)
 					bul->ym = 0x1000;
 					break;
 			}
-			
+
 			//Set hitbox
 			switch (level)
 			{
@@ -507,12 +507,12 @@ void ActBullet_FireBall(BULLET *bul, int level)
 			bBreak = TRUE;
 		if (bul->flag & 1 && bul->flag & 4)
 			bBreak = TRUE;
-	
+
 		if (!bul->direct && bul->flag & 1)
 			bul->direct = 2;
 		if (bul->direct == 2 && bul->flag & 4)
 			bul->direct = 0;
-		
+
 		if (bBreak)
 		{
 			bul->cond = 0;
@@ -524,7 +524,7 @@ void ActBullet_FireBall(BULLET *bul, int level)
 			if (bul->act_no == 0)
 			{
 				bul->act_no = 1;
-				
+
 				switch (bul->direct)
 				{
 					case 0:
@@ -532,17 +532,17 @@ void ActBullet_FireBall(BULLET *bul, int level)
 						break;
 					case 1:
 						bul->xm = gMC.xm;
-						
+
 						if (gMC.xm < 0)
 							bul->direct = 0;
 						else
 							bul->direct = 2;
-						
+
 						if (gMC.direct == 0)
 							bul->xm -= 0x80;
 						else
 							bul->xm += 0x80;
-						
+
 						bul->ym = -0x5FF;
 						break;
 					case 2:
@@ -569,14 +569,14 @@ void ActBullet_FireBall(BULLET *bul, int level)
 					bul->xm = 0x400;
 				else if (bul->flag & 4)
 					bul->xm = -0x400;
-				
+
 				bul->ym += 85;
 				if (bul->ym > 0x3FF)
 					bul->ym = 0x3FF;
-				
+
 				bul->x += bul->xm;
 				bul->y += bul->ym;
-				
+
 				if (bul->flag & 0xD)
 					PlaySoundObject(34, 1);
 			}
@@ -598,14 +598,14 @@ void ActBullet_FireBall(BULLET *bul, int level)
 			SET_RECT(rect_right2[0], 224, 16, 240, 32)
 			SET_RECT(rect_right2[1], 208, 16, 224, 32)
 			SET_RECT(rect_right2[2], 192, 16, 208, 32)
-			
+
 			bul->ani_no++;
-			
+
 			if (level == 1)
 			{
 				if (bul->ani_no > 3)
 					bul->ani_no = 0;
-				
+
 				if (bul->direct == 0)
 					bul->rect = rect_left1[bul->ani_no];
 				else
@@ -615,12 +615,12 @@ void ActBullet_FireBall(BULLET *bul, int level)
 			{
 				if (bul->ani_no > 2)
 					bul->ani_no = 0;
-				
+
 				if (bul->direct == 0)
 					bul->rect = rect_left2[bul->ani_no];
 				else
 					bul->rect = rect_right2[bul->ani_no];
-				
+
 				if (level == 2)
 					SetNpChar(129, bul->x, bul->y, 0, -0x200, bul->ani_no, 0, 0x100);
 				else
@@ -676,9 +676,9 @@ void ActBullet_MachineGun(BULLET *bul, int level)
 					move = 0x1000;
 					break;
 			}
-			
+
 			bul->act_no = 1;
-			
+
 			switch (bul->direct)
 			{
 				case 0:
@@ -703,7 +703,7 @@ void ActBullet_MachineGun(BULLET *bul, int level)
 		{
 			bul->x += bul->xm;
 			bul->y += bul->ym;
-			
+
 			switch (level)
 			{
 				case 1:
@@ -808,7 +808,7 @@ void ActBullet_Missile(BULLET *bul, int level)
 				}
 
 				static unsigned int inc;
-				
+
 				switch (++inc % 3)
 				{
 					case 0:
@@ -945,7 +945,7 @@ void ActBullet_Bom(BULLET *bul, int level)
 	{
 		case 0:
 			bul->act_no = 1;
-			
+
 			switch (level)
 			{
 				case 1:
@@ -958,7 +958,7 @@ void ActBullet_Bom(BULLET *bul, int level)
 					bul->act_wait = 5;
 					break;
 			}
-			
+
 			PlaySoundObject(44, 1);
 			// Fallthrough
 		case 1:
@@ -979,7 +979,7 @@ void ActBullet_Bom(BULLET *bul, int level)
 						SetDestroyNpCharUp(bul->x + (Random(-40, 40) << 9), bul->y + (Random(-40, 40) << 9), bul->enemyXL, 2);
 					break;
 			}
-			
+
 			if (--bul->act_wait < 0)
 				bul->cond = 0;
 			break;

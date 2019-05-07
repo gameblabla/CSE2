@@ -10,12 +10,12 @@
 int Call_Escape()
 {
 	RECT rc = {0, 128, 208, 144};
-	
+
 	while (1)
 	{
 		//Get pressed keys
 		GetTrg();
-		
+
 		if (gKeyTrg & KEY_ESCAPE) //Escape is pressed, quit game
 		{
 			gKeyTrg = 0;
@@ -31,7 +31,7 @@ int Call_Escape()
 			gKeyTrg = 0;
 			return 2;
 		}
-		
+
 		//Draw screen
 		CortBox(&grcFull, 0x000000);
 		PutBitmap3(&grcFull, (WINDOW_WIDTH - 208) / 2, (WINDOW_HEIGHT - 16) / 2, &rc, SURFACE_ID_TEXT_BOX);
@@ -44,6 +44,6 @@ int Call_Escape()
 			return 0;
 		}
 	}
-	
+
 	return 0;
 }

@@ -542,35 +542,35 @@ void ActNpc006(NPCHAR *npc)
 	{
 		case 0: //Init
 			npc->act_no = 1;
-			
+
 			if (npc->direct == 0)
 				npc->act_no = 1;
 			else
 				npc->act_no = 3;
 			break;
-		
+
 		case 1:
 			//Accelerate to the left
 			npc->xm -= 0x10;
 			if (npc->xm < -0x400)
 				npc->xm = -0x400;
-			
+
 			//Move
 			if (npc->shock)
 				npc->x += npc->xm / 2;
 			else
 				npc->x += npc->xm;
-			
+
 			//Animate
 			if (++npc->ani_wait > 1)
 			{
 				npc->ani_wait = 0;
 				++npc->ani_no;
 			}
-			
+
 			if (npc->ani_no > 2)
 				npc->ani_no = 1;
-			
+
 			//Stop when hitting a wall
 			if (npc->flag & 1)
 			{
@@ -581,7 +581,7 @@ void ActNpc006(NPCHAR *npc)
 				npc->direct = 2;
 			}
 			break;
-			
+
 		case 2:
 			//Wait 60 frames then move to the right
 			if (++npc->act_wait > 60)
@@ -591,29 +591,29 @@ void ActNpc006(NPCHAR *npc)
 				npc->ani_no = 1;
 			}
 			break;
-			
+
 		case 3:
 			//Accelerate to the right
 			npc->xm += 0x10;
 			if (npc->xm > 0x400)
 				npc->xm = 0x400;
-			
+
 			//Move
 			if (npc->shock)
 				npc->x += npc->xm / 2;
 			else
 				npc->x += npc->xm;
-			
+
 			//Animate
 			if (++npc->ani_wait > 1)
 			{
 				npc->ani_wait = 0;
 				++npc->ani_no;
 			}
-			
+
 			if (npc->ani_no > 2)
 				npc->ani_no = 1;
-			
+
 			//Stop when hitting a wall
 			if (npc->flag & 4)
 			{
@@ -624,7 +624,7 @@ void ActNpc006(NPCHAR *npc)
 				npc->direct = 0;
 			}
 			break;
-		
+
 		case 4:
 			//Wait 60 frames then move to the left
 			if (++npc->act_wait > 60)
@@ -635,7 +635,7 @@ void ActNpc006(NPCHAR *npc)
 			}
 			break;
 	}
-	
+
 	//Set framerect
 	if (npc->direct == 0)
 		npc->rect = rcLeft[npc->ani_no];

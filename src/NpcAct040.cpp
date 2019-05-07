@@ -93,7 +93,7 @@ void ActNpc040(NPCHAR *npc)
 			npc->ani_no = 6;
 			break;
 	}
-	
+
 	if (npc->direct == 0)
 		npc->rect = rcLeft[npc->ani_no];
 	else
@@ -825,17 +825,17 @@ void ActNpc048(NPCHAR *npc)
 			npc->ym = -0x100;
 		}
 	}
-	
+
 	if (npc->direct == 2)
 	{
 		npc->bits &= ~npc_shootable;
 		npc->bits |= npc_invulnerable;
 	}
-	
+
 	npc->ym += 5;
 	npc->y += npc->ym;
 	npc->x += npc->xm;
-	
+
 	RECT rcLeft[2] = {
 		{288, 88, 304, 104},
 		{304, 88, 320, 104},
@@ -845,20 +845,20 @@ void ActNpc048(NPCHAR *npc)
 		{288, 104, 304, 120},
 		{304, 104, 320, 120},
 	};
-		
+
 	if (++npc->ani_wait > 2)
 	{
 		npc->ani_wait = 0;
 		if (++npc->ani_no > 1)
 			npc->ani_no = 0;
 	}
-	
+
 	if (++npc->act_wait > 750)
 	{
 		SetCaret(npc->x, npc->y, 2, 0);
 		npc->cond = 0;
 	}
-	
+
 	if (npc->direct == 0)
 		npc->rect = rcLeft[npc->ani_no];
 	else
