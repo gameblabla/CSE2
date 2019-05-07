@@ -30,7 +30,7 @@ int JudgeHitBulletBlock(int x, int y, BULLET *bul)
 		&& bul->y - bul->blockYL < (0x10 * y + 8) * 0x200
 		&& bul->y + bul->blockYL> (0x10 * y - 8) * 0x200)
 		hit |= 0x200;
-	
+
 	if (hit && (bul->bbits & 0x60) && GetAttribute(x, y) == 0x43)
 	{
 		if (!(bul->bbits & 0x40))
@@ -41,7 +41,7 @@ int JudgeHitBulletBlock(int x, int y, BULLET *bul)
 			SetNpChar(4, x * 0x200 * 0x10, y * 0x200 * 0x10, Random(-0x200, 0x200), Random(-0x200, 0x200), 0, 0, 256);
 		ShiftMapParts(x, y);
 	}
-	
+
 	return hit;
 }
 
@@ -51,7 +51,7 @@ int JudgeHitBulletBlock2(int x, int y, uint8_t *atrb, BULLET *bul)
 	int workX;
 	int workY;
 	int hit = 0;
-	
+
 	int block[4];
 	if (bul->bbits & 0x40)
 	{
@@ -77,10 +77,10 @@ int JudgeHitBulletBlock2(int x, int y, uint8_t *atrb, BULLET *bul)
 			++atrb;
 		}
 	}
-	
+
 	workX = (0x10 * x + 8) * 0x200;
 	workY = (0x10 * y + 8) * 0x200;
-	
+
 	//Left wall
 	if (block[0] && block[2])
 	{
@@ -97,7 +97,7 @@ int JudgeHitBulletBlock2(int x, int y, uint8_t *atrb, BULLET *bul)
 		if (bul->x - bul->blockXL < workX && bul->y + bul->blockYL > workY + 0x600)
 			hit |= 1;
 	}
-	
+
 	//Right wall
 	if (block[1] && block[3])
 	{
@@ -131,7 +131,7 @@ int JudgeHitBulletBlock2(int x, int y, uint8_t *atrb, BULLET *bul)
 		if (bul->y - bul->blockYL < workY && bul->x + bul->blockXL > workX + 0x600)
 			hit |= 2;
 	}
-	
+
 	//Ground
 	if (block[2] && block[3])
 	{
@@ -148,7 +148,7 @@ int JudgeHitBulletBlock2(int x, int y, uint8_t *atrb, BULLET *bul)
 		if (bul->y + bul->blockYL > workY && bul->x + bul->blockXL > workX + 0x600)
 			hit |= 8;
 	}
-	
+
 	//Clip
 	if (bul->bbits & 8)
 	{
@@ -165,7 +165,7 @@ int JudgeHitBulletBlock2(int x, int y, uint8_t *atrb, BULLET *bul)
 	{
 		Vanish(bul);
 	}
-	
+
 	return hit;
 }
 
@@ -323,7 +323,7 @@ void HitBulletMap()
 
 		x = gBul[i].x / 0x10 / 0x200;
 		y = gBul[i].y / 0x10 / 0x200;
-		
+
 		//Get surrounding tiles
 		offx[0] = 0;
 		offx[1] = 1;
@@ -333,15 +333,15 @@ void HitBulletMap()
 		offy[1] = 0;
 		offy[2] = 1;
 		offy[3] = 1;
-		
+
 		atrb[0] = GetAttribute(x, y);
 		atrb[1] = GetAttribute(x + 1, y);
 		atrb[2] = GetAttribute(x, y + 1);
 		atrb[3] = GetAttribute(x + 1, y + 1);
-		
+
 		//Clear hit tiles
 		gBul[i].flag = 0;
-		
+
 		if (gBul[i].bbits & 4)
 		{
 			// For some reason a 'continue' just doesn't produce the same assembly
@@ -396,7 +396,7 @@ void HitBulletMap()
 						break;
 				}
 			}
-			
+
 			gBul[i].flag |= JudgeHitBulletBlock2(x, y, atrb, &gBul[i]);
 		}
 	}

@@ -29,7 +29,7 @@ void WriteMiniMapLine(int line)
 		{242, 24, 243, 25},
 		{243, 24, 244, 25},
 	};
-	
+
 	for (x = 0; x < gMap.width; x++)
 	{
 		a = GetAttribute(x, line);
@@ -84,12 +84,12 @@ int MiniMapLoop()
 	RECT my_rect = {0, 57, 1, 58};
 	int my_x = (gMC.x / 0x200 + 8) / 16;
 	int my_y = (gMC.y / 0x200 + 8) / 16;
-	
+
 	RECT rcView;
 	for (f = 0; f <= 8; f++)
 	{
 		GetTrg();
-		
+
 		if (gKey & KEY_ESCAPE)
 		{
 			switch (Call_Escape())
@@ -100,9 +100,9 @@ int MiniMapLoop()
 					return 2;
 			}
 		}
-		
+
 		PutBitmap4(&grcGame, 0, 0, &grcGame, SURFACE_ID_SCREEN_GRAB);
-		
+
 		rcView.left = (WINDOW_WIDTH / 2) - gMap.width * f / 8 / 2;
 		rcView.right = (WINDOW_WIDTH / 2) + gMap.width * f / 8 / 2;
 		rcView.top = (WINDOW_HEIGHT / 2) - gMap.length * f / 8 / 2;
@@ -110,12 +110,12 @@ int MiniMapLoop()
 
 		PutMapName(true);
 		CortBox(&rcView, 0);
-		
+
 		PutFramePerSecound();
 		if (!Flip_SystemTask())
 			return 0;
 	}
-	
+
 	RECT rcMiniMap;
 	rcMiniMap.left = 0;
 	rcMiniMap.right = gMap.width;
@@ -125,16 +125,16 @@ int MiniMapLoop()
 	rcView.right = --rcView.left + gMap.width + 2;
 	rcView.bottom = --rcView.top + gMap.length + 2;
 	CortBox2(&rcMiniMap, 0, SURFACE_ID_MAP);
-	
+
 	int line = 0;
 	uint8_t my_wait = 0;
 	while (true)
 	{
 		GetTrg();
-		
+
 		if ((gKeyCancel | gKeyOk) & gKeyTrg)
 			break;
-		
+
 		if (gKey & KEY_ESCAPE)
 		{
 			switch (Call_Escape())
@@ -145,10 +145,10 @@ int MiniMapLoop()
 					return 2;
 			}
 		}
-		
+
 		PutBitmap4(&grcGame, 0, 0, &grcGame, SURFACE_ID_SCREEN_GRAB);
 		CortBox(&rcView, 0);
-		
+
 		if (line < gMap.length)
 		{
 			WriteMiniMapLine(line);
@@ -161,17 +161,17 @@ int MiniMapLoop()
 		}
 
 		PutBitmap3(&grcGame, rcView.left + 1, rcView.top + 1, &rcMiniMap, SURFACE_ID_MAP);
-		
+
 		PutMapName(true);
-		
+
 		if (++my_wait / 8 % 2)
 			PutBitmap3(&grcGame, my_x + rcView.left + 1, my_y + rcView.top + 1, &my_rect, SURFACE_ID_TEXT_BOX);
-		
+
 		PutFramePerSecound();
 		if (!Flip_SystemTask())
 			return 0;
 	}
-	
+
 	for (f = 8; f >= -1; --f)
 	{
 		GetTrg();

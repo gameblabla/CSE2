@@ -41,7 +41,7 @@ bool OrganyaNoteAlloc(uint16_t alloc)
 		info.tdata[j].wave_no = 0;
 		info.tdata[j].note_list = NULL;
 		info.tdata[j].note_p = new NOTELIST[alloc];
-		
+
 		if(info.tdata[j].note_p == NULL)
 		{
 			for(int i = 0; i < MAXTRACK; i++)
@@ -66,7 +66,7 @@ bool OrganyaNoteAlloc(uint16_t alloc)
 			(info.tdata[j].note_p + i)->y = KEYDUMMY;
 		}
 	}
-	
+
 	for(int j = 0; j < MAXMELODY; j++)
 		MakeOrganyaWave(j, info.tdata[j].wave_no, info.tdata[j].pipi);
 	//for(int j = 0; j < MAXDRAM; j++)
@@ -119,29 +119,29 @@ bool MakeSoundObject8(int8_t *wavep, int8_t track, int8_t pipi)
 		{
 			size_t wave_size = oct_wave[j].wave_size;
 			size_t data_size = pipi ? wave_size * oct_wave[j].oct_size : wave_size;
-			
+
 			//Create sound buffer
 			lpORGANBUFFER[track][j][k] = new SOUNDBUFFER(data_size);
-			
+
 			//Get wave data
 			uint8_t *wp = new uint8_t[data_size];
 			uint8_t *wp_sub = wp;
 			size_t wav_tp = 0;
-			
+
 			for (size_t i = 0; i < data_size; i++)
 			{
 				uint8_t work = *(wavep+wav_tp);
 				work += 0x80;
-				
+
 				*wp_sub = work;
-				
+
 				wav_tp += 0x100 / wave_size;
 				if (wav_tp >= 0x100)
 					wav_tp -= 0x100;
-				
+
 				wp_sub++;
 			}
-			
+
 			//Copy wave data to sound buffer
 			uint8_t *buf;
 			lpORGANBUFFER[track][j][k]->Lock(&buf, NULL);
@@ -151,7 +151,7 @@ bool MakeSoundObject8(int8_t *wavep, int8_t track, int8_t pipi)
 			delete[] wp;
 		}
 	}
-	
+
 	return true;
 }
 
@@ -167,7 +167,7 @@ void ChangeOrganFrequency(uint8_t key, int8_t track, int32_t a)
 	}
 }
 
-int16_t pan_tbl[13] = {0, 43, 86, 129, 172, 215, 256, 297, 340, 383, 426, 469, 512}; 
+int16_t pan_tbl[13] = {0, 43, 86, 129, 172, 215, 256, 297, 340, 383, 426, 469, 512};
 uint8_t old_key[MAXTRACK] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 uint8_t key_on[MAXTRACK] = {0};
 uint8_t key_twin[MAXTRACK] = {0};
@@ -197,10 +197,10 @@ void PlayOrganObject(uint8_t key, int mode, int8_t track, int32_t freq)
 					lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]]->SetCurrentPosition(0);
 				}
 				break;
-			
+
 			case 1:
 				break;
-				
+
 			case 2:
 				if (old_key[track] != 0xFF)
 				{
@@ -208,7 +208,7 @@ void PlayOrganObject(uint8_t key, int mode, int8_t track, int32_t freq)
 					old_key[track] = 0xFF;
 				}
 				break;
-				
+
 			case -1:
 				if (old_key[track] == 0xFF)
 				{
@@ -222,7 +222,7 @@ void PlayOrganObject(uint8_t key, int mode, int8_t track, int32_t freq)
 					lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]]->Play(false);
 					key_twin[track]++;
 					if(key_twin[track] == 2)
-						key_twin[track] = 0; 
+						key_twin[track] = 0;
 					lpORGANBUFFER[track][key / 12][key_twin[track]]->Play(true);
 				}
 				else
@@ -230,7 +230,7 @@ void PlayOrganObject(uint8_t key, int mode, int8_t track, int32_t freq)
 					lpORGANBUFFER[track][old_key[track]/12][key_twin[track]]->Play(false);
 					key_twin[track]++;
 					if(key_twin[track] == 2)
-						key_twin[track] = 0; 
+						key_twin[track] = 0;
 					ChangeOrganFrequency(key % 12, track, freq);
 					lpORGANBUFFER[track][key / 12][key_twin[track]]->Play(true);
 					old_key[track] = key;
@@ -281,7 +281,7 @@ bool MakeOrganyaWave(int8_t track, int8_t wave_no, int8_t pipi)
 		printf("WARNING: track %d has out-of-range wave_no %d\n", track, wave_no);
 		return false;
 	}
-	
+
 	ReleaseOrganyaObject(track);
 	MakeSoundObject8(wave_data[wave_no], track, pipi);
 	return true;
@@ -347,44 +347,44 @@ void OrganyaPlayData()
 				PlayOrganObject(play_np[i]->y,-1,i,info.tdata[i].freq);
 				now_leng[i] = play_np[i]->length;
 			}
-			
+
 			if(play_np[i]->pan != PANDUMMY)
 				ChangeOrganPan(play_np[i]->y,play_np[i]->pan, i);
 			if(play_np[i]->volume != VOLDUMMY)
 				gTrackVol[i] = play_np[i]->volume;
-			
+
 			play_np[i] = play_np[i]->to;
 		}
-		
+
 		if (now_leng[i] == 0 )
 			PlayOrganObject(0, 2, i, info.tdata[i].freq);
-		
+
 		if (now_leng[i] > 0)
 			now_leng[i]--;
-		
+
 		if (play_np[i])
 			ChangeOrganVolume(play_np[i]->y, gOrgVolume * gTrackVol[i] / 0x7F, i);
 	}
-	
+
 	for(int i = MAXMELODY; i < MAXTRACK; i++)
 	{
 		if (play_np[i] != NULL && play_p == play_np[i]->x)
 		{
 			if (play_np[i]->y != KEYDUMMY)
 				PlayDramObject(play_np[i]->y,1,i-MAXMELODY);
-			
+
 			if(play_np[i]->pan != PANDUMMY)
 				ChangeDramPan(play_np[i]->pan,i-MAXMELODY);
 			if(play_np[i]->volume != VOLDUMMY)
 				gTrackVol[i] = play_np[i]->volume;
-			
+
 			play_np[i] = play_np[i]->to;
 		}
-		
+
 		if (play_np[i])
 			ChangeDramVolume(gOrgVolume * gTrackVol[i] / 0x7F, i - MAXMELODY);
 	}
-	
+
 	//Looping
 	play_p++;
 	if(play_p >= info.end_x)
@@ -402,7 +402,7 @@ void SetPlayPointer(int32_t x)
 		while (play_np[i] != NULL && play_np[i]->x < x)
 			play_np[i] = play_np[i]->to;
 	}
-	
+
 	play_p = x;
 }
 
@@ -444,14 +444,14 @@ void LoadOrganya(const char *name)
 		printf("Failed to open .org, invalid version %s", pass_check);
 		return;
 	}
-	
+
 	//Set song information
 	info.wait = READ_LE16(p);
 	info.line = *p++;
 	info.dot = *p++;
 	info.repeat_x = READ_LE32(p);
 	info.end_x = READ_LE32(p);
-	
+
 	for (int i = 0; i < 16; i++) {
 		info.tdata[i].freq = READ_LE16(p);
 		info.tdata[i].wave_no = *p++;
@@ -525,7 +525,7 @@ void LoadOrganya(const char *name)
 
 	//Reset position
 	SetPlayPointer(0);
-	
+
 	//Set as loaded
 	info.loaded = true;
 }
@@ -555,7 +555,7 @@ bool ChangeOrganyaVolume(signed int volume)
 		gOrgVolume = volume;
 		return true;
 	}
-	
+
 	return false;
 }
 
@@ -563,11 +563,11 @@ void StopOrganyaMusic()
 {
 	//Stop timer
 	OrganyaEndTimer();
-	
+
 	//Stop notes
 	for (int i = 0; i < MAXMELODY; i++)
 		PlayOrganObject(0, 2, i, 0);
-	
+
 	memset(old_key, 255, sizeof(old_key));
 	memset(key_on, 0, sizeof(key_on));
 	memset(key_twin, 0, sizeof(key_twin));
@@ -585,21 +585,21 @@ bool bEndTimer = false;
 int OrganyaPlayTimer(void *ptr)
 {
 	SDL_SetThreadPriority(SDL_THREAD_PRIORITY_HIGH);
-	
+
 	//Set time for next step to play
 	uint32_t NextTick = SDL_GetTicks() + info.wait;
-	
+
 	while (bEndTimer == false)
 	{
 		if (info.loaded)
 		{
 			//Play music
 			OrganyaPlayData();
-			
+
 			//Wait until this step is over
 			while (NextTick > SDL_GetTicks())
 				SDL_Delay(1);
-			
+
 			//Get time for next step to play
 			while (NextTick <= SDL_GetTicks())
 				NextTick += info.wait;
@@ -610,7 +610,7 @@ int OrganyaPlayTimer(void *ptr)
 			SDL_Delay(1);
 		}
 	}
-	
+
 	return 0;
 }
 
@@ -639,10 +639,10 @@ void EndOrganya()
 {
 	//End timer
 	OrganyaEndTimer();
-	
+
 	//Release everything related to org
 	OrganyaReleaseNote();
-	
+
 	for (int i = 0; i < MAXMELODY; i++)
 		ReleaseOrganyaObject(i);
 }

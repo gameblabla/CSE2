@@ -133,13 +133,13 @@ BOOL TransferStage(int no, int w, int x, int y)
 {
 	//Move character
 	SetMyCharPosition(x << 13, y << 13);
-	
+
 	BOOL bError = FALSE;
-	
+
 	//Get path
 	char path_dir[20];
 	strcpy(path_dir, "Stage");
-	
+
 	//Load tileset
 	char path[PATH_LENGTH];
 	sprintf(path, "%s/Prt%s", path_dir, gTMT[no].parts);
@@ -149,7 +149,7 @@ BOOL TransferStage(int no, int w, int x, int y)
 	sprintf(path, "%s/%s.pxa", path_dir, gTMT[no].parts);
 	if (!LoadAttributeData(path))
 		bError = TRUE;
-	
+
 	//Load tilemap
 	sprintf(path, "%s/%s.pxm", path_dir, gTMT[no].map);
 	if (!LoadMapData2(path))
@@ -164,24 +164,24 @@ BOOL TransferStage(int no, int w, int x, int y)
 	sprintf(path, "%s/%s.tsc", path_dir, gTMT[no].map);
 	if (!LoadTextScript_Stage(path))
 		bError = TRUE;
-	
+
 	//Load background
 	strcpy(path, gTMT[no].back);
 	if (!InitBack(path, gTMT[no].bkType))
 		bError = TRUE;
-	
+
 	//Get path
 	strcpy(path_dir, "Npc");
-	
+
 	//Load NPC sprite sheets
 	sprintf(path, "%s/Npc%s", path_dir, gTMT[no].npc);
 	if (!ReloadBitmap_File(path, SURFACE_ID_LEVEL_SPRITESET_1))
 		bError = TRUE;
-	
+
 	sprintf(path, "%s/Npc%s", path_dir, gTMT[no].boss);
 	if (!ReloadBitmap_File(path, SURFACE_ID_LEVEL_SPRITESET_2))
 		bError = TRUE;
-	
+
 	if (bError)
 	{
 		printf("Failed to load stage %d\n", no);
@@ -191,7 +191,7 @@ BOOL TransferStage(int no, int w, int x, int y)
 	{
 		//Load map name
 		ReadyMapName(gTMT[no].name);
-		
+
 		StartTextScript(w);
 		SetFrameMyChar();
 		ClearBullet();
@@ -203,7 +203,7 @@ BOOL TransferStage(int no, int w, int x, int y)
 		gStageNo = no;
 		return TRUE;
 	}
-	
+
 	return FALSE;
 }
 
@@ -270,10 +270,10 @@ void ChangeMusic(int no)
 		gOldPos = GetOrganyaPosition();
 		gOldNo = gMusicNo;
 		StopOrganyaMusic();
-		
+
 		//Load .org
 		LoadOrganya(gMusicTable[no]);
-		
+
 		//Reset position, volume, and then play the song
 		ChangeOrganyaVolume(100);
 		SetOrganyaPosition(0);
@@ -286,10 +286,10 @@ void ReCallMusic()
 {
 	//Stop old song
 	StopOrganyaMusic();
-	
+
 	//Load .org that was playing before
 	LoadOrganya(gMusicTable[gOldNo]);
-	
+
 	//Reset position, volume, and then play the song
 	SetOrganyaPosition(gOldPos);
 	ChangeOrganyaVolume(100);

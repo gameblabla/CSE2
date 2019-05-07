@@ -160,7 +160,7 @@ BOOL LoadGenericData()
 	int pt_size;
 
 	MakeSurface_Resource("PIXEL", SURFACE_ID_PIXEL);
-	
+
 	bError = FALSE;
 	if (!MakeSurface_File("MyChar", SURFACE_ID_MY_CHAR))
 		bError = TRUE;
@@ -188,9 +188,9 @@ BOOL LoadGenericData()
 		bError = TRUE;
 	if (!MakeSurface_File("Fade", SURFACE_ID_FADE))
 		bError = TRUE;
-	
+
 	MakeSurface_Resource("CREDIT01", SURFACE_ID_CREDITS_IMAGE);
-	
+
 	if (bError)
 	{
 		return FALSE;

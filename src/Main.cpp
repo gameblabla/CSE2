@@ -78,17 +78,17 @@ int GetFramePerSecound()
 		base_tick = SDL_GetTicks();
 		need_new_base_tick = false;
 	}
-	
+
 	current_tick = SDL_GetTicks();
 	++current_frame;
-	
+
 	if ( base_tick + 1000 <= current_tick )
 	{
 		base_tick += 1000;
 		frames_this_second = current_frame;
 		current_frame = 0;
 	}
-	
+
 	return frames_this_second;
 }
 
@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
 	strcpy(gModulePath, SDL_GetBasePath());
 	if (gModulePath[strlen(gModulePath) - 1] == '/' || gModulePath[strlen(gModulePath) - 1] == '\\')
 		gModulePath[strlen(gModulePath) - 1] = '\0'; //String cannot end in slash or stuff will probably break (original does this through a windows.h provided function)
-	
+
 	//Get path of the data folder
 	strcpy(gDataPath, gModulePath);
 	strcat(gDataPath, "/data");
@@ -114,10 +114,10 @@ int main(int argc, char *argv[])
 	{
 		//Load configuration
 		CONFIG config;
-		
+
 		if (!LoadConfigData(&config))
 			DefaultConfigData(&config);
-		
+
 		//Apply keybinds
 		//Swap X and Z buttons
 		if (config.attack_button_mode)
@@ -133,7 +133,7 @@ int main(int argc, char *argv[])
 			gKeyJump = KEY_Z;
 			gKeyShot = KEY_X;
 		}
-		
+
 		//Swap Okay and Cancel buttons
 		if (config.ok_button_mode)
 		{
@@ -148,14 +148,14 @@ int main(int argc, char *argv[])
 			gKeyOk = gKeyJump;
 			gKeyCancel = gKeyShot;
 		}
-		
+
 		//Swap left and right weapon switch keys
 		if (CheckFileExists("s_reverse"))
 		{
 			gKeyArms = KEY_ARMSREV;
 			gKeyArmsRev = KEY_ARMS;
 		}
-		
+
 		//Alternate movement keys
 		if (config.move_button_mode)
 		{
@@ -174,7 +174,7 @@ int main(int argc, char *argv[])
 			gKeyRight = KEY_RIGHT;
 			gKeyDown = KEY_DOWN;
 		}
-		
+
 		//Set gamepad inputs
 		for (int i = 0; i < 8; i++)
 		{
@@ -183,38 +183,38 @@ int main(int argc, char *argv[])
 				case 1:
 					gJoystickButtonTable[i] = gKeyJump;
 					break;
-					
+
 				case 2:
 					gJoystickButtonTable[i] = gKeyShot;
 					break;
-					
+
 				case 3:
 					gJoystickButtonTable[i] = gKeyArms;
 					break;
-					
+
 				case 6:
 					gJoystickButtonTable[i] = gKeyArmsRev;
 					break;
-					
+
 				case 4:
 					gJoystickButtonTable[i] = gKeyItem;
 					break;
-					
+
 				case 5:
 					gJoystickButtonTable[i] = gKeyMap;
 					break;
-					
+
 				default:
 					continue;
 			}
 		}
-		
+
 		RECT unused_rect = {0, 0, 320, 240};
 
 		//Load cursor
 		size_t size;
 		const unsigned char *data = FindResource("CURSOR_NORMAL", "CURSOR", &size);
-		
+
 		if (data)
 		{
 			SDL_RWops *fp = SDL_RWFromConstMem(data, size);
@@ -240,7 +240,7 @@ int main(int argc, char *argv[])
 		int windowWidth;
 		int windowHeight;
 		int colourDepth;
-		
+
 		switch (config.display_mode)
 		{
 			case 1:
@@ -256,10 +256,10 @@ int main(int argc, char *argv[])
 					windowWidth = WINDOW_WIDTH * 2;
 					windowHeight = WINDOW_HEIGHT * 2;
 				}
-				
+
 				//Create window
 				gWindow = SDL_CreateWindow(lpWindowName, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, 0);
-				
+
 				if (gWindow)
 				{
 					if (config.display_mode == 1)
@@ -268,19 +268,19 @@ int main(int argc, char *argv[])
 						StartDirectDraw(1, 0);
 					break;
 				}
-				
+
 				break;
-			
+
 			case 0:
 			case 3:
 			case 4:
 				//Set window dimensions
 				windowWidth = WINDOW_WIDTH * 2;
 				windowHeight = WINDOW_HEIGHT * 2;
-				
+
 				//Create window
 				gWindow = SDL_CreateWindow(lpWindowName, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, 0);
-				
+
 				if (gWindow)
 				{
 					//Set colour depth
@@ -296,30 +296,30 @@ int main(int argc, char *argv[])
 							colourDepth = 32;
 							break;
 					}
-					
+
 					StartDirectDraw(2, colourDepth);
-					
+
 					fullscreen = true;
 					SDL_ShowCursor(0);
 					break;
 				}
 				break;
 		}
-		
+
 		//Create window
-		
-		
+
+
 		if (gWindow)
 		{
 			//Check debug things
 			if (CheckFileExists("fps"))
 				bFps = true;
-			
+
 #ifndef WINDOWS
 			//Load icon
 			size_t size;
 			const unsigned char *data = FindResource("ICON_MINI", "ICON", &size);
-			
+
 			if (data)
 			{
 				SDL_RWops *fp = SDL_RWFromConstMem(data, size);
@@ -341,34 +341,34 @@ int main(int argc, char *argv[])
 			//Set rects
 			RECT loading_rect = {0, 0, 64, 8};
 			RECT clip_rect = {0, 0, windowWidth, windowHeight};
-			
+
 			//Load the "LOADING" text
 			MakeSurface_File("Loading", SURFACE_ID_LOADING);
-			
+
 			//Draw loading screen
 			CortBox(&clip_rect, 0x000000);
 			PutBitmap3(&clip_rect, (WINDOW_WIDTH - 64) / 2, (WINDOW_HEIGHT - 8) / 2, &loading_rect, SURFACE_ID_LOADING);
-			
+
 			//Draw to screen
 			if (Flip_SystemTask())
 			{
 				//Initialize sound
 				InitDirectSound();
-				
+
 				//Initialize joystick
 				if (config.bJoystick && InitDirectInput())
 				{
 					ResetJoystickStatus();
 					gbUseJoystick = true;
 				}
-				
+
 				//Initialize stuff
 				InitTextObject(config.font_name);
 				InitTriangleTable();
-				
+
 				//Run game code
 				Game();
-				
+
 				//End stuff
 				EndDirectSound();
 				EndTextObject();
@@ -381,7 +381,7 @@ int main(int argc, char *argv[])
 		SDL_Quit();
 		return -1;
 	}
-	
+
 	SDL_Quit();
 	return 0;
 }
@@ -394,7 +394,7 @@ void InactiveWindow()
 		StopOrganyaMusic();
 		SleepNoise();
 	}
-	
+
 	PlaySoundObject(7, 0);
 }
 
@@ -414,12 +414,12 @@ void ActiveWindow()
 void JoystickProc()
 {
 	JOYSTICK_STATUS status;
-	
+
 	if (GetJoystickStatus(&status))
 	{
 		//Clear held buttons
 		gKey &= (KEY_ESCAPE | KEY_F2 | KEY_F1);
-		
+
 		//Set movement buttons
 		if (status.bLeft)
 			gKey |= gKeyLeft;
@@ -429,7 +429,7 @@ void JoystickProc()
 			gKey |= gKeyUp;
 		if (status.bDown)
 			gKey |= gKeyDown;
-		
+
 		//Set held buttons
 		for (int i = 0; i < 8; i++)
 		{
@@ -450,18 +450,18 @@ bool SystemTask()
 {
 	//Handle window events
 	bool focusGained = true;
-	
+
 	while (SDL_PollEvent(NULL) || !focusGained)
 	{
 		SDL_Event event;
 		SDL_WaitEvent(&event);
-		
+
 		switch (event.type)
 		{
 			case SDL_QUIT:
 				return false;
 				break;
-				
+
 			case SDL_WINDOWEVENT:
 				switch (event.window.event)
 				{
@@ -469,22 +469,22 @@ bool SystemTask()
 						focusGained = true;
 						ActiveWindow();
 						break;
-						
+
 					case SDL_WINDOWEVENT_FOCUS_LOST:
 						focusGained = false;
 						InactiveWindow();
 						break;
-					
+
 					default:
 						break;
 				}
 				break;
-				
+
 			case SDL_DROPFILE:
 				LoadProfile(event.drop.file);
 				SDL_free(event.drop.file);
 				break;
-			
+
 			case SDL_KEYDOWN:
 			case SDL_KEYUP:
 			#ifdef FIX_BUGS
@@ -552,7 +552,7 @@ bool SystemTask()
 
 					case SDL_SCANCODE_SEMICOLON:
 						DO_KEY_PRESS(KEY_PLUS)
-						
+
 					case SDL_SCANCODE_F5:
 						gbUseJoystick = false;
 						break;
@@ -621,7 +621,7 @@ bool SystemTask()
 
 					case SDLK_SEMICOLON:
 						DO_KEY_PRESS(KEY_PLUS)
-						
+
 					case SDLK_F5:
 						gbUseJoystick = false;
 						break;
@@ -630,10 +630,10 @@ bool SystemTask()
 			#endif
 		}
 	}
-	
+
 	//Run joystick code
 	if (gbUseJoystick)
 		JoystickProc();
-	
+
 	return true;
 }
