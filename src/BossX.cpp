@@ -13,8 +13,7 @@
 
 static void ActBossChar03_01(NPCHAR *npc)
 {
-	RECT rcUp[6] =
-	{
+	RECT rcUp[6] = {
 		{0, 0, 72, 32},
 		{0, 32, 72, 64},
 		{72, 0, 144, 32},
@@ -23,8 +22,7 @@ static void ActBossChar03_01(NPCHAR *npc)
 		{144, 32, 216, 64},
 	};
 
-	RECT rcDown[6] =
-	{
+	RECT rcDown[6] = {
 		{0, 64, 72, 96},
 		{0, 96, 72, 128},
 		{72, 64, 144, 96},
@@ -216,8 +214,7 @@ static void ActBossChar03_02(NPCHAR *npc)
 {
 	int direct;
 
-	RECT rect[4] =
-	{
+	RECT rect[4] = {
 		{0, 128, 72, 160},
 		{72, 128, 144, 160},
 		{0, 160, 72, 192},
@@ -369,8 +366,7 @@ static void ActBossChar03_04(NPCHAR *npc)
 	int ym;
 	int xm;
 
-	RECT rect[8] =
-	{
+	RECT rect[8] = {
 		{0, 192, 16, 208},
 		{16, 192, 32, 208},
 		{32, 192, 48, 208},
@@ -444,8 +440,7 @@ static void ActBossChar03_face(NPCHAR *npc)
 {
 	static unsigned char flash;
 
-	RECT rect[3] =
-	{
+	RECT rect[3] = {
 		{216, 0, 320, 48},
 		{216, 48, 320, 96},
 		{216, 144, 320, 192},

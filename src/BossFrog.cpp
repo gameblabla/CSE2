@@ -91,8 +91,7 @@ void ActBossChar_Frog(void)
 	int ym;
 	int xm;
 
-	RECT rcLeft[9] =
-	{
+	RECT rcLeft[9] = {
 		{0, 0, 0, 0},
 		{0, 48, 80, 112},
 		{0, 112, 80, 176},
@@ -104,8 +103,7 @@ void ActBossChar_Frog(void)
 		{120, 0, 160, 24},
 	};
 
-	RECT rcRight[9] =
-	{
+	RECT rcRight[9] = {
 		{0, 0, 0, 0},
 		{80, 48, 160, 112},
 		{80, 112, 160, 176},

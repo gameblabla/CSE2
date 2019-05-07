@@ -41,14 +41,12 @@ static void ActBoss01_34()
 {
 	int i;
 
-	RECT rcLeft[2] =
-	{
+	RECT rcLeft[2] = {
 		{0, 56, 40, 88},
 		{40, 56, 80, 88},
 	};
 
-	RECT rcRight[2] =
-	{
+	RECT rcRight[2] = {
 		{0, 88, 40, 120},
 		{40, 88, 80, 120},
 	};
@@ -456,8 +454,7 @@ void ActBossChar_Omega()
 			break;
 	}
 
-	RECT rect[4] =
-	{
+	RECT rect[4] = {
 		{0, 0, 80, 56},
 		{80, 0, 160, 56},
 		{160, 0, 240, 56},

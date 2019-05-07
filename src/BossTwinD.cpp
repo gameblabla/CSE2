@@ -14,15 +14,13 @@ static void ActBossCharT_DragonBody(NPCHAR *npc)
 {
 	unsigned char deg;
 
-	RECT rcLeft[3] =
-	{
+	RECT rcLeft[3] = {
 		{0, 0, 40, 40},
 		{40, 0, 80, 40},
 		{80, 0, 120, 40},
 	};
 
-	RECT rcRight[3] =
-	{
+	RECT rcRight[3] = {
 		{0, 40, 40, 80},
 		{40, 40, 80, 80},
 		{80, 40, 120, 80},
@@ -98,16 +96,14 @@ static void ActBossCharT_DragonHead(NPCHAR *npc)
 	int ym;
 	int xm;
 
-	RECT rcLeft[4] =
-	{
+	RECT rcLeft[4] = {
 		{0, 80, 40, 112},
 		{40, 80, 80, 112},
 		{80, 80, 120, 112},
 		{120, 80, 160, 112},
 	};
 
-	RECT rcRight[4] =
-	{
+	RECT rcRight[4] = {
 		{0, 112, 40, 144},
 		{40, 112, 80, 144},
 		{80, 112, 120, 144},

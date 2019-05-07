@@ -174,8 +174,7 @@ void ActBossChar_Ironhead(void)
 			break;
 	}
 
-	RECT rc[9] =
-	{
+	RECT rc[9] = {
 		{0, 0, 64, 24},
 		{64, 0, 128, 24},
 		{128, 0, 192, 24},
@@ -187,8 +186,7 @@ void ActBossChar_Ironhead(void)
 		{256, 48, 320, 72},
 	};
 
-	RECT rcDamage[9] =
-	{
+	RECT rcDamage[9] = {
 		{0, 24, 64, 48},
 		{64, 24, 128, 48},
 		{128, 24, 192, 48},
