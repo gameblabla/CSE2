@@ -567,12 +567,13 @@ void InitTextObject(const char *font_name)
 		fontHeight = 12;
 	}
 	else
-	{*/
+	{
+		fontWidth = 5 * magnification;
+		fontHeight = 10 * magnification;
+	}*/
 
 	fontWidth = 5 * magnification;
 	fontHeight = 10 * magnification;
-
-//	}
 
 	size_t data_size;
 #ifdef WINDOWS
