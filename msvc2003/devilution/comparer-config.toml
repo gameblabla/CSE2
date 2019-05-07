@@ -12,6 +12,14 @@ addr = 0x402270
 size = 0x100
 
 [[func]]
+name = "ActBack"
+addr = 0x402370
+
+[[func]]
+name = "PutBack"
+addr = 0x4023D0
+
+[[func]]
 name = "PutFront"
 addr = 0x402830
 
@@ -270,6 +278,14 @@ addr = 0x40ABC0
 [[func]]
 name = "SetCaret"
 addr = 0x40AC90
+
+[[func]]
+name = "LoadConfigData"
+addr = 0x40AD60
+
+[[func]]
+name = "DefaultConfigData"
+addr = 0x40AE30
 
 [[func]]
 name = "Call_Escape"
@@ -605,6 +621,18 @@ addr = 0x41FE70
 [[func]]
 name = "PlaySoundObject"
 addr = 0x420640
+
+[[func]]
+name = "TransferStage"
+addr = 0x420BE0
+
+[[func]]
+name = "ChangeMusic"
+addr = 0x420EE0
+
+[[func]]
+name = "ReCallMusic"
+addr = 0x420F50
 
 [[func]]
 name = "InitStar"

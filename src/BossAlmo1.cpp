@@ -459,7 +459,7 @@ void ActBossChar_Core(void)
 				PlaySoundObject(101, 1);
 			}
 
-			if ( npc->act_wait > 400 )
+			if (npc->act_wait > 400)
 			{
 				npc->act_no = 200;
 				gBoss[4].ani_no = 2;

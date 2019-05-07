@@ -2,6 +2,8 @@
 
 #include <stdint.h>
 
+#include "WindowsWrapper.h"
+
 struct CONFIG
 {
 	char proof[0x20];
@@ -14,5 +16,5 @@ struct CONFIG
 	int32_t joystick_button[8];
 };
 
-bool LoadConfigData(CONFIG *conf);
+BOOL LoadConfigData(CONFIG *conf);
 void DefaultConfigData(CONFIG *conf);
