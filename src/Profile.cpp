@@ -31,11 +31,11 @@ bool IsProfile()
 {
 	char path[PATH_LENGTH];
 	sprintf(path, "%s/%s", gModulePath, gDefaultName);
-	
+
 	FILE *fp = fopen(path, "rb");
 	if (fp == NULL)
 		return false;
-	
+
 	fclose(fp);
 	return true;
 }
@@ -44,19 +44,19 @@ bool SaveProfile(const char *name)
 {
 	//Get path
 	char path[PATH_LENGTH];
-	
+
 	if (name)
 		sprintf(path, "%s/%s", gModulePath, name);
 	else
 		sprintf(path, "%s/%s", gModulePath, gDefaultName);
-	
+
 	//Open file
 	PROFILE profile;
-	
+
 	FILE *fp = fopen(path, "wb");
 	if (fp == NULL)
 		return false;
-	
+
 	//Set up profile
 	memset(&profile, 0, sizeof(PROFILE));
 	memcpy(profile.code, gProfileCode, sizeof(profile.code));
@@ -79,7 +79,7 @@ bool SaveProfile(const char *name)
 	memcpy(profile.permitstage, gPermitStage, sizeof(profile.permitstage));
 	memcpy(profile.permit_mapping, gMapping, sizeof(profile.permit_mapping));
 	memcpy(profile.flags, gFlagNPC, sizeof(profile.flags));
-	
+
 	//Write to file
 	fwrite(profile.code, 8, 1, fp);
 	File_WriteLE32(profile.stage, fp);
@@ -114,7 +114,7 @@ bool SaveProfile(const char *name)
 	fwrite(profile.permit_mapping, 0x80, 1, fp);
 	fwrite("FLAG", 4, 1, fp);
 	fwrite(profile.flags, 1000, 1, fp);
-	
+
 	fclose(fp);
 	return true;
 }
@@ -123,19 +123,19 @@ bool LoadProfile(const char *name)
 {
 	//Get path
 	char path[PATH_LENGTH];
-	
+
 	if (name)
 		strcpy(path, name);
 	else
 		sprintf(path, "%s/%s", gModulePath, gDefaultName);
-	
+
 	//Open file
 	PROFILE profile;
-	
+
 	FILE *fp = fopen(path, "rb");
 	if (fp == NULL)
 		return false;
-	
+
 	//Check header code
 	fread(profile.code, 8, 1, fp);
 	if (memcmp(profile.code, gProfileCode, 8))
@@ -145,7 +145,7 @@ bool LoadProfile(const char *name)
 #endif
 		return false;
 	}
-	
+
 	//Read data
 	fseek(fp, 0, SEEK_SET); //Pixel epic redundant code 😎😎😎
 	fread(profile.code, 8, 1, fp);
@@ -182,7 +182,7 @@ bool LoadProfile(const char *name)
 	fread(profile.FLAG, 4, 1, fp);
 	fread(profile.flags, 1000, 1, fp);
 	fclose(fp);
-	
+
 	//Set things
 	gSelectedArms = profile.select_arms;
 	gSelectedItem = profile.select_item;
@@ -193,13 +193,13 @@ bool LoadProfile(const char *name)
 	memcpy(gPermitStage, profile.permitstage, sizeof(gPermitStage));
 	memcpy(gMapping, profile.permit_mapping, sizeof(gMapping));
 	memcpy(gFlagNPC, profile.flags, sizeof(gFlagNPC));
-	
+
 	//Load stage
 	ChangeMusic(profile.music);
 	InitMyChar();
 	if (!TransferStage(profile.stage, 0, 0, 1))
 		return false;
-	
+
 	//Set character properties
 	gMC.equip = profile.equip;
 	gMC.unit = profile.unit;
@@ -212,12 +212,12 @@ bool LoadProfile(const char *name)
 	gMC.lifeBr = profile.life;
 	gMC.x = profile.x;
 	gMC.y = profile.y;
-	
+
 	gMC.rect_arms.left = 24 * (gArmsData[gSelectedArms].code % 10);
 	gMC.rect_arms.right = gMC.rect_arms.left + 24;
 	gMC.rect_arms.top = 32 * (gArmsData[gSelectedArms].code / 10);
 	gMC.rect_arms.bottom = gMC.rect_arms.top + 16;
-	
+
 	//Reset stuff
 	ClearFade();
 	SetFrameMyChar();

@@ -46,7 +46,7 @@ bool LoadNpcTable(const char *path)
 		fread(&gNpcTable[n].hit, 4, 1, fp);
 	for (long n = 0; n < num; n++) //view
 		fread(&gNpcTable[n].view, 4, 1, fp);
-		
+
 	fclose(fp);
 	return true;
 }

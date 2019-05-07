@@ -577,7 +577,7 @@ void ActNpc127(NPCHAR *npc)
 		if (++npc->ani_no > 2)
 			npc->cond = 0;
 	}
-	
+
 	if (npc->direct == 0)
 		npc->rect = rcH[npc->ani_no];
 	else
@@ -618,11 +618,11 @@ void ActNpc128(NPCHAR *npc)
 		{224, 32, 232, 40},
 		{224, 40, 232, 48},
 	};
-	
+
 	if (npc->act_no == 0)
 	{
 		npc->act_no = 1;
-		
+
 		if (npc->direct == 0 || npc->direct == 2)
 		{
 			npc->view.front = 0x800;
@@ -634,10 +634,10 @@ void ActNpc128(NPCHAR *npc)
 			npc->view.top = 0x800;
 		}
 	}
-	
+
 	if (++npc->ani_no > 4)
 		npc->cond = 0;
-	
+
 	switch (npc->direct)
 	{
 		case 0:
@@ -678,16 +678,16 @@ void ActNpc129(NPCHAR *npc)
 		{0xC0, 0x50, 0xD0, 0x60},
 		{0xD0, 0x50, 0xE0, 0x60},
 	};
-	
+
 	if (++npc->ani_wait > 1)
 	{
 		npc->ani_wait = 0;
 		if (++npc->ani_no > 2)
 			npc->cond = 0;
 	}
-	
+
 	npc->y += npc->ym;
-	
+
 	npc->rect = rect[3 * npc->direct + npc->ani_no];
 }
 
