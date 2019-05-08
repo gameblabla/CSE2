@@ -14,7 +14,7 @@
 #include "File.h"
 
 // Uncomment for that authentic pre-Windows Vista feel
-//#define DISABLE_FONT_ANTIALIASING
+// #define DISABLE_FONT_ANTIALIASING
 
 #undef MIN
 #undef MAX
@@ -1655,7 +1655,8 @@ static unsigned long UTF8ToUnicode(const unsigned char *string, unsigned int *by
 	unsigned long charcode;
 
 	unsigned int zero_bit = 0;
-	for (unsigned char lead_byte = string[0]; zero_bit < 5 && (lead_byte & 0x80); ++zero_bit, lead_byte <<= 1);
+	for (unsigned char lead_byte = string[0]; zero_bit < 5 && (lead_byte & 0x80); ++zero_bit, lead_byte <<= 1)
+		;
 
 	switch (zero_bit)
 	{
