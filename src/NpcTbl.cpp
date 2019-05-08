@@ -1,8 +1,11 @@
 #include "NpcTbl.h"
 
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "WindowsWrapper.h"
 
 #include "File.h"
 #include "Generic.h"
@@ -10,51 +13,86 @@
 
 NPC_TABLE *gNpcTable;
 
-bool LoadNpcTable(const char *path)
+BOOL LoadNpcTable(const char *path)
 {
-	const long size = GetFileSizeLong(path);
-	if (size == -1)
-		return false;
+	FILE *fp;
+	long n;
+	long num;
+	unsigned long size;
 
-	const long num = size / 0x18;
+	size = GetFileSizeLong(path);
+	if (size == -1)
+		return FALSE;
+
+	num = size / 0x18;
 
 	gNpcTable = (NPC_TABLE*)malloc(num * sizeof(NPC_TABLE));
 	if (gNpcTable == NULL)
-		return false;
+		return FALSE;
 
-	FILE *fp = fopen(path, "rb");
+	fp = fopen(path, "rb");
 	if (fp == NULL)
-		return false;
+	{
+		free(gNpcTable);
+		gNpcTable = NULL;
+		return FALSE;
+	}
 
-	for (long n = 0; n < num; n++) //bits
-		gNpcTable[n].bits = File_ReadLE16(fp);
-	for (long n = 0; n < num; n++) //life
-		gNpcTable[n].life = File_ReadLE16(fp);
-	for (long n = 0; n < num; n++) //surf
+#ifdef NONPORTABLE
+	for (n = 0; n < num; n++) //bits
+		fread(&gNpcTable[n].bits, 2, 1, fp);
+	for (n = 0; n < num; n++) //life
+		fread(&gNpcTable[n].life, 2, 1, fp);
+	for (n = 0; n < num; n++) //surf
 		fread(&gNpcTable[n].surf, 1, 1, fp);
-	for (long n = 0; n < num; n++) //destroy_voice
+	for (n = 0; n < num; n++) //destroy_voice
 		fread(&gNpcTable[n].destroy_voice, 1, 1, fp);
-	for (long n = 0; n < num; n++) //hit_voice
+	for (n = 0; n < num; n++) //hit_voice
 		fread(&gNpcTable[n].hit_voice, 1, 1, fp);
-	for (long n = 0; n < num; n++) //size
+	for (n = 0; n < num; n++) //size
 		fread(&gNpcTable[n].size, 1, 1, fp);
-	for (long n = 0; n < num; n++) //exp
-		gNpcTable[n].exp = File_ReadLE32(fp);
-	for (long n = 0; n < num; n++) //damage
-		gNpcTable[n].damage = File_ReadLE32(fp);
-	for (long n = 0; n < num; n++) //hit
+	for (n = 0; n < num; n++) //exp
+		fread(&gNpcTable[n].exp, 4, 1, fp);
+	for (n = 0; n < num; n++) //damage
+		fread(&gNpcTable[n].damage, 4, 1, fp);
+	for (n = 0; n < num; n++) //hit
 		fread(&gNpcTable[n].hit, 4, 1, fp);
-	for (long n = 0; n < num; n++) //view
+	for (n = 0; n < num; n++) //view
 		fread(&gNpcTable[n].view, 4, 1, fp);
+#else
+	for (n = 0; n < num; n++) //bits
+		gNpcTable[n].bits = File_ReadLE16(fp);
+	for (n = 0; n < num; n++) //life
+		gNpcTable[n].life = File_ReadLE16(fp);
+	for (n = 0; n < num; n++) //surf
+		fread(&gNpcTable[n].surf, 1, 1, fp);
+	for (n = 0; n < num; n++) //destroy_voice
+		fread(&gNpcTable[n].destroy_voice, 1, 1, fp);
+	for (n = 0; n < num; n++) //hit_voice
+		fread(&gNpcTable[n].hit_voice, 1, 1, fp);
+	for (n = 0; n < num; n++) //size
+		fread(&gNpcTable[n].size, 1, 1, fp);
+	for (n = 0; n < num; n++) //exp
+		gNpcTable[n].exp = File_ReadLE32(fp);
+	for (n = 0; n < num; n++) //damage
+		gNpcTable[n].damage = File_ReadLE32(fp);
+	for (n = 0; n < num; n++) //hit
+		fread(&gNpcTable[n].hit, 4, 1, fp);
+	for (n = 0; n < num; n++) //view
+		fread(&gNpcTable[n].view, 4, 1, fp);
+#endif
 
 	fclose(fp);
-	return true;
+	return TRUE;
 }
 
 void ReleaseNpcTable()
 {
 	if (gNpcTable)
+	{
 		free(gNpcTable);
+		gNpcTable = NULL;
+	}
 }
 
 //Npc function table
