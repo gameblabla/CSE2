@@ -7,6 +7,10 @@
 unsigned char gFlagNPC[1000];
 unsigned char gSkipFlag[8];
 
+#define SET_BIT(x, i) ((x)[(i) / 8] |= 1 << (i) % 8;)
+#define UNSET_BIT(x, i) ((x)[(i) / 8] &= ~(1 << (i) % 8);)
+#define GET_BIT(x, i) ((x)[(i) / 8] & (1 << (i) % 8))
+
 //Flag inits
 void InitFlags()
 {
@@ -21,17 +25,17 @@ void InitSkipFlags()
 //NPC flags
 void SetNPCFlag(long a)
 {
-	gFlagNPC[a / 8] |= 1 << a % 8;
+	SET_BIT(gFlagNPC, a);
 }
 
 void CutNPCFlag(long a)
 {
-	gFlagNPC[a / 8] &= ~(1 << a % 8);
+	UNSET_BIT(gFlagNPC, a);
 }
 
 BOOL GetNPCFlag(long a)
 {
-	if (gFlagNPC[a / 8] & (1 << a % 8))
+	if (GET_BIT(gFlagNPC, a))
 		return TRUE;
 	else
 		return FALSE;
@@ -40,17 +44,17 @@ BOOL GetNPCFlag(long a)
 //Skip flags
 void SetSkipFlag(long a)
 {
-	gSkipFlag[a / 8] |= 1 << a % 8;
+	SET_BIT(gSkipFlag, a);
 }
 
 void CutSkipFlag(long a)
 {
-	gSkipFlag[a / 8] &= ~(1 << a % 8);
+	UNSET_BIT(gSkipFlag, a);
 }
 
 BOOL GetSkipFlag(long a)
 {
-	if (gSkipFlag[a / 8] & (1 << a % 8))
+	if (GET_BIT(gSkipFlag, a))
 		return TRUE;
 	else
 		return FALSE;
