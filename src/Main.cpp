@@ -236,7 +236,7 @@ int main(int argc, char *argv[])
 			printf("Failed to load cursor\n");
 		}
 
-		// Get window dimensions and color depth
+		// Get window dimensions and colour depth
 		int windowWidth;
 		int windowHeight;
 		int colourDepth;
@@ -283,7 +283,7 @@ int main(int argc, char *argv[])
 
 				if (gWindow)
 				{
-					// Set color depth
+					// Set colour depth
 					switch (config.display_mode)
 					{
 						case 0:
