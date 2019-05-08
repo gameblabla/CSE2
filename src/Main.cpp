@@ -44,7 +44,7 @@ const char *lpWindowName = "洞窟物語エンジン2";
 const char *lpWindowName = "Cave Story Engine 2 ~ Doukutsu Monogatari Enjin 2";
 #endif
 
-//A replication of MSVC's rand algorithm
+// A replication of MSVC's rand algorithm
 static unsigned long int next = 1;
 
 int rep_rand()
@@ -58,7 +58,7 @@ void rep_srand(unsigned int seed)
 	next = seed;
 }
 
-//Framerate stuff
+// Framerate stuff
 void PutFramePerSecound()
 {
 	if (bFps)
@@ -94,12 +94,12 @@ int GetFramePerSecound()
 
 int main(int argc, char *argv[])
 {
-	//Get executable's path
+	// Get executable's path
 	strcpy(gModulePath, SDL_GetBasePath());
 	if (gModulePath[strlen(gModulePath) - 1] == '/' || gModulePath[strlen(gModulePath) - 1] == '\\')
-		gModulePath[strlen(gModulePath) - 1] = '\0'; //String cannot end in slash or stuff will probably break (original does this through a windows.h provided function)
+		gModulePath[strlen(gModulePath) - 1] = '\0'; // String cannot end in slash or stuff will probably break (original does this through a windows.h provided function)
 
-	//Get path of the data folder
+	// Get path of the data folder
 	strcpy(gDataPath, gModulePath);
 	strcat(gDataPath, "/data");
 
@@ -109,17 +109,17 @@ int main(int argc, char *argv[])
 	SDL_SetHint(SDL_HINT_WINDOWS_INTRESOURCE_ICON_SMALL, "102");
 #endif
 
-	//Initialize SDL
+	// Initialize SDL
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_TIMER) >= 0)
 	{
-		//Load configuration
+		// Load configuration
 		CONFIG config;
 
 		if (!LoadConfigData(&config))
 			DefaultConfigData(&config);
 
-		//Apply keybinds
-		//Swap X and Z buttons
+		// Apply keybinds
+		// Swap X and Z buttons
 		if (config.attack_button_mode)
 		{
 			if (config.attack_button_mode == 1)
@@ -134,7 +134,7 @@ int main(int argc, char *argv[])
 			gKeyShot = KEY_X;
 		}
 
-		//Swap Okay and Cancel buttons
+		// Swap Okay and Cancel buttons
 		if (config.ok_button_mode)
 		{
 			if (config.ok_button_mode == 1)
@@ -149,14 +149,14 @@ int main(int argc, char *argv[])
 			gKeyCancel = gKeyShot;
 		}
 
-		//Swap left and right weapon switch keys
+		// Swap left and right weapon switch keys
 		if (CheckFileExists("s_reverse"))
 		{
 			gKeyArms = KEY_ARMSREV;
 			gKeyArmsRev = KEY_ARMS;
 		}
 
-		//Alternate movement keys
+		// Alternate movement keys
 		if (config.move_button_mode)
 		{
 			if (config.move_button_mode == 1)
@@ -175,7 +175,7 @@ int main(int argc, char *argv[])
 			gKeyDown = KEY_DOWN;
 		}
 
-		//Set gamepad inputs
+		// Set gamepad inputs
 		for (int i = 0; i < 8; i++)
 		{
 			switch (config.joystick_button[i])
@@ -211,7 +211,7 @@ int main(int argc, char *argv[])
 
 		RECT unused_rect = {0, 0, 320, 240};
 
-		//Load cursor
+		// Load cursor
 		size_t size;
 		const unsigned char *data = FindResource("CURSOR_NORMAL", "CURSOR", &size);
 
@@ -236,7 +236,7 @@ int main(int argc, char *argv[])
 			printf("Failed to load cursor\n");
 		}
 
-		//Get window dimensions and colour depth
+		// Get window dimensions and color depth
 		int windowWidth;
 		int windowHeight;
 		int colourDepth;
@@ -245,7 +245,7 @@ int main(int argc, char *argv[])
 		{
 			case 1:
 			case 2:
-				//Set window dimensions
+				// Set window dimensions
 				if (config.display_mode == 1)
 				{
 					windowWidth = WINDOW_WIDTH;
@@ -257,7 +257,7 @@ int main(int argc, char *argv[])
 					windowHeight = WINDOW_HEIGHT * 2;
 				}
 
-				//Create window
+				// Create window
 				gWindow = SDL_CreateWindow(lpWindowName, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, 0);
 
 				if (gWindow)
@@ -274,16 +274,16 @@ int main(int argc, char *argv[])
 			case 0:
 			case 3:
 			case 4:
-				//Set window dimensions
+				// Set window dimensions
 				windowWidth = WINDOW_WIDTH * 2;
 				windowHeight = WINDOW_HEIGHT * 2;
 
-				//Create window
+				// Create window
 				gWindow = SDL_CreateWindow(lpWindowName, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, 0);
 
 				if (gWindow)
 				{
-					//Set colour depth
+					// Set color depth
 					switch (config.display_mode)
 					{
 						case 0:
@@ -306,17 +306,17 @@ int main(int argc, char *argv[])
 				break;
 		}
 
-		//Create window
+		// Create window
 
 
 		if (gWindow)
 		{
-			//Check debug things
+			// Check debug things
 			if (CheckFileExists("fps"))
 				bFps = true;
 
 #ifndef WINDOWS
-			//Load icon
+			// Load icon
 			size_t size;
 			const unsigned char *data = FindResource("ICON_MINI", "ICON", &size);
 
@@ -338,38 +338,38 @@ int main(int argc, char *argv[])
 			}
 #endif
 
-			//Set rects
+			// Set rects
 			RECT loading_rect = {0, 0, 64, 8};
 			RECT clip_rect = {0, 0, windowWidth, windowHeight};
 
-			//Load the "LOADING" text
+			// Load the "LOADING" text
 			MakeSurface_File("Loading", SURFACE_ID_LOADING);
 
-			//Draw loading screen
+			// Draw loading screen
 			CortBox(&clip_rect, 0x000000);
 			PutBitmap3(&clip_rect, (WINDOW_WIDTH - 64) / 2, (WINDOW_HEIGHT - 8) / 2, &loading_rect, SURFACE_ID_LOADING);
 
-			//Draw to screen
+			// Draw to screen
 			if (Flip_SystemTask())
 			{
-				//Initialize sound
+				// Initialize sound
 				InitDirectSound();
 
-				//Initialize joystick
+				// Initialize joystick
 				if (config.bJoystick && InitDirectInput())
 				{
 					ResetJoystickStatus();
 					gbUseJoystick = true;
 				}
 
-				//Initialize stuff
+				// Initialize stuff
 				InitTextObject(config.font_name);
 				InitTriangleTable();
 
-				//Run game code
+				// Run game code
 				Game();
 
-				//End stuff
+				// End stuff
 				EndDirectSound();
 				EndTextObject();
 				EndDirectDraw();
@@ -417,10 +417,10 @@ void JoystickProc()
 
 	if (GetJoystickStatus(&status))
 	{
-		//Clear held buttons
+		// Clear held buttons
 		gKey &= (KEY_ESCAPE | KEY_F2 | KEY_F1);
 
-		//Set movement buttons
+		// Set movement buttons
 		if (status.bLeft)
 			gKey |= gKeyLeft;
 		if (status.bRight)
@@ -430,7 +430,7 @@ void JoystickProc()
 		if (status.bDown)
 			gKey |= gKeyDown;
 
-		//Set held buttons
+		// Set held buttons
 		for (int i = 0; i < 8; i++)
 		{
 			if (status.bButton[i])
@@ -448,7 +448,7 @@ void JoystickProc()
 
 bool SystemTask()
 {
-	//Handle window events
+	// Handle window events
 	bool focusGained = true;
 
 	while (SDL_PollEvent(NULL) || !focusGained)
@@ -488,11 +488,9 @@ bool SystemTask()
 			case SDL_KEYDOWN:
 			case SDL_KEYUP:
 #ifdef FIX_BUGS
-				//BUG FIX: Pixel relied on key codes for input, but these differ based on keyboard layout.
-				//This would break the alternate movement keys on typical English keyboards, since the '=' key
-				//is in a completely different place to where it is on a Japanese keyboard.
-				//To solve this, we use scancodes instead, which are based on the physical location of keys,
-				//rather than their meaning.
+				// BUG FIX: Pixel relied on key codes for input, but these differ based on keyboard layout.
+				// This would break the alternate movement keys on typical English keyboards, since the '=' key is in a completely different place to where it is on a Japanese keyboard.
+				// To solve this, we use scan codes instead, which are based on the physical location of keys, rather than their meaning.
 				switch (event.key.keysym.scancode)
 				{
 					case SDL_SCANCODE_ESCAPE:
@@ -631,7 +629,7 @@ bool SystemTask()
 		}
 	}
 
-	//Run joystick code
+	// Run joystick code
 	if (gbUseJoystick)
 		JoystickProc();
 

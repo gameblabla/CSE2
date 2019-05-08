@@ -80,12 +80,11 @@ void ReadyMapName(const char *str)
 		str = (char*)presentText;
 	}
 
-	// Copy map's name to the MapName
+	// Copy map's name to the global map name
 	strcpy(gMapName.name, str);
 
 	// Draw the text to the surface
 	a = (int)strlen(gMapName.name);
-
 	CortBox2(&rc, 0, SURFACE_ID_ROOM_NAME);
 	PutText2((160 - 6 * a) / 2 + 6, 1, gMapName.name, RGB(0x11, 0x00, 0x22), SURFACE_ID_ROOM_NAME);
 	PutText2((160 - 6 * a) / 2 + 6, 0, gMapName.name, RGB(0xFF, 0xFF, 0xFE), SURFACE_ID_ROOM_NAME);

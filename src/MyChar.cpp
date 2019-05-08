@@ -225,7 +225,7 @@ void PutMyChar(int fx, int fy)
 
 			PutBitmap3(&grcGame, (gMC.x - gMC.view.left) / 0x200 - fx / 0x200, (gMC.y - gMC.view.top) / 0x200 - fy / 0x200, &rect, SURFACE_ID_MY_CHAR);
 
-			// Draw airtank
+			// Draw air tank
 			RECT rcBubble[2] = {
 				{56, 96, 80, 120},
 				{80, 96, 104, 120},
