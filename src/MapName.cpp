@@ -14,7 +14,7 @@ void ReadyMapName(const char *str)
 {
 	int a;
 
-	//Handle "Studio Pixel presents" text in the intro
+	//Handle "Studio Pixel presents" text in the intro, using an obfuscated string
 	unsigned char presentText[24] =
 	{
 #ifdef JAPANESE
@@ -93,7 +93,7 @@ void ReadyMapName(const char *str)
 
 void PutMapName(BOOL bMini)
 {
-	// 'unused_rect' isn't the original name. The Linux port optimised this out, so there's no name for it.
+	// 'unused_rect' isn't the original name. The Linux port optimized this out, so there's no name for it.
 	RECT unused_rect = {0, 0, 160, 16};
 
 	if (bMini)
