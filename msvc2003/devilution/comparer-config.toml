@@ -2127,6 +2127,14 @@ name = "ActNpc360"
 addr = 0x46EA90
 
 [[func]]
+name = "LoadNpcTable"
+addr = 0x472400
+
+[[func]]
+name = "ReleaseNpcTable"
+addr = 0x472710
+
+[[func]]
 name = "InitBossChar"
 addr = 0x472740
 
