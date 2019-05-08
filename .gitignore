@@ -1,7 +1,7 @@
 # Exclude obj directory (object files for Makefile build)
 /obj
 
-# Exclude the converted resource files
+# Exclude converted resource files
 src/Resource
 
 # Exclude .dat and .rec files in build directories (avoid Config.dat, 290.rec and others)
@@ -14,19 +14,19 @@ build_jp/*.rec
 msvc2003/devilution/orig.asm
 msvc2003/devilution/compare.asm
 
-# Exclude build output on Linux (exclude normally produced executable files)
+# Exclude build output on Linux (exclude normally produced executable files and out files)
 build_en/CSE2
 build_en/CSE2d
 build_en/DoConfig
 build_en/DoConfigd
-
 build_jp/CSE2
 build_jp/CSE2d
 build_jp/DoConfig
 build_jp/DoConfigd
+build_en/*.out
+build_jp/*.out
 
-
-# Exclude executables in the build folder (and .exe.manifest files)
+# Exclude PE executables in the build folder (and .exe.manifest files)
 build_en/*.exe
 build_en/*.exe.manifest
 build_jp/*.exe
@@ -46,12 +46,3 @@ msvc2003/Debug
 msvc2003/Release
 msvc2003/Debug (Japanese)
 msvc2003/Release (Japanese)
-
-# Exclude VS Code folder
-.vscode/*
-
-# Include generically useful files for VS Code users
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
