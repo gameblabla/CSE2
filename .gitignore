@@ -23,7 +23,8 @@ build_jp/CSE2
 build_jp/CSE2d
 build_jp/DoConfig
 build_jp/DoConfigd
-*.out
+build_en/*.out
+build_jp/*.out
 
 # Exclude PE executables in the build folder (and .exe.manifest files)
 build_en/*.exe
