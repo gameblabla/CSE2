@@ -186,7 +186,7 @@ void ActCaret05(CARET *crt)
 		++crt->ani_no;
 	}
 
-	if ( crt->ani_no > 6 )
+	if (crt->ani_no > 6)
 		crt->cond = 0;
 
 	crt->x += 0x80;
@@ -345,7 +345,7 @@ void ActCaret12(CARET *crt)
 	{
 		crt->ani_wait = 0;
 		if (++crt->ani_no > 1)
-		  crt->cond = 0;
+			crt->cond = 0;
 	}
 
 	crt->rect = rcLeft[crt->ani_no];
@@ -468,9 +468,8 @@ void ActCaret17(CARET *crt)
 		crt->rect = rcLeft[1];
 }
 
-//Tables
-CARET_TABLE gCaretTable[18] =
-{
+// Tables
+CARET_TABLE gCaretTable[18] = {
 	{0, 0},
 	{0x800, 0x800},
 	{0x1000, 0x1000},

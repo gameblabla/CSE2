@@ -97,7 +97,7 @@ void HitBossBullet()
 			if (gBul[bul].damage == -1)
 				continue;
 
-			//Check if bullet touches boss
+			// Check if bullet touches boss
 			bHit = FALSE;
 			if (gBoss[bos].bits & npc_shootable
 				&& gBoss[bos].x - gBoss[bos].hit.back < gBul[bul].x + gBul[bul].enemyXL
@@ -114,7 +114,7 @@ void HitBossBullet()
 
 			if (bHit)
 			{
-				//Damage boss
+				// Damage boss
 				if (gBoss[bos].bits & npc_shootable)
 				{
 					if (gBoss[bos].cond & 0x10)

@@ -2,6 +2,8 @@
 
 #include <stdint.h>
 
+#include "WindowsWrapper.h"
+
 #include "Draw.h"
 #include "NpChar.h"
 
@@ -29,7 +31,7 @@ struct NPC_TABLE
 
 extern NPC_TABLE *gNpcTable;
 
-bool LoadNpcTable(const char *path);
+BOOL LoadNpcTable(const char *path);
 void ReleaseNpcTable();
 
 //NPC Function table

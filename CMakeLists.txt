@@ -358,6 +358,9 @@ else()
 	# Compile it ourselves
 	message(STATUS "Using local SDL2")
 	set(SDL_SHARED_ENABLED_BY_DEFAULT OFF)
+	if(MSVC)
+		set(LIBC ON)	# Needed to prevent possible 'symbol already defined' errors
+	endif()
 	add_subdirectory("external/SDL2" EXCLUDE_FROM_ALL)
 	target_link_libraries(CSE2 SDL2-static SDL2main)
 endif()
