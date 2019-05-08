@@ -50,12 +50,12 @@ static unsigned long int next = 1;
 int rep_rand()
 {
 	next = ((next) * 214013 + 2531011);
-    return ((next) >> 16) & 0x7FFF;
+	return ((next) >> 16) & 0x7FFF;
 }
 
 void rep_srand(unsigned int seed)
 {
-    next = seed;
+	next = seed;
 }
 
 //Framerate stuff
@@ -82,7 +82,7 @@ int GetFramePerSecound()
 	current_tick = SDL_GetTicks();
 	++current_frame;
 
-	if ( base_tick + 1000 <= current_tick )
+	if (base_tick + 1000 <= current_tick)
 	{
 		base_tick += 1000;
 		frames_this_second = current_frame;
@@ -487,7 +487,7 @@ bool SystemTask()
 
 			case SDL_KEYDOWN:
 			case SDL_KEYUP:
-			#ifdef FIX_BUGS
+#ifdef FIX_BUGS
 				//BUG FIX: Pixel relied on key codes for input, but these differ based on keyboard layout.
 				//This would break the alternate movement keys on typical English keyboards, since the '=' key
 				//is in a completely different place to where it is on a Japanese keyboard.
@@ -561,7 +561,7 @@ bool SystemTask()
 						break;
 				}
 				break;
-			#else
+#else
 				switch (event.key.keysym.sym)
 				{
 					case SDLK_ESCAPE:
@@ -627,7 +627,7 @@ bool SystemTask()
 						break;
 				}
 				break;
-			#endif
+#endif
 		}
 	}
 
