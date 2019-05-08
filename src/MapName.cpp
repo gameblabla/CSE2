@@ -14,16 +14,16 @@ void ReadyMapName(const char *str)
 {
 	int a;
 
-	//Handle "Studio Pixel presents" text in the intro, using an obfuscated string
+	// Handle "Studio Pixel presents" text in the intro, using an obfuscated string
 	unsigned char presentText[24] =
 	{
 #ifdef JAPANESE
-		// "ŠJ”­ŽºPixel presents"
-		0x8A - 1,	// ŠJ
+		// "é–‹ç™ºå®¤Pixel presents"
+		0x8A - 1,	// é–‹
 		0x4A - 1,
-		0x94 - 1,	// ”­
+		0x94 - 1,	// ç™º
 		0xAD - 1,
-		0x8E - 1,	// Žº
+		0x8E - 1,	// å®¤
 		0xBA - 1,
 		'P' - 1,
 		'i' - 1,
@@ -68,7 +68,7 @@ void ReadyMapName(const char *str)
 		0xFF
 	};
 
-	//Reset map name flags
+	// Reset map name flags
 	gMapName.flag = 0;
 	gMapName.wait = 0;
 
@@ -80,10 +80,10 @@ void ReadyMapName(const char *str)
 		str = (char*)presentText;
 	}
 
-	//Copy map's name to the MapName
+	// Copy map's name to the MapName
 	strcpy(gMapName.name, str);
 
-	//Draw the text to the surface
+	// Draw the text to the surface
 	a = (int)strlen(gMapName.name);
 
 	CortBox2(&rc, 0, SURFACE_ID_ROOM_NAME);
@@ -98,7 +98,7 @@ void PutMapName(BOOL bMini)
 
 	if (bMini)
 	{
-		//Map system
+		// Map system
 		RECT rcBack;
 		rcBack.left = 0;
 		rcBack.right = WINDOW_WIDTH;
@@ -110,7 +110,7 @@ void PutMapName(BOOL bMini)
 	}
 	else if (gMapName.flag)
 	{
-		//MNA
+		// MNA
 		PutBitmap3(&grcGame, (WINDOW_WIDTH - 172) / 2, (WINDOW_HEIGHT - 80) / 2, &rc, SURFACE_ID_ROOM_NAME);
 		if (++gMapName.wait > 160)
 			gMapName.flag = 0;
