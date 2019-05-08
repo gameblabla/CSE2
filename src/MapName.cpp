@@ -15,8 +15,7 @@ void ReadyMapName(const char *str)
 	int a;
 
 	// Handle "Studio Pixel presents" text in the intro, using an obfuscated string
-	unsigned char presentText[24] =
-	{
+	unsigned char presentText[24] = {
 #ifdef JAPANESE
 		// "開発室Pixel presents"
 		0x8A - 1,	// 開
