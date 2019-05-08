@@ -85,7 +85,7 @@ void MoveFrame3()
 		gFrame.y = ((map_l - 1) * 0x10 - WINDOW_HEIGHT) * 0x200;
 #endif
 
-	//Quake
+	// Quake
 	if (gFrame.quake2)
 	{
 		gFrame.x += (Random(-5, 5) * 0x200);
@@ -114,18 +114,18 @@ void GetFramePosition(int *fx, int *fy)
 
 void SetFramePosition(int fx, int fy)
 {
-	//End quake
+	// End quake
 	gFrame.quake = 0;
 	gFrame.quake2 = 0;
 
-	//Move frame position
+	// Move frame position
 	int16_t map_w, map_l;
 	GetMapData(0, &map_w, &map_l);
 
 	gFrame.x = fx;
 	gFrame.y = fy;
 
-	//Keep in bounds
+	// Keep in bounds
 	if (gFrame.x / 0x200 < 0)
 		gFrame.x = 0;
 	if (gFrame.y / 0x200 < 0)
@@ -139,7 +139,7 @@ void SetFramePosition(int fx, int fy)
 
 void SetFrameMyChar()
 {
-	//Move frame position
+	// Move frame position
 	int mc_x, mc_y;
 	GetMyCharPosition(&mc_x, &mc_y);
 
@@ -149,7 +149,7 @@ void SetFrameMyChar()
 	gFrame.x = mc_x - (WINDOW_WIDTH << 8);
 	gFrame.y = mc_y - (WINDOW_HEIGHT << 8);
 
-	//Keep in bounds
+	// Keep in bounds
 	if (gFrame.x / 0x200 < 0)
 		gFrame.x = 0;
 	if (gFrame.y / 0x200 < 0)
