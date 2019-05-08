@@ -10,6 +10,7 @@
 #include "Sound.h"
 #include "Triangle.h"
 
+// Balfrog's mouth
 static void ActBossChar02_01(void)
 {
 	NPCHAR *boss;
@@ -84,6 +85,7 @@ static void ActBossChar02_02(void)
 	}
 }
 
+// Main boss AI
 void ActBossChar_Frog(void)
 {
 	int i;
@@ -91,6 +93,7 @@ void ActBossChar_Frog(void)
 	int ym;
 	int xm;
 
+	// Rects 1-4 are for when Balfrog is a frog, 5-8 for when he reverts and goes into the ceiling
 	RECT rcLeft[9] = {
 		{0, 0, 0, 0},
 		{0, 48, 80, 112},
