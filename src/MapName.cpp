@@ -15,8 +15,9 @@ void ReadyMapName(const char *str)
 	int a;
 
 	//Handle "Studio Pixel presents" text in the intro
-	unsigned char presentText[24] = {
-	#ifdef JAPANESE
+	unsigned char presentText[24] =
+	{
+#ifdef JAPANESE
 		// "ŠJ”­ŽºPixel presents"
 		0x8A - 1,	// ŠJ
 		0x4A - 1,
@@ -38,7 +39,7 @@ void ReadyMapName(const char *str)
 		'n' - 1,
 		't' - 1,
 		's' - 1,
-	#else
+#else
 		// "  Studio Pixel presents"
 		' ' - 1,
 		' ' - 1,
@@ -63,7 +64,7 @@ void ReadyMapName(const char *str)
 		'n' - 1,
 		't' - 1,
 		's' - 1,
-	#endif
+#endif
 		0xFF
 	};
 
