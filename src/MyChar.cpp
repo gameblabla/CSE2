@@ -225,7 +225,7 @@ void PutMyChar(int fx, int fy)
 
 			PutBitmap3(&grcGame, SubpixelToScreenCoord(gMC.x - gMC.view.left) - SubpixelToScreenCoord(fx), SubpixelToScreenCoord(gMC.y - gMC.view.top) - SubpixelToScreenCoord(fy), &rect, SURFACE_ID_MY_CHAR);
 
-			// Draw airtank
+			// Draw air tank
 			RECT rcBubble[2] = {
 				{56, 96, 80, 120},
 				{80, 96, 104, 120},
