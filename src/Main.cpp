@@ -490,7 +490,7 @@ bool SystemTask()
 #ifdef FIX_BUGS
 				// BUG FIX: Pixel relied on key codes for input, but these differ based on keyboard layout.
 				// This would break the alternate movement keys on typical English keyboards, since the '=' key is in a completely different place to where it is on a Japanese keyboard.
-				// To solve this, we use scan codes instead, which are based on the physical location of keys, rather than their meaning.
+				// To solve this, we use scancodes instead, which are based on the physical location of keys, rather than their meaning.
 				switch (event.key.keysym.scancode)
 				{
 					case SDL_SCANCODE_ESCAPE:
