@@ -131,7 +131,7 @@ void PutBack(int fx, int fy)
 			for (int i = 0; i < ((WINDOW_WIDTH - 1) / 320) + 1; i++)
 				PutBitmap4(&grcGame, PixelToScreenCoord(320 * (i + 1)) - SubpixelToScreenCoord(gBack.fx * 0x200 / 2 % (320 * 0x200)), PixelToScreenCoord(88 + (WINDOW_HEIGHT - 240)), &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
-			//Cloud layer 2
+			// Cloud layer 2
 			rect.top = 123;
 			rect.bottom = 146;
 			rect.left = gBack.fx % 320;
@@ -142,7 +142,7 @@ void PutBack(int fx, int fy)
 			for (int i = 0; i < ((WINDOW_WIDTH - 1) / 320) + 1; i++)
 				PutBitmap4(&grcGame, PixelToScreenCoord((320 * (i + 1)) - gBack.fx % 320), PixelToScreenCoord(123 + (WINDOW_HEIGHT - 240)), &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
-			//Cloud layer 3
+			// Cloud layer 3
 			rect.top = 146;
 			rect.bottom = 176;
 			rect.left = 2 * gBack.fx % 320;
@@ -153,7 +153,7 @@ void PutBack(int fx, int fy)
 			for (int i = 0; i < ((WINDOW_WIDTH - 1) / 320) + 1; i++)
 				PutBitmap4(&grcGame, PixelToScreenCoord((320 * (i + 1)) - 2 * gBack.fx % 320), PixelToScreenCoord(146 + (WINDOW_HEIGHT - 240)), &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
-			//Cloud layer 4
+			// Cloud layer 4
 			rect.top = 176;
 			rect.bottom = 240;
 			rect.left = 4 * gBack.fx % 320;
