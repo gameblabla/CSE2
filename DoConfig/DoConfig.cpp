@@ -135,7 +135,7 @@ void read_Config(){
 	for(char i=0;i<8;i++){
 		const unsigned long button = CharsToLong(config.buttons[i]);
 		if(button<9 && button>0){
-			joyRows[i]->value(button -1);
+			joyRows[i]->value(button);
 		}
 	}
 }
