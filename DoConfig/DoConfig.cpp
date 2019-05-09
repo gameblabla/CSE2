@@ -107,6 +107,9 @@ void activatejoy(Fl_Widget*, void*){
 		joystuffcontainer->activate();
 	}
 }
+
+const unsigned int button_lookup[8] = {0, 1, 2, 5, 3, 4, 6, 7};
+
 void read_Config(){
 	std::fstream fd;
 	fd.open("Config.dat", std::ios::in | std::ios::binary);
@@ -135,7 +138,7 @@ void read_Config(){
 	for(char i=0;i<8;i++){
 		const unsigned long button = CharsToLong(config.buttons[i]);
 		if(button<9 && button>0){
-			joyRows[i]->value(button);
+			joyRows[button_lookup[i]]->value(button-1);
 		}
 	}
 }
@@ -148,7 +151,7 @@ void write_Config(Fl_Widget*, void*){
 	LongToChars(displaychoice->value(), config.display);
 	LongToChars(joychoice->value(), config.useJoy);
 	for(char i =0;i<8;i++){
-		LongToChars(joyRows[i]->value(), config.buttons[i]);
+		LongToChars(joyRows[button_lookup[i]]->value()+1, config.buttons[i]);
 	}
 	std::fstream fd;
 	fd.open("Config.dat", std::ios::out | std::ios::binary);
