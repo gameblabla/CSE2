@@ -243,16 +243,16 @@ void PutArmsEnergy(bool flash)
 		int arms_code = gArmsData[gSelectedArms].code;
 		int exp_now = gArmsData[gSelectedArms].exp;
 		int exp_next = gArmsLevelTable[0].exp[lv + 3 * arms_code];
-	
+
 		PutBitmap3(&rcView, PixelToScreenCoord(gArmsEnergyX + 24), PixelToScreenCoord(32), &rcExpBox, SURFACE_ID_TEXT_BOX);
-	
+
 		if (lv != 2 || gArmsData[gSelectedArms].exp != gArmsLevelTable[0].exp[3 * arms_code + 2])
 		{
 			if (exp_next)
 				rcExpVal.right += 40 * exp_now / exp_next;
 			else
 				rcExpVal.right = 0;
-		
+
 			PutBitmap3(&rcView, PixelToScreenCoord(gArmsEnergyX + 24), PixelToScreenCoord(32), &rcExpVal, SURFACE_ID_TEXT_BOX);
 		}
 		else
@@ -323,7 +323,7 @@ void PutMyLife(bool flash)
 		rcCase.right = 64;
 		rcLife.right = 40 * gMC.life / gMC.max_life - 1;
 		rcBr.right = 40 * gMC.lifeBr / gMC.max_life - 1;
-	
+
 		PutBitmap3(&grcGame, PixelToScreenCoord(16), PixelToScreenCoord(40), &rcCase, SURFACE_ID_TEXT_BOX);
 		PutBitmap3(&grcGame, PixelToScreenCoord(40), PixelToScreenCoord(40), &rcBr, SURFACE_ID_TEXT_BOX);
 		PutBitmap3(&grcGame, PixelToScreenCoord(40), PixelToScreenCoord(40), &rcLife, SURFACE_ID_TEXT_BOX);

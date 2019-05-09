@@ -161,12 +161,12 @@ int MiniMapLoop()
 		}
 
 		PutBitmap3(&grcGame, PixelToScreenCoord(rcView.left + 1), PixelToScreenCoord(rcView.top + 1), &rcMiniMap, SURFACE_ID_MAP);
-	
+
 		PutMapName(true);
 
 		if (++my_wait / 8 % 2)
 			PutBitmap3(&grcGame, PixelToScreenCoord(my_x + rcView.left + 1), PixelToScreenCoord(my_y + rcView.top + 1), &my_rect, SURFACE_ID_TEXT_BOX);
-	
+
 		PutFramePerSecound();
 		if (!Flip_SystemTask())
 			return 0;
