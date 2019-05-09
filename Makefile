@@ -186,11 +186,11 @@ else
 	endif
 endif
 
-OBJECTS = $(addprefix obj/$(FILENAME)/, $(addsuffix .o, $(SOURCES)))
-DEPENDENCIES = $(addprefix obj/$(FILENAME)/, $(addsuffix .o.d, $(SOURCES)))
+OBJECTS = $(addprefix obj/$(BUILD_DIR)/$(FILENAME)/, $(addsuffix .o, $(SOURCES)))
+DEPENDENCIES = $(addprefix obj/$(BUILD_DIR)/$(FILENAME)/, $(addsuffix .o.d, $(SOURCES)))
 
 ifeq ($(WINDOWS), 1)
-	OBJECTS += obj/$(FILENAME)/win_icon.o
+	OBJECTS += obj/$(BUILD_DIR)/$(FILENAME)/win_icon.o
 endif
 
 all: $(BUILD_DIR)/$(FILENAME)
@@ -201,17 +201,17 @@ $(BUILD_DIR)/$(FILENAME): $(OBJECTS)
 	@$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -o $@ $(LIBS)
 	@echo Finished compiling: $@
 
-obj/$(FILENAME)/%.o: src/%.c
+obj/$(BUILD_DIR)/$(FILENAME)/%.o: src/%.c
 	@mkdir -p $(@D)
 	@echo Compiling $<
 	@$(CC) $(CFLAGS) $(DEFINES) $< -o $@ -c
 
-obj/$(FILENAME)/%.o: src/%.cpp
+obj/$(BUILD_DIR)/$(FILENAME)/%.o: src/%.cpp
 	@mkdir -p $(@D)
 	@echo Compiling $<
 	@$(CXX) $(CXXFLAGS) $(DEFINES) $< -o $@ -c
 
-obj/$(FILENAME)/Resource.o: src/Resource.cpp $(addprefix src/Resource/, $(addsuffix .h, $(RESOURCES)))
+obj/$(BUILD_DIR)/$(FILENAME)/Resource.o: src/Resource.cpp $(addprefix src/Resource/, $(addsuffix .h, $(RESOURCES)))
 	@mkdir -p $(@D)
 	@echo Compiling $<
 	@$(CXX) $(CXXFLAGS) $(DEFINES) $< -o $@ -c
@@ -228,7 +228,7 @@ obj/bin2h: src/misc/bin2h.c
 
 include $(wildcard $(DEPENDENCIES))
 
-obj/$(FILENAME)/win_icon.o: res/ICON/ICON.rc res/ICON/0.ico res/ICON/ICON_MINI.ico
+obj/$(BUILD_DIR)/$(FILENAME)/win_icon.o: res/ICON/ICON.rc res/ICON/0.ico res/ICON/ICON_MINI.ico
 	@mkdir -p $(@D)
 	@windres $< $@
 
