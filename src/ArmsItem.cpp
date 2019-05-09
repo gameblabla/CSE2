@@ -290,15 +290,15 @@ void PutCampObject()
 		PutBitmap3(&rcView, PixelToScreenCoord((WINDOW_WIDTH - 244) / 2), PixelToScreenCoord(((WINDOW_HEIGHT - 240) / 2) + (8 * (y + 1))), &rcBoxBody, SURFACE_ID_TEXT_BOX);
 	PutBitmap3(&rcView, PixelToScreenCoord((WINDOW_WIDTH - 244) / 2), PixelToScreenCoord(((WINDOW_HEIGHT - 240) / 2) + (8 * (y + 1))), &rcBoxBottom, SURFACE_ID_TEXT_BOX);
 
-	//Move titles
+	// Move titles
 	if (gCampTitleY > (WINDOW_HEIGHT - 208) / 2)
 		--gCampTitleY;
 
-	//Draw titles
+	// Draw titles
 	PutBitmap3(&rcView, PixelToScreenCoord((WINDOW_WIDTH - 224) / 2), PixelToScreenCoord(gCampTitleY), &rcTitle1, SURFACE_ID_TEXT_BOX);
 	PutBitmap3(&rcView, PixelToScreenCoord((WINDOW_WIDTH - 224) / 2), PixelToScreenCoord(gCampTitleY + 52), &rcTitle2, SURFACE_ID_TEXT_BOX);
 
-	//Draw arms cursor
+	// Draw arms cursor
 	static unsigned int flash;
 	++flash;
 
@@ -307,7 +307,7 @@ void PutCampObject()
 	else
 		PutBitmap3(&rcView, PixelToScreenCoord(40 * gSelectedArms + (WINDOW_WIDTH - 224) / 2), PixelToScreenCoord((WINDOW_HEIGHT / 2) - 96), &rcCur1[1], SURFACE_ID_TEXT_BOX);
 
-	//Draw arms
+	// Draw arms
 	for (int i = 0; i < ARMS_MAX; i++)
 	{
 		if (gArmsData[i].code == 0)
