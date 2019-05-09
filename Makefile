@@ -5,22 +5,16 @@ EXTRA_SOUND_FORMATS ?= 1
 ifeq ($(RELEASE), 1)
 	CXXFLAGS = -O3 -flto
 	LDFLAGS = -s
-	FILENAME_DEF = release
+	FILENAME_DEF = CSE2
 else
 	CXXFLAGS = -O0 -g
-	FILENAME_DEF = debug
+	FILENAME_DEF = CSE2d
 endif
 
 ifeq ($(JAPANESE), 1)
 	BUILD_DIR = build_jp
 
 	CXXFLAGS += -DJAPANESE
-
-	ifeq ($(RELEASE), 1)
-		FILENAME_DEF = releasejp
-	else
-		FILENAME_DEF = debugjp
-	endif
 else
 	BUILD_DIR = build_en
 endif
