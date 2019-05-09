@@ -366,7 +366,7 @@ void ReCallMusic()
 			char path[PATH_LENGTH];
 			sprintf(path, "%s/%s", gDataPath, gMusicTable[gOldNo].path);
 			LoadOrganya(path);
-	
+
 			//Reset position, volume, and then play the song
 			SetOrganyaPosition(gOldPos);
 			ChangeOrganyaVolume(100);
