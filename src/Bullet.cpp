@@ -142,7 +142,7 @@ void PutBullet(int fx, int fy)
 					y = gBul[i].y - gBul[i].view.back;
 					break;
 			}
-		
+
 			PutBitmap3(&grcGame, SubpixelToScreenCoord(x) - SubpixelToScreenCoord(fx), SubpixelToScreenCoord(y) - SubpixelToScreenCoord(fy), &gBul[i].rect, SURFACE_ID_BULLET);
 		}
 	}
