@@ -136,9 +136,9 @@ static const STAGE_TABLE gTMTDefault[95] = {
 
 static const STAGE_TABLE *gTMT = gTMTDefault;
 
-bool LoadStageTable(const char *path)
+BOOL LoadStageTable(const char *path)
 {
-	bool success = false;
+	BOOL success = FALSE;
 
 	unsigned char *file_buffer;
 	const long file_size = LoadFileToMemory(path, &file_buffer);
@@ -168,13 +168,13 @@ bool LoadStageTable(const char *path)
 			}
 
 			gTMT = pTMT;
-			success = true;
+			success = TRUE;
 		}
 
 		free(file_buffer);
 	}
 
-	if (success == false)
+	if (success == FALSE)
 		printf("Failed to load mrmap.bin\n");
 
 	return success;
