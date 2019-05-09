@@ -523,7 +523,7 @@ void CortBox2(RECT *rect, uint32_t col, Surface_Ids surf_no)
 	// Get rect
 	SDL_Rect destRect = RectToSDLRectScaled(rect);
 
- 	// Set colour and draw
+	// Set colour and draw
 	const unsigned char col_red = col & 0x000000FF;
 	const unsigned char col_green = (col & 0x0000FF00) >> 8;
 	const unsigned char col_blue = (col & 0x00FF0000) >> 16;
