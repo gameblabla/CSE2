@@ -104,7 +104,7 @@ void DamageMyChar(int damage)
 {
 	if (!gMC.shock)
 	{
-		//Damage player
+		// Damage player
 		PlaySoundObject(16, 1);
 		gMC.cond &= ~1;
 		gMC.shock = 128;
@@ -112,11 +112,11 @@ void DamageMyChar(int damage)
 			gMC.ym = -0x400;
 		gMC.life -= damage;
 
-		//Lose a whimsical star
+		// Lose a whimsical star
 		if (gMC.equip & 0x80 && gMC.star > 0)
 			--gMC.star;
 
-		//Lose experience
+		// Lose experience
 		if (gMC.equip & 4)
 			gArmsData[gSelectedArms].exp -= damage;
 		else
@@ -136,10 +136,10 @@ void DamageMyChar(int damage)
 			}
 		}
 
-		//Tell player how much damage was taken
+		// Tell player how much damage was taken
 		SetValueView(&gMC.x, &gMC.y, -damage);
 
-		//Death
+		// Death
 		if (gMC.life <= 0)
 		{
 			PlaySoundObject(17, 1);
@@ -161,7 +161,7 @@ void ZeroArmsEnergy_All()
 
 void AddBulletMyChar(int no, int val)
 {
-	//Missile Launcher
+	// Missile Launcher
 	for (int a = 0; a < ARMS_MAX; a++)
 	{
 		if (gArmsData[a].code == 5)
@@ -173,7 +173,7 @@ void AddBulletMyChar(int no, int val)
 		}
 	}
 
-	//Super Missile Launcher
+	// Super Missile Launcher
 	for (int a = 0; a < ARMS_MAX; a++)
 	{
 		if (gArmsData[a].code == 10)
@@ -215,7 +215,7 @@ void PutArmsEnergy(bool flash)
 	if (gArmsEnergyX < 16)
 		gArmsEnergyX += 2;
 
-	//Draw max ammo
+	// Draw max ammo
 	if (gArmsData[gSelectedArms].max_num)
 	{
 		PutNumber4(gArmsEnergyX + 32, 16, gArmsData[gSelectedArms].num, 0);
@@ -227,7 +227,7 @@ void PutArmsEnergy(bool flash)
 		PutBitmap3(&rcView, gArmsEnergyX + 48, 24, &rcNone, SURFACE_ID_TEXT_BOX);
 	}
 
-	//Draw experience and ammo
+	// Draw experience and ammo
 	if (!flash || !((gMC.shock >> 1) & 1))
 	{
 		PutBitmap3(&rcView, gArmsEnergyX + 32, 24, &rcPer, SURFACE_ID_TEXT_BOX);
@@ -277,7 +277,7 @@ void PutActiveArmsList()
 	{
 		for (int a = 0; a < arms_num; a++)
 		{
-			//Get X position to draw at
+			// Get X position to draw at
 			int x = 16 * (a - gSelectedArms) + gArmsEnergyX;
 
 			if (x >= 8)
@@ -295,7 +295,7 @@ void PutActiveArmsList()
 			if (x < 72 && x >= 24)
 				x -= 48;
 
-			//Draw icon
+			// Draw icon
 			rect.left = 16 * gArmsData[a].code;
 			rect.right = rect.left + 16;
 			PutBitmap3(&grcGame, x, 16, &rect, SURFACE_ID_ARMS_IMAGE);
@@ -319,7 +319,7 @@ void PutMyLife(bool flash)
 		else if (++gMC.lifeBr_count > 30)
 			--gMC.lifeBr;
 
-		//Draw bar
+		// Draw bar
 		rcCase.right = 64;
 		rcLife.right = 40 * gMC.life / gMC.max_life - 1;
 		rcBr.right = 40 * gMC.lifeBr / gMC.max_life - 1;
@@ -340,11 +340,11 @@ void PutMyAir(int x, int y)
 
 	if (!(gMC.equip & 0x10) && gMC.air_get)
 	{
-		//Draw how much air is left
+		// Draw how much air is left
 		if (gMC.air_get % 6 <= 3)
 			PutNumber4(x + 32, y, gMC.air / 10, 0);
 
-		//Draw "AIR" text
+		// Draw "AIR" text
 		if (gMC.air % 30 <= 10)
 			PutBitmap3(&grcGame, x, y, &rcAir[1], SURFACE_ID_TEXT_BOX);
 		else
@@ -362,7 +362,7 @@ void PutTimeCounter(int x, int y)
 
 	if (gMC.equip & 0x100)
 	{
-		//Draw clock and increase time
+		// Draw clock and increase time
 		if (g_GameFlags & 2)
 		{
 			if (time_count < 300000)
@@ -378,7 +378,7 @@ void PutTimeCounter(int x, int y)
 			PutBitmap3(&grcGame, x, y, &rcTime[0], SURFACE_ID_TEXT_BOX);
 		}
 
-		//Draw time
+		// Draw time
 		PutNumber4(x,		y, time_count / 3000,		false);
 		PutNumber4(x + 20,	y, time_count / 50 % 60,	true);
 		PutNumber4(x + 32,	y, time_count / 5 % 10,		false);
@@ -394,18 +394,18 @@ bool SaveTimeCounter()
 {
 	REC rec;
 
-	//Quit if player doesn't have the Nikumaru Counter
+	// Quit if player doesn't have the Nikumaru Counter
 	if (!(gMC.equip & 0x100))
 		return true;
 
-	//Get last time
+	// Get last time
 	char path[PATH_LENGTH];
 	sprintf(path, "%s/290.rec", gModulePath);
 
 	FILE *fp = fopen(path, "rb");
 	if (fp)
 	{
-		//Read data
+		// Read data
 		rec.counter[0] = File_ReadLE32(fp);
 		rec.counter[1] = File_ReadLE32(fp);
 		rec.counter[2] = File_ReadLE32(fp);
@@ -422,12 +422,12 @@ bool SaveTimeCounter()
 		p[2] -= rec.random[0];
 		p[3] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[0] >> 1) : (rec.random[0]);
 
-		//If this is faster than our new time, quit
+		// If this is faster than our new time, quit
 		if (rec.counter[0] < time_count)
 			return true;
 	}
 
-	//Save new time
+	// Save new time
 	for (int i = 0; i < 4; i++)
 	{
 		rec.counter[i] = time_count;
@@ -457,7 +457,7 @@ bool SaveTimeCounter()
 
 int LoadTimeCounter()
 {
-	//Open file
+	// Open file
 	char path[PATH_LENGTH];
 	sprintf(path, "%s/290.rec", gModulePath);
 
@@ -467,7 +467,7 @@ int LoadTimeCounter()
 
 	REC rec;
 
-	//Read data
+	// Read data
 	rec.counter[0] = File_ReadLE32(fp);
 	rec.counter[1] = File_ReadLE32(fp);
 	rec.counter[2] = File_ReadLE32(fp);
@@ -478,7 +478,7 @@ int LoadTimeCounter()
 	rec.random[3] = fgetc(fp);
 	fclose(fp);
 
-	//Decode from checksum
+	// Decode from checksum
 	for (int i = 0; i < 4; i++)
 	{
 		uint8_t *p = (uint8_t*)&rec.counter[i];
@@ -488,7 +488,7 @@ int LoadTimeCounter()
 		p[3] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[i] >> 1) : (rec.random[i]);
 	}
 
-	//Verify checksum's result
+	// Verify checksum's result
 	if (rec.counter[0] == rec.counter[1] && rec.counter[0] == rec.counter[2])
 	{
 		time_count = rec.counter[0];

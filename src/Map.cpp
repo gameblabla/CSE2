@@ -67,7 +67,7 @@ BOOL LoadMapData2(const char *path_map)
 		}
 		else
 		{
-			// Read tiledata
+			// Read tile data
 			fread(gMap.data, 1, gMap.length * gMap.width, fp);
 			fclose(fp);
 			return TRUE;
