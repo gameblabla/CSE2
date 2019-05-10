@@ -7,7 +7,7 @@
 unsigned char gFlagNPC[1000];
 unsigned char gSkipFlag[8];
 
-// Flag inits
+// Flag initializers
 void InitFlags()
 {
 	memset(gFlagNPC, 0, sizeof(gFlagNPC));
