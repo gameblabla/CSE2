@@ -16,44 +16,44 @@ static const char* const config_magic = "DOUKUTSU20041206";	// Not the original 
 
 BOOL LoadConfigData(CONFIG *conf)
 {
-	//Clear old config data
+	// Clear old configuration data
 	memset(conf, 0, sizeof(CONFIG));
 
-	//Get path
+	// Get path
 	char path[PATH_LENGTH];
 	sprintf(path, "%s/%s", gModulePath, config_filename);
 
-	//Open file
+	// Open file
 	FILE *fp = fopen(path, "rb");
 	if (fp == NULL)
 		return FALSE;
 
-	//Read data
+	// Read data
 #ifdef NONPORTABLE
 	size_t fread_result = fread(conf, sizeof(CONFIG), 1, fp); // Not the original name
 #else
-	//Read the version id and font name
+	// Read the version id and font name
 	fread(conf->proof, sizeof(conf->proof), 1, fp);
 	fread(conf->font_name, sizeof(conf->font_name), 1, fp);
 
-	//Read control settings
+	// Read control settings
 	conf->move_button_mode = File_ReadLE32(fp);
 	conf->attack_button_mode = File_ReadLE32(fp);
 	conf->ok_button_mode = File_ReadLE32(fp);
 
-	//Read display mode (320x240, 640x480, 24-bit fullscreen, 32-bit fullscreen) TODO: add more things?
+	// Read display mode (320x240, 640x480, 24-bit fullscreen, 32-bit fullscreen) TODO: add more things?
 	conf->display_mode = File_ReadLE32(fp);
 
-	//Read joystick configuration (if enabled, and mappings)
+	// Read joystick configuration (if enabled, and mappings)
 	conf->bJoystick = File_ReadLE32(fp);
 	for (int button = 0; button < 8; button++)
 		conf->joystick_button[button] = File_ReadLE32(fp);
 #endif
 
-	//Close file
+	// Close file
 	fclose(fp);
 
-	//Check if version is not correct, and return if it failed
+	// Check if version is not correct, and return if it failed
 #ifdef NONPORTABLE
 	if (fread_result != 1 || strcmp(conf->proof, config_magic))
 #else
@@ -69,13 +69,13 @@ BOOL LoadConfigData(CONFIG *conf)
 
 void DefaultConfigData(CONFIG *conf)
 {
-	//Clear old config data
+	// Clear old configuration data
 	memset(conf, 0, sizeof(CONFIG));
 
-	//Fun fact: The Linux port added this line:
-	//conf->display_mode = 1;
+	// Fun fact: The Linux port added this line:
+	// conf->display_mode = 1;
 
-	//Reset joystick settings (as these can't simply be set to 0)
+	// Reset joystick settings (as these can't simply be set to 0)
 	conf->bJoystick = 1;
 	conf->joystick_button[0] = 2;
 	conf->joystick_button[1] = 1;
