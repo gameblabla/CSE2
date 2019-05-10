@@ -571,6 +571,22 @@ name = "MakePixelWaveData"
 addr = 0x41CB10
 
 [[func]]
+name = "IsProfile"
+addr = 0x41CFC0
+
+[[func]]
+name = "SaveProfile"
+addr = 0x41D040
+
+[[func]]
+name = "LoadProfile"
+addr = 0x41D260
+
+[[func]]
+name = "InitializeGame"
+addr = 0x41D550
+
+[[func]]
 name = "ShootBullet_Frontia1"
 addr = 0x41DBD0
 

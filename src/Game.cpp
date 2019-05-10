@@ -49,7 +49,7 @@
 int g_GameFlags;
 int gCounter;
 
-bool bContinue;
+BOOL bContinue;
 
 int Random(int min, int max)
 {
@@ -405,7 +405,7 @@ int ModeTitle()
 		}
 
 		int char_y;
-		if (bContinue == 1)
+		if (bContinue == TRUE)
 			char_y = (WINDOW_HEIGHT + 54) / 2;
 		else
 			char_y = (WINDOW_HEIGHT + 14) / 2;
