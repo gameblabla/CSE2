@@ -35,79 +35,79 @@ int JudgeHitMyCharBlock(int x, int y)
 {
 	int hit = 0;
 
-	//Left wall
+	// Left wall
 	if (gMC.y - gMC.hit.top < (2 * (2 * y + 1) - 1) << 11
 		&& gMC.y + gMC.hit.bottom > (2 * (2 * y - 1) + 1) << 11
 		&& gMC.x - gMC.hit.left < (2 * x + 1) << 12
 		&& gMC.x - gMC.hit.left > x << 13)
 	{
-		//Clip
+		// Clip
 		gMC.x = ((2 * x + 1) << 12) + gMC.hit.left;
 
-		//Halt momentum
+		// Halt momentum
 		if (gMC.xm < -0x180)
 			gMC.xm = -0x180;
 		if (!(gKey & gKeyLeft) && gMC.xm < 0)
 			gMC.xm = 0;
 
-		//Set that a left wall was hit
+		// Set that a left wall was hit
 		hit |= 1;
 	}
 
-	//Right wall
+	// Right wall
 	if (gMC.y - gMC.hit.top < (2 * (2 * y + 1) - 1) << 11
 		&& gMC.y + gMC.hit.bottom > (2 * (2 * y - 1) + 1) << 11
 		&& gMC.x + gMC.hit.right > (2 * x - 1) << 12
 		&& gMC.x + gMC.hit.left < x << 13)
 	{
-		//Clip
+		// Clip
 		gMC.x = ((2 * x - 1) << 12) - gMC.hit.right;
 
-		//Halt momentum
+		// Halt momentum
 		if (gMC.xm > 0x180)
 			gMC.xm = 0x180;
 		if (!(gKey & gKeyRight) && gMC.xm > 0)
 			gMC.xm = 0;
 
-		//Set that a right wall was hit
+		// Set that a right wall was hit
 		hit |= 4;
 	}
 
-	//Ceiling
+	// Ceiling
 	if (gMC.x - gMC.hit.right < ((2 * x + 1) << 12) - 0x600
 		&& gMC.x + gMC.hit.right > ((2 * x - 1) << 12) + 0x600
 		&& gMC.y - gMC.hit.top < (2 * y + 1) << 12
 		&& gMC.y - gMC.hit.top > y << 13)
 	{
-		//Clip
+		// Clip
 		gMC.y = ((2 * y + 1) << 12) + gMC.hit.top;
 
-		//Halt momentum
+		// Halt momentum
 		if (!(gMC.cond & 2) && gMC.ym < -0x200)
 			PutlittleStar();
 		if (gMC.ym < 0)
 			gMC.ym = 0;
 
-		//Set that a ceiling was hit
+		// Set that a ceiling was hit
 		hit |= 2;
 	}
 
-	//Floor
+	// Floor
 	if (gMC.x - gMC.hit.right < ((2 * x + 1) << 12) - 0x600
 		&& gMC.x + gMC.hit.right > ((2 * x - 1) << 12) + 0x600
 		&& gMC.y + gMC.hit.bottom > (2 * y - 1) << 12
 		&& gMC.y + gMC.hit.bottom < y << 13)
 	{
-		//Clip
+		// Clip
 		gMC.y = ((2 * y - 1) << 12) - gMC.hit.bottom;
 
-		//Halt momentum
+		// Halt momentum
 		if (gMC.ym > 0x400)
 			PlaySoundObject(23, 1);
 		if (gMC.ym > 0)
 			gMC.ym = 0;
 
-		//Set that a floor was hit
+		// Set that a floor was hit
 		hit |= 8;
 	}
 
@@ -123,16 +123,16 @@ int JudgeHitMyCharTriangleA(int x, int y)
 		&& gMC.y - gMC.hit.top < (y << 13) - (-0x2000 * x + gMC.x) / 2 + 0x800
 		&& gMC.y + gMC.hit.bottom > (2 * y - 1) << 12)
 	{
-		//Clip
+		// Clip
 		gMC.y = (y << 13) - (-0x2000 * x + gMC.x) / 2 + 0x800 + gMC.hit.top;
 
-		//Halt momentum
+		// Halt momentum
 		if (!(gMC.cond & 2) && gMC.ym < -0x200)
 			PutlittleStar();
 		if (gMC.ym < 0)
 			gMC.ym = 0;
 
-		//Set that hit a ceiling
+		// Set that hit a ceiling
 		hit |= 2;
 	}
 
@@ -148,16 +148,16 @@ int JudgeHitMyCharTriangleB(int x, int y)
 		&& gMC.y - gMC.hit.top < (y << 13) - (-0x2000 * x + gMC.x) / 2 - 0x800
 		&& gMC.y + gMC.hit.bottom > (2 * y - 1) << 12)
 	{
-		//Clip
+		// Clip
 		gMC.y = (y << 13) - (-0x2000 * x + gMC.x) / 2 - 0x800 + gMC.hit.top;
 
-		//Halt momentum
+		// Halt momentum
 		if (!(gMC.cond & 2) && gMC.ym < -0x200)
 			PutlittleStar();
 		if (gMC.ym < 0)
 			gMC.ym = 0;
 
-		//Set that hit a ceiling
+		// Set that hit a ceiling
 		hit |= 2;
 	}
 
@@ -173,16 +173,16 @@ int JudgeHitMyCharTriangleC(int x, int y)
 		&& gMC.y - gMC.hit.top < (y << 13) + (-0x2000 * x + gMC.x) / 2 - 0x800
 		&& gMC.y + gMC.hit.bottom > (2 * y - 1) << 12)
 	{
-		//Clip
+		// Clip
 		gMC.y = (y << 13) + (-0x2000 * x + gMC.x) / 2 - 0x800 + gMC.hit.top;
 
-		//Halt momentum
+		// Halt momentum
 		if (!(gMC.cond & 2) && gMC.ym < -0x200)
 			PutlittleStar();
 		if (gMC.ym < 0)
 			gMC.ym = 0;
 
-		//Set that hit a ceiling
+		// Set that hit a ceiling
 		hit |= 2;
 	}
 
@@ -198,16 +198,16 @@ int JudgeHitMyCharTriangleD(int x, int y)
 		&& gMC.y - gMC.hit.top < (y << 13) + (-0x2000 * x + gMC.x) / 2 + 0x800
 		&& gMC.y + gMC.hit.bottom > (2 * y - 1) << 12)
 	{
-		//Clip
+		// Clip
 		gMC.y = (y << 13) + (-0x2000 * x + gMC.x) / 2 + 0x800 + gMC.hit.top;
 
-		//Halt momentum
+		// Halt momentum
 		if (!(gMC.cond & 2) && gMC.ym < -0x200)
 			PutlittleStar();
 		if (gMC.ym < 0)
 			gMC.ym = 0;
 
-		//Set that hit a ceiling
+		// Set that hit a ceiling
 		hit |= 2;
 	}
 
@@ -223,16 +223,16 @@ int JudgeHitMyCharTriangleE(int x, int y)
 		&& gMC.y + gMC.hit.bottom > (y << 13) + (-0x2000 * x + gMC.x) / 2 - 0x800
 		&& gMC.y - gMC.hit.top < (2 * y + 1) << 12)
 	{
-		//Clip
+		// Clip
 		gMC.y = (y << 13) + (-0x2000 * x + gMC.x) / 2 - 0x800 - gMC.hit.bottom;
 
-		//Halt momentum
+		// Halt momentum
 		if (gMC.ym > 0x400)
 			PlaySoundObject(23, 1);
 		if (gMC.ym > 0)
 			gMC.ym = 0;
 
-		//Set that hit this slope
+		// Set that hit this slope
 		hit = 0x10028;
 	}
 
@@ -248,16 +248,16 @@ int JudgeHitMyCharTriangleF(int x, int y)
 		&& gMC.y + gMC.hit.bottom > (y << 13) + (-0x2000 * x + gMC.x) / 2 + 0x800
 		&& gMC.y - gMC.hit.top < (2 * y + 1) << 12)
 	{
-		//Clip
+		// Clip
 		gMC.y = (y << 13) + (-0x2000 * x + gMC.x) / 2 + 0x800 - gMC.hit.bottom;
 
-		//Halt momentum
+		// Halt momentum
 		if (gMC.ym > 0x400)
 			PlaySoundObject(23, 1);
 		if (gMC.ym > 0)
 			gMC.ym = 0;
 
-		//Set that hit this slope
+		// Set that hit this slope
 		hit = 0x20028;
 	}
 
@@ -273,16 +273,16 @@ int JudgeHitMyCharTriangleG(int x, int y)
 		&& gMC.y + gMC.hit.bottom > (y << 13) - (-0x2000 * x + gMC.x) / 2 + 0x800
 		&& gMC.y - gMC.hit.top < (2 * y + 1) << 12)
 	{
-		//Clip
+		// Clip
 		gMC.y = (y << 13) - (-0x2000 * x + gMC.x) / 2 + 0x800 - gMC.hit.bottom;
 
-		//Halt momentum
+		// Halt momentum
 		if (gMC.ym > 0x400)
 			PlaySoundObject(23, 1);
 		if (gMC.ym > 0)
 			gMC.ym = 0;
 
-		//Set that hit this slope
+		// Set that hit this slope
 		hit = 0x40018;
 	}
 
@@ -298,16 +298,16 @@ int JudgeHitMyCharTriangleH(int x, int y)
 		&& gMC.y + gMC.hit.bottom > (y << 13) - (-0x2000 * x + gMC.x) / 2 - 0x800
 		&& gMC.y - gMC.hit.top < (2 * y + 1) << 12)
 	{
-		//Clip
+		// Clip
 		gMC.y = (y << 13) - (-0x2000 * x + gMC.x) / 2 - 0x800 - gMC.hit.bottom;
 
-		//Halt momentum
+		// Halt momentum
 		if (gMC.ym > 0x400)
 			PlaySoundObject(23, 1);
 		if (gMC.ym > 0)
 			gMC.ym = 0;
 
-		//Set that hit this slope
+		// Set that hit this slope
 		hit = 0x80018;
 	}
 
@@ -424,12 +424,12 @@ void HitMyCharMap()
 
 		switch (atrb[i])
 		{
-			//Water
+			// Water
 			case 0x02:
 				gMC.flag |= JudgeHitMyCharWater(x + offx[i], y + offy[i]);
 				break;
 
-			//Block
+			// Block
 			case 0x05:
 			case 0x41:
 			case 0x43:
@@ -437,12 +437,12 @@ void HitMyCharMap()
 				gMC.flag |= JudgeHitMyCharBlock(x + offx[i], y + offy[i]);
 				break;
 
-			//Spikes
+			// Spikes
 			case 0x42:
 				gMC.flag |= JudgeHitMyCharDamage(x + offx[i], y + offy[i]);
 				break;
 
-			//Slopes
+			// Slopes
 			case 0x50:
 				gMC.flag |= JudgeHitMyCharTriangleA(x + offx[i], y + offy[i]);
 				break;
@@ -475,7 +475,7 @@ void HitMyCharMap()
 				gMC.flag |= JudgeHitMyCharTriangleH(x + offx[i], y + offy[i]);
 				break;
 
-			//Water and water blocks
+			// Water and water blocks
 			case 0x60:
 				gMC.flag |= JudgeHitMyCharWater(x + offx[i], y + offy[i]);
 				break;
@@ -485,53 +485,53 @@ void HitMyCharMap()
 				gMC.flag |= JudgeHitMyCharWater(x + offx[i], y + offy[i]);
 				break;
 
-			//Water spikes
+			// Water spikes
 			case 0x62:
 				gMC.flag |= JudgeHitMyCharDamageW(x + offx[i], y + offy[i]);
 				break;
 
-			//Water slopes
+			// Water slopes
 			case 0x70:
-				gMC.flag |=  JudgeHitMyCharTriangleA(x + offx[i], y + offy[i]);
-				gMC.flag |=  JudgeHitMyCharWater(x + offx[i], y + offy[i]);
+				gMC.flag |= JudgeHitMyCharTriangleA(x + offx[i], y + offy[i]);
+				gMC.flag |= JudgeHitMyCharWater(x + offx[i], y + offy[i]);
 				break;
 
 			case 0x71:
-				gMC.flag |=  JudgeHitMyCharTriangleB(x + offx[i], y + offy[i]);
-				gMC.flag |=  JudgeHitMyCharWater(x + offx[i], y + offy[i]);
+				gMC.flag |= JudgeHitMyCharTriangleB(x + offx[i], y + offy[i]);
+				gMC.flag |= JudgeHitMyCharWater(x + offx[i], y + offy[i]);
 				break;
 
 			case 0x72:
-				gMC.flag |=  JudgeHitMyCharTriangleC(x + offx[i], y + offy[i]);
-				gMC.flag |=  JudgeHitMyCharWater(x + offx[i], y + offy[i]);
+				gMC.flag |= JudgeHitMyCharTriangleC(x + offx[i], y + offy[i]);
+				gMC.flag |= JudgeHitMyCharWater(x + offx[i], y + offy[i]);
 				break;
 
 			case 0x73:
-				gMC.flag |=  JudgeHitMyCharTriangleD(x + offx[i], y + offy[i]);
-				gMC.flag |=  JudgeHitMyCharWater(x + offx[i], y + offy[i]);
+				gMC.flag |= JudgeHitMyCharTriangleD(x + offx[i], y + offy[i]);
+				gMC.flag |= JudgeHitMyCharWater(x + offx[i], y + offy[i]);
 				break;
 
 			case 0x74:
-				gMC.flag |=  JudgeHitMyCharTriangleE(x + offx[i], y + offy[i]);
-				gMC.flag |=  JudgeHitMyCharWater(x + offx[i], y + offy[i]);
+				gMC.flag |= JudgeHitMyCharTriangleE(x + offx[i], y + offy[i]);
+				gMC.flag |= JudgeHitMyCharWater(x + offx[i], y + offy[i]);
 				break;
 
 			case 0x75:
-				gMC.flag |=  JudgeHitMyCharTriangleF(x + offx[i], y + offy[i]);
-				gMC.flag |=  JudgeHitMyCharWater(x + offx[i], y + offy[i]);
+				gMC.flag |= JudgeHitMyCharTriangleF(x + offx[i], y + offy[i]);
+				gMC.flag |= JudgeHitMyCharWater(x + offx[i], y + offy[i]);
 				break;
 
 			case 0x76:
-				gMC.flag |=  JudgeHitMyCharTriangleG(x + offx[i], y + offy[i]);
-				gMC.flag |=  JudgeHitMyCharWater(x + offx[i], y + offy[i]);
+				gMC.flag |= JudgeHitMyCharTriangleG(x + offx[i], y + offy[i]);
+				gMC.flag |= JudgeHitMyCharWater(x + offx[i], y + offy[i]);
 				break;
 
 			case 0x77:
-				gMC.flag |=  JudgeHitMyCharTriangleH(x + offx[i], y + offy[i]);
-				gMC.flag |=  JudgeHitMyCharWater(x + offx[i], y + offy[i]);
+				gMC.flag |= JudgeHitMyCharTriangleH(x + offx[i], y + offy[i]);
+				gMC.flag |= JudgeHitMyCharWater(x + offx[i], y + offy[i]);
 				break;
 
-			//Wind
+			// Wind
 			case 0x80:
 				gMC.flag |= JudgeHitMyCharVectLeft(x + offx[i], y + offy[i]);
 				break;
@@ -548,7 +548,7 @@ void HitMyCharMap()
 				gMC.flag |= JudgeHitMyCharVectDown(x + offx[i], y + offy[i]);
 				break;
 
-			//Water current
+			// Water current
 			case 0xA0:
 				gMC.flag |= JudgeHitMyCharVectLeft(x + offx[i], y + offy[i]);
 				gMC.flag |= JudgeHitMyCharWater(x + offx[i], y + offy[i]);
@@ -657,7 +657,7 @@ int JudgeHitMyCharNPC3(NPCHAR *npc)
 
 int JudgeHitMyCharNPC4(NPCHAR *npc)
 {
-	//TODO: comment this
+	// TODO: comment this
 	int hit = 0;
 	long double v1, v2;
 
@@ -688,7 +688,7 @@ int JudgeHitMyCharNPC4(NPCHAR *npc)
 		{
 			if (gMC.x - gMC.hit.right < npc->x + npc->hit.back && gMC.x - gMC.hit.right > npc->x)
 			{
-				if ( gMC.xm < npc->xm )
+				if (gMC.xm < npc->xm)
 					gMC.xm = npc->xm;
 				gMC.x = npc->hit.back + npc->x + gMC.hit.right;
 				hit |= 1;
@@ -696,7 +696,7 @@ int JudgeHitMyCharNPC4(NPCHAR *npc)
 
 			if (gMC.x + gMC.hit.right > npc->x - npc->hit.back && gMC.hit.right + gMC.x < npc->x)
 			{
-				if ( gMC.xm > npc->xm )
+				if (gMC.xm > npc->xm)
 					gMC.xm = npc->xm;
 				gMC.x = npc->x - npc->hit.back - gMC.hit.right;
 				hit |= 4;
@@ -774,7 +774,7 @@ void HitMyCharNpChar()
 					hit = JudgeHitMyCharNPC3(&gNPC[i]);
 				}
 
-				//Special NPCs (pickups)
+				// Special NPCs (pickups)
 				if (hit && gNPC[i].code_char == 1)
 				{
 					PlaySoundObject(14, 1);
@@ -796,11 +796,11 @@ void HitMyCharNpChar()
 					gNPC[i].cond = 0;
 				}
 
-				//Run event on contact
+				// Run event on contact
 				if (!(g_GameFlags & 4) && hit && gNPC[i].bits & npc_eventTouch)
 					StartTextScript(gNPC[i].code_event);
 
-				//NPC damage
+				// NPC damage
 				if (g_GameFlags & 2 && !(gNPC[i].bits & npc_interact))
 				{
 					if (gNPC[i].bits & npc_rearTop)
@@ -820,7 +820,7 @@ void HitMyCharNpChar()
 					}
 				}
 
-				//Interaction
+				// Interaction
 				if (!(g_GameFlags & 4) && hit && gMC.cond & 1 && gNPC[i].bits & npc_interact)
 				{
 					StartTextScript(gNPC[i].code_event);
@@ -830,7 +830,7 @@ void HitMyCharNpChar()
 			}
 		}
 
-		//Create question mark when NPC hasn't been interacted with
+		// Create question mark when NPC hasn't been interacted with
 		if (gMC.ques)
 			SetCaret(gMC.x, gMC.y, 9, 0);
 	}
