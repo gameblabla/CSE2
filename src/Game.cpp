@@ -49,7 +49,7 @@
 int g_GameFlags;
 int gCounter;
 
-bool bContinue;
+BOOL bContinue;
 
 int Random(int min, int max)
 {
@@ -275,13 +275,13 @@ int ModeTitle()
 	//Set character
 	time_counter = LoadTimeCounter();
 
-	if (time_counter && time_counter < 18000)
+	if (time_counter && time_counter < 6 * 60 * 50)	// 6 minutes
 		char_type = 1;
-	if (time_counter && time_counter < 15000)
+	if (time_counter && time_counter < 5 * 60 * 50)	// 5 minutes
 		char_type = 2;
-	if (time_counter && time_counter < 12000)
+	if (time_counter && time_counter < 4 * 60 * 50)	// 4 minutes
 		char_type = 3;
-	if (time_counter && time_counter < 9000)
+	if (time_counter && time_counter < 3 * 60 * 50)	// 3 minutes
 		char_type = 4;
 
 	//Set music to character's specific music
@@ -405,7 +405,7 @@ int ModeTitle()
 		}
 
 		int char_y;
-		if (bContinue == 1)
+		if (bContinue == TRUE)
 			char_y = (WINDOW_HEIGHT + 54) / 2;
 		else
 			char_y = (WINDOW_HEIGHT + 14) / 2;
