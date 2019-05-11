@@ -275,13 +275,13 @@ int ModeTitle()
 	//Set character
 	time_counter = LoadTimeCounter();
 
-	if (time_counter && time_counter < 6 * 60 * 50)	// 6 minutes
+	if (time_counter && time_counter < 6 * 60 * 60)	// 6 minutes
 		char_type = 1;
-	if (time_counter && time_counter < 5 * 60 * 50)	// 5 minutes
+	if (time_counter && time_counter < 5 * 60 * 60)	// 5 minutes
 		char_type = 2;
-	if (time_counter && time_counter < 4 * 60 * 50)	// 4 minutes
+	if (time_counter && time_counter < 4 * 60 * 60)	// 4 minutes
 		char_type = 3;
-	if (time_counter && time_counter < 3 * 60 * 50)	// 3 minutes
+	if (time_counter && time_counter < 3 * 60 * 60)	// 3 minutes
 		char_type = 4;
 
 	//Set music to character's specific music
