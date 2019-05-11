@@ -46,9 +46,9 @@ void AddExpMyChar(int x)
 
 	if (lv == 2)
 	{
-		if (gArmsData[gSelectedArms].exp >= gArmsLevelTable[0].exp[3 * arms_code + 2])
+		if (gArmsData[gSelectedArms].exp >= gArmsLevelTable[arms_code].exp[lv])
 		{
-			gArmsData[gSelectedArms].exp = gArmsLevelTable[0].exp[3 * arms_code + 2];
+			gArmsData[gSelectedArms].exp = gArmsLevelTable[arms_code].exp[lv];
 
 			if (gMC.equip & 0x80)
 			{
@@ -59,9 +59,9 @@ void AddExpMyChar(int x)
 	}
 	else
 	{
-		while (lv <= 1)
+		for (; lv < 2; ++lv)
 		{
-			if (gArmsData[gSelectedArms].exp >= gArmsLevelTable[0].exp[lv + 3 * arms_code])
+			if (gArmsData[gSelectedArms].exp >= gArmsLevelTable[arms_code].exp[lv])
 			{
 				++gArmsData[gSelectedArms].level;
 				gArmsData[gSelectedArms].exp = 0;
@@ -72,19 +72,17 @@ void AddExpMyChar(int x)
 					SetCaret(gMC.x, gMC.y, 10, 0);
 				}
 			}
-
-			++lv;
 		}
 	}
 
-	if (gArmsData[gSelectedArms].code == 13)
-	{
-		gMC.exp_wait = 10;
-	}
-	else
+	if (gArmsData[gSelectedArms].code != 13)
 	{
 		gMC.exp_count += x;
 		gMC.exp_wait = 30;
+	}
+	else
+	{
+		gMC.exp_wait = 10;
 	}
 }
 
@@ -96,57 +94,86 @@ void ZeroExpMyChar()
 
 BOOL IsMaxExpMyChar()
 {
-	return gArmsData[gSelectedArms].level == 3
-		&& gArmsData[gSelectedArms].exp >= gArmsLevelTable[gArmsData[gSelectedArms].code].exp[2];
+	if (gArmsData[gSelectedArms].level == 3)
+	{
+		int arms_code = gArmsData[gSelectedArms].code;
+
+		if (gArmsData[gSelectedArms].exp >= gArmsLevelTable[arms_code].exp[2])
+			return TRUE;
+	}
+
+	return FALSE;
 }
 
 void DamageMyChar(int damage)
 {
-	if (!gMC.shock)
+#ifdef FIX_BUGS
+	if ((g_GameFlags & 2) == 0)
+#else
+	// I'm preeeetty sure this is a typo. The Linux port optimised it out.
+	if ((g_GameFlags | 2) == 0)
+#endif
+		return;
+
+	if (gMC.shock)
+		return;
+
+	// Damage player
+	PlaySoundObject(16, 1);
+	gMC.cond &= ~1;
+	gMC.shock = 128;
+
+	if (gMC.unit == 1)
 	{
-		// Damage player
-		PlaySoundObject(16, 1);
-		gMC.cond &= ~1;
-		gMC.shock = 128;
-		if (gMC.unit != 1)
-			gMC.ym = -0x400;
-		gMC.life -= damage;
+		// Another weird case where there *has* to be an empty 'if' here to produce the same assembly
+	}
+	else
+	{
+		gMC.ym = -0x400;
+	}
 
-		// Lose a whimsical star
-		if (gMC.equip & 0x80 && gMC.star > 0)
-			--gMC.star;
+	gMC.life -= (short)damage;
 
-		// Lose experience
-		if (gMC.equip & 4)
-			gArmsData[gSelectedArms].exp -= damage;
+	// Lose a whimsical star
+	if (gMC.equip & 0x80 && gMC.star > 0)
+		gMC.star = (short)gMC.star - 1;	// Why the hell is it written this way?
+
+	// Lose experience
+	if (gMC.equip & 4)
+		gArmsData[gSelectedArms].exp -= damage;
+	else
+		gArmsData[gSelectedArms].exp -= 2 * damage;
+
+	while (gArmsData[gSelectedArms].exp < 0)
+	{
+		if (gArmsData[gSelectedArms].level > 1)
+		{
+			--gArmsData[gSelectedArms].level;
+
+			int lv = gArmsData[gSelectedArms].level - 1;
+			int arms_code = gArmsData[gSelectedArms].code;
+
+			gArmsData[gSelectedArms].exp = gArmsLevelTable[arms_code].exp[lv] + gArmsData[gSelectedArms].exp;
+
+			if (gMC.life > 0 && gArmsData[gSelectedArms].code != 13)
+				SetCaret(gMC.x, gMC.y, 10, 2);
+		}
 		else
-			gArmsData[gSelectedArms].exp -= 2 * damage;
-
-		while (gArmsData[gSelectedArms].exp < 0)
 		{
-			if (gArmsData[gSelectedArms].level <= 1)
-			{
-				gArmsData[gSelectedArms].exp = 0;
-			}
-			else
-			{
-				gArmsData[gSelectedArms].exp += gArmsLevelTable[0].exp[--gArmsData[gSelectedArms].level - 1 + 3 * gArmsData[gSelectedArms].code];
-				if (gMC.life > 0 && gArmsData[gSelectedArms].code != 13)
-					SetCaret(gMC.x, gMC.y, 10, 2);
-			}
+			gArmsData[gSelectedArms].exp = 0;
 		}
+	}
 
-		// Tell player how much damage was taken
-		SetValueView(&gMC.x, &gMC.y, -damage);
+	// Tell player how much damage was taken
+	SetValueView(&gMC.x, &gMC.y, -damage);
 
-		// Death
-		if (gMC.life <= 0)
-		{
-			PlaySoundObject(17, 1);
-			gMC.cond = 0;
-			SetDestroyNpChar(gMC.x, gMC.y, 0x1400, 0x40);
-			StartTextScript(40);
-		}
+	// Death
+	if (gMC.life <= 0)
+	{
+		PlaySoundObject(17, 1);
+		gMC.cond = 0;
+		SetDestroyNpChar(gMC.x, gMC.y, 0x1400, 0x40);
+		StartTextScript(40);
 	}
 }
 
@@ -161,34 +188,31 @@ void ZeroArmsEnergy_All()
 
 void AddBulletMyChar(int no, int val)
 {
+	int a = 0;
+
 	// Missile Launcher
-	for (int a = 0; a < ARMS_MAX; a++)
+	while (a < ARMS_MAX && gArmsData[a].code != 5)
+		++a;
+
+	if (a == ARMS_MAX)
 	{
-		if (gArmsData[a].code == 5)
-		{
-			gArmsData[a].num += val;
-			if (gArmsData[a].num > gArmsData[a].max_num)
-				gArmsData[a].num = gArmsData[a].max_num;
-			break;
-		}
+		// Super Missile Launcher
+		a = 0;
+		while (a < ARMS_MAX && gArmsData[a].code != 10)
+			++a;
+
+		if (a == ARMS_MAX)
+			return;
 	}
 
-	// Super Missile Launcher
-	for (int a = 0; a < ARMS_MAX; a++)
-	{
-		if (gArmsData[a].code == 10)
-		{
-			gArmsData[a].num += val;
-			if (gArmsData[a].num > gArmsData[a].max_num)
-				gArmsData[a].num = gArmsData[a].max_num;
-			break;
-		}
-	}
+	gArmsData[a].num += val;
+	if (gArmsData[a].num > gArmsData[a].max_num)
+		gArmsData[a].num = gArmsData[a].max_num;
 }
 
 void AddLifeMyChar(int x)
 {
-	gMC.life += x;
+	gMC.life += (short)x;
 	if (gMC.life > gMC.max_life)
 		gMC.life = gMC.max_life;
 	gMC.lifeBr = gMC.life;
@@ -196,15 +220,25 @@ void AddLifeMyChar(int x)
 
 void AddMaxLifeMyChar(int val)
 {
-	gMC.max_life += val;
+	gMC.max_life += (short)val;
 	if (gMC.max_life > 232)
 		gMC.max_life = 232;
-	gMC.life += val;
+	gMC.life += (short)val;
 	gMC.lifeBr = gMC.life;
 }
 
-void PutArmsEnergy(bool flash)
+void PutArmsEnergy(BOOL flash)
 {
+	RECT rcExpBox;
+	RECT rcExpVal;
+	RECT rcExpMax;
+	RECT rcExpFlash;
+
+	int lv;
+	int arms_code;
+	int exp_now;
+	int exp_next;
+
 	RECT rcPer = {72, 48, 80, 56};
 	RECT rcLv = {80, 80, 96, 88};
 	RECT rcView = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
@@ -228,107 +262,111 @@ void PutArmsEnergy(bool flash)
 	}
 
 	// Draw experience and ammo
-	if (!flash || !((gMC.shock >> 1) & 1))
+	if (flash == TRUE && (gMC.shock / 2) % 2)
+		return;
+
+	PutBitmap3(&rcView, gArmsEnergyX + 32, 24, &rcPer, SURFACE_ID_TEXT_BOX);
+	PutBitmap3(&rcView, gArmsEnergyX, 32, &rcLv, SURFACE_ID_TEXT_BOX);
+	PutNumber4(gArmsEnergyX - 8, 32, gArmsData[gSelectedArms].level, 0);
+
+	SET_RECT(rcExpBox, 0, 72, 40, 80)
+	SET_RECT(rcExpVal, 0, 80, 0, 88)
+	SET_RECT(rcExpMax, 40, 72, 80, 80)
+	SET_RECT(rcExpFlash, 40, 80, 80, 88)
+
+	lv = gArmsData[gSelectedArms].level - 1;
+	arms_code = gArmsData[gSelectedArms].code;
+	exp_now = gArmsData[gSelectedArms].exp;
+	exp_next = gArmsLevelTable[arms_code].exp[lv];
+
+	PutBitmap3(&rcView, gArmsEnergyX + 24, 32, &rcExpBox, SURFACE_ID_TEXT_BOX);
+
+	if (lv == 2 && gArmsData[gSelectedArms].exp == gArmsLevelTable[arms_code].exp[lv])
 	{
-		PutBitmap3(&rcView, gArmsEnergyX + 32, 24, &rcPer, SURFACE_ID_TEXT_BOX);
-		PutBitmap3(&rcView, gArmsEnergyX, 32, &rcLv, SURFACE_ID_TEXT_BOX);
-		PutNumber4(gArmsEnergyX - 8, 32, gArmsData[gSelectedArms].level, 0);
-
-		RECT rcExpBox = {0, 72, 40, 80};
-		RECT rcExpVal = {0, 80, 0, 88};
-		RECT rcExpMax = {40, 72, 80, 80};
-		RECT rcExpFlash = {40, 80, 80, 88};
-
-		int lv = gArmsData[gSelectedArms].level - 1;
-		int arms_code = gArmsData[gSelectedArms].code;
-		int exp_now = gArmsData[gSelectedArms].exp;
-		int exp_next = gArmsLevelTable[0].exp[lv + 3 * arms_code];
-
-		PutBitmap3(&rcView, gArmsEnergyX + 24, 32, &rcExpBox, SURFACE_ID_TEXT_BOX);
-
-		if (lv != 2 || gArmsData[gSelectedArms].exp != gArmsLevelTable[0].exp[3 * arms_code + 2])
-		{
-			if (exp_next)
-				rcExpVal.right += 40 * exp_now / exp_next;
-			else
-				rcExpVal.right = 0;
-
-			PutBitmap3(&rcView, gArmsEnergyX + 24, 32, &rcExpVal, SURFACE_ID_TEXT_BOX);
-		}
-		else
-		{
-			PutBitmap3(&rcView, gArmsEnergyX + 24, 32, &rcExpMax, SURFACE_ID_TEXT_BOX);
-		}
-
-		static int add_flash = true;
-		if (gMC.exp_wait && ((add_flash++ >> 1) & 1))
-			PutBitmap3(&rcView, gArmsEnergyX + 24, 32, &rcExpFlash, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&rcView, gArmsEnergyX + 24, 32, &rcExpMax, SURFACE_ID_TEXT_BOX);
 	}
+	else
+	{
+		if (exp_next)
+			rcExpVal.right += 40 * exp_now / exp_next;
+		else
+			rcExpVal.right = 0;
+
+		PutBitmap3(&rcView, gArmsEnergyX + 24, 32, &rcExpVal, SURFACE_ID_TEXT_BOX);
+	}
+
+	static unsigned char add_flash;
+	if (gMC.exp_wait && ((add_flash++ / 2) % 2))
+		PutBitmap3(&rcView, gArmsEnergyX + 24, 32, &rcExpFlash, SURFACE_ID_TEXT_BOX);
 }
 
 void PutActiveArmsList()
 {
+	int x;
+	int a;
+	int arms_num;
 	RECT rect = {0, 0, 0, 16};
 
-	int arms_num;
-	for (arms_num = 0; gArmsData[arms_num].code != 0; ++arms_num);
+	arms_num = 0;
+	while (gArmsData[arms_num].code != 0)
+		++arms_num;
 
-	if (arms_num)
+	if (arms_num == 0)
+		return;
+
+	for (a = 0; a < arms_num; a++)
 	{
-		for (int a = 0; a < arms_num; a++)
-		{
-			// Get X position to draw at
-			int x = 16 * (a - gSelectedArms) + gArmsEnergyX;
+		// Get X position to draw at
+		x = 16 * (a - gSelectedArms) + gArmsEnergyX;
 
-			if (x >= 8)
-			{
-				if (x >= 24)
-					x += 48;
-			}
-			else
-			{
-				x += 16 * (arms_num + 3);
-			}
+		if (x < 8)
+			x += 48 + (16 * arms_num);
+		else if (x >= 24)
+			x += 48;
 
-			if (8 * (2 * (arms_num + 3) + 1) <= x)
-				x += 16 * (-3 - arms_num);
-			if (x < 72 && x >= 24)
-				x -= 48;
+		if (x >= 72 + (16 * (arms_num - 1)))
+			x -= 48 + (16 * arms_num);
+		if (x < 72 && x >= 24)
+			x -= 48;
 
-			// Draw icon
-			rect.left = 16 * gArmsData[a].code;
-			rect.right = rect.left + 16;
-			PutBitmap3(&grcGame, x, 16, &rect, SURFACE_ID_ARMS_IMAGE);
-		}
+		// Draw icon
+		rect.left = 16 * gArmsData[a].code;
+		rect.right = rect.left + 16;
+		PutBitmap3(&grcGame, x, 16, &rect, SURFACE_ID_ARMS_IMAGE);
 	}
 }
 
-void PutMyLife(bool flash)
+void PutMyLife(BOOL flash)
 {
 	RECT rcCase = {0, 40, 232, 48};
 	RECT rcLife = {0, 24, 232, 32};
 	RECT rcBr = {0, 32, 232, 40};
 
-	if (!flash || !((gMC.shock >> 1) & 1))
+	if (flash == TRUE && (gMC.shock / 2) % 2)
+		return;
+
+	if (gMC.lifeBr < gMC.life)
+		gMC.lifeBr = gMC.life;
+
+	if (gMC.lifeBr > gMC.life)
 	{
-		if (gMC.lifeBr < gMC.life)
-			gMC.lifeBr = gMC.life;
-
-		if (gMC.lifeBr <= gMC.life)
-			gMC.lifeBr_count = 0;
-		else if (++gMC.lifeBr_count > 30)
+		if (++gMC.lifeBr_count > 30)
 			--gMC.lifeBr;
-
-		// Draw bar
-		rcCase.right = 64;
-		rcLife.right = 40 * gMC.life / gMC.max_life - 1;
-		rcBr.right = 40 * gMC.lifeBr / gMC.max_life - 1;
-
-		PutBitmap3(&grcGame, 16, 40, &rcCase, SURFACE_ID_TEXT_BOX);
-		PutBitmap3(&grcGame, 40, 40, &rcBr, SURFACE_ID_TEXT_BOX);
-		PutBitmap3(&grcGame, 40, 40, &rcLife, SURFACE_ID_TEXT_BOX);
-		PutNumber4(8, 40, gMC.lifeBr, 0);
 	}
+	else
+	{
+		gMC.lifeBr_count = 0;
+	}
+
+	// Draw bar
+	rcCase.right = 64;
+	rcLife.right = 40 * gMC.life / gMC.max_life - 1;
+	rcBr.right = 40 * gMC.lifeBr / gMC.max_life - 1;
+
+	PutBitmap3(&grcGame, 16, 40, &rcCase, SURFACE_ID_TEXT_BOX);
+	PutBitmap3(&grcGame, 40, 40, &rcBr, SURFACE_ID_TEXT_BOX);
+	PutBitmap3(&grcGame, 40, 40, &rcLife, SURFACE_ID_TEXT_BOX);
+	PutNumber4(8, 40, gMC.lifeBr, 0);
 }
 
 void PutMyAir(int x, int y)
@@ -338,17 +376,20 @@ void PutMyAir(int x, int y)
 		{112, 80, 144, 88},
 	};
 
-	if (!(gMC.equip & 0x10) && gMC.air_get)
+	if (gMC.equip & 0x10)
+		return;
+
+	if (gMC.air_get)
 	{
 		// Draw how much air is left
-		if (gMC.air_get % 6 <= 3)
+		if (gMC.air_get % 6 < 4)
 			PutNumber4(x + 32, y, gMC.air / 10, 0);
 
 		// Draw "AIR" text
-		if (gMC.air % 30 <= 10)
-			PutBitmap3(&grcGame, x, y, &rcAir[1], SURFACE_ID_TEXT_BOX);
-		else
+		if (gMC.air % 30 > 10)
 			PutBitmap3(&grcGame, x, y, &rcAir[0], SURFACE_ID_TEXT_BOX);
+		else
+			PutBitmap3(&grcGame, x, y, &rcAir[1], SURFACE_ID_TEXT_BOX);
 	}
 }
 
@@ -368,10 +409,10 @@ void PutTimeCounter(int x, int y)
 			if (time_count < 300000)
 				++time_count;
 
-			if (time_count % 30 <= 10)
-				PutBitmap3(&grcGame, x, y, &rcTime[1], SURFACE_ID_TEXT_BOX);
-			else
+			if (time_count % 30 > 10)
 				PutBitmap3(&grcGame, x, y, &rcTime[0], SURFACE_ID_TEXT_BOX);
+			else
+				PutBitmap3(&grcGame, x, y, &rcTime[1], SURFACE_ID_TEXT_BOX);
 		}
 		else
 		{
@@ -390,13 +431,16 @@ void PutTimeCounter(int x, int y)
 	}
 }
 
-bool SaveTimeCounter()
+BOOL SaveTimeCounter()
 {
+	unsigned char *p;
+	int i;
+
 	REC rec;
 
 	// Quit if player doesn't have the Nikumaru Counter
 	if (!(gMC.equip & 0x100))
-		return true;
+		return TRUE;
 
 	// Get last time
 	char path[PATH_LENGTH];
@@ -406,6 +450,9 @@ bool SaveTimeCounter()
 	if (fp)
 	{
 		// Read data
+#ifdef NONPORTABLE
+		fread(&rec, sizeof(REC), 1, fp);
+#else
 		rec.counter[0] = File_ReadLE32(fp);
 		rec.counter[1] = File_ReadLE32(fp);
 		rec.counter[2] = File_ReadLE32(fp);
@@ -414,35 +461,53 @@ bool SaveTimeCounter()
 		rec.random[1] = fgetc(fp);
 		rec.random[2] = fgetc(fp);
 		rec.random[3] = fgetc(fp);
+#endif
 		fclose(fp);
 
-		uint8_t *p = (uint8_t*)&rec.counter[0];
-		p[0] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[0]) : (rec.random[0] >> 1);
+		p = (unsigned char*)&rec.counter[0];
+#ifdef NONPORTABLE
+		p[0] -= rec.random[0];
 		p[1] -= rec.random[0];
 		p[2] -= rec.random[0];
-		p[3] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[0] >> 1) : (rec.random[0]);
-
+		p[3] -= rec.random[0] / 2;
+#else
+		p[0] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[0]) : (rec.random[0] / 2);
+		p[1] -= rec.random[0];
+		p[2] -= rec.random[0];
+		p[3] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[0] / 2) : (rec.random[0]);
+#endif
 		// If this is faster than our new time, quit
 		if (rec.counter[0] < time_count)
-			return true;
+			return TRUE;
 	}
 
 	// Save new time
-	for (int i = 0; i < 4; i++)
+	for (i = 0; i < 4; i++)
 	{
 		rec.counter[i] = time_count;
 		rec.random[i] = Random(0, 250) + i;
 
-		uint8_t *p = (uint8_t*)&rec.counter[i];
-		p[0] += (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[i]) : (rec.random[i] >> 1);
+		p = (unsigned char*)&rec.counter[i];
+#ifdef NONPORTABLE
+		p[0] += rec.random[i];
 		p[1] += rec.random[i];
 		p[2] += rec.random[i];
-		p[3] += (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[i] >> 1) : (rec.random[i]);
+		p[3] += rec.random[i] / 2;
+#else
+		p[0] += (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[i]) : (rec.random[i] / 2);
+		p[1] += rec.random[i];
+		p[2] += rec.random[i];
+		p[3] += (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[i] / 2) : (rec.random[i]);
+#endif
 	}
 
 	fp = fopen(path, "wb");
 	if (fp == NULL)
-		return false;
+		return FALSE;
+
+#ifdef NONPORTABLE
+	fwrite(&rec, sizeof(REC), 1, fp);
+#else
 	File_WriteLE32(rec.counter[0], fp);
 	File_WriteLE32(rec.counter[1], fp);
 	File_WriteLE32(rec.counter[2], fp);
@@ -451,12 +516,17 @@ bool SaveTimeCounter()
 	fputc(rec.random[1], fp);
 	fputc(rec.random[2], fp);
 	fputc(rec.random[3], fp);
+#endif
+
 	fclose(fp);
-	return true;
+	return TRUE;
 }
 
 int LoadTimeCounter()
 {
+	unsigned char *p;
+	int i;
+
 	// Open file
 	char path[PATH_LENGTH];
 	sprintf(path, "%s/290.rec", gModulePath);
@@ -468,6 +538,9 @@ int LoadTimeCounter()
 	REC rec;
 
 	// Read data
+#ifdef NONPORTABLE
+	fread(&rec, sizeof(REC), 1, fp);
+#else
 	rec.counter[0] = File_ReadLE32(fp);
 	rec.counter[1] = File_ReadLE32(fp);
 	rec.counter[2] = File_ReadLE32(fp);
@@ -476,27 +549,35 @@ int LoadTimeCounter()
 	rec.random[1] = fgetc(fp);
 	rec.random[2] = fgetc(fp);
 	rec.random[3] = fgetc(fp);
+#endif
 	fclose(fp);
 
 	// Decode from checksum
-	for (int i = 0; i < 4; i++)
+	for (i = 0; i < 4; i++)
 	{
-		uint8_t *p = (uint8_t*)&rec.counter[i];
-		p[0] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[i]) : (rec.random[i] >> 1);
+		p = (unsigned char*)&rec.counter[i];
+#ifdef NONPORTABLE
+		p[0] -= rec.random[i];
 		p[1] -= rec.random[i];
 		p[2] -= rec.random[i];
-		p[3] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[i] >> 1) : (rec.random[i]);
+		p[3] -= rec.random[i] / 2;
+#else
+		p[0] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[i]) : (rec.random[i] / 2);
+		p[1] -= rec.random[i];
+		p[2] -= rec.random[i];
+		p[3] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[i] / 2) : (rec.random[i]);
+#endif
 	}
 
 	// Verify checksum's result
-	if (rec.counter[0] == rec.counter[1] && rec.counter[0] == rec.counter[2])
-	{
-		time_count = rec.counter[0];
-		return rec.counter[0];
-	}
-	else
+	if (rec.counter[0] != rec.counter[1] || rec.counter[0] != rec.counter[2])
 	{
 		time_count = 0;
 		return 0;
+	}
+	else
+	{
+		time_count = rec.counter[0];
+		return time_count;
 	}
 }
