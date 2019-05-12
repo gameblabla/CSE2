@@ -99,7 +99,7 @@ void SetNpCharActionNo(int code_event, int act_no, int dir);
 void MoveNpChar(int code_event, int x, int y, int dir);
 void BackStepMyChar(int code_event);
 void DeleteNpCharEvent(int code);
-void DeleteNpCharCode(int code, bool bSmoke);
+void DeleteNpCharCode(int code, BOOL bSmoke);
 void GetNpCharPosition(int *x, int *y, int i);
 BOOL IsNpCharCode(int code);
 BOOL GetNpCharAlive(int code_event);

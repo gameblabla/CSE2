@@ -2203,6 +2203,98 @@ name = "ActNpc360"
 addr = 0x46EA90
 
 [[func]]
+name = "InitNpChar"
+addr = 0x46EB30
+
+[[func]]
+name = "LoadEvent"
+addr = 0x46EB50
+
+[[func]]
+name = "SetUniqueParameter"
+addr = 0x46EE50
+
+[[func]]
+name = "SetNpChar"
+addr = 0x46EFD0
+
+[[func]]
+name = "SetDestroyNpChar"
+addr = 0x46F150
+
+[[func]]
+name = "SetDestroyNpCharUp"
+addr = 0x46F200
+
+[[func]]
+name = "SetExpObjects"
+addr = 0x46F2B0
+
+[[func]]
+name = "SetBulletObject"
+addr = 0x46F430
+
+[[func]]
+name = "SetLifeObject"
+addr = 0x46F630
+
+[[func]]
+name = "VanishNpChar"
+addr = 0x46F760
+
+[[func]]
+name = "PutNpChar"
+addr = 0x46F810
+
+[[func]]
+name = "ActNpChar"
+addr = 0x46FA00
+
+[[func]]
+name = "ChangeNpCharByEvent"
+addr = 0x46FAB0
+
+[[func]]
+name = "ChangeCheckableNpCharByEvent"
+addr = 0x46FD10
+
+[[func]]
+name = "SetNpCharActionNo"
+addr = 0x46FF90
+
+[[func]]
+name = "MoveNpChar"
+addr = 0x470060
+
+[[func]]
+name = "BackStepMyChar"
+addr = 0x470150
+
+[[func]]
+name = "DeleteNpCharEvent"
+addr = 0x470250
+
+[[func]]
+name = "DeleteNpCharCode"
+addr = 0x4702D0
+
+[[func]]
+name = "GetNpCharPosition"
+addr = 0x470460
+
+[[func]]
+name = "IsNpCharCode"
+addr = 0x470490
+
+[[func]]
+name = "GetNpCharAlive"
+addr = 0x4704F0
+
+[[func]]
+name = "CountAliveNpChar"
+addr = 0x470560
+
+[[func]]
 name = "LoadNpcTable"
 addr = 0x472400
 
