@@ -443,7 +443,7 @@ static void DrawBitmap(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_
 	SDL_Rect clipRect = RectToSDLRectScaled(rcView);
 	SDL_Rect frameRect = RectToSDLRectScaled(rect);
 
-	// Get dest rect
+	// Get destination rect
 	SDL_Rect destRect = {x * magnification, y * magnification, frameRect.w, frameRect.h};
 
 	// Set cliprect
