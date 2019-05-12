@@ -14,11 +14,11 @@
 
 #define JOYSTICK_DEADZONE 10000
 
-SDL_Joystick *joystick; //This may be a name that was given by Simon, but it fits the rest of Pixel's names so it's fine.
+SDL_Joystick *joystick; // This was probably a name that was given by Simon, but it fits the rest of Pixel's names so it's fine.
 
 void ReleaseDirectInput()
 {
-	//Close opened joystick (if exists)
+	// Close opened joystick (if exists)
 	if (joystick)
 	{
 		SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
@@ -29,14 +29,14 @@ void ReleaseDirectInput()
 
 bool InitDirectInput()
 {
-	//Open first available joystick
+	// Open first available joystick
 	SDL_InitSubSystem(SDL_INIT_JOYSTICK);
 
 	for (int i = 0; i < SDL_NumJoysticks(); i++)
 	{
 		joystick = SDL_JoystickOpen(i);
 
-		//Break as soon as a joystick is properly opened
+		// Break as soon as a joystick is properly opened
 		if (joystick)
 			break;
 	}
@@ -46,7 +46,7 @@ bool InitDirectInput()
 
 bool GetJoystickStatus(JOYSTICK_STATUS *pStatus)
 {
-	//Clear status
+	// Clear status
 	memset(pStatus, 0, sizeof(JOYSTICK_STATUS));
 
 	if (joystick)
