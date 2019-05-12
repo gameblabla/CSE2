@@ -118,7 +118,7 @@ int ModeOpening()
 	SetFrameTargetMyChar(16);
 	SetFadeMask();
 
-	// Reset clip rect and flags
+	// Reset cliprect and flags
 	grcGame.left = 0;
 	// Non-vanilla: these three lines are widescreen-related(?)
 	grcGame.top = 0;
@@ -304,7 +304,7 @@ int ModeTitle()
 			break;
 	}
 
-	// Reset clip rect, flags, and give the player the Nikumaru counter
+	// Reset cliprect, flags, and give the player the Nikumaru counter
 	grcGame.left = 0;
 	// Non-vanilla: these three lines are widescreen-related(?)
 	grcGame.top = 0;
