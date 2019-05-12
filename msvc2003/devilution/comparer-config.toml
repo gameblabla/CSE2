@@ -516,6 +516,66 @@ name = "SetMapping"
 addr = 0x414B40
 
 [[func]]
+name = "AddExpMyChar"
+addr = 0x4196F0
+
+[[func]]
+name = "ZeroExpMyChar"
+addr = 0x419890
+
+[[func]]
+name = "IsMaxExpMyChar"
+addr = 0x4198C0
+
+[[func]]
+name = "DamageMyChar"
+addr = 0x419910
+
+[[func]]
+name = "ZeroArmsEnergy_All"
+addr = 0x419B50
+
+[[func]]
+name = "AddBulletMyChar"
+addr = 0x419BA0
+
+[[func]]
+name = "AddLifeMyChar"
+addr = 0x419C60
+
+[[func]]
+name = "AddMaxLifeMyChar"
+addr = 0x419CB0
+
+[[func]]
+name = "PutArmsEnergy"
+addr = 0x419D10
+
+[[func]]
+name = "PutActiveArmsList"
+addr = 0x41A0B0
+
+[[func]]
+name = "PutMyLife"
+addr = 0x41A1D0
+
+[[func]]
+name = "PutMyAir"
+addr = 0x41A350
+
+[[func]]
+name = "PutTimeCounter"
+addr = 0x41A430
+
+[[func]]
+name = "SaveTimeCounter"
+addr = 0x41A5D0
+
+[[func]]
+name = "LoadTimeCounter"
+addr = 0x41A7C0
+
+[[func]]
 name = "ChangeOrganFrequency"
 addr = 0x41ABA0
 size = 0xC9
@@ -569,6 +629,22 @@ addr = 0x41C8F0
 [[func]]
 name = "MakePixelWaveData"
 addr = 0x41CB10
+
+[[func]]
+name = "IsProfile"
+addr = 0x41CFC0
+
+[[func]]
+name = "SaveProfile"
+addr = 0x41D040
+
+[[func]]
+name = "LoadProfile"
+addr = 0x41D260
+
+[[func]]
+name = "InitializeGame"
+addr = 0x41D550
 
 [[func]]
 name = "ShootBullet_Frontia1"
