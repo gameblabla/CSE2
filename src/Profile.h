@@ -2,6 +2,8 @@
 
 #include <stdint.h>
 
+#include "WindowsWrapper.h"
+
 #include "ArmsItem.h"
 #include "SelStage.h"
 
@@ -30,7 +32,7 @@ struct PROFILE
 	uint8_t flags[1000];
 };
 
-bool IsProfile();
-bool SaveProfile(const char *name);
-bool LoadProfile(const char *name);
-bool InitializeGame();
+BOOL IsProfile();
+BOOL SaveProfile(const char *name);
+BOOL LoadProfile(const char *name);
+BOOL InitializeGame();
