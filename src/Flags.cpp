@@ -7,6 +7,7 @@
 unsigned char gFlagNPC[1000];
 unsigned char gSkipFlag[8];
 
+// Macros for setting, un-setting and getting bits
 #define SET_BIT(x, i) ((x)[(i) / 8] |= 1 << (i) % 8)
 #define UNSET_BIT(x, i) ((x)[(i) / 8] &= ~(1 << (i) % 8))
 #define GET_BIT(x, i) ((x)[(i) / 8] & (1 << (i) % 8))
