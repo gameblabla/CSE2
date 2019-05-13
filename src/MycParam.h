@@ -1,7 +1,5 @@
 #pragma once
 
-#include <stdint.h>
-
 #include "WindowsWrapper.h"
 
 struct ARMS_LEVEL
@@ -11,8 +9,8 @@ struct ARMS_LEVEL
 
 struct REC
 {
-	int32_t counter[4];
-	uint8_t random[4];
+	long counter[4];
+	unsigned char random[4];
 };
 
 extern ARMS_LEVEL gArmsLevelTable[14];

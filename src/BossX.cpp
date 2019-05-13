@@ -523,7 +523,7 @@ void ActBossChar_MonstX(void)
 			gBoss[2].direct = 2;
 			gBoss[3].cond = 0x80;
 			gBoss[3].life = 60;
-			gBoss[3].size = 3;	// Redundant: this get overwriten a few lines later
+			gBoss[3].size = 3;	// Redundant: this get overwritten a few lines later
 			gBoss[3].hit_voice = 54;
 			gBoss[3].destroy_voice = 71;
 			gBoss[3].size = 2;
