@@ -358,6 +358,9 @@ static BOOL LoadBitmap_Resource(const char *res, Surface_Ids surf_no, bool creat
 
 	if (data)
 	{
+		// For some dumbass reason, SDL2 measures size with a signed int.
+		// Has anyone ever told the devs that an int can be as little as 16 bits long? Real portable.
+		// But hey, if I ever need to create an RWops from an array that's -32768 bytes long, they've got me covered!
 		SDL_RWops *fp = SDL_RWFromConstMem(data, size);
 
 		printf("Loading surface from resource %s for surface id %d\n", res, surf_no);
@@ -490,9 +493,9 @@ void CortBox(RECT *rect, unsigned long col)
 	SDL_Rect destRect = RectToSDLRectScaled(rect);
 
 	// Set colour and draw
-	const unsigned char col_red = col & 0x0000FF;
-	const unsigned char col_green = (col & 0x00FF00) >> 8;
-	const unsigned char col_blue = (col & 0xFF0000) >> 16;
+	const unsigned char col_red = (unsigned char)(col & 0xFF);
+	const unsigned char col_green = (unsigned char)((col >> 8) & 0xFF);
+	const unsigned char col_blue = (unsigned char)((col >> 16) & 0xFF);
 	SDL_SetRenderDrawColor(gRenderer, col_red, col_green, col_blue, 0xFF);
 	SDL_RenderFillRect(gRenderer, &destRect);
 }
@@ -503,9 +506,9 @@ void CortBox2(RECT *rect, unsigned long col, Surface_Ids surf_no)
 	SDL_Rect destRect = RectToSDLRectScaled(rect);
 
 	// Set colour and draw
-	const unsigned char col_red = col & 0x0000FF;
-	const unsigned char col_green = (col & 0x00FF00) >> 8;
-	const unsigned char col_blue = (col & 0xFF0000) >> 16;
+	const unsigned char col_red = (unsigned char)(col & 0xFF);
+	const unsigned char col_green = (unsigned char)((col >> 8) & 0xFF);
+	const unsigned char col_blue = (unsigned char)((col >> 16) & 0xFF);
 	SDL_FillRect(surf[surf_no].surface, &destRect, SDL_MapRGB(surf[surf_no].surface->format, col_red, col_green, col_blue));
 	surf[surf_no].needs_updating = true;
 }
