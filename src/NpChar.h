@@ -1,7 +1,5 @@
 #pragma once
 
-#include <stdint.h>
-
 #include "WindowsWrapper.h"
 
 #include "Draw.h"
@@ -29,7 +27,7 @@ enum NPC_flags
 
 struct NPCHAR
 {
-	uint8_t cond;
+	unsigned char cond;
 	int flag;
 	int x;
 	int y;
@@ -49,7 +47,7 @@ struct NPCHAR
 	int exp;
 	int size;
 	int direct;
-	uint16_t bits;
+	unsigned short bits;
 	RECT rect;
 	int ani_wait;
 	int ani_no;
@@ -59,7 +57,7 @@ struct NPCHAR
 	int act_wait;
 	RECT hit;
 	RECT view;
-	uint8_t shock;
+	unsigned char shock;
 	int damage_view;
 	int damage;
 	NPCHAR *pNpc;
@@ -67,12 +65,12 @@ struct NPCHAR
 
 struct EVENT
 {
-  int16_t x;
-  int16_t y;
-  int16_t code_flag;
-  int16_t code_event;
-  int16_t code_char;
-  uint16_t bits;
+	short x;
+	short y;
+	short code_flag;
+	short code_event;
+	short code_char;
+	unsigned short bits;
 };
 
 extern NPCHAR gNPC[NPC_MAX];

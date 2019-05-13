@@ -1,7 +1,6 @@
 #include "Input.h"
 
 #include <stddef.h>
-#include <stdint.h>
 #include <string.h>
 
 #include <SDL.h>
@@ -51,8 +50,8 @@ bool GetJoystickStatus(JOYSTICK_STATUS *pStatus)
 
 	if (joystick)
 	{
-		int32_t x = SDL_JoystickGetAxis(joystick, 0);
-		int32_t y = SDL_JoystickGetAxis(joystick, 1);
+		Sint16 x = SDL_JoystickGetAxis(joystick, 0);
+		Sint16 y = SDL_JoystickGetAxis(joystick, 1);
 		pStatus->bLeft = x <= -JOYSTICK_DEADZONE;
 		pStatus->bRight = x >= JOYSTICK_DEADZONE;
 		pStatus->bUp = y <= -JOYSTICK_DEADZONE;

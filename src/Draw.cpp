@@ -1,5 +1,4 @@
 #include <stddef.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -57,8 +56,8 @@ BOOL Flip_SystemTask()
 			return FALSE;
 
 		// Framerate limiter
-		static uint32_t timePrev;
-		const uint32_t timeNow = SDL_GetTicks();
+		static Uint32 timePrev;
+		const Uint32 timeNow = SDL_GetTicks();
 
 		if (timeNow >= timePrev + FRAMERATE)
 		{
@@ -485,7 +484,7 @@ unsigned long GetCortBoxColor(unsigned long col)
 	return col;
 }
 
-void CortBox(RECT *rect, uint32_t col)
+void CortBox(RECT *rect, unsigned long col)
 {
 	// Get rect
 	SDL_Rect destRect = RectToSDLRectScaled(rect);
@@ -498,7 +497,7 @@ void CortBox(RECT *rect, uint32_t col)
 	SDL_RenderFillRect(gRenderer, &destRect);
 }
 
-void CortBox2(RECT *rect, uint32_t col, Surface_Ids surf_no)
+void CortBox2(RECT *rect, unsigned long col, Surface_Ids surf_no)
 {
 	// Get rect
 	SDL_Rect destRect = RectToSDLRectScaled(rect);
@@ -610,7 +609,7 @@ void InitTextObject(const char *font_name)
 		gFont = LoadFontFromData(res_data, data_size, fontWidth, fontHeight);
 }
 
-void PutText(int x, int y, const char *text, uint32_t color)
+void PutText(int x, int y, const char *text, unsigned long color)
 {
 	int surface_width, surface_height;
 	SDL_GetRendererOutputSize(gRenderer, &surface_width, &surface_height);
@@ -626,7 +625,7 @@ void PutText(int x, int y, const char *text, uint32_t color)
 	SDL_DestroyTexture(screen_texture);
 }
 
-void PutText2(int x, int y, const char *text, uint32_t color, Surface_Ids surf_no)
+void PutText2(int x, int y, const char *text, unsigned long color, Surface_Ids surf_no)
 {
 	DrawText(gFont, (unsigned char*)surf[surf_no].surface->pixels, surf[surf_no].surface->pitch, surf[surf_no].surface->w, surf[surf_no].surface->h, x * magnification, y * magnification, color, text, strlen(text));
 	surf[surf_no].needs_updating = true;

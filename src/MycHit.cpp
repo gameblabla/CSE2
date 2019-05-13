@@ -1,7 +1,5 @@
 #include "MycHit.h"
 
-#include <stdint.h>
-
 #include "WindowsWrapper.h"
 
 #include "Back.h"

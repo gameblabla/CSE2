@@ -1,7 +1,6 @@
 #include "NpChar.h"
 
 #include <stddef.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -239,12 +238,11 @@ void SetExpObjects(int x, int y, int exp)
 
 BOOL SetBulletObject(int x, int y, int val)
 {
-	int t;
+	int t = 0;
+	int bullet_no;
 	int tamakazu_ari[10];
 	int n;
-	int bullet_no;
 
-	t = 0;
 	memset(tamakazu_ari, 0, sizeof(tamakazu_ari));
 	for (n = 0; n < 8; ++n)
 	{
@@ -297,7 +295,7 @@ BOOL SetLifeObject(int x, int y, int val)
 		return FALSE;
 
 	memset(&gNPC[n], 0, sizeof(NPCHAR));
-	gNPC[n].cond |= 0x80u;
+	gNPC[n].cond |= 0x80;
 	gNPC[n].direct = 0;
 	gNPC[n].code_char = 87;
 	gNPC[n].x = x;

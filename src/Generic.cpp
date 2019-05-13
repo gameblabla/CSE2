@@ -1,6 +1,5 @@
 #include "Generic.h"
 
-#include <stdint.h>
 #include <stdio.h>
 
 #include "CommonDefines.h"
@@ -45,7 +44,7 @@ bool CheckFileExists(const char *name)
 	return false;
 }
 
-bool IsShiftJIS(uint8_t c)
+bool IsShiftJIS(unsigned char c)
 {
 	if (c > 0x80 && c < 0xA0)
 		return true;
