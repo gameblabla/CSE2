@@ -941,7 +941,8 @@ void SetMyCharDirect(unsigned char dir)
 		}
 		else
 		{
-			for (int i = 0; i < NPC_MAX; i++)
+			int i;
+			for (i = 0; i < NPC_MAX; i++)
 				if (gNPC[i].code_event == dir)
 					break;
 
