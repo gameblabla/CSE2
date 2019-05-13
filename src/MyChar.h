@@ -6,11 +6,11 @@
 
 struct MYCHAR
 {
-	uint8_t cond;
+	unsigned char cond;
 	unsigned int flag;
 	int direct;
-	int up;
-	int down;
+	BOOL up;
+	BOOL down;
 	int unit;
 	int equip;
 	int x;
@@ -30,41 +30,41 @@ struct MYCHAR
 	int level;
 	int exp_wait;
 	int exp_count;
-	uint8_t shock;
-	uint8_t no_life;
-	uint8_t rensha;
-	uint8_t bubble;
-	int16_t life;
-	int16_t star;
-	int16_t max_life;
-	int16_t a;
+	unsigned char shock;
+	unsigned char no_life;
+	unsigned char rensha;
+	unsigned char bubble;
+	short life;
+	short star;
+	short max_life;
+	short a;
 	int lifeBr;
 	int lifeBr_count;
 	int air;
 	int air_get;
-	int8_t sprash;
-	int8_t ques;
-	int8_t boost_sw;
+	signed char sprash;
+	signed char ques;
+	signed char boost_sw;
 	int boost_cnt;
 };
 
 extern MYCHAR gMC;
 
 void InitMyChar();
-void AnimationMyChar(bool bKey);
-void ShowMyChar(bool bShow);
+void AnimationMyChar(BOOL bKey);
+void ShowMyChar(BOOL bShow);
 void PutMyChar(int fx, int fy);
-void ActMyChar_Normal(bool bKey);
-void ActMyChar(bool bKey);
+void ActMyChar_Normal(BOOL bKey);
+void ActMyChar(BOOL bKey);
 void GetMyCharPosition(int *x, int *y);
 void SetMyCharPosition(int x, int y);
 void MoveMyChar(int x, int y);
 void ZeroMyCharXMove();
 int GetUnitMyChar();
-void SetMyCharDirect(uint8_t dir);
-void ChangeMyUnit(uint8_t a);
+void SetMyCharDirect(unsigned char dir);
+void ChangeMyUnit(unsigned char a);
 void PitMyChar();
-void EquipItem(int flag, bool b);
+void EquipItem(int flag, BOOL b);
 void ResetCheck();
 void SetNoise(int no, int freq);
 void CutNoise();

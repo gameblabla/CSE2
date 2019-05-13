@@ -516,6 +516,94 @@ name = "SetMapping"
 addr = 0x414B40
 
 [[func]]
+name = "InitMyChar"
+addr = 0x414B50
+
+[[func]]
+name = "AnimationMyChar"
+addr = 0x414BF0
+
+[[func]]
+name = "ShowMyChar"
+addr = 0x415220
+
+[[func]]
+name = "PutMyChar"
+addr = 0x415250
+
+[[func]]
+name = "ActMyChar_Normal"
+addr = 0x4156C0
+
+[[func]]
+name = "ActMyChar_Stream"
+addr = 0x416470
+
+[[func]]
+name = "ActMyChar"
+addr = 0x4168C0
+
+[[func]]
+name = "AirProcess"
+addr = 0x416990
+
+[[func]]
+name = "GetMyCharPosition"
+addr = 0x416AA0
+
+[[func]]
+name = "SetMyCharPosition"
+addr = 0x416AC0
+
+[[func]]
+name = "MoveMyChar"
+addr = 0x416B30
+
+[[func]]
+name = "ZeroMyCharXMove"
+addr = 0x416B50
+
+[[func]]
+name = "GetUnitMyChar"
+addr = 0x416B60
+
+[[func]]
+name = "SetMyCharDirect"
+addr = 0x416B70
+
+[[func]]
+name = "ChangeMyUnit"
+addr = 0x416C40
+
+[[func]]
+name = "PitMyChar"
+addr = 0x416C50
+
+[[func]]
+name = "EquipItem"
+addr = 0x416C70
+
+[[func]]
+name = "ResetCheck"
+addr = 0x416CA0
+
+[[func]]
+name = "SetNoise"
+addr = 0x416CC0
+
+[[func]]
+name = "CutNoise"
+addr = 0x416D40
+
+[[func]]
+name = "ResetNoise"
+addr = 0x416D80
+
+[[func]]
+name = "SleepNoise"
+addr = 0x416DF0
+
+[[func]]
 name = "ResetMyCharFlag"
 addr = 0x416E20
 
