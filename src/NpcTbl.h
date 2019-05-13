@@ -1,7 +1,5 @@
 #pragma once
 
-#include <stdint.h>
-
 #include "WindowsWrapper.h"
 
 #include "Draw.h"
@@ -9,22 +7,22 @@
 
 struct NPC_TBL_RECT
 {
-  uint8_t front;
-  uint8_t top;
-  uint8_t back;
-  uint8_t bottom;
+	unsigned char front;
+	unsigned char top;
+	unsigned char back;
+	unsigned char bottom;
 };
 
 struct NPC_TABLE
 {
-	uint16_t bits;
-	uint16_t life;
-	uint8_t surf;
-	uint8_t hit_voice;
-	uint8_t destroy_voice;
-	uint8_t size;
-	int32_t exp;
-	int32_t damage;
+	unsigned short bits;
+	unsigned short life;
+	unsigned char surf;
+	unsigned char hit_voice;
+	unsigned char destroy_voice;
+	unsigned char size;
+	long exp;
+	long damage;
 	NPC_TBL_RECT hit;
 	NPC_TBL_RECT view;
 };

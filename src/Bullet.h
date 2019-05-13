@@ -1,7 +1,5 @@
 #pragma once
 
-#include <stdint.h>
-
 #include "WindowsWrapper.h"
 
 struct BULLET
@@ -20,7 +18,7 @@ struct BULLET
 	int act_wait;
 	int ani_wait;
 	int ani_no;
-	uint8_t direct;
+	unsigned char direct;
 	RECT rect;
 	int count1;
 	int count2;
@@ -36,8 +34,8 @@ struct BULLET
 
 struct BULLET_TABLE
 {
-	int8_t damage;
-	int8_t life;
+	signed char damage;
+	signed char life;
 	int life_count;
 	int bbits;
 	int enemyXL;

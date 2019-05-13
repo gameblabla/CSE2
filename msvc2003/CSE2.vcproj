@@ -21,7 +21,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="SDL2/include;freetype/include;./"
+				AdditionalIncludeDirectories="SDL2/include;freetype/include"
 				PreprocessorDefinitions="WIN32;_DEBUG;WINDOWS;NONPORTABLE"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="0"
@@ -73,7 +73,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="SDL2/include;freetype/include;./"
+				AdditionalIncludeDirectories="SDL2/include;freetype/include"
 				PreprocessorDefinitions="WIN32;NDEBUG;WINDOWS;NONPORTABLE"
 				MinimalRebuild="TRUE"
 				RuntimeLibrary="0"
@@ -123,7 +123,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="SDL2/include;freetype/include;./"
+				AdditionalIncludeDirectories="SDL2/include;freetype/include"
 				PreprocessorDefinitions="WIN32;NDEBUG;WINDOWS;NONPORTABLE;JAPANESE"
 				MinimalRebuild="TRUE"
 				RuntimeLibrary="0"
@@ -173,7 +173,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="SDL2/include;freetype/include;./"
+				AdditionalIncludeDirectories="SDL2/include;freetype/include"
 				PreprocessorDefinitions="WIN32;_DEBUG;WINDOWS;NONPORTABLE;JAPANESE"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="0"

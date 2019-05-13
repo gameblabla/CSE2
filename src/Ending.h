@@ -1,7 +1,5 @@
 #pragma once
 
-#include <stdint.h>
-
 struct CREDIT
 {
 	int size;
