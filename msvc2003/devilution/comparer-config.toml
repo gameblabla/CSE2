@@ -516,6 +516,102 @@ name = "SetMapping"
 addr = 0x414B40
 
 [[func]]
+name = "ResetMyCharFlag"
+addr = 0x416E20
+
+[[func]]
+name = "JudgeHitMyCharBlock"
+addr = 0x416E30
+
+[[func]]
+name = "PutlittleStar"
+addr = 0x417160
+
+[[func]]
+name = "JudgeHitMyCharTriangleA"
+addr = 0x4171D0
+
+[[func]]
+name = "JudgeHitMyCharTriangleB"
+addr = 0x4172E0
+
+[[func]]
+name = "JudgeHitMyCharTriangleC"
+addr = 0x4173F0
+
+[[func]]
+name = "JudgeHitMyCharTriangleD"
+addr = 0x417500
+
+[[func]]
+name = "JudgeHitMyCharTriangleE"
+addr = 0x417610
+
+[[func]]
+name = "JudgeHitMyCharTriangleF"
+addr = 0x417720
+
+[[func]]
+name = "JudgeHitMyCharTriangleG"
+addr = 0x417830
+
+[[func]]
+name = "JudgeHitMyCharTriangleH"
+addr = 0x417940
+
+[[func]]
+name = "JudgeHitMyCharWater"
+addr = 0x417A50
+
+[[func]]
+name = "JudgeHitMyCharDamage"
+addr = 0x417AE0
+
+[[func]]
+name = "JudgeHitMyCharDamageW"
+addr = 0x417B70
+
+[[func]]
+name = "JudgeHitMyCharVectLeft"
+addr = 0x417C00
+
+[[func]]
+name = "JudgeHitMyCharVectUp"
+addr = 0x417C90
+
+[[func]]
+name = "JudgeHitMyCharVectRight"
+addr = 0x417D20
+
+[[func]]
+name = "JudgeHitMyCharVectDown"
+addr = 0x417DB0
+
+[[func]]
+name = "HitMyCharMap"
+addr = 0x417E40
+
+[[func]]
+name = "JudgeHitMyCharNPC"
+addr = 0x4187F0
+
+[[func]]
+name = "JudgeHitMyCharNPC3"
+addr = 0x418B10
+
+[[func]]
+name = "JudgeHitMyCharNPC4"
+addr = 0x418C20
+
+[[func]]
+name = "HitMyCharNpChar"
+addr = 0x419030
+
+[[func]]
+name = "HitMyCharBoss"
+addr = 0x419450
+
+[[func]]
 name = "AddExpMyChar"
 addr = 0x4196F0
 
