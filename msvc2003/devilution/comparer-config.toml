@@ -1063,6 +1063,62 @@ name = "PutStar"
 addr = 0x4213B0
 
 [[func]]
+name = "InitTextScript2"
+addr = 0x4214E0
+
+[[func]]
+name = "EndTextScript"
+addr = 0x421570
+
+[[func]]
+name = "EncryptionBinaryData2"
+addr = 0x4215C0
+
+[[func]]
+name = "LoadTextScript2"
+addr = 0x421660
+
+[[func]]
+name = "LoadTextScript_Stage"
+addr = 0x421750
+
+[[func]]
+name = "GetTextScriptPath"
+addr = 0x4218E0
+
+[[func]]
+name = "GetTextScriptNo"
+addr = 0x421900
+
+[[func]]
+name = "StartTextScript"
+addr = 0x421990
+
+[[func]]
+name = "JumpTextScript"
+addr = 0x421AF0
+
+[[func]]
+name = "StopTextScript"
+addr = 0x421C50
+
+[[func]]
+name = "CheckNewLine"
+addr = 0x421C80
+
+[[func]]
+name = "SetNumberTextScript"
+addr = 0x421D10
+
+[[func]]
+name = "ClearTextLine"
+addr = 0x421E90
+
+[[func]]
+name = "PutTextScript"
+addr = 0x421F10
+
+[[func]]
 name = "TextScriptProc"
 addr = 0x422510
 
