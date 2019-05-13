@@ -3,8 +3,76 @@
 address_offset = 0x400000
 
 [[func]]
+name = "ClearArmsData"
+addr = 0x401000
+
+[[func]]
+name = "ClearItemData"
+addr = 0x401030
+
+[[func]]
 name = "AddArmsData"
 addr = 0x401050
+
+[[func]]
+name = "SubArmsData"
+addr = 0x401160
+
+[[func]]
+name = "TradeArms"
+addr = 0x401220
+
+[[func]]
+name = "AddItemData"
+addr = 0x4012D0
+
+[[func]]
+name = "SubItemData"
+addr = 0x401330
+
+[[func]]
+name = "MoveCampCursor"
+addr = 0x4013C0
+
+[[func]]
+name = "PutCampObject"
+addr = 0x4016F0
+
+[[func]]
+name = "CampLoop"
+addr = 0x401D10
+
+[[func]]
+name = "CheckItem"
+addr = 0x401F20
+
+[[func]]
+name = "CheckArms"
+addr = 0x401F60
+
+[[func]]
+name = "UseArmsEnergy"
+addr = 0x401FA0
+
+[[func]]
+name = "ChargeArmsEnergy"
+addr = 0x402020
+
+[[func]]
+name = "FullArmsEnergy"
+addr = 0x402090
+
+[[func]]
+name = "RotationArms"
+addr = 0x4020E0
+
+[[func]]
+name = "RotationArmsRev"
+addr = 0x402190
+
+[[func]]
+name = "ChangeToFirstArms"
+addr = 0x402240
 
 [[func]]
 name = "InitBack"
