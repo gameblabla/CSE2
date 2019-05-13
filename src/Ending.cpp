@@ -39,20 +39,27 @@ void ActionStripper()
 // Draw casts
 void PutStripper()
 {
+	RECT rc;
+
 	for (int s = 0; s < MAX_STRIP; s++)
 	{
 		if (Strip[s].flag & 0x80)
 		{
 			// Draw text
-			RECT rc = {0, 16 * s, 320, 16 * s + 16};
-			PutBitmap3(&grcFull, (Strip[s].x + ((WINDOW_WIDTH - 320) << 8)) / 0x200, Strip[s].y / 0x200, &rc, SURFACE_ID_CREDIT_CAST);
+			rc.left = 0;
+			rc.right = 320;
+			rc.top = s * 0x10;
+			rc.bottom = rc.top + 0x10;
+
+			PutBitmap3(&grcFull, (Strip[s].x / 0x200) + ((WINDOW_WIDTH - 320) / 2), (Strip[s].y / 0x200), &rc, SURFACE_ID_CREDIT_CAST);
 
 			// Draw character
 			rc.left = 24 * (Strip[s].cast % 13);
 			rc.right = rc.left + 24;
 			rc.top = 24 * (Strip[s].cast / 13);
 			rc.bottom = rc.top + 24;
-			PutBitmap3(&grcFull, (Strip[s].x + ((WINDOW_WIDTH - 320) << 8)) / 0x200 - 24, Strip[s].y / 0x200 - 8, &rc, SURFACE_ID_CASTS);
+
+			PutBitmap3(&grcFull, (Strip[s].x / 0x200) + ((WINDOW_WIDTH - 320) / 2) - 24, (Strip[s].y / 0x200) - 8, &rc, SURFACE_ID_CASTS);
 		}
 	}
 }
@@ -60,34 +67,47 @@ void PutStripper()
 // Create a cast object
 void SetStripper(int x, int y, const char *text, int cast)
 {
-	for (int s = 0; s < MAX_STRIP; s++)
-	{
-		if (!(Strip[s].flag & 0x80))
-		{
-			// Initialize cast property
-			Strip[s].flag = 0x80;
-			Strip[s].x = x;
-			Strip[s].y = y;
-			Strip[s].cast = cast;
-			strcpy(Strip[s].str, text);
+	RECT rc;
+	int s;
 
-			// Draw text
-			RECT rc = {0, 16 * s, 320, 16 * s + 16};
-			CortBox2(&rc, 0, SURFACE_ID_CREDIT_CAST);
-			PutText2(0, 16 * s, text, RGB(0xFF, 0xFF, 0xFE), SURFACE_ID_CREDIT_CAST);
+	for (s = 0; s < MAX_STRIP; s++)
+		if (!(Strip[s].flag & 0x80))
 			break;
-		}
-	}
+
+	if (s == MAX_STRIP)
+		return;
+
+	// Initialize cast property
+	Strip[s].flag = 0x80;
+	Strip[s].x = x;
+	Strip[s].y = y;
+	Strip[s].cast = cast;
+	strcpy(Strip[s].str, text);
+
+	// Draw text
+	rc.left = 0;
+	rc.right = 320;
+	rc.top = s * 0x10;
+	rc.bottom = rc.top + 0x10;
+
+	CortBox2(&rc, 0, SURFACE_ID_CREDIT_CAST);
+	PutText2(0, rc.top, text, RGB(0xFF, 0xFF, 0xFE), SURFACE_ID_CREDIT_CAST);
 }
 
 // Regenerate cast text
 void RestoreStripper()
 {
+	RECT rc;
+
 	for (int s = 0; s < MAX_STRIP; s++)
 	{
 		if (Strip[s].flag & 0x80)
 		{
-			RECT rc = {0, 16 * s, 320, 16 * s + 16};
+			rc.left = 0;
+			rc.right = 320;
+			rc.top = s * 0x10;
+			rc.bottom = rc.top + 0x10;
+
 			CortBox2(&rc, 0, SURFACE_ID_CREDIT_CAST);
 			PutText2(0, rc.top, Strip[s].str, RGB(0xFF, 0xFF, 0xFE), SURFACE_ID_CREDIT_CAST);
 		}
@@ -121,8 +141,13 @@ void ActionIllust()
 void PutIllust()
 {
 	RECT rcIllust = {0, 0, 160, 240};
+#if WINDOW_WIDTH != 320 || WINDOW_HEIGHT != 240
+	// Widescreen edit
 	RECT rcClip = {(WINDOW_WIDTH - 320) / 2, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
-	PutBitmap3(&rcClip, (Illust.x + ((WINDOW_WIDTH - 320) << 8)) / 0x200, (WINDOW_HEIGHT - 240) / 2, &rcIllust, SURFACE_ID_CREDITS_IMAGE);
+	PutBitmap3(&rcClip, (Illust.x / 0x200) + ((WINDOW_WIDTH - 320) / 2), (WINDOW_HEIGHT - 240) / 2, &rcIllust, SURFACE_ID_CREDITS_IMAGE);
+#else
+	PutBitmap3(&grcFull, (Illust.x / 0x200) + ((WINDOW_WIDTH - 320) / 2), (WINDOW_HEIGHT - 240) / 2, &rcIllust, SURFACE_ID_CREDITS_IMAGE);
+#endif
 }
 
 // Load illustration
@@ -151,8 +176,10 @@ void ReleaseCreditScript()
 	}
 }
 
+const char *credit_script = "Credit.tsc";
+
 // Start playing credits
-bool StartCreditScript()
+BOOL StartCreditScript()
 {
 	// Clear previously existing credits data
 	if (Credit.pData)
@@ -163,22 +190,22 @@ bool StartCreditScript()
 
 	// Open file
 	char path[PATH_LENGTH];
-	sprintf(path, "%s/%s", gDataPath, "Credit.tsc");
+	sprintf(path, "%s/%s", gDataPath, credit_script);
 
 	Credit.size = GetFileSizeLong(path);
 	if (Credit.size == -1)
-		return false;
+		return FALSE;
 
 	// Allocate buffer data
 	Credit.pData = (char*)malloc(Credit.size);
 	if (Credit.pData == NULL)
-		return false;
+		return FALSE;
 
 	FILE *fp = fopen(path, "rb");
 	if (fp == NULL)
 	{
-		printf("Couldn't open %s", path);
-		return false;
+		free(Credit.pData);
+		return FALSE;
 	}
 
 	// Read data
@@ -199,98 +226,97 @@ bool StartCreditScript()
 
 	// Modify cliprect
 	grcGame.left = WINDOW_WIDTH / 2;
+#if WINDOW_WIDTH != 320 || WINDOW_HEIGHT != 240
 	// These three are non-vanilla: for wide/tallscreen support
 	grcGame.right = ((WINDOW_WIDTH - 320) / 2) + 320;
 	grcGame.top = (WINDOW_HEIGHT - 240) / 2;
 	grcGame.bottom = ((WINDOW_HEIGHT - 240) / 2) + 240;
+#endif
 
 	// Reload casts
 	if (!ReloadBitmap_File("casts", SURFACE_ID_CASTS))
-		return false;
+		return FALSE;
 
 	// Clear casts
 	memset(Strip, 0, sizeof(Strip));
-	return true;
+	return TRUE;
 }
 
 // Get number from text (4 digit)
 int GetScriptNumber(const char *text)
 {
-	return	1000 * text[0] - 48000 +
-			100 * text[1] - 4800 +
-			10 * text[2] - 480 +
-			text[3] - 48;
+	return (text[0] - '0') * 1000 +
+		(text[1] - '0') * 100 +
+		(text[2] - '0') * 10 +
+		text[3] - '0';
 }
 
 // Parse credits
 void ActionCredit_Read()
 {
-	while (Credit.offset < Credit.size)
-	{
-		// Get character
-		unsigned char character = Credit.pData[Credit.offset];
+	int a, b, len;
+	char text[40];
 
-		int a, b, len;
-		switch (character)
+	while (1)
+	{
+		if (Credit.offset >= Credit.size)
+			break;
+
+		switch (Credit.pData[Credit.offset])
 		{
 			case '[': // Create cast
 				// Get the range for the cast text
-				a = ++Credit.offset;
+				++Credit.offset;
+
+				a = Credit.offset;
 
 				while (Credit.pData[a] != ']')
 				{
 					if (IsShiftJIS(Credit.pData[a]))
 						a += 2;
 					else
-						a++;
+						a += 1;
 				}
 
 				len = a - Credit.offset;
 
 				// Copy the text to the cast text
-				char text[40];
-				memcpy(text, &Credit.pData[Credit.offset], a - Credit.offset);
+				memcpy(text, &Credit.pData[Credit.offset], len);
 				text[len] = 0;
 
 				// Get cast id
-				Credit.offset = a + 1;
-				len = GetScriptNumber(&Credit.pData[a + 1]);
+				Credit.offset = a;
+				len = GetScriptNumber(&Credit.pData[++Credit.offset]);
 
 				// Create cast object
-				SetStripper(Credit.start_x, (WINDOW_HEIGHT << 9) + 0x1000, text, len);
+				SetStripper(Credit.start_x, (WINDOW_HEIGHT * 0x200) + (8 * 0x200), text, len);
 
 				// Change offset
 				Credit.offset += 4;
 				return;
 
-			case 'j': // Jump to label
-				// Get number
-				b = GetScriptNumber(&Credit.pData[++Credit.offset]);
-
-				// Change offset
+			case '-': // Wait for X amount of frames
+				++Credit.offset;
+				Credit.wait = GetScriptNumber(&Credit.pData[Credit.offset]);
 				Credit.offset += 4;
+				Credit.mode = 2;
+				return;
 
-				// Jump to specific label
-				while (Credit.offset < Credit.size)
-				{
-					if (Credit.pData[Credit.offset] == 'l')
-					{
-						// What is this
-						a = GetScriptNumber(&Credit.pData[++Credit.offset]);
-						Credit.offset += 4;
-						if (b == a)
-							return;
-					}
-					else if (IsShiftJIS(Credit.pData[Credit.offset]))
-					{
-						Credit.offset += 2;
-					}
-					else
-					{
-						++Credit.offset;
-					}
-				}
+			case '+': // Change casts x-position
+				++Credit.offset;
+				Credit.start_x = GetScriptNumber(&Credit.pData[Credit.offset]) * 0x200;
+				Credit.offset += 4;
+				return;
 
+			case '/': // Stop credits
+				Credit.mode = 0;
+				return;
+
+			case '!': // Change music
+				++Credit.offset;
+				a = GetScriptNumber(&Credit.pData[Credit.offset]);
+				Credit.offset += 4;
+				ChangeMusic(a);
 				return;
 
 			case '~': // Start fading out music
@@ -298,9 +324,46 @@ void ActionCredit_Read()
 				SetOrganyaFadeout();
 				return;
 
+			case 'j': // Jump to label
+				++Credit.offset;
+
+				// Get number
+				b = GetScriptNumber(&Credit.pData[Credit.offset]);
+
+				// Change offset
+				Credit.offset += 4;
+
+				// Jump to specific label
+				if (1)
+				{
+					while (Credit.offset < Credit.size)
+					{
+						if (Credit.pData[Credit.offset] == 'l')
+						{
+							// What is this
+							a = GetScriptNumber(&Credit.pData[++Credit.offset]);
+							Credit.offset += 4;
+							if (b == a)
+								break;
+						}
+						else if (IsShiftJIS(Credit.pData[Credit.offset]))
+						{
+							Credit.offset += 2;
+						}
+						else
+						{
+							++Credit.offset;
+						}
+					}
+				}
+
+				return;
+
 			case 'f': // Flag jump
+				++Credit.offset;
+
 				// Read numbers XXXX:YYYY
-				a = GetScriptNumber(&Credit.pData[++Credit.offset]);
+				a = GetScriptNumber(&Credit.pData[Credit.offset]);
 				Credit.offset += 5;
 				b = GetScriptNumber(&Credit.pData[Credit.offset]);
 				Credit.offset += 4;
@@ -316,7 +379,7 @@ void ActionCredit_Read()
 							a = GetScriptNumber(&Credit.pData[++Credit.offset]);
 							Credit.offset += 4;
 							if (b == a)
-								return;
+								break;
 						}
 						else if (IsShiftJIS(Credit.pData[Credit.offset]))
 						{
@@ -330,47 +393,30 @@ void ActionCredit_Read()
 				}
 				return;
 
-			case '+': // Change casts x-position
-				Credit.start_x = GetScriptNumber(&Credit.pData[++Credit.offset]) << 9;
-				Credit.offset += 4;
-				return;
-
-			case '-': // Wait for X amount of frames
-				Credit.wait = GetScriptNumber(&Credit.pData[++Credit.offset]);
-				Credit.offset += 4;
-				Credit.mode = 2;
-				return;
-
-			case '/': // Stop credits
-				Credit.mode = 0;
-				return;
-
-			case '!': // Change music
-				a = GetScriptNumber(&Credit.pData[++Credit.offset]);
-				Credit.offset += 4;
-				ChangeMusic(a);
-				return;
+			default:
+				// Progress through file
+				++Credit.offset;
+				break;
 		}
-
-		// Progress through file
-		++Credit.offset;
 	}
 }
 
 // Update credits
 void ActionCredit()
 {
-	if (Credit.offset < Credit.size)
+	if (Credit.offset >= Credit.size)
+		return;
+
+	// Update script, or if waiting, decrement the wait value
+	switch (Credit.mode)
 	{
-		// Update script, or if waiting, decrement the wait value
-		if (Credit.mode == 1)
-		{
+		case 1:
 			ActionCredit_Read();
-		}
-		else if (Credit.mode == 2 && --Credit.wait <= 0)
-		{
-			Credit.mode = 1;
-		}
+			break;
+
+		case 2:
+			if (--Credit.wait <= 0)
+				Credit.mode = 1;
 	}
 }
 
@@ -388,7 +434,7 @@ void CutCreditIllust()
 }
 
 // Scene of the island falling
-int Scene_DownIsland(int mode)
+int Scene_DownIsland(int hWnd, int mode)
 {
 	// Setup background
 	RECT rc_frame = {(WINDOW_WIDTH - 160) / 2, (WINDOW_HEIGHT - 80) / 2, (WINDOW_WIDTH + 160) / 2, (WINDOW_HEIGHT + 80) / 2};
@@ -410,11 +456,13 @@ int Scene_DownIsland(int mode)
 		// Escape menu
 		if (gKey & 0x8000)
 		{
-			int escRet = Call_Escape(hWnd);
-			if (escRet == 0)
-				return 0;
-			if (escRet == 2)
-				return 2;
+			switch (Call_Escape(hWnd))
+			{
+				case 0:
+					return 0;
+				case 2:
+					return 2;
+			}
 		}
 
 		switch (mode)
@@ -425,33 +473,27 @@ int Scene_DownIsland(int mode)
 				break;
 
 			case 1:
-				if (wait >= 350)
-				{
-					if (wait >= 500)
-					{
-						if (wait >= 600)
-						{
-							// End scene
-							if (wait == 750)
-								wait = 900;
-						}
-						else
-						{
-							// Move down slow
-							sprite.y += 0xC;
-						}
-					}
-					else
-					{
-						// Move down slower
-						sprite.y += 0x19;
-					}
-				}
-				else
+				if (wait < 350)
 				{
 					// Move down at normal speed
 					sprite.y += 0x33;
 				}
+				else if (wait < 500)
+				{
+					// Move down slower
+					sprite.y += 0x19;
+				}
+				else if (wait < 600)
+				{
+					// Move down slow
+					sprite.y += 0xC;
+				}
+				else if (wait == 750)
+				{
+					// End scene
+					wait = 900;
+				}
+
 				break;
 		}
 

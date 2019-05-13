@@ -151,7 +151,7 @@ int StageSelectLoop(int *p_event)
 
 		if (gKey & KEY_ESCAPE)
 		{
-			int escRet = Call_Escape(hWnd);
+			int escRet = Call_Escape(ghWnd);
 			if (escRet == 0)
 				return 0;
 			if (escRet == 2)
@@ -193,7 +193,7 @@ int StageSelectLoop(int *p_event)
 
 		PutFramePerSecound();
 	}
-	while (Flip_SystemTask(hWnd));
+	while (Flip_SystemTask(ghWnd));
 
 	return 0;
 }

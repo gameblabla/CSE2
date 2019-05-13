@@ -32,7 +32,7 @@ char gDataPath[PATH_LENGTH];
 
 int gJoystickButtonTable[8];
 
-int hWnd;	// Placeholder until we restore the WinAPI code
+int ghWnd;	// Placeholder until we restore the WinAPI code
 bool gbUseJoystick = false;
 bool bFps = false;
 
@@ -350,7 +350,7 @@ int main(int argc, char *argv[])
 			PutBitmap3(&clip_rect, (WINDOW_WIDTH - 64) / 2, (WINDOW_HEIGHT - 8) / 2, &loading_rect, SURFACE_ID_LOADING);
 
 			// Draw to screen
-			if (Flip_SystemTask(hWnd))
+			if (Flip_SystemTask(ghWnd))
 			{
 				// Initialize sound
 				InitDirectSound();

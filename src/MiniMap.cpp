@@ -95,7 +95,7 @@ int MiniMapLoop()
 
 		if (gKey & KEY_ESCAPE)
 		{
-			switch (Call_Escape(hWnd))
+			switch (Call_Escape(ghWnd))
 			{
 				case 0:
 					return 0;
@@ -115,7 +115,7 @@ int MiniMapLoop()
 		CortBox(&rcView, 0);
 
 		PutFramePerSecound();
-		if (!Flip_SystemTask(hWnd))
+		if (!Flip_SystemTask(ghWnd))
 			return 0;
 	}
 
@@ -139,7 +139,7 @@ int MiniMapLoop()
 
 		if (gKey & KEY_ESCAPE)
 		{
-			switch (Call_Escape(hWnd))
+			switch (Call_Escape(ghWnd))
 			{
 				case 0:
 					return 0;
@@ -170,7 +170,7 @@ int MiniMapLoop()
 			PutBitmap3(&grcGame, my_x + rcView.left + 1, my_y + rcView.top + 1, &my_rect, SURFACE_ID_TEXT_BOX);
 
 		PutFramePerSecound();
-		if (!Flip_SystemTask(hWnd))
+		if (!Flip_SystemTask(ghWnd))
 			return 0;
 	}
 
@@ -180,7 +180,7 @@ int MiniMapLoop()
 
 		if (gKey & KEY_ESCAPE)
 		{
-			switch (Call_Escape(hWnd))
+			switch (Call_Escape(ghWnd))
 			{
 				case 0:
 					return 0;
@@ -200,7 +200,7 @@ int MiniMapLoop()
 		CortBox(&rcView, 0);
 
 		PutFramePerSecound();
-		if (!Flip_SystemTask(hWnd))
+		if (!Flip_SystemTask(ghWnd))
 			return 0;
 	}
 

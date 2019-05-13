@@ -356,6 +356,70 @@ name = "DefaultConfigData"
 addr = 0x40AE30
 
 [[func]]
+name = "ActionStripper"
+addr = 0x40CF90
+
+[[func]]
+name = "PutStripper"
+addr = 0x40D010
+
+[[func]]
+name = "SetStripper"
+addr = 0x40D150
+
+[[func]]
+name = "RestoreStripper"
+addr = 0x40D240
+
+[[func]]
+name = "ActionIllust"
+addr = 0x40D2D0
+
+[[func]]
+name = "PutIllust"
+addr = 0x40D350
+
+[[func]]
+name = "ReloadIllust"
+addr = 0x40D3A0
+
+[[func]]
+name = "InitCreditScript"
+addr = 0x40D3E0
+
+[[func]]
+name = "ReleaseCreditScript"
+addr = 0x40D410
+
+[[func]]
+name = "StartCreditScript"
+addr = 0x40D440
+
+[[func]]
+name = "ActionCredit"
+addr = 0x40D5C0
+
+[[func]]
+name = "ActionCredit_Read"
+addr = 0x40D620
+
+[[func]]
+name = "GetScriptNumber"
+addr = 0x40DB00
+
+[[func]]
+name = "SetCreditIllust"
+addr = 0x40DB40
+
+[[func]]
+name = "CutCreditIllust"
+addr = 0x40DB60
+
+[[func]]
+name = "Scene_DownIsland"
+addr = 0x40DB70
+
+[[func]]
 name = "Call_Escape"
 addr = 0x40DD70
 

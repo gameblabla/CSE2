@@ -21,6 +21,7 @@
 #include "Game.h"
 #include "Generic.h"
 #include "KeyControl.h"
+#include "Main.h"
 #include "Map.h"
 #include "MapName.h"
 #include "MiniMap.h"
@@ -682,7 +683,7 @@ int TextScriptProc()
 							SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Failed to load stage", NULL);
 							#endif
 
-							//MessageBoxA(hWnd, "ステージの読み込みに失敗", "エラー", 0);
+							//MessageBoxA(ghWnd, "ステージの読み込みに失敗", "エラー", 0);
 							return 0;
 						}
 					}
@@ -1207,7 +1208,7 @@ int TextScriptProc()
 						bExit = TRUE;
 						z = GetTextScriptNo(gTS.p_read + 4);
 
-						switch (Scene_DownIsland(z))
+						switch (Scene_DownIsland(ghWnd, z))
 						{
 							case 0:
 								return 0;

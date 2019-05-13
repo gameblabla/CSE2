@@ -1,6 +1,6 @@
 #pragma once
 
-extern int hWnd;
+extern int ghWnd;
 
 void PutFramePerSecound();
 int GetFramePerSecound();
