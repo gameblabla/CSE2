@@ -2295,6 +2295,58 @@ name = "CountAliveNpChar"
 addr = 0x470560
 
 [[func]]
+name = "JadgeHitNpCharBlock"
+addr = 0x4705C0
+
+[[func]]
+name = "JudgeHitNpCharTriangleA"
+addr = 0x470870
+
+[[func]]
+name = "JudgeHitNpCharTriangleB"
+addr = 0x470970
+
+[[func]]
+name = "JudgeHitNpCharTriangleC"
+addr = 0x470A70
+
+[[func]]
+name = "JudgeHitNpCharTriangleD"
+addr = 0x470B70
+
+[[func]]
+name = "JudgeHitNpCharTriangleE"
+addr = 0x470C70
+
+[[func]]
+name = "JudgeHitNpCharTriangleF"
+addr = 0x470D80
+
+[[func]]
+name = "JudgeHitNpCharTriangleG"
+addr = 0x470E90
+
+[[func]]
+name = "JudgeHitNpCharTriangleH"
+addr = 0x470FA0
+
+[[func]]
+name = "JudgeHitNpCharWater"
+addr = 0x4710B0
+
+[[func]]
+name = "HitNpCharMap"
+addr = 0x471160
+
+[[func]]
+name = "LoseNpChar"
+addr = 0x471B80
+
+[[func]]
+name = "HitNpCharBullet"
+addr = 0x471D50
+
+[[func]]
 name = "LoadNpcTable"
 addr = 0x472400
 
