@@ -1,7 +1,5 @@
 #pragma once
 
-#include <stdint.h>
-
 #include "WindowsWrapper.h"
 
 #include "CommonDefines.h"
@@ -54,12 +52,12 @@ struct TEXT_SCRIPT
 	int offsetY;
 
 	//NOD cursor blink
-	uint8_t wait_beam;
+	unsigned char wait_beam;
 };
 
 BOOL InitTextScript2();
 void EndTextScript();
-void EncryptionBinaryData2(uint8_t *pData, int size);
+void EncryptionBinaryData2(unsigned char *pData, int size);
 BOOL LoadTextScript2(const char *name);
 BOOL LoadTextScript_Stage(const char *name);
 void GetTextScriptPath(char *path);

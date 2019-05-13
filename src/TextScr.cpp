@@ -1,6 +1,5 @@
 #include "TextScr.h"
 
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -91,7 +90,7 @@ void EndTextScript()
 }
 
 //Decrypt .tsc
-void EncryptionBinaryData2(uint8_t *pData, int size)
+void EncryptionBinaryData2(unsigned char *pData, int size)
 {
 	int val1;
 
@@ -136,7 +135,7 @@ BOOL LoadTextScript2(const char *name)
 	strcpy(gTS.path, name);
 
 	//Decrypt data
-	EncryptionBinaryData2((uint8_t*)gTS.data, gTS.size);
+	EncryptionBinaryData2((unsigned char*)gTS.data, gTS.size);
 	return TRUE;
 }
 
@@ -157,7 +156,7 @@ BOOL LoadTextScript_Stage(const char *name)
 
 	//Read Head.tsc
 	fread(gTS.data, 1, head_size, fp);
-	EncryptionBinaryData2((uint8_t*)gTS.data, head_size);
+	EncryptionBinaryData2((unsigned char*)gTS.data, head_size);
 	gTS.data[head_size] = 0;
 	fclose(fp);
 
@@ -174,7 +173,7 @@ BOOL LoadTextScript_Stage(const char *name)
 
 	//Read stage's tsc
 	fread(&gTS.data[head_size], 1, body_size, fp);
-	EncryptionBinaryData2((uint8_t*)&gTS.data[head_size], body_size);
+	EncryptionBinaryData2((unsigned char*)&gTS.data[head_size], body_size);
 	gTS.data[head_size + body_size] = 0;
 	fclose(fp);
 

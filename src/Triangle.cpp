@@ -1,10 +1,9 @@
 #include "Triangle.h"
 
-#include <stdint.h>
 #include <math.h>
 
 int gSin[0x100];
-int16_t gTan[0x21];
+short gTan[0x21];
 
 void InitTriangleTable()
 {
@@ -23,27 +22,27 @@ void InitTriangleTable()
 	{
 		a = (float)(i * 6.2831855f / 256.0f);
 		b = sinf(a) / cosf(a);
-		gTan[i] = (int16_t)(b * 8192.0f);
+		gTan[i] = (short)(b * 8192.0f);
 	}
 }
 
-int GetSin(uint8_t deg)
+int GetSin(unsigned char deg)
 {
 	return gSin[deg];
 }
 
-int GetCos(uint8_t deg)
+int GetCos(unsigned char deg)
 {
 	deg += 0x40;
 	return gSin[deg];
 }
 
-uint8_t GetArktan(int x, int y)
+unsigned char GetArktan(int x, int y)
 {
 	x *= -1;
 	y *= -1;
-	uint8_t a = 0;
-	int16_t k;
+	unsigned char a = 0;
+	short k;
 
 	if (x > 0)
 	{

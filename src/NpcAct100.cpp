@@ -1352,8 +1352,18 @@ void ActNpc117(NPCHAR *npc)
 			break;
 
 		case 3:
-			// TODO: This code is being problematic, and
-			// assembling with the wrong registers.
+			if (0)
+			{
+				// There used to be an if here that didn't do anything, but the compiler optimised it out.
+				// We only know this was here because empty ifs mess with the register usage.
+				// Since there's no code, we have no idea what the original condition actually was.
+			}
+
+			if (0)
+			{
+				// Another empty if
+			}
+
 			npc->act_no = 4;
 			npc->ani_no = 1;
 			npc->ani_wait = 0;
@@ -1382,9 +1392,15 @@ void ActNpc117(NPCHAR *npc)
 			npc->ani_no = 5;
 			SetDestroyNpChar(npc->x, npc->y, npc->view.back, 8);
 			break;
-			// End of wrong-reg code
 
 		case 6:
+			if (0)
+			{
+				// There used to be an if here that didn't do anything, but the compiler optimised it out.
+				// We only know this was here because empty ifs mess with the register usage.
+				// Since there's no code, we have no idea what the original condition actually was.
+			}
+
 			npc->ani_no = 5;
 			break;
 

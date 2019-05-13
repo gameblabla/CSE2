@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <cmath>
-#include <stdint.h>
 #include <stdio.h>
 #include <string>
 #include <cstring>
@@ -48,7 +47,7 @@ SOUNDBUFFER::SOUNDBUFFER(size_t bufSize)
 	samplePosition = 0.0;
 
 	//Create waveform buffer
-	data = new uint8_t[bufSize];
+	data = new unsigned char[bufSize];
 	memset(data, 0x80, bufSize);
 
 	//Add to buffer list
@@ -88,7 +87,7 @@ void SOUNDBUFFER::Release()
 	delete this;
 }
 
-void SOUNDBUFFER::Lock(uint8_t **outBuffer, size_t *outSize)
+void SOUNDBUFFER::Lock(unsigned char **outBuffer, size_t *outSize)
 {
 	SDL_LockAudioDevice(audioDevice);
 
@@ -104,35 +103,35 @@ void SOUNDBUFFER::Unlock()
 	SDL_UnlockAudioDevice(audioDevice);
 }
 
-void SOUNDBUFFER::SetCurrentPosition(uint32_t dwNewPosition)
+void SOUNDBUFFER::SetCurrentPosition(unsigned long dwNewPosition)
 {
 	SDL_LockAudioDevice(audioDevice);
 	samplePosition = dwNewPosition;
 	SDL_UnlockAudioDevice(audioDevice);
 }
 
-void SOUNDBUFFER::SetFrequency(uint32_t dwFrequency)
+void SOUNDBUFFER::SetFrequency(unsigned long dwFrequency)
 {
 	SDL_LockAudioDevice(audioDevice);
 	frequency = (double)dwFrequency;
 	SDL_UnlockAudioDevice(audioDevice);
 }
 
-float MillibelToVolume(int32_t lVolume)
+float MillibelToVolume(long lVolume)
 {
 	//Volume is in hundredths of decibels, from 0 to -10000
-	lVolume = clamp(lVolume, (int32_t)-10000, (int32_t)0);
+	lVolume = clamp(lVolume, (long)-10000, (long)0);
 	return (float)pow(10.0, lVolume / 2000.0);
 }
 
-void SOUNDBUFFER::SetVolume(int32_t lVolume)
+void SOUNDBUFFER::SetVolume(long lVolume)
 {
 	SDL_LockAudioDevice(audioDevice);
 	volume = MillibelToVolume(lVolume);
 	SDL_UnlockAudioDevice(audioDevice);
 }
 
-void SOUNDBUFFER::SetPan(int32_t lPan)
+void SOUNDBUFFER::SetPan(long lPan)
 {
 	SDL_LockAudioDevice(audioDevice);
 	volume_l = MillibelToVolume(-lPan);
@@ -288,19 +287,19 @@ void PlaySoundObject(int no, int mode)
 	}
 }
 
-void ChangeSoundFrequency(int no, uint32_t rate)
+void ChangeSoundFrequency(int no, unsigned long rate)
 {
 	if (lpSECONDARYBUFFER[no])
 		lpSECONDARYBUFFER[no]->SetFrequency(10 * rate + 100);
 }
 
-void ChangeSoundVolume(int no, int32_t volume)
+void ChangeSoundVolume(int no, long volume)
 {
 	if (lpSECONDARYBUFFER[no])
 		lpSECONDARYBUFFER[no]->SetVolume(8 * volume - 2400);
 }
 
-void ChangeSoundPan(int no, int32_t pan)
+void ChangeSoundPan(int no, long pan)
 {
 	if (lpSECONDARYBUFFER[no])
 		lpSECONDARYBUFFER[no]->SetPan(10 * (pan - 256));

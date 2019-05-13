@@ -1,6 +1,5 @@
 #include "Boss.h"
 
-#include <stdint.h>
 #include <string.h>
 
 #include "WindowsWrapper.h"
