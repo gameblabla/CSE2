@@ -4,6 +4,16 @@
 
 #include "WindowsWrapper.h"
 
+// Macros for setting, un-setting and getting bits
+#define SET_BIT(x, i) ((x)[(i) / 8] |= 1 << (i) % 8)
+#define UNSET_BIT(x, i) ((x)[(i) / 8] &= ~(1 << (i) % 8))
+#define GET_BIT(x, i) ((x)[(i) / 8] & (1 << (i) % 8))
+
+// Each flag is stored in a bit, so we can use the exact same macros for this
+#define SET_FLAG(x, i) SET_BIT(x, i)
+#define UNSET_FLAG(x, i) UNSET_BIT(x, i)
+#define GET_FLAG(x, i) GET_BIT(x, i)
+
 unsigned char gFlagNPC[1000];
 unsigned char gSkipFlag[8];
 
@@ -17,15 +27,6 @@ void InitSkipFlags()
 {
 	memset(gSkipFlag, 0, sizeof(gSkipFlag));
 }
-
-// Macros for setting, un-setting and getting flags
-// Each flag is stored in a single bit
-#define SET_BIT(x, i) ((x)[(i) / 8] |= 1 << (i) % 8)
-#define UNSET_BIT(x, i) ((x)[(i) / 8] &= ~(1 << (i) % 8))
-#define GET_BIT(x, i) ((x)[(i) / 8] & (1 << (i) % 8))
-#define SET_FLAG SET_BIT
-#define UNSET_FLAG UNSET_BIT
-#define GET_FLAG GET_BIT
 
 //NPC flags
 void SetNPCFlag(long a)
