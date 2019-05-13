@@ -963,6 +963,30 @@ name = "InitializeGame"
 addr = 0x41D550
 
 [[func]]
+name = "ClearPermitStage"
+addr = 0x41D610
+
+[[func]]
+name = "AddPermitStage"
+addr = 0x41D630
+
+[[func]]
+name = "SubPermitStage"
+addr = 0x41D6A0
+
+[[func]]
+name = "MoveStageSelectCursor"
+addr = 0x41D740
+
+[[func]]
+name = "PutStageSelectObject"
+addr = 0x41D840
+
+[[func]]
+name = "StageSelectLoop"
+addr = 0x41DA00
+
+[[func]]
 name = "ShootBullet_Frontia1"
 addr = 0x41DBD0
 
