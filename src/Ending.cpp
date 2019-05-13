@@ -1,6 +1,5 @@
 #include "Ending.h"
 
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -187,7 +186,7 @@ bool StartCreditScript()
 
 	// Read data
 	fread(Credit.pData, 1, Credit.size, fp);
-	EncryptionBinaryData2((uint8_t*)Credit.pData, Credit.size);
+	EncryptionBinaryData2((unsigned char*)Credit.pData, Credit.size);
 
 #ifdef FIX_BUGS
 	// The original game forgot to close the file
@@ -232,7 +231,7 @@ void ActionCredit_Read()
 	while (Credit.offset < Credit.size)
 	{
 		// Get character
-		uint8_t character = Credit.pData[Credit.offset];
+		unsigned char character = Credit.pData[Credit.offset];
 
 		int a, b, len;
 		switch (character)

@@ -1,7 +1,6 @@
 #include "Map.h"
 
 #include <stddef.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -21,7 +20,7 @@ static const char *code_pxma = "PXM";
 
 BOOL InitMapData2()
 {
-	gMap.data = (uint8_t*)malloc(PXM_BUFFER_SIZE);
+	gMap.data = (unsigned char*)malloc(PXM_BUFFER_SIZE);
 	return TRUE;
 }
 
@@ -103,7 +102,7 @@ void ReleasePartsImage()
 	ReleaseSurface(SURFACE_ID_LEVEL_TILESET);
 }
 
-void GetMapData(uint8_t **data, int16_t *mw, int16_t *ml)
+void GetMapData(unsigned char **data, short *mw, short *ml)
 {
 	if (data)
 		*data = gMap.data;
@@ -132,7 +131,7 @@ void ShiftMapParts(int x, int y)
 	*(gMap.data + x + gMap.width * y) -= 1;
 }
 
-BOOL ChangeMapParts(int x, int y, uint8_t no)
+BOOL ChangeMapParts(int x, int y, unsigned char no)
 {
 	if (*(gMap.data + x + gMap.width * y) == no)
 		return FALSE;

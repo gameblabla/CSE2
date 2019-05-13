@@ -1,6 +1,5 @@
 #include "MiniMap.h"
 
-#include <stdint.h>
 #include <string.h>
 
 #include "WindowsWrapper.h"
@@ -127,7 +126,7 @@ int MiniMapLoop()
 	CortBox2(&rcMiniMap, 0, SURFACE_ID_MAP);
 
 	int line = 0;
-	uint8_t my_wait = 0;
+	unsigned char my_wait = 0;
 	while (true)
 	{
 		GetTrg();

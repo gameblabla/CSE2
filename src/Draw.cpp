@@ -1,5 +1,4 @@
 #include <stddef.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -70,8 +69,8 @@ BOOL Flip_SystemTask()
 				return FALSE;
 
 			// Framerate limiter
-			static uint32_t timePrev;
-			const uint32_t timeNow = SDL_GetTicks();
+			static Uint32 timePrev;
+			const Uint32 timeNow = SDL_GetTicks();
 
 			if (timeNow >= timePrev + frameDelays[frame % 3])
 			{
@@ -381,6 +380,9 @@ static BOOL LoadBitmap_Resource(const char *res, Surface_Ids surf_no, bool creat
 
 	if (data)
 	{
+		// For some dumbass reason, SDL2 measures size with a signed int.
+		// Has anyone ever told the devs that an int can be as little as 16 bits long? Real portable.
+		// But hey, if I ever need to create an RWops from an array that's -32768 bytes long, they've got me covered!
 		SDL_RWops *fp = SDL_RWFromConstMem(data, size);
 
 		printf("Loading surface from resource %s for surface id %d\n", res, surf_no);
@@ -465,7 +467,7 @@ static void DrawBitmap(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_
 	SDL_Rect clipRect = RectToSDLRectScaled(rcView);
 	SDL_Rect frameRect = RectToSDLRectScaled(rect);
 
-	// Get dest rect
+	// Get destination rect
 	SDL_Rect destRect = {x, y, frameRect.w, frameRect.h};
 
 	// Set cliprect
@@ -505,29 +507,29 @@ unsigned long GetCortBoxColor(unsigned long col)
 	return col;
 }
 
-void CortBox(RECT *rect, uint32_t col)
+void CortBox(RECT *rect, unsigned long col)
 {
 	// Get rect
 	SDL_Rect destRect = RectToSDLRectScaled(rect);
 
 	// Set colour and draw
-	const unsigned char col_red = col & 0x0000FF;
-	const unsigned char col_green = (col & 0x00FF00) >> 8;
-	const unsigned char col_blue = (col & 0xFF0000) >> 16;
+	const unsigned char col_red = (unsigned char)(col & 0xFF);
+	const unsigned char col_green = (unsigned char)((col >> 8) & 0xFF);
+	const unsigned char col_blue = (unsigned char)((col >> 16) & 0xFF);
 	SDL_SetRenderDrawColor(gRenderer, col_red, col_green, col_blue, 0xFF);
 	SDL_RenderFillRect(gRenderer, &destRect);
 }
 
-void CortBox2(RECT *rect, uint32_t col, Surface_Ids surf_no)
+void CortBox2(RECT *rect, unsigned long col, Surface_Ids surf_no)
 {
 	// Get rect
 	SDL_Rect destRect = RectToSDLRectScaled(rect);
 
 	// Set colour and draw
-	const unsigned char col_red = col & 0x000000FF;
-	const unsigned char col_green = (col & 0x0000FF00) >> 8;
-	const unsigned char col_blue = (col & 0x00FF0000) >> 16;
-	const unsigned char col_alpha = (col & 0xFF000000) >> 24;
+	const unsigned char col_red = (unsigned char)(col & 0xFF);
+	const unsigned char col_green = (unsigned char)((col >> 8) & 0xFF);
+	const unsigned char col_blue = (unsigned char)((col >> 16) & 0xFF);
+	const unsigned char col_alpha = (unsigned char)(col >> 24) & 0xFF;
 	SDL_FillRect(surf[surf_no].surface, &destRect, SDL_MapRGBA(surf[surf_no].surface->format, col_red, col_green, col_blue, col_alpha));
 	surf[surf_no].needs_updating = true;
 }
@@ -641,7 +643,7 @@ void InitTextObject(const char *font_name)
 		gFont = LoadFontFromData(res_data, data_size, fontWidth, fontHeight);
 }
 
-void PutText(int x, int y, const char *text, uint32_t color)
+void PutText(int x, int y, const char *text, unsigned long color)
 {
 	int surface_width, surface_height;
 	SDL_GetRendererOutputSize(gRenderer, &surface_width, &surface_height);
@@ -657,7 +659,7 @@ void PutText(int x, int y, const char *text, uint32_t color)
 	SDL_DestroyTexture(screen_texture);
 }
 
-void PutText2(int x, int y, const char *text, uint32_t color, Surface_Ids surf_no)
+void PutText2(int x, int y, const char *text, unsigned long color, Surface_Ids surf_no)
 {
 	DrawText(gFont, (unsigned char*)surf[surf_no].surface->pixels, surf[surf_no].surface->pitch, surf[surf_no].surface->w, surf[surf_no].surface->h, x * magnification, y * magnification, color, text, strlen(text));
 	surf[surf_no].needs_updating = true;

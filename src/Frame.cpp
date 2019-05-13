@@ -13,7 +13,7 @@ FRAME gFrame;
 
 void MoveFrame3()
 {
-	int16_t map_w, map_l;
+	short map_w, map_l;
 	GetMapData(0, &map_w, &map_l);
 
 #if WINDOW_WIDTH != 320 || WINDOW_HEIGHT != 240	// TODO - Really need to make this a compiler flag
@@ -119,7 +119,7 @@ void SetFramePosition(int fx, int fy)
 	gFrame.quake2 = 0;
 
 	//Move frame position
-	int16_t map_w, map_l;
+	short map_w, map_l;
 	GetMapData(0, &map_w, &map_l);
 
 	gFrame.x = fx;
@@ -143,7 +143,7 @@ void SetFrameMyChar()
 	int mc_x, mc_y;
 	GetMyCharPosition(&mc_x, &mc_y);
 
-	int16_t map_w, map_l;
+	short map_w, map_l;
 	GetMapData(0, &map_w, &map_l);
 
 	gFrame.x = mc_x - (WINDOW_WIDTH << 8);

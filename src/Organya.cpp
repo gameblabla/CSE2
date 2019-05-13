@@ -1,7 +1,6 @@
 #include "Organya.h"
 
 #include <stddef.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -34,7 +33,7 @@ int gTrackVol[MAXTRACK];
 int gOrgVolume = 100;
 bool bFadeout = false;
 
-bool OrganyaNoteAlloc(uint16_t alloc)
+bool OrganyaNoteAlloc(unsigned short alloc)
 {
 	for(int j = 0; j < MAXTRACK; j++)
 	{
@@ -111,7 +110,7 @@ OCTWAVE oct_wave[8] = {
 	{   8,128, 32 }, //7 Oct
 };
 
-bool MakeSoundObject8(int8_t *wavep, int8_t track, int8_t pipi)
+bool MakeSoundObject8(signed char *wavep, signed char track, signed char pipi)
 {
 	for (int j = 0; j < 8; j++)
 	{
@@ -124,13 +123,13 @@ bool MakeSoundObject8(int8_t *wavep, int8_t track, int8_t pipi)
 			lpORGANBUFFER[track][j][k] = new SOUNDBUFFER(data_size);
 
 			//Get wave data
-			uint8_t *wp = new uint8_t[data_size];
-			uint8_t *wp_sub = wp;
+			unsigned char *wp = new unsigned char[data_size];
+			unsigned char *wp_sub = wp;
 			size_t wav_tp = 0;
 
 			for (size_t i = 0; i < data_size; i++)
 			{
-				uint8_t work = *(wavep+wav_tp);
+				unsigned char work = *(wavep+wav_tp);
 				work += 0x80;
 
 				*wp_sub = work;
@@ -143,7 +142,7 @@ bool MakeSoundObject8(int8_t *wavep, int8_t track, int8_t pipi)
 			}
 
 			//Copy wave data to sound buffer
-			uint8_t *buf;
+			unsigned char *buf;
 			lpORGANBUFFER[track][j][k]->Lock(&buf, NULL);
 			memcpy(buf, wp, data_size);
 			lpORGANBUFFER[track][j][k]->Unlock();
@@ -158,7 +157,7 @@ bool MakeSoundObject8(int8_t *wavep, int8_t track, int8_t pipi)
 //Playing melody tracks
 short freq_tbl[12] = { 262,277,294,311,330,349,370,392,415,440,466,494 };
 
-void ChangeOrganFrequency(uint8_t key, int8_t track, int32_t a)
+void ChangeOrganFrequency(unsigned char key, signed char track, long a)
 {
 	for (int j = 0; j < 8; j++) {
 		for (int i = 0; i < 2; i++) {
@@ -167,24 +166,24 @@ void ChangeOrganFrequency(uint8_t key, int8_t track, int32_t a)
 	}
 }
 
-int16_t pan_tbl[13] = {0, 43, 86, 129, 172, 215, 256, 297, 340, 383, 426, 469, 512};
-uint8_t old_key[MAXTRACK] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-uint8_t key_on[MAXTRACK] = {0};
-uint8_t key_twin[MAXTRACK] = {0};
+short pan_tbl[13] = {0, 43, 86, 129, 172, 215, 256, 297, 340, 383, 426, 469, 512};
+unsigned char old_key[MAXTRACK] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+unsigned char key_on[MAXTRACK] = {0};
+unsigned char key_twin[MAXTRACK] = {0};
 
-void ChangeOrganPan(uint8_t key, uint8_t pan, int8_t track)
+void ChangeOrganPan(unsigned char key, unsigned char pan, signed char track)
 {
 	if(old_key[track] != PANDUMMY)
 		lpORGANBUFFER[track][old_key[track]/12][key_twin[track]]->SetPan((pan_tbl[pan] - 0x100) * 10);
 }
 
-void ChangeOrganVolume(int no, int32_t volume, int8_t track)
+void ChangeOrganVolume(int no, long volume, signed char track)
 {
 	if(old_key[track] != VOLDUMMY)
 		lpORGANBUFFER[track][old_key[track]/12][key_twin[track]]->SetVolume((volume - 0xFF) * 8);
 }
 
-void PlayOrganObject(uint8_t key, int mode, int8_t track, int32_t freq)
+void PlayOrganObject(unsigned char key, int mode, signed char track, long freq)
 {
 	if (lpORGANBUFFER[track][key/12][key_twin[track]] != NULL)
 	{
@@ -241,7 +240,7 @@ void PlayOrganObject(uint8_t key, int mode, int8_t track, int32_t freq)
 }
 
 //Release tracks
-void ReleaseOrganyaObject(int8_t track)
+void ReleaseOrganyaObject(signed char track)
 {
 	for(int i = 0; i < 8; i++)
 	{
@@ -259,7 +258,7 @@ void ReleaseOrganyaObject(int8_t track)
 }
 
 //Handling WAVE100
-int8_t wave_data[100][0x100];
+signed char wave_data[100][0x100];
 
 BOOL InitWaveData100()
 {
@@ -279,7 +278,7 @@ BOOL InitWaveData100()
 }
 
 //Create org wave
-bool MakeOrganyaWave(int8_t track, int8_t wave_no, int8_t pipi)
+bool MakeOrganyaWave(signed char track, signed char wave_no, signed char pipi)
 {
 	if(wave_no > 99)
 	{
@@ -293,17 +292,17 @@ bool MakeOrganyaWave(int8_t track, int8_t wave_no, int8_t pipi)
 }
 
 //Dram
-void ChangeDramFrequency(uint8_t key, int8_t track)
+void ChangeDramFrequency(unsigned char key, signed char track)
 {
 	lpDRAMBUFFER[track]->SetFrequency(key * 800 + 100);
 }
 
-void ChangeDramPan(uint8_t pan, int8_t track)
+void ChangeDramPan(unsigned char pan, signed char track)
 {
 	lpDRAMBUFFER[track]->SetPan((pan_tbl[pan] - 0x100) * 10);
 }
 
-void ChangeDramVolume(int32_t volume, int8_t track)
+void ChangeDramVolume(long volume, signed char track)
 {
 	lpDRAMBUFFER[track]->SetVolume((volume - 0xFF) * 8);
 }
@@ -330,9 +329,9 @@ void PlayDramObject(unsigned char key, int mode, signed char track)
 }
 
 //Play data
-int32_t play_p;
+long play_p;
 NOTELIST *play_np[MAXTRACK];
-int32_t now_leng[MAXMELODY] = {0};
+long now_leng[MAXMELODY] = {0};
 
 void OrganyaPlayData()
 {
@@ -399,7 +398,7 @@ void OrganyaPlayData()
 	}
 }
 
-void SetPlayPointer(int32_t x)
+void SetPlayPointer(long x)
 {
 	for (int i = 0; i < MAXTRACK; i++)
 	{
@@ -441,7 +440,7 @@ void LoadOrganya(const char *name)
 	}
 
 	//Version Check
-	uint8_t ver = 0;
+	unsigned char ver = 0;
 	char pass_check[6];
 
 	fread(&pass_check[0], sizeof(char), 6, fp);
@@ -466,7 +465,7 @@ void LoadOrganya(const char *name)
 	for (int i = 0; i < 16; i++) {
 		info.tdata[i].freq = File_ReadLE16(fp);
 		info.tdata[i].wave_no = fgetc(fp);
-		const int8_t pipi = fgetc(fp);
+		const signed char pipi = fgetc(fp);
 		info.tdata[i].pipi = ver == 1 ? 0 : pipi;
 		info.tdata[i].note_num = File_ReadLE16(fp);
 	}
@@ -600,7 +599,7 @@ int OrganyaPlayTimer(void *ptr)
 	SDL_SetThreadPriority(SDL_THREAD_PRIORITY_HIGH);
 
 	//Set time for next step to play
-	uint32_t NextTick = SDL_GetTicks() + info.wait;
+	Uint32 NextTick = SDL_GetTicks() + info.wait;
 
 	while (bEndTimer == false)
 	{

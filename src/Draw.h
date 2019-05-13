@@ -1,7 +1,5 @@
 #pragma once
 
-#include <stdint.h>
-
 #include "WindowsWrapper.h"
 
 #ifndef RGB
@@ -72,11 +70,11 @@ void PutBitmap3(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_no);
 void PutBitmap4(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_no);
 void Surface2Surface(int x, int y, RECT *rect, int to, int from);
 unsigned long GetCortBoxColor(unsigned long col);
-void CortBox(RECT *rect, uint32_t col);
-void CortBox2(RECT *rect, uint32_t col, Surface_Ids surf_no);
+void CortBox(RECT *rect, unsigned long col);
+void CortBox2(RECT *rect, unsigned long col, Surface_Ids surf_no);
 int SubpixelToScreenCoord(int coord);
 int PixelToScreenCoord(int coord);
 void InitTextObject(const char *font_name);
-void PutText(int x, int y, const char *text, uint32_t color);
-void PutText2(int x, int y, const char *text, uint32_t color, Surface_Ids surf_no);
+void PutText(int x, int y, const char *text, unsigned long color);
+void PutText2(int x, int y, const char *text, unsigned long color, Surface_Ids surf_no);
 void EndTextObject();

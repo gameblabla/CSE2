@@ -45,7 +45,7 @@ int JudgeHitBulletBlock(int x, int y, BULLET *bul)
 	return hit;
 }
 
-int JudgeHitBulletBlock2(int x, int y, uint8_t *atrb, BULLET *bul)
+int JudgeHitBulletBlock2(int x, int y, unsigned char *atrb, BULLET *bul)
 {
 	int i;
 	int workX;

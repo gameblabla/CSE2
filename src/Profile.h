@@ -1,7 +1,5 @@
 #pragma once
 
-#include <stdint.h>
-
 #include "WindowsWrapper.h"
 
 #include "ArmsItem.h"
@@ -15,10 +13,10 @@ struct PROFILE
 	int x;
 	int y;
 	int direct;
-	int16_t max_life;
-	int16_t star;
-	int16_t life;
-	int16_t a;
+	short max_life;
+	short star;
+	short life;
+	short a;
 	int select_arms;
 	int select_item;
 	int equip;
@@ -29,7 +27,7 @@ struct PROFILE
 	PERMIT_STAGE permitstage[8];
 	signed char permit_mapping[0x80];
 	char FLAG[4];
-	uint8_t flags[1000];
+	unsigned char flags[1000];
 };
 
 BOOL IsProfile();
