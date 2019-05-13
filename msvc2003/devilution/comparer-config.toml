@@ -3,8 +3,76 @@
 address_offset = 0x400000
 
 [[func]]
+name = "ClearArmsData"
+addr = 0x401000
+
+[[func]]
+name = "ClearItemData"
+addr = 0x401030
+
+[[func]]
 name = "AddArmsData"
 addr = 0x401050
+
+[[func]]
+name = "SubArmsData"
+addr = 0x401160
+
+[[func]]
+name = "TradeArms"
+addr = 0x401220
+
+[[func]]
+name = "AddItemData"
+addr = 0x4012D0
+
+[[func]]
+name = "SubItemData"
+addr = 0x401330
+
+[[func]]
+name = "MoveCampCursor"
+addr = 0x4013C0
+
+[[func]]
+name = "PutCampObject"
+addr = 0x4016F0
+
+[[func]]
+name = "CampLoop"
+addr = 0x401D10
+
+[[func]]
+name = "CheckItem"
+addr = 0x401F20
+
+[[func]]
+name = "CheckArms"
+addr = 0x401F60
+
+[[func]]
+name = "UseArmsEnergy"
+addr = 0x401FA0
+
+[[func]]
+name = "ChargeArmsEnergy"
+addr = 0x402020
+
+[[func]]
+name = "FullArmsEnergy"
+addr = 0x402090
+
+[[func]]
+name = "RotationArms"
+addr = 0x4020E0
+
+[[func]]
+name = "RotationArmsRev"
+addr = 0x402190
+
+[[func]]
+name = "ChangeToFirstArms"
+addr = 0x402240
 
 [[func]]
 name = "InitBack"
@@ -286,6 +354,70 @@ addr = 0x40AD60
 [[func]]
 name = "DefaultConfigData"
 addr = 0x40AE30
+
+[[func]]
+name = "ActionStripper"
+addr = 0x40CF90
+
+[[func]]
+name = "PutStripper"
+addr = 0x40D010
+
+[[func]]
+name = "SetStripper"
+addr = 0x40D150
+
+[[func]]
+name = "RestoreStripper"
+addr = 0x40D240
+
+[[func]]
+name = "ActionIllust"
+addr = 0x40D2D0
+
+[[func]]
+name = "PutIllust"
+addr = 0x40D350
+
+[[func]]
+name = "ReloadIllust"
+addr = 0x40D3A0
+
+[[func]]
+name = "InitCreditScript"
+addr = 0x40D3E0
+
+[[func]]
+name = "ReleaseCreditScript"
+addr = 0x40D410
+
+[[func]]
+name = "StartCreditScript"
+addr = 0x40D440
+
+[[func]]
+name = "ActionCredit"
+addr = 0x40D5C0
+
+[[func]]
+name = "ActionCredit_Read"
+addr = 0x40D620
+
+[[func]]
+name = "GetScriptNumber"
+addr = 0x40DB00
+
+[[func]]
+name = "SetCreditIllust"
+addr = 0x40DB40
+
+[[func]]
+name = "CutCreditIllust"
+addr = 0x40DB60
+
+[[func]]
+name = "Scene_DownIsland"
+addr = 0x40DB70
 
 [[func]]
 name = "Call_Escape"
@@ -831,6 +963,30 @@ name = "InitializeGame"
 addr = 0x41D550
 
 [[func]]
+name = "ClearPermitStage"
+addr = 0x41D610
+
+[[func]]
+name = "AddPermitStage"
+addr = 0x41D630
+
+[[func]]
+name = "SubPermitStage"
+addr = 0x41D6A0
+
+[[func]]
+name = "MoveStageSelectCursor"
+addr = 0x41D740
+
+[[func]]
+name = "PutStageSelectObject"
+addr = 0x41D840
+
+[[func]]
+name = "StageSelectLoop"
+addr = 0x41DA00
+
+[[func]]
 name = "ShootBullet_Frontia1"
 addr = 0x41DBD0
 
@@ -905,6 +1061,62 @@ addr = 0x421040
 [[func]]
 name = "PutStar"
 addr = 0x4213B0
+
+[[func]]
+name = "InitTextScript2"
+addr = 0x4214E0
+
+[[func]]
+name = "EndTextScript"
+addr = 0x421570
+
+[[func]]
+name = "EncryptionBinaryData2"
+addr = 0x4215C0
+
+[[func]]
+name = "LoadTextScript2"
+addr = 0x421660
+
+[[func]]
+name = "LoadTextScript_Stage"
+addr = 0x421750
+
+[[func]]
+name = "GetTextScriptPath"
+addr = 0x4218E0
+
+[[func]]
+name = "GetTextScriptNo"
+addr = 0x421900
+
+[[func]]
+name = "StartTextScript"
+addr = 0x421990
+
+[[func]]
+name = "JumpTextScript"
+addr = 0x421AF0
+
+[[func]]
+name = "StopTextScript"
+addr = 0x421C50
+
+[[func]]
+name = "CheckNewLine"
+addr = 0x421C80
+
+[[func]]
+name = "SetNumberTextScript"
+addr = 0x421D10
+
+[[func]]
+name = "ClearTextLine"
+addr = 0x421E90
+
+[[func]]
+name = "PutTextScript"
+addr = 0x421F10
 
 [[func]]
 name = "TextScriptProc"

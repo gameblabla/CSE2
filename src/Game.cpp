@@ -141,7 +141,7 @@ int ModeOpening()
 		// Escape menu
 		if (gKey & KEY_ESCAPE)
 		{
-			int escRet = Call_Escape();
+			int escRet = Call_Escape(ghWnd);
 			if (escRet == 0)
 				return 0;
 			if (escRet == 2)
@@ -193,7 +193,7 @@ int ModeOpening()
 		PutTextScript();
 		PutFramePerSecound();
 
-		if (!Flip_SystemTask())
+		if (!Flip_SystemTask(ghWnd))
 			return 0;
 
 		++gCounter;
@@ -204,7 +204,7 @@ int ModeOpening()
 	{
 		CortBox(&grcGame, 0x000000);
 		PutFramePerSecound();
-		if (!Flip_SystemTask())
+		if (!Flip_SystemTask(ghWnd))
 			return 0;
 	}
 	return 2;
@@ -335,7 +335,7 @@ int ModeTitle()
 
 		if (gKey & KEY_ESCAPE)
 		{
-			int escRet = Call_Escape();
+			int escRet = Call_Escape(ghWnd);
 			if (escRet == 0)
 				return 0;
 			if (escRet == 2)
@@ -420,7 +420,7 @@ int ModeTitle()
 
 		PutFramePerSecound();
 
-		if (!Flip_SystemTask())
+		if (!Flip_SystemTask(ghWnd))
 			return 0;
 	}
 
@@ -433,7 +433,7 @@ int ModeTitle()
 	{
 		CortBox(&grcGame, 0);
 		PutFramePerSecound();
-		if (!Flip_SystemTask())
+		if (!Flip_SystemTask(ghWnd))
 			return 0;
 	}
 
@@ -479,7 +479,7 @@ int ModeAction()
 			// Escape menu
 			if (gKey & KEY_ESCAPE)
 			{
-				int escRet = Call_Escape();
+				int escRet = Call_Escape(ghWnd);
 				if (escRet == 0)
 					return 0;
 				if (escRet == 2)
@@ -614,7 +614,7 @@ int ModeAction()
 			PutTextScript();
 
 			PutFramePerSecound();
-			if (!Flip_SystemTask())
+			if (!Flip_SystemTask(ghWnd))
 				break;
 			++gCounter;
 		}

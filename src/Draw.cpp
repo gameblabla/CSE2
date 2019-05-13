@@ -51,8 +51,10 @@ SURFACE surf[SURFACE_ID_MAX];
 
 FontObject *gFont;
 
-BOOL Flip_SystemTask()
+BOOL Flip_SystemTask(int hWnd)
 {
+	(void)hWnd;
+
 	if (vsync)
 	{
 		if (!SystemTask())
@@ -193,8 +195,10 @@ void ReleaseSurface(int s)
 	}
 }
 
-BOOL MakeSurface_Generic(int bxsize, int bysize, Surface_Ids surf_no)
+BOOL MakeSurface_Generic(int bxsize, int bysize, Surface_Ids surf_no, BOOL bSystem)
 {
+	(void)bSystem;
+
 	BOOL success = FALSE;
 
 #ifdef FIX_BUGS
@@ -289,7 +293,7 @@ static bool LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, bool create_surface)
 			}
 			else
 			{
-				if (create_surface == false || MakeSurface_Generic(surface->w, surface->h, surf_no))
+				if (create_surface == false || MakeSurface_Generic(surface->w, surface->h, surf_no, FALSE))
 				{
 					if (magnification == 1)
 					{
