@@ -52,7 +52,7 @@ struct SURFACE;
 
 extern SURFACE surf[SURFACE_ID_MAX];
 
-BOOL Flip_SystemTask();
+BOOL Flip_SystemTask(int hWnd);
 BOOL StartDirectDraw(int lMagnification, int lColourDepth);
 void EndDirectDraw();
 void ReleaseSurface(int s);

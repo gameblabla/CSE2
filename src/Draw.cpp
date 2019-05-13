@@ -48,8 +48,10 @@ FontObject *gFont;
 
 #define FRAMERATE 20
 
-BOOL Flip_SystemTask()
+BOOL Flip_SystemTask(int hWnd)
 {
+	(void)hWnd;
+
 	while (true)
 	{
 		if (!SystemTask())

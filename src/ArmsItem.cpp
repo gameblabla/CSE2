@@ -129,10 +129,10 @@ BOOL AddItemData(long code)
 	}
 
 	if (i == ITEM_MAX)
-		return false;
+		return FALSE;
 
 	gItemData[i].code = code;
-	return true;
+	return TRUE;
 }
 
 BOOL SubItemData(long code)
@@ -388,7 +388,7 @@ int CampLoop()
 
 		if (gKeyTrg & KEY_ESCAPE)
 		{
-			switch (Call_Escape())
+			switch (Call_Escape(hWnd))
 			{
 				case 0:
 					return 0;
@@ -430,7 +430,7 @@ int CampLoop()
 			}
 		}
 
-		if (!Flip_SystemTask())
+		if (!Flip_SystemTask(hWnd))
 			return 0;
 	}
 

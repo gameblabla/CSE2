@@ -79,19 +79,23 @@ void WriteMiniMapLine(int line)
 int MiniMapLoop()
 {
 	int f;
+	int line;
+	unsigned char my_wait;
+
+	RECT rcMiniMap;
+	RECT rcView;
 
 	RECT my_rect = {0, 57, 1, 58};
 	int my_x = (gMC.x / 0x200 + 8) / 16;
 	int my_y = (gMC.y / 0x200 + 8) / 16;
 
-	RECT rcView;
 	for (f = 0; f <= 8; f++)
 	{
 		GetTrg();
 
 		if (gKey & KEY_ESCAPE)
 		{
-			switch (Call_Escape())
+			switch (Call_Escape(hWnd))
 			{
 				case 0:
 					return 0;
@@ -111,11 +115,10 @@ int MiniMapLoop()
 		CortBox(&rcView, 0);
 
 		PutFramePerSecound();
-		if (!Flip_SystemTask())
+		if (!Flip_SystemTask(hWnd))
 			return 0;
 	}
 
-	RECT rcMiniMap;
 	rcMiniMap.left = 0;
 	rcMiniMap.right = gMap.width;
 	rcMiniMap.top = 0;
@@ -125,8 +128,8 @@ int MiniMapLoop()
 	rcView.bottom = --rcView.top + gMap.length + 2;
 	CortBox2(&rcMiniMap, 0, SURFACE_ID_MAP);
 
-	int line = 0;
-	unsigned char my_wait = 0;
+	line = 0;
+	my_wait = 0;
 	while (true)
 	{
 		GetTrg();
@@ -136,7 +139,7 @@ int MiniMapLoop()
 
 		if (gKey & KEY_ESCAPE)
 		{
-			switch (Call_Escape())
+			switch (Call_Escape(hWnd))
 			{
 				case 0:
 					return 0;
@@ -167,7 +170,7 @@ int MiniMapLoop()
 			PutBitmap3(&grcGame, my_x + rcView.left + 1, my_y + rcView.top + 1, &my_rect, SURFACE_ID_TEXT_BOX);
 
 		PutFramePerSecound();
-		if (!Flip_SystemTask())
+		if (!Flip_SystemTask(hWnd))
 			return 0;
 	}
 
@@ -177,7 +180,7 @@ int MiniMapLoop()
 
 		if (gKey & KEY_ESCAPE)
 		{
-			switch (Call_Escape())
+			switch (Call_Escape(hWnd))
 			{
 				case 0:
 					return 0;
@@ -197,7 +200,7 @@ int MiniMapLoop()
 		CortBox(&rcView, 0);
 
 		PutFramePerSecound();
-		if (!Flip_SystemTask())
+		if (!Flip_SystemTask(hWnd))
 			return 0;
 	}
 

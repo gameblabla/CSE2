@@ -410,7 +410,7 @@ int Scene_DownIsland(int mode)
 		// Escape menu
 		if (gKey & 0x8000)
 		{
-			int escRet = Call_Escape();
+			int escRet = Call_Escape(hWnd);
 			if (escRet == 0)
 				return 0;
 			if (escRet == 2)
@@ -464,7 +464,7 @@ int Scene_DownIsland(int mode)
 
 		// Draw window
 		PutFramePerSecound();
-		if (!Flip_SystemTask())
+		if (!Flip_SystemTask(hWnd))
 			return 0;
 	}
 
