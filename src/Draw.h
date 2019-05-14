@@ -52,7 +52,7 @@ struct SURFACE;
 
 extern SURFACE surf[SURFACE_ID_MAX];
 
-BOOL Flip_SystemTask();
+BOOL Flip_SystemTask(int hWnd);
 BOOL StartDirectDraw(int lMagnification, int lColourDepth);
 void EndDirectDraw();
 void ReleaseSurface(int s);
@@ -60,7 +60,7 @@ BOOL MakeSurface_File(const char *name, Surface_Ids surf_no);
 BOOL MakeSurface_Resource(const char *res, Surface_Ids surf_no);
 BOOL ReloadBitmap_File(const char *name, Surface_Ids surf_no);
 BOOL ReloadBitmap_Resource(const char *res, Surface_Ids surf_no);
-BOOL MakeSurface_Generic(int bxsize, int bysize, Surface_Ids surf_no);
+BOOL MakeSurface_Generic(int bxsize, int bysize, Surface_Ids surf_no, BOOL bSystem);
 void BackupSurface(Surface_Ids surf_no, RECT *rect);
 void PutBitmap3(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_no);
 void PutBitmap4(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_no);

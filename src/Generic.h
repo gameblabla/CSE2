@@ -1,6 +1,8 @@
 #pragma once
 
-bool GetCompileVersion(int *v1, int *v2, int *v3, int *v4);
+#include "WindowsWrapper.h"
+
+BOOL GetCompileVersion(int *v1, int *v2, int *v3, int *v4);
 long GetFileSizeLong(const char *path);
-bool CheckFileExists(const char *name);
-bool IsShiftJIS(unsigned char c);
+BOOL CheckFileExists(const char *name);
+BOOL IsShiftJIS(unsigned char c);
