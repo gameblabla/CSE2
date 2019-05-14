@@ -252,8 +252,8 @@ void PutArmsEnergy(BOOL flash)
 	// Draw max ammo
 	if (gArmsData[gSelectedArms].max_num)
 	{
-		PutNumber4(gArmsEnergyX + 32, 16, gArmsData[gSelectedArms].num, 0);
-		PutNumber4(gArmsEnergyX + 32, 24, gArmsData[gSelectedArms].max_num, 0);
+		PutNumber4(gArmsEnergyX + 32, 16, gArmsData[gSelectedArms].num, FALSE);
+		PutNumber4(gArmsEnergyX + 32, 24, gArmsData[gSelectedArms].max_num, FALSE);
 	}
 	else
 	{
@@ -267,7 +267,7 @@ void PutArmsEnergy(BOOL flash)
 
 	PutBitmap3(&rcView, gArmsEnergyX + 32, 24, &rcPer, SURFACE_ID_TEXT_BOX);
 	PutBitmap3(&rcView, gArmsEnergyX, 32, &rcLv, SURFACE_ID_TEXT_BOX);
-	PutNumber4(gArmsEnergyX - 8, 32, gArmsData[gSelectedArms].level, 0);
+	PutNumber4(gArmsEnergyX - 8, 32, gArmsData[gSelectedArms].level, FALSE);
 
 	SET_RECT(rcExpBox, 0, 72, 40, 80)
 	SET_RECT(rcExpVal, 0, 80, 0, 88)
@@ -366,7 +366,7 @@ void PutMyLife(BOOL flash)
 	PutBitmap3(&grcGame, 16, 40, &rcCase, SURFACE_ID_TEXT_BOX);
 	PutBitmap3(&grcGame, 40, 40, &rcBr, SURFACE_ID_TEXT_BOX);
 	PutBitmap3(&grcGame, 40, 40, &rcLife, SURFACE_ID_TEXT_BOX);
-	PutNumber4(8, 40, gMC.lifeBr, 0);
+	PutNumber4(8, 40, gMC.lifeBr, FALSE);
 }
 
 void PutMyAir(int x, int y)
@@ -383,7 +383,7 @@ void PutMyAir(int x, int y)
 	{
 		// Draw how much air is left
 		if (gMC.air_get % 6 < 4)
-			PutNumber4(x + 32, y, gMC.air / 10, 0);
+			PutNumber4(x + 32, y, gMC.air / 10, FALSE);
 
 		// Draw "AIR" text
 		if (gMC.air % 30 > 10)
@@ -420,9 +420,9 @@ void PutTimeCounter(int x, int y)
 		}
 
 		// Draw time
-		PutNumber4(x,		y, time_count / (60 * 50),	false);
-		PutNumber4(x + 20,	y, time_count / 50 % 60,	true);
-		PutNumber4(x + 32,	y, time_count / 5 % 10,		false);
+		PutNumber4(x,		y, time_count / (60 * 50),	FALSE);
+		PutNumber4(x + 20,	y, time_count / 50 % 60,	TRUE);
+		PutNumber4(x + 32,	y, time_count / 5 % 10,		FALSE);
 		PutBitmap3(&grcGame, x + 30, y, &rcTime[2], SURFACE_ID_TEXT_BOX);
 	}
 	else
