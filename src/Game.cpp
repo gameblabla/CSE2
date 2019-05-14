@@ -56,7 +56,7 @@ int Random(int min, int max)
 	return min + rep_rand() % (max - min + 1);
 }
 
-void PutNumber4(int x, int y, int value, bool bZero)
+void PutNumber4(int x, int y, int value, BOOL bZero)
 {
 	// Define rects
 	RECT rcClient = grcFull;
@@ -189,7 +189,7 @@ int ModeOpening()
 		if (tscRet == 2)
 			return 1;
 
-		PutMapName(false);
+		PutMapName(FALSE);
 		PutTextScript();
 		PutFramePerSecound();
 
@@ -317,7 +317,7 @@ int ModeTitle()
 	// Start loop
 	unsigned int wait = 0;
 
-	while (true)
+	while (1)
 	{
 		// Don't accept selection for 10 frames
 		if (wait < 10)
@@ -365,10 +365,10 @@ int ModeTitle()
 
 		int v1, v2, v3, v4;
 		GetCompileVersion(&v1, &v2, &v3, &v4);
-		PutNumber4((WINDOW_WIDTH - 40) / 2, WINDOW_HEIGHT - 24, v1, 0);
-		PutNumber4((WINDOW_WIDTH - 8) / 2, WINDOW_HEIGHT - 24, v2, 0);
-		PutNumber4((WINDOW_WIDTH + 24) / 2, WINDOW_HEIGHT - 24, v3, 0);
-		PutNumber4((WINDOW_WIDTH + 56) / 2, WINDOW_HEIGHT - 24, v4, 0);
+		PutNumber4((WINDOW_WIDTH - 40) / 2, WINDOW_HEIGHT - 24, v1, FALSE);
+		PutNumber4((WINDOW_WIDTH - 8) / 2, WINDOW_HEIGHT - 24, v2, FALSE);
+		PutNumber4((WINDOW_WIDTH + 24) / 2, WINDOW_HEIGHT - 24, v3, FALSE);
+		PutNumber4((WINDOW_WIDTH + 56) / 2, WINDOW_HEIGHT - 24, v4, FALSE);
 
 		// Draw main title
 		PutBitmap3(&grcGame, (WINDOW_WIDTH - 144) / 2, 40, &rcTitle, SURFACE_ID_TITLE);
@@ -447,7 +447,7 @@ int ModeAction()
 
 	unsigned long color = GetCortBoxColor(RGB(0, 0, 0x20));
 
-	bool swPlay = true;
+	unsigned int swPlay = 1;
 
 	// Reset stuff
 	gCounter = 0;
@@ -471,7 +471,7 @@ int ModeAction()
 
 	if ((bContinue && LoadProfile(NULL)) || InitializeGame())
 	{
-		while (true)
+		while (1)
 		{
 			// Get pressed keys
 			GetTrg();
@@ -486,12 +486,12 @@ int ModeAction()
 					return 1;
 			}
 
-			if (swPlay & 1 && g_GameFlags & 1)
+			if (swPlay % 2 && g_GameFlags & 1)
 			{
 				if (g_GameFlags & 2)
-					ActMyChar(true);
+					ActMyChar(TRUE);
 				else
-					ActMyChar(false);
+					ActMyChar(FALSE);
 
 				ActStar();
 				ActNpChar();
@@ -515,9 +515,9 @@ int ModeAction()
 				ActFlash(frame_x, frame_y);
 
 				if (g_GameFlags & 2)
-					AnimationMyChar(true);
+					AnimationMyChar(TRUE);
 				else
-					AnimationMyChar(false);
+					AnimationMyChar(FALSE);
 			}
 
 			if (g_GameFlags & 8)
@@ -585,7 +585,7 @@ int ModeAction()
 					RotationArmsRev();
 			}
 
-			if (swPlay & 1)
+			if (swPlay % 2)
 			{
 				int tscRet = TextScriptProc();
 				if (tscRet == 0)
@@ -594,13 +594,13 @@ int ModeAction()
 					return 1;
 			}
 
-			PutMapName(false);
+			PutMapName(FALSE);
 			PutTimeCounter(16, 8);
 
 			if (g_GameFlags & 2)
 			{
-				PutMyLife(true);
-				PutArmsEnergy(true);
+				PutMyLife(TRUE);
+				PutArmsEnergy(TRUE);
 				PutMyAir((WINDOW_WIDTH - 80) / 2, (WINDOW_HEIGHT - 32) / 2);
 				PutActiveArmsList();
 			}
@@ -623,7 +623,7 @@ int ModeAction()
 	return 0;
 }
 
-bool Game()
+BOOL Game()
 {
 	if (LoadGenericData())
 	{
@@ -655,9 +655,9 @@ bool Game()
 		}
 		else
 		{
-			return false;
+			return FALSE;
 		}
 	}
 
-	return true;
+	return TRUE;
 }

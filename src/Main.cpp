@@ -62,7 +62,7 @@ void rep_srand(unsigned int seed)
 void PutFramePerSecound()
 {
 	if (bFps)
-		PutNumber4(WINDOW_WIDTH - 40, 8, GetFramePerSecound(), false);
+		PutNumber4(WINDOW_WIDTH - 40, 8, GetFramePerSecound(), FALSE);
 }
 
 int GetFramePerSecound()
