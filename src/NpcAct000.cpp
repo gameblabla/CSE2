@@ -432,7 +432,7 @@ void ActNpc005(NPCHAR *npc)
 
 	switch (npc->act_no)
 	{
-		case 0: // Init
+		case 0: // Initialize
 			npc->y += 0x600;
 			npc->act_no = 1;
 			// Fallthrough
@@ -542,7 +542,7 @@ void ActNpc006(NPCHAR *npc)
 
 	switch (npc->act_no)
 	{
-		case 0: // Init
+		case 0: // Initialize
 			npc->act_no = 1;
 
 			if (npc->direct == 0)
