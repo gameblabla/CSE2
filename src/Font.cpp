@@ -14,7 +14,7 @@
 #include "File.h"
 
 // Uncomment for that authentic pre-Windows Vista feel
-// #define DISABLE_FONT_ANTIALIASING
+//#define DISABLE_FONT_ANTIALIASING
 
 #undef MIN
 #undef MAX
