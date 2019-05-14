@@ -7,7 +7,7 @@
 unsigned char gFlagNPC[1000];
 unsigned char gSkipFlag[8];
 
-//Flag inits
+// Flag initializers
 void InitFlags()
 {
 	memset(gFlagNPC, 0, sizeof(gFlagNPC));
@@ -18,7 +18,7 @@ void InitSkipFlags()
 	memset(gSkipFlag, 0, sizeof(gSkipFlag));
 }
 
-//NPC flags
+// NPC flags
 void SetNPCFlag(long a)
 {
 	gFlagNPC[a / 8] |= 1 << a % 8;
@@ -37,7 +37,7 @@ BOOL GetNPCFlag(long a)
 		return FALSE;
 }
 
-//Skip flags
+// Skip flags
 void SetSkipFlag(long a)
 {
 	gSkipFlag[a / 8] |= 1 << a % 8;
