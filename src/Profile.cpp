@@ -45,7 +45,7 @@ BOOL SaveProfile(const char *name)
 {
 	PROFILE profile;
 	FILE *fp;
-	char *FLAG = "FLAG";
+	const char *FLAG = "FLAG";
 	char path[PATH_LENGTH];
 
 	//Get path
@@ -254,12 +254,12 @@ BOOL InitializeGame()
 	InitFlags();
 	if (!TransferStage(13, 200, 10, 8))
 	{
-		// TODO - restore this when hWnd is available
+		// TODO - restore this when ghWnd is available
 /*#if defined(NONPORTABLE) && defined(WINDOWS)
 #ifdef JAPANESE
-		MessageBoxA(hWnd, "ステージの読み込みに失敗", "エラー", MB_OK);
+		MessageBoxA(ghWnd, "ステージの読み込みに失敗", "エラー", MB_OK);
 #else
-		MessageBoxA(hWnd, "Failed to load stage", "Error", MB_OK);
+		MessageBoxA(ghWnd, "Failed to load stage", "Error", MB_OK);
 #endif
 #else*/
 #ifdef JAPANESE

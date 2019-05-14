@@ -3,7 +3,7 @@ ifeq ($(RELEASE), 1)
 	LDFLAGS = -s
 	FILENAME_DEF = CSE2
 else
-	CXXFLAGS = -O0 -g
+	CXXFLAGS = -Og -g3
 	FILENAME_DEF = CSE2d
 endif
 
