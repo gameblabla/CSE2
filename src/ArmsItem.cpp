@@ -129,10 +129,10 @@ BOOL AddItemData(long code)
 	}
 
 	if (i == ITEM_MAX)
-		return false;
+		return FALSE;
 
 	gItemData[i].code = code;
-	return true;
+	return TRUE;
 }
 
 BOOL SubItemData(long code)
@@ -270,6 +270,10 @@ void MoveCampCursor()
 
 void PutCampObject()
 {
+	int i;
+	RECT rcArms;
+	RECT rcItem;
+
 	// Get rects
 	RECT rcPer = {72, 48, 80, 56};
 	RECT rcNone = {80, 48, 96, 56};
@@ -284,11 +288,10 @@ void PutCampObject()
 	RECT rcBoxBottom = {0, 16, 244, 24};
 
 	// Draw box
-	int y;
 	PutBitmap3(&rcView, (WINDOW_WIDTH - 244) / 2, (WINDOW_HEIGHT - 224) / 2, &rcBoxTop, SURFACE_ID_TEXT_BOX);
-	for (y = 1; y < 18; y++)
-		PutBitmap3(&rcView, (WINDOW_WIDTH - 244) / 2, ((WINDOW_HEIGHT - 240) / 2) + (8 * (y + 1)), &rcBoxBody, SURFACE_ID_TEXT_BOX);
-	PutBitmap3(&rcView, (WINDOW_WIDTH - 244) / 2, ((WINDOW_HEIGHT - 240) / 2) + (8 * (y + 1)), &rcBoxBottom, SURFACE_ID_TEXT_BOX);
+	for (i = 1; i < 18; ++i)
+		PutBitmap3(&rcView, (WINDOW_WIDTH - 244) / 2, ((WINDOW_HEIGHT - 240) / 2) + (8 * (i + 1)), &rcBoxBody, SURFACE_ID_TEXT_BOX);
+	PutBitmap3(&rcView, (WINDOW_WIDTH - 244) / 2, ((WINDOW_HEIGHT - 240) / 2) + (8 * (i + 1)), &rcBoxBottom, SURFACE_ID_TEXT_BOX);
 
 	// Move titles
 	if (gCampTitleY > (WINDOW_HEIGHT - 208) / 2)
@@ -308,12 +311,11 @@ void PutCampObject()
 		PutBitmap3(&rcView, 40 * gSelectedArms + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT / 2) - 96, &rcCur1[1], SURFACE_ID_TEXT_BOX);
 
 	// Draw arms
-	for (int i = 0; i < ARMS_MAX; i++)
+	for (i = 0; i < ARMS_MAX; i++)
 	{
 		if (gArmsData[i].code == 0)
 			break;
 
-		RECT rcArms;
 		rcArms.left = 16 * (gArmsData[i].code % 16);
 		rcArms.right = rcArms.left + 16;
 		rcArms.top = 16 * (gArmsData[i].code / 16);
@@ -322,13 +324,13 @@ void PutCampObject()
 		PutBitmap3(&rcView, 40 * i + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT - 192) / 2, &rcArms, SURFACE_ID_ARMS_IMAGE);
 		PutBitmap3(&rcView, 40 * i + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT - 128) / 2, &rcPer, SURFACE_ID_TEXT_BOX);
 		PutBitmap3(&rcView, 40 * i + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT - 160) / 2, &rcLv, SURFACE_ID_TEXT_BOX);
-		PutNumber4(40 * i + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT - 160) / 2, gArmsData[i].level, 0);
+		PutNumber4(40 * i + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT - 160) / 2, gArmsData[i].level, FALSE);
 
 		// Draw ammo
 		if (gArmsData[i].max_num)
 		{
-			PutNumber4(40 * i + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT - 144) / 2, gArmsData[i].num, 0);
-			PutNumber4(40 * i + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT - 128) / 2, gArmsData[i].max_num, 0);
+			PutNumber4(40 * i + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT - 144) / 2, gArmsData[i].num, FALSE);
+			PutNumber4(40 * i + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT - 128) / 2, gArmsData[i].max_num, FALSE);
 		}
 		else
 		{
@@ -343,12 +345,11 @@ void PutCampObject()
 	else
 		PutBitmap3(&rcView, 32 * (gSelectedItem % 6) + (WINDOW_WIDTH - 224) / 2, 16 * (gSelectedItem / 6) + (WINDOW_HEIGHT - 88) / 2, &rcCur2[1], SURFACE_ID_TEXT_BOX);
 
-	for (int i = 0; i < ITEM_MAX; i++)
+	for (i = 0; i < ITEM_MAX; i++)
 	{
 		if (gItemData[i].code == 0)
 			break;
 
-		RECT rcItem;
 		rcItem.left = 32 * (gItemData[i].code % 8);
 		rcItem.right = rcItem.left + 32;
 		rcItem.top = 16 * (gItemData[i].code / 8);
@@ -360,10 +361,12 @@ void PutCampObject()
 
 int CampLoop()
 {
+	int arms_num;
+	char old_script_path[PATH_LENGTH];
+
 	RECT rcView = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
 	// Load the inventory script
-	char old_script_path[PATH_LENGTH];
 	GetTextScriptPath(old_script_path);
 
 	LoadTextScript2("ArmsItem.tsc");
@@ -373,7 +376,7 @@ int CampLoop()
 	gSelectedItem = 0;
 
 	// Run script
-	int arms_num = 0;
+	arms_num = 0;
 	for (; gArmsData[arms_num].code != 0;)
 		++arms_num;
 
@@ -388,7 +391,7 @@ int CampLoop()
 
 		if (gKeyTrg & KEY_ESCAPE)
 		{
-			switch (Call_Escape())
+			switch (Call_Escape(ghWnd))
 			{
 				case 0:
 					return 0;
@@ -430,7 +433,7 @@ int CampLoop()
 			}
 		}
 
-		if (!Flip_SystemTask())
+		if (!Flip_SystemTask(ghWnd))
 			return 0;
 	}
 

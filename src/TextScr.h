@@ -21,7 +21,7 @@ struct TEXT_SCRIPT
 
 	//Current positions (read position in buffer, x position in line)
 	unsigned int p_read;
-	unsigned int p_write;
+	int p_write;
 
 	//Current line to write to
 	int line;
