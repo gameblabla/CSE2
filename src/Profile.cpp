@@ -45,7 +45,7 @@ BOOL SaveProfile(const char *name)
 {
 	PROFILE profile;
 	FILE *fp;
-	char *FLAG = "FLAG";
+	const char *FLAG = "FLAG";
 	char path[PATH_LENGTH];
 
 	//Get path
