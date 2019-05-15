@@ -5,14 +5,10 @@
 #include "WindowsWrapper.h"
 
 // Macros for setting, un-setting and getting bits
-#define SET_BIT(x, i) ((x)[(i) / 8] |= 1 << (i) % 8)
-#define UNSET_BIT(x, i) ((x)[(i) / 8] &= ~(1 << (i) % 8))
-#define GET_BIT(x, i) ((x)[(i) / 8] & (1 << (i) % 8))
-
-// Each flag is stored in a bit, so we can use the exact same macros for this
-#define SET_FLAG(x, i) SET_BIT(x, i)
-#define UNSET_FLAG(x, i) UNSET_BIT(x, i)
-#define GET_FLAG(x, i) GET_BIT(x, i)
+// Each flag is stored in a bit, so we can use the exact same macros for this (not defining BIT macros for conciseness)
+#define SET_FLAG(x, i) ((x)[(i) / 8] |= 1 << (i) % 8)
+#define UNSET_FLAG(x, i) ((x)[(i) / 8] &= ~(1 << (i) % 8))
+#define GET_FLAG(x, i) ((x)[(i) / 8] & (1 << (i) % 8))
 
 unsigned char gFlagNPC[1000];
 unsigned char gSkipFlag[8];
