@@ -13,7 +13,7 @@
 #include "Sound.h"
 #include "Triangle.h"
 
-//Shovel Brigade (caged)
+// Shovel Brigade (caged)
 void ActNpc260(NPCHAR *npc)
 {
 	RECT rcLeft[3] = {
@@ -75,7 +75,7 @@ void ActNpc260(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Chie (caged)
+// Chie (caged)
 void ActNpc261(NPCHAR *npc)
 {
 	RECT rcLeft[2] = {
