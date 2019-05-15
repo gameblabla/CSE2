@@ -4,10 +4,16 @@
 
 #include "WindowsWrapper.h"
 
+// Macros for setting, un-setting and getting flags
+// Each flag is stored in a bit, so we can use the exact same macros we'd use for bits
+#define SET_FLAG(x, i) ((x)[(i) / 8] |= 1 << (i) % 8)
+#define UNSET_FLAG(x, i) ((x)[(i) / 8] &= ~(1 << (i) % 8))
+#define GET_FLAG(x, i) ((x)[(i) / 8] & (1 << (i) % 8))
+
 unsigned char gFlagNPC[1000];
 unsigned char gSkipFlag[8];
 
-//Flag inits
+// Flag initializers
 void InitFlags()
 {
 	memset(gFlagNPC, 0, sizeof(gFlagNPC));
@@ -18,39 +24,39 @@ void InitSkipFlags()
 	memset(gSkipFlag, 0, sizeof(gSkipFlag));
 }
 
-//NPC flags
+// NPC flags
 void SetNPCFlag(long a)
 {
-	gFlagNPC[a / 8] |= 1 << a % 8;
+	SET_FLAG(gFlagNPC, a);
 }
 
 void CutNPCFlag(long a)
 {
-	gFlagNPC[a / 8] &= ~(1 << a % 8);
+	UNSET_FLAG(gFlagNPC, a);
 }
 
 BOOL GetNPCFlag(long a)
 {
-	if (gFlagNPC[a / 8] & (1 << a % 8))
+	if (GET_FLAG(gFlagNPC, a))
 		return TRUE;
 	else
 		return FALSE;
 }
 
-//Skip flags
+// Skip flags
 void SetSkipFlag(long a)
 {
-	gSkipFlag[a / 8] |= 1 << a % 8;
+	SET_FLAG(gSkipFlag, a);
 }
 
 void CutSkipFlag(long a)
 {
-	gSkipFlag[a / 8] &= ~(1 << a % 8);
+	UNSET_FLAG(gSkipFlag, a);
 }
 
 BOOL GetSkipFlag(long a)
 {
-	if (gSkipFlag[a / 8] & (1 << a % 8))
+	if (GET_FLAG(gSkipFlag, a))
 		return TRUE;
 	else
 		return FALSE;
