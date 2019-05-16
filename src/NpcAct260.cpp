@@ -535,7 +535,7 @@ void ActNpc265(NPCHAR *npc)
 }
 
 // Doctor red ball projectile (bouncing)
-void ActNpc266( NPCHAR *npc)
+void ActNpc266(NPCHAR *npc)
 {
 	RECT rc[2] = {
 		{304, 16, 320, 32},
