@@ -108,7 +108,7 @@ void ActNpc261(NPCHAR *npc)
 			break;
 
 		case 2:
-			if (++npc->act_wait > 12 )
+			if (++npc->act_wait > 12)
 			{
 				npc->act_no = 1;
 				npc->ani_no = 0;
@@ -128,7 +128,7 @@ void ActNpc261(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Chaco (caged)
+// Chaco (caged)
 void ActNpc262(NPCHAR *npc)
 {
 	RECT rcLeft[2] = {
@@ -181,7 +181,7 @@ void ActNpc262(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Doctor (boss)
+// Doctor (boss)
 void ActNpc263(NPCHAR *npc)
 {
 	int deg;
@@ -354,7 +354,7 @@ void ActNpc263(NPCHAR *npc)
 			break;
 
 		case 102:
-			if (++npc->act_wait > 40 )
+			if (++npc->act_wait > 40)
 			{
 				npc->act_no = 103;
 				npc->act_wait = 16;
@@ -465,7 +465,7 @@ void ActNpc263(NPCHAR *npc)
 	}
 }
 
-//Doctor red wave (projectile)
+// Doctor red wave (projectile)
 void ActNpc264(NPCHAR *npc)
 {
 	unsigned char deg;
@@ -513,7 +513,7 @@ void ActNpc264(NPCHAR *npc)
 	npc->rect = rc;
 }
 
-//Doctor red ball projectile
+// Doctor red ball projectile
 void ActNpc265(NPCHAR *npc)
 {
 	RECT rc[3] = {
@@ -534,8 +534,8 @@ void ActNpc265(NPCHAR *npc)
 		npc->rect = rc[npc->ani_no];
 }
 
-//Doctor red ball projectile (bouncing)
-void ActNpc266(NPCHAR *npc)
+// Doctor red ball projectile (bouncing)
+void ActNpc266( NPCHAR *npc)
 {
 	RECT rc[2] = {
 		{304, 16, 320, 32},
@@ -567,7 +567,7 @@ void ActNpc266(NPCHAR *npc)
 		VanishNpChar(npc);
 }
 
-//Muscle Doctor
+// Muscle Doctor
 void ActNpc267(NPCHAR *npc)
 {
 	RECT rcLeft[10] = {
@@ -724,18 +724,22 @@ void ActNpc267(NPCHAR *npc)
 					case 8:
 						npc->act_no = 20;
 						break;
+
 					case 2:
 					case 7:
 						npc->act_no = 100;
 						break;
+
 					case 3:
 					case 6:
 						npc->act_no = 30;
 						break;
+
 					case 1:
 					case 9:
 						npc->act_no = 40;
 						break;
+
 					default:
 						npc->act_no = 15;
 						npc->act_wait = 0;
@@ -830,7 +834,7 @@ void ActNpc267(NPCHAR *npc)
 				PlaySoundObject(39, 1);
 			}
 
-			if ( npc->act_wait > 90 )
+			if (npc->act_wait > 90)
 				npc->act_no = 10;
 
 			break;
@@ -957,12 +961,12 @@ void ActNpc267(NPCHAR *npc)
 				npc->tgt_x = gMC.x;
 				npc->tgt_y = gMC.y - 0x4000;
 
-				if ( npc->tgt_y < 0x8000 )
+				if (npc->tgt_y < 0x8000)
 					npc->tgt_y = 0x8000;
 
-				if ( npc->tgt_x < 0x8000 )
+				if (npc->tgt_x < 0x8000)
 					npc->tgt_x = 0x8000;
-				if ( npc->tgt_x > 0x48000 )
+				if (npc->tgt_x > 0x48000)
 					npc->tgt_x = 0x48000;
 			}
 
@@ -1128,7 +1132,7 @@ void ActNpc267(NPCHAR *npc)
 	}
 }
 
-//Igor (enemy)
+// Igor (enemy)
 void ActNpc268(NPCHAR *npc)
 {
 	unsigned char deg;
@@ -1331,7 +1335,7 @@ void ActNpc268(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Red Bat (bouncing)
+// Red Bat (bouncing)
 void ActNpc269(NPCHAR *npc)
 {
 	RECT rcLeft[3] = {
@@ -1394,7 +1398,7 @@ void ActNpc269(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Doctor's blood (or """"red energy"""")
+// Doctor's blood (or """"red energy"""")
 void ActNpc270(NPCHAR *npc)
 {
 	RECT rc[2] = {
@@ -1563,7 +1567,7 @@ void ActNpc272(NPCHAR *npc)
 	}
 }
 
-//Droll projectile
+// Droll projectile
 void ActNpc273(NPCHAR *npc)
 {
 	RECT rc[3] = {
@@ -1602,7 +1606,7 @@ void ActNpc273(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Droll
+// Droll
 void ActNpc274(NPCHAR *npc)
 {
 	RECT rcLeft[6] = {
@@ -1731,7 +1735,7 @@ void ActNpc274(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Puppy (plantation)
+// Puppy (plantation)
 void ActNpc275(NPCHAR *npc)
 {
 	RECT rcRight[4] = {
@@ -1790,7 +1794,7 @@ void ActNpc275(NPCHAR *npc)
 	npc->rect = rcRight[npc->ani_no];
 }
 
-//Red Demon
+// Red Demon
 void ActNpc276(NPCHAR *npc)
 {
 	RECT rcLeft[9] = {
@@ -1994,7 +1998,7 @@ void ActNpc276(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Red Demon projectile
+// Red Demon projectile
 void ActNpc277(NPCHAR *npc)
 {
 	RECT rc[3] = {
@@ -2033,7 +2037,7 @@ void ActNpc277(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Little family
+// Little family
 void ActNpc278(NPCHAR *npc)
 {
 	RECT rcPapa[2] = {
@@ -2100,7 +2104,7 @@ void ActNpc278(NPCHAR *npc)
 		case 11:
 			if (npc->direct == 0 && (npc->flag & 1))
 				npc->direct = 2;
-			else if ( npc->direct == 2 && npc->flag & 4 )
+			else if (npc->direct == 2 && npc->flag & 4)
 				npc->direct = 0;
 
 			if (npc->direct == 0)
@@ -2147,7 +2151,7 @@ void ActNpc278(NPCHAR *npc)
 	}
 }
 
-//Falling block (large)
+// Falling block (large)
 void ActNpc279(NPCHAR *npc)
 {
 	RECT rc[2] = {
@@ -2165,6 +2169,7 @@ void ActNpc279(NPCHAR *npc)
 					npc->bits |= 4;
 					npc->ani_no = 0;
 					break;
+
 				case 2:
 					npc->act_no = 100;
 					npc->bits |= 4;
@@ -2178,6 +2183,7 @@ void ActNpc279(NPCHAR *npc)
 					npc->hit.top = 0x1000;
 					npc->hit.bottom = 0x1000;
 					break;
+
 				case 1:
 					npc->ani_no = 0;
 					npc->act_no = 10;
