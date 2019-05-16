@@ -15,7 +15,7 @@
 #include "Sound.h"
 #include "Triangle.h"
 
-//Ballos
+// Ballos
 void ActNpc340(NPCHAR *npc)
 {
 	int i;
@@ -78,6 +78,7 @@ void ActNpc340(NPCHAR *npc)
 					case 3:
 						npc->act_no = 200;
 						break;
+
 					case 4:
 						npc->act_no = 300;
 						break;
@@ -558,7 +559,7 @@ void ActNpc340(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Ballos 1 head
+// Ballos 1 head
 void ActNpc341(NPCHAR *npc)
 {
 	RECT rc[3] = {
@@ -584,7 +585,7 @@ void ActNpc341(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Ballos 3 eye
+// Ballos 3 eye
 void ActNpc342(NPCHAR *npc)
 {
 	static int flash;
@@ -810,6 +811,7 @@ void ActNpc342(NPCHAR *npc)
 					PlaySoundObject(26, 1);
 				}
 				break;
+
 			case 1:
 				if (npc->count1 == 268)
 				{
@@ -818,6 +820,7 @@ void ActNpc342(NPCHAR *npc)
 					PlaySoundObject(26, 1);
 				}
 				break;
+
 			case 2:
 				if (npc->count1 == 396)
 				{
@@ -827,6 +830,7 @@ void ActNpc342(NPCHAR *npc)
 					PlaySoundObject(26, 1);
 				}
 				break;
+
 			case 3:
 				if (npc->count1 == 12)
 				{
@@ -855,7 +859,7 @@ void ActNpc342(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Ballos 2 cutscene
+// Ballos 2 cutscene
 void ActNpc343(NPCHAR *npc)
 {
 	RECT rc = {0, 0, 120, 120};
@@ -869,7 +873,7 @@ void ActNpc343(NPCHAR *npc)
 	npc->y = npc->pNpc->y;
 }
 
-//Ballos 2 eyes
+// Ballos 2 eyes
 void ActNpc344(NPCHAR *npc)
 {
 	RECT rc[2] = {
@@ -894,7 +898,7 @@ void ActNpc344(NPCHAR *npc)
 	npc->y = npc->pNpc->y - 0x4800;
 }
 
-//Ballos skull projectile
+// Ballos skull projectile
 void ActNpc345(NPCHAR *npc)
 {
 	int i;
@@ -940,7 +944,7 @@ void ActNpc345(NPCHAR *npc)
 		case 110:
 			npc->ym += 0x40;
 
-			if ( npc->y > (gMap.length * 0x200 * 0x10) + (2 * 0x200 * 0x10))
+			if (npc->y > (gMap.length * 0x200 * 0x10) + (2 * 0x200 * 0x10))
 			{
 				npc->cond = 0;
 				return;
@@ -963,7 +967,7 @@ void ActNpc345(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Ballos 4 orbiting platform
+// Ballos 4 orbiting platform
 void ActNpc346(NPCHAR *npc)
 {
 	unsigned char deg;
@@ -1099,7 +1103,7 @@ void ActNpc346(NPCHAR *npc)
 	npc->rect = rc;
 }
 
-//Hoppy
+// Hoppy
 void ActNpc347(NPCHAR *npc)
 {
 	switch (npc->act_no)
@@ -1186,7 +1190,7 @@ void ActNpc347(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Ballos 4 spikes
+// Ballos 4 spikes
 void ActNpc348(NPCHAR *npc)
 {
 	RECT rc[2] = {
@@ -1222,7 +1226,7 @@ void ActNpc348(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Statue
+// Statue
 void ActNpc349(NPCHAR *npc)
 {
 	RECT rect = {0, 0, 16, 16};
@@ -1240,7 +1244,7 @@ void ActNpc349(NPCHAR *npc)
 	npc->rect = rect;
 }
 
-//Flying Bute archer
+// Flying Bute archer
 void ActNpc350(NPCHAR *npc)
 {
 	RECT rcLeft[7] = {
@@ -1425,7 +1429,7 @@ void ActNpc350(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Statue (shootable)
+// Statue (shootable)
 void ActNpc351(NPCHAR *npc)
 {
 	RECT rc[9] = {
@@ -1478,19 +1482,19 @@ void ActNpc351(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Ending characters
+// Ending characters
 void ActNpc352(NPCHAR *npc)
 {
 	switch (npc->act_no)
 	{
 		case 0:
-			//Set state
+			// Set state
 			npc->act_no = 1;
 			npc->ani_no = 0;
 			npc->count1 = npc->direct / 100;
 			npc->direct %= 100;
 
-			//Set surfaces / offset
+			// Set surfaces / offset
 			switch (npc->count1)
 			{
 				case 7:
@@ -1500,6 +1504,7 @@ void ActNpc352(NPCHAR *npc)
 				case 13:
 					npc->surf = SURFACE_ID_LEVEL_SPRITESET_1;
 					break;
+
 				default:
 					break;
 			}
@@ -1512,11 +1517,12 @@ void ActNpc352(NPCHAR *npc)
 				case 12:
 					npc->view.top = 0x2000;
 					break;
+
 				default:
 					break;
 			}
 
-			//Balrog
+			// Balrog
 			if (npc->count1 == 9)
 			{
 				npc->view.back = 0x2800;
@@ -1524,10 +1530,10 @@ void ActNpc352(NPCHAR *npc)
 				npc->x -= 0x200;
 			}
 
-			//Spawn King's sword
+			// Spawn King's sword
 			if (!npc->count1)
 				SetNpChar(145, 0, 0, 0, 0, 2, npc, 0x100);
-			//Fallthrough
+			// Fallthrough
 		case 1:
 			npc->ym += 0x40;
 			if (npc->ym > 0x5FF)
@@ -1578,7 +1584,7 @@ void ActNpc352(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no + 2 * npc->count1];
 }
 
-//Bute with sword (flying)
+// Bute with sword (flying)
 void ActNpc353(NPCHAR *npc)
 {
 	RECT rc[4] = {
@@ -1608,12 +1614,15 @@ void ActNpc353(NPCHAR *npc)
 				case 0:
 					npc->xm = -0x600;
 					break;
+
 				case 2:
 					npc->xm = 0x600;
 					break;
+
 				case 1:
 					npc->ym = -0x600;
 					break;
+
 				case 3:
 					npc->ym = 0x600;
 					break;
@@ -1716,7 +1725,7 @@ void ActNpc353(NPCHAR *npc)
 	}
 }
 
-//Invisible deathtrap wall
+// Invisible deathtrap wall
 void ActNpc354(NPCHAR *npc)
 {
 	int i;
@@ -1763,7 +1772,7 @@ void ActNpc354(NPCHAR *npc)
 	}
 }
 
-//Quote and Curly on Balrog's back
+// Quote and Curly on Balrog's back
 void ActNpc355(NPCHAR *npc)
 {
 	RECT rc[4] = {
@@ -1813,7 +1822,7 @@ void ActNpc355(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Balrog rescue
+// Balrog rescue
 void ActNpc356(NPCHAR *npc)
 {
 	RECT rcRight[2] = {
@@ -1883,7 +1892,7 @@ void ActNpc356(NPCHAR *npc)
 	npc->rect = rcRight[npc->ani_no];
 }
 
-//Puppy ghost
+// Puppy ghost
 void ActNpc357(NPCHAR *npc)
 {
 	RECT rc = {224, 136, 240, 152};
@@ -1917,7 +1926,7 @@ void ActNpc357(NPCHAR *npc)
 		SetCaret(npc->x + (Random(-8, 8) * 0x200), npc->y + 0x1000, 13, 1);
 }
 
-//Misery (stood in the wind during the credits)
+// Misery (stood in the wind during the credits)
 void ActNpc358(NPCHAR *npc)
 {
 	RECT rc[5] = {
@@ -1958,7 +1967,7 @@ void ActNpc358(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Water droplet generator
+// Water droplet generator
 void ActNpc359(NPCHAR *npc)
 {
 	int x;
@@ -1970,7 +1979,7 @@ void ActNpc359(NPCHAR *npc)
 	}
 }
 
-//Thank you
+// Thank you
 void ActNpc360(NPCHAR *npc)
 {
 	RECT rc = {0, 176, 48, 184};
