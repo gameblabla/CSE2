@@ -12,7 +12,7 @@
 #include "Sound.h"
 #include "Triangle.h"
 
-//Mimiga (jailed)
+// Mimiga (jailed)
 void ActNpc240(NPCHAR *npc)
 {
 	RECT rcLeft[6] = {
@@ -117,7 +117,7 @@ void ActNpc240(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Critter (Last Cave)
+// Critter (Last Cave)
 void ActNpc241(NPCHAR *npc)
 {
 	RECT rcLeft[3] = {
@@ -150,7 +150,7 @@ void ActNpc241(NPCHAR *npc)
 			}
 			else
 			{
-				if ( npc->act_wait < 8 )
+				if (npc->act_wait < 8)
 					++npc->act_wait;
 
 				npc->ani_no = 0;
@@ -214,7 +214,7 @@ void ActNpc241(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Bat (Last Cave)
+// Bat (Last Cave)
 void ActNpc242(NPCHAR *npc)
 {
 	if (npc->x < 0 || npc->x > gMap.width * 0x10 * 0x200)
@@ -292,7 +292,7 @@ void ActNpc242(NPCHAR *npc)
 		npc->rect = rect_right[npc->ani_no];
 }
 
-//Bat generator (Last Cave)
+// Bat generator (Last Cave)
 void ActNpc243(NPCHAR *npc)
 {
 	switch (npc->act_no)
@@ -316,7 +316,7 @@ void ActNpc243(NPCHAR *npc)
 	}
 }
 
-//Lava drop
+// Lava drop
 void ActNpc244(NPCHAR *npc)
 {
 	int i;
@@ -353,7 +353,7 @@ void ActNpc244(NPCHAR *npc)
 	}
 }
 
-//Lava drop generator
+// Lava drop generator
 void ActNpc245(NPCHAR *npc)
 {
 	RECT rc[4] = {
@@ -373,7 +373,7 @@ void ActNpc245(NPCHAR *npc)
 		case 1:
 			npc->ani_no = 0;
 
-			if ( npc->act_wait )
+			if (npc->act_wait)
 			{
 				--npc->act_wait;
 				return;
@@ -409,7 +409,7 @@ void ActNpc245(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Press (proximity)
+// Press (proximity)
 void ActNpc246(NPCHAR *npc)
 {
 	RECT rcLeft[3] = {
@@ -498,7 +498,7 @@ void ActNpc246(NPCHAR *npc)
 	npc->rect = rcLeft[npc->ani_no];
 }
 
-//Misery (boss)
+// Misery (boss)
 void ActNpc247(NPCHAR *npc)
 {
 	unsigned char deg;
@@ -812,7 +812,7 @@ void ActNpc247(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Boss Misery (vanishing)
+// Boss Misery (vanishing)
 void ActNpc248(NPCHAR *npc)
 {
 	if (npc->flag & 0xFF)
@@ -847,7 +847,7 @@ void ActNpc248(NPCHAR *npc)
 	}
 }
 
-//Boss Misery energy shot
+// Boss Misery energy shot
 void ActNpc249(NPCHAR *npc)
 {
 	RECT rc[2] = {
@@ -870,7 +870,7 @@ void ActNpc249(NPCHAR *npc)
 	}
 }
 
-//Boss Misery lightning ball
+// Boss Misery lightning ball
 void ActNpc250(NPCHAR *npc)
 {
 	RECT rc[3] = {
@@ -947,7 +947,7 @@ void ActNpc250(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Boss Misery lightning
+// Boss Misery lightning
 void ActNpc251(NPCHAR *npc)
 {
 	RECT rc[2] = {
@@ -978,7 +978,7 @@ void ActNpc251(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Boss Misery bats
+// Boss Misery bats
 void ActNpc252(NPCHAR *npc)
 {
 	RECT rcLeft[4] = {
@@ -1010,7 +1010,7 @@ void ActNpc252(NPCHAR *npc)
 
 			deg = npc->count1;
 
-			if ( npc->act_wait < 192 )
+			if (npc->act_wait < 192)
 				++npc->act_wait;
 
 			npc->x = npc->pNpc->x + npc->act_wait * GetCos(deg) / 4;
@@ -1073,7 +1073,7 @@ void ActNpc252(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//EXP capsule
+// EXP capsule
 void ActNpc253(NPCHAR *npc)
 {
 	switch (npc->act_no)
@@ -1110,7 +1110,7 @@ void ActNpc253(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Helicopter
+// Helicopter
 void ActNpc254(NPCHAR *npc)
 {
 	RECT rc[2] = {
@@ -1125,15 +1125,18 @@ void ActNpc254(NPCHAR *npc)
 			SetNpChar(255, npc->x + 0x2400, npc->y - 0x7200, 0, 0, 0, npc, 0x100);
 			SetNpChar(255, npc->x - 0x4000, npc->y - 0x6800, 0, 0, 2, npc, 0x100);
 			break;
+
 		case 20:
 			npc->act_wait = 0;
 			npc->count1 = 60;
 			npc->act_no = 21;
 			break;
+
 		case 30:
 			npc->act_no = 21;
 			SetNpChar(223, npc->x - 0x1600, npc->y - 0x1C00, 0, 0, 0, 0, 0x100);
 			break;
+
 		case 40:
 			npc->act_no = 21;
 			SetNpChar(223, npc->x - 0x1200, npc->y - 0x1C00, 0, 0, 0, 0, 0x100);
@@ -1148,7 +1151,7 @@ void ActNpc254(NPCHAR *npc)
 		npc->rect = rc[1];
 }
 
-//Helicopter blades
+// Helicopter blades
 void ActNpc255(NPCHAR *npc)
 {
 	RECT rcLeft[4] = {
@@ -1214,7 +1217,7 @@ void ActNpc255(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Doctor (facing away)
+// Doctor (facing away)
 void ActNpc256(NPCHAR *npc)
 {
 	RECT rcLeft[6] = {
@@ -1226,7 +1229,7 @@ void ActNpc256(NPCHAR *npc)
 		{24, 160, 48, 192},
 	};
 
-	switch ( npc->act_no )
+	switch (npc->act_no)
 	{
 		case 0:
 			gSuperXpos = 0;
@@ -1305,7 +1308,7 @@ void ActNpc256(NPCHAR *npc)
 	npc->rect = rcLeft[npc->ani_no];
 }
 
-//Red crystal
+// Red crystal
 void ActNpc257(NPCHAR *npc)
 {
 	RECT rc[3] = {
@@ -1368,14 +1371,14 @@ void ActNpc257(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Mimiga (sleeping)
+// Mimiga (sleeping)
 void ActNpc258(NPCHAR *npc)
 {
 	RECT rc = {48, 32, 64, 48};
 	npc->rect = rc;
 }
 
-//Curly (carried and unconcious)
+// Curly (carried and unconcious)
 void ActNpc259(NPCHAR *npc)
 {
 	RECT rcLeft = {224, 96, 240, 112};

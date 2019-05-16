@@ -12,7 +12,7 @@
 #include "Sound.h"
 #include "Triangle.h"
 
-//Sue (being teleported by Misery)
+// Sue (being teleported by Misery)
 void ActNpc280(NPCHAR *npc)
 {
 	RECT rcLeft[2] = {
@@ -83,7 +83,7 @@ void ActNpc280(NPCHAR *npc)
 	}
 }
 
-//Doctor (red energy form)
+// Doctor (red energy form)
 void ActNpc281(NPCHAR *npc)
 {
 	RECT rc = {0, 0, 0, 0};
@@ -125,7 +125,7 @@ void ActNpc281(NPCHAR *npc)
 	npc->rect = rc;
 }
 
-//Mini Undead Core (active)
+// Mini Undead Core (active)
 void ActNpc282(NPCHAR *npc)
 {
 	RECT tc[3] = {
@@ -199,7 +199,7 @@ void ActNpc282(NPCHAR *npc)
 	npc->rect = tc[npc->ani_no];
 }
 
-//Misery (transformed)
+// Misery (transformed)
 void ActNpc283(NPCHAR *npc)
 {
 	RECT rcLeft[11] = {
@@ -367,7 +367,7 @@ void ActNpc283(NPCHAR *npc)
 
 			if (npc->act_wait % 6 == 1)
 			{
-				if ( npc->count2 == 289 )
+				if (npc->count2 == 289)
 				{
 					x = npc->x + (Random(-0x40, 0x40) * 0x200);
 					y = npc->y + (Random(-0x20, 0x20) * 0x200);
@@ -456,12 +456,15 @@ void ActNpc283(NPCHAR *npc)
 							case 0:
 								direct = 0xD8;
 								break;
+
 							case 1:
 								direct = 0xEC;
 								break;
+
 							case 2:
 								direct = 0x14;
 								break;
+
 							case 3:
 								direct = 0x28;
 								break;
@@ -477,12 +480,15 @@ void ActNpc283(NPCHAR *npc)
 							case 0:
 								direct = 0x58;
 								break;
+
 							case 1:
 								direct = 0x6C;
 								break;
+
 							case 2:
 								direct = 0x94;
 								break;
+
 							case 3:
 								direct = 0xA8;
 								break;
@@ -505,12 +511,15 @@ void ActNpc283(NPCHAR *npc)
 						case 0:
 							direct = 0xD8;
 							break;
+
 						case 1:
 							direct = 0xEC;
 							break;
+
 						case 2:
 							direct = 0x14;
 							break;
+
 						case 3:
 							direct = 0x28;
 							break;
@@ -526,12 +535,15 @@ void ActNpc283(NPCHAR *npc)
 						case 0:
 							direct = 0x58;
 							break;
+
 						case 1:
 							direct = 0x6C;
 							break;
+
 						case 2:
 							direct = 0x94;
 							break;
+
 						case 3:
 							direct = 0xA8;
 							break;
@@ -600,7 +612,7 @@ void ActNpc283(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Sue (transformed)
+// Sue (transformed)
 void ActNpc284(NPCHAR *npc)
 {
 	RECT rcLeft[13] = {
@@ -735,9 +747,11 @@ void ActNpc284(NPCHAR *npc)
 					case 3:
 						npc->act_no = 34;
 						break;
+
 					case 0:
 						npc->act_no = 32;
 						break;
+
 					case 2:
 						npc->act_no = 32;
 						break;
@@ -949,7 +963,7 @@ void ActNpc284(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Undead Core spiral projectile
+// Undead Core spiral projectile
 void ActNpc285(NPCHAR *npc)
 {
 	RECT rc = {232, 104, 248, 120};
@@ -996,7 +1010,7 @@ void ActNpc285(NPCHAR *npc)
 	npc->rect = rc;
 }
 
-//Undead Core spiral shot trail
+// Undead Core spiral shot trail
 void ActNpc286(NPCHAR *npc)
 {
 	RECT rc[3] = {
@@ -1017,7 +1031,7 @@ void ActNpc286(NPCHAR *npc)
 		npc->rect = rc[npc->ani_no];
 }
 
-//Orange smoke
+// Orange smoke
 void ActNpc287(NPCHAR *npc)
 {
 	RECT rcLeft[7] = {
@@ -1056,7 +1070,7 @@ void ActNpc287(NPCHAR *npc)
 		npc->rect = rcLeft[npc->ani_no];
 }
 
-//Undead Core exploding rock
+// Undead Core exploding rock
 void ActNpc288(NPCHAR *npc)
 {
 	RECT rc[5] = {
@@ -1145,7 +1159,7 @@ void ActNpc288(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Critter (orange, Misery)
+// Critter (orange, Misery)
 void ActNpc289(NPCHAR *npc)
 {
 	RECT rcLeft[3] = {
@@ -1255,7 +1269,7 @@ void ActNpc289(NPCHAR *npc)
 	}
 }
 
-//Bat (Misery)
+// Bat (Misery)
 void ActNpc290(NPCHAR *npc)
 {
 	RECT rcLeft[3] = {
@@ -1341,7 +1355,7 @@ void ActNpc290(NPCHAR *npc)
 	}
 }
 
-//Mini Undead Core (inactive)
+// Mini Undead Core (inactive)
 void ActNpc291(NPCHAR *npc)
 {
 	RECT tc[2] = {
@@ -1366,7 +1380,7 @@ void ActNpc291(NPCHAR *npc)
 	npc->rect = tc[npc->ani_no];
 }
 
-//Quake
+// Quake
 void ActNpc292(NPCHAR *npc)
 {
 	(void)npc;
@@ -1374,7 +1388,7 @@ void ActNpc292(NPCHAR *npc)
 	SetQuake(10);
 }
 
-//Undead Core giant energy shot
+// Undead Core giant energy shot
 void ActNpc293(NPCHAR *npc)
 {
 	RECT rect[2] = {
@@ -1404,7 +1418,7 @@ void ActNpc293(NPCHAR *npc)
 	npc->rect = rect[npc->ani_no];
 }
 
-//Quake + falling block generator
+// Quake + falling block generator
 void ActNpc294(NPCHAR *npc)
 {
 	int x;
@@ -1466,7 +1480,7 @@ void ActNpc294(NPCHAR *npc)
 	}
 }
 
-//Cloud
+// Cloud
 void ActNpc295(NPCHAR *npc)
 {
 	RECT rc[4] = {
@@ -1488,36 +1502,43 @@ void ActNpc295(NPCHAR *npc)
 					npc->view.back = 0xD000;
 					npc->view.front = 0xD000;
 					break;
+
 				case 1:
 					npc->ym = -0x800;
 					npc->view.back = 0x7000;
 					npc->view.front = 0x7000;
 					break;
+
 				case 2:
 					npc->ym = -0x400;
 					npc->view.back = 0x4000;
 					npc->view.front = 0x4000;
 					break;
+
 				case 3:
 					npc->ym = -0x200;
 					npc->view.back = 0x2800;
 					npc->view.front = 0x2800;
 					break;
+
 				case 4:
 					npc->xm = -0x400;
 					npc->view.back = 0xD000;
 					npc->view.front = 0xD000;
 					break;
+
 				case 5:
 					npc->xm = -0x200;
 					npc->view.back = 0x7000;
 					npc->view.front = 0x7000;
 					break;
+
 				case 6:
 					npc->xm = -0x100;
 					npc->view.back = 0x4000;
 					npc->view.front = 0x4000;
 					break;
+
 				case 7:
 					npc->xm = -0x80;
 					npc->view.back = 0x2800;
@@ -1540,7 +1561,7 @@ void ActNpc295(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Cloud generator
+// Cloud generator
 void ActNpc296(NPCHAR *npc)
 {
 	int x;
@@ -1560,12 +1581,15 @@ void ActNpc296(NPCHAR *npc)
 				case 0:
 					pri = 0x180;
 					break;
+
 				case 1:
 					pri = 0x80;
 					break;
+
 				case 2:
 					pri = 0x40;
 					break;
+
 				case 3:
 					pri = 0x00;
 					break;
@@ -1582,12 +1606,15 @@ void ActNpc296(NPCHAR *npc)
 				case 0:
 					pri = 0x80;
 					break;
+
 				case 1:
 					pri = 0x55;
 					break;
+
 				case 2:
 					pri = 0x40;
 					break;
+
 				case 3:
 					pri = 0x00;
 					break;
@@ -1600,7 +1627,7 @@ void ActNpc296(NPCHAR *npc)
 	}
 }
 
-//Sue in dragon's mouth
+// Sue in dragon's mouth
 void ActNpc297(NPCHAR *npc)
 {
 	RECT rc = {112, 48, 0x80, 64};
@@ -1611,7 +1638,7 @@ void ActNpc297(NPCHAR *npc)
 	npc->rect = rc;
 }
 
-//Doctor (opening)
+// Doctor (opening)
 void ActNpc298(NPCHAR *npc)
 {
 	RECT rc[8] = {
@@ -1676,7 +1703,7 @@ void ActNpc298(NPCHAR *npc)
 				++npc->ani_no;
 			}
 
-			if ( npc->ani_no > 5 )
+			if (npc->ani_no > 5)
 				npc->ani_no = 2;
 
 			npc->x += 0x100;
@@ -1718,7 +1745,7 @@ void ActNpc298(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Balrog/Misery (opening)
+// Balrog/Misery (opening)
 void ActNpc299(NPCHAR *npc)
 {
 	RECT rc[2] = {

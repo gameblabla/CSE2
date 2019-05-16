@@ -16,7 +16,7 @@
 #include "Sound.h"
 #include "Triangle.h"
 
-//Curly AI
+// Curly AI
 void ActNpc180(NPCHAR *npc)
 {
 	RECT rcLeft[11] = {
@@ -206,7 +206,7 @@ void ActNpc180(NPCHAR *npc)
 	int xx = npc->x - npc->tgt_x;
 	int yy = npc->y - npc->tgt_y;
 
-	if ( xx < 0 )
+	if (xx < 0)
 		xx *= -1;
 
 	if (npc->act_no == 100)
@@ -219,7 +219,7 @@ void ActNpc180(NPCHAR *npc)
 
 	if (npc->act_no == 210 || npc->act_no == 310)
 	{
-		if ( xx + 0x400 < yy )
+		if (xx + 0x400 < yy)
 			npc->ani_no = 6;
 		else
 			npc->ani_no = 1;
@@ -312,7 +312,7 @@ void ActNpc180(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Curly AI Machine Gun
+// Curly AI Machine Gun
 void ActNpc181(NPCHAR *npc)
 {
 	RECT rcLeft[2] = {
@@ -419,7 +419,7 @@ void ActNpc181(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Curly AI Polar Star
+// Curly AI Polar Star
 void ActNpc182(NPCHAR *npc)
 {
 	RECT rcLeft[2] = {
@@ -526,7 +526,7 @@ void ActNpc182(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Curly Air Tank Bubble
+// Curly Air Tank Bubble
 void ActNpc183(NPCHAR *npc)
 {
 	RECT rect[2] = {
@@ -564,7 +564,7 @@ void ActNpc183(NPCHAR *npc)
 		npc->rect.right = 0;
 }
 
-//Shutter Big
+// Shutter Big
 void ActNpc184(NPCHAR *npc)
 {
 	RECT rc[4] = {
@@ -594,12 +594,15 @@ void ActNpc184(NPCHAR *npc)
 				case 0:
 					npc->x -= 0x80;
 					break;
+
 				case 1:
 					npc->y -= 0x80;
 					break;
+
 				case 2:
 					npc->x += 0x80;
 					break;
+
 				case 3:
 					npc->y += 0x80;
 					break;
@@ -631,7 +634,7 @@ void ActNpc184(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Shutter Small
+// Shutter Small
 void ActNpc185(NPCHAR *npc)
 {
 	RECT rc = {96, 64, 112, 96};
@@ -642,30 +645,35 @@ void ActNpc185(NPCHAR *npc)
 			npc->act_no = 1;
 			npc->y += 0x1000;
 			break;
+
 		case 10:
 			npc->act_no = 11;
 			npc->ani_no = 1;
 			npc->act_wait = 0;
 			npc->bits |= npc_ignoreSolid;
-			//Fallthrough
+			// Fallthrough
 		case 11:
 			switch (npc->direct)
 			{
 				case 0:
 					npc->x -= 0x80;
 					break;
+
 				case 1:
 					npc->y -= 0x80;
 					break;
+
 				case 2:
 					npc->x += 0x80;
 					break;
+
 				case 3:
 					npc->y += 0x80;
 					break;
 			}
 			++npc->act_wait;
 			break;
+
 		case 20:
 			npc->y -= 0x3000;
 			npc->act_no = 1;
@@ -675,7 +683,7 @@ void ActNpc185(NPCHAR *npc)
 	npc->rect = rc;
 }
 
-//Lift block
+// Lift block
 void ActNpc186(NPCHAR *npc)
 {
 	RECT rc[4] = {
@@ -689,27 +697,31 @@ void ActNpc186(NPCHAR *npc)
 	{
 		case 0:
 			npc->act_no = 1;
-			//Fallthrough
+			// Fallthrough
 		case 1:
 			break;
+
 		case 10:
 			npc->act_no = 11;
 			npc->ani_no = 1;
 			npc->act_wait = 0;
 			npc->bits |= 8;
-			//Fallthrough
+			// Fallthrough
 		case 11:
 			switch (npc->direct)
 			{
 				case 0:
 					npc->x -= 0x80;
 					break;
+
 				case 1:
 					npc->y -= 0x80;
 					break;
+
 				case 2:
 					npc->x += 0x80;
 					break;
+
 				case 3:
 					npc->y += 0x80;
 					break;
@@ -730,7 +742,7 @@ void ActNpc186(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Fuzz Core
+// Fuzz Core
 void ActNpc187(NPCHAR *npc)
 {
 	int i;
@@ -805,7 +817,7 @@ void ActNpc187(NPCHAR *npc)
 		npc->rect = rect_right[npc->ani_no];
 }
 
-//Fuzz
+// Fuzz
 void ActNpc188(NPCHAR *npc)
 {
 	unsigned char deg;
@@ -889,7 +901,7 @@ void ActNpc188(NPCHAR *npc)
 		npc->rect = rect_right[npc->ani_no];
 }
 
-//Unused homing flame object (possibly related to the Core?)
+// Unused homing flame object (possibly related to the Core?)
 void ActNpc189(NPCHAR *npc)
 {
 	switch (npc->act_no)
@@ -955,7 +967,7 @@ void ActNpc189(NPCHAR *npc)
 	npc->rect = rect[npc->ani_no];
 }
 
-//Broken robot
+// Broken robot
 void ActNpc190(NPCHAR *npc)
 {
 	RECT rect[2] = {
@@ -968,12 +980,14 @@ void ActNpc190(NPCHAR *npc)
 		case 0:
 			npc->ani_no = 0;
 			break;
+
 		case 10:
 			PlaySoundObject(72, 1);
 			for (int i = 0; i < 8; i++)
 				SetNpChar(4, npc->x, npc->y + (Random(-8, 8) << 9), Random(-8, -2) << 9, Random(-3, 3) << 9, 0, 0, 0x100);
 			npc->cond = 0;
 			break;
+
 		case 20:
 			if (++npc->ani_wait > 10)
 			{
@@ -988,16 +1002,16 @@ void ActNpc190(NPCHAR *npc)
 	npc->rect = rect[npc->ani_no];
 }
 
-//Water level
+// Water level
 void ActNpc191(NPCHAR *npc)
 {
-	switch ( npc->act_no )
+	switch (npc->act_no)
 	{
 		case 0:
 			npc->act_no = 10;
 			npc->tgt_y = npc->y;
 			npc->ym = 0x200;
-			//Fallthrough
+			// Fallthrough
 		case 10:
 			if (npc->y < npc->tgt_y)
 				npc->ym += 4;
@@ -1011,10 +1025,11 @@ void ActNpc191(NPCHAR *npc)
 
 			npc->y += npc->ym;
 			break;
+
 		case 20:
 			npc->act_no = 21;
 			npc->act_wait = 0;
-			//Fallthrough
+			// Fallthrough
 		case 21:
 			if (npc->y < npc->tgt_y)
 				npc->ym += 4;
@@ -1073,10 +1088,10 @@ void ActNpc191(NPCHAR *npc)
 	npc->rect.bottom = 0;
 }
 
-//Scooter
+// Scooter
 void ActNpc192(NPCHAR *npc)
 {
-	switch ( npc->act_no )
+	switch (npc->act_no)
 	{
 		case 0:
 			npc->act_no = 1;
@@ -1176,7 +1191,7 @@ void ActNpc192(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Scooter (broken)
+// Scooter (broken)
 void ActNpc193(NPCHAR *npc)
 {
 	RECT rc = {256, 96, 320, 112};
@@ -1193,7 +1208,7 @@ void ActNpc193(NPCHAR *npc)
 	npc->rect = rc;
 }
 
-//Blue robot (broken)
+// Blue robot (broken)
 void ActNpc194(NPCHAR *npc)
 {
 	RECT rc = {192, 120, 224, 128};
@@ -1207,14 +1222,14 @@ void ActNpc194(NPCHAR *npc)
 	npc->rect = rc;
 }
 
-//Grate
+// Grate
 void ActNpc195(NPCHAR *npc)
 {
 	RECT rc = {112, 64, 128, 80};
 	npc->rect = rc;
 }
 
-//Ironhead motion wall
+// Ironhead motion wall
 void ActNpc196(NPCHAR *npc)
 {
 	RECT rcLeft = {112, 64, 144, 80};
@@ -1231,7 +1246,7 @@ void ActNpc196(NPCHAR *npc)
 		npc->rect = rcRight;
 }
 
-//Porcupine Fish
+// Porcupine Fish
 void ActNpc197(NPCHAR *npc)
 {
 	RECT rc[4] = {
@@ -1301,7 +1316,7 @@ void ActNpc197(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Ironhead projectile
+// Ironhead projectile
 void ActNpc198(NPCHAR *npc)
 {
 	RECT rcRight[3] = {
@@ -1349,7 +1364,7 @@ void ActNpc198(NPCHAR *npc)
 		PlaySoundObject(46, 1);
 }
 
-//Water/wind particles
+// Water/wind particles
 void ActNpc199(NPCHAR *npc)
 {
 	RECT rect[5] = {
@@ -1371,12 +1386,15 @@ void ActNpc199(NPCHAR *npc)
 				case 0:
 					npc->xm = -1;
 					break;
+
 				case 1:
 					npc->ym = -1;
 					break;
+
 				case 2:
 					npc->xm = 1;
 					break;
+
 				case 3:
 					npc->ym = 1;
 					break;

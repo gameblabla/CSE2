@@ -12,7 +12,7 @@
 #include "Sound.h"
 #include "Triangle.h"
 
-//Shovel Brigade
+// Shovel Brigade
 void ActNpc220(NPCHAR *npc)
 {
 	RECT rcLeft[2] = {
@@ -58,7 +58,7 @@ void ActNpc220(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Shovel Brigade (walking)
+// Shovel Brigade (walking)
 void ActNpc221(NPCHAR *npc)
 {
 	RECT rcLeft[6] = {
@@ -127,7 +127,7 @@ void ActNpc221(NPCHAR *npc)
 		case 11:
 			if (npc->direct == 0 && npc->flag & 1)
 				npc->direct = 2;
-			else if ( npc->direct == 2 && npc->flag & 4 )
+			else if (npc->direct == 2 && npc->flag & 4)
 				npc->direct = 0;
 
 			if (npc->direct == 0)
@@ -163,7 +163,7 @@ void ActNpc221(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Prison bars
+// Prison bars
 void ActNpc222(NPCHAR *npc)
 {
 	RECT rc = {96, 168, 112, 200};
@@ -177,7 +177,7 @@ void ActNpc222(NPCHAR *npc)
 	npc->rect = rc;
 }
 
-//Momorin
+// Momorin
 void ActNpc223(NPCHAR *npc)
 {
 	RECT rcLeft[3] = {
@@ -237,7 +237,7 @@ void ActNpc223(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Chie
+// Chie
 void ActNpc224(NPCHAR *npc)
 {
 	RECT rcLeft[2] = {
@@ -268,7 +268,7 @@ void ActNpc224(NPCHAR *npc)
 			break;
 
 		case 2:
-			if (++npc->act_wait > 12 )
+			if (++npc->act_wait > 12)
 			{
 				npc->act_no = 1;
 				npc->ani_no = 0;
@@ -291,7 +291,7 @@ void ActNpc224(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Megane
+// Megane
 void ActNpc225(NPCHAR *npc)
 {
 	RECT rcLeft[2] = {
@@ -322,7 +322,7 @@ void ActNpc225(NPCHAR *npc)
 			break;
 
 		case 2:
-			if (++npc->act_wait > 12 )
+			if (++npc->act_wait > 12)
 			{
 				npc->act_no = 1;
 				npc->ani_no = 0;
@@ -337,7 +337,7 @@ void ActNpc225(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Kanpachi
+// Kanpachi
 void ActNpc226(NPCHAR *npc)
 {
 	RECT rcRight[7] = {
@@ -413,14 +413,14 @@ void ActNpc226(NPCHAR *npc)
 	npc->rect = rcRight[npc->ani_no];
 }
 
-//Bucket
+// Bucket
 void ActNpc227(NPCHAR *npc)
 {
 	RECT rc = {208, 32, 224, 48};
 	npc->rect = rc;
 }
 
-//Droll (guard)
+// Droll (guard)
 void ActNpc228(NPCHAR *npc)
 {
 	RECT rcLeft[4] = {
@@ -517,7 +517,7 @@ void ActNpc228(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Red Flowers (sprouts)
+// Red Flowers (sprouts)
 void ActNpc229(NPCHAR *npc)
 {
 	RECT rc[2] = {
@@ -539,7 +539,7 @@ void ActNpc229(NPCHAR *npc)
 		npc->rect = rc[1];
 }
 
-//Red Flowers (blooming)
+// Red Flowers (blooming)
 void ActNpc230(NPCHAR *npc)
 {
 	RECT rc[2] = {
@@ -562,7 +562,7 @@ void ActNpc230(NPCHAR *npc)
 		npc->rect = rc[1];
 }
 
-//Rocket
+// Rocket
 void ActNpc231(NPCHAR *npc)
 {
 	int i;
@@ -674,7 +674,7 @@ void ActNpc231(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Orangebell
+// Orangebell
 void ActNpc232(NPCHAR *npc)
 {
 	int i;
@@ -744,7 +744,7 @@ void ActNpc232(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Orangebell bat
+// Orangebell bat
 void ActNpc233(NPCHAR *npc)
 {
 	unsigned char deg;
@@ -861,7 +861,7 @@ void ActNpc233(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Red Flowers (picked)
+// Red Flowers (picked)
 void ActNpc234(NPCHAR *npc)
 {
 	RECT rc[2] = {
@@ -883,7 +883,7 @@ void ActNpc234(NPCHAR *npc)
 		npc->rect = rc[1];
 }
 
-//Midorin
+// Midorin
 void ActNpc235(NPCHAR *npc)
 {
 	RECT rcLeft[4] = {
@@ -989,7 +989,7 @@ void ActNpc235(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Gunfish
+// Gunfish
 void ActNpc236(NPCHAR *npc)
 {
 	RECT rcLeft[6] = {
@@ -1123,7 +1123,7 @@ void ActNpc236(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Gunfish projectile
+// Gunfish projectile
 void ActNpc237(NPCHAR *npc)
 {
 	int i;
@@ -1264,7 +1264,7 @@ void ActNpc238(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Cage bars
+// Cage bars
 void ActNpc239(NPCHAR *npc)
 {
 	RECT rcLeft = {192, 48, 256, 80};
