@@ -13,7 +13,7 @@
 #include "Sound.h"
 #include "Triangle.h"
 
-//Gravekeeper
+// Gravekeeper
 void ActNpc080(NPCHAR *npc)
 {
 	RECT rcLeft[7] = {
@@ -172,7 +172,7 @@ void ActNpc080(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Giant pignon
+// Giant pignon
 void ActNpc081(NPCHAR *npc)
 {
 	RECT rcLeft[6] = {
@@ -316,7 +316,7 @@ void ActNpc081(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Misery (standing)
+// Misery (standing)
 void ActNpc082(NPCHAR *npc)
 {
 	switch (npc->act_no)
@@ -520,7 +520,7 @@ void ActNpc082(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Igor (cutscene)
+// Igor (cutscene)
 void ActNpc083(NPCHAR *npc)
 {
 	RECT rcLeft[8] = {
@@ -619,7 +619,7 @@ void ActNpc083(NPCHAR *npc)
 	}
 
 	npc->ym += 0x40;
-	if ( npc->ym > 0x5FF )
+	if (npc->ym > 0x5FF)
 		npc->ym = 0x5FF;
 
 	npc->x += npc->xm;
@@ -631,7 +631,7 @@ void ActNpc083(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Basu projectile (Egg Corridor)
+// Basu projectile (Egg Corridor)
 void ActNpc084(NPCHAR *npc)
 {
 	if (npc->flag & 0xFF)
@@ -1323,7 +1323,7 @@ void ActNpc092(NPCHAR *npc)
 	npc->rect = rcLeft[npc->ani_no];
 }
 
-//Chaco
+// Chaco
 void ActNpc093(NPCHAR *npc)
 {
 	RECT rcLeft[7] = {
@@ -1420,7 +1420,7 @@ void ActNpc093(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Kulala
+// Kulala
 void ActNpc094(NPCHAR *npc)
 {
 	RECT rect[5] = {
@@ -1569,7 +1569,7 @@ void ActNpc094(NPCHAR *npc)
 	npc->rect = rect[npc->ani_no];
 }
 
-//Jelly
+// Jelly
 void ActNpc095(NPCHAR *npc)
 {
 	RECT rcLeft[4] = {
@@ -1702,7 +1702,7 @@ void ActNpc095(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Fan (left)
+// Fan (left)
 void ActNpc096(NPCHAR *npc)
 {
 	RECT rc[3] = {
@@ -1714,7 +1714,7 @@ void ActNpc096(NPCHAR *npc)
 	switch (npc->act_no)
 	{
 		case 0:
-			if ( npc->direct == 2 )
+			if (npc->direct == 2)
 				npc->act_no = 2;
 			else
 				npc->ani_no = 1;
@@ -1752,7 +1752,7 @@ void ActNpc096(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Fan (up)
+// Fan (up)
 void ActNpc097(NPCHAR *npc)
 {
 	RECT rc[3] = {
@@ -1799,7 +1799,7 @@ void ActNpc097(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Fan (right)
+// Fan (right)
 void ActNpc098(NPCHAR *npc)
 {
 	RECT rc[3] = {
@@ -1849,7 +1849,7 @@ void ActNpc098(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Fan (down)
+// Fan (down)
 void ActNpc099(NPCHAR *npc)
 {
 	RECT rc[3] = {
