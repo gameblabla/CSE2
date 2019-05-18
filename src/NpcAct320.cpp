@@ -14,7 +14,7 @@
 #include "Sound.h"
 #include "Triangle.h"
 
-//Curly (carried, shooting)
+// Curly (carried, shooting)
 void ActNpc320(NPCHAR *npc)
 {
 	RECT rcLeft[3] = {
@@ -104,7 +104,7 @@ void ActNpc320(NPCHAR *npc)
 		npc->rect = rcLeft[npc->ani_no];
 }
 
-//Curly's Nemesis
+// Curly's Nemesis
 void ActNpc321(NPCHAR *npc)
 {
 	RECT rcLeft[3] = {
@@ -177,7 +177,7 @@ void ActNpc321(NPCHAR *npc)
 		npc->rect = rcLeft[npc->ani_no];
 }
 
-//Deleet
+// Deleet
 void ActNpc322(NPCHAR *npc)
 {
 	RECT rc[3] = {
@@ -222,18 +222,23 @@ void ActNpc322(NPCHAR *npc)
 				case 0:
 					SetNpChar(207, npc->x + 0x800, npc->y, 0, 0, 0, 0, 0x180);
 					break;
+
 				case 50:
 					SetNpChar(207, npc->x + 0x800, npc->y, 0, 0, 1, 0, 0x180);
 					break;
+
 				case 100:
 					SetNpChar(207, npc->x + 0x800, npc->y, 0, 0, 2, 0, 0x180);
 					break;
+
 				case 150:
 					SetNpChar(207, npc->x + 0x800, npc->y, 0, 0, 3, 0, 0x180);
 					break;
+
 				case 200:
 					SetNpChar(207, npc->x + 0x800, npc->y, 0, 0, 4, 0, 0x180);
 					break;
+
 				case 250:
 					npc->hit.back = 0x6000;
 					npc->hit.front = 0x6000;
@@ -265,7 +270,7 @@ void ActNpc322(NPCHAR *npc)
 	}
 }
 
-//Bute (spinning)
+// Bute (spinning)
 void ActNpc323(NPCHAR *npc)
 {
 	RECT rc[4] = {
@@ -293,12 +298,15 @@ void ActNpc323(NPCHAR *npc)
 				case 0:
 					npc->xm = -0x600;
 					break;
+
 				case 2:
 					npc->xm = 0x600;
 					break;
+
 				case 1:
 					npc->ym = -0x600;
 					break;
+
 				case 3:
 					npc->ym = 0x600;
 					break;
@@ -322,14 +330,17 @@ void ActNpc323(NPCHAR *npc)
 						if (npc->x <= gMC.x + 0x4000)
 							npc->act_no = 10;
 						break;
+
 					case 2:
 						if (npc->x >= gMC.x - 0x4000)
 							npc->act_no = 10;
 						break;
+
 					case 1:
 						if (npc->y <= gMC.y + 0x4000)
 							npc->act_no = 10;
 						break;
+
 					case 3:
 						if (npc->y >= gMC.y - 0x4000)
 							npc->act_no = 10;
@@ -354,7 +365,7 @@ void ActNpc323(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Bute generator
+// Bute generator
 void ActNpc324(NPCHAR *npc)
 {
 	switch (npc->act_no)
@@ -374,7 +385,7 @@ void ActNpc324(NPCHAR *npc)
 	}
 }
 
-//Heavy Press lightning
+// Heavy Press lightning
 void ActNpc325(NPCHAR *npc)
 {
 	RECT rc[7] = {
@@ -436,7 +447,7 @@ void ActNpc325(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Sue/Itoh becoming humans
+// Sue/Itoh becoming humans
 void ActNpc326(NPCHAR *npc)
 {
 	switch (npc->act_no)
@@ -446,7 +457,7 @@ void ActNpc326(NPCHAR *npc)
 			npc->y -= 0x1000;
 			npc->x += 0x2000;
 			npc->ani_no = 0;
-			//Fallthrough
+			// Fallthrough
 		case 1:
 			if (++npc->act_wait > 80)
 			{
@@ -540,7 +551,7 @@ void ActNpc326(NPCHAR *npc)
 			npc->act_no = 41;
 			npc->act_wait = 0;
 			npc->ani_no = 0;
-			//Fallthrough
+			// Fallthrough
 		case 41:
 			if (++npc->act_wait == 30)
 				npc->ani_no = 1;
@@ -579,7 +590,7 @@ void ActNpc326(NPCHAR *npc)
 		npc->rect = rcSu[npc->ani_no];
 }
 
-//Sneeze
+// Sneeze
 void ActNpc327(NPCHAR *npc)
 {
 	RECT rc[2] = {
@@ -624,14 +635,14 @@ void ActNpc327(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Thingy that turns Sue and Itoh into humans for 4 seconds
+// Thingy that turns Sue and Itoh into humans for 4 seconds
 void ActNpc328(NPCHAR *npc)
 {
 	RECT rc = {96, 0, 128, 48};
 	npc->rect = rc;
 }
 
-//Laboratory fan
+// Laboratory fan
 void ActNpc329(NPCHAR *npc)
 {
 	RECT rc[2] = {
@@ -645,7 +656,7 @@ void ActNpc329(NPCHAR *npc)
 		npc->rect = rc[1];
 }
 
-//Rolling
+// Rolling
 void ActNpc330(NPCHAR *npc)
 {
 	RECT rc[3] = {
@@ -728,7 +739,7 @@ void ActNpc330(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Ballos bone projectile
+// Ballos bone projectile
 void ActNpc331(NPCHAR *npc)
 {
 	RECT rc[4] = {
@@ -787,7 +798,7 @@ void ActNpc331(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Ballos shockwave
+// Ballos shockwave
 void ActNpc332(NPCHAR *npc)
 {
 	int xm;
@@ -843,7 +854,7 @@ void ActNpc332(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Ballos lightning
+// Ballos lightning
 void ActNpc333(NPCHAR *npc)
 {
 	RECT rc[2] = {
@@ -879,7 +890,7 @@ void ActNpc333(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Sweat
+// Sweat
 void ActNpc334(NPCHAR *npc)
 {
 	RECT rcLeft[2] = {
@@ -926,7 +937,7 @@ void ActNpc334(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Ikachan
+// Ikachan
 void ActNpc335(NPCHAR *npc)
 {
 	RECT rc[3] = {
@@ -982,7 +993,7 @@ void ActNpc335(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Ikachan generator
+// Ikachan generator
 void ActNpc336(NPCHAR *npc)
 {
 	int y;
@@ -996,7 +1007,7 @@ void ActNpc336(NPCHAR *npc)
 			break;
 
 		case 10:
-			if (++npc->act_wait % 4 == 1 )
+			if (++npc->act_wait % 4 == 1)
 			{
 				y = npc->y + (Random(0, 13) * 0x200 * 0x10);
 				SetNpChar(335, npc->x, y, 0, 0, 0, 0, 0);
@@ -1006,7 +1017,7 @@ void ActNpc336(NPCHAR *npc)
 	}
 }
 
-//Numhachi
+// Numhachi
 void ActNpc337(NPCHAR *npc)
 {
 	RECT rcLeft[2] = {
@@ -1048,7 +1059,7 @@ void ActNpc337(NPCHAR *npc)
 	npc->rect = rcLeft[npc->ani_no];
 }
 
-//Green Devil
+// Green Devil
 void ActNpc338(NPCHAR *npc)
 {
 	RECT rcLeft[2] = {
@@ -1115,7 +1126,7 @@ void ActNpc338(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Green Devil generator
+// Green Devil generator
 void ActNpc339(NPCHAR *npc)
 {
 	switch (npc->act_no)

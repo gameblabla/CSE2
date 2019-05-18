@@ -11,7 +11,7 @@
 #include "Sound.h"
 #include "Triangle.h"
 
-//Computer
+// Computer
 void ActNpc020(NPCHAR *npc)
 {
 	RECT rcLeft = {288, 16, 320, 40};
@@ -37,7 +37,7 @@ void ActNpc020(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Chest (open)
+// Chest (open)
 void ActNpc021(NPCHAR *npc)
 {
 	if (npc->act_no == 0)
@@ -53,7 +53,7 @@ void ActNpc021(NPCHAR *npc)
 	npc->rect = rect;
 }
 
-//Teleporter
+// Teleporter
 void ActNpc022(NPCHAR *npc)
 {
 	RECT rect[2] = {
@@ -77,7 +77,7 @@ void ActNpc022(NPCHAR *npc)
 	npc->rect = rect[npc->ani_no];
 }
 
-//Teleporter lights
+// Teleporter lights
 void ActNpc023(NPCHAR *npc)
 {
 	RECT rect[8] = {
@@ -103,7 +103,7 @@ void ActNpc023(NPCHAR *npc)
 	npc->rect = rect[npc->ani_no];
 }
 
-//Power Critter
+// Power Critter
 void ActNpc024(NPCHAR *npc)
 {
 	RECT rcLeft[6] = {
@@ -192,7 +192,7 @@ void ActNpc024(NPCHAR *npc)
 				npc->act_no = 4;
 				npc->ani_no = 3;
 				npc->act_wait = 0;
-				npc->act_wait = 0;	// lol duplicate line
+				npc->act_wait = 0;	// Pixel duplicated this line
 			}
 
 			break;
@@ -408,7 +408,7 @@ void ActNpc025(NPCHAR *npc)
 	npc->rect = rcLeft[npc->ani_no];
 }
 
-//Bat (Grasstown, flying)
+// Bat (Grasstown, flying)
 void ActNpc026(NPCHAR *npc)
 {
 	unsigned char deg;
@@ -528,7 +528,7 @@ void ActNpc026(NPCHAR *npc)
 		npc->rect = rect_right[npc->ani_no];
 }
 
-//Death trap
+// Death trap
 void ActNpc027(NPCHAR *npc)
 {
 	RECT rcLeft[1] = {96, 64, 128, 88};
@@ -536,7 +536,7 @@ void ActNpc027(NPCHAR *npc)
 	npc->rect = rcLeft[npc->ani_no];
 }
 
-//Flying Critter (Grasstown)
+// Flying Critter (Grasstown)
 void ActNpc028(NPCHAR *npc)
 {
 	RECT rcLeft[6] = {
@@ -588,7 +588,7 @@ void ActNpc028(NPCHAR *npc)
 				npc->act_wait = 0;
 			}
 
-			if ( npc->act_wait >= 8 && npc->x - 0xC000 < gMC.x && npc->x + 0xC000 > gMC.x && npc->y - 0xC000 < gMC.y && npc->y + 0x6000 > gMC.y)
+			if (npc->act_wait >= 8 && npc->x - 0xC000 < gMC.x && npc->x + 0xC000 > gMC.x && npc->y - 0xC000 < gMC.y && npc->y + 0x6000 > gMC.y)
 			{
 				npc->act_no = 2;
 				npc->ani_no = 0;
@@ -625,7 +625,7 @@ void ActNpc028(NPCHAR *npc)
 				npc->act_no = 4;
 				npc->ani_no = 3;
 				npc->act_wait = 0;
-				npc->act_wait = 0;	// lol duplicate line
+				npc->act_wait = 0;	// Pixel duplicated this line
 			}
 
 			break;
@@ -717,7 +717,7 @@ void ActNpc028(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Cthulhu
+// Cthulhu
 void ActNpc029(NPCHAR *npc)
 {
 	RECT rcLeft[2] = {
@@ -752,7 +752,7 @@ void ActNpc029(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Gunsmith
+// Gunsmith
 void ActNpc030(NPCHAR *npc)
 {
 	RECT rc[3] = {
@@ -810,7 +810,7 @@ void ActNpc030(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Bat (Grasstown, hanging)
+// Bat (Grasstown, hanging)
 void ActNpc031(NPCHAR *npc)
 {
 	RECT rcLeft[5] = {
@@ -945,7 +945,7 @@ void ActNpc031(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Life capsule
+// Life capsule
 void ActNpc032(NPCHAR *npc)
 {
 	RECT rect[2] = {
@@ -959,13 +959,13 @@ void ActNpc032(NPCHAR *npc)
 		++npc->ani_no;
 	}
 
-	if ( npc->ani_no > 1 )
+	if (npc->ani_no > 1)
 		npc->ani_no = 0;
 
 	npc->rect = rect[npc->ani_no];
 }
 
-//Balrog bouncing projectile
+// Balrog bouncing projectile
 void ActNpc033(NPCHAR *npc)
 {
 	if (npc->flag & 5)
@@ -1005,7 +1005,7 @@ void ActNpc033(NPCHAR *npc)
 	}
 }
 
-//Bed
+// Bed
 void ActNpc034(NPCHAR *npc)
 {
 	RECT rcLeft = {192, 48, 224, 64};
@@ -1017,7 +1017,7 @@ void ActNpc034(NPCHAR *npc)
 		npc->rect = rcRight;
 }
 
-//Mannan
+// Mannan
 void ActNpc035(NPCHAR *npc)
 {
 	if (npc->act_no < 3 && npc->life < 90)
@@ -1093,7 +1093,7 @@ void ActNpc035(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Balrog (hover)
+// Balrog (hover)
 void ActNpc036(NPCHAR *npc)
 {
 	unsigned char deg;
@@ -1279,7 +1279,7 @@ void ActNpc036(NPCHAR *npc)
 		npc->rect = rect_right[npc->ani_no];
 }
 
-//Signpost
+// Signpost
 void ActNpc037(NPCHAR *npc)
 {
 	RECT rect[2] = {
@@ -1299,7 +1299,7 @@ void ActNpc037(NPCHAR *npc)
 	npc->rect = rect[npc->ani_no];
 }
 
-//Fireplace
+// Fireplace
 void ActNpc038(NPCHAR *npc)
 {
 	RECT rect[4] = {
@@ -1335,7 +1335,7 @@ void ActNpc038(NPCHAR *npc)
 	}
 }
 
-//Save sign
+// Save sign
 void ActNpc039(NPCHAR *npc)
 {
 	RECT rect[2] = {

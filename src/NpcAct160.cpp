@@ -14,7 +14,7 @@
 #include "Sound.h"
 #include "Triangle.h"
 
-//Puu Black
+// Puu Black
 void ActNpc160(NPCHAR *npc)
 {
 	int i;
@@ -137,18 +137,23 @@ void ActNpc160(NPCHAR *npc)
 		case 1:
 			npc->ani_no = 3;
 			break;
+
 		case 2:
 			npc->ani_no = 3;
 			break;
+
 		case 3:
 			npc->ani_no = 2;
 			break;
+
 		case 4:
 			npc->ani_no = 0;
 			break;
+
 		case 5:
 			npc->ani_no = 3;
 			break;
+
 		case 6:
 			npc->ani_no = 3;
 			break;
@@ -174,7 +179,7 @@ void ActNpc160(NPCHAR *npc)
 		npc->rect = rect_right[npc->ani_no];
 }
 
-//Puu Black projectile
+// Puu Black projectile
 void ActNpc161(NPCHAR *npc)
 {
 	npc->exp = 0;
@@ -227,7 +232,7 @@ void ActNpc161(NPCHAR *npc)
 	npc->rect = rect[npc->ani_no];
 }
 
-//Puu Black (dead)
+// Puu Black (dead)
 void ActNpc162(NPCHAR *npc)
 {
 	int i;
@@ -316,7 +321,7 @@ void ActNpc162(NPCHAR *npc)
 	gSuperYpos = -0x7D000;
 }
 
-//Dr Gero
+// Dr Gero
 void ActNpc163(NPCHAR *npc)
 {
 	RECT rcLeft[2] = {
@@ -362,7 +367,7 @@ void ActNpc163(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Nurse Hasumi
+// Nurse Hasumi
 void ActNpc164(NPCHAR *npc)
 {
 	RECT rcLeft[2] = {
@@ -408,7 +413,7 @@ void ActNpc164(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Curly (collapsed)
+// Curly (collapsed)
 void ActNpc165(NPCHAR *npc)
 {
 	RECT rcRight[2] = {
@@ -439,7 +444,7 @@ void ActNpc165(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Chaba
+// Chaba
 void ActNpc166(NPCHAR *npc)
 {
 	RECT rcLeft[2] = {
@@ -465,7 +470,7 @@ void ActNpc166(NPCHAR *npc)
 			break;
 
 		case 2:
-			if (++npc->act_wait > 8 )
+			if (++npc->act_wait > 8)
 			{
 				npc->act_no = 1;
 				npc->ani_no = 0;
@@ -477,7 +482,7 @@ void ActNpc166(NPCHAR *npc)
 	npc->rect = rcLeft[npc->ani_no];
 }
 
-//Professor Booster (falling)
+// Professor Booster (falling)
 void ActNpc167(NPCHAR *npc)
 {
 	RECT rect[3] = {
@@ -492,6 +497,7 @@ void ActNpc167(NPCHAR *npc)
 			npc->act_no = 1;
 			npc->ani_no = 1;
 			break;
+
 		case 10:
 			npc->ani_no = 0;
 
@@ -501,6 +507,7 @@ void ActNpc167(NPCHAR *npc)
 
 			npc->y += npc->ym;
 			break;
+
 		case 20:
 			npc->act_no = 21;
 			npc->act_wait = 0;
@@ -525,7 +532,7 @@ void ActNpc167(NPCHAR *npc)
 	npc->rect = rect[npc->ani_no];
 }
 
-//Boulder
+// Boulder
 void ActNpc168(NPCHAR *npc)
 {
 	RECT rect = {264, 56, 320, 96};
@@ -579,7 +586,7 @@ void ActNpc168(NPCHAR *npc)
 	npc->rect = rect;
 }
 
-//Balrog (missile)
+// Balrog (missile)
 void ActNpc169(NPCHAR *npc)
 {
 	switch (npc->act_no)
@@ -827,7 +834,7 @@ void ActNpc169(NPCHAR *npc)
 		npc->rect = rect_right[npc->ani_no];
 }
 
-//Balrog missile
+// Balrog missile
 void ActNpc170(NPCHAR *npc)
 {
 	RECT rcLeft[2] = {
@@ -917,7 +924,7 @@ void ActNpc170(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Fire Whirrr
+// Fire Whirrr
 void ActNpc171(NPCHAR *npc)
 {
 	RECT rcLeft[2] = {
@@ -1004,7 +1011,7 @@ void ActNpc171(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Fire Whirr projectile
+// Fire Whirr projectile
 void ActNpc172(NPCHAR *npc)
 {
 	RECT rect[3] = {
@@ -1046,7 +1053,7 @@ void ActNpc172(NPCHAR *npc)
 	npc->rect = rect[npc->ani_no];
 }
 
-//Gaudi (armoured)
+// Gaudi (armoured)
 void ActNpc173(NPCHAR *npc)
 {
 	unsigned char deg;
@@ -1213,7 +1220,7 @@ void ActNpc173(NPCHAR *npc)
 	}
 }
 
-//Armoured-Gaudi projectile
+// Armoured-Gaudi projectile
 void ActNpc174(NPCHAR *npc)
 {
 	BOOL bHit;
@@ -1297,7 +1304,7 @@ void ActNpc174(NPCHAR *npc)
 	npc->rect = rect_left[npc->ani_no];
 }
 
-//Gaudi egg
+// Gaudi egg
 void ActNpc175(NPCHAR *npc)
 {
 	RECT rcLeft[2] = {
@@ -1345,7 +1352,7 @@ void ActNpc175(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//BuyoBuyo Base
+// BuyoBuyo Base
 void ActNpc176(NPCHAR *npc)
 {
 	RECT rcLeft[3] = {
@@ -1442,7 +1449,7 @@ void ActNpc176(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//BuyoBuyo
+// BuyoBuyo
 void ActNpc177(NPCHAR *npc)
 {
 	RECT rc[2] = {
@@ -1537,7 +1544,7 @@ void ActNpc177(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Core blade projectile
+// Core blade projectile
 void ActNpc178(NPCHAR *npc)
 {
 	if (npc->flag & 0xFF)
@@ -1581,7 +1588,7 @@ void ActNpc178(NPCHAR *npc)
 	}
 }
 
-//Core wisp projectile
+// Core wisp projectile
 void ActNpc179(NPCHAR *npc)
 {
 	if (npc->flag & 0xFF)

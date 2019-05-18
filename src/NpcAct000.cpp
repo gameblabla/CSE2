@@ -12,7 +12,7 @@
 #include "Sound.h"
 #include "Triangle.h"
 
-//Null
+// Null
 void ActNpc000(NPCHAR *npc)
 {
 	RECT rect = {0x00, 0x00, 0x10, 0x10};
@@ -28,40 +28,40 @@ void ActNpc000(NPCHAR *npc)
 	npc->rect = rect;
 }
 
-//Experience
+// Experience
 void ActNpc001(NPCHAR *npc)
 {
-	//In wind
+	// In wind
 	if (gBack.type == 5 || gBack.type == 6)
 	{
 		if (npc->act_no == 0)
 		{
-			//Set state
+			// Set state
 			npc->act_no = 1;
 
-			//Set random speed
+			// Set random speed
 			npc->ym = Random(-0x80, 0x80);
 			npc->xm = Random(0x7F, 0x100);
 		}
 
-		//Blow to the left
+		// Blow to the left
 		npc->xm -= 8;
 
-		//Destroy when off-screen
+		// Destroy when off-screen
 		if (npc->x < 0xA000)
 			npc->cond = 0;
 
 #ifdef FIX_BUGS
-		//Limit speed
+		// Limit speed
 		if (npc->xm < -0x600)
 			npc->xm = -0x600;
 #else
-		//Limit speed (except pixel applied it to the X position)
+		// Limit speed (except pixel applied it to the X position)
 		if (npc->x < -0x600)
 			npc->x = -0x600;
 #endif
 
-		//Bounce off walls
+		// Bounce off walls
 		if (npc->flag & 1)
 			npc->xm = 0x100;
 		if (npc->flag & 2)
@@ -69,43 +69,43 @@ void ActNpc001(NPCHAR *npc)
 		if (npc->flag & 8)
 			npc->ym = -0x40;
 	}
-	//When not in wind
+	// When not in wind
 	else
 	{
 		if (npc->act_no == 0)
 		{
-			//Set state
+			// Set state
 			npc->act_no = 1;
 			npc->ani_no = Random(0, 4);
 
-			//Random speed
+			// Random speed
 			npc->xm = Random(-0x200, 0x200);
 			npc->ym = Random(-0x400, 0);
 
-			//Random direction (reverse animation or not)
+			// Random direction (reverse animation or not)
 			if (Random(0, 1) != 0)
 				npc->direct = 0;
 			else
 				npc->direct = 2;
 		}
 
-		//Gravity
+		// Gravity
 		if (npc->flag & 0x100)
 			npc->ym += 21;
 		else
 			npc->ym += 42;
 
-		//Bounce off walls
+		// Bounce off walls
 		if (npc->flag & 1 && npc->xm < 0)
 			npc->xm *= -1;
 		if (npc->flag & 4 && npc->xm > 0)
 			npc->xm *= -1;
 
-		//Bounce off ceiling
+		// Bounce off ceiling
 		if (npc->flag & 2 && npc->ym < 0)
 			npc->ym *= -1;
 
-		//Bounce off floor
+		// Bounce off floor
 		if (npc->flag & 8)
 		{
 			PlaySoundObject(45, 1);
@@ -113,7 +113,7 @@ void ActNpc001(NPCHAR *npc)
 			npc->xm = 2 * npc->xm / 3;
 		}
 
-		//Play bounce song (and try to clip out of floor if stuck)
+		// Play bounce song (and try to clip out of floor if stuck)
 		if (npc->flag & 0xD)
 		{
 			PlaySoundObject(45, 1);
@@ -125,7 +125,7 @@ void ActNpc001(NPCHAR *npc)
 			npc->count2 = 0;
 		}
 
-		//Limit speed
+		// Limit speed
 		if (npc->xm < -0x5FF)
 			npc->xm = -0x5FF;
 		if (npc->xm > 0x5FF)
@@ -136,11 +136,11 @@ void ActNpc001(NPCHAR *npc)
 			npc->ym = 0x5FF;
 	}
 
-	//Move
+	// Move
 	npc->y += npc->ym;
 	npc->x += npc->xm;
 
-	//Get framerects
+	// Get framerects
 	RECT rect[6] = {
 		{0x00, 0x10, 0x10, 0x20},
 		{0x10, 0x10, 0x20, 0x20},
@@ -152,7 +152,7 @@ void ActNpc001(NPCHAR *npc)
 
 	RECT rcNo = {0, 0, 0, 0};
 
-	//Animate
+	// Animate
 	++npc->ani_wait;
 
 	if (npc->direct == 0)
@@ -176,7 +176,7 @@ void ActNpc001(NPCHAR *npc)
 
 	npc->rect = rect[npc->ani_no];
 
-	//Size
+	// Size
 	if (npc->act_no)
 	{
 		switch (npc->exp)
@@ -195,11 +195,11 @@ void ActNpc001(NPCHAR *npc)
 		npc->act_no = 1;
 	}
 
-	//Delete after 500 frames
+	// Delete after 500 frames
 	if (++npc->count1 > 500 && npc->ani_no == 5 && npc->ani_wait == 2)
 		npc->cond = 0;
 
-	//Blink after 400 frames
+	// Blink after 400 frames
 	if (npc->count1 > 400)
 	{
 		if (npc->count1 / 2 % 2)
@@ -207,10 +207,10 @@ void ActNpc001(NPCHAR *npc)
 	}
 }
 
-//Behemoth
+// Behemoth
 void ActNpc002(NPCHAR *npc)
 {
-	//Rects
+	// Rects
 	RECT rcLeft[7] = {
 		{32, 0, 64, 24},
 		{0, 0, 32, 24},
@@ -231,7 +231,7 @@ void ActNpc002(NPCHAR *npc)
 		{160, 24, 192, 48},
 	};
 
-	//Turn when touching a wall
+	// Turn when touching a wall
 	if (npc->flag & 1)
 		npc->direct = 2;
 	else if (npc->flag & 4)
@@ -239,7 +239,7 @@ void ActNpc002(NPCHAR *npc)
 
 	switch (npc->act_no)
 	{
-		case 0: //Walking
+		case 0: // Walking
 			if (npc->direct == 0)
 				npc->xm = -0x100;
 			else
@@ -261,7 +261,8 @@ void ActNpc002(NPCHAR *npc)
 				npc->ani_no = 4;
 			}
 			break;
-		case 1: //Shot
+
+		case 1: // Shot
 			npc->xm = 7 * npc->xm / 8;
 
 			if (++npc->count1 > 40)
@@ -281,7 +282,8 @@ void ActNpc002(NPCHAR *npc)
 				}
 			}
 			break;
-		case 2: //Charge
+
+		case 2: // Charge
 			if (npc->direct == 0)
 				npc->xm = -0x400;
 			else
@@ -310,23 +312,23 @@ void ActNpc002(NPCHAR *npc)
 			break;
 	}
 
-	//Gravity
+	// Gravity
 	npc->ym += 0x40;
 	if (npc->ym > 0x5FF)
 		npc->ym = 0x5FF;
 
-	//Move
+	// Move
 	npc->x += npc->xm;
 	npc->y += npc->ym;
 
-	//Set framerect
+	// Set framerect
 	if (npc->direct == 0)
 		npc->rect = rcLeft[npc->ani_no];
 	else
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Dead enemy (make sure damage shown doesn't teleport to a new loaded npc)
+// Dead enemy (make sure damage shown doesn't teleport to a new loaded npc)
 void ActNpc003(NPCHAR *npc)
 {
 	if (++npc->count1 > 100)
@@ -336,7 +338,7 @@ void ActNpc003(NPCHAR *npc)
 	npc->rect = rect;
 }
 
-//Smoke
+// Smoke
 void ActNpc004(NPCHAR *npc)
 {
 	RECT rcLeft[8] = {
@@ -365,7 +367,7 @@ void ActNpc004(NPCHAR *npc)
 
 	if (npc->act_no == 0)
 	{
-		//Move in random direction at random speed
+		// Move in random direction at random speed
 		if (npc->direct == 0 || npc->direct == 1)
 		{
 			deg = Random(0, 0xFF);
@@ -373,33 +375,33 @@ void ActNpc004(NPCHAR *npc)
 			npc->ym = GetSin(deg) * Random(0x200, 0x5FF) / 0x200;
 		}
 
-		//Set state
+		// Set state
 		npc->ani_no = Random(0, 4);
 		npc->ani_wait = Random(0, 3);
 		npc->act_no = 1;
 	}
 	else
 	{
-		//Slight drag
+		// Slight drag
 		npc->xm = 20 * npc->xm / 21;
 		npc->ym = 20 * npc->ym / 21;
 
-		//Move
+		// Move
 		npc->x += npc->xm;
 		npc->y += npc->ym;
 	}
 
-	//Animate
+	// Animate
 	if (++npc->ani_wait > 4)
 	{
 		npc->ani_wait = 0;
 		npc->ani_no++;
 	}
 
-	//Set framerect
+	// Set framerect
 	if (npc->ani_no > 7)
 	{
-		//Destroy if over
+		// Destroy if over
 		npc->cond = 0;
 	}
 	else
@@ -413,7 +415,7 @@ void ActNpc004(NPCHAR *npc)
 	}
 }
 
-//Critter (Green, Egg Corridor)
+// Critter (Green, Egg Corridor)
 void ActNpc005(NPCHAR *npc)
 {
 	RECT rcLeft[3] = {
@@ -430,18 +432,18 @@ void ActNpc005(NPCHAR *npc)
 
 	switch (npc->act_no)
 	{
-		case 0: //Init
+		case 0: // Initialize
 			npc->y += 0x600;
 			npc->act_no = 1;
 			// Fallthrough
-		case 1: //Waiting
-			//Look at player
+		case 1: // Waiting
+			// Look at player
 			if (npc->x > gMC.x)
 				npc->direct = 0;
 			else
 				npc->direct = 2;
 
-			//Open eyes near player
+			// Open eyes near player
 			if (npc->act_wait >= 8 && npc->x - 0xE000 < gMC.x && npc->x + 0xE000 > gMC.x && npc->y - 0xA000 < gMC.y && npc->y + 0xA000 > gMC.y)
 			{
 				npc->ani_no = 1;
@@ -454,7 +456,7 @@ void ActNpc005(NPCHAR *npc)
 				npc->ani_no = 0;
 			}
 
-			//Jump if attacked
+			// Jump if attacked
 			if (npc->shock)
 			{
 				npc->act_no = 2;
@@ -462,7 +464,7 @@ void ActNpc005(NPCHAR *npc)
 				npc->act_wait = 0;
 			}
 
-			//Jump if player is nearby
+			// Jump if player is nearby
 			if (npc->act_wait >= 8 && npc->x - 0x6000 < gMC.x && npc->x + 0x6000 > gMC.x && npc->y - 0xA000 < gMC.y && npc->y + 0x6000 > gMC.y)
 			{
 				npc->act_no = 2;
@@ -471,18 +473,18 @@ void ActNpc005(NPCHAR *npc)
 			}
 			break;
 
-		case 2: //Going to jump
+		case 2: // Going to jump
 			if (++npc->act_wait > 8)
 			{
-				//Set jump state
+				// Set jump state
 				npc->act_no = 3;
 				npc->ani_no = 2;
 
-				//Jump
+				// Jump
 				npc->ym = -0x5FF;
 				PlaySoundObject(30, 1);
 
-				//Jump in facing direction
+				// Jump in facing direction
 				if (npc->direct == 0)
 					npc->xm = -0x100;
 				else
@@ -490,8 +492,8 @@ void ActNpc005(NPCHAR *npc)
 			}
 			break;
 
-		case 3: //Jumping
-			//Land
+		case 3: // Jumping
+			// Land
 			if (npc->flag & 8)
 			{
 				npc->xm = 0;
@@ -503,23 +505,23 @@ void ActNpc005(NPCHAR *npc)
 			break;
 	}
 
-	//Gravity
+	// Gravity
 	npc->ym += 64;
 	if (npc->ym > 0x5FF)
 		npc->ym = 0x5FF;
 
-	//Move
+	// Move
 	npc->x += npc->xm;
 	npc->y += npc->ym;
 
-	//Set framerect
+	// Set framerect
 	if (npc->direct == 0)
 		npc->rect = rcLeft[npc->ani_no];
 	else
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Beetle (Goes left and right, Egg Corridor)
+// Beetle (Goes left and right, Egg Corridor)
 void ActNpc006(NPCHAR *npc)
 {
 	RECT rcLeft[5] = {
@@ -540,7 +542,7 @@ void ActNpc006(NPCHAR *npc)
 
 	switch (npc->act_no)
 	{
-		case 0: //Init
+		case 0: // Initialize
 			npc->act_no = 1;
 
 			if (npc->direct == 0)
@@ -550,18 +552,18 @@ void ActNpc006(NPCHAR *npc)
 			break;
 
 		case 1:
-			//Accelerate to the left
+			// Accelerate to the left
 			npc->xm -= 0x10;
 			if (npc->xm < -0x400)
 				npc->xm = -0x400;
 
-			//Move
+			// Move
 			if (npc->shock)
 				npc->x += npc->xm / 2;
 			else
 				npc->x += npc->xm;
 
-			//Animate
+			// Animate
 			if (++npc->ani_wait > 1)
 			{
 				npc->ani_wait = 0;
@@ -571,7 +573,7 @@ void ActNpc006(NPCHAR *npc)
 			if (npc->ani_no > 2)
 				npc->ani_no = 1;
 
-			//Stop when hitting a wall
+			// Stop when hitting a wall
 			if (npc->flag & 1)
 			{
 				npc->act_no = 2;
@@ -583,7 +585,7 @@ void ActNpc006(NPCHAR *npc)
 			break;
 
 		case 2:
-			//Wait 60 frames then move to the right
+			// Wait 60 frames then move to the right
 			if (++npc->act_wait > 60)
 			{
 				npc->act_no = 3;
@@ -593,18 +595,18 @@ void ActNpc006(NPCHAR *npc)
 			break;
 
 		case 3:
-			//Accelerate to the right
+			// Accelerate to the right
 			npc->xm += 0x10;
 			if (npc->xm > 0x400)
 				npc->xm = 0x400;
 
-			//Move
+			// Move
 			if (npc->shock)
 				npc->x += npc->xm / 2;
 			else
 				npc->x += npc->xm;
 
-			//Animate
+			// Animate
 			if (++npc->ani_wait > 1)
 			{
 				npc->ani_wait = 0;
@@ -614,7 +616,7 @@ void ActNpc006(NPCHAR *npc)
 			if (npc->ani_no > 2)
 				npc->ani_no = 1;
 
-			//Stop when hitting a wall
+			// Stop when hitting a wall
 			if (npc->flag & 4)
 			{
 				npc->act_no = 4;
@@ -626,7 +628,7 @@ void ActNpc006(NPCHAR *npc)
 			break;
 
 		case 4:
-			//Wait 60 frames then move to the left
+			// Wait 60 frames then move to the left
 			if (++npc->act_wait > 60)
 			{
 				npc->act_no = 1;
@@ -636,14 +638,14 @@ void ActNpc006(NPCHAR *npc)
 			break;
 	}
 
-	//Set framerect
+	// Set framerect
 	if (npc->direct == 0)
 		npc->rect = rcLeft[npc->ani_no];
 	else
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Basil
+// Basil
 void ActNpc007(NPCHAR *npc)
 {
 	RECT rcLeft[3] = {
@@ -726,7 +728,7 @@ void ActNpc007(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Beetle (Follows you, Egg Corridor)
+// Beetle (Follows you, Egg Corridor)
 void ActNpc008(NPCHAR *npc)
 {
 	RECT rcLeft[2] = {
@@ -829,7 +831,7 @@ void ActNpc008(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Balrog (drop-in)
+// Balrog (drop-in)
 void ActNpc009(NPCHAR *npc)
 {
 	int i;
@@ -904,7 +906,7 @@ void ActNpc009(NPCHAR *npc)
 		npc->rect = rect_right[npc->ani_no];
 }
 
-//Balrog (shooting) (super-secret version from prototype)
+// Balrog (shooting) (super-secret version from prototype)
 void ActNpc010(NPCHAR *npc)
 {
 	unsigned char deg;
@@ -1027,7 +1029,7 @@ void ActNpc010(NPCHAR *npc)
 		npc->rect = rect_right[npc->ani_no];
 }
 
-//Proto-Balrog's projectile
+// Proto-Balrog's projectile
 void ActNpc011(NPCHAR *npc)
 {
 	if (npc->flag & 0xFF)
@@ -1062,7 +1064,7 @@ void ActNpc011(NPCHAR *npc)
 	}
 }
 
-//Balrog (cutscene)
+// Balrog (cutscene)
 void ActNpc012(NPCHAR *npc)
 {
 	int i;
@@ -1395,7 +1397,7 @@ void ActNpc012(NPCHAR *npc)
 	}
 }
 
-//Forcefield
+// Forcefield
 void ActNpc013(NPCHAR *npc)
 {
 	RECT rect[4] = {
@@ -1417,7 +1419,7 @@ void ActNpc013(NPCHAR *npc)
 	npc->rect = rect[npc->ani_no];
 }
 
-//Santa's Key
+// Santa's Key
 void ActNpc014(NPCHAR *npc)
 {
 	RECT rect[3] = {
@@ -1460,7 +1462,7 @@ void ActNpc014(NPCHAR *npc)
 	npc->rect = rect[npc->ani_no];
 }
 
-//Chest (closed)
+// Chest (closed)
 void ActNpc015(NPCHAR *npc)
 {
 	RECT rcLeft[3] = {
@@ -1517,7 +1519,7 @@ void ActNpc015(NPCHAR *npc)
 	npc->rect = rcLeft[npc->ani_no];
 }
 
-//Save point
+// Save point
 void ActNpc016(NPCHAR *npc)
 {
 	RECT rect[8] = {

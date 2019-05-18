@@ -14,7 +14,7 @@
 #include "Sound.h"
 #include "Triangle.h"
 
-//Toroko (frenzied)
+// Toroko (frenzied)
 void ActNpc140(NPCHAR *npc)
 {
 	int i;
@@ -553,7 +553,7 @@ void ActNpc143(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Toroko (teleporting in)
+// Toroko (teleporting in)
 void ActNpc144(NPCHAR *npc)
 {
 	RECT rcLeft[5] = {
@@ -660,7 +660,7 @@ void ActNpc144(NPCHAR *npc)
 	}
 }
 
-//King's sword
+// King's sword
 void ActNpc145(NPCHAR *npc)
 {
 	RECT rcLeft[1] = {96, 32, 112, 48};
@@ -700,7 +700,7 @@ void ActNpc145(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Lightning
+// Lightning
 void ActNpc146(NPCHAR *npc)
 {
 	RECT rect[5] = {
@@ -750,7 +750,7 @@ void ActNpc146(NPCHAR *npc)
 	npc->rect = rect[npc->ani_no];
 }
 
-//Critter (purple)
+// Critter (purple)
 void ActNpc147(NPCHAR *npc)
 {
 	unsigned char deg;
@@ -934,7 +934,7 @@ void ActNpc147(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Purple Critter's projectile
+// Purple Critter's projectile
 void ActNpc148(NPCHAR *npc)
 {
 	if (npc->flag & 0xFF)
@@ -963,7 +963,7 @@ void ActNpc148(NPCHAR *npc)
 	}
 }
 
-//Moving block (horizontal)
+// Moving block (horizontal)
 void ActNpc149(NPCHAR *npc)
 {
 	int i;
@@ -1087,7 +1087,7 @@ void ActNpc149(NPCHAR *npc)
 	npc->rect = rect;
 }
 
-//Quote
+// Quote
 void ActNpc150(NPCHAR *npc)
 {
 	int i;
@@ -1271,7 +1271,7 @@ void ActNpc150(NPCHAR *npc)
 	}
 }
 
-//Blue robot (standing)
+// Blue robot (standing)
 void ActNpc151(NPCHAR *npc)
 {
 	RECT rcLeft[2] = {
@@ -1318,7 +1318,7 @@ void ActNpc151(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Shutter stuck
+// Shutter stuck
 void ActNpc152(NPCHAR *npc)
 {
 	RECT rc = {0, 0, 0, 0};
@@ -1384,7 +1384,7 @@ static const RECT grcKitR[21] = {
 	{96, 72, 120, 96}
 };
 
-//Gaudi
+// Gaudi
 void ActNpc153(NPCHAR *npc)
 {
 	if (npc->x > gMC.x + (WINDOW_WIDTH * 0x200) || npc->x < gMC.x - (WINDOW_WIDTH * 0x200) || npc->y > gMC.y + (WINDOW_HEIGHT * 0x200) || npc->y < gMC.y - (WINDOW_HEIGHT * 0x200))
@@ -1420,7 +1420,7 @@ void ActNpc153(NPCHAR *npc)
 			break;
 
 		case 2:
-			if ( ++npc->act_wait > 20 )
+			if (++npc->act_wait > 20)
 			{
 				npc->act_no = 1;
 				npc->ani_no = 0;
@@ -1544,7 +1544,7 @@ void ActNpc153(NPCHAR *npc)
 	}
 }
 
-//Gaudi (dead)
+// Gaudi (dead)
 void ActNpc154(NPCHAR *npc)
 {
 	switch (npc->act_no)
@@ -1607,7 +1607,7 @@ void ActNpc154(NPCHAR *npc)
 		npc->rect = grcKitR[npc->ani_no];
 }
 
-//Gaudi (flying)
+// Gaudi (flying)
 void ActNpc155(NPCHAR *npc)
 {
 	if (npc->x > gMC.x + (WINDOW_WIDTH * 0x200) || npc->x < gMC.x - (WINDOW_WIDTH * 0x200) || npc->y > gMC.y + (WINDOW_HEIGHT * 0x200) || npc->y < gMC.y - (WINDOW_HEIGHT * 0x200))
@@ -1712,7 +1712,7 @@ void ActNpc155(NPCHAR *npc)
 	}
 }
 
-//Gaudi projectile
+// Gaudi projectile
 void ActNpc156(NPCHAR *npc)
 {
 	if (npc->flag & 0xFF)
@@ -1742,7 +1742,7 @@ void ActNpc156(NPCHAR *npc)
 	}
 }
 
-//Moving block (vertical)
+// Moving block (vertical)
 void ActNpc157(NPCHAR *npc)
 {
 	int i;
@@ -1865,7 +1865,7 @@ void ActNpc157(NPCHAR *npc)
 	npc->rect = rect;
 }
 
-//Fish Missile
+// Fish Missile
 void ActNpc158(NPCHAR *npc)
 {
 	RECT rect[8] = {
@@ -1889,12 +1889,15 @@ void ActNpc158(NPCHAR *npc)
 				case 0:
 					npc->count1 = 0xA0;
 					break;
+
 				case 1:
 					npc->count1 = 0xE0;
 					break;
+
 				case 2:
 					npc->count1 = 0x20;
 					break;
+
 				case 3:
 					npc->count1 = 0x60;
 					break;
@@ -1944,7 +1947,7 @@ void ActNpc158(NPCHAR *npc)
 	npc->rect = rect[npc->ani_no];
 }
 
-//Monster X (defeated)
+// Monster X (defeated)
 void ActNpc159(NPCHAR *npc)
 {
 	RECT rect = {144, 128, 192, 200};
