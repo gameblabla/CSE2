@@ -8,14 +8,16 @@ This branch adds several enhancements including:
 * PNG support
 * Full alpha blending support
 * Fixed text blending, utilising the aforementioned alpha support
-* Externalised resource files
-* [Booster's Lab](https://github.com/taedixon/boosters-lab) support
+* All resource files moved to the data folder
+* [Booster's Lab](https://github.com/taedixon/boosters-lab) support (open 'data/mrmap.bin')
 * 60FPS
 * Widescreen
 * Vastly-improved fullscreen
-* Removal of the design choice that locks sprites to a 320x240 grid when drawn (can easily be [re-enabled](src/Draw.cpp#L540) for stylistic purposes)
+* Automatic vsync (only enabled on 60hz monitors)
+* Smooth sprite movement, through the removal of the design choice that locks sprites to a 320x240 grid when drawn (can easily be [re-enabled](src/Draw.cpp#L540) for stylistic purposes)
 * Bugfixes enabled by default
-* Support for Ogg Vorbis, FLAC, .it, .xm, .mod, .s3m, and Pxtone music/SFX formats
+* Pixtone sounds split to .pxt files
+* Support for Ogg Vorbis, FLAC, .it, .xm, .mod, .s3m, and Pxtone audio formats for music and SFX
 
 ## Dependencies
 
