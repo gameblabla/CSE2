@@ -1,8 +1,6 @@
 #include <stddef.h>
 #include <stdio.h>
-#ifdef WINDOWS
 #include <stdlib.h>
-#endif
 #include <string.h>
 
 #ifdef WINDOWS
