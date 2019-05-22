@@ -4,7 +4,7 @@ ifeq ($(RELEASE), 1)
 	FILENAME_DEF = CSE2
 else
 	CXXFLAGS = -Og -g3
-	FILENAME_DEF = CSE2d
+	FILENAME_DEF = CSE2_debug
 endif
 
 ifeq ($(JAPANESE), 1)
