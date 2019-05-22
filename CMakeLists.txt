@@ -314,9 +314,9 @@ endforeach()
 #	CXX_EXTENSIONS OFF
 #)
 
-# Name debug builds "CSE2d", to distinguish them
+# Name debug builds "CSE2_debug", to distinguish them
 set_target_properties(CSE2 PROPERTIES
-	DEBUG_OUTPUT_NAME "CSE2d"
+	DEBUG_OUTPUT_NAME "CSE2_debug"
 )
 
 # Send executable to the build_en/build_jp directory

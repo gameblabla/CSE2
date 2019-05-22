@@ -10,8 +10,8 @@ project(DoConfig LANGUAGES CXX)
 
 add_executable(DoConfig "DoConfig.cpp" "icon.rc")
 
-# Name debug builds "DoConfigd", to distinguish them
-set_target_properties(CSE2 PROPERTIES DEBUG_OUTPUT_NAME "DoConfigd")
+# Name debug builds "DoConfig_debug", to distinguish them
+set_target_properties(CSE2 PROPERTIES DEBUG_OUTPUT_NAME "DoConfig_debug")
 
 # Windows tweak
 if(WIN32)
