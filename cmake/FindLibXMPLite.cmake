@@ -5,7 +5,7 @@
 # * libxmp-lite
 
 find_path(LIBXMPLITE_INCLUDE_DIRS xmp.h PATH_SUFFIXES libxmp-lite)
-find_library(LIBXMPLITE_LIBRARIES libxmp-lite)
+find_library(LIBXMPLITE_LIBRARIES xmp-lite)
 mark_as_advanced(LIBXMPLITE_INCLUDE_DIRS LIBXMPLITE_LIBRARIES)
 
 include(FindPackageHandleStandardArgs)
