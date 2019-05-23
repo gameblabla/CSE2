@@ -26,7 +26,7 @@ This branch adds several enhancements including:
 * SDL2
 * FreeType
 * FLTK
-* libxmp-lite (only if EXTRA_SOUND_FORMATS is enabled)
+* libxmp-lite (only if PXTONE_AUDIO is enabled)
 
 ## Building
 
@@ -46,6 +46,10 @@ You can also add the following flags:
 * `-DNONPORTABLE=ON` - Enable bits of code that aren't portable, but are what the original game used
 * `-DFORCE_LOCAL_LIBS=ON` - Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones
 * `-DEXTRA_SOUND_FORMATS=ON` - Enabled by default - Enable support for more music/SFX formats, including Ogg Vorbis, FLAC, various tracker formats (.it, .xm, .mod, .s3m), and Pxtone (not to be confused with Pixtone)
+* `-DOGG_AUDIO=ON` - Enable support for Ogg Vorbis music/SFX
+* `-DFLAC_AUDIO` - Enable support for FLAC music/SFX
+* `-DTRACKER_AUDIO` - Enable support for .it, .xm, .mod, .s3m music/SFX
+* `-DPXTONE_AUDIO` - Enable support for PxTone music/SFX (not to be confused with PixTone)
 
 Then compile CSE2 with this command:
 

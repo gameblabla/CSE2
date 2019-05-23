@@ -8,7 +8,11 @@ option(JAPANESE "Enable the Japanese-language build" OFF)
 option(FIX_BUGS "Fix certain bugs (see src/Bug Fixes.txt)" ON)
 option(NONPORTABLE "Enable bits of code that aren't portable, but are what the original game used" OFF)
 option(FORCE_LOCAL_LIBS "Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones" OFF)
-option(EXTRA_SOUND_FORMATS "Enable support for more music/SFX formats, including Ogg Vorbis, FLAC, various tracker formats (.it, .xm, .mod, .s3m), and Pxtone (not to be confused with Pixtone)" ON)
+option(OGG_AUDIO "Enable support for Ogg Vorbis music/SFX" OFF)
+option(FLAC_AUDIO "Enable support for FLAC music/SFX" OFF)
+option(TRACKER_AUDIO "Enable support for .it, .xm, .mod, .s3m music/SFX" OFF)
+option(PXTONE_AUDIO "Enable support for PxTone music/SFX (not to be confused with PixTone)" OFF)
+
 
 list(APPEND CMAKE_MODULE_PATH
 	"${CMAKE_SOURCE_DIR}/cmake"
@@ -186,7 +190,7 @@ if(NONPORTABLE)
 	target_compile_definitions(CSE2 PRIVATE NONPORTABLE)
 endif()
 
-if (EXTRA_SOUND_FORMATS)
+if (OGG_AUDIO OR FLAC_AUDIO OR TRACKER_AUDIO OR PXTONE_AUDIO)
 	target_sources(CSE2 PRIVATE
 		src/ExtraSoundFormats.cpp
 		src/ExtraSoundFormats.h
@@ -197,24 +201,52 @@ if (EXTRA_SOUND_FORMATS)
 		src/audio_lib/mixer.c
 		src/audio_lib/mixer.h
 		src/audio_lib/decoders/common.h
-		src/audio_lib/decoders/dr_flac.c
-		src/audio_lib/decoders/dr_flac.h
-		src/audio_lib/decoders/libxmp-lite.c
-		src/audio_lib/decoders/libxmp-lite.h
 		src/audio_lib/decoders/memory_file.c
 		src/audio_lib/decoders/memory_file.h
 		src/audio_lib/decoders/misc_utilities.c
 		src/audio_lib/decoders/misc_utilities.h
 		src/audio_lib/decoders/predecode.c
 		src/audio_lib/decoders/predecode.h
-		src/audio_lib/decoders/pxtone.c
-		src/audio_lib/decoders/pxtone.h
 		src/audio_lib/decoders/split.c
 		src/audio_lib/decoders/split.h
+	)
+
+	target_compile_definitions(CSE2 PRIVATE EXTRA_SOUND_FORMATS)
+endif()
+
+if (OGG_AUDIO)
+	target_sources(CSE2 PRIVATE
 		src/audio_lib/decoders/stb_vorbis.c
 		src/audio_lib/decoders/stb_vorbis.h
-		src/audio_lib/decoders/libs/dr_flac.h
 		src/audio_lib/decoders/libs/stb_vorbis.h
+	)
+
+	target_compile_definitions(CSE2 PRIVATE USE_STB_VORBIS)
+endif()
+
+if (FLAC_AUDIO)
+	target_sources(CSE2 PRIVATE
+		src/audio_lib/decoders/dr_flac.c
+		src/audio_lib/decoders/dr_flac.h
+		src/audio_lib/decoders/libs/dr_flac.h
+	)
+
+	target_compile_definitions(CSE2 PRIVATE USE_DR_FLAC)
+endif()
+
+if (TRACKER_AUDIO)
+	target_sources(CSE2 PRIVATE
+		src/audio_lib/decoders/libxmp-lite.c
+		src/audio_lib/decoders/libxmp-lite.h
+	)
+
+	target_compile_definitions(CSE2 PRIVATE USE_LIBXMPLITE)
+endif()
+
+if (PXTONE_AUDIO)
+	target_sources(CSE2 PRIVATE
+		src/audio_lib/decoders/pxtone.c
+		src/audio_lib/decoders/pxtone.h
 		src/audio_lib/decoders/libs/pxtone/pxtn.h
 		src/audio_lib/decoders/libs/pxtone/pxtnDelay.cpp
 		src/audio_lib/decoders/libs/pxtone/pxtnDelay.h
@@ -260,7 +292,7 @@ if (EXTRA_SOUND_FORMATS)
 		src/audio_lib/decoders/libs/pxtone/shim.h
 	)
 
-	target_compile_definitions(CSE2 PRIVATE EXTRA_SOUND_FORMATS USE_STB_VORBIS USE_DR_FLAC USE_PXTONE USE_LIBXMPLITE)
+	target_compile_definitions(CSE2 PRIVATE USE_PXTONE)
 endif()
 
 # Make some tweaks if we're targetting Windows
@@ -386,7 +418,7 @@ else()
 	target_link_libraries(CSE2 freetype)
 endif()
 
-if (EXTRA_SOUND_FORMATS)
+if (TRACKER_AUDIO)
 	if(NOT FORCE_LOCAL_LIBS)
 		find_package(LibXMPLite)
 	endif()
