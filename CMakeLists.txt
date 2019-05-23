@@ -292,9 +292,7 @@ set_target_properties(CSE2 PROPERTIES
 )
 
 # Name debug builds "CSE2_debug", to distinguish them
-set_target_properties(CSE2 PROPERTIES
-	DEBUG_OUTPUT_NAME "CSE2_debug"
-)
+set_target_properties(CSE2 PROPERTIES DEBUG_OUTPUT_NAME "CSE2_debug")
 
 # Send executable to the build_en/build_jp directory
 set_target_properties(CSE2 PROPERTIES
@@ -368,6 +366,9 @@ endif()
 ##
 
 add_subdirectory("DoConfig")
+
+# Name debug builds "DoConfig_debug", to distinguish them
+set_target_properties(DoConfig PROPERTIES DEBUG_OUTPUT_NAME "DoConfig_debug")
 
 # Send executable to the build_en/build_jp directory
 set_target_properties(DoConfig PROPERTIES
