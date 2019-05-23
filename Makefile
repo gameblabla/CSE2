@@ -1,6 +1,5 @@
 # Defaults
 FIX_BUGS ?= 1
-EXTRA_SOUND_FORMATS ?= 1
 
 ifeq ($(RELEASE), 1)
 	CXXFLAGS = -O3 -flto
@@ -127,9 +126,53 @@ SOURCES = \
 	Triangle \
 	ValueView
 
-ifeq ($(EXTRA_SOUND_FORMATS), 1)
+ifneq (,$(filter 1,$(OGG_AUDIO)$(FLAC_AUDIO)$(TRACKER_AUDIO)$(PXTONE_AUDIO)))
 SOURCES += \
 	ExtraSoundFormats \
+	audio_lib/decoder \
+	audio_lib/miniaudio \
+	audio_lib/mixer \
+	audio_lib/decoders/memory_file \
+	audio_lib/decoders/misc_utilities \
+	audio_lib/decoders/predecode \
+	audio_lib/decoders/split
+
+DEFINES += -DEXTRA_SOUND_FORMATS
+endif
+
+ifeq ($(OGG_AUDIO), 1)
+SOURCES += \
+	audio_lib/decoders/stb_vorbis
+
+DEFINES += -DUSE_STB_VORBIS
+endif
+
+ifeq ($(FLAC_AUDIO), 1)
+SOURCES += \
+	audio_lib/decoders/dr_flac
+
+DEFINES += -DUSE_DR_FLAC
+endif
+
+ifeq ($(TRACKER_AUDIO), 1)
+SOURCES += \
+	audio_lib/decoders/libxmp-lite
+
+DEFINES += -DUSE_LIBXMPLITE
+
+CFLAGS += `pkg-config libxmp-lite --cflags`
+CXXFLAGS += `pkg-config libxmp-lite --cflags`
+
+ifeq ($(STATIC), 1)
+	LIBS += `pkg-config libxmp-lite --libs --static`
+else
+	LIBS += `pkg-config libxmp-lite --libs`
+endif
+endif
+
+ifeq ($(PXTONE_AUDIO), 1)
+SOURCES += \
+	audio_lib/decoders/pxtone \
 	audio_lib/decoders/libs/pxtone/pxtnDelay \
 	audio_lib/decoders/libs/pxtone/pxtnDescriptor \
 	audio_lib/decoders/libs/pxtone/pxtnError \
@@ -151,29 +194,9 @@ SOURCES += \
 	audio_lib/decoders/libs/pxtone/pxtnWoice_io \
 	audio_lib/decoders/libs/pxtone/pxtnWoicePTV \
 	audio_lib/decoders/libs/pxtone/pxtoneNoise \
-	audio_lib/decoders/libs/pxtone/shim \
-	audio_lib/decoders/dr_flac \
-	audio_lib/decoders/libxmp-lite \
-	audio_lib/decoders/memory_file \
-	audio_lib/decoders/misc_utilities \
-	audio_lib/decoders/predecode \
-	audio_lib/decoders/pxtone \
-	audio_lib/decoders/split \
-	audio_lib/decoders/stb_vorbis \
-	audio_lib/decoder \
-	audio_lib/miniaudio \
-	audio_lib/mixer
+	audio_lib/decoders/libs/pxtone/shim
 
-DEFINES += -DEXTRA_SOUND_FORMATS -DUSE_STB_VORBIS -DUSE_DR_FLAC -DUSE_PXTONE -DUSE_LIBXMPLITE
-
-CFLAGS += `pkg-config libxmp-lite --cflags`
-CXXFLAGS += `pkg-config libxmp-lite --cflags`
-
-ifeq ($(STATIC), 1)
-	LIBS += `pkg-config libxmp-lite --libs --static` -lfreetype
-else
-	LIBS += `pkg-config libxmp-lite --libs`
-endif
+DEFINES += -DUSE_PXTONE
 endif
 
 RESOURCES =

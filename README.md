@@ -45,11 +45,10 @@ You can also add the following flags:
 * `-DFIX_BUGS=ON` - Enabled by default - Fix bugs in the game (see [src/Bug Fixes.txt](src/Bug%20Fixes.txt))
 * `-DNONPORTABLE=ON` - Enable bits of code that aren't portable, but are what the original game used
 * `-DFORCE_LOCAL_LIBS=ON` - Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones
-* `-DEXTRA_SOUND_FORMATS=ON` - Enabled by default - Enable support for more music/SFX formats, including Ogg Vorbis, FLAC, various tracker formats (.it, .xm, .mod, .s3m), and Pxtone (not to be confused with Pixtone)
 * `-DOGG_AUDIO=ON` - Enable support for Ogg Vorbis music/SFX
-* `-DFLAC_AUDIO` - Enable support for FLAC music/SFX
-* `-DTRACKER_AUDIO` - Enable support for .it, .xm, .mod, .s3m music/SFX
-* `-DPXTONE_AUDIO` - Enable support for PxTone music/SFX (not to be confused with PixTone)
+* `-DFLAC_AUDIO=ON` - Enable support for FLAC music/SFX
+* `-DTRACKER_AUDIO=ON` - Enable support for .it, .xm, .mod, .s3m music/SFX
+* `-DPXTONE_AUDIO=ON` - Enable support for PxTone music/SFX (not to be confused with PixTone)
 
 Then compile CSE2 with this command:
 
@@ -74,7 +73,10 @@ Run 'make' in the base directory, preferably with some of the following settings
 * `WINDOWS=1` - Enable Windows-only features like a unique file/taskbar icon, and system font loading (needed for the font setting in Config.dat to do anything)
 * `RASPBERRY_PI=1` - Enable tweaks to improve performance on Raspberry Pis
 * `NONPORTABLE=1` - Enable bits of code that aren't portable, but are what the original game used
-* `EXTRA_SOUND_FORMATS=1` - Enabled by default - Enable support for more music/SFX formats, including Ogg Vorbis, FLAC, various tracker formats (.it, .xm, .mod, .s3m), and Pxtone (not to be confused with Pixtone)
+* `OGG_AUDIO=1` - Enable support for Ogg Vorbis music/SFX
+* `FLAC_AUDIO=1` - Enable support for FLAC music/SFX
+* `TRACKER_AUDIO=1` - Enable support for .it, .xm, .mod, .s3m music/SFX
+* `PXTONE_AUDIO=1` - Enable support for PxTone music/SFX (not to be confused with PixTone)
 
 ## Licensing
 
