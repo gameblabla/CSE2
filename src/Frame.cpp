@@ -130,9 +130,9 @@ void SetFramePosition(int fx, int fy)
 	if (g_GameFlags & 8)
 	{
 		// Use the original camera boundaries during the credits
-		if (gFrame.x / 0x200 < 0)
+		if (gFrame.x < 0)
 			gFrame.x = 0;
-		if (gFrame.y / 0x200 < 0)
+		if (gFrame.y < 0)
 			gFrame.y = 0;
 
 		if (gFrame.x > ((map_w - 1) * 0x10 - 320) * 0x200)
