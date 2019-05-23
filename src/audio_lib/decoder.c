@@ -57,17 +57,17 @@
 	(unsigned long(*)(void*,void*,unsigned long))Decoder_##name##_GetSamples \
 }
 
-typedef struct DecoderData
+struct DecoderData
 {
 	LinkedBackend *linked_backend;
 	void *backend_data;
-} DecoderData;
+};
 
-typedef struct Decoder
+struct Decoder
 {
 	void *backend_object;
 	DecoderData *data;
-} Decoder;
+};
 
 static const struct
 {

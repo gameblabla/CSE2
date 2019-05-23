@@ -28,18 +28,18 @@
 #include "common.h"
 #include "memory_file.h"
 
-typedef struct DecoderData_STB_Vorbis
+struct DecoderData_STB_Vorbis
 {
 	unsigned char *file_buffer;
 	size_t file_size;
-} DecoderData_STB_Vorbis;
+};
 
-typedef struct Decoder_STB_Vorbis
+struct Decoder_STB_Vorbis
 {
 	DecoderData_STB_Vorbis *data;
 	stb_vorbis *instance;
 	bool loops;
-} Decoder_STB_Vorbis;
+};
 
 DecoderData_STB_Vorbis* Decoder_STB_Vorbis_LoadData(const char *file_path, LinkedBackend *linked_backend)
 {

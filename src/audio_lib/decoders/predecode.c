@@ -10,20 +10,20 @@
 #include "common.h"
 #include "memory_file.h"
 
-typedef struct DecoderData_Predecode
+struct DecoderData_Predecode
 {
 	unsigned char *buffer;
 	size_t buffer_size;
 	unsigned int size_of_frame;
 	DecoderInfo info;
-} DecoderData_Predecode;
+};
 
-typedef struct Decoder_Predecode
+struct Decoder_Predecode
 {
 	MemoryFile *file;
 	unsigned int size_of_frame;
 	bool loop;
-} Decoder_Predecode;
+};
 
 DecoderData_Predecode* Decoder_Predecode_LoadData(const char *file_path, LinkedBackend *linked_backend)
 {

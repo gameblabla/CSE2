@@ -16,17 +16,17 @@
 #define SAMPLE_RATE 48000
 #define CHANNEL_COUNT 2
 
-typedef struct DecoderData_Pxtone
+struct DecoderData_Pxtone
 {
 	const char *file_path;
-} DecoderData_Pxtone;
+};
 
-typedef struct Decoder_Pxtone
+struct Decoder_Pxtone
 {
 	DecoderData_Pxtone *data;
 	pxtnService *pxtn;
 	bool loop;
-} Decoder_Pxtone;
+};
 
 DecoderData_Pxtone* Decoder_Pxtone_LoadData(const char *file_path, LinkedBackend *linked_backend)
 {

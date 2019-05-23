@@ -10,13 +10,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct MemoryFile
+struct MemoryFile
 {
 	unsigned char *data;
 	size_t size;
 	size_t current_offset;
 	bool free_buffer;
-} MemoryFile;
+};
 
 MemoryFile* MemoryFile_fopen_from(unsigned char *data, size_t size, bool free_buffer)
 {

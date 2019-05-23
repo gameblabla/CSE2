@@ -11,16 +11,16 @@
 
 #include "common.h"
 
-typedef struct DecoderData_Split
+struct DecoderData_Split
 {
 	bool is_split;
 
 	void *subdecoder_data[2];
 
 	const DecoderBackend *backend;
-} DecoderData_Split;
+};
 
-typedef struct Decoder_Split
+struct Decoder_Split
 {
 	DecoderData_Split *data;
 
@@ -31,7 +31,7 @@ typedef struct Decoder_Split
 	void *subdecoders[2];
 
 	unsigned int size_of_frame;
-} Decoder_Split;
+};
 
 static int LoadFiles(const char *file_path, LinkedBackend *linked_backend, void *subdecoder_data[2])
 {

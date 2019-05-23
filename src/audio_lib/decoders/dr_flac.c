@@ -23,18 +23,18 @@
 #include "common.h"
 #include "memory_file.h"
 
-typedef struct DecoderData_DR_FLAC
+struct DecoderData_DR_FLAC
 {
 	unsigned char *file_buffer;
 	size_t file_size;
-} DecoderData_DR_FLAC;
+};
 
-typedef struct Decoder_DR_FLAC
+struct Decoder_DR_FLAC
 {
 	DecoderData_DR_FLAC *data;
 	drflac *instance;
 	bool loops;
-} Decoder_DR_FLAC;
+};
 
 DecoderData_DR_FLAC* Decoder_DR_FLAC_LoadData(const char *file_path, LinkedBackend *linked_backend)
 {

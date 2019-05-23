@@ -16,18 +16,18 @@
 #define SAMPLE_RATE 48000
 #define CHANNEL_COUNT 2
 
-typedef struct DecoderData_libXMPLite
+struct DecoderData_libXMPLite
 {
 	unsigned char *file_buffer;
 	size_t file_size;
-} DecoderData_libXMPLite;
+};
 
-typedef struct Decoder_libXMPLite
+struct Decoder_libXMPLite
 {
 	DecoderData_libXMPLite *data;
 	xmp_context context;
 	bool loops;
-} Decoder_libXMPLite;
+};
 
 DecoderData_libXMPLite* Decoder_libXMPLite_LoadData(const char *file_path, LinkedBackend *linked_backend)
 {
