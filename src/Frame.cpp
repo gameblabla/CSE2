@@ -41,7 +41,7 @@ void MoveFrame3()
 		// Widescreen/tallscreen-safe behaviour
 		if (map_w * 0x10 < WINDOW_WIDTH)
 		{
-			gFrame.x = -((WINDOW_WIDTH - map_w * 0x10) * 0x200 / 2);
+			gFrame.x = -(((WINDOW_WIDTH - map_w * 0x10) * 0x200) / 2);
 		}
 		else
 		{
@@ -56,7 +56,7 @@ void MoveFrame3()
 
 		if (map_l * 0x10 < WINDOW_HEIGHT)
 		{
-			gFrame.y = -((WINDOW_HEIGHT - map_l * 0x10) * 0x200 / 2);
+			gFrame.y = -(((WINDOW_HEIGHT - map_l * 0x10) * 0x200) / 2);
 		}
 		else
 		{
@@ -148,7 +148,7 @@ void SetFramePosition(int fx, int fy)
 		// Widescreen/tallscreen-safe behaviour
 		if (map_w * 0x10 < WINDOW_WIDTH)
 		{
-			gFrame.x = -((WINDOW_WIDTH - map_w * 0x10) * 0x200 / 2);
+			gFrame.x = -(((WINDOW_WIDTH - map_w * 0x10) * 0x200) / 2);
 		}
 		else
 		{
@@ -161,7 +161,7 @@ void SetFramePosition(int fx, int fy)
 
 		if (map_l * 0x10 < WINDOW_HEIGHT)
 		{
-			gFrame.y = -((WINDOW_HEIGHT - map_l * 0x10) * 0x200 / 2);
+			gFrame.y = -(((WINDOW_HEIGHT - map_l * 0x10) * 0x200) / 2);
 		}
 		else
 		{
@@ -221,7 +221,7 @@ void SetFrameMyChar()
 		// Widescreen/tallscreen-safe behaviour
 		if (map_w * 0x10 < WINDOW_WIDTH)
 		{
-			gFrame.x = -((WINDOW_WIDTH - map_w * 0x10) * 0x200 / 2);
+			gFrame.x = -(((WINDOW_WIDTH - map_w * 0x10) * 0x200) / 2);
 		}
 		else
 		{
@@ -234,7 +234,7 @@ void SetFrameMyChar()
 
 		if (map_l * 0x10 < WINDOW_HEIGHT)
 		{
-			gFrame.y = -((WINDOW_HEIGHT - map_l * 0x10) * 0x200 / 2);
+			gFrame.y = -(((WINDOW_HEIGHT - map_l * 0x10) * 0x200) / 2);
 		}
 		else
 		{
