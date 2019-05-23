@@ -315,17 +315,7 @@ elseif(NOT WIN32)
 endif()
 
 # Magic to convert resources to header files
-add_executable(bin2h "src/misc/bin2h.c")
-
-set_target_properties(bin2h PROPERTIES
-	C_STANDARD 90
-	C_STANDARD_REQUIRED ON
-	C_EXTENSIONS OFF
-)
-
-if(MSVC)
-	target_compile_definitions(bin2h PRIVATE _CRT_SECURE_NO_WARNINGS)	# Shut up those stupid warnings
-endif()
+add_subdirectory("bin2h")
 foreach(FILENAME IN LISTS RESOURCES)
 	set(IN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/res")
 	set(OUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/Resource")
@@ -354,9 +344,7 @@ set_target_properties(CSE2 PROPERTIES
 )
 
 # Name debug builds "CSE2_debug", to distinguish them
-set_target_properties(CSE2 PROPERTIES
-	DEBUG_OUTPUT_NAME "CSE2_debug"
-)
+set_target_properties(CSE2 PROPERTIES DEBUG_OUTPUT_NAME "CSE2_debug")
 
 # Send executable to the build_en/build_jp directory
 set_target_properties(CSE2 PROPERTIES
@@ -446,6 +434,9 @@ endif()
 ##
 
 add_subdirectory("DoConfig")
+
+# Name debug builds "DoConfig_debug", to distinguish them
+set_target_properties(DoConfig PROPERTIES DEBUG_OUTPUT_NAME "DoConfig_debug")
 
 # Send executable to the build_en/build_jp directory
 set_target_properties(DoConfig PROPERTIES

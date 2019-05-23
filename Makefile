@@ -244,10 +244,10 @@ src/Resource/%.h: res/% obj/bin2h
 	@echo Converting $<
 	@obj/bin2h $< $@
 
-obj/bin2h: src/misc/bin2h.c
+obj/bin2h: bin2h/bin2h.c
 	@mkdir -p $(@D)
 	@echo Compiling $^
-	@$(CC) -O3 -s -std=c90 $^ -o $@
+	@$(CC) -O3 -s -std=c90 -Wall -Wextra -pedantic $^ -o $@
 
 include $(wildcard $(DEPENDENCIES))
 
