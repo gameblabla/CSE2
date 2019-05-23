@@ -338,6 +338,10 @@ void ChangeMusic(int no)
 			ChangeOrganyaVolume(100);
 			SetOrganyaPosition(0);
 			PlayOrganyaMusic();
+
+#ifdef EXTRA_SOUND_FORMATS
+			ExtraSound_LoadMusic(NULL, false);	// Play a null song so any current song gets pushed back to the backup slot
+#endif
 			break;
 
 #ifdef EXTRA_SOUND_FORMATS

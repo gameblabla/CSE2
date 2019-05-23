@@ -87,15 +87,21 @@ void ExtraSound_LoadMusic(const char *path, bool loop)
 	}
 
 	if (song.valid)
-	{
 		Mixer_PauseSound(song.instance);
-		previous_song = song;
-	}
 
-	song.sound = Mixer_LoadSound(path, false);
-	song.instance = Mixer_PlaySound(song.sound, loop);
-	Mixer_UnpauseSound(song.instance);
-	song.valid = true;
+	previous_song = song;
+
+	if (path)
+	{
+		song.sound = Mixer_LoadSound(path, false);
+		song.instance = Mixer_PlaySound(song.sound, loop);
+		Mixer_UnpauseSound(song.instance);
+		song.valid = true;
+	}
+	else
+	{
+		song.valid = false;
+	}
 }
 
 void ExtraSound_LoadPreviousMusic(void)
