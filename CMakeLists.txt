@@ -339,19 +339,19 @@ foreach(FILENAME IN LISTS RESOURCES)
 	target_sources(CSE2 PRIVATE "${OUT_DIR}/${FILENAME}.h")
 endforeach()
 
-# Force strict C90
-#set_target_properties(CSE2 PROPERTIES
-#	C_STANDARD 90
-#	C_STANDARD_REQUIRED ON
-#	C_EXTENSIONS OFF
-#)
+# Force strict C99
+set_target_properties(CSE2 PROPERTIES
+	C_STANDARD 99
+	C_STANDARD_REQUIRED ON
+	C_EXTENSIONS OFF
+)
 
-# Force strict C++98
-#set_target_properties(CSE2 PROPERTIES
-#	CXX_STANDARD 98
-#	CXX_STANDARD_REQUIRED ON
-#	CXX_EXTENSIONS OFF
-#)
+# Force strict C++11
+set_target_properties(CSE2 PROPERTIES
+	CXX_STANDARD 11
+	CXX_STANDARD_REQUIRED ON
+	CXX_EXTENSIONS OFF
+)
 
 # Name debug builds "CSE2_debug", to distinguish them
 set_target_properties(CSE2 PROPERTIES
