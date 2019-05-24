@@ -30,9 +30,9 @@ MUSICINFO info;
 
 int gTrackVol[MAXTRACK];
 int gOrgVolume = 100;
-bool bFadeout = false;
+BOOL bFadeout = FALSE;
 
-bool OrganyaNoteAlloc(unsigned short alloc)
+BOOL OrganyaNoteAlloc(unsigned short alloc)
 {
 	for(int j = 0; j < MAXTRACK; j++)
 	{
@@ -51,7 +51,7 @@ bool OrganyaNoteAlloc(unsigned short alloc)
 				}
 			}
 
-			return false;
+			return FALSE;
 		}
 
 		for(int i = 0; i < alloc; i++)
@@ -72,7 +72,7 @@ bool OrganyaNoteAlloc(unsigned short alloc)
 
 	//this->track = 0;
 
-	return true;
+	return FALSE;
 }
 
 void OrganyaReleaseNote()
@@ -109,7 +109,7 @@ OCTWAVE oct_wave[8] = {
 	{   8,128, 32 }, //7 Oct
 };
 
-bool MakeSoundObject8(signed char *wavep, signed char track, signed char pipi)
+BOOL MakeSoundObject8(signed char *wavep, signed char track, signed char pipi)
 {
 	for (int j = 0; j < 8; j++)
 	{
@@ -150,7 +150,7 @@ bool MakeSoundObject8(signed char *wavep, signed char track, signed char pipi)
 		}
 	}
 
-	return true;
+	return TRUE;
 }
 
 //Playing melody tracks
@@ -272,17 +272,17 @@ BOOL InitWaveData100()
 }
 
 //Create org wave
-bool MakeOrganyaWave(signed char track, signed char wave_no, signed char pipi)
+BOOL MakeOrganyaWave(signed char track, signed char wave_no, signed char pipi)
 {
 	if(wave_no > 99)
 	{
 		printf("WARNING: track %d has out-of-range wave_no %d\n", track, wave_no);
-		return false;
+		return FALSE;
 	}
 
 	ReleaseOrganyaObject(track);
 	MakeSoundObject8(wave_data[wave_no], track, pipi);
-	return true;
+	return TRUE;
 }
 
 //Dram
@@ -525,14 +525,14 @@ void LoadOrganya(const char *name)
 	SetPlayPointer(0);
 
 	//Set as loaded
-	info.loaded = true;
+	info.loaded = TRUE;
 }
 
 void SetOrganyaPosition(unsigned int x)
 {
 	SetPlayPointer(x);
 	gOrgVolume = 100;
-	bFadeout = false;
+	bFadeout = FALSE;
 }
 
 unsigned int GetOrganyaPosition()
@@ -546,15 +546,15 @@ void PlayOrganyaMusic()
 	OrganyaStartTimer(info.wait);
 }
 
-bool ChangeOrganyaVolume(signed int volume)
+BOOL ChangeOrganyaVolume(signed int volume)
 {
 	if (volume >= 0 && volume <= 100)
 	{
 		gOrgVolume = volume;
-		return true;
+		return TRUE;
 	}
 
-	return false;
+	return FALSE;
 }
 
 void StopOrganyaMusic()
@@ -573,12 +573,12 @@ void StopOrganyaMusic()
 
 void SetOrganyaFadeout()
 {
-	bFadeout = true;
+	bFadeout = TRUE;
 }
 
 //Org timer
 SDL_Thread *OrganyaTimer = NULL;
-bool bEndTimer = false;
+BOOL bEndTimer = FALSE;
 
 int OrganyaPlayTimer(void *ptr)
 {
@@ -587,7 +587,7 @@ int OrganyaPlayTimer(void *ptr)
 	//Set time for next step to play
 	Uint32 NextTick = SDL_GetTicks() + info.wait;
 
-	while (bEndTimer == false)
+	while (bEndTimer == FALSE)
 	{
 		if (info.loaded)
 		{
@@ -615,13 +615,13 @@ int OrganyaPlayTimer(void *ptr)
 void OrganyaStartTimer(unsigned int wait)
 {
 	OrganyaEndTimer();
-	bEndTimer = false;
+	bEndTimer = FALSE;
 	OrganyaTimer = SDL_CreateThread(OrganyaPlayTimer, "OrganyaPlayTimer", (void*)NULL);
 }
 
 void OrganyaEndTimer()
 {
-	bEndTimer = true; //Tell thread to end
+	bEndTimer = TRUE; //Tell thread to end
 	SDL_WaitThread(OrganyaTimer, NULL); //Wait for thread to end
 	OrganyaTimer = NULL;
 }

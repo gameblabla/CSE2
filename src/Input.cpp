@@ -26,7 +26,7 @@ void ReleaseDirectInput()
 	}
 }
 
-bool InitDirectInput()
+BOOL InitDirectInput()
 {
 	// Open first available joystick
 	SDL_InitSubSystem(SDL_INIT_JOYSTICK);
@@ -40,10 +40,10 @@ bool InitDirectInput()
 			break;
 	}
 
-	return true;
+	return TRUE;
 }
 
-bool GetJoystickStatus(JOYSTICK_STATUS *pStatus)
+BOOL GetJoystickStatus(JOYSTICK_STATUS *pStatus)
 {
 	// Clear status
 	memset(pStatus, 0, sizeof(JOYSTICK_STATUS));
@@ -64,13 +64,13 @@ bool GetJoystickStatus(JOYSTICK_STATUS *pStatus)
 		for (int button = 0; button < numButtons; button++)
 			pStatus->bButton[button] = SDL_JoystickGetButton(joystick, button) != 0;
 
-		return true;
+		return TRUE;
 	}
 
-	return false;
+	return FALSE;
 }
 
-bool ResetJoystickStatus()
+BOOL ResetJoystickStatus()
 {
-	return true;
+	return TRUE;
 }

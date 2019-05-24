@@ -33,10 +33,10 @@ char gDataPath[PATH_LENGTH];
 int gJoystickButtonTable[8];
 
 int ghWnd;	// Placeholder until we restore the WinAPI code
-bool gbUseJoystick = false;
-bool bFps = false;
+BOOL gbUseJoystick = FALSE;
+BOOL bFps = FALSE;
 
-bool bActive = true;
+BOOL bActive = TRUE;
 
 #ifdef JAPANESE
 const char *lpWindowName = "洞窟物語エンジン2";
@@ -68,7 +68,7 @@ void PutFramePerSecound()
 int GetFramePerSecound()
 {
 	unsigned int current_tick;
-	static bool need_new_base_tick = true;
+	static BOOL need_new_base_tick = TRUE;
 	static int frames_this_second;
 	static int current_frame;
 	static int base_tick;
@@ -76,7 +76,7 @@ int GetFramePerSecound()
 	if (need_new_base_tick)
 	{
 		base_tick = SDL_GetTicks();
-		need_new_base_tick = false;
+		need_new_base_tick = FALSE;
 	}
 
 	current_tick = SDL_GetTicks();
@@ -299,7 +299,7 @@ int main(int argc, char *argv[])
 
 					StartDirectDraw(2, colourDepth);
 
-					fullscreen = true;
+					fullscreen = TRUE;
 					SDL_ShowCursor(0);
 					break;
 				}
@@ -313,7 +313,7 @@ int main(int argc, char *argv[])
 		{
 			// Check debug things
 			if (CheckFileExists("fps"))
-				bFps = true;
+				bFps = TRUE;
 
 #ifndef WINDOWS
 			// Load icon
@@ -359,7 +359,7 @@ int main(int argc, char *argv[])
 				if (config.bJoystick && InitDirectInput())
 				{
 					ResetJoystickStatus();
-					gbUseJoystick = true;
+					gbUseJoystick = TRUE;
 				}
 
 				// Initialize stuff
@@ -390,7 +390,7 @@ void InactiveWindow()
 {
 	if (bActive)
 	{
-		bActive = false;
+		bActive = FALSE;
 		StopOrganyaMusic();
 		SleepNoise();
 	}
@@ -402,7 +402,7 @@ void ActiveWindow()
 {
 	if (!bActive)
 	{
-		bActive = true;
+		bActive = TRUE;
 		StopOrganyaMusic();
 		PlayOrganyaMusic();
 		ResetNoise();
@@ -446,10 +446,10 @@ void JoystickProc()
 		gKey &= ~key; \
 	break;
 
-bool SystemTask()
+BOOL SystemTask()
 {
 	// Handle window events
-	bool focusGained = true;
+	BOOL focusGained = TRUE;
 
 	while (SDL_PollEvent(NULL) || !focusGained)
 	{
@@ -459,19 +459,19 @@ bool SystemTask()
 		switch (event.type)
 		{
 			case SDL_QUIT:
-				return false;
+				return FALSE;
 				break;
 
 			case SDL_WINDOWEVENT:
 				switch (event.window.event)
 				{
 					case SDL_WINDOWEVENT_FOCUS_GAINED:
-						focusGained = true;
+						focusGained = TRUE;
 						ActiveWindow();
 						break;
 
 					case SDL_WINDOWEVENT_FOCUS_LOST:
-						focusGained = false;
+						focusGained = FALSE;
 						InactiveWindow();
 						break;
 
@@ -552,7 +552,7 @@ bool SystemTask()
 						DO_KEY_PRESS(KEY_PLUS)
 
 					case SDL_SCANCODE_F5:
-						gbUseJoystick = false;
+						gbUseJoystick = FALSE;
 						break;
 
 					default:
@@ -621,7 +621,7 @@ bool SystemTask()
 						DO_KEY_PRESS(KEY_PLUS)
 
 					case SDLK_F5:
-						gbUseJoystick = false;
+						gbUseJoystick = FALSE;
 						break;
 				}
 				break;
@@ -633,5 +633,5 @@ bool SystemTask()
 	if (gbUseJoystick)
 		JoystickProc();
 
-	return true;
+	return TRUE;
 }

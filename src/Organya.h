@@ -1,5 +1,7 @@
 #pragma once
 
+#include "WindowsWrapper.h"
+
 //Below are Organya song data structures
 struct NOTELIST {
 	NOTELIST *from; //Previous address
@@ -26,8 +28,8 @@ struct TRACKDATA {
 //Unique information held in songs
 struct MUSICINFO {
 	unsigned short wait;
-	bool loaded;
-	bool playing;
+	BOOL loaded;
+	BOOL playing;
 	unsigned char line; //Number of lines in one measure
 	unsigned char dot; //Number of dots per line
 	unsigned short alloc_note; //Number of allocated notes
@@ -36,14 +38,14 @@ struct MUSICINFO {
 	TRACKDATA tdata[16];
 };
 
-bool MakeOrganyaWave(signed char track, signed char wave_no, signed char pipi);
+BOOL MakeOrganyaWave(signed char track, signed char wave_no, signed char pipi);
 void OrganyaPlayData();
 void SetPlayPointer(long x);
 void LoadOrganya(const char *name);
 void SetOrganyaPosition(unsigned int x);
 unsigned int GetOrganyaPosition();
 void PlayOrganyaMusic();
-bool ChangeOrganyaVolume(signed int volume);
+BOOL ChangeOrganyaVolume(signed int volume);
 void StopOrganyaMusic();
 void SetOrganyaFadeout();
 void OrganyaStartTimer(unsigned int wait);

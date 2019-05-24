@@ -8,6 +8,8 @@
 
 #include <SDL.h>
 
+#include "WindowsWrapper.h"
+
 #include "Organya.h"
 #include "PixTone.h"
 
@@ -219,7 +221,7 @@ void AudioCallback(void *userdata, Uint8 *stream, int len)
 //Sound things
 SOUNDBUFFER* lpSECONDARYBUFFER[SOUND_NO];
 
-bool InitDirectSound()
+BOOL InitDirectSound()
 {
 	//Init sound
 	SDL_InitSubSystem(SDL_INIT_AUDIO);
@@ -240,7 +242,7 @@ bool InitDirectSound()
 	if (audioDevice == 0)
 	{
 		printf("Failed to open audio device\nSDL Error: %s\n", SDL_GetError());
-		return false;
+		return FALSE;
 	}
 
 	//Unpause audio device
@@ -248,7 +250,7 @@ bool InitDirectSound()
 
 	//Start organya
 	StartOrganya();
-	return true;
+	return TRUE;
 }
 
 void EndDirectSound()

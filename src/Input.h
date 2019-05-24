@@ -1,18 +1,20 @@
 #pragma once
 
-extern bool gbUseJoystick;
+#include "WindowsWrapper.h"
+
+extern BOOL gbUseJoystick;
 extern int gJoystickButtonTable[8];
 
 struct JOYSTICK_STATUS
 {
-	bool bLeft;
-	bool bRight;
-	bool bUp;
-	bool bDown;
-	bool bButton[32];
+	BOOL bLeft;
+	BOOL bRight;
+	BOOL bUp;
+	BOOL bDown;
+	BOOL bButton[32];
 };
 
 void ReleaseDirectInput();
-bool InitDirectInput();
-bool GetJoystickStatus(JOYSTICK_STATUS *pStatus);
-bool ResetJoystickStatus();
+BOOL InitDirectInput();
+BOOL GetJoystickStatus(JOYSTICK_STATUS *pStatus);
+BOOL ResetJoystickStatus();

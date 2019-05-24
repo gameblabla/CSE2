@@ -11,6 +11,8 @@
 #include FT_LCD_FILTER_H
 #include FT_BITMAP_H
 
+#include "WindowsWrapper.h"
+
 #include "File.h"
 
 // Uncomment for that authentic pre-Windows Vista feel
@@ -39,7 +41,7 @@ typedef struct FontObject
 	FT_Face face;
 	unsigned char *data;
 #ifndef DISABLE_FONT_ANTIALIASING
-	bool lcd_mode;
+	BOOL lcd_mode;
 #endif
 	CachedGlyph *glyph_list_head;
 } FontObject;
