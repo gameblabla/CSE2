@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 
 		filename_pointer = (last_path_seperator == NULL) ? argv[1] : last_path_seperator + 1;
 		dot = strchr(filename_pointer, '.');
-		filename_length = (dot == NULL) ? strlen(filename_pointer) : dot - filename_pointer;
+		filename_length = (dot == NULL) ? strlen(filename_pointer) : (size_t)(dot - filename_pointer);
 
 		filename = malloc(filename_length + 1);
 		memcpy(filename, filename_pointer, filename_length);
