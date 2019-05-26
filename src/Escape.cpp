@@ -7,43 +7,43 @@
 #include "KeyControl.h"
 #include "Main.h"
 
-int Call_Escape()
+int Call_Escape(int hWnd)
 {
 	RECT rc = {0, 128, 208, 144};
-	
+
 	while (1)
 	{
-		//Get pressed keys
+		// Get pressed keys
 		GetTrg();
-		
-		if (gKeyTrg & KEY_ESCAPE) //Escape is pressed, quit game
+
+		if (gKeyTrg & KEY_ESCAPE) // Escape is pressed, quit game
 		{
 			gKeyTrg = 0;
 			return 0;
 		}
-		if (gKeyTrg & KEY_F1) //F1 is pressed, continue
+		if (gKeyTrg & KEY_F1) // F1 is pressed, continue
 		{
 			gKeyTrg = 0;
 			return 1;
 		}
-		if (gKeyTrg & KEY_F2) //F2 is pressed, reset
+		if (gKeyTrg & KEY_F2) // F2 is pressed, reset
 		{
 			gKeyTrg = 0;
 			return 2;
 		}
-		
-		//Draw screen
+
+		// Draw screen
 		CortBox(&grcFull, 0x000000);
 		PutBitmap3(&grcFull, (WINDOW_WIDTH - 208) / 2, (WINDOW_HEIGHT - 16) / 2, &rc, SURFACE_ID_TEXT_BOX);
 		PutFramePerSecound();
 
-		if (!Flip_SystemTask())
+		if (!Flip_SystemTask(hWnd))
 		{
-			//Quit if window is closed
+			// Quit if window is closed
 			gKeyTrg = 0;
 			return 0;
 		}
 	}
-	
+
 	return 0;
 }

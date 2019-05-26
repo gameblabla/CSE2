@@ -1,9 +1,10 @@
 #include "Profile.h"
 
 #include <stddef.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+
+#include "SDL.h"
 
 #include "WindowsWrapper.h"
 
@@ -27,40 +28,41 @@
 const char *gDefaultName = "Profile.dat";
 const char *gProfileCode = "Do041220";
 
-bool IsProfile()
+BOOL IsProfile()
 {
 	char path[PATH_LENGTH];
 	sprintf(path, "%s/%s", gModulePath, gDefaultName);
-	
+
 	FILE *fp = fopen(path, "rb");
 	if (fp == NULL)
-		return false;
-	
+		return FALSE;
+
 	fclose(fp);
-	return true;
+	return TRUE;
 }
 
-bool SaveProfile(char *name)
+BOOL SaveProfile(const char *name)
 {
-	//Get path
+	PROFILE profile;
+	FILE *fp;
+	const char *FLAG = "FLAG";
 	char path[PATH_LENGTH];
-	
+
+	//Get path
 	if (name)
 		sprintf(path, "%s/%s", gModulePath, name);
 	else
 		sprintf(path, "%s/%s", gModulePath, gDefaultName);
-	
+
 	//Open file
-	PROFILE profile;
-	
-	FILE *fp = fopen(path, "wb");
+	fp = fopen(path, "wb");
 	if (fp == NULL)
-		return false;
-	
+		return FALSE;
+
 	//Set up profile
 	memset(&profile, 0, sizeof(PROFILE));
 	memcpy(profile.code, gProfileCode, sizeof(profile.code));
-	memcpy(profile.FLAG, "FLAG", sizeof(profile.FLAG));
+	memcpy(profile.FLAG, FLAG, sizeof(profile.FLAG));
 	profile.stage = gStageNo;
 	profile.music = gMusicNo;
 	profile.x = gMC.x;
@@ -79,8 +81,11 @@ bool SaveProfile(char *name)
 	memcpy(profile.permitstage, gPermitStage, sizeof(profile.permitstage));
 	memcpy(profile.permit_mapping, gMapping, sizeof(profile.permit_mapping));
 	memcpy(profile.flags, gFlagNPC, sizeof(profile.flags));
-	
+
 	//Write to file
+#ifdef NONPORTABLE
+	fwrite(&profile, sizeof(PROFILE), 1, fp);
+#else
 	fwrite(profile.code, 8, 1, fp);
 	File_WriteLE32(profile.stage, fp);
 	File_WriteLE32(profile.music, fp);
@@ -112,30 +117,31 @@ bool SaveProfile(char *name)
 		File_WriteLE32(profile.permitstage[stage].event, fp);
 	}
 	fwrite(profile.permit_mapping, 0x80, 1, fp);
-	fwrite("FLAG", 4, 1, fp);
+	fwrite(FLAG, 4, 1, fp);
 	fwrite(profile.flags, 1000, 1, fp);
-	
+#endif
+
 	fclose(fp);
-	return true;
+	return TRUE;
 }
 
-bool LoadProfile(char *name)
+BOOL LoadProfile(const char *name)
 {
 	//Get path
 	char path[PATH_LENGTH];
-	
+
 	if (name)
-		strcpy(path, name);
+		sprintf(path, "%s", name);
 	else
 		sprintf(path, "%s/%s", gModulePath, gDefaultName);
-	
+
 	//Open file
 	PROFILE profile;
-	
+
 	FILE *fp = fopen(path, "rb");
 	if (fp == NULL)
-		return false;
-	
+		return FALSE;
+
 	//Check header code
 	fread(profile.code, 8, 1, fp);
 	if (memcmp(profile.code, gProfileCode, 8))
@@ -143,11 +149,15 @@ bool LoadProfile(char *name)
 #ifdef FIX_BUGS
 		fclose(fp);	// The original game forgets to close the file
 #endif
-		return false;
+		return FALSE;
 	}
-	
+
 	//Read data
-	fseek(fp, 0, SEEK_SET); //Pixel epic redundant code �酒沽酒沽�
+	fseek(fp, 0, SEEK_SET);
+	memset(&profile, 0, sizeof(PROFILE));
+#ifdef NONPORTABLE
+	fread(&profile, sizeof(PROFILE), 1, fp);
+#else
 	fread(profile.code, 8, 1, fp);
 	profile.stage = File_ReadLE32(fp);
 	profile.music = File_ReadLE32(fp);
@@ -181,8 +191,9 @@ bool LoadProfile(char *name)
 	fread(profile.permit_mapping, 0x80, 1, fp);
 	fread(profile.FLAG, 4, 1, fp);
 	fread(profile.flags, 1000, 1, fp);
+#endif
 	fclose(fp);
-	
+
 	//Set things
 	gSelectedArms = profile.select_arms;
 	gSelectedItem = profile.select_item;
@@ -193,13 +204,13 @@ bool LoadProfile(char *name)
 	memcpy(gPermitStage, profile.permitstage, sizeof(gPermitStage));
 	memcpy(gMapping, profile.permit_mapping, sizeof(gMapping));
 	memcpy(gFlagNPC, profile.flags, sizeof(gFlagNPC));
-	
+
 	//Load stage
 	ChangeMusic(profile.music);
 	InitMyChar();
 	if (!TransferStage(profile.stage, 0, 0, 1))
-		return false;
-	
+		return FALSE;
+
 	//Set character properties
 	gMC.equip = profile.equip;
 	gMC.unit = profile.unit;
@@ -212,12 +223,12 @@ bool LoadProfile(char *name)
 	gMC.lifeBr = profile.life;
 	gMC.x = profile.x;
 	gMC.y = profile.y;
-	
+
 	gMC.rect_arms.left = 24 * (gArmsData[gSelectedArms].code % 10);
 	gMC.rect_arms.right = gMC.rect_arms.left + 24;
 	gMC.rect_arms.top = 32 * (gArmsData[gSelectedArms].code / 10);
 	gMC.rect_arms.bottom = gMC.rect_arms.top + 16;
-	
+
 	//Reset stuff
 	ClearFade();
 	SetFrameMyChar();
@@ -227,10 +238,10 @@ bool LoadProfile(char *name)
 	InitStar();
 	ClearValueView();
 	gCurlyShoot_wait = 0;
-	return true;
+	return TRUE;
 }
 
-bool InitializeGame()
+BOOL InitializeGame()
 {
 	InitMyChar();
 	gSelectedArms = 0;
@@ -242,7 +253,24 @@ bool InitializeGame()
 	StartMapping();
 	InitFlags();
 	if (!TransferStage(13, 200, 10, 8))
-		return false;
+	{
+		// TODO - restore this when ghWnd is available
+/*#if defined(NONPORTABLE) && defined(WINDOWS)
+#ifdef JAPANESE
+		MessageBoxA(ghWnd, "ステージの読み込みに失敗", "エラー", MB_OK);
+#else
+		MessageBoxA(ghWnd, "Failed to load stage", "Error", MB_OK);
+#endif
+#else*/
+#ifdef JAPANESE
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", "ステージの読み込みに失敗", NULL);
+#else
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Failed to load stage", NULL);
+#endif
+//#endif
+		return FALSE;
+	}
+
 	ClearFade();
 	SetFrameMyChar();
 	SetFrameTargetMyChar(16);
@@ -252,5 +280,5 @@ bool InitializeGame()
 	gCurlyShoot_wait = 0;
 	SetFadeMask();
 	SetFrameTargetMyChar(16);
-	return true;
+	return TRUE;
 }

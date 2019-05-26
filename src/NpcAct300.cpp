@@ -16,7 +16,7 @@
 #include "Sound.h"
 #include "Triangle.h"
 
-//Demon crown (opening)
+// Demon crown (opening)
 void ActNpc300(NPCHAR *npc)
 {
 	RECT rc = {192, 80, 208, 96};
@@ -33,7 +33,7 @@ void ActNpc300(NPCHAR *npc)
 	npc->rect = rc;
 }
 
-//Fish missile (Misery)
+// Fish missile (Misery)
 void ActNpc301(NPCHAR *npc)
 {
 	RECT rect[8] = {
@@ -100,7 +100,7 @@ void ActNpc301(NPCHAR *npc)
 	npc->rect = rect[npc->ani_no];
 }
 
-//Camera focus marker
+// Camera focus marker
 void ActNpc302(NPCHAR *npc)
 {
 	switch (npc->act_no)
@@ -116,12 +116,15 @@ void ActNpc302(NPCHAR *npc)
 				case 0:
 					npc->x -= 0x400;
 					break;
+
 				case 1:
 					npc->y -= 0x400;
 					break;
+
 				case 2:
 					npc->x += 0x400;
 					break;
+
 				case 3:
 					npc->y += 0x400;
 					break;
@@ -150,7 +153,7 @@ void ActNpc302(NPCHAR *npc)
 						break;
 					}
 				}
-				
+
 				if (i == 0x200)
 				{
 					npc->cond = 0;
@@ -169,7 +172,7 @@ void ActNpc302(NPCHAR *npc)
 	}
 }
 
-//Curly's machine gun
+// Curly's machine gun
 void ActNpc303(NPCHAR *npc)
 {
 	RECT rcLeft[2] = {
@@ -181,11 +184,11 @@ void ActNpc303(NPCHAR *npc)
 		{216, 168, 232, 184},
 		{232, 168, 248, 184},
 	};
-	
+
 	if (npc->pNpc == NULL)
 		return;
 
-	//Set position
+	// Set position
 	if (npc->pNpc->direct == 0)
 	{
 		npc->direct = 0;
@@ -198,20 +201,20 @@ void ActNpc303(NPCHAR *npc)
 	}
 
 	npc->y = npc->pNpc->y;
-	
-	//Animation
+
+	// Animation
 	npc->ani_no = 0;
 	if (npc->pNpc->ani_no == 3 || npc->pNpc->ani_no == 5)
 		npc->y -= 0x200;
-	
-	//Set framerect
+
+	// Set framerect
 	if (npc->direct == 0)
 		npc->rect = rcLeft[npc->ani_no];
 	else
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Gaudi in hospital
+// Gaudi in hospital
 void ActNpc304(NPCHAR *npc)
 {
 	RECT rc[4] = {
@@ -220,41 +223,44 @@ void ActNpc304(NPCHAR *npc)
 		{48, 176, 72, 192},
 		{72, 176, 96, 192},
 	};
-	
+
 	switch (npc->act_no)
 	{
 		case 0:
 			npc->act_no = 1;
 			npc->y += 5120;
-			//Fallthrough
+			// Fallthrough
 		case 1:
 			npc->ani_no = 0;
 			break;
+
 		case 10:
 			npc->ani_no = 1;
 			break;
+
 		case 20:
 			npc->act_no = 21;
 			npc->ani_no = 2;
-			//Fallthrough
+			// Fallthrough
 		case 21:
 			if (++npc->ani_wait > 10)
 			{
 				npc->ani_wait = 0;
 				++npc->ani_no;
 			}
-			
+
 			if (npc->ani_no > 3)
 				npc->ani_no = 2;
 			break;
+
 		default:
 			break;
 	}
-	
+
 	npc->rect = rc[npc->ani_no];
 }
 
-//Small puppy
+// Small puppy
 void ActNpc305(NPCHAR *npc)
 {
 	RECT rcLeft[2] = {
@@ -266,34 +272,34 @@ void ActNpc305(NPCHAR *npc)
 		{160, 160, 176, 176},
 		{176, 160, 192, 176},
 	};
-	
+
 	switch (npc->act_no)
 	{
 		case 0:
 			npc->act_no = 1;
 			npc->y -= 0x2000;
 			npc->ani_wait = Random(0, 6);
-			//Fallthrough
-			
+			// Fallthrough
+
 		case 1:
 			if (++npc->ani_wait > 6)
 			{
 				npc->ani_wait = 0;
 				++npc->ani_no;
 			}
-			
+
 			if (npc->ani_no > 1)
 				npc->ani_no = 0;
 			break;
 	}
-	
+
 	if (npc->direct == 0)
 		npc->rect = rcLeft[npc->ani_no];
 	else
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Balrog (nurse)
+// Balrog (nurse)
 void ActNpc306(NPCHAR *npc)
 {
 	RECT rcLeft[2] = {
@@ -305,7 +311,7 @@ void ActNpc306(NPCHAR *npc)
 		{160, 152, 200, 184},
 		{200, 152, 240, 184},
 	};
-	
+
 	switch (npc->act_no)
 	{
 		case 0:
@@ -313,7 +319,7 @@ void ActNpc306(NPCHAR *npc)
 			npc->ani_no = 0;
 			npc->ani_wait = 0;
 			npc->y += 0x800;
-			//Fallthrough
+			// Fallthrough
 		case 1:
 			if (Random(0, 120) == 10)
 			{
@@ -322,6 +328,7 @@ void ActNpc306(NPCHAR *npc)
 				npc->ani_no = 1;
 			}
 			break;
+
 		case 2:
 			if (++npc->act_wait > 8)
 			{
@@ -330,14 +337,14 @@ void ActNpc306(NPCHAR *npc)
 			}
 			break;
 	}
-	
+
 	if (npc->direct == 0)
 		npc->rect = rcLeft[npc->ani_no];
 	else
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Caged Santa
+// Caged Santa
 void ActNpc307(NPCHAR *npc)
 {
 	RECT rcLeft[2] = {
@@ -349,7 +356,7 @@ void ActNpc307(NPCHAR *npc)
 		{0, 48, 16, 64},
 		{16, 48, 32, 64},
 	};
-	
+
 	switch (npc->act_no)
 	{
 		case 0:
@@ -358,7 +365,7 @@ void ActNpc307(NPCHAR *npc)
 			npc->act_no = 1;
 			npc->ani_no = 0;
 			npc->ani_wait = 0;
-			//Fallthrough
+			// Fallthrough
 		case 1:
 			if (Random(0, 160) == 1)
 			{
@@ -367,6 +374,7 @@ void ActNpc307(NPCHAR *npc)
 				npc->ani_no = 1;
 			}
 			break;
+
 		case 2:
 			if (++npc->act_wait > 12)
 			{
@@ -375,19 +383,19 @@ void ActNpc307(NPCHAR *npc)
 			}
 			break;
 	}
-	
+
 	if (gMC.x < npc->x)
 		npc->direct = 0;
 	else
 		npc->direct = 2;
-	
+
 	if (npc->direct == 0)
 		npc->rect = rcLeft[npc->ani_no];
 	else
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Stumpy
+// Stumpy
 void ActNpc308(NPCHAR *npc)
 {
 	RECT rcLeft[2] = {
@@ -496,7 +504,7 @@ void ActNpc308(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Bute
+// Bute
 void ActNpc309(NPCHAR *npc)
 {
 	RECT rcLeft[2] = {
@@ -602,7 +610,7 @@ void ActNpc309(NPCHAR *npc)
 	}
 }
 
-//Bute (with sword)
+// Bute (with sword)
 void ActNpc310(NPCHAR *npc)
 {
 	RECT rcLeft[5] = {
@@ -753,7 +761,7 @@ void ActNpc310(NPCHAR *npc)
 	}
 }
 
-//Bute archer
+// Bute archer
 void ActNpc311(NPCHAR *npc)
 {
 	RECT rcLeft[7] = {
@@ -900,7 +908,7 @@ void ActNpc311(NPCHAR *npc)
 	}
 }
 
-//Bute arrow projectile
+// Bute arrow projectile
 void ActNpc312(NPCHAR *npc)
 {
 	RECT rcLeft[5] = {
@@ -1017,7 +1025,7 @@ void ActNpc312(NPCHAR *npc)
 	}
 }
 
-//Ma Pignon
+// Ma Pignon
 void ActNpc313(NPCHAR *npc)
 {
 	RECT rcLeft[14] = {
@@ -1367,7 +1375,7 @@ void ActNpc313(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Ma Pignon rock
+// Ma Pignon rock
 void ActNpc314(NPCHAR *npc)
 {
 	RECT rc[3] = {
@@ -1438,7 +1446,7 @@ void ActNpc314(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Ma Pignon clone
+// Ma Pignon clone
 void ActNpc315(NPCHAR *npc)
 {
 	RECT rcLeft[4] = {
@@ -1580,7 +1588,7 @@ void ActNpc315(NPCHAR *npc)
 	}
 }
 
-//Bute (dead)
+// Bute (dead)
 void ActNpc316(NPCHAR *npc)
 {
 	RECT rcLeft[3] = {
@@ -1659,7 +1667,7 @@ void ActNpc316(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Mesa
+// Mesa
 void ActNpc317(NPCHAR *npc)
 {
 	RECT rcLeft[4] = {
@@ -1704,7 +1712,7 @@ void ActNpc317(NPCHAR *npc)
 			if (npc->ani_no > 1)
 				npc->ani_no = 0;
 
-			if (gMC.x > npc->x - 0x28000 && gMC.x < npc->x + 0x28000 && gMC.y > npc->y - 0x14000 && gMC.y < npc->y + 0x14000 && ++npc->count1 > 50 )
+			if (gMC.x > npc->x - 0x28000 && gMC.x < npc->x + 0x28000 && gMC.y > npc->y - 0x14000 && gMC.y < npc->y + 0x14000 && ++npc->count1 > 50)
 			{
 				npc->act_no = 10;
 			}
@@ -1754,7 +1762,7 @@ void ActNpc317(NPCHAR *npc)
 	}
 }
 
-//Mesa (dead)
+// Mesa (dead)
 void ActNpc318(NPCHAR *npc)
 {
 	RECT rcLeft[3] = {
@@ -1830,7 +1838,7 @@ void ActNpc318(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Mesa block
+// Mesa block
 void ActNpc319(NPCHAR *npc)
 {
 	RECT rc[3] = {

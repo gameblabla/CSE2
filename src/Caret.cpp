@@ -34,31 +34,31 @@ void ActCaret01(CARET *crt)
 		{64, 24, 72, 32},
 		{72, 24, 80, 32},
 		{80, 24, 88, 32},
-		{88, 24, 92, 32},
+		{88, 24, 96, 32},
 	};
-	
+
 	if (!crt->act_no)
 	{
 		crt->act_no = 1;
 		crt->xm = Random(-0x400, 0x400);
 		crt->ym = Random(-0x400, 0);
 	}
-	
+
 	crt->ym += 0x40;
 	crt->x += crt->xm;
 	crt->y += crt->ym;
-	
+
 	if (++crt->ani_wait > 5)
 	{
 		crt->ani_wait = 0;
 		if (++crt->ani_no > 3)
 			crt->cond = 0;
 	}
-	
-	if (crt->direct)
-		crt->rect = rcRight[crt->ani_no];
-	else
+
+	if (crt->direct == 0)
 		crt->rect = rcLeft[crt->ani_no];
+	else
+		crt->rect = rcRight[crt->ani_no];
 }
 
 void ActCaret02(CARET *crt)
@@ -88,31 +88,38 @@ void ActCaret02(CARET *crt)
 		case 0:
 			crt->ym -= 0x10;
 			crt->y += crt->ym;
+
 			if (++crt->ani_wait > 5)
 			{
 				crt->ani_wait = 0;
 				++crt->ani_no;
 			}
-			if ( crt->ani_no > 3 )
+
+			if (crt->ani_no > 3)
 				crt->cond = 0;
+
 			crt->rect = rect_left[crt->ani_no];
 			break;
-			
-		case 1:
-			crt->rect = rect_up[++crt->ani_wait / 2 % 3];
-			if (crt->ani_wait > 24)
-				crt->cond = 0;
-			break;
-			
+
 		case 2:
-			if ( ++crt->ani_wait > 2 )
+			if (++crt->ani_wait > 2)
 			{
 				crt->ani_wait = 0;
 				++crt->ani_no;
 			}
-			if ( crt->ani_no > 3 )
+
+			if (crt->ani_no > 3)
 				crt->cond = 0;
+
 			crt->rect = rect_right[crt->ani_no];
+			break;
+
+		case 1:
+			crt->rect = rect_up[++crt->ani_wait / 2 % 3];
+
+			if (crt->ani_wait > 24)
+				crt->cond = 0;
+
 			break;
 	}
 }
@@ -125,14 +132,14 @@ void ActCaret03(CARET *crt)
 		{32, 48, 48, 64},
 		{48, 48, 64, 64},
 	};
-	
+
 	if (++crt->ani_wait > 2)
 	{
 		crt->ani_wait = 0;
 		if (++crt->ani_no > 3)
 			crt->cond = 0;
 	}
-	
+
 	crt->rect = rect[crt->ani_no];
 }
 
@@ -158,7 +165,7 @@ void ActCaret04(CARET *crt)
 			crt->cond = 0;
 	}
 
-	crt->rect = rect[crt->ani_no + 3 * crt->direct];
+	crt->rect = rect[3 * crt->direct + crt->ani_no];
 }
 
 void ActCaret05(CARET *crt)
@@ -179,7 +186,7 @@ void ActCaret05(CARET *crt)
 		++crt->ani_no;
 	}
 
-	if ( crt->ani_no > 6 )
+	if (crt->ani_no > 6)
 		crt->cond = 0;
 
 	crt->x += 0x80;
@@ -243,11 +250,12 @@ void ActCaret09(CARET *crt)
 	RECT rcLeft = {0, 80, 16, 96};
 	RECT rcRight = {48, 64, 64, 80};
 
-	if (++crt->ani_wait <= 4)
+	if (++crt->ani_wait < 5)
 		crt->y -= 0x800;
-	if (crt->ani_wait == 32 )
+
+	if (crt->ani_wait == 32)
 		crt->cond = 0;
-	
+
 	if (crt->direct == 0)
 		crt->rect = rcLeft;
 	else
@@ -267,41 +275,45 @@ void ActCaret10(CARET *crt)
 	};
 
 	++crt->ani_wait;
-	
-	if (crt->direct)
-	{
-		if (crt->ani_wait < 20)
-			crt->y -= 0x200;
-		if (crt->ani_wait == 80)
-		crt->cond = 0;
-	}
-	else
+
+	if (crt->direct == 0)
 	{
 		if (crt->ani_wait < 20)
 			crt->y -= 0x400;
+
 		if (crt->ani_wait == 80)
 			crt->cond = 0;
 	}
-	
-	if (crt->direct)
-		crt->rect = rcRight[crt->ani_wait / 2 % 2];
 	else
+	{
+		if (crt->ani_wait < 20)
+			crt->y -= 0x200;
+
+		if (crt->ani_wait == 80)
+			crt->cond = 0;
+	}
+
+	if (crt->direct == 0)
 		crt->rect = rcLeft[crt->ani_wait / 2 % 2];
+	else
+		crt->rect = rcRight[crt->ani_wait / 2 % 2];
 }
 
 void ActCaret11(CARET *crt)
 {
+	unsigned char deg;
+
 	if (!crt->act_no)
 	{
 		crt->act_no = 1;
-		uint8_t deg = Random(0, 0xFF);
+		deg = Random(0, 0xFF);
 		crt->xm = 2 * GetCos(deg);
 		crt->ym = 2 * GetSin(deg);
 	}
-	
+
 	crt->x += crt->xm;
 	crt->y += crt->ym;
-	
+
 	RECT rcRight[7] = {
 		{56, 8, 64, 16},
 		{64, 8, 72, 16},
@@ -318,7 +330,7 @@ void ActCaret11(CARET *crt)
 		if (++crt->ani_no > 6)
 			crt->cond = 0;
 	}
-	
+
 	crt->rect = rcRight[crt->ani_no];
 }
 
@@ -328,14 +340,14 @@ void ActCaret12(CARET *crt)
 		{112, 0, 144, 32},
 		{144, 0, 176, 32},
 	};
-	
+
 	if (++crt->ani_wait > 2)
 	{
 		crt->ani_wait = 0;
 		if (++crt->ani_no > 1)
-		  crt->cond = 0;
+			crt->cond = 0;
 	}
-	
+
 	crt->rect = rcLeft[crt->ani_no];
 }
 
@@ -345,38 +357,40 @@ void ActCaret13(CARET *crt)
 		{56, 24, 64, 32},
 		{0, 0, 0, 0},
 	};
-	
-	if (!crt->act_no)
+
+	if (crt->act_no == 0)
 	{
 		crt->act_no = 1;
-		
+
 		switch (crt->direct)
 		{
 			case 0:
 				crt->xm = Random(-0x600, 0x600);
 				crt->ym = Random(-0x200, 0x200);
 				break;
-				
+
 			case 1:
 				crt->ym = -0x200 * Random(1, 3);
 				break;
 		}
 	}
-	
-	if (!crt->direct)
+
+	switch (crt->direct)
 	{
-		crt->xm = 4 * crt->xm / 5;
-		crt->ym = 4 * crt->ym / 5;
+		case 0:
+			crt->xm = 4 * crt->xm / 5;
+			crt->ym = 4 * crt->ym / 5;
+			break;
 	}
-	
+
 	crt->x += crt->xm;
 	crt->y += crt->ym;
-	
+
 	if (++crt->ani_wait > 20)
 		crt->cond = 0;
 
 	crt->rect = rcLeft[crt->ani_wait / 2 % 2];
-	
+
 	if (crt->direct == 5)
 		crt->x -= 0x800;
 }
@@ -454,9 +468,8 @@ void ActCaret17(CARET *crt)
 		crt->rect = rcLeft[1];
 }
 
-//Tables
-CARET_TABLE gCaretTable[18] =
-{
+// Tables
+CARET_TABLE gCaretTable[18] = {
 	{0, 0},
 	{0x800, 0x800},
 	{0x1000, 0x1000},
@@ -502,10 +515,16 @@ CARETFUNCTION gpCaretFuncTbl[] =
 
 void ActCaret()
 {
-	for (int i = 0; i < CARET_MAX; i++)
+	int i;
+	int code;
+
+	for (i = 0; i < CARET_MAX; i++)
 	{
 		if (gCrt[i].cond & 0x80)
-			gpCaretFuncTbl[gCrt[i].code](&gCrt[i]);
+		{
+			code = gCrt[i].code;
+			gpCaretFuncTbl[code](&gCrt[i]);
+		}
 	}
 }
 
@@ -527,19 +546,20 @@ void PutCaret(int fx, int fy)
 
 void SetCaret(int x, int y, int code, int dir)
 {
-	for (int c = 0; c < CARET_MAX; c++)
-	{
-		if (!gCrt[c].cond)
-		{
-			memset(&gCrt[c], 0, sizeof(CARET));
-			gCrt[c].cond = 0x80;
-			gCrt[c].code = code;
-			gCrt[c].x = x;
-			gCrt[c].y = y;
-			gCrt[c].view_left = gCaretTable[code].view_left;
-			gCrt[c].view_top = gCaretTable[code].view_top;
-			gCrt[c].direct = dir;
+	int c;
+	for (c = 0; c < CARET_MAX; c++)
+		if (gCrt[c].cond == 0)
 			break;
-		}
-	}
+
+	if (c == CARET_MAX)
+		return;
+
+	memset(&gCrt[c], 0, sizeof(CARET));
+	gCrt[c].cond = 0x80;
+	gCrt[c].code = code;
+	gCrt[c].x = x;
+	gCrt[c].y = y;
+	gCrt[c].view_left = gCaretTable[code].view_left;
+	gCrt[c].view_top = gCaretTable[code].view_top;
+	gCrt[c].direct = dir;
 }

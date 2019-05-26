@@ -1,7 +1,6 @@
 #include "Map.h"
 
 #include <stddef.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -21,7 +20,7 @@ static const char *code_pxma = "PXM";
 
 BOOL InitMapData2()
 {
-	gMap.data = (uint8_t*)malloc(PXM_BUFFER_SIZE);
+	gMap.data = (unsigned char*)malloc(PXM_BUFFER_SIZE);
 	return TRUE;
 }
 
@@ -29,16 +28,16 @@ BOOL LoadMapData2(const char *path_map)
 {
 	unsigned char dum;
 
-	//Get path
+	// Get path
 	char path[PATH_LENGTH];
 	sprintf(path, "%s/%s", gDataPath, path_map);
 
-	//Open file
+	// Open file
 	FILE *fp = fopen(path, "rb");
 	if (fp == NULL)
 		return FALSE;
 
-	//Make sure file begins with "PXM"
+	// Make sure file begins with "PXM"
 	char check[3];
 	fread(check, 1, 3, fp);
 
@@ -50,10 +49,9 @@ BOOL LoadMapData2(const char *path_map)
 	else
 	{
 		fread(&dum, 1, 1, fp);
-		//Get width and height
+		// Get width and height
 #ifdef NONPORTABLE
-		// This fails on big-endian hardware, and platforms
-		// where short is not two bytes long.
+		// This fails on big-endian hardware, and platforms where short is not two bytes long.
 		fread(&gMap.width, 2, 1, fp);
 		fread(&gMap.length, 2, 1, fp);
 #else
@@ -68,7 +66,7 @@ BOOL LoadMapData2(const char *path_map)
 		}
 		else
 		{
-			//Read tiledata
+			// Read tile data
 			fread(gMap.data, 1, gMap.length * gMap.width, fp);
 			fclose(fp);
 			return TRUE;
@@ -80,15 +78,15 @@ BOOL LoadMapData2(const char *path_map)
 
 BOOL LoadAttributeData(const char *path_atrb)
 {
-	//Open file
-	char path[260];
+	// Open file
+	char path[PATH_LENGTH];
 	sprintf(path, "%s/%s", gDataPath, path_atrb);
 
 	FILE *fp = fopen(path, "rb");
 	if (fp == NULL)
 		return FALSE;
 
-	//Read data
+	// Read data
 	fread(gMap.atrb, 1, 0x100, fp);
 	fclose(fp);
 	return TRUE;
@@ -104,7 +102,7 @@ void ReleasePartsImage()
 	ReleaseSurface(SURFACE_ID_LEVEL_TILESET);
 }
 
-void GetMapData(uint8_t **data, int16_t *mw, int16_t *ml)
+void GetMapData(unsigned char **data, short *mw, short *ml)
 {
 	if (data)
 		*data = gMap.data;
@@ -133,7 +131,7 @@ void ShiftMapParts(int x, int y)
 	*(gMap.data + x + gMap.width * y) -= 1;
 }
 
-BOOL ChangeMapParts(int x, int y, uint8_t no)
+BOOL ChangeMapParts(int x, int y, unsigned char no)
 {
 	if (*(gMap.data + x + gMap.width * y) == no)
 		return FALSE;
@@ -158,7 +156,7 @@ void PutStage_Back(int fx, int fy)
 	RECT rect;
 	int num_x;
 
-	//Get range to draw
+	// Get range to draw
 	num_x = ((WINDOW_WIDTH + 0xF) / 0x10) + 1;
 	num_y = ((WINDOW_HEIGHT + 0xF) / 0x10) + 1;
 	put_x = (fx / 0x200 + 8) / 0x10;
@@ -168,14 +166,14 @@ void PutStage_Back(int fx, int fy)
 	{
 		for (i = put_x; i < put_x + num_x; i++)
 		{
-			//Get attribute
+			// Get attribute
 			offset = i + j * gMap.width;
 			atrb = GetAttribute(i, j);
 
 			if (atrb >= 0x20)
 				continue;
 
-			//Draw tile
+			// Draw tile
 			rect.left = 16 * (gMap.data[offset] % 0x10);
 			rect.top = 16 * (gMap.data[offset] / 0x10);
 			rect.right = rect.left + 16;
@@ -199,7 +197,7 @@ void PutStage_Front(int fx, int fy)
 	RECT rect;
 	int num_x;
 
-	//Get range to draw
+	// Get range to draw
 	num_x = ((WINDOW_WIDTH + 0xF) >> 4) + 1;
 	num_y = ((WINDOW_HEIGHT + 0xF) >> 4) + 1;
 	put_x = (fx / 0x200 + 8) / 16;
@@ -209,14 +207,14 @@ void PutStage_Front(int fx, int fy)
 	{
 		for (i = put_x; i < put_x + num_x; i++)
 		{
-			//Get attribute
+			// Get attribute
 			offset = i + j * gMap.width;
 			atrb = GetAttribute(i, j);
 
 			if (atrb < 0x40 || atrb >= 0x80)
 				continue;
 
-			//Draw tile
+			// Draw tile
 			rect.left = 16 * (gMap.data[offset] % 0x10);
 			rect.top = 16 * (gMap.data[offset] / 0x10);
 			rect.right = rect.left + 16;
@@ -242,11 +240,11 @@ void PutMapDataVector(int fx, int fy)
 	RECT rect;
 	int num_x;
 
-	//Animate the wind
+	// Animate the wind
 	static unsigned char count = 0;
 	count += 2;
 
-	//Get range to draw
+	// Get range to draw
 	num_x = ((WINDOW_WIDTH + 0xF) >> 4) + 1;
 	num_y = ((WINDOW_HEIGHT + 0xF) >> 4) + 1;
 	put_x = (fx / 0x200 + 8) / 16;
@@ -256,7 +254,7 @@ void PutMapDataVector(int fx, int fy)
 	{
 		for (i = put_x; i < put_x + num_x; i++)
 		{
-			//Get attribute
+			// Get attribute
 			offset = i + j * gMap.width;
 			atrb = GetAttribute(i, j);
 

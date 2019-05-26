@@ -11,7 +11,7 @@
 #include "Sound.h"
 #include "Triangle.h"
 
-//Santa
+// Santa
 void ActNpc040(NPCHAR *npc)
 {
 	RECT rcLeft[7] = {
@@ -93,14 +93,14 @@ void ActNpc040(NPCHAR *npc)
 			npc->ani_no = 6;
 			break;
 	}
-	
+
 	if (npc->direct == 0)
 		npc->rect = rcLeft[npc->ani_no];
 	else
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Busted Door
+// Busted Door
 void ActNpc041(NPCHAR *npc)
 {
 	RECT rect = {0, 80, 48, 112};
@@ -114,7 +114,7 @@ void ActNpc041(NPCHAR *npc)
 	npc->rect = rect;
 }
 
-//Sue
+// Sue
 void ActNpc042(NPCHAR *npc)
 {
 	RECT rcLeft[13] = {
@@ -403,7 +403,7 @@ void ActNpc042(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Chalkboard
+// Chalkboard
 void ActNpc043(NPCHAR *npc)
 {
 	RECT rcLeft = {128, 80, 168, 112};
@@ -423,7 +423,7 @@ void ActNpc043(NPCHAR *npc)
 		npc->rect = rcRight;
 }
 
-//Polish
+// Polish
 void ActNpc044(NPCHAR *npc)
 {
 	// Yeah, Pixel defined these backwards for some reason.
@@ -545,7 +545,7 @@ void ActNpc044(NPCHAR *npc)
 				npc->xm += 0x100;
 			}
 
-			if ( npc->flag & 4 )
+			if (npc->flag & 4)
 				npc->act_no = 9;
 
 			break;
@@ -605,7 +605,7 @@ void ActNpc044(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Baby
+// Baby
 void ActNpc045(NPCHAR *npc)
 {
 	RECT rect[3] = {
@@ -634,7 +634,7 @@ void ActNpc045(NPCHAR *npc)
 			// Fallthrough
 		case 1:
 		case 2:
-			if ( ++npc->ani_no > 2 )
+			if (++npc->ani_no > 2)
 				npc->ani_no = 1;
 
 			break;
@@ -674,7 +674,7 @@ void ActNpc045(NPCHAR *npc)
 	npc->rect = rect[npc->ani_no];
 }
 
-//H/V Trigger
+// H/V Trigger
 void ActNpc046(NPCHAR *npc)
 {
 	RECT rect = {0, 0, 16, 16};
@@ -699,10 +699,10 @@ void ActNpc046(NPCHAR *npc)
 	npc->rect = rect;
 }
 
-//Sandcroc
+// Sandcroc
 void ActNpc047(NPCHAR *npc)
 {
-	switch ( npc->act_no )
+	switch (npc->act_no)
 	{
 		case 0:
 			npc->ani_no = 0;
@@ -802,7 +802,7 @@ void ActNpc047(NPCHAR *npc)
 	npc->rect = rect[npc->ani_no];
 }
 
-//Omega projectiles
+// Omega projectiles
 void ActNpc048(NPCHAR *npc)
 {
 	if (npc->flag & 1 && npc->xm < 0)
@@ -825,17 +825,17 @@ void ActNpc048(NPCHAR *npc)
 			npc->ym = -0x100;
 		}
 	}
-	
+
 	if (npc->direct == 2)
 	{
 		npc->bits &= ~npc_shootable;
 		npc->bits |= npc_invulnerable;
 	}
-	
+
 	npc->ym += 5;
 	npc->y += npc->ym;
 	npc->x += npc->xm;
-	
+
 	RECT rcLeft[2] = {
 		{288, 88, 304, 104},
 		{304, 88, 320, 104},
@@ -845,27 +845,27 @@ void ActNpc048(NPCHAR *npc)
 		{288, 104, 304, 120},
 		{304, 104, 320, 120},
 	};
-		
+
 	if (++npc->ani_wait > 2)
 	{
 		npc->ani_wait = 0;
 		if (++npc->ani_no > 1)
 			npc->ani_no = 0;
 	}
-	
+
 	if (++npc->act_wait > 750)
 	{
 		SetCaret(npc->x, npc->y, 2, 0);
 		npc->cond = 0;
 	}
-	
+
 	if (npc->direct == 0)
 		npc->rect = rcLeft[npc->ani_no];
 	else
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Skullhead
+// Skullhead
 void ActNpc049(NPCHAR *npc)
 {
 	unsigned char deg;
@@ -1011,7 +1011,7 @@ void ActNpc049(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Skeleton projectile
+// Skeleton projectile
 void ActNpc050(NPCHAR *npc)
 {
 	switch (npc->act_no)
@@ -1112,7 +1112,7 @@ void ActNpc050(NPCHAR *npc)
 	npc->rect = rect[npc->ani_no];
 }
 
-//Crow & Skullhead
+// Crow & Skullhead
 void ActNpc051(NPCHAR *npc)
 {
 	switch (npc->act_no)
@@ -1261,7 +1261,7 @@ void ActNpc051(NPCHAR *npc)
 		npc->rect = rect_right[npc->ani_no];
 }
 
-//Bliue robot (sitting)
+// Blue robot (sitting)
 void ActNpc052(NPCHAR *npc)
 {
 	RECT rect = {240, 96, 256, 112};
@@ -1269,7 +1269,7 @@ void ActNpc052(NPCHAR *npc)
 	npc->rect = rect;
 }
 
-//Skullstep leg
+// Skullstep leg
 void ActNpc053(NPCHAR *npc)
 {
 	RECT rcLeft[2] = {
@@ -1339,7 +1339,7 @@ void ActNpc053(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Skullstep
+// Skullstep
 void ActNpc054(NPCHAR *npc)
 {
 	RECT rcLeft[3] = {
@@ -1446,7 +1446,7 @@ void ActNpc054(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Kazuma
+// Kazuma
 void ActNpc055(NPCHAR *npc)
 {
 	RECT rcLeft[6] = {
@@ -1514,7 +1514,7 @@ void ActNpc055(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Beetle (Sand Zone)
+// Beetle (Sand Zone)
 void ActNpc056(NPCHAR *npc)
 {
 	RECT rcLeft[3] = {
@@ -1630,7 +1630,7 @@ void ActNpc056(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Crow
+// Crow
 void ActNpc057(NPCHAR *npc)
 {
 	unsigned char deg;
@@ -1789,7 +1789,7 @@ void ActNpc057(NPCHAR *npc)
 		npc->rect = rect_right[npc->ani_no];
 }
 
-//Basu (Egg Corridor)
+// Basu (Egg Corridor)
 void ActNpc058(NPCHAR *npc)
 {
 	RECT rcLeft[3] = {
@@ -1942,7 +1942,7 @@ void ActNpc058(NPCHAR *npc)
 	}
 }
 
-//Eye door
+// Eye door
 void ActNpc059(NPCHAR *npc)
 {
 	RECT rcLeft[4] = {

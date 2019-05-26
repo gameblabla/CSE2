@@ -16,9 +16,9 @@ struct FADE
 	int mode;
 	BOOL bMask;
 	int count;
-	char ani_no[FADE_HEIGHT][FADE_WIDTH];
-	char flag[FADE_HEIGHT][FADE_WIDTH];	// Not a BOOLEAN (those are unsigned)
-	char dir;
+	signed char ani_no[FADE_HEIGHT][FADE_WIDTH];
+	signed char flag[FADE_HEIGHT][FADE_WIDTH];	// Not a BOOLEAN (those are unsigned)
+	signed char dir;
 };
 
 static FADE gFade;
@@ -41,13 +41,13 @@ void ClearFade()
 	gFade.mode = 0;
 }
 
-void StartFadeOut(char dir)
+void StartFadeOut(signed char dir)
 {
 	gFade.mode = 2;
 	gFade.count = 0;
 	gFade.dir = dir;
 	gFade.bMask = FALSE;
-	
+
 	for (int y = 0; y < FADE_HEIGHT; y++)
 	{
 		for (int x = 0; x < FADE_WIDTH; x++)
@@ -58,7 +58,7 @@ void StartFadeOut(char dir)
 	}
 }
 
-void StartFadeIn(char dir)
+void StartFadeIn(signed char dir)
 {
 	int x;
 	int y;
@@ -67,7 +67,7 @@ void StartFadeIn(char dir)
 	gFade.count = 0;
 	gFade.dir = dir;
 	gFade.bMask = TRUE;
-	
+
 	for (y = 0; y < FADE_HEIGHT; y++)
 	{
 		for (x = 0; x < FADE_WIDTH; x++)
@@ -100,7 +100,7 @@ void ProcFade()
 						}
 					}
 					break;
-					
+
 				case 2:
 					for (y = 0; y < FADE_HEIGHT; y++)
 					{
@@ -111,7 +111,7 @@ void ProcFade()
 						}
 					}
 					break;
-					
+
 				case 1:
 					for (y = 0; y < FADE_HEIGHT; y++)
 					{
@@ -122,7 +122,7 @@ void ProcFade()
 						}
 					}
 					break;
-					
+
 				case 3:
 					for (y = 0; y < FADE_HEIGHT; y++)
 					{
@@ -133,7 +133,7 @@ void ProcFade()
 						}
 					}
 					break;
-					
+
 				case 4:
 					for (y = 0; y < (FADE_HEIGHT / 2); y++)
 					{
@@ -169,7 +169,7 @@ void ProcFade()
 					}
 					break;
 			}
-			
+
 			for (y = 0; y < FADE_HEIGHT; y++)
 			{
 				for (x = 0; x < FADE_WIDTH; x++)
@@ -178,7 +178,7 @@ void ProcFade()
 						++gFade.ani_no[y][x];
 				}
 			}
-			
+
 			if (++gFade.count > ((FADE_WIDTH > FADE_HEIGHT) ? FADE_WIDTH : FADE_HEIGHT) + 16)
 			{
 				gFade.bMask = TRUE;
@@ -189,7 +189,7 @@ void ProcFade()
 
 		case 1:
 			gFade.bMask = FALSE;
-			
+
 			switch (gFade.dir)
 			{
 				case 0:
@@ -202,7 +202,7 @@ void ProcFade()
 						}
 					}
 					break;
-					
+
 				case 2:
 					for (y = 0; y < FADE_HEIGHT; y++)
 					{
@@ -213,7 +213,7 @@ void ProcFade()
 						}
 					}
 					break;
-					
+
 				case 1:
 					for (y = 0; y < FADE_HEIGHT; y++)
 					{
@@ -224,7 +224,7 @@ void ProcFade()
 						}
 					}
 					break;
-					
+
 				case 3:
 					for (y = 0; y < FADE_HEIGHT; y++)
 					{
@@ -235,7 +235,7 @@ void ProcFade()
 						}
 					}
 					break;
-					
+
 				case 4:
 					for (y = 0; y < (FADE_HEIGHT / 2); y++)
 					{
@@ -271,7 +271,7 @@ void ProcFade()
 					}
 					break;
 			}
-			
+
 			for (y = 0; y < FADE_HEIGHT; y++)
 			{
 				for (x = 0; x < FADE_WIDTH; x++)
@@ -280,7 +280,7 @@ void ProcFade()
 						--gFade.ani_no[y][x];
 				}
 			}
-			
+
 			if (++gFade.count > ((FADE_WIDTH > FADE_HEIGHT) ? FADE_WIDTH : FADE_HEIGHT) + 16)
 				gFade.mode = 0;
 
@@ -293,7 +293,7 @@ void PutFade()
 	RECT rect;
 	rect.top = 0;
 	rect.bottom = 16;
-	
+
 	if (gFade.bMask)
 	{
 		CortBox(&grcGame, mask_color);

@@ -142,6 +142,7 @@ void ActBossChar_Ballos(void)
 	switch (npc->act_no)
 	{
 		case 0:
+			// Initialize main boss
 			npc->act_no = 1;
 			npc->cond = 0x80;
 			npc->exp = 1;
@@ -159,6 +160,7 @@ void ActBossChar_Ballos(void)
 			npc->code_event = 1000;
 			npc->life = 800;
 
+			// Initialize eyes
 			gBoss[1].cond = 0x90;
 			gBoss[1].direct = 0;
 			gBoss[1].bits = 8;
@@ -175,6 +177,7 @@ void ActBossChar_Ballos(void)
 			gBoss[2] = gBoss[1];
 			gBoss[2].direct = 2;
 
+			// Initialize the body
 			gBoss[3].cond = 0x90;
 			gBoss[3].bits = 0xD;
 			gBoss[3].view.front = 0x7800;
@@ -230,7 +233,7 @@ void ActBossChar_Ballos(void)
 				SetQuake2(30);
 				PlaySoundObject(44, 1);
 
-				if ( gMC.y > npc->y + 0x6000 && gMC.x < npc->x + 0x3000 && gMC.x > npc->x - 0x3000 )
+				if (gMC.y > npc->y + 0x6000 && gMC.x < npc->x + 0x3000 && gMC.x > npc->x - 0x3000)
 					DamageMyChar(16);
 
 				for (i = 0; i < 0x10; ++i)

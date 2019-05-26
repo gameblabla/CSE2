@@ -1,7 +1,8 @@
 #pragma once
 
 #include <stddef.h>
-#include <stdint.h>
+
+#include "WindowsWrapper.h"
 
 #include "PixTone.h"
 
@@ -10,31 +11,31 @@ class SOUNDBUFFER
 	public:
 		SOUNDBUFFER(size_t bufSize);
 		~SOUNDBUFFER();
-		
+
 		void Release();
-		
-		void Lock(uint8_t **buffer, size_t *size);
+
+		void Lock(unsigned char **buffer, size_t *size);
 		void Unlock();
-		
-		void SetCurrentPosition(uint32_t dwNewPosition);
-		void SetFrequency(uint32_t dwFrequency);
-		void SetVolume(int32_t lVolume);
-		void SetPan(int32_t lPan);
+
+		void SetCurrentPosition(unsigned long dwNewPosition);
+		void SetFrequency(unsigned long dwFrequency);
+		void SetVolume(long lVolume);
+		void SetPan(long lPan);
 		void Play(bool bLooping);
 		void Stop();
-		
-		void Mix(float (*buffer)[2], size_t samples);
-		
+
+		void Mix(float *buffer, size_t frames);
+
 		SOUNDBUFFER *next;
-	
+
 	private:
-		uint8_t *data;
+		unsigned char *data;
 		size_t size;
-		
+
 		bool playing;
 		bool looping;
 		bool looped;
-		
+
 		double frequency;
 		double volume;
 		double volume_l;
@@ -92,10 +93,10 @@ enum MUSIC_IDS
 #define SOUND_NO 0x100
 extern SOUNDBUFFER* lpSECONDARYBUFFER[SOUND_NO];
 
-bool InitDirectSound();
+BOOL InitDirectSound();
 void EndDirectSound();
 void PlaySoundObject(int no, int mode);
-void ChangeSoundFrequency(int no, uint32_t rate);
-void ChangeSoundVolume(int no, int32_t volume);
-void ChangeSoundPan(int no, int32_t pan);
-size_t MakePixToneObject(const PIXTONEPARAMETER *ptp, int ptp_num, int no);
+void ChangeSoundFrequency(int no, unsigned long rate);
+void ChangeSoundVolume(int no, long volume);
+void ChangeSoundPan(int no, long pan);
+int MakePixToneObject(const PIXTONEPARAMETER *ptp, int ptp_num, int no);

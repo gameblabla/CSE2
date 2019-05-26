@@ -13,7 +13,7 @@
 #include "Sound.h"
 #include "Triangle.h"
 
-//Colon (1)
+// Colon (1)
 void ActNpc120(NPCHAR *npc)
 {
 	RECT rect[2] = {
@@ -27,7 +27,7 @@ void ActNpc120(NPCHAR *npc)
 		npc->rect = rect[1];
 }
 
-//Colon (2)
+// Colon (2)
 void ActNpc121(NPCHAR *npc)
 {
 	RECT rect[3] = {
@@ -78,7 +78,7 @@ void ActNpc121(NPCHAR *npc)
 	}
 }
 
-//Colon (attacking)
+// Colon (attacking)
 void ActNpc122(NPCHAR *npc)
 {
 	RECT rcLeft[10] = {
@@ -255,7 +255,7 @@ void ActNpc122(NPCHAR *npc)
 	if (npc->xm < -0x1FF)
 		npc->xm = -0x1FF;
 
-	if (npc->ym > 0x5FF )
+	if (npc->ym > 0x5FF)
 		npc->ym = 0x5FF;
 
 	npc->y += npc->ym;
@@ -267,7 +267,7 @@ void ActNpc122(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Curly boss projectile
+// Curly boss projectile
 void ActNpc123(NPCHAR *npc)
 {
 	RECT rect[4] = {
@@ -292,14 +292,17 @@ void ActNpc123(NPCHAR *npc)
 					npc->xm = -0x1000;
 					npc->ym = Random(-0x80, 0x80);
 					break;
+
 				case 1:
 					npc->ym = -0x1000;
 					npc->xm = Random(-0x80, 0x80);
 					break;
+
 				case 2:
 					npc->xm = 0x1000;
 					npc->ym = Random(-0x80, 0x80);
 					break;
+
 				case 3:
 					npc->ym = 0x1000;
 					npc->xm = Random(-0x80, 0x80);
@@ -315,14 +318,17 @@ void ActNpc123(NPCHAR *npc)
 					if (npc->flag & 1)
 						bBreak = TRUE;
 					break;
+
 				case 1:
 					if (npc->flag & 2)
 						bBreak = TRUE;
 					break;
+
 				case 2:
 					if (npc->flag & 4)
 						bBreak = TRUE;
 					break;
+
 				case 3:
 					if (npc->flag & 8)
 						bBreak = TRUE;
@@ -345,7 +351,7 @@ void ActNpc123(NPCHAR *npc)
 	npc->rect = rect[npc->direct];
 }
 
-//Sunstone
+// Sunstone
 void ActNpc124(NPCHAR *npc)
 {
 	RECT rect[2] = {
@@ -377,12 +383,15 @@ void ActNpc124(NPCHAR *npc)
 				case 0:
 					npc->x -= 0x80;
 					break;
+
 				case 1:
 					npc->y -= 0x80;
 					break;
+
 				case 2:
 					npc->x += 0x80;
 					break;
+
 				case 3:
 					npc->y += 0x80;
 					break;
@@ -397,7 +406,7 @@ void ActNpc124(NPCHAR *npc)
 	npc->rect = rect[npc->ani_no];
 }
 
-//Hidden item
+// Hidden item
 void ActNpc125(NPCHAR *npc)
 {
 	if (npc->life < 990)
@@ -424,7 +433,7 @@ void ActNpc125(NPCHAR *npc)
 		npc->rect = rc[1];
 }
 
-//Puppy (running)
+// Puppy (running)
 void ActNpc126(NPCHAR *npc)
 {
 	RECT rcLeft[6] = {
@@ -556,7 +565,7 @@ void ActNpc126(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Machine gun trail (Level 2)
+// Machine gun trail (Level 2)
 void ActNpc127(NPCHAR *npc)
 {
 	RECT rcV[3] = {
@@ -577,14 +586,14 @@ void ActNpc127(NPCHAR *npc)
 		if (++npc->ani_no > 2)
 			npc->cond = 0;
 	}
-	
+
 	if (npc->direct == 0)
 		npc->rect = rcH[npc->ani_no];
 	else
 		npc->rect = rcV[npc->ani_no];
 }
 
-//Machine gun trail (Level 3)
+// Machine gun trail (Level 3)
 void ActNpc128(NPCHAR *npc)
 {
 	RECT rcLeft[5] = {
@@ -618,11 +627,11 @@ void ActNpc128(NPCHAR *npc)
 		{224, 32, 232, 40},
 		{224, 40, 232, 48},
 	};
-	
+
 	if (npc->act_no == 0)
 	{
 		npc->act_no = 1;
-		
+
 		if (npc->direct == 0 || npc->direct == 2)
 		{
 			npc->view.front = 0x800;
@@ -634,28 +643,31 @@ void ActNpc128(NPCHAR *npc)
 			npc->view.top = 0x800;
 		}
 	}
-	
+
 	if (++npc->ani_no > 4)
 		npc->cond = 0;
-	
+
 	switch (npc->direct)
 	{
 		case 0:
 			npc->rect = rcLeft[npc->ani_no];
 			break;
+
 		case 1:
 			npc->rect = rcUp[npc->ani_no];
 			break;
+
 		case 2:
 			npc->rect = rcRight[npc->ani_no];
 			break;
+
 		case 3:
 			npc->rect = rcDown[npc->ani_no];
 			break;
 	}
 }
 
-//Fireball trail (Level 2 & 3)
+// Fireball trail (Level 2 & 3)
 void ActNpc129(NPCHAR *npc)
 {
 	RECT rect[18] = {
@@ -678,20 +690,20 @@ void ActNpc129(NPCHAR *npc)
 		{0xC0, 0x50, 0xD0, 0x60},
 		{0xD0, 0x50, 0xE0, 0x60},
 	};
-	
+
 	if (++npc->ani_wait > 1)
 	{
 		npc->ani_wait = 0;
 		if (++npc->ani_no > 2)
 			npc->cond = 0;
 	}
-	
+
 	npc->y += npc->ym;
-	
+
 	npc->rect = rect[3 * npc->direct + npc->ani_no];
 }
 
-//Puppy (sitting, wagging tail)
+// Puppy (sitting, wagging tail)
 void ActNpc130(NPCHAR *npc)
 {
 	RECT rcLeft[4] = {
@@ -769,7 +781,7 @@ void ActNpc130(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Puppy (sleeping)
+// Puppy (sleeping)
 void ActNpc131(NPCHAR *npc)
 {
 	RECT rcLeft[1] = {144, 144, 160, 160};
@@ -787,7 +799,7 @@ void ActNpc131(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Puppy (barking)
+// Puppy (barking)
 void ActNpc132(NPCHAR *npc)
 {
 	RECT rcLeft[5] = {
@@ -932,7 +944,7 @@ void ActNpc132(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Jenka
+// Jenka
 void ActNpc133(NPCHAR *npc)
 {
 	RECT rcLeft[2] = {
@@ -978,7 +990,7 @@ void ActNpc133(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Armadillo
+// Armadillo
 void ActNpc134(NPCHAR *npc)
 {
 	RECT rcLeft[3] = {
@@ -1067,7 +1079,7 @@ void ActNpc134(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Skeleton
+// Skeleton
 void ActNpc135(NPCHAR *npc)
 {
 	unsigned char deg;
@@ -1087,7 +1099,7 @@ void ActNpc135(NPCHAR *npc)
 	if (gMC.x < npc->x - 0x2C000 || gMC.x > npc->x + 0x2C000 || gMC.y < npc->y - 0x14000 || gMC.y > npc->y + 0x8000)
 		npc->act_no = 0;
 
-	switch ( npc->act_no )
+	switch (npc->act_no)
 	{
 		case 0:
 			npc->act_no = 1;
@@ -1180,7 +1192,7 @@ void ActNpc135(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Puppy (carried)
+// Puppy (carried)
 void ActNpc136(NPCHAR *npc)
 {
 	RECT rcLeft[2] = {
@@ -1243,7 +1255,7 @@ void ActNpc136(NPCHAR *npc)
 		++npc->rect.top;
 }
 
-//Large door (frame)
+// Large door (frame)
 void ActNpc137(NPCHAR *npc)
 {
 	RECT rc = {96, 136, 128, 188};
@@ -1251,7 +1263,7 @@ void ActNpc137(NPCHAR *npc)
 	npc->rect = rc;
 }
 
-//Large door (door)
+// Large door (door)
 void ActNpc138(NPCHAR *npc)
 {
 	RECT rcLeft = {96, 112, 112, 136};
@@ -1305,7 +1317,7 @@ void ActNpc138(NPCHAR *npc)
 	}
 }
 
-//Doctor
+// Doctor
 void ActNpc139(NPCHAR *npc)
 {
 	RECT rcLeft[3] = {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdint.h>
+#include "WindowsWrapper.h"
 
 struct CREDIT
 {
@@ -33,19 +33,19 @@ struct ISLAND_SPRITE
 	int y;
 };
 
-#define MAX_STRIP (WINDOW_HEIGHT / 16) + 1
+#define MAX_STRIP ((WINDOW_HEIGHT / 16) + 1)
 
 void ActionStripper();
 void PutStripper();
-void SetStripper(int x, int y, char *text, int cast);
+void SetStripper(int x, int y, const char *text, int cast);
 void RestoreStripper();
 void ActionIllust();
 void PutIllust();
 void ReloadIllust(int a);
 void InitCreditScript();
 void ReleaseCreditScript();
-bool StartCreditScript();
+BOOL StartCreditScript();
 void ActionCredit();
 void SetCreditIllust(int a);
 void CutCreditIllust();
-int Scene_DownIsland(int mode);
+int Scene_DownIsland(int hWnd, int mode);

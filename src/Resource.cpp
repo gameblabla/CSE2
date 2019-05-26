@@ -1,76 +1,72 @@
 #include "Resource.h"
 
-#include <stdint.h>
-#include <string>
+#include <stddef.h>
+#include <string.h>
 
-#include <SDL_rwops.h>
-
-#include "WindowsWrapper.h"
-
-#include "Resource/ORG/ACCESS.org.h"
-#include "Resource/ORG/ANZEN.org.h"
-#include "Resource/ORG/BALCONY.org.h"
-#include "Resource/ORG/BALLOS.org.h"
-#include "Resource/ORG/BDOWN.org.h"
-#include "Resource/ORG/CEMETERY.org.h"
-#include "Resource/ORG/CURLY.org.h"
-#include "Resource/ORG/DR.org.h"
-#include "Resource/ORG/ENDING.org.h"
-#include "Resource/ORG/ESCAPE.org.h"
-#include "Resource/ORG/FANFALE1.org.h"
-#include "Resource/ORG/FANFALE2.org.h"
-#include "Resource/ORG/FANFALE3.org.h"
-#include "Resource/ORG/FIREEYE.org.h"
-#include "Resource/ORG/GAMEOVER.org.h"
-#include "Resource/ORG/GINSUKE.org.h"
-#include "Resource/ORG/GRAND.org.h"
-#include "Resource/ORG/GRAVITY.org.h"
-#include "Resource/ORG/HELL.org.h"
-#include "Resource/ORG/IRONH.org.h"
-#include "Resource/ORG/JENKA.org.h"
-#include "Resource/ORG/JENKA2.org.h"
-#include "Resource/ORG/KODOU.org.h"
-#include "Resource/ORG/LASTBT3.org.h"
-#include "Resource/ORG/LASTBTL.org.h"
-#include "Resource/ORG/LASTCAVE.org.h"
-#include "Resource/ORG/MARINE.org.h"
-#include "Resource/ORG/MAZE.org.h"
-#include "Resource/ORG/MDOWN2.org.h"
-#include "Resource/ORG/MURA.org.h"
-#include "Resource/ORG/OSIDE.org.h"
-#include "Resource/ORG/PLANT.org.h"
-#include "Resource/ORG/QUIET.org.h"
-#include "Resource/ORG/REQUIEM.org.h"
-#include "Resource/ORG/TOROKO.org.h"
-#include "Resource/ORG/VIVI.org.h"
-#include "Resource/ORG/WANPAK2.org.h"
-#include "Resource/ORG/WANPAKU.org.h"
-#include "Resource/ORG/WEED.org.h"
-#include "Resource/ORG/WHITE.org.h"
+#include "Resource/ORG/Access.org.h"
+#include "Resource/ORG/Anzen.org.h"
+#include "Resource/ORG/Balcony.org.h"
+#include "Resource/ORG/Ballos.org.h"
+#include "Resource/ORG/BreakDown.org.h"
+#include "Resource/ORG/Cemetery.org.h"
+#include "Resource/ORG/Curly.org.h"
+#include "Resource/ORG/Dr.org.h"
+#include "Resource/ORG/Ending.org.h"
+#include "Resource/ORG/Escape.org.h"
+#include "Resource/ORG/Fanfale1.org.h"
+#include "Resource/ORG/Fanfale2.org.h"
+#include "Resource/ORG/Fanfale3.org.h"
+#include "Resource/ORG/FireEye.org.h"
+#include "Resource/ORG/Gameover.org.h"
+#include "Resource/ORG/Ginsuke.org.h"
+#include "Resource/ORG/Grand.org.h"
+#include "Resource/ORG/Gravity.org.h"
+#include "Resource/ORG/Hell.org.h"
+#include "Resource/ORG/ironH.org.h"
+#include "Resource/ORG/Jenka.org.h"
+#include "Resource/ORG/Jenka2.org.h"
+#include "Resource/ORG/Kodou.org.h"
+#include "Resource/ORG/LastBtl3.org.h"
+#include "Resource/ORG/LastBtl.org.h"
+#include "Resource/ORG/LastCave.org.h"
+#include "Resource/ORG/Marine.org.h"
+#include "Resource/ORG/Maze.org.h"
+#include "Resource/ORG/MDown2.org.h"
+#include "Resource/ORG/Mura.org.h"
+#include "Resource/ORG/Oside.org.h"
+#include "Resource/ORG/Plant.org.h"
+#include "Resource/ORG/quiet.org.h"
+#include "Resource/ORG/Requiem.org.h"
+#include "Resource/ORG/Toroko.org.h"
+#include "Resource/ORG/Vivi.org.h"
+#include "Resource/ORG/Wanpak2.org.h"
+#include "Resource/ORG/Wanpaku.org.h"
+#include "Resource/ORG/Weed.org.h"
+#include "Resource/ORG/White.org.h"
 #include "Resource/ORG/XXXX.org.h"
-#include "Resource/ORG/ZONBIE.org.h"
-#include "Resource/WAVE/WAVE100.h"
-#include "Resource/BITMAP/CREDIT01.bmp.h"
-#include "Resource/BITMAP/CREDIT02.bmp.h"
-#include "Resource/BITMAP/CREDIT03.bmp.h"
-#include "Resource/BITMAP/CREDIT04.bmp.h"
-#include "Resource/BITMAP/CREDIT05.bmp.h"
-#include "Resource/BITMAP/CREDIT06.bmp.h"
-#include "Resource/BITMAP/CREDIT07.bmp.h"
-#include "Resource/BITMAP/CREDIT08.bmp.h"
-#include "Resource/BITMAP/CREDIT09.bmp.h"
-#include "Resource/BITMAP/CREDIT10.bmp.h"
-#include "Resource/BITMAP/CREDIT11.bmp.h"
-#include "Resource/BITMAP/CREDIT12.bmp.h"
-#include "Resource/BITMAP/CREDIT14.bmp.h"
-#include "Resource/BITMAP/CREDIT15.bmp.h"
-#include "Resource/BITMAP/CREDIT16.bmp.h"
-#include "Resource/BITMAP/CREDIT17.bmp.h"
-#include "Resource/BITMAP/CREDIT18.bmp.h"
+#include "Resource/ORG/Zonbie.org.h"
+#include "Resource/WAVE/Wave.dat.h"
+#include "Resource/BITMAP/Credit01.bmp.h"
+#include "Resource/BITMAP/Credit02.bmp.h"
+#include "Resource/BITMAP/Credit03.bmp.h"
+#include "Resource/BITMAP/Credit04.bmp.h"
+#include "Resource/BITMAP/Credit05.bmp.h"
+#include "Resource/BITMAP/Credit06.bmp.h"
+#include "Resource/BITMAP/Credit07.bmp.h"
+#include "Resource/BITMAP/Credit08.bmp.h"
+#include "Resource/BITMAP/Credit09.bmp.h"
+#include "Resource/BITMAP/Credit10.bmp.h"
+#include "Resource/BITMAP/Credit11.bmp.h"
+#include "Resource/BITMAP/Credit12.bmp.h"
+#include "Resource/BITMAP/Credit14.bmp.h"
+#include "Resource/BITMAP/Credit15.bmp.h"
+#include "Resource/BITMAP/Credit16.bmp.h"
+#include "Resource/BITMAP/Credit17.bmp.h"
+#include "Resource/BITMAP/Credit18.bmp.h"
 #ifdef JAPANESE
-#include "Resource/BITMAP/PIXEL_JP.bmp.h"
+#include "Resource/BITMAP/pixel_jp.bmp.h"
 #else
-#include "Resource/BITMAP/PIXEL.bmp.h"
+#include "Resource/BITMAP/pixel.bmp.h"
 #endif
 #ifndef WINDOWS
 #include "Resource/ICON/ICON_MINI.bmp.h"
@@ -78,362 +74,117 @@
 #include "Resource/CURSOR/CURSOR_IKA.bmp.h"
 #include "Resource/CURSOR/CURSOR_NORMAL.bmp.h"
 
-const unsigned char* GetResource(const char *name, size_t *size)
-{
-	//ORG
-	if (!strcmp(name, "ACCESS"))
-	{
-		*size = sizeof(rACCESS);
-		return rACCESS;
-	}
-	if (!strcmp(name, "ANZEN"))
-	{
-		*size = sizeof(rANZEN);
-		return rANZEN;
-	}
-	if (!strcmp(name, "BALCONY"))
-	{
-		*size = sizeof(rBALCONY);
-		return rBALCONY;
-	}
-	if (!strcmp(name, "BALLOS"))
-	{
-		*size = sizeof(rBALLOS);
-		return rBALLOS;
-	}
-	if (!strcmp(name, "BDOWN"))
-	{
-		*size = sizeof(rBDOWN);
-		return rBDOWN;
-	}
-	if (!strcmp(name, "CEMETERY"))
-	{
-		*size = sizeof(rCEMETERY);
-		return rCEMETERY;
-	}
-	if (!strcmp(name, "CURLY"))
-	{
-		*size = sizeof(rCURLY);
-		return rCURLY;
-	}
-	if (!strcmp(name, "DR"))
-	{
-		*size = sizeof(rDR);
-		return rDR;
-	}
-	if (!strcmp(name, "ENDING"))
-	{
-		*size = sizeof(rENDING);
-		return rENDING;
-	}
-	if (!strcmp(name, "ESCAPE"))
-	{
-		*size = sizeof(rESCAPE);
-		return rESCAPE;
-	}
-	if (!strcmp(name, "FANFALE1"))
-	{
-		*size = sizeof(rFANFALE1);
-		return rFANFALE1;
-	}
-	if (!strcmp(name, "FANFALE2"))
-	{
-		*size = sizeof(rFANFALE2);
-		return rFANFALE2;
-	}
-	if (!strcmp(name, "FANFALE3"))
-	{
-		*size = sizeof(rFANFALE3);
-		return rFANFALE3;
-	}
-	if (!strcmp(name, "FIREEYE"))
-	{
-		*size = sizeof(rFIREEYE);
-		return rFIREEYE;
-	}
-	if (!strcmp(name, "GAMEOVER"))
-	{
-		*size = sizeof(rGAMEOVER);
-		return rGAMEOVER;
-	}
-	if (!strcmp(name, "GINSUKE"))
-	{
-		*size = sizeof(rGINSUKE);
-		return rGINSUKE;
-	}
-	if (!strcmp(name, "GRAND"))
-	{
-		*size = sizeof(rGRAND);
-		return rGRAND;
-	}
-	if (!strcmp(name, "GRAVITY"))
-	{
-		*size = sizeof(rGRAVITY);
-		return rGRAVITY;
-	}
-	if (!strcmp(name, "HELL"))
-	{
-		*size = sizeof(rHELL);
-		return rHELL;
-	}
-	if (!strcmp(name, "IRONH"))
-	{
-		*size = sizeof(rIRONH);
-		return rIRONH;
-	}
-	if (!strcmp(name, "JENKA"))
-	{
-		*size = sizeof(rJENKA);
-		return rJENKA;
-	}
-	if (!strcmp(name, "JENKA2"))
-	{
-		*size = sizeof(rJENKA2);
-		return rJENKA2;
-	}
-	if (!strcmp(name, "KODOU"))
-	{
-		*size = sizeof(rKODOU);
-		return rKODOU;
-	}
-	if (!strcmp(name, "LASTBT3"))
-	{
-		*size = sizeof(rLASTBT3);
-		return rLASTBT3;
-	}
-	if (!strcmp(name, "LASTBTL"))
-	{
-		*size = sizeof(rLASTBTL);
-		return rLASTBTL;
-	}
-	if (!strcmp(name, "LASTCAVE"))
-	{
-		*size = sizeof(rLASTCAVE);
-		return rLASTCAVE;
-	}
-	if (!strcmp(name, "MARINE"))
-	{
-		*size = sizeof(rMARINE);
-		return rMARINE;
-	}
-	if (!strcmp(name, "MAZE"))
-	{
-		*size = sizeof(rMAZE);
-		return rMAZE;
-	}
-	if (!strcmp(name, "MDOWN2"))
-	{
-		*size = sizeof(rMDOWN2);
-		return rMDOWN2;
-	}
-	if (!strcmp(name, "MURA"))
-	{
-		*size = sizeof(rMURA);
-		return rMURA;
-	}
-	if (!strcmp(name, "OSIDE"))
-	{
-		*size = sizeof(rOSIDE);
-		return rOSIDE;
-	}
-	if (!strcmp(name, "PLANT"))
-	{
-		*size = sizeof(rPLANT);
-		return rPLANT;
-	}
-	if (!strcmp(name, "QUIET"))
-	{
-		*size = sizeof(rQUIET);
-		return rQUIET;
-	}
-	if (!strcmp(name, "REQUIEM"))
-	{
-		*size = sizeof(rREQUIEM);
-		return rREQUIEM;
-	}
-	if (!strcmp(name, "TOROKO"))
-	{
-		*size = sizeof(rTOROKO);
-		return rTOROKO;
-	}
-	if (!strcmp(name, "VIVI"))
-	{
-		*size = sizeof(rVIVI);
-		return rVIVI;
-	}
-	if (!strcmp(name, "WANPAK2"))
-	{
-		*size = sizeof(rWANPAK2);
-		return rWANPAK2;
-	}
-	if (!strcmp(name, "WANPAKU"))
-	{
-		*size = sizeof(rWANPAKU);
-		return rWANPAKU;
-	}
-	if (!strcmp(name, "WEED"))
-	{
-		*size = sizeof(rWEED);
-		return rWEED;
-	}
-	if (!strcmp(name, "WHITE"))
-	{
-		*size = sizeof(rWHITE);
-		return rWHITE;
-	}
-	if (!strcmp(name, "XXXX"))
-	{
-		*size = sizeof(rXXXX);
-		return rXXXX;
-	}
-	if (!strcmp(name, "ZONBIE"))
-	{
-		*size = sizeof(rZONBIE);
-		return rZONBIE;
-	}
-	
-	//WAVE
-	if (!strcmp(name, "WAVE100"))
-	{
-		*size = sizeof(rWAVE100);
-		return rWAVE100;
-	}
-	
-	//Bitmap
-	if (!strcmp(name, "CREDIT01"))
-	{
-		*size = sizeof(rCREDIT01);
-		return rCREDIT01;
-	}
-	if (!strcmp(name, "CREDIT02"))
-	{
-		*size = sizeof(rCREDIT02);
-		return rCREDIT02;
-	}
-	if (!strcmp(name, "CREDIT03"))
-	{
-		*size = sizeof(rCREDIT03);
-		return rCREDIT03;
-	}
-	if (!strcmp(name, "CREDIT04"))
-	{
-		*size = sizeof(rCREDIT04);
-		return rCREDIT04;
-	}
-	if (!strcmp(name, "CREDIT05"))
-	{
-		*size = sizeof(rCREDIT05);
-		return rCREDIT05;
-	}
-	if (!strcmp(name, "CREDIT06"))
-	{
-		*size = sizeof(rCREDIT06);
-		return rCREDIT06;
-	}
-	if (!strcmp(name, "CREDIT07"))
-	{
-		*size = sizeof(rCREDIT07);
-		return rCREDIT07;
-	}
-	if (!strcmp(name, "CREDIT08"))
-	{
-		*size = sizeof(rCREDIT08);
-		return rCREDIT08;
-	}
-	if (!strcmp(name, "CREDIT09"))
-	{
-		*size = sizeof(rCREDIT09);
-		return rCREDIT09;
-	}
-	if (!strcmp(name, "CREDIT10"))
-	{
-		*size = sizeof(rCREDIT10);
-		return rCREDIT10;
-	}
-	if (!strcmp(name, "CREDIT11"))
-	{
-		*size = sizeof(rCREDIT11);
-		return rCREDIT11;
-	}
-	if (!strcmp(name, "CREDIT12"))
-	{
-		*size = sizeof(rCREDIT12);
-		return rCREDIT12;
-	}
-	if (!strcmp(name, "CREDIT14"))
-	{
-		*size = sizeof(rCREDIT14);
-		return rCREDIT14;
-	}
-	if (!strcmp(name, "CREDIT15"))
-	{
-		*size = sizeof(rCREDIT15);
-		return rCREDIT15;
-	}
-	if (!strcmp(name, "CREDIT16"))
-	{
-		*size = sizeof(rCREDIT16);
-		return rCREDIT16;
-	}
-	if (!strcmp(name, "CREDIT17"))
-	{
-		*size = sizeof(rCREDIT17);
-		return rCREDIT17;
-	}
-	if (!strcmp(name, "CREDIT18"))
-	{
-		*size = sizeof(rCREDIT18);
-		return rCREDIT18;
-	}
-	if (!strcmp(name, "PIXEL"))
-	{
 #ifdef JAPANESE
-		*size = sizeof(rPIXEL_JP);
-		return rPIXEL_JP;
+#include "Resource/FONT/msgothic.ttc.h"
 #else
-		*size = sizeof(rPIXEL);
-		return rPIXEL;
-#endif
-	}
-	
 #ifndef WINDOWS
-	//ICON
-	if (!strcmp(name, "ICON_MINI"))
-	{
-		*size = sizeof(rICON_MINI);
-		return rICON_MINI;
-	}
+#include "Resource/FONT/cour.ttf.h"
+#endif
 #endif
 
-	//CURSOR
-	if (!strcmp(name, "CURSOR_NORMAL"))
-	{
-		*size = sizeof(rCURSOR_NORMAL);
-		return rCURSOR_NORMAL;
-	}
-	if (!strcmp(name, "CURSOR_IKA"))
-	{
-		*size = sizeof(rCURSOR_IKA);
-		return rCURSOR_IKA;
-	}
-	return NULL;
-}
-
-SDL_RWops* FindResource(const char *name)
+static const struct
 {
-	size_t resSize;
-	const unsigned char* resource = GetResource(name, &resSize);
-	
-	if (!resource)
-		return NULL;
-	
-	SDL_RWops *fp = SDL_RWFromConstMem(resource, (int)resSize);
-	
-	if (!fp)
+	const char *type;
+	const char *name;
+	const unsigned char *data;
+	size_t size;
+} resources[] = {
+	{"ORG", "ACCESS", rAccess, sizeof(rAccess)},
+	{"ORG", "ANZEN", rAnzen, sizeof(rAnzen)},
+	{"ORG", "BALCONY", rBalcony, sizeof(rBalcony)},
+	{"ORG", "BALLOS", rBallos, sizeof(rBallos)},
+	{"ORG", "BDOWN", rBreakDown, sizeof(rBreakDown)},
+	{"ORG", "CEMETERY", rCemetery, sizeof(rCemetery)},
+	{"ORG", "CURLY", rCurly, sizeof(rCurly)},
+	{"ORG", "DR", rDr, sizeof(rDr)},
+	{"ORG", "ENDING", rEnding, sizeof(rEnding)},
+	{"ORG", "ESCAPE", rEscape, sizeof(rEscape)},
+	{"ORG", "FANFALE1", rFanfale1, sizeof(rFanfale1)},
+	{"ORG", "FANFALE2", rFanfale2, sizeof(rFanfale2)},
+	{"ORG", "FANFALE3", rFanfale3, sizeof(rFanfale3)},
+	{"ORG", "FIREEYE", rFireEye, sizeof(rFireEye)},
+	{"ORG", "GAMEOVER", rGameover, sizeof(rGameover)},
+	{"ORG", "GINSUKE", rGinsuke, sizeof(rGinsuke)},
+	{"ORG", "GRAND", rGrand, sizeof(rGrand)},
+	{"ORG", "GRAVITY", rGravity, sizeof(rGravity)},
+	{"ORG", "HELL", rHell, sizeof(rHell)},
+	{"ORG", "IRONH", rironH, sizeof(rironH)},
+	{"ORG", "JENKA", rJenka, sizeof(rJenka)},
+	{"ORG", "JENKA2", rJenka2, sizeof(rJenka2)},
+	{"ORG", "KODOU", rKodou, sizeof(rKodou)},
+	{"ORG", "LASTBT3", rLastBtl3, sizeof(rLastBtl3)},
+	{"ORG", "LASTBTL", rLastBtl, sizeof(rLastBtl)},
+	{"ORG", "LASTCAVE", rLastCave, sizeof(rLastCave)},
+	{"ORG", "MARINE", rMarine, sizeof(rMarine)},
+	{"ORG", "MAZE", rMaze, sizeof(rMaze)},
+	{"ORG", "MDOWN2", rMDown2, sizeof(rMDown2)},
+	{"ORG", "MURA", rMura, sizeof(rMura)},
+	{"ORG", "OSIDE", rOside, sizeof(rOside)},
+	{"ORG", "PLANT", rPlant, sizeof(rPlant)},
+	{"ORG", "QUIET", rquiet, sizeof(rquiet)},
+	{"ORG", "REQUIEM", rRequiem, sizeof(rRequiem)},
+	{"ORG", "TOROKO", rToroko, sizeof(rToroko)},
+	{"ORG", "VIVI", rVivi, sizeof(rVivi)},
+	{"ORG", "WANPAK2", rWanpak2, sizeof(rWanpak2)},
+	{"ORG", "WANPAKU", rWanpaku, sizeof(rWanpaku)},
+	{"ORG", "WEED", rWeed, sizeof(rWeed)},
+	{"ORG", "WHITE", rWhite, sizeof(rWhite)},
+	{"ORG", "XXXX", rXXXX, sizeof(rXXXX)},
+	{"ORG", "ZONBIE", rZonbie, sizeof(rZonbie)},
+
+	{"WAVE", "WAVE100", rWave, sizeof(rWave)},
+
+	{"BITMAP", "CREDIT01", rCredit01, sizeof(rCredit01)},
+	{"BITMAP", "CREDIT02", rCredit02, sizeof(rCredit02)},
+	{"BITMAP", "CREDIT03", rCredit03, sizeof(rCredit03)},
+	{"BITMAP", "CREDIT04", rCredit04, sizeof(rCredit04)},
+	{"BITMAP", "CREDIT05", rCredit05, sizeof(rCredit05)},
+	{"BITMAP", "CREDIT06", rCredit06, sizeof(rCredit06)},
+	{"BITMAP", "CREDIT07", rCredit07, sizeof(rCredit07)},
+	{"BITMAP", "CREDIT08", rCredit08, sizeof(rCredit08)},
+	{"BITMAP", "CREDIT09", rCredit09, sizeof(rCredit09)},
+	{"BITMAP", "CREDIT10", rCredit10, sizeof(rCredit10)},
+	{"BITMAP", "CREDIT11", rCredit11, sizeof(rCredit11)},
+	{"BITMAP", "CREDIT12", rCredit12, sizeof(rCredit12)},
+	{"BITMAP", "CREDIT14", rCredit14, sizeof(rCredit14)},
+	{"BITMAP", "CREDIT15", rCredit15, sizeof(rCredit15)},
+	{"BITMAP", "CREDIT16", rCredit16, sizeof(rCredit16)},
+	{"BITMAP", "CREDIT17", rCredit17, sizeof(rCredit17)},
+	{"BITMAP", "CREDIT18", rCredit18, sizeof(rCredit18)},
+#ifdef JAPANESE
+	{"BITMAP", "PIXEL", rpixel_jp, sizeof(rpixel_jp)},
+#else
+	{"BITMAP", "PIXEL", rpixel, sizeof(rpixel)},
+#endif
+
+#ifndef WINDOWS
+	{"ICON", "ICON_MINI", rICON_MINI, sizeof(rICON_MINI)},
+#endif
+
+	{"CURSOR", "CURSOR_NORMAL", rCURSOR_NORMAL, sizeof(rCURSOR_NORMAL)},
+	{"CURSOR", "CURSOR_IKA", rCURSOR_IKA, sizeof(rCURSOR_IKA)},
+
+#ifdef JAPANESE
+	{"FONT", "DEFAULT_FONT", rmsgothic, sizeof(rmsgothic)},
+#else
+#ifndef WINDOWS
+	{"FONT", "DEFAULT_FONT", rcour, sizeof(rcour)},
+#endif
+#endif
+};
+
+const unsigned char* FindResource(const char *name, const char *type, size_t *size)
+{
+	for (unsigned int i = 0; i < sizeof(resources) / sizeof(resources[0]); ++i)
 	{
-		printf("Couldn't open resource %s\nSDL Error: %s\n", name, SDL_GetError());
-		return NULL;
+		if (!strcmp(name, resources[i].name) && !strcmp(type, resources[i].type))
+		{
+			if (size)
+				*size = resources[i].size;
+
+			return resources[i].data;
+		}
 	}
-	
-	return fp;
+
+	return NULL;
 }

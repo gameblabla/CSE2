@@ -1,6 +1,5 @@
 #include "Stage.h"
 
-#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -132,14 +131,14 @@ const STAGE_TABLE gTMT[95] = {
 BOOL TransferStage(int no, int w, int x, int y)
 {
 	//Move character
-	SetMyCharPosition(x << 13, y << 13);
-	
+	SetMyCharPosition(x * 0x10 * 0x200, y * 0x10 * 0x200);
+
 	BOOL bError = FALSE;
-	
+
 	//Get path
 	char path_dir[20];
 	strcpy(path_dir, "Stage");
-	
+
 	//Load tileset
 	char path[PATH_LENGTH];
 	sprintf(path, "%s/Prt%s", path_dir, gTMT[no].parts);
@@ -149,7 +148,7 @@ BOOL TransferStage(int no, int w, int x, int y)
 	sprintf(path, "%s/%s.pxa", path_dir, gTMT[no].parts);
 	if (!LoadAttributeData(path))
 		bError = TRUE;
-	
+
 	//Load tilemap
 	sprintf(path, "%s/%s.pxm", path_dir, gTMT[no].map);
 	if (!LoadMapData2(path))
@@ -164,47 +163,40 @@ BOOL TransferStage(int no, int w, int x, int y)
 	sprintf(path, "%s/%s.tsc", path_dir, gTMT[no].map);
 	if (!LoadTextScript_Stage(path))
 		bError = TRUE;
-	
+
 	//Load background
-	strcpy(path, gTMT[no].back);
+	sprintf(path, "%s", gTMT[no].back);
 	if (!InitBack(path, gTMT[no].bkType))
 		bError = TRUE;
-	
+
 	//Get path
 	strcpy(path_dir, "Npc");
-	
+
 	//Load NPC sprite sheets
 	sprintf(path, "%s/Npc%s", path_dir, gTMT[no].npc);
 	if (!ReloadBitmap_File(path, SURFACE_ID_LEVEL_SPRITESET_1))
 		bError = TRUE;
-	
+
 	sprintf(path, "%s/Npc%s", path_dir, gTMT[no].boss);
 	if (!ReloadBitmap_File(path, SURFACE_ID_LEVEL_SPRITESET_2))
 		bError = TRUE;
-	
+
 	if (bError)
-	{
-		printf("Failed to load stage %d\n", no);
 		return FALSE;
-	}
-	else
-	{
-		//Load map name
-		ReadyMapName(gTMT[no].name);
-		
-		StartTextScript(w);
-		SetFrameMyChar();
-		ClearBullet();
-		InitCaret();
-		ClearValueView();
-		ResetQuake();
-		InitBossChar(gTMT[no].boss_no);
-		ResetFlash();
-		gStageNo = no;
-		return TRUE;
-	}
-	
-	return FALSE;
+
+	//Load map name
+	ReadyMapName(gTMT[no].name);
+
+	StartTextScript(w);
+	SetFrameMyChar();
+	ClearBullet();
+	InitCaret();
+	ClearValueView();
+	ResetQuake();
+	InitBossChar(gTMT[no].boss_no);
+	ResetFlash();
+	gStageNo = no;
+	return TRUE;
 }
 
 //Music
@@ -234,7 +226,11 @@ const char *gMusicTable[42] =
 	"ACCESS",
 	"IRONH",
 	"GRAND",
+#ifdef NONPORTABLE
+	"Curly",	// The vanilla game used the original filename instead of the internal 8.3 one
+#else
 	"CURLY",
+#endif
 	"OSIDE",
 	"REQUIEM",
 	"WANPAK2",
@@ -260,32 +256,32 @@ int gMusicNo;
 
 void ChangeMusic(int no)
 {
-	if (!no || no != gMusicNo)
-	{
-		//Stop and keep track of old song
-		gOldPos = GetOrganyaPosition();
-		gOldNo = gMusicNo;
-		StopOrganyaMusic();
-		
-		//Load .org
-		LoadOrganya(gMusicTable[no]);
-		
-		//Reset position, volume, and then play the song
-		ChangeOrganyaVolume(100);
-		SetOrganyaPosition(0);
-		PlayOrganyaMusic();
-		gMusicNo = no;
-	}
+	if (no && no == gMusicNo)
+		return;
+
+	//Stop and keep track of old song
+	gOldPos = GetOrganyaPosition();
+	gOldNo = gMusicNo;
+	StopOrganyaMusic();
+
+	//Load .org
+	LoadOrganya(gMusicTable[no]);
+
+	//Reset position, volume, and then play the song
+	ChangeOrganyaVolume(100);
+	SetOrganyaPosition(0);
+	PlayOrganyaMusic();
+	gMusicNo = no;
 }
 
 void ReCallMusic()
 {
 	//Stop old song
 	StopOrganyaMusic();
-	
+
 	//Load .org that was playing before
 	LoadOrganya(gMusicTable[gOldNo]);
-	
+
 	//Reset position, volume, and then play the song
 	SetOrganyaPosition(gOldPos);
 	ChangeOrganyaVolume(100);

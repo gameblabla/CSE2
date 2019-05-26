@@ -55,7 +55,7 @@ static void ActBossChar03_01(NPCHAR *npc)
 				++npc->ani_no;
 			}
 
-			if ( npc->ani_no > 3 )
+			if (npc->ani_no > 3)
 				npc->ani_no = 2;
 
 			npc->xm -= 0x20;
@@ -100,7 +100,7 @@ static void ActBossChar03_01(NPCHAR *npc)
 				++npc->ani_no;
 			}
 
-			if ( npc->ani_no > 5 )
+			if (npc->ani_no > 5)
 				npc->ani_no = 4;
 
 			npc->xm += 0x20;
@@ -523,7 +523,7 @@ void ActBossChar_MonstX(void)
 			gBoss[2].direct = 2;
 			gBoss[3].cond = 0x80;
 			gBoss[3].life = 60;
-			gBoss[3].size = 3;	// Redundant: this get overwriten a few lines later
+			gBoss[3].size = 3;	// Redundant: this get overwritten a few lines later
 			gBoss[3].hit_voice = 54;
 			gBoss[3].destroy_voice = 71;
 			gBoss[3].size = 2;

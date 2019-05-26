@@ -4,35 +4,63 @@ Cave Story Engine 2 is a decompilation of Cave Story, ported from DirectX to SDL
 
 ![Screenshot](screenshot.png)
 
-## Disclaimer
-
-Cave Story Engine 2 is based off of the *original freeware release* by Studio Pixel, and is not based off of Nicalis' ports, and contains no extra features included in said ports (graphics, audio, and other changes).
-
 ## Dependencies
+
+*Note: if these are not found, they will be built locally (CMake only)*
 
 * SDL2
 * FreeType
-* pkg-config
+* FLTK
 
 ## Building
 
-The main way to build the project is 'the Linux way':
+### CMake
 
-Just run 'make' in the base directory, preferably with some of the following settings:
+This project primarily uses CMake, allowing it to be built with a range of compilers.
 
-* RELEASE=1 to compile a release build (optimised, stripped, etc.)
-* STATIC=1 to produce a statically-linked executable (good for Windows builds, so you don't need to bundle DLL files)
-* JAPANESE=1 to enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
-* FIX_BUGS=1 to fix certain bugs (see [src/Bug Fixes.txt](src/Bug%20Fixes.txt))
-* WINDOWS=1 to enable Windows-only features like a unique file/taskbar icon, and system font loading (needed for the font setting in Config.dat to do anything)
-* RASPBERRY_PI=1 to enable tweaks to improve performance on Raspberry Pis
-* NONPORTABLE=1 to enable bits of code that aren't portable, but are what the original game used
+In this directory, create a directory called 'build', then switch to the command-line (Visual Studio users should open the [Developer Command Prompt](https://docs.microsoft.com/en-us/dotnet/framework/tools/developer-command-prompt-for-vs)) and `cd` into it. After that, generate the files for your build system with:
 
-Project files for Visual Studio 2003 are also available, in the 'msvc2003' directory (VS2003 was what Pixel used to compile the original EXE).
+```
+cmake .. -DCMAKE_BUILD_TYPE=Release
+```
 
-## Running
+You can also add the following flags:
+* `-DJAPANESE=ON` - Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
+* `-DFIX_BUGS=ON` - Fix bugs in the game (see [src/Bug Fixes.txt](src/Bug%20Fixes.txt))
+* `-DNONPORTABLE=ON` - Enable bits of code that aren't portable, but are what the original game used
+* `-DFORCE_LOCAL_LIBS=ON` - Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones
 
-In order to run Cave Story Engine 2, you have to get the "data" folder from a vanilla copy of Cave Story. Just copy and paste it into the same folder as the executable.
+Then compile CSE2 with this command:
+
+```
+cmake --build . --config Release
+```
+
+If you're a Visual Studio user, you can open the generated `CSE2.sln` file instead.
+
+Once built, the executables can be found in `build_en` or `build_jp`, depending on the selected language.
+
+### Makefile (deprecated)
+
+*Note: this requires pkg-config*
+
+Run 'make' in the base directory, preferably with some of the following settings:
+
+* `RELEASE=1` - Compile a release build (optimised, stripped, etc.)
+* `STATIC=1` - Produce a statically-linked executable (good for Windows builds, so you don't need to bundle DLL files)
+* `JAPANESE=1` - Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
+* `FIX_BUGS=1` - Fix bugs in the game (see [src/Bug Fixes.txt](src/Bug%20Fixes.txt))
+* `WINDOWS=1` - Enable Windows-only features like a unique file/taskbar icon, and system font loading (needed for the font setting in Config.dat to do anything)
+* `RASPBERRY_PI=1` - Enable tweaks to improve performance on Raspberry Pis
+* `NONPORTABLE=1` - Enable bits of code that aren't portable, but are what the original game used
+
+### Visual Studio .NET 2003
+
+Project files for Visual Studio .NET 2003 are available in the 'msvc2003' directory.
+
+Visual Studio .NET 2003 was used by Pixel to create the original `Doukutsu.exe`, so these project files allow us to check the accuracy of the decompilation by comparing the generated assembly code to that of the original executable.
+
+This option is **strictly** for checking the decompilation's accuracy; CMake should be preferred in all other situations.
 
 ## Licensing
 

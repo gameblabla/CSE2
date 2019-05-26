@@ -12,7 +12,7 @@
 #include "Sound.h"
 #include "Triangle.h"
 
-//Dragon Zombie
+// Dragon Zombie
 void ActNpc200(NPCHAR *npc)
 {
 	unsigned char deg;
@@ -140,7 +140,7 @@ void ActNpc200(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Dragon Zombie (dead)
+// Dragon Zombie (dead)
 void ActNpc201(NPCHAR *npc)
 {
 	RECT rcLeft[1] = {200, 0, 240, 40};
@@ -152,7 +152,7 @@ void ActNpc201(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Dragon Zombie projectile
+// Dragon Zombie projectile
 void ActNpc202(NPCHAR *npc)
 {
 	if (npc->flag & 0xFF)
@@ -176,7 +176,7 @@ void ActNpc202(NPCHAR *npc)
 		++npc->ani_no;
 	}
 
-	if ( npc->ani_no > 2 )
+	if (npc->ani_no > 2)
 		npc->ani_no = 0;
 
 	npc->rect = rect_left[npc->ani_no];
@@ -188,7 +188,7 @@ void ActNpc202(NPCHAR *npc)
 	}
 }
 
-//Critter (destroyed Egg Corridor)
+// Critter (destroyed Egg Corridor)
 void ActNpc203(NPCHAR *npc)
 {
 	RECT rcLeft[3] = {
@@ -289,7 +289,7 @@ void ActNpc203(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Falling spike (small)
+// Falling spike (small)
 void ActNpc204(NPCHAR *npc)
 {
 	RECT rc[2] = {
@@ -345,7 +345,7 @@ void ActNpc204(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Falling spike (large)
+// Falling spike (large)
 void ActNpc205(NPCHAR *npc)
 {
 	RECT rc[2] = {
@@ -428,7 +428,7 @@ void ActNpc205(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Counter Bomb
+// Counter Bomb
 void ActNpc206(NPCHAR *npc)
 {
 	switch (npc->act_no)
@@ -538,7 +538,7 @@ void ActNpc206(NPCHAR *npc)
 	npc->rect = rect_left[npc->ani_no];
 }
 
-//Counter Bomb's countdown
+// Counter Bomb's countdown
 void ActNpc207(NPCHAR *npc)
 {
 	RECT rc[5] = {
@@ -580,7 +580,7 @@ void ActNpc207(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Basu (destroyed Egg Corridor)
+// Basu (destroyed Egg Corridor)
 void ActNpc208(NPCHAR *npc)
 {
 	RECT rcLeft[3] = {
@@ -732,7 +732,7 @@ void ActNpc208(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Basu projectile (destroyed Egg Corridor)
+// Basu projectile (destroyed Egg Corridor)
 void ActNpc209(NPCHAR *npc)
 {
 	if (npc->flag & 0xFF)
@@ -769,7 +769,7 @@ void ActNpc209(NPCHAR *npc)
 	}
 }
 
-//Beetle (destroyed Egg Corridor)
+// Beetle (destroyed Egg Corridor)
 void ActNpc210(NPCHAR *npc)
 {
 	RECT rcLeft[2] = {
@@ -872,7 +872,7 @@ void ActNpc210(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Spikes (small)
+// Spikes (small)
 void ActNpc211(NPCHAR *npc)
 {
 	RECT rects[4] = {
@@ -885,7 +885,7 @@ void ActNpc211(NPCHAR *npc)
 	npc->rect = rects[npc->code_event];
 }
 
-//Sky Dragon
+// Sky Dragon
 void ActNpc212(NPCHAR *npc)
 {
 	RECT rcRight[4] = {
@@ -996,7 +996,7 @@ void ActNpc212(NPCHAR *npc)
 	}
 }
 
-//Night Spirit
+// Night Spirit
 void ActNpc213(NPCHAR *npc)
 {
 	RECT rect[10] = {
@@ -1155,14 +1155,14 @@ void ActNpc213(NPCHAR *npc)
 		else
 			npc->y += npc->ym;
 
-		if ( gMC.y > npc->tgt_y + 0x1E000 || gMC.y < npc->tgt_y - 0x1E000 )
+		if (gMC.y > npc->tgt_y + 0x1E000 || gMC.y < npc->tgt_y - 0x1E000)
 			npc->act_no = 40;
 	}
 
 	npc->rect = rect[npc->ani_no];
 }
 
-//Night Spirit projectile
+// Night Spirit projectile
 void ActNpc214(NPCHAR *npc)
 {
 	RECT rect[3] = {
@@ -1208,7 +1208,7 @@ void ActNpc214(NPCHAR *npc)
 	npc->rect = rect[npc->ani_no];
 }
 
-//Sandcroc (Outer Wall)
+// Sandcroc (Outer Wall)
 void ActNpc215(NPCHAR *npc)
 {
 	switch (npc->act_no)
@@ -1313,7 +1313,7 @@ void ActNpc215(NPCHAR *npc)
 	npc->rect = rect[npc->ani_no];
 }
 
-//Debug Cat
+// Debug Cat
 void ActNpc216(NPCHAR *npc)
 {
 	RECT rect = {256, 192, 272, 216};
@@ -1321,7 +1321,7 @@ void ActNpc216(NPCHAR *npc)
 	npc->rect = rect;
 }
 
-//Itoh
+// Itoh
 void ActNpc217(NPCHAR *npc)
 {
 	RECT rect[8] = {
@@ -1473,7 +1473,7 @@ void ActNpc218(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-//Smoke generator
+// Smoke generator
 void ActNpc219(NPCHAR *npc)
 {
 	RECT rc = {0, 0, 0, 0};

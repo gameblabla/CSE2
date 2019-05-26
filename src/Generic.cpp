@@ -1,18 +1,19 @@
 #include "Generic.h"
 
-#include <stdint.h>
 #include <stdio.h>
+
+#include "WindowsWrapper.h"
 
 #include "CommonDefines.h"
 #include "Tags.h"
 
-bool GetCompileVersion(int *v1, int *v2, int *v3, int *v4)
+BOOL GetCompileVersion(int *v1, int *v2, int *v3, int *v4)
 {
 	*v1 = 1;
 	*v2 = 0;
 	*v3 = 0;
 	*v4 = 6;
-	return true;
+	return TRUE;
 }
 
 long GetFileSizeLong(const char *path)
@@ -30,26 +31,26 @@ long GetFileSizeLong(const char *path)
 	return len;
 }
 
-bool CheckFileExists(const char *name)
+BOOL CheckFileExists(const char *name)
 {
 	char path[PATH_LENGTH];
 	sprintf(path, "%s/%s", gModulePath, name);
-	
+
 	FILE *file = fopen(path, "rb");
 	if (file)
 	{
 		fclose(file);
-		return true;
+		return TRUE;
 	}
-	
-	return false;
+
+	return FALSE;
 }
 
-bool IsShiftJIS(uint8_t c)
+BOOL IsShiftJIS(unsigned char c)
 {
-	if ( c > 0x80 && c < 0xA0 )
-		return true;
-	if ( c < 0xE0 || c >= 0xF0 )
-		return false;
-	return true;
+	if (c > 0x80 && c < 0xA0)
+		return TRUE;
+	if (c < 0xE0 || c >= 0xF0)
+		return FALSE;
+	return TRUE;
 }

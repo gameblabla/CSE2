@@ -1,9 +1,10 @@
 #include "TextScr.h"
 
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "SDL.h"
 
 #include "WindowsWrapper.h"
 
@@ -20,6 +21,7 @@
 #include "Game.h"
 #include "Generic.h"
 #include "KeyControl.h"
+#include "Main.h"
 #include "Map.h"
 #include "MapName.h"
 #include "MiniMap.h"
@@ -63,7 +65,7 @@ BOOL InitTextScript2()
 
 	//Create line surfaces
 	for (int i = 0; i < 4; i++)
-		MakeSurface_Generic(gRect_line.right, gRect_line.bottom, (Surface_Ids)(i + SURFACE_ID_TEXT_LINE1));
+		MakeSurface_Generic(gRect_line.right, gRect_line.bottom, (Surface_Ids)(i + SURFACE_ID_TEXT_LINE1), FALSE);
 
 	//Clear text
 	memset(text, 0, sizeof(text));
@@ -89,9 +91,11 @@ void EndTextScript()
 }
 
 //Decrypt .tsc
-void EncryptionBinaryData2(uint8_t *pData, int size)
+void EncryptionBinaryData2(unsigned char *pData, int size)
 {
 	int val1;
+	int work;
+	int i;
 
 	int half = size / 2;
 	if (pData[half] == 0)
@@ -99,9 +103,9 @@ void EncryptionBinaryData2(uint8_t *pData, int size)
 	else
 		val1 = (pData[half] % 256) * -1;
 
-	for (int i = 0; i < size; i++)
+	for (i = 0; i < size; i++)
 	{
-		int work = pData[i];
+		work = pData[i];
 		work += val1;
 
 		if (i != half)
@@ -110,7 +114,7 @@ void EncryptionBinaryData2(uint8_t *pData, int size)
 }
 
 //Load generic .tsc
-bool LoadTextScript2(const char *name)
+BOOL LoadTextScript2(const char *name)
 {
 	//Get path
 	char path[260];
@@ -118,12 +122,12 @@ bool LoadTextScript2(const char *name)
 
 	gTS.size = GetFileSizeLong(path);
 	if (gTS.size == -1)
-		return false;
+		return FALSE;
 
 	//Open file
 	FILE *fp = fopen(path, "rb");
 	if (fp == NULL)
-		return false;
+		return FALSE;
 
 	//Read data
 	fread(gTS.data, 1, gTS.size, fp);
@@ -134,12 +138,12 @@ bool LoadTextScript2(const char *name)
 	strcpy(gTS.path, name);
 
 	//Decrypt data
-	EncryptionBinaryData2((uint8_t*)gTS.data, gTS.size);
-	return true;
+	EncryptionBinaryData2((unsigned char*)gTS.data, gTS.size);
+	return TRUE;
 }
 
 //Load stage .tsc
-bool LoadTextScript_Stage(char *name)
+BOOL LoadTextScript_Stage(const char *name)
 {
 	//Open Head.tsc
 	char path[PATH_LENGTH];
@@ -147,15 +151,15 @@ bool LoadTextScript_Stage(char *name)
 
 	long head_size = GetFileSizeLong(path);
 	if (head_size == -1)
-		return false;
+		return FALSE;
 
 	FILE *fp = fopen(path, "rb");
 	if (fp == NULL)
-		return false;
+		return FALSE;
 
 	//Read Head.tsc
 	fread(gTS.data, 1, head_size, fp);
-	EncryptionBinaryData2((uint8_t*)gTS.data, head_size);
+	EncryptionBinaryData2((unsigned char*)gTS.data, head_size);
 	gTS.data[head_size] = 0;
 	fclose(fp);
 
@@ -164,22 +168,22 @@ bool LoadTextScript_Stage(char *name)
 
 	long body_size = GetFileSizeLong(path);
 	if (body_size == -1)
-		return false;
+		return FALSE;
 
 	fp = fopen(path, "rb");
 	if (fp == NULL)
-		return false;
+		return FALSE;
 
 	//Read stage's tsc
 	fread(&gTS.data[head_size], 1, body_size, fp);
-	EncryptionBinaryData2((uint8_t*)&gTS.data[head_size], body_size);
+	EncryptionBinaryData2((unsigned char*)&gTS.data[head_size], body_size);
 	gTS.data[head_size + body_size] = 0;
 	fclose(fp);
 
 	//Set parameters
 	gTS.size = head_size + body_size;
 	strcpy(gTS.path, name);
-	return true;
+	return TRUE;
 }
 
 //Get current path
@@ -218,7 +222,7 @@ BOOL StartTextScript(int no)
 
 	gTS.rcText.left = TEXT_LEFT;
 	gTS.rcText.top = WINDOW_HEIGHT - 56;
-	gTS.rcText.right = WINDOW_WIDTH + 108;
+	gTS.rcText.right = WINDOW_WIDTH - TEXT_LEFT;
 	gTS.rcText.bottom = gTS.rcText.top + 48;
 
 	/* This is present in the Linux port, but not the Windows version (1.0.0.6, at least)
@@ -323,7 +327,7 @@ void StopTextScript()
 //Prepare a new line
 void CheckNewLine()
 {
-	if (gTS.ypos_line[gTS.line % 4] == '0')
+	if (gTS.ypos_line[gTS.line % 4] == 48)
 	{
 		gTS.mode = 3;
 		g_GameFlags |= 4;
@@ -335,6 +339,13 @@ void CheckNewLine()
 //Type a number into the text buffer
 void SetNumberTextScript(int index)
 {
+	int a;
+	int b;
+	int i;
+	BOOL bZero;
+	int offset;
+	char str[5];
+
 	//Get digit table
 	int table[3];
 	table[0] = 1000;
@@ -342,15 +353,13 @@ void SetNumberTextScript(int index)
 	table[2] = 10;
 
 	//Get number to print
-	int a = gNumberTextScript[index];
-	int b;
+	a = gNumberTextScript[index];
 
-	char str[5];
-	BOOL bZero = false;
-	int offset = 0;
+	bZero = FALSE;
+	offset = 0;
 
 	//Trim leading zeroes
-	for (int i = 0; i < 3; i++)
+	for (i = 0; i < 3; i++)
 	{
 		if (a / table[i] || bZero != FALSE)
 		{
@@ -363,7 +372,7 @@ void SetNumberTextScript(int index)
 	}
 
 	//Set last digit of string, and add null terminator
-	str[offset] = a + '0';
+	str[offset] = (char)a + '0';
 	str[offset + 1] = 0;
 
 	//Append number to line
@@ -403,6 +412,18 @@ void ClearTextLine()
 //Draw textbox and whatever else
 void PutTextScript()
 {
+	RECT rcFace;
+	RECT rcItemBox1;
+	RECT rcItemBox2;
+	RECT rcItemBox3;
+	RECT rcItemBox4;
+	RECT rcItemBox5;
+	int i;
+	RECT rect_yesno;
+	RECT rect_cur;
+	RECT rect;
+	int text_offset;
+
 	if (gTS.mode == 0)
 		return;
 
@@ -429,14 +450,12 @@ void PutTextScript()
 		RECT rcFrame3 = {0, 16, 244, 24};
 
 		PutBitmap3(&grcFull, WINDOW_WIDTH / 2 - 122, gTS.rcText.top - 10, &rcFrame1, SURFACE_ID_TEXT_BOX);
-		int i;
 		for (i = 1; i < 7; i++)
 			PutBitmap3(&grcFull, WINDOW_WIDTH / 2 - 122, 8 * i + gTS.rcText.top - 10, &rcFrame2, SURFACE_ID_TEXT_BOX);
 		PutBitmap3(&grcFull, WINDOW_WIDTH / 2 - 122, 8 * i + gTS.rcText.top - 10, &rcFrame3, SURFACE_ID_TEXT_BOX);
 	}
 
 	//Draw face picture
-	RECT rcFace;
 	rcFace.left = 48 * (gTS.face % 6);
 	rcFace.top = 48 * (gTS.face / 6);
 	rcFace.right = rcFace.left + 48;
@@ -444,23 +463,22 @@ void PutTextScript()
 
 	if (gTS.face_x < (TEXT_LEFT * 0x200))
 		gTS.face_x += 0x1000;
+
 	PutBitmap3(&gTS.rcText, gTS.face_x / 0x200, gTS.rcText.top - 3, &rcFace, SURFACE_ID_FACE);
 
 	//Draw text
-	int text_offset;
 	if (gTS.face)
 		text_offset = 56;
 	else
 		text_offset = 0;
 
-	for (int i = 0; i < 4; i++)
+	for (i = 0; i < 4; i++)
 		PutBitmap3(&gTS.rcText, text_offset + TEXT_LEFT, gTS.offsetY + gTS.ypos_line[i] + gTS.rcText.top, &gRect_line, (Surface_Ids)(i + SURFACE_ID_TEXT_LINE1));
 
 	//Draw NOD cursor
 	if ((gTS.wait_beam++ % 20 > 12) && gTS.mode == 2)
 	{
-		RECT rect;
-		rect.left = TEXT_LEFT + text_offset + 6 * gTS.p_write;
+		rect.left = TEXT_LEFT + 6 * gTS.p_write + text_offset;
 		rect.top = gTS.ypos_line[gTS.line % 4] + gTS.rcText.top + gTS.offsetY;
 		rect.right = rect.left + 5;
 		rect.bottom = rect.top + 11;
@@ -473,16 +491,18 @@ void PutTextScript()
 		// instead).
 		//CortBox(&rect, GetCortBoxColor(RGB(0xFF, 0xFF, 0xFE));
 #else
+		// This accidentally uses a BGR value directly, without
+		// running it though GetCortBoxColor first
 		CortBox(&rect, RGB(0xFF, 0xFF, 0xFE));
 #endif
 	}
 
 	//Draw GIT
-	RECT rcItemBox1 = {0, 0, 72, 16};
-	RECT rcItemBox2 = {0, 8, 72, 24};
-	RECT rcItemBox3 = {240, 0, 244, 8};
-	RECT rcItemBox4 = {240, 8, 244, 16};
-	RECT rcItemBox5 = {240, 16, 244, 24};
+	SET_RECT(rcItemBox1, 0, 0, 72, 16)
+	SET_RECT(rcItemBox2, 0, 8, 72, 24)
+	SET_RECT(rcItemBox3, 240, 0, 244, 8)
+	SET_RECT(rcItemBox4, 240, 8, 244, 16)
+	SET_RECT(rcItemBox5, 240, 16, 244, 24)
 
 	if (gTS.item)
 	{
@@ -496,7 +516,6 @@ void PutTextScript()
 		if (gTS.item_y < WINDOW_HEIGHT - 104)
 			++gTS.item_y;
 
-		RECT rect;
 		if (gTS.item < 1000)
 		{
 			rect.left = 16 * (gTS.item % 16);
@@ -516,12 +535,11 @@ void PutTextScript()
 	}
 
 	//Draw Yes / No selection
-	RECT rect_yesno = {152, 48, 244, 80};
-	RECT rect_cur = {112, 88, 128, 104};
+	SET_RECT(rect_yesno, 152, 48, 244, 80)
+	SET_RECT(rect_cur, 112, 88, 128, 104)
 
 	if (gTS.mode == 6)
 	{
-		int i;
 		if (gTS.wait < 2)
 			i = (WINDOW_HEIGHT - 96) + (2 - gTS.wait) * 4;
 		else
@@ -536,9 +554,13 @@ void PutTextScript()
 //Parse TSC
 int TextScriptProc()
 {
-	RECT rcSymbol = {64, 48, 72, 56};
-
 	BOOL bExit;
+	char c[3];
+	int w, x, y, z;
+	int i;
+	int length;
+
+	RECT rcSymbol = {64, 48, 72, 56};
 
 	switch (gTS.mode)
 	{
@@ -555,7 +577,6 @@ int TextScriptProc()
 			gTS.wait = 0;
 
 			//Parsing time
-			int w, x, y, z;
 			bExit = FALSE;
 
 			while (bExit == FALSE)
@@ -603,13 +624,13 @@ int TextScriptProc()
 					else if (IS_COMMAND('E','Q','+'))
 					{
 						z = GetTextScriptNo(gTS.p_read + 4);
-						EquipItem(z, true);
+						EquipItem(z, TRUE);
 						gTS.p_read += 8;
 					}
 					else if (IS_COMMAND('E','Q','-'))
 					{
 						z = GetTextScriptNo(gTS.p_read + 4);
-						EquipItem(z, false);
+						EquipItem(z, FALSE);
 						gTS.p_read += 8;
 					}
 					else if (IS_COMMAND('A','M','+'))
@@ -673,7 +694,13 @@ int TextScriptProc()
 						y = GetTextScriptNo(gTS.p_read + 19);
 						if (!TransferStage(z, w, x, y))
 						{
-						//	MessageBoxA(hWnd, "ﾃ｢Xﾃ｢eﾃｼ[ﾃ｢Wﾃｩﾂｦﾃｴﾃεｩﾂｦﾃｬﾃ療ｩﾂｦﾃｩ+ﾃ�ﾂｩﾃｶs", "ﾃ｢Gﾃ｢ﾃｫﾃｼ[", 0);
+							#ifdef JAPANESE
+							SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", "ステージの読み込みに失敗", NULL);
+							#else
+							SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Failed to load stage", NULL);
+							#endif
+
+							//MessageBoxA(ghWnd, "ステージの読み込みに失敗", "エラー", 0);
 							return 0;
 						}
 					}
@@ -686,12 +713,12 @@ int TextScriptProc()
 					}
 					else if (IS_COMMAND('H','M','C'))
 					{
-						ShowMyChar(false);
+						ShowMyChar(FALSE);
 						gTS.p_read += 4;
 					}
 					else if (IS_COMMAND('S','M','C'))
 					{
-						ShowMyChar(true);
+						ShowMyChar(TRUE);
 						gTS.p_read += 4;
 					}
 					else if (IS_COMMAND('F','L','+'))
@@ -722,7 +749,7 @@ int TextScriptProc()
 					{
 						g_GameFlags &= ~2;
 						g_GameFlags |= 1;
-						gMC.up = false;
+						gMC.up = FALSE;
 						gMC.shock = 0;
 						gTS.p_read += 4;
 					}
@@ -1198,7 +1225,7 @@ int TextScriptProc()
 						bExit = TRUE;
 						z = GetTextScriptNo(gTS.p_read + 4);
 
-						switch (Scene_DownIsland(z))
+						switch (Scene_DownIsland(ghWnd, z))
 						{
 							case 0:
 								return 0;
@@ -1214,9 +1241,18 @@ int TextScriptProc()
 					}
 					else
 					{
-						printf("Unimplemented command: <%c%c%c\n", (char)gTS.data[gTS.p_read + 1], (char)gTS.data[gTS.p_read + 2], (char)gTS.data[gTS.p_read + 3]);
-						gTS.p_read += 4;
-						return 1;
+						char str_0[0x40];
+						#ifdef JAPANESE
+						sprintf(str_0, "不明のコード:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);
+						SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", str_0, NULL);
+						#else
+						sprintf(str_0, "Unknown code:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);
+						SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", str_0, NULL);
+						#endif
+
+						//MessageBoxA(0, str_0, "エラー", 0);
+
+						return 0;
 					}
 				}
 				else
@@ -1236,6 +1272,7 @@ int TextScriptProc()
 					else if (gTS.flags & 0x10)
 					{
 						//SAT/CAT/TUR printing
+						char str[72];
 						x = gTS.p_read;
 						//Break if reaches command, or new-line
 						while (gTS.data[x] != '<' && gTS.data[x] != '\r')
@@ -1248,8 +1285,7 @@ int TextScriptProc()
 						}
 
 						//Get text to copy
-						char str[72];
-						int length = x - gTS.p_read;
+						length = x - gTS.p_read;
 						memcpy(str, &gTS.data[gTS.p_read], length);
 						str[length] = 0;
 
@@ -1270,17 +1306,16 @@ int TextScriptProc()
 					else
 					{
 						//Get text to print
-						char c[3];
 						c[0] = gTS.data[gTS.p_read];
 
 						if (c[0] & 0x80)
 						{
 							c[1] = gTS.data[gTS.p_read + 1];
-							c[2] = 0;
+							c[2] = '\0';
 						}
 						else
 						{
-							c[1] = 0;
+							c[1] = '\0';
 						}
 
 						//Print text
@@ -1329,7 +1364,7 @@ int TextScriptProc()
 			break;
 
 		case 3: //NEW LINE
-			for (int i = 0; i < 4; i++)
+			for (i = 0; i < 4; i++)
 			{
 				gTS.ypos_line[i] -= 4;
 

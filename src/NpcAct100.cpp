@@ -12,7 +12,7 @@
 #include "Sound.h"
 #include "Triangle.h"
 
-//Grate
+// Grate
 void ActNpc100(NPCHAR *npc)
 {
 	RECT rc[2] = {
@@ -34,7 +34,7 @@ void ActNpc100(NPCHAR *npc)
 		npc->rect = rc[1];
 }
 
-//Malco computer screen
+// Malco computer screen
 void ActNpc101(NPCHAR *npc)
 {
 	RECT rect[3] = {
@@ -55,7 +55,7 @@ void ActNpc101(NPCHAR *npc)
 	npc->rect = rect[npc->ani_no];
 }
 
-//Malco computer wave
+// Malco computer wave
 void ActNpc102(NPCHAR *npc)
 {
 	RECT rect[4] = {
@@ -83,7 +83,7 @@ void ActNpc102(NPCHAR *npc)
 	npc->rect = rect[npc->ani_no];
 }
 
-//Mannan projectile
+// Mannan projectile
 void ActNpc103(NPCHAR *npc)
 {
 	RECT rcLeft[3] = {
@@ -135,7 +135,7 @@ void ActNpc103(NPCHAR *npc)
 		PlaySoundObject(46, 1);
 }
 
-//Frog
+// Frog
 void ActNpc104(NPCHAR *npc)
 {
 	RECT rcLeft[3] = {
@@ -299,7 +299,7 @@ void ActNpc104(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//'HEY!' speech bubble (low)
+// "HEY!" speech bubble (low)
 void ActNpc105(NPCHAR *npc)
 {
 	RECT rect[2] = {
@@ -316,7 +316,7 @@ void ActNpc105(NPCHAR *npc)
 	npc->rect = rect[npc->ani_no];
 }
 
-//'HEY!' speech bubble (high)
+// "HEY!" speech bubble (high)
 void ActNpc106(NPCHAR *npc)
 {
 	switch (npc->act_no)
@@ -328,7 +328,7 @@ void ActNpc106(NPCHAR *npc)
 	}
 }
 
-//Malco
+// Malco
 void ActNpc107(NPCHAR *npc)
 {
 	int i;
@@ -494,7 +494,7 @@ void ActNpc107(NPCHAR *npc)
 	npc->rect = rcPoweron[npc->ani_no];
 }
 
-//Balfrog projectile
+// Balfrog projectile
 void ActNpc108(NPCHAR *npc)
 {
 	if (npc->flag & 0xFF)
@@ -530,7 +530,7 @@ void ActNpc108(NPCHAR *npc)
 	}
 }
 
-//Malco (broken)
+// Malco (broken)
 void ActNpc109(NPCHAR *npc)
 {
 	int i;
@@ -603,7 +603,7 @@ void ActNpc109(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Puchi
+// Puchi
 void ActNpc110(NPCHAR *npc)
 {
 	RECT rcLeft[3] = {
@@ -766,7 +766,7 @@ void ActNpc110(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Quote (teleport out)
+// Quote (teleport out)
 void ActNpc111(NPCHAR *npc)
 {
 	RECT rcLeft[2] = {
@@ -854,7 +854,7 @@ void ActNpc111(NPCHAR *npc)
 	}
 }
 
-//Quote (teleport in)
+// Quote (teleport in)
 void ActNpc112(NPCHAR *npc)
 {
 	RECT rcLeft[2] = {
@@ -925,12 +925,12 @@ void ActNpc112(NPCHAR *npc)
 	{
 		npc->rect.bottom = npc->rect.top + npc->act_wait / 4;
 
-		if ( npc->act_wait / 2 % 2 )
+		if (npc->act_wait / 2 % 2)
 			++npc->rect.left;
 	}
 }
 
-//Professor Booster
+// Professor Booster
 void ActNpc113(NPCHAR *npc)
 {
 	RECT rcLeft[7] = {
@@ -1061,7 +1061,7 @@ void ActNpc113(NPCHAR *npc)
 	}
 }
 
-//Press
+// Press
 void ActNpc114(NPCHAR *npc)
 {
 	RECT rcLeft[3] = {
@@ -1085,6 +1085,7 @@ void ActNpc114(NPCHAR *npc)
 			npc->ani_no = 1;
 
 			break;
+
 		case 10:
 			if (++npc->ani_wait > 2)
 			{
@@ -1135,7 +1136,7 @@ void ActNpc114(NPCHAR *npc)
 	npc->rect = rcLeft[npc->ani_no];
 }
 
-//Ravil
+// Ravil
 void ActNpc115(NPCHAR *npc)
 {
 	int i;
@@ -1294,7 +1295,7 @@ void ActNpc115(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Red petals
+// Red petals
 void ActNpc116(NPCHAR *npc)
 {
 	RECT rc = {272, 184, 320, 200};
@@ -1302,7 +1303,7 @@ void ActNpc116(NPCHAR *npc)
 	npc->rect = rc;
 }
 
-//Curly
+// Curly
 void ActNpc117(NPCHAR *npc)
 {
 	RECT rcLeft[10] = {
@@ -1352,8 +1353,18 @@ void ActNpc117(NPCHAR *npc)
 			break;
 
 		case 3:
-			// TODO: This code is being problematic, and
-			// assembling with the wrong registers.
+			if (0)
+			{
+				// There used to be an if here that didn't do anything, but the compiler optimised it out.
+				// We only know this was here because empty ifs mess with the register usage.
+				// Since there's no code, we have no idea what the original condition actually was.
+			}
+
+			if (0)
+			{
+				// Another empty if
+			}
+
 			npc->act_no = 4;
 			npc->ani_no = 1;
 			npc->ani_wait = 0;
@@ -1382,9 +1393,15 @@ void ActNpc117(NPCHAR *npc)
 			npc->ani_no = 5;
 			SetDestroyNpChar(npc->x, npc->y, npc->view.back, 8);
 			break;
-			// End of wrong-reg code
 
 		case 6:
+			if (0)
+			{
+				// There used to be an if here that didn't do anything, but the compiler optimised it out.
+				// We only know this was here because empty ifs mess with the register usage.
+				// Since there's no code, we have no idea what the original condition actually was.
+			}
+
 			npc->ani_no = 5;
 			break;
 
@@ -1491,7 +1508,7 @@ void ActNpc117(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Curly (boss)
+// Curly (boss)
 void ActNpc118(NPCHAR *npc)
 {
 	RECT rcLeft[9] = {
@@ -1522,7 +1539,7 @@ void ActNpc118(NPCHAR *npc)
 
 	if (npc->direct == 0 && npc->x < gMC.x)
 		bUpper = TRUE;
-	if ( npc->direct == 2 && npc->x > gMC.x)
+	if (npc->direct == 2 && npc->x > gMC.x)
 		bUpper = TRUE;
 
 	switch (npc->act_no)
@@ -1692,7 +1709,7 @@ void ActNpc118(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Table and chair
+// Table and chair
 void ActNpc119(NPCHAR *npc)
 {
 	RECT rc = {248, 184, 272, 200};

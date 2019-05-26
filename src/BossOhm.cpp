@@ -23,7 +23,7 @@ static void ActBoss01_12()
 	for (i = 1; i < 3; ++i)
 	{
 		gBoss[i].y = (gBoss[0].y + gBoss[i + 2].y - 0x1000) / 2;
-		
+
 		if (gBoss[i].direct == 0)
 		{
 			gBoss[i].x = gBoss[0].x - 0x2000;
@@ -183,7 +183,7 @@ void ActBossChar_Omega()
 			gBoss[5].cond = 0x80;
 			break;
 
-		case 20: //Rising out of the ground
+		case 20: // Rising out of the ground
 			gBoss[0].act_no = 30;
 			gBoss[0].act_wait = 0;
 			gBoss[0].ani_no = 0;
@@ -227,7 +227,7 @@ void ActBossChar_Omega()
 			}
 			break;
 
-		case 50: //Open mouth
+		case 50: // Open mouth
 			if (++gBoss[0].count1 > 2)
 			{
 				gBoss[0].count1 = 0;
@@ -244,7 +244,7 @@ void ActBossChar_Omega()
 			}
 			break;
 
-		case 60: //Shoot out of mouth
+		case 60: // Shoot out of mouth
 			if (++gBoss[0].act_wait > 20 && gBoss[0].act_wait < 80 && !(gBoss[0].act_wait % 3))
 			{
 				if (Random(0, 9) < 8)
@@ -263,7 +263,7 @@ void ActBossChar_Omega()
 			}
 			break;
 
-		case 70: //Close mouth
+		case 70: // Close mouth
 			if (++gBoss[0].count1 > 2)
 			{
 				gBoss[0].count1 = 0;
@@ -299,7 +299,7 @@ void ActBossChar_Omega()
 			}
 			break;
 
-		case 90: //Go back into the ground
+		case 90: // Go back into the ground
 			SetQuake(2);
 			gBoss[0].y += 0x200;
 
@@ -313,7 +313,7 @@ void ActBossChar_Omega()
 			}
 			break;
 
-		case 100: //Move to proper position for coming out of the ground
+		case 100: // Move to proper position for coming out of the ground
 			if (++gBoss[0].act_wait == 120)
 			{
 				gBoss[0].act_wait = 0;

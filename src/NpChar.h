@@ -1,7 +1,5 @@
 #pragma once
 
-#include <stdint.h>
-
 #include "WindowsWrapper.h"
 
 #include "Draw.h"
@@ -29,7 +27,7 @@ enum NPC_flags
 
 struct NPCHAR
 {
-	uint8_t cond;
+	unsigned char cond;
 	int flag;
 	int x;
 	int y;
@@ -49,7 +47,7 @@ struct NPCHAR
 	int exp;
 	int size;
 	int direct;
-	uint16_t bits;
+	unsigned short bits;
 	RECT rect;
 	int ani_wait;
 	int ani_no;
@@ -59,7 +57,7 @@ struct NPCHAR
 	int act_wait;
 	RECT hit;
 	RECT view;
-	uint8_t shock;
+	unsigned char shock;
 	int damage_view;
 	int damage;
 	NPCHAR *pNpc;
@@ -67,12 +65,12 @@ struct NPCHAR
 
 struct EVENT
 {
-  int16_t x;
-  int16_t y;
-  int16_t code_flag;
-  int16_t code_event;
-  int16_t code_char;
-  uint16_t bits;
+	short x;
+	short y;
+	short code_flag;
+	short code_event;
+	short code_char;
+	unsigned short bits;
 };
 
 extern NPCHAR gNPC[NPC_MAX];
@@ -83,13 +81,13 @@ extern int gSuperXpos;
 extern int gSuperYpos;
 
 void InitNpChar();
-bool LoadEvent(char *path_event);
+BOOL LoadEvent(const char *path_event);
 void SetNpChar(int code_char, int x, int y, int xm, int ym, int dir, NPCHAR *npc, int start_index);
 void SetDestroyNpChar(int x, int y, int w, int num);
 void SetDestroyNpCharUp(int x, int y, int w, int num);
 void SetExpObjects(int x, int y, int exp);
-bool SetBulletObject(int x, int y, int val);
-bool SetLifeObject(int x, int y, int val);
+BOOL SetBulletObject(int x, int y, int val);
+BOOL SetLifeObject(int x, int y, int val);
 void VanishNpChar(NPCHAR *npc);
 void PutNpChar(int fx, int fy);
 void ActNpChar();
@@ -99,7 +97,7 @@ void SetNpCharActionNo(int code_event, int act_no, int dir);
 void MoveNpChar(int code_event, int x, int y, int dir);
 void BackStepMyChar(int code_event);
 void DeleteNpCharEvent(int code);
-void DeleteNpCharCode(int code, bool bSmoke);
+void DeleteNpCharCode(int code, BOOL bSmoke);
 void GetNpCharPosition(int *x, int *y, int i);
 BOOL IsNpCharCode(int code);
 BOOL GetNpCharAlive(int code_event);

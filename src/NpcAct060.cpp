@@ -14,7 +14,7 @@
 #include "Sound.h"
 #include "Triangle.h"
 
-//Toroko
+// Toroko
 void ActNpc060(NPCHAR *npc)
 {
 	RECT rcLeft[8] = {
@@ -161,7 +161,7 @@ void ActNpc060(NPCHAR *npc)
 			break;
 
 		case 11:
-			if ( npc->act_wait++ && npc->flag & 8 )
+			if (npc->act_wait++ && npc->flag & 8)
 			{
 				npc->act_no = 12;
 				npc->ani_no = 7;
@@ -194,7 +194,7 @@ void ActNpc060(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//King
+// King
 void ActNpc061(NPCHAR *npc)
 {
 	RECT rcLeft[11] = {
@@ -277,6 +277,7 @@ void ActNpc061(NPCHAR *npc)
 				npc->act_no = 5;
 
 			break;
+
 		case 8:
 			npc->act_no = 9;
 			npc->ani_no = 4;
@@ -420,7 +421,7 @@ void ActNpc061(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Kazuma at computer
+// Kazuma at computer
 void ActNpc062(NPCHAR *npc)
 {
 	RECT rcLeft[3] = {
@@ -488,7 +489,7 @@ void ActNpc062(NPCHAR *npc)
 	npc->rect = rcLeft[npc->ani_no];
 }
 
-//Toroko with stick
+// Toroko with stick
 void ActNpc063(NPCHAR *npc)
 {
 	RECT rcLeft[6] = {
@@ -625,7 +626,7 @@ void ActNpc063(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//First Cave Critter
+// First Cave Critter
 void ActNpc064(NPCHAR *npc)
 {
 	RECT rcLeft[3] = {
@@ -642,12 +643,12 @@ void ActNpc064(NPCHAR *npc)
 
 	switch (npc->act_no)
 	{
-		case 0: //Init
+		case 0: // Initialize
 			npc->y += 0x600;
 			npc->act_no = 1;
 			// Fallthrough
-		case 1: //Waiting
-			//Look at player
+		case 1: // Waiting
+			// Look at player
 			if (npc->x > gMC.x)
 				npc->direct = 0;
 			else
@@ -656,7 +657,7 @@ void ActNpc064(NPCHAR *npc)
 			if (npc->tgt_x < 100)
 				++npc->tgt_x;
 
-			//Open eyes near player
+			// Open eyes near player
 			if (npc->act_wait >= 8 && npc->x - 0xE000 < gMC.x && npc->x + 0xE000 > gMC.x && npc->y - 0xA000 < gMC.y && npc->y + 0xA000 > gMC.y)
 			{
 				npc->ani_no = 1;
@@ -669,7 +670,7 @@ void ActNpc064(NPCHAR *npc)
 				npc->ani_no = 0;
 			}
 
-			//Jump if attacked
+			// Jump if attacked
 			if (npc->shock)
 			{
 				npc->act_no = 2;
@@ -677,7 +678,7 @@ void ActNpc064(NPCHAR *npc)
 				npc->act_wait = 0;
 			}
 
-			//Jump if player is nearby
+			// Jump if player is nearby
 			if (npc->act_wait >= 8 && npc->tgt_x >= 100 && npc->x - 0x8000 < gMC.x && npc->x + 0x8000 > gMC.x && npc->y - 0xA000 < gMC.y && npc->y + 0x6000 > gMC.y)
 			{
 				npc->act_no = 2;
@@ -686,18 +687,18 @@ void ActNpc064(NPCHAR *npc)
 			}
 			break;
 
-		case 2: //Going to jump
+		case 2: // Going to jump
 			if (++npc->act_wait > 8)
 			{
-				//Set jump state
+				// Set jump state
 				npc->act_no = 3;
 				npc->ani_no = 2;
 
-				//Jump
+				// Jump
 				npc->ym = -0x5FF;
 				PlaySoundObject(30, 1);
 
-				//Jump in facing direction
+				// Jump in facing direction
 				if (npc->direct == 0)
 					npc->xm = -0x100;
 				else
@@ -705,8 +706,8 @@ void ActNpc064(NPCHAR *npc)
 			}
 			break;
 
-		case 3: //Jumping
-			//Land
+		case 3: // Jumping
+			// Land
 			if (npc->flag & 8)
 			{
 				npc->xm = 0;
@@ -718,23 +719,23 @@ void ActNpc064(NPCHAR *npc)
 			break;
 	}
 
-	//Gravity
+	// Gravity
 	npc->ym += 0x40;
 	if (npc->ym > 0x5FF)
 		npc->ym = 0x5FF;
 
-	//Move
+	// Move
 	npc->x += npc->xm;
 	npc->y += npc->ym;
 
-	//Set framerect
+	// Set framerect
 	if (npc->direct == 0)
 		npc->rect = rcLeft[npc->ani_no];
 	else
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//First Cave Bat
+// First Cave Bat
 void ActNpc065(NPCHAR *npc)
 {
 	switch (npc->act_no)
@@ -808,7 +809,7 @@ void ActNpc065(NPCHAR *npc)
 		npc->rect = rect_right[npc->ani_no];
 }
 
-//Misery bubble
+// Misery bubble
 void ActNpc066(NPCHAR *npc)
 {
 	RECT rect[4] = {
@@ -889,7 +890,7 @@ void ActNpc066(NPCHAR *npc)
 	npc->rect = rect[npc->ani_no];
 }
 
-//Misery (floating)
+// Misery (floating)
 void ActNpc067(NPCHAR *npc)
 {
 	switch (npc->act_no)
@@ -1071,7 +1072,7 @@ void ActNpc067(NPCHAR *npc)
 		npc->rect.bottom = ++npc->ani_wait / 2 + npc->rect.bottom - 16;
 }
 
-//Balrog (running)
+// Balrog (running)
 void ActNpc068(NPCHAR *npc)
 {
 	switch (npc->act_no)
@@ -1287,7 +1288,7 @@ void ActNpc068(NPCHAR *npc)
 		npc->rect = rect_right[npc->ani_no];
 }
 
-//Sparkle
+// Pignon
 void ActNpc069(NPCHAR *npc)
 {
 	RECT rcLeft[6] = {
@@ -1426,7 +1427,7 @@ void ActNpc069(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Sparkle
+// Sparkle
 void ActNpc070(NPCHAR *npc)
 {
 	RECT rect[4] = {
@@ -1448,7 +1449,7 @@ void ActNpc070(NPCHAR *npc)
 	npc->rect = rect[npc->ani_no];
 }
 
-//Chinfish
+// Chinfish
 void ActNpc071(NPCHAR *npc)
 {
 	switch (npc->act_no)
@@ -1506,7 +1507,7 @@ void ActNpc071(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 }
 
-//Sprinkler
+// Sprinkler
 void ActNpc072(NPCHAR *npc)
 {
 	if (npc->direct == 0)
@@ -1540,7 +1541,7 @@ void ActNpc072(NPCHAR *npc)
 	npc->rect = rect[npc->ani_no];
 }
 
-//Water droplet
+// Water droplet
 void ActNpc073(NPCHAR *npc)
 {
 	RECT rect[5] = {
@@ -1701,7 +1702,7 @@ void ActNpc075(NPCHAR *npc)
 	npc->rect = rcLeft[npc->ani_no];
 }
 
-//Flowers
+// Flowers
 void ActNpc076(NPCHAR *npc)
 {
 	npc->rect.left = 16 * npc->code_event;
@@ -1710,7 +1711,7 @@ void ActNpc076(NPCHAR *npc)
 	npc->rect.bottom = 16;
 }
 
-//Yamashita
+// Yamashita
 void ActNpc077(NPCHAR *npc)
 {
 	RECT rc[3] = {
@@ -1766,7 +1767,7 @@ void ActNpc078(NPCHAR *npc)
 		npc->rect = rc[1];
 }
 
-// Mahin the sex god
+// Mahin
 void ActNpc079(NPCHAR *npc)
 {
 	RECT rcLeft[3] = {
@@ -1810,7 +1811,7 @@ void ActNpc079(NPCHAR *npc)
 			break;
 
 		case 3:
-			if (++npc->act_wait > 8 )
+			if (++npc->act_wait > 8)
 			{
 				npc->act_no = 2;
 				npc->ani_no = 0;
@@ -1820,7 +1821,7 @@ void ActNpc079(NPCHAR *npc)
 	}
 
 	npc->ym += 0x40;
-	if ( npc->ym > 0x5FF )
+	if (npc->ym > 0x5FF)
 		npc->ym = 0x5FF;
 
 	npc->y += npc->ym;

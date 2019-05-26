@@ -11,7 +11,7 @@
 #include FT_LCD_FILTER_H
 #include FT_BITMAP_H
 
-#include "SDL.h"
+#include "WindowsWrapper.h"
 
 #include "File.h"
 
@@ -23,14 +23,27 @@
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
 
+typedef struct CachedGlyph
+{
+	unsigned long unicode_value;
+	FT_Bitmap bitmap;
+	unsigned char pixel_mode;
+	int x;
+	int y;
+	int x_advance;
+
+	struct CachedGlyph *next;
+} CachedGlyph;
+
 typedef struct FontObject
 {
 	FT_Library library;
 	FT_Face face;
 	unsigned char *data;
 #ifndef DISABLE_FONT_ANTIALIASING
-	bool lcd_mode;
+	BOOL lcd_mode;
 #endif
+	CachedGlyph *glyph_list_head;
 } FontObject;
 
 #ifdef JAPANESE
@@ -1693,6 +1706,55 @@ static unsigned long UTF8ToUnicode(const unsigned char *string, unsigned int *by
 }
 #endif
 
+static CachedGlyph* GetGlyphCached(FontObject *font_object, unsigned long unicode_value)
+{
+	for (CachedGlyph *glyph = font_object->glyph_list_head; glyph != NULL; glyph = glyph->next)
+		if (glyph->unicode_value == unicode_value)
+			return glyph;
+
+	CachedGlyph *glyph = (CachedGlyph*)malloc(sizeof(CachedGlyph));
+
+	if (glyph)
+	{
+		glyph->next = font_object->glyph_list_head;
+		font_object->glyph_list_head = glyph;
+
+		unsigned int glyph_index = FT_Get_Char_Index(font_object->face, unicode_value);
+
+#ifndef DISABLE_FONT_ANTIALIASING
+		FT_Load_Glyph(font_object->face, glyph_index, FT_LOAD_RENDER | (font_object->lcd_mode ? FT_LOAD_TARGET_LCD : 0));
+#else
+		FT_Load_Glyph(font_object->face, glyph_index, FT_LOAD_RENDER | FT_LOAD_MONOCHROME);
+#endif
+
+		glyph->unicode_value = unicode_value;
+		FT_Bitmap_New(&glyph->bitmap);
+		FT_Bitmap_Convert(font_object->library, &font_object->face->glyph->bitmap, &glyph->bitmap, 1);
+		glyph->pixel_mode = font_object->face->glyph->bitmap.pixel_mode;
+		glyph->x = font_object->face->glyph->bitmap_left;
+		glyph->y = (FT_MulFix(font_object->face->ascender, font_object->face->size->metrics.y_scale) - font_object->face->glyph->metrics.horiBearingY + (64 / 2)) / 64;
+		glyph->x_advance = font_object->face->glyph->advance.x / 64;
+	}
+
+	return glyph;
+}
+
+static void UnloadCachedGlyphs(FontObject *font_object)
+{
+	CachedGlyph *glyph = font_object->glyph_list_head;
+	while (glyph != NULL)
+	{
+		CachedGlyph *next_glyph = glyph->next;
+
+		FT_Bitmap_Done(font_object->library, &glyph->bitmap);
+		free(glyph);
+
+		glyph = next_glyph;
+	}
+
+	font_object->glyph_list_head = NULL;
+}
+
 FontObject* LoadFontFromData(const unsigned char *data, size_t data_size, unsigned int cell_width, unsigned int cell_height)
 {
 	FontObject *font_object = (FontObject*)malloc(sizeof(FontObject));
@@ -1746,6 +1808,8 @@ FontObject* LoadFontFromData(const unsigned char *data, size_t data_size, unsign
 
 	FT_Set_Pixel_Sizes(font_object->face, best_pixel_width, best_pixel_height);
 
+	font_object->glyph_list_head = NULL;
+
 	return font_object;
 }
 
@@ -1765,13 +1829,11 @@ FontObject* LoadFont(const char *font_filename, unsigned int cell_width, unsigne
 	return font_object;
 }
 
-void DrawText(FontObject *font_object, SDL_Surface *surface, int x, int y, unsigned long colour, const char *string, size_t string_length)
+void DrawText(FontObject *font_object, unsigned char *bitmap_buffer, size_t bitmap_pitch, int bitmap_width, int bitmap_height, int x, int y, unsigned long colour, const char *string, size_t string_length)
 {
 	if (font_object != NULL)
 	{
 		const unsigned char colours[3] = {(unsigned char)colour, (unsigned char)(colour >> 8), (unsigned char)(colour >> 16)};
-
-		FT_Face face = font_object->face;
 
 		unsigned int pen_x = 0;
 
@@ -1782,93 +1844,84 @@ void DrawText(FontObject *font_object, SDL_Surface *surface, int x, int y, unsig
 		{
 			unsigned int bytes_read;
 #ifdef JAPANESE
-			const unsigned short val = ShiftJISToUnicode(string_pointer, &bytes_read);
+			const unsigned short unicode_value = ShiftJISToUnicode(string_pointer, &bytes_read);
 #else
-			const unsigned long val = UTF8ToUnicode(string_pointer, &bytes_read);
+			const unsigned long unicode_value = UTF8ToUnicode(string_pointer, &bytes_read);
 #endif
 			string_pointer += bytes_read;
 
-			unsigned int glyph_index = FT_Get_Char_Index(face, val);
+			CachedGlyph *glyph = GetGlyphCached(font_object, unicode_value);
 
-#ifndef DISABLE_FONT_ANTIALIASING
-			FT_Load_Glyph(face, glyph_index, FT_LOAD_RENDER | (font_object->lcd_mode ? FT_LOAD_TARGET_LCD : 0));
-#else
-			FT_Load_Glyph(face, glyph_index, FT_LOAD_RENDER | FT_LOAD_MONOCHROME);
-#endif
-
-			FT_Bitmap converted;
-			FT_Bitmap_New(&converted);
-			FT_Bitmap_Convert(font_object->library, &face->glyph->bitmap, &converted, 1);
-
-			const int letter_x = x + pen_x + face->glyph->bitmap_left;
-			const int letter_y = y + ((FT_MulFix(face->ascender, face->size->metrics.y_scale) - face->glyph->metrics.horiBearingY + (64 / 2)) / 64);
-
-			switch (face->glyph->bitmap.pixel_mode)
+			if (glyph)
 			{
-				case FT_PIXEL_MODE_LCD:
-					for (int iy = MAX(-letter_y, 0); letter_y + iy < MIN(letter_y + (int)converted.rows, surface->h); ++iy)
-					{
-						for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)converted.width / 3, surface->w); ++ix)
+				const int letter_x = x + pen_x + glyph->x;
+				const int letter_y = y + glyph->y;
+
+				switch (glyph->pixel_mode)
+				{
+					case FT_PIXEL_MODE_LCD:
+						for (int iy = MAX(-letter_y, 0); letter_y + iy < MIN(letter_y + (int)glyph->bitmap.rows, bitmap_height); ++iy)
 						{
-							const unsigned char *font_pixel = converted.buffer + iy * converted.pitch + ix * 3;
-
-							if (font_pixel[0] || font_pixel[1] || font_pixel[2])
+							for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)glyph->bitmap.width / 3, bitmap_width); ++ix)
 							{
-								unsigned char *surface_pixel = (unsigned char*)surface->pixels + (letter_y + iy) * surface->pitch + (letter_x + ix) * 3;
+								const unsigned char *font_pixel = glyph->bitmap.buffer + iy * glyph->bitmap.pitch + ix * 3;
 
-								for (unsigned int j = 0; j < 3; ++j)
+								if (font_pixel[0] || font_pixel[1] || font_pixel[2])
 								{
-									const double alpha = pow((font_pixel[j] / 255.0), 1.0 / 1.8);			// Gamma correction
-									surface_pixel[j] = (unsigned char)((colours[j] * alpha) + (surface_pixel[j] * (1.0 - alpha)));	// Alpha blending
+									unsigned char *bitmap_pixel = bitmap_buffer + (letter_y + iy) * bitmap_pitch + (letter_x + ix) * 3;
+
+									for (unsigned int j = 0; j < 3; ++j)
+									{
+										const double alpha = pow((font_pixel[j] / 255.0), 1.0 / 1.8);			// Gamma correction
+										bitmap_pixel[j] = (unsigned char)((colours[j] * alpha) + (bitmap_pixel[j] * (1.0 - alpha)));	// Alpha blending
+									}
 								}
 							}
 						}
-					}
 
-					break;
+						break;
 
-				case FT_PIXEL_MODE_GRAY:
-					for (int iy = MAX(-letter_y, 0); letter_y + iy < MIN(letter_y + (int)converted.rows, surface->h); ++iy)
-					{
-						for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)converted.width, surface->w); ++ix)
+					case FT_PIXEL_MODE_GRAY:
+						for (int iy = MAX(-letter_y, 0); letter_y + iy < MIN(letter_y + (int)glyph->bitmap.rows, bitmap_height); ++iy)
 						{
-							const unsigned char font_pixel = converted.buffer[iy * converted.pitch + ix];
-
-							if (font_pixel)
+							for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)glyph->bitmap.width, bitmap_width); ++ix)
 							{
-								const double alpha = pow((double)font_pixel / (converted.num_grays - 1), 1.0 / 1.8);			// Gamma-corrected
+								const unsigned char font_pixel = glyph->bitmap.buffer[iy * glyph->bitmap.pitch + ix];
 
-								unsigned char *surface_pixel = (unsigned char*)surface->pixels + (letter_y + iy) * surface->pitch + (letter_x + ix) * 3;
+								if (font_pixel)
+								{
+									const double alpha = pow((double)font_pixel / (glyph->bitmap.num_grays - 1), 1.0 / 1.8);			// Gamma-corrected
 
-								for (unsigned int j = 0; j < 3; ++j)
-									surface_pixel[j] = (unsigned char)((colours[j] * alpha) + (surface_pixel[j] * (1.0 - alpha)));	// Alpha blending
+									unsigned char *bitmap_pixel = bitmap_buffer + (letter_y + iy) * bitmap_pitch + (letter_x + ix) * 3;
+
+									for (unsigned int j = 0; j < 3; ++j)
+										bitmap_pixel[j] = (unsigned char)((colours[j] * alpha) + (bitmap_pixel[j] * (1.0 - alpha)));	// Alpha blending
+								}
 							}
 						}
-					}
 
-					break;
+						break;
 
-				case FT_PIXEL_MODE_MONO:
-					for (int iy = MAX(-letter_y, 0); letter_y + iy < MIN(letter_y + (int)converted.rows, surface->h); ++iy)
-					{
-						for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)converted.width, surface->w); ++ix)
+					case FT_PIXEL_MODE_MONO:
+						for (int iy = MAX(-letter_y, 0); letter_y + iy < MIN(letter_y + (int)glyph->bitmap.rows, bitmap_height); ++iy)
 						{
-							if (converted.buffer[iy * converted.pitch + ix])
+							for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)glyph->bitmap.width, bitmap_width); ++ix)
 							{
-								unsigned char *surface_pixel = (unsigned char*)surface->pixels + (letter_y + iy) * surface->pitch + (letter_x + ix) * 3;
+								if (glyph->bitmap.buffer[iy * glyph->bitmap.pitch + ix])
+								{
+									unsigned char *bitmap_pixel = bitmap_buffer + (letter_y + iy) * bitmap_pitch + (letter_x + ix) * 3;
 
-								for (unsigned int j = 0; j < 3; ++j)
-									surface_pixel[j] = colours[j];
+									for (unsigned int j = 0; j < 3; ++j)
+										bitmap_pixel[j] = colours[j];
+								}
 							}
 						}
-					}
 
-					break;
+						break;
+				}
+
+				pen_x += glyph->x_advance;
 			}
-
-			FT_Bitmap_Done(font_object->library, &converted);
-
-			pen_x += face->glyph->advance.x / 64;
 		}
 	}
 }
@@ -1877,6 +1930,8 @@ void UnloadFont(FontObject *font_object)
 {
 	if (font_object != NULL)
 	{
+		UnloadCachedGlyphs(font_object);
+
 		FT_Done_Face(font_object->face);
 		free(font_object->data);
 		FT_Done_FreeType(font_object->library);
