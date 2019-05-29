@@ -16,9 +16,9 @@
 #define FREQUENCY 44100
 
 #ifdef RASPBERRY_PI
-#define STREAM_SIZE 0x400
+#define STREAM_SIZE 0x400	// Larger buffer to prevent stutter
 #else
-#define STREAM_SIZE (FREQUENCY / 200)
+#define STREAM_SIZE 0x100	// FREQUENCY/200 rounded to the nearest power of 2 (SDL2 *needs* a power-of-2 buffer size)
 #endif
 
 #define clamp(x, y, z) (((x) > (z)) ? (z) : ((x) < (y)) ? (y) : (x))
