@@ -3,7 +3,7 @@
 #include <stddef.h>
 #include <string.h>
 
-#include <SDL.h>
+#include "SDL.h"
 
 #include "WindowsWrapper.h"
 
