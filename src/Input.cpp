@@ -7,10 +7,6 @@
 
 #include "WindowsWrapper.h"
 
-#include "CommonDefines.h"
-#include "Tags.h"
-#include "Types.h"
-
 #define JOYSTICK_DEADZONE 10000
 
 SDL_Joystick *joystick; // This was probably a name that was given by Simon, but it fits the rest of Pixel's names so it's fine.

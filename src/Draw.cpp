@@ -26,7 +26,6 @@
 #include "Font.h"
 #include "Resource.h"
 #include "Tags.h"
-#include "Types.h"
 
 struct SURFACE
 {

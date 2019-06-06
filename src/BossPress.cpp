@@ -5,6 +5,7 @@
 #include "Boss.h"
 #include "Game.h"
 #include "Map.h"
+#include "NpChar.h"
 #include "Sound.h"
 
 void ActBossChar_Press(void)

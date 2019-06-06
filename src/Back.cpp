@@ -1,9 +1,11 @@
 #include "Back.h"
 
+#include <stddef.h>
 #include <stdio.h>
 
 #include "WindowsWrapper.h"
 
+#include "CommonDefines.h"
 #include "Draw.h"
 #include "File.h"
 #include "Frame.h"

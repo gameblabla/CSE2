@@ -4,6 +4,7 @@
 
 #include "WindowsWrapper.h"
 
+#include "CommonDefines.h"
 #include "Draw.h"
 #include "Escape.h"
 #include "KeyControl.h"

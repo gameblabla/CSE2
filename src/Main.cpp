@@ -21,7 +21,6 @@
 #include "Resource.h"
 #include "Sound.h"
 #include "Triangle.h"
-#include "Types.h"
 
 // These two are defined in Draw.cpp. This is a bit of a hack.
 extern SDL_Window *gWindow;

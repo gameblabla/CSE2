@@ -2,7 +2,6 @@
 
 #include "WindowsWrapper.h"
 
-#include "Draw.h"
 #include "NpChar.h"
 
 struct NPC_TBL_RECT

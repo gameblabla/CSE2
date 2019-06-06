@@ -3,7 +3,6 @@
 #include "WindowsWrapper.h"
 
 #include "Draw.h"
-#include "Game.h"
 #include "ValueView.h"
 
 #define VALUEVIEW_MAX 0x10

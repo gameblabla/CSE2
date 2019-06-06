@@ -1,7 +1,5 @@
 #include "Frame.h"
 
-#include <string.h>
-
 #include "Boss.h"
 #include "CommonDefines.h"
 #include "Game.h"

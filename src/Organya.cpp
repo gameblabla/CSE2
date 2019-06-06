@@ -4,16 +4,12 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <SDL_thread.h>
-#include <SDL_timer.h>
-#include <SDL_events.h>
+#include "SDL.h"
 
 #include "WindowsWrapper.h"
 
-#include "CommonDefines.h"
 #include "Resource.h"
 #include "Sound.h"
-#include "Tags.h"
 
 #define PANDUMMY 0xFF
 #define VOLDUMMY 0xFF

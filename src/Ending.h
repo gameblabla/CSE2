@@ -2,6 +2,8 @@
 
 #include "WindowsWrapper.h"
 
+#include "CommonDefines.h"
+
 struct CREDIT
 {
 	int size;

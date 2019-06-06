@@ -1,12 +1,11 @@
 #include "Sound.h"
 
-#include <algorithm>
-#include <cmath>
+#include <math.h>
 #include <stdio.h>
-#include <string>
-#include <cstring>
+#include <stdlib.h>
+#include <string.h>
 
-#include <SDL.h>
+#include "SDL.h"
 
 #include "WindowsWrapper.h"
 

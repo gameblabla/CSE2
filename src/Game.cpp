@@ -1,8 +1,7 @@
 #include "Game.h"
 
-#include <stdlib.h>
+#include <stddef.h>
 #include <stdio.h>
-#include <string.h>
 
 #include <SDL_timer.h>
 
@@ -15,6 +14,7 @@
 #include "BulHit.h"
 #include "Bullet.h"
 #include "Caret.h"
+#include "CommonDefines.h"
 #include "Draw.h"
 #include "Ending.h"
 #include "Escape.h"
@@ -35,7 +35,6 @@
 #include "NpChar.h"
 #include "NpcHit.h"
 #include "NpcTbl.h"
-#include "Organya.h"
 #include "Profile.h"
 #include "SelStage.h"
 #include "Shoot.h"

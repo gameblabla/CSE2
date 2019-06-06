@@ -2,7 +2,6 @@
 
 #include "WindowsWrapper.h"
 
-#include "Back.h"
 #include "Bullet.h"
 #include "Caret.h"
 #include "CommonDefines.h"
