@@ -1,3 +1,6 @@
+NATIVECC = cc
+NATIVECXX = c++
+
 ifeq ($(RELEASE), 1)
 	CXXFLAGS = -O3 -flto
 	LDFLAGS = -s
@@ -179,7 +182,7 @@ RESOURCES = \
 	ORG/White.org \
 	ORG/XXXX.org \
 	ORG/Zonbie.org \
-	WAVE/Wave.dat \
+	WAVE/Wave.dat
 
 ifeq ($(JAPANESE), 1)
 	RESOURCES += BITMAP/pixel_jp.bmp
@@ -204,12 +207,12 @@ ifeq ($(WINDOWS), 1)
 endif
 
 all: $(BUILD_DIR)/$(FILENAME)
+	@echo Finished
 
 $(BUILD_DIR)/$(FILENAME): $(OBJECTS)
 	@mkdir -p $(@D)
-	@echo Linking
+	@echo Linking $@
 	@$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -o $@ $(LIBS)
-	@echo Finished compiling: $@
 
 obj/$(BUILD_DIR)/$(FILENAME)/%.o: src/%.cpp
 	@mkdir -p $(@D)
@@ -229,7 +232,7 @@ src/Resource/%.h: res/% obj/bin2h
 obj/bin2h: bin2h/bin2h.c
 	@mkdir -p $(@D)
 	@echo Compiling $^
-	@$(CC) -O3 -s -std=c90 -Wall -Wextra -pedantic $^ -o $@
+	@$(NATIVECC) -O3 -s -std=c90 -Wall -Wextra -pedantic $^ -o $@
 
 include $(wildcard $(DEPENDENCIES))
 
