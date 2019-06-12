@@ -6,7 +6,6 @@
 #include "WindowsWrapper.h"
 
 #include "Draw.h"
-#include "Game.h"
 
 #define FADE_WIDTH	(((WINDOW_WIDTH - 1) / 16) + 1)
 #define FADE_HEIGHT	(((WINDOW_HEIGHT - 1) / 16) + 1)

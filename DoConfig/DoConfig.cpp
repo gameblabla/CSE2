@@ -5,14 +5,17 @@
  * http://sam.zoy.org/wtfpl/COPYING for more details. */
 
 #include <cstdlib>
-#include <iostream>
 #include <fstream>
-#include <cstring>
 #include "FL/Fl.H"
 #include "FL/Fl_Window.H"
 #include "FL/Fl_Radio_Round_Button.H"
 #include "FL/Fl_Choice.H"
 #include "FL/Fl_Check_Button.H"
+#include <FL/Fl_Button.H>
+#include <FL/Fl_Group.H>
+#include <FL/Fl_Menu_Item.H>
+#include <FL/Fl_Round_Button.H>
+#include <FL/Enumerations.H>
 
 #define MAGIC "DOUKUTSU20041206"
 #define FONT "Courier New"

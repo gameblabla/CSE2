@@ -2,7 +2,6 @@
 
 #include "WindowsWrapper.h"
 
-#include "Back.h"
 #include "Caret.h"
 #include "Game.h"
 #include "Frame.h"

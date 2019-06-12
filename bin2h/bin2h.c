@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 
 		filename_pointer = (last_path_seperator == NULL) ? argv[1] : last_path_seperator + 1;
 		dot = strchr(filename_pointer, '.');
-		filename_length = (dot == NULL) ? strlen(filename_pointer) : dot - filename_pointer;
+		filename_length = (dot == NULL) ? strlen(filename_pointer) : (size_t)(dot - filename_pointer);
 
 		filename = malloc(filename_length + 1);
 		memcpy(filename, filename_pointer, filename_length);
@@ -65,17 +65,17 @@ int main(int argc, char *argv[])
 
 			setvbuf(out_file, NULL, _IOFBF, 0x10000);
 
-			fprintf(out_file, "#pragma once\n\nconst unsigned char r%s[0x%lX] = {\n\t", filename, in_file_size);
+			fprintf(out_file, "#pragma once\n\nstatic const unsigned char r%s[0x%lX] = {\n\t", filename, in_file_size);
 
 			for (i = 0; i < in_file_size - 1; ++i)
 			{
-				if (i % 16 == 15)
-					fprintf(out_file, "0x%02X,\n\t", *in_file_pointer++);
+				if (i % 32 == 32-1)
+					fprintf(out_file, "%d,\n\t", *in_file_pointer++);
 				else
-					fprintf(out_file, "0x%02X, ", *in_file_pointer++);
+					fprintf(out_file, "%d,", *in_file_pointer++);
 			}
 
-			fprintf(out_file, "0x%02X\n};\n", *in_file_pointer++);
+			fprintf(out_file, "%d\n};\n", *in_file_pointer++);
 
 			fclose(out_file);
 			free(in_file_buffer);

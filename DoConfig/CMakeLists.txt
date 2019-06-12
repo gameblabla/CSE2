@@ -10,9 +10,6 @@ project(DoConfig LANGUAGES CXX)
 
 add_executable(DoConfig "DoConfig.cpp" "icon.rc")
 
-# Name debug builds "DoConfigd", to distinguish them
-set_target_properties(CSE2 PROPERTIES DEBUG_OUTPUT_NAME "DoConfigd")
-
 # Windows tweak
 if(WIN32)
 	set_target_properties(DoConfig PROPERTIES WIN32_EXECUTABLE YES)	# Disable the console window

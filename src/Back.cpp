@@ -1,9 +1,11 @@
 #include "Back.h"
 
+#include <stddef.h>
 #include <stdio.h>
 
 #include "WindowsWrapper.h"
 
+#include "CommonDefines.h"
 #include "Draw.h"
 #include "File.h"
 #include "Frame.h"
@@ -250,7 +252,7 @@ void PutFront(int fx, int fy)
 	// Draw black bars
 	if (!(g_GameFlags & 8)) // Detect if credits are running
 	{
-		const bool fromFocus = (gStageNo == 31); // Get if we should only draw around a 320x240 area of the focus point
+		const BOOL fromFocus = (gStageNo == 31); // Get if we should only draw around a 320x240 area of the focus point
 
 		// Get focus rect
 		int focusX = gFrame.x + (WINDOW_WIDTH << 8) - (320 << 8);

@@ -1,12 +1,13 @@
 #include "Sound.h"
 
-#include <algorithm>
-#include <cmath>
+#include <math.h>
 #include <stdio.h>
-#include <string>
-#include <cstring>
+#include <stdlib.h>
+#include <string.h>
 
-#include <SDL.h>
+#include "SDL.h"
+
+#include "WindowsWrapper.h"
 
 #include "Organya.h"
 #include "PixTone.h"
@@ -14,9 +15,9 @@
 #define FREQUENCY 44100
 
 #ifdef RASPBERRY_PI
-#define STREAM_SIZE 0x400
+#define STREAM_SIZE 0x400	// Larger buffer to prevent stutter
 #else
-#define STREAM_SIZE (FREQUENCY / 200)
+#define STREAM_SIZE 0x100	// FREQUENCY/200 rounded to the nearest power of 2 (SDL2 *needs* a power-of-2 buffer size)
 #endif
 
 #define clamp(x, y, z) (((x) > (z)) ? (z) : ((x) < (y)) ? (y) : (x))
@@ -219,7 +220,7 @@ void AudioCallback(void *userdata, Uint8 *stream, int len)
 //Sound things
 SOUNDBUFFER* lpSECONDARYBUFFER[SOUND_NO];
 
-bool InitDirectSound()
+BOOL InitDirectSound()
 {
 	//Init sound
 	SDL_InitSubSystem(SDL_INIT_AUDIO);
@@ -240,7 +241,7 @@ bool InitDirectSound()
 	if (audioDevice == 0)
 	{
 		printf("Failed to open audio device\nSDL Error: %s\n", SDL_GetError());
-		return false;
+		return FALSE;
 	}
 
 	//Unpause audio device
@@ -248,7 +249,7 @@ bool InitDirectSound()
 
 	//Start organya
 	StartOrganya();
-	return true;
+	return TRUE;
 }
 
 void EndDirectSound()

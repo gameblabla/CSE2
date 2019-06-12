@@ -16,13 +16,13 @@ msvc2003/devilution/compare.asm
 
 # Exclude build output on Linux (exclude normally produced executable files and out files)
 build_en/CSE2
-build_en/CSE2d
+build_en/CSE2_debug
 build_en/DoConfig
-build_en/DoConfigd
+build_en/DoConfig_debug
 build_jp/CSE2
-build_jp/CSE2d
+build_jp/CSE2_debug
 build_jp/DoConfig
-build_jp/DoConfigd
+build_jp/DoConfig_debug
 build_en/*.out
 build_jp/*.out
 

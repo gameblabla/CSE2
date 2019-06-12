@@ -1,5 +1,8 @@
 #include <stddef.h>
 #include <stdio.h>
+#ifdef WINDOWS
+#include <stdlib.h>
+#endif
 #include <string.h>
 
 #ifdef WINDOWS
@@ -23,12 +26,11 @@
 #include "Font.h"
 #include "Resource.h"
 #include "Tags.h"
-#include "Types.h"
 
 struct SURFACE
 {
-	bool in_use;
-	bool needs_updating;
+	BOOL in_use;
+	BOOL needs_updating;
 	SDL_Surface *surface;
 	SDL_Texture *texture;
 };
@@ -40,7 +42,7 @@ RECT grcGame = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 RECT grcFull = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
 int magnification;
-bool fullscreen;
+BOOL fullscreen;
 
 SURFACE surf[SURFACE_ID_MAX];
 
@@ -52,7 +54,7 @@ BOOL Flip_SystemTask(int hWnd)
 {
 	(void)hWnd;
 
-	while (true)
+	while (TRUE)
 	{
 		if (!SystemTask())
 			return FALSE;
@@ -99,17 +101,17 @@ BOOL StartDirectDraw(int lMagnification, int lColourDepth)
 		{
 			case 0:
 				magnification = 1;
-				fullscreen = false;
+				fullscreen = FALSE;
 				break;
 
 			case 1:
 				magnification = 2;
-				fullscreen = false;
+				fullscreen = FALSE;
 				break;
 
 			case 2:
 				magnification = 2;
-				fullscreen = true;
+				fullscreen = TRUE;
 				SDL_SetWindowFullscreen(gWindow, SDL_WINDOW_FULLSCREEN);
 				break;
 		}
@@ -129,7 +131,7 @@ void EndDirectDraw()
 		ReleaseSurface(i);
 }
 
-static bool IsEnableBitmap(SDL_RWops *fp)
+static BOOL IsEnableBitmap(SDL_RWops *fp)
 {
 	char str[16];
 	const char *extra_text = "(C)Pixel";
@@ -149,7 +151,7 @@ void ReleaseSurface(int s)
 	{
 		SDL_DestroyTexture(surf[s].texture);
 		SDL_FreeSurface(surf[s].surface);
-		surf[s].in_use = false;
+		surf[s].in_use = FALSE;
 	}
 }
 
@@ -169,7 +171,7 @@ BOOL MakeSurface_Generic(int bxsize, int bysize, Surface_Ids surf_no, BOOL bSyst
 	}
 	else
 	{
-		if (surf[surf_no].in_use == true)
+		if (surf[surf_no].in_use == TRUE)
 		{
 			printf("Tried to create drawable surface at occupied slot (%d)\n", surf_no);
 		}
@@ -194,7 +196,7 @@ BOOL MakeSurface_Generic(int bxsize, int bysize, Surface_Ids surf_no, BOOL bSyst
 				}
 				else
 				{
-					surf[surf_no].in_use = true;
+					surf[surf_no].in_use = TRUE;
 					success = TRUE;
 				}
 			}
@@ -231,9 +233,9 @@ static void FlushSurface(Surface_Ids surf_no)
 	SDL_UnlockTexture(surf[surf_no].texture);
 }
 
-static bool LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, bool create_surface)
+static BOOL LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, BOOL create_surface)
 {
-	bool success = false;
+	BOOL success = FALSE;
 
 	if (surf_no >= SURFACE_ID_MAX)
 	{
@@ -255,15 +257,15 @@ static bool LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, bool create_surface)
 			}
 			else
 			{
-				if (create_surface == false || MakeSurface_Generic(surface->w, surface->h, surf_no, FALSE))
+				if (create_surface == FALSE || MakeSurface_Generic(surface->w, surface->h, surf_no, FALSE))
 				{
 					if (magnification == 1)
 					{
 						SDL_Rect dst_rect = {0, 0, surface->w, surface->h};
 						SDL_BlitSurface(surface, NULL, surf[surf_no].surface, &dst_rect);
-						surf[surf_no].needs_updating = true;
+						surf[surf_no].needs_updating = TRUE;
 						printf(" ^ Successfully loaded\n");
-						success = true;
+						success = TRUE;
 					}
 					else
 					{
@@ -301,9 +303,9 @@ static bool LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, bool create_surface)
 							}
 
 							SDL_FreeSurface(converted_surface);
-							surf[surf_no].needs_updating = true;
+							surf[surf_no].needs_updating = TRUE;
 							printf(" ^ Successfully loaded\n");
-							success = true;
+							success = TRUE;
 						}
 					}
 				}
@@ -318,7 +320,7 @@ static bool LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, bool create_surface)
 	return success;
 }
 
-static BOOL LoadBitmap_File(const char *name, Surface_Ids surf_no, bool create_surface)
+static BOOL LoadBitmap_File(const char *name, Surface_Ids surf_no, BOOL create_surface)
 {
 	char path[PATH_LENGTH];
 	SDL_RWops *fp;
@@ -355,7 +357,7 @@ static BOOL LoadBitmap_File(const char *name, Surface_Ids surf_no, bool create_s
 	return FALSE;
 }
 
-static BOOL LoadBitmap_Resource(const char *res, Surface_Ids surf_no, bool create_surface)
+static BOOL LoadBitmap_Resource(const char *res, Surface_Ids surf_no, BOOL create_surface)
 {
 	size_t size;
 	const unsigned char *data = FindResource(res, "BITMAP", &size);
@@ -378,22 +380,22 @@ static BOOL LoadBitmap_Resource(const char *res, Surface_Ids surf_no, bool creat
 
 BOOL MakeSurface_File(const char *name, Surface_Ids surf_no)
 {
-	return LoadBitmap_File(name, surf_no, true);
+	return LoadBitmap_File(name, surf_no, TRUE);
 }
 
 BOOL MakeSurface_Resource(const char *res, Surface_Ids surf_no)
 {
-	return LoadBitmap_Resource(res, surf_no, true);
+	return LoadBitmap_Resource(res, surf_no, TRUE);
 }
 
 BOOL ReloadBitmap_File(const char *name, Surface_Ids surf_no)
 {
-	return LoadBitmap_File(name, surf_no, false);
+	return LoadBitmap_File(name, surf_no, FALSE);
 }
 
 BOOL ReloadBitmap_Resource(const char *res, Surface_Ids surf_no)
 {
-	return LoadBitmap_Resource(res, surf_no, false);
+	return LoadBitmap_Resource(res, surf_no, FALSE);
 }
 
 static SDL_Rect RectToSDLRect(RECT *rect)
@@ -431,18 +433,18 @@ void BackupSurface(Surface_Ids surf_no, RECT *rect)
 	SDL_Rect frameRect = RectToSDLRectScaled(rect);
 
 	SDL_BlitSurface(surface, &frameRect, surf[surf_no].surface, &frameRect);
-	surf[surf_no].needs_updating = true;
+	surf[surf_no].needs_updating = TRUE;
 
 	// Free surface
 	SDL_FreeSurface(surface);
 }
 
-static void DrawBitmap(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_no, bool transparent)
+static void DrawBitmap(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_no, BOOL transparent)
 {
 	if (surf[surf_no].needs_updating)
 	{
 		FlushSurface(surf_no);
-		surf[surf_no].needs_updating = false;
+		surf[surf_no].needs_updating = FALSE;
 	}
 
 	// Get SDL_Rects
@@ -467,12 +469,12 @@ static void DrawBitmap(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_
 
 void PutBitmap3(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_no) // Transparency
 {
-	DrawBitmap(rcView, x, y, rect, surf_no, true);
+	DrawBitmap(rcView, x, y, rect, surf_no, TRUE);
 }
 
 void PutBitmap4(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_no) // No Transparency
 {
-	DrawBitmap(rcView, x, y, rect, surf_no, false);
+	DrawBitmap(rcView, x, y, rect, surf_no, FALSE);
 }
 
 void Surface2Surface(int x, int y, RECT *rect, int to, int from)
@@ -482,7 +484,7 @@ void Surface2Surface(int x, int y, RECT *rect, int to, int from)
 	SDL_Rect frameRect = RectToSDLRectScaled(rect);
 
 	SDL_BlitSurface(surf[from].surface, &frameRect, surf[to].surface, &rcSet);
-	surf[to].needs_updating = true;
+	surf[to].needs_updating = TRUE;
 }
 
 unsigned long GetCortBoxColor(unsigned long col)
@@ -514,7 +516,7 @@ void CortBox2(RECT *rect, unsigned long col, Surface_Ids surf_no)
 	const unsigned char col_green = (unsigned char)((col >> 8) & 0xFF);
 	const unsigned char col_blue = (unsigned char)((col >> 16) & 0xFF);
 	SDL_FillRect(surf[surf_no].surface, &destRect, SDL_MapRGB(surf[surf_no].surface->format, col_red, col_green, col_blue));
-	surf[surf_no].needs_updating = true;
+	surf[surf_no].needs_updating = TRUE;
 }
 
 #ifdef WINDOWS
@@ -635,7 +637,7 @@ void PutText(int x, int y, const char *text, unsigned long color)
 void PutText2(int x, int y, const char *text, unsigned long color, Surface_Ids surf_no)
 {
 	DrawText(gFont, (unsigned char*)surf[surf_no].surface->pixels, surf[surf_no].surface->pitch, surf[surf_no].surface->w, surf[surf_no].surface->h, x * magnification, y * magnification, color, text, strlen(text));
-	surf[surf_no].needs_updating = true;
+	surf[surf_no].needs_updating = TRUE;
 }
 
 void EndTextObject()

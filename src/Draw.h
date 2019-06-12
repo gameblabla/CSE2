@@ -10,7 +10,7 @@ extern RECT grcGame;
 extern RECT grcFull;
 
 extern int magnification;
-extern bool fullscreen;
+extern BOOL fullscreen;
 
 typedef enum Surface_Ids
 {

@@ -2,7 +2,6 @@
 
 #include <math.h>
 #include <stddef.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -10,6 +9,8 @@
 #include FT_FREETYPE_H
 #include FT_LCD_FILTER_H
 #include FT_BITMAP_H
+
+#include "WindowsWrapper.h"
 
 #include "File.h"
 
@@ -39,7 +40,7 @@ typedef struct FontObject
 	FT_Face face;
 	unsigned char *data;
 #ifndef DISABLE_FONT_ANTIALIASING
-	bool lcd_mode;
+	BOOL lcd_mode;
 #endif
 	CachedGlyph *glyph_list_head;
 } FontObject;

@@ -35,4 +35,4 @@ struct RECT
 	int bottom;
 };
 
-bool SystemTask();
+BOOL SystemTask();
