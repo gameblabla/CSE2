@@ -38,46 +38,46 @@ BOOL LoadNpcTable(const char *path)
 	}
 
 #ifdef NONPORTABLE
-	for (n = 0; n < num; n++) //bits
+	for (n = 0; n < num; n++) // Bits
 		fread(&gNpcTable[n].bits, 2, 1, fp);
-	for (n = 0; n < num; n++) //life
+	for (n = 0; n < num; n++) // Life
 		fread(&gNpcTable[n].life, 2, 1, fp);
-	for (n = 0; n < num; n++) //surf
+	for (n = 0; n < num; n++) // Surf
 		fread(&gNpcTable[n].surf, 1, 1, fp);
-	for (n = 0; n < num; n++) //destroy_voice
+	for (n = 0; n < num; n++) // Destroy_voice
 		fread(&gNpcTable[n].destroy_voice, 1, 1, fp);
-	for (n = 0; n < num; n++) //hit_voice
+	for (n = 0; n < num; n++) // Hit_voice
 		fread(&gNpcTable[n].hit_voice, 1, 1, fp);
-	for (n = 0; n < num; n++) //size
+	for (n = 0; n < num; n++) // Size
 		fread(&gNpcTable[n].size, 1, 1, fp);
-	for (n = 0; n < num; n++) //exp
+	for (n = 0; n < num; n++) // Exp
 		fread(&gNpcTable[n].exp, 4, 1, fp);
-	for (n = 0; n < num; n++) //damage
+	for (n = 0; n < num; n++) // Damage
 		fread(&gNpcTable[n].damage, 4, 1, fp);
-	for (n = 0; n < num; n++) //hit
+	for (n = 0; n < num; n++) // Hit
 		fread(&gNpcTable[n].hit, 4, 1, fp);
-	for (n = 0; n < num; n++) //view
+	for (n = 0; n < num; n++) // View
 		fread(&gNpcTable[n].view, 4, 1, fp);
 #else
-	for (n = 0; n < num; n++) //bits
+	for (n = 0; n < num; n++) // Bits
 		gNpcTable[n].bits = File_ReadLE16(fp);
-	for (n = 0; n < num; n++) //life
+	for (n = 0; n < num; n++) // Life
 		gNpcTable[n].life = File_ReadLE16(fp);
-	for (n = 0; n < num; n++) //surf
+	for (n = 0; n < num; n++) // Surf
 		fread(&gNpcTable[n].surf, 1, 1, fp);
-	for (n = 0; n < num; n++) //destroy_voice
+	for (n = 0; n < num; n++) // Destroy_voice
 		fread(&gNpcTable[n].destroy_voice, 1, 1, fp);
-	for (n = 0; n < num; n++) //hit_voice
+	for (n = 0; n < num; n++) // Hit_voice
 		fread(&gNpcTable[n].hit_voice, 1, 1, fp);
-	for (n = 0; n < num; n++) //size
+	for (n = 0; n < num; n++) // Size
 		fread(&gNpcTable[n].size, 1, 1, fp);
-	for (n = 0; n < num; n++) //exp
+	for (n = 0; n < num; n++) // Exp
 		gNpcTable[n].exp = File_ReadLE32(fp);
-	for (n = 0; n < num; n++) //damage
+	for (n = 0; n < num; n++) // Damage
 		gNpcTable[n].damage = File_ReadLE32(fp);
-	for (n = 0; n < num; n++) //hit
+	for (n = 0; n < num; n++) // Hit
 		fread(&gNpcTable[n].hit, 4, 1, fp);
-	for (n = 0; n < num; n++) //view
+	for (n = 0; n < num; n++) // View
 		fread(&gNpcTable[n].view, 4, 1, fp);
 #endif
 
@@ -94,7 +94,7 @@ void ReleaseNpcTable()
 	}
 }
 
-//Npc function table
+// Npc function table
 NPCFUNCTION gpNpcFuncTbl[361] =
 {
 	ActNpc000,
