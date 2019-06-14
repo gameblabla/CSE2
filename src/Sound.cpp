@@ -169,7 +169,7 @@ void SOUNDBUFFER::Mix(float *buffer, size_t frames)
 		const float sample2 = ((looping || (((size_t)samplePosition) + 1) < size) ? data[(((size_t)samplePosition) + 1) % size] : 128.0f);
 
 		//Interpolate sample
-		const float subPos = (float)std::fmod(samplePosition, 1.0);
+		const float subPos = (float)fmod(samplePosition, 1.0);
 		const float sampleA = sample1 + (sample2 - sample1) * subPos;
 
 		//Convert sample to float32
@@ -186,7 +186,7 @@ void SOUNDBUFFER::Mix(float *buffer, size_t frames)
 		{
 			if (looping)
 			{
-				samplePosition = std::fmod(samplePosition, size);
+				samplePosition = fmod(samplePosition, size);
 				looped = true;
 			}
 			else
