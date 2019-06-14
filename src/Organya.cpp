@@ -19,8 +19,8 @@
 #define MAXMELODY 8
 #define MAXDRAM 8
 
-SOUNDBUFFER* lpORGANBUFFER[8][8][2] = { NULL };
-SOUNDBUFFER** lpDRAMBUFFER = &lpSECONDARYBUFFER[0x96];
+SOUNDBUFFER *lpORGANBUFFER[8][8][2] = { NULL };
+SOUNDBUFFER **lpDRAMBUFFER = &lpSECONDARYBUFFER[0x96];
 
 MUSICINFO info;
 
@@ -30,17 +30,17 @@ BOOL bFadeout = FALSE;
 
 BOOL OrganyaNoteAlloc(unsigned short alloc)
 {
-	for(int j = 0; j < MAXTRACK; j++)
+	for (int j = 0; j < MAXTRACK; j++)
 	{
 		info.tdata[j].wave_no = 0;
 		info.tdata[j].note_list = NULL;
 		info.tdata[j].note_p = new NOTELIST[alloc];
 
-		if(info.tdata[j].note_p == NULL)
+		if (info.tdata[j].note_p == NULL)
 		{
-			for(int i = 0; i < MAXTRACK; i++)
+			for (int i = 0; i < MAXTRACK; i++)
 			{
-				if(info.tdata[i].note_p != NULL)
+				if (info.tdata[i].note_p != NULL)
 				{
 					delete[] info.tdata[i].note_p;
 					info.tdata[j].note_p = NULL;	// Uses j instead of i
@@ -50,7 +50,7 @@ BOOL OrganyaNoteAlloc(unsigned short alloc)
 			return FALSE;
 		}
 
-		for(int i = 0; i < alloc; i++)
+		for (int i = 0; i < alloc; i++)
 		{
 			(info.tdata[j].note_p + i)->from = NULL;
 			(info.tdata[j].note_p + i)->to = NULL;
@@ -61,7 +61,7 @@ BOOL OrganyaNoteAlloc(unsigned short alloc)
 		}
 	}
 
-	for(int j = 0; j < MAXMELODY; j++)
+	for (int j = 0; j < MAXMELODY; j++)
 		MakeOrganyaWave(j, info.tdata[j].wave_no, info.tdata[j].pipi);
 	// for(int j = 0; j < MAXDRAM; j++)
 	// 	InitDramObject(j);
@@ -73,9 +73,9 @@ BOOL OrganyaNoteAlloc(unsigned short alloc)
 
 void OrganyaReleaseNote()
 {
-	for(int i = 0; i < MAXTRACK; i++)
+	for (int i = 0; i < MAXTRACK; i++)
 	{
-		if(info.tdata[i].note_p != NULL)
+		if (info.tdata[i].note_p != NULL)
 		{
 #ifdef FIX_BUGS
 			delete[] info.tdata[i].note_p;
@@ -88,13 +88,15 @@ void OrganyaReleaseNote()
 }
 
 // Wave playing and loading
-typedef struct {
+typedef struct
+{
 	short wave_size;
 	short oct_par;
 	short oct_size;
 } OCTWAVE;
 
-OCTWAVE oct_wave[8] = {
+OCTWAVE oct_wave[8] =
+{
 	{ 256,  1,  4 }, // 0 Oct
 	{ 256,  2,  8 }, // 1 Oct
 	{ 128,  4, 12 }, // 2 Oct
@@ -102,7 +104,7 @@ OCTWAVE oct_wave[8] = {
 	{  64, 16, 20 }, // 4 Oct
 	{  32, 32, 24 }, // 5 Oct
 	{  16, 64, 28 }, // 6 Oct
-	{   8,128, 32 }, // 7 Oct
+	{   8, 128, 32 }, // 7 Oct
 };
 
 BOOL MakeSoundObject8(signed char *wavep, signed char track, signed char pipi)
@@ -124,7 +126,7 @@ BOOL MakeSoundObject8(signed char *wavep, signed char track, signed char pipi)
 
 			for (size_t i = 0; i < data_size; i++)
 			{
-				unsigned char work = *(wavep+wav_tp);
+				unsigned char work = *(wavep + wav_tp);
 				work += 0x80;
 
 				*wp_sub = work;
@@ -150,12 +152,14 @@ BOOL MakeSoundObject8(signed char *wavep, signed char track, signed char pipi)
 }
 
 // Playing melody tracks
-short freq_tbl[12] = { 262,277,294,311,330,349,370,392,415,440,466,494 };
+short freq_tbl[12] = { 262, 277, 294, 311, 330, 349, 370, 392, 415, 440, 466, 494 };
 
 void ChangeOrganFrequency(unsigned char key, signed char track, long a)
 {
-	for (int j = 0; j < 8; j++) {
-		for (int i = 0; i < 2; i++) {
+	for (int j = 0; j < 8; j++)
+	{
+		for (int i = 0; i < 2; i++)
+		{
 			lpORGANBUFFER[track][j][i]->SetFrequency(((oct_wave[j].wave_size * freq_tbl[key]) * oct_wave[j].oct_par) / 8 + (a - 1000));
 		}
 	}
@@ -168,21 +172,21 @@ unsigned char key_twin[MAXTRACK] = { 0 };
 
 void ChangeOrganPan(unsigned char key, unsigned char pan, signed char track)
 {
-	if(old_key[track] != PANDUMMY)
-		lpORGANBUFFER[track][old_key[track]/12][key_twin[track]]->SetPan((pan_tbl[pan] - 0x100) * 10);
+	if (old_key[track] != PANDUMMY)
+		lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]]->SetPan((pan_tbl[pan] - 0x100) * 10);
 }
 
 void ChangeOrganVolume(int no, long volume, signed char track)
 {
-	if(old_key[track] != VOLDUMMY)
-		lpORGANBUFFER[track][old_key[track]/12][key_twin[track]]->SetVolume((volume - 0xFF) * 8);
+	if (old_key[track] != VOLDUMMY)
+		lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]]->SetVolume((volume - 0xFF) * 8);
 }
 
 void PlayOrganObject(unsigned char key, int mode, signed char track, long freq)
 {
-	if (lpORGANBUFFER[track][key/12][key_twin[track]] != NULL)
+	if (lpORGANBUFFER[track][key / 12][key_twin[track]] != NULL)
 	{
-		switch(mode)
+		switch (mode)
 		{
 			case 0:
 				if (old_key[track] != 0xFF)
@@ -215,15 +219,15 @@ void PlayOrganObject(unsigned char key, int mode, signed char track, long freq)
 				{
 					lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]]->Play(false);
 					key_twin[track]++;
-					if(key_twin[track] == 2)
+					if (key_twin[track] == 2)
 						key_twin[track] = 0;
 					lpORGANBUFFER[track][key / 12][key_twin[track]]->Play(true);
 				}
 				else
 				{
-					lpORGANBUFFER[track][old_key[track]/12][key_twin[track]]->Play(false);
+					lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]]->Play(false);
 					key_twin[track]++;
-					if(key_twin[track] == 2)
+					if (key_twin[track] == 2)
 						key_twin[track] = 0;
 					ChangeOrganFrequency(key % 12, track, freq);
 					lpORGANBUFFER[track][key / 12][key_twin[track]]->Play(true);
@@ -237,14 +241,14 @@ void PlayOrganObject(unsigned char key, int mode, signed char track, long freq)
 // Release tracks
 void ReleaseOrganyaObject(signed char track)
 {
-	for(int i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
-		if(lpORGANBUFFER[track][i][0] != NULL)
+		if (lpORGANBUFFER[track][i][0] != NULL)
 		{
 			lpORGANBUFFER[track][i][0]->Release();
 			lpORGANBUFFER[track][i][0] = NULL;
 		}
-		if(lpORGANBUFFER[track][i][1] != NULL)
+		if (lpORGANBUFFER[track][i][1] != NULL)
 		{
 			lpORGANBUFFER[track][i][1]->Release();
 			lpORGANBUFFER[track][i][1] = NULL;
@@ -270,7 +274,7 @@ BOOL InitWaveData100()
 // Create org wave
 BOOL MakeOrganyaWave(signed char track, signed char wave_no, signed char pipi)
 {
-	if(wave_no > 99)
+	if (wave_no > 99)
 	{
 		printf("WARNING: track %d has out-of-range wave_no %d\n", track, wave_no);
 		return FALSE;
@@ -299,7 +303,7 @@ void ChangeDramVolume(long volume, signed char track)
 
 void PlayDramObject(unsigned char key, int mode, signed char track)
 {
-	switch(mode)
+	switch (mode)
 	{
 		case 0:
 			lpDRAMBUFFER[track]->Stop();
@@ -335,19 +339,19 @@ void OrganyaPlayData()
 		gOrgVolume = 0;
 
 	// Play melody
-	for(int i = 0; i < MAXMELODY; i++)
+	for (int i = 0; i < MAXMELODY; i++)
 	{
 		if (play_np[i] != NULL && play_p == play_np[i]->x)
 		{
-			if(play_np[i]->y != KEYDUMMY)
+			if (play_np[i]->y != KEYDUMMY)
 			{
 				PlayOrganObject(play_np[i]->y, -1, i, info.tdata[i].freq);
 				now_leng[i] = play_np[i]->length;
 			}
 
-			if(play_np[i]->pan != PANDUMMY)
+			if (play_np[i]->pan != PANDUMMY)
 				ChangeOrganPan(play_np[i]->y, play_np[i]->pan, i);
-			if(play_np[i]->volume != VOLDUMMY)
+			if (play_np[i]->volume != VOLDUMMY)
 				gTrackVol[i] = play_np[i]->volume;
 
 			play_np[i] = play_np[i]->to;
@@ -363,16 +367,16 @@ void OrganyaPlayData()
 			ChangeOrganVolume(play_np[i]->y, gOrgVolume * gTrackVol[i] / 0x7F, i);
 	}
 
-	for(int i = MAXMELODY; i < MAXTRACK; i++)
+	for (int i = MAXMELODY; i < MAXTRACK; i++)
 	{
 		if (play_np[i] != NULL && play_p == play_np[i]->x)
 		{
 			if (play_np[i]->y != KEYDUMMY)
 				PlayDramObject(play_np[i]->y, 1, i - MAXMELODY);
 
-			if(play_np[i]->pan != PANDUMMY)
+			if (play_np[i]->pan != PANDUMMY)
 				ChangeDramPan(play_np[i]->pan, i - MAXMELODY);
-			if(play_np[i]->volume != VOLDUMMY)
+			if (play_np[i]->volume != VOLDUMMY)
 				gTrackVol[i] = play_np[i]->volume;
 
 			play_np[i] = play_np[i]->to;
@@ -384,7 +388,7 @@ void OrganyaPlayData()
 
 	// Looping
 	play_p++;
-	if(play_p >= info.end_x)
+	if (play_p >= info.end_x)
 	{
 		play_p = info.repeat_x;
 		SetPlayPointer(play_p);
@@ -454,7 +458,8 @@ void LoadOrganya(const char *name)
 	info.repeat_x = READ_LE32(p);
 	info.end_x = READ_LE32(p);
 
-	for (int i = 0; i < 16; i++) {
+	for (int i = 0; i < 16; i++)
+	{
 		info.tdata[i].freq = READ_LE16(p);
 		info.tdata[i].wave_no = *p++;
 		const signed char pipi = *p++;
@@ -494,31 +499,36 @@ void LoadOrganya(const char *name)
 
 		// Set note properties
 		np = info.tdata[j].note_p; // X position
-		for (int i = 0; i < info.tdata[j].note_num; i++) {
+		for (int i = 0; i < info.tdata[j].note_num; i++)
+		{
 			np->x = READ_LE32(p);
 			np++;
 		}
 
 		np = info.tdata[j].note_p; // Y position
-		for (int i = 0; i < info.tdata[j].note_num; i++) {
+		for (int i = 0; i < info.tdata[j].note_num; i++)
+		{
 			np->y = *p++;
 			np++;
 		}
 
 		np = info.tdata[j].note_p; // Length
-		for (int i = 0; i < info.tdata[j].note_num; i++) {
+		for (int i = 0; i < info.tdata[j].note_num; i++)
+		{
 			np->length = *p++;
 			np++;
 		}
 
 		np = info.tdata[j].note_p; // Volume
-		for (int i = 0; i < info.tdata[j].note_num; i++) {
+		for (int i = 0; i < info.tdata[j].note_num; i++)
+		{
 			np->volume = *p++;
 			np++;
 		}
 
 		np = info.tdata[j].note_p; // Pan
-		for (int i = 0; i < info.tdata[j].note_num; i++) {
+		for (int i = 0; i < info.tdata[j].note_num; i++)
+		{
 			np->pan = *p++;
 			np++;
 		}
