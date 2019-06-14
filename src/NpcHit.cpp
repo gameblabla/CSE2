@@ -628,3 +628,4 @@ void HitNpCharBullet()
 			LoseNpChar(&gNPC[n], TRUE);
 	}
 }
+
