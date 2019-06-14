@@ -255,7 +255,8 @@ BOOL InitializeGame()
 	if (!TransferStage(13, 200, 10, 8))
 	{
 		// TODO - restore this when ghWnd is available
-/*
+
+		/*
 
 #if defined(NONPORTABLE) && defined(WINDOWS)
 #ifdef JAPANESE
@@ -265,7 +266,7 @@ BOOL InitializeGame()
 #endif
 #else
 
-*/
+		*/
 #ifdef JAPANESE
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", "ステージの読み込みに失敗", NULL);
 #else
