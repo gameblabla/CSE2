@@ -48,18 +48,18 @@ BOOL SaveProfile(const char *name)
 	const char *FLAG = "FLAG";
 	char path[PATH_LENGTH];
 
-	//Get path
+	// Get path
 	if (name)
 		sprintf(path, "%s/%s", gModulePath, name);
 	else
 		sprintf(path, "%s/%s", gModulePath, gDefaultName);
 
-	//Open file
+	// Open file
 	fp = fopen(path, "wb");
 	if (fp == NULL)
 		return FALSE;
 
-	//Set up profile
+	// Set up profile
 	memset(&profile, 0, sizeof(PROFILE));
 	memcpy(profile.code, gProfileCode, sizeof(profile.code));
 	memcpy(profile.FLAG, FLAG, sizeof(profile.FLAG));
@@ -82,7 +82,7 @@ BOOL SaveProfile(const char *name)
 	memcpy(profile.permit_mapping, gMapping, sizeof(profile.permit_mapping));
 	memcpy(profile.flags, gFlagNPC, sizeof(profile.flags));
 
-	//Write to file
+	// Write to file
 #ifdef NONPORTABLE
 	fwrite(&profile, sizeof(PROFILE), 1, fp);
 #else
@@ -127,7 +127,7 @@ BOOL SaveProfile(const char *name)
 
 BOOL LoadProfile(const char *name)
 {
-	//Get path
+	// Get path
 	char path[PATH_LENGTH];
 
 	if (name)
@@ -135,14 +135,14 @@ BOOL LoadProfile(const char *name)
 	else
 		sprintf(path, "%s/%s", gModulePath, gDefaultName);
 
-	//Open file
+	// Open file
 	PROFILE profile;
 
 	FILE *fp = fopen(path, "rb");
 	if (fp == NULL)
 		return FALSE;
 
-	//Check header code
+	// Check header code
 	fread(profile.code, 8, 1, fp);
 	if (memcmp(profile.code, gProfileCode, 8))
 	{
@@ -152,7 +152,7 @@ BOOL LoadProfile(const char *name)
 		return FALSE;
 	}
 
-	//Read data
+	// Read data
 	fseek(fp, 0, SEEK_SET);
 	memset(&profile, 0, sizeof(PROFILE));
 #ifdef NONPORTABLE
@@ -194,7 +194,7 @@ BOOL LoadProfile(const char *name)
 #endif
 	fclose(fp);
 
-	//Set things
+	// Set things
 	gSelectedArms = profile.select_arms;
 	gSelectedItem = profile.select_item;
 	gCounter = profile.counter;
@@ -205,13 +205,13 @@ BOOL LoadProfile(const char *name)
 	memcpy(gMapping, profile.permit_mapping, sizeof(gMapping));
 	memcpy(gFlagNPC, profile.flags, sizeof(gFlagNPC));
 
-	//Load stage
+	// Load stage
 	ChangeMusic(profile.music);
 	InitMyChar();
 	if (!TransferStage(profile.stage, 0, 0, 1))
 		return FALSE;
 
-	//Set character properties
+	// Set character properties
 	gMC.equip = profile.equip;
 	gMC.unit = profile.unit;
 	gMC.direct = profile.direct;
@@ -229,7 +229,7 @@ BOOL LoadProfile(const char *name)
 	gMC.rect_arms.top = 32 * (gArmsData[gSelectedArms].code / 10);
 	gMC.rect_arms.bottom = gMC.rect_arms.top + 16;
 
-	//Reset stuff
+	// Reset stuff
 	ClearFade();
 	SetFrameMyChar();
 	SetFrameTargetMyChar(16);
@@ -255,19 +255,23 @@ BOOL InitializeGame()
 	if (!TransferStage(13, 200, 10, 8))
 	{
 		// TODO - restore this when ghWnd is available
-/*#if defined(NONPORTABLE) && defined(WINDOWS)
+/*
+
+#if defined(NONPORTABLE) && defined(WINDOWS)
 #ifdef JAPANESE
 		MessageBoxA(ghWnd, "ステージの読み込みに失敗", "エラー", MB_OK);
 #else
 		MessageBoxA(ghWnd, "Failed to load stage", "Error", MB_OK);
 #endif
-#else*/
+#else
+
+*/
 #ifdef JAPANESE
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", "ステージの読み込みに失敗", NULL);
 #else
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Failed to load stage", NULL);
 #endif
-//#endif
+// #endif
 		return FALSE;
 	}
 
