@@ -19,7 +19,7 @@
 #define MAXMELODY 8
 #define MAXDRAM 8
 
-SOUNDBUFFER *lpORGANBUFFER[8][8][2] = { NULL };
+SOUNDBUFFER *lpORGANBUFFER[8][8][2] = {NULL};
 SOUNDBUFFER **lpDRAMBUFFER = &lpSECONDARYBUFFER[0x96];
 
 MUSICINFO info;
@@ -152,7 +152,7 @@ BOOL MakeSoundObject8(signed char *wavep, signed char track, signed char pipi)
 }
 
 // Playing melody tracks
-short freq_tbl[12] = { 262, 277, 294, 311, 330, 349, 370, 392, 415, 440, 466, 494 };
+short freq_tbl[12] = {262, 277, 294, 311, 330, 349, 370, 392, 415, 440, 466, 494};
 
 void ChangeOrganFrequency(unsigned char key, signed char track, long a)
 {
@@ -165,10 +165,10 @@ void ChangeOrganFrequency(unsigned char key, signed char track, long a)
 	}
 }
 
-short pan_tbl[13] = { 0, 43, 86, 129, 172, 215, 256, 297, 340, 383, 426, 469, 512 };
-unsigned char old_key[MAXTRACK] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
-unsigned char key_on[MAXTRACK] = { 0 };
-unsigned char key_twin[MAXTRACK] = { 0 };
+short pan_tbl[13] = {0, 43, 86, 129, 172, 215, 256, 297, 340, 383, 426, 469, 512};
+unsigned char old_key[MAXTRACK] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+unsigned char key_on[MAXTRACK] = {0};
+unsigned char key_twin[MAXTRACK] = {0};
 
 void ChangeOrganPan(unsigned char key, unsigned char pan, signed char track)
 {
@@ -328,7 +328,7 @@ void PlayDramObject(unsigned char key, int mode, signed char track)
 // Play data
 long play_p;
 NOTELIST *play_np[MAXTRACK];
-long now_leng[MAXMELODY] = { 0 };
+long now_leng[MAXMELODY] = {0};
 
 void OrganyaPlayData()
 {
