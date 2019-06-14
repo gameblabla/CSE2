@@ -262,8 +262,26 @@ elseif(NOT WIN32)
 	list(APPEND RESOURCES "FONT/cour.ttf")
 endif()
 
-# Magic to convert resources to header files
-add_subdirectory("bin2h")
+# Build bin2h externally, so it isn't cross-compiled when CSE2 is (Emscripten)
+include(ExternalProject)
+
+ExternalProject_Add(bin2h
+                    SOURCE_DIR "${CMAKE_SOURCE_DIR}/bin2h"
+                    DOWNLOAD_COMMAND ""
+                    UPDATE_COMMAND ""
+                    CMAKE_ARGS
+                       -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+                       -DCMAKE_BUILD_TYPE=Release
+					   -DCMAKE_CONFIGURATION_TYPES=Release
+)
+
+ExternalProject_Get_Property(bin2h INSTALL_DIR)
+
+add_executable(bin2h_tool IMPORTED)
+add_dependencies(bin2h_tool bin2h)
+set_target_properties(bin2h_tool PROPERTIES IMPORTED_LOCATION "${INSTALL_DIR}/bin/bin2h")
+
+# Convert resources to header files
 foreach(FILENAME IN LISTS RESOURCES)
 	set(IN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/res")
 	set(OUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/Resource")
@@ -271,8 +289,8 @@ foreach(FILENAME IN LISTS RESOURCES)
 	add_custom_command(
 		OUTPUT "${OUT_DIR}/${FILENAME}.h"
 		COMMAND ${CMAKE_COMMAND} -E make_directory "${OUT_DIR}/${DIRECTORY}"
-		COMMAND bin2h "${IN_DIR}/${FILENAME}" "${OUT_DIR}/${FILENAME}.h"
-		DEPENDS bin2h "${IN_DIR}/${FILENAME}"
+		COMMAND bin2h_tool "${IN_DIR}/${FILENAME}" "${OUT_DIR}/${FILENAME}.h"
+		DEPENDS bin2h_tool "${IN_DIR}/${FILENAME}"
 		)
 	target_sources(CSE2 PRIVATE "${OUT_DIR}/${FILENAME}.h")
 endforeach()
