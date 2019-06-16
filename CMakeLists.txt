@@ -266,13 +266,13 @@ endif()
 include(ExternalProject)
 
 ExternalProject_Add(bin2h
-                    SOURCE_DIR "${CMAKE_SOURCE_DIR}/bin2h"
-                    DOWNLOAD_COMMAND ""
-                    UPDATE_COMMAND ""
-                    CMAKE_ARGS
-                       -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
-                       -DCMAKE_BUILD_TYPE=Release
-					   -DCMAKE_CONFIGURATION_TYPES=Release
+	SOURCE_DIR "${CMAKE_SOURCE_DIR}/bin2h"
+	DOWNLOAD_COMMAND ""
+	UPDATE_COMMAND ""
+	CMAKE_ARGS
+		DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+		DCMAKE_BUILD_TYPE=Release
+		DCMAKE_CONFIGURATION_TYPES=Release
 )
 
 ExternalProject_Get_Property(bin2h INSTALL_DIR)
