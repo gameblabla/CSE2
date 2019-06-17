@@ -38,7 +38,7 @@ cmake --build . --config Release
 
 If you're a Visual Studio user, you can open the generated `CSE2.sln` file instead.
 
-Once built, the executables can be found in `build_en` or `build_jp`, depending on the selected language.
+Once built, the executables and assets can be found in the newly-generated `game` directory.
 
 ### Makefile (deprecated)
 
