@@ -4,6 +4,9 @@ if((${CMAKE_VERSION} VERSION_EQUAL 3.9) OR (${CMAKE_VERSION} VERSION_GREATER 3.9
 	cmake_policy(SET CMP0069 NEW)
 endif()
 
+set(BUILD_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/game")
+set(ASSETS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/assets")
+
 option(JAPANESE "Enable the Japanese-language build" OFF)
 option(FIX_BUGS "Fix certain bugs (see src/Bug Fixes.txt)" OFF)
 option(NONPORTABLE "Enable bits of code that aren't portable, but are what the original game used" OFF)
@@ -221,11 +224,11 @@ set(RESOURCES
 
 # Handle options
 if(JAPANESE)
-	set(BUILD_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/build_jp")
+	set(DATA_DIRECTORY "${ASSETS_DIRECTORY}/data_jp")
 	list(APPEND RESOURCES "BITMAP/pixel_jp.bmp")
 	target_compile_definitions(CSE2 PRIVATE JAPANESE)
 else()
-	set(BUILD_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/build_en")
+	set(DATA_DIRECTORY "${ASSETS_DIRECTORY}/data_en")
 	list(APPEND RESOURCES "BITMAP/pixel.bmp")
 endif()
 
@@ -283,7 +286,7 @@ set_target_properties(bin2h_tool PROPERTIES IMPORTED_LOCATION "${INSTALL_DIR}/bi
 
 # Convert resources to header files
 foreach(FILENAME IN LISTS RESOURCES)
-	set(IN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/res")
+	set(IN_DIR "${ASSETS_DIRECTORY}/resources")
 	set(OUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/Resource")
 	get_filename_component(DIRECTORY "${FILENAME}" DIRECTORY)
 	add_custom_command(
@@ -319,6 +322,12 @@ set_target_properties(CSE2 PROPERTIES
 	RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${BUILD_DIRECTORY}
 	RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${BUILD_DIRECTORY}
 	RUNTIME_OUTPUT_DIRECTORY_DEBUG ${BUILD_DIRECTORY}
+)
+
+# Copy data folder to build directory
+add_custom_command(TARGET CSE2 POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E remove_directory "${BUILD_DIRECTORY}/data"
+	COMMAND ${CMAKE_COMMAND} -E copy_directory "${DATA_DIRECTORY}" "${BUILD_DIRECTORY}/data"
 )
 
 # Enable link-time optimisation if available
@@ -378,6 +387,7 @@ else()
 	add_subdirectory("external/freetype" EXCLUDE_FROM_ALL)
 	target_link_libraries(CSE2 freetype)
 endif()
+
 
 ##
 # DoConfig
