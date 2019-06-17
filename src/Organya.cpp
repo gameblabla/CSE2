@@ -1,3 +1,9 @@
+// Some of the original source code for this file can be found here:
+// https://github.com/shbow/organya/blob/master/source/OrgFile.cpp
+// https://github.com/shbow/organya/blob/master/source/OrgPlay.cpp
+// https://github.com/shbow/organya/blob/master/source/Sound.cpp
+// https://github.com/shbow/organya/blob/master/source/WinTimer.cpp
+
 #include "Organya.h"
 
 #include <stddef.h>
@@ -104,7 +110,7 @@ OCTWAVE oct_wave[8] =
 	{  64, 16, 20 }, // 4 Oct
 	{  32, 32, 24 }, // 5 Oct
 	{  16, 64, 28 }, // 6 Oct
-	{   8, 128, 32 }, // 7 Oct
+	{   8,128, 32 }, // 7 Oct
 };
 
 BOOL MakeSoundObject8(signed char *wavep, signed char track, signed char pipi)
