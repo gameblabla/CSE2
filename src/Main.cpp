@@ -375,7 +375,7 @@ void EntryPoint(MainLoopMeta *meta)
 						// Run game code
 						EnterMainLoop(Game, NULL, NULL);
 
-						++meta->routine;
+						++meta->routine;	// As soon as we return from the above function, exit
 						return;
 					}
 				}
@@ -389,7 +389,7 @@ void EntryPoint(MainLoopMeta *meta)
 
 			break;
 
-		case -1:
+		case 1:
 			// End stuff
 			EndDirectSound();
 			EndTextObject();
@@ -464,9 +464,9 @@ void JoystickProc()
 BOOL SystemTask()
 {
 	// Handle window events
-	BOOL focusGained = TRUE;
+	//BOOL focusGained = TRUE;
 
-	while (SDL_PollEvent(NULL) || !focusGained)
+	while (SDL_PollEvent(NULL) /*|| !focusGained*/)
 	{
 		SDL_Event event;
 		SDL_WaitEvent(&event);
@@ -481,12 +481,12 @@ BOOL SystemTask()
 				switch (event.window.event)
 				{
 					case SDL_WINDOWEVENT_FOCUS_GAINED:
-						focusGained = TRUE;
+						//focusGained = TRUE;
 						ActiveWindow();
 						break;
 
 					case SDL_WINDOWEVENT_FOCUS_LOST:
-						focusGained = FALSE;
+						//focusGained = FALSE;
 						InactiveWindow();
 						break;
 
