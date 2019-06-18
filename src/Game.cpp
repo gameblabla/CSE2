@@ -26,6 +26,7 @@
 #include "GenericLoad.h"
 #include "KeyControl.h"
 #include "Main.h"
+#include "MainLoop.h"
 #include "Map.h"
 #include "MapName.h"
 #include "MiniMap.h"
@@ -104,109 +105,144 @@ void PutNumber4(int x, int y, int value, BOOL bZero)
 	}
 }
 
-int ModeOpening()
+void ModeOpening(MainLoopMeta *meta)
 {
-	InitNpChar();
-	InitCaret();
-	InitStar();
-	InitFade();
-	InitFlash();
-	InitBossLife();
-	ChangeMusic(0);
-	TransferStage(72, 100, 3, 3);
-	SetFrameTargetMyChar(16);
-	SetFadeMask();
+	static unsigned int wait;
 
-	// Reset cliprect and flags
-	grcGame.left = 0;
-	// Non-vanilla: these three lines are widescreen-related(?)
-	grcGame.top = 0;
-	grcGame.right = WINDOW_WIDTH;
-	grcGame.bottom = WINDOW_HEIGHT;
-
-	g_GameFlags = 3;
-
-	CutNoise();
-
-	unsigned int wait = 0;
-	while (wait < 500)
+	switch (meta->routine)
 	{
-		// Increase timer
-		++wait;
+		case 0:
+			InitNpChar();
+			InitCaret();
+			InitStar();
+			InitFade();
+			InitFlash();
+			InitBossLife();
+			ChangeMusic(0);
+			TransferStage(72, 100, 3, 3);
+			SetFrameTargetMyChar(16);
+			SetFadeMask();
 
-		// Get pressed keys
-		GetTrg();
+			// Reset cliprect and flags
+			grcGame.left = 0;
+			// Non-vanilla: these three lines are widescreen-related(?)
+			grcGame.top = 0;
+			grcGame.right = WINDOW_WIDTH;
+			grcGame.bottom = WINDOW_HEIGHT;
 
-		// Escape menu
-		if (gKey & KEY_ESCAPE)
-		{
-			int escRet = Call_Escape(ghWnd);
-			if (escRet == 0)
-				return 0;
-			if (escRet == 2)
-				return 1;
-		}
+			g_GameFlags = 3;
 
-		// Skip intro if OK is pressed
-		if (gKey & gKeyOk)
-			break;
+			CutNoise();
 
-		// Update everything
-		ActNpChar();
-		ActBossChar();
-		ActBack();
-		ResetMyCharFlag();
-		HitMyCharMap();
-		HitMyCharNpChar();
-		HitMyCharBoss();
-		HitNpCharMap();
-		HitBossMap();
-		HitBossBullet();
-		ActCaret();
-		MoveFrame3();
-		ProcFade();
+			wait = 0;
 
-		// Draw everything
-		CortBox(&grcFull, 0x000000);
+			++meta->routine;
+			// Fallthrough
+		case 1:
+			if (wait < 500)
+			{
+				// Increase timer
+				++wait;
 
-		int frame_x, frame_y;
-		GetFramePosition(&frame_x, &frame_y);
-		PutBack(frame_x, frame_y);
-		PutStage_Back(frame_x, frame_y);
-		PutBossChar(frame_x, frame_y);
-		PutNpChar(frame_x, frame_y);
-		PutMapDataVector(frame_x, frame_y);
-		PutStage_Front(frame_x, frame_y);
-		PutFront(frame_x, frame_y);
-		PutCaret(frame_x, frame_y);
-		PutFade();
+				// Get pressed keys
+				GetTrg();
 
-		// Update Text Script
-		int tscRet = TextScriptProc();
-		if (tscRet == 0)
-			return 0;
-		if (tscRet == 2)
-			return 1;
+				// Escape menu
+				if (gKey & KEY_ESCAPE)
+				{
+					int escRet = Call_Escape(ghWnd);
+					if (escRet == 0)
+					{
+						ExitMainLoop(0);
+						return;
+					}
+					if (escRet == 2)
+					{
+						ExitMainLoop(1);
+						return;
+					}
+				}
 
-		PutMapName(FALSE);
-		PutTextScript();
-		PutFramePerSecound();
+				// Update everything
+				ActNpChar();
+				ActBossChar();
+				ActBack();
+				ResetMyCharFlag();
+				HitMyCharMap();
+				HitMyCharNpChar();
+				HitMyCharBoss();
+				HitNpCharMap();
+				HitBossMap();
+				HitBossBullet();
+				ActCaret();
+				MoveFrame3();
+				ProcFade();
 
-		if (!Flip_SystemTask(ghWnd))
-			return 0;
+				// Draw everything
+				CortBox(&grcFull, 0x000000);
 
-		++gCounter;
+				int frame_x, frame_y;
+				GetFramePosition(&frame_x, &frame_y);
+				PutBack(frame_x, frame_y);
+				PutStage_Back(frame_x, frame_y);
+				PutBossChar(frame_x, frame_y);
+				PutNpChar(frame_x, frame_y);
+				PutMapDataVector(frame_x, frame_y);
+				PutStage_Front(frame_x, frame_y);
+				PutFront(frame_x, frame_y);
+				PutCaret(frame_x, frame_y);
+				PutFade();
+
+				// Update Text Script
+				int tscRet = TextScriptProc();
+				if (tscRet == 0)
+				{
+					ExitMainLoop(0);
+					return;
+				}
+				if (tscRet == 2)
+				{
+					ExitMainLoop(1);
+					return;
+				}
+
+				PutMapName(FALSE);
+				PutTextScript();
+				PutFramePerSecound();
+
+				if (!Flip_SystemTask(ghWnd))
+				{
+					ExitMainLoop(0);
+					return;
+				}
+
+				++gCounter;
+
+				// Skip intro if OK is pressed
+				if (!(gKey & gKeyOk))
+					break;
+			}
+
+			wait = SDL_GetTicks();
+			++meta->routine;
+			// Fallthrough
+		case 2:
+			if (SDL_GetTicks() < wait + 500)
+			{
+				CortBox(&grcGame, 0x000000);
+				PutFramePerSecound();
+				if (!Flip_SystemTask(ghWnd))
+				{
+					ExitMainLoop(0);
+					return;
+				}
+
+				break;
+			}
+
+			ExitMainLoop(2);
+			return;
 	}
-
-	wait = SDL_GetTicks();
-	while (SDL_GetTicks() < wait + 500)
-	{
-		CortBox(&grcGame, 0x000000);
-		PutFramePerSecound();
-		if (!Flip_SystemTask(ghWnd))
-			return 0;
-	}
-	return 2;
 }
 
 int ModeTitle()
@@ -622,41 +658,60 @@ int ModeAction()
 	return 0;
 }
 
-BOOL Game()
+void GameMainLoopSelector(MainLoopMeta *meta, int mode)
 {
-	if (LoadGenericData())
+	(void)meta;
+
+	switch (mode)
 	{
-		char path[PATH_LENGTH];
-		sprintf(path, "%s/npc.tbl", gDataPath);
+		case 0:
+			ExitMainLoop(0);
+			break;
+		case 1:
+			EnterMainLoop(ModeOpening, GameMainLoopSelector, NULL);
+			break;
+		case 2:
+	//		EnterMainLoop(ModeTitle, GameMainLoopSelector, NULL);
+			break;
+		case 3:
+	//		EnterMainLoop(ModeAction, GameMainLoopSelector, NULL);
+			break;
+	}
+}
 
-		if (LoadNpcTable(path))
-		{
-			InitTextScript2();
-			InitSkipFlags();
-			InitMapData2();
-			InitCreditScript();
-
-			int mode = 1;
-			while (mode)
+void Game(MainLoopMeta *meta)
+{
+	switch (meta->routine)
+	{
+		case 0:
+			if (LoadGenericData())
 			{
-				if (mode == 1)
-					mode = ModeOpening();
-				if (mode == 2)
-					mode = ModeTitle();
-				if (mode == 3)
-					mode = ModeAction();
+				char path[PATH_LENGTH];
+				sprintf(path, "%s/npc.tbl", gDataPath);
+
+				if (LoadNpcTable(path))
+				{
+					InitTextScript2();
+					InitSkipFlags();
+					InitMapData2();
+					InitCreditScript();
+
+					GameMainLoopSelector(meta, 1);
+				}
+				else
+				{
+					ExitMainLoop(0);
+					return;
+				}
 			}
 
+			break;
+
+		case -1:
 			EndMapData();
 			EndTextScript();
 			ReleaseNpcTable();
 			ReleaseCreditScript();
-		}
-		else
-		{
-			return FALSE;
-		}
+			break;
 	}
-
-	return TRUE;
 }

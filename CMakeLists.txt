@@ -152,6 +152,8 @@ add_executable(CSE2
 	src/ValueView.cpp
 	src/ValueView.h
 	src/WindowsWrapper.h
+	src/MainLoop.cpp
+	src/MainLoop.h
 )
 
 set(RESOURCES
@@ -255,6 +257,12 @@ if(MSVC)
 	target_compile_definitions(CSE2 PRIVATE _CRT_SECURE_NO_WARNINGS)	# Shut up those stupid warnings
 endif()
 
+# Do some setup if we're targetting Emscripten
+if(EMSCRIPTEN)
+	target_compile_options(CSE2 PRIVATE "SHELL:-s USE_SDL=2" "SHELL:-s USE_FREETYPE=1")
+	target_link_libraries(CSE2 PRIVATE "-s USE_SDL=2 -s USE_FREETYPE=1 --preload-file ${BUILD_DIRECTORY}/fps@/ --preload-file ${BUILD_DIRECTORY}/data@/data --preload-file ${BUILD_DIRECTORY}/Config.dat@/ -s ALLOW_MEMORY_GROWTH=1 --no-heap-copy")
+endif()
+
 # Decide the embedded font
 if(JAPANESE)
 	list(APPEND RESOURCES "FONT/msgothic.ttc")
@@ -334,65 +342,69 @@ endif()
 
 # Find dependencies
 
-if(NOT FORCE_LOCAL_LIBS)
-	find_package(SDL2)
-endif()
-
-if(TARGET SDL2::SDL2)
-	# CMake-generated config (Arch, vcpkg, Raspbian)
-	message(STATUS "Using system SDL2")
-	target_link_libraries(CSE2 SDL2::SDL2 SDL2::SDL2main)
-elseif(SDL2_FOUND)
-	# Autotools-generated config (MSYS2)
-	message(STATUS "Using system SDL2")
-	target_include_directories(CSE2 PRIVATE ${SDL2_INCLUDE_DIRS})
-	target_link_libraries(CSE2 ${SDL2_LIBRARIES})
-else()
-	# Compile it ourselves
-	message(STATUS "Using local SDL2")
-	set(SDL_SHARED_ENABLED_BY_DEFAULT OFF)
-	if(MSVC)
-		set(LIBC ON)	# Needed to prevent possible 'symbol already defined' errors
+if(NOT EMSCRIPTEN)
+	if(NOT FORCE_LOCAL_LIBS)
+		find_package(SDL2)
 	endif()
-	add_subdirectory("external/SDL2" EXCLUDE_FROM_ALL)
-	target_link_libraries(CSE2 SDL2-static SDL2main)
-endif()
 
-if(NOT FORCE_LOCAL_LIBS)
-	find_package(Freetype)
-endif()
-
-if(FREETYPE_FOUND)
-	message(STATUS "Using system FreeType")
-	target_include_directories(CSE2 PRIVATE ${FREETYPE_INCLUDE_DIRS})
-	target_link_libraries(CSE2 ${FREETYPE_LIBRARIES})
-else()
-	# Compile it ourselves
-	message(STATUS "Using local FreeType")
-	if(FORCE_LOCAL_LIBS)
-		set(CMAKE_DISABLE_FIND_PACKAGE_HarfBuzz ON)
-		set(CMAKE_DISABLE_FIND_PACKAGE_ZLIB ON)
-		set(CMAKE_DISABLE_FIND_PACKAGE_PNG ON)
-		set(CMAKE_DISABLE_FIND_PACKAGE_BZip2 ON)
+	if(TARGET SDL2::SDL2)
+		# CMake-generated config (Arch, vcpkg, Raspbian)
+		message(STATUS "Using system SDL2")
+		target_link_libraries(CSE2 SDL2::SDL2 SDL2::SDL2main)
+	elseif(SDL2_FOUND)
+		# Autotools-generated config (MSYS2)
+		message(STATUS "Using system SDL2")
+		target_include_directories(CSE2 PRIVATE ${SDL2_INCLUDE_DIRS})
+		target_link_libraries(CSE2 ${SDL2_LIBRARIES})
+	else()
+		# Compile it ourselves
+		message(STATUS "Using local SDL2")
+		set(SDL_SHARED_ENABLED_BY_DEFAULT OFF)
+		if(MSVC)
+			set(LIBC ON)	# Needed to prevent possible 'symbol already defined' errors
+		endif()
+		add_subdirectory("external/SDL2" EXCLUDE_FROM_ALL)
+		target_link_libraries(CSE2 SDL2-static SDL2main)
 	endif()
-	add_subdirectory("external/freetype" EXCLUDE_FROM_ALL)
-	target_link_libraries(CSE2 freetype)
+
+	if(NOT FORCE_LOCAL_LIBS)
+		find_package(Freetype)
+	endif()
+
+	if(FREETYPE_FOUND)
+		message(STATUS "Using system FreeType")
+		target_include_directories(CSE2 PRIVATE ${FREETYPE_INCLUDE_DIRS})
+		target_link_libraries(CSE2 ${FREETYPE_LIBRARIES})
+	else()
+		# Compile it ourselves
+		message(STATUS "Using local FreeType")
+		if(FORCE_LOCAL_LIBS)
+			set(CMAKE_DISABLE_FIND_PACKAGE_HarfBuzz ON)
+			set(CMAKE_DISABLE_FIND_PACKAGE_ZLIB ON)
+			set(CMAKE_DISABLE_FIND_PACKAGE_PNG ON)
+			set(CMAKE_DISABLE_FIND_PACKAGE_BZip2 ON)
+		endif()
+		add_subdirectory("external/freetype" EXCLUDE_FROM_ALL)
+		target_link_libraries(CSE2 freetype)
+	endif()
 endif()
 
 ##
 # DoConfig
 ##
 
-add_subdirectory("DoConfig")
+if(NOT EMSCRIPTEN)
+	add_subdirectory("DoConfig")
 
-# Name debug builds "DoConfig_debug", to distinguish them
-set_target_properties(DoConfig PROPERTIES DEBUG_OUTPUT_NAME "DoConfig_debug")
+	# Name debug builds "DoConfig_debug", to distinguish them
+	set_target_properties(DoConfig PROPERTIES DEBUG_OUTPUT_NAME "DoConfig_debug")
 
-# Send executable to the build_en/build_jp directory
-set_target_properties(DoConfig PROPERTIES
-	RUNTIME_OUTPUT_DIRECTORY ${BUILD_DIRECTORY}
-	RUNTIME_OUTPUT_DIRECTORY_RELEASE ${BUILD_DIRECTORY}
-	RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${BUILD_DIRECTORY}
-	RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${BUILD_DIRECTORY}
-	RUNTIME_OUTPUT_DIRECTORY_DEBUG ${BUILD_DIRECTORY}
-)
+	# Send executable to the build_en/build_jp directory
+	set_target_properties(DoConfig PROPERTIES
+		RUNTIME_OUTPUT_DIRECTORY ${BUILD_DIRECTORY}
+		RUNTIME_OUTPUT_DIRECTORY_RELEASE ${BUILD_DIRECTORY}
+		RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${BUILD_DIRECTORY}
+		RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${BUILD_DIRECTORY}
+		RUNTIME_OUTPUT_DIRECTORY_DEBUG ${BUILD_DIRECTORY}
+	)
+endif()

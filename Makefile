@@ -118,7 +118,8 @@ SOURCES = \
 	Star \
 	TextScr \
 	Triangle \
-	ValueView
+	ValueView \
+	MainLoop
 
 RESOURCES = \
 	BITMAP/Credit01.bmp \
