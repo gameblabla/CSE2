@@ -1,6 +1,9 @@
 NATIVECC = cc
 NATIVECXX = c++
 
+BUILD_DIRECTORY = game
+ASSETS_DIRECTORY = assets
+
 ifeq ($(RELEASE), 1)
 	CXXFLAGS = -O3 -flto
 	LDFLAGS = -s
@@ -11,11 +14,11 @@ else
 endif
 
 ifeq ($(JAPANESE), 1)
-	BUILD_DIR = build_jp
+	DATA_DIRECTORY = $(ASSETS_DIRECTORY)/data_jp
 
 	CXXFLAGS += -DJAPANESE
 else
-	BUILD_DIR = build_en
+	DATA_DIRECTORY = $(ASSETS_DIRECTORY)/data_en
 endif
 
 FILENAME ?= $(FILENAME_DEF)
@@ -200,32 +203,36 @@ ifneq ($(WINDOWS), 1)
 	RESOURCES += ICON/ICON_MINI.bmp
 endif
 
-OBJECTS = $(addprefix obj/$(BUILD_DIR)/$(FILENAME)/, $(addsuffix .o, $(SOURCES)))
-DEPENDENCIES = $(addprefix obj/$(BUILD_DIR)/$(FILENAME)/, $(addsuffix .o.d, $(SOURCES)))
+OBJECTS = $(addprefix obj/$(FILENAME)/, $(addsuffix .o, $(SOURCES)))
+DEPENDENCIES = $(addprefix obj/$(FILENAME)/, $(addsuffix .o.d, $(SOURCES)))
 
 ifeq ($(WINDOWS), 1)
-	OBJECTS += obj/$(BUILD_DIR)/$(FILENAME)/win_icon.o
+	OBJECTS += obj/$(FILENAME)/win_icon.o
 endif
 
-all: $(BUILD_DIR)/$(FILENAME)
+all: $(BUILD_DIRECTORY)/$(FILENAME) $(BUILD_DIRECTORY)/data
 	@echo Finished
 
-$(BUILD_DIR)/$(FILENAME): $(OBJECTS)
+$(BUILD_DIRECTORY)/data: $(DATA_DIRECTORY)
+	@rm -rf $(BUILD_DIRECTORY)/data
+	@cp -r $(DATA_DIRECTORY) $(BUILD_DIRECTORY)/data
+
+$(BUILD_DIRECTORY)/$(FILENAME): $(OBJECTS)
 	@mkdir -p $(@D)
 	@echo Linking $@
 	@$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -o $@ $(LIBS)
 
-obj/$(BUILD_DIR)/$(FILENAME)/%.o: src/%.cpp
+obj/$(FILENAME)/%.o: src/%.cpp
 	@mkdir -p $(@D)
 	@echo Compiling $<
 	@$(CXX) $(CXXFLAGS) $< -o $@ -c
 
-obj/$(BUILD_DIR)/$(FILENAME)/Resource.o: src/Resource.cpp $(addprefix src/Resource/, $(addsuffix .h, $(RESOURCES)))
+obj/$(FILENAME)/Resource.o: src/Resource.cpp $(addprefix src/Resource/, $(addsuffix .h, $(RESOURCES)))
 	@mkdir -p $(@D)
 	@echo Compiling $<
 	@$(CXX) $(CXXFLAGS) $< -o $@ -c
 
-src/Resource/%.h: res/% obj/bin2h
+src/Resource/%.h: $(ASSETS_DIRECTORY)/resources/% obj/bin2h
 	@mkdir -p $(@D)
 	@echo Converting $<
 	@obj/bin2h $< $@
@@ -237,7 +244,7 @@ obj/bin2h: bin2h/bin2h.c
 
 include $(wildcard $(DEPENDENCIES))
 
-obj/$(BUILD_DIR)/$(FILENAME)/win_icon.o: res/ICON/ICON.rc res/ICON/0.ico res/ICON/ICON_MINI.ico
+obj/$(FILENAME)/win_icon.o: res/ICON/ICON.rc res/ICON/0.ico res/ICON/ICON_MINI.ico
 	@mkdir -p $(@D)
 	@windres $< $@
 

@@ -1,3 +1,6 @@
+// Some of the original source code for this file can be found here:
+// https://github.com/shbow/organya/blob/master/source/Sound.cpp
+
 #include "Sound.h"
 
 #include <math.h>

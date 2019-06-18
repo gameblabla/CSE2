@@ -6,7 +6,7 @@ Cave Story Engine 2 is a decompilation of Cave Story, ported from DirectX to SDL
 
 ## Dependencies
 
-*Note: if these are not found, they will be built locally (CMake only)*
+*Note: with CMake, if these are not found, they will be built locally*
 
 * SDL2
 * FreeType
@@ -18,7 +18,7 @@ Cave Story Engine 2 is a decompilation of Cave Story, ported from DirectX to SDL
 
 This project primarily uses CMake, allowing it to be built with a range of compilers.
 
-In this directory, create a directory called 'build', then switch to the command-line (Visual Studio users should open the [Developer Command Prompt](https://docs.microsoft.com/en-us/dotnet/framework/tools/developer-command-prompt-for-vs)) and `cd` into it. After that, generate the files for your build system with:
+In this folder, create another folder called 'build', then switch to the command-line (Visual Studio users should open the [Developer Command Prompt](https://docs.microsoft.com/en-us/dotnet/framework/tools/developer-command-prompt-for-vs)) and `cd` into it. After that, generate the files for your build system with:
 
 ```
 cmake .. -DCMAKE_BUILD_TYPE=Release
@@ -38,13 +38,13 @@ cmake --build . --config Release
 
 If you're a Visual Studio user, you can open the generated `CSE2.sln` file instead.
 
-Once built, the executables can be found in `build_en` or `build_jp`, depending on the selected language.
+Once built, the executables and assets can be found in the newly-generated `game` folder.
 
 ### Makefile (deprecated)
 
 *Note: this requires pkg-config*
 
-Run 'make' in the base directory, preferably with some of the following settings:
+Run 'make' in this folder, preferably with some of the following settings:
 
 * `RELEASE=1` - Compile a release build (optimised, stripped, etc.)
 * `STATIC=1` - Produce a statically-linked executable (good for Windows builds, so you don't need to bundle DLL files)
@@ -56,7 +56,7 @@ Run 'make' in the base directory, preferably with some of the following settings
 
 ### Visual Studio .NET 2003
 
-Project files for Visual Studio .NET 2003 are available in the 'msvc2003' directory.
+Project files for Visual Studio .NET 2003 are available in the 'msvc2003' folder.
 
 Visual Studio .NET 2003 was used by Pixel to create the original `Doukutsu.exe`, so these project files allow us to check the accuracy of the decompilation by comparing the generated assembly code to that of the original executable.
 
