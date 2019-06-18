@@ -1,3 +1,5 @@
 #pragma once
 
-int Call_Escape(int hWnd);
+#include "MainLoop.h"
+
+void Call_Escape(MainLoopMeta *meta);

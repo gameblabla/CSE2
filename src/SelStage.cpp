@@ -9,6 +9,7 @@
 #include "Escape.h"
 #include "KeyControl.h"
 #include "Main.h"
+#include "MainLoop.h"
 #include "Sound.h"
 #include "TextScr.h"
 
@@ -150,6 +151,22 @@ void PutStageSelectObject(void)
 	}
 }
 
+static void StageSelectLoopReturn(MainLoopMeta *meta, int return_value)
+{
+	(void)meta;
+
+	switch (return_value)
+	{
+		case 0:
+			ExitMainLoop(0);
+			return;
+
+		case 2:
+			ExitMainLoop(2);
+			return;
+	}
+}
+
 int StageSelectLoop(int *p_event)
 {
 	char old_script_path[260];
@@ -169,13 +186,8 @@ int StageSelectLoop(int *p_event)
 
 		if (gKey & KEY_ESCAPE)
 		{
-			switch (Call_Escape(ghWnd))
-			{
-				case 0:
-					return 0;
-				case 2:
-					return 2;
-			}
+			EnterMainLoop(Call_Escape, StageSelectLoopReturn, &ghWnd);
+			return 0;	// TODO
 		}
 
 		MoveStageSelectCursor();

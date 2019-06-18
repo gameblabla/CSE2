@@ -9,6 +9,7 @@
 #include "Escape.h"
 #include "KeyControl.h"
 #include "Main.h"
+#include "MainLoop.h"
 #include "Map.h"
 #include "MapName.h"
 #include "MyChar.h"
@@ -75,6 +76,22 @@ void WriteMiniMapLine(int line)
 	}
 }
 
+static void MiniMapLoopReturn(MainLoopMeta *meta, int return_value)
+{
+	(void)meta;
+
+	switch (return_value)
+	{
+		case 0:
+			ExitMainLoop(0);
+			return;
+
+		case 2:
+			ExitMainLoop(2);
+			return;
+	}
+}
+
 int MiniMapLoop()
 {
 	int f;
@@ -94,13 +111,8 @@ int MiniMapLoop()
 
 		if (gKey & KEY_ESCAPE)
 		{
-			switch (Call_Escape(ghWnd))
-			{
-				case 0:
-					return 0;
-				case 2:
-					return 2;
-			}
+			EnterMainLoop(Call_Escape, MiniMapLoopReturn, &ghWnd);
+			return 0;	// TODO
 		}
 
 		PutBitmap4(&grcGame, 0, 0, &grcGame, SURFACE_ID_SCREEN_GRAB);
@@ -138,13 +150,8 @@ int MiniMapLoop()
 
 		if (gKey & KEY_ESCAPE)
 		{
-			switch (Call_Escape(ghWnd))
-			{
-				case 0:
-					return 0;
-				case 2:
-					return 2;
-			}
+			EnterMainLoop(Call_Escape, MiniMapLoopReturn, &ghWnd);
+			return 0;	// TODO
 		}
 
 		PutBitmap4(&grcGame, 0, 0, &grcGame, SURFACE_ID_SCREEN_GRAB);
@@ -179,13 +186,8 @@ int MiniMapLoop()
 
 		if (gKey & KEY_ESCAPE)
 		{
-			switch (Call_Escape(ghWnd))
-			{
-				case 0:
-					return 0;
-				case 2:
-					return 2;
-			}
+			EnterMainLoop(Call_Escape, MiniMapLoopReturn, &ghWnd);
+			return 0;	// TODO
 		}
 
 		PutBitmap4(&grcGame, 0, 0, &grcGame, SURFACE_ID_SCREEN_GRAB);

@@ -12,6 +12,7 @@
 #include "Generic.h"
 #include "KeyControl.h"
 #include "Main.h"
+#include "MainLoop.h"
 #include "MycParam.h"
 #include "Organya.h"
 #include "Stage.h"
@@ -433,6 +434,22 @@ void CutCreditIllust()
 	Illust.act_no = 2;
 }
 
+static void Scene_DownIslandReturn(MainLoopMeta *meta, int return_value)
+{
+	(void)meta;
+
+	switch (return_value)
+	{
+		case 0:
+			ExitMainLoop(0);
+			return;
+
+		case 2:
+			ExitMainLoop(2);
+			return;
+	}
+}
+
 // Scene of the island falling
 int Scene_DownIsland(int hWnd, int mode)
 {
@@ -456,13 +473,8 @@ int Scene_DownIsland(int hWnd, int mode)
 		// Escape menu
 		if (gKey & 0x8000)
 		{
-			switch (Call_Escape(hWnd))
-			{
-				case 0:
-					return 0;
-				case 2:
-					return 2;
-			}
+			EnterMainLoop(Call_Escape, Scene_DownIslandReturn, &hWnd);
+			return 0;	// TODO
 		}
 
 		switch (mode)

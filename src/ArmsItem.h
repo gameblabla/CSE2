@@ -2,6 +2,8 @@
 
 #include "WindowsWrapper.h"
 
+#include "MainLoop.h"
+
 struct ARMS
 {
 	int code;
@@ -38,7 +40,7 @@ BOOL SubArmsData(long code);
 BOOL TradeArms(long code1, long code2, long max_num);
 BOOL AddItemData(long code);
 BOOL SubItemData(long code);
-int CampLoop();
+void CampLoop(MainLoopMeta *meta);
 BOOL CheckItem(long a);
 BOOL CheckArms(long a);
 BOOL UseArmsEnergy(long num);

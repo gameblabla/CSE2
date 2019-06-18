@@ -105,6 +105,22 @@ void PutNumber4(int x, int y, int value, BOOL bZero)
 	}
 }
 
+static void ModeReturn(MainLoopMeta *meta, int return_value)
+{
+	(void)meta;
+
+	switch (return_value)
+	{
+		case 0:
+			ExitMainLoop(0);
+			return;
+
+		case 2:
+			ExitMainLoop(1);
+			return;
+	}
+}
+
 void ModeOpening(MainLoopMeta *meta)
 {
 	static unsigned int wait;
@@ -150,17 +166,8 @@ void ModeOpening(MainLoopMeta *meta)
 				// Escape menu
 				if (gKey & KEY_ESCAPE)
 				{
-					int escRet = Call_Escape(ghWnd);
-					if (escRet == 0)
-					{
-						ExitMainLoop(0);
-						return;
-					}
-					if (escRet == 2)
-					{
-						ExitMainLoop(1);
-						return;
-					}
+					EnterMainLoop(Call_Escape, ModeReturn, &ghWnd);
+					return;
 				}
 
 				// Skip intro if OK is pressed
@@ -379,17 +386,8 @@ void ModeTitle(MainLoopMeta *meta)
 			{
 				if (gKey & KEY_ESCAPE)
 				{
-					int escRet = Call_Escape(ghWnd);
-					if (escRet == 0)
-					{
-						ExitMainLoop(0);
-						return;
-					}
-					if (escRet == 2)
-					{
-						ExitMainLoop(1);
-						return;
-					}
+					EnterMainLoop(Call_Escape, ModeReturn, &ghWnd);
+					return;
 				}
 
 				// Move cursor
@@ -506,187 +504,205 @@ void ModeTitle(MainLoopMeta *meta)
 	}
 }
 
-int ModeAction()
+void ModeAction(MainLoopMeta *meta)
 {
-	int frame_x = 0;
-	int frame_y = 0;
+	static int frame_x;
+	static int frame_y;
 
-	unsigned long color = GetCortBoxColor(RGB(0, 0, 0x20));
+	static unsigned long color;
 
-	unsigned int swPlay = 1;
+	static unsigned int swPlay;
 
-	// Reset stuff
-	gCounter = 0;
-	grcGame.left = 0;
-	g_GameFlags = 3;
-
-	// Initialize everything
-	InitMyChar();
-	InitNpChar();
-	InitBullet();
-	InitCaret();
-	InitStar();
-	InitFade();
-	InitFlash();
-	ClearArmsData();
-	ClearItemData();
-	ClearPermitStage();
-	StartMapping();
-	InitFlags();
-	InitBossLife();
-
-	if ((bContinue && LoadProfile(NULL)) || InitializeGame())
+	switch (meta->routine)
 	{
-		while (1)
-		{
-			// Get pressed keys
-			GetTrg();
+		case 0:
+			frame_x = 0;
+			frame_y = 0;
 
-			// Escape menu
-			if (gKey & KEY_ESCAPE)
+			color = GetCortBoxColor(RGB(0, 0, 0x20));
+
+			swPlay = 1;
+
+			// Reset stuff
+			gCounter = 0;
+			grcGame.left = 0;
+			g_GameFlags = 3;
+
+			// Initialize everything
+			InitMyChar();
+			InitNpChar();
+			InitBullet();
+			InitCaret();
+			InitStar();
+			InitFade();
+			InitFlash();
+			ClearArmsData();
+			ClearItemData();
+			ClearPermitStage();
+			StartMapping();
+			InitFlags();
+			InitBossLife();
+
+			if ((bContinue && LoadProfile(NULL)) || InitializeGame())
 			{
-				int escRet = Call_Escape(ghWnd);
-				if (escRet == 0)
-					return 0;
-				if (escRet == 2)
-					return 1;
-			}
+				++meta->routine;
+				// Fallthrough
+			case 1:
+				// Get pressed keys
+				GetTrg();
 
-			if (swPlay % 2 && g_GameFlags & 1)
-			{
-				if (g_GameFlags & 2)
-					ActMyChar(TRUE);
-				else
-					ActMyChar(FALSE);
-
-				ActStar();
-				ActNpChar();
-				ActBossChar();
-				ActValueView();
-				ActBack();
-				ResetMyCharFlag();
-				HitMyCharMap();
-				HitMyCharNpChar();
-				HitMyCharBoss();
-				HitNpCharMap();
-				HitBossMap();
-				HitBulletMap();
-				HitNpCharBullet();
-				HitBossBullet();
-				if (g_GameFlags & 2)
-					ShootBullet();
-				ActBullet();
-				ActCaret();
-				MoveFrame3();
-				ActFlash(frame_x, frame_y);
-
-				if (g_GameFlags & 2)
-					AnimationMyChar(TRUE);
-				else
-					AnimationMyChar(FALSE);
-			}
-
-			if (g_GameFlags & 8)
-			{
-				ActionCredit();
-				ActionIllust();
-				ActionStripper();
-			}
-
-			ProcFade();
-			CortBox(&grcFull, color);
-			GetFramePosition(&frame_x, &frame_y);
-			PutBack(frame_x, frame_y);
-			PutStage_Back(frame_x, frame_y);
-			PutBossChar(frame_x, frame_y);
-			PutNpChar(frame_x, frame_y);
-			PutBullet(frame_x, frame_y);
-			PutMyChar(frame_x, frame_y);
-			PutStar(frame_x, frame_y);
-			PutMapDataVector(frame_x, frame_y);
-			PutStage_Front(frame_x, frame_y);
-			PutFront(frame_x, frame_y);
-			PutFlash();
-			PutCaret(frame_x, frame_y);
-			PutValueView(frame_x, frame_y);
-			PutBossLife();
-			PutFade();
-
-			if (!(g_GameFlags & 4))
-			{
-				// Open inventory
-				if (gKeyTrg & gKeyItem)
+				// Escape menu
+				if (gKey & KEY_ESCAPE)
 				{
-					BackupSurface(SURFACE_ID_SCREEN_GRAB, &grcGame);
-
-					switch (CampLoop())
-					{
-						case 0:
-							return 0;
-						case 2:
-							return 1;
-					}
-
-					gMC.cond &= ~1;
+					EnterMainLoop(Call_Escape, ModeReturn, &ghWnd);
+					return;
 				}
-				else if (gMC.equip & 2 && gKeyTrg & gKeyMap)
+
+				if (swPlay % 2 && g_GameFlags & 1)
 				{
-					BackupSurface(SURFACE_ID_SCREEN_GRAB, &grcGame);
+					if (g_GameFlags & 2)
+						ActMyChar(TRUE);
+					else
+						ActMyChar(FALSE);
 
-					switch (MiniMapLoop())
+					ActStar();
+					ActNpChar();
+					ActBossChar();
+					ActValueView();
+					ActBack();
+					ResetMyCharFlag();
+					HitMyCharMap();
+					HitMyCharNpChar();
+					HitMyCharBoss();
+					HitNpCharMap();
+					HitBossMap();
+					HitBulletMap();
+					HitNpCharBullet();
+					HitBossBullet();
+					if (g_GameFlags & 2)
+						ShootBullet();
+					ActBullet();
+					ActCaret();
+					MoveFrame3();
+					ActFlash(frame_x, frame_y);
+
+					if (g_GameFlags & 2)
+						AnimationMyChar(TRUE);
+					else
+						AnimationMyChar(FALSE);
+				}
+
+				if (g_GameFlags & 8)
+				{
+					ActionCredit();
+					ActionIllust();
+					ActionStripper();
+				}
+
+				ProcFade();
+				CortBox(&grcFull, color);
+				GetFramePosition(&frame_x, &frame_y);
+				PutBack(frame_x, frame_y);
+				PutStage_Back(frame_x, frame_y);
+				PutBossChar(frame_x, frame_y);
+				PutNpChar(frame_x, frame_y);
+				PutBullet(frame_x, frame_y);
+				PutMyChar(frame_x, frame_y);
+				PutStar(frame_x, frame_y);
+				PutMapDataVector(frame_x, frame_y);
+				PutStage_Front(frame_x, frame_y);
+				PutFront(frame_x, frame_y);
+				PutFlash();
+				PutCaret(frame_x, frame_y);
+				PutValueView(frame_x, frame_y);
+				PutBossLife();
+				PutFade();
+
+				if (!(g_GameFlags & 4))
+				{
+					// Open inventory
+					if (gKeyTrg & gKeyItem)
 					{
-						case 0:
-							return 0;
-						case 2:
-							return 1;
+						gMC.cond &= ~1;
+
+						BackupSurface(SURFACE_ID_SCREEN_GRAB, &grcGame);
+
+						EnterMainLoop(CampLoop, ModeReturn, NULL);
+						return;
 					}
+					else if (gMC.equip & 2 && gKeyTrg & gKeyMap)
+					{
+						BackupSurface(SURFACE_ID_SCREEN_GRAB, &grcGame);
+
+						switch (MiniMapLoop())
+						{
+							case 0:
+							{
+								ExitMainLoop(0);
+								return;
+							}
+							case 2:
+							{
+								ExitMainLoop(1);
+								return;
+							}
+						}
+					}
+				}
+
+				if (g_GameFlags & 2)
+				{
+					if (gKeyTrg & gKeyArms)
+						RotationArms();
+					else if (gKeyTrg & gKeyArmsRev)
+						RotationArmsRev();
+				}
+
+				if (swPlay % 2)
+				{
+					int tscRet = TextScriptProc();
+					if (tscRet == 0)
+					{
+						ExitMainLoop(0);
+						return;
+					}
+					if (tscRet == 2)
+					{
+						ExitMainLoop(1);
+						return;
+					}
+				}
+
+				PutMapName(FALSE);
+				PutTimeCounter(16, 8);
+
+				if (g_GameFlags & 2)
+				{
+					PutMyLife(TRUE);
+					PutArmsEnergy(TRUE);
+					PutMyAir((WINDOW_WIDTH - 80) / 2, (WINDOW_HEIGHT - 32) / 2);
+					PutActiveArmsList();
+				}
+
+				if (g_GameFlags & 8)
+				{
+					PutIllust();
+					PutStripper();
+				}
+
+				PutTextScript();
+
+				PutFramePerSecound();
+				if (Flip_SystemTask(ghWnd))
+				{
+					++gCounter;
+					break;
 				}
 			}
 
-			if (g_GameFlags & 2)
-			{
-				if (gKeyTrg & gKeyArms)
-					RotationArms();
-				else if (gKeyTrg & gKeyArmsRev)
-					RotationArmsRev();
-			}
-
-			if (swPlay % 2)
-			{
-				int tscRet = TextScriptProc();
-				if (tscRet == 0)
-					return 0;
-				if (tscRet == 2)
-					return 1;
-			}
-
-			PutMapName(FALSE);
-			PutTimeCounter(16, 8);
-
-			if (g_GameFlags & 2)
-			{
-				PutMyLife(TRUE);
-				PutArmsEnergy(TRUE);
-				PutMyAir((WINDOW_WIDTH - 80) / 2, (WINDOW_HEIGHT - 32) / 2);
-				PutActiveArmsList();
-			}
-
-			if (g_GameFlags & 8)
-			{
-				PutIllust();
-				PutStripper();
-			}
-
-			PutTextScript();
-
-			PutFramePerSecound();
-			if (!Flip_SystemTask(ghWnd))
-				break;
-			++gCounter;
-		}
+			ExitMainLoop(0);
+			return;
 	}
-
-	return 0;
 }
 
 void GameMainLoopSelector(MainLoopMeta *meta, int mode)
@@ -705,7 +721,7 @@ void GameMainLoopSelector(MainLoopMeta *meta, int mode)
 			EnterMainLoop(ModeTitle, GameMainLoopSelector, NULL);
 			break;
 		case 3:
-	//		EnterMainLoop(ModeAction, GameMainLoopSelector, NULL);
+			EnterMainLoop(ModeAction, GameMainLoopSelector, NULL);
 			break;
 	}
 }

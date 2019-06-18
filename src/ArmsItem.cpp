@@ -10,6 +10,7 @@
 #include "Game.h"
 #include "KeyControl.h"
 #include "Main.h"
+#include "MainLoop.h"
 #include "Shoot.h"
 #include "Sound.h"
 #include "TextScr.h"
@@ -359,88 +360,125 @@ void PutCampObject()
 	}
 }
 
-int CampLoop()
+static void CampLoopReturn(MainLoopMeta *meta, int return_value)
+{
+	(void)meta;
+
+	switch (return_value)
+	{
+		case 0:
+			ExitMainLoop(0);
+			return;
+
+		case 2:
+			ExitMainLoop(2);
+			return;
+	}
+}
+
+void CampLoop(MainLoopMeta *meta)
 {
 	int arms_num;
-	char old_script_path[PATH_LENGTH];
+	static char old_script_path[PATH_LENGTH];
 
 	RECT rcView = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
-	// Load the inventory script
-	GetTextScriptPath(old_script_path);
-
-	LoadTextScript2("ArmsItem.tsc");
-
-	gCampTitleY = (WINDOW_HEIGHT - 192) / 2;
-	gCampActive = FALSE;
-	gSelectedItem = 0;
-
-	// Run script
-	arms_num = 0;
-	for (; gArmsData[arms_num].code != 0;)
-		++arms_num;
-
-	if (arms_num)
-		StartTextScript(gArmsData[gSelectedArms].code + 1000);
-	else
-		StartTextScript(gItemData[gSelectedItem].code + 5000);
-
-	for (;;)
+	switch (meta->routine)
 	{
-		GetTrg();
+		case 0:
+			// Load the inventory script
+			GetTextScriptPath(old_script_path);
 
-		if (gKeyTrg & KEY_ESCAPE)
-		{
-			switch (Call_Escape(ghWnd))
+			LoadTextScript2("ArmsItem.tsc");
+
+			gCampTitleY = (WINDOW_HEIGHT - 192) / 2;
+			gCampActive = FALSE;
+			gSelectedItem = 0;
+
+			// Run script
+			arms_num = 0;
+			for (; gArmsData[arms_num].code != 0;)
+				++arms_num;
+
+			if (arms_num)
+				StartTextScript(gArmsData[gSelectedArms].code + 1000);
+			else
+				StartTextScript(gItemData[gSelectedItem].code + 5000);
+
+			++meta->routine;
+			// Fallthrough
+		case 1:
+			GetTrg();
+
+			if (gKeyTrg & KEY_ESCAPE)
+			{			
+				EnterMainLoop(Call_Escape, CampLoopReturn, &ghWnd);
+				return;
+			}
+
+			if (g_GameFlags & 2)
+				MoveCampCursor();
+
+			switch (TextScriptProc())
 			{
 				case 0:
-					return 0;
+				{
+					ExitMainLoop(0);
+					return;
+				}
 				case 2:
-					return 2;
+				{
+					ExitMainLoop(2);
+					return;
+				}
 			}
-		}
 
-		if (g_GameFlags & 2)
-			MoveCampCursor();
+			PutBitmap4(&rcView, 0, 0, &rcView, SURFACE_ID_SCREEN_GRAB);
+			PutCampObject();
+			PutTextScript();
+			PutFramePerSecound();
 
-		switch (TextScriptProc())
-		{
-			case 0:
-				return 0;
-			case 2:
-				return 2;
-		}
-
-		PutBitmap4(&rcView, 0, 0, &rcView, SURFACE_ID_SCREEN_GRAB);
-		PutCampObject();
-		PutTextScript();
-		PutFramePerSecound();
-
-		if (gCampActive)
-		{
-			if (g_GameFlags & 2 && (gKeyCancel | gKeyItem) & gKeyTrg)
+			if (gCampActive)
 			{
-				StopTextScript();
-				break;
-			}
-		}
-		else
-		{
-			if ((gKeyCancel | gKeyOk | gKeyItem) & gKeyTrg)
-			{
-				StopTextScript();
-				break;
-			}
-		}
+				if (g_GameFlags & 2 && (gKeyCancel | gKeyItem) & gKeyTrg)
+				{
+					StopTextScript();
+				}
+				else
+				{
+					if (!Flip_SystemTask(ghWnd))
+					{
+						ExitMainLoop(0);
+						return;
+					}
 
-		if (!Flip_SystemTask(ghWnd))
-			return 0;
+					break;
+				}
+			}
+			else
+			{
+				if ((gKeyCancel | gKeyOk | gKeyItem) & gKeyTrg)
+				{
+					StopTextScript();
+				}
+				else
+				{
+					if (!Flip_SystemTask(ghWnd))
+					{
+						ExitMainLoop(0);
+						return;
+					}
+
+					break;
+				}
+			}
+
+			// Resume original script
+			LoadTextScript_Stage(old_script_path);
+			gArmsEnergyX = 32;
+			ExitMainLoop(1);
+			return;
 	}
-
-	// Resume original script
-	LoadTextScript_Stage(old_script_path);
-	gArmsEnergyX = 32;
-	return 1;
 }
 
 BOOL CheckItem(long a)
