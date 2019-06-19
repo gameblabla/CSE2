@@ -17,6 +17,9 @@
 #undef RECT
 #endif
 
+#ifdef __EMSCRIPTEN__
+#include "emscripten.h"
+#endif
 #include "SDL.h"
 
 #include "WindowsWrapper.h"
@@ -54,6 +57,11 @@ BOOL Flip_SystemTask(int hWnd)
 {
 	(void)hWnd;
 
+#ifdef __EMSCRIPTEN__
+	// Emscripten handles framelimiting on its own
+	if (!SystemTask())
+		return FALSE;
+#else
 	while (TRUE)
 	{
 		if (!SystemTask())
@@ -75,6 +83,7 @@ BOOL Flip_SystemTask(int hWnd)
 
 		SDL_Delay(1);
 	}
+#endif
 
 	SDL_RenderPresent(gRenderer);
 	return TRUE;
@@ -89,6 +98,12 @@ BOOL StartDirectDraw(int lMagnification, int lColourDepth)
 
 	// Create renderer
 	gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED);
+
+#ifdef __EMSCRIPTEN__
+	// Work around a stupid bug in Emscripten (or at least its SDL2 port), by resetting the timing.
+	// If we don't do this, the game will run at an uncapped framerate.
+	emscripten_set_main_loop_timing(EM_TIMING_SETTIMEOUT, 1000 / 50);
+#endif
 
 	if (gRenderer != NULL)
 	{
