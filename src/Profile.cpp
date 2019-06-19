@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 #include "SDL.h"
 
 #include "WindowsWrapper.h"
@@ -25,7 +28,11 @@
 #include "Tags.h"
 #include "ValueView.h"
 
+#ifdef __EMSCRIPTEN__
+const char *gDefaultName = "offline/Profile.dat";
+#else
 const char *gDefaultName = "Profile.dat";
+#endif
 const char *gProfileCode = "Do041220";
 
 BOOL IsProfile()
@@ -122,6 +129,16 @@ BOOL SaveProfile(const char *name)
 #endif
 
 	fclose(fp);
+
+#ifdef __EMSCRIPTEN__
+	// Sync to make sure the data's permanently saved
+	EM_ASM(
+		FS.syncfs(function (err) {
+			// Error
+		});
+	);
+#endif
+
 	return TRUE;
 }
 

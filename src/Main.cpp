@@ -100,6 +100,18 @@ void EntryPoint(MainLoopMeta *meta)
 	switch (meta->routine)
 	{
 		case 0:
+		#ifdef __EMSCRIPTEN__
+			// Create the persistent storage directory
+			EM_ASM(
+				FS.mkdir('/offline');
+				FS.mount(IDBFS, {}, '/offline');
+
+				FS.syncfs(true, function (err) {
+					// Error
+				});
+			);
+		#endif
+
 			// Get executable's path
 			strcpy(gModulePath, SDL_GetBasePath());
 			if (gModulePath[strlen(gModulePath) - 1] == '/' || gModulePath[strlen(gModulePath) - 1] == '\\')

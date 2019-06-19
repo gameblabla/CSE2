@@ -2,6 +2,9 @@
 
 #include <stdio.h>
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 #include "SDL.h"
 
 #include "WindowsWrapper.h"
@@ -446,7 +449,11 @@ BOOL SaveTimeCounter()
 
 	// Get last time
 	char path[PATH_LENGTH];
+#ifdef __EMSCRIPTEN__
+	sprintf(path, "%s/offline/290.rec", gModulePath);
+#else
 	sprintf(path, "%s/290.rec", gModulePath);
+#endif
 
 	FILE *fp = fopen(path, "rb");
 	if (fp)
@@ -521,6 +528,16 @@ BOOL SaveTimeCounter()
 #endif
 
 	fclose(fp);
+
+#ifdef __EMSCRIPTEN__
+	// Sync to make sure the data's permanently saved
+	EM_ASM(
+		FS.syncfs(function (err) {
+			// Error
+		});
+	);
+#endif
+
 	return TRUE;
 }
 
@@ -531,7 +548,11 @@ int LoadTimeCounter()
 
 	// Open file
 	char path[PATH_LENGTH];
+#ifdef __EMSCRIPTEN__
+	sprintf(path, "%s/offline/290.rec", gModulePath);
+#else
 	sprintf(path, "%s/290.rec", gModulePath);
+#endif
 
 	FILE *fp = fopen(path, "rb");
 	if (!fp)
