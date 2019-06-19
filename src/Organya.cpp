@@ -34,6 +34,9 @@ int gTrackVol[MAXTRACK];
 int gOrgVolume = 100;
 BOOL bFadeout = FALSE;
 
+unsigned int gOrgTimer;
+unsigned int gOrgWait = -1;
+
 BOOL OrganyaNoteAlloc(unsigned short alloc)
 {
 	for (int j = 0; j < MAXTRACK; j++)
@@ -566,7 +569,9 @@ unsigned int GetOrganyaPosition()
 void PlayOrganyaMusic()
 {
 	// Start timer
-	OrganyaStartTimer(info.wait);
+	//OrganyaStartTimer(info.wait);
+	gOrgTimer = 0;
+	gOrgWait = info.wait;
 }
 
 BOOL ChangeOrganyaVolume(signed int volume)
@@ -583,7 +588,8 @@ BOOL ChangeOrganyaVolume(signed int volume)
 void StopOrganyaMusic()
 {
 	// Stop timer
-	OrganyaEndTimer();
+	//OrganyaEndTimer();
+	gOrgWait = -1;
 
 	// Stop notes
 	for (int i = 0; i < MAXMELODY; i++)
@@ -602,6 +608,8 @@ void SetOrganyaFadeout()
 // Org timer
 SDL_Thread *OrganyaTimer = NULL;
 BOOL bEndTimer = FALSE;
+
+/* Emscripten doesn't support threads, so we update Organya in the audio callback instead (see Sound.cpp)
 
 int OrganyaPlayTimer(void *ptr)
 {
@@ -648,7 +656,7 @@ void OrganyaEndTimer()
 	SDL_WaitThread(OrganyaTimer, NULL); // Wait for thread to end
 	OrganyaTimer = NULL;
 }
-
+*/
 // Start and end organya
 void StartOrganya()
 {
@@ -659,7 +667,8 @@ void StartOrganya()
 void EndOrganya()
 {
 	// End timer
-	OrganyaEndTimer();
+	//OrganyaEndTimer();
+	gOrgWait = -1;
 
 	// Release everything related to org
 	OrganyaReleaseNote();

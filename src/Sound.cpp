@@ -211,6 +211,20 @@ void AudioCallback(void *userdata, Uint8 *stream, int len)
 	float *buffer = (float*)stream;
 	const size_t frames = len / (sizeof(float) * 2);
 
+	//Update Organya (we can't use threads in Emscripten, so we do it here)
+	if (gOrgWait != -1)
+	{
+		const unsigned int OrgSamplesPerStep = gOrgWait * FREQUENCY / 1000;
+
+		while (gOrgTimer >= OrgSamplesPerStep)
+		{
+			OrganyaPlayData();
+			gOrgTimer -= OrgSamplesPerStep;
+		}
+
+		gOrgTimer += frames;
+	}
+
 	//Clear stream
 	for (size_t i = 0; i < frames * 2; ++i)
 		buffer[i] = 0.0f;
