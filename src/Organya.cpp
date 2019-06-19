@@ -605,11 +605,11 @@ void SetOrganyaFadeout()
 	bFadeout = TRUE;
 }
 
+/* Emscripten doesn't support threads, so we update Organya in the audio callback instead (see Sound.cpp)
+
 // Org timer
 SDL_Thread *OrganyaTimer = NULL;
 BOOL bEndTimer = FALSE;
-
-/* Emscripten doesn't support threads, so we update Organya in the audio callback instead (see Sound.cpp)
 
 int OrganyaPlayTimer(void *ptr)
 {
