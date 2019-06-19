@@ -263,7 +263,7 @@ endif()
 # Do some setup if we're targetting Emscripten
 if(EMSCRIPTEN)
 	target_compile_options(CSE2 PRIVATE "SHELL:-s USE_SDL=2" "SHELL:-s USE_FREETYPE=1")
-	target_link_libraries(CSE2 PRIVATE "-s USE_SDL=2 -s USE_FREETYPE=1 --preload-file ${BUILD_DIRECTORY}/fps@/ --preload-file ${BUILD_DIRECTORY}/data@/data --preload-file ${BUILD_DIRECTORY}/Config.dat@/ -s ALLOW_MEMORY_GROWTH=1 --no-heap-copy")
+	target_link_libraries(CSE2 PRIVATE "-s USE_SDL=2 -s USE_FREETYPE=1 --preload-file ${ASSETS_DIRECTORY}/emscripten/fps@/ --preload-file ${DATA_DIRECTORY}@/data --preload-file ${ASSETS_DIRECTORY}/emscripten/Config.dat@/ -s ALLOW_MEMORY_GROWTH=1 --no-heap-copy")
 endif()
 
 # Decide the embedded font
@@ -333,10 +333,12 @@ set_target_properties(CSE2 PROPERTIES
 )
 
 # Copy data folder to build directory
-add_custom_command(TARGET CSE2 POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E remove_directory "${BUILD_DIRECTORY}/data"
-	COMMAND ${CMAKE_COMMAND} -E copy_directory "${DATA_DIRECTORY}" "${BUILD_DIRECTORY}/data"
-)
+if(NOT EMSCRIPTEN)
+	add_custom_command(TARGET CSE2 POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E remove_directory "${BUILD_DIRECTORY}/data"
+		COMMAND ${CMAKE_COMMAND} -E copy_directory "${DATA_DIRECTORY}" "${BUILD_DIRECTORY}/data"
+	)
+endif()
 
 # Enable link-time optimisation if available
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
