@@ -204,7 +204,7 @@ void ModeOpening(MainLoopMeta *meta)
 					PutFade();
 
 					// Update Text Script
-					int tscRet = TextScriptProc();
+					int tscRet = TextScriptProc(ModeReturn);
 					if (tscRet == 0)
 					{
 						ExitMainLoop(0);
@@ -634,19 +634,8 @@ void ModeAction(MainLoopMeta *meta)
 					{
 						BackupSurface(SURFACE_ID_SCREEN_GRAB, &grcGame);
 
-						switch (MiniMapLoop())
-						{
-							case 0:
-							{
-								ExitMainLoop(0);
-								return;
-							}
-							case 2:
-							{
-								ExitMainLoop(1);
-								return;
-							}
-						}
+						EnterMainLoop(MiniMapLoop, ModeReturn, NULL);
+						return;
 					}
 				}
 
@@ -660,7 +649,7 @@ void ModeAction(MainLoopMeta *meta)
 
 				if (swPlay % 2)
 				{
-					int tscRet = TextScriptProc();
+					int tscRet = TextScriptProc(ModeReturn);
 					if (tscRet == 0)
 					{
 						ExitMainLoop(0);

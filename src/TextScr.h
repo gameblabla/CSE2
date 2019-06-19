@@ -3,6 +3,7 @@
 #include "WindowsWrapper.h"
 
 #include "CommonDefines.h"
+#include "MainLoop.h"
 
 struct TEXT_SCRIPT
 {
@@ -64,4 +65,4 @@ void GetTextScriptPath(char *path);
 BOOL StartTextScript(int no);
 void StopTextScript();
 void PutTextScript();
-int TextScriptProc();
+int TextScriptProc(void (*caller_return)(MainLoopMeta *meta, int return_value));

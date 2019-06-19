@@ -23,6 +23,7 @@ void EnterMainLoop(void (*function)(MainLoopMeta *meta), void (*return_handler)(
 	mainloop->return_value = 0;
 	mainloop->meta.routine = 0;
 	mainloop->meta.user_data = user_data;
+	mainloop->meta.next = mainloop_list_head ? &mainloop_list_head->meta : NULL;
 	mainloop->next = mainloop_list_head;
 	mainloop_list_head = mainloop;
 }
@@ -59,7 +60,7 @@ bool MainLoopSelector(void)
 			}
 
 			if (mainloop->return_handler)
-				mainloop->return_handler(&mainloop_list_head->meta, mainloop->return_value);
+				mainloop->return_handler(&mainloop->meta, mainloop->return_value);
 
 			free(mainloop);
 		}

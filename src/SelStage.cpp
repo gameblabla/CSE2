@@ -167,68 +167,89 @@ static void StageSelectLoopReturn(MainLoopMeta *meta, int return_value)
 	}
 }
 
-int StageSelectLoop(int *p_event)
+void StageSelectLoop(MainLoopMeta *meta)
 {
-	char old_script_path[260];
+	StageSelectLoop_Data *data = (StageSelectLoop_Data*)meta->user_data;
+
+	static char old_script_path[260];
 
 	RECT rcView = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
-	gSelectedStage = 0;
-	BackupSurface(SURFACE_ID_SCREEN_GRAB, &grcFull);
-	GetTextScriptPath(old_script_path);
-	LoadTextScript2("StageSelect.tsc");
-	gStageSelectTitleY = (WINDOW_HEIGHT / 2) - 66;
-	StartTextScript(gPermitStage[gSelectedStage].index + 1000);
-
-	for (;;)
+	switch (meta->routine)
 	{
-		GetTrg();
+		case 0:
+			gSelectedStage = 0;
+			BackupSurface(SURFACE_ID_SCREEN_GRAB, &grcFull);
+			GetTextScriptPath(old_script_path);
+			LoadTextScript2("StageSelect.tsc");
+			gStageSelectTitleY = (WINDOW_HEIGHT / 2) - 66;
+			StartTextScript(gPermitStage[gSelectedStage].index + 1000);
 
-		if (gKey & KEY_ESCAPE)
-		{
-			EnterMainLoop(Call_Escape, StageSelectLoopReturn, &ghWnd);
-			return 0;	// TODO
-		}
+			++meta->routine;
+			// Fallthrough
+		case 1:
+			GetTrg();
 
-		MoveStageSelectCursor();
+			if (gKey & KEY_ESCAPE)
+			{
+				EnterMainLoop(Call_Escape, StageSelectLoopReturn, &ghWnd);
+				return;
+			}
 
-		switch (TextScriptProc())
-		{
-			case 0:
-				return 0;
-			case 2:
-				return 2;
-		}
+			MoveStageSelectCursor();
 
-#ifdef FIX_BUGS
-		PutBitmap4(&rcView, 0, 0, &rcView, SURFACE_ID_SCREEN_GRAB);
-#else
-		// The original accidentally drew the screencap with transparency enabled
-		PutBitmap3(&rcView, 0, 0, &rcView, SURFACE_ID_SCREEN_GRAB);
-#endif
-		PutStageSelectObject();
-		PutTextScript();
+			switch (TextScriptProc(StageSelectLoopReturn))
+			{
+				case 0:
+				{
+					ExitMainLoop(0);
+					return;
+				}
+				case 2:
+				{
+					ExitMainLoop(2);
+					return;
+				}
+			}
 
-		if (gKeyTrg & gKeyOk)
-		{
-			StopTextScript();
-			break;
-		}
-		else if (gKeyTrg & gKeyCancel)
-		{
-			StopTextScript();
+	#ifdef FIX_BUGS
+			PutBitmap4(&rcView, 0, 0, &rcView, SURFACE_ID_SCREEN_GRAB);
+	#else
+			// The original accidentally drew the screencap with transparency enabled
+			PutBitmap3(&rcView, 0, 0, &rcView, SURFACE_ID_SCREEN_GRAB);
+	#endif
+			PutStageSelectObject();
+			PutTextScript();
+
+			if (gKeyTrg & gKeyOk)
+			{
+				StopTextScript();
+			}
+			else
+			{
+				if (gKeyTrg & gKeyCancel)
+				{
+					StopTextScript();
+					LoadTextScript_Stage(old_script_path);
+					data->event = 0;
+					ExitMainLoop(1);
+					return;
+				}
+
+				PutFramePerSecound();
+
+				if (!Flip_SystemTask(ghWnd))
+				{
+					ExitMainLoop(0);
+					return;
+				}
+
+				break;
+			}
+
 			LoadTextScript_Stage(old_script_path);
-			*p_event = 0;
-			return 1;
-		}
-
-		PutFramePerSecound();
-
-		if (!Flip_SystemTask(ghWnd))
-			return 0;
+			data->event = gPermitStage[gSelectedStage].event;
+			ExitMainLoop(1);
+			return;
 	}
-
-	LoadTextScript_Stage(old_script_path);
-	*p_event = gPermitStage[gSelectedStage].event;
-	return 1;
 }

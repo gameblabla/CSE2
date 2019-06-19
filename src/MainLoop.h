@@ -6,6 +6,7 @@ typedef struct MainLoopMeta
 {
 	int routine;
 	void *user_data;
+	struct MainLoopMeta *next;
 } MainLoopMeta;
 
 bool MainLoopSelector(void);

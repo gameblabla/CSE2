@@ -551,8 +551,43 @@ void PutTextScript()
 	}
 }
 
+static void TextScriptProcReturn(MainLoopMeta *meta, int return_value)
+{
+	void (*caller_return)(MainLoopMeta *meta, int return_value) = (void (*)(MainLoopMeta *meta, int return_value))meta->user_data;
+
+	switch (return_value)
+	{
+		case 0:
+			caller_return(meta->next, 0);
+			return;
+
+		case 2:
+			caller_return(meta->next, 2);
+			return;
+	}
+}
+static void TextScriptProcReturn_StageSelectLoop(MainLoopMeta *meta, int return_value)
+{
+	StageSelectLoop_Data *data = (StageSelectLoop_Data*)meta->user_data;
+
+	switch (return_value)
+	{
+		case 0:
+			data->caller_return(meta->next, 0);
+			return;
+
+		case 1:
+			JumpTextScript(data->event);
+			return;
+
+		case 2:
+			data->caller_return(meta->next, 2);
+			return;
+	}
+}
+
 //Parse TSC
-int TextScriptProc()
+int TextScriptProc(void (*caller_return)(MainLoopMeta *meta, int return_value))
 {
 	BOOL bExit;
 	char c[3];
@@ -1029,27 +1064,16 @@ int TextScriptProc()
 						gTS.p_read += 4;
 						bExit = TRUE;
 
-						switch (MiniMapLoop())
-						{
-							case 0:
-								return 0;
-							case 2:
-								return 2;
-						}
+						EnterMainLoop(MiniMapLoop, TextScriptProcReturn, (void*)caller_return);
 					}
 					else if (IS_COMMAND('S','L','P'))
 					{
 						bExit = TRUE;
 
-						switch (StageSelectLoop(&z))
-						{
-							case 0:
-								return 0;
-							case 2:
-								return 2;
-						}
+						static StageSelectLoop_Data data = {0, caller_return};
 
-						JumpTextScript(z);
+						EnterMainLoop(StageSelectLoop, TextScriptProcReturn_StageSelectLoop, &data);
+
 						g_GameFlags &= ~3;
 					}
 					else if (IS_COMMAND('D','N','P'))

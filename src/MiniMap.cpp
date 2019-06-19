@@ -92,120 +92,157 @@ static void MiniMapLoopReturn(MainLoopMeta *meta, int return_value)
 	}
 }
 
-int MiniMapLoop()
+void MiniMapLoop(MainLoopMeta *meta)
 {
-	int f;
-	int line;
-	unsigned char my_wait;
+	static int f;
+	static int line;
+	static unsigned char my_wait;
 
-	RECT rcMiniMap;
-	RECT rcView;
+	static RECT rcMiniMap;
+	static RECT rcView;
 
 	RECT my_rect = {0, 57, 1, 58};
 	int my_x = (gMC.x / 0x200 + 8) / 16;
 	int my_y = (gMC.y / 0x200 + 8) / 16;
 
-	for (f = 0; f <= 8; f++)
+	switch (meta->routine)
 	{
-		GetTrg();
+		case 0:
+			f = 0;
+			++meta->routine;
+			// Fallthrough
+		case 1:
+			if (f <= 8)
+			{
+				GetTrg();
 
-		if (gKey & KEY_ESCAPE)
-		{
-			EnterMainLoop(Call_Escape, MiniMapLoopReturn, &ghWnd);
-			return 0;	// TODO
-		}
+				if (gKey & KEY_ESCAPE)
+				{
+					EnterMainLoop(Call_Escape, MiniMapLoopReturn, &ghWnd);
+					return;
+				}
 
-		PutBitmap4(&grcGame, 0, 0, &grcGame, SURFACE_ID_SCREEN_GRAB);
+				PutBitmap4(&grcGame, 0, 0, &grcGame, SURFACE_ID_SCREEN_GRAB);
 
-		rcView.left = (WINDOW_WIDTH / 2) - gMap.width * f / 8 / 2;
-		rcView.right = (WINDOW_WIDTH / 2) + gMap.width * f / 8 / 2;
-		rcView.top = (WINDOW_HEIGHT / 2) - gMap.length * f / 8 / 2;
-		rcView.bottom = (WINDOW_HEIGHT / 2) + gMap.length * f / 8 / 2;
+				rcView.left = (WINDOW_WIDTH / 2) - gMap.width * f / 8 / 2;
+				rcView.right = (WINDOW_WIDTH / 2) + gMap.width * f / 8 / 2;
+				rcView.top = (WINDOW_HEIGHT / 2) - gMap.length * f / 8 / 2;
+				rcView.bottom = (WINDOW_HEIGHT / 2) + gMap.length * f / 8 / 2;
 
-		PutMapName(TRUE);
-		CortBox(&rcView, 0);
+				PutMapName(TRUE);
+				CortBox(&rcView, 0);
 
-		PutFramePerSecound();
-		if (!Flip_SystemTask(ghWnd))
-			return 0;
+				PutFramePerSecound();
+				if (!Flip_SystemTask(ghWnd))
+				{
+					ExitMainLoop(0);
+					return;
+				}
+
+				++f;
+
+				break;
+			}
+
+			++meta->routine;
+			// Fallthrough
+		case 2:
+			rcMiniMap.left = 0;
+			rcMiniMap.right = gMap.width;
+			rcMiniMap.top = 0;
+			rcMiniMap.bottom = gMap.length;
+
+			rcView.right = --rcView.left + gMap.width + 2;
+			rcView.bottom = --rcView.top + gMap.length + 2;
+			CortBox2(&rcMiniMap, 0, SURFACE_ID_MAP);
+
+			line = 0;
+			my_wait = 0;
+
+			++meta->routine;
+			// Fallthrough
+		case 3:
+			GetTrg();
+
+			if (!((gKeyCancel | gKeyOk) & gKeyTrg))
+			{
+				if (gKey & KEY_ESCAPE)
+				{
+					EnterMainLoop(Call_Escape, MiniMapLoopReturn, &ghWnd);
+					return;
+				}
+
+				PutBitmap4(&grcGame, 0, 0, &grcGame, SURFACE_ID_SCREEN_GRAB);
+				CortBox(&rcView, 0);
+
+				if (line < gMap.length)
+				{
+					WriteMiniMapLine(line);
+					line++;
+				}
+				if (line < gMap.length)
+				{
+					WriteMiniMapLine(line);
+					line++;
+				}
+
+				PutBitmap3(&grcGame, rcView.left + 1, rcView.top + 1, &rcMiniMap, SURFACE_ID_MAP);
+
+				PutMapName(TRUE);
+
+				if (++my_wait / 8 % 2)
+					PutBitmap3(&grcGame, my_x + rcView.left + 1, my_y + rcView.top + 1, &my_rect, SURFACE_ID_TEXT_BOX);
+
+				PutFramePerSecound();
+				if (!Flip_SystemTask(ghWnd))
+				{
+					ExitMainLoop(0);
+					return;
+				}
+
+				break;
+			}
+
+			f = 8;
+
+			++meta->routine;
+			// Fallthrough
+		case 4:
+			if (f >= -1)
+			{
+				GetTrg();
+
+				if (gKey & KEY_ESCAPE)
+				{
+					EnterMainLoop(Call_Escape, MiniMapLoopReturn, &ghWnd);
+					return;
+				}
+
+				PutBitmap4(&grcGame, 0, 0, &grcGame, SURFACE_ID_SCREEN_GRAB);
+
+				rcView.left = (WINDOW_WIDTH / 2) - gMap.width * f / 8 / 2;
+				rcView.right = (WINDOW_WIDTH / 2) + gMap.width * f / 8 / 2;
+				rcView.top = (WINDOW_HEIGHT / 2) - gMap.length * f / 8 / 2;
+				rcView.bottom = (WINDOW_HEIGHT / 2) + gMap.length * f / 8 / 2;
+
+				PutMapName(TRUE);
+				CortBox(&rcView, 0);
+
+				PutFramePerSecound();
+				if (!Flip_SystemTask(ghWnd))
+				{
+					ExitMainLoop(0);
+					return;
+				}
+
+				--f;
+
+				break;
+			}
+
+			ExitMainLoop(1);
+			return;
 	}
-
-	rcMiniMap.left = 0;
-	rcMiniMap.right = gMap.width;
-	rcMiniMap.top = 0;
-	rcMiniMap.bottom = gMap.length;
-
-	rcView.right = --rcView.left + gMap.width + 2;
-	rcView.bottom = --rcView.top + gMap.length + 2;
-	CortBox2(&rcMiniMap, 0, SURFACE_ID_MAP);
-
-	line = 0;
-	my_wait = 0;
-	while (1)
-	{
-		GetTrg();
-
-		if ((gKeyCancel | gKeyOk) & gKeyTrg)
-			break;
-
-		if (gKey & KEY_ESCAPE)
-		{
-			EnterMainLoop(Call_Escape, MiniMapLoopReturn, &ghWnd);
-			return 0;	// TODO
-		}
-
-		PutBitmap4(&grcGame, 0, 0, &grcGame, SURFACE_ID_SCREEN_GRAB);
-		CortBox(&rcView, 0);
-
-		if (line < gMap.length)
-		{
-			WriteMiniMapLine(line);
-			line++;
-		}
-		if (line < gMap.length)
-		{
-			WriteMiniMapLine(line);
-			line++;
-		}
-
-		PutBitmap3(&grcGame, rcView.left + 1, rcView.top + 1, &rcMiniMap, SURFACE_ID_MAP);
-
-		PutMapName(TRUE);
-
-		if (++my_wait / 8 % 2)
-			PutBitmap3(&grcGame, my_x + rcView.left + 1, my_y + rcView.top + 1, &my_rect, SURFACE_ID_TEXT_BOX);
-
-		PutFramePerSecound();
-		if (!Flip_SystemTask(ghWnd))
-			return 0;
-	}
-
-	for (f = 8; f >= -1; --f)
-	{
-		GetTrg();
-
-		if (gKey & KEY_ESCAPE)
-		{
-			EnterMainLoop(Call_Escape, MiniMapLoopReturn, &ghWnd);
-			return 0;	// TODO
-		}
-
-		PutBitmap4(&grcGame, 0, 0, &grcGame, SURFACE_ID_SCREEN_GRAB);
-
-		rcView.left = (WINDOW_WIDTH / 2) - gMap.width * f / 8 / 2;
-		rcView.right = (WINDOW_WIDTH / 2) + gMap.width * f / 8 / 2;
-		rcView.top = (WINDOW_HEIGHT / 2) - gMap.length * f / 8 / 2;
-		rcView.bottom = (WINDOW_HEIGHT / 2) + gMap.length * f / 8 / 2;
-
-		PutMapName(TRUE);
-		CortBox(&rcView, 0);
-
-		PutFramePerSecound();
-		if (!Flip_SystemTask(ghWnd))
-			return 0;
-	}
-
-	return 1;
 }
 
 BOOL IsMapping()

@@ -419,7 +419,7 @@ void CampLoop(MainLoopMeta *meta)
 			if (g_GameFlags & 2)
 				MoveCampCursor();
 
-			switch (TextScriptProc())
+			switch (TextScriptProc(CampLoopReturn))
 			{
 				case 0:
 				{

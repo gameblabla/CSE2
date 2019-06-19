@@ -2,6 +2,14 @@
 
 #include "WindowsWrapper.h"
 
+#include "MainLoop.h"
+
+typedef struct StageSelectLoop_Data
+{
+	int event;
+	void (*caller_return)(MainLoopMeta *meta, int return_value);
+} StageSelectLoop_Data;
+
 struct PERMIT_STAGE
 {
 	int index;
@@ -15,4 +23,4 @@ BOOL AddPermitStage(int index, int event);
 BOOL SubPermitStage(int index);
 void MoveStageSelectCursor(void);
 void PutStageSelectObject(void);
-int StageSelectLoop(int *p_event);
+void StageSelectLoop(MainLoopMeta *meta);
