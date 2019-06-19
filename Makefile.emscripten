@@ -9,7 +9,7 @@ ifeq ($(RELEASE), 1)
 	LDFLAGS = -s
 	FILENAME_DEF = CSE2
 else
-	CXXFLAGS = -Og -g3
+	CXXFLAGS = -g4
 	FILENAME_DEF = CSE2_debug
 endif
 
@@ -40,14 +40,7 @@ ifeq ($(RASPBERRY_PI), 1)
 	CXXFLAGS += -DRASPBERRY_PI
 endif
 
-CXXFLAGS += -std=c++98 `pkg-config sdl2 --cflags` `pkg-config freetype2 --cflags` -MMD -MP -MF $@.d
-
-ifeq ($(STATIC), 1)
-	LDFLAGS += -static
-	LIBS += `pkg-config sdl2 --libs --static` `pkg-config freetype2 --libs --static` -lfreetype
-else
-	LIBS += `pkg-config sdl2 --libs` `pkg-config freetype2 --libs`
-endif
+CXXFLAGS += -std=c++98 -s USE_SDL=2 -s USE_FREETYPE=1 -MMD -MP -MF $@.d
 
 # For an accurate result to the original's code, compile in alphabetical order
 SOURCES = \
@@ -210,14 +203,15 @@ ifeq ($(WINDOWS), 1)
 	OBJECTS += obj/$(FILENAME)/win_icon.o
 endif
 
-all: $(BUILD_DIRECTORY)/$(FILENAME) $(BUILD_DIRECTORY)/data
+all: $(BUILD_DIRECTORY)/$(FILENAME).html
 	@echo Finished
 
-$(BUILD_DIRECTORY)/data: $(DATA_DIRECTORY)
-	@rm -rf $(BUILD_DIRECTORY)/data
-	@cp -r $(DATA_DIRECTORY) $(BUILD_DIRECTORY)/data
+$(BUILD_DIRECTORY)/$(FILENAME).html: $(BUILD_DIRECTORY)/$(FILENAME).bc $(ASSETS_DIRECTORY)/emscripten/shell.html
+	@mkdir -p $(@D)
+	@echo Compiling bytecode
+	@emcc $< -s USE_SDL=2 -s USE_FREETYPE=1 --preload-file $(ASSETS_DIRECTORY)/emscripten/fps@/ --preload-file $(DATA_DIRECTORY)@/data --preload-file $(ASSETS_DIRECTORY)/emscripten/Config.dat@/ -o $@ -s ALLOW_MEMORY_GROWTH=1 --no-heap-copy -O3 --shell-file $(ASSETS_DIRECTORY)/emscripten/shell.html
 
-$(BUILD_DIRECTORY)/$(FILENAME): $(OBJECTS)
+$(BUILD_DIRECTORY)/$(FILENAME).bc: $(OBJECTS)
 	@mkdir -p $(@D)
 	@echo Linking $@
 	@$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -o $@ $(LIBS)
