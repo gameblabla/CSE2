@@ -50,4 +50,4 @@ BOOL StartCreditScript();
 void ActionCredit();
 void SetCreditIllust(int a);
 void CutCreditIllust();
-int Scene_DownIsland(int hWnd, int mode);
+int Scene_DownIsland(HWND hWnd, int mode);

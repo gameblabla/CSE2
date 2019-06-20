@@ -1,7 +1,13 @@
 #pragma once
 
-int rep_rand();
-void rep_srand(unsigned int seed);
+#ifdef NONPORTABLE
+#include <Windows.h>
+// Avoid name collisions
+#undef DrawText
+#undef FindResource
+#else
+
+typedef int HWND;
 
 typedef int BOOL;
 
@@ -13,26 +19,22 @@ typedef int BOOL;
 #define TRUE 1
 #endif
 
+struct RECT
+{
+	long left;
+	long top;
+	long right;
+	long bottom;
+};
+#endif
+
 #define SET_RECT(rect, l, t, r, b) \
 	rect.left = l; \
 	rect.top = t; \
 	rect.right = r; \
 	rect.bottom = b;
 
-struct RECT
-{
-	union
-	{
-		int left;
-		int front;
-	};
-	int top;
-	union
-	{
-		int right;
-		int back;
-	};
-	int bottom;
-};
+int rep_rand();
+void rep_srand(unsigned int seed);
 
 BOOL SystemTask();

@@ -1,6 +1,8 @@
 #pragma once
 
-extern int ghWnd;
+#include "WindowsWrapper.h"
+
+extern HWND ghWnd;
 
 void PutFramePerSecound();
 int GetFramePerSecound();

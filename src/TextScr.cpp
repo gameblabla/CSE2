@@ -1251,7 +1251,7 @@ int TextScriptProc()
 						char str_0[0x40];
 						#ifdef NONPORTABLE
 						sprintf(str_0, "不明のコード:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);
-						MessageBoxA(0, str_0, "エラー", 0);
+						MessageBoxA(ghWnd, str_0, "エラー", 0);
 						#else
 							#ifdef JAPANESE
 							sprintf(str_0, "不明のコード:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);
