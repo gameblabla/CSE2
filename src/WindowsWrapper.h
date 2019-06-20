@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef NONPORTABLE
+#ifdef WINDOWS
 #include <Windows.h>
 // Avoid name collisions
 #undef DrawText
