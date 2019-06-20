@@ -695,7 +695,11 @@ int TextScriptProc()
 						if (!TransferStage(z, w, x, y))
 						{
 							#if defined(NONPORTABLE) && defined(WINDOWS)
-							MessageBoxA(ghWnd, "ステージの読み込みに失敗", "エラー", 0);
+								#ifdef JAPANESE
+								MessageBoxA(ghWnd, "ステージの読み込みに失敗", "エラー", MB_OK);
+								#else
+								MessageBoxA(ghWnd, "Failed to load stage", "Error", MB_OK);
+								#endif
 							#else
 								#ifdef JAPANESE
 								SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", "ステージの読み込みに失敗", NULL);
@@ -1250,16 +1254,19 @@ int TextScriptProc()
 					else
 					{
 						char str_0[0x40];
-						#if defined(NONPORTABLE) && defined(WINDOWS)
-						sprintf(str_0, "不明のコード:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);
-						MessageBoxA(0, str_0, "エラー", 0);
-						#else
-							#ifdef JAPANESE
+						#ifdef JAPANESE
 							sprintf(str_0, "不明のコード:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);
-							SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", str_0, NULL);
+							#if defined(NONPORTABLE) && defined(WINDOWS)
+								MessageBoxA(NULL, str_0, "エラー", MB_OK);
 							#else
+								SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", str_0, NULL);
+							#endif
+						#else
 							sprintf(str_0, "Unknown code:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);
-							SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", str_0, NULL);
+							#if defined(NONPORTABLE) && defined(WINDOWS)
+								MessageBoxA(NULL, str_0, "Error", MB_OK);
+							#else
+								SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", str_0, NULL);
 							#endif
 						#endif
 

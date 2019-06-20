@@ -254,21 +254,22 @@ BOOL InitializeGame(HWND hWnd)
 	InitFlags();
 	if (!TransferStage(13, 200, 10, 8))
 	{
-#if defined(NONPORTABLE) && defined(WINDOWS)
-	#ifdef JAPANESE
-		MessageBoxA(hWnd, "ステージの読み込みに失敗", "エラー", MB_OK);
-	#else
-		MessageBoxA(hWnd, "Failed to load stage", "Error", MB_OK);
-	#endif
-#else
-	(void)hWnd;
+		#if defined(NONPORTABLE) && defined(WINDOWS)
+			#ifdef JAPANESE
+			MessageBoxA(hWnd, "ステージの読み込みに失敗", "エラー", MB_OK);
+			#else
+			MessageBoxA(hWnd, "Failed to load stage", "Error", MB_OK);
+			#endif
+		#else
+			(void)hWnd;
 
-	#ifdef JAPANESE
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", "ステージの読み込みに失敗", NULL);
-	#else
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Failed to load stage", NULL);
-	#endif
-#endif
+			#ifdef JAPANESE
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", "ステージの読み込みに失敗", NULL);
+			#else
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Failed to load stage", NULL);
+			#endif
+		#endif
+
 		return FALSE;
 	}
 
