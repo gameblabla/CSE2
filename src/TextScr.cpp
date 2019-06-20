@@ -694,7 +694,7 @@ int TextScriptProc()
 						y = GetTextScriptNo(gTS.p_read + 19);
 						if (!TransferStage(z, w, x, y))
 						{
-							#ifdef NONPORTABLE
+							#if defined(NONPORTABLE) && defined(WINDOWS)
 							MessageBoxA(ghWnd, "ステージの読み込みに失敗", "エラー", 0);
 							#else
 								#ifdef JAPANESE
@@ -1250,7 +1250,7 @@ int TextScriptProc()
 					else
 					{
 						char str_0[0x40];
-						#ifdef NONPORTABLE
+						#if defined(NONPORTABLE) && defined(WINDOWS)
 						sprintf(str_0, "不明のコード:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);
 						MessageBoxA(0, str_0, "エラー", 0);
 						#else
