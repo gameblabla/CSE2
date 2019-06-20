@@ -468,7 +468,7 @@ int ModeAction()
 	InitFlags();
 	InitBossLife();
 
-	if ((bContinue && LoadProfile(NULL)) || InitializeGame())
+	if ((bContinue && LoadProfile(NULL)) || InitializeGame(ghWnd))
 	{
 		while (1)
 		{

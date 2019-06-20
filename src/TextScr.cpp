@@ -558,6 +558,7 @@ int TextScriptProc()
 	char c[3];
 	int w, x, y, z;
 	int i;
+	char str[72];
 
 	RECT rcSymbol = {64, 48, 72, 56};
 
@@ -1164,7 +1165,7 @@ int TextScriptProc()
 					}
 					else if (IS_COMMAND('I','N','I'))
 					{
-						InitializeGame();
+						InitializeGame(ghWnd);
 						gTS.p_read += 4;
 					}
 					else if (IS_COMMAND('S','V','P'))
@@ -1175,7 +1176,7 @@ int TextScriptProc()
 					else if (IS_COMMAND('L','D','P'))
 					{
 						if (!LoadProfile(NULL))
-							InitializeGame();
+							InitializeGame(ghWnd);
 					}
 					else if (IS_COMMAND('F','A','C'))
 					{
@@ -1251,7 +1252,7 @@ int TextScriptProc()
 						char str_0[0x40];
 						#ifdef NONPORTABLE
 						sprintf(str_0, "不明のコード:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);
-						MessageBoxA(ghWnd, str_0, "エラー", 0);
+						MessageBoxA(0, str_0, "エラー", 0);
 						#else
 							#ifdef JAPANESE
 							sprintf(str_0, "不明のコード:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);
@@ -1282,7 +1283,6 @@ int TextScriptProc()
 					else if (gTS.flags & 0x10)
 					{
 						//SAT/CAT/TUR printing
-						char str[72];
 						x = gTS.p_read;
 						//Break if reaches command, or new-line
 						while (gTS.data[x] != '<' && gTS.data[x] != '\r')

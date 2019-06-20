@@ -241,8 +241,10 @@ BOOL LoadProfile(const char *name)
 	return TRUE;
 }
 
-BOOL InitializeGame()
+BOOL InitializeGame(HWND hWnd)
 {
+	(void)hWnd;
+
 	InitMyChar();
 	gSelectedArms = 0;
 	gSelectedItem = 0;
