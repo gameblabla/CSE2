@@ -246,7 +246,7 @@ endif()
 
 # Make some tweaks if we're targetting Windows
 if(WIN32)
-	target_sources(CSE2 PRIVATE "res/ICON/ICON.rc")
+	target_sources(CSE2 PRIVATE "${ASSETS_DIRECTORY}/resources/ICON/ICON.rc")
 	target_compile_definitions(CSE2 PRIVATE WINDOWS)
 	set_target_properties(CSE2 PROPERTIES WIN32_EXECUTABLE YES)	# Disable the console window
 else()
@@ -272,10 +272,12 @@ ExternalProject_Add(bin2h
 	SOURCE_DIR "${CMAKE_SOURCE_DIR}/bin2h"
 	DOWNLOAD_COMMAND ""
 	UPDATE_COMMAND ""
+	BUILD_BYPRODUCTS "<INSTALL_DIR>/bin/bin2h"
 	CMAKE_ARGS
 		-DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
 		-DCMAKE_BUILD_TYPE=Release
-		-DCMAKE_CONFIGURATION_TYPES=Release
+	INSTALL_COMMAND
+		${CMAKE_COMMAND} --build . --config Release --target install
 )
 
 ExternalProject_Get_Property(bin2h INSTALL_DIR)
