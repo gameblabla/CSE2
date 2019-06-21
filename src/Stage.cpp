@@ -18,7 +18,6 @@
 #include "MyChar.h"
 #include "NpChar.h"
 #include "Organya.h"
-#include "Tags.h"
 #include "TextScr.h"
 #include "ValueView.h"
 

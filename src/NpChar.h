@@ -55,8 +55,20 @@ struct NPCHAR
 	int count2;
 	int act_no;
 	int act_wait;
-	RECT hit;
-	RECT view;
+	struct
+	{
+		int front;
+		int top;
+		int back;
+		int bottom;
+	} hit;
+	struct
+	{
+		int front;
+		int top;
+		int back;
+		int bottom;
+	} view;
 	unsigned char shock;
 	int damage_view;
 	int damage;

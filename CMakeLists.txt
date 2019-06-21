@@ -4,6 +4,9 @@ if((${CMAKE_VERSION} VERSION_EQUAL 3.9) OR (${CMAKE_VERSION} VERSION_GREATER 3.9
 	cmake_policy(SET CMP0069 NEW)
 endif()
 
+set(BUILD_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/game")
+set(ASSETS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/assets")
+
 option(JAPANESE "Enable the Japanese-language build" OFF)
 option(FIX_BUGS "Fix certain bugs (see src/Bug Fixes.txt)" OFF)
 option(NONPORTABLE "Enable bits of code that aren't portable, but are what the original game used" OFF)
@@ -221,11 +224,11 @@ set(RESOURCES
 
 # Handle options
 if(JAPANESE)
-	set(BUILD_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/build_jp")
+	set(DATA_DIRECTORY "${ASSETS_DIRECTORY}/data_jp")
 	list(APPEND RESOURCES "BITMAP/pixel_jp.bmp")
 	target_compile_definitions(CSE2 PRIVATE JAPANESE)
 else()
-	set(BUILD_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/build_en")
+	set(DATA_DIRECTORY "${ASSETS_DIRECTORY}/data_en")
 	list(APPEND RESOURCES "BITMAP/pixel.bmp")
 endif()
 
@@ -243,7 +246,7 @@ endif()
 
 # Make some tweaks if we're targetting Windows
 if(WIN32)
-	target_sources(CSE2 PRIVATE "res/ICON/ICON.rc")
+	target_sources(CSE2 PRIVATE "${ASSETS_DIRECTORY}/resources/ICON/ICON.rc")
 	target_compile_definitions(CSE2 PRIVATE WINDOWS)
 	set_target_properties(CSE2 PROPERTIES WIN32_EXECUTABLE YES)	# Disable the console window
 else()
@@ -262,17 +265,37 @@ elseif(NOT WIN32)
 	list(APPEND RESOURCES "FONT/cour.ttf")
 endif()
 
-# Magic to convert resources to header files
-add_subdirectory("bin2h")
+# Build bin2h externally, so it isn't cross-compiled when CSE2 is (Emscripten)
+include(ExternalProject)
+
+ExternalProject_Add(bin2h
+	SOURCE_DIR "${CMAKE_SOURCE_DIR}/bin2h"
+	DOWNLOAD_COMMAND ""
+	UPDATE_COMMAND ""
+	BUILD_BYPRODUCTS "<INSTALL_DIR>/bin/bin2h"
+	CMAKE_ARGS
+		-DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+		-DCMAKE_BUILD_TYPE=Release
+	INSTALL_COMMAND
+		${CMAKE_COMMAND} --build . --config Release --target install
+)
+
+ExternalProject_Get_Property(bin2h INSTALL_DIR)
+
+add_executable(bin2h_tool IMPORTED)
+add_dependencies(bin2h_tool bin2h)
+set_target_properties(bin2h_tool PROPERTIES IMPORTED_LOCATION "${INSTALL_DIR}/bin/bin2h")
+
+# Convert resources to header files
 foreach(FILENAME IN LISTS RESOURCES)
-	set(IN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/res")
+	set(IN_DIR "${ASSETS_DIRECTORY}/resources")
 	set(OUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/Resource")
 	get_filename_component(DIRECTORY "${FILENAME}" DIRECTORY)
 	add_custom_command(
 		OUTPUT "${OUT_DIR}/${FILENAME}.h"
 		COMMAND ${CMAKE_COMMAND} -E make_directory "${OUT_DIR}/${DIRECTORY}"
-		COMMAND bin2h "${IN_DIR}/${FILENAME}" "${OUT_DIR}/${FILENAME}.h"
-		DEPENDS bin2h "${IN_DIR}/${FILENAME}"
+		COMMAND bin2h_tool "${IN_DIR}/${FILENAME}" "${OUT_DIR}/${FILENAME}.h"
+		DEPENDS bin2h_tool "${IN_DIR}/${FILENAME}"
 		)
 	target_sources(CSE2 PRIVATE "${OUT_DIR}/${FILENAME}.h")
 endforeach()
@@ -301,6 +324,12 @@ set_target_properties(CSE2 PROPERTIES
 	RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${BUILD_DIRECTORY}
 	RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${BUILD_DIRECTORY}
 	RUNTIME_OUTPUT_DIRECTORY_DEBUG ${BUILD_DIRECTORY}
+)
+
+# Copy data folder to build directory
+add_custom_command(TARGET CSE2 POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E remove_directory "${BUILD_DIRECTORY}/data"
+	COMMAND ${CMAKE_COMMAND} -E copy_directory "${DATA_DIRECTORY}" "${BUILD_DIRECTORY}/data"
 )
 
 # Enable link-time optimisation if available
@@ -360,6 +389,7 @@ else()
 	add_subdirectory("external/freetype" EXCLUDE_FROM_ALL)
 	target_link_libraries(CSE2 freetype)
 endif()
+
 
 ##
 # DoConfig

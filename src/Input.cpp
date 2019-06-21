@@ -3,13 +3,9 @@
 #include <stddef.h>
 #include <string.h>
 
-#include <SDL.h>
+#include "SDL.h"
 
 #include "WindowsWrapper.h"
-
-#include "CommonDefines.h"
-#include "Tags.h"
-#include "Types.h"
 
 #define JOYSTICK_DEADZONE 10000
 

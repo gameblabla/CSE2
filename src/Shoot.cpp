@@ -1,5 +1,7 @@
 #include "Shoot.h"
 
+#include "WindowsWrapper.h"
+
 #include "ArmsItem.h"
 #include "Bullet.h"
 #include "Caret.h"

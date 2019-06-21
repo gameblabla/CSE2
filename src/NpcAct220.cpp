@@ -2,10 +2,7 @@
 
 #include "WindowsWrapper.h"
 
-#include "Back.h"
-#include "Bullet.h"
 #include "Caret.h"
-#include "Frame.h"
 #include "Game.h"
 #include "MyChar.h"
 #include "NpChar.h"

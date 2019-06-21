@@ -36,11 +36,11 @@ int JudgeHitMyCharBlock(int x, int y)
 	// Left wall
 	if (gMC.y - gMC.hit.top < (y * 0x10 + 4) * 0x200
 		&& gMC.y + gMC.hit.bottom > (y * 0x10 - 4) * 0x200
-		&& gMC.x - gMC.hit.left < (x * 0x10 + 8) * 0x200
-		&& gMC.x - gMC.hit.left > x * 0x10 * 0x200)
+		&& gMC.x - gMC.hit.back < (x * 0x10 + 8) * 0x200
+		&& gMC.x - gMC.hit.back > x * 0x10 * 0x200)
 	{
 		// Clip
-		gMC.x = ((x * 0x10 + 8) * 0x200) + gMC.hit.left;
+		gMC.x = ((x * 0x10 + 8) * 0x200) + gMC.hit.back;
 
 		// Halt momentum
 		if (gMC.xm < -0x180)
@@ -55,11 +55,11 @@ int JudgeHitMyCharBlock(int x, int y)
 	// Right wall
 	if (gMC.y - gMC.hit.top < (y * 0x10 + 4) * 0x200
 		&& gMC.y + gMC.hit.bottom > (y * 0x10 - 4) * 0x200
-		&& gMC.x + gMC.hit.right > (x * 0x10 - 8) * 0x200
-		&& gMC.x + gMC.hit.left < x * 0x10 * 0x200)
+		&& gMC.x + gMC.hit.back > (x * 0x10 - 8) * 0x200
+		&& gMC.x + gMC.hit.back < x * 0x10 * 0x200)
 	{
 		// Clip
-		gMC.x = ((x * 0x10 - 8) * 0x200) - gMC.hit.right;
+		gMC.x = ((x * 0x10 - 8) * 0x200) - gMC.hit.back;
 
 		// Halt momentum
 		if (gMC.xm > 0x180)
@@ -72,8 +72,8 @@ int JudgeHitMyCharBlock(int x, int y)
 	}
 
 	// Ceiling
-	if (gMC.x - gMC.hit.right < (x * 0x10 + 5) * 0x200
-		&& gMC.x + gMC.hit.right > (x * 0x10 - 5) * 0x200
+	if (gMC.x - gMC.hit.back < (x * 0x10 + 5) * 0x200
+		&& gMC.x + gMC.hit.back > (x * 0x10 - 5) * 0x200
 		&& gMC.y - gMC.hit.top < (y * 0x10 + 8) * 0x200
 		&& gMC.y - gMC.hit.top > y * 0x10 * 0x200)
 	{
@@ -91,8 +91,8 @@ int JudgeHitMyCharBlock(int x, int y)
 	}
 
 	// Floor
-	if (gMC.x - gMC.hit.right < (x * 0x10 + 5) * 0x200
-		&& gMC.x + gMC.hit.right > ((x * 0x10 - 5) * 0x200)
+	if (gMC.x - gMC.hit.back < (x * 0x10 + 5) * 0x200
+		&& gMC.x + gMC.hit.back > ((x * 0x10 - 5) * 0x200)
 		&& gMC.y + gMC.hit.bottom > (y * 0x10 - 8) * 0x200
 		&& gMC.y + gMC.hit.bottom < y * 0x10 * 0x200)
 	{
@@ -324,8 +324,8 @@ int JudgeHitMyCharWater(int x, int y)
 {
 	int hit = 0;
 
-	if (gMC.x - gMC.hit.right < (x * 0x10 + 5) * 0x200
-		&& gMC.x + gMC.hit.right > ((x * 0x10 - 5) * 0x200)
+	if (gMC.x - gMC.hit.back < (x * 0x10 + 5) * 0x200
+		&& gMC.x + gMC.hit.back > ((x * 0x10 - 5) * 0x200)
 		&& gMC.y - gMC.hit.top < ((y * 0x10 + 5) * 0x200)
 		&& gMC.y + gMC.hit.bottom > y * 0x10 * 0x200)
 		hit |= 0x100;
@@ -362,8 +362,8 @@ int JudgeHitMyCharDamageW(int x, int y)
 int JudgeHitMyCharVectLeft(int x, int y)
 {
 	int hit = 0;
-	if (gMC.x - gMC.hit.right < (x * 0x10 + 6) * 0x200
-		&& gMC.x + gMC.hit.right > (x * 0x10 - 6) * 0x200
+	if (gMC.x - gMC.hit.back < (x * 0x10 + 6) * 0x200
+		&& gMC.x + gMC.hit.back > (x * 0x10 - 6) * 0x200
 		&& gMC.y - gMC.hit.top < (y * 0x10 + 6) * 0x200
 		&& gMC.y + gMC.hit.bottom > (y * 0x10 - 6) * 0x200)
 		hit |= 0x1000;
@@ -374,8 +374,8 @@ int JudgeHitMyCharVectLeft(int x, int y)
 int JudgeHitMyCharVectUp(int x, int y)
 {
 	int hit = 0;
-	if (gMC.x - gMC.hit.right < (x * 0x10 + 6) * 0x200
-		&& gMC.x + gMC.hit.right > (x * 0x10 - 6) * 0x200
+	if (gMC.x - gMC.hit.back < (x * 0x10 + 6) * 0x200
+		&& gMC.x + gMC.hit.back > (x * 0x10 - 6) * 0x200
 		&& gMC.y - gMC.hit.top < (y * 0x10 + 6) * 0x200
 		&& gMC.y + gMC.hit.bottom > (y * 0x10 - 6) * 0x200)
 		hit |= 0x2000;
@@ -386,8 +386,8 @@ int JudgeHitMyCharVectUp(int x, int y)
 int JudgeHitMyCharVectRight(int x, int y)
 {
 	int hit = 0;
-	if (gMC.x - gMC.hit.right < (x * 0x10 + 6) * 0x200
-		&& gMC.x + gMC.hit.right > (x * 0x10 - 6) * 0x200
+	if (gMC.x - gMC.hit.back < (x * 0x10 + 6) * 0x200
+		&& gMC.x + gMC.hit.back > (x * 0x10 - 6) * 0x200
 		&& gMC.y - gMC.hit.top < (y * 0x10 + 6) * 0x200
 		&& gMC.y + gMC.hit.bottom > (y * 0x10 - 6) * 0x200)
 		hit |= 0x4000;
@@ -398,8 +398,8 @@ int JudgeHitMyCharVectRight(int x, int y)
 int JudgeHitMyCharVectDown(int x, int y)
 {
 	int hit = 0;
-	if (gMC.x - gMC.hit.right < (x * 0x10 + 6) * 0x200
-		&& gMC.x + gMC.hit.right > (x * 0x10 - 6) * 0x200
+	if (gMC.x - gMC.hit.back < (x * 0x10 + 6) * 0x200
+		&& gMC.x + gMC.hit.back > (x * 0x10 - 6) * 0x200
 		&& gMC.y - gMC.hit.top < (y * 0x10 + 6) * 0x200
 		&& gMC.y + gMC.hit.bottom > (y * 0x10 - 6) * 0x200)
 		hit |= 0x8000;
@@ -591,8 +591,8 @@ int JudgeHitMyCharNPC(NPCHAR *npc)
 
 	if (gMC.y - gMC.hit.top < npc->y + npc->hit.bottom - 0x600
 		&& gMC.y + gMC.hit.bottom > npc->y - npc->hit.top + 0x600
-		&& gMC.x - gMC.hit.right < npc->x + npc->hit.back
-		&& gMC.x - gMC.hit.right > npc->x)
+		&& gMC.x - gMC.hit.back < npc->x + npc->hit.back
+		&& gMC.x - gMC.hit.back > npc->x)
 	{
 		if (gMC.xm < 0x200)
 			gMC.xm += 0x200;
@@ -601,16 +601,16 @@ int JudgeHitMyCharNPC(NPCHAR *npc)
 
 	if (gMC.y - gMC.hit.top < npc->y + npc->hit.bottom - 0x600
 		&& gMC.y + gMC.hit.bottom > npc->y - npc->hit.top + 0x600
-		&& gMC.x + gMC.hit.right - 0x200 > npc->x - npc->hit.back
-		&& gMC.x + gMC.hit.right - 0x200 < npc->x)
+		&& gMC.x + gMC.hit.back - 0x200 > npc->x - npc->hit.back
+		&& gMC.x + gMC.hit.back - 0x200 < npc->x)
 	{
 		if (gMC.xm > -0x200)
 			gMC.xm -= 0x200;
 		hit |= 4;
 	}
 
-	if (gMC.x - gMC.hit.right < npc->x + npc->hit.back - 0x600
-		&& gMC.x + gMC.hit.right > npc->x - npc->hit.back + 0x600
+	if (gMC.x - gMC.hit.back < npc->x + npc->hit.back - 0x600
+		&& gMC.x + gMC.hit.back > npc->x - npc->hit.back + 0x600
 		&& gMC.y - gMC.hit.top < npc->y + npc->hit.bottom
 		&& gMC.y - gMC.hit.top > npc->y)
 	{
@@ -619,8 +619,8 @@ int JudgeHitMyCharNPC(NPCHAR *npc)
 		hit |= 2;
 	}
 
-	if (gMC.x - gMC.hit.right < npc->x + npc->hit.back - 0x600
-		&& gMC.x + gMC.hit.right > npc->x - npc->hit.back + 0x600
+	if (gMC.x - gMC.hit.back < npc->x + npc->hit.back - 0x600
+		&& gMC.x + gMC.hit.back > npc->x - npc->hit.back + 0x600
 		&& gMC.y + gMC.hit.bottom > npc->y - npc->hit.top
 		&& gMC.hit.bottom + gMC.y < npc->y + 0x600)
 	{
@@ -692,7 +692,7 @@ int JudgeHitMyCharNPC4(NPCHAR *npc)
 
 	if (fy1 / fx1 > fy2 / fx2)
 	{
-		if (gMC.x - gMC.hit.right < npc->x + npc->hit.back && gMC.x + gMC.hit.right > npc->x - npc->hit.back)
+		if (gMC.x - gMC.hit.back < npc->x + npc->hit.back && gMC.x + gMC.hit.back > npc->x - npc->hit.back)
 		{
 			if (gMC.y - gMC.hit.top < npc->y + npc->hit.bottom && gMC.y - gMC.hit.top > npc->y)
 			{
@@ -739,22 +739,22 @@ int JudgeHitMyCharNPC4(NPCHAR *npc)
 	{
 		if (gMC.y - gMC.hit.top < npc->y + npc->hit.bottom && gMC.y + gMC.hit.bottom > npc->y - npc->hit.top)
 		{
-			if (gMC.x - gMC.hit.right < npc->x + npc->hit.back && gMC.x - gMC.hit.right > npc->x)
+			if (gMC.x - gMC.hit.back < npc->x + npc->hit.back && gMC.x - gMC.hit.back > npc->x)
 			{
 				if (gMC.xm < npc->xm)
 					gMC.xm = npc->xm;
 
-				gMC.x = npc->hit.back + npc->x + gMC.hit.right;
+				gMC.x = npc->hit.back + npc->x + gMC.hit.back;
 
 				hit |= 1;
 			}
 
-			if (gMC.x + gMC.hit.right > npc->x - npc->hit.back && gMC.hit.right + gMC.x < npc->x)
+			if (gMC.x + gMC.hit.back > npc->x - npc->hit.back && gMC.hit.back + gMC.x < npc->x)
 			{
 				if (gMC.xm > npc->xm)
 					gMC.xm = npc->xm;
 
-				gMC.x = npc->x - npc->hit.back - gMC.hit.right;
+				gMC.x = npc->x - npc->hit.back - gMC.hit.back;
 
 				hit |= 4;
 			}

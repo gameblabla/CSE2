@@ -29,3 +29,5 @@ if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
 		endif()
 	endif()
 endif()
+
+install(TARGETS bin2h RUNTIME DESTINATION bin)

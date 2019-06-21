@@ -68,14 +68,14 @@ void JudgeHitNpCharTriangleA(NPCHAR *npc, int x, int y)
 		&& npc->y - npc->hit.top < (y * 0x10 * 0x200) - ((npc->x - (x * 0x10 * 0x200)) / 2) + 0x800
 		&& npc->y + npc->hit.bottom > (y * 0x10 - 8) * 0x200)
 	{
-		//Clip
+		// Clip
 		npc->y = (y * 0x10 * 0x200) - ((npc->x - (x * 0x10 * 0x200)) / 2) + 0x800 + npc->hit.top;
 
-		//Halt momentum
+		// Halt momentum
 		if (npc->ym < 0)
 			npc->ym = 0;
 
-		//Set that hit a ceiling
+		// Set that hit a ceiling
 		hit |= 2;
 	}
 
@@ -91,14 +91,14 @@ void JudgeHitNpCharTriangleB(NPCHAR *npc, int x, int y)
 		&& npc->y - npc->hit.top < (y * 0x10 * 0x200) - ((npc->x - (x * 0x10 * 0x200)) / 2) - 0x800
 		&& npc->y + npc->hit.bottom > (y * 0x10 - 8) * 0x200)
 	{
-		//Clip
+		// Clip
 		npc->y = (y * 0x10 * 0x200) - ((npc->x - (x * 0x10 * 0x200)) / 2) - 0x800 + npc->hit.top;
 
-		//Halt momentum
+		// Halt momentum
 		if (npc->ym < 0)
 			npc->ym = 0;
 
-		//Set that hit a ceiling
+		// Set that hit a ceiling
 		hit |= 2;
 	}
 
@@ -114,14 +114,14 @@ void JudgeHitNpCharTriangleC(NPCHAR *npc, int x, int y)
 		&& npc->y - npc->hit.top < (y * 0x10 * 0x200) + ((npc->x - (x * 0x10 * 0x200)) / 2) - 0x800
 		&& npc->y + npc->hit.bottom > (y * 0x10 - 8) * 0x200)
 	{
-		//Clip
+		// Clip
 		npc->y = (y * 0x10 * 0x200) + ((npc->x - (x * 0x10 * 0x200)) / 2) - 0x800 + npc->hit.top;
 
-		//Halt momentum
+		// Halt momentum
 		if (npc->ym < 0)
 			npc->ym = 0;
 
-		//Set that hit a ceiling
+		// Set that hit a ceiling
 		hit |= 2;
 	}
 
@@ -137,14 +137,14 @@ void JudgeHitNpCharTriangleD(NPCHAR *npc, int x, int y)
 		&& npc->y - npc->hit.top < (y * 0x10 * 0x200) + ((npc->x - (x * 0x10 * 0x200)) / 2) + 0x800
 		&& npc->y + npc->hit.bottom > (y * 0x10 - 8) * 0x200)
 	{
-		//Clip
+		// Clip
 		npc->y = (y * 0x10 * 0x200) + ((npc->x - (x * 0x10 * 0x200)) / 2) + 0x800 + npc->hit.top;
 
-		//Halt momentum
+		// Halt momentum
 		if (npc->ym < 0)
 			npc->ym = 0;
 
-		//Set that hit a ceiling
+		// Set that hit a ceiling
 		hit |= 2;
 	}
 
@@ -162,14 +162,14 @@ void JudgeHitNpCharTriangleE(NPCHAR *npc, int x, int y)
 		&& npc->y + npc->hit.bottom > (y * 0x10 * 0x200) + ((npc->x - (x * 0x10 * 0x200)) / 2) - 0x800
 		&& npc->y - npc->hit.top < (y * 0x10 + 8) * 0x200)
 	{
-		//Clip
+		// Clip
 		npc->y = (y * 0x10 * 0x200) + ((npc->x - (x * 0x10 * 0x200)) / 2) - 0x800 - npc->hit.bottom;
 
-		//Halt momentum
+		// Halt momentum
 		if (npc->ym > 0)
 			npc->ym = 0;
 
-		//Set that hit this slope
+		// Set that hit this slope
 		hit |= 0x28;
 	}
 
@@ -187,14 +187,14 @@ void JudgeHitNpCharTriangleF(NPCHAR *npc, int x, int y)
 		&& npc->y + npc->hit.bottom > (y * 0x10 * 0x200) + ((npc->x - (x * 0x10 * 0x200)) / 2) + 0x800
 		&& npc->y - npc->hit.top < (y * 0x10 + 8) * 0x200)
 	{
-		//Clip
+		// Clip
 		npc->y = (y * 0x10 * 0x200) + ((npc->x - (x * 0x10 * 0x200)) / 2) + 0x800 - npc->hit.bottom;
 
-		//Halt momentum
+		// Halt momentum
 		if (npc->ym > 0)
 			npc->ym = 0;
 
-		//Set that hit this slope
+		// Set that hit this slope
 		hit |= 0x28;
 	}
 
@@ -212,14 +212,14 @@ void JudgeHitNpCharTriangleG(NPCHAR *npc, int x, int y)
 		&& npc->y + npc->hit.bottom > (y * 0x10 * 0x200) - ((npc->x - (x * 0x10 * 0x200)) / 2) + 0x800
 		&& npc->y - npc->hit.top < (y * 0x10 + 8) * 0x200)
 	{
-		//Clip
+		// Clip
 		npc->y = (y * 0x10 * 0x200) - ((npc->x - (x * 0x10 * 0x200)) / 2) + 0x800 - npc->hit.bottom;
 
-		//Halt momentum
+		// Halt momentum
 		if (npc->ym > 0)
 			npc->ym = 0;
 
-		//Set that hit this slope
+		// Set that hit this slope
 		hit |= 0x18;
 	}
 
@@ -237,14 +237,14 @@ void JudgeHitNpCharTriangleH(NPCHAR *npc, int x, int y)
 		&& npc->y + npc->hit.bottom > (y * 0x10 * 0x200) - ((npc->x - (x * 0x10 * 0x200)) / 2) - 0x800
 		&& npc->y - npc->hit.top < (y * 0x10 + 8) * 0x200)
 	{
-		//Clip
+		// Clip
 		npc->y = (y * 0x10 * 0x200) - ((npc->x - (x * 0x10 * 0x200)) / 2) - 0x800 - npc->hit.bottom;
 
-		//Halt momentum
+		// Halt momentum
 		if (npc->ym > 0)
 			npc->ym = 0;
 
-		//Set that hit this slope
+		// Set that hit this slope
 		hit |= 0x18;
 	}
 
@@ -321,12 +321,12 @@ void HitNpCharMap()
 		{
 			switch (GetAttribute(x + offx[j], y + offy[j]))
 			{
-				//No NPC block
+				// No NPC block
 				case 0x44:
 					if (gNPC[i].bits & npc_ignore44)
 						break;
 					// Fallthrough
-				//Block
+				// Block
 				case 0x03:
 				case 0x05:
 				case 0x41:
@@ -334,7 +334,7 @@ void HitNpCharMap()
 					JadgeHitNpCharBlock(&gNPC[i], x + offx[j], y + offy[j]);
 					break;
 
-				//Slopes
+				// Slopes
 				case 0x50:
 					JudgeHitNpCharTriangleA(&gNPC[i], x + offx[j], y + offy[j]);
 					break;
@@ -367,14 +367,14 @@ void HitNpCharMap()
 					JudgeHitNpCharTriangleH(&gNPC[i], x + offx[j], y + offy[j]);
 					break;
 
-				//Water
+				// Water
 				case 0x02:
 				case 0x60:
 				case 0x62:
 					JudgeHitNpCharWater(&gNPC[i], x + offx[j], y + offy[j]);
 					break;
 
-				//Water block
+				// Water block
 				case 0x04:
 				case 0x61:
 				case 0x64:
@@ -382,7 +382,7 @@ void HitNpCharMap()
 					JudgeHitNpCharWater(&gNPC[i], x + offx[j], y + offy[j]);
 					break;
 
-				//Water slopes
+				// Water slopes
 				case 0x70:
 					JudgeHitNpCharTriangleA(&gNPC[i], x + offx[j], y + offy[j]);
 					JudgeHitNpCharWater(&gNPC[i], x + offx[j], y + offy[j]);
@@ -460,24 +460,26 @@ void HitNpCharMap()
 
 void LoseNpChar(NPCHAR *npc, BOOL bVanish)
 {
-	//Play death sound
+	// Play death sound
 	PlaySoundObject(npc->destroy_voice, 1);
 
-	//Create smoke
+	// Create smoke
 	switch (npc->size)
 	{
 		case 1:
 			SetDestroyNpChar(npc->x, npc->y, npc->view.back, 3);
 			break;
+
 		case 2:
 			SetDestroyNpChar(npc->x, npc->y, npc->view.back, 7);
 			break;
+
 		case 3:
 			SetDestroyNpChar(npc->x, npc->y, npc->view.back, 12);
 			break;
 	}
 
-	//Create drop
+	// Create drop
 	if (npc->exp)
 	{
 		int val;
@@ -512,10 +514,10 @@ void LoseNpChar(NPCHAR *npc, BOOL bVanish)
 		}
 	}
 
-	//Set flag
+	// Set flag
 	SetNPCFlag(npc->code_flag);
 
-	//Create value view
+	// Create value view
 	if (npc->bits & npc_showDamage)
 	{
 		if ((npc->bits & npc_showDamage) && npc->damage_view)
@@ -551,7 +553,7 @@ void HitNpCharBullet()
 			if (gBul[b].damage == -1)
 				continue;
 
-			//Check if bullet touches npc
+			// Check if bullet touches npc
 			bHit = FALSE;
 			if (gNPC[n].bits & npc_shootable
 				&& gNPC[n].x - gNPC[n].hit.back < gBul[b].x + gBul[b].enemyXL
@@ -568,7 +570,7 @@ void HitNpCharBullet()
 
 			if (bHit)
 			{
-				//Damage NPC
+				// Damage NPC
 				if (gNPC[n].bits & npc_shootable)
 				{
 					gNPC[n].life -= gBul[b].damage;
@@ -611,7 +613,7 @@ void HitNpCharBullet()
 				}
 				else if ((gBul[b].bbits & 0x10) == 0)
 				{
-					//Hit invulnerable NPC
+					// Hit invulnerable NPC
 					SetCaret((gBul[b].x + gNPC[n].x) / 2, (gBul[b].y + gNPC[n].y) / 2, 2, 2);
 					PlaySoundObject(31, 1);
 					gBul[b].life = 0;
@@ -626,3 +628,4 @@ void HitNpCharBullet()
 			LoseNpChar(&gNPC[n], TRUE);
 	}
 }
+

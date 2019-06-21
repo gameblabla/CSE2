@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <SDL.h>
+#include "SDL.h"
 
 #include "WindowsWrapper.h"
 
@@ -21,7 +21,6 @@
 #include "Resource.h"
 #include "Sound.h"
 #include "Triangle.h"
-#include "Types.h"
 
 // These two are defined in Draw.cpp. This is a bit of a hack.
 extern SDL_Window *gWindow;
@@ -32,7 +31,7 @@ char gDataPath[PATH_LENGTH];
 
 int gJoystickButtonTable[8];
 
-int ghWnd;	// Placeholder until we restore the WinAPI code
+HWND ghWnd;	// Placeholder until we restore the WinAPI code
 BOOL gbUseJoystick = FALSE;
 BOOL bFps = FALSE;
 

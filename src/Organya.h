@@ -3,7 +3,8 @@
 #include "WindowsWrapper.h"
 
 //Below are Organya song data structures
-struct NOTELIST {
+struct NOTELIST
+{
 	NOTELIST *from; //Previous address
 	NOTELIST *to; //Next address
 
@@ -15,7 +16,8 @@ struct NOTELIST {
 };
 
 //Track data * 8
-struct TRACKDATA {
+struct TRACKDATA
+{
 	unsigned short freq; //Frequency (1000 is default)
 	unsigned char wave_no; //Waveform No.
 	signed char pipi;
@@ -26,7 +28,8 @@ struct TRACKDATA {
 };
 
 //Unique information held in songs
-struct MUSICINFO {
+struct MUSICINFO
+{
 	unsigned short wait;
 	BOOL loaded;
 	BOOL playing;

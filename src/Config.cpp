@@ -8,7 +8,6 @@
 #include "Config.h"
 #include "File.h"
 #include "Tags.h"
-#include "Types.h"
 
 static const char* const config_filename = "Config.dat";	// Not the original name
 static const char* const config_magic = "DOUKUTSU20041206";	// Not the original name
