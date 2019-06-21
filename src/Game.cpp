@@ -140,11 +140,13 @@ int ModeOpening()
 		// Escape menu
 		if (gKey & KEY_ESCAPE)
 		{
-			int escRet = Call_Escape(ghWnd);
-			if (escRet == 0)
-				return 0;
-			if (escRet == 2)
-				return 1;
+			switch (Call_Escape(ghWnd))
+			{
+				case 0:
+					return 0;
+				case 2:
+					return 1;
+			}
 		}
 
 		// Skip intro if OK is pressed
@@ -182,11 +184,13 @@ int ModeOpening()
 		PutFade();
 
 		// Update Text Script
-		int tscRet = TextScriptProc();
-		if (tscRet == 0)
-			return 0;
-		if (tscRet == 2)
-			return 1;
+		switch (TextScriptProc())
+		{
+			case 0:
+				return 0;
+			case 2:
+				return 1;
+		}
 
 		PutMapName(FALSE);
 		PutTextScript();
@@ -334,11 +338,13 @@ int ModeTitle()
 
 		if (gKey & KEY_ESCAPE)
 		{
-			int escRet = Call_Escape(ghWnd);
-			if (escRet == 0)
-				return 0;
-			if (escRet == 2)
-				return 1;
+			switch (Call_Escape(ghWnd))
+			{
+				case 0:
+					return 0;
+				case 2:
+					return 1;
+			}
 		}
 
 		// Move cursor
@@ -478,11 +484,13 @@ int ModeAction()
 			// Escape menu
 			if (gKey & KEY_ESCAPE)
 			{
-				int escRet = Call_Escape(ghWnd);
-				if (escRet == 0)
-					return 0;
-				if (escRet == 2)
-					return 1;
+				switch (Call_Escape(ghWnd))
+				{
+					case 0:
+						return 0;
+					case 2:
+						return 1;
+				}
 			}
 
 			if (swPlay % 2 && g_GameFlags & 1)
@@ -586,11 +594,13 @@ int ModeAction()
 
 			if (swPlay % 2)
 			{
-				int tscRet = TextScriptProc();
-				if (tscRet == 0)
-					return 0;
-				if (tscRet == 2)
-					return 1;
+				switch (TextScriptProc())
+				{
+					case 0:
+						return 0;
+					case 2:
+						return 1;
+				}
 			}
 
 			PutMapName(FALSE);
