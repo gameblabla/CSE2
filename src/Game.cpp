@@ -204,16 +204,14 @@ void ModeOpening(MainLoopMeta *meta)
 					PutFade();
 
 					// Update Text Script
-					int tscRet = TextScriptProc(ModeReturn);
-					if (tscRet == 0)
+					switch (TextScriptProc(ModeReturn))
 					{
-						ExitMainLoop(0);
-						return;
-					}
-					if (tscRet == 2)
-					{
-						ExitMainLoop(1);
-						return;
+						case 0:
+							ExitMainLoop(0);
+							return;
+						case 2:
+							ExitMainLoop(1);
+							return;
 					}
 
 					PutMapName(FALSE);
@@ -543,7 +541,7 @@ void ModeAction(MainLoopMeta *meta)
 			InitFlags();
 			InitBossLife();
 
-			if ((bContinue && LoadProfile(NULL)) || InitializeGame())
+			if ((bContinue && LoadProfile(NULL)) || InitializeGame(ghWnd))
 			{
 				++meta->routine;
 				// Fallthrough
@@ -649,16 +647,14 @@ void ModeAction(MainLoopMeta *meta)
 
 				if (swPlay % 2)
 				{
-					int tscRet = TextScriptProc(ModeReturn);
-					if (tscRet == 0)
+					switch (TextScriptProc(ModeReturn))
 					{
-						ExitMainLoop(0);
-						return;
-					}
-					if (tscRet == 2)
-					{
-						ExitMainLoop(1);
-						return;
+						case 0:
+							ExitMainLoop(0);
+							return;
+						case 2:
+							ExitMainLoop(1);
+							return;
 					}
 				}
 

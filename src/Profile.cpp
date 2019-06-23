@@ -258,7 +258,7 @@ BOOL LoadProfile(const char *name)
 	return TRUE;
 }
 
-BOOL InitializeGame()
+BOOL InitializeGame(HWND hWnd)
 {
 	InitMyChar();
 	gSelectedArms = 0;
@@ -271,25 +271,22 @@ BOOL InitializeGame()
 	InitFlags();
 	if (!TransferStage(13, 200, 10, 8))
 	{
-		// TODO - restore this when ghWnd is available
+		#if defined(NONPORTABLE) && defined(WINDOWS)
+			#ifdef JAPANESE
+			MessageBoxA(hWnd, "ステージの読み込みに失敗", "エラー", MB_OK);
+			#else
+			MessageBoxA(hWnd, "Failed to load stage", "Error", MB_OK);
+			#endif
+		#else
+			(void)hWnd;
 
-		/*
+			#ifdef JAPANESE
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", "ステージの読み込みに失敗", NULL);
+			#else
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Failed to load stage", NULL);
+			#endif
+		#endif
 
-#if defined(NONPORTABLE) && defined(WINDOWS)
-#ifdef JAPANESE
-		MessageBoxA(ghWnd, "ステージの読み込みに失敗", "エラー", MB_OK);
-#else
-		MessageBoxA(ghWnd, "Failed to load stage", "Error", MB_OK);
-#endif
-#else
-
-		*/
-#ifdef JAPANESE
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", "ステージの読み込みに失敗", NULL);
-#else
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Failed to load stage", NULL);
-#endif
-// #endif
 		return FALSE;
 	}
 

@@ -10,7 +10,7 @@
 
 void Call_Escape(MainLoopMeta *meta)
 {
-	int hWnd = *(int*)meta->user_data;
+	HWND hWnd = *(HWND*)meta->user_data;
 
 	RECT rc = {0, 128, 208, 144};
 

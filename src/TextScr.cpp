@@ -593,7 +593,7 @@ int TextScriptProc(void (*caller_return)(MainLoopMeta *meta, int return_value))
 	char c[3];
 	int w, x, y, z;
 	int i;
-	int length;
+	char str[72];
 
 	RECT rcSymbol = {64, 48, 72, 56};
 
@@ -729,13 +729,20 @@ int TextScriptProc(void (*caller_return)(MainLoopMeta *meta, int return_value))
 						y = GetTextScriptNo(gTS.p_read + 19);
 						if (!TransferStage(z, w, x, y))
 						{
-							#ifdef JAPANESE
-							SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", "ステージの読み込みに失敗", NULL);
+							#if defined(NONPORTABLE) && defined(WINDOWS)
+								#ifdef JAPANESE
+								MessageBoxA(ghWnd, "ステージの読み込みに失敗", "エラー", MB_OK);
+								#else
+								MessageBoxA(ghWnd, "Failed to load stage", "Error", MB_OK);
+								#endif
 							#else
-							SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Failed to load stage", NULL);
+								#ifdef JAPANESE
+								SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", "ステージの読み込みに失敗", NULL);
+								#else
+								SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Failed to load stage", NULL);
+								#endif
 							#endif
 
-							//MessageBoxA(ghWnd, "ステージの読み込みに失敗", "エラー", 0);
 							return 0;
 						}
 					}
@@ -977,7 +984,12 @@ int TextScriptProc(void (*caller_return)(MainLoopMeta *meta, int return_value))
 					}
 					else if (IS_COMMAND('S','P','S'))
 					{
+					#ifdef FIX_BUGS
+						SetNoise(2, 0);
+					#else
+						// x is not initialised. This bug isn't too bad, since that parameter's not used when the first one is set to 2, but still.
 						SetNoise(2, x);
+					#endif
 						gTS.p_read += 4;
 					}
 					else if (IS_COMMAND('C','P','S'))
@@ -1181,7 +1193,7 @@ int TextScriptProc(void (*caller_return)(MainLoopMeta *meta, int return_value))
 					}
 					else if (IS_COMMAND('I','N','I'))
 					{
-						InitializeGame();
+						InitializeGame(ghWnd);
 						gTS.p_read += 4;
 					}
 					else if (IS_COMMAND('S','V','P'))
@@ -1192,7 +1204,7 @@ int TextScriptProc(void (*caller_return)(MainLoopMeta *meta, int return_value))
 					else if (IS_COMMAND('L','D','P'))
 					{
 						if (!LoadProfile(NULL))
-							InitializeGame();
+							InitializeGame(ghWnd);
 					}
 					else if (IS_COMMAND('F','A','C'))
 					{
@@ -1204,7 +1216,7 @@ int TextScriptProc(void (*caller_return)(MainLoopMeta *meta, int return_value))
 						}
 						gTS.p_read += 8;
 					}
-					else if (IS_COMMAND('F','A','C'))
+					else if (IS_COMMAND('F','A','C'))	// Duplicate command
 					{
 						z = GetTextScriptNo(gTS.p_read + 4);
 						if (gTS.face != (signed char)z)
@@ -1267,14 +1279,20 @@ int TextScriptProc(void (*caller_return)(MainLoopMeta *meta, int return_value))
 					{
 						char str_0[0x40];
 						#ifdef JAPANESE
-						sprintf(str_0, "不明のコード:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);
-						SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", str_0, NULL);
+							sprintf(str_0, "不明のコード:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);
+							#if defined(NONPORTABLE) && defined(WINDOWS)
+								MessageBoxA(NULL, str_0, "エラー", MB_OK);
+							#else
+								SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", str_0, NULL);
+							#endif
 						#else
-						sprintf(str_0, "Unknown code:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);
-						SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", str_0, NULL);
+							sprintf(str_0, "Unknown code:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);
+							#if defined(NONPORTABLE) && defined(WINDOWS)
+								MessageBoxA(NULL, str_0, "Error", MB_OK);
+							#else
+								SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", str_0, NULL);
+							#endif
 						#endif
-
-						//MessageBoxA(0, str_0, "エラー", 0);
 
 						return 0;
 					}
@@ -1296,7 +1314,6 @@ int TextScriptProc(void (*caller_return)(MainLoopMeta *meta, int return_value))
 					else if (gTS.flags & 0x10)
 					{
 						//SAT/CAT/TUR printing
-						char str[72];
 						x = gTS.p_read;
 						//Break if reaches command, or new-line
 						while (gTS.data[x] != '<' && gTS.data[x] != '\r')
@@ -1309,9 +1326,9 @@ int TextScriptProc(void (*caller_return)(MainLoopMeta *meta, int return_value))
 						}
 
 						//Get text to copy
-						length = x - gTS.p_read;
-						memcpy(str, &gTS.data[gTS.p_read], length);
-						str[length] = 0;
+						y = x - gTS.p_read;
+						memcpy(str, &gTS.data[gTS.p_read], y);
+						str[y] = 0;
 
 						gTS.p_write = x;
 
@@ -1320,7 +1337,7 @@ int TextScriptProc(void (*caller_return)(MainLoopMeta *meta, int return_value))
 						sprintf(&text[gTS.line % 4 * 0x40], str);
 
 						//Check if should move to next line (prevent a memory overflow, come on guys, this isn't a leftover of pixel trying to make text wrapping)
-						gTS.p_read += length;
+						gTS.p_read += y;
 
 						if (gTS.p_write >= 35)
 							CheckNewLine();

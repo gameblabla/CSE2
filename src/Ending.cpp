@@ -451,7 +451,7 @@ static void Scene_DownIslandReturn(MainLoopMeta *meta, int return_value)
 }
 
 // Scene of the island falling
-int Scene_DownIsland(int hWnd, int mode)
+int Scene_DownIsland(HWND hWnd, int mode)
 {
 	// Setup background
 	RECT rc_frame = {(WINDOW_WIDTH - 160) / 2, (WINDOW_HEIGHT - 80) / 2, (WINDOW_WIDTH + 160) / 2, (WINDOW_HEIGHT + 80) / 2};

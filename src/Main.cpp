@@ -35,7 +35,7 @@ char gDataPath[PATH_LENGTH];
 
 int gJoystickButtonTable[8];
 
-int ghWnd;	// Placeholder until we restore the WinAPI code
+HWND ghWnd;	// Placeholder until we restore the WinAPI code
 BOOL gbUseJoystick = FALSE;
 BOOL bFps = FALSE;
 

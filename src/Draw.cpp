@@ -5,18 +5,6 @@
 #endif
 #include <string.h>
 
-#ifdef WINDOWS
-#define RECT WINRECT
-#define FindResource WinFindResource	// All these damn name collisions...
-#define DrawText WinDrawText
-#define LoadFont WinLoadFont
-#include <windows.h>
-#undef LoadFont
-#undef DrawText
-#undef FindResource
-#undef RECT
-#endif
-
 #ifdef __EMSCRIPTEN__
 #include "emscripten.h"
 #endif
@@ -53,7 +41,7 @@ FontObject *gFont;
 
 #define FRAMERATE 20
 
-BOOL Flip_SystemTask(int hWnd)
+BOOL Flip_SystemTask(HWND hWnd)
 {
 	(void)hWnd;
 

@@ -214,6 +214,7 @@ all: $(BUILD_DIRECTORY)/$(FILENAME) $(BUILD_DIRECTORY)/data
 	@echo Finished
 
 $(BUILD_DIRECTORY)/data: $(DATA_DIRECTORY)
+	@mkdir -p $(@D)
 	@rm -rf $(BUILD_DIRECTORY)/data
 	@cp -r $(DATA_DIRECTORY) $(BUILD_DIRECTORY)/data
 
@@ -244,7 +245,7 @@ obj/bin2h: bin2h/bin2h.c
 
 include $(wildcard $(DEPENDENCIES))
 
-obj/$(FILENAME)/win_icon.o: res/ICON/ICON.rc res/ICON/0.ico res/ICON/ICON_MINI.ico
+obj/$(FILENAME)/win_icon.o: $(ASSETS_DIRECTORY)/resources/ICON/ICON.rc $(ASSETS_DIRECTORY)/resources/ICON/0.ico $(ASSETS_DIRECTORY)/resources/ICON/ICON_MINI.ico
 	@mkdir -p $(@D)
 	@windres $< $@
 
