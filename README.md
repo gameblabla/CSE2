@@ -4,6 +4,8 @@ Cave Story Engine 2 is a decompilation of Cave Story, ported from DirectX to SDL
 
 ![Screenshot](screenshot.png)
 
+This branch allows the game to be compiled with [Emscripten](http://emscripten.org/), enabling it to be played in a browser. This requires fairly extensive (and messy) modifications to the engine, to remove its dependency on "mainloops" - the infinite loops games put themselves in so they can run indefinitely. It's because of this that Emscripten support is limited to this branch: it's just so invasive.
+
 ## Dependencies
 
 *Note: with CMake, if these are not found, they will be built locally*
@@ -22,6 +24,12 @@ In this folder, create another folder called 'build', then switch to the command
 
 ```
 cmake .. -DCMAKE_BUILD_TYPE=Release
+```
+
+Emscripten users should do this instead:
+
+```
+emcmake cmake .. -DCMAKE_BUILD_TYPE=Release
 ```
 
 You can also add the following flags:
@@ -44,7 +52,7 @@ Once built, the executables and assets can be found in the newly-generated `game
 
 *Note: this requires pkg-config*
 
-Run 'make' in this folder, preferably with some of the following settings:
+Run 'make' in this folder ('make -f Makefile.emscripten' for Emscripten builds), preferably with some of the following settings:
 
 * `RELEASE=1` - Compile a release build (optimised, stripped, etc.)
 * `STATIC=1` - Produce a statically-linked executable (good for Windows builds, so you don't need to bundle DLL files)
