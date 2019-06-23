@@ -214,17 +214,17 @@ $(BUILD_DIRECTORY)/$(FILENAME).html: $(BUILD_DIRECTORY)/$(FILENAME).bc $(ASSETS_
 $(BUILD_DIRECTORY)/$(FILENAME).bc: $(OBJECTS)
 	@mkdir -p $(@D)
 	@echo Linking $@
-	@$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -o $@ $(LIBS)
+	@emcc $(CXXFLAGS) $(LDFLAGS) $^ -o $@ $(LIBS)
 
 obj/$(FILENAME)/%.o: src/%.cpp
 	@mkdir -p $(@D)
 	@echo Compiling $<
-	@$(CXX) $(CXXFLAGS) $< -o $@ -c
+	@emcc $(CXXFLAGS) $< -o $@ -c
 
 obj/$(FILENAME)/Resource.o: src/Resource.cpp $(addprefix src/Resource/, $(addsuffix .h, $(RESOURCES)))
 	@mkdir -p $(@D)
 	@echo Compiling $<
-	@$(CXX) $(CXXFLAGS) $< -o $@ -c
+	@emcc $(CXXFLAGS) $< -o $@ -c
 
 src/Resource/%.h: $(ASSETS_DIRECTORY)/resources/% obj/bin2h
 	@mkdir -p $(@D)
