@@ -5,7 +5,7 @@ BUILD_DIRECTORY = game
 ASSETS_DIRECTORY = assets
 
 ifeq ($(RELEASE), 1)
-	CXXFLAGS = -O3 -flto
+	CXXFLAGS = -O3 -fno-rtti -fno-exceptions --llvm-lto 1
 	LDFLAGS = -s
 	FILENAME_DEF = CSE2
 else
@@ -209,7 +209,7 @@ all: $(BUILD_DIRECTORY)/$(FILENAME).html
 $(BUILD_DIRECTORY)/$(FILENAME).html: $(BUILD_DIRECTORY)/$(FILENAME).bc $(ASSETS_DIRECTORY)/emscripten/shell.html
 	@mkdir -p $(@D)
 	@echo Compiling bytecode
-	@emcc $< -s USE_SDL=2 -s USE_FREETYPE=1 --preload-file $(ASSETS_DIRECTORY)/emscripten/fps@/ --preload-file $(DATA_DIRECTORY)@/data --preload-file $(ASSETS_DIRECTORY)/emscripten/Config.dat@/ -o $@ -s ALLOW_MEMORY_GROWTH=1 --no-heap-copy -O3 --shell-file $(ASSETS_DIRECTORY)/emscripten/shell.html
+	@emcc $< $(CXXFLAGS) -s USE_SDL=2 -s USE_FREETYPE=1 --preload-file $(ASSETS_DIRECTORY)/emscripten/fps@/ --preload-file $(DATA_DIRECTORY)@/data --preload-file $(ASSETS_DIRECTORY)/emscripten/Config.dat@/ -o $@ -s ALLOW_MEMORY_GROWTH=1 --no-heap-copy --shell-file $(ASSETS_DIRECTORY)/emscripten/shell.html
 
 $(BUILD_DIRECTORY)/$(FILENAME).bc: $(OBJECTS)
 	@mkdir -p $(@D)
