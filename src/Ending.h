@@ -3,6 +3,14 @@
 #include "WindowsWrapper.h"
 
 #include "CommonDefines.h"
+#include "MainLoop.h"
+
+typedef struct Scene_DownIsland_Data
+{
+	HWND hWnd;
+	int mode;
+	void (*caller_return)(MainLoopMeta *meta, int return_value);
+} Scene_DownIsland_Data;
 
 struct CREDIT
 {
@@ -50,4 +58,4 @@ BOOL StartCreditScript();
 void ActionCredit();
 void SetCreditIllust(int a);
 void CutCreditIllust();
-int Scene_DownIsland(HWND hWnd, int mode);
+void Scene_DownIsland(MainLoopMeta *meta);

@@ -451,8 +451,10 @@ static void Scene_DownIslandReturn(MainLoopMeta *meta, int return_value)
 }
 
 // Scene of the island falling
-int Scene_DownIsland(HWND hWnd, int mode)
+void Scene_DownIsland(MainLoopMeta *meta)
 {
+	Scene_DownIsland_Data *data = (Scene_DownIsland_Data*)meta->user_data;
+
 	// Setup background
 	RECT rc_frame = {(WINDOW_WIDTH - 160) / 2, (WINDOW_HEIGHT - 80) / 2, (WINDOW_WIDTH + 160) / 2, (WINDOW_HEIGHT + 80) / 2};
 	RECT rc_sky = {0, 0, 160, 80};
@@ -461,66 +463,87 @@ int Scene_DownIsland(HWND hWnd, int mode)
 	// Setup island
 	RECT rc_sprite = {160, 0, 200, 24};
 
-	ISLAND_SPRITE sprite;
-	sprite.x = 0x15000;
-	sprite.y = 0x8000;
+	static ISLAND_SPRITE sprite;
+	static int wait;
 
-	for (int wait = 0; wait < 900; wait++)
+	switch (meta->routine)
 	{
-		// Get pressed keys
-		GetTrg();
+		case 0:
+			sprite.x = 0x15000;
+			sprite.y = 0x8000;
 
-		// Escape menu
-		if (gKey & 0x8000)
-		{
-			EnterMainLoop(Call_Escape, Scene_DownIslandReturn, &hWnd);
-			return 0;	// TODO
-		}
+			wait = 0;
 
-		switch (mode)
-		{
-			case 0:
-				// Move down
-				sprite.y += 0x33;
-				break;
+			++meta->routine;
+			// Fallthrough
+		case 1:
+			if (wait < 900)
+			{
+				// Get pressed keys
+				GetTrg();
 
-			case 1:
-				if (wait < 350)
+				// Escape menu
+				if (gKey & 0x8000)
 				{
-					// Move down at normal speed
-					sprite.y += 0x33;
-				}
-				else if (wait < 500)
-				{
-					// Move down slower
-					sprite.y += 0x19;
-				}
-				else if (wait < 600)
-				{
-					// Move down slow
-					sprite.y += 0xC;
-				}
-				else if (wait == 750)
-				{
-					// End scene
-					wait = 900;
+					EnterMainLoop(Call_Escape, Scene_DownIslandReturn, &data->hWnd);
+					return;
 				}
 
-				break;
-		}
+				switch (data->mode)
+				{
+					case 0:
+						// Move down
+						sprite.y += 0x33;
+						break;
 
-		// Draw scene
-		CortBox(&grcFull, 0);
-		PutBitmap3(&rc_frame, 80 + (WINDOW_WIDTH - 320) / 2, 80 + (WINDOW_HEIGHT - 240) / 2, &rc_sky, SURFACE_ID_LEVEL_SPRITESET_1);
-		PutBitmap3(&rc_frame, sprite.x / 0x200 - 20 + (WINDOW_WIDTH - 320) / 2, sprite.y / 512 - 12 + (WINDOW_HEIGHT - 240) / 2, &rc_sprite, SURFACE_ID_LEVEL_SPRITESET_1);
-		PutBitmap3(&rc_frame, 80 + (WINDOW_WIDTH - 320) / 2, 128 + (WINDOW_HEIGHT - 240) / 2, &rc_ground, SURFACE_ID_LEVEL_SPRITESET_1);
-		PutTimeCounter(16, 8);
+					case 1:
+						if (wait < 350)
+						{
+							// Move down at normal speed
+							sprite.y += 0x33;
+						}
+						else if (wait < 500)
+						{
+							// Move down slower
+							sprite.y += 0x19;
+						}
+						else if (wait < 600)
+						{
+							// Move down slow
+							sprite.y += 0xC;
+						}
+						else if (wait == 750)
+						{
+							// End scene
+							wait = 900;
+						}
 
-		// Draw window
-		PutFramePerSecound();
-		if (!Flip_SystemTask(hWnd))
-			return 0;
+						break;
+				}
+
+				// Draw scene
+				CortBox(&grcFull, 0);
+				PutBitmap3(&rc_frame, 80 + (WINDOW_WIDTH - 320) / 2, 80 + (WINDOW_HEIGHT - 240) / 2, &rc_sky, SURFACE_ID_LEVEL_SPRITESET_1);
+				PutBitmap3(&rc_frame, sprite.x / 0x200 - 20 + (WINDOW_WIDTH - 320) / 2, sprite.y / 512 - 12 + (WINDOW_HEIGHT - 240) / 2, &rc_sprite, SURFACE_ID_LEVEL_SPRITESET_1);
+				PutBitmap3(&rc_frame, 80 + (WINDOW_WIDTH - 320) / 2, 128 + (WINDOW_HEIGHT - 240) / 2, &rc_ground, SURFACE_ID_LEVEL_SPRITESET_1);
+				PutTimeCounter(16, 8);
+
+				// Draw window
+				PutFramePerSecound();
+				if (!Flip_SystemTask(data->hWnd))
+				{
+					ExitMainLoop(0);
+					return;
+				}
+
+				++wait;
+			}
+			else
+			{
+				ExitMainLoop(1);
+				return;
+			}
+
+			break;
 	}
-
-	return 1;
 }

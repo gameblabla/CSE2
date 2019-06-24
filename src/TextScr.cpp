@@ -551,7 +551,7 @@ void PutTextScript()
 	}
 }
 
-static void TextScriptProcReturn(MainLoopMeta *meta, int return_value)
+static void Return_MiniMapLoop(MainLoopMeta *meta, int return_value)
 {
 	void (*caller_return)(MainLoopMeta *meta, int return_value) = (void (*)(MainLoopMeta *meta, int return_value))meta->user_data;
 
@@ -566,7 +566,8 @@ static void TextScriptProcReturn(MainLoopMeta *meta, int return_value)
 			return;
 	}
 }
-static void TextScriptProcReturn_StageSelectLoop(MainLoopMeta *meta, int return_value)
+
+static void Return_StageSelectLoop(MainLoopMeta *meta, int return_value)
 {
 	StageSelectLoop_Data *data = (StageSelectLoop_Data*)meta->user_data;
 
@@ -578,6 +579,22 @@ static void TextScriptProcReturn_StageSelectLoop(MainLoopMeta *meta, int return_
 
 		case 1:
 			JumpTextScript(data->event);
+			return;
+
+		case 2:
+			data->caller_return(meta->next, 2);
+			return;
+	}
+}
+
+static void Return_Scene_DownIsland(MainLoopMeta *meta, int return_value)
+{
+	Scene_DownIsland_Data *data = (Scene_DownIsland_Data*)meta->user_data;
+
+	switch (return_value)
+	{
+		case 0:
+			data->caller_return(meta->next, 0);
 			return;
 
 		case 2:
@@ -1076,7 +1093,7 @@ int TextScriptProc(void (*caller_return)(MainLoopMeta *meta, int return_value))
 						gTS.p_read += 4;
 						bExit = TRUE;
 
-						EnterMainLoop(MiniMapLoop, TextScriptProcReturn, (void*)caller_return);
+						EnterMainLoop(MiniMapLoop, Return_MiniMapLoop, (void*)caller_return);
 					}
 					else if (IS_COMMAND('S','L','P'))
 					{
@@ -1084,7 +1101,7 @@ int TextScriptProc(void (*caller_return)(MainLoopMeta *meta, int return_value))
 
 						static StageSelectLoop_Data data = {0, caller_return};
 
-						EnterMainLoop(StageSelectLoop, TextScriptProcReturn_StageSelectLoop, &data);
+						EnterMainLoop(StageSelectLoop, Return_StageSelectLoop, &data);
 
 						g_GameFlags &= ~3;
 					}
@@ -1261,13 +1278,9 @@ int TextScriptProc(void (*caller_return)(MainLoopMeta *meta, int return_value))
 						bExit = TRUE;
 						z = GetTextScriptNo(gTS.p_read + 4);
 
-						switch (Scene_DownIsland(ghWnd, z))
-						{
-							case 0:
-								return 0;
-							case 2:
-								return 2;
-						}
+						static Scene_DownIsland_Data data = {ghWnd, z, caller_return};
+
+						EnterMainLoop(Scene_DownIsland, Return_Scene_DownIsland, &data);
 
 						gTS.p_read += 8;
 					}
