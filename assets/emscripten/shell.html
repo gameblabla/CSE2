@@ -42,13 +42,25 @@
         from {transform: rotate(0deg);}
         to {transform: rotate(360deg);}
       }
+
+  .content {
+    padding-left:20%;
+    padding-right:20%;
+  }
+
+@media screen and (max-width: 900px) {
+  .content {
+    padding-left:0%;
+    padding-right:0%;
+  }
+}
     </style>
   </head>
   <body>
    <!--
    <hr/>
    -->
-    <h1 style="font-family:sans-serif;text-align:center;">Clownacy ruins everything</h1>
+    <h1 style="font-family:sans-serif;text-align:center;">Cave Story Emscripten port</h1>
     <figure style="overflow:visible;" id="spinner"><div class="spinner"></div><center style="margin-top:0.5em"><strong>emscripten</strong></center></figure>
     <div class="emscripten" id="status">Downloading...</div>
     <div class="emscripten">
@@ -71,6 +83,20 @@
     <textarea class="emscripten" id="output" rows="8"></textarea>
     <hr>
     -->
+	<br/>
+    <div class='content' style='text-align:center;'>
+		<strong>You need a powerful device for this to run at full speed.</strong>
+		<p>
+			Emscripten is annoying to port things to: one of its biggest limitations is that you can't use any mainloops
+			(the infinite loops a game puts itself in so it runs indefinitely), but Cave Story's engine *heavily* relies
+			on them. On the upside, Emscripten supports SDL2, so I didn't have to rewrite any of the existing backend code.
+		</p>
+		<p>
+			If you're new here, this port is based on CSE2 - the Cave Story decompilation project.
+			<a href='https://github.com/Clownacy/Cave-Story-Engine-2/tree/emscripten'>You can find the source code for
+			this port here.</a>
+		</p>
+    </div>
     <script type='text/javascript'>
       var statusElement = document.getElementById('status');
       var progressElement = document.getElementById('progress');
