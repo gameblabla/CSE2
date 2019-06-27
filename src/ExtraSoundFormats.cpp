@@ -95,7 +95,6 @@ void ExtraSound_LoadMusic(const char *path, bool loop)
 	{
 		song.sound = Mixer_LoadSound(path, false);
 		song.instance = Mixer_PlaySound(song.sound, loop);
-		Mixer_SetSoundVolume(song.instance, 0.75f);
 		Mixer_UnpauseSound(song.instance);
 		song.valid = true;
 	}
