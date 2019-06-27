@@ -1,5 +1,7 @@
 #include "MycParam.h"
 
+#include <stdio.h>
+
 #include "SDL.h"
 
 #include "WindowsWrapper.h"

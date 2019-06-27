@@ -7,7 +7,6 @@
 #include "CommonDefines.h"
 #include "Draw.h"
 #include "Escape.h"
-#include "Game.h"
 #include "KeyControl.h"
 #include "Main.h"
 #include "Map.h"

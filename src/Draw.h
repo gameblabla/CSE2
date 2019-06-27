@@ -14,7 +14,7 @@ extern RECT grcGame;
 extern RECT grcFull;
 
 extern int magnification;
-extern bool fullscreen;
+extern BOOL fullscreen;
 
 typedef enum Surface_Ids
 {
@@ -56,7 +56,7 @@ struct SURFACE;
 
 extern SURFACE surf[SURFACE_ID_MAX];
 
-BOOL Flip_SystemTask(int hWnd);
+BOOL Flip_SystemTask(HWND hWnd);
 BOOL StartDirectDraw(int lMagnification, int lColourDepth);
 void EndDirectDraw();
 void ReleaseSurface(int s);

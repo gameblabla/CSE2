@@ -6,6 +6,7 @@
 #include "Frame.h"
 #include "Game.h"
 #include "MyChar.h"
+#include "NpChar.h"
 #include "Sound.h"
 
 void ActBossChar_Ironhead(void)

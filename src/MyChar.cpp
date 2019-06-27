@@ -201,14 +201,14 @@ void PutMyChar(int fx, int fy)
 	if (gMC.direct == 0)
 		PutBitmap3(
 			&grcGame,
-			SubpixelToScreenCoord(gMC.x - gMC.view.left) - SubpixelToScreenCoord(fx) - PixelToScreenCoord(8),
+			SubpixelToScreenCoord(gMC.x - gMC.view.front) - SubpixelToScreenCoord(fx) - PixelToScreenCoord(8),
 			SubpixelToScreenCoord(gMC.y - gMC.view.top) - SubpixelToScreenCoord(fy) + PixelToScreenCoord(arms_offset_y),
 			&gMC.rect_arms,
 			SURFACE_ID_ARMS);
 	else
 		PutBitmap3(
 			&grcGame,
-			SubpixelToScreenCoord(gMC.x - gMC.view.left) - SubpixelToScreenCoord(fx),
+			SubpixelToScreenCoord(gMC.x - gMC.view.front) - SubpixelToScreenCoord(fx),
 			SubpixelToScreenCoord(gMC.y - gMC.view.top) - SubpixelToScreenCoord(fy) + PixelToScreenCoord(arms_offset_y),
 			&gMC.rect_arms,
 			SURFACE_ID_ARMS);
@@ -224,7 +224,7 @@ void PutMyChar(int fx, int fy)
 		rect.bottom += 32;
 	}
 
-	PutBitmap3(&grcGame, SubpixelToScreenCoord(gMC.x - gMC.view.left) - SubpixelToScreenCoord(fx), SubpixelToScreenCoord(gMC.y - gMC.view.top) - SubpixelToScreenCoord(fy), &rect, SURFACE_ID_MY_CHAR);
+	PutBitmap3(&grcGame, SubpixelToScreenCoord(gMC.x - gMC.view.front) - SubpixelToScreenCoord(fx), SubpixelToScreenCoord(gMC.y - gMC.view.top) - SubpixelToScreenCoord(fy), &rect, SURFACE_ID_MY_CHAR);
 
 	// Draw air tank
 	RECT rcBubble[2] = {

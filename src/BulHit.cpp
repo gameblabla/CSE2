@@ -1,13 +1,9 @@
 #include "BulHit.h"
 
-#include <stdio.h>
-#include <string.h>
-
 #include "Bullet.h"
 #include "Caret.h"
 #include "Game.h"
 #include "Map.h"
-#include "MyChar.h"
 #include "NpChar.h"
 #include "Sound.h"
 

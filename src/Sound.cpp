@@ -1,12 +1,16 @@
+// Some of the original source code for this file can be found here:
+// https://github.com/shbow/organya/blob/master/source/Sound.cpp
+
 #include "Sound.h"
 
-#include <algorithm>
-#include <cmath>
+#include <math.h>
 #include <stdio.h>
-#include <string>
-#include <cstring>
+#include <stdlib.h>
+#include <string.h>
 
-#include <SDL.h>
+#include "SDL.h"
+
+#include "WindowsWrapper.h"
 
 #include "Organya.h"
 #ifdef EXTRA_SOUND_FORMATS
@@ -17,9 +21,9 @@
 #define FREQUENCY 44100
 
 #ifdef RASPBERRY_PI
-#define STREAM_SIZE 0x400
+#define STREAM_SIZE 0x400	// Larger buffer to prevent stutter
 #else
-#define STREAM_SIZE (FREQUENCY / 200)
+#define STREAM_SIZE 0x100	// FREQUENCY/200 rounded to the nearest power of 2 (SDL2 *needs* a power-of-2 buffer size)
 #endif
 
 #define clamp(x, y, z) (((x) > (z)) ? (z) : ((x) < (y)) ? (y) : (x))
@@ -171,7 +175,7 @@ void SOUNDBUFFER::Mix(float *buffer, size_t frames)
 		const float sample2 = ((looping || (((size_t)samplePosition) + 1) < size) ? data[(((size_t)samplePosition) + 1) % size] : 128.0f);
 
 		//Interpolate sample
-		const float subPos = (float)std::fmod(samplePosition, 1.0);
+		const float subPos = (float)fmod(samplePosition, 1.0);
 		const float sampleA = sample1 + (sample2 - sample1) * subPos;
 
 		//Convert sample to float32
@@ -188,7 +192,7 @@ void SOUNDBUFFER::Mix(float *buffer, size_t frames)
 		{
 			if (looping)
 			{
-				samplePosition = std::fmod(samplePosition, size);
+				samplePosition = fmod(samplePosition, size);
 				looped = true;
 			}
 			else
@@ -226,7 +230,7 @@ void AudioCallback(void *userdata, Uint8 *stream, int len)
 //Sound things
 SOUNDBUFFER* lpSECONDARYBUFFER[SOUND_NO];
 
-bool InitDirectSound()
+BOOL InitDirectSound()
 {
 #ifdef EXTRA_SOUND_FORMATS
 	ExtraSound_Init(FREQUENCY);
@@ -251,7 +255,7 @@ bool InitDirectSound()
 	if (audioDevice == 0)
 	{
 		printf("Failed to open audio device\nSDL Error: %s\n", SDL_GetError());
-		return false;
+		return FALSE;
 	}
 
 	//Unpause audio device
@@ -259,7 +263,7 @@ bool InitDirectSound()
 
 	//Start organya
 	StartOrganya();
-	return true;
+	return TRUE;
 }
 
 void EndDirectSound()

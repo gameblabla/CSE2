@@ -1,5 +1,7 @@
 #include "Shoot.h"
 
+#include "WindowsWrapper.h"
+
 #include "ArmsItem.h"
 #include "Bullet.h"
 #include "Caret.h"
@@ -1039,7 +1041,7 @@ void ShootBullet()
 		--empty;
 
 	//Only let the player shoot every 4 frames
-	static int soft_rensha;
+	static int soft_rensha;	// 'rensha' is Japanese for 'rapid-fire', apparently
 	if (soft_rensha)
 		--soft_rensha;
 

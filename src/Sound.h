@@ -2,6 +2,8 @@
 
 #include <stddef.h>
 
+#include "WindowsWrapper.h"
+
 #include "PixTone.h"
 
 class SOUNDBUFFER
@@ -91,7 +93,7 @@ enum MUSIC_IDS
 #define SOUND_NO 0x100
 extern SOUNDBUFFER* lpSECONDARYBUFFER[SOUND_NO];
 
-bool InitDirectSound();
+BOOL InitDirectSound();
 void EndDirectSound();
 void PlaySoundObject(int no, int mode);
 void ChangeSoundFrequency(int no, unsigned long rate);

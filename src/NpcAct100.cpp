@@ -2,7 +2,6 @@
 
 #include "WindowsWrapper.h"
 
-#include "Back.h"
 #include "Bullet.h"
 #include "Caret.h"
 #include "Frame.h"
@@ -10,7 +9,6 @@
 #include "MyChar.h"
 #include "NpChar.h"
 #include "Sound.h"
-#include "Triangle.h"
 
 // Grate
 void ActNpc100(NPCHAR *npc)

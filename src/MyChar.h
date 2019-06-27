@@ -21,8 +21,20 @@ struct MYCHAR
 	int ym;
 	int ani_wait;
 	int ani_no;
-	RECT hit;
-	RECT view;
+	struct
+	{
+		int front;
+		int top;
+		int back;
+		int bottom;
+	} hit;
+	struct
+	{
+		int front;
+		int top;
+		int back;
+		int bottom;
+	} view;
 	RECT rect;
 	RECT rect_arms;
 	int level;

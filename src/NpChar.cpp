@@ -67,7 +67,7 @@ BOOL LoadEvent(const char *path_event)
 	if (fp == NULL)
 		return FALSE;
 
-	//Read "PXE" check
+	// Read "PXE" check
 	char code[4];
 	fread(code, 1, 4, fp);
 	if (memcmp(code, gPassPixEve, 3))
@@ -79,20 +79,20 @@ BOOL LoadEvent(const char *path_event)
 		return FALSE;
 	}
 
-	//Get amount of NPCs
+	// Get amount of NPCs
 #ifdef NONPORTABLE
 	fread(&count, 4, 1, fp);
 #else
 	count = File_ReadLE32(fp);
 #endif
 
-	//Load NPCs
+	// Load NPCs
 	memset(gNPC, 0, sizeof(gNPC));
 
 	n = 170;
 	for (i = 0; i < count; i++)
 	{
-		//Get data from file
+		// Get data from file
 #ifdef NONPORTABLE
 		fread(&eve, sizeof(EVENT), 1, fp);
 #else
@@ -104,7 +104,7 @@ BOOL LoadEvent(const char *path_event)
 		eve.bits = File_ReadLE16(fp);
 #endif
 
-		//Set NPC parameters
+		// Set NPC parameters
 		gNPC[n].direct = (eve.bits & npc_altDir) ? 2 : 0;
 		gNPC[n].code_char = eve.code_char;
 		gNPC[n].code_event = eve.code_event;
@@ -116,7 +116,7 @@ BOOL LoadEvent(const char *path_event)
 		gNPC[n].exp = gNpcTable[gNPC[n].code_char].exp;
 		SetUniqueParameter(&gNPC[n]);
 
-		//Check flags
+		// Check flags
 		if (gNPC[n].bits & npc_appearSet)
 		{
 			if (GetNPCFlag(gNPC[n].code_flag) == TRUE)
@@ -132,7 +132,7 @@ BOOL LoadEvent(const char *path_event)
 			gNPC[n].cond = 0x80;
 		}
 
-		//Increase index
+		// Increase index
 		n++;
 	}
 
@@ -149,7 +149,7 @@ void SetNpChar(int code_char, int x, int y, int xm, int ym, int dir, NPCHAR *npc
 	if (n == NPC_MAX)
 		return;
 
-	//Set NPC parameters
+	// Set NPC parameters
 	memset(&gNPC[n], 0, sizeof(NPCHAR));
 	gNPC[n].cond |= 0x80u;
 	gNPC[n].direct = dir;
@@ -166,7 +166,7 @@ void SetNpChar(int code_char, int x, int y, int xm, int ym, int dir, NPCHAR *npc
 
 void SetDestroyNpChar(int x, int y, int w, int num)
 {
-	//Create smoke
+	// Create smoke
 	w /= 0x200;
 	for (int i = 0; i < num; i++)
 	{
@@ -175,13 +175,13 @@ void SetDestroyNpChar(int x, int y, int w, int num)
 		SetNpChar(4, x + offset_x, y + offset_y, 0, 0, 0, NULL, 0x100);
 	}
 
-	//Flash effect
+	// Flash effect
 	SetCaret(x, y, 12, 0);
 }
 
 void SetDestroyNpCharUp(int x, int y, int w, int num)
 {
-	//Create smoke
+	// Create smoke
 	w /= 0x200;
 	for (int i = 0; i < num; i++)
 	{
@@ -190,7 +190,7 @@ void SetDestroyNpCharUp(int x, int y, int w, int num)
 		SetNpChar(4, x + offset_x, y + offset_y, 0, 0, 1, NULL, 0x100);
 	}
 
-	//Flash effect
+	// Flash effect
 	SetCaret(x, y, 12, 0);
 }
 
@@ -251,9 +251,11 @@ BOOL SetBulletObject(int x, int y, int val)
 			case 5:
 				tamakazu_ari[t++] = 0;
 				break;
+
 			case 10:
 				tamakazu_ari[t++] = 1;
 				break;
+
 			default:
 				tamakazu_ari[t] = 0;
 				break;
@@ -601,9 +603,11 @@ void DeleteNpCharCode(int code, BOOL bSmoke)
 					case 1:
 						SetDestroyNpChar(gNPC[n].x, gNPC[n].y, gNPC[n].view.back, 4);
 						break;
+
 					case 2:
 						SetDestroyNpChar(gNPC[n].x, gNPC[n].y, gNPC[n].view.back, 8);
 						break;
+
 					case 3:
 						SetDestroyNpChar(gNPC[n].x, gNPC[n].y, gNPC[n].view.back, 16);
 						break;
