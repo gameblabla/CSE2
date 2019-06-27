@@ -1347,7 +1347,11 @@ int TextScriptProc(void (*caller_return)(MainLoopMeta *meta, int return_value))
 
 						//Print text
 						PutText2(0, 0, str, RGB(0xFF, 0xFF, 0xFE), (Surface_Ids)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
-						sprintf(&text[gTS.line % 4 * 0x40], str);
+					#ifdef FIX_BUGS
+						strcpy(&text[gTS.line % 4 * 0x40], str);
+					#else
+						sprintf(&text[gTS.line % 4 * 0x40], str);	// No point to using an sprintf here, and it makes Clang mad
+					#endif
 
 						//Check if should move to next line (prevent a memory overflow, come on guys, this isn't a leftover of pixel trying to make text wrapping)
 						gTS.p_read += y;

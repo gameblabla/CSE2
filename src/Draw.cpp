@@ -403,7 +403,7 @@ BOOL ReloadBitmap_Resource(const char *res, Surface_Ids surf_no)
 
 static SDL_Rect RectToSDLRect(RECT *rect)
 {
-	SDL_Rect SDLRect = {rect->left, rect->top, rect->right - rect->left, rect->bottom - rect->top};
+	SDL_Rect SDLRect = {(int)rect->left, (int)rect->top, (int)(rect->right - rect->left), (int)(rect->bottom - rect->top)};
 	if (SDLRect.w < 0)
 		SDLRect.w = 0;
 	if (SDLRect.h < 0)
@@ -483,7 +483,7 @@ void PutBitmap4(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_no) // 
 void Surface2Surface(int x, int y, RECT *rect, int to, int from)
 {
 	// Get rects
-	SDL_Rect rcSet = {x * magnification, y * magnification, (rect->right - rect->left) * magnification, (rect->bottom - rect->top) * magnification};
+	SDL_Rect rcSet = {x * magnification, y * magnification, (int)(rect->right - rect->left) * magnification, (int)(rect->bottom - rect->top) * magnification};
 	SDL_Rect frameRect = RectToSDLRectScaled(rect);
 
 	SDL_BlitSurface(surf[from].surface, &frameRect, surf[to].surface, &rcSet);
