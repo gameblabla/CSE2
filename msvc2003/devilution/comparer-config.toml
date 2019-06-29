@@ -560,6 +560,10 @@ name = "LoadGenericData"
 addr = 0x411390
 
 [[func]]
+name = "GetTrg"
+addr = 0x4122E0
+
+[[func]]
 name = "InitMapData2"
 addr = 0x413750
 
