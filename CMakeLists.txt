@@ -249,6 +249,7 @@ if(WIN32)
 	target_sources(CSE2 PRIVATE "${ASSETS_DIRECTORY}/resources/ICON/ICON.rc")
 	target_compile_definitions(CSE2 PRIVATE WINDOWS)
 	set_target_properties(CSE2 PROPERTIES WIN32_EXECUTABLE YES)	# Disable the console window
+	target_link_libraries(CSE2 "version.lib")	# Link this for some code in Generic.cpp
 else()
 	list(APPEND RESOURCES "ICON/ICON_MINI.bmp")
 endif()

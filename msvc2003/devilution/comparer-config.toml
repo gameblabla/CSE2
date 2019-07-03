@@ -580,6 +580,50 @@ name = "ModeAction"
 addr = 0x410400
 
 [[func]]
+name = "GetCompileDate"
+addr = 0x4108B0
+
+[[func]]
+name = "GetCompileVersion"
+addr = 0x410990
+
+[[func]]
+name = "OpenVolumeConfiguration"
+addr = 0x410AB0
+
+[[func]]
+name = "DeleteDebugLog"
+addr = 0x410BC0
+
+[[func]]
+name = "PrintDebugLog"
+addr = 0x410C10
+
+[[func]]
+name = "CheckTime"
+addr = 0x410CA0
+
+[[func]]
+name = "CheckFileExists"
+addr = 0x410D10
+
+[[func]]
+name = "GetFileSizeLong"
+addr = 0x410D80
+
+[[func]]
+name = "PrintBitmapError"
+addr = 0x410DE0
+
+[[func]]
+name = "IsShiftJIS"
+addr = 0x410E90
+
+[[func]]
+name = "IsEnableBitmap"
+addr = 0x4112E0
+
+[[func]]
 name = "LoadGenericData"
 addr = 0x411390
 

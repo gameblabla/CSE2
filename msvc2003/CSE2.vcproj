@@ -34,7 +34,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="SDL2/lib/SDL2.lib SDL2/lib/SDL2main.lib freetype/lib/freetype.lib"
+				AdditionalDependencies="SDL2/lib/SDL2.lib SDL2/lib/SDL2main.lib freetype/lib/freetype.lib Version.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
@@ -85,7 +85,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="SDL2/lib/SDL2.lib SDL2/lib/SDL2main.lib freetype/lib/freetype.lib"
+				AdditionalDependencies="SDL2/lib/SDL2.lib SDL2/lib/SDL2main.lib freetype/lib/freetype.lib Version.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
 				IgnoreAllDefaultLibraries="FALSE"
@@ -135,7 +135,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="SDL2/lib/SDL2.lib SDL2/lib/SDL2main.lib freetype/lib/freetype.lib"
+				AdditionalDependencies="SDL2/lib/SDL2.lib SDL2/lib/SDL2main.lib freetype/lib/freetype.lib Version.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
 				IgnoreAllDefaultLibraries="FALSE"
@@ -186,7 +186,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="SDL2/lib/SDL2.lib SDL2/lib/SDL2main.lib freetype/lib/freetype.lib"
+				AdditionalDependencies="SDL2/lib/SDL2.lib SDL2/lib/SDL2main.lib freetype/lib/freetype.lib Version.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
