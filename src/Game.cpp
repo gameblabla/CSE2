@@ -559,6 +559,10 @@ int ModeAction(HWND hWnd)
 			ActBullet();
 			ActCaret();
 			MoveFrame3();
+#ifdef FIX_BUGS
+			// ActFlash uses frame_x and frame_y uninitialised
+			GetFramePosition(&frame_x, &frame_y);
+#endif
 			ActFlash(frame_x, frame_y);
 
 			if (g_GameFlags & 2)
