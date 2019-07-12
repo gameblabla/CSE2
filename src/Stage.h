@@ -4,12 +4,12 @@
 
 struct STAGE_TABLE
 {
-	char parts[0x10];
-	char map[0x10];
-	char bkType;
-	char back[0x10];
-	char npc[0x10];
-	char boss[0x10];
+	char parts[0x20];
+	char map[0x20];
+	int bkType;
+	char back[0x20];
+	char npc[0x20];
+	char boss[0x20];
 	signed char boss_no;
 	char name[0x22];
 };
@@ -17,7 +17,7 @@ struct STAGE_TABLE
 extern int gStageNo;
 extern int gMusicNo;
 
-BOOL LoadStageTable(const char *path);
+BOOL LoadStageTable();
 BOOL TransferStage(int no, int w, int x, int y);
 void ChangeMusic(int no);
 void ReCallMusic();

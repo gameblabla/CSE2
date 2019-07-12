@@ -135,20 +135,68 @@ static const STAGE_TABLE gTMTDefault[95] = {
 
 static const STAGE_TABLE *gTMT = gTMTDefault;
 
-BOOL LoadStageTable(const char *path)
+BOOL LoadStageTable()
 {
-	BOOL success = FALSE;
+	char path[PATH_LENGTH];
 
 	unsigned char *file_buffer;
-	const long file_size = LoadFileToMemory(path, &file_buffer);
+	long file_size;
 
-	if (file_size != -1 && file_size >= 4)
+	// Try to load stage.tbl
+	sprintf(path, "%s/stage.tbl", gDataPath);
+	file_size = LoadFileToMemory(path, &file_buffer);
+
+	if (file_size != -1)
+	{
+		const long entry_count = file_size / 0xE5;
+
+		STAGE_TABLE *pTMT = (STAGE_TABLE*)malloc(entry_count * sizeof(STAGE_TABLE));
+
+		if (pTMT == NULL)
+		{
+			free(file_buffer);
+		}
+		else
+		{
+			for (long i = 0; i < entry_count; ++i)
+			{
+				unsigned char *entry = file_buffer + i * 0xE5;
+
+				memcpy(pTMT[i].parts, entry, 0x20);
+				memcpy(pTMT[i].map, entry + 0x20, 0x20);
+				pTMT[i].bkType = (entry[0x40 + 3] << 24) | (entry[0x40 + 2] << 16) | (entry[0x40 + 1] << 8) | entry[0x40];
+				memcpy(pTMT[i].back, entry + 0x44, 0x20);
+				memcpy(pTMT[i].npc, entry + 0x64, 0x20);
+				memcpy(pTMT[i].boss, entry + 0x84, 0x20);
+				pTMT[i].boss_no = entry[0xA4];
+#ifdef JAPANESE
+				memcpy(pTMT[i].name, entry + 0xA5, 0x20);
+#else
+				memcpy(pTMT[i].name, entry + 0xC5, 0x20);
+#endif
+			}
+
+			gTMT = pTMT;
+			free(file_buffer);
+			return TRUE;
+		}
+	}
+
+	// Try to load mrmap.bin
+	sprintf(path, "%s/mrmap.bin", gDataPath);
+	file_size = LoadFileToMemory(path, &file_buffer);
+
+	if (file_size != -1)
 	{
 		const long entry_count = file_buffer[0] | (file_buffer[1] << 8) | (file_buffer[2] << 16) | (file_buffer[3] << 24);
 
 		STAGE_TABLE *pTMT = (STAGE_TABLE*)malloc(entry_count * sizeof(STAGE_TABLE));
 
-		if (pTMT != NULL)
+		if (pTMT == NULL)
+		{
+			free(file_buffer);
+		}
+		else
 		{
 			for (long i = 0; i < entry_count; ++i)
 			{
@@ -167,16 +215,14 @@ BOOL LoadStageTable(const char *path)
 			}
 
 			gTMT = pTMT;
-			success = TRUE;
+			free(file_buffer);
+			return TRUE;
 		}
 
-		free(file_buffer);
 	}
 
-	if (success == FALSE)
-		printf("Failed to load mrmap.bin\n");
-
-	return success;
+	printf("Failed to load stage.tbl/mrmap.bin\n");
+	return FALSE;
 }
 
 BOOL TransferStage(int no, int w, int x, int y)

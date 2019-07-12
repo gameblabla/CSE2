@@ -698,8 +698,7 @@ BOOL Game(HWND hWnd)
 		return FALSE;
 	}
 
-	sprintf(path, "%s/mrmap.bin", gDataPath);
-	LoadStageTable(path);
+	LoadStageTable();
 
 	InitTextScript2();
 	InitSkipFlags();

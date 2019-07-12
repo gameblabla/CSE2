@@ -18,25 +18,52 @@ BACK gBack;
 int gWaterY;
 static unsigned long color_black;
 
+static BOOL GetBackSizes(const char *fName, int *width, int *height)
+{
+	FILE *fp;
+	char path[PATH_LENGTH];
+
+	// Try .pbm/.bmp
+	sprintf(path, "%s/%s.pbm", gDataPath, fName);
+	fp = fopen(path, "rb");
+	if (fp == NULL)
+	{
+		sprintf(path, "%s/%s.bmp", gDataPath, fName);
+		fp = fopen(path, "rb");
+	}
+
+	if (fp != NULL)
+	{
+		fseek(fp, 0x12, SEEK_SET);
+		*width = File_ReadLE32(fp);
+		*height = File_ReadLE32(fp);
+		fclose(fp);
+		return TRUE;
+	}
+
+	// Now .png
+	sprintf(path, "%s/%s.png", gDataPath, fName);
+	fp = fopen(path, "rb");
+	if (fp != NULL)
+	{
+		fseek(fp, 0x10, SEEK_SET);
+		*width = File_ReadBE32(fp);
+		*height = File_ReadBE32(fp);
+		fclose(fp);
+		return TRUE;
+	}
+
+	return FALSE;
+}
+
 BOOL InitBack(const char *fName, int type)
 {
 	// Unused, hilariously
 	color_black = GetCortBoxColor(RGB(0, 0, 0x10));
 
 	// Get width and height
-	char path[PATH_LENGTH];
-	sprintf(path, "%s/%s.png", gDataPath, fName);
-
-	FILE *fp = fopen(path, "rb");
-
-	if (fp == NULL)
+	if (!GetBackSizes(fName, &gBack.partsW, &gBack.partsH))
 		return FALSE;
-
-	fseek(fp, 0x10, SEEK_SET);
-	gBack.partsW = File_ReadBE32(fp);
-	gBack.partsH = File_ReadBE32(fp);
-
-	fclose(fp);
 
 	// Set background stuff and load texture
 	gBack.flag = 1;
