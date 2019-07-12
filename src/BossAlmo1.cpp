@@ -110,15 +110,14 @@ static void ActBossChar_Core_Tail(NPCHAR *npc)
 
 static void ActBossChar_Core_Mini(NPCHAR *npc)
 {
-	unsigned char deg;
-	int ym;
-	int xm;
-
 	RECT rect[3] = {
 		{256, 0, 320, 40},
 		{256, 40, 320, 80},
 		{256, 80, 320, 120},
 	};
+
+	int xm, ym;
+	unsigned char deg;
 
 	npc->life = 1000;
 
@@ -242,16 +241,13 @@ static void ActBossChar_Core_Hit(NPCHAR *npc)
 
 void ActBossChar_Core(void)
 {
-	unsigned char deg;
-	int ym;
-	int xm;
-	int i;
-
-	static unsigned char flash;
-
 	NPCHAR *npc = gBoss;
 
+	static unsigned char flash;
 	BOOL bShock = FALSE;
+	int i;
+	unsigned char deg;
+	int xm, ym;
 
 	switch (npc->act_no)
 	{

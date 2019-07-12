@@ -238,52 +238,59 @@ void SetExpObjects(int x, int y, int exp)
 
 BOOL SetBulletObject(int x, int y, int val)
 {
-	int t = 0;
-	int bullet_no;
-	int tamakazu_ari[10];
 	int n;
+	int bullet_no;	// The Linux debug data claims there's a 3-line gap between this and the next variable declaration. Just enough space for an 'if' statement.
 
-	memset(tamakazu_ari, 0, sizeof(tamakazu_ari));
-	for (n = 0; n < 8; ++n)
-	{
-		switch (gArmsData[n].code)
+	// if (/* unknown */)
+	{	// This is necessary for accurate ASM (stack frame layout)
+		int tamakazu_ari[10];
+		int t = 0;
+
+		memset(tamakazu_ari, 0, sizeof(tamakazu_ari));
+
+		for (n = 0; n < 8; ++n)
 		{
-			case 5:
-				tamakazu_ari[t++] = 0;
-				break;
+			switch (gArmsData[n].code)
+			{
+				case 5:
+					tamakazu_ari[t++] = 0;
+					break;
 
-			case 10:
-				tamakazu_ari[t++] = 1;
-				break;
+				case 10:
+					tamakazu_ari[t++] = 1;
+					break;
 
-			default:
-				tamakazu_ari[t] = 0;
-				break;
+				default:
+					tamakazu_ari[t] = 0;
+					break;
+			}
 		}
+
+		if (t == 0)
+			return FALSE;
+
+		n = Random(1, 10 * t);
+		bullet_no = tamakazu_ari[n % t];
+
+		n = 0x100;
+		while (n < NPC_MAX && gNPC[n].cond)
+			++n;
+
+		if (n == NPC_MAX)
+			return FALSE;
+
+		memset(&gNPC[n], 0, sizeof(NPCHAR));
+		gNPC[n].cond |= 0x80;
+		gNPC[n].direct = 0;
+		gNPC[n].code_event = bullet_no;
+		gNPC[n].code_char = 86;
+		gNPC[n].x = x;
+		gNPC[n].y = y;
+		gNPC[n].bits = gNpcTable[gNPC[n].code_char].bits;
+		gNPC[n].exp = val;
+		SetUniqueParameter(&gNPC[n]);
 	}
 
-	if (t == 0)
-		return FALSE;
-
-	n = Random(1, 10 * t);
-	bullet_no = tamakazu_ari[n % t];
-	n = 0x100;
-	while (n < NPC_MAX && gNPC[n].cond)
-		++n;
-
-	if (n == NPC_MAX)
-		return FALSE;
-
-	memset(&gNPC[n], 0, sizeof(NPCHAR));
-	gNPC[n].cond |= 0x80;
-	gNPC[n].direct = 0;
-	gNPC[n].code_event = bullet_no;
-	gNPC[n].code_char = 86;
-	gNPC[n].x = x;
-	gNPC[n].y = y;
-	gNPC[n].bits = gNpcTable[gNPC[n].code_char].bits;
-	gNPC[n].exp = val;
-	SetUniqueParameter(&gNPC[n]);
 	return TRUE;
 }
 

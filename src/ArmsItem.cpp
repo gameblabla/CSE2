@@ -37,7 +37,7 @@ void ClearItemData()
 BOOL AddArmsData(long code, long max_num)
 {
 	int i = 0;
-	for (; i < ARMS_MAX;)
+	while (i < ARMS_MAX)
 	{
 		if (gArmsData[i].code == code)
 			break;
@@ -70,8 +70,8 @@ BOOL AddArmsData(long code, long max_num)
 
 BOOL SubArmsData(long code)
 {
-	int i = 0;
-	for (; i < ARMS_MAX; ++i)
+	int i;
+	for (i = 0; i < ARMS_MAX; ++i)
 		if (gArmsData[i].code == code)
 			break;
 
@@ -83,19 +83,20 @@ BOOL SubArmsData(long code)
 		return FALSE;
 
 	// Shift all arms from the right to the left
-	for (i += 1; i < ARMS_MAX; ++i)
+	for (++i; i < ARMS_MAX; ++i)
 		gArmsData[i - 1] = gArmsData[i];
 
 	// Clear farthest weapon and select first
 	gArmsData[i - 1].code = 0;
 	gSelectedArms = 0;
+
 	return TRUE;
 }
 
 BOOL TradeArms(long code1, long code2, long max_num)
 {
 	int i = 0;
-	for (; i < ARMS_MAX;)
+	while (i < ARMS_MAX)
 	{
 		if (gArmsData[i].code == code1)
 			break;
@@ -111,13 +112,14 @@ BOOL TradeArms(long code1, long code2, long max_num)
 	gArmsData[i].max_num += max_num;
 	gArmsData[i].num += max_num;
 	gArmsData[i].exp = 0;
+
 	return TRUE;
 }
 
 BOOL AddItemData(long code)
 {
 	int i = 0;
-	for (; i < ITEM_MAX;)
+	while (i < ITEM_MAX)
 	{
 		if (gItemData[i].code == code)
 			break;
@@ -132,13 +134,14 @@ BOOL AddItemData(long code)
 		return FALSE;
 
 	gItemData[i].code = code;
+
 	return TRUE;
 }
 
 BOOL SubItemData(long code)
 {
-	int i = 0;
-	for (; i < ITEM_MAX; ++i)
+	int i;
+	for (i = 0; i < ITEM_MAX; ++i)
 		if (gItemData[i].code == code)
 			break;
 
@@ -146,11 +149,12 @@ BOOL SubItemData(long code)
 		return FALSE;
 
 	// Shift all items from the right to the left
-	for (i += 1; i < ITEM_MAX; ++i)
+	for (++i; i < ITEM_MAX; ++i)
 		gItemData[i - 1] = gItemData[i];
 
 	gItemData[i - 1].code = 0;
 	gSelectedItem = 0;
+
 	return TRUE;
 }
 
@@ -167,6 +171,7 @@ void MoveCampCursor()
 		return;
 
 	BOOL bChange = FALSE;
+
 	if (gCampActive == FALSE)
 	{
 		if (gKeyTrg & gKeyLeft)
@@ -179,10 +184,11 @@ void MoveCampCursor()
 			++gSelectedArms;
 			bChange = TRUE;
 		}
-		if ((gKeyDown | gKeyUp) & gKeyTrg)
+		if (gKeyTrg & (gKeyUp | gKeyDown))
 		{
 			if (item_num)
 				gCampActive = TRUE;
+
 			bChange = TRUE;
 		}
 
@@ -207,13 +213,10 @@ void MoveCampCursor()
 		{
 			if (gSelectedItem == item_num - 1)
 				gSelectedItem = 6 * (gSelectedItem / 6);
+			else if (gSelectedItem % 6 == 5)
+				gSelectedItem -= 5;
 			else
-			{
-				if (gSelectedItem % 6 == 5)
-					gSelectedItem -= 5;
-				else
-					++gSelectedItem;
-			}
+				++gSelectedItem;
 
 			bChange = TRUE;
 		}
@@ -311,7 +314,7 @@ void PutCampObject()
 		PutBitmap3(&rcView, PixelToScreenCoord(40 * gSelectedArms + (WINDOW_WIDTH - 224) / 2), PixelToScreenCoord((WINDOW_HEIGHT / 2) - 96), &rcCur1[1], SURFACE_ID_TEXT_BOX);
 
 	// Draw arms
-	for (i = 0; i < ARMS_MAX; i++)
+	for (i = 0; i < ARMS_MAX; ++i)
 	{
 		if (gArmsData[i].code == 0)
 			break;
@@ -345,7 +348,7 @@ void PutCampObject()
 	else
 		PutBitmap3(&rcView, PixelToScreenCoord(32 * (gSelectedItem % 6) + (WINDOW_WIDTH - 224) / 2), PixelToScreenCoord(16 * (gSelectedItem / 6) + (WINDOW_HEIGHT - 88) / 2), &rcCur2[1], SURFACE_ID_TEXT_BOX);
 
-	for (i = 0; i < ITEM_MAX; i++)
+	for (i = 0; i < ITEM_MAX; ++i)
 	{
 		if (gItemData[i].code == 0)
 			break;
@@ -377,7 +380,7 @@ int CampLoop()
 
 	// Run script
 	arms_num = 0;
-	for (; gArmsData[arms_num].code != 0;)
+	while (gArmsData[arms_num].code != 0)
 		++arms_num;
 
 	if (arms_num)
@@ -418,7 +421,7 @@ int CampLoop()
 
 		if (gCampActive)
 		{
-			if (g_GameFlags & 2 && (gKeyCancel | gKeyItem) & gKeyTrg)
+			if (g_GameFlags & 2 && gKeyTrg & (gKeyCancel | gKeyItem))
 			{
 				StopTextScript();
 				break;
@@ -426,7 +429,7 @@ int CampLoop()
 		}
 		else
 		{
-			if ((gKeyCancel | gKeyOk | gKeyItem) & gKeyTrg)
+			if (gKeyTrg & (gKeyOk | gKeyCancel | gKeyItem))
 			{
 				StopTextScript();
 				break;
@@ -445,7 +448,7 @@ int CampLoop()
 
 BOOL CheckItem(long a)
 {
-	for (int i = 0; i < ITEM_MAX; i++)
+	for (int i = 0; i < ITEM_MAX; ++i)
 	{
 		if (gItemData[i].code == a)
 			return TRUE;
@@ -456,7 +459,7 @@ BOOL CheckItem(long a)
 
 BOOL CheckArms(long a)
 {
-	for (int i = 0; i < ARMS_MAX; i++)
+	for (int i = 0; i < ARMS_MAX; ++i)
 	{
 		if (gArmsData[i].code == a)
 			return TRUE;
@@ -467,21 +470,26 @@ BOOL CheckArms(long a)
 
 BOOL UseArmsEnergy(long num)
 {
-	if (!gArmsData[gSelectedArms].max_num)
+	if (gArmsData[gSelectedArms].max_num == 0)
 		return TRUE;
-	if (!gArmsData[gSelectedArms].num)
+	if (gArmsData[gSelectedArms].num == 0)
 		return FALSE;
+
 	gArmsData[gSelectedArms].num -= num;
+
 	if (gArmsData[gSelectedArms].num < 0)
 		gArmsData[gSelectedArms].num = 0;
+
 	return TRUE;
 }
 
 BOOL ChargeArmsEnergy(long num)
 {
 	gArmsData[gSelectedArms].num += num;
+
 	if (gArmsData[gSelectedArms].num > gArmsData[gSelectedArms].max_num)
 		gArmsData[gSelectedArms].num = gArmsData[gSelectedArms].max_num;
+
 	return TRUE;
 }
 
@@ -499,7 +507,7 @@ void FullArmsEnergy()
 int RotationArms()
 {
 	int arms_num = 0;
-	for (; gArmsData[arms_num].code != 0;)
+	while (gArmsData[arms_num].code != 0)
 		++arms_num;
 
 	if (arms_num == 0)
@@ -508,6 +516,7 @@ int RotationArms()
 	ResetSpurCharge();
 
 	++gSelectedArms;
+
 	while (gSelectedArms < arms_num)
 	{
 		if (gArmsData[gSelectedArms].code)
@@ -528,7 +537,7 @@ int RotationArms()
 int RotationArmsRev()
 {
 	int arms_num = 0;
-	for (; gArmsData[arms_num].code != 0;)
+	while (gArmsData[arms_num].code != 0)
 		++arms_num;
 
 	if (arms_num == 0)

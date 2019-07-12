@@ -556,8 +556,36 @@ name = "ResetQuake"
 addr = 0x40F330
 
 [[func]]
+name = "Random"
+addr = 0x40F350
+
+[[func]]
+name = "PutNumber4"
+addr = 0x40F380
+
+[[func]]
+name = "Game"
+addr = 0x40F5F0
+
+[[func]]
+name = "ModeOpening"
+addr = 0x40F730
+
+[[func]]
+name = "ModeTitle"
+addr = 0x40F9B0
+
+[[func]]
+name = "ModeAction"
+addr = 0x410400
+
+[[func]]
 name = "LoadGenericData"
 addr = 0x411390
+
+[[func]]
+name = "GetTrg"
+addr = 0x4122E0
 
 [[func]]
 name = "InitMapData2"

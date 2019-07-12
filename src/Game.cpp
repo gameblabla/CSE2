@@ -3,7 +3,7 @@
 #include <stddef.h>
 #include <stdio.h>
 
-#include <SDL_timer.h>
+#include "SDL.h"
 
 #include "WindowsWrapper.h"
 
@@ -52,13 +52,14 @@ BOOL bContinue;
 
 int Random(int min, int max)
 {
-	return min + rep_rand() % (max - min + 1);
+	const int range = max - min + 1;
+	return min + rep_rand() % range;
 }
 
 void PutNumber4(int x, int y, int value, BOOL bZero)
 {
 	// Define rects
-	RECT rcClient = grcFull;
+	RECT rcClient = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
 	RECT rect[10] = {
 		{0, 56, 8, 64},
@@ -76,19 +77,23 @@ void PutNumber4(int x, int y, int value, BOOL bZero)
 	// Digits
 	int tbl[4] = {1000, 100, 10, 1};
 
+	int a;
+	int sw;
+	int offset;
+
 	// Limit value
 	if (value > 9999)
 		value = 9999;
 
 	// Go through number and draw digits
-	int offset = 0;
-	int sw = 0;
+	offset = 0;
+	sw = 0;
 	while (offset < 4)
 	{
 		// Get the digit that this is
-		int a = 0;
+		a = 0;
 
-		while (tbl[offset] <= value)
+		while (value >= tbl[offset])
 		{
 			value -= tbl[offset];
 			++a;
@@ -104,8 +109,12 @@ void PutNumber4(int x, int y, int value, BOOL bZero)
 	}
 }
 
-int ModeOpening()
+int ModeOpening(HWND hWnd)
 {
+	int frame_x;
+	int frame_y;
+	unsigned int wait;
+
 	InitNpChar();
 	InitCaret();
 	InitStar();
@@ -119,16 +128,18 @@ int ModeOpening()
 
 	// Reset cliprect and flags
 	grcGame.left = 0;
-	// Non-vanilla: these three lines are widescreen-related(?)
+#if WINDOW_WIDTH != 320 || WINDOW_HEIGHT != 240
+	// Non-vanilla: these three lines are widescreen-related
 	grcGame.top = 0;
 	grcGame.right = WINDOW_WIDTH;
 	grcGame.bottom = WINDOW_HEIGHT;
+#endif
 
 	g_GameFlags = 3;
 
 	CutNoise();
 
-	unsigned int wait = 0;
+	wait = 0;
 	while (wait < 500)
 	{
 		// Increase timer
@@ -171,7 +182,6 @@ int ModeOpening()
 		// Draw everything
 		CortBox(&grcFull, 0x000000);
 
-		int frame_x, frame_y;
 		GetFramePosition(&frame_x, &frame_y);
 		PutBack(frame_x, frame_y);
 		PutStage_Back(frame_x, frame_y);
@@ -202,7 +212,7 @@ int ModeOpening()
 		++gCounter;
 	}
 
-	wait = SDL_GetTicks();
+	wait = SDL_GetTicks();	// The original version used GetTickCount instead
 	while (SDL_GetTicks() < wait + 500)
 	{
 		CortBox(&grcGame, 0x000000);
@@ -213,12 +223,11 @@ int ModeOpening()
 	return 2;
 }
 
-int ModeTitle()
+int ModeTitle(HWND hWnd)
 {
 	// Set rects
-	RECT rcTitle = {0, 0, 144, 32};
+	RECT rcTitle = {0, 0, 144, 40};
 	RECT rcPixel = {0, 0, 160, 16};
-
 	RECT rcNew = {144, 0, 192, 16};
 	RECT rcContinue = {144, 16, 192, 32};
 
@@ -261,19 +270,36 @@ int ModeTitle()
 		{48, 16, 64, 32},
 	};
 
+	unsigned int wait;
+
+	int anime;
+	int v1, v2, v3, v4;
+
+	RECT char_rc;
+	int char_type;
+	int time_counter;
+	int char_y;
+	Surface_Ids char_surf;
+	unsigned long back_color;
+
 	// Reset everything
 	InitCaret();
 	InitStar();
 	CutNoise();
 
 	// Create variables
-	int anime = 0;
-	int char_type = 0;
-	int time_counter = 0;
-	unsigned long back_color = GetCortBoxColor(RGB(0x20, 0x20, 0x20));
+	anime = 0;
+	char_type = 0;
+	time_counter = 0;
+	back_color = GetCortBoxColor(RGB(0x20, 0x20, 0x20));
+
+	GetCompileVersion(&v1, &v2, &v3, &v4);
 
 	// Set state
-	bContinue = IsProfile();
+	if (IsProfile())
+		bContinue = TRUE;
+	else
+		bContinue = FALSE;
 
 	// Set character
 	time_counter = LoadTimeCounter();
@@ -288,37 +314,31 @@ int ModeTitle()
 		char_type = 4;
 
 	// Set music to character's specific music
-	switch (char_type)
-	{
-		case 1:
-			ChangeMusic(mus_RunningHell);
-			break;
-		case 2:
-			ChangeMusic(mus_TorokosTheme);
-			break;
-		case 3:
-			ChangeMusic(mus_White);
-			break;
-		case 4:
-			ChangeMusic(mus_Safety);
-			break;
-		default:
-			ChangeMusic(mus_CaveStory);
-			break;
-	}
+	if (char_type == 1)
+		ChangeMusic(mus_RunningHell);
+	else if (char_type == 2)
+		ChangeMusic(mus_TorokosTheme);
+	else if (char_type == 3)
+		ChangeMusic(mus_White);
+	else if (char_type == 4)
+		ChangeMusic(mus_Safety);
+	else
+		ChangeMusic(mus_CaveStory);
 
 	// Reset cliprect, flags, and give the player the Nikumaru counter
 	grcGame.left = 0;
-	// Non-vanilla: these three lines are widescreen-related(?)
+#if WINDOW_WIDTH != 320 || WINDOW_HEIGHT != 240
+	// Non-vanilla: these three lines are widescreen-related
 	grcGame.top = 0;
 	grcGame.right = WINDOW_WIDTH;
 	grcGame.bottom = WINDOW_HEIGHT;
+#endif
 
 	g_GameFlags = 0;
 	gMC.equip |= 0x100;
 
 	// Start loop
-	unsigned int wait = 0;
+	wait = 0;
 
 	while (1)
 	{
@@ -333,7 +353,10 @@ int ModeTitle()
 		if (wait >= 10)
 		{
 			if (gKeyTrg & gKeyOk)
+			{
+				PlaySoundObject(18, 1);
 				break;
+			}
 		}
 
 		if (gKey & KEY_ESCAPE)
@@ -348,10 +371,14 @@ int ModeTitle()
 		}
 
 		// Move cursor
-		if ((gKeyDown | gKeyUp) & gKeyTrg)
+		if (gKeyTrg & (gKeyUp | gKeyDown))
 		{
 			PlaySoundObject(1, 1);
-			bContinue = !bContinue;
+
+			if (bContinue)
+				bContinue = FALSE;
+			else
+				bContinue = TRUE;
 		}
 
 		// Update carets
@@ -368,8 +395,6 @@ int ModeTitle()
 		PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 120) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 24), &rcVersion, SURFACE_ID_TEXT_BOX);
 		PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 8) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 24), &rcPeriod, SURFACE_ID_TEXT_BOX);
 
-		int v1, v2, v3, v4;
-		GetCompileVersion(&v1, &v2, &v3, &v4);
 		PutNumber4((WINDOW_WIDTH - 40) / 2, WINDOW_HEIGHT - 24, v1, FALSE);
 		PutNumber4((WINDOW_WIDTH - 8) / 2, WINDOW_HEIGHT - 24, v2, FALSE);
 		PutNumber4((WINDOW_WIDTH + 24) / 2, WINDOW_HEIGHT - 24, v3, FALSE);
@@ -382,9 +407,6 @@ int ModeTitle()
 		PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 160) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 48), &rcPixel, SURFACE_ID_PIXEL);
 
 		// Draw character cursor
-		RECT char_rc;
-		Surface_Ids char_surf;
-
 		switch (char_type)
 		{
 			case 0:
@@ -409,13 +431,16 @@ int ModeTitle()
 				break;
 		}
 
-		int char_y;
-		if (bContinue == TRUE)
-			char_y = (WINDOW_HEIGHT + 54) / 2;
-		else
+		if (!bContinue)
 			char_y = (WINDOW_HEIGHT + 14) / 2;
+		else
+			char_y = (WINDOW_HEIGHT + 54) / 2;
 
-		PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 88) / 2), PixelToScreenCoord(char_y), &char_rc, char_surf);
+		// Pixel being redundant
+		if (!bContinue)
+			PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 88) / 2), PixelToScreenCoord(char_y), &char_rc, char_surf);
+		else
+			PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 88) / 2), PixelToScreenCoord(char_y), &char_rc, char_surf);
 
 		// Draw carets
 		PutCaret(0, 0);
@@ -429,11 +454,10 @@ int ModeTitle()
 			return 0;
 	}
 
-	PlaySoundObject(18, 1);
 	ChangeMusic(0);
 
 	// Black screen when option is selected
-	wait = SDL_GetTicks();
+	wait = SDL_GetTicks();	// The original version used GetTickCount instead
 	while (SDL_GetTicks() < wait + 1000)
 	{
 		CortBox(&grcGame, 0);
@@ -445,18 +469,25 @@ int ModeTitle()
 	return 3;
 }
 
-int ModeAction()
+int ModeAction(HWND hWnd)
 {
-	int frame_x = 0;
-	int frame_y = 0;
+	int frame_x;
+	int frame_y;
 
+	unsigned int swPlay;
 	unsigned long color = GetCortBoxColor(RGB(0, 0, 0x20));
 
-	unsigned int swPlay = 1;
+	swPlay = 1;
 
 	// Reset stuff
 	gCounter = 0;
 	grcGame.left = 0;
+#if WINDOW_WIDTH != 320 || WINDOW_HEIGHT != 240
+	// Non-vanilla: these three lines are widescreen-related
+	grcGame.top = 0;
+	grcGame.right = WINDOW_WIDTH;
+	grcGame.bottom = WINDOW_HEIGHT;
+#endif
 	g_GameFlags = 3;
 
 	// Initialize everything
@@ -474,202 +505,228 @@ int ModeAction()
 	InitFlags();
 	InitBossLife();
 
-	if ((bContinue && LoadProfile(NULL)) || InitializeGame(ghWnd))
+	if (bContinue)
 	{
-		while (1)
+		if (!LoadProfile(NULL) && !InitializeGame(hWnd))	// ...Shouldn't that '&&' be a '||'?
+			return 0;
+	}
+	else
+	{
+		if (!InitializeGame(hWnd))
+			return 0;
+	}
+
+	while (1)
+	{
+		// Get pressed keys
+		GetTrg();
+
+		// Escape menu
+		if (gKey & KEY_ESCAPE)
 		{
-			// Get pressed keys
-			GetTrg();
-
-			// Escape menu
-			if (gKey & KEY_ESCAPE)
+			switch (Call_Escape(ghWnd))
 			{
-				switch (Call_Escape(ghWnd))
-				{
-					case 0:
-						return 0;
-					case 2:
-						return 1;
-				}
+				case 0:
+					return 0;
+				case 2:
+					return 1;
 			}
-
-			if (swPlay % 2 && g_GameFlags & 1)
-			{
-				if (g_GameFlags & 2)
-					ActMyChar(TRUE);
-				else
-					ActMyChar(FALSE);
-
-				ActStar();
-				ActNpChar();
-				ActBossChar();
-				ActValueView();
-				ActBack();
-				ResetMyCharFlag();
-				HitMyCharMap();
-				HitMyCharNpChar();
-				HitMyCharBoss();
-				HitNpCharMap();
-				HitBossMap();
-				HitBulletMap();
-				HitNpCharBullet();
-				HitBossBullet();
-				if (g_GameFlags & 2)
-					ShootBullet();
-				ActBullet();
-				ActCaret();
-				MoveFrame3();
-				ActFlash(frame_x, frame_y);
-
-				if (g_GameFlags & 2)
-					AnimationMyChar(TRUE);
-				else
-					AnimationMyChar(FALSE);
-			}
-
-			if (g_GameFlags & 8)
-			{
-				ActionCredit();
-				ActionIllust();
-				ActionStripper();
-			}
-
-			ProcFade();
-			CortBox(&grcFull, color);
-			GetFramePosition(&frame_x, &frame_y);
-			PutBack(frame_x, frame_y);
-			PutStage_Back(frame_x, frame_y);
-			PutBossChar(frame_x, frame_y);
-			PutNpChar(frame_x, frame_y);
-			PutBullet(frame_x, frame_y);
-			PutMyChar(frame_x, frame_y);
-			PutStar(frame_x, frame_y);
-			PutMapDataVector(frame_x, frame_y);
-			PutStage_Front(frame_x, frame_y);
-			PutFront(frame_x, frame_y);
-			PutFlash();
-			PutCaret(frame_x, frame_y);
-			PutValueView(frame_x, frame_y);
-			PutBossLife();
-			PutFade();
-
-			if (!(g_GameFlags & 4))
-			{
-				// Open inventory
-				if (gKeyTrg & gKeyItem)
-				{
-					BackupSurface(SURFACE_ID_SCREEN_GRAB, &grcGame);
-
-					switch (CampLoop())
-					{
-						case 0:
-							return 0;
-						case 2:
-							return 1;
-					}
-
-					gMC.cond &= ~1;
-				}
-				else if (gMC.equip & 2 && gKeyTrg & gKeyMap)
-				{
-					BackupSurface(SURFACE_ID_SCREEN_GRAB, &grcGame);
-
-					switch (MiniMapLoop())
-					{
-						case 0:
-							return 0;
-						case 2:
-							return 1;
-					}
-				}
-			}
-
-			if (g_GameFlags & 2)
-			{
-				if (gKeyTrg & gKeyArms)
-					RotationArms();
-				else if (gKeyTrg & gKeyArmsRev)
-					RotationArmsRev();
-			}
-
-			if (swPlay % 2)
-			{
-				switch (TextScriptProc())
-				{
-					case 0:
-						return 0;
-					case 2:
-						return 1;
-				}
-			}
-
-			PutMapName(FALSE);
-			PutTimeCounter(16, 8);
-
-			if (g_GameFlags & 2)
-			{
-				PutMyLife(TRUE);
-				PutArmsEnergy(TRUE);
-				PutMyAir((WINDOW_WIDTH - 80) / 2, (WINDOW_HEIGHT - 32) / 2);
-				PutActiveArmsList();
-			}
-
-			if (g_GameFlags & 8)
-			{
-				PutIllust();
-				PutStripper();
-			}
-
-			PutTextScript();
-
-			PutFramePerSecound();
-			if (!Flip_SystemTask(ghWnd))
-				break;
-			++gCounter;
 		}
+
+		if (swPlay % 2 && g_GameFlags & 1)
+		{
+			if (g_GameFlags & 2)
+				ActMyChar(TRUE);
+			else
+				ActMyChar(FALSE);
+
+			ActStar();
+			ActNpChar();
+			ActBossChar();
+			ActValueView();
+			ActBack();
+			ResetMyCharFlag();
+			HitMyCharMap();
+			HitMyCharNpChar();
+			HitMyCharBoss();
+			HitNpCharMap();
+			HitBossMap();
+			HitBulletMap();
+			HitNpCharBullet();
+			HitBossBullet();
+			if (g_GameFlags & 2)
+				ShootBullet();
+			ActBullet();
+			ActCaret();
+			MoveFrame3();
+			ActFlash(frame_x, frame_y);
+
+			if (g_GameFlags & 2)
+				AnimationMyChar(TRUE);
+			else
+				AnimationMyChar(FALSE);
+		}
+
+		if (g_GameFlags & 8)
+		{
+			ActionCredit();
+			ActionIllust();
+			ActionStripper();
+		}
+
+		ProcFade();
+		CortBox(&grcFull, color);
+		GetFramePosition(&frame_x, &frame_y);
+		PutBack(frame_x, frame_y);
+		PutStage_Back(frame_x, frame_y);
+		PutBossChar(frame_x, frame_y);
+		PutNpChar(frame_x, frame_y);
+		PutBullet(frame_x, frame_y);
+		PutMyChar(frame_x, frame_y);
+		PutStar(frame_x, frame_y);
+		PutMapDataVector(frame_x, frame_y);
+		PutStage_Front(frame_x, frame_y);
+		PutFront(frame_x, frame_y);
+		PutFlash();
+		PutCaret(frame_x, frame_y);
+		PutValueView(frame_x, frame_y);
+		PutBossLife();
+		PutFade();
+
+		if (!(g_GameFlags & 4))
+		{
+			// Open inventory
+			if (gKeyTrg & gKeyItem)
+			{
+				BackupSurface(SURFACE_ID_SCREEN_GRAB, &grcGame);
+
+				switch (CampLoop())
+				{
+					case 0:
+						return 0;
+					case 2:
+						return 1;
+				}
+
+				gMC.cond &= ~1;
+			}
+			else if (gMC.equip & 2 && gKeyTrg & gKeyMap)
+			{
+				BackupSurface(SURFACE_ID_SCREEN_GRAB, &grcGame);
+
+				switch (MiniMapLoop())
+				{
+					case 0:
+						return 0;
+					case 2:
+						return 1;
+				}
+			}
+		}
+
+		if (g_GameFlags & 2)
+		{
+			if (gKeyTrg & gKeyArms)
+				RotationArms();
+			else if (gKeyTrg & gKeyArmsRev)
+				RotationArmsRev();
+		}
+
+		if (swPlay % 2)
+		{
+			switch (TextScriptProc())
+			{
+				case 0:
+					return 0;
+				case 2:
+					return 1;
+			}
+		}
+
+		PutMapName(FALSE);
+		PutTimeCounter(16, 8);
+
+		if (g_GameFlags & 2)
+		{
+			PutMyLife(TRUE);
+			PutArmsEnergy(TRUE);
+			PutMyAir((WINDOW_WIDTH - 80) / 2, (WINDOW_HEIGHT - 32) / 2);
+			PutActiveArmsList();
+		}
+
+		if (g_GameFlags & 8)
+		{
+			PutIllust();
+			PutStripper();
+		}
+
+		PutTextScript();
+
+		PutFramePerSecound();
+
+		if (!Flip_SystemTask(ghWnd))
+			return 0;
+
+		++gCounter;
 	}
 
 	return 0;
 }
 
-BOOL Game()
+BOOL Game(HWND hWnd)
 {
-	if (LoadGenericData())
+	int mode;
+
+	if (!LoadGenericData())
 	{
-		char path[PATH_LENGTH];
-		sprintf(path, "%s/npc.tbl", gDataPath);
-
-		if (LoadNpcTable(path))
-		{
-			sprintf(path, "%s/mrmap.bin", gDataPath);
-			LoadStageTable(path);
-
-			InitTextScript2();
-			InitSkipFlags();
-			InitMapData2();
-			InitCreditScript();
-
-			int mode = 1;
-			while (mode)
-			{
-				if (mode == 1)
-					mode = ModeOpening();
-				if (mode == 2)
-					mode = ModeTitle();
-				if (mode == 3)
-					mode = ModeAction();
-			}
-
-			EndMapData();
-			EndTextScript();
-			ReleaseNpcTable();
-			ReleaseCreditScript();
-		}
-		else
-		{
-			return FALSE;
-		}
+#ifdef WINDOWS
+		MessageBoxA(hWnd, "汎用ファイルが読めない", "エラー", MB_OK);	// "Error - Couldn't read general purpose files"
+#endif
+		return FALSE;
 	}
+
+	PlaySoundObject(7, -1);
+
+	char path[PATH_LENGTH];
+	sprintf(path, "%s/npc.tbl", gDataPath);
+
+	if (!LoadNpcTable(path))
+	{
+#ifdef WINDOWS
+		MessageBoxA(hWnd, "NPCテーブルが読めない", "エラー", MB_OK);	// "Error - Couldn't read the NPC table"
+#endif
+		return FALSE;
+	}
+
+	sprintf(path, "%s/mrmap.bin", gDataPath);
+	LoadStageTable(path);
+
+	InitTextScript2();
+	InitSkipFlags();
+	InitMapData2();
+	InitCreditScript();
+
+	mode = 1;
+	while (mode)
+	{
+		if (mode == 1)
+			mode = ModeOpening(hWnd);
+		if (mode == 2)
+			mode = ModeTitle(hWnd);
+		if (mode == 3)
+			mode = ModeAction(hWnd);
+	}
+
+	PlaySoundObject(7, 0);
+
+	EndMapData();
+	EndTextScript();
+	ReleaseNpcTable();
+	ReleaseCreditScript();
+
+	// This needs uncommenting when SaveWindowRect is added
+	//if (!bFullscreen)
+	//	SaveWindowRect(hWnd, "window.rect");
 
 	return TRUE;
 }

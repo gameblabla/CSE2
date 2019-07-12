@@ -375,7 +375,7 @@ int main(int argc, char *argv[])
 				InitTriangleTable();
 
 				// Run game code
-				Game();
+				Game(ghWnd);
 
 				// End stuff
 				EndDirectSound();
