@@ -263,16 +263,35 @@ static BOOL LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, BOOL create_surface)
 		}
 		else
 		{
-			const size_t file_size = (size_t)fp->size(fp);
-			unsigned char *file_buffer = (unsigned char*)malloc(file_size);
-			fp->read(fp, file_buffer, 1, file_size);
+			char fourcc[2];
+			fp->read(fp, fourcc, 1, 2);
+			fp->seek(fp, 0, RW_SEEK_SET);
 
-			unsigned int bitmap_width, bitmap_height;
-			unsigned char *bitmap_pixels;
-			lodepng_decode32(&bitmap_pixels, &bitmap_width, &bitmap_height, file_buffer, file_size);
-			free(file_buffer);
+			BOOL is_bmp = (fourcc[0] == 'B' && fourcc[1] == 'M');
 
-			SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormatFrom(bitmap_pixels, bitmap_width, bitmap_height, 0, bitmap_width * 4, SDL_PIXELFORMAT_RGBA32);
+			SDL_Surface *surface;
+
+			if (is_bmp)
+			{
+				// BMP file
+				surface = SDL_LoadBMP_RW(fp, 0);
+				SDL_SetColorKey(surface, SDL_TRUE, SDL_MapRGB(surface->format, 0, 0, 0));
+			}
+			else
+			{
+				// PNG file
+				const size_t file_size = (size_t)fp->size(fp);
+				unsigned char *file_buffer = (unsigned char*)malloc(file_size);
+				fp->read(fp, file_buffer, 1, file_size);
+
+				unsigned int bitmap_width, bitmap_height;
+				unsigned char *bitmap_pixels;
+				lodepng_decode32(&bitmap_pixels, &bitmap_width, &bitmap_height, file_buffer, file_size);
+				free(file_buffer);
+
+				surface = SDL_CreateRGBSurfaceWithFormatFrom(bitmap_pixels, bitmap_width, bitmap_height, 0, bitmap_width * 4, SDL_PIXELFORMAT_RGBA32);
+			}
+
 			SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_NONE);
 
 			if (surface == NULL)
@@ -335,8 +354,10 @@ static BOOL LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, BOOL create_surface)
 					}
 				}
 
+				if (!is_bmp)
+					free(surface->pixels);
+
 				SDL_FreeSurface(surface);
-				free(bitmap_pixels);
 			}
 		}
 	}
@@ -350,6 +371,26 @@ static BOOL LoadBitmap_File(const char *name, Surface_Ids surf_no, BOOL create_s
 {
 	char path[PATH_LENGTH];
 	SDL_RWops *fp;
+
+	// Attempt to load PBM
+	sprintf(path, "%s/%s.pbm", gDataPath, name);
+	fp = SDL_RWFromFile(path, "rb");
+	if (fp)
+	{
+		printf("Loading surface (as .pbm) from %s for surface id %d\n", path, surf_no);
+		if (LoadBitmap(fp, surf_no, create_surface))
+			return TRUE;
+	}
+
+	// Attempt to load BMP
+	sprintf(path, "%s/%s.bmp", gDataPath, name);
+	fp = SDL_RWFromFile(path, "rb");
+	if (fp)
+	{
+		printf("Loading surface (as .bmp) from %s for surface id %d\n", path, surf_no);
+		if (LoadBitmap(fp, surf_no, create_surface))
+			return TRUE;
+	}
 
 	// Attempt to load PNG
 	sprintf(path, "%s/%s.png", gDataPath, name);
@@ -447,7 +488,7 @@ void BackupSurface(Surface_Ids surf_no, RECT *rect)
 	SDL_FreeSurface(surface);
 }
 
-static void DrawBitmap(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_no)
+static void DrawBitmap(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_no, BOOL transparent)
 {
 	if (surf[surf_no].needs_updating)
 	{
@@ -465,6 +506,8 @@ static void DrawBitmap(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_
 	// Set cliprect
 	SDL_RenderSetClipRect(gRenderer, &clipRect);
 
+	SDL_SetTextureBlendMode(surf[surf_no].texture, transparent ? SDL_BLENDMODE_BLEND : SDL_BLENDMODE_NONE);
+
 	// Draw to screen
 	if (SDL_RenderCopy(gRenderer, surf[surf_no].texture, &frameRect, &destRect) < 0)
 		printf("Failed to draw texture %d\nSDL Error: %s\n", surf_no, SDL_GetError());
@@ -475,12 +518,12 @@ static void DrawBitmap(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_
 
 void PutBitmap3(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_no) // Transparency
 {
-	DrawBitmap(rcView, x, y, rect, surf_no);
+	DrawBitmap(rcView, x, y, rect, surf_no, TRUE);
 }
 
 void PutBitmap4(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_no) // No Transparency
 {
-	DrawBitmap(rcView, x, y, rect, surf_no);
+	DrawBitmap(rcView, x, y, rect, surf_no, FALSE);
 }
 
 void Surface2Surface(int x, int y, RECT *rect, int to, int from)
