@@ -264,9 +264,9 @@ void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned cha
 	}
 }
 
-void Backend_ColourFillToScreen(const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
+void Backend_ColourFillToScreen(const RECT *rect, unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha)
 {
-	Backend_ColourFill(&framebuffer, rect, red, green, blue, 0xFF);
+	Backend_ColourFill(&framebuffer, rect, red, green, blue, alpha);
 }
 
 void Backend_ScreenToSurface(Backend_Surface *surface, const RECT *rect)

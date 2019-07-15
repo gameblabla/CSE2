@@ -517,8 +517,9 @@ void CortBox(const RECT *rect, unsigned long col)
 	const unsigned char col_red = (unsigned char)(col & 0xFF);
 	const unsigned char col_green = (unsigned char)((col >> 8) & 0xFF);
 	const unsigned char col_blue = (unsigned char)((col >> 16) & 0xFF);
+	const unsigned char col_alpha = (unsigned char)((col >> 24) & 0xFF);
 
-	Backend_ColourFillToScreen(&destRect, col_red, col_green, col_blue);
+	Backend_ColourFillToScreen(&destRect, col_red, col_green, col_blue, col_alpha);
 }
 
 void CortBox2(const RECT *rect, unsigned long col, Surface_Ids surf_no)
