@@ -78,6 +78,7 @@ Backend_Surface* Backend_CreateSurface(unsigned int width, unsigned int height)
 void Backend_FreeSurface(Backend_Surface *surface)
 {
 	free(surface->pixels);
+	free(surface);
 }
 
 void Backend_LoadPixels(Backend_Surface *surface, const unsigned char *pixels, unsigned int width, unsigned int height, unsigned int pitch)
@@ -91,7 +92,7 @@ void Backend_LoadPixels(Backend_Surface *surface, const unsigned char *pixels, u
 	}
 }
 
-void Backend_Blit(const Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL colour_key)
+void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL colour_key)
 {
 	RECT rect_clamped;
 
@@ -163,7 +164,7 @@ void Backend_Blit(const Backend_Surface *source_surface, const RECT *rect, Backe
 	}
 }
 
-void Backend_BlitToScreen(const Backend_Surface *source_surface, const RECT *rect, long x, long y, BOOL colour_key)
+void Backend_BlitToScreen(Backend_Surface *source_surface, const RECT *rect, long x, long y, BOOL colour_key)
 {
 	Backend_Blit(source_surface, rect, &framebuffer, x, y, colour_key);
 }

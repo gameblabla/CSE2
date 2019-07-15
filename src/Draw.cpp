@@ -343,27 +343,6 @@ BOOL ReloadBitmap_Resource(const char *res, Surface_Ids surf_no)
 {
 	return LoadBitmap_Resource(res, surf_no, FALSE);
 }
-/*
-static SDL_Rect RectToSDLRect(RECT *rect)
-{
-	SDL_Rect SDLRect = {(int)rect->left, (int)rect->top, (int)(rect->right - rect->left), (int)(rect->bottom - rect->top)};
-	if (SDLRect.w < 0)
-		SDLRect.w = 0;
-	if (SDLRect.h < 0)
-		SDLRect.h = 0;
-	return SDLRect;
-}
-
-static SDL_Rect RectToSDLRectScaled(RECT *rect)
-{
-	SDL_Rect SDLRect = RectToSDLRect(rect);
-	SDLRect.x *= magnification;
-	SDLRect.y *= magnification;
-	SDLRect.w *= magnification;
-	SDLRect.h *= magnification;
-	return SDLRect;
-}
-*/
 
 static void ScaleRect(const RECT *source_rect, RECT *destination_rect)
 {
@@ -379,17 +358,10 @@ void BackupSurface(Surface_Ids surf_no, const RECT *rect)
 	ScaleRect(rect, &frameRect);
 
 	Backend_ScreenToSurface(surf[surf_no].backend, &frameRect);
-	//surf[surf_no].needs_updating = TRUE;
 }
 
 static void DrawBitmap(const RECT *rcView, int x, int y, const RECT *rect, Surface_Ids surf_no, BOOL transparent)
 {
-/*	if (surf[surf_no].needs_updating)
-	{
-		FlushSurface(surf_no);
-		surf[surf_no].needs_updating = FALSE;
-	}
-*/
 	RECT frameRect;
 
 	frameRect.left = rect->left;
@@ -445,7 +417,6 @@ void Surface2Surface(int x, int y, const RECT *rect, int to, int from)
 	ScaleRect(rect, &frameRect);
 
 	Backend_Blit(surf[from].backend, &frameRect, surf[to].backend, x * magnification, y * magnification, TRUE);
-	//surf[to].needs_updating = TRUE;
 }
 
 unsigned long GetCortBoxColor(unsigned long col)
@@ -481,7 +452,6 @@ void CortBox2(const RECT *rect, unsigned long col, Surface_Ids surf_no)
 	const unsigned char col_blue = (unsigned char)((col >> 16) & 0xFF);
 
 	Backend_ColourFill(surf[surf_no].backend, &destRect, col_red, col_green, col_blue);
-	//surf[surf_no].needs_updating = TRUE;
 }
 
 #ifdef WINDOWS
@@ -591,7 +561,6 @@ void PutText(int x, int y, const char *text, unsigned long color)
 void PutText2(int x, int y, const char *text, unsigned long color, Surface_Ids surf_no)
 {
 	Backend_DrawText(surf[surf_no].backend, gFont, x * magnification, y * magnification, text, color);
-	//surf[surf_no].needs_updating = TRUE;
 }
 
 void EndTextObject()
