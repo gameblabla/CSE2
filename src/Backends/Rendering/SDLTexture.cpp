@@ -213,7 +213,7 @@ void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned cha
 	if (red == 0 && green == 0 && blue == 0)
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 	else
-		SDL_SetRenderDrawColor(renderer, red, green, blue, 0xFF);
+		SDL_SetRenderDrawColor(renderer, red, green, blue, SDL_ALPHA_OPAQUE);
 
 	// Draw colour
 	SDL_SetRenderTarget(renderer, surface->texture);
@@ -229,7 +229,7 @@ void Backend_ColourFillToScreen(const RECT *rect, unsigned char red, unsigned ch
 	RectToSDLRect(rect, &sdl_rect);
 
 	// Draw colour
-	SDL_SetRenderDrawColor(renderer, red, green, blue, 0xFF);
+	SDL_SetRenderDrawColor(renderer, red, green, blue, SDL_ALPHA_OPAQUE);
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
 	SDL_RenderFillRect(renderer, &sdl_rect);
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
