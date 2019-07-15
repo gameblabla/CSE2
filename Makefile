@@ -206,9 +206,9 @@ ifneq ($(WINDOWS), 1)
 endif
 
 ifeq ($(RENDERER), Texture)
-	SOURCES += Backends/Rendering/SDLTexture.cpp
+	SOURCES += Backends/Rendering/SDLTexture
 else ifeq ($(RENDERER), Software)
-	SOURCES += Backends/Rendering/Software.cpp
+	SOURCES += Backends/Rendering/Software
 endif
 
 OBJECTS = $(addprefix obj/$(FILENAME)/, $(addsuffix .o, $(SOURCES)))
