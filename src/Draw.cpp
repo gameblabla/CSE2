@@ -154,24 +154,24 @@ BOOL StartDirectDraw(int lMagnification, int lColourDepth)
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
 	SDL_SetRenderTarget(gRenderer, screen_texture);
 
+	rgba32_pixel_format = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA32);
+
 	// Create renderer
 	if (!Backend_Init(gRenderer))
 		return FALSE;
-
-	rgba32_pixel_format = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA32);
 
 	return TRUE;
 }
 
 void EndDirectDraw()
 {
-	SDL_FreeFormat(rgba32_pixel_format);
-
 	// Release all surfaces
 	for (int i = 0; i < SURFACE_ID_MAX; i++)
 		ReleaseSurface(i);
 
 	Backend_Deinit();
+
+	SDL_FreeFormat(rgba32_pixel_format);
 
 	SDL_DestroyTexture(screen_texture);
 	SDL_DestroyRenderer(gRenderer);

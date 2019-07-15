@@ -148,10 +148,10 @@ void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Sur
 		rect_clamped.bottom -= overflow;
 	}
 
-	if (rect_clamped.bottom - rect_clamped.top < 0)
+	if (rect_clamped.bottom - rect_clamped.top <= 0)
 		return;
 
-	if (rect_clamped.right - rect_clamped.left < 0)
+	if (rect_clamped.right - rect_clamped.left <= 0)
 		return;
 
 	// Do the actual blitting
@@ -243,6 +243,12 @@ void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned cha
 	{
 		rect_clamped.bottom -= overflow;
 	}
+
+	if (rect_clamped.bottom - rect_clamped.top <= 0)
+		return;
+
+	if (rect_clamped.right - rect_clamped.left <= 0)
+		return;
 
 	for (long j = 0; j < rect_clamped.bottom - rect_clamped.top; ++j)
 	{
