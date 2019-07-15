@@ -155,6 +155,8 @@ add_executable(CSE2
 	src/ValueView.cpp
 	src/ValueView.h
 	src/WindowsWrapper.h
+	src/Backends/SDLSoftware.cpp
+	src/Backends/Rendering.h
 )
 
 set(RESOURCES
