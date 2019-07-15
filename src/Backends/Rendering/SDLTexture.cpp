@@ -1,13 +1,13 @@
-#include "Rendering.h"
+#include "../Rendering.h"
 
 #include <stddef.h>
 #include <stdlib.h>
 
 #include "SDL.h"
 
-#include "../WindowsWrapper.h"
+#include "../../WindowsWrapper.h"
 
-#include "../Font.h"
+#include "../../Font.h"
 
 struct Backend_Surface
 {

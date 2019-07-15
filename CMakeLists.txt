@@ -247,9 +247,9 @@ if(NONPORTABLE)
 endif()
 
 if(RENDERER MATCHES "Texture")
-	target_sources(CSE2 PRIVATE "src/Backends/SDLTexture.cpp")
+	target_sources(CSE2 PRIVATE "src/Backends/Rendering/SDLTexture.cpp")
 elseif(RENDERER MATCHES "Software")
-	target_sources(CSE2 PRIVATE "src/Backends/SDLSoftware.cpp")
+	target_sources(CSE2 PRIVATE "src/Backends/Rendering/Software.cpp")
 endif()
 
 # Make some tweaks if we're targetting Windows
