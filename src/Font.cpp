@@ -14,8 +14,16 @@
 
 #include "File.h"
 
-// Uncomment for that authentic pre-Windows Vista feel
-//#define DISABLE_FONT_ANTIALIASING
+// Cave Story wasn't intended to use font anti-aliasing. It's only because Microsoft enabled it
+// by default from Windows Vista onwards that the game started using it.
+// Font anti-aliasing conflicts with the game's colour-keying, causing ugly artifacting around
+// the text in numerous cases.
+// The only way to 'fix' the artifacting is to convert the entire drawing system to use alpha
+// blending instead of colour-keying, which is way out of scope for a simple compile flag, so
+// instead we just disable the anti-aliasing entirely. It's how it was meant to be anyway.
+#ifdef FIX_BUGS
+#define DISABLE_FONT_ANTIALIASING
+#endif
 
 #undef MIN
 #undef MAX

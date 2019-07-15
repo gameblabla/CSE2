@@ -382,6 +382,8 @@ int main(int argc, char *argv[])
 				EndTextObject();
 				EndDirectDraw();
 			}
+
+			SDL_DestroyWindow(gWindow);
 		}
 	}
 	else
@@ -476,9 +478,19 @@ BOOL SystemTask()
 				return FALSE;
 				break;
 
+			case SDL_RENDER_TARGETS_RESET:
+			case SDL_RENDER_DEVICE_RESET:
+				HandleDeviceLoss();
+				break;
+
 			case SDL_WINDOWEVENT:
 				switch (event.window.event)
 				{
+					case SDL_WINDOWEVENT_RESIZED:
+					case SDL_WINDOWEVENT_SIZE_CHANGED:
+						HandleWindowResize();
+						break;
+
 					case SDL_WINDOWEVENT_FOCUS_GAINED:
 						focusGained = TRUE;
 						ActiveWindow();

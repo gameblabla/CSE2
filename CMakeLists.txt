@@ -11,6 +11,7 @@ option(JAPANESE "Enable the Japanese-language build" OFF)
 option(FIX_BUGS "Fix certain bugs (see src/Bug Fixes.txt)" ON)
 option(NONPORTABLE "Enable bits of code that aren't portable, but are what the original game used" OFF)
 option(FORCE_LOCAL_LIBS "Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones" OFF)
+set(RENDERER "Texture" CACHE STRING "Which renderer the game should use: 'Texture' for SDL2's hardware-accelerated Texture API, and 'Software' for a handwritten software renderer")
 option(OGG_AUDIO "Enable support for Ogg Vorbis music/SFX" OFF)
 option(FLAC_AUDIO "Enable support for FLAC music/SFX" OFF)
 option(TRACKER_AUDIO "Enable support for .it, .xm, .mod, .s3m music/SFX" OFF)
@@ -166,6 +167,7 @@ add_executable(CSE2
 	src/ValueView.cpp
 	src/ValueView.h
 	src/WindowsWrapper.h
+	src/Backends/Rendering.h
 )
 
 set(RESOURCES
@@ -191,6 +193,12 @@ endif()
 
 if(NONPORTABLE)
 	target_compile_definitions(CSE2 PRIVATE NONPORTABLE)
+endif()
+
+if(RENDERER MATCHES "Texture")
+	target_sources(CSE2 PRIVATE "src/Backends/Rendering/SDLTexture.cpp")
+elseif(RENDERER MATCHES "Software")
+	target_sources(CSE2 PRIVATE "src/Backends/Rendering/Software.cpp")
 endif()
 
 if (OGG_AUDIO OR FLAC_AUDIO OR TRACKER_AUDIO OR PXTONE_AUDIO)
