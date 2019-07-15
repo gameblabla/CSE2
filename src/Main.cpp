@@ -298,7 +298,6 @@ int main(int argc, char *argv[])
 
 					StartDirectDraw(2, colourDepth);
 
-					fullscreen = TRUE;
 					SDL_ShowCursor(0);
 					break;
 				}

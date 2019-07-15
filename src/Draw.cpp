@@ -92,24 +92,24 @@ BOOL StartDirectDraw(int lMagnification, int lColourDepth)
 			break;
 	}
 
+	rgb24_pixel_format = SDL_AllocFormat(SDL_PIXELFORMAT_RGB24);
+
 	// Create renderer
 	if (!Backend_Init(gWindow))
 		return FALSE;
-
-	rgb24_pixel_format = SDL_AllocFormat(SDL_PIXELFORMAT_RGB24);
 
 	return TRUE;
 }
 
 void EndDirectDraw()
 {
-	SDL_FreeFormat(rgb24_pixel_format);
-
 	// Release all surfaces
 	for (int i = 0; i < SURFACE_ID_MAX; i++)
 		ReleaseSurface(i);
 
 	Backend_Deinit();
+
+	SDL_FreeFormat(rgb24_pixel_format);
 }
 
 static BOOL IsEnableBitmap(SDL_RWops *fp)

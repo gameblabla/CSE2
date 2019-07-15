@@ -86,6 +86,7 @@ BOOL Backend_Init(SDL_Window *window)
 
 void Backend_Deinit(void)
 {
+	SDL_DestroyTexture(screen_texture);
 	SDL_DestroyRenderer(renderer);
 }
 
@@ -126,9 +127,10 @@ Backend_Surface* Backend_CreateSurface(unsigned int width, unsigned int height)
 	surface->needs_syncing = FALSE;
 
 	surface->next = surface_list_head;
+	surface->prev = NULL;
+	surface_list_head = surface;
 	if (surface->next)
 		surface->next->prev = surface;
-	surface_list_head = surface;
 
 	return surface;
 }
