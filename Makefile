@@ -4,6 +4,9 @@ NATIVECXX = c++
 BUILD_DIRECTORY = game
 ASSETS_DIRECTORY = assets
 
+# Default options
+RENDERER ?= Texture
+
 ifeq ($(RELEASE), 1)
 	CXXFLAGS = -O3 -flto
 	LDFLAGS = -s
@@ -200,6 +203,12 @@ endif
 
 ifneq ($(WINDOWS), 1)
 	RESOURCES += ICON/ICON_MINI.bmp
+endif
+
+ifeq ($(RENDERER), Texture)
+	SOURCES += Backends/Rendering/SDLTexture.cpp
+else ifeq ($(RENDERER), Software)
+	SOURCES += Backends/Rendering/Software.cpp
 endif
 
 OBJECTS = $(addprefix obj/$(FILENAME)/, $(addsuffix .o, $(SOURCES)))
