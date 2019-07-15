@@ -373,6 +373,8 @@ int main(int argc, char *argv[])
 				EndTextObject();
 				EndDirectDraw();
 			}
+
+			SDL_DestroyWindow(gWindow);
 		}
 	}
 	else
