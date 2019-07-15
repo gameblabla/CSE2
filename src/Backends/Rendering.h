@@ -21,3 +21,5 @@ void Backend_ColourFillToScreen(const RECT *rect, unsigned char red, unsigned ch
 void Backend_ScreenToSurface(Backend_Surface *surface, const RECT *rect);
 void Backend_DrawText(Backend_Surface *surface, FontObject *font, int x, int y, const char *text, unsigned long colour);
 void Backend_DrawTextToScreen(FontObject *font, int x, int y, const char *text, unsigned long colour);
+void Backend_HandleDeviceLoss(void);
+void Backend_HandleWindowResize(void);

@@ -569,3 +569,13 @@ void EndTextObject()
 	UnloadFont(gFont);
 	gFont = NULL;
 }
+
+void HandleDeviceLoss()
+{
+	Backend_HandleDeviceLoss();
+}
+
+void HandleWindowResize()
+{
+	Backend_HandleWindowResize();
+}

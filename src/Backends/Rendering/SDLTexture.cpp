@@ -14,10 +14,15 @@ struct Backend_Surface
 	BOOL needs_syncing;
 	SDL_Surface *sdl_surface;
 	SDL_Texture *texture;
+
+	struct Backend_Surface *next;
+	struct Backend_Surface *prev;
 };
 
 static SDL_Renderer *renderer;
 static SDL_Texture *screen_texture;
+
+static Backend_Surface *surface_list_head;
 
 static void FlushSurface(Backend_Surface *surface)
 {
@@ -120,11 +125,21 @@ Backend_Surface* Backend_CreateSurface(unsigned int width, unsigned int height)
 
 	surface->needs_syncing = FALSE;
 
+	surface->next = surface_list_head;
+	if (surface->next)
+		surface->next->prev = surface;
+	surface_list_head = surface;
+
 	return surface;
 }
 
 void Backend_FreeSurface(Backend_Surface *surface)
 {
+	if (surface->next)
+		surface->next->prev = surface->prev;
+	if (surface->prev)
+		surface->prev->next = surface->next;
+
 	SDL_FreeSurface(surface->sdl_surface);
 	free(surface);
 }
@@ -273,4 +288,16 @@ void Backend_DrawTextToScreen(FontObject *font, int x, int y, const char *text, 
 	SDL_FreeSurface(screen_surface);
 	SDL_RenderCopy(renderer, texture, NULL, NULL);
 	SDL_DestroyTexture(texture);
+}
+
+void Backend_HandleDeviceLoss(void)
+{
+	// All of our textures have been lost, so regenerate them
+	for (Backend_Surface *surface = surface_list_head; surface != NULL; surface = surface->next)
+		surface->needs_syncing = TRUE;
+}
+
+void Backend_HandleWindowResize(void)
+{
+	// No problem for us
 }

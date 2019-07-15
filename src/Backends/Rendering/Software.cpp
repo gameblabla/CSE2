@@ -83,10 +83,10 @@ void Backend_FreeSurface(Backend_Surface *surface)
 
 void Backend_LoadPixels(Backend_Surface *surface, const unsigned char *pixels, unsigned int width, unsigned int height, unsigned int pitch)
 {
-	for (unsigned int h = 0; h < height; ++h)
+	for (unsigned int i = 0; i < height; ++i)
 	{
-		const unsigned char *src_row = &pixels[h * pitch];
-		unsigned char *dst_row = &surface->pixels[h * surface->pitch];
+		const unsigned char *src_row = &pixels[i * pitch];
+		unsigned char *dst_row = &surface->pixels[i * surface->pitch];
 
 		memcpy(dst_row, src_row, width * 3);
 	}
@@ -231,10 +231,21 @@ void Backend_ScreenToSurface(Backend_Surface *surface, const RECT *rect)
 void Backend_DrawText(Backend_Surface *surface, FontObject *font, int x, int y, const char *text, unsigned long colour)
 {
 	DrawText(font, surface->pixels, surface->pitch, surface->width, surface->height, x, y, colour, text, strlen(text));
-	//surf[surf_no].needs_updating = TRUE;
 }
 
 void Backend_DrawTextToScreen(FontObject *font, int x, int y, const char *text, unsigned long colour)
 {
 	Backend_DrawText(&framebuffer, font, x, y, text, colour);
+}
+
+void Backend_HandleDeviceLoss(void)
+{
+	// No problem for us
+}
+
+void Backend_HandleWindowResize(void)
+{
+	// https://wiki.libsdl.org/SDL_GetWindowSurface
+	// We need to fetch a new surface pointer
+	window_surface = SDL_GetWindowSurface(window);
 }
