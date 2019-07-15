@@ -26,7 +26,7 @@ This branch adds several enhancements including:
 * SDL2
 * FreeType
 * FLTK
-* libxmp-lite (only if PXTONE_AUDIO is enabled)
+* libxmp-lite (only if TRACKER_AUDIO is enabled)
 
 ## Building
 
