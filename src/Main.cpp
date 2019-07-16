@@ -208,7 +208,7 @@ int main(int argc, char *argv[])
 			}
 		}
 
-		RECT unused_rect = {0, 0, 320, 240};
+		RECT unused_rect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
 		// Load cursor
 		size_t size;
@@ -265,7 +265,6 @@ int main(int argc, char *argv[])
 						StartDirectDraw(0, 0);
 					else
 						StartDirectDraw(1, 0);
-					break;
 				}
 
 				break;
@@ -299,8 +298,8 @@ int main(int argc, char *argv[])
 					StartDirectDraw(2, colourDepth);
 
 					SDL_ShowCursor(0);
-					break;
 				}
+
 				break;
 		}
 
@@ -338,7 +337,7 @@ int main(int argc, char *argv[])
 
 			// Set rects
 			RECT loading_rect = {0, 0, 64, 8};
-			RECT clip_rect = {0, 0, windowWidth, windowHeight};
+			RECT clip_rect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
 			// Load the "LOADING" text
 			MakeSurface_File("Loading", SURFACE_ID_LOADING);

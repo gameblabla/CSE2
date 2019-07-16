@@ -250,7 +250,6 @@ static BOOL LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, BOOL create_surface)
 						}
 
 						SDL_FreeSurface(converted_surface);
-						//surf[surf_no].needs_updating = TRUE;
 						printf(" ^ Successfully loaded\n");
 						success = TRUE;
 					}
