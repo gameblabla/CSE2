@@ -214,7 +214,7 @@ int main(int argc, char *argv[])
 			}
 		}
 
-		RECT unused_rect = {0, 0, 320, 240};
+		RECT unused_rect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
 		// Load cursor
 		char path[PATH_LENGTH];
@@ -315,7 +315,7 @@ int main(int argc, char *argv[])
 
 			// Set rects
 			RECT loading_rect = {0, 0, 64, 8};
-			RECT clip_rect = {0, 0, windowWidth, windowHeight};
+			RECT clip_rect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
 			// Load the "LOADING" text
 			MakeSurface_File("Loading", SURFACE_ID_LOADING);
