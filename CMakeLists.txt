@@ -202,7 +202,7 @@ elseif(RENDERER MATCHES "Software")
 	target_sources(CSE2 PRIVATE "src/Backends/Rendering/Software.cpp")
 endif()
 
-if (OGG_AUDIO OR FLAC_AUDIO OR TRACKER_AUDIO OR PXTONE_AUDIO)
+if(OGG_AUDIO OR FLAC_AUDIO OR TRACKER_AUDIO OR PXTONE_AUDIO)
 	target_sources(CSE2 PRIVATE
 		src/ExtraSoundFormats.cpp
 		src/ExtraSoundFormats.h
@@ -226,7 +226,7 @@ if (OGG_AUDIO OR FLAC_AUDIO OR TRACKER_AUDIO OR PXTONE_AUDIO)
 	target_compile_definitions(CSE2 PRIVATE EXTRA_SOUND_FORMATS)
 endif()
 
-if (OGG_AUDIO)
+if(OGG_AUDIO)
 	target_sources(CSE2 PRIVATE
 		src/audio_lib/decoders/stb_vorbis.c
 		src/audio_lib/decoders/stb_vorbis.h
@@ -236,7 +236,7 @@ if (OGG_AUDIO)
 	target_compile_definitions(CSE2 PRIVATE USE_STB_VORBIS)
 endif()
 
-if (FLAC_AUDIO)
+if(FLAC_AUDIO)
 	target_sources(CSE2 PRIVATE
 		src/audio_lib/decoders/dr_flac.c
 		src/audio_lib/decoders/dr_flac.h
@@ -246,7 +246,7 @@ if (FLAC_AUDIO)
 	target_compile_definitions(CSE2 PRIVATE USE_DR_FLAC)
 endif()
 
-if (TRACKER_AUDIO)
+if(TRACKER_AUDIO)
 	target_sources(CSE2 PRIVATE
 		src/audio_lib/decoders/libxmp-lite.c
 		src/audio_lib/decoders/libxmp-lite.h
@@ -255,7 +255,7 @@ if (TRACKER_AUDIO)
 	target_compile_definitions(CSE2 PRIVATE USE_LIBXMPLITE)
 endif()
 
-if (PXTONE_AUDIO)
+if(PXTONE_AUDIO)
 	target_sources(CSE2 PRIVATE
 		src/audio_lib/decoders/pxtone.c
 		src/audio_lib/decoders/pxtone.h

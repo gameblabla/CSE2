@@ -138,76 +138,76 @@ SOURCES = \
 	ValueView
 
 ifneq (,$(filter 1,$(OGG_AUDIO)$(FLAC_AUDIO)$(TRACKER_AUDIO)$(PXTONE_AUDIO)))
-SOURCES += \
-	ExtraSoundFormats \
-	audio_lib/decoder \
-	audio_lib/miniaudio \
-	audio_lib/mixer \
-	audio_lib/decoders/memory_file \
-	audio_lib/decoders/misc_utilities \
-	audio_lib/decoders/predecode \
-	audio_lib/decoders/split
+	SOURCES += \
+		ExtraSoundFormats \
+		audio_lib/decoder \
+		audio_lib/miniaudio \
+		audio_lib/mixer \
+		audio_lib/decoders/memory_file \
+		audio_lib/decoders/misc_utilities \
+		audio_lib/decoders/predecode \
+		audio_lib/decoders/split
 
-DEFINES += -DEXTRA_SOUND_FORMATS
+	DEFINES += -DEXTRA_SOUND_FORMATS
 endif
 
 ifeq ($(OGG_AUDIO), 1)
-SOURCES += \
-	audio_lib/decoders/stb_vorbis
+	SOURCES += \
+		audio_lib/decoders/stb_vorbis
 
-DEFINES += -DUSE_STB_VORBIS
+	DEFINES += -DUSE_STB_VORBIS
 endif
 
 ifeq ($(FLAC_AUDIO), 1)
-SOURCES += \
-	audio_lib/decoders/dr_flac
+	SOURCES += \
+		audio_lib/decoders/dr_flac
 
-DEFINES += -DUSE_DR_FLAC
+	DEFINES += -DUSE_DR_FLAC
 endif
 
 ifeq ($(TRACKER_AUDIO), 1)
-SOURCES += \
-	audio_lib/decoders/libxmp-lite
+	SOURCES += \
+		audio_lib/decoders/libxmp-lite
 
-DEFINES += -DUSE_LIBXMPLITE
+	DEFINES += -DUSE_LIBXMPLITE
 
-CFLAGS += `pkg-config libxmp-lite --cflags`
-CXXFLAGS += `pkg-config libxmp-lite --cflags`
+	CFLAGS += `pkg-config libxmp-lite --cflags`
+	CXXFLAGS += `pkg-config libxmp-lite --cflags`
 
-ifeq ($(STATIC), 1)
-	LIBS += `pkg-config libxmp-lite --libs --static`
-else
-	LIBS += `pkg-config libxmp-lite --libs`
-endif
+	ifeq ($(STATIC), 1)
+		LIBS += `pkg-config libxmp-lite --libs --static`
+	else
+		LIBS += `pkg-config libxmp-lite --libs`
+	endif
 endif
 
 ifeq ($(PXTONE_AUDIO), 1)
-SOURCES += \
-	audio_lib/decoders/pxtone \
-	audio_lib/decoders/libs/pxtone/pxtnDelay \
-	audio_lib/decoders/libs/pxtone/pxtnDescriptor \
-	audio_lib/decoders/libs/pxtone/pxtnError \
-	audio_lib/decoders/libs/pxtone/pxtnEvelist \
-	audio_lib/decoders/libs/pxtone/pxtnMaster \
-	audio_lib/decoders/libs/pxtone/pxtnMem \
-	audio_lib/decoders/libs/pxtone/pxtnOverDrive \
-	audio_lib/decoders/libs/pxtone/pxtnPulse_Frequency \
-	audio_lib/decoders/libs/pxtone/pxtnPulse_Noise \
-	audio_lib/decoders/libs/pxtone/pxtnPulse_NoiseBuilder \
-	audio_lib/decoders/libs/pxtone/pxtnPulse_Oggv \
-	audio_lib/decoders/libs/pxtone/pxtnPulse_Oscillator \
-	audio_lib/decoders/libs/pxtone/pxtnPulse_PCM \
-	audio_lib/decoders/libs/pxtone/pxtnService \
-	audio_lib/decoders/libs/pxtone/pxtnService_moo \
-	audio_lib/decoders/libs/pxtone/pxtnText \
-	audio_lib/decoders/libs/pxtone/pxtnUnit \
-	audio_lib/decoders/libs/pxtone/pxtnWoice \
-	audio_lib/decoders/libs/pxtone/pxtnWoice_io \
-	audio_lib/decoders/libs/pxtone/pxtnWoicePTV \
-	audio_lib/decoders/libs/pxtone/pxtoneNoise \
-	audio_lib/decoders/libs/pxtone/shim
+	SOURCES += \
+		audio_lib/decoders/pxtone \
+		audio_lib/decoders/libs/pxtone/pxtnDelay \
+		audio_lib/decoders/libs/pxtone/pxtnDescriptor \
+		audio_lib/decoders/libs/pxtone/pxtnError \
+		audio_lib/decoders/libs/pxtone/pxtnEvelist \
+		audio_lib/decoders/libs/pxtone/pxtnMaster \
+		audio_lib/decoders/libs/pxtone/pxtnMem \
+		audio_lib/decoders/libs/pxtone/pxtnOverDrive \
+		audio_lib/decoders/libs/pxtone/pxtnPulse_Frequency \
+		audio_lib/decoders/libs/pxtone/pxtnPulse_Noise \
+		audio_lib/decoders/libs/pxtone/pxtnPulse_NoiseBuilder \
+		audio_lib/decoders/libs/pxtone/pxtnPulse_Oggv \
+		audio_lib/decoders/libs/pxtone/pxtnPulse_Oscillator \
+		audio_lib/decoders/libs/pxtone/pxtnPulse_PCM \
+		audio_lib/decoders/libs/pxtone/pxtnService \
+		audio_lib/decoders/libs/pxtone/pxtnService_moo \
+		audio_lib/decoders/libs/pxtone/pxtnText \
+		audio_lib/decoders/libs/pxtone/pxtnUnit \
+		audio_lib/decoders/libs/pxtone/pxtnWoice \
+		audio_lib/decoders/libs/pxtone/pxtnWoice_io \
+		audio_lib/decoders/libs/pxtone/pxtnWoicePTV \
+		audio_lib/decoders/libs/pxtone/pxtoneNoise \
+		audio_lib/decoders/libs/pxtone/shim
 
-DEFINES += -DUSE_PXTONE
+	DEFINES += -DUSE_PXTONE
 endif
 
 ifeq ($(SMOOTH_SPRITE_MOVEMENT), 1)
