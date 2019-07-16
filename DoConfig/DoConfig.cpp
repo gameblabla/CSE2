@@ -188,11 +188,11 @@ int main(int argc, char* argv[]){
 
 	displaychoice = new Fl_Choice(205, 70, 185, 20);
 	Fl_Menu_Item screens[] = {
-		{"Fullscreen 16-bit"},
+		{"Fullscreen"},
 		{"Windowed 320x240"},
- 		{"Windowed 640x480"},
-		{"Fullscreen 24-bit"},
-		{"Fullscreen 32-bit"},
+		{"Windowed 640x480"},
+		{"Windowed 960x720"},
+		{"Windowed 1280x960"},
 		{0}};
 	displaychoice->menu(screens);
 	joychoice = new Fl_Check_Button(205, 100, 185, 20, "Use Joypad");

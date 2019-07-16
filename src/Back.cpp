@@ -65,6 +65,10 @@ BOOL InitBack(const char *fName, int type)
 	if (!GetBackSizes(fName, &gBack.partsW, &gBack.partsH))
 		return FALSE;
 
+	// Adjust for 2x
+	gBack.partsW /= SPRITE_SCALE;
+	gBack.partsH /= SPRITE_SCALE;
+
 	// Set background stuff and load texture
 	gBack.flag = 1;
 	if (!ReloadBitmap_File(fName, SURFACE_ID_LEVEL_BACKGROUND))

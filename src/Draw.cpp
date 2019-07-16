@@ -114,23 +114,16 @@ BOOL Flip_SystemTask(HWND hWnd)
 	return TRUE;
 }
 
-BOOL StartDirectDraw(int lMagnification, int lColourDepth)
+BOOL StartDirectDraw(int lMagnification)
 {
-	(void)lColourDepth;	// There's no way I'm supporting a bunch of different colour depths
-
 	switch (lMagnification)
 	{
+		default:
+			magnification = lMagnification;
+			fullscreen = FALSE;
+			break;
+
 		case 0:
-			magnification = 1;
-			fullscreen = FALSE;
-			break;
-
-		case 1:
-			magnification = 2;
-			fullscreen = FALSE;
-			break;
-
-		case 2:
 			SDL_SetWindowFullscreen(gWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
 			int width, height;
 			SDL_GetWindowSize(gWindow, &width, &height);
@@ -138,6 +131,9 @@ BOOL StartDirectDraw(int lMagnification, int lColourDepth)
 			fullscreen = TRUE;
 			break;
 	}
+
+	// Ugly way to round the magnification up to the nearest multiple of SPRITE_SCALE (we can't use 2x sprites at 1x or 3x internal resolution)
+	magnification = ((magnification + (SPRITE_SCALE - 1)) / SPRITE_SCALE) * SPRITE_SCALE;
 
 	// Check if vsync is possible
 	SDL_DisplayMode display_mode;
@@ -291,8 +287,9 @@ static BOOL LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, BOOL create_surface)
 					}
 					else
 					{
-						// IF YOU WANT TO ADD HD SPRITES, THIS IS THE CODE YOU SHOULD EDIT
-						if (magnification == 1)
+						const int magnification_scaled = magnification / SPRITE_SCALE;
+
+						if (magnification_scaled == 1)
 						{
 							// Just copy the pixels the way they are
 							Backend_LoadPixels(surf[surf_no].backend, (unsigned char*)converted_surface->pixels, converted_surface->w, converted_surface->h, converted_surface->pitch);
@@ -300,19 +297,19 @@ static BOOL LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, BOOL create_surface)
 						else
 						{
 							// Upscale the bitmap to the game's internal resolution
-							unsigned char *pixels = (unsigned char*)malloc((converted_surface->w * magnification) * (converted_surface->h * magnification) * 4);
+							unsigned char *pixels = (unsigned char*)malloc((converted_surface->w * magnification_scaled) * (converted_surface->h * magnification_scaled) * 4);
 
 							for (int h = 0; h < converted_surface->h; ++h)
 							{
 								const unsigned char *src_row = (unsigned char*)converted_surface->pixels + h * converted_surface->pitch;
-								unsigned char *dst_row = pixels + h * (converted_surface->w * magnification * 4) * magnification;
+								unsigned char *dst_row = pixels + h * (converted_surface->w * magnification_scaled * 4) * magnification_scaled;
 
 								const unsigned char *src_ptr = src_row;
 								unsigned char *dst_ptr = dst_row;
 
 								for (int w = 0; w < converted_surface->w; ++w)
 								{
-									for (int i = 0; i < magnification; ++i)
+									for (int i = 0; i < magnification_scaled; ++i)
 									{
 										*dst_ptr++ = src_ptr[0];
 										*dst_ptr++ = src_ptr[1];
@@ -323,16 +320,15 @@ static BOOL LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, BOOL create_surface)
 									src_ptr += 4;
 								}
 
-								for (int i = 1; i < magnification; ++i)
-									memcpy(dst_row + i * converted_surface->w * magnification * 4, dst_row, converted_surface->w * magnification * 4);
+								for (int i = 1; i < magnification_scaled; ++i)
+									memcpy(dst_row + i * converted_surface->w * magnification_scaled * 4, dst_row, converted_surface->w * magnification_scaled * 4);
 							}
 
-							Backend_LoadPixels(surf[surf_no].backend, pixels, converted_surface->w * magnification, converted_surface->h * magnification, converted_surface->w * magnification * 4);
+							Backend_LoadPixels(surf[surf_no].backend, pixels, converted_surface->w * magnification_scaled, converted_surface->h * magnification_scaled, converted_surface->w * magnification_scaled * 4);
 							free(pixels);
 						}
 
 						SDL_FreeSurface(converted_surface);
-						//surf[surf_no].needs_updating = TRUE;
 						printf(" ^ Successfully loaded\n");
 						success = TRUE;
 					}

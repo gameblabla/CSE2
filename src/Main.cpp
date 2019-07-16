@@ -244,69 +244,37 @@ int main(int argc, char *argv[])
 		// Get window dimensions and colour depth
 		int windowWidth;
 		int windowHeight;
-		int colourDepth;
 
 		switch (config.display_mode)
 		{
-			case 1:
-			case 2:
+			default:
 				// Set window dimensions
-				if (config.display_mode == 1)
-				{
-					windowWidth = WINDOW_WIDTH;
-					windowHeight = WINDOW_HEIGHT;
-				}
-				else
-				{
-					windowWidth = WINDOW_WIDTH * 2;
-					windowHeight = WINDOW_HEIGHT * 2;
-				}
+				windowWidth = WINDOW_WIDTH * config.display_mode;
+				windowHeight = WINDOW_HEIGHT * config.display_mode;
 
 				// Create window
 				gWindow = SDL_CreateWindow(lpWindowName, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, 0);
 
 				if (gWindow)
-				{
-					if (config.display_mode == 1)
-						StartDirectDraw(0, 0);
-					else
-						StartDirectDraw(1, 0);
-					break;
-				}
+					StartDirectDraw(config.display_mode);
 
 				break;
 
 			case 0:
-			case 3:
-			case 4:
 				// Set window dimensions
 				windowWidth = WINDOW_WIDTH * 2;
 				windowHeight = WINDOW_HEIGHT * 2;
 
 				// Create window
-				gWindow = SDL_CreateWindow(lpWindowName, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, 0);
+				gWindow = SDL_CreateWindow(lpWindowName, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 0, 0, 0);
 
 				if (gWindow)
 				{
-					// Set colour depth
-					switch (config.display_mode)
-					{
-						case 0:
-							colourDepth = 16;
-							break;
-						case 3:
-							colourDepth = 24;
-							break;
-						case 4:
-							colourDepth = 32;
-							break;
-					}
-
-					StartDirectDraw(2, colourDepth);
+					StartDirectDraw(0);
 
 					SDL_ShowCursor(0);
-					break;
 				}
+
 				break;
 		}
 
