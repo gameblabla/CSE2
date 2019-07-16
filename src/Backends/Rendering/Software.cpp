@@ -180,6 +180,8 @@ void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Sur
 					for (unsigned int j = 0; j < 3; ++j)
 						destination_pointer[j] = (unsigned char)((source_pointer[j] * src_alpha + destination_pointer[j] * dst_alpha * (1.0f - src_alpha)) / out_alpha);
 
+					destination_pointer[3] = (unsigned char)(out_alpha * 255.0f);
+
 					source_pointer += 4;
 					destination_pointer += 4;
 				}
