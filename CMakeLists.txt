@@ -16,6 +16,7 @@ option(OGG_AUDIO "Enable support for Ogg Vorbis music/SFX" OFF)
 option(FLAC_AUDIO "Enable support for FLAC music/SFX" OFF)
 option(TRACKER_AUDIO "Enable support for .it, .xm, .mod, .s3m music/SFX" OFF)
 option(PXTONE_AUDIO "Enable support for PxTone music/SFX (not to be confused with PixTone)" OFF)
+option(SMOOTH_SPRITE_MOVEMENT "Removes the grid that all sprites are locked to, allowing them to move smoothly at higher resolutions" ON)
 
 
 list(APPEND CMAKE_MODULE_PATH
@@ -304,6 +305,10 @@ if (PXTONE_AUDIO)
 	)
 
 	target_compile_definitions(CSE2 PRIVATE USE_PXTONE)
+endif()
+
+if(SMOOTH_SPRITE_MOVEMENT)
+	target_compile_definitions(CSE2 PRIVATE SMOOTH_SPRITE_MOVEMENT)
 endif()
 
 # Make some tweaks if we're targetting Windows

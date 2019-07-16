@@ -7,6 +7,7 @@ ASSETS_DIRECTORY = assets
 # Default options
 FIX_BUGS ?= 1
 RENDERER ?= Texture
+SMOOTH_SPRITE_MOVEMENT ?= 1
 
 ifeq ($(RELEASE), 1)
 	CXXFLAGS = -O3 -flto
@@ -207,6 +208,10 @@ SOURCES += \
 	audio_lib/decoders/libs/pxtone/shim
 
 DEFINES += -DUSE_PXTONE
+endif
+
+ifeq ($(SMOOTH_SPRITE_MOVEMENT), 1)
+	DEFINES += -DSMOOTH_SPRITE_MOVEMENT
 endif
 
 RESOURCES =

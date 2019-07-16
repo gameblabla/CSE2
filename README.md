@@ -14,7 +14,7 @@ This branch adds several enhancements including:
 * Widescreen
 * Vastly-improved fullscreen
 * Automatic vsync (only enabled on 60hz monitors)
-* Smooth sprite movement, through the removal of the design choice that locks sprites to a 320x240 grid when drawn (can easily be [re-enabled](src/Draw.cpp#L540) for stylistic purposes)
+* Smooth sprite movement, through the removal of the design choice that locks sprites to a 320x240 grid when drawn (can be re-enabled by disabling SMOOTH_SPRITE_MOVEMENT)
 * Bugfixes enabled by default
 * Pixtone sounds split to .pxt files
 * Support for Ogg Vorbis, FLAC, .it, .xm, .mod, .s3m, and Pxtone audio formats for music and SFX
@@ -51,6 +51,7 @@ You can also add the following flags:
 * `-DFLAC_AUDIO=ON` - Enable support for FLAC music/SFX
 * `-DTRACKER_AUDIO=ON` - Enable support for .it, .xm, .mod, .s3m music/SFX
 * `-DPXTONE_AUDIO=ON` - Enable support for PxTone music/SFX (not to be confused with PixTone)
+* `-DSMOOTH_SPRITE_MOVEMENT=ON` - Enabled by default - Removes the grid that all sprites are locked to, allowing them to move smoothly at higher resolutions
 
 Then compile CSE2 with this command:
 
@@ -81,6 +82,7 @@ Run 'make' in this folder, preferably with some of the following settings:
 * `FLAC_AUDIO=1` - Enable support for FLAC music/SFX
 * `TRACKER_AUDIO=1` - Enable support for .it, .xm, .mod, .s3m music/SFX
 * `PXTONE_AUDIO=1` - Enable support for PxTone music/SFX (not to be confused with PixTone)
+* `SMOOTH_SPRITE_MOVEMENT=1` - Enabled by default - Removes the grid that all sprites are locked to, allowing them to move smoothly at higher resolutions
 
 ### Visual Studio .NET 2003
 
