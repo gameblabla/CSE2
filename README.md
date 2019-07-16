@@ -18,6 +18,7 @@ This branch adds several enhancements including:
 * Bugfixes enabled by default
 * Pixtone sounds split to .pxt files
 * Support for Ogg Vorbis, FLAC, .it, .xm, .mod, .s3m, and Pxtone audio formats for music and SFX
+* Support for high-resolution sprites (see SPRITE_SCALE in CommonDefines.h)
 
 ## Dependencies
 
