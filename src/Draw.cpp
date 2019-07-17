@@ -451,9 +451,9 @@ static void DrawBitmap(const RECT *rcView, int x, int y, const RECT *rect, Surfa
 	RECT clipRect;
 	ScaleRect(rcView, &clipRect);
 
-	if (x + (rect->right - rect->left) > clipRect.right)
+	if (x + (frameRect.right - frameRect.left) > clipRect.right)
 	{
-		frameRect.right -= (x + (rect->right - rect->left)) - clipRect.right;
+		frameRect.right -= (x + (frameRect.right - frameRect.left)) - clipRect.right;
 	}
 
 	if (x < clipRect.left)
@@ -462,9 +462,9 @@ static void DrawBitmap(const RECT *rcView, int x, int y, const RECT *rect, Surfa
 		x = clipRect.left;
 	}
 
-	if (y + (rect->bottom - rect->top) > clipRect.bottom)
+	if (y + (frameRect.bottom - frameRect.top) > clipRect.bottom)
 	{
-		frameRect.bottom -= (y + (rect->bottom - rect->top)) - clipRect.bottom;
+		frameRect.bottom -= (y + (frameRect.bottom - frameRect.top)) - clipRect.bottom;
 	}
 
 	if (y < clipRect.top)
