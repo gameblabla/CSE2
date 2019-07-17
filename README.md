@@ -30,8 +30,6 @@ You can also add the following flags:
 * `-DNONPORTABLE=ON` - Enable bits of code that aren't portable, but are what the original game used
 * `-DFORCE_LOCAL_LIBS=ON` - Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones
 * `-DRENDERER=Texture` - Use the hardware-accelerated SDL2 Texture API renderer (default)
-* `-DRENDERER=Surface` - Use SDL2's software-renderer Surface API
-* `-DRENDERER=Texture` - Use the hardware-accelerated SDL2 Texture API renderer (default)
 * `-DRENDERER=Surface` - Use the software-rendered SDL2 Surface API renderer
 * `-DRENDERER=Software` - Use a handwritten software renderer
 
