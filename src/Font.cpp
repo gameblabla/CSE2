@@ -1821,7 +1821,7 @@ FontObject* LoadFont(const char *font_filename, unsigned int cell_width, unsigne
 	return font_object;
 }
 
-void DrawText(FontObject *font_object, unsigned char *bitmap_buffer, size_t bitmap_pitch, int bitmap_width, int bitmap_height, int x, int y, unsigned long colour, const char *string, size_t string_length)
+void DrawText(FontObject *font_object, unsigned char *bitmap_buffer, size_t bitmap_pitch, int bitmap_width, int bitmap_height, int x, int y, unsigned long colour, const char *string, size_t string_length, BOOL rgba)
 {
 	if (font_object != NULL)
 	{
@@ -1852,24 +1852,47 @@ void DrawText(FontObject *font_object, unsigned char *bitmap_buffer, size_t bitm
 				switch (glyph->pixel_mode)
 				{
 					case FT_PIXEL_MODE_GRAY:
-						for (int iy = MAX(-letter_y, 0); letter_y + iy < MIN(letter_y + (int)glyph->bitmap.rows, bitmap_height); ++iy)
+						if (rgba)
 						{
-							for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)glyph->bitmap.width, bitmap_width); ++ix)
+							for (int iy = MAX(-letter_y, 0); letter_y + iy < MIN(letter_y + (int)glyph->bitmap.rows, bitmap_height); ++iy)
 							{
-								const unsigned char font_pixel = glyph->bitmap.buffer[iy * glyph->bitmap.pitch + ix];
-
-								if (font_pixel)
+								for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)glyph->bitmap.width, bitmap_width); ++ix)
 								{
-									unsigned char *bitmap_pixel = bitmap_buffer + (letter_y + iy) * bitmap_pitch + (letter_x + ix) * 4;
+									const unsigned char font_pixel = glyph->bitmap.buffer[iy * glyph->bitmap.pitch + ix];
 
-									const double src_alpha = pow((double)font_pixel / (glyph->bitmap.num_grays - 1), 1.0 / 1.8);
-									const double dst_alpha = bitmap_pixel[3] / 255.0;
-									const double out_alpha = src_alpha + dst_alpha * (1.0 - src_alpha);
+									if (font_pixel)
+									{
+										unsigned char *bitmap_pixel = bitmap_buffer + (letter_y + iy) * bitmap_pitch + (letter_x + ix) * 4;
 
-									for (unsigned int j = 0; j < 3; ++j)
-										bitmap_pixel[j] = (unsigned char)((colours[j] * src_alpha + bitmap_pixel[j] * dst_alpha * (1.0 - src_alpha)) / out_alpha);			// Gamma-corrected alpha blending
+										const double src_alpha = pow((double)font_pixel / (glyph->bitmap.num_grays - 1), 1.0 / 1.8);
+										const double dst_alpha = bitmap_pixel[3] / 255.0;
+										const double out_alpha = src_alpha + dst_alpha * (1.0 - src_alpha);
 
-									bitmap_pixel[3] = (unsigned char)(out_alpha * 255.0);
+										for (unsigned int j = 0; j < 3; ++j)
+											bitmap_pixel[j] = (unsigned char)((colours[j] * src_alpha + bitmap_pixel[j] * dst_alpha * (1.0 - src_alpha)) / out_alpha);			// Gamma-corrected alpha blending
+
+										bitmap_pixel[3] = (unsigned char)(out_alpha * 255.0);
+									}
+								}
+							}
+						}
+						else
+						{
+							for (int iy = MAX(-letter_y, 0); letter_y + iy < MIN(letter_y + (int)glyph->bitmap.rows, bitmap_height); ++iy)
+							{
+								for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)glyph->bitmap.width, bitmap_width); ++ix)
+								{
+									const unsigned char font_pixel = glyph->bitmap.buffer[iy * glyph->bitmap.pitch + ix];
+
+									if (font_pixel)
+									{
+										const double alpha = pow((double)font_pixel / (glyph->bitmap.num_grays - 1), 1.0 / 1.8);			// Gamma-corrected
+
+										unsigned char *bitmap_pixel = bitmap_buffer + (letter_y + iy) * bitmap_pitch + (letter_x + ix) * 3;
+
+										for (unsigned int j = 0; j < 3; ++j)
+											bitmap_pixel[j] = (unsigned char)((colours[j] * alpha) + (bitmap_pixel[j] * (1.0 - alpha)));	// Alpha blending
+									}
 								}
 							}
 						}
@@ -1877,18 +1900,37 @@ void DrawText(FontObject *font_object, unsigned char *bitmap_buffer, size_t bitm
 						break;
 
 					case FT_PIXEL_MODE_MONO:
-						for (int iy = MAX(-letter_y, 0); letter_y + iy < MIN(letter_y + (int)glyph->bitmap.rows, bitmap_height); ++iy)
+						if (rgba)
 						{
-							for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)glyph->bitmap.width, bitmap_width); ++ix)
+							for (int iy = MAX(-letter_y, 0); letter_y + iy < MIN(letter_y + (int)glyph->bitmap.rows, bitmap_height); ++iy)
 							{
-								if (glyph->bitmap.buffer[iy * glyph->bitmap.pitch + ix])
+								for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)glyph->bitmap.width, bitmap_width); ++ix)
 								{
-									unsigned char *bitmap_pixel = bitmap_buffer + (letter_y + iy) * bitmap_pitch + (letter_x + ix) * 4;
+									if (glyph->bitmap.buffer[iy * glyph->bitmap.pitch + ix])
+									{
+										unsigned char *bitmap_pixel = bitmap_buffer + (letter_y + iy) * bitmap_pitch + (letter_x + ix) * 3;
 
-									for (unsigned int j = 0; j < 3; ++j)
-										bitmap_pixel[j] = colours[j];
+										for (unsigned int j = 0; j < 3; ++j)
+											bitmap_pixel[j] = colours[j];
+									}
+								}
+							}
+						}
+						else
+						{
+							for (int iy = MAX(-letter_y, 0); letter_y + iy < MIN(letter_y + (int)glyph->bitmap.rows, bitmap_height); ++iy)
+							{
+								for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)glyph->bitmap.width, bitmap_width); ++ix)
+								{
+									if (glyph->bitmap.buffer[iy * glyph->bitmap.pitch + ix])
+									{
+										unsigned char *bitmap_pixel = bitmap_buffer + (letter_y + iy) * bitmap_pitch + (letter_x + ix) * 4;
 
-									bitmap_pixel[3] = 0xFF;
+										for (unsigned int j = 0; j < 3; ++j)
+											bitmap_pixel[j] = colours[j];
+
+										bitmap_pixel[3] = 0xFF;
+									}
 								}
 							}
 						}

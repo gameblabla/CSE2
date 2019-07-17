@@ -179,13 +179,13 @@ void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned cha
 	SDL_SetRenderTarget(renderer, default_target);
 }
 
-void Backend_ColourFillToScreen(const RECT *rect, unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha)
+void Backend_ColourFillToScreen(const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
 {
 	SDL_Rect sdl_rect;
 	RectToSDLRect(rect, &sdl_rect);
 
 	// Draw colour
-	SDL_SetRenderDrawColor(renderer, red, green, blue, alpha);
+	SDL_SetRenderDrawColor(renderer, red, green, blue, SDL_ALPHA_OPAQUE);
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
 	SDL_RenderFillRect(renderer, &sdl_rect);
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
@@ -228,7 +228,7 @@ void Backend_ScreenToSurface(Backend_Surface *surface, const RECT *rect)
 
 void Backend_DrawText(Backend_Surface *surface, FontObject *font, int x, int y, const char *text, unsigned long colour)
 {
-	DrawText(font, (unsigned char*)surface->sdl_surface->pixels, surface->sdl_surface->pitch, surface->sdl_surface->w, surface->sdl_surface->h, x, y, colour, text, strlen(text));
+	DrawText(font, (unsigned char*)surface->sdl_surface->pixels, surface->sdl_surface->pitch, surface->sdl_surface->w, surface->sdl_surface->h, x, y, colour, text, strlen(text), TRUE);
 	surface->needs_syncing = TRUE;
 }
 
@@ -238,10 +238,10 @@ void Backend_DrawTextToScreen(FontObject *font, int x, int y, const char *text, 
 	int surface_width, surface_height;
 	SDL_GetRendererOutputSize(renderer, &surface_width, &surface_height);
 
-	SDL_Surface *screen_surface = SDL_CreateRGBSurfaceWithFormat(0, surface_width, surface_height, 0, SDL_PIXELFORMAT_RGBA32);
-	SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_RGBA32, screen_surface->pixels, screen_surface->pitch);
+	SDL_Surface *screen_surface = SDL_CreateRGBSurfaceWithFormat(0, surface_width, surface_height, 0, SDL_PIXELFORMAT_RGB24);
+	SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_RGB24, screen_surface->pixels, screen_surface->pitch);
 
-	DrawText(font, (unsigned char*)screen_surface->pixels, screen_surface->pitch, screen_surface->w, screen_surface->h, x, y, colour, text, strlen(text));
+	DrawText(font, (unsigned char*)screen_surface->pixels, screen_surface->pitch, screen_surface->w, screen_surface->h, x, y, colour, text, strlen(text), FALSE);
 
 	SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, screen_surface);
 	SDL_FreeSurface(screen_surface);

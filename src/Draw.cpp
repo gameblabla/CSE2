@@ -513,9 +513,17 @@ void CortBox(const RECT *rect, unsigned long col)
 	const unsigned char col_red = (unsigned char)(col & 0xFF);
 	const unsigned char col_green = (unsigned char)((col >> 8) & 0xFF);
 	const unsigned char col_blue = (unsigned char)((col >> 16) & 0xFF);
-	const unsigned char col_alpha = (unsigned char)((col >> 24) & 0xFF);
 
-	Backend_ColourFillToScreen(&destRect, col_red, col_green, col_blue, col_alpha);
+	// Note for future-me: this has to ignore alpha because you obviously
+	// can't have transparent parts of the window. It'll just appear as
+	// solid black. Setting the alpha as anything but 255 in this case
+	// can break things, like the 'Studio Pixel presents' text rendering
+	// in the software renderer, since it blends using the alpha value
+	// that doesn't do anything.
+	// Besides, the original game only used colour-keying on surface blits,
+	// not the drawing of the actual window.
+
+	Backend_ColourFillToScreen(&destRect, col_red, col_green, col_blue);
 }
 
 void CortBox2(const RECT *rect, unsigned long col, Surface_Ids surf_no)
