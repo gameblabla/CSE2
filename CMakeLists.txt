@@ -11,7 +11,7 @@ option(JAPANESE "Enable the Japanese-language build" OFF)
 option(FIX_BUGS "Fix certain bugs (see src/Bug Fixes.txt)" OFF)
 option(NONPORTABLE "Enable bits of code that aren't portable, but are what the original game used" OFF)
 option(FORCE_LOCAL_LIBS "Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones" OFF)
-set(RENDERER "Texture" CACHE STRING "Which renderer the game should use: 'Texture' for SDL2's hardware-accelerated Texture API, and 'Software' for a handwritten software renderer")
+set(RENDERER "Texture" CACHE STRING "Which renderer the game should use: 'Texture' for SDL2's hardware-accelerated Texture API, 'Surface' for SDL2's software-rendered Surface API, and 'Software' for a handwritten software renderer")
 
 project(CSE2 LANGUAGES C CXX)
 
@@ -248,8 +248,12 @@ endif()
 
 if(RENDERER MATCHES "Texture")
 	target_sources(CSE2 PRIVATE "src/Backends/Rendering/SDLTexture.cpp")
+elseif(RENDERER MATCHES "Surface")
+	target_sources(CSE2 PRIVATE "src/Backends/Rendering/SDLSurface.cpp")
 elseif(RENDERER MATCHES "Software")
 	target_sources(CSE2 PRIVATE "src/Backends/Rendering/Software.cpp")
+else()
+	message(FATAL_ERROR "Invalid RENDERER selected")
 endif()
 
 # Make some tweaks if we're targetting Windows

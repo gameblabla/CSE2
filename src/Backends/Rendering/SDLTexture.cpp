@@ -9,7 +9,7 @@
 
 #include "../../Font.h"
 
-struct Backend_Surface
+typedef struct Backend_Surface
 {
 	BOOL needs_syncing;
 	SDL_Surface *sdl_surface;
@@ -17,7 +17,7 @@ struct Backend_Surface
 
 	struct Backend_Surface *next;
 	struct Backend_Surface *prev;
-};
+} Backend_Surface;
 
 static SDL_Renderer *renderer;
 static SDL_Texture *screen_texture;

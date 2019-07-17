@@ -6,7 +6,7 @@
 
 #include "../Font.h"
 
-struct Backend_Surface;
+typedef struct Backend_Surface Backend_Surface;
 
 BOOL Backend_Init(SDL_Window *window);
 void Backend_Deinit(void);

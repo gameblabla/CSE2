@@ -15,7 +15,7 @@ struct Backend_Surface
 	unsigned int width;
 	unsigned int height;
 	unsigned int pitch;
-};
+} Backend_Surface;
 
 static SDL_Window *window;
 static SDL_Surface *window_surface;
