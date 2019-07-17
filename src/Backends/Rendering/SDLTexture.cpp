@@ -9,7 +9,7 @@
 
 #include "../../Font.h"
 
-struct Backend_Surface
+typedef struct Backend_Surface
 {
 	BOOL needs_syncing;
 	SDL_Surface *sdl_surface;
@@ -17,7 +17,7 @@ struct Backend_Surface
 
 	struct Backend_Surface *next;
 	struct Backend_Surface *prev;
-};
+} Backend_Surface;
 
 static SDL_Renderer *renderer;
 
@@ -107,10 +107,10 @@ void Backend_FreeSurface(Backend_Surface *surface)
 
 void Backend_LoadPixels(Backend_Surface *surface, const unsigned char *pixels, unsigned int width, unsigned int height, unsigned int pitch)
 {
-	for (unsigned int h = 0; h < height; ++h)
+	for (unsigned int i = 0; i < height; ++i)
 	{
-		const unsigned char *src_row = &pixels[h * pitch];
-		unsigned char *dst_row = (unsigned char*)surface->sdl_surface->pixels + h * surface->sdl_surface->pitch;
+		const unsigned char *src_row = &pixels[i * pitch];
+		unsigned char *dst_row = (unsigned char*)surface->sdl_surface->pixels + i * surface->sdl_surface->pitch;
 
 		memcpy(dst_row, src_row, width * 4);
 	}

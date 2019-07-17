@@ -9,13 +9,13 @@
 
 #include "../../Font.h"
 
-struct Backend_Surface
+typedef struct Backend_Surface
 {
 	unsigned char *pixels;
 	unsigned int width;
 	unsigned int height;
 	unsigned int pitch;
-};
+} Backend_Surface;
 
 static SDL_Renderer *renderer;
 static SDL_Texture *texture;
@@ -346,14 +346,14 @@ void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned cha
 
 	for (long j = 0; j < rect_clamped.bottom - rect_clamped.top; ++j)
 	{
-		unsigned char *source_pointer = &surface->pixels[((rect_clamped.top + j) * surface->pitch) + (rect_clamped.left * 4)];
+		unsigned char *destination_pointer = &surface->pixels[((rect_clamped.top + j) * surface->pitch) + (rect_clamped.left * 4)];
 
 		for (long i = 0; i < rect_clamped.right - rect_clamped.left; ++i)
 		{
-			*source_pointer++ = red;
-			*source_pointer++ = green;
-			*source_pointer++ = blue;
-			*source_pointer++ = alpha;
+			*destination_pointer++ = red;
+			*destination_pointer++ = green;
+			*destination_pointer++ = blue;
+			*destination_pointer++ = alpha;
 		}
 	}
 }

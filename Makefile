@@ -226,8 +226,12 @@ endif
 
 ifeq ($(RENDERER), Texture)
 	SOURCES += Backends/Rendering/SDLTexture
+else ifeq ($(RENDERER), Surface)
+	SOURCES += Backends/Rendering/Software
 else ifeq ($(RENDERER), Software)
 	SOURCES += Backends/Rendering/Software
+else
+	@echo Invalid RENDERER selected; this build will fail
 endif
 
 OBJECTS = $(addprefix obj/$(FILENAME)/, $(addsuffix .o, $(SOURCES)))
