@@ -146,15 +146,17 @@ void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Sur
 
 			for (long i = 0; i < rect_clamped.right - rect_clamped.left; ++i)
 			{
-				if (source_pointer[0] != 0 || source_pointer[1] != 0 || source_pointer[2] != 0)	// Assumes the colour key will always be #00000000 (black)
+				if (source_pointer[0] == 0 && source_pointer[1] == 0 && source_pointer[2] == 0)	// Assumes the colour key will always be #000000 (black)
 				{
-					destination_pointer[0] = source_pointer[0];
-					destination_pointer[1] = source_pointer[1];
-					destination_pointer[2] = source_pointer[2];
+					source_pointer += 3;
+					destination_pointer += 3;
 				}
-
-				source_pointer += 3;
-				destination_pointer += 3;
+				else
+				{
+					*destination_pointer++ = *source_pointer++;
+					*destination_pointer++ = *source_pointer++;
+					*destination_pointer++ = *source_pointer++;
+				}
 			}
 		}
 	}
@@ -219,13 +221,13 @@ void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned cha
 
 	for (long j = 0; j < rect_clamped.bottom - rect_clamped.top; ++j)
 	{
-		unsigned char *source_pointer = &surface->pixels[((rect_clamped.top + j) * surface->pitch) + (rect_clamped.left * 3)];
+		unsigned char *destination_pointer = &surface->pixels[((rect_clamped.top + j) * surface->pitch) + (rect_clamped.left * 3)];
 
 		for (long i = 0; i < rect_clamped.right - rect_clamped.left; ++i)
 		{
-			*source_pointer++ = red;
-			*source_pointer++ = green;
-			*source_pointer++ = blue;
+			*destination_pointer++ = red;
+			*destination_pointer++ = green;
+			*destination_pointer++ = blue;
 		}
 	}
 }

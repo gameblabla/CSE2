@@ -30,20 +30,20 @@ static void FlushSurface(Backend_Surface *surface)
 	unsigned char *buffer_pointer = buffer;
 
 	// Convert the SDL_Surface's colour-keyed pixels to RGBA32
-	for (int h = 0; h < surface->sdl_surface->h; ++h)
+	for (int y = 0; y < surface->sdl_surface->h; ++y)
 	{
-		unsigned char *src_pixel = (unsigned char*)surface->sdl_surface->pixels + (h * surface->sdl_surface->pitch);
+		unsigned char *src_pixel = (unsigned char*)surface->sdl_surface->pixels + (y * surface->sdl_surface->pitch);
 
-		for (int w = 0; w < surface->sdl_surface->w; ++w)
+		for (int x = 0; x < surface->sdl_surface->x; ++x)
 		{
 			*buffer_pointer++ = src_pixel[0];
 			*buffer_pointer++ = src_pixel[1];
 			*buffer_pointer++ = src_pixel[2];
 
-			if (src_pixel[0] != 0 || src_pixel[1] != 0 || src_pixel[2] != 0)	// Assumes the colour key will always be #00000000 (black)
-				*buffer_pointer++ = 0xFF;
-			else
+			if (src_pixel[0] == 0 && src_pixel[1] == 0 && src_pixel[2] == 0)	// Assumes the colour key will always be #000000 (black)
 				*buffer_pointer++ = 0;
+			else
+				*buffer_pointer++ = 0xFF;
 
 			src_pixel += 3;
 		}
@@ -148,10 +148,10 @@ void Backend_FreeSurface(Backend_Surface *surface)
 
 void Backend_LoadPixels(Backend_Surface *surface, const unsigned char *pixels, unsigned int width, unsigned int height, unsigned int pitch)
 {
-	for (unsigned int h = 0; h < height; ++h)
+	for (unsigned int i = 0; i < height; ++i)
 	{
-		const unsigned char *src_row = &pixels[h * pitch];
-		unsigned char *dst_row = (unsigned char*)surface->sdl_surface->pixels + h * surface->sdl_surface->pitch;
+		const unsigned char *src_row = &pixels[i * pitch];
+		unsigned char *dst_row = (unsigned char*)surface->sdl_surface->pixels + i * surface->sdl_surface->pitch;
 
 		memcpy(dst_row, src_row, width * 3);
 	}
