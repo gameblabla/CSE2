@@ -82,15 +82,15 @@ void Backend_FreeSurface(Backend_Surface *surface)
 	free(surface);
 }
 
-void Backend_LoadPixels(Backend_Surface *surface, const unsigned char *pixels, unsigned int width, unsigned int height, unsigned int pitch)
+unsigned char* Backend_Lock(Backend_Surface *surface, unsigned int *pitch)
 {
-	for (unsigned int i = 0; i < height; ++i)
-	{
-		const unsigned char *src_row = &pixels[i * pitch];
-		unsigned char *dst_row = (unsigned char*)surface->sdl_surface->pixels + i * surface->sdl_surface->pitch;
+	*pitch = surface->sdl_surface->pitch;
+	return (unsigned char*)surface->sdl_surface->pixels;
+}
 
-		memcpy(dst_row, src_row, width * 3);
-	}
+void Backend_Unlock(Backend_Surface *surface)
+{
+	
 }
 
 void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL colour_key)

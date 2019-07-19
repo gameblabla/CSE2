@@ -211,25 +211,32 @@ static BOOL LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, BOOL create_surface)
 					else
 					{
 						// IF YOU WANT TO ADD HD SPRITES, THIS IS THE CODE YOU SHOULD EDIT
+						unsigned int pitch;
+						unsigned char *pixels = Backend_Lock(surf[surf_no].backend, &pitch);
+
 						if (magnification == 1)
 						{
 							// Just copy the pixels the way they are
-							Backend_LoadPixels(surf[surf_no].backend, (unsigned char*)converted_surface->pixels, converted_surface->w, converted_surface->h, converted_surface->pitch);
+							for (int y = 0; y < converted_surface->h; ++y)
+							{
+								const unsigned char *src_row = (unsigned char*)converted_surface->pixels + y * converted_surface->pitch;
+								unsigned char *dst_row = &pixels[y * pitch];
+
+								memcpy(dst_row, src_row, converted_surface->w * 3);
+							}
 						}
 						else
 						{
 							// Upscale the bitmap to the game's internal resolution
-							unsigned char *pixels = (unsigned char*)malloc((converted_surface->w * magnification) * (converted_surface->h * magnification) * 3);
-
-							for (int h = 0; h < converted_surface->h; ++h)
+							for (int y = 0; y < converted_surface->h; ++y)
 							{
-								const unsigned char *src_row = (unsigned char*)converted_surface->pixels + h * converted_surface->pitch;
-								unsigned char *dst_row = pixels + h * (converted_surface->w * magnification * 3) * magnification;
+								const unsigned char *src_row = (unsigned char*)converted_surface->pixels + y * converted_surface->pitch;
+								unsigned char *dst_row = &pixels[y * pitch * magnification];
 
 								const unsigned char *src_ptr = src_row;
 								unsigned char *dst_ptr = dst_row;
 
-								for (int w = 0; w < converted_surface->w; ++w)
+								for (int x = 0; x < converted_surface->w; ++x)
 								{
 									for (int i = 0; i < magnification; ++i)
 									{
@@ -242,13 +249,11 @@ static BOOL LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, BOOL create_surface)
 								}
 
 								for (int i = 1; i < magnification; ++i)
-									memcpy(dst_row + i * converted_surface->w * magnification * 3, dst_row, converted_surface->w * magnification * 3);
+									memcpy(dst_row + i * pitch, dst_row, converted_surface->w * magnification * 3);
 							}
-
-							Backend_LoadPixels(surf[surf_no].backend, pixels, converted_surface->w * magnification, converted_surface->h * magnification, converted_surface->w * magnification * 3);
-							free(pixels);
 						}
 
+						Backend_Unlock(surf[surf_no].backend);
 						SDL_FreeSurface(converted_surface);
 						printf(" ^ Successfully loaded\n");
 						success = TRUE;
