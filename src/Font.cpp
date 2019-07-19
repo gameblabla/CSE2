@@ -1715,11 +1715,13 @@ static unsigned long UTF8ToUnicode(const unsigned char *string, unsigned int *by
 
 static CachedGlyph* GetGlyphCached(FontObject *font_object, unsigned long unicode_value)
 {
-	for (CachedGlyph *glyph = font_object->glyph_list_head; glyph != NULL; glyph = glyph->next)
+	CachedGlyph *glyph;
+
+	for (glyph = font_object->glyph_list_head; glyph != NULL; glyph = glyph->next)
 		if (glyph->unicode_value == unicode_value)
 			return glyph;
 
-	CachedGlyph *glyph = (CachedGlyph*)malloc(sizeof(CachedGlyph));
+	glyph = (CachedGlyph*)malloc(sizeof(CachedGlyph));
 
 	if (glyph)
 	{
