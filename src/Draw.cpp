@@ -543,7 +543,7 @@ void CortBox2(const RECT *rect, unsigned long col, Surface_Ids surf_no)
 
 int SubpixelToScreenCoord(int coord)
 {
-#ifdef SMOOTH_SPRITE_SCROLLING
+#ifdef SMOOTH_SPRITE_MOVEMENT
 	return (coord * magnification) / 0x200;
 #else
 	return (coord / (0x200 / SPRITE_SCALE)) * (magnification / SPRITE_SCALE);
