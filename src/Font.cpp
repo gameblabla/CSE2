@@ -12,24 +12,20 @@
 
 #include "WindowsWrapper.h"
 
+#include "Draw.h"
 #include "File.h"
+#include "Backends/Rendering.h"
 
 // Uncomment for that authentic pre-Windows Vista feel
 //#define DISABLE_FONT_ANTIALIASING
 
-#undef MIN
-#undef MAX
-#define MIN(a,b) ((a) < (b) ? (a) : (b))
-#define MAX(a,b) ((a) > (b) ? (a) : (b))
-
 typedef struct CachedGlyph
 {
 	unsigned long unicode_value;
-	FT_Bitmap bitmap;
-	unsigned char pixel_mode;
 	int x;
 	int y;
 	int x_advance;
+	Backend_Glyph *backend;
 
 	struct CachedGlyph *next;
 } CachedGlyph;
@@ -1726,12 +1722,29 @@ static CachedGlyph* GetGlyphCached(FontObject *font_object, unsigned long unicod
 #endif
 
 		glyph->unicode_value = unicode_value;
-		FT_Bitmap_New(&glyph->bitmap);
-		FT_Bitmap_Convert(font_object->library, &font_object->face->glyph->bitmap, &glyph->bitmap, 1);
-		glyph->pixel_mode = font_object->face->glyph->bitmap.pixel_mode;
 		glyph->x = font_object->face->glyph->bitmap_left;
 		glyph->y = (FT_MulFix(font_object->face->ascender, font_object->face->size->metrics.y_scale) - font_object->face->glyph->metrics.horiBearingY + (64 / 2)) / 64;
 		glyph->x_advance = font_object->face->glyph->advance.x / 64;
+
+		FT_Bitmap bitmap;
+		FT_Bitmap_New(&bitmap);
+		FT_Bitmap_Convert(font_object->library, &font_object->face->glyph->bitmap, &bitmap, 1);
+
+		unsigned char pixel_mode;
+		switch (font_object->face->glyph->bitmap.pixel_mode)
+		{
+			case FT_PIXEL_MODE_GRAY:
+				pixel_mode = FONT_PIXEL_MODE_GRAY;
+				break;
+
+			case FT_PIXEL_MODE_MONO:
+				pixel_mode = FONT_PIXEL_MODE_MONO;
+				break;
+		}
+
+		glyph->backend = Backend_LoadGlyph(bitmap.buffer, bitmap.width, bitmap.rows, bitmap.pitch, bitmap.num_grays, pixel_mode);
+
+		FT_Bitmap_Done(font_object->library, &bitmap);
 	}
 
 	return glyph;
@@ -1744,7 +1757,7 @@ static void UnloadCachedGlyphs(FontObject *font_object)
 	{
 		CachedGlyph *next_glyph = glyph->next;
 
-		FT_Bitmap_Done(font_object->library, &glyph->bitmap);
+		Backend_UnloadGlyph(glyph->backend);
 		free(glyph);
 
 		glyph = next_glyph;
@@ -1823,7 +1836,8 @@ FontObject* LoadFont(const char *font_filename, unsigned int cell_width, unsigne
 	return font_object;
 }
 
-void DrawText(FontObject *font_object, unsigned char *bitmap_buffer, size_t bitmap_pitch, int bitmap_width, int bitmap_height, int x, int y, unsigned long colour, const char *string, size_t string_length, BOOL rgba)
+
+void DrawText(FontObject *font_object, Backend_Surface *surface, int x, int y, unsigned long colour, const char *string, size_t string_length)
 {
 	if (font_object != NULL)
 	{
@@ -1851,93 +1865,12 @@ void DrawText(FontObject *font_object, unsigned char *bitmap_buffer, size_t bitm
 				const int letter_x = x + pen_x + glyph->x;
 				const int letter_y = y + glyph->y;
 
-				switch (glyph->pixel_mode)
+				if (glyph->backend)
 				{
-					case FT_PIXEL_MODE_GRAY:
-						if (rgba)
-						{
-							for (int iy = MAX(-letter_y, 0); letter_y + iy < MIN(letter_y + (int)glyph->bitmap.rows, bitmap_height); ++iy)
-							{
-								for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)glyph->bitmap.width, bitmap_width); ++ix)
-								{
-									const unsigned char font_pixel = glyph->bitmap.buffer[iy * glyph->bitmap.pitch + ix];
-
-									if (font_pixel)
-									{
-										unsigned char *bitmap_pixel = bitmap_buffer + (letter_y + iy) * bitmap_pitch + (letter_x + ix) * 4;
-
-										const double src_alpha = pow((double)font_pixel / (glyph->bitmap.num_grays - 1), 1.0 / 1.8);
-										const double dst_alpha = bitmap_pixel[3] / 255.0;
-										const double out_alpha = src_alpha + dst_alpha * (1.0 - src_alpha);
-
-										for (unsigned int j = 0; j < 3; ++j)
-											bitmap_pixel[j] = (unsigned char)((colours[j] * src_alpha + bitmap_pixel[j] * dst_alpha * (1.0 - src_alpha)) / out_alpha);			// Gamma-corrected alpha blending
-
-										bitmap_pixel[3] = (unsigned char)(out_alpha * 255.0);
-									}
-								}
-							}
-						}
-						else
-						{
-							for (int iy = MAX(-letter_y, 0); letter_y + iy < MIN(letter_y + (int)glyph->bitmap.rows, bitmap_height); ++iy)
-							{
-								for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)glyph->bitmap.width, bitmap_width); ++ix)
-								{
-									const unsigned char font_pixel = glyph->bitmap.buffer[iy * glyph->bitmap.pitch + ix];
-
-									if (font_pixel)
-									{
-										const double alpha = pow((double)font_pixel / (glyph->bitmap.num_grays - 1), 1.0 / 1.8);			// Gamma-corrected
-
-										unsigned char *bitmap_pixel = bitmap_buffer + (letter_y + iy) * bitmap_pitch + (letter_x + ix) * 3;
-
-										for (unsigned int j = 0; j < 3; ++j)
-											bitmap_pixel[j] = (unsigned char)((colours[j] * alpha) + (bitmap_pixel[j] * (1.0 - alpha)));	// Alpha blending
-									}
-								}
-							}
-						}
-
-						break;
-
-					case FT_PIXEL_MODE_MONO:
-						if (rgba)
-						{
-							for (int iy = MAX(-letter_y, 0); letter_y + iy < MIN(letter_y + (int)glyph->bitmap.rows, bitmap_height); ++iy)
-							{
-								for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)glyph->bitmap.width, bitmap_width); ++ix)
-								{
-									if (glyph->bitmap.buffer[iy * glyph->bitmap.pitch + ix])
-									{
-										unsigned char *bitmap_pixel = bitmap_buffer + (letter_y + iy) * bitmap_pitch + (letter_x + ix) * 3;
-
-										for (unsigned int j = 0; j < 3; ++j)
-											bitmap_pixel[j] = colours[j];
-									}
-								}
-							}
-						}
-						else
-						{
-							for (int iy = MAX(-letter_y, 0); letter_y + iy < MIN(letter_y + (int)glyph->bitmap.rows, bitmap_height); ++iy)
-							{
-								for (int ix = MAX(-letter_x, 0); letter_x + ix < MIN(letter_x + (int)glyph->bitmap.width, bitmap_width); ++ix)
-								{
-									if (glyph->bitmap.buffer[iy * glyph->bitmap.pitch + ix])
-									{
-										unsigned char *bitmap_pixel = bitmap_buffer + (letter_y + iy) * bitmap_pitch + (letter_x + ix) * 4;
-
-										for (unsigned int j = 0; j < 3; ++j)
-											bitmap_pixel[j] = colours[j];
-
-										bitmap_pixel[3] = 0xFF;
-									}
-								}
-							}
-						}
-
-						break;
+					if (surface)
+						Backend_DrawGlyph(surface, glyph->backend, letter_x, letter_y, colours);
+					else
+						Backend_DrawGlyphToScreen(glyph->backend, letter_x, letter_y, colours);
 				}
 
 				pen_x += glyph->x_advance;

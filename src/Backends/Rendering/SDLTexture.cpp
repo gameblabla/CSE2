@@ -11,6 +11,7 @@
 
 typedef struct Backend_Surface
 {
+	BOOL alpha;
 	BOOL needs_syncing;
 	SDL_Surface *sdl_surface;
 	SDL_Texture *texture;
@@ -18,6 +19,11 @@ typedef struct Backend_Surface
 	struct Backend_Surface *next;
 	struct Backend_Surface *prev;
 } Backend_Surface;
+
+typedef struct Backend_Glyph
+{
+	Backend_Surface *surface;
+} Backend_Glyph;
 
 static SDL_Renderer *renderer;
 
@@ -224,27 +230,98 @@ void Backend_ScreenToSurface(Backend_Surface *surface, const RECT *rect)
 	SDL_SetRenderTarget(renderer, default_target);
 }
 
-void Backend_DrawText(Backend_Surface *surface, FontObject *font, int x, int y, const char *text, unsigned long colour)
+Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch, unsigned short total_greys, unsigned char pixel_mode)
 {
-	DrawText(font, (unsigned char*)surface->sdl_surface->pixels, surface->sdl_surface->pitch, surface->sdl_surface->w, surface->sdl_surface->h, x, y, colour, text, strlen(text), TRUE);
-	surface->needs_syncing = TRUE;
+	Backend_Glyph *glyph = (Backend_Glyph*)malloc(sizeof(Backend_Glyph));
+
+	if (glyph == NULL)
+		return NULL;
+
+	glyph->surface = Backend_CreateSurface(width, height);
+
+	if (glyph->surface == NULL)
+	{
+		free(glyph);
+		return NULL;
+	}
+
+	unsigned int surface_pitch;
+	unsigned char *surface_pixels = Backend_Lock(glyph->surface, &surface_pitch);
+
+	switch (pixel_mode)
+	{
+		case FONT_PIXEL_MODE_GRAY:
+			for (unsigned int y = 0; y < height; ++y)
+			{
+				const unsigned char *source_pointer = pixels + y * pitch;
+				unsigned char *destination_pointer = surface_pixels + y * surface_pitch;
+
+				for (unsigned int x = 0; x < width; ++x)
+				{
+					*destination_pointer++ = 0xFF;
+					*destination_pointer++ = 0xFF;
+					*destination_pointer++ = 0xFF;
+					*destination_pointer++ = (unsigned char)(pow((double)*source_pointer++ / (total_greys - 1), 1.0 / 1.8) * 255.0);
+				}
+			}
+
+			break;
+
+		case FONT_PIXEL_MODE_MONO:
+			for (unsigned int y = 0; y < height; ++y)
+			{
+				const unsigned char *source_pointer = pixels + y * pitch;
+				unsigned char *destination_pointer = surface_pixels + y * surface_pitch;
+
+				for (unsigned int x = 0; x < width; ++x)
+				{
+					*destination_pointer++ = 0xFF;
+					*destination_pointer++ = 0xFF;
+					*destination_pointer++ = 0xFF;
+					*destination_pointer++ = *source_pointer++ ? 0xFF : 0;
+				}
+			}
+
+			break;
+	}
+
+	Backend_Unlock(glyph->surface);
+
+	return glyph;
 }
 
-void Backend_DrawTextToScreen(FontObject *font, int x, int y, const char *text, unsigned long colour)
+void Backend_UnloadGlyph(Backend_Glyph *glyph)
 {
-	// Painfully slow. Really need to add hardware-accelerated font rendering.
-	int surface_width, surface_height;
-	SDL_GetRendererOutputSize(renderer, &surface_width, &surface_height);
+	Backend_FreeSurface(glyph->surface);
+	free(glyph);
+}
 
-	SDL_Surface *screen_surface = SDL_CreateRGBSurfaceWithFormat(0, surface_width, surface_height, 0, SDL_PIXELFORMAT_RGB24);
-	SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_RGB24, screen_surface->pixels, screen_surface->pitch);
+void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
+{
+	RECT rect;
+	rect.left = 0;
+	rect.top = 0;
+	rect.right = glyph->surface->sdl_surface->w;
+	rect.bottom = glyph->surface->sdl_surface->h;
 
-	DrawText(font, (unsigned char*)screen_surface->pixels, screen_surface->pitch, screen_surface->w, screen_surface->h, x, y, colour, text, strlen(text), FALSE);
+	SDL_SetSurfaceColorMod(glyph->surface->sdl_surface, colours[0], colours[1], colours[2]);
+	SDL_SetTextureColorMod(glyph->surface->texture, colours[0], colours[1], colours[2]);
 
-	SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, screen_surface);
-	SDL_FreeSurface(screen_surface);
-	SDL_RenderCopy(renderer, texture, NULL, NULL);
-	SDL_DestroyTexture(texture);
+	Backend_Blit(glyph->surface, &rect, surface, x, y, TRUE);
+}
+
+void Backend_DrawGlyphToScreen(Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
+{
+	RECT rect;
+	rect.left = 0;
+	rect.top = 0;
+	rect.right = glyph->surface->sdl_surface->w;
+	rect.bottom = glyph->surface->sdl_surface->h;
+
+	SDL_SetSurfaceColorMod(glyph->surface->sdl_surface, colours[0], colours[1], colours[2]);
+	SDL_SetTextureColorMod(glyph->surface->texture, colours[0], colours[1], colours[2]);
+
+	Backend_BlitToScreen(glyph->surface, &rect, x, y, TRUE);
 }
 
 void Backend_HandleDeviceLoss(void)

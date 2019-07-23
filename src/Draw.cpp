@@ -16,15 +16,7 @@
 #include "Tags.h"
 #include "Backends/Rendering.h"
 
-struct SURFACE
-{
-	BOOL in_use;
-	Backend_Surface *backend;
-};
-
 SDL_Window *gWindow;
-static SDL_Renderer *gRenderer;
-static SDL_Texture *screen_texture;
 
 static SDL_PixelFormat *rgba32_pixel_format;	// Needed because SDL2 is stupid
 
@@ -34,23 +26,29 @@ RECT grcFull = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 int magnification;
 BOOL fullscreen;
 
+struct SURFACE
+{
+	BOOL in_use;
+	Backend_Surface *backend;
+};
+
 SURFACE surf[SURFACE_ID_MAX];
 
 FontObject *gFont;
 
-static BOOL vsync;
+//static BOOL vsync;
 
 BOOL Flip_SystemTask(HWND hWnd)
 {
 	(void)hWnd;
 
-	if (vsync)
+/*	if (vsync)
 	{
 		if (!SystemTask())
 			return FALSE;
 	}
 	else
-	{
+	{*/
 		while (TRUE)
 		{
 			const unsigned int frameDelays[3] = {17, 16, 17};
@@ -75,11 +73,11 @@ BOOL Flip_SystemTask(HWND hWnd)
 
 			SDL_Delay(1);
 		}
-	}
+//	}
 
 	Backend_DrawScreen();
 
-	SDL_SetRenderTarget(gRenderer, NULL);
+/*	SDL_SetRenderTarget(gRenderer, NULL);
 
 	int renderer_width, renderer_height;
 	SDL_GetRendererOutputSize(gRenderer, &renderer_width, &renderer_height);
@@ -109,7 +107,7 @@ BOOL Flip_SystemTask(HWND hWnd)
 
 	SDL_SetRenderTarget(gRenderer, screen_texture);
 
-	SDL_RenderPresent(gRenderer);
+	SDL_RenderPresent(gRenderer);*/
 
 	return TRUE;
 }
@@ -135,6 +133,7 @@ BOOL StartDirectDraw(int lMagnification)
 	// Ugly way to round the magnification up to the nearest multiple of SPRITE_SCALE (we can't use 2x sprites at 1x or 3x internal resolution)
 	magnification = ((magnification + (SPRITE_SCALE - 1)) / SPRITE_SCALE) * SPRITE_SCALE;
 
+	/*
 	// Check if vsync is possible
 	SDL_DisplayMode display_mode;
 	SDL_GetWindowDisplayMode(gWindow, &display_mode);
@@ -149,11 +148,12 @@ BOOL StartDirectDraw(int lMagnification)
 	screen_texture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, WINDOW_WIDTH * magnification, WINDOW_HEIGHT * magnification);
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
 	SDL_SetRenderTarget(gRenderer, screen_texture);
+	*/
 
 	rgba32_pixel_format = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA32);
 
 	// Create renderer
-	if (!Backend_Init(gRenderer))
+	if (!Backend_Init(gWindow))
 		return FALSE;
 
 	return TRUE;
@@ -169,8 +169,8 @@ void EndDirectDraw()
 
 	SDL_FreeFormat(rgba32_pixel_format);
 
-	SDL_DestroyTexture(screen_texture);
-	SDL_DestroyRenderer(gRenderer);
+	//SDL_DestroyTexture(screen_texture);
+	//SDL_DestroyRenderer(gRenderer);
 }
 
 void ReleaseSurface(int s)
@@ -661,12 +661,12 @@ void InitTextObject(const char *font_name)
 
 void PutText(int x, int y, const char *text, unsigned long color)
 {
-	Backend_DrawTextToScreen(gFont, x * magnification, y * magnification, text, color);
+	DrawText(gFont, NULL, x * magnification, y * magnification, color, text, strlen(text));
 }
 
 void PutText2(int x, int y, const char *text, unsigned long color, Surface_Ids surf_no)
 {
-	Backend_DrawText(surf[surf_no].backend, gFont, x * magnification, y * magnification, text, color);
+	DrawText(gFont, surf[surf_no].backend, x * magnification, y * magnification, color, text, strlen(text));
 }
 
 void EndTextObject()

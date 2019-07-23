@@ -4,11 +4,16 @@
 
 #include "../WindowsWrapper.h"
 
-#include "../Font.h"
+enum
+{
+	FONT_PIXEL_MODE_GRAY,
+	FONT_PIXEL_MODE_MONO,
+};
 
 typedef struct Backend_Surface Backend_Surface;
+typedef struct Backend_Glyph Backend_Glyph;
 
-BOOL Backend_Init(SDL_Renderer *renderer);
+BOOL Backend_Init(SDL_Window *renderer);
 void Backend_Deinit(void);
 void Backend_DrawScreen(void);
 Backend_Surface* Backend_CreateSurface(unsigned int width, unsigned int height);
@@ -20,7 +25,9 @@ void Backend_BlitToScreen(Backend_Surface *source_surface, const RECT *rect, lon
 void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha);
 void Backend_ColourFillToScreen(const RECT *rect, unsigned char red, unsigned char green, unsigned char blue);
 void Backend_ScreenToSurface(Backend_Surface *surface, const RECT *rect);
-void Backend_DrawText(Backend_Surface *surface, FontObject *font, int x, int y, const char *text, unsigned long colour);
-void Backend_DrawTextToScreen(FontObject *font, int x, int y, const char *text, unsigned long colour);
+Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch, unsigned short total_greys, unsigned char pixel_mode);
+void Backend_UnloadGlyph(Backend_Glyph *glyph);
+void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours);
+void Backend_DrawGlyphToScreen(Backend_Glyph *glyph, long x, long y, const unsigned char *colours);
 void Backend_HandleDeviceLoss(void);
 void Backend_HandleWindowResize(void);
