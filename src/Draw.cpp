@@ -36,19 +36,19 @@ SURFACE surf[SURFACE_ID_MAX];
 
 FontObject *gFont;
 
-//static BOOL vsync;
+static BOOL vsync;
 
 BOOL Flip_SystemTask(HWND hWnd)
 {
 	(void)hWnd;
 
-/*	if (vsync)
+	if (vsync)
 	{
 		if (!SystemTask())
 			return FALSE;
 	}
 	else
-	{*/
+	{
 		while (TRUE)
 		{
 			const unsigned int frameDelays[3] = {17, 16, 17};
@@ -73,41 +73,9 @@ BOOL Flip_SystemTask(HWND hWnd)
 
 			SDL_Delay(1);
 		}
-//	}
+	}
 
 	Backend_DrawScreen();
-
-/*	SDL_SetRenderTarget(gRenderer, NULL);
-
-	int renderer_width, renderer_height;
-	SDL_GetRendererOutputSize(gRenderer, &renderer_width, &renderer_height);
-
-	int texture_width, texture_height;
-	SDL_QueryTexture(screen_texture, NULL, NULL, &texture_width, &texture_height);
-
-	SDL_Rect dst_rect;
-	if ((float)renderer_width / texture_width < (float)renderer_height / texture_height)
-	{
-		dst_rect.w = renderer_width;
-		dst_rect.h = (int)(texture_height * (float)renderer_width / texture_width);
-		dst_rect.x = 0;
-		dst_rect.y = (renderer_height - dst_rect.h) / 2;
-	}
-	else
-	{
-		dst_rect.w = (int)(texture_width * (float)renderer_height / texture_height);
-		dst_rect.h = renderer_height;
-		dst_rect.x = (renderer_width - dst_rect.w) / 2;
-		dst_rect.y = 0;
-	}
-
-	SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
-	SDL_RenderClear(gRenderer);
-	SDL_RenderCopy(gRenderer, screen_texture, NULL, &dst_rect);
-
-	SDL_SetRenderTarget(gRenderer, screen_texture);
-
-	SDL_RenderPresent(gRenderer);*/
 
 	return TRUE;
 }
@@ -133,27 +101,10 @@ BOOL StartDirectDraw(int lMagnification)
 	// Ugly way to round the magnification up to the nearest multiple of SPRITE_SCALE (we can't use 2x sprites at 1x or 3x internal resolution)
 	magnification = ((magnification + (SPRITE_SCALE - 1)) / SPRITE_SCALE) * SPRITE_SCALE;
 
-	/*
-	// Check if vsync is possible
-	SDL_DisplayMode display_mode;
-	SDL_GetWindowDisplayMode(gWindow, &display_mode);
-	vsync = display_mode.refresh_rate == 60;
-
-	gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE | (vsync ? SDL_RENDERER_PRESENTVSYNC : 0));
-
-	if (gRenderer == NULL)
-		return FALSE;
-
-	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
-	screen_texture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, WINDOW_WIDTH * magnification, WINDOW_HEIGHT * magnification);
-	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
-	SDL_SetRenderTarget(gRenderer, screen_texture);
-	*/
-
 	rgba32_pixel_format = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA32);
 
 	// Create renderer
-	if (!Backend_Init(gWindow))
+	if (!Backend_Init(gWindow, WINDOW_WIDTH * magnification, WINDOW_HEIGHT * magnification, &vsync))
 		return FALSE;
 
 	return TRUE;
@@ -168,9 +119,6 @@ void EndDirectDraw()
 	Backend_Deinit();
 
 	SDL_FreeFormat(rgba32_pixel_format);
-
-	//SDL_DestroyTexture(screen_texture);
-	//SDL_DestroyRenderer(gRenderer);
 }
 
 void ReleaseSurface(int s)

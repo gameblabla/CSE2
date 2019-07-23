@@ -33,25 +33,34 @@ static SDL_Texture *texture;
 
 static Backend_Surface framebuffer;
 
-BOOL Backend_Init(SDL_Renderer *p_renderer)
+BOOL Backend_Init(SDL_Window *window, unsigned int width, unsigned int height, BOOL *vsync)
 {
-	renderer = p_renderer;
+	// Check if vsync is possible
+	SDL_DisplayMode display_mode;
+	SDL_GetWindowDisplayMode(window, &display_mode);
+	*vsync = display_mode.refresh_rate == 60;
 
-	SDL_Texture *render_target = SDL_GetRenderTarget(renderer);
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE | (*vsync ? SDL_RENDERER_PRESENTVSYNC : 0));
 
-	int width, height;
-	SDL_QueryTexture(render_target, NULL, NULL, &width, &height);
+	if (renderer == NULL)
+		return FALSE;
 
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
 	texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, width, height);
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
 
 	if (texture == NULL)
+	{
+		SDL_DestroyRenderer(renderer);
 		return FALSE;
+	}
 
 	framebuffer.pixels = (unsigned char*)malloc(width * height * 3);
 
 	if (framebuffer.pixels == NULL)
 	{
 		SDL_DestroyTexture(texture);
+		SDL_DestroyRenderer(renderer);
 		return FALSE;
 	}
 
@@ -66,6 +75,7 @@ void Backend_Deinit(void)
 {
 	free(framebuffer.pixels);
 	SDL_DestroyTexture(texture);
+	SDL_DestroyRenderer(renderer);
 }
 
 void Backend_DrawScreen(void)
@@ -79,7 +89,33 @@ void Backend_DrawScreen(void)
 
 	SDL_UnlockTexture(texture);
 
-	SDL_RenderCopy(renderer, texture, NULL, NULL);
+	int renderer_width, renderer_height;
+	SDL_GetRendererOutputSize(renderer, &renderer_width, &renderer_height);
+
+	int texture_width, texture_height;
+	SDL_QueryTexture(texture, NULL, NULL, &texture_width, &texture_height);
+
+	SDL_Rect dst_rect;
+	if ((float)renderer_width / texture_width < (float)renderer_height / texture_height)
+	{
+		dst_rect.w = renderer_width;
+		dst_rect.h = (int)(texture_height * (float)renderer_width / texture_width);
+		dst_rect.x = 0;
+		dst_rect.y = (renderer_height - dst_rect.h) / 2;
+	}
+	else
+	{
+		dst_rect.w = (int)(texture_width * (float)renderer_height / texture_height);
+		dst_rect.h = renderer_height;
+		dst_rect.x = (renderer_width - dst_rect.w) / 2;
+		dst_rect.y = 0;
+	}
+
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+	SDL_RenderClear(renderer);
+	SDL_RenderCopy(renderer, texture, NULL, &dst_rect);
+
+	SDL_RenderPresent(renderer);
 }
 
 Backend_Surface* Backend_CreateSurface(unsigned int width, unsigned int height)

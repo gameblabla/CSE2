@@ -31,7 +31,7 @@ static GLuint framebuffer_id;
 
 static Backend_Surface framebuffer_surface;
 
-BOOL Backend_Init(SDL_Window *p_window)
+BOOL Backend_Init(SDL_Window *p_window, unsigned int width, unsigned int height, BOOL *vsync)
 {
 	window = p_window;
 
@@ -213,7 +213,7 @@ static void ColourFillCommon(const RECT *rect, unsigned char red, unsigned char 
 }
 
 void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha)
-{	
+{
 	// Point our framebuffer to the destination texture
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, surface->texture_id, 0);
 

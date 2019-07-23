@@ -13,7 +13,7 @@ enum
 typedef struct Backend_Surface Backend_Surface;
 typedef struct Backend_Glyph Backend_Glyph;
 
-BOOL Backend_Init(SDL_Window *renderer);
+BOOL Backend_Init(SDL_Window *window, unsigned int width, unsigned int height, BOOL *vsync);
 void Backend_Deinit(void);
 void Backend_DrawScreen(void);
 Backend_Surface* Backend_CreateSurface(unsigned int width, unsigned int height);
