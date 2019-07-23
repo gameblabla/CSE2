@@ -35,7 +35,7 @@ void WriteMiniMapLine(int line)
 		// Yup. This really is an if/else chain.
 		// No switch here.
 		if (a == 0)
-			Surface2Surface(x, line, &rcLevel[0], 9, 26);
+			Surface2Surface(x, line, &rcLevel[0], SURFACE_ID_MAP, SURFACE_ID_TEXT_BOX);
 		else if (a == 68 ||
 			a == 1 ||
 			a == 64 ||
@@ -57,7 +57,7 @@ void WriteMiniMapLine(int line)
 			a == 161 ||
 			a == 162 ||
 			a == 163)
-			Surface2Surface(x, line, &rcLevel[1], 9, 26);
+			Surface2Surface(x, line, &rcLevel[1], SURFACE_ID_MAP, SURFACE_ID_TEXT_BOX);
 		else if (a == 67 ||
 			a == 99 ||
 			a == 80 ||
@@ -69,9 +69,9 @@ void WriteMiniMapLine(int line)
 			a == 115 ||
 			a == 116 ||
 			a == 119)
-			Surface2Surface(x, line, &rcLevel[2], 9, 26);
+			Surface2Surface(x, line, &rcLevel[2], SURFACE_ID_MAP, SURFACE_ID_TEXT_BOX);
 		else
-			Surface2Surface(x, line, &rcLevel[3], 9, 26);
+			Surface2Surface(x, line, &rcLevel[3], SURFACE_ID_MAP, SURFACE_ID_TEXT_BOX);
 	}
 }
 
