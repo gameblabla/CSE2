@@ -16,12 +16,6 @@
 #include "Tags.h"
 #include "Backends/Rendering.h"
 
-struct SURFACE
-{
-	BOOL in_use;
-	Backend_Surface *backend;
-};
-
 SDL_Window *gWindow;
 
 static SDL_PixelFormat *rgb24_pixel_format;	// Needed because SDL2 is stupid
@@ -31,6 +25,12 @@ RECT grcFull = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
 int magnification;
 BOOL fullscreen;
+
+struct SURFACE
+{
+	BOOL in_use;
+	Backend_Surface *backend;
+};
 
 SURFACE surf[SURFACE_ID_MAX];
 
@@ -559,12 +559,12 @@ void InitTextObject(const char *font_name)
 
 void PutText(int x, int y, const char *text, unsigned long color)
 {
-	Backend_DrawTextToScreen(gFont, x * magnification, y * magnification, text, color);
+	DrawText(gFont, NULL, x * magnification, y * magnification, color, text, strlen(text));
 }
 
 void PutText2(int x, int y, const char *text, unsigned long color, Surface_Ids surf_no)
 {
-	Backend_DrawText(surf[surf_no].backend, gFont, x * magnification, y * magnification, text, color);
+	DrawText(gFont, surf[surf_no].backend, x * magnification, y * magnification, color, text, strlen(text));
 }
 
 void EndTextObject()
