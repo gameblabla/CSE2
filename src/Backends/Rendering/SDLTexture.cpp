@@ -67,46 +67,6 @@ static void FlushSurface(Backend_Surface *surface)
 	}
 }
 
-Backend_Surface* CreateSurface(unsigned int width, unsigned int height, BOOL alpha)
-{
-	Backend_Surface *surface = (Backend_Surface*)malloc(sizeof(Backend_Surface));
-
-	if (surface == NULL)
-		return NULL;
-
-	surface->sdl_surface = SDL_CreateRGBSurfaceWithFormat(0, width, height, 0, alpha ? SDL_PIXELFORMAT_RGBA32 : SDL_PIXELFORMAT_RGB24);
-
-	if (surface->sdl_surface == NULL)
-	{
-		free(surface);
-		return NULL;
-	}
-
-	surface->texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, width, height);
-
-	if (surface->texture == NULL)
-	{
-		SDL_FreeSurface(surface->sdl_surface);
-		free(surface);
-		return NULL;
-	}
-
-	surface->alpha = alpha;
-
-	if (!surface->alpha)
-		SDL_SetColorKey(surface->sdl_surface, SDL_TRUE, SDL_MapRGB(surface->sdl_surface->format, 0, 0, 0));
-
-	surface->needs_syncing = FALSE;
-
-	surface->next = surface_list_head;
-	surface->prev = NULL;
-	surface_list_head = surface;
-	if (surface->next)
-		surface->next->prev = surface;
-
-	return surface;
-}
-
 static void RectToSDLRect(const RECT *rect, SDL_Rect *sdl_rect)
 {
 	sdl_rect->x = (int)rect->left;
@@ -149,6 +109,46 @@ void Backend_DrawScreen(void)
 	SDL_RenderCopy(renderer, screen_texture, NULL, NULL);
 	SDL_SetRenderTarget(renderer, screen_texture);
 	SDL_RenderPresent(renderer);
+}
+
+static Backend_Surface* CreateSurface(unsigned int width, unsigned int height, BOOL alpha)
+{
+	Backend_Surface *surface = (Backend_Surface*)malloc(sizeof(Backend_Surface));
+
+	if (surface == NULL)
+		return NULL;
+
+	surface->sdl_surface = SDL_CreateRGBSurfaceWithFormat(0, width, height, 0, alpha ? SDL_PIXELFORMAT_RGBA32 : SDL_PIXELFORMAT_RGB24);
+
+	if (surface->sdl_surface == NULL)
+	{
+		free(surface);
+		return NULL;
+	}
+
+	surface->texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, width, height);
+
+	if (surface->texture == NULL)
+	{
+		SDL_FreeSurface(surface->sdl_surface);
+		free(surface);
+		return NULL;
+	}
+
+	surface->alpha = alpha;
+
+	if (!surface->alpha)
+		SDL_SetColorKey(surface->sdl_surface, SDL_TRUE, SDL_MapRGB(surface->sdl_surface->format, 0, 0, 0));
+
+	surface->needs_syncing = FALSE;
+
+	surface->next = surface_list_head;
+	surface->prev = NULL;
+	surface_list_head = surface;
+	if (surface->next)
+		surface->next->prev = surface;
+
+	return surface;
 }
 
 Backend_Surface* Backend_CreateSurface(unsigned int width, unsigned int height)
