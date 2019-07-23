@@ -363,6 +363,11 @@ void Backend_UnloadGlyph(Backend_Glyph *glyph)
 
 void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
 {
+	// This is actually slightly imperfect: the SDL_Texture side of things uses alpha, not a colour-key,
+	// so the bug where the font is blended with the colour key doesn't occur. SDL_Textures don't support
+	// colour-keys, so the next best thing is relying on the software fallback, but I don't like the idea
+	// of uploading textures to the GPU every time a glyph is drawn.
+
 	RECT rect;
 	rect.left = 0;
 	rect.top = 0;
