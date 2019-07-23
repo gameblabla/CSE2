@@ -26,6 +26,7 @@ void Backend_BlitToScreen(Backend_Surface *source_surface, const RECT *rect, lon
 void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue);
 void Backend_ColourFillToScreen(const RECT *rect, unsigned char red, unsigned char green, unsigned char blue);
 void Backend_ScreenToSurface(Backend_Surface *surface, const RECT *rect);
+BOOL Backend_SupportsSubpixelGlyph(void);
 Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch, unsigned short total_greys, unsigned char pixel_mode);
 void Backend_UnloadGlyph(Backend_Glyph *glyph);
 void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours);

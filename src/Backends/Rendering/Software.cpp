@@ -255,6 +255,11 @@ void Backend_ScreenToSurface(Backend_Surface *surface, const RECT *rect)
 	Backend_Blit(&framebuffer, rect, surface, rect->left, rect->top, FALSE);
 }
 
+BOOL Backend_SupportsSubpixelGlyph(void)
+{
+	return TRUE;	// It's a software renderer, baby
+}
+
 Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch, unsigned short total_greys, unsigned char pixel_mode)
 {
 	Backend_Glyph *glyph = (Backend_Glyph*)malloc(sizeof(Backend_Glyph));
