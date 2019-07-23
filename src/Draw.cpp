@@ -229,7 +229,7 @@ static BOOL LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, BOOL create_surface)
 
 	if (surf_no >= SURFACE_ID_MAX)
 	{
-		printf("Tried to load bitmap at invalid slot (%d - maximum is %d\n", surf_no, SURFACE_ID_MAX);
+		printf("Tried to load bitmap at invalid slot (%d - maximum is %d)\n", surf_no, SURFACE_ID_MAX);
 	}
 	else
 	{
@@ -287,27 +287,34 @@ static BOOL LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, BOOL create_surface)
 					}
 					else
 					{
+						unsigned int pitch;
+						unsigned char *pixels = Backend_Lock(surf[surf_no].backend, &pitch);
+
 						const int magnification_scaled = magnification / SPRITE_SCALE;
 
 						if (magnification_scaled == 1)
 						{
 							// Just copy the pixels the way they are
-							Backend_LoadPixels(surf[surf_no].backend, (unsigned char*)converted_surface->pixels, converted_surface->w, converted_surface->h, converted_surface->pitch);
+							for (int y = 0; y < converted_surface->h; ++y)
+							{
+								const unsigned char *src_row = (unsigned char*)converted_surface->pixels + y * converted_surface->pitch;
+								unsigned char *dst_row = &pixels[y * pitch];
+
+								memcpy(dst_row, src_row, converted_surface->w * 4);
+							}
 						}
 						else
 						{
 							// Upscale the bitmap to the game's internal resolution
-							unsigned char *pixels = (unsigned char*)malloc((converted_surface->w * magnification_scaled) * (converted_surface->h * magnification_scaled) * 4);
-
-							for (int h = 0; h < converted_surface->h; ++h)
+							for (int y = 0; y < converted_surface->h; ++y)
 							{
-								const unsigned char *src_row = (unsigned char*)converted_surface->pixels + h * converted_surface->pitch;
-								unsigned char *dst_row = pixels + h * (converted_surface->w * magnification_scaled * 4) * magnification_scaled;
+								const unsigned char *src_row = (unsigned char*)converted_surface->pixels + y * converted_surface->pitch;
+								unsigned char *dst_row = &pixels[y * pitch * magnification_scaled];
 
 								const unsigned char *src_ptr = src_row;
 								unsigned char *dst_ptr = dst_row;
 
-								for (int w = 0; w < converted_surface->w; ++w)
+								for (int x = 0; x < converted_surface->w; ++x)
 								{
 									for (int i = 0; i < magnification_scaled; ++i)
 									{
@@ -321,13 +328,11 @@ static BOOL LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, BOOL create_surface)
 								}
 
 								for (int i = 1; i < magnification_scaled; ++i)
-									memcpy(dst_row + i * converted_surface->w * magnification_scaled * 4, dst_row, converted_surface->w * magnification_scaled * 4);
+									memcpy(dst_row + i * pitch, dst_row, converted_surface->w * magnification_scaled * 4);
 							}
-
-							Backend_LoadPixels(surf[surf_no].backend, pixels, converted_surface->w * magnification_scaled, converted_surface->h * magnification_scaled, converted_surface->w * magnification_scaled * 4);
-							free(pixels);
 						}
 
+						Backend_Unlock(surf[surf_no].backend);
 						SDL_FreeSurface(converted_surface);
 						printf(" ^ Successfully loaded\n");
 						success = TRUE;
