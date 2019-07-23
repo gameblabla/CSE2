@@ -22,11 +22,9 @@ typedef struct Backend_Surface
 
 typedef struct Backend_Glyph
 {
-	unsigned char *pixels;
+	void *pixels;
 	unsigned int width;
 	unsigned int height;
-	int pitch;
-	unsigned short total_greys;
 	unsigned char pixel_mode;
 } Backend_Glyph;
 
@@ -267,20 +265,85 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 	if (glyph == NULL)
 		return NULL;
 
-	glyph->pixels = (unsigned char*)malloc(pitch * height);
-
-	if (glyph->pixels == NULL)
+	switch (pixel_mode)
 	{
-		free(glyph);
-		return NULL;
-	}
+		case FONT_PIXEL_MODE_LCD:
+		{
+			glyph->pixels = malloc(width * height * sizeof(double) * 3);
 
-	memcpy(glyph->pixels, pixels, pitch * height);
+			if (glyph->pixels == NULL)
+			{
+				free(glyph);
+				return NULL;
+			}
+
+			double *destination_pointer = (double*)glyph->pixels;
+
+			for (unsigned int y = 0; y < height; ++y)
+			{
+				const unsigned char *source_pointer = pixels + y * pitch;
+
+				for (unsigned int x = 0; x < width; ++x)
+				{
+					for (unsigned int i = 0; i < 3; ++i)
+					{
+						*destination_pointer++ = pow((*source_pointer++ / 255.0), 1.0 / 1.8);	// Gamma correction
+					}
+				}
+			}
+
+			break;
+		}
+
+		case FONT_PIXEL_MODE_GRAY:
+		{
+			glyph->pixels = malloc(width * height * sizeof(double));
+
+			if (glyph->pixels == NULL)
+			{
+				free(glyph);
+				return NULL;
+			}
+
+			double *destination_pointer = (double*)glyph->pixels;
+
+			for (unsigned int y = 0; y < height; ++y)
+			{
+				const unsigned char *source_pointer = pixels + y * pitch;
+
+				for (unsigned int x = 0; x < width; ++x)
+				{
+					*destination_pointer++ = pow((double)*source_pointer++ / (total_greys - 1), 1.0 / 1.8);	// Gamma correction
+				}
+			}
+
+			break;
+		}
+
+		case FONT_PIXEL_MODE_MONO:
+		{
+			glyph->pixels = malloc(width * height);
+
+			if (glyph->pixels == NULL)
+			{
+				free(glyph);
+				return NULL;
+			}
+
+			for (unsigned int y = 0; y < height; ++y)
+			{
+				const unsigned char *source_pointer = pixels + y * pitch;
+				unsigned char *destination_pointer = (unsigned char*)glyph->pixels + y * width;
+
+				memcpy(destination_pointer, source_pointer, width);
+			}
+
+			break;
+		}
+	}
 
 	glyph->width = width;
 	glyph->height = height;
-	glyph->pitch = pitch;
-	glyph->total_greys = total_greys;
 	glyph->pixel_mode = pixel_mode;
 
 	return glyph;
@@ -301,7 +364,7 @@ void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, l
 			{
 				for (unsigned int ix = MAX(-x, 0); x + ix < MIN(x + glyph->width / 3, surface->width); ++ix)
 				{
-					const unsigned char *font_pixel = glyph->pixels + iy * glyph->pitch + ix * 3;
+					const double *font_pixel = (double*)glyph->pixels + (iy * glyph->width + ix) * 3;
 
 					if (font_pixel[0] || font_pixel[1] || font_pixel[2])
 					{
@@ -309,7 +372,7 @@ void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, l
 
 						for (unsigned int j = 0; j < 3; ++j)
 						{
-							const double alpha = pow((font_pixel[j] / 255.0), 1.0 / 1.8);			// Gamma correction
+							const double alpha = font_pixel[j];
 							bitmap_pixel[j] = (unsigned char)((colours[j] * alpha) + (bitmap_pixel[j] * (1.0 - alpha)));	// Alpha blending
 						}
 					}
@@ -323,12 +386,10 @@ void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, l
 			{
 				for (unsigned int ix = MAX(-x, 0); x + ix < MIN(x + glyph->width, surface->width); ++ix)
 				{
-					const unsigned char font_pixel = glyph->pixels[iy * glyph->pitch + ix];
+					const double alpha = ((double*)glyph->pixels)[iy * glyph->width + ix];
 
-					if (font_pixel)
+					if (alpha)
 					{
-						const double alpha = pow((double)font_pixel / (glyph->total_greys - 1), 1.0 / 1.8);			// Gamma-corrected
-
 						unsigned char *bitmap_pixel = surface->pixels + (y + iy) * surface->pitch + (x + ix) * 3;
 
 						for (unsigned int j = 0; j < 3; ++j)
@@ -344,7 +405,7 @@ void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, l
 			{
 				for (unsigned int ix = MAX(-x, 0); x + ix < MIN(x + glyph->width, surface->width); ++ix)
 				{
-					if (glyph->pixels[iy * glyph->pitch + ix])
+					if (((unsigned char*)glyph->pixels)[iy * glyph->width + ix])
 					{
 						unsigned char *bitmap_pixel = surface->pixels + (y + iy) * surface->pitch + (x + ix) * 3;
 
