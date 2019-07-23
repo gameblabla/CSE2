@@ -18,6 +18,13 @@ typedef struct Backend_Surface
 	unsigned char *pixels;
 } Backend_Surface;
 
+typedef struct Backend_Glyph
+{
+	GLuint texture_id;
+	unsigned int width;
+	unsigned int height;
+} Backend_Glyph;
+
 static SDL_Window *window;
 static SDL_GLContext context;
 static GLuint colour_key_program_id;
@@ -88,6 +95,8 @@ BOOL Backend_Init(SDL_Window *p_window)
 //	glLoadIdentity();
 
 	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -228,14 +237,7 @@ void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Sur
 	// Point our framebuffer to the destination texture
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, destination_surface->texture_id, 0);
 
-	// The matrix needs resetting to fit the dimensions of the destination texture
-	glPushMatrix();
-	glLoadIdentity();
-	glOrtho(0.0, destination_surface->width, 0.0, destination_surface->height, 1.0, -1.0);
-
 	BlitCommon(source_surface, rect, x, y, colour_key);
-
-	glPopMatrix();
 }
 
 void Backend_BlitToScreen(Backend_Surface *source_surface, const RECT *rect, long x, long y, BOOL colour_key)
@@ -268,14 +270,7 @@ void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned cha
 	// Point our framebuffer to the destination texture
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, surface->texture_id, 0);
 
-	// The matrix needs resetting to fit the dimensions of the destination texture
-	glPushMatrix();
-	glLoadIdentity();
-	glOrtho(0.0, surface->width, 0.0, surface->height, 1.0, -1.0);
-
 	ColourFillCommon(rect, red, green, blue);
-
-	glPopMatrix();
 }
 
 void Backend_ColourFillToScreen(const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
@@ -291,24 +286,116 @@ void Backend_ScreenToSurface(Backend_Surface *surface, const RECT *rect)
 	// Point our framebuffer to the destination texture
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, surface->texture_id, 0);
 
-	// The matrix needs resetting to fit the dimensions of the destination texture
-	glPushMatrix();
-	glLoadIdentity();
-	glOrtho(0.0, surface->width, 0.0, surface->height, 1.0, -1.0);
-
 	BlitCommon(&framebuffer_surface, rect, rect->left, rect->top, FALSE);
-
-	glPopMatrix();
 }
 
-void Backend_DrawText(Backend_Surface *surface, FontObject *font, int x, int y, const char *text, unsigned long colour)
+BOOL Backend_SupportsSubpixelGlyph(void)
 {
-	// Soon
+	return FALSE;	// Per-component alpha is available as an extension, but I haven't looked into it yet
 }
 
-void Backend_DrawTextToScreen(FontObject *font, int x, int y, const char *text, unsigned long colour)
+Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch, unsigned short total_greys, unsigned char pixel_mode)
 {
-	// Soon
+	Backend_Glyph *glyph = (Backend_Glyph*)malloc(sizeof(Backend_Glyph));
+
+	if (glyph == NULL)
+		return NULL;
+
+	unsigned char *buffer = (unsigned char*)malloc(width * height * 4);
+
+	switch (pixel_mode)
+	{
+		// FONT_PIXEL_MODE_LCD is unsupported
+
+		case FONT_PIXEL_MODE_GRAY:
+			for (unsigned int y = 0; y < height; ++y)
+			{
+				const unsigned char *source_pointer = pixels + y * pitch;
+				unsigned char *destination_pointer = buffer + y * width * 4;
+
+				for (unsigned int x = 0; x < width; ++x)
+				{
+					*destination_pointer++ = 0xFF;
+					*destination_pointer++ = 0xFF;
+					*destination_pointer++ = 0xFF;
+					*destination_pointer++ = (unsigned char)(pow((double)*source_pointer++ / (total_greys - 1), 1.0 / 1.8) * 255.0);
+				}
+			}
+
+			break;
+
+		case FONT_PIXEL_MODE_MONO:
+			for (unsigned int y = 0; y < height; ++y)
+			{
+				const unsigned char *source_pointer = pixels + y * pitch;
+				unsigned char *destination_pointer = buffer + y * width * 4;
+
+				for (unsigned int x = 0; x < width; ++x)
+				{
+					*destination_pointer++ = 0xFF;
+					*destination_pointer++ = 0xFF;
+					*destination_pointer++ = 0xFF;
+					*destination_pointer++ = *source_pointer++ ? 0xFF : 0;
+				}
+			}
+
+			break;
+	}
+
+	glGenTextures(1, &glyph->texture_id);
+	glBindTexture(GL_TEXTURE_2D, glyph->texture_id);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	glyph->width = width;
+	glyph->height = height;
+
+	free(buffer);
+
+	return glyph;
+}
+
+void Backend_UnloadGlyph(Backend_Glyph *glyph)
+{
+	glDeleteTextures(1, &glyph->texture_id);
+	free(glyph);
+}
+
+static void DrawGlyphCommon(Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
+{
+	// Disable colour-keying
+	glUseProgram(0);
+
+	glBindTexture(GL_TEXTURE_2D, glyph->texture_id);
+
+	glBegin(GL_QUADS);
+		glColor3f(colours[0] / 255.0f, colours[1] / 255.0f, colours[2] / 255.0f);
+		glTexCoord2f(0.0f, 0.0f);
+		glVertex2f((GLfloat)x, (GLfloat)y);
+		glTexCoord2f(1.0f, 0.0f);
+		glVertex2f((GLfloat)x + glyph->width, (GLfloat)y);
+		glTexCoord2f(1.0f, 1.0f);
+		glVertex2f((GLfloat)x + glyph->width, (GLfloat)y + glyph->height);
+		glTexCoord2f(0.0f, 1.0f);
+		glVertex2f((GLfloat)x, (GLfloat)y + glyph->height);
+	glEnd();
+}
+
+void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
+{
+	// Point our framebuffer to the destination texture
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, surface->texture_id, 0);
+
+	DrawGlyphCommon(glyph, x, y, colours);
+}
+
+void Backend_DrawGlyphToScreen(Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
+{
+	// Point our framebuffer to the screen texture
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, framebuffer_surface.texture_id, 0);
+
+	DrawGlyphCommon(glyph, x, y, colours);
 }
 
 void Backend_HandleDeviceLoss(void)
