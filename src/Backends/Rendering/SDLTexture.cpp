@@ -163,28 +163,41 @@ Backend_Surface* Backend_CreateSurface(unsigned int width, unsigned int height)
 
 void Backend_FreeSurface(Backend_Surface *surface)
 {
+	if (surface == NULL)
+		return;
+
 	if (surface->next)
 		surface->next->prev = surface->prev;
 	if (surface->prev)
 		surface->prev->next = surface->next;
 
+	SDL_DestroyTexture(surface->texture);
 	SDL_FreeSurface(surface->sdl_surface);
 	free(surface);
 }
 
 unsigned char* Backend_Lock(Backend_Surface *surface, unsigned int *pitch)
 {
+	if (surface == NULL)
+		return NULL;
+
 	*pitch = surface->sdl_surface->pitch;
 	return (unsigned char*)surface->sdl_surface->pixels;
 }
 
 void Backend_Unlock(Backend_Surface *surface)
 {
+	if (surface == NULL)
+		return;
+
 	surface->needs_syncing = TRUE;
 }
 
 void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL colour_key)
 {
+	if (source_surface == NULL || destination_surface == NULL)
+		return;
+
 	if (source_surface->needs_syncing)
 	{
 		FlushSurface(source_surface);
@@ -209,6 +222,9 @@ void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Sur
 
 void Backend_BlitToScreen(Backend_Surface *source_surface, const RECT *rect, long x, long y, BOOL colour_key)
 {
+	if (source_surface == NULL)
+		return;
+
 	if (source_surface->needs_syncing)
 	{
 		FlushSurface(source_surface);
@@ -227,6 +243,9 @@ void Backend_BlitToScreen(Backend_Surface *source_surface, const RECT *rect, lon
 
 void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
 {
+	if (surface == NULL)
+		return;
+
 	SDL_Rect sdl_rect;
 	RectToSDLRect(rect, &sdl_rect);
 
@@ -261,6 +280,9 @@ void Backend_ColourFillToScreen(const RECT *rect, unsigned char red, unsigned ch
 
 void Backend_ScreenToSurface(Backend_Surface *surface, const RECT *rect)
 {
+	if (surface == NULL)
+		return;
+
 	SDL_Rect sdl_rect;
 	RectToSDLRect(rect, &sdl_rect);
 
@@ -362,6 +384,9 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 
 void Backend_UnloadGlyph(Backend_Glyph *glyph)
 {
+	if (glyph == NULL)
+		return;
+
 	Backend_FreeSurface(glyph->surface);
 	free(glyph);
 }
@@ -372,6 +397,9 @@ void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, l
 	// so the bug where the font is blended with the colour key doesn't occur. SDL_Textures don't support
 	// colour-keys, so the next best thing is relying on the software fallback, but I don't like the idea
 	// of uploading textures to the GPU every time a glyph is drawn.
+
+	if (glyph == NULL || surface == NULL)
+		return;
 
 	RECT rect;
 	rect.left = 0;
@@ -387,6 +415,9 @@ void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, l
 
 void Backend_DrawGlyphToScreen(Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
 {
+	if (glyph == NULL)
+		return;
+
 	RECT rect;
 	rect.left = 0;
 	rect.top = 0;
