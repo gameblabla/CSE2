@@ -208,7 +208,16 @@ ifneq ($(WINDOWS), 1)
 	RESOURCES += ICON/ICON_MINI.bmp
 endif
 
-ifeq ($(RENDERER), Texture)
+ifeq ($(RENDERER), OpenGL2)
+	SOURCES += Backends/Rendering/OpenGL2
+	CXXFLAGS += `pkg-config glew --cflags`
+
+	ifeq ($(STATIC), 1)
+		LIBS += `pkg-config glew --libs --static`
+	else
+		LIBS += `pkg-config glew --libs`
+	endif
+else ifeq ($(RENDERER), Texture)
 	SOURCES += Backends/Rendering/SDLTexture
 else ifeq ($(RENDERER), Surface)
 	SOURCES += Backends/Rendering/Software
