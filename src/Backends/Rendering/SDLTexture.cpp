@@ -25,8 +25,11 @@ typedef struct Backend_Glyph
 } Backend_Glyph;
 
 static SDL_Renderer *renderer;
+static SDL_Texture *texture;
 
 static Backend_Surface *surface_list_head;
+
+static SDL_BlendMode premultiplied_blend_mode;
 
 static void FlushSurface(Backend_Surface *surface)
 {
@@ -47,21 +50,70 @@ static void RectToSDLRect(const RECT *rect, SDL_Rect *sdl_rect)
 		sdl_rect->h = 0;
 }
 
-BOOL Backend_Init(SDL_Renderer *p_renderer)
+BOOL Backend_Init(SDL_Window *window, unsigned int width, unsigned int height, BOOL vsync)
 {
-	renderer = p_renderer;
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE | (vsync ? SDL_RENDERER_PRESENTVSYNC : 0));
+
+	if (renderer == NULL)
+		return FALSE;
+
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+	texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_TARGET, width, height);
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+
+	if (texture == NULL)
+	{
+		SDL_DestroyRenderer(renderer);
+		return FALSE;
+	}
+
+	SDL_SetRenderTarget(renderer, texture);
+
+	// Set up our premultiplied-alpha blend mode
+	premultiplied_blend_mode = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
 
 	return TRUE;
 }
 
 void Backend_Deinit(void)
 {
-	
+	SDL_DestroyTexture(texture);
+	SDL_DestroyRenderer(renderer);
 }
 
 void Backend_DrawScreen(void)
 {
-	
+	SDL_SetRenderTarget(renderer, NULL);
+
+	int renderer_width, renderer_height;
+	SDL_GetRendererOutputSize(renderer, &renderer_width, &renderer_height);
+
+	int texture_width, texture_height;
+	SDL_QueryTexture(texture, NULL, NULL, &texture_width, &texture_height);
+
+	SDL_Rect dst_rect;
+	if ((float)renderer_width / texture_width < (float)renderer_height / texture_height)
+	{
+		dst_rect.w = renderer_width;
+		dst_rect.h = (int)(texture_height * (float)renderer_width / texture_width);
+		dst_rect.x = 0;
+		dst_rect.y = (renderer_height - dst_rect.h) / 2;
+	}
+	else
+	{
+		dst_rect.w = (int)(texture_width * (float)renderer_height / texture_height);
+		dst_rect.h = renderer_height;
+		dst_rect.x = (renderer_width - dst_rect.w) / 2;
+		dst_rect.y = 0;
+	}
+
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+	SDL_RenderClear(renderer);
+	SDL_RenderCopy(renderer, texture, NULL, &dst_rect);
+
+	SDL_RenderPresent(renderer);
+
+	SDL_SetRenderTarget(renderer, texture);
 }
 
 Backend_Surface* Backend_CreateSurface(unsigned int width, unsigned int height)
@@ -118,6 +170,20 @@ unsigned char* Backend_Lock(Backend_Surface *surface, unsigned int *pitch)
 
 void Backend_Unlock(Backend_Surface *surface)
 {
+	// Pre-multiply the colour channels with the alpha, so blending works correctly
+	for (int y = 0; y < surface->sdl_surface->h; ++y)
+	{
+		unsigned char *pixels = (unsigned char*)surface->sdl_surface->pixels + y * surface->sdl_surface->pitch;
+
+		for (int x = 0; x < surface->sdl_surface->w; ++x)
+		{
+			pixels[0] = (pixels[0] * pixels[3]) / 0xFF;
+			pixels[1] = (pixels[1] * pixels[3]) / 0xFF;
+			pixels[2] = (pixels[2] * pixels[3]) / 0xFF;
+			pixels += 4;
+		}
+	}
+
 	surface->needs_syncing = TRUE;
 }
 
@@ -139,7 +205,7 @@ void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Sur
 	SDL_BlitSurface(source_surface->sdl_surface, &source_rect, destination_surface->sdl_surface, &destination_rect);
 
 	// Now blit the texture
-	SDL_SetTextureBlendMode(source_surface->texture, alpha_blend ? SDL_BLENDMODE_BLEND : SDL_BLENDMODE_NONE);
+	SDL_SetTextureBlendMode(source_surface->texture, alpha_blend ? premultiplied_blend_mode : SDL_BLENDMODE_NONE);
 	SDL_Texture *default_target = SDL_GetRenderTarget(renderer);
 	SDL_SetRenderTarget(renderer, destination_surface->texture);
 	SDL_RenderCopy(renderer, source_surface->texture, &source_rect, &destination_rect);
@@ -160,7 +226,7 @@ void Backend_BlitToScreen(Backend_Surface *source_surface, const RECT *rect, lon
 	SDL_Rect destination_rect = {x, y, source_rect.w, source_rect.h};
 
 	// Blit the texture
-	SDL_SetTextureBlendMode(source_surface->texture, alpha_blend ? SDL_BLENDMODE_BLEND : SDL_BLENDMODE_NONE);
+	SDL_SetTextureBlendMode(source_surface->texture, alpha_blend ? premultiplied_blend_mode : SDL_BLENDMODE_NONE);
 	SDL_RenderCopy(renderer, source_surface->texture, &source_rect, &destination_rect);
 }
 
@@ -257,10 +323,12 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 
 				for (unsigned int x = 0; x < width; ++x)
 				{
+					const unsigned char alpha = (unsigned char)(pow((double)*source_pointer++ / (total_greys - 1), 1.0 / 1.8) * 255.0);
+
 					*destination_pointer++ = 0xFF;
 					*destination_pointer++ = 0xFF;
 					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = (unsigned char)(pow((double)*source_pointer++ / (total_greys - 1), 1.0 / 1.8) * 255.0);
+					*destination_pointer++ = alpha;
 				}
 			}
 
@@ -274,10 +342,12 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 
 				for (unsigned int x = 0; x < width; ++x)
 				{
+					const unsigned char alpha = *source_pointer++ ? 0xFF : 0;
+
 					*destination_pointer++ = 0xFF;
 					*destination_pointer++ = 0xFF;
 					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = *source_pointer++ ? 0xFF : 0;
+					*destination_pointer++ = alpha;
 				}
 			}
 

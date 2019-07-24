@@ -38,14 +38,9 @@ static void RectToSDLRect(const RECT *rect, SDL_Rect *sdl_rect)
 		sdl_rect->h = 0;
 }
 
-BOOL Backend_Init(SDL_Window *window, unsigned int width, unsigned int height, BOOL *vsync)
+BOOL Backend_Init(SDL_Window *window, unsigned int width, unsigned int height, BOOL vsync)
 {
-	// Check if vsync is possible
-	SDL_DisplayMode display_mode;
-	SDL_GetWindowDisplayMode(window, &display_mode);
-	*vsync = display_mode.refresh_rate == 60;
-
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE | (*vsync ? SDL_RENDERER_PRESENTVSYNC : 0));
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE | (vsync ? SDL_RENDERER_PRESENTVSYNC : 0));
 
 	if (renderer == NULL)
 		return FALSE;
@@ -150,7 +145,19 @@ unsigned char* Backend_Lock(Backend_Surface *surface, unsigned int *pitch)
 
 void Backend_Unlock(Backend_Surface *surface)
 {
-	
+	// Pre-multiply the colour channels with the alpha, so blending works correctly
+	for (int y = 0; y < surface->sdl_surface->h; ++y)
+	{
+		unsigned char *pixels = (unsigned char*)surface->sdl_surface->pixels + y * surface->sdl_surface->pitch;
+
+		for (int x = 0; x < surface->sdl_surface->w; ++x)
+		{
+			pixels[0] = (pixels[0] * pixels[3]) / 0xFF;
+			pixels[1] = (pixels[1] * pixels[3]) / 0xFF;
+			pixels[2] = (pixels[2] * pixels[3]) / 0xFF;
+			pixels += 4;
+		}
+	}
 }
 
 void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL alpha_blend)
@@ -217,10 +224,12 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 
 				for (unsigned int x = 0; x < width; ++x)
 				{
-					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = (unsigned char)(pow((double)*source_pointer++ / (total_greys - 1), 1.0 / 1.8) * 255.0);
+					const unsigned char alpha = (unsigned char)(pow((double)*source_pointer++ / (total_greys - 1), 1.0 / 1.8) * 255.0);
+
+					*destination_pointer++ = alpha;
+					*destination_pointer++ = alpha;
+					*destination_pointer++ = alpha;
+					*destination_pointer++ = alpha;
 				}
 			}
 
@@ -234,10 +243,12 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 
 				for (unsigned int x = 0; x < width; ++x)
 				{
-					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = *source_pointer++ ? 0xFF : 0;
+					const unsigned char alpha = *source_pointer++ ? 0xFF : 0;
+
+					*destination_pointer++ = alpha;
+					*destination_pointer++ = alpha;
+					*destination_pointer++ = alpha;
+					*destination_pointer++ = alpha;
 				}
 			}
 

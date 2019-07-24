@@ -33,14 +33,9 @@ static SDL_Texture *texture;
 
 static Backend_Surface framebuffer;
 
-BOOL Backend_Init(SDL_Window *window, unsigned int width, unsigned int height, BOOL *vsync)
+BOOL Backend_Init(SDL_Window *window, unsigned int width, unsigned int height, BOOL vsync)
 {
-	// Check if vsync is possible
-	SDL_DisplayMode display_mode;
-	SDL_GetWindowDisplayMode(window, &display_mode);
-	*vsync = display_mode.refresh_rate == 60;
-
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE | (*vsync ? SDL_RENDERER_PRESENTVSYNC : 0));
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE | (vsync ? SDL_RENDERER_PRESENTVSYNC : 0));
 
 	if (renderer == NULL)
 		return FALSE;

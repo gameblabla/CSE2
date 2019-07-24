@@ -31,7 +31,7 @@ static GLuint framebuffer_id;
 
 static Backend_Surface framebuffer_surface;
 
-BOOL Backend_Init(SDL_Window *p_window, unsigned int width, unsigned int height, BOOL *vsync)
+BOOL Backend_Init(SDL_Window *p_window, unsigned int width, unsigned int height, BOOL vsync)
 {
 	window = p_window;
 
@@ -39,6 +39,8 @@ BOOL Backend_Init(SDL_Window *p_window, unsigned int width, unsigned int height,
 	SDL_GetWindowSize(window, &screen_width, &screen_height);
 
 	context = SDL_GL_CreateContext(window);
+
+	SDL_GL_SetSwapInterval(vsync);
 
 	if (glewInit() != GLEW_OK)
 		return FALSE;
@@ -55,8 +57,11 @@ BOOL Backend_Init(SDL_Window *p_window, unsigned int width, unsigned int height,
 //	glLoadIdentity();
 
 	glEnable(GL_TEXTURE_2D);
+
 	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// We're using pre-multiplied alpha so we can blend onto textures that have their own alpha
+	// http://apoorvaj.io/alpha-compositing-opengl-blending-and-premultiplied-alpha.html
+	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -70,6 +75,7 @@ BOOL Backend_Init(SDL_Window *p_window, unsigned int width, unsigned int height,
 
 	// Set up framebuffer (used for surface-to-surface blitting)
 	glGenFramebuffersEXT(1, &framebuffer_id);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, framebuffer_id);
 
 	// Set up framebuffer screen texture (used for screen-to-surface blitting)
 	glGenTextures(1, &framebuffer_surface.texture_id);
@@ -93,6 +99,13 @@ void Backend_Deinit(void)
 
 void Backend_DrawScreen(void)
 {
+	// This would be a good time to use a custom shader to divide the pixels by
+	// their alpha, to undo the premultiplied alpha stuff, but the framebuffer
+	// is pretty much guaranteed to be fully opaque, and X / 1 == X, so it'd be
+	// a waste of processing power.
+
+	glDisable(GL_BLEND);
+
 	// Target actual screen, and not our framebuffer
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
@@ -160,6 +173,20 @@ unsigned char* Backend_Lock(Backend_Surface *surface, unsigned int *pitch)
 
 void Backend_Unlock(Backend_Surface *surface)
 {
+	// Pre-multiply the colour channels with the alpha, so blending works correctly
+	unsigned char *pixels = surface->pixels;
+
+	for (unsigned int y = 0; y < surface->height; ++y)
+	{
+		for (unsigned int x = 0; x < surface->width; ++x)
+		{
+			pixels[0] = (pixels[0] * pixels[3]) / 0xFF;
+			pixels[1] = (pixels[1] * pixels[3]) / 0xFF;
+			pixels[2] = (pixels[2] * pixels[3]) / 0xFF;
+			pixels += 4;
+		}
+	}
+
 	glBindTexture(GL_TEXTURE_2D, surface->texture_id);
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, surface->width, surface->height, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
 	free(surface->pixels);
@@ -167,6 +194,14 @@ void Backend_Unlock(Backend_Surface *surface)
 
 static void BlitCommon(Backend_Surface *source_surface, const RECT *rect, long x, long y, BOOL alpha_blend)
 {
+	if (rect->right - rect->left < 0 || rect->bottom - rect->top < 0)
+		return;
+
+	if (alpha_blend)
+		glEnable(GL_BLEND);
+	else
+		glDisable(GL_BLEND);
+
 	glBindTexture(GL_TEXTURE_2D, source_surface->texture_id);
 
 	glBegin(GL_QUADS);
@@ -200,6 +235,11 @@ void Backend_BlitToScreen(Backend_Surface *source_surface, const RECT *rect, lon
 
 static void ColourFillCommon(const RECT *rect, unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha)
 {
+	if (rect->right - rect->left < 0 || rect->bottom - rect->top < 0)
+		return;
+
+	glDisable(GL_BLEND);
+
 	// Use blank default texture, for a solid colour-fill
 	glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -255,10 +295,12 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 
 				for (unsigned int x = 0; x < width; ++x)
 				{
-					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = (unsigned char)(pow((double)*source_pointer++ / (total_greys - 1), 1.0 / 1.8) * 255.0);
+					const unsigned char alpha = (unsigned char)(pow((double)*source_pointer++ / (total_greys - 1), 1.0 / 1.8) * 255.0);
+
+					*destination_pointer++ = alpha;
+					*destination_pointer++ = alpha;
+					*destination_pointer++ = alpha;
+					*destination_pointer++ = alpha;
 				}
 			}
 
@@ -272,10 +314,12 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 
 				for (unsigned int x = 0; x < width; ++x)
 				{
-					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = *source_pointer++ ? 0xFF : 0;
+					const unsigned char alpha = *source_pointer++ ? 0xFF : 0;
+
+					*destination_pointer++ = alpha;
+					*destination_pointer++ = alpha;
+					*destination_pointer++ = alpha;
+					*destination_pointer++ = alpha;
 				}
 			}
 
@@ -304,6 +348,8 @@ void Backend_UnloadGlyph(Backend_Glyph *glyph)
 
 static void DrawGlyphCommon(Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
 {
+	glEnable(GL_BLEND);
+
 	glBindTexture(GL_TEXTURE_2D, glyph->texture_id);
 
 	glBegin(GL_QUADS);

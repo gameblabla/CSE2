@@ -103,8 +103,13 @@ BOOL StartDirectDraw(int lMagnification)
 
 	rgba32_pixel_format = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA32);
 
+	// Check if vsync is possible
+	SDL_DisplayMode display_mode;
+	SDL_GetWindowDisplayMode(gWindow, &display_mode);
+	vsync = display_mode.refresh_rate == 60;
+
 	// Create renderer
-	if (!Backend_Init(gWindow, WINDOW_WIDTH * magnification, WINDOW_HEIGHT * magnification, &vsync))
+	if (!Backend_Init(gWindow, WINDOW_WIDTH * magnification, WINDOW_HEIGHT * magnification, vsync))
 		return FALSE;
 
 	return TRUE;
@@ -424,6 +429,12 @@ static void DrawBitmap(const RECT *rcView, int x, int y, const RECT *rect, Surfa
 	{
 		frameRect.top += clipRect.top - y;
 		y = clipRect.top;
+	}
+
+	if (surf_no == SURFACE_ID_FACE)
+	{
+		printf("x = %d\ny = %d\n", x, y);
+		printf("frameRect.left = %d\nframeRect.top = %d\nframeRect.right = %d\nframeRect.bottom = %d\n\n", frameRect.left, frameRect.top, frameRect.right, frameRect.bottom);
 	}
 
 	// Draw to screen
