@@ -31,21 +31,32 @@ static GLuint framebuffer_id;
 
 static Backend_Surface framebuffer_surface;
 
+static int internal_screen_width, internal_screen_height;
+
+static void SetRenderTarget(Backend_Surface *surface)
+{
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, surface->texture_id, 0);
+
+	glViewport(0, 0, surface->width, surface->height);
+
+	glLoadIdentity();
+	glOrtho(0.0, surface->width, 0.0, surface->height, 1.0, -1.0);
+}
+
 SDL_Window* Backend_CreateWindow(const char *title, int width, int height)
 {
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 
-	return SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL);
+	return SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 }
 
-BOOL Backend_Init(SDL_Window *p_window, unsigned int width, unsigned int height, BOOL vsync)
+BOOL Backend_Init(SDL_Window *p_window, unsigned int p_internal_screen_width, unsigned int p_internal_screen_height, BOOL vsync)
 {
 	window = p_window;
-
-	int screen_width, screen_height;
-	SDL_GetWindowSize(window, &screen_width, &screen_height);
+	internal_screen_width = p_internal_screen_width;
+	internal_screen_height = p_internal_screen_height;
 
 	context = SDL_GL_CreateContext(window);
 
@@ -57,13 +68,6 @@ BOOL Backend_Init(SDL_Window *p_window, unsigned int width, unsigned int height,
 	// Check for framebuffer object extension (is part of the core spec in OpenGL 3.0, but not 2.1)
 	if (!GLEW_EXT_framebuffer_object)
 		return FALSE;
-
-//	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glOrtho(0.0, screen_width, 0.0, screen_height, 1.0, -1.0);
-
-//	glMatrixMode(GL_PROJECTION);
-//	glLoadIdentity();
 
 	glEnable(GL_TEXTURE_2D);
 
@@ -89,12 +93,12 @@ BOOL Backend_Init(SDL_Window *p_window, unsigned int width, unsigned int height,
 	// Set up framebuffer screen texture (used for screen-to-surface blitting)
 	glGenTextures(1, &framebuffer_surface.texture_id);
 	glBindTexture(GL_TEXTURE_2D, framebuffer_surface.texture_id);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, screen_width, screen_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, internal_screen_width, internal_screen_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-	framebuffer_surface.width = screen_width;
-	framebuffer_surface.height = screen_height;
+	framebuffer_surface.width = internal_screen_width;
+	framebuffer_surface.height = internal_screen_height;
 
 	return TRUE;
 }
@@ -113,10 +117,32 @@ void Backend_DrawScreen(void)
 	// is pretty much guaranteed to be fully opaque, and X / 1 == X, so it'd be
 	// a waste of processing power.
 
+	// Fit the screen to the window
+	int window_width, window_height;
+	SDL_GetWindowSize(window, &window_width, &window_height);
+
+	float fit_width, fit_height;
+
+	if ((float)internal_screen_width / internal_screen_height > (float)window_width / window_height)
+	{
+		fit_width = 1.0f;
+		fit_height = ((float)internal_screen_height / internal_screen_width) / ((float)window_height / window_width);
+	}
+	else
+	{
+		fit_width = ((float)internal_screen_width / internal_screen_height) / ((float)window_width / window_height);
+		fit_height = 1.0f;
+	}
+
 	glDisable(GL_BLEND);
 
 	// Target actual screen, and not our framebuffer
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+
+	glViewport(0, 0, window_width, window_height);
+
+	glLoadIdentity();
+	glOrtho(0.0, window_width, 0.0, window_height, 1.0, -1.0);
 
 	// Draw framebuffer to screen
 	glPushMatrix();
@@ -127,13 +153,13 @@ void Backend_DrawScreen(void)
 	glBegin(GL_QUADS);
 		glColor3f(1.0f, 1.0f, 1.0f);
 		glTexCoord2f(0.0f, 1.0f);
-		glVertex2f(-1.0f, -1.0f);
+		glVertex2f(-fit_width, -fit_height);
 		glTexCoord2f(1.0f, 1.0f);
-		glVertex2f(1.0f, -1.0f);
+		glVertex2f(fit_width, -fit_height);
 		glTexCoord2f(1.0f, 0.0f);
-		glVertex2f(1.0f, 1.0f);
+		glVertex2f(fit_width, fit_height);
 		glTexCoord2f(0.0f, 0.0f);
-		glVertex2f(-1.0f, 1.0f);
+		glVertex2f(-fit_width, fit_height);
 	glEnd();
 
 	glPopMatrix();
@@ -229,7 +255,7 @@ static void BlitCommon(Backend_Surface *source_surface, const RECT *rect, long x
 void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL alpha_blend)
 {
 	// Point our framebuffer to the destination texture
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, destination_surface->texture_id, 0);
+	SetRenderTarget(destination_surface);
 
 	BlitCommon(source_surface, rect, x, y, alpha_blend);
 }
@@ -237,7 +263,7 @@ void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Sur
 void Backend_BlitToScreen(Backend_Surface *source_surface, const RECT *rect, long x, long y, BOOL alpha_blend)
 {
 	// Point our framebuffer to the screen texture
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, framebuffer_surface.texture_id, 0);
+	SetRenderTarget(&framebuffer_surface);
 
 	BlitCommon(source_surface, rect, x, y, alpha_blend);
 }
@@ -264,7 +290,7 @@ static void ColourFillCommon(const RECT *rect, unsigned char red, unsigned char 
 void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha)
 {
 	// Point our framebuffer to the destination texture
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, surface->texture_id, 0);
+	SetRenderTarget(surface);
 
 	ColourFillCommon(rect, red, green, blue, alpha);
 }
@@ -272,7 +298,7 @@ void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned cha
 void Backend_ColourFillToScreen(const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
 {
 	// Point our framebuffer to the screen texture
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, framebuffer_surface.texture_id, 0);
+	SetRenderTarget(&framebuffer_surface);
 
 	ColourFillCommon(rect, red, green, blue, 0xFF);
 }
@@ -280,7 +306,7 @@ void Backend_ColourFillToScreen(const RECT *rect, unsigned char red, unsigned ch
 void Backend_ScreenToSurface(Backend_Surface *surface, const RECT *rect)
 {
 	// Point our framebuffer to the destination texture
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, surface->texture_id, 0);
+	SetRenderTarget(surface);
 
 	BlitCommon(&framebuffer_surface, rect, rect->left, rect->top, FALSE);
 }
@@ -383,7 +409,7 @@ static void DrawGlyphCommon(Backend_Glyph *glyph, long x, long y, const unsigned
 void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
 {
 	// Point our framebuffer to the destination texture
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, surface->texture_id, 0);
+	SetRenderTarget(surface);
 
 	DrawGlyphCommon(glyph, x, y, colours);
 }
@@ -391,7 +417,7 @@ void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, l
 void Backend_DrawGlyphToScreen(Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
 {
 	// Point our framebuffer to the screen texture
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, framebuffer_surface.texture_id, 0);
+	SetRenderTarget(&framebuffer_surface);
 
 	DrawGlyphCommon(glyph, x, y, colours);
 }

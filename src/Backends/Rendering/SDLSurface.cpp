@@ -43,7 +43,7 @@ SDL_Window* Backend_CreateWindow(const char *title, int width, int height)
 	return SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, 0);
 }
 
-BOOL Backend_Init(SDL_Window *window, unsigned int width, unsigned int height, BOOL vsync)
+BOOL Backend_Init(SDL_Window *window, unsigned int internal_screen_width, unsigned int internal_screen_height, BOOL vsync)
 {
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE | (vsync ? SDL_RENDERER_PRESENTVSYNC : 0));
 
@@ -51,7 +51,7 @@ BOOL Backend_Init(SDL_Window *window, unsigned int width, unsigned int height, B
 		return FALSE;
 
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
-	texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, width, height);
+	texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, internal_screen_width, internal_screen_height);
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
 
 	if (texture == NULL)
@@ -60,7 +60,7 @@ BOOL Backend_Init(SDL_Window *window, unsigned int width, unsigned int height, B
 		return FALSE;
 	}
 
-	framebuffer.sdl_surface = SDL_CreateRGBSurfaceWithFormat(0, width, height, 0, SDL_PIXELFORMAT_RGB24);
+	framebuffer.sdl_surface = SDL_CreateRGBSurfaceWithFormat(0, internal_screen_width, internal_screen_height, 0, SDL_PIXELFORMAT_RGB24);
 
 	if (framebuffer.sdl_surface == NULL)
 	{
