@@ -31,8 +31,6 @@ static GLuint framebuffer_id;
 
 static Backend_Surface framebuffer_surface;
 
-static int internal_screen_width, internal_screen_height;
-
 static void SetRenderTarget(Backend_Surface *surface)
 {
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, surface->texture_id, 0);
@@ -52,11 +50,9 @@ SDL_Window* Backend_CreateWindow(const char *title, int width, int height)
 	return SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 }
 
-BOOL Backend_Init(SDL_Window *p_window, unsigned int p_internal_screen_width, unsigned int p_internal_screen_height, BOOL vsync)
+BOOL Backend_Init(SDL_Window *p_window, unsigned int internal_screen_width, unsigned int internal_screen_height, BOOL vsync)
 {
 	window = p_window;
-	internal_screen_width = p_internal_screen_width;
-	internal_screen_height = p_internal_screen_height;
 
 	context = SDL_GL_CreateContext(window);
 
@@ -123,14 +119,14 @@ void Backend_DrawScreen(void)
 
 	float fit_width, fit_height;
 
-	if ((float)internal_screen_width / internal_screen_height > (float)window_width / window_height)
+	if ((float)framebuffer_surface.width / framebuffer_surface.height > (float)window_width / window_height)
 	{
 		fit_width = 1.0f;
-		fit_height = ((float)internal_screen_height / internal_screen_width) / ((float)window_height / window_width);
+		fit_height = ((float)framebuffer_surface.height / framebuffer_surface.width) / ((float)window_height / window_width);
 	}
 	else
 	{
-		fit_width = ((float)internal_screen_width / internal_screen_height) / ((float)window_width / window_height);
+		fit_width = ((float)framebuffer_surface.width / framebuffer_surface.height) / ((float)window_width / window_height);
 		fit_height = 1.0f;
 	}
 
