@@ -286,7 +286,6 @@ void Backend_ScreenToSurface(Backend_Surface *surface, const RECT *rect)
 	SDL_Rect sdl_rect;
 	RectToSDLRect(rect, &sdl_rect);
 
-
 	//
 	// Copy screen to surface
 	//
@@ -304,7 +303,6 @@ void Backend_ScreenToSurface(Backend_Surface *surface, const RECT *rect)
 
 	// Cleanup
 	SDL_FreeSurface(screen_surface);
-
 
 	//
 	// Copy screen to texture
