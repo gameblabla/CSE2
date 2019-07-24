@@ -326,7 +326,9 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 	if (glyph == NULL)
 		return NULL;
 
-	unsigned char *buffer = (unsigned char*)malloc(width * height * 4);
+	const int destination_pitch = (width + 3) & ~3;	// Round up to the nearest 4 (OpenGL needs this)
+
+	unsigned char *buffer = (unsigned char*)malloc(destination_pitch * height);
 
 	if (buffer == NULL)
 	{
@@ -342,13 +344,10 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 			for (unsigned int y = 0; y < height; ++y)
 			{
 				const unsigned char *source_pointer = pixels + y * pitch;
-				unsigned char *destination_pointer = buffer + y * width * 4;
+				unsigned char *destination_pointer = buffer + y * destination_pitch;
 
 				for (unsigned int x = 0; x < width; ++x)
 				{
-					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = 0xFF;
 					*destination_pointer++ = (unsigned char)(pow((double)*source_pointer++ / (total_greys - 1), 1.0 / 1.8) * 255.0);
 				}
 			}
@@ -359,13 +358,10 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 			for (unsigned int y = 0; y < height; ++y)
 			{
 				const unsigned char *source_pointer = pixels + y * pitch;
-				unsigned char *destination_pointer = buffer + y * width * 4;
+				unsigned char *destination_pointer = buffer + y * destination_pitch;
 
 				for (unsigned int x = 0; x < width; ++x)
 				{
-					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = 0xFF;
 					*destination_pointer++ = *source_pointer++ ? 0xFF : 0;
 				}
 			}
@@ -375,7 +371,7 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 
 	glGenTextures(1, &glyph->texture_id);
 	glBindTexture(GL_TEXTURE_2D, glyph->texture_id);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA8, width, height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, buffer);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
