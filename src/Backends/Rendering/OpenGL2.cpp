@@ -191,19 +191,29 @@ Backend_Surface* Backend_CreateSurface(unsigned int width, unsigned int height)
 
 void Backend_FreeSurface(Backend_Surface *surface)
 {
+	if (surface == NULL)
+		return;
+
 	glDeleteTextures(1, &surface->texture_id);
 	free(surface);
 }
 
 unsigned char* Backend_Lock(Backend_Surface *surface, unsigned int *pitch)
 {
+	if (surface == NULL)
+		return NULL;
+
 	surface->pixels = (unsigned char*)malloc(surface->width * surface->height * 4);
 	*pitch = surface->width * 4;
+
 	return surface->pixels;
 }
 
 void Backend_Unlock(Backend_Surface *surface)
 {
+	if (surface == NULL)
+		return;
+
 	// Pre-multiply the colour channels with the alpha, so blending works correctly
 	unsigned char *pixels = surface->pixels;
 
@@ -250,6 +260,9 @@ static void BlitCommon(Backend_Surface *source_surface, const RECT *rect, long x
 
 void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL alpha_blend)
 {
+	if (source_surface == NULL || destination_surface == NULL)
+		return;
+
 	// Point our framebuffer to the destination texture
 	SetRenderTarget(destination_surface);
 
@@ -258,6 +271,9 @@ void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Sur
 
 void Backend_BlitToScreen(Backend_Surface *source_surface, const RECT *rect, long x, long y, BOOL alpha_blend)
 {
+	if (source_surface == NULL)
+		return;
+
 	// Point our framebuffer to the screen texture
 	SetRenderTarget(&framebuffer_surface);
 
@@ -285,6 +301,9 @@ static void ColourFillCommon(const RECT *rect, unsigned char red, unsigned char 
 
 void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha)
 {
+	if (surface == NULL)
+		return;
+
 	// Point our framebuffer to the destination texture
 	SetRenderTarget(surface);
 
@@ -301,6 +320,9 @@ void Backend_ColourFillToScreen(const RECT *rect, unsigned char red, unsigned ch
 
 void Backend_ScreenToSurface(Backend_Surface *surface, const RECT *rect)
 {
+	if (surface == NULL)
+		return;
+
 	// Point our framebuffer to the destination texture
 	SetRenderTarget(surface);
 
@@ -377,6 +399,9 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 
 void Backend_UnloadGlyph(Backend_Glyph *glyph)
 {
+	if (glyph == NULL)
+		return;
+
 	glDeleteTextures(1, &glyph->texture_id);
 	free(glyph);
 }
@@ -402,6 +427,9 @@ static void DrawGlyphCommon(Backend_Glyph *glyph, long x, long y, const unsigned
 
 void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
 {
+	if (glyph == NULL || surface == NULL)
+		return;
+
 	// Point our framebuffer to the destination texture
 	SetRenderTarget(surface);
 
@@ -410,6 +438,9 @@ void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, l
 
 void Backend_DrawGlyphToScreen(Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
 {
+	if (glyph == NULL)
+		return;
+
 	// Point our framebuffer to the screen texture
 	SetRenderTarget(&framebuffer_surface);
 

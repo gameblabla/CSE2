@@ -142,12 +142,18 @@ Backend_Surface* Backend_CreateSurface(unsigned int width, unsigned int height)
 
 void Backend_FreeSurface(Backend_Surface *surface)
 {
+	if (surface == NULL)
+		return;
+
 	free(surface->pixels);
 	free(surface);
 }
 
 unsigned char* Backend_Lock(Backend_Surface *surface, unsigned int *pitch)
 {
+	if (surface == NULL)
+		return NULL;
+
 	*pitch = surface->pitch;
 	return surface->pixels;
 }
@@ -159,6 +165,9 @@ void Backend_Unlock(Backend_Surface *surface)
 
 void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL alpha_blend)
 {
+	if (source_surface == NULL || destination_surface == NULL)
+		return;
+
 	RECT rect_clamped;
 
 	rect_clamped.left = rect->left;
@@ -351,6 +360,9 @@ void Backend_BlitToScreen(Backend_Surface *source_surface, const RECT *rect, lon
 
 void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha)
 {
+	if (surface == NULL)
+		return;
+
 	RECT rect_clamped;
 
 	rect_clamped.left = rect->left;
@@ -588,12 +600,18 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 
 void Backend_UnloadGlyph(Backend_Glyph *glyph)
 {
+	if (glyph == NULL)
+		return;
+
 	free(glyph->pixels);
 	free(glyph);
 }
 
 void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
 {
+	if (glyph == NULL || surface == NULL)
+		return;
+
 	switch (glyph->pixel_mode)
 	{
 		case FONT_PIXEL_MODE_GRAY:

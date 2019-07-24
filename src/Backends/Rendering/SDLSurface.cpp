@@ -138,12 +138,18 @@ Backend_Surface* Backend_CreateSurface(unsigned int width, unsigned int height)
 
 void Backend_FreeSurface(Backend_Surface *surface)
 {
+	if (surface == NULL)
+		return;
+
 	SDL_FreeSurface(surface->sdl_surface);
 	free(surface);
 }
 
 unsigned char* Backend_Lock(Backend_Surface *surface, unsigned int *pitch)
 {
+	if (surface == NULL)
+		return NULL;
+
 	*pitch = surface->sdl_surface->pitch;
 	return (unsigned char*)surface->sdl_surface->pixels;
 }
@@ -167,6 +173,9 @@ void Backend_Unlock(Backend_Surface *surface)
 
 void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL alpha_blend)
 {
+	if (source_surface == NULL || destination_surface == NULL)
+		return;
+
 	SDL_Rect source_rect;
 	RectToSDLRect(rect, &source_rect);
 
@@ -188,6 +197,9 @@ void Backend_BlitToScreen(Backend_Surface *source_surface, const RECT *rect, lon
 
 void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha)
 {
+	if (surface == NULL)
+		return;
+
 	SDL_Rect destination_rect;
 	RectToSDLRect(rect, &destination_rect);
 
@@ -265,12 +277,18 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 
 void Backend_UnloadGlyph(Backend_Glyph *glyph)
 {
+	if (glyph == NULL)
+		return;
+
 	SDL_FreeSurface(glyph->sdl_surface);
 	free(glyph);
 }
 
 void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
 {
+	if (glyph == NULL || surface == NULL)
+		return;
+
 	SDL_Rect rect;
 	rect.x = x;
 	rect.y = y;
