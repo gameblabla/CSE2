@@ -1,5 +1,7 @@
 #pragma once
 
+#include "SDL.h"
+
 #include "WindowsWrapper.h"
 
 #ifndef RGB
@@ -57,6 +59,7 @@ struct SURFACE;
 extern SURFACE surf[SURFACE_ID_MAX];
 
 BOOL Flip_SystemTask(HWND hWnd);
+SDL_Window* CreateWindow(const char *title, int width, int height);
 BOOL StartDirectDraw(int lMagnification);
 void EndDirectDraw();
 void ReleaseSurface(int s);

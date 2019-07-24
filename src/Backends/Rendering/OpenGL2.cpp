@@ -31,6 +31,15 @@ static GLuint framebuffer_id;
 
 static Backend_Surface framebuffer_surface;
 
+SDL_Window* Backend_CreateWindow(const char *title, int width, int height)
+{
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+
+	return SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL);
+}
+
 BOOL Backend_Init(SDL_Window *p_window, unsigned int width, unsigned int height, BOOL vsync)
 {
 	window = p_window;
@@ -284,6 +293,12 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 		return NULL;
 
 	unsigned char *buffer = (unsigned char*)malloc(width * height * 4);
+
+	if (buffer == NULL)
+	{
+		free(glyph);
+		return NULL;
+	}
 
 	switch (pixel_mode)
 	{

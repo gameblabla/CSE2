@@ -33,6 +33,11 @@ static SDL_Texture *texture;
 
 static Backend_Surface framebuffer;
 
+SDL_Window* Backend_CreateWindow(const char *title, int width, int height)
+{
+	return SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, 0);
+}
+
 BOOL Backend_Init(SDL_Window *window, unsigned int width, unsigned int height, BOOL vsync)
 {
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE | (vsync ? SDL_RENDERER_PRESENTVSYNC : 0));

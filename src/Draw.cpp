@@ -80,6 +80,11 @@ BOOL Flip_SystemTask(HWND hWnd)
 	return TRUE;
 }
 
+SDL_Window* CreateWindow(const char *title, int width, int height)
+{
+	return Backend_CreateWindow(title, width, height);
+}
+
 BOOL StartDirectDraw(int lMagnification)
 {
 	switch (lMagnification)
