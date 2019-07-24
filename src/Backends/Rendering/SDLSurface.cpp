@@ -40,7 +40,7 @@ static void RectToSDLRect(const RECT *rect, SDL_Rect *sdl_rect)
 
 SDL_Window* Backend_CreateWindow(const char *title, int width, int height)
 {
-	return SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, 0);
+	return SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_RESIZABLE);
 }
 
 BOOL Backend_Init(SDL_Window *window, unsigned int internal_screen_width, unsigned int internal_screen_height, BOOL vsync)
