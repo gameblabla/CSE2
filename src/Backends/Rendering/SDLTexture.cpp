@@ -263,7 +263,7 @@ void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned cha
 	SDL_FillRect(surface->sdl_surface, &sdl_rect, SDL_MapRGBA(surface->sdl_surface->format, red, green, blue, alpha));
 
 	// Draw colour
-	SDL_SetRenderDrawColor(renderer, red, green, blue, alpha);
+	SDL_SetRenderDrawColor(renderer, (red * alpha) / 0xFF, (green * alpha) / 0xFF, (blue * alpha) / 0xFF, alpha);
 	SDL_Texture *default_target = SDL_GetRenderTarget(renderer);
 	SDL_SetRenderTarget(renderer, surface->texture);
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
