@@ -48,7 +48,6 @@ You can also add the following flags:
 * `-DFORCE_LOCAL_LIBS=ON` - Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones
 * `-DRENDERER=OpenGL2` - Use the hardware-accelerated OpenGL 2.1 renderer
 * `-DRENDERER=Texture` - Use the hardware-accelerated SDL2 Texture API renderer (default)
-* `-DRENDERER=Surface` - Use the software-rendered SDL2 Surface API renderer
 * `-DRENDERER=Software` - Use a handwritten software renderer
 * `-DOGG_AUDIO=ON` - Enable support for Ogg Vorbis music/SFX
 * `-DFLAC_AUDIO=ON` - Enable support for FLAC music/SFX
@@ -81,7 +80,6 @@ Run 'make' in this folder, preferably with some of the following settings:
 * `NONPORTABLE=1` - Enable bits of code that aren't portable, but are what the original game used
 * `RENDERER=OpenGL2` - Use the hardware-accelerated OpenGL 2.1 renderer
 * `RENDERER=Texture` - Use the hardware-accelerated SDL2 Texture API renderer (default)
-* `RENDERER=Surface` - Use the software-rendered SDL2 Surface API renderer
 * `RENDERER=Software` - Use a hand-written software renderer
 * `OGG_AUDIO=1` - Enable support for Ogg Vorbis music/SFX
 * `FLAC_AUDIO=1` - Enable support for FLAC music/SFX

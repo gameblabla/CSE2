@@ -235,8 +235,6 @@ ifeq ($(RENDERER), OpenGL2)
 	endif
 else ifeq ($(RENDERER), Texture)
 	SOURCES += Backends/Rendering/SDLTexture
-else ifeq ($(RENDERER), Surface)
-	SOURCES += Backends/Rendering/Software
 else ifeq ($(RENDERER), Software)
 	SOURCES += Backends/Rendering/Software
 else
