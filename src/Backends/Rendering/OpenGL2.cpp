@@ -113,6 +113,7 @@ BOOL Backend_Init(SDL_Window *p_window)
 
 	// Set up framebuffer (used for surface-to-surface blitting)
 	glGenFramebuffersEXT(1, &framebuffer_id);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, framebuffer_id);
 
 	// Set up framebuffer screen texture (used for screen-to-surface blitting)
 	glGenTextures(1, &framebuffer_surface.texture_id);
@@ -214,6 +215,9 @@ void Backend_Unlock(Backend_Surface *surface)
 
 static void BlitCommon(Backend_Surface *source_surface, const RECT *rect, long x, long y, BOOL colour_key)
 {
+	if (rect->right - rect->left < 0 || rect->bottom - rect->top < 0)
+		return;
+
 	// Switch to colour-key shader if we have to
 	glUseProgram(colour_key ? colour_key_program_id : 0);
 
@@ -250,6 +254,9 @@ void Backend_BlitToScreen(Backend_Surface *source_surface, const RECT *rect, lon
 
 static void ColourFillCommon(const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
 {
+	if (rect->right - rect->left < 0 || rect->bottom - rect->top < 0)
+		return;
+
 	// Disable colour-keying
 	glUseProgram(0);
 
@@ -302,6 +309,12 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 		return NULL;
 
 	unsigned char *buffer = (unsigned char*)malloc(width * height * 4);
+
+	if (buffer == NULL)
+	{
+		free(glyph);
+		return NULL;
+	}
 
 	switch (pixel_mode)
 	{
