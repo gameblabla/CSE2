@@ -71,6 +71,15 @@ static GLuint CompileShader(const char *fragment_shader_source)
 	return program_id;
 }
 
+SDL_Window* Backend_CreateWindow(const char *title, int width, int height)
+{
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+
+	return SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL);
+}
+
 BOOL Backend_Init(SDL_Window *p_window)
 {
 	window = p_window;

@@ -69,6 +69,11 @@ BOOL Flip_SystemTask(HWND hWnd)
 	return TRUE;
 }
 
+SDL_Window* CreateWindow(const char *title, int width, int height)
+{
+	return Backend_CreateWindow(title, width, height);
+}
+
 BOOL StartDirectDraw(int lMagnification, int lColourDepth)
 {
 	(void)lColourDepth;	// There's no way I'm supporting a bunch of different colour depths
