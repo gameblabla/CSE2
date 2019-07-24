@@ -328,12 +328,10 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 
 				for (unsigned int x = 0; x < width; ++x)
 				{
-					const unsigned char alpha = (unsigned char)(pow((double)*source_pointer++ / (total_greys - 1), 1.0 / 1.8) * 255.0);
-
 					*destination_pointer++ = 0xFF;
 					*destination_pointer++ = 0xFF;
 					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = alpha;
+					*destination_pointer++ = (unsigned char)(pow((double)*source_pointer++ / (total_greys - 1), 1.0 / 1.8) * 255.0);
 				}
 			}
 
@@ -347,12 +345,10 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 
 				for (unsigned int x = 0; x < width; ++x)
 				{
-					const unsigned char alpha = *source_pointer++ ? 0xFF : 0;
-
 					*destination_pointer++ = 0xFF;
 					*destination_pointer++ = 0xFF;
 					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = alpha;
+					*destination_pointer++ = *source_pointer++ ? 0xFF : 0;
 				}
 			}
 
