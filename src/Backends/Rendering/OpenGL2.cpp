@@ -291,7 +291,7 @@ static void ColourFillCommon(const RECT *rect, unsigned char red, unsigned char 
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	glBegin(GL_QUADS);
-		glColor4f((red * alpha) / 255.0f, (green * alpha) / 255.0f, (blue * alpha) / 255.0f, alpha / 255.0f);
+		glColor4f((red / 255.0f) * (alpha / 255.0f), (green / 255.0f) * (alpha / 255.0f), (blue / 255.0f) * (alpha / 255.0f), alpha / 255.0f);
 		glVertex2f((GLfloat)rect->left, (GLfloat)rect->top);
 		glVertex2f((GLfloat)rect->right, (GLfloat)rect->top);
 		glVertex2f((GLfloat)rect->right, (GLfloat)rect->bottom);
