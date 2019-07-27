@@ -102,6 +102,10 @@ BOOL Backend_Init(SDL_Window *p_window)
 	if (glewInit() != GLEW_OK)
 		return FALSE;
 
+	// Check if the platform supports OpenGL 2.1
+	if (!GLEW_VERSION_2_1)
+		return FALSE;
+
 	// Check for framebuffer object extension (is part of the core spec in OpenGL 3.0, but not 2.1)
 	if (!GLEW_EXT_framebuffer_object)
 		return FALSE;
