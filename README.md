@@ -27,6 +27,7 @@ This branch adds several enhancements including:
 * SDL2
 * FreeType
 * FLTK
+* GLEW (if the OpenGL backend is selected) (not currently built with CMake)
 * libxmp-lite (only if TRACKER_AUDIO is enabled)
 
 ## Building
