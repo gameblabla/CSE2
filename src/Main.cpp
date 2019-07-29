@@ -94,7 +94,9 @@ int GetFramePerSecound()
 int main(int argc, char *argv[])
 {
 	// Get executable's path
-	strcpy(gModulePath, SDL_GetBasePath());
+	char *base_path = SDL_GetBasePath();
+	strcpy(gModulePath, base_path);
+	SDL_free(base_path);
 	if (gModulePath[strlen(gModulePath) - 1] == '/' || gModulePath[strlen(gModulePath) - 1] == '\\')
 		gModulePath[strlen(gModulePath) - 1] = '\0'; // String cannot end in slash or stuff will probably break (original does this through a windows.h provided function)
 
