@@ -31,7 +31,7 @@ static GLuint colour_key_program_id;
 static GLuint framebuffer_id;
 static GLfloat vertex_buffer[4][2];
 static GLfloat texture_coordinate_buffer[4][2];
-static GLfloat colour_buffer[4][3];
+static GLubyte colour_buffer[4][3];
 
 static Backend_Surface framebuffer_surface;
 
@@ -122,7 +122,7 @@ BOOL Backend_Init(SDL_Window *p_window)
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	glVertexPointer(2, GL_FLOAT, 0, vertex_buffer);
 	glTexCoordPointer(2, GL_FLOAT, 0, texture_coordinate_buffer);
-	glColorPointer(3, GL_FLOAT, 0, colour_buffer);
+	glColorPointer(3, GL_UNSIGNED_BYTE, 0, colour_buffer);
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -181,9 +181,9 @@ void Backend_DrawScreen(void)
 
 	glBindTexture(GL_TEXTURE_2D, framebuffer_surface.texture_id);
 
-	colour_buffer[0][0] = 1.0f;
-	colour_buffer[0][1] = 1.0f;
-	colour_buffer[0][2] = 1.0f;
+	colour_buffer[0][0] = 0xFF;
+	colour_buffer[0][1] = 0xFF;
+	colour_buffer[0][2] = 0xFF;
 	colour_buffer[1][0] = colour_buffer[0][0];
 	colour_buffer[1][1] = colour_buffer[0][1];
 	colour_buffer[1][2] = colour_buffer[0][2];
@@ -294,9 +294,9 @@ static void BlitCommon(Backend_Surface *source_surface, const RECT *rect, long x
 	const GLfloat vertex_top = (GLfloat)y;
 	const GLfloat vertex_bottom = (GLfloat)y + (rect->bottom - rect->top);
 
-	colour_buffer[0][0] = 1.0f;
-	colour_buffer[0][1] = 1.0f;
-	colour_buffer[0][2] = 1.0f;
+	colour_buffer[0][0] = 0xFF;
+	colour_buffer[0][1] = 0xFF;
+	colour_buffer[0][2] = 0xFF;
 	colour_buffer[1][0] = colour_buffer[0][0];
 	colour_buffer[1][1] = colour_buffer[0][1];
 	colour_buffer[1][2] = colour_buffer[0][2];
@@ -361,9 +361,9 @@ static void ColourFillCommon(const RECT *rect, unsigned char red, unsigned char 
 	// Use blank default texture, for a solid colour-fill
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	colour_buffer[0][0] = red / 255.0f;
-	colour_buffer[0][1] = green / 255.0f;
-	colour_buffer[0][2] = blue / 255.0f;
+	colour_buffer[0][0] = red;
+	colour_buffer[0][1] = green;
+	colour_buffer[0][2] = blue;
 	colour_buffer[1][0] = colour_buffer[0][0];
 	colour_buffer[1][1] = colour_buffer[0][1];
 	colour_buffer[1][2] = colour_buffer[0][2];
@@ -508,9 +508,9 @@ static void DrawGlyphCommon(Backend_Glyph *glyph, long x, long y, const unsigned
 	const GLfloat vertex_top = (GLfloat)y;
 	const GLfloat vertex_bottom = (GLfloat)y + glyph->height;
 
-	colour_buffer[0][0] = colours[0] / 255.0f;
-	colour_buffer[0][1] = colours[1] / 255.0f;
-	colour_buffer[0][2] = colours[2] / 255.0f;
+	colour_buffer[0][0] = colours[0];
+	colour_buffer[0][1] = colours[1];
+	colour_buffer[0][2] = colours[2];
 	colour_buffer[1][0] = colour_buffer[0][0];
 	colour_buffer[1][1] = colour_buffer[0][1];
 	colour_buffer[1][2] = colour_buffer[0][2];
