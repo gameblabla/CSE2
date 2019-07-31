@@ -259,7 +259,7 @@ void Backend_DrawScreen(void)
 	vertex_buffer[3][0] = -1.0f;
 	vertex_buffer[3][1] = 1.0f;
 
-	glDrawArrays(GL_QUADS, 0, 4);
+	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
 	SDL_GL_SwapWindow(window);
 
@@ -357,7 +357,7 @@ static void BlitCommon(Backend_Surface *source_surface, const RECT *rect, long x
 	vertex_buffer[3][0] = vertex_left;
 	vertex_buffer[3][1] = vertex_bottom;
 
-	glDrawArrays(GL_QUADS, 0, 4);
+	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 }
 
 void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL colour_key)
@@ -400,7 +400,7 @@ static void ColourFillCommon(const RECT *rect, unsigned char red, unsigned char 
 	vertex_buffer[3][0] = (GLfloat)rect->left;
 	vertex_buffer[3][1] = (GLfloat)rect->bottom;
 
-	glDrawArrays(GL_QUADS, 0, 4);
+	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 }
 
 void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
@@ -544,7 +544,7 @@ static void DrawGlyphCommon(Backend_Glyph *glyph, long x, long y, const unsigned
 	vertex_buffer[3][0] = vertex_left;
 	vertex_buffer[3][1] = vertex_bottom;
 
-	glDrawArrays(GL_QUADS, 0, 4);
+	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 }
 
 void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
