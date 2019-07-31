@@ -260,7 +260,6 @@ static BOOL LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, BOOL create_surface)
 
 						Backend_Unlock(surf[surf_no].backend);
 						SDL_FreeSurface(converted_surface);
-						printf(" ^ Successfully loaded\n");
 						success = TRUE;
 					}
 				}
@@ -292,7 +291,6 @@ static BOOL LoadBitmap_File(const char *name, Surface_Ids surf_no, BOOL create_s
 		}
 		else
 		{
-			printf("Loading surface (as .pbm) from %s for surface id %d\n", path, surf_no);
 			if (LoadBitmap(fp, surf_no, create_surface))
 				return TRUE;
 		}
@@ -303,7 +301,6 @@ static BOOL LoadBitmap_File(const char *name, Surface_Ids surf_no, BOOL create_s
 	fp = SDL_RWFromFile(path, "rb");
 	if (fp)
 	{
-		printf("Loading surface (as .bmp) from %s for surface id %d\n", path, surf_no);
 		if (LoadBitmap(fp, surf_no, create_surface))
 			return TRUE;
 	}
@@ -324,7 +321,6 @@ static BOOL LoadBitmap_Resource(const char *res, Surface_Ids surf_no, BOOL creat
 		// But hey, if I ever need to create an RWops from an array that's -32768 bytes long, they've got me covered!
 		SDL_RWops *fp = SDL_RWFromConstMem(data, size);
 
-		printf("Loading surface from resource %s for surface id %d\n", res, surf_no);
 		if (LoadBitmap(fp, surf_no, create_surface))
 			return TRUE;
 	}
