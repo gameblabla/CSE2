@@ -228,8 +228,6 @@ void Backend_DrawScreen(void)
 	glViewport(0, 0, framebuffer_surface.width, framebuffer_surface.height);
 
 	// Draw framebuffer to screen
-	glLoadIdentity();
-
 	glBindTexture(GL_TEXTURE_2D, framebuffer_surface.texture_id);
 
 	texture_coordinate_buffer[0][0] = 0.0f;
