@@ -207,7 +207,7 @@ void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Sur
 	SDL_Rect source_rect;
 	RectToSDLRect(rect, &source_rect);
 
-	SDL_Rect destination_rect = {x, y, source_rect.w, source_rect.h};
+	SDL_Rect destination_rect = {(int)x, (int)y, source_rect.w, source_rect.h};
 
 	// Blit the surface
 	SDL_SetSurfaceBlendMode(source_surface->sdl_surface, colour_key ? SDL_BLENDMODE_BLEND : SDL_BLENDMODE_NONE);
@@ -234,7 +234,7 @@ void Backend_BlitToScreen(Backend_Surface *source_surface, const RECT *rect, lon
 	SDL_Rect source_rect;
 	RectToSDLRect(rect, &source_rect);
 
-	SDL_Rect destination_rect = {x, y, source_rect.w, source_rect.h};
+	SDL_Rect destination_rect = {(int)x, (int)y, source_rect.w, source_rect.h};
 
 	// Blit the texture
 	SDL_SetTextureBlendMode(source_surface->texture, colour_key ? SDL_BLENDMODE_BLEND : SDL_BLENDMODE_NONE);
@@ -398,7 +398,7 @@ void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, l
 	if (glyph == NULL || surface == NULL)
 		return;
 
-	SDL_Rect destination_rect = {x, y, glyph->surface->sdl_surface->w, glyph->surface->sdl_surface->h};
+	SDL_Rect destination_rect = {(int)x, (int)y, glyph->surface->sdl_surface->w, glyph->surface->sdl_surface->h};
 
 	SDL_SetSurfaceColorMod(glyph->surface->sdl_surface, colours[0], colours[1], colours[2]);
 	SDL_SetSurfaceBlendMode(glyph->surface->sdl_surface, SDL_BLENDMODE_BLEND);
