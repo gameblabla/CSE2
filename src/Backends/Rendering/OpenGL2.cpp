@@ -181,18 +181,9 @@ void Backend_DrawScreen(void)
 
 	glBindTexture(GL_TEXTURE_2D, framebuffer_surface.texture_id);
 
-	colour_buffer[0][0] = 0xFF;
-	colour_buffer[0][1] = 0xFF;
-	colour_buffer[0][2] = 0xFF;
-	colour_buffer[1][0] = colour_buffer[0][0];
-	colour_buffer[1][1] = colour_buffer[0][1];
-	colour_buffer[1][2] = colour_buffer[0][2];
-	colour_buffer[2][0] = colour_buffer[0][0];
-	colour_buffer[2][1] = colour_buffer[0][1];
-	colour_buffer[2][2] = colour_buffer[0][2];
-	colour_buffer[3][0] = colour_buffer[0][0];
-	colour_buffer[3][1] = colour_buffer[0][1];
-	colour_buffer[3][2] = colour_buffer[0][2];
+	colour_buffer[0][0] = colour_buffer[1][0] = colour_buffer[2][0] = colour_buffer[3][0] = 0xFF;
+	colour_buffer[0][1] = colour_buffer[1][1] = colour_buffer[2][1] = colour_buffer[3][1] = 0xFF;
+	colour_buffer[0][2] = colour_buffer[1][2] = colour_buffer[2][2] = colour_buffer[3][2] = 0xFF;
 
 	texture_coordinate_buffer[0][0] = 0.0f;
 	texture_coordinate_buffer[0][1] = 1.0f;
@@ -294,18 +285,9 @@ static void BlitCommon(Backend_Surface *source_surface, const RECT *rect, long x
 	const GLfloat vertex_top = (GLfloat)y;
 	const GLfloat vertex_bottom = (GLfloat)y + (rect->bottom - rect->top);
 
-	colour_buffer[0][0] = 0xFF;
-	colour_buffer[0][1] = 0xFF;
-	colour_buffer[0][2] = 0xFF;
-	colour_buffer[1][0] = colour_buffer[0][0];
-	colour_buffer[1][1] = colour_buffer[0][1];
-	colour_buffer[1][2] = colour_buffer[0][2];
-	colour_buffer[2][0] = colour_buffer[0][0];
-	colour_buffer[2][1] = colour_buffer[0][1];
-	colour_buffer[2][2] = colour_buffer[0][2];
-	colour_buffer[3][0] = colour_buffer[0][0];
-	colour_buffer[3][1] = colour_buffer[0][1];
-	colour_buffer[3][2] = colour_buffer[0][2];
+	colour_buffer[0][0] = colour_buffer[1][0] = colour_buffer[2][0] = colour_buffer[3][0] = 0xFF;
+	colour_buffer[0][1] = colour_buffer[1][1] = colour_buffer[2][1] = colour_buffer[3][1] = 0xFF;
+	colour_buffer[0][2] = colour_buffer[1][2] = colour_buffer[2][2] = colour_buffer[3][2] = 0xFF;
 
 	texture_coordinate_buffer[0][0] = texture_left;
 	texture_coordinate_buffer[0][1] = texture_top;
@@ -361,18 +343,9 @@ static void ColourFillCommon(const RECT *rect, unsigned char red, unsigned char 
 	// Use blank default texture, for a solid colour-fill
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	colour_buffer[0][0] = red;
-	colour_buffer[0][1] = green;
-	colour_buffer[0][2] = blue;
-	colour_buffer[1][0] = colour_buffer[0][0];
-	colour_buffer[1][1] = colour_buffer[0][1];
-	colour_buffer[1][2] = colour_buffer[0][2];
-	colour_buffer[2][0] = colour_buffer[0][0];
-	colour_buffer[2][1] = colour_buffer[0][1];
-	colour_buffer[2][2] = colour_buffer[0][2];
-	colour_buffer[3][0] = colour_buffer[0][0];
-	colour_buffer[3][1] = colour_buffer[0][1];
-	colour_buffer[3][2] = colour_buffer[0][2];
+	colour_buffer[0][0] = colour_buffer[1][0] = colour_buffer[2][0] = colour_buffer[3][0] = red;
+	colour_buffer[0][1] = colour_buffer[1][1] = colour_buffer[2][1] = colour_buffer[3][1] = green;
+	colour_buffer[0][2] = colour_buffer[1][2] = colour_buffer[2][2] = colour_buffer[3][2] = blue;
 
 	vertex_buffer[0][0] = (GLfloat)rect->left;
 	vertex_buffer[0][1] = (GLfloat)rect->top;
@@ -508,18 +481,9 @@ static void DrawGlyphCommon(Backend_Glyph *glyph, long x, long y, const unsigned
 	const GLfloat vertex_top = (GLfloat)y;
 	const GLfloat vertex_bottom = (GLfloat)y + glyph->height;
 
-	colour_buffer[0][0] = colours[0];
-	colour_buffer[0][1] = colours[1];
-	colour_buffer[0][2] = colours[2];
-	colour_buffer[1][0] = colour_buffer[0][0];
-	colour_buffer[1][1] = colour_buffer[0][1];
-	colour_buffer[1][2] = colour_buffer[0][2];
-	colour_buffer[2][0] = colour_buffer[0][0];
-	colour_buffer[2][1] = colour_buffer[0][1];
-	colour_buffer[2][2] = colour_buffer[0][2];
-	colour_buffer[3][0] = colour_buffer[0][0];
-	colour_buffer[3][1] = colour_buffer[0][1];
-	colour_buffer[3][2] = colour_buffer[0][2];
+	colour_buffer[0][0] = colour_buffer[1][0] = colour_buffer[2][0] = colour_buffer[3][0] = colours[0];
+	colour_buffer[0][1] = colour_buffer[1][1] = colour_buffer[2][1] = colour_buffer[3][1] = colours[1];
+	colour_buffer[0][2] = colour_buffer[1][2] = colour_buffer[2][2] = colour_buffer[3][2] = colours[2];
 
 	texture_coordinate_buffer[0][0] = 0.0f;
 	texture_coordinate_buffer[0][1] = 0.0f;
