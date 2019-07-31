@@ -169,7 +169,6 @@ BOOL Backend_Init(SDL_Window *p_window)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	glVertexPointer(2, GL_FLOAT, 0, vertex_buffer);
 	glTexCoordPointer(2, GL_FLOAT, 0, texture_coordinate_buffer);
 
@@ -220,6 +219,8 @@ void Backend_Deinit(void)
 void Backend_DrawScreen(void)
 {
 	glUseProgram(program_texture);
+
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
 	// Target actual screen, and not our framebuffer
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
@@ -317,6 +318,8 @@ static void BlitCommon(Backend_Surface *source_surface, const RECT *rect, Backen
 	// Switch to colour-key shader if we have to
 	glUseProgram(colour_key ? program_texture_colour_key : program_texture);
 
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
 	glBindTexture(GL_TEXTURE_2D, source_surface->texture_id);
 
 	const GLfloat texture_left = (GLfloat)rect->left / (GLfloat)source_surface->width;
@@ -380,6 +383,8 @@ static void ColourFillCommon(Backend_Surface *surface, const RECT *rect, unsigne
 		return;
 
 	glUseProgram(program_colour_fill);
+
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
 	glUniform4f(uniform_colour_fill_colour, red / 255.0f, green / 255.0f, blue / 255.0f, 1.0f);
 
@@ -516,6 +521,8 @@ void Backend_UnloadGlyph(Backend_Glyph *glyph)
 static void DrawGlyphCommon(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
 {
 	glUseProgram(program_glyph);
+
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
 	glBindTexture(GL_TEXTURE_2D, glyph->texture_id);
 
