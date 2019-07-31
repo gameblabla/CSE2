@@ -25,6 +25,12 @@ typedef struct Backend_Glyph
 	unsigned int height;
 } Backend_Glyph;
 
+typedef struct VertexBuffer
+{
+	GLfloat vertexes[4][2];
+	GLfloat texture_coordinates[4][2];
+} VertexBuffer;
+
 static SDL_Window *window;
 static SDL_GLContext context;
 
@@ -39,11 +45,7 @@ static GLint program_glyph_uniform_colour;
 static GLuint framebuffer_id;
 static GLuint vertex_buffer_id;
 
-static struct
-{
-	GLfloat vertexes[4][2];
-	GLfloat texture_coordinates[4][2];
-} vertex_buffer;
+static VertexBuffer vertex_buffer;
 
 static Backend_Surface framebuffer_surface;
 
@@ -198,22 +200,27 @@ BOOL Backend_Init(SDL_Window *p_window)
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	// Set up VAO
+	// Set up Vertex Array Object
 	GLuint vertex_array_id;
 	glGenVertexArrays(1, &vertex_array_id);
 	glBindVertexArray(vertex_array_id);
 
-	// Set up VBO
+	// Set up Vertex Buffer Object
 	glGenBuffers(1, &vertex_buffer_id);
 	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_id);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer), NULL, GL_DYNAMIC_DRAW);
 
-	// Set up IBO
+	// Set up Index Buffer Object
 	const GLuint indices[4] = {0, 1, 2, 3};
-	GLuint indices_buffer_id;
-	glGenBuffers(1, &indices_buffer_id);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices_buffer_id);
+	GLuint index_buffer_id;
+	glGenBuffers(1, &index_buffer_id);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer_id);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	// Set up the vertex attributes
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid*)offsetof(VertexBuffer, vertexes));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid*)offsetof(VertexBuffer, texture_coordinates));
 
 	// Set up our shaders
 	program_texture = CompileShader(vertex_shader_texture, fragment_shader_texture);
@@ -227,10 +234,6 @@ BOOL Backend_Init(SDL_Window *p_window)
 	// Get shader uniforms
 	program_colour_fill_uniform_colour = glGetUniformLocation(program_colour_fill, "colour");
 	program_glyph_uniform_colour = glGetUniformLocation(program_glyph, "colour");
-
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid*)(sizeof(GLfloat) * 4 * 2));
 
 	// Set up framebuffer (used for surface-to-surface blitting)
 	glGenFramebuffers(1, &framebuffer_id);
