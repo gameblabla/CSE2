@@ -569,6 +569,13 @@ void Backend_UnloadGlyph(Backend_Glyph *glyph)
 
 static void DrawGlyphCommon(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
 {
+	if (glyph == NULL || surface == NULL)
+		return;
+
+	// Point our framebuffer to the destination texture
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, surface->texture_id, 0);
+	glViewport(0, 0, surface->width, surface->height);
+
 	glUseProgram(program_glyph);
 
 	glEnable(GL_BLEND);
@@ -609,25 +616,11 @@ static void DrawGlyphCommon(Backend_Surface *surface, Backend_Glyph *glyph, long
 
 void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
 {
-	if (glyph == NULL || surface == NULL)
-		return;
-
-	// Point our framebuffer to the destination texture
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, surface->texture_id, 0);
-	glViewport(0, 0, surface->width, surface->height);
-
 	DrawGlyphCommon(surface, glyph, x, y, colours);
 }
 
 void Backend_DrawGlyphToScreen(Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
 {
-	if (glyph == NULL)
-		return;
-
-	// Point our framebuffer to the screen texture
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebuffer_surface.texture_id, 0);
-	glViewport(0, 0, framebuffer_surface.width, framebuffer_surface.height);
-
 	DrawGlyphCommon(&framebuffer_surface, glyph, x, y, colours);
 }
 
