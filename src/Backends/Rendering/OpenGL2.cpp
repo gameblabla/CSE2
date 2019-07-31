@@ -27,6 +27,7 @@ typedef struct Backend_Glyph
 
 static SDL_Window *window;
 static SDL_GLContext context;
+static GLuint normal_program_id;
 static GLuint colour_key_program_id;
 static GLuint framebuffer_id;
 static GLfloat vertex_buffer[4][2];
@@ -35,7 +36,26 @@ static GLubyte colour_buffer[4][3];
 
 static Backend_Surface framebuffer_surface;
 
-static const GLchar *fragment_shader_source = " \
+static const GLchar *vertex_shader_source = " \
+#version 120\n \
+void main() \
+{ \
+	gl_FrontColor = gl_Color; \
+	gl_TexCoord[0] = gl_MultiTexCoord0; \
+	gl_Position = gl_ModelViewMatrix * gl_Vertex; \
+} \
+";
+
+static const GLchar *fragment_shader_source_normal = " \
+#version 120\n \
+uniform sampler2D tex; \
+void main() \
+{ \
+	gl_FragColor = gl_Color * texture2D(tex, gl_TexCoord[0].st); \
+} \
+";
+
+static const GLchar *fragment_shader_source_colour_key = " \
 #version 120\n \
 uniform sampler2D tex; \
 void main() \
@@ -49,11 +69,21 @@ void main() \
 } \
 ";
 
-static GLuint CompileShader(const char *fragment_shader_source)
+static GLuint CompileShader(const char *vertex_shader_source, const char *fragment_shader_source)
 {
 	GLint shader_status;
 
 	GLuint program_id = glCreateProgram();
+
+	GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vertex_shader, 1, &vertex_shader_source, NULL);
+	glCompileShader(vertex_shader);
+
+	glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &shader_status);
+	if (shader_status != GL_TRUE)
+		return 0;
+
+	glAttachShader(program_id, vertex_shader);
 
 	GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fragment_shader, 1, &fragment_shader_source, NULL);
@@ -134,8 +164,12 @@ BOOL Backend_Init(SDL_Window *p_window)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-	// Set up our colour-key-enabled fragment shader
-	colour_key_program_id = CompileShader(fragment_shader_source);
+	// Set up our shaders
+	normal_program_id = CompileShader(vertex_shader_source, fragment_shader_source_normal);
+	colour_key_program_id = CompileShader(vertex_shader_source, fragment_shader_source_colour_key);
+
+	if (normal_program_id == 0 || colour_key_program_id == 0)
+		printf("Failed to compile shaders\n");
 
 	// Set up framebuffer (used for surface-to-surface blitting)
 	glGenFramebuffersEXT(1, &framebuffer_id);
@@ -165,7 +199,7 @@ void Backend_Deinit(void)
 void Backend_DrawScreen(void)
 {
 	// Disable colour-keying
-	glUseProgram(0);
+	glUseProgram(normal_program_id);
 
 	// Target actual screen, and not our framebuffer
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
@@ -271,7 +305,7 @@ static void BlitCommon(Backend_Surface *source_surface, const RECT *rect, long x
 		return;
 
 	// Switch to colour-key shader if we have to
-	glUseProgram(colour_key ? colour_key_program_id : 0);
+	glUseProgram(colour_key ? colour_key_program_id : normal_program_id);
 
 	glBindTexture(GL_TEXTURE_2D, source_surface->texture_id);
 
@@ -338,7 +372,7 @@ static void ColourFillCommon(const RECT *rect, unsigned char red, unsigned char 
 		return;
 
 	// Disable colour-keying
-	glUseProgram(0);
+	glUseProgram(normal_program_id);
 
 	// Use blank default texture, for a solid colour-fill
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -472,7 +506,7 @@ void Backend_UnloadGlyph(Backend_Glyph *glyph)
 static void DrawGlyphCommon(Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
 {
 	// Disable colour-keying
-	glUseProgram(0);
+	glUseProgram(normal_program_id);
 
 	glBindTexture(GL_TEXTURE_2D, glyph->texture_id);
 
