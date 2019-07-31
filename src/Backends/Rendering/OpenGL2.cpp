@@ -236,11 +236,7 @@ void Backend_DrawScreen(void)
 
 	glViewport(0, 0, framebuffer_surface.width, framebuffer_surface.height);
 
-	glLoadIdentity();
-	glOrtho(0.0, framebuffer_surface.width, 0.0, framebuffer_surface.height, 1.0, -1.0);
-
 	// Draw framebuffer to screen
-	glPushMatrix();
 	glLoadIdentity();
 
 	glBindTexture(GL_TEXTURE_2D, framebuffer_surface.texture_id);
@@ -264,8 +260,6 @@ void Backend_DrawScreen(void)
 	vertex_buffer[3][1] = 1.0f;
 
 	glDrawArrays(GL_QUADS, 0, 4);
-
-	glPopMatrix();
 
 	SDL_GL_SwapWindow(window);
 
