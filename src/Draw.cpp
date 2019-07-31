@@ -436,12 +436,6 @@ static void DrawBitmap(const RECT *rcView, int x, int y, const RECT *rect, Surfa
 		y = clipRect.top;
 	}
 
-	if (surf_no == SURFACE_ID_FACE)
-	{
-		printf("x = %d\ny = %d\n", x, y);
-		printf("frameRect.left = %d\nframeRect.top = %d\nframeRect.right = %d\nframeRect.bottom = %d\n\n", frameRect.left, frameRect.top, frameRect.right, frameRect.bottom);
-	}
-
 	// Draw to screen
 	Backend_BlitToScreen(surf[surf_no].backend, &frameRect, x, y, transparent);
 }
