@@ -46,7 +46,7 @@ static const GLchar *vertex_shader_plain = " \
 #version 120\n \
 void main() \
 { \
-	gl_Position = gl_ModelViewMatrix * gl_Vertex; \
+	gl_Position = gl_Vertex; \
 } \
 ";
 
@@ -55,7 +55,7 @@ static const GLchar *vertex_shader_texture = " \
 void main() \
 { \
 	gl_TexCoord[0] = gl_MultiTexCoord0; \
-	gl_Position = gl_ModelViewMatrix * gl_Vertex; \
+	gl_Position = gl_Vertex; \
 } \
 ";
 
@@ -134,16 +134,6 @@ static GLuint CompileShader(const char *vertex_shader_source, const char *fragme
 		return 0;
 
 	return program_id;
-}
-
-static void SetRenderTarget(Backend_Surface *surface)
-{
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, surface->texture_id, 0);
-
-	glViewport(0, 0, surface->width, surface->height);
-
-	glLoadIdentity();
-	glOrtho(0.0, surface->width, 0.0, surface->height, 1.0, -1.0);
 }
 
 SDL_Window* Backend_CreateWindow(const char *title, int width, int height)
@@ -319,7 +309,7 @@ void Backend_Unlock(Backend_Surface *surface)
 	free(surface->pixels);
 }
 
-static void BlitCommon(Backend_Surface *source_surface, const RECT *rect, long x, long y, BOOL colour_key)
+static void BlitCommon(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL colour_key)
 {
 	if (rect->right - rect->left < 0 || rect->bottom - rect->top < 0)
 		return;
@@ -334,10 +324,10 @@ static void BlitCommon(Backend_Surface *source_surface, const RECT *rect, long x
 	const GLfloat texture_top = (GLfloat)rect->top / (GLfloat)source_surface->height;
 	const GLfloat texture_bottom = (GLfloat)rect->bottom / (GLfloat)source_surface->height;
 
-	const GLfloat vertex_left = (GLfloat)x;
-	const GLfloat vertex_right = (GLfloat)x + (rect->right - rect->left);
-	const GLfloat vertex_top = (GLfloat)y;
-	const GLfloat vertex_bottom = (GLfloat)y + (rect->bottom - rect->top);
+	const GLfloat vertex_left = (x * (2.0f / destination_surface->width)) - 1.0f;
+	const GLfloat vertex_right = ((x + (rect->right - rect->left)) * (2.0f / destination_surface->width)) - 1.0f;
+	const GLfloat vertex_top = (y * (2.0f / destination_surface->height)) - 1.0f;
+	const GLfloat vertex_bottom = ((y + (rect->bottom - rect->top)) * (2.0f / destination_surface->height)) - 1.0f;
 
 	texture_coordinate_buffer[0][0] = texture_left;
 	texture_coordinate_buffer[0][1] = texture_top;
@@ -366,9 +356,10 @@ void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Sur
 		return;
 
 	// Point our framebuffer to the destination texture
-	SetRenderTarget(destination_surface);
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, destination_surface->texture_id, 0);
+	glViewport(0, 0, destination_surface->width, destination_surface->height);
 
-	BlitCommon(source_surface, rect, x, y, colour_key);
+	BlitCommon(source_surface, rect, destination_surface, x, y, colour_key);
 }
 
 void Backend_BlitToScreen(Backend_Surface *source_surface, const RECT *rect, long x, long y, BOOL colour_key)
@@ -377,12 +368,13 @@ void Backend_BlitToScreen(Backend_Surface *source_surface, const RECT *rect, lon
 		return;
 
 	// Point our framebuffer to the screen texture
-	SetRenderTarget(&framebuffer_surface);
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, framebuffer_surface.texture_id, 0);
+	glViewport(0, 0, framebuffer_surface.width, framebuffer_surface.height);
 
-	BlitCommon(source_surface, rect, x, y, colour_key);
+	BlitCommon(source_surface, rect, &framebuffer_surface, x, y, colour_key);
 }
 
-static void ColourFillCommon(const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
+static void ColourFillCommon(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
 {
 	if (rect->right - rect->left < 0 || rect->bottom - rect->top < 0)
 		return;
@@ -391,14 +383,19 @@ static void ColourFillCommon(const RECT *rect, unsigned char red, unsigned char 
 
 	glUniform4f(uniform_colour_fill_colour, red / 255.0f, green / 255.0f, blue / 255.0f, 1.0f);
 
-	vertex_buffer[0][0] = (GLfloat)rect->left;
-	vertex_buffer[0][1] = (GLfloat)rect->top;
-	vertex_buffer[1][0] = (GLfloat)rect->right;
-	vertex_buffer[1][1] = (GLfloat)rect->top;
-	vertex_buffer[2][0] = (GLfloat)rect->right;
-	vertex_buffer[2][1] = (GLfloat)rect->bottom;
-	vertex_buffer[3][0] = (GLfloat)rect->left;
-	vertex_buffer[3][1] = (GLfloat)rect->bottom;
+	const GLfloat vertex_left = (rect->left * (2.0f / surface->width)) - 1.0f;
+	const GLfloat vertex_right = (rect->right * (2.0f / surface->width)) - 1.0f;
+	const GLfloat vertex_top = (rect->top * (2.0f / surface->height)) - 1.0f;
+	const GLfloat vertex_bottom = (rect->bottom * (2.0f / surface->height)) - 1.0f;
+
+	vertex_buffer[0][0] = vertex_left;
+	vertex_buffer[0][1] = vertex_top;
+	vertex_buffer[1][0] = vertex_right;
+	vertex_buffer[1][1] = vertex_top;
+	vertex_buffer[2][0] = vertex_right;
+	vertex_buffer[2][1] = vertex_bottom;
+	vertex_buffer[3][0] = vertex_left;
+	vertex_buffer[3][1] = vertex_bottom;
 
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 }
@@ -409,17 +406,19 @@ void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned cha
 		return;
 
 	// Point our framebuffer to the destination texture
-	SetRenderTarget(surface);
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, surface->texture_id, 0);
+	glViewport(0, 0, surface->width, surface->height);
 
-	ColourFillCommon(rect, red, green, blue);
+	ColourFillCommon(surface, rect, red, green, blue);
 }
 
 void Backend_ColourFillToScreen(const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
 {
 	// Point our framebuffer to the screen texture
-	SetRenderTarget(&framebuffer_surface);
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, framebuffer_surface.texture_id, 0);
+	glViewport(0, 0, framebuffer_surface.width, framebuffer_surface.height);
 
-	ColourFillCommon(rect, red, green, blue);
+	ColourFillCommon(&framebuffer_surface, rect, red, green, blue);
 }
 
 void Backend_ScreenToSurface(Backend_Surface *surface, const RECT *rect)
@@ -428,9 +427,10 @@ void Backend_ScreenToSurface(Backend_Surface *surface, const RECT *rect)
 		return;
 
 	// Point our framebuffer to the destination texture
-	SetRenderTarget(surface);
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, surface->texture_id, 0);
+	glViewport(0, 0, surface->width, surface->height);
 
-	BlitCommon(&framebuffer_surface, rect, rect->left, rect->top, FALSE);
+	BlitCommon(&framebuffer_surface, rect, surface, rect->left, rect->top, FALSE);
 }
 
 BOOL Backend_SupportsSubpixelGlyph(void)
@@ -513,16 +513,16 @@ void Backend_UnloadGlyph(Backend_Glyph *glyph)
 	free(glyph);
 }
 
-static void DrawGlyphCommon(Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
+static void DrawGlyphCommon(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
 {
 	glUseProgram(program_glyph);
 
 	glBindTexture(GL_TEXTURE_2D, glyph->texture_id);
 
-	const GLfloat vertex_left = (GLfloat)x;
-	const GLfloat vertex_right = (GLfloat)x + glyph->width;
-	const GLfloat vertex_top = (GLfloat)y;
-	const GLfloat vertex_bottom = (GLfloat)y + glyph->height;
+	const GLfloat vertex_left = (x * (2.0f / surface->width)) - 1.0f;
+	const GLfloat vertex_right = ((x + glyph->width) * (2.0f / surface->width)) - 1.0f;
+	const GLfloat vertex_top = (y * (2.0f / surface->height)) - 1.0f;
+	const GLfloat vertex_bottom = ((y + glyph->height) * (2.0f / surface->height)) - 1.0f;
 
 	glUniform4f(uniform_glyph_colour, colours[0] / 255.0f, colours[1] / 255.0f, colours[2] / 255.0f, 1.0f);
 
@@ -553,9 +553,10 @@ void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, l
 		return;
 
 	// Point our framebuffer to the destination texture
-	SetRenderTarget(surface);
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, surface->texture_id, 0);
+	glViewport(0, 0, surface->width, surface->height);
 
-	DrawGlyphCommon(glyph, x, y, colours);
+	DrawGlyphCommon(surface, glyph, x, y, colours);
 }
 
 void Backend_DrawGlyphToScreen(Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
@@ -564,9 +565,10 @@ void Backend_DrawGlyphToScreen(Backend_Glyph *glyph, long x, long y, const unsig
 		return;
 
 	// Point our framebuffer to the screen texture
-	SetRenderTarget(&framebuffer_surface);
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, framebuffer_surface.texture_id, 0);
+	glViewport(0, 0, framebuffer_surface.width, framebuffer_surface.height);
 
-	DrawGlyphCommon(glyph, x, y, colours);
+	DrawGlyphCommon(&framebuffer_surface, glyph, x, y, colours);
 }
 
 void Backend_HandleDeviceLoss(void)
