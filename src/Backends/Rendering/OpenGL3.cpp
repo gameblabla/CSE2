@@ -122,9 +122,7 @@ void main() \
 static void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void* userParam)
 {
 	if (type == GL_DEBUG_TYPE_ERROR)
-	printf("GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
-           ( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ),
-            type, severity, message);
+		printf("GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n", ( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ), type, severity, message);
 }
 
 static GLuint CompileShader(const char *vertex_shader_source, const char *fragment_shader_source)
@@ -190,7 +188,6 @@ BOOL Backend_Init(SDL_Window *p_window)
 	if (!GLEW_VERSION_3_2)
 		return FALSE;
 
-	// During init, enable debug output
 	glEnable(GL_DEBUG_OUTPUT);
 	glDebugMessageCallback(MessageCallback, 0);
 
@@ -295,7 +292,7 @@ void Backend_DrawScreen(void)
 	SDL_GL_SwapWindow(window);
 
 	// According to https://www.khronos.org/opengl/wiki/Common_Mistakes#Swap_Buffers
-	// the buffer should always be cleared
+	// the buffer should always be cleared, even if it seems unnecessary
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	// Switch back to our framebuffer
@@ -352,8 +349,15 @@ void Backend_Unlock(Backend_Surface *surface)
 
 static void BlitCommon(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL colour_key)
 {
+	if (source_surface == NULL || destination_surface == NULL)
+		return;
+
 	if (rect->right - rect->left < 0 || rect->bottom - rect->top < 0)
 		return;
+
+	// Point our framebuffer to the destination texture
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, destination_surface->texture_id, 0);
+	glViewport(0, 0, destination_surface->width, destination_surface->height);
 
 	// Switch to colour-key shader if we have to
 	glUseProgram(colour_key ? program_texture_colour_key : program_texture);
@@ -397,32 +401,25 @@ static void BlitCommon(Backend_Surface *source_surface, const RECT *rect, Backen
 
 void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL colour_key)
 {
-	if (source_surface == NULL || destination_surface == NULL)
-		return;
-
-	// Point our framebuffer to the destination texture
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, destination_surface->texture_id, 0);
-	glViewport(0, 0, destination_surface->width, destination_surface->height);
-
 	BlitCommon(source_surface, rect, destination_surface, x, y, colour_key);
 }
 
 void Backend_BlitToScreen(Backend_Surface *source_surface, const RECT *rect, long x, long y, BOOL colour_key)
 {
-	if (source_surface == NULL)
-		return;
-
-	// Point our framebuffer to the screen texture
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebuffer_surface.texture_id, 0);
-	glViewport(0, 0, framebuffer_surface.width, framebuffer_surface.height);
-
 	BlitCommon(source_surface, rect, &framebuffer_surface, x, y, colour_key);
 }
 
 static void ColourFillCommon(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
 {
+	if (surface == NULL)
+		return;
+
 	if (rect->right - rect->left < 0 || rect->bottom - rect->top < 0)
 		return;
+
+	// Point our framebuffer to the destination texture
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, surface->texture_id, 0);
+	glViewport(0, 0, surface->width, surface->height);
 
 	glUseProgram(program_colour_fill);
 
@@ -445,40 +442,22 @@ static void ColourFillCommon(Backend_Surface *surface, const RECT *rect, unsigne
 	vertex_buffer.vertexes[3][0] = vertex_left;
 	vertex_buffer.vertexes[3][1] = vertex_bottom;
 
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_buffer), &vertex_buffer);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_buffer.vertexes), &vertex_buffer);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 }
 
 void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
 {
-	if (surface == NULL)
-		return;
-
-	// Point our framebuffer to the destination texture
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, surface->texture_id, 0);
-	glViewport(0, 0, surface->width, surface->height);
-
 	ColourFillCommon(surface, rect, red, green, blue);
 }
 
 void Backend_ColourFillToScreen(const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
 {
-	// Point our framebuffer to the screen texture
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebuffer_surface.texture_id, 0);
-	glViewport(0, 0, framebuffer_surface.width, framebuffer_surface.height);
-
 	ColourFillCommon(&framebuffer_surface, rect, red, green, blue);
 }
 
 void Backend_ScreenToSurface(Backend_Surface *surface, const RECT *rect)
 {
-	if (surface == NULL)
-		return;
-
-	// Point our framebuffer to the destination texture
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, surface->texture_id, 0);
-	glViewport(0, 0, surface->width, surface->height);
-
 	BlitCommon(&framebuffer_surface, rect, surface, rect->left, rect->top, FALSE);
 }
 
