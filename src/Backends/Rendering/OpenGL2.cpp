@@ -143,7 +143,6 @@ BOOL Backend_Init(SDL_Window *p_window)
 	if (!GLEW_EXT_framebuffer_object)
 		return FALSE;
 
-	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
