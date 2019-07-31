@@ -160,7 +160,7 @@ unsigned char* Backend_Lock(Backend_Surface *surface, unsigned int *pitch)
 
 void Backend_Unlock(Backend_Surface *surface)
 {
-	
+	(void)surface;
 }
 
 void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL alpha_blend)

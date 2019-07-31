@@ -440,8 +440,6 @@ void LoadOrganya(const char *name)
 	memset(now_leng, 0, sizeof(now_leng));
 
 	// Open file
-	printf("Loading org %s\n", name);
-
 	FILE *fp = fopen(name, "rb");
 
 	if (!fp)

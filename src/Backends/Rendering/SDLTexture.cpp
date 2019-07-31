@@ -216,7 +216,7 @@ void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Sur
 	SDL_Rect source_rect;
 	RectToSDLRect(rect, &source_rect);
 
-	SDL_Rect destination_rect = {x, y, source_rect.w, source_rect.h};
+	SDL_Rect destination_rect = {(int)x, (int)y, source_rect.w, source_rect.h};
 
 	// Blit the surface
 	SDL_SetSurfaceBlendMode(source_surface->sdl_surface, alpha_blend ? SDL_BLENDMODE_BLEND : SDL_BLENDMODE_NONE);
@@ -244,7 +244,7 @@ void Backend_BlitToScreen(Backend_Surface *source_surface, const RECT *rect, lon
 	SDL_Rect source_rect;
 	RectToSDLRect(rect, &source_rect);
 
-	SDL_Rect destination_rect = {x, y, source_rect.w, source_rect.h};
+	SDL_Rect destination_rect = {(int)x, (int)y, source_rect.w, source_rect.h};
 
 	// Blit the texture
 	SDL_SetTextureBlendMode(source_surface->texture, alpha_blend ? premultiplied_blend_mode : SDL_BLENDMODE_NONE);

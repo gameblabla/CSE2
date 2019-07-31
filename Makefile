@@ -224,8 +224,8 @@ else
 	endif
 endif
 
-ifeq ($(RENDERER), OpenGL2)
-	SOURCES += Backends/Rendering/OpenGL2
+ifeq ($(RENDERER), OpenGL3)
+	SOURCES += Backends/Rendering/OpenGL3
 	CXXFLAGS += `pkg-config glew --cflags`
 
 	ifeq ($(STATIC), 1)
