@@ -199,7 +199,6 @@ BOOL Backend_Init(SDL_Window *p_window)
 	glEnable(GL_DEBUG_OUTPUT);
 	glDebugMessageCallback(MessageCallback, 0);
 
-	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -268,6 +267,8 @@ void Backend_Deinit(void)
 void Backend_DrawScreen(void)
 {
 	glUseProgram(program_texture);
+
+	glDisable(GL_BLEND);
 
 	// Enable texture coordinates, since this uses textures
 	glEnableVertexAttribArray(2);
@@ -377,6 +378,8 @@ static void BlitCommon(Backend_Surface *source_surface, const RECT *rect, Backen
 	// Switch to colour-key shader if we have to
 	glUseProgram(colour_key ? program_texture_colour_key : program_texture);
 
+	glDisable(GL_BLEND);
+
 	// Enable texture coordinates, since this uses textures
 	glEnableVertexAttribArray(2);
 
@@ -437,6 +440,8 @@ static void ColourFillCommon(Backend_Surface *surface, const RECT *rect, unsigne
 	glViewport(0, 0, surface->width, surface->height);
 
 	glUseProgram(program_colour_fill);
+
+	glDisable(GL_BLEND);
 
 	// Disable texture coordinate array, since this doesn't use textures
 	glDisableVertexAttribArray(2);
@@ -567,6 +572,8 @@ static void DrawGlyphCommon(Backend_Surface *surface, Backend_Glyph *glyph, long
 	glViewport(0, 0, surface->width, surface->height);
 
 	glUseProgram(program_glyph);
+
+	glEnable(GL_BLEND);
 
 	// Enable texture coordinates, since this uses textures
 	glEnableVertexAttribArray(2);
