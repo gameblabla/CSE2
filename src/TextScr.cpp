@@ -466,7 +466,15 @@ void PutTextScript()
 
 	if (gTS.face_x < (TEXT_LEFT * 0x200))
 		gTS.face_x += 0x1000;
+
+#ifdef FIX_BUGS
+	gTS.rcText.top -= 2;
+	PutBitmap3(&gTS.rcText, SubpixelToScreenCoord(gTS.face_x), PixelToScreenCoord(gTS.rcText.top), &rcFace, SURFACE_ID_FACE);
+	gTS.rcText.top += 2;
+#else
+	// The top few rows of pixels are cut off by the clip rectangle, and the facepic is off-centre
 	PutBitmap3(&gTS.rcText, SubpixelToScreenCoord(gTS.face_x), PixelToScreenCoord(gTS.rcText.top - 3), &rcFace, SURFACE_ID_FACE);
+#endif
 
 	//Draw text
 	if (gTS.face)

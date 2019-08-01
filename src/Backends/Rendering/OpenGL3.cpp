@@ -41,8 +41,9 @@ static GLuint program_glyph;
 static GLint program_colour_fill_uniform_colour;
 static GLint program_glyph_uniform_colour;
 
-static GLuint framebuffer_id;
+static GLuint vertex_array_id;
 static GLuint vertex_buffer_id;
+static GLuint framebuffer_id;
 
 static VertexBuffer vertex_buffer;
 
@@ -189,7 +190,6 @@ BOOL Backend_Init(SDL_Window *p_window, unsigned int internal_screen_width, unsi
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	// Set up Vertex Array Object
-	GLuint vertex_array_id;
 	glGenVertexArrays(1, &vertex_array_id);
 	glBindVertexArray(vertex_array_id);
 
@@ -242,6 +242,8 @@ void Backend_Deinit(void)
 	glDeleteProgram(program_glyph);
 	glDeleteProgram(program_colour_fill);
 	glDeleteProgram(program_texture);
+	glDeleteBuffers(1, &vertex_buffer_id);
+	glDeleteVertexArrays(1, &vertex_array_id);
 	SDL_GL_DeleteContext(context);
 }
 
