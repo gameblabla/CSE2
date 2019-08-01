@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -58,8 +58,6 @@
 #   else
 #    define DECLSPEC    __declspec(dllimport)
 #   endif
-#  elif defined(SDL_STATIC)
-#   define DECLSPEC
 #  else
 #   define DECLSPEC __declspec(dllexport)
 #  endif
@@ -106,6 +104,9 @@
 #if defined(_MSC_VER) || defined(__MWERKS__) || defined(__BORLANDC__)
 #ifdef _MSC_VER
 #pragma warning(disable: 4103)
+#endif
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wpragma-pack"
 #endif
 #ifdef __BORLANDC__
 #pragma nopackwarning
