@@ -1843,6 +1843,7 @@ endif()
 if(SDL_STATIC)
   set (BUILD_SHARED_LIBS FALSE)
   add_library(SDL2-static STATIC ${SOURCE_FILES})
+  target_compile_definitions(SDL2-static PRIVATE SDL_STATIC)
   if (NOT SDL_SHARED OR NOT WIN32)
     set_target_properties(SDL2-static PROPERTIES OUTPUT_NAME "SDL2")
     # Note: Apparently, OUTPUT_NAME must really be unique; even when

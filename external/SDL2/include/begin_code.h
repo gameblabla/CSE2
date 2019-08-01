@@ -58,6 +58,8 @@
 #   else
 #    define DECLSPEC    __declspec(dllimport)
 #   endif
+#  elif defined(SDL_STATIC)
+#   define DECLSPEC
 #  else
 #   define DECLSPEC __declspec(dllexport)
 #  endif
