@@ -1,6 +1,8 @@
 #include "../Rendering.h"
 
+#include <math.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #include <GL/glew.h>
@@ -25,10 +27,16 @@ typedef struct Backend_Glyph
 	unsigned int height;
 } Backend_Glyph;
 
+typedef struct Coordinate2D
+{
+	GLfloat x;
+	GLfloat y;
+} Coordinate2D;
+
 typedef struct VertexBuffer
 {
-	GLfloat vertexes[4][2];
-	GLfloat texture_coordinates[4][2];
+	Coordinate2D vertexes[4];
+	Coordinate2D texture_coordinates[4];
 } VertexBuffer;
 
 static SDL_Window *window;
@@ -286,23 +294,23 @@ void Backend_DrawScreen(void)
 	// Draw framebuffer to screen
 	glBindTexture(GL_TEXTURE_2D, framebuffer_surface.texture_id);
 
-	vertex_buffer.texture_coordinates[0][0] = 0.0f;
-	vertex_buffer.texture_coordinates[0][1] = 1.0f;
-	vertex_buffer.texture_coordinates[1][0] = 1.0f;
-	vertex_buffer.texture_coordinates[1][1] = 1.0f;
-	vertex_buffer.texture_coordinates[2][0] = 1.0f;
-	vertex_buffer.texture_coordinates[2][1] = 0.0f;
-	vertex_buffer.texture_coordinates[3][0] = 0.0f;
-	vertex_buffer.texture_coordinates[3][1] = 0.0f;
+	vertex_buffer.texture_coordinates[0].x = 0.0f;
+	vertex_buffer.texture_coordinates[0].y = 1.0f;
+	vertex_buffer.texture_coordinates[1].x = 1.0f;
+	vertex_buffer.texture_coordinates[1].y = 1.0f;
+	vertex_buffer.texture_coordinates[2].x = 1.0f;
+	vertex_buffer.texture_coordinates[2].y = 0.0f;
+	vertex_buffer.texture_coordinates[3].x = 0.0f;
+	vertex_buffer.texture_coordinates[3].y = 0.0f;
 
-	vertex_buffer.vertexes[0][0] = -fit_width;
-	vertex_buffer.vertexes[0][1] = -fit_height;
-	vertex_buffer.vertexes[1][0] = fit_width;
-	vertex_buffer.vertexes[1][1] = -fit_height;
-	vertex_buffer.vertexes[2][0] = fit_width;
-	vertex_buffer.vertexes[2][1] = fit_height;
-	vertex_buffer.vertexes[3][0] = -fit_width;
-	vertex_buffer.vertexes[3][1] = fit_height;
+	vertex_buffer.vertexes[0].x = -fit_width;
+	vertex_buffer.vertexes[0].y = -fit_height;
+	vertex_buffer.vertexes[1].x = fit_width;
+	vertex_buffer.vertexes[1].y = -fit_height;
+	vertex_buffer.vertexes[2].x = fit_width;
+	vertex_buffer.vertexes[2].y = fit_height;
+	vertex_buffer.vertexes[3].x = -fit_width;
+	vertex_buffer.vertexes[3].y = fit_height;
 
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_buffer), &vertex_buffer);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
@@ -417,23 +425,23 @@ static void BlitCommon(Backend_Surface *source_surface, const RECT *rect, Backen
 	const GLfloat vertex_top = (y * (2.0f / destination_surface->height)) - 1.0f;
 	const GLfloat vertex_bottom = ((y + (rect->bottom - rect->top)) * (2.0f / destination_surface->height)) - 1.0f;
 
-	vertex_buffer.texture_coordinates[0][0] = texture_left;
-	vertex_buffer.texture_coordinates[0][1] = texture_top;
-	vertex_buffer.texture_coordinates[1][0] = texture_right;
-	vertex_buffer.texture_coordinates[1][1] = texture_top;
-	vertex_buffer.texture_coordinates[2][0] = texture_right;
-	vertex_buffer.texture_coordinates[2][1] = texture_bottom;
-	vertex_buffer.texture_coordinates[3][0] = texture_left;
-	vertex_buffer.texture_coordinates[3][1] = texture_bottom;
+	vertex_buffer.texture_coordinates[0].x = texture_left;
+	vertex_buffer.texture_coordinates[0].y = texture_top;
+	vertex_buffer.texture_coordinates[1].x = texture_right;
+	vertex_buffer.texture_coordinates[1].y = texture_top;
+	vertex_buffer.texture_coordinates[2].x = texture_right;
+	vertex_buffer.texture_coordinates[2].y = texture_bottom;
+	vertex_buffer.texture_coordinates[3].x = texture_left;
+	vertex_buffer.texture_coordinates[3].y = texture_bottom;
 
-	vertex_buffer.vertexes[0][0] = vertex_left;
-	vertex_buffer.vertexes[0][1] = vertex_top;
-	vertex_buffer.vertexes[1][0] = vertex_right;
-	vertex_buffer.vertexes[1][1] = vertex_top;
-	vertex_buffer.vertexes[2][0] = vertex_right;
-	vertex_buffer.vertexes[2][1] = vertex_bottom;
-	vertex_buffer.vertexes[3][0] = vertex_left;
-	vertex_buffer.vertexes[3][1] = vertex_bottom;
+	vertex_buffer.vertexes[0].x = vertex_left;
+	vertex_buffer.vertexes[0].y = vertex_top;
+	vertex_buffer.vertexes[1].x = vertex_right;
+	vertex_buffer.vertexes[1].y = vertex_top;
+	vertex_buffer.vertexes[2].x = vertex_right;
+	vertex_buffer.vertexes[2].y = vertex_bottom;
+	vertex_buffer.vertexes[3].x = vertex_left;
+	vertex_buffer.vertexes[3].y = vertex_bottom;
 
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_buffer), &vertex_buffer);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
@@ -476,14 +484,14 @@ static void ColourFillCommon(Backend_Surface *surface, const RECT *rect, unsigne
 	const GLfloat vertex_top = (rect->top * (2.0f / surface->height)) - 1.0f;
 	const GLfloat vertex_bottom = (rect->bottom * (2.0f / surface->height)) - 1.0f;
 
-	vertex_buffer.vertexes[0][0] = vertex_left;
-	vertex_buffer.vertexes[0][1] = vertex_top;
-	vertex_buffer.vertexes[1][0] = vertex_right;
-	vertex_buffer.vertexes[1][1] = vertex_top;
-	vertex_buffer.vertexes[2][0] = vertex_right;
-	vertex_buffer.vertexes[2][1] = vertex_bottom;
-	vertex_buffer.vertexes[3][0] = vertex_left;
-	vertex_buffer.vertexes[3][1] = vertex_bottom;
+	vertex_buffer.vertexes[0].x = vertex_left;
+	vertex_buffer.vertexes[0].y = vertex_top;
+	vertex_buffer.vertexes[1].x = vertex_right;
+	vertex_buffer.vertexes[1].y = vertex_top;
+	vertex_buffer.vertexes[2].x = vertex_right;
+	vertex_buffer.vertexes[2].y = vertex_bottom;
+	vertex_buffer.vertexes[3].x = vertex_left;
+	vertex_buffer.vertexes[3].y = vertex_bottom;
 
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_buffer.vertexes), &vertex_buffer);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
@@ -603,23 +611,23 @@ static void DrawGlyphCommon(Backend_Surface *surface, Backend_Glyph *glyph, long
 
 	glUniform4f(program_glyph_uniform_colour, colours[0] / 255.0f, colours[1] / 255.0f, colours[2] / 255.0f, 1.0f);
 
-	vertex_buffer.texture_coordinates[0][0] = 0.0f;
-	vertex_buffer.texture_coordinates[0][1] = 0.0f;
-	vertex_buffer.texture_coordinates[1][0] = 1.0f;
-	vertex_buffer.texture_coordinates[1][1] = 0.0f;
-	vertex_buffer.texture_coordinates[2][0] = 1.0f;
-	vertex_buffer.texture_coordinates[2][1] = 1.0f;
-	vertex_buffer.texture_coordinates[3][0] = 0.0f;
-	vertex_buffer.texture_coordinates[3][1] = 1.0f;
+	vertex_buffer.texture_coordinates[0].x = 0.0f;
+	vertex_buffer.texture_coordinates[0].y = 0.0f;
+	vertex_buffer.texture_coordinates[1].x = 1.0f;
+	vertex_buffer.texture_coordinates[1].y = 0.0f;
+	vertex_buffer.texture_coordinates[2].x = 1.0f;
+	vertex_buffer.texture_coordinates[2].y = 1.0f;
+	vertex_buffer.texture_coordinates[3].x = 0.0f;
+	vertex_buffer.texture_coordinates[3].y = 1.0f;
 
-	vertex_buffer.vertexes[0][0] = vertex_left;
-	vertex_buffer.vertexes[0][1] = vertex_top;
-	vertex_buffer.vertexes[1][0] = vertex_right;
-	vertex_buffer.vertexes[1][1] = vertex_top;
-	vertex_buffer.vertexes[2][0] = vertex_right;
-	vertex_buffer.vertexes[2][1] = vertex_bottom;
-	vertex_buffer.vertexes[3][0] = vertex_left;
-	vertex_buffer.vertexes[3][1] = vertex_bottom;
+	vertex_buffer.vertexes[0].x = vertex_left;
+	vertex_buffer.vertexes[0].y = vertex_top;
+	vertex_buffer.vertexes[1].x = vertex_right;
+	vertex_buffer.vertexes[1].y = vertex_top;
+	vertex_buffer.vertexes[2].x = vertex_right;
+	vertex_buffer.vertexes[2].y = vertex_bottom;
+	vertex_buffer.vertexes[3].x = vertex_left;
+	vertex_buffer.vertexes[3].y = vertex_bottom;
 
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_buffer), &vertex_buffer);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
