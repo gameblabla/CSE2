@@ -3,6 +3,7 @@
 #include <math.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "SDL.h"
 
@@ -386,7 +387,7 @@ void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, l
 		case FONT_PIXEL_MODE_LCD:
 			for (unsigned int iy = MAX(-y, 0); y + iy < MIN(y + glyph->height, surface->height); ++iy)
 			{
-				for (unsigned int ix = MAX(-x, 0); x + ix < MIN(x + glyph->width / 3, surface->width); ++ix)
+				for (unsigned int ix = MAX(-x, 0); x + ix < MIN(x + glyph->width, surface->width); ++ix)
 				{
 					const double *font_pixel = (double*)glyph->pixels + (iy * glyph->width + ix) * 3;
 

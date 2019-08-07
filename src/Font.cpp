@@ -1757,7 +1757,7 @@ static CachedGlyph* GetGlyphCached(FontObject *font_object, unsigned long unicod
 				break;
 		}
 
-		glyph->backend = Backend_LoadGlyph(bitmap.buffer, bitmap.width, bitmap.rows, bitmap.pitch, bitmap.num_grays, pixel_mode);
+		glyph->backend = Backend_LoadGlyph(bitmap.buffer, pixel_mode == FONT_PIXEL_MODE_LCD ? bitmap.width / 3 : bitmap.width, bitmap.rows, bitmap.pitch, bitmap.num_grays, pixel_mode);
 
 		FT_Bitmap_Done(font_object->library, &bitmap);
 	}
