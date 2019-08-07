@@ -25,6 +25,7 @@ typedef struct Backend_Glyph
 	GLuint texture_id;
 	unsigned int width;
 	unsigned int height;
+	BOOL subpixel_mode;
 } Backend_Glyph;
 
 typedef struct Coordinate2D
@@ -45,10 +46,13 @@ static SDL_GLContext context;
 static GLuint program_texture;
 static GLuint program_texture_colour_key;
 static GLuint program_colour_fill;
-static GLuint program_glyph;
+static GLuint program_glyph_normal;
+static GLuint program_glyph_subpixel_part1;
+static GLuint program_glyph_subpixel_part2;
 
 static GLint program_colour_fill_uniform_colour;
-static GLint program_glyph_uniform_colour;
+static GLint program_glyph_normal_uniform_colour;
+static GLint program_glyph_subpixel_part2_uniform_colour;
 
 static GLuint vertex_array_id;
 static GLuint vertex_buffer_id;
@@ -116,7 +120,7 @@ void main() \
 } \
 ";
 
-static const GLchar *fragment_shader_glyph = " \
+static const GLchar *fragment_shader_glyph_normal = " \
 #version 150 core\n \
 uniform sampler2D tex; \
 uniform vec4 colour; \
@@ -125,6 +129,29 @@ out vec4 fragment; \
 void main() \
 { \
 	fragment = colour * vec4(1.0, 1.0, 1.0, texture2D(tex, texture_coordinates).r); \
+} \
+";
+
+static const GLchar *fragment_shader_glyph_subpixel_part1 = " \
+#version 150 core\n \
+uniform sampler2D tex; \
+in vec2 texture_coordinates; \
+out vec4 fragment; \
+void main() \
+{ \
+	fragment = texture2D(tex, texture_coordinates); \
+} \
+";
+
+static const GLchar *fragment_shader_glyph_subpixel_part2 = " \
+#version 150 core\n \
+uniform sampler2D tex; \
+uniform vec4 colour; \
+in vec2 texture_coordinates; \
+out vec4 fragment; \
+void main() \
+{ \
+	fragment = colour * texture2D(tex, texture_coordinates); \
 } \
 ";
 
@@ -207,8 +234,6 @@ BOOL Backend_Init(SDL_Window *p_window)
 	glEnable(GL_DEBUG_OUTPUT);
 	glDebugMessageCallback(MessageCallback, 0);
 
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -230,14 +255,17 @@ BOOL Backend_Init(SDL_Window *p_window)
 	program_texture = CompileShader(vertex_shader_texture, fragment_shader_texture);
 	program_texture_colour_key = CompileShader(vertex_shader_texture, fragment_shader_texture_colour_key);
 	program_colour_fill = CompileShader(vertex_shader_plain, fragment_shader_colour_fill);
-	program_glyph = CompileShader(vertex_shader_texture, fragment_shader_glyph);
+	program_glyph_normal = CompileShader(vertex_shader_texture, fragment_shader_glyph_normal);
+	program_glyph_subpixel_part1 = CompileShader(vertex_shader_texture, fragment_shader_glyph_subpixel_part1);
+	program_glyph_subpixel_part2 = CompileShader(vertex_shader_texture, fragment_shader_glyph_subpixel_part2);
 
-	if (program_texture == 0 || program_texture_colour_key == 0 || program_colour_fill == 0 || program_glyph == 0)
+	if (program_texture == 0 || program_texture_colour_key == 0 || program_colour_fill == 0 || program_glyph_normal == 0 || program_glyph_subpixel_part1 == 0 || program_glyph_subpixel_part2 == 0)
 		printf("Failed to compile shaders\n");
 
 	// Get shader uniforms
 	program_colour_fill_uniform_colour = glGetUniformLocation(program_colour_fill, "colour");
-	program_glyph_uniform_colour = glGetUniformLocation(program_glyph, "colour");
+	program_glyph_normal_uniform_colour = glGetUniformLocation(program_glyph_normal, "colour");
+	program_glyph_subpixel_part2_uniform_colour = glGetUniformLocation(program_glyph_subpixel_part2, "colour");
 
 	// Set up framebuffer (used for surface-to-surface blitting)
 	glGenFramebuffers(1, &framebuffer_id);
@@ -263,7 +291,9 @@ void Backend_Deinit(void)
 {
 	glDeleteTextures(1, &framebuffer_surface.texture_id);
 	glDeleteFramebuffers(1, &framebuffer_id);
-	glDeleteProgram(program_glyph);
+	glDeleteProgram(program_glyph_subpixel_part2);
+	glDeleteProgram(program_glyph_subpixel_part1);
+	glDeleteProgram(program_glyph_normal);
 	glDeleteProgram(program_colour_fill);
 	glDeleteProgram(program_texture_colour_key);
 	glDeleteProgram(program_texture);
@@ -491,7 +521,7 @@ void Backend_ScreenToSurface(Backend_Surface *surface, const RECT *rect)
 
 BOOL Backend_SupportsSubpixelGlyph(void)
 {
-	return FALSE;	// Per-component alpha is available as an extension, but I haven't looked into it yet
+	return TRUE;
 }
 
 Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch, unsigned short total_greys, unsigned char pixel_mode)
@@ -501,7 +531,9 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 	if (glyph == NULL)
 		return NULL;
 
-	const int destination_pitch = (width + 3) & ~3;	// Round up to the nearest 4 (OpenGL needs this)
+	const BOOL subpixel_mode = pixel_mode == FONT_PIXEL_MODE_LCD;
+
+	const int destination_pitch = ((subpixel_mode ? width * 3 : width) + 3) & ~3;	// Round up to the nearest 4 (OpenGL needs this)
 
 	unsigned char *buffer = (unsigned char*)malloc(destination_pitch * height);
 
@@ -513,7 +545,22 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 
 	switch (pixel_mode)
 	{
-		// FONT_PIXEL_MODE_LCD is unsupported
+		case FONT_PIXEL_MODE_LCD:
+			for (unsigned int y = 0; y < height; ++y)
+			{
+				const unsigned char *source_pointer = pixels + y * pitch;
+				unsigned char *destination_pointer = buffer + y * destination_pitch;
+
+				for (unsigned int x = 0; x < width; ++x)
+				{
+					for (unsigned int i = 0; i < 3; ++i)
+					{
+						*destination_pointer++ = (unsigned char)(pow((*source_pointer++ / 255.0), 1.0 / 1.8) * 255.0);
+					}
+				}
+			}
+
+			break;
 
 		case FONT_PIXEL_MODE_GRAY:
 			for (unsigned int y = 0; y < height; ++y)
@@ -546,7 +593,7 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 
 	glGenTextures(1, &glyph->texture_id);
 	glBindTexture(GL_TEXTURE_2D, glyph->texture_id);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0,  GL_RED, GL_UNSIGNED_BYTE, buffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, subpixel_mode ? GL_RGB8 : GL_R8, width, height, 0, subpixel_mode ? GL_RGB : GL_RED, GL_UNSIGNED_BYTE, buffer);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -555,6 +602,7 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 
 	glyph->width = width;
 	glyph->height = height;
+	glyph->subpixel_mode = subpixel_mode;
 
 	free(buffer);
 
@@ -579,8 +627,6 @@ static void DrawGlyphCommon(Backend_Surface *surface, Backend_Glyph *glyph, long
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, surface->texture_id, 0);
 	glViewport(0, 0, surface->width, surface->height);
 
-	glUseProgram(program_glyph);
-
 	glEnable(GL_BLEND);
 
 	// Enable texture coordinates, since this uses textures
@@ -592,8 +638,6 @@ static void DrawGlyphCommon(Backend_Surface *surface, Backend_Glyph *glyph, long
 	const GLfloat vertex_right = ((x + glyph->width) * (2.0f / surface->width)) - 1.0f;
 	const GLfloat vertex_top = (y * (2.0f / surface->height)) - 1.0f;
 	const GLfloat vertex_bottom = ((y + glyph->height) * (2.0f / surface->height)) - 1.0f;
-
-	glUniform4f(program_glyph_uniform_colour, colours[0] / 255.0f, colours[1] / 255.0f, colours[2] / 255.0f, 1.0f);
 
 	vertex_buffer.texture_coordinates[0].x = 0.0f;
 	vertex_buffer.texture_coordinates[0].y = 0.0f;
@@ -614,7 +658,31 @@ static void DrawGlyphCommon(Backend_Surface *surface, Backend_Glyph *glyph, long
 	vertex_buffer.vertexes[3].y = vertex_bottom;
 
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_buffer), &vertex_buffer);
-	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+
+	if (glyph->subpixel_mode)
+	{
+		// Here we're going to draw with per-component alpha.
+		// Since OpenGL doesn't really support this, we have to do it manually:
+
+		// Step one: attenuate the destination pixels by the alpha
+		glBlendFunc(GL_ZERO, GL_ONE_MINUS_SRC_COLOR);
+		glUseProgram(program_glyph_subpixel_part1);
+		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+
+		// Step two: add the new pixels on top of them
+		glBlendFunc(GL_ONE, GL_ONE);
+		glUseProgram(program_glyph_subpixel_part2);
+		glUniform4f(program_glyph_subpixel_part2_uniform_colour, colours[0] / 255.0f, colours[1] / 255.0f, colours[2] / 255.0f, 1.0f);
+		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+	}
+	else
+	{
+		// Here, we just use a regular alpha channel
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glUseProgram(program_glyph_normal);
+		glUniform4f(program_glyph_normal_uniform_colour, colours[0] / 255.0f, colours[1] / 255.0f, colours[2] / 255.0f, 1.0f);
+		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+	}
 }
 
 void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
