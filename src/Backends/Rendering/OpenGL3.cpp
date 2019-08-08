@@ -1,9 +1,9 @@
 #include "../Rendering.h"
 
-#include <math.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <GL/glew.h>
 #include "SDL.h"
@@ -512,22 +512,16 @@ void Backend_ScreenToSurface(Backend_Surface *surface, const RECT *rect)
 	BlitCommon(&framebuffer_surface, rect, surface, rect->left, rect->top, FALSE);
 }
 
-Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch, unsigned short total_greys, unsigned char pixel_mode)
+Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch, unsigned char pixel_mode)
 {
 	Backend_Glyph *glyph = (Backend_Glyph*)malloc(sizeof(Backend_Glyph));
 
 	if (glyph == NULL)
 		return NULL;
 
-	const int destination_pitch = (width + 3) & ~3;	// Round up to the nearest 4 (OpenGL needs this)
+	const unsigned int destination_pitch = (width + 3) & ~3;	// Round up to the nearest 4 (OpenGL needs this)
 
 	unsigned char *buffer = (unsigned char*)malloc(destination_pitch * height);
-
-	if (buffer == NULL)
-	{
-		free(glyph);
-		return NULL;
-	}
 
 	switch (pixel_mode)
 	{
@@ -536,11 +530,7 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 			{
 				const unsigned char *source_pointer = pixels + y * pitch;
 				unsigned char *destination_pointer = buffer + y * destination_pitch;
-
-				for (unsigned int x = 0; x < width; ++x)
-				{
-					*destination_pointer++ = (unsigned char)(pow((double)*source_pointer++ / (total_greys - 1), 1.0 / 1.8) * 255.0);
-				}
+				memcpy(destination_pointer, source_pointer, width);
 			}
 
 			break;
@@ -552,9 +542,7 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 				unsigned char *destination_pointer = buffer + y * destination_pitch;
 
 				for (unsigned int x = 0; x < width; ++x)
-				{
-					*destination_pointer++ = *source_pointer++ ? 0xFF : 0;
-				}
+					*destination_pointer++ = (*source_pointer++ ? 0xFF : 0);
 			}
 
 			break;

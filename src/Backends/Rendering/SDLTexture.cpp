@@ -1,6 +1,5 @@
 #include "../Rendering.h"
 
-#include <math.h>
 #include <stddef.h>
 #include <stdlib.h>
 
@@ -321,7 +320,7 @@ void Backend_ScreenToSurface(Backend_Surface *surface, const RECT *rect)
 	SDL_SetRenderTarget(renderer, default_target);
 }
 
-Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch, unsigned short total_greys, unsigned char pixel_mode)
+Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch, unsigned char pixel_mode)
 {
 	Backend_Glyph *glyph = (Backend_Glyph*)malloc(sizeof(Backend_Glyph));
 
@@ -352,7 +351,7 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 					*destination_pointer++ = 0xFF;
 					*destination_pointer++ = 0xFF;
 					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = (unsigned char)(pow((double)*source_pointer++ / (total_greys - 1), 1.0 / 1.8) * 255.0);
+					*destination_pointer++ = *source_pointer++;
 				}
 			}
 

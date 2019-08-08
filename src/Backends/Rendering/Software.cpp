@@ -1,6 +1,5 @@
 #include "../Rendering.h"
 
-#include <math.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
@@ -537,7 +536,7 @@ BOOL Backend_SupportsSubpixelGlyph(void)
 	return TRUE;	// It's a software renderer, baby
 }
 
-Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch, unsigned short total_greys, unsigned char pixel_mode)
+Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch, unsigned char pixel_mode)
 {
 	Backend_Glyph *glyph = (Backend_Glyph*)malloc(sizeof(Backend_Glyph));
 
@@ -548,7 +547,7 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 	{
 		case FONT_PIXEL_MODE_GRAY:
 		{
-			glyph->pixels = malloc(width * height * sizeof(double));
+			glyph->pixels = malloc(width * height * sizeof(float));
 
 			if (glyph->pixels == NULL)
 			{
@@ -556,16 +555,14 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 				return NULL;
 			}
 
-			double *destination_pointer = (double*)glyph->pixels;
+			float *destination_pointer = (float*)glyph->pixels;
 
 			for (unsigned int y = 0; y < height; ++y)
 			{
 				const unsigned char *source_pointer = pixels + y * pitch;
 
 				for (unsigned int x = 0; x < width; ++x)
-				{
-					*destination_pointer++ = pow((double)*source_pointer++ / (total_greys - 1), 1.0 / 1.8);	// Gamma correction
-				}
+					*destination_pointer++ = *source_pointer++ / 255.0f;
 			}
 
 			break;
@@ -621,19 +618,19 @@ void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, l
 			{
 				for (unsigned int ix = MAX(-x, 0); x + ix < MIN(x + glyph->width, surface->width); ++ix)
 				{
-					const double src_alpha = ((double*)glyph->pixels)[iy * glyph->width + ix];
+					const float src_alpha = ((float*)glyph->pixels)[iy * glyph->width + ix];
 
 					if (src_alpha)
 					{
 						unsigned char *bitmap_pixel = surface->pixels + (y + iy) * surface->pitch + (x + ix) * 4;
 
-						const double dst_alpha = bitmap_pixel[3] / 255.0;
-						const double out_alpha = src_alpha + dst_alpha * (1.0 - src_alpha);
+						const float dst_alpha = bitmap_pixel[3] / 255.0f;
+						const float out_alpha = src_alpha + dst_alpha * (1.0f - src_alpha);
 
 						for (unsigned int j = 0; j < 3; ++j)
-							bitmap_pixel[j] = (unsigned char)((colours[j] * src_alpha + bitmap_pixel[j] * dst_alpha * (1.0 - src_alpha)) / out_alpha);	// Alpha blending			// Gamma-corrected alpha blending
+							bitmap_pixel[j] = (unsigned char)((colours[j] * src_alpha + bitmap_pixel[j] * dst_alpha * (1.0f - src_alpha)) / out_alpha);	// Alpha blending			// Gamma-corrected alpha blending
 
-						bitmap_pixel[3] = (unsigned char)(out_alpha * 255.0);
+						bitmap_pixel[3] = (unsigned char)(out_alpha * 255.0f);
 					}
 				}
 			}
