@@ -63,7 +63,7 @@ static VertexBuffer vertex_buffer;
 static Backend_Surface framebuffer_surface;
 
 static const GLchar *vertex_shader_plain = " \
-#version 150 core\n \
+#version 140\n \
 in vec2 input_vertex_coordinates; \
 void main() \
 { \
@@ -72,7 +72,7 @@ void main() \
 ";
 
 static const GLchar *vertex_shader_texture = " \
-#version 150 core\n \
+#version 140\n \
 in vec2 input_vertex_coordinates; \
 in vec2 input_texture_coordinates; \
 out vec2 texture_coordinates; \
@@ -84,7 +84,7 @@ void main() \
 ";
 
 static const GLchar *fragment_shader_texture = " \
-#version 150 core\n \
+#version 140\n \
 uniform sampler2D tex; \
 in vec2 texture_coordinates; \
 out vec4 fragment; \
@@ -95,7 +95,7 @@ void main() \
 ";
 
 static const GLchar *fragment_shader_texture_colour_key = " \
-#version 150 core\n \
+#version 140\n \
 uniform sampler2D tex; \
 in vec2 texture_coordinates; \
 out vec4 fragment; \
@@ -111,7 +111,7 @@ void main() \
 ";
 
 static const GLchar *fragment_shader_colour_fill = " \
-#version 150 core\n \
+#version 140\n \
 uniform vec4 colour; \
 out vec4 fragment; \
 void main() \
@@ -121,7 +121,7 @@ void main() \
 ";
 
 static const GLchar *fragment_shader_glyph_normal = " \
-#version 150 core\n \
+#version 140\n \
 uniform sampler2D tex; \
 uniform vec4 colour; \
 in vec2 texture_coordinates; \
@@ -133,7 +133,7 @@ void main() \
 ";
 
 static const GLchar *fragment_shader_glyph_subpixel_part1 = " \
-#version 150 core\n \
+#version 140\n \
 uniform sampler2D tex; \
 in vec2 texture_coordinates; \
 out vec4 fragment; \
@@ -144,7 +144,7 @@ void main() \
 ";
 
 static const GLchar *fragment_shader_glyph_subpixel_part2 = " \
-#version 150 core\n \
+#version 140\n \
 uniform sampler2D tex; \
 uniform vec4 colour; \
 in vec2 texture_coordinates; \
@@ -218,10 +218,8 @@ static void SetFramebufferTarget(GLuint texture_id)
 
 SDL_Window* Backend_CreateWindow(const char *title, int width, int height)
 {
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 
 	return SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL);
 }
@@ -238,8 +236,8 @@ BOOL Backend_Init(SDL_Window *p_window)
 	if (glewInit() != GLEW_OK)
 		return FALSE;
 
-	// Check if the platform supports OpenGL 3.2
-	if (!GLEW_VERSION_3_2)
+	// Check if the platform supports OpenGL 3.1
+	if (!GLEW_VERSION_3_1)
 		return FALSE;
 
 	glEnable(GL_DEBUG_OUTPUT);
@@ -248,18 +246,27 @@ BOOL Backend_Init(SDL_Window *p_window)
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	// Set up Vertex Array Object
-	glGenVertexArrays(1, &vertex_array_id);
-	glBindVertexArray(vertex_array_id);
+	if (GLEW_ARB_compatibility)
+	{
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, vertex_buffer.vertexes);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, vertex_buffer.texture_coordinates);
+	}
+	else
+	{
+		// Set up Vertex Array Object
+		glGenVertexArrays(1, &vertex_array_id);
+		glBindVertexArray(vertex_array_id);
 
-	// Set up Vertex Buffer Object
-	glGenBuffers(1, &vertex_buffer_id);
-	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_id);
+		// Set up Vertex Buffer Object
+		glGenBuffers(1, &vertex_buffer_id);
+		glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_id);
 
-	// Set up the vertex attributes
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid*)offsetof(VertexBuffer, vertexes));
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid*)offsetof(VertexBuffer, texture_coordinates));
+		// Set up the vertex attributes
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid*)offsetof(VertexBuffer, vertexes));
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid*)offsetof(VertexBuffer, texture_coordinates));
+	}
 
 	// Set up our shaders
 	program_texture = CompileShader(vertex_shader_texture, fragment_shader_texture);
@@ -347,7 +354,9 @@ void Backend_DrawScreen(void)
 	vertex_buffer.vertexes[3].x = -1.0f;
 	vertex_buffer.vertexes[3].y = 1.0f;
 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer), &vertex_buffer, GL_STREAM_DRAW);
+	if (!GLEW_ARB_compatibility)
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer), &vertex_buffer, GL_STREAM_DRAW);
+
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
 	SDL_GL_SwapWindow(window);
@@ -461,7 +470,9 @@ static void BlitCommon(Backend_Surface *source_surface, const RECT *rect, Backen
 	vertex_buffer.vertexes[3].x = vertex_left;
 	vertex_buffer.vertexes[3].y = vertex_bottom;
 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer), &vertex_buffer, GL_STREAM_DRAW);
+	if (!GLEW_ARB_compatibility)
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer), &vertex_buffer, GL_STREAM_DRAW);
+
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 }
 
@@ -510,7 +521,9 @@ static void ColourFillCommon(Backend_Surface *surface, const RECT *rect, unsigne
 	vertex_buffer.vertexes[3].x = vertex_left;
 	vertex_buffer.vertexes[3].y = vertex_bottom;
 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer), &vertex_buffer, GL_STREAM_DRAW);
+	if (!GLEW_ARB_compatibility)
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer), &vertex_buffer, GL_STREAM_DRAW);
+
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 }
 
@@ -640,7 +653,8 @@ static void DrawGlyphCommon(Backend_Surface *surface, Backend_Glyph *glyph, long
 	vertex_buffer.vertexes[3].x = vertex_left;
 	vertex_buffer.vertexes[3].y = vertex_bottom;
 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer), &vertex_buffer, GL_STREAM_DRAW);
+	if (!GLEW_ARB_compatibility)
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer), &vertex_buffer, GL_STREAM_DRAW);
 
 	if (glyph->pixel_mode == FONT_PIXEL_MODE_LCD)
 	{
