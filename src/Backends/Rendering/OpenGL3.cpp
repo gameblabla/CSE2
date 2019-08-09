@@ -255,7 +255,7 @@ BOOL Backend_Init(SDL_Window *p_window)
 	// Set up Vertex Buffer Object
 	glGenBuffers(1, &vertex_buffer_id);
 	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_id);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer), NULL, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer), NULL, GL_STREAM_DRAW);
 
 	// Set up the vertex attributes
 	glEnableVertexAttribArray(1);
