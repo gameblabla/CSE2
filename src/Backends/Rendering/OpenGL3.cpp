@@ -255,7 +255,6 @@ BOOL Backend_Init(SDL_Window *p_window)
 	// Set up Vertex Buffer Object
 	glGenBuffers(1, &vertex_buffer_id);
 	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_id);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer), NULL, GL_STREAM_DRAW);
 
 	// Set up the vertex attributes
 	glEnableVertexAttribArray(1);
@@ -348,7 +347,7 @@ void Backend_DrawScreen(void)
 	vertex_buffer.vertexes[3].x = -1.0f;
 	vertex_buffer.vertexes[3].y = 1.0f;
 
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_buffer), &vertex_buffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer), &vertex_buffer, GL_STREAM_DRAW);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
 	SDL_GL_SwapWindow(window);
@@ -462,7 +461,7 @@ static void BlitCommon(Backend_Surface *source_surface, const RECT *rect, Backen
 	vertex_buffer.vertexes[3].x = vertex_left;
 	vertex_buffer.vertexes[3].y = vertex_bottom;
 
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_buffer), &vertex_buffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer), &vertex_buffer, GL_STREAM_DRAW);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 }
 
@@ -511,7 +510,7 @@ static void ColourFillCommon(Backend_Surface *surface, const RECT *rect, unsigne
 	vertex_buffer.vertexes[3].x = vertex_left;
 	vertex_buffer.vertexes[3].y = vertex_bottom;
 
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_buffer.vertexes), &vertex_buffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer), &vertex_buffer, GL_STREAM_DRAW);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 }
 
@@ -641,7 +640,7 @@ static void DrawGlyphCommon(Backend_Surface *surface, Backend_Glyph *glyph, long
 	vertex_buffer.vertexes[3].x = vertex_left;
 	vertex_buffer.vertexes[3].y = vertex_bottom;
 
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_buffer), &vertex_buffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer), &vertex_buffer, GL_STREAM_DRAW);
 
 	if (glyph->pixel_mode == FONT_PIXEL_MODE_LCD)
 	{
