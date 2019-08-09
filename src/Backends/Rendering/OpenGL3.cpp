@@ -205,6 +205,17 @@ static GLuint CompileShader(const char *vertex_shader_source, const char *fragme
 	return program_id;
 }
 
+static void SetFramebufferTarget(GLuint texture_id)
+{
+	static GLuint last_framebuffer_target;
+
+	if (texture_id != last_framebuffer_target)
+	{
+		last_framebuffer_target = texture_id;
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture_id, 0);
+	}
+}
+
 SDL_Window* Backend_CreateWindow(const char *title, int width, int height)
 {
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -410,7 +421,7 @@ static void BlitCommon(Backend_Surface *source_surface, const RECT *rect, Backen
 		return;
 
 	// Point our framebuffer to the destination texture
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, destination_surface->texture_id, 0);
+	SetFramebufferTarget(destination_surface->texture_id);
 	glViewport(0, 0, destination_surface->width, destination_surface->height);
 
 	// Switch to colour-key shader if we have to
@@ -474,7 +485,7 @@ static void ColourFillCommon(Backend_Surface *surface, const RECT *rect, unsigne
 		return;
 
 	// Point our framebuffer to the destination texture
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, surface->texture_id, 0);
+	SetFramebufferTarget(surface->texture_id);
 	glViewport(0, 0, surface->width, surface->height);
 
 	glUseProgram(program_colour_fill);
@@ -597,7 +608,7 @@ static void DrawGlyphCommon(Backend_Surface *surface, Backend_Glyph *glyph, long
 		return;
 
 	// Point our framebuffer to the destination texture
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, surface->texture_id, 0);
+	SetFramebufferTarget(surface->texture_id);
 	glViewport(0, 0, surface->width, surface->height);
 
 	glEnable(GL_BLEND);
