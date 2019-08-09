@@ -162,6 +162,17 @@ static GLuint CompileShader(const char *vertex_shader_source, const char *fragme
 	return program_id;
 }
 
+static void SetFramebufferTarget(GLuint texture_id)
+{
+	static GLuint last_framebuffer_target;
+
+	if (texture_id != last_framebuffer_target)
+	{
+		last_framebuffer_target = texture_id;
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture_id, 0);
+	}
+}
+
 SDL_Window* Backend_CreateWindow(const char *title, int width, int height)
 {
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -204,7 +215,6 @@ BOOL Backend_Init(SDL_Window *p_window, unsigned int internal_screen_width, unsi
 	// Set up Vertex Buffer Object
 	glGenBuffers(1, &vertex_buffer_id);
 	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_id);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer), NULL, GL_DYNAMIC_DRAW);
 
 	// Set up the vertex attributes
 	glEnableVertexAttribArray(1);
@@ -312,7 +322,7 @@ void Backend_DrawScreen(void)
 	vertex_buffer.vertexes[3].x = -fit_width;
 	vertex_buffer.vertexes[3].y = fit_height;
 
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_buffer), &vertex_buffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer), &vertex_buffer, GL_STREAM_DRAW);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
 	SDL_GL_SwapWindow(window);
@@ -400,7 +410,7 @@ static void BlitCommon(Backend_Surface *source_surface, const RECT *rect, Backen
 		return;
 
 	// Point our framebuffer to the destination texture
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, destination_surface->texture_id, 0);
+	SetFramebufferTarget(destination_surface->texture_id);
 	glViewport(0, 0, destination_surface->width, destination_surface->height);
 
 	glUseProgram(program_texture);
@@ -443,7 +453,7 @@ static void BlitCommon(Backend_Surface *source_surface, const RECT *rect, Backen
 	vertex_buffer.vertexes[3].x = vertex_left;
 	vertex_buffer.vertexes[3].y = vertex_bottom;
 
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_buffer), &vertex_buffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer), &vertex_buffer, GL_STREAM_DRAW);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 }
 
@@ -467,7 +477,7 @@ static void ColourFillCommon(Backend_Surface *surface, const RECT *rect, unsigne
 		return;
 
 	// Point our framebuffer to the destination texture
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, surface->texture_id, 0);
+	SetFramebufferTarget(surface->texture_id);
 	glViewport(0, 0, surface->width, surface->height);
 
 	glUseProgram(program_colour_fill);
@@ -493,7 +503,7 @@ static void ColourFillCommon(Backend_Surface *surface, const RECT *rect, unsigne
 	vertex_buffer.vertexes[3].x = vertex_left;
 	vertex_buffer.vertexes[3].y = vertex_bottom;
 
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_buffer.vertexes), &vertex_buffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer), &vertex_buffer, GL_STREAM_DRAW);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 }
 
@@ -580,7 +590,7 @@ static void DrawGlyphCommon(Backend_Surface *surface, Backend_Glyph *glyph, long
 		return;
 
 	// Point our framebuffer to the destination texture
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, surface->texture_id, 0);
+	SetFramebufferTarget(surface->texture_id);
 	glViewport(0, 0, surface->width, surface->height);
 
 	glUseProgram(program_glyph);
@@ -617,7 +627,7 @@ static void DrawGlyphCommon(Backend_Surface *surface, Backend_Glyph *glyph, long
 	vertex_buffer.vertexes[3].x = vertex_left;
 	vertex_buffer.vertexes[3].y = vertex_bottom;
 
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_buffer), &vertex_buffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer), &vertex_buffer, GL_STREAM_DRAW);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 }
 
