@@ -64,7 +64,7 @@ else
 endif
 
 SOURCES = \
-	src/lodepng/lodepng \
+	external/lodepng/lodepng \
 	src/ArmsItem \
 	src/Back \
 	src/Boss \
@@ -137,37 +137,37 @@ SOURCES = \
 	src/Triangle \
 	src/ValueView
 
-ifneq (,$(filter 1,$(OGG_AUDIO)$(FLAC_AUDIO)$(TRACKER_AUDIO)$(PXTONE_AUDIO)))
+ifneq (,$(filter 1,$(OGG_AUDIO)$(FLAC_AUDIO) $(TRACKER_AUDIO) $(PXTONE_AUDIO)))
 	SOURCES += \
-		ExtraSoundFormats \
-		audio_lib/decoder \
-		audio_lib/miniaudio \
-		audio_lib/mixer \
-		audio_lib/decoders/memory_file \
-		audio_lib/decoders/misc_utilities \
-		audio_lib/decoders/predecode \
-		audio_lib/decoders/split
+		src/ExtraSoundFormats \
+		external/audio_lib/decoder \
+		external/audio_lib/miniaudio \
+		external/audio_lib/mixer \
+		external/audio_lib/decoders/memory_file \
+		external/audio_lib/decoders/misc_utilities \
+		external/audio_lib/decoders/predecode \
+		external/audio_lib/decoders/split
 
 	DEFINES += -DEXTRA_SOUND_FORMATS
 endif
 
 ifeq ($(OGG_AUDIO), 1)
 	SOURCES += \
-		audio_lib/decoders/stb_vorbis
+		external/audio_lib/decoders/stb_vorbis
 
 	DEFINES += -DUSE_STB_VORBIS
 endif
 
 ifeq ($(FLAC_AUDIO), 1)
 	SOURCES += \
-		audio_lib/decoders/dr_flac
+		external/audio_lib/decoders/dr_flac
 
 	DEFINES += -DUSE_DR_FLAC
 endif
 
 ifeq ($(TRACKER_AUDIO), 1)
 	SOURCES += \
-		audio_lib/decoders/libxmp-lite
+		external/audio_lib/decoders/libxmp-lite
 
 	DEFINES += -DUSE_LIBXMPLITE
 
@@ -183,29 +183,29 @@ endif
 
 ifeq ($(PXTONE_AUDIO), 1)
 	SOURCES += \
-		audio_lib/decoders/pxtone \
-		audio_lib/decoders/libs/pxtone/pxtnDelay \
-		audio_lib/decoders/libs/pxtone/pxtnDescriptor \
-		audio_lib/decoders/libs/pxtone/pxtnError \
-		audio_lib/decoders/libs/pxtone/pxtnEvelist \
-		audio_lib/decoders/libs/pxtone/pxtnMaster \
-		audio_lib/decoders/libs/pxtone/pxtnMem \
-		audio_lib/decoders/libs/pxtone/pxtnOverDrive \
-		audio_lib/decoders/libs/pxtone/pxtnPulse_Frequency \
-		audio_lib/decoders/libs/pxtone/pxtnPulse_Noise \
-		audio_lib/decoders/libs/pxtone/pxtnPulse_NoiseBuilder \
-		audio_lib/decoders/libs/pxtone/pxtnPulse_Oggv \
-		audio_lib/decoders/libs/pxtone/pxtnPulse_Oscillator \
-		audio_lib/decoders/libs/pxtone/pxtnPulse_PCM \
-		audio_lib/decoders/libs/pxtone/pxtnService \
-		audio_lib/decoders/libs/pxtone/pxtnService_moo \
-		audio_lib/decoders/libs/pxtone/pxtnText \
-		audio_lib/decoders/libs/pxtone/pxtnUnit \
-		audio_lib/decoders/libs/pxtone/pxtnWoice \
-		audio_lib/decoders/libs/pxtone/pxtnWoice_io \
-		audio_lib/decoders/libs/pxtone/pxtnWoicePTV \
-		audio_lib/decoders/libs/pxtone/pxtoneNoise \
-		audio_lib/decoders/libs/pxtone/shim
+		external/audio_lib/decoders/pxtone \
+		external/audio_lib/decoders/libs/pxtone/pxtnDelay \
+		external/audio_lib/decoders/libs/pxtone/pxtnDescriptor \
+		external/audio_lib/decoders/libs/pxtone/pxtnError \
+		external/audio_lib/decoders/libs/pxtone/pxtnEvelist \
+		external/audio_lib/decoders/libs/pxtone/pxtnMaster \
+		external/audio_lib/decoders/libs/pxtone/pxtnMem \
+		external/audio_lib/decoders/libs/pxtone/pxtnOverDrive \
+		external/audio_lib/decoders/libs/pxtone/pxtnPulse_Frequency \
+		external/audio_lib/decoders/libs/pxtone/pxtnPulse_Noise \
+		external/audio_lib/decoders/libs/pxtone/pxtnPulse_NoiseBuilder \
+		external/audio_lib/decoders/libs/pxtone/pxtnPulse_Oggv \
+		external/audio_lib/decoders/libs/pxtone/pxtnPulse_Oscillator \
+		external/audio_lib/decoders/libs/pxtone/pxtnPulse_PCM \
+		external/audio_lib/decoders/libs/pxtone/pxtnService \
+		external/audio_lib/decoders/libs/pxtone/pxtnService_moo \
+		external/audio_lib/decoders/libs/pxtone/pxtnText \
+		external/audio_lib/decoders/libs/pxtone/pxtnUnit \
+		external/audio_lib/decoders/libs/pxtone/pxtnWoice \
+		external/audio_lib/decoders/libs/pxtone/pxtnWoice_io \
+		external/audio_lib/decoders/libs/pxtone/pxtnWoicePTV \
+		external/audio_lib/decoders/libs/pxtone/pxtoneNoise \
+		external/audio_lib/decoders/libs/pxtone/shim
 
 	DEFINES += -DUSE_PXTONE
 endif
