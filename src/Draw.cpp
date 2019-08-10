@@ -217,7 +217,7 @@ static BOOL LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, BOOL create_surface)
 					{
 						// IF YOU WANT TO ADD HD SPRITES, THIS IS THE CODE YOU SHOULD EDIT
 						unsigned int pitch;
-						unsigned char *pixels = Backend_Lock(surf[surf_no].backend, &pitch);
+						unsigned char *pixels = Backend_LockSurface(surf[surf_no].backend, &pitch);
 
 						if (magnification == 1)
 						{
@@ -258,7 +258,7 @@ static BOOL LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, BOOL create_surface)
 							}
 						}
 
-						Backend_Unlock(surf[surf_no].backend);
+						Backend_UnlockSurface(surf[surf_no].backend);
 						SDL_FreeSurface(converted_surface);
 						success = TRUE;
 					}
@@ -421,7 +421,7 @@ void Surface2Surface(int x, int y, const RECT *rect, int to, int from)
 	RECT frameRect;
 	ScaleRect(rect, &frameRect);
 
-	Backend_Blit(surf[from].backend, &frameRect, surf[to].backend, x * magnification, y * magnification);
+	Backend_BlitToSurface(surf[from].backend, &frameRect, surf[to].backend, x * magnification, y * magnification);
 }
 
 unsigned long GetCortBoxColor(unsigned long col)
@@ -456,7 +456,7 @@ void CortBox2(const RECT *rect, unsigned long col, Surface_Ids surf_no)
 	const unsigned char col_green = (unsigned char)((col >> 8) & 0xFF);
 	const unsigned char col_blue = (unsigned char)((col >> 16) & 0xFF);
 
-	Backend_ColourFill(surf[surf_no].backend, &destRect, col_red, col_green, col_blue);
+	Backend_ColourFillToSurface(surf[surf_no].backend, &destRect, col_red, col_green, col_blue);
 }
 
 #ifdef WINDOWS

@@ -101,7 +101,7 @@ void Backend_FreeSurface(Backend_Surface *surface)
 	free(surface);
 }
 
-unsigned char* Backend_Lock(Backend_Surface *surface, unsigned int *pitch)
+unsigned char* Backend_LockSurface(Backend_Surface *surface, unsigned int *pitch)
 {
 	if (surface == NULL)
 		return NULL;
@@ -110,7 +110,7 @@ unsigned char* Backend_Lock(Backend_Surface *surface, unsigned int *pitch)
 	return surface->pixels;
 }
 
-void Backend_Unlock(Backend_Surface *surface)
+void Backend_UnlockSurface(Backend_Surface *surface)
 {
 	(void)surface;
 }
@@ -198,7 +198,7 @@ static void BlitCommon(Backend_Surface *source_surface, const RECT *rect, Backen
 	}
 }
 
-void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y)
+void Backend_BlitToSurface(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y)
 {
 	BlitCommon(source_surface, rect, &framebuffer, x, y, TRUE);
 }
@@ -208,7 +208,7 @@ void Backend_BlitToScreen(Backend_Surface *source_surface, const RECT *rect, lon
 	BlitCommon(source_surface, rect, &framebuffer, x, y, colour_key);
 }
 
-void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
+void Backend_ColourFillToSurface(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
 {
 	if (surface == NULL)
 		return;
@@ -268,7 +268,7 @@ void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned cha
 
 void Backend_ColourFillToScreen(const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
 {
-	Backend_ColourFill(&framebuffer, rect, red, green, blue);
+	Backend_ColourFillToSurface(&framebuffer, rect, red, green, blue);
 }
 
 void Backend_ScreenToSurface(Backend_Surface *surface, const RECT *rect)
@@ -352,7 +352,7 @@ void Backend_UnloadGlyph(Backend_Glyph *glyph)
 	free(glyph);
 }
 
-void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
+void Backend_DrawGlyphToSurface(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
 {
 	if (glyph == NULL || surface == NULL)
 		return;
@@ -421,7 +421,7 @@ void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, l
 
 void Backend_DrawGlyphToScreen(Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
 {
-	Backend_DrawGlyph(&framebuffer, glyph, x, y, colours);
+	Backend_DrawGlyphToSurface(&framebuffer, glyph, x, y, colours);
 }
 
 void Backend_HandleDeviceLoss(void)

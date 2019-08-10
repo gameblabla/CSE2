@@ -176,7 +176,7 @@ void Backend_FreeSurface(Backend_Surface *surface)
 	free(surface);
 }
 
-unsigned char* Backend_Lock(Backend_Surface *surface, unsigned int *pitch)
+unsigned char* Backend_LockSurface(Backend_Surface *surface, unsigned int *pitch)
 {
 	if (surface == NULL)
 		return NULL;
@@ -185,7 +185,7 @@ unsigned char* Backend_Lock(Backend_Surface *surface, unsigned int *pitch)
 	return (unsigned char*)surface->sdl_surface->pixels;
 }
 
-void Backend_Unlock(Backend_Surface *surface)
+void Backend_UnlockSurface(Backend_Surface *surface)
 {
 	if (surface == NULL)
 		return;
@@ -193,7 +193,7 @@ void Backend_Unlock(Backend_Surface *surface)
 	surface->needs_syncing = TRUE;
 }
 
-void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y)
+void Backend_BlitToSurface(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y)
 {
 	if (source_surface == NULL || destination_surface == NULL)
 		return;
@@ -241,7 +241,7 @@ void Backend_BlitToScreen(Backend_Surface *source_surface, const RECT *rect, lon
 	SDL_RenderCopy(renderer, source_surface->texture, &source_rect, &destination_rect);
 }
 
-void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
+void Backend_ColourFillToSurface(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
 {
 	if (surface == NULL)
 		return;
@@ -334,7 +334,7 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 	}
 
 	unsigned int surface_pitch;
-	unsigned char *surface_pixels = Backend_Lock(glyph->surface, &surface_pitch);
+	unsigned char *surface_pixels = Backend_LockSurface(glyph->surface, &surface_pitch);
 
 	switch (pixel_mode)
 	{
@@ -375,7 +375,7 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 			break;
 	}
 
-	Backend_Unlock(glyph->surface);
+	Backend_UnlockSurface(glyph->surface);
 
 	return glyph;
 }
@@ -389,7 +389,7 @@ void Backend_UnloadGlyph(Backend_Glyph *glyph)
 	free(glyph);
 }
 
-void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
+void Backend_DrawGlyphToSurface(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
 {
 	// The SDL_Texture side of things uses alpha, not a colour-key, so the bug where the font is blended
 	// with the colour key doesn't occur. SDL_Textures don't support colour-keys, so the next best thing

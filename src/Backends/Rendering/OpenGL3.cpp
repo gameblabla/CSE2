@@ -463,7 +463,7 @@ void Backend_FreeSurface(Backend_Surface *surface)
 	free(surface);
 }
 
-unsigned char* Backend_Lock(Backend_Surface *surface, unsigned int *pitch)
+unsigned char* Backend_LockSurface(Backend_Surface *surface, unsigned int *pitch)
 {
 	if (surface == NULL)
 		return NULL;
@@ -473,7 +473,7 @@ unsigned char* Backend_Lock(Backend_Surface *surface, unsigned int *pitch)
 	return surface->pixels;
 }
 
-void Backend_Unlock(Backend_Surface *surface)
+void Backend_UnlockSurface(Backend_Surface *surface)
 {
 	if (surface == NULL)
 		return;
@@ -565,7 +565,7 @@ static void BlitCommon(Backend_Surface *source_surface, const RECT *rect, Backen
 	vertex_buffer_slot->vertices[1][2].vertex_coordinate.y = vertex_bottom;
 }
 
-void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y)
+void Backend_BlitToSurface(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y)
 {
 	BlitCommon(source_surface, rect, destination_surface, x, y, TRUE);
 }
@@ -636,7 +636,7 @@ static void ColourFillCommon(Backend_Surface *surface, const RECT *rect, unsigne
 	vertex_buffer_slot->vertices[1][2].vertex_coordinate.y = vertex_bottom;
 }
 
-void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
+void Backend_ColourFillToSurface(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
 {
 	ColourFillCommon(surface, rect, red, green, blue);
 }
@@ -811,7 +811,7 @@ static void DrawGlyphCommon(Backend_Surface *surface, Backend_Glyph *glyph, long
 	vertex_buffer_slot->vertices[1][2].vertex_coordinate.y = vertex_bottom;
 }
 
-void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
+void Backend_DrawGlyphToSurface(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
 {
 	DrawGlyphCommon(surface, glyph, x, y, colours);
 }
