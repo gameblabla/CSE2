@@ -150,7 +150,7 @@ void Backend_FreeSurface(Backend_Surface *surface)
 	free(surface);
 }
 
-unsigned char* Backend_Lock(Backend_Surface *surface, unsigned int *pitch)
+unsigned char* Backend_LockSurface(Backend_Surface *surface, unsigned int *pitch)
 {
 	if (surface == NULL)
 		return NULL;
@@ -159,12 +159,12 @@ unsigned char* Backend_Lock(Backend_Surface *surface, unsigned int *pitch)
 	return surface->pixels;
 }
 
-void Backend_Unlock(Backend_Surface *surface)
+void Backend_UnlockSurface(Backend_Surface *surface)
 {
 	(void)surface;
 }
 
-void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL alpha_blend)
+void Backend_BlitToSurface(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y)
 {
 	if (source_surface == NULL || destination_surface == NULL)
 		return;
@@ -211,53 +211,39 @@ void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Sur
 	if (rect_clamped.right - rect_clamped.left <= 0)
 		return;
 
-	// Do the actual blitting
-	if (alpha_blend)
+	for (long j = 0; j < rect_clamped.bottom - rect_clamped.top; ++j)
 	{
-		for (long j = 0; j < rect_clamped.bottom - rect_clamped.top; ++j)
-		{
-			unsigned char *source_pointer = &source_surface->pixels[((rect_clamped.top + j) * source_surface->pitch) + (rect_clamped.left * 4)];
-			unsigned char *destination_pointer = &destination_surface->pixels[((y + j) * destination_surface->pitch) + (x * 4)];
+		unsigned char *source_pointer = &source_surface->pixels[((rect_clamped.top + j) * source_surface->pitch) + (rect_clamped.left * 4)];
+		unsigned char *destination_pointer = &destination_surface->pixels[((y + j) * destination_surface->pitch) + (x * 4)];
 
-			for (long i = 0; i < rect_clamped.right - rect_clamped.left; ++i)
+		for (long i = 0; i < rect_clamped.right - rect_clamped.left; ++i)
+		{
+			if (source_pointer[3] == 0xFF)
 			{
-				if (source_pointer[3] == 0xFF)
-				{
-					*destination_pointer++ = *source_pointer++;
-					*destination_pointer++ = *source_pointer++;
-					*destination_pointer++ = *source_pointer++;
-					*destination_pointer++ = *source_pointer++;
-				}
-				else if (source_pointer[3] != 0)
-				{
-					const float src_alpha = source_pointer[3] / 255.0f;
-					const float dst_alpha = destination_pointer[3] / 255.0f;
-					const float out_alpha = src_alpha + dst_alpha * (1.0f - src_alpha);
-
-					for (unsigned int j = 0; j < 3; ++j)
-						destination_pointer[j] = (unsigned char)((source_pointer[j] * src_alpha + destination_pointer[j] * dst_alpha * (1.0f - src_alpha)) / out_alpha);
-
-					destination_pointer[3] = (unsigned char)(out_alpha * 255.0f);
-
-					source_pointer += 4;
-					destination_pointer += 4;
-				}
-				else
-				{
-					source_pointer += 4;
-					destination_pointer += 4;
-				}
+				*destination_pointer++ = *source_pointer++;
+				*destination_pointer++ = *source_pointer++;
+				*destination_pointer++ = *source_pointer++;
+				*destination_pointer++ = *source_pointer++;
 			}
-		}
-	}
-	else
-	{
-		for (long j = 0; j < rect_clamped.bottom - rect_clamped.top; ++j)
-		{
-			unsigned char *source_pointer = &source_surface->pixels[((rect_clamped.top + j) * source_surface->pitch) + (rect_clamped.left * 4)];
-			unsigned char *destination_pointer = &destination_surface->pixels[((y + j) * destination_surface->pitch) + (x * 4)];
+			else if (source_pointer[3] != 0)
+			{
+				const float src_alpha = source_pointer[3] / 255.0f;
+				const float dst_alpha = destination_pointer[3] / 255.0f;
+				const float out_alpha = src_alpha + dst_alpha * (1.0f - src_alpha);
 
-			memcpy(destination_pointer, source_pointer, (rect_clamped.right - rect_clamped.left) * 4);
+				for (unsigned int j = 0; j < 3; ++j)
+					destination_pointer[j] = (unsigned char)((source_pointer[j] * src_alpha + destination_pointer[j] * dst_alpha * (1.0f - src_alpha)) / out_alpha);
+
+				destination_pointer[3] = (unsigned char)(out_alpha * 255.0f);
+
+				source_pointer += 4;
+				destination_pointer += 4;
+			}
+			else
+			{
+				source_pointer += 4;
+				destination_pointer += 4;
+			}
 		}
 	}
 }
@@ -359,7 +345,7 @@ void Backend_BlitToScreen(Backend_Surface *source_surface, const RECT *rect, lon
 	}
 }
 
-void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha)
+void Backend_ColourFillToSurface(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha)
 {
 	if (surface == NULL)
 		return;
@@ -606,7 +592,7 @@ void Backend_UnloadGlyph(Backend_Glyph *glyph)
 	free(glyph);
 }
 
-void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
+void Backend_DrawGlyphToSurface(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
 {
 	if (glyph == NULL || surface == NULL)
 		return;
@@ -660,7 +646,7 @@ void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, l
 
 void Backend_DrawGlyphToScreen(Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
 {
-	Backend_DrawGlyph(&framebuffer, glyph, x, y, colours);
+	Backend_DrawGlyphToSurface(&framebuffer, glyph, x, y, colours);
 }
 
 void Backend_HandleDeviceLoss(void)

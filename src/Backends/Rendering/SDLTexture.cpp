@@ -171,7 +171,7 @@ void Backend_FreeSurface(Backend_Surface *surface)
 	free(surface);
 }
 
-unsigned char* Backend_Lock(Backend_Surface *surface, unsigned int *pitch)
+unsigned char* Backend_LockSurface(Backend_Surface *surface, unsigned int *pitch)
 {
 	if (surface == NULL)
 		return NULL;
@@ -180,7 +180,7 @@ unsigned char* Backend_Lock(Backend_Surface *surface, unsigned int *pitch)
 	return (unsigned char*)surface->sdl_surface->pixels;
 }
 
-void Backend_Unlock(Backend_Surface *surface)
+void Backend_UnlockSurface(Backend_Surface *surface)
 {
 	if (surface == NULL)
 		return;
@@ -202,7 +202,7 @@ void Backend_Unlock(Backend_Surface *surface)
 	surface->needs_syncing = TRUE;
 }
 
-void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL alpha_blend)
+void Backend_BlitToSurface(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y)
 {
 	if (source_surface == NULL || destination_surface == NULL)
 		return;
@@ -219,11 +219,11 @@ void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Sur
 	SDL_Rect destination_rect = {(int)x, (int)y, source_rect.w, source_rect.h};
 
 	// Blit the surface
-	SDL_SetSurfaceBlendMode(source_surface->sdl_surface, alpha_blend ? SDL_BLENDMODE_BLEND : SDL_BLENDMODE_NONE);
+	SDL_SetSurfaceBlendMode(source_surface->sdl_surface, SDL_BLENDMODE_BLEND);
 	SDL_BlitSurface(source_surface->sdl_surface, &source_rect, destination_surface->sdl_surface, &destination_rect);
 
 	// Now blit the texture
-	SDL_SetTextureBlendMode(source_surface->texture, alpha_blend ? premultiplied_blend_mode : SDL_BLENDMODE_NONE);
+	SDL_SetTextureBlendMode(source_surface->texture, premultiplied_blend_mode);
 	SDL_Texture *default_target = SDL_GetRenderTarget(renderer);
 	SDL_SetRenderTarget(renderer, destination_surface->texture);
 	SDL_RenderCopy(renderer, source_surface->texture, &source_rect, &destination_rect);
@@ -251,7 +251,7 @@ void Backend_BlitToScreen(Backend_Surface *source_surface, const RECT *rect, lon
 	SDL_RenderCopy(renderer, source_surface->texture, &source_rect, &destination_rect);
 }
 
-void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha)
+void Backend_ColourFillToSurface(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha)
 {
 	if (surface == NULL)
 		return;
@@ -336,7 +336,7 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 	}
 
 	unsigned int surface_pitch;
-	unsigned char *surface_pixels = Backend_Lock(glyph->surface, &surface_pitch);
+	unsigned char *surface_pixels = Backend_LockSurface(glyph->surface, &surface_pitch);
 
 	switch (pixel_mode)
 	{
@@ -375,7 +375,7 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 			break;
 	}
 
-	Backend_Unlock(glyph->surface);
+	Backend_UnlockSurface(glyph->surface);
 
 	return glyph;
 }
@@ -389,7 +389,7 @@ void Backend_UnloadGlyph(Backend_Glyph *glyph)
 	free(glyph);
 }
 
-void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
+void Backend_DrawGlyphToSurface(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
 {
 	if (glyph == NULL || surface == NULL)
 		return;
@@ -403,7 +403,7 @@ void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, l
 	SDL_SetSurfaceColorMod(glyph->surface->sdl_surface, colours[0], colours[1], colours[2]);
 	SDL_SetTextureColorMod(glyph->surface->texture, colours[0], colours[1], colours[2]);
 
-	Backend_Blit(glyph->surface, &rect, surface, x, y, TRUE);
+	Backend_BlitToSurface(glyph->surface, &rect, surface, x, y);
 }
 
 void Backend_DrawGlyphToScreen(Backend_Glyph *glyph, long x, long y, const unsigned char *colours)

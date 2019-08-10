@@ -1126,7 +1126,7 @@ void DrawText(FontObject *font_object, Backend_Surface *surface, int x, int y, u
 				if (glyph->backend)
 				{
 					if (surface)
-						Backend_DrawGlyph(surface, glyph->backend, letter_x, letter_y, colours);
+						Backend_DrawGlyphToSurface(surface, glyph->backend, letter_x, letter_y, colours);
 					else
 						Backend_DrawGlyphToScreen(glyph->backend, letter_x, letter_y, colours);
 				}
