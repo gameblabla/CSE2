@@ -478,7 +478,7 @@ if(RENDERER MATCHES "OpenGL3")
 	target_link_libraries(CSE2 OpenGL::GL)
 endif()
 
-if (TRACKER_AUDIO)
+if(TRACKER_AUDIO)
 	if(NOT FORCE_LOCAL_LIBS)
 		find_package(LibXMPLite)
 	endif()
