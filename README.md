@@ -11,7 +11,7 @@ Cave Story Engine 2 is a decompilation of Cave Story, ported from DirectX to SDL
 * SDL2
 * FreeType
 * FLTK
-* GLEW (if the OpenGL backend is selected) (not currently built with CMake)
+* GLEW (if the OpenGL rendering backend is selected)
 
 ## Building
 
