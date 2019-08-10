@@ -421,7 +421,7 @@ void Surface2Surface(int x, int y, const RECT *rect, int to, int from)
 	RECT frameRect;
 	ScaleRect(rect, &frameRect);
 
-	Backend_Blit(surf[from].backend, &frameRect, surf[to].backend, x * magnification, y * magnification, TRUE);
+	Backend_Blit(surf[from].backend, &frameRect, surf[to].backend, x * magnification, y * magnification);
 }
 
 unsigned long GetCortBoxColor(unsigned long col)

@@ -565,9 +565,9 @@ static void BlitCommon(Backend_Surface *source_surface, const RECT *rect, Backen
 	vertex_buffer_slot->vertices[1][2].vertex_coordinate.y = vertex_bottom;
 }
 
-void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL colour_key)
+void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y)
 {
-	BlitCommon(source_surface, rect, destination_surface, x, y, colour_key);
+	BlitCommon(source_surface, rect, destination_surface, x, y, TRUE);
 }
 
 void Backend_BlitToScreen(Backend_Surface *source_surface, const RECT *rect, long x, long y, BOOL colour_key)

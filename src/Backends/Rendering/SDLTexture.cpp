@@ -193,7 +193,7 @@ void Backend_Unlock(Backend_Surface *surface)
 	surface->needs_syncing = TRUE;
 }
 
-void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL colour_key)
+void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y)
 {
 	if (source_surface == NULL || destination_surface == NULL)
 		return;
@@ -210,11 +210,11 @@ void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Sur
 	SDL_Rect destination_rect = {(int)x, (int)y, source_rect.w, source_rect.h};
 
 	// Blit the surface
-	SDL_SetSurfaceBlendMode(source_surface->sdl_surface, colour_key ? SDL_BLENDMODE_BLEND : SDL_BLENDMODE_NONE);
+	SDL_SetSurfaceBlendMode(source_surface->sdl_surface, SDL_BLENDMODE_BLEND);
 	SDL_BlitSurface(source_surface->sdl_surface, &source_rect, destination_surface->sdl_surface, &destination_rect);
 
 	// Now blit the texture
-	SDL_SetTextureBlendMode(source_surface->texture, colour_key ? SDL_BLENDMODE_BLEND : SDL_BLENDMODE_NONE);
+	SDL_SetTextureBlendMode(source_surface->texture, SDL_BLENDMODE_BLEND);
 	SDL_SetRenderTarget(renderer, destination_surface->texture);
 	SDL_RenderCopy(renderer, source_surface->texture, &source_rect, &destination_rect);
 	SDL_SetRenderTarget(renderer, screen_texture);

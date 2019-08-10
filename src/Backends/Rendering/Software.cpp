@@ -115,7 +115,7 @@ void Backend_Unlock(Backend_Surface *surface)
 	(void)surface;
 }
 
-void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL colour_key)
+static void BlitCommon(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL colour_key)
 {
 	if (source_surface == NULL || destination_surface == NULL)
 		return;
@@ -198,9 +198,14 @@ void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Sur
 	}
 }
 
+void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y)
+{
+	BlitCommon(source_surface, rect, &framebuffer, x, y, TRUE);
+}
+
 void Backend_BlitToScreen(Backend_Surface *source_surface, const RECT *rect, long x, long y, BOOL colour_key)
 {
-	Backend_Blit(source_surface, rect, &framebuffer, x, y, colour_key);
+	BlitCommon(source_surface, rect, &framebuffer, x, y, colour_key);
 }
 
 void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
@@ -268,7 +273,7 @@ void Backend_ColourFillToScreen(const RECT *rect, unsigned char red, unsigned ch
 
 void Backend_ScreenToSurface(Backend_Surface *surface, const RECT *rect)
 {
-	Backend_Blit(&framebuffer, rect, surface, rect->left, rect->top, FALSE);
+	BlitCommon(&framebuffer, rect, surface, rect->left, rect->top, FALSE);
 }
 
 BOOL Backend_SupportsSubpixelGlyph(void)

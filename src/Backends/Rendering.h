@@ -22,7 +22,7 @@ Backend_Surface* Backend_CreateSurface(unsigned int width, unsigned int height);
 void Backend_FreeSurface(Backend_Surface *surface);
 unsigned char* Backend_Lock(Backend_Surface *surface, unsigned int *pitch);
 void Backend_Unlock(Backend_Surface *surface);
-void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL colour_key);
+void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y);
 void Backend_BlitToScreen(Backend_Surface *source_surface, const RECT *rect, long x, long y, BOOL colour_key);
 void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue);
 void Backend_ColourFillToScreen(const RECT *rect, unsigned char red, unsigned char green, unsigned char blue);
