@@ -12,6 +12,15 @@
 
 #include "../../Font.h"
 
+typedef enum RenderMode
+{
+	MODE_BLANK,
+	MODE_DRAW_SURFACE,
+	MODE_DRAW_SURFACE_WITH_TRANSPARENCY,
+	MODE_COLOUR_FILL,
+	MODE_DRAW_GLYPH
+} RenderMode;
+
 typedef struct Backend_Surface
 {
 	GLuint texture_id;
@@ -33,11 +42,16 @@ typedef struct Coordinate2D
 	GLfloat y;
 } Coordinate2D;
 
-typedef struct VertexBuffer
+typedef struct Vertex
 {
-	Coordinate2D vertexes[4];
-	Coordinate2D texture_coordinates[4];
-} VertexBuffer;
+	Coordinate2D vertex_coordinate;
+	Coordinate2D texture_coordinate;
+} Vertex;
+
+typedef struct VertexBufferSlot
+{
+	Vertex vertices[2][3];
+} VertexBufferSlot;
 
 static SDL_Window *window;
 static SDL_GLContext context;
@@ -53,9 +67,13 @@ static GLuint vertex_array_id;
 static GLuint vertex_buffer_id;
 static GLuint framebuffer_id;
 
-static VertexBuffer vertex_buffer;
+static VertexBufferSlot *vertex_buffer;
 
 static Backend_Surface framebuffer_surface;
+
+static unsigned long current_vertex_buffer_slot;
+
+static RenderMode last_render_mode;
 
 static const GLchar *vertex_shader_plain = " \
 #version 150 core\n \
@@ -162,15 +180,42 @@ static GLuint CompileShader(const char *vertex_shader_source, const char *fragme
 	return program_id;
 }
 
-static void SetFramebufferTarget(GLuint texture_id)
+static void SetFramebufferTarget(Backend_Surface *surface)
 {
-	static GLuint last_framebuffer_target;
+	static Backend_Surface *last_framebuffer_target;
 
-	if (texture_id != last_framebuffer_target)
+	if (surface != last_framebuffer_target)
 	{
-		last_framebuffer_target = texture_id;
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture_id, 0);
+		last_framebuffer_target = surface;
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, surface->texture_id, 0);
+		glViewport(0, 0, surface->width, surface->height);
 	}
+}
+
+static VertexBufferSlot* GetVertexBufferSlot(void)
+{
+	static unsigned long max_slots = 0;
+
+	if (current_vertex_buffer_slot >= max_slots)
+	{
+		if (max_slots == 0)
+			max_slots = 1;
+		else
+			max_slots <<= 1;
+
+		vertex_buffer = (VertexBufferSlot*)realloc(vertex_buffer, max_slots * sizeof(VertexBufferSlot));
+		glBufferData(GL_ARRAY_BUFFER, max_slots * sizeof(VertexBufferSlot), NULL, GL_STREAM_DRAW);
+	}
+
+	return &vertex_buffer[current_vertex_buffer_slot++];
+}
+
+static void FlushVertexBuffer(void)
+{
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(VertexBufferSlot) * current_vertex_buffer_slot, vertex_buffer);
+	glDrawArrays(GL_TRIANGLES, 0, 6 * current_vertex_buffer_slot);
+
+	current_vertex_buffer_slot = 0;
 }
 
 SDL_Window* Backend_CreateWindow(const char *title, int width, int height)
@@ -215,11 +260,12 @@ BOOL Backend_Init(SDL_Window *p_window, unsigned int internal_screen_width, unsi
 	// Set up Vertex Buffer Object
 	glGenBuffers(1, &vertex_buffer_id);
 	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_id);
+	glBufferData(GL_ARRAY_BUFFER, 1 * sizeof(VertexBufferSlot), NULL, GL_STREAM_DRAW);
 
 	// Set up the vertex attributes
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid*)offsetof(VertexBuffer, vertexes));
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid*)offsetof(VertexBuffer, texture_coordinates));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, vertex_coordinate));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texture_coordinate));
 
 	// Set up our shaders
 	program_texture = CompileShader(vertex_shader_texture, fragment_shader_texture);
@@ -267,6 +313,9 @@ void Backend_Deinit(void)
 
 void Backend_DrawScreen(void)
 {
+	FlushVertexBuffer();
+	last_render_mode = MODE_BLANK;
+
 	// This would be a good time to use a custom shader to divide the pixels by
 	// their alpha, to undo the premultiplied alpha stuff, but the framebuffer
 	// is pretty much guaranteed to be fully opaque, and X / 1 == X, so it'd be
@@ -304,26 +353,38 @@ void Backend_DrawScreen(void)
 	// Draw framebuffer to screen
 	glBindTexture(GL_TEXTURE_2D, framebuffer_surface.texture_id);
 
-	vertex_buffer.texture_coordinates[0].x = 0.0f;
-	vertex_buffer.texture_coordinates[0].y = 1.0f;
-	vertex_buffer.texture_coordinates[1].x = 1.0f;
-	vertex_buffer.texture_coordinates[1].y = 1.0f;
-	vertex_buffer.texture_coordinates[2].x = 1.0f;
-	vertex_buffer.texture_coordinates[2].y = 0.0f;
-	vertex_buffer.texture_coordinates[3].x = 0.0f;
-	vertex_buffer.texture_coordinates[3].y = 0.0f;
+//	static VertexBufferSlot buffer;
+	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot();
 
-	vertex_buffer.vertexes[0].x = -fit_width;
-	vertex_buffer.vertexes[0].y = -fit_height;
-	vertex_buffer.vertexes[1].x = fit_width;
-	vertex_buffer.vertexes[1].y = -fit_height;
-	vertex_buffer.vertexes[2].x = fit_width;
-	vertex_buffer.vertexes[2].y = fit_height;
-	vertex_buffer.vertexes[3].x = -fit_width;
-	vertex_buffer.vertexes[3].y = fit_height;
+	vertex_buffer_slot->vertices[0][0].texture_coordinate.x = 0.0f;
+	vertex_buffer_slot->vertices[0][0].texture_coordinate.y = 1.0f;
+	vertex_buffer_slot->vertices[0][1].texture_coordinate.x = 1.0f;
+	vertex_buffer_slot->vertices[0][1].texture_coordinate.y = 1.0f;
+	vertex_buffer_slot->vertices[0][2].texture_coordinate.x = 1.0f;
+	vertex_buffer_slot->vertices[0][2].texture_coordinate.y = 0.0f;
 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer), &vertex_buffer, GL_STREAM_DRAW);
-	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+	vertex_buffer_slot->vertices[1][0].texture_coordinate.x = 0.0f;
+	vertex_buffer_slot->vertices[1][0].texture_coordinate.y = 1.0f;
+	vertex_buffer_slot->vertices[1][1].texture_coordinate.x = 1.0f;
+	vertex_buffer_slot->vertices[1][1].texture_coordinate.y = 0.0f;
+	vertex_buffer_slot->vertices[1][2].texture_coordinate.x = 0.0f;
+	vertex_buffer_slot->vertices[1][2].texture_coordinate.y = 0.0f;
+
+	vertex_buffer_slot->vertices[0][0].vertex_coordinate.x = -fit_width;
+	vertex_buffer_slot->vertices[0][0].vertex_coordinate.y = -fit_height;
+	vertex_buffer_slot->vertices[0][1].vertex_coordinate.x = fit_width;
+	vertex_buffer_slot->vertices[0][1].vertex_coordinate.y = -fit_height;
+	vertex_buffer_slot->vertices[0][2].vertex_coordinate.x = fit_width;
+	vertex_buffer_slot->vertices[0][2].vertex_coordinate.y = fit_height;
+
+	vertex_buffer_slot->vertices[1][0].vertex_coordinate.x = -fit_width;
+	vertex_buffer_slot->vertices[1][0].vertex_coordinate.y = -fit_height;
+	vertex_buffer_slot->vertices[1][1].vertex_coordinate.x = fit_width;
+	vertex_buffer_slot->vertices[1][1].vertex_coordinate.y = fit_height;
+	vertex_buffer_slot->vertices[1][2].vertex_coordinate.x = -fit_width;
+	vertex_buffer_slot->vertices[1][2].vertex_coordinate.y = fit_height;
+
+	FlushVertexBuffer();
 
 	SDL_GL_SwapWindow(window);
 
@@ -396,34 +457,52 @@ void Backend_Unlock(Backend_Surface *surface)
 		}
 	}
 
+	GLint previously_bound_texture;
+	glGetIntegerv(GL_TEXTURE_BINDING_2D, &previously_bound_texture);
+
 	glBindTexture(GL_TEXTURE_2D, surface->texture_id);
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, surface->width, surface->height, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
 	free(surface->pixels);
+
+	glBindTexture(GL_TEXTURE_2D, previously_bound_texture);
 }
 
 static void BlitCommon(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL alpha_blend)
 {
+	static Backend_Surface *last_source_surface;
+	static Backend_Surface *last_destination_surface;
+
 	if (source_surface == NULL || destination_surface == NULL)
 		return;
 
 	if (rect->right - rect->left < 0 || rect->bottom - rect->top < 0)
 		return;
 
-	// Point our framebuffer to the destination texture
-	SetFramebufferTarget(destination_surface->texture_id);
-	glViewport(0, 0, destination_surface->width, destination_surface->height);
+	const RenderMode render_mode = (alpha_blend ? MODE_DRAW_SURFACE_WITH_TRANSPARENCY : MODE_DRAW_SURFACE);
 
-	glUseProgram(program_texture);
+	if (last_render_mode != render_mode || last_source_surface != source_surface || last_destination_surface != destination_surface)
+	{
+		FlushVertexBuffer();
 
-	if (alpha_blend)
-		glEnable(GL_BLEND);
-	else
-		glDisable(GL_BLEND);
+		last_render_mode = render_mode;
+		last_source_surface = source_surface;
+		last_destination_surface = destination_surface;
 
-	// Enable texture coordinates, since this uses textures
-	glEnableVertexAttribArray(2);
+		// Point our framebuffer to the destination texture
+		SetFramebufferTarget(destination_surface);
 
-	glBindTexture(GL_TEXTURE_2D, source_surface->texture_id);
+		glUseProgram(program_texture);
+
+		if (alpha_blend)
+			glEnable(GL_BLEND);
+		else
+			glDisable(GL_BLEND);
+
+		// Enable texture coordinates, since this uses textures
+		glEnableVertexAttribArray(2);
+
+		glBindTexture(GL_TEXTURE_2D, source_surface->texture_id);
+	}
 
 	const GLfloat texture_left = (GLfloat)rect->left / (GLfloat)source_surface->width;
 	const GLfloat texture_right = (GLfloat)rect->right / (GLfloat)source_surface->width;
@@ -435,26 +514,35 @@ static void BlitCommon(Backend_Surface *source_surface, const RECT *rect, Backen
 	const GLfloat vertex_top = (y * (2.0f / destination_surface->height)) - 1.0f;
 	const GLfloat vertex_bottom = ((y + (rect->bottom - rect->top)) * (2.0f / destination_surface->height)) - 1.0f;
 
-	vertex_buffer.texture_coordinates[0].x = texture_left;
-	vertex_buffer.texture_coordinates[0].y = texture_top;
-	vertex_buffer.texture_coordinates[1].x = texture_right;
-	vertex_buffer.texture_coordinates[1].y = texture_top;
-	vertex_buffer.texture_coordinates[2].x = texture_right;
-	vertex_buffer.texture_coordinates[2].y = texture_bottom;
-	vertex_buffer.texture_coordinates[3].x = texture_left;
-	vertex_buffer.texture_coordinates[3].y = texture_bottom;
+	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot();
 
-	vertex_buffer.vertexes[0].x = vertex_left;
-	vertex_buffer.vertexes[0].y = vertex_top;
-	vertex_buffer.vertexes[1].x = vertex_right;
-	vertex_buffer.vertexes[1].y = vertex_top;
-	vertex_buffer.vertexes[2].x = vertex_right;
-	vertex_buffer.vertexes[2].y = vertex_bottom;
-	vertex_buffer.vertexes[3].x = vertex_left;
-	vertex_buffer.vertexes[3].y = vertex_bottom;
+	vertex_buffer_slot->vertices[0][0].texture_coordinate.x = texture_left;
+	vertex_buffer_slot->vertices[0][0].texture_coordinate.y = texture_top;
+	vertex_buffer_slot->vertices[0][1].texture_coordinate.x = texture_right;
+	vertex_buffer_slot->vertices[0][1].texture_coordinate.y = texture_top;
+	vertex_buffer_slot->vertices[0][2].texture_coordinate.x = texture_right;
+	vertex_buffer_slot->vertices[0][2].texture_coordinate.y = texture_bottom;
 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer), &vertex_buffer, GL_STREAM_DRAW);
-	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+	vertex_buffer_slot->vertices[1][0].texture_coordinate.x = texture_left;
+	vertex_buffer_slot->vertices[1][0].texture_coordinate.y = texture_top;
+	vertex_buffer_slot->vertices[1][1].texture_coordinate.x = texture_right;
+	vertex_buffer_slot->vertices[1][1].texture_coordinate.y = texture_bottom;
+	vertex_buffer_slot->vertices[1][2].texture_coordinate.x = texture_left;
+	vertex_buffer_slot->vertices[1][2].texture_coordinate.y = texture_bottom;
+
+	vertex_buffer_slot->vertices[0][0].vertex_coordinate.x = vertex_left;
+	vertex_buffer_slot->vertices[0][0].vertex_coordinate.y = vertex_top;
+	vertex_buffer_slot->vertices[0][1].vertex_coordinate.x = vertex_right;
+	vertex_buffer_slot->vertices[0][1].vertex_coordinate.y = vertex_top;
+	vertex_buffer_slot->vertices[0][2].vertex_coordinate.x = vertex_right;
+	vertex_buffer_slot->vertices[0][2].vertex_coordinate.y = vertex_bottom;
+
+	vertex_buffer_slot->vertices[1][0].vertex_coordinate.x = vertex_left;
+	vertex_buffer_slot->vertices[1][0].vertex_coordinate.y = vertex_top;
+	vertex_buffer_slot->vertices[1][1].vertex_coordinate.x = vertex_right;
+	vertex_buffer_slot->vertices[1][1].vertex_coordinate.y = vertex_bottom;
+	vertex_buffer_slot->vertices[1][2].vertex_coordinate.x = vertex_left;
+	vertex_buffer_slot->vertices[1][2].vertex_coordinate.y = vertex_bottom;
 }
 
 void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL alpha_blend)
@@ -470,41 +558,62 @@ void Backend_BlitToScreen(Backend_Surface *source_surface, const RECT *rect, lon
 
 static void ColourFillCommon(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha)
 {
+	static Backend_Surface *last_surface;
+	static unsigned char last_red;
+	static unsigned char last_green;
+	static unsigned char last_blue;
+
 	if (surface == NULL)
 		return;
 
 	if (rect->right - rect->left < 0 || rect->bottom - rect->top < 0)
 		return;
 
-	// Point our framebuffer to the destination texture
-	SetFramebufferTarget(surface->texture_id);
-	glViewport(0, 0, surface->width, surface->height);
+	if (last_render_mode != MODE_COLOUR_FILL || last_surface != surface || last_red != red || last_green != green || last_blue != blue)
+	{
+		FlushVertexBuffer();
 
-	glUseProgram(program_colour_fill);
+		last_render_mode = MODE_COLOUR_FILL;
+		last_surface = surface;
+		last_red = red;
+		last_green = green;
+		last_blue = blue;
 
-	glDisable(GL_BLEND);
+		// Point our framebuffer to the destination texture
+		SetFramebufferTarget(surface);
 
-	// Disable texture coordinate array, since this doesn't use textures
-	glDisableVertexAttribArray(2);
+		glUseProgram(program_colour_fill);
 
-	glUniform4f(program_colour_fill_uniform_colour, red / 255.0f, green / 255.0f, blue / 255.0f, alpha / 255.0f);
+		glDisable(GL_BLEND);
+
+		// Disable texture coordinate array, since this doesn't use textures
+		glDisableVertexAttribArray(2);
+
+		glUniform4f(program_colour_fill_uniform_colour, red / 255.0f, green / 255.0f, blue / 255.0f, alpha / 255.0f);
+
+		current_vertex_buffer_slot = 0;
+	}
 
 	const GLfloat vertex_left = (rect->left * (2.0f / surface->width)) - 1.0f;
 	const GLfloat vertex_right = (rect->right * (2.0f / surface->width)) - 1.0f;
 	const GLfloat vertex_top = (rect->top * (2.0f / surface->height)) - 1.0f;
 	const GLfloat vertex_bottom = (rect->bottom * (2.0f / surface->height)) - 1.0f;
 
-	vertex_buffer.vertexes[0].x = vertex_left;
-	vertex_buffer.vertexes[0].y = vertex_top;
-	vertex_buffer.vertexes[1].x = vertex_right;
-	vertex_buffer.vertexes[1].y = vertex_top;
-	vertex_buffer.vertexes[2].x = vertex_right;
-	vertex_buffer.vertexes[2].y = vertex_bottom;
-	vertex_buffer.vertexes[3].x = vertex_left;
-	vertex_buffer.vertexes[3].y = vertex_bottom;
+	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot();
 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer), &vertex_buffer, GL_STREAM_DRAW);
-	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+	vertex_buffer_slot->vertices[0][0].vertex_coordinate.x = vertex_left;
+	vertex_buffer_slot->vertices[0][0].vertex_coordinate.y = vertex_top;
+	vertex_buffer_slot->vertices[0][1].vertex_coordinate.x = vertex_right;
+	vertex_buffer_slot->vertices[0][1].vertex_coordinate.y = vertex_top;
+	vertex_buffer_slot->vertices[0][2].vertex_coordinate.x = vertex_right;
+	vertex_buffer_slot->vertices[0][2].vertex_coordinate.y = vertex_bottom;
+
+	vertex_buffer_slot->vertices[1][0].vertex_coordinate.x = vertex_left;
+	vertex_buffer_slot->vertices[1][0].vertex_coordinate.y = vertex_top;
+	vertex_buffer_slot->vertices[1][1].vertex_coordinate.x = vertex_right;
+	vertex_buffer_slot->vertices[1][1].vertex_coordinate.y = vertex_bottom;
+	vertex_buffer_slot->vertices[1][2].vertex_coordinate.x = vertex_left;
+	vertex_buffer_slot->vertices[1][2].vertex_coordinate.y = vertex_bottom;
 }
 
 void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha)
@@ -558,6 +667,9 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 			break;
 	}
 
+	GLint previously_bound_texture;
+	glGetIntegerv(GL_TEXTURE_BINDING_2D, &previously_bound_texture);
+
 	glGenTextures(1, &glyph->texture_id);
 	glBindTexture(GL_TEXTURE_2D, glyph->texture_id);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, buffer);
@@ -571,6 +683,8 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 	glyph->height = height;
 
 	free(buffer);
+
+	glBindTexture(GL_TEXTURE_2D, previously_bound_texture);
 
 	return glyph;
 }
@@ -586,49 +700,76 @@ void Backend_UnloadGlyph(Backend_Glyph *glyph)
 
 static void DrawGlyphCommon(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
 {
+	static Backend_Surface *last_surface;
+	static Backend_Glyph *last_glyph;
+	static unsigned char last_red;
+	static unsigned char last_green;
+	static unsigned char last_blue;
+
 	if (glyph == NULL || surface == NULL)
 		return;
 
-	// Point our framebuffer to the destination texture
-	SetFramebufferTarget(surface->texture_id);
-	glViewport(0, 0, surface->width, surface->height);
+	if (last_render_mode != MODE_DRAW_GLYPH || last_surface != surface || last_glyph != glyph || last_red != colours[0] || last_green != colours[1] || last_blue != colours[2])
+	{
+		FlushVertexBuffer();
 
-	glUseProgram(program_glyph);
+		last_render_mode = MODE_DRAW_GLYPH;
+		last_surface = surface;
+		last_glyph = glyph;
+		last_red = colours[0];
+		last_green = colours[1];
+		last_blue = colours[2];
 
-	glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	// Enable texture coordinates, since this uses textures
-	glEnableVertexAttribArray(2);
+		glUseProgram(program_glyph);
+		glUniform4f(program_glyph_uniform_colour, colours[0] / 255.0f, colours[1] / 255.0f, colours[2] / 255.0f, 1.0f);
 
-	glBindTexture(GL_TEXTURE_2D, glyph->texture_id);
+		// Point our framebuffer to the destination texture
+		SetFramebufferTarget(surface);
+
+		glEnable(GL_BLEND);
+
+		// Enable texture coordinates, since this uses textures
+		glEnableVertexAttribArray(2);
+
+		glBindTexture(GL_TEXTURE_2D, glyph->texture_id);
+	}
 
 	const GLfloat vertex_left = (x * (2.0f / surface->width)) - 1.0f;
 	const GLfloat vertex_right = ((x + glyph->width) * (2.0f / surface->width)) - 1.0f;
 	const GLfloat vertex_top = (y * (2.0f / surface->height)) - 1.0f;
 	const GLfloat vertex_bottom = ((y + glyph->height) * (2.0f / surface->height)) - 1.0f;
 
-	glUniform4f(program_glyph_uniform_colour, colours[0] / 255.0f, colours[1] / 255.0f, colours[2] / 255.0f, 1.0f);
+	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot();
 
-	vertex_buffer.texture_coordinates[0].x = 0.0f;
-	vertex_buffer.texture_coordinates[0].y = 0.0f;
-	vertex_buffer.texture_coordinates[1].x = 1.0f;
-	vertex_buffer.texture_coordinates[1].y = 0.0f;
-	vertex_buffer.texture_coordinates[2].x = 1.0f;
-	vertex_buffer.texture_coordinates[2].y = 1.0f;
-	vertex_buffer.texture_coordinates[3].x = 0.0f;
-	vertex_buffer.texture_coordinates[3].y = 1.0f;
+	vertex_buffer_slot->vertices[0][0].texture_coordinate.x = 0.0f;
+	vertex_buffer_slot->vertices[0][0].texture_coordinate.y = 0.0f;
+	vertex_buffer_slot->vertices[0][1].texture_coordinate.x = 1.0f;
+	vertex_buffer_slot->vertices[0][1].texture_coordinate.y = 0.0f;
+	vertex_buffer_slot->vertices[0][2].texture_coordinate.x = 1.0f;
+	vertex_buffer_slot->vertices[0][2].texture_coordinate.y = 1.0f;
 
-	vertex_buffer.vertexes[0].x = vertex_left;
-	vertex_buffer.vertexes[0].y = vertex_top;
-	vertex_buffer.vertexes[1].x = vertex_right;
-	vertex_buffer.vertexes[1].y = vertex_top;
-	vertex_buffer.vertexes[2].x = vertex_right;
-	vertex_buffer.vertexes[2].y = vertex_bottom;
-	vertex_buffer.vertexes[3].x = vertex_left;
-	vertex_buffer.vertexes[3].y = vertex_bottom;
+	vertex_buffer_slot->vertices[1][0].texture_coordinate.x = 0.0f;
+	vertex_buffer_slot->vertices[1][0].texture_coordinate.y = 0.0f;
+	vertex_buffer_slot->vertices[1][1].texture_coordinate.x = 1.0f;
+	vertex_buffer_slot->vertices[1][1].texture_coordinate.y = 1.0f;
+	vertex_buffer_slot->vertices[1][2].texture_coordinate.x = 0.0f;
+	vertex_buffer_slot->vertices[1][2].texture_coordinate.y = 1.0f;
 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer), &vertex_buffer, GL_STREAM_DRAW);
-	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+	vertex_buffer_slot->vertices[0][0].vertex_coordinate.x = vertex_left;
+	vertex_buffer_slot->vertices[0][0].vertex_coordinate.y = vertex_top;
+	vertex_buffer_slot->vertices[0][1].vertex_coordinate.x = vertex_right;
+	vertex_buffer_slot->vertices[0][1].vertex_coordinate.y = vertex_top;
+	vertex_buffer_slot->vertices[0][2].vertex_coordinate.x = vertex_right;
+	vertex_buffer_slot->vertices[0][2].vertex_coordinate.y = vertex_bottom;
+
+	vertex_buffer_slot->vertices[1][0].vertex_coordinate.x = vertex_left;
+	vertex_buffer_slot->vertices[1][0].vertex_coordinate.y = vertex_top;
+	vertex_buffer_slot->vertices[1][1].vertex_coordinate.x = vertex_right;
+	vertex_buffer_slot->vertices[1][1].vertex_coordinate.y = vertex_bottom;
+	vertex_buffer_slot->vertices[1][2].vertex_coordinate.x = vertex_left;
+	vertex_buffer_slot->vertices[1][2].vertex_coordinate.y = vertex_bottom;
 }
 
 void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
