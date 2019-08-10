@@ -720,8 +720,6 @@ static void DrawGlyphCommon(Backend_Surface *surface, Backend_Glyph *glyph, long
 		last_green = colours[1];
 		last_blue = colours[2];
 
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 		glUseProgram(program_glyph);
 		glUniform4f(program_glyph_uniform_colour, colours[0] / 255.0f, colours[1] / 255.0f, colours[2] / 255.0f, 1.0f);
 
