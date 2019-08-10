@@ -217,6 +217,12 @@ ifeq ($(RENDERER), OpenGL3)
 	else
 		LIBS += `pkg-config glew --libs`
 	endif
+
+	ifeq ($(WINDOWS), 1)
+		LIBS += -lopengl32
+	else
+		LIBS += -lGL
+	endif
 else ifeq ($(RENDERER), Texture)
 	SOURCES += src/Backends/Rendering/SDLTexture
 else ifeq ($(RENDERER), Surface)
