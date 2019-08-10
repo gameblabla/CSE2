@@ -82,7 +82,7 @@ static unsigned long current_vertex_buffer_slot;
 static RenderMode last_render_mode;
 
 static const GLchar *vertex_shader_plain = " \
-#version 140\n \
+#version 150 core\n \
 in vec2 input_vertex_coordinates; \
 void main() \
 { \
@@ -91,7 +91,7 @@ void main() \
 ";
 
 static const GLchar *vertex_shader_texture = " \
-#version 140\n \
+#version 150 core\n \
 in vec2 input_vertex_coordinates; \
 in vec2 input_texture_coordinates; \
 out vec2 texture_coordinates; \
@@ -103,7 +103,7 @@ void main() \
 ";
 
 static const GLchar *fragment_shader_texture = " \
-#version 140\n \
+#version 150 core\n \
 uniform sampler2D tex; \
 in vec2 texture_coordinates; \
 out vec4 fragment; \
@@ -114,7 +114,7 @@ void main() \
 ";
 
 static const GLchar *fragment_shader_texture_colour_key = " \
-#version 140\n \
+#version 150 core\n \
 uniform sampler2D tex; \
 in vec2 texture_coordinates; \
 out vec4 fragment; \
@@ -130,7 +130,7 @@ void main() \
 ";
 
 static const GLchar *fragment_shader_colour_fill = " \
-#version 140\n \
+#version 150 core\n \
 uniform vec4 colour; \
 out vec4 fragment; \
 void main() \
@@ -140,7 +140,7 @@ void main() \
 ";
 
 static const GLchar *fragment_shader_glyph_normal = " \
-#version 140\n \
+#version 150 core\n \
 uniform sampler2D tex; \
 uniform vec4 colour; \
 in vec2 texture_coordinates; \
@@ -152,7 +152,7 @@ void main() \
 ";
 
 static const GLchar *fragment_shader_glyph_subpixel_part1 = " \
-#version 140\n \
+#version 150 core\n \
 uniform sampler2D tex; \
 in vec2 texture_coordinates; \
 out vec4 fragment; \
@@ -163,7 +163,7 @@ void main() \
 ";
 
 static const GLchar *fragment_shader_glyph_subpixel_part2 = " \
-#version 140\n \
+#version 150 core\n \
 uniform sampler2D tex; \
 uniform vec4 colour; \
 in vec2 texture_coordinates; \
@@ -286,8 +286,10 @@ static void FlushVertexBuffer(void)
 
 SDL_Window* Backend_CreateWindow(const char *title, int width, int height)
 {
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 
 	return SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL);
 }
@@ -304,8 +306,8 @@ BOOL Backend_Init(SDL_Window *p_window)
 	if (glewInit() != GLEW_OK)
 		return FALSE;
 
-	// Check if the platform supports OpenGL 3.1
-	if (!GLEW_VERSION_3_1)
+	// Check if the platform supports OpenGL 3.2
+	if (!GLEW_VERSION_3_2)
 		return FALSE;
 
 	glEnable(GL_DEBUG_OUTPUT);
