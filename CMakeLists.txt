@@ -383,6 +383,9 @@ set_target_properties(CSE2 PROPERTIES
 	CXX_EXTENSIONS OFF
 )
 
+# Include directory for third-party software
+target_include_directories(CSE2 PRIVATE "external")
+
 # Name debug builds "CSE2_debug", to distinguish them
 set_target_properties(CSE2 PROPERTIES DEBUG_OUTPUT_NAME "CSE2_debug")
 
