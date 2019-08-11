@@ -200,7 +200,7 @@ static void BlitCommon(Backend_Surface *source_surface, const RECT *rect, Backen
 
 void Backend_BlitToSurface(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y)
 {
-	BlitCommon(source_surface, rect, &framebuffer, x, y, TRUE);
+	BlitCommon(source_surface, rect, destination_surface, x, y, TRUE);
 }
 
 void Backend_BlitToScreen(Backend_Surface *source_surface, const RECT *rect, long x, long y, BOOL colour_key)
