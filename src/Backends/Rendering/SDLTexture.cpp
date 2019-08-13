@@ -58,7 +58,7 @@ Backend_Surface* Backend_Init(SDL_Window *window, unsigned int internal_screen_w
 		return NULL;
 
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
-	framebuffer.texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_TARGET, internal_screen_width, internal_screen_height);
+	framebuffer.texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, internal_screen_width, internal_screen_height);
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
 
 	if (framebuffer.texture == NULL)
@@ -69,6 +69,16 @@ Backend_Surface* Backend_Init(SDL_Window *window, unsigned int internal_screen_w
 
 	// Set up our premultiplied-alpha blend mode
 	premultiplied_blend_mode = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
+
+	if (framebuffer.texture == NULL)
+	{
+		SDL_DestroyRenderer(renderer);
+		return NULL;
+	}
+
+	framebuffer.alpha = TRUE;
+	framebuffer.width = width;
+	framebuffer.height = height;
 
 	return &framebuffer;
 }
