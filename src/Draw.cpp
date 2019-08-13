@@ -17,6 +17,13 @@
 #include "Tags.h"
 #include "Backends/Rendering.h"
 
+typedef enum SurfaceType
+{
+	SURFACE_SOURCE_NONE = 1,
+	SURFACE_SOURCE_RESOURCE,
+	SURFACE_SOURCE_FILE
+} SurfaceType;
+
 SDL_Window *gWindow;
 
 static SDL_PixelFormat *rgb24_pixel_format;	// Needed because SDL2 is stupid
@@ -35,7 +42,7 @@ static FontObject *gFont;
 // This doesn't exist in the Linux port, so none of these symbol names are accurate
 static struct
 {
-	unsigned char type;
+	SurfaceType type;
 	unsigned int width;
 	unsigned int height;
 	BOOL bSystem;	// Basically a 'do not regenerate' flag
@@ -188,7 +195,7 @@ BOOL MakeSurface_Generic(int bxsize, int bysize, Surface_Ids surf_no, BOOL bSyst
 			}
 			else
 			{
-				surface_metadata[surf_no].type = 1;
+				surface_metadata[surf_no].type = SURFACE_SOURCE_NONE;
 				surface_metadata[surf_no].width = bxsize;
 				surface_metadata[surf_no].height = bysize;
 				surface_metadata[surf_no].bSystem = bSystem;
@@ -202,7 +209,7 @@ BOOL MakeSurface_Generic(int bxsize, int bysize, Surface_Ids surf_no, BOOL bSyst
 	return success;
 }
 
-static BOOL LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, BOOL create_surface, const char *name, unsigned char type)
+static BOOL LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, BOOL create_surface, const char *name, SurfaceType type)
 {
 	BOOL success = FALSE;
 
@@ -325,7 +332,7 @@ static BOOL LoadBitmap_File(const char *name, Surface_Ids surf_no, BOOL create_s
 		}
 		else
 		{
-			if (LoadBitmap(fp, surf_no, create_surface, name, 3))
+			if (LoadBitmap(fp, surf_no, create_surface, name, SURFACE_SOURCE_FILE))
 				return TRUE;
 		}
 	}
@@ -335,7 +342,7 @@ static BOOL LoadBitmap_File(const char *name, Surface_Ids surf_no, BOOL create_s
 	fp = SDL_RWFromFile(path, "rb");
 	if (fp)
 	{
-		if (LoadBitmap(fp, surf_no, create_surface, name, 3))
+		if (LoadBitmap(fp, surf_no, create_surface, name, SURFACE_SOURCE_FILE))
 			return TRUE;
 	}
 
@@ -355,7 +362,7 @@ static BOOL LoadBitmap_Resource(const char *res, Surface_Ids surf_no, BOOL creat
 		// But hey, if I ever need to create an RWops from an array that's -32768 bytes long, they've got me covered!
 		SDL_RWops *fp = SDL_RWFromConstMem(data, size);
 
-		if (LoadBitmap(fp, surf_no, create_surface, res, 2))
+		if (LoadBitmap(fp, surf_no, create_surface, res, SURFACE_SOURCE_RESOURCE))
 			return TRUE;
 	}
 
@@ -492,7 +499,7 @@ void CortBox2(const RECT *rect, unsigned long col, Surface_Ids surf_no)
 
 	Backend_ColourFill(surf[surf_no], &destRect, col_red, col_green, col_blue);
 
-	surface_metadata[surf_no].type = 1;
+	surface_metadata[surf_no].type = SURFACE_SOURCE_NONE;
 }
 
 void RestoreSurfaces()	// Guessed function name - this doesn't exist in the Linux port
@@ -505,7 +512,7 @@ void RestoreSurfaces()	// Guessed function name - this doesn't exist in the Linu
 		{
 			switch (surface_metadata[i].type)
 			{
-				case 1:
+				case SURFACE_SOURCE_NONE:
 					rect.left = 0;
 					rect.top = 0;
 					rect.right = surface_metadata[i].width;
@@ -513,11 +520,11 @@ void RestoreSurfaces()	// Guessed function name - this doesn't exist in the Linu
 					CortBox2(&rect, 0, (Surface_Ids)i);
 					break;
 
-				case 2:
+				case SURFACE_SOURCE_RESOURCE:
 					ReloadBitmap_Resource(surface_metadata[i].name, (Surface_Ids)i);
 					break;
 
-				case 3:
+				case SURFACE_SOURCE_FILE:
 					ReloadBitmap_File(surface_metadata[i].name, (Surface_Ids)i);
 					break;
 			}
