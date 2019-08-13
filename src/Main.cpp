@@ -50,7 +50,7 @@ const char *lpWindowName = "Cave Story Engine 2 ~ Doukutsu Monogatari Enjin 2";
 #endif
 
 // A replication of MSVC's rand algorithm
-static unsigned long int next = 1;
+static unsigned long next = 1;
 
 int rep_rand()
 {

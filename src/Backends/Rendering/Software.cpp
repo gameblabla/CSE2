@@ -39,7 +39,7 @@ SDL_Window* Backend_CreateWindow(const char *title, int width, int height)
 	return SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_RESIZABLE);
 }
 
-BOOL Backend_Init(SDL_Window *window, unsigned int internal_screen_width, unsigned int internal_screen_height, BOOL vsync)
+Backend_Surface* Backend_Init(SDL_Window *window, unsigned int internal_screen_width, unsigned int internal_screen_height, BOOL vsync)
 {
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE | (vsync ? SDL_RENDERER_PRESENTVSYNC : 0));
 
@@ -47,7 +47,7 @@ BOOL Backend_Init(SDL_Window *window, unsigned int internal_screen_width, unsign
 		return FALSE;
 
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
-	texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, internal_screen_width, internal_screen_height);
+	texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STREAMING, internal_screen_width, internal_screen_height);
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
 
 	if (texture == NULL)
@@ -56,7 +56,7 @@ BOOL Backend_Init(SDL_Window *window, unsigned int internal_screen_width, unsign
 		return FALSE;
 	}
 
-	framebuffer.pixels = (unsigned char*)malloc(internal_screen_width * internal_screen_height * 3);
+	framebuffer.pixels = (unsigned char*)malloc(internal_screen_width * internal_screen_height * 4);
 
 	if (framebuffer.pixels == NULL)
 	{
@@ -67,9 +67,9 @@ BOOL Backend_Init(SDL_Window *window, unsigned int internal_screen_width, unsign
 
 	framebuffer.width = internal_screen_width;
 	framebuffer.height = internal_screen_height;
-	framebuffer.pitch = internal_screen_width * 3;
+	framebuffer.pitch = internal_screen_width * 4;
 
-	return TRUE;
+	return &framebuffer;
 }
 
 void Backend_Deinit(void)
@@ -86,7 +86,7 @@ void Backend_DrawScreen(void)
 	SDL_LockTexture(texture, NULL, (void**)&pixels, &pitch);
 
 	for (unsigned int i = 0; i < framebuffer.height; ++i)
-		memcpy(&pixels[i * pitch], &framebuffer.pixels[i * framebuffer.pitch], framebuffer.width * 3);
+		memcpy(&pixels[i * pitch], &framebuffer.pixels[i * framebuffer.pitch], framebuffer.width * 4);
 
 	SDL_UnlockTexture(texture);
 
@@ -164,7 +164,7 @@ void Backend_UnlockSurface(Backend_Surface *surface)
 	(void)surface;
 }
 
-void Backend_BlitToSurface(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y)
+void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL alpha_blend)
 {
 	if (source_surface == NULL || destination_surface == NULL)
 		return;
@@ -248,104 +248,7 @@ void Backend_BlitToSurface(Backend_Surface *source_surface, const RECT *rect, Ba
 	}
 }
 
-void Backend_BlitToScreen(Backend_Surface *source_surface, const RECT *rect, long x, long y, BOOL alpha_blend)
-{
-	RECT rect_clamped;
-
-	rect_clamped.left = rect->left;
-	rect_clamped.top = rect->top;
-	rect_clamped.right = rect->right;
-	rect_clamped.bottom = rect->bottom;
-
-	// Clamp the rect and coordinates so we don't write outside the pixel buffer
-	long overflow;
-
-	overflow = 0 - x;
-	if (overflow > 0)
-	{
-		rect_clamped.left += overflow;
-		x += overflow;
-	}
-
-	overflow = 0 - y;
-	if (overflow > 0)
-	{
-		rect_clamped.top += overflow;
-		y += overflow;
-	}
-
-	overflow = (x + (rect_clamped.right - rect_clamped.left)) - framebuffer.width;
-	if (overflow > 0)
-	{
-		rect_clamped.right -= overflow;
-	}
-
-	overflow = (y + (rect_clamped.bottom - rect_clamped.top)) - framebuffer.height;
-	if (overflow > 0)
-	{
-		rect_clamped.bottom -= overflow;
-	}
-
-	if (rect_clamped.bottom - rect_clamped.top <= 0)
-		return;
-
-	if (rect_clamped.right - rect_clamped.left <= 0)
-		return;
-
-	// Do the actual blitting
-	if (alpha_blend)
-	{
-		for (long j = 0; j < rect_clamped.bottom - rect_clamped.top; ++j)
-		{
-			unsigned char *source_pointer = &source_surface->pixels[((rect_clamped.top + j) * source_surface->pitch) + (rect_clamped.left * 4)];
-			unsigned char *destination_pointer = &framebuffer.pixels[((y + j) * framebuffer.pitch) + (x * 3)];
-
-			for (long i = 0; i < rect_clamped.right - rect_clamped.left; ++i)
-			{
-				if (source_pointer[3] == 0xFF)
-				{
-					*destination_pointer++ = *source_pointer++;
-					*destination_pointer++ = *source_pointer++;
-					*destination_pointer++ = *source_pointer++;
-					++source_pointer;
-				}
-				else if (source_pointer[3] != 0)
-				{
-					const float src_alpha = source_pointer[3] / 255.0f;
-
-					for (unsigned int j = 0; j < 3; ++j)
-						destination_pointer[j] = (unsigned char)(source_pointer[j] * src_alpha + destination_pointer[j] * (1.0f - src_alpha));
-
-					source_pointer += 4;
-					destination_pointer += 3;
-				}
-				else
-				{
-					source_pointer += 4;
-					destination_pointer += 3;
-				}
-			}
-		}
-	}
-	else
-	{
-		for (long j = 0; j < rect_clamped.bottom - rect_clamped.top; ++j)
-		{
-			unsigned char *source_pointer = &source_surface->pixels[((rect_clamped.top + j) * source_surface->pitch) + (rect_clamped.left * 4)];
-			unsigned char *destination_pointer = &framebuffer.pixels[((y + j) * framebuffer.pitch) + (x * 3)];
-
-			for (long i = 0; i < rect_clamped.right - rect_clamped.left; ++i)
-			{
-				*destination_pointer++ = *source_pointer++;
-				*destination_pointer++ = *source_pointer++;
-				*destination_pointer++ = *source_pointer++;
-				++source_pointer;
-			}
-		}
-	}
-}
-
-void Backend_ColourFillToSurface(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha)
+void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha)
 {
 	if (surface == NULL)
 		return;
@@ -402,124 +305,6 @@ void Backend_ColourFillToSurface(Backend_Surface *surface, const RECT *rect, uns
 			*destination_pointer++ = alpha;
 		}
 	}
-}
-
-void Backend_ColourFillToScreen(const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
-{
-	RECT rect_clamped;
-
-	rect_clamped.left = rect->left;
-	rect_clamped.top = rect->top;
-	rect_clamped.right = rect->right;
-	rect_clamped.bottom = rect->bottom;
-
-	// Clamp the rect so it doesn't write outside the pixel buffer
-	long overflow;
-
-	overflow = 0 - rect_clamped.left;
-	if (overflow > 0)
-	{
-		rect_clamped.left += overflow;
-	}
-
-	overflow = 0 - rect_clamped.top;
-	if (overflow > 0)
-	{
-		rect_clamped.top += overflow;
-	}
-
-	overflow = rect_clamped.right - framebuffer.width;
-	if (overflow > 0)
-	{
-		rect_clamped.right -= overflow;
-	}
-
-	overflow = rect_clamped.bottom - framebuffer.height;
-	if (overflow > 0)
-	{
-		rect_clamped.bottom -= overflow;
-	}
-
-	if (rect_clamped.bottom - rect_clamped.top <= 0)
-		return;
-
-	if (rect_clamped.right - rect_clamped.left <= 0)
-		return;
-
-	for (long j = 0; j < rect_clamped.bottom - rect_clamped.top; ++j)
-	{
-		unsigned char *source_pointer = &framebuffer.pixels[((rect_clamped.top + j) * framebuffer.pitch) + (rect_clamped.left * 3)];
-
-		for (long i = 0; i < rect_clamped.right - rect_clamped.left; ++i)
-		{
-			*source_pointer++ = red;
-			*source_pointer++ = green;
-			*source_pointer++ = blue;
-		}
-	}
-}
-
-void Backend_ScreenToSurface(Backend_Surface *surface, const RECT *rect)
-{
-	RECT rect_clamped;
-
-	rect_clamped.left = rect->left;
-	rect_clamped.top = rect->top;
-	rect_clamped.right = rect->right;
-	rect_clamped.bottom = rect->bottom;
-
-	// Clamp the rect and coordinates so we don't write outside the pixel buffer
-	long overflow;
-
-	overflow = 0 - rect_clamped.left;
-	if (overflow > 0)
-	{
-		rect_clamped.left += overflow;
-	}
-
-	overflow = 0 - rect_clamped.top;
-	if (overflow > 0)
-	{
-		rect_clamped.top += overflow;
-	}
-
-	overflow = rect_clamped.right - surface->width;
-	if (overflow > 0)
-	{
-		rect_clamped.right -= overflow;
-	}
-
-	overflow = rect_clamped.bottom - surface->height;
-	if (overflow > 0)
-	{
-		rect_clamped.bottom -= overflow;
-	}
-
-	if (rect_clamped.bottom - rect_clamped.top <= 0)
-		return;
-
-	if (rect_clamped.right - rect_clamped.left <= 0)
-		return;
-
-	// Do the actual blitting
-	for (long j = 0; j < rect_clamped.bottom - rect_clamped.top; ++j)
-	{
-		unsigned char *source_pointer = &framebuffer.pixels[((rect_clamped.top + j) * framebuffer.pitch) + (rect_clamped.left * 3)];
-		unsigned char *destination_pointer = &surface->pixels[((rect_clamped.top + j) * surface->pitch) + (rect_clamped.left * 4)];
-
-		for (long i = 0; i < rect_clamped.right - rect_clamped.left; ++i)
-		{
-			*destination_pointer++ = *source_pointer++;
-			*destination_pointer++ = *source_pointer++;
-			*destination_pointer++ = *source_pointer++;
-			*destination_pointer++ = 0xFF;
-		}
-	}
-}
-
-BOOL Backend_SupportsSubpixelGlyph(void)
-{
-	return TRUE;	// It's a software renderer, baby
 }
 
 Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch, unsigned char pixel_mode)
@@ -592,7 +377,7 @@ void Backend_UnloadGlyph(Backend_Glyph *glyph)
 	free(glyph);
 }
 
-void Backend_DrawGlyphToSurface(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
+void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
 {
 	if (glyph == NULL || surface == NULL)
 		return;
@@ -642,11 +427,6 @@ void Backend_DrawGlyphToSurface(Backend_Surface *surface, Backend_Glyph *glyph, 
 
 			break;
 	}
-}
-
-void Backend_DrawGlyphToScreen(Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
-{
-	Backend_DrawGlyphToSurface(&framebuffer, glyph, x, y, colours);
 }
 
 void Backend_HandleDeviceLoss(void)

@@ -54,10 +54,6 @@ typedef enum Surface_Ids
 	SURFACE_ID_MAX = 40
 } Surface_Ids;
 
-struct SURFACE;
-
-extern SURFACE surf[SURFACE_ID_MAX];
-
 BOOL Flip_SystemTask(HWND hWnd);
 SDL_Window* CreateWindow(const char *title, int width, int height);
 BOOL StartDirectDraw(int lMagnification);
@@ -75,6 +71,7 @@ void Surface2Surface(int x, int y, const RECT *rect, int to, int from);
 unsigned long GetCortBoxColor(unsigned long col);
 void CortBox(const RECT *rect, unsigned long col);
 void CortBox2(const RECT *rect, unsigned long col, Surface_Ids surf_no);
+void RestoreSurfaces();
 int SubpixelToScreenCoord(int coord);
 int PixelToScreenCoord(int coord);
 void InitTextObject(const char *font_name);
