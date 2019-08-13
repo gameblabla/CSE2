@@ -67,6 +67,7 @@ void Surface2Surface(int x, int y, const RECT *rect, int to, int from);
 unsigned long GetCortBoxColor(unsigned long col);
 void CortBox(const RECT *rect, unsigned long col);
 void CortBox2(const RECT *rect, unsigned long col, Surface_Ids surf_no);
+void RestoreSurfaces();
 void InitTextObject(const char *font_name);
 void PutText(int x, int y, const char *text, unsigned long color);
 void PutText2(int x, int y, const char *text, unsigned long color, Surface_Ids surf_no);

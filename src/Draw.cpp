@@ -1,3 +1,5 @@
+#include "Draw.h"
+
 #include <stddef.h>
 #include <stdio.h>
 #ifdef WINDOWS
@@ -10,7 +12,6 @@
 #include "WindowsWrapper.h"
 
 #include "CommonDefines.h"
-#include "Draw.h"
 #include "Font.h"
 #include "Resource.h"
 #include "Tags.h"
@@ -30,6 +31,16 @@ static Backend_Surface *surf[SURFACE_ID_MAX];
 static Backend_Surface *framebuffer;
 
 static FontObject *gFont;
+
+// This doesn't exist in the Linux port, so none of these symbol names are accurate
+static struct
+{
+	unsigned char type;
+	unsigned int width;
+	unsigned int height;
+	BOOL bSystem;	// Basically a 'do not regenerate' flag
+	char name[0x20];
+} surface_metadata[SURFACE_ID_MAX];
 
 #define FRAMERATE 20
 
@@ -72,6 +83,8 @@ SDL_Window* CreateWindow(const char *title, int width, int height)
 BOOL StartDirectDraw(int lMagnification, int lColourDepth)
 {
 	(void)lColourDepth;	// There's no way I'm supporting a bunch of different colour depths
+
+	memset(surface_metadata, 0, sizeof(surface_metadata));
 
 	switch (lMagnification)
 	{
@@ -117,6 +130,8 @@ void EndDirectDraw()
 	Backend_Deinit();
 
 	SDL_FreeFormat(rgb24_pixel_format);
+
+	memset(surface_metadata, 0, sizeof(surface_metadata));
 }
 
 static BOOL IsEnableBitmap(SDL_RWops *fp)
@@ -140,12 +155,12 @@ void ReleaseSurface(int s)
 		Backend_FreeSurface(surf[s]);
 		surf[s] = NULL;
 	}
+
+	memset(&surface_metadata[s], 0, sizeof(surface_metadata[0]));
 }
 
 BOOL MakeSurface_Generic(int bxsize, int bysize, Surface_Ids surf_no, BOOL bSystem)
 {
-	(void)bSystem;
-
 	BOOL success = FALSE;
 
 #ifdef FIX_BUGS
@@ -168,16 +183,26 @@ BOOL MakeSurface_Generic(int bxsize, int bysize, Surface_Ids surf_no, BOOL bSyst
 			surf[surf_no] = Backend_CreateSurface(bxsize * magnification, bysize * magnification);
 
 			if (surf[surf_no] == NULL)
+			{
 				printf("Failed to create backend surface %d\n", surf_no);
+			}
 			else
+			{
+				surface_metadata[surf_no].type = 1;
+				surface_metadata[surf_no].width = bxsize;
+				surface_metadata[surf_no].height = bysize;
+				surface_metadata[surf_no].bSystem = bSystem;
+				strcpy(surface_metadata[surf_no].name, "generic");
+
 				success = TRUE;
+			}
 		}
 	}
 
 	return success;
 }
 
-static BOOL LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, BOOL create_surface)
+static BOOL LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, BOOL create_surface, const char *name, unsigned char type)
 {
 	BOOL success = FALSE;
 
@@ -257,6 +282,18 @@ static BOOL LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, BOOL create_surface)
 
 						Backend_UnlockSurface(surf[surf_no]);
 						SDL_FreeSurface(converted_surface);
+
+						surface_metadata[surf_no].type = type;
+
+						if (create_surface)
+						{
+							surface_metadata[surf_no].width = surface->w;
+							surface_metadata[surf_no].height = surface->h;
+							surface_metadata[surf_no].bSystem = FALSE;
+						}
+
+						strcpy(surface_metadata[surf_no].name, name);
+
 						success = TRUE;
 					}
 				}
@@ -288,7 +325,7 @@ static BOOL LoadBitmap_File(const char *name, Surface_Ids surf_no, BOOL create_s
 		}
 		else
 		{
-			if (LoadBitmap(fp, surf_no, create_surface))
+			if (LoadBitmap(fp, surf_no, create_surface, name, 3))
 				return TRUE;
 		}
 	}
@@ -298,7 +335,7 @@ static BOOL LoadBitmap_File(const char *name, Surface_Ids surf_no, BOOL create_s
 	fp = SDL_RWFromFile(path, "rb");
 	if (fp)
 	{
-		if (LoadBitmap(fp, surf_no, create_surface))
+		if (LoadBitmap(fp, surf_no, create_surface, name, 3))
 			return TRUE;
 	}
 
@@ -318,7 +355,7 @@ static BOOL LoadBitmap_Resource(const char *res, Surface_Ids surf_no, BOOL creat
 		// But hey, if I ever need to create an RWops from an array that's -32768 bytes long, they've got me covered!
 		SDL_RWops *fp = SDL_RWFromConstMem(data, size);
 
-		if (LoadBitmap(fp, surf_no, create_surface))
+		if (LoadBitmap(fp, surf_no, create_surface, res, 2))
 			return TRUE;
 	}
 
@@ -454,6 +491,38 @@ void CortBox2(const RECT *rect, unsigned long col, Surface_Ids surf_no)
 	const unsigned char col_blue = (unsigned char)((col >> 16) & 0xFF);
 
 	Backend_ColourFill(surf[surf_no], &destRect, col_red, col_green, col_blue);
+
+	surface_metadata[surf_no].type = 1;
+}
+
+void RestoreSurfaces()	// Guessed function name - this doesn't exist in the Linux port
+{
+	RECT rect;
+
+	for (int i = 0; i < SURFACE_ID_MAX; ++i)
+	{
+		if (surf[i] && !surface_metadata[i].bSystem)
+		{
+			switch (surface_metadata[i].type)
+			{
+				case 1:
+					rect.left = 0;
+					rect.top = 0;
+					rect.right = surface_metadata[i].width;
+					rect.bottom = surface_metadata[i].height;
+					CortBox2(&rect, 0, (Surface_Ids)i);
+					break;
+
+				case 2:
+					ReloadBitmap_Resource(surface_metadata[i].name, (Surface_Ids)i);
+					break;
+
+				case 3:
+					ReloadBitmap_File(surface_metadata[i].name, (Surface_Ids)i);
+					break;
+			}
+		}
+	}
 }
 
 #ifdef WINDOWS
@@ -571,6 +640,8 @@ void EndTextObject()
 	UnloadFont(gFont);
 	gFont = NULL;
 }
+
+// These functions are new
 
 void HandleDeviceLoss()
 {

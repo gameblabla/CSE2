@@ -7,7 +7,11 @@
 
 #include "../../WindowsWrapper.h"
 
+#include "../../Draw.h"
+#include "../../Ending.h"
 #include "../../Font.h"
+#include "../../MapName.h"
+#include "../../TextScr.h"
 
 typedef struct Backend_Surface
 {
@@ -300,7 +304,10 @@ void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, l
 void Backend_HandleDeviceLoss(void)
 {
 	// All of our textures have been lost, so regenerate them
-	// TODO
+	RestoreSurfaces();
+	RestoreStripper();
+	RestoreMapName();
+	RestoreTextScript();
 }
 
 void Backend_HandleWindowResize(void)

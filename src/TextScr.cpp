@@ -1487,3 +1487,12 @@ int TextScriptProc()
 		g_GameFlags |= 4;
 	return 1;
 }
+
+void RestoreTextScript()
+{
+	for (int i = 0; i < 4; ++i)
+	{
+		CortBox2(&gRect_line, 0x000000, (Surface_Ids)(i + SURFACE_ID_TEXT_LINE1));
+		PutText2(0, 0, &text[i * 0x40], RGB(0xFF, 0xFF, 0xFE), (Surface_Ids)(i + SURFACE_ID_TEXT_LINE1));
+	}
+}
