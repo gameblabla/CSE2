@@ -293,58 +293,19 @@ void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned cha
 	}
 }
 
-Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch, unsigned char pixel_mode)
+Backend_Glyph* Backend_CreateGlyph(unsigned int width, unsigned int height, unsigned char pixel_mode)
 {
 	Backend_Glyph *glyph = (Backend_Glyph*)malloc(sizeof(Backend_Glyph));
 
 	if (glyph == NULL)
 		return NULL;
 
-	switch (pixel_mode)
+	glyph->pixels = malloc(width * height * (pixel_mode == FONT_PIXEL_MODE_MONO ? sizeof(unsigned char) : sizeof(float)));
+
+	if (glyph->pixels == NULL)
 	{
-		case FONT_PIXEL_MODE_GRAY:
-		{
-			glyph->pixels = malloc(width * height * sizeof(float));
-
-			if (glyph->pixels == NULL)
-			{
-				free(glyph);
-				return NULL;
-			}
-
-			float *destination_pointer = (float*)glyph->pixels;
-
-			for (unsigned int y = 0; y < height; ++y)
-			{
-				const unsigned char *source_pointer = pixels + y * pitch;
-
-				for (unsigned int x = 0; x < width; ++x)
-					*destination_pointer++ = *source_pointer++ / 255.0f;
-			}
-
-			break;
-		}
-
-		case FONT_PIXEL_MODE_MONO:
-		{
-			glyph->pixels = malloc(width * height);
-
-			if (glyph->pixels == NULL)
-			{
-				free(glyph);
-				return NULL;
-			}
-
-			for (unsigned int y = 0; y < height; ++y)
-			{
-				const unsigned char *source_pointer = pixels + y * pitch;
-				unsigned char *destination_pointer = (unsigned char*)glyph->pixels + y * width;
-
-				memcpy(destination_pointer, source_pointer, width);
-			}
-
-			break;
-		}
+		free(glyph);
+		return NULL;
 	}
 
 	glyph->width = width;
@@ -354,13 +315,50 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 	return glyph;
 }
 
-void Backend_UnloadGlyph(Backend_Glyph *glyph)
+void Backend_FreeGlyph(Backend_Glyph *glyph)
 {
 	if (glyph == NULL)
 		return;
 
 	free(glyph->pixels);
 	free(glyph);
+}
+
+void Backend_LoadGlyphPixels(Backend_Glyph *glyph, const unsigned char *pixels, int pitch)
+{
+	if (glyph == NULL)
+		return;
+
+	switch (glyph->pixel_mode)
+	{
+		case FONT_PIXEL_MODE_GRAY:
+		{
+			float *destination_pointer = (float*)glyph->pixels;
+
+			for (unsigned int y = 0; y < glyph->height; ++y)
+			{
+				const unsigned char *source_pointer = pixels + y * pitch;
+
+				for (unsigned int x = 0; x < glyph->width; ++x)
+					*destination_pointer++ = *source_pointer++ / 255.0f;
+			}
+
+			break;
+		}
+
+		case FONT_PIXEL_MODE_MONO:
+		{
+			for (unsigned int y = 0; y < glyph->height; ++y)
+			{
+				const unsigned char *source_pointer = pixels + y * pitch;
+				unsigned char *destination_pointer = (unsigned char*)glyph->pixels + y * glyph->width;
+
+				memcpy(destination_pointer, source_pointer, glyph->width);
+			}
+
+			break;
+		}
+	}
 }
 
 void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)

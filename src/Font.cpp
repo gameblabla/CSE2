@@ -944,6 +944,34 @@ static unsigned char GammaCorrect(unsigned char value)
 	return lookup[value];
 }
 
+static void SendGlyphToBackend(FontObject *font_object, Backend_Glyph *backend)
+{
+	if (backend == NULL)
+		return;
+
+	FT_Bitmap bitmap;
+	FT_Bitmap_New(&bitmap);
+	FT_Bitmap_Convert(font_object->library, &font_object->face->glyph->bitmap, &bitmap, 1);
+
+	if (font_object->face->glyph->bitmap.pixel_mode == FT_PIXEL_MODE_GRAY)
+	{
+		for (unsigned int y = 0; y < bitmap.rows; ++y)
+		{
+			unsigned char *pixel_pointer = bitmap.buffer + y * bitmap.pitch;
+
+			for (unsigned int x = 0; x < bitmap.width; ++x)
+			{
+				*pixel_pointer = GammaCorrect((*pixel_pointer * 0xFF) / (bitmap.num_grays - 1));
+				++pixel_pointer;
+			}
+		}
+	}
+
+	Backend_LoadGlyphPixels(backend, bitmap.buffer, bitmap.pitch);
+
+	FT_Bitmap_Done(font_object->library, &bitmap);
+}
+
 static CachedGlyph* GetGlyphCached(FontObject *font_object, unsigned long unicode_value)
 {
 	CachedGlyph *glyph;
@@ -967,32 +995,11 @@ static CachedGlyph* GetGlyphCached(FontObject *font_object, unsigned long unicod
 		FT_Load_Glyph(font_object->face, glyph_index, FT_LOAD_RENDER | FT_LOAD_MONOCHROME);
 #endif
 
-		glyph->unicode_value = unicode_value;
-		glyph->x = font_object->face->glyph->bitmap_left;
-		glyph->y = (FT_MulFix(font_object->face->ascender, font_object->face->size->metrics.y_scale) - font_object->face->glyph->metrics.horiBearingY + (64 / 2)) / 64;
-		glyph->x_advance = font_object->face->glyph->advance.x / 64;
-
-		FT_Bitmap bitmap;
-		FT_Bitmap_New(&bitmap);
-		FT_Bitmap_Convert(font_object->library, &font_object->face->glyph->bitmap, &bitmap, 1);
-
 		unsigned char pixel_mode;
 		switch (font_object->face->glyph->bitmap.pixel_mode)
 		{
 			case FT_PIXEL_MODE_GRAY:
 				pixel_mode = FONT_PIXEL_MODE_GRAY;
-
-				for (unsigned int y = 0; y < bitmap.rows; ++y)
-				{
-					unsigned char *pixel_pointer = bitmap.buffer + y * bitmap.pitch;
-
-					for (unsigned int x = 0; x < bitmap.width; ++x)
-					{
-						*pixel_pointer = GammaCorrect((*pixel_pointer * 0xFF) / (bitmap.num_grays - 1));
-						++pixel_pointer;
-					}
-				}
-
 				break;
 
 			case FT_PIXEL_MODE_MONO:
@@ -1000,9 +1007,13 @@ static CachedGlyph* GetGlyphCached(FontObject *font_object, unsigned long unicod
 				break;
 		}
 
-		glyph->backend = Backend_LoadGlyph(bitmap.buffer, bitmap.width, bitmap.rows, bitmap.pitch, pixel_mode);
+		glyph->backend = Backend_CreateGlyph(font_object->face->glyph->bitmap.width, font_object->face->glyph->bitmap.rows, pixel_mode);
+		glyph->unicode_value = unicode_value;
+		glyph->x = font_object->face->glyph->bitmap_left;
+		glyph->y = (FT_MulFix(font_object->face->ascender, font_object->face->size->metrics.y_scale) - font_object->face->glyph->metrics.horiBearingY + (64 / 2)) / 64;
+		glyph->x_advance = font_object->face->glyph->advance.x / 64;
 
-		FT_Bitmap_Done(font_object->library, &bitmap);
+		SendGlyphToBackend(font_object, glyph->backend);
 	}
 
 	return glyph;
@@ -1015,7 +1026,7 @@ static void UnloadCachedGlyphs(FontObject *font_object)
 	{
 		CachedGlyph *next_glyph = glyph->next;
 
-		Backend_UnloadGlyph(glyph->backend);
+		Backend_FreeGlyph(glyph->backend);
 		free(glyph);
 
 		glyph = next_glyph;
@@ -1142,5 +1153,21 @@ void UnloadFont(FontObject *font_object)
 		free(font_object->data);
 		FT_Done_FreeType(font_object->library);
 		free(font_object);
+	}
+}
+
+void RestoreGlyphs(FontObject *font_object)
+{
+	for (CachedGlyph *glyph = font_object->glyph_list_head; glyph != NULL; glyph = glyph->next)
+	{
+		unsigned int glyph_index = FT_Get_Char_Index(font_object->face, glyph->unicode_value);
+
+#ifndef DISABLE_FONT_ANTIALIASING
+		FT_Load_Glyph(font_object->face, glyph_index, FT_LOAD_RENDER);
+#else
+		FT_Load_Glyph(font_object->face, glyph_index, FT_LOAD_RENDER | FT_LOAD_MONOCHROME);
+#endif
+
+		SendGlyphToBackend(font_object, glyph->backend);
 	}
 }

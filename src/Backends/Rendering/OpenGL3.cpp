@@ -32,6 +32,7 @@ typedef struct Backend_Glyph
 	GLuint texture_id;
 	unsigned int width;
 	unsigned int height;
+	unsigned char pixel_mode;
 } Backend_Glyph;
 
 typedef struct Coordinate2D
@@ -592,36 +593,70 @@ void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned cha
 	vertex_buffer_slot->vertices[1][2].vertex_coordinate.y = vertex_bottom;
 }
 
-Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch, unsigned char pixel_mode)
+Backend_Glyph* Backend_CreateGlyph(unsigned int width, unsigned int height, unsigned char pixel_mode)
 {
 	Backend_Glyph *glyph = (Backend_Glyph*)malloc(sizeof(Backend_Glyph));
 
 	if (glyph == NULL)
 		return NULL;
 
-	const unsigned int destination_pitch = (width + 3) & ~3;	// Round up to the nearest 4 (OpenGL needs this)
+	GLint previously_bound_texture;
+	glGetIntegerv(GL_TEXTURE_BINDING_2D, &previously_bound_texture);
 
-	unsigned char *buffer = (unsigned char*)malloc(destination_pitch * height);
+	glGenTextures(1, &glyph->texture_id);
+	glBindTexture(GL_TEXTURE_2D, glyph->texture_id);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-	switch (pixel_mode)
+	glyph->width = width;
+	glyph->height = height;
+	glyph->pixel_mode = pixel_mode;
+
+	glBindTexture(GL_TEXTURE_2D, previously_bound_texture);
+
+	return glyph;
+}
+
+void Backend_FreeGlyph(Backend_Glyph *glyph)
+{
+	if (glyph == NULL)
+		return;
+
+	glDeleteTextures(1, &glyph->texture_id);
+	free(glyph);
+}
+
+void Backend_LoadGlyphPixels(Backend_Glyph *glyph, const unsigned char *pixels, int pitch)
+{
+	if (glyph == NULL)
+		return;
+
+	const unsigned int destination_pitch = (glyph->width + 3) & ~3;	// Round up to the nearest 4 (OpenGL needs this)
+
+	unsigned char *buffer = (unsigned char*)malloc(destination_pitch * glyph->height);
+
+	switch (glyph->pixel_mode)
 	{
 		case FONT_PIXEL_MODE_GRAY:
-			for (unsigned int y = 0; y < height; ++y)
+			for (unsigned int y = 0; y < glyph->height; ++y)
 			{
 				const unsigned char *source_pointer = pixels + y * pitch;
 				unsigned char *destination_pointer = buffer + y * destination_pitch;
-				memcpy(destination_pointer, source_pointer, width);
+				memcpy(destination_pointer, source_pointer, glyph->width);
 			}
 
 			break;
 
 		case FONT_PIXEL_MODE_MONO:
-			for (unsigned int y = 0; y < height; ++y)
+			for (unsigned int y = 0; y < glyph->height; ++y)
 			{
 				const unsigned char *source_pointer = pixels + y * pitch;
 				unsigned char *destination_pointer = buffer + y * destination_pitch;
 
-				for (unsigned int x = 0; x < width; ++x)
+				for (unsigned int x = 0; x < glyph->width; ++x)
 					*destination_pointer++ = (*source_pointer++ ? 0xFF : 0);
 			}
 
@@ -631,32 +666,12 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 	GLint previously_bound_texture;
 	glGetIntegerv(GL_TEXTURE_BINDING_2D, &previously_bound_texture);
 
-	glGenTextures(1, &glyph->texture_id);
 	glBindTexture(GL_TEXTURE_2D, glyph->texture_id);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, buffer);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-	glyph->width = width;
-	glyph->height = height;
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, glyph->width, glyph->height, 0, GL_RED, GL_UNSIGNED_BYTE, buffer);
 
 	free(buffer);
 
 	glBindTexture(GL_TEXTURE_2D, previously_bound_texture);
-
-	return glyph;
-}
-
-void Backend_UnloadGlyph(Backend_Glyph *glyph)
-{
-	if (glyph == NULL)
-		return;
-
-	glDeleteTextures(1, &glyph->texture_id);
-	free(glyph);
 }
 
 void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)

@@ -570,6 +570,8 @@ void RestoreSurfaces()	// Guessed function name - this doesn't exist in the Linu
 			}
 		}
 	}
+
+	RestoreGlyphs(gFont);
 }
 
 int SubpixelToScreenCoord(int coord)

@@ -23,8 +23,9 @@ unsigned char* Backend_LockSurface(Backend_Surface *surface, unsigned int *pitch
 void Backend_UnlockSurface(Backend_Surface *surface);
 void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL alpha_blend);
 void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha);
-Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch, unsigned char pixel_mode);
-void Backend_UnloadGlyph(Backend_Glyph *glyph);
+Backend_Glyph* Backend_CreateGlyph(unsigned int width, unsigned int height, unsigned char pixel_mode);
+void Backend_FreeGlyph(Backend_Glyph *glyph);
+void Backend_LoadGlyphPixels(Backend_Glyph *glyph, const unsigned char *pixels, int pitch);
 void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours);
 void Backend_HandleDeviceLoss(void);
 void Backend_HandleWindowResize(void);
