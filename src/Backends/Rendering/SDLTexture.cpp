@@ -54,11 +54,21 @@ Backend_Surface* Backend_Init(SDL_Window *window)
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
 
 	if (renderer == NULL)
-		return FALSE;
+		return NULL;
 
 	int width, height;
 	SDL_GetRendererOutputSize(renderer, &width, &height);
 	framebuffer.texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, width, height);
+
+	if (framebuffer.texture == NULL)
+	{
+		SDL_DestroyRenderer(renderer);
+		return NULL;
+	}
+
+	framebuffer.alpha = TRUE;
+	framebuffer.width = width;
+	framebuffer.height = height;
 
 	return &framebuffer;
 }
@@ -119,7 +129,7 @@ unsigned char* Backend_LockSurface(Backend_Surface *surface, unsigned int *pitch
 
 	*pitch = surface->width * (surface->alpha ? 4 : 3);
 
-	surface->pixels = (unsigned char*)malloc(surface->width * surface->height * (surface->alpha ? 4 : 3));
+	surface->pixels = (unsigned char*)malloc(surface->height * *pitch);
 
 	return surface->pixels;
 }
@@ -128,8 +138,6 @@ void Backend_UnlockSurface(Backend_Surface *surface)
 {
 	if (surface == NULL)
 		return;
-
-	SDL_UnlockTexture(surface->texture);
 
 	if (surface->alpha)
 	{
