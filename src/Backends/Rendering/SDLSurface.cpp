@@ -7,8 +7,6 @@
 
 #include "../../WindowsWrapper.h"
 
-#include "../../Font.h"
-
 typedef struct Backend_Surface
 {
 	SDL_Surface *sdlsurface;

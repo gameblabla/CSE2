@@ -10,8 +10,6 @@
 
 #include "../../WindowsWrapper.h"
 
-#include "../../Font.h"
-
 typedef enum RenderMode
 {
 	MODE_BLANK,

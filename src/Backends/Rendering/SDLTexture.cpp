@@ -9,7 +9,6 @@
 
 #include "../../Draw.h"
 #include "../../Ending.h"
-#include "../../Font.h"
 #include "../../MapName.h"
 #include "../../TextScr.h"
 
