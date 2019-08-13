@@ -291,9 +291,6 @@ void Backend_UnloadGlyph(Backend_Glyph *glyph)
 
 void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
 {
-	// The SDL_Texture side of things uses alpha, not a colour-key, so the bug where the font is blended
-	// with the colour key doesn't occur.
-
 	if (glyph == NULL || surface == NULL)
 		return;
 
