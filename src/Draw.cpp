@@ -42,11 +42,11 @@ static FontObject *gFont;
 // This doesn't exist in the Linux port, so none of these symbol names are accurate
 static struct
 {
-	SurfaceType type;
+	char name[20];
 	unsigned int width;
 	unsigned int height;
+	SurfaceType type;
 	BOOL bSystem;	// Basically a 'do not regenerate' flag
-	char name[0x20];
 } surface_metadata[SURFACE_ID_MAX];
 
 #define FRAMERATE 20
