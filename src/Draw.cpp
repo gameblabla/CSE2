@@ -26,15 +26,10 @@ RECT grcFull = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 int magnification;
 BOOL fullscreen;
 
-struct SURFACE
-{
-	BOOL in_use;
-	Backend_Surface *backend;
-};
+static Backend_Surface *surf[SURFACE_ID_MAX];
+static Backend_Surface *framebuffer;
 
-SURFACE surf[SURFACE_ID_MAX];
-
-FontObject *gFont;
+static FontObject *gFont;
 
 #define FRAMERATE 20
 
@@ -99,8 +94,9 @@ BOOL StartDirectDraw(int lMagnification, int lColourDepth)
 
 	rgb24_pixel_format = SDL_AllocFormat(SDL_PIXELFORMAT_RGB24);
 
-	// Create renderer
-	if (!Backend_Init(gWindow))
+	framebuffer = Backend_Init(gWindow);
+
+	if (framebuffer == NULL)
 		return FALSE;
 
 	return TRUE;
@@ -109,8 +105,14 @@ BOOL StartDirectDraw(int lMagnification, int lColourDepth)
 void EndDirectDraw()
 {
 	// Release all surfaces
-	for (int i = 0; i < SURFACE_ID_MAX; i++)
-		ReleaseSurface(i);
+	for (int i = 0; i < SURFACE_ID_MAX; ++i)
+	{
+		if (surf[i])
+		{
+			Backend_FreeSurface(surf[i]);
+			surf[i] = NULL;
+		}
+	}
 
 	Backend_Deinit();
 
@@ -133,10 +135,10 @@ static BOOL IsEnableBitmap(SDL_RWops *fp)
 void ReleaseSurface(int s)
 {
 	// Release the surface we want to release
-	if (surf[s].in_use)
+	if (surf[s])
 	{
-		Backend_FreeSurface(surf[s].backend);
-		surf[s].in_use = FALSE;
+		Backend_FreeSurface(surf[s]);
+		surf[s] = NULL;
 	}
 }
 
@@ -156,24 +158,19 @@ BOOL MakeSurface_Generic(int bxsize, int bysize, Surface_Ids surf_no, BOOL bSyst
 	}
 	else
 	{
-		if (surf[surf_no].in_use)
+		if (surf[surf_no])
 		{
 			printf("Tried to create drawable surface at occupied slot (%d)\n", surf_no);
 		}
 		else
 		{
 			// Create surface
-			surf[surf_no].backend = Backend_CreateSurface(bxsize * magnification, bysize * magnification);
+			surf[surf_no] = Backend_CreateSurface(bxsize * magnification, bysize * magnification);
 
-			if (surf[surf_no].backend == NULL)
-			{
+			if (surf[surf_no] == NULL)
 				printf("Failed to create backend surface %d\n", surf_no);
-			}
 			else
-			{
-				surf[surf_no].in_use = TRUE;
 				success = TRUE;
-			}
 		}
 	}
 
@@ -190,7 +187,7 @@ static BOOL LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, BOOL create_surface)
 	}
 	else
 	{
-		if (create_surface && surf[surf_no].in_use)
+		if (create_surface && surf[surf_no])
 		{
 			printf("Tried to create drawable surface at occupied slot (%d)\n", surf_no);
 		}
@@ -217,7 +214,7 @@ static BOOL LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, BOOL create_surface)
 					{
 						// IF YOU WANT TO ADD HD SPRITES, THIS IS THE CODE YOU SHOULD EDIT
 						unsigned int pitch;
-						unsigned char *pixels = Backend_LockSurface(surf[surf_no].backend, &pitch);
+						unsigned char *pixels = Backend_LockSurface(surf[surf_no], &pitch);
 
 						if (magnification == 1)
 						{
@@ -258,7 +255,7 @@ static BOOL LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, BOOL create_surface)
 							}
 						}
 
-						Backend_UnlockSurface(surf[surf_no].backend);
+						Backend_UnlockSurface(surf[surf_no]);
 						SDL_FreeSurface(converted_surface);
 						success = TRUE;
 					}
@@ -362,7 +359,7 @@ void BackupSurface(Surface_Ids surf_no, const RECT *rect)
 	RECT frameRect;
 	ScaleRect(rect, &frameRect);
 
-	Backend_ScreenToSurface(surf[surf_no].backend, &frameRect);
+	Backend_Blit(surf[surf_no], &frameRect, framebuffer, frameRect.left, frameRect.top, FALSE);
 }
 
 static void DrawBitmap(const RECT *rcView, int x, int y, const RECT *rect, Surface_Ids surf_no, BOOL transparent)
@@ -402,7 +399,7 @@ static void DrawBitmap(const RECT *rcView, int x, int y, const RECT *rect, Surfa
 	frameRect.bottom *= magnification;
 
 	// Draw to screen
-	Backend_BlitToScreen(surf[surf_no].backend, &frameRect, x * magnification, y * magnification, transparent);
+	Backend_Blit(surf[surf_no], &frameRect, framebuffer, x * magnification, y * magnification, transparent);
 }
 
 void PutBitmap3(const RECT *rcView, int x, int y, const RECT *rect, Surface_Ids surf_no) // Transparency
@@ -421,7 +418,7 @@ void Surface2Surface(int x, int y, const RECT *rect, int to, int from)
 	RECT frameRect;
 	ScaleRect(rect, &frameRect);
 
-	Backend_BlitToSurface(surf[from].backend, &frameRect, surf[to].backend, x * magnification, y * magnification);
+	Backend_Blit(surf[from], &frameRect, surf[to], x * magnification, y * magnification, TRUE);
 }
 
 unsigned long GetCortBoxColor(unsigned long col)
@@ -442,7 +439,7 @@ void CortBox(const RECT *rect, unsigned long col)
 	const unsigned char col_green = (unsigned char)((col >> 8) & 0xFF);
 	const unsigned char col_blue = (unsigned char)((col >> 16) & 0xFF);
 
-	Backend_ColourFillToScreen(&destRect, col_red, col_green, col_blue);
+	Backend_ColourFill(framebuffer, &destRect, col_red, col_green, col_blue);
 }
 
 void CortBox2(const RECT *rect, unsigned long col, Surface_Ids surf_no)
@@ -456,7 +453,7 @@ void CortBox2(const RECT *rect, unsigned long col, Surface_Ids surf_no)
 	const unsigned char col_green = (unsigned char)((col >> 8) & 0xFF);
 	const unsigned char col_blue = (unsigned char)((col >> 16) & 0xFF);
 
-	Backend_ColourFillToSurface(surf[surf_no].backend, &destRect, col_red, col_green, col_blue);
+	Backend_ColourFill(surf[surf_no], &destRect, col_red, col_green, col_blue);
 }
 
 #ifdef WINDOWS
@@ -560,12 +557,12 @@ void InitTextObject(const char *font_name)
 
 void PutText(int x, int y, const char *text, unsigned long color)
 {
-	DrawText(gFont, NULL, x * magnification, y * magnification, color, text, strlen(text));
+	DrawText(gFont, framebuffer, x * magnification, y * magnification, color, text, strlen(text));
 }
 
 void PutText2(int x, int y, const char *text, unsigned long color, Surface_Ids surf_no)
 {
-	DrawText(gFont, surf[surf_no].backend, x * magnification, y * magnification, color, text, strlen(text));
+	DrawText(gFont, surf[surf_no], x * magnification, y * magnification, color, text, strlen(text));
 }
 
 void EndTextObject()

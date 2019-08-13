@@ -30,9 +30,8 @@ typedef struct Backend_Glyph
 } Backend_Glyph;
 
 static SDL_Window *window;
-static SDL_Surface *window_surface;
-static SDL_Surface *screen_surface;
-
+static SDL_Surface *window_sdlsurface;
+static SDL_Surface *framebuffer_sdlsurface;
 static Backend_Surface framebuffer;
 
 SDL_Window* Backend_CreateWindow(const char *title, int width, int height)
@@ -40,33 +39,33 @@ SDL_Window* Backend_CreateWindow(const char *title, int width, int height)
 	return SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, 0);
 }
 
-BOOL Backend_Init(SDL_Window *p_window)
+Backend_Surface* Backend_Init(SDL_Window *p_window)
 {
 	window = p_window;
 
-	window_surface = SDL_GetWindowSurface(window);
+	window_sdlsurface = SDL_GetWindowSurface(window);
 
-	screen_surface = SDL_CreateRGBSurfaceWithFormat(0, window_surface->w, window_surface->h, 0, SDL_PIXELFORMAT_RGB24);
+	framebuffer_sdlsurface = SDL_CreateRGBSurfaceWithFormat(0, window_sdlsurface->w, window_sdlsurface->h, 0, SDL_PIXELFORMAT_RGB24);
 
-	if (screen_surface == NULL)
-		return FALSE;
+	if (framebuffer_sdlsurface == NULL)
+		return NULL;
 
-	framebuffer.pixels = (unsigned char*)screen_surface->pixels;
-	framebuffer.width = screen_surface->w;
-	framebuffer.height = screen_surface->h;
-	framebuffer.pitch = screen_surface->pitch;
+	framebuffer.pixels = (unsigned char*)framebuffer_sdlsurface->pixels;
+	framebuffer.width = framebuffer_sdlsurface->w;
+	framebuffer.height = framebuffer_sdlsurface->h;
+	framebuffer.pitch = framebuffer_sdlsurface->pitch;
 
-	return TRUE;
+	return &framebuffer;
 }
 
 void Backend_Deinit(void)
 {
-	SDL_FreeSurface(screen_surface);
+	SDL_FreeSurface(framebuffer_sdlsurface);
 }
 
 void Backend_DrawScreen(void)
 {
-	SDL_BlitSurface(screen_surface, NULL, window_surface, NULL);
+	SDL_BlitSurface(framebuffer_sdlsurface, NULL, window_sdlsurface, NULL);
 	SDL_UpdateWindowSurface(window);
 }
 
@@ -115,7 +114,7 @@ void Backend_UnlockSurface(Backend_Surface *surface)
 	(void)surface;
 }
 
-static void BlitCommon(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL colour_key)
+void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL colour_key)
 {
 	if (source_surface == NULL || destination_surface == NULL)
 		return;
@@ -198,17 +197,7 @@ static void BlitCommon(Backend_Surface *source_surface, const RECT *rect, Backen
 	}
 }
 
-void Backend_BlitToSurface(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y)
-{
-	BlitCommon(source_surface, rect, destination_surface, x, y, TRUE);
-}
-
-void Backend_BlitToScreen(Backend_Surface *source_surface, const RECT *rect, long x, long y, BOOL colour_key)
-{
-	BlitCommon(source_surface, rect, &framebuffer, x, y, colour_key);
-}
-
-void Backend_ColourFillToSurface(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
+void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
 {
 	if (surface == NULL)
 		return;
@@ -264,16 +253,6 @@ void Backend_ColourFillToSurface(Backend_Surface *surface, const RECT *rect, uns
 			*destination_pointer++ = blue;
 		}
 	}
-}
-
-void Backend_ColourFillToScreen(const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
-{
-	Backend_ColourFillToSurface(&framebuffer, rect, red, green, blue);
-}
-
-void Backend_ScreenToSurface(Backend_Surface *surface, const RECT *rect)
-{
-	BlitCommon(&framebuffer, rect, surface, rect->left, rect->top, FALSE);
 }
 
 BOOL Backend_SupportsSubpixelGlyph(void)
@@ -352,7 +331,7 @@ void Backend_UnloadGlyph(Backend_Glyph *glyph)
 	free(glyph);
 }
 
-void Backend_DrawGlyphToSurface(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
+void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
 {
 	if (glyph == NULL || surface == NULL)
 		return;
@@ -419,11 +398,6 @@ void Backend_DrawGlyphToSurface(Backend_Surface *surface, Backend_Glyph *glyph, 
 	}
 }
 
-void Backend_DrawGlyphToScreen(Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
-{
-	Backend_DrawGlyphToSurface(&framebuffer, glyph, x, y, colours);
-}
-
 void Backend_HandleDeviceLoss(void)
 {
 	// No problem for us
@@ -433,5 +407,5 @@ void Backend_HandleWindowResize(void)
 {
 	// https://wiki.libsdl.org/SDL_GetWindowSurface
 	// We need to fetch a new surface pointer
-	window_surface = SDL_GetWindowSurface(window);
+	window_sdlsurface = SDL_GetWindowSurface(window);
 }

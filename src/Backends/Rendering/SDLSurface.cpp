@@ -57,8 +57,10 @@ BOOL Backend_Init(SDL_Window *p_window)
 	return TRUE;
 }
 
-void Backend_Deinit(void)
+void Backend_Deinit(Backend_Surface *framebuffer_surface)
 {
+	(void)framebuffer_surface;
+
 	SDL_FreeSurface(framebuffer.sdl_surface);
 }
 
