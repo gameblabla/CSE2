@@ -74,12 +74,11 @@ static GLuint vertex_buffer_id;
 static GLuint framebuffer_id;
 
 static VertexBufferSlot *vertex_buffer;
-
-static Backend_Surface framebuffer_surface;
-
 static unsigned long current_vertex_buffer_slot;
 
 static RenderMode last_render_mode;
+
+static Backend_Surface framebuffer;
 
 static const GLchar *vertex_shader_plain = " \
 #version 150 core\n \
@@ -282,7 +281,7 @@ SDL_Window* Backend_CreateWindow(const char *title, int width, int height)
 	return SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL);
 }
 
-BOOL Backend_Init(SDL_Window *p_window)
+Backend_Surface* Backend_Init(SDL_Window *p_window)
 {
 	window = p_window;
 
@@ -339,8 +338,8 @@ BOOL Backend_Init(SDL_Window *p_window)
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
 
 	// Set up framebuffer screen texture (used for screen-to-surface blitting)
-	glGenTextures(1, &framebuffer_surface.texture_id);
-	glBindTexture(GL_TEXTURE_2D, framebuffer_surface.texture_id);
+	glGenTextures(1, &framebuffer.texture_id);
+	glBindTexture(GL_TEXTURE_2D, framebuffer.texture_id);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, window_width, window_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -348,15 +347,15 @@ BOOL Backend_Init(SDL_Window *p_window)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-	framebuffer_surface.width = window_width;
-	framebuffer_surface.height = window_height;
+	framebuffer.width = window_width;
+	framebuffer.height = window_height;
 
-	return TRUE;
+	return &framebuffer;
 }
 
 void Backend_Deinit(void)
 {
-	glDeleteTextures(1, &framebuffer_surface.texture_id);
+	glDeleteTextures(1, &framebuffer.texture_id);
 	glDeleteFramebuffers(1, &framebuffer_id);
 	glDeleteProgram(program_glyph_subpixel_part2);
 	glDeleteProgram(program_glyph_subpixel_part1);
@@ -384,10 +383,10 @@ void Backend_DrawScreen(void)
 	// Target actual screen, and not our framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	glViewport(0, 0, framebuffer_surface.width, framebuffer_surface.height);
+	glViewport(0, 0, framebuffer.width, framebuffer.height);
 
 	// Draw framebuffer to screen
-	glBindTexture(GL_TEXTURE_2D, framebuffer_surface.texture_id);
+	glBindTexture(GL_TEXTURE_2D, framebuffer.texture_id);
 
 //	static VertexBufferSlot buffer;
 	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot();
@@ -488,7 +487,7 @@ void Backend_UnlockSurface(Backend_Surface *surface)
 	glBindTexture(GL_TEXTURE_2D, previously_bound_texture);
 }
 
-static void BlitCommon(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL colour_key)
+void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL colour_key)
 {
 	static Backend_Surface *last_source_surface;
 	static Backend_Surface *last_destination_surface;
@@ -565,17 +564,7 @@ static void BlitCommon(Backend_Surface *source_surface, const RECT *rect, Backen
 	vertex_buffer_slot->vertices[1][2].vertex_coordinate.y = vertex_bottom;
 }
 
-void Backend_BlitToSurface(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y)
-{
-	BlitCommon(source_surface, rect, destination_surface, x, y, TRUE);
-}
-
-void Backend_BlitToScreen(Backend_Surface *source_surface, const RECT *rect, long x, long y, BOOL colour_key)
-{
-	BlitCommon(source_surface, rect, &framebuffer_surface, x, y, colour_key);
-}
-
-static void ColourFillCommon(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
+void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
 {
 	static Backend_Surface *last_surface;
 	static unsigned char last_red;
@@ -634,21 +623,6 @@ static void ColourFillCommon(Backend_Surface *surface, const RECT *rect, unsigne
 	vertex_buffer_slot->vertices[1][1].vertex_coordinate.y = vertex_bottom;
 	vertex_buffer_slot->vertices[1][2].vertex_coordinate.x = vertex_left;
 	vertex_buffer_slot->vertices[1][2].vertex_coordinate.y = vertex_bottom;
-}
-
-void Backend_ColourFillToSurface(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
-{
-	ColourFillCommon(surface, rect, red, green, blue);
-}
-
-void Backend_ColourFillToScreen(const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
-{
-	ColourFillCommon(&framebuffer_surface, rect, red, green, blue);
-}
-
-void Backend_ScreenToSurface(Backend_Surface *surface, const RECT *rect)
-{
-	BlitCommon(&framebuffer_surface, rect, surface, rect->left, rect->top, FALSE);
 }
 
 BOOL Backend_SupportsSubpixelGlyph(void)
@@ -728,7 +702,7 @@ void Backend_UnloadGlyph(Backend_Glyph *glyph)
 	free(glyph);
 }
 
-static void DrawGlyphCommon(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
+void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
 {
 	static Backend_Surface *last_surface;
 	static Backend_Glyph *last_glyph;
@@ -809,16 +783,6 @@ static void DrawGlyphCommon(Backend_Surface *surface, Backend_Glyph *glyph, long
 	vertex_buffer_slot->vertices[1][1].vertex_coordinate.y = vertex_bottom;
 	vertex_buffer_slot->vertices[1][2].vertex_coordinate.x = vertex_left;
 	vertex_buffer_slot->vertices[1][2].vertex_coordinate.y = vertex_bottom;
-}
-
-void Backend_DrawGlyphToSurface(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
-{
-	DrawGlyphCommon(surface, glyph, x, y, colours);
-}
-
-void Backend_DrawGlyphToScreen(Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
-{
-	DrawGlyphCommon(&framebuffer_surface, glyph, x, y, colours);
 }
 
 void Backend_HandleDeviceLoss(void)
