@@ -260,33 +260,56 @@ BOOL Backend_SupportsSubpixelGlyphs(void)
 	return TRUE;	// It's a software renderer, baby
 }
 
-Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch, unsigned char pixel_mode)
+Backend_Glyph* Backend_CreateGlyph(unsigned int width, unsigned int height, unsigned char pixel_mode)
 {
 	Backend_Glyph *glyph = (Backend_Glyph*)malloc(sizeof(Backend_Glyph));
 
 	if (glyph == NULL)
 		return NULL;
 
-	switch (pixel_mode)
+	glyph->pixels = malloc(width * height * (pixel_mode == FONT_PIXEL_MODE_MONO ? sizeof(unsigned char) : sizeof(float)));
+
+	if (glyph->pixels == NULL)
+	{
+		free(glyph);
+		return NULL;
+	}
+
+	glyph->width = width;
+	glyph->height = height;
+	glyph->pixel_mode = pixel_mode;
+
+	return glyph;
+}
+
+void Backend_FreeGlyph(Backend_Glyph *glyph)
+{
+	if (glyph == NULL)
+		return;
+
+	free(glyph->pixels);
+	free(glyph);
+}
+
+void Backend_LoadGlyphPixels(Backend_Glyph *glyph, const unsigned char *pixels, int pitch)
+{
+	if (glyph == NULL)
+		return;
+
+	const unsigned int width_in_bytes = (glyph->pixel_mode == FONT_PIXEL_MODE_LCD ? glyph->width * 3 : glyph->width);
+
+	switch (glyph->pixel_mode)
 	{
 		case FONT_PIXEL_MODE_LCD:
 		case FONT_PIXEL_MODE_GRAY:
 		{
-			glyph->pixels = malloc(width * height * sizeof(float));
-
-			if (glyph->pixels == NULL)
-			{
-				free(glyph);
-				return NULL;
-			}
-
 			float *destination_pointer = (float*)glyph->pixels;
 
-			for (unsigned int y = 0; y < height; ++y)
+			for (unsigned int y = 0; y < glyph->height; ++y)
 			{
 				const unsigned char *source_pointer = pixels + y * pitch;
 
-				for (unsigned int x = 0; x < width; ++x)
+				for (unsigned int x = 0; x < width_in_bytes; ++x)
 					*destination_pointer++ = *source_pointer++ / 255.0f;
 			}
 
@@ -295,40 +318,17 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 
 		case FONT_PIXEL_MODE_MONO:
 		{
-			glyph->pixels = malloc(width * height);
-
-			if (glyph->pixels == NULL)
-			{
-				free(glyph);
-				return NULL;
-			}
-
-			for (unsigned int y = 0; y < height; ++y)
+			for (unsigned int y = 0; y < glyph->height; ++y)
 			{
 				const unsigned char *source_pointer = pixels + y * pitch;
-				unsigned char *destination_pointer = (unsigned char*)glyph->pixels + y * width;
+				unsigned char *destination_pointer = (unsigned char*)glyph->pixels + y * width_in_bytes;
 
-				memcpy(destination_pointer, source_pointer, width);
+				memcpy(destination_pointer, source_pointer, width_in_bytes);
 			}
 
 			break;
 		}
 	}
-
-	glyph->width = (pixel_mode == FONT_PIXEL_MODE_LCD ? width / 3 : width);
-	glyph->height = height;
-	glyph->pixel_mode = pixel_mode;
-
-	return glyph;
-}
-
-void Backend_UnloadGlyph(Backend_Glyph *glyph)
-{
-	if (glyph == NULL)
-		return;
-
-	free(glyph->pixels);
-	free(glyph);
 }
 
 void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
