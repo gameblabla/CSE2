@@ -359,7 +359,7 @@ void BackupSurface(Surface_Ids surf_no, const RECT *rect)
 	RECT frameRect;
 	ScaleRect(rect, &frameRect);
 
-	Backend_Blit(surf[surf_no], &frameRect, framebuffer, frameRect.left, frameRect.top, FALSE);
+	Backend_Blit(framebuffer, &frameRect, surf[surf_no], frameRect.left, frameRect.top, FALSE);
 }
 
 static void DrawBitmap(const RECT *rcView, int x, int y, const RECT *rect, Surface_Ids surf_no, BOOL transparent)
