@@ -255,7 +255,7 @@ void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned cha
 	}
 }
 
-BOOL Backend_SupportsSubpixelGlyph(void)
+BOOL Backend_SupportsSubpixelGlyphs(void)
 {
 	return TRUE;	// It's a software renderer, baby
 }

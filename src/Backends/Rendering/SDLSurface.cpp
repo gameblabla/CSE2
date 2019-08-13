@@ -137,7 +137,7 @@ void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned cha
 	SDL_FillRect(surface->sdlsurface, &destination_rect, SDL_MapRGB(surface->sdlsurface->format, red, green, blue));
 }
 
-BOOL Backend_SupportsSubpixelGlyph(void)
+BOOL Backend_SupportsSubpixelGlyphs(void)
 {
 	return FALSE;	// SDL_Surfaces don't have per-component alpha
 }

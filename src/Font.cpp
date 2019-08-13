@@ -1058,7 +1058,7 @@ FontObject* LoadFontFromData(const unsigned char *data, size_t data_size, unsign
 	FT_Init_FreeType(&font_object->library);
 
 #ifndef DISABLE_FONT_ANTIALIASING
-	font_object->lcd_mode = Backend_SupportsSubpixelGlyph() && FT_Library_SetLcdFilter(font_object->library, FT_LCD_FILTER_DEFAULT) != FT_Err_Unimplemented_Feature;
+	font_object->lcd_mode = Backend_SupportsSubpixelGlyphs() && FT_Library_SetLcdFilter(font_object->library, FT_LCD_FILTER_DEFAULT) != FT_Err_Unimplemented_Feature;
 #endif
 
 	font_object->data = (unsigned char*)malloc(data_size);

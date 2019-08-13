@@ -623,7 +623,7 @@ void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned cha
 	vertex_buffer_slot->vertices[1][2].vertex_coordinate.y = vertex_bottom;
 }
 
-BOOL Backend_SupportsSubpixelGlyph(void)
+BOOL Backend_SupportsSubpixelGlyphs(void)
 {
 	return TRUE;
 }

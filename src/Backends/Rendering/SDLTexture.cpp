@@ -205,7 +205,7 @@ void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned cha
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 }
 
-BOOL Backend_SupportsSubpixelGlyph(void)
+BOOL Backend_SupportsSubpixelGlyphs(void)
 {
 	return FALSE;	// SDL_Textures don't have per-component alpha
 }
