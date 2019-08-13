@@ -56,38 +56,22 @@ Backend_Surface* Backend_Init(SDL_Window *window, unsigned int internal_screen_w
 		return FALSE;
 	}
 
-	framebuffer.pixels = (unsigned char*)malloc(internal_screen_width * internal_screen_height * 4);
-
-	if (framebuffer.pixels == NULL)
-	{
-		SDL_DestroyTexture(texture);
-		SDL_DestroyRenderer(renderer);
-		return FALSE;
-	}
+	SDL_LockTexture(texture, NULL, (void**)&framebuffer.pixels, (int*)&framebuffer.pitch);
 
 	framebuffer.width = internal_screen_width;
 	framebuffer.height = internal_screen_height;
-	framebuffer.pitch = internal_screen_width * 4;
 
 	return &framebuffer;
 }
 
 void Backend_Deinit(void)
 {
-	free(framebuffer.pixels);
 	SDL_DestroyTexture(texture);
 	SDL_DestroyRenderer(renderer);
 }
 
 void Backend_DrawScreen(void)
 {
-	unsigned char *pixels;
-	int pitch;
-	SDL_LockTexture(texture, NULL, (void**)&pixels, &pitch);
-
-	for (unsigned int i = 0; i < framebuffer.height; ++i)
-		memcpy(&pixels[i * pitch], &framebuffer.pixels[i * framebuffer.pitch], framebuffer.width * 4);
-
 	SDL_UnlockTexture(texture);
 
 	int renderer_width, renderer_height;
@@ -117,6 +101,8 @@ void Backend_DrawScreen(void)
 	SDL_RenderCopy(renderer, texture, NULL, &dst_rect);
 
 	SDL_RenderPresent(renderer);
+
+	SDL_LockTexture(texture, NULL, (void**)&framebuffer.pixels, (int*)&framebuffer.pitch);
 }
 
 Backend_Surface* Backend_CreateSurface(unsigned int width, unsigned int height)
