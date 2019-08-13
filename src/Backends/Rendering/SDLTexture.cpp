@@ -68,17 +68,11 @@ Backend_Surface* Backend_Init(SDL_Window *window, unsigned int internal_screen_w
 		return NULL;
 	}
 
-	// Set up our premultiplied-alpha blend mode
-	premultiplied_blend_mode = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
-
-	if (framebuffer.texture == NULL)
-	{
-		SDL_DestroyRenderer(renderer);
-		return NULL;
-	}
-
 	framebuffer.width = internal_screen_width;
 	framebuffer.height = internal_screen_height;
+
+	// Set up our premultiplied-alpha blend mode
+	premultiplied_blend_mode = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
 
 	return &framebuffer;
 }
