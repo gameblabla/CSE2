@@ -1151,6 +1151,10 @@ name = "TextScriptProc"
 addr = 0x422510
 
 [[func]]
+name = "RestoreTextScript"
+addr = 0x425790
+
+[[func]]
 name = "InitTriangleTable"
 addr = 0x4257F0
 
