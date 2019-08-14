@@ -90,8 +90,8 @@ enum MUSIC_IDS
 	mus_White = 0x29
 };
 
-#define SOUND_NO 0x100
-extern SOUNDBUFFER* lpSECONDARYBUFFER[SOUND_NO];
+#define SE_MAX 160	// According to the Organya source code release, this is the real name for this constant
+extern SOUNDBUFFER* lpSECONDARYBUFFER[SE_MAX];
 
 BOOL InitDirectSound();
 void EndDirectSound();
