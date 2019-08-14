@@ -1027,8 +1027,7 @@ static CachedGlyph* GetGlyphCached(FontObject *font_object, unsigned long unicod
 				break;
 		}
 
-		glyph->backend = Backend_CreateGlyph((pixel_mode == FT_PIXEL_MODE_LCD ? bitmap.width / 3 : bitmap.width), bitmap.rows, pixel_mode);
-		Backend_LoadGlyphPixels(glyph->backend, bitmap.buffer, bitmap.pitch);
+		glyph->backend = Backend_LoadGlyph(bitmap.buffer, bitmap.width, bitmap.rows, bitmap.pitch, pixel_mode);
 
 		FT_Bitmap_Done(font_object->library, &bitmap);
 	}
@@ -1043,7 +1042,7 @@ static void UnloadCachedGlyphs(FontObject *font_object)
 	{
 		CachedGlyph *next_glyph = glyph->next;
 
-		Backend_FreeGlyph(glyph->backend);
+		Backend_UnloadGlyph(glyph->backend);
 		free(glyph);
 
 		glyph = next_glyph;

@@ -24,7 +24,6 @@ typedef struct Backend_Surface
 typedef struct Backend_Glyph
 {
 	Backend_Surface *surface;
-	unsigned char pixel_mode;
 } Backend_Glyph;
 
 static SDL_Renderer *renderer;
@@ -151,10 +150,10 @@ void Backend_UnlockSurface(Backend_Surface *surface)
 		const unsigned char *src_pixel = surface->pixels;
 
 		// Convert the SDL_Surface's colour-keyed pixels to RGBA32
-		for (unsigned int y = 0; y < surface->height; ++y)
+		for (int y = 0; y < surface->height; ++y)
 		{
 
-			for (unsigned int x = 0; x < surface->width; ++x)
+			for (int x = 0; x < surface->width; ++x)
 			{
 				*buffer_pointer++ = src_pixel[0];
 				*buffer_pointer++ = src_pixel[1];
@@ -219,7 +218,7 @@ BOOL Backend_SupportsSubpixelGlyphs(void)
 	return FALSE;	// SDL_Textures don't have per-component alpha
 }
 
-Backend_Glyph* Backend_CreateGlyph(unsigned int width, unsigned int height, unsigned char pixel_mode)
+Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch, unsigned char pixel_mode)
 {
 	Backend_Glyph *glyph = (Backend_Glyph*)malloc(sizeof(Backend_Glyph));
 
@@ -234,39 +233,20 @@ Backend_Glyph* Backend_CreateGlyph(unsigned int width, unsigned int height, unsi
 		return NULL;
 	}
 
-	glyph->pixel_mode = pixel_mode;
-
-	return glyph;
-}
-
-void Backend_FreeGlyph(Backend_Glyph *glyph)
-{
-	if (glyph == NULL)
-		return;
-
-	Backend_FreeSurface(glyph->surface);
-	free(glyph);
-}
-
-void Backend_LoadGlyphPixels(Backend_Glyph *glyph, const unsigned char *pixels, int pitch)
-{
-	if (glyph == NULL)
-		return;
-
 	unsigned int surface_pitch;
 	unsigned char *surface_pixels = Backend_LockSurface(glyph->surface, &surface_pitch);
 
-	switch (glyph->pixel_mode)
+	switch (pixel_mode)
 	{
 		// FONT_PIXEL_MODE_LCD is unsupported
 
 		case FONT_PIXEL_MODE_GRAY:
-			for (unsigned int y = 0; y < glyph->surface->height; ++y)
+			for (unsigned int y = 0; y < height; ++y)
 			{
 				const unsigned char *source_pointer = pixels + y * pitch;
 				unsigned char *destination_pointer = surface_pixels + y * surface_pitch;
 
-				for (unsigned int x = 0; x < glyph->surface->width; ++x)
+				for (unsigned int x = 0; x < width; ++x)
 				{
 					*destination_pointer++ = 0xFF;
 					*destination_pointer++ = 0xFF;
@@ -278,12 +258,12 @@ void Backend_LoadGlyphPixels(Backend_Glyph *glyph, const unsigned char *pixels, 
 			break;
 
 		case FONT_PIXEL_MODE_MONO:
-			for (unsigned int y = 0; y < glyph->surface->height; ++y)
+			for (unsigned int y = 0; y < height; ++y)
 			{
 				const unsigned char *source_pointer = pixels + y * pitch;
 				unsigned char *destination_pointer = surface_pixels + y * surface_pitch;
 
-				for (unsigned int x = 0; x < glyph->surface->width; ++x)
+				for (unsigned int x = 0; x < width; ++x)
 				{
 					*destination_pointer++ = 0xFF;
 					*destination_pointer++ = 0xFF;
@@ -296,6 +276,17 @@ void Backend_LoadGlyphPixels(Backend_Glyph *glyph, const unsigned char *pixels, 
 	}
 
 	Backend_UnlockSurface(glyph->surface);
+
+	return glyph;
+}
+
+void Backend_UnloadGlyph(Backend_Glyph *glyph)
+{
+	if (glyph == NULL)
+		return;
+
+	Backend_FreeSurface(glyph->surface);
+	free(glyph);
 }
 
 void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
