@@ -641,7 +641,7 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-	glyph->width = (pixel_mode == FONT_PIXEL_MODE_LCD ? width / 3 : width);
+	glyph->width = width;
 	glyph->height = height;
 	glyph->pixel_mode = pixel_mode;
 

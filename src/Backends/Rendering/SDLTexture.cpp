@@ -251,10 +251,12 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 
 				for (unsigned int x = 0; x < width; ++x)
 				{
-					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = *source_pointer++;
+					const unsigned char alpha = *source_pointer++;
+
+					*destination_pointer++ = alpha;
+					*destination_pointer++ = alpha;
+					*destination_pointer++ = alpha;
+					*destination_pointer++ = alpha;
 				}
 			}
 
@@ -267,10 +269,12 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 
 				for (unsigned int x = 0; x < width; ++x)
 				{
-					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = *source_pointer++ ? 0xFF : 0;
+					const unsigned char alpha = *source_pointer++ ? 0xFF : 0;
+
+					*destination_pointer++ = alpha;
+					*destination_pointer++ = alpha;
+					*destination_pointer++ = alpha;
+					*destination_pointer++ = alpha;
 				}
 			}
 
@@ -303,7 +307,7 @@ void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, l
 
 	// Blit the texture
 	SDL_SetTextureColorMod(glyph->texture, colours[0], colours[1], colours[2]);
-	SDL_SetTextureBlendMode(glyph->texture, SDL_BLENDMODE_BLEND);
+	SDL_SetTextureBlendMode(glyph->texture, premultiplied_blend_mode);
 	SDL_SetRenderTarget(renderer, surface->texture);
 	SDL_RenderCopy(renderer, glyph->texture, NULL, &destination_rect);
 }
