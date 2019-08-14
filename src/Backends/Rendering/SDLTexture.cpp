@@ -14,7 +14,6 @@
 
 typedef struct Backend_Surface
 {
-	BOOL alpha;
 	SDL_Texture *texture;
 	unsigned char *pixels;
 	unsigned int width;
@@ -23,7 +22,9 @@ typedef struct Backend_Surface
 
 typedef struct Backend_Glyph
 {
-	Backend_Surface *surface;
+	SDL_Texture *texture;
+	unsigned int width;
+	unsigned int height;
 } Backend_Glyph;
 
 static SDL_Renderer *renderer;
@@ -66,7 +67,6 @@ Backend_Surface* Backend_Init(SDL_Window *window)
 		return NULL;
 	}
 
-	framebuffer.alpha = TRUE;
 	framebuffer.width = width;
 	framebuffer.height = height;
 
@@ -86,7 +86,7 @@ void Backend_DrawScreen(void)
 	SDL_RenderPresent(renderer);
 }
 
-static Backend_Surface* CreateSurface(unsigned int width, unsigned int height, BOOL alpha)
+Backend_Surface* Backend_CreateSurface(unsigned int width, unsigned int height)
 {
 	Backend_Surface *surface = (Backend_Surface*)malloc(sizeof(Backend_Surface));
 
@@ -101,16 +101,10 @@ static Backend_Surface* CreateSurface(unsigned int width, unsigned int height, B
 		return NULL;
 	}
 
-	surface->alpha = alpha;
 	surface->width = width;
 	surface->height = height;
 
 	return surface;
-}
-
-Backend_Surface* Backend_CreateSurface(unsigned int width, unsigned int height)
-{
-	return CreateSurface(width, height, FALSE);
 }
 
 void Backend_FreeSurface(Backend_Surface *surface)
@@ -127,9 +121,9 @@ unsigned char* Backend_LockSurface(Backend_Surface *surface, unsigned int *pitch
 	if (surface == NULL)
 		return NULL;
 
-	*pitch = surface->width * (surface->alpha ? 4 : 3);
+	*pitch = surface->width * 3;
 
-	surface->pixels = (unsigned char*)malloc(surface->height * *pitch);
+	surface->pixels = (unsigned char*)malloc(surface->width * surface->height * 3);
 
 	return surface->pixels;
 }
@@ -139,41 +133,34 @@ void Backend_UnlockSurface(Backend_Surface *surface)
 	if (surface == NULL)
 		return;
 
-	if (surface->alpha)
-	{
-		SDL_UpdateTexture(surface->texture, NULL, surface->pixels, surface->width * 4);
-	}
-	else
-	{
-		unsigned char *buffer = (unsigned char*)malloc(surface->width * surface->height * 4);
-		unsigned char *buffer_pointer = buffer;
-		const unsigned char *src_pixel = surface->pixels;
+	unsigned char *buffer = (unsigned char*)malloc(surface->width * surface->height * 4);
+	unsigned char *buffer_pointer = buffer;
+	const unsigned char *src_pixel = surface->pixels;
 
-		// Convert the SDL_Surface's colour-keyed pixels to RGBA32
-		for (int y = 0; y < surface->height; ++y)
+	// Convert the SDL_Surface's colour-keyed pixels to RGBA32
+	for (int y = 0; y < surface->height; ++y)
+	{
+
+		for (int x = 0; x < surface->width; ++x)
 		{
+			*buffer_pointer++ = src_pixel[0];
+			*buffer_pointer++ = src_pixel[1];
+			*buffer_pointer++ = src_pixel[2];
 
-			for (int x = 0; x < surface->width; ++x)
-			{
-				*buffer_pointer++ = src_pixel[0];
-				*buffer_pointer++ = src_pixel[1];
-				*buffer_pointer++ = src_pixel[2];
+			if (src_pixel[0] == 0 && src_pixel[1] == 0 && src_pixel[2] == 0)	// Assumes the colour key will always be #000000 (black)
+				*buffer_pointer++ = 0;
+			else
+				*buffer_pointer++ = 0xFF;
 
-				if (src_pixel[0] == 0 && src_pixel[1] == 0 && src_pixel[2] == 0)	// Assumes the colour key will always be #000000 (black)
-					*buffer_pointer++ = 0;
-				else
-					*buffer_pointer++ = 0xFF;
-
-				src_pixel += 3;
-			}
+			src_pixel += 3;
 		}
-
-		SDL_UpdateTexture(surface->texture, NULL, buffer, surface->width * 4);
-
-		free(buffer);
 	}
 
 	free(surface->pixels);
+
+	SDL_UpdateTexture(surface->texture, NULL, buffer, surface->width * 4);
+
+	free(buffer);
 }
 
 void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL colour_key)
@@ -225,26 +212,34 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 	if (glyph == NULL)
 		return NULL;
 
-	glyph->surface = CreateSurface(width, height, TRUE);
+	glyph->texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STATIC, width, height);
 
-	if (glyph->surface == NULL)
+	if (glyph->texture == NULL)
 	{
 		free(glyph);
 		return NULL;
 	}
 
-	unsigned int surface_pitch;
-	unsigned char *surface_pixels = Backend_LockSurface(glyph->surface, &surface_pitch);
+	unsigned char *buffer = (unsigned char*)malloc(width * height * 4);
+
+	if (buffer == NULL)
+	{
+		SDL_DestroyTexture(glyph->texture);
+		free(glyph);
+		return NULL;
+	}
+
+	unsigned char *destination_pointer = buffer;
 
 	switch (pixel_mode)
 	{
 		// FONT_PIXEL_MODE_LCD is unsupported
 
 		case FONT_PIXEL_MODE_GRAY:
+
 			for (unsigned int y = 0; y < height; ++y)
 			{
 				const unsigned char *source_pointer = pixels + y * pitch;
-				unsigned char *destination_pointer = surface_pixels + y * surface_pitch;
 
 				for (unsigned int x = 0; x < width; ++x)
 				{
@@ -261,7 +256,6 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 			for (unsigned int y = 0; y < height; ++y)
 			{
 				const unsigned char *source_pointer = pixels + y * pitch;
-				unsigned char *destination_pointer = surface_pixels + y * surface_pitch;
 
 				for (unsigned int x = 0; x < width; ++x)
 				{
@@ -275,7 +269,10 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 			break;
 	}
 
-	Backend_UnlockSurface(glyph->surface);
+	SDL_UpdateTexture(glyph->texture, NULL, buffer, width * 4);
+
+	glyph->width = width;
+	glyph->height = height;
 
 	return glyph;
 }
@@ -285,7 +282,7 @@ void Backend_UnloadGlyph(Backend_Glyph *glyph)
 	if (glyph == NULL)
 		return;
 
-	Backend_FreeSurface(glyph->surface);
+	SDL_DestroyTexture(glyph->texture);
 	free(glyph);
 }
 
@@ -297,20 +294,18 @@ void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, l
 	if (glyph == NULL || surface == NULL)
 		return;
 
-	RECT rect;
-	rect.left = 0;
-	rect.top = 0;
-	rect.right = glyph->surface->width;
-	rect.bottom = glyph->surface->height;
+	SDL_Rect destination_rect = {(int)x, (int)y, glyph->width, glyph->height};
 
-	SDL_SetTextureColorMod(glyph->surface->texture, colours[0], colours[1], colours[2]);
-
-	Backend_Blit(glyph->surface, &rect, surface, x, y, TRUE);
+	// Blit the texture
+	SDL_SetTextureColorMod(glyph->texture, colours[0], colours[1], colours[2]);
+	SDL_SetTextureBlendMode(glyph->texture, SDL_BLENDMODE_BLEND);
+	SDL_SetRenderTarget(renderer, surface->texture);
+	SDL_RenderCopy(renderer, glyph->texture, NULL, &destination_rect);
 }
 
 void Backend_HandleDeviceLoss(void)
 {
-	// All of our textures have been lost, so regenerate them
+	// All of our target-textures have been lost, so regenerate them
 	RestoreSurfaces();
 	RestoreStripper();
 	RestoreMapName();
