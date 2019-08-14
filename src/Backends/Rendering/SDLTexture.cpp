@@ -303,7 +303,7 @@ void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, l
 	if (glyph == NULL || surface == NULL)
 		return;
 
-	SDL_Rect destination_rect = {(int)x, (int)y, glyph->width, glyph->height};
+	SDL_Rect destination_rect = {(int)x, (int)y, (int)glyph->width, (int)glyph->height};
 
 	// Blit the texture
 	SDL_SetTextureColorMod(glyph->texture, colours[0], colours[1], colours[2]);
