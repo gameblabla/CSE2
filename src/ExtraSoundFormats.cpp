@@ -27,7 +27,7 @@ typedef struct SFX
 static Song song;
 static Song previous_song;
 
-static SFX *sfx_list[SOUND_NO];
+static SFX *sfx_list[SE_MAX];
 
 static bool playing = true;
 
@@ -54,7 +54,7 @@ void ExtraSound_Deinit(void)
 	}
 
 	// Free SFX
-	for (unsigned int i = 0; i < SOUND_NO; ++i)
+	for (unsigned int i = 0; i < SE_MAX; ++i)
 	{
 		if (sfx_list[i])
 		{

@@ -211,21 +211,21 @@ if(OGG_AUDIO OR FLAC_AUDIO OR TRACKER_AUDIO OR PXTONE_AUDIO)
 	target_sources(CSE2 PRIVATE
 		src/ExtraSoundFormats.cpp
 		src/ExtraSoundFormats.h
-		src/audio_lib/decoder.c
-		src/audio_lib/decoder.h
-		src/audio_lib/miniaudio.c
-		src/audio_lib/miniaudio.h
-		src/audio_lib/mixer.c
-		src/audio_lib/mixer.h
-		src/audio_lib/decoders/common.h
-		src/audio_lib/decoders/memory_file.c
-		src/audio_lib/decoders/memory_file.h
-		src/audio_lib/decoders/misc_utilities.c
-		src/audio_lib/decoders/misc_utilities.h
-		src/audio_lib/decoders/predecode.c
-		src/audio_lib/decoders/predecode.h
-		src/audio_lib/decoders/split.c
-		src/audio_lib/decoders/split.h
+		external/audio_lib/decoder.c
+		external/audio_lib/decoder.h
+		external/audio_lib/miniaudio.c
+		external/audio_lib/miniaudio.h
+		external/audio_lib/mixer.c
+		external/audio_lib/mixer.h
+		external/audio_lib/decoders/common.h
+		external/audio_lib/decoders/memory_file.c
+		external/audio_lib/decoders/memory_file.h
+		external/audio_lib/decoders/misc_utilities.c
+		external/audio_lib/decoders/misc_utilities.h
+		external/audio_lib/decoders/predecode.c
+		external/audio_lib/decoders/predecode.h
+		external/audio_lib/decoders/split.c
+		external/audio_lib/decoders/split.h
 	)
 
 	target_compile_definitions(CSE2 PRIVATE EXTRA_SOUND_FORMATS)
@@ -233,9 +233,9 @@ endif()
 
 if(OGG_AUDIO)
 	target_sources(CSE2 PRIVATE
-		src/audio_lib/decoders/stb_vorbis.c
-		src/audio_lib/decoders/stb_vorbis.h
-		src/audio_lib/decoders/libs/stb_vorbis.h
+		external/audio_lib/decoders/stb_vorbis.c
+		external/audio_lib/decoders/stb_vorbis.h
+		external/audio_lib/decoders/libs/stb_vorbis.h
 	)
 
 	target_compile_definitions(CSE2 PRIVATE USE_STB_VORBIS)
@@ -243,9 +243,9 @@ endif()
 
 if(FLAC_AUDIO)
 	target_sources(CSE2 PRIVATE
-		src/audio_lib/decoders/dr_flac.c
-		src/audio_lib/decoders/dr_flac.h
-		src/audio_lib/decoders/libs/dr_flac.h
+		external/audio_lib/decoders/dr_flac.c
+		external/audio_lib/decoders/dr_flac.h
+		external/audio_lib/decoders/libs/dr_flac.h
 	)
 
 	target_compile_definitions(CSE2 PRIVATE USE_DR_FLAC)
@@ -253,8 +253,8 @@ endif()
 
 if(TRACKER_AUDIO)
 	target_sources(CSE2 PRIVATE
-		src/audio_lib/decoders/libxmp-lite.c
-		src/audio_lib/decoders/libxmp-lite.h
+		external/audio_lib/decoders/libxmp-lite.c
+		external/audio_lib/decoders/libxmp-lite.h
 	)
 
 	target_compile_definitions(CSE2 PRIVATE USE_LIBXMPLITE)
@@ -262,51 +262,51 @@ endif()
 
 if(PXTONE_AUDIO)
 	target_sources(CSE2 PRIVATE
-		src/audio_lib/decoders/pxtone.c
-		src/audio_lib/decoders/pxtone.h
-		src/audio_lib/decoders/libs/pxtone/pxtn.h
-		src/audio_lib/decoders/libs/pxtone/pxtnDelay.cpp
-		src/audio_lib/decoders/libs/pxtone/pxtnDelay.h
-		src/audio_lib/decoders/libs/pxtone/pxtnDescriptor.cpp
-		src/audio_lib/decoders/libs/pxtone/pxtnDescriptor.h
-		src/audio_lib/decoders/libs/pxtone/pxtnError.cpp
-		src/audio_lib/decoders/libs/pxtone/pxtnError.h
-		src/audio_lib/decoders/libs/pxtone/pxtnEvelist.cpp
-		src/audio_lib/decoders/libs/pxtone/pxtnEvelist.h
-		src/audio_lib/decoders/libs/pxtone/pxtnMaster.cpp
-		src/audio_lib/decoders/libs/pxtone/pxtnMaster.h
-		src/audio_lib/decoders/libs/pxtone/pxtnMax.h
-		src/audio_lib/decoders/libs/pxtone/pxtnMem.cpp
-		src/audio_lib/decoders/libs/pxtone/pxtnMem.h
-		src/audio_lib/decoders/libs/pxtone/pxtnOverDrive.cpp
-		src/audio_lib/decoders/libs/pxtone/pxtnOverDrive.h
-		src/audio_lib/decoders/libs/pxtone/pxtnPulse_Frequency.cpp
-		src/audio_lib/decoders/libs/pxtone/pxtnPulse_Frequency.h
-		src/audio_lib/decoders/libs/pxtone/pxtnPulse_Noise.cpp
-		src/audio_lib/decoders/libs/pxtone/pxtnPulse_Noise.h
-		src/audio_lib/decoders/libs/pxtone/pxtnPulse_NoiseBuilder.cpp
-		src/audio_lib/decoders/libs/pxtone/pxtnPulse_NoiseBuilder.h
-		src/audio_lib/decoders/libs/pxtone/pxtnPulse_Oggv.cpp
-		src/audio_lib/decoders/libs/pxtone/pxtnPulse_Oggv.h
-		src/audio_lib/decoders/libs/pxtone/pxtnPulse_Oscillator.cpp
-		src/audio_lib/decoders/libs/pxtone/pxtnPulse_Oscillator.h
-		src/audio_lib/decoders/libs/pxtone/pxtnPulse_PCM.cpp
-		src/audio_lib/decoders/libs/pxtone/pxtnPulse_PCM.h
-		src/audio_lib/decoders/libs/pxtone/pxtnService.cpp
-		src/audio_lib/decoders/libs/pxtone/pxtnService.h
-		src/audio_lib/decoders/libs/pxtone/pxtnService_moo.cpp
-		src/audio_lib/decoders/libs/pxtone/pxtnText.cpp
-		src/audio_lib/decoders/libs/pxtone/pxtnText.h
-		src/audio_lib/decoders/libs/pxtone/pxtnUnit.cpp
-		src/audio_lib/decoders/libs/pxtone/pxtnUnit.h
-		src/audio_lib/decoders/libs/pxtone/pxtnWoice.cpp
-		src/audio_lib/decoders/libs/pxtone/pxtnWoice.h
-		src/audio_lib/decoders/libs/pxtone/pxtnWoice_io.cpp
-		src/audio_lib/decoders/libs/pxtone/pxtnWoicePTV.cpp
-		src/audio_lib/decoders/libs/pxtone/pxtoneNoise.cpp
-		src/audio_lib/decoders/libs/pxtone/pxtoneNoise.h
-		src/audio_lib/decoders/libs/pxtone/shim.cpp
-		src/audio_lib/decoders/libs/pxtone/shim.h
+		external/audio_lib/decoders/pxtone.c
+		external/audio_lib/decoders/pxtone.h
+		external/audio_lib/decoders/libs/pxtone/pxtn.h
+		external/audio_lib/decoders/libs/pxtone/pxtnDelay.cpp
+		external/audio_lib/decoders/libs/pxtone/pxtnDelay.h
+		external/audio_lib/decoders/libs/pxtone/pxtnDescriptor.cpp
+		external/audio_lib/decoders/libs/pxtone/pxtnDescriptor.h
+		external/audio_lib/decoders/libs/pxtone/pxtnError.cpp
+		external/audio_lib/decoders/libs/pxtone/pxtnError.h
+		external/audio_lib/decoders/libs/pxtone/pxtnEvelist.cpp
+		external/audio_lib/decoders/libs/pxtone/pxtnEvelist.h
+		external/audio_lib/decoders/libs/pxtone/pxtnMaster.cpp
+		external/audio_lib/decoders/libs/pxtone/pxtnMaster.h
+		external/audio_lib/decoders/libs/pxtone/pxtnMax.h
+		external/audio_lib/decoders/libs/pxtone/pxtnMem.cpp
+		external/audio_lib/decoders/libs/pxtone/pxtnMem.h
+		external/audio_lib/decoders/libs/pxtone/pxtnOverDrive.cpp
+		external/audio_lib/decoders/libs/pxtone/pxtnOverDrive.h
+		external/audio_lib/decoders/libs/pxtone/pxtnPulse_Frequency.cpp
+		external/audio_lib/decoders/libs/pxtone/pxtnPulse_Frequency.h
+		external/audio_lib/decoders/libs/pxtone/pxtnPulse_Noise.cpp
+		external/audio_lib/decoders/libs/pxtone/pxtnPulse_Noise.h
+		external/audio_lib/decoders/libs/pxtone/pxtnPulse_NoiseBuilder.cpp
+		external/audio_lib/decoders/libs/pxtone/pxtnPulse_NoiseBuilder.h
+		external/audio_lib/decoders/libs/pxtone/pxtnPulse_Oggv.cpp
+		external/audio_lib/decoders/libs/pxtone/pxtnPulse_Oggv.h
+		external/audio_lib/decoders/libs/pxtone/pxtnPulse_Oscillator.cpp
+		external/audio_lib/decoders/libs/pxtone/pxtnPulse_Oscillator.h
+		external/audio_lib/decoders/libs/pxtone/pxtnPulse_PCM.cpp
+		external/audio_lib/decoders/libs/pxtone/pxtnPulse_PCM.h
+		external/audio_lib/decoders/libs/pxtone/pxtnService.cpp
+		external/audio_lib/decoders/libs/pxtone/pxtnService.h
+		external/audio_lib/decoders/libs/pxtone/pxtnService_moo.cpp
+		external/audio_lib/decoders/libs/pxtone/pxtnText.cpp
+		external/audio_lib/decoders/libs/pxtone/pxtnText.h
+		external/audio_lib/decoders/libs/pxtone/pxtnUnit.cpp
+		external/audio_lib/decoders/libs/pxtone/pxtnUnit.h
+		external/audio_lib/decoders/libs/pxtone/pxtnWoice.cpp
+		external/audio_lib/decoders/libs/pxtone/pxtnWoice.h
+		external/audio_lib/decoders/libs/pxtone/pxtnWoice_io.cpp
+		external/audio_lib/decoders/libs/pxtone/pxtnWoicePTV.cpp
+		external/audio_lib/decoders/libs/pxtone/pxtoneNoise.cpp
+		external/audio_lib/decoders/libs/pxtone/pxtoneNoise.h
+		external/audio_lib/decoders/libs/pxtone/shim.cpp
+		external/audio_lib/decoders/libs/pxtone/shim.h
 	)
 
 	target_compile_definitions(CSE2 PRIVATE USE_PXTONE)
