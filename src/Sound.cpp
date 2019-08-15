@@ -263,7 +263,8 @@ void EndDirectSound()
 	EndOrganya();
 
 	for (unsigned int i = 0; i < SE_MAX; ++i)
-		lpSECONDARYBUFFER[i]->Release();
+		if (lpSECONDARYBUFFER[i])
+			lpSECONDARYBUFFER[i]->Release();
 
 	SDL_QuitSubSystem(SDL_INIT_AUDIO);
 
