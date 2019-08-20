@@ -213,6 +213,7 @@ ifeq ($(RENDERER), OpenGL3)
 	CXXFLAGS += `pkg-config glew --cflags`
 
 	ifeq ($(STATIC), 1)
+		CXXFLAGS += -DGLEW_STATIC
 		LIBS += `pkg-config glew --libs --static`
 	else
 		LIBS += `pkg-config glew --libs`
