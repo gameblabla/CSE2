@@ -174,13 +174,13 @@ void main() \
 static void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void* userParam)
 {
 	(void)source;
+	(void)type;
 	(void)id;
-	(void)severity;
 	(void)length;
 	(void)userParam;
 
-	if (type == GL_DEBUG_TYPE_ERROR)
-		printf("OpenGL error: %s\n", message);
+	if (severity != GL_DEBUG_SEVERITY_NOTIFICATION)
+		printf("OpenGL debug: %s\n", message);
 }
 
 static GLuint CompileShader(const char *vertex_shader_source, const char *fragment_shader_source)
