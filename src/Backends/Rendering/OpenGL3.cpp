@@ -106,7 +106,7 @@ in vec2 texture_coordinates; \
 out vec4 fragment; \
 void main() \
 { \
-	fragment = texture2D(tex, texture_coordinates); \
+	fragment = texture(tex, texture_coordinates); \
 } \
 ";
 
@@ -117,7 +117,7 @@ in vec2 texture_coordinates; \
 out vec4 fragment; \
 void main() \
 { \
-	vec4 colour = texture2D(tex, texture_coordinates); \
+	vec4 colour = texture(tex, texture_coordinates); \
 \
 	if (colour.xyz == vec3(0.0f, 0.0f, 0.0f)) \
 		discard; \
@@ -144,7 +144,7 @@ in vec2 texture_coordinates; \
 out vec4 fragment; \
 void main() \
 { \
-	fragment = colour * vec4(1.0, 1.0, 1.0, texture2D(tex, texture_coordinates).r); \
+	fragment = colour * vec4(1.0, 1.0, 1.0, texture(tex, texture_coordinates).r); \
 } \
 ";
 
@@ -155,7 +155,7 @@ in vec2 texture_coordinates; \
 out vec4 fragment; \
 void main() \
 { \
-	fragment = texture2D(tex, texture_coordinates); \
+	fragment = texture(tex, texture_coordinates); \
 } \
 ";
 
@@ -167,7 +167,7 @@ in vec2 texture_coordinates; \
 out vec4 fragment; \
 void main() \
 { \
-	fragment = colour * texture2D(tex, texture_coordinates); \
+	fragment = colour * texture(tex, texture_coordinates); \
 } \
 ";
 
