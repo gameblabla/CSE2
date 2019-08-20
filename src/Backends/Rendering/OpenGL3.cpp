@@ -101,7 +101,7 @@ in vec2 texture_coordinates; \
 out vec4 fragment; \
 void main() \
 { \
-	fragment = texture2D(tex, texture_coordinates); \
+	fragment = texture(tex, texture_coordinates); \
 } \
 ";
 
@@ -123,7 +123,7 @@ in vec2 texture_coordinates; \
 out vec4 fragment; \
 void main() \
 { \
-	float alpha = texture2D(tex, texture_coordinates).r; \
+	float alpha = texture(tex, texture_coordinates).r; \
 	fragment = colour * vec4(alpha, alpha, alpha, alpha); \
 } \
 ";
@@ -131,13 +131,13 @@ void main() \
 static void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void* userParam)
 {
 	(void)source;
+	(void)type;
 	(void)id;
-	(void)severity;
 	(void)length;
 	(void)userParam;
 
-	if (type == GL_DEBUG_TYPE_ERROR)
-		printf("OpenGL error: %s\n", message);
+	if (severity != GL_DEBUG_SEVERITY_NOTIFICATION)
+		printf("OpenGL debug: %s\n", message);
 }
 
 static GLuint CompileShader(const char *vertex_shader_source, const char *fragment_shader_source)
