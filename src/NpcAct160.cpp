@@ -21,7 +21,7 @@ void ActNpc160(NPCHAR *npc)
 	switch (npc->act_no)
 	{
 		case 0:
-			npc->bits &= ~1;
+			npc->bits &= ~NPC_SOLID_SOFT;
 			npc->act_no = 1;
 			// Fallthrough
 		case 1:
@@ -38,7 +38,7 @@ void ActNpc160(NPCHAR *npc)
 			}
 			else
 			{
-				npc->bits &= ~8;
+				npc->bits &= ~NPC_IGNORE_SOLIDITY;
 				npc->act_no = 2;
 			}
 
@@ -94,7 +94,7 @@ void ActNpc160(NPCHAR *npc)
 					npc->count1 = 0;
 					npc->act_no = 5;
 					npc->ym = -0xC00;
-					npc->bits |= 8;
+					npc->bits |= NPC_IGNORE_SOLIDITY;
 				}
 			}
 
@@ -205,8 +205,8 @@ void ActNpc161(NPCHAR *npc)
 
 	if (npc->life < 100)
 	{
-		npc->bits &= ~0x20;
-		npc->bits &= ~4;
+		npc->bits &= ~NPC_SHOOTABLE;
+		npc->bits &= ~NPC_INVULNERABLE;
 		npc->damage = 0;
 		npc->ani_no = 2;
 	}
@@ -1321,7 +1321,7 @@ void ActNpc175(NPCHAR *npc)
 		LoseNpChar(npc, 0);
 		npc->act_no = 10;
 		npc->ani_no = 1;
-		npc->bits &= ~0x20;
+		npc->bits &= ~NPC_SHOOTABLE;
 		npc->damage = 0;
 	}
 
@@ -1371,7 +1371,7 @@ void ActNpc176(NPCHAR *npc)
 		LoseNpChar(npc, 0);
 		npc->act_no = 10;
 		npc->ani_no = 2;
-		npc->bits &= ~0x20;
+		npc->bits &= ~NPC_SHOOTABLE;
 		npc->damage = 0;
 	}
 

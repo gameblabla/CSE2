@@ -678,7 +678,7 @@ void ActNpc046(NPCHAR *npc)
 {
 	RECT rect = {0, 0, 16, 16};
 
-	npc->bits |= 0x100;
+	npc->bits |= NPC_EVENT_WHEN_TOUCHED;
 
 	if (npc->direct == 0)
 	{
@@ -708,10 +708,10 @@ void ActNpc047(NPCHAR *npc)
 			npc->act_no = 1;
 			npc->act_wait = 0;
 			npc->tgt_y = npc->y;
-			npc->bits &= ~0x20;
-			npc->bits &= ~4;
-			npc->bits &= ~1;
-			npc->bits &= ~8;
+			npc->bits &= ~NPC_SHOOTABLE;
+			npc->bits &= ~NPC_INVULNERABLE;
+			npc->bits &= ~NPC_SOLID_SOFT;
+			npc->bits &= ~NPC_IGNORE_SOLIDITY;
 			// Fallthrough
 		case 1:
 			if (gMC.x > npc->x - 0x1000 && gMC.x < npc->x + 0x1000 && gMC.y > npc->y && gMC.y < npc->y + 0x1000)
@@ -741,7 +741,7 @@ void ActNpc047(NPCHAR *npc)
 
 			if (npc->ani_no == 4)
 			{
-				npc->bits |= 0x20;
+				npc->bits |= NPC_SHOOTABLE;
 				npc->act_no = 3;
 				npc->act_wait = 0;
 			}
@@ -749,7 +749,7 @@ void ActNpc047(NPCHAR *npc)
 			break;
 
 		case 3:
-			npc->bits |= 1;
+			npc->bits |= NPC_SOLID_SOFT;
 			npc->damage = 0;
 			++npc->act_wait;
 
@@ -762,13 +762,13 @@ void ActNpc047(NPCHAR *npc)
 			break;
 
 		case 4:
-			npc->bits |= 8;
+			npc->bits |= NPC_IGNORE_SOLIDITY;
 			npc->y += 0x200;
 
 			if (++npc->act_wait == 32)
 			{
-				npc->bits &= ~1;
-				npc->bits &= ~0x20;
+				npc->bits &= ~NPC_SOLID_SOFT;
+				npc->bits &= ~NPC_SHOOTABLE;
 				npc->act_no = 5;
 				npc->act_wait = 0;
 			}
@@ -827,8 +827,8 @@ void ActNpc048(NPCHAR *npc)
 
 	if (npc->direct == 2)
 	{
-		npc->bits &= ~npc_shootable;
-		npc->bits |= npc_invulnerable;
+		npc->bits &= ~NPC_SHOOTABLE;
+		npc->bits |= NPC_INVULNERABLE;
 	}
 
 	npc->ym += 5;
@@ -1808,7 +1808,7 @@ void ActNpc058(NPCHAR *npc)
 		case 0:
 			if (gMC.x < npc->x + 0x2000 && gMC.x > npc->x - 0x2000)
 			{
-				npc->bits |= 0x20;
+				npc->bits |= NPC_SHOOTABLE;
 				npc->ym = -0x100;
 				npc->tgt_x = npc->x;
 				npc->tgt_y = npc->y;
@@ -1835,7 +1835,7 @@ void ActNpc058(NPCHAR *npc)
 				npc->damage = 0;
 				npc->xm = 0;
 				npc->ym = 0;
-				npc->bits &= ~0x20;
+				npc->bits &= ~NPC_SHOOTABLE;
 			}
 
 			break;

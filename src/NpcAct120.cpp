@@ -185,7 +185,7 @@ void ActNpc122(NPCHAR *npc)
 			}
 			else
 			{
-				npc->bits |= 0x20;
+				npc->bits |= NPC_SHOOTABLE;
 				npc->act_no = 15;
 				npc->ani_no = 2;
 				npc->ym = -0x200;
@@ -197,7 +197,7 @@ void ActNpc122(NPCHAR *npc)
 		case 15:
 			if (npc->flag & 8)
 			{
-				npc->bits |= 0x20;
+				npc->bits |= NPC_SHOOTABLE;
 				npc->xm = 0;
 				npc->act_no = 10;
 				npc->damage = 0;
@@ -229,7 +229,7 @@ void ActNpc122(NPCHAR *npc)
 			}
 			else
 			{
-				npc->bits |= 0x20;
+				npc->bits |= NPC_SHOOTABLE;
 				npc->life = 1000;
 				npc->act_no = 11;
 				npc->act_wait = Random(0, 50);
@@ -244,7 +244,7 @@ void ActNpc122(NPCHAR *npc)
 		npc->act_no = 20;
 		npc->ym = -0x200;
 		npc->ani_no = Random(6, 7);
-		npc->bits &= ~0x20;
+		npc->bits &= ~NPC_SHOOTABLE;
 	}
 
 	npc->ym += 0x20;
@@ -366,7 +366,7 @@ void ActNpc124(NPCHAR *npc)
 			npc->y += 0x1000;
 			// Fallthrough
 		case 1:
-			npc->bits &= ~8;
+			npc->bits &= ~NPC_IGNORE_SOLIDITY;
 			npc->ani_no = 0;
 			break;
 
@@ -374,7 +374,7 @@ void ActNpc124(NPCHAR *npc)
 			npc->act_no = 11;
 			npc->ani_no = 1;
 			npc->act_wait = 0;
-			npc->bits |= 8;
+			npc->bits |= NPC_IGNORE_SOLIDITY;
 			// Fallthrough
 		case 11:
 			switch (npc->direct)
@@ -547,9 +547,9 @@ void ActNpc126(NPCHAR *npc)
 	}
 
 	if (gKeyTrg & gKeyDown)
-		npc->bits |= 0x2000;
+		npc->bits |= NPC_INTERACTABLE;
 	else
-		npc->bits &= ~0x2000;
+		npc->bits &= ~NPC_INTERACTABLE;
 
 	npc->ym += 0x40;
 	if (npc->ym > 0x5FF)
@@ -725,7 +725,7 @@ void ActNpc130(NPCHAR *npc)
 			npc->act_no = 1;
 			npc->ani_no = 0;
 			npc->ani_wait = 0;
-			npc->bits |= 0x2000;
+			npc->bits |= NPC_INTERACTABLE;
 			// Fallthrough
 		case 1:
 			if (Random(0, 120) == 10)
@@ -1009,15 +1009,15 @@ void ActNpc134(NPCHAR *npc)
 		case 0:
 			npc->act_no = 1;
 			npc->ani_no = 2;
-			npc->bits &= ~0x20;
-			npc->bits |= 4;
+			npc->bits &= ~NPC_SHOOTABLE;
+			npc->bits |= NPC_INVULNERABLE;
 			// Fallthrough
 		case 1:
 			if (gMC.x > npc->x - 0x28000 && gMC.x < npc->x + 0x28000 && gMC.y > npc->y - 0x14000 && gMC.y < npc->y + 0x8000)	// TODO: Maybe do something about this for widescreen/tallscreen?
 			{
 				npc->act_no = 10;
-				npc->bits |= 0x20;
-				npc->bits &= ~4;
+				npc->bits |= NPC_SHOOTABLE;
+				npc->bits &= ~NPC_INVULNERABLE;
 			}
 
 			break;
@@ -1047,8 +1047,8 @@ void ActNpc134(NPCHAR *npc)
 				npc->act_no = 20;
 				npc->act_wait = 0;
 				npc->ani_no = 2;
-				npc->bits &= ~0x20;
-				npc->bits |= 4;
+				npc->bits &= ~NPC_SHOOTABLE;
+				npc->bits |= NPC_INVULNERABLE;
 			}
 
 			break;
@@ -1059,8 +1059,8 @@ void ActNpc134(NPCHAR *npc)
 				npc->act_no = 10;
 				npc->ani_no = 0;
 				npc->ani_wait = 0;
-				npc->bits |= 0x20;
-				npc->bits &= ~4;
+				npc->bits |= NPC_SHOOTABLE;
+				npc->bits &= ~NPC_INVULNERABLE;
 			}
 
 			break;
@@ -1207,7 +1207,7 @@ void ActNpc136(NPCHAR *npc)
 	switch (npc->act_no)
 	{
 		case 0:
-			npc->bits &= ~0x2000;
+			npc->bits &= ~NPC_INTERACTABLE;
 			npc->act_no = 1;
 			npc->ani_no = 0;
 			npc->ani_wait = 0;
@@ -1291,7 +1291,7 @@ void ActNpc138(NPCHAR *npc)
 			npc->act_no = 11;
 			npc->ani_no = 1;
 			npc->act_wait = 0;
-			npc->bits |= 8;
+			npc->bits |= NPC_IGNORE_SOLIDITY;
 			// Fallthrough
 		case 11:
 			if (++npc->act_wait % 8 == 0)

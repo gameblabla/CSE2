@@ -624,7 +624,7 @@ int JudgeHitMyCharNPC(NPCHAR *npc)
 		&& gMC.y + gMC.hit.bottom > npc->y - npc->hit.top
 		&& gMC.hit.bottom + gMC.y < npc->y + 0x600)
 	{
-		if (npc->bits & npc_bouncy)
+		if (npc->bits & NPC_BOUNCY)
 		{
 			gMC.ym = npc->ym - 0x200;
 			hit |= 8;
@@ -720,7 +720,7 @@ int JudgeHitMyCharNPC4(NPCHAR *npc)
 					gMC.y = npc->y - npc->hit.top - gMC.hit.bottom + 0x200;
 					hit |= 8;
 				}
-				else if (npc->bits & npc_bouncy)
+				else if (npc->bits & NPC_BOUNCY)
 				{
 					gMC.ym = npc->ym - 0x200;
 					hit |= 8;
@@ -780,12 +780,12 @@ void HitMyCharNpChar()
 
 		hit = 0;
 
-		if (gNPC[i].bits & npc_solidSoft)
+		if (gNPC[i].bits & NPC_SOLID_SOFT)
 		{
 			hit = JudgeHitMyCharNPC(&gNPC[i]);
 			gMC.flag |= hit;
 		}
-		else if (gNPC[i].bits & npc_solidHard)
+		else if (gNPC[i].bits & NPC_SOLID_HARD)
 		{
 			hit = JudgeHitMyCharNPC4(&gNPC[i]);
 			gMC.flag |= hit;
@@ -818,13 +818,13 @@ void HitMyCharNpChar()
 		}
 
 		// Run event on contact
-		if ((g_GameFlags & 4) == 0 && hit && gNPC[i].bits & npc_eventTouch)
+		if ((g_GameFlags & 4) == 0 && hit && gNPC[i].bits & NPC_EVENT_WHEN_TOUCHED)
 			StartTextScript(gNPC[i].code_event);
 
 		// NPC damage
-		if (g_GameFlags & 2 && (gNPC[i].bits & npc_interact) == 0)
+		if (g_GameFlags & 2 && (gNPC[i].bits & NPC_INTERACTABLE) == 0)
 		{
-			if (gNPC[i].bits & npc_rearTop)
+			if (gNPC[i].bits & NPC_REAR_AND_TOP_DONT_HURT)
 			{
 				if (hit & 4 && gNPC[i].xm < 0)
 					DamageMyChar(gNPC[i].damage);
@@ -842,7 +842,7 @@ void HitMyCharNpChar()
 		}
 
 		// Interaction
-		if ((g_GameFlags & 4) == 0 && hit && gMC.cond & 1 && gNPC[i].bits & npc_interact)
+		if ((g_GameFlags & 4) == 0 && hit && gMC.cond & 1 && gNPC[i].bits & NPC_INTERACTABLE)
 		{
 			StartTextScript(gNPC[i].code_event);
 			gMC.xm = 0;
@@ -869,12 +869,12 @@ void HitMyCharBoss()
 
 		hit = 0;
 
-		if (gBoss[b].bits & npc_solidSoft)
+		if (gBoss[b].bits & NPC_SOLID_SOFT)
 		{
 			hit = JudgeHitMyCharNPC(&gBoss[b]);
 			gMC.flag |= hit;
 		}
-		else if (gBoss[b].bits & npc_solidHard)
+		else if (gBoss[b].bits & NPC_SOLID_HARD)
 		{
 			hit = JudgeHitMyCharNPC4(&gBoss[b]);
 			gMC.flag |= hit;
@@ -884,13 +884,13 @@ void HitMyCharBoss()
 			hit = JudgeHitMyCharNPC3(&gBoss[b]);
 		}
 
-		if (!(g_GameFlags & 4) && hit && gBoss[b].bits & npc_eventTouch)
+		if (!(g_GameFlags & 4) && hit && gBoss[b].bits & NPC_EVENT_WHEN_TOUCHED)
 		{
 			StartTextScript(gBoss[b].code_event);
 			gMC.ques = 0;
 		}
 
-		if (gBoss[b].bits & npc_rearTop)
+		if (gBoss[b].bits & NPC_REAR_AND_TOP_DONT_HURT)
 		{
 			if (hit & 4 && gBoss[b].xm < 0)
 				DamageMyChar(gBoss[b].damage);
@@ -902,7 +902,7 @@ void HitMyCharBoss()
 			DamageMyChar(gBoss[b].damage);
 		}
 
-		if (!(g_GameFlags & 4) && hit && (gMC.cond & 1) && gBoss[b].bits & npc_interact)
+		if (!(g_GameFlags & 4) && hit && (gMC.cond & 1) && gBoss[b].bits & NPC_INTERACTABLE)
 		{
 			StartTextScript(gBoss[b].code_event);
 			gMC.xm = 0;

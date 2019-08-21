@@ -455,12 +455,12 @@ void ActNpc246(NPCHAR *npc)
 
 			if (gMC.y > npc->y)
 			{
-				npc->bits &= ~0x40;
+				npc->bits &= ~NPC_SOLID_HARD;
 				npc->damage = 0x7F;
 			}
 			else
 			{
-				npc->bits |= 0x40;
+				npc->bits |= NPC_SOLID_HARD;
 				npc->damage = 0;
 			}
 
@@ -478,7 +478,7 @@ void ActNpc246(NPCHAR *npc)
 				npc->act_no = 20;
 				npc->ani_no = 0;
 				npc->ani_wait = 0;
-				npc->bits |= 0x40;
+				npc->bits |= NPC_SOLID_HARD;
 				npc->damage = 0;
 			}
 
@@ -590,7 +590,7 @@ void ActNpc247(NPCHAR *npc)
 			npc->act_wait = 0;
 			npc->ani_no = 0;
 			npc->xm = 0;
-			npc->bits |= 0x20;
+			npc->bits |= NPC_SHOOTABLE;
 			npc->count2 = npc->life;
 			// Fallthrough
 		case 101:
@@ -622,7 +622,7 @@ void ActNpc247(NPCHAR *npc)
 			npc->act_wait = 0;
 			npc->xm = 0;
 			npc->ym = 0;
-			npc->bits &= ~0x20;
+			npc->bits &= ~NPC_SHOOTABLE;
 			// Fallthrough
 		case 111:
 			if (++npc->act_wait % 2)
@@ -699,7 +699,7 @@ void ActNpc247(NPCHAR *npc)
 			{
 				npc->act_wait = 0;
 				npc->ym = -0x200;
-				npc->bits |= 0x20;
+				npc->bits |= NPC_SHOOTABLE;
 				npc->x = npc->tgt_x;
 				npc->y = npc->tgt_y;
 
@@ -759,7 +759,7 @@ void ActNpc247(NPCHAR *npc)
 			break;
 
 		case 1000:
-			npc->bits &= ~0x20;
+			npc->bits &= ~NPC_SHOOTABLE;
 			npc->act_no = 1001;
 			npc->act_wait = 0;
 			npc->ani_no = 4;
@@ -1025,9 +1025,9 @@ void ActNpc252(NPCHAR *npc)
 
 		case 10:
 			npc->act_no = 11;
-			npc->bits |= 0x20;
-			npc->bits &= ~4;
-			npc->bits &= ~8;
+			npc->bits |= NPC_SHOOTABLE;
+			npc->bits &= ~NPC_INVULNERABLE;
+			npc->bits &= ~NPC_IGNORE_SOLIDITY;
 
 			deg = GetArktan(npc->x - gMC.x, npc->y - gMC.y);
 			deg += (unsigned char)Random(-3, 3);
@@ -1386,7 +1386,7 @@ void ActNpc259(NPCHAR *npc)
 	switch (npc->act_no)
 	{
 		case 0:
-			npc->bits &= ~0x2000;
+			npc->bits &= ~NPC_INTERACTABLE;
 			npc->act_no = 1;
 			// Fallthrough
 		case 1:

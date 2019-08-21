@@ -49,7 +49,7 @@ void ActNpc340(NPCHAR *npc)
 			npc->ani_no = 1;
 			npc->ani_wait = 0;
 			npc->damage = 4;
-			npc->bits |= 0x20;
+			npc->bits |= NPC_SHOOTABLE;
 			// Fallthrough
 		case 110:
 			npc->act_no = 111;
@@ -453,7 +453,7 @@ void ActNpc340(NPCHAR *npc)
 			npc->ani_no = 10;
 			npc->tgt_x = npc->x;
 			npc->xm = 0;
-			npc->bits &= ~0x20;
+			npc->bits &= ~NPC_SHOOTABLE;
 			SetDestroyNpChar(npc->x, npc->y, 0x10, 0x10);
 			PlaySoundObject(72, 1);
 			// Fallthrough
@@ -498,7 +498,7 @@ void ActNpc340(NPCHAR *npc)
 				npc->ani_no = 3;
 				npc->ym -= 0xA00;
 				npc->direct = 0;
-				npc->bits |= 8;
+				npc->bits |= NPC_IGNORE_SOLIDITY;
 			}
 
 			break;
@@ -633,7 +633,7 @@ void ActNpc342(NPCHAR *npc)
 
 		case 20:
 			npc->act_no = 21;
-			npc->bits |= 0x20;
+			npc->bits |= NPC_SHOOTABLE;
 			npc->life = 1000;
 			// Fallthrough
 		case 21:
@@ -657,7 +657,7 @@ void ActNpc342(NPCHAR *npc)
 			if (npc->life < 900)
 			{
 				npc->act_no = 22;
-				npc->bits &= ~0x20;
+				npc->bits &= ~NPC_SHOOTABLE;
 				SetDestroyNpChar(npc->x, npc->y, 0x2000, 0x20);
 				PlaySoundObject(71, 1);
 			}
@@ -699,7 +699,7 @@ void ActNpc342(NPCHAR *npc)
 			npc->damage = 10;
 
 			if (npc->direct == 0)
-				npc->bits |= 0x20;
+				npc->bits |= NPC_SHOOTABLE;
 
 			npc->ym = 0;
 			// Fallthrough
@@ -710,7 +710,7 @@ void ActNpc342(NPCHAR *npc)
 			if (npc->count2 > 0x100)
 				--npc->count2;
 
-			if (npc->bits & 0x20)
+			if (npc->bits & NPC_SHOOTABLE)
 			{
 				if (npc->shock)
 				{
@@ -740,7 +740,7 @@ void ActNpc342(NPCHAR *npc)
 			npc->ym = 0;
 			npc->ani_no = 2;
 			npc->damage = 5;
-			npc->bits &= ~0x28;
+			npc->bits &= ~(NPC_IGNORE_SOLIDITY | NPC_SHOOTABLE);
 			SetDestroyNpChar(npc->x, npc->y, 0x2000, 0x20);
 			PlaySoundObject(71, 1);
 			// Fallthrough
@@ -775,7 +775,7 @@ void ActNpc342(NPCHAR *npc)
 			npc->xm = 0;
 			npc->ym = 0;
 			npc->ani_no = 2;
-			npc->bits &= ~0x28;
+			npc->bits &= ~(NPC_IGNORE_SOLIDITY | NPC_SHOOTABLE);
 			npc->damage = 0;
 			npc->count1 /= 4;
 			npc->exp = 0;
@@ -922,7 +922,7 @@ void ActNpc345(NPCHAR *npc)
 				npc->ym = 0x700;
 
 			if (npc->y > 0x10000)
-				npc->bits &= ~8;
+				npc->bits &= ~NPC_IGNORE_SOLIDITY;
 
 			if (npc->act_wait++ / 2 % 2)
 				SetNpChar(4, npc->x, npc->y, 0, 0, 0, 0, 0x100);
@@ -931,7 +931,7 @@ void ActNpc345(NPCHAR *npc)
 			{
 				npc->ym = -0x200;
 				npc->act_no = 110;
-				npc->bits |= 8;
+				npc->bits |= NPC_IGNORE_SOLIDITY;
 				PlaySoundObject(12, 1);
 				SetQuake(10);
 
@@ -1055,7 +1055,7 @@ void ActNpc346(NPCHAR *npc)
 			npc->act_no = 1001;
 			npc->xm = 0;
 			npc->ym = 0;
-			npc->bits &= ~0x40;
+			npc->bits &= ~NPC_SOLID_HARD;
 			// Fallthrough
 		case 1001:
 			npc->ym += 0x40;
@@ -1069,9 +1069,9 @@ void ActNpc346(NPCHAR *npc)
 	if (npc->act_no < 1000)
 	{
 		if (gMC.y > npc->y - 0x1000 && gMC.ym < 0)
-			npc->bits &= ~0x40;
+			npc->bits &= ~NPC_SOLID_HARD;
 		else
-			npc->bits |= 0x40;
+			npc->bits |= NPC_SOLID_HARD;
 
 		deg = npc->count1 / 4;
 		npc->tgt_x = npc->pNpc->x + npc->count2 * GetCos(deg) / 4;
@@ -1461,7 +1461,7 @@ void ActNpc351(NPCHAR *npc)
 			else
 			{
 				npc->act_no = 11;
-				npc->bits |= 0x20;
+				npc->bits |= NPC_SHOOTABLE;
 			}
 			// Fallthrough
 		case 11:
@@ -1632,7 +1632,7 @@ void ActNpc353(NPCHAR *npc)
 			++npc->act_wait;
 
 			if (npc->act_wait == 8)
-				npc->bits &= ~8;
+				npc->bits &= ~NPC_IGNORE_SOLIDITY;
 
 			npc->x += npc->xm;
 			npc->y += npc->ym;
@@ -1654,8 +1654,8 @@ void ActNpc353(NPCHAR *npc)
 		case 10:
 			npc->act_no = 11;
 			npc->ani_no = 0;
-			npc->bits |= 0x20;
-			npc->bits &= ~8;
+			npc->bits |= NPC_SHOOTABLE;
+			npc->bits &= ~NPC_IGNORE_SOLIDITY;
 			npc->damage = 5;
 			npc->view.top = 0x1000;
 			// Fallthrough

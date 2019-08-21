@@ -26,7 +26,7 @@ static void ActBossCharA_Head(NPCHAR *npc)
 		case 10:
 			npc->act_no = 11;
 			npc->ani_no = 2;
-			npc->bits = 8;
+			npc->bits = NPC_IGNORE_SOLIDITY;
 			npc->view.front = 0x4800;
 			npc->view.top = 0x7000;
 			// Fallthrough
@@ -72,7 +72,7 @@ static void ActBossCharA_Tail(NPCHAR *npc)
 		case 10:
 			npc->act_no = 11;
 			npc->ani_no = 0;
-			npc->bits = 8;
+			npc->bits = NPC_IGNORE_SOLIDITY;
 			npc->view.front = 0x5800;
 			npc->view.top = 0x7000;
 			// Fallthrough
@@ -165,7 +165,7 @@ static void ActBossCharA_Face(NPCHAR *npc)
 	npc->x = gBoss[0].x - 0x4800;
 	npc->y = gBoss[0].y + 0x800;
 
-	npc->bits = 8;
+	npc->bits = NPC_IGNORE_SOLIDITY;
 
 	npc->rect = rect[npc->ani_no];
 }
@@ -188,33 +188,33 @@ static void ActBossCharA_Mini(NPCHAR *npc)
 	switch (npc->act_no)
 	{
 		case 0:
-			npc->bits &= ~0x20;
+			npc->bits &= ~NPC_SHOOTABLE;
 			break;
 
 		case 5:
 			npc->ani_no = 0;
-			npc->bits &= ~0x20;
+			npc->bits &= ~NPC_SHOOTABLE;
 			++npc->count2;
 			npc->count2 %= 0x100;
 			break;
 
 		case 10:
 			npc->ani_no = 0;
-			npc->bits &= ~0x20;
+			npc->bits &= ~NPC_SHOOTABLE;
 			npc->count2 += 2;
 			npc->count2 %= 0x100;
 			break;
 
 		case 20:
 			npc->ani_no = 1;
-			npc->bits &= ~0x20;
+			npc->bits &= ~NPC_SHOOTABLE;
 			npc->count2 += 2;
 			npc->count2 %= 0x100;
 			break;
 
 		case 30:
 			npc->ani_no = 0;
-			npc->bits &= ~0x20;
+			npc->bits &= ~NPC_SHOOTABLE;
 			npc->count2 += 4;
 			npc->count2 %= 0x100;
 			break;
@@ -295,7 +295,7 @@ void ActBossChar_Undead(void)
 			npc->act_no = 10;
 			npc->exp = 1;
 			npc->cond = 0x80;
-			npc->bits = 0x800C;
+			npc->bits = (NPC_INVULNERABLE | NPC_IGNORE_SOLIDITY | NPC_SHOW_DAMAGE);
 			npc->life = 700;
 			npc->hit_voice = 114;
 			npc->x = 0x4A000;
@@ -303,7 +303,7 @@ void ActBossChar_Undead(void)
 			npc->xm = 0;
 			npc->ym = 0;
 			npc->code_event = 1000;
-			npc->bits |= 0x200;
+			npc->bits |= NPC_EVENT_WHEN_KILLED;
 
 			gBoss[3].cond = 0x80;
 			gBoss[3].act_no = 0;
@@ -315,7 +315,7 @@ void ActBossChar_Undead(void)
 			gBoss[5].act_no = 10;
 
 			gBoss[8].cond = 0x80;
-			gBoss[8].bits = 8;
+			gBoss[8].bits = NPC_IGNORE_SOLIDITY;
 			gBoss[8].view.front = 0;
 			gBoss[8].view.top = 0;
 			gBoss[8].hit.back = 0x5000;
@@ -344,7 +344,7 @@ void ActBossChar_Undead(void)
 
 			gBoss[1].cond = 0x80;
 			gBoss[1].act_no = 0;
-			gBoss[1].bits = 40;
+			gBoss[1].bits = (NPC_IGNORE_SOLIDITY | NPC_SHOOTABLE);
 			gBoss[1].life = 1000;
 			gBoss[1].hit_voice = 54;
 			gBoss[1].hit.back = 0x3000;
@@ -392,10 +392,10 @@ void ActBossChar_Undead(void)
 			gBoss[3].act_no = 0;
 			gBoss[4].ani_no = 2;
 			gBoss[5].ani_no = 0;
-			gBoss[8].bits &= ~4;
-			gBoss[9].bits &= ~4;
-			gBoss[10].bits &= ~4;
-			gBoss[11].bits &= ~0x20;
+			gBoss[8].bits &= ~NPC_INVULNERABLE;
+			gBoss[9].bits &= ~NPC_INVULNERABLE;
+			gBoss[10].bits &= ~NPC_INVULNERABLE;
+			gBoss[11].bits &= ~NPC_SHOOTABLE;
 			gSuperYpos = 0;
 			CutNoise();
 			bShock = TRUE;
@@ -427,10 +427,10 @@ void ActBossChar_Undead(void)
 			npc->act_no = 211;
 			npc->act_wait = 0;
 			gBoss[3].act_no = 10;
-			gBoss[8].bits |= 4;
-			gBoss[9].bits |= 4;
-			gBoss[10].bits |= 4;
-			gBoss[11].bits |= 0x20;
+			gBoss[8].bits |= NPC_INVULNERABLE;
+			gBoss[9].bits |= NPC_INVULNERABLE;
+			gBoss[10].bits |= NPC_INVULNERABLE;
+			gBoss[11].bits |= NPC_SHOOTABLE;
 			life = npc->life;
 			bShock = TRUE;
 			// Fallthrough
@@ -475,10 +475,10 @@ void ActBossChar_Undead(void)
 			npc->count1 = 0;
 			gSuperYpos = 1;
 			gBoss[3].act_no = 20;
-			gBoss[8].bits |= 4;
-			gBoss[9].bits |= 4;
-			gBoss[10].bits |= 4;
-			gBoss[11].bits |= 0x20;
+			gBoss[8].bits |= NPC_INVULNERABLE;
+			gBoss[9].bits |= NPC_INVULNERABLE;
+			gBoss[10].bits |= NPC_INVULNERABLE;
+			gBoss[11].bits |= NPC_SHOOTABLE;
 			SetQuake(100);
 			life = npc->life;
 			bShock = TRUE;
@@ -533,10 +533,10 @@ void ActBossChar_Undead(void)
 			npc->act_no = 231;
 			npc->act_wait = 0;
 			gBoss[3].act_no = 30;
-			gBoss[8].bits |= 4;
-			gBoss[9].bits |= 4;
-			gBoss[10].bits |= 4;
-			gBoss[11].bits |= 0x20;
+			gBoss[8].bits |= NPC_INVULNERABLE;
+			gBoss[9].bits |= NPC_INVULNERABLE;
+			gBoss[10].bits |= NPC_INVULNERABLE;
+			gBoss[11].bits |= NPC_SHOOTABLE;
 			PlaySoundObject(25, 1);
 			SetNpChar(285, gBoss[3].x - 0x2000, gBoss[3].y, 0, 0, 0, 0, 0x100);
 			SetNpChar(285, gBoss[3].x - 0x2000, gBoss[3].y, 0, 0, 0x400, 0, 0x100);
@@ -595,10 +595,10 @@ void ActBossChar_Undead(void)
 				SetNpChar(4, npc->x + (Random(-0x80, 0x80) * 0x200), npc->y + (Random(-0x40, 0x40) * 0x200), Random(-0x80, 0x80) * 0x200, Random(-0x80, 0x80) * 0x200, 0, 0, 0);
 
 			DeleteNpCharCode(282, 1);
-			gBoss[11].bits &= ~0x20;
+			gBoss[11].bits &= ~NPC_SHOOTABLE;
 
 			for (i = 0; i < 12; ++i)
-				gBoss[i].bits &= ~4;
+				gBoss[i].bits &= ~NPC_INVULNERABLE;
 			// Fallthrough
 		case 501:
 			++npc->act_wait;
