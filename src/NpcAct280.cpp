@@ -172,22 +172,22 @@ void ActNpc282(NPCHAR *npc)
 
 			if (gMC.flag & 1 && gMC.x < npc->x - npc->hit.back && gMC.x > npc->x - npc->hit.back - 0x1000 && gMC.y + gMC.hit.bottom > npc->y - npc->hit.top && gMC.y - gMC.hit.top < npc->y + npc->hit.bottom)
 			{
-				npc->bits &= ~0x40;
+				npc->bits &= ~NPC_SOLID_HARD;
 				npc->ani_no = 1;
 			}
 			else if (gMC.flag & 4 && gMC.x > npc->x + npc->hit.back && gMC.x < npc->x + npc->hit.back + 0x1000 && gMC.y + gMC.hit.bottom > npc->y - npc->hit.top && gMC.y - gMC.hit.top < npc->y + npc->hit.bottom)
 			{
-				npc->bits &= ~0x40;
+				npc->bits &= ~NPC_SOLID_HARD;
 				npc->ani_no = 1;
 			}
 			else if (gMC.flag & 2 && gMC.y < npc->y - npc->hit.top && gMC.y > npc->y - npc->hit.top - 0x1000 && gMC.x + gMC.hit.front > npc->x - npc->hit.back && gMC.x - gMC.hit.back < npc->x + npc->hit.front)
 			{
-				npc->bits &= ~0x40;
+				npc->bits &= ~NPC_SOLID_HARD;
 				npc->ani_no = 1;
 			}
 			else if (gMC.flag & 8 && gMC.y > npc->y + npc->hit.bottom - 0x800 && gMC.y < npc->y + npc->hit.bottom + 0x1800 && gMC.x + gMC.hit.front > npc->x - npc->hit.back - 0x800 && gMC.x - gMC.hit.back < npc->x + npc->hit.front + 0x800)
 			{
-				npc->bits &= ~0x40;
+				npc->bits &= ~NPC_SOLID_HARD;
 				npc->ani_no = 1;
 			}
 	}
@@ -569,15 +569,15 @@ void ActNpc283(NPCHAR *npc)
 			npc->xm = 0;
 			npc->ym = 0;
 			npc->ani_no = 9;
-			npc->bits &= ~0x20;
+			npc->bits &= ~NPC_SHOOTABLE;
 			break;
 
 		case 100:
 			npc->act_no = 101;
 			npc->ani_no = 9;
 			npc->damage = 0;
-			npc->bits &= ~0x20;
-			npc->bits |= 8;
+			npc->bits &= ~NPC_SHOOTABLE;
+			npc->bits |= NPC_IGNORE_SOLIDITY;
 			npc->ym = -0x200;
 			npc->shock += 50;
 			npc->hit.bottom = 0x1800;
@@ -695,8 +695,8 @@ void ActNpc284(NPCHAR *npc)
 			npc->ani_no = 0;
 			npc->ani_wait = 0;
 			npc->damage = 0;
-			npc->bits |= 0x20;
-			npc->bits &= ~8;
+			npc->bits |= NPC_SHOOTABLE;
+			npc->bits &= ~NPC_IGNORE_SOLIDITY;
 			// Fallthrough
 		case 21:
 			npc->xm = 7 * npc->xm / 8;
@@ -762,7 +762,7 @@ void ActNpc284(NPCHAR *npc)
 		case 32:
 			npc->act_no = 33;
 			npc->act_wait = 0;
-			npc->bits &= ~0x20;
+			npc->bits &= ~NPC_SHOOTABLE;
 
 			if (gMC.x < npc->x)
 				npc->tgt_x = gMC.x - 0x14000;
@@ -774,21 +774,21 @@ void ActNpc284(NPCHAR *npc)
 			deg = GetArktan(npc->x - npc->tgt_x, npc->y - npc->tgt_y);
 			npc->xm = 3 * GetCos(deg);
 			npc->ym = 3 * GetSin(deg);
-			npc->bits &= ~8;
+			npc->bits &= ~NPC_IGNORE_SOLIDITY;
 
 			if (npc->x < (gMap.width * 0x200 * 0x10) / 2 && npc->xm > 0)
 			{
 				if (npc->y < (gMap.length * 0x200 * 0x10) / 2 && npc->ym > 0)
-					npc->bits |= 8;
+					npc->bits |= NPC_IGNORE_SOLIDITY;
 				if (npc->y > (gMap.length * 0x200 * 0x10) / 2 && npc->ym < 0)
-					npc->bits |= 8;
+					npc->bits |= NPC_IGNORE_SOLIDITY;
 			}
 			if (npc->x > (gMap.width * 0x200 * 0x10) / 2 && npc->xm < 0)
 			{
 				if (npc->y < (gMap.length * 0x200 * 0x10) / 2 && npc->ym > 0)
-					npc->bits |= 8;
+					npc->bits |= NPC_IGNORE_SOLIDITY;
 				if (npc->y > (gMap.length * 0x200 * 0x10) / 2 && npc->ym < 0)
-					npc->bits |= 8;
+					npc->bits |= NPC_IGNORE_SOLIDITY;
 			}
 
 			if (npc->xm > 0)
@@ -818,22 +818,22 @@ void ActNpc284(NPCHAR *npc)
 			deg = GetArktan(npc->x - npc->tgt_x, npc->y - npc->tgt_y);
 			npc->ym = 3 * GetSin(deg);
 			npc->xm = 3 * GetCos(deg);
-			npc->bits &= ~8;
+			npc->bits &= ~NPC_IGNORE_SOLIDITY;
 
 			if (npc->x < (gMap.width * 0x200 * 0x10) / 2 && npc->xm > 0)
 			{
 				if (npc->y < (gMap.length * 0x200 * 0x10) / 2 && npc->ym > 0)
-					npc->bits |= 8;
+					npc->bits |= NPC_IGNORE_SOLIDITY;
 				if (npc->y > (gMap.length * 0x200 * 0x10) / 2 && npc->ym < 0)
-					npc->bits |= 8;
+					npc->bits |= NPC_IGNORE_SOLIDITY;
 			}
 
 			if (npc->x > (gMap.width * 0x200 * 0x10) / 2 && npc->xm < 0)
 			{
 				if (npc->y < (gMap.length * 0x200 * 0x10) / 2 && npc->ym > 0)
-					npc->bits |= 8;
+					npc->bits |= NPC_IGNORE_SOLIDITY;
 				if (npc->y > (gMap.length * 0x200 * 0x10) / 2 && npc->ym < 0)
-					npc->bits |= 8;
+					npc->bits |= NPC_IGNORE_SOLIDITY;
 			}
 
 			if (npc->xm > 0)
@@ -870,7 +870,7 @@ void ActNpc284(NPCHAR *npc)
 			npc->act_wait = 0;
 			npc->ani_no = 2;
 			npc->damage = 0;
-			npc->bits &= ~8;
+			npc->bits &= ~NPC_IGNORE_SOLIDITY;
 			// Fallthrough
 		case 41:
 			npc->xm = 7 * npc->xm / 8;
@@ -921,15 +921,15 @@ void ActNpc284(NPCHAR *npc)
 			npc->xm = 0;
 			npc->ym = 0;
 			npc->ani_no = 9;
-			npc->bits &= ~0x20;
+			npc->bits &= ~NPC_SHOOTABLE;
 			break;
 
 		case 100:
 			npc->act_no = 101;
 			npc->ani_no = 9;
 			npc->damage = 0;
-			npc->bits &= ~0x20;
-			npc->bits |= 8;
+			npc->bits &= ~NPC_SHOOTABLE;
+			npc->bits |= NPC_IGNORE_SOLIDITY;
 			npc->ym = -0x200;
 			npc->shock += 50;
 			++gBoss[0].ani_no;
@@ -1121,7 +1121,7 @@ void ActNpc288(NPCHAR *npc)
 			PlaySoundObject(44, 1);
 			npc->act_no = 3;
 			npc->act_wait = 0;
-			npc->bits |= 8;
+			npc->bits |= NPC_IGNORE_SOLIDITY;
 			npc->ym = 0;
 
 			if (npc->x > gMC.x)
@@ -1191,7 +1191,7 @@ void ActNpc289(NPCHAR *npc)
 				npc->view.top = 0x1000;
 				npc->view.bottom = 0x1000;
 				npc->damage = 2;
-				npc->bits |= 0x20;
+				npc->bits |= NPC_SHOOTABLE;
 			}
 
 			break;
@@ -1234,7 +1234,7 @@ void ActNpc289(NPCHAR *npc)
 			break;
 
 		case 12:
-			npc->bits |= 8;
+			npc->bits |= NPC_IGNORE_SOLIDITY;
 
 			if (npc->y > gMap.length * 0x200 * 0x10)
 			{
@@ -1301,7 +1301,7 @@ void ActNpc290(NPCHAR *npc)
 				npc->view.top = 0x1000;
 				npc->view.bottom = 0x1000;
 				npc->damage = 2;
-				npc->bits |= 0x20;
+				npc->bits |= NPC_SHOOTABLE;
 				npc->tgt_y = npc->y;
 				npc->ym = 0x400;
 			}
@@ -1369,7 +1369,7 @@ void ActNpc291(NPCHAR *npc)
 
 			if (npc->direct == 2)
 			{
-				npc->bits &= ~0x40;
+				npc->bits &= ~NPC_SOLID_HARD;
 				npc->ani_no = 1;
 			}
 

@@ -35,11 +35,11 @@ static void ActBossChar03_01(NPCHAR *npc)
 	{
 		case 10:
 			npc->ani_no = 0;
-			npc->bits &= ~0x10;
+			npc->bits &= ~NPC_BOUNCY;
 			break;
 
 		case 100:
-			npc->bits |= 0x10;
+			npc->bits |= NPC_BOUNCY;
 			npc->act_no = 101;
 			npc->act_wait = 0;
 			npc->ani_no = 2;
@@ -62,7 +62,7 @@ static void ActBossChar03_01(NPCHAR *npc)
 			break;
 
 		case 102:
-			npc->bits &= ~0x10;
+			npc->bits &= ~NPC_BOUNCY;
 			npc->act_no = 103;
 			npc->ani_no = 0;
 			npc->ani_wait = 0;
@@ -83,8 +83,8 @@ static void ActBossChar03_01(NPCHAR *npc)
 			break;
 
 		case 200:
-			npc->bits |= 0x10;
-			npc->bits |= 0x80;
+			npc->bits |= NPC_BOUNCY;
+			npc->bits |= NPC_REAR_AND_TOP_DONT_HURT;
 			npc->act_no = 201;
 			npc->act_wait = 0;
 			npc->ani_no = 4;
@@ -107,7 +107,7 @@ static void ActBossChar03_01(NPCHAR *npc)
 			break;
 
 		case 202:
-			npc->bits &= ~0x10;
+			npc->bits &= ~NPC_BOUNCY;
 			npc->act_no = 203;
 			npc->ani_no = 0;
 			npc->ani_wait = 0;
@@ -131,7 +131,7 @@ static void ActBossChar03_01(NPCHAR *npc)
 			npc->act_no = 301;
 			npc->ani_no = 4;
 			npc->ani_wait = 0;
-			npc->bits |= 0x10;
+			npc->bits |= NPC_BOUNCY;
 			// Fallthrough
 		case 301:
 			if (++npc->ani_wait > 0)
@@ -157,7 +157,7 @@ static void ActBossChar03_01(NPCHAR *npc)
 			npc->act_no = 401;
 			npc->ani_no = 2;
 			npc->ani_wait = 0;
-			npc->bits |= 0x10;
+			npc->bits |= NPC_BOUNCY;
 			// Fallthrough
 		case 401:
 			if (++npc->ani_wait > 0)
@@ -189,12 +189,12 @@ static void ActBossChar03_01(NPCHAR *npc)
 	if (npc->act_no >= 100 && gMC.y < npc->y + 0x800 && gMC.y > npc->y - 0x800)
 	{
 		npc->damage = 10;
-		npc->bits |= 0x80;
+		npc->bits |= NPC_REAR_AND_TOP_DONT_HURT;
 	}
 	else
 	{
 		npc->damage = 0;
-		npc->bits &= ~0x80;
+		npc->bits &= ~NPC_REAR_AND_TOP_DONT_HURT;
 	}
 
 	if (npc->xm > 0x400)
@@ -380,14 +380,14 @@ static void ActBossChar03_04(NPCHAR *npc)
 	switch (npc->act_no)
 	{
 		case 0:
-			npc->bits &= ~0x20;
+			npc->bits &= ~NPC_SHOOTABLE;
 			npc->ani_no = 0;
 			break;
 
 		case 10:
 			npc->act_no = 11;
 			npc->act_wait = 10 * npc->tgt_x + 40;
-			npc->bits |= 0x20;
+			npc->bits |= NPC_SHOOTABLE;
 			// Fallthrough
 		case 11:
 			if (npc->act_wait < 16 && npc->act_wait / 2 % 2)
@@ -449,14 +449,14 @@ static void ActBossChar03_face(NPCHAR *npc)
 	switch (npc->act_no)
 	{
 		case 0:
-			gBoss[0].bits &= ~0x20;
+			gBoss[0].bits &= ~NPC_SHOOTABLE;
 			npc->ani_no = 0;
 			break;
 
 		case 10:
 			npc->act_no = 11;
 			npc->act_wait = 10 * npc->tgt_x + 40;
-			gBoss[0].bits |= 0x20;
+			gBoss[0].bits |= NPC_SHOOTABLE;
 			// Fallthrough
 		case 11:
 			if (gBoss[0].shock)
@@ -507,7 +507,7 @@ void ActBossChar_MonstX(void)
 			npc->hit.top = 0x3000;
 			npc->hit.back = 0x3000;
 			npc->hit.bottom = 0x3000;
-			npc->bits = 0x8208;
+			npc->bits = (NPC_IGNORE_SOLIDITY | NPC_EVENT_WHEN_KILLED | NPC_SHOW_DAMAGE);
 			npc->size = 3;
 			npc->code_event = 1000;
 			npc->ani_no = 0;
@@ -518,7 +518,7 @@ void ActBossChar_MonstX(void)
 			gBoss[1].view.top = 0x3000;
 			gBoss[1].view.back = 0x3000;
 			gBoss[1].view.bottom = 0x3000;
-			gBoss[1].bits = 8;
+			gBoss[1].bits = NPC_IGNORE_SOLIDITY;
 			gBoss[2] = gBoss[1];
 			gBoss[2].direct = 2;
 			gBoss[3].cond = 0x80;
@@ -535,7 +535,7 @@ void ActBossChar_MonstX(void)
 			gBoss[3].hit.back = 0xA00;
 			gBoss[3].hit.top = 0xA00;
 			gBoss[3].hit.bottom = 0xA00;
-			gBoss[3].bits = 8;
+			gBoss[3].bits = NPC_IGNORE_SOLIDITY;
 			gBoss[3].tgt_x = 0;
 			gBoss[4] = gBoss[3];
 			gBoss[4].tgt_x = 1;
@@ -557,7 +557,7 @@ void ActBossChar_MonstX(void)
 			gBoss[7].hit.top = 0x3000;
 			gBoss[7].hit.back = 0x1000;
 			gBoss[7].hit.bottom = 0x2000;
-			gBoss[7].bits = 8;
+			gBoss[7].bits = NPC_IGNORE_SOLIDITY;
 			gBoss[7].size = 3;
 			gBoss[7].ani_no = 0;
 			gBoss[9].cond = 0x80;
@@ -574,7 +574,7 @@ void ActBossChar_MonstX(void)
 			gBoss[9].hit.top = 0x1000;
 			gBoss[9].hit.back = 0x3800;
 			gBoss[9].hit.bottom = 0x2000;
-			gBoss[9].bits = 141;
+			gBoss[9].bits = (NPC_SOLID_SOFT | NPC_INVULNERABLE | NPC_IGNORE_SOLIDITY | NPC_REAR_AND_TOP_DONT_HURT);
 			gBoss[9].size = 3;
 			gBoss[10] = gBoss[9];
 			gBoss[10].x = 0x108000;
@@ -596,25 +596,25 @@ void ActBossChar_MonstX(void)
 			gBoss[13].view.back = 0x5400;
 			gBoss[13].count1 = 9;
 			gBoss[13].ani_no = 0;
-			gBoss[13].bits = 8;
+			gBoss[13].bits = NPC_IGNORE_SOLIDITY;
 			gBoss[14] = gBoss[13];
 			gBoss[14].view.front = 0x5400;
 			gBoss[14].view.back = 0x3C00;
 			gBoss[14].count1 = 10;
 			gBoss[14].ani_no = 1;
-			gBoss[14].bits = 8;
+			gBoss[14].bits = NPC_IGNORE_SOLIDITY;
 			gBoss[15] = gBoss[13];
 			gBoss[15].view.top = 0x2000;
 			gBoss[15].view.bottom = 0x2000;
 			gBoss[15].count1 = 11;
 			gBoss[15].ani_no = 2;
-			gBoss[15].bits = 8;
+			gBoss[15].bits = NPC_IGNORE_SOLIDITY;
 			gBoss[16] = gBoss[15];
 			gBoss[16].view.front = 0x5400;
 			gBoss[16].view.back = 0x3C00;
 			gBoss[16].count1 = 12;
 			gBoss[16].ani_no = 3;
-			gBoss[16].bits = 8;
+			gBoss[16].bits = NPC_IGNORE_SOLIDITY;
 			npc->act_no = 2;
 			break;
 

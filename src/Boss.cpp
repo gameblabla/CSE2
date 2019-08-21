@@ -50,7 +50,7 @@ void PutBossChar(int fx, int fy)
 			{
 				a = 0;
 
-				if (gBoss[b].bits & npc_showDamage && gBoss[b].damage_view)
+				if (gBoss[b].bits & NPC_SHOW_DAMAGE && gBoss[b].damage_view)
 				{
 					SetValueView(&gBoss[b].x, &gBoss[b].y, gBoss[b].damage_view);
 					gBoss[b].damage_view = 0;
@@ -100,13 +100,13 @@ void HitBossBullet()
 
 			// Check if bullet touches boss
 			bHit = FALSE;
-			if (gBoss[bos].bits & npc_shootable
+			if (gBoss[bos].bits & NPC_SHOOTABLE
 				&& gBoss[bos].x - gBoss[bos].hit.back < gBul[bul].x + gBul[bul].enemyXL
 				&& gBoss[bos].x + gBoss[bos].hit.back > gBul[bul].x - gBul[bul].enemyXL
 				&& gBoss[bos].y - gBoss[bos].hit.top < gBul[bul].y + gBul[bul].enemyYL
 				&& gBoss[bos].y + gBoss[bos].hit.bottom > gBul[bul].y - gBul[bul].enemyYL)
 				bHit = TRUE;
-			else if (gBoss[bos].bits & npc_invulnerable
+			else if (gBoss[bos].bits & NPC_INVULNERABLE
 				&& gBoss[bos].x - gBoss[bos].hit.back < gBul[bul].x + gBul[bul].blockXL
 				&& gBoss[bos].x + gBoss[bos].hit.back > gBul[bul].x - gBul[bul].blockXL
 				&& gBoss[bos].y - gBoss[bos].hit.top < gBul[bul].y + gBul[bul].blockYL
@@ -116,7 +116,7 @@ void HitBossBullet()
 			if (bHit)
 			{
 				// Damage boss
-				if (gBoss[bos].bits & npc_shootable)
+				if (gBoss[bos].bits & NPC_SHOOTABLE)
 				{
 					if (gBoss[bos].cond & 0x10)
 						bos_ = 0;
@@ -129,7 +129,7 @@ void HitBossBullet()
 					{
 						gBoss[bos_].life = bos_;
 
-						if ((gMC.cond & 0x80) && gBoss[bos_].bits & npc_eventDie)
+						if ((gMC.cond & 0x80) && gBoss[bos_].bits & NPC_EVENT_WHEN_KILLED)
 						{
 							StartTextScript(gBoss[bos_].code_event);
 						}
@@ -282,7 +282,7 @@ void HitBossMap()
 		if ((gBoss[b].cond & 0x80) == 0)
 			continue;
 
-		if (gBoss[b].bits & npc_ignoreSolid)
+		if (gBoss[b].bits & NPC_IGNORE_SOLIDITY)
 			continue;
 
 		if (gBoss[b].size >= 3)
@@ -306,7 +306,7 @@ void HitBossMap()
 			switch (atrb[j])
 			{
 				case 0x44:
-					if (gBoss[b].bits & npc_ignore44)
+					if (gBoss[b].bits & NPC_IGNORE_TILE_44)
 						break;
 					// Fallthrough
 				case 0x05:

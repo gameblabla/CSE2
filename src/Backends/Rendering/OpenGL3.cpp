@@ -593,7 +593,7 @@ void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned cha
 	vertex_buffer_slot->vertices[1][2].vertex_coordinate.y = vertex_bottom;
 }
 
-Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch, unsigned char pixel_mode)
+Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch, FontPixelMode pixel_mode)
 {
 	Backend_Glyph *glyph = (Backend_Glyph*)malloc(sizeof(Backend_Glyph));
 

@@ -543,7 +543,7 @@ void ActNpc309(NPCHAR *npc)
 
 		case 10:
 			npc->act_no = 11;
-			npc->bits |= 0x20;
+			npc->bits |= NPC_SHOOTABLE;
 			npc->damage = 5;
 			// Fallthrough
 		case 11:
@@ -632,8 +632,8 @@ void ActNpc310(NPCHAR *npc)
 	{
 		case 0:
 			npc->act_no = 1;
-			npc->bits &= ~0x20;
-			npc->bits |= 4;
+			npc->bits &= ~NPC_SHOOTABLE;
+			npc->bits |= NPC_INVULNERABLE;
 			npc->damage = 0;
 			// Fallthrough
 		case 1:
@@ -653,8 +653,8 @@ void ActNpc310(NPCHAR *npc)
 			npc->xm = 0;
 			npc->act_no = 11;
 			npc->act_wait = 0;
-			npc->bits &= ~0x20;
-			npc->bits |= 4;
+			npc->bits &= ~NPC_SHOOTABLE;
+			npc->bits |= NPC_INVULNERABLE;
 			npc->damage = 0;
 			npc->ani_no = 0;
 			// Fallthrough
@@ -667,8 +667,8 @@ void ActNpc310(NPCHAR *npc)
 		case 20:
 			npc->act_no = 21;
 			npc->act_wait = 0;
-			npc->bits &= ~4;
-			npc->bits |= 0x20;
+			npc->bits &= ~NPC_INVULNERABLE;
+			npc->bits |= NPC_SHOOTABLE;
 			npc->damage = 0;
 
 			if (npc->x > gMC.x)
@@ -949,7 +949,7 @@ void ActNpc312(NPCHAR *npc)
 			++npc->act_wait;
 
 			if (npc->act_wait == 4)
-				npc->bits &= ~8;
+				npc->bits &= ~NPC_IGNORE_SOLIDITY;
 
 			if (npc->act_wait > 10)
 				npc->act_no = 10;
@@ -1102,7 +1102,7 @@ void ActNpc313(NPCHAR *npc)
 			npc->act_no = 110;
 			npc->act_wait = 0;
 			npc->count1 = 0;
-			npc->bits |= 0x20;
+			npc->bits |= NPC_SHOOTABLE;
 			// Fallthrough
 		case 110:
 			npc->damage = 1;
@@ -1147,7 +1147,7 @@ void ActNpc313(NPCHAR *npc)
 			npc->ym += 0x80;
 
 			if (npc->y > 0x10000)
-				npc->bits &= ~8;
+				npc->bits &= ~NPC_IGNORE_SOLIDITY;
 
 			if (npc->xm < 0 && npc->flag & 1)
 				npc->xm *= -1;
@@ -1206,8 +1206,8 @@ void ActNpc313(NPCHAR *npc)
 					npc->xm = 0x5FF;
 
 				PlaySoundObject(25, 1);
-				npc->bits &= ~0x20;
-				npc->bits |= 4;
+				npc->bits &= ~NPC_SHOOTABLE;
+				npc->bits |= NPC_INVULNERABLE;
 				npc->damage = 10;
 			}
 
@@ -1242,8 +1242,8 @@ void ActNpc313(NPCHAR *npc)
 			{
 				npc->count1 = 0;
 				npc->act_no = 130;
-				npc->bits |= 0x20;
-				npc->bits &= ~4;
+				npc->bits |= NPC_SHOOTABLE;
+				npc->bits &= ~NPC_INVULNERABLE;
 				npc->damage = 3;
 			}
 
@@ -1286,9 +1286,9 @@ void ActNpc313(NPCHAR *npc)
 				npc->ani_no = 12;
 				npc->ym = -0x800;
 				PlaySoundObject(25, 1);
-				npc->bits |= 8;
-				npc->bits &= ~0x20;
-				npc->bits |= 4;
+				npc->bits |= NPC_IGNORE_SOLIDITY;
+				npc->bits &= ~NPC_SHOOTABLE;
+				npc->bits |= NPC_INVULNERABLE;
 				npc->damage = 10;
 			}
 
@@ -1321,15 +1321,15 @@ void ActNpc313(NPCHAR *npc)
 			{
 				npc->count1 = 0;
 				npc->act_no = 130;
-				npc->bits |= 0x20;
-				npc->bits &= ~4;
+				npc->bits |= NPC_SHOOTABLE;
+				npc->bits &= ~NPC_INVULNERABLE;
 				npc->damage = 3;
 			}
 
 			break;
 
 		case 500:
-			npc->bits &= ~0x20;
+			npc->bits &= ~NPC_SHOOTABLE;
 			npc->act_no = 501;
 			npc->act_wait = 0;
 			npc->ani_no = 8;
@@ -1352,13 +1352,13 @@ void ActNpc313(NPCHAR *npc)
 	{
 		if (IsActiveSomeBullet())
 		{
-			npc->bits &= ~0x20;
-			npc->bits |= 4;
+			npc->bits &= ~NPC_SHOOTABLE;
+			npc->bits |= NPC_INVULNERABLE;
 		}
 		else
 		{
-			npc->bits |= 0x20;
-			npc->bits &= ~4;
+			npc->bits |= NPC_SHOOTABLE;
+			npc->bits &= ~NPC_INVULNERABLE;
 		}
 	}
 
@@ -1388,7 +1388,7 @@ void ActNpc314(NPCHAR *npc)
 		case 0:
 			npc->count2 = 0;
 			npc->act_no = 100;
-			npc->bits |= 4;
+			npc->bits |= NPC_INVULNERABLE;
 			npc->ani_no = Random(0, 2);
 			// Fallthrough
 		case 100:
@@ -1398,13 +1398,13 @@ void ActNpc314(NPCHAR *npc)
 				npc->ym = 0x700;
 
 			if (npc->y > 0x10000)
-				npc->bits &= ~8;
+				npc->bits &= ~NPC_IGNORE_SOLIDITY;
 
 			if (npc->flag & 8)
 			{
 				npc->ym = -0x200;
 				npc->act_no = 110;
-				npc->bits |= 8;
+				npc->bits |= NPC_IGNORE_SOLIDITY;
 				PlaySoundObject(12, 1);
 				SetQuake(10);
 
@@ -1471,7 +1471,7 @@ void ActNpc315(NPCHAR *npc)
 			if (npc->y > 0x10000)
 			{
 				npc->act_no = 130;
-				npc->bits &= ~8;
+				npc->bits &= ~NPC_IGNORE_SOLIDITY;
 			}
 
 			break;
@@ -1480,7 +1480,7 @@ void ActNpc315(NPCHAR *npc)
 			npc->act_no = 110;
 			npc->act_wait = 0;
 			npc->count1 = 0;
-			npc->bits |= 0x20;
+			npc->bits |= NPC_SHOOTABLE;
 			// Fallthrough
 		case 110:
 			if (npc->x > gMC.x)
@@ -1548,7 +1548,7 @@ void ActNpc315(NPCHAR *npc)
 			if (++npc->act_wait > 4)
 			{
 				npc->act_no = 110;
-				npc->bits |= 0x20;
+				npc->bits |= NPC_SHOOTABLE;
 			}
 
 			break;
@@ -1558,13 +1558,13 @@ void ActNpc315(NPCHAR *npc)
 	{
 		if (IsActiveSomeBullet())
 		{
-			npc->bits &= ~0x20;
-			npc->bits |= 4;
+			npc->bits &= ~NPC_SHOOTABLE;
+			npc->bits |= NPC_INVULNERABLE;
 		}
 		else
 		{
-			npc->bits |= 0x20;
-			npc->bits &= ~4;
+			npc->bits |= NPC_SHOOTABLE;
+			npc->bits &= ~NPC_INVULNERABLE;
 		}
 	}
 
@@ -1605,8 +1605,8 @@ void ActNpc316(NPCHAR *npc)
 	switch (npc->act_no)
 	{
 		case 0:
-			npc->bits &= ~0x20;
-			npc->bits &= ~8;
+			npc->bits &= ~NPC_SHOOTABLE;
+			npc->bits &= ~NPC_IGNORE_SOLIDITY;
 			npc->damage = 0;
 			npc->act_no = 1;
 			npc->ani_no = 0;
@@ -1779,9 +1779,9 @@ void ActNpc318(NPCHAR *npc)
 	switch (npc->act_no)
 	{
 		case 0:
-			npc->bits &= ~0x20;
-			npc->bits &= ~8;
-			npc->bits &= ~1;
+			npc->bits &= ~NPC_SHOOTABLE;
+			npc->bits &= ~NPC_IGNORE_SOLIDITY;
+			npc->bits &= ~NPC_SOLID_SOFT;
 			npc->damage = 0;
 			npc->act_no = 1;
 			npc->ani_no = 0;
@@ -1880,7 +1880,7 @@ void ActNpc319(NPCHAR *npc)
 
 		case 2:
 			if (++npc->act_wait == 4)
-				npc->bits &= ~8;
+				npc->bits &= ~NPC_IGNORE_SOLIDITY;
 
 			npc->ym += 0x2A;
 			if (npc->ym > 0x5FF)

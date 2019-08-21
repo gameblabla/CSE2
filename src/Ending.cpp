@@ -319,7 +319,7 @@ void ActionCredit_Read()
 				++Credit.offset;
 				a = GetScriptNumber(&Credit.pData[Credit.offset]);
 				Credit.offset += 4;
-				ChangeMusic(a);
+				ChangeMusic((MusicID)a);
 				return;
 
 			case '~': // Start fading out music

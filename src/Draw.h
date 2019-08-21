@@ -18,7 +18,7 @@ extern RECT grcFull;
 extern int magnification;
 extern BOOL fullscreen;
 
-typedef enum Surface_Ids
+typedef enum SurfaceID
 {
 	SURFACE_ID_TITLE = 0,
 	SURFACE_ID_PIXEL = 1,
@@ -52,31 +52,31 @@ typedef enum Surface_Ids
 	SURFACE_ID_CREDITS_IMAGE = 36,
 	SURFACE_ID_CASTS = 37,
 	SURFACE_ID_MAX = 40
-} Surface_Ids;
+} SurfaceID;
 
 BOOL Flip_SystemTask(HWND hWnd);
 SDL_Window* CreateWindow(const char *title, int width, int height);
 BOOL StartDirectDraw(int lMagnification);
 void EndDirectDraw();
 void ReleaseSurface(int s);
-BOOL MakeSurface_File(const char *name, Surface_Ids surf_no);
-BOOL MakeSurface_Resource(const char *res, Surface_Ids surf_no);
-BOOL ReloadBitmap_File(const char *name, Surface_Ids surf_no);
-BOOL ReloadBitmap_Resource(const char *res, Surface_Ids surf_no);
-BOOL MakeSurface_Generic(int bxsize, int bysize, Surface_Ids surf_no, BOOL bSystem);
-void BackupSurface(Surface_Ids surf_no, const RECT *rect);
-void PutBitmap3(const RECT *rcView, int x, int y, const RECT *rect, Surface_Ids surf_no);
-void PutBitmap4(const RECT *rcView, int x, int y, const RECT *rect, Surface_Ids surf_no);
+BOOL MakeSurface_File(const char *name, SurfaceID surf_no);
+BOOL MakeSurface_Resource(const char *res, SurfaceID surf_no);
+BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no);
+BOOL ReloadBitmap_Resource(const char *res, SurfaceID surf_no);
+BOOL MakeSurface_Generic(int bxsize, int bysize, SurfaceID surf_no, BOOL bSystem);
+void BackupSurface(SurfaceID surf_no, const RECT *rect);
+void PutBitmap3(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID surf_no);
+void PutBitmap4(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID surf_no);
 void Surface2Surface(int x, int y, const RECT *rect, int to, int from);
 unsigned long GetCortBoxColor(unsigned long col);
 void CortBox(const RECT *rect, unsigned long col);
-void CortBox2(const RECT *rect, unsigned long col, Surface_Ids surf_no);
+void CortBox2(const RECT *rect, unsigned long col, SurfaceID surf_no);
 void RestoreSurfaces();
 int SubpixelToScreenCoord(int coord);
 int PixelToScreenCoord(int coord);
 void InitTextObject(const char *font_name);
 void PutText(int x, int y, const char *text, unsigned long color);
-void PutText2(int x, int y, const char *text, unsigned long color, Surface_Ids surf_no);
+void PutText2(int x, int y, const char *text, unsigned long color, SurfaceID surf_no);
 void EndTextObject();
 void HandleDeviceLoss();
 void HandleWindowResize();

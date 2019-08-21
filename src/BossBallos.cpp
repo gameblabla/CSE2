@@ -91,9 +91,9 @@ static void ActBossChar_Eye(NPCHAR *npc)
 	if (npc->act_no >= 0 && npc->act_no < 300)
 	{
 		if (npc->ani_no != 3)
-			npc->bits &= ~0x20;
+			npc->bits &= ~NPC_SHOOTABLE;
 		else
-			npc->bits |= 0x20;
+			npc->bits |= NPC_SHOOTABLE;
 	}
 
 	if (npc->direct == 0)
@@ -154,7 +154,7 @@ void ActBossChar_Ballos(void)
 			npc->hit.top = 0x6000;
 			npc->hit.back = 0x4000;
 			npc->hit.bottom = 0x6000;
-			npc->bits = 0x8248;
+			npc->bits = (NPC_IGNORE_SOLIDITY | NPC_SOLID_HARD | NPC_EVENT_WHEN_KILLED | NPC_SHOW_DAMAGE);
 			npc->size = 3;
 			npc->damage = 0;
 			npc->code_event = 1000;
@@ -163,7 +163,7 @@ void ActBossChar_Ballos(void)
 			// Initialize eyes
 			gBoss[1].cond = 0x90;
 			gBoss[1].direct = 0;
-			gBoss[1].bits = 8;
+			gBoss[1].bits = NPC_IGNORE_SOLIDITY;
 			gBoss[1].life = 10000;
 			gBoss[1].view.front = 0x1800;
 			gBoss[1].view.top = 0;
@@ -179,7 +179,7 @@ void ActBossChar_Ballos(void)
 
 			// Initialize the body
 			gBoss[3].cond = 0x90;
-			gBoss[3].bits = 0xD;
+			gBoss[3].bits = (NPC_SOLID_SOFT | NPC_INVULNERABLE | NPC_IGNORE_SOLIDITY);
 			gBoss[3].view.front = 0x7800;
 			gBoss[3].view.top = 0x7800;
 			gBoss[3].view.back = 0x7800;
@@ -190,14 +190,14 @@ void ActBossChar_Ballos(void)
 			gBoss[3].hit.bottom = 0x4000;
 
 			gBoss[4].cond = 0x90;
-			gBoss[4].bits = 0xD;
+			gBoss[4].bits = (NPC_SOLID_SOFT | NPC_INVULNERABLE | NPC_IGNORE_SOLIDITY);
 			gBoss[4].hit.front = 0x4000;
 			gBoss[4].hit.top = 0x1000;
 			gBoss[4].hit.back = 0x4000;
 			gBoss[4].hit.bottom = 0x1000;
 
 			gBoss[5].cond = 0x90;
-			gBoss[5].bits = 0x4C;
+			gBoss[5].bits = (NPC_INVULNERABLE | NPC_IGNORE_SOLIDITY | NPC_SOLID_HARD);
 			gBoss[5].hit.front = 0x4000;
 			gBoss[5].hit.top = 0;
 			gBoss[5].hit.back = 0x4000;
@@ -598,13 +598,17 @@ void ActBossChar_Ballos(void)
 			gBoss[1].act_no = 300;
 			gBoss[2].act_no = 300;
 
-			gBoss[1].act_no &= ~0x41;
-			gBoss[2].act_no &= ~0x41;
+#ifndef FIX_BUGS
+			// This code makes absolutely no sense.
+			// Luckily, it doesn't cause any bugs.
+			gBoss[1].act_no &= ~(NPC_SOLID_SOFT | NPC_SOLID_HARD);
+			gBoss[2].act_no &= ~(NPC_SOLID_SOFT | NPC_SOLID_HARD);
+#endif
 
-			gBoss[0].bits &= ~0x41;
-			gBoss[3].bits &= ~0x41;
-			gBoss[4].bits &= ~0x41;
-			gBoss[5].bits &= ~0x41;
+			gBoss[0].bits &= ~(NPC_SOLID_SOFT | NPC_SOLID_HARD);
+			gBoss[3].bits &= ~(NPC_SOLID_SOFT | NPC_SOLID_HARD);
+			gBoss[4].bits &= ~(NPC_SOLID_SOFT | NPC_SOLID_HARD);
+			gBoss[5].bits &= ~(NPC_SOLID_SOFT | NPC_SOLID_HARD);
 			// Fallthrough
 		case 1001:
 			++gBoss[0].act_wait;
@@ -646,9 +650,9 @@ void ActBossChar_Ballos(void)
 
 	if (npc->act_no > 420 && npc->act_no < 500)
 	{
-		gBoss[3].bits |= 0x20;
-		gBoss[4].bits |= 0x20;
-		gBoss[5].bits |= 0x20;
+		gBoss[3].bits |= NPC_SHOOTABLE;
+		gBoss[4].bits |= NPC_SHOOTABLE;
+		gBoss[5].bits |= NPC_SHOOTABLE;
 
 		if (++npc->act_wait > 300)
 		{

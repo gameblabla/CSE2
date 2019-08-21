@@ -167,7 +167,7 @@ void ReleaseSurface(int s)
 	memset(&surface_metadata[s], 0, sizeof(surface_metadata[0]));
 }
 
-BOOL MakeSurface_Generic(int bxsize, int bysize, Surface_Ids surf_no, BOOL bSystem)
+BOOL MakeSurface_Generic(int bxsize, int bysize, SurfaceID surf_no, BOOL bSystem)
 {
 	BOOL success = FALSE;
 
@@ -210,7 +210,7 @@ BOOL MakeSurface_Generic(int bxsize, int bysize, Surface_Ids surf_no, BOOL bSyst
 	return success;
 }
 
-static BOOL LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, BOOL create_surface, const char *name, SurfaceType type)
+static BOOL LoadBitmap(SDL_RWops *fp, SurfaceID surf_no, BOOL create_surface, const char *name, SurfaceType type)
 {
 	BOOL success = FALSE;
 
@@ -350,7 +350,7 @@ static BOOL LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, BOOL create_surface, 
 	return success;
 }
 
-static BOOL LoadBitmap_File(const char *name, Surface_Ids surf_no, BOOL create_surface)
+static BOOL LoadBitmap_File(const char *name, SurfaceID surf_no, BOOL create_surface)
 {
 	char path[PATH_LENGTH];
 	SDL_RWops *fp;
@@ -386,7 +386,7 @@ static BOOL LoadBitmap_File(const char *name, Surface_Ids surf_no, BOOL create_s
 	return FALSE;
 }
 
-static BOOL LoadBitmap_Resource(const char *res, Surface_Ids surf_no, BOOL create_surface)
+static BOOL LoadBitmap_Resource(const char *res, SurfaceID surf_no, BOOL create_surface)
 {
 	size_t size;
 	const unsigned char *data = FindResource(res, "BITMAP", &size);
@@ -406,22 +406,22 @@ static BOOL LoadBitmap_Resource(const char *res, Surface_Ids surf_no, BOOL creat
 	return FALSE;
 }
 
-BOOL MakeSurface_File(const char *name, Surface_Ids surf_no)
+BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 {
 	return LoadBitmap_File(name, surf_no, TRUE);
 }
 
-BOOL MakeSurface_Resource(const char *res, Surface_Ids surf_no)
+BOOL MakeSurface_Resource(const char *res, SurfaceID surf_no)
 {
 	return LoadBitmap_Resource(res, surf_no, TRUE);
 }
 
-BOOL ReloadBitmap_File(const char *name, Surface_Ids surf_no)
+BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 {
 	return LoadBitmap_File(name, surf_no, FALSE);
 }
 
-BOOL ReloadBitmap_Resource(const char *res, Surface_Ids surf_no)
+BOOL ReloadBitmap_Resource(const char *res, SurfaceID surf_no)
 {
 	return LoadBitmap_Resource(res, surf_no, FALSE);
 }
@@ -434,7 +434,7 @@ static void ScaleRect(const RECT *source_rect, RECT *destination_rect)
 	destination_rect->bottom = source_rect->bottom * magnification;
 }
 
-void BackupSurface(Surface_Ids surf_no, const RECT *rect)
+void BackupSurface(SurfaceID surf_no, const RECT *rect)
 {
 	RECT frameRect;
 	ScaleRect(rect, &frameRect);
@@ -442,7 +442,7 @@ void BackupSurface(Surface_Ids surf_no, const RECT *rect)
 	Backend_Blit(framebuffer, &frameRect, surf[surf_no], frameRect.left, frameRect.top, FALSE);
 }
 
-static void DrawBitmap(const RECT *rcView, int x, int y, const RECT *rect, Surface_Ids surf_no, BOOL transparent)
+static void DrawBitmap(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID surf_no, BOOL transparent)
 {
 	RECT frameRect;
 	ScaleRect(rect, &frameRect);
@@ -476,12 +476,12 @@ static void DrawBitmap(const RECT *rcView, int x, int y, const RECT *rect, Surfa
 	Backend_Blit(surf[surf_no], &frameRect, framebuffer, x, y, transparent);
 }
 
-void PutBitmap3(const RECT *rcView, int x, int y, const RECT *rect, Surface_Ids surf_no) // Transparency
+void PutBitmap3(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID surf_no) // Transparency
 {
 	DrawBitmap(rcView, x, y, rect, surf_no, TRUE);
 }
 
-void PutBitmap4(const RECT *rcView, int x, int y, const RECT *rect, Surface_Ids surf_no) // No Transparency
+void PutBitmap4(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID surf_no) // No Transparency
 {
 	DrawBitmap(rcView, x, y, rect, surf_no, FALSE);
 }
@@ -525,7 +525,7 @@ void CortBox(const RECT *rect, unsigned long col)
 	Backend_ColourFill(framebuffer, &destRect, col_red, col_green, col_blue, 0xFF);
 }
 
-void CortBox2(const RECT *rect, unsigned long col, Surface_Ids surf_no)
+void CortBox2(const RECT *rect, unsigned long col, SurfaceID surf_no)
 {
 	// Get rect
 	RECT destRect;
@@ -557,15 +557,15 @@ void RestoreSurfaces()	// Guessed function name - this doesn't exist in the Linu
 					rect.top = 0;
 					rect.right = surface_metadata[i].width;
 					rect.bottom = surface_metadata[i].height;
-					CortBox2(&rect, 0, (Surface_Ids)i);
+					CortBox2(&rect, 0, (SurfaceID)i);
 					break;
 
 				case SURFACE_SOURCE_RESOURCE:
-					ReloadBitmap_Resource(surface_metadata[i].name, (Surface_Ids)i);
+					ReloadBitmap_Resource(surface_metadata[i].name, (SurfaceID)i);
 					break;
 
 				case SURFACE_SOURCE_FILE:
-					ReloadBitmap_File(surface_metadata[i].name, (Surface_Ids)i);
+					ReloadBitmap_File(surface_metadata[i].name, (SurfaceID)i);
 					break;
 			}
 		}
@@ -690,7 +690,7 @@ void PutText(int x, int y, const char *text, unsigned long color)
 	DrawText(gFont, framebuffer, x * magnification, y * magnification, color, text, strlen(text));
 }
 
-void PutText2(int x, int y, const char *text, unsigned long color, Surface_Ids surf_no)
+void PutText2(int x, int y, const char *text, unsigned long color, SurfaceID surf_no)
 {
 	DrawText(gFont, surf[surf_no], x * magnification, y * magnification, color, text, strlen(text));
 }

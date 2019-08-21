@@ -976,7 +976,7 @@ static CachedGlyph* GetGlyphCached(FontObject *font_object, unsigned long unicod
 		FT_Bitmap_New(&bitmap);
 		FT_Bitmap_Convert(font_object->library, &font_object->face->glyph->bitmap, &bitmap, 1);
 
-		unsigned char pixel_mode;
+		FontPixelMode pixel_mode;
 		switch (font_object->face->glyph->bitmap.pixel_mode)
 		{
 			case FT_PIXEL_MODE_GRAY:

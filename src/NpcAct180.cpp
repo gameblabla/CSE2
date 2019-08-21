@@ -103,7 +103,7 @@ void ActNpc180(NPCHAR *npc)
 		case 41:
 			if (++npc->act_wait == 750)
 			{
-				npc->bits &= ~0x2000;
+				npc->bits &= ~NPC_INTERACTABLE;
 				npc->ani_no = 0;
 			}
 
@@ -586,7 +586,7 @@ void ActNpc184(NPCHAR *npc)
 			npc->act_no = 11;
 			npc->ani_no = 1;
 			npc->act_wait = 0;
-			npc->bits |= npc_ignoreSolid;
+			npc->bits |= NPC_IGNORE_SOLIDITY;
 			// Fallthrough
 		case 11:
 			switch (npc->direct)
@@ -650,7 +650,7 @@ void ActNpc185(NPCHAR *npc)
 			npc->act_no = 11;
 			npc->ani_no = 1;
 			npc->act_wait = 0;
-			npc->bits |= npc_ignoreSolid;
+			npc->bits |= NPC_IGNORE_SOLIDITY;
 			// Fallthrough
 		case 11:
 			switch (npc->direct)
@@ -705,7 +705,7 @@ void ActNpc186(NPCHAR *npc)
 			npc->act_no = 11;
 			npc->ani_no = 1;
 			npc->act_wait = 0;
-			npc->bits |= 8;
+			npc->bits |= NPC_IGNORE_SOLIDITY;
 			// Fallthrough
 		case 11:
 			switch (npc->direct)

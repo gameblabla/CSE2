@@ -68,7 +68,7 @@ BOOL InitTextScript2()
 
 	//Create line surfaces
 	for (int i = 0; i < 4; i++)
-		MakeSurface_Generic(gRect_line.right, gRect_line.bottom, (Surface_Ids)(i + SURFACE_ID_TEXT_LINE1), FALSE);
+		MakeSurface_Generic(gRect_line.right, gRect_line.bottom, (SurfaceID)(i + SURFACE_ID_TEXT_LINE1), FALSE);
 
 	//Clear text
 	memset(text, 0, sizeof(text));
@@ -233,7 +233,7 @@ BOOL StartTextScript(int no)
 	for (int i = 0; i < 4; i++)
 	{
 		gTS.ypos_line[i] = 16 * i;
-		CortBox2(&gRect_line, 0x000000, (Surface_Ids)(i + SURFACE_ID_TEXT_LINE1));
+		CortBox2(&gRect_line, 0x000000, (SurfaceID)(i + SURFACE_ID_TEXT_LINE1));
 		memset(&text[i * 0x40], 0, 0x40);
 	}*/
 
@@ -282,7 +282,7 @@ BOOL JumpTextScript(int no)
 	for (int i = 0; i < 4; i++)
 	{
 		gTS.ypos_line[i] = 16 * i;
-		CortBox2(&gRect_line, 0x000000, (Surface_Ids)(i + SURFACE_ID_TEXT_LINE1));
+		CortBox2(&gRect_line, 0x000000, (SurfaceID)(i + SURFACE_ID_TEXT_LINE1));
 		memset(&text[i * 0x40], 0, 0x40);
 	}
 
@@ -334,7 +334,7 @@ void CheckNewLine()
 	{
 		gTS.mode = 3;
 		g_GameFlags |= 4;
-		CortBox2(&gRect_line, 0, (Surface_Ids)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
+		CortBox2(&gRect_line, 0, (SurfaceID)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
 		memset(&text[gTS.line % 4 * 0x40], 0, 0x40);
 	}
 }
@@ -379,7 +379,7 @@ void SetNumberTextScript(int index)
 	str[offset + 1] = 0;
 
 	//Append number to line
-	PutText2(6 * gTS.p_write, 0, str, RGB(0xFF, 0xFF, 0xFE), (Surface_Ids)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
+	PutText2(6 * gTS.p_write, 0, str, RGB(0xFF, 0xFF, 0xFE), (SurfaceID)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
 	strcat(&text[gTS.line % 4 * 0x40], str);
 
 	//Play sound and reset blinking cursor
@@ -407,7 +407,7 @@ void ClearTextLine()
 	for (int i = 0; i < 4; i++)
 	{
 		gTS.ypos_line[i] = 16 * i;
-		CortBox2(&gRect_line, 0x000000, (Surface_Ids)(i + SURFACE_ID_TEXT_LINE1));
+		CortBox2(&gRect_line, 0x000000, (SurfaceID)(i + SURFACE_ID_TEXT_LINE1));
 		memset(&text[i * 0x40], 0, 0x40);
 	}
 }
@@ -483,7 +483,7 @@ void PutTextScript()
 		text_offset = 0;
 
 	for (i = 0; i < 4; i++)
-		PutBitmap3(&gTS.rcText, PixelToScreenCoord(text_offset + TEXT_LEFT), PixelToScreenCoord(gTS.offsetY + gTS.ypos_line[i] + gTS.rcText.top), &gRect_line, (Surface_Ids)(i + SURFACE_ID_TEXT_LINE1));
+		PutBitmap3(&gTS.rcText, PixelToScreenCoord(text_offset + TEXT_LEFT), PixelToScreenCoord(gTS.offsetY + gTS.ypos_line[i] + gTS.rcText.top), &gRect_line, (SurfaceID)(i + SURFACE_ID_TEXT_LINE1));
 
 	//Draw NOD cursor
 	if ((gTS.wait_beam++ % 20 > 12) && gTS.mode == 2)
@@ -1039,7 +1039,7 @@ int TextScriptProc()
 					else if (IS_COMMAND('C','M','U'))
 					{
 						z = GetTextScriptNo(gTS.p_read + 4);
-						ChangeMusic(z);
+						ChangeMusic((MusicID)z);
 						gTS.p_read += 8;
 					}
 					else if (IS_COMMAND('F','M','U'))
@@ -1335,7 +1335,7 @@ int TextScriptProc()
 						gTS.p_write = x;
 
 						//Print text
-						PutText2(0, 0, str, RGB(0xFF, 0xFF, 0xFE), (Surface_Ids)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
+						PutText2(0, 0, str, RGB(0xFF, 0xFF, 0xFE), (SurfaceID)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
 					#ifdef FIX_BUGS
 						strcpy(&text[gTS.line % 4 * 0x40], str);
 					#else
@@ -1368,11 +1368,11 @@ int TextScriptProc()
 						//Print text
 						if (c[0] == '=')
 						{
-							Surface2Surface(6 * gTS.p_write, 2, &rcSymbol, (Surface_Ids)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1), SURFACE_ID_TEXT_BOX);
+							Surface2Surface(6 * gTS.p_write, 2, &rcSymbol, (SurfaceID)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1), SURFACE_ID_TEXT_BOX);
 						}
 						else
 						{
-							PutText2(6 * gTS.p_write, 0, c, RGB(0xFF, 0xFF, 0xFE), (Surface_Ids)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
+							PutText2(6 * gTS.p_write, 0, c, RGB(0xFF, 0xFF, 0xFE), (SurfaceID)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
 						}
 
 						strcat(&text[gTS.line % 4 * 0x40], c);
@@ -1500,7 +1500,7 @@ void RestoreTextScript()
 {
 	for (int i = 0; i < 4; ++i)
 	{
-		CortBox2(&gRect_line, 0x000000, (Surface_Ids)(i + SURFACE_ID_TEXT_LINE1));
-		PutText2(0, 0, &text[i * 0x40], RGB(0xFF, 0xFF, 0xFE), (Surface_Ids)(i + SURFACE_ID_TEXT_LINE1));
+		CortBox2(&gRect_line, 0x000000, (SurfaceID)(i + SURFACE_ID_TEXT_LINE1));
+		PutText2(0, 0, &text[i * 0x40], RGB(0xFF, 0xFF, 0xFE), (SurfaceID)(i + SURFACE_ID_TEXT_LINE1));
 	}
 }

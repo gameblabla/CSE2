@@ -355,10 +355,10 @@ const struct
 };
 
 unsigned int gOldPos;
-int gOldNo;
-int gMusicNo;
+MusicID gOldNo;
+MusicID gMusicNo;
 
-void ChangeMusic(int no)
+void ChangeMusic(MusicID no)
 {
 	if (no && no == gMusicNo)
 		return;

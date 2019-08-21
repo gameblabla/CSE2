@@ -58,7 +58,7 @@ static void ActBossCharT_DragonBody(NPCHAR *npc)
 
 		case 1000:
 			npc->act_no = 1001;
-			npc->bits &= ~0x20;
+			npc->bits &= ~NPC_SHOOTABLE;
 			// Fallthrough
 		case 1001:
 			deg = ((npc->pNpc->count1 / 4) + npc->count1) % 0x100;
@@ -120,7 +120,7 @@ static void ActBossCharT_DragonHead(NPCHAR *npc)
 			npc->act_no = 200;
 			// Fallthrough
 		case 200:
-			npc->bits &= ~0x20;
+			npc->bits &= ~NPC_SHOOTABLE;
 			npc->ani_no = 0;
 			npc->hit.front = 0x2000;
 			npc->act_no = 201;
@@ -148,7 +148,7 @@ static void ActBossCharT_DragonHead(NPCHAR *npc)
 			{
 				npc->ani_no = 2;
 				npc->hit.front = 0x1000;
-				npc->bits |= 0x20;
+				npc->bits |= NPC_SHOOTABLE;
 				npc->count2 = 0;
 			}
 
@@ -205,7 +205,7 @@ static void ActBossCharT_DragonHead(NPCHAR *npc)
 			npc->act_wait = 0;
 			npc->ani_no = 0;
 			npc->hit.front = 0x2000;
-			npc->bits &= ~0x20;
+			npc->bits &= ~NPC_SHOOTABLE;
 			// Fallthrough
 		case 401:
 			if (++npc->act_wait == 3)
@@ -215,7 +215,7 @@ static void ActBossCharT_DragonHead(NPCHAR *npc)
 			{
 				npc->ani_no = 2;
 				npc->hit.front = 0x1000;
-				npc->bits |= 0x20;
+				npc->bits |= NPC_SHOOTABLE;
 				npc->count2 = 0;
 			}
 
@@ -237,7 +237,7 @@ static void ActBossCharT_DragonHead(NPCHAR *npc)
 			break;
 
 		case 1000:
-			npc->bits &= ~0x20;
+			npc->bits &= ~NPC_SHOOTABLE;
 			npc->ani_no = 3;
 			break;
 	}
@@ -279,8 +279,8 @@ void ActBossChar_Twin(void)
 			npc->hit.top = 0x1000;
 			npc->hit.back = 0x1000;
 			npc->hit.bottom = 0x1000;
-			npc->bits = 8;
-			npc->bits |= 0x200;
+			npc->bits = NPC_IGNORE_SOLIDITY;
+			npc->bits |= NPC_EVENT_WHEN_KILLED;
 			npc->size = 3;
 			npc->damage = 0;
 			npc->code_event = 1000;
@@ -298,7 +298,7 @@ void ActBossChar_Twin(void)
 			gBoss[2].hit.front = 0x1800;
 			gBoss[2].hit.top = 0x1400;
 			gBoss[2].hit.bottom = 0x1400;
-			gBoss[2].bits = 12;
+			gBoss[2].bits = (NPC_INVULNERABLE | NPC_IGNORE_SOLIDITY);
 			gBoss[2].pNpc = &gBoss[3];
 			gBoss[2].cond |= 0x10;
 			gBoss[2].damage = 10;
@@ -312,7 +312,7 @@ void ActBossChar_Twin(void)
 			gBoss[3].hit.front = 0x1800;
 			gBoss[3].hit.top = 0x400;
 			gBoss[3].hit.bottom = 0x2000;
-			gBoss[3].bits = 8;
+			gBoss[3].bits = NPC_IGNORE_SOLIDITY;
 			gBoss[3].pNpc = npc;
 			gBoss[3].damage = 10;
 
