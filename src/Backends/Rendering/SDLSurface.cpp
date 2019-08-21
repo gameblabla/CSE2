@@ -142,7 +142,7 @@ BOOL Backend_SupportsSubpixelGlyphs(void)
 	return FALSE;	// SDL_Surfaces don't have per-component alpha
 }
 
-Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch, unsigned char pixel_mode)
+Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch, FontPixelMode pixel_mode)
 {
 	Backend_Glyph *glyph = (Backend_Glyph*)malloc(sizeof(Backend_Glyph));
 
@@ -159,7 +159,9 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 
 	switch (pixel_mode)
 	{
-		// FONT_PIXEL_MODE_LCD is unsupported
+		case FONT_PIXEL_MODE_LCD:
+			// Unsupported
+			break;
 
 		case FONT_PIXEL_MODE_GRAY:
 			for (unsigned int y = 0; y < height; ++y)

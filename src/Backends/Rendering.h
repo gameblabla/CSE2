@@ -4,12 +4,12 @@
 
 #include "../WindowsWrapper.h"
 
-enum
+typedef enum FontPixelMode
 {
 	FONT_PIXEL_MODE_LCD,
 	FONT_PIXEL_MODE_GRAY,
 	FONT_PIXEL_MODE_MONO,
-};
+} FontPixelMode;
 
 typedef struct Backend_Surface Backend_Surface;
 typedef struct Backend_Glyph Backend_Glyph;
@@ -25,7 +25,7 @@ void Backend_UnlockSurface(Backend_Surface *surface);
 void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL colour_key);
 void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue);
 BOOL Backend_SupportsSubpixelGlyphs(void);
-Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch, unsigned char pixel_mode);
+Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch, FontPixelMode pixel_mode);
 void Backend_UnloadGlyph(Backend_Glyph *glyph);
 void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours);
 void Backend_HandleDeviceLoss(void);
