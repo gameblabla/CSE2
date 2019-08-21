@@ -40,7 +40,7 @@ struct NPCHAR
 	int code_char;
 	int code_flag;
 	int code_event;
-	Surface_Ids surf;
+	SurfaceID surf;
 	int hit_voice;
 	int destroy_voice;
 	int life;

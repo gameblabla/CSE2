@@ -279,7 +279,7 @@ int ModeTitle(HWND hWnd)
 	int char_type;
 	int time_counter;
 	int char_y;
-	Surface_Ids char_surf;
+	SurfaceID char_surf;
 	unsigned long back_color;
 
 	// Reset everything
