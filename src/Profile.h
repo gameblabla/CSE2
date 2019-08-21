@@ -4,12 +4,13 @@
 
 #include "ArmsItem.h"
 #include "SelStage.h"
+#include "Stage.h"
 
 struct PROFILE
 {
 	char code[8];
 	int stage;
-	int music;
+	MusicID music;
 	int x;
 	int y;
 	int direct;

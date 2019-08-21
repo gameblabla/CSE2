@@ -1036,7 +1036,7 @@ int TextScriptProc()
 					else if (IS_COMMAND('C','M','U'))
 					{
 						z = GetTextScriptNo(gTS.p_read + 4);
-						ChangeMusic(z);
+						ChangeMusic((MusicID)z);
 						gTS.p_read += 8;
 					}
 					else if (IS_COMMAND('F','M','U'))
