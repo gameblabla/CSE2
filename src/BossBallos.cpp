@@ -117,13 +117,13 @@ static void ActBossChar_Body(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-static void ActBossChar_HITAI(NPCHAR *npc)
+static void ActBossChar_HITAI(NPCHAR *npc)	// "Hitai" = "forehead" or "brow" (according to Google Translate, anyway)
 {
 	npc->x = gBoss[0].x;
 	npc->y = gBoss[0].y - 0x5800;
 }
 
-static void ActBossChar_HARA(NPCHAR *npc)
+static void ActBossChar_HARA(NPCHAR *npc)	// "Hara" = "belly" or "stomach" (according to Google Translate, anyway)
 {
 	npc->x = gBoss[0].x;
 	npc->y = gBoss[0].y;
@@ -373,8 +373,8 @@ void ActBossChar_Ballos(void)
 
 			for (i = 0; i < 0x100; i += 0x40)
 			{
-				SetNpChar(342, npc->x, npc->y, 0, 0, i, npc, 0x5A);
-				SetNpChar(342, npc->x, npc->y, 0, 0, i + 544, npc, 0x5A);
+				SetNpChar(342, npc->x, npc->y, 0, 0, i, npc, 90);
+				SetNpChar(342, npc->x, npc->y, 0, 0, i + 544, npc, 90);
 			}
 
 			SetNpChar(343, npc->x, npc->y, 0, 0, 0, npc, 0x18);
@@ -641,6 +641,7 @@ void ActBossChar_Ballos(void)
 				gBoss[3].cond = 0;
 				gBoss[4].cond = 0;
 				gBoss[5].cond = 0;
+
 				DeleteNpCharCode(350, 1);
 				DeleteNpCharCode(348, 1);
 			}

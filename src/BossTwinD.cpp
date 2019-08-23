@@ -324,7 +324,7 @@ void ActBossChar_Twin(void)
 			break;
 
 		case 20:
-			if (--npc->tgt_x <= 112)
+			if (--npc->tgt_x <= 0x70)
 			{
 				npc->act_no = 100;
 				npc->act_wait = 0;
@@ -341,40 +341,28 @@ void ActBossChar_Twin(void)
 			{
 				++npc->count1;
 			}
+			else if (npc->act_wait < 120)
+			{
+				npc->count1 += 2;
+			}
+			else if (npc->act_wait < npc->count2)
+			{
+				npc->count1 += 4;
+			}
+			else if (npc->act_wait < npc->count2 + 40)
+			{
+				npc->count1 += 2;
+			}
+			else if (npc->act_wait < npc->count2 + 60)
+			{
+				++npc->count1;
+			}
 			else
 			{
-				if (npc->act_wait < 120)
-				{
-					npc->count1 += 2;
-				}
-				else
-				{
-					if (npc->act_wait < npc->count2)
-					{
-						npc->count1 += 4;
-					}
-					else
-					{
-						if (npc->act_wait < npc->count2 + 40)
-						{
-							npc->count1 += 2;
-						}
-						else
-						{
-							if (npc->act_wait < npc->count2 + 60)
-							{
-								++npc->count1;
-							}
-							else
-							{
-								npc->act_wait = 0;
-								npc->act_no = 110;
-								npc->count2 = Random(400, 700);
-								break;
-							}
-						}
-					}
-				}
+				npc->act_wait = 0;
+				npc->act_no = 110;
+				npc->count2 = Random(400, 700);
+				break;
 			}
 
 			if (npc->count1 > 0x3FF)
@@ -387,51 +375,39 @@ void ActBossChar_Twin(void)
 			{
 				--npc->count1;
 			}
+			else if (npc->act_wait < 60)
+			{
+				npc->count1 -= 2;
+			}
+			else if (npc->act_wait < npc->count2)
+			{
+				npc->count1 -= 4;
+			}
+			else if (npc->act_wait < npc->count2 + 40)
+			{
+				npc->count1 -= 2;
+			}
+			else if (npc->act_wait < npc->count2 + 60)
+			{
+				--npc->count1;
+			}
 			else
 			{
-				if (npc->act_wait < 60)
+				if (npc->life < 300)
 				{
-					npc->count1 -= 2;
+					npc->act_wait = 0;
+					npc->act_no = 400;
+					gBoss[2].act_no = 400;
+					gBoss[4].act_no = 400;
 				}
 				else
 				{
-					if (npc->act_wait < npc->count2)
-					{
-						npc->count1 -= 4;
-					}
-					else
-					{
-						if (npc->act_wait < npc->count2 + 40)
-						{
-							npc->count1 -= 2;
-						}
-						else
-						{
-							if (npc->act_wait < npc->count2 + 60)
-							{
-								--npc->count1;
-							}
-							else
-							{
-								if (npc->life < 300)
-								{
-									npc->act_wait = 0;
-									npc->act_no = 400;
-									gBoss[2].act_no = 400;
-									gBoss[4].act_no = 400;
-								}
-								else
-								{
-									npc->act_wait = 0;
-									npc->act_no = 100;
-									npc->count2 = Random(400, 700);
-								}
-
-								break;
-							}
-						}
-					}
+					npc->act_wait = 0;
+					npc->act_no = 100;
+					npc->count2 = Random(400, 700);
 				}
+
+				break;
 			}
 
 			if (npc->count1 <= 0)
@@ -453,41 +429,29 @@ void ActBossChar_Twin(void)
 			{
 				++npc->count1;
 			}
+			else if (npc->act_wait < 120)
+			{
+				npc->count1 += 2;
+			}
+			else if (npc->act_wait < 500)
+			{
+				npc->count1 += 4;
+			}
+			else if (npc->act_wait < 540)
+			{
+				npc->count1 += 2;
+			}
+			else if (npc->act_wait < 560)
+			{
+				++npc->count1;
+			}
 			else
 			{
-				if (npc->act_wait < 120)
-				{
-					npc->count1 += 2;
-				}
-				else
-				{
-					if (npc->act_wait < 500)
-					{
-						npc->count1 += 4;
-					}
-					else
-					{
-						if (npc->act_wait < 540)
-						{
-							npc->count1 += 2;
-						}
-						else
-						{
-							if (npc->act_wait < 560)
-							{
-								++npc->count1;
-							}
-							else
-							{
-								npc->act_no = 100;
-								npc->act_wait = 0;
-								gBoss[2].act_no = 100;
-								gBoss[4].act_no = 100;
-								break;
-							}
-						}
-					}
-				}
+				npc->act_no = 100;
+				npc->act_wait = 0;
+				gBoss[2].act_no = 100;
+				gBoss[4].act_no = 100;
+				break;
 			}
 
 			if (npc->count1 > 0x3FF)
