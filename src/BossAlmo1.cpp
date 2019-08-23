@@ -137,8 +137,8 @@ static void ActBossChar_Core_Mini(NPCHAR *npc)
 			npc->bits |= NPC_SHOOTABLE;
 			// Fallthrough
 		case 101:
-			npc->x += (npc->tgt_x - npc->x) / 16;
-			npc->y += (npc->tgt_y - npc->y) / 16;
+			npc->x += (npc->tgt_x - npc->x) / 0x10;
+			npc->y += (npc->tgt_y - npc->y) / 0x10;
 
 			if (++npc->act_wait > 50)
 				npc->ani_no = 0;
@@ -168,8 +168,8 @@ static void ActBossChar_Core_Mini(NPCHAR *npc)
 			npc->tgt_y = npc->y + (Random(-4, 4) * 0x200);
 			// Fallthrough
 		case 131:
-			npc->x += (npc->tgt_x - npc->x) / 16;
-			npc->y += (npc->tgt_y - npc->y) / 16;
+			npc->x += (npc->tgt_x - npc->x) / 0x10;
+			npc->y += (npc->tgt_y - npc->y) / 0x10;
 
 			if (++npc->act_wait > 50)
 			{
@@ -190,8 +190,8 @@ static void ActBossChar_Core_Mini(NPCHAR *npc)
 			break;
 
 		case 140:
-			npc->x += (npc->tgt_x - npc->x) / 16;
-			npc->y += (npc->tgt_y - npc->y) / 16;
+			npc->x += (npc->tgt_x - npc->x) / 0x10;
+			npc->y += (npc->tgt_y - npc->y) / 0x10;
 			break;
 
 		case 200:
@@ -224,14 +224,17 @@ static void ActBossChar_Core_Hit(NPCHAR *npc)
 			npc->x = gBoss[0].x;
 			npc->y = gBoss[0].y - 0x4000;
 			break;
+
 		case 1:
 			npc->x = gBoss[0].x + 0x3800;
 			npc->y = gBoss[0].y;
 			break;
+
 		case 2:
 			npc->x = gBoss[0].x + 0x800;
 			npc->y = gBoss[0].y + 0x4000;
 			break;
+
 		case 3:
 			npc->x = gBoss[0].x - 0x3800;
 			npc->y = gBoss[0].y + 0x800;
@@ -423,7 +426,7 @@ void ActBossChar_Core(void)
 			// Fallthrough
 		case 221:
 			++npc->act_wait;
-			SetNpChar(199, gMC.x + (Random(-50, 150) * 0x200 * 2), gMC.y + (Random(-0xA0, 0xA0) * 0x200), 0, 0, 0, 0, 0x100);
+			SetNpChar(199, gMC.x + (Random(-50, 150) * 0x200 * 2), gMC.y + (Random(-160, 160) * 0x200), 0, 0, 0, 0, 0x100);
 			gMC.xm -= 0x20;
 			gMC.cond |= 0x20;
 

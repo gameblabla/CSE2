@@ -532,18 +532,23 @@ void ActBossChar_Undead(void)
 		case 230:
 			npc->act_no = 231;
 			npc->act_wait = 0;
+
 			gBoss[3].act_no = 30;
+
 			gBoss[8].bits |= NPC_INVULNERABLE;
 			gBoss[9].bits |= NPC_INVULNERABLE;
 			gBoss[10].bits |= NPC_INVULNERABLE;
 			gBoss[11].bits |= NPC_SHOOTABLE;
+
 			PlaySoundObject(25, 1);
+
 			SetNpChar(285, gBoss[3].x - 0x2000, gBoss[3].y, 0, 0, 0, 0, 0x100);
 			SetNpChar(285, gBoss[3].x - 0x2000, gBoss[3].y, 0, 0, 0x400, 0, 0x100);
 			SetNpChar(285, gBoss[3].x, gBoss[3].y - 0x2000, 0, 0, 0, 0, 0x100);
 			SetNpChar(285, gBoss[3].x, gBoss[3].y - 0x2000, 0, 0, 0x400, 0, 0x100);
 			SetNpChar(285, gBoss[3].x, gBoss[3].y + 0x2000, 0, 0, 0, 0, 0x100);
 			SetNpChar(285, gBoss[3].x, gBoss[3].y + 0x2000, 0, 0, 0x400, 0, 0x100);
+
 			life = npc->life;
 			bShock = TRUE;
 			// Fallthrough
@@ -719,12 +724,16 @@ void ActBossChar_Undead(void)
 	npc->y += npc->ym;
 
 	ActBossCharA_Face(&gBoss[3]);
+
 	ActBossCharA_Head(&gBoss[4]);
+
 	ActBossCharA_Tail(&gBoss[5]);
+
 	ActBossCharA_Mini(&gBoss[1]);
 	ActBossCharA_Mini(&gBoss[2]);
 	ActBossCharA_Mini(&gBoss[6]);
 	ActBossCharA_Mini(&gBoss[7]);
+
 	ActBossCharA_Hit(&gBoss[8]);
 	ActBossCharA_Hit(&gBoss[9]);
 	ActBossCharA_Hit(&gBoss[10]);

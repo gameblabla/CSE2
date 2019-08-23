@@ -192,7 +192,7 @@ void ActBossChar_Omega()
 			SetQuake(2);
 			gBoss[0].y -= 0x200;
 
-			if (!(++gBoss[0].act_wait % 4))
+			if (++gBoss[0].act_wait % 4 == 0)
 				PlaySoundObject(26, 1);
 
 			if (gBoss[0].act_wait == 48)
@@ -273,7 +273,7 @@ void ActBossChar_Omega()
 			if (gBoss[0].count2 == 1)
 				gBoss[0].damage = 20;
 
-			if (!gBoss[0].count2)
+			if (gBoss[0].count2 == 0)
 			{
 				PlaySoundObject(102, 0);
 				PlaySoundObject(12, 1);
@@ -303,7 +303,7 @@ void ActBossChar_Omega()
 			SetQuake(2);
 			gBoss[0].y += 0x200;
 
-			if (!(++gBoss[0].act_wait % 4))
+			if (++gBoss[0].act_wait % 4 == 0)
 				PlaySoundObject(26, 1);
 
 			if (gBoss[0].act_wait == 48)
@@ -319,7 +319,7 @@ void ActBossChar_Omega()
 				gBoss[0].act_wait = 0;
 				gBoss[0].act_no = 30;
 
-				gBoss[0].x = gBoss[0].tgt_x + (Random(-64, 64) << 9);
+				gBoss[0].x = gBoss[0].tgt_x + (Random(-0x40, 0x40) * 0x200);
 				gBoss[0].y = gBoss[0].tgt_y;
 			}
 			break;
@@ -351,7 +351,7 @@ void ActBossChar_Omega()
 
 			if (gBoss[0].act_wait < 30 && !(gBoss[0].act_wait % 5))
 			{
-				SetNpChar(48, gBoss[0].x, gBoss[0].y - 0x2000, Random(-0x155, 0x155), -0x333, 0, NULL, 0x100);
+				SetNpChar(48, gBoss[0].x, gBoss[0].y - 0x2000, Random(-341, 341), -0x333, 0, NULL, 0x100);
 				PlaySoundObject(39, 1);
 			}
 			break;
@@ -422,10 +422,10 @@ void ActBossChar_Omega()
 		case 150:
 			SetQuake(2);
 
-			if (!(++gBoss[0].act_wait % 12))
+			if (++gBoss[0].act_wait % 12 == 0)
 				PlaySoundObject(52, 1);
 
-			SetDestroyNpChar(gBoss[0].x + (Random(-48, 48) << 9), gBoss[0].y + (Random(-48, 24) << 9), 1, 1);
+			SetDestroyNpChar(gBoss[0].x + (Random(-0x30, 0x30) * 0x200), gBoss[0].y + (Random(-0x30, 0x18) * 0x200), 1, 1);
 
 			if (gBoss[0].act_wait > 100)
 			{
@@ -449,9 +449,6 @@ void ActBossChar_Omega()
 				gBoss[5].cond = 0;
 			}
 			break;
-
-		default:
-			break;
 	}
 
 	RECT rect[4] = {
@@ -472,7 +469,7 @@ void ActBossChar_Omega()
 	ActBoss01_12();
 	ActBoss01_5();
 
-	if (!gBoss[0].life && gBoss[0].act_no < 150)
+	if (gBoss[0].life == 0 && gBoss[0].act_no < 150)
 	{
 		gBoss[0].act_no = 150;
 		gBoss[0].act_wait = 0;

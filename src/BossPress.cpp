@@ -74,7 +74,7 @@ void ActBossChar_Press(void)
 		case 30:
 			npc->act_no = 31;
 			npc->ani_no = 2;
-			npc->x = 81920;
+			npc->x = 0x14000;
 			npc->y = 0x8000;
 			// Fallthrough
 		case 31:

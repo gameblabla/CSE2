@@ -147,7 +147,7 @@ void ActBossChar_Frog(void)
 			boss->ani_no = 3;
 			boss->cond = 0x80;
 			boss->rect = rcRight[0];
-			gBoss[1].cond = -112;
+			gBoss[1].cond = 0x90;
 			gBoss[1].code_event = 1000;
 			gBoss[2].cond = 0x80;
 			gBoss[1].damage = 5;
