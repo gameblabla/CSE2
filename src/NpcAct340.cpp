@@ -134,6 +134,7 @@ void ActNpc340(NPCHAR *npc)
 				else
 					npc->act_no = 230;
 			}
+
 			break;
 
 		case 210:
@@ -606,7 +607,7 @@ void ActNpc342(NPCHAR *npc)
 			npc->act_no = 10;
 			npc->count1 = 2 * (npc->direct & 0xFF);
 			npc->direct >>= 8;
-			npc->count2 = 192;
+			npc->count2 = 0xC0;
 			npc->damage = 14;
 			// Fallthrough
 		case 10:
@@ -1504,9 +1505,6 @@ void ActNpc352(NPCHAR *npc)
 				case 13:
 					npc->surf = SURFACE_ID_LEVEL_SPRITESET_1;
 					break;
-
-				default:
-					break;
 			}
 
 			switch (npc->count1)
@@ -1516,9 +1514,6 @@ void ActNpc352(NPCHAR *npc)
 				case 9:
 				case 12:
 					npc->view.top = 0x2000;
-					break;
-
-				default:
 					break;
 			}
 
@@ -1531,7 +1526,7 @@ void ActNpc352(NPCHAR *npc)
 			}
 
 			// Spawn King's sword
-			if (!npc->count1)
+			if (npc->count1 == 0)
 				SetNpChar(145, 0, 0, 0, 0, 2, npc, 0x100);
 			// Fallthrough
 		case 1:
@@ -1547,6 +1542,7 @@ void ActNpc352(NPCHAR *npc)
 			}
 
 			npc->y += npc->ym;
+
 			break;
 	}
 
