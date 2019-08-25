@@ -343,7 +343,6 @@ void Backend_DrawScreen(void)
 	// Draw framebuffer to screen
 	glBindTexture(GL_TEXTURE_2D, framebuffer.texture_id);
 
-//	static VertexBufferSlot buffer;
 	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot();
 
 	vertex_buffer_slot->vertices[0][0].texture_coordinate.x = 0.0f;

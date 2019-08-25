@@ -683,9 +683,20 @@ BOOL Game(HWND hWnd)
 
 	if (!LoadGenericData())
 	{
-#ifdef WINDOWS
-		MessageBoxA(hWnd, "”Ä—pƒtƒ@ƒCƒ‹‚ª“Ç‚ß‚È‚¢", "ƒGƒ‰[", MB_OK);	// "Error - Couldn't read general purpose files"
-#endif
+		#if defined(NONPORTABLE) && defined(WINDOWS)
+			#ifdef JAPANESE
+			MessageBoxA(hWnd, "\x94\xC4\x97\x70\x83\x74\x83\x40\x83\x43\x83\x8B\x82\xAA\x93\xC7\x82\xDF\x82\xC8\x82\xA2", "\x83\x47\x83\x89\x81\x5B", MB_OK);
+			#else
+			MessageBoxA(hWnd, "Couldn't read general purpose files", "Error", MB_OK);
+			#endif
+		#else
+			#ifdef JAPANESE
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "ã‚¨ãƒ©ãƒ¼", "æ±ç”¨ãƒ•ã‚¡ã‚¤ãƒ«ãŒèª­ã‚ãªã„", NULL);
+			#else
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Couldn't read general purpose files", NULL);
+			#endif
+		#endif
+
 		return FALSE;
 	}
 
@@ -696,9 +707,20 @@ BOOL Game(HWND hWnd)
 
 	if (!LoadNpcTable(path))
 	{
-#ifdef WINDOWS
-		MessageBoxA(hWnd, "NPCƒe[ƒuƒ‹‚ª“Ç‚ß‚È‚¢", "ƒGƒ‰[", MB_OK);	// "Error - Couldn't read the NPC table"
-#endif
+		#if defined(NONPORTABLE) && defined(WINDOWS)
+			#ifdef JAPANESE
+			MessageBoxA(hWnd, "\x4E\x50\x43\x83\x65\x81\x5B\x83\x75\x83\x8B\x82\xAA\x93\xC7\x82\xDF\x82\xC8\x82\xA2", "\x83\x47\x83\x89\x81\x5B", MB_OK);
+			#else
+			MessageBoxA(hWnd, "Couldn't read the NPC table", "Error", MB_OK);
+			#endif
+		#else
+			#ifdef JAPANESE
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "ã‚¨ãƒ©ãƒ¼", "NPCãƒ†ãƒ¼ãƒ–ãƒ«ãŒèª­ã‚ãªã„", NULL);
+			#else
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Couldn't read the NPC table", NULL);
+			#endif
+		#endif
+
 		return FALSE;
 	}
 
