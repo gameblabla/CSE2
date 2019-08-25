@@ -348,6 +348,10 @@ Backend_Surface* Backend_Init(SDL_Window *p_window)
 	framebuffer.width = window_width;
 	framebuffer.height = window_height;
 
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebuffer.texture_id, 0);
+	glViewport(0, 0, framebuffer.width, framebuffer.height);
+
+
 	return &framebuffer;
 }
 
