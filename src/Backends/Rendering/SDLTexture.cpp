@@ -138,10 +138,10 @@ void Backend_UnlockSurface(Backend_Surface *surface)
 	const unsigned char *src_pixel = surface->pixels;
 
 	// Convert the SDL_Surface's colour-keyed pixels to RGBA32
-	for (int y = 0; y < surface->height; ++y)
+	for (unsigned int y = 0; y < surface->height; ++y)
 	{
 
-		for (int x = 0; x < surface->width; ++x)
+		for (unsigned int x = 0; x < surface->width; ++x)
 		{
 			*buffer_pointer++ = src_pixel[0];
 			*buffer_pointer++ = src_pixel[1];
