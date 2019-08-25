@@ -95,7 +95,11 @@ static const struct
 	{"ORG", "BALLOS", rBallos, sizeof(rBallos)},
 	{"ORG", "BDOWN", rBreakDown, sizeof(rBreakDown)},
 	{"ORG", "CEMETERY", rCemetery, sizeof(rCemetery)},
+#ifdef NONPORTABLE
+	{"ORG", "Curly", rCurly, sizeof(rCurly)},
+#else
 	{"ORG", "CURLY", rCurly, sizeof(rCurly)},
+#endif
 	{"ORG", "DR", rDr, sizeof(rDr)},
 	{"ORG", "ENDING", rEnding, sizeof(rEnding)},
 	{"ORG", "ESCAPE", rEscape, sizeof(rEscape)},
