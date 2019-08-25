@@ -35,7 +35,7 @@ void ActBossChar_Press(void)
 			npc->hit.top = 0x7800;
 			npc->hit.back = 0x5000;
 			npc->hit.bottom = 0x6000;
-			npc->bits = 0x8248;
+			npc->bits = (NPC_IGNORE_SOLIDITY | NPC_SOLID_HARD | NPC_EVENT_WHEN_KILLED | NPC_SHOW_DAMAGE);
 			npc->size = 3;
 			npc->damage = 10;
 			npc->code_event = 1000;
@@ -61,7 +61,7 @@ void ActBossChar_Press(void)
 			npc->act_no = 21;
 			npc->x = 0x14000;
 			npc->y = 0x33A00;
-			npc->bits &= ~0x40;
+			npc->bits &= ~NPC_SOLID_HARD;
 			gBoss[1].cond = 0;
 			gBoss[2].cond = 0;
 			// Fallthrough
@@ -74,7 +74,7 @@ void ActBossChar_Press(void)
 		case 30:
 			npc->act_no = 31;
 			npc->ani_no = 2;
-			npc->x = 81920;
+			npc->x = 0x14000;
 			npc->y = 0x8000;
 			// Fallthrough
 		case 31:
@@ -107,12 +107,12 @@ void ActBossChar_Press(void)
 			gBoss[1].hit.back = 0x1C00;
 			gBoss[1].hit.top = 0x1000;
 			gBoss[1].hit.bottom = 0x1000;
-			gBoss[1].bits = 12;
+			gBoss[1].bits = (NPC_INVULNERABLE | NPC_IGNORE_SOLIDITY);
 
 			gBoss[2] = gBoss[1];
 
 			gBoss[3].cond = 0x90;
-			gBoss[3].bits |= 0x20;
+			gBoss[3].bits |= NPC_SHOOTABLE;
 			gBoss[3].hit.front = 0xC00;
 			gBoss[3].hit.back = 0xC00;
 			gBoss[3].hit.top = 0x1000;
@@ -148,7 +148,7 @@ void ActBossChar_Press(void)
 			break;
 
 		case 500:
-			gBoss[3].bits &= ~0x20;
+			gBoss[3].bits &= ~NPC_SHOOTABLE;
 
 			npc->act_no = 501;
 			npc->act_wait = 0;

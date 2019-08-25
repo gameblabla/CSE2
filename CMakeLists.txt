@@ -11,6 +11,7 @@ option(JAPANESE "Enable the Japanese-language build" OFF)
 option(FIX_BUGS "Fix certain bugs (see src/Bug Fixes.txt)" OFF)
 option(NONPORTABLE "Enable bits of code that aren't portable, but are what the original game used" OFF)
 option(FORCE_LOCAL_LIBS "Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones" OFF)
+set(RENDERER "Texture" CACHE STRING "Which renderer the game should use: 'OpenGL3' for an OpenGL 3.2 renderer, 'Texture' for SDL2's hardware-accelerated Texture API, 'Surface' for SDL2's software-rendered Surface API, and 'Software' for a handwritten software renderer")
 
 project(CSE2 LANGUAGES C CXX)
 
@@ -155,6 +156,7 @@ add_executable(CSE2
 	src/ValueView.cpp
 	src/ValueView.h
 	src/WindowsWrapper.h
+	src/Backends/Rendering.h
 )
 
 set(RESOURCES
@@ -244,6 +246,18 @@ if(NONPORTABLE)
 	target_compile_definitions(CSE2 PRIVATE NONPORTABLE)
 endif()
 
+if(RENDERER MATCHES "OpenGL3")
+	target_sources(CSE2 PRIVATE "src/Backends/Rendering/OpenGL3.cpp")
+elseif(RENDERER MATCHES "Texture")
+	target_sources(CSE2 PRIVATE "src/Backends/Rendering/SDLTexture.cpp")
+elseif(RENDERER MATCHES "Surface")
+	target_sources(CSE2 PRIVATE "src/Backends/Rendering/SDLSurface.cpp")
+elseif(RENDERER MATCHES "Software")
+	target_sources(CSE2 PRIVATE "src/Backends/Rendering/Software.cpp")
+else()
+	message(FATAL_ERROR "Invalid RENDERER selected")
+endif()
+
 # Make some tweaks if we're targetting Windows
 if(WIN32)
 	target_sources(CSE2 PRIVATE "${ASSETS_DIRECTORY}/resources/ICON/ICON.rc")
@@ -314,6 +328,9 @@ set_target_properties(CSE2 PROPERTIES
 	CXX_STANDARD_REQUIRED ON
 	CXX_EXTENSIONS OFF
 )
+
+# Include directory for third-party software
+target_include_directories(CSE2 PRIVATE "external")
 
 # Name debug builds "CSE2_debug", to distinguish them
 set_target_properties(CSE2 PROPERTIES DEBUG_OUTPUT_NAME "CSE2_debug")
@@ -391,6 +408,24 @@ else()
 	target_link_libraries(CSE2 freetype)
 endif()
 
+if(RENDERER MATCHES "OpenGL3")
+	if(NOT FORCE_LOCAL_LIBS)
+		find_package(GLEW)
+	endif()
+
+	if(TARGET GLEW::GLEW)
+		message(STATUS "Using system GLEW")
+		target_link_libraries(CSE2 GLEW::GLEW)
+	else()
+		# Compile it ourselves
+		message(STATUS "Using local GLEW")
+		target_sources(CSE2 PRIVATE "external/glew/glew.c" "external/glew/GL/glew.h")
+		target_include_directories(CSE2 PRIVATE "external/glew")
+	endif()
+
+	find_package(OpenGL REQUIRED)
+	target_link_libraries(CSE2 OpenGL::GL)
+endif()
 
 ##
 # DoConfig

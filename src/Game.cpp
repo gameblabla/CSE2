@@ -121,7 +121,7 @@ int ModeOpening(HWND hWnd)
 	InitFade();
 	InitFlash();
 	InitBossLife();
-	ChangeMusic(0);
+	ChangeMusic(MUS_SILENCE);
 	TransferStage(72, 100, 3, 3);
 	SetFrameTargetMyChar(16);
 	SetFadeMask();
@@ -279,7 +279,7 @@ int ModeTitle(HWND hWnd)
 	int char_type;
 	int time_counter;
 	int char_y;
-	Surface_Ids char_surf;
+	SurfaceID char_surf;
 	unsigned long back_color;
 
 	// Reset everything
@@ -315,15 +315,15 @@ int ModeTitle(HWND hWnd)
 
 	// Set music to character's specific music
 	if (char_type == 1)
-		ChangeMusic(mus_RunningHell);
+		ChangeMusic(MUS_RUNNING_HELL);
 	else if (char_type == 2)
-		ChangeMusic(mus_TorokosTheme);
+		ChangeMusic(MUS_TOROKOS_THEME);
 	else if (char_type == 3)
-		ChangeMusic(mus_White);
+		ChangeMusic(MUS_WHITE);
 	else if (char_type == 4)
-		ChangeMusic(mus_Safety);
+		ChangeMusic(MUS_SAFETY);
 	else
-		ChangeMusic(mus_CaveStory);
+		ChangeMusic(MUS_CAVE_STORY);
 
 	// Reset cliprect, flags, and give the player the Nikumaru counter
 	grcGame.left = 0;
@@ -454,7 +454,7 @@ int ModeTitle(HWND hWnd)
 			return 0;
 	}
 
-	ChangeMusic(0);
+	ChangeMusic(MUS_SILENCE);
 
 	// Black screen when option is selected
 	wait = SDL_GetTicks();	// The original version used GetTickCount instead
@@ -559,6 +559,10 @@ int ModeAction(HWND hWnd)
 			ActBullet();
 			ActCaret();
 			MoveFrame3();
+#ifdef FIX_BUGS
+			// ActFlash uses frame_x and frame_y uninitialised
+			GetFramePosition(&frame_x, &frame_y);
+#endif
 			ActFlash(frame_x, frame_y);
 
 			if (g_GameFlags & 2)

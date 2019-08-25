@@ -34,7 +34,7 @@ void ActBossChar_Ironhead(void)
 			npc->hit.top = 0x1400;
 			npc->hit.back = 0x2000;
 			npc->hit.bottom = 0x1400;
-			npc->bits = 0x8228;
+			npc->bits = (NPC_IGNORE_SOLIDITY | NPC_SHOOTABLE | NPC_EVENT_WHEN_KILLED | NPC_SHOW_DAMAGE);
 			npc->size = 3;
 			npc->damage = 10;
 			npc->code_event = 1000;
@@ -43,7 +43,7 @@ void ActBossChar_Ironhead(void)
 
 		case 100:
 			npc->act_no = 101;
-			npc->bits &= ~0x20;
+			npc->bits &= ~NPC_SHOOTABLE;
 			npc->act_wait = 0;
 			// Fallthrough
 		case 101:
@@ -78,7 +78,7 @@ void ActBossChar_Ironhead(void)
 			npc->ym = Random(-0x200, 0x200);
 			npc->xm = Random(-0x200, 0x200);
 
-			npc->bits |= 0x20;
+			npc->bits |= NPC_SHOOTABLE;
 			// Fallthrough
 		case 251:
 			if (npc->direct == 2)
@@ -148,7 +148,7 @@ void ActBossChar_Ironhead(void)
 			break;
 
 		case 1000:
-			npc->bits &= ~0x20;
+			npc->bits &= ~NPC_SHOOTABLE;
 			npc->ani_no = 8;
 			npc->damage = 0;
 			npc->act_no = 1001;

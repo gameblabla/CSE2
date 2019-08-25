@@ -597,7 +597,7 @@ void ActNpc231(NPCHAR *npc)
 			break;
 
 		case 12:
-			npc->bits &= ~0x2000;
+			npc->bits &= ~NPC_INTERACTABLE;
 			npc->act_no = 13;
 			npc->act_wait = 0;
 			npc->ani_no = 1;
@@ -653,7 +653,7 @@ void ActNpc231(NPCHAR *npc)
 
 			if (npc->flag & 8)
 			{
-				npc->bits |= 0x2000;
+				npc->bits |= NPC_INTERACTABLE;
 				npc->act_no = 1;
 				npc->ani_no = 0;
 			}
@@ -796,7 +796,7 @@ void ActNpc233(NPCHAR *npc)
 					npc->xm /= 4;
 					npc->ym = 0;
 					npc->act_no = 3;
-					npc->bits &= ~8;
+					npc->bits &= ~NPC_IGNORE_SOLIDITY;
 				}
 			}
 
@@ -813,7 +813,7 @@ void ActNpc233(NPCHAR *npc)
 				npc->xm *= 2;
 				npc->count1 = 0;
 				npc->act_no = 1;
-				npc->bits |= 8;
+				npc->bits |= NPC_IGNORE_SOLIDITY;
 			}
 
 			break;

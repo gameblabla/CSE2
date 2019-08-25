@@ -746,7 +746,7 @@ void ActNpc008(NPCHAR *npc)
 		case 0:
 			if (gMC.x < npc->x + 0x2000 && gMC.x > npc->x - 0x2000)
 			{
-				npc->bits |= 0x20;
+				npc->bits |= NPC_SHOOTABLE;
 				npc->ym = -0x100;
 				npc->tgt_y = npc->y;
 				npc->act_no = 1;
@@ -765,7 +765,7 @@ void ActNpc008(NPCHAR *npc)
 			}
 			else
 			{
-				npc->bits &= ~0x20;
+				npc->bits &= ~NPC_SHOOTABLE;
 				npc->rect.right = 0;
 				npc->damage = 0;
 				npc->xm = 0;
@@ -851,8 +851,8 @@ void ActNpc009(NPCHAR *npc)
 			}
 			else
 			{
-				npc->bits &= ~8;
-				npc->bits |= 1;
+				npc->bits &= ~NPC_IGNORE_SOLIDITY;
+				npc->bits |= NPC_SOLID_SOFT;
 			}
 
 			if (npc->flag & 8)
@@ -1125,7 +1125,7 @@ void ActNpc012(NPCHAR *npc)
 				npc->act_wait = 0;
 				npc->ani_no = 3;
 				npc->ym = -0x800;
-				npc->bits |= 8;
+				npc->bits |= NPC_IGNORE_SOLIDITY;
 			}
 
 			break;
@@ -1308,7 +1308,7 @@ void ActNpc012(NPCHAR *npc)
 				npc->act_wait = 0;
 				npc->ani_no = 3;
 				npc->ym = -0x800;
-				npc->bits |= 8;
+				npc->bits |= NPC_IGNORE_SOLIDITY;
 				DeleteNpCharCode(150, 0);
 				DeleteNpCharCode(117, 0);
 				SetNpChar(355, 0, 0, 0, 0, 0, npc, 0x100);
@@ -1475,7 +1475,7 @@ void ActNpc015(NPCHAR *npc)
 	{
 		case 0:
 			npc->act_no = 1;
-			npc->bits |= 0x2000u;
+			npc->bits |= NPC_INTERACTABLE;
 
 			if (npc->direct == 2)
 			{
@@ -1536,12 +1536,12 @@ void ActNpc016(NPCHAR *npc)
 	switch (npc->act_no)
 	{
 		case 0:
-			npc->bits |= 0x2000;
+			npc->bits |= NPC_INTERACTABLE;
 			npc->act_no = 1;
 
 			if (npc->direct == 2)
 			{
-				npc->bits &= ~0x2000;
+				npc->bits &= ~NPC_INTERACTABLE;
 				npc->ym = -0x200;
 
 				for (int i = 0; i < 4; ++i)
@@ -1551,7 +1551,7 @@ void ActNpc016(NPCHAR *npc)
 			// Fallthrough
 		case 1:
 			if (npc->flag & 8)
-				npc->bits |= 0x2000;
+				npc->bits |= NPC_INTERACTABLE;
 
 			break;
 	}

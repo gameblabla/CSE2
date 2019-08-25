@@ -1,6 +1,6 @@
 #pragma once
 
-enum KEYBIND
+enum KeyBind
 {
 	//The movement keys go in the order of left, right, up and down
 	KEY_LEFT =      0x00000001,
@@ -34,22 +34,22 @@ enum KEYBIND
 	KEY_PLUS =      0x00100000
 };
 
-extern int gKey;
-extern int gKeyTrg;
+extern long gKey;
+extern long gKeyTrg;
 
-extern int gKeyJump;
-extern int gKeyShot;
-extern int gKeyArms;
-extern int gKeyArmsRev;
-extern int gKeyItem;
-extern int gKeyMap;
+extern long gKeyJump;
+extern long gKeyShot;
+extern long gKeyArms;
+extern long gKeyArmsRev;
+extern long gKeyItem;
+extern long gKeyMap;
 
-extern int gKeyOk;
-extern int gKeyCancel;
+extern long gKeyOk;
+extern long gKeyCancel;
 
-extern int gKeyLeft;
-extern int gKeyUp;
-extern int gKeyRight;
-extern int gKeyDown;
+extern long gKeyLeft;
+extern long gKeyUp;
+extern long gKeyRight;
+extern long gKeyDown;
 
 void GetTrg();

@@ -11,6 +11,7 @@ Cave Story Engine 2 is a decompilation of Cave Story, ported from DirectX to SDL
 * SDL2
 * FreeType
 * FLTK
+* GLEW (if the OpenGL rendering backend is selected)
 
 ## Building
 
@@ -29,6 +30,10 @@ You can also add the following flags:
 * `-DFIX_BUGS=ON` - Fix bugs in the game (see [src/Bug Fixes.txt](src/Bug%20Fixes.txt))
 * `-DNONPORTABLE=ON` - Enable bits of code that aren't portable, but are what the original game used
 * `-DFORCE_LOCAL_LIBS=ON` - Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones
+* `-DRENDERER=OpenGL3` - Use the hardware-accelerated OpenGL 3.2 renderer
+* `-DRENDERER=Texture` - Use the hardware-accelerated SDL2 Texture API renderer (default)
+* `-DRENDERER=Surface` - Use the software-rendered SDL2 Surface API renderer
+* `-DRENDERER=Software` - Use a handwritten software renderer
 
 Then compile CSE2 with this command:
 
@@ -53,6 +58,10 @@ Run 'make' in this folder, preferably with some of the following settings:
 * `WINDOWS=1` - Enable Windows-only features like a unique file/taskbar icon, and system font loading (needed for the font setting in Config.dat to do anything)
 * `RASPBERRY_PI=1` - Enable tweaks to improve performance on Raspberry Pis
 * `NONPORTABLE=1` - Enable bits of code that aren't portable, but are what the original game used
+* `RENDERER=OpenGL3` - Use the hardware-accelerated OpenGL 3.2 renderer
+* `RENDERER=Texture` - Use the hardware-accelerated SDL2 Texture API renderer (default)
+* `RENDERER=Surface` - Use the software-rendered SDL2 Surface API renderer
+* `RENDERER=Software` - Use a hand-written software renderer
 
 ### Visual Studio .NET 2003
 

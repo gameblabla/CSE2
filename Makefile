@@ -4,13 +4,18 @@ NATIVECXX = c++
 BUILD_DIRECTORY = game
 ASSETS_DIRECTORY = assets
 
+# Default options
+RENDERER ?= Texture
+
 ifeq ($(RELEASE), 1)
 	CXXFLAGS = -O3 -flto
 	LDFLAGS = -s
 	FILENAME_DEF = CSE2
+	DOCONFIG_FILENAME_DEF = DoConfig
 else
 	CXXFLAGS = -Og -g3
 	FILENAME_DEF = CSE2_debug
+	DOCONFIG_FILENAME_DEF = DoConfig_debug
 endif
 
 ifeq ($(JAPANESE), 1)
@@ -22,6 +27,7 @@ else
 endif
 
 FILENAME ?= $(FILENAME_DEF)
+DOCONFIG_FILENAME ?= $(DOCONFIG_FILENAME_DEF)
 
 ifeq ($(FIX_BUGS), 1)
 	CXXFLAGS += -DFIX_BUGS
@@ -40,7 +46,7 @@ ifeq ($(RASPBERRY_PI), 1)
 	CXXFLAGS += -DRASPBERRY_PI
 endif
 
-CXXFLAGS += -std=c++98 `pkg-config sdl2 --cflags` `pkg-config freetype2 --cflags` -MMD -MP -MF $@.d
+CXXFLAGS += -std=c++98 -Iexternal `pkg-config sdl2 --cflags` `pkg-config freetype2 --cflags` -MMD -MP -MF $@.d
 
 ifeq ($(STATIC), 1)
 	LDFLAGS += -static
@@ -51,77 +57,77 @@ endif
 
 # For an accurate result to the original's code, compile in alphabetical order
 SOURCES = \
-	ArmsItem \
-	Back \
-	Boss \
-	BossAlmo1 \
-	BossAlmo2 \
-	BossBallos \
-	BossFrog \
-	BossIronH \
-	BossLife \
-	BossOhm \
-	BossPress \
-	BossTwinD \
-	BossX \
-	BulHit \
-	Bullet \
-	Caret \
-	Config \
-	Draw \
-	Ending \
-	Escape \
-	Fade \
-	File \
-	Flags \
-	Flash \
-	Font \
-	Frame \
-	Game \
-	Generic \
-	GenericLoad \
-	Input \
-	KeyControl \
-	Main \
-	Map \
-	MapName \
-	MiniMap \
-	MyChar \
-	MycHit \
-	MycParam \
-	NpcAct000 \
-	NpcAct020 \
-	NpcAct040 \
-	NpcAct060 \
-	NpcAct080 \
-	NpcAct100 \
-	NpcAct120 \
-	NpcAct140 \
-	NpcAct160 \
-	NpcAct180 \
-	NpcAct200 \
-	NpcAct220 \
-	NpcAct240 \
-	NpcAct260 \
-	NpcAct280 \
-	NpcAct300 \
-	NpcAct320 \
-	NpcAct340 \
-	NpChar \
-	NpcHit \
-	NpcTbl \
-	Organya \
-	PixTone \
-	Profile \
-	Resource \
-	SelStage \
-	Shoot \
-	Sound \
-	Stage \
-	Star \
-	TextScr \
-	Triangle \
-	ValueView
+	src/ArmsItem \
+	src/Back \
+	src/Boss \
+	src/BossAlmo1 \
+	src/BossAlmo2 \
+	src/BossBallos \
+	src/BossFrog \
+	src/BossIronH \
+	src/BossLife \
+	src/BossOhm \
+	src/BossPress \
+	src/BossTwinD \
+	src/BossX \
+	src/BulHit \
+	src/Bullet \
+	src/Caret \
+	src/Config \
+	src/Draw \
+	src/Ending \
+	src/Escape \
+	src/Fade \
+	src/File \
+	src/Flags \
+	src/Flash \
+	src/Font \
+	src/Frame \
+	src/Game \
+	src/Generic \
+	src/GenericLoad \
+	src/Input \
+	src/KeyControl \
+	src/Main \
+	src/Map \
+	src/MapName \
+	src/MiniMap \
+	src/MyChar \
+	src/MycHit \
+	src/MycParam \
+	src/NpcAct000 \
+	src/NpcAct020 \
+	src/NpcAct040 \
+	src/NpcAct060 \
+	src/NpcAct080 \
+	src/NpcAct100 \
+	src/NpcAct120 \
+	src/NpcAct140 \
+	src/NpcAct160 \
+	src/NpcAct180 \
+	src/NpcAct200 \
+	src/NpcAct220 \
+	src/NpcAct240 \
+	src/NpcAct260 \
+	src/NpcAct280 \
+	src/NpcAct300 \
+	src/NpcAct320 \
+	src/NpcAct340 \
+	src/NpChar \
+	src/NpcHit \
+	src/NpcTbl \
+	src/Organya \
+	src/PixTone \
+	src/Profile \
+	src/Resource \
+	src/SelStage \
+	src/Shoot \
+	src/Sound \
+	src/Stage \
+	src/Star \
+	src/TextScr \
+	src/Triangle \
+	src/ValueView
 
 RESOURCES = \
 	BITMAP/Credit01.bmp \
@@ -202,6 +208,32 @@ ifneq ($(WINDOWS), 1)
 	RESOURCES += ICON/ICON_MINI.bmp
 endif
 
+ifeq ($(RENDERER), OpenGL3)
+	SOURCES += src/Backends/Rendering/OpenGL3
+	CXXFLAGS += `pkg-config glew --cflags`
+
+	ifeq ($(STATIC), 1)
+		CXXFLAGS += -DGLEW_STATIC
+		LIBS += `pkg-config glew --libs --static`
+	else
+		LIBS += `pkg-config glew --libs`
+	endif
+
+	ifeq ($(WINDOWS), 1)
+		LIBS += -lopengl32
+	else
+		LIBS += -lGL
+	endif
+else ifeq ($(RENDERER), Texture)
+	SOURCES += src/Backends/Rendering/SDLTexture
+else ifeq ($(RENDERER), Surface)
+	SOURCES += src/Backends/Rendering/SDLSurface
+else ifeq ($(RENDERER), Software)
+	SOURCES += src/Backends/Rendering/Software
+else
+	@echo Invalid RENDERER selected; this build will fail
+endif
+
 OBJECTS = $(addprefix obj/$(FILENAME)/, $(addsuffix .o, $(SOURCES)))
 DEPENDENCIES = $(addprefix obj/$(FILENAME)/, $(addsuffix .o.d, $(SOURCES)))
 
@@ -209,7 +241,7 @@ ifeq ($(WINDOWS), 1)
 	OBJECTS += obj/$(FILENAME)/win_icon.o
 endif
 
-all: $(BUILD_DIRECTORY)/$(FILENAME) $(BUILD_DIRECTORY)/data
+all: $(BUILD_DIRECTORY)/$(FILENAME) $(BUILD_DIRECTORY)/data $(BUILD_DIRECTORY)/$(DOCONFIG_FILENAME)
 	@echo Finished
 
 $(BUILD_DIRECTORY)/data: $(DATA_DIRECTORY)
@@ -222,7 +254,7 @@ $(BUILD_DIRECTORY)/$(FILENAME): $(OBJECTS)
 	@echo Linking $@
 	@$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -o $@ $(LIBS)
 
-obj/$(FILENAME)/%.o: src/%.cpp
+obj/$(FILENAME)/%.o: %.cpp
 	@mkdir -p $(@D)
 	@echo Compiling $<
 	@$(CXX) $(CXXFLAGS) $< -o $@ -c
@@ -247,6 +279,15 @@ include $(wildcard $(DEPENDENCIES))
 obj/$(FILENAME)/win_icon.o: $(ASSETS_DIRECTORY)/resources/ICON/ICON.rc $(ASSETS_DIRECTORY)/resources/ICON/0.ico $(ASSETS_DIRECTORY)/resources/ICON/ICON_MINI.ico
 	@mkdir -p $(@D)
 	@windres $< $@
+
+$(BUILD_DIRECTORY)/$(DOCONFIG_FILENAME): DoConfig/DoConfig.cpp
+	@mkdir -p $(@D)
+	@echo Linking $@
+ifeq ($(STATIC), 1)
+	@$(CXX) -O3 -s -std=c++98 -static $^ -o $@ `fltk-config --cxxflags --libs --ldstaticflags`
+else
+	@$(CXX) -O3 -s -std=c++98 $^ -o $@ `fltk-config --cxxflags --libs --ldflags`
+endif
 
 # TODO
 clean:

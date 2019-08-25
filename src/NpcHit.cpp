@@ -299,7 +299,7 @@ void HitNpCharMap()
 		if ((gNPC[i].cond & 0x80) == 0)
 			continue;
 
-		if (gNPC[i].bits & 8)
+		if (gNPC[i].bits & NPC_IGNORE_SOLIDITY)
 			continue;
 
 		if (gNPC[i].size >= 3)
@@ -323,7 +323,7 @@ void HitNpCharMap()
 			{
 				// No NPC block
 				case 0x44:
-					if (gNPC[i].bits & npc_ignore44)
+					if (gNPC[i].bits & NPC_IGNORE_TILE_44)
 						break;
 					// Fallthrough
 				// Block
@@ -518,9 +518,9 @@ void LoseNpChar(NPCHAR *npc, BOOL bVanish)
 	SetNPCFlag(npc->code_flag);
 
 	// Create value view
-	if (npc->bits & npc_showDamage)
+	if (npc->bits & NPC_SHOW_DAMAGE)
 	{
-		if ((npc->bits & npc_showDamage) && npc->damage_view)
+		if ((npc->bits & NPC_SHOW_DAMAGE) && npc->damage_view)
 			SetValueView(&npc->x, &npc->y, npc->damage_view);
 		if (bVanish)
 			VanishNpChar(npc);
@@ -542,7 +542,7 @@ void HitNpCharBullet()
 		if ((gNPC[n].cond & 0x80) == 0)
 			continue;
 
-		if (gNPC[n].bits & npc_shootable && gNPC[n].bits & npc_interact)
+		if (gNPC[n].bits & NPC_SHOOTABLE && gNPC[n].bits & NPC_INTERACTABLE)
 			continue;
 
 		for (b = 0; b < BULLET_MAX; b++)
@@ -555,13 +555,13 @@ void HitNpCharBullet()
 
 			// Check if bullet touches npc
 			bHit = FALSE;
-			if (gNPC[n].bits & npc_shootable
+			if (gNPC[n].bits & NPC_SHOOTABLE
 				&& gNPC[n].x - gNPC[n].hit.back < gBul[b].x + gBul[b].enemyXL
 				&& gNPC[n].x + gNPC[n].hit.back > gBul[b].x - gBul[b].enemyXL
 				&& gNPC[n].y - gNPC[n].hit.top < gBul[b].y + gBul[b].enemyYL
 				&& gNPC[n].y + gNPC[n].hit.bottom > gBul[b].y - gBul[b].enemyYL)
 				bHit = TRUE;
-			else if (gNPC[n].bits & npc_invulnerable
+			else if (gNPC[n].bits & NPC_INVULNERABLE
 				&& gNPC[n].x - gNPC[n].hit.back < gBul[b].x + gBul[b].blockXL
 				&& gNPC[n].x + gNPC[n].hit.back > gBul[b].x - gBul[b].blockXL
 				&& gNPC[n].y - gNPC[n].hit.top < gBul[b].y + gBul[b].blockYL
@@ -571,7 +571,7 @@ void HitNpCharBullet()
 			if (bHit)
 			{
 				// Damage NPC
-				if (gNPC[n].bits & npc_shootable)
+				if (gNPC[n].bits & NPC_SHOOTABLE)
 				{
 					gNPC[n].life -= gBul[b].damage;
 
@@ -579,10 +579,10 @@ void HitNpCharBullet()
 					{
 						gNPC[n].life = 0;
 
-						if (gNPC[n].bits & npc_showDamage)
+						if (gNPC[n].bits & NPC_SHOW_DAMAGE)
 							gNPC[n].damage_view -= gBul[b].damage;
 
-						if ((gMC.cond & 0x80) && gNPC[n].bits & npc_eventDie)
+						if ((gMC.cond & 0x80) && gNPC[n].bits & NPC_EVENT_WHEN_KILLED)
 							StartTextScript(gNPC[n].code_event);
 						else
 							gNPC[n].cond |= 8;
@@ -598,7 +598,7 @@ void HitNpCharBullet()
 							gNPC[n].shock = 16;
 						}
 
-						if (gNPC[n].bits & npc_showDamage)
+						if (gNPC[n].bits & NPC_SHOW_DAMAGE)
 							gNPC[n].damage_view -= gBul[b].damage;
 					}
 				}

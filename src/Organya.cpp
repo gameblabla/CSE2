@@ -432,7 +432,6 @@ void LoadOrganya(const char *name)
 	memset(now_leng, 0, sizeof(now_leng));
 
 	// Open file
-	printf("Loading org %s\n", name);
 	const unsigned char *p = FindResource(name, "ORG", NULL);
 
 	// Version Check

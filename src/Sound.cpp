@@ -221,7 +221,7 @@ void AudioCallback(void *userdata, Uint8 *stream, int len)
 }
 
 //Sound things
-SOUNDBUFFER* lpSECONDARYBUFFER[SOUND_NO];
+SOUNDBUFFER* lpSECONDARYBUFFER[SE_MAX];
 
 BOOL InitDirectSound()
 {
@@ -250,6 +250,9 @@ BOOL InitDirectSound()
 	//Unpause audio device
 	SDL_PauseAudioDevice(audioDevice, 0);
 
+	for (unsigned int i = 0; i < SE_MAX; ++i)
+		lpSECONDARYBUFFER[i] = NULL;
+
 	//Start organya
 	StartOrganya();
 	return TRUE;
@@ -257,14 +260,16 @@ BOOL InitDirectSound()
 
 void EndDirectSound()
 {
-	//Quit sub-system
+	EndOrganya();
+
+	for (unsigned int i = 0; i < SE_MAX; ++i)
+		if (lpSECONDARYBUFFER[i])
+			lpSECONDARYBUFFER[i]->Release();
+
 	SDL_QuitSubSystem(SDL_INIT_AUDIO);
 
-	//Close audio device
 	SDL_CloseAudioDevice(audioDevice);
 
-	//End organya
-	EndOrganya();
 }
 
 //Sound effects playing
@@ -293,20 +298,17 @@ void PlaySoundObject(int no, int mode)
 
 void ChangeSoundFrequency(int no, unsigned long rate)
 {
-	if (lpSECONDARYBUFFER[no])
-		lpSECONDARYBUFFER[no]->SetFrequency(10 * rate + 100);
+	lpSECONDARYBUFFER[no]->SetFrequency((rate * 10) + 100);
 }
 
 void ChangeSoundVolume(int no, long volume)
 {
-	if (lpSECONDARYBUFFER[no])
-		lpSECONDARYBUFFER[no]->SetVolume(8 * volume - 2400);
+	lpSECONDARYBUFFER[no]->SetVolume((volume - 300) * 8);
 }
 
 void ChangeSoundPan(int no, long pan)
 {
-	if (lpSECONDARYBUFFER[no])
-		lpSECONDARYBUFFER[no]->SetPan(10 * (pan - 256));
+	lpSECONDARYBUFFER[no]->SetPan((pan - 256) * 10);
 }
 
 int MakePixToneObject(const PIXTONEPARAMETER *ptp, int ptp_num, int no)

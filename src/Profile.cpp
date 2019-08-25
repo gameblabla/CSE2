@@ -160,7 +160,7 @@ BOOL LoadProfile(const char *name)
 #else
 	fread(profile.code, 8, 1, fp);
 	profile.stage = File_ReadLE32(fp);
-	profile.music = File_ReadLE32(fp);
+	profile.music = (MusicID)File_ReadLE32(fp);
 	profile.x = File_ReadLE32(fp);
 	profile.y = File_ReadLE32(fp);
 	profile.direct = File_ReadLE32(fp);

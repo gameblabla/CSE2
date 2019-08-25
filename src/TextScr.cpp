@@ -43,7 +43,7 @@
 
 TEXT_SCRIPT gTS;
 
-int gNumberTextScript[4];
+int gNumberTextScript[4];	// Seems to be for debugging
 char text[0x100];
 
 RECT gRect_line = {0, 0, 216, 16};
@@ -65,7 +65,7 @@ BOOL InitTextScript2()
 
 	//Create line surfaces
 	for (int i = 0; i < 4; i++)
-		MakeSurface_Generic(gRect_line.right, gRect_line.bottom, (Surface_Ids)(i + SURFACE_ID_TEXT_LINE1), FALSE);
+		MakeSurface_Generic(gRect_line.right, gRect_line.bottom, (SurfaceID)(i + SURFACE_ID_TEXT_LINE1), FALSE);
 
 	//Clear text
 	memset(text, 0, sizeof(text));
@@ -230,7 +230,7 @@ BOOL StartTextScript(int no)
 	for (int i = 0; i < 4; i++)
 	{
 		gTS.ypos_line[i] = 16 * i;
-		CortBox2(&gRect_line, 0x000000, (Surface_Ids)(i + SURFACE_ID_TEXT_LINE1));
+		CortBox2(&gRect_line, 0x000000, (SurfaceID)(i + SURFACE_ID_TEXT_LINE1));
 		memset(&text[i * 0x40], 0, 0x40);
 	}*/
 
@@ -279,7 +279,7 @@ BOOL JumpTextScript(int no)
 	for (int i = 0; i < 4; i++)
 	{
 		gTS.ypos_line[i] = 16 * i;
-		CortBox2(&gRect_line, 0x000000, (Surface_Ids)(i + SURFACE_ID_TEXT_LINE1));
+		CortBox2(&gRect_line, 0x000000, (SurfaceID)(i + SURFACE_ID_TEXT_LINE1));
 		memset(&text[i * 0x40], 0, 0x40);
 	}
 
@@ -331,7 +331,7 @@ void CheckNewLine()
 	{
 		gTS.mode = 3;
 		g_GameFlags |= 4;
-		CortBox2(&gRect_line, 0, (Surface_Ids)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
+		CortBox2(&gRect_line, 0, (SurfaceID)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
 		memset(&text[gTS.line % 4 * 0x40], 0, 0x40);
 	}
 }
@@ -376,7 +376,7 @@ void SetNumberTextScript(int index)
 	str[offset + 1] = 0;
 
 	//Append number to line
-	PutText2(6 * gTS.p_write, 0, str, RGB(0xFF, 0xFF, 0xFE), (Surface_Ids)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
+	PutText2(6 * gTS.p_write, 0, str, RGB(0xFF, 0xFF, 0xFE), (SurfaceID)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
 	strcat(&text[gTS.line % 4 * 0x40], str);
 
 	//Play sound and reset blinking cursor
@@ -404,7 +404,7 @@ void ClearTextLine()
 	for (int i = 0; i < 4; i++)
 	{
 		gTS.ypos_line[i] = 16 * i;
-		CortBox2(&gRect_line, 0x000000, (Surface_Ids)(i + SURFACE_ID_TEXT_LINE1));
+		CortBox2(&gRect_line, 0x000000, (SurfaceID)(i + SURFACE_ID_TEXT_LINE1));
 		memset(&text[i * 0x40], 0, 0x40);
 	}
 }
@@ -464,7 +464,14 @@ void PutTextScript()
 	if (gTS.face_x < (TEXT_LEFT * 0x200))
 		gTS.face_x += 0x1000;
 
+#ifdef FIX_BUGS
+	gTS.rcText.top -= 2;
+	PutBitmap3(&gTS.rcText, gTS.face_x / 0x200, gTS.rcText.top, &rcFace, SURFACE_ID_FACE);
+	gTS.rcText.top += 2;
+#else
+	// The top few rows of pixels are cut off by the clip rectangle, and the facepic is off-centre
 	PutBitmap3(&gTS.rcText, gTS.face_x / 0x200, gTS.rcText.top - 3, &rcFace, SURFACE_ID_FACE);
+#endif
 
 	//Draw text
 	if (gTS.face)
@@ -473,7 +480,7 @@ void PutTextScript()
 		text_offset = 0;
 
 	for (i = 0; i < 4; i++)
-		PutBitmap3(&gTS.rcText, text_offset + TEXT_LEFT, gTS.offsetY + gTS.ypos_line[i] + gTS.rcText.top, &gRect_line, (Surface_Ids)(i + SURFACE_ID_TEXT_LINE1));
+		PutBitmap3(&gTS.rcText, text_offset + TEXT_LEFT, gTS.offsetY + gTS.ypos_line[i] + gTS.rcText.top, &gRect_line, (SurfaceID)(i + SURFACE_ID_TEXT_LINE1));
 
 	//Draw NOD cursor
 	if ((gTS.wait_beam++ % 20 > 12) && gTS.mode == 2)
@@ -637,8 +644,14 @@ int TextScriptProc()
 					{
 						w = GetTextScriptNo(gTS.p_read + 4);
 						x = GetTextScriptNo(gTS.p_read + 9);
+
+						// Looks like Pixel left some debug code in. Oops.
 						gNumberTextScript[0] = x;
+					#ifndef FIX_BUGS
+						// z is uninitialised. Probably a leftover from copypasting.
 						gNumberTextScript[1] = z;
+					#endif
+
 						PlaySoundObject(38, 1);
 						AddArmsData(w, x);
 						gTS.p_read += 13;
@@ -1023,7 +1036,7 @@ int TextScriptProc()
 					else if (IS_COMMAND('C','M','U'))
 					{
 						z = GetTextScriptNo(gTS.p_read + 4);
-						ChangeMusic(z);
+						ChangeMusic((MusicID)z);
 						gTS.p_read += 8;
 					}
 					else if (IS_COMMAND('F','M','U'))
@@ -1211,6 +1224,11 @@ int TextScriptProc()
 					}
 					else if (IS_COMMAND('N','U','M'))
 					{
+						// This seems to be a command used for debugging TSC scripts:
+						// It prints a selected char in the gNumberTextScript array.
+						// gNumberTextScript is only used by the '<AM+' command, and
+						// even then, part of it's assigned to an uninitialised
+						// variable, while the other half of it is completely unused.
 						z = GetTextScriptNo(gTS.p_read + 4);
 						SetNumberTextScript(z);
 						gTS.p_read += 8;
@@ -1309,7 +1327,7 @@ int TextScriptProc()
 						gTS.p_write = x;
 
 						//Print text
-						PutText2(0, 0, str, RGB(0xFF, 0xFF, 0xFE), (Surface_Ids)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
+						PutText2(0, 0, str, RGB(0xFF, 0xFF, 0xFE), (SurfaceID)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
 					#ifdef FIX_BUGS
 						strcpy(&text[gTS.line % 4 * 0x40], str);
 					#else
@@ -1342,11 +1360,11 @@ int TextScriptProc()
 						//Print text
 						if (c[0] == '=')
 						{
-							Surface2Surface(6 * gTS.p_write, 2, &rcSymbol, (Surface_Ids)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1), SURFACE_ID_TEXT_BOX);
+							Surface2Surface(6 * gTS.p_write, 2, &rcSymbol, (SurfaceID)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1), SURFACE_ID_TEXT_BOX);
 						}
 						else
 						{
-							PutText2(6 * gTS.p_write, 0, c, RGB(0xFF, 0xFF, 0xFE), (Surface_Ids)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
+							PutText2(6 * gTS.p_write, 0, c, RGB(0xFF, 0xFF, 0xFE), (SurfaceID)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
 						}
 
 						strcat(&text[gTS.line % 4 * 0x40], c);
@@ -1468,4 +1486,13 @@ int TextScriptProc()
 	else
 		g_GameFlags |= 4;
 	return 1;
+}
+
+void RestoreTextScript()
+{
+	for (int i = 0; i < 4; ++i)
+	{
+		CortBox2(&gRect_line, 0x000000, (SurfaceID)(i + SURFACE_ID_TEXT_LINE1));
+		PutText2(0, 0, &text[i * 0x40], RGB(0xFF, 0xFF, 0xFE), (SurfaceID)(i + SURFACE_ID_TEXT_LINE1));
+	}
 }

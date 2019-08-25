@@ -5,6 +5,7 @@
 // Avoid name collisions
 #undef DrawText
 #undef FindResource
+#undef CreateWindow
 #else
 
 typedef int HWND;

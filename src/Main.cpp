@@ -44,7 +44,7 @@ const char *lpWindowName = "Cave Story Engine 2 ~ Doukutsu Monogatari Enjin 2";
 #endif
 
 // A replication of MSVC's rand algorithm
-static unsigned long int next = 1;
+static unsigned long next = 1;
 
 int rep_rand()
 {
@@ -94,7 +94,9 @@ int GetFramePerSecound()
 int main(int argc, char *argv[])
 {
 	// Get executable's path
-	strcpy(gModulePath, SDL_GetBasePath());
+	char *base_path = SDL_GetBasePath();
+	strcpy(gModulePath, base_path);
+	SDL_free(base_path);
 	if (gModulePath[strlen(gModulePath) - 1] == '/' || gModulePath[strlen(gModulePath) - 1] == '\\')
 		gModulePath[strlen(gModulePath) - 1] = '\0'; // String cannot end in slash or stuff will probably break (original does this through a windows.h provided function)
 
@@ -208,7 +210,7 @@ int main(int argc, char *argv[])
 			}
 		}
 
-		RECT unused_rect = {0, 0, 320, 240};
+		RECT unused_rect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
 		// Load cursor
 		size_t size;
@@ -257,7 +259,7 @@ int main(int argc, char *argv[])
 				}
 
 				// Create window
-				gWindow = SDL_CreateWindow(lpWindowName, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, 0);
+				gWindow = CreateWindow(lpWindowName, windowWidth, windowHeight);
 
 				if (gWindow)
 				{
@@ -265,7 +267,6 @@ int main(int argc, char *argv[])
 						StartDirectDraw(0, 0);
 					else
 						StartDirectDraw(1, 0);
-					break;
 				}
 
 				break;
@@ -278,7 +279,7 @@ int main(int argc, char *argv[])
 				windowHeight = WINDOW_HEIGHT * 2;
 
 				// Create window
-				gWindow = SDL_CreateWindow(lpWindowName, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, 0);
+				gWindow = CreateWindow(lpWindowName, windowWidth, windowHeight);
 
 				if (gWindow)
 				{
@@ -298,10 +299,9 @@ int main(int argc, char *argv[])
 
 					StartDirectDraw(2, colourDepth);
 
-					fullscreen = TRUE;
 					SDL_ShowCursor(0);
-					break;
 				}
+
 				break;
 		}
 
@@ -339,7 +339,7 @@ int main(int argc, char *argv[])
 
 			// Set rects
 			RECT loading_rect = {0, 0, 64, 8};
-			RECT clip_rect = {0, 0, windowWidth, windowHeight};
+			RECT clip_rect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
 			// Load the "LOADING" text
 			MakeSurface_File("Loading", SURFACE_ID_LOADING);
@@ -373,6 +373,8 @@ int main(int argc, char *argv[])
 				EndTextObject();
 				EndDirectDraw();
 			}
+
+			SDL_DestroyWindow(gWindow);
 		}
 	}
 	else
@@ -461,9 +463,19 @@ BOOL SystemTask()
 				return FALSE;
 				break;
 
+			case SDL_RENDER_TARGETS_RESET:
+			case SDL_RENDER_DEVICE_RESET:
+				HandleDeviceLoss();
+				break;
+
 			case SDL_WINDOWEVENT:
 				switch (event.window.event)
 				{
+					case SDL_WINDOWEVENT_RESIZED:
+					case SDL_WINDOWEVENT_SIZE_CHANGED:
+						HandleWindowResize();
+						break;
+
 					case SDL_WINDOWEVENT_FOCUS_GAINED:
 						focusGained = TRUE;
 						ActiveWindow();

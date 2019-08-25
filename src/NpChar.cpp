@@ -36,7 +36,7 @@ void InitNpChar()
 void SetUniqueParameter(NPCHAR *npc)
 {
 	int code = npc->code_char;
-	npc->surf = (Surface_Ids)gNpcTable[code].surf;
+	npc->surf = (SurfaceID)gNpcTable[code].surf;
 	npc->hit_voice = gNpcTable[code].hit_voice;
 	npc->destroy_voice = gNpcTable[code].destroy_voice;
 	npc->damage = gNpcTable[code].damage;
@@ -105,7 +105,7 @@ BOOL LoadEvent(const char *path_event)
 #endif
 
 		// Set NPC parameters
-		gNPC[n].direct = (eve.bits & npc_altDir) ? 2 : 0;
+		gNPC[n].direct = (eve.bits & NPC_SPAWN_IN_OTHER_DIRECTION) ? 2 : 0;
 		gNPC[n].code_char = eve.code_char;
 		gNPC[n].code_event = eve.code_event;
 		gNPC[n].code_flag = eve.code_flag;
@@ -117,12 +117,12 @@ BOOL LoadEvent(const char *path_event)
 		SetUniqueParameter(&gNPC[n]);
 
 		// Check flags
-		if (gNPC[n].bits & npc_appearSet)
+		if (gNPC[n].bits & NPC_APPEAR_WHEN_FLAG_SET)
 		{
 			if (GetNPCFlag(gNPC[n].code_flag) == TRUE)
 				gNPC[n].cond |= 0x80;
 		}
-		else if (gNPC[n].bits & npc_hideSet)
+		else if (gNPC[n].bits & NPC_HIDE_WHEN_FLAG_SET)
 		{
 			if (GetNPCFlag(gNPC[n].code_flag) == FALSE)
 				gNPC[n].cond |= 0x80;
@@ -346,7 +346,7 @@ void PutNpChar(int fx, int fy)
 			else
 			{
 				a = 0;
-				if (gNPC[n].bits & npc_showDamage && gNPC[n].damage_view)
+				if (gNPC[n].bits & NPC_SHOW_DAMAGE && gNPC[n].damage_view)
 				{
 					SetValueView(&gNPC[n].x, &gNPC[n].y, gNPC[n].damage_view);
 					gNPC[n].damage_view = 0;
@@ -364,7 +364,7 @@ void PutNpChar(int fx, int fy)
 				(gNPC[n].x - side) / 0x200 - fx / 0x200 + a,
 				(gNPC[n].y - gNPC[n].view.top) / 0x200 - fy / 0x200,
 				&gNPC[n].rect,
-				(Surface_Ids)gNPC[n].surf);
+				(SurfaceID)gNPC[n].surf);
 		}
 	}
 }
@@ -391,7 +391,7 @@ void ChangeNpCharByEvent(int code_event, int code_char, int dir)
 	{
 		if ((gNPC[n].cond & 0x80) && gNPC[n].code_event == code_event)
 		{
-			gNPC[n].bits &= (npc_eventTouch | npc_eventDie | 0x400 | npc_appearSet | npc_altDir | npc_interact | npc_hideSet);
+			gNPC[n].bits &= ~(NPC_SOLID_SOFT | NPC_IGNORE_TILE_44 | NPC_INVULNERABLE | NPC_IGNORE_SOLIDITY | NPC_BOUNCY | NPC_SHOOTABLE | NPC_SOLID_HARD | NPC_REAR_AND_TOP_DONT_HURT | NPC_SHOW_DAMAGE);	// Clear these flags
 			gNPC[n].code_char = code_char;
 			gNPC[n].bits |= gNpcTable[gNPC[n].code_char].bits;
 			gNPC[n].exp = gNpcTable[gNPC[n].code_char].exp;
@@ -433,8 +433,8 @@ void ChangeCheckableNpCharByEvent(int code_event, int code_char, int dir)
 	{
 		if ((gNPC[n].cond & 0x80) != 0 && gNPC[n].code_event == code_event)
 		{
-			gNPC[n].bits &= ~(npc_showDamage | npc_rearTop | npc_solidHard | npc_shootable | npc_bouncy | npc_ignoreSolid | npc_invulnerable | npc_ignore44 | npc_solidSoft);
-			gNPC[n].bits |= npc_interact;
+			gNPC[n].bits &= ~(NPC_SOLID_SOFT | NPC_IGNORE_TILE_44 | NPC_INVULNERABLE | NPC_IGNORE_SOLIDITY | NPC_BOUNCY | NPC_SHOOTABLE | NPC_SOLID_HARD | NPC_REAR_AND_TOP_DONT_HURT | NPC_SHOW_DAMAGE);	// Clear these flags
+			gNPC[n].bits |= NPC_INTERACTABLE;
 			gNPC[n].code_char = code_char;
 			gNPC[n].bits |= gNpcTable[gNPC[n].code_char].bits;
 			gNPC[n].exp = gNpcTable[gNPC[n].code_char].exp;

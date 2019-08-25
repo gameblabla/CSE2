@@ -163,14 +163,14 @@ void ActNpc104(NPCHAR *npc)
 				else
 					npc->direct = 2;
 
-				npc->bits |= 8;
+				npc->bits |= NPC_IGNORE_SOLIDITY;
 				npc->ani_no = 2;
 				npc->act_no = 3;
 				break;
 			}
 			else
 			{
-				npc->bits &= ~8;
+				npc->bits &= ~NPC_IGNORE_SOLIDITY;
 			}
 			// Fallthrough
 		case 1:
@@ -209,7 +209,7 @@ void ActNpc104(NPCHAR *npc)
 
 		case 3:
 			if (++npc->act_wait > 40)
-				npc->bits &= ~8;
+				npc->bits &= ~NPC_IGNORE_SOLIDITY;
 
 			if (npc->flag & 8)
 			{
@@ -631,7 +631,7 @@ void ActNpc110(NPCHAR *npc)
 				else
 					npc->direct = 2;
 
-				npc->bits |= 8;
+				npc->bits |= NPC_IGNORE_SOLIDITY;
 				npc->ani_no = 2;
 				npc->act_no = 3;
 
@@ -639,7 +639,7 @@ void ActNpc110(NPCHAR *npc)
 			}
 			else
 			{
-				npc->bits &= ~8;
+				npc->bits &= ~NPC_IGNORE_SOLIDITY;
 			}
 			// Fallthrough
 		case 1:
@@ -678,7 +678,7 @@ void ActNpc110(NPCHAR *npc)
 
 		case 3:
 			if (++npc->act_wait > 40)
-				npc->bits &= ~8;
+				npc->bits &= ~NPC_IGNORE_SOLIDITY;
 
 			if (npc->flag & 8)
 			{
@@ -1096,12 +1096,12 @@ void ActNpc114(NPCHAR *npc)
 
 			if (gMC.y > npc->y)
 			{
-				npc->bits &= ~0x40;
+				npc->bits &= ~NPC_SOLID_HARD;
 				npc->damage = 0x7F;
 			}
 			else
 			{
-				npc->bits |= 0x40;
+				npc->bits |= NPC_SOLID_HARD;
 				npc->damage = 0;
 			}
 
@@ -1119,7 +1119,7 @@ void ActNpc114(NPCHAR *npc)
 				npc->act_no = 1;
 				npc->ani_no = 0;
 				npc->damage = 0;
-				npc->bits |= 0x40;
+				npc->bits |= NPC_SOLID_HARD;
 			}
 
 			break;
@@ -1261,7 +1261,7 @@ void ActNpc115(NPCHAR *npc)
 			npc->ani_no = 4;
 			npc->damage = 0;
 			npc->ym = -0x200;
-			npc->bits &= ~0x21;
+			npc->bits &= ~(NPC_SOLID_SOFT | NPC_SHOOTABLE);
 			PlaySoundObject(51, 1);
 			// Fallthrough
 		case 51:
@@ -1558,8 +1558,8 @@ void ActNpc118(NPCHAR *npc)
 			else
 				npc->direct = 2;
 
-			npc->bits |= 0x20;
-			npc->bits &= ~4;
+			npc->bits |= NPC_SHOOTABLE;
+			npc->bits &= ~NPC_INVULNERABLE;
 			// Fallthrough
 		case 11:
 			if (npc->act_wait)
@@ -1600,7 +1600,7 @@ void ActNpc118(NPCHAR *npc)
 			}
 			else
 			{
-				npc->bits |= 0x20;
+				npc->bits |= NPC_SHOOTABLE;
 				npc->act_no = 20;
 				npc->act_wait = 0;
 				PlaySoundObject(103, 1);
@@ -1683,8 +1683,8 @@ void ActNpc118(NPCHAR *npc)
 		npc->act_wait = 0;
 		npc->act_no = 30;
 		npc->ani_no = 7;
-		npc->bits &= ~0x20;
-		npc->bits |= 4;
+		npc->bits &= ~NPC_SHOOTABLE;
+		npc->bits |= NPC_INVULNERABLE;
 		npc->xm = 0;
 	}
 

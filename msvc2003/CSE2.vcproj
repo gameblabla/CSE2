@@ -425,6 +425,9 @@
 				RelativePath="..\src\Resource.cpp">
 			</File>
 			<File
+				RelativePath="..\src\Backends\Rendering\SDLTexture.cpp">
+			</File>
+			<File
 				RelativePath="..\src\SelStage.cpp">
 			</File>
 			<File
@@ -590,6 +593,9 @@
 			</File>
 			<File
 				RelativePath="..\src\Profile.h">
+			</File>
+			<File
+				RelativePath="..\src\Backends\Rendering.h">
 			</File>
 			<File
 				RelativePath="..\src\Resource.h">
