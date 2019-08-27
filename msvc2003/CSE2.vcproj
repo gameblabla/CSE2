@@ -601,6 +601,9 @@
 				RelativePath="..\src\Resource.h">
 			</File>
 			<File
+				RelativePath=".\resource1.h">
+			</File>
+			<File
 				RelativePath="..\src\SelStage.h">
 			</File>
 			<File
@@ -639,7 +642,7 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}">
 			<File
-				RelativePath="..\assets\resources\Icon\ICON.rc">
+				RelativePath=".\CSE2.rc">
 			</File>
 		</Filter>
 	</Files>
