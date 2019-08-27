@@ -141,17 +141,16 @@ void EndDirectDraw()
 	memset(surface_metadata, 0, sizeof(surface_metadata));
 }
 
-static BOOL IsEnableBitmap(SDL_RWops *fp)
+static BOOL IsEnableBitmap(const unsigned char *data, size_t data_size)
 {
-	char str[16];
 	const char *extra_text = "(C)Pixel";
 
 	const size_t len = strlen(extra_text);
 
-	fp->seek(fp, -(Sint64)len, RW_SEEK_END);
-	fp->read(fp, str, 1, len);
-	fp->seek(fp, 0, RW_SEEK_SET);
-	return memcmp(str, extra_text, len) == 0;
+	if (data_size < len)
+		return FALSE;
+
+	return memcmp(data + data_size - len, extra_text, len) == 0;
 }
 
 void ReleaseSurface(int s)
@@ -209,7 +208,7 @@ BOOL MakeSurface_Generic(int bxsize, int bysize, SurfaceID surf_no, BOOL bSystem
 	return success;
 }
 
-static BOOL LoadBitmap(SDL_RWops *fp, SurfaceID surf_no, BOOL create_surface, const char *name, SurfaceType type)
+static BOOL LoadBitmap(const unsigned char *data, size_t data_size, SurfaceID surf_no, BOOL create_surface, const char *name, SurfaceType type)
 {
 	BOOL success = FALSE;
 
@@ -225,7 +224,11 @@ static BOOL LoadBitmap(SDL_RWops *fp, SurfaceID surf_no, BOOL create_surface, co
 		}
 		else
 		{
-			SDL_Surface *surface = SDL_LoadBMP_RW(fp, 0);
+			// For some dumbass reason, SDL2 measures size with a signed int.
+			// Has anyone ever told the devs that an int can be as little as 16 bits long? Real portable.
+			// But hey, if I ever need to create an RWops from an array that's -32768 bytes long, they've got me covered!
+			SDL_RWops *fp = SDL_RWFromConstMem(data, data_size);
+			SDL_Surface *surface = SDL_LoadBMP_RW(fp, 1);
 
 			if (surface == NULL)
 			{
@@ -310,40 +313,64 @@ static BOOL LoadBitmap(SDL_RWops *fp, SurfaceID surf_no, BOOL create_surface, co
 		}
 	}
 
-	fp->close(fp);
-
 	return success;
+}
+
+static unsigned char* LoadFileToMemory(const char *path, size_t *size)
+{
+	FILE *fp = fopen(path, "rb");
+	if (fp == NULL)
+		return NULL;
+
+	fseek(fp, 0, SEEK_END);
+	*size = ftell(fp);
+	rewind(fp);
+	unsigned char *data = (unsigned char *)malloc(*size);
+	fread(data, 1, *size, fp);
+	fclose(fp);
+
+	return data;
 }
 
 static BOOL LoadBitmap_File(const char *name, SurfaceID surf_no, BOOL create_surface)
 {
 	char path[PATH_LENGTH];
-	SDL_RWops *fp;
+	unsigned char *data;
+	size_t size;
 
 	// Attempt to load PBM
 	sprintf(path, "%s/%s.pbm", gDataPath, name);
-	fp = SDL_RWFromFile(path, "rb");
-	if (fp)
+	data = LoadFileToMemory(path, &size);
+	if (data != NULL)
 	{
-		if (!IsEnableBitmap(fp))
+		if (!IsEnableBitmap(data, size))
 		{
 			printf("Tried to load bitmap to surface %d, but it's missing the '(C)Pixel' string\n", surf_no);
-			fp->close(fp);
 		}
 		else
 		{
-			if (LoadBitmap(fp, surf_no, create_surface, name, SURFACE_SOURCE_FILE))
+			if (LoadBitmap(data, size, surf_no, create_surface, name, SURFACE_SOURCE_FILE))
+			{
+				free(data);
 				return TRUE;
+			}
 		}
+
+		free(data);
 	}
 
 	// Attempt to load BMP
 	sprintf(path, "%s/%s.bmp", gDataPath, name);
-	fp = SDL_RWFromFile(path, "rb");
-	if (fp)
+	data = LoadFileToMemory(path, &size);
+	if (data != NULL)
 	{
-		if (LoadBitmap(fp, surf_no, create_surface, name, SURFACE_SOURCE_FILE))
+		if (LoadBitmap(data, size, surf_no, create_surface, name, SURFACE_SOURCE_FILE))
+		{
+			free(data);
 			return TRUE;
+		}
+
+		free(data);
 	}
 
 	printf("Failed to open file %s\n", name);
@@ -356,15 +383,8 @@ static BOOL LoadBitmap_Resource(const char *res, SurfaceID surf_no, BOOL create_
 	const unsigned char *data = FindResource(res, "BITMAP", &size);
 
 	if (data)
-	{
-		// For some dumbass reason, SDL2 measures size with a signed int.
-		// Has anyone ever told the devs that an int can be as little as 16 bits long? Real portable.
-		// But hey, if I ever need to create an RWops from an array that's -32768 bytes long, they've got me covered!
-		SDL_RWops *fp = SDL_RWFromConstMem(data, size);
-
-		if (LoadBitmap(fp, surf_no, create_surface, res, SURFACE_SOURCE_RESOURCE))
+		if (LoadBitmap(data, size, surf_no, create_surface, res, SURFACE_SOURCE_RESOURCE))
 			return TRUE;
-	}
 
 	printf("Failed to open resource %s\n", res);
 	return FALSE;
