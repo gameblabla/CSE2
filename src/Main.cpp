@@ -18,7 +18,6 @@
 #include "MyChar.h"
 #include "Organya.h"
 #include "Profile.h"
-#include "Resource.h"
 #include "Sound.h"
 #include "Triangle.h"
 
@@ -106,8 +105,8 @@ int main(int argc, char *argv[])
 
 #ifdef WINDOWS
 	// Set the window icons. See res/ICON/ICON.rc.
-	SDL_SetHint(SDL_HINT_WINDOWS_INTRESOURCE_ICON, "101");
-	SDL_SetHint(SDL_HINT_WINDOWS_INTRESOURCE_ICON_SMALL, "102");
+//	SDL_SetHint(SDL_HINT_WINDOWS_INTRESOURCE_ICON, "101");
+//	SDL_SetHint(SDL_HINT_WINDOWS_INTRESOURCE_ICON_SMALL, "102");
 #endif
 
 	// Initialize SDL
@@ -212,7 +211,7 @@ int main(int argc, char *argv[])
 
 		RECT unused_rect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
-		// Load cursor
+/*		// Load cursor
 		size_t size;
 		const unsigned char *data = FindResource("CURSOR_NORMAL", "CURSOR", &size);
 
@@ -236,7 +235,7 @@ int main(int argc, char *argv[])
 		{
 			printf("Failed to load cursor\n");
 		}
-
+*/
 		// Get window dimensions and colour depth
 		int windowWidth;
 		int windowHeight;
@@ -315,7 +314,7 @@ int main(int argc, char *argv[])
 				bFps = TRUE;
 
 #ifndef WINDOWS
-			// Load icon
+/*			// Load icon
 			size_t size;
 			const unsigned char *data = FindResource("ICON_MINI", "ICON", &size);
 
@@ -334,7 +333,7 @@ int main(int argc, char *argv[])
 			else
 			{
 				printf("Failed to load icon\n");
-			}
+			}*/
 #endif
 
 			// Set rects

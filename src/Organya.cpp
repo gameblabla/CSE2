@@ -14,7 +14,6 @@
 
 #include "WindowsWrapper.h"
 
-#include "Resource.h"
 #include "Sound.h"
 
 #define PANDUMMY 0xFF
@@ -267,10 +266,12 @@ signed char wave_data[100][0x100];
 
 BOOL InitWaveData100()
 {
-	const unsigned char *data = FindResource("WAVE100", "WAVE", NULL);
+	HRSRC hrscr = FindResourceA(NULL, "WAVE100", "WAVE");
 
-	if (data == NULL)
+	if (hrscr == NULL)
 		return FALSE;
+
+	const unsigned char *data = (unsigned char*)LockResource(LoadResource(NULL, hrscr));
 
 	memcpy(wave_data, data, 100 * 0x100);
 
@@ -432,7 +433,12 @@ void LoadOrganya(const char *name)
 	memset(now_leng, 0, sizeof(now_leng));
 
 	// Open file
-	const unsigned char *p = FindResource(name, "ORG", NULL);
+	HRSRC hrscr = FindResourceA(NULL, name, "ORG");
+
+	if (hrscr == NULL)
+		return;
+
+	const unsigned char *p = (unsigned char*)LockResource(LoadResource(NULL, hrscr));
 
 	// Version Check
 	unsigned char ver = 0;

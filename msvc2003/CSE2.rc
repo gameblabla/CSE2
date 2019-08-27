@@ -58,6 +58,85 @@ BEGIN
     END
 END
 
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+CREDIT01                BITMAP                  "..\\assets\\resources\\BITMAP\\Credit01.bmp"
+CREDIT02                BITMAP                  "..\\assets\\resources\\BITMAP\\Credit02.bmp"
+CREDIT03                BITMAP                  "..\\assets\\resources\\BITMAP\\Credit03.bmp"
+CREDIT04                BITMAP                  "..\\assets\\resources\\BITMAP\\Credit04.bmp"
+CREDIT05                BITMAP                  "..\\assets\\resources\\BITMAP\\Credit05.bmp"
+CREDIT06                BITMAP                  "..\\assets\\resources\\BITMAP\\Credit06.bmp"
+CREDIT07                BITMAP                  "..\\assets\\resources\\BITMAP\\Credit07.bmp"
+CREDIT08                BITMAP                  "..\\assets\\resources\\BITMAP\\Credit08.bmp"
+CREDIT09                BITMAP                  "..\\assets\\resources\\BITMAP\\Credit09.bmp"
+CREDIT10                BITMAP                  "..\\assets\\resources\\BITMAP\\Credit10.bmp"
+CREDIT11                BITMAP                  "..\\assets\\resources\\BITMAP\\Credit11.bmp"
+CREDIT12                BITMAP                  "..\\assets\\resources\\BITMAP\\Credit12.bmp"
+CREDIT14                BITMAP                  "..\\assets\\resources\\BITMAP\\Credit14.bmp"
+CREDIT15                BITMAP                  "..\\assets\\resources\\BITMAP\\Credit15.bmp"
+CREDIT16                BITMAP                  "..\\assets\\resources\\BITMAP\\Credit16.bmp"
+CREDIT17                BITMAP                  "..\\assets\\resources\\BITMAP\\Credit17.bmp"
+CREDIT18                BITMAP                  "..\\assets\\resources\\BITMAP\\Credit18.bmp"
+PIXEL                   BITMAP                  "..\\assets\\resources\\BITMAP\\pixel.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// ORG
+//
+
+ACCESS                  ORG                     "..\\assets\\resources\\ORG\\Access.org"
+ANZEN                   ORG                     "..\\assets\\resources\\ORG\\Anzen.org"
+BALCONY                 ORG                     "..\\assets\\resources\\ORG\\Balcony.org"
+BALLOS                  ORG                     "..\\assets\\resources\\ORG\\Ballos.org"
+BDOWN                   ORG                     "..\\assets\\resources\\ORG\\BreakDown.org"
+CEMETERY                ORG                     "..\\assets\\resources\\ORG\\Cemetery.org"
+CURLY                   ORG                     "..\\assets\\resources\\ORG\\Curly.org"
+DR                      ORG                     "..\\assets\\resources\\ORG\\Dr.org"
+ENDING                  ORG                     "..\\assets\\resources\\ORG\\Ending.org"
+ESCAPE                  ORG                     "..\\assets\\resources\\ORG\\Escape.org"
+FANFALE1                ORG                     "..\\assets\\resources\\ORG\\Fanfale1.org"
+FANFALE2                ORG                     "..\\assets\\resources\\ORG\\Fanfale2.org"
+FANFALE3                ORG                     "..\\assets\\resources\\ORG\\Fanfale3.org"
+FIREEYE                 ORG                     "..\\assets\\resources\\ORG\\FireEye.org"
+GAMEOVER                ORG                     "..\\assets\\resources\\ORG\\Gameover.org"
+GINSUKE                 ORG                     "..\\assets\\resources\\ORG\\Ginsuke.org"
+GRAND                   ORG                     "..\\assets\\resources\\ORG\\Grand.org"
+GRAVITY                 ORG                     "..\\assets\\resources\\ORG\\Gravity.org"
+HELL                    ORG                     "..\\assets\\resources\\ORG\\Hell.org"
+IRONH                   ORG                     "..\\assets\\resources\\ORG\\ironH.org"
+JENKA                   ORG                     "..\\assets\\resources\\ORG\\Jenka.org"
+JENKA2                  ORG                     "..\\assets\\resources\\ORG\\Jenka2.org"
+KODOU                   ORG                     "..\\assets\\resources\\ORG\\Kodou.org"
+LASTBTL                 ORG                     "..\\assets\\resources\\ORG\\LastBtl.org"
+LASTBT3                 ORG                     "..\\assets\\resources\\ORG\\LastBtl3.org"
+LASTCAVE                ORG                     "..\\assets\\resources\\ORG\\LastCave.org"
+MARINE                  ORG                     "..\\assets\\resources\\ORG\\Marine.org"
+MAZE                    ORG                     "..\\assets\\resources\\ORG\\Maze.org"
+MDOWN2                  ORG                     "..\\assets\\resources\\ORG\\MDown2.org"
+OSIDE                   ORG                     "..\\assets\\resources\\ORG\\Oside.org"
+MURA                    ORG                     "..\\assets\\resources\\ORG\\Mura.org"
+PLANT                   ORG                     "..\\assets\\resources\\ORG\\Plant.org"
+QUIET                   ORG                     "..\\assets\\resources\\ORG\\quiet.org"
+REQUIEM                 ORG                     "..\\assets\\resources\\ORG\\Requiem.org"
+TOROKO                  ORG                     "..\\assets\\resources\\ORG\\Toroko.org"
+VIVI                    ORG                     "..\\assets\\resources\\ORG\\Vivi.org"
+WANPAK2                 ORG                     "..\\assets\\resources\\ORG\\Wanpak2.org"
+WANPAKU                 ORG                     "..\\assets\\resources\\ORG\\Wanpaku.org"
+WEED                    ORG                     "..\\assets\\resources\\ORG\\Weed.org"
+WHITE                   ORG                     "..\\assets\\resources\\ORG\\White.org"
+XXXX                    ORG                     "..\\assets\\resources\\ORG\\XXXX.org"
+ZONBIE                  ORG                     "..\\assets\\resources\\ORG\\Zonbie.org"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// WAVE
+//
+
+WAVE100                 WAVE                    "..\\assets\\resources\\WAVE\\Wave.dat"
 #endif    // Japanese resources
 /////////////////////////////////////////////////////////////////////////////
 

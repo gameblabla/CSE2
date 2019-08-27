@@ -13,7 +13,6 @@
 
 #include "CommonDefines.h"
 #include "Font.h"
-#include "Resource.h"
 #include "Tags.h"
 #include "Backends/Rendering.h"
 
@@ -379,13 +378,32 @@ static BOOL LoadBitmap_File(const char *name, SurfaceID surf_no, BOOL create_sur
 
 static BOOL LoadBitmap_Resource(const char *res, SurfaceID surf_no, BOOL create_surface)
 {
-	size_t size;
-	const unsigned char *data = FindResource(res, "BITMAP", &size);
+	HRSRC hrscr = FindResourceA(NULL, res, RT_BITMAP);
 
-	if (data)
-		if (LoadBitmap(data, size, surf_no, create_surface, res, SURFACE_SOURCE_RESOURCE))
-			return TRUE;
+	if (hrscr == NULL)
+		return FALSE;
 
+	size_t size = SizeofResource(NULL, hrscr);
+	const unsigned char *data = (unsigned char*)LockResource(LoadResource(NULL, hrscr));
+
+	// The bitmap we get from LockResource is incomplete, so we need to restore its missing header here
+	unsigned char *bmp_buffer = (unsigned char*)malloc(size + 0xE);
+
+	if (bmp_buffer == NULL)
+		return FALSE;
+
+	const unsigned char bmp_header[0xE] = {0x42, 0x4D, 0x76, 0x4B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x76, 0x00, 0x00, 0x00};
+
+	memcpy(bmp_buffer, bmp_header, 0xE);
+	memcpy(bmp_buffer + 0xE, data, size);
+
+	if (LoadBitmap(bmp_buffer, size + 0xE, surf_no, create_surface, res, SURFACE_SOURCE_RESOURCE))
+	{
+		free(bmp_buffer);
+		return TRUE;
+	}
+
+	free(bmp_buffer);
 	printf("Failed to open resource %s\n", res);
 	return FALSE;
 }
@@ -644,11 +662,11 @@ void InitTextObject(const char *font_name)
 #endif
 #endif
 	// Fall back on the built-in font
-	(void)font_name;
+/*	(void)font_name;
 	const unsigned char *res_data = FindResource("DEFAULT_FONT", "FONT", &data_size);
 
 	if (res_data != NULL)
-		gFont = LoadFontFromData(res_data, data_size, fontWidth, fontHeight);
+		gFont = LoadFontFromData(res_data, data_size, fontWidth, fontHeight);*/
 }
 
 void PutText(int x, int y, const char *text, unsigned long color)
