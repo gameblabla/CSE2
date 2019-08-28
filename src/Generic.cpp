@@ -38,6 +38,7 @@ void GetCompileDate(int *year, int *month, int *day)
 }
 
 #ifdef WINDOWS
+// TODO - Inaccurate stack frame
 BOOL GetCompileVersion(int *v1, int *v2, int *v3, int *v4)
 {
 	unsigned int puLen;
@@ -108,13 +109,14 @@ BOOL GetCompileVersion(int *v1, int *v2, int *v3, int *v4)
 
 #ifdef WINDOWS
 // This seems to be broken in recent Windows (Sndvol32.exe was renamed 'SndVol.exe')
+// TODO - Inaccurate stack frame
 BOOL OpenVolumeConfiguration(HWND hWnd)
 {
 	char path[PATH_LENGTH];
 	char path2[PATH_LENGTH];
 	char path3[PATH_LENGTH];
-	size_t error1;
-	size_t error2;
+	int error1;
+	int error2;
 	size_t i;
 
 	GetSystemDirectoryA(path, sizeof(path));
@@ -127,8 +129,8 @@ BOOL OpenVolumeConfiguration(HWND hWnd)
 	path[i] = '\0';
 	sprintf(path3, "%s\\Sndvol32.exe", path);
 
-	error1 = (size_t)ShellExecuteA(hWnd, "open", path2, NULL, NULL, SW_SHOW);	// Convert to size_t instead of int so 64-bit MinGW-w64 shuts up
-	error2 = (size_t)ShellExecuteA(hWnd, "open", path3, NULL, NULL, SW_SHOW);
+	error1 = (int)ShellExecuteA(hWnd, "open", path2, NULL, NULL, SW_SHOW);
+	error2 = (int)ShellExecuteA(hWnd, "open", path3, NULL, NULL, SW_SHOW);
 
 	if (error1 <= 32 && error2 <= 32)
 		return FALSE;
@@ -275,6 +277,155 @@ BOOL IsShiftJIS(unsigned char c)
 		return TRUE;
 
 	return FALSE;
+}
+
+// TODO - Inaccurate stack frame
+BOOL CenterWindow(HWND hWnd)
+{
+	RECT window_rect;
+	HWND parent_hwnd;
+	RECT parent_rect;
+	int x;
+	int y;
+	RECT child_rect;
+
+	SystemParametersInfoA(SPI_GETWORKAREA, 0, &child_rect, 0);
+
+	GetWindowRect(hWnd, &window_rect);
+
+	parent_hwnd = GetParent(hWnd);
+	if (parent_hwnd)
+		GetWindowRect(parent_hwnd, &parent_rect);
+	else
+		SystemParametersInfoA(SPI_GETWORKAREA, 0, &parent_rect, 0);
+
+	x = parent_rect.left + (parent_rect.right - parent_rect.left - (window_rect.right - window_rect.left)) / 2;
+	y = parent_rect.top + (parent_rect.bottom - parent_rect.top - (window_rect.bottom - window_rect.top)) / 2;
+
+	if (x < child_rect.left)
+		x = child_rect.left;
+
+	if (y < child_rect.top)
+		y = child_rect.top;
+
+	if (window_rect.right - window_rect.left + x > child_rect.right)
+		x = child_rect.right - (window_rect.right - window_rect.left);
+
+	if (window_rect.bottom - window_rect.top + y > child_rect.bottom)
+		y = child_rect.bottom - (window_rect.bottom - window_rect.top);
+
+	return SetWindowPos(hWnd, HWND_TOP, x, y, 0, 0, SWP_NOSIZE);
+}
+
+// TODO - Inaccurate stack frame
+BOOL LoadWindowRect(HWND hWnd, char *window_rect_filename, BOOL unknown)
+{
+	char path[PATH_LENGTH];
+	int min_window_width;
+	int min_window_height;
+	int max_window_width;
+	int max_window_height;
+	FILE *fp;
+	RECT Rect;
+	int showCmd;
+	RECT pvParam;
+
+	showCmd = SW_SHOWNORMAL;
+
+	sprintf(path, "%s\\%s", gModulePath, window_rect_filename);
+
+	fp = fopen(path, "rb");
+	if (fp)
+	{
+		fread(&Rect, sizeof(RECT), 1, fp);
+		fread(&showCmd, sizeof(int), 1, fp);
+		fclose(fp);
+
+		SystemParametersInfoA(SPI_GETWORKAREA, 0, &pvParam, 0);
+
+		max_window_width = GetSystemMetrics(SM_CXMAXIMIZED);
+		max_window_height = GetSystemMetrics(SM_CYMAXIMIZED);
+		min_window_width = GetSystemMetrics(SM_CXMIN);
+		min_window_height = GetSystemMetrics(SM_CYMIN);
+
+		if (Rect.right - Rect.left < min_window_width)
+			Rect.right = min_window_width + Rect.left;
+		if (Rect.bottom - Rect.top < min_window_height)
+			Rect.bottom = min_window_height + Rect.top;
+		if (Rect.right - Rect.left > max_window_width)
+			Rect.right = max_window_width + Rect.left;
+		if (Rect.bottom - Rect.top > max_window_height)
+			Rect.bottom = max_window_width + Rect.top;
+
+		if (Rect.left < pvParam.left)
+		{
+			Rect.right += pvParam.left - Rect.left;
+			Rect.left = pvParam.left;
+		}
+		if (Rect.top < pvParam.top)
+		{
+			Rect.bottom += pvParam.top - Rect.top;
+			Rect.top = pvParam.top;
+		}
+		if (Rect.right > pvParam.right)
+		{
+			Rect.left -= Rect.right - pvParam.right;
+			Rect.right -= Rect.right - pvParam.right;
+		}
+		if (Rect.bottom > pvParam.bottom)
+		{
+			Rect.top -= Rect.bottom - pvParam.bottom;
+			Rect.bottom -= Rect.bottom - pvParam.bottom;
+		}
+
+		if (unknown)
+			MoveWindow(hWnd, Rect.left, Rect.top, Rect.right - Rect.left, Rect.bottom - Rect.top, 0);
+		else
+			SetWindowPos(hWnd, HWND_TOP, Rect.left, Rect.top, 0, 0, SWP_NOSIZE);
+	}
+
+	if (showCmd == SW_MAXIMIZE)
+	{
+		if (!ShowWindow(hWnd, SW_MAXIMIZE))
+			return FALSE;
+	}
+	else
+	{
+		ShowWindow(hWnd, SW_SHOWNORMAL);
+	}
+
+	return TRUE;
+}
+
+BOOL SaveWindowRect(HWND hWnd, const char *filename)
+{
+	char path[PATH_LENGTH];
+	WINDOWPLACEMENT wndpl;
+	FILE *fp;
+	RECT rect;
+
+	if (!GetWindowPlacement(hWnd, &wndpl))
+		return FALSE;
+
+	if (wndpl.showCmd == SW_SHOWNORMAL)
+	{
+		if (!GetWindowRect(hWnd, &rect))
+			return FALSE;
+
+		wndpl.rcNormalPosition = rect;
+	}
+
+	sprintf(path, "%s\\%s", gModulePath, filename);
+
+	fp = fopen(path, "wb");
+	if (fp == NULL)
+		return FALSE;
+
+	fwrite(&wndpl.rcNormalPosition, sizeof(RECT), 1, fp);
+	fwrite(&wndpl.showCmd, sizeof(int), 1, fp);
+	fclose(fp);
+
+	return TRUE;
 }
 
 BOOL IsEnableBitmap(const char *path)

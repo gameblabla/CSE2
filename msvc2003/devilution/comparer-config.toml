@@ -620,6 +620,18 @@ name = "IsShiftJIS"
 addr = 0x410E90
 
 [[func]]
+name = "CenterWindow"
+addr = 0x410EE0
+
+[[func]]
+name = "LoadWindowRect"
+addr = 0x410FE0
+
+[[func]]
+name = "SaveWindowRect"
+addr = 0x4111F0
+
+[[func]]
 name = "IsEnableBitmap"
 addr = 0x4112E0
 
