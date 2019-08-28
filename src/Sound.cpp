@@ -270,12 +270,14 @@ void ChangeSoundPan(int no, long pan)	// 512がMAXで256がﾉｰﾏﾙ (512 is 
 // TODO - The stack frame for this function is inaccurate
 int MakePixToneObject(const PIXTONEPARAMETER *ptp, int ptp_num, int no)
 {
+	// For some reason, this function creates an entire WAV file header,
+	// when it only needs a WAVEFORMATEX
 	typedef struct WavHeader
 	{
-		char riff_header[4];
+		char riff[4];
 		unsigned long wav_size;
-		char wav_header[4];
-		char fmt_header[4];
+		char wave[4];
+		char fmt[4];
 		unsigned long fmt_chunk_size;
 		unsigned short audio_format;
 		unsigned short num_channels;
@@ -283,7 +285,7 @@ int MakePixToneObject(const PIXTONEPARAMETER *ptp, int ptp_num, int no)
 		unsigned long byte_rate;
 		unsigned short sample_alignment;
 		unsigned short bit_depth;
-		char data_header[4];
+		char data[4];
 		unsigned long data_bytes;
 	} WavHeader;
 
@@ -309,10 +311,10 @@ int MakePixToneObject(const PIXTONEPARAMETER *ptp, int ptp_num, int no)
 	wav_header.num_channels = 1;
 	wav_header.audio_format = WAVE_FORMAT_PCM;
 	wav_header.fmt_chunk_size = 16;
-	memcpy(wav_header.riff_header, riff, 4);
-	memcpy(wav_header.fmt_header, fmt, 4);
-	memcpy(wav_header.wav_header, wave, 4);
-	memcpy(wav_header.data_header, data, 4);
+	memcpy(wav_header.riff, riff, 4);
+	memcpy(wav_header.fmt, fmt, 4);
+	memcpy(wav_header.wave, wave, 4);
+	memcpy(wav_header.data, data, 4);
 	wav_header.sample_alignment = (wav_header.bit_depth / 8) * wav_header.num_channels;
 	wav_header.byte_rate = (wav_header.bit_depth / 8) * wav_header.num_channels * wav_header.sample_rate;
 	wav_header.data_bytes = wav_header.sample_alignment * ptp->size;
