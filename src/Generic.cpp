@@ -318,7 +318,7 @@ BOOL CenterWindow(HWND hWnd)
 }
 
 // TODO - Inaccurate stack frame
-BOOL LoadWindowRect(HWND hWnd, char *window_rect_filename, BOOL unknown)
+BOOL LoadWindowRect(HWND hWnd, char *filename, BOOL unknown)
 {
 	char path[PATH_LENGTH];
 	int min_window_width;
@@ -332,7 +332,7 @@ BOOL LoadWindowRect(HWND hWnd, char *window_rect_filename, BOOL unknown)
 
 	showCmd = SW_SHOWNORMAL;
 
-	sprintf(path, "%s\\%s", gModulePath, window_rect_filename);
+	sprintf(path, "%s\\%s", gModulePath, filename);
 
 	fp = fopen(path, "rb");
 	if (fp)
