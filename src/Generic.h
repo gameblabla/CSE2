@@ -16,4 +16,7 @@ long GetFileSizeLong(const char *path);
 BOOL PrintBitmapError(char *string, int value);
 #endif
 BOOL IsShiftJIS(unsigned char c);
+BOOL CenterWindow(HWND hWnd);
+BOOL LoadWindowRect(HWND hWnd, char *window_rect_filename, BOOL unknown);
+BOOL SaveWindowRect(HWND hWnd, const char *filename);
 BOOL IsEnableBitmap(const char *path);

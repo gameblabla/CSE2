@@ -31,9 +31,10 @@ char gDataPath[PATH_LENGTH];
 
 int gJoystickButtonTable[8];
 
-HWND ghWnd;	// Placeholder until we restore the WinAPI code
+HWND ghWnd;
 BOOL gbUseJoystick = FALSE;
 BOOL bFps = FALSE;
+BOOL bFullscreen;
 
 BOOL bActive = TRUE;
 
@@ -298,6 +299,7 @@ int main(int argc, char *argv[])
 					}
 
 					StartDirectDraw(2, colourDepth);
+					bFullscreen = TRUE;
 
 					SDL_ShowCursor(0);
 				}
