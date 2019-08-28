@@ -964,6 +964,10 @@ name = "LoadTimeCounter"
 addr = 0x41A7C0
 
 [[func]]
+name = "MakeSoundObject8"
+addr = 0x41A8F0
+
+[[func]]
 name = "ChangeOrganFrequency"
 addr = 0x41ABA0
 size = 0xC9
@@ -983,7 +987,7 @@ name = "PlayOrganObject"
 addr = 0x41ADC0
 
 [[func]]
-name = "ReleaseOrganya"
+name = "ReleaseOrganyaObject"
 addr = 0x41B2A0
 
 [[func]]
@@ -1009,6 +1013,95 @@ addr = 0x41B4D0
 [[func]]
 name = "PlayDramObject"
 addr = 0x41B510
+
+[[func]]
+name = "OrgData::OrgData"
+addr = 0x41B600
+
+[[func]]
+name = "OrgData::InitOrgData"
+addr = 0x41B650
+
+[[func]]
+name = "OrgData::SetMusicInfo"
+addr = 0x41B730
+
+[[func]]
+name = "OrgData::NoteAlloc"
+addr = 0x41B890
+
+[[func]]
+name = "OrgData::ReleaseNote"
+addr = 0x41BA70
+
+[[func]]
+name = "OrgData::InitMusicData"
+addr = 0x41BAD0
+
+[[func]]
+name = "OrgData::GetMusicInfo"
+addr = 0x41C0B0
+
+[[func]]
+name = "InitMMTimer"
+addr = 0x41C180
+
+[[func]]
+name = "StartTimer"
+addr = 0x41C1E0
+size = 0x4A
+
+[[func]]
+name = "TimerProc"
+addr = 0x41C230
+
+[[func]]
+name = "QuitMMTimer"
+addr = 0x41C250
+
+[[func]]
+name = "OrgData::PlayData"
+addr = 0x41C2B0
+
+[[func]]
+name = "OrgData::SetPlayPointer"
+addr = 0x41C630
+
+[[func]]
+name = "StartOrganya"
+addr = 0x41C6C0
+
+[[func]]
+name = "LoadOrganya"
+addr = 0x41C6F0
+
+[[func]]
+name = "SetOrganyaPosition"
+addr = 0x41C730
+
+[[func]]
+name = "GetOrganyaPosition"
+addr = 0x41C770
+
+[[func]]
+name = "PlayOrganyaMusic"
+addr = 0x41C790
+
+[[func]]
+name = "ChangeOrganyaVolume"
+addr = 0x41C7C0
+
+[[func]]
+name = "StopOrganyaMusic"
+addr = 0x41C7F0
+
+[[func]]
+name = "SetOrganyaFadeout"
+addr = 0x41C880
+
+[[func]]
+name = "EndOrganya"
+addr = 0x41C890
 
 [[func]]
 name = "MakeWaveTables"
@@ -1107,6 +1200,22 @@ name = "ShootBullet"
 addr = 0x41FE70
 
 [[func]]
+name = "InitDirectSound"
+addr = 0x4200C0
+
+[[func]]
+name = "EndDirectSound"
+addr = 0x4201A0
+
+[[func]]
+name = "InitSoundObject"
+addr = 0x420240
+
+[[func]]
+name = "LoadSoundObject"
+addr = 0x420390
+
+[[func]]
 name = "PlaySoundObject"
 addr = 0x420640
 
@@ -1124,6 +1233,10 @@ size = 0x35
 name = "ChangeSoundPan"
 addr = 0x4207A0
 size = 0x36
+
+[[func]]
+name = "MakePixToneObject"
+addr = 0x4207E0
 
 [[func]]
 name = "TransferStage"

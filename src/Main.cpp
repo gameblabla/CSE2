@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "SDL.h"
+#include "SDL_syswm.h"
 
 #include "WindowsWrapper.h"
 
@@ -347,11 +348,16 @@ int main(int argc, char *argv[])
 			CortBox(&clip_rect, 0x000000);
 			PutBitmap3(&clip_rect, (WINDOW_WIDTH - 64) / 2, (WINDOW_HEIGHT - 8) / 2, &loading_rect, SURFACE_ID_LOADING);
 
+			SDL_SysWMinfo wmInfo;
+			SDL_VERSION(&wmInfo.version);
+			SDL_GetWindowWMInfo(gWindow, &wmInfo);
+			ghWnd = wmInfo.info.win.window;
+
 			// Draw to screen
 			if (Flip_SystemTask(ghWnd))
 			{
 				// Initialize sound
-				InitDirectSound();
+				InitDirectSound(ghWnd);
 
 				// Initialize joystick
 				if (config.bJoystick && InitDirectInput())
