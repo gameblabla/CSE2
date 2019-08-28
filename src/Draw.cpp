@@ -165,49 +165,6 @@ void ReleaseSurface(int s)
 	memset(&surface_metadata[s], 0, sizeof(surface_metadata[0]));
 }
 
-BOOL MakeSurface_Generic(int bxsize, int bysize, SurfaceID surf_no, BOOL bSystem)
-{
-	BOOL success = FALSE;
-
-#ifdef FIX_BUGS
-	if (surf_no >= SURFACE_ID_MAX)
-#else
-	if (surf_no > SURFACE_ID_MAX)	// OOPS (should be '>=')
-#endif
-	{
-		printf("Tried to create drawable surface at invalid slot (%d - maximum is %d)\n", surf_no, SURFACE_ID_MAX);
-	}
-	else
-	{
-		if (surf[surf_no])
-		{
-			printf("Tried to create drawable surface at occupied slot (%d)\n", surf_no);
-		}
-		else
-		{
-			// Create surface
-			surf[surf_no] = Backend_CreateSurface(bxsize * magnification, bysize * magnification);
-
-			if (surf[surf_no] == NULL)
-			{
-				printf("Failed to create backend surface %d\n", surf_no);
-			}
-			else
-			{
-				surface_metadata[surf_no].type = SURFACE_SOURCE_NONE;
-				surface_metadata[surf_no].width = bxsize;
-				surface_metadata[surf_no].height = bysize;
-				surface_metadata[surf_no].bSystem = bSystem;
-				strcpy(surface_metadata[surf_no].name, "generic");
-
-				success = TRUE;
-			}
-		}
-	}
-
-	return success;
-}
-
 static BOOL LoadBitmap(const unsigned char *data, size_t data_size, SurfaceID surf_no, BOOL create_surface, const char *name, SurfaceType type)
 {
 	BOOL success = FALSE;
@@ -408,6 +365,49 @@ BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 BOOL ReloadBitmap_Resource(const char *res, SurfaceID surf_no)
 {
 	return LoadBitmap_Resource(res, surf_no, FALSE);
+}
+
+BOOL MakeSurface_Generic(int bxsize, int bysize, SurfaceID surf_no, BOOL bSystem)
+{
+	BOOL success = FALSE;
+
+#ifdef FIX_BUGS
+	if (surf_no >= SURFACE_ID_MAX)
+#else
+	if (surf_no > SURFACE_ID_MAX)	// OOPS (should be '>=')
+#endif
+	{
+		printf("Tried to create drawable surface at invalid slot (%d - maximum is %d)\n", surf_no, SURFACE_ID_MAX);
+	}
+	else
+	{
+		if (surf[surf_no])
+		{
+			printf("Tried to create drawable surface at occupied slot (%d)\n", surf_no);
+		}
+		else
+		{
+			// Create surface
+			surf[surf_no] = Backend_CreateSurface(bxsize * magnification, bysize * magnification);
+
+			if (surf[surf_no] == NULL)
+			{
+				printf("Failed to create backend surface %d\n", surf_no);
+			}
+			else
+			{
+				surface_metadata[surf_no].type = SURFACE_SOURCE_NONE;
+				surface_metadata[surf_no].width = bxsize;
+				surface_metadata[surf_no].height = bysize;
+				surface_metadata[surf_no].bSystem = bSystem;
+				strcpy(surface_metadata[surf_no].name, "generic");
+
+				success = TRUE;
+			}
+		}
+	}
+
+	return success;
 }
 
 static void ScaleRect(const RECT *source_rect, RECT *destination_rect)
