@@ -267,6 +267,7 @@ void ChangeSoundPan(int no, long pan)	// 512がMAXで256がﾉｰﾏﾙ (512 is 
 	lpSECONDARYBUFFER[no]->SetPan((pan - 256) * 10);
 }
 
+// TODO - The stack frame for this function is inaccurate
 int MakePixToneObject(const PIXTONEPARAMETER *ptp, int ptp_num, int no)
 {
 	typedef struct WavHeader
