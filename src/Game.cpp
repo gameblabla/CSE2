@@ -747,9 +747,8 @@ BOOL Game(HWND hWnd)
 	ReleaseNpcTable();
 	ReleaseCreditScript();
 
-	// This needs uncommenting when SaveWindowRect is added
-	//if (!bFullscreen)
-	//	SaveWindowRect(hWnd, "window.rect");
+	if (!bFullscreen)
+		SaveWindowRect(hWnd, "window.rect");
 
 	return TRUE;
 }
