@@ -18,6 +18,7 @@ BACK gBack;
 int gWaterY;
 static unsigned long color_black;
 
+// TODO - Another function that has an incorrect stack frame
 BOOL InitBack(const char *fName, int type)
 {
 	// Unused, hilariously
@@ -29,12 +30,7 @@ BOOL InitBack(const char *fName, int type)
 
 	FILE *fp = fopen(path, "rb");
 	if (fp == NULL)
-	{
-		sprintf(path, "%s/%s.bmp", gDataPath, fName);
-		fp = fopen(path, "rb");
-		if (fp == NULL)
-			return FALSE;
-	}
+		return FALSE;
 
 #ifdef NONPORTABLE
 	// This is ridiculously platform-dependant:
@@ -100,106 +96,84 @@ void ActBack()
 
 void PutBack(int fx, int fy)
 {
+	int x;
+	int y;
 	RECT rect = {0, 0, gBack.partsW, gBack.partsH};
-	RECT rcSkyFiller = {106, 0, 255, 88};
 
 	switch (gBack.type)
 	{
 		case 0:
-			for (int y = 0; y < WINDOW_HEIGHT; y += gBack.partsH)
-			{
-				for (int x = 0; x < WINDOW_WIDTH; x += gBack.partsW)
+			for (y = 0; y < WINDOW_HEIGHT; y += gBack.partsH)
+				for (x = 0; x < WINDOW_WIDTH; x += gBack.partsW)
 					PutBitmap4(&grcGame, x, y, &rect, SURFACE_ID_LEVEL_BACKGROUND);
-			}
+
 			break;
 
 		case 1:
-			for (int y = -(fy / 0x400 % gBack.partsH); y < WINDOW_HEIGHT; y += gBack.partsH)
-			{
-				for (int x = -(fx / 0x400 % gBack.partsW); x < WINDOW_WIDTH; x += gBack.partsW)
+			for (y = -(fy / 2 / 0x200 % gBack.partsH); y < WINDOW_HEIGHT; y += gBack.partsH)
+				for (x = -(fx / 2 / 0x200 % gBack.partsW); x < WINDOW_WIDTH; x += gBack.partsW)
 					PutBitmap4(&grcGame, x, y, &rect, SURFACE_ID_LEVEL_BACKGROUND);
-			}
+
 			break;
 
 		case 2:
-			for (int y = -(fy / 0x200 % gBack.partsH); y < WINDOW_HEIGHT; y += gBack.partsH)
-			{
-				for (int x = -(fx / 0x200 % gBack.partsW); x < WINDOW_WIDTH; x += gBack.partsW)
+			for (y = -(fy / 0x200 % gBack.partsH); y < WINDOW_HEIGHT; y += gBack.partsH)
+				for (x = -(fx / 0x200 % gBack.partsW); x < WINDOW_WIDTH; x += gBack.partsW)
 					PutBitmap4(&grcGame, x, y, &rect, SURFACE_ID_LEVEL_BACKGROUND);
-			}
+
 			break;
 
 		case 5:
-			for (int y = -gBack.partsH; y < WINDOW_HEIGHT; y += gBack.partsH)
-			{
-				for (int x = -(gBack.fx / 0x200 % gBack.partsW); x < WINDOW_WIDTH; x += gBack.partsW)
+			for (y = -gBack.partsH; y < WINDOW_HEIGHT; y += gBack.partsH)
+				for (x = -(gBack.fx / 0x200 % gBack.partsW); x < WINDOW_WIDTH; x += gBack.partsW)
 					PutBitmap4(&grcGame, x, y, &rect, SURFACE_ID_LEVEL_BACKGROUND);
-			}
+
 			break;
 
 		case 6:
 		case 7:
-			// Sky
-			static unsigned int fillNext;
-			fillNext = 0;
-			for (int y = 0; y < WINDOW_HEIGHT - 240 + 88; y += 88)
-			{
-				fillNext = ((fillNext) * 214013 + 2531011);
-				for (int x = -(int)(fillNext % 149); x < WINDOW_WIDTH; x += 149)
-				{
-					PutBitmap4(&grcGame, x, y, &rcSkyFiller, SURFACE_ID_LEVEL_BACKGROUND);
-				}
-			}
-
 			rect.top = 0;
 			rect.bottom = 88;
 			rect.left = 0;
 			rect.right = 320;
-			PutBitmap4(&grcGame, (WINDOW_WIDTH - 320) / 2, WINDOW_HEIGHT - 240, &rect, SURFACE_ID_LEVEL_BACKGROUND);
+			PutBitmap4(&grcGame, 0, 0, &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
-			// Cloud layer 1
 			rect.top = 88;
 			rect.bottom = 123;
 			rect.left = gBack.fx / 2;
 			rect.right = 320;
-			PutBitmap4(&grcGame, 0, 88 + (WINDOW_HEIGHT - 240), &rect, SURFACE_ID_LEVEL_BACKGROUND);
+			PutBitmap4(&grcGame, 0, 88, &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
 			rect.left = 0;
-			for (int i = 0; i < ((WINDOW_WIDTH - 1) / 320) + 1; i++)
-				PutBitmap4(&grcGame, (320 * (i + 1)) - gBack.fx / 2 % 320, 88 + (WINDOW_HEIGHT - 240), &rect, SURFACE_ID_LEVEL_BACKGROUND);
+			PutBitmap4(&grcGame, 320 - gBack.fx / 2 % 320, 88, &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
-			// Cloud layer 2
 			rect.top = 123;
 			rect.bottom = 146;
 			rect.left = gBack.fx % 320;
 			rect.right = 320;
-			PutBitmap4(&grcGame, 0, 123 + (WINDOW_HEIGHT - 240), &rect, SURFACE_ID_LEVEL_BACKGROUND);
+			PutBitmap4(&grcGame, 0, 123, &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
 			rect.left = 0;
-			for (int i = 0; i < ((WINDOW_WIDTH - 1) / 320) + 1; i++)
-				PutBitmap4(&grcGame, (320 * (i + 1)) - gBack.fx % 320, 123 + (WINDOW_HEIGHT - 240), &rect, SURFACE_ID_LEVEL_BACKGROUND);
+			PutBitmap4(&grcGame, 320 - gBack.fx % 320, 123, &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
-			// Cloud layer 3
 			rect.top = 146;
 			rect.bottom = 176;
 			rect.left = 2 * gBack.fx % 320;
 			rect.right = 320;
-			PutBitmap4(&grcGame, 0, 146 + (WINDOW_HEIGHT - 240), &rect, SURFACE_ID_LEVEL_BACKGROUND);
+			PutBitmap4(&grcGame, 0, 146, &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
 			rect.left = 0;
-			for (int i = 0; i < ((WINDOW_WIDTH - 1) / 320) + 1; i++)
-				PutBitmap4(&grcGame, (320 * (i + 1)) - 2 * gBack.fx % 320, 146 + (WINDOW_HEIGHT - 240), &rect, SURFACE_ID_LEVEL_BACKGROUND);
+			PutBitmap4(&grcGame, 320 - 2 * gBack.fx % 320, 146, &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
-			// Cloud layer 4
 			rect.top = 176;
 			rect.bottom = 240;
 			rect.left = 4 * gBack.fx % 320;
 			rect.right = 320;
-			PutBitmap4(&grcGame, 0, 176 + (WINDOW_HEIGHT - 240), &rect, SURFACE_ID_LEVEL_BACKGROUND);
+			PutBitmap4(&grcGame, 0, 176, &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
 			rect.left = 0;
-			for (int i = 0; i < ((WINDOW_WIDTH - 1) / 320) + 1; i++)
-				PutBitmap4(&grcGame, (320 * (i + 1)) - 4 * gBack.fx % 320, 176 + (WINDOW_HEIGHT - 240), &rect, SURFACE_ID_LEVEL_BACKGROUND);
+			PutBitmap4(&grcGame, 320 - 4 * gBack.fx % 320, 176, &rect, SURFACE_ID_LEVEL_BACKGROUND);
+
 			break;
 
 		default:
@@ -248,7 +222,7 @@ void PutFront(int fx, int fy)
 			}
 
 	}
-
+/*
 	// Draw black bars
 	if (!(g_GameFlags & 8)) // Detect if credits are running
 	{
@@ -298,4 +272,5 @@ void PutFront(int fx, int fy)
 		barRect.bottom = WINDOW_HEIGHT;
 		CortBox(&barRect, 0x000000);
 	}
+	*/
 }
