@@ -242,13 +242,23 @@ BOOL StartCreditScript()
 	return TRUE;
 }
 
-// Get number from text (4 digit)
-int GetScriptNumber(const char *text)
+// Update credits
+void ActionCredit()
 {
-	return (text[0] - '0') * 1000 +
-		(text[1] - '0') * 100 +
-		(text[2] - '0') * 10 +
-		text[3] - '0';
+	if (Credit.offset >= Credit.size)
+		return;
+
+	// Update script, or if waiting, decrement the wait value
+	switch (Credit.mode)
+	{
+		case 1:
+			ActionCredit_Read();
+			break;
+
+		case 2:
+			if (--Credit.wait <= 0)
+				Credit.mode = 1;
+	}
 }
 
 // Parse credits
@@ -401,24 +411,15 @@ void ActionCredit_Read()
 	}
 }
 
-// Update credits
-void ActionCredit()
+// Get number from text (4 digit)
+int GetScriptNumber(const char *text)
 {
-	if (Credit.offset >= Credit.size)
-		return;
-
-	// Update script, or if waiting, decrement the wait value
-	switch (Credit.mode)
-	{
-		case 1:
-			ActionCredit_Read();
-			break;
-
-		case 2:
-			if (--Credit.wait <= 0)
-				Credit.mode = 1;
-	}
+	return (text[0] - '0') * 1000 +
+		(text[1] - '0') * 100 +
+		(text[2] - '0') * 10 +
+		text[3] - '0';
 }
+
 
 // Change illustration
 void SetCreditIllust(int a)
