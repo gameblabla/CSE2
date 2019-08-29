@@ -640,6 +640,35 @@ name = "LoadGenericData"
 addr = 0x411390
 
 [[func]]
+name = "ReleaseDirectInput"
+addr = 0x411E10
+
+[[func]]
+name = "SetDeviceAquire"
+addr = 0x411E60
+size = 0x46
+
+[[func]]
+name = "InitDirectInput"
+addr = 0x411EB0
+
+[[func]]
+name = "HookAllDirectInputDevices"
+addr = 0x411EF0
+
+[[func]]
+name = "EnumDevices_Callback"
+addr = 0x411FC0
+
+[[func]]
+name = "GetJoystickStatus"
+addr = 0x4120F0
+
+[[func]]
+name = "ResetJoystickStatus"
+addr = 0x412250
+
+[[func]]
 name = "GetTrg"
 addr = 0x4122E0
 

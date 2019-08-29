@@ -14,7 +14,7 @@ struct JOYSTICK_STATUS
 	BOOL bButton[32];
 };
 
-void ReleaseDirectInput();
-BOOL InitDirectInput();
-BOOL GetJoystickStatus(JOYSTICK_STATUS *pStatus);
-BOOL ResetJoystickStatus();
+void ReleaseDirectInput(void);
+BOOL InitDirectInput(HINSTANCE hinst, HWND hWnd);
+BOOL GetJoystickStatus(BOOL *buttons);
+BOOL ResetJoystickStatus(void);

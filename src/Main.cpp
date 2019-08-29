@@ -354,6 +354,7 @@ int main(int argc, char *argv[])
 			SDL_VERSION(&wmInfo.version);
 			SDL_GetWindowWMInfo(gWindow, &wmInfo);
 			ghWnd = wmInfo.info.win.window;
+			HINSTANCE hinstance = wmInfo.info.win.hinstance;
 
 			// Draw to screen
 			if (Flip_SystemTask(ghWnd))
@@ -362,7 +363,7 @@ int main(int argc, char *argv[])
 				InitDirectSound(ghWnd);
 
 				// Initialize joystick
-				if (config.bJoystick && InitDirectInput())
+				if (config.bJoystick && InitDirectInput(hinstance, ghWnd))
 				{
 					ResetJoystickStatus();
 					gbUseJoystick = TRUE;
@@ -421,7 +422,7 @@ void ActiveWindow()
 
 void JoystickProc()
 {
-	JOYSTICK_STATUS status;
+/*	JOYSTICK_STATUS status;
 
 	if (GetJoystickStatus(&status))
 	{
@@ -444,7 +445,7 @@ void JoystickProc()
 			if (status.bButton[i])
 				gKey |= gJoystickButtonTable[i];
 		}
-	}
+	}*/
 }
 
 #define DO_KEY_PRESS(key) \
