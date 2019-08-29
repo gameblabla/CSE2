@@ -92,18 +92,14 @@ BOOL HookAllDirectInputDevices(HWND hWnd)
 	joystick = directinput_objects.device;
 
 	if (joystick->SetDataFormat(&c_dfDIJoystick) != DI_OK)	// c_dfDIJoystick might be incorrect
-	{
 		return FALSE;
-	}
-	else if (joystick->SetCooperativeLevel(hWnd, DISCL_EXCLUSIVE | DISCL_BACKGROUND) != DI_OK)
-	{
+
+	if (joystick->SetCooperativeLevel(hWnd, DISCL_EXCLUSIVE | DISCL_BACKGROUND) != DI_OK)
 		return FALSE;
-	}
-	else
-	{
-		joystick->Acquire();
-		return TRUE;
-	}
+
+	joystick->Acquire();
+
+	return TRUE;
 }
 
 // The original name for this function is unknown
