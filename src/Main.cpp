@@ -115,16 +115,16 @@ int main(int argc, char *argv[])
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_TIMER) >= 0)
 	{
 		// Load configuration
-		CONFIG config;
+		CONFIG conf;
 
-		if (!LoadConfigData(&config))
-			DefaultConfigData(&config);
+		if (!LoadConfigData(&conf))
+			DefaultConfigData(&conf);
 
 		// Apply keybinds
 		// Swap X and Z buttons
-		if (config.attack_button_mode)
+		if (conf.attack_button_mode)
 		{
-			if (config.attack_button_mode == 1)
+			if (conf.attack_button_mode == 1)
 			{
 				gKeyJump = KEY_X;
 				gKeyShot = KEY_Z;
@@ -137,9 +137,9 @@ int main(int argc, char *argv[])
 		}
 
 		// Swap Okay and Cancel buttons
-		if (config.ok_button_mode)
+		if (conf.ok_button_mode)
 		{
-			if (config.ok_button_mode == 1)
+			if (conf.ok_button_mode == 1)
 			{
 				gKeyOk = gKeyShot;
 				gKeyCancel = gKeyJump;
@@ -159,9 +159,9 @@ int main(int argc, char *argv[])
 		}
 
 		// Alternate movement keys
-		if (config.move_button_mode)
+		if (conf.move_button_mode)
 		{
-			if (config.move_button_mode == 1)
+			if (conf.move_button_mode == 1)
 			{
 				gKeyLeft = KEY_ALT_LEFT;
 				gKeyUp = KEY_ALT_UP;
@@ -180,7 +180,7 @@ int main(int argc, char *argv[])
 		// Set gamepad inputs
 		for (int i = 0; i < 8; i++)
 		{
-			switch (config.joystick_button[i])
+			switch (conf.joystick_button[i])
 			{
 				case 1:
 					gJoystickButtonTable[i] = gKeyJump;
@@ -241,14 +241,14 @@ int main(int argc, char *argv[])
 		// Get window dimensions and colour depth
 		int windowWidth;
 		int windowHeight;
-		int colourDepth;
+		int depth;
 
-		switch (config.display_mode)
+		switch (conf.display_mode)
 		{
 			case 1:
 			case 2:
 				// Set window dimensions
-				if (config.display_mode == 1)
+				if (conf.display_mode == 1)
 				{
 					windowWidth = WINDOW_WIDTH;
 					windowHeight = WINDOW_HEIGHT;
@@ -264,7 +264,7 @@ int main(int argc, char *argv[])
 
 				if (gWindow)
 				{
-					if (config.display_mode == 1)
+					if (conf.display_mode == 1)
 						StartDirectDraw(0, 0);
 					else
 						StartDirectDraw(1, 0);
@@ -285,20 +285,20 @@ int main(int argc, char *argv[])
 				if (gWindow)
 				{
 					// Set colour depth
-					switch (config.display_mode)
+					switch (conf.display_mode)
 					{
 						case 0:
-							colourDepth = 16;
+							depth = 16;
 							break;
 						case 3:
-							colourDepth = 24;
+							depth = 24;
 							break;
 						case 4:
-							colourDepth = 32;
+							depth = 32;
 							break;
 					}
 
-					StartDirectDraw(2, colourDepth);
+					StartDirectDraw(2, depth);
 					bFullscreen = TRUE;
 
 					SDL_ShowCursor(0);
@@ -340,15 +340,15 @@ int main(int argc, char *argv[])
 #endif
 
 			// Set rects
-			RECT loading_rect = {0, 0, 64, 8};
-			RECT clip_rect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
+			RECT rcLoading = {0, 0, 64, 8};
+			RECT rcFull = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
 			// Load the "LOADING" text
 			MakeSurface_File("Loading", SURFACE_ID_LOADING);
 
 			// Draw loading screen
-			CortBox(&clip_rect, 0x000000);
-			PutBitmap3(&clip_rect, (WINDOW_WIDTH - 64) / 2, (WINDOW_HEIGHT - 8) / 2, &loading_rect, SURFACE_ID_LOADING);
+			CortBox(&rcFull, 0x000000);
+			PutBitmap3(&rcFull, (WINDOW_WIDTH - 64) / 2, (WINDOW_HEIGHT - 8) / 2, &rcLoading, SURFACE_ID_LOADING);
 
 			SDL_SysWMinfo wmInfo;
 			SDL_VERSION(&wmInfo.version);
@@ -363,14 +363,14 @@ int main(int argc, char *argv[])
 				InitDirectSound(ghWnd);
 
 				// Initialize joystick
-				if (config.bJoystick && InitDirectInput(hinstance, ghWnd))
+				if (conf.bJoystick && InitDirectInput(hinstance, ghWnd))
 				{
 					ResetJoystickStatus();
 					gbUseJoystick = TRUE;
 				}
 
 				// Initialize stuff
-				InitTextObject(config.font_name);
+				InitTextObject(conf.font_name);
 				InitTriangleTable();
 
 				// Run game code
