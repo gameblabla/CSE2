@@ -356,6 +356,22 @@ name = "DefaultConfigData"
 addr = 0x40AE30
 
 [[func]]
+name = "VersionDialog"
+addr = 0x40AEC0
+
+[[func]]
+name = "DebugMuteDialog"
+addr = 0x40AFC0
+
+[[func]]
+name = "DebugSaveDialog"
+addr = 0x40B1D0
+
+[[func]]
+name = "QuitDialog"
+addr = 0x40B290
+
+[[func]]
 name = "ActionStripper"
 addr = 0x40CF90
 

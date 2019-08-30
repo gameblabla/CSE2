@@ -22,10 +22,6 @@
 #define VOLDUMMY 0xFF
 #define KEYDUMMY 0xFF
 
-#define MAXTRACK 16
-#define MAXMELODY 8
-#define MAXDRAM 8
-
 #define ALLOCNOTE 4096
 
 #define DEFVOLUME	200//255はVOLDUMMY。MAXは254
