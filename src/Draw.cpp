@@ -167,50 +167,7 @@ void ReleaseSurface(int s)
 	memset(&surface_metadata[s], 0, sizeof(surface_metadata[0]));
 }
 
-BOOL MakeSurface_Generic(int bxsize, int bysize, SurfaceID surf_no, BOOL bSystem)
-{
-	BOOL success = FALSE;
-
-#ifdef FIX_BUGS
-	if (surf_no >= SURFACE_ID_MAX)
-#else
-	if (surf_no > SURFACE_ID_MAX)	// OOPS (should be '>=')
-#endif
-	{
-		printf("Tried to create drawable surface at invalid slot (%d - maximum is %d)\n", surf_no, SURFACE_ID_MAX);
-	}
-	else
-	{
-		if (surf[surf_no])
-		{
-			printf("Tried to create drawable surface at occupied slot (%d)\n", surf_no);
-		}
-		else
-		{
-			// Create surface
-			surf[surf_no] = Backend_CreateSurface(bxsize * magnification, bysize * magnification);
-
-			if (surf[surf_no] == NULL)
-			{
-				printf("Failed to create backend surface %d\n", surf_no);
-			}
-			else
-			{
-				surface_metadata[surf_no].type = SURFACE_SOURCE_NONE;
-				surface_metadata[surf_no].width = bxsize;
-				surface_metadata[surf_no].height = bysize;
-				surface_metadata[surf_no].bSystem = bSystem;
-				strcpy(surface_metadata[surf_no].name, "generic");
-
-				success = TRUE;
-			}
-		}
-	}
-
-	return success;
-}
-
-static BOOL LoadBitmap(SDL_RWops *fp, SurfaceID surf_no, BOOL create_surface, const char *name, SurfaceType type)
+static BOOL LoadBitmap(const unsigned char *data, size_t data_size, SurfaceID surf_no, BOOL create_surface, const char *name, SurfaceType type)
 {
 	BOOL success = FALSE;
 
@@ -226,31 +183,26 @@ static BOOL LoadBitmap(SDL_RWops *fp, SurfaceID surf_no, BOOL create_surface, co
 		}
 		else
 		{
-			char fourcc[2];
-			fp->read(fp, fourcc, 1, 2);
-			fp->seek(fp, 0, RW_SEEK_SET);
-
-			BOOL is_bmp = (fourcc[0] == 'B' && fourcc[1] == 'M');
+			BOOL is_bmp = (data[0] == 'B' && data[1] == 'M');
 
 			SDL_Surface *surface;
 
 			if (is_bmp)
 			{
 				// BMP file
-				surface = SDL_LoadBMP_RW(fp, 0);
+				// For some dumbass reason, SDL2 measures size with a signed int.
+				// Has anyone ever told the devs that an int can be as little as 16 bits long? Real portable.
+				// But hey, if I ever need to create an RWops from an array that's -32768 bytes long, they've got me covered!
+				SDL_RWops *fp = SDL_RWFromConstMem(data, data_size);
+				surface = SDL_LoadBMP_RW(fp, 1);
 				SDL_SetColorKey(surface, SDL_TRUE, SDL_MapRGB(surface->format, 0, 0, 0));
 			}
 			else
 			{
 				// PNG file
-				const size_t file_size = (size_t)fp->size(fp);
-				unsigned char *file_buffer = (unsigned char*)malloc(file_size);
-				fp->read(fp, file_buffer, 1, file_size);
-
 				unsigned int bitmap_width, bitmap_height;
 				unsigned char *bitmap_pixels;
-				lodepng_decode32(&bitmap_pixels, &bitmap_width, &bitmap_height, file_buffer, file_size);
-				free(file_buffer);
+				lodepng_decode32(&bitmap_pixels, &bitmap_width, &bitmap_height, data, data_size);
 
 				surface = SDL_CreateRGBSurfaceWithFormatFrom(bitmap_pixels, bitmap_width, bitmap_height, 0, bitmap_width * 4, SDL_PIXELFORMAT_RGBA32);
 			}
@@ -345,41 +297,71 @@ static BOOL LoadBitmap(SDL_RWops *fp, SurfaceID surf_no, BOOL create_surface, co
 		}
 	}
 
-	fp->close(fp);
-
 	return success;
+}
+
+static unsigned char* LoadFileToMemory(const char *path, size_t *size)
+{
+	FILE *fp = fopen(path, "rb");
+	if (fp == NULL)
+		return NULL;
+
+	fseek(fp, 0, SEEK_END);
+	*size = ftell(fp);
+	rewind(fp);
+	unsigned char *data = (unsigned char *)malloc(*size);
+	fread(data, 1, *size, fp);
+	fclose(fp);
+
+	return data;
 }
 
 static BOOL LoadBitmap_File(const char *name, SurfaceID surf_no, BOOL create_surface)
 {
 	char path[PATH_LENGTH];
-	SDL_RWops *fp;
+	unsigned char *data;
+	size_t size;
 
 	// Attempt to load PBM
 	sprintf(path, "%s/%s.pbm", gDataPath, name);
-	fp = SDL_RWFromFile(path, "rb");
-	if (fp)
+	data = LoadFileToMemory(path, &size);
+	if (data != NULL)
 	{
-		if (LoadBitmap(fp, surf_no, create_surface, name, SURFACE_SOURCE_FILE))
+		if (LoadBitmap(data, size, surf_no, create_surface, name, SURFACE_SOURCE_FILE))
+		{
+			free(data);
 			return TRUE;
+		}
+
+		free(data);
 	}
 
 	// Attempt to load BMP
 	sprintf(path, "%s/%s.bmp", gDataPath, name);
-	fp = SDL_RWFromFile(path, "rb");
-	if (fp)
+	data = LoadFileToMemory(path, &size);
+	if (data != NULL)
 	{
-		if (LoadBitmap(fp, surf_no, create_surface, name, SURFACE_SOURCE_FILE))
+		if (LoadBitmap(data, size, surf_no, create_surface, name, SURFACE_SOURCE_FILE))
+		{
+			free(data);
 			return TRUE;
+		}
+
+		free(data);
 	}
 
 	// Attempt to load PNG
 	sprintf(path, "%s/%s.png", gDataPath, name);
-	fp = SDL_RWFromFile(path, "rb");
-	if (fp)
+	data = LoadFileToMemory(path, &size);
+	if (data != NULL)
 	{
-		if (LoadBitmap(fp, surf_no, create_surface, name, SURFACE_SOURCE_FILE))
+		if (LoadBitmap(data, size, surf_no, create_surface, name, SURFACE_SOURCE_FILE))
+		{
+			free(data);
 			return TRUE;
+		}
+
+		free(data);
 	}
 
 	printf("Failed to open file %s\n", name);
@@ -392,15 +374,8 @@ static BOOL LoadBitmap_Resource(const char *res, SurfaceID surf_no, BOOL create_
 	const unsigned char *data = FindResource(res, "BITMAP", &size);
 
 	if (data)
-	{
-		// For some dumbass reason, SDL2 measures size with a signed int.
-		// Has anyone ever told the devs that an int can be as little as 16 bits long? Real portable.
-		// But hey, if I ever need to create an RWops from an array that's -32768 bytes long, they've got me covered!
-		SDL_RWops *fp = SDL_RWFromConstMem(data, size);
-
-		if (LoadBitmap(fp, surf_no, create_surface, res, SURFACE_SOURCE_RESOURCE))
+		if (LoadBitmap(data, size, surf_no, create_surface, res, SURFACE_SOURCE_RESOURCE))
 			return TRUE;
-	}
 
 	printf("Failed to open resource %s\n", res);
 	return FALSE;
@@ -424,6 +399,49 @@ BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 BOOL ReloadBitmap_Resource(const char *res, SurfaceID surf_no)
 {
 	return LoadBitmap_Resource(res, surf_no, FALSE);
+}
+
+BOOL MakeSurface_Generic(int bxsize, int bysize, SurfaceID surf_no, BOOL bSystem)
+{
+	BOOL success = FALSE;
+
+#ifdef FIX_BUGS
+	if (surf_no >= SURFACE_ID_MAX)
+#else
+	if (surf_no > SURFACE_ID_MAX)	// OOPS (should be '>=')
+#endif
+	{
+		printf("Tried to create drawable surface at invalid slot (%d - maximum is %d)\n", surf_no, SURFACE_ID_MAX);
+	}
+	else
+	{
+		if (surf[surf_no])
+		{
+			printf("Tried to create drawable surface at occupied slot (%d)\n", surf_no);
+		}
+		else
+		{
+			// Create surface
+			surf[surf_no] = Backend_CreateSurface(bxsize * magnification, bysize * magnification);
+
+			if (surf[surf_no] == NULL)
+			{
+				printf("Failed to create backend surface %d\n", surf_no);
+			}
+			else
+			{
+				surface_metadata[surf_no].type = SURFACE_SOURCE_NONE;
+				surface_metadata[surf_no].width = bxsize;
+				surface_metadata[surf_no].height = bysize;
+				surface_metadata[surf_no].bSystem = bSystem;
+				strcpy(surface_metadata[surf_no].name, "generic");
+
+				success = TRUE;
+			}
+		}
+	}
+
+	return success;
 }
 
 static void ScaleRect(const RECT *source_rect, RECT *destination_rect)

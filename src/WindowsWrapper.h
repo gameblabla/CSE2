@@ -1,7 +1,7 @@
 #pragma once
 
 #ifdef WINDOWS
-#include <Windows.h>
+#include <windows.h>
 // Avoid name collisions
 #undef DrawText
 #undef FindResource
