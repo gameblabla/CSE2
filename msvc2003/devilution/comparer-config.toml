@@ -372,6 +372,100 @@ name = "QuitDialog"
 addr = 0x40B290
 
 [[func]]
+name = "SetWindowPadding"
+addr = 0x40B320
+
+[[func]]
+name = "Flip_SystemTask"
+addr = 0x40B340
+
+[[func]]
+name = "StartDirectDraw"
+addr = 0x40B450
+
+[[func]]
+name = "EndDirectDraw"
+addr = 0x40B6C0
+
+[[func]]
+name = "ReleaseSurface"
+addr = 0x40B7A0
+
+[[func]]
+name = "MakeSurface_Resource"
+addr = 0x40B800
+size = 0x2BB
+
+[[func]]
+name = "MakeSurface_File"
+addr = 0x40BAC0
+size = 0x34F
+
+[[func]]
+name = "ReloadBitmap_Resource"
+addr = 0x40BE10
+
+[[func]]
+name = "ReloadBitmap_File"
+addr = 0x40BFD0
+
+[[func]]
+name = "MakeSurface_Generic"
+addr = 0x40C1D0
+
+[[func]]
+name = "BackupSurface"
+addr = 0x40C320
+
+[[func]]
+name = "PutBitmap3"
+addr = 0x40C3C0
+
+[[func]]
+name = "PutBitmap4"
+addr = 0x40C5B0
+
+[[func]]
+name = "Surface2Surface"
+addr = 0x40C7A0
+
+[[func]]
+name = "GetCortBoxColor"
+addr = 0x40C8B0
+
+[[func]]
+name = "CortBox"
+addr = 0x40C9E0
+
+[[func]]
+name = "CortBox2"
+addr = 0x40CA80
+
+[[func]]
+name = "DummiedOutLogFunction"
+addr = 0x40CB30
+
+[[func]]
+name = "RestoreSurfaces"
+addr = 0x40CB60
+
+[[func]]
+name = "InitTextObject"
+addr = 0x40CD50
+
+[[func]]
+name = "PutText"
+addr = 0x40CE00
+
+[[func]]
+name = "PutText2"
+addr = 0x40CEB0
+
+[[func]]
+name = "EndTextObject"
+addr = 0x40CF70
+
+[[func]]
 name = "ActionStripper"
 addr = 0x40CF90
 

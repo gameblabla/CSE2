@@ -87,7 +87,7 @@ void EndTextScript()
 	//Release buffers
 	ReleaseSurface(SURFACE_ID_TEXT_BOX);
 	for (int i = 0; i < 4; i++)
-		ReleaseSurface(i + 30);
+		ReleaseSurface((SurfaceID)(i + SURFACE_ID_TEXT_LINE1));
 }
 
 //Decrypt .tsc

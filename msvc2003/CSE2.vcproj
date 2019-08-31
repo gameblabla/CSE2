@@ -34,7 +34,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="SDL2/lib/SDL2.lib SDL2/lib/SDL2main.lib freetype/lib/freetype.lib Version.lib dsound.lib WinMM.lib dxguid.lib dinput.lib"
+				AdditionalDependencies="SDL2/lib/SDL2.lib SDL2/lib/SDL2main.lib freetype/lib/freetype.lib Version.lib dsound.lib WinMM.lib dxguid.lib dinput.lib ddraw.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
@@ -85,7 +85,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="SDL2/lib/SDL2.lib SDL2/lib/SDL2main.lib freetype/lib/freetype.lib Version.lib dsound.lib WinMM.lib dxguid.lib dinput.lib"
+				AdditionalDependencies="SDL2/lib/SDL2.lib SDL2/lib/SDL2main.lib freetype/lib/freetype.lib Version.lib dsound.lib WinMM.lib dxguid.lib dinput.lib ddraw.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
 				IgnoreAllDefaultLibraries="FALSE"
@@ -135,7 +135,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="SDL2/lib/SDL2.lib SDL2/lib/SDL2main.lib freetype/lib/freetype.lib Version.lib dsound.lib WinMM.lib dxguid.lib dinput.lib"
+				AdditionalDependencies="SDL2/lib/SDL2.lib SDL2/lib/SDL2main.lib freetype/lib/freetype.lib Version.lib dsound.lib WinMM.lib dxguid.lib dinput.lib ddraw.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
 				IgnoreAllDefaultLibraries="FALSE"
@@ -186,7 +186,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="SDL2/lib/SDL2.lib SDL2/lib/SDL2main.lib freetype/lib/freetype.lib Version.lib dsound.lib WinMM.lib dxguid.lib dinput.lib"
+				AdditionalDependencies="SDL2/lib/SDL2.lib SDL2/lib/SDL2main.lib freetype/lib/freetype.lib Version.lib dsound.lib WinMM.lib dxguid.lib dinput.lib ddraw.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
@@ -297,21 +297,6 @@
 			</File>
 			<File
 				RelativePath="..\src\Flash.cpp">
-			</File>
-			<File
-				RelativePath="..\src\Font.cpp">
-				<FileConfiguration
-					Name="Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="3"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release (Japanese)|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="3"/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\src\Frame.cpp">
@@ -425,9 +410,6 @@
 				RelativePath="..\src\Profile.cpp">
 			</File>
 			<File
-				RelativePath="..\src\Backends\Rendering\SDLTexture.cpp">
-			</File>
-			<File
 				RelativePath="..\src\SelStage.cpp">
 			</File>
 			<File
@@ -535,9 +517,6 @@
 				RelativePath="..\src\Flash.h">
 			</File>
 			<File
-				RelativePath="..\src\Font.h">
-			</File>
-			<File
 				RelativePath="..\src\Frame.h">
 			</File>
 			<File
@@ -596,9 +575,6 @@
 			</File>
 			<File
 				RelativePath="..\src\Profile.h">
-			</File>
-			<File
-				RelativePath="..\src\Backends\Rendering.h">
 			</File>
 			<File
 				RelativePath=".\resource1.h">

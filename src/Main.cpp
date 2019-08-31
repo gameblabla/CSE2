@@ -23,8 +23,7 @@
 #include "Triangle.h"
 
 // These two are defined in Draw.cpp. This is a bit of a hack.
-extern SDL_Window *gWindow;
-extern SDL_Renderer *gRenderer;
+SDL_Window *gWindow;
 
 char gModulePath[MAX_PATH];
 char gDataPath[MAX_PATH];
@@ -243,6 +242,8 @@ int main(int argc, char *argv[])
 		int windowHeight;
 		int depth;
 
+		HINSTANCE hinstance;
+
 		switch (conf.display_mode)
 		{
 			case 1:
@@ -260,14 +261,20 @@ int main(int argc, char *argv[])
 				}
 
 				// Create window
-				gWindow = CreateWindow(lpWindowName, windowWidth, windowHeight);
+				gWindow = SDL_CreateWindow(lpWindowName, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, 0);
 
 				if (gWindow)
 				{
+					SDL_SysWMinfo wmInfo;
+					SDL_VERSION(&wmInfo.version);
+					SDL_GetWindowWMInfo(gWindow, &wmInfo);
+					ghWnd = wmInfo.info.win.window;
+					hinstance = wmInfo.info.win.hinstance;
+
 					if (conf.display_mode == 1)
-						StartDirectDraw(0, 0);
+						StartDirectDraw(ghWnd, 0, 0);
 					else
-						StartDirectDraw(1, 0);
+						StartDirectDraw(ghWnd, 1, 0);
 				}
 
 				break;
@@ -280,7 +287,7 @@ int main(int argc, char *argv[])
 				windowHeight = WINDOW_HEIGHT * 2;
 
 				// Create window
-				gWindow = CreateWindow(lpWindowName, windowWidth, windowHeight);
+				gWindow = SDL_CreateWindow(lpWindowName, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, 0);
 
 				if (gWindow)
 				{
@@ -298,7 +305,13 @@ int main(int argc, char *argv[])
 							break;
 					}
 
-					StartDirectDraw(2, depth);
+					SDL_SysWMinfo wmInfo;
+					SDL_VERSION(&wmInfo.version);
+					SDL_GetWindowWMInfo(gWindow, &wmInfo);
+					ghWnd = wmInfo.info.win.window;
+					hinstance = wmInfo.info.win.hinstance;
+
+					StartDirectDraw(ghWnd, 2, depth);
 					bFullscreen = TRUE;
 
 					SDL_ShowCursor(0);
@@ -350,12 +363,6 @@ int main(int argc, char *argv[])
 			CortBox(&rcFull, 0x000000);
 			PutBitmap3(&rcFull, (WINDOW_WIDTH - 64) / 2, (WINDOW_HEIGHT - 8) / 2, &rcLoading, SURFACE_ID_LOADING);
 
-			SDL_SysWMinfo wmInfo;
-			SDL_VERSION(&wmInfo.version);
-			SDL_GetWindowWMInfo(gWindow, &wmInfo);
-			ghWnd = wmInfo.info.win.window;
-			HINSTANCE hinstance = wmInfo.info.win.hinstance;
-
 			// Draw to screen
 			if (Flip_SystemTask(ghWnd))
 			{
@@ -379,7 +386,7 @@ int main(int argc, char *argv[])
 				// End stuff
 				EndDirectSound();
 				EndTextObject();
-				EndDirectDraw();
+				EndDirectDraw(ghWnd);
 			}
 
 			SDL_DestroyWindow(gWindow);
@@ -469,21 +476,10 @@ BOOL SystemTask()
 		{
 			case SDL_QUIT:
 				return FALSE;
-				break;
-
-			case SDL_RENDER_TARGETS_RESET:
-			case SDL_RENDER_DEVICE_RESET:
-				HandleDeviceLoss();
-				break;
 
 			case SDL_WINDOWEVENT:
 				switch (event.window.event)
 				{
-					case SDL_WINDOWEVENT_RESIZED:
-					case SDL_WINDOWEVENT_SIZE_CHANGED:
-						HandleWindowResize();
-						break;
-
 					case SDL_WINDOWEVENT_FOCUS_GAINED:
 						focusGained = TRUE;
 						ActiveWindow();
