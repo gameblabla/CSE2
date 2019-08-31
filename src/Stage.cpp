@@ -9,7 +9,6 @@
 #include "Boss.h"
 #include "Bullet.h"
 #include "Caret.h"
-#include "CommonDefines.h"
 #include "Draw.h"
 #include "Flash.h"
 #include "Frame.h"
@@ -139,7 +138,7 @@ BOOL TransferStage(int no, int w, int x, int y)
 	strcpy(path_dir, "Stage");
 
 	//Load tileset
-	char path[PATH_LENGTH];
+	char path[MAX_PATH];
 	sprintf(path, "%s/Prt%s", path_dir, gTMT[no].parts);
 	if (!ReloadBitmap_File(path, SURFACE_ID_LEVEL_TILESET))
 		bError = TRUE;

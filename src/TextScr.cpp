@@ -146,7 +146,7 @@ BOOL LoadTextScript2(const char *name)
 BOOL LoadTextScript_Stage(const char *name)
 {
 	//Open Head.tsc
-	char path[PATH_LENGTH];
+	char path[MAX_PATH];
 	sprintf(path, "%s/%s", gDataPath, "Head.tsc");
 
 	long head_size = GetFileSizeLong(path);

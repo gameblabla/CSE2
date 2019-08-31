@@ -6,7 +6,6 @@
 
 #include "WindowsWrapper.h"
 
-#include "CommonDefines.h"
 #include "Tags.h"
 
 void GetCompileDate(int *year, int *month, int *day)
@@ -45,7 +44,7 @@ BOOL GetCompileVersion(int *v1, int *v2, int *v3, int *v4)
 	VS_FIXEDFILEINFO *lpBuffer;
 	DWORD dwHandle;
 	DWORD dwLen;
-	char path[PATH_LENGTH];
+	char path[MAX_PATH];
 	LPVOID lpData;
 	BOOL bResult;
 
@@ -112,9 +111,9 @@ BOOL GetCompileVersion(int *v1, int *v2, int *v3, int *v4)
 // TODO - Inaccurate stack frame
 BOOL OpenVolumeConfiguration(HWND hWnd)
 {
-	char path[PATH_LENGTH];
-	char path2[PATH_LENGTH];
-	char path3[PATH_LENGTH];
+	char path[MAX_PATH];
+	char path2[MAX_PATH];
+	char path3[MAX_PATH];
 	int error1;
 	int error2;
 	size_t i;
@@ -142,7 +141,7 @@ BOOL OpenVolumeConfiguration(HWND hWnd)
 #ifdef WINDOWS
 void DeleteDebugLog(void)
 {
-	char path[PATH_LENGTH];
+	char path[MAX_PATH];
 
 	sprintf(path, "%s\\debug.txt", gModulePath);
 	DeleteFileA(path);
@@ -150,7 +149,7 @@ void DeleteDebugLog(void)
 
 BOOL PrintDebugLog(const char *string, int value1, int value2, int value3)
 {
-	char path[PATH_LENGTH];
+	char path[MAX_PATH];
 	FILE *fp;
 
 	sprintf(path, "%s\\debug.txt", gModulePath);
@@ -198,7 +197,7 @@ int CheckTime(SYSTEMTIME *system_time_low, SYSTEMTIME *system_time_high)
 
 BOOL CheckFileExists(const char *name)
 {
-	char path[PATH_LENGTH];
+	char path[MAX_PATH];
 
 #ifdef NONPORTABLE
 	sprintf(path, "%s\\%s", gModulePath, name);
@@ -250,7 +249,7 @@ long GetFileSizeLong(const char *path)
 #ifdef WINDOWS
 BOOL PrintBitmapError(char *string, int value)
 {
-	char path[PATH_LENGTH];
+	char path[MAX_PATH];
 	FILE *fp;
 
 	sprintf(path, "%s\\%s", gModulePath, "error.log");
@@ -320,7 +319,7 @@ BOOL CenterWindow(HWND hWnd)
 // TODO - Inaccurate stack frame
 BOOL LoadWindowRect(HWND hWnd, char *filename, BOOL unknown)
 {
-	char path[PATH_LENGTH];
+	char path[MAX_PATH];
 	int min_window_width;
 	int min_window_height;
 	int max_window_width;
@@ -399,7 +398,7 @@ BOOL LoadWindowRect(HWND hWnd, char *filename, BOOL unknown)
 
 BOOL SaveWindowRect(HWND hWnd, const char *filename)
 {
-	char path[PATH_LENGTH];
+	char path[MAX_PATH];
 	WINDOWPLACEMENT wndpl;
 	FILE *fp;
 	RECT rect;

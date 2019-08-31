@@ -26,8 +26,8 @@
 extern SDL_Window *gWindow;
 extern SDL_Renderer *gRenderer;
 
-char gModulePath[PATH_LENGTH];
-char gDataPath[PATH_LENGTH];
+char gModulePath[MAX_PATH];
+char gDataPath[MAX_PATH];
 
 int gJoystickButtonTable[8];
 

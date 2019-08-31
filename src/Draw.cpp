@@ -290,7 +290,7 @@ static unsigned char* LoadFileToMemory(const char *path, size_t *size)
 
 static BOOL LoadBitmap_File(const char *name, SurfaceID surf_no, BOOL create_surface)
 {
-	char path[PATH_LENGTH];
+	char path[MAX_PATH];
 	unsigned char *data;
 	size_t size;
 

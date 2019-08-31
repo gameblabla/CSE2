@@ -4,7 +4,6 @@
 
 #include "WindowsWrapper.h"
 
-#include "CommonDefines.h"
 #include "Config.h"
 #include "File.h"
 #include "Tags.h"
@@ -18,7 +17,7 @@ BOOL LoadConfigData(CONFIG *conf)
 	memset(conf, 0, sizeof(CONFIG));
 
 	// Get path
-	char path[PATH_LENGTH];
+	char path[MAX_PATH];
 	sprintf(path, "%s/%s", gModulePath, config_filename);
 
 	// Open file

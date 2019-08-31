@@ -2,12 +2,10 @@
 
 #include "WindowsWrapper.h"
 
-#include "CommonDefines.h"
-
 struct TEXT_SCRIPT
 {
 	//Path (reload when exit teleporter menu/inventory)
-	char path[PATH_LENGTH];
+	char path[MAX_PATH];
 
 	//Script buffer
 	int size;

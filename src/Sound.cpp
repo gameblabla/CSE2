@@ -21,7 +21,6 @@ equivalents.
 
 #include "WindowsWrapper.h"
 
-#include "CommonDefines.h"
 #include "Organya.h"
 #include "PixTone.h"
 #include "Tags.h"
@@ -132,7 +131,7 @@ BOOL InitSoundObject(LPCSTR resname, int no)
 
 BOOL LoadSoundObject(LPCSTR file_name, int no)
 {
-	char path[PATH_LENGTH];
+	char path[MAX_PATH];
 	DWORD i;
 	DWORD file_size = 0;
 	char check_box[58];

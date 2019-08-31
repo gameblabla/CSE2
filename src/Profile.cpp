@@ -10,7 +10,6 @@
 
 #include "ArmsItem.h"
 #include "BossLife.h"
-#include "CommonDefines.h"
 #include "Fade.h"
 #include "File.h"
 #include "Flags.h"
@@ -30,7 +29,7 @@ const char *gProfileCode = "Do041220";
 
 BOOL IsProfile()
 {
-	char path[PATH_LENGTH];
+	char path[MAX_PATH];
 	sprintf(path, "%s/%s", gModulePath, gDefaultName);
 
 	FILE *fp = fopen(path, "rb");
@@ -46,7 +45,7 @@ BOOL SaveProfile(const char *name)
 	PROFILE profile;
 	FILE *fp;
 	const char *FLAG = "FLAG";
-	char path[PATH_LENGTH];
+	char path[MAX_PATH];
 
 	// Get path
 	if (name)
@@ -128,7 +127,7 @@ BOOL SaveProfile(const char *name)
 BOOL LoadProfile(const char *name)
 {
 	// Get path
-	char path[PATH_LENGTH];
+	char path[MAX_PATH];
 
 	if (name)
 		sprintf(path, "%s", name);

@@ -25,7 +25,7 @@ BOOL InitBack(const char *fName, int type)
 	color_black = GetCortBoxColor(RGB(0, 0, 0x10));
 
 	// Get width and height
-	char path[PATH_LENGTH];
+	char path[MAX_PATH];
 	sprintf(path, "%s/%s.pbm", gDataPath, fName);
 
 	FILE *fp = fopen(path, "rb");

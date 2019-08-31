@@ -8,6 +8,8 @@
 #undef CreateWindow
 #else
 
+#include <stdio.h>
+
 typedef int HWND;
 
 typedef int BOOL;
@@ -34,6 +36,10 @@ struct RECT
 	rect.top = t; \
 	rect.right = r; \
 	rect.bottom = b;
+
+#ifndef MAX_PATH
+#define MAX_PATH FILENAME_MAX
+#endif
 
 int rep_rand();
 void rep_srand(unsigned int seed);

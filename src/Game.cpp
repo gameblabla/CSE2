@@ -702,7 +702,7 @@ BOOL Game(HWND hWnd)
 
 	PlaySoundObject(7, -1);
 
-	char path[PATH_LENGTH];
+	char path[MAX_PATH];
 	sprintf(path, "%s/npc.tbl", gDataPath);
 
 	if (!LoadNpcTable(path))

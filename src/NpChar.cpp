@@ -7,7 +7,6 @@
 #include "WindowsWrapper.h"
 
 #include "ArmsItem.h"
-#include "CommonDefines.h"
 #include "Caret.h"
 #include "Draw.h"
 #include "File.h"
@@ -60,7 +59,7 @@ BOOL LoadEvent(const char *path_event)
 	int n;
 	EVENT eve;
 
-	char path[PATH_LENGTH];
+	char path[MAX_PATH];
 	sprintf(path, "%s/%s", gDataPath, path_event);
 
 	fp = fopen(path, "rb");
