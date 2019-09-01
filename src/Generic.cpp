@@ -114,12 +114,23 @@ BOOL OpenVolumeConfiguration(HWND hWnd)
 	char path[MAX_PATH];
 	char path2[MAX_PATH];
 	char path3[MAX_PATH];
+#ifdef FIX_BUGS
+	char path4[MAX_PATH];
+	char path5[MAX_PATH];
+#endif
 	int error1;
 	int error2;
+#ifdef FIX_BUGS
+	int error3;
+	int error4;
+#endif
 	size_t i;
 
 	GetSystemDirectoryA(path, sizeof(path));
 	sprintf(path2, "%s\\Sndvol32.exe", path);
+#ifdef FIX_BUGS
+	sprintf(path4, "%s\\Sndvol.exe", path);
+#endif
 
 	i = strlen(path);
 	while (path[i] != '\\')
@@ -127,7 +138,29 @@ BOOL OpenVolumeConfiguration(HWND hWnd)
 
 	path[i] = '\0';
 	sprintf(path3, "%s\\Sndvol32.exe", path);
+#ifdef FIX_BUGS
+	sprintf(path5, "%s\\Sndvol.exe", path);
+#endif
 
+#ifdef FIX_BUGS
+	error1 = (int)ShellExecuteA(hWnd, "open", path2, NULL, NULL, SW_SHOW);
+	if (error1 > 32)
+		return TRUE;
+
+	error2 = (int)ShellExecuteA(hWnd, "open", path3, NULL, NULL, SW_SHOW);
+	if (error2 > 32)
+		return TRUE;
+
+	error3 = (int)ShellExecuteA(hWnd, "open", path4, NULL, NULL, SW_SHOW);
+	if (error3 > 32)
+		return TRUE;
+
+	error4 = (int)ShellExecuteA(hWnd, "open", path5, NULL, NULL, SW_SHOW);
+	if (error4 > 32)
+		return TRUE;
+
+	return FALSE;
+#else
 	error1 = (int)ShellExecuteA(hWnd, "open", path2, NULL, NULL, SW_SHOW);
 	error2 = (int)ShellExecuteA(hWnd, "open", path3, NULL, NULL, SW_SHOW);
 
@@ -135,6 +168,7 @@ BOOL OpenVolumeConfiguration(HWND hWnd)
 		return FALSE;
 	else
 		return TRUE;
+#endif
 }
 #endif
 
