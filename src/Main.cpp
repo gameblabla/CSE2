@@ -98,6 +98,8 @@ int GetFramePerSecound(void)
 
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
+	int i;
+
 	hObject = OpenMutexA(MUTEX_ALL_ACCESS, 0, mutex_name);
 	if (hObject != NULL)
 	{
@@ -176,7 +178,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 	}
 
 	// Set gamepad inputs
-	for (int i = 0; i < 8; i++)
+	for (i = 0; i < 8; i++)
 	{
 		switch (conf.joystick_button[i])
 		{
@@ -213,19 +215,23 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 	wndclassex.cbSize = sizeof(WNDCLASSEXA);
 	wndclassex.lpfnWndProc = WindowProcedure;
 	wndclassex.hInstance = hInstance;
-	wndclassex.hbrBackground = (HBRUSH)GetStockObject(3);
+	wndclassex.hbrBackground = (HBRUSH)GetStockObject(DKGRAY_BRUSH);	// This is what gives the window's undrawn regions its grey colour
 	wndclassex.lpszClassName = lpWindowName;
 	wndclassex.hCursor = LoadCursorA(hInstance, "CURSOR_NORMAL");
 	wndclassex.hIcon = LoadIconA(hInstance, "0");
 	wndclassex.hIconSm = LoadIconA(hInstance, "ICON_MINI");
 
 	HWND hWnd;
+	HMENU hMenu;
+	int nWidth;
+	int nHeight;
+	int x;
+	int y;
 
 	switch (conf.display_mode)
 	{
 		case 1:
 		case 2:
-		{
 			wndclassex.lpszMenuName = "MENU_MAIN";
 			if (RegisterClassExA(&wndclassex) == 0)
 			{
@@ -245,14 +251,14 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 				windowHeight = WINDOW_HEIGHT * 2;
 			}
 
-			int nWidth = windowWidth + 2 * GetSystemMetrics(7) + 2;
+			nWidth = windowWidth + 2 * GetSystemMetrics(SM_CXFIXEDFRAME) + 2;
+			nHeight = (2 * GetSystemMetrics(SM_CYFIXEDFRAME) + GetSystemMetrics(SM_CYCAPTION)) + GetSystemMetrics(SM_CYMENU) + windowHeight + 2;
+			x = (GetSystemMetrics(SM_CXSCREEN) - nWidth) / 2;
+			y = (GetSystemMetrics(SM_CYSCREEN) - nHeight) / 2;
 
-			int nHeight = (2 * GetSystemMetrics(8) + GetSystemMetrics(4)) + GetSystemMetrics(15) + windowHeight + 2;
-			int x = (GetSystemMetrics(0) - nWidth) / 2;
-			int y = (GetSystemMetrics(1) - nHeight) / 2;
-			SetWindowPadding(GetSystemMetrics(7) + 1, GetSystemMetrics(8) + GetSystemMetrics(4) + GetSystemMetrics(15) + 1);
+			SetWindowPadding(GetSystemMetrics(SM_CXFIXEDFRAME) + 1, GetSystemMetrics(SM_CYFIXEDFRAME) + GetSystemMetrics(SM_CYCAPTION) + GetSystemMetrics(SM_CYMENU) + 1);
 
-			hWnd = CreateWindowExA(0, lpWindowName, lpWindowName, 0x10CA0000u, x, y, nWidth, nHeight, 0, 0, hInstance, 0);
+			hWnd = CreateWindowExA(WS_EX_LEFT | WS_EX_LTRREADING | WS_EX_RIGHTSCROLLBAR, lpWindowName, lpWindowName, WS_MINIMIZEBOX | WS_SYSMENU | WS_BORDER | WS_DLGFRAME | WS_VISIBLE, x, y, nWidth, nHeight, NULL, NULL, hInstance, NULL);
 			ghWnd = hWnd;
 
 			if (hWnd == NULL)
@@ -261,7 +267,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 				return 0;
 			}
 
-			HMENU v18 = GetMenu(hWnd);
+			hMenu = GetMenu(hWnd);
 
 			if (conf.display_mode == 1)
 				StartDirectDraw(hWnd, 0, 0);
@@ -269,12 +275,10 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 				StartDirectDraw(hWnd, 1, 0);
 
 			break;
-		}
 
 		case 0:
 		case 3:
 		case 4:
-		{
 			if (RegisterClassExA(&wndclassex) == 0)
 			{
 				ReleaseMutex(hMutex);
@@ -286,8 +290,10 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 			windowHeight = WINDOW_HEIGHT * 2;
 
 			SetWindowPadding(0, 0);
-			hWnd = CreateWindowExA(0, lpWindowName, lpWindowName, 0x90080000, 0, 0, GetSystemMetrics(0), GetSystemMetrics(1), 0, 0, hInstance, 0);
+
+			hWnd = CreateWindowExA(WS_EX_LEFT | WS_EX_LTRREADING | WS_EX_RIGHTSCROLLBAR, lpWindowName, lpWindowName, WS_SYSMENU | WS_VISIBLE | WS_POPUP, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), NULL, NULL, hInstance, NULL);
 			ghWnd = hWnd;
+
 			if (hWnd == NULL)
 			{
 				ReleaseMutex(hMutex);
@@ -313,9 +319,8 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 			StartDirectDraw(ghWnd, 2, depth);
 			bFullscreen = TRUE;
 
-			ShowCursor(0);
+			ShowCursor(FALSE);
 			break;
-		}
 	}
 
 	// Set rects
@@ -737,6 +742,7 @@ BOOL SystemTask(void)
 
 void JoystickProc(void)
 {
+	int i;
 	JOYSTICK_STATUS status;
 
 	if (!GetJoystickStatus(&status))
@@ -766,11 +772,11 @@ void JoystickProc(void)
 		gKey &= ~gKeyDown;
 
 	// Clear held buttons
-	for (int i = 0; i < 8; i++)
+	for (i = 0; i < 8; i++)
 		gKey &= ~gJoystickButtonTable[i];
 
 	// Set held buttons
-	for (int i = 0; i < 8; i++)
+	for (i = 0; i < 8; i++)
 	{
 		if (status.bButton[i])
 			gKey |= gJoystickButtonTable[i];
