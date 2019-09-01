@@ -64,18 +64,18 @@ void PutFramePerSecound(void)
 {
 	if (bFps)
 	{
-		const int fps = GetFramePerSecound();
+		const unsigned long fps = GetFramePerSecound();
 		PutNumber4(WINDOW_WIDTH - 40, 8, fps, FALSE);
 	}
 }
 
-int GetFramePerSecound(void)
+unsigned long GetFramePerSecound(void)
 {
-	unsigned int current_tick;
+	unsigned long current_tick;
 	static BOOL need_new_base_tick = TRUE;
-	static int frames_this_second;
-	static int current_frame;
-	static int base_tick;
+	static unsigned long frames_this_second;
+	static unsigned long current_frame;
+	static unsigned long base_tick;
 
 	if (need_new_base_tick)
 	{
