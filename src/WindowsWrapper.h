@@ -41,7 +41,4 @@ struct RECT
 #define MAX_PATH FILENAME_MAX
 #endif
 
-int rep_rand();
-void rep_srand(unsigned int seed);
-
 BOOL SystemTask();

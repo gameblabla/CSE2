@@ -12,8 +12,6 @@
 
 #include <dsound.h>
 
-#include "SDL.h"
-
 #include "WindowsWrapper.h"
 
 #include "Sound.h"

@@ -4,8 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "SDL.h"
-#include "SDL_syswm.h"
+#include <shlwapi.h>
 
 #include "WindowsWrapper.h"
 
@@ -22,40 +21,32 @@
 #include "Sound.h"
 #include "Triangle.h"
 
-// These two are defined in Draw.cpp. This is a bit of a hack.
-SDL_Window *gWindow;
-
 char gModulePath[MAX_PATH];
 char gDataPath[MAX_PATH];
 
 int gJoystickButtonTable[8];
 
 HWND ghWnd;
-BOOL gbUseJoystick = FALSE;
-BOOL bFps = FALSE;
 BOOL bFullscreen;
 
-BOOL bActive = TRUE;
+static BOOL gbUseJoystick = FALSE;
+static BOOL bFps = FALSE;
+static BOOL bActive = TRUE;
+
+static HANDLE hObject;
+static HANDLE hMutex;
+static HINSTANCE ghInstance;
+
+static int windowWidth;
+static int windowHeight;
+
+static const char *mutex_name = "Doukutsu";
 
 #ifdef JAPANESE
-const char *lpWindowName = "洞窟物語エンジン2";
+static const char *lpWindowName = "\x93\xB4\x8C\x41\x95\xA8\x8C\xEA";
 #else
-const char *lpWindowName = "Cave Story Engine 2 ~ Doukutsu Monogatari Enjin 2";
+static const char *lpWindowName = "Cave Story ~ Doukutsu Monogatari";
 #endif
-
-// A replication of MSVC's rand algorithm
-static unsigned long next = 1;
-
-int rep_rand()
-{
-	next = ((next) * 214013 + 2531011);
-	return ((next) >> 16) & 0x7FFF;
-}
-
-void rep_srand(unsigned int seed)
-{
-	next = seed;
-}
 
 // Framerate stuff
 void PutFramePerSecound()
@@ -66,7 +57,7 @@ void PutFramePerSecound()
 
 int GetFramePerSecound()
 {
-	unsigned int current_tick;
+/*	unsigned int current_tick;
 	static BOOL need_new_base_tick = TRUE;
 	static int frames_this_second;
 	static int current_frame;
@@ -88,318 +79,279 @@ int GetFramePerSecound()
 		current_frame = 0;
 	}
 
-	return frames_this_second;
+	return frames_this_second;*/
+	return 0;
 }
 
-int main(int argc, char *argv[])
+int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
+	hObject = OpenMutexA(MUTEX_ALL_ACCESS, 0, mutex_name);
+	if (hObject != NULL)
+	{
+		CloseHandle(hObject);
+		return 0;
+	}
+
+	hMutex = CreateMutexA(NULL, FALSE, mutex_name);
+
+	ghInstance = hInstance;
+
 	// Get executable's path
-	char *base_path = SDL_GetBasePath();
-	strcpy(gModulePath, base_path);
-	SDL_free(base_path);
-	if (gModulePath[strlen(gModulePath) - 1] == '/' || gModulePath[strlen(gModulePath) - 1] == '\\')
-		gModulePath[strlen(gModulePath) - 1] = '\0'; // String cannot end in slash or stuff will probably break (original does this through a windows.h provided function)
+	GetModuleFileNameA(NULL, gModulePath, MAX_PATH);
+	PathRemoveFileSpecA(gModulePath);
 
 	// Get path of the data folder
 	strcpy(gDataPath, gModulePath);
-	strcat(gDataPath, "/data");
+	strcat(gDataPath, "\\data");
 
-#ifdef WINDOWS
-	// Set the window icons. See res/ICON/ICON.rc.
-//	SDL_SetHint(SDL_HINT_WINDOWS_INTRESOURCE_ICON, "101");
-//	SDL_SetHint(SDL_HINT_WINDOWS_INTRESOURCE_ICON_SMALL, "102");
-#endif
+	CONFIG conf;
+	if (!LoadConfigData(&conf))
+		DefaultConfigData(&conf);
 
-	// Initialize SDL
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_TIMER) >= 0)
+	// Apply keybinds
+	// Swap X and Z buttons
+	switch (conf.attack_button_mode)
 	{
-		// Load configuration
-		CONFIG conf;
-
-		if (!LoadConfigData(&conf))
-			DefaultConfigData(&conf);
-
-		// Apply keybinds
-		// Swap X and Z buttons
-		if (conf.attack_button_mode)
-		{
-			if (conf.attack_button_mode == 1)
-			{
-				gKeyJump = KEY_X;
-				gKeyShot = KEY_Z;
-			}
-		}
-		else
-		{
+		case 0:
 			gKeyJump = KEY_Z;
 			gKeyShot = KEY_X;
-		}
+			break;
 
-		// Swap Okay and Cancel buttons
-		if (conf.ok_button_mode)
-		{
-			if (conf.ok_button_mode == 1)
-			{
-				gKeyOk = gKeyShot;
-				gKeyCancel = gKeyJump;
-			}
-		}
-		else
-		{
+		case 1:
+			gKeyJump = KEY_X;
+			gKeyShot = KEY_Z;
+			break;
+	}
+
+	// Swap Okay and Cancel buttons
+	switch (conf.ok_button_mode)
+	{
+		case 0:
 			gKeyOk = gKeyJump;
 			gKeyCancel = gKeyShot;
-		}
+			break;
 
-		// Swap left and right weapon switch keys
-		if (CheckFileExists("s_reverse"))
-		{
-			gKeyArms = KEY_ARMSREV;
-			gKeyArmsRev = KEY_ARMS;
-		}
+		case 1:
+			gKeyOk = gKeyShot;
+			gKeyCancel = gKeyJump;
+			break;
+	}
 
-		// Alternate movement keys
-		if (conf.move_button_mode)
-		{
-			if (conf.move_button_mode == 1)
-			{
-				gKeyLeft = KEY_ALT_LEFT;
-				gKeyUp = KEY_ALT_UP;
-				gKeyRight = KEY_ALT_RIGHT;
-				gKeyDown = KEY_ALT_DOWN;
-			}
-		}
-		else
-		{
+	// Swap left and right weapon switch keys
+	if (CheckFileExists("s_reverse"))
+	{
+		gKeyArms = KEY_ARMSREV;
+		gKeyArmsRev = KEY_ARMS;
+	}
+
+	// Alternate movement keys
+	switch (conf.move_button_mode)
+	{
+		case 0:
 			gKeyLeft = KEY_LEFT;
 			gKeyUp = KEY_UP;
 			gKeyRight = KEY_RIGHT;
 			gKeyDown = KEY_DOWN;
-		}
+			break;
 
-		// Set gamepad inputs
-		for (int i = 0; i < 8; i++)
-		{
-			switch (conf.joystick_button[i])
-			{
-				case 1:
-					gJoystickButtonTable[i] = gKeyJump;
-					break;
+		case 1:
+			gKeyLeft = KEY_ALT_LEFT;
+			gKeyUp = KEY_ALT_UP;
+			gKeyRight = KEY_ALT_RIGHT;
+			gKeyDown = KEY_ALT_DOWN;
+			break;
+	}
 
-				case 2:
-					gJoystickButtonTable[i] = gKeyShot;
-					break;
-
-				case 3:
-					gJoystickButtonTable[i] = gKeyArms;
-					break;
-
-				case 6:
-					gJoystickButtonTable[i] = gKeyArmsRev;
-					break;
-
-				case 4:
-					gJoystickButtonTable[i] = gKeyItem;
-					break;
-
-				case 5:
-					gJoystickButtonTable[i] = gKeyMap;
-					break;
-
-				default:
-					continue;
-			}
-		}
-
-		RECT unused_rect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
-
-/*		// Load cursor
-		size_t size;
-		const unsigned char *data = FindResource("CURSOR_NORMAL", "CURSOR", &size);
-
-		if (data)
-		{
-			SDL_RWops *fp = SDL_RWFromConstMem(data, size);
-
-			SDL_Surface *cursor_surface = SDL_LoadBMP_RW(fp, 1);
-			SDL_SetColorKey(cursor_surface, SDL_TRUE, SDL_MapRGB(cursor_surface->format, 0xFF, 0, 0xFF));	// Pink regions are transparent
-
-			SDL_Cursor *cursor = SDL_CreateColorCursor(cursor_surface, 0, 0);	// Don't worry, the hotspots are accurate to the original files
-
-			if (cursor)
-				SDL_SetCursor(cursor);
-			else
-				printf("Failed to load cursor\n");
-
-			SDL_FreeSurface(cursor_surface);
-		}
-		else
-		{
-			printf("Failed to load cursor\n");
-		}
-*/
-		// Get window dimensions and colour depth
-		int windowWidth;
-		int windowHeight;
-		int depth;
-
-		HINSTANCE hinstance;
-
-		switch (conf.display_mode)
+	// Set gamepad inputs
+	for (int i = 0; i < 8; i++)
+	{
+		switch (conf.joystick_button[i])
 		{
 			case 1:
-			case 2:
-				// Set window dimensions
-				if (conf.display_mode == 1)
-				{
-					windowWidth = WINDOW_WIDTH;
-					windowHeight = WINDOW_HEIGHT;
-				}
-				else
-				{
-					windowWidth = WINDOW_WIDTH * 2;
-					windowHeight = WINDOW_HEIGHT * 2;
-				}
-
-				// Create window
-				gWindow = SDL_CreateWindow(lpWindowName, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, 0);
-
-				if (gWindow)
-				{
-					SDL_SysWMinfo wmInfo;
-					SDL_VERSION(&wmInfo.version);
-					SDL_GetWindowWMInfo(gWindow, &wmInfo);
-					ghWnd = wmInfo.info.win.window;
-					hinstance = wmInfo.info.win.hinstance;
-
-					if (conf.display_mode == 1)
-						StartDirectDraw(ghWnd, 0, 0);
-					else
-						StartDirectDraw(ghWnd, 1, 0);
-				}
-
+				gJoystickButtonTable[i] = gKeyJump;
 				break;
 
-			case 0:
+			case 2:
+				gJoystickButtonTable[i] = gKeyShot;
+				break;
+
 			case 3:
+				gJoystickButtonTable[i] = gKeyArms;
+				break;
+
+			case 6:
+				gJoystickButtonTable[i] = gKeyArmsRev;
+				break;
+
 			case 4:
-				// Set window dimensions
-				windowWidth = WINDOW_WIDTH * 2;
-				windowHeight = WINDOW_HEIGHT * 2;
+				gJoystickButtonTable[i] = gKeyItem;
+				break;
 
-				// Create window
-				gWindow = SDL_CreateWindow(lpWindowName, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, 0);
-
-				if (gWindow)
-				{
-					// Set colour depth
-					switch (conf.display_mode)
-					{
-						case 0:
-							depth = 16;
-							break;
-						case 3:
-							depth = 24;
-							break;
-						case 4:
-							depth = 32;
-							break;
-					}
-
-					SDL_SysWMinfo wmInfo;
-					SDL_VERSION(&wmInfo.version);
-					SDL_GetWindowWMInfo(gWindow, &wmInfo);
-					ghWnd = wmInfo.info.win.window;
-					hinstance = wmInfo.info.win.hinstance;
-
-					StartDirectDraw(ghWnd, 2, depth);
-					bFullscreen = TRUE;
-
-					SDL_ShowCursor(0);
-				}
-
+			case 5:
+				gJoystickButtonTable[i] = gKeyMap;
 				break;
 		}
+	}
 
-		// Create window
+	RECT unused_rect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
+	WNDCLASSEXA wndclassex;
+	memset(&wndclassex, 0, sizeof(WNDCLASSEXA));
+	wndclassex.cbSize = sizeof(WNDCLASSEXA);
+//	wndclassex.lpfnWndProc = WindowProcedure;
+	wndclassex.hInstance = hInstance;
+	wndclassex.hbrBackground = (HBRUSH)GetStockObject(3);
+	wndclassex.lpszClassName = lpWindowName;
+	wndclassex.hCursor = LoadCursorA(hInstance, "CURSOR_NORMAL");
+	wndclassex.hIcon = LoadIconA(hInstance, "0");
+	wndclassex.hIconSm = LoadIconA(hInstance, "ICON_MINI");
 
-		if (gWindow)
+	HWND hWnd;
+
+	switch (conf.display_mode)
+	{
+		case 1:
+		case 2:
 		{
-			// Check debug things
-			if (CheckFileExists("fps"))
-				bFps = TRUE;
-
-#ifndef WINDOWS
-/*			// Load icon
-			size_t size;
-			const unsigned char *data = FindResource("ICON_MINI", "ICON", &size);
-
-			if (data)
+			wndclassex.lpszMenuName = "MENU_MAIN";
+			if (RegisterClassExA(&wndclassex) == 0)
 			{
-				SDL_RWops *fp = SDL_RWFromConstMem(data, size);
-				SDL_Surface *iconSurf = SDL_LoadBMP_RW(fp, 1);
-				SDL_Surface *iconConverted = SDL_ConvertSurfaceFormat(iconSurf, SDL_PIXELFORMAT_RGB888, 0);
-				SDL_FreeSurface(iconSurf);
-				SDL_Surface *iconSurfUpscaled = SDL_CreateRGBSurfaceWithFormat(0, 256, 256, 0, SDL_PIXELFORMAT_RGB888);
-				SDL_LowerBlitScaled(iconConverted, NULL, iconSurfUpscaled, NULL);
-				SDL_FreeSurface(iconConverted);
-				SDL_SetWindowIcon(gWindow, iconSurfUpscaled);
-				SDL_FreeSurface(iconSurfUpscaled);
+				ReleaseMutex(hMutex);
+				return 0;
+			}
+
+			// Set window dimensions
+			if (conf.display_mode == 1)
+			{
+				windowWidth = WINDOW_WIDTH;
+				windowHeight = WINDOW_HEIGHT;
 			}
 			else
 			{
-				printf("Failed to load icon\n");
-			}*/
-#endif
-
-			// Set rects
-			RECT rcLoading = {0, 0, 64, 8};
-			RECT rcFull = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
-
-			// Load the "LOADING" text
-			MakeSurface_File("Loading", SURFACE_ID_LOADING);
-
-			// Draw loading screen
-			CortBox(&rcFull, 0x000000);
-			PutBitmap3(&rcFull, (WINDOW_WIDTH - 64) / 2, (WINDOW_HEIGHT - 8) / 2, &rcLoading, SURFACE_ID_LOADING);
-
-			// Draw to screen
-			if (Flip_SystemTask(ghWnd))
-			{
-				// Initialize sound
-				InitDirectSound(ghWnd);
-
-				// Initialize joystick
-				if (conf.bJoystick && InitDirectInput(hinstance, ghWnd))
-				{
-					ResetJoystickStatus();
-					gbUseJoystick = TRUE;
-				}
-
-				// Initialize stuff
-				InitTextObject(conf.font_name);
-				InitTriangleTable();
-
-				// Run game code
-				Game(ghWnd);
-
-				// End stuff
-				EndDirectSound();
-				EndTextObject();
-				EndDirectDraw(ghWnd);
+				windowWidth = WINDOW_WIDTH * 2;
+				windowHeight = WINDOW_HEIGHT * 2;
 			}
 
-			SDL_DestroyWindow(gWindow);
+			int nWidth = windowWidth + 2 * GetSystemMetrics(7) + 2;
+
+			int nHeight = (2 * GetSystemMetrics(8) + GetSystemMetrics(4)) + GetSystemMetrics(15) + windowHeight + 2;
+			int x = (GetSystemMetrics(0) - nWidth) / 2;
+			int y = (GetSystemMetrics(1) - nHeight) / 2;
+			SetWindowPadding(GetSystemMetrics(7) + 1, GetSystemMetrics(8) + GetSystemMetrics(4) + GetSystemMetrics(15) + 1);
+
+			hWnd = CreateWindowExA(0, lpWindowName, lpWindowName, 0x10CA0000u, x, y, nWidth, nHeight, 0, 0, hInstance, 0);
+			ghWnd = hWnd;
+
+			if (hWnd == NULL)
+			{
+				ReleaseMutex(hMutex);
+				return 0;
+			}
+
+			HMENU v18 = GetMenu(hWnd);
+
+			if (conf.display_mode == 1)
+				StartDirectDraw(hWnd, 0, 0);
+			else
+				StartDirectDraw(hWnd, 1, 0);
+
+			break;
 		}
+
+		case 0:
+		case 3:
+		case 4:
+		{
+			if (RegisterClassExA(&wndclassex) == 0)
+			{
+				ReleaseMutex(hMutex);
+				return 0;
+			}
+
+			// Set window dimensions
+			windowWidth = WINDOW_WIDTH * 2;
+			windowHeight = WINDOW_HEIGHT * 2;
+
+			SetWindowPadding(0, 0);
+			hWnd = CreateWindowExA(0, lpWindowName, lpWindowName, 0x90080000, 0, 0, GetSystemMetrics(0), GetSystemMetrics(1), 0, 0, hInstance, 0);
+			ghWnd = hWnd;
+			if (hWnd == NULL)
+			{
+				ReleaseMutex(hMutex);
+				return 0;
+			}
+
+			// Set colour depth
+			int depth;
+
+			switch (conf.display_mode)
+			{
+				case 0:
+					depth = 16;
+					break;
+				case 3:
+					depth = 24;
+					break;
+				case 4:
+					depth = 32;
+					break;
+			}
+
+			StartDirectDraw(ghWnd, 2, depth);
+			bFullscreen = TRUE;
+
+			ShowCursor(0);
+			break;
+		}
+	}
+
+	// Set rects
+	RECT rcLoading = {0, 0, 64, 8};
+	RECT rcFull = {0, 0, 0, 0};
+	rcFull.right = WINDOW_WIDTH;
+	rcFull.bottom = WINDOW_HEIGHT;
+
+	// Load the "LOADING" text
+	BOOL b = MakeSurface_File("Loading", SURFACE_ID_LOADING);
+
+	// Draw loading screen
+	CortBox(&rcFull, 0x000000);
+	PutBitmap3(&rcFull, (WINDOW_WIDTH - 64) / 2, (WINDOW_HEIGHT - 8) / 2, &rcLoading, SURFACE_ID_LOADING);
+
+	// Draw to screen
+	if (!Flip_SystemTask(ghWnd))
+	{
+		ReleaseMutex(hMutex);
+		return 1;
 	}
 	else
 	{
-		SDL_Quit();
-		return -1;
+		// Initialize sound
+		InitDirectSound(hWnd);
+
+		// Initialize joystick
+		if (conf.bJoystick && InitDirectInput(hInstance, hWnd))
+		{
+			ResetJoystickStatus();
+			gbUseJoystick = TRUE;
+		}
+
+		// Initialize stuff
+		InitTextObject(conf.font_name);
+		InitTriangleTable();
+
+		// Run game code
+		Game(hWnd);
+
+		// End stuff
+		EndDirectSound();
+		EndTextObject();
+		EndDirectDraw(hWnd);
+
+		ReleaseMutex(hMutex);
 	}
 
-	SDL_Quit();
-	return 0;
+	return 1;
 }
 
 void InactiveWindow()
@@ -466,7 +418,7 @@ BOOL SystemTask()
 {
 	// Handle window events
 	BOOL focusGained = TRUE;
-
+/*
 	while (SDL_PollEvent(NULL) || !focusGained)
 	{
 		SDL_Event event;
@@ -643,7 +595,7 @@ BOOL SystemTask()
 #endif
 		}
 	}
-
+*/
 	// Run joystick code
 	if (gbUseJoystick)
 		JoystickProc();

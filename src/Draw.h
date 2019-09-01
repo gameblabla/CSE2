@@ -1,7 +1,5 @@
 #pragma once
 
-#include "SDL.h"
-
 #include "WindowsWrapper.h"
 
 #ifndef RGB
@@ -50,6 +48,7 @@ typedef enum SurfaceID
 	SURFACE_ID_MAX = 40
 } SurfaceID;
 
+void SetWindowPadding(int width, int height);
 BOOL Flip_SystemTask(HWND hWnd);
 BOOL StartDirectDraw(HWND hWnd, int lMagnification, int lColourDepth);
 void EndDirectDraw(HWND hWnd);

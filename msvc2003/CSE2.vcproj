@@ -21,7 +21,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="SDL2/include;freetype/include"
+				AdditionalIncludeDirectories=""
 				PreprocessorDefinitions="WIN32;_DEBUG;WINDOWS;NONPORTABLE"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="0"
@@ -34,7 +34,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="SDL2/lib/SDL2.lib SDL2/lib/SDL2main.lib freetype/lib/freetype.lib Version.lib dsound.lib WinMM.lib dxguid.lib dinput.lib ddraw.lib"
+				AdditionalDependencies="Version.lib dsound.lib WinMM.lib dxguid.lib dinput.lib ddraw.lib ShLwApi.Lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
@@ -73,7 +73,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="SDL2/include;freetype/include"
+				AdditionalIncludeDirectories=""
 				PreprocessorDefinitions="WIN32;NDEBUG;WINDOWS;NONPORTABLE"
 				MinimalRebuild="TRUE"
 				RuntimeLibrary="0"
@@ -85,7 +85,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="SDL2/lib/SDL2.lib SDL2/lib/SDL2main.lib freetype/lib/freetype.lib Version.lib dsound.lib WinMM.lib dxguid.lib dinput.lib ddraw.lib"
+				AdditionalDependencies="Version.lib dsound.lib WinMM.lib dxguid.lib dinput.lib ddraw.lib ShLwApi.Lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
 				IgnoreAllDefaultLibraries="FALSE"
@@ -123,7 +123,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="SDL2/include;freetype/include"
+				AdditionalIncludeDirectories=""
 				PreprocessorDefinitions="WIN32;NDEBUG;WINDOWS;NONPORTABLE;JAPANESE"
 				MinimalRebuild="TRUE"
 				RuntimeLibrary="0"
@@ -135,7 +135,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="SDL2/lib/SDL2.lib SDL2/lib/SDL2main.lib freetype/lib/freetype.lib Version.lib dsound.lib WinMM.lib dxguid.lib dinput.lib ddraw.lib"
+				AdditionalDependencies="Version.lib dsound.lib WinMM.lib dxguid.lib dinput.lib ddraw.lib ShLwApi.Lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
 				IgnoreAllDefaultLibraries="FALSE"
@@ -173,7 +173,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="SDL2/include;freetype/include"
+				AdditionalIncludeDirectories=""
 				PreprocessorDefinitions="WIN32;_DEBUG;WINDOWS;NONPORTABLE;JAPANESE"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="0"
@@ -186,7 +186,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="SDL2/lib/SDL2.lib SDL2/lib/SDL2main.lib freetype/lib/freetype.lib Version.lib dsound.lib WinMM.lib dxguid.lib dinput.lib ddraw.lib"
+				AdditionalDependencies="Version.lib dsound.lib WinMM.lib dxguid.lib dinput.lib ddraw.lib ShLwApi.Lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""

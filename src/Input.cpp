@@ -7,8 +7,6 @@
 #define DIRECTINPUT_VERSION 0x500
 #include <dinput.h>
 
-#include "SDL.h"
-
 #include "WindowsWrapper.h"
 
 typedef struct DirectInputPair

@@ -2,8 +2,7 @@
 
 #include <stddef.h>
 #include <stdio.h>
-
-#include "SDL.h"
+#include <stdlib.h>
 
 #include "WindowsWrapper.h"
 
@@ -53,7 +52,7 @@ BOOL bContinue;
 int Random(int min, int max)
 {
 	const int range = max - min + 1;
-	return min + rep_rand() % range;
+	return min + rand() % range;
 }
 
 void PutNumber4(int x, int y, int value, BOOL bZero)
@@ -212,8 +211,8 @@ int ModeOpening(HWND hWnd)
 		++gCounter;
 	}
 
-	wait = SDL_GetTicks();	// The original version used GetTickCount instead
-	while (SDL_GetTicks() < wait + 500)
+	wait = GetTickCount();
+	while (GetTickCount() < wait + 500)
 	{
 		CortBox(&grcGame, 0x000000);
 		PutFramePerSecound();
@@ -457,8 +456,8 @@ int ModeTitle(HWND hWnd)
 	ChangeMusic(MUS_SILENCE);
 
 	// Black screen when option is selected
-	wait = SDL_GetTicks();	// The original version used GetTickCount instead
-	while (SDL_GetTicks() < wait + 1000)
+	wait = GetTickCount();
+	while (GetTickCount() < wait + 1000)
 	{
 		CortBox(&grcGame, 0);
 		PutFramePerSecound();
