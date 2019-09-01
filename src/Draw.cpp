@@ -829,10 +829,26 @@ void InitTextObject(const char *name)
 
 	// The game uses DEFAULT_CHARSET when it should have used SHIFTJIS_CHARSET.
 	// This breaks the Japanese text on English Windows installations.
-	font = CreateFontA(height, width, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH | FF_DONTCARE, name);
+
+	// Also, the game uses DEFAULT_QUALITY instead of NONANTIALIASED_QUALITY,
+	// causing font antialiasing to blend with the colour-key, giving text ab
+	// ugly black outline.
+#ifdef FIX_BUGS
+	#define QUALITY NONANTIALIASED_QUALITY
+	#ifdef JAPANESE
+		#define CHARSET SHIFTJIS_CHARSET
+	#else
+		#define CHARSET DEFAULT_CHARSET
+	#endif
+#else
+	#define QUALITY DEFAULT_QUALITY
+	#define CHARSET DEFAULT_CHARSET
+#endif
+
+	font = CreateFontA(height, width, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, CHARSET, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, QUALITY, FIXED_PITCH | FF_DONTCARE, name);
 
 	if (font == NULL)
-		font = CreateFontA(height, width, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH | FF_DONTCARE, NULL);
+		font = CreateFontA(height, width, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, CHARSET, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, QUALITY, FIXED_PITCH | FF_DONTCARE, NULL);
 }
 
 void PutText(int x, int y, const char *text, unsigned long color)
