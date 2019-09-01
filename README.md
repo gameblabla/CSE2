@@ -1,6 +1,12 @@
+This branch is still a work-in-progress - a lot of this readme is outdated.
+
+All you really need to know is that this branch can only be compiled with MSVC2003 (and possibly newer versions), and that it has no outside dependencies.
+
+This branch is focussed on accuracy, down to using the original DirectX code.
+
 # Cave Story Engine 2
 
-Cave Story Engine 2 is a decompilation of Cave Story, ported from DirectX to SDL2.
+Cave Story Engine 2 is a decompilation of Cave Story.
 
 ![Screenshot](screenshot.png)
 
