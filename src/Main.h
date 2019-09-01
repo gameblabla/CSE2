@@ -5,5 +5,5 @@
 extern HWND ghWnd;
 extern BOOL bFullscreen;
 
-void PutFramePerSecound();
-int GetFramePerSecound();
+void PutFramePerSecound(void);
+int GetFramePerSecound(void);

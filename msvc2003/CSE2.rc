@@ -175,6 +175,80 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+MENU_MAIN MENU 
+BEGIN
+    MENUITEM "Quit",                        40001
+    MENUITEM "Volume",                      40004
+    MENUITEM "Version",                     40002
+    MENUITEM "Debug Save",                  40005
+    MENUITEM "Mute",                        40007
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+DLG_ABOUT DIALOGEX 0, 0, 123, 75
+STYLE DS_SETFONT | WS_POPUP | WS_CAPTION | WS_SYSMENU
+FONT 9, "Arial", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",1,37,54,50,14,BS_FLAT
+    CTEXT           "---",1011,7,14,109,35
+END
+
+DLG_MUTE DIALOGEX 0, 0, 118, 111
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Mute"
+FONT 9, "Arial", 400, 0, 0x80
+BEGIN
+    DEFPUSHBUTTON   "OK",1,7,90,50,14
+    PUSHBUTTON      "Cancel",2,61,90,50,14
+    CONTROL         "0",1010,"Button",BS_AUTOCHECKBOX | BS_LEFTTEXT | 
+                    WS_TABSTOP,7,7,20,10
+    CONTROL         "1",1018,"Button",BS_AUTOCHECKBOX | BS_LEFTTEXT | 
+                    WS_TABSTOP,17,15,20,10
+    CONTROL         "2",1019,"Button",BS_AUTOCHECKBOX | BS_LEFTTEXT | 
+                    WS_TABSTOP,26,24,20,10
+    CONTROL         "3",1020,"Button",BS_AUTOCHECKBOX | BS_LEFTTEXT | 
+                    WS_TABSTOP,35,33,20,10
+    CONTROL         "4",1021,"Button",BS_AUTOCHECKBOX | BS_LEFTTEXT | 
+                    WS_TABSTOP,45,41,20,10
+    CONTROL         "5",1022,"Button",BS_AUTOCHECKBOX | BS_LEFTTEXT | 
+                    WS_TABSTOP,54,50,20,10
+    CONTROL         "6",1023,"Button",BS_AUTOCHECKBOX | BS_LEFTTEXT | 
+                    WS_TABSTOP,63,58,20,10
+    CONTROL         "7",1024,"Button",BS_AUTOCHECKBOX | BS_LEFTTEXT | 
+                    WS_TABSTOP,73,67,20,10
+END
+
+DLG_SAVE DIALOGEX 0, 0, 118, 47
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Save"
+FONT 9, "Arial", 0, 0, 0x1
+BEGIN
+    EDITTEXT        1008,36,8,72,12,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",1,8,28,48,12
+    PUSHBUTTON      "Cancel",2,60,28,48,12
+    LTEXT           "Name",-1,8,8,20,12,SS_CENTERIMAGE
+END
+
+DLG_YESNO DIALOGEX 0, 0, 119, 49
+STYLE DS_SETFONT | WS_POPUP | WS_CAPTION
+FONT 9, "Arial", 400, 0, 0x80
+BEGIN
+    PUSHBUTTON      "Yes",1,7,28,50,14,BS_FLAT
+    PUSHBUTTON      "No",2,62,28,50,14,BS_FLAT
+    CTEXT           "---",1009,7,8,105,15,SS_CENTERIMAGE
+END
+
 #endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
 

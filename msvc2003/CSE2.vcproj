@@ -34,7 +34,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Version.lib dsound.lib WinMM.lib dxguid.lib dinput.lib ddraw.lib ShLwApi.Lib"
+				AdditionalDependencies="Version.lib dsound.lib WinMM.lib dxguid.lib dinput.lib ddraw.lib ShLwApi.Lib Imm32.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
@@ -85,7 +85,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Version.lib dsound.lib WinMM.lib dxguid.lib dinput.lib ddraw.lib ShLwApi.Lib"
+				AdditionalDependencies="Version.lib dsound.lib WinMM.lib dxguid.lib dinput.lib ddraw.lib ShLwApi.Lib Imm32.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
 				IgnoreAllDefaultLibraries="FALSE"
@@ -135,7 +135,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Version.lib dsound.lib WinMM.lib dxguid.lib dinput.lib ddraw.lib ShLwApi.Lib"
+				AdditionalDependencies="Version.lib dsound.lib WinMM.lib dxguid.lib dinput.lib ddraw.lib ShLwApi.Lib Imm32.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
 				IgnoreAllDefaultLibraries="FALSE"
@@ -186,7 +186,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Version.lib dsound.lib WinMM.lib dxguid.lib dinput.lib ddraw.lib ShLwApi.Lib"
+				AdditionalDependencies="Version.lib dsound.lib WinMM.lib dxguid.lib dinput.lib ddraw.lib ShLwApi.Lib Imm32.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
@@ -825,6 +825,9 @@
 				RelativePath="..\assets\resources\Org\Zonbie.org">
 			</File>
 		</Filter>
+		<File
+			RelativePath="..\assets\resources\Wave\Wave.dat">
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

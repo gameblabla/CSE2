@@ -783,8 +783,44 @@ name = "GetTrg"
 addr = 0x4122E0
 
 [[func]]
+name = "SetWindowName"
+addr = 0x412320
+
+[[func]]
+name = "PutFramePerSecound"
+addr = 0x412370
+
+[[func]]
+name = "GetFramePerSecound"
+addr = 0x4123A0
+
+[[func]]
 name = "WinMain"
 addr = 0x412420
+
+[[func]]
+name = "InactiveWindow"
+addr = 0x412BC0
+
+[[func]]
+name = "ActiveWindow"
+addr = 0x412BF0
+
+[[func]]
+name = "DragAndDropHandler"
+addr = 0x412C30
+
+[[func]]
+name = "WindowProcedure"
+addr = 0x412CA0
+
+[[func]]
+name = "SystemTask"
+addr = 0x413570
+
+[[func]]
+name = "JoystickProc"
+addr = 0x4135E0
 
 [[func]]
 name = "InitMapData2"

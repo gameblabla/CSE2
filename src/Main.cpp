@@ -10,6 +10,7 @@
 
 #include "CommonDefines.h"
 #include "Config.h"
+#include "Dialog.h"
 #include "Draw.h"
 #include "Game.h"
 #include "Generic.h"
@@ -20,6 +21,8 @@
 #include "Profile.h"
 #include "Sound.h"
 #include "Triangle.h"
+
+LRESULT __stdcall WindowProcedure(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 
 char gModulePath[MAX_PATH];
 char gDataPath[MAX_PATH];
@@ -48,16 +51,27 @@ static const char *lpWindowName = "\x93\xB4\x8C\x41\x95\xA8\x8C\xEA";
 static const char *lpWindowName = "Cave Story ~ Doukutsu Monogatari";
 #endif
 
-// Framerate stuff
-void PutFramePerSecound()
+void SetWindowName(HWND hWnd)
 {
-	if (bFps)
-		PutNumber4(WINDOW_WIDTH - 40, 8, GetFramePerSecound(), FALSE);
+	char window_name[0x100];
+
+	sprintf(window_name, "%s", lpWindowName);
+	SetWindowTextA(hWnd, window_name);
 }
 
-int GetFramePerSecound()
+// Framerate stuff
+void PutFramePerSecound(void)
 {
-/*	unsigned int current_tick;
+	if (bFps)
+	{
+		const int fps = GetFramePerSecound();
+		PutNumber4(WINDOW_WIDTH - 40, 8, fps, FALSE);
+	}
+}
+
+int GetFramePerSecound(void)
+{
+	unsigned int current_tick;
 	static BOOL need_new_base_tick = TRUE;
 	static int frames_this_second;
 	static int current_frame;
@@ -65,11 +79,11 @@ int GetFramePerSecound()
 
 	if (need_new_base_tick)
 	{
-		base_tick = SDL_GetTicks();
+		base_tick = GetTickCount();
 		need_new_base_tick = FALSE;
 	}
 
-	current_tick = SDL_GetTicks();
+	current_tick = GetTickCount();
 	++current_frame;
 
 	if (base_tick + 1000 <= current_tick)
@@ -79,8 +93,7 @@ int GetFramePerSecound()
 		current_frame = 0;
 	}
 
-	return frames_this_second;*/
-	return 0;
+	return frames_this_second;
 }
 
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
@@ -198,7 +211,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 	WNDCLASSEXA wndclassex;
 	memset(&wndclassex, 0, sizeof(WNDCLASSEXA));
 	wndclassex.cbSize = sizeof(WNDCLASSEXA);
-//	wndclassex.lpfnWndProc = WindowProcedure;
+	wndclassex.lpfnWndProc = WindowProcedure;
 	wndclassex.hInstance = hInstance;
 	wndclassex.hbrBackground = (HBRUSH)GetStockObject(3);
 	wndclassex.lpszClassName = lpWindowName;
@@ -354,7 +367,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 	return 1;
 }
 
-void InactiveWindow()
+void InactiveWindow(void)
 {
 	if (bActive)
 	{
@@ -366,7 +379,7 @@ void InactiveWindow()
 	PlaySoundObject(7, 0);
 }
 
-void ActiveWindow()
+void ActiveWindow(void)
 {
 	if (!bActive)
 	{
@@ -379,226 +392,380 @@ void ActiveWindow()
 	PlaySoundObject(7, -1);
 }
 
-void JoystickProc()
+// Turns out you could drag-and-drop a save file onto the
+// window to load it, but this behavior is dummied-out.
+BOOL DragAndDropHandler(HWND hWnd, WPARAM wParam)
 {
-/*	JOYSTICK_STATUS status;
+	char path[MAX_PATH];
+	HDROP hDrop = (HDROP)wParam;
 
-	if (GetJoystickStatus(&status))
+	if (DragQueryFileA(hDrop, 0xFFFFFFFF, NULL, 0) != 0)
 	{
-		// Clear held buttons
-		gKey &= (KEY_ESCAPE | KEY_F2 | KEY_F1);
+		DragQueryFileA(hDrop, 0, path, sizeof(path));
+		LoadProfile(path);
+	}
 
-		// Set movement buttons
-		if (status.bLeft)
-			gKey |= gKeyLeft;
-		if (status.bRight)
-			gKey |= gKeyRight;
-		if (status.bUp)
-			gKey |= gKeyUp;
-		if (status.bDown)
-			gKey |= gKeyDown;
+	DragFinish(hDrop);
 
-		// Set held buttons
-		for (int i = 0; i < 8; i++)
-		{
-			if (status.bButton[i])
-				gKey |= gJoystickButtonTable[i];
-		}
-	}*/
+	return TRUE;
 }
 
-#define DO_KEY_PRESS(key) \
-	if (event.type == SDL_KEYDOWN) \
-		gKey |= key; \
-	else \
-		gKey &= ~key; \
-	break;
-
-BOOL SystemTask()
+LRESULT __stdcall WindowProcedure(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
-	// Handle window events
-	BOOL focusGained = TRUE;
-/*
-	while (SDL_PollEvent(NULL) || !focusGained)
+	BOOL window_focus;
+	HMENU hMenu;
+
+	switch (Msg)
 	{
-		SDL_Event event;
-		SDL_WaitEvent(&event);
+		case WM_CREATE:
+			hMenu = GetMenu(hWnd);
+			//if (!CheckFileExists("save"))	// Chances are a line like this used to exist
+				DeleteMenu(hMenu, 40005, MF_BYCOMMAND);
+			DrawMenuBar(hWnd);
 
-		switch (event.type)
-		{
-			case SDL_QUIT:
-				return FALSE;
+			hMenu = GetMenu(hWnd);
+			if (!CheckFileExists("mute"))
+				DeleteMenu(hMenu, 40007, MF_BYCOMMAND);
+			DrawMenuBar(hWnd);
 
-			case SDL_WINDOWEVENT:
-				switch (event.window.event)
-				{
-					case SDL_WINDOWEVENT_FOCUS_GAINED:
-						focusGained = TRUE;
-						ActiveWindow();
-						break;
+			if (CheckFileExists("fps"))
+				bFps = TRUE;
 
-					case SDL_WINDOWEVENT_FOCUS_LOST:
-						focusGained = FALSE;
-						InactiveWindow();
-						break;
+			if (!bFullscreen)
+				LoadWindowRect(hWnd, "window.rect", FALSE);
 
-					default:
-						break;
-				}
-				break;
+			SetWindowName(hWnd);
+			break;
 
-			case SDL_DROPFILE:
-				LoadProfile(event.drop.file);
-				SDL_free(event.drop.file);
-				break;
+		case WM_SYSCOMMAND:
+			switch (wParam)
+			{
+				case SC_MONITORPOWER:
+					break;
 
-			case SDL_KEYDOWN:
-			case SDL_KEYUP:
-#ifdef FIX_BUGS
-				// BUG FIX: Pixel relied on key codes for input, but these differ based on keyboard layout.
-				// This would break the alternate movement keys on typical English keyboards, since the '=' key is in a completely different place to where it is on a Japanese keyboard.
-				// To solve this, we use scancodes instead, which are based on the physical location of keys, rather than their meaning.
-				switch (event.key.keysym.scancode)
-				{
-					case SDL_SCANCODE_ESCAPE:
-						DO_KEY_PRESS(KEY_ESCAPE)
+				case SC_KEYMENU:
+					break;
 
-					case SDL_SCANCODE_W:
-						DO_KEY_PRESS(KEY_MAP)
+				case SC_SCREENSAVE:
+					break;
 
-					case SDL_SCANCODE_LEFT:
-						DO_KEY_PRESS(KEY_LEFT)
+				default:
+					DefWindowProcA(hWnd, Msg, wParam, lParam);
+					break;
+			}
 
-					case SDL_SCANCODE_RIGHT:
-						DO_KEY_PRESS(KEY_RIGHT)
+			break;
 
-					case SDL_SCANCODE_UP:
-						DO_KEY_PRESS(KEY_UP)
+		case WM_IME_NOTIFY:
+			if (wParam == IMN_SETOPENSTATUS)
+			{
+				HIMC hImc = ImmGetContext(hWnd);
+				ImmSetOpenStatus(hImc, 0);
+				ImmReleaseContext(hWnd, hImc);
+			}
 
-					case SDL_SCANCODE_DOWN:
-						DO_KEY_PRESS(KEY_DOWN)
+			break;
 
-					case SDL_SCANCODE_X:
-						DO_KEY_PRESS(KEY_X)
+		case WM_KEYDOWN:
+			switch (wParam)
+			{
+				case VK_ESCAPE:
+					gKey |= KEY_ESCAPE;
+					break;
 
-					case SDL_SCANCODE_Z:
-						DO_KEY_PRESS(KEY_Z)
+				case 'W':
+					gKey |= KEY_MAP;
+					break;
 
-					case SDL_SCANCODE_S:
-						DO_KEY_PRESS(KEY_ARMS)
+				case VK_LEFT:
+					gKey |= KEY_LEFT;
+					break;
 
-					case SDL_SCANCODE_A:
-						DO_KEY_PRESS(KEY_ARMSREV)
+				case VK_RIGHT:
+					gKey |= KEY_RIGHT;
+					break;
 
-					case SDL_SCANCODE_RSHIFT:
-					case SDL_SCANCODE_LSHIFT:
-						DO_KEY_PRESS(KEY_SHIFT)
+				case VK_UP:
+					gKey |= KEY_UP;
+					break;
 
-					case SDL_SCANCODE_F1:
-						DO_KEY_PRESS(KEY_F1)
+				case VK_DOWN:
+					gKey |= KEY_DOWN;
+					break;
 
-					case SDL_SCANCODE_F2:
-						DO_KEY_PRESS(KEY_F2)
+				case 'X':
+					gKey |= KEY_X;
+					break;
 
-					case SDL_SCANCODE_Q:
-						DO_KEY_PRESS(KEY_ITEM)
+				case 'Z':
+					gKey |= KEY_Z;
+					break;
 
-					case SDL_SCANCODE_COMMA:
-						DO_KEY_PRESS(KEY_ALT_LEFT)
+				case 'S':
+					gKey |= KEY_ARMS;
+					break;
 
-					case SDL_SCANCODE_PERIOD:
-						DO_KEY_PRESS(KEY_ALT_DOWN)
+				case 'A':
+					gKey |= KEY_ARMSREV;
+					break;
 
-					case SDL_SCANCODE_SLASH:
-						DO_KEY_PRESS(KEY_ALT_RIGHT)
+				case VK_SHIFT:
+					gKey |= KEY_SHIFT;
+					break;
 
-					case SDL_SCANCODE_L:
-						DO_KEY_PRESS(KEY_ALT_UP)
+				case VK_F1:
+					gKey |= KEY_F1;
+					break;
 
-					case SDL_SCANCODE_SEMICOLON:
-						DO_KEY_PRESS(KEY_PLUS)
+				case VK_F2:
+					gKey |= KEY_F2;
+					break;
 
-					case SDL_SCANCODE_F5:
-						gbUseJoystick = FALSE;
-						break;
+				case 'Q':
+					gKey |= KEY_ITEM;
+					break;
 
-					default:
-						break;
-				}
-				break;
-#else
-				switch (event.key.keysym.sym)
-				{
-					case SDLK_ESCAPE:
-						DO_KEY_PRESS(KEY_ESCAPE)
+				case VK_OEM_COMMA:
+					gKey |= KEY_ALT_LEFT;
+					break;
 
-					case SDLK_w:
-						DO_KEY_PRESS(KEY_MAP)
+				case VK_OEM_PERIOD:
+					gKey |= KEY_ALT_DOWN;
+					break;
 
-					case SDLK_LEFT:
-						DO_KEY_PRESS(KEY_LEFT)
+				case VK_OEM_2:
+					gKey |= KEY_ALT_RIGHT;
+					break;
 
-					case SDLK_RIGHT:
-						DO_KEY_PRESS(KEY_RIGHT)
+				case 'L':
+					gKey |= KEY_L;
+					break;
 
-					case SDLK_UP:
-						DO_KEY_PRESS(KEY_UP)
+				case VK_OEM_PLUS:
+					gKey |= KEY_PLUS;
+					break;
 
-					case SDLK_DOWN:
-						DO_KEY_PRESS(KEY_DOWN)
+				case VK_F5:
+					gbUseJoystick = FALSE;
+					break;
+			}
 
-					case SDLK_x:
-						DO_KEY_PRESS(KEY_X)
+			break;
 
-					case SDLK_z:
-						DO_KEY_PRESS(KEY_Z)
+		case WM_KEYUP:
+			switch (wParam)
+			{
+				case VK_ESCAPE:
+					gKey &= ~KEY_ESCAPE;
+					break;
 
-					case SDLK_s:
-						DO_KEY_PRESS(KEY_ARMS)
+				case 'W':
+					gKey &= ~KEY_MAP;
+					break;
 
-					case SDLK_a:
-						DO_KEY_PRESS(KEY_ARMSREV)
+				case VK_LEFT:
+					gKey &= ~KEY_LEFT;
+					break;
 
-					case SDLK_RSHIFT:
-					case SDLK_LSHIFT:
-						DO_KEY_PRESS(KEY_SHIFT)
+				case VK_RIGHT:
+					gKey &= ~KEY_RIGHT;
+					break;
 
-					case SDLK_F1:
-						DO_KEY_PRESS(KEY_F1)
+				case VK_UP:
+					gKey &= ~KEY_UP;
+					break;
 
-					case SDLK_F2:
-						DO_KEY_PRESS(KEY_F2)
+				case VK_DOWN:
+					gKey &= ~KEY_DOWN;
+					break;
 
-					case SDLK_q:
-						DO_KEY_PRESS(KEY_ITEM)
+				case 'X':
+					gKey &= ~KEY_X;
+					break;
 
-					case SDLK_COMMA:
-						DO_KEY_PRESS(KEY_ALT_LEFT)
+				case 'Z':
+					gKey &= ~KEY_Z;
+					break;
 
-					case SDLK_PERIOD:
-						DO_KEY_PRESS(KEY_ALT_DOWN)
+				case 'S':
+					gKey &= ~KEY_ARMS;
+					break;
 
-					case SDLK_SLASH:
-						DO_KEY_PRESS(KEY_ALT_RIGHT)
+				case 'A':
+					gKey &= ~KEY_ARMSREV;
+					break;
 
-					case SDLK_l:
-						DO_KEY_PRESS(KEY_ALT_UP)
+				case VK_SHIFT:
+					gKey &= ~KEY_SHIFT;
+					break;
 
-					case SDLK_SEMICOLON:
-						DO_KEY_PRESS(KEY_PLUS)
+				case VK_F1:
+					gKey &= ~KEY_F1;
+					break;
 
-					case SDLK_F5:
-						gbUseJoystick = FALSE;
-						break;
-				}
-				break;
-#endif
-		}
+				case VK_F2:
+					gKey &= ~KEY_F2;
+					break;
+
+				case 'Q':
+					gKey &= ~KEY_ITEM;
+					break;
+
+				case VK_OEM_COMMA:
+					gKey &= ~KEY_ALT_LEFT;
+					break;
+
+				case VK_OEM_PERIOD:
+					gKey &= ~KEY_ALT_DOWN;
+					break;
+
+				case VK_OEM_2:
+					gKey &= ~KEY_ALT_RIGHT;
+					break;
+
+				case 'L':
+					gKey &= ~KEY_L;
+					break;
+
+				case VK_OEM_PLUS:
+					gKey &= ~KEY_PLUS;
+					break;
+			}
+
+			break;
+
+		case WM_COMMAND:
+			switch (LOWORD(wParam))
+			{
+				case 40001:
+					if (DialogBoxParamA(ghInstance, "DLG_YESNO", hWnd, QuitDialog, (LPARAM)"Quit?") == 1)
+						PostMessageA(hWnd, WM_CLOSE, 0, 0);
+					break;
+
+				case 40002:
+					DialogBoxParamA(ghInstance, "DLG_ABOUT", hWnd, VersionDialog, NULL);
+					break;
+
+				case 40004:
+					if (!OpenVolumeConfiguration(hWnd))
+					#ifdef JAPANESE
+						MessageBoxA(hWnd, "â{âèâàü[âÇÉ¦ÆÞé­ïNô«é+é½é_é¦é±é+éÁé¢", lpWindowName, NULL);
+					#else
+						MessageBoxA(hWnd, "Could not launch volume configuration", lpWindowName, NULL);
+					#endif
+					break;
+
+				case 40005:
+					DialogBoxParamA(ghInstance, "DLG_SAVE", hWnd, DebugSaveDialog, NULL);
+					break;
+
+				case 40007:
+					DialogBoxParamA(ghInstance, "DLG_MUTE", hWnd, DebugMuteDialog, NULL);
+					break;
+			}
+
+			break;
+
+		case WM_DROPFILES:
+			DragAndDropHandler(hWnd, wParam);
+			break;
+
+		case WM_ACTIVATE:
+			switch (LOWORD(wParam))
+			{
+				case WA_INACTIVE:
+					window_focus = FALSE;
+					break;
+
+				case WA_ACTIVE:
+				case WA_CLICKACTIVE:
+					if (HIWORD(wParam) != 0)
+						window_focus = FALSE;
+					else
+						window_focus = TRUE;
+
+					break;
+			}
+
+			if (window_focus)
+				ActiveWindow();
+			else
+				InactiveWindow();
+
+			break;
+
+		case WM_CLOSE:
+			StopOrganyaMusic();
+			PostQuitMessage(0);
+			break;
+
+		default:
+			return DefWindowProcA(hWnd, Msg, wParam, lParam);
 	}
-*/
+
+	return 1;
+}
+
+void JoystickProc(void);
+
+BOOL SystemTask(void)
+{
+	MSG Msg;
+
+	while (PeekMessageA(&Msg, NULL, 0, 0, PM_NOREMOVE) || !bActive)
+	{
+		if (!GetMessageA(&Msg, NULL, 0, 0))
+			return FALSE;
+
+		TranslateMessage(&Msg);
+		DispatchMessageA(&Msg);
+	}
+
 	// Run joystick code
 	if (gbUseJoystick)
 		JoystickProc();
 
 	return TRUE;
+}
+
+void JoystickProc(void)
+{
+	JOYSTICK_STATUS status;
+
+	if (!GetJoystickStatus(&status))
+		return;
+
+	gKey &= (KEY_ESCAPE | KEY_F2 | KEY_F1);
+
+	// Set movement buttons
+	if (status.bLeft)
+		gKey |= gKeyLeft;
+	else
+		gKey &= ~gKeyLeft;
+
+	if (status.bRight)
+		gKey |= gKeyRight;
+	else
+		gKey &= ~gKeyRight;
+
+	if (status.bUp)
+		gKey |= gKeyUp;
+	else
+		gKey &= ~gKeyUp;
+
+	if (status.bDown)
+		gKey |= gKeyDown;
+	else
+		gKey &= ~gKeyDown;
+
+	// Clear held buttons
+	for (int i = 0; i < 8; i++)
+		gKey &= ~gJoystickButtonTable[i];
+
+	// Set held buttons
+	for (int i = 0; i < 8; i++)
+	{
+		if (status.bButton[i])
+			gKey |= gJoystickButtonTable[i];
+	}
 }

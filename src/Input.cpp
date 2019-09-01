@@ -143,7 +143,7 @@ BOOL __stdcall EnumDevices_Callback(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef)
 	return FALSE;
 }
 
-BOOL GetJoystickStatus(BOOL *buttons)
+BOOL GetJoystickStatus(JOYSTICK_STATUS *status)
 {
 	DIJOYSTATE joystate;
 
@@ -165,25 +165,25 @@ BOOL GetJoystickStatus(BOOL *buttons)
 	for (int i = 0; i < 32; ++i)
 	{
 		if (joystate.rgbButtons[i] & 0x80)
-			buttons[i + 4] = TRUE;
+			status->bButton[i] = TRUE;
 		else
-			buttons[i + 4] = FALSE;
+			status->bButton[i] = FALSE;
 	}
 
-	buttons[3] = FALSE;
-	buttons[1] = FALSE;
-	buttons[2] = FALSE;
-	buttons[0] = FALSE;
+	status->bDown = FALSE;
+	status->bRight = FALSE;
+	status->bUp = FALSE;
+	status->bLeft = FALSE;
 
 	if (joystate.lX < joystick_neutral_x - 10000)
-		buttons[0] = TRUE;
+		status->bLeft = TRUE;
 	else if (joystate.lX > joystick_neutral_x + 10000)
-		buttons[1] = TRUE;
+		status->bRight = TRUE;
 
 	if (joystate.lY < joystick_neutral_y - 10000)
-		buttons[2] = TRUE;
+		status->bUp = TRUE;
 	else if (joystate.lY > joystick_neutral_y + 10000)
-		buttons[3] = TRUE;
+		status->bDown = TRUE;
 
 	return TRUE;
 }
