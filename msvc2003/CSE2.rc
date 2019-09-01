@@ -137,6 +137,15 @@ ZONBIE                  ORG                     "..\\assets\\resources\\ORG\\Zon
 //
 
 WAVE100                 WAVE                    "..\\assets\\resources\\WAVE\\Wave.dat"
+
+CURSOR_IKA CURSOR "..\\assets\\resources\\CURSOR\\CURSOR_IKA.cur"
+
+CURSOR_NORMAL CURSOR "..\\assets\\resources\\CURSOR\\CURSOR_NORMAL.cur"
+
+0 ICON "..\\assets\\resources\\ICON\\0.ico"
+
+ICON_MINI ICON "..\\assets\\resources\\ICON\\ICON_MINI.ico"
+
 #endif    // Japanese resources
 /////////////////////////////////////////////////////////////////////////////
 
