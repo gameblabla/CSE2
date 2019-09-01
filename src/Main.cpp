@@ -419,7 +419,9 @@ LRESULT __stdcall WindowProcedure(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lPa
 	{
 		case WM_CREATE:
 			hMenu = GetMenu(hWnd);
-			//if (!CheckFileExists("save"))	// Chances are a line like this used to exist
+		#ifdef DEBUG_SAVE
+			if (!CheckFileExists("save"))	// Chances are a line like this used to exist
+		#endif
 				DeleteMenu(hMenu, 40005, MF_BYCOMMAND);
 			DrawMenuBar(hWnd);
 
@@ -435,6 +437,11 @@ LRESULT __stdcall WindowProcedure(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lPa
 				LoadWindowRect(hWnd, "window.rect", FALSE);
 
 			SetWindowName(hWnd);
+
+		#ifdef DEBUG_SAVE
+			DragAcceptFiles(hWnd, TRUE);
+		#endif
+
 			break;
 
 		case WM_SYSCOMMAND:
