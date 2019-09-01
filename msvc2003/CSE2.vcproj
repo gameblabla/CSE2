@@ -290,9 +290,6 @@
 				RelativePath="..\src\Fade.cpp">
 			</File>
 			<File
-				RelativePath="..\src\File.cpp">
-			</File>
-			<File
 				RelativePath="..\src\Flags.cpp">
 			</File>
 			<File
@@ -506,9 +503,6 @@
 			</File>
 			<File
 				RelativePath="..\src\Fade.h">
-			</File>
-			<File
-				RelativePath="..\src\File.h">
 			</File>
 			<File
 				RelativePath="..\src\Flags.h">
