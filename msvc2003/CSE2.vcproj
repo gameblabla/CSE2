@@ -34,7 +34,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Version.lib dsound.lib WinMM.lib dxguid.lib dinput.lib ddraw.lib ShLwApi.Lib Imm32.lib"
+				AdditionalDependencies="ddraw.lib dinput.lib dsound.lib Version.lib ShLwApi.Lib Imm32.lib WinMM.lib dxguid.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
@@ -85,7 +85,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Version.lib dsound.lib WinMM.lib dxguid.lib dinput.lib ddraw.lib ShLwApi.Lib Imm32.lib"
+				AdditionalDependencies="ddraw.lib dinput.lib dsound.lib Version.lib ShLwApi.Lib Imm32.lib WinMM.lib dxguid.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
 				IgnoreAllDefaultLibraries="FALSE"
@@ -135,7 +135,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Version.lib dsound.lib WinMM.lib dxguid.lib dinput.lib ddraw.lib ShLwApi.Lib Imm32.lib"
+				AdditionalDependencies="ddraw.lib dinput.lib dsound.lib Version.lib ShLwApi.Lib Imm32.lib WinMM.lib dxguid.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
 				IgnoreAllDefaultLibraries="FALSE"
@@ -186,7 +186,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Version.lib dsound.lib WinMM.lib dxguid.lib dinput.lib ddraw.lib ShLwApi.Lib Imm32.lib"
+				AdditionalDependencies="ddraw.lib dinput.lib dsound.lib Version.lib ShLwApi.Lib Imm32.lib WinMM.lib dxguid.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
