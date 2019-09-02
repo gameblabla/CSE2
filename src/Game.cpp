@@ -205,7 +205,7 @@ int ModeOpening(HWND hWnd)
 		PutTextScript();
 		PutFramePerSecound();
 
-		if (!Flip_SystemTask(ghWnd))
+		if (!Flip_SystemTask())
 			return 0;
 
 		++gCounter;
@@ -216,7 +216,7 @@ int ModeOpening(HWND hWnd)
 	{
 		CortBox(&grcGame, 0x000000);
 		PutFramePerSecound();
-		if (!Flip_SystemTask(ghWnd))
+		if (!Flip_SystemTask())
 			return 0;
 	}
 	return 2;
@@ -449,7 +449,7 @@ int ModeTitle(HWND hWnd)
 
 		PutFramePerSecound();
 
-		if (!Flip_SystemTask(ghWnd))
+		if (!Flip_SystemTask())
 			return 0;
 	}
 
@@ -461,7 +461,7 @@ int ModeTitle(HWND hWnd)
 	{
 		CortBox(&grcGame, 0);
 		PutFramePerSecound();
-		if (!Flip_SystemTask(ghWnd))
+		if (!Flip_SystemTask())
 			return 0;
 	}
 
@@ -667,7 +667,7 @@ int ModeAction(HWND hWnd)
 
 		PutFramePerSecound();
 
-		if (!Flip_SystemTask(ghWnd))
+		if (!Flip_SystemTask())
 			return 0;
 
 		++gCounter;

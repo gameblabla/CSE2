@@ -37,7 +37,7 @@ int Call_Escape(HWND hWnd)
 		PutBitmap3(&grcFull, (WINDOW_WIDTH - 208) / 2, (WINDOW_HEIGHT - 16) / 2, &rc, SURFACE_ID_TEXT_BOX);
 		PutFramePerSecound();
 
-		if (!Flip_SystemTask(hWnd))
+		if (!Flip_SystemTask())
 		{
 			// Quit if window is closed
 			gKeyTrg = 0;

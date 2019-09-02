@@ -225,9 +225,7 @@ int main(int argc, char *argv[])
 				windowHeight = WINDOW_HEIGHT * 2;
 			}
 
-			SetWindowPadding(GetSystemMetrics(SM_CXFIXEDFRAME) + 1, GetSystemMetrics(SM_CYFIXEDFRAME) + GetSystemMetrics(SM_CYCAPTION) + 1);
-
-			window = SDL_CreateWindow(lpWindowName, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, 0);
+			window = CreateWindow(lpWindowName, windowWidth, windowHeight);
 
 			if (window == NULL)
 			{
@@ -242,9 +240,9 @@ int main(int argc, char *argv[])
 			ghWnd = hWnd;
 
 			if (conf.display_mode == 1)
-				StartDirectDraw(hWnd, 0, 0);
+				StartDirectDraw(window, 0);
 			else
-				StartDirectDraw(hWnd, 1, 0);
+				StartDirectDraw(window, 1);
 
 			break;
 
@@ -255,9 +253,7 @@ int main(int argc, char *argv[])
 			windowWidth = WINDOW_WIDTH * 2;
 			windowHeight = WINDOW_HEIGHT * 2;
 
-			SetWindowPadding(0, 0);
-
-			window = SDL_CreateWindow(lpWindowName, 0, 0, windowWidth, windowHeight, SDL_WINDOW_FULLSCREEN);
+			window = CreateWindow(lpWindowName, windowWidth, windowHeight);
 
 			if (window == NULL)
 			{
@@ -273,6 +269,7 @@ int main(int argc, char *argv[])
 
 			if (hWnd == NULL)
 			{
+				SDL_DestroyWindow(window);
 				ReleaseMutex(hMutex);
 				return 0;
 			}
@@ -293,7 +290,7 @@ int main(int argc, char *argv[])
 					break;
 			}
 
-			StartDirectDraw(ghWnd, 2, depth);
+			StartDirectDraw(window, 2);
 			bFullscreen = TRUE;
 
 			break;
@@ -317,8 +314,9 @@ int main(int argc, char *argv[])
 	PutBitmap3(&rcFull, (WINDOW_WIDTH - 64) / 2, (WINDOW_HEIGHT - 8) / 2, &rcLoading, SURFACE_ID_LOADING);
 
 	// Draw to screen
-	if (!Flip_SystemTask(ghWnd))
+	if (!Flip_SystemTask())
 	{
+		SDL_DestroyWindow(window);
 		ReleaseMutex(hMutex);
 		return 1;
 	}
@@ -344,8 +342,9 @@ int main(int argc, char *argv[])
 		// End stuff
 		EndDirectSound();
 		EndTextObject();
-		EndDirectDraw(hWnd);
+		EndDirectDraw();
 
+		SDL_DestroyWindow(window);
 		ReleaseMutex(hMutex);
 	}
 

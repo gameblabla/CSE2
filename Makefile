@@ -5,6 +5,9 @@ WINDRES = windres
 BUILD_DIRECTORY = game
 ASSETS_DIRECTORY = assets
 
+# Default options
+RENDERER ?= Texture
+
 ifeq ($(RELEASE), 1)
 	CXXFLAGS = -O3
 	LDFLAGS = -s
@@ -121,6 +124,32 @@ SOURCES = \
 	src/TextScr \
 	src/Triangle \
 	src/ValueView
+
+ifeq ($(RENDERER), OpenGL3)
+	SOURCES += src/Backends/Rendering/OpenGL3
+	CXXFLAGS += `pkg-config glew --cflags`
+
+	ifeq ($(STATIC), 1)
+		CXXFLAGS += -DGLEW_STATIC
+		LIBS += `pkg-config glew --libs --static`
+	else
+		LIBS += `pkg-config glew --libs`
+	endif
+
+#	ifeq ($(WINDOWS), 1)
+		LIBS += -lopengl32
+#	else
+#		LIBS += -lGL
+#	endif
+else ifeq ($(RENDERER), Texture)
+	SOURCES += src/Backends/Rendering/SDLTexture
+else ifeq ($(RENDERER), Surface)
+	SOURCES += src/Backends/Rendering/SDLSurface
+else ifeq ($(RENDERER), Software)
+	SOURCES += src/Backends/Rendering/Software
+else
+	@echo Invalid RENDERER selected; this build will fail
+endif
 
 OBJECTS = $(addprefix obj/$(FILENAME)/, $(addsuffix .o, $(SOURCES)))
 DEPENDENCIES = $(addprefix obj/$(FILENAME)/, $(addsuffix .o.d, $(SOURCES)))

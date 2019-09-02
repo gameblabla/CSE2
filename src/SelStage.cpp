@@ -212,7 +212,7 @@ int StageSelectLoop(int *p_event)
 
 		PutFramePerSecound();
 
-		if (!Flip_SystemTask(ghWnd))
+		if (!Flip_SystemTask())
 			return 0;
 	}
 

@@ -4,10 +4,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <ddraw.h>
+#include "SDL.h"
 
 #include "WindowsWrapper.h"
 
+#include "Backends/Rendering.h"
 #include "CommonDefines.h"
 #include "Ending.h"
 #include "Generic.h"
@@ -28,20 +29,11 @@ RECT grcFull = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 int magnification;
 BOOL fullscreen;
 
-static LPDIRECTDRAW lpDD;
-static LPDIRECTDRAWSURFACE frontbuffer;
-static LPDIRECTDRAWSURFACE backbuffer;
+static Backend_Surface *framebuffer;
 
-static LPDIRECTDRAWCLIPPER clipper;
+static Backend_Surface *surf[SURFACE_ID_MAX];
 
-static LPDIRECTDRAWSURFACE surf[SURFACE_ID_MAX];
-
-static RECT backbuffer_rect;
-
-static int scaled_window_width;
-static int scaled_window_height;
-
-static HFONT font;
+static SDL_PixelFormat *rgb24_pixel_format;	// Needed because SDL2 is stupid
 
 // This doesn't exist in the Linux port, so none of these symbol names are accurate
 static struct
@@ -53,20 +45,9 @@ static struct
 	BOOL bSystem;	// Basically a 'do not regenerate' flag
 } surface_metadata[SURFACE_ID_MAX];
 
-// The original names for these variables are unknown
-static int x_offset;
-static int y_offset;
-
 #define FRAMERATE 20
 
-// The original name for this function is unknown
-void SetWindowPadding(int width, int height)
-{
-	x_offset = width;
-	y_offset = height;
-}
-
-BOOL Flip_SystemTask(HWND hWnd)
+BOOL Flip_SystemTask(void)
 {
 	static DWORD timePrev;
 	static DWORD timeNow;
@@ -90,32 +71,18 @@ BOOL Flip_SystemTask(HWND hWnd)
 	else
 		timePrev += FRAMERATE;
 
-	static RECT dst_rect;
-	GetWindowRect(hWnd, &dst_rect);
-	dst_rect.left += x_offset;
-	dst_rect.top += y_offset;
-	dst_rect.right = dst_rect.left + scaled_window_width;
-	dst_rect.bottom = dst_rect.top + scaled_window_height;
-
-	frontbuffer->Blt(&dst_rect, backbuffer, &backbuffer_rect, DDBLT_WAIT, NULL);
-
-	if (RestoreSurfaces())
-	{
-		RestoreStripper();
-		RestoreMapName();
-		RestoreTextScript();
-	}
+	Backend_DrawScreen();
 
 	return TRUE;
 }
 
-BOOL StartDirectDraw(HWND hWnd, int lMagnification, int lColourDepth)
+SDL_Window* CreateWindow(const char *title, int width, int height)
 {
-	DDSURFACEDESC ddsd;
+	return Backend_CreateWindow(title, width, height);
+}
 
-	if (DirectDrawCreate(NULL, &lpDD, NULL) != DD_OK)
-		return FALSE;
-
+BOOL StartDirectDraw(SDL_Window *window, int lMagnification)
+{
 	memset(surface_metadata, 0, sizeof(surface_metadata));
 
 	switch (lMagnification)
@@ -123,84 +90,44 @@ BOOL StartDirectDraw(HWND hWnd, int lMagnification, int lColourDepth)
 		case 0:
 			magnification = 1;
 			fullscreen = FALSE;
-			lpDD->SetCooperativeLevel(hWnd, DDSCL_NORMAL);
 			break;
 
 		case 1:
 			magnification = 2;
 			fullscreen = FALSE;
-			lpDD->SetCooperativeLevel(hWnd, DDSCL_NORMAL);
 			break;
 
 		case 2:
 			magnification = 2;
 			fullscreen = TRUE;
-			lpDD->SetCooperativeLevel(hWnd, DDSCL_FULLSCREEN | DDSCL_EXCLUSIVE);
-			lpDD->SetDisplayMode(WINDOW_WIDTH * magnification, WINDOW_HEIGHT * magnification, lColourDepth);
+			SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 			break;
 	}
 
-	backbuffer_rect.left = 0;
-	backbuffer_rect.top = 0;
-	backbuffer_rect.right = WINDOW_WIDTH * magnification;
-	backbuffer_rect.bottom = WINDOW_HEIGHT * magnification;
+	framebuffer = Backend_Init(window);
 
-	scaled_window_width = WINDOW_WIDTH * magnification;
-	scaled_window_height = WINDOW_HEIGHT * magnification;
-
-	memset(&ddsd, 0, sizeof(DDSURFACEDESC));
-	ddsd.dwSize = sizeof(DDSURFACEDESC);
-	ddsd.dwFlags = DDSD_CAPS;
-	ddsd.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE;
-	ddsd.dwBackBufferCount = 0;
-
-	if (lpDD->CreateSurface(&ddsd, &frontbuffer, NULL) != DD_OK)
-		return FALSE;
-
-	memset(&ddsd, 0, sizeof(DDSURFACEDESC));
-	ddsd.dwSize = sizeof(DDSURFACEDESC);
-	ddsd.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH;
-	ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN;
-	ddsd.dwWidth = WINDOW_WIDTH * magnification;
-	ddsd.dwHeight = WINDOW_HEIGHT * magnification;
-
-	if (lpDD->CreateSurface(&ddsd, &backbuffer, NULL) != DD_OK)
-		return FALSE;
-
-	lpDD->CreateClipper(0, &clipper, NULL);
-	clipper->SetHWnd(0, hWnd);
-	frontbuffer->SetClipper(clipper);
+	rgb24_pixel_format = SDL_AllocFormat(SDL_PIXELFORMAT_RGB24);
 
 	return TRUE;
 }
 
-void EndDirectDraw(HWND hWnd)
+void EndDirectDraw(void)
 {
 	// Release all surfaces
 	for (int i = 0; i < SURFACE_ID_MAX; ++i)
 	{
 		if (surf[i] != NULL)
 		{
-			surf[i]->Release();
+			Backend_FreeSurface(surf[i]);
 			surf[i] = NULL;
 		}
 	}
 
-	if (frontbuffer != NULL)
-	{
-		frontbuffer->Release();
-		frontbuffer = NULL;
-		backbuffer = NULL;
-	}
+	framebuffer = NULL;
 
-	if (fullscreen)
-		lpDD->SetCooperativeLevel(hWnd, DDSCL_NORMAL);
+	SDL_FreeFormat(rgb24_pixel_format);
 
-	if (lpDD != NULL)
-	{
-		lpDD->Release();
-		lpDD = NULL;
-	}
+	Backend_Deinit();
 
 	memset(surface_metadata, 0, sizeof(surface_metadata));
 }
@@ -210,11 +137,69 @@ void ReleaseSurface(SurfaceID s)
 	// Release the surface we want to release
 	if (surf[s] != NULL)
 	{
-		surf[s]->Release();
+		Backend_FreeSurface(surf[s]);
 		surf[s] = NULL;
 	}
 
 	memset(&surface_metadata[s], 0, sizeof(surface_metadata[0]));
+}
+
+static BOOL ScaleAndUploadSurface(SDL_Surface *surface, SurfaceID surf_no)
+{
+	SDL_Surface *converted_surface = SDL_ConvertSurface(surface, rgb24_pixel_format, 0);
+
+	SDL_FreeSurface(surface);
+
+	if (converted_surface == NULL)
+		return FALSE;
+
+	// IF YOU WANT TO ADD HD SPRITES, THIS IS THE CODE YOU SHOULD EDIT
+	unsigned int pitch;
+	unsigned char *pixels = Backend_LockSurface(surf[surf_no], &pitch);
+
+	if (magnification == 1)
+	{
+		// Just copy the pixels the way they are
+		for (int y = 0; y < converted_surface->h; ++y)
+		{
+			const unsigned char *src_row = (unsigned char*)converted_surface->pixels + y * converted_surface->pitch;
+			unsigned char *dst_row = &pixels[y * pitch];
+
+			memcpy(dst_row, src_row, converted_surface->w * 3);
+		}
+	}
+	else
+	{
+		// Upscale the bitmap to the game's internal resolution
+		for (int y = 0; y < converted_surface->h; ++y)
+		{
+			const unsigned char *src_row = (unsigned char*)converted_surface->pixels + y * converted_surface->pitch;
+			unsigned char *dst_row = &pixels[y * pitch * magnification];
+
+			const unsigned char *src_ptr = src_row;
+			unsigned char *dst_ptr = dst_row;
+
+			for (int x = 0; x < converted_surface->w; ++x)
+			{
+				for (int i = 0; i < magnification; ++i)
+				{
+					*dst_ptr++ = src_ptr[0];
+					*dst_ptr++ = src_ptr[1];
+					*dst_ptr++ = src_ptr[2];
+				}
+
+				src_ptr += 3;
+			}
+
+			for (int i = 1; i < magnification; ++i)
+				memcpy(dst_row + i * pitch, dst_row, converted_surface->w * magnification * 3);
+		}
+	}
+
+	Backend_UnlockSurface(surf[surf_no]);
+	SDL_FreeSurface(converted_surface);
+
+	return TRUE;
 }
 
 // TODO - Inaccurate stack frame
@@ -226,59 +211,45 @@ BOOL MakeSurface_Resource(const char *name, SurfaceID surf_no)
 	if (surf[surf_no] != NULL)
 		return FALSE;
 
-	HANDLE handle = LoadImageA(GetModuleHandleA(NULL), name, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
-	if (handle == NULL)
+	HRSRC hrscr = FindResourceA(NULL, name, RT_BITMAP);
+
+	if (hrscr == NULL)
 		return FALSE;
 
-	BITMAP bitmap;
-	GetObjectA(handle, sizeof(BITMAP), &bitmap);
+	size_t size = SizeofResource(NULL, hrscr);
+	const unsigned char *data = (unsigned char*)LockResource(LoadResource(NULL, hrscr));
 
-	DDSURFACEDESC ddsd;
-	memset(&ddsd, 0, sizeof(DDSURFACEDESC));
-	ddsd.dwSize = sizeof(DDSURFACEDESC);
-	ddsd.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH;
-	ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN;
-	ddsd.dwWidth = bitmap.bmWidth * magnification;
-	ddsd.dwHeight = bitmap.bmHeight * magnification;
+	// The bitmap we get from LockResource is incomplete, so we need to restore its missing header here
+	unsigned char *bmp_buffer = (unsigned char*)malloc(size + 0xE);
 
-	if (lpDD->CreateSurface(&ddsd, &surf[surf_no], NULL) != DD_OK)
+	if (bmp_buffer == NULL)
 		return FALSE;
 
-	int src_x = 0;
-	int src_y = 0;
-	int src_w = bitmap.bmWidth;
-	int src_h = bitmap.bmHeight;
+	const unsigned char bmp_header[0xE] = {0x42, 0x4D, 0x76, 0x4B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x76, 0x00, 0x00, 0x00};
 
-	int dst_x = 0;
-	int dst_y = 0;
-	int dst_w = bitmap.bmWidth * magnification;
-	int dst_h = bitmap.bmHeight * magnification;
+	memcpy(bmp_buffer, bmp_header, 0xE);
+	memcpy(bmp_buffer + 0xE, data, size);
 
-	HDC hdc = CreateCompatibleDC(NULL);
-	HGDIOBJ hgdiobj = SelectObject(hdc, handle);
+	SDL_RWops *fp = SDL_RWFromConstMem(bmp_buffer, size + 0xE);
+	SDL_Surface *surface = SDL_LoadBMP_RW(fp, 1);
 
-	HDC hdc2;
-	surf[surf_no]->GetDC(&hdc2);
-	StretchBlt(hdc2, dst_x, dst_y, dst_w, dst_h, hdc, src_x, src_y, src_w, src_h, SRCCOPY);
-	surf[surf_no]->ReleaseDC(hdc2);
+	surf[surf_no] = Backend_CreateSurface(surface->w * magnification, surface->h * magnification);
 
-	SelectObject(hdc, hgdiobj);
-	DeleteDC(hdc);
+	if (surf[surf_no] == NULL)
+	{
+		SDL_FreeSurface(surface);
+		return FALSE;
+	}
 
-	DDCOLORKEY ddcolorkey;
-	ddcolorkey.dwColorSpaceLowValue = 0;
-	ddcolorkey.dwColorSpaceHighValue = 0;
-
-	surf[surf_no]->SetColorKey(DDCKEY_SRCBLT, &ddcolorkey);
-	surf[surf_no]->SetClipper(clipper);
-
-#ifdef FIX_BUGS
-	DeleteObject(handle);
-#endif
+	if (!ScaleAndUploadSurface(surface, surf_no))
+	{
+		Backend_FreeSurface(surf[surf_no]);
+		return FALSE;
+	}
 
 	surface_metadata[surf_no].type = SURFACE_SOURCE_RESOURCE;
-	surface_metadata[surf_no].width = bitmap.bmWidth;
-	surface_metadata[surf_no].height = bitmap.bmHeight;
+	surface_metadata[surf_no].width = surface->w;
+	surface_metadata[surf_no].height = surface->h;
 	surface_metadata[surf_no].bSystem = FALSE;
 	strcpy(surface_metadata[surf_no].name, name);
 
@@ -313,59 +284,31 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 		return FALSE;
 	}
 
-	HANDLE handle = LoadImageA(GetModuleHandleA(NULL), path, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
-	if (handle == NULL)
+	SDL_Surface *surface = SDL_LoadBMP(path);
+
+	if (surface == NULL)
 	{
 		PrintBitmapError(path, 1);
 		return FALSE;
 	}
 
-	BITMAP bitmap;
-	GetObjectA(handle, sizeof(BITMAP), &bitmap);
+	surf[surf_no] = Backend_CreateSurface(surface->w * magnification, surface->h * magnification);
 
-	DDSURFACEDESC ddsd;
-	memset(&ddsd, 0, sizeof(DDSURFACEDESC));
-	ddsd.dwSize = sizeof(DDSURFACEDESC);
-	ddsd.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH;
-	ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN;
-	ddsd.dwWidth = bitmap.bmWidth * magnification;
-	ddsd.dwHeight = bitmap.bmHeight * magnification;
+	if (surf[surf_no] == NULL)
+	{
+		SDL_FreeSurface(surface);
+		return FALSE;
+	}
 
-	lpDD->CreateSurface(&ddsd, &surf[surf_no], NULL);
-
-	int src_x = 0;
-	int src_y = 0;
-	int src_w = bitmap.bmWidth;
-	int src_h = bitmap.bmHeight;
-
-	int dst_x = 0;
-	int dst_y = 0;
-	int dst_w = bitmap.bmWidth * magnification;
-	int dst_h = bitmap.bmHeight * magnification;
-
-	HDC hdc = CreateCompatibleDC(NULL);
-	HGDIOBJ hgdiobj = SelectObject(hdc, handle);
-
-	HDC hdc2;
-	surf[surf_no]->GetDC(&hdc2);
-	StretchBlt(hdc2, dst_x, dst_y, dst_w, dst_h, hdc, src_x, src_y, src_w, src_h, SRCCOPY);
-	surf[surf_no]->ReleaseDC(hdc2);
-
-	SelectObject(hdc, hgdiobj);
-	DeleteDC(hdc);
-
-	DDCOLORKEY ddcolorkey;
-	ddcolorkey.dwColorSpaceLowValue = 0;
-	ddcolorkey.dwColorSpaceHighValue = 0;
-
-	surf[surf_no]->SetColorKey(DDCKEY_SRCBLT, &ddcolorkey);
-	surf[surf_no]->SetClipper(clipper);
-
-	DeleteObject(handle);
+	if (!ScaleAndUploadSurface(surface, surf_no))
+	{
+		Backend_FreeSurface(surf[surf_no]);
+		return FALSE;
+	}
 
 	surface_metadata[surf_no].type = SURFACE_SOURCE_FILE;
-	surface_metadata[surf_no].width = bitmap.bmWidth;
-	surface_metadata[surf_no].height = bitmap.bmHeight;
+	surface_metadata[surf_no].width = surface->w;
+	surface_metadata[surf_no].height = surface->h;
 	surface_metadata[surf_no].bSystem = FALSE;
 	strcpy(surface_metadata[surf_no].name, name);
 
@@ -378,44 +321,30 @@ BOOL ReloadBitmap_Resource(const char *name, SurfaceID surf_no)
 	if (surf_no >= SURFACE_ID_MAX)
 		return FALSE;
 
-	HANDLE handle = LoadImageA(GetModuleHandleA(NULL), name, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
-	if (handle == NULL)
+	HRSRC hrscr = FindResourceA(NULL, name, RT_BITMAP);
+
+	if (hrscr == NULL)
 		return FALSE;
 
-	BITMAP bitmap;
-	GetObjectA(handle, sizeof(BITMAP), &bitmap);
+	size_t size = SizeofResource(NULL, hrscr);
+	const unsigned char *data = (unsigned char*)LockResource(LoadResource(NULL, hrscr));
 
-	int src_x = 0;
-	int src_y = 0;
-	int src_w = bitmap.bmWidth;
-	int src_h = bitmap.bmHeight;
+	// The bitmap we get from LockResource is incomplete, so we need to restore its missing header here
+	unsigned char *bmp_buffer = (unsigned char*)malloc(size + 0xE);
 
-	int dst_x = 0;
-	int dst_y = 0;
-	int dst_w = bitmap.bmWidth * magnification;
-	int dst_h = bitmap.bmHeight * magnification;
+	if (bmp_buffer == NULL)
+		return FALSE;
 
-	HDC hdc = CreateCompatibleDC(NULL);
-	HGDIOBJ hgdiobj = SelectObject(hdc, handle);
+	const unsigned char bmp_header[0xE] = {0x42, 0x4D, 0x76, 0x4B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x76, 0x00, 0x00, 0x00};
 
-	HDC hdc2;
-	surf[surf_no]->GetDC(&hdc2);
-	StretchBlt(hdc2, dst_x, dst_y, dst_w, dst_h, hdc, src_x, src_y, src_w, src_h, SRCCOPY);
-	surf[surf_no]->ReleaseDC(hdc2);
+	memcpy(bmp_buffer, bmp_header, 0xE);
+	memcpy(bmp_buffer + 0xE, data, size);
 
-	SelectObject(hdc, hgdiobj);
-	DeleteDC(hdc);
+	SDL_RWops *fp = SDL_RWFromConstMem(bmp_buffer, size + 0xE);
+	SDL_Surface *surface = SDL_LoadBMP_RW(fp, 1);
 
-	DDCOLORKEY ddcolorkey;
-	ddcolorkey.dwColorSpaceLowValue = 0;
-	ddcolorkey.dwColorSpaceHighValue = 0;
-
-	surf[surf_no]->SetColorKey(DDCKEY_SRCBLT, &ddcolorkey);
-	surf[surf_no]->SetClipper(clipper);
-
-#ifdef FIX_BUGS
-	DeleteObject(handle);
-#endif
+	if (!ScaleAndUploadSurface(surface, surf_no))
+		return FALSE;
 
 	surface_metadata[surf_no].type = SURFACE_SOURCE_RESOURCE;
 	strcpy(surface_metadata[surf_no].name, name);
@@ -445,40 +374,16 @@ BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 		return FALSE;
 	}
 
-	HANDLE handle = LoadImageA(GetModuleHandleA(NULL), path, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
-	if (handle == NULL)
+	SDL_Surface *surface = SDL_LoadBMP(path);
+
+	if (surface == NULL)
 	{
 		PrintBitmapError(path, 1);
 		return FALSE;
 	}
 
-	BITMAP bitmap;
-	GetObjectA(handle, sizeof(BITMAP), &bitmap);
-
-	int src_x = 0;
-	int src_y = 0;
-	int src_w = bitmap.bmWidth;
-	int src_h = bitmap.bmHeight;
-
-	int dst_x = 0;
-	int dst_y = 0;
-	int dst_w = bitmap.bmWidth * magnification;
-	int dst_h = bitmap.bmHeight * magnification;
-
-	HDC hdc = CreateCompatibleDC(NULL);
-	HGDIOBJ hgdiobj = SelectObject(hdc, handle);
-
-	HDC hdc2;
-	surf[surf_no]->GetDC(&hdc2);
-	StretchBlt(hdc2, dst_x, dst_y, dst_w, dst_h, hdc, src_x, src_y, src_w, src_h, SRCCOPY);
-	surf[surf_no]->ReleaseDC(hdc2);
-
-	SelectObject(hdc, hgdiobj);
-	DeleteDC(hdc);
-
-	// No colour-keying
-
-	DeleteObject(handle);
+	if (!ScaleAndUploadSurface(surface, surf_no))
+		return FALSE;
 
 	surface_metadata[surf_no].type = SURFACE_SOURCE_FILE;
 	strcpy(surface_metadata[surf_no].name, name);
@@ -499,30 +404,14 @@ BOOL MakeSurface_Generic(int bxsize, int bysize, SurfaceID surf_no, BOOL bSystem
 	if (surf[surf_no] != NULL)
 		return FALSE;
 
-	DDSURFACEDESC ddsd;
-	memset(&ddsd, 0, sizeof(DDSURFACEDESC));
-	ddsd.dwSize = sizeof(DDSURFACEDESC);
-	ddsd.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH;
+	surf[surf_no] = Backend_CreateSurface(bxsize * magnification, bysize * magnification);
 
-	if (bSystem)
-		ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN | DDSCAPS_SYSTEMMEMORY;
-	else
-		ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN;
-
-	ddsd.dwWidth = bxsize * magnification;
-	ddsd.dwHeight = bysize * magnification;
-
-	lpDD->CreateSurface(&ddsd, &surf[surf_no], NULL);
-
-	DDCOLORKEY ddcolorkey;
-	ddcolorkey.dwColorSpaceLowValue = 0;
-	ddcolorkey.dwColorSpaceHighValue = 0;
-
-	surf[surf_no]->SetColorKey(DDCKEY_SRCBLT, &ddcolorkey);
+	if (surf[surf_no] == NULL)
+		return FALSE;
 
 	surface_metadata[surf_no].type = SURFACE_SOURCE_NONE;
-	surface_metadata[surf_no].width = ddsd.dwWidth / magnification;
-	surface_metadata[surf_no].height = ddsd.dwHeight / magnification;
+	surface_metadata[surf_no].width = bxsize;
+	surface_metadata[surf_no].height = bysize;
 
 	if (bSystem)
 		surface_metadata[surf_no].bSystem = TRUE;
@@ -536,24 +425,18 @@ BOOL MakeSurface_Generic(int bxsize, int bysize, SurfaceID surf_no, BOOL bSystem
 
 void BackupSurface(SurfaceID surf_no, const RECT *rect)
 {
-	static DDBLTFX ddbltfx;
-
-	memset(&ddbltfx, 0, sizeof(DDBLTFX));
-	ddbltfx.dwSize = sizeof(DDBLTFX);
-
 	static RECT scaled_rect;
 	scaled_rect.left = rect->left * magnification;
 	scaled_rect.top = rect->top * magnification;
 	scaled_rect.right = rect->right * magnification;
 	scaled_rect.bottom = rect->bottom * magnification;
 
-	surf[surf_no]->Blt(&scaled_rect, backbuffer, &scaled_rect, DDBLT_WAIT, &ddbltfx);
+	Backend_Blit(framebuffer, &scaled_rect, surf[surf_no], scaled_rect.left, scaled_rect.top, FALSE);
 }
 
 void PutBitmap3(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID surf_no) // Transparency
 {
 	static RECT src_rect;
-	static RECT dst_rect;
 
 	src_rect = *rect;
 
@@ -575,28 +458,17 @@ void PutBitmap3(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID su
 		y = rcView->top;
 	}
 
-	dst_rect.left = x;
-	dst_rect.top = y;
-	dst_rect.right = x + src_rect.right - src_rect.left;
-	dst_rect.bottom = y + src_rect.bottom - src_rect.top;
-
 	src_rect.left *= magnification;
 	src_rect.top *= magnification;
 	src_rect.right *= magnification;
 	src_rect.bottom *= magnification;
 
-	dst_rect.left *= magnification;
-	dst_rect.top *= magnification;
-	dst_rect.right *= magnification;
-	dst_rect.bottom *= magnification;
-
-	backbuffer->Blt(&dst_rect, surf[surf_no], &src_rect, DDBLT_KEYSRC | DDBLT_WAIT, NULL);
+	Backend_Blit(surf[surf_no], &src_rect, framebuffer, x * magnification, y * magnification, TRUE);
 }
 
 void PutBitmap4(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID surf_no) // No Transparency
 {
 	static RECT src_rect;
-	static RECT dst_rect;
 
 	src_rect = *rect;
 
@@ -618,106 +490,49 @@ void PutBitmap4(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID su
 		y = rcView->top;
 	}
 
-	dst_rect.left = x;
-	dst_rect.top = y;
-	dst_rect.right = x + src_rect.right - src_rect.left;
-	dst_rect.bottom = y + src_rect.bottom - src_rect.top;
-
 	src_rect.left *= magnification;
 	src_rect.top *= magnification;
 	src_rect.right *= magnification;
 	src_rect.bottom *= magnification;
 
-	dst_rect.left *= magnification;
-	dst_rect.top *= magnification;
-	dst_rect.right *= magnification;
-	dst_rect.bottom *= magnification;
-
-	backbuffer->Blt(&dst_rect, surf[surf_no], &src_rect, DDBLT_WAIT, NULL);
+	Backend_Blit(surf[surf_no], &src_rect, framebuffer, x * magnification, y * magnification, FALSE);
 }
 
 void Surface2Surface(int x, int y, const RECT *rect, int to, int from)
 {
 	static RECT src_rect;
-	static RECT dst_rect;
 
 	src_rect.left = rect->left * magnification;
 	src_rect.top = rect->top * magnification;
 	src_rect.right = rect->right * magnification;
 	src_rect.bottom = rect->bottom * magnification;
 
-	dst_rect.left = x;
-	dst_rect.top = y;
-	dst_rect.right = x + rect->right - rect->left;
-	dst_rect.bottom = y + rect->bottom - rect->top;
-
-	dst_rect.left *= magnification;
-	dst_rect.top *= magnification;
-	dst_rect.right *= magnification;
-	dst_rect.bottom *= magnification;
-
-	surf[to]->Blt(&dst_rect, surf[from], &src_rect, DDBLT_KEYSRC | DDBLT_WAIT, NULL);
+	Backend_Blit(surf[from], &src_rect, surf[to], x * magnification, y * magnification, TRUE);
 }
 
-// This converts a colour to the 'native' format by writing it
-// straight to the framebuffer, and then reading it back
 unsigned long GetCortBoxColor(COLORREF col)
 {
-	HDC hdc;
-
-	if (backbuffer->GetDC(&hdc) != DD_OK)
-		return 0xFFFFFFFF;
-
-	COLORREF original_colour = GetPixel(hdc, 0, 0);
-	SetPixel(hdc, 0, 0, col);
-	backbuffer->ReleaseDC(hdc);
-
-	DDSURFACEDESC ddsd;
-	memset(&ddsd, 0, sizeof(DDSURFACEDESC));
-	ddsd.dwSize = sizeof(DDSURFACEDESC);
-
-	if (backbuffer->Lock(NULL, &ddsd, DDLOCK_WAIT, NULL) != DD_OK)
-		return 0xFFFFFFFF;
-
-	DWORD native_colour = *(DWORD*)ddsd.lpSurface;
-
-	if (ddsd.ddpfPixelFormat.dwRGBBitCount < 32)
-		native_colour &= (1 << ddsd.ddpfPixelFormat.dwRGBBitCount) - 1;
-
-	backbuffer->Unlock(0);
-
-	if (backbuffer->GetDC(&hdc) != DD_OK)
-		return 0xFFFFFFFF;
-
-	SetPixel(hdc, 0, 0, original_colour);
-	backbuffer->ReleaseDC(hdc);
-
-	return native_colour;
+	// Comes in 00BBGGRR, goes out 00BBGGRR
+	return col;
 }
 
 void CortBox(const RECT *rect, unsigned long col)
 {
-	static DDBLTFX ddbltfx;
-	memset(&ddbltfx, 0, sizeof(DDBLTFX));
-	ddbltfx.dwSize = sizeof(DDBLTFX);
-	ddbltfx.dwFillColor = col;
-
 	static RECT dst_rect;
 	dst_rect.left = rect->left * magnification;
 	dst_rect.top = rect->top * magnification;
 	dst_rect.right = rect->right * magnification;
 	dst_rect.bottom = rect->bottom * magnification;
 
-	backbuffer->Blt(&dst_rect, 0, 0, DDBLT_COLORFILL | DDBLT_WAIT, &ddbltfx);
+	const unsigned char red = col & 0xFF;
+	const unsigned char green = (col >> 8) & 0xFF;
+	const unsigned char blue = (col >> 16) & 0xFF;
+
+	Backend_ColourFill(framebuffer, &dst_rect, red, green, blue);
 }
 
 void CortBox2(const RECT *rect, unsigned long col, SurfaceID surf_no)
 {
-	static DDBLTFX ddbltfx;
-	memset(&ddbltfx, 0, sizeof(DDBLTFX));
-	ddbltfx.dwSize = sizeof(DDBLTFX);
-	ddbltfx.dwFillColor = col;
-
 	static RECT dst_rect;
 	dst_rect.left = rect->left * magnification;
 	dst_rect.top = rect->top * magnification;
@@ -726,9 +541,13 @@ void CortBox2(const RECT *rect, unsigned long col, SurfaceID surf_no)
 
 	surface_metadata[surf_no].type = SURFACE_SOURCE_NONE;
 
-	surf[surf_no]->Blt(&dst_rect, 0, 0, DDBLT_COLORFILL | DDBLT_WAIT, &ddbltfx);
-}
+	const unsigned char red = col & 0xFF;
+	const unsigned char green = (col >> 8) & 0xFF;
+	const unsigned char blue = (col >> 16) & 0xFF;
 
+	Backend_ColourFill(surf[surf_no], &dst_rect, red, green, blue);
+}
+/*
 BOOL DummiedOutLogFunction(int unknown)
 {
 	char unknown2[0x100];
@@ -807,10 +626,10 @@ int RestoreSurfaces(void)	// Guessed function name - this doesn't exist in the L
 
 	return surfaces_regenerated;
 }
-
+*/
 // TODO - Inaccurate stack frame
 void InitTextObject(const char *name)
-{
+{/*
 	// Get font size
 	unsigned int width, height;
 
@@ -849,10 +668,10 @@ void InitTextObject(const char *name)
 
 	if (font == NULL)
 		font = CreateFontA(height, width, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, CHARSET, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, QUALITY, FIXED_PITCH | FF_DONTCARE, NULL);
-}
+*/}
 
 void PutText(int x, int y, const char *text, unsigned long color)
-{
+{/*
 	HDC hdc;
 	backbuffer->GetDC(&hdc);
 	HGDIOBJ hgdiobj = SelectObject(hdc, font);
@@ -861,10 +680,10 @@ void PutText(int x, int y, const char *text, unsigned long color)
 	TextOutA(hdc, x * magnification, y * magnification, text, (int)strlen(text));
 	SelectObject(hdc, hgdiobj);
 	backbuffer->ReleaseDC(hdc);
-}
+*/}
 
 void PutText2(int x, int y, const char *text, unsigned long color, SurfaceID surf_no)
-{
+{/*
 	HDC hdc;
 	surf[surf_no]->GetDC(&hdc);
 	HGDIOBJ hgdiobj = SelectObject(hdc, font);
@@ -873,9 +692,9 @@ void PutText2(int x, int y, const char *text, unsigned long color, SurfaceID sur
 	TextOutA(hdc, x * magnification, y * magnification, text, (int)strlen(text));
 	SelectObject(hdc, hgdiobj);
 	surf[surf_no]->ReleaseDC(hdc);
-}
+*/}
 
 void EndTextObject(void)
 {
-	DeleteObject(font);
+//	DeleteObject(font);
 }

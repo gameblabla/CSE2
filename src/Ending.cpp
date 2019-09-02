@@ -507,7 +507,7 @@ int Scene_DownIsland(HWND hWnd, int mode)
 
 		// Draw window
 		PutFramePerSecound();
-		if (!Flip_SystemTask(hWnd))
+		if (!Flip_SystemTask())
 			return 0;
 	}
 

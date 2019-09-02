@@ -436,7 +436,7 @@ int CampLoop()
 			}
 		}
 
-		if (!Flip_SystemTask(ghWnd))
+		if (!Flip_SystemTask())
 			return 0;
 	}
 
