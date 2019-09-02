@@ -9,7 +9,6 @@
 #include "Caret.h"
 #include "Draw.h"
 #include "Game.h"
-#include "File.h"
 #include "MyChar.h"
 #include "NpChar.h"
 #include "Sound.h"

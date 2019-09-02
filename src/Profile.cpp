@@ -9,7 +9,6 @@
 #include "ArmsItem.h"
 #include "BossLife.h"
 #include "Fade.h"
-#include "File.h"
 #include "Flags.h"
 #include "Frame.h"
 #include "Game.h"

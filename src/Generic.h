@@ -13,10 +13,10 @@ int CheckTime(SYSTEMTIME *system_time_low, SYSTEMTIME *system_time_high);
 BOOL CheckFileExists(const char *name);
 long GetFileSizeLong(const char *path);
 #ifdef WINDOWS
-BOOL PrintBitmapError(char *string, int value);
+BOOL PrintBitmapError(const char *string, int value);
 #endif
 BOOL IsShiftJIS(unsigned char c);
 BOOL CenterWindow(HWND hWnd);
-BOOL LoadWindowRect(HWND hWnd, char *filename, BOOL unknown);
+BOOL LoadWindowRect(HWND hWnd, const char *filename, BOOL unknown);
 BOOL SaveWindowRect(HWND hWnd, const char *filename);
 BOOL IsEnableBitmap(const char *path);

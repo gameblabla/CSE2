@@ -281,7 +281,7 @@ long GetFileSizeLong(const char *path)
 }
 
 #ifdef WINDOWS
-BOOL PrintBitmapError(char *string, int value)
+BOOL PrintBitmapError(const char *string, int value)
 {
 	char path[MAX_PATH];
 	FILE *fp;
@@ -351,7 +351,7 @@ BOOL CenterWindow(HWND hWnd)
 }
 
 // TODO - Inaccurate stack frame
-BOOL LoadWindowRect(HWND hWnd, char *filename, BOOL unknown)
+BOOL LoadWindowRect(HWND hWnd, const char *filename, BOOL unknown)
 {
 	char path[MAX_PATH];
 	int min_window_width;

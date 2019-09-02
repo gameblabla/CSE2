@@ -31,8 +31,8 @@ int gJoystickButtonTable[8];
 
 HWND ghWnd;
 BOOL bFullscreen;
+BOOL gbUseJoystick = FALSE;
 
-static BOOL gbUseJoystick = FALSE;
 static BOOL bFps = FALSE;
 static BOOL bActive = TRUE;
 
@@ -655,24 +655,24 @@ LRESULT __stdcall WindowProcedure(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lPa
 					break;
 
 				case 40002:
-					DialogBoxParamA(ghInstance, "DLG_ABOUT", hWnd, VersionDialog, NULL);
+					DialogBoxParamA(ghInstance, "DLG_ABOUT", hWnd, VersionDialog, 0);
 					break;
 
 				case 40004:
 					if (!OpenVolumeConfiguration(hWnd))
 					#ifdef JAPANESE
-						MessageBoxA(hWnd, "â{âèâàü[âÇÉ¦ÆÞé­ïNô«é+é½é_é¦é±é+éÁé¢", lpWindowName, NULL);
+						MessageBoxA(hWnd, "â{âèâàü[âÇÉ¦ÆÞé­ïNô«é+é½é_é¦é±é+éÁé¢", lpWindowName, 0);
 					#else
-						MessageBoxA(hWnd, "Could not launch volume configuration", lpWindowName, NULL);
+						MessageBoxA(hWnd, "Could not launch volume configuration", lpWindowName, 0);
 					#endif
 					break;
 
 				case 40005:
-					DialogBoxParamA(ghInstance, "DLG_SAVE", hWnd, DebugSaveDialog, NULL);
+					DialogBoxParamA(ghInstance, "DLG_SAVE", hWnd, DebugSaveDialog, 0);
 					break;
 
 				case 40007:
-					DialogBoxParamA(ghInstance, "DLG_MUTE", hWnd, DebugMuteDialog, NULL);
+					DialogBoxParamA(ghInstance, "DLG_MUTE", hWnd, DebugMuteDialog, 0);
 					break;
 			}
 

@@ -109,7 +109,7 @@ typedef struct OrgData
 	void PlayData(void);
 	void SetPlayPointer(long x);	// 再生ポインターを指定の位置に設定 (Set playback pointer to specified position)
 	// 以下はファイル関係 (The following are related to files)
-	BOOL OrgData::InitMusicData(const char *path);
+	BOOL InitMusicData(const char *path);
 } ORGDATA;
 
 ORGDATA org_data;
@@ -765,7 +765,7 @@ BOOL QuitMMTimer();
 //グローバル変数 (Global variable)
 /*■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■*/
 static UINT ExactTime   = 13;	// 最小精度 (Minimum accuracy)
-static UINT TimerID     = NULL;
+static UINT TimerID;
 static BOOL nameless_flag;
 
 /*■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■*/
@@ -799,7 +799,7 @@ BOOL InitMMTimer()
 /*■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■*/
 BOOL StartTimer(DWORD dwTimer)
 {
-	MMRESULT ret = NULL;
+	MMRESULT ret = MMSYSERR_NOERROR;
 	ExactTime = dwTimer;
 
 	// タイマーを生成する (Generate timer)
@@ -808,7 +808,7 @@ BOOL StartTimer(DWORD dwTimer)
 		dwTimer,                   // タイマー時間 (Timer time)
 		10,                        // 許容できるタイマー精度 (Acceptable timer accuracy)
 		(LPTIMECALLBACK)TimerProc, // コールバックプロシージャ (Callback procedure)
-		NULL,                      // ユーザーがコールバック関数のdwUserに送る情報値 (Information value sent by user to dwUser in callback function)
+		0,                         // ユーザーがコールバック関数のdwUserに送る情報値 (Information value sent by user to dwUser in callback function)
 		TIME_PERIODIC              // タイマー時間毎にイベントを発生させる (Generate an event every timer time)
 	);
 

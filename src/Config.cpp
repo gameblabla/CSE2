@@ -5,7 +5,6 @@
 #include "WindowsWrapper.h"
 
 #include "Config.h"
-#include "File.h"
 #include "Tags.h"
 
 static const char* const config_filename = "Config.dat";	// Not the original name
