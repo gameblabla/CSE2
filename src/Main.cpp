@@ -300,6 +300,12 @@ int main(int argc, char *argv[])
 	SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
 #endif
 
+	if (CheckFileExists("fps"))
+		bFps = TRUE;
+
+	if (!bFullscreen)
+		LoadWindowRect(hWnd, "window.rect", FALSE);
+
 	// Set rects
 	RECT rcLoading = {0, 0, 64, 8};
 	RECT rcFull = {0, 0, 0, 0};
