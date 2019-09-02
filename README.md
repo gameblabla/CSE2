@@ -1,9 +1,3 @@
-This branch is still a work-in-progress - a lot of this readme is outdated.
-
-All you really need to know is that this branch can only be compiled with MSVC2003 (and possibly newer versions), and that it has no outside dependencies.
-
-This branch is focussed on accuracy, down to using the original DirectX code.
-
 # Cave Story Engine 2
 
 Cave Story Engine 2 is a decompilation of Cave Story.
@@ -12,12 +6,12 @@ Cave Story Engine 2 is a decompilation of Cave Story.
 
 ## Building
 
-### Makefile
+### Makefile (MinGW-w64)
 
 Run 'make' in this folder, preferably with some of the following settings:
 
 * `RELEASE=1` - Compile a release build (optimised, stripped, etc.)
-* `STATIC=1` - Produce a statically-linked executable (good for Windows builds, so you don't need to bundle DLL files)
+* `STATIC=1` - Produce a statically-linked executable (so you don't need to bundle DLL files)
 * `JAPANESE=1` - Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
 * `FIX_BUGS=1` - Fix bugs in the game (see [src/Bug Fixes.txt](src/Bug%20Fixes.txt))
 * `DEBUG_SAVE=1` - Re-enable the dummied-out 'Debug Save' option, and the ability to drag-and-drop save files onto the window
