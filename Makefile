@@ -127,7 +127,7 @@ DEPENDENCIES = $(addprefix obj/$(FILENAME)/, $(addsuffix .o.d, $(SOURCES)))
 
 OBJECTS += obj/$(FILENAME)/resources.o
 
-all: $(BUILD_DIRECTORY)/$(FILENAME) $(BUILD_DIRECTORY)/data
+all: $(BUILD_DIRECTORY)/$(FILENAME) $(BUILD_DIRECTORY)/data $(BUILD_DIRECTORY)/$(DOCONFIG_FILENAME)
 	@echo Finished
 
 $(BUILD_DIRECTORY)/data: $(DATA_DIRECTORY)
