@@ -562,7 +562,7 @@ BOOL SystemTask(void)
 				break;
 
 			case SDL_WINDOWEVENT:
-				switch (event.window.type)
+				switch (event.window.event)
 				{
 					case SDL_WINDOWEVENT_FOCUS_LOST:
 						InactiveWindow();
