@@ -41,11 +41,14 @@ ifeq ($(DEBUG_SAVE), 1)
 	CXXFLAGS += -DDEBUG_SAVE
 endif
 
-CXXFLAGS += -std=c++98 -MMD -MP -MF $@.d -DWINDOWS -DNONPORTABLE
+CXXFLAGS += -std=c++98 -MMD -MP -MF $@.d -DWINDOWS -DNONPORTABLE `pkg-config sdl2 --cflags`
 LIBS += -lkernel32 -lgdi32 -lddraw -ldinput -ldsound -lversion -lshlwapi -limm32 -lwinmm -ldxguid
 
 ifeq ($(STATIC), 1)
 	LDFLAGS += -static
+	LIBS += `pkg-config sdl2 --libs --static`
+else
+	LIBS += `pkg-config sdl2 --libs`
 endif
 
 SOURCES = \

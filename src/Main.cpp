@@ -6,6 +6,9 @@
 
 #include <shlwapi.h>
 
+#include "SDL.h"
+#include "SDL_syswm.h"
+
 #include "WindowsWrapper.h"
 
 #include "CommonDefines.h"
@@ -22,8 +25,6 @@
 #include "Sound.h"
 #include "Triangle.h"
 
-LRESULT __stdcall WindowProcedure(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
-
 char gModulePath[MAX_PATH];
 char gDataPath[MAX_PATH];
 
@@ -38,7 +39,6 @@ static BOOL bActive = TRUE;
 
 static HANDLE hObject;
 static HANDLE hMutex;
-static HINSTANCE ghInstance;
 
 static int windowWidth;
 static int windowHeight;
@@ -46,18 +46,10 @@ static int windowHeight;
 static const char *mutex_name = "Doukutsu";
 
 #ifdef JAPANESE
-static const char *lpWindowName = "\x93\xB4\x8C\x41\x95\xA8\x8C\xEA";
+static const char *lpWindowName = "洞窟物語";
 #else
 static const char *lpWindowName = "Cave Story ~ Doukutsu Monogatari";
 #endif
-
-void SetWindowName(HWND hWnd)
-{
-	char window_name[0x100];
-
-	sprintf(window_name, "%s", lpWindowName);
-	SetWindowTextA(hWnd, window_name);
-}
 
 // Framerate stuff
 void PutFramePerSecound(void)
@@ -96,8 +88,11 @@ unsigned long GetFramePerSecound(void)
 	return frames_this_second;
 }
 
-int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
+int main(int argc, char *argv[])
 {
+	(void)argc;
+	(void)argv;
+
 	int i;
 
 	hObject = OpenMutexA(MUTEX_ALL_ACCESS, 0, mutex_name);
@@ -108,8 +103,6 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 	}
 
 	hMutex = CreateMutexA(NULL, FALSE, mutex_name);
-
-	ghInstance = hInstance;
 
 	// Get executable's path
 	GetModuleFileNameA(NULL, gModulePath, MAX_PATH);
@@ -210,35 +203,16 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 
 	RECT unused_rect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
-	WNDCLASSEXA wndclassex;
-	memset(&wndclassex, 0, sizeof(WNDCLASSEXA));
-	wndclassex.cbSize = sizeof(WNDCLASSEXA);
-	wndclassex.lpfnWndProc = WindowProcedure;
-	wndclassex.hInstance = hInstance;
-	wndclassex.hbrBackground = (HBRUSH)GetStockObject(DKGRAY_BRUSH);	// This is what gives the window's undrawn regions its grey colour
-	wndclassex.lpszClassName = lpWindowName;
-	wndclassex.hCursor = LoadCursorA(hInstance, "CURSOR_NORMAL");
-	wndclassex.hIcon = LoadIconA(hInstance, "0");
-	wndclassex.hIconSm = LoadIconA(hInstance, "ICON_MINI");
+	SDL_Init(SDL_INIT_EVENTS);
 
 	HWND hWnd;
-	HMENU hMenu;
-	int nWidth;
-	int nHeight;
-	int x;
-	int y;
+	SDL_Window *window;
+	SDL_SysWMinfo info;
 
 	switch (conf.display_mode)
 	{
 		case 1:
 		case 2:
-			wndclassex.lpszMenuName = "MENU_MAIN";
-			if (RegisterClassExA(&wndclassex) == 0)
-			{
-				ReleaseMutex(hMutex);
-				return 0;
-			}
-
 			// Set window dimensions
 			if (conf.display_mode == 1)
 			{
@@ -251,23 +225,21 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 				windowHeight = WINDOW_HEIGHT * 2;
 			}
 
-			nWidth = windowWidth + 2 * GetSystemMetrics(SM_CXFIXEDFRAME) + 2;
-			nHeight = (2 * GetSystemMetrics(SM_CYFIXEDFRAME) + GetSystemMetrics(SM_CYCAPTION)) + GetSystemMetrics(SM_CYMENU) + windowHeight + 2;
-			x = (GetSystemMetrics(SM_CXSCREEN) - nWidth) / 2;
-			y = (GetSystemMetrics(SM_CYSCREEN) - nHeight) / 2;
+			SetWindowPadding(GetSystemMetrics(SM_CXFIXEDFRAME) + 1, GetSystemMetrics(SM_CYFIXEDFRAME) + GetSystemMetrics(SM_CYCAPTION) + 1);
 
-			SetWindowPadding(GetSystemMetrics(SM_CXFIXEDFRAME) + 1, GetSystemMetrics(SM_CYFIXEDFRAME) + GetSystemMetrics(SM_CYCAPTION) + GetSystemMetrics(SM_CYMENU) + 1);
+			window = SDL_CreateWindow(lpWindowName, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, 0);
 
-			hWnd = CreateWindowExA(WS_EX_LEFT | WS_EX_LTRREADING | WS_EX_RIGHTSCROLLBAR, lpWindowName, lpWindowName, WS_MINIMIZEBOX | WS_SYSMENU | WS_BORDER | WS_DLGFRAME | WS_VISIBLE, x, y, nWidth, nHeight, NULL, NULL, hInstance, NULL);
-			ghWnd = hWnd;
-
-			if (hWnd == NULL)
+			if (window == NULL)
 			{
 				ReleaseMutex(hMutex);
 				return 0;
 			}
 
-			hMenu = GetMenu(hWnd);
+			SDL_VERSION(&info.version);
+			SDL_GetWindowWMInfo(window, &info);
+			hWnd = info.info.win.window;
+
+			ghWnd = hWnd;
 
 			if (conf.display_mode == 1)
 				StartDirectDraw(hWnd, 0, 0);
@@ -279,19 +251,24 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 		case 0:
 		case 3:
 		case 4:
-			if (RegisterClassExA(&wndclassex) == 0)
-			{
-				ReleaseMutex(hMutex);
-				return 0;
-			}
-
 			// Set window dimensions
 			windowWidth = WINDOW_WIDTH * 2;
 			windowHeight = WINDOW_HEIGHT * 2;
 
 			SetWindowPadding(0, 0);
 
-			hWnd = CreateWindowExA(WS_EX_LEFT | WS_EX_LTRREADING | WS_EX_RIGHTSCROLLBAR, lpWindowName, lpWindowName, WS_SYSMENU | WS_VISIBLE | WS_POPUP, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), NULL, NULL, hInstance, NULL);
+			window = SDL_CreateWindow(lpWindowName, 0, 0, windowWidth, windowHeight, SDL_WINDOW_FULLSCREEN);
+
+			if (window == NULL)
+			{
+				ReleaseMutex(hMutex);
+				return 0;
+			}
+
+			SDL_VERSION(&info.version);
+			SDL_GetWindowWMInfo(window, &info);
+			hWnd = info.info.win.window;
+
 			ghWnd = hWnd;
 
 			if (hWnd == NULL)
@@ -319,9 +296,12 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 			StartDirectDraw(ghWnd, 2, depth);
 			bFullscreen = TRUE;
 
-			ShowCursor(FALSE);
 			break;
 	}
+
+#ifdef DEBUG_SAVE
+	SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
+#endif
 
 	// Set rects
 	RECT rcLoading = {0, 0, 64, 8};
@@ -348,7 +328,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 		InitDirectSound(hWnd);
 
 		// Initialize joystick
-		if (conf.bJoystick && InitDirectInput(hInstance, hWnd))
+		if (conf.bJoystick && InitDirectInput(info.info.win.hinstance, hWnd))
 		{
 			ResetJoystickStatus();
 			gbUseJoystick = TRUE;
@@ -397,340 +377,208 @@ void ActiveWindow(void)
 	PlaySoundObject(7, -1);
 }
 
-// Turns out you could drag-and-drop a save file onto the
-// window to load it, but this behavior is dummied-out.
-BOOL DragAndDropHandler(HWND hWnd, WPARAM wParam)
-{
-	char path[MAX_PATH];
-	HDROP hDrop = (HDROP)wParam;
-
-	if (DragQueryFileA(hDrop, 0xFFFFFFFF, NULL, 0) != 0)
-	{
-		DragQueryFileA(hDrop, 0, path, sizeof(path));
-		LoadProfile(path);
-	}
-
-	DragFinish(hDrop);
-
-	return TRUE;
-}
-
-LRESULT __stdcall WindowProcedure(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
-{
-	BOOL window_focus;
-	HMENU hMenu;
-
-	switch (Msg)
-	{
-		case WM_CREATE:
-			hMenu = GetMenu(hWnd);
-		#ifdef DEBUG_SAVE
-			if (!CheckFileExists("save"))	// Chances are a line like this used to exist
-		#endif
-				DeleteMenu(hMenu, 40005, MF_BYCOMMAND);
-			DrawMenuBar(hWnd);
-
-			hMenu = GetMenu(hWnd);
-			if (!CheckFileExists("mute"))
-				DeleteMenu(hMenu, 40007, MF_BYCOMMAND);
-			DrawMenuBar(hWnd);
-
-			if (CheckFileExists("fps"))
-				bFps = TRUE;
-
-			if (!bFullscreen)
-				LoadWindowRect(hWnd, "window.rect", FALSE);
-
-			SetWindowName(hWnd);
-
-		#ifdef DEBUG_SAVE
-			DragAcceptFiles(hWnd, TRUE);
-		#endif
-
-			break;
-
-		case WM_SYSCOMMAND:
-			switch (wParam)
-			{
-				case SC_MONITORPOWER:
-					break;
-
-				case SC_KEYMENU:
-					break;
-
-				case SC_SCREENSAVE:
-					break;
-
-				default:
-					DefWindowProcA(hWnd, Msg, wParam, lParam);
-					break;
-			}
-
-			break;
-
-		case WM_IME_NOTIFY:
-			if (wParam == IMN_SETOPENSTATUS)
-			{
-				HIMC hImc = ImmGetContext(hWnd);
-				ImmSetOpenStatus(hImc, 0);
-				ImmReleaseContext(hWnd, hImc);
-			}
-
-			break;
-
-		case WM_KEYDOWN:
-			switch (wParam)
-			{
-				case VK_ESCAPE:
-					gKey |= KEY_ESCAPE;
-					break;
-
-				case 'W':
-					gKey |= KEY_MAP;
-					break;
-
-				case VK_LEFT:
-					gKey |= KEY_LEFT;
-					break;
-
-				case VK_RIGHT:
-					gKey |= KEY_RIGHT;
-					break;
-
-				case VK_UP:
-					gKey |= KEY_UP;
-					break;
-
-				case VK_DOWN:
-					gKey |= KEY_DOWN;
-					break;
-
-				case 'X':
-					gKey |= KEY_X;
-					break;
-
-				case 'Z':
-					gKey |= KEY_Z;
-					break;
-
-				case 'S':
-					gKey |= KEY_ARMS;
-					break;
-
-				case 'A':
-					gKey |= KEY_ARMSREV;
-					break;
-
-				case VK_SHIFT:
-					gKey |= KEY_SHIFT;
-					break;
-
-				case VK_F1:
-					gKey |= KEY_F1;
-					break;
-
-				case VK_F2:
-					gKey |= KEY_F2;
-					break;
-
-				case 'Q':
-					gKey |= KEY_ITEM;
-					break;
-
-				case VK_OEM_COMMA:
-					gKey |= KEY_ALT_LEFT;
-					break;
-
-				case VK_OEM_PERIOD:
-					gKey |= KEY_ALT_DOWN;
-					break;
-
-				case VK_OEM_2:
-					gKey |= KEY_ALT_RIGHT;
-					break;
-
-				case 'L':
-					gKey |= KEY_L;
-					break;
-
-				case VK_OEM_PLUS:
-					gKey |= KEY_PLUS;
-					break;
-
-				case VK_F5:
-					gbUseJoystick = FALSE;
-					break;
-			}
-
-			break;
-
-		case WM_KEYUP:
-			switch (wParam)
-			{
-				case VK_ESCAPE:
-					gKey &= ~KEY_ESCAPE;
-					break;
-
-				case 'W':
-					gKey &= ~KEY_MAP;
-					break;
-
-				case VK_LEFT:
-					gKey &= ~KEY_LEFT;
-					break;
-
-				case VK_RIGHT:
-					gKey &= ~KEY_RIGHT;
-					break;
-
-				case VK_UP:
-					gKey &= ~KEY_UP;
-					break;
-
-				case VK_DOWN:
-					gKey &= ~KEY_DOWN;
-					break;
-
-				case 'X':
-					gKey &= ~KEY_X;
-					break;
-
-				case 'Z':
-					gKey &= ~KEY_Z;
-					break;
-
-				case 'S':
-					gKey &= ~KEY_ARMS;
-					break;
-
-				case 'A':
-					gKey &= ~KEY_ARMSREV;
-					break;
-
-				case VK_SHIFT:
-					gKey &= ~KEY_SHIFT;
-					break;
-
-				case VK_F1:
-					gKey &= ~KEY_F1;
-					break;
-
-				case VK_F2:
-					gKey &= ~KEY_F2;
-					break;
-
-				case 'Q':
-					gKey &= ~KEY_ITEM;
-					break;
-
-				case VK_OEM_COMMA:
-					gKey &= ~KEY_ALT_LEFT;
-					break;
-
-				case VK_OEM_PERIOD:
-					gKey &= ~KEY_ALT_DOWN;
-					break;
-
-				case VK_OEM_2:
-					gKey &= ~KEY_ALT_RIGHT;
-					break;
-
-				case 'L':
-					gKey &= ~KEY_L;
-					break;
-
-				case VK_OEM_PLUS:
-					gKey &= ~KEY_PLUS;
-					break;
-			}
-
-			break;
-
-		case WM_COMMAND:
-			switch (LOWORD(wParam))
-			{
-				case 40001:
-					if (DialogBoxParamA(ghInstance, "DLG_YESNO", hWnd, QuitDialog, (LPARAM)"Quit?") == 1)
-						PostMessageA(hWnd, WM_CLOSE, 0, 0);
-					break;
-
-				case 40002:
-					DialogBoxParamA(ghInstance, "DLG_ABOUT", hWnd, VersionDialog, 0);
-					break;
-
-				case 40004:
-					if (!OpenVolumeConfiguration(hWnd))
-					#ifdef JAPANESE
-						MessageBoxA(hWnd, "â{âèâàü[âÇÉ¦ÆÞé­ïNô«é+é½é_é¦é±é+éÁé¢", lpWindowName, 0);
-					#else
-						MessageBoxA(hWnd, "Could not launch volume configuration", lpWindowName, 0);
-					#endif
-					break;
-
-				case 40005:
-					DialogBoxParamA(ghInstance, "DLG_SAVE", hWnd, DebugSaveDialog, 0);
-					break;
-
-				case 40007:
-					DialogBoxParamA(ghInstance, "DLG_MUTE", hWnd, DebugMuteDialog, 0);
-					break;
-			}
-
-			break;
-
-		case WM_DROPFILES:
-			DragAndDropHandler(hWnd, wParam);
-			break;
-
-		case WM_ACTIVATE:
-			switch (LOWORD(wParam))
-			{
-				case WA_INACTIVE:
-					window_focus = FALSE;
-					break;
-
-				case WA_ACTIVE:
-				case WA_CLICKACTIVE:
-					if (HIWORD(wParam) != 0)
-						window_focus = FALSE;
-					else
-						window_focus = TRUE;
-
-					break;
-			}
-
-			if (window_focus)
-				ActiveWindow();
-			else
-				InactiveWindow();
-
-			break;
-
-		case WM_CLOSE:
-			StopOrganyaMusic();
-			PostQuitMessage(0);
-			break;
-
-		default:
-			return DefWindowProcA(hWnd, Msg, wParam, lParam);
-	}
-
-	return 1;
-}
-
 void JoystickProc(void);
 
 BOOL SystemTask(void)
 {
-	MSG Msg;
-
-	while (PeekMessageA(&Msg, NULL, 0, 0, PM_NOREMOVE) || !bActive)
+	SDL_Event event;
+	while (SDL_PollEvent(&event) || !bActive)
 	{
-		if (!GetMessageA(&Msg, NULL, 0, 0))
-			return FALSE;
+		switch (event.type)
+		{
+			case SDL_KEYDOWN:
+				switch (event.key.keysym.sym)
+				{
+					case SDLK_ESCAPE:
+						gKey |= KEY_ESCAPE;
+						break;
 
-		TranslateMessage(&Msg);
-		DispatchMessageA(&Msg);
+					case SDLK_w:
+						gKey |= KEY_MAP;
+						break;
+
+					case SDLK_LEFT:
+						gKey |= KEY_LEFT;
+						break;
+
+					case SDLK_RIGHT:
+						gKey |= KEY_RIGHT;
+						break;
+
+					case SDLK_UP:
+						gKey |= KEY_UP;
+						break;
+
+					case SDLK_DOWN:
+						gKey |= KEY_DOWN;
+						break;
+
+					case SDLK_x:
+						gKey |= KEY_X;
+						break;
+
+					case SDLK_z:
+						gKey |= KEY_Z;
+						break;
+
+					case SDLK_s:
+						gKey |= KEY_ARMS;
+						break;
+
+					case SDLK_a:
+						gKey |= KEY_ARMSREV;
+						break;
+
+					case SDLK_LSHIFT:
+					case SDLK_RSHIFT:
+						gKey |= KEY_SHIFT;
+						break;
+
+					case SDLK_F1:
+						gKey |= KEY_F1;
+						break;
+
+					case SDLK_F2:
+						gKey |= KEY_F2;
+						break;
+
+					case SDLK_q:
+						gKey |= KEY_ITEM;
+						break;
+
+					case SDLK_COMMA:
+						gKey |= KEY_ALT_LEFT;
+						break;
+
+					case SDLK_PERIOD:
+						gKey |= KEY_ALT_DOWN;
+						break;
+
+					case SDLK_SLASH:
+						gKey |= KEY_ALT_RIGHT;
+						break;
+
+					case SDLK_l:
+						gKey |= KEY_L;
+						break;
+
+					case SDLK_PLUS:
+						gKey |= KEY_PLUS;
+						break;
+
+					case SDLK_F5:
+						gbUseJoystick = FALSE;
+						break;
+				}
+
+				break;
+
+			case SDL_KEYUP:
+				switch (event.key.keysym.sym)
+				{
+					case SDLK_ESCAPE:
+						gKey &= ~KEY_ESCAPE;
+						break;
+
+					case SDLK_w:
+						gKey &= ~KEY_MAP;
+						break;
+
+					case SDLK_LEFT:
+						gKey &= ~KEY_LEFT;
+						break;
+
+					case SDLK_RIGHT:
+						gKey &= ~KEY_RIGHT;
+						break;
+
+					case SDLK_UP:
+						gKey &= ~KEY_UP;
+						break;
+
+					case SDLK_DOWN:
+						gKey &= ~KEY_DOWN;
+						break;
+
+					case SDLK_x:
+						gKey &= ~KEY_X;
+						break;
+
+					case SDLK_z:
+						gKey &= ~KEY_Z;
+						break;
+
+					case SDLK_s:
+						gKey &= ~KEY_ARMS;
+						break;
+
+					case SDLK_a:
+						gKey &= ~KEY_ARMSREV;
+						break;
+
+					case SDLK_LSHIFT:
+					case SDLK_RSHIFT:
+						gKey &= ~KEY_SHIFT;
+						break;
+
+					case SDLK_F1:
+						gKey &= ~KEY_F1;
+						break;
+
+					case SDLK_F2:
+						gKey &= ~KEY_F2;
+						break;
+
+					case SDLK_q:
+						gKey &= ~KEY_ITEM;
+						break;
+
+					case SDLK_COMMA:
+						gKey &= ~KEY_ALT_LEFT;
+						break;
+
+					case SDLK_PERIOD:
+						gKey &= ~KEY_ALT_DOWN;
+						break;
+
+					case SDLK_SLASH:
+						gKey &= ~KEY_ALT_RIGHT;
+						break;
+
+					case SDLK_l:
+						gKey &= ~KEY_L;
+						break;
+
+					case SDLK_PLUS:
+						gKey &= ~KEY_PLUS;
+						break;
+				}
+
+				break;
+
+			case SDL_DROPFILE:
+				LoadProfile(event.drop.file);
+				SDL_free(event.drop.file);
+				break;
+
+			case SDL_WINDOWEVENT:
+				switch (event.window.type)
+				{
+					case SDL_WINDOWEVENT_FOCUS_LOST:
+						InactiveWindow();
+						break;
+
+					case SDL_WINDOWEVENT_FOCUS_GAINED:
+						ActiveWindow();
+						break;
+				}
+
+				break;
+
+			case SDL_QUIT:
+				StopOrganyaMusic();
+				return FALSE;
+		}
 	}
 
 	// Run joystick code
