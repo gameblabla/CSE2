@@ -41,7 +41,10 @@ BOOL InitDirectSound(HWND hwnd)
 	if (DirectSoundCreate(NULL, &lpDS, NULL) != DS_OK)
 	{
 		lpDS = NULL;
+#ifndef FIX_BUGS
+		// This makes absolutely no sense here
 		StartOrganya(lpDS, "Org\\Wave.dat");
+#endif
 		return FALSE;
 	}
 
