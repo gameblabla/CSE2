@@ -607,7 +607,7 @@ BOOL OrgData::InitMusicData(const char *path)
 	char pass_check[6];
 	char ver = 0;
 
-	HRSRC hrscr = FindResourceA(0, path, "ORG");
+	HRSRC hrscr = FindResourceA(NULL, path, "ORG");
 	if (hrscr == NULL)
 		return FALSE;
 
