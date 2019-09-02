@@ -10,7 +10,7 @@ ifeq ($(RELEASE), 1)
 	FILENAME_DEF = CSE2
 	DOCONFIG_FILENAME_DEF = DoConfig
 else
-	CXXFLAGS = -Og -gdb3
+	CXXFLAGS = -Og -ggdb3
 	FILENAME_DEF = CSE2_debug
 	DOCONFIG_FILENAME_DEF = DoConfig_debug
 endif
@@ -41,7 +41,7 @@ ifeq ($(DEBUG_SAVE), 1)
 endif
 
 CXXFLAGS += -std=c++98 -MMD -MP -MF $@.d -DWINDOWS -DNONPORTABLE
-LIBS += -lkernel32 -lgdi32 -lddraw -ldinput -ldsound -lVersion -lShLwApi -lImm32 -lWinMM -ldxguid
+LIBS += -lkernel32 -lgdi32 -lddraw -ldinput -ldsound -lversion -lshlwapi -limm32 -lwinmm -ldxguid
 
 ifeq ($(STATIC), 1)
 	LDFLAGS += -static
@@ -145,7 +145,7 @@ include $(wildcard $(DEPENDENCIES))
 
 obj/$(FILENAME)/resources.o: msvc2003/CSE2.rc
 	@mkdir -p $(@D)
-	@windres $< $@
+	@$(WINDRES) $< $@
 
 $(BUILD_DIRECTORY)/$(DOCONFIG_FILENAME): DoConfig/DoConfig.cpp
 	@mkdir -p $(@D)
