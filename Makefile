@@ -4,11 +4,8 @@ NATIVECXX = c++
 BUILD_DIRECTORY = game
 ASSETS_DIRECTORY = assets
 
-# Default options
-RENDERER ?= Texture
-
 ifeq ($(RELEASE), 1)
-	CXXFLAGS = -O3 -flto
+	CXXFLAGS = -O3
 	LDFLAGS = -s
 	FILENAME_DEF = CSE2
 	DOCONFIG_FILENAME_DEF = DoConfig
@@ -33,29 +30,23 @@ ifeq ($(FIX_BUGS), 1)
 	CXXFLAGS += -DFIX_BUGS
 endif
 
-ifeq ($(WINDOWS), 1)
-	ifeq ($(CONSOLE), 1)
-		CXXFLAGS += -mconsole
-	endif
-
-	CXXFLAGS += -DWINDOWS
-	LIBS += -lkernel32
+ifeq ($(CONSOLE), 1)
+	CXXFLAGS += -mconsole
+else
+	CXXFLAGS += -mwindows
 endif
 
-ifeq ($(RASPBERRY_PI), 1)
-	CXXFLAGS += -DRASPBERRY_PI
+ifeq ($(DEBUG_SAVE), 1)
+	CXXFLAGS += -DDEBUG_SAVE
 endif
 
-CXXFLAGS += -std=c++98 -Iexternal `pkg-config sdl2 --cflags` `pkg-config freetype2 --cflags` -MMD -MP -MF $@.d
+CXXFLAGS += -std=c++98 -MMD -MP -MF $@.d -DWINDOWS -DNONPORTABLE
+LIBS += -lkernel32 -lgdi32 -lddraw -ldinput -ldsound -lVersion -lShLwApi -lImm32 -lWinMM -ldxguid
 
 ifeq ($(STATIC), 1)
 	LDFLAGS += -static
-	LIBS += `pkg-config sdl2 --libs --static` `pkg-config freetype2 --libs --static` -lfreetype
-else
-	LIBS += `pkg-config sdl2 --libs` `pkg-config freetype2 --libs`
 endif
 
-# For an accurate result to the original's code, compile in alphabetical order
 SOURCES = \
 	src/ArmsItem \
 	src/Back \
@@ -74,14 +65,13 @@ SOURCES = \
 	src/Bullet \
 	src/Caret \
 	src/Config \
+	src/Dialog \
 	src/Draw \
 	src/Ending \
 	src/Escape \
 	src/Fade \
-	src/File \
 	src/Flags \
 	src/Flash \
-	src/Font \
 	src/Frame \
 	src/Game \
 	src/Generic \
@@ -119,7 +109,6 @@ SOURCES = \
 	src/Organya \
 	src/PixTone \
 	src/Profile \
-	src/Resource \
 	src/SelStage \
 	src/Shoot \
 	src/Sound \
@@ -129,119 +118,12 @@ SOURCES = \
 	src/Triangle \
 	src/ValueView
 
-RESOURCES = \
-	BITMAP/Credit01.bmp \
-	BITMAP/Credit02.bmp \
-	BITMAP/Credit03.bmp \
-	BITMAP/Credit04.bmp \
-	BITMAP/Credit05.bmp \
-	BITMAP/Credit06.bmp \
-	BITMAP/Credit07.bmp \
-	BITMAP/Credit08.bmp \
-	BITMAP/Credit09.bmp \
-	BITMAP/Credit10.bmp \
-	BITMAP/Credit11.bmp \
-	BITMAP/Credit12.bmp \
-	BITMAP/Credit14.bmp \
-	BITMAP/Credit15.bmp \
-	BITMAP/Credit16.bmp \
-	BITMAP/Credit17.bmp \
-	BITMAP/Credit18.bmp \
-	CURSOR/CURSOR_IKA.bmp \
-	CURSOR/CURSOR_NORMAL.bmp \
-	ORG/Access.org \
-	ORG/Anzen.org \
-	ORG/Balcony.org \
-	ORG/Ballos.org \
-	ORG/BreakDown.org \
-	ORG/Cemetery.org \
-	ORG/Curly.org \
-	ORG/Dr.org \
-	ORG/Ending.org \
-	ORG/Escape.org \
-	ORG/Fanfale1.org \
-	ORG/Fanfale2.org \
-	ORG/Fanfale3.org \
-	ORG/FireEye.org \
-	ORG/Gameover.org \
-	ORG/Ginsuke.org \
-	ORG/Grand.org \
-	ORG/Gravity.org \
-	ORG/Hell.org \
-	ORG/ironH.org \
-	ORG/Jenka.org \
-	ORG/Jenka2.org \
-	ORG/Kodou.org \
-	ORG/LastBtl3.org \
-	ORG/LastBtl.org \
-	ORG/LastCave.org \
-	ORG/Marine.org \
-	ORG/Maze.org \
-	ORG/MDown2.org \
-	ORG/Mura.org \
-	ORG/Oside.org \
-	ORG/Plant.org \
-	ORG/quiet.org \
-	ORG/Requiem.org \
-	ORG/Toroko.org \
-	ORG/Vivi.org \
-	ORG/Wanpak2.org \
-	ORG/Wanpaku.org \
-	ORG/Weed.org \
-	ORG/White.org \
-	ORG/XXXX.org \
-	ORG/Zonbie.org \
-	WAVE/Wave.dat
-
-ifeq ($(JAPANESE), 1)
-	RESOURCES += BITMAP/pixel_jp.bmp
-	RESOURCES += FONT/msgothic.ttc
-else
-	RESOURCES += BITMAP/pixel.bmp
-
-	ifneq ($(WINDOWS), 1)
-		RESOURCES += FONT/cour.ttf
-	endif
-endif
-
-ifneq ($(WINDOWS), 1)
-	RESOURCES += ICON/ICON_MINI.bmp
-endif
-
-ifeq ($(RENDERER), OpenGL3)
-	SOURCES += src/Backends/Rendering/OpenGL3
-	CXXFLAGS += `pkg-config glew --cflags`
-
-	ifeq ($(STATIC), 1)
-		CXXFLAGS += -DGLEW_STATIC
-		LIBS += `pkg-config glew --libs --static`
-	else
-		LIBS += `pkg-config glew --libs`
-	endif
-
-	ifeq ($(WINDOWS), 1)
-		LIBS += -lopengl32
-	else
-		LIBS += -lGL
-	endif
-else ifeq ($(RENDERER), Texture)
-	SOURCES += src/Backends/Rendering/SDLTexture
-else ifeq ($(RENDERER), Surface)
-	SOURCES += src/Backends/Rendering/SDLSurface
-else ifeq ($(RENDERER), Software)
-	SOURCES += src/Backends/Rendering/Software
-else
-	@echo Invalid RENDERER selected; this build will fail
-endif
-
 OBJECTS = $(addprefix obj/$(FILENAME)/, $(addsuffix .o, $(SOURCES)))
 DEPENDENCIES = $(addprefix obj/$(FILENAME)/, $(addsuffix .o.d, $(SOURCES)))
 
-ifeq ($(WINDOWS), 1)
-	OBJECTS += obj/$(FILENAME)/win_icon.o
-endif
+OBJECTS += obj/$(FILENAME)/resources.o
 
-all: $(BUILD_DIRECTORY)/$(FILENAME) $(BUILD_DIRECTORY)/data $(BUILD_DIRECTORY)/$(DOCONFIG_FILENAME)
+all: $(BUILD_DIRECTORY)/$(FILENAME) $(BUILD_DIRECTORY)/data
 	@echo Finished
 
 $(BUILD_DIRECTORY)/data: $(DATA_DIRECTORY)
@@ -259,24 +141,9 @@ obj/$(FILENAME)/%.o: %.cpp
 	@echo Compiling $<
 	@$(CXX) $(CXXFLAGS) $< -o $@ -c
 
-obj/$(FILENAME)/Resource.o: src/Resource.cpp $(addprefix src/Resource/, $(addsuffix .h, $(RESOURCES)))
-	@mkdir -p $(@D)
-	@echo Compiling $<
-	@$(CXX) $(CXXFLAGS) $< -o $@ -c
-
-src/Resource/%.h: $(ASSETS_DIRECTORY)/resources/% obj/bin2h
-	@mkdir -p $(@D)
-	@echo Converting $<
-	@obj/bin2h $< $@
-
-obj/bin2h: bin2h/bin2h.c
-	@mkdir -p $(@D)
-	@echo Compiling $^
-	@$(NATIVECC) -O3 -s -std=c90 -Wall -Wextra -pedantic $^ -o $@
-
 include $(wildcard $(DEPENDENCIES))
 
-obj/$(FILENAME)/win_icon.o: $(ASSETS_DIRECTORY)/resources/ICON/ICON.rc $(ASSETS_DIRECTORY)/resources/ICON/0.ico $(ASSETS_DIRECTORY)/resources/ICON/ICON_MINI.ico
+obj/$(FILENAME)/resources.o: msvc2003/CSE2.rc
 	@mkdir -p $(@D)
 	@windres $< $@
 
