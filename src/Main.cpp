@@ -326,7 +326,7 @@ int main(int argc, char *argv[])
 		InitDirectSound(hWnd);
 
 		// Initialize joystick
-		if (conf.bJoystick && InitDirectInput(info.info.win.hinstance, hWnd))
+		if (conf.bJoystick && InitDirectInput())
 		{
 			ResetJoystickStatus();
 			gbUseJoystick = TRUE;
