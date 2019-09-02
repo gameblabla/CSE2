@@ -46,7 +46,7 @@ static int windowHeight;
 static const char *mutex_name = "Doukutsu";
 
 #ifdef JAPANESE
-static const char *lpWindowName = "\x93\xB4\x8C\x41\x95\xA8\x8C\xEA";
+static const char *lpWindowName = "\x93\xB4\x8C\x41\x95\xA8\x8C\xEA";	// '洞窟物語' (Cave Story) in Shift-JIS
 #else
 static const char *lpWindowName = "Cave Story ~ Doukutsu Monogatari";
 #endif
