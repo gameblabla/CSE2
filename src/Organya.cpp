@@ -14,6 +14,7 @@
 
 #include "WindowsWrapper.h"
 
+#include "Resource.h"
 #include "Sound.h"
 
 #define PANDUMMY 0xFF
@@ -358,20 +359,17 @@ signed char wave_data[100][0x100];
 
 BOOL InitWaveData100(void)
 {
-	HRSRC hrscr;
-	DWORD *lpdword;	// リソースのアドレス (Resource address)
+	const DWORD *lpdword;	// リソースのアドレス (Resource address)
 
 	if (lpDS == NULL)
 		return FALSE;
 
 	// リソースの検索 (Search for resources)
-	hrscr = FindResourceA(NULL, "WAVE100", "WAVE");
+	lpdword = (DWORD*)FindResource("WAVE100", "WAVE", NULL);
 
-	if (hrscr == NULL)
+	if (lpdword == NULL)
 		return FALSE;
 
-	// リソースのアドレスを取得 (Get resource address)
-	lpdword = (DWORD*)LockResource(LoadResource(NULL, hrscr));
 	memcpy(wave_data, lpdword, 100 * 0x100);
 
 	return TRUE;
@@ -607,11 +605,9 @@ BOOL OrgData::InitMusicData(const char *path)
 	char pass_check[6];
 	char ver = 0;
 
-	HRSRC hrscr = FindResourceA(NULL, path, "ORG");
-	if (hrscr == NULL)
+	const unsigned char *p = FindResource(path, "ORG", NULL);
+	if (p == NULL)
 		return FALSE;
-
-	unsigned char *p = (unsigned char*)LockResource(LoadResource(0, hrscr));
 
 	memcpy(&pass_check[0], p, 6);
 	p += 6;

@@ -116,6 +116,7 @@ SOURCES = \
 	src/Organya \
 	src/PixTone \
 	src/Profile \
+	src/Resource \
 	src/SelStage \
 	src/Shoot \
 	src/Sound \
@@ -124,6 +125,76 @@ SOURCES = \
 	src/TextScr \
 	src/Triangle \
 	src/ValueView
+
+RESOURCES = \
+	BITMAP/Credit01.bmp \
+	BITMAP/Credit02.bmp \
+	BITMAP/Credit03.bmp \
+	BITMAP/Credit04.bmp \
+	BITMAP/Credit05.bmp \
+	BITMAP/Credit06.bmp \
+	BITMAP/Credit07.bmp \
+	BITMAP/Credit08.bmp \
+	BITMAP/Credit09.bmp \
+	BITMAP/Credit10.bmp \
+	BITMAP/Credit11.bmp \
+	BITMAP/Credit12.bmp \
+	BITMAP/Credit14.bmp \
+	BITMAP/Credit15.bmp \
+	BITMAP/Credit16.bmp \
+	BITMAP/Credit17.bmp \
+	BITMAP/Credit18.bmp \
+	CURSOR/CURSOR_IKA.bmp \
+	CURSOR/CURSOR_NORMAL.bmp \
+	ORG/Access.org \
+	ORG/Anzen.org \
+	ORG/Balcony.org \
+	ORG/Ballos.org \
+	ORG/BreakDown.org \
+	ORG/Cemetery.org \
+	ORG/Curly.org \
+	ORG/Dr.org \
+	ORG/Ending.org \
+	ORG/Escape.org \
+	ORG/Fanfale1.org \
+	ORG/Fanfale2.org \
+	ORG/Fanfale3.org \
+	ORG/FireEye.org \
+	ORG/Gameover.org \
+	ORG/Ginsuke.org \
+	ORG/Grand.org \
+	ORG/Gravity.org \
+	ORG/Hell.org \
+	ORG/ironH.org \
+	ORG/Jenka.org \
+	ORG/Jenka2.org \
+	ORG/Kodou.org \
+	ORG/LastBtl3.org \
+	ORG/LastBtl.org \
+	ORG/LastCave.org \
+	ORG/Marine.org \
+	ORG/Maze.org \
+	ORG/MDown2.org \
+	ORG/Mura.org \
+	ORG/Oside.org \
+	ORG/Plant.org \
+	ORG/quiet.org \
+	ORG/Requiem.org \
+	ORG/Toroko.org \
+	ORG/Vivi.org \
+	ORG/Wanpak2.org \
+	ORG/Wanpaku.org \
+	ORG/Weed.org \
+	ORG/White.org \
+	ORG/XXXX.org \
+	ORG/Zonbie.org \
+	WAVE/Wave.dat
+
+ifeq ($(JAPANESE), 1)
+	RESOURCES += BITMAP/pixel_jp.bmp
+else
+	RESOURCES += BITMAP/pixel.bmp
+endif
 
 ifeq ($(RENDERER), OpenGL3)
 	SOURCES += src/Backends/Rendering/OpenGL3
@@ -173,6 +244,21 @@ obj/$(FILENAME)/%.o: %.cpp
 	@mkdir -p $(@D)
 	@echo Compiling $<
 	@$(CXX) $(CXXFLAGS) $< -o $@ -c
+
+obj/$(FILENAME)/Resource.o: src/Resource.cpp $(addprefix src/Resource/, $(addsuffix .h, $(RESOURCES)))
+	@mkdir -p $(@D)
+	@echo Compiling $<
+	@$(CXX) $(CXXFLAGS) $< -o $@ -c
+
+src/Resource/%.h: $(ASSETS_DIRECTORY)/resources/% obj/bin2h
+	@mkdir -p $(@D)
+	@echo Converting $<
+	@obj/bin2h $< $@
+
+obj/bin2h: bin2h/bin2h.c
+	@mkdir -p $(@D)
+	@echo Compiling $^
+	@$(NATIVECC) -O3 -s -std=c90 -Wall -Wextra -pedantic $^ -o $@
 
 include $(wildcard $(DEPENDENCIES))
 

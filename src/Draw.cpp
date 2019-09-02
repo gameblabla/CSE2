@@ -13,6 +13,7 @@
 #include "Ending.h"
 #include "Generic.h"
 #include "MapName.h"
+#include "Resource.h"
 #include "Tags.h"
 #include "TextScr.h"
 
@@ -211,26 +212,13 @@ BOOL MakeSurface_Resource(const char *name, SurfaceID surf_no)
 	if (surf[surf_no] != NULL)
 		return FALSE;
 
-	HRSRC hrscr = FindResourceA(NULL, name, RT_BITMAP);
+	size_t size;
+	const unsigned char *data = FindResource(name, "BITMAP", &size);
 
-	if (hrscr == NULL)
+	if (data == NULL)
 		return FALSE;
 
-	size_t size = SizeofResource(NULL, hrscr);
-	const unsigned char *data = (unsigned char*)LockResource(LoadResource(NULL, hrscr));
-
-	// The bitmap we get from LockResource is incomplete, so we need to restore its missing header here
-	unsigned char *bmp_buffer = (unsigned char*)malloc(size + 0xE);
-
-	if (bmp_buffer == NULL)
-		return FALSE;
-
-	const unsigned char bmp_header[0xE] = {0x42, 0x4D, 0x76, 0x4B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x76, 0x00, 0x00, 0x00};
-
-	memcpy(bmp_buffer, bmp_header, 0xE);
-	memcpy(bmp_buffer + 0xE, data, size);
-
-	SDL_RWops *fp = SDL_RWFromConstMem(bmp_buffer, size + 0xE);
+	SDL_RWops *fp = SDL_RWFromConstMem(data, size);
 	SDL_Surface *surface = SDL_LoadBMP_RW(fp, 1);
 
 	surf[surf_no] = Backend_CreateSurface(surface->w * magnification, surface->h * magnification);
@@ -321,26 +309,10 @@ BOOL ReloadBitmap_Resource(const char *name, SurfaceID surf_no)
 	if (surf_no >= SURFACE_ID_MAX)
 		return FALSE;
 
-	HRSRC hrscr = FindResourceA(NULL, name, RT_BITMAP);
+	size_t size;
+	const unsigned char *data = FindResource(name, "BITMAP", &size);
 
-	if (hrscr == NULL)
-		return FALSE;
-
-	size_t size = SizeofResource(NULL, hrscr);
-	const unsigned char *data = (unsigned char*)LockResource(LoadResource(NULL, hrscr));
-
-	// The bitmap we get from LockResource is incomplete, so we need to restore its missing header here
-	unsigned char *bmp_buffer = (unsigned char*)malloc(size + 0xE);
-
-	if (bmp_buffer == NULL)
-		return FALSE;
-
-	const unsigned char bmp_header[0xE] = {0x42, 0x4D, 0x76, 0x4B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x76, 0x00, 0x00, 0x00};
-
-	memcpy(bmp_buffer, bmp_header, 0xE);
-	memcpy(bmp_buffer + 0xE, data, size);
-
-	SDL_RWops *fp = SDL_RWFromConstMem(bmp_buffer, size + 0xE);
+	SDL_RWops *fp = SDL_RWFromConstMem(data, size);
 	SDL_Surface *surface = SDL_LoadBMP_RW(fp, 1);
 
 	if (!ScaleAndUploadSurface(surface, surf_no))
