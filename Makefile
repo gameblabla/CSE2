@@ -10,7 +10,7 @@ ifeq ($(RELEASE), 1)
 	FILENAME_DEF = CSE2
 	DOCONFIG_FILENAME_DEF = DoConfig
 else
-	CXXFLAGS = -Og -g3
+	CXXFLAGS = -Og -gdb3
 	FILENAME_DEF = CSE2_debug
 	DOCONFIG_FILENAME_DEF = DoConfig_debug
 endif
