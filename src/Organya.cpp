@@ -177,9 +177,9 @@ BOOL MakeSoundObject8(signed char *wavep, signed char track, signed char pipi)
 			else
 				data_size = wave_size;
 
-			ZeroMemory(&dsbd, sizeof(DSBUFFERDESC));
+			ZeroMemory(&dsbd, sizeof(dsbd));
 
-			dsbd.dwSize = sizeof(DSBUFFERDESC);
+			dsbd.dwSize = sizeof(dsbd);
 			dsbd.dwBufferBytes = data_size;
 			dsbd.lpwfxFormat = &format_tbl2;
 			dsbd.dwFlags = DSBCAPS_STATIC | DSBCAPS_GLOBALFOCUS | DSBCAPS_CTRLPAN | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY;
