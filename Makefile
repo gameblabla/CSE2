@@ -122,7 +122,7 @@ SOURCES = \
 OBJECTS = $(addprefix obj/$(FILENAME)/, $(addsuffix .o, $(SOURCES)))
 DEPENDENCIES = $(addprefix obj/$(FILENAME)/, $(addsuffix .o.d, $(SOURCES)))
 
-OBJECTS += obj/$(FILENAME)/resources.o
+OBJECTS += obj/$(FILENAME)/windows_resources.o
 
 all: $(BUILD_DIRECTORY)/$(FILENAME) $(BUILD_DIRECTORY)/data
 	@echo Finished
@@ -144,7 +144,7 @@ obj/$(FILENAME)/%.o: %.cpp
 
 include $(wildcard $(DEPENDENCIES))
 
-obj/$(FILENAME)/resources.o: msvc2003/CSE2.rc
+obj/$(FILENAME)/windows_resources.o: msvc2003/CSE2.rc
 	@mkdir -p $(@D)
 	@$(WINDRES) $< $@
 
