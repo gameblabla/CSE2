@@ -1,1 +1,0 @@
-FreeType 2.10.0 built with MSVC2003
