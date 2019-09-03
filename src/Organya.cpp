@@ -10,10 +10,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <dsound.h>
-
 #include "WindowsWrapper.h"
 
+#include "Backends/Audio.h"
 #include "Resource.h"
 #include "Sound.h"
 
@@ -115,7 +114,7 @@ typedef struct OrgData
 
 ORGDATA org_data;
 
-LPDIRECTSOUNDBUFFER lpORGANBUFFER[8][8][2] = {NULL};
+AudioBackend_Sound *lpORGANBUFFER[8][8][2] = {NULL};
 
 int gTrackVol[MAXTRACK];
 int gOrgVolume = 100;
@@ -147,11 +146,6 @@ static const OCTWAVE oct_wave[8] =
 	{   8,128, 32 }, // 7 Oct
 };
 
-static WAVEFORMATEX format_tbl2 = {WAVE_FORMAT_PCM, 1, 22050, 22050, 1, 8, 0};	// 22050HzのFormat
-
-// In the original source code, format_tbl2 was a raw array of bytes, as seen below
-// BYTE format_tbl2[] = {0x01,0x00,0x01,0x00,0x22,0x56,0x00,0x00,0x22,0x56,0x00,0x00,0x01,0x00,0x08,0x00,0x00,0x00};	// 22050HzのFormat
-
 BOOL MakeSoundObject8(signed char *wavep, signed char track, signed char pipi)
 {
 	DWORD i,j,k;
@@ -161,11 +155,6 @@ BOOL MakeSoundObject8(signed char *wavep, signed char track, signed char pipi)
 	BYTE *wp;
 	BYTE *wp_sub;
 	int work;
-	// セカンダリバッファの生成 (Create secondary buffer)
-	DSBUFFERDESC dsbd;
-
-	if (lpDS == NULL)
-		return FALSE;
 
 	for (j = 0; j < 8; j++)
 	{
@@ -178,18 +167,13 @@ BOOL MakeSoundObject8(signed char *wavep, signed char track, signed char pipi)
 			else
 				data_size = wave_size;
 
-			ZeroMemory(&dsbd, sizeof(dsbd));
+			lpORGANBUFFER[track][j][k] = AudioBackend_CreateSound(22050, data_size);
 
-			dsbd.dwSize = sizeof(dsbd);
-			dsbd.dwBufferBytes = data_size;
-			dsbd.lpwfxFormat = &format_tbl2;
-			dsbd.dwFlags = DSBCAPS_STATIC | DSBCAPS_GLOBALFOCUS | DSBCAPS_CTRLPAN | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY;
-
-			if(lpDS->CreateSoundBuffer(&dsbd, &lpORGANBUFFER[track][j][k], NULL) != DS_OK)	// j = se_no
+			if (lpORGANBUFFER[track][j][k] == NULL)
 				return FALSE;
 
 			// Get wave data
-			wp = (BYTE*)malloc(data_size);
+			wp = AudioBackend_LockSound(lpORGANBUFFER[track][j][k], NULL);
 			wp_sub = wp;
 			wav_tp = 0;
 
@@ -207,29 +191,8 @@ BOOL MakeSoundObject8(signed char *wavep, signed char track, signed char pipi)
 				wp_sub++;
 			}
 
-			// データの転送 (Data transfer)
-			LPVOID lpbuf1, lpbuf2;
-			DWORD dwbuf1, dwbuf2=0;
-			HRESULT hr;
-
-			hr = lpORGANBUFFER[track][j][k]->Lock(0, data_size, &lpbuf1, &dwbuf1, &lpbuf2, &dwbuf2, 0); 
-
-			if (hr != DS_OK)
-			{
-#ifdef FIX_BUGS
-				free(wp);	// The updated Organya source code includes this fix
-#endif
-				return FALSE;
-			}
-
-			CopyMemory(lpbuf1, (BYTE*)wp, dwbuf1);
-
-			if (dwbuf2 != 0)
-				CopyMemory(lpbuf2, (BYTE*)wp+dwbuf1, dwbuf2);
-
-			lpORGANBUFFER[track][j][k]->Unlock(lpbuf1, dwbuf1, lpbuf2, dwbuf2);
-			lpORGANBUFFER[track][j][k]->SetCurrentPosition(0);
-			free(wp);
+			AudioBackend_UnlockSound(lpORGANBUFFER[track][j][k]);
+			AudioBackend_SetSoundPosition(lpORGANBUFFER[track][j][k], 0);
 		}
 	}
 
@@ -240,12 +203,9 @@ static const short freq_tbl[12] = {262, 277, 294, 311, 330, 349, 370, 392, 415, 
 
 void ChangeOrganFrequency(unsigned char key, signed char track, long a)
 {
-	if (lpDS == NULL)
-		return;
-
 	for (int j = 0; j < 8; j++)
 		for (int i = 0; i < 2; i++)
-			lpORGANBUFFER[track][j][i]->SetFrequency(((oct_wave[j].wave_size * freq_tbl[key]) * oct_wave[j].oct_par) / 8 + (a - 1000));	// 1000を+αのデフォルト値とする (1000 is the default value for + α)
+			AudioBackend_SetSoundFrequency(lpORGANBUFFER[track][j][i], ((oct_wave[j].wave_size * freq_tbl[key]) * oct_wave[j].oct_par) / 8 + (a - 1000));	// 1000を+αのデフォルト値とする (1000 is the default value for + α)
 }
 
 const short pan_tbl[13] = {0, 43, 86, 129, 172, 215, 256, 297, 340, 383, 426, 469, 512};
@@ -255,28 +215,19 @@ unsigned char key_twin[MAXTRACK];	// 今使っているキー(連続時のノイ
 
 void ChangeOrganPan(unsigned char key, unsigned char pan, signed char track)	// 512がMAXで256がﾉｰﾏﾙ (512 is MAX and 256 is normal)
 {
-	if (lpDS == NULL)
-		return;
-
 	if (old_key[track] != PANDUMMY)
-		lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]]->SetPan((pan_tbl[pan] - 0x100) * 10);
+		AudioBackend_SetSoundPan(lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]], (pan_tbl[pan] - 0x100) * 10);
 }
 
 void ChangeOrganVolume(int no, long volume, signed char track)	// 300がMAXで300がﾉｰﾏﾙ (300 is MAX and 300 is normal)
 {
-	if (lpDS == NULL)
-		return;
-
 	if (old_key[track] != VOLDUMMY)
-		lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]]->SetVolume((volume - 0xFF) * 8);
+		AudioBackend_SetSoundVolume(lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]], (volume - 0xFF) * 8);
 }
 
 // サウンドの再生 (Play sound)
 void PlayOrganObject(unsigned char key, int mode, signed char track, long freq)
 {
-	if (lpDS == NULL)
-		return;
-
 	if (lpORGANBUFFER[track][key / 12][key_twin[track]] != NULL)
 	{
 		switch (mode)
@@ -284,8 +235,8 @@ void PlayOrganObject(unsigned char key, int mode, signed char track, long freq)
 			case 0:	// 停止 (Stop)
 				if (old_key[track] != 0xFF)
 				{
-					lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]]->Stop();
-					lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]]->SetCurrentPosition(0);
+					AudioBackend_StopSound(lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]]);
+					AudioBackend_SetSoundPosition(lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]], 0);
 				}
 				break;
 
@@ -295,7 +246,7 @@ void PlayOrganObject(unsigned char key, int mode, signed char track, long freq)
 			case 2:	// 歩かせ停止 (Stop playback)
 				if (old_key[track] != 0xFF)
 				{
-					lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]]->Play(0, 0, 0);
+					AudioBackend_PlaySound(lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]], FALSE);
 					old_key[track] = 0xFF;
 				}
 				break;
@@ -304,27 +255,27 @@ void PlayOrganObject(unsigned char key, int mode, signed char track, long freq)
 				if (old_key[track] == 0xFF)	// 新規鳴らす (New sound)
 				{
 					ChangeOrganFrequency(key % 12, track, freq);	// 周波数を設定して (Set the frequency)
-					lpORGANBUFFER[track][key / 12][key_twin[track]]->Play(0, 0, DSBPLAY_LOOPING);
+					AudioBackend_PlaySound(lpORGANBUFFER[track][key / 12][key_twin[track]], TRUE);
 					old_key[track] = key;
 					key_on[track] = 1;
 				}
 				else if (key_on[track] == 1 && old_key[track] == key)	// 同じ音 (Same sound)
 				{
 					// 今なっているのを歩かせ停止 (Stop playback now)
-					lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]]->Play(0, 0, 0);
+					AudioBackend_PlaySound(lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]], FALSE);
 					key_twin[track]++;
 					if (key_twin[track] > 1)
 						key_twin[track] = 0;
-					lpORGANBUFFER[track][key / 12][key_twin[track]]->Play(0, 0, DSBPLAY_LOOPING);
+					AudioBackend_PlaySound(lpORGANBUFFER[track][key / 12][key_twin[track]], TRUE);
 				}
 				else	// 違う音を鳴らすなら (If you make a different sound)
 				{
-					lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]]->Play(0, 0, 0);	// 今なっているのを歩かせ停止 (Stop playback now)
+					AudioBackend_PlaySound(lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]], FALSE);	// 今なっているのを歩かせ停止 (Stop playback now)
 					key_twin[track]++;
 					if (key_twin[track] > 1)
 						key_twin[track] = 0;
 					ChangeOrganFrequency(key % 12, track, freq);	// 周波数を設定して (Set the frequency)
-					lpORGANBUFFER[track][key / 12][key_twin[track]]->Play(0, 0, DSBPLAY_LOOPING);
+					AudioBackend_PlaySound(lpORGANBUFFER[track][key / 12][key_twin[track]], TRUE);
 					old_key[track] = key;
 				}
 
@@ -336,19 +287,16 @@ void PlayOrganObject(unsigned char key, int mode, signed char track, long freq)
 // オルガーニャオブジェクトを開放 (Open Organya object)
 void ReleaseOrganyaObject(signed char track)
 {
-	if (lpDS == NULL)
-		return;
-
 	for (int i = 0; i < 8; i++)
 	{
 		if (lpORGANBUFFER[track][i][0] != NULL)
 		{
-			lpORGANBUFFER[track][i][0]->Release();
+			AudioBackend_DestroySound(lpORGANBUFFER[track][i][0]);
 			lpORGANBUFFER[track][i][0] = NULL;
 		}
 		if (lpORGANBUFFER[track][i][1] != NULL)
 		{
-			lpORGANBUFFER[track][i][1]->Release();
+			AudioBackend_DestroySound(lpORGANBUFFER[track][i][1]);
 			lpORGANBUFFER[track][i][1] = NULL;
 		}
 	}
@@ -360,9 +308,6 @@ signed char wave_data[100][0x100];
 BOOL InitWaveData100(void)
 {
 	const DWORD *lpdword;	// リソースのアドレス (Resource address)
-
-	if (lpDS == NULL)
-		return FALSE;
 
 	// リソースの検索 (Search for resources)
 	lpdword = (DWORD*)FindResource("WAVE100", "WAVE", NULL);
@@ -378,9 +323,6 @@ BOOL InitWaveData100(void)
 // 波形を１００個の中から選択して作成 (Select from 100 waveforms to create)
 BOOL MakeOrganyaWave(signed char track, signed char wave_no, signed char pipi)
 {
-	if (lpDS == NULL)
-		return FALSE;
-
 	if (wave_no > 99)
 		return FALSE;
 
@@ -396,48 +338,36 @@ BOOL MakeOrganyaWave(signed char track, signed char wave_no, signed char pipi)
 
 void ChangeDramFrequency(unsigned char key, signed char track)
 {
-	if (lpDS == NULL)
-		return;
-
-	lpSECONDARYBUFFER[150 + track]->SetFrequency(key * 800 + 100);
+	AudioBackend_SetSoundFrequency(lpSECONDARYBUFFER[150 + track], key * 800 + 100);
 }
 
 void ChangeDramPan(unsigned char pan, signed char track)
 {
-	if (lpDS == NULL)
-		return;
-
-	lpSECONDARYBUFFER[150 + track]->SetPan((pan_tbl[pan] - 0x100) * 10);
+	AudioBackend_SetSoundPan(lpSECONDARYBUFFER[150 + track], (pan_tbl[pan] - 0x100) * 10);
 }
 
 void ChangeDramVolume(long volume, signed char track)
 {
-	if (lpDS == NULL)
-		return;
-
-	lpSECONDARYBUFFER[150 + track]->SetVolume((volume - 0xFF) * 8);
+	AudioBackend_SetSoundVolume(lpSECONDARYBUFFER[150 + track], (volume - 0xFF) * 8);
 }
 
 // サウンドの再生 (Play sound)
 void PlayDramObject(unsigned char key, int mode, signed char track)
 {
-	if (lpDS == NULL)
-		return;
-
 	if (lpSECONDARYBUFFER[150 + track] != NULL)
 	{
 		switch (mode)
 		{
 			case 0:	// 停止 (Stop)
-				lpSECONDARYBUFFER[150 + track]->Stop();
-				lpSECONDARYBUFFER[150 + track]->SetCurrentPosition(0);
+				AudioBackend_StopSound(lpSECONDARYBUFFER[150 + track]);
+				AudioBackend_SetSoundPosition(lpSECONDARYBUFFER[150 + track], 0);
 				break;
 
 			case 1:	// 再生 (Playback)
-				lpSECONDARYBUFFER[150 + track]->Stop();
-				lpSECONDARYBUFFER[150 + track]->SetCurrentPosition(0);
+				AudioBackend_StopSound(lpSECONDARYBUFFER[150 + track]);
+				AudioBackend_SetSoundPosition(lpSECONDARYBUFFER[150 + track], 0);
 				ChangeDramFrequency(key, track);	// 周波数を設定して ()
-				lpSECONDARYBUFFER[150 + track]->Play(0, 0, 0);
+				AudioBackend_PlaySound(lpSECONDARYBUFFER[150 + track], FALSE);
 				break;
 
 			case 2:	// 歩かせ停止 (Stop playback)
@@ -945,11 +875,8 @@ void OrgData::SetPlayPointer(long x)
 }
 
 // Start and end organya
-BOOL StartOrganya(LPDIRECTSOUND _lpDS, const char *path_wave)	// Both arguments are ignored for some reason
+BOOL StartOrganya(const char *path_wave)	// The argument is ignored for some reason
 {
-	if (lpDS == NULL)
-		return FALSE;
-
 	if (!InitWaveData100())
 		return FALSE;
 
@@ -961,9 +888,6 @@ BOOL StartOrganya(LPDIRECTSOUND _lpDS, const char *path_wave)	// Both arguments 
 // Load organya file
 BOOL LoadOrganya(const char *name)
 {
-	if (lpDS == NULL)
-		return FALSE;
-
 	if (!org_data.InitMusicData(name))
 		return FALSE;
 
@@ -979,9 +903,6 @@ BOOL LoadOrganya(const char *name)
 
 void SetOrganyaPosition(unsigned int x)
 {
-	if (lpDS == NULL)
-		return;
-
 	org_data.SetPlayPointer(x);
 	gOrgVolume = 100;
 	bFadeout = FALSE;
@@ -989,17 +910,11 @@ void SetOrganyaPosition(unsigned int x)
 
 unsigned int GetOrganyaPosition(void)
 {
-	if (lpDS == NULL)
-		return 0;
-
 	return play_p;
 }
 
 void PlayOrganyaMusic(void)
 {
-	if (lpDS == NULL)
-		return;
-
 	QuitMMTimer();
 	InitMMTimer();
 	StartTimer(org_data.info.wait);
@@ -1007,9 +922,6 @@ void PlayOrganyaMusic(void)
 
 BOOL ChangeOrganyaVolume(signed int volume)
 {
-	if (lpDS == NULL)
-		return FALSE;
-
 	if (volume < 0 || volume > 100)
 		return FALSE;
 
@@ -1019,9 +931,6 @@ BOOL ChangeOrganyaVolume(signed int volume)
 
 void StopOrganyaMusic()
 {
-	if (lpDS == NULL)
-		return;
-
 	// Stop timer
 	QuitMMTimer();
 
@@ -1043,9 +952,6 @@ void SetOrganyaFadeout()
 
 void EndOrganya()
 {
-	if (lpDS == NULL)
-		return;
-
 	// End timer
 	QuitMMTimer();
 

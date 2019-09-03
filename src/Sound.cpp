@@ -17,50 +17,29 @@ equivalents.
 #include <stdlib.h>
 #include <string.h>
 
-#define DIRECTSOUND_VERSION 0x500
-#include <dsound.h>
-
 #include "WindowsWrapper.h"
 
+#include "Backends/Audio.h"
 #include "Organya.h"
 #include "PixTone.h"
 #include "Tags.h"
 
 #define FREQUENCY 44100
 
-LPDIRECTSOUND       lpDS;            // DirectSoundオブジェクト (DirectSound object)
-LPDIRECTSOUNDBUFFER lpPRIMARYBUFFER; // 一時バッファ (Temporary buffer)
-LPDIRECTSOUNDBUFFER lpSECONDARYBUFFER[SE_MAX]; 
+AudioBackend_Sound *lpSECONDARYBUFFER[SE_MAX];
 
 // DirectSoundの開始 (Starting DirectSound)
-BOOL InitDirectSound(HWND hwnd)
+BOOL InitDirectSound(void)
 {
 	int i;
-	DSBUFFERDESC dsbd;
 
-	// DirectDrawの初期化 (DirectDraw initialization)
-	if (DirectSoundCreate(NULL, &lpDS, NULL) != DS_OK)
-	{
-		lpDS = NULL;
-#ifndef FIX_BUGS
-		// This makes absolutely no sense here
-		StartOrganya(lpDS, "Org\\Wave.dat");
-#endif
+	if (!AudioBackend_Init())
 		return FALSE;
-	}
-
-	lpDS->SetCooperativeLevel(hwnd, DSSCL_EXCLUSIVE);
-
-	// 一次バッファの初期化 (Initializing the primary buffer)
-	ZeroMemory(&dsbd, sizeof(dsbd));
-	dsbd.dwSize = sizeof(dsbd);
-	dsbd.dwFlags = DSBCAPS_PRIMARYBUFFER | DSBCAPS_CTRLPAN | DSBCAPS_CTRLVOLUME;
-	lpDS->CreateSoundBuffer(&dsbd, &lpPRIMARYBUFFER, NULL);
 
 	for (i = 0; i < SE_MAX; i++)
 		lpSECONDARYBUFFER[i] = NULL;
 
-	StartOrganya(lpDS, "Org\\Wave.dat");
+	StartOrganya("Org\\Wave.dat");
 
 	return TRUE;
 }
@@ -70,24 +49,15 @@ void EndDirectSound(void)
 {
 	int i;
 
-	if (lpDS == NULL)
-		return;
-
 	EndOrganya();
 
 	for (i = 0; i < SE_MAX; i++)
 		if (lpSECONDARYBUFFER[i] != NULL)
-			lpSECONDARYBUFFER[i]->Release();
+			AudioBackend_DestroySound(lpSECONDARYBUFFER[i]);
 
-	if (lpPRIMARYBUFFER != NULL)
-		lpPRIMARYBUFFER->Release();
-
-	if (lpDS != NULL)
-		lpDS->Release();
-
-	lpDS = NULL;
+	AudioBackend_Deinit();
 }
-
+/*
 // サウンドの設定 (Sound settings)
 BOOL InitSoundObject(LPCSTR resname, int no)
 {
@@ -219,28 +189,25 @@ BOOL LoadSoundObject(LPCSTR file_name, int no)
 
 	return TRUE;
 }
-
+*/
 void PlaySoundObject(int no, int mode)
 {
-	if (lpDS == NULL)
-		return;
-
 	if (lpSECONDARYBUFFER[no] != NULL)
 	{
 		switch (mode)
 		{
 			case 0:	// 停止 (Stop)
-				lpSECONDARYBUFFER[no]->Stop();
+				AudioBackend_StopSound(lpSECONDARYBUFFER[no]);
 				break;
 
 			case 1:	// 再生 (Playback)
-				lpSECONDARYBUFFER[no]->Stop();
-				lpSECONDARYBUFFER[no]->SetCurrentPosition(0);
-				lpSECONDARYBUFFER[no]->Play(0, 0, 0);
+				AudioBackend_StopSound(lpSECONDARYBUFFER[no]);
+				AudioBackend_SetSoundPosition(lpSECONDARYBUFFER[no], 0);
+				AudioBackend_PlaySound(lpSECONDARYBUFFER[no], FALSE);
 				break;
 
 			case -1:// ループ再生 (Loop playback)
-				lpSECONDARYBUFFER[no]->Play(0, 0, DSBPLAY_LOOPING);
+				AudioBackend_PlaySound(lpSECONDARYBUFFER[no], TRUE);
 				break;
 		}
 	}
@@ -248,80 +215,29 @@ void PlaySoundObject(int no, int mode)
 
 void ChangeSoundFrequency(int no, DWORD rate)	// 100がMIN9999がMAXで2195?がﾉｰﾏﾙ (100 is MIN, 9999 is MAX, and 2195 is normal)
 {
-	if (lpDS == NULL)
-		return;
-
-	lpSECONDARYBUFFER[no]->SetFrequency((rate * 10) + 100);
+	AudioBackend_SetSoundFrequency(lpSECONDARYBUFFER[no], (rate * 10) + 100);
 }
 
 void ChangeSoundVolume(int no, long volume)	// 300がMAXで300がﾉｰﾏﾙ (300 is MAX and 300 is normal)
 {
-	if (lpDS == NULL)
-		return;
-
-	lpSECONDARYBUFFER[no]->SetVolume((volume - 300) * 8);
+	AudioBackend_SetSoundVolume(lpSECONDARYBUFFER[no], (volume - 300) * 8);
 }
 
 void ChangeSoundPan(int no, long pan)	// 512がMAXで256がﾉｰﾏﾙ (512 is MAX and 256 is normal)
 {
-	if (lpDS == NULL)
-		return;
-
-	lpSECONDARYBUFFER[no]->SetPan((pan - 256) * 10);
+	AudioBackend_SetSoundPan(lpSECONDARYBUFFER[no], (pan - 256) * 10);
 }
 
 // TODO - The stack frame for this function is inaccurate
 int MakePixToneObject(const PIXTONEPARAMETER *ptp, int ptp_num, int no)
 {
-	// For some reason, this function creates an entire WAV file header,
-	// when it only needs a WAVEFORMATEX
-	typedef struct WavHeader
-	{
-		char riff[4];
-		unsigned long wav_size;
-		char wave[4];
-		char fmt[4];
-		unsigned long fmt_chunk_size;
-		unsigned short audio_format;
-		unsigned short num_channels;
-		unsigned long sample_rate;
-		unsigned long byte_rate;
-		unsigned short sample_alignment;
-		unsigned short bit_depth;
-		char data[4];
-		unsigned long data_bytes;
-	} WavHeader;
-
 	int i;
 	int j;
 	DSBUFFERDESC dsbd;
-	WavHeader wav_header;
 	const PIXTONEPARAMETER *ptp_pointer;
 	int sample_count;
 	unsigned char *pcm_buffer;
 	unsigned char *mixed_pcm_buffer;
-
-	if (lpDS == NULL)
-		return 0;
-
-	const char *riff = "RIFF";
-	const char *fmt = "fmt ";
-	const char *wave = "WAVE";
-	const char *data = "data";
-
-	wav_header.bit_depth = 8;
-	wav_header.sample_rate = 22050;
-	wav_header.num_channels = 1;
-	wav_header.audio_format = WAVE_FORMAT_PCM;
-	wav_header.fmt_chunk_size = 16;
-	memcpy(wav_header.riff, riff, 4);
-	memcpy(wav_header.fmt, fmt, 4);
-	memcpy(wav_header.wave, wave, 4);
-	memcpy(wav_header.data, data, 4);
-	wav_header.sample_alignment = (wav_header.bit_depth / 8) * wav_header.num_channels;
-	wav_header.byte_rate = (wav_header.bit_depth / 8) * wav_header.num_channels * wav_header.sample_rate;
-	wav_header.data_bytes = wav_header.sample_alignment * ptp->size;
-	wav_header.wav_size = wav_header.data_bytes + 36;
 
 	ptp_pointer = ptp;
 	sample_count = 0;
@@ -334,13 +250,9 @@ int MakePixToneObject(const PIXTONEPARAMETER *ptp, int ptp_num, int no)
 		++ptp_pointer;
 	}
 
-	ZeroMemory(&dsbd, sizeof(dsbd));
-	dsbd.dwSize = sizeof(dsbd);
-	dsbd.dwFlags = DSBCAPS_STATIC | DSBCAPS_GLOBALFOCUS | DSBCAPS_CTRLPAN | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY;
-	dsbd.dwBufferBytes = sample_count;
-	dsbd.lpwfxFormat = (WAVEFORMATEX*)&wav_header.audio_format;
+	lpSECONDARYBUFFER[no] = AudioBackend_CreateSound(22050, ptp->size);
 
-	if (lpDS->CreateSoundBuffer(&dsbd, &lpSECONDARYBUFFER[no], 0) != DS_OK)
+	if (lpSECONDARYBUFFER[no] == NULL)
 		return -1;
 
 	pcm_buffer = mixed_pcm_buffer = NULL;
@@ -394,17 +306,11 @@ int MakePixToneObject(const PIXTONEPARAMETER *ptp, int ptp_num, int no)
 	mixed_pcm_buffer[0] = mixed_pcm_buffer[0];
 	mixed_pcm_buffer[sample_count - 1] = mixed_pcm_buffer[sample_count - 1];
 
-	LPVOID lpbuf1, lpbuf2;
-	DWORD dwbuf1, dwbuf2;
+	unsigned char *buffer = AudioBackend_LockSound(lpSECONDARYBUFFER[no], NULL);
 
-	lpSECONDARYBUFFER[no]->Lock(0, sample_count, &lpbuf1, &dwbuf1, &lpbuf2, &dwbuf2, 0); 
+	memcpy(buffer, mixed_pcm_buffer, ptp->size);
 
-	CopyMemory(lpbuf1, mixed_pcm_buffer, dwbuf1);
-
-	if (dwbuf2 != 0)
-		CopyMemory(lpbuf2, mixed_pcm_buffer + dwbuf1, dwbuf2);
-
-	lpSECONDARYBUFFER[no]->Unlock(lpbuf1, dwbuf1, lpbuf2, dwbuf2);
+	AudioBackend_UnlockSound(lpSECONDARYBUFFER[no]);
 
 	if (pcm_buffer != NULL)
 		free(pcm_buffer);

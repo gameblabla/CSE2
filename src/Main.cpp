@@ -329,7 +329,7 @@ int main(int argc, char *argv[])
 	else
 	{
 		// Initialize sound
-		InitDirectSound(hWnd);
+		InitDirectSound();
 
 		// Initialize joystick
 		if (conf.bJoystick && InitDirectInput())

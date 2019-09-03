@@ -20,5 +20,5 @@ void PlayOrganyaMusic();
 BOOL ChangeOrganyaVolume(signed int volume);
 void StopOrganyaMusic();
 void SetOrganyaFadeout();
-BOOL StartOrganya(LPDIRECTSOUND lpDS, const char *wave_filename);
+BOOL StartOrganya(const char *wave_filename);
 void EndOrganya();

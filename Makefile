@@ -124,7 +124,8 @@ SOURCES = \
 	src/Star \
 	src/TextScr \
 	src/Triangle \
-	src/ValueView
+	src/ValueView \
+	src/Backends/Audio/SDL2
 
 RESOURCES = \
 	BITMAP/Credit01.bmp \
