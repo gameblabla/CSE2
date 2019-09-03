@@ -51,14 +51,8 @@ BOOL LoadMapData2(const char *path_map)
 	{
 		fread(&dum, 1, 1, fp);
 		// Get width and height
-#ifdef NONPORTABLE
-		// This fails on big-endian hardware, and platforms where short is not two bytes long.
-		fread(&gMap.width, 2, 1, fp);
-		fread(&gMap.length, 2, 1, fp);
-#else
 		gMap.width = File_ReadLE16(fp);
 		gMap.length = File_ReadLE16(fp);
-#endif
 
 		if (gMap.data == NULL)
 		{

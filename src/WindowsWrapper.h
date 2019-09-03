@@ -1,13 +1,5 @@
 #pragma once
-/*
-#ifdef WINDOWS
-#include <windows.h>
-// Avoid name collisions
-#undef DrawText
-#undef FindResource
-#undef CreateWindow
-#else
-*/
+
 #include <stdio.h>
 
 typedef int HWND;
@@ -32,7 +24,6 @@ struct RECT
 	long right;
 	long bottom;
 };
-//#endif
 
 #define SET_RECT(rect, l, t, r, b) \
 	rect.left = l; \

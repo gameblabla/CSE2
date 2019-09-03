@@ -1263,20 +1263,11 @@ int TextScriptProc()
 					{
 						char str_0[0x40];
 						#ifdef JAPANESE
-							#if defined(NONPORTABLE) && defined(WINDOWS)
-								sprintf(str_0, "\x95\x73\x96\xBE\x82\xCC\x83\x52\x81\x5B\x83\x68:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);
-								MessageBoxA(NULL, str_0, "\x83\x47\x83\x89\x81\x5B", MB_OK);
-							#else
-								sprintf(str_0, "不明のコード:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);
-								SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", str_0, NULL);
-							#endif
+						sprintf(str_0, "不明のコード:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);
+						SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", str_0, NULL);
 						#else
-							sprintf(str_0, "Unknown code:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);
-							#if defined(NONPORTABLE) && defined(WINDOWS)
-								MessageBoxA(NULL, str_0, "Error", MB_OK);
-							#else
-								SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", str_0, NULL);
-							#endif
+						sprintf(str_0, "Unknown code:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);
+						SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", str_0, NULL);
 						#endif
 
 						return 0;

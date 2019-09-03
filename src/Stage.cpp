@@ -224,11 +224,7 @@ const char *gMusicTable[42] =
 	"ACCESS",
 	"IRONH",
 	"GRAND",
-#ifdef NONPORTABLE
-	"Curly",	// The vanilla game used the original filename instead of the internal 8.3 one
-#else
 	"CURLY",
-#endif
 	"OSIDE",
 	"REQUIEM",
 	"WANPAK2",

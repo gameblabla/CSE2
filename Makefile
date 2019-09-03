@@ -44,7 +44,7 @@ ifeq ($(DEBUG_SAVE), 1)
 	CXXFLAGS += -DDEBUG_SAVE
 endif
 
-CXXFLAGS += -std=c++98 -MMD -MP -MF $@.d -DWINDOWS `pkg-config sdl2 --cflags`
+CXXFLAGS += -std=c++98 -MMD -MP -MF $@.d `pkg-config sdl2 --cflags`
 LIBS += -lkernel32 -lgdi32 -lddraw -ldinput -ldsound -lversion -lshlwapi -limm32 -lwinmm -ldxguid
 
 ifeq ($(STATIC), 1)

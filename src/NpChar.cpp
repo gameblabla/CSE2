@@ -79,11 +79,7 @@ BOOL LoadEvent(const char *path_event)
 	}
 
 	// Get amount of NPCs
-#ifdef NONPORTABLE
-	fread(&count, 4, 1, fp);
-#else
 	count = File_ReadLE32(fp);
-#endif
 
 	// Load NPCs
 	memset(gNPC, 0, sizeof(gNPC));
@@ -92,16 +88,12 @@ BOOL LoadEvent(const char *path_event)
 	for (i = 0; i < count; i++)
 	{
 		// Get data from file
-#ifdef NONPORTABLE
-		fread(&eve, sizeof(EVENT), 1, fp);
-#else
 		eve.x = File_ReadLE16(fp);
 		eve.y = File_ReadLE16(fp);
 		eve.code_flag = File_ReadLE16(fp);
 		eve.code_event = File_ReadLE16(fp);
 		eve.code_char = File_ReadLE16(fp);
 		eve.bits = File_ReadLE16(fp);
-#endif
 
 		// Set NPC parameters
 		gNPC[n].direct = (eve.bits & NPC_SPAWN_IN_OTHER_DIRECTION) ? 2 : 0;

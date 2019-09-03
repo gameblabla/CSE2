@@ -80,9 +80,6 @@ BOOL SaveProfile(const char *name)
 	memcpy(profile.flags, gFlagNPC, sizeof(profile.flags));
 
 	// Write to file
-#ifdef NONPORTABLE
-	fwrite(&profile, sizeof(PROFILE), 1, fp);
-#else
 	fwrite(profile.code, 8, 1, fp);
 	File_WriteLE32(profile.stage, fp);
 	File_WriteLE32(profile.music, fp);
@@ -116,7 +113,6 @@ BOOL SaveProfile(const char *name)
 	fwrite(profile.permit_mapping, 0x80, 1, fp);
 	fwrite(FLAG, 4, 1, fp);
 	fwrite(profile.flags, 1000, 1, fp);
-#endif
 
 	fclose(fp);
 	return TRUE;
@@ -152,9 +148,6 @@ BOOL LoadProfile(const char *name)
 	// Read data
 	fseek(fp, 0, SEEK_SET);
 	memset(&profile, 0, sizeof(PROFILE));
-#ifdef NONPORTABLE
-	fread(&profile, sizeof(PROFILE), 1, fp);
-#else
 	fread(profile.code, 8, 1, fp);
 	profile.stage = File_ReadLE32(fp);
 	profile.music = (MusicID)File_ReadLE32(fp);
@@ -188,7 +181,6 @@ BOOL LoadProfile(const char *name)
 	fread(profile.permit_mapping, 0x80, 1, fp);
 	fread(profile.FLAG, 4, 1, fp);
 	fread(profile.flags, 1000, 1, fp);
-#endif
 	fclose(fp);
 
 	// Set things

@@ -2,6 +2,8 @@
 
 #include <stdio.h>
 
+#include "SDL.h"
+
 #include "WindowsWrapper.h"
 
 #include "ArmsItem.h"
@@ -450,9 +452,6 @@ BOOL SaveTimeCounter()
 	if (fp)
 	{
 		// Read data
-#ifdef NONPORTABLE
-		fread(&rec, sizeof(REC), 1, fp);
-#else
 		rec.counter[0] = File_ReadLE32(fp);
 		rec.counter[1] = File_ReadLE32(fp);
 		rec.counter[2] = File_ReadLE32(fp);
@@ -461,21 +460,13 @@ BOOL SaveTimeCounter()
 		rec.random[1] = fgetc(fp);
 		rec.random[2] = fgetc(fp);
 		rec.random[3] = fgetc(fp);
-#endif
 		fclose(fp);
 
 		p = (unsigned char*)&rec.counter[0];
-#ifdef NONPORTABLE
-		p[0] -= rec.random[0];
-		p[1] -= rec.random[0];
-		p[2] -= rec.random[0];
-		p[3] -= rec.random[0] / 2;
-#else
 		p[0] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[0]) : (rec.random[0] / 2);
 		p[1] -= rec.random[0];
 		p[2] -= rec.random[0];
 		p[3] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[0] / 2) : (rec.random[0]);
-#endif
 		// If this is faster than our new time, quit
 		if (rec.counter[0] < time_count)
 			return TRUE;
@@ -488,26 +479,16 @@ BOOL SaveTimeCounter()
 		rec.random[i] = Random(0, 250) + i;
 
 		p = (unsigned char*)&rec.counter[i];
-#ifdef NONPORTABLE
-		p[0] += rec.random[i];
-		p[1] += rec.random[i];
-		p[2] += rec.random[i];
-		p[3] += rec.random[i] / 2;
-#else
 		p[0] += (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[i]) : (rec.random[i] / 2);
 		p[1] += rec.random[i];
 		p[2] += rec.random[i];
 		p[3] += (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[i] / 2) : (rec.random[i]);
-#endif
 	}
 
 	fp = fopen(path, "wb");
 	if (fp == NULL)
 		return FALSE;
 
-#ifdef NONPORTABLE
-	fwrite(&rec, sizeof(REC), 1, fp);
-#else
 	File_WriteLE32(rec.counter[0], fp);
 	File_WriteLE32(rec.counter[1], fp);
 	File_WriteLE32(rec.counter[2], fp);
@@ -516,7 +497,6 @@ BOOL SaveTimeCounter()
 	fputc(rec.random[1], fp);
 	fputc(rec.random[2], fp);
 	fputc(rec.random[3], fp);
-#endif
 
 	fclose(fp);
 	return TRUE;
@@ -538,9 +518,6 @@ int LoadTimeCounter()
 	REC rec;
 
 	// Read data
-#ifdef NONPORTABLE
-	fread(&rec, sizeof(REC), 1, fp);
-#else
 	rec.counter[0] = File_ReadLE32(fp);
 	rec.counter[1] = File_ReadLE32(fp);
 	rec.counter[2] = File_ReadLE32(fp);
@@ -549,24 +526,16 @@ int LoadTimeCounter()
 	rec.random[1] = fgetc(fp);
 	rec.random[2] = fgetc(fp);
 	rec.random[3] = fgetc(fp);
-#endif
 	fclose(fp);
 
 	// Decode from checksum
 	for (i = 0; i < 4; i++)
 	{
 		p = (unsigned char*)&rec.counter[i];
-#ifdef NONPORTABLE
-		p[0] -= rec.random[i];
-		p[1] -= rec.random[i];
-		p[2] -= rec.random[i];
-		p[3] -= rec.random[i] / 2;
-#else
 		p[0] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[i]) : (rec.random[i] / 2);
 		p[1] -= rec.random[i];
 		p[2] -= rec.random[i];
 		p[3] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[i] / 2) : (rec.random[i]);
-#endif
 	}
 
 	// Verify checksum's result
