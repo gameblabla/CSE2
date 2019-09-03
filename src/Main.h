@@ -2,7 +2,6 @@
 
 #include "WindowsWrapper.h"
 
-extern HWND ghWnd;
 extern BOOL bFullscreen;
 
 void PutFramePerSecound(void);

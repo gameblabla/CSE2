@@ -4,17 +4,14 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <shlwapi.h>
-
 #include "SDL.h"
-#include "SDL_syswm.h"
 
 #include "WindowsWrapper.h"
 
 #include "CommonDefines.h"
 #include "Config.h"
-#include "Dialog.h"
 #include "Draw.h"
+#include "File.h"
 #include "Game.h"
 #include "Generic.h"
 #include "Input.h"
@@ -30,15 +27,11 @@ char gDataPath[MAX_PATH];
 
 int gJoystickButtonTable[8];
 
-HWND ghWnd;
 BOOL bFullscreen;
 BOOL gbUseJoystick = FALSE;
 
 static BOOL bFps = FALSE;
 static BOOL bActive = TRUE;
-
-static HANDLE hObject;
-static HANDLE hMutex;
 
 static int windowWidth;
 static int windowHeight;
@@ -71,11 +64,11 @@ unsigned long GetFramePerSecound(void)
 
 	if (need_new_base_tick)
 	{
-		base_tick = GetTickCount();
+		base_tick = SDL_GetTicks();
 		need_new_base_tick = FALSE;
 	}
 
-	current_tick = GetTickCount();
+	current_tick = SDL_GetTicks();
 	++current_frame;
 
 	if (base_tick + 1000 <= current_tick)
@@ -95,22 +88,16 @@ int main(int argc, char *argv[])
 
 	int i;
 
-	hObject = OpenMutexA(MUTEX_ALL_ACCESS, 0, mutex_name);
-	if (hObject != NULL)
-	{
-		CloseHandle(hObject);
-		return 0;
-	}
-
-	hMutex = CreateMutexA(NULL, FALSE, mutex_name);
-
 	// Get executable's path
-	GetModuleFileNameA(NULL, gModulePath, MAX_PATH);
-	PathRemoveFileSpecA(gModulePath);
+	char *base_path = SDL_GetBasePath();
+	size_t base_path_length = strlen(base_path);
+	base_path[base_path_length - 1] = '\0';
+	strcpy(gModulePath, base_path);
+	SDL_free(base_path);
 
 	// Get path of the data folder
 	strcpy(gDataPath, gModulePath);
-	strcat(gDataPath, "\\data");
+	strcat(gDataPath, "/data");
 
 	CONFIG conf;
 	if (!LoadConfigData(&conf))
@@ -205,9 +192,7 @@ int main(int argc, char *argv[])
 
 	SDL_Init(SDL_INIT_EVENTS);
 
-	HWND hWnd;
 	SDL_Window *window;
-	SDL_SysWMinfo info;
 
 	switch (conf.display_mode)
 	{
@@ -228,16 +213,7 @@ int main(int argc, char *argv[])
 			window = CreateWindow(lpWindowName, windowWidth, windowHeight);
 
 			if (window == NULL)
-			{
-				ReleaseMutex(hMutex);
 				return 0;
-			}
-
-			SDL_VERSION(&info.version);
-			SDL_GetWindowWMInfo(window, &info);
-			hWnd = info.info.win.window;
-
-			ghWnd = hWnd;
 
 			if (conf.display_mode == 1)
 				StartDirectDraw(window, 0);
@@ -256,23 +232,7 @@ int main(int argc, char *argv[])
 			window = CreateWindow(lpWindowName, windowWidth, windowHeight);
 
 			if (window == NULL)
-			{
-				ReleaseMutex(hMutex);
 				return 0;
-			}
-
-			SDL_VERSION(&info.version);
-			SDL_GetWindowWMInfo(window, &info);
-			hWnd = info.info.win.window;
-
-			ghWnd = hWnd;
-
-			if (hWnd == NULL)
-			{
-				SDL_DestroyWindow(window);
-				ReleaseMutex(hMutex);
-				return 0;
-			}
 
 			// Set colour depth
 			int depth;
@@ -303,9 +263,6 @@ int main(int argc, char *argv[])
 	if (CheckFileExists("fps"))
 		bFps = TRUE;
 
-	if (!bFullscreen)
-		LoadWindowRect(hWnd, "window.rect", FALSE);
-
 	// Set rects
 	RECT rcLoading = {0, 0, 64, 8};
 	RECT rcFull = {0, 0, 0, 0};
@@ -323,7 +280,6 @@ int main(int argc, char *argv[])
 	if (!Flip_SystemTask())
 	{
 		SDL_DestroyWindow(window);
-		ReleaseMutex(hMutex);
 		return 1;
 	}
 	else
@@ -343,7 +299,7 @@ int main(int argc, char *argv[])
 		InitTriangleTable();
 
 		// Run game code
-		Game(hWnd);
+		Game();
 
 		// End stuff
 		EndDirectSound();
@@ -351,7 +307,6 @@ int main(int argc, char *argv[])
 		EndDirectDraw();
 
 		SDL_DestroyWindow(window);
-		ReleaseMutex(hMutex);
 	}
 
 	return 1;

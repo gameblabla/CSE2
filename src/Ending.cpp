@@ -435,7 +435,7 @@ void CutCreditIllust()
 }
 
 // Scene of the island falling
-int Scene_DownIsland(HWND hWnd, int mode)
+int Scene_DownIsland(int mode)
 {
 	// Setup background
 	RECT rc_frame = {(WINDOW_WIDTH - 160) / 2, (WINDOW_HEIGHT - 80) / 2, (WINDOW_WIDTH + 160) / 2, (WINDOW_HEIGHT + 80) / 2};
@@ -457,7 +457,7 @@ int Scene_DownIsland(HWND hWnd, int mode)
 		// Escape menu
 		if (gKey & 0x8000)
 		{
-			switch (Call_Escape(hWnd))
+			switch (Call_Escape())
 			{
 				case 0:
 					return 0;

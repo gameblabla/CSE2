@@ -394,7 +394,7 @@ int CampLoop()
 
 		if (gKeyTrg & KEY_ESCAPE)
 		{
-			switch (Call_Escape(ghWnd))
+			switch (Call_Escape())
 			{
 				case 0:
 					return 0;

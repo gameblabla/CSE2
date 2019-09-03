@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "SDL.h"
+
 #include "WindowsWrapper.h"
 
 #include "ArmsItem.h"
@@ -108,7 +110,7 @@ void PutNumber4(int x, int y, int value, BOOL bZero)
 	}
 }
 
-int ModeOpening(HWND hWnd)
+int ModeOpening()
 {
 	int frame_x;
 	int frame_y;
@@ -150,7 +152,7 @@ int ModeOpening(HWND hWnd)
 		// Escape menu
 		if (gKey & KEY_ESCAPE)
 		{
-			switch (Call_Escape(ghWnd))
+			switch (Call_Escape())
 			{
 				case 0:
 					return 0;
@@ -211,8 +213,8 @@ int ModeOpening(HWND hWnd)
 		++gCounter;
 	}
 
-	wait = GetTickCount();
-	while (GetTickCount() < wait + 500)
+	wait = SDL_GetTicks();
+	while (SDL_GetTicks() < wait + 500)
 	{
 		CortBox(&grcGame, 0x000000);
 		PutFramePerSecound();
@@ -222,7 +224,7 @@ int ModeOpening(HWND hWnd)
 	return 2;
 }
 
-int ModeTitle(HWND hWnd)
+int ModeTitle(void)
 {
 	// Set rects
 	RECT rcTitle = {0, 0, 144, 40};
@@ -360,7 +362,7 @@ int ModeTitle(HWND hWnd)
 
 		if (gKey & KEY_ESCAPE)
 		{
-			switch (Call_Escape(ghWnd))
+			switch (Call_Escape())
 			{
 				case 0:
 					return 0;
@@ -456,8 +458,8 @@ int ModeTitle(HWND hWnd)
 	ChangeMusic(MUS_SILENCE);
 
 	// Black screen when option is selected
-	wait = GetTickCount();
-	while (GetTickCount() < wait + 1000)
+	wait = SDL_GetTicks();
+	while (SDL_GetTicks() < wait + 1000)
 	{
 		CortBox(&grcGame, 0);
 		PutFramePerSecound();
@@ -468,7 +470,7 @@ int ModeTitle(HWND hWnd)
 	return 3;
 }
 
-int ModeAction(HWND hWnd)
+int ModeAction(void)
 {
 	int frame_x;
 	int frame_y;
@@ -506,12 +508,12 @@ int ModeAction(HWND hWnd)
 
 	if (bContinue)
 	{
-		if (!LoadProfile(NULL) && !InitializeGame(hWnd))	// ...Shouldn't that '&&' be a '||'?
+		if (!LoadProfile(NULL) && !InitializeGame())	// ...Shouldn't that '&&' be a '||'?
 			return 0;
 	}
 	else
 	{
-		if (!InitializeGame(hWnd))
+		if (!InitializeGame())
 			return 0;
 	}
 
@@ -523,7 +525,7 @@ int ModeAction(HWND hWnd)
 		// Escape menu
 		if (gKey & KEY_ESCAPE)
 		{
-			switch (Call_Escape(ghWnd))
+			switch (Call_Escape())
 			{
 				case 0:
 					return 0;
@@ -676,25 +678,17 @@ int ModeAction(HWND hWnd)
 	return 0;
 }
 
-BOOL Game(HWND hWnd)
+BOOL Game(void)
 {
 	int mode;
 
 	if (!LoadGenericData())
 	{
-		#if defined(NONPORTABLE) && defined(WINDOWS)
-			#ifdef JAPANESE
-			MessageBoxA(hWnd, "\x94\xC4\x97\x70\x83\x74\x83\x40\x83\x43\x83\x8B\x82\xAA\x93\xC7\x82\xDF\x82\xC8\x82\xA2", "\x83\x47\x83\x89\x81\x5B", MB_OK);
-			#else
-			MessageBoxA(hWnd, "Couldn't read general purpose files", "Error", MB_OK);
-			#endif
-		#else
-			#ifdef JAPANESE
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", "汎用ファイルが読めない", NULL);
-			#else
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Couldn't read general purpose files", NULL);
-			#endif
-		#endif
+#ifdef JAPANESE
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", "汎用ファイルが読めない", NULL);
+#else
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Couldn't read general purpose files", NULL);
+#endif
 
 		return FALSE;
 	}
@@ -706,19 +700,11 @@ BOOL Game(HWND hWnd)
 
 	if (!LoadNpcTable(path))
 	{
-		#if defined(NONPORTABLE) && defined(WINDOWS)
-			#ifdef JAPANESE
-			MessageBoxA(hWnd, "\x4E\x50\x43\x83\x65\x81\x5B\x83\x75\x83\x8B\x82\xAA\x93\xC7\x82\xDF\x82\xC8\x82\xA2", "\x83\x47\x83\x89\x81\x5B", MB_OK);
-			#else
-			MessageBoxA(hWnd, "Couldn't read the NPC table", "Error", MB_OK);
-			#endif
-		#else
-			#ifdef JAPANESE
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", "NPCテーブルが読めない", NULL);
-			#else
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Couldn't read the NPC table", NULL);
-			#endif
-		#endif
+#ifdef JAPANESE
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", "NPCテーブルが読めない", NULL);
+#else
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Couldn't read the NPC table", NULL);
+#endif
 
 		return FALSE;
 	}
@@ -732,11 +718,11 @@ BOOL Game(HWND hWnd)
 	while (mode)
 	{
 		if (mode == 1)
-			mode = ModeOpening(hWnd);
+			mode = ModeOpening();
 		if (mode == 2)
-			mode = ModeTitle(hWnd);
+			mode = ModeTitle();
 		if (mode == 3)
-			mode = ModeAction(hWnd);
+			mode = ModeAction();
 	}
 
 	PlaySoundObject(7, 0);
@@ -745,9 +731,6 @@ BOOL Game(HWND hWnd)
 	EndTextScript();
 	ReleaseNpcTable();
 	ReleaseCreditScript();
-
-	if (!bFullscreen)
-		SaveWindowRect(hWnd, "window.rect");
 
 	return TRUE;
 }

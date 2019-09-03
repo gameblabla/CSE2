@@ -64,7 +64,7 @@ void BackupSurface(SurfaceID surf_no, const RECT *rect);
 void PutBitmap3(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID surf_no);
 void PutBitmap4(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID surf_no);
 void Surface2Surface(int x, int y, const RECT *rect, int to, int from);
-unsigned long GetCortBoxColor(COLORREF col);
+unsigned long GetCortBoxColor(unsigned long col);
 void CortBox(const RECT *rect, unsigned long col);
 void CortBox2(const RECT *rect, unsigned long col, SurfaceID surf_no);
 int RestoreSurfaces(void);

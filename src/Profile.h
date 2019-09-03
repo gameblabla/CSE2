@@ -34,4 +34,4 @@ struct PROFILE
 BOOL IsProfile();
 BOOL SaveProfile(const char *name);
 BOOL LoadProfile(const char *name);
-BOOL InitializeGame(HWND hWnd);
+BOOL InitializeGame(void);

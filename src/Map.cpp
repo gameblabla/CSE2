@@ -9,6 +9,7 @@
 
 #include "CommonDefines.h"
 #include "Draw.h"
+#include "File.h"
 #include "NpChar.h"
 #include "Tags.h"
 

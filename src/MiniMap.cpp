@@ -94,7 +94,7 @@ int MiniMapLoop()
 
 		if (gKey & KEY_ESCAPE)
 		{
-			switch (Call_Escape(ghWnd))
+			switch (Call_Escape())
 			{
 				case 0:
 					return 0;
@@ -138,7 +138,7 @@ int MiniMapLoop()
 
 		if (gKey & KEY_ESCAPE)
 		{
-			switch (Call_Escape(ghWnd))
+			switch (Call_Escape())
 			{
 				case 0:
 					return 0;
@@ -179,7 +179,7 @@ int MiniMapLoop()
 
 		if (gKey & KEY_ESCAPE)
 		{
-			switch (Call_Escape(ghWnd))
+			switch (Call_Escape())
 			{
 				case 0:
 					return 0;

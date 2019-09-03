@@ -1,5 +1,5 @@
 #pragma once
-
+/*
 #ifdef WINDOWS
 #include <windows.h>
 // Avoid name collisions
@@ -7,12 +7,15 @@
 #undef FindResource
 #undef CreateWindow
 #else
-
+*/
 #include <stdio.h>
 
 typedef int HWND;
 
 typedef int BOOL;
+
+typedef unsigned char BYTE;
+typedef unsigned long DWORD;
 
 #ifndef FALSE
 #define FALSE 0
@@ -29,7 +32,7 @@ struct RECT
 	long right;
 	long bottom;
 };
-#endif
+//#endif
 
 #define SET_RECT(rect, l, t, r, b) \
 	rect.left = l; \

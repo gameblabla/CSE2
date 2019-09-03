@@ -7,6 +7,7 @@
 
 #include "CommonDefines.h"
 #include "Draw.h"
+#include "File.h"
 #include "Frame.h"
 #include "Game.h"
 #include "Map.h"

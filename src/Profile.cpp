@@ -9,6 +9,7 @@
 #include "ArmsItem.h"
 #include "BossLife.h"
 #include "Fade.h"
+#include "File.h"
 #include "Flags.h"
 #include "Frame.h"
 #include "Game.h"
@@ -237,7 +238,7 @@ BOOL LoadProfile(const char *name)
 	return TRUE;
 }
 
-BOOL InitializeGame(HWND hWnd)
+BOOL InitializeGame(void)
 {
 	InitMyChar();
 	gSelectedArms = 0;
@@ -250,21 +251,11 @@ BOOL InitializeGame(HWND hWnd)
 	InitFlags();
 	if (!TransferStage(13, 200, 10, 8))
 	{
-		#if defined(NONPORTABLE) && defined(WINDOWS)
-			#ifdef JAPANESE
-			MessageBoxA(hWnd, "\x83\x58\x83\x65\x81\x5B\x83\x57\x82\xCC\x93\xC7\x82\xDD\x8D\x9E\x82\xDD\x82\xC9\x8E\xB8\x94\x73", "\x83\x47\x83\x89\x81\x5B", MB_OK);
-			#else
-			MessageBoxA(hWnd, "Failed to load stage", "Error", MB_OK);
-			#endif
-		#else
-			(void)hWnd;
-
-			#ifdef JAPANESE
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", "ステージの読み込みに失敗", NULL);
-			#else
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Failed to load stage", NULL);
-			#endif
-		#endif
+#ifdef JAPANESE
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", "ステージの読み込みに失敗", NULL);
+#else
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Failed to load stage", NULL);
+#endif
 
 		return FALSE;
 	}

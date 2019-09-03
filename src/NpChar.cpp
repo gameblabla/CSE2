@@ -9,6 +9,7 @@
 #include "ArmsItem.h"
 #include "Caret.h"
 #include "Draw.h"
+#include "File.h"
 #include "Flags.h"
 #include "Game.h"
 #include "MyChar.h"

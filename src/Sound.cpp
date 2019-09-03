@@ -233,7 +233,6 @@ int MakePixToneObject(const PIXTONEPARAMETER *ptp, int ptp_num, int no)
 {
 	int i;
 	int j;
-	DSBUFFERDESC dsbd;
 	const PIXTONEPARAMETER *ptp_pointer;
 	int sample_count;
 	unsigned char *pcm_buffer;

@@ -8,6 +8,7 @@
 #include "CommonDefines.h"
 #include "Caret.h"
 #include "Draw.h"
+#include "File.h"
 #include "Game.h"
 #include "MyChar.h"
 #include "NpChar.h"

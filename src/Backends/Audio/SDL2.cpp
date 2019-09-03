@@ -6,6 +6,7 @@
 
 #include "SDL.h"
 
+#include "../../Organya.h"
 #include "../../WindowsWrapper.h"
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
@@ -77,6 +78,22 @@ static void Callback(void *user_data, Uint8 *stream_uint8, int len)
 
 	for (unsigned int i = 0; i < frames_total * 2; ++i)
 		stream[i] = 0.0f;
+
+	if (organya_timer != 0)
+	{
+		static int timer_countdown;
+
+		timer_countdown -= frames_total * 1000;
+
+		if (timer_countdown <= 0)
+		{
+			do
+			{
+				timer_countdown += organya_timer * 44100;
+				UpdateOrganya();
+			} while (timer_countdown <= 0);
+		}
+	}
 
 	for (AudioBackend_Sound *sound = sound_list_head; sound != NULL; sound = sound->next)
 	{

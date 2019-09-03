@@ -6,6 +6,7 @@
 
 #include "WindowsWrapper.h"
 
+#include "File.h"
 #include "Generic.h"
 #include "NpcAct.h"
 

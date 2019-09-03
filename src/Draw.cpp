@@ -59,12 +59,12 @@ BOOL Flip_SystemTask(void)
 			return FALSE;
 
 		// Framerate limiter
-		timeNow = GetTickCount();
+		timeNow = SDL_GetTicks();
 
 		if (timeNow >= timePrev + FRAMERATE)
 			break;
 
-		Sleep(1);
+		SDL_Delay(1);
 	}
 
 	if (timeNow >= timePrev + 100)
@@ -482,7 +482,7 @@ void Surface2Surface(int x, int y, const RECT *rect, int to, int from)
 	Backend_Blit(surf[from], &src_rect, surf[to], x * magnification, y * magnification, TRUE);
 }
 
-unsigned long GetCortBoxColor(COLORREF col)
+unsigned long GetCortBoxColor(unsigned long col)
 {
 	// Comes in 00BBGGRR, goes out 00BBGGRR
 	return col;

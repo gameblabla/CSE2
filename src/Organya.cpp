@@ -8,6 +8,7 @@
 
 #include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "WindowsWrapper.h"
@@ -111,6 +112,8 @@ typedef struct OrgData
 	// 以下はファイル関係 (The following are related to files)
 	BOOL InitMusicData(const char *path);
 } ORGDATA;
+
+unsigned short organya_timer;
 
 ORGDATA org_data;
 
@@ -678,117 +681,6 @@ void OrgData::GetMusicInfo(MUSICINFO *mi)
 	}
 }
 
-/*■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■*/
-//プロトタイプ宣言 (prototype declaration)
-/*■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■*/
-
-BOOL InitMMTimer();
-BOOL StartTimer(DWORD dwTimer);
-VOID CALLBACK TimerProc(UINT uTID,UINT uMsg,DWORD dwUser,DWORD dwParam1,DWORD dwParam2);
-BOOL QuitMMTimer();
-
-/*■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■*/
-//グローバル変数 (Global variable)
-/*■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■*/
-static UINT ExactTime   = 13;	// 最小精度 (Minimum accuracy)
-static UINT TimerID;
-static BOOL nameless_flag;
-
-/*■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■*/
-// タイマー精度を設定する。 (Set timer accuracy.)
-// この関数はアプリケーション初期化時に一度呼び出す。 (This function is called once when the application is initialized.)
-/*■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■*/
-BOOL InitMMTimer()
-{
-	TIMECAPS tc;
-	MMRESULT ret;
-
-	// タイマーの精度情報を取得する (Get timer accuracy information)
-	ret = timeGetDevCaps(&tc,sizeof(TIMECAPS));
-	if (ret != TIMERR_NOERROR)
-		return FALSE;
-
-	if (ExactTime < tc.wPeriodMin)
-		ExactTime = tc.wPeriodMin;
-
-	// この精度で初期化する (Initialize with this precision)
-	ret = timeBeginPeriod(ExactTime);
-	if (ret != TIMERR_NOERROR)
-		return FALSE;
-
-	return TRUE;
-}
-
-/*■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■*/
-// タイマーを起動する。 (Start the timer.)
-// dwTimer   設定するタイマー間隔 (dwTimer   Timer interval to be set)
-/*■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■*/
-BOOL StartTimer(DWORD dwTimer)
-{
-	MMRESULT ret = MMSYSERR_NOERROR;
-	ExactTime = dwTimer;
-
-	// タイマーを生成する (Generate timer)
-	TimerID = timeSetEvent
-	(
-		dwTimer,                   // タイマー時間 (Timer time)
-		10,                        // 許容できるタイマー精度 (Acceptable timer accuracy)
-		(LPTIMECALLBACK)TimerProc, // コールバックプロシージャ (Callback procedure)
-		0,                         // ユーザーがコールバック関数のdwUserに送る情報値 (Information value sent by user to dwUser in callback function)
-		TIME_PERIODIC              // タイマー時間毎にイベントを発生させる (Generate an event every timer time)
-	);
-
-	if (ret != TIMERR_NOERROR)
-		return FALSE;
-
-	nameless_flag = TRUE;
-
-	return TRUE;
-}
-
-/*■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■*/
-// タイマーのコールバック関数 (Timer callback function)
-/*■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■*/
-VOID CALLBACK TimerProc(UINT uTID,UINT uMsg,DWORD dwUser,DWORD dwParam1,DWORD dwParam2)
-{
-	DWORD dwNowTime;
-	dwNowTime = timeGetTime();
-	//===================================================================================
-	// ここにユーザー定義のソースを書く。 (Write user-defined source here.)
-	// 基本的に関数を呼び出すだけで処理は他の関数でするべきだろう。 (Basically just call a function and the process should be another function.)
-	//===================================================================================
-	org_data.PlayData();
-}
-
-/*■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■*/
-// タイマーリソースを開放する。 (Release timer resources.)
-// アプリケーション終了時に一度呼び出す。 (Call once when the application ends.)
-/*■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■*/
-BOOL QuitMMTimer()
-{
-	MMRESULT ret;
-
-	if (!nameless_flag)
-		return FALSE;
-
-	if(TimerID != TIMERR_NOERROR)
-	{
-		// タイマーを使用中なら終了させる (Terminate timer if in use)
-		ret = timeKillEvent(TimerID);
-		if (ret != TIMERR_NOERROR)
-			return FALSE;
-	}
-
-	// タイマーリソースを開放する (Release timer resources)
-	ret = timeEndPeriod(ExactTime);
-	if (ret != TIMERR_NOERROR)
-		return FALSE;
-
-	nameless_flag = FALSE;
-
-	return TRUE;
-}
-
 // Play data
 long play_p;
 NOTELIST *play_np[MAXTRACK];
@@ -915,9 +807,7 @@ unsigned int GetOrganyaPosition(void)
 
 void PlayOrganyaMusic(void)
 {
-	QuitMMTimer();
-	InitMMTimer();
-	StartTimer(org_data.info.wait);
+	organya_timer = org_data.info.wait;
 }
 
 BOOL ChangeOrganyaVolume(signed int volume)
@@ -931,8 +821,7 @@ BOOL ChangeOrganyaVolume(signed int volume)
 
 void StopOrganyaMusic()
 {
-	// Stop timer
-	QuitMMTimer();
+	organya_timer = 0;
 
 	// Stop notes
 	for (int i = 0; i < MAXMELODY; i++)
@@ -942,7 +831,7 @@ void StopOrganyaMusic()
 	memset(key_on, 0, sizeof(key_on));
 	memset(key_twin, 0, sizeof(key_twin));
 
-	Sleep(100);
+//	Sleep(100);
 }
 
 void SetOrganyaFadeout()
@@ -952,8 +841,7 @@ void SetOrganyaFadeout()
 
 void EndOrganya()
 {
-	// End timer
-	QuitMMTimer();
+	organya_timer = 0;
 
 	// Release everything related to org
 	org_data.ReleaseNote();
@@ -963,4 +851,9 @@ void EndOrganya()
 		PlayOrganObject(0, 0, i, 0);
 		ReleaseOrganyaObject(i);
 	}
+}
+
+void UpdateOrganya(void)
+{
+	org_data.PlayData();
 }

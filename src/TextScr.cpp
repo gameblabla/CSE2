@@ -705,18 +705,10 @@ int TextScriptProc()
 						y = GetTextScriptNo(gTS.p_read + 19);
 						if (!TransferStage(z, w, x, y))
 						{
-							#if defined(NONPORTABLE) && defined(WINDOWS)
-								#ifdef JAPANESE
-								MessageBoxA(ghWnd, "\x83\x58\x83\x65\x81\x5B\x83\x57\x82\xCC\x93\xC7\x82\xDD\x8D\x9E\x82\xDD\x82\xC9\x8E\xB8\x94\x73", "\x83\x47\x83\x89\x81\x5B", MB_OK);
-								#else
-								MessageBoxA(ghWnd, "Failed to load stage", "Error", MB_OK);
-								#endif
+							#ifdef JAPANESE
+							SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", "ステージの読み込みに失敗", NULL);
 							#else
-								#ifdef JAPANESE
-								SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", "ステージの読み込みに失敗", NULL);
-								#else
-								SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Failed to load stage", NULL);
-								#endif
+							SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Failed to load stage", NULL);
 							#endif
 
 							return 0;
@@ -1180,7 +1172,7 @@ int TextScriptProc()
 					}
 					else if (IS_COMMAND('I','N','I'))
 					{
-						InitializeGame(ghWnd);
+						InitializeGame();
 						gTS.p_read += 4;
 					}
 					else if (IS_COMMAND('S','V','P'))
@@ -1191,7 +1183,7 @@ int TextScriptProc()
 					else if (IS_COMMAND('L','D','P'))
 					{
 						if (!LoadProfile(NULL))
-							InitializeGame(ghWnd);
+							InitializeGame();
 					}
 					else if (IS_COMMAND('F','A','C'))
 					{
@@ -1253,7 +1245,7 @@ int TextScriptProc()
 						bExit = TRUE;
 						z = GetTextScriptNo(gTS.p_read + 4);
 
-						switch (Scene_DownIsland(ghWnd, z))
+						switch (Scene_DownIsland(z))
 						{
 							case 0:
 								return 0;
