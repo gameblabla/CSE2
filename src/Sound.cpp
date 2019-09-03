@@ -17,6 +17,7 @@ equivalents.
 #include <stdlib.h>
 #include <string.h>
 
+#define DIRECTSOUND_VERSION 0x500
 #include <dsound.h>
 
 #include "WindowsWrapper.h"
@@ -35,23 +36,26 @@ LPDIRECTSOUNDBUFFER lpSECONDARYBUFFER[SE_MAX];
 BOOL InitDirectSound(HWND hwnd)
 {
 	int i;
-	DSBUFFERDESC1 dsbd;
+	DSBUFFERDESC dsbd;
 
 	// DirectDrawの初期化 (DirectDraw initialization)
 	if (DirectSoundCreate(NULL, &lpDS, NULL) != DS_OK)
 	{
 		lpDS = NULL;
+#ifndef FIX_BUGS
+		// This makes absolutely no sense here
 		StartOrganya(lpDS, "Org\\Wave.dat");
+#endif
 		return FALSE;
 	}
 
 	lpDS->SetCooperativeLevel(hwnd, DSSCL_EXCLUSIVE);
 
 	// 一次バッファの初期化 (Initializing the primary buffer)
-	ZeroMemory(&dsbd, sizeof(DSBUFFERDESC1));
-	dsbd.dwSize = sizeof(DSBUFFERDESC1);
+	ZeroMemory(&dsbd, sizeof(dsbd));
+	dsbd.dwSize = sizeof(dsbd);
 	dsbd.dwFlags = DSBCAPS_PRIMARYBUFFER | DSBCAPS_CTRLPAN | DSBCAPS_CTRLVOLUME;
-	lpDS->CreateSoundBuffer((DSBUFFERDESC*)&dsbd, &lpPRIMARYBUFFER, NULL);
+	lpDS->CreateSoundBuffer(&dsbd, &lpPRIMARYBUFFER, NULL);
 
 	for (i = 0; i < SE_MAX; i++)
 		lpSECONDARYBUFFER[i] = NULL;
@@ -88,7 +92,7 @@ void EndDirectSound(void)
 BOOL InitSoundObject(LPCSTR resname, int no)
 {
 	HRSRC hrscr;
-	DSBUFFERDESC1 dsbd;
+	DSBUFFERDESC dsbd;
 	DWORD *lpdword;	// リソースのアドレス (Resource address)
 
 	if (lpDS == NULL)
@@ -102,13 +106,13 @@ BOOL InitSoundObject(LPCSTR resname, int no)
 	lpdword = (DWORD*)LockResource(LoadResource(NULL, hrscr));
 
 	// 二次バッファの生成 (Create secondary buffer)
-	ZeroMemory(&dsbd, sizeof(DSBUFFERDESC1));
-	dsbd.dwSize = sizeof(DSBUFFERDESC1);
+	ZeroMemory(&dsbd, sizeof(dsbd));
+	dsbd.dwSize = sizeof(dsbd);
 	dsbd.dwFlags = DSBCAPS_STATIC | DSBCAPS_GLOBALFOCUS | DSBCAPS_CTRLPAN | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY;
 	dsbd.dwBufferBytes = *(DWORD*)((BYTE*)lpdword+0x36);	// WAVEデータのサイズ (WAVE data size)
 	dsbd.lpwfxFormat = (LPWAVEFORMATEX)(lpdword+5); 
 
-	if (lpDS->CreateSoundBuffer((DSBUFFERDESC*)&dsbd, &lpSECONDARYBUFFER[no], NULL) != DS_OK)
+	if (lpDS->CreateSoundBuffer(&dsbd, &lpSECONDARYBUFFER[no], NULL) != DS_OK)
 		return FALSE;
 
 	LPVOID lpbuf1, lpbuf2;
@@ -175,14 +179,14 @@ BOOL LoadSoundObject(LPCSTR file_name, int no)
 	fclose(fp);
 
 	// セカンダリバッファの生成 (Create secondary buffer)
-	DSBUFFERDESC1 dsbd;
-	ZeroMemory(&dsbd, sizeof(DSBUFFERDESC1));
-	dsbd.dwSize = sizeof(DSBUFFERDESC1);
+	DSBUFFERDESC dsbd;
+	ZeroMemory(&dsbd, sizeof(dsbd));
+	dsbd.dwSize = sizeof(dsbd);
 	dsbd.dwFlags = DSBCAPS_STATIC | DSBCAPS_GLOBALFOCUS | DSBCAPS_CTRLPAN | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY;
 	dsbd.dwBufferBytes = *(DWORD*)((BYTE*)wp+0x36);	// WAVEデータのサイズ (WAVE data size)
 	dsbd.lpwfxFormat = (LPWAVEFORMATEX)(wp+5); 
 
-	if (lpDS->CreateSoundBuffer((DSBUFFERDESC*)&dsbd, &lpSECONDARYBUFFER[no], NULL) != DS_OK)
+	if (lpDS->CreateSoundBuffer(&dsbd, &lpSECONDARYBUFFER[no], NULL) != DS_OK)
 	{
 #ifdef FIX_BUGS
 		free(wp);	// The updated Organya source code includes this fix
@@ -290,7 +294,7 @@ int MakePixToneObject(const PIXTONEPARAMETER *ptp, int ptp_num, int no)
 
 	int i;
 	int j;
-	DSBUFFERDESC1 dsbd;
+	DSBUFFERDESC dsbd;
 	WavHeader wav_header;
 	const PIXTONEPARAMETER *ptp_pointer;
 	int sample_count;
@@ -330,13 +334,13 @@ int MakePixToneObject(const PIXTONEPARAMETER *ptp, int ptp_num, int no)
 		++ptp_pointer;
 	}
 
-	ZeroMemory(&dsbd, sizeof(DSBUFFERDESC1));
-	dsbd.dwSize = sizeof(DSBUFFERDESC1);
+	ZeroMemory(&dsbd, sizeof(dsbd));
+	dsbd.dwSize = sizeof(dsbd);
 	dsbd.dwFlags = DSBCAPS_STATIC | DSBCAPS_GLOBALFOCUS | DSBCAPS_CTRLPAN | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY;
 	dsbd.dwBufferBytes = sample_count;
 	dsbd.lpwfxFormat = (WAVEFORMATEX*)&wav_header.audio_format;
 
-	if (lpDS->CreateSoundBuffer((DSBUFFERDESC*)&dsbd, &lpSECONDARYBUFFER[no], 0) != DS_OK)
+	if (lpDS->CreateSoundBuffer(&dsbd, &lpSECONDARYBUFFER[no], 0) != DS_OK)
 		return -1;
 
 	pcm_buffer = mixed_pcm_buffer = NULL;
