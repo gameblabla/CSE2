@@ -69,7 +69,7 @@ typedef struct MUSICINFO
 	unsigned short alloc_note;	// Number of allocated notes
 	long repeat_x;	// Repeat
 	long end_x;	// End of song (Return to repeat)
-	TRACKDATA tdata[16];
+	TRACKDATA tdata[MAXTRACK];
 } MUSICINFO;
 
 // メインクラス。このアプリケーションの中心。（クラスってやつを初めて使う） (Main class. The heart of this application. (Class is used for the first time))
