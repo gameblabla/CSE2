@@ -144,6 +144,7 @@ RESOURCES = \
 	BITMAP/Credit18.bmp \
 	CURSOR/CURSOR_IKA.bmp \
 	CURSOR/CURSOR_NORMAL.bmp \
+	ICON/ICON_MINI.bmp \
 	ORG/Access.org \
 	ORG/Anzen.org \
 	ORG/Balcony.org \

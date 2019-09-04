@@ -19,6 +19,7 @@
 #include "MyChar.h"
 #include "Organya.h"
 #include "Profile.h"
+#include "Resource.h"
 #include "Sound.h"
 #include "Triangle.h"
 
@@ -260,6 +261,24 @@ int main(int argc, char *argv[])
 	SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
 #endif
 
+	// Set up the window icon and cursor
+	const unsigned char *resource_data;
+	size_t resource_size;
+	SDL_RWops *rwops;
+
+	resource_data = FindResource("ICON_MINI", "ICON", &resource_size);
+	rwops = SDL_RWFromConstMem(resource_data, resource_size);
+	SDL_Surface *icon_surface = SDL_LoadBMP_RW(rwops, 1);
+	SDL_SetWindowIcon(window, icon_surface);
+	SDL_FreeSurface(icon_surface);
+
+	resource_data = FindResource("CURSOR_NORMAL", "CURSOR", &resource_size);
+	rwops = SDL_RWFromConstMem(resource_data, resource_size);
+	SDL_Surface *cursor_surface = SDL_LoadBMP_RW(rwops, 1);
+	SDL_SetColorKey(cursor_surface, SDL_TRUE, SDL_MapRGB(cursor_surface->format, 0xFF, 0, 0xFF));
+	SDL_Cursor *cursor = SDL_CreateColorCursor(cursor_surface, 0, 0);
+	SDL_SetCursor(cursor);
+
 	if (CheckFileExists("fps"))
 		bFps = TRUE;
 
@@ -279,6 +298,8 @@ int main(int argc, char *argv[])
 	// Draw to screen
 	if (!Flip_SystemTask())
 	{
+        SDL_FreeCursor(cursor);
+        SDL_FreeSurface(cursor_surface);
 		SDL_DestroyWindow(window);
 		return 1;
 	}
@@ -306,6 +327,8 @@ int main(int argc, char *argv[])
 		EndTextObject();
 		EndDirectDraw();
 
+        SDL_FreeCursor(cursor);
+        SDL_FreeSurface(cursor_surface);
 		SDL_DestroyWindow(window);
 	}
 

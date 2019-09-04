@@ -58,13 +58,7 @@ BEGIN
     END
 END
 
-CURSOR_IKA CURSOR "CURSOR\\CURSOR_IKA.cur"
-
-CURSOR_NORMAL CURSOR "CURSOR\\CURSOR_NORMAL.cur"
-
 0 ICON "ICON\\0.ico"
-
-ICON_MINI ICON "ICON\\ICON_MINI.ico"
 
 #endif    // Japanese resources
 /////////////////////////////////////////////////////////////////////////////

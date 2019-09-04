@@ -3,6 +3,31 @@
 #include <stddef.h>
 #include <string.h>
 
+#include "Resource/BITMAP/Credit01.bmp.h"
+#include "Resource/BITMAP/Credit02.bmp.h"
+#include "Resource/BITMAP/Credit03.bmp.h"
+#include "Resource/BITMAP/Credit04.bmp.h"
+#include "Resource/BITMAP/Credit05.bmp.h"
+#include "Resource/BITMAP/Credit06.bmp.h"
+#include "Resource/BITMAP/Credit07.bmp.h"
+#include "Resource/BITMAP/Credit08.bmp.h"
+#include "Resource/BITMAP/Credit09.bmp.h"
+#include "Resource/BITMAP/Credit10.bmp.h"
+#include "Resource/BITMAP/Credit11.bmp.h"
+#include "Resource/BITMAP/Credit12.bmp.h"
+#include "Resource/BITMAP/Credit14.bmp.h"
+#include "Resource/BITMAP/Credit15.bmp.h"
+#include "Resource/BITMAP/Credit16.bmp.h"
+#include "Resource/BITMAP/Credit17.bmp.h"
+#include "Resource/BITMAP/Credit18.bmp.h"
+#ifdef JAPANESE
+#include "Resource/BITMAP/pixel_jp.bmp.h"
+#else
+#include "Resource/BITMAP/pixel.bmp.h"
+#endif
+#include "Resource/CURSOR/CURSOR_IKA.bmp.h"
+#include "Resource/CURSOR/CURSOR_NORMAL.bmp.h"
+#include "Resource/ICON/ICON_MINI.bmp.h"
 #include "Resource/ORG/Access.org.h"
 #include "Resource/ORG/Anzen.org.h"
 #include "Resource/ORG/Balcony.org.h"
@@ -46,28 +71,6 @@
 #include "Resource/ORG/XXXX.org.h"
 #include "Resource/ORG/Zonbie.org.h"
 #include "Resource/WAVE/Wave.dat.h"
-#include "Resource/BITMAP/Credit01.bmp.h"
-#include "Resource/BITMAP/Credit02.bmp.h"
-#include "Resource/BITMAP/Credit03.bmp.h"
-#include "Resource/BITMAP/Credit04.bmp.h"
-#include "Resource/BITMAP/Credit05.bmp.h"
-#include "Resource/BITMAP/Credit06.bmp.h"
-#include "Resource/BITMAP/Credit07.bmp.h"
-#include "Resource/BITMAP/Credit08.bmp.h"
-#include "Resource/BITMAP/Credit09.bmp.h"
-#include "Resource/BITMAP/Credit10.bmp.h"
-#include "Resource/BITMAP/Credit11.bmp.h"
-#include "Resource/BITMAP/Credit12.bmp.h"
-#include "Resource/BITMAP/Credit14.bmp.h"
-#include "Resource/BITMAP/Credit15.bmp.h"
-#include "Resource/BITMAP/Credit16.bmp.h"
-#include "Resource/BITMAP/Credit17.bmp.h"
-#include "Resource/BITMAP/Credit18.bmp.h"
-#ifdef JAPANESE
-#include "Resource/BITMAP/pixel_jp.bmp.h"
-#else
-#include "Resource/BITMAP/pixel.bmp.h"
-#endif
 
 static const struct
 {
@@ -76,6 +79,31 @@ static const struct
 	const unsigned char *data;
 	size_t size;
 } resources[] = {
+	{"BITMAP", "CREDIT01", rCredit01, sizeof(rCredit01)},
+	{"BITMAP", "CREDIT02", rCredit02, sizeof(rCredit02)},
+	{"BITMAP", "CREDIT03", rCredit03, sizeof(rCredit03)},
+	{"BITMAP", "CREDIT04", rCredit04, sizeof(rCredit04)},
+	{"BITMAP", "CREDIT05", rCredit05, sizeof(rCredit05)},
+	{"BITMAP", "CREDIT06", rCredit06, sizeof(rCredit06)},
+	{"BITMAP", "CREDIT07", rCredit07, sizeof(rCredit07)},
+	{"BITMAP", "CREDIT08", rCredit08, sizeof(rCredit08)},
+	{"BITMAP", "CREDIT09", rCredit09, sizeof(rCredit09)},
+	{"BITMAP", "CREDIT10", rCredit10, sizeof(rCredit10)},
+	{"BITMAP", "CREDIT11", rCredit11, sizeof(rCredit11)},
+	{"BITMAP", "CREDIT12", rCredit12, sizeof(rCredit12)},
+	{"BITMAP", "CREDIT14", rCredit14, sizeof(rCredit14)},
+	{"BITMAP", "CREDIT15", rCredit15, sizeof(rCredit15)},
+	{"BITMAP", "CREDIT16", rCredit16, sizeof(rCredit16)},
+	{"BITMAP", "CREDIT17", rCredit17, sizeof(rCredit17)},
+	{"BITMAP", "CREDIT18", rCredit18, sizeof(rCredit18)},
+#ifdef JAPANESE
+	{"BITMAP", "PIXEL", rpixel_jp, sizeof(rpixel_jp)},
+#else
+	{"BITMAP", "PIXEL", rpixel, sizeof(rpixel)},
+#endif
+	{"CURSOR", "CURSOR_IKA", rCURSOR_IKA, sizeof(rCURSOR_IKA)},
+	{"CURSOR", "CURSOR_NORMAL", rCURSOR_NORMAL, sizeof(rCURSOR_NORMAL)},
+	{"ICON", "ICON_MINI", rICON_MINI, sizeof(rICON_MINI)},
 	{"ORG", "ACCESS", rAccess, sizeof(rAccess)},
 	{"ORG", "ANZEN", rAnzen, sizeof(rAnzen)},
 	{"ORG", "BALCONY", rBalcony, sizeof(rBalcony)},
@@ -120,29 +148,6 @@ static const struct
 	{"ORG", "ZONBIE", rZonbie, sizeof(rZonbie)},
 
 	{"WAVE", "WAVE100", rWave, sizeof(rWave)},
-
-	{"BITMAP", "CREDIT01", rCredit01, sizeof(rCredit01)},
-	{"BITMAP", "CREDIT02", rCredit02, sizeof(rCredit02)},
-	{"BITMAP", "CREDIT03", rCredit03, sizeof(rCredit03)},
-	{"BITMAP", "CREDIT04", rCredit04, sizeof(rCredit04)},
-	{"BITMAP", "CREDIT05", rCredit05, sizeof(rCredit05)},
-	{"BITMAP", "CREDIT06", rCredit06, sizeof(rCredit06)},
-	{"BITMAP", "CREDIT07", rCredit07, sizeof(rCredit07)},
-	{"BITMAP", "CREDIT08", rCredit08, sizeof(rCredit08)},
-	{"BITMAP", "CREDIT09", rCredit09, sizeof(rCredit09)},
-	{"BITMAP", "CREDIT10", rCredit10, sizeof(rCredit10)},
-	{"BITMAP", "CREDIT11", rCredit11, sizeof(rCredit11)},
-	{"BITMAP", "CREDIT12", rCredit12, sizeof(rCredit12)},
-	{"BITMAP", "CREDIT14", rCredit14, sizeof(rCredit14)},
-	{"BITMAP", "CREDIT15", rCredit15, sizeof(rCredit15)},
-	{"BITMAP", "CREDIT16", rCredit16, sizeof(rCredit16)},
-	{"BITMAP", "CREDIT17", rCredit17, sizeof(rCredit17)},
-	{"BITMAP", "CREDIT18", rCredit18, sizeof(rCredit18)},
-#ifdef JAPANESE
-	{"BITMAP", "PIXEL", rpixel_jp, sizeof(rpixel_jp)},
-#else
-	{"BITMAP", "PIXEL", rpixel, sizeof(rpixel)},
-#endif
 };
 
 const unsigned char* FindResource(const char *name, const char *type, size_t *size)
