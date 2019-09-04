@@ -609,7 +609,7 @@ void InitTextObject(const char *name)
 	size_t size;
 	const unsigned char *data = FindResource("FONT", "FONT", &size);
 
-	font = LoadFontFromData(data, size, 5 * magnification, 10 * magnification);
+	font = LoadFontFromData(data, size, 8 * magnification, 9 * magnification);
 }
 
 void PutText(int x, int y, const char *text, unsigned long color)
