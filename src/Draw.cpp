@@ -11,8 +11,8 @@
 #include "CommonDefines.h"
 #include "Ending.h"
 #include "Generic.h"
-#include "MapName.h"
 #include "Main.h"
+#include "MapName.h"
 #include "Tags.h"
 #include "TextScr.h"
 
