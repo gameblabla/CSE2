@@ -1,6 +1,8 @@
-# Cave Story Engine 2
+# Cave Story Engine 2 (portable)
 
 Cave Story Engine 2 is a decompilation of Cave Story.
+
+This branch migrates the engine from WinAPI to SDL2, and addresses numerous portability issues, allowing it to run on other platforms.
 
 ![Screenshot](screenshot.png)
 
