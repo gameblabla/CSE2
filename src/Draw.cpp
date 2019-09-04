@@ -50,8 +50,8 @@ static struct
 
 BOOL Flip_SystemTask(void)
 {
-	static DWORD timePrev;
-	static DWORD timeNow;
+	static unsigned long timePrev;
+	static unsigned long timeNow;
 
 	while (TRUE)
 	{

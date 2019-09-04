@@ -151,12 +151,12 @@ static const OCTWAVE oct_wave[8] =
 
 BOOL MakeSoundObject8(signed char *wavep, signed char track, signed char pipi)
 {
-	DWORD i,j,k;
+	unsigned long i,j,k;
 	unsigned long wav_tp;	// WAVテーブルをさすポインタ (Pointer to WAV table)
-	DWORD wave_size;	// 256;
-	DWORD data_size;
-	BYTE *wp;
-	BYTE *wp_sub;
+	unsigned long wave_size;	// 256;
+	unsigned long data_size;
+	unsigned char *wp;
+	unsigned char *wp_sub;
 	int work;
 
 	for (j = 0; j < 8; j++)
@@ -185,7 +185,7 @@ BOOL MakeSoundObject8(signed char *wavep, signed char track, signed char pipi)
 				work = *(wavep + wav_tp);
 				work += 0x80;
 
-				*wp_sub = (BYTE)work;
+				*wp_sub = (unsigned char)work;
 
 				wav_tp += 0x100 / wave_size;
 				if (wav_tp > 0xFF)
@@ -310,10 +310,10 @@ signed char wave_data[100][0x100];
 
 BOOL InitWaveData100(void)
 {
-	const DWORD *lpdword;	// リソースのアドレス (Resource address)
+	const unsigned long *lpdword;	// リソースのアドレス (Resource address)
 
 	// リソースの検索 (Search for resources)
-	lpdword = (DWORD*)FindResource("WAVE100", "WAVE", NULL);
+	lpdword = (unsigned long*)FindResource("WAVE100", "WAVE", NULL);
 
 	if (lpdword == NULL)
 		return FALSE;

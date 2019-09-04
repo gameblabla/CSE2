@@ -2,12 +2,7 @@
 
 #include <stdio.h>
 
-typedef int HWND;
-
 typedef int BOOL;
-
-typedef unsigned char BYTE;
-typedef unsigned long DWORD;
 
 #ifndef FALSE
 #define FALSE 0
