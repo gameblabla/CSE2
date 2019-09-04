@@ -1,6 +1,7 @@
 NATIVECC = cc
 NATIVECXX = c++
 WINDRES = windres
+PKG_CONFIG = pkg-config
 
 BUILD_DIRECTORY = game
 ASSETS_DIRECTORY = assets
@@ -42,13 +43,13 @@ ifeq ($(DEBUG_SAVE), 1)
 	CXXFLAGS += -DDEBUG_SAVE
 endif
 
-CXXFLAGS += -std=c++98 -MMD -MP -MF $@.d `pkg-config sdl2 --cflags`
+CXXFLAGS += -std=c++98 -MMD -MP -MF $@.d `$(PKG_CONFIG) sdl2 --cflags`
 
 ifeq ($(STATIC), 1)
 	LDFLAGS += -static
-	LIBS += `pkg-config sdl2 --libs --static`
+	LIBS += `$(PKG_CONFIG) sdl2 --libs --static`
 else
-	LIBS += `pkg-config sdl2 --libs`
+	LIBS += `$(PKG_CONFIG) sdl2 --libs`
 endif
 
 SOURCES = \
@@ -197,13 +198,13 @@ endif
 
 ifeq ($(RENDERER), OpenGL3)
 	SOURCES += src/Backends/Rendering/OpenGL3
-	CXXFLAGS += `pkg-config glew --cflags`
+	CXXFLAGS += `$(PKG_CONFIG) glew --cflags`
 
 	ifeq ($(STATIC), 1)
 		CXXFLAGS += -DGLEW_STATIC
-		LIBS += `pkg-config glew --libs --static`
+		LIBS += `$(PKG_CONFIG) glew --libs --static`
 	else
-		LIBS += `pkg-config glew --libs`
+		LIBS += `$(PKG_CONFIG) glew --libs`
 	endif
 
 	ifeq ($(WINDOWS), 1)
