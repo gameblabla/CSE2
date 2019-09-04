@@ -13,6 +13,7 @@
 #include "Ending.h"
 #include "Generic.h"
 #include "MapName.h"
+#include "Main.h"
 #include "Resource.h"
 #include "Tags.h"
 #include "TextScr.h"

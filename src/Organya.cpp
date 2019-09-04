@@ -617,14 +617,13 @@ BOOL OrgData::InitMusicData(const char *path)
 	// データを有効に (Enable data)
 	for (j = 0; j < MAXMELODY; j++)
 		MakeOrganyaWave(j,info.tdata[j].wave_no, info.tdata[j].pipi);
-#ifndef FIX_BUGS
+
 	// Pixel ripped out some code so he could use PixTone sounds as drums, but he left this dead code
 	for (j = MAXMELODY; j < MAXTRACK; j++)
 	{
 		i = info.tdata[j].wave_no;
 		//InitDramObject(dram_name[i], j - MAXMELODY);
 	}
-#endif
 
 	SetPlayPointer(0);	// 頭出し (Cue)
 

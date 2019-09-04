@@ -26,8 +26,4 @@ struct RECT
 	rect.right = r; \
 	rect.bottom = b;
 
-#ifndef MAX_PATH
 #define MAX_PATH FILENAME_MAX
-#endif
-
-BOOL SystemTask();
