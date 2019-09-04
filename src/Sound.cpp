@@ -39,7 +39,7 @@ BOOL InitDirectSound(void)
 	for (i = 0; i < SE_MAX; i++)
 		lpSECONDARYBUFFER[i] = NULL;
 
-	StartOrganya("Org\\Wave.dat");
+	StartOrganya("Org/Wave.dat");
 
 	return TRUE;
 }

@@ -248,7 +248,7 @@ BOOL MakeSurface_Resource(const char *name, SurfaceID surf_no)
 BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 {
 	char path[MAX_PATH];
-	sprintf(path, "%s\\%s.pbm", gDataPath, name);
+	sprintf(path, "%s/%s.pbm", gDataPath, name);
 
 	if (!IsEnableBitmap(path))
 	{
@@ -328,7 +328,7 @@ BOOL ReloadBitmap_Resource(const char *name, SurfaceID surf_no)
 BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 {
 	char path[MAX_PATH];
-	sprintf(path, "%s\\%s.pbm", gDataPath, name);
+	sprintf(path, "%s/%s.pbm", gDataPath, name);
 
 	if (!IsEnableBitmap(path))
 	{
