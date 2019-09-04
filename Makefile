@@ -43,13 +43,13 @@ ifeq ($(DEBUG_SAVE), 1)
 	CXXFLAGS += -DDEBUG_SAVE
 endif
 
-CXXFLAGS += -std=c++98 -MMD -MP -MF $@.d `$(PKG_CONFIG) sdl2 --cflags`
+CXXFLAGS += -std=c++98 -MMD -MP -MF $@.d `$(PKG_CONFIG) sdl2 --cflags` `$(PKG_CONFIG) freetype2 --cflags`
 
 ifeq ($(STATIC), 1)
 	LDFLAGS += -static
-	LIBS += `$(PKG_CONFIG) sdl2 --libs --static`
+	LIBS += `$(PKG_CONFIG) sdl2 --libs --static` `$(PKG_CONFIG) freetype2 --libs --static`
 else
-	LIBS += `$(PKG_CONFIG) sdl2 --libs`
+	LIBS += `$(PKG_CONFIG) sdl2 --libs` `$(PKG_CONFIG) freetype2 --libs`
 endif
 
 SOURCES = \
@@ -77,6 +77,7 @@ SOURCES = \
 	src/File \
 	src/Flags \
 	src/Flash \
+	src/Font \
 	src/Frame \
 	src/Game \
 	src/Generic \
@@ -145,6 +146,7 @@ RESOURCES = \
 	BITMAP/Credit18.bmp \
 	CURSOR/CURSOR_IKA.bmp \
 	CURSOR/CURSOR_NORMAL.bmp \
+	FONT/LiberationMono.ttf \
 	ICON/ICON_MINI.bmp \
 	ORG/Access.org \
 	ORG/Anzen.org \
@@ -247,7 +249,7 @@ obj/$(FILENAME)/%.o: %.cpp
 	@echo Compiling $<
 	@$(CXX) $(CXXFLAGS) $< -o $@ -c
 
-obj/$(FILENAME)/Resource.o: src/Resource.cpp $(addprefix src/Resource/, $(addsuffix .h, $(RESOURCES)))
+obj/$(FILENAME)/src/Resource.o: src/Resource.cpp $(addprefix src/Resource/, $(addsuffix .h, $(RESOURCES)))
 	@mkdir -p $(@D)
 	@echo Compiling $<
 	@$(CXX) $(CXXFLAGS) $< -o $@ -c

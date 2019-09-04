@@ -9,6 +9,7 @@ This branch migrates the engine from WinAPI to SDL2, and addresses numerous port
 ## Dependencies
 
 * SDL2
+* Freetype
 * FLTK
 * GLEW (if the OpenGL rendering backend is selected)
 

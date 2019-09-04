@@ -11,6 +11,7 @@
 #include "Backends/Rendering.h"
 #include "CommonDefines.h"
 #include "Ending.h"
+#include "Font.h"
 #include "Generic.h"
 #include "Main.h"
 #include "MapName.h"
@@ -36,6 +37,8 @@ static Backend_Surface *framebuffer;
 static Backend_Surface *surf[SURFACE_ID_MAX];
 
 static SDL_PixelFormat *rgb24_pixel_format;	// Needed because SDL2 is stupid
+
+static FontObject *font;
 
 // This doesn't exist in the Linux port, so none of these symbol names are accurate
 static struct
@@ -602,72 +605,24 @@ int RestoreSurfaces(void)	// Guessed function name - this doesn't exist in the L
 */
 // TODO - Inaccurate stack frame
 void InitTextObject(const char *name)
-{/*
-	// Get font size
-	unsigned int width, height;
+{
+	size_t size;
+	const unsigned char *data = FindResource("FONT", "FONT", &size);
 
-	switch (magnification)
-	{
-		case 1:
-			height = 12;
-			width = 6;
-			break;
-
-		case 2:
-			height = 20;
-			width = 10;
-			break;
-	}
-
-	// The game uses DEFAULT_CHARSET when it should have used SHIFTJIS_CHARSET.
-	// This breaks the Japanese text on English Windows installations.
-
-	// Also, the game uses DEFAULT_QUALITY instead of NONANTIALIASED_QUALITY,
-	// causing font antialiasing to blend with the colour-key, giving text ab
-	// ugly black outline.
-#ifdef FIX_BUGS
-	#define QUALITY NONANTIALIASED_QUALITY
-	#ifdef JAPANESE
-		#define CHARSET SHIFTJIS_CHARSET
-	#else
-		#define CHARSET DEFAULT_CHARSET
-	#endif
-#else
-	#define QUALITY DEFAULT_QUALITY
-	#define CHARSET DEFAULT_CHARSET
-#endif
-
-	font = CreateFontA(height, width, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, CHARSET, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, QUALITY, FIXED_PITCH | FF_DONTCARE, name);
-
-	if (font == NULL)
-		font = CreateFontA(height, width, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, CHARSET, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, QUALITY, FIXED_PITCH | FF_DONTCARE, NULL);
-*/}
+	font = LoadFontFromData(data, size, 5 * magnification, 10 * magnification);
+}
 
 void PutText(int x, int y, const char *text, unsigned long color)
-{/*
-	HDC hdc;
-	backbuffer->GetDC(&hdc);
-	HGDIOBJ hgdiobj = SelectObject(hdc, font);
-	SetBkMode(hdc, 1);
-	SetTextColor(hdc, color);
-	TextOutA(hdc, x * magnification, y * magnification, text, (int)strlen(text));
-	SelectObject(hdc, hgdiobj);
-	backbuffer->ReleaseDC(hdc);
-*/}
+{
+	DrawText(font, framebuffer, x * magnification, y * magnification, color, text);
+}
 
 void PutText2(int x, int y, const char *text, unsigned long color, SurfaceID surf_no)
-{/*
-	HDC hdc;
-	surf[surf_no]->GetDC(&hdc);
-	HGDIOBJ hgdiobj = SelectObject(hdc, font);
-	SetBkMode(hdc, 1);
-	SetTextColor(hdc, color);
-	TextOutA(hdc, x * magnification, y * magnification, text, (int)strlen(text));
-	SelectObject(hdc, hgdiobj);
-	surf[surf_no]->ReleaseDC(hdc);
-*/}
+{
+	DrawText(font, surf[surf_no], x * magnification, y * magnification, color, text);
+}
 
 void EndTextObject(void)
 {
-//	DeleteObject(font);
+	UnloadFont(font);
 }
