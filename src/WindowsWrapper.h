@@ -11,5 +11,3 @@
 	rect.top = t; \
 	rect.right = r; \
 	rect.bottom = b;
-
-BOOL SystemTask();
