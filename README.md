@@ -25,6 +25,7 @@ Run 'make' in this folder, preferably with some of the following settings:
 * `STATIC=1` - Produce a statically-linked executable (so you don't need to bundle DLL files)
 * `JAPANESE=1` - Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
 * `FIX_BUGS=1` - Fix bugs in the game (see [src/Bug Fixes.txt](src/Bug%20Fixes.txt))
+* `WINDOWS=1` - Build for Windows
 * `DEBUG_SAVE=1` - Re-enable the ability to drag-and-drop save files onto the window
 * `RENDERER=OpenGL3` - Use the hardware-accelerated OpenGL 3.2 renderer
 * `RENDERER=Texture` - Use the hardware-accelerated SDL2 Texture API renderer (default)

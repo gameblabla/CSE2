@@ -397,9 +397,6 @@ void OrgData::InitOrgData(void)
 // 曲情報を設定。flagはアイテムを指定 (Set song information. flag specifies an item)
 BOOL OrgData::SetMusicInfo(MUSICINFO *mi, unsigned long flag)
 {
-#ifndef FIX_BUGS	// Leftover debug junk
-	char str[32];
-#endif
 	int i;
 
 	if (flag & SETGRID)	// グリッドを有効に (Enable grid)
@@ -411,9 +408,6 @@ BOOL OrgData::SetMusicInfo(MUSICINFO *mi, unsigned long flag)
 	if (flag & SETWAIT)
 	{
 		info.wait = mi->wait;
-#ifndef FIX_BUGS
-		itoa(mi->wait, str, 10);
-#endif
 	}
 
 	if (flag & SETREPEAT)

@@ -34,12 +34,6 @@ ifeq ($(FIX_BUGS), 1)
 	CXXFLAGS += -DFIX_BUGS
 endif
 
-ifeq ($(CONSOLE), 1)
-	CXXFLAGS += -mconsole
-else
-	CXXFLAGS += -mwindows
-endif
-
 ifeq ($(DEBUG_SAVE), 1)
 	CXXFLAGS += -DDEBUG_SAVE
 endif
@@ -207,11 +201,11 @@ ifeq ($(RENDERER), OpenGL3)
 		LIBS += `pkg-config glew --libs`
 	endif
 
-#	ifeq ($(WINDOWS), 1)
+	ifeq ($(WINDOWS), 1)
 		LIBS += -lopengl32
-#	else
-#		LIBS += -lGL
-#	endif
+	else
+		LIBS += -lGL
+	endif
 else ifeq ($(RENDERER), Texture)
 	SOURCES += src/Backends/Rendering/SDLTexture
 else ifeq ($(RENDERER), Surface)
@@ -225,7 +219,9 @@ endif
 OBJECTS = $(addprefix obj/$(FILENAME)/, $(addsuffix .o, $(SOURCES)))
 DEPENDENCIES = $(addprefix obj/$(FILENAME)/, $(addsuffix .o.d, $(SOURCES)))
 
-OBJECTS += obj/$(FILENAME)/windows_resources.o
+ifeq ($(WINDOWS), 1)
+	OBJECTS += obj/$(FILENAME)/windows_resources.o
+endif
 
 all: $(BUILD_DIRECTORY)/$(FILENAME) $(BUILD_DIRECTORY)/data $(BUILD_DIRECTORY)/$(DOCONFIG_FILENAME)
 	@echo Finished
