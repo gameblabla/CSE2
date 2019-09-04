@@ -16,7 +16,7 @@ Run 'make' in this folder, preferably with some of the following settings:
 * `STATIC=1` - Produce a statically-linked executable (so you don't need to bundle DLL files)
 * `JAPANESE=1` - Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
 * `FIX_BUGS=1` - Fix bugs in the game (see [src/Bug Fixes.txt](src/Bug%20Fixes.txt))
-* `DEBUG_SAVE=1` - Re-enable the dummied-out 'Debug Save' option, and the ability to drag-and-drop save files onto the window
+* `DEBUG_SAVE=1` - Re-enable the ability to drag-and-drop save files onto the window
 
 ## Licensing
 
