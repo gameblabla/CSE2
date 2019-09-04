@@ -37,6 +37,7 @@
 #include "NpcHit.h"
 #include "NpcTbl.h"
 #include "Profile.h"
+#include "Random.h"
 #include "SelStage.h"
 #include "Shoot.h"
 #include "Sound.h"
@@ -54,7 +55,7 @@ BOOL bContinue;
 int Random(int min, int max)
 {
 	const int range = max - min + 1;
-	return min + rand() % range;
+	return min + msvc_rand() % range;
 }
 
 void PutNumber4(int x, int y, int value, BOOL bZero)

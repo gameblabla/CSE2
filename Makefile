@@ -115,6 +115,7 @@ SOURCES = \
 	src/Organya \
 	src/PixTone \
 	src/Profile \
+	src/Random \
 	src/Resource \
 	src/SelStage \
 	src/Shoot \
