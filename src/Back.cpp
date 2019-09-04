@@ -31,7 +31,6 @@ BOOL InitBack(const char *fName, int type)
 	if (fp == NULL)
 		return FALSE;
 
-#ifdef NONPORTABLE
 	// This is ridiculously platform-dependant:
 	// It should break on big-endian CPUs, and platforms where short isn't 16-bit and long isn't 32-bit.
 	unsigned short bmp_header_buffer[7];	// These names aren't the original. This ruins the stack frame layout.
@@ -54,19 +53,6 @@ BOOL InitBack(const char *fName, int type)
 
 	gBack.partsW = bmp_header_buffer2[1];
 	gBack.partsH = bmp_header_buffer2[2];
-#else
-	if (fgetc(fp) != 'B' || fgetc(fp) != 'M')
-	{
-		fclose(fp);
-		return FALSE;
-	}
-
-	fseek(fp, 18, SEEK_SET);
-
-	gBack.partsW = File_ReadLE32(fp);
-	gBack.partsH = File_ReadLE32(fp);
-	fclose(fp);
-#endif
 
 	// Set background stuff and load texture
 	gBack.flag = 1;

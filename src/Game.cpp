@@ -682,20 +682,7 @@ BOOL Game(HWND hWnd)
 
 	if (!LoadGenericData())
 	{
-		#if defined(NONPORTABLE) && defined(WINDOWS)
-			#ifdef JAPANESE
-			MessageBoxA(hWnd, "\x94\xC4\x97\x70\x83\x74\x83\x40\x83\x43\x83\x8B\x82\xAA\x93\xC7\x82\xDF\x82\xC8\x82\xA2", "\x83\x47\x83\x89\x81\x5B", MB_OK);
-			#else
-			MessageBoxA(hWnd, "Couldn't read general purpose files", "Error", MB_OK);
-			#endif
-		#else
-			#ifdef JAPANESE
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", "汎用ファイルが読めない", NULL);
-			#else
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Couldn't read general purpose files", NULL);
-			#endif
-		#endif
-
+		MessageBoxA(hWnd, "\x94\xC4\x97\x70\x83\x74\x83\x40\x83\x43\x83\x8B\x82\xAA\x93\xC7\x82\xDF\x82\xC8\x82\xA2", "\x83\x47\x83\x89\x81\x5B", MB_OK);
 		return FALSE;
 	}
 
@@ -706,20 +693,7 @@ BOOL Game(HWND hWnd)
 
 	if (!LoadNpcTable(path))
 	{
-		#if defined(NONPORTABLE) && defined(WINDOWS)
-			#ifdef JAPANESE
-			MessageBoxA(hWnd, "\x4E\x50\x43\x83\x65\x81\x5B\x83\x75\x83\x8B\x82\xAA\x93\xC7\x82\xDF\x82\xC8\x82\xA2", "\x83\x47\x83\x89\x81\x5B", MB_OK);
-			#else
-			MessageBoxA(hWnd, "Couldn't read the NPC table", "Error", MB_OK);
-			#endif
-		#else
-			#ifdef JAPANESE
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", "NPCテーブルが読めない", NULL);
-			#else
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Couldn't read the NPC table", NULL);
-			#endif
-		#endif
-
+		MessageBoxA(hWnd, "\x4E\x50\x43\x83\x65\x81\x5B\x83\x75\x83\x8B\x82\xAA\x93\xC7\x82\xDF\x82\xC8\x82\xA2", "\x83\x47\x83\x89\x81\x5B", MB_OK);
 		return FALSE;
 	}
 

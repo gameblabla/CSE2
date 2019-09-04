@@ -36,7 +36,6 @@ void GetCompileDate(int *year, int *month, int *day)
 	*month = i;
 }
 
-#ifdef WINDOWS
 // TODO - Inaccurate stack frame
 BOOL GetCompileVersion(int *v1, int *v2, int *v3, int *v4)
 {
@@ -95,18 +94,7 @@ BOOL GetCompileVersion(int *v1, int *v2, int *v3, int *v4)
 
 	return bResult;
 }
-#else
-BOOL GetCompileVersion(int *v1, int *v2, int *v3, int *v4)
-{
-	*v1 = 1;
-	*v2 = 0;
-	*v3 = 0;
-	*v4 = 6;
-	return TRUE;
-}
-#endif
 
-#ifdef WINDOWS
 // This seems to be broken in recent Windows (Sndvol32.exe was renamed 'SndVol.exe')
 // TODO - Inaccurate stack frame
 BOOL OpenVolumeConfiguration(HWND hWnd)
@@ -170,9 +158,7 @@ BOOL OpenVolumeConfiguration(HWND hWnd)
 		return TRUE;
 #endif
 }
-#endif
 
-#ifdef WINDOWS
 void DeleteDebugLog(void)
 {
 	char path[MAX_PATH];
@@ -196,9 +182,7 @@ BOOL PrintDebugLog(const char *string, int value1, int value2, int value3)
 	fclose(fp);
 	return TRUE;
 }
-#endif
 
-#ifdef WINDOWS
 /*
 This function is a mystery. It seems to check if the system time is within
 a certain range, specified by the two parameters. Nothing in the original game
@@ -227,17 +211,12 @@ int CheckTime(SYSTEMTIME *system_time_low, SYSTEMTIME *system_time_high)
 	else
 		return 0;
 }
-#endif
 
 BOOL CheckFileExists(const char *name)
 {
 	char path[MAX_PATH];
 
-#ifdef NONPORTABLE
 	sprintf(path, "%s\\%s", gModulePath, name);
-#else
-	sprintf(path, "%s/%s", gModulePath, name);
-#endif
 
 	FILE *file = fopen(path, "rb");
 
@@ -250,7 +229,6 @@ BOOL CheckFileExists(const char *name)
 
 long GetFileSizeLong(const char *path)
 {
-#ifdef NONPORTABLE
 	DWORD len;
 	HANDLE hFile;
 
@@ -263,24 +241,8 @@ long GetFileSizeLong(const char *path)
 	len = GetFileSize(hFile, NULL);
 	CloseHandle(hFile);
 	return len;
-#else
-	long len;
-	FILE *fp;
-
-	len = 0;
-
-	fp = fopen(path, "rb");
-	if (fp == NULL)
-		return -1;
-
-	fseek(fp, 0, SEEK_END);
-	len = ftell(fp);
-	fclose(fp);
-	return len;
-#endif
 }
 
-#ifdef WINDOWS
 BOOL PrintBitmapError(const char *string, int value)
 {
 	char path[MAX_PATH];
@@ -299,7 +261,6 @@ BOOL PrintBitmapError(const char *string, int value)
 	fclose(fp);
 	return TRUE;
 }
-#endif
 
 BOOL IsShiftJIS(unsigned char c)
 {
