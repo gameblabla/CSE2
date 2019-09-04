@@ -490,9 +490,7 @@ void OrgData::InitOrgData(void)
 // 曲情報を設定。flagはアイテムを指定 (Set song information. flag specifies an item)
 BOOL OrgData::SetMusicInfo(MUSICINFO *mi, unsigned long flag)
 {
-#ifndef FIX_BUGS	// Leftover debug junk
-	char str[32];
-#endif
+	char str[32];	// Leftover debug junk
 	int i;
 
 	if (flag & SETGRID)	// グリッドを有効に (Enable grid)
@@ -504,9 +502,7 @@ BOOL OrgData::SetMusicInfo(MUSICINFO *mi, unsigned long flag)
 	if (flag & SETWAIT)
 	{
 		info.wait = mi->wait;
-#ifndef FIX_BUGS
-		itoa(mi->wait, str, 10);
-#endif
+		itoa(mi->wait, str, 10);	// Leftover debug junk
 	}
 
 	if (flag & SETREPEAT)
@@ -720,14 +716,13 @@ BOOL OrgData::InitMusicData(const char *path)
 	// データを有効に (Enable data)
 	for (j = 0; j < MAXMELODY; j++)
 		MakeOrganyaWave(j,info.tdata[j].wave_no, info.tdata[j].pipi);
-#ifndef FIX_BUGS
+
 	// Pixel ripped out some code so he could use PixTone sounds as drums, but he left this dead code
 	for (j = MAXMELODY; j < MAXTRACK; j++)
 	{
 		i = info.tdata[j].wave_no;
 		//InitDramObject(dram_name[i], j - MAXMELODY);
 	}
-#endif
 
 	SetPlayPointer(0);	// 頭出し (Cue)
 
