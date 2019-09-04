@@ -197,12 +197,11 @@ void PlaySoundObject(int no, int mode)
 		switch (mode)
 		{
 			case 0:	// 停止 (Stop)
-				AudioBackend_StopSound(lpSECONDARYBUFFER[no]);
+				AudioBackend_PauseSound(lpSECONDARYBUFFER[no]);
 				break;
 
 			case 1:	// 再生 (Playback)
 				AudioBackend_StopSound(lpSECONDARYBUFFER[no]);
-				AudioBackend_SetSoundPosition(lpSECONDARYBUFFER[no], 0);
 				AudioBackend_PlaySound(lpSECONDARYBUFFER[no], FALSE);
 				break;
 

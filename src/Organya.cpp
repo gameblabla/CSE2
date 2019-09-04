@@ -177,7 +177,6 @@ BOOL MakeSoundObject8(signed char *wavep, signed char track, signed char pipi)
 			}
 
 			AudioBackend_UnlockSound(lpORGANBUFFER[track][j][k]);
-			AudioBackend_SetSoundPosition(lpORGANBUFFER[track][j][k], 0);
 		}
 	}
 
@@ -219,10 +218,7 @@ void PlayOrganObject(unsigned char key, int mode, signed char track, long freq)
 		{
 			case 0:	// 停止 (Stop)
 				if (old_key[track] != 0xFF)
-				{
 					AudioBackend_StopSound(lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]]);
-					AudioBackend_SetSoundPosition(lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]], 0);
-				}
 				break;
 
 			case 1: // 再生 (Playback)
@@ -345,12 +341,10 @@ void PlayDramObject(unsigned char key, int mode, signed char track)
 		{
 			case 0:	// 停止 (Stop)
 				AudioBackend_StopSound(lpSECONDARYBUFFER[150 + track]);
-				AudioBackend_SetSoundPosition(lpSECONDARYBUFFER[150 + track], 0);
 				break;
 
 			case 1:	// 再生 (Playback)
 				AudioBackend_StopSound(lpSECONDARYBUFFER[150 + track]);
-				AudioBackend_SetSoundPosition(lpSECONDARYBUFFER[150 + track], 0);
 				ChangeDramFrequency(key, track);	// 周波数を設定して ()
 				AudioBackend_PlaySound(lpSECONDARYBUFFER[150 + track], FALSE);
 				break;

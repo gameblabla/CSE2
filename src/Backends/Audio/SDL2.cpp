@@ -272,6 +272,19 @@ void AudioBackend_StopSound(AudioBackend_Sound *sound)
 	SDL_LockAudioDevice(device_id);
 
 	sound->playing = FALSE;
+	sound->position = 0.0;
+
+	SDL_UnlockAudioDevice(device_id);
+}
+
+void AudioBackend_PauseSound(AudioBackend_Sound *sound)
+{
+	if (sound == NULL)
+		return;
+
+	SDL_LockAudioDevice(device_id);
+
+	sound->playing = FALSE;
 
 	SDL_UnlockAudioDevice(device_id);
 }
@@ -308,18 +321,6 @@ void AudioBackend_SetSoundPan(AudioBackend_Sound *sound, long pan)
 	SDL_LockAudioDevice(device_id);
 
 	SetSoundPan(sound, pan);
-
-	SDL_UnlockAudioDevice(device_id);
-}
-
-void AudioBackend_SetSoundPosition(AudioBackend_Sound *sound, size_t position)
-{
-	if (sound == NULL)
-		return;
-
-	SDL_LockAudioDevice(device_id);
-
-	SetSoundPosition(sound, position);
 
 	SDL_UnlockAudioDevice(device_id);
 }
