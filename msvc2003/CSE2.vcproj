@@ -571,7 +571,7 @@
 				RelativePath="..\src\Profile.h">
 			</File>
 			<File
-				RelativePath=".\resource1.h">
+				RelativePath="..\assets\resources\resource1.h">
 			</File>
 			<File
 				RelativePath="..\src\SelStage.h">
@@ -681,7 +681,7 @@
 				RelativePath="..\assets\resources\Bitmap\Credit18.bmp">
 			</File>
 			<File
-				RelativePath=".\CSE2.rc">
+				RelativePath="..\assets\resources\CSE2.rc">
 				<FileConfiguration
 					Name="Debug|Win32">
 					<Tool
