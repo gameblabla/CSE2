@@ -36,24 +36,6 @@
 #define SETWAVE		0x00000020
 #define SETPIPI		0x00000040
 
-typedef struct ORGANYATRACK
-{
-	unsigned short freq;	// +α周波数(1000がDefault) (+ α frequency (1000 is Default))
-	unsigned char wave_no;	// 波形No (Waveform No)
-	unsigned char pipi;	// ☆
-	unsigned short note_num;	// 音符の数 (Number of notes)
-} ORGANYATRACK;
-
-typedef struct ORGANYADATA
-{
-	unsigned short wait;
-	unsigned char line;
-	unsigned char dot;
-	long repeat_x;	// リピート (repeat)
-	long end_x;	// 曲の終わり(リピートに戻る)	(End of song (return to repeat))
-	ORGANYATRACK tdata[MAXTRACK];
-} ORGANYADATA;
-
 // Below are Organya song data structures
 typedef struct NOTELIST
 {
@@ -532,11 +514,14 @@ static const char pass2[7] = "Org-02";	// Pipi
 
 BOOL OrgData::InitMusicData(const char *path)
 {
-	ORGANYADATA org_data;
+	#define READ_LE16(p) ((p[1] << 8) | p[0]); p += 2
+	#define READ_LE32(p) ((p[3] << 24) | (p[2] << 16) | (p[1] << 8) | p[0]); p += 4
+
 	NOTELIST *np;
 	int i,j;
 	char pass_check[6];
 	char ver = 0;
+	unsigned short note_num[MAXTRACK];
 
 	const unsigned char *p = FindResource(path, "ORG", NULL);
 	if (p == NULL)
@@ -553,34 +538,34 @@ BOOL OrgData::InitMusicData(const char *path)
 	if(ver == 0)
 		return FALSE;
 
-	// 曲情報の読み込み (Loading song information)
-	memcpy(&org_data, p, sizeof(ORGANYADATA));
-	p += sizeof(ORGANYADATA);
-
 	// 曲の情報を設定 (Set song information)
-	info.wait = org_data.wait;
-	info.line = org_data.line;
-	info.dot = org_data.dot;
-	info.repeat_x = org_data.repeat_x;
-	info.end_x = org_data.end_x;
+	info.wait = READ_LE16(p);
+	info.line = *p++;
+	info.dot = *p++;
+	info.repeat_x = READ_LE32(p);
+	info.end_x = READ_LE32(p);
 
 	for (i = 0; i < MAXTRACK; i++)
 	{
-		info.tdata[i].freq = org_data.tdata[i].freq;
+		info.tdata[i].freq = READ_LE16(p);
+
+		info.tdata[i].wave_no = *p++;
 
 		if (ver == 1)
 			info.tdata[i].pipi = 0;
 		else
-			info.tdata[i].pipi = org_data.tdata[i].pipi;
+			info.tdata[i].pipi = *p;
 
-		info.tdata[i].wave_no = org_data.tdata[i].wave_no;
+		++p;
+
+		note_num[i] = READ_LE16(p);
 	}
 
 	// 音符のロード (Loading notes)
 	for (j = 0; j < MAXTRACK; j++)
 	{
 		// 最初の音符はfromがNULLとなる (The first note has from as NULL)
-		if (org_data.tdata[j].note_num == 0)
+		if (note_num[j] == 0)
 		{
 			info.tdata[j].note_list = NULL;
 			continue;
@@ -593,7 +578,7 @@ BOOL OrgData::InitMusicData(const char *path)
 		np->to = (np + 1);
 		np++;
 
-		for (i = 1; i < org_data.tdata[j].note_num; i++)
+		for (i = 1; i < note_num[j]; i++)
 		{
 			np->from = (np - 1);
 			np->to = (np + 1);
@@ -606,42 +591,37 @@ BOOL OrgData::InitMusicData(const char *path)
 
 		// 内容を代入 (Assign content)
 		np = info.tdata[j].note_p;	// Ｘ座標 (X coordinate)
-		for (i = 0; i < org_data.tdata[j].note_num; i++)
+		for (i = 0; i < note_num[j]; i++)
 		{
-			memcpy(&np->x, p, sizeof(long));
-			p += sizeof(long);
+			np->x = READ_LE32(p);
 			np++;
 		}
 
 		np = info.tdata[j].note_p;	// Ｙ座標 (Y coordinate)
-		for (i = 0; i < org_data.tdata[j].note_num; i++)
+		for (i = 0; i < note_num[j]; i++)
 		{
-			memcpy(&np->y, p, sizeof(unsigned char));
-			p += sizeof(unsigned char);
+			np->y = *p++;
 			np++;
 		}
 
 		np = info.tdata[j].note_p;	// 長さ (Length)
-		for (i = 0; i < org_data.tdata[j].note_num; i++)
+		for (i = 0; i < note_num[j]; i++)
 		{
-			memcpy(&np->length, p, sizeof(unsigned char));
-			p += sizeof(unsigned char);
+			np->length = *p++;
 			np++;
 		}
 
 		np = info.tdata[j].note_p;	// ボリューム (Volume)
-		for (i = 0; i < org_data.tdata[j].note_num; i++)
+		for (i = 0; i < note_num[j]; i++)
 		{
-			memcpy(&np->volume, p, sizeof(unsigned char));
-			p += sizeof(unsigned char);
+			np->volume = *p++;
 			np++;
 		}
 
 		np = info.tdata[j].note_p;	// パン (Pan)
-		for (i = 0; i < org_data.tdata[j].note_num; i++)
+		for (i = 0; i < note_num[j]; i++)
 		{
-			memcpy(&np->pan, p, sizeof(unsigned char));
-			p += sizeof(unsigned char);
+			np->pan = *p++;
 			np++;
 		}
 	}
