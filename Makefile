@@ -8,12 +8,12 @@ ASSETS_DIRECTORY = assets
 ifeq ($(RELEASE), 1)
 	CXXFLAGS = -O3
 	LDFLAGS = -s
-	FILENAME_DEF = CSE2
-	DOCONFIG_FILENAME_DEF = DoConfig
+	FILENAME_DEF = CSE2.exe
+	DOCONFIG_FILENAME_DEF = DoConfig.exe
 else
 	CXXFLAGS = -Og -ggdb3
-	FILENAME_DEF = CSE2_debug
-	DOCONFIG_FILENAME_DEF = DoConfig_debug
+	FILENAME_DEF = CSE2_debug.exe
+	DOCONFIG_FILENAME_DEF = DoConfig_debug.exe
 endif
 
 ifeq ($(JAPANESE), 1)
