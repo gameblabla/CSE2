@@ -1,27 +1,21 @@
 # Exclude obj directory (object files for Makefile build)
 /obj
 
-# Exclude converted resource files
-src/Resource
-
 # Exclude build output directory
 /game
 
 Exclude devilution-comparer assembly output
-msvc2003/devilution/orig.asm
-msvc2003/devilution/compare.asm
-
-Exclude the (recommended) CMake build directory
-build/*
+devilution/orig.asm
+devilution/compare.asm
 
 # Exclude MSVC IntelliSense database
-msvc2003/CSE2.ncb
+CSE2.ncb
 
 # Exclude MSVC Solution User Options file
-msvc2003/CSE2.suo
+CSE2.suo
 
 # Exclude MSVC build folders
-msvc2003/Debug
-msvc2003/Release
-msvc2003/Debug (Japanese)
-msvc2003/Release (Japanese)
+Debug
+Release
+Debug (Japanese)
+Release (Japanese)
