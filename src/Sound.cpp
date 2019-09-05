@@ -320,7 +320,7 @@ int MakePixToneObject(const PIXTONEPARAMETER *ptp, int ptp_num, int no)
 	memcpy(wav_header.data, data, 4);
 	wav_header.sample_alignment = (wav_header.bit_depth / 8) * wav_header.num_channels;
 	wav_header.byte_rate = (wav_header.bit_depth / 8) * wav_header.num_channels * wav_header.sample_rate;
-	wav_header.data_bytes = wav_header.sample_alignment * ptp->size;
+	wav_header.data_bytes = wav_header.sample_alignment * ptp->size;	// Note that this uses ptp->size, not sample_count. If this header were ever used, it would be incorrect.
 	wav_header.wav_size = wav_header.data_bytes + 36;
 
 	ptp_pointer = ptp;
