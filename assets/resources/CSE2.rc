@@ -64,88 +64,97 @@ END
 // Bitmap
 //
 
-CREDIT01                BITMAP                  "BITMAP\\Credit01.bmp"
-CREDIT02                BITMAP                  "BITMAP\\Credit02.bmp"
-CREDIT03                BITMAP                  "BITMAP\\Credit03.bmp"
-CREDIT04                BITMAP                  "BITMAP\\Credit04.bmp"
-CREDIT05                BITMAP                  "BITMAP\\Credit05.bmp"
-CREDIT06                BITMAP                  "BITMAP\\Credit06.bmp"
-CREDIT07                BITMAP                  "BITMAP\\Credit07.bmp"
-CREDIT08                BITMAP                  "BITMAP\\Credit08.bmp"
-CREDIT09                BITMAP                  "BITMAP\\Credit09.bmp"
-CREDIT10                BITMAP                  "BITMAP\\Credit10.bmp"
-CREDIT11                BITMAP                  "BITMAP\\Credit11.bmp"
-CREDIT12                BITMAP                  "BITMAP\\Credit12.bmp"
-CREDIT14                BITMAP                  "BITMAP\\Credit14.bmp"
-CREDIT15                BITMAP                  "BITMAP\\Credit15.bmp"
-CREDIT16                BITMAP                  "BITMAP\\Credit16.bmp"
-CREDIT17                BITMAP                  "BITMAP\\Credit17.bmp"
-CREDIT18                BITMAP                  "BITMAP\\Credit18.bmp"
-PIXEL                   BITMAP                  "BITMAP\\pixel.bmp"
+CREDIT01                BITMAP                  "BITMAP/Credit01.bmp"
+CREDIT02                BITMAP                  "BITMAP/Credit02.bmp"
+CREDIT03                BITMAP                  "BITMAP/Credit03.bmp"
+CREDIT04                BITMAP                  "BITMAP/Credit04.bmp"
+CREDIT05                BITMAP                  "BITMAP/Credit05.bmp"
+CREDIT06                BITMAP                  "BITMAP/Credit06.bmp"
+CREDIT07                BITMAP                  "BITMAP/Credit07.bmp"
+CREDIT08                BITMAP                  "BITMAP/Credit08.bmp"
+CREDIT09                BITMAP                  "BITMAP/Credit09.bmp"
+CREDIT10                BITMAP                  "BITMAP/Credit10.bmp"
+CREDIT11                BITMAP                  "BITMAP/Credit11.bmp"
+CREDIT12                BITMAP                  "BITMAP/Credit12.bmp"
+CREDIT14                BITMAP                  "BITMAP/Credit14.bmp"
+CREDIT15                BITMAP                  "BITMAP/Credit15.bmp"
+CREDIT16                BITMAP                  "BITMAP/Credit16.bmp"
+CREDIT17                BITMAP                  "BITMAP/Credit17.bmp"
+CREDIT18                BITMAP                  "BITMAP/Credit18.bmp"
+PIXEL                   BITMAP                  "BITMAP/pixel.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // ORG
 //
 
-ACCESS                  ORG                     "ORG\\Access.org"
-ANZEN                   ORG                     "ORG\\Anzen.org"
-BALCONY                 ORG                     "ORG\\Balcony.org"
-BALLOS                  ORG                     "ORG\\Ballos.org"
-BDOWN                   ORG                     "ORG\\BreakDown.org"
-CEMETERY                ORG                     "ORG\\Cemetery.org"
-CURLY                   ORG                     "ORG\\Curly.org"
-DR                      ORG                     "ORG\\Dr.org"
-ENDING                  ORG                     "ORG\\Ending.org"
-ESCAPE                  ORG                     "ORG\\Escape.org"
-FANFALE1                ORG                     "ORG\\Fanfale1.org"
-FANFALE2                ORG                     "ORG\\Fanfale2.org"
-FANFALE3                ORG                     "ORG\\Fanfale3.org"
-FIREEYE                 ORG                     "ORG\\FireEye.org"
-GAMEOVER                ORG                     "ORG\\Gameover.org"
-GINSUKE                 ORG                     "ORG\\Ginsuke.org"
-GRAND                   ORG                     "ORG\\Grand.org"
-GRAVITY                 ORG                     "ORG\\Gravity.org"
-HELL                    ORG                     "ORG\\Hell.org"
-IRONH                   ORG                     "ORG\\ironH.org"
-JENKA                   ORG                     "ORG\\Jenka.org"
-JENKA2                  ORG                     "ORG\\Jenka2.org"
-KODOU                   ORG                     "ORG\\Kodou.org"
-LASTBTL                 ORG                     "ORG\\LastBtl.org"
-LASTBT3                 ORG                     "ORG\\LastBtl3.org"
-LASTCAVE                ORG                     "ORG\\LastCave.org"
-MARINE                  ORG                     "ORG\\Marine.org"
-MAZE                    ORG                     "ORG\\Maze.org"
-MDOWN2                  ORG                     "ORG\\MDown2.org"
-OSIDE                   ORG                     "ORG\\Oside.org"
-MURA                    ORG                     "ORG\\Mura.org"
-PLANT                   ORG                     "ORG\\Plant.org"
-QUIET                   ORG                     "ORG\\quiet.org"
-REQUIEM                 ORG                     "ORG\\Requiem.org"
-TOROKO                  ORG                     "ORG\\Toroko.org"
-VIVI                    ORG                     "ORG\\Vivi.org"
-WANPAK2                 ORG                     "ORG\\Wanpak2.org"
-WANPAKU                 ORG                     "ORG\\Wanpaku.org"
-WEED                    ORG                     "ORG\\Weed.org"
-WHITE                   ORG                     "ORG\\White.org"
-XXXX                    ORG                     "ORG\\XXXX.org"
-ZONBIE                  ORG                     "ORG\\Zonbie.org"
+ACCESS                  ORG                     "ORG/Access.org"
+ANZEN                   ORG                     "ORG/Anzen.org"
+BALCONY                 ORG                     "ORG/Balcony.org"
+BALLOS                  ORG                     "ORG/Ballos.org"
+BDOWN                   ORG                     "ORG/BreakDown.org"
+CEMETERY                ORG                     "ORG/Cemetery.org"
+CURLY                   ORG                     "ORG/Curly.org"
+DR                      ORG                     "ORG/Dr.org"
+ENDING                  ORG                     "ORG/Ending.org"
+ESCAPE                  ORG                     "ORG/Escape.org"
+FANFALE1                ORG                     "ORG/Fanfale1.org"
+FANFALE2                ORG                     "ORG/Fanfale2.org"
+FANFALE3                ORG                     "ORG/Fanfale3.org"
+FIREEYE                 ORG                     "ORG/FireEye.org"
+GAMEOVER                ORG                     "ORG/Gameover.org"
+GINSUKE                 ORG                     "ORG/Ginsuke.org"
+GRAND                   ORG                     "ORG/Grand.org"
+GRAVITY                 ORG                     "ORG/Gravity.org"
+HELL                    ORG                     "ORG/Hell.org"
+IRONH                   ORG                     "ORG/ironH.org"
+JENKA                   ORG                     "ORG/Jenka.org"
+JENKA2                  ORG                     "ORG/Jenka2.org"
+KODOU                   ORG                     "ORG/Kodou.org"
+LASTBTL                 ORG                     "ORG/LastBtl.org"
+LASTBT3                 ORG                     "ORG/LastBtl3.org"
+LASTCAVE                ORG                     "ORG/LastCave.org"
+MARINE                  ORG                     "ORG/Marine.org"
+MAZE                    ORG                     "ORG/Maze.org"
+MDOWN2                  ORG                     "ORG/MDown2.org"
+OSIDE                   ORG                     "ORG/Oside.org"
+MURA                    ORG                     "ORG/Mura.org"
+PLANT                   ORG                     "ORG/Plant.org"
+QUIET                   ORG                     "ORG/quiet.org"
+REQUIEM                 ORG                     "ORG/Requiem.org"
+TOROKO                  ORG                     "ORG/Toroko.org"
+VIVI                    ORG                     "ORG/Vivi.org"
+WANPAK2                 ORG                     "ORG/Wanpak2.org"
+WANPAKU                 ORG                     "ORG/Wanpaku.org"
+WEED                    ORG                     "ORG/Weed.org"
+WHITE                   ORG                     "ORG/White.org"
+XXXX                    ORG                     "ORG/XXXX.org"
+ZONBIE                  ORG                     "ORG/Zonbie.org"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // WAVE
 //
 
-WAVE100                 WAVE                    "WAVE\\Wave.dat"
+WAVE100                 WAVE                    "WAVE/Wave.dat"
 
-CURSOR_IKA CURSOR "CURSOR\\CURSOR_IKA.cur"
+/////////////////////////////////////////////////////////////////////////////
+//
+// Cursor
+//
 
-CURSOR_NORMAL CURSOR "CURSOR\\CURSOR_NORMAL.cur"
+CURSOR_IKA              CURSOR                  "CURSOR/CURSOR_IKA.cur"
+CURSOR_NORMAL           CURSOR                  "CURSOR/CURSOR_NORMAL.cur"
 
-0 ICON "ICON\\0.ico"
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
 
-ICON_MINI ICON "ICON\\ICON_MINI.ico"
-
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+0                       ICON                    "ICON/0.ico"
+ICON_MINI               ICON                    "ICON/ICON_MINI.ico"
 #endif    // Japanese resources
 /////////////////////////////////////////////////////////////////////////////
 
