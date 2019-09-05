@@ -17,7 +17,7 @@ static const char *version_string =
 	;
 
 // TODO - Inaccurate stack frame
-BOOL __stdcall VersionDialog(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
+INT_PTR __stdcall VersionDialog(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	char string_buffer[104];
 
@@ -56,7 +56,7 @@ BOOL __stdcall VersionDialog(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
-BOOL __stdcall DebugMuteDialog(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
+INT_PTR __stdcall DebugMuteDialog(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (Msg)
 	{
@@ -98,7 +98,7 @@ BOOL __stdcall DebugMuteDialog(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 	return FALSE;
 }
 
-BOOL __stdcall DebugSaveDialog(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
+INT_PTR __stdcall DebugSaveDialog(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	char string[100];
 
@@ -129,7 +129,7 @@ BOOL __stdcall DebugSaveDialog(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 	return FALSE;
 }
 
-BOOL __stdcall QuitDialog(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
+INT_PTR __stdcall QuitDialog(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (Msg)
 	{

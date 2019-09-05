@@ -99,26 +99,53 @@ BOOL GetCompileVersion(int *v1, int *v2, int *v3, int *v4)
 // TODO - Inaccurate stack frame
 BOOL OpenVolumeConfiguration(HWND hWnd)
 {
+#ifdef FIX_BUGS
 	char path[MAX_PATH];
 	char path2[MAX_PATH];
 	char path3[MAX_PATH];
-#ifdef FIX_BUGS
-	char path4[MAX_PATH];
-	char path5[MAX_PATH];
-#endif
-	int error1;
-	int error2;
-#ifdef FIX_BUGS
-	int error3;
-	int error4;
-#endif
+	INT_PTR error;
+	size_t i;
+
+	GetSystemDirectoryA(path, sizeof(path));
+	GetSystemDirectoryA(path2, sizeof(path2));
+
+	i = strlen(path2);
+	while (path2[i] != '\\')
+		--i;
+
+	path2[i] = '\0';
+
+	sprintf(path3, "%s\\Sndvol32.exe", path);
+	error = (INT_PTR)ShellExecuteA(hWnd, "open", path3, NULL, NULL, SW_SHOW);
+	if (error > 32)
+		return TRUE;
+
+	sprintf(path3, "%s\\Sndvol32.exe", path2);
+	error = (INT_PTR)ShellExecuteA(hWnd, "open", path3, NULL, NULL, SW_SHOW);
+	if (error > 32)
+		return TRUE;
+
+	sprintf(path3, "%s\\Sndvol.exe", path);
+	error = (INT_PTR)ShellExecuteA(hWnd, "open", path3, NULL, NULL, SW_SHOW);
+	if (error > 32)
+		return TRUE;
+
+	sprintf(path3, "%s\\Sndvol.exe", path2);
+	error = (INT_PTR)ShellExecuteA(hWnd, "open", path3, NULL, NULL, SW_SHOW);
+	if (error > 32)
+		return TRUE;
+
+	return FALSE;
+#else
+	char path[MAX_PATH];
+	char path2[MAX_PATH];
+	char path3[MAX_PATH];
+	INT_PTR error1;
+	INT_PTR error2;
 	size_t i;
 
 	GetSystemDirectoryA(path, sizeof(path));
 	sprintf(path2, "%s\\Sndvol32.exe", path);
-#ifdef FIX_BUGS
-	sprintf(path4, "%s\\Sndvol.exe", path);
-#endif
 
 	i = strlen(path);
 	while (path[i] != '\\')
@@ -126,31 +153,9 @@ BOOL OpenVolumeConfiguration(HWND hWnd)
 
 	path[i] = '\0';
 	sprintf(path3, "%s\\Sndvol32.exe", path);
-#ifdef FIX_BUGS
-	sprintf(path5, "%s\\Sndvol.exe", path);
-#endif
 
-#ifdef FIX_BUGS
-	error1 = (int)ShellExecuteA(hWnd, "open", path2, NULL, NULL, SW_SHOW);
-	if (error1 > 32)
-		return TRUE;
-
-	error2 = (int)ShellExecuteA(hWnd, "open", path3, NULL, NULL, SW_SHOW);
-	if (error2 > 32)
-		return TRUE;
-
-	error3 = (int)ShellExecuteA(hWnd, "open", path4, NULL, NULL, SW_SHOW);
-	if (error3 > 32)
-		return TRUE;
-
-	error4 = (int)ShellExecuteA(hWnd, "open", path5, NULL, NULL, SW_SHOW);
-	if (error4 > 32)
-		return TRUE;
-
-	return FALSE;
-#else
-	error1 = (int)ShellExecuteA(hWnd, "open", path2, NULL, NULL, SW_SHOW);
-	error2 = (int)ShellExecuteA(hWnd, "open", path3, NULL, NULL, SW_SHOW);
+	error1 = (INT_PTR)ShellExecuteA(hWnd, "open", path2, NULL, NULL, SW_SHOW);
+	error2 = (INT_PTR)ShellExecuteA(hWnd, "open", path3, NULL, NULL, SW_SHOW);
 
 	if (error1 <= 32 && error2 <= 32)
 		return FALSE;
