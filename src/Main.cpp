@@ -364,9 +364,13 @@ void JoystickProc(void);
 
 BOOL SystemTask(void)
 {
-	SDL_Event event;
-	while (SDL_PollEvent(&event) || !bActive)
+	while (SDL_PollEvent(NULL) || !bActive)
 	{
+		SDL_Event event;
+
+		if (!SDL_WaitEvent(&event))
+			return FALSE;
+
 		switch (event.type)
 		{
 			case SDL_KEYDOWN:
