@@ -60,7 +60,7 @@ BOOL LoadEvent(const char *path_event)
 	EVENT eve;
 
 	char path[MAX_PATH];
-	sprintf(path, "%s/%s", gDataPath, path_event);
+	sprintf(path, "%s\\%s", gDataPath, path_event);
 
 	fp = fopen(path, "rb");
 	if (fp == NULL)

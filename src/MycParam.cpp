@@ -446,7 +446,7 @@ BOOL SaveTimeCounter()
 
 	// Get last time
 	char path[MAX_PATH];
-	sprintf(path, "%s/290.rec", gModulePath);
+	sprintf(path, "%s\\290.rec", gModulePath);
 
 	FILE *fp = fopen(path, "rb");
 	if (fp)
@@ -509,7 +509,7 @@ int LoadTimeCounter()
 
 	// Open file
 	char path[MAX_PATH];
-	sprintf(path, "%s/290.rec", gModulePath);
+	sprintf(path, "%s\\290.rec", gModulePath);
 
 	FILE *fp = fopen(path, "rb");
 	if (!fp)

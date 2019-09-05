@@ -58,7 +58,7 @@ BEGIN
     END
 END
 
-0 ICON "ICON\\0.ico"
+0 ICON "ICON/0.ico"
 
 #endif    // Japanese resources
 /////////////////////////////////////////////////////////////////////////////
