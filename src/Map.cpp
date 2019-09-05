@@ -31,7 +31,7 @@ BOOL LoadMapData2(const char *path_map)
 
 	// Get path
 	char path[MAX_PATH];
-	sprintf(path, "%s\\%s", gDataPath, path_map);
+	sprintf(path, "%s/%s", gDataPath, path_map);
 
 	// Open file
 	FILE *fp = fopen(path, "rb");
@@ -75,7 +75,7 @@ BOOL LoadAttributeData(const char *path_atrb)
 {
 	// Open file
 	char path[MAX_PATH];
-	sprintf(path, "%s\\%s", gDataPath, path_atrb);
+	sprintf(path, "%s/%s", gDataPath, path_atrb);
 
 	FILE *fp = fopen(path, "rb");
 	if (fp == NULL)

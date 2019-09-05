@@ -139,26 +139,26 @@ BOOL TransferStage(int no, int w, int x, int y)
 
 	//Load tileset
 	char path[MAX_PATH];
-	sprintf(path, "%s\\Prt%s", path_dir, gTMT[no].parts);
+	sprintf(path, "%s/Prt%s", path_dir, gTMT[no].parts);
 	if (!ReloadBitmap_File(path, SURFACE_ID_LEVEL_TILESET))
 		bError = TRUE;
 
-	sprintf(path, "%s\\%s.pxa", path_dir, gTMT[no].parts);
+	sprintf(path, "%s/%s.pxa", path_dir, gTMT[no].parts);
 	if (!LoadAttributeData(path))
 		bError = TRUE;
 
 	//Load tilemap
-	sprintf(path, "%s\\%s.pxm", path_dir, gTMT[no].map);
+	sprintf(path, "%s/%s.pxm", path_dir, gTMT[no].map);
 	if (!LoadMapData2(path))
 		bError = TRUE;
 
 	//Load NPCs
-	sprintf(path, "%s\\%s.pxe", path_dir, gTMT[no].map);
+	sprintf(path, "%s/%s.pxe", path_dir, gTMT[no].map);
 	if (!LoadEvent(path))
 		bError = TRUE;
 
 	//Load script
-	sprintf(path, "%s\\%s.tsc", path_dir, gTMT[no].map);
+	sprintf(path, "%s/%s.tsc", path_dir, gTMT[no].map);
 	if (!LoadTextScript_Stage(path))
 		bError = TRUE;
 
@@ -171,11 +171,11 @@ BOOL TransferStage(int no, int w, int x, int y)
 	strcpy(path_dir, "Npc");
 
 	//Load NPC sprite sheets
-	sprintf(path, "%s\\Npc%s", path_dir, gTMT[no].npc);
+	sprintf(path, "%s/Npc%s", path_dir, gTMT[no].npc);
 	if (!ReloadBitmap_File(path, SURFACE_ID_LEVEL_SPRITESET_1))
 		bError = TRUE;
 
-	sprintf(path, "%s\\Npc%s", path_dir, gTMT[no].boss);
+	sprintf(path, "%s/Npc%s", path_dir, gTMT[no].boss);
 	if (!ReloadBitmap_File(path, SURFACE_ID_LEVEL_SPRITESET_2))
 		bError = TRUE;
 

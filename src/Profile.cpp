@@ -28,7 +28,7 @@ const char *gProfileCode = "Do041220";
 BOOL IsProfile()
 {
 	char path[MAX_PATH];
-	sprintf(path, "%s\\%s", gModulePath, gDefaultName);
+	sprintf(path, "%s/%s", gModulePath, gDefaultName);
 
 	FILE *fp = fopen(path, "rb");
 	if (fp == NULL)
@@ -47,9 +47,9 @@ BOOL SaveProfile(const char *name)
 
 	// Get path
 	if (name)
-		sprintf(path, "%s\\%s", gModulePath, name);
+		sprintf(path, "%s/%s", gModulePath, name);
 	else
-		sprintf(path, "%s\\%s", gModulePath, gDefaultName);
+		sprintf(path, "%s/%s", gModulePath, gDefaultName);
 
 	// Open file
 	fp = fopen(path, "wb");
@@ -126,7 +126,7 @@ BOOL LoadProfile(const char *name)
 	if (name)
 		sprintf(path, "%s", name);
 	else
-		sprintf(path, "%s\\%s", gModulePath, gDefaultName);
+		sprintf(path, "%s/%s", gModulePath, gDefaultName);
 
 	// Open file
 	PROFILE profile;

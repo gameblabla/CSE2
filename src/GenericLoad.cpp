@@ -174,9 +174,9 @@ BOOL LoadGenericData()
 		bError = TRUE;
 	if (!MakeSurface_File("StageImage", SURFACE_ID_STAGE_ITEM))
 		bError = TRUE;
-	if (!MakeSurface_File("Npc\\NpcSym", SURFACE_ID_NPC_SYM))
+	if (!MakeSurface_File("Npc/NpcSym", SURFACE_ID_NPC_SYM))
 		bError = TRUE;
-	if (!MakeSurface_File("Npc\\NpcRegu", SURFACE_ID_NPC_REGU))
+	if (!MakeSurface_File("Npc/NpcRegu", SURFACE_ID_NPC_REGU))
 		bError = TRUE;
 	if (!MakeSurface_File("TextBox", SURFACE_ID_TEXT_BOX))
 		bError = TRUE;
