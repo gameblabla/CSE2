@@ -25,7 +25,7 @@ BOOL InitBack(const char *fName, int type)
 
 	// Get width and height
 	char path[MAX_PATH];
-	sprintf(path, "%s/%s.pbm", gDataPath, fName);
+	sprintf(path, "%s\\%s.pbm", gDataPath, fName);
 
 	FILE *fp = fopen(path, "rb");
 	if (fp == NULL)

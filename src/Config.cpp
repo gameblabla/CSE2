@@ -17,7 +17,7 @@ BOOL LoadConfigData(CONFIG *conf)
 
 	// Get path
 	char path[MAX_PATH];
-	sprintf(path, "%s/%s", gModulePath, config_filename);
+	sprintf(path, "%s\\%s", gModulePath, config_filename);
 
 	// Open file
 	FILE *fp = fopen(path, "rb");
