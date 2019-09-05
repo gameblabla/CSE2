@@ -31,16 +31,18 @@ Together, these findings are a goldmine of information on the game's inner-worki
 
 Run 'make' in this folder, preferably with some of the following settings:
 
-* `RELEASE=1` - Compile a release build (optimised, stripped, etc.)
-* `STATIC=1` - Produce a statically-linked executable (so you don't need to bundle DLL files)
-* `JAPANESE=1` - Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
-* `FIX_BUGS=1` - Fix various bugs in the game
-* `WINDOWS=1` - Build for Windows
-* `DEBUG_SAVE=1` - Re-enable the ability to drag-and-drop save files onto the window
-* `RENDERER=OpenGL3` - Use the hardware-accelerated OpenGL 3.2 renderer
-* `RENDERER=Texture` - Use the hardware-accelerated SDL2 Texture API renderer (default)
-* `RENDERER=Surface` - Use the software-rendered SDL2 Surface API renderer
-* `RENDERER=Software` - Use a hand-written software renderer
+Name | Function
+--------|--------
+`RELEASE=1` | Compile a release build (optimised, stripped, etc.)
+`STATIC=1` | Produce a statically-linked executable (so you don't need to bundle DLL files)
+`JAPANESE=1` | Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
+`FIX_BUGS=1` | Fix various bugs in the game
+`WINDOWS=1` | Build for Windows
+`DEBUG_SAVE=1` | Re-enable the ability to drag-and-drop save files onto the window
+`RENDERER=OpenGL3` | Use the hardware-accelerated OpenGL 3.2 renderer
+`RENDERER=Texture` | Use the hardware-accelerated SDL2 Texture API renderer (default)
+`RENDERER=Surface` | Use the software-rendered SDL2 Surface API renderer
+`RENDERER=Software` | Use a hand-written software renderer
 
 ## Licensing
 
