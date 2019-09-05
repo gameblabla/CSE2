@@ -64,11 +64,6 @@ static void SetSoundPan(AudioBackend_Sound *sound, long pan)
 	sound->volume_r = sound->pan_r * sound->volume;
 }
 
-static void SetSoundPosition(AudioBackend_Sound *sound, size_t position)
-{
-	sound->position = position;
-}
-
 static void Callback(void *user_data, Uint8 *stream_uint8, int len)
 {
 	(void)user_data;
@@ -194,11 +189,11 @@ AudioBackend_Sound* AudioBackend_CreateSound(unsigned int frequency, size_t fram
 
 	sound->frames = frames;
 	sound->playing = FALSE;
+	sound->position = 0.0;
 
 	SetSoundFrequency(sound, frequency);
 	SetSoundVolume(sound, 0);
 	SetSoundPan(sound, 0);
-	SetSoundPosition(sound, 0);
 
 	SDL_LockAudioDevice(device_id);
 
