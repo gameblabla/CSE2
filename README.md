@@ -34,7 +34,7 @@ Run 'make' in this folder, preferably with some of the following settings:
 Name | Function
 --------|--------
 `RELEASE=1` | Compile a release build (optimised, stripped, etc.)
-`STATIC=1` | Produce a statically-linked executable (so you don't need to bundle DLL files)
+`STATIC=1` | Produce a statically-linked executable (good for Windows builds, so you don't need to bundle DLL files)
 `JAPANESE=1` | Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
 `FIX_BUGS=1` | Fix various bugs in the game
 `WINDOWS=1` | Build for Windows
