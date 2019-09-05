@@ -697,6 +697,26 @@
 				</File>
 			</Filter>
 			<Filter
+				Name="Cursor"
+				Filter="">
+				<File
+					RelativePath=".\assets\resources\Cursor\CURSOR_IKA.cur">
+				</File>
+				<File
+					RelativePath=".\assets\resources\Cursor\CURSOR_NORMAL.cur">
+				</File>
+			</Filter>
+			<Filter
+				Name="Icon"
+				Filter="">
+				<File
+					RelativePath=".\assets\resources\Icon\0.ico">
+				</File>
+				<File
+					RelativePath=".\assets\resources\Icon\ICON_MINI.ico">
+				</File>
+			</Filter>
+			<Filter
 				Name="Organya"
 				Filter="">
 				<File
