@@ -351,7 +351,7 @@ void PlayDramObject(unsigned char key, int mode, signed char track)
 			case 1:	// 再生 (Playback)
 				AudioBackend_StopSound(lpSECONDARYBUFFER[150 + track]);
 				AudioBackend_RewindSound(lpSECONDARYBUFFER[150 + track]);
-				ChangeDramFrequency(key, track);	// 周波数を設定して ()
+				ChangeDramFrequency(key, track);	// 周波数を設定して (Set the frequency)
 				AudioBackend_PlaySound(lpSECONDARYBUFFER[150 + track], FALSE);
 				break;
 

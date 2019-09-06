@@ -27,7 +27,7 @@ void GetCompileDate(int *year, int *month, int *day)
 	months[10] = "Oct";
 	months[11] = "Nov";
 	months[12] = "Dec";
-	sscanf(__DATE__, "%s %d %d", &month_string, day, year);
+	sscanf(__DATE__, "%s %d %d", month_string, day, year);
 
 	for (i = 0; i < 12; ++i)	// This being 12 instead of 13 might be a bug, but it works anyway by accident
 		if (!memcmp(&month_string, months[i], 3))
