@@ -219,8 +219,10 @@ void PlayOrganObject(unsigned char key, int mode, signed char track, long freq)
 		{
 			case 0:	// 停止 (Stop)
 				if (old_key[track] != 0xFF)
+				{
 					AudioBackend_StopSound(lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]]);
 					AudioBackend_RewindSound(lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]]);
+				}
 				break;
 
 			case 1: // 再生 (Playback)
