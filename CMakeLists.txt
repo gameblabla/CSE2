@@ -137,6 +137,8 @@ add_executable(CSE2
 	src/PixTone.h
 	src/Profile.cpp
 	src/Profile.h
+	src/Random.cpp
+	src/Random.h
 	src/Resource.cpp
 	src/Resource.h
 	src/SelStage.cpp
@@ -157,6 +159,8 @@ add_executable(CSE2
 	src/ValueView.h
 	src/WindowsWrapper.h
 	src/Backends/Rendering.h
+	src/Backends/Audio/SDL2.cpp
+	src/Backends/Audio.h
 )
 
 set(RESOURCES
@@ -179,6 +183,8 @@ set(RESOURCES
 	BITMAP/Credit18.bmp
 	CURSOR/CURSOR_IKA.bmp
 	CURSOR/CURSOR_NORMAL.bmp
+	FONT/LiberationMono.ttf
+	ICON/ICON_MINI.bmp
 	ORG/Access.org
 	ORG/Anzen.org
 	ORG/Balcony.org
@@ -238,14 +244,6 @@ if(FIX_BUGS)
 	target_compile_definitions(CSE2 PRIVATE FIX_BUGS)
 endif()
 
-if(EXISTS "/opt/vc/include/bcm_host.h")	# Detect Raspberry Pi
-	target_compile_definitions(CSE2 PRIVATE RASPBERRY_PI)
-endif()
-
-if(NONPORTABLE)
-	target_compile_definitions(CSE2 PRIVATE NONPORTABLE)
-endif()
-
 if(RENDERER MATCHES "OpenGL3")
 	target_sources(CSE2 PRIVATE "src/Backends/Rendering/OpenGL3.cpp")
 elseif(RENDERER MATCHES "Texture")
@@ -261,23 +259,12 @@ endif()
 # Make some tweaks if we're targetting Windows
 if(WIN32)
 	target_sources(CSE2 PRIVATE "${ASSETS_DIRECTORY}/resources/ICON/ICON.rc")
-	target_compile_definitions(CSE2 PRIVATE WINDOWS)
 	set_target_properties(CSE2 PROPERTIES WIN32_EXECUTABLE YES)	# Disable the console window
-	target_link_libraries(CSE2 "version.lib")	# Link this for some code in Generic.cpp
-else()
-	list(APPEND RESOURCES "ICON/ICON_MINI.bmp")
 endif()
 
 # Make some tweaks if we're using MSVC
 if(MSVC)
 	target_compile_definitions(CSE2 PRIVATE _CRT_SECURE_NO_WARNINGS)	# Shut up those stupid warnings
-endif()
-
-# Decide the embedded font
-if(JAPANESE)
-	list(APPEND RESOURCES "FONT/msgothic.ttc")
-elseif(NOT WIN32)
-	list(APPEND RESOURCES "FONT/cour.ttf")
 endif()
 
 # Build bin2h externally, so it isn't cross-compiled when CSE2 is (Emscripten)
