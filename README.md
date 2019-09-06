@@ -24,12 +24,46 @@ Many months of copypasting and experimenting later, this is the result.
 
 ## Dependencies
 
+*Note: with CMake, if these are not found, they will be built locally*
+
 * SDL2
 * Freetype
 * FLTK
 * GLEW (if the OpenGL rendering backend is selected)
 
 ## Building
+
+### CMake
+
+This project primarily uses CMake, allowing it to be built with a range of compilers.
+
+In this folder, create another folder called 'build', then switch to the command-line (Visual Studio users should open the [Developer Command Prompt](https://docs.microsoft.com/en-us/dotnet/framework/tools/developer-command-prompt-for-vs)) and `cd` into it. After that, generate the files for your build system with:
+
+```
+cmake .. -DCMAKE_BUILD_TYPE=Release
+```
+
+You can also add the following flags:
+
+Name | Function
+--------|--------
+`-DJAPANESE=ON` | Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
+`-DFIX_BUGS=ON` | Fix bugs in the game (see [src/Bug Fixes.txt](src/Bug%20Fixes.txt))
+`-DFORCE_LOCAL_LIBS=ON` | Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones
+`-DRENDERER=OpenGL3` | Use the hardware-accelerated OpenGL 3.2 renderer
+`-DRENDERER=Texture` | Use the hardware-accelerated SDL2 Texture API renderer (default)
+`-DRENDERER=Surface` | Use the software-rendered SDL2 Surface API renderer
+`-DRENDERER=Software` | Use the handwritten software renderer
+
+Then compile CSE2 with this command:
+
+```
+cmake --build . --config Release
+```
+
+If you're a Visual Studio user, you can open the generated `CSE2.sln` file instead.
+
+Once built, the executables and assets can be found in the newly-generated `game` folder.
 
 ### Makefile
 
@@ -48,7 +82,9 @@ Name | Function
 `RENDERER=OpenGL3` | Use the hardware-accelerated OpenGL 3.2 renderer
 `RENDERER=Texture` | Use the hardware-accelerated SDL2 Texture API renderer (default)
 `RENDERER=Surface` | Use the software-rendered SDL2 Surface API renderer
-`RENDERER=Software` | Use a hand-written software renderer
+`RENDERER=Software` | Use the hand-written software renderer
+
+Once built, the executables and assets can be found in the newly-generated `game` folder.
 
 ## Licensing
 
