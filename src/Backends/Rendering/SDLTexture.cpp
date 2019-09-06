@@ -139,6 +139,11 @@ BOOL Backend_IsSurfaceLost(Backend_Surface *surface)
 	return surface->lost;
 }
 
+void Backend_RestoreSurface(Backend_Surface *surface)
+{
+	surface->lost = FALSE;
+}
+
 unsigned char* Backend_LockSurface(Backend_Surface *surface, unsigned int *pitch)
 {
 	if (surface == NULL)

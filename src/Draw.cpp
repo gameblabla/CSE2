@@ -78,6 +78,13 @@ BOOL Flip_SystemTask(void)
 
 	Backend_DrawScreen();
 
+	if (RestoreSurfaces())
+	{
+		RestoreStripper();
+		RestoreMapName();
+		RestoreTextScript();
+	}
+
 	return TRUE;
 }
 
@@ -551,6 +558,7 @@ int RestoreSurfaces(void)	// Guessed function name - this doesn't exist in the L
 	if (Backend_IsSurfaceLost(framebuffer))
 	{
 		++surfaces_regenerated;
+		Backend_RestoreSurface(framebuffer);
 		DummiedOutLogFunction(0x62);
 	}
 
@@ -561,6 +569,7 @@ int RestoreSurfaces(void)	// Guessed function name - this doesn't exist in the L
 			if (Backend_IsSurfaceLost(surf[s]))
 			{
 				++surfaces_regenerated;
+				Backend_RestoreSurface(surf[s]);
 				DummiedOutLogFunction(0x30 + s);
 
 				if (!surface_metadata[s].bSystem)

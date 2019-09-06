@@ -21,6 +21,7 @@ void Backend_DrawScreen(void);
 Backend_Surface* Backend_CreateSurface(unsigned int width, unsigned int height);
 void Backend_FreeSurface(Backend_Surface *surface);
 BOOL Backend_IsSurfaceLost(Backend_Surface *surface);
+void Backend_RestoreSurface(Backend_Surface *surface);
 unsigned char* Backend_LockSurface(Backend_Surface *surface, unsigned int *pitch);
 void Backend_UnlockSurface(Backend_Surface *surface);
 void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL colour_key);
