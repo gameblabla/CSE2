@@ -137,7 +137,11 @@ BOOL __stdcall EnumDevices_Callback(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef)
 	directinput_objects->device = _joystick;
 
 	char string[0x100];
-	sprintf(string, "DeviceGUID = %x\n", lpddi->guidInstance);
+#ifdef FIX_BUGS
+	sprintf(string, "DeviceGUID = %lx\n", lpddi->guidInstance.Data1);
+#else
+	sprintf(string, "DeviceGUID = %x\n", (unsigned int)lpddi->guidInstance.Data1);
+#endif
 	OutputDebugStringA(string);
 
 	return FALSE;

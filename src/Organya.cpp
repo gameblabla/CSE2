@@ -753,7 +753,8 @@ void OrgData::GetMusicInfo(MUSICINFO *mi)
 
 BOOL InitMMTimer();
 BOOL StartTimer(DWORD dwTimer);
-VOID CALLBACK TimerProc(UINT uTID,UINT uMsg,DWORD dwUser,DWORD dwParam1,DWORD dwParam2);
+//VOID CALLBACK TimerProc(UINT uTID,UINT uMsg,DWORD dwUser,DWORD dwParam1,DWORD dwParam2);	// The original code used the wrong types
+VOID CALLBACK TimerProc(UINT uTID,UINT uMsg,DWORD_PTR dwUser,DWORD_PTR dwParam1,DWORD_PTR dwParam2);
 BOOL QuitMMTimer();
 
 /*■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■*/
@@ -802,7 +803,7 @@ BOOL StartTimer(DWORD dwTimer)
 	(
 		dwTimer,                   // タイマー時間 (Timer time)
 		10,                        // 許容できるタイマー精度 (Acceptable timer accuracy)
-		(LPTIMECALLBACK)TimerProc, // コールバックプロシージャ (Callback procedure)
+		TimerProc,                 // コールバックプロシージャ (Callback procedure)
 		0,                         // ユーザーがコールバック関数のdwUserに送る情報値 (Information value sent by user to dwUser in callback function)
 		TIME_PERIODIC              // タイマー時間毎にイベントを発生させる (Generate an event every timer time)
 	);
@@ -818,8 +819,15 @@ BOOL StartTimer(DWORD dwTimer)
 /*■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■*/
 // タイマーのコールバック関数 (Timer callback function)
 /*■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■*/
-VOID CALLBACK TimerProc(UINT uTID,UINT uMsg,DWORD dwUser,DWORD dwParam1,DWORD dwParam2)
+//VOID CALLBACK TimerProc(UINT uTID,UINT uMsg,DWORD dwUser,DWORD dwParam1,DWORD dwParam2)	// The original code used the wrong types
+VOID CALLBACK TimerProc(UINT uTID,UINT uMsg,DWORD_PTR dwUser,DWORD_PTR dwParam1,DWORD_PTR dwParam2)
 {
+	(void)uTID;
+	(void)uMsg;
+	(void)dwUser;
+	(void)dwParam1;
+	(void)dwParam2;
+
 	DWORD dwNowTime;
 	dwNowTime = timeGetTime();
 	//===================================================================================

@@ -98,6 +98,10 @@ unsigned long GetFramePerSecound(void)
 
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
+	(void)hPrevInstance;
+	(void)lpCmdLine;
+	(void)nShowCmd;
+
 	int i;
 
 	hObject = OpenMutexA(MUTEX_ALL_ACCESS, 0, mutex_name);
