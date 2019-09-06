@@ -15,7 +15,7 @@ void AudioBackend_UnlockSound(AudioBackend_Sound *sound);
 
 void AudioBackend_PlaySound(AudioBackend_Sound *sound, BOOL looping);
 void AudioBackend_StopSound(AudioBackend_Sound *sound);
-void AudioBackend_PauseSound(AudioBackend_Sound *sound);
+void AudioBackend_RewindSound(AudioBackend_Sound *sound);
 
 void AudioBackend_SetSoundFrequency(AudioBackend_Sound *sound, unsigned int frequency);
 void AudioBackend_SetSoundVolume(AudioBackend_Sound *sound, long volume);

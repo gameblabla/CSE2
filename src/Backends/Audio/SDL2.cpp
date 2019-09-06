@@ -272,14 +272,14 @@ void AudioBackend_StopSound(AudioBackend_Sound *sound)
 	SDL_UnlockAudioDevice(device_id);
 }
 
-void AudioBackend_PauseSound(AudioBackend_Sound *sound)
+void AudioBackend_RewindSound(AudioBackend_Sound *sound)
 {
 	if (sound == NULL)
 		return;
 
 	SDL_LockAudioDevice(device_id);
 
-	sound->playing = FALSE;
+	sound->position = 0.0;
 
 	SDL_UnlockAudioDevice(device_id);
 }
