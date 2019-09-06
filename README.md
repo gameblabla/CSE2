@@ -8,7 +8,7 @@ This branch migrates the engine from WinAPI to SDL2, and addresses numerous port
 
 ## Background
 
-In 2007, a Linux port of Cave Story was made by Peter Mackey and Simon Parzer. Details about it can be found in [Peter's old blog](https://web.archive.org/web/20070911202919/http://aaiiee.wordpress.com:80/). This port received an update in 2011, including two shiny new executables. What Peter and Simon didn't realise was that they left huge amounts of debugging information in these executables, including the names of every C++ source file, and the variables and functions they contained.
+In 2007, a Linux port of Cave Story was made by Peter Mackay and Simon Parzer. Details about it can be found in [Peter's old blog](https://web.archive.org/web/20070911202919/http://aaiiee.wordpress.com:80/). This port received an update in 2011, including two shiny new executables. What Peter and Simon didn't realise was that they left huge amounts of debugging information in these executables, including the names of every C++ source file, and the variables and functions they contained.
 
 This was a goldmine of information about not just the game's inner-workings, but its _source code._ With this, a decompilation seemed like a real option. But this wasn't _all_ the help we'd get...
 
