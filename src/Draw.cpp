@@ -523,7 +523,7 @@ void CortBox2(const RECT *rect, unsigned long col, SurfaceID surf_no)
 
 	Backend_ColourFill(surf[surf_no], &dst_rect, red, green, blue);
 }
-/*
+
 BOOL DummiedOutLogFunction(int unknown)
 {
 	char unknown2[0x100];
@@ -545,23 +545,12 @@ int RestoreSurfaces(void)	// Guessed function name - this doesn't exist in the L
 	RECT rect;
 	int surfaces_regenerated = 0;
 
-	if (frontbuffer == NULL)
+	if (framebuffer == NULL)
 		return surfaces_regenerated;
 
-	if (backbuffer == NULL)
-		return surfaces_regenerated;
-
-	if (frontbuffer->IsLost() == DDERR_SURFACELOST)
+	if (Backend_IsSurfaceLost(framebuffer))
 	{
 		++surfaces_regenerated;
-		frontbuffer->Restore();
-		DummiedOutLogFunction(0x66);
-	}
-
-	if (backbuffer->IsLost() == DDERR_SURFACELOST)
-	{
-		++surfaces_regenerated;
-		backbuffer->Restore();
 		DummiedOutLogFunction(0x62);
 	}
 
@@ -569,10 +558,9 @@ int RestoreSurfaces(void)	// Guessed function name - this doesn't exist in the L
 	{
 		if (surf[s] != NULL)
 		{
-			if (surf[s]->IsLost() == DDERR_SURFACELOST)
+			if (Backend_IsSurfaceLost(surf[s]))
 			{
 				++surfaces_regenerated;
-				surf[s]->Restore();
 				DummiedOutLogFunction(0x30 + s);
 
 				if (!surface_metadata[s].bSystem)
@@ -602,7 +590,7 @@ int RestoreSurfaces(void)	// Guessed function name - this doesn't exist in the L
 
 	return surfaces_regenerated;
 }
-*/
+
 // TODO - Inaccurate stack frame
 void InitTextObject(const char *name)
 {

@@ -93,6 +93,11 @@ void Backend_FreeSurface(Backend_Surface *surface)
 	free(surface);
 }
 
+BOOL Backend_IsSurfaceLost(Backend_Surface *surface)
+{
+	return FALSE;
+}
+
 unsigned char* Backend_LockSurface(Backend_Surface *surface, unsigned int *pitch)
 {
 	if (surface == NULL)
@@ -226,7 +231,7 @@ void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, l
 	SDL_BlitSurface(glyph->sdlsurface, NULL, surface->sdlsurface, &rect);
 }
 
-void Backend_HandleDeviceLoss(void)
+void Backend_HandleRenderTargetLoss(void)
 {
 	// No problem for us
 }

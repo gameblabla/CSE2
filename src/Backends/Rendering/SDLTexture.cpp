@@ -18,6 +18,10 @@ typedef struct Backend_Surface
 	unsigned char *pixels;
 	unsigned int width;
 	unsigned int height;
+	BOOL lost;
+
+	struct Backend_Surface *next;
+	struct Backend_Surface *prev;
 } Backend_Surface;
 
 typedef struct Backend_Glyph
@@ -30,6 +34,8 @@ typedef struct Backend_Glyph
 static SDL_Renderer *renderer;
 
 static Backend_Surface framebuffer;
+
+static Backend_Surface *surface_list_head;
 
 static void RectToSDLRect(const RECT *rect, SDL_Rect *sdl_rect)
 {
@@ -103,6 +109,12 @@ Backend_Surface* Backend_CreateSurface(unsigned int width, unsigned int height)
 
 	surface->width = width;
 	surface->height = height;
+	surface->lost = FALSE;
+
+	// Add to linked-list
+	surface->prev = NULL;
+	surface->next = surface_list_head;
+	surface_list_head = surface;
 
 	return surface;
 }
@@ -112,8 +124,19 @@ void Backend_FreeSurface(Backend_Surface *surface)
 	if (surface == NULL)
 		return;
 
+	// Remove from linked list
+	if (surface->next != NULL)
+		surface->next->prev = surface->prev;
+	if (surface->prev != NULL)
+		surface->prev->next = surface->next;
+
 	SDL_DestroyTexture(surface->texture);
 	free(surface);
+}
+
+BOOL Backend_IsSurfaceLost(Backend_Surface *surface)
+{
+	return surface->lost;
 }
 
 unsigned char* Backend_LockSurface(Backend_Surface *surface, unsigned int *pitch)
@@ -305,14 +328,10 @@ void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, l
 	SDL_RenderCopy(renderer, glyph->texture, NULL, &destination_rect);
 }
 
-void Backend_HandleDeviceLoss(void)
+void Backend_HandleRenderTargetLoss(void)
 {
-	// TODO - RestoreSurfaces
-	// All of our target-textures have been lost, so regenerate them
-//	RestoreSurfaces();
-//	RestoreStripper();
-//	RestoreMapName();
-//	RestoreTextScript();
+	for (Backend_Surface *surface = surface_list_head; surface != NULL; surface = surface->next)
+		surface->lost = TRUE;
 }
 
 void Backend_HandleWindowResize(void)

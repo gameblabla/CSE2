@@ -8,6 +8,7 @@
 
 #include "WindowsWrapper.h"
 
+#include "Backends/Rendering.h"
 #include "CommonDefines.h"
 #include "Config.h"
 #include "Draw.h"
@@ -558,6 +559,11 @@ BOOL SystemTask(void)
 					case SDL_WINDOWEVENT_FOCUS_GAINED:
 						ActiveWindow();
 						break;
+
+					case SDL_WINDOWEVENT_RESIZED:
+					case SDL_WINDOWEVENT_SIZE_CHANGED:
+						Backend_HandleWindowResize();
+						break;
 				}
 
 				break;
@@ -565,6 +571,11 @@ BOOL SystemTask(void)
 			case SDL_QUIT:
 				StopOrganyaMusic();
 				return FALSE;
+
+			case SDL_RENDER_TARGETS_RESET:
+				Backend_HandleRenderTargetLoss();
+				break;
+
 		}
 	}
 
