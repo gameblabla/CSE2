@@ -48,7 +48,8 @@ You can also add the following flags:
 Name | Function
 --------|--------
 `-DJAPANESE=ON` | Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
-`-DFIX_BUGS=ON` | Fix bugs in the game (see [src/Bug Fixes.txt](src/Bug%20Fixes.txt))
+`-DFIX_BUGS=ON` | Fix various bugs in the game
+`-DDEBUG_SAVE=ON` | Re-enable the ability to drag-and-drop save files onto the window
 `-DFORCE_LOCAL_LIBS=ON` | Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones
 `-DRENDERER=OpenGL3` | Use the hardware-accelerated OpenGL 3.2 renderer
 `-DRENDERER=Texture` | Use the hardware-accelerated SDL2 Texture API renderer (default)

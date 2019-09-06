@@ -8,8 +8,8 @@ set(BUILD_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/game")
 set(ASSETS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/assets")
 
 option(JAPANESE "Enable the Japanese-language build" OFF)
-option(FIX_BUGS "Fix certain bugs (see src/Bug Fixes.txt)" OFF)
-option(NONPORTABLE "Enable bits of code that aren't portable, but are what the original game used" OFF)
+option(FIX_BUGS "Fix various bugs in the game" OFF)
+option(DEBUG_SAVE "Re-enable the ability to drag-and-drop save files onto the window" OFF)
 option(FORCE_LOCAL_LIBS "Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones" OFF)
 set(RENDERER "Texture" CACHE STRING "Which renderer the game should use: 'OpenGL3' for an OpenGL 3.2 renderer, 'Texture' for SDL2's hardware-accelerated Texture API, 'Surface' for SDL2's software-rendered Surface API, and 'Software' for a handwritten software renderer")
 
@@ -242,6 +242,10 @@ endif()
 
 if(FIX_BUGS)
 	target_compile_definitions(CSE2 PRIVATE FIX_BUGS)
+endif()
+
+if(DEBUG_SAVE)
+	target_compile_definitions(CSE2 PRIVATE DEBUG_SAVE)
 endif()
 
 if(RENDERER MATCHES "OpenGL3")
