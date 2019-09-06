@@ -438,7 +438,7 @@ void PlayDramObject(unsigned char key, int mode, signed char track)
 			case 1:	// 再生 (Playback)
 				lpSECONDARYBUFFER[150 + track]->Stop();
 				lpSECONDARYBUFFER[150 + track]->SetCurrentPosition(0);
-				ChangeDramFrequency(key, track);	// 周波数を設定して ()
+				ChangeDramFrequency(key, track);	// 周波数を設定して (Set the frequency)
 				lpSECONDARYBUFFER[150 + track]->Play(0, 0, 0);
 				break;
 
