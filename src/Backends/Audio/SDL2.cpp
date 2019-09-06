@@ -49,7 +49,7 @@ static void SetSoundFrequency(AudioBackend_Sound *sound, unsigned int frequency)
 
 static void SetSoundVolume(AudioBackend_Sound *sound, long volume)
 {
-	sound->volume = MillibelToScale(volume);
+	sound->volume = (float)MillibelToScale(volume);
 
 	sound->volume_l = sound->pan_l * sound->volume;
 	sound->volume_r = sound->pan_r * sound->volume;
@@ -57,8 +57,8 @@ static void SetSoundVolume(AudioBackend_Sound *sound, long volume)
 
 static void SetSoundPan(AudioBackend_Sound *sound, long pan)
 {
-	sound->pan_l = MillibelToScale(-pan);
-	sound->pan_r = MillibelToScale(pan);
+	sound->pan_l = (float)MillibelToScale(-pan);
+	sound->pan_r = (float)MillibelToScale(pan);
 
 	sound->volume_l = sound->pan_l * sound->volume;
 	sound->volume_r = sound->pan_r * sound->volume;
@@ -100,7 +100,7 @@ static void Callback(void *user_data, Uint8 *stream_uint8, int len)
 
 			while (frames_done != frames_total)
 			{
-				const unsigned int frames_to_do = MIN(ceil((sound->frames - sound->position) / sound->advance_delta), frames_total - frames_done);
+				const unsigned int frames_to_do = MIN((unsigned int)ceil((sound->frames - sound->position) / sound->advance_delta), frames_total - frames_done);
 
 				for (unsigned int i = 0; i < frames_to_do; ++i)
 				{
@@ -126,7 +126,7 @@ static void Callback(void *user_data, Uint8 *stream_uint8, int len)
 				{
 					if (sound->looping)
 					{
-						sound->position = fmod(sound->position, sound->frames);
+						sound->position = fmod(sound->position, (double)sound->frames);
 					}
 					else
 					{
