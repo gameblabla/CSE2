@@ -10,7 +10,6 @@
 #include "Boss.h"
 #include "Bullet.h"
 #include "Caret.h"
-#include "CommonDefines.h"
 #include "Draw.h"
 #include "File.h"
 #include "Flash.h"
@@ -137,7 +136,7 @@ static const STAGE_TABLE *gTMT = gTMTDefault;
 
 BOOL LoadStageTable()
 {
-	char path[PATH_LENGTH];
+	char path[MAX_PATH];
 
 	unsigned char *file_buffer;
 	long file_size;
@@ -237,7 +236,7 @@ BOOL TransferStage(int no, int w, int x, int y)
 	strcpy(path_dir, "Stage");
 
 	//Load tileset
-	char path[PATH_LENGTH];
+	char path[MAX_PATH];
 	sprintf(path, "%s/Prt%s", path_dir, gTMT[no].parts);
 	if (!ReloadBitmap_File(path, SURFACE_ID_LEVEL_TILESET))
 		bError = TRUE;
@@ -371,7 +370,7 @@ void ChangeMusic(MusicID no)
 	ExtraSound_PauseMusic();
 #endif
 
-	char path[PATH_LENGTH];
+	char path[MAX_PATH];
 	sprintf(path, "%s/%s", gDataPath, gMusicTable[no].path);
 
 	switch (gMusicTable[no].type)
@@ -412,7 +411,7 @@ void ReCallMusic()
 	{
 		case MUSIC_TYPE_ORGANYA:
 			//Load .org that was playing before
-			char path[PATH_LENGTH];
+			char path[MAX_PATH];
 			sprintf(path, "%s/%s", gDataPath, gMusicTable[gOldNo].path);
 			LoadOrganya(path);
 

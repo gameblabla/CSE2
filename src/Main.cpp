@@ -11,9 +11,11 @@
 
 #include "WindowsWrapper.h"
 
+#include "Backends/Rendering.h"
 #include "CommonDefines.h"
 #include "Config.h"
 #include "Draw.h"
+#include "File.h"
 #include "Game.h"
 #include "Generic.h"
 #include "Input.h"
@@ -28,55 +30,45 @@
 #include "Sound.h"
 #include "Triangle.h"
 
-// These two are defined in Draw.cpp. This is a bit of a hack.
-extern SDL_Window *gWindow;
-extern SDL_Renderer *gRenderer;
-
-char gModulePath[PATH_LENGTH];
-char gDataPath[PATH_LENGTH];
+char gModulePath[MAX_PATH];
+char gDataPath[MAX_PATH];
 
 int gJoystickButtonTable[8];
 
-HWND ghWnd;	// Placeholder until we restore the WinAPI code
+BOOL bFullscreen;
 BOOL gbUseJoystick = FALSE;
-BOOL bFps = FALSE;
 
-BOOL bActive = TRUE;
+static BOOL bFps = FALSE;
+static BOOL bActive = TRUE;
+
+static int windowWidth;
+static int windowHeight;
+
+static const char *mutex_name = "Doukutsu";
 
 #ifdef JAPANESE
-const char *lpWindowName = "洞窟物語エンジン2";
+static const char *lpWindowName = "洞窟物語";	// "Cave Story"
 #else
-const char *lpWindowName = "Cave Story Engine 2 ~ Doukutsu Monogatari Enjin 2";
+static const char *lpWindowName = "Cave Story ~ Doukutsu Monogatari";
 #endif
 
-// A replication of MSVC's rand algorithm
-static unsigned long next = 1;
-
-int rep_rand()
-{
-	next = ((next) * 214013 + 2531011);
-	return ((next) >> 16) & 0x7FFF;
-}
-
-void rep_srand(unsigned int seed)
-{
-	next = seed;
-}
-
 // Framerate stuff
-void PutFramePerSecound()
+void PutFramePerSecound(void)
 {
 	if (bFps)
-		PutNumber4(WINDOW_WIDTH - 40, 8, GetFramePerSecound(), FALSE);
+	{
+		const unsigned long fps = GetFramePerSecound();
+		PutNumber4(WINDOW_WIDTH - 40, 8, fps, FALSE);
+	}
 }
 
-int GetFramePerSecound()
+unsigned long GetFramePerSecound(void)
 {
-	unsigned int current_tick;
+	unsigned long current_tick;
 	static BOOL need_new_base_tick = TRUE;
-	static int frames_this_second;
-	static int current_frame;
-	static int base_tick;
+	static unsigned long frames_this_second;
+	static unsigned long current_frame;
+	static unsigned long base_tick;
 
 	if (need_new_base_tick)
 	{
@@ -99,273 +91,251 @@ int GetFramePerSecound()
 
 int main(int argc, char *argv[])
 {
+	(void)argc;
+	(void)argv;
+
+	int i;
+
 	// Get executable's path
 	char *base_path = SDL_GetBasePath();
+	size_t base_path_length = strlen(base_path);
+	base_path[base_path_length - 1] = '\0';
 	strcpy(gModulePath, base_path);
 	SDL_free(base_path);
-	if (gModulePath[strlen(gModulePath) - 1] == '/' || gModulePath[strlen(gModulePath) - 1] == '\\')
-		gModulePath[strlen(gModulePath) - 1] = '\0'; // String cannot end in slash or stuff will probably break (original does this through a windows.h provided function)
 
 	// Get path of the data folder
 	strcpy(gDataPath, gModulePath);
 	strcat(gDataPath, "/data");
 
-#ifdef WINDOWS
-	// Set the window icons. See res/ICON/ICON.rc.
-	SDL_SetHint(SDL_HINT_WINDOWS_INTRESOURCE_ICON, "101");
-	SDL_SetHint(SDL_HINT_WINDOWS_INTRESOURCE_ICON_SMALL, "102");
-#endif
+	CONFIG conf;
+	if (!LoadConfigData(&conf))
+		DefaultConfigData(&conf);
 
-	// Initialize SDL
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_TIMER) >= 0)
+	// Apply keybinds
+	// Swap X and Z buttons
+	switch (conf.attack_button_mode)
 	{
-		// Load configuration
-		CONFIG config;
-
-		if (!LoadConfigData(&config))
-			DefaultConfigData(&config);
-
-		// Apply keybinds
-		// Swap X and Z buttons
-		if (config.attack_button_mode)
-		{
-			if (config.attack_button_mode == 1)
-			{
-				gKeyJump = KEY_X;
-				gKeyShot = KEY_Z;
-			}
-		}
-		else
-		{
+		case 0:
 			gKeyJump = KEY_Z;
 			gKeyShot = KEY_X;
-		}
+			break;
 
-		// Swap Okay and Cancel buttons
-		if (config.ok_button_mode)
-		{
-			if (config.ok_button_mode == 1)
-			{
-				gKeyOk = gKeyShot;
-				gKeyCancel = gKeyJump;
-			}
-		}
-		else
-		{
+		case 1:
+			gKeyJump = KEY_X;
+			gKeyShot = KEY_Z;
+			break;
+	}
+
+	// Swap Okay and Cancel buttons
+	switch (conf.ok_button_mode)
+	{
+		case 0:
 			gKeyOk = gKeyJump;
 			gKeyCancel = gKeyShot;
-		}
+			break;
 
-		// Swap left and right weapon switch keys
-		if (CheckFileExists("s_reverse"))
-		{
-			gKeyArms = KEY_ARMSREV;
-			gKeyArmsRev = KEY_ARMS;
-		}
+		case 1:
+			gKeyOk = gKeyShot;
+			gKeyCancel = gKeyJump;
+			break;
+	}
 
-		// Alternate movement keys
-		if (config.move_button_mode)
-		{
-			if (config.move_button_mode == 1)
-			{
-				gKeyLeft = KEY_ALT_LEFT;
-				gKeyUp = KEY_ALT_UP;
-				gKeyRight = KEY_ALT_RIGHT;
-				gKeyDown = KEY_ALT_DOWN;
-			}
-		}
-		else
-		{
+	// Swap left and right weapon switch keys
+	if (CheckFileExists("s_reverse"))
+	{
+		gKeyArms = KEY_ARMSREV;
+		gKeyArmsRev = KEY_ARMS;
+	}
+
+	// Alternate movement keys
+	switch (conf.move_button_mode)
+	{
+		case 0:
 			gKeyLeft = KEY_LEFT;
 			gKeyUp = KEY_UP;
 			gKeyRight = KEY_RIGHT;
 			gKeyDown = KEY_DOWN;
-		}
+			break;
 
-		// Set gamepad inputs
-		for (int i = 0; i < 8; i++)
+		case 1:
+			gKeyLeft = KEY_ALT_LEFT;
+			gKeyUp = KEY_ALT_UP;
+			gKeyRight = KEY_ALT_RIGHT;
+			gKeyDown = KEY_ALT_DOWN;
+			break;
+	}
+
+	// Set gamepad inputs
+	for (i = 0; i < 8; i++)
+	{
+		switch (conf.joystick_button[i])
 		{
-			switch (config.joystick_button[i])
+			case 1:
+				gJoystickButtonTable[i] = gKeyJump;
+				break;
+
+			case 2:
+				gJoystickButtonTable[i] = gKeyShot;
+				break;
+
+			case 3:
+				gJoystickButtonTable[i] = gKeyArms;
+				break;
+
+			case 6:
+				gJoystickButtonTable[i] = gKeyArmsRev;
+				break;
+
+			case 4:
+				gJoystickButtonTable[i] = gKeyItem;
+				break;
+
+			case 5:
+				gJoystickButtonTable[i] = gKeyMap;
+				break;
+		}
+	}
+
+	RECT unused_rect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
+
+	SDL_Init(SDL_INIT_EVENTS);
+
+	SDL_Window *window;
+
+	switch (conf.display_mode)
+	{
+		case 1:
+		case 2:
+			// Set window dimensions
+			windowWidth = WINDOW_WIDTH * conf.display_mode;
+			windowHeight = WINDOW_HEIGHT * conf.display_mode;
+
+			window = CreateWindow(lpWindowName, windowWidth, windowHeight);
+
+			if (window == NULL)
+				return 0;
+
+			StartDirectDraw(window, conf.display_mode);
+
+			break;
+
+		case 0:
+		case 3:
+		case 4:
+			// Set window dimensions
+			windowWidth = WINDOW_WIDTH * 2;
+			windowHeight = WINDOW_HEIGHT * 2;
+
+			window = CreateWindow(lpWindowName, windowWidth, windowHeight);
+
+			if (window == NULL)
+				return 0;
+
+			// Set colour depth
+			int depth;
+
+			switch (conf.display_mode)
 			{
-				case 1:
-					gJoystickButtonTable[i] = gKeyJump;
+				case 0:
+					depth = 16;
 					break;
-
-				case 2:
-					gJoystickButtonTable[i] = gKeyShot;
-					break;
-
 				case 3:
-					gJoystickButtonTable[i] = gKeyArms;
+					depth = 24;
 					break;
-
-				case 6:
-					gJoystickButtonTable[i] = gKeyArmsRev;
-					break;
-
 				case 4:
-					gJoystickButtonTable[i] = gKeyItem;
+					depth = 32;
 					break;
-
-				case 5:
-					gJoystickButtonTable[i] = gKeyMap;
-					break;
-
-				default:
-					continue;
 			}
-		}
 
-		RECT unused_rect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
+			StartDirectDraw(window, 0);
+			bFullscreen = TRUE;
 
-		// Load cursor
-		char path[PATH_LENGTH];
-		sprintf(path, "%s/Resource/CURSOR/CURSOR_NORMAL.png", gDataPath);
-		unsigned int bitmap_width, bitmap_height;
-		unsigned char *bitmap_pixels;
-		lodepng_decode32_file(&bitmap_pixels, &bitmap_width, &bitmap_height, path);
+			break;
+	}
 
-		if (bitmap_pixels)
-		{
-			SDL_Surface *cursor_surface = SDL_CreateRGBSurfaceWithFormatFrom(bitmap_pixels, bitmap_width, bitmap_height, 0, bitmap_width * 4, SDL_PIXELFORMAT_RGBA32);
-			SDL_Cursor *cursor = SDL_CreateColorCursor(cursor_surface, 0, 0);	// Don't worry, the hotspots are accurate to the original files
-
-			if (cursor)
-				SDL_SetCursor(cursor);
-			else
-				printf("Failed to load cursor\n");
-
-			SDL_FreeSurface(cursor_surface);
-			free(bitmap_pixels);
-		}
-		else
-		{
-			printf("Failed to load cursor\n");
-		}
-
-		// Get window dimensions and colour depth
-		int windowWidth;
-		int windowHeight;
-
-		switch (config.display_mode)
-		{
-			default:
-				// Set window dimensions
-				windowWidth = WINDOW_WIDTH * config.display_mode;
-				windowHeight = WINDOW_HEIGHT * config.display_mode;
-
-				// Create window
-				gWindow = CreateWindow(lpWindowName, windowWidth, windowHeight);
-
-				if (gWindow)
-					StartDirectDraw(config.display_mode);
-
-				break;
-
-			case 0:
-				// Set window dimensions
-				windowWidth = WINDOW_WIDTH * 2;
-				windowHeight = WINDOW_HEIGHT * 2;
-
-				// Create window
-				gWindow = CreateWindow(lpWindowName, windowWidth, windowHeight);
-
-				if (gWindow)
-				{
-					StartDirectDraw(0);
-
-					SDL_ShowCursor(0);
-				}
-
-				break;
-		}
-
-		// Create window
-
-
-		if (gWindow)
-		{
-			// Check debug things
-			if (CheckFileExists("fps"))
-				bFps = TRUE;
-
-#ifndef WINDOWS
-			// Load icon
-			char path[PATH_LENGTH];
-			sprintf(path, "%s/Resource/ICON/ICON_MINI.png", gDataPath);
-			unsigned int bitmap_width, bitmap_height;
-			unsigned char *bitmap_pixels;
-			lodepng_decode32_file(&bitmap_pixels, &bitmap_width, &bitmap_height, path);
-
-			if (bitmap_pixels)
-			{
-				SDL_Surface *iconSurf = SDL_CreateRGBSurfaceWithFormatFrom(bitmap_pixels, bitmap_width, bitmap_height, 0, bitmap_width * 4, SDL_PIXELFORMAT_RGBA32);
-				SDL_Surface *iconConverted = SDL_ConvertSurfaceFormat(iconSurf, SDL_PIXELFORMAT_RGB888, 0);
-				SDL_FreeSurface(iconSurf);
-				free(bitmap_pixels);
-				SDL_Surface *iconSurfUpscaled = SDL_CreateRGBSurfaceWithFormat(0, 256, 256, 0, SDL_PIXELFORMAT_RGB888);
-				SDL_LowerBlitScaled(iconConverted, NULL, iconSurfUpscaled, NULL);
-				SDL_FreeSurface(iconConverted);
-				SDL_SetWindowIcon(gWindow, iconSurfUpscaled);
-				SDL_FreeSurface(iconSurfUpscaled);
-			}
-			else
-			{
-				printf("Failed to load icon\n");
-			}
+#ifdef DEBUG_SAVE
+	SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
 #endif
 
-			// Set rects
-			RECT loading_rect = {0, 0, 64, 8};
-			RECT clip_rect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
+	// Set up the window icon and cursor
+	unsigned char *image_buffer;
+	unsigned int image_width;
+	unsigned int image_height;
+	char image_path[MAX_PATH];
 
-			// Load the "LOADING" text
-			MakeSurface_File("Loading", SURFACE_ID_LOADING);
+	sprintf(image_path, "%s/Resource/ICON/ICON_MINI.png", gDataPath);
+	lodepng_decode32_file(&image_buffer, &image_width, &image_height, image_path);
+	SDL_Surface *icon_surface = SDL_CreateRGBSurfaceWithFormatFrom(image_buffer, image_width, image_height, 32, image_width * 4, SDL_PIXELFORMAT_RGBA32);
+	SDL_SetWindowIcon(window, icon_surface);
+	SDL_FreeSurface(icon_surface);
+	free(image_buffer);
 
-			// Draw loading screen
-			CortBox(&clip_rect, 0x000000);
-			PutBitmap3(&clip_rect, PixelToScreenCoord((WINDOW_WIDTH - 64) / 2), PixelToScreenCoord((WINDOW_HEIGHT - 8) / 2), &loading_rect, SURFACE_ID_LOADING);
+	sprintf(image_path, "%s/Resource/CURSOR/CURSOR_NORMAL.png", gDataPath);
+	lodepng_decode32_file(&image_buffer, &image_width, &image_height, image_path);
+	SDL_Surface *cursor_surface = SDL_CreateRGBSurfaceWithFormatFrom(image_buffer, image_width, image_height, 32, image_width * 4, SDL_PIXELFORMAT_RGBA32);
+	SDL_SetColorKey(cursor_surface, SDL_TRUE, SDL_MapRGB(cursor_surface->format, 0xFF, 0, 0xFF));
+	SDL_Cursor *cursor = SDL_CreateColorCursor(cursor_surface, 0, 0);
+	SDL_SetCursor(cursor);
 
-			// Draw to screen
-			if (Flip_SystemTask(ghWnd))
-			{
-				// Initialize sound
-				InitDirectSound();
+	if (CheckFileExists("fps"))
+		bFps = TRUE;
 
-				// Initialize joystick
-				if (config.bJoystick && InitDirectInput())
-				{
-					ResetJoystickStatus();
-					gbUseJoystick = TRUE;
-				}
+	// Set rects
+	RECT rcLoading = {0, 0, 64, 8};
+	RECT rcFull = {0, 0, 0, 0};
+	rcFull.right = WINDOW_WIDTH;
+	rcFull.bottom = WINDOW_HEIGHT;
 
-				// Initialize stuff
-				InitTextObject(config.font_name);
-				InitTriangleTable();
+	// Load the "LOADING" text
+	BOOL b = MakeSurface_File("Loading", SURFACE_ID_LOADING);
 
-				// Run game code
-				Game(ghWnd);
+	// Draw loading screen
+	CortBox(&rcFull, 0x000000);
+	PutBitmap3(&rcFull, PixelToScreenCoord((WINDOW_WIDTH - 64) / 2), PixelToScreenCoord((WINDOW_HEIGHT - 8) / 2), &rcLoading, SURFACE_ID_LOADING);
 
-				// End stuff
-				EndDirectSound();
-				EndTextObject();
-				EndDirectDraw();
-			}
-
-			SDL_DestroyWindow(gWindow);
-		}
+	// Draw to screen
+	if (!Flip_SystemTask())
+	{
+        SDL_FreeCursor(cursor);
+        SDL_FreeSurface(cursor_surface);
+		free(image_buffer);
+		SDL_DestroyWindow(window);
+		return 1;
 	}
 	else
 	{
-		SDL_Quit();
-		return -1;
+		// Initialize sound
+		InitDirectSound();
+
+		// Initialize joystick
+		if (conf.bJoystick && InitDirectInput())
+		{
+			ResetJoystickStatus();
+			gbUseJoystick = TRUE;
+		}
+
+		// Initialize stuff
+		InitTextObject(conf.font_name);
+		InitTriangleTable();
+
+		// Run game code
+		Game();
+
+		// End stuff
+		EndDirectSound();
+		EndTextObject();
+		EndDirectDraw();
+
+        SDL_FreeCursor(cursor);
+        SDL_FreeSurface(cursor_surface);
+		free(image_buffer);
+		SDL_DestroyWindow(window);
 	}
 
-	SDL_Quit();
-	return 0;
+	return 1;
 }
 
-void InactiveWindow()
+void InactiveWindow(void)
 {
 	if (bActive)
 	{
@@ -380,7 +350,7 @@ void InactiveWindow()
 	PlaySoundObject(7, 0);
 }
 
-void ActiveWindow()
+void ActiveWindow(void)
 {
 	if (!bActive)
 	{
@@ -396,83 +366,187 @@ void ActiveWindow()
 	PlaySoundObject(7, -1);
 }
 
-void JoystickProc()
+void JoystickProc(void);
+
+BOOL SystemTask(void)
 {
-	JOYSTICK_STATUS status;
-
-	if (GetJoystickStatus(&status))
-	{
-		// Clear held buttons
-		gKey &= (KEY_ESCAPE | KEY_F2 | KEY_F1);
-
-		// Set movement buttons
-		if (status.bLeft)
-			gKey |= gKeyLeft;
-		if (status.bRight)
-			gKey |= gKeyRight;
-		if (status.bUp)
-			gKey |= gKeyUp;
-		if (status.bDown)
-			gKey |= gKeyDown;
-
-		// Set held buttons
-		for (int i = 0; i < 8; i++)
-		{
-			if (status.bButton[i])
-				gKey |= gJoystickButtonTable[i];
-		}
-	}
-}
-
-#define DO_KEY_PRESS(key) \
-	if (event.type == SDL_KEYDOWN) \
-		gKey |= key; \
-	else \
-		gKey &= ~key; \
-	break;
-
-BOOL SystemTask()
-{
-	// Handle window events
-	BOOL focusGained = TRUE;
-
-	while (SDL_PollEvent(NULL) || !focusGained)
+	while (SDL_PollEvent(NULL) || !bActive)
 	{
 		SDL_Event event;
-		SDL_WaitEvent(&event);
+
+		if (!SDL_WaitEvent(&event))
+			return FALSE;
 
 		switch (event.type)
 		{
-			case SDL_QUIT:
-				return FALSE;
-				break;
-
-			case SDL_RENDER_TARGETS_RESET:
-			case SDL_RENDER_DEVICE_RESET:
-				HandleDeviceLoss();
-				break;
-
-			case SDL_WINDOWEVENT:
-				switch (event.window.event)
+			case SDL_KEYDOWN:
+				switch (event.key.keysym.sym)
 				{
-					case SDL_WINDOWEVENT_RESIZED:
-					case SDL_WINDOWEVENT_SIZE_CHANGED:
-						HandleWindowResize();
+					case SDLK_ESCAPE:
+						gKey |= KEY_ESCAPE;
 						break;
 
-					case SDL_WINDOWEVENT_FOCUS_GAINED:
-						focusGained = TRUE;
-						ActiveWindow();
+					case SDLK_w:
+						gKey |= KEY_MAP;
 						break;
 
-					case SDL_WINDOWEVENT_FOCUS_LOST:
-						focusGained = FALSE;
-						InactiveWindow();
+					case SDLK_LEFT:
+						gKey |= KEY_LEFT;
 						break;
 
-					default:
+					case SDLK_RIGHT:
+						gKey |= KEY_RIGHT;
+						break;
+
+					case SDLK_UP:
+						gKey |= KEY_UP;
+						break;
+
+					case SDLK_DOWN:
+						gKey |= KEY_DOWN;
+						break;
+
+					case SDLK_x:
+						gKey |= KEY_X;
+						break;
+
+					case SDLK_z:
+						gKey |= KEY_Z;
+						break;
+
+					case SDLK_s:
+						gKey |= KEY_ARMS;
+						break;
+
+					case SDLK_a:
+						gKey |= KEY_ARMSREV;
+						break;
+
+					case SDLK_LSHIFT:
+					case SDLK_RSHIFT:
+						gKey |= KEY_SHIFT;
+						break;
+
+					case SDLK_F1:
+						gKey |= KEY_F1;
+						break;
+
+					case SDLK_F2:
+						gKey |= KEY_F2;
+						break;
+
+					case SDLK_q:
+						gKey |= KEY_ITEM;
+						break;
+
+					case SDLK_COMMA:
+						gKey |= KEY_ALT_LEFT;
+						break;
+
+					case SDLK_PERIOD:
+						gKey |= KEY_ALT_DOWN;
+						break;
+
+					case SDLK_SLASH:
+						gKey |= KEY_ALT_RIGHT;
+						break;
+
+					case SDLK_l:
+						gKey |= KEY_L;
+						break;
+
+					case SDLK_PLUS:
+						gKey |= KEY_PLUS;
+						break;
+
+					case SDLK_F5:
+						gbUseJoystick = FALSE;
 						break;
 				}
+
+				break;
+
+			case SDL_KEYUP:
+				switch (event.key.keysym.sym)
+				{
+					case SDLK_ESCAPE:
+						gKey &= ~KEY_ESCAPE;
+						break;
+
+					case SDLK_w:
+						gKey &= ~KEY_MAP;
+						break;
+
+					case SDLK_LEFT:
+						gKey &= ~KEY_LEFT;
+						break;
+
+					case SDLK_RIGHT:
+						gKey &= ~KEY_RIGHT;
+						break;
+
+					case SDLK_UP:
+						gKey &= ~KEY_UP;
+						break;
+
+					case SDLK_DOWN:
+						gKey &= ~KEY_DOWN;
+						break;
+
+					case SDLK_x:
+						gKey &= ~KEY_X;
+						break;
+
+					case SDLK_z:
+						gKey &= ~KEY_Z;
+						break;
+
+					case SDLK_s:
+						gKey &= ~KEY_ARMS;
+						break;
+
+					case SDLK_a:
+						gKey &= ~KEY_ARMSREV;
+						break;
+
+					case SDLK_LSHIFT:
+					case SDLK_RSHIFT:
+						gKey &= ~KEY_SHIFT;
+						break;
+
+					case SDLK_F1:
+						gKey &= ~KEY_F1;
+						break;
+
+					case SDLK_F2:
+						gKey &= ~KEY_F2;
+						break;
+
+					case SDLK_q:
+						gKey &= ~KEY_ITEM;
+						break;
+
+					case SDLK_COMMA:
+						gKey &= ~KEY_ALT_LEFT;
+						break;
+
+					case SDLK_PERIOD:
+						gKey &= ~KEY_ALT_DOWN;
+						break;
+
+					case SDLK_SLASH:
+						gKey &= ~KEY_ALT_RIGHT;
+						break;
+
+					case SDLK_l:
+						gKey &= ~KEY_L;
+						break;
+
+					case SDLK_PLUS:
+						gKey &= ~KEY_PLUS;
+						break;
+				}
+
 				break;
 
 			case SDL_DROPFILE:
@@ -480,147 +554,33 @@ BOOL SystemTask()
 				SDL_free(event.drop.file);
 				break;
 
-			case SDL_KEYDOWN:
-			case SDL_KEYUP:
-#ifdef FIX_BUGS
-				// BUG FIX: Pixel relied on key codes for input, but these differ based on keyboard layout.
-				// This would break the alternate movement keys on typical English keyboards, since the '=' key is in a completely different place to where it is on a Japanese keyboard.
-				// To solve this, we use scancodes instead, which are based on the physical location of keys, rather than their meaning.
-				switch (event.key.keysym.scancode)
+			case SDL_WINDOWEVENT:
+				switch (event.window.event)
 				{
-					case SDL_SCANCODE_ESCAPE:
-						DO_KEY_PRESS(KEY_ESCAPE)
-
-					case SDL_SCANCODE_W:
-						DO_KEY_PRESS(KEY_MAP)
-
-					case SDL_SCANCODE_LEFT:
-						DO_KEY_PRESS(KEY_LEFT)
-
-					case SDL_SCANCODE_RIGHT:
-						DO_KEY_PRESS(KEY_RIGHT)
-
-					case SDL_SCANCODE_UP:
-						DO_KEY_PRESS(KEY_UP)
-
-					case SDL_SCANCODE_DOWN:
-						DO_KEY_PRESS(KEY_DOWN)
-
-					case SDL_SCANCODE_X:
-						DO_KEY_PRESS(KEY_X)
-
-					case SDL_SCANCODE_Z:
-						DO_KEY_PRESS(KEY_Z)
-
-					case SDL_SCANCODE_S:
-						DO_KEY_PRESS(KEY_ARMS)
-
-					case SDL_SCANCODE_A:
-						DO_KEY_PRESS(KEY_ARMSREV)
-
-					case SDL_SCANCODE_RSHIFT:
-					case SDL_SCANCODE_LSHIFT:
-						DO_KEY_PRESS(KEY_SHIFT)
-
-					case SDL_SCANCODE_F1:
-						DO_KEY_PRESS(KEY_F1)
-
-					case SDL_SCANCODE_F2:
-						DO_KEY_PRESS(KEY_F2)
-
-					case SDL_SCANCODE_Q:
-						DO_KEY_PRESS(KEY_ITEM)
-
-					case SDL_SCANCODE_COMMA:
-						DO_KEY_PRESS(KEY_ALT_LEFT)
-
-					case SDL_SCANCODE_PERIOD:
-						DO_KEY_PRESS(KEY_ALT_DOWN)
-
-					case SDL_SCANCODE_SLASH:
-						DO_KEY_PRESS(KEY_ALT_RIGHT)
-
-					case SDL_SCANCODE_L:
-						DO_KEY_PRESS(KEY_ALT_UP)
-
-					case SDL_SCANCODE_SEMICOLON:
-						DO_KEY_PRESS(KEY_PLUS)
-
-					case SDL_SCANCODE_F5:
-						gbUseJoystick = FALSE;
+					case SDL_WINDOWEVENT_FOCUS_LOST:
+						InactiveWindow();
 						break;
 
-					default:
+					case SDL_WINDOWEVENT_FOCUS_GAINED:
+						ActiveWindow();
+						break;
+
+					case SDL_WINDOWEVENT_RESIZED:
+					case SDL_WINDOWEVENT_SIZE_CHANGED:
+						Backend_HandleWindowResize();
 						break;
 				}
+
 				break;
-#else
-				switch (event.key.keysym.sym)
-				{
-					case SDLK_ESCAPE:
-						DO_KEY_PRESS(KEY_ESCAPE)
 
-					case SDLK_w:
-						DO_KEY_PRESS(KEY_MAP)
+			case SDL_QUIT:
+				StopOrganyaMusic();
+				return FALSE;
 
-					case SDLK_LEFT:
-						DO_KEY_PRESS(KEY_LEFT)
-
-					case SDLK_RIGHT:
-						DO_KEY_PRESS(KEY_RIGHT)
-
-					case SDLK_UP:
-						DO_KEY_PRESS(KEY_UP)
-
-					case SDLK_DOWN:
-						DO_KEY_PRESS(KEY_DOWN)
-
-					case SDLK_x:
-						DO_KEY_PRESS(KEY_X)
-
-					case SDLK_z:
-						DO_KEY_PRESS(KEY_Z)
-
-					case SDLK_s:
-						DO_KEY_PRESS(KEY_ARMS)
-
-					case SDLK_a:
-						DO_KEY_PRESS(KEY_ARMSREV)
-
-					case SDLK_RSHIFT:
-					case SDLK_LSHIFT:
-						DO_KEY_PRESS(KEY_SHIFT)
-
-					case SDLK_F1:
-						DO_KEY_PRESS(KEY_F1)
-
-					case SDLK_F2:
-						DO_KEY_PRESS(KEY_F2)
-
-					case SDLK_q:
-						DO_KEY_PRESS(KEY_ITEM)
-
-					case SDLK_COMMA:
-						DO_KEY_PRESS(KEY_ALT_LEFT)
-
-					case SDLK_PERIOD:
-						DO_KEY_PRESS(KEY_ALT_DOWN)
-
-					case SDLK_SLASH:
-						DO_KEY_PRESS(KEY_ALT_RIGHT)
-
-					case SDLK_l:
-						DO_KEY_PRESS(KEY_ALT_UP)
-
-					case SDLK_SEMICOLON:
-						DO_KEY_PRESS(KEY_PLUS)
-
-					case SDLK_F5:
-						gbUseJoystick = FALSE;
-						break;
-				}
+			case SDL_RENDER_TARGETS_RESET:
+				Backend_HandleRenderTargetLoss();
 				break;
-#endif
+
 		}
 	}
 
@@ -629,4 +589,47 @@ BOOL SystemTask()
 		JoystickProc();
 
 	return TRUE;
+}
+
+void JoystickProc(void)
+{
+	int i;
+	JOYSTICK_STATUS status;
+
+	if (!GetJoystickStatus(&status))
+		return;
+
+	gKey &= (KEY_ESCAPE | KEY_F2 | KEY_F1);
+
+	// Set movement buttons
+	if (status.bLeft)
+		gKey |= gKeyLeft;
+	else
+		gKey &= ~gKeyLeft;
+
+	if (status.bRight)
+		gKey |= gKeyRight;
+	else
+		gKey &= ~gKeyRight;
+
+	if (status.bUp)
+		gKey |= gKeyUp;
+	else
+		gKey &= ~gKeyUp;
+
+	if (status.bDown)
+		gKey |= gKeyDown;
+	else
+		gKey &= ~gKeyDown;
+
+	// Clear held buttons
+	for (i = 0; i < 8; i++)
+		gKey &= ~gJoystickButtonTable[i];
+
+	// Set held buttons
+	for (i = 0; i < 8; i++)
+	{
+		if (status.bButton[i])
+			gKey |= gJoystickButtonTable[i];
+	}
 }

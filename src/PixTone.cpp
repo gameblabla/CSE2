@@ -1,9 +1,12 @@
 #include "PixTone.h"
 
 #include <math.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "WindowsWrapper.h"
+
+#include "Random.h"
 
 static signed char gWaveModelTable[6][256];
 
@@ -53,9 +56,9 @@ void MakeWaveTables(void)
 		gWaveModelTable[4][i] = -0x40;
 
 	// White noise wave
-	rep_srand(0);
+	msvc_srand(0);
 	for (i = 0; i < 256; ++i)
-		gWaveModelTable[5][i] = (signed char)(rep_rand() & 0xFF) / 2;
+		gWaveModelTable[5][i] = (signed char)(msvc_rand() & 0xFF) / 2;
 }
 
 BOOL MakePixelWaveData(const PIXTONEPARAMETER *ptp, unsigned char *pData)

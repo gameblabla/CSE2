@@ -21,7 +21,7 @@ void InitTriangleTable()
 	for (i = 0; i < 0x21; ++i)
 	{
 		a = (float)(i * 6.2831855f / 256.0f);
-		b = sinf(a) / cosf(a);
+		b = (float)sin(a) / (float)cos(a);
 		gTan[i] = (short)(b * 8192.0f);
 	}
 }

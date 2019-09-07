@@ -8,8 +8,8 @@ set(BUILD_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/game")
 set(ASSETS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/assets")
 
 option(JAPANESE "Enable the Japanese-language build" OFF)
-option(FIX_BUGS "Fix certain bugs (see src/Bug Fixes.txt)" ON)
-option(NONPORTABLE "Enable bits of code that aren't portable, but are what the original game used" OFF)
+option(FIX_BUGS "Fix various bugs in the game" ON)
+option(DEBUG_SAVE "Re-enable the ability to drag-and-drop save files onto the window" OFF)
 option(FORCE_LOCAL_LIBS "Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones" OFF)
 set(RENDERER "Texture" CACHE STRING "Which renderer the game should use: 'OpenGL3' for an OpenGL 3.2 renderer, 'Texture' for SDL2's hardware-accelerated Texture API, 'Software' for a handwritten software renderer")
 option(OGG_AUDIO "Enable support for Ogg Vorbis music/SFX" OFF)
@@ -149,6 +149,8 @@ add_executable(CSE2
 	src/PixTone.h
 	src/Profile.cpp
 	src/Profile.h
+	src/Random.cpp
+	src/Random.h
 	src/Resource.cpp
 	src/Resource.h
 	src/SelStage.cpp
@@ -169,9 +171,12 @@ add_executable(CSE2
 	src/ValueView.h
 	src/WindowsWrapper.h
 	src/Backends/Rendering.h
+	src/Backends/Audio/SDL2.cpp
+	src/Backends/Audio.h
 )
 
 set(RESOURCES
+	FONT/LiberationMono.ttf
 )
 
 target_include_directories(CSE2 PRIVATE "external")
@@ -189,12 +194,8 @@ if(FIX_BUGS)
 	target_compile_definitions(CSE2 PRIVATE FIX_BUGS)
 endif()
 
-if(EXISTS "/opt/vc/include/bcm_host.h")	# Detect Raspberry Pi
-	target_compile_definitions(CSE2 PRIVATE RASPBERRY_PI)
-endif()
-
-if(NONPORTABLE)
-	target_compile_definitions(CSE2 PRIVATE NONPORTABLE)
+if(DEBUG_SAVE)
+	target_compile_definitions(CSE2 PRIVATE DEBUG_SAVE)
 endif()
 
 if(RENDERER MATCHES "OpenGL3")
@@ -318,21 +319,13 @@ endif()
 
 # Make some tweaks if we're targetting Windows
 if(WIN32)
-	target_sources(CSE2 PRIVATE "${ASSETS_DIRECTORY}/resources/ICON/ICON.rc")
-	target_compile_definitions(CSE2 PRIVATE WINDOWS)
+	target_sources(CSE2 PRIVATE "${ASSETS_DIRECTORY}/resources/CSE2.rc")
 	set_target_properties(CSE2 PROPERTIES WIN32_EXECUTABLE YES)	# Disable the console window
 endif()
 
 # Make some tweaks if we're using MSVC
 if(MSVC)
 	target_compile_definitions(CSE2 PRIVATE _CRT_SECURE_NO_WARNINGS)	# Shut up those stupid warnings
-endif()
-
-# Decide the embedded font
-if(JAPANESE)
-	list(APPEND RESOURCES "FONT/msgothic.ttc")
-elseif(NOT WIN32)
-	list(APPEND RESOURCES "FONT/cour.ttf")
 endif()
 
 # Build bin2h externally, so it isn't cross-compiled when CSE2 is (Emscripten)

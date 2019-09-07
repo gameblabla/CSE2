@@ -7,7 +7,7 @@
 #include "KeyControl.h"
 #include "Main.h"
 
-int Call_Escape(HWND hWnd)
+int Call_Escape(void)
 {
 	RECT rc = {0, 128, 208, 144};
 
@@ -37,7 +37,7 @@ int Call_Escape(HWND hWnd)
 		PutBitmap3(&grcFull, PixelToScreenCoord((WINDOW_WIDTH - 208) / 2), PixelToScreenCoord((WINDOW_HEIGHT - 16) / 2), &rc, SURFACE_ID_TEXT_BOX);
 		PutFramePerSecound();
 
-		if (!Flip_SystemTask(hWnd))
+		if (!Flip_SystemTask())
 		{
 			// Quit if window is closed
 			gKeyTrg = 0;

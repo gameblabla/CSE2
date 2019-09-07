@@ -1043,35 +1043,11 @@ FontObject* LoadFontFromData(const unsigned char *data, size_t data_size, unsign
 		return NULL;
 	}
 
-	unsigned int best_pixel_width = 0;
-	unsigned int best_pixel_height = 0;
-
-	for (unsigned int i = 0;; ++i)
-	{
-		FT_Set_Pixel_Sizes(font_object->face, i, i);
-
-		const unsigned int current_cell_width = font_object->face->size->metrics.max_advance / 64;
-		const unsigned int current_cell_height = font_object->face->size->metrics.height / 64;
-
-		if (current_cell_width > cell_width && current_cell_height > cell_height)
-		{
-			break;
-		}
-		else
-		{
-			if (current_cell_width <= cell_width)
-				best_pixel_width = i;
-
-			if (current_cell_height <= cell_height)
-				best_pixel_height = i;
-		}
-	}
-
 #ifdef JAPANESE
-	best_pixel_width = 0;	// Cheap hack to make the font square
+	cell_width = 0;	// Cheap hack to make the font square
 #endif
 
-	FT_Set_Pixel_Sizes(font_object->face, best_pixel_width, best_pixel_height);
+	FT_Set_Pixel_Sizes(font_object->face, cell_width, cell_height);
 
 	font_object->glyph_list_head = NULL;
 
@@ -1094,7 +1070,7 @@ FontObject* LoadFont(const char *font_filename, unsigned int cell_width, unsigne
 	return font_object;
 }
 
-void DrawText(FontObject *font_object, Backend_Surface *surface, int x, int y, unsigned long colour, const char *string, size_t string_length)
+void DrawText(FontObject *font_object, Backend_Surface *surface, int x, int y, unsigned long colour, const char *string)
 {
 	if (font_object != NULL)
 	{
@@ -1103,7 +1079,7 @@ void DrawText(FontObject *font_object, Backend_Surface *surface, int x, int y, u
 		unsigned int pen_x = 0;
 
 		const unsigned char *string_pointer = (unsigned char*)string;
-		const unsigned char *string_end = (unsigned char*)string + string_length;
+		const unsigned char *string_end = (unsigned char*)string + strlen(string);
 
 		while (string_pointer != string_end)
 		{

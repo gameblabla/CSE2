@@ -4,13 +4,10 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "SDL.h"
-
 #include "WindowsWrapper.h"
 
 #include "ArmsItem.h"
 #include "BossLife.h"
-#include "CommonDefines.h"
 #include "Fade.h"
 #include "File.h"
 #include "Flags.h"
@@ -30,7 +27,7 @@ const char *gProfileCode = "Do041220";
 
 BOOL IsProfile()
 {
-	char path[PATH_LENGTH];
+	char path[MAX_PATH];
 	sprintf(path, "%s/%s", gModulePath, gDefaultName);
 
 	FILE *fp = fopen(path, "rb");
@@ -46,7 +43,7 @@ BOOL SaveProfile(const char *name)
 	PROFILE profile;
 	FILE *fp;
 	const char *FLAG = "FLAG";
-	char path[PATH_LENGTH];
+	char path[MAX_PATH];
 
 	// Get path
 	if (name)
@@ -83,9 +80,6 @@ BOOL SaveProfile(const char *name)
 	memcpy(profile.flags, gFlagNPC, sizeof(profile.flags));
 
 	// Write to file
-#ifdef NONPORTABLE
-	fwrite(&profile, sizeof(PROFILE), 1, fp);
-#else
 	fwrite(profile.code, 8, 1, fp);
 	File_WriteLE32(profile.stage, fp);
 	File_WriteLE32(profile.music, fp);
@@ -119,7 +113,6 @@ BOOL SaveProfile(const char *name)
 	fwrite(profile.permit_mapping, 0x80, 1, fp);
 	fwrite(FLAG, 4, 1, fp);
 	fwrite(profile.flags, 1000, 1, fp);
-#endif
 
 	fclose(fp);
 	return TRUE;
@@ -128,7 +121,7 @@ BOOL SaveProfile(const char *name)
 BOOL LoadProfile(const char *name)
 {
 	// Get path
-	char path[PATH_LENGTH];
+	char path[MAX_PATH];
 
 	if (name)
 		sprintf(path, "%s", name);
@@ -155,9 +148,6 @@ BOOL LoadProfile(const char *name)
 	// Read data
 	fseek(fp, 0, SEEK_SET);
 	memset(&profile, 0, sizeof(PROFILE));
-#ifdef NONPORTABLE
-	fread(&profile, sizeof(PROFILE), 1, fp);
-#else
 	fread(profile.code, 8, 1, fp);
 	profile.stage = File_ReadLE32(fp);
 	profile.music = (MusicID)File_ReadLE32(fp);
@@ -191,7 +181,6 @@ BOOL LoadProfile(const char *name)
 	fread(profile.permit_mapping, 0x80, 1, fp);
 	fread(profile.FLAG, 4, 1, fp);
 	fread(profile.flags, 1000, 1, fp);
-#endif
 	fclose(fp);
 
 	// Set things
@@ -241,7 +230,7 @@ BOOL LoadProfile(const char *name)
 	return TRUE;
 }
 
-BOOL InitializeGame(HWND hWnd)
+BOOL InitializeGame(void)
 {
 	InitMyChar();
 	gSelectedArms = 0;
@@ -254,21 +243,11 @@ BOOL InitializeGame(HWND hWnd)
 	InitFlags();
 	if (!TransferStage(13, 200, 10, 8))
 	{
-		#if defined(NONPORTABLE) && defined(WINDOWS)
-			#ifdef JAPANESE
-			MessageBoxA(hWnd, "\x83\x58\x83\x65\x81\x5B\x83\x57\x82\xCC\x93\xC7\x82\xDD\x8D\x9E\x82\xDD\x82\xC9\x8E\xB8\x94\x73", "\x83\x47\x83\x89\x81\x5B", MB_OK);
-			#else
-			MessageBoxA(hWnd, "Failed to load stage", "Error", MB_OK);
-			#endif
-		#else
-			(void)hWnd;
-
-			#ifdef JAPANESE
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", "ステージの読み込みに失敗", NULL);
-			#else
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Failed to load stage", NULL);
-			#endif
-		#endif
+#ifdef JAPANESE
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", "ステージの読み込みに失敗", NULL);
+#else
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Failed to load stage", NULL);
+#endif
 
 		return FALSE;
 	}

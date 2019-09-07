@@ -1,20 +1,22 @@
 #include "Input.h"
 
 #include <stddef.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "SDL.h"
 
 #include "WindowsWrapper.h"
 
-#define JOYSTICK_DEADZONE 10000
+static SDL_Joystick *joystick;
 
-SDL_Joystick *joystick; // This was probably a name that was given by Simon, but it fits the rest of Pixel's names so it's fine.
+static int joystick_neutral_x;
+static int joystick_neutral_y;
 
-void ReleaseDirectInput()
+void ReleaseDirectInput(void)
 {
 	// Close opened joystick (if exists)
-	if (joystick)
+	if (joystick != NULL)
 	{
 		SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
 		SDL_JoystickClose(joystick);
@@ -22,51 +24,78 @@ void ReleaseDirectInput()
 	}
 }
 
-BOOL InitDirectInput()
+BOOL HookAllDirectInputDevices(void);
+
+BOOL InitDirectInput(void)
 {
-	// Open first available joystick
 	SDL_InitSubSystem(SDL_INIT_JOYSTICK);
 
+	if (!HookAllDirectInputDevices())
+		return FALSE;
+
+	return TRUE;
+}
+
+// The original name for this function is unknown
+BOOL HookAllDirectInputDevices(void)
+{
+	// Open first available joystick
 	for (int i = 0; i < SDL_NumJoysticks(); i++)
 	{
 		joystick = SDL_JoystickOpen(i);
 
 		// Break as soon as a joystick is properly opened
-		if (joystick)
-			break;
-	}
-
-	return TRUE;
-}
-
-BOOL GetJoystickStatus(JOYSTICK_STATUS *pStatus)
-{
-	// Clear status
-	memset(pStatus, 0, sizeof(JOYSTICK_STATUS));
-
-	if (joystick)
-	{
-		Sint16 x = SDL_JoystickGetAxis(joystick, 0);
-		Sint16 y = SDL_JoystickGetAxis(joystick, 1);
-		pStatus->bLeft = x <= -JOYSTICK_DEADZONE;
-		pStatus->bRight = x >= JOYSTICK_DEADZONE;
-		pStatus->bUp = y <= -JOYSTICK_DEADZONE;
-		pStatus->bDown = y >= JOYSTICK_DEADZONE;
-
-		int numButtons = SDL_JoystickNumButtons(joystick);
-		if (numButtons > 32)
-			numButtons = 32;
-
-		for (int button = 0; button < numButtons; button++)
-			pStatus->bButton[button] = SDL_JoystickGetButton(joystick, button) != 0;
-
-		return TRUE;
+		if (joystick != NULL)
+			return TRUE;
 	}
 
 	return FALSE;
 }
 
-BOOL ResetJoystickStatus()
+BOOL GetJoystickStatus(JOYSTICK_STATUS *status)
 {
+	if (joystick == NULL)
+		return FALSE;
+
+	int numButtons = SDL_JoystickNumButtons(joystick);
+	if (numButtons > 32)
+		numButtons = 32;
+
+	for (int i = 0; i < numButtons; ++i)
+	{
+		if (SDL_JoystickGetButton(joystick, i) != 0)
+			status->bButton[i] = TRUE;
+		else
+			status->bButton[i] = FALSE;
+	}
+
+	status->bDown = FALSE;
+	status->bRight = FALSE;
+	status->bUp = FALSE;
+	status->bLeft = FALSE;
+
+	const Sint16 joystick_x = SDL_JoystickGetAxis(joystick, 0);
+	if (joystick_x < joystick_neutral_x - 10000)
+		status->bLeft = TRUE;
+	else if (joystick_x > joystick_neutral_x + 10000)
+		status->bRight = TRUE;
+
+	const Sint16 joystick_y = SDL_JoystickGetAxis(joystick, 0);
+	if (joystick_y < joystick_neutral_y - 10000)
+		status->bUp = TRUE;
+	else if (joystick_y > joystick_neutral_y + 10000)
+		status->bDown = TRUE;
+
+	return TRUE;
+}
+
+BOOL ResetJoystickStatus(void)
+{
+	if (joystick == NULL)
+		return FALSE;
+
+	joystick_neutral_x = SDL_JoystickGetAxis(joystick, 0);
+	joystick_neutral_y = SDL_JoystickGetAxis(joystick, 1);
+
 	return TRUE;
 }

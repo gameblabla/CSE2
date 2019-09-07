@@ -52,4 +52,4 @@ void ActionCredit_Read();
 int GetScriptNumber(const char *text);
 void SetCreditIllust(int a);
 void CutCreditIllust();
-int Scene_DownIsland(HWND hWnd, int mode);
+int Scene_DownIsland(int mode);

@@ -8,4 +8,4 @@ extern int gCounter;
 int Random(int min, int max);
 void PutNumber4(int x, int y, int value, BOOL bZero);
 
-BOOL Game(HWND hWnd);
+BOOL Game(void);

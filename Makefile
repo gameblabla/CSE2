@@ -1,5 +1,7 @@
 NATIVECC = cc
 NATIVECXX = c++
+WINDRES = windres
+PKG_CONFIG = pkg-config
 
 BUILD_DIRECTORY = game
 ASSETS_DIRECTORY = assets
@@ -9,15 +11,19 @@ FIX_BUGS ?= 1
 RENDERER ?= Texture
 SMOOTH_SPRITE_MOVEMENT ?= 1
 
+ifeq ($(WINDOWS), 1)
+	EXE_EXTENSION = .exe
+endif
+
 ifeq ($(RELEASE), 1)
-	CXXFLAGS = -O3 -flto
+	CXXFLAGS = -O3
 	LDFLAGS = -s
-	FILENAME_DEF = CSE2
-	DOCONFIG_FILENAME_DEF = DoConfig
+	FILENAME_DEF = CSE2$(EXE_EXTENSION)
+	DOCONFIG_FILENAME_DEF = DoConfig$(EXE_EXTENSION)
 else
-	CXXFLAGS = -Og -g3
-	FILENAME_DEF = CSE2_debug
-	DOCONFIG_FILENAME_DEF = DoConfig_debug
+	CXXFLAGS = -Og -ggdb3
+	FILENAME_DEF = CSE2_debug$(EXE_EXTENSION)
+	DOCONFIG_FILENAME_DEF = DoConfig_debug$(EXE_EXTENSION)
 endif
 
 ifeq ($(JAPANESE), 1)
@@ -35,20 +41,11 @@ ifeq ($(FIX_BUGS), 1)
 	CXXFLAGS += -DFIX_BUGS
 endif
 
-ifeq ($(WINDOWS), 1)
-	ifeq ($(CONSOLE), 1)
-		CXXFLAGS += -mconsole
-	endif
-
-	CXXFLAGS += -DWINDOWS
-	LIBS += -lkernel32
+ifeq ($(DEBUG_SAVE), 1)
+	CXXFLAGS += -DDEBUG_SAVE
 endif
 
-ifeq ($(RASPBERRY_PI), 1)
-	CXXFLAGS += -DRASPBERRY_PI
-endif
-
-CXXFLAGS += -Iexternal `pkg-config sdl2 --cflags` `pkg-config freetype2 --cflags` -MMD -MP -MF $@.d
+CXXFLAGS += -MMD -MP -MF $@.d `$(PKG_CONFIG) sdl2 --cflags` `$(PKG_CONFIG) freetype2 --cflags` -Iexternal
 DEFINES += -DLODEPNG_NO_COMPILE_ENCODER -DLODEPNG_NO_COMPILE_ERROR_TEXT -DLODEPNG_NO_COMPILE_CPP
 
 CFLAGS := $(CXXFLAGS)
@@ -58,9 +55,9 @@ CXXFLAGS += -std=c++11
 
 ifeq ($(STATIC), 1)
 	LDFLAGS += -static
-	LIBS += `pkg-config sdl2 --libs --static` `pkg-config freetype2 --libs --static` -lfreetype
+	LIBS += `$(PKG_CONFIG) sdl2 --libs --static` `$(PKG_CONFIG) freetype2 --libs --static`
 else
-	LIBS += `pkg-config sdl2 --libs` `pkg-config freetype2 --libs`
+	LIBS += `$(PKG_CONFIG) sdl2 --libs` `$(PKG_CONFIG) freetype2 --libs`
 endif
 
 SOURCES = \
@@ -127,6 +124,7 @@ SOURCES = \
 	src/Organya \
 	src/PixTone \
 	src/Profile \
+	src/Random \
 	src/Resource \
 	src/SelStage \
 	src/Shoot \
@@ -135,7 +133,8 @@ SOURCES = \
 	src/Star \
 	src/TextScr \
 	src/Triangle \
-	src/ValueView
+	src/ValueView \
+	src/Backends/Audio/SDL2
 
 ifneq (,$(filter 1,$(OGG_AUDIO)$(FLAC_AUDIO) $(TRACKER_AUDIO) $(PXTONE_AUDIO)))
 	SOURCES += \
@@ -214,25 +213,18 @@ ifeq ($(SMOOTH_SPRITE_MOVEMENT), 1)
 	DEFINES += -DSMOOTH_SPRITE_MOVEMENT
 endif
 
-RESOURCES =
-
-ifeq ($(JAPANESE), 1)
-	RESOURCES += FONT/msgothic.ttc
-else
-	ifneq ($(WINDOWS), 1)
-		RESOURCES += FONT/cour.ttf
-	endif
-endif
+RESOURCES = \
+	FONT/LiberationMono.ttf
 
 ifeq ($(RENDERER), OpenGL3)
 	SOURCES += src/Backends/Rendering/OpenGL3
-	CXXFLAGS += `pkg-config glew --cflags`
+	CXXFLAGS += `$(PKG_CONFIG) glew --cflags`
 
 	ifeq ($(STATIC), 1)
 		CXXFLAGS += -DGLEW_STATIC
-		LIBS += `pkg-config glew --libs --static`
+		LIBS += `$(PKG_CONFIG) glew --libs --static`
 	else
-		LIBS += `pkg-config glew --libs`
+		LIBS += `$(PKG_CONFIG) glew --libs`
 	endif
 
 	ifeq ($(WINDOWS), 1)
@@ -252,7 +244,7 @@ OBJECTS = $(addprefix obj/$(FILENAME)/, $(addsuffix .o, $(SOURCES)))
 DEPENDENCIES = $(addprefix obj/$(FILENAME)/, $(addsuffix .o.d, $(SOURCES)))
 
 ifeq ($(WINDOWS), 1)
-	OBJECTS += obj/$(FILENAME)/win_icon.o
+	OBJECTS += obj/$(FILENAME)/windows_resources.o
 endif
 
 all: $(BUILD_DIRECTORY)/$(FILENAME) $(BUILD_DIRECTORY)/data $(BUILD_DIRECTORY)/$(DOCONFIG_FILENAME)
@@ -278,7 +270,7 @@ obj/$(FILENAME)/%.o: %.cpp
 	@echo Compiling $<
 	@$(CXX) $(CXXFLAGS) $(DEFINES) $< -o $@ -c
 
-obj/$(FILENAME)/Resource.o: src/Resource.cpp $(addprefix src/Resource/, $(addsuffix .h, $(RESOURCES)))
+obj/$(FILENAME)/src/Resource.o: src/Resource.cpp $(addprefix src/Resource/, $(addsuffix .h, $(RESOURCES)))
 	@mkdir -p $(@D)
 	@echo Compiling $<
 	@$(CXX) $(CXXFLAGS) $(DEFINES) $< -o $@ -c
@@ -295,9 +287,9 @@ obj/bin2h: bin2h/bin2h.c
 
 include $(wildcard $(DEPENDENCIES))
 
-obj/$(FILENAME)/win_icon.o: $(ASSETS_DIRECTORY)/resources/ICON/ICON.rc $(ASSETS_DIRECTORY)/resources/ICON/0.ico $(ASSETS_DIRECTORY)/resources/ICON/ICON_MINI.ico
+obj/$(FILENAME)/windows_resources.o: assets/resources/CSE2.rc
 	@mkdir -p $(@D)
-	@windres $< $@
+	@$(WINDRES) $< $@
 
 $(BUILD_DIRECTORY)/$(DOCONFIG_FILENAME): DoConfig/DoConfig.cpp
 	@mkdir -p $(@D)

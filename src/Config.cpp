@@ -4,7 +4,6 @@
 
 #include "WindowsWrapper.h"
 
-#include "CommonDefines.h"
 #include "Config.h"
 #include "File.h"
 #include "Tags.h"
@@ -18,7 +17,7 @@ BOOL LoadConfigData(CONFIG *conf)
 	memset(conf, 0, sizeof(CONFIG));
 
 	// Get path
-	char path[PATH_LENGTH];
+	char path[MAX_PATH];
 	sprintf(path, "%s/%s", gModulePath, config_filename);
 
 	// Open file
@@ -26,10 +25,6 @@ BOOL LoadConfigData(CONFIG *conf)
 	if (fp == NULL)
 		return FALSE;
 
-	// Read data
-#ifdef NONPORTABLE
-	size_t fread_result = fread(conf, sizeof(CONFIG), 1, fp); // Not the original name
-#else
 	// Read the version id and font name
 	fread(conf->proof, sizeof(conf->proof), 1, fp);
 	fread(conf->font_name, sizeof(conf->font_name), 1, fp);
@@ -46,17 +41,12 @@ BOOL LoadConfigData(CONFIG *conf)
 	conf->bJoystick = File_ReadLE32(fp);
 	for (int button = 0; button < 8; button++)
 		conf->joystick_button[button] = File_ReadLE32(fp);
-#endif
 
 	// Close file
 	fclose(fp);
 
 	// Check if version is not correct, and return if it failed
-#ifdef NONPORTABLE
-	if (fread_result != 1 || strcmp(conf->proof, config_magic))
-#else
 	if (strcmp(conf->proof, config_magic))
-#endif
 	{
 		memset(conf, 0, sizeof(CONFIG));
 		return FALSE;

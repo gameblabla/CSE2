@@ -18,56 +18,52 @@ BACK gBack;
 int gWaterY;
 static unsigned long color_black;
 
-static BOOL GetBackSizes(const char *fName, int *width, int *height)
-{
-	FILE *fp;
-	char path[PATH_LENGTH];
-
-	// Try .pbm/.bmp
-	sprintf(path, "%s/%s.pbm", gDataPath, fName);
-	fp = fopen(path, "rb");
-	if (fp == NULL)
-	{
-		sprintf(path, "%s/%s.bmp", gDataPath, fName);
-		fp = fopen(path, "rb");
-	}
-
-	if (fp != NULL)
-	{
-		fseek(fp, 0x12, SEEK_SET);
-		*width = File_ReadLE32(fp);
-		*height = File_ReadLE32(fp);
-		fclose(fp);
-		return TRUE;
-	}
-
-	// Now .png
-	sprintf(path, "%s/%s.png", gDataPath, fName);
-	fp = fopen(path, "rb");
-	if (fp != NULL)
-	{
-		fseek(fp, 0x10, SEEK_SET);
-		*width = File_ReadBE32(fp);
-		*height = File_ReadBE32(fp);
-		fclose(fp);
-		return TRUE;
-	}
-
-	return FALSE;
-}
-
+// TODO - Another function that has an incorrect stack frame
 BOOL InitBack(const char *fName, int type)
 {
 	// Unused, hilariously
 	color_black = GetCortBoxColor(RGB(0, 0, 0x10));
 
 	// Get width and height
-	if (!GetBackSizes(fName, &gBack.partsW, &gBack.partsH))
-		return FALSE;
+	char path[MAX_PATH];
+	sprintf(path, "%s/%s.pbm", gDataPath, fName);
 
-	// Adjust for 2x
-	gBack.partsW /= SPRITE_SCALE;
-	gBack.partsH /= SPRITE_SCALE;
+	FILE *fp = fopen(path, "rb");
+
+	if (fp != NULL)
+	{
+		if (fgetc(fp) != 'B' || fgetc(fp) != 'M')
+		{
+			fclose(fp);
+			return FALSE;
+		}
+
+		fseek(fp, 18, SEEK_SET);
+
+		gBack.partsW = File_ReadLE32(fp);
+		gBack.partsH = File_ReadLE32(fp);
+		fclose(fp);
+	}
+	else
+	{
+		sprintf(path, "%s/%s.png", gDataPath, fName);
+		fp = fopen(path, "rb");
+
+		if (fp == NULL)
+			return FALSE;
+
+		if (fgetc(fp) != 0x89 || fgetc(fp) != 'P' || fgetc(fp) != 'N' || fgetc(fp) != 'G')
+		{
+			fclose(fp);
+			return FALSE;
+		}
+
+		fseek(fp, 16, SEEK_SET);
+
+		gBack.partsW = File_ReadBE32(fp);
+		gBack.partsH = File_ReadBE32(fp);
+		fclose(fp);
+	}
 
 	// Set background stuff and load texture
 	gBack.flag = 1;
@@ -96,106 +92,84 @@ void ActBack()
 
 void PutBack(int fx, int fy)
 {
+	int x;
+	int y;
 	RECT rect = {0, 0, gBack.partsW, gBack.partsH};
-	RECT rcSkyFiller = {106, 0, 255, 88};
 
 	switch (gBack.type)
 	{
 		case 0:
-			for (int y = 0; y < WINDOW_HEIGHT; y += gBack.partsH)
-			{
-				for (int x = 0; x < WINDOW_WIDTH; x += gBack.partsW)
-					PutBitmap4(&grcGame, PixelToScreenCoord(x), PixelToScreenCoord(y), &rect, SURFACE_ID_LEVEL_BACKGROUND);
-			}
+			for (y = 0; y < WINDOW_HEIGHT; y += gBack.partsH)
+				for (x = 0; x < WINDOW_WIDTH; x += gBack.partsW)
+					PutBitmap4(&grcGame, x, y, &rect, SURFACE_ID_LEVEL_BACKGROUND);
+
 			break;
 
 		case 1:
-			for (int y = -(fy / 2 % (gBack.partsH * 0x200)); y < WINDOW_HEIGHT * 0x200; y += gBack.partsH * 0x200)
-			{
-				for (int x = -(fx / 2 % (gBack.partsW * 0x200)); x < WINDOW_WIDTH * 0x200; x += gBack.partsW * 0x200)
-					PutBitmap4(&grcGame, SubpixelToScreenCoord(x), SubpixelToScreenCoord(y), &rect, SURFACE_ID_LEVEL_BACKGROUND);
-			}
+			for (y = -(fy / 2 / 0x200 % gBack.partsH); y < WINDOW_HEIGHT; y += gBack.partsH)
+				for (x = -(fx / 2 / 0x200 % gBack.partsW); x < WINDOW_WIDTH; x += gBack.partsW)
+					PutBitmap4(&grcGame, x, y, &rect, SURFACE_ID_LEVEL_BACKGROUND);
+
 			break;
 
 		case 2:
-			for (int y = -(fy % (gBack.partsH * 0x200)); y < WINDOW_HEIGHT * 0x200; y += gBack.partsH * 0x200)
-			{
-				for (int x = -(fx % (gBack.partsW * 0x200)); x < WINDOW_WIDTH * 0x200; x += gBack.partsW * 0x200)
-					PutBitmap4(&grcGame, SubpixelToScreenCoord(x), SubpixelToScreenCoord(y), &rect, SURFACE_ID_LEVEL_BACKGROUND);
-			}
+			for (y = -(fy / 0x200 % gBack.partsH); y < WINDOW_HEIGHT; y += gBack.partsH)
+				for (x = -(fx / 0x200 % gBack.partsW); x < WINDOW_WIDTH; x += gBack.partsW)
+					PutBitmap4(&grcGame, x, y, &rect, SURFACE_ID_LEVEL_BACKGROUND);
+
 			break;
 
 		case 5:
-			for (int y = -gBack.partsH; y < WINDOW_HEIGHT; y += gBack.partsH)
-			{
-				for (int x = -(gBack.fx % (gBack.partsW * 0x200)); x < WINDOW_WIDTH * 0x200; x += gBack.partsW * 0x200)
-					PutBitmap4(&grcGame, SubpixelToScreenCoord(x), PixelToScreenCoord(y), &rect, SURFACE_ID_LEVEL_BACKGROUND);
-			}
+			for (y = -gBack.partsH; y < WINDOW_HEIGHT; y += gBack.partsH)
+				for (x = -(gBack.fx / 0x200 % gBack.partsW); x < WINDOW_WIDTH; x += gBack.partsW)
+					PutBitmap4(&grcGame, x, y, &rect, SURFACE_ID_LEVEL_BACKGROUND);
+
 			break;
 
 		case 6:
 		case 7:
-			// Sky
-			static unsigned int fillNext;
-			fillNext = 0;
-			for (int y = 0; y < WINDOW_HEIGHT - 240 + 88; y += 88)
-			{
-				fillNext = ((fillNext) * 214013 + 2531011);
-				for (int x = -(int)(fillNext % 149); x < WINDOW_WIDTH; x += 149)
-				{
-					PutBitmap4(&grcGame, PixelToScreenCoord(x), PixelToScreenCoord(y), &rcSkyFiller, SURFACE_ID_LEVEL_BACKGROUND);
-				}
-			}
-
 			rect.top = 0;
 			rect.bottom = 88;
 			rect.left = 0;
 			rect.right = 320;
-			PutBitmap4(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 320) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 240), &rect, SURFACE_ID_LEVEL_BACKGROUND);
+			PutBitmap4(&grcGame, 0, 0, &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
-			// Cloud layer 1
 			rect.top = 88;
 			rect.bottom = 123;
 			rect.left = gBack.fx / 2;
 			rect.right = 320;
-			PutBitmap4(&grcGame, 0, PixelToScreenCoord(88 + (WINDOW_HEIGHT - 240)), &rect, SURFACE_ID_LEVEL_BACKGROUND);
+			PutBitmap4(&grcGame, 0, 88, &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
 			rect.left = 0;
-			for (int i = 0; i < ((WINDOW_WIDTH - 1) / 320) + 1; i++)
-				PutBitmap4(&grcGame, PixelToScreenCoord(320 * (i + 1)) - SubpixelToScreenCoord(gBack.fx * 0x200 / 2 % (320 * 0x200)), PixelToScreenCoord(88 + (WINDOW_HEIGHT - 240)), &rect, SURFACE_ID_LEVEL_BACKGROUND);
+			PutBitmap4(&grcGame, 320 - gBack.fx / 2 % 320, 88, &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
-			// Cloud layer 2
 			rect.top = 123;
 			rect.bottom = 146;
 			rect.left = gBack.fx % 320;
 			rect.right = 320;
-			PutBitmap4(&grcGame, 0, PixelToScreenCoord(123 + (WINDOW_HEIGHT - 240)), &rect, SURFACE_ID_LEVEL_BACKGROUND);
+			PutBitmap4(&grcGame, 0, 123, &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
 			rect.left = 0;
-			for (int i = 0; i < ((WINDOW_WIDTH - 1) / 320) + 1; i++)
-				PutBitmap4(&grcGame, PixelToScreenCoord((320 * (i + 1)) - gBack.fx % 320), PixelToScreenCoord(123 + (WINDOW_HEIGHT - 240)), &rect, SURFACE_ID_LEVEL_BACKGROUND);
+			PutBitmap4(&grcGame, 320 - gBack.fx % 320, 123, &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
-			// Cloud layer 3
 			rect.top = 146;
 			rect.bottom = 176;
 			rect.left = 2 * gBack.fx % 320;
 			rect.right = 320;
-			PutBitmap4(&grcGame, 0, PixelToScreenCoord(146 + (WINDOW_HEIGHT - 240)), &rect, SURFACE_ID_LEVEL_BACKGROUND);
+			PutBitmap4(&grcGame, 0, 146, &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
 			rect.left = 0;
-			for (int i = 0; i < ((WINDOW_WIDTH - 1) / 320) + 1; i++)
-				PutBitmap4(&grcGame, PixelToScreenCoord((320 * (i + 1)) - 2 * gBack.fx % 320), PixelToScreenCoord(146 + (WINDOW_HEIGHT - 240)), &rect, SURFACE_ID_LEVEL_BACKGROUND);
+			PutBitmap4(&grcGame, 320 - 2 * gBack.fx % 320, 146, &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
-			// Cloud layer 4
 			rect.top = 176;
 			rect.bottom = 240;
 			rect.left = 4 * gBack.fx % 320;
 			rect.right = 320;
-			PutBitmap4(&grcGame, 0, PixelToScreenCoord(176 + (WINDOW_HEIGHT - 240)), &rect, SURFACE_ID_LEVEL_BACKGROUND);
+			PutBitmap4(&grcGame, 0, 176, &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
 			rect.left = 0;
-			for (int i = 0; i < ((WINDOW_WIDTH - 1) / 320) + 1; i++)
-				PutBitmap4(&grcGame, PixelToScreenCoord((320 * (i + 1)) - 4 * gBack.fx % 320), PixelToScreenCoord(176 + (WINDOW_HEIGHT - 240)), &rect, SURFACE_ID_LEVEL_BACKGROUND);
+			PutBitmap4(&grcGame, 320 - 4 * gBack.fx % 320, 176, &rect, SURFACE_ID_LEVEL_BACKGROUND);
+
 			break;
 
 		default:
@@ -226,25 +200,25 @@ void PutFront(int fx, int fy)
 
 			for (y = y_1; y < y_2; y++)
 			{
-				ypos = (y * 0x20 * 0x200) - fy + gWaterY;
+				ypos = (y * 0x20 * 0x200) / 0x200 - fy / 0x200 + gWaterY / 0x200;
 
-				if (ypos < -32 * 0x200)
+				if (ypos < -32)
 					continue;
 
-				if (ypos > WINDOW_HEIGHT * 0x200)
+				if (ypos > WINDOW_HEIGHT)
 					break;
 
 				for (x = x_1; x < x_2; x++)
 				{
-					xpos = (x * 0x20 * 0x200) - fx;
-					PutBitmap3(&grcGame, SubpixelToScreenCoord(xpos), SubpixelToScreenCoord(ypos), &rcWater[1], SURFACE_ID_LEVEL_BACKGROUND);
+					xpos = (x * 0x20 * 0x200) / 0x200 - fx / 0x200;
+					PutBitmap3(&grcGame, xpos, ypos, &rcWater[1], SURFACE_ID_LEVEL_BACKGROUND);
 					if (!y)
-						PutBitmap3(&grcGame, SubpixelToScreenCoord(xpos), SubpixelToScreenCoord(ypos), &rcWater[0], SURFACE_ID_LEVEL_BACKGROUND);
+						PutBitmap3(&grcGame, xpos, ypos, &rcWater[0], SURFACE_ID_LEVEL_BACKGROUND);
 				}
 			}
 
 	}
-
+/*
 	// Draw black bars
 	if (!(g_GameFlags & 8)) // Detect if credits are running
 	{
@@ -294,4 +268,5 @@ void PutFront(int fx, int fy)
 		barRect.bottom = WINDOW_HEIGHT;
 		CortBox(&barRect, 0x000000);
 	}
+	*/
 }

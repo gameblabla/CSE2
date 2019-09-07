@@ -365,7 +365,7 @@ void PutCampObject()
 int CampLoop()
 {
 	int arms_num;
-	char old_script_path[PATH_LENGTH];
+	char old_script_path[MAX_PATH];
 
 	RECT rcView = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
@@ -394,7 +394,7 @@ int CampLoop()
 
 		if (gKeyTrg & KEY_ESCAPE)
 		{
-			switch (Call_Escape(ghWnd))
+			switch (Call_Escape())
 			{
 				case 0:
 					return 0;
@@ -436,7 +436,7 @@ int CampLoop()
 			}
 		}
 
-		if (!Flip_SystemTask(ghWnd))
+		if (!Flip_SystemTask())
 			return 0;
 	}
 

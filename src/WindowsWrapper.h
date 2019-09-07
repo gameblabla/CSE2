@@ -1,14 +1,6 @@
 #pragma once
 
-#ifdef WINDOWS
-#include <windows.h>
-// Avoid name collisions
-#undef DrawText
-#undef FindResource
-#undef CreateWindow
-#else
-
-typedef int HWND;
+#include <stdio.h>
 
 typedef int BOOL;
 
@@ -27,7 +19,6 @@ struct RECT
 	long right;
 	long bottom;
 };
-#endif
 
 #define SET_RECT(rect, l, t, r, b) \
 	rect.left = l; \
@@ -35,7 +26,4 @@ struct RECT
 	rect.right = r; \
 	rect.bottom = b;
 
-int rep_rand();
-void rep_srand(unsigned int seed);
-
-BOOL SystemTask();
+#define MAX_PATH FILENAME_MAX

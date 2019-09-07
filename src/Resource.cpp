@@ -3,13 +3,7 @@
 #include <stddef.h>
 #include <string.h>
 
-#ifdef JAPANESE
-#include "Resource/FONT/msgothic.ttc.h"
-#else
-#ifndef WINDOWS
-#include "Resource/FONT/cour.ttf.h"
-#endif
-#endif
+#include "Resource/FONT/LiberationMono.ttf.h"
 
 static const struct
 {
@@ -18,15 +12,7 @@ static const struct
 	const unsigned char *data;
 	size_t size;
 } resources[] = {
-#ifdef JAPANESE
-	{"FONT", "DEFAULT_FONT", rmsgothic, sizeof(rmsgothic)},
-#else
-#ifndef WINDOWS
-	{"FONT", "DEFAULT_FONT", rcour, sizeof(rcour)},
-#else
-	0	// Dummy entry to prevent 'cannot create empty array' error
-#endif
-#endif
+	{"FONT", "FONT", rLiberationMono, sizeof(rLiberationMono)},
 };
 
 const unsigned char* FindResource(const char *name, const char *type, size_t *size)

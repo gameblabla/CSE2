@@ -156,7 +156,7 @@ void PutIllust()
 // Load illustration
 void ReloadIllust(int a)
 {
-	char path[PATH_LENGTH];
+	char path[MAX_PATH];
 	sprintf(path, "Resource/BITMAP/Credit%02d", a);
 	ReloadBitmap_File(path, SURFACE_ID_CREDITS_IMAGE);
 }
@@ -192,7 +192,7 @@ BOOL StartCreditScript()
 	}
 
 	// Open file
-	char path[PATH_LENGTH];
+	char path[MAX_PATH];
 	sprintf(path, "%s/%s", gDataPath, credit_script);
 
 	Credit.size = GetFileSizeLong(path);
@@ -441,7 +441,7 @@ void CutCreditIllust()
 }
 
 // Scene of the island falling
-int Scene_DownIsland(HWND hWnd, int mode)
+int Scene_DownIsland(int mode)
 {
 	// Setup background
 	RECT rc_frame = {(WINDOW_WIDTH - 160) / 2, (WINDOW_HEIGHT - 80) / 2, (WINDOW_WIDTH + 160) / 2, (WINDOW_HEIGHT + 80) / 2};
@@ -463,7 +463,7 @@ int Scene_DownIsland(HWND hWnd, int mode)
 		// Escape menu
 		if (gKey & 0x8000)
 		{
-			switch (Call_Escape(hWnd))
+			switch (Call_Escape())
 			{
 				case 0:
 					return 0;
@@ -513,7 +513,7 @@ int Scene_DownIsland(HWND hWnd, int mode)
 
 		// Draw window
 		PutFramePerSecound();
-		if (!Flip_SystemTask(hWnd))
+		if (!Flip_SystemTask())
 			return 0;
 	}
 

@@ -2,7 +2,9 @@
 
 #include "WindowsWrapper.h"
 
-extern HWND ghWnd;
+extern BOOL bFullscreen;
 
-void PutFramePerSecound();
-int GetFramePerSecound();
+void PutFramePerSecound(void);
+unsigned long GetFramePerSecound(void);
+
+BOOL SystemTask(void);

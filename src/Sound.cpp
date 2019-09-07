@@ -1,6 +1,15 @@
 // Some of the original source code for this file can be found here:
 // https://github.com/shbow/organya/blob/master/source/Sound.cpp
 
+/*
+TODO - Code style
+Pixel's code was *extremely* Windows-centric, to the point of using
+things like ZeroMemory and LPCSTR instead of standard things like
+memset and const char*. For now, the decompilation is accurate despite
+not using these since they're just macros that evaluate to the portable
+equivalents.
+*/
+
 #include "Sound.h"
 
 #include <math.h>
@@ -8,373 +17,314 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "SDL.h"
-
 #include "WindowsWrapper.h"
 
-#include "Organya.h"
-#ifdef EXTRA_SOUND_FORMATS
+#include "Backends/Audio.h"
 #include "ExtraSoundFormats.h"
-#endif
+#include "Organya.h"
 #include "PixTone.h"
+#include "Tags.h"
 
 #define FREQUENCY 44100
 
-#ifdef RASPBERRY_PI
-#define STREAM_SIZE 0x400	// Larger buffer to prevent stutter
-#else
-#define STREAM_SIZE 0x100	// FREQUENCY/200 rounded to the nearest power of 2 (SDL2 *needs* a power-of-2 buffer size)
-#endif
+AudioBackend_Sound *lpSECONDARYBUFFER[SE_MAX];
 
-#define clamp(x, y, z) (((x) > (z)) ? (z) : ((x) < (y)) ? (y) : (x))
-
-//Audio device
-SDL_AudioDeviceID audioDevice;
-
-//Keep track of all existing sound buffers
-SOUNDBUFFER *soundBuffers;
-
-//Sound buffer code
-SOUNDBUFFER::SOUNDBUFFER(size_t bufSize)
+// DirectSoundの開始 (Starting DirectSound)
+BOOL InitDirectSound(void)
 {
-	//Lock audio buffer
-	SDL_LockAudioDevice(audioDevice);
-
-	//Set parameters
-	size = bufSize;
-
-	playing = false;
-	looping = false;
-	looped = false;
-
-	frequency = 0.0;
-	volume = 1.0;
-	volume_l = 1.0;
-	volume_r = 1.0;
-	samplePosition = 0.0;
-
-	//Create waveform buffer
-	data = new unsigned char[bufSize];
-	memset(data, 0x80, bufSize);
-
-	//Add to buffer list
-	this->next = soundBuffers;
-	soundBuffers = this;
-
-	//Unlock audio buffer
-	SDL_UnlockAudioDevice(audioDevice);
-}
-
-SOUNDBUFFER::~SOUNDBUFFER()
-{
-	//Lock audio buffer
-	SDL_LockAudioDevice(audioDevice);
-
-	//Free buffer
-	if (data)
-		delete[] data;
-
-	//Remove from buffer list
-	for (SOUNDBUFFER **soundBuffer = &soundBuffers; *soundBuffer != NULL; soundBuffer = &(*soundBuffer)->next)
-	{
-		if (*soundBuffer == this)
-		{
-			*soundBuffer = this->next;
-			break;
-		}
-	}
-
-	//Unlock audio buffer
-	SDL_UnlockAudioDevice(audioDevice);
-}
-
-void SOUNDBUFFER::Release()
-{
-	//TODO: find a better and more stable(?) way to handle this function
-	delete this;
-}
-
-void SOUNDBUFFER::Lock(unsigned char **outBuffer, size_t *outSize)
-{
-	SDL_LockAudioDevice(audioDevice);
-
-	if (outBuffer != NULL)
-		*outBuffer = data;
-
-	if (outSize != NULL)
-		*outSize = size;
-}
-
-void SOUNDBUFFER::Unlock()
-{
-	SDL_UnlockAudioDevice(audioDevice);
-}
-
-void SOUNDBUFFER::SetCurrentPosition(unsigned long dwNewPosition)
-{
-	SDL_LockAudioDevice(audioDevice);
-	samplePosition = dwNewPosition;
-	SDL_UnlockAudioDevice(audioDevice);
-}
-
-void SOUNDBUFFER::SetFrequency(unsigned long dwFrequency)
-{
-	SDL_LockAudioDevice(audioDevice);
-	frequency = (double)dwFrequency;
-	SDL_UnlockAudioDevice(audioDevice);
-}
-
-float MillibelToVolume(long lVolume)
-{
-	//Volume is in hundredths of decibels, from 0 to -10000
-	lVolume = clamp(lVolume, (long)-10000, (long)0);
-	return (float)pow(10.0, lVolume / 2000.0);
-}
-
-void SOUNDBUFFER::SetVolume(long lVolume)
-{
-	SDL_LockAudioDevice(audioDevice);
-	volume = MillibelToVolume(lVolume);
-	SDL_UnlockAudioDevice(audioDevice);
-}
-
-void SOUNDBUFFER::SetPan(long lPan)
-{
-	SDL_LockAudioDevice(audioDevice);
-	volume_l = MillibelToVolume(-lPan);
-	volume_r = MillibelToVolume(lPan);
-	SDL_UnlockAudioDevice(audioDevice);
-}
-
-void SOUNDBUFFER::Play(bool bLooping)
-{
-	SDL_LockAudioDevice(audioDevice);
-	playing = true;
-	looping = bLooping;
-	SDL_UnlockAudioDevice(audioDevice);
-}
-
-void SOUNDBUFFER::Stop()
-{
-	SDL_LockAudioDevice(audioDevice);
-	playing = false;
-	SDL_UnlockAudioDevice(audioDevice);
-}
-
-void SOUNDBUFFER::Mix(float *buffer, size_t frames)
-{
-	if (!playing) //This sound buffer isn't playing
-		return;
-
-	for (size_t i = 0; i < frames; ++i)
-	{
-		const double freqPosition = frequency / FREQUENCY; //This is added to position at the end
-
-		//Get the in-between sample this is (linear interpolation)
-		const float sample1 = ((looped || ((size_t)samplePosition) >= 1) ? data[(size_t)samplePosition] : 128.0f);
-		const float sample2 = ((looping || (((size_t)samplePosition) + 1) < size) ? data[(((size_t)samplePosition) + 1) % size] : 128.0f);
-
-		//Interpolate sample
-		const float subPos = (float)fmod(samplePosition, 1.0);
-		const float sampleA = sample1 + (sample2 - sample1) * subPos;
-
-		//Convert sample to float32
-		const float sampleConvert = (sampleA - 128.0f) / 128.0f;
-
-		//Mix
-		*buffer++ += (float)(sampleConvert * volume * volume_l);
-		*buffer++ += (float)(sampleConvert * volume * volume_r);
-
-		//Increment position
-		samplePosition += freqPosition;
-
-		if (samplePosition >= size)
-		{
-			if (looping)
-			{
-				samplePosition = fmod(samplePosition, size);
-				looped = true;
-			}
-			else
-			{
-				samplePosition = 0.0;
-				playing = false;
-				looped = false;
-				break;
-			}
-		}
-	}
-}
-
-//Sound mixer
-void AudioCallback(void *userdata, Uint8 *stream, int len)
-{
-	(void)userdata;
-
-	float *buffer = (float*)stream;
-	const size_t frames = len / (sizeof(float) * 2);
-
-	//Clear stream
-	for (size_t i = 0; i < frames * 2; ++i)
-		buffer[i] = 0.0f;
-
-	//Mix sounds to primary buffer
-	for (SOUNDBUFFER *sound = soundBuffers; sound != NULL; sound = sound->next)
-		sound->Mix(buffer, frames);
+	int i;
 
 #ifdef EXTRA_SOUND_FORMATS
-	ExtraSound_Mix((float*)buffer, frames);
-#endif
-}
-
-//Sound things
-SOUNDBUFFER* lpSECONDARYBUFFER[SE_MAX];
-
-BOOL InitDirectSound()
-{
-#ifdef EXTRA_SOUND_FORMATS
-	ExtraSound_Init(FREQUENCY);
+	ExtraSound_Init(44100);
 #endif
 
-	//Init sound
-	SDL_InitSubSystem(SDL_INIT_AUDIO);
-
-	//Open audio device
-	SDL_AudioSpec want, have;
-
-	//Set specifications we want
-	SDL_memset(&want, 0, sizeof(want));
-	want.freq = FREQUENCY;
-	want.format = AUDIO_F32;
-	want.channels = 2;
-	want.samples = STREAM_SIZE;
-	want.callback = AudioCallback;
-
-	audioDevice = SDL_OpenAudioDevice(NULL, 0, &want, &have, 0);
-
-	if (audioDevice == 0)
-	{
-		printf("Failed to open audio device\nSDL Error: %s\n", SDL_GetError());
+	if (!AudioBackend_Init())
 		return FALSE;
-	}
 
-	//Unpause audio device
-	SDL_PauseAudioDevice(audioDevice, 0);
-
-	for (unsigned int i = 0; i < SE_MAX; ++i)
+	for (i = 0; i < SE_MAX; i++)
 		lpSECONDARYBUFFER[i] = NULL;
 
-	//Start organya
-	StartOrganya();
+	StartOrganya("Org/Wave.dat");
+
 	return TRUE;
 }
 
-void EndDirectSound()
+// DirectSoundの終了 (Exit DirectSound)
+void EndDirectSound(void)
 {
+	int i;
+
 	EndOrganya();
 
-	for (unsigned int i = 0; i < SE_MAX; ++i)
-		if (lpSECONDARYBUFFER[i])
-			lpSECONDARYBUFFER[i]->Release();
+	for (i = 0; i < SE_MAX; i++)
+		if (lpSECONDARYBUFFER[i] != NULL)
+			AudioBackend_DestroySound(lpSECONDARYBUFFER[i]);
 
-	SDL_QuitSubSystem(SDL_INIT_AUDIO);
-
-	SDL_CloseAudioDevice(audioDevice);
-
+	AudioBackend_Deinit();
+	
 #ifdef EXTRA_SOUND_FORMATS
 	ExtraSound_Deinit();
 #endif
 }
+/*
+// サウンドの設定 (Sound settings)
+BOOL InitSoundObject(LPCSTR resname, int no)
+{
+	HRSRC hrscr;
+	DSBUFFERDESC dsbd;
+	DWORD *lpdword;	// リソースのアドレス (Resource address)
 
-//Sound effects playing
+	if (lpDS == NULL)
+		return TRUE;
+
+	// リソースの検索 (Search for resources)
+	if ((hrscr = FindResourceA(NULL, resname, "WAVE")) == NULL)
+		return FALSE;
+
+	// リソースのアドレスを取得 (Get resource address)
+	lpdword = (DWORD*)LockResource(LoadResource(NULL, hrscr));
+
+	// 二次バッファの生成 (Create secondary buffer)
+	ZeroMemory(&dsbd, sizeof(dsbd));
+	dsbd.dwSize = sizeof(dsbd);
+	dsbd.dwFlags = DSBCAPS_STATIC | DSBCAPS_GLOBALFOCUS | DSBCAPS_CTRLPAN | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY;
+	dsbd.dwBufferBytes = *(DWORD*)((BYTE*)lpdword+0x36);	// WAVEデータのサイズ (WAVE data size)
+	dsbd.lpwfxFormat = (LPWAVEFORMATEX)(lpdword+5); 
+
+	if (lpDS->CreateSoundBuffer(&dsbd, &lpSECONDARYBUFFER[no], NULL) != DS_OK)
+		return FALSE;
+
+	LPVOID lpbuf1, lpbuf2;
+	DWORD dwbuf1, dwbuf2;
+
+	// 二次バッファのロック (Secondary buffer lock)
+	lpSECONDARYBUFFER[no]->Lock(0, *(DWORD*)((BYTE*)lpdword+0x36), &lpbuf1, &dwbuf1, &lpbuf2, &dwbuf2, 0); 
+
+	// 音源データの設定 (Sound source data settings)
+	CopyMemory(lpbuf1, (BYTE*)lpdword+0x3A, dwbuf1);
+
+	if (dwbuf2 != 0)
+		CopyMemory(lpbuf2, (BYTE*)lpdword+0x3A+dwbuf1, dwbuf2);
+
+	// 二次バッファのロック解除 (Unlock secondary buffer)
+	lpSECONDARYBUFFER[no]->Unlock(lpbuf1, dwbuf1, lpbuf2, dwbuf2); 
+
+	return TRUE;
+}
+
+BOOL LoadSoundObject(LPCSTR file_name, int no)
+{
+	char path[MAX_PATH];
+	DWORD i;
+	DWORD file_size = 0;
+	char check_box[58];
+	FILE *fp;
+	HANDLE hFile;
+
+	sprintf(path, "%s\\%s", gModulePath, file_name);
+
+	if (lpDS == NULL)
+		return TRUE;
+
+	hFile = CreateFileA(path, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (hFile == INVALID_HANDLE_VALUE)
+		return FALSE;
+
+	file_size = GetFileSize(hFile, NULL);
+	CloseHandle(hFile);
+
+	if ((fp = fopen(path, "rb")) == NULL)
+		return FALSE;
+
+	for (i = 0; i < 58; i++)
+		fread(&check_box[i], sizeof(char), 1, fp);
+
+	if (check_box[0] != 'R')
+		return FALSE;
+	if (check_box[1] != 'I')
+		return FALSE;
+	if (check_box[2] != 'F')
+		return FALSE;
+	if (check_box[3] != 'F')
+		return FALSE;
+
+	DWORD *wp;
+	wp = (DWORD*)malloc(file_size);	// ファイルのワークスペースを作る (Create a file workspace)
+	fseek(fp, 0, SEEK_SET);
+
+	for (i = 0; i < file_size; i++)
+		fread((BYTE*)wp+i, sizeof(BYTE), 1, fp);
+
+	fclose(fp);
+
+	// セカンダリバッファの生成 (Create secondary buffer)
+	DSBUFFERDESC dsbd;
+	ZeroMemory(&dsbd, sizeof(dsbd));
+	dsbd.dwSize = sizeof(dsbd);
+	dsbd.dwFlags = DSBCAPS_STATIC | DSBCAPS_GLOBALFOCUS | DSBCAPS_CTRLPAN | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY;
+	dsbd.dwBufferBytes = *(DWORD*)((BYTE*)wp+0x36);	// WAVEデータのサイズ (WAVE data size)
+	dsbd.lpwfxFormat = (LPWAVEFORMATEX)(wp+5); 
+
+	if (lpDS->CreateSoundBuffer(&dsbd, &lpSECONDARYBUFFER[no], NULL) != DS_OK)
+	{
+#ifdef FIX_BUGS
+		free(wp);	// The updated Organya source code includes this fix
+#endif
+		return FALSE;	
+	}
+
+	LPVOID lpbuf1, lpbuf2;
+	DWORD dwbuf1, dwbuf2;
+
+	HRESULT hr;
+	hr = lpSECONDARYBUFFER[no]->Lock(0, *(DWORD*)((BYTE*)wp+0x36), &lpbuf1, &dwbuf1, &lpbuf2, &dwbuf2, 0);
+
+	if (hr != DS_OK)
+	{
+#ifdef FIX_BUGS
+		free(wp);	// The updated Organya source code includes this fix
+#endif
+		return FALSE;
+	}
+
+	CopyMemory(lpbuf1, (BYTE*)wp+0x3A, dwbuf1);	// +3aはデータの頭 (+ 3a is the head of the data)
+
+	if (dwbuf2 != 0)
+		CopyMemory(lpbuf2, (BYTE*)wp+0x3A+dwbuf1, dwbuf2);
+
+	lpSECONDARYBUFFER[no]->Unlock(lpbuf1, dwbuf1, lpbuf2, dwbuf2); 
+	
+	free(wp);
+
+	return TRUE;
+}
+*/
 void PlaySoundObject(int no, int mode)
 {
-	if (lpSECONDARYBUFFER[no])
+	if (lpSECONDARYBUFFER[no] != NULL)
 	{
 		switch (mode)
 		{
-			case 0:
-				lpSECONDARYBUFFER[no]->Stop();
+			case 0:	// 停止 (Stop)
+				AudioBackend_StopSound(lpSECONDARYBUFFER[no]);
 				break;
 
-			case 1:
-				lpSECONDARYBUFFER[no]->Stop();
-				lpSECONDARYBUFFER[no]->SetCurrentPosition(0);
-				lpSECONDARYBUFFER[no]->Play(false);
+			case 1:	// 再生 (Playback)
+				AudioBackend_StopSound(lpSECONDARYBUFFER[no]);
+				AudioBackend_RewindSound(lpSECONDARYBUFFER[no]);
+				AudioBackend_PlaySound(lpSECONDARYBUFFER[no], FALSE);
 				break;
 
-			case -1:
-				lpSECONDARYBUFFER[no]->Play(true);
+			case -1:// ループ再生 (Loop playback)
+				AudioBackend_PlaySound(lpSECONDARYBUFFER[no], TRUE);
 				break;
 		}
 	}
-#ifdef EXTRA_SOUND_FORMATS
-	else
-	{
-		ExtraSound_PlaySFX(no, mode);
-	}
-#endif
 }
 
-void ChangeSoundFrequency(int no, unsigned long rate)
+void ChangeSoundFrequency(int no, unsigned long rate)	// 100がMIN9999がMAXで2195?がﾉｰﾏﾙ (100 is MIN, 9999 is MAX, and 2195 is normal)
 {
-	lpSECONDARYBUFFER[no]->SetFrequency((rate * 10) + 100);
+	AudioBackend_SetSoundFrequency(lpSECONDARYBUFFER[no], (rate * 10) + 100);
 }
 
-void ChangeSoundVolume(int no, long volume)
+void ChangeSoundVolume(int no, long volume)	// 300がMAXで300がﾉｰﾏﾙ (300 is MAX and 300 is normal)
 {
-	lpSECONDARYBUFFER[no]->SetVolume((volume - 300) * 8);
+	AudioBackend_SetSoundVolume(lpSECONDARYBUFFER[no], (volume - 300) * 8);
 }
 
-void ChangeSoundPan(int no, long pan)
+void ChangeSoundPan(int no, long pan)	// 512がMAXで256がﾉｰﾏﾙ (512 is MAX and 256 is normal)
 {
-	lpSECONDARYBUFFER[no]->SetPan((pan - 256) * 10);
+	AudioBackend_SetSoundPan(lpSECONDARYBUFFER[no], (pan - 256) * 10);
 }
 
+// TODO - The stack frame for this function is inaccurate
 int MakePixToneObject(const PIXTONEPARAMETER *ptp, int ptp_num, int no)
 {
-	int sample_count = 0;
-	for (int i = 0; i < ptp_num; ++i)
+	int i;
+	int j;
+	const PIXTONEPARAMETER *ptp_pointer;
+	int sample_count;
+	unsigned char *pcm_buffer;
+	unsigned char *mixed_pcm_buffer;
+
+	ptp_pointer = ptp;
+	sample_count = 0;
+
+	for (i = 0; i < ptp_num; i++)
 	{
-		if (ptp[i].size > sample_count)
-			sample_count = ptp[i].size;
+		if (ptp_pointer->size > sample_count)
+			sample_count = ptp_pointer->size;
+
+		++ptp_pointer;
 	}
 
-	unsigned char *pcm_buffer = (unsigned char*)malloc(sample_count);
-	unsigned char *mixed_pcm_buffer = (unsigned char*)malloc(sample_count);
+	lpSECONDARYBUFFER[no] = AudioBackend_CreateSound(22050, sample_count);
+
+	if (lpSECONDARYBUFFER[no] == NULL)
+		return -1;
+
+	pcm_buffer = mixed_pcm_buffer = NULL;
+
+	pcm_buffer = (unsigned char*)malloc(sample_count);
+	mixed_pcm_buffer = (unsigned char*)malloc(sample_count);
+
+	if (pcm_buffer == NULL || mixed_pcm_buffer == NULL)
+	{
+		if (pcm_buffer != NULL)
+			free(pcm_buffer);
+
+		if (mixed_pcm_buffer != NULL)
+			free(mixed_pcm_buffer);
+
+		return -1;
+	}
+
 	memset(pcm_buffer, 0x80, sample_count);
 	memset(mixed_pcm_buffer, 0x80, sample_count);
 
-	for (int i = 0; i < ptp_num; ++i)
+	ptp_pointer = ptp;
+
+	for (i = 0; i < ptp_num; i++)
 	{
-		if (!MakePixelWaveData(&ptp[i], pcm_buffer))
+		if (!MakePixelWaveData(ptp_pointer, pcm_buffer))
 		{
-			free(pcm_buffer);
-			free(mixed_pcm_buffer);
+			if (pcm_buffer)
+				free(pcm_buffer);
+
+			if (mixed_pcm_buffer)
+				free(mixed_pcm_buffer);
+
 			return -1;
 		}
 
-		for (int j = 0; j < ptp[i].size; ++j)
+		for (j = 0; j < ptp_pointer->size; j++)
 		{
 			if (pcm_buffer[j] + mixed_pcm_buffer[j] - 0x100 < -0x7F)
 				mixed_pcm_buffer[j] = 0;
 			else if (pcm_buffer[j] + mixed_pcm_buffer[j] - 0x100 > 0x7F)
 				mixed_pcm_buffer[j] = 0xFF;
 			else
-				mixed_pcm_buffer[j] += pcm_buffer[j] + -0x80;
+				mixed_pcm_buffer[j] = mixed_pcm_buffer[j] + pcm_buffer[j] - 0x80;
 		}
+
+		++ptp_pointer;
 	}
 
-	lpSECONDARYBUFFER[no] = new SOUNDBUFFER(sample_count);
+	// Maybe this used to be something to prevent audio popping?
+	mixed_pcm_buffer[0] = mixed_pcm_buffer[0];
+	mixed_pcm_buffer[sample_count - 1] = mixed_pcm_buffer[sample_count - 1];
 
-	unsigned char *buf;
-	lpSECONDARYBUFFER[no]->Lock(&buf, NULL);
-	memcpy(buf, mixed_pcm_buffer, sample_count);
-	lpSECONDARYBUFFER[no]->Unlock();
-	lpSECONDARYBUFFER[no]->SetFrequency(22050);
+	unsigned char *buffer = AudioBackend_LockSound(lpSECONDARYBUFFER[no], NULL);
 
-	free(pcm_buffer);
-	free(mixed_pcm_buffer);
+	memcpy(buffer, mixed_pcm_buffer, sample_count);
+
+	AudioBackend_UnlockSound(lpSECONDARYBUFFER[no]);
+
+	if (pcm_buffer != NULL)
+		free(pcm_buffer);
+
+	if (mixed_pcm_buffer != NULL)
+		free(mixed_pcm_buffer);
 
 	return sample_count;
 }

@@ -416,6 +416,16 @@ void Backend_FreeSurface(Backend_Surface *surface)
 	free(surface);
 }
 
+BOOL Backend_IsSurfaceLost(Backend_Surface *surface)
+{
+	return FALSE;
+}
+
+void Backend_RestoreSurface(Backend_Surface *surface)
+{
+	
+}
+
 unsigned char* Backend_LockSurface(Backend_Surface *surface, unsigned int *pitch)
 {
 	if (surface == NULL)
@@ -737,7 +747,7 @@ void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, l
 	vertex_buffer_slot->vertices[1][2].vertex_coordinate.y = vertex_bottom;
 }
 
-void Backend_HandleDeviceLoss(void)
+void Backend_HandleRenderTargetLoss(void)
 {
 	// No problem for us
 }

@@ -37,28 +37,6 @@ BOOL LoadNpcTable(const char *path)
 		return FALSE;
 	}
 
-#ifdef NONPORTABLE
-	for (n = 0; n < num; n++) // bits
-		fread(&gNpcTable[n].bits, 2, 1, fp);
-	for (n = 0; n < num; n++) // life
-		fread(&gNpcTable[n].life, 2, 1, fp);
-	for (n = 0; n < num; n++) // surf
-		fread(&gNpcTable[n].surf, 1, 1, fp);
-	for (n = 0; n < num; n++) // destroy_voice
-		fread(&gNpcTable[n].destroy_voice, 1, 1, fp);
-	for (n = 0; n < num; n++) // hit_voice
-		fread(&gNpcTable[n].hit_voice, 1, 1, fp);
-	for (n = 0; n < num; n++) // size
-		fread(&gNpcTable[n].size, 1, 1, fp);
-	for (n = 0; n < num; n++) // exp
-		fread(&gNpcTable[n].exp, 4, 1, fp);
-	for (n = 0; n < num; n++) // damage
-		fread(&gNpcTable[n].damage, 4, 1, fp);
-	for (n = 0; n < num; n++) // hit
-		fread(&gNpcTable[n].hit, 4, 1, fp);
-	for (n = 0; n < num; n++) // view
-		fread(&gNpcTable[n].view, 4, 1, fp);
-#else
 	for (n = 0; n < num; n++) // bits
 		gNpcTable[n].bits = File_ReadLE16(fp);
 	for (n = 0; n < num; n++) // life
@@ -79,7 +57,6 @@ BOOL LoadNpcTable(const char *path)
 		fread(&gNpcTable[n].hit, 4, 1, fp);
 	for (n = 0; n < num; n++) // view
 		fread(&gNpcTable[n].view, 4, 1, fp);
-#endif
 
 	fclose(fp);
 	return TRUE;

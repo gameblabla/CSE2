@@ -220,7 +220,7 @@ BOOL LoadGenericData()
 
 		for (unsigned int i = 0; i < sizeof(gPtpTable) / sizeof(gPtpTable[0]); ++i)
 		{
-			char path[PATH_LENGTH];
+			char path[MAX_PATH];
 			sprintf(path, "%s/%s", gDataPath, gPtpTable[i].path);
 
 			switch (gPtpTable[i].type)
