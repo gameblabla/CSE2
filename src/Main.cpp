@@ -236,22 +236,6 @@ int main(int argc, char *argv[])
 			if (window == NULL)
 				return 0;
 
-			// Set colour depth
-			int depth;
-
-			switch (conf.display_mode)
-			{
-				case 0:
-					depth = 16;
-					break;
-				case 3:
-					depth = 24;
-					break;
-				case 4:
-					depth = 32;
-					break;
-			}
-
 			StartDirectDraw(window, 2);
 			bFullscreen = TRUE;
 
