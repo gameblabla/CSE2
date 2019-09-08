@@ -13,6 +13,9 @@
 #include "NpChar.h"
 #include "Tags.h"
 
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+
 #define PXM_BUFFER_SIZE 0x4B000
 
 MAP_DATA gMap;
@@ -152,10 +155,10 @@ void PutStage_Back(int fx, int fy)
 	int num_x;
 
 	// Get range to draw
-	num_x = ((WINDOW_WIDTH + 0xF) / 0x10) + 1;
-	num_y = ((WINDOW_HEIGHT + 0xF) / 0x10) + 1;
-	put_x = (fx / 0x200 + 8) / 0x10;
-	put_y = (fy / 0x200 + 8) / 0x10;
+	num_x = MIN(gMap.width, ((WINDOW_WIDTH + 0xF) / 0x10) + 1);
+	num_y = MIN(gMap.length, ((WINDOW_HEIGHT + 0xF) / 0x10) + 1);
+	put_x = MAX(0, (fx / 0x200 + 8) / 0x10);
+	put_y = MAX(0, (fy / 0x200 + 8) / 0x10);
 
 	for (j = put_y; j < put_y + num_y; j++)
 	{
@@ -193,10 +196,10 @@ void PutStage_Front(int fx, int fy)
 	int num_x;
 
 	// Get range to draw
-	num_x = ((WINDOW_WIDTH + 0xF) >> 4) + 1;
-	num_y = ((WINDOW_HEIGHT + 0xF) >> 4) + 1;
-	put_x = (fx / 0x200 + 8) / 16;
-	put_y = (fy / 0x200 + 8) / 16;
+	num_x = MIN(gMap.width, ((WINDOW_WIDTH + 0xF) >> 4) + 1);
+	num_y = MIN(gMap.length, ((WINDOW_HEIGHT + 0xF) >> 4) + 1);
+	put_x = MAX(0, (fx / 0x200 + 8) / 16);
+	put_y = MAX(0, (fy / 0x200 + 8) / 16);
 
 	for (j = put_y; j < put_y + num_y; j++)
 	{
@@ -240,10 +243,10 @@ void PutMapDataVector(int fx, int fy)
 	count += 2;
 
 	// Get range to draw
-	num_x = ((WINDOW_WIDTH + 0xF) >> 4) + 1;
-	num_y = ((WINDOW_HEIGHT + 0xF) >> 4) + 1;
-	put_x = (fx / 0x200 + 8) / 16;
-	put_y = (fy / 0x200 + 8) / 16;
+	num_x = MIN(gMap.width, ((WINDOW_WIDTH + 0xF) >> 4) + 1);
+	num_y = MIN(gMap.length, ((WINDOW_HEIGHT + 0xF) >> 4) + 1);
+	put_x = MAX(0, (fx / 0x200 + 8) / 16);
+	put_y = MAX(0, (fy / 0x200 + 8) / 16);
 
 	for (j = put_y; j < put_y + num_y; j++)
 	{
