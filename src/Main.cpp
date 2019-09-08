@@ -239,6 +239,7 @@ int main(int argc, char *argv[])
 			StartDirectDraw(window, 2);
 			bFullscreen = TRUE;
 
+			SDL_ShowCursor(SDL_DISABLE);
 			break;
 	}
 
