@@ -4,7 +4,11 @@
 #include <stdio.h>
 #include <string.h>
 
+#if defined(_MSC_VER) && _MSC_VER >= 1500	// Newer versions of Visual Studio don't support anything earlier than DirectInput8
+#define DIRECTINPUT_VERSION 0x800
+#else
 #define DIRECTINPUT_VERSION 0x500
+#endif
 #include <dinput.h>
 
 #include "WindowsWrapper.h"
@@ -58,7 +62,11 @@ BOOL __stdcall EnumDevices_Callback(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef);
 
 BOOL InitDirectInput(HINSTANCE hinst, HWND hWnd)
 {
+#if defined(_MSC_VER) && _MSC_VER >= 1500
+	if (DirectInput8Create(hinst, DIRECTINPUT_VERSION, IID_IDirectInput8A, (LPVOID*)&lpDI, NULL) != DI_OK)
+#else
 	if (DirectInputCreateA(hinst, DIRECTINPUT_VERSION, &lpDI, NULL) != DI_OK)
+#endif
 		return FALSE;
 
 	if (!HookAllDirectInputDevices(hWnd))

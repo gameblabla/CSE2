@@ -1,0 +1,624 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files\NPC">
+      <UniqueIdentifier>{e3ddc3b2-53c8-437b-9bbd-2cf890dce515}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Boss">
+      <UniqueIdentifier>{e59cab1f-6e61-4e3c-9b62-66e2139ee067}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files\Bitmap">
+      <UniqueIdentifier>{d3050ffa-0164-47af-ad15-595b6259cebc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Cursor">
+      <UniqueIdentifier>{4f28c353-f3e2-4895-8941-90ade1525853}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Icon">
+      <UniqueIdentifier>{32f06e34-3c82-435a-9c83-468da6521995}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Organya">
+      <UniqueIdentifier>{5caa2b1b-5219-4227-822a-56f2cf394a12}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\ArmsItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Back.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\BulHit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Bullet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Caret.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Config.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Dialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Draw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Ending.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Escape.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Fade.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Flags.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Flash.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Frame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Game.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Generic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\GenericLoad.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Input.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\KeyControl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Map.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\MapName.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\MiniMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\MyChar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\MycHit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\MycParam.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Organya.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\PixTone.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Profile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SelStage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Shoot.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Sound.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Stage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Star.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\TextScr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Triangle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ValueView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\NpcAct000.cpp">
+      <Filter>Source Files\NPC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\NpcAct020.cpp">
+      <Filter>Source Files\NPC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\NpcAct040.cpp">
+      <Filter>Source Files\NPC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\NpcAct060.cpp">
+      <Filter>Source Files\NPC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\NpcAct080.cpp">
+      <Filter>Source Files\NPC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\NpcAct100.cpp">
+      <Filter>Source Files\NPC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\NpcAct120.cpp">
+      <Filter>Source Files\NPC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\NpcAct140.cpp">
+      <Filter>Source Files\NPC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\NpcAct160.cpp">
+      <Filter>Source Files\NPC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\NpcAct180.cpp">
+      <Filter>Source Files\NPC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\NpcAct200.cpp">
+      <Filter>Source Files\NPC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\NpcAct220.cpp">
+      <Filter>Source Files\NPC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\NpcAct240.cpp">
+      <Filter>Source Files\NPC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\NpcAct260.cpp">
+      <Filter>Source Files\NPC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\NpcAct280.cpp">
+      <Filter>Source Files\NPC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\NpcAct300.cpp">
+      <Filter>Source Files\NPC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\NpcAct320.cpp">
+      <Filter>Source Files\NPC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\NpcAct340.cpp">
+      <Filter>Source Files\NPC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\NpChar.cpp">
+      <Filter>Source Files\NPC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\NpcHit.cpp">
+      <Filter>Source Files\NPC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\NpcTbl.cpp">
+      <Filter>Source Files\NPC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Boss.cpp">
+      <Filter>Source Files\Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\BossAlmo1.cpp">
+      <Filter>Source Files\Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\BossAlmo2.cpp">
+      <Filter>Source Files\Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\BossBallos.cpp">
+      <Filter>Source Files\Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\BossFrog.cpp">
+      <Filter>Source Files\Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\BossIronH.cpp">
+      <Filter>Source Files\Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\BossLife.cpp">
+      <Filter>Source Files\Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\BossOhm.cpp">
+      <Filter>Source Files\Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\BossPress.cpp">
+      <Filter>Source Files\Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\BossTwinD.cpp">
+      <Filter>Source Files\Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\BossX.cpp">
+      <Filter>Source Files\Boss</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\ArmsItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Back.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Boss.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\BossAlmo1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\BossAlmo2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\BossBallos.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\BossFrog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\BossIronH.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\BossLife.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\BossOhm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\BossPress.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\BossTwinD.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\BossX.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\BulHit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Bullet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Caret.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\CommonDefines.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Dialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Draw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Ending.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Escape.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Fade.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Flags.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Flash.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Frame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Generic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\GenericLoad.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\KeyControl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Main.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Map.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\MapName.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\MiniMap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\MyChar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\MycHit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\MycParam.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\NpcAct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\NpChar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\NpcHit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\NpcTbl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Organya.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\PixTone.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Profile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SelStage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Shoot.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Sound.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Stage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Star.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Tags.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\TextScr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Triangle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ValueView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\WindowsWrapper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\assets\resources\afxres.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\assets\resources\resource1.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\assets\resources\CSE2.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\assets\resources\Bitmap\Credit01.bmp">
+      <Filter>Resource Files\Bitmap</Filter>
+    </Image>
+    <Image Include="..\assets\resources\Bitmap\Credit02.bmp">
+      <Filter>Resource Files\Bitmap</Filter>
+    </Image>
+    <Image Include="..\assets\resources\Bitmap\Credit03.bmp">
+      <Filter>Resource Files\Bitmap</Filter>
+    </Image>
+    <Image Include="..\assets\resources\Bitmap\Credit04.bmp">
+      <Filter>Resource Files\Bitmap</Filter>
+    </Image>
+    <Image Include="..\assets\resources\Bitmap\Credit05.bmp">
+      <Filter>Resource Files\Bitmap</Filter>
+    </Image>
+    <Image Include="..\assets\resources\Bitmap\Credit06.bmp">
+      <Filter>Resource Files\Bitmap</Filter>
+    </Image>
+    <Image Include="..\assets\resources\Bitmap\Credit07.bmp">
+      <Filter>Resource Files\Bitmap</Filter>
+    </Image>
+    <Image Include="..\assets\resources\Bitmap\Credit08.bmp">
+      <Filter>Resource Files\Bitmap</Filter>
+    </Image>
+    <Image Include="..\assets\resources\Bitmap\Credit09.bmp">
+      <Filter>Resource Files\Bitmap</Filter>
+    </Image>
+    <Image Include="..\assets\resources\Bitmap\Credit10.bmp">
+      <Filter>Resource Files\Bitmap</Filter>
+    </Image>
+    <Image Include="..\assets\resources\Bitmap\Credit11.bmp">
+      <Filter>Resource Files\Bitmap</Filter>
+    </Image>
+    <Image Include="..\assets\resources\Bitmap\Credit12.bmp">
+      <Filter>Resource Files\Bitmap</Filter>
+    </Image>
+    <Image Include="..\assets\resources\Bitmap\Credit14.bmp">
+      <Filter>Resource Files\Bitmap</Filter>
+    </Image>
+    <Image Include="..\assets\resources\Bitmap\Credit15.bmp">
+      <Filter>Resource Files\Bitmap</Filter>
+    </Image>
+    <Image Include="..\assets\resources\Bitmap\Credit16.bmp">
+      <Filter>Resource Files\Bitmap</Filter>
+    </Image>
+    <Image Include="..\assets\resources\Bitmap\Credit17.bmp">
+      <Filter>Resource Files\Bitmap</Filter>
+    </Image>
+    <Image Include="..\assets\resources\Bitmap\Credit18.bmp">
+      <Filter>Resource Files\Bitmap</Filter>
+    </Image>
+    <Image Include="..\assets\resources\Bitmap\pixel.bmp">
+      <Filter>Resource Files\Bitmap</Filter>
+    </Image>
+    <Image Include="..\assets\resources\Icon\0.ico">
+      <Filter>Resource Files\Icon</Filter>
+    </Image>
+    <Image Include="..\assets\resources\Icon\ICON_MINI.ico">
+      <Filter>Resource Files\Icon</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\assets\resources\Cursor\CURSOR_IKA.cur">
+      <Filter>Resource Files\Cursor</Filter>
+    </None>
+    <None Include="..\assets\resources\Cursor\CURSOR_NORMAL.cur">
+      <Filter>Resource Files\Cursor</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\Access.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\Anzen.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\Balcony.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\Ballos.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\BreakDown.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\Cemetery.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\Curly.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\Dr.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\Ending.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\Escape.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\Fanfale1.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\Fanfale2.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\Fanfale3.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\FireEye.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\Gameover.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\Ginsuke.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\Grand.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\Gravity.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\Hell.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\ironH.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\Jenka.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\Jenka2.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\Kodou.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\LastBtl.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\LastBtl3.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\LastCave.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\Marine.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\Maze.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\MDown2.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\Mura.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\Oside.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\Plant.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\quiet.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\Requiem.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\Toroko.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\Vivi.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\Wanpak2.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\Wanpaku.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Wave\Wave.dat">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\Weed.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\White.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\XXXX.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+    <None Include="..\assets\resources\Org\Zonbie.org">
+      <Filter>Resource Files\Organya</Filter>
+    </None>
+  </ItemGroup>
+</Project>
