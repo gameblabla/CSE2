@@ -425,6 +425,9 @@
 				RelativePath="..\src\Resource.cpp">
 			</File>
 			<File
+				RelativePath="..\src\Backends\Rendering\SDLTexture.cpp">
+			</File>
+			<File
 				RelativePath="..\src\SelStage.cpp">
 			</File>
 			<File
@@ -592,6 +595,9 @@
 				RelativePath="..\src\Profile.h">
 			</File>
 			<File
+				RelativePath="..\src\Backends\Rendering.h">
+			</File>
+			<File
 				RelativePath="..\src\Resource.h">
 			</File>
 			<File
@@ -633,7 +639,7 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}">
 			<File
-				RelativePath="..\res\Icon\ICON.rc">
+				RelativePath="..\assets\resources\Icon\ICON.rc">
 			</File>
 		</Filter>
 	</Files>

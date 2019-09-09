@@ -36,7 +36,9 @@ void InitBossChar(int code)
 void PutBossChar(int fx, int fy)
 {
 	char a = 0;
-	for (int b = BOSS_MAX - 1; b >= 0; b--)
+	int b;
+
+	for (b = BOSS_MAX - 1; b >= 0; --b)
 	{
 		if (gBoss[b].cond & 0x80)
 		{
@@ -48,7 +50,7 @@ void PutBossChar(int fx, int fy)
 			{
 				a = 0;
 
-				if (gBoss[b].bits & npc_showDamage && gBoss[b].damage_view)
+				if (gBoss[b].bits & NPC_SHOW_DAMAGE && gBoss[b].damage_view)
 				{
 					SetValueView(&gBoss[b].x, &gBoss[b].y, gBoss[b].damage_view);
 					gBoss[b].damage_view = 0;
@@ -78,17 +80,17 @@ void SetBossCharActNo(int a)
 
 void HitBossBullet()
 {
-	int bos;
-	int bul;
-	int bos_;
 	BOOL bHit;
+	int bul;
+	int bos;
+	int bos_;
 
-	for (bos = 0; bos < BOSS_MAX; bos++)
+	for (bos = 0; bos < BOSS_MAX; ++bos)
 	{
 		if ((gBoss[bos].cond & 0x80) == 0)
 			continue;
 
-		for (bul = 0; bul < BULLET_MAX; bul++)
+		for (bul = 0; bul < BULLET_MAX; ++bul)
 		{
 			if ((gBul[bul].cond & 0x80) == 0)
 				continue;
@@ -98,13 +100,13 @@ void HitBossBullet()
 
 			// Check if bullet touches boss
 			bHit = FALSE;
-			if (gBoss[bos].bits & npc_shootable
+			if (gBoss[bos].bits & NPC_SHOOTABLE
 				&& gBoss[bos].x - gBoss[bos].hit.back < gBul[bul].x + gBul[bul].enemyXL
 				&& gBoss[bos].x + gBoss[bos].hit.back > gBul[bul].x - gBul[bul].enemyXL
 				&& gBoss[bos].y - gBoss[bos].hit.top < gBul[bul].y + gBul[bul].enemyYL
 				&& gBoss[bos].y + gBoss[bos].hit.bottom > gBul[bul].y - gBul[bul].enemyYL)
 				bHit = TRUE;
-			else if (gBoss[bos].bits & npc_invulnerable
+			else if (gBoss[bos].bits & NPC_INVULNERABLE
 				&& gBoss[bos].x - gBoss[bos].hit.back < gBul[bul].x + gBul[bul].blockXL
 				&& gBoss[bos].x + gBoss[bos].hit.back > gBul[bul].x - gBul[bul].blockXL
 				&& gBoss[bos].y - gBoss[bos].hit.top < gBul[bul].y + gBul[bul].blockYL
@@ -114,7 +116,7 @@ void HitBossBullet()
 			if (bHit)
 			{
 				// Damage boss
-				if (gBoss[bos].bits & npc_shootable)
+				if (gBoss[bos].bits & NPC_SHOOTABLE)
 				{
 					if (gBoss[bos].cond & 0x10)
 						bos_ = 0;
@@ -127,7 +129,7 @@ void HitBossBullet()
 					{
 						gBoss[bos_].life = bos_;
 
-						if ((gMC.cond & 0x80) && gBoss[bos_].bits & npc_eventDie)
+						if ((gMC.cond & 0x80) && gBoss[bos_].bits & NPC_EVENT_WHEN_KILLED)
 						{
 							StartTextScript(gBoss[bos_].code_event);
 						}
@@ -180,7 +182,7 @@ void HitBossBullet()
 				}
 				else
 				{
-					if (!(gBul[bul].bbits & 0x10))
+					if ((gBul[bul].bbits & 0x10) == 0)
 					{
 						SetCaret(gBul[bul].x, gBul[bul].y, 2, 2);
 						PlaySoundObject(31, 1);
@@ -224,11 +226,9 @@ void ActBossChar()
 
 	gpBossFuncTbl[code_char]();
 
-	for (bos = 0; bos < BOSS_MAX; bos++)
-	{
+	for (bos = 0; bos < BOSS_MAX; ++bos)
 		if (gBoss[bos].shock)
-			gBoss[bos].shock--;
-	}
+			--gBoss[bos].shock;
 }
 
 void HitBossMap()
@@ -275,14 +275,14 @@ void HitBossMap()
 	offy[14] = -1;
 	offy[15] = -1;
 
-	for (b = 0; b < BOSS_MAX; b++)
+	for (b = 0; b < BOSS_MAX; ++b)
 	{
 		int judg;
 
 		if ((gBoss[b].cond & 0x80) == 0)
 			continue;
 
-		if (gBoss[b].bits & npc_ignoreSolid)
+		if (gBoss[b].bits & NPC_IGNORE_SOLIDITY)
 			continue;
 
 		if (gBoss[b].size >= 3)
@@ -299,14 +299,14 @@ void HitBossMap()
 		}
 
 		gBoss[b].flag = 0;
-		for (j = 0; j < judg; j++)
+		for (j = 0; j < judg; ++j)
 		{
 			atrb[j] = GetAttribute(x + offx[j], y + offy[j]);
 
 			switch (atrb[j])
 			{
 				case 0x44:
-					if (gBoss[b].bits & npc_ignore44)
+					if (gBoss[b].bits & NPC_IGNORE_TILE_44)
 						break;
 					// Fallthrough
 				case 0x05:

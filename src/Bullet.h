@@ -29,7 +29,13 @@ struct BULLET
 	int enemyYL;
 	int blockXL;
 	int blockYL;
-	RECT view;
+	struct
+	{
+		int front;
+		int top;
+		int back;
+		int bottom;
+	} view;
 };
 
 struct BULLET_TABLE
@@ -42,7 +48,13 @@ struct BULLET_TABLE
 	int enemyYL;
 	int blockXL;
 	int blockYL;
-	RECT view;
+	struct
+	{
+		int front;
+		int top;
+		int back;
+		int bottom;
+	} view;
 };
 
 #define BULLET_MAX 0x40

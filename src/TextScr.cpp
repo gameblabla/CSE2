@@ -43,7 +43,7 @@
 
 TEXT_SCRIPT gTS;
 
-int gNumberTextScript[4];
+int gNumberTextScript[4];	// Seems to be for debugging
 char text[0x100];
 
 RECT gRect_line = {0, 0, 216, 16};
@@ -65,7 +65,7 @@ BOOL InitTextScript2()
 
 	//Create line surfaces
 	for (int i = 0; i < 4; i++)
-		MakeSurface_Generic(gRect_line.right, gRect_line.bottom, (Surface_Ids)(i + SURFACE_ID_TEXT_LINE1), FALSE);
+		MakeSurface_Generic(gRect_line.right, gRect_line.bottom, (SurfaceID)(i + SURFACE_ID_TEXT_LINE1), FALSE);
 
 	//Clear text
 	memset(text, 0, sizeof(text));
@@ -230,7 +230,7 @@ BOOL StartTextScript(int no)
 	for (int i = 0; i < 4; i++)
 	{
 		gTS.ypos_line[i] = 16 * i;
-		CortBox2(&gRect_line, 0x000000, (Surface_Ids)(i + SURFACE_ID_TEXT_LINE1));
+		CortBox2(&gRect_line, 0x000000, (SurfaceID)(i + SURFACE_ID_TEXT_LINE1));
 		memset(&text[i * 0x40], 0, 0x40);
 	}*/
 
@@ -279,7 +279,7 @@ BOOL JumpTextScript(int no)
 	for (int i = 0; i < 4; i++)
 	{
 		gTS.ypos_line[i] = 16 * i;
-		CortBox2(&gRect_line, 0x000000, (Surface_Ids)(i + SURFACE_ID_TEXT_LINE1));
+		CortBox2(&gRect_line, 0x000000, (SurfaceID)(i + SURFACE_ID_TEXT_LINE1));
 		memset(&text[i * 0x40], 0, 0x40);
 	}
 
@@ -331,7 +331,7 @@ void CheckNewLine()
 	{
 		gTS.mode = 3;
 		g_GameFlags |= 4;
-		CortBox2(&gRect_line, 0, (Surface_Ids)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
+		CortBox2(&gRect_line, 0, (SurfaceID)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
 		memset(&text[gTS.line % 4 * 0x40], 0, 0x40);
 	}
 }
@@ -376,7 +376,7 @@ void SetNumberTextScript(int index)
 	str[offset + 1] = 0;
 
 	//Append number to line
-	PutText2(6 * gTS.p_write, 0, str, RGB(0xFF, 0xFF, 0xFE), (Surface_Ids)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
+	PutText2(6 * gTS.p_write, 0, str, RGB(0xFF, 0xFF, 0xFE), (SurfaceID)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
 	strcat(&text[gTS.line % 4 * 0x40], str);
 
 	//Play sound and reset blinking cursor
@@ -404,7 +404,7 @@ void ClearTextLine()
 	for (int i = 0; i < 4; i++)
 	{
 		gTS.ypos_line[i] = 16 * i;
-		CortBox2(&gRect_line, 0x000000, (Surface_Ids)(i + SURFACE_ID_TEXT_LINE1));
+		CortBox2(&gRect_line, 0x000000, (SurfaceID)(i + SURFACE_ID_TEXT_LINE1));
 		memset(&text[i * 0x40], 0, 0x40);
 	}
 }
@@ -464,7 +464,14 @@ void PutTextScript()
 	if (gTS.face_x < (TEXT_LEFT * 0x200))
 		gTS.face_x += 0x1000;
 
+#ifdef FIX_BUGS
+	gTS.rcText.top -= 2;
+	PutBitmap3(&gTS.rcText, gTS.face_x / 0x200, gTS.rcText.top, &rcFace, SURFACE_ID_FACE);
+	gTS.rcText.top += 2;
+#else
+	// The top few rows of pixels are cut off by the clip rectangle, and the facepic is off-centre
 	PutBitmap3(&gTS.rcText, gTS.face_x / 0x200, gTS.rcText.top - 3, &rcFace, SURFACE_ID_FACE);
+#endif
 
 	//Draw text
 	if (gTS.face)
@@ -473,7 +480,7 @@ void PutTextScript()
 		text_offset = 0;
 
 	for (i = 0; i < 4; i++)
-		PutBitmap3(&gTS.rcText, text_offset + TEXT_LEFT, gTS.offsetY + gTS.ypos_line[i] + gTS.rcText.top, &gRect_line, (Surface_Ids)(i + SURFACE_ID_TEXT_LINE1));
+		PutBitmap3(&gTS.rcText, text_offset + TEXT_LEFT, gTS.offsetY + gTS.ypos_line[i] + gTS.rcText.top, &gRect_line, (SurfaceID)(i + SURFACE_ID_TEXT_LINE1));
 
 	//Draw NOD cursor
 	if ((gTS.wait_beam++ % 20 > 12) && gTS.mode == 2)
@@ -558,7 +565,7 @@ int TextScriptProc()
 	char c[3];
 	int w, x, y, z;
 	int i;
-	int length;
+	char str[72];
 
 	RECT rcSymbol = {64, 48, 72, 56};
 
@@ -637,8 +644,14 @@ int TextScriptProc()
 					{
 						w = GetTextScriptNo(gTS.p_read + 4);
 						x = GetTextScriptNo(gTS.p_read + 9);
+
+						// Looks like Pixel left some debug code in. Oops.
 						gNumberTextScript[0] = x;
+					#ifndef FIX_BUGS
+						// z is uninitialised. Probably a leftover from copypasting.
 						gNumberTextScript[1] = z;
+					#endif
+
 						PlaySoundObject(38, 1);
 						AddArmsData(w, x);
 						gTS.p_read += 13;
@@ -694,13 +707,20 @@ int TextScriptProc()
 						y = GetTextScriptNo(gTS.p_read + 19);
 						if (!TransferStage(z, w, x, y))
 						{
-							#ifdef JAPANESE
-							SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "ÉGÉâÅ[", "ÉXÉeÅ[ÉWÇÃì«Ç›çûÇ›Ç…é∏îs", NULL);
+							#if defined(NONPORTABLE) && defined(WINDOWS)
+								#ifdef JAPANESE
+								MessageBoxA(ghWnd, "\x83\x58\x83\x65\x81\x5B\x83\x57\x82\xCC\x93\xC7\x82\xDD\x8D\x9E\x82\xDD\x82\xC9\x8E\xB8\x94\x73", "\x83\x47\x83\x89\x81\x5B", MB_OK);
+								#else
+								MessageBoxA(ghWnd, "Failed to load stage", "Error", MB_OK);
+								#endif
 							#else
-							SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Failed to load stage", NULL);
+								#ifdef JAPANESE
+								SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "„Ç®„É©„Éº", "„Çπ„ÉÜ„Éº„Ç∏„ÅÆË™≠„ÅøËæº„Åø„Å´Â§±Êïó", NULL);
+								#else
+								SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Failed to load stage", NULL);
+								#endif
 							#endif
 
-							//MessageBoxA(ghWnd, "ÉXÉeÅ[ÉWÇÃì«Ç›çûÇ›Ç…é∏îs", "ÉGÉâÅ[", 0);
 							return 0;
 						}
 					}
@@ -942,7 +962,12 @@ int TextScriptProc()
 					}
 					else if (IS_COMMAND('S','P','S'))
 					{
+					#ifdef FIX_BUGS
+						SetNoise(2, 0);
+					#else
+						// x is not initialised. This bug isn't too bad, since that parameter's not used when the first one is set to 2, but still.
 						SetNoise(2, x);
+					#endif
 						gTS.p_read += 4;
 					}
 					else if (IS_COMMAND('C','P','S'))
@@ -1011,7 +1036,7 @@ int TextScriptProc()
 					else if (IS_COMMAND('C','M','U'))
 					{
 						z = GetTextScriptNo(gTS.p_read + 4);
-						ChangeMusic(z);
+						ChangeMusic((MusicID)z);
 						gTS.p_read += 8;
 					}
 					else if (IS_COMMAND('F','M','U'))
@@ -1157,7 +1182,7 @@ int TextScriptProc()
 					}
 					else if (IS_COMMAND('I','N','I'))
 					{
-						InitializeGame();
+						InitializeGame(ghWnd);
 						gTS.p_read += 4;
 					}
 					else if (IS_COMMAND('S','V','P'))
@@ -1168,7 +1193,7 @@ int TextScriptProc()
 					else if (IS_COMMAND('L','D','P'))
 					{
 						if (!LoadProfile(NULL))
-							InitializeGame();
+							InitializeGame(ghWnd);
 					}
 					else if (IS_COMMAND('F','A','C'))
 					{
@@ -1180,7 +1205,7 @@ int TextScriptProc()
 						}
 						gTS.p_read += 8;
 					}
-					else if (IS_COMMAND('F','A','C'))
+					else if (IS_COMMAND('F','A','C'))	// Duplicate command
 					{
 						z = GetTextScriptNo(gTS.p_read + 4);
 						if (gTS.face != (signed char)z)
@@ -1199,6 +1224,11 @@ int TextScriptProc()
 					}
 					else if (IS_COMMAND('N','U','M'))
 					{
+						// This seems to be a command used for debugging TSC scripts:
+						// It prints a selected char in the gNumberTextScript array.
+						// gNumberTextScript is only used by the '<AM+' command, and
+						// even then, part of it's assigned to an uninitialised
+						// variable, while the other half of it is completely unused.
 						z = GetTextScriptNo(gTS.p_read + 4);
 						SetNumberTextScript(z);
 						gTS.p_read += 8;
@@ -1243,14 +1273,21 @@ int TextScriptProc()
 					{
 						char str_0[0x40];
 						#ifdef JAPANESE
-						sprintf(str_0, "ïsñæÇÃÉRÅ[Éh:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);
-						SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "ÉGÉâÅ[", str_0, NULL);
+							#if defined(NONPORTABLE) && defined(WINDOWS)
+								sprintf(str_0, "\x95\x73\x96\xBE\x82\xCC\x83\x52\x81\x5B\x83\x68:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);
+								MessageBoxA(NULL, str_0, "\x83\x47\x83\x89\x81\x5B", MB_OK);
+							#else
+								sprintf(str_0, "‰∏çÊòé„ÅÆ„Ç≥„Éº„Éâ:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);
+								SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "„Ç®„É©„Éº", str_0, NULL);
+							#endif
 						#else
-						sprintf(str_0, "Unknown code:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);
-						SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", str_0, NULL);
+							sprintf(str_0, "Unknown code:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);
+							#if defined(NONPORTABLE) && defined(WINDOWS)
+								MessageBoxA(NULL, str_0, "Error", MB_OK);
+							#else
+								SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", str_0, NULL);
+							#endif
 						#endif
-
-						//MessageBoxA(0, str_0, "ÉGÉâÅ[", 0);
 
 						return 0;
 					}
@@ -1272,7 +1309,6 @@ int TextScriptProc()
 					else if (gTS.flags & 0x10)
 					{
 						//SAT/CAT/TUR printing
-						char str[72];
 						x = gTS.p_read;
 						//Break if reaches command, or new-line
 						while (gTS.data[x] != '<' && gTS.data[x] != '\r')
@@ -1285,18 +1321,22 @@ int TextScriptProc()
 						}
 
 						//Get text to copy
-						length = x - gTS.p_read;
-						memcpy(str, &gTS.data[gTS.p_read], length);
-						str[length] = 0;
+						y = x - gTS.p_read;
+						memcpy(str, &gTS.data[gTS.p_read], y);
+						str[y] = 0;
 
 						gTS.p_write = x;
 
 						//Print text
-						PutText2(0, 0, str, RGB(0xFF, 0xFF, 0xFE), (Surface_Ids)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
-						sprintf(&text[gTS.line % 4 * 0x40], str);
+						PutText2(0, 0, str, RGB(0xFF, 0xFF, 0xFE), (SurfaceID)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
+					#ifdef FIX_BUGS
+						strcpy(&text[gTS.line % 4 * 0x40], str);
+					#else
+						sprintf(&text[gTS.line % 4 * 0x40], str);	// No point to using an sprintf here, and it makes Clang mad
+					#endif
 
 						//Check if should move to next line (prevent a memory overflow, come on guys, this isn't a leftover of pixel trying to make text wrapping)
-						gTS.p_read += length;
+						gTS.p_read += y;
 
 						if (gTS.p_write >= 35)
 							CheckNewLine();
@@ -1321,11 +1361,11 @@ int TextScriptProc()
 						//Print text
 						if (c[0] == '=')
 						{
-							Surface2Surface(6 * gTS.p_write, 2, &rcSymbol, (Surface_Ids)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1), SURFACE_ID_TEXT_BOX);
+							Surface2Surface(6 * gTS.p_write, 2, &rcSymbol, (SurfaceID)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1), SURFACE_ID_TEXT_BOX);
 						}
 						else
 						{
-							PutText2(6 * gTS.p_write, 0, c, RGB(0xFF, 0xFF, 0xFE), (Surface_Ids)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
+							PutText2(6 * gTS.p_write, 0, c, RGB(0xFF, 0xFF, 0xFE), (SurfaceID)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
 						}
 
 						strcat(&text[gTS.line % 4 * 0x40], c);
@@ -1447,4 +1487,13 @@ int TextScriptProc()
 	else
 		g_GameFlags |= 4;
 	return 1;
+}
+
+void RestoreTextScript()
+{
+	for (int i = 0; i < 4; ++i)
+	{
+		CortBox2(&gRect_line, 0x000000, (SurfaceID)(i + SURFACE_ID_TEXT_LINE1));
+		PutText2(0, 0, &text[i * 0x40], RGB(0xFF, 0xFF, 0xFE), (SurfaceID)(i + SURFACE_ID_TEXT_LINE1));
+	}
 }

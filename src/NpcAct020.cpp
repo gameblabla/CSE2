@@ -465,7 +465,7 @@ void ActNpc026(NPCHAR *npc)
 					npc->xm /= 2;
 					npc->ym = 0;
 					npc->act_no = 3;
-					npc->bits &= ~8;
+					npc->bits &= ~NPC_IGNORE_SOLIDITY;
 				}
 			}
 
@@ -482,7 +482,7 @@ void ActNpc026(NPCHAR *npc)
 				npc->xm *= 2;
 				npc->count1 = 0;
 				npc->act_no = 1;
-				npc->bits |= 8;
+				npc->bits |= NPC_IGNORE_SOLIDITY;
 			}
 
 			break;
@@ -1027,7 +1027,7 @@ void ActNpc035(NPCHAR *npc)
 		npc->act_no = 3;
 		npc->act_wait = 0;
 		npc->ani_no = 2;
-		npc->bits &= ~0x20;
+		npc->bits &= ~NPC_SHOOTABLE;
 		npc->damage = 0;
 	}
 

@@ -556,8 +556,36 @@ name = "ResetQuake"
 addr = 0x40F330
 
 [[func]]
+name = "Random"
+addr = 0x40F350
+
+[[func]]
+name = "PutNumber4"
+addr = 0x40F380
+
+[[func]]
+name = "Game"
+addr = 0x40F5F0
+
+[[func]]
+name = "ModeOpening"
+addr = 0x40F730
+
+[[func]]
+name = "ModeTitle"
+addr = 0x40F9B0
+
+[[func]]
+name = "ModeAction"
+addr = 0x410400
+
+[[func]]
 name = "LoadGenericData"
 addr = 0x411390
+
+[[func]]
+name = "GetTrg"
+addr = 0x4122E0
 
 [[func]]
 name = "InitMapData2"
@@ -1039,6 +1067,21 @@ name = "PlaySoundObject"
 addr = 0x420640
 
 [[func]]
+name = "ChangeSoundFrequency"
+addr = 0x420720
+size = 0x34
+
+[[func]]
+name = "ChangeSoundVolume"
+addr = 0x420760
+size = 0x35
+
+[[func]]
+name = "ChangeSoundPan"
+addr = 0x4207A0
+size = 0x36
+
+[[func]]
 name = "TransferStage"
 addr = 0x420BE0
 
@@ -1121,6 +1164,10 @@ addr = 0x421F10
 [[func]]
 name = "TextScriptProc"
 addr = 0x422510
+
+[[func]]
+name = "RestoreTextScript"
+addr = 0x425790
 
 [[func]]
 name = "InitTriangleTable"

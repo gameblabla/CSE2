@@ -1,3 +1,5 @@
+#include "Draw.h"
+
 #include <stddef.h>
 #include <stdio.h>
 #ifdef WINDOWS
@@ -5,38 +7,26 @@
 #endif
 #include <string.h>
 
-#ifdef WINDOWS
-#define RECT WINRECT
-#define FindResource WinFindResource	// All these damn name collisions...
-#define DrawText WinDrawText
-#define LoadFont WinLoadFont
-#include <windows.h>
-#undef LoadFont
-#undef DrawText
-#undef FindResource
-#undef RECT
-#endif
-
 #include "SDL.h"
 
 #include "WindowsWrapper.h"
 
 #include "CommonDefines.h"
-#include "Draw.h"
 #include "Font.h"
 #include "Resource.h"
 #include "Tags.h"
+#include "Backends/Rendering.h"
 
-struct SURFACE
+typedef enum SurfaceType
 {
-	BOOL in_use;
-	BOOL needs_updating;
-	SDL_Surface *surface;
-	SDL_Texture *texture;
-};
+	SURFACE_SOURCE_NONE = 1,
+	SURFACE_SOURCE_RESOURCE,
+	SURFACE_SOURCE_FILE
+} SurfaceType;
 
 SDL_Window *gWindow;
-SDL_Renderer *gRenderer;
+
+static SDL_PixelFormat *rgb24_pixel_format;	// Needed because SDL2 is stupid
 
 RECT grcGame = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 RECT grcFull = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
@@ -44,13 +34,24 @@ RECT grcFull = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 int magnification;
 BOOL fullscreen;
 
-SURFACE surf[SURFACE_ID_MAX];
+static Backend_Surface *surf[SURFACE_ID_MAX];
+static Backend_Surface *framebuffer;
 
-FontObject *gFont;
+static FontObject *gFont;
+
+// This doesn't exist in the Linux port, so none of these symbol names are accurate
+static struct
+{
+	char name[20];
+	unsigned int width;
+	unsigned int height;
+	SurfaceType type;
+	BOOL bSystem;	// Basically a 'do not regenerate' flag
+} surface_metadata[SURFACE_ID_MAX];
 
 #define FRAMERATE 20
 
-BOOL Flip_SystemTask(int hWnd)
+BOOL Flip_SystemTask(HWND hWnd)
 {
 	(void)hWnd;
 
@@ -76,180 +77,115 @@ BOOL Flip_SystemTask(int hWnd)
 		SDL_Delay(1);
 	}
 
-	SDL_RenderPresent(gRenderer);
+	Backend_DrawScreen();
+
 	return TRUE;
+}
+
+SDL_Window* CreateWindow(const char *title, int width, int height)
+{
+	return Backend_CreateWindow(title, width, height);
 }
 
 BOOL StartDirectDraw(int lMagnification, int lColourDepth)
 {
-	(void)lColourDepth;
+	(void)lColourDepth;	// There's no way I'm supporting a bunch of different colour depths
 
-	// Initialize rendering
-	SDL_InitSubSystem(SDL_INIT_VIDEO);
+	memset(surface_metadata, 0, sizeof(surface_metadata));
 
-	// Create renderer
-	gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED);
-
-	if (gRenderer != NULL)
+	switch (lMagnification)
 	{
-		// Print the name of the renderer SDL2 is using
-		SDL_RendererInfo info;
-		SDL_GetRendererInfo(gRenderer, &info);
-		printf("Renderer: %s\n", info.name);
+		case 0:
+			magnification = 1;
+			fullscreen = FALSE;
+			break;
 
-		switch (lMagnification)
-		{
-			case 0:
-				magnification = 1;
-				fullscreen = FALSE;
-				break;
+		case 1:
+			magnification = 2;
+			fullscreen = FALSE;
+			break;
 
-			case 1:
-				magnification = 2;
-				fullscreen = FALSE;
-				break;
-
-			case 2:
-				magnification = 2;
-				fullscreen = TRUE;
-				SDL_SetWindowFullscreen(gWindow, SDL_WINDOW_FULLSCREEN);
-				break;
-		}
-
+		case 2:
+			magnification = 2;
+			fullscreen = TRUE;
+			SDL_SetWindowFullscreen(gWindow, SDL_WINDOW_FULLSCREEN);
+			break;
 	}
+
+	rgb24_pixel_format = SDL_AllocFormat(SDL_PIXELFORMAT_RGB24);
+
+	framebuffer = Backend_Init(gWindow);
+
+	if (framebuffer == NULL)
+		return FALSE;
 
 	return TRUE;
 }
 
 void EndDirectDraw()
 {
-	// Quit sub-system
-	SDL_QuitSubSystem(SDL_INIT_VIDEO);
-
 	// Release all surfaces
-	for (int i = 0; i < SURFACE_ID_MAX; i++)
-		ReleaseSurface(i);
+	for (int i = 0; i < SURFACE_ID_MAX; ++i)
+	{
+		if (surf[i])
+		{
+			Backend_FreeSurface(surf[i]);
+			surf[i] = NULL;
+		}
+	}
+
+	Backend_Deinit();
+
+	SDL_FreeFormat(rgb24_pixel_format);
+
+	memset(surface_metadata, 0, sizeof(surface_metadata));
 }
 
-static BOOL IsEnableBitmap(SDL_RWops *fp)
+static BOOL IsEnableBitmap(const unsigned char *data, size_t data_size)
 {
-	char str[16];
 	const char *extra_text = "(C)Pixel";
 
 	const size_t len = strlen(extra_text);
 
-	fp->seek(fp, -(Sint64)len, RW_SEEK_END);
-	fp->read(fp, str, 1, len);
-	fp->seek(fp, 0, RW_SEEK_SET);
-	return memcmp(str, extra_text, len) == 0;
+	if (data_size < len)
+		return FALSE;
+
+	return memcmp(data + data_size - len, extra_text, len) == 0;
 }
 
 void ReleaseSurface(int s)
 {
 	// Release the surface we want to release
-	if (surf[s].in_use)
+	if (surf[s])
 	{
-		SDL_DestroyTexture(surf[s].texture);
-		SDL_FreeSurface(surf[s].surface);
-		surf[s].in_use = FALSE;
+		Backend_FreeSurface(surf[s]);
+		surf[s] = NULL;
 	}
+
+	memset(&surface_metadata[s], 0, sizeof(surface_metadata[0]));
 }
 
-BOOL MakeSurface_Generic(int bxsize, int bysize, Surface_Ids surf_no, BOOL bSystem)
-{
-	(void)bSystem;
-
-	BOOL success = FALSE;
-
-#ifdef FIX_BUGS
-	if (surf_no >= SURFACE_ID_MAX)
-#else
-	if (surf_no > SURFACE_ID_MAX)	// OOPS (should be '>=')
-#endif
-	{
-		printf("Tried to create drawable surface at invalid slot (%d - maximum is %d)\n", surf_no, SURFACE_ID_MAX);
-	}
-	else
-	{
-		if (surf[surf_no].in_use == TRUE)
-		{
-			printf("Tried to create drawable surface at occupied slot (%d)\n", surf_no);
-		}
-		else
-		{
-			// Create surface
-			surf[surf_no].surface = SDL_CreateRGBSurfaceWithFormat(0, bxsize * magnification, bysize * magnification, 0, SDL_PIXELFORMAT_RGB24);
-			SDL_SetSurfaceBlendMode(surf[surf_no].surface, SDL_BLENDMODE_NONE);
-
-			if (surf[surf_no].surface == NULL)
-			{
-				printf("Failed to create drawable surface %d (SDL_CreateRGBSurfaceWithFormat)\nSDL Error: %s\n", surf_no, SDL_GetError());
-			}
-			else
-			{
-				surf[surf_no].texture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STREAMING, bxsize * magnification, bysize * magnification);
-
-				if (surf[surf_no].texture == NULL)
-				{
-					printf("Failed to create drawable surface %d (SDL_CreateTexture)\nSDL Error: %s\n", surf_no, SDL_GetError());
-					SDL_FreeSurface(surf[surf_no].surface);
-				}
-				else
-				{
-					surf[surf_no].in_use = TRUE;
-					success = TRUE;
-				}
-			}
-		}
-	}
-
-	return success;
-}
-
-static void FlushSurface(Surface_Ids surf_no)
-{
-	unsigned char *raw_pixels;
-	int pitch;
-	SDL_LockTexture(surf[surf_no].texture, NULL, (void**)&raw_pixels, &pitch);
-
-	for (int h = 0; h < surf[surf_no].surface->h; ++h)
-	{
-		for (int w = 0; w < surf[surf_no].surface->w; ++w)
-		{
-			unsigned char *src_pixel = (unsigned char*)surf[surf_no].surface->pixels + (h * surf[surf_no].surface->pitch) + (w * 3);
-			unsigned char *dst_pixel = (unsigned char*)raw_pixels + (h * pitch) + (w * 4);
-
-			dst_pixel[0] = src_pixel[0];
-			dst_pixel[1] = src_pixel[1];
-			dst_pixel[2] = src_pixel[2];
-
-			if (src_pixel[0] || src_pixel[1] || src_pixel[2])	// Colour-key
-				dst_pixel[3] = 0xFF;
-			else
-				dst_pixel[3] = 0;
-		}
-	}
-
-	SDL_UnlockTexture(surf[surf_no].texture);
-}
-
-static BOOL LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, BOOL create_surface)
+static BOOL LoadBitmap(const unsigned char *data, size_t data_size, SurfaceID surf_no, BOOL create_surface, const char *name, SurfaceType type)
 {
 	BOOL success = FALSE;
 
 	if (surf_no >= SURFACE_ID_MAX)
 	{
-		printf("Tried to load bitmap at invalid slot (%d - maximum is %d\n", surf_no, SURFACE_ID_MAX);
+		printf("Tried to load bitmap at invalid slot (%d - maximum is %d)\n", surf_no, SURFACE_ID_MAX);
 	}
 	else
 	{
-		if (create_surface && surf[surf_no].in_use)
+		if (create_surface && surf[surf_no])
 		{
 			printf("Tried to create drawable surface at occupied slot (%d)\n", surf_no);
 		}
 		else
 		{
-			SDL_Surface *surface = SDL_LoadBMP_RW(fp, 0);
+			// For some dumbass reason, SDL2 measures size with a signed int.
+			// Has anyone ever told the devs that an int can be as little as 16 bits long? Real portable.
+			// But hey, if I ever need to create an RWops from an array that's -32768 bytes long, they've got me covered!
+			SDL_RWops *fp = SDL_RWFromConstMem(data, data_size);
+			SDL_Surface *surface = SDL_LoadBMP_RW(fp, 1);
 
 			if (surface == NULL)
 			{
@@ -259,34 +195,42 @@ static BOOL LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, BOOL create_surface)
 			{
 				if (create_surface == FALSE || MakeSurface_Generic(surface->w, surface->h, surf_no, FALSE))
 				{
-					if (magnification == 1)
+
+					SDL_Surface *converted_surface = SDL_ConvertSurface(surface, rgb24_pixel_format, 0);
+
+					if (converted_surface == NULL)
 					{
-						SDL_Rect dst_rect = {0, 0, surface->w, surface->h};
-						SDL_BlitSurface(surface, NULL, surf[surf_no].surface, &dst_rect);
-						surf[surf_no].needs_updating = TRUE;
-						printf(" ^ Successfully loaded\n");
-						success = TRUE;
+						printf("Couldn't convert bitmap to surface format (surface id %d)\nSDL Error: %s\n", surf_no, SDL_GetError());
 					}
 					else
 					{
-						SDL_Surface *converted_surface = SDL_ConvertSurface(surface, surf[surf_no].surface->format, 0);
+						// IF YOU WANT TO ADD HD SPRITES, THIS IS THE CODE YOU SHOULD EDIT
+						unsigned int pitch;
+						unsigned char *pixels = Backend_LockSurface(surf[surf_no], &pitch);
 
-						if (converted_surface == NULL)
+						if (magnification == 1)
 						{
-							printf("Couldn't convert bitmap to surface format (surface id %d)\nSDL Error: %s\n", surf_no, SDL_GetError());
+							// Just copy the pixels the way they are
+							for (int y = 0; y < converted_surface->h; ++y)
+							{
+								const unsigned char *src_row = (unsigned char*)converted_surface->pixels + y * converted_surface->pitch;
+								unsigned char *dst_row = &pixels[y * pitch];
+
+								memcpy(dst_row, src_row, converted_surface->w * 3);
+							}
 						}
 						else
 						{
-							// Upscale the bitmap to the game's native resolution (SDL_BlitScaled is buggy, so we have to do it on our own)
-							for (int h = 0; h < converted_surface->h; ++h)
+							// Upscale the bitmap to the game's internal resolution
+							for (int y = 0; y < converted_surface->h; ++y)
 							{
-								const unsigned char *src_row = (unsigned char*)converted_surface->pixels + h * converted_surface->pitch;
-								unsigned char *dst_row = (unsigned char*)surf[surf_no].surface->pixels + h * surf[surf_no].surface->pitch * magnification;
+								const unsigned char *src_row = (unsigned char*)converted_surface->pixels + y * converted_surface->pitch;
+								unsigned char *dst_row = &pixels[y * pitch * magnification];
 
 								const unsigned char *src_ptr = src_row;
 								unsigned char *dst_ptr = dst_row;
 
-								for (int w = 0; w < converted_surface->w; ++w)
+								for (int x = 0; x < converted_surface->w; ++x)
 								{
 									for (int i = 0; i < magnification; ++i)
 									{
@@ -299,14 +243,25 @@ static BOOL LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, BOOL create_surface)
 								}
 
 								for (int i = 1; i < magnification; ++i)
-									memcpy(dst_row + i * surf[surf_no].surface->pitch, dst_row, surf[surf_no].surface->w * 3);
+									memcpy(dst_row + i * pitch, dst_row, converted_surface->w * magnification * 3);
 							}
-
-							SDL_FreeSurface(converted_surface);
-							surf[surf_no].needs_updating = TRUE;
-							printf(" ^ Successfully loaded\n");
-							success = TRUE;
 						}
+
+						Backend_UnlockSurface(surf[surf_no]);
+						SDL_FreeSurface(converted_surface);
+
+						surface_metadata[surf_no].type = type;
+
+						if (create_surface)
+						{
+							surface_metadata[surf_no].width = surface->w;
+							surface_metadata[surf_no].height = surface->h;
+							surface_metadata[surf_no].bSystem = FALSE;
+						}
+
+						strcpy(surface_metadata[surf_no].name, name);
+
+						success = TRUE;
 					}
 				}
 
@@ -315,208 +270,286 @@ static BOOL LoadBitmap(SDL_RWops *fp, Surface_Ids surf_no, BOOL create_surface)
 		}
 	}
 
-	fp->close(fp);
-
 	return success;
 }
 
-static BOOL LoadBitmap_File(const char *name, Surface_Ids surf_no, BOOL create_surface)
+static unsigned char* LoadFileToMemory(const char *path, size_t *size)
+{
+	FILE *fp = fopen(path, "rb");
+	if (fp == NULL)
+		return NULL;
+
+	fseek(fp, 0, SEEK_END);
+	*size = ftell(fp);
+	rewind(fp);
+	unsigned char *data = (unsigned char *)malloc(*size);
+	fread(data, 1, *size, fp);
+	fclose(fp);
+
+	return data;
+}
+
+static BOOL LoadBitmap_File(const char *name, SurfaceID surf_no, BOOL create_surface)
 {
 	char path[PATH_LENGTH];
-	SDL_RWops *fp;
+	unsigned char *data;
+	size_t size;
 
 	// Attempt to load PBM
 	sprintf(path, "%s/%s.pbm", gDataPath, name);
-	fp = SDL_RWFromFile(path, "rb");
-	if (fp)
+	data = LoadFileToMemory(path, &size);
+	if (data != NULL)
 	{
-		if (!IsEnableBitmap(fp))
+		if (!IsEnableBitmap(data, size))
 		{
 			printf("Tried to load bitmap to surface %d, but it's missing the '(C)Pixel' string\n", surf_no);
-			fp->close(fp);
 		}
 		else
 		{
-			printf("Loading surface (as .pbm) from %s for surface id %d\n", path, surf_no);
-			if (LoadBitmap(fp, surf_no, create_surface))
+			if (LoadBitmap(data, size, surf_no, create_surface, name, SURFACE_SOURCE_FILE))
+			{
+				free(data);
 				return TRUE;
+			}
 		}
+
+		free(data);
 	}
 
 	// Attempt to load BMP
 	sprintf(path, "%s/%s.bmp", gDataPath, name);
-	fp = SDL_RWFromFile(path, "rb");
-	if (fp)
+	data = LoadFileToMemory(path, &size);
+	if (data != NULL)
 	{
-		printf("Loading surface (as .bmp) from %s for surface id %d\n", path, surf_no);
-		if (LoadBitmap(fp, surf_no, create_surface))
+		if (LoadBitmap(data, size, surf_no, create_surface, name, SURFACE_SOURCE_FILE))
+		{
+			free(data);
 			return TRUE;
+		}
+
+		free(data);
 	}
 
 	printf("Failed to open file %s\n", name);
 	return FALSE;
 }
 
-static BOOL LoadBitmap_Resource(const char *res, Surface_Ids surf_no, BOOL create_surface)
+static BOOL LoadBitmap_Resource(const char *res, SurfaceID surf_no, BOOL create_surface)
 {
 	size_t size;
 	const unsigned char *data = FindResource(res, "BITMAP", &size);
 
 	if (data)
-	{
-		// For some dumbass reason, SDL2 measures size with a signed int.
-		// Has anyone ever told the devs that an int can be as little as 16 bits long? Real portable.
-		// But hey, if I ever need to create an RWops from an array that's -32768 bytes long, they've got me covered!
-		SDL_RWops *fp = SDL_RWFromConstMem(data, size);
-
-		printf("Loading surface from resource %s for surface id %d\n", res, surf_no);
-		if (LoadBitmap(fp, surf_no, create_surface))
+		if (LoadBitmap(data, size, surf_no, create_surface, res, SURFACE_SOURCE_RESOURCE))
 			return TRUE;
-	}
 
 	printf("Failed to open resource %s\n", res);
 	return FALSE;
 }
 
-BOOL MakeSurface_File(const char *name, Surface_Ids surf_no)
+BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 {
 	return LoadBitmap_File(name, surf_no, TRUE);
 }
 
-BOOL MakeSurface_Resource(const char *res, Surface_Ids surf_no)
+BOOL MakeSurface_Resource(const char *res, SurfaceID surf_no)
 {
 	return LoadBitmap_Resource(res, surf_no, TRUE);
 }
 
-BOOL ReloadBitmap_File(const char *name, Surface_Ids surf_no)
+BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 {
 	return LoadBitmap_File(name, surf_no, FALSE);
 }
 
-BOOL ReloadBitmap_Resource(const char *res, Surface_Ids surf_no)
+BOOL ReloadBitmap_Resource(const char *res, SurfaceID surf_no)
 {
 	return LoadBitmap_Resource(res, surf_no, FALSE);
 }
 
-static SDL_Rect RectToSDLRect(RECT *rect)
+BOOL MakeSurface_Generic(int bxsize, int bysize, SurfaceID surf_no, BOOL bSystem)
 {
-	SDL_Rect SDLRect = {rect->left, rect->top, rect->right - rect->left, rect->bottom - rect->top};
-	if (SDLRect.w < 0)
-		SDLRect.w = 0;
-	if (SDLRect.h < 0)
-		SDLRect.h = 0;
-	return SDLRect;
-}
+	BOOL success = FALSE;
 
-static SDL_Rect RectToSDLRectScaled(RECT *rect)
-{
-	SDL_Rect SDLRect = RectToSDLRect(rect);
-	SDLRect.x *= magnification;
-	SDLRect.y *= magnification;
-	SDLRect.w *= magnification;
-	SDLRect.h *= magnification;
-	return SDLRect;
-}
-
-void BackupSurface(Surface_Ids surf_no, RECT *rect)
-{
-	// Get renderer size
-	int w, h;
-	SDL_GetRendererOutputSize(gRenderer, &w, &h);
-
-	// Get texture of what's currently rendered on screen
-	SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormat(0, w, h, 0, SDL_PIXELFORMAT_RGB24);
-	SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_NONE);
-	SDL_RenderReadPixels(gRenderer, NULL, SDL_PIXELFORMAT_RGB24, surface->pixels, surface->pitch);
-
-	// Get rects
-	SDL_Rect frameRect = RectToSDLRectScaled(rect);
-
-	SDL_BlitSurface(surface, &frameRect, surf[surf_no].surface, &frameRect);
-	surf[surf_no].needs_updating = TRUE;
-
-	// Free surface
-	SDL_FreeSurface(surface);
-}
-
-static void DrawBitmap(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_no, BOOL transparent)
-{
-	if (surf[surf_no].needs_updating)
+#ifdef FIX_BUGS
+	if (surf_no >= SURFACE_ID_MAX)
+#else
+	if (surf_no > SURFACE_ID_MAX)	// OOPS (should be '>=')
+#endif
 	{
-		FlushSurface(surf_no);
-		surf[surf_no].needs_updating = FALSE;
+		printf("Tried to create drawable surface at invalid slot (%d - maximum is %d)\n", surf_no, SURFACE_ID_MAX);
+	}
+	else
+	{
+		if (surf[surf_no])
+		{
+			printf("Tried to create drawable surface at occupied slot (%d)\n", surf_no);
+		}
+		else
+		{
+			// Create surface
+			surf[surf_no] = Backend_CreateSurface(bxsize * magnification, bysize * magnification);
+
+			if (surf[surf_no] == NULL)
+			{
+				printf("Failed to create backend surface %d\n", surf_no);
+			}
+			else
+			{
+				surface_metadata[surf_no].type = SURFACE_SOURCE_NONE;
+				surface_metadata[surf_no].width = bxsize;
+				surface_metadata[surf_no].height = bysize;
+				surface_metadata[surf_no].bSystem = bSystem;
+				strcpy(surface_metadata[surf_no].name, "generic");
+
+				success = TRUE;
+			}
+		}
 	}
 
-	// Get SDL_Rects
-	SDL_Rect clipRect = RectToSDLRectScaled(rcView);
-	SDL_Rect frameRect = RectToSDLRectScaled(rect);
-
-	// Get destination rect
-	SDL_Rect destRect = {x * magnification, y * magnification, frameRect.w, frameRect.h};
-
-	// Set cliprect
-	SDL_RenderSetClipRect(gRenderer, &clipRect);
-
-	SDL_SetTextureBlendMode(surf[surf_no].texture, transparent ? SDL_BLENDMODE_BLEND : SDL_BLENDMODE_NONE);
-
-	// Draw to screen
-	if (SDL_RenderCopy(gRenderer, surf[surf_no].texture, &frameRect, &destRect) < 0)
-		printf("Failed to draw texture %d\nSDL Error: %s\n", surf_no, SDL_GetError());
-
-	// Undo cliprect
-	SDL_RenderSetClipRect(gRenderer, NULL);
+	return success;
 }
 
-void PutBitmap3(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_no) // Transparency
+static void ScaleRect(const RECT *source_rect, RECT *destination_rect)
+{
+	destination_rect->left = source_rect->left * magnification;
+	destination_rect->top = source_rect->top * magnification;
+	destination_rect->right = source_rect->right * magnification;
+	destination_rect->bottom = source_rect->bottom * magnification;
+}
+
+void BackupSurface(SurfaceID surf_no, const RECT *rect)
+{
+	RECT frameRect;
+	ScaleRect(rect, &frameRect);
+
+	Backend_Blit(framebuffer, &frameRect, surf[surf_no], frameRect.left, frameRect.top, FALSE);
+}
+
+static void DrawBitmap(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID surf_no, BOOL transparent)
+{
+	RECT frameRect;
+
+	frameRect.left = rect->left;
+	frameRect.top = rect->top;
+	frameRect.right = rect->right;
+	frameRect.bottom = rect->bottom;
+
+	if (x + (rect->right - rect->left) > rcView->right)
+	{
+		frameRect.right -= (x + (rect->right - rect->left)) - rcView->right;
+	}
+
+	if (x < rcView->left)
+	{
+		frameRect.left += rcView->left - x;
+		x = rcView->left;
+	}
+
+	if (y + (rect->bottom - rect->top) > rcView->bottom)
+	{
+		frameRect.bottom -= (y + (rect->bottom - rect->top)) - rcView->bottom;
+	}
+
+	if (y < rcView->top)
+	{
+		frameRect.top += rcView->top - y;
+		y = rcView->top;
+	}
+
+	frameRect.left *= magnification;
+	frameRect.top *= magnification;
+	frameRect.right *= magnification;
+	frameRect.bottom *= magnification;
+
+	// Draw to screen
+	Backend_Blit(surf[surf_no], &frameRect, framebuffer, x * magnification, y * magnification, transparent);
+}
+
+void PutBitmap3(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID surf_no) // Transparency
 {
 	DrawBitmap(rcView, x, y, rect, surf_no, TRUE);
 }
 
-void PutBitmap4(RECT *rcView, int x, int y, RECT *rect, Surface_Ids surf_no) // No Transparency
+void PutBitmap4(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID surf_no) // No Transparency
 {
 	DrawBitmap(rcView, x, y, rect, surf_no, FALSE);
 }
 
-void Surface2Surface(int x, int y, RECT *rect, int to, int from)
+void Surface2Surface(int x, int y, const RECT *rect, int to, int from)
 {
 	// Get rects
-	SDL_Rect rcSet = {x * magnification, y * magnification, (rect->right - rect->left) * magnification, (rect->bottom - rect->top) * magnification};
-	SDL_Rect frameRect = RectToSDLRectScaled(rect);
+	RECT frameRect;
+	ScaleRect(rect, &frameRect);
 
-	SDL_BlitSurface(surf[from].surface, &frameRect, surf[to].surface, &rcSet);
-	surf[to].needs_updating = TRUE;
+	Backend_Blit(surf[from], &frameRect, surf[to], x * magnification, y * magnification, TRUE);
 }
 
 unsigned long GetCortBoxColor(unsigned long col)
 {
-	// This comes in BGR, and goes out BGR
+	// In vanilla, this called a DirectDraw function to convert it to the 'native' colour type.
+	// Here, we just return the colour in its original BGR form.
 	return col;
 }
 
-void CortBox(RECT *rect, unsigned long col)
+void CortBox(const RECT *rect, unsigned long col)
 {
 	// Get rect
-	SDL_Rect destRect = RectToSDLRectScaled(rect);
+	RECT destRect;
+	ScaleRect(rect, &destRect);
 
 	// Set colour and draw
 	const unsigned char col_red = (unsigned char)(col & 0xFF);
 	const unsigned char col_green = (unsigned char)((col >> 8) & 0xFF);
 	const unsigned char col_blue = (unsigned char)((col >> 16) & 0xFF);
-	SDL_SetRenderDrawColor(gRenderer, col_red, col_green, col_blue, 0xFF);
-	SDL_RenderFillRect(gRenderer, &destRect);
+
+	Backend_ColourFill(framebuffer, &destRect, col_red, col_green, col_blue);
 }
 
-void CortBox2(RECT *rect, unsigned long col, Surface_Ids surf_no)
+void CortBox2(const RECT *rect, unsigned long col, SurfaceID surf_no)
 {
 	// Get rect
-	SDL_Rect destRect = RectToSDLRectScaled(rect);
+	RECT destRect;
+	ScaleRect(rect, &destRect);
 
 	// Set colour and draw
 	const unsigned char col_red = (unsigned char)(col & 0xFF);
 	const unsigned char col_green = (unsigned char)((col >> 8) & 0xFF);
 	const unsigned char col_blue = (unsigned char)((col >> 16) & 0xFF);
-	SDL_FillRect(surf[surf_no].surface, &destRect, SDL_MapRGB(surf[surf_no].surface->format, col_red, col_green, col_blue));
-	surf[surf_no].needs_updating = TRUE;
+
+	Backend_ColourFill(surf[surf_no], &destRect, col_red, col_green, col_blue);
+
+	surface_metadata[surf_no].type = SURFACE_SOURCE_NONE;
+}
+
+void RestoreSurfaces()	// Guessed function name - this doesn't exist in the Linux port
+{
+	RECT rect;
+
+	for (int i = 0; i < SURFACE_ID_MAX; ++i)
+	{
+		if (surf[i] && !surface_metadata[i].bSystem)
+		{
+			switch (surface_metadata[i].type)
+			{
+				case SURFACE_SOURCE_NONE:
+					rect.left = 0;
+					rect.top = 0;
+					rect.right = surface_metadata[i].width;
+					rect.bottom = surface_metadata[i].height;
+					CortBox2(&rect, 0, (SurfaceID)i);
+					break;
+
+				case SURFACE_SOURCE_RESOURCE:
+					ReloadBitmap_Resource(surface_metadata[i].name, (SurfaceID)i);
+					break;
+
+				case SURFACE_SOURCE_FILE:
+					ReloadBitmap_File(surface_metadata[i].name, (SurfaceID)i);
+					break;
+			}
+		}
+	}
 }
 
 #ifdef WINDOWS
@@ -620,24 +653,12 @@ void InitTextObject(const char *font_name)
 
 void PutText(int x, int y, const char *text, unsigned long color)
 {
-	int surface_width, surface_height;
-	SDL_GetRendererOutputSize(gRenderer, &surface_width, &surface_height);
-
-	SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormat(0, surface_width, surface_height, 0, SDL_PIXELFORMAT_RGB24);
-	SDL_RenderReadPixels(gRenderer, NULL, SDL_PIXELFORMAT_RGB24, surface->pixels, surface->pitch);
-
-	DrawText(gFont, (unsigned char*)surface->pixels, surface->pitch, surface->w, surface->h, x * magnification, y * magnification, color, text, strlen(text));
-
-	SDL_Texture *screen_texture = SDL_CreateTextureFromSurface(gRenderer, surface);
-	SDL_FreeSurface(surface);
-	SDL_RenderCopy(gRenderer, screen_texture, NULL, NULL);
-	SDL_DestroyTexture(screen_texture);
+	DrawText(gFont, framebuffer, x * magnification, y * magnification, color, text, strlen(text));
 }
 
-void PutText2(int x, int y, const char *text, unsigned long color, Surface_Ids surf_no)
+void PutText2(int x, int y, const char *text, unsigned long color, SurfaceID surf_no)
 {
-	DrawText(gFont, (unsigned char*)surf[surf_no].surface->pixels, surf[surf_no].surface->pitch, surf[surf_no].surface->w, surf[surf_no].surface->h, x * magnification, y * magnification, color, text, strlen(text));
-	surf[surf_no].needs_updating = TRUE;
+	DrawText(gFont, surf[surf_no], x * magnification, y * magnification, color, text, strlen(text));
 }
 
 void EndTextObject()
@@ -645,4 +666,16 @@ void EndTextObject()
 	// Destroy font
 	UnloadFont(gFont);
 	gFont = NULL;
+}
+
+// These functions are new
+
+void HandleDeviceLoss()
+{
+	Backend_HandleDeviceLoss();
+}
+
+void HandleWindowResize()
+{
+	Backend_HandleWindowResize();
 }

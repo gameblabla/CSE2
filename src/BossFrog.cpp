@@ -32,7 +32,7 @@ static void ActBossChar02_01(void)
 			boss->hit.back = 0x2000;
 			boss->hit.bottom = 0x2000;
 			boss->size = 3;
-			boss->bits = 4;
+			boss->bits = NPC_INVULNERABLE;
 			break;
 
 		case 1:
@@ -71,7 +71,7 @@ static void ActBossChar02_02(void)
 			boss->hit.back = 0x3000;
 			boss->hit.bottom = 0x2000;
 			boss->size = 3;
-			boss->bits = 4;
+			boss->bits = NPC_INVULNERABLE;
 			break;
 
 		case 1:
@@ -138,7 +138,7 @@ void ActBossChar_Frog(void)
 			boss->size = 3;
 			boss->exp = 1;
 			boss->code_event = 1000;
-			boss->bits |= 0x8200;
+			boss->bits |= (NPC_EVENT_WHEN_KILLED | NPC_SHOW_DAMAGE);
 			boss->life = 300;
 			break;
 
@@ -147,7 +147,7 @@ void ActBossChar_Frog(void)
 			boss->ani_no = 3;
 			boss->cond = 0x80;
 			boss->rect = rcRight[0];
-			gBoss[1].cond = -112;
+			gBoss[1].cond = 0x90;
 			gBoss[1].code_event = 1000;
 			gBoss[2].cond = 0x80;
 			gBoss[1].damage = 5;
@@ -282,7 +282,7 @@ void ActBossChar_Frog(void)
 				boss->act_wait = 0;
 				boss->ani_no = 3;
 				boss->count1 = 16;
-				gBoss[1].bits |= 0x20;
+				gBoss[1].bits |= NPC_SHOOTABLE;
 				boss->tgt_x = boss->life;
 			}
 
@@ -332,7 +332,7 @@ void ActBossChar_Frog(void)
 					boss->act_wait = 0;
 					boss->ani_no = 2;
 					boss->ani_wait = 0;
-					gBoss[1].bits &= ~0x20;
+					gBoss[1].bits &= ~NPC_SHOOTABLE;
 				}
 			}
 
@@ -507,7 +507,7 @@ void ActBossChar_Frog(void)
 			{
 				boss->ani_no = 8;
 				boss->ym = -0xA00;
-				boss->bits |= 8;
+				boss->bits |= NPC_IGNORE_SOLIDITY;
 				boss->act_no = 143;
 			}
 

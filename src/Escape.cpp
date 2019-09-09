@@ -7,7 +7,7 @@
 #include "KeyControl.h"
 #include "Main.h"
 
-int Call_Escape(int hWnd)
+int Call_Escape(HWND hWnd)
 {
 	RECT rc = {0, 128, 208, 144};
 

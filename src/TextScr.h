@@ -65,3 +65,4 @@ BOOL StartTextScript(int no);
 void StopTextScript();
 void PutTextScript();
 int TextScriptProc();
+void RestoreTextScript();

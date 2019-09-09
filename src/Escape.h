@@ -1,3 +1,5 @@
 #pragma once
 
-int Call_Escape(int hWnd);
+#include "WindowsWrapper.h"
+
+int Call_Escape(HWND hWnd);

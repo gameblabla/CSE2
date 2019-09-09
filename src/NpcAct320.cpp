@@ -190,8 +190,8 @@ void ActNpc322(NPCHAR *npc)
 	{
 		npc->act_no = 2;
 		npc->act_wait = 0;
-		npc->bits &= ~0x20;
-		npc->bits |= 4;
+		npc->bits &= ~NPC_SHOOTABLE;
+		npc->bits |= NPC_INVULNERABLE;
 		PlaySoundObject(22, 1);
 	}
 
@@ -314,7 +314,7 @@ void ActNpc323(NPCHAR *npc)
 			// Fallthrough
 		case 1:
 			if (++npc->act_wait == 16)
-				npc->bits &= ~8;
+				npc->bits &= ~NPC_IGNORE_SOLIDITY;
 
 			npc->x += npc->xm;
 			npc->y += npc->ym;
@@ -356,8 +356,8 @@ void ActNpc323(NPCHAR *npc)
 		npc->code_char = 309;
 		npc->ani_no = 0;
 		npc->act_no = 11;
-		npc->bits |= 0x20;
-		npc->bits &= ~8;
+		npc->bits |= NPC_SHOOTABLE;
+		npc->bits &= ~NPC_IGNORE_SOLIDITY;
 		npc->damage = 5;
 		npc->view.top = 0x1000;
 	}
@@ -1079,7 +1079,7 @@ void ActNpc338(NPCHAR *npc)
 			npc->view.top = 0x1000;
 			npc->view.bottom = 0x1000;
 			npc->damage = 3;
-			npc->bits |= 0x20;
+			npc->bits |= NPC_SHOOTABLE;
 			npc->tgt_y = npc->y;
 			npc->ym = (Random(-10, 10) * 0x200) / 2;
 			// Fallthrough

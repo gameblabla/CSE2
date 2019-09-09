@@ -17,7 +17,7 @@ BOOL LoadNpcTable(const char *path)
 	FILE *fp;
 	long n;
 	long num;
-	unsigned long size;
+	long size;
 
 	size = GetFileSizeLong(path);
 	if (size == -1)

@@ -42,7 +42,7 @@ void ActNpc200(NPCHAR *npc)
 		SetDestroyNpChar(npc->x, npc->y, npc->view.back, 8);
 		SetExpObjects(npc->x, npc->y, npc->exp);
 		npc->act_no = 100;
-		npc->bits &= ~0x20;
+		npc->bits &= ~NPC_SHOOTABLE;
 		npc->damage = 0;
 	}
 
@@ -385,18 +385,18 @@ void ActNpc205(NPCHAR *npc)
 
 			if (gMC.y > npc->y)
 			{
-				npc->bits &= ~0x40;
+				npc->bits &= ~NPC_SOLID_HARD;
 				npc->damage = 0x7F;
 			}
 			else
 			{
-				npc->bits |= 0x40;
+				npc->bits |= NPC_SOLID_HARD;
 				npc->damage = 0;
 			}
 
 			if (++npc->act_wait > 8 && npc->flag & 0xFF)
 			{
-				npc->bits |= 0x40;
+				npc->bits |= NPC_SOLID_HARD;
 				npc->act_no = 4;
 				npc->act_wait = 0;
 				npc->ym = 0;
@@ -413,7 +413,7 @@ void ActNpc205(NPCHAR *npc)
 			if (++npc->act_wait > 4)
 			{
 				npc->act_no = 5;
-				npc->bits |= 0x20;
+				npc->bits |= NPC_SHOOTABLE;
 			}
 
 			break;
@@ -599,7 +599,7 @@ void ActNpc208(NPCHAR *npc)
 		case 0:
 			if (gMC.x < npc->x + 0x2000 && gMC.x > npc->x - 0x2000)
 			{
-				npc->bits |= 0x20;
+				npc->bits |= NPC_SHOOTABLE;
 				npc->ym = -0x200;
 				npc->tgt_x = npc->x;
 				npc->tgt_y = npc->y;
@@ -626,7 +626,7 @@ void ActNpc208(NPCHAR *npc)
 				npc->damage = 0;
 				npc->xm = 0;
 				npc->ym = 0;
-				npc->bits &= ~0x20;
+				npc->bits &= ~NPC_SHOOTABLE;
 			}
 
 			return;
@@ -786,7 +786,7 @@ void ActNpc210(NPCHAR *npc)
 		case 0:
 			if (gMC.x < npc->x + 0x2000 && gMC.x > npc->x - 0x2000)
 			{
-				npc->bits |= 0x20;
+				npc->bits |= NPC_SHOOTABLE;
 				npc->ym = -0x200;
 				npc->tgt_y = npc->y;
 				npc->act_no = 1;
@@ -805,7 +805,7 @@ void ActNpc210(NPCHAR *npc)
 			}
 			else
 			{
-				npc->bits &= ~0x20;
+				npc->bits &= ~NPC_SHOOTABLE;
 				npc->rect.right = 0;
 				npc->damage = 0;
 				npc->xm = 0;
@@ -919,7 +919,7 @@ void ActNpc212(NPCHAR *npc)
 			npc->tgt_y = npc->y - 0x2000;
 			npc->tgt_x = npc->x - 0xC00;
 			npc->ym = 0;
-			npc->bits |= 8;
+			npc->bits |= NPC_IGNORE_SOLIDITY;
 			// Fallthrough
 		case 11:
 			if (npc->x < npc->tgt_x)
@@ -948,7 +948,7 @@ void ActNpc212(NPCHAR *npc)
 
 		case 20:
 			npc->act_no = 21;
-			npc->bits |= 8;
+			npc->bits |= NPC_IGNORE_SOLIDITY;
 			// Fallthrough
 		case 21:
 			if (npc->y < npc->tgt_y)
@@ -1030,7 +1030,7 @@ void ActNpc213(NPCHAR *npc)
 				npc->act_wait = 0;
 				npc->ani_no = 1;
 				npc->ym = 0;
-				npc->bits |= 0x20;
+				npc->bits |= NPC_SHOOTABLE;
 			}
 
 			break;
@@ -1174,7 +1174,7 @@ void ActNpc214(NPCHAR *npc)
 	{
 		case 0:
 			npc->act_no = 1;
-			npc->bits |= 8;
+			npc->bits |= NPC_IGNORE_SOLIDITY;
 			// Fallthrough
 		case 1:
 			if (++npc->ani_wait > 2)
@@ -1192,7 +1192,7 @@ void ActNpc214(NPCHAR *npc)
 			npc->y += npc->ym;
 
 			if (npc->xm < 0)
-				npc->bits &= ~8;
+				npc->bits &= ~NPC_IGNORE_SOLIDITY;
 
 			if (npc->flag & 0xFF)
 			{
@@ -1217,10 +1217,10 @@ void ActNpc215(NPCHAR *npc)
 			npc->act_no = 1;
 			npc->act_wait = 0;
 			npc->tgt_y = npc->y;
-			npc->bits &= ~0x20;
-			npc->bits &= ~4;
-			npc->bits &= ~1;
-			npc->bits &= ~8;
+			npc->bits &= ~NPC_SHOOTABLE;
+			npc->bits &= ~NPC_INVULNERABLE;
+			npc->bits &= ~NPC_SOLID_SOFT;
+			npc->bits &= ~NPC_IGNORE_SOLIDITY;
 			// Fallthrough
 		case 1:
 			if (gMC.x > npc->x - 0x1800 && gMC.x < npc->x + 0x1800 && gMC.y > npc->y && gMC.y < npc->y + 0x1000)
@@ -1252,7 +1252,7 @@ void ActNpc215(NPCHAR *npc)
 
 			if (npc->ani_no == 4)
 			{
-				npc->bits |= 0x20;
+				npc->bits |= NPC_SHOOTABLE;
 				npc->act_no = 30;
 				npc->act_wait = 0;
 			}
@@ -1260,7 +1260,7 @@ void ActNpc215(NPCHAR *npc)
 			break;
 
 		case 30:
-			npc->bits |= 1;
+			npc->bits |= NPC_SOLID_SOFT;
 			npc->damage = 0;
 			++npc->act_wait;
 
@@ -1273,13 +1273,13 @@ void ActNpc215(NPCHAR *npc)
 			break;
 
 		case 40:
-			npc->bits |= 8;
+			npc->bits |= NPC_IGNORE_SOLIDITY;
 			npc->y += 0x200;
 
 			if (++npc->act_wait == 32)
 			{
-				npc->bits &= ~1;
-				npc->bits &= ~0x20;
+				npc->bits &= ~NPC_SOLID_SOFT;
+				npc->bits &= ~NPC_SHOOTABLE;
 				npc->act_no = 50;
 				npc->act_wait = 0;
 			}
