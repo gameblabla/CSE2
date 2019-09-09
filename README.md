@@ -24,7 +24,7 @@ Many months of copypasting and experimenting later, this is the result.
 
 ### Visual Studio .NET 2003
 
-Of course, project files for Visual Studio .NET 2003 are available.
+Of course, project files for Visual Studio .NET 2003 are available, and can be found in the 'vs2003' folder.
 
 Visual Studio .NET 2003 was used by Pixel to create the original `Doukutsu.exe`, so these project files allow us to check the accuracy of the decompilation by comparing the generated assembly code to that of the original executable. The tool for this can be found in the 'devilution' folder.
 

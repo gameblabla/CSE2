@@ -224,218 +224,218 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath="src\ArmsItem.cpp">
+				RelativePath="..\src\ArmsItem.cpp">
 			</File>
 			<File
-				RelativePath="src\Back.cpp">
+				RelativePath="..\src\Back.cpp">
 			</File>
 			<File
-				RelativePath="src\BulHit.cpp">
+				RelativePath="..\src\BulHit.cpp">
 			</File>
 			<File
-				RelativePath="src\Bullet.cpp">
+				RelativePath="..\src\Bullet.cpp">
 			</File>
 			<File
-				RelativePath="src\Caret.cpp">
+				RelativePath="..\src\Caret.cpp">
 			</File>
 			<File
-				RelativePath="src\Config.cpp">
+				RelativePath="..\src\Config.cpp">
 			</File>
 			<File
-				RelativePath="src\Dialog.cpp">
+				RelativePath="..\src\Dialog.cpp">
 			</File>
 			<File
-				RelativePath="src\Draw.cpp">
+				RelativePath="..\src\Draw.cpp">
 			</File>
 			<File
-				RelativePath="src\Ending.cpp">
+				RelativePath="..\src\Ending.cpp">
 			</File>
 			<File
-				RelativePath="src\Escape.cpp">
+				RelativePath="..\src\Escape.cpp">
 			</File>
 			<File
-				RelativePath="src\Fade.cpp">
+				RelativePath="..\src\Fade.cpp">
 			</File>
 			<File
-				RelativePath="src\Flags.cpp">
+				RelativePath="..\src\Flags.cpp">
 			</File>
 			<File
-				RelativePath="src\Flash.cpp">
+				RelativePath="..\src\Flash.cpp">
 			</File>
 			<File
-				RelativePath="src\Frame.cpp">
+				RelativePath="..\src\Frame.cpp">
 			</File>
 			<File
-				RelativePath="src\Game.cpp">
+				RelativePath="..\src\Game.cpp">
 			</File>
 			<File
-				RelativePath="src\Generic.cpp">
+				RelativePath="..\src\Generic.cpp">
 			</File>
 			<File
-				RelativePath="src\GenericLoad.cpp">
+				RelativePath="..\src\GenericLoad.cpp">
 			</File>
 			<File
-				RelativePath="src\Input.cpp">
+				RelativePath="..\src\Input.cpp">
 			</File>
 			<File
-				RelativePath="src\KeyControl.cpp">
+				RelativePath="..\src\KeyControl.cpp">
 			</File>
 			<File
-				RelativePath="src\Main.cpp">
+				RelativePath="..\src\Main.cpp">
 			</File>
 			<File
-				RelativePath="src\Map.cpp">
+				RelativePath="..\src\Map.cpp">
 			</File>
 			<File
-				RelativePath="src\MapName.cpp">
+				RelativePath="..\src\MapName.cpp">
 			</File>
 			<File
-				RelativePath="src\MiniMap.cpp">
+				RelativePath="..\src\MiniMap.cpp">
 			</File>
 			<File
-				RelativePath="src\MyChar.cpp">
+				RelativePath="..\src\MyChar.cpp">
 			</File>
 			<File
-				RelativePath="src\MycHit.cpp">
+				RelativePath="..\src\MycHit.cpp">
 			</File>
 			<File
-				RelativePath="src\MycParam.cpp">
+				RelativePath="..\src\MycParam.cpp">
 			</File>
 			<File
-				RelativePath="src\Organya.cpp">
+				RelativePath="..\src\Organya.cpp">
 			</File>
 			<File
-				RelativePath="src\PixTone.cpp">
+				RelativePath="..\src\PixTone.cpp">
 			</File>
 			<File
-				RelativePath="src\Profile.cpp">
+				RelativePath="..\src\Profile.cpp">
 			</File>
 			<File
-				RelativePath="src\SelStage.cpp">
+				RelativePath="..\src\SelStage.cpp">
 			</File>
 			<File
-				RelativePath="src\Shoot.cpp">
+				RelativePath="..\src\Shoot.cpp">
 			</File>
 			<File
-				RelativePath="src\Sound.cpp">
+				RelativePath="..\src\Sound.cpp">
 			</File>
 			<File
-				RelativePath="src\Stage.cpp">
+				RelativePath="..\src\Stage.cpp">
 			</File>
 			<File
-				RelativePath="src\Star.cpp">
+				RelativePath="..\src\Star.cpp">
 			</File>
 			<File
-				RelativePath="src\TextScr.cpp">
+				RelativePath="..\src\TextScr.cpp">
 			</File>
 			<File
-				RelativePath="src\Triangle.cpp">
+				RelativePath="..\src\Triangle.cpp">
 			</File>
 			<File
-				RelativePath="src\ValueView.cpp">
+				RelativePath="..\src\ValueView.cpp">
 			</File>
 			<Filter
 				Name="NPC"
 				Filter="">
 				<File
-					RelativePath="src\NpcAct000.cpp">
+					RelativePath="..\src\NpcAct000.cpp">
 				</File>
 				<File
-					RelativePath="src\NpcAct020.cpp">
+					RelativePath="..\src\NpcAct020.cpp">
 				</File>
 				<File
-					RelativePath="src\NpcAct040.cpp">
+					RelativePath="..\src\NpcAct040.cpp">
 				</File>
 				<File
-					RelativePath="src\NpcAct060.cpp">
+					RelativePath="..\src\NpcAct060.cpp">
 				</File>
 				<File
-					RelativePath="src\NpcAct080.cpp">
+					RelativePath="..\src\NpcAct080.cpp">
 				</File>
 				<File
-					RelativePath="src\NpcAct100.cpp">
+					RelativePath="..\src\NpcAct100.cpp">
 				</File>
 				<File
-					RelativePath="src\NpcAct120.cpp">
+					RelativePath="..\src\NpcAct120.cpp">
 				</File>
 				<File
-					RelativePath="src\NpcAct140.cpp">
+					RelativePath="..\src\NpcAct140.cpp">
 				</File>
 				<File
-					RelativePath="src\NpcAct160.cpp">
+					RelativePath="..\src\NpcAct160.cpp">
 				</File>
 				<File
-					RelativePath="src\NpcAct180.cpp">
+					RelativePath="..\src\NpcAct180.cpp">
 				</File>
 				<File
-					RelativePath="src\NpcAct200.cpp">
+					RelativePath="..\src\NpcAct200.cpp">
 				</File>
 				<File
-					RelativePath="src\NpcAct220.cpp">
+					RelativePath="..\src\NpcAct220.cpp">
 				</File>
 				<File
-					RelativePath="src\NpcAct240.cpp">
+					RelativePath="..\src\NpcAct240.cpp">
 				</File>
 				<File
-					RelativePath="src\NpcAct260.cpp">
+					RelativePath="..\src\NpcAct260.cpp">
 				</File>
 				<File
-					RelativePath="src\NpcAct280.cpp">
+					RelativePath="..\src\NpcAct280.cpp">
 				</File>
 				<File
-					RelativePath="src\NpcAct300.cpp">
+					RelativePath="..\src\NpcAct300.cpp">
 				</File>
 				<File
-					RelativePath="src\NpcAct320.cpp">
+					RelativePath="..\src\NpcAct320.cpp">
 				</File>
 				<File
-					RelativePath="src\NpcAct340.cpp">
+					RelativePath="..\src\NpcAct340.cpp">
 				</File>
 				<File
-					RelativePath="src\NpChar.cpp">
+					RelativePath="..\src\NpChar.cpp">
 				</File>
 				<File
-					RelativePath="src\NpcHit.cpp">
+					RelativePath="..\src\NpcHit.cpp">
 				</File>
 				<File
-					RelativePath="src\NpcTbl.cpp">
+					RelativePath="..\src\NpcTbl.cpp">
 				</File>
 			</Filter>
 			<Filter
 				Name="Boss"
 				Filter="">
 				<File
-					RelativePath="src\Boss.cpp">
+					RelativePath="..\src\Boss.cpp">
 				</File>
 				<File
-					RelativePath="src\BossAlmo1.cpp">
+					RelativePath="..\src\BossAlmo1.cpp">
 				</File>
 				<File
-					RelativePath="src\BossAlmo2.cpp">
+					RelativePath="..\src\BossAlmo2.cpp">
 				</File>
 				<File
-					RelativePath="src\BossBallos.cpp">
+					RelativePath="..\src\BossBallos.cpp">
 				</File>
 				<File
-					RelativePath="src\BossFrog.cpp">
+					RelativePath="..\src\BossFrog.cpp">
 				</File>
 				<File
-					RelativePath="src\BossIronH.cpp">
+					RelativePath="..\src\BossIronH.cpp">
 				</File>
 				<File
-					RelativePath="src\BossLife.cpp">
+					RelativePath="..\src\BossLife.cpp">
 				</File>
 				<File
-					RelativePath="src\BossOhm.cpp">
+					RelativePath="..\src\BossOhm.cpp">
 				</File>
 				<File
-					RelativePath="src\BossPress.cpp">
+					RelativePath="..\src\BossPress.cpp">
 				</File>
 				<File
-					RelativePath="src\BossTwinD.cpp">
+					RelativePath="..\src\BossTwinD.cpp">
 				</File>
 				<File
-					RelativePath="src\BossX.cpp">
+					RelativePath="..\src\BossX.cpp">
 				</File>
 			</Filter>
 		</Filter>
@@ -444,172 +444,172 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath="src\ArmsItem.h">
+				RelativePath="..\src\ArmsItem.h">
 			</File>
 			<File
-				RelativePath="src\Back.h">
+				RelativePath="..\src\Back.h">
 			</File>
 			<File
-				RelativePath="src\Boss.h">
+				RelativePath="..\src\Boss.h">
 			</File>
 			<File
-				RelativePath="src\BossAlmo1.h">
+				RelativePath="..\src\BossAlmo1.h">
 			</File>
 			<File
-				RelativePath="src\BossAlmo2.h">
+				RelativePath="..\src\BossAlmo2.h">
 			</File>
 			<File
-				RelativePath="src\BossBallos.h">
+				RelativePath="..\src\BossBallos.h">
 			</File>
 			<File
-				RelativePath="src\BossFrog.h">
+				RelativePath="..\src\BossFrog.h">
 			</File>
 			<File
-				RelativePath="src\BossIronH.h">
+				RelativePath="..\src\BossIronH.h">
 			</File>
 			<File
-				RelativePath="src\BossLife.h">
+				RelativePath="..\src\BossLife.h">
 			</File>
 			<File
-				RelativePath="src\BossOhm.h">
+				RelativePath="..\src\BossOhm.h">
 			</File>
 			<File
-				RelativePath="src\BossPress.h">
+				RelativePath="..\src\BossPress.h">
 			</File>
 			<File
-				RelativePath="src\BossTwinD.h">
+				RelativePath="..\src\BossTwinD.h">
 			</File>
 			<File
-				RelativePath="src\BossX.h">
+				RelativePath="..\src\BossX.h">
 			</File>
 			<File
-				RelativePath="src\BulHit.h">
+				RelativePath="..\src\BulHit.h">
 			</File>
 			<File
-				RelativePath="src\Bullet.h">
+				RelativePath="..\src\Bullet.h">
 			</File>
 			<File
-				RelativePath="src\Caret.h">
+				RelativePath="..\src\Caret.h">
 			</File>
 			<File
-				RelativePath="src\CommonDefines.h">
+				RelativePath="..\src\CommonDefines.h">
 			</File>
 			<File
-				RelativePath="src\Config.h">
+				RelativePath="..\src\Config.h">
 			</File>
 			<File
-				RelativePath="src\Dialog.h">
+				RelativePath="..\src\Dialog.h">
 			</File>
 			<File
-				RelativePath="src\Draw.h">
+				RelativePath="..\src\Draw.h">
 			</File>
 			<File
-				RelativePath="src\Ending.h">
+				RelativePath="..\src\Ending.h">
 			</File>
 			<File
-				RelativePath="src\Escape.h">
+				RelativePath="..\src\Escape.h">
 			</File>
 			<File
-				RelativePath="src\Fade.h">
+				RelativePath="..\src\Fade.h">
 			</File>
 			<File
-				RelativePath="src\Flags.h">
+				RelativePath="..\src\Flags.h">
 			</File>
 			<File
-				RelativePath="src\Flash.h">
+				RelativePath="..\src\Flash.h">
 			</File>
 			<File
-				RelativePath="src\Frame.h">
+				RelativePath="..\src\Frame.h">
 			</File>
 			<File
-				RelativePath="src\Game.h">
+				RelativePath="..\src\Game.h">
 			</File>
 			<File
-				RelativePath="src\Generic.h">
+				RelativePath="..\src\Generic.h">
 			</File>
 			<File
-				RelativePath="src\GenericLoad.h">
+				RelativePath="..\src\GenericLoad.h">
 			</File>
 			<File
-				RelativePath="src\Input.h">
+				RelativePath="..\src\Input.h">
 			</File>
 			<File
-				RelativePath="src\KeyControl.h">
+				RelativePath="..\src\KeyControl.h">
 			</File>
 			<File
-				RelativePath="src\Main.h">
+				RelativePath="..\src\Main.h">
 			</File>
 			<File
-				RelativePath="src\Map.h">
+				RelativePath="..\src\Map.h">
 			</File>
 			<File
-				RelativePath="src\MapName.h">
+				RelativePath="..\src\MapName.h">
 			</File>
 			<File
-				RelativePath="src\MiniMap.h">
+				RelativePath="..\src\MiniMap.h">
 			</File>
 			<File
-				RelativePath="src\MyChar.h">
+				RelativePath="..\src\MyChar.h">
 			</File>
 			<File
-				RelativePath="src\MycHit.h">
+				RelativePath="..\src\MycHit.h">
 			</File>
 			<File
-				RelativePath="src\MycParam.h">
+				RelativePath="..\src\MycParam.h">
 			</File>
 			<File
-				RelativePath="src\NpcAct.h">
+				RelativePath="..\src\NpcAct.h">
 			</File>
 			<File
-				RelativePath="src\NpChar.h">
+				RelativePath="..\src\NpChar.h">
 			</File>
 			<File
-				RelativePath="src\NpcHit.h">
+				RelativePath="..\src\NpcHit.h">
 			</File>
 			<File
-				RelativePath="src\NpcTbl.h">
+				RelativePath="..\src\NpcTbl.h">
 			</File>
 			<File
-				RelativePath="src\Organya.h">
+				RelativePath="..\src\Organya.h">
 			</File>
 			<File
-				RelativePath="src\PixTone.h">
+				RelativePath="..\src\PixTone.h">
 			</File>
 			<File
-				RelativePath="src\Profile.h">
+				RelativePath="..\src\Profile.h">
 			</File>
 			<File
-				RelativePath="src\SelStage.h">
+				RelativePath="..\src\SelStage.h">
 			</File>
 			<File
-				RelativePath="src\Shoot.h">
+				RelativePath="..\src\Shoot.h">
 			</File>
 			<File
-				RelativePath="src\Sound.h">
+				RelativePath="..\src\Sound.h">
 			</File>
 			<File
-				RelativePath="src\Stage.h">
+				RelativePath="..\src\Stage.h">
 			</File>
 			<File
-				RelativePath="src\Star.h">
+				RelativePath="..\src\Star.h">
 			</File>
 			<File
-				RelativePath="src\Tags.h">
+				RelativePath="..\src\Tags.h">
 			</File>
 			<File
-				RelativePath="src\TextScr.h">
+				RelativePath="..\src\TextScr.h">
 			</File>
 			<File
-				RelativePath="src\Triangle.h">
+				RelativePath="..\src\Triangle.h">
 			</File>
 			<File
-				RelativePath="src\Types.h">
+				RelativePath="..\src\Types.h">
 			</File>
 			<File
-				RelativePath="src\ValueView.h">
+				RelativePath="..\src\ValueView.h">
 			</File>
 			<File
-				RelativePath="src\WindowsWrapper.h">
+				RelativePath="..\src\WindowsWrapper.h">
 			</File>
 		</Filter>
 		<Filter
@@ -617,10 +617,10 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}">
 			<File
-				RelativePath=".\assets\resources\afxres.h">
+				RelativePath=".\..\assets\resources\afxres.h">
 			</File>
 			<File
-				RelativePath="assets\resources\CSE2.rc">
+				RelativePath="..\assets\resources\CSE2.rc">
 				<FileConfiguration
 					Name="Debug|Win32">
 					<Tool
@@ -647,217 +647,217 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="assets\resources\resource1.h">
+				RelativePath="..\assets\resources\resource1.h">
 			</File>
 			<Filter
 				Name="Bitmap"
 				Filter="">
 				<File
-					RelativePath="assets\resources\Bitmap\Credit01.bmp">
+					RelativePath="..\assets\resources\Bitmap\Credit01.bmp">
 				</File>
 				<File
-					RelativePath="assets\resources\Bitmap\Credit02.bmp">
+					RelativePath="..\assets\resources\Bitmap\Credit02.bmp">
 				</File>
 				<File
-					RelativePath="assets\resources\Bitmap\Credit03.bmp">
+					RelativePath="..\assets\resources\Bitmap\Credit03.bmp">
 				</File>
 				<File
-					RelativePath="assets\resources\Bitmap\Credit04.bmp">
+					RelativePath="..\assets\resources\Bitmap\Credit04.bmp">
 				</File>
 				<File
-					RelativePath="assets\resources\Bitmap\Credit05.bmp">
+					RelativePath="..\assets\resources\Bitmap\Credit05.bmp">
 				</File>
 				<File
-					RelativePath="assets\resources\Bitmap\Credit06.bmp">
+					RelativePath="..\assets\resources\Bitmap\Credit06.bmp">
 				</File>
 				<File
-					RelativePath="assets\resources\Bitmap\Credit07.bmp">
+					RelativePath="..\assets\resources\Bitmap\Credit07.bmp">
 				</File>
 				<File
-					RelativePath="assets\resources\Bitmap\Credit08.bmp">
+					RelativePath="..\assets\resources\Bitmap\Credit08.bmp">
 				</File>
 				<File
-					RelativePath="assets\resources\Bitmap\Credit09.bmp">
+					RelativePath="..\assets\resources\Bitmap\Credit09.bmp">
 				</File>
 				<File
-					RelativePath="assets\resources\Bitmap\Credit10.bmp">
+					RelativePath="..\assets\resources\Bitmap\Credit10.bmp">
 				</File>
 				<File
-					RelativePath="assets\resources\Bitmap\Credit11.bmp">
+					RelativePath="..\assets\resources\Bitmap\Credit11.bmp">
 				</File>
 				<File
-					RelativePath="assets\resources\Bitmap\Credit12.bmp">
+					RelativePath="..\assets\resources\Bitmap\Credit12.bmp">
 				</File>
 				<File
-					RelativePath="assets\resources\Bitmap\Credit14.bmp">
+					RelativePath="..\assets\resources\Bitmap\Credit14.bmp">
 				</File>
 				<File
-					RelativePath="assets\resources\Bitmap\Credit15.bmp">
+					RelativePath="..\assets\resources\Bitmap\Credit15.bmp">
 				</File>
 				<File
-					RelativePath="assets\resources\Bitmap\Credit16.bmp">
+					RelativePath="..\assets\resources\Bitmap\Credit16.bmp">
 				</File>
 				<File
-					RelativePath="assets\resources\Bitmap\Credit17.bmp">
+					RelativePath="..\assets\resources\Bitmap\Credit17.bmp">
 				</File>
 				<File
-					RelativePath="assets\resources\Bitmap\Credit18.bmp">
+					RelativePath="..\assets\resources\Bitmap\Credit18.bmp">
 				</File>
 				<File
-					RelativePath="assets\resources\Bitmap\pixel.bmp">
+					RelativePath="..\assets\resources\Bitmap\pixel.bmp">
 				</File>
 			</Filter>
 			<Filter
 				Name="Cursor"
 				Filter="">
 				<File
-					RelativePath=".\assets\resources\Cursor\CURSOR_IKA.cur">
+					RelativePath=".\..\assets\resources\Cursor\CURSOR_IKA.cur">
 				</File>
 				<File
-					RelativePath=".\assets\resources\Cursor\CURSOR_NORMAL.cur">
+					RelativePath=".\..\assets\resources\Cursor\CURSOR_NORMAL.cur">
 				</File>
 			</Filter>
 			<Filter
 				Name="Icon"
 				Filter="">
 				<File
-					RelativePath=".\assets\resources\Icon\0.ico">
+					RelativePath=".\..\assets\resources\Icon\0.ico">
 				</File>
 				<File
-					RelativePath=".\assets\resources\Icon\ICON_MINI.ico">
+					RelativePath=".\..\assets\resources\Icon\ICON_MINI.ico">
 				</File>
 			</Filter>
 			<Filter
 				Name="Organya"
 				Filter="">
 				<File
-					RelativePath="assets\resources\Org\Access.org">
+					RelativePath="..\assets\resources\Org\Access.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\Anzen.org">
+					RelativePath="..\assets\resources\Org\Anzen.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\Balcony.org">
+					RelativePath="..\assets\resources\Org\Balcony.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\Ballos.org">
+					RelativePath="..\assets\resources\Org\Ballos.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\BreakDown.org">
+					RelativePath="..\assets\resources\Org\BreakDown.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\Cemetery.org">
+					RelativePath="..\assets\resources\Org\Cemetery.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\Curly.org">
+					RelativePath="..\assets\resources\Org\Curly.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\Dr.org">
+					RelativePath="..\assets\resources\Org\Dr.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\Ending.org">
+					RelativePath="..\assets\resources\Org\Ending.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\Escape.org">
+					RelativePath="..\assets\resources\Org\Escape.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\Fanfale1.org">
+					RelativePath="..\assets\resources\Org\Fanfale1.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\Fanfale2.org">
+					RelativePath="..\assets\resources\Org\Fanfale2.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\Fanfale3.org">
+					RelativePath="..\assets\resources\Org\Fanfale3.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\FireEye.org">
+					RelativePath="..\assets\resources\Org\FireEye.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\Gameover.org">
+					RelativePath="..\assets\resources\Org\Gameover.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\Ginsuke.org">
+					RelativePath="..\assets\resources\Org\Ginsuke.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\Grand.org">
+					RelativePath="..\assets\resources\Org\Grand.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\Gravity.org">
+					RelativePath="..\assets\resources\Org\Gravity.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\Hell.org">
+					RelativePath="..\assets\resources\Org\Hell.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\ironH.org">
+					RelativePath="..\assets\resources\Org\ironH.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\Jenka.org">
+					RelativePath="..\assets\resources\Org\Jenka.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\Jenka2.org">
+					RelativePath="..\assets\resources\Org\Jenka2.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\Kodou.org">
+					RelativePath="..\assets\resources\Org\Kodou.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\LastBtl.org">
+					RelativePath="..\assets\resources\Org\LastBtl.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\LastBtl3.org">
+					RelativePath="..\assets\resources\Org\LastBtl3.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\LastCave.org">
+					RelativePath="..\assets\resources\Org\LastCave.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\Marine.org">
+					RelativePath="..\assets\resources\Org\Marine.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\Maze.org">
+					RelativePath="..\assets\resources\Org\Maze.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\MDown2.org">
+					RelativePath="..\assets\resources\Org\MDown2.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\Mura.org">
+					RelativePath="..\assets\resources\Org\Mura.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\Oside.org">
+					RelativePath="..\assets\resources\Org\Oside.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\Plant.org">
+					RelativePath="..\assets\resources\Org\Plant.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\quiet.org">
+					RelativePath="..\assets\resources\Org\quiet.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\Requiem.org">
+					RelativePath="..\assets\resources\Org\Requiem.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\Toroko.org">
+					RelativePath="..\assets\resources\Org\Toroko.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\Vivi.org">
+					RelativePath="..\assets\resources\Org\Vivi.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\Wanpak2.org">
+					RelativePath="..\assets\resources\Org\Wanpak2.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\Wanpaku.org">
+					RelativePath="..\assets\resources\Org\Wanpaku.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Wave\Wave.dat">
+					RelativePath="..\assets\resources\Wave\Wave.dat">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\Weed.org">
+					RelativePath="..\assets\resources\Org\Weed.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\White.org">
+					RelativePath="..\assets\resources\Org\White.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\XXXX.org">
+					RelativePath="..\assets\resources\Org\XXXX.org">
 				</File>
 				<File
-					RelativePath="assets\resources\Org\Zonbie.org">
+					RelativePath="..\assets\resources\Org\Zonbie.org">
 				</File>
 			</Filter>
 		</Filter>

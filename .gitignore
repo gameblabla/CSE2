@@ -9,13 +9,13 @@ devilution/orig.asm
 devilution/compare.asm
 
 # Exclude MSVC IntelliSense database
-CSE2.ncb
+vs2003/CSE2.ncb
 
 # Exclude MSVC Solution User Options file
-CSE2.suo
+vs2003/CSE2.suo
 
 # Exclude MSVC build folders
-Debug
-Release
-Debug (Japanese)
-Release (Japanese)
+vs2003/Debug
+vs2003/Release
+vs2003/Debug (Japanese)
+vs2003/Release (Japanese)
