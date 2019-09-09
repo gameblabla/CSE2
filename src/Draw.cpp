@@ -321,7 +321,11 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 	sprintf(path, "%s/%s.pbm", gDataPath, name);
 	SDL_Surface *surface = SDL_LoadBMP(path);
 
-	if (surface == NULL)
+	if (surface != NULL)
+	{
+		SDL_SetColorKey(surface, SDL_TRUE, SDL_MapRGB(surface->format, 0, 0, 0));	// Assumes the colour key will always be #000000 (black)
+	}
+	else
 	{
 		unsigned char *image_buffer;
 		unsigned int image_width;
@@ -415,7 +419,11 @@ BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 
 	SDL_Surface *surface = SDL_LoadBMP(path);
 
-	if (surface == NULL)
+	if (surface != NULL)
+	{
+		SDL_SetColorKey(surface, SDL_TRUE, SDL_MapRGB(surface->format, 0, 0, 0));	// Assumes the colour key will always be #000000 (black)
+	}
+	else
 	{
 		unsigned char *image_buffer;
 		unsigned int image_width;
