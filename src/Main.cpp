@@ -204,9 +204,8 @@ int main(int argc, char *argv[])
 
 	switch (conf.display_mode)
 	{
-		case 1:
-		case 2:
-			// Set window dimensions
+		default:
+			// Windowed
 			windowWidth = WINDOW_WIDTH * conf.display_mode;
 			windowHeight = WINDOW_HEIGHT * conf.display_mode;
 
@@ -220,9 +219,7 @@ int main(int argc, char *argv[])
 			break;
 
 		case 0:
-		case 3:
-		case 4:
-			// Set window dimensions
+			// Fullscreen
 			windowWidth = WINDOW_WIDTH * 2;
 			windowHeight = WINDOW_HEIGHT * 2;
 
