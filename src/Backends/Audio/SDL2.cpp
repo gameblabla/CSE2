@@ -12,7 +12,7 @@
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
-#define clamp(x, y, z) MIN(MAX(x, y), z)
+#define clamp(x, y, z) MIN(MAX((x), (y)), (z))
 
 struct AudioBackend_Sound
 {
@@ -65,32 +65,8 @@ static void SetSoundPan(AudioBackend_Sound *sound, long pan)
 	sound->volume_r = sound->pan_r * sound->volume;
 }
 
-static void Callback(void *user_data, Uint8 *stream_uint8, int len)
+static void MixSounds(float *stream, size_t frames_total)
 {
-	(void)user_data;
-
-	float *stream = (float*)stream_uint8;
-	unsigned int frames_total = len / sizeof(float) / 2;
-
-	for (unsigned int i = 0; i < frames_total * 2; ++i)
-		stream[i] = 0.0f;
-
-	if (organya_timer != 0)
-	{
-		static int timer_countdown;
-
-		timer_countdown -= frames_total * 1000;
-
-		if (timer_countdown <= 0)
-		{
-			do
-			{
-				timer_countdown += organya_timer * 44100;
-				UpdateOrganya();
-			} while (timer_countdown <= 0);
-		}
-	}
-
 	for (AudioBackend_Sound *sound = sound_list_head; sound != NULL; sound = sound->next)
 	{
 		if (sound->playing)
@@ -147,6 +123,49 @@ static void Callback(void *user_data, Uint8 *stream_uint8, int len)
 #endif
 }
 
+static void Callback(void *user_data, Uint8 *stream_uint8, int len)
+{
+	(void)user_data;
+
+	float *stream = (float*)stream_uint8;
+	unsigned int frames_total = len / sizeof(float) / 2;
+
+	for (unsigned int i = 0; i < frames_total * 2; ++i)
+		stream[i] = 0.0f;
+
+	if (organya_timer == 0)
+	{
+		MixSounds(stream, frames_total);
+	}
+	else
+	{
+		// Synchronise audio generation with Organya.
+		// In the original game, Organya ran asynchronously in a separate thread,
+		// firing off commands to DirectSound in realtime. To match that, we'd
+		// need a very low-latency buffer, otherwise we'd get mistimed instruments.
+		// Instead, we can just do this.
+		unsigned int frames_done = 0;
+
+		while (frames_done != frames_total)
+		{
+			static unsigned long organya_countdown;
+
+			if (organya_countdown == 0)
+			{
+				organya_countdown = (organya_timer * 44100) / 1000;	// organya_timer is in milliseconds, so convert it to audio frames
+				UpdateOrganya();
+			}
+
+			const unsigned int frames_to_do = MIN(organya_countdown, frames_total - frames_done);
+
+			MixSounds(stream + frames_done * 2, frames_to_do);
+
+			frames_done += frames_to_do;
+			organya_countdown -= frames_to_do;
+		}
+	}
+}
+
 BOOL AudioBackend_Init(void)
 {
 	if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
@@ -156,7 +175,7 @@ BOOL AudioBackend_Init(void)
 	specification.freq = 44100;
 	specification.format = AUDIO_F32;
 	specification.channels = 2;
-	specification.samples = 0x200;
+	specification.samples = 0x400;	// Roughly 10 milliseconds
 	specification.callback = Callback;
 	specification.userdata = NULL;
 
