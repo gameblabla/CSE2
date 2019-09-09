@@ -128,47 +128,53 @@ void PutBack(int fx, int fy)
 
 		case 6:
 		case 7:
+			// Draw the top row (including the moon/sun)
 			rect.top = 0;
 			rect.bottom = 88;
 			rect.left = 0;
 			rect.right = 320;
-			PutBitmap4(&grcGame, PixelToScreenCoord(0), PixelToScreenCoord(0), &rect, SURFACE_ID_LEVEL_BACKGROUND);
+			PutBitmap4(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 320) / 2), PixelToScreenCoord(0), &rect, SURFACE_ID_LEVEL_BACKGROUND);
+
+			// Draw the repeating star/sky pattern on each side of the top row
+			if (gBack.type == 6)
+				rect.right = 255;
+			else
+				rect.left = 106;
+
+			for (x = ((WINDOW_WIDTH - 320) / 2); x > 0; x -= (rect.right - rect.left))
+				PutBitmap4(&grcGame, PixelToScreenCoord(x - (rect.right - rect.left)), PixelToScreenCoord(0), &rect, SURFACE_ID_LEVEL_BACKGROUND);
+			for (x = ((WINDOW_WIDTH - 320) / 2) + 320; x < WINDOW_WIDTH; x += (rect.right - rect.left))
+				PutBitmap4(&grcGame, PixelToScreenCoord(x), PixelToScreenCoord(0), &rect, SURFACE_ID_LEVEL_BACKGROUND);
+
+			// Draw each cloud layer from top to bottom
 
 			rect.top = 88;
 			rect.bottom = 123;
-			rect.left = gBack.fx / 2;
-			rect.right = 320;
-			PutBitmap4(&grcGame, PixelToScreenCoord(0), PixelToScreenCoord(88), &rect, SURFACE_ID_LEVEL_BACKGROUND);
-
 			rect.left = 0;
-			PutBitmap4(&grcGame, PixelToScreenCoord(320 - gBack.fx / 2 % 320), PixelToScreenCoord(88), &rect, SURFACE_ID_LEVEL_BACKGROUND);
+			rect.right = 320;
+			for (x = -((gBack.fx * 0x200) / 2); x < WINDOW_WIDTH * 0x200; x += 320 * 0x200)
+				PutBitmap4(&grcGame, SubpixelToScreenCoord(x), PixelToScreenCoord(88), &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
 			rect.top = 123;
 			rect.bottom = 146;
-			rect.left = gBack.fx % 320;
-			rect.right = 320;
-			PutBitmap4(&grcGame, PixelToScreenCoord(0), PixelToScreenCoord(123), &rect, SURFACE_ID_LEVEL_BACKGROUND);
-
 			rect.left = 0;
-			PutBitmap4(&grcGame, PixelToScreenCoord(320 - gBack.fx % 320), PixelToScreenCoord(123), &rect, SURFACE_ID_LEVEL_BACKGROUND);
+			rect.right = 320;
+			for (x = -((gBack.fx % 320) * 0x200); x < WINDOW_WIDTH * 0x200; x += 320 * 0x200)
+				PutBitmap4(&grcGame, SubpixelToScreenCoord(x), PixelToScreenCoord(123), &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
 			rect.top = 146;
 			rect.bottom = 176;
-			rect.left = 2 * gBack.fx % 320;
-			rect.right = 320;
-			PutBitmap4(&grcGame, PixelToScreenCoord(0), PixelToScreenCoord(146), &rect, SURFACE_ID_LEVEL_BACKGROUND);
-
 			rect.left = 0;
-			PutBitmap4(&grcGame, PixelToScreenCoord(320 - 2 * gBack.fx % 320), PixelToScreenCoord(146), &rect, SURFACE_ID_LEVEL_BACKGROUND);
+			rect.right = 320;
+			for (x = -((2 * gBack.fx % 320) * 0x200); x < WINDOW_WIDTH * 0x200; x += 320 * 0x200)
+				PutBitmap4(&grcGame, SubpixelToScreenCoord(x), PixelToScreenCoord(146), &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
 			rect.top = 176;
 			rect.bottom = 240;
-			rect.left = 4 * gBack.fx % 320;
-			rect.right = 320;
-			PutBitmap4(&grcGame, PixelToScreenCoord(0), PixelToScreenCoord(176), &rect, SURFACE_ID_LEVEL_BACKGROUND);
-
 			rect.left = 0;
-			PutBitmap4(&grcGame, PixelToScreenCoord(320 - 4 * gBack.fx % 320), PixelToScreenCoord(176), &rect, SURFACE_ID_LEVEL_BACKGROUND);
+			rect.right = 320;
+			for (x = -((4 * gBack.fx % 320) * 0x200); x < WINDOW_WIDTH * 0x200; x += 320 * 0x200)
+				PutBitmap4(&grcGame, SubpixelToScreenCoord(x), PixelToScreenCoord(176), &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
 			break;
 
