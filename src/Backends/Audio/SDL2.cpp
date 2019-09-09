@@ -11,7 +11,7 @@
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
-#define clamp(x, y, z) MIN(MAX(x, y), z)
+#define clamp(x, y, z) MIN(MAX((x), (y)), (z))
 
 struct AudioBackend_Sound
 {
