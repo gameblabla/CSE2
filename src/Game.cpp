@@ -111,6 +111,64 @@ void PutNumber4(int x, int y, int value, BOOL bZero)
 	}
 }
 
+// Draws black bars to cover the out-of-bounds parts of the screen
+void PutBlackBars(int fx, int fy)
+{
+	RECT rect;
+
+	// Don't draw if credits are running
+	if (g_GameFlags & 8)
+		return;
+
+	int stage_left;
+	int stage_top;
+	int stage_width;
+	int stage_height;
+
+	if (gStageNo == 31)
+	{
+		stage_left = 20 * 16;
+		stage_top = 0;
+		stage_width = 320;
+		stage_height = 240;
+	}
+	else
+	{
+		stage_left = 0;
+		stage_top = 0;
+		stage_width = (gMap.width - 1) * 16;
+		stage_height = (gMap.length - 1) * 16;
+	}
+
+	// Left bar
+	rect.left = 0;
+	rect.top = 0;
+	rect.right = stage_left - (fx / 0x200);
+	rect.bottom = WINDOW_HEIGHT;
+	CortBox(&rect, 0);
+
+	// Right bar
+	rect.left = stage_left + stage_width - (fx / 0x200);
+	rect.top = 0;
+	rect.right = WINDOW_WIDTH;
+	rect.bottom = WINDOW_HEIGHT;
+	CortBox(&rect, 0);
+
+	// Top bar
+	rect.left = 0;
+	rect.top = 0;
+	rect.right = WINDOW_WIDTH;
+	rect.bottom = stage_top - (fy / 0x200);
+	CortBox(&rect, 0);
+
+	// Bottom bar
+	rect.left = 0;
+	rect.top = stage_top + stage_height - (fy / 0x200);
+	rect.right = WINDOW_WIDTH;
+	rect.bottom = WINDOW_HEIGHT;
+	CortBox(&rect, 0);
+}
+
 int ModeOpening()
 {
 	int frame_x;
@@ -192,6 +250,7 @@ int ModeOpening()
 		PutMapDataVector(frame_x, frame_y);
 		PutStage_Front(frame_x, frame_y);
 		PutFront(frame_x, frame_y);
+		PutBlackBars(frame_x, frame_y);
 		PutCaret(frame_x, frame_y);
 		PutFade();
 
@@ -593,6 +652,7 @@ int ModeAction(void)
 		PutMapDataVector(frame_x, frame_y);
 		PutStage_Front(frame_x, frame_y);
 		PutFront(frame_x, frame_y);
+		PutBlackBars(frame_x, frame_y);
 		PutFlash();
 		PutCaret(frame_x, frame_y);
 		PutValueView(frame_x, frame_y);
