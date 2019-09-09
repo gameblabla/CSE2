@@ -189,8 +189,8 @@ BOOL StartCreditScript()
 	}
 
 	// Open file
-	char path[PATH_LENGTH];
-	sprintf(path, "%s/%s", gDataPath, credit_script);
+	char path[MAX_PATH];
+	sprintf(path, "%s\\%s", gDataPath, credit_script);
 
 	Credit.size = GetFileSizeLong(path);
 	if (Credit.size == -1)

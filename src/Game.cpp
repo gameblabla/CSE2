@@ -2,8 +2,7 @@
 
 #include <stddef.h>
 #include <stdio.h>
-
-#include "SDL.h"
+#include <stdlib.h>
 
 #include "WindowsWrapper.h"
 
@@ -53,7 +52,7 @@ BOOL bContinue;
 int Random(int min, int max)
 {
 	const int range = max - min + 1;
-	return min + rep_rand() % range;
+	return min + rand() % range;
 }
 
 void PutNumber4(int x, int y, int value, BOOL bZero)
@@ -212,8 +211,8 @@ int ModeOpening(HWND hWnd)
 		++gCounter;
 	}
 
-	wait = SDL_GetTicks();	// The original version used GetTickCount instead
-	while (SDL_GetTicks() < wait + 500)
+	wait = GetTickCount();
+	while (GetTickCount() < wait + 500)
 	{
 		CortBox(&grcGame, 0x000000);
 		PutFramePerSecound();
@@ -457,8 +456,8 @@ int ModeTitle(HWND hWnd)
 	ChangeMusic(MUS_SILENCE);
 
 	// Black screen when option is selected
-	wait = SDL_GetTicks();	// The original version used GetTickCount instead
-	while (SDL_GetTicks() < wait + 1000)
+	wait = GetTickCount();
+	while (GetTickCount() < wait + 1000)
 	{
 		CortBox(&grcGame, 0);
 		PutFramePerSecound();
@@ -683,44 +682,18 @@ BOOL Game(HWND hWnd)
 
 	if (!LoadGenericData())
 	{
-		#if defined(NONPORTABLE) && defined(WINDOWS)
-			#ifdef JAPANESE
-			MessageBoxA(hWnd, "\x94\xC4\x97\x70\x83\x74\x83\x40\x83\x43\x83\x8B\x82\xAA\x93\xC7\x82\xDF\x82\xC8\x82\xA2", "\x83\x47\x83\x89\x81\x5B", MB_OK);
-			#else
-			MessageBoxA(hWnd, "Couldn't read general purpose files", "Error", MB_OK);
-			#endif
-		#else
-			#ifdef JAPANESE
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", "汎用ファイルが読めない", NULL);
-			#else
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Couldn't read general purpose files", NULL);
-			#endif
-		#endif
-
+		MessageBoxA(hWnd, "\x94\xC4\x97\x70\x83\x74\x83\x40\x83\x43\x83\x8B\x82\xAA\x93\xC7\x82\xDF\x82\xC8\x82\xA2", "\x83\x47\x83\x89\x81\x5B", MB_OK);
 		return FALSE;
 	}
 
 	PlaySoundObject(7, -1);
 
-	char path[PATH_LENGTH];
-	sprintf(path, "%s/npc.tbl", gDataPath);
+	char path[MAX_PATH];
+	sprintf(path, "%s\\npc.tbl", gDataPath);
 
 	if (!LoadNpcTable(path))
 	{
-		#if defined(NONPORTABLE) && defined(WINDOWS)
-			#ifdef JAPANESE
-			MessageBoxA(hWnd, "\x4E\x50\x43\x83\x65\x81\x5B\x83\x75\x83\x8B\x82\xAA\x93\xC7\x82\xDF\x82\xC8\x82\xA2", "\x83\x47\x83\x89\x81\x5B", MB_OK);
-			#else
-			MessageBoxA(hWnd, "Couldn't read the NPC table", "Error", MB_OK);
-			#endif
-		#else
-			#ifdef JAPANESE
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", "NPCテーブルが読めない", NULL);
-			#else
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Couldn't read the NPC table", NULL);
-			#endif
-		#endif
-
+		MessageBoxA(hWnd, "\x4E\x50\x43\x83\x65\x81\x5B\x83\x75\x83\x8B\x82\xAA\x93\xC7\x82\xDF\x82\xC8\x82\xA2", "\x83\x47\x83\x89\x81\x5B", MB_OK);
 		return FALSE;
 	}
 
@@ -747,9 +720,8 @@ BOOL Game(HWND hWnd)
 	ReleaseNpcTable();
 	ReleaseCreditScript();
 
-	// This needs uncommenting when SaveWindowRect is added
-	//if (!bFullscreen)
-	//	SaveWindowRect(hWnd, "window.rect");
+	if (!bFullscreen)
+		SaveWindowRect(hWnd, "window.rect");
 
 	return TRUE;
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CommonDefines.h"
+#include "WindowsWrapper.h"
 
-extern char gModulePath[PATH_LENGTH];
-extern char gDataPath[PATH_LENGTH];
+extern char gModulePath[MAX_PATH];
+extern char gDataPath[MAX_PATH];

@@ -1,7 +1,5 @@
 #pragma once
 
-#include "SDL.h"
-
 #include "WindowsWrapper.h"
 
 #ifndef RGB
@@ -50,27 +48,25 @@ typedef enum SurfaceID
 	SURFACE_ID_MAX = 40
 } SurfaceID;
 
+void SetWindowPadding(int width, int height);
 BOOL Flip_SystemTask(HWND hWnd);
-SDL_Window* CreateWindow(const char *title, int width, int height);
-BOOL StartDirectDraw(int lMagnification, int lColourDepth);
-void EndDirectDraw();
-void ReleaseSurface(int s);
+BOOL StartDirectDraw(HWND hWnd, int lMagnification, int lColourDepth);
+void EndDirectDraw(HWND hWnd);
+void ReleaseSurface(SurfaceID s);
+BOOL MakeSurface_Resource(const char *name, SurfaceID surf_no);
 BOOL MakeSurface_File(const char *name, SurfaceID surf_no);
-BOOL MakeSurface_Resource(const char *res, SurfaceID surf_no);
+BOOL ReloadBitmap_Resource(const char *name, SurfaceID surf_no);
 BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no);
-BOOL ReloadBitmap_Resource(const char *res, SurfaceID surf_no);
 BOOL MakeSurface_Generic(int bxsize, int bysize, SurfaceID surf_no, BOOL bSystem);
 void BackupSurface(SurfaceID surf_no, const RECT *rect);
 void PutBitmap3(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID surf_no);
 void PutBitmap4(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID surf_no);
 void Surface2Surface(int x, int y, const RECT *rect, int to, int from);
-unsigned long GetCortBoxColor(unsigned long col);
+unsigned long GetCortBoxColor(COLORREF col);
 void CortBox(const RECT *rect, unsigned long col);
 void CortBox2(const RECT *rect, unsigned long col, SurfaceID surf_no);
-void RestoreSurfaces();
+int RestoreSurfaces(void);
 void InitTextObject(const char *font_name);
 void PutText(int x, int y, const char *text, unsigned long color);
 void PutText2(int x, int y, const char *text, unsigned long color, SurfaceID surf_no);
-void EndTextObject();
-void HandleDeviceLoss();
-void HandleWindowResize();
+void EndTextObject(void);

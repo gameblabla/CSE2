@@ -9,7 +9,6 @@
 
 #include "CommonDefines.h"
 #include "Draw.h"
-#include "File.h"
 #include "NpChar.h"
 #include "Tags.h"
 
@@ -30,8 +29,8 @@ BOOL LoadMapData2(const char *path_map)
 	unsigned char dum;
 
 	// Get path
-	char path[PATH_LENGTH];
-	sprintf(path, "%s/%s", gDataPath, path_map);
+	char path[MAX_PATH];
+	sprintf(path, "%s\\%s", gDataPath, path_map);
 
 	// Open file
 	FILE *fp = fopen(path, "rb");
@@ -51,14 +50,9 @@ BOOL LoadMapData2(const char *path_map)
 	{
 		fread(&dum, 1, 1, fp);
 		// Get width and height
-#ifdef NONPORTABLE
 		// This fails on big-endian hardware, and platforms where short is not two bytes long.
 		fread(&gMap.width, 2, 1, fp);
 		fread(&gMap.length, 2, 1, fp);
-#else
-		gMap.width = File_ReadLE16(fp);
-		gMap.length = File_ReadLE16(fp);
-#endif
 
 		if (gMap.data == NULL)
 		{
@@ -80,8 +74,8 @@ BOOL LoadMapData2(const char *path_map)
 BOOL LoadAttributeData(const char *path_atrb)
 {
 	// Open file
-	char path[PATH_LENGTH];
-	sprintf(path, "%s/%s", gDataPath, path_atrb);
+	char path[MAX_PATH];
+	sprintf(path, "%s\\%s", gDataPath, path_atrb);
 
 	FILE *fp = fopen(path, "rb");
 	if (fp == NULL)

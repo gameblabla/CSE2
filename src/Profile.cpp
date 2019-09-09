@@ -4,15 +4,11 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "SDL.h"
-
 #include "WindowsWrapper.h"
 
 #include "ArmsItem.h"
 #include "BossLife.h"
-#include "CommonDefines.h"
 #include "Fade.h"
-#include "File.h"
 #include "Flags.h"
 #include "Frame.h"
 #include "Game.h"
@@ -30,8 +26,8 @@ const char *gProfileCode = "Do041220";
 
 BOOL IsProfile()
 {
-	char path[PATH_LENGTH];
-	sprintf(path, "%s/%s", gModulePath, gDefaultName);
+	char path[MAX_PATH];
+	sprintf(path, "%s\\%s", gModulePath, gDefaultName);
 
 	FILE *fp = fopen(path, "rb");
 	if (fp == NULL)
@@ -46,13 +42,13 @@ BOOL SaveProfile(const char *name)
 	PROFILE profile;
 	FILE *fp;
 	const char *FLAG = "FLAG";
-	char path[PATH_LENGTH];
+	char path[MAX_PATH];
 
 	// Get path
 	if (name)
-		sprintf(path, "%s/%s", gModulePath, name);
+		sprintf(path, "%s\\%s", gModulePath, name);
 	else
-		sprintf(path, "%s/%s", gModulePath, gDefaultName);
+		sprintf(path, "%s\\%s", gModulePath, gDefaultName);
 
 	// Open file
 	fp = fopen(path, "wb");
@@ -83,43 +79,7 @@ BOOL SaveProfile(const char *name)
 	memcpy(profile.flags, gFlagNPC, sizeof(profile.flags));
 
 	// Write to file
-#ifdef NONPORTABLE
 	fwrite(&profile, sizeof(PROFILE), 1, fp);
-#else
-	fwrite(profile.code, 8, 1, fp);
-	File_WriteLE32(profile.stage, fp);
-	File_WriteLE32(profile.music, fp);
-	File_WriteLE32(profile.x, fp);
-	File_WriteLE32(profile.y, fp);
-	File_WriteLE32(profile.direct, fp);
-	File_WriteLE16(profile.max_life, fp);
-	File_WriteLE16(profile.star, fp);
-	File_WriteLE16(profile.life, fp);
-	File_WriteLE16(profile.a, fp);
-	File_WriteLE32(profile.select_arms, fp);
-	File_WriteLE32(profile.select_item, fp);
-	File_WriteLE32(profile.equip, fp);
-	File_WriteLE32(profile.unit, fp);
-	File_WriteLE32(profile.counter, fp);
-	for (int arm = 0; arm < 8; arm++)
-	{
-		File_WriteLE32(profile.arms[arm].code, fp);
-		File_WriteLE32(profile.arms[arm].level, fp);
-		File_WriteLE32(profile.arms[arm].exp, fp);
-		File_WriteLE32(profile.arms[arm].max_num, fp);
-		File_WriteLE32(profile.arms[arm].num, fp);
-	}
-	for (int item = 0; item < 32; item++)
-		File_WriteLE32(profile.items[item].code, fp);
-	for (int stage = 0; stage < 8; stage++)
-	{
-		File_WriteLE32(profile.permitstage[stage].index, fp);
-		File_WriteLE32(profile.permitstage[stage].event, fp);
-	}
-	fwrite(profile.permit_mapping, 0x80, 1, fp);
-	fwrite(FLAG, 4, 1, fp);
-	fwrite(profile.flags, 1000, 1, fp);
-#endif
 
 	fclose(fp);
 	return TRUE;
@@ -128,12 +88,12 @@ BOOL SaveProfile(const char *name)
 BOOL LoadProfile(const char *name)
 {
 	// Get path
-	char path[PATH_LENGTH];
+	char path[MAX_PATH];
 
 	if (name)
 		sprintf(path, "%s", name);
 	else
-		sprintf(path, "%s/%s", gModulePath, gDefaultName);
+		sprintf(path, "%s\\%s", gModulePath, gDefaultName);
 
 	// Open file
 	PROFILE profile;
@@ -155,43 +115,7 @@ BOOL LoadProfile(const char *name)
 	// Read data
 	fseek(fp, 0, SEEK_SET);
 	memset(&profile, 0, sizeof(PROFILE));
-#ifdef NONPORTABLE
 	fread(&profile, sizeof(PROFILE), 1, fp);
-#else
-	fread(profile.code, 8, 1, fp);
-	profile.stage = File_ReadLE32(fp);
-	profile.music = (MusicID)File_ReadLE32(fp);
-	profile.x = File_ReadLE32(fp);
-	profile.y = File_ReadLE32(fp);
-	profile.direct = File_ReadLE32(fp);
-	profile.max_life = File_ReadLE16(fp);
-	profile.star = File_ReadLE16(fp);
-	profile.life = File_ReadLE16(fp);
-	profile.a = File_ReadLE16(fp);
-	profile.select_arms = File_ReadLE32(fp);
-	profile.select_item = File_ReadLE32(fp);
-	profile.equip = File_ReadLE32(fp);
-	profile.unit = File_ReadLE32(fp);
-	profile.counter = File_ReadLE32(fp);
-	for (int arm = 0; arm < 8; arm++)
-	{
-		profile.arms[arm].code = File_ReadLE32(fp);
-		profile.arms[arm].level = File_ReadLE32(fp);
-		profile.arms[arm].exp = File_ReadLE32(fp);
-		profile.arms[arm].max_num = File_ReadLE32(fp);
-		profile.arms[arm].num = File_ReadLE32(fp);
-	}
-	for (int item = 0; item < 32; item++)
-		profile.items[item].code = File_ReadLE32(fp);
-	for (int stage = 0; stage < 8; stage++)
-	{
-		profile.permitstage[stage].index = File_ReadLE32(fp);
-		profile.permitstage[stage].event = File_ReadLE32(fp);
-	}
-	fread(profile.permit_mapping, 0x80, 1, fp);
-	fread(profile.FLAG, 4, 1, fp);
-	fread(profile.flags, 1000, 1, fp);
-#endif
 	fclose(fp);
 
 	// Set things
@@ -254,22 +178,7 @@ BOOL InitializeGame(HWND hWnd)
 	InitFlags();
 	if (!TransferStage(13, 200, 10, 8))
 	{
-		#if defined(NONPORTABLE) && defined(WINDOWS)
-			#ifdef JAPANESE
-			MessageBoxA(hWnd, "\x83\x58\x83\x65\x81\x5B\x83\x57\x82\xCC\x93\xC7\x82\xDD\x8D\x9E\x82\xDD\x82\xC9\x8E\xB8\x94\x73", "\x83\x47\x83\x89\x81\x5B", MB_OK);
-			#else
-			MessageBoxA(hWnd, "Failed to load stage", "Error", MB_OK);
-			#endif
-		#else
-			(void)hWnd;
-
-			#ifdef JAPANESE
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", "ステージの読み込みに失敗", NULL);
-			#else
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Failed to load stage", NULL);
-			#endif
-		#endif
-
+		MessageBoxA(hWnd, "\x83\x58\x83\x65\x81\x5B\x83\x57\x82\xCC\x93\xC7\x82\xDD\x8D\x9E\x82\xDD\x82\xC9\x8E\xB8\x94\x73", "\x83\x47\x83\x89\x81\x5B", MB_OK);
 		return FALSE;
 	}
 

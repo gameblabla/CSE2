@@ -365,7 +365,7 @@ void PutCampObject()
 int CampLoop()
 {
 	int arms_num;
-	char old_script_path[PATH_LENGTH];
+	char old_script_path[MAX_PATH];
 
 	RECT rcView = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
