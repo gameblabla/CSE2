@@ -4,7 +4,7 @@
 # Exclude build output directory
 /game
 
-Exclude devilution-comparer assembly output
+# Exclude devilution-comparer assembly output
 devilution/orig.asm
 devilution/compare.asm
 
