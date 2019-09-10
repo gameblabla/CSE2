@@ -4,7 +4,9 @@
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://sam.zoy.org/wtfpl/COPYING for more details. */
 
+#include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <fstream>
 #include "FL/Fl.H"
 #include "FL/Fl_Window.H"
@@ -41,6 +43,8 @@ class RadioRow{
 		Fl_Radio_Round_Button *buttons[6];
 		Fl_Group *label;
 };
+
+static char config_path[FILENAME_MAX];
 
 static data config = {MAGIC, FONT};
 
@@ -113,7 +117,7 @@ void activatejoy(Fl_Widget*, void*){
 
 void read_Config(){
 	std::fstream fd;
-	fd.open("Config.dat", std::ios::in | std::ios::binary);
+	fd.open(config_path, std::ios::in | std::ios::binary);
 	fd.read((char*)&config, sizeof(config));
 	fd.close();
 	if (CharsToLong(config.move) == 0){
@@ -157,12 +161,29 @@ void write_Config(Fl_Widget*, void*){
 		LongToChars(button_lookup[joyRows[i]->value()]+1, config.buttons[i]);
 	}
 	std::fstream fd;
-	fd.open("Config.dat", std::ios::out | std::ios::binary);
+	fd.open(config_path, std::ios::out | std::ios::binary);
 	fd.write((char*)&config, sizeof(config));
 	fd.close();
 	exit(0);
 }
 int main(int argc, char* argv[]){
+	strcpy(config_path, argv[0]);
+
+	for (size_t i = strlen(config_path); ; --i)
+	{
+		if (i == 0)
+		{
+			strcpy(config_path, "Config.dat");
+			break;
+		}
+		else if (config_path[i] == '\\' || config_path[i] == '/')
+		{
+			config_path[i] = '\0';
+			strcat(config_path, "/Config.dat");
+			break;
+		}
+	}
+
 	Fl_Window *mainw = new Fl_Window(400, 380, "DoConfig - Doukutsu Monogatari Settings");
 
 	Fl_Group *movegroup = new Fl_Group(10, 10, 185, 50);
