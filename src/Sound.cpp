@@ -20,13 +20,11 @@ equivalents.
 #include "WindowsWrapper.h"
 
 #include "Backends/Audio.h"
-#include "ExtraSoundFormats.h"
 #include "Organya.h"
 #include "PixTone.h"
 #include "Tags.h"
 
-#define FREQUENCY 44100
-
+BOOL audio_backend_initialised;
 AudioBackend_Sound *lpSECONDARYBUFFER[SE_MAX];
 
 // DirectSoundの開始 (Starting DirectSound)
@@ -34,12 +32,16 @@ BOOL InitDirectSound(void)
 {
 	int i;
 
-#ifdef EXTRA_SOUND_FORMATS
-	ExtraSound_Init(44100);
-#endif
+	audio_backend_initialised = AudioBackend_Init();
 
-	if (!AudioBackend_Init())
+	if (!audio_backend_initialised)
+	{
+#ifndef FIX_BUGS
+		// This makes absolutely no sense here
+		StartOrganya("Org/Wave.dat");
+#endif
 		return FALSE;
+	}
 
 	for (i = 0; i < SE_MAX; i++)
 		lpSECONDARYBUFFER[i] = NULL;
@@ -54,6 +56,9 @@ void EndDirectSound(void)
 {
 	int i;
 
+	if (!audio_backend_initialised)
+		return;
+
 	EndOrganya();
 
 	for (i = 0; i < SE_MAX; i++)
@@ -61,10 +66,6 @@ void EndDirectSound(void)
 			AudioBackend_DestroySound(lpSECONDARYBUFFER[i]);
 
 	AudioBackend_Deinit();
-	
-#ifdef EXTRA_SOUND_FORMATS
-	ExtraSound_Deinit();
-#endif
 }
 /*
 // サウンドの設定 (Sound settings)
@@ -201,6 +202,9 @@ BOOL LoadSoundObject(LPCSTR file_name, int no)
 */
 void PlaySoundObject(int no, int mode)
 {
+	if (!audio_backend_initialised)
+		return;
+
 	if (lpSECONDARYBUFFER[no] != NULL)
 	{
 		switch (mode)
@@ -224,16 +228,25 @@ void PlaySoundObject(int no, int mode)
 
 void ChangeSoundFrequency(int no, unsigned long rate)	// 100がMIN9999がMAXで2195?がﾉｰﾏﾙ (100 is MIN, 9999 is MAX, and 2195 is normal)
 {
+	if (!audio_backend_initialised)
+		return;
+
 	AudioBackend_SetSoundFrequency(lpSECONDARYBUFFER[no], (rate * 10) + 100);
 }
 
 void ChangeSoundVolume(int no, long volume)	// 300がMAXで300がﾉｰﾏﾙ (300 is MAX and 300 is normal)
 {
+	if (!audio_backend_initialised)
+		return;
+
 	AudioBackend_SetSoundVolume(lpSECONDARYBUFFER[no], (volume - 300) * 8);
 }
 
 void ChangeSoundPan(int no, long pan)	// 512がMAXで256がﾉｰﾏﾙ (512 is MAX and 256 is normal)
 {
+	if (!audio_backend_initialised)
+		return;
+
 	AudioBackend_SetSoundPan(lpSECONDARYBUFFER[no], (pan - 256) * 10);
 }
 
@@ -246,6 +259,9 @@ int MakePixToneObject(const PIXTONEPARAMETER *ptp, int ptp_num, int no)
 	int sample_count;
 	unsigned char *pcm_buffer;
 	unsigned char *mixed_pcm_buffer;
+
+	if (!audio_backend_initialised)
+		return 0;
 
 	ptp_pointer = ptp;
 	sample_count = 0;

@@ -142,6 +142,9 @@ BOOL MakeSoundObject8(signed char *wavep, signed char track, signed char pipi)
 	unsigned char *wp_sub;
 	int work;
 
+	if (!audio_backend_initialised)
+		return FALSE;
+
 	for (j = 0; j < 8; j++)
 	{
 		for (k = 0; k < 2; k++)
@@ -189,6 +192,9 @@ static const short freq_tbl[12] = {262, 277, 294, 311, 330, 349, 370, 392, 415, 
 
 void ChangeOrganFrequency(unsigned char key, signed char track, long a)
 {
+	if (!audio_backend_initialised)
+		return;
+
 	for (int j = 0; j < 8; j++)
 		for (int i = 0; i < 2; i++)
 			AudioBackend_SetSoundFrequency(lpORGANBUFFER[track][j][i], ((oct_wave[j].wave_size * freq_tbl[key]) * oct_wave[j].oct_par) / 8 + (a - 1000));	// 1000を+αのデフォルト値とする (1000 is the default value for + α)
@@ -201,12 +207,18 @@ unsigned char key_twin[MAXTRACK];	// 今使っているキー(連続時のノイ
 
 void ChangeOrganPan(unsigned char key, unsigned char pan, signed char track)	// 512がMAXで256がﾉｰﾏﾙ (512 is MAX and 256 is normal)
 {
+	if (!audio_backend_initialised)
+		return;
+
 	if (old_key[track] != PANDUMMY)
 		AudioBackend_SetSoundPan(lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]], (pan_tbl[pan] - 0x100) * 10);
 }
 
 void ChangeOrganVolume(int no, long volume, signed char track)	// 300がMAXで300がﾉｰﾏﾙ (300 is MAX and 300 is normal)
 {
+	if (!audio_backend_initialised)
+		return;
+
 	if (old_key[track] != VOLDUMMY)
 		AudioBackend_SetSoundVolume(lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]], (volume - 0xFF) * 8);
 }
@@ -214,6 +226,9 @@ void ChangeOrganVolume(int no, long volume, signed char track)	// 300がMAXで30
 // サウンドの再生 (Play sound)
 void PlayOrganObject(unsigned char key, int mode, signed char track, long freq)
 {
+	if (!audio_backend_initialised)
+		return;
+
 	if (lpORGANBUFFER[track][key / 12][key_twin[track]] != NULL)
 	{
 		switch (mode)
@@ -273,6 +288,9 @@ void PlayOrganObject(unsigned char key, int mode, signed char track, long freq)
 // オルガーニャオブジェクトを開放 (Open Organya object)
 void ReleaseOrganyaObject(signed char track)
 {
+	if (!audio_backend_initialised)
+		return;
+
 	for (int i = 0; i < 8; i++)
 	{
 		if (lpORGANBUFFER[track][i][0] != NULL)
@@ -296,6 +314,9 @@ BOOL InitWaveData100(void)
 	char path[MAX_PATH];
 	sprintf(path, "%s/Resource/WAVE/Wave.dat", gDataPath);
 
+	if (!audio_backend_initialised)
+		return FALSE;
+
 	FILE *fp = fopen(path, "rb");
 
 	if (fp == NULL)
@@ -311,6 +332,9 @@ BOOL InitWaveData100(void)
 // 波形を１００個の中から選択して作成 (Select from 100 waveforms to create)
 BOOL MakeOrganyaWave(signed char track, signed char wave_no, signed char pipi)
 {
+	if (!audio_backend_initialised)
+		return FALSE;
+
 	if (wave_no > 99)
 		return FALSE;
 
@@ -326,22 +350,34 @@ BOOL MakeOrganyaWave(signed char track, signed char wave_no, signed char pipi)
 
 void ChangeDramFrequency(unsigned char key, signed char track)
 {
+	if (!audio_backend_initialised)
+		return;
+
 	AudioBackend_SetSoundFrequency(lpSECONDARYBUFFER[150 + track], key * 800 + 100);
 }
 
 void ChangeDramPan(unsigned char pan, signed char track)
 {
+	if (!audio_backend_initialised)
+		return;
+
 	AudioBackend_SetSoundPan(lpSECONDARYBUFFER[150 + track], (pan_tbl[pan] - 0x100) * 10);
 }
 
 void ChangeDramVolume(long volume, signed char track)
 {
+	if (!audio_backend_initialised)
+		return;
+
 	AudioBackend_SetSoundVolume(lpSECONDARYBUFFER[150 + track], (volume - 0xFF) * 8);
 }
 
 // サウンドの再生 (Play sound)
 void PlayDramObject(unsigned char key, int mode, signed char track)
 {
+	if (!audio_backend_initialised)
+		return;
+
 	if (lpSECONDARYBUFFER[150 + track] != NULL)
 	{
 		switch (mode)
@@ -742,6 +778,9 @@ void OrgData::SetPlayPointer(long x)
 // Start and end organya
 BOOL StartOrganya(const char *path_wave)	// The argument is ignored for some reason
 {
+	if (!audio_backend_initialised)
+		return FALSE;
+
 	if (!InitWaveData100())
 		return FALSE;
 
@@ -753,6 +792,9 @@ BOOL StartOrganya(const char *path_wave)	// The argument is ignored for some rea
 // Load organya file
 BOOL LoadOrganya(const char *name)
 {
+	if (!audio_backend_initialised)
+		return FALSE;
+
 	if (!org_data.InitMusicData(name))
 		return FALSE;
 
@@ -768,6 +810,9 @@ BOOL LoadOrganya(const char *name)
 
 void SetOrganyaPosition(unsigned int x)
 {
+	if (!audio_backend_initialised)
+		return;
+
 	org_data.SetPlayPointer(x);
 	gOrgVolume = 100;
 	bFadeout = FALSE;
@@ -775,16 +820,25 @@ void SetOrganyaPosition(unsigned int x)
 
 unsigned int GetOrganyaPosition(void)
 {
+	if (!audio_backend_initialised)
+		return 0 ;
+
 	return play_p;
 }
 
 void PlayOrganyaMusic(void)
 {
+	if (!audio_backend_initialised)
+		return;
+
 	organya_timer = org_data.info.wait;
 }
 
 BOOL ChangeOrganyaVolume(signed int volume)
 {
+	if (!audio_backend_initialised)
+		return FALSE;
+
 	if (volume < 0 || volume > 100)
 		return FALSE;
 
@@ -794,6 +848,9 @@ BOOL ChangeOrganyaVolume(signed int volume)
 
 void StopOrganyaMusic()
 {
+	if (!audio_backend_initialised)
+		return;
+
 	organya_timer = 0;
 
 	// Stop notes
@@ -814,6 +871,9 @@ void SetOrganyaFadeout()
 
 void EndOrganya()
 {
+	if (!audio_backend_initialised)
+		return;
+
 	organya_timer = 0;
 
 	// Release everything related to org

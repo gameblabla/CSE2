@@ -9,6 +9,7 @@
 
 #define SE_MAX 160	// According to the Organya source code release, this is the real name for this constant
 
+extern BOOL audio_backend_initialised;
 extern AudioBackend_Sound *lpSECONDARYBUFFER[SE_MAX];
 
 BOOL InitDirectSound(void);
