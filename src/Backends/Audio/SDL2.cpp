@@ -64,7 +64,7 @@ static void SetSoundPan(AudioBackend_Sound *sound, long pan)
 	sound->volume_r = sound->pan_r * sound->volume;
 }
 
-static void MixSounds(float *stream, size_t frames_total)
+static void MixSounds(float *stream, unsigned int frames_total)
 {
 	for (AudioBackend_Sound *sound = sound_list_head; sound != NULL; sound = sound->next)
 	{
