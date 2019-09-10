@@ -115,26 +115,26 @@ unsigned char GetAttribute(int x, int y)
 	if (x < 0 || y < 0 || x >= gMap.width || y >= gMap.length)
 		return 0;
 
-	const size_t a = *(gMap.data + x + gMap.width * y);
+	const size_t a = *(gMap.data + x + (y * gMap.width));	// Yes, the original code really does do this
 	return gMap.atrb[a];
 }
 
 void DeleteMapParts(int x, int y)
 {
-	*(gMap.data + x + gMap.width * y) = 0;
+	*(gMap.data + x + (y * gMap.width)) = 0;
 }
 
 void ShiftMapParts(int x, int y)
 {
-	*(gMap.data + x + gMap.width * y) -= 1;
+	*(gMap.data + x + (y * gMap.width)) -= 1;
 }
 
 BOOL ChangeMapParts(int x, int y, unsigned char no)
 {
-	if (*(gMap.data + x + gMap.width * y) == no)
+	if (*(gMap.data + x + (y * gMap.width)) == no)
 		return FALSE;
 
-	*(gMap.data + x + gMap.width * y) = no;
+	*(gMap.data + x + (y * gMap.width)) = no;
 
 	for (int i = 0; i < 3; i++)
 		SetNpChar(4, x * 0x200 * 0x10, y * 0x200 * 0x10, 0, 0, 0, 0, 0);
@@ -155,10 +155,10 @@ void PutStage_Back(int fx, int fy)
 	int num_x;
 
 	// Get range to draw
-	num_x = MIN(gMap.width, ((WINDOW_WIDTH + 0xF) / 0x10) + 1);
-	num_y = MIN(gMap.length, ((WINDOW_HEIGHT + 0xF) / 0x10) + 1);
-	put_x = MAX(0, (fx / 0x200 + 8) / 0x10);
-	put_y = MAX(0, (fy / 0x200 + 8) / 0x10);
+	num_x = MIN(gMap.width, ((WINDOW_WIDTH + (16 - 1)) / 16) + 1);
+	num_y = MIN(gMap.length, ((WINDOW_HEIGHT + (16 - 1)) / 16) + 1);
+	put_x = MAX(0, (fx / 0x200 + 8) / 16);
+	put_y = MAX(0, (fy / 0x200 + 8) / 16);
 
 	for (j = put_y; j < put_y + num_y; j++)
 	{
@@ -172,12 +172,12 @@ void PutStage_Back(int fx, int fy)
 				continue;
 
 			// Draw tile
-			rect.left = 16 * (gMap.data[offset] % 0x10);
-			rect.top = 16 * (gMap.data[offset] / 0x10);
+			rect.left = 16 * (gMap.data[offset] % 16);
+			rect.top = 16 * (gMap.data[offset] / 16);
 			rect.right = rect.left + 16;
 			rect.bottom = rect.top + 16;
 
-			PutBitmap3(&grcGame, PixelToScreenCoord(0x10 * i - 8) - SubpixelToScreenCoord(fx), PixelToScreenCoord(0x10 * j - 8) - SubpixelToScreenCoord(fy), &rect, SURFACE_ID_LEVEL_TILESET);
+			PutBitmap3(&grcGame, PixelToScreenCoord(i * 16 - 8) - SubpixelToScreenCoord(fx), PixelToScreenCoord(j * 16 - 8) - SubpixelToScreenCoord(fy), &rect, SURFACE_ID_LEVEL_TILESET);
 		}
 	}
 }
@@ -196,8 +196,8 @@ void PutStage_Front(int fx, int fy)
 	int num_x;
 
 	// Get range to draw
-	num_x = MIN(gMap.width, ((WINDOW_WIDTH + 0xF) >> 4) + 1);
-	num_y = MIN(gMap.length, ((WINDOW_HEIGHT + 0xF) >> 4) + 1);
+	num_x = MIN(gMap.width, ((WINDOW_WIDTH + (16 - 1)) / 16) + 1);
+	num_y = MIN(gMap.length, ((WINDOW_HEIGHT + (16 - 1)) / 16) + 1);
 	put_x = MAX(0, (fx / 0x200 + 8) / 16);
 	put_y = MAX(0, (fy / 0x200 + 8) / 16);
 
@@ -213,15 +213,15 @@ void PutStage_Front(int fx, int fy)
 				continue;
 
 			// Draw tile
-			rect.left = 16 * (gMap.data[offset] % 0x10);
-			rect.top = 16 * (gMap.data[offset] / 0x10);
+			rect.left = 16 * (gMap.data[offset] % 16);
+			rect.top = 16 * (gMap.data[offset] / 16);
 			rect.right = rect.left + 16;
 			rect.bottom = rect.top + 16;
 
-			PutBitmap3(&grcGame, PixelToScreenCoord(16 * i - 8) - SubpixelToScreenCoord(fx), PixelToScreenCoord(16 * j - 8) - SubpixelToScreenCoord(fy), &rect, SURFACE_ID_LEVEL_TILESET);
+			PutBitmap3(&grcGame, PixelToScreenCoord(i * 16 - 8) - SubpixelToScreenCoord(fx), PixelToScreenCoord(j * 16 - 8) - SubpixelToScreenCoord(fy), &rect, SURFACE_ID_LEVEL_TILESET);
 
 			if (atrb == 0x43)
-				PutBitmap3(&grcGame, PixelToScreenCoord(16 * i - 8) - SubpixelToScreenCoord(fx), PixelToScreenCoord(16 * j - 8) - SubpixelToScreenCoord(fy), &rcSnack, SURFACE_ID_NPC_SYM);
+				PutBitmap3(&grcGame, PixelToScreenCoord(i * 16 - 8) - SubpixelToScreenCoord(fx), PixelToScreenCoord(j * 16 - 8) - SubpixelToScreenCoord(fy), &rcSnack, SURFACE_ID_NPC_SYM);
 		}
 	}
 }
@@ -243,8 +243,8 @@ void PutMapDataVector(int fx, int fy)
 	count += 2;
 
 	// Get range to draw
-	num_x = MIN(gMap.width, ((WINDOW_WIDTH + 0xF) >> 4) + 1);
-	num_y = MIN(gMap.length, ((WINDOW_HEIGHT + 0xF) >> 4) + 1);
+	num_x = MIN(gMap.width, ((WINDOW_WIDTH + (16 - 1)) / 16) + 1);
+	num_y = MIN(gMap.length, ((WINDOW_HEIGHT + (16 - 1)) / 16) + 1);
 	put_x = MAX(0, (fx / 0x200 + 8) / 16);
 	put_y = MAX(0, (fy / 0x200 + 8) / 16);
 
@@ -270,7 +270,7 @@ void PutMapDataVector(int fx, int fy)
 			{
 				case 128:
 				case 160:
-					rect.left = 224 + (count % 0x10);
+					rect.left = 224 + (count % 16);
 					rect.right = rect.left + 16;
 					rect.top = 48;
 					rect.bottom = rect.top + 16;
@@ -279,12 +279,12 @@ void PutMapDataVector(int fx, int fy)
 				case 161:
 					rect.left = 224;
 					rect.right = rect.left + 16;
-					rect.top = 48 + (count % 0x10);
+					rect.top = 48 + (count % 16);
 					rect.bottom = rect.top + 16;
 					break;
 				case 130:
 				case 162:
-					rect.left = 240 - (count % 0x10);
+					rect.left = 240 - (count % 16);
 					rect.right = rect.left + 16;
 					rect.top = 48;
 					rect.bottom = rect.top + 16;
@@ -293,12 +293,12 @@ void PutMapDataVector(int fx, int fy)
 				case 163:
 					rect.left = 224;
 					rect.right = rect.left + 16;
-					rect.top = 64 - (count % 0x10);
+					rect.top = 64 - (count % 16);
 					rect.bottom = rect.top + 16;
 					break;
 			}
 
-			PutBitmap3(&grcGame, PixelToScreenCoord(16 * i - 8) - SubpixelToScreenCoord(fx), PixelToScreenCoord(16 * j - 8) - SubpixelToScreenCoord(fy), &rect, SURFACE_ID_CARET);
+			PutBitmap3(&grcGame, PixelToScreenCoord(i * 16 - 8) - SubpixelToScreenCoord(fx), PixelToScreenCoord(j * 16 - 8) - SubpixelToScreenCoord(fy), &rect, SURFACE_ID_CARET);
 		}
 	}
 }
