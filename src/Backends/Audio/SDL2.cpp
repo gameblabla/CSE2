@@ -10,8 +10,6 @@
 #include "../../Organya.h"
 #include "../../WindowsWrapper.h"
 
-#define OUTPUT_FREQUENCY 44100
-
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define clamp(x, y, z) MIN(MAX((x), (y)), (z))
@@ -37,6 +35,8 @@ struct AudioBackend_Sound
 static AudioBackend_Sound *sound_list_head;
 static SDL_AudioDeviceID device_id;
 
+static unsigned long output_frequency;
+
 static double MillibelToScale(long volume)
 {
 	// Volume is in hundredths of decibels, from 0 to -10000
@@ -47,7 +47,7 @@ static double MillibelToScale(long volume)
 static void SetSoundFrequency(AudioBackend_Sound *sound, unsigned int frequency)
 {
 	sound->frequency = frequency;
-	sound->advance_delta = (double)frequency / (double)OUTPUT_FREQUENCY;
+	sound->advance_delta = (double)frequency / (double)output_frequency;
 }
 
 static void SetSoundVolume(AudioBackend_Sound *sound, long volume)
@@ -150,7 +150,7 @@ static void Callback(void *user_data, Uint8 *stream_uint8, int len)
 
 			if (organya_countdown == 0)
 			{
-				organya_countdown = (organya_timer * OUTPUT_FREQUENCY) / 1000;	// organya_timer is in milliseconds, so convert it to audio frames
+				organya_countdown = (organya_timer * output_frequency) / 1000;	// organya_timer is in milliseconds, so convert it to audio frames
 				UpdateOrganya();
 			}
 
@@ -170,14 +170,16 @@ BOOL AudioBackend_Init(void)
 		return FALSE;
 
 	SDL_AudioSpec specification;
-	specification.freq = OUTPUT_FREQUENCY;
+	specification.freq = 44100;
 	specification.format = AUDIO_F32;
 	specification.channels = 2;
 	specification.samples = 0x400;	// Roughly 10 milliseconds for 44100Hz
 	specification.callback = Callback;
 	specification.userdata = NULL;
 
-	device_id = SDL_OpenAudioDevice(NULL, 0, &specification, NULL, 0);
+	SDL_AudioSpec obtained_specification;
+	device_id = SDL_OpenAudioDevice(NULL, 0, &specification, &obtained_specification, SDL_AUDIO_ALLOW_FREQUENCY_CHANGE);
+	output_frequency = obtained_specification.freq;
 
 	if (device_id == 0)
 		return FALSE;
