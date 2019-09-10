@@ -7,5 +7,5 @@ src/Resource
 # Exclude build output directory
 /game
 
-Exclude the (recommended) CMake build directory
+# Exclude the (recommended) CMake build directory
 build/*

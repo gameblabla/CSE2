@@ -22,6 +22,7 @@ endif()
 
 # Find FLTK
 if(NOT FORCE_LOCAL_LIBS)
+	set(FLTK_SKIP_FLUID ON)
 	find_package(FLTK)
 endif()
 
