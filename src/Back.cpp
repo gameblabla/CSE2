@@ -186,7 +186,7 @@ void PutFront(int fx, int fy)
 
 			for (y = y_1; y < y_2; y++)
 			{
-				ypos = (y * 0x20 * 0x200) / 0x200 - fy / 0x200 + gWaterY / 0x200;
+				ypos = (y * 32 * 0x200) / 0x200 - fy / 0x200 + gWaterY / 0x200;
 
 				if (ypos < -32)
 					continue;
@@ -196,7 +196,7 @@ void PutFront(int fx, int fy)
 
 				for (x = x_1; x < x_2; x++)
 				{
-					xpos = (x * 0x20 * 0x200) / 0x200 - fx / 0x200;
+					xpos = (x * 32 * 0x200) / 0x200 - fx / 0x200;
 					PutBitmap3(&grcGame, xpos, ypos, &rcWater[1], SURFACE_ID_LEVEL_BACKGROUND);
 					if (y == 0)
 						PutBitmap3(&grcGame, xpos, ypos, &rcWater[0], SURFACE_ID_LEVEL_BACKGROUND);
