@@ -24,8 +24,6 @@ equivalents.
 #include "PixTone.h"
 #include "Tags.h"
 
-#define FREQUENCY 44100
-
 AudioBackend_Sound *lpSECONDARYBUFFER[SE_MAX];
 
 // DirectSoundの開始 (Starting DirectSound)
