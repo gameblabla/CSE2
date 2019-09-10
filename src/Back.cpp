@@ -150,9 +150,6 @@ void PutBack(int fx, int fy)
 			PutBitmap4(&grcGame, 320 - 4 * gBack.fx % 320, 176, &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
 			break;
-
-		default:
-			return;
 	}
 }
 
@@ -173,13 +170,13 @@ void PutFront(int fx, int fy)
 	{
 		case 3:
 			x_1 = fx / 0x4000;
-			x_2 = x_1 + (((WINDOW_WIDTH + 31) >> 5) + 1);
+			x_2 = x_1 + (((WINDOW_WIDTH + (32 - 1)) / 32) + 1);
 			y_1 = 0;
 			y_2 = y_1 + 32;
 
 			for (y = y_1; y < y_2; y++)
 			{
-				ypos = (y * 0x20 * 0x200) / 0x200 - fy / 0x200 + gWaterY / 0x200;
+				ypos = (y * 32 * 0x200) / 0x200 - fy / 0x200 + gWaterY / 0x200;
 
 				if (ypos < -32)
 					continue;
@@ -189,63 +186,12 @@ void PutFront(int fx, int fy)
 
 				for (x = x_1; x < x_2; x++)
 				{
-					xpos = (x * 0x20 * 0x200) / 0x200 - fx / 0x200;
+					xpos = (x * 32 * 0x200) / 0x200 - fx / 0x200;
 					PutBitmap3(&grcGame, xpos, ypos, &rcWater[1], SURFACE_ID_LEVEL_BACKGROUND);
-					if (!y)
+					if (y == 0)
 						PutBitmap3(&grcGame, xpos, ypos, &rcWater[0], SURFACE_ID_LEVEL_BACKGROUND);
 				}
 			}
 
 	}
-/*
-	// Draw black bars
-	if (!(g_GameFlags & 8)) // Detect if credits are running
-	{
-		const BOOL fromFocus = (gStageNo == 31); // Get if we should only draw around a 320x240 area of the focus point
-
-		// Get focus rect
-		int focusX = gFrame.x + (WINDOW_WIDTH << 8) - (320 << 8);
-		int focusY = gFrame.y + (WINDOW_HEIGHT << 8) - (240 << 8);
-		int focusR = focusX + (320 << 9);
-		int focusB = focusY + (240 << 9);
-
-		// Get borders
-		const int barLeft = fromFocus ? focusX : -0x1000;
-		const int barTop = fromFocus ? focusY : -0x1000;
-
-		const int barRight = fromFocus ? focusR : (gMap.width << 13) - 0x1000;
-		const int barBottom = fromFocus ? focusB : (gMap.length << 13) - 0x1000;
-
-		// Draw bars
-		RECT barRect;
-
-		// Left
-		barRect.left = 0;
-		barRect.top = 0;
-		barRect.right = (barLeft - gFrame.x) >> 9;
-		barRect.bottom = WINDOW_HEIGHT;
-		CortBox(&barRect, 0x000000);
-
-		// Top
-		barRect.left = 0;
-		barRect.top = 0;
-		barRect.right = WINDOW_WIDTH;
-		barRect.bottom = (barTop - gFrame.y) >> 9;
-		CortBox(&barRect, 0x000000);
-
-		// Right
-		barRect.left = (barRight - gFrame.x) >> 9;
-		barRect.top = 0;
-		barRect.right = WINDOW_WIDTH;
-		barRect.bottom = WINDOW_HEIGHT;
-		CortBox(&barRect, 0x000000);
-
-		// Bottom
-		barRect.left = 0;
-		barRect.top = (barBottom - gFrame.y) >> 9;
-		barRect.right = WINDOW_WIDTH;
-		barRect.bottom = WINDOW_HEIGHT;
-		CortBox(&barRect, 0x000000);
-	}
-	*/
 }
