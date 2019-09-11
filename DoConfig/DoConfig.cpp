@@ -107,7 +107,8 @@ void quit(Fl_Widget*, void*){
 	std::exit(0);
 }
 
-void activatejoy(Fl_Widget*, void*){
+void activatejoy(Fl_Widget*, void*)
+{
 	if(joystuffcontainer->active()){
 		joystuffcontainer->deactivate();
 	} else {
@@ -166,6 +167,7 @@ void write_Config(Fl_Widget*, void*){
 	fd.close();
 	exit(0);
 }
+
 int main(int argc, char* argv[]){
 	strcpy(config_path, argv[0]);
 
@@ -216,6 +218,7 @@ int main(int argc, char* argv[]){
 		{"Fullscreen 32-bit"},
 		{0}};
 	displaychoice->menu(screens);
+
 	joychoice = new Fl_Check_Button(205, 100, 185, 20, "Use Joypad");
 	joychoice->callback(&activatejoy);
 
@@ -258,8 +261,10 @@ int main(int argc, char* argv[]){
 
 	joystuffcontainer->end();
 
+
 	Fl_Button *okaybutton = new Fl_Button(10, 340, 185, 30, "Okay");
 	okaybutton->callback(&write_Config);
+
 	Fl_Button *cancelbutton = new Fl_Button(205, 340, 185, 30, "Cancel");
 	cancelbutton->callback(&quit);
 
