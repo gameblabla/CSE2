@@ -80,7 +80,7 @@ BOOL GetJoystickStatus(JOYSTICK_STATUS *status)
 	else if (joystick_x > joystick_neutral_x + 10000)
 		status->bRight = TRUE;
 
-	const Sint16 joystick_y = SDL_JoystickGetAxis(joystick, 0);
+	const Sint16 joystick_y = SDL_JoystickGetAxis(joystick, 1);
 	if (joystick_y < joystick_neutral_y - 10000)
 		status->bUp = TRUE;
 	else if (joystick_y > joystick_neutral_y + 10000)
