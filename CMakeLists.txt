@@ -11,7 +11,7 @@ option(JAPANESE "Enable the Japanese-language build" OFF)
 option(FIX_BUGS "Fix various bugs in the game" OFF)
 option(DEBUG_SAVE "Re-enable the ability to drag-and-drop save files onto the window" OFF)
 option(FORCE_LOCAL_LIBS "Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones" OFF)
-set(RENDERER "Texture" CACHE STRING "Which renderer the game should use, the options being : 'OpenGL3' for an OpenGL 3.2 renderer, 'Texture' for SDL2's hardware-accelerated Texture API, 'Surface' for SDL2's software-rendered Surface API and 'Software' for a handwritten software renderer ")
+set(RENDERER "Texture" CACHE STRING "Which renderer the game should use : 'OpenGL3' for an OpenGL 3.2 renderer, 'Texture' for SDL2's hardware-accelerated Texture API, 'Surface' for SDL2's software-rendered Surface API and 'Software' for a handwritten software renderer")
 
 project(CSE2 LANGUAGES C CXX)
 
@@ -271,7 +271,7 @@ if(MSVC)
 	target_compile_definitions(CSE2 PRIVATE _CRT_SECURE_NO_WARNINGS)	# Disable warnings that normally fire up on MSVC when using "unsafe" functions instead of using MSVC's "safe" _s functions
 endif()
 
-# Build bin2h externally, so it isn't cross-compiled when CSE2 is (Emscripten, cross-gcc, mingw on Linux, etc.)
+# Build bin2h externally, so it isn't cross-compiled when CSE2 is (Emscripten, cross-GCC, MinGW on Linux, etc.)
 include(ExternalProject)
 
 ExternalProject_Add(bin2h
