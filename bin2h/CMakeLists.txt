@@ -16,8 +16,7 @@ set_target_properties(bin2h PROPERTIES
 
 # MSVC tweak
 if(MSVC)
-	target_compile_definitions(bin2h PRIVATE _CRT_SECURE_NO_WARNINGS)	# Shut up those stupid warnings
-endif()
+	target_compile_definitions(bin2h PRIVATE _CRT_SECURE_NO_WARNINGS)	# Disable warnings that normally fire up on MSVC when using "unsafe" functions instead of using MSVC's "safe" _s functions
 
 # Enable link-time optimisation if available
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
