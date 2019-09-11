@@ -4,25 +4,26 @@
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://sam.zoy.org/wtfpl/COPYING for more details. */
 
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <fstream>
 #include "FL/Fl.H"
-#include "FL/Fl_Window.H"
-#include "FL/Fl_Radio_Round_Button.H"
-#include "FL/Fl_Choice.H"
 #include "FL/Fl_Check_Button.H"
+#include "FL/Fl_Choice.H"
+#include "FL/Fl_Radio_Round_Button.H"
+#include "FL/Fl_Window.H"
+#include <FL/Enumerations.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Menu_Item.H>
 #include <FL/Fl_Round_Button.H>
-#include <FL/Enumerations.H>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <fstream>
 
 #define MAGIC "DOUKUTSU20041206"
 #define FONT "Courier New"
 
-struct data{
+struct data
+{
 	char magic[32];
 	char font[64];
 	unsigned char move[4];
@@ -33,12 +34,14 @@ struct data{
 	unsigned char buttons[8][4];
 };
 
-class RadioRow{
-public:
+class RadioRow
+{
+  public:
 	RadioRow(char offset);
 	int value();
 	void value(int input);
-private:
+
+  private:
 	Fl_Group *group;
 	Fl_Radio_Round_Button *buttons[6];
 	Fl_Group *label;
@@ -61,30 +64,30 @@ static void LongToChars(unsigned long long_var, unsigned char *chars)
 	chars[3] = (long_var >> 24) & 0xFF;
 }
 
-RadioRow::RadioRow(char offset){
+RadioRow::RadioRow(char offset)
+{
 	char *temp = new char[2];
 	temp[0] = '1' + offset;
 	temp[1] = '\0';
-	this->group = new Fl_Group(140+offset*30, 150, 30, 180);
+	this->group = new Fl_Group(140 + offset * 30, 150, 30, 180);
 	this->group->label(temp);
 	this->group->align(FL_ALIGN_TOP_LEFT);
-	for(char i=0;i<6;i++){
-		this->buttons[i] = new Fl_Radio_Round_Button(140+offset*30, 150+30*i, 30, 30);
-	}
+	for (char i = 0; i < 6; i++)
+		this->buttons[i] = new Fl_Radio_Round_Button(140 + offset * 30, 150 + 30 * i, 30, 30);
 	this->group->end();
 }
 
-int RadioRow::value(){
+int RadioRow::value()
+{
 	char i;
-	for(i=0;i<6;i++){
-		if(this->buttons[i]->value()){
+	for (i = 0; i < 6; i++)
+		if (this->buttons[i]->value())
 			return (int)i;
-		}
-	}
 	return 0;
 }
 
-void RadioRow::value(int input){
+void RadioRow::value(int input)
+{
 	this->buttons[input]->setonly();
 }
 
@@ -103,75 +106,71 @@ Fl_Check_Button *joychoice;
 Fl_Group *joystuffcontainer;
 RadioRow *joyRows[8];
 
-void quit(Fl_Widget*, void*){
+void quit(Fl_Widget *, void *)
+{
 	std::exit(0);
 }
 
-void activatejoy(Fl_Widget*, void*)
+void activatejoy(Fl_Widget *, void *)
 {
-	if(joystuffcontainer->active()){
+	if (joystuffcontainer->active())
 		joystuffcontainer->deactivate();
-	} else {
+	else
 		joystuffcontainer->activate();
-	}
 }
 
-void read_Config(){
+void read_Config()
+{
 	std::fstream fd;
 	fd.open(config_path, std::ios::in | std::ios::binary);
-	fd.read((char*)&config, sizeof(config));
+	fd.read((char *)&config, sizeof(config));
 	fd.close();
-	if (CharsToLong(config.move) == 0){
-		movear->setonly();
-	} else {
-		movegt->setonly();
-	}
-	if (CharsToLong(config.attack) == 0){
-		buttonxz->setonly();
-	} else {
-		buttonzx->setonly();
-	}
-	if (CharsToLong(config.okay) == 0){
-		okayjump->setonly();
-	}else{
-		okayattack->setonly();
-	}
+	CharsToLong(config.move) ? movegt->setonly() : movear->setonly();
+	CharsToLong(config.attack) ? buttonzx->setonly() : buttonxz->setonly();
+	CharsToLong(config.okay) ? okayattack->setonly() : okayjump->setonly();
+
 	displaychoice->value(CharsToLong(config.display));
 	joychoice->value(CharsToLong(config.useJoy));
-	if( !CharsToLong(config.useJoy) ){
+
+	if (!CharsToLong(config.useJoy))
 		joystuffcontainer->deactivate();
-	}
-	for(char i=0;i<8;i++){
+
+	for (char i = 0; i < 8; i++)
+	{
 		const unsigned long button = CharsToLong(config.buttons[i]);
-		if(button<6 && button>0){
+		if (button < 6 && button > 0)
+		{
 			const unsigned int button_lookup[6] = {0, 1, 2, 4, 5, 3};
-			joyRows[i]->value(button_lookup[button-1]);
+			joyRows[i]->value(button_lookup[button - 1]);
 		}
 	}
 }
 
-void write_Config(Fl_Widget*, void*){
+void write_Config(Fl_Widget *, void *)
+{
 	LongToChars(movegt->value(), config.move);
 	LongToChars(buttonzx->value(), config.attack);
 	LongToChars(okayattack->value(), config.okay);
 
 	LongToChars(displaychoice->value(), config.display);
 	LongToChars(joychoice->value(), config.useJoy);
-	for(char i =0;i<8;i++){
+	for (char i = 0; i < 8; i++)
+	{
 		const unsigned int button_lookup[6] = {0, 1, 2, 5, 3, 4};
-		LongToChars(button_lookup[joyRows[i]->value()]+1, config.buttons[i]);
+		LongToChars(button_lookup[joyRows[i]->value()] + 1, config.buttons[i]);
 	}
 	std::fstream fd;
 	fd.open(config_path, std::ios::out | std::ios::binary);
-	fd.write((char*)&config, sizeof(config));
+	fd.write((char *)&config, sizeof(config));
 	fd.close();
 	exit(0);
 }
 
-int main(int argc, char* argv[]){
+int main(int argc, char *argv[])
+{
 	strcpy(config_path, argv[0]);
 
-	for (size_t i = strlen(config_path); ; --i)
+	for (size_t i = strlen(config_path);; --i)
 	{
 		if (i == 0)
 		{
@@ -210,13 +209,7 @@ int main(int argc, char* argv[]){
 	okaygroup->end();
 
 	displaychoice = new Fl_Choice(205, 70, 185, 20);
-	Fl_Menu_Item screens[] = {
-		{"Fullscreen 16-bit"},
-		{"Windowed 320x240"},
-		{"Windowed 640x480"},
-		{"Fullscreen 24-bit"},
-		{"Fullscreen 32-bit"},
-		{0}};
+	Fl_Menu_Item screens[] = {{"Fullscreen 16-bit"}, {"Windowed 320x240"}, {"Windowed 640x480"}, {"Fullscreen 24-bit"}, {"Fullscreen 32-bit"}, {0}};
 	displaychoice->menu(screens);
 
 	joychoice = new Fl_Check_Button(205, 100, 185, 20, "Use Joypad");
@@ -224,11 +217,12 @@ int main(int argc, char* argv[]){
 
 	joystuffcontainer = new Fl_Group(10, 130, 380, 200);
 	joystuffcontainer->box(FL_THIN_DOWN_BOX);
-	for(char i=0;i<8;i++){
+	for (char i = 0; i < 8; i++)
+	{
 		joyRows[i] = new RadioRow(i);
 	}
 
-	//There's no Label class alright? I'll switch it as soon as one is introduced.
+	// There's no Label class alright? I'll switch it as soon as one is introduced.
 	Fl_Group *labeljump = new Fl_Group(10, 150, 10, 20);
 	labeljump->label("Jump:");
 	labeljump->align(FL_ALIGN_RIGHT);
@@ -260,7 +254,6 @@ int main(int argc, char* argv[]){
 	labelmap->end();
 
 	joystuffcontainer->end();
-
 
 	Fl_Button *okaybutton = new Fl_Button(10, 340, 185, 30, "Okay");
 	okaybutton->callback(&write_Config);
