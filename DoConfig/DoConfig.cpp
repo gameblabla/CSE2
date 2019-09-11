@@ -36,12 +36,12 @@ struct data
 
 class RadioRow
 {
-  public:
+public:
 	RadioRow(char offset);
 	int value();
 	void value(int input);
 
-  private:
+private:
 	Fl_Group *group;
 	Fl_Radio_Round_Button *buttons[6];
 	Fl_Group *label;
