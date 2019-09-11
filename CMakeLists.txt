@@ -271,7 +271,7 @@ if(MSVC)
 	target_compile_definitions(CSE2 PRIVATE _CRT_SECURE_NO_WARNINGS)	# Disable warnings that normally fire up on MSVC when using "unsafe" functions instead of using MSVC's "safe" _s functions
 endif()
 
-# Build bin2h externally, so it isn't cross-compiled when we're cross-compiling CSE2 (Emscriptem, etc.)
+# Build bin2h externally, so it isn't cross-compiled when we're cross-compiling CSE2 (Emscriptem, cross-gcc, mingw on Linux, etc.)
 include(ExternalProject)
 
 ExternalProject_Add(bin2h
