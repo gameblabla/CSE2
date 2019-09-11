@@ -10,7 +10,7 @@ Branch | Description
 [emscripten](https://www.github.com/Clownacy/Cave-Story-Engine-2/tree/emscripten) | Modifies the engine to build with Emscripten, [allowing it to run in web browsers](http://sonicresearch.org/clownacy/cave.html).
 [wii](https://www.github.com/Clownacy/Cave-Story-Engine-2/tree/wii) | Ports the engine to the Nintendo Wii.
 
-# Cave Story Engine 2 (portable)
+# Cave Story Engine 2 (Portable)
 
 Cave Story Engine 2 is a decompilation of Cave Story.
 
