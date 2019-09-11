@@ -34,14 +34,14 @@ struct data{
 };
 
 class RadioRow{
-	public:
-		RadioRow(char offset);
-		int value();
-		void value(int input);
-	private:
-		Fl_Group *group;
-		Fl_Radio_Round_Button *buttons[6];
-		Fl_Group *label;
+public:
+	RadioRow(char offset);
+	int value();
+	void value(int input);
+private:
+	Fl_Group *group;
+	Fl_Radio_Round_Button *buttons[6];
+	Fl_Group *label;
 };
 
 static char config_path[FILENAME_MAX];
@@ -63,8 +63,8 @@ static void LongToChars(unsigned long long_var, unsigned char *chars)
 
 RadioRow::RadioRow(char offset){
 	char *temp = new char[2];
-	*(temp) = (char)(49+offset); //Muhahahahahahah!
-	*(temp+1) = '\0';
+	temp[0] = '1' + offset;
+	temp[1] = '\0';
 	this->group = new Fl_Group(140+offset*30, 150, 30, 180);
 	this->group->label(temp);
 	this->group->align(FL_ALIGN_TOP_LEFT);
@@ -142,7 +142,7 @@ void read_Config(){
 	}
 	for(char i=0;i<8;i++){
 		const unsigned long button = CharsToLong(config.buttons[i]);
-		if(button<9 && button>0){
+		if(button<6 && button>0){
 			const unsigned int button_lookup[6] = {0, 1, 2, 4, 5, 3};
 			joyRows[i]->value(button_lookup[button-1]);
 		}
@@ -187,31 +187,31 @@ int main(int argc, char* argv[]){
 	Fl_Window *mainw = new Fl_Window(400, 380, "DoConfig - Doukutsu Monogatari Settings");
 
 	Fl_Group *movegroup = new Fl_Group(10, 10, 185, 50);
-		movegroup->box(FL_THIN_DOWN_BOX);
-		movear = new Fl_Radio_Round_Button(10, 10, 185, 20, "Arrows for Movement");
-		movear->setonly();
-		movegt = new Fl_Radio_Round_Button(10, 40, 185, 20, "<>? for Movement");
+	movegroup->box(FL_THIN_DOWN_BOX);
+	movear = new Fl_Radio_Round_Button(10, 10, 185, 20, "Arrows for Movement");
+	movear->setonly();
+	movegt = new Fl_Radio_Round_Button(10, 40, 185, 20, "<>? for Movement");
 	movegroup->end();
 
 	Fl_Group *buttongroup = new Fl_Group(10, 70, 185, 50);
-		buttongroup->box(FL_THIN_DOWN_BOX);
-		buttonxz = new Fl_Radio_Round_Button(10, 70, 185, 20, "Z=Jump; X=Attack");
-		buttonxz->setonly();
-		buttonzx = new Fl_Radio_Round_Button(10, 100, 185, 20, "X=Jump; Z=Attack");
+	buttongroup->box(FL_THIN_DOWN_BOX);
+	buttonxz = new Fl_Radio_Round_Button(10, 70, 185, 20, "Z=Jump; X=Attack");
+	buttonxz->setonly();
+	buttonzx = new Fl_Radio_Round_Button(10, 100, 185, 20, "X=Jump; Z=Attack");
 	buttongroup->end();
 
 	Fl_Group *okaygroup = new Fl_Group(205, 10, 185, 50);
-		okaygroup->box(FL_THIN_DOWN_BOX);
-		okayjump = new Fl_Radio_Round_Button(205, 10, 185, 20, "Jump=Okay");
-		okayjump->setonly();
-		okayattack = new Fl_Radio_Round_Button(205, 40, 185, 20, "Attack=Okay");
+	okaygroup->box(FL_THIN_DOWN_BOX);
+	okayjump = new Fl_Radio_Round_Button(205, 10, 185, 20, "Jump=Okay");
+	okayjump->setonly();
+	okayattack = new Fl_Radio_Round_Button(205, 40, 185, 20, "Attack=Okay");
 	okaygroup->end();
 
 	displaychoice = new Fl_Choice(205, 70, 185, 20);
 	Fl_Menu_Item screens[] = {
 		{"Fullscreen 16-bit"},
 		{"Windowed 320x240"},
- 		{"Windowed 640x480"},
+		{"Windowed 640x480"},
 		{"Fullscreen 24-bit"},
 		{"Fullscreen 32-bit"},
 		{0}};
@@ -220,35 +220,41 @@ int main(int argc, char* argv[]){
 	joychoice->callback(&activatejoy);
 
 	joystuffcontainer = new Fl_Group(10, 130, 380, 200);
-		joystuffcontainer->box(FL_THIN_DOWN_BOX);
-		for(char i=0;i<8;i++){
-			joyRows[i] = new RadioRow(i);
-		}
-		//There's no Label class alright? I'll switch it as soon as one is introduced.
-		Fl_Group *labeljump = new Fl_Group(10, 150, 10, 20);
-		labeljump->label("Jump:");
-		labeljump->align(FL_ALIGN_RIGHT);
-		labeljump->end();
-		Fl_Group *labelattack = new Fl_Group(10, 180, 10, 20);
-		labelattack->label("Attack:");
-		labelattack->align(FL_ALIGN_RIGHT);
-		labelattack->end();
-		Fl_Group *labelweaponup = new Fl_Group(10, 210, 10, 20);
-		labelweaponup->label("Weapon+:");
-		labelweaponup->align(FL_ALIGN_RIGHT);
-		labelweaponup->end();
-		Fl_Group *labelweapondown = new Fl_Group(10, 240, 10, 20);
-		labelweapondown->label("Weapon-:");
-		labelweapondown->align(FL_ALIGN_RIGHT);
-		labelweapondown->end();
-		Fl_Group *labelitem = new Fl_Group(10, 270, 10, 20);
-		labelitem->label("Items:");
-		labelitem->align(FL_ALIGN_RIGHT);
-		labelitem->end();
-		Fl_Group *labelmap = new Fl_Group(10, 300, 10, 20);
-		labelmap->label("Map:");
-		labelmap->align(FL_ALIGN_RIGHT);
-		labelmap->end();
+	joystuffcontainer->box(FL_THIN_DOWN_BOX);
+	for(char i=0;i<8;i++){
+		joyRows[i] = new RadioRow(i);
+	}
+
+	//There's no Label class alright? I'll switch it as soon as one is introduced.
+	Fl_Group *labeljump = new Fl_Group(10, 150, 10, 20);
+	labeljump->label("Jump:");
+	labeljump->align(FL_ALIGN_RIGHT);
+	labeljump->end();
+
+	Fl_Group *labelattack = new Fl_Group(10, 180, 10, 20);
+	labelattack->label("Attack:");
+	labelattack->align(FL_ALIGN_RIGHT);
+	labelattack->end();
+
+	Fl_Group *labelweaponup = new Fl_Group(10, 210, 10, 20);
+	labelweaponup->label("Weapon+:");
+	labelweaponup->align(FL_ALIGN_RIGHT);
+	labelweaponup->end();
+
+	Fl_Group *labelweapondown = new Fl_Group(10, 240, 10, 20);
+	labelweapondown->label("Weapon-:");
+	labelweapondown->align(FL_ALIGN_RIGHT);
+	labelweapondown->end();
+
+	Fl_Group *labelitem = new Fl_Group(10, 270, 10, 20);
+	labelitem->label("Items:");
+	labelitem->align(FL_ALIGN_RIGHT);
+	labelitem->end();
+
+	Fl_Group *labelmap = new Fl_Group(10, 300, 10, 20);
+	labelmap->label("Map:");
+	labelmap->align(FL_ALIGN_RIGHT);
+	labelmap->end();
 
 	joystuffcontainer->end();
 
