@@ -7,7 +7,7 @@
 #include "Sound.h"
 
 extern "C" {
-#include "audio_lib/mixer.h"
+#include "clownaudio/mixer.h"
 }
 
 typedef struct Song

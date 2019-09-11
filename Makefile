@@ -139,34 +139,34 @@ SOURCES = \
 ifneq (,$(filter 1,$(OGG_AUDIO)$(FLAC_AUDIO) $(TRACKER_AUDIO) $(PXTONE_AUDIO)))
 	SOURCES += \
 		src/ExtraSoundFormats \
-		external/audio_lib/decoder \
-		external/audio_lib/miniaudio \
-		external/audio_lib/mixer \
-		external/audio_lib/decoders/memory_file \
-		external/audio_lib/decoders/misc_utilities \
-		external/audio_lib/decoders/predecode \
-		external/audio_lib/decoders/split
+		external/clownaudio/decoder \
+		external/clownaudio/miniaudio \
+		external/clownaudio/mixer \
+		external/clownaudio/decoders/memory_file \
+		external/clownaudio/decoders/misc_utilities \
+		external/clownaudio/decoders/predecode \
+		external/clownaudio/decoders/split
 
 	DEFINES += -DEXTRA_SOUND_FORMATS
 endif
 
 ifeq ($(OGG_AUDIO), 1)
 	SOURCES += \
-		external/audio_lib/decoders/stb_vorbis
+		external/clownaudio/decoders/stb_vorbis
 
 	DEFINES += -DUSE_STB_VORBIS
 endif
 
 ifeq ($(FLAC_AUDIO), 1)
 	SOURCES += \
-		external/audio_lib/decoders/dr_flac
+		external/clownaudio/decoders/dr_flac
 
 	DEFINES += -DUSE_DR_FLAC
 endif
 
 ifeq ($(TRACKER_AUDIO), 1)
 	SOURCES += \
-		external/audio_lib/decoders/libxmp-lite
+		external/clownaudio/decoders/libxmp-lite
 
 	DEFINES += -DUSE_LIBXMPLITE
 
@@ -182,29 +182,29 @@ endif
 
 ifeq ($(PXTONE_AUDIO), 1)
 	SOURCES += \
-		external/audio_lib/decoders/pxtone \
-		external/audio_lib/decoders/libs/pxtone/pxtnDelay \
-		external/audio_lib/decoders/libs/pxtone/pxtnDescriptor \
-		external/audio_lib/decoders/libs/pxtone/pxtnError \
-		external/audio_lib/decoders/libs/pxtone/pxtnEvelist \
-		external/audio_lib/decoders/libs/pxtone/pxtnMaster \
-		external/audio_lib/decoders/libs/pxtone/pxtnMem \
-		external/audio_lib/decoders/libs/pxtone/pxtnOverDrive \
-		external/audio_lib/decoders/libs/pxtone/pxtnPulse_Frequency \
-		external/audio_lib/decoders/libs/pxtone/pxtnPulse_Noise \
-		external/audio_lib/decoders/libs/pxtone/pxtnPulse_NoiseBuilder \
-		external/audio_lib/decoders/libs/pxtone/pxtnPulse_Oggv \
-		external/audio_lib/decoders/libs/pxtone/pxtnPulse_Oscillator \
-		external/audio_lib/decoders/libs/pxtone/pxtnPulse_PCM \
-		external/audio_lib/decoders/libs/pxtone/pxtnService \
-		external/audio_lib/decoders/libs/pxtone/pxtnService_moo \
-		external/audio_lib/decoders/libs/pxtone/pxtnText \
-		external/audio_lib/decoders/libs/pxtone/pxtnUnit \
-		external/audio_lib/decoders/libs/pxtone/pxtnWoice \
-		external/audio_lib/decoders/libs/pxtone/pxtnWoice_io \
-		external/audio_lib/decoders/libs/pxtone/pxtnWoicePTV \
-		external/audio_lib/decoders/libs/pxtone/pxtoneNoise \
-		external/audio_lib/decoders/libs/pxtone/shim
+		external/clownaudio/decoders/pxtone \
+		external/clownaudio/decoders/libs/pxtone/pxtnDelay \
+		external/clownaudio/decoders/libs/pxtone/pxtnDescriptor \
+		external/clownaudio/decoders/libs/pxtone/pxtnError \
+		external/clownaudio/decoders/libs/pxtone/pxtnEvelist \
+		external/clownaudio/decoders/libs/pxtone/pxtnMaster \
+		external/clownaudio/decoders/libs/pxtone/pxtnMem \
+		external/clownaudio/decoders/libs/pxtone/pxtnOverDrive \
+		external/clownaudio/decoders/libs/pxtone/pxtnPulse_Frequency \
+		external/clownaudio/decoders/libs/pxtone/pxtnPulse_Noise \
+		external/clownaudio/decoders/libs/pxtone/pxtnPulse_NoiseBuilder \
+		external/clownaudio/decoders/libs/pxtone/pxtnPulse_Oggv \
+		external/clownaudio/decoders/libs/pxtone/pxtnPulse_Oscillator \
+		external/clownaudio/decoders/libs/pxtone/pxtnPulse_PCM \
+		external/clownaudio/decoders/libs/pxtone/pxtnService \
+		external/clownaudio/decoders/libs/pxtone/pxtnService_moo \
+		external/clownaudio/decoders/libs/pxtone/pxtnText \
+		external/clownaudio/decoders/libs/pxtone/pxtnUnit \
+		external/clownaudio/decoders/libs/pxtone/pxtnWoice \
+		external/clownaudio/decoders/libs/pxtone/pxtnWoice_io \
+		external/clownaudio/decoders/libs/pxtone/pxtnWoicePTV \
+		external/clownaudio/decoders/libs/pxtone/pxtoneNoise \
+		external/clownaudio/decoders/libs/pxtone/shim
 
 	DEFINES += -DUSE_PXTONE
 endif
