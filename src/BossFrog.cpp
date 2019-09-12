@@ -8,7 +8,37 @@
 #include "MyChar.h"
 #include "NpChar.h"
 #include "Sound.h"
+#include "Stage.h"
 #include "Triangle.h"
+
+enum BalfrogStates
+{
+	BALFROG_INITIALIZE = 0,
+	BALFROG_START = 10,
+	BALFROG_INITIALIZE_FLICKER = 20,
+	BALFROG_FLICKER = 21,
+	BALFROG_WAIT = 100,
+	BALFROG_INITIALIZE_HOP_1 = 101,
+	BALFROG_INITIALIZE_HOP_2 = 102,
+	BALFROG_HOP = 103,
+	BALFROG_MIDAIR = 104,
+	BALFROG_INITIALIZE_LAND = 110,
+	BALFROG_LAND = 111,
+	BALFROG_INITIALIZE_SHOOT = 113,
+	BALFROG_INITIALIZE_LEAP_1 = 120,
+	BALFROG_INITIALIZE_LEAP_2 = 121,
+	BALFROG_INITIALIZE_LEAP_3 = 122,
+	BALFROG_LEAP = 123,
+	BALFROG_LEAP_MIDAIR = 124,
+	BALFROG_DIE = 130,
+	BALFROG_DIE_FLASHING = 131,
+	BALFROG_REVERT = 132,
+	BALFROG_NOP_START = 140,
+	BALFROG_NOP = 141,
+	BALFROG_GO_INTO_CEILING = 142,
+	BALFROG_GONE_INTO_CEILING = 143
+};
+
 
 // Balfrog's mouth
 static void ActBossChar02_01(void)
@@ -27,33 +57,33 @@ static void ActBossChar02_01(void)
 	{
 		case 0:
 			boss->hit_voice = 52;
-			boss->hit.front = 0x2000;
-			boss->hit.top = 0x2000;
-			boss->hit.back = 0x2000;
-			boss->hit.bottom = 0x2000;
+			boss->hit.front = PIXELS_TO_UNITS(16);
+			boss->hit.top = PIXELS_TO_UNITS(16);
+			boss->hit.back = PIXELS_TO_UNITS(16);
+			boss->hit.bottom = PIXELS_TO_UNITS(16);
 			boss->size = 3;
 			boss->bits = NPC_INVULNERABLE;
 			break;
 
 		case 1:
-			boss->x = gBoss[0].x + -0x3000 * minus;
-			boss->y = gBoss[0].y - 0x3000;
+			boss->x = gBoss[0].x + -PIXELS_TO_UNITS(24) * minus;
+			boss->y = gBoss[0].y - PIXELS_TO_UNITS(24);
 			break;
 
 		case 2:
-			boss->x = gBoss[0].x + -0x3000 * minus;
-			boss->y = gBoss[0].y - 0x2800;
+			boss->x = gBoss[0].x + -PIXELS_TO_UNITS(24) * minus;
+			boss->y = gBoss[0].y - PIXELS_TO_UNITS(20);
 			break;
 
 		case 3:
 		case 4:
-			boss->x = gBoss[0].x + -0x3000 * minus;
-			boss->y = gBoss[0].y - 0x2000;
+			boss->x = gBoss[0].x + -PIXELS_TO_UNITS(24) * minus;
+			boss->y = gBoss[0].y - PIXELS_TO_UNITS(32);
 			break;
 
 		case 5:
-			boss->x = gBoss[0].x + -0x3000 * minus;
-			boss->y = gBoss[0].y - 0x5600;
+			boss->x = gBoss[0].x + -PIXELS_TO_UNITS(24) * minus;
+			boss->y = gBoss[0].y - PIXELS_TO_UNITS(43);
 			break;
 	}
 }
@@ -66,10 +96,10 @@ static void ActBossChar02_02(void)
 	{
 		case 0:
 			boss->hit_voice = 52;
-			boss->hit.front = 0x3000;
-			boss->hit.top = 0x2000;
-			boss->hit.back = 0x3000;
-			boss->hit.bottom = 0x2000;
+			boss->hit.front = PIXELS_TO_UNITS(24);
+			boss->hit.top = PIXELS_TO_UNITS(16);
+			boss->hit.back = PIXELS_TO_UNITS(24);
+			boss->hit.bottom = PIXELS_TO_UNITS(16);
 			boss->size = 3;
 			boss->bits = NPC_INVULNERABLE;
 			break;
@@ -93,7 +123,7 @@ void ActBossChar_Frog(void)
 	int ym;
 	int xm;
 
-	// Rects 1-4 are for when Balfrog is a frog, 5-8 for when he reverts and goes into the ceiling
+	// Rects 1-4 are for when Balfrog is a frog, 5-8 for when he reverts into Balrog and goes into the ceiling
 	RECT rcLeft[9] = {
 		{0, 0, 0, 0},
 		{0, 48, 80, 112},
@@ -122,19 +152,19 @@ void ActBossChar_Frog(void)
 
 	switch (boss->act_no)
 	{
-		case 0:
-			boss->x = 0xC000;
-			boss->y = 0x19000;
+		case BALFROG_INITIALIZE:
+			boss->x = TILES_TO_UNITS(6);
+			boss->y = (TILES_TO_UNITS(12) + PIXELS_TO_UNITS(8));
 			boss->direct = 2;
-			boss->view.front = 0x6000;
-			boss->view.top = 0x6000;
-			boss->view.back = 0x4000;
-			boss->view.bottom = 0x2000;
+			boss->view.front = TILES_TO_UNITS(3);
+			boss->view.top = TILES_TO_UNITS(3);
+			boss->view.back = TILES_TO_UNITS(2);
+			boss->view.bottom = TILES_TO_UNITS(1);
 			boss->hit_voice = 52;
-			boss->hit.front = 0x3000;
-			boss->hit.top = 0x2000;
-			boss->hit.back = 0x3000;
-			boss->hit.bottom = 0x2000;
+			boss->hit.front = TILES_TO_UNITS(1) + PIXELS_TO_UNITS(8);
+			boss->hit.top = TILES_TO_UNITS(1);
+			boss->hit.back = TILES_TO_UNITS(1) + PIXELS_TO_UNITS(8);
+			boss->hit.bottom = TILES_TO_UNITS(1);
 			boss->size = 3;
 			boss->exp = 1;
 			boss->code_event = 1000;
@@ -142,27 +172,29 @@ void ActBossChar_Frog(void)
 			boss->life = 300;
 			break;
 
-		case 10:
-			boss->act_no = 11;
+		case BALFROG_START:
+			boss->act_no = (BALFROG_START + 1);
 			boss->ani_no = 3;
-			boss->cond = 0x80;
+			boss->cond = NPCCOND_ALIVE;
 			boss->rect = rcRight[0];
-			gBoss[1].cond = 0x90;
+
+			gBoss[1].cond = (NPCCOND_ALIVE | NPCCOND_DAMAGE_BOSS);
 			gBoss[1].code_event = 1000;
-			gBoss[2].cond = 0x80;
+			gBoss[2].cond = NPCCOND_ALIVE;
+
 			gBoss[1].damage = 5;
 			gBoss[2].damage = 5;
 
 			for (i = 0; i < 8; ++i)
-				SetNpChar(4, boss->x + (Random(-12, 12) * 0x200), boss->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+				SetNpChar(NPC_SMOKE, boss->x + PIXELS_TO_UNITS(Random(-12, 12)), boss->y + PIXELS_TO_UNITS(Random(-12, 12)), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
 
 			break;
 
-		case 20:
-			boss->act_no = 21;
+		case BALFROG_INITIALIZE_FLICKER:
+			boss->act_no = BALFROG_FLICKER;
 			boss->act_wait = 0;
 			// Fallthrough
-		case 21:
+		case BALFROG_FLICKER:
 			if (++boss->act_wait / 2 % 2)
 				boss->ani_no = 3;
 			else
@@ -170,62 +202,62 @@ void ActBossChar_Frog(void)
 
 			break;
 
-		case 100:
-			boss->act_no = 101;
+		case BALFROG_WAIT:
+			boss->act_no = BALFROG_INITIALIZE_HOP_1;
 			boss->act_wait = 0;
 			boss->ani_no = 1;
 			boss->xm = 0;
 			// Fallthrough
-		case 101:
+		case BALFROG_INITIALIZE_HOP_1:
 			if (++boss->act_wait > 50)
 			{
-				boss->act_no = 102;
+				boss->act_no = BALFROG_INITIALIZE_HOP_2;
 				boss->ani_wait = 0;
 				boss->ani_no = 2;
 			}
 
 			break;
 
-		case 102:
+		case BALFROG_INITIALIZE_HOP_2:
 			if (++boss->ani_wait > 10)
 			{
-				boss->act_no = 103;
+				boss->act_no = BALFROG_HOP;
 				boss->ani_wait = 0;
 				boss->ani_no = 1;
 			}
 
 			break;
 
-		case 103:
+		case BALFROG_HOP:
 			if (++boss->ani_wait > 4)
 			{
-				boss->act_no = 104;
+				boss->act_no = BALFROG_MIDAIR;
 				boss->ani_no = 5;
-				boss->ym = -0x400;
+				boss->ym = -PIXELS_TO_UNITS(2);
 				PlaySoundObject(25, 1);
 
 				if (boss->direct == 0)
-					boss->xm = -0x200;
+					boss->xm = -PIXELS_TO_UNITS(1);
 				else
-					boss->xm = 0x200;
+					boss->xm = PIXELS_TO_UNITS(1);
 
-				boss->view.top = 0x8000;
-				boss->view.bottom = 0x3000;
+				boss->view.top = TILES_TO_UNITS(4);
+				boss->view.bottom = TILES_TO_UNITS(1) + PIXELS_TO_UNITS(8);
 			}
 
 			break;
 
-		case 104:
+		case BALFROG_MIDAIR:
 			if (boss->direct == 0 && boss->flag & 1)
 			{
 				boss->direct = 2;
-				boss->xm = 0x200;
+				boss->xm = PIXELS_TO_UNITS(1);
 			}
 
 			if (boss->direct == 2 && boss->flag & 4)
 			{
 				boss->direct = 0;
-				boss->xm = -0x200;
+				boss->xm = -PIXELS_TO_UNITS(1);
 			}
 
 			if (boss->flag & 8)

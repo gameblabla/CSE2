@@ -66,3 +66,10 @@ extern MusicID gMusicNo;
 BOOL TransferStage(int no, int w, int x, int y);
 void ChangeMusic(MusicID no);
 void ReCallMusic();
+
+#define TILES_TO_UNITS(x) ((x) * 0x2000)
+#define UNITS_TO_TILES(x) ((x) / 0x2000)
+#define TILES_TO_PIXELS(x) ((x) * 0x10)
+#define PIXELS_TO_TILES(x) ((x) / 0x10)
+#define PIXELS_TO_UNITS(x) ((x) * 0x200)
+#define UNITS_TO_PIXELS(x) ((x) / 0x200)

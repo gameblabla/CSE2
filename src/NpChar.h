@@ -26,6 +26,22 @@ enum NPCFlags
 	NPC_SHOW_DAMAGE = 1<<15               // Show the number of damage taken when harmed
 };
 
+enum NPCCond
+{
+	NPCCOND_DAMAGE_BOSS = 0x10,	// (gBoss npc exclusive) When set, damage the main boss
+	NPCCOND_ALIVE = 0x80	// Whether the NPC is alive or not
+};
+
+enum NPCNames
+{
+	NPC_NULL = 0,
+	NPC_EXP = 1,
+	NPC_ENEMY_BEHEMOTH = 2,
+	NPC_NULL_DELETES_ITSELF = 3,
+	NPC_SMOKE = 4,
+	// To be finished later
+};
+
 struct NPCHAR
 {
 	unsigned char cond;
