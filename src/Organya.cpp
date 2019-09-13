@@ -10,6 +10,11 @@
 #include <stdio.h>
 #include <string.h>
 
+#ifdef FIX_BUGS
+// The original source code forgot to set this (you can tell because, in the original EXE,
+// the DSBUFFERDESC structs in this file have a different size to the ones in Sound.cpp)
+#define DIRECTSOUND_VERSION 0x500
+#endif
 #include <dsound.h>
 
 #include "WindowsWrapper.h"
