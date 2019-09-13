@@ -3,14 +3,14 @@
 #define WINDOW_WIDTH 320
 #define WINDOW_HEIGHT 240
 
-enum Direction
-{
-	DIR_LEFT = 0,
-	DIR_UP = 1,
-	DIR_RIGHT = 2,
-	DIR_DOWN = 3,
-	DIR_AUTO = 4
-};
+#define TILES_TO_UNITS(x) ((x) * 0x2000)
+#define UNITS_TO_TILES(x) ((x) / 0x2000)
+#define TILES_TO_PIXELS(x) ((x) * 0x10)
+#define PIXELS_TO_TILES(x) ((x) / 0x10)
+#define PIXELS_TO_UNITS(x) ((x) * 0x200)
+#define UNITS_TO_PIXELS(x) ((x) / 0x200)
+#define SECONDS_TO_FRAMES(x) ((x) * 50)
+#define FRAMES_TO_SECONDS(x) ((x) / 50)
 
 enum Collisions
 {
@@ -21,11 +21,11 @@ enum Collisions
 	// To be continued
 };
 
-#define TILES_TO_UNITS(x) ((x) * 0x2000)
-#define UNITS_TO_TILES(x) ((x) / 0x2000)
-#define TILES_TO_PIXELS(x) ((x) * 0x10)
-#define PIXELS_TO_TILES(x) ((x) / 0x10)
-#define PIXELS_TO_UNITS(x) ((x) * 0x200)
-#define UNITS_TO_PIXELS(x) ((x) / 0x200)
-#define SECONDS_TO_FRAMES(x) ((x) * 50)
-#define FRAMES_TO_SECONDS(x) ((x) / 50)
+enum Direction
+{
+	DIR_LEFT = 0,
+	DIR_UP = 1,
+	DIR_RIGHT = 2,
+	DIR_DOWN = 3,
+	DIR_AUTO = 4
+};
