@@ -574,8 +574,8 @@ void ActBossChar_Frog(void)
 	}
 
 	boss->ym += 0x40;
-	if (boss->ym > (PIXELS_TO_UNITS(3) - 1))
-		boss->ym = (PIXELS_TO_UNITS(3) - 1);
+	if (boss->ym > 0x5FF)
+		boss->ym = 0x5FF;
 
 	boss->x += boss->xm;
 	boss->y += boss->ym;
