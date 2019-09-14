@@ -71,33 +71,33 @@ static void ActBossChar02_01(void)
 	{
 		case BALFANI_NOTHING:
 			boss->hit_voice = SND_BEHEMOTH_LARGE_HURT;
-			boss->hit.front = PIXELS_TO_UNITS(16);
-			boss->hit.top = PIXELS_TO_UNITS(16);
-			boss->hit.back = PIXELS_TO_UNITS(16);
-			boss->hit.bottom = PIXELS_TO_UNITS(16);
+			boss->hit.front = TILES_TO_UNITS(1);
+			boss->hit.top = TILES_TO_UNITS(1);
+			boss->hit.back = TILES_TO_UNITS(1);
+			boss->hit.bottom = TILES_TO_UNITS(1);
 			boss->size = 3;
 			boss->bits = NPC_INVULNERABLE;
 			break;
 
 		case BALFANI_STANDING_STILL:
-			boss->x = gBoss[0].x + -PIXELS_TO_UNITS(24) * minus;
-			boss->y = gBoss[0].y - PIXELS_TO_UNITS(24);
+			boss->x = gBoss[0].x + -TILES_TO_UNITS(1.5) * minus;
+			boss->y = gBoss[0].y - TILES_TO_UNITS(1.5);
 			break;
 
 		case BALFANI_MOUTH_BARELY_OPEN_CROUCHING:
-			boss->x = gBoss[0].x + -PIXELS_TO_UNITS(24) * minus;
-			boss->y = gBoss[0].y - PIXELS_TO_UNITS(20);
+			boss->x = gBoss[0].x + -TILES_TO_UNITS(1.5) * minus;
+			boss->y = gBoss[0].y - TILES_TO_UNITS(1.25);
 			break;
 
 		case BALFANI_MOUTH_OPEN_CROUCHING:
 		case BALFANI_MOUTH_OPEN_CROUCHING_FLASHING:
-			boss->x = gBoss[0].x + -PIXELS_TO_UNITS(24) * minus;
-			boss->y = gBoss[0].y - PIXELS_TO_UNITS(32);
+			boss->x = gBoss[0].x + -TILES_TO_UNITS(1.5) * minus;
+			boss->y = gBoss[0].y - TILES_TO_UNITS(2);
 			break;
 
 		case BALFANI_JUMPING:
-			boss->x = gBoss[0].x + -PIXELS_TO_UNITS(24) * minus;
-			boss->y = gBoss[0].y - PIXELS_TO_UNITS(43);
+			boss->x = gBoss[0].x + -TILES_TO_UNITS(1.5) * minus;
+			boss->y = gBoss[0].y - PIXELS_TO_UNITS(43);	// 2.6873 tiles
 			break;
 	}
 }
@@ -110,10 +110,10 @@ static void ActBossChar02_02(void)
 	{
 		case BALFANI_NOTHING:
 			boss->hit_voice = SND_BEHEMOTH_LARGE_HURT;
-			boss->hit.front = PIXELS_TO_UNITS(24);
-			boss->hit.top = PIXELS_TO_UNITS(16);
-			boss->hit.back = PIXELS_TO_UNITS(24);
-			boss->hit.bottom = PIXELS_TO_UNITS(16);
+			boss->hit.front = TILES_TO_UNITS(1.5);
+			boss->hit.top = TILES_TO_UNITS(1);
+			boss->hit.back = TILES_TO_UNITS(1.5);
+			boss->hit.bottom = TILES_TO_UNITS(1);
 			boss->size = 3;
 			boss->bits = NPC_INVULNERABLE;
 			break;
@@ -169,16 +169,16 @@ void ActBossChar_Frog(void)
 	{
 		case BALFROG_INITIALIZE:
 			boss->x = TILES_TO_UNITS(6);
-			boss->y = (TILES_TO_UNITS(12) + PIXELS_TO_UNITS(8));
+			boss->y = TILES_TO_UNITS(12.5);
 			boss->direct = DIR_RIGHT;
 			boss->view.front = TILES_TO_UNITS(3);
 			boss->view.top = TILES_TO_UNITS(3);
 			boss->view.back = TILES_TO_UNITS(2);
 			boss->view.bottom = TILES_TO_UNITS(1);
 			boss->hit_voice = SND_BEHEMOTH_LARGE_HURT;
-			boss->hit.front = TILES_TO_UNITS(1) + PIXELS_TO_UNITS(8);
+			boss->hit.front = TILES_TO_UNITS(1.5);
 			boss->hit.top = TILES_TO_UNITS(1);
-			boss->hit.back = TILES_TO_UNITS(1) + PIXELS_TO_UNITS(8);
+			boss->hit.back = TILES_TO_UNITS(1.5);
 			boss->hit.bottom = TILES_TO_UNITS(1);
 			boss->size = 3;
 			boss->exp = 1;
@@ -257,7 +257,7 @@ void ActBossChar_Frog(void)
 					boss->xm = PIXELS_TO_UNITS(1);
 
 				boss->view.top = TILES_TO_UNITS(4);
-				boss->view.bottom = TILES_TO_UNITS(1) + PIXELS_TO_UNITS(8);
+				boss->view.bottom = TILES_TO_UNITS(1.5);
 			}
 
 			break;
@@ -437,7 +437,7 @@ void ActBossChar_Frog(void)
 				boss->ani_no = BALFANI_JUMPING;
 				boss->ym = -PIXELS_TO_UNITS(5);
 				boss->view.top = TILES_TO_UNITS(4);
-				boss->view.bottom = TILES_TO_UNITS(1) + PIXELS_TO_UNITS(8);
+				boss->view.bottom = TILES_TO_UNITS(1.5);
 				PlaySoundObject(SND_SILLY_EXPLOSION, 1);
 			}
 
@@ -510,9 +510,9 @@ void ActBossChar_Frog(void)
 		case BALFROG_REVERT:
 			if (++boss->act_wait / 2 % 2)
 			{
-				boss->view.front = TILES_TO_UNITS(1) + PIXELS_TO_UNITS(8);
+				boss->view.front = TILES_TO_UNITS(1.5);
 				boss->view.top = PIXELS_TO_UNITS(12);
-				boss->view.back = TILES_TO_UNITS(1) + PIXELS_TO_UNITS(8);
+				boss->view.back = TILES_TO_UNITS(1.5);
 				boss->view.bottom = PIXELS_TO_UNITS(12);
 				boss->ani_no = BALFANI_BALROG_WHITE;
 			}
