@@ -92,7 +92,7 @@ static void ActBossChar02_01(void)
 		case BALFROG_SPRT_MOUTH_OPEN_CROUCHING:
 		case BALFROG_SPRT_MOUTH_OPEN_CROUCHING_FLASHING:
 			boss->x = gBoss[0].x + PIXELS_TO_UNITS(-24) * minus;
-			boss->y = gBoss[0].y - PIXELS_TO_UNITS(32);
+			boss->y = gBoss[0].y - PIXELS_TO_UNITS(16);
 			break;
 
 		case BALFROG_SPRT_JUMPING:
