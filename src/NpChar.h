@@ -1,10 +1,29 @@
 #pragma once
 
+#include "CommonDefines.h"
 #include "WindowsWrapper.h"
 
 #include "Draw.h"
 
 #define NPC_MAX 0x200
+
+#define NPC_CAP_Y_VELOCITY(npc, maxYVel) \
+	if (npc->ym > (maxYVel)) \
+		npc->ym = (maxYVel)
+
+#define NPC_DO_GRAVITY(npc, ymAdd, maxYVel) \
+	npc->ym += ymAdd; \
+	NPC_CAP_Y_VELOCITY(npc, maxYVel)
+
+#define NPC_UPDATE_POSITIONS_WITH_VELOCITIES(npc) \
+	npc->x += npc->xm; \
+	npc->y = npc->ym;
+
+#define NPC_SET_RECT_FROM_LEFT_RIGHT(npc, rcLeft, rcRight) \
+	if (npc->direct == DIR_LEFT) \
+		npc->rect = rcLeft[npc->ani_no]; \
+	else \
+		npc->rect = rcRight[npc->ani_no];
 
 // Be careful when changing these: they're baked into the 'npc.tbl' file
 enum NPCFlags
