@@ -171,10 +171,10 @@ void ActBossChar_Frog(void)
 			boss->x = TILES_TO_UNITS(6);
 			boss->y = TILES_TO_UNITS(12.5);
 			boss->direct = DIR_RIGHT;
-			boss->view.front = TILES_TO_UNITS(3);
-			boss->view.top = TILES_TO_UNITS(3);
-			boss->view.back = TILES_TO_UNITS(2);
-			boss->view.bottom = TILES_TO_UNITS(1);
+			boss->view.front = PIXELS_TO_UNITS(48);
+			boss->view.top = PIXELS_TO_UNITS(48);
+			boss->view.back = PIXELS_TO_UNITS(32);
+			boss->view.bottom = PIXELS_TO_UNITS(16);
 			boss->hit_voice = SND_BEHEMOTH_LARGE_HURT;
 			boss->hit.front = PIXELS_TO_UNITS(24);
 			boss->hit.top = PIXELS_TO_UNITS(16);
@@ -256,8 +256,8 @@ void ActBossChar_Frog(void)
 				else
 					boss->xm = PIXELS_TO_UNITS(1);
 
-				boss->view.top = TILES_TO_UNITS(4);
-				boss->view.bottom = TILES_TO_UNITS(1.5);
+				boss->view.top = PIXELS_TO_UNITS(64);
+				boss->view.bottom = PIXELS_TO_UNITS(24);
 			}
 
 			break;
@@ -281,8 +281,8 @@ void ActBossChar_Frog(void)
 				SetQuake(30);
 				boss->act_no = BALFROG_WAIT;
 				boss->ani_no = BALFROG_SPRT_STANDING_STILL;
-				boss->view.top = TILES_TO_UNITS(3);
-				boss->view.bottom = TILES_TO_UNITS(1);
+				boss->view.top = PIXELS_TO_UNITS(48);
+				boss->view.bottom = PIXELS_TO_UNITS(16);
 
 				if (boss->direct == DIR_LEFT && boss->x < gMC.x)
 				{
@@ -436,8 +436,8 @@ void ActBossChar_Frog(void)
 				boss->act_no = BALFROG_LEAP_MIDAIR;
 				boss->ani_no = BALFROG_SPRT_JUMPING;
 				boss->ym = PIXELS_TO_UNITS(-5);
-				boss->view.top = TILES_TO_UNITS(4);
-				boss->view.bottom = TILES_TO_UNITS(1.5);
+				boss->view.top = PIXELS_TO_UNITS(64);
+				boss->view.bottom = PIXELS_TO_UNITS(24);
 				PlaySoundObject(SND_SILLY_EXPLOSION, 1);
 			}
 
@@ -450,8 +450,8 @@ void ActBossChar_Frog(void)
 				SetQuake(60);
 				boss->act_no = BALFROG_WAIT;
 				boss->ani_no = BALFROG_SPRT_STANDING_STILL;
-				boss->view.top = TILES_TO_UNITS(3);
-				boss->view.bottom = TILES_TO_UNITS(1);
+				boss->view.top = PIXELS_TO_UNITS(48);
+				boss->view.bottom = PIXELS_TO_UNITS(16);
 
 				for (i = 0; i < 2; ++i)
 					SetNpChar(NPC_ENEMY_FROG, TILES_TO_UNITS(Random(4, 16)), TILES_TO_UNITS(Random(0, 4)), 0, 0, DIR_AUTO, NULL, 0x80);
@@ -510,18 +510,18 @@ void ActBossChar_Frog(void)
 		case BALFROG_REVERT:
 			if (++boss->act_wait / 2 % 2)
 			{
-				boss->view.front = TILES_TO_UNITS(1.5);
+				boss->view.front = PIXELS_TO_UNITS(24);
 				boss->view.top = PIXELS_TO_UNITS(12);
-				boss->view.back = TILES_TO_UNITS(1.5);
+				boss->view.back = PIXELS_TO_UNITS(24);
 				boss->view.bottom = PIXELS_TO_UNITS(12);
 				boss->ani_no = BALFROG_SPRT_BALROG_WHITE;
 			}
 			else
 			{
-				boss->view.front = TILES_TO_UNITS(3);
-				boss->view.top = TILES_TO_UNITS(3);
-				boss->view.back = TILES_TO_UNITS(2);
-				boss->view.bottom = TILES_TO_UNITS(1);
+				boss->view.front = PIXELS_TO_UNITS(48);
+				boss->view.top = PIXELS_TO_UNITS(48);
+				boss->view.back = PIXELS_TO_UNITS(32);
+				boss->view.bottom = PIXELS_TO_UNITS(16);
 				boss->ani_no = BALFROG_SPRT_MOUTH_OPEN_CROUCHING;
 			}
 
