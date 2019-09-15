@@ -139,15 +139,15 @@ void ActBossChar_Frog(void)
 
 	// Rects 1-4 are for when Balfrog is a frog, 5-8 for when he reverts into Balrog and goes into the ceiling
 	RECT rcLeft[9] = {
-		{0, 0, 0, 0},	// Nothing
-		{0, 48, 80, 112},	// Balfrog standing still
-		{0, 112, 80, 176},	// Balfrog with his mouth barely open, crouching
-		{0, 176, 80, 240},	// Balfrog with his mouth open, crouching
-		{160, 48, 240, 112},	// Balfrog with his mouth open, crouching, flashing
-		{160, 112, 240, 200},	// Balfrog jumping
-		{200, 0, 240, 24},	// Balrog completely white
-		{80, 0, 120, 24},	// Balrog crouching
-		{120, 0, 160, 24},	// Balrog jumping
+		{0, 0, 0, 0},           // Nothing
+		{0, 48, 80, 112},       // Balfrog standing still
+		{0, 112, 80, 176},      // Balfrog with his mouth barely open, crouching
+		{0, 176, 80, 240},      // Balfrog with his mouth open, crouching
+		{160, 48, 240, 112},    // Balfrog with his mouth open, crouching, flashing
+		{160, 112, 240, 200},   // Balfrog jumping
+		{200, 0, 240, 24},      // Balrog completely white
+		{80, 0, 120, 24},       // Balrog crouching
+		{120, 0, 160, 24},      // Balrog jumping
 	};
 
 	// See above

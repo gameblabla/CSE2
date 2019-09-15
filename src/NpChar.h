@@ -25,6 +25,12 @@
 	else \
 		npc->rect = rcRight[npc->ani_no]
 
+enum NPCCond
+{
+	NPCCOND_DAMAGE_BOSS = 0x10, // (gBoss npc exclusive) When set, damage the main boss
+	NPCCOND_ALIVE = 0x80        // Whether the NPC is alive or not
+};
+
 // Be careful when changing these: they're baked into the 'npc.tbl' file
 enum NPCFlags
 {
@@ -43,12 +49,6 @@ enum NPCFlags
 	NPC_INTERACTABLE = 1<<13,             // Run event when interacted with
 	NPC_HIDE_WHEN_FLAG_SET = 1<<14,       // Hide when flag is set
 	NPC_SHOW_DAMAGE = 1<<15               // Show the number of damage taken when harmed
-};
-
-enum NPCCond
-{
-	NPCCOND_DAMAGE_BOSS = 0x10,	// (gBoss npc exclusive) When set, damage the main boss
-	NPCCOND_ALIVE = 0x80	// Whether the NPC is alive or not
 };
 
 enum NPCNames
