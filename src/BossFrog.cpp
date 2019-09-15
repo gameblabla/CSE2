@@ -573,9 +573,17 @@ void ActBossChar_Frog(void)
 			break;
 	}
 
-	NPC_DO_GRAVITY(boss, 0x40, 0x5FF);
-	NPC_UPDATE_POSITIONS_WITH_VELOCITIES(boss);
-	NPC_SET_RECT_FROM_LEFT_RIGHT(boss, rcLeft, rcRight);
+	boss->ym += 0x40;
+	if (boss->ym > 0x5FF)
+		boss->ym = 0x5FF;
+
+	boss->x += boss->xm;
+	boss->y += boss->ym;
+
+	if (boss->direct == DIR_LEFT)
+		boss->rect = rcLeft[boss->ani_no];
+	else
+		boss->rect = rcRight[boss->ani_no];
 
 	ActBossChar02_01();
 	ActBossChar02_02();
