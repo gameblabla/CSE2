@@ -510,9 +510,9 @@ void ActBossChar_Frog(void)
 		case BALFROG_REVERT:
 			if (++boss->act_wait / 2 % 2)
 			{
-				boss->view.front = PIXELS_TO_UNITS(24);
+				boss->view.front = PIXELS_TO_UNITS(20);
 				boss->view.top = PIXELS_TO_UNITS(12);
-				boss->view.back = PIXELS_TO_UNITS(24);
+				boss->view.back = PIXELS_TO_UNITS(20);
 				boss->view.bottom = PIXELS_TO_UNITS(12);
 				boss->ani_no = BALFROG_SPRITE_BALROG_WHITE;
 			}
