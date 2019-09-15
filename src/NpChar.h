@@ -17,7 +17,7 @@
 
 #define NPC_UPDATE_POSITIONS_WITH_VELOCITIES(npc) \
 	npc->x += npc->xm; \
-	npc->y = npc->ym
+	npc->y += npc->ym
 
 #define NPC_SET_RECT_FROM_LEFT_RIGHT(npc, rcLeft, rcRight) \
 	if (npc->direct == DIR_LEFT) \
