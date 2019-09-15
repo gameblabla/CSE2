@@ -97,7 +97,7 @@ static void ActBossChar02_01(void)
 
 		case BALFROG_SPRT_JUMPING:
 			boss->x = gBoss[0].x + PIXELS_TO_UNITS(-24) * minus;
-			boss->y = gBoss[0].y - PIXELS_TO_UNITS(43);	// 2.6873 tiles
+			boss->y = gBoss[0].y - PIXELS_TO_UNITS(43);
 			break;
 	}
 }
