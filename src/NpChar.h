@@ -1,10 +1,17 @@
 #pragma once
 
+#include "CommonDefines.h"
 #include "WindowsWrapper.h"
 
 #include "Draw.h"
 
 #define NPC_MAX 0x200
+
+enum NPCCond
+{
+	NPCCOND_DAMAGE_BOSS = 0x10, // (gBoss npc exclusive) When set, damage the main boss
+	NPCCOND_ALIVE = 0x80        // Whether the NPC is alive or not
+};
 
 // Be careful when changing these: they're baked into the 'npc.tbl' file
 enum NPCFlags
@@ -24,6 +31,24 @@ enum NPCFlags
 	NPC_INTERACTABLE = 1<<13,             // Run event when interacted with
 	NPC_HIDE_WHEN_FLAG_SET = 1<<14,       // Hide when flag is set
 	NPC_SHOW_DAMAGE = 1<<15               // Show the number of damage taken when harmed
+};
+
+enum NPCNames
+{
+	NPC_NULL = 0,
+	NPC_EXP = 1,
+	NPC_ENEMY_BEHEMOTH = 2,
+	NPC_DAMAGE_TEXT_HOLDER = 3,
+	NPC_SMOKE = 4,
+	// To be continued
+	NPC_ENEMY_FROG = 104,
+	NPC_SPEECH_BALLOON_HEY_LOW = 105,
+	NPC_SPEECH_BALLOON_HEY_HIGH = 106,
+	NPC_MALCO_UNDAMAGED = 107,
+	NPC_PROJECTILE_BALFROG_SPITBALL = 108,
+	NPC_MALCO_DAMAGED = 109,
+	NPC_ENEMY_PUCHI = 110,
+	// To be continued
 };
 
 struct NPCHAR

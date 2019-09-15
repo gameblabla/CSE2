@@ -3,6 +3,7 @@
 #include "WindowsWrapper.h"
 
 #include "Boss.h"
+#include "CommonDefines.h"
 #include "Frame.h"
 #include "Game.h"
 #include "MyChar.h"
@@ -10,13 +11,56 @@
 #include "Sound.h"
 #include "Triangle.h"
 
+enum BalfrogSprites
+{
+	BALFROG_SPRITE_NOTHING = 0,
+	BALFROG_SPRITE_STANDING_STILL = 1,
+	BALFROG_SPRITE_MOUTH_BARELY_OPEN_CROUCHING = 2,
+	BALFROG_SPRITE_MOUTH_OPEN_CROUCHING = 3,
+	BALFROG_SPRITE_MOUTH_OPEN_CROUCHING_FLASHING = 4,
+	BALFROG_SPRITE_JUMPING = 5,
+	BALFROG_SPRITE_BALROG_WHITE = 6,
+	BALFROG_SPRITE_BALROG_CROUCHING = 7,
+	BALFROG_SPRITE_BALROG_JUMPING = 8
+};
+
+enum BalfrogStates
+{
+	BALFROG_INITIALIZE = 0,
+	BALFROG_START = 10,
+	BALFROG_INITIALIZE_FLICKER = 20,
+	BALFROG_FLICKER = 21,
+	BALFROG_WAIT = 100,
+	BALFROG_INITIALIZE_HOP_1 = 101,
+	BALFROG_INITIALIZE_HOP_2 = 102,
+	BALFROG_HOP = 103,
+	BALFROG_MIDAIR = 104,
+	BALFROG_INITIALIZE_LAND = 110,
+	BALFROG_LAND = 111,
+	BALFROG_INITIALIZE_SHOOT = 112,
+	BALFROG_SHOOT = 113,
+	BALFROG_AFTER_SHOOT_WAIT = 114,
+	BALFROG_INITIALIZE_LEAP_1 = 120,
+	BALFROG_INITIALIZE_LEAP_2 = 121,
+	BALFROG_INITIALIZE_LEAP_3 = 122,
+	BALFROG_LEAP = 123,
+	BALFROG_LEAP_MIDAIR = 124,
+	BALFROG_DIE = 130,
+	BALFROG_DIE_FLASHING = 131,
+	BALFROG_REVERT = 132,
+	BALFROG_NOP_START = 140,
+	BALFROG_NOP = 141,
+	BALFROG_GO_INTO_CEILING = 142,
+	BALFROG_GONE_INTO_CEILING = 143
+};
+
 // Balfrog's mouth
 static void ActBossChar02_01(void)
 {
 	NPCHAR *boss;
 	int minus;
 
-	if (gBoss[0].direct == 0)
+	if (gBoss[0].direct == DIR_LEFT)
 		minus = 1;
 	else
 		minus = -1;
@@ -25,35 +69,35 @@ static void ActBossChar02_01(void)
 
 	switch (gBoss[0].ani_no)
 	{
-		case 0:
-			boss->hit_voice = 52;
-			boss->hit.front = 0x2000;
-			boss->hit.top = 0x2000;
-			boss->hit.back = 0x2000;
-			boss->hit.bottom = 0x2000;
+		case BALFROG_SPRITE_NOTHING:
+			boss->hit_voice = SND_BEHEMOTH_LARGE_HURT;
+			boss->hit.front = PIXELS_TO_UNITS(16);
+			boss->hit.top = PIXELS_TO_UNITS(16);
+			boss->hit.back = PIXELS_TO_UNITS(16);
+			boss->hit.bottom = PIXELS_TO_UNITS(16);
 			boss->size = 3;
 			boss->bits = NPC_INVULNERABLE;
 			break;
 
-		case 1:
-			boss->x = gBoss[0].x + -0x3000 * minus;
-			boss->y = gBoss[0].y - 0x3000;
+		case BALFROG_SPRITE_STANDING_STILL:
+			boss->x = gBoss[0].x + PIXELS_TO_UNITS(-24) * minus;
+			boss->y = gBoss[0].y - PIXELS_TO_UNITS(24);
 			break;
 
-		case 2:
-			boss->x = gBoss[0].x + -0x3000 * minus;
-			boss->y = gBoss[0].y - 0x2800;
+		case BALFROG_SPRITE_MOUTH_BARELY_OPEN_CROUCHING:
+			boss->x = gBoss[0].x + PIXELS_TO_UNITS(-24) * minus;
+			boss->y = gBoss[0].y - PIXELS_TO_UNITS(20);
 			break;
 
-		case 3:
-		case 4:
-			boss->x = gBoss[0].x + -0x3000 * minus;
-			boss->y = gBoss[0].y - 0x2000;
+		case BALFROG_SPRITE_MOUTH_OPEN_CROUCHING:
+		case BALFROG_SPRITE_MOUTH_OPEN_CROUCHING_FLASHING:
+			boss->x = gBoss[0].x + PIXELS_TO_UNITS(-24) * minus;
+			boss->y = gBoss[0].y - PIXELS_TO_UNITS(16);
 			break;
 
-		case 5:
-			boss->x = gBoss[0].x + -0x3000 * minus;
-			boss->y = gBoss[0].y - 0x5600;
+		case BALFROG_SPRITE_JUMPING:
+			boss->x = gBoss[0].x + PIXELS_TO_UNITS(-24) * minus;
+			boss->y = gBoss[0].y - PIXELS_TO_UNITS(43);
 			break;
 	}
 }
@@ -64,21 +108,21 @@ static void ActBossChar02_02(void)
 
 	switch (gBoss[0].ani_no)
 	{
-		case 0:
-			boss->hit_voice = 52;
-			boss->hit.front = 0x3000;
-			boss->hit.top = 0x2000;
-			boss->hit.back = 0x3000;
-			boss->hit.bottom = 0x2000;
+		case BALFROG_SPRITE_NOTHING:
+			boss->hit_voice = SND_BEHEMOTH_LARGE_HURT;
+			boss->hit.front = PIXELS_TO_UNITS(24);
+			boss->hit.top = PIXELS_TO_UNITS(16);
+			boss->hit.back = PIXELS_TO_UNITS(24);
+			boss->hit.bottom = PIXELS_TO_UNITS(16);
 			boss->size = 3;
 			boss->bits = NPC_INVULNERABLE;
 			break;
 
-		case 1:
-		case 2:
-		case 3:
-		case 4:
-		case 5:
+		case BALFROG_SPRITE_STANDING_STILL:
+		case BALFROG_SPRITE_MOUTH_BARELY_OPEN_CROUCHING:
+		case BALFROG_SPRITE_MOUTH_OPEN_CROUCHING:
+		case BALFROG_SPRITE_MOUTH_OPEN_CROUCHING_FLASHING:
+		case BALFROG_SPRITE_JUMPING:
 			boss->x = gBoss[0].x;
 			boss->y = gBoss[0].y;
 			break;
@@ -93,19 +137,20 @@ void ActBossChar_Frog(void)
 	int ym;
 	int xm;
 
-	// Rects 1-4 are for when Balfrog is a frog, 5-8 for when he reverts and goes into the ceiling
+	// Rects 1-4 are for when Balfrog is a frog, 5-8 for when he reverts into Balrog and goes into the ceiling
 	RECT rcLeft[9] = {
-		{0, 0, 0, 0},
-		{0, 48, 80, 112},
-		{0, 112, 80, 176},
-		{0, 176, 80, 240},
-		{160, 48, 240, 112},
-		{160, 112, 240, 200},
-		{200, 0, 240, 24},
-		{80, 0, 120, 24},
-		{120, 0, 160, 24},
+		{0, 0, 0, 0},           // Nothing
+		{0, 48, 80, 112},       // Balfrog standing still
+		{0, 112, 80, 176},      // Balfrog with his mouth barely open, crouching
+		{0, 176, 80, 240},      // Balfrog with his mouth open, crouching
+		{160, 48, 240, 112},    // Balfrog with his mouth open, crouching, flashing
+		{160, 112, 240, 200},   // Balfrog jumping
+		{200, 0, 240, 24},      // Balrog completely white
+		{80, 0, 120, 24},       // Balrog crouching
+		{120, 0, 160, 24},      // Balrog jumping
 	};
 
+	// See above
 	RECT rcRight[9] = {
 		{0, 0, 0, 0},
 		{80, 48, 160, 112},
@@ -122,19 +167,19 @@ void ActBossChar_Frog(void)
 
 	switch (boss->act_no)
 	{
-		case 0:
-			boss->x = 0xC000;
-			boss->y = 0x19000;
-			boss->direct = 2;
-			boss->view.front = 0x6000;
-			boss->view.top = 0x6000;
-			boss->view.back = 0x4000;
-			boss->view.bottom = 0x2000;
-			boss->hit_voice = 52;
-			boss->hit.front = 0x3000;
-			boss->hit.top = 0x2000;
-			boss->hit.back = 0x3000;
-			boss->hit.bottom = 0x2000;
+		case BALFROG_INITIALIZE:
+			boss->x = TILES_TO_UNITS(6);
+			boss->y = TILES_TO_UNITS(12.5);
+			boss->direct = DIR_RIGHT;
+			boss->view.front = PIXELS_TO_UNITS(48);
+			boss->view.top = PIXELS_TO_UNITS(48);
+			boss->view.back = PIXELS_TO_UNITS(32);
+			boss->view.bottom = PIXELS_TO_UNITS(16);
+			boss->hit_voice = SND_BEHEMOTH_LARGE_HURT;
+			boss->hit.front = PIXELS_TO_UNITS(24);
+			boss->hit.top = PIXELS_TO_UNITS(16);
+			boss->hit.back = PIXELS_TO_UNITS(24);
+			boss->hit.bottom = PIXELS_TO_UNITS(16);
 			boss->size = 3;
 			boss->exp = 1;
 			boss->code_event = 1000;
@@ -142,145 +187,147 @@ void ActBossChar_Frog(void)
 			boss->life = 300;
 			break;
 
-		case 10:
-			boss->act_no = 11;
-			boss->ani_no = 3;
-			boss->cond = 0x80;
+		case BALFROG_START:
+			boss->act_no = (BALFROG_START + 1);
+			boss->ani_no = BALFROG_SPRITE_MOUTH_OPEN_CROUCHING;
+			boss->cond = NPCCOND_ALIVE;
 			boss->rect = rcRight[0];
-			gBoss[1].cond = 0x90;
+
+			gBoss[1].cond = (NPCCOND_ALIVE | NPCCOND_DAMAGE_BOSS);
 			gBoss[1].code_event = 1000;
-			gBoss[2].cond = 0x80;
+			gBoss[2].cond = NPCCOND_ALIVE;
+
 			gBoss[1].damage = 5;
 			gBoss[2].damage = 5;
 
 			for (i = 0; i < 8; ++i)
-				SetNpChar(4, boss->x + (Random(-12, 12) * 0x200), boss->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+				SetNpChar(NPC_SMOKE, boss->x + PIXELS_TO_UNITS(Random(-12, 12)), boss->y + PIXELS_TO_UNITS(Random(-12, 12)), Random(-341, 341), Random(PIXELS_TO_UNITS(-3), 0), DIR_LEFT, NULL, 0x100);
 
 			break;
 
-		case 20:
-			boss->act_no = 21;
+		case BALFROG_INITIALIZE_FLICKER:
+			boss->act_no = BALFROG_FLICKER;
 			boss->act_wait = 0;
 			// Fallthrough
-		case 21:
+		case BALFROG_FLICKER:
 			if (++boss->act_wait / 2 % 2)
-				boss->ani_no = 3;
+				boss->ani_no = BALFROG_SPRITE_MOUTH_OPEN_CROUCHING;
 			else
-				boss->ani_no = 0;
+				boss->ani_no = BALFROG_SPRITE_NOTHING;
 
 			break;
 
-		case 100:
-			boss->act_no = 101;
+		case BALFROG_WAIT:
+			boss->act_no = BALFROG_INITIALIZE_HOP_1;
 			boss->act_wait = 0;
-			boss->ani_no = 1;
+			boss->ani_no = BALFROG_SPRITE_STANDING_STILL;
 			boss->xm = 0;
 			// Fallthrough
-		case 101:
-			if (++boss->act_wait > 50)
+		case BALFROG_INITIALIZE_HOP_1:
+			if (++boss->act_wait > SECONDS_TO_FRAMES(1))
 			{
-				boss->act_no = 102;
+				boss->act_no = BALFROG_INITIALIZE_HOP_2;
 				boss->ani_wait = 0;
-				boss->ani_no = 2;
+				boss->ani_no = BALFROG_SPRITE_MOUTH_BARELY_OPEN_CROUCHING;
 			}
 
 			break;
 
-		case 102:
+		case BALFROG_INITIALIZE_HOP_2:
 			if (++boss->ani_wait > 10)
 			{
-				boss->act_no = 103;
+				boss->act_no = BALFROG_HOP;
 				boss->ani_wait = 0;
-				boss->ani_no = 1;
+				boss->ani_no = BALFROG_SPRITE_STANDING_STILL;
 			}
 
 			break;
 
-		case 103:
+		case BALFROG_HOP:
 			if (++boss->ani_wait > 4)
 			{
-				boss->act_no = 104;
-				boss->ani_no = 5;
-				boss->ym = -0x400;
+				boss->act_no = BALFROG_MIDAIR;
+				boss->ani_no = BALFROG_SPRITE_JUMPING;
+				boss->ym = PIXELS_TO_UNITS(-2);
 				PlaySoundObject(25, 1);
 
-				if (boss->direct == 0)
-					boss->xm = -0x200;
+				if (boss->direct == DIR_LEFT)
+					boss->xm = PIXELS_TO_UNITS(-1);
 				else
-					boss->xm = 0x200;
+					boss->xm = PIXELS_TO_UNITS(1);
 
-				boss->view.top = 0x8000;
-				boss->view.bottom = 0x3000;
+				boss->view.top = PIXELS_TO_UNITS(64);
+				boss->view.bottom = PIXELS_TO_UNITS(24);
 			}
 
 			break;
 
-		case 104:
-			if (boss->direct == 0 && boss->flag & 1)
+		case BALFROG_MIDAIR:
+			if (boss->direct == DIR_LEFT && boss->flag & COLL_LEFT_WALL)
 			{
-				boss->direct = 2;
-				boss->xm = 0x200;
+				boss->direct = DIR_RIGHT;
+				boss->xm = PIXELS_TO_UNITS(1);
 			}
 
-			if (boss->direct == 2 && boss->flag & 4)
+			if (boss->direct == DIR_RIGHT && boss->flag & COLL_RIGHT_WALL)
 			{
-				boss->direct = 0;
-				boss->xm = -0x200;
+				boss->direct = DIR_LEFT;
+				boss->xm = PIXELS_TO_UNITS(-1);
 			}
 
-			if (boss->flag & 8)
+			if (boss->flag & COLL_GROUND)
 			{
-				PlaySoundObject(26, 1);
+				PlaySoundObject(SND_LARGE_OBJECT_HIT_GROUND, 1);
 				SetQuake(30);
-				boss->act_no = 100;
-				boss->ani_no = 1;
-				boss->view.top = 0x6000;
-				boss->view.bottom = 0x2000;
+				boss->act_no = BALFROG_WAIT;
+				boss->ani_no = BALFROG_SPRITE_STANDING_STILL;
+				boss->view.top = PIXELS_TO_UNITS(48);
+				boss->view.bottom = PIXELS_TO_UNITS(16);
 
-				if (boss->direct == 0 && boss->x < gMC.x)
+				if (boss->direct == DIR_LEFT && boss->x < gMC.x)
 				{
-					boss->direct = 2;
-					boss->act_no = 110;
+					boss->direct = DIR_RIGHT;
+					boss->act_no = BALFROG_INITIALIZE_LAND;
 				}
 
-				if (boss->direct == 2 && boss->x > gMC.x)
+				if (boss->direct == DIR_RIGHT && boss->x > gMC.x)
 				{
-					boss->direct = 0;
-					boss->act_no = 110;
+					boss->direct = DIR_LEFT;
+					boss->act_no = BALFROG_INITIALIZE_LAND;
 				}
 
-				SetNpChar(110, Random(4, 16) * 0x2000, Random(0, 4) * 0x2000, 0, 0, 4, 0, 0x80);
+				SetNpChar(110, TILES_TO_UNITS(Random(4, 16)), TILES_TO_UNITS(Random(0, 4)), 0, 0, DIR_AUTO, NULL, 0x80);
 
 				for (i = 0; i < 4; ++i)
-					SetNpChar(4, boss->x + (Random(-12, 12) * 0x200), boss->y + boss->hit.bottom, Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+					SetNpChar(NPC_SMOKE, boss->x + PIXELS_TO_UNITS(Random(-12, 12)), boss->y + boss->hit.bottom, Random(-341, 341), Random(PIXELS_TO_UNITS(-3), 0), DIR_LEFT, NULL, 0x100);
 			}
 
 			break;
 
-		case 110:
-			boss->ani_no = 1;
+		case BALFROG_INITIALIZE_LAND:
+			boss->ani_no = BALFROG_SPRITE_STANDING_STILL;
 			boss->act_wait = 0;
-			boss->act_no = 111;
+			boss->act_no = BALFROG_LAND;
 			// Fallthrough
-		case 111:
+		case BALFROG_LAND:
 			++boss->act_wait;
 			boss->xm = 8 * boss->xm / 9;
 
-			if (boss->act_wait > 50)
+			if (boss->act_wait > SECONDS_TO_FRAMES(1))
 			{
-				boss->ani_no = 2;
+				boss->ani_no = BALFROG_SPRITE_MOUTH_BARELY_OPEN_CROUCHING;
 				boss->ani_wait = 0;
-				boss->act_no = 112;
+				boss->act_no = BALFROG_INITIALIZE_SHOOT;
 			}
 
 			break;
 
-		case 112:
+		case BALFROG_INITIALIZE_SHOOT:
 			if (++boss->ani_wait > 4)
 			{
-				boss->act_no = 113;
+				boss->act_no = BALFROG_SHOOT;
 				boss->act_wait = 0;
-				boss->ani_no = 3;
+				boss->ani_no = BALFROG_SPRITE_MOUTH_OPEN_CROUCHING;
 				boss->count1 = 16;
 				gBoss[1].bits |= NPC_SHOOTABLE;
 				boss->tgt_x = boss->life;
@@ -288,18 +335,18 @@ void ActBossChar_Frog(void)
 
 			break;
 
-		case 113:
+		case BALFROG_SHOOT:
 			if (boss->shock)
 			{
 				if (boss->count2++ / 2 % 2)
-					boss->ani_no = 4;
+					boss->ani_no = BALFROG_SPRITE_MOUTH_OPEN_CROUCHING_FLASHING;
 				else
-					boss->ani_no = 3;
+					boss->ani_no = BALFROG_SPRITE_MOUTH_OPEN_CROUCHING;
 			}
 			else
 			{
 				boss->count2 = 0;
-				boss->ani_no = 3;
+				boss->ani_no = BALFROG_SPRITE_MOUTH_OPEN_CROUCHING;
 			}
 
 			boss->xm = 10 * boss->xm / 11;
@@ -309,28 +356,28 @@ void ActBossChar_Frog(void)
 				boss->act_wait = 0;
 				--boss->count1;
 
-				if (boss->direct == 0)
-					deg = GetArktan(boss->x - 0x4000 - gMC.x, boss->y - 0x1000 - gMC.y);
+				if (boss->direct == DIR_LEFT)
+					deg = GetArktan(boss->x - TILES_TO_UNITS(2) - gMC.x, boss->y - PIXELS_TO_UNITS(8) - gMC.y);
 				else
-					deg = GetArktan(boss->x + 0x4000 - gMC.x, boss->y - 0x1000 - gMC.y);
+					deg = GetArktan(boss->x + TILES_TO_UNITS(2) - gMC.x, boss->y - PIXELS_TO_UNITS(8) - gMC.y);
 
-				deg += (unsigned char)Random(-16, 16);
+				deg += (unsigned char)Random(-0x10, 0x10);
 
 				ym = GetSin(deg);
 				xm = GetCos(deg);
 
-				if (boss->direct == 0)
-					SetNpChar(108, boss->x - 0x4000, boss->y - 0x1000, xm, ym, 0, 0, 0x100);
+				if (boss->direct == DIR_LEFT)
+					SetNpChar(NPC_PROJECTILE_BALFROG_SPITBALL, boss->x - TILES_TO_UNITS(2), boss->y - PIXELS_TO_UNITS(8), xm, ym, DIR_LEFT, NULL, 0x100);
 				else
-					SetNpChar(108, boss->x + 0x4000, boss->y - 0x1000, xm, ym, 0, 0, 0x100);
+					SetNpChar(NPC_PROJECTILE_BALFROG_SPITBALL, boss->x + TILES_TO_UNITS(2), boss->y - PIXELS_TO_UNITS(8), xm, ym, DIR_LEFT, NULL, 0x100);
 
-				PlaySoundObject(39, 1);
+				PlaySoundObject(SND_ENEMY_SHOOT_PROJETILE, 1);
 
 				if (boss->count1 == 0 || boss->life < boss->tgt_x - 90)
 				{
-					boss->act_no = 114;
+					boss->act_no = BALFROG_AFTER_SHOOT_WAIT;
 					boss->act_wait = 0;
-					boss->ani_no = 2;
+					boss->ani_no = BALFROG_SPRITE_MOUTH_BARELY_OPEN_CROUCHING;
 					boss->ani_wait = 0;
 					gBoss[1].bits &= ~NPC_SHOOTABLE;
 				}
@@ -338,188 +385,188 @@ void ActBossChar_Frog(void)
 
 			break;
 
-		case 114:
+		case BALFROG_AFTER_SHOOT_WAIT:
 			if (++boss->ani_wait > 10)
 			{
 				if (++gBoss[1].count1 > 2)
 				{
 					gBoss[1].count1 = 0;
-					boss->act_no = 120;
+					boss->act_no = BALFROG_INITIALIZE_LEAP_1;
 				}
 				else
 				{
-					boss->act_no = 100;
+					boss->act_no = BALFROG_WAIT;
 				}
 
 				boss->ani_wait = 0;
-				boss->ani_no = 1;
+				boss->ani_no = BALFROG_SPRITE_STANDING_STILL;
 			}
 
 			break;
 
-		case 120:
-			boss->act_no = 121;
+		case BALFROG_INITIALIZE_LEAP_1:
+			boss->act_no = BALFROG_INITIALIZE_LEAP_2;
 			boss->act_wait = 0;
-			boss->ani_no = 1;
+			boss->ani_no = BALFROG_SPRITE_STANDING_STILL;
 			boss->xm = 0;
 			// Fallthrough
-		case 121:
-			if (++boss->act_wait > 50)
+		case BALFROG_INITIALIZE_LEAP_2:
+			if (++boss->act_wait > SECONDS_TO_FRAMES(1))
 			{
-				boss->act_no = 122;
+				boss->act_no = BALFROG_INITIALIZE_LEAP_3;
 				boss->ani_wait = 0;
-				boss->ani_no = 2;
+				boss->ani_no = BALFROG_SPRITE_MOUTH_BARELY_OPEN_CROUCHING;
 			}
 
 			break;
 
-		case 122:
+		case BALFROG_INITIALIZE_LEAP_3:
 			if (++boss->ani_wait > 20)
 			{
-				boss->act_no = 123;
+				boss->act_no = BALFROG_LEAP;
 				boss->ani_wait = 0;
-				boss->ani_no = 1;
+				boss->ani_no = BALFROG_SPRITE_STANDING_STILL;
 			}
 
 			break;
 
-		case 123:
+		case BALFROG_LEAP:
 			if (++boss->ani_wait > 4)
 			{
-				boss->act_no = 124;
-				boss->ani_no = 5;
-				boss->ym = -0xA00;
-				boss->view.top = 0x8000;
-				boss->view.bottom = 0x3000;
-				PlaySoundObject(25, 1);
+				boss->act_no = BALFROG_LEAP_MIDAIR;
+				boss->ani_no = BALFROG_SPRITE_JUMPING;
+				boss->ym = PIXELS_TO_UNITS(-5);
+				boss->view.top = PIXELS_TO_UNITS(64);
+				boss->view.bottom = PIXELS_TO_UNITS(24);
+				PlaySoundObject(SND_SILLY_EXPLOSION, 1);
 			}
 
 			break;
 
-		case 124:
-			if (boss->flag & 8)
+		case BALFROG_LEAP_MIDAIR:
+			if (boss->flag & COLL_GROUND)
 			{
-				PlaySoundObject(26, 1);
+				PlaySoundObject(SND_LARGE_OBJECT_HIT_GROUND, 1);
 				SetQuake(60);
-				boss->act_no = 100;
-				boss->ani_no = 1;
-				boss->view.top = 0x6000;
-				boss->view.bottom = 0x2000;
+				boss->act_no = BALFROG_WAIT;
+				boss->ani_no = BALFROG_SPRITE_STANDING_STILL;
+				boss->view.top = PIXELS_TO_UNITS(48);
+				boss->view.bottom = PIXELS_TO_UNITS(16);
 
 				for (i = 0; i < 2; ++i)
-					SetNpChar(104, Random(4, 16) * 0x2000, Random(0, 4) * 0x2000, 0, 0, 4, 0, 0x80);
+					SetNpChar(NPC_ENEMY_FROG, TILES_TO_UNITS(Random(4, 16)), TILES_TO_UNITS(Random(0, 4)), 0, 0, DIR_AUTO, NULL, 0x80);
 
 				for (i = 0; i < 6; ++i)
-					SetNpChar(110, Random(4, 16) * 0x2000, Random(0, 4) * 0x2000, 0, 0, 4, 0, 0x80);
+					SetNpChar(NPC_ENEMY_PUCHI, TILES_TO_UNITS(Random(4, 16)), TILES_TO_UNITS(Random(0, 4)), 0, 0, DIR_AUTO, NULL, 0x80);
 
 				for (i = 0; i < 8; ++i)
-					SetNpChar(4, boss->x + (Random(-12, 12) * 0x200), boss->y + boss->hit.bottom, Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+					SetNpChar(NPC_SMOKE, boss->x + PIXELS_TO_UNITS(Random(-12, 12)), boss->y + boss->hit.bottom, Random(-341, 341), Random(PIXELS_TO_UNITS(-3), 0), DIR_LEFT, NULL, 0x100);
 
-				if (boss->direct == 0 && boss->x < gMC.x)
+				if (boss->direct == DIR_LEFT && boss->x < gMC.x)
 				{
-					boss->direct = 2;
-					boss->act_no = 110;
+					boss->direct = DIR_RIGHT;
+					boss->act_no = BALFROG_INITIALIZE_LAND;
 				}
 
-				if (boss->direct == 2 && boss->x > gMC.x)
+				if (boss->direct == DIR_RIGHT && boss->x > gMC.x)
 				{
-					boss->direct = 0;
-					boss->act_no = 110;
+					boss->direct = DIR_LEFT;
+					boss->act_no = BALFROG_INITIALIZE_LAND;
 				}
 			}
 
 			break;
 
-		case 130:
-			boss->act_no = 131;
-			boss->ani_no = 3;
+		case BALFROG_DIE:
+			boss->act_no = BALFROG_DIE_FLASHING;
+			boss->ani_no = BALFROG_SPRITE_MOUTH_OPEN_CROUCHING;
 			boss->act_wait = 0;
 			boss->xm = 0;
-			PlaySoundObject(72, 1);
+			PlaySoundObject(SND_EXPLOSION, 1);
 
 			for (i = 0; i < 8; ++i)
-				SetNpChar(4, boss->x + (Random(-12, 12) * 0x200), boss->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+				SetNpChar(NPC_SMOKE, boss->x + PIXELS_TO_UNITS(Random(-12, 12)), boss->y + PIXELS_TO_UNITS(Random(-12, 12)), Random(-341, 341), Random(PIXELS_TO_UNITS(-3), 0), DIR_LEFT, NULL, 0x100);
 
 			gBoss[1].cond = 0;
 			gBoss[2].cond = 0;
 			// Fallthrough
-		case 131:
+		case BALFROG_DIE_FLASHING:
 			if (++boss->act_wait % 5 == 0)
-				SetNpChar(4, boss->x + (Random(-12, 12) * 0x200), boss->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+				SetNpChar(NPC_SMOKE, boss->x + PIXELS_TO_UNITS(Random(-12, 12)), boss->y + PIXELS_TO_UNITS(Random(-12, 12)), Random(-341, 341), Random(PIXELS_TO_UNITS(-3), 0), DIR_LEFT, NULL, 0x100);
 
 			if (boss->act_wait / 2 % 2)
-				boss->x -= 0x200;
+				boss->x -= PIXELS_TO_UNITS(1);
 			else
-				boss->x += 0x200;
+				boss->x += PIXELS_TO_UNITS(1);
 
-			if (boss->act_wait > 100)
+			if (boss->act_wait > SECONDS_TO_FRAMES(2))
 			{
 				boss->act_wait = 0;
-				boss->act_no = 132;
+				boss->act_no = BALFROG_REVERT;
 			}
 
 			break;
 
-		case 132:
+		case BALFROG_REVERT:
 			if (++boss->act_wait / 2 % 2)
 			{
-				boss->view.front = 0x2800;
-				boss->view.top = 0x1800;
-				boss->view.back = 0x2800;
-				boss->view.bottom = 0x1800;
-				boss->ani_no = 6;
+				boss->view.front = PIXELS_TO_UNITS(20);
+				boss->view.top = PIXELS_TO_UNITS(12);
+				boss->view.back = PIXELS_TO_UNITS(20);
+				boss->view.bottom = PIXELS_TO_UNITS(12);
+				boss->ani_no = BALFROG_SPRITE_BALROG_WHITE;
 			}
 			else
 			{
-				boss->view.front = 0x6000;
-				boss->view.top = 0x6000;
-				boss->view.back = 0x4000;
-				boss->view.bottom = 0x2000;
-				boss->ani_no = 3;
+				boss->view.front = PIXELS_TO_UNITS(48);
+				boss->view.top = PIXELS_TO_UNITS(48);
+				boss->view.back = PIXELS_TO_UNITS(32);
+				boss->view.bottom = PIXELS_TO_UNITS(16);
+				boss->ani_no = BALFROG_SPRITE_MOUTH_OPEN_CROUCHING;
 			}
 
 			if (boss->act_wait % 9 == 0)
-				SetNpChar(4, boss->x + (Random(-12, 12) * 0x200), boss->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+				SetNpChar(NPC_SMOKE, boss->x + PIXELS_TO_UNITS(Random(-12, 12)), boss->y + PIXELS_TO_UNITS(Random(-12, 12)), Random(-341, 341), Random(PIXELS_TO_UNITS(-3), 0), DIR_LEFT, NULL, 0x100);
 
-			if (boss->act_wait > 150)
+			if (boss->act_wait > SECONDS_TO_FRAMES(3))
 			{
-				boss->act_no = 140;
-				boss->hit.bottom = 0x1800;
+				boss->act_no = BALFROG_NOP_START;
+				boss->hit.bottom = PIXELS_TO_UNITS(12);
 			}
 
 			break;
 
-		case 140:
-			boss->act_no = 141;
+		case BALFROG_NOP_START:
+			boss->act_no = BALFROG_NOP;
 			// Fallthrough
-		case 141:
-			if (boss->flag & 8)
+		case BALFROG_NOP:
+			if (boss->flag & COLL_GROUND)
 			{
-				boss->act_no = 142;
+				boss->act_no = BALFROG_GO_INTO_CEILING;
 				boss->act_wait = 0;
-				boss->ani_no = 7;
+				boss->ani_no = BALFROG_SPRITE_BALROG_CROUCHING;
 			}
 
 			break;
 
-		case 142:
+		case BALFROG_GO_INTO_CEILING:
 			if (++boss->act_wait > 30)
 			{
-				boss->ani_no = 8;
-				boss->ym = -0xA00;
+				boss->ani_no = BALFROG_SPRITE_BALROG_JUMPING;
+				boss->ym = PIXELS_TO_UNITS(-5);
 				boss->bits |= NPC_IGNORE_SOLIDITY;
-				boss->act_no = 143;
+				boss->act_no = BALFROG_GONE_INTO_CEILING;
 			}
 
 			break;
 
-		case 143:
-			boss->ym = -0xA00;
+		case BALFROG_GONE_INTO_CEILING:
+			boss->ym = PIXELS_TO_UNITS(-5);
 
 			if (boss->y < 0)
 			{
 				boss->cond = 0;
-				PlaySoundObject(26, 1);
+				PlaySoundObject(SND_LARGE_OBJECT_HIT_GROUND, 1);
 				SetQuake(30);
 			}
 
@@ -533,7 +580,7 @@ void ActBossChar_Frog(void)
 	boss->x += boss->xm;
 	boss->y += boss->ym;
 
-	if (boss->direct == 0)
+	if (boss->direct == DIR_LEFT)
 		boss->rect = rcLeft[boss->ani_no];
 	else
 		boss->rect = rcRight[boss->ani_no];
