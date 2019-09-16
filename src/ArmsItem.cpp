@@ -14,18 +14,20 @@
 #include "Sound.h"
 #include "TextScr.h"
 
-int gArmsEnergyX = 16;
+int gArmsEnergyX = 0x10;
+
+int gSelectedArms;
+int gSelectedItem;
 
 ARMS gArmsData[ARMS_MAX];
 ITEM gItemData[ITEM_MAX];
-int gSelectedArms;
-int gSelectedItem;
-int gCampTitleY;
-BOOL gCampActive;
+
+static BOOL gCampActive;
+static int gCampTitleY;
 
 void ClearArmsData()
 {
-	gArmsEnergyX = 32;
+	gArmsEnergyX = 0x20;
 	memset(gArmsData, 0, sizeof(gArmsData));
 }
 
@@ -49,7 +51,7 @@ BOOL AddArmsData(long code, long max_num)
 	}
 
 	if (i == ARMS_MAX)
-		return FALSE;
+		return FALSE;	// No space left
 
 	if (gArmsData[i].code == 0)
 	{
@@ -62,6 +64,7 @@ BOOL AddArmsData(long code, long max_num)
 	gArmsData[i].max_num += max_num;
 	gArmsData[i].num += max_num;
 
+	// Cap the amount of current ammo to the maximum amount of ammo
 	if (gArmsData[i].num > gArmsData[i].max_num)
 		gArmsData[i].num = gArmsData[i].max_num;
 
@@ -70,6 +73,7 @@ BOOL AddArmsData(long code, long max_num)
 
 BOOL SubArmsData(long code)
 {
+	// Find weapon index
 	int i;
 	for (i = 0; i < ARMS_MAX; ++i)
 		if (gArmsData[i].code == code)
@@ -80,7 +84,7 @@ BOOL SubArmsData(long code)
 #else
 	if (i == ITEM_MAX)	// Oops
 #endif
-		return FALSE;
+		return FALSE;	// Not found
 
 	// Shift all arms from the right to the left
 	for (++i; i < ARMS_MAX; ++i)
@@ -122,7 +126,7 @@ BOOL AddItemData(long code)
 	while (i < ITEM_MAX)
 	{
 		if (gItemData[i].code == code)
-			break;
+			break;	// Really, this could just return as the following code won't do anything meaningful in this case
 
 		if (gItemData[i].code == 0)
 			break;
@@ -158,7 +162,7 @@ BOOL SubItemData(long code)
 	return TRUE;
 }
 
-void MoveCampCursor()
+static void MoveCampCursor()
 {
 	int arms_num = 0;
 	int item_num = 0;
@@ -442,7 +446,7 @@ int CampLoop()
 
 	// Resume original script
 	LoadTextScript_Stage(old_script_path);
-	gArmsEnergyX = 32;
+	gArmsEnergyX = 0x20;
 	return 1;
 }
 
@@ -528,7 +532,7 @@ int RotationArms()
 	if (gSelectedArms == arms_num)
 		gSelectedArms = 0;
 
-	gArmsEnergyX = 32;
+	gArmsEnergyX = 0x20;
 	PlaySoundObject(4, 1);
 
 	return gArmsData[gSelectedArms].code;
