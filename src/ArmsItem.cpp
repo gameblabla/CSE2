@@ -27,6 +27,9 @@ static int gCampTitleY;
 
 void ClearArmsData()
 {
+#ifdef FIX_BUGS
+	gSelectedArms = 0; // Should probably be done in order to avoid potential problems
+#endif
 	gArmsEnergyX = 0x20;
 	memset(gArmsData, 0, sizeof(gArmsData));
 }
@@ -149,10 +152,10 @@ BOOL SubItemData(long code)
 	int i;
 	for (i = 0; i < ITEM_MAX; ++i)
 		if (gItemData[i].code == code)
-			break;
+			break; // Found
 
 	if (i == ITEM_MAX)
-		return FALSE;
+		return FALSE; // Not found
 
 	// Shift all items from the right to the left
 	for (++i; i < ITEM_MAX; ++i)
@@ -164,6 +167,7 @@ BOOL SubItemData(long code)
 	return TRUE;
 }
 
+/// Handle the moving
 static void MoveCampCursor()
 {
 	int arms_num = 0;

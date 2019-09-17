@@ -44,10 +44,10 @@ extern ARMS gArmsData[ARMS_MAX];
 extern ITEM gItemData[ITEM_MAX];
 
 
-/// Clear the weapons array, reverting it to the default state (no weapons)
+/// Clear the weapons array, reverting it to the default state (no weapons) and adjust variables (initialize weapons basically)
 void ClearArmsData();
 
-/// Clear the item array, reverting it to the default state (no items)
+/// Clear the item array, reverting it to the default state (no items) (initialize items basically)
 void ClearItemData();
 
 
