@@ -51,7 +51,8 @@ void ClearArmsData();
 void ClearItemData();
 
 
-/// Add code to the weapons, setting max_num as the max ammo, or find code and add max_num to its ammo. Fails if no space is available and the weapon isn't already present
+/// Add code to the weapons, setting max_num as the max ammo, or find code and add max_num to its ammo. Fails if no space is available and the weapon isn't
+/// already present
 BOOL AddArmsData(long code, long max_num);
 
 /// Remove code from the weapons. Fails if code is not found
