@@ -569,6 +569,6 @@ int RotationArmsRev()
 void ChangeToFirstArms()
 {
 	gSelectedArms = 0;
-	gArmsEnergyX = 32;
+	gArmsEnergyX = 0x20;
 	PlaySoundObject(4, 1);
 }
