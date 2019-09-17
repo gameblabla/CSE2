@@ -51,7 +51,7 @@ BOOL AddArmsData(long code, long max_num)
 	}
 
 	if (i == ARMS_MAX)
-		return FALSE;	// No space left
+		return FALSE; // No space left
 
 	if (gArmsData[i].code == 0)
 	{
@@ -82,9 +82,9 @@ BOOL SubArmsData(long code)
 #ifdef FIX_BUGS
 	if (i == ARMS_MAX)
 #else
-	if (i == ITEM_MAX)	// Oops
+	if (i == ITEM_MAX) // Oops
 #endif
-		return FALSE;	// Not found
+		return FALSE; // Not found
 
 	// Shift all arms from the right to the left
 	for (++i; i < ARMS_MAX; ++i)
@@ -126,7 +126,7 @@ BOOL AddItemData(long code)
 	while (i < ITEM_MAX)
 	{
 		if (gItemData[i].code == code)
-			break;	// Really, this could just return as the following code won't do anything meaningful in this case
+			break; // Really, this could just return as the following code won't do anything meaningful in this case
 
 		if (gItemData[i].code == 0)
 			break;
@@ -348,9 +348,11 @@ static void PutCampObject()
 
 	// Draw items cursor
 	if (gCampActive == TRUE)
-		PutBitmap3(&rcView, 32 * (gSelectedItem % 6) + (WINDOW_WIDTH - 224) / 2, 16 * (gSelectedItem / 6) + (WINDOW_HEIGHT - 88) / 2, &rcCur2[(flash / 2) % 2], SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&rcView, 32 * (gSelectedItem % 6) + (WINDOW_WIDTH - 224) / 2, 16 * (gSelectedItem / 6) + (WINDOW_HEIGHT - 88) / 2, &rcCur2[(flash / 2) % 2],
+		           SURFACE_ID_TEXT_BOX);
 	else
-		PutBitmap3(&rcView, 32 * (gSelectedItem % 6) + (WINDOW_WIDTH - 224) / 2, 16 * (gSelectedItem / 6) + (WINDOW_HEIGHT - 88) / 2, &rcCur2[1], SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&rcView, 32 * (gSelectedItem % 6) + (WINDOW_WIDTH - 224) / 2, 16 * (gSelectedItem / 6) + (WINDOW_HEIGHT - 88) / 2, &rcCur2[1],
+		           SURFACE_ID_TEXT_BOX);
 
 	for (i = 0; i < ITEM_MAX; ++i)
 	{
@@ -400,10 +402,10 @@ int CampLoop()
 		{
 			switch (Call_Escape(ghWnd))
 			{
-				case 0:
-					return 0;
-				case 2:
-					return 2;
+			case 0:
+				return 0;
+			case 2:
+				return 2;
 			}
 		}
 
@@ -412,10 +414,10 @@ int CampLoop()
 
 		switch (TextScriptProc())
 		{
-			case 0:
-				return 0;
-			case 2:
-				return 2;
+		case 0:
+			return 0;
+		case 2:
+			return 2;
 		}
 
 		PutBitmap4(&rcView, 0, 0, &rcView, SURFACE_ID_SCREEN_GRAB);
