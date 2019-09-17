@@ -104,13 +104,13 @@ BOOL TradeArms(long code1, long code2, long max_num)
 	while (i < ARMS_MAX)
 	{
 		if (gArmsData[i].code == code1)
-			break;	// Found
+			break; // Found
 
 		++i;
 	}
 
 	if (i == ARMS_MAX)
-		return FALSE;	// Not found
+		return FALSE; // Not found
 
 	// Initialize new weapon replacing old one, but adding the maximum ammunition to that of the old weapon.
 	gArmsData[i].level = 1;
