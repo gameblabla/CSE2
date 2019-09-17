@@ -42,10 +42,10 @@ BOOL AddArmsData(long code, long max_num)
 	while (i < ARMS_MAX)
 	{
 		if (gArmsData[i].code == code)
-			break;
+			break; // Found identical
 
 		if (gArmsData[i].code == 0)
-			break;
+			break; // Found free slot
 
 		++i;
 	}
@@ -55,6 +55,7 @@ BOOL AddArmsData(long code, long max_num)
 
 	if (gArmsData[i].code == 0)
 	{
+		// Initialize new weapon
 		memset(&gArmsData[i], 0, sizeof(ARMS));
 		gArmsData[i].level = 1;
 	}
@@ -77,12 +78,12 @@ BOOL SubArmsData(long code)
 	int i;
 	for (i = 0; i < ARMS_MAX; ++i)
 		if (gArmsData[i].code == code)
-			break;
+			break; // Found
 
 #ifdef FIX_BUGS
 	if (i == ARMS_MAX)
 #else
-	if (i == ITEM_MAX) // Oops
+	if (i == ITEM_MAX) // Wrong
 #endif
 		return FALSE; // Not found
 
@@ -103,14 +104,15 @@ BOOL TradeArms(long code1, long code2, long max_num)
 	while (i < ARMS_MAX)
 	{
 		if (gArmsData[i].code == code1)
-			break;
+			break;	// Found
 
 		++i;
 	}
 
 	if (i == ARMS_MAX)
-		return FALSE;
+		return FALSE;	// Not found
 
+	// Initialize new weapon replacing old one, but adding the maximum ammunition to that of the old weapon.
 	gArmsData[i].level = 1;
 	gArmsData[i].code = code2;
 	gArmsData[i].max_num += max_num;
@@ -126,16 +128,16 @@ BOOL AddItemData(long code)
 	while (i < ITEM_MAX)
 	{
 		if (gItemData[i].code == code)
-			break; // Really, this could just return as the following code won't do anything meaningful in this case
+			break; // Found identical. Really, this could just return as the following code won't do anything meaningful in this case
 
 		if (gItemData[i].code == 0)
-			break;
+			break; // Found free slot
 
 		++i;
 	}
 
 	if (i == ITEM_MAX)
-		return FALSE;
+		return FALSE; // Not found
 
 	gItemData[i].code = code;
 
