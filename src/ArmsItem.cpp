@@ -275,7 +275,7 @@ static void MoveCampCursor()
 	}
 }
 
-void PutCampObject()
+static void PutCampObject()
 {
 	int i;
 	RECT rcArms;
