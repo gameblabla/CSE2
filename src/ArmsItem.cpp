@@ -22,13 +22,49 @@ int gSelectedItem;
 ARMS gArmsData[ARMS_MAX];
 ITEM gItemData[ITEM_MAX];
 
+/// True if we're in the items section of the inventory (and not in the weapons section) (only relevant when the inventory is open)
 static BOOL gCampActive;
 static int gCampTitleY;
+
+#define FIND_CODE_OR_0(iterator, array, arrayCount, codeVariable) \
+	while ((iterator) < (arrayCount)) \
+	{ \
+		if ((array)[(iterator)].code == (codeVariable)) \
+			break; /* Found identical */ \
+\
+		if ((array)[(iterator)].code == 0) \
+			break; /* Found free slot */ \
+\
+		++(iterator); \
+	}
+
+#define FIND_CODE(iterator, array, arrayCount, codeVariable) \
+	for ((iterator) = 0; (iterator) < (arrayCount); ++(iterator)) \
+		if ((array)[(iterator)].code == (codeVariable)) \
+			break; // Found
+
+// Special version of FIND_CODE using while for accurate code
+#define FIND_CODE_WHILE(iterator, array, arrayCount, codeVariable) \
+	while ((iterator) < (arrayCount)) \
+	{ \
+		if ((array)[(iterator)].code == (codeVariable)) \
+			break; /* Found */ \
+		++(iterator); \
+	} \
+
+/*
+	while (i < ARMS_MAX)
+	{
+		if (gArmsData[i].code == code1)
+			break; // Found
+
+		++i;
+	} */
 
 void ClearArmsData()
 {
 #ifdef FIX_BUGS
-	gSelectedArms = 0; // Should probably be done in order to avoid potential problems
+	gSelectedArms = 0; // Should probably be done in order to avoid potential problems with the selected weapon being invalid (like is done in SubArmsData)
 #endif
 	gArmsEnergyX = 0x20;
 	memset(gArmsData, 0, sizeof(gArmsData));
@@ -42,16 +78,7 @@ void ClearItemData()
 BOOL AddArmsData(long code, long max_num)
 {
 	int i = 0;
-	while (i < ARMS_MAX)
-	{
-		if (gArmsData[i].code == code)
-			break; // Found identical
-
-		if (gArmsData[i].code == 0)
-			break; // Found free slot
-
-		++i;
-	}
+	FIND_CODE_OR_0(i, gArmsData, ARMS_MAX, code)
 
 	if (i == ARMS_MAX)
 		return FALSE; // No space left
@@ -79,9 +106,7 @@ BOOL SubArmsData(long code)
 {
 	// Find weapon index
 	int i;
-	for (i = 0; i < ARMS_MAX; ++i)
-		if (gArmsData[i].code == code)
-			break; // Found
+	FIND_CODE(i, gArmsData, ARMS_MAX, code)
 
 #ifdef FIX_BUGS
 	if (i == ARMS_MAX)
@@ -104,13 +129,7 @@ BOOL SubArmsData(long code)
 BOOL TradeArms(long code1, long code2, long max_num)
 {
 	int i = 0;
-	while (i < ARMS_MAX)
-	{
-		if (gArmsData[i].code == code1)
-			break; // Found
-
-		++i;
-	}
+	FIND_CODE_WHILE(i, gArmsData, ARMS_MAX, code1)
 
 	if (i == ARMS_MAX)
 		return FALSE; // Not found
@@ -128,16 +147,7 @@ BOOL TradeArms(long code1, long code2, long max_num)
 BOOL AddItemData(long code)
 {
 	int i = 0;
-	while (i < ITEM_MAX)
-	{
-		if (gItemData[i].code == code)
-			break; // Found identical. Really, this could just return as the following code won't do anything meaningful in this case
-
-		if (gItemData[i].code == 0)
-			break; // Found free slot
-
-		++i;
-	}
+	FIND_CODE_OR_0(i, gItemData, ITEM_MAX, code)
 
 	if (i == ITEM_MAX)
 		return FALSE; // Not found
@@ -167,9 +177,10 @@ BOOL SubItemData(long code)
 	return TRUE;
 }
 
-/// Handle the moving
+/// Update the inventory cursor
 static void MoveCampCursor()
 {
+	// Compute the current amount of weapons and items
 	int arms_num = 0;
 	int item_num = 0;
 	while (gArmsData[arms_num].code != 0)
@@ -178,22 +189,26 @@ static void MoveCampCursor()
 		++item_num;
 
 	if (arms_num == 0 && item_num == 0)
-		return;
+		return;	// Empty inventory
 
+	// True if we're currently changing inventory mode (weapons->items / items->weapons)
 	BOOL bChange = FALSE;
 
 	if (gCampActive == FALSE)
 	{
+		// Handle selected weapon
 		if (gKeyTrg & gKeyLeft)
 		{
 			--gSelectedArms;
 			bChange = TRUE;
 		}
+
 		if (gKeyTrg & gKeyRight)
 		{
 			++gSelectedArms;
 			bChange = TRUE;
 		}
+
 		if (gKeyTrg & (gKeyUp | gKeyDown))
 		{
 			if (item_num)
@@ -202,13 +217,16 @@ static void MoveCampCursor()
 			bChange = TRUE;
 		}
 
+
 		if (gSelectedArms < 0)
 			gSelectedArms = arms_num - 1;
+
 		if (gSelectedArms > arms_num - 1)
 			gSelectedArms = 0;
 	}
 	else
 	{
+		// Handle selected item
 		if (gKeyTrg & gKeyLeft)
 		{
 			if (gSelectedItem % 6 == 0)
@@ -262,7 +280,8 @@ static void MoveCampCursor()
 	{
 		if (gCampActive == FALSE)
 		{
-			PlaySoundObject(4, 1);
+			// Weapons to items
+			PlaySoundObject(SND_SWITCH_WEAPON, 1);
 
 			if (arms_num)
 				StartTextScript(gArmsData[gSelectedArms].code + 1000);
@@ -271,7 +290,12 @@ static void MoveCampCursor()
 		}
 		else
 		{
-			PlaySoundObject(1, 1);
+			// Items to weapons
+#ifdef FIX_BUGS
+			PlaySoundObject(SND_SWITCH_WEAPON, 1);
+#else
+			PlaySoundObject(SND_YES_NO_CHANGE_CHOICE, 1); // Pretty sure this is not intended
+#endif
 
 			if (item_num)
 				StartTextScript(gItemData[gSelectedItem].code + 5000);
@@ -281,16 +305,22 @@ static void MoveCampCursor()
 	}
 }
 
+/// Draw the inventory
 static void PutCampObject()
 {
 	int i;
+
+	/// Rect for the current weapon
 	RECT rcArms;
+
+	/// Rect for the current item
 	RECT rcItem;
 
-	// Get rects
 	RECT rcPer = {72, 48, 80, 56};
 	RECT rcNone = {80, 48, 96, 56};
 	RECT rcLv = {80, 80, 96, 88};
+
+	/// Final rect drawn on the screen
 	RECT rcView = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 	RECT rcCur1[2] = {{0, 88, 40, 128}, {40, 88, 80, 128}};
 	RECT rcCur2[2] = {{80, 88, 112, 104}, {80, 104, 112, 120}};
@@ -461,10 +491,8 @@ int CampLoop()
 BOOL CheckItem(long a)
 {
 	for (int i = 0; i < ITEM_MAX; ++i)
-	{
 		if (gItemData[i].code == a)
 			return TRUE;
-	}
 
 	return FALSE;
 }
@@ -472,10 +500,8 @@ BOOL CheckItem(long a)
 BOOL CheckArms(long a)
 {
 	for (int i = 0; i < ARMS_MAX; ++i)
-	{
 		if (gArmsData[i].code == a)
 			return TRUE;
-	}
 
 	return FALSE;
 }
