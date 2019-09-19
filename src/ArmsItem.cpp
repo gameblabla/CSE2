@@ -316,13 +316,22 @@ static void PutCampObject()
 	/// Rect for the current item
 	RECT rcItem;
 
+	/// Probably the rect for the slash
 	RECT rcPer = {72, 48, 80, 56};
+
+	/// Rect for when there is no ammo (double dashes)
 	RECT rcNone = {80, 48, 96, 56};
+
+	/// Rect for the "Lv" text!
 	RECT rcLv = {80, 80, 96, 88};
 
 	/// Final rect drawn on the screen
 	RECT rcView = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
+
+	/// Cursor rect array for weapons, element [1] being for when the cursor is flashing
 	RECT rcCur1[2] = {{0, 88, 40, 128}, {40, 88, 80, 128}};
+
+	/// Cursor rect array for items, element [1] being for when the cursor is flashing
 	RECT rcCur2[2] = {{80, 88, 112, 104}, {80, 104, 112, 120}};
 	RECT rcTitle1 = {80, 48, 144, 56};
 	RECT rcTitle2 = {80, 56, 144, 64};
@@ -353,16 +362,16 @@ static void PutCampObject()
 	else
 		PutBitmap3(&rcView, 40 * gSelectedArms + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT / 2) - 96, &rcCur1[1], SURFACE_ID_TEXT_BOX);
 
-	// Draw arms
+	// Draw weapons
 	for (i = 0; i < ARMS_MAX; ++i)
 	{
 		if (gArmsData[i].code == 0)
 			break;
 
-		rcArms.left = 16 * (gArmsData[i].code % 16);
-		rcArms.right = rcArms.left + 16;
-		rcArms.top = 16 * (gArmsData[i].code / 16);
-		rcArms.bottom = rcArms.top + 16;
+		rcArms.left = TILES_TO_PIXELS(gArmsData[i].code % 0x10);
+		rcArms.right = rcArms.left + TILES_TO_PIXELS(1);
+		rcArms.top = TILES_TO_PIXELS(PIXELS_TO_TILES(gArmsData[i].code));
+		rcArms.bottom = rcArms.top + TILES_TO_PIXELS(1);
 
 		PutBitmap3(&rcView, 40 * i + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT - 192) / 2, &rcArms, SURFACE_ID_ARMS_IMAGE);
 		PutBitmap3(&rcView, 40 * i + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT - 128) / 2, &rcPer, SURFACE_ID_TEXT_BOX);
