@@ -333,6 +333,7 @@ static void PutCampObject()
 
 	/// Cursor rect array for items, element [1] being for when the cursor is flashing
 	RECT rcCur2[2] = {{80, 88, 112, 104}, {80, 104, 112, 120}};
+
 	RECT rcTitle1 = {80, 48, 144, 56};
 	RECT rcTitle2 = {80, 56, 144, 64};
 	RECT rcBoxTop = {0, 0, 244, 8};
@@ -366,13 +367,15 @@ static void PutCampObject()
 	for (i = 0; i < ARMS_MAX; ++i)
 	{
 		if (gArmsData[i].code == 0)
-			break;
+			break; // Not a weapon
 
+		// Get rect for current weapon
 		rcArms.left = TILES_TO_PIXELS(gArmsData[i].code % 0x10);
 		rcArms.right = rcArms.left + TILES_TO_PIXELS(1);
 		rcArms.top = TILES_TO_PIXELS(PIXELS_TO_TILES(gArmsData[i].code));
 		rcArms.bottom = rcArms.top + TILES_TO_PIXELS(1);
 
+		// Draw the icon, slash and "Lv"
 		PutBitmap3(&rcView, 40 * i + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT - 192) / 2, &rcArms, SURFACE_ID_ARMS_IMAGE);
 		PutBitmap3(&rcView, 40 * i + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT - 128) / 2, &rcPer, SURFACE_ID_TEXT_BOX);
 		PutBitmap3(&rcView, 40 * i + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT - 160) / 2, &rcLv, SURFACE_ID_TEXT_BOX);
