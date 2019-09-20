@@ -367,9 +367,9 @@ static void PutCampObject()
 	for (i = 0; i < ARMS_MAX; ++i)
 	{
 		if (gArmsData[i].code == 0)
-			break; // Not a weapon
+			break; // Invalid weapon
 
-		// Get rect for current weapon
+		// Get icon rect for next weapon
 		rcArms.left = TILES_TO_PIXELS(gArmsData[i].code % 0x10);
 		rcArms.right = rcArms.left + TILES_TO_PIXELS(1);
 		rcArms.top = TILES_TO_PIXELS(PIXELS_TO_TILES(gArmsData[i].code));
@@ -389,6 +389,7 @@ static void PutCampObject()
 		}
 		else
 		{
+			// Weapon doesn't use ammunition
 			PutBitmap3(&rcView, 40 * i + (WINDOW_WIDTH - 192) / 2, (WINDOW_HEIGHT - 144) / 2, &rcNone, SURFACE_ID_TEXT_BOX);
 			PutBitmap3(&rcView, 40 * i + (WINDOW_WIDTH - 192) / 2, (WINDOW_HEIGHT - 128) / 2, &rcNone, SURFACE_ID_TEXT_BOX);
 		}
@@ -405,8 +406,9 @@ static void PutCampObject()
 	for (i = 0; i < ITEM_MAX; ++i)
 	{
 		if (gItemData[i].code == 0)
-			break;
+			break; // Invalid item
 
+		// Get rect for next item
 		rcItem.left = 32 * (gItemData[i].code % 8);
 		rcItem.right = rcItem.left + 32;
 		rcItem.top = 16 * (gItemData[i].code / 8);
