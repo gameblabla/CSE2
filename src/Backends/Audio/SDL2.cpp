@@ -86,20 +86,15 @@ static void MixSounds(float *stream, unsigned int frames_total)
 
 				for (unsigned int i = 0; i < frames_to_do; ++i)
 				{
+					// Get two samples, and normalise them to 0-1
+					const float sample1 = (sound->samples[(size_t)sound->position] - 128.0f) / 128.0f;
+					const float sample2 = (sound->samples[(size_t)sound->position + 1] - 128.0f) / 128.0f;
+
 					// Perform linear interpolation
-
-					// Get two samples
-					const unsigned char sample1 = sound->samples[(size_t)sound->position];
-					const unsigned char sample2 = sound->samples[(size_t)sound->position + 1];
-
-					// Interpolate
 					const float interpolated_sample = sample1 + ((sample2 - sample1) * (float)fmod(sound->position, 1.0));
 
-					// Normalise to 0-1
-					const float sample_normalised = (interpolated_sample - 128.0f) / 128.0f;
-
-					*steam_pointer++ += sample_normalised * sound->volume_l;
-					*steam_pointer++ += sample_normalised * sound->volume_r;
+					*steam_pointer++ += interpolated_sample * sound->volume_l;
+					*steam_pointer++ += interpolated_sample * sound->volume_r;
 
 					sound->position += sound->advance_delta;
 				}
@@ -112,8 +107,8 @@ static void MixSounds(float *stream, unsigned int frames_total)
 					}
 					else
 					{
-						sound->position = 0.0;
 						sound->playing = FALSE;
+						sound->position = 0.0;
 						break;
 					}
 				}
@@ -272,7 +267,7 @@ unsigned char* AudioBackend_LockSound(AudioBackend_Sound *sound, size_t *size)
 
 	SDL_LockAudioDevice(device_id);
 
-	if (size)
+	if (size != NULL)
 		*size = sound->frames;
 
 	return sound->samples;

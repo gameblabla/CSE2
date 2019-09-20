@@ -55,7 +55,7 @@ CXXFLAGS += -std=c++11
 
 ifeq ($(STATIC), 1)
 	LDFLAGS += -static
-	LIBS += `$(PKG_CONFIG) sdl2 --libs --static` `$(PKG_CONFIG) freetype2 --libs --static`
+	LIBS += `$(PKG_CONFIG) sdl2 --libs --static` `$(PKG_CONFIG) freetype2 --libs --static` -lfreetype
 else
 	LIBS += `$(PKG_CONFIG) sdl2 --libs` `$(PKG_CONFIG) freetype2 --libs`
 endif
