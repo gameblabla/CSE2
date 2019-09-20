@@ -169,7 +169,7 @@ void PutFront(int fx, int fy)
 	switch (gBack.type)
 	{
 		case 3:
-			x_1 = fx / 0x4000;
+			x_1 = fx / (32 * 0x200);
 			x_2 = x_1 + (((WINDOW_WIDTH + (32 - 1)) / 32) + 1);
 			y_1 = 0;
 			y_2 = y_1 + 32;
