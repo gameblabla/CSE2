@@ -47,7 +47,7 @@ CXXFLAGS += -std=c++98 -MMD -MP -MF $@.d `$(PKG_CONFIG) sdl2 --cflags` `$(PKG_CO
 
 ifeq ($(STATIC), 1)
 	LDFLAGS += -static
-	LIBS += `$(PKG_CONFIG) sdl2 --libs --static` `$(PKG_CONFIG) freetype2 --libs --static`
+	LIBS += `$(PKG_CONFIG) sdl2 --libs --static` `$(PKG_CONFIG) freetype2 --libs --static` -lfreetype
 else
 	LIBS += `$(PKG_CONFIG) sdl2 --libs` `$(PKG_CONFIG) freetype2 --libs`
 endif
