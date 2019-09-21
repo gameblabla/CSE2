@@ -4,7 +4,9 @@
 
 enum GameFlagsValues
 {
+	// To be continued
 	GAME_FLAG_IS_CONTROL_ENABLED = 2, // Idk tbh
+	// To be continued
 };
 
 extern int g_GameFlags;
