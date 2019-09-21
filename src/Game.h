@@ -21,7 +21,7 @@ enum GameFlagsValues
 	 * - Create a bullet if some other conditions are fullfilled while iterating over the stars in ActStar (If you have any idea of how that actually works, you may
 	 * want to replace this line with a better explanation)
 	 */
-	GAME_FLAG_IS_CONTROL_ENABLED = 2,
+	GAME_FLAG_IS_CONTROL_DISABLED = 2,
 
 	// To be continued
 };

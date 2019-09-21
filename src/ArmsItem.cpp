@@ -461,7 +461,7 @@ int CampLoop()
 			}
 		}
 
-		if (g_GameFlags & GAME_FLAG_IS_CONTROL_ENABLED)
+		if (g_GameFlags & GAME_FLAG_IS_CONTROL_DISABLED)
 			MoveCampCursor();
 
 		switch (TextScriptProc())
@@ -479,7 +479,7 @@ int CampLoop()
 
 		if (gCampActive)
 		{
-			if (g_GameFlags & GAME_FLAG_IS_CONTROL_ENABLED && gKeyTrg & (gKeyCancel | gKeyItem))
+			if (g_GameFlags & GAME_FLAG_IS_CONTROL_DISABLED && gKeyTrg & (gKeyCancel | gKeyItem))
 			{
 				StopTextScript();
 				break;
