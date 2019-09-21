@@ -26,41 +26,6 @@ ITEM gItemData[ITEM_MAX];
 static BOOL gCampActive;
 static int gCampTitleY;
 
-#define FIND_CODE_OR_0(iterator, array, arrayCount, codeVariable) \
-	while ((iterator) < (arrayCount)) \
-	{ \
-		if ((array)[(iterator)].code == (codeVariable)) \
-			break; /* Found identical */ \
-\
-		if ((array)[(iterator)].code == 0) \
-			break; /* Found free slot */ \
-\
-		++(iterator); \
-	}
-
-#define FIND_CODE(iterator, array, arrayCount, codeVariable) \
-	for ((iterator) = 0; (iterator) < (arrayCount); ++(iterator)) \
-		if ((array)[(iterator)].code == (codeVariable)) \
-			break; // Found
-
-// Special version of FIND_CODE using while for accurate code
-#define FIND_CODE_WHILE(iterator, array, arrayCount, codeVariable) \
-	while ((iterator) < (arrayCount)) \
-	{ \
-		if ((array)[(iterator)].code == (codeVariable)) \
-			break; /* Found */ \
-		++(iterator); \
-	} \
-
-/*
-	while (i < ARMS_MAX)
-	{
-		if (gArmsData[i].code == code1)
-			break; // Found
-
-		++i;
-	} */
-
 void ClearArmsData()
 {
 #ifdef FIX_BUGS
@@ -78,7 +43,14 @@ void ClearItemData()
 BOOL AddArmsData(long code, long max_num)
 {
 	int i = 0;
-	FIND_CODE_OR_0(i, gArmsData, ARMS_MAX, code)
+	while (i < ARMS_MAX)
+	{
+		if (gArmsData[i].code == code)
+			break; // Found identical
+
+		if (gArmsData[i].code == 0)
+			break; // Found free slot
+	}
 
 	if (i == ARMS_MAX)
 		return FALSE; // No space left
@@ -106,7 +78,9 @@ BOOL SubArmsData(long code)
 {
 	// Find weapon index
 	int i;
-	FIND_CODE(i, gArmsData, ARMS_MAX, code)
+	for (i = 0; i < ARMS_MAX; ++i)
+		if (gArmsData[i].code == code)
+			break; // Found
 
 #ifdef FIX_BUGS
 	if (i == ARMS_MAX)
@@ -129,7 +103,12 @@ BOOL SubArmsData(long code)
 BOOL TradeArms(long code1, long code2, long max_num)
 {
 	int i = 0;
-	FIND_CODE_WHILE(i, gArmsData, ARMS_MAX, code1)
+	while (i < ARMS_MAX)
+	{
+		if (gArmsData[i].code == code1)
+			break; // Found identical
+		++i;
+	}
 
 	if (i == ARMS_MAX)
 		return FALSE; // Not found
@@ -147,7 +126,16 @@ BOOL TradeArms(long code1, long code2, long max_num)
 BOOL AddItemData(long code)
 {
 	int i = 0;
-	FIND_CODE_OR_0(i, gItemData, ITEM_MAX, code)
+	while (i < ITEM_MAX)
+	{
+		if (gItemData[i].code == code)
+			break; // Found identical
+
+		if (gItemData[i].code == 0)
+			break; // Found free slot
+
+		++i;
+	}
 
 	if (i == ITEM_MAX)
 		return FALSE; // Not found
@@ -432,6 +420,8 @@ int CampLoop()
 	LoadTextScript2("ArmsItem.tsc");
 
 	gCampTitleY = (WINDOW_HEIGHT - 192) / 2;
+
+	// Put the cursor on the first weapon
 	gCampActive = FALSE;
 	gSelectedItem = 0;
 
@@ -455,9 +445,9 @@ int CampLoop()
 			switch (Call_Escape(ghWnd))
 			{
 			case 0:
-				return 0;
+				return 0; // Quit game
 			case 2:
-				return 2;
+				return 2; // Go to game intro
 			}
 		}
 
@@ -467,16 +457,18 @@ int CampLoop()
 		switch (TextScriptProc())
 		{
 		case 0:
-			return 0;
+			return 0; // Quit game
 		case 2:
-			return 2;
+			return 2; // Go to game intro
 		}
 
+		// Get currently displayed image
 		PutBitmap4(&rcView, 0, 0, &rcView, SURFACE_ID_SCREEN_GRAB);
 		PutCampObject();
 		PutTextScript();
 		PutFramePerSecound();
 
+		// Check whether we're getting out of the loop
 		if (gCampActive)
 		{
 			if (g_GameFlags & GAME_FLAG_IS_CONTROL_ENABLED && gKeyTrg & (gKeyCancel | gKeyItem))
@@ -495,22 +487,22 @@ int CampLoop()
 		}
 
 		if (!Flip_SystemTask(ghWnd))
-			return 0;
+			return 0; // Quit game
 	}
 
 	// Resume original script
 	LoadTextScript_Stage(old_script_path);
-	gArmsEnergyX = 0x20;
-	return 1;
+	gArmsEnergyX = 0x20; // ?
+	return 1; // Go to game
 }
 
 BOOL CheckItem(long a)
 {
 	for (int i = 0; i < ITEM_MAX; ++i)
 		if (gItemData[i].code == a)
-			return TRUE;
+			return TRUE; // Found
 
-	return FALSE;
+	return FALSE; // Not found
 }
 
 BOOL CheckArms(long a)
