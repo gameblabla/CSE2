@@ -479,7 +479,7 @@ int CampLoop()
 
 		if (gCampActive)
 		{
-			if (g_GameFlags & 2 && gKeyTrg & (gKeyCancel | gKeyItem))
+			if (g_GameFlags & GAME_FLAG_IS_CONTROL_ENABLED && gKeyTrg & (gKeyCancel | gKeyItem))
 			{
 				StopTextScript();
 				break;
