@@ -42,6 +42,7 @@ void ClearItemData()
 
 BOOL AddArmsData(long code, long max_num)
 {
+	// Search for code
 	int i = 0;
 	while (i < ARMS_MAX)
 	{
@@ -76,7 +77,7 @@ BOOL AddArmsData(long code, long max_num)
 
 BOOL SubArmsData(long code)
 {
-	// Find weapon index
+	// Search for code
 	int i;
 	for (i = 0; i < ARMS_MAX; ++i)
 		if (gArmsData[i].code == code)
@@ -102,6 +103,7 @@ BOOL SubArmsData(long code)
 
 BOOL TradeArms(long code1, long code2, long max_num)
 {
+	// Search for code1
 	int i = 0;
 	while (i < ARMS_MAX)
 	{
@@ -125,6 +127,7 @@ BOOL TradeArms(long code1, long code2, long max_num)
 
 BOOL AddItemData(long code)
 {
+	// Search for code
 	int i = 0;
 	while (i < ITEM_MAX)
 	{
@@ -147,6 +150,7 @@ BOOL AddItemData(long code)
 
 BOOL SubItemData(long code)
 {
+	// Search for code
 	int i;
 	for (i = 0; i < ITEM_MAX; ++i)
 		if (gItemData[i].code == code)
