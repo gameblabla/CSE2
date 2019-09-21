@@ -425,16 +425,16 @@ int CampLoop()
 
 	RECT rcView = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
-	// Load the inventory script
+	// Save the current script path (to restore it when we get out of the inventory)
 	GetTextScriptPath(old_script_path);
 
+	// Load the inventory script
 	LoadTextScript2("ArmsItem.tsc");
 
 	gCampTitleY = (WINDOW_HEIGHT - 192) / 2;
 	gCampActive = FALSE;
 	gSelectedItem = 0;
 
-	// Run script
 	arms_num = 0;
 	while (gArmsData[arms_num].code != 0)
 		++arms_num;
