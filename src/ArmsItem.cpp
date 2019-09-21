@@ -435,6 +435,7 @@ int CampLoop()
 	gCampActive = FALSE;
 	gSelectedItem = 0;
 
+	// Compute current amount of weapons
 	arms_num = 0;
 	while (gArmsData[arms_num].code != 0)
 		++arms_num;
@@ -448,6 +449,7 @@ int CampLoop()
 	{
 		GetTrg();
 
+		// Handle ESC
 		if (gKeyTrg & KEY_ESCAPE)
 		{
 			switch (Call_Escape(ghWnd))
@@ -459,7 +461,7 @@ int CampLoop()
 			}
 		}
 
-		if (g_GameFlags & 2)
+		if (g_GameFlags & GAME_FLAG_IS_CONTROL_ENABLED)
 			MoveCampCursor();
 
 		switch (TextScriptProc())

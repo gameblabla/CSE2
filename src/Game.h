@@ -2,6 +2,11 @@
 
 #include "WindowsWrapper.h"
 
+enum GameFlagsValues
+{
+	GAME_FLAG_IS_CONTROL_ENABLED = 2, // Idk tbh
+};
+
 extern int g_GameFlags;
 extern int gCounter;
 
