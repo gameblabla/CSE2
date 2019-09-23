@@ -362,10 +362,10 @@ static void PutCampObject()
 			break; // Invalid weapon
 
 		// Get icon rect for next weapon
-		rcArms.left = TILES_TO_PIXELS(gArmsData[i].code % 0x10);
-		rcArms.right = rcArms.left + TILES_TO_PIXELS(1);
-		rcArms.top = TILES_TO_PIXELS(PIXELS_TO_TILES(gArmsData[i].code));
-		rcArms.bottom = rcArms.top + TILES_TO_PIXELS(1);
+		rcArms.left = (gArmsData[i].code % 16) * 16;
+		rcArms.right = rcArms.left + 16;
+		rcArms.top = ((gArmsData[i].code) / 16) * 16;
+		rcArms.bottom = rcArms.top + 16;
 
 		// Draw the icon, slash and "Lv"
 		PutBitmap3(&rcView, 40 * i + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT - 192) / 2, &rcArms, SURFACE_ID_ARMS_IMAGE);
