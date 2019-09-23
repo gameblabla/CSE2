@@ -173,7 +173,7 @@ BOOL SubItemData(long code)
 }
 
 /// Update the inventory cursor
-static void MoveCampCursor()
+void MoveCampCursor()
 {
 	// Compute the current amount of weapons and items
 	int arms_num = 0;
