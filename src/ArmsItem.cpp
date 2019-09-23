@@ -51,6 +51,8 @@ BOOL AddArmsData(long code, long max_num)
 
 		if (gArmsData[i].code == 0)
 			break; // Found free slot
+
+		++i;
 	}
 
 	if (i == ARMS_MAX)
