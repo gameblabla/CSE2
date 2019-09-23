@@ -448,10 +448,10 @@ int CampLoop()
 		{
 			switch (Call_Escape(ghWnd))
 			{
-			case 0:
-				return 0; // Quit game
-			case 2:
-				return 2; // Go to game intro
+				case 0:
+					return 0; // Quit game
+				case 2:
+					return 2; // Go to game intro
 			}
 		}
 
@@ -460,10 +460,10 @@ int CampLoop()
 
 		switch (TextScriptProc())
 		{
-		case 0:
-			return 0; // Quit game
-		case 2:
-			return 2; // Go to game intro
+			case 0:
+				return 0; // Quit game
+			case 2:
+				return 2; // Go to game intro
 		}
 
 		// Get currently displayed image
