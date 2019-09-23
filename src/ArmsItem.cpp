@@ -298,7 +298,7 @@ void MoveCampCursor()
 }
 
 /// Draw the inventory
-static void PutCampObject()
+void PutCampObject()
 {
 	int i;
 
