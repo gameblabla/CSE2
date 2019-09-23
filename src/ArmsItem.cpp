@@ -233,9 +233,9 @@ static void MoveCampCursor()
 		if (gKeyTrg & gKeyRight)
 		{
 			if (gSelectedItem == item_num - 1)
-				gSelectedItem = 6 * (gSelectedItem / 6);
+				gSelectedItem = 6 * (gSelectedItem / 6); // Round down to multiple of 6
 			else if (gSelectedItem % 6 == 5)
-				gSelectedItem -= 5;
+				gSelectedItem -= 5; // Loop around row
 			else
 				++gSelectedItem;
 
@@ -245,7 +245,7 @@ static void MoveCampCursor()
 		if (gKeyTrg & gKeyUp)
 		{
 			if (gSelectedItem / 6 == 0)
-				gCampActive = FALSE;
+				gCampActive = FALSE; // We're on the first row, transition to weapons
 			else
 				gSelectedItem -= 6;
 
@@ -255,7 +255,7 @@ static void MoveCampCursor()
 		if (gKeyTrg & gKeyDown)
 		{
 			if (gSelectedItem / 6 == (item_num - 1) / 6)
-				gCampActive = FALSE;
+				gCampActive = FALSE; // We're on the last row, transition to weapons
 			else
 				gSelectedItem += 6;
 
@@ -263,7 +263,7 @@ static void MoveCampCursor()
 		}
 
 		if (gSelectedItem >= item_num)
-			gSelectedItem = item_num - 1;
+			gSelectedItem = item_num - 1; // Don't allow selecting a non-existing item
 
 		if (gCampActive && gKeyTrg & gKeyOk)
 			StartTextScript(gItemData[gSelectedItem].code + 6000);
