@@ -284,11 +284,7 @@ static void MoveCampCursor()
 		else
 		{
 			// Switch to an item
-#ifdef FIX_BUGS
-			PlaySoundObject(SND_SWITCH_WEAPON, 1);
-#else
-			PlaySoundObject(SND_YES_NO_CHANGE_CHOICE, 1); // Pretty sure this is not intended
-#endif
+			PlaySoundObject(SND_YES_NO_CHANGE_CHOICE, 1);
 
 			if (item_num)
 				StartTextScript(gItemData[gSelectedItem].code + 5000);
