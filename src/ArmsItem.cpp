@@ -111,6 +111,7 @@ BOOL TradeArms(long code1, long code2, long max_num)
 	{
 		if (gArmsData[i].code == code1)
 			break; // Found identical
+
 		++i;
 	}
 
