@@ -273,7 +273,7 @@ static void MoveCampCursor()
 	{
 		if (gCampActive == FALSE)
 		{
-			// Weapons to items
+			// Switch to a weapon
 			PlaySoundObject(SND_SWITCH_WEAPON, 1);
 
 			if (arms_num)
@@ -283,7 +283,7 @@ static void MoveCampCursor()
 		}
 		else
 		{
-			// Items to weapons
+			// Switch to an item
 #ifdef FIX_BUGS
 			PlaySoundObject(SND_SWITCH_WEAPON, 1);
 #else
