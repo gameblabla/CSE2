@@ -203,13 +203,14 @@ static void MoveCampCursor()
 
 		if (gKeyTrg & (gKeyUp | gKeyDown))
 		{
+			// If there are any items, we're changing to the items section, since the weapons section has only 1 row
 			if (item_num)
 				gCampActive = TRUE;
 
 			bChange = TRUE;
 		}
 
-
+		// Loop around gSelectedArms if needed
 		if (gSelectedArms < 0)
 			gSelectedArms = arms_num - 1;
 
@@ -513,24 +514,24 @@ BOOL CheckArms(long a)
 {
 	for (int i = 0; i < ARMS_MAX; ++i)
 		if (gArmsData[i].code == a)
-			return TRUE;
+			return TRUE; // Found
 
-	return FALSE;
+	return FALSE; // Not found
 }
 
 BOOL UseArmsEnergy(long num)
 {
 	if (gArmsData[gSelectedArms].max_num == 0)
-		return TRUE;
+		return TRUE; // No ammo needed
 	if (gArmsData[gSelectedArms].num == 0)
-		return FALSE;
+		return FALSE; // No ammo left
 
 	gArmsData[gSelectedArms].num -= num;
 
 	if (gArmsData[gSelectedArms].num < 0)
 		gArmsData[gSelectedArms].num = 0;
 
-	return TRUE;
+	return TRUE; // Was able to spend ammo
 }
 
 BOOL ChargeArmsEnergy(long num)
