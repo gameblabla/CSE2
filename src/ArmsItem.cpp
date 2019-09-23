@@ -183,7 +183,7 @@ static void MoveCampCursor()
 	if (arms_num == 0 && item_num == 0)
 		return;	// Empty inventory
 
-	// True if we're currently changing inventory mode (weapons->items / items->weapons)
+	/// True if we're currently changing cursor position
 	BOOL bChange = FALSE;
 
 	if (gCampActive == FALSE)
@@ -538,10 +538,11 @@ BOOL ChargeArmsEnergy(long num)
 {
 	gArmsData[gSelectedArms].num += num;
 
+	// Cap the ammo to the maximum ammunition
 	if (gArmsData[gSelectedArms].num > gArmsData[gSelectedArms].max_num)
 		gArmsData[gSelectedArms].num = gArmsData[gSelectedArms].max_num;
 
-	return TRUE;
+	return TRUE; // Always successfull
 }
 
 void FullArmsEnergy()
