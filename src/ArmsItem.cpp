@@ -22,7 +22,7 @@ int gSelectedItem;
 ARMS gArmsData[ARMS_MAX];
 ITEM gItemData[ITEM_MAX];
 
-/// True if we're in the items section of the inventory (and not in the weapons section) (only relevant when the inventory is open)
+/// True if we're in the items section of the inventory (not in the weapons section) (only relevant when the inventory is open)
 static BOOL gCampActive;
 static int gCampTitleY;
 
