@@ -546,7 +546,7 @@ void FullArmsEnergy()
 	for (int a = 0; a < ARMS_MAX; a++)
 	{
 		if (gArmsData[a].code == 0)
-			continue;
+			continue; // Don't change empty weapons
 
 		gArmsData[a].num = gArmsData[a].max_num;
 	}
@@ -554,6 +554,7 @@ void FullArmsEnergy()
 
 int RotationArms()
 {
+	// Get amount of weapons
 	int arms_num = 0;
 	while (gArmsData[arms_num].code != 0)
 		++arms_num;
@@ -563,6 +564,7 @@ int RotationArms()
 
 	ResetSpurCharge();
 
+	// Select next valid weapon
 	++gSelectedArms;
 
 	while (gSelectedArms < arms_num)
@@ -577,13 +579,14 @@ int RotationArms()
 		gSelectedArms = 0;
 
 	gArmsEnergyX = 0x20;
-	PlaySoundObject(4, 1);
+	PlaySoundObject(SND_SWITCH_WEAPON, 1);
 
 	return gArmsData[gSelectedArms].code;
 }
 
 int RotationArmsRev()
 {
+	// Get amount of weapons
 	int arms_num = 0;
 	while (gArmsData[arms_num].code != 0)
 		++arms_num;
@@ -593,6 +596,7 @@ int RotationArmsRev()
 
 	ResetSpurCharge();
 
+	// Select previous valid weapon
 	if (--gSelectedArms < 0)
 		gSelectedArms = arms_num - 1;
 
@@ -605,7 +609,7 @@ int RotationArmsRev()
 	}
 
 	gArmsEnergyX = 0;
-	PlaySoundObject(4, 1);
+	PlaySoundObject(SND_SWITCH_WEAPON, 1);
 
 	return gArmsData[gSelectedArms].code;
 }
@@ -614,5 +618,5 @@ void ChangeToFirstArms()
 {
 	gSelectedArms = 0;
 	gArmsEnergyX = 0x20;
-	PlaySoundObject(4, 1);
+	PlaySoundObject(SND_SWITCH_WEAPON, 1);
 }
