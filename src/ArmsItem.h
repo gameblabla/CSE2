@@ -34,13 +34,20 @@ struct ITEM
 #define ITEM_MAX 0x20
 
 
-/// X coordinate for the weapons energy
+/// X coordinate for the weapons HUD section. Set it to 32 for the forward weapon rotation "animation", 0 for the reverse weapon rotation "animation" and 16 to immobilise it
 extern int gArmsEnergyX;
 
+
+/// Currently selected weapon
 extern int gSelectedArms;
+
+// Currently selected item
 extern int gSelectedItem;
 
+/// Contains data for all the weapons the character currently has
 extern ARMS gArmsData[ARMS_MAX];
+
+/// Contains data for all the items the character currently has
 extern ITEM gItemData[ITEM_MAX];
 
 

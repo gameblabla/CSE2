@@ -14,7 +14,7 @@
 #include "Sound.h"
 #include "TextScr.h"
 
-int gArmsEnergyX = 0x10;
+int gArmsEnergyX = 16;
 
 int gSelectedArms;
 int gSelectedItem;
@@ -31,7 +31,7 @@ void ClearArmsData()
 #ifdef FIX_BUGS
 	gSelectedArms = 0; // Should probably be done in order to avoid potential problems with the selected weapon being invalid (like is done in SubArmsData)
 #endif
-	gArmsEnergyX = 0x20;
+	gArmsEnergyX = 32;
 	memset(gArmsData, 0, sizeof(gArmsData));
 }
 
@@ -494,7 +494,7 @@ int CampLoop()
 
 	// Resume original script
 	LoadTextScript_Stage(old_script_path);
-	gArmsEnergyX = 0x20; // ?
+	gArmsEnergyX = 32; // Displays weapon rotation animation in case the weapon was changed
 	return 1;	// Go to game
 }
 
@@ -579,7 +579,7 @@ int RotationArms()
 	if (gSelectedArms == arms_num)
 		gSelectedArms = 0;
 
-	gArmsEnergyX = 0x20;
+	gArmsEnergyX = 32;
 	PlaySoundObject(SND_SWITCH_WEAPON, 1);
 
 	return gArmsData[gSelectedArms].code;
@@ -618,6 +618,6 @@ int RotationArmsRev()
 void ChangeToFirstArms()
 {
 	gSelectedArms = 0;
-	gArmsEnergyX = 0x20;
+	gArmsEnergyX = 32;
 	PlaySoundObject(SND_SWITCH_WEAPON, 1);
 }
