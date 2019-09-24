@@ -12,7 +12,10 @@ struct ARMS
 	/// ID of the weapon
 	int code;
 
+	/// Current level of the weapon
 	int level;
+
+	/// Current EXP of the weapon, is reset to 0 at each level up
 	int exp;
 
 	/// Maximum ammunition
