@@ -16,15 +16,21 @@
 
 int gArmsEnergyX = 16;
 
-ARMS gArmsData[ARMS_MAX];
-ITEM gItemData[ITEM_MAX];
 int gSelectedArms;
 int gSelectedItem;
-int gCampTitleY;
-BOOL gCampActive;
+
+ARMS gArmsData[ARMS_MAX];
+ITEM gItemData[ITEM_MAX];
+
+/// True if we're in the items section of the inventory (not in the weapons section) (only relevant when the inventory is open)
+static BOOL gCampActive;
+static int gCampTitleY;
 
 void ClearArmsData()
 {
+#ifdef FIX_BUGS
+	gSelectedArms = 0; // Should probably be done in order to avoid potential problems with the selected weapon being invalid (like is done in SubArmsData)
+#endif
 	gArmsEnergyX = 32;
 	memset(gArmsData, 0, sizeof(gArmsData));
 }
@@ -36,23 +42,25 @@ void ClearItemData()
 
 BOOL AddArmsData(long code, long max_num)
 {
+	// Search for code
 	int i = 0;
 	while (i < ARMS_MAX)
 	{
 		if (gArmsData[i].code == code)
-			break;
+			break;	// Found identical
 
 		if (gArmsData[i].code == 0)
-			break;
+			break;	// Found free slot
 
 		++i;
 	}
 
 	if (i == ARMS_MAX)
-		return FALSE;
+		return FALSE;	// No space left
 
 	if (gArmsData[i].code == 0)
 	{
+		// Initialize new weapon
 		memset(&gArmsData[i], 0, sizeof(ARMS));
 		gArmsData[i].level = 1;
 	}
@@ -62,6 +70,7 @@ BOOL AddArmsData(long code, long max_num)
 	gArmsData[i].max_num += max_num;
 	gArmsData[i].num += max_num;
 
+	// Cap the amount of current ammo to the maximum amount of ammo
 	if (gArmsData[i].num > gArmsData[i].max_num)
 		gArmsData[i].num = gArmsData[i].max_num;
 
@@ -70,17 +79,18 @@ BOOL AddArmsData(long code, long max_num)
 
 BOOL SubArmsData(long code)
 {
+	// Search for code
 	int i;
 	for (i = 0; i < ARMS_MAX; ++i)
 		if (gArmsData[i].code == code)
-			break;
+			break;	// Found
 
 #ifdef FIX_BUGS
 	if (i == ARMS_MAX)
 #else
-	if (i == ITEM_MAX)	// Oops
+	if (i == ITEM_MAX)	// Wrong
 #endif
-		return FALSE;
+		return FALSE;	// Not found
 
 	// Shift all arms from the right to the left
 	for (++i; i < ARMS_MAX; ++i)
@@ -95,18 +105,20 @@ BOOL SubArmsData(long code)
 
 BOOL TradeArms(long code1, long code2, long max_num)
 {
+	// Search for code1
 	int i = 0;
 	while (i < ARMS_MAX)
 	{
 		if (gArmsData[i].code == code1)
-			break;
+			break;	// Found identical
 
 		++i;
 	}
 
 	if (i == ARMS_MAX)
-		return FALSE;
+		return FALSE;	// Not found
 
+	// Initialize new weapon replacing old one, but adding the maximum ammunition to that of the old weapon.
 	gArmsData[i].level = 1;
 	gArmsData[i].code = code2;
 	gArmsData[i].max_num += max_num;
@@ -118,20 +130,21 @@ BOOL TradeArms(long code1, long code2, long max_num)
 
 BOOL AddItemData(long code)
 {
+	// Search for code
 	int i = 0;
 	while (i < ITEM_MAX)
 	{
 		if (gItemData[i].code == code)
-			break;
+			break;	// Found identical
 
 		if (gItemData[i].code == 0)
-			break;
+			break;	// Found free slot
 
 		++i;
 	}
 
 	if (i == ITEM_MAX)
-		return FALSE;
+		return FALSE;	// Not found
 
 	gItemData[i].code = code;
 
@@ -140,13 +153,14 @@ BOOL AddItemData(long code)
 
 BOOL SubItemData(long code)
 {
+	// Search for code
 	int i;
 	for (i = 0; i < ITEM_MAX; ++i)
 		if (gItemData[i].code == code)
-			break;
+			break;	// Found
 
 	if (i == ITEM_MAX)
-		return FALSE;
+		return FALSE;	// Not found
 
 	// Shift all items from the right to the left
 	for (++i; i < ITEM_MAX; ++i)
@@ -158,8 +172,10 @@ BOOL SubItemData(long code)
 	return TRUE;
 }
 
+/// Update the inventory cursor
 void MoveCampCursor()
 {
+	// Compute the current amount of weapons and items
 	int arms_num = 0;
 	int item_num = 0;
 	while (gArmsData[arms_num].code != 0)
@@ -168,37 +184,45 @@ void MoveCampCursor()
 		++item_num;
 
 	if (arms_num == 0 && item_num == 0)
-		return;
+		return;	// Empty inventory
 
+	/// True if we're currently changing cursor position
 	BOOL bChange = FALSE;
 
 	if (gCampActive == FALSE)
 	{
+		// Handle selected weapon
 		if (gKeyTrg & gKeyLeft)
 		{
 			--gSelectedArms;
 			bChange = TRUE;
 		}
+
 		if (gKeyTrg & gKeyRight)
 		{
 			++gSelectedArms;
 			bChange = TRUE;
 		}
+
 		if (gKeyTrg & (gKeyUp | gKeyDown))
 		{
+			// If there are any items, we're changing to the items section, since the weapons section has only 1 row
 			if (item_num)
 				gCampActive = TRUE;
 
 			bChange = TRUE;
 		}
 
+		// Loop around gSelectedArms if needed
 		if (gSelectedArms < 0)
 			gSelectedArms = arms_num - 1;
+
 		if (gSelectedArms > arms_num - 1)
 			gSelectedArms = 0;
 	}
 	else
 	{
+		// Handle selected item
 		if (gKeyTrg & gKeyLeft)
 		{
 			if (gSelectedItem % 6 == 0)
@@ -212,9 +236,9 @@ void MoveCampCursor()
 		if (gKeyTrg & gKeyRight)
 		{
 			if (gSelectedItem == item_num - 1)
-				gSelectedItem = 6 * (gSelectedItem / 6);
+				gSelectedItem = 6 * (gSelectedItem / 6);	// Round down to multiple of 6
 			else if (gSelectedItem % 6 == 5)
-				gSelectedItem -= 5;
+				gSelectedItem -= 5;	// Loop around row
 			else
 				++gSelectedItem;
 
@@ -224,7 +248,7 @@ void MoveCampCursor()
 		if (gKeyTrg & gKeyUp)
 		{
 			if (gSelectedItem / 6 == 0)
-				gCampActive = FALSE;
+				gCampActive = FALSE;	// We're on the first row, transition to weapons
 			else
 				gSelectedItem -= 6;
 
@@ -234,7 +258,7 @@ void MoveCampCursor()
 		if (gKeyTrg & gKeyDown)
 		{
 			if (gSelectedItem / 6 == (item_num - 1) / 6)
-				gCampActive = FALSE;
+				gCampActive = FALSE;	// We're on the last row, transition to weapons
 			else
 				gSelectedItem += 6;
 
@@ -242,7 +266,7 @@ void MoveCampCursor()
 		}
 
 		if (gSelectedItem >= item_num)
-			gSelectedItem = item_num - 1;
+			gSelectedItem = item_num - 1;	// Don't allow selecting a non-existing item
 
 		if (gCampActive && gKeyTrg & gKeyOk)
 			StartTextScript(gItemData[gSelectedItem].code + 6000);
@@ -252,7 +276,8 @@ void MoveCampCursor()
 	{
 		if (gCampActive == FALSE)
 		{
-			PlaySoundObject(4, 1);
+			// Switch to a weapon
+			PlaySoundObject(SND_SWITCH_WEAPON, 1);
 
 			if (arms_num)
 				StartTextScript(gArmsData[gSelectedArms].code + 1000);
@@ -261,7 +286,8 @@ void MoveCampCursor()
 		}
 		else
 		{
-			PlaySoundObject(1, 1);
+			// Switch to an item
+			PlaySoundObject(SND_YES_NO_CHANGE_CHOICE, 1);
 
 			if (item_num)
 				StartTextScript(gItemData[gSelectedItem].code + 5000);
@@ -271,19 +297,35 @@ void MoveCampCursor()
 	}
 }
 
+/// Draw the inventory
 void PutCampObject()
 {
 	int i;
+
+	/// Rect for the current weapon
 	RECT rcArms;
+
+	/// Rect for the current item
 	RECT rcItem;
 
-	// Get rects
+	/// Probably the rect for the slash
 	RECT rcPer = {72, 48, 80, 56};
+
+	/// Rect for when there is no ammo (double dashes)
 	RECT rcNone = {80, 48, 96, 56};
+
+	/// Rect for the "Lv" text!
 	RECT rcLv = {80, 80, 96, 88};
+
+	/// Final rect drawn on the screen
 	RECT rcView = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
+
+	/// Cursor rect array for weapons, element [1] being for when the cursor is flashing
 	RECT rcCur1[2] = {{0, 88, 40, 128}, {40, 88, 80, 128}};
+
+	/// Cursor rect array for items, element [1] being for when the cursor is flashing
 	RECT rcCur2[2] = {{80, 88, 112, 104}, {80, 104, 112, 120}};
+
 	RECT rcTitle1 = {80, 48, 144, 56};
 	RECT rcTitle2 = {80, 56, 144, 64};
 	RECT rcBoxTop = {0, 0, 244, 8};
@@ -313,17 +355,19 @@ void PutCampObject()
 	else
 		PutBitmap3(&rcView, PixelToScreenCoord(40 * gSelectedArms + (WINDOW_WIDTH - 224) / 2), PixelToScreenCoord((WINDOW_HEIGHT / 2) - 96), &rcCur1[1], SURFACE_ID_TEXT_BOX);
 
-	// Draw arms
+	// Draw weapons
 	for (i = 0; i < ARMS_MAX; ++i)
 	{
 		if (gArmsData[i].code == 0)
-			break;
+			break;	// Invalid weapon
 
-		rcArms.left = 16 * (gArmsData[i].code % 16);
+		// Get icon rect for next weapon
+		rcArms.left = (gArmsData[i].code % 16) * 16;
 		rcArms.right = rcArms.left + 16;
-		rcArms.top = 16 * (gArmsData[i].code / 16);
+		rcArms.top = ((gArmsData[i].code) / 16) * 16;
 		rcArms.bottom = rcArms.top + 16;
 
+		// Draw the icon, slash and "Lv"
 		PutBitmap3(&rcView, PixelToScreenCoord(40 * i + (WINDOW_WIDTH - 224) / 2), PixelToScreenCoord((WINDOW_HEIGHT - 192) / 2), &rcArms, SURFACE_ID_ARMS_IMAGE);
 		PutBitmap3(&rcView, PixelToScreenCoord(40 * i + (WINDOW_WIDTH - 224) / 2), PixelToScreenCoord((WINDOW_HEIGHT - 128) / 2), &rcPer, SURFACE_ID_TEXT_BOX);
 		PutBitmap3(&rcView, PixelToScreenCoord(40 * i + (WINDOW_WIDTH - 224) / 2), PixelToScreenCoord((WINDOW_HEIGHT - 160) / 2), &rcLv, SURFACE_ID_TEXT_BOX);
@@ -337,6 +381,7 @@ void PutCampObject()
 		}
 		else
 		{
+			// Weapon doesn't use ammunition
 			PutBitmap3(&rcView, PixelToScreenCoord(40 * i + (WINDOW_WIDTH - 192) / 2), PixelToScreenCoord((WINDOW_HEIGHT - 144) / 2), &rcNone, SURFACE_ID_TEXT_BOX);
 			PutBitmap3(&rcView, PixelToScreenCoord(40 * i + (WINDOW_WIDTH - 192) / 2), PixelToScreenCoord((WINDOW_HEIGHT - 128) / 2), &rcNone, SURFACE_ID_TEXT_BOX);
 		}
@@ -351,8 +396,9 @@ void PutCampObject()
 	for (i = 0; i < ITEM_MAX; ++i)
 	{
 		if (gItemData[i].code == 0)
-			break;
+			break;	// Invalid item
 
+		// Get rect for next item
 		rcItem.left = 32 * (gItemData[i].code % 8);
 		rcItem.right = rcItem.left + 32;
 		rcItem.top = 16 * (gItemData[i].code / 8);
@@ -369,16 +415,19 @@ int CampLoop()
 
 	RECT rcView = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
-	// Load the inventory script
+	// Save the current script path (to restore it when we get out of the inventory)
 	GetTextScriptPath(old_script_path);
 
+	// Load the inventory script
 	LoadTextScript2("ArmsItem.tsc");
 
 	gCampTitleY = (WINDOW_HEIGHT - 192) / 2;
+
+	// Put the cursor on the first weapon
 	gCampActive = FALSE;
 	gSelectedItem = 0;
 
-	// Run script
+	// Compute current amount of weapons
 	arms_num = 0;
 	while (gArmsData[arms_num].code != 0)
 		++arms_num;
@@ -392,36 +441,39 @@ int CampLoop()
 	{
 		GetTrg();
 
+		// Handle ESC
 		if (gKeyTrg & KEY_ESCAPE)
 		{
 			switch (Call_Escape())
 			{
 				case 0:
-					return 0;
+					return 0;	// Quit game
 				case 2:
-					return 2;
+					return 2;	// Go to game intro
 			}
 		}
 
-		if (g_GameFlags & 2)
+		if (g_GameFlags & GAME_FLAG_IS_CONTROL_ENABLED)
 			MoveCampCursor();
 
 		switch (TextScriptProc())
 		{
 			case 0:
-				return 0;
+				return 0;	// Quit game
 			case 2:
-				return 2;
+				return 2;	// Go to game intro
 		}
 
+		// Get currently displayed image
 		PutBitmap4(&rcView, 0, 0, &rcView, SURFACE_ID_SCREEN_GRAB);
 		PutCampObject();
 		PutTextScript();
 		PutFramePerSecound();
 
+		// Check whether we're getting out of the loop
 		if (gCampActive)
 		{
-			if (g_GameFlags & 2 && gKeyTrg & (gKeyCancel | gKeyItem))
+			if (g_GameFlags & GAME_FLAG_IS_CONTROL_ENABLED && gKeyTrg & (gKeyCancel | gKeyItem))
 			{
 				StopTextScript();
 				break;
@@ -437,60 +489,57 @@ int CampLoop()
 		}
 
 		if (!Flip_SystemTask())
-			return 0;
+			return 0;	// Quit game
 	}
 
 	// Resume original script
 	LoadTextScript_Stage(old_script_path);
-	gArmsEnergyX = 32;
-	return 1;
+	gArmsEnergyX = 32; // Displays weapon rotation animation in case the weapon was changed
+	return 1;	// Go to game
 }
 
 BOOL CheckItem(long a)
 {
 	for (int i = 0; i < ITEM_MAX; ++i)
-	{
 		if (gItemData[i].code == a)
-			return TRUE;
-	}
+			return TRUE;	// Found
 
-	return FALSE;
+	return FALSE;	// Not found
 }
 
 BOOL CheckArms(long a)
 {
 	for (int i = 0; i < ARMS_MAX; ++i)
-	{
 		if (gArmsData[i].code == a)
-			return TRUE;
-	}
+			return TRUE;	// Found
 
-	return FALSE;
+	return FALSE;	// Not found
 }
 
 BOOL UseArmsEnergy(long num)
 {
 	if (gArmsData[gSelectedArms].max_num == 0)
-		return TRUE;
+		return TRUE;	// No ammo needed
 	if (gArmsData[gSelectedArms].num == 0)
-		return FALSE;
+		return FALSE;	// No ammo left
 
 	gArmsData[gSelectedArms].num -= num;
 
 	if (gArmsData[gSelectedArms].num < 0)
 		gArmsData[gSelectedArms].num = 0;
 
-	return TRUE;
+	return TRUE;	// Was able to spend ammo
 }
 
 BOOL ChargeArmsEnergy(long num)
 {
 	gArmsData[gSelectedArms].num += num;
 
+	// Cap the ammo to the maximum ammunition
 	if (gArmsData[gSelectedArms].num > gArmsData[gSelectedArms].max_num)
 		gArmsData[gSelectedArms].num = gArmsData[gSelectedArms].max_num;
 
-	return TRUE;
+	return TRUE;	// Always successfull
 }
 
 void FullArmsEnergy()
@@ -498,7 +547,7 @@ void FullArmsEnergy()
 	for (int a = 0; a < ARMS_MAX; a++)
 	{
 		if (gArmsData[a].code == 0)
-			continue;
+			continue;	// Don't change empty weapons
 
 		gArmsData[a].num = gArmsData[a].max_num;
 	}
@@ -506,6 +555,7 @@ void FullArmsEnergy()
 
 int RotationArms()
 {
+	// Get amount of weapons
 	int arms_num = 0;
 	while (gArmsData[arms_num].code != 0)
 		++arms_num;
@@ -515,6 +565,7 @@ int RotationArms()
 
 	ResetSpurCharge();
 
+	// Select next valid weapon
 	++gSelectedArms;
 
 	while (gSelectedArms < arms_num)
@@ -529,13 +580,14 @@ int RotationArms()
 		gSelectedArms = 0;
 
 	gArmsEnergyX = 32;
-	PlaySoundObject(4, 1);
+	PlaySoundObject(SND_SWITCH_WEAPON, 1);
 
 	return gArmsData[gSelectedArms].code;
 }
 
 int RotationArmsRev()
 {
+	// Get amount of weapons
 	int arms_num = 0;
 	while (gArmsData[arms_num].code != 0)
 		++arms_num;
@@ -545,6 +597,7 @@ int RotationArmsRev()
 
 	ResetSpurCharge();
 
+	// Select previous valid weapon
 	if (--gSelectedArms < 0)
 		gSelectedArms = arms_num - 1;
 
@@ -557,7 +610,7 @@ int RotationArmsRev()
 	}
 
 	gArmsEnergyX = 0;
-	PlaySoundObject(4, 1);
+	PlaySoundObject(SND_SWITCH_WEAPON, 1);
 
 	return gArmsData[gSelectedArms].code;
 }
@@ -566,5 +619,5 @@ void ChangeToFirstArms()
 {
 	gSelectedArms = 0;
 	gArmsEnergyX = 32;
-	PlaySoundObject(4, 1);
+	PlaySoundObject(SND_SWITCH_WEAPON, 1);
 }

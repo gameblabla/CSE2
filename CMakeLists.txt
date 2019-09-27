@@ -176,7 +176,6 @@ add_executable(CSE2
 )
 
 set(RESOURCES
-	FONT/LiberationMono.ttf
 )
 
 target_include_directories(CSE2 PRIVATE "external")
@@ -185,9 +184,11 @@ target_compile_definitions(CSE2 PRIVATE LODEPNG_NO_COMPILE_ENCODER LODEPNG_NO_CO
 # Handle options
 if(JAPANESE)
 	set(DATA_DIRECTORY "${ASSETS_DIRECTORY}/data_jp")
+	list(APPEND RESOURCES "FONT/NotoSansMonoCJKjp.otf")
 	target_compile_definitions(CSE2 PRIVATE JAPANESE)
 else()
 	set(DATA_DIRECTORY "${ASSETS_DIRECTORY}/data_en")
+	list(APPEND RESOURCES "FONT/LiberationMono.ttf")
 endif()
 
 if(FIX_BUGS)

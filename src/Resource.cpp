@@ -3,7 +3,11 @@
 #include <stddef.h>
 #include <string.h>
 
+#ifdef JAPANESE
+#include "Resource/FONT/NotoSansMonoCJKjp.otf.h"
+#else
 #include "Resource/FONT/LiberationMono.ttf.h"
+#endif
 
 static const struct
 {
@@ -12,7 +16,11 @@ static const struct
 	const unsigned char *data;
 	size_t size;
 } resources[] = {
+#ifdef JAPANESE
+	{"FONT", "FONT", rNotoSansMonoCJKjp, sizeof(rNotoSansMonoCJKjp)},
+#else
 	{"FONT", "FONT", rLiberationMono, sizeof(rLiberationMono)},
+#endif
 };
 
 const unsigned char* FindResource(const char *name, const char *type, size_t *size)

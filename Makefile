@@ -155,7 +155,6 @@ ifeq ($(OGG_AUDIO), 1)
 		external/clownaudio/decoders/stb_vorbis
 
 	DEFINES += -DUSE_STB_VORBIS
-endif
 
 ifeq ($(FLAC_AUDIO), 1)
 	SOURCES += \
@@ -213,8 +212,13 @@ ifeq ($(SMOOTH_SPRITE_MOVEMENT), 1)
 	DEFINES += -DSMOOTH_SPRITE_MOVEMENT
 endif
 
-RESOURCES = \
-	FONT/LiberationMono.ttf
+RESOURCES = 
+
+ifeq ($(JAPANESE), 1)
+	RESOURCES += FONT/NotoSansMonoCJKjp.otf
+else
+	RESOURCES += FONT/LiberationMono.ttf
+endif
 
 ifeq ($(RENDERER), OpenGL3)
 	SOURCES += src/Backends/Rendering/OpenGL3
