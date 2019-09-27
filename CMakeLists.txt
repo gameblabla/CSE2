@@ -183,7 +183,6 @@ set(RESOURCES
 	BITMAP/Credit18.bmp
 	CURSOR/CURSOR_IKA.bmp
 	CURSOR/CURSOR_NORMAL.bmp
-	FONT/LiberationMono.ttf
 	ICON/ICON_MINI.bmp
 	ORG/Access.org
 	ORG/Anzen.org
@@ -233,11 +232,11 @@ set(RESOURCES
 # Handle options
 if(JAPANESE)
 	set(DATA_DIRECTORY "${ASSETS_DIRECTORY}/data_jp")
-	list(APPEND RESOURCES "BITMAP/pixel_jp.bmp")
+	list(APPEND RESOURCES "BITMAP/pixel_jp.bmp" "FONT/NotoSansMonoCJKjp.otf")
 	target_compile_definitions(CSE2 PRIVATE JAPANESE)
 else()
 	set(DATA_DIRECTORY "${ASSETS_DIRECTORY}/data_en")
-	list(APPEND RESOURCES "BITMAP/pixel.bmp")
+	list(APPEND RESOURCES "BITMAP/pixel.bmp" "FONT/LiberationMono.ttf")
 endif()
 
 if(FIX_BUGS)

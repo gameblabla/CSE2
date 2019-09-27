@@ -147,7 +147,6 @@ RESOURCES = \
 	BITMAP/Credit18.bmp \
 	CURSOR/CURSOR_IKA.bmp \
 	CURSOR/CURSOR_NORMAL.bmp \
-	FONT/LiberationMono.ttf \
 	ICON/ICON_MINI.bmp \
 	ORG/Access.org \
 	ORG/Anzen.org \
@@ -195,8 +194,10 @@ RESOURCES = \
 
 ifeq ($(JAPANESE), 1)
 	RESOURCES += BITMAP/pixel_jp.bmp
+	RESOURCES += FONT/NotoSansMonoCJKjp.otf
 else
 	RESOURCES += BITMAP/pixel.bmp
+	RESOURCES += FONT/LiberationMono.ttf
 endif
 
 ifeq ($(RENDERER), OpenGL3)
