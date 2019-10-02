@@ -664,11 +664,7 @@ LRESULT __stdcall WindowProcedure(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lPa
 
 				case 40004:
 					if (!OpenVolumeConfiguration(hWnd))
-					#ifdef JAPANESE
-						MessageBoxA(hWnd, "â{âèâàü[âÇÉ¦ÆÞé­ïNô«é+é½é_é¦é±é+éÁé¢", lpWindowName, 0);
-					#else
-						MessageBoxA(hWnd, "Could not launch volume configuration", lpWindowName, 0);
-					#endif
+					MessageBoxA(hWnd, "â{âèâàü[âÇÉ¦ÆÞé­ïNô«é+é½é_é¦é±é+éÁé¢", lpWindowName, 0);	// 'ボリューム設定を起動できませんでした' (Could not launch volume configuration) in Shift-JIS
 					break;
 
 				case 40005:
