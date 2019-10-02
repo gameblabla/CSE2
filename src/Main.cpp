@@ -664,7 +664,7 @@ LRESULT __stdcall WindowProcedure(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lPa
 
 				case 40004:
 					if (!OpenVolumeConfiguration(hWnd))
-					MessageBoxA(hWnd, "\x83\x7B\x83\x8A\x83\x85\x81\x5B\x83\x80\x90\xDD\x92\xE8\x82\xF0\x8B\x4E\x93\xAE\x82\xC5\x82\xAB\x82\xDC\x82\xB9\x82\xF1\x82\xC5\x82\xB5\x82\xBD", lpWindowName, 0);	// 'ボリューム設定を起動できませんでした' (Could not launch volume configuration) in Shift-JIS
+						MessageBoxA(hWnd, "\x83\x7B\x83\x8A\x83\x85\x81\x5B\x83\x80\x90\xDD\x92\xE8\x82\xF0\x8B\x4E\x93\xAE\x82\xC5\x82\xAB\x82\xDC\x82\xB9\x82\xF1\x82\xC5\x82\xB5\x82\xBD", lpWindowName, 0);	// 'ボリューム設定を起動できませんでした' (Could not launch volume configuration) in Shift-JIS
 					break;
 
 				case 40005:
