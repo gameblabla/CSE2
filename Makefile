@@ -9,11 +9,9 @@ ifeq ($(RELEASE), 1)
 	CXXFLAGS = -O3
 	LDFLAGS = -s
 	FILENAME_DEF = CSE2.exe
-	DOCONFIG_FILENAME_DEF = DoConfig.exe
 else
 	CXXFLAGS = -Og -ggdb3
 	FILENAME_DEF = CSE2_debug.exe
-	DOCONFIG_FILENAME_DEF = DoConfig_debug.exe
 endif
 
 ifeq ($(JAPANESE), 1)
@@ -25,7 +23,6 @@ else
 endif
 
 FILENAME ?= $(FILENAME_DEF)
-DOCONFIG_FILENAME ?= $(DOCONFIG_FILENAME_DEF)
 
 ifeq ($(FIX_BUGS), 1)
 	CXXFLAGS += -DFIX_BUGS
@@ -147,15 +144,6 @@ include $(wildcard $(DEPENDENCIES))
 obj/$(FILENAME)/windows_resources.o: assets/resources/CSE2.rc
 	@mkdir -p $(@D)
 	@$(WINDRES) $< $@
-
-$(BUILD_DIRECTORY)/$(DOCONFIG_FILENAME): DoConfig/DoConfig.cpp
-	@mkdir -p $(@D)
-	@echo Linking $@
-ifeq ($(STATIC), 1)
-	@$(CXX) -O3 -s -std=c++98 -static $^ -o $@ `fltk-config --cxxflags --libs --ldstaticflags`
-else
-	@$(CXX) -O3 -s -std=c++98 $^ -o $@ `fltk-config --cxxflags --libs --ldflags`
-endif
 
 # TODO
 clean:
