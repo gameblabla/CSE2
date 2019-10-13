@@ -1,5 +1,3 @@
-NATIVECC = cc
-NATIVECXX = c++
 WINDRES = windres
 PKG_CONFIG = pkg-config
 
