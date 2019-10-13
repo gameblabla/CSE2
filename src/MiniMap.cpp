@@ -216,7 +216,7 @@ BOOL IsMapping()
 
 void StartMapping()
 {
-	memset(gMapping, FALSE, 0x80);
+	memset(gMapping, FALSE, sizeof(gMapping));
 }
 
 void SetMapping(int a)
