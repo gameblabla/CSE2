@@ -7,7 +7,7 @@ BUILD_DIRECTORY = game
 ASSETS_DIRECTORY = assets
 
 # Default options
-RENDERER ?= Texture
+RENDERER ?= SDLTexture
 
 ifeq ($(WINDOWS), 1)
 	EXE_EXTENSION = .exe
@@ -216,9 +216,9 @@ ifeq ($(RENDERER), OpenGL3)
 	else
 		LIBS += -lGL
 	endif
-else ifeq ($(RENDERER), Texture)
+else ifeq ($(RENDERER), SDLTexture)
 	SOURCES += src/Backends/Rendering/SDLTexture
-else ifeq ($(RENDERER), Surface)
+else ifeq ($(RENDERER), SDLSurface)
 	SOURCES += src/Backends/Rendering/SDLSurface
 else ifeq ($(RENDERER), Software)
 	SOURCES += src/Backends/Rendering/Software
