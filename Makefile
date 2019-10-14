@@ -8,7 +8,7 @@ ASSETS_DIRECTORY = assets
 
 # Default options
 FIX_BUGS ?= 1
-RENDERER ?= Texture
+RENDERER ?= SDLTexture
 SMOOTH_SPRITE_MOVEMENT ?= 1
 
 ifeq ($(WINDOWS), 1)
@@ -236,7 +236,7 @@ ifeq ($(RENDERER), OpenGL3)
 	else
 		LIBS += -lGL
 	endif
-else ifeq ($(RENDERER), Texture)
+else ifeq ($(RENDERER), SDLTexture)
 	SOURCES += src/Backends/Rendering/SDLTexture
 else ifeq ($(RENDERER), Software)
 	SOURCES += src/Backends/Rendering/Software

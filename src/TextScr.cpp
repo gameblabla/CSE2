@@ -44,7 +44,7 @@
 
 TEXT_SCRIPT gTS;
 
-int gNumberTextScript[4];	// Seems to be for debugging
+int gNumberTextScript[4];
 char text[0x100];
 
 RECT gRect_line = {0, 0, 216, 16};
@@ -646,10 +646,9 @@ int TextScriptProc()
 						w = GetTextScriptNo(gTS.p_read + 4);
 						x = GetTextScriptNo(gTS.p_read + 9);
 
-						// Looks like Pixel left some debug code in. Oops.
 						gNumberTextScript[0] = x;
 					#ifndef FIX_BUGS
-						// z is uninitialised. Probably a leftover from copypasting.
+						// z is uninitialised. Probably a leftover from copypasting this from elsewhere.
 						gNumberTextScript[1] = z;
 					#endif
 
@@ -1222,11 +1221,7 @@ int TextScriptProc()
 					}
 					else if (IS_COMMAND('N','U','M'))
 					{
-						// This seems to be a command used for debugging TSC scripts:
-						// It prints a selected char in the gNumberTextScript array.
-						// gNumberTextScript is only used by the '<AM+' command, and
-						// even then, part of it's assigned to an uninitialised
-						// variable, while the other half of it is completely unused.
+						// This supports up to four different values, but only one is actually used (a second is used erroneously)
 						z = GetTextScriptNo(gTS.p_read + 4);
 						SetNumberTextScript(z);
 						gTS.p_read += 8;
