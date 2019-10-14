@@ -57,7 +57,7 @@ Many months of copypasting and experimenting later, this is the result.
 * Freetype
 * FLTK
 * GLEW (if the OpenGL rendering backend is selected)
-* libxmp-lite (only if TRACKER_AUDIO is enabled)
+* libxmp-lite (only if AUDIO_TRACKER is enabled)
 
 ## Building
 
@@ -83,10 +83,10 @@ Name | Function
 `-DRENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default)
 `-DRENDERER=SDLSurface` | Use the software-rendered SDL2 Surface API renderer
 `-DRENDERER=Software` | Use the handwritten software renderer
-`-DOGG_AUDIO=ON` | Enable support for Ogg Vorbis music/SFX
-`-DFLAC_AUDIO=ON` | Enable support for FLAC music/SFX
-`-DTRACKER_AUDIO=ON` | Enable support for .it, .xm, .mod, .s3m music/SFX
-`-DPXTONE_AUDIO=ON` | Enable support for PxTone music/SFX (not to be confused with PixTone)
+`-DAUDIO_OGG=ON` | Enable support for Ogg Vorbis music/SFX
+`-DAUDIO_FLAC=ON` | Enable support for FLAC music/SFX
+`-DAUDIO_TRACKER=ON` | Enable support for .it, .xm, .mod, .s3m music/SFX
+`-DAUDIO_PXTONE=ON` | Enable support for PxTone music/SFX (not to be confused with PixTone)
 `-DSMOOTH_SPRITE_MOVEMENT=ON` | Enabled by default - Removes the grid that all sprites are locked to, allowing them to move smoothly at higher resolutions
 
 Then compile CSE2 with this command:
@@ -117,10 +117,10 @@ Name | Function
 `RENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default)
 `RENDERER=SDLSurface` | Use the software-rendered SDL2 Surface API renderer
 `RENDERER=Software` | Use the hand-written software renderer
-`OGG_AUDIO=1` | Enable support for Ogg Vorbis music/SFX
-`FLAC_AUDIO=1` | Enable support for FLAC music/SFX
-`TRACKER_AUDIO=1` | Enable support for .it, .xm, .mod, .s3m music/SFX
-`PXTONE_AUDIO=1` | Enable support for PxTone music/SFX (not to be confused with PixTone)
+`AUDIO_OGG=1` | Enable support for Ogg Vorbis music/SFX
+`AUDIO_FLAC=1` | Enable support for FLAC music/SFX
+`AUDIO_TRACKER=1` | Enable support for .it, .xm, .mod, .s3m music/SFX
+`AUDIO_PXTONE=1` | Enable support for PxTone music/SFX (not to be confused with PixTone)
 `SMOOTH_SPRITE_MOVEMENT=1` | Enabled by default - Removes the grid that all sprites are locked to, allowing them to move smoothly at higher resolutions
 
 Once built, the executables and assets can be found in the newly-generated `game` folder.

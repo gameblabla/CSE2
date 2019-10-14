@@ -136,7 +136,7 @@ SOURCES = \
 	src/ValueView \
 	src/Backends/Audio/SDL2
 
-ifneq (,$(filter 1,$(OGG_AUDIO)$(FLAC_AUDIO) $(TRACKER_AUDIO) $(PXTONE_AUDIO)))
+ifneq (,$(filter 1,$(AUDIO_OGG)$(AUDIO_FLAC) $(AUDIO_TRACKER) $(AUDIO_PXTONE)))
 	SOURCES += \
 		src/ExtraSoundFormats \
 		external/clownaudio/decoder \
@@ -150,20 +150,20 @@ ifneq (,$(filter 1,$(OGG_AUDIO)$(FLAC_AUDIO) $(TRACKER_AUDIO) $(PXTONE_AUDIO)))
 	DEFINES += -DEXTRA_SOUND_FORMATS
 endif
 
-ifeq ($(OGG_AUDIO), 1)
+ifeq ($(AUDIO_OGG), 1)
 	SOURCES += \
 		external/clownaudio/decoders/stb_vorbis
 
 	DEFINES += -DUSE_STB_VORBIS
 
-ifeq ($(FLAC_AUDIO), 1)
+ifeq ($(AUDIO_FLAC), 1)
 	SOURCES += \
 		external/clownaudio/decoders/dr_flac
 
 	DEFINES += -DUSE_DR_FLAC
 endif
 
-ifeq ($(TRACKER_AUDIO), 1)
+ifeq ($(AUDIO_TRACKER), 1)
 	SOURCES += \
 		external/clownaudio/decoders/libxmp-lite
 
@@ -179,7 +179,7 @@ ifeq ($(TRACKER_AUDIO), 1)
 	endif
 endif
 
-ifeq ($(PXTONE_AUDIO), 1)
+ifeq ($(AUDIO_PXTONE), 1)
 	SOURCES += \
 		external/clownaudio/decoders/pxtone \
 		external/clownaudio/decoders/libs/pxtone/pxtnDelay \

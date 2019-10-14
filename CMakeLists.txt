@@ -12,10 +12,10 @@ option(FIX_BUGS "Fix various bugs in the game" ON)
 option(DEBUG_SAVE "Re-enable the ability to drag-and-drop save files onto the window" OFF)
 option(FORCE_LOCAL_LIBS "Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones" OFF)
 set(RENDERER "Texture" CACHE STRING "Which renderer the game should use: 'OpenGL3' for an OpenGL 3.2 renderer, 'SDLTexture' for SDL2's hardware-accelerated Texture API, or 'Software' for a handwritten software renderer")
-option(OGG_AUDIO "Enable support for Ogg Vorbis music/SFX" OFF)
-option(FLAC_AUDIO "Enable support for FLAC music/SFX" OFF)
-option(TRACKER_AUDIO "Enable support for .it, .xm, .mod, .s3m music/SFX" OFF)
-option(PXTONE_AUDIO "Enable support for PxTone music/SFX (not to be confused with PixTone)" OFF)
+option(AUDIO_OGG "Enable support for Ogg Vorbis music/SFX" OFF)
+option(AUDIO_FLAC "Enable support for FLAC music/SFX" OFF)
+option(AUDIO_TRACKER "Enable support for .it, .xm, .mod, .s3m music/SFX" OFF)
+option(AUDIO_PXTONE "Enable support for PxTone music/SFX (not to be confused with PixTone)" OFF)
 option(SMOOTH_SPRITE_MOVEMENT "Removes the grid that all sprites are locked to, allowing them to move smoothly at higher resolutions" ON)
 
 
@@ -209,7 +209,7 @@ else()
 	message(FATAL_ERROR "Invalid RENDERER selected")
 endif()
 
-if(OGG_AUDIO OR FLAC_AUDIO OR TRACKER_AUDIO OR PXTONE_AUDIO)
+if(AUDIO_OGG OR AUDIO_FLAC OR AUDIO_TRACKER OR AUDIO_PXTONE)
 	target_sources(CSE2 PRIVATE
 		src/ExtraSoundFormats.cpp
 		src/ExtraSoundFormats.h
@@ -233,7 +233,7 @@ if(OGG_AUDIO OR FLAC_AUDIO OR TRACKER_AUDIO OR PXTONE_AUDIO)
 	target_compile_definitions(CSE2 PRIVATE EXTRA_SOUND_FORMATS)
 endif()
 
-if(OGG_AUDIO)
+if(AUDIO_OGG)
 	target_sources(CSE2 PRIVATE
 		external/clownaudio/decoders/stb_vorbis.c
 		external/clownaudio/decoders/stb_vorbis.h
@@ -243,7 +243,7 @@ if(OGG_AUDIO)
 	target_compile_definitions(CSE2 PRIVATE USE_STB_VORBIS)
 endif()
 
-if(FLAC_AUDIO)
+if(AUDIO_FLAC)
 	target_sources(CSE2 PRIVATE
 		external/clownaudio/decoders/dr_flac.c
 		external/clownaudio/decoders/dr_flac.h
@@ -253,7 +253,7 @@ if(FLAC_AUDIO)
 	target_compile_definitions(CSE2 PRIVATE USE_DR_FLAC)
 endif()
 
-if(TRACKER_AUDIO)
+if(AUDIO_TRACKER)
 	target_sources(CSE2 PRIVATE
 		external/clownaudio/decoders/libxmp-lite.c
 		external/clownaudio/decoders/libxmp-lite.h
@@ -262,7 +262,7 @@ if(TRACKER_AUDIO)
 	target_compile_definitions(CSE2 PRIVATE USE_LIBXMPLITE)
 endif()
 
-if(PXTONE_AUDIO)
+if(AUDIO_PXTONE)
 	target_sources(CSE2 PRIVATE
 		external/clownaudio/decoders/pxtone.c
 		external/clownaudio/decoders/pxtone.h
@@ -480,7 +480,7 @@ if(RENDERER MATCHES "OpenGL3")
 	target_link_libraries(CSE2 OpenGL::GL)
 endif()
 
-if(TRACKER_AUDIO)
+if(AUDIO_TRACKER)
 	if(NOT FORCE_LOCAL_LIBS)
 		find_package(LibXMPLite)
 	endif()
