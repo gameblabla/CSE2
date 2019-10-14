@@ -22,17 +22,17 @@ This branch migrates the engine from WinAPI to SDL2, and addresses numerous port
 
 In 2007, a Linux port of Cave Story was made by Peter Mackay and Simon Parzer. Details about it can be found in [Peter's old blog](https://web.archive.org/web/20070911202919/http://aaiiee.wordpress.com:80/). This port received an update in 2011, including two shiny new executables. What Peter and Simon didn't realise was that they left huge amounts of debugging information in these executables, including the names of every C++ source file, and the variables and functions they contained.
 
-This was a goldmine of information about not just the game's inner-workings, but its _source code._ With this, a decompilation seemed like a real option. But this wasn't _all_ the help we'd get...
+This was a goldmine of information about not just the game's inner-workings, but its _source code._ This alone made a decompilation viable, but it wasn't the only help we'd get...
 
-When Pixel made Cave Story, he compiled the original Windows EXE with no optimisations. This left the generated assembly code extremely verbose and easy to read. It also made the code very decompiler-friendly. Additionally, the EXE's [Rich Header](http://bytepointer.com/articles/the_microsoft_rich_header.htm) told us exactly what compiler was used: Visual C++ .NET 2003.
+When Pixel made Cave Story, he compiled the original Windows EXE with no optimisations. This left the generated assembly code extremely verbose and easy to read. It also made the code very decompiler-friendly, since the assembly could be mapped directly back to the original C(++) code.
 
-A combination of easy-to-decompile code and a near-complete symbol list made much of the decompilation process a copy/paste job, but not all code would need to be decompiled...
+A combination of easy-to-decompile code and a near-complete symbol list made much of the decompilation process a copy/paste job, but not all of the game would need decompiling, as some of Cave Story's source code would actually see the light of day...
 
-Some of Cave Story's source code would actually see the light of day: in early 2018, the Organya music engine was [released on GitHub](https://github.com/shbow/organya) by an old friend of Pixel's. On top of providing an insight into Pixel's coding style, this helped with figuring out one of the most complex parts of Cave Story's codebase.
+In early 2018, the Organya music engine was [released on GitHub](https://github.com/shbow/organya) by an old friend of Pixel's. On top of providing an insight into Pixel's coding style, this helped with figuring out one of the most complex parts of Cave Story's codebase.
 
-It's because of these findings that a decompilation was possible: [the Mario 64 decompilation project](https://github.com/n64decomp/sm64) had a game that was built with no optimisations, [the Devilution project](https://github.com/diasurgical/devilution) was lucky enough to find a symbol list, so it's a miracle that we had _both._
+It's because of these findings that a decompilation is possible: [the Mario 64 decompilation project](https://github.com/n64decomp/sm64) had a game that was built with no optimisations, [the Devilution project](https://github.com/diasurgical/devilution) was lucky enough to find a symbol list, so it's a miracle that we have both!
 
-Many months of copypasting and experimenting later, this is the result.
+Many months of copypasting and tinkering later, here is the result.
 
 ## Dependencies
 
