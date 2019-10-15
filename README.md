@@ -80,7 +80,6 @@ Name | Function
 `-DFORCE_LOCAL_LIBS=ON` | Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones
 `-DRENDERER=OpenGL3` | Use the hardware-accelerated OpenGL 3.2 renderer
 `-DRENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default)
-`-DRENDERER=SDLSurface` | Use the software-rendered SDL2 Surface API renderer
 `-DRENDERER=Software` | Use the handwritten software renderer
 `-DAUDIO_OGG=ON` | Enable support for Ogg Vorbis music/SFX
 `-DAUDIO_FLAC=ON` | Enable support for FLAC music/SFX
@@ -114,7 +113,6 @@ Name | Function
 `DEBUG_SAVE=1` | Re-enable the ability to drag-and-drop save files onto the window
 `RENDERER=OpenGL3` | Use the hardware-accelerated OpenGL 3.2 renderer
 `RENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default)
-`RENDERER=SDLSurface` | Use the software-rendered SDL2 Surface API renderer
 `RENDERER=Software` | Use the hand-written software renderer
 `AUDIO_OGG=1` | Enable support for Ogg Vorbis music/SFX
 `AUDIO_FLAC=1` | Enable support for FLAC music/SFX
