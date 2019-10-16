@@ -1949,6 +1949,8 @@ void ActNpc158(NPCHAR *npc)
 // Monster X (defeated)
 void ActNpc159(NPCHAR *npc)
 {
+	int i;
+
 	RECT rect = {144, 128, 192, 200};
 
 	switch (npc->act_no)
@@ -1956,7 +1958,7 @@ void ActNpc159(NPCHAR *npc)
 		case 0:
 			npc->act_no = 1;
 
-			for (int i = 0; i < 8; ++i)
+			for (i = 0; i < 8; ++i)
 				SetNpChar(4, npc->x + (Random(-16, 16) * 0x200), npc->y + (Random(-16, 16) * 0x200), Random(-341, 341), Random(-341, 341), 0, 0, 0x100);
 			// Fallthrough
 		case 1:
