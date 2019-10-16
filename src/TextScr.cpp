@@ -42,7 +42,7 @@
 TEXT_SCRIPT gTS;
 
 int gNumberTextScript[4];
-char text[0x100];
+char text[4][0x40];
 
 RECT gRect_line = {0, 0, 216, 16};
 
@@ -229,7 +229,7 @@ BOOL StartTextScript(int no)
 	{
 		gTS.ypos_line[i] = 16 * i;
 		CortBox2(&gRect_line, 0x000000, (SurfaceID)(i + SURFACE_ID_TEXT_LINE1));
-		memset(&text[i * 0x40], 0, 0x40);
+		memset(text[i], 0, sizeof(text[0]));
 	}*/
 
 	//Find where event starts
@@ -278,7 +278,7 @@ BOOL JumpTextScript(int no)
 	{
 		gTS.ypos_line[i] = 16 * i;
 		CortBox2(&gRect_line, 0x000000, (SurfaceID)(i + SURFACE_ID_TEXT_LINE1));
-		memset(&text[i * 0x40], 0, 0x40);
+		memset(text[i], 0, sizeof(text[0]));
 	}
 
 	//Find where event starts
@@ -330,7 +330,7 @@ void CheckNewLine()
 		gTS.mode = 3;
 		g_GameFlags |= 4;
 		CortBox2(&gRect_line, 0, (SurfaceID)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
-		memset(&text[gTS.line % 4 * 0x40], 0, 0x40);
+		memset(text[gTS.line % 4], 0, sizeof(text[0]));
 	}
 }
 
@@ -375,7 +375,7 @@ void SetNumberTextScript(int index)
 
 	//Append number to line
 	PutText2(6 * gTS.p_write, 0, str, RGB(0xFF, 0xFF, 0xFE), (SurfaceID)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
-	strcat(&text[gTS.line % 4 * 0x40], str);
+	strcat(text[gTS.line % 4], str);
 
 	//Play sound and reset blinking cursor
 	PlaySoundObject(2, 1);
@@ -403,7 +403,7 @@ void ClearTextLine()
 	{
 		gTS.ypos_line[i] = 16 * i;
 		CortBox2(&gRect_line, 0x000000, (SurfaceID)(i + SURFACE_ID_TEXT_LINE1));
-		memset(&text[i * 0x40], 0, 0x40);
+		memset(text[i], 0, sizeof(text[0]));
 	}
 }
 
@@ -1295,9 +1295,9 @@ int TextScriptProc()
 						//Print text
 						PutText2(0, 0, str, RGB(0xFF, 0xFF, 0xFE), (SurfaceID)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
 					#ifdef FIX_BUGS
-						strcpy(&text[gTS.line % 4 * 0x40], str);
+						strcpy(text[gTS.line % 4], str);
 					#else
-						sprintf(&text[gTS.line % 4 * 0x40], str);	// No point to using an sprintf here, and it makes Clang mad
+						sprintf(text[gTS.line % 4], str);	// No point to using an sprintf here, and it makes Clang mad
 					#endif
 
 						//Check if should move to next line (prevent a memory overflow, come on guys, this isn't a leftover of pixel trying to make text wrapping)
@@ -1333,7 +1333,7 @@ int TextScriptProc()
 							PutText2(6 * gTS.p_write, 0, c, RGB(0xFF, 0xFF, 0xFE), (SurfaceID)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
 						}
 
-						strcat(&text[gTS.line % 4 * 0x40], c);
+						strcat(text[gTS.line % 4], c);
 						PlaySoundObject(2, 1);
 						gTS.wait_beam = 0;
 
@@ -1459,6 +1459,6 @@ void RestoreTextScript()
 	for (int i = 0; i < 4; ++i)
 	{
 		CortBox2(&gRect_line, 0x000000, (SurfaceID)(i + SURFACE_ID_TEXT_LINE1));
-		PutText2(0, 0, &text[i * 0x40], RGB(0xFF, 0xFF, 0xFE), (SurfaceID)(i + SURFACE_ID_TEXT_LINE1));
+		PutText2(0, 0, text[i], RGB(0xFF, 0xFF, 0xFE), (SurfaceID)(i + SURFACE_ID_TEXT_LINE1));
 	}
 }
