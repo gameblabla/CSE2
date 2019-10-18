@@ -823,7 +823,7 @@ int TextScriptProc()
 					{
 						ClearTextLine();
 						gTS.flags |= 1;
-						gTS.flags &= 0xCD;
+						gTS.flags &= ~0x32;
 						if (gTS.flags & 0x40)
 							gTS.flags |= 0x10;
 						gTS.face = 0;
