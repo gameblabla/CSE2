@@ -11,6 +11,7 @@
 #include "MyChar.h"
 #include "NpChar.h"
 #include "Sound.h"
+#include "TextScr.h"
 #include "Triangle.h"
 
 // Toroko (frenzied)
@@ -1254,6 +1255,11 @@ void ActNpc150(NPCHAR *npc)
 		npc->rect = rcLeft[npc->ani_no];
 	else
 		npc->rect = rcRight[npc->ani_no];
+
+#ifdef ENABLE_MIM
+	npc->rect.top += 32 * gMIMCurrentNum;
+	npc->rect.bottom += 32 * gMIMCurrentNum;
+#endif
 
 	if (npc->act_no == 21)
 	{

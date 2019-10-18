@@ -9,6 +9,7 @@
 #include "MyChar.h"
 #include "NpChar.h"
 #include "Sound.h"
+#include "TextScr.h"
 
 // Grate
 void ActNpc100(NPCHAR *npc)
@@ -837,11 +838,16 @@ void ActNpc111(NPCHAR *npc)
 	else
 		npc->rect = rcRight[npc->ani_no];
 
+#ifdef ENABLE_MIM
+	npc->rect.top += 32 * gMIMCurrentNum;
+	npc->rect.bottom += 32 * gMIMCurrentNum;
+#else
 	if (gMC.equip & 0x40)
 	{
 		npc->rect.top += 32;
 		npc->rect.bottom += 32;
 	}
+#endif
 
 	if (npc->act_no == 4)
 	{
@@ -913,11 +919,16 @@ void ActNpc112(NPCHAR *npc)
 	else
 		npc->rect = rcRight[npc->ani_no];
 
+#ifndef ENABLE_MIM
+	npc->rect.top += 32 * gMIMCurrentNum;
+	npc->rect.bottom += 32 * gMIMCurrentNum;
+#else
 	if (gMC.equip & 0x40)
 	{
 		npc->rect.top += 32;
 		npc->rect.bottom += 32;
 	}
+#endif
 
 	if (npc->act_no == 1)
 	{

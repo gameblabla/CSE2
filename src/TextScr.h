@@ -64,3 +64,8 @@ void StopTextScript();
 void PutTextScript();
 int TextScriptProc();
 void RestoreTextScript();
+
+#ifndef ENABLE_MIM
+/// Contains the latest value given through <MIM
+extern unsigned int gMIMCurrentNum;
+#endif

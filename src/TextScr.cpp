@@ -53,6 +53,10 @@ RECT gRect_line = {0, 0, 216, 16};
 static unsigned long nod_color;
 #endif
 
+#ifdef ENABLE_MIM
+unsigned int gMIMCurrentNum = 0;
+#endif
+
 //Initialize and end tsc
 BOOL InitTextScript2()
 {
@@ -599,6 +603,13 @@ int TextScriptProc()
 						gTS.face = 0;
 						bExit = TRUE;
 					}
+#ifdef ENABLE_MIM
+					else if (IS_COMMAND('M','I','M'))
+					{
+						gMIMCurrentNum = GetTextScriptNo(gTS.p_read + 4);
+						gTS.p_read += 8;
+					}
+#endif
 					else if (IS_COMMAND('L','I','+'))
 					{
 						x = GetTextScriptNo(gTS.p_read + 4);
