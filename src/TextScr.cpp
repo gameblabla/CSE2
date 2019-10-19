@@ -55,6 +55,10 @@ static unsigned long nod_color;
 
 unsigned int gMIMCurrentNum = 0;
 
+#ifdef ENABLE_PHY
+int gPHYArray[17];
+#endif
+
 // Initialize and end tsc
 BOOL InitTextScript2(void)
 {
@@ -687,6 +691,17 @@ int TextScriptProc(void)
 						ZeroArmsEnergy_All();
 						gTS.p_read += 4;
 					}
+#ifdef ENABLE_PHY
+					else if (IS_COMMAND('P','H','Y'))
+					{
+						y = GetTextScriptNo(gTS.p_read + 4);
+						if (y < 17)
+						{
+							gPHYArray[y] = GetTextScriptNo(gTS.p_read + 9);
+						}
+						gTS.p_read += 13;
+					}
+#endif
 					else if (IS_COMMAND('T','A','M'))
 					{
 						x = GetTextScriptNo(gTS.p_read + 4);

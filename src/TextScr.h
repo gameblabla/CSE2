@@ -67,3 +67,11 @@ void StopTextScript(void);
 void PutTextScript(void);
 int TextScriptProc(void);
 void RestoreTextScript(void);
+
+
+#ifdef ENABLE_PHY
+/// Array used by <PHY to contain the values of the different variables it may contain. The first 8 values contain the values for normal physics and the last 8 for when the character is underwater.
+/// The values are, in order : max_dash, max_move, gravity1, gravity2, dash1, dash2, resist, jump
+/// The seventeenth value enables some stuff (determines whether the player is underwater i think)
+extern int gPHYArray[17];
+#endif

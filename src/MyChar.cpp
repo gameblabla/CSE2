@@ -263,6 +263,7 @@ void ActMyChar_Normal(BOOL bKey)
 	if (gMC.cond & 2)
 		return;
 
+#ifndef ENABLE_PHY
 	if (gMC.flag & 0x100)
 	{
 		max_dash = 0x196;
@@ -285,6 +286,17 @@ void ActMyChar_Normal(BOOL bKey)
 		dash2 = 0x20;
 		resist = 0x33;
 	}
+#else
+	int *phyArray = gMC.flag & 0x100 ? &gPHYArray[8] : &gPHYArray[0];
+	max_dash = phyArray[0];
+	max_move = phyArray[1];
+	gravity1 = phyArray[2];
+	gravity2 = phyArray[3];
+	dash1 = phyArray[4];
+	dash2 = phyArray[5];
+	resist = phyArray[6];
+	jump = phyArray[7];
+#endif
 
 	// Don't create "?" effect
 	gMC.ques = FALSE;
@@ -582,6 +594,7 @@ void ActMyChar_Normal(BOOL bKey)
 	}
 
 	// Limit speed
+#ifndef ENABLE_PHY
 	if (gMC.flag & 0x100 && !(gMC.flag & 0xF000))
 	{
 		if (gMC.xm < -0x2FF)
@@ -604,8 +617,23 @@ void ActMyChar_Normal(BOOL bKey)
 		if (gMC.ym > 0x5FF)
 			gMC.ym = 0x5FF;
 	}
+#else
+	int speedLimit = (!(gMC.flag & 0x100) || gMC.flag & 0xF000) ? gPHYArray[1] : gPHYArray[9];
+	if (gMC.xm < -speedLimit)
+		gMC.xm = -speedLimit;
+	if (gMC.ym < -speedLimit)
+		gMC.ym = -speedLimit;
+
+	if (gMC.xm > speedLimit)
+		gMC.xm = speedLimit;
+	if (gMC.ym > speedLimit)
+		gMC.ym = speedLimit;
+#endif
 
 	// Water splashing
+#ifdef ENABLE_PHY
+	if (!gPHYArray[16])
+#endif
 	if (!gMC.sprash && gMC.flag & 0x100)
 	{
 		int dir;
@@ -824,7 +852,11 @@ void AirProcess(void)
 	}
 	else
 	{
-		if (!(gMC.flag & 0x100))
+		if (!(gMC.flag & 0x100)
+#ifdef ENABLE_PHY
+			|| gPHYArray[17]
+#endif
+			)
 		{
 			gMC.air = 1000;
 		}
