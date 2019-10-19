@@ -818,7 +818,6 @@ int TextScriptProc()
 						gTS.p_read += 4;
 						bExit = TRUE;
 					}
-#ifdef ENABLE_MS4
 					else if (IS_COMMAND('M','S','4'))
 					{
 						ClearTextLine();
@@ -830,7 +829,6 @@ int TextScriptProc()
 						gTS.p_read += 4;
 						bExit = TRUE;
 					}
-#endif
 					else if (IS_COMMAND('W','A','I'))
 					{
 						gTS.mode = 4;
