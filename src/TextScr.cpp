@@ -821,7 +821,7 @@ int TextScriptProc()
 					else if (IS_COMMAND('M','S','4'))
 					{
 						ClearTextLine();
-						gTS.flags |= 1;
+						gTS.flags |= 0x01;
 						gTS.flags &= ~0x32;
 						if (gTS.flags & 0x40)
 							gTS.flags |= 0x10;
