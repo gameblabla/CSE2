@@ -833,7 +833,7 @@ void InitTextObject(const char *name)
 	// This breaks the Japanese text on English Windows installations.
 
 	// Also, the game uses DEFAULT_QUALITY instead of NONANTIALIASED_QUALITY,
-	// causing font antialiasing to blend with the colour-key, giving text ab
+	// causing font antialiasing to blend with the colour-key, giving text an
 	// ugly black outline.
 #ifdef FIX_BUGS
 	#define QUALITY NONANTIALIASED_QUALITY
