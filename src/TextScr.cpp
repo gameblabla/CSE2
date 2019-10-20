@@ -818,6 +818,17 @@ int TextScriptProc()
 						gTS.p_read += 4;
 						bExit = TRUE;
 					}
+					else if (IS_COMMAND('M','S','4'))
+					{
+						ClearTextLine();
+						gTS.flags |= 1;
+						gTS.flags &= ~0x32;
+						if (gTS.flags & 0x40)
+							gTS.flags |= 0x10;
+						gTS.face = 0;
+						gTS.p_read += 4;
+						bExit = TRUE;
+					}
 					else if (IS_COMMAND('W','A','I'))
 					{
 						gTS.mode = 4;
