@@ -169,7 +169,7 @@ BOOL GetJoystickStatus(JOYSTICK_STATUS *status)
 	if (res)
 	{
 		if (res == DIERR_INPUTLOST)
-			SetDeviceAquire(0);
+			SetDeviceAquire(FALSE);
 		else
 			return FALSE;
 	}
@@ -214,7 +214,7 @@ BOOL ResetJoystickStatus(void)
 	if (res)
 	{
 		if (res == DIERR_INPUTLOST)
-			SetDeviceAquire(0);
+			SetDeviceAquire(FALSE);
 		else
 			return FALSE;
 	}
