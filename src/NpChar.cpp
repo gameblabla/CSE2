@@ -142,7 +142,7 @@ void SetNpChar(int code_char, int x, int y, int xm, int ym, int dir, NPCHAR *npc
 
 	// Set NPC parameters
 	memset(&gNPC[n], 0, sizeof(NPCHAR));
-	gNPC[n].cond |= 0x80u;
+	gNPC[n].cond |= 0x80;
 	gNPC[n].direct = dir;
 	gNPC[n].code_char = code_char;
 	gNPC[n].x = x;

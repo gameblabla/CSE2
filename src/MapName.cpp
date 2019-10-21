@@ -16,12 +16,12 @@ void ReadyMapName(const char *str)
 	// Handle "Studio Pixel presents" text in the intro, using an obfuscated string
 	unsigned char presentText[24] = {
 #ifdef JAPANESE
-		// "ŠJ”­ŽºPixel presents"
-		0x8A - 1,	// ŠJ
+		// "é–‹ç™ºå®¤Pixel presents"
+		0x8A - 1,	// é–‹
 		0x4A - 1,
-		0x94 - 1,	// ”­
+		0x94 - 1,	// ç™º
 		0xAD - 1,
-		0x8E - 1,	// Žº
+		0x8E - 1,	// å®¤
 		0xBA - 1,
 		'P' - 1,
 		'i' - 1,

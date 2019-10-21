@@ -970,6 +970,8 @@ void ActNpc189(NPCHAR *npc)
 // Broken robot
 void ActNpc190(NPCHAR *npc)
 {
+	int i;
+
 	RECT rect[2] = {
 		{192, 32, 208, 48},
 		{208, 32, 224, 48},
@@ -983,7 +985,7 @@ void ActNpc190(NPCHAR *npc)
 
 		case 10:
 			PlaySoundObject(72, 1);
-			for (int i = 0; i < 8; i++)
+			for (i = 0; i < 8; i++)
 				SetNpChar(4, npc->x, npc->y + (Random(-8, 8) << 9), Random(-8, -2) << 9, Random(-3, 3) << 9, 0, 0, 0x100);
 			npc->cond = 0;
 			break;
