@@ -137,8 +137,8 @@ BOOL StartDirectDraw(SDL_Window *window, int lMagnification)
 
 	// Check if vsync is possible
 	SDL_DisplayMode display_mode;
-	SDL_GetWindowDisplayMode(window, &display_mode);
-	vsync = display_mode.refresh_rate == 60;
+	if (!SDL_GetWindowDisplayMode(window, &display_mode))
+		vsync = display_mode.refresh_rate == 60;
 
 	framebuffer = Backend_Init(window, WINDOW_WIDTH * magnification, WINDOW_HEIGHT * magnification, vsync);
 
