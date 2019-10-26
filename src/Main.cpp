@@ -304,8 +304,8 @@ int main(int argc, char *argv[])
 		Game();
 
 		// End stuff
-		EndDirectSound();
 		EndTextObject();
+		EndDirectSound();
 		EndDirectDraw();
 
         SDL_FreeCursor(cursor);
