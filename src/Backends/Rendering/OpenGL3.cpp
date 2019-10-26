@@ -289,7 +289,7 @@ Backend_Surface* Backend_Init(SDL_Window *p_window)
 	context = SDL_GL_CreateContext(window);
 
 	if (glewInit() != GLEW_OK)
-		return NULL
+		return NULL;
 
 	// Check if the platform supports OpenGL 3.2
 	if (!GLEW_VERSION_3_2)
