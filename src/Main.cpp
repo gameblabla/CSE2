@@ -366,8 +366,8 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 		Game(hWnd);
 
 		// End stuff
-		EndDirectSound();
 		EndTextObject();
+		EndDirectSound();
 		EndDirectDraw(hWnd);
 
 		ReleaseMutex(hMutex);
