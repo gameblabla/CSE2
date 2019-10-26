@@ -220,7 +220,7 @@ Backend_Surface* Backend_Init(SDL_Window *p_window, unsigned int internal_screen
 
 	context = SDL_GL_CreateContext(window);
 
-	SDL_GL_SetSwapInterval(vsync);
+	SDL_GL_SetSwapInterval(vsync);	// TODO - Handle this failing
 
 	if (glewInit() != GLEW_OK)
 		return NULL
