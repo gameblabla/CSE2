@@ -44,7 +44,7 @@ Backend_Surface* Backend_Init(SDL_Window *window, unsigned int internal_screen_w
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE | (vsync ? SDL_RENDERER_PRESENTVSYNC : 0));
 
 	if (renderer == NULL)
-		return FALSE;
+		return NULL;
 
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
 	texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STREAMING, internal_screen_width, internal_screen_height);
@@ -53,7 +53,7 @@ Backend_Surface* Backend_Init(SDL_Window *window, unsigned int internal_screen_w
 	if (texture == NULL)
 	{
 		SDL_DestroyRenderer(renderer);
-		return FALSE;
+		return NULL;
 	}
 
 	SDL_LockTexture(texture, NULL, (void**)&framebuffer.pixels, (int*)&framebuffer.pitch);
