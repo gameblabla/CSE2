@@ -223,7 +223,7 @@ Backend_Surface* Backend_Init(SDL_Window *p_window, unsigned int internal_screen
 	SDL_GL_SetSwapInterval(vsync);	// TODO - Handle this failing
 
 	if (glewInit() != GLEW_OK)
-		return NULL
+		return NULL;
 
 	// Check if the platform supports OpenGL 3.2
 	if (!GLEW_VERSION_3_2)
