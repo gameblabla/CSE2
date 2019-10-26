@@ -155,6 +155,7 @@ ifeq ($(AUDIO_OGG), 1)
 		external/clownaudio/decoders/stb_vorbis
 
 	DEFINES += -DUSE_STB_VORBIS
+endif
 
 ifeq ($(AUDIO_FLAC), 1)
 	SOURCES += \
