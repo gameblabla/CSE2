@@ -223,11 +223,11 @@ Backend_Surface* Backend_Init(SDL_Window *p_window, unsigned int internal_screen
 	SDL_GL_SetSwapInterval(vsync);
 
 	if (glewInit() != GLEW_OK)
-		return FALSE;
+		return NULL
 
 	// Check if the platform supports OpenGL 3.2
 	if (!GLEW_VERSION_3_2)
-		return FALSE;
+		return NULL;
 
 	glEnable(GL_DEBUG_OUTPUT);
 	glDebugMessageCallback(MessageCallback, 0);
@@ -284,7 +284,6 @@ Backend_Surface* Backend_Init(SDL_Window *p_window, unsigned int internal_screen
 
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebuffer.texture_id, 0);
 	glViewport(0, 0, framebuffer.width, framebuffer.height);
-
 
 	return &framebuffer;
 }
