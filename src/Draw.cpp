@@ -136,9 +136,13 @@ BOOL StartDirectDraw(SDL_Window *window, int lMagnification)
 	magnification = ((magnification + (SPRITE_SCALE - 1)) / SPRITE_SCALE) * SPRITE_SCALE;
 
 	// Check if vsync is possible
-	SDL_DisplayMode display_mode;
-	if (!SDL_GetWindowDisplayMode(window, &display_mode))
-		vsync = display_mode.refresh_rate == 60;
+	int display_index = SDL_GetWindowDisplayIndex(window);
+	if (display_index >= 0)
+	{
+		SDL_DisplayMode display_mode;
+		if (!SDL_GetCurrentDisplayMode(display_index, &display_mode))
+			vsync = display_mode.refresh_rate == 60;
+	}
 
 	framebuffer = Backend_Init(window, WINDOW_WIDTH * magnification, WINDOW_HEIGHT * magnification, vsync);
 
