@@ -119,6 +119,9 @@ BOOL StartDirectDraw(SDL_Window *window, int lMagnification)
 
 	framebuffer = Backend_Init(window);
 
+	if (framebuffer == NULL)
+		return FALSE;
+
 	rgb24_pixel_format = SDL_AllocFormat(SDL_PIXELFORMAT_RGB24);
 
 	return TRUE;
