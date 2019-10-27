@@ -9,11 +9,38 @@ set(ASSETS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/assets")
 
 option(JAPANESE "Enable the Japanese-language build" OFF)
 option(FIX_BUGS "Fix various bugs in the game" OFF)
+option(WARNINGS "Enable common warnings" OFF)
+option(ALL_WARNINGS "Enable ALL warnings (clang/MSVC-only)" OFF)
+option(FATAL_WARNINGS "Stop compilation on any warnings" OFF)
 option(DEBUG_SAVE "Re-enable the ability to drag-and-drop save files onto the window" OFF)
 option(FORCE_LOCAL_LIBS "Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones" OFF)
 set(RENDERER "SDLTexture" CACHE STRING "Which renderer the game should use: 'OpenGL3' for an OpenGL 3.2 renderer, 'SDLTexture' for SDL2's hardware-accelerated Texture API, 'SDLSurface' for SDL2's software-rendered Surface API, or 'Software' for a handwritten software renderer")
 
 project(CSE2 LANGUAGES C CXX)
+
+# Has to be placed after "project()"
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+	# Using Clang (this is a match so that we also get "AppleClang" which is the Apple-provided Clang
+	set(COMPILER_IS_CLANG true)
+	message(STATUS "Compiling with clang")
+endif()
+
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+	# Using GCC
+	set(COMPILER_IS_GCC true)
+	message(STATUS "Compiling with gcc")
+endif()
+
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+	# Using Intel C++
+	set(COMPILER_IS_ICC true)
+	message(STATUS "Compiling with ICC")
+endif()
+
+if (COMPILER_IS_CLANG OR COMPILER_IS_GCC OR COMPILER_IS_ICC)
+	set(COMPILER_IS_GCC_COMPATIBLE true)
+	message(STATUS "Compiling with a GCC-compatible compiler")
+endif()
 
 if(MSVC)
 	# Statically-link the CRT (vcpkg static libs do this)
@@ -247,6 +274,62 @@ if(DEBUG_SAVE)
 	target_compile_definitions(CSE2 PRIVATE DEBUG_SAVE)
 endif()
 
+if (WARNINGS)
+	# HACK : Replace this with CMake provided stuff when possible (when CMake makes avoiding this possible (it isn't currently))
+
+	if (MSVC)
+		# Force to always compile with /W4 on MSVC
+
+		# Can't do this with target_compile_options
+		# if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
+		# 	string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+		# else()
+		# 	target_compile_options(CSE2 PRIVATE /W4)
+		# endif()
+
+		target_compile_options(CSE2 PRIVATE /W4)
+	elseif(COMPILER_IS_GCC_COMPATIBLE)
+		target_compile_options(CSE2 PRIVATE -Wall -Wextra -pedantic)
+	else()
+		message(WARNING "Could not activate warnings ! (Unsupported compiler)")
+	endif()
+endif()
+
+if (ALL_WARNINGS)
+	# HACK : Replace this with CMake provided stuff when possible (when CMake makes avoiding this possible (it isn't currently))
+
+	if (MSVC)
+		# Force to always compile with /Wall on MSVC
+
+		# Can't do this with target_compile_options
+		# if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
+		# 	string(REGEX REPLACE "/W[0-4]" "/Wall" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+		# else()
+		# 	target_compile_options(CSE2 PRIVATE /Wall)
+		# endif()
+
+		target_compile_options(CSE2 PRIVATE /Wall)
+	elseif(COMPILER_IS_CLANG)
+		target_compile_options(CSE2 PRIVATE -Weverything)
+	else()
+		message(WARNING "Could not activate all warnings ! (Unsupported compiler)")
+	endif()
+endif()
+
+if (FATAL_WARNINGS)
+	# HACK : Replace this with CMake provided stuff when possible (when CMake makes avoiding this possible (it isn't currently))
+
+	if (MSVC)
+		target_compile_options(CSE2 PRIVATE /WX)
+		target_compile_options(bin2h PRIVATE /WX)
+	elseif(COMPILER_IS_GCC_COMPATIBLE)
+		target_compile_options(CSE2 PRIVATE -Werror)
+		target_compile_options(bin2h PRIVATE -Werror)
+	else()
+		message(WARNING "Could not activate fatal warnings ! (Unsupported compiler)")
+	endif()
+endif()
+
 if(RENDERER MATCHES "OpenGL3")
 	target_sources(CSE2 PRIVATE "src/Backends/Rendering/OpenGL3.cpp")
 elseif(RENDERER MATCHES "SDLTexture")
@@ -281,6 +364,9 @@ ExternalProject_Add(bin2h
 	CMAKE_ARGS
 		-DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
 		-DCMAKE_BUILD_TYPE=Release
+		-DWARNINGS=${WARNINGS}
+		-DALL_WARNINGS=${ALL_WARNINGS}
+		-DFATAL_WARNINGS=${FATAL_WARNINGS}
 	INSTALL_COMMAND
 		${CMAKE_COMMAND} --build . --config Release --target install
 )

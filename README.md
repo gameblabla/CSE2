@@ -63,6 +63,9 @@ Name | Function
 `-DFIX_BUGS=ON` | Fix various bugs in the game
 `-DDEBUG_SAVE=ON` | Re-enable the ability to drag-and-drop save files onto the window
 `-DFORCE_LOCAL_LIBS=ON` | Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones
+`-DWARNINGS=ON` | Enable common warnings
+`-DALL_WARNINGS=ON` | Enable ALL warnings (clang/MSVC-only)
+`-DFATAL_WARNINGS=ON` | Make all warnings errors
 `-DRENDERER=OpenGL3` | Use the hardware-accelerated OpenGL 3.2 renderer
 `-DRENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default)
 `-DRENDERER=SDLSurface` | Use the software-rendered SDL2 Surface API renderer
@@ -92,6 +95,9 @@ Name | Function
 `FIX_BUGS=1` | Fix various bugs in the game
 `WINDOWS=1` | Build for Windows
 `DEBUG_SAVE=1` | Re-enable the ability to drag-and-drop save files onto the window
+`WARNINGS=1` | Enable common warnings
+`ALL_WARNINGS=1` | Enable ALL warnings (clang/MSVC only)
+`FATAL_WARNINGS=1` | Make all warnings errors
 `RENDERER=OpenGL3` | Use the hardware-accelerated OpenGL 3.2 renderer
 `RENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default)
 `RENDERER=SDLSurface` | Use the software-rendered SDL2 Surface API renderer
