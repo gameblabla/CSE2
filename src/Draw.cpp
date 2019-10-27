@@ -146,6 +146,9 @@ BOOL StartDirectDraw(SDL_Window *window, int lMagnification)
 
 	framebuffer = Backend_Init(window, WINDOW_WIDTH * magnification, WINDOW_HEIGHT * magnification, vsync);
 
+	if (framebuffer == NULL)
+		return FALSE;
+
 	rgba32_pixel_format = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA32);
 
 	return TRUE;
