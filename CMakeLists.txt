@@ -18,6 +18,8 @@ set(RENDERER "SDLTexture" CACHE STRING "Which renderer the game should use: 'Ope
 
 project(CSE2 LANGUAGES C CXX)
 
+message(STATUS "Compiler ID : ${CMAKE_CXX_COMPILER_ID}")
+
 # Has to be placed after "project()"
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 	# Using Clang (this is a match so that we also get "AppleClang" which is the Apple-provided Clang

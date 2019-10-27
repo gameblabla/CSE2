@@ -14,20 +14,22 @@ set_target_properties(bin2h PROPERTIES
 	C_EXTENSIONS OFF
 )
 
+message(STATUS "Compiler ID : ${CMAKE_C_COMPILER_ID}")
+
 # Has to be placed after "project()"
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+if (CMAKE_C_COMPILER_ID MATCHES "Clang")
 	# Using Clang (this is a match so that we also get "AppleClang" which is the Apple-provided Clang
 	set(COMPILER_IS_CLANG true)
 	message(STATUS "Compiling with clang")
 endif()
 
-if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
 	# Using GCC
 	set(COMPILER_IS_GCC true)
 	message(STATUS "Compiling with gcc")
 endif()
 
-if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
+if (CMAKE_C_COMPILER_ID STREQUAL "Intel")
 	# Using Intel C++
 	set(COMPILER_IS_ICC true)
 	message(STATUS "Compiling with ICC")
