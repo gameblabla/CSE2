@@ -25,13 +25,13 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 	message(STATUS "Compiling with clang")
 endif()
 
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	# Using GCC
 	set(COMPILER_IS_GCC true)
 	message(STATUS "Compiling with gcc")
 endif()
 
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
 	# Using Intel C++
 	set(COMPILER_IS_ICC true)
 	message(STATUS "Compiling with ICC")

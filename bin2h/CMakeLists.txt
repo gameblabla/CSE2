@@ -6,6 +6,14 @@ endif()
 
 project(bin2h LANGUAGES C)
 
+add_executable(bin2h "bin2h.c")
+
+set_target_properties(bin2h PROPERTIES
+	C_STANDARD 90
+	C_STANDARD_REQUIRED ON
+	C_EXTENSIONS OFF
+)
+
 # Has to be placed after "project()"
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 	# Using Clang (this is a match so that we also get "AppleClang" which is the Apple-provided Clang
@@ -13,13 +21,13 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 	message(STATUS "Compiling with clang")
 endif()
 
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	# Using GCC
 	set(COMPILER_IS_GCC true)
 	message(STATUS "Compiling with gcc")
 endif()
 
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
 	# Using Intel C++
 	set(COMPILER_IS_ICC true)
 	message(STATUS "Compiling with ICC")
@@ -29,15 +37,6 @@ if (COMPILER_IS_CLANG OR COMPILER_IS_GCC OR COMPILER_IS_ICC)
 	set(COMPILER_IS_GCC_COMPATIBLE true)
 	message(STATUS "Compiling with a GCC-compatible compiler")
 endif()
-
-add_executable(bin2h "bin2h.c")
-
-set_target_properties(bin2h PROPERTIES
-	C_STANDARD 90
-	C_STANDARD_REQUIRED ON
-	C_EXTENSIONS OFF
-)
-
 
 if (WARNINGS)
 	# HACK : Replace this with CMake provided stuff when possible (when CMake makes avoiding this possible (it isn't currently))
