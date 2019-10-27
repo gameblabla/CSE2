@@ -72,7 +72,7 @@ void ReleaseNpcTable()
 }
 
 // Npc function table
-NPCFUNCTION gpNpcFuncTbl[361] =
+NPCFUNCTION gpNpcFuncTbl[382] =
 {
 	ActNpc000,
 	ActNpc001,
@@ -435,4 +435,25 @@ NPCFUNCTION gpNpcFuncTbl[361] =
 	ActNpc358,
 	ActNpc359,
 	ActNpc360,
+	ActNpc361,
+	ActNpc362,
+	ActNpc363,
+	ActNpc364,
+	ActNpc365,
+	ActNpc366,
+	ActNpc367,
+	ActNpc368,
+	ActNpc369,
+	nullptr,	// 370
+	nullptr,	// 371
+	nullptr,	// 372
+	nullptr,	// 373
+	nullptr,	// 374
+	nullptr,	// 375
+	nullptr,	// 376
+	nullptr,	// 377
+	nullptr,	// 378
+	nullptr,	// 379
+	nullptr,	// 380
+	ActNpc381,
 };
