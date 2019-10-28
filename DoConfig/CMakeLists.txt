@@ -20,6 +20,9 @@ if(MSVC)
 	target_compile_definitions(DoConfig PRIVATE _CRT_SECURE_NO_WARNINGS)	# Disable warnings that normally fire up on MSVC when using "unsafe" functions instead of using MSVC's "safe" _s functions
 endif()
 
+# Make it so source files are recognized as UTF-8 by MSVC
+add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
+
 # Find FLTK
 if(NOT FORCE_LOCAL_LIBS)
 	set(FLTK_SKIP_FLUID ON)	# Do not require fltk-fluid (the UI designer)

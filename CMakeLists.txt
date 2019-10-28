@@ -270,6 +270,9 @@ if(MSVC)
 	target_compile_definitions(CSE2 PRIVATE _CRT_SECURE_NO_WARNINGS)	# Disable warnings that normally fire up on MSVC when using "unsafe" functions instead of using MSVC's "safe" _s functions
 endif()
 
+# Make it so source files are recognized as UTF-8 by MSVC
+add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
+
 # Build bin2h externally, so it isn't cross-compiled when CSE2 is (Emscripten, cross-GCC, MinGW on Linux, etc.)
 include(ExternalProject)
 
