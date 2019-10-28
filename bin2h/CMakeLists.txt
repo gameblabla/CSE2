@@ -20,7 +20,7 @@ if(MSVC)
 endif()
 
 # Make it so source files are recognized as UTF-8 by MSVC
-add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
+add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
 
 # Enable link-time optimisation if available
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
