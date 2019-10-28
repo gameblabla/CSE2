@@ -19,6 +19,9 @@ if(MSVC)
 	target_compile_definitions(bin2h PRIVATE _CRT_SECURE_NO_WARNINGS)	# Disable warnings that normally fire up on MSVC when using "unsafe" functions instead of using MSVC's "safe" _s functions
 endif()
 
+# Make it so source files are recognized as UTF-8 by MSVC
+add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
+
 # Enable link-time optimisation if available
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
 	if((${CMAKE_VERSION} VERSION_EQUAL 3.9) OR (${CMAKE_VERSION} VERSION_GREATER 3.9))
