@@ -260,6 +260,9 @@ unsigned char* AudioBackend_LockSound(AudioBackend_Sound *sound, size_t *size)
 
 void AudioBackend_UnlockSound(AudioBackend_Sound *sound)
 {
+	if (sound == NULL)
+		return;
+
 	SDL_UnlockAudioDevice(device_id);	
 }
 
