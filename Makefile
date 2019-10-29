@@ -309,8 +309,9 @@ obj/bin2h: bin2h/bin2h.c
 
 include $(wildcard $(DEPENDENCIES))
 
-obj/$(FILENAME)/windows_resources.o: assets/resources/CSE2.rc
+obj/$(FILENAME)/windows_resources.o: $(ASSETS_DIRECTORY)/resources/CSE2.rc $(ASSETS_DIRECTORY)/resources/resource1.h $(ASSETS_DIRECTORY)/resources/afxres.h $(ASSETS_DIRECTORY)/resources/ICON/0.ico
 	@mkdir -p $(@D)
+	@echo Compiling Windows resource file $<
 	@$(WINDRES) $< $@
 
 $(BUILD_DIRECTORY)/$(DOCONFIG_FILENAME): DoConfig/DoConfig.cpp
