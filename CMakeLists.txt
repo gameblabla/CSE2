@@ -7,7 +7,7 @@ endif()
 set(BUILD_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/game")
 set(ASSETS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/assets")
 
-option(JAPANESE "Enable the Japanese-language build" OFF)
+option(JAPANESE "Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)" OFF)
 option(FIX_BUGS "Fix various bugs in the game" OFF)
 option(DEBUG_SAVE "Re-enable the ability to drag-and-drop save files onto the window" OFF)
 set(RENDERER "SDLTexture" CACHE STRING "Which renderer the game should use: 'OpenGL3' for an OpenGL 3.2 renderer, 'SDLTexture' for SDL2's hardware-accelerated Texture API, 'SDLSurface' for SDL2's software-rendered Surface API, or 'Software' for a handwritten software renderer")
