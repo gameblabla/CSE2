@@ -67,8 +67,8 @@ Name | Function
 `-DRENDERER=SDLSurface` | Use the software-rendered SDL2 Surface API renderer
 `-DRENDERER=Software` | Use the handwritten software renderer
 `-DWARNINGS=ON` | Enable common compiler warnings (for gcc-compatible compilers and MSVC only)
-`-DALL_WARNINGS=ON` | Enable ALL compiler warnings (for clang and MSVC only)
-`-DFATAL_WARNINGS=ON` | Stop compilation on any compiler warning (for gcc-compatible compilers and MSVC only)
+`-DWARNINGS_ALL=ON` | Enable ALL compiler warnings (for clang and MSVC only)
+`-DWARNINGS_FATAL=ON` | Stop compilation on any compiler warning (for gcc-compatible compilers and MSVC only)
 `-DFORCE_LOCAL_LIBS=ON` | Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones
 
 Then compile CSE2 with this command:
@@ -100,8 +100,8 @@ Name | Function
 `RENDERER=SDLSurface` | Use the software-rendered SDL2 Surface API renderer
 `RENDERER=Software` | Use the hand-written software renderer
 `WARNINGS=1` | Enable common warnings
-`ALL_WARNINGS=1` | Enable ALL warnings (clang/MSVC only)
-`FATAL_WARNINGS=1` | Make all warnings errors
+`WARNINGS_ALL=1` | Enable ALL warnings (clang/MSVC only)
+`WARNINGS_FATAL=1` | Make all warnings errors
 
 Once built, the executables and assets can be found in the newly-generated `game` folder.
 

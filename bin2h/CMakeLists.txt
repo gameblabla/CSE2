@@ -61,7 +61,7 @@ if (WARNINGS)
 	endif()
 endif()
 
-if (ALL_WARNINGS)
+if (WARNINGS_ALL)
 	# HACK : Replace this with CMake provided stuff when possible (when CMake makes avoiding this possible (it isn't currently))
 
 	if (MSVC)
@@ -82,7 +82,7 @@ if (ALL_WARNINGS)
 	endif()
 endif()
 
-if (FATAL_WARNINGS)
+if (WARNINGS_FATAL)
 	# HACK : Replace this with CMake provided stuff when possible (when CMake makes avoiding this possible (it isn't currently))
 
 	if (MSVC)

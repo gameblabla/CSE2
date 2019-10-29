@@ -17,8 +17,8 @@ option(DEBUG_SAVE "Re-enable the ability to drag-and-drop save files onto the wi
 set(RENDERER "SDLTexture" CACHE STRING "Which renderer the game should use: 'OpenGL3' for an OpenGL 3.2 renderer, 'SDLTexture' for SDL2's hardware-accelerated Texture API, 'SDLSurface' for SDL2's software-rendered Surface API, or 'Software' for a handwritten software renderer")
 
 option(WARNINGS "Enable common compiler warnings (for gcc-compatible compilers and MSVC only)" OFF)
-option(ALL_WARNINGS "Enable ALL compiler warnings (for clang and MSVC only)" OFF)
-option(FATAL_WARNINGS "Stop compilation on any compiler warning (for gcc-compatible compilers and MSVC only)" OFF)
+option(WARNINGS_ALL "Enable ALL compiler warnings (for clang and MSVC only)" OFF)
+option(WARNINGS_FATAL "Stop compilation on any compiler warning (for gcc-compatible compilers and MSVC only)" OFF)
 option(FORCE_LOCAL_LIBS "Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones" OFF)
 
 project(CSE2 LANGUAGES C CXX)
@@ -302,7 +302,7 @@ if (WARNINGS)
 	endif()
 endif()
 
-if (ALL_WARNINGS)
+if (WARNINGS_ALL)
 	# HACK : Replace this with CMake provided stuff when possible (when CMake makes avoiding this possible (it isn't currently))
 
 	if (MSVC)
@@ -323,7 +323,7 @@ if (ALL_WARNINGS)
 	endif()
 endif()
 
-if (FATAL_WARNINGS)
+if (WARNINGS_FATAL)
 	# HACK : Replace this with CMake provided stuff when possible (when CMake makes avoiding this possible (it isn't currently))
 
 	if (MSVC)
@@ -373,8 +373,8 @@ ExternalProject_Add(bin2h
 		-DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
 		-DCMAKE_BUILD_TYPE=Release
 		-DWARNINGS=${WARNINGS}
-		-DALL_WARNINGS=${ALL_WARNINGS}
-		-DFATAL_WARNINGS=${FATAL_WARNINGS}
+		-DWARNINGS_ALL=${WARNINGS_ALL}
+		-DWARNINGS_FATAL=${WARNINGS_FATAL}
 	INSTALL_COMMAND
 		${CMAKE_COMMAND} --build . --config Release --target install
 )
