@@ -17,8 +17,13 @@ static void ActBoss01_12()
 {
 	int i;
 
-	RECT rcLeft[1] = {80, 56, 104, 72};
-	RECT rcRight[1] = {104, 56, 128, 72};
+	RECT rcLeft[1] = {
+		{80, 56, 104, 72}
+	};
+
+	RECT rcRight[1] = {
+		{104, 56, 128, 72}
+	};
 
 	for (i = 1; i < 3; ++i)
 	{

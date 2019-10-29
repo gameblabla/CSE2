@@ -783,8 +783,13 @@ void ActNpc130(NPCHAR *npc)
 // Puppy (sleeping)
 void ActNpc131(NPCHAR *npc)
 {
-	RECT rcLeft[1] = {144, 144, 160, 160};
-	RECT rcRight[1] = {144, 160, 160, 176};
+	RECT rcLeft[1] = {
+		{144, 144, 160, 160}
+	};
+
+	RECT rcRight[1] = {
+		{144, 160, 160, 176}
+	};
 
 	if (++npc->act_wait > 100)
 	{
