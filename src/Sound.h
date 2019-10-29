@@ -28,7 +28,7 @@ enum SoundEffectNames
 	// To be continued
 	SND_BEHEMOTH_LARGE_HURT = 52,
 	// To be continued
-	SND_EXPLOSION = 72,
+	SND_EXPLOSION = 72
 	// To be continued
 };
 
