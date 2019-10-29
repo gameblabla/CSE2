@@ -95,13 +95,13 @@ Name | Function
 `FIX_BUGS=1` | Fix various bugs in the game
 `WINDOWS=1` | Build for Windows
 `DEBUG_SAVE=1` | Re-enable the ability to drag-and-drop save files onto the window
-`WARNINGS=1` | Enable common warnings
-`ALL_WARNINGS=1` | Enable ALL warnings (clang/MSVC only)
-`FATAL_WARNINGS=1` | Make all warnings errors
 `RENDERER=OpenGL3` | Use the hardware-accelerated OpenGL 3.2 renderer
 `RENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default)
 `RENDERER=SDLSurface` | Use the software-rendered SDL2 Surface API renderer
 `RENDERER=Software` | Use the hand-written software renderer
+`WARNINGS=1` | Enable common warnings
+`ALL_WARNINGS=1` | Enable ALL warnings (clang/MSVC only)
+`FATAL_WARNINGS=1` | Make all warnings errors
 
 Once built, the executables and assets can be found in the newly-generated `game` folder.
 
