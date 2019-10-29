@@ -519,11 +519,6 @@ endif()
 # DoConfig
 ##
 
-# Set warning options for DoConfig
-set(WARNINGS ${WARNINGS} FORCE BOOL)
-set(ALL_WARNINGS ${ALL_WARNINGS} FORCE BOOL)
-set(FATAL_WARNINGS ${FATAL_WARNINGS} FORCE BOOL)
-
 add_subdirectory("DoConfig")
 
 # Name debug builds "DoConfig_debug", to distinguish them
