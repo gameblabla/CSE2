@@ -20,7 +20,7 @@ enum Collisions
 	COLL_LEFT_WALL = 1,     // Touching a left wall
 	COLL_CEILING = 2,       // Touching a ceiling
 	COLL_RIGHT_WALL = 4,    // Touching a right wall
-	COLL_GROUND = 8,        // Touching the ground
+	COLL_GROUND = 8         // Touching the ground
 	// To be continued
 };
 

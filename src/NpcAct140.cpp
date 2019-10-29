@@ -543,8 +543,13 @@ void ActNpc142(NPCHAR *npc)
 // Jenka (collapsed)
 void ActNpc143(NPCHAR *npc)
 {
-	RECT rcLeft[1] = {208, 32, 224, 48};
-	RECT rcRight[1] = {208, 48, 224, 64};
+	RECT rcLeft[1] = {
+		{208, 32, 224, 48}
+	};
+
+	RECT rcRight[1] = {
+		{208, 48, 224, 64}
+	};
 
 	if (npc->direct == 0)
 		npc->rect = rcLeft[npc->ani_no];
@@ -662,8 +667,13 @@ void ActNpc144(NPCHAR *npc)
 // King's sword
 void ActNpc145(NPCHAR *npc)
 {
-	RECT rcLeft[1] = {96, 32, 112, 48};
-	RECT rcRight[1] = {112, 32, 128, 48};
+	RECT rcLeft[1] = {
+		{96, 32, 112, 48}
+	};
+
+	RECT rcRight[1] = {
+		{112, 32, 128, 48}
+	};
 
 	switch (npc->act_no)
 	{

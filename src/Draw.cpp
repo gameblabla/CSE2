@@ -710,6 +710,8 @@ int PixelToScreenCoord(int coord)
 // TODO - Inaccurate stack frame
 void InitTextObject(const char *name)
 {
+	(void)name;	// Unused in this branch
+
 	size_t size;
 	const unsigned char *data = FindResource("FONT", "FONT", &size);
 

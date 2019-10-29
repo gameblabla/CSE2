@@ -44,7 +44,6 @@ public:
 private:
 	Fl_Group *group;
 	Fl_Radio_Round_Button *buttons[6];
-	Fl_Group *label;
 };
 
 static char config_path[FILENAME_MAX];
@@ -72,17 +71,16 @@ RadioRow::RadioRow(char offset)
 	this->group = new Fl_Group(140 + offset * 30, 150, 30, 180);
 	this->group->label(temp);
 	this->group->align(FL_ALIGN_TOP_LEFT);
-	for (char i = 0; i < 6; i++)
+	for (int i = 0; i < 6; i++)
 		this->buttons[i] = new Fl_Radio_Round_Button(140 + offset * 30, 150 + 30 * i, 30, 30);
 	this->group->end();
 }
 
 int RadioRow::value()
 {
-	char i;
-	for (i = 0; i < 6; i++)
+	for (int i = 0; i < 6; i++)
 		if (this->buttons[i]->value())
-			return (int)i;
+			return i;
 	return 0;
 }
 
@@ -135,7 +133,7 @@ void read_Config()
 	if (!CharsToLong(config.useJoy))
 		joystuffcontainer->deactivate();
 
-	for (char i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		const unsigned long button = CharsToLong(config.buttons[i]);
 		if (button < 6 && button > 0)
@@ -154,7 +152,7 @@ void write_Config(Fl_Widget *, void *)
 
 	LongToChars(displaychoice->value(), config.display);
 	LongToChars(joychoice->value(), config.useJoy);
-	for (char i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		const unsigned int button_lookup[6] = {0, 1, 2, 5, 3, 4};
 		LongToChars(button_lookup[joyRows[i]->value()] + 1, config.buttons[i]);
@@ -223,7 +221,7 @@ int main(int argc, char *argv[])
 
 	joystuffcontainer = new Fl_Group(10, 130, 380, 200);
 	joystuffcontainer->box(FL_THIN_DOWN_BOX);
-	for (char i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		joyRows[i] = new RadioRow(i);
 	}

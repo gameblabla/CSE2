@@ -44,8 +44,6 @@ static BOOL bActive = TRUE;
 static int windowWidth;
 static int windowHeight;
 
-static const char *mutex_name = "Doukutsu";
-
 #ifdef JAPANESE
 static const char *lpWindowName = "洞窟物語";	// "Cave Story"
 #else

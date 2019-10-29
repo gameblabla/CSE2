@@ -530,7 +530,9 @@ void ActNpc026(NPCHAR *npc)
 // Death trap
 void ActNpc027(NPCHAR *npc)
 {
-	RECT rcLeft[1] = {96, 64, 128, 88};
+	RECT rcLeft[1] = {
+		{96, 64, 128, 88}
+	};
 
 	npc->rect = rcLeft[npc->ani_no];
 }

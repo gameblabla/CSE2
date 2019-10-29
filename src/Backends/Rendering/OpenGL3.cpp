@@ -417,12 +417,14 @@ void Backend_FreeSurface(Backend_Surface *surface)
 
 BOOL Backend_IsSurfaceLost(Backend_Surface *surface)
 {
+	(void)surface;
+
 	return FALSE;
 }
 
 void Backend_RestoreSurface(Backend_Surface *surface)
 {
-	
+	(void)surface;
 }
 
 unsigned char* Backend_LockSurface(Backend_Surface *surface, unsigned int *pitch)
