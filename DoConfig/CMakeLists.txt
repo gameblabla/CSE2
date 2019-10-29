@@ -8,6 +8,9 @@ if((${CMAKE_VERSION} VERSION_EQUAL 3.11) OR (${CMAKE_VERSION} VERSION_GREATER 3.
 	cmake_policy(SET CMP0072 NEW)
 endif()
 
+option(WARNINGS "Enable common compiler warnings (for gcc-compatible compilers and MSVC only)" OFF)
+option(WARNINGS_ALL "Enable ALL compiler warnings (for clang and MSVC only)" OFF)
+option(WARNINGS_FATAL "Stop compilation on any compiler warning (for gcc-compatible compilers and MSVC only)" OFF)
 option(FORCE_LOCAL_LIBS "Compile the built-in version of FLTK instead of using the system-provided one" OFF)
 
 project(DoConfig LANGUAGES CXX)

@@ -4,6 +4,10 @@ if((${CMAKE_VERSION} VERSION_EQUAL 3.9) OR (${CMAKE_VERSION} VERSION_GREATER 3.9
 	cmake_policy(SET CMP0069 NEW)
 endif()
 
+option(WARNINGS "Enable common compiler warnings (for gcc-compatible compilers and MSVC only)" OFF)
+option(WARNINGS_ALL "Enable ALL compiler warnings (for clang and MSVC only)" OFF)
+option(WARNINGS_FATAL "Stop compilation on any compiler warning (for gcc-compatible compilers and MSVC only)" OFF)
+
 project(bin2h LANGUAGES C)
 
 add_executable(bin2h "bin2h.c")
