@@ -142,8 +142,13 @@ void ActNpc200(NPCHAR *npc)
 // Dragon Zombie (dead)
 void ActNpc201(NPCHAR *npc)
 {
-	RECT rcLeft[1] = {200, 0, 240, 40};
-	RECT rcRight[1] = {200, 40, 240, 80};
+	RECT rcLeft[1] = {
+		{200, 0, 240, 40}
+	};
+
+	RECT rcRight[1] = {
+		{200, 40, 240, 80}
+	};
 
 	if (npc->direct == 0)
 		npc->rect = rcLeft[npc->ani_no];
