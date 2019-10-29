@@ -9,12 +9,13 @@ set(ASSETS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/assets")
 
 option(JAPANESE "Enable the Japanese-language build" OFF)
 option(FIX_BUGS "Fix various bugs in the game" OFF)
-option(WARNINGS "Enable common warnings" OFF)
-option(ALL_WARNINGS "Enable ALL warnings (clang/MSVC-only)" OFF)
-option(FATAL_WARNINGS "Stop compilation on any warnings" OFF)
 option(DEBUG_SAVE "Re-enable the ability to drag-and-drop save files onto the window" OFF)
-option(FORCE_LOCAL_LIBS "Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones" OFF)
 set(RENDERER "SDLTexture" CACHE STRING "Which renderer the game should use: 'OpenGL3' for an OpenGL 3.2 renderer, 'SDLTexture' for SDL2's hardware-accelerated Texture API, 'SDLSurface' for SDL2's software-rendered Surface API, or 'Software' for a handwritten software renderer")
+
+option(WARNINGS "Enable common compiler warnings (for gcc-compatible compilers and MSVC only)" OFF)
+option(ALL_WARNINGS "Enable ALL compiler warnings (for clang and MSVC only)" OFF)
+option(FATAL_WARNINGS "Stop compilation on any compiler warning (for gcc-compatible compilers and MSVC only)" OFF)
+option(FORCE_LOCAL_LIBS "Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones" OFF)
 
 project(CSE2 LANGUAGES C CXX)
 
@@ -323,10 +324,8 @@ if (FATAL_WARNINGS)
 
 	if (MSVC)
 		target_compile_options(CSE2 PRIVATE /WX)
-		target_compile_options(bin2h PRIVATE /WX)
 	elseif(COMPILER_IS_GCC_COMPATIBLE)
 		target_compile_options(CSE2 PRIVATE -Werror)
-		target_compile_options(bin2h PRIVATE -Werror)
 	else()
 		message(WARNING "Could not activate fatal warnings ! (Unsupported compiler)")
 	endif()
@@ -512,6 +511,11 @@ endif()
 ##
 # DoConfig
 ##
+
+# Set warning options for DoConfig
+set(WARNINGS ${WARNINGS} FORCE BOOL)
+set(ALL_WARNINGS ${ALL_WARNINGS} FORCE BOOL)
+set(FATAL_WARNINGS ${FATAL_WARNINGS} FORCE BOOL)
 
 add_subdirectory("DoConfig")
 
