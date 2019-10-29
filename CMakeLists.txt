@@ -14,7 +14,6 @@ set(ASSETS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/assets")
 option(JAPANESE "Enable the Japanese-language build" OFF)
 option(FIX_BUGS "Fix various bugs in the game" ON)
 option(DEBUG_SAVE "Re-enable the ability to drag-and-drop save files onto the window" OFF)
-option(FORCE_LOCAL_LIBS "Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones" OFF)
 set(RENDERER "SDLTexture" CACHE STRING "Which renderer the game should use: 'OpenGL3' for an OpenGL 3.2 renderer, 'SDLTexture' for SDL2's hardware-accelerated Texture API, or 'Software' for a handwritten software renderer")
 option(AUDIO_OGG "Enable support for Ogg Vorbis music/SFX" OFF)
 option(AUDIO_FLAC "Enable support for FLAC music/SFX" OFF)
@@ -22,12 +21,43 @@ option(AUDIO_TRACKER "Enable support for .it, .xm, .mod, .s3m music/SFX" OFF)
 option(AUDIO_PXTONE "Enable support for PxTone music/SFX (not to be confused with PixTone)" OFF)
 option(SMOOTH_SPRITE_MOVEMENT "Removes the grid that all sprites are locked to, allowing them to move smoothly at higher resolutions" ON)
 
+option(WARNINGS "Enable common compiler warnings (for gcc-compatible compilers and MSVC only)" OFF)
+option(WARNINGS_ALL "Enable ALL compiler warnings (for clang and MSVC only)" OFF)
+option(WARNINGS_FATAL "Stop compilation on any compiler warning (for gcc-compatible compilers and MSVC only)" OFF)
+option(FORCE_LOCAL_LIBS "Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones" OFF)
+
 
 list(APPEND CMAKE_MODULE_PATH
 	"${CMAKE_SOURCE_DIR}/cmake"
 )
 
 project(CSE2 LANGUAGES C CXX)
+
+message(STATUS "Compiler ID : ${CMAKE_CXX_COMPILER_ID}")
+
+# Has to be placed after "project()"
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+	# Using Clang (this is a match so that we also get "AppleClang" which is the Apple-provided Clang
+	set(COMPILER_IS_CLANG true)
+	message(STATUS "Compiling with clang")
+endif()
+
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+	# Using GCC
+	set(COMPILER_IS_GCC true)
+	message(STATUS "Compiling with gcc")
+endif()
+
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
+	# Using Intel C++
+	set(COMPILER_IS_ICC true)
+	message(STATUS "Compiling with ICC")
+endif()
+
+if (COMPILER_IS_CLANG OR COMPILER_IS_GCC OR COMPILER_IS_ICC)
+	set(COMPILER_IS_GCC_COMPATIBLE true)
+	message(STATUS "Compiling with a GCC-compatible compiler")
+endif()
 
 if(MSVC)
 	# Statically-link the CRT (vcpkg static libs do this)
@@ -203,6 +233,60 @@ if(DEBUG_SAVE)
 	target_compile_definitions(CSE2 PRIVATE DEBUG_SAVE)
 endif()
 
+if (WARNINGS)
+	# HACK : Replace this with CMake provided stuff when possible (when CMake makes avoiding this possible (it isn't currently))
+
+	if (MSVC)
+		# Force to always compile with /W4 on MSVC
+
+		# Can't do this with target_compile_options
+		# if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
+		# 	string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+		# else()
+		# 	target_compile_options(CSE2 PRIVATE /W4)
+		# endif()
+
+		target_compile_options(CSE2 PRIVATE /W4)
+	elseif(COMPILER_IS_GCC_COMPATIBLE)
+		target_compile_options(CSE2 PRIVATE -Wall -Wextra -pedantic)
+	else()
+		message(WARNING "Could not activate warnings ! (Unsupported compiler)")
+	endif()
+endif()
+
+if (WARNINGS_ALL)
+	# HACK : Replace this with CMake provided stuff when possible (when CMake makes avoiding this possible (it isn't currently))
+
+	if (MSVC)
+		# Force to always compile with /Wall on MSVC
+
+		# Can't do this with target_compile_options
+		# if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
+		# 	string(REGEX REPLACE "/W[0-4]" "/Wall" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+		# else()
+		# 	target_compile_options(CSE2 PRIVATE /Wall)
+		# endif()
+
+		target_compile_options(CSE2 PRIVATE /Wall)
+	elseif(COMPILER_IS_CLANG)
+		target_compile_options(CSE2 PRIVATE -Weverything)
+	else()
+		message(WARNING "Could not activate all warnings ! (Unsupported compiler)")
+	endif()
+endif()
+
+if (WARNINGS_FATAL)
+	# HACK : Replace this with CMake provided stuff when possible (when CMake makes avoiding this possible (it isn't currently))
+
+	if (MSVC)
+		target_compile_options(CSE2 PRIVATE /WX)
+	elseif(COMPILER_IS_GCC_COMPATIBLE)
+		target_compile_options(CSE2 PRIVATE -Werror)
+	else()
+		message(WARNING "Could not activate fatal warnings ! (Unsupported compiler)")
+	endif()
+endif()
+
 if(RENDERER MATCHES "OpenGL3")
 	target_sources(CSE2 PRIVATE "src/Backends/Rendering/OpenGL3.cpp")
 elseif(RENDERER MATCHES "SDLTexture")
@@ -333,6 +417,9 @@ if(MSVC)
 	target_compile_definitions(CSE2 PRIVATE _CRT_SECURE_NO_WARNINGS)	# Disable warnings that normally fire up on MSVC when using "unsafe" functions instead of using MSVC's "safe" _s functions
 endif()
 
+# Make it so source files are recognized as UTF-8 by MSVC
+add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
+
 # Build bin2h externally, so it isn't cross-compiled when CSE2 is (Emscripten, cross-GCC, MinGW on Linux, etc.)
 include(ExternalProject)
 
@@ -344,6 +431,9 @@ ExternalProject_Add(bin2h
 	CMAKE_ARGS
 		-DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
 		-DCMAKE_BUILD_TYPE=Release
+		-DWARNINGS=${WARNINGS}
+		-DWARNINGS_ALL=${WARNINGS_ALL}
+		-DWARNINGS_FATAL=${WARNINGS_FATAL}
 	INSTALL_COMMAND
 		${CMAKE_COMMAND} --build . --config Release --target install
 )

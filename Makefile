@@ -45,6 +45,23 @@ ifeq ($(DEBUG_SAVE), 1)
 	CXXFLAGS += -DDEBUG_SAVE
 endif
 
+ifeq ($(WARNINGS), 1)
+	CXXFLAGS += -Wall -Wextra -pedantic
+endif
+
+ifeq ($(ALL_WARNINGS), 1)
+	ifneq ($(findstring clang,$(CXX),)
+		# Use clang-specific flag -Weverything
+		CXXFLAGS += -Weverything
+	else
+		@echo Couldn\'t activate all warnings (Unsupported compiler)
+	endif
+endif
+
+ifeq ($(FATAL_WARNINGS), 1)
+	CXXFLAGS += -Werror
+endif
+
 CXXFLAGS += -MMD -MP -MF $@.d `$(PKG_CONFIG) sdl2 --cflags` `$(PKG_CONFIG) freetype2 --cflags` -Iexternal
 DEFINES += -DLODEPNG_NO_COMPILE_ENCODER -DLODEPNG_NO_COMPILE_ERROR_TEXT -DLODEPNG_NO_COMPILE_CPP
 
