@@ -607,6 +607,8 @@ int RestoreSurfaces(void)	// Guessed function name - this doesn't exist in the L
 // TODO - Inaccurate stack frame
 void InitTextObject(const char *name)
 {
+	(void)name;	// Unused in this branch
+
 	size_t size;
 	const unsigned char *data = FindResource("FONT", "FONT", &size);
 

@@ -8,7 +8,7 @@ typedef enum FontPixelMode
 {
 	FONT_PIXEL_MODE_LCD,
 	FONT_PIXEL_MODE_GRAY,
-	FONT_PIXEL_MODE_MONO,
+	FONT_PIXEL_MODE_MONO
 } FontPixelMode;
 
 typedef struct Backend_Surface Backend_Surface;
