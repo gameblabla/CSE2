@@ -141,6 +141,7 @@ include $(wildcard $(DEPENDENCIES))
 
 obj/$(FILENAME)/windows_resources.o: assets/resources/CSE2.rc
 	@mkdir -p $(@D)
+	@echo Compiling Windows resource file $<
 	@$(WINDRES) $< $@
 
 # TODO
