@@ -135,6 +135,8 @@ SOURCES = \
 	src/NpcAct300 \
 	src/NpcAct320 \
 	src/NpcAct340 \
+	src/NpcAct360 \
+	src/NpcAct380 \
 	src/NpChar \
 	src/NpcHit \
 	src/NpcTbl \
