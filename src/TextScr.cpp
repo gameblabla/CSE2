@@ -53,6 +53,8 @@ RECT gRect_line = {0, 0, 216, 16};
 static unsigned long nod_color;
 #endif
 
+unsigned int gMIMCurrentNum = 0;
+
 //Initialize and end tsc
 BOOL InitTextScript2()
 {
@@ -598,6 +600,11 @@ int TextScriptProc()
 						g_GameFlags |= 3;
 						gTS.face = 0;
 						bExit = TRUE;
+					}
+					else if (IS_COMMAND('M','I','M'))
+					{
+						gMIMCurrentNum = GetTextScriptNo(gTS.p_read + 4);
+						gTS.p_read += 8;
 					}
 					else if (IS_COMMAND('L','I','+'))
 					{

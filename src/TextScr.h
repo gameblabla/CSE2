@@ -64,3 +64,6 @@ void StopTextScript();
 void PutTextScript();
 int TextScriptProc();
 void RestoreTextScript();
+
+/// Contains the latest value given through <MIM
+extern unsigned int gMIMCurrentNum;

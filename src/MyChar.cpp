@@ -218,11 +218,15 @@ void PutMyChar(int fx, int fy)
 
 	// Draw player
 	RECT rect = gMC.rect;
+	rect.top += 32 * gMIMCurrentNum;
+	rect.bottom += 32 * gMIMCurrentNum;
+#ifndef ENABLE_MIM_DISABLE_EQUIP_40_GRAPHICS
 	if (gMC.equip & 0x40)
 	{
 		rect.top += 32;
 		rect.bottom += 32;
 	}
+#endif
 
 	PutBitmap3(&grcGame, SubpixelToScreenCoord(gMC.x - gMC.view.front) - SubpixelToScreenCoord(fx), SubpixelToScreenCoord(gMC.y - gMC.view.top) - SubpixelToScreenCoord(fy), &rect, SURFACE_ID_MY_CHAR);
 
