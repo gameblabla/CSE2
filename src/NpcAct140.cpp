@@ -1256,10 +1256,8 @@ void ActNpc150(NPCHAR *npc)
 	else
 		npc->rect = rcRight[npc->ani_no];
 
-#ifdef ENABLE_MIM
 	npc->rect.top += 32 * gMIMCurrentNum;
 	npc->rect.bottom += 32 * gMIMCurrentNum;
-#endif
 
 	if (npc->act_no == 21)
 	{
@@ -1269,6 +1267,7 @@ void ActNpc150(NPCHAR *npc)
 			++npc->rect.left;
 	}
 
+	// In theory this should be disabled by ENABLE_MIM_DISABLE_EQUIP_40_GRAPHICS, but the original mod doesn't do that (probably a bug tbh) so we don't do it either in order to make it so its behaviour is reproduced exactly with ENABLE_MIM_DISABLE_EQUIP_40_GRAPHICS
 	if (gMC.equip & 0x40)
 	{
 		npc->rect.top += 32;

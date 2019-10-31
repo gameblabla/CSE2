@@ -218,10 +218,9 @@ void PutMyChar(int fx, int fy)
 
 	// Draw player
 	RECT rect = gMC.rect;
-#ifdef ENABLE_MIM
 	rect.top += 32 * gMIMCurrentNum;
 	rect.bottom += 32 * gMIMCurrentNum;
-#else
+#ifndef ENABLE_MIM_DISABLE_EQUIP_40_GRAPHICS
 	if (gMC.equip & 0x40)
 	{
 		rect.top += 32;

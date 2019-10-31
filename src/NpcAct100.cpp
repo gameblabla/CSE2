@@ -838,10 +838,9 @@ void ActNpc111(NPCHAR *npc)
 	else
 		npc->rect = rcRight[npc->ani_no];
 
-#ifdef ENABLE_MIM
 	npc->rect.top += 32 * gMIMCurrentNum;
 	npc->rect.bottom += 32 * gMIMCurrentNum;
-#else
+#ifndef ENABLE_MIM_DISABLE_EQUIP_40_GRAPHICS
 	if (gMC.equip & 0x40)
 	{
 		npc->rect.top += 32;
@@ -919,10 +918,9 @@ void ActNpc112(NPCHAR *npc)
 	else
 		npc->rect = rcRight[npc->ani_no];
 
-#ifndef ENABLE_MIM
 	npc->rect.top += 32 * gMIMCurrentNum;
 	npc->rect.bottom += 32 * gMIMCurrentNum;
-#else
+#ifndef ENABLE_MIM_DISABLE_EQUIP_40_GRAPHICS
 	if (gMC.equip & 0x40)
 	{
 		npc->rect.top += 32;
