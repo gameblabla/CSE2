@@ -1509,6 +1509,9 @@ void ActNpc117(NPCHAR *npc)
 // Curly (boss)
 void ActNpc118(NPCHAR *npc)
 {
+#ifdef ENABLE_OVERRIDE_NPC_118_TO_CREEPY_CURLY
+	return ActNpc381(npc);
+#endif
 	RECT rcLeft[9] = {
 		{0, 32, 32, 56},
 		{32, 32, 64, 56},
