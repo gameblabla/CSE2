@@ -36,19 +36,19 @@ matrix:
         # TODO add gcc from https://docs.travis-ci.com/user/languages/cpp/#gcc-on-macos
 
         # Clang on Linux
-        - env: COMPILER=clang++-8 BUILD_TYPE=Debug
+        - env: COMPILER=clang++-9 BUILD_TYPE=Debug
           addons: &clang80
             apt:
                 packages:
-                    - clang-8
+                    - clang-9
                     - g++-9
                 sources:
-                    - ubuntu-toolchain-r-test
-                    - sourceline: 'deb https://apt.llvm.org/bionic/ llvm-toolchain-bionic-8 main'
+                    - sourceline: 'ppa:ubuntu-toolchain-r/test'
+                    - sourceline: 'deb https://apt.llvm.org/bionic/ llvm-toolchain-bionic-9 main'
                       key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
           name: Linux Clang Debug
 
-        - env: COMPILER=clang++-8 BUILD_TYPE=Release
+        - env: COMPILER=clang++-9 BUILD_TYPE=Release
           addons: *clang80
           name: Linux Clang Release
 
