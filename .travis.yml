@@ -57,6 +57,10 @@ env:
     - BUILD_TYPE=RelWithDebInfo
 
 before_install:
+    # Set URL for Discord send script
+    - DISCORD_SEND_SCRIPT_URL=https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
+    - DISCORD_SEND_SCRIPT_FILENAME=discordSendNotification.sh
+
     # Display available disk space
     - df -h
 
@@ -125,3 +129,15 @@ script:
     - cd ..
     - make -j ${JOBS} FIX_BUGS=1 RELEASE=1 WARNINGS=1 ALL_WARNINGS=1
     - cd ${CMAKE_BUILD_DIR}
+
+after_success:
+    # Send success notification to Discord through DISCORD_WEBHOOK_URL
+    - travis_retry wget ${DISCORD_SEND_SCRIPT_URL} -O ${DISCORD_SEND_SCRIPT_FILENAME}
+    - chmod +x ${DISCORD_SEND_SCRIPT_FILENAME}
+    - ./${DISCORD_SEND_SCRIPT_FILENAME} success $DISCORD_WEBHOOK_URL
+
+after_failure:
+    # Send failure notification to Discord through DISCORD_WEBHOOK_URL
+    - travis_retry wget ${DISCORD_SEND_SCRIPT_URL} -O ${DISCORD_SEND_SCRIPT_FILENAME}
+    - chmod +x ${DISCORD_SEND_SCRIPT_FILENAME}
+    - ./${DISCORD_SEND_SCRIPT_FILENAME} failure $DISCORD_WEBHOOK_URL
