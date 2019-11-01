@@ -27,19 +27,29 @@ os:
 addons:
   apt:
     sources:
-    - sourceline: 'deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-9 main'
-      key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
-    - sourceline: 'ppa:ubuntu-toolchain-r/test'
+        - sourceline: 'deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-9 main'
+          key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
+        - sourceline: 'ppa:ubuntu-toolchain-r/test'
     packages:
-    - clang-9
-    - cmake
-    - gcc-9
-    - g++-9
+        - cmake
+        - gcc-9
+        - g++-9
+        - clang-9
+        - libsdl2-dev
+        - libfreetype6-dev
+        - libfltk-dev
+        - libglew-dev
+        - libxmp-dev
   homebrew:
     packages:
-    - cmake
-    - gcc@9
-    - llvm@9
+        - cmake
+        - gcc@9
+        - llvm@9
+        - sdl2
+        - freetype
+        - fltk
+        - glew
+        - libxmp-lite
     update: true
 
 env:
