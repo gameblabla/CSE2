@@ -5,9 +5,6 @@ git:
 # No need for sudo
 sudo: false
 
-# Use linux unless specified otherwise
-os: linux
-
 # Bionic is the most recent version of Ubuntu I can get to work properly
 dist: bionic
 
@@ -17,53 +14,37 @@ language: cpp
 # Cache compiled object files with ccache
 cache: ccache
 
-# Matrix for configuring all the build configurations
-matrix:
-    include:
-        # Clang on OSX
-        - env: COMPILER=clang++ BUILD_TYPE=Debug
-          os: osx
-          osx_image: xcode11.2
-          compiler: clang
-          name: OSX Clang Debug
+osx_image: xcode11.2
 
-        - env: COMPILER=clang++ BUILD_TYPE=Release
-          os: osx
-          osx_image: xcode11.2
-          compiler: clang
-          name: OSX Clang Release
+compiler:
+    - gcc
+    - clang
 
-        # TODO add gcc from https://docs.travis-ci.com/user/languages/cpp/#gcc-on-macos
+os:
+    - linux
+    - osx
 
-        # Clang on Linux
-        - env: COMPILER=clang++-9 BUILD_TYPE=Debug
-          addons: &clang80
-            apt:
-                packages:
-                    - clang-9
-                sources:
-                    - sourceline: 'ppa:ubuntu-toolchain-r/test'
-                    - sourceline: 'deb https://apt.llvm.org/bionic/ llvm-toolchain-bionic-9 main'
-                      key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
-          name: Linux Clang Debug
+addons:
+  apt:
+    sources:
+    - sourceline: 'deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-9 main'
+      key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
+    - sourceline: 'ppa:ubuntu-toolchain-r/test'
+    packages:
+    - clang-9
+    - cmake
+    - gcc-9
+    - g++-9
+  homebrew:
+    packages:
+    - cmake
+    - gcc@9
+    - llvm@9
+    update: true
 
-        - env: COMPILER=clang++-9 BUILD_TYPE=Release
-          addons: *clang80
-          name: Linux Clang Release
-
-        # GCC on Linux
-        - env: COMPILER=g++-9 BUILD_TYPE=Debug
-          addons: &gcc9
-            apt:
-                packages:
-                    - g++-9
-                sources:
-                    - ubuntu-toolchain-r-test
-          name: Linux GCC Debug
-
-        - env: COMPILER=g++-9 BUILD_TYPE=Release
-          addons: *gcc9
-          name: Linux GCC Release
+env:
+    - BUILD_TYPE=Debug
+    - BUILD_TYPE=RelWithDebInfo
 
 before_install:
     # Display available disk space
@@ -75,13 +56,31 @@ before_install:
     # Display build type
     - echo $BUILD_TYPE
 
-install:
-    # Set ${CXX} properly
-    - export CXX=${COMPILER}
+    # The following Homebrew packages aren't linked by default, and need to be prepended to the path explicitly.
+    - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
+        export PATH="$(brew --prefix llvm)/bin:$PATH";
+      fi
 
-    # Display compiler version
+    # /usr/bin/gcc points to an older compiler on both Linux and macOS.
+    - if [ "$CXX" = "g++" ]; then export CXX="g++-9" CC="gcc-9"; fi
+
+    # /usr/bin/clang points to an older compiler on both Linux and macOS.
+    #
+    # Homebrew's llvm package doesn't ship a versioned clang++ binary, so the values
+    # below don't work on macOS. Fortunately, the path change above makes the
+    # default values (clang and clang++) resolve to the correct compiler on macOS.
+    - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+        if [ "$CXX" = "clang++" ]; then export CXX="clang++-9" CC="clang-9"; fi;
+      fi
+
+    # Display compilers/cmake name/version
+    - echo ${CC}
+    - echo ${CXX}
+    - ${CC} --version
     - ${CXX} --version
+    - cmake --version
 
+install:
     # Get number of cores (or 2 by default if somehow none of these are available somehow)
     - JOBS=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null || echo 2)
     - echo $JOBS
@@ -93,29 +92,12 @@ install:
     - |
       if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
           # This is OSX
-          brew install ccache || brew upgrade cmake
+          brew install ccache
           export PATH="/usr/local/opt/ccache/libexec:$PATH"
       fi
 
     # Install required libraries
     - mkdir travisLibs && cd travisLibs
-
-    # Install modern CMake
-    - CMAKE_VERSION=3.14.5
-    - |
-      if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
-          # This is Linux
-          CMAKE_URL="https://cmake.org/files/v${CMAKE_VERSION%.[0-9]}/cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz"
-          CMAKE_DIR=cmakeDownload
-          mkdir ${CMAKE_DIR} && travis_retry wget --no-check-certificate -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C ${CMAKE_DIR}
-          export PATH=${PWD}/${CMAKE_DIR}/bin:${PATH}
-      else
-          # This is OSX
-          brew install cmake || brew upgrade cmake
-      fi
-
-    # Display CMake version
-    - cmake --version
 
     # Install modern SDL2
     - SDL2_VERSION=2.0.10
