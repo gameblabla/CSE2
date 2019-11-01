@@ -1,6 +1,6 @@
 # Optimize git clone
 git:
-	depth: 5
+    depth: 5
 
 # No need for sudo
 sudo: false
@@ -33,7 +33,7 @@ matrix:
           compiler: clang
           name: OSX Clang Release
 
-		# TODO add gcc from https://docs.travis-ci.com/user/languages/cpp/#gcc-on-macos
+        # TODO add gcc from https://docs.travis-ci.com/user/languages/cpp/#gcc-on-macos
 
         # Clang on Linux
         - env: COMPILER=clang++-8 BUILD_TYPE=Debug
@@ -89,19 +89,19 @@ install:
     # Recommanded build directory
     - CMAKE_BUILD_DIR=build
 
-	# Install ccache on OSX
-	- |
-	  if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
-		  # This is OSX
-		  brew install ccache || brew upgrade cmake
-		  export PATH="/usr/local/opt/ccache/libexec:$PATH"
-	  fi
+    # Install ccache on OSX
+    - |
+      if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
+          # This is OSX
+          brew install ccache || brew upgrade cmake
+          export PATH="/usr/local/opt/ccache/libexec:$PATH"
+      fi
 
-	# Install required libraries
-	- mkdir travisLibs && cd travisLibs
+    # Install required libraries
+    - mkdir travisLibs && cd travisLibs
 
-	# Install modern CMake
-	- CMAKE_VERSION=3.14.5
+    # Install modern CMake
+    - CMAKE_VERSION=3.14.5
     - |
       if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
           # This is Linux
@@ -114,32 +114,32 @@ install:
           brew install cmake || brew upgrade cmake
       fi
 
-	# Display CMake version
-	- cmake --version
+    # Display CMake version
+    - cmake --version
 
-	# Install modern SDL2
-	- SDL2_VERSION=2.0.10
+    # Install modern SDL2
+    - SDL2_VERSION=2.0.10
     - |
       travis_retry curl -L https://www.libsdl.org/release/SDL2-${SDL2_VERSION}.tar.gz | tar xz
       cd SDL2-${SDL2_VERSION}
       ./configure
       make -j ${JOBS}
       sudo make install -j ${JOBS}
-	  cd ..
+      cd ..
 
-	# Finished installing required libraries
-	- cd ..
+    # Finished installing required libraries
+    - cd ..
 
 before_script:
-	# Make build directory and generate CMake build files
-	- mkdir -p ${CMAKE_BUILD_DIR} && cd ${CMAKE_BUILD_DIR}
+    # Make build directory and generate CMake build files
+    - mkdir -p ${CMAKE_BUILD_DIR} && cd ${CMAKE_BUILD_DIR}
     - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DFIX_BUGS=ON -DWARNINGS=ON -DALL_WARNINGS=ON
 
 script:
-	# CMake build
-	- cmake --build . --config ${BUILD_TYPE} --parallel ${JOBS}
+    # CMake build
+    - cmake --build . --config ${BUILD_TYPE} --parallel ${JOBS}
 
-	# Make build
-	- cd ..
-	- make -j ${JOBS} FIX_BUGS=1 RELEASE=1 WARNINGS=1 ALL_WARNINGS=1
-	- cd ${CMAKE_BUILD_DIR}
+    # Make build
+    - cd ..
+    - make -j ${JOBS} FIX_BUGS=1 RELEASE=1 WARNINGS=1 ALL_WARNINGS=1
+    - cd ${CMAKE_BUILD_DIR}
