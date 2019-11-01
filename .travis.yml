@@ -41,7 +41,6 @@ matrix:
             apt:
                 packages:
                     - clang-9
-                    - g++-9
                 sources:
                     - sourceline: 'ppa:ubuntu-toolchain-r/test'
                     - sourceline: 'deb https://apt.llvm.org/bionic/ llvm-toolchain-bionic-9 main'
