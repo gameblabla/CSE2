@@ -52,7 +52,7 @@ ifeq ($(ALL_WARNINGS), 1)
 		# Use clang-specific flag -Weverything
 		CXXFLAGS += -Weverything
 	else
-		@echo Couldn\'t activate all warnings (Unsupported compiler)
+		$(warning Couldn\'t activate all warnings (Unsupported compiler))
 	endif
 endif
 
