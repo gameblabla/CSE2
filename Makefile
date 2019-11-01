@@ -52,7 +52,8 @@ ifeq ($(ALL_WARNINGS), 1)
 		# Use clang-specific flag -Weverything
 		CXXFLAGS += -Weverything
 	else
-		$(warning Couldn\'t activate all warnings (Unsupported compiler))
+		# This is indented with spaces because otherwise it doesn't compile (make doesn't like tabs there for some reason
+        $(warning Couldn\'t activate all warnings (Unsupported compiler))
 	endif
 endif
 
