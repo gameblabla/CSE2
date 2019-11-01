@@ -1,8 +1,145 @@
+# Optimize git clone
+git:
+	depth: 5
+
+# No need for sudo
+sudo: false
+
+# Use linux unless specified otherwise
+os: linux
+
+# Bionic is the most recent version of Ubuntu I can get to work properly
+dist: bionic
+
+# Enable C++ language support
 language: cpp
 
-compiler:
-	- clang
-	- gcc
+# Cache compiled object files with ccache
+cache: ccache
 
-dist:
-	- trusty
+# Matrix for configuring all the build configurations
+matrix:
+    include:
+        # Clang on OSX
+        - env: COMPILER=clang++ BUILD_TYPE=Debug
+          os: osx
+          osx_image: xcode11.2
+          compiler: clang
+          name: OSX Clang Debug
+
+        - env: COMPILER=clang++ BUILD_TYPE=Release
+          os: osx
+          osx_image: xcode11.2
+          compiler: clang
+          name: OSX Clang Release
+
+		# TODO add gcc from https://docs.travis-ci.com/user/languages/cpp/#gcc-on-macos
+
+        # Clang on Linux
+        - env: COMPILER=clang++-8 BUILD_TYPE=Debug
+          addons: &clang80
+            apt:
+                packages:
+                    - clang-8
+                    - g++-9
+                sources:
+                    - ubuntu-toolchain-r-test
+                    - llvm-toolchain-xenial-7
+          name: Linux Clang Debug
+
+        - env: COMPILER=clang++-8 BUILD_TYPE=Release
+          addons: *clang80
+          name: Linux Clang Release
+
+        # GCC on Linux
+        - env: COMPILER=g++-9 BUILD_TYPE=Debug
+          addons: &gcc9
+            apt:
+                packages:
+                    - g++-9
+                sources:
+                    - ubuntu-toolchain-r-test
+          name: Linux GCC Debug
+
+        - env: COMPILER=g++-9 BUILD_TYPE=Release
+          addons: *gcc9
+          name: Linux GCC Release
+
+before_install:
+    # Display available disk space
+    - df -h
+
+    # Display Travis OS name
+    - echo $TRAVIS_OS_NAME
+
+    # Display build type
+    - echo $BUILD_TYPE
+
+install:
+    # Set ${CXX} properly
+    - export CXX=${COMPILER}
+
+    # Display compiler version
+    - ${CXX} --version
+
+    # Get number of cores (or 2 by default if somehow none of these are available somehow)
+    - JOBS=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null || echo 2)
+    - echo $JOBS
+
+    # Recommanded build directory
+    - CMAKE_BUILD_DIR=build
+
+	# Install ccache on OSX
+	- |
+	  if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
+		  # This is OSX
+		  brew install ccache || brew upgrade cmake
+		  export PATH="/usr/local/opt/ccache/libexec:$PATH"
+	  fi
+
+	# Install required libraries
+	- mkdir travisLibs && cd travisLibs
+
+	# Install modern CMake
+	- CMAKE_VERSION=3.14.5
+    - |
+      if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
+          # This is Linux
+          CMAKE_URL="https://cmake.org/files/v${CMAKE_VERSION%.[0-9]}/cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz"
+          CMAKE_DIR=cmakeDownload
+          mkdir ${CMAKE_DIR} && travis_retry wget --no-check-certificate -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C ${CMAKE_DIR}
+          export PATH=${PWD}/${CMAKE_DIR}/bin:${PATH}
+      else
+          # This is OSX
+          brew install cmake || brew upgrade cmake
+      fi
+
+	# Display CMake version
+	- cmake --version
+
+	# Install modern SDL2
+	- SDL2_VERSION=2.0.10
+    - |
+      travis_retry curl -L https://www.libsdl.org/release/SDL2-${SDL2_VERSION}.tar.gz | tar xz
+      cd SDL2-${SDL2_VERSION}
+      ./configure
+      make -j ${JOBS}
+      sudo make install -j ${JOBS}
+	  cd ..
+
+	# Finished installing required libraries
+	- cd ..
+
+before_script:
+	# Make build directory and generate CMake build files
+	- mkdir -p ${CMAKE_BUILD_DIR} && cd ${CMAKE_BUILD_DIR}
+    - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DFIX_BUGS=ON -DWARNINGS=ON -DALL_WARNINGS=ON
+
+script:
+	# CMake build
+	- cmake --build . --config ${BUILD_TYPE} --parallel ${JOBS}
+
+	# Make build
+	- cd ..
+	- make -j ${JOBS} FIX_BUGS=1 RELEASE=1 WARNINGS=1 ALL_WARNINGS=1
+	- cd ${CMAKE_BUILD_DIR}
