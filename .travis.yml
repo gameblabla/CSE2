@@ -1,0 +1,143 @@
+# Optimize git clone
+git:
+    depth: 5
+
+# No need for sudo
+sudo: false
+
+# Bionic is the most recent version of Ubuntu I can get to work properly
+dist: bionic
+
+# Enable C++ language support
+language: cpp
+
+# Cache compiled object files with ccache
+cache: ccache
+
+osx_image: xcode11.2
+
+compiler:
+    - gcc
+    - clang
+
+os:
+    - linux
+    - osx
+
+addons:
+  apt:
+    sources:
+        - sourceline: 'deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-9 main'
+          key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
+        - sourceline: 'ppa:ubuntu-toolchain-r/test'
+    packages:
+        - cmake
+        - gcc-9
+        - g++-9
+        - clang-9
+        - libsdl2-dev
+        - libfreetype6-dev
+        - libfltk1.3-dev
+        - libglew-dev
+        - libxmp-dev
+  homebrew:
+    packages:
+        - cmake
+        - gcc@9
+        - llvm@9
+        - sdl2
+        - freetype
+        - fltk
+        - glew
+        - libxmp-lite
+    update: true
+
+env:
+    - BUILD_TYPE=Debug
+    - BUILD_TYPE=RelWithDebInfo
+
+before_install:
+    # Set URL for Discord send script
+    - DISCORD_SEND_SCRIPT_URL=https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
+    - DISCORD_SEND_SCRIPT_FILENAME=discordSendNotification.sh
+
+    # Display available disk space
+    - df -h
+
+    # Display Travis OS name
+    - echo $TRAVIS_OS_NAME
+
+    # Display build type
+    - echo $BUILD_TYPE
+
+    # The following Homebrew packages aren't linked by default, and need to be prepended to the path explicitly.
+    - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
+        export PATH="$(brew --prefix llvm)/bin:$PATH";
+      fi
+
+    # /usr/bin/gcc points to an older compiler on both Linux and macOS.
+    - if [ "$CXX" = "g++" ]; then export CXX="g++-9" CC="gcc-9"; fi
+
+    # /usr/bin/clang points to an older compiler on both Linux and macOS.
+    #
+    # Homebrew's llvm package doesn't ship a versioned clang++ binary, so the values
+    # below don't work on macOS. Fortunately, the path change above makes the
+    # default values (clang and clang++) resolve to the correct compiler on macOS.
+    - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+        if [ "$CXX" = "clang++" ]; then export CXX="clang++-9" CC="clang-9"; fi;
+      fi
+
+    # Display compilers/cmake name/version
+    - echo ${CC}
+    - echo ${CXX}
+    - ${CC} --version
+    - ${CXX} --version
+    - cmake --version
+
+install:
+    # Get number of cores (or 2 by default if somehow none of these are available somehow)
+    - JOBS=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null || echo 2)
+    - echo $JOBS
+
+    # Recommanded build directory
+    - CMAKE_BUILD_DIR=build
+
+    # Install ccache on OSX
+    - |
+      if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
+          # This is OSX
+          brew install ccache
+          export PATH="/usr/local/opt/ccache/libexec:$PATH"
+      fi
+
+    # Install required libraries
+    - mkdir travisLibs && cd travisLibs
+
+    # Finished installing required libraries
+    - cd ..
+
+before_script:
+    # Make build directory and generate CMake build files
+    - mkdir -p ${CMAKE_BUILD_DIR} && cd ${CMAKE_BUILD_DIR}
+    - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DFIX_BUGS=ON -DWARNINGS=ON -DALL_WARNINGS=ON
+
+script:
+    # CMake build
+    - cmake --build . --config ${BUILD_TYPE} --parallel ${JOBS}
+
+    # Make build
+    - cd ..
+    - make -j ${JOBS} FIX_BUGS=1 RELEASE=1 WARNINGS=1 ALL_WARNINGS=1
+    - cd ${CMAKE_BUILD_DIR}
+
+after_success:
+    # Send success notification to Discord through DISCORD_WEBHOOK_URL
+    - travis_retry wget ${DISCORD_SEND_SCRIPT_URL} -O ${DISCORD_SEND_SCRIPT_FILENAME}
+    - chmod +x ${DISCORD_SEND_SCRIPT_FILENAME}
+    - ./${DISCORD_SEND_SCRIPT_FILENAME} success $DISCORD_WEBHOOK_URL
+
+after_failure:
+    # Send failure notification to Discord through DISCORD_WEBHOOK_URL
+    - travis_retry wget ${DISCORD_SEND_SCRIPT_URL} -O ${DISCORD_SEND_SCRIPT_FILENAME}
+    - chmod +x ${DISCORD_SEND_SCRIPT_FILENAME}
+    - ./${DISCORD_SEND_SCRIPT_FILENAME} failure $DISCORD_WEBHOOK_URL
