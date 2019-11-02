@@ -566,7 +566,10 @@ BOOL OrgData::InitMusicData(const char *path)
 		ver = 2;
 
 	if(ver == 0)
+	{
+		fclose(fp);
 		return FALSE;
+	}
 
 	// 曲の情報を設定 (Set song information)
 	info.wait = File_ReadLE16(fp);
@@ -655,6 +658,8 @@ BOOL OrgData::InitMusicData(const char *path)
 			np++;
 		}
 	}
+
+	fclose(fp);
 
 	// データを有効に (Enable data)
 	for (j = 0; j < MAXMELODY; j++)
