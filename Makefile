@@ -49,7 +49,7 @@ ifeq ($(WARNINGS), 1)
 	CXXFLAGS += -Wall -Wextra -pedantic
 endif
 
-ifeq ($(ALL_WARNINGS), 1)
+ifeq ($(WARNINGS_ALL), 1)
 	ifneq ($(findstring clang,$(CXX)),)
 		# Use clang-specific flag -Weverything
 		CXXFLAGS += -Weverything
@@ -59,7 +59,7 @@ ifeq ($(ALL_WARNINGS), 1)
 	endif
 endif
 
-ifeq ($(FATAL_WARNINGS), 1)
+ifeq ($(WARNINGS_FATAL), 1)
 	CXXFLAGS += -Werror
 endif
 
