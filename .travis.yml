@@ -38,8 +38,8 @@ addons:
         - libsdl2-dev
         - libfreetype6-dev
         - libfltk1.3-dev
-        - libglew-dev
-        - libxmp-dev
+#        - libglew-dev # Needed by OpenGL renderer
+#        - libxmp-dev  # Needed by AUDIO_TRACKER in the enhanced branch
   homebrew:
     packages:
         - cmake
@@ -48,8 +48,8 @@ addons:
         - sdl2
         - freetype
         - fltk
-        - glew
-        - libxmp-lite
+#        - glew
+#        - libxmp-lite
     update: true
 
 env:
