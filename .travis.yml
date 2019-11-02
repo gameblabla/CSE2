@@ -119,7 +119,7 @@ install:
 before_script:
     # Make build directory and generate CMake build files
     - mkdir -p ${CMAKE_BUILD_DIR} && cd ${CMAKE_BUILD_DIR}
-    - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DFIX_BUGS=ON -DWARNINGS=ON -DALL_WARNINGS=ON
+    - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DFIX_BUGS=ON -DWARNINGS=ON -DWARNINGS_ALL=ON
 
 script:
     # CMake build
@@ -127,7 +127,7 @@ script:
 
     # Make build
     - cd ..
-    - make -j ${JOBS} FIX_BUGS=1 RELEASE=1 WARNINGS=1 ALL_WARNINGS=1
+    - make -j ${JOBS} FIX_BUGS=1 RELEASE=1 WARNINGS=1 WARNINGS_ALL=1
     - cd ${CMAKE_BUILD_DIR}
 
 after_success:
