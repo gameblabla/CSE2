@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/Clownacy/Cave-Story-Engine-2.svg?branch=enhanced)](https://travis-ci.com/Clownacy/Cave-Story-Engine-2)
+
 ## Table of Contents
 
 This repo has multiple branches:
