@@ -88,7 +88,7 @@ BOOL Flip_SystemTask(void)
 		if (timeNow >= timePrev + 100)
 			timePrev = timeNow;	// If the timer is freakishly out of sync, panic and reset it, instead of spamming frames for who-knows how long
 		else
-			timePrev += frame % 3;
+			timePrev += frameDelays[frame % 3];
 
 		++frame;
 	}
