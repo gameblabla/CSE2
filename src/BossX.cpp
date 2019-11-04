@@ -766,7 +766,7 @@ void ActBossChar_MonstX(void)
 			gBoss[1].act_no = 20;
 			gBoss[2].act_no = 20;
 			// Fallthrough
-		case 503:
+		case 503:	// Exactly identical to case 603
 			if (++npc->act_wait > 50)
 			{
 				if (npc->x > gMC.x)
@@ -803,7 +803,7 @@ void ActBossChar_MonstX(void)
 			gBoss[2].act_no = 40;
 			// Fallthrough
 
-		case 603:
+		case 603:	// Exactly identical to case 503
 			if (++npc->act_wait > 50)
 			{
 				if (npc->x > gMC.x)
