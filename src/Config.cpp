@@ -31,7 +31,7 @@ BOOL LoadConfigData(CONFIG *conf)
 	fclose(fp);
 
 	// Check if version is not correct, and return if it failed
-	if (fread_result != 1 || strcmp(conf->proof, config_magic))
+	if (fread_result != 1 || strcmp(conf->proof, config_magic) != 0)
 	{
 		memset(conf, 0, sizeof(CONFIG));
 		return FALSE;
