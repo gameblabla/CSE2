@@ -2352,7 +2352,7 @@ void ActBullet()
 					case 33:
 						ActBullet_SuperBom(&gBul[i], 3);
 						break;
-					case 34:
+					case 34:	// Identical to case 43
 						ActBullet_Nemesis(&gBul[i], 1);
 						break;
 					case 35:
@@ -2379,7 +2379,7 @@ void ActBullet()
 					case 42:
 						ActBullet_SpurTail(&gBul[i], 3);
 						break;
-					case 43:
+					case 43:	// Identical to case 34
 						ActBullet_Nemesis(&gBul[i], 1);
 						break;
 					case 44:
