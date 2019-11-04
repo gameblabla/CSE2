@@ -66,6 +66,7 @@ BULLET gBul[BULLET_MAX];
 
 void InitBullet()
 {
+	// Identical to ClearBullet
 	for (int i = 0; i < BULLET_MAX; i++)
 		gBul[i].cond = 0;
 }
@@ -110,6 +111,7 @@ void DeleteBullet(int code)
 
 void ClearBullet()
 {
+	// Identical to InitBullet
 	for (int i = 0; i < BULLET_MAX; i++)
 		gBul[i].cond = 0;
 }
