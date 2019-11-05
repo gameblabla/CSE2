@@ -68,7 +68,7 @@ BOOL LoadEvent(const char *path_event)
 	// Read "PXE" check
 	char code[4];
 	fread(code, 1, 4, fp);
-	if (memcmp(code, gPassPixEve, 3))
+	if (memcmp(code, gPassPixEve, 3) != 0)
 	{
 #ifdef FIX_BUGS
 		// The original game forgot to close the file here
