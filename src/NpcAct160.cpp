@@ -70,7 +70,7 @@ void ActNpc160(NPCHAR *npc)
 
 		case 3:
 			npc->damage = 20;
-			npc->damage = 0;	// Smart code
+			npc->damage = 0;	// Duplicate line
 
 			if (++npc->act_wait > 24)
 			{
