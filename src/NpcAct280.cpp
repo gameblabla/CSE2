@@ -747,11 +747,11 @@ void ActNpc284(NPCHAR *npc)
 						npc->act_no = 34;
 						break;
 
-					case 0:
+					case 0:	// Identical to case 2
 						npc->act_no = 32;
 						break;
 
-					case 2:
+					case 2:	// Identical to case 0
 						npc->act_no = 32;
 						break;
 				}
