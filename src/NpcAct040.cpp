@@ -1895,7 +1895,7 @@ void ActNpc058(NPCHAR *npc)
 				break;
 			}
 
-			if (npc->act_no)
+			if (npc->act_no)	// This is always true
 			{
 				if (npc->act_wait < 150)
 					++npc->act_wait;
