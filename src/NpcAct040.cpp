@@ -1122,7 +1122,7 @@ void ActNpc051(NPCHAR *npc)
 				npc->tgt_x = npc->x;
 				npc->tgt_y = npc->y;
 
-				if (npc->direct == 0)
+				if (npc->direct == 0)	// Completely redundant as both the conditions are the same
 					npc->ym = 0x400;
 				else
 					npc->ym = 0x400;
