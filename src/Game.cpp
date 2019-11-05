@@ -532,7 +532,7 @@ int ModeAction(HWND hWnd)
 			}
 		}
 
-		if (swPlay % 2 && g_GameFlags & 1)
+		if (swPlay % 2 && g_GameFlags & 1)	// The "swPlay % 2" part is always true
 		{
 			if (g_GameFlags & 2)
 				ActMyChar(TRUE);
@@ -635,7 +635,7 @@ int ModeAction(HWND hWnd)
 				RotationArmsRev();
 		}
 
-		if (swPlay % 2)
+		if (swPlay % 2)	// This is always true
 		{
 			switch (TextScriptProc())
 			{
