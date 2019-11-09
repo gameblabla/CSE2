@@ -1081,8 +1081,6 @@ void ActNpc088(NPCHAR *npc)
 		case 10:
 			if (++npc->act_wait > 100 && npc->act_wait % 6 == 1)
 			{
-				// The range of unsigned char is [0, 255] so these two values are implicitly truncated (Might be UB ?)
-				// TODO : Investigate on whether this is erroneous
 				if (npc->direct == 0)
 					deg = 0x88;
 				else
