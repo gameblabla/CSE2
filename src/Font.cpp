@@ -965,7 +965,7 @@ static CachedGlyph* GetGlyphCached(FontObject *font_object, unsigned long unicod
 
 	glyph = (CachedGlyph*)malloc(sizeof(CachedGlyph));
 
-	if (glyph)
+	if (glyph != NULL)
 	{
 		glyph->next = font_object->glyph_list_head;
 		font_object->glyph_list_head = glyph;
@@ -1055,34 +1055,43 @@ FontObject* LoadFontFromData(const unsigned char *data, size_t data_size, unsign
 {
 	FontObject *font_object = (FontObject*)malloc(sizeof(FontObject));
 
-	FT_Init_FreeType(&font_object->library);
-
+	if (font_object != NULL)
+	{
+		if (FT_Init_FreeType(&font_object->library) == 0)
+		{
 #ifndef DISABLE_FONT_ANTIALIASING
-	font_object->lcd_mode = Backend_SupportsSubpixelGlyphs() && FT_Library_SetLcdFilter(font_object->library, FT_LCD_FILTER_DEFAULT) != FT_Err_Unimplemented_Feature;
+			font_object->lcd_mode = Backend_SupportsSubpixelGlyphs() && FT_Library_SetLcdFilter(font_object->library, FT_LCD_FILTER_DEFAULT) != FT_Err_Unimplemented_Feature;
 #endif
 
-	font_object->data = (unsigned char*)malloc(data_size);
-	memcpy(font_object->data, data, data_size);
+			font_object->data = (unsigned char*)malloc(data_size);
 
-	FT_Error error = FT_New_Memory_Face(font_object->library, font_object->data, (FT_Long)data_size, 0, &font_object->face);
+			if (font_object->data != NULL)
+			{
+				memcpy(font_object->data, data, data_size);
 
-	if (error)
-	{
-		free(font_object->data);
-		FT_Done_FreeType(font_object->library);
+				if (FT_New_Memory_Face(font_object->library, font_object->data, (FT_Long)data_size, 0, &font_object->face) == 0)
+				{
+#ifdef JAPANESE
+					cell_width = 0;	// Cheap hack to make the font square
+#endif
+
+					FT_Set_Pixel_Sizes(font_object->face, cell_width, cell_height);
+
+					font_object->glyph_list_head = NULL;
+
+					return font_object;
+				}
+
+				free(font_object->data);
+			}
+
+			FT_Done_FreeType(font_object->library);
+		}
+
 		free(font_object);
-		return NULL;
 	}
 
-#ifdef JAPANESE
-	cell_width = 0;	// Cheap hack to make the font square
-#endif
-
-	FT_Set_Pixel_Sizes(font_object->face, cell_width, cell_height);
-
-	font_object->glyph_list_head = NULL;
-
-	return font_object;
+	return NULL;
 }
 
 FontObject* LoadFont(const char *font_filename, unsigned int cell_width, unsigned int cell_height)
