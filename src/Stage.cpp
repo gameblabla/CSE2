@@ -250,7 +250,7 @@ MusicID gMusicNo;
 
 void ChangeMusic(MusicID no)
 {
-	if (no && no == gMusicNo)
+	if (no != MUS_SILENCE && no == gMusicNo)
 		return;
 
 	//Stop and keep track of old song

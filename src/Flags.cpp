@@ -6,9 +6,9 @@
 
 // Macros for setting, un-setting and getting flags
 // Each flag is stored in a bit, so we can use the exact same macros we'd use for bits
-#define SET_FLAG(x, i) ((x)[(i) / 8] |= 1 << (i) % 8)
-#define UNSET_FLAG(x, i) ((x)[(i) / 8] &= ~(1 << (i) % 8))
-#define GET_FLAG(x, i) ((x)[(i) / 8] & (1 << (i) % 8))
+#define SET_FLAG(x, i) ((x)[(i) / 8] |= 1 << ((i) % 8))
+#define UNSET_FLAG(x, i) ((x)[(i) / 8] &= ~(1 << ((i) % 8)))
+#define GET_FLAG(x, i) ((x)[(i) / 8] & (1 << ((i) % 8)))
 
 unsigned char gFlagNPC[1000];
 unsigned char gSkipFlag[8];

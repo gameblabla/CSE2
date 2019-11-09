@@ -33,7 +33,7 @@
 #include "Stage.h"
 #include "Tags.h"
 
-#define IS_COMMAND(c1, c2, c3) gTS.data[gTS.p_read + 1] == c1 && gTS.data[gTS.p_read + 2] == c2 && gTS.data[gTS.p_read + 3] == c3
+#define IS_COMMAND(c1, c2, c3) (gTS.data[gTS.p_read + 1] == (c1) && gTS.data[gTS.p_read + 2] == (c2) && gTS.data[gTS.p_read + 3] == (c3))
 
 #define TSC_BUFFER_SIZE 0x5000
 

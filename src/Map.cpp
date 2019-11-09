@@ -42,7 +42,7 @@ BOOL LoadMapData2(const char *path_map)
 	char check[3];
 	fread(check, 1, 3, fp);
 
-	if (memcmp(check, code_pxma, 3))
+	if (memcmp(check, code_pxma, 3) != 0)
 	{
 		fclose(fp);
 		return FALSE;
