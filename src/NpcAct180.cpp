@@ -985,8 +985,10 @@ void ActNpc190(NPCHAR *npc)
 
 		case 10:
 			PlaySoundObject(72, 1);
+
 			for (i = 0; i < 8; i++)
-				SetNpChar(4, npc->x, npc->y + (Random(-8, 8) << 9), Random(-8, -2) << 9, Random(-3, 3) << 9, 0, 0, 0x100);
+				SetNpChar(4, npc->x, npc->y + (Random(-8, 8) * 0x200), Random(-8, -2) * 0x200, Random(-3, 3) * 0x200, 0, 0, 0x100);
+
 			npc->cond = 0;
 			break;
 
@@ -996,8 +998,10 @@ void ActNpc190(NPCHAR *npc)
 				npc->ani_wait = 0;
 				++npc->ani_no;
 			}
+
 			if (npc->ani_no > 1)
 				npc->ani_no = 0;
+
 			break;
 	}
 
@@ -1172,9 +1176,9 @@ void ActNpc192(NPCHAR *npc)
 		PlaySoundObject(34, 1);
 
 		if (npc->direct == 0)
-			SetCaret(npc->x + 5120, npc->y + 5120, 7, 2);
+			SetCaret(npc->x + (10 * 0x200), npc->y + (10 * 0x200), 7, 2);
 		else
-			SetCaret(npc->x - 5120, npc->y + 5120, 7, 0);
+			SetCaret(npc->x - (10 * 0x200), npc->y + (10 * 0x200), 7, 0);
 	}
 
 	RECT rcLeft[2] = {
