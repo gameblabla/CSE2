@@ -368,10 +368,10 @@ int MakePixToneObject(const PIXTONEPARAMETER *ptp, int ptp_num, int no)
 	{
 		if (!MakePixelWaveData(ptp_pointer, pcm_buffer))
 		{
-			if (pcm_buffer)
+			if (pcm_buffer != NULL)
 				free(pcm_buffer);
 
-			if (mixed_pcm_buffer)
+			if (mixed_pcm_buffer != NULL)
 				free(mixed_pcm_buffer);
 
 			return -1;
