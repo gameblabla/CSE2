@@ -680,7 +680,7 @@ void ActMyChar_Normal(BOOL bKey)
 	// Change position
 	if (gMC.xm <= resist && gMC.xm >= -resist)
 	{
-		// This case is completely empty. This is most likely the result of commented code or some other change (so this is most likely inaccurate to the original source)
+		// This case is completely empty. This is most likely the result of commented-out code or some other change (so this is most likely inaccurate to the original source code)
 	}
 	else
 	{
