@@ -954,7 +954,7 @@ static CachedGlyph* GetGlyphCached(FontObject *font_object, unsigned long unicod
 
 	glyph = (CachedGlyph*)malloc(sizeof(CachedGlyph));
 
-	if (glyph)
+	if (glyph != NULL)
 	{
 		glyph->next = font_object->glyph_list_head;
 		font_object->glyph_list_head = glyph;
@@ -1028,30 +1028,39 @@ FontObject* LoadFontFromData(const unsigned char *data, size_t data_size, unsign
 {
 	FontObject *font_object = (FontObject*)malloc(sizeof(FontObject));
 
-	FT_Init_FreeType(&font_object->library);
-
-	font_object->data = (unsigned char*)malloc(data_size);
-	memcpy(font_object->data, data, data_size);
-
-	FT_Error error = FT_New_Memory_Face(font_object->library, font_object->data, (FT_Long)data_size, 0, &font_object->face);
-
-	if (error)
+	if (font_object != NULL)
 	{
-		free(font_object->data);
-		FT_Done_FreeType(font_object->library);
-		free(font_object);
-		return NULL;
-	}
+		if (FT_Init_FreeType(&font_object->library) == 0)
+		{
+			font_object->data = (unsigned char*)malloc(data_size);
 
+			if (font_object->data != NULL)
+			{
+				memcpy(font_object->data, data, data_size);
+
+				if (FT_New_Memory_Face(font_object->library, font_object->data, (FT_Long)data_size, 0, &font_object->face) == 0)
+				{
 #ifdef JAPANESE
-	cell_width = 0;	// Cheap hack to make the font square
+					cell_width = 0;	// Cheap hack to make the font square
 #endif
 
-	FT_Set_Pixel_Sizes(font_object->face, cell_width, cell_height);
+					FT_Set_Pixel_Sizes(font_object->face, cell_width, cell_height);
 
-	font_object->glyph_list_head = NULL;
+					font_object->glyph_list_head = NULL;
 
-	return font_object;
+					return font_object;
+				}
+
+				free(font_object->data);
+			}
+
+			FT_Done_FreeType(font_object->library);
+		}
+
+		free(font_object);
+	}
+
+	return NULL;
 }
 
 FontObject* LoadFont(const char *font_filename, unsigned int cell_width, unsigned int cell_height)

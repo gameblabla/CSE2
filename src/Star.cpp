@@ -96,6 +96,7 @@ void ActStar()
 		if (star[i].ym < -0xA00)
 			star[i].ym = -0xA00;
 
+		// Duplicate of the past 8 lines of code
 		if (star[i].xm > 0xA00)
 			star[i].xm = 0xA00;
 		if (star[i].xm < -0xA00)

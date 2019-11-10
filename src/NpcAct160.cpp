@@ -69,8 +69,8 @@ void ActNpc160(NPCHAR *npc)
 			break;
 
 		case 3:
-			npc->damage = 20;
-			npc->damage = 0;	// Smart code
+			npc->damage = 20;	// Overriden by the following line
+			npc->damage = 0;
 
 			if (++npc->act_wait > 24)
 			{
@@ -426,10 +426,10 @@ void ActNpc165(NPCHAR *npc)
 	{
 		case 0:
 			npc->act_no = 1;
-			npc->y += 0x1400;
+			npc->y += 10 * 0x200;
 			// Fallthrough
 		case 1:
-			if (npc->direct == 2 && gMC.x > npc->x - 0x4000 && gMC.x < npc->x + 0x4000 && gMC.y > npc->y - 0x2000 && gMC.y < npc->y + 0x2000)
+			if (npc->direct == 2 && gMC.x > npc->x - (0x20 * 0x200) && gMC.x < npc->x + (0x20 * 0x200) && gMC.y > npc->y - (0x10 * 0x200) && gMC.y < npc->y + (0x10 * 0x200))
 				npc->ani_no = 1;
 			else
 				npc->ani_no = 0;

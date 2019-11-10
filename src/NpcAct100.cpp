@@ -672,7 +672,7 @@ void ActNpc110(NPCHAR *npc)
 			if (npc->act_wait > 18)
 			{
 				npc->act_no = 1;
-				npc->act_no = 1;
+				npc->act_no = 1;	// Duplicate line
 			}
 
 			break;

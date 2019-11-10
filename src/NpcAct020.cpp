@@ -306,7 +306,7 @@ void ActNpc025(NPCHAR *npc)
 
 			break;
 
-		case 2:
+		case 2:	// Identical to case 4
 			if (++npc->act_wait <= 0x40)
 			{
 				npc->y -= 0x200;
@@ -328,7 +328,7 @@ void ActNpc025(NPCHAR *npc)
 
 			break;
 
-		case 4:
+		case 4:	// Identical to case 2
 			if (++npc->act_wait <= 0x40)
 			{
 				npc->y -= 0x200;
