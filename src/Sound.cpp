@@ -304,10 +304,10 @@ int MakePixToneObject(const PIXTONEPARAMETER *ptp, int ptp_num, int no)
 	{
 		if (!MakePixelWaveData(ptp_pointer, pcm_buffer))
 		{
-			if (pcm_buffer)
+			if (pcm_buffer != NULL) // This is always true
 				free(pcm_buffer);
 
-			if (mixed_pcm_buffer)
+			if (mixed_pcm_buffer != NULL) // This is always true
 				free(mixed_pcm_buffer);
 
 			return -1;
@@ -326,7 +326,7 @@ int MakePixToneObject(const PIXTONEPARAMETER *ptp, int ptp_num, int no)
 		++ptp_pointer;
 	}
 
-	// Maybe this used to be something to prevent audio popping?
+	// This is self-assignment, so redundant. Maybe this used to be something to prevent audio popping ?
 	mixed_pcm_buffer[0] = mixed_pcm_buffer[0];
 	mixed_pcm_buffer[sample_count - 1] = mixed_pcm_buffer[sample_count - 1];
 

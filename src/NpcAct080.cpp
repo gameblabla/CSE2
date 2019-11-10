@@ -991,6 +991,7 @@ void ActNpc088(NPCHAR *npc)
 				npc->act_wait = 0;
 				npc->xm = 3 * npc->xm / 2;
 				npc->damage = 2;
+				break;
 			}
 			else
 			{
@@ -1081,11 +1082,11 @@ void ActNpc088(NPCHAR *npc)
 			if (++npc->act_wait > 100 && npc->act_wait % 6 == 1)
 			{
 				if (npc->direct == 0)
-					deg = -120;
+					deg = 0x88;
 				else
-					deg = -8;
+					deg = 0xF8;
 
-				deg += (unsigned char)Random(-16, 16);
+				deg += (unsigned char)Random(-0x10, 0x10);
 				ym = 3 * GetSin(deg);
 				xm = 3 * GetCos(deg);
 				SetNpChar(11, npc->x, npc->y + 0x800, xm, ym, 0, 0, 0x100);

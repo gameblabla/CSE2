@@ -507,7 +507,7 @@ void HitMyCharMap()
 				gMC.flag |= JudgeHitMyCharWater(x + offx[i], y + offy[i]);
 				break;
 
-			// Water and water blocks
+			// Water and water blocks (same as the previous case)
 			case 0x60:
 				gMC.flag |= JudgeHitMyCharWater(x + offx[i], y + offy[i]);
 				break;

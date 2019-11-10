@@ -1292,9 +1292,9 @@ void ActNpc268(NPCHAR *npc)
 			if (++npc->act_wait > 30 && npc->act_wait % 4 == 1)
 			{
 				if (npc->direct == 0)
-					deg = -120;
+					deg = 0x88;
 				else
-					deg = -8;
+					deg = 0xF8;
 
 				deg += (unsigned char)Random(-0x10, 0x10);
 				ym = 5 * GetSin(deg);

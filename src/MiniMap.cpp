@@ -64,7 +64,7 @@ void WriteMiniMapLine(int line)
 			a == 83 ||
 			a == 84 ||
 			a == 87 ||
-			a == 96 ||	// This is already listed above
+			a == 96 ||	// This is already listed above, so that part of the expression is always false
 			a == 112 ||
 			a == 115 ||
 			a == 116 ||

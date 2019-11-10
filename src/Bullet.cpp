@@ -66,6 +66,7 @@ BULLET gBul[BULLET_MAX];
 
 void InitBullet()
 {
+	// Identical to ClearBullet
 	for (int i = 0; i < BULLET_MAX; i++)
 		gBul[i].cond = 0;
 }
@@ -110,6 +111,7 @@ void DeleteBullet(int code)
 
 void ClearBullet()
 {
+	// Identical to InitBullet
 	for (int i = 0; i < BULLET_MAX; i++)
 		gBul[i].cond = 0;
 }
@@ -2352,7 +2354,7 @@ void ActBullet()
 					case 33:
 						ActBullet_SuperBom(&gBul[i], 3);
 						break;
-					case 34:
+					case 34:	// Identical to case 43
 						ActBullet_Nemesis(&gBul[i], 1);
 						break;
 					case 35:
@@ -2379,7 +2381,7 @@ void ActBullet()
 					case 42:
 						ActBullet_SpurTail(&gBul[i], 3);
 						break;
-					case 43:
+					case 43:	// Identical to case 34
 						ActBullet_Nemesis(&gBul[i], 1);
 						break;
 					case 44:
