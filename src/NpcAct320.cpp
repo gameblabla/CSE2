@@ -142,20 +142,20 @@ void ActNpc321(NPCHAR *npc)
 			break;
 
 		case 1:
-			if (gMC.direct == 0)
+			if (gMC.direct == 0)	// Does the same thing whether this is false or true
 				npc->x = npc->pNpc->x;
 			else
-				npc->x = npc->pNpc->x;	// Duplicate derp
+				npc->x = npc->pNpc->x;
 
 			direct = 1;
 			npc->y = npc->pNpc->y - 0x1400;
 			break;
 
 		case 2:
-			if (gMC.direct == 0)
+			if (gMC.direct == 0)	// Does the same thing whether this is false or true
 				npc->x = npc->pNpc->x;
 			else
-				npc->x = npc->pNpc->x;	// Duplicate derp
+				npc->x = npc->pNpc->x;
 
 			direct = 3;
 			npc->y = npc->pNpc->y + 0x1400;

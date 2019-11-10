@@ -520,7 +520,7 @@ void LoseNpChar(NPCHAR *npc, BOOL bVanish)
 	// Create value view
 	if (npc->bits & NPC_SHOW_DAMAGE)
 	{
-		if ((npc->bits & NPC_SHOW_DAMAGE) && npc->damage_view)
+		if ((npc->bits & NPC_SHOW_DAMAGE) && npc->damage_view)	// npc->bits & NPC_SHOW_DAMAGE is already verified at this point, so this is redundant
 			SetValueView(&npc->x, &npc->y, npc->damage_view);
 		if (bVanish)
 			VanishNpChar(npc);

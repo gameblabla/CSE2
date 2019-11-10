@@ -76,7 +76,7 @@ void StartFadeIn(signed char dir)
 		}
 	}
 
-	x = x;	// What
+	x = x;	// x is assigned to itself. Thanks, Pixel. (Most likely, the original code wasn't written the exact same way)
 }
 
 void ProcFade()

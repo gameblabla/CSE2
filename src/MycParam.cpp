@@ -135,7 +135,7 @@ void DamageMyChar(int damage)
 
 	// Lose a whimsical star
 	if (gMC.equip & 0x80 && gMC.star > 0)
-		gMC.star = (short)gMC.star - 1;	// Why the hell is it written this way?
+		gMC.star = (short)gMC.star - 1;	// For some reason, does a cast to short. Might not accurate to the original source (possibly, Pixel was just being careful about int size/conversion, or this is from some weird macro)
 
 	// Lose experience
 	if (gMC.equip & 4)

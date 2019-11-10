@@ -69,8 +69,8 @@ void ActNpc160(NPCHAR *npc)
 			break;
 
 		case 3:
-			npc->damage = 20;
-			npc->damage = 0;	// Smart code
+			npc->damage = 20;	// Overriden by the following line
+			npc->damage = 0;
 
 			if (++npc->act_wait > 24)
 			{
