@@ -5,7 +5,7 @@
 int gSin[0x100];
 short gTan[0x21];
 
-void InitTriangleTable()
+void InitTriangleTable(void)
 {
 	int i;
 	float a;
@@ -39,10 +39,13 @@ int GetCos(unsigned char deg)
 
 unsigned char GetArktan(int x, int y)
 {
+	unsigned char a;
+	short k;
+
 	x *= -1;
 	y *= -1;
-	unsigned char a = 0;
-	short k;
+
+	a = 0;
 
 	if (x > 0)
 	{
