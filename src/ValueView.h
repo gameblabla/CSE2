@@ -13,7 +13,7 @@ struct VALUEVIEW
   RECT rect;
 };
 
-void ClearValueView();
+void ClearValueView(void);
 void SetValueView(int *px, int *py, int value);
-void ActValueView();
+void ActValueView(void);
 void PutValueView(int flx, int fly);

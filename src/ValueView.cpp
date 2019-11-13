@@ -6,10 +6,11 @@
 #include "ValueView.h"
 
 #define VALUEVIEW_MAX 0x10
+
 VALUEVIEW gVV[VALUEVIEW_MAX];
 int gVVIndex;
 
-void ClearValueView()
+void ClearValueView(void)
 {
 	memset(gVV, 0, sizeof(gVV));
 	gVVIndex = 0;
@@ -26,7 +27,7 @@ void SetValueView(int *px, int *py, int value)
 	BOOL sw;
 	int i;
 
-	for (i = 0; i < VALUEVIEW_MAX; i++)
+	for (i = 0; i < VALUEVIEW_MAX; ++i)
 	{
 		if (gVV[i].flag && gVV[i].px == px)
 		{
@@ -41,8 +42,10 @@ void SetValueView(int *px, int *py, int value)
 	if (i == VALUEVIEW_MAX)
 	{
 		index = gVVIndex++;
+
 		if (gVVIndex == VALUEVIEW_MAX)
 			gVVIndex = 0;
+
 		gVV[index].count = 0;
 		gVV[index].offset_y = 0;
 		gVV[index].value = value;
@@ -50,7 +53,8 @@ void SetValueView(int *px, int *py, int value)
 	else
 	{
 		index = i;
-		gVV[i].count = 32;
+
+		gVV[index].count = 32;
 		gVV[index].value += value;
 		value = gVV[index].value;
 	}
@@ -116,9 +120,10 @@ void SetValueView(int *px, int *py, int value)
 	dig[2] = 100;
 	dig[3] = 1000;
 
-	for (i = 3; i >= 0; i--)
+	for (i = 3; i >= 0; --i)
 	{
 		fig[i] = 0;
+
 		while (v >= dig[i])
 		{
 			v -= dig[i];
@@ -141,7 +146,7 @@ void SetValueView(int *px, int *py, int value)
 
 	for (i = 3; i >= 0; i--)
 	{
-		if (sw == FALSE && i != 0 && fig[i] == 0)
+		if (!sw && i != 0 && fig[i] == 0)
 			continue;
 
 		sw = TRUE;
@@ -149,13 +154,15 @@ void SetValueView(int *px, int *py, int value)
 		if (minus)
 			fig[i] += 10;
 
-		Surface2Surface((3 - i) * 8 + 8, gVV[index].rect.top, &rect[fig[i]], 29, 26);
+		Surface2Surface(((3 - i) * 8) + 8, gVV[index].rect.top, &rect[fig[i]], SURFACE_ID_VALUE_VIEW, SURFACE_ID_TEXT_BOX);
 	}
 }
 
-void ActValueView()
+void ActValueView(void)
 {
-	for (int v = 0; v < VALUEVIEW_MAX; v++)
+	int v;
+
+	for (v = 0; v < VALUEVIEW_MAX; ++v)
 	{
 		if (gVV[v].flag == FALSE)
 			continue;
@@ -176,7 +183,7 @@ void PutValueView(int flx, int fly)
 	int v;
 	int offset_x;
 
-	for (v = 0; v < VALUEVIEW_MAX; v++)
+	for (v = 0; v < VALUEVIEW_MAX; ++v)
 	{
 		if (gVV[v].flag == FALSE)
 			continue;
@@ -185,8 +192,8 @@ void PutValueView(int flx, int fly)
 
 		PutBitmap3(
 			&grcGame,
-			(*gVV[v].px) / 0x200 - offset_x - flx / 0x200,
-			(*gVV[v].py) / 0x200 + gVV[v].offset_y / 0x200 - 4 - fly / 0x200,
+			(*gVV[v].px / 0x200) - offset_x - (flx / 0x200),
+			(*gVV[v].py / 0x200) + (gVV[v].offset_y / 0x200) - 4 - (fly / 0x200),
 			&gVV[v].rect,
 			SURFACE_ID_VALUE_VIEW);
 	}
