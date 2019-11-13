@@ -587,7 +587,7 @@ if(AUDIO_TRACKER)
 	else()
 		# Compile it ourselves
 		message(STATUS "Using local libxmp-lite")
-		add_subdirectory(external/libxmp-lite EXCLUDE_FROM_ALL)
+		add_subdirectory("external/libxmp-lite" EXCLUDE_FROM_ALL)
 		target_link_libraries(CSE2 libxmp-lite)
 	endif()
 endif()
