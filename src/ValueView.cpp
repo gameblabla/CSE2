@@ -59,7 +59,7 @@ void SetValueView(int *px, int *py, int value)
 		value = gVV[index].value;
 	}
 
-	//Get if negative or not
+	// Get if negative or not
 	if (value < 0)
 	{
 		value *= -1;
@@ -70,7 +70,7 @@ void SetValueView(int *px, int *py, int value)
 		minus = FALSE;
 	}
 
-	//Get width
+	// Get width
 	v = value;
 
 	if (value > 999)
@@ -82,7 +82,7 @@ void SetValueView(int *px, int *py, int value)
 	else
 		width = 16;
 
-	//Set properties
+	// Set properties
 	gVV[index].flag = TRUE;
 	gVV[index].px = px;
 	gVV[index].py = py;
@@ -114,7 +114,7 @@ void SetValueView(int *px, int *py, int value)
 		{72, 64, 80, 72},
 	};
 
-	//Get digits
+	// Get digits
 	dig[0] = 1;
 	dig[1] = 10;
 	dig[2] = 100;
@@ -136,7 +136,7 @@ void SetValueView(int *px, int *py, int value)
 	RECT rcPlus = {32, 48, 40, 56};
 	RECT rcMinus = {40, 48, 48, 56};
 
-	//Draw value
+	// Draw value
 	CortBox2(&gVV[index].rect, 0x000000, SURFACE_ID_VALUE_VIEW);
 
 	if (minus)

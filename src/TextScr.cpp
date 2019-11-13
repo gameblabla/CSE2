@@ -33,11 +33,11 @@
 #include "Stage.h"
 #include "Tags.h"
 
-#define IS_COMMAND(c1, c2, c3) (gTS.data[gTS.p_read + 1] == (c1) && gTS.data[gTS.p_read + 2] == (c2) && gTS.data[gTS.p_read + 3] == (c3))
-
 #define TSC_BUFFER_SIZE 0x5000
 
 #define TEXT_LEFT (WINDOW_WIDTH / 2 - 108)
+
+#define IS_COMMAND(c1, c2, c3) (gTS.data[gTS.p_read + 1] == (c1) && gTS.data[gTS.p_read + 2] == (c2) && gTS.data[gTS.p_read + 3] == (c3))
 
 TEXT_SCRIPT gTS;
 
@@ -50,25 +50,25 @@ RECT gRect_line = {0, 0, 216, 16};
 static unsigned long nod_color;
 #endif
 
-//Initialize and end tsc
+// Initialize and end tsc
 BOOL InitTextScript2()
 {
 #ifdef FIX_BUGS
 	nod_color = GetCortBoxColor(RGB(0xFF, 0xFF, 0xFE));
 #endif
 
-	//Clear flags
+	// Clear flags
 	gTS.mode = 0;
 	g_GameFlags &= ~0x04;
 
-	//Create line surfaces
+	// Create line surfaces
 	for (int i = 0; i < 4; i++)
 		MakeSurface_Generic(gRect_line.right, gRect_line.bottom, (SurfaceID)(i + SURFACE_ID_TEXT_LINE1), FALSE);
 
-	//Clear text
+	// Clear text
 	memset(text, 0, sizeof(text));
 
-	//Allocate script buffer
+	// Allocate script buffer
 	gTS.data = (char*)malloc(TSC_BUFFER_SIZE);
 
 	if (gTS.data == NULL)
@@ -79,16 +79,16 @@ BOOL InitTextScript2()
 
 void EndTextScript()
 {
-	//Free TSC buffer
+	// Free TSC buffer
 	free(gTS.data);
 
-	//Release buffers
+	// Release buffers
 	ReleaseSurface(SURFACE_ID_TEXT_BOX);
 	for (int i = 0; i < 4; i++)
 		ReleaseSurface((SurfaceID)(i + SURFACE_ID_TEXT_LINE1));
 }
 
-//Decrypt .tsc
+// Decrypt .tsc
 void EncryptionBinaryData2(unsigned char *pData, int size)
 {
 	int val1;
@@ -111,10 +111,10 @@ void EncryptionBinaryData2(unsigned char *pData, int size)
 	}
 }
 
-//Load generic .tsc
+// Load generic .tsc
 BOOL LoadTextScript2(const char *name)
 {
-	//Get path
+	// Get path
 	char path[260];
 	sprintf(path, "%s\\%s", gDataPath, name);
 
@@ -122,28 +122,28 @@ BOOL LoadTextScript2(const char *name)
 	if (gTS.size == -1)
 		return FALSE;
 
-	//Open file
+	// Open file
 	FILE *fp = fopen(path, "rb");
 	if (fp == NULL)
 		return FALSE;
 
-	//Read data
+	// Read data
 	fread(gTS.data, 1, gTS.size, fp);
 	gTS.data[gTS.size] = 0;
 	fclose(fp);
 
-	//Set path
+	// Set path
 	strcpy(gTS.path, name);
 
-	//Decrypt data
+	// Decrypt data
 	EncryptionBinaryData2((unsigned char*)gTS.data, gTS.size);
 	return TRUE;
 }
 
-//Load stage .tsc
+// Load stage .tsc
 BOOL LoadTextScript_Stage(const char *name)
 {
-	//Open Head.tsc
+	// Open Head.tsc
 	char path[MAX_PATH];
 	sprintf(path, "%s\\%s", gDataPath, "Head.tsc");
 
@@ -155,13 +155,13 @@ BOOL LoadTextScript_Stage(const char *name)
 	if (fp == NULL)
 		return FALSE;
 
-	//Read Head.tsc
+	// Read Head.tsc
 	fread(gTS.data, 1, head_size, fp);
 	EncryptionBinaryData2((unsigned char*)gTS.data, head_size);
 	gTS.data[head_size] = 0;
 	fclose(fp);
 
-	//Open stage's .tsc
+	// Open stage's .tsc
 	sprintf(path, "%s\\%s", gDataPath, name);
 
 	long body_size = GetFileSizeLong(path);
@@ -172,25 +172,25 @@ BOOL LoadTextScript_Stage(const char *name)
 	if (fp == NULL)
 		return FALSE;
 
-	//Read stage's tsc
+	// Read stage's tsc
 	fread(&gTS.data[head_size], 1, body_size, fp);
 	EncryptionBinaryData2((unsigned char*)&gTS.data[head_size], body_size);
 	gTS.data[head_size + body_size] = 0;
 	fclose(fp);
 
-	//Set parameters
+	// Set parameters
 	gTS.size = head_size + body_size;
 	strcpy(gTS.path, name);
 	return TRUE;
 }
 
-//Get current path
+// Get current path
 void GetTextScriptPath(char *path)
 {
 	strcpy(path, gTS.path);
 }
 
-//Get 4 digit number from TSC data
+// Get 4 digit number from TSC data
 int GetTextScriptNo(int a)
 {
 	int b = 0;
@@ -201,10 +201,10 @@ int GetTextScriptNo(int a)
 	return b;
 }
 
-//Start TSC event
+// Start TSC event
 BOOL StartTextScript(int no)
 {
-	//Reset state
+	// Reset state
 	gTS.mode = 1;
 	g_GameFlags |= 5;
 	gTS.line = 0;
@@ -224,7 +224,7 @@ BOOL StartTextScript(int no)
 	gTS.rcText.bottom = gTS.rcText.top + 48;
 
 	/* This is present in the Linux port, but not the Windows version (1.0.0.6, at least)
-	//Clear text lines
+	// Clear text lines
 	for (int i = 0; i < 4; i++)
 	{
 		gTS.ypos_line[i] = 16 * i;
@@ -232,18 +232,18 @@ BOOL StartTextScript(int no)
 		memset(text[i], 0, sizeof(text[0]));
 	}*/
 
-	//Find where event starts
+	// Find where event starts
 	gTS.p_read = 0;
 	while (1)
 	{
-		//Check if we are still in the proper range
+		// Check if we are still in the proper range
 		if (gTS.data[gTS.p_read] == '\0')
 			return FALSE;
 
-		//Check if we are at an event
+		// Check if we are at an event
 		if (gTS.data[gTS.p_read] == '#')
 		{
-			//Check if this is our event
+			// Check if this is our event
 			int event_no = GetTextScriptNo(++gTS.p_read);
 
 			if (no == event_no)
@@ -255,7 +255,7 @@ BOOL StartTextScript(int no)
 		++gTS.p_read;
 	}
 
-	//Advance until new-line
+	// Advance until new-line
 	while (gTS.data[gTS.p_read] != '\n')
 		++gTS.p_read;
 	++gTS.p_read;
@@ -265,7 +265,7 @@ BOOL StartTextScript(int no)
 
 BOOL JumpTextScript(int no)
 {
-	//Set state
+	// Set state
 	gTS.mode = 1;
 	g_GameFlags |= 4u;
 	gTS.line = 0;
@@ -273,7 +273,7 @@ BOOL JumpTextScript(int no)
 	gTS.wait = 4;
 	gTS.wait_beam = 0;
 
-	//Clear text lines
+	// Clear text lines
 	for (int i = 0; i < 4; i++)
 	{
 		gTS.ypos_line[i] = 16 * i;
@@ -281,18 +281,18 @@ BOOL JumpTextScript(int no)
 		memset(text[i], 0, sizeof(text[0]));
 	}
 
-	//Find where event starts
+	// Find where event starts
 	gTS.p_read = 0;
 	while(1)
 	{
-		//Check if we are still in the proper range
+		// Check if we are still in the proper range
 		if (gTS.data[gTS.p_read] == '\0')
 			return FALSE;
 
-		//Check if we are at an event
+		// Check if we are at an event
 		if (gTS.data[gTS.p_read] == '#')
 		{
-			//Check if this is our event
+			// Check if this is our event
 			int event_no = GetTextScriptNo(++gTS.p_read);
 
 			if (no == event_no)
@@ -304,7 +304,7 @@ BOOL JumpTextScript(int no)
 		++gTS.p_read;
 	}
 
-	//Advance until new-line
+	// Advance until new-line
 	while (gTS.data[gTS.p_read] != '\n')
 		++gTS.p_read;
 	++gTS.p_read;
@@ -312,17 +312,17 @@ BOOL JumpTextScript(int no)
 	return TRUE;
 }
 
-//End event
+// End event
 void StopTextScript()
 {
-	//End TSC and reset flags
+	// End TSC and reset flags
 	gTS.mode = 0;
 	g_GameFlags &= ~4;
 	g_GameFlags |= 3;
 	gTS.flags = 0;
 }
 
-//Prepare a new line
+// Prepare a new line
 void CheckNewLine()
 {
 	if (gTS.ypos_line[gTS.line % 4] == 48)
@@ -334,7 +334,7 @@ void CheckNewLine()
 	}
 }
 
-//Type a number into the text buffer
+// Type a number into the text buffer
 void SetNumberTextScript(int index)
 {
 	int a;
@@ -344,19 +344,19 @@ void SetNumberTextScript(int index)
 	int offset;
 	char str[5];
 
-	//Get digit table
+	// Get digit table
 	int table[3];
 	table[0] = 1000;
 	table[1] = 100;
 	table[2] = 10;
 
-	//Get number to print
+	// Get number to print
 	a = gNumberTextScript[index];
 
 	bZero = FALSE;
 	offset = 0;
 
-	//Trim leading zeroes
+	// Trim leading zeroes
 	for (i = 0; i < 3; i++)
 	{
 		if (a / table[i] || bZero != FALSE)
@@ -369,19 +369,19 @@ void SetNumberTextScript(int index)
 		}
 	}
 
-	//Set last digit of string, and add null terminator
+	// Set last digit of string, and add null terminator
 	str[offset] = (char)a + '0';
 	str[offset + 1] = 0;
 
-	//Append number to line
+	// Append number to line
 	PutText2(6 * gTS.p_write, 0, str, RGB(0xFF, 0xFF, 0xFE), (SurfaceID)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
 	strcat(text[gTS.line % 4], str);
 
-	//Play sound and reset blinking cursor
+	// Play sound and reset blinking cursor
 	PlaySoundObject(2, 1);
 	gTS.wait_beam = 0;
 
-	//Check if should move to next line (prevent a memory overflow, come on guys, this isn't a leftover of pixel trying to make text wrapping)
+	// Check if should move to next line (prevent a memory overflow, come on guys, this isn't a leftover of pixel trying to make text wrapping)
 	gTS.p_write += (unsigned int)strlen(str);
 
 	if (gTS.p_write >= 35)
@@ -392,7 +392,7 @@ void SetNumberTextScript(int index)
 	}
 }
 
-//Clear text lines
+// Clear text lines
 void ClearTextLine()
 {
 	gTS.line = 0;
@@ -407,7 +407,7 @@ void ClearTextLine()
 	}
 }
 
-//Draw textbox and whatever else
+// Draw textbox and whatever else
 void PutTextScript()
 {
 	RECT rcFace;
@@ -428,7 +428,7 @@ void PutTextScript()
 	if ((gTS.flags & 1) == 0)
 		return;
 
-	//Set textbox position
+	// Set textbox position
 	if (gTS.flags & 0x20)
 	{
 		gTS.rcText.top = 32;
@@ -440,7 +440,7 @@ void PutTextScript()
 		gTS.rcText.bottom = gTS.rcText.top + 48;
 	}
 
-	//Draw textbox
+	// Draw textbox
 	if (gTS.flags & 2)
 	{
 		RECT rcFrame1 = {0, 0, 244, 8};
@@ -453,7 +453,7 @@ void PutTextScript()
 		PutBitmap3(&grcFull, WINDOW_WIDTH / 2 - 122, 8 * i + gTS.rcText.top - 10, &rcFrame3, SURFACE_ID_TEXT_BOX);
 	}
 
-	//Draw face picture
+	// Draw face picture
 	rcFace.left = 48 * (gTS.face % 6);
 	rcFace.top = 48 * (gTS.face / 6);
 	rcFace.right = rcFace.left + 48;
@@ -471,7 +471,7 @@ void PutTextScript()
 	PutBitmap3(&gTS.rcText, gTS.face_x / 0x200, gTS.rcText.top - 3, &rcFace, SURFACE_ID_FACE);
 #endif
 
-	//Draw text
+	// Draw text
 	if (gTS.face)
 		text_offset = 56;
 	else
@@ -480,7 +480,7 @@ void PutTextScript()
 	for (i = 0; i < 4; i++)
 		PutBitmap3(&gTS.rcText, text_offset + TEXT_LEFT, gTS.offsetY + gTS.ypos_line[i] + gTS.rcText.top, &gRect_line, (SurfaceID)(i + SURFACE_ID_TEXT_LINE1));
 
-	//Draw NOD cursor
+	// Draw NOD cursor
 	if ((gTS.wait_beam++ % 20 > 12) && gTS.mode == 2)
 	{
 		rect.left = TEXT_LEFT + 6 * gTS.p_write + text_offset;
@@ -494,7 +494,7 @@ void PutTextScript()
 		// the way Pixel would do it (he only calls GetCortBoxColor
 		// once, during init functions, so our fix does it that way
 		// instead).
-		//CortBox(&rect, GetCortBoxColor(RGB(0xFF, 0xFF, 0xFE));
+		// CortBox(&rect, GetCortBoxColor(RGB(0xFF, 0xFF, 0xFE));
 #else
 		// This accidentally uses a BGR value directly, without
 		// running it though GetCortBoxColor first
@@ -502,7 +502,7 @@ void PutTextScript()
 #endif
 	}
 
-	//Draw GIT
+	// Draw GIT
 	SET_RECT(rcItemBox1, 0, 0, 72, 16)
 	SET_RECT(rcItemBox2, 0, 8, 72, 24)
 	SET_RECT(rcItemBox3, 240, 0, 244, 8)
@@ -539,7 +539,7 @@ void PutTextScript()
 		}
 	}
 
-	//Draw Yes / No selection
+	// Draw Yes / No selection
 	SET_RECT(rect_yesno, 152, 48, 244, 80)
 	SET_RECT(rect_cur, 112, 88, 128, 104)
 
@@ -556,7 +556,7 @@ void PutTextScript()
 	}
 }
 
-//Parse TSC
+// Parse TSC
 int TextScriptProc()
 {
 	BOOL bExit;
@@ -569,8 +569,8 @@ int TextScriptProc()
 
 	switch (gTS.mode)
 	{
-		case 1: //PARSE
-			//Type out (faster if ok or cancel are held)
+		case 1: // PARSE
+			// Type out (faster if ok or cancel are held)
 			++gTS.wait;
 
 			if (!(g_GameFlags & 2) && (gKeyCancel | gKeyOk) & gKey)
@@ -581,7 +581,7 @@ int TextScriptProc()
 
 			gTS.wait = 0;
 
-			//Parsing time
+			// Parsing time
 			bExit = FALSE;
 
 			while (bExit == FALSE)
@@ -1261,7 +1261,7 @@ int TextScriptProc()
 				{
 					if (gTS.data[gTS.p_read] == '\r')
 					{
-						//Go to new-line
+						// Go to new-line
 						gTS.p_read += 2;
 						gTS.p_write = 0;
 
@@ -1273,26 +1273,26 @@ int TextScriptProc()
 					}
 					else if (gTS.flags & 0x10)
 					{
-						//SAT/CAT/TUR printing
+						// SAT/CAT/TUR printing
 						x = gTS.p_read;
-						//Break if reaches command, or new-line
+						// Break if reaches command, or new-line
 						while (gTS.data[x] != '<' && gTS.data[x] != '\r')
 						{
-							//Skip if SHIFT-JIS
+							// Skip if SHIFT-JIS
 							if (gTS.data[x] & 0x80)
 								++x;
 
 							++x;
 						}
 
-						//Get text to copy
+						// Get text to copy
 						y = x - gTS.p_read;
 						memcpy(str, &gTS.data[gTS.p_read], y);
 						str[y] = 0;
 
 						gTS.p_write = x;
 
-						//Print text
+						// Print text
 						PutText2(0, 0, str, RGB(0xFF, 0xFF, 0xFE), (SurfaceID)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
 					#ifdef FIX_BUGS
 						strcpy(text[gTS.line % 4], str);
@@ -1300,7 +1300,7 @@ int TextScriptProc()
 						sprintf(text[gTS.line % 4], str);	// No point to using an sprintf here, and it makes Clang mad
 					#endif
 
-						//Check if should move to next line (prevent a memory overflow, come on guys, this isn't a leftover of pixel trying to make text wrapping)
+						// Check if should move to next line (prevent a memory overflow, come on guys, this isn't a leftover of pixel trying to make text wrapping)
 						gTS.p_read += y;
 
 						if (gTS.p_write >= 35)
@@ -1310,7 +1310,7 @@ int TextScriptProc()
 					}
 					else
 					{
-						//Get text to print
+						// Get text to print
 						c[0] = gTS.data[gTS.p_read];
 
 						if (c[0] & 0x80)
@@ -1323,7 +1323,7 @@ int TextScriptProc()
 							c[1] = '\0';
 						}
 
-						//Print text
+						// Print text
 						if (c[0] == '=')
 						{
 							Surface2Surface(6 * gTS.p_write, 2, &rcSymbol, (SurfaceID)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1), SURFACE_ID_TEXT_BOX);
@@ -1337,7 +1337,7 @@ int TextScriptProc()
 						PlaySoundObject(2, 1);
 						gTS.wait_beam = 0;
 
-						//Offset read and write positions
+						// Offset read and write positions
 						if (c[0] & 0x80)
 						{
 							gTS.p_read += 2;
@@ -1363,12 +1363,12 @@ int TextScriptProc()
 			}
 			break;
 
-		case 2: //NOD
+		case 2: // NOD
 			if ((gKeyCancel | gKeyOk) & gKeyTrg)
 				gTS.mode = 1;
 			break;
 
-		case 3: //NEW LINE
+		case 3: // NEW LINE
 			for (i = 0; i < 4; i++)
 			{
 				gTS.ypos_line[i] -= 4;
@@ -1381,7 +1381,7 @@ int TextScriptProc()
 			}
 			break;
 
-		case 4: //WAI
+		case 4: // WAI
 			if (gTS.wait_next == 9999)
 				break;
 
@@ -1395,28 +1395,28 @@ int TextScriptProc()
 			gTS.wait_beam = 0;
 			break;
 
-		case 5: //FAI/FAO
+		case 5: // FAI/FAO
 			if (GetFadeActive())
 				break;
 
 			gTS.mode = 1;
 			gTS.wait_beam = 0;
 			break;
-		case 7: //WAS
+		case 7: // WAS
 			if ((gMC.flag & 8) == 0)
 			break;
 
 			gTS.mode = 1;
 			gTS.wait_beam = 0;
 			break;
-		case 6: //YNJ
+		case 6: // YNJ
 			if (gTS.wait < 16)
 			{
 				gTS.wait++;
 			}
 			else
 			{
-				//Select option
+				// Select option
 				if (gKeyTrg & gKeyOk)
 				{
 					PlaySoundObject(18, 1);
@@ -1431,13 +1431,13 @@ int TextScriptProc()
 						gTS.wait_beam = 0;
 					}
 				}
-				//Yes
+				// Yes
 				else if (gKeyTrg & gKeyLeft)
 				{
 					gTS.select = 0;
 					PlaySoundObject(1, 1);
 				}
-				//No
+				// No
 				else if (gKeyTrg & gKeyRight)
 				{
 					gTS.select = 1;
