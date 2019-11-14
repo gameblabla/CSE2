@@ -42,7 +42,7 @@ void ActNpc320(NPCHAR *npc)
 		if (gMC.up)
 		{
 			npc->tgt_x = gMC.x;
-			npc->tgt_y = gMC.y - 0x1400;
+			npc->tgt_y = gMC.y - (10 * 0x200);
 			npc->ani_no = 1;
 		}
 		else
@@ -51,13 +51,13 @@ void ActNpc320(NPCHAR *npc)
 
 			if (gMC.direct == 0)
 			{
-				npc->tgt_x = gMC.x + 0xE00;
-				npc->tgt_y = gMC.y - 0x600;
+				npc->tgt_x = gMC.x + (7 * 0x200);
+				npc->tgt_y = gMC.y - (3 * 0x200);
 			}
 			else
 			{
-				npc->tgt_x = gMC.x - 0xE00;
-				npc->tgt_y = gMC.y - 0x600;
+				npc->tgt_x = gMC.x - (7 * 0x200);
+				npc->tgt_y = gMC.y - (3 * 0x200);
 			}
 		}
 	}
@@ -66,13 +66,13 @@ void ActNpc320(NPCHAR *npc)
 		if (gMC.up)
 		{
 			npc->tgt_x = gMC.x;
-			npc->tgt_y = gMC.y + 0x1000;
+			npc->tgt_y = gMC.y + (8 * 0x200);
 			npc->ani_no = 2;
 		}
 		else if (gMC.down)
 		{
 			npc->tgt_x = gMC.x;
-			npc->tgt_y = gMC.y - 0x1000;
+			npc->tgt_y = gMC.y - (8 * 0x200);
 			npc->ani_no = 1;
 		}
 		else
@@ -81,13 +81,13 @@ void ActNpc320(NPCHAR *npc)
 
 			if (gMC.direct == 0)
 			{
-				npc->tgt_x = gMC.x + 0xE00;
-				npc->tgt_y = gMC.y - 0x600;
+				npc->tgt_x = gMC.x + (7 * 0x200);
+				npc->tgt_y = gMC.y - (3 * 0x200);
 			}
 			else
 			{
-				npc->tgt_x = gMC.x - 0xE00;
-				npc->tgt_y = gMC.y - 0x600;
+				npc->tgt_x = gMC.x - (7 * 0x200);
+				npc->tgt_y = gMC.y - (3 * 0x200);
 			}
 		}
 	}
@@ -96,7 +96,7 @@ void ActNpc320(NPCHAR *npc)
 	npc->y += (npc->tgt_y - npc->y) / 2;
 
 	if (gMC.ani_no % 2)
-		npc->y -= 0x200;
+		npc->y -= 1 * 0x200;
 
 	if (gMC.direct == 0)
 		npc->rect = rcRight[npc->ani_no];
@@ -129,12 +129,12 @@ void ActNpc321(NPCHAR *npc)
 		case 0:
 			if (gMC.direct == 0)
 			{
-				npc->x = npc->pNpc->x + 0x1000;
+				npc->x = npc->pNpc->x + (8 * 0x200);
 				direct = 2;
 			}
 			else
 			{
-				npc->x = npc->pNpc->x - 0x1000;
+				npc->x = npc->pNpc->x - (8 * 0x200);
 				direct = 0;
 			}
 
@@ -148,7 +148,7 @@ void ActNpc321(NPCHAR *npc)
 				npc->x = npc->pNpc->x;
 
 			direct = 1;
-			npc->y = npc->pNpc->y - 0x1400;
+			npc->y = npc->pNpc->y - (10 * 0x200);
 			break;
 
 		case 2:
@@ -158,7 +158,7 @@ void ActNpc321(NPCHAR *npc)
 				npc->x = npc->pNpc->x;
 
 			direct = 3;
-			npc->y = npc->pNpc->y + 0x1400;
+			npc->y = npc->pNpc->y + (10 * 0x200);
 			break;
 	}
 
@@ -201,9 +201,9 @@ void ActNpc322(NPCHAR *npc)
 			npc->act_no = 1;
 
 			if (npc->direct == 0)
-				npc->y += 0x1000;
+				npc->y += 8 * 0x200;
 			else
-				npc->x += 0x1000;
+				npc->x += 8 * 0x200;
 			// Fallthrough
 		case 1:
 			if (npc->shock)
@@ -220,30 +220,30 @@ void ActNpc322(NPCHAR *npc)
 			switch (npc->act_wait)
 			{
 				case 0:
-					SetNpChar(207, npc->x + 0x800, npc->y, 0, 0, 0, 0, 0x180);
+					SetNpChar(207, npc->x + (4 * 0x200), npc->y, 0, 0, 0, NULL, 0x180);
 					break;
 
 				case 50:
-					SetNpChar(207, npc->x + 0x800, npc->y, 0, 0, 1, 0, 0x180);
+					SetNpChar(207, npc->x + (4 * 0x200), npc->y, 0, 0, 1, NULL, 0x180);
 					break;
 
 				case 100:
-					SetNpChar(207, npc->x + 0x800, npc->y, 0, 0, 2, 0, 0x180);
+					SetNpChar(207, npc->x + (4 * 0x200), npc->y, 0, 0, 2, NULL, 0x180);
 					break;
 
 				case 150:
-					SetNpChar(207, npc->x + 0x800, npc->y, 0, 0, 3, 0, 0x180);
+					SetNpChar(207, npc->x + (4 * 0x200), npc->y, 0, 0, 3, NULL, 0x180);
 					break;
 
 				case 200:
-					SetNpChar(207, npc->x + 0x800, npc->y, 0, 0, 4, 0, 0x180);
+					SetNpChar(207, npc->x + (4 * 0x200), npc->y, 0, 0, 4, NULL, 0x180);
 					break;
 
 				case 250:
-					npc->hit.back = 0x6000;
-					npc->hit.front = 0x6000;
-					npc->hit.top = 0x6000;
-					npc->hit.bottom = 0x6000;
+					npc->hit.back = 48 * 0x200;
+					npc->hit.front = 48 * 0x200;
+					npc->hit.top = 48 * 0x200;
+					npc->hit.bottom = 48 * 0x200;
 					npc->damage = 12;
 					PlaySoundObject(26, 1);
 					SetDestroyNpChar(npc->x, npc->y, 0x6000, 40);
@@ -251,13 +251,13 @@ void ActNpc322(NPCHAR *npc)
 
 					if (npc->direct == 0)
 					{
-						DeleteMapParts(npc->x / 0x200 / 0x10, (npc->y - 0x1000) / 0x200 / 0x10);
-						DeleteMapParts(npc->x / 0x200 / 0x10, (npc->y + 0x1000) / 0x200 / 0x10);
+						DeleteMapParts(npc->x / 0x200 / 0x10, (npc->y - (8 * 0x200)) / 0x200 / 0x10);
+						DeleteMapParts(npc->x / 0x200 / 0x10, (npc->y + (8 * 0x200)) / 0x200 / 0x10);
 					}
 					else
 					{
-						DeleteMapParts((npc->x - 0x1000) / 0x200 / 0x10, npc->y / 0x200 / 0x10);
-						DeleteMapParts((npc->x + 0x1000) / 0x200 / 0x10, npc->y / 0x200 / 0x10);
+						DeleteMapParts((npc->x - (8 * 0x200)) / 0x200 / 0x10, npc->y / 0x200 / 0x10);
+						DeleteMapParts((npc->x + (8 * 0x200)) / 0x200 / 0x10, npc->y / 0x200 / 0x10);
 					}
 
 					npc->cond |= 8;
@@ -327,22 +327,22 @@ void ActNpc323(NPCHAR *npc)
 				switch (npc->direct)
 				{
 					case 0:
-						if (npc->x <= gMC.x + 0x4000)
+						if (npc->x <= gMC.x + (32 * 0x200))
 							npc->act_no = 10;
 						break;
 
 					case 2:
-						if (npc->x >= gMC.x - 0x4000)
+						if (npc->x >= gMC.x - (32 * 0x200))
 							npc->act_no = 10;
 						break;
 
 					case 1:
-						if (npc->y <= gMC.y + 0x4000)
+						if (npc->y <= gMC.y + (32 * 0x200))
 							npc->act_no = 10;
 						break;
 
 					case 3:
-						if (npc->y >= gMC.y - 0x4000)
+						if (npc->y >= gMC.y - (32 * 0x200))
 							npc->act_no = 10;
 						break;
 				}
@@ -359,7 +359,7 @@ void ActNpc323(NPCHAR *npc)
 		npc->bits |= NPC_SHOOTABLE;
 		npc->bits &= ~NPC_IGNORE_SOLIDITY;
 		npc->damage = 5;
-		npc->view.top = 0x1000;
+		npc->view.top = 8 * 0x200;
 	}
 
 	npc->rect = rc[npc->ani_no];
@@ -376,7 +376,7 @@ void ActNpc324(NPCHAR *npc)
 			// Fallthrough
 		case 11:
 			if (++npc->act_wait % 50 == 1)
-				SetNpChar(323, npc->x, npc->y, 0, 0, npc->direct, 0, 0x100);
+				SetNpChar(323, npc->x, npc->y, 0, 0, npc->direct, NULL, 0x100);
 
 			if (npc->act_wait > 351)
 				npc->act_no = 0;
@@ -420,10 +420,10 @@ void ActNpc325(NPCHAR *npc)
 				npc->ani_wait = 0;
 				npc->ani_no = 3;
 				npc->damage = 10;
-				npc->view.front = 0x1000;
-				npc->view.top = 0x1800;
+				npc->view.front = 8 * 0x200;
+				npc->view.top = 12 * 0x200;
 				PlaySoundObject(101, 1);
-				SetDestroyNpChar(npc->x, npc->y + 0xA800, 0, 3);
+				SetDestroyNpChar(npc->x, npc->y + (84 * 0x200), 0, 3);
 			}
 
 			break;
@@ -447,15 +447,15 @@ void ActNpc325(NPCHAR *npc)
 	npc->rect = rc[npc->ani_no];
 }
 
-// Sue/Itoh becoming humans
+// Sue/Itoh becoming human
 void ActNpc326(NPCHAR *npc)
 {
 	switch (npc->act_no)
 	{
 		case 0:
 			npc->act_no = 1;
-			npc->y -= 0x1000;
-			npc->x += 0x2000;
+			npc->y -= 8 * 0x200;
+			npc->x += 16 * 0x200;
 			npc->ani_no = 0;
 			// Fallthrough
 		case 1:
@@ -465,23 +465,22 @@ void ActNpc326(NPCHAR *npc)
 				npc->act_wait = 0;
 				break;
 			}
+
+			if (npc->direct == 0)
+			{
+				if (npc->act_wait == 30)
+					npc->ani_no = 1;
+				if (npc->act_wait == 40)
+					npc->ani_no = 0;
+			}
 			else
 			{
-				if (npc->direct == 0)
-				{
-					if (npc->act_wait == 30)
-						npc->ani_no = 1;
-					if (npc->act_wait == 40)
-						npc->ani_no = 0;
-				}
-				else
-				{
-					if (npc->act_wait == 50)
-						npc->ani_no = 1;
-					if (npc->act_wait == 60)
-						npc->ani_no = 0;
-				}
+				if (npc->act_wait == 50)
+					npc->ani_no = 1;
+				if (npc->act_wait == 60)
+					npc->ani_no = 0;
 			}
+
 			break;
 
 		case 10:
@@ -497,13 +496,12 @@ void ActNpc326(NPCHAR *npc)
 
 				break;
 			}
+
+			if (npc->act_wait / 2 % 2)
+				npc->ani_no = 2;
 			else
-			{
-				if (npc->act_wait / 2 % 2)
-					npc->ani_no = 2;
-				else
-					npc->ani_no = 3;
-			}
+				npc->ani_no = 3;
+
 			break;
 
 		case 15:
@@ -529,9 +527,9 @@ void ActNpc326(NPCHAR *npc)
 				npc->ani_no = 6;
 
 				if (npc->direct == 0)
-					SetNpChar(327, npc->x, npc->y - 0x2000, 0, 0, 0, npc, 0x100);
+					SetNpChar(327, npc->x, npc->y - (16 * 0x200), 0, 0, 0, npc, 0x100);
 				else
-					SetNpChar(327, npc->x, npc->y - 0x1000, 0, 0, 0, npc, 0x100);
+					SetNpChar(327, npc->x, npc->y - (8 * 0x200), 0, 0, 0, npc, 0x100);
 
 				break;
 			}
@@ -604,7 +602,7 @@ void ActNpc327(NPCHAR *npc)
 	{
 		case 0:
 			if (npc->act_wait < 4)
-				npc->y -= 0x400;
+				npc->y -= 2 * 0x200;
 
 			if (npc->pNpc->ani_no == 7)
 			{
@@ -878,7 +876,7 @@ void ActNpc333(NPCHAR *npc)
 				npc->ani_no = 1;
 
 			if (npc->direct == 0 && npc->act_wait == 20)
-				SetNpChar(146, npc->tgt_x, npc->tgt_y, 0, 0, 0, 0, 0x100);
+				SetNpChar(146, npc->tgt_x, npc->tgt_y, 0, 0, 0, NULL, 0x100);
 
 			if (npc->act_wait > 40)
 				npc->cond = 0;
@@ -910,13 +908,13 @@ void ActNpc334(NPCHAR *npc)
 
 			if (npc->direct == 0)
 			{
-				npc->x += 0x1400;
-				npc->y -= 0x2400;
+				npc->x += 10 * 0x200;
+				npc->y -= 18 * 0x200;
 			}
 			else
 			{
-				npc->x = gMC.x - 0x1400;
-				npc->y = gMC.y - 0x400;
+				npc->x = gMC.x - (10 * 0x200);
+				npc->y = gMC.y - (2 * 0x200);
 			}
 			// Fallthrough
 		case 10:
@@ -1029,7 +1027,7 @@ void ActNpc337(NPCHAR *npc)
 	{
 		case 0:
 			npc->act_no = 1;
-			npc->y -= 0x1000;
+			npc->y -= 8 * 0x200;
 			// Fallthrough
 		case 1:
 			npc->xm = 0;
@@ -1076,8 +1074,8 @@ void ActNpc338(NPCHAR *npc)
 	{
 		case 0:
 			npc->act_no = 1;
-			npc->view.top = 0x1000;
-			npc->view.bottom = 0x1000;
+			npc->view.top = 8 * 0x200;
+			npc->view.bottom = 8 * 0x200;
 			npc->damage = 3;
 			npc->bits |= NPC_SHOOTABLE;
 			npc->tgt_y = npc->y;
@@ -1143,7 +1141,7 @@ void ActNpc339(NPCHAR *npc)
 			else
 			{
 				npc->act_no = 0;
-				SetNpChar(338, npc->x, npc->y + (Random(-0x10, 0x10) * 0x200), 0, 0, npc->direct, 0, 0x100);
+				SetNpChar(338, npc->x, npc->y + (Random(-0x10, 0x10) * 0x200), 0, 0, npc->direct, NULL, 0x100);
 			}
 
 			break;
