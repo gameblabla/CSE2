@@ -456,7 +456,7 @@ void PlayDramObject(unsigned char key, int mode, signed char track)
 	}
 }
 
-OrgData::OrgData()
+OrgData::OrgData(void)
 {
 	int i;
 
@@ -773,7 +773,7 @@ static BOOL nameless_flag;
 // タイマー精度を設定する。 (Set timer accuracy.)
 // この関数はアプリケーション初期化時に一度呼び出す。 (This function is called once when the application is initialized.)
 /*■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■*/
-BOOL InitMMTimer()
+BOOL InitMMTimer(void)
 {
 	TIMECAPS tc;
 	MMRESULT ret;
@@ -846,7 +846,7 @@ VOID CALLBACK TimerProc(UINT uTID,UINT uMsg,DWORD_PTR dwUser,DWORD_PTR dwParam1,
 // タイマーリソースを開放する。 (Release timer resources.)
 // アプリケーション終了時に一度呼び出す。 (Call once when the application ends.)
 /*■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■*/
-BOOL QuitMMTimer()
+BOOL QuitMMTimer(void)
 {
 	MMRESULT ret;
 
@@ -876,7 +876,7 @@ long play_p;
 NOTELIST *play_np[MAXTRACK];
 long now_leng[MAXMELODY];
 
-void OrgData::PlayData()
+void OrgData::PlayData(void)
 {
 	int i;
 
@@ -1029,7 +1029,7 @@ BOOL ChangeOrganyaVolume(signed int volume)
 	return TRUE;
 }
 
-void StopOrganyaMusic()
+void StopOrganyaMusic(void)
 {
 	if (lpDS == NULL)
 		return;
@@ -1048,12 +1048,12 @@ void StopOrganyaMusic()
 	Sleep(100);
 }
 
-void SetOrganyaFadeout()
+void SetOrganyaFadeout(void)
 {
 	bFadeout = TRUE;
 }
 
-void EndOrganya()
+void EndOrganya(void)
 {
 	if (lpDS == NULL)
 		return;
