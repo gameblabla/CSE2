@@ -1,4 +1,4 @@
 #pragma once
 
 void ResetSpurCharge(void);
-void ShootBullet();
+void ShootBullet(void);
