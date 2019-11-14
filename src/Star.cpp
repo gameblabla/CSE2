@@ -27,12 +27,12 @@ static struct
 	RECT rect;
 } star[3];
 
-void InitStar()
+void InitStar(void)
 {
-	//Clear stars
+	// Clear stars
 	memset(star, 0, sizeof(star));
 
-	//Position
+	// Position
 	star[0].x = gMC.x;
 	star[0].y = gMC.y;
 
@@ -42,7 +42,7 @@ void InitStar()
 	star[2].x = gMC.x;
 	star[2].y = gMC.y;
 
-	//Speed
+	// Speed
 	star[0].xm = 0x400;
 	star[0].ym = -0x200;
 
@@ -53,15 +53,17 @@ void InitStar()
 	star[2].ym = 0x200;
 }
 
-void ActStar()
+void ActStar(void)
 {
+	int i;
 	static int a;
-	a++;
+
+	++a;
 	a %= 3;
 
-	for (int i = 0; i < 3; i++)
+	for (i = 0; i < 3; ++i)
 	{
-		if (i)
+		if (i != 0)
 		{
 			if (star[i - 1].x < star[i].x)
 				star[i].xm -= 0x80;
