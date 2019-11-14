@@ -1,6 +1,6 @@
 #pragma once
 
-void ResetMyCharFlag();
-void HitMyCharMap();
-void HitMyCharNpChar();
-void HitMyCharBoss();
+void ResetMyCharFlag(void);
+void HitMyCharMap(void);
+void HitMyCharNpChar(void);
+void HitMyCharBoss(void);
