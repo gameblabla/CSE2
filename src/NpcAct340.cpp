@@ -28,9 +28,9 @@ void ActNpc340(NPCHAR *npc)
 			npc->cond = 0x80;
 			npc->exp = 1;
 			npc->direct = 0;
-			npc->y -= 0xC00;
+			npc->y -= 6 * 0x200;
 			npc->damage = 0;
-			SetNpChar(341, npc->x, npc->y - 0x2000, 0, 0, 0, npc, 0x100);
+			SetNpChar(341, npc->x, npc->y - (16 * 0x200), 0, 0, 0, npc, 0x100);
 			break;
 
 		case 10:
@@ -129,7 +129,7 @@ void ActNpc340(NPCHAR *npc)
 
 			if (++npc->act_wait > 20)
 			{
-				if (gMC.y < npc->y + 0x1800)
+				if (gMC.y < npc->y + (12 * 0x200))
 					npc->act_no = 220;
 				else
 					npc->act_no = 230;
@@ -181,7 +181,7 @@ void ActNpc340(NPCHAR *npc)
 				PlaySoundObject(26, 1);
 			}
 
-			if (npc->count1 < 4 && gMC.x > npc->x - 0x2000 && gMC.x < npc->x + 0x2000)
+			if (npc->count1 < 4 && gMC.x > npc->x - (16 * 0x200) && gMC.x < npc->x + (16 * 0x200))
 				npc->act_no = 201;
 
 			break;
@@ -219,9 +219,9 @@ void ActNpc340(NPCHAR *npc)
 			else
 				npc->ani_no = 9;
 
-			if (npc->y < 0x6000)
+			if (npc->y < (48 * 0x200))
 			{
-				npc->y = 0x6000;
+				npc->y = (48 * 0x200);
 				npc->ym = 0;
 				npc->act_no = 222;
 				npc->act_wait = 0;
@@ -230,16 +230,16 @@ void ActNpc340(NPCHAR *npc)
 				for (i = 0; i < 8; ++i)
 				{
 					x = npc->x + (Random(-0x10, 0x10) * 0x200);
-					SetNpChar(4, x, npc->y - 0x1400, 0, 0, 0, 0, 0x100);
+					SetNpChar(4, x, npc->y - (10 * 0x200), 0, 0, 0, NULL, 0x100);
 				}
 
-				SetNpChar(332, npc->x - 0x1800, npc->y - 0x1800, 0, 0, 0, 0, 0x100);
-				SetNpChar(332, npc->x + 0x1800, npc->y - 0x1800, 0, 0, 2, 0, 0x100);
+				SetNpChar(332, npc->x - (12 * 0x200), npc->y - (12 * 0x200), 0, 0, 0, NULL, 0x100);
+				SetNpChar(332, npc->x + (12 * 0x200), npc->y - (12 * 0x200), 0, 0, 2, NULL, 0x100);
 				SetQuake2(10);
 				PlaySoundObject(26, 1);
 			}
 
-			if (npc->count1 < 4 && gMC.y > npc->y - 0x2000 && gMC.y < npc->y + 0x2000)
+			if (npc->count1 < 4 && gMC.y > npc->y - (16 * 0x200) && gMC.y < npc->y + (16 * 0x200))
 				npc->act_no = 201;
 
 			break;
@@ -291,16 +291,16 @@ void ActNpc340(NPCHAR *npc)
 				for (i = 0; i < 8; ++i)
 				{
 					x = npc->x + (Random(-0x10, 0x10) * 0x200);
-					SetNpChar(4, x, npc->y + 0x1400, 0, 0, 0, 0, 0x100);
+					SetNpChar(4, x, npc->y + (10 * 0x200), 0, 0, 0, NULL, 0x100);
 				}
 
-				SetNpChar(332, npc->x - 0x1800, npc->y + 0x1800, 0, 0, 0, 0, 0x100);
-				SetNpChar(332, npc->x + 0x1800, npc->y + 0x1800, 0, 0, 2, 0, 0x100);
+				SetNpChar(332, npc->x - (12 * 0x200), npc->y + (12 * 0x200), 0, 0, 0, NULL, 0x100);
+				SetNpChar(332, npc->x + (12 * 0x200), npc->y + (12 * 0x200), 0, 0, 2, NULL, 0x100);
 				SetQuake2(10);
 				PlaySoundObject(26, 1);
 			}
 
-			if (npc->count1 < 4 && gMC.y > npc->y - 0x2000 && gMC.y < npc->y + 0x2000)
+			if (npc->count1 < 4 && gMC.y > npc->y - (16 * 0x200) && gMC.y < npc->y + (16 * 0x200))
 				npc->act_no = 201;
 
 			break;
@@ -362,17 +362,17 @@ void ActNpc340(NPCHAR *npc)
 			npc->act_wait = 0;
 			npc->ym = -0x600;
 
-			if (npc->x > 0x28000)
+			if (npc->x > 320 * 0x200)
 			{
 				npc->direct = 2;
 				npc->tgt_x = gMC.x;
-				npc->tgt_y = 0x16000;
+				npc->tgt_y = 176 * 0x200;
 			}
 			else
 			{
 				npc->direct = 0;
 				npc->tgt_x = gMC.x;
-				npc->tgt_y = 0x16000;
+				npc->tgt_y = 176 * 0x200;
 			}
 
 			npc->ani_wait = 0;
@@ -413,7 +413,7 @@ void ActNpc340(NPCHAR *npc)
 			if (npc->act_wait > 200 && npc->act_wait % 40 == 1)
 			{
 				npc->ani_wait = 0;
-				SetNpChar(333, gMC.x, 0x26000, 0, 0, 0, 0, 0x100);
+				SetNpChar(333, gMC.x, 304 * 0x200, 0, 0, 0, NULL, 0x100);
 			}
 
 			if (npc->act_wait > 480)
@@ -435,7 +435,7 @@ void ActNpc340(NPCHAR *npc)
 			if (npc->act_wait > 50 && npc->act_wait % 10 == 1)
 			{
 				x = ((4 * npc->act_wait - 200) / 10 + 2) * 0x200 * 0x10;
-				SetNpChar(333, x, 0x26000, 0, 0, 0, 0, 0x100);
+				SetNpChar(333, x, 304 * 0x200, 0, 0, 0, NULL, 0x100);
 			}
 
 			if (npc->act_wait > 140)
