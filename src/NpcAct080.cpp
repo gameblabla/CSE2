@@ -1,5 +1,7 @@
 #include "NpcAct.h"
 
+#include <stddef.h>
+
 #include "WindowsWrapper.h"
 
 #include "Back.h"
@@ -42,12 +44,12 @@ void ActNpc080(NPCHAR *npc)
 			npc->bits &= ~NPC_SHOOTABLE;
 			npc->act_no = 1;
 			npc->damage = 0;
-			npc->hit.front = 0x800;
+			npc->hit.front = 4 * 0x200;
 			// Fallthrough
 		case 1:
 			npc->ani_no = 0;
 
-			if (npc->x - 0x10000 < gMC.x && npc->x + 0x10000 > gMC.x && npc->y - 0x6000 < gMC.y && npc->y + 0x4000 > gMC.y)
+			if (npc->x - (128 * 0x200) < gMC.x && npc->x + (128 * 0x200) > gMC.x && npc->y - (48 * 0x200) < gMC.y && npc->y + (32 * 0x200) > gMC.y)
 			{
 				npc->ani_wait = 0;
 				npc->act_no = 2;
@@ -78,9 +80,9 @@ void ActNpc080(NPCHAR *npc)
 			if (npc->ani_no > 3)
 				npc->ani_no = 0;
 
-			if (npc->x - 0x2000 < gMC.x && npc->x + 0x2000 > gMC.x)
+			if (npc->x - (16 * 0x200) < gMC.x && npc->x + (16 * 0x200) > gMC.x)
 			{
-				npc->hit.front = 0x2400;
+				npc->hit.front = (18 * 0x200);
 				npc->act_wait = 0;
 				npc->act_no = 3;
 				npc->bits |= NPC_SHOOTABLE;
@@ -157,6 +159,7 @@ void ActNpc080(NPCHAR *npc)
 	if (npc->ym < -0x5FF)
 		npc->ym = -0x5FF;
 #else
+	// Caps npc->xm instead of npc->ym
 	if (npc->ym > 0x5FF)
 		npc->xm = 0x5FF;
 	if (npc->ym < -0x5FF)
@@ -207,24 +210,22 @@ void ActNpc081(NPCHAR *npc)
 				npc->act_no = 2;
 				npc->act_wait = 0;
 				npc->ani_no = 1;
+				break;
 			}
-			else
+
+			if (Random(0, 150) == 1)
 			{
-				if (Random(0, 150) == 1)
-				{
-					if (npc->direct == 0)
-						npc->direct = 2;
-					else
-						npc->direct = 0;
-				}
+				if (npc->direct == 0)
+					npc->direct = 2;
+				else
+					npc->direct = 0;
+			}
 
-				if (Random(0, 150) == 1)
-				{
-					npc->act_no = 3;
-					npc->act_wait = 50;
-					npc->ani_no = 0;
-				}
-
+			if (Random(0, 150) == 1)
+			{
+				npc->act_no = 3;
+				npc->act_wait = 50;
+				npc->ani_no = 0;
 				break;
 			}
 
@@ -353,7 +354,7 @@ void ActNpc082(NPCHAR *npc)
 			if (++npc->act_wait == 30)
 			{
 				PlaySoundObject(21, 1);
-				SetNpChar(66, npc->x, npc->y - 0x2000, 0, 0, 0, npc, 0);
+				SetNpChar(66, npc->x, npc->y - (16 * 0x200), 0, 0, 0, npc, 0);
 			}
 
 			if (npc->act_wait == 50)
@@ -370,7 +371,7 @@ void ActNpc082(NPCHAR *npc)
 		case 21:
 			npc->ym -= 0x20;
 
-			if (npc->y < -0x1000)
+			if (npc->y < -8 * 0x200)
 				npc->cond = 0;
 
 			break;
@@ -440,7 +441,7 @@ void ActNpc082(NPCHAR *npc)
 				case 30:
 				case 40:
 				case 50:
-					SetNpChar(11, npc->x + 0x1000, npc->y - 0x1000, 0x600, Random(-0x200, 0), 0, 0, 0x100);
+					SetNpChar(11, npc->x + (8 * 0x200), npc->y - (8 * 0x200), 0x600, Random(-0x200, 0), 0, NULL, 0x100);
 					PlaySoundObject(33, 1);
 					break;
 			}
@@ -484,7 +485,7 @@ void ActNpc082(NPCHAR *npc)
 
 	if (npc->act_no == 11)
 	{
-		if (npc->ani_wait)
+		if (npc->ani_wait != 0)
 		{
 			--npc->ani_wait;
 			npc->ani_no = 1;
@@ -500,7 +501,7 @@ void ActNpc082(NPCHAR *npc)
 
 	if (npc->act_no == 14)
 	{
-		if (npc->ani_wait)
+		if (npc->ani_wait != 0)
 		{
 			--npc->ani_wait;
 			npc->ani_no = 3;
@@ -688,7 +689,7 @@ void ActNpc085(NPCHAR *npc)
 		case 0:
 			npc->ani_no = 0;
 
-			if (npc->x - 0x1000 < gMC.x && npc->x + 0x1000 > gMC.x && npc->y - 0x2000 < gMC.y && npc->y + 0x1000 > gMC.y)
+			if (npc->x - (8 * 0x200) < gMC.x && npc->x + (8 * 0x200) > gMC.x && npc->y - (16 * 0x200) < gMC.y && npc->y + (8 * 0x200) > gMC.y)
 			{
 				PlaySoundObject(43, 1);
 				npc->act_no = 1;
@@ -747,11 +748,11 @@ void ActNpc086(NPCHAR *npc)
 
 		npc->xm -= 8;
 
-		if (npc->x < 0xA000)
+		if (npc->x < 80 * 0x200)
 			npc->cond = 0;
 
-		if (npc->x < -0x600)
-			npc->x = -0x600;
+		if (npc->x < -3 * 0x200)
+			npc->x = -3 * 0x200;
 
 		if (npc->flag & 1)
 			npc->xm = 0x100;
@@ -828,11 +829,11 @@ void ActNpc087(NPCHAR *npc)
 
 		npc->xm -= 8;
 
-		if (npc->x < 0xA000)
+		if (npc->x < 80 * 0x200)
 			npc->cond = 0;
 
-		if (npc->x < -0x600)
-			npc->x = -0x600;
+		if (npc->x < -3 * 0x200)
+			npc->x = -3 * 0x200;
 
 		if (npc->flag & 1)
 			npc->xm = 0x100;
@@ -941,6 +942,7 @@ void ActNpc088(NPCHAR *npc)
 			if (++npc->count1 < 3 || npc->life > 150)
 			{
 				npc->count2 = 0;
+
 				if (gMC.x < npc->x)
 					npc->direct = 0;
 				else
@@ -989,7 +991,7 @@ void ActNpc088(NPCHAR *npc)
 				npc->ym = -0x400;
 				npc->act_no = 7;
 				npc->act_wait = 0;
-				npc->xm = 3 * npc->xm / 2;
+				npc->xm = (npc->xm * 3) / 2;
 				npc->damage = 2;
 				break;
 			}
@@ -997,12 +999,12 @@ void ActNpc088(NPCHAR *npc)
 			{
 				if (npc->direct == 0)
 				{
-					if (npc->x - 0x3000 < gMC.x)
+					if (npc->x - (24 * 0x200) < gMC.x)
 						npc->act_no = 4;
 				}
 				else
 				{
-					if (npc->x + 0x3000 > gMC.x)
+					if (npc->x + (24 * 0x200) > gMC.x)
 						npc->act_no = 4;
 				}
 			}
@@ -1023,7 +1025,7 @@ void ActNpc088(NPCHAR *npc)
 				npc->ani_no = 7;
 				PlaySoundObject(70, 1);
 				npc->damage = 5;
-				npc->hit.front = 0x3000;
+				npc->hit.front = 24 * 0x200;
 				npc->hit.top = 1;
 			}
 
@@ -1035,8 +1037,8 @@ void ActNpc088(NPCHAR *npc)
 				npc->act_no = 0;
 				npc->ani_no = 0;
 				npc->damage = 0;
-				npc->hit.front = 0x1000;
-				npc->hit.top = 0x2000;
+				npc->hit.front = 8 * 0x200;
+				npc->hit.top = 16 * 0x200;
 			}
 
 			break;
@@ -1051,7 +1053,7 @@ void ActNpc088(NPCHAR *npc)
 				npc->damage = 0;
 
 				for (i = 0; i < 4; ++i)
-					SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+					SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, NULL, 0x100);
 			}
 
 			break;
@@ -1087,9 +1089,9 @@ void ActNpc088(NPCHAR *npc)
 					deg = 0xF8;
 
 				deg += (unsigned char)Random(-0x10, 0x10);
-				ym = 3 * GetSin(deg);
-				xm = 3 * GetCos(deg);
-				SetNpChar(11, npc->x, npc->y + 0x800, xm, ym, 0, 0, 0x100);
+				ym = GetSin(deg) * 3;
+				xm = GetCos(deg) * 3;
+				SetNpChar(11, npc->x, npc->y + (4 * 0x200), xm, ym, 0, NULL, 0x100);
 
 				PlaySoundObject(12, 1);
 			}
@@ -1152,7 +1154,7 @@ void ActNpc089(NPCHAR *npc)
 				npc->direct = 2;
 
 			for (i = 0; i < 8; ++i)
-				SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+				SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, NULL, 0x100);
 
 			npc->act_no = 1;
 			// Fallthrough
@@ -1164,7 +1166,7 @@ void ActNpc089(NPCHAR *npc)
 			}
 
 			if (npc->act_wait % 5 == 0)
-				SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+				SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, NULL, 0x100);
 
 			if (npc->direct == 0)
 				npc->rect = rcLeft[0];
@@ -1180,16 +1182,16 @@ void ActNpc089(NPCHAR *npc)
 			if (++npc->act_wait / 2 % 2 && npc->act_wait < 100)
 			{
 				npc->ani_no = 0;
-				npc->view.back = 0x2800;
-				npc->view.front = 0x2800;
-				npc->view.top = 0x2800;
+				npc->view.back = 20 * 0x200;
+				npc->view.front = 20 * 0x200;
+				npc->view.top = 20 * 0x200;
 			}
 			else
 			{
 				npc->ani_no = 1;
-				npc->view.back = 0x1800;
-				npc->view.front = 0x1800;
-				npc->view.top = 0x1000;
+				npc->view.back = 12 * 0x200;
+				npc->view.front = 12 * 0x200;
+				npc->view.top = 8 * 0x200;
 			}
 
 			if (npc->act_wait > 150)
@@ -1200,7 +1202,7 @@ void ActNpc089(NPCHAR *npc)
 			}
 
 			if (npc->act_wait % 9 == 0)
-				SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+				SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, NULL, 0x100);
 
 			if (npc->direct == 0)
 				npc->rect = rcLeft[npc->ani_no];
@@ -1251,7 +1253,7 @@ void ActNpc091(NPCHAR *npc)
 	if (npc->act_no == 0)
 	{
 		++npc->act_no;
-		npc->y += 0x10 * 0x200;
+		npc->y += 16 * 0x200;
 	}
 
 	npc->rect = rect;
@@ -1269,8 +1271,8 @@ void ActNpc092(NPCHAR *npc)
 	switch (npc->act_no)
 	{
 		case 0:
-			npc->x -= 0x800;
-			npc->y += 0x2000;
+			npc->x -= 4 * 0x200;
+			npc->y += 16 * 0x200;
 			npc->act_no = 1;
 			npc->ani_no = 0;
 			npc->ani_wait = 0;
@@ -1362,7 +1364,7 @@ void ActNpc093(NPCHAR *npc)
 				npc->ani_no = 1;
 			}
 
-			if (npc->x - 0x4000 < gMC.x && npc->x + 0x4000 > gMC.x && npc->y - 0x4000 < gMC.y && npc->y + 0x2000 > gMC.y)
+			if (npc->x - (32 * 0x200) < gMC.x && npc->x + (32 * 0x200) > gMC.x && npc->y - (32 * 0x200) < gMC.y && npc->y + (16 * 0x200) > gMC.y)
 			{
 				if (npc->x > gMC.x)
 					npc->direct = 0;
@@ -1397,9 +1399,9 @@ void ActNpc093(NPCHAR *npc)
 				npc->ani_no = 2;
 
 			if (npc->direct == 0)
-				npc->x -= 0x200;
+				npc->x -= 1 * 0x200;
 			else
-				npc->x += 0x200;
+				npc->x += 1 * 0x200;
 
 			break;
 
@@ -1529,7 +1531,7 @@ void ActNpc094(NPCHAR *npc)
 			npc->direct = 0;
 		}
 
-		if (npc->count1)
+		if (npc->count1 != 0)
 		{
 			--npc->count1;
 
@@ -1735,13 +1737,13 @@ void ActNpc096(NPCHAR *npc)
 			if (npc->ani_no > 2)
 				npc->ani_no = 0;
 
-			if (gMC.x > npc->x - (WINDOW_WIDTH * 0x200) && gMC.x < npc->x + (WINDOW_WIDTH * 0x200) && gMC.y > npc->y - (WINDOW_HEIGHT * 0x200) && gMC.y < npc->y + (WINDOW_HEIGHT * 0x200))
+			if (gMC.x > npc->x - (((WINDOW_WIDTH / 2) + 160) * 0x200) && gMC.x < npc->x + (((WINDOW_WIDTH / 2) + 160) * 0x200) && gMC.y > npc->y - (((WINDOW_HEIGHT / 2) + 120) * 0x200) && gMC.y < npc->y + (((WINDOW_HEIGHT / 2) + 120) * 0x200))
 			{
 				if (Random(0, 5) == 1)
-					SetNpChar(199, npc->x, npc->y + (Random(-8, 8) * 0x200), 0, 0, 0, 0, 0x100);
+					SetNpChar(199, npc->x, npc->y + (Random(-8, 8) * 0x200), 0, 0, 0, NULL, 0x100);
 			}
 
-			if (gMC.y < npc->y + 0x1000 && gMC.y > npc->y - 0x1000 && gMC.x < npc->x && gMC.x > npc->x - 0xC000)
+			if (gMC.y < npc->y + (8 * 0x200) && gMC.y > npc->y - (8 * 0x200) && gMC.x < npc->x && gMC.x > npc->x - (96 * 0x200))
 			{
 				gMC.xm -= 0x88;
 				gMC.cond |= 0x20;
@@ -1785,13 +1787,13 @@ void ActNpc097(NPCHAR *npc)
 			if (npc->ani_no > 2)
 				npc->ani_no = 0;
 
-			if (gMC.x > npc->x - (WINDOW_WIDTH * 0x200) && gMC.x < npc->x + (WINDOW_WIDTH * 0x200) && gMC.y > npc->y - (WINDOW_HEIGHT * 0x200) && gMC.y < npc->y + (WINDOW_HEIGHT * 0x200))
+			if (gMC.x > npc->x - (((WINDOW_WIDTH / 2) + 160) * 0x200) && gMC.x < npc->x + (((WINDOW_WIDTH / 2) + 160) * 0x200) && gMC.y > npc->y - (((WINDOW_HEIGHT / 2) + 120) * 0x200) && gMC.y < npc->y + (((WINDOW_HEIGHT / 2) + 120) * 0x200))
 			{
 				if (Random(0, 5) == 1)
-					SetNpChar(199, npc->x + (Random(-8, 8) * 0x200), npc->y, 0, 0, 1, 0, 0x100);
+					SetNpChar(199, npc->x + (Random(-8, 8) * 0x200), npc->y, 0, 0, 1, NULL, 0x100);
 			}
 
-			if (gMC.x < npc->x + 0x1000 && gMC.x > npc->x - 0x1000 && gMC.y < npc->y && gMC.y > npc->y - 0xC000)
+			if (gMC.x < npc->x + (8 * 0x200) && gMC.x > npc->x - (8 * 0x200) && gMC.y < npc->y && gMC.y > npc->y - (96 * 0x200))
 				gMC.ym -= 0x88;
 
 			break;
@@ -1832,13 +1834,13 @@ void ActNpc098(NPCHAR *npc)
 			if (npc->ani_no > 2)
 				npc->ani_no = 0;
 
-			if (gMC.x > npc->x - (WINDOW_WIDTH * 0x200) && gMC.x < npc->x + (WINDOW_WIDTH * 0x200) && gMC.y > npc->y - (WINDOW_HEIGHT * 0x200) && gMC.y < npc->y + (WINDOW_HEIGHT * 0x200))
+			if (gMC.x > npc->x - (((WINDOW_WIDTH / 2) + 160) * 0x200) && gMC.x < npc->x + (((WINDOW_WIDTH / 2) + 160) * 0x200) && gMC.y > npc->y - (((WINDOW_HEIGHT / 2) + 120) * 0x200) && gMC.y < npc->y + (((WINDOW_HEIGHT / 2) + 120) * 0x200))
 			{
 				if (Random(0, 5) == 1)
-					SetNpChar(199, npc->x, npc->y + (Random(-8, 8) * 0x200), 0, 0, 2, 0, 0x100);
+					SetNpChar(199, npc->x, npc->y + (Random(-8, 8) * 0x200), 0, 0, 2, NULL, 0x100);
 			}
 
-			if (gMC.y < npc->y + 0x1000 && gMC.y > npc->y - 0x1000 && gMC.x < npc->x + 0xC000 && gMC.x > npc->x)
+			if (gMC.y < npc->y + (8 * 0x200) && gMC.y > npc->y - (8 * 0x200) && gMC.x < npc->x + (96 * 0x200) && gMC.x > npc->x)
 			{
 				gMC.xm += 0x88;
 				gMC.cond |= 0x20;
@@ -1882,13 +1884,13 @@ void ActNpc099(NPCHAR *npc)
 			if (npc->ani_no > 2)
 				npc->ani_no = 0;
 
-			if (gMC.x > npc->x - (WINDOW_WIDTH * 0x200) && gMC.x < npc->x + (WINDOW_WIDTH * 0x200) && gMC.y > npc->y - (WINDOW_HEIGHT * 0x200) && gMC.y < npc->y + (WINDOW_HEIGHT * 0x200))
+			if (gMC.x > npc->x - (((WINDOW_WIDTH / 2) + 160) * 0x200) && gMC.x < npc->x + (((WINDOW_WIDTH / 2) + 160) * 0x200) && gMC.y > npc->y - (((WINDOW_HEIGHT / 2) + 120) * 0x200) && gMC.y < npc->y + (((WINDOW_HEIGHT / 2) + 120) * 0x200))
 			{
 				if (Random(0, 5) == 1)
-					SetNpChar(199, npc->x + (Random(-8, 8) * 0x200), npc->y, 0, 0, 3, 0, 0x100);
+					SetNpChar(199, npc->x + (Random(-8, 8) * 0x200), npc->y, 0, 0, 3, NULL, 0x100);
 			}
 
-			if (gMC.x < npc->x + 0x1000 && gMC.x > npc->x - 0x1000 && gMC.y < npc->y + 0xC000 && gMC.y > npc->y)
+			if (gMC.x < npc->x + (8 * 0x200) && gMC.x > npc->x - (8 * 0x200) && gMC.y < npc->y + (96 * 0x200) && gMC.y > npc->y)
 				gMC.ym += 0x88;
 
 			break;
