@@ -119,6 +119,8 @@ void ActStar(void)
 
 void PutStar(int fx, int fy)
 {
+	int i;
+
 	RECT rc[3] = {
 		{192, 0, 200, 8},
 		{192, 8, 200, 16},
@@ -128,12 +130,10 @@ void PutStar(int fx, int fy)
 	if (gMC.cond & 2)
 		return;
 
-	if ((gMC.equip & 0x80) == 0)
+	if (!(gMC.equip & 0x80))
 		return;
 
-	for (int i = 0; i < 3; i++)
-	{
+	for (i = 0; i < 3; ++i)
 		if (i < gMC.star)
-			PutBitmap3(&grcGame, star[i].x / 0x200 - fx / 0x200 - 4, star[i].y / 0x200 - fy / 0x200 - 4, &rc[i], SURFACE_ID_MY_CHAR);
-	}
+			PutBitmap3(&grcGame, (star[i].x / 0x200) - (fx / 0x200) - 4, (star[i].y / 0x200) - (fy / 0x200) - 4, &rc[i], SURFACE_ID_MY_CHAR);
 }
