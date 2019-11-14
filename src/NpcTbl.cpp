@@ -14,15 +14,15 @@ NPC_TABLE *gNpcTable;
 BOOL LoadNpcTable(const char *path)
 {
 	FILE *fp;
-	long n;
-	long num;
-	long size;
+	int n;
+	int num;
+	size_t size;
 
-	size = GetFileSizeLong(path);
+	size = GetFileSizeLong(path);	// TODO - Investigate whether GetFileSizeLong actually returns an unsigned long or not
 	if (size == -1)
 		return FALSE;
 
-	num = size / 0x18;
+	num = (int)(size / 0x18);
 
 	gNpcTable = (NPC_TABLE*)malloc(num * sizeof(NPC_TABLE));
 	if (gNpcTable == NULL)
@@ -36,34 +36,34 @@ BOOL LoadNpcTable(const char *path)
 		return FALSE;
 	}
 
-	for (n = 0; n < num; n++) // bits
+	for (n = 0; n < num; ++n) // bits
 		fread(&gNpcTable[n].bits, 2, 1, fp);
-	for (n = 0; n < num; n++) // life
+	for (n = 0; n < num; ++n) // life
 		fread(&gNpcTable[n].life, 2, 1, fp);
-	for (n = 0; n < num; n++) // surf
+	for (n = 0; n < num; ++n) // surf
 		fread(&gNpcTable[n].surf, 1, 1, fp);
-	for (n = 0; n < num; n++) // destroy_voice
+	for (n = 0; n < num; ++n) // destroy_voice
 		fread(&gNpcTable[n].destroy_voice, 1, 1, fp);
-	for (n = 0; n < num; n++) // hit_voice
+	for (n = 0; n < num; ++n) // hit_voice
 		fread(&gNpcTable[n].hit_voice, 1, 1, fp);
-	for (n = 0; n < num; n++) // size
+	for (n = 0; n < num; ++n) // size
 		fread(&gNpcTable[n].size, 1, 1, fp);
-	for (n = 0; n < num; n++) // exp
+	for (n = 0; n < num; ++n) // exp
 		fread(&gNpcTable[n].exp, 4, 1, fp);
-	for (n = 0; n < num; n++) // damage
+	for (n = 0; n < num; ++n) // damage
 		fread(&gNpcTable[n].damage, 4, 1, fp);
-	for (n = 0; n < num; n++) // hit
+	for (n = 0; n < num; ++n) // hit
 		fread(&gNpcTable[n].hit, 4, 1, fp);
-	for (n = 0; n < num; n++) // view
+	for (n = 0; n < num; ++n) // view
 		fread(&gNpcTable[n].view, 4, 1, fp);
 
 	fclose(fp);
 	return TRUE;
 }
 
-void ReleaseNpcTable()
+void ReleaseNpcTable(void)
 {
-	if (gNpcTable)
+	if (gNpcTable != NULL)
 	{
 		free(gNpcTable);
 		gNpcTable = NULL;
@@ -71,8 +71,7 @@ void ReleaseNpcTable()
 }
 
 // Npc function table
-NPCFUNCTION gpNpcFuncTbl[361] =
-{
+const NPCFUNCTION gpNpcFuncTbl[361] = {
 	ActNpc000,
 	ActNpc001,
 	ActNpc002,
