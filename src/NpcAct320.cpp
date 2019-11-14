@@ -219,27 +219,29 @@ void ActNpc322(NPCHAR *npc)
 
 			switch (npc->act_wait)
 			{
-				case 0:
+				// Interestingly, this NPC counts down at 50 frames per second,
+				// while the NPC206 (the Egg Corridor Counter Bomb), counts at 60.
+				case 50 * 0:
 					SetNpChar(207, npc->x + (4 * 0x200), npc->y, 0, 0, 0, NULL, 0x180);
 					break;
 
-				case 50:
+				case 50 * 1:
 					SetNpChar(207, npc->x + (4 * 0x200), npc->y, 0, 0, 1, NULL, 0x180);
 					break;
 
-				case 100:
+				case 50 * 2:
 					SetNpChar(207, npc->x + (4 * 0x200), npc->y, 0, 0, 2, NULL, 0x180);
 					break;
 
-				case 150:
+				case 50 * 3:
 					SetNpChar(207, npc->x + (4 * 0x200), npc->y, 0, 0, 3, NULL, 0x180);
 					break;
 
-				case 200:
+				case 50 * 4:
 					SetNpChar(207, npc->x + (4 * 0x200), npc->y, 0, 0, 4, NULL, 0x180);
 					break;
 
-				case 250:
+				case 50 * 5:
 					npc->hit.back = 48 * 0x200;
 					npc->hit.front = 48 * 0x200;
 					npc->hit.top = 48 * 0x200;

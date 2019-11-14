@@ -475,6 +475,8 @@ void ActNpc206(NPCHAR *npc)
 		case 3:
 			switch (npc->act_wait)
 			{
+				// Interestingly, this NPC counts down at 60 frames per second,
+				// while the NPC322 (Deleet), counts at 50.
 				case 60 * 0:
 					SetNpChar(207, npc->x + (16 * 0x200), npc->y + (4 * 0x200), 0, 0, 0, NULL, 0x100);
 					break;
