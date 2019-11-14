@@ -26,7 +26,7 @@ int gSuperYpos;
 
 const char *gPassPixEve = "PXE";
 
-void InitNpChar()
+void InitNpChar(void)
 {
 	memset(gNPC, 0, sizeof(gNPC));
 }
@@ -40,14 +40,14 @@ void SetUniqueParameter(NPCHAR *npc)
 	npc->damage = gNpcTable[code].damage;
 	npc->size = gNpcTable[code].size;
 	npc->life = gNpcTable[code].life;
-	npc->hit.front = gNpcTable[code].hit.front << 9;
-	npc->hit.back = gNpcTable[code].hit.back << 9;
-	npc->hit.top = gNpcTable[code].hit.top << 9;
-	npc->hit.bottom = gNpcTable[code].hit.bottom << 9;
-	npc->view.front = gNpcTable[code].view.front << 9;
-	npc->view.back = gNpcTable[code].view.back << 9;
-	npc->view.top = gNpcTable[code].view.top << 9;
-	npc->view.bottom = gNpcTable[code].view.bottom << 9;
+	npc->hit.front = gNpcTable[code].hit.front * 0x200;
+	npc->hit.back = gNpcTable[code].hit.back * 0x200;
+	npc->hit.top = gNpcTable[code].hit.top * 0x200;
+	npc->hit.bottom = gNpcTable[code].hit.bottom * 0x200;
+	npc->view.front = gNpcTable[code].view.front * 0x200;
+	npc->view.back = gNpcTable[code].view.back * 0x200;
+	npc->view.top = gNpcTable[code].view.top * 0x200;
+	npc->view.bottom = gNpcTable[code].view.bottom * 0x200;
 }
 
 BOOL LoadEvent(const char *path_event)
@@ -57,8 +57,9 @@ BOOL LoadEvent(const char *path_event)
 	int i;
 	int n;
 	EVENT eve;
-
 	char path[MAX_PATH];
+	char code[4];
+
 	sprintf(path, "%s\\%s", gDataPath, path_event);
 
 	fp = fopen(path, "rb");
@@ -66,7 +67,6 @@ BOOL LoadEvent(const char *path_event)
 		return FALSE;
 
 	// Read "PXE" check
-	char code[4];
 	fread(code, 1, 4, fp);
 	if (memcmp(code, gPassPixEve, 3) != 0)
 	{
@@ -84,7 +84,7 @@ BOOL LoadEvent(const char *path_event)
 	memset(gNPC, 0, sizeof(gNPC));
 
 	n = 170;
-	for (i = 0; i < count; i++)
+	for (i = 0; i < count; ++i)
 	{
 		// Get data from file
 		fread(&eve, sizeof(EVENT), 1, fp);
@@ -118,7 +118,7 @@ BOOL LoadEvent(const char *path_event)
 		}
 
 		// Increase index
-		n++;
+		++n;
 	}
 
 	fclose(fp);
@@ -151,12 +151,16 @@ void SetNpChar(int code_char, int x, int y, int xm, int ym, int dir, NPCHAR *npc
 
 void SetDestroyNpChar(int x, int y, int w, int num)
 {
+	int i;
+	int offset_x;
+	int offset_y;
+
 	// Create smoke
 	w /= 0x200;
-	for (int i = 0; i < num; i++)
+	for (i = 0; i < num; ++i)
 	{
-		int offset_x = Random(-w, w) * 0x200;
-		int offset_y = Random(-w, w) * 0x200;
+		offset_x = Random(-w, w) * 0x200;
+		offset_y = Random(-w, w) * 0x200;
 		SetNpChar(4, x + offset_x, y + offset_y, 0, 0, 0, NULL, 0x100);
 	}
 
@@ -166,12 +170,16 @@ void SetDestroyNpChar(int x, int y, int w, int num)
 
 void SetDestroyNpCharUp(int x, int y, int w, int num)
 {
+	int i;
+	int offset_x;
+	int offset_y;
+
 	// Create smoke
 	w /= 0x200;
-	for (int i = 0; i < num; i++)
+	for (i = 0; i < num; ++i)
 	{
-		int offset_x = Random(-w, w) * 0x200;
-		int offset_y = Random(-w, w) * 0x200;
+		offset_x = Random(-w, w) * 0x200;
+		offset_y = Random(-w, w) * 0x200;
 		SetNpChar(4, x + offset_x, y + offset_y, 0, 0, 1, NULL, 0x100);
 	}
 
@@ -318,12 +326,15 @@ void VanishNpChar(NPCHAR *npc)
 
 void PutNpChar(int fx, int fy)
 {
+	int n;
 	signed char a = 0;
 
-	for (int n = 0; n < NPC_MAX; ++n)
+	for (n = 0; n < NPC_MAX; ++n)
 	{
 		if (gNPC[n].cond & 0x80)
 		{
+			int side;
+
 			if (gNPC[n].shock)
 			{
 				a = 2 * ((gNPC[n].shock / 2) % 2) - 1;
@@ -338,7 +349,6 @@ void PutNpChar(int fx, int fy)
 				}
 			}
 
-			int side;
 			if (gNPC[n].direct == 0)
 				side = gNPC[n].view.front;
 			else
@@ -354,9 +364,11 @@ void PutNpChar(int fx, int fy)
 	}
 }
 
-void ActNpChar()
+void ActNpChar(void)
 {
-	for (int i = 0; i < NPC_MAX; ++i)
+	int i;
+
+	for (i = 0; i < NPC_MAX; ++i)
 	{
 		if (gNPC[i].cond & 0x80)
 		{
@@ -372,7 +384,9 @@ void ActNpChar()
 
 void ChangeNpCharByEvent(int code_event, int code_char, int dir)
 {
-	for (int n = 0; n < NPC_MAX; n++)
+	int n;
+
+	for (n = 0; n < NPC_MAX; ++n)
 	{
 		if ((gNPC[n].cond & 0x80) && gNPC[n].code_event == code_event)
 		{
@@ -414,9 +428,11 @@ void ChangeNpCharByEvent(int code_event, int code_char, int dir)
 
 void ChangeCheckableNpCharByEvent(int code_event, int code_char, int dir)
 {
-	for (int n = 0; n < NPC_MAX; n++)
+	int n;
+
+	for (n = 0; n < NPC_MAX; ++n)
 	{
-		if ((gNPC[n].cond & 0x80) != 0 && gNPC[n].code_event == code_event)
+		if (!(gNPC[n].cond & 0x80) && gNPC[n].code_event == code_event)
 		{
 			gNPC[n].bits &= ~(NPC_SOLID_SOFT | NPC_IGNORE_TILE_44 | NPC_INVULNERABLE | NPC_IGNORE_SOLIDITY | NPC_BOUNCY | NPC_SHOOTABLE | NPC_SOLID_HARD | NPC_REAR_AND_TOP_DONT_HURT | NPC_SHOW_DAMAGE);	// Clear these flags
 			gNPC[n].bits |= NPC_INTERACTABLE;
@@ -567,7 +583,9 @@ void BackStepMyChar(int code_event)
 
 void DeleteNpCharEvent(int code)
 {
-	for (int i = 0; i < NPC_MAX; i++)
+	int i;
+
+	for (i = 0; i < NPC_MAX; ++i)
 	{
 		if ((gNPC[i].cond & 0x80) && gNPC[i].code_event == code)
 		{
@@ -579,7 +597,9 @@ void DeleteNpCharEvent(int code)
 
 void DeleteNpCharCode(int code, BOOL bSmoke)
 {
-	for (int n = 0; n < NPC_MAX; n++)
+	int n;
+
+	for (n = 0; n < NPC_MAX; ++n)
 	{
 		if ((gNPC[n].cond & 0x80) && gNPC[n].code_char == code)
 		{
@@ -617,7 +637,9 @@ void GetNpCharPosition(int *x, int *y, int i)
 
 BOOL IsNpCharCode(int code)
 {
-	for (int i = 0; i < NPC_MAX; ++i)
+	int i;
+
+	for (i = 0; i < NPC_MAX; ++i)
 		if ((gNPC[i].cond & 0x80) && gNPC[i].code_char == code)
 			return TRUE;
 
@@ -627,6 +649,7 @@ BOOL IsNpCharCode(int code)
 BOOL GetNpCharAlive(int code_event)
 {
 	int i;
+
 	for (i = 0; i < NPC_MAX; ++i)
 		if ((gNPC[i].cond & 0x80) && gNPC[i].code_event == code_event)
 			break;
@@ -637,14 +660,14 @@ BOOL GetNpCharAlive(int code_event)
 		return FALSE;
 }
 
-int CountAliveNpChar()
+int CountAliveNpChar(void)
 {
+	int n;
 	int count = 0;
-	for (int n = 0; n < NPC_MAX; ++n)
-	{
+
+	for (n = 0; n < NPC_MAX; ++n)
 		if (gNPC[n].cond & 0x80)
 			++count;
-	}
 
 	return count;
 }
