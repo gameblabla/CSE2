@@ -31,7 +31,7 @@ struct PROFILE
 	unsigned char flags[1000];
 };
 
-BOOL IsProfile();
+BOOL IsProfile(void);
 BOOL SaveProfile(const char *name);
 BOOL LoadProfile(const char *name);
 BOOL InitializeGame(HWND hWnd);
