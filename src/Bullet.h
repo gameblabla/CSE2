@@ -60,12 +60,12 @@ struct BULLET_TABLE
 #define BULLET_MAX 0x40
 extern BULLET gBul[BULLET_MAX];
 
-void InitBullet();
+void InitBullet(void);
 int CountArmsBullet(int arms_code);
 int CountBulletNum(int bullet_code);
 void DeleteBullet(int code);
-void ClearBullet();
+void ClearBullet(void);
 void PutBullet(int fx, int fy);
 void SetBullet(int no, int x, int y, int dir);
-void ActBullet();
+void ActBullet(void);
 BOOL IsActiveSomeBullet(void);
