@@ -847,7 +847,7 @@ void HitMyCharNpChar(void)
 		{
 			StartTextScript(gNPC[i].code_event);
 			gMC.xm = 0;
-			gMC.ques = 0;
+			gMC.ques = FALSE;
 		}
 	}
 
@@ -890,7 +890,7 @@ void HitMyCharBoss(void)
 		if (!(g_GameFlags & 4) && hit != 0 && gBoss[b].bits & NPC_EVENT_WHEN_TOUCHED)
 		{
 			StartTextScript(gBoss[b].code_event);
-			gMC.ques = 0;
+			gMC.ques = FALSE;
 		}
 
 		if (gBoss[b].bits & NPC_REAR_AND_TOP_DONT_HURT)
@@ -909,7 +909,7 @@ void HitMyCharBoss(void)
 		{
 			StartTextScript(gBoss[b].code_event);
 			gMC.xm = 0;
-			gMC.ques = 0;
+			gMC.ques = FALSE;
 		}
 	}
 
