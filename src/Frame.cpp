@@ -9,7 +9,7 @@
 
 FRAME gFrame;
 
-void MoveFrame3()
+void MoveFrame3(void)
 {
 	short map_w, map_l;
 	GetMapData(0, &map_w, &map_l);
@@ -18,18 +18,18 @@ void MoveFrame3()
 	if (g_GameFlags & 8)
 	{
 		// Use the original camera boundaries during the credits
-		gFrame.x += (*gFrame.tgt_x - (320 * 0x100) - gFrame.x) / gFrame.wait;
-		gFrame.y += (*gFrame.tgt_y - (240 * 0x100) - gFrame.y) / gFrame.wait;
+		gFrame.x += (*gFrame.tgt_x - (320 * 0x200 / 2) - gFrame.x) / gFrame.wait;
+		gFrame.y += (*gFrame.tgt_y - (240 * 0x200 / 2) - gFrame.y) / gFrame.wait;
 
 		if (gFrame.x / 0x200 < 0)
 			gFrame.x = 0;
 		if (gFrame.y / 0x200 < 0)
 			gFrame.y = 0;
 
-		if (gFrame.x > ((map_w - 1) * 0x10 - 320) * 0x200)
-			gFrame.x = ((map_w - 1) * 0x10 - 320) * 0x200;
-		if (gFrame.y > ((map_l - 1) * 0x10 - 240) * 0x200)
-			gFrame.y = ((map_l - 1) * 0x10 - 240) * 0x200;
+		if (gFrame.x > (((map_w - 1) * 16) - 320) * 0x200)
+			gFrame.x = (((map_w - 1) * 16) - 320) * 0x200;
+		if (gFrame.y > (((map_l - 1) * 16) - 240) * 0x200)
+			gFrame.y = (((map_l - 1) * 16) - 240) * 0x200;
 
 		gFrame.x -= ((WINDOW_WIDTH - 320) / 2) * 0x200;
 		gFrame.y -= ((WINDOW_HEIGHT - 240) / 2) * 0x200;
@@ -37,50 +37,50 @@ void MoveFrame3()
 	else
 	{
 		// Widescreen/tallscreen-safe behaviour
-		if (map_w * 0x10 < WINDOW_WIDTH)
+		if (map_w * 16 < WINDOW_WIDTH)
 		{
-			gFrame.x = -(((WINDOW_WIDTH - (map_w - 1) * 0x10) * 0x200) / 2);
+			gFrame.x = -(((WINDOW_WIDTH - ((map_w - 1) * 16)) * 0x200) / 2);
 		}
 		else
 		{
-			gFrame.x += (*gFrame.tgt_x - (WINDOW_WIDTH * 0x100) - gFrame.x) / gFrame.wait;
+			gFrame.x += (*gFrame.tgt_x - (WINDOW_WIDTH * 0x200 / 2) - gFrame.x) / gFrame.wait;
 
 			if (gFrame.x / 0x200 < 0)
 				gFrame.x = 0;
 
-			if (gFrame.x > ((map_w - 1) * 0x10 - WINDOW_WIDTH) * 0x200)
-				gFrame.x = ((map_w - 1) * 0x10 - WINDOW_WIDTH) * 0x200;
+			if (gFrame.x > (((map_w - 1) * 16) - WINDOW_WIDTH) * 0x200)
+				gFrame.x = (((map_w - 1) * 16) - WINDOW_WIDTH) * 0x200;
 		}
 
-		if (map_l * 0x10 < WINDOW_HEIGHT)
+		if (map_l * 16 < WINDOW_HEIGHT)
 		{
-			gFrame.y = -(((WINDOW_HEIGHT - (map_l - 1) * 0x10) * 0x200) / 2);
+			gFrame.y = -(((WINDOW_HEIGHT - ((map_l - 1) * 16)) * 0x200) / 2);
 		}
 		else
 		{
-			gFrame.y += (*gFrame.tgt_y - (WINDOW_HEIGHT * 0x100) - gFrame.y) / gFrame.wait;
+			gFrame.y += (*gFrame.tgt_y - (WINDOW_HEIGHT * 0x200 / 2) - gFrame.y) / gFrame.wait;
 
 			if (gFrame.y / 0x200 < 0)
 				gFrame.y = 0;
 
-			if (gFrame.y > ((map_l - 1) * 0x10 - WINDOW_HEIGHT) * 0x200)
-				gFrame.y = ((map_l - 1) * 0x10 - WINDOW_HEIGHT) * 0x200;
+			if (gFrame.y > (((map_l - 1) * 16) - WINDOW_HEIGHT) * 0x200)
+				gFrame.y = (((map_l - 1) * 16) - WINDOW_HEIGHT) * 0x200;
 		}
 	}
 #else
 	// Vanilla behaviour
-	gFrame.x += (*gFrame.tgt_x - (WINDOW_WIDTH * 0x100) - gFrame.x) / gFrame.wait;
-	gFrame.y += (*gFrame.tgt_y - (WINDOW_HEIGHT * 0x100) - gFrame.y) / gFrame.wait;
+	gFrame.x += (*gFrame.tgt_x - (WINDOW_WIDTH * 0x200 / 2) - gFrame.x) / gFrame.wait;
+	gFrame.y += (*gFrame.tgt_y - (WINDOW_HEIGHT * 0x200 / 2) - gFrame.y) / gFrame.wait;
 
 	if (gFrame.x / 0x200 < 0)
 		gFrame.x = 0;
 	if (gFrame.y / 0x200 < 0)
 		gFrame.y = 0;
 
-	if (gFrame.x > ((map_w - 1) * 0x10 - WINDOW_WIDTH) * 0x200)
-		gFrame.x = ((map_w - 1) * 0x10 - WINDOW_WIDTH) * 0x200;
-	if (gFrame.y > ((map_l - 1) * 0x10 - WINDOW_HEIGHT) * 0x200)
-		gFrame.y = ((map_l - 1) * 0x10 - WINDOW_HEIGHT) * 0x200;
+	if (gFrame.x > (((map_w - 1) * 16) - WINDOW_WIDTH) * 0x200)
+		gFrame.x = (((map_w - 1) * 16) - WINDOW_WIDTH) * 0x200;
+	if (gFrame.y > (((map_l - 1) * 16) - WINDOW_HEIGHT) * 0x200)
+		gFrame.y = (((map_l - 1) * 16) - WINDOW_HEIGHT) * 0x200;
 #endif
 
 	// Quake
@@ -97,7 +97,7 @@ void MoveFrame3()
 		--gFrame.quake;
 	}
 
-	// This code exists in the Linux port, but not the Windows version
+	// This code exists in the Linux port (v1.0.0.4), but not the Windows version (v1.0.0.6)
 /*	if (gFrame.x / 0x200 < 0)
 		gFrame.x = 0;
 	if (gFrame.y / 0x200 < 0)
@@ -133,10 +133,10 @@ void SetFramePosition(int fx, int fy)
 		if (gFrame.y / 0x200 < 0)
 			gFrame.y = 0;
 
-		if (gFrame.x > ((map_w - 1) * 0x10 - 320) * 0x200)
-			gFrame.x = ((map_w - 1) * 0x10 - 320) * 0x200;
-		if (gFrame.y > ((map_l - 1) * 0x10 - 240) * 0x200)
-			gFrame.y = ((map_l - 1) * 0x10 - 240) * 0x200;
+		if (gFrame.x > (((map_w - 1) * 16) - 320) * 0x200)
+			gFrame.x = (((map_w - 1) * 16) - 320) * 0x200;
+		if (gFrame.y > (((map_l - 1) * 16) - 240) * 0x200)
+			gFrame.y = (((map_l - 1) * 16) - 240) * 0x200;
 
 		gFrame.x -= ((WINDOW_WIDTH - 320) / 2) * 0x200;
 		gFrame.y -= ((WINDOW_HEIGHT - 240) / 2) * 0x200;
@@ -144,30 +144,30 @@ void SetFramePosition(int fx, int fy)
 	else
 	{
 		// Widescreen/tallscreen-safe behaviour
-		if (map_w * 0x10 < WINDOW_WIDTH)
+		if (map_w * 16 < WINDOW_WIDTH)
 		{
-			gFrame.x = -(((WINDOW_WIDTH - (map_w - 1) * 0x10) * 0x200) / 2);
+			gFrame.x = -(((WINDOW_WIDTH - ((map_w - 1) * 16)) * 0x200) / 2);
 		}
 		else
 		{
 			if (gFrame.x / 0x200 < 0)
 				gFrame.x = 0;
 
-			if (gFrame.x > ((map_w - 1) * 0x10 - WINDOW_WIDTH) * 0x200)
-				gFrame.x = ((map_w - 1) * 0x10 - WINDOW_WIDTH) * 0x200;
+			if (gFrame.x > (((map_w - 1) * 16) - WINDOW_WIDTH) * 0x200)
+				gFrame.x = (((map_w - 1) * 16) - WINDOW_WIDTH) * 0x200;
 		}
 
-		if (map_l * 0x10 < WINDOW_HEIGHT)
+		if (map_l * 16 < WINDOW_HEIGHT)
 		{
-			gFrame.y = -(((WINDOW_HEIGHT - (map_l - 1) * 0x10) * 0x200) / 2);
+			gFrame.y = -(((WINDOW_HEIGHT - ((map_l - 1) * 16)) * 0x200) / 2);
 		}
 		else
 		{
 			if (gFrame.y / 0x200 < 0)
 				gFrame.y = 0;
 
-			if (gFrame.y > ((map_l - 1) * 0x10 - WINDOW_HEIGHT) * 0x200)
-				gFrame.y = ((map_l - 1) * 0x10 - WINDOW_HEIGHT) * 0x200;
+			if (gFrame.y > (((map_l - 1) * 16) - WINDOW_HEIGHT) * 0x200)
+				gFrame.y = (((map_l - 1) * 16) - WINDOW_HEIGHT) * 0x200;
 		}
 	}
 #else
@@ -177,14 +177,14 @@ void SetFramePosition(int fx, int fy)
 	if (gFrame.y / 0x200 < 0)
 		gFrame.y = 0;
 
-	if (gFrame.x > (((map_w - 1) * 0x10) - WINDOW_WIDTH) * 0x200)
-		gFrame.x = (((map_w - 1) * 0x10) - WINDOW_WIDTH) * 0x200;
-	if (gFrame.y > (((map_l - 1) * 0x10) - WINDOW_HEIGHT) * 0x200)
-		gFrame.y = (((map_l - 1) * 0x10) - WINDOW_HEIGHT) * 0x200;
+	if (gFrame.x > (((map_w - 1) * 16) - WINDOW_WIDTH) * 0x200)
+		gFrame.x = (((map_w - 1) * 16) - WINDOW_WIDTH) * 0x200;
+	if (gFrame.y > (((map_l - 1) * 16) - WINDOW_HEIGHT) * 0x200)
+		gFrame.y = (((map_l - 1) * 16) - WINDOW_HEIGHT) * 0x200;
 #endif
 }
 
-void SetFrameMyChar()
+void SetFrameMyChar(void)
 {
 	// Move frame position
 	int mc_x, mc_y;
@@ -193,8 +193,8 @@ void SetFrameMyChar()
 	short map_w, map_l;
 	GetMapData(0, &map_w, &map_l);
 
-	gFrame.x = mc_x - (WINDOW_WIDTH << 8);
-	gFrame.y = mc_y - (WINDOW_HEIGHT << 8);
+	gFrame.x = mc_x - ((WINDOW_WIDTH / 2) * 0x200);
+	gFrame.y = mc_y - ((WINDOW_HEIGHT / 2) * 0x200);
 
 	// Keep in bounds
 #if WINDOW_WIDTH != 320 || WINDOW_HEIGHT != 240
@@ -206,10 +206,10 @@ void SetFrameMyChar()
 		if (gFrame.y / 0x200 < 0)
 			gFrame.y = 0;
 
-		if (gFrame.x > ((map_w - 1) * 0x10 - 320) * 0x200)
-			gFrame.x = ((map_w - 1) * 0x10 - 320) * 0x200;
-		if (gFrame.y > ((map_l - 1) * 0x10 - 240) * 0x200)
-			gFrame.y = ((map_l - 1) * 0x10 - 240) * 0x200;
+		if (gFrame.x > (((map_w - 1) * 16) - 320) * 0x200)
+			gFrame.x = (((map_w - 1) * 16) - 320) * 0x200;
+		if (gFrame.y > (((map_l - 1) * 16) - 240) * 0x200)
+			gFrame.y = (((map_l - 1) * 16) - 240) * 0x200;
 
 		gFrame.x -= ((WINDOW_WIDTH - 320) / 2) * 0x200;
 		gFrame.y -= ((WINDOW_HEIGHT - 240) / 2) * 0x200;
@@ -217,30 +217,30 @@ void SetFrameMyChar()
 	else
 	{
 		// Widescreen/tallscreen-safe behaviour
-		if (map_w * 0x10 < WINDOW_WIDTH)
+		if (map_w * 16 < WINDOW_WIDTH)
 		{
-			gFrame.x = -(((WINDOW_WIDTH - (map_w - 1) * 0x10) * 0x200) / 2);
+			gFrame.x = -(((WINDOW_WIDTH - ((map_w - 1) * 16)) * 0x200) / 2);
 		}
 		else
 		{
 			if (gFrame.x / 0x200 < 0)
 				gFrame.x = 0;
 
-			if (gFrame.x > ((map_w - 1) * 0x10 - WINDOW_WIDTH) * 0x200)
-				gFrame.x = ((map_w - 1) * 0x10 - WINDOW_WIDTH) * 0x200;
+			if (gFrame.x > (((map_w - 1) * 16) - WINDOW_WIDTH) * 0x200)
+				gFrame.x = (((map_w - 1) * 16) - WINDOW_WIDTH) * 0x200;
 		}
 
-		if (map_l * 0x10 < WINDOW_HEIGHT)
+		if (map_l * 16 < WINDOW_HEIGHT)
 		{
-			gFrame.y = -(((WINDOW_HEIGHT - (map_l - 1) * 0x10) * 0x200) / 2);
+			gFrame.y = -(((WINDOW_HEIGHT - ((map_l - 1) * 16)) * 0x200) / 2);
 		}
 		else
 		{
 			if (gFrame.y / 0x200 < 0)
 				gFrame.y = 0;
 
-			if (gFrame.y > ((map_l - 1) * 0x10 - WINDOW_HEIGHT) * 0x200)
-				gFrame.y = ((map_l - 1) * 0x10 - WINDOW_HEIGHT) * 0x200;
+			if (gFrame.y > (((map_l - 1) * 16) - WINDOW_HEIGHT) * 0x200)
+				gFrame.y = (((map_l - 1) * 16) - WINDOW_HEIGHT) * 0x200;
 		}
 	}
 #else
@@ -250,10 +250,10 @@ void SetFrameMyChar()
 	if (gFrame.y / 0x200 < 0)
 		gFrame.y = 0;
 
-	if (gFrame.x > (((map_w - 1) * 0x10) - WINDOW_WIDTH) * 0x200)
-		gFrame.x = (((map_w - 1) * 0x10) - WINDOW_WIDTH) * 0x200;
-	if (gFrame.y > (((map_l - 1) * 0x10) - WINDOW_HEIGHT) * 0x200)
-		gFrame.y = (((map_l - 1) * 0x10) - WINDOW_HEIGHT) * 0x200;
+	if (gFrame.x > (((map_w - 1) * 16) - WINDOW_WIDTH) * 0x200)
+		gFrame.x = (((map_w - 1) * 16) - WINDOW_WIDTH) * 0x200;
+	if (gFrame.y > (((map_l - 1) * 16) - WINDOW_HEIGHT) * 0x200)
+		gFrame.y = (((map_l - 1) * 16) - WINDOW_HEIGHT) * 0x200;
 #endif
 }
 
@@ -267,7 +267,7 @@ void SetFrameTargetMyChar(int wait)
 void SetFrameTargetNpChar(int event, int wait)
 {
 	int i;
-	for (i = 0; i < NPC_MAX; i++)
+	for (i = 0; i < NPC_MAX; ++i)
 		if (gNPC[i].code_event == event)
 			break;
 
@@ -296,7 +296,7 @@ void SetQuake2(int time)
 	gFrame.quake2 = time;
 }
 
-void ResetQuake()
+void ResetQuake(void)
 {
 	gFrame.quake = 0;
 	gFrame.quake2 = 0;
