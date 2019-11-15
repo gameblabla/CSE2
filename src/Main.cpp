@@ -182,7 +182,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 	}
 
 	// Set gamepad inputs
-	for (i = 0; i < 8; i++)
+	for (i = 0; i < 8; ++i)
 	{
 		switch (conf.joystick_button[i])
 		{
@@ -237,6 +237,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 		case 1:
 		case 2:
 			wndclassex.lpszMenuName = "MENU_MAIN";
+
 			if (RegisterClassExA(&wndclassex) == 0)
 			{
 				ReleaseMutex(hMutex);
@@ -255,8 +256,8 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 				windowHeight = WINDOW_HEIGHT * 2;
 			}
 
-			nWidth = windowWidth + 2 * GetSystemMetrics(SM_CXFIXEDFRAME) + 2;
-			nHeight = (2 * GetSystemMetrics(SM_CYFIXEDFRAME) + GetSystemMetrics(SM_CYCAPTION)) + GetSystemMetrics(SM_CYMENU) + windowHeight + 2;
+			nWidth = (GetSystemMetrics(SM_CXFIXEDFRAME) * 2) + windowWidth + 2;
+			nHeight = (GetSystemMetrics(SM_CYFIXEDFRAME) * 2) + GetSystemMetrics(SM_CYCAPTION) + GetSystemMetrics(SM_CYMENU) + windowHeight + 2;
 			x = (GetSystemMetrics(SM_CXSCREEN) - nWidth) / 2;
 			y = (GetSystemMetrics(SM_CYSCREEN) - nHeight) / 2;
 
@@ -320,7 +321,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 					break;
 			}
 
-			StartDirectDraw(ghWnd, 2, depth);
+			StartDirectDraw(hWnd, 2, depth);
 			bFullscreen = TRUE;
 
 			ShowCursor(FALSE);
@@ -338,7 +339,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 
 	// Draw loading screen
 	CortBox(&rcFull, 0x000000);
-	PutBitmap3(&rcFull, (WINDOW_WIDTH - 64) / 2, (WINDOW_HEIGHT - 8) / 2, &rcLoading, SURFACE_ID_LOADING);
+	PutBitmap3(&rcFull, (WINDOW_WIDTH / 2) - 32, (WINDOW_HEIGHT / 2) - 4, &rcLoading, SURFACE_ID_LOADING);
 
 	// Draw to screen
 	if (!Flip_SystemTask(ghWnd))
@@ -346,32 +347,30 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 		ReleaseMutex(hMutex);
 		return 1;
 	}
-	else
+
+	// Initialize sound
+	InitDirectSound(hWnd);
+
+	// Initialize joystick
+	if (conf.bJoystick && InitDirectInput(hInstance, hWnd))
 	{
-		// Initialize sound
-		InitDirectSound(hWnd);
-
-		// Initialize joystick
-		if (conf.bJoystick && InitDirectInput(hInstance, hWnd))
-		{
-			ResetJoystickStatus();
-			gbUseJoystick = TRUE;
-		}
-
-		// Initialize stuff
-		InitTextObject(conf.font_name);
-		InitTriangleTable();
-
-		// Run game code
-		Game(hWnd);
-
-		// End stuff
-		EndTextObject();
-		EndDirectSound();
-		EndDirectDraw(hWnd);
-
-		ReleaseMutex(hMutex);
+		ResetJoystickStatus();
+		gbUseJoystick = TRUE;
 	}
+
+	// Initialize stuff
+	InitTextObject(conf.font_name);
+	InitTriangleTable();
+
+	// Run game code
+	Game(hWnd);
+
+	// End stuff
+	EndTextObject();
+	EndDirectSound();
+	EndDirectDraw(hWnd);
+
+	ReleaseMutex(hMutex);
 
 	return 1;
 }
@@ -772,13 +771,11 @@ void JoystickProc(void)
 		gKey &= ~gKeyDown;
 
 	// Clear held buttons
-	for (i = 0; i < 8; i++)
+	for (i = 0; i < 8; ++i)
 		gKey &= ~gJoystickButtonTable[i];
 
 	// Set held buttons
-	for (i = 0; i < 8; i++)
-	{
+	for (i = 0; i < 8; ++i)
 		if (status.bButton[i])
 			gKey |= gJoystickButtonTable[i];
-	}
 }
