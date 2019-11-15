@@ -93,7 +93,7 @@ void EndTextScript(void)
 }
 
 // Decrypt .tsc
-void EncryptionBinaryData2(unsigned char *pData, int size)
+void EncryptionBinaryData2(unsigned char *pData, long size)
 {
 	int val1;
 	int work;
@@ -124,7 +124,7 @@ BOOL LoadTextScript2(const char *name)
 	sprintf(path, "%s\\%s", gDataPath, name);
 
 	gTS.size = GetFileSizeLong(path);
-	if (gTS.size == -1)
+	if (gTS.size == INVALID_FILE_SIZE)
 		return FALSE;
 
 	// Open file
@@ -154,7 +154,7 @@ BOOL LoadTextScript_Stage(const char *name)
 	sprintf(path, "%s\\%s", gDataPath, "Head.tsc");
 
 	long head_size = GetFileSizeLong(path);
-	if (head_size == -1)
+	if (head_size == INVALID_FILE_SIZE)
 		return FALSE;
 
 	FILE *fp = fopen(path, "rb");
@@ -171,7 +171,7 @@ BOOL LoadTextScript_Stage(const char *name)
 	sprintf(path, "%s\\%s", gDataPath, name);
 
 	long body_size = GetFileSizeLong(path);
-	if (body_size == -1)
+	if (body_size == INVALID_FILE_SIZE)
 		return FALSE;
 
 	fp = fopen(path, "rb");

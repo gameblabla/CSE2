@@ -193,7 +193,7 @@ BOOL StartCreditScript()
 	sprintf(path, "%s\\%s", gDataPath, credit_script);
 
 	Credit.size = GetFileSizeLong(path);
-	if (Credit.size == -1)
+	if (Credit.size == INVALID_FILE_SIZE)
 		return FALSE;
 
 	// Allocate buffer data

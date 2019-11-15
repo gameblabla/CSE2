@@ -6,7 +6,7 @@
 
 struct CREDIT
 {
-	int size;
+	long size;
 	char *pData;
 	int offset;
 	int wait;

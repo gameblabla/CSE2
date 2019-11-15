@@ -54,42 +54,28 @@ BOOL GetCompileVersion(int *v1, int *v2, int *v3, int *v4)
 	dwLen = GetFileVersionInfoSizeA(path, &dwHandle);
 
 	if (dwLen == 0)
-	{
-		
-	}
-	else
-	{
-		lpData = malloc(dwLen);
+		goto fail;
 
-		if (lpData == NULL)
-		{
-			
-		}
-		else
-		{
-			if (!GetFileVersionInfoA(path, 0, dwLen, lpData))
-			{
-				
-			}
-			else
-			{
-				if (!VerQueryValueA(lpData, "\\", (LPVOID*)&lpBuffer, &puLen))
-				{
-					
-				}
-				else
-				{
-					*v1 = (unsigned short)(lpBuffer->dwFileVersionMS >> 16);
-					*v2 = (unsigned short)(lpBuffer->dwFileVersionMS & 0xFFFF);
-					*v3 = (unsigned short)(lpBuffer->dwFileVersionLS >> 16);
-					*v4 = (unsigned short)(lpBuffer->dwFileVersionLS & 0xFFFF);
-					bResult = TRUE;
-				}
-			}
-		}
-	}
+	lpData = malloc(dwLen);
 
-	if (lpData)
+	if (lpData == NULL)
+		goto fail;
+
+	if (!GetFileVersionInfoA(path, 0, dwLen, lpData))
+		goto fail;
+
+	if (!VerQueryValueA(lpData, "\\", (LPVOID*)&lpBuffer, &puLen))
+		goto fail;
+
+	*v1 = (unsigned short)(lpBuffer->dwFileVersionMS >> 16);
+	*v2 = (unsigned short)(lpBuffer->dwFileVersionMS & 0xFFFF);
+	*v3 = (unsigned short)(lpBuffer->dwFileVersionLS >> 16);
+	*v4 = (unsigned short)(lpBuffer->dwFileVersionLS & 0xFFFF);
+	bResult = TRUE;
+
+fail:
+
+	if (lpData != NULL)
 		free(lpData);
 
 	return bResult;
@@ -213,8 +199,8 @@ int CheckTime(SYSTEMTIME *system_time_low, SYSTEMTIME *system_time_high)
 
 	if (CompareFileTime(&FileTime2, &FileTime1) <= 0)
 		return 1;	// Return if actual time is higher than system_time_high
-	else
-		return 0;
+
+	return 0;
 }
 
 BOOL CheckFileExists(const char *name)
@@ -241,7 +227,7 @@ long GetFileSizeLong(const char *path)
 
 	hFile = CreateFileA(path, 0, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hFile == INVALID_HANDLE_VALUE)
-		return -1;
+		return INVALID_FILE_SIZE;
 
 	len = GetFileSize(hFile, NULL);
 	CloseHandle(hFile);
@@ -293,13 +279,13 @@ BOOL CenterWindow(HWND hWnd)
 	GetWindowRect(hWnd, &window_rect);
 
 	parent_hwnd = GetParent(hWnd);
-	if (parent_hwnd)
+	if (parent_hwnd != NULL)
 		GetWindowRect(parent_hwnd, &parent_rect);
 	else
 		SystemParametersInfoA(SPI_GETWORKAREA, 0, &parent_rect, 0);
 
-	x = parent_rect.left + (parent_rect.right - parent_rect.left - (window_rect.right - window_rect.left)) / 2;
-	y = parent_rect.top + (parent_rect.bottom - parent_rect.top - (window_rect.bottom - window_rect.top)) / 2;
+	x = parent_rect.left + ((parent_rect.right - parent_rect.left) - (window_rect.right - window_rect.left)) / 2;
+	y = parent_rect.top + ((parent_rect.bottom - parent_rect.top) - (window_rect.bottom - window_rect.top)) / 2;
 
 	if (x < child_rect.left)
 		x = child_rect.left;
@@ -307,10 +293,10 @@ BOOL CenterWindow(HWND hWnd)
 	if (y < child_rect.top)
 		y = child_rect.top;
 
-	if (window_rect.right - window_rect.left + x > child_rect.right)
+	if (x + (window_rect.right - window_rect.left) > child_rect.right)
 		x = child_rect.right - (window_rect.right - window_rect.left);
 
-	if (window_rect.bottom - window_rect.top + y > child_rect.bottom)
+	if (y + (window_rect.bottom - window_rect.top) > child_rect.bottom)
 		y = child_rect.bottom - (window_rect.bottom - window_rect.top);
 
 	return SetWindowPos(hWnd, HWND_TOP, x, y, 0, 0, SWP_NOSIZE);
@@ -334,7 +320,7 @@ BOOL LoadWindowRect(HWND hWnd, const char *filename, BOOL unknown)
 	sprintf(path, "%s\\%s", gModulePath, filename);
 
 	fp = fopen(path, "rb");
-	if (fp)
+	if (fp != NULL)
 	{
 		fread(&Rect, sizeof(RECT), 1, fp);
 		fread(&showCmd, sizeof(int), 1, fp);
@@ -348,13 +334,13 @@ BOOL LoadWindowRect(HWND hWnd, const char *filename, BOOL unknown)
 		min_window_height = GetSystemMetrics(SM_CYMIN);
 
 		if (Rect.right - Rect.left < min_window_width)
-			Rect.right = min_window_width + Rect.left;
+			Rect.right = Rect.left + min_window_width;
 		if (Rect.bottom - Rect.top < min_window_height)
-			Rect.bottom = min_window_height + Rect.top;
+			Rect.bottom = Rect.top + min_window_height;
 		if (Rect.right - Rect.left > max_window_width)
-			Rect.right = max_window_width + Rect.left;
+			Rect.right = Rect.left + max_window_width;
 		if (Rect.bottom - Rect.top > max_window_height)
-			Rect.bottom = max_window_width + Rect.top;
+			Rect.bottom = Rect.top + max_window_width;
 
 		if (Rect.left < pvParam.left)
 		{
@@ -443,7 +429,7 @@ BOOL IsEnableBitmap(const char *path)
 	fread(str, 1, len, fp);
 	fclose(fp);
 
-	if (memcmp(str, extra_text, len) != 0)
+	if (memcmp(str, extra_text, len))
 		return FALSE;
 	else
 		return TRUE;

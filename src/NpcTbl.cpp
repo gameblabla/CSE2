@@ -19,7 +19,7 @@ BOOL LoadNpcTable(const char *path)
 	size_t size;
 
 	size = GetFileSizeLong(path);	// TODO - Investigate whether GetFileSizeLong actually returns an unsigned long or not
-	if (size == -1)
+	if (size == INVALID_FILE_SIZE)
 		return FALSE;
 
 	num = (int)(size / 0x18);
