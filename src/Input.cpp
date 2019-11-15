@@ -114,7 +114,7 @@ BOOL __stdcall EnumDevices_Callback(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef)
 	static int already_ran;
 	static DirectInputPair *directinput_objects;
 
-	if ((already_ran & 1) == 0)
+	if (!(already_ran & 1))
 	{
 		already_ran |= 1;
 		directinput_objects = (DirectInputPair*)pvRef;
@@ -166,7 +166,7 @@ BOOL GetJoystickStatus(JOYSTICK_STATUS *status)
 		return FALSE;
 
 	HRESULT res = joystick->GetDeviceState(sizeof(DIJOYSTATE), &joystate);
-	if (res)
+	if (res != DI_OK)
 	{
 		if (res == DIERR_INPUTLOST)
 			SetDeviceAquire(FALSE);
@@ -211,7 +211,7 @@ BOOL ResetJoystickStatus(void)
 		return FALSE;
 
 	HRESULT res = joystick->GetDeviceState(sizeof(DIJOYSTATE), &joystate);
-	if (res)
+	if (res != DI_OK)
 	{
 		if (res == DIERR_INPUTLOST)
 			SetDeviceAquire(FALSE);
