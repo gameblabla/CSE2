@@ -14,12 +14,12 @@ unsigned char gFlagNPC[1000];
 unsigned char gSkipFlag[8];
 
 // Flag initializers
-void InitFlags()
+void InitFlags(void)
 {
 	memset(gFlagNPC, 0, sizeof(gFlagNPC));
 }
 
-void InitSkipFlags()
+void InitSkipFlags(void)
 {
 	memset(gSkipFlag, 0, sizeof(gSkipFlag));
 }
