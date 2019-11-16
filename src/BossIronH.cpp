@@ -23,17 +23,17 @@ void ActBossChar_Ironhead(void)
 			npc->exp = 1;
 			npc->direct = 2;
 			npc->act_no = 100;
-			npc->x = 0x14000;
-			npc->y = 0x10000;
-			npc->view.front = 0x5000;
-			npc->view.top = 0x1800;
-			npc->view.back = 0x3000;
-			npc->view.bottom = 0x1800;
+			npc->x = 160 * 0x200;
+			npc->y = 128 * 0x200;
+			npc->view.front = 40 * 0x200;
+			npc->view.top = 12 * 0x200;
+			npc->view.back = 24 * 0x200;
+			npc->view.bottom = 12 * 0x200;
 			npc->hit_voice = 54;
-			npc->hit.front = 0x2000;
-			npc->hit.top = 0x1400;
-			npc->hit.back = 0x2000;
-			npc->hit.bottom = 0x1400;
+			npc->hit.front = 16 * 0x200;
+			npc->hit.top = 10 * 0x200;
+			npc->hit.back = 16 * 0x200;
+			npc->hit.bottom = 10 * 0x200;
 			npc->bits = (NPC_IGNORE_SOLIDITY | NPC_SHOOTABLE | NPC_EVENT_WHEN_KILLED | NPC_SHOW_DAMAGE);
 			npc->size = 3;
 			npc->damage = 10;
@@ -47,14 +47,16 @@ void ActBossChar_Ironhead(void)
 			npc->act_wait = 0;
 			// Fallthrough
 		case 101:
-			if (++npc->act_wait > 50)
+			++npc->act_wait;
+
+			if (npc->act_wait > 50)
 			{
 				npc->act_no = 250;
 				npc->act_wait = 0;
 			}
 
 			if (npc->act_wait % 4 == 0)
-				SetNpChar(197, Random(15, 18) * 0x2000, Random(2, 13) * 0x2000, 0, 0, 0, 0, 0x100);
+				SetNpChar(197, Random(15, 18) * (16 * 0x200), Random(2, 13) * (16 * 0x200), 0, 0, 0, NULL, 0x100);
 
 			break;
 
@@ -63,13 +65,13 @@ void ActBossChar_Ironhead(void)
 
 			if (npc->direct == 2)
 			{
-				npc->x = 0x1E000;
+				npc->x = 240 * 0x200;
 				npc->y = gMC.y;
 			}
 			else
 			{
-				npc->x = 0x5A000;
-				npc->y = Random(2, 13) * 0x2000;
+				npc->x = 720 * 0x200;
+				npc->y = Random(2, 13) * (16 * 0x200);
 			}
 
 			npc->tgt_x = npc->x;
@@ -83,16 +85,16 @@ void ActBossChar_Ironhead(void)
 		case 251:
 			if (npc->direct == 2)
 			{
-				npc->tgt_x += 0x400;
+				npc->tgt_x += 2 * 0x200;
 			}
 			else
 			{
-				npc->tgt_x -= 0x200;
+				npc->tgt_x -= 1 * 0x200;
 
 				if (npc->tgt_y < gMC.y)
-					npc->tgt_y += 0x200;
+					npc->tgt_y += 1 * 0x200;
 				else
-					npc->tgt_y -= 0x200;
+					npc->tgt_y -= 1 * 0x200;
 			}
 
 			if (npc->x < npc->tgt_x)
@@ -115,7 +117,7 @@ void ActBossChar_Ironhead(void)
 
 			if (npc->direct == 2)
 			{
-				if (npc->x > 0x5A000)
+				if (npc->x > 720 * 0x200)
 				{
 					npc->direct = 0;
 					npc->act_no = 100;
@@ -123,20 +125,27 @@ void ActBossChar_Ironhead(void)
 			}
 			else
 			{
-				if (npc->x < 0x22000)
+				if (npc->x < 272 * 0x200)
 				{
 					npc->direct = 2;
 					npc->act_no = 100;
 				}
 			}
 
-			if (npc->direct == 0 && (++npc->act_wait == 300 || npc->act_wait == 310 || npc->act_wait == 320))
+			if (npc->direct == 0)
 			{
-				PlaySoundObject(39, 1);
-				SetNpChar(198, npc->x + 0x1400, npc->y + 0x200, Random(-3, 0) * 0x200, Random(-3, 3) * 0x200, 2, 0, 0x100);
+				++npc->act_wait;
+
+				if (npc->act_wait == 300 || npc->act_wait == 310 || npc->act_wait == 320)
+				{
+					PlaySoundObject(39, 1);
+					SetNpChar(198, npc->x + (10 * 0x200), npc->y + (1 * 0x200), Random(-3, 0) * 0x200, Random(-3, 3) * 0x200, 2, NULL, 0x100);
+				}
 			}
 
-			if (++npc->ani_wait > 2)
+			++npc->ani_wait;
+
+			if (npc->ani_wait > 2)
 			{
 				npc->ani_wait = 0;
 				++npc->ani_no;
@@ -157,20 +166,20 @@ void ActBossChar_Ironhead(void)
 			SetQuake(20);
 
 			for (i = 0; i < 0x20; ++i)
-				SetNpChar(4, npc->x + (Random(-0x80, 0x80) * 0x200), npc->y + (Random(-0x40, 0x40) * 0x200), Random(-0x80, 0x80) * 0x200, Random(-0x80, 0x80) * 0x200, 0, 0, 0x100);
+				SetNpChar(4, npc->x + (Random(-128, 128) * 0x200), npc->y + (Random(-64, 64) * 0x200), Random(-128, 128) * 0x200, Random(-128, 128) * 0x200, 0, NULL, 0x100);
 
 			DeleteNpCharCode(197, 1);
 			DeleteNpCharCode(271, 1);
 			DeleteNpCharCode(272, 1);
 			// Fallthrough
 		case 1001:
-			npc->tgt_x -= 0x200;
+			npc->tgt_x -= 1 * 0x200;
 
 			npc->x = npc->tgt_x + (Random(-1, 1) * 0x200);
 			npc->y = npc->tgt_y + (Random(-1, 1) * 0x200);
 
 			if (++npc->act_wait % 4 == 0)
-				SetNpChar(4, npc->x + (Random(-0x80, 0x80) * 0x200), npc->y + (Random(-0x40, 0x40) * 0x200), Random(-0x80, 0x80) * 0x200, Random(-0x80, 0x80) * 0x200, 0, 0, 0x100);
+				SetNpChar(4, npc->x + (Random(-128, 128) * 0x200), npc->y + (Random(-64, 64) * 0x200), Random(-128, 128) * 0x200, Random(-128, 128) * 0x200, 0, NULL, 0x100);
 
 			break;
 	}
@@ -199,7 +208,7 @@ void ActBossChar_Ironhead(void)
 		{256, 48, 320, 72},
 	};
 
-	if (npc->shock)
+	if (npc->shock != 0)
 	{
 		if (++flash / 2 % 2)
 			npc->rect = rc[npc->ani_no];
