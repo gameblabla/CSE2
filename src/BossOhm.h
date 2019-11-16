@@ -1,3 +1,3 @@
 #pragma once
 
-void ActBossChar_Omega();
+void ActBossChar_Omega(void);
