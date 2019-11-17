@@ -18,7 +18,7 @@ struct TEXT_SCRIPT
 	signed char flags;
 
 	// Current positions (read position in buffer, x position in line)
-	unsigned int p_read;
+	int p_read;
 	int p_write;
 
 	// Current line to write to
