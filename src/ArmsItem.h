@@ -55,10 +55,10 @@ extern ITEM gItemData[ITEM_MAX];
 
 
 /// Clear the weapons array, reverting it to the default state (no weapons) and adjust variables (initialize weapons basically)
-void ClearArmsData();
+void ClearArmsData(void);
 
 /// Clear the item array, reverting it to the default state (no items) (initialize items basically)
-void ClearItemData();
+void ClearItemData(void);
 
 
 /// Add code to the weapons, setting max_num as the max ammo, or find code and add max_num to its ammo. Fails if no space is available and the weapon isn't
@@ -80,7 +80,7 @@ BOOL SubItemData(long code);
 
 
 /// Inventory loop. Returns mode.
-int CampLoop();
+int CampLoop(void);
 
 
 /// Search for a in the items. Returns whether a was found
@@ -97,16 +97,16 @@ BOOL UseArmsEnergy(long num);
 BOOL ChargeArmsEnergy(long num);
 
 /// Set every weapons ammunition to its maximum ammunition
-void FullArmsEnergy();
+void FullArmsEnergy(void);
 
 
 // "Rotation" means "Weapons currently owned by the player (present in the weapons array)"
 
 /// Change the current weapon to the next one in the rotation. Returns the ID of the newly selected weapon
-int RotationArms();
+int RotationArms(void);
 
 /// Change the current weapon to the previous one in the rotation. Returns the ID of the newly selected weapon
-int RotationArmsRev();
+int RotationArmsRev(void);
 
 /// Change the current weapon to be the first one and play the usual rotation animation
-void ChangeToFirstArms();
+void ChangeToFirstArms(void);
