@@ -609,7 +609,7 @@ void ActNpc169(NPCHAR *npc)
 				npc->direct = 2;
 			// Fallthrough
 		case 1:
-			if (--npc->act_wait)
+			if (--npc->act_wait != 0)
 				break;
 
 			npc->act_no = 2;
@@ -623,7 +623,9 @@ void ActNpc169(NPCHAR *npc)
 			npc->ani_wait = 0;
 			// Fallthrough
 		case 3:
-			if (++npc->ani_wait > 3)
+			++npc->ani_wait;
+
+			if (npc->ani_wait > 3)
 			{
 				npc->ani_wait = 0;
 				++npc->ani_no;
@@ -648,46 +650,42 @@ void ActNpc169(NPCHAR *npc)
 				DamageMyChar(5);
 				break;
 			}
-			else
+
+			++npc->act_wait;
+
+			if (npc->act_wait > 75)
 			{
-				if (++npc->act_wait > 75)
+				npc->act_no = 9;
+				npc->ani_no = 0;
+				break;
+			}
+
+			if (npc->flag & 5)
+			{
+				if (npc->count2 < 5)
 				{
-					npc->act_no = 9;
-					npc->ani_no = 0;
-					break;
+					++npc->count2;
 				}
 				else
 				{
-					if (npc->flag & 5)
-					{
-						if (npc->count2 < 5)
-						{
-							++npc->count2;
-						}
-						else
-						{
-							npc->act_no = 4;
-							npc->act_wait = 0;
-							npc->ani_no = 7;
-							npc->ym = -0x5FF;
-						}
-					}
-					else
-					{
-						npc->count2 = 0;
-					}
-
-					if (npc->count1 % 2 == 0 && npc->act_wait > 25)
-					{
-						npc->act_no = 4;
-						npc->act_wait = 0;
-						npc->ani_no = 7;
-						npc->ym = -0x5FF;
-						break;
-					}
-
-					break;
+					npc->act_no = 4;
+					npc->act_wait = 0;
+					npc->ani_no = 7;
+					npc->ym = -0x5FF;
 				}
+			}
+			else
+			{
+				npc->count2 = 0;
+			}
+
+			if (npc->count1 % 2 == 0 && npc->act_wait > 25)
+			{
+				npc->act_no = 4;
+				npc->act_wait = 0;
+				npc->ani_no = 7;
+				npc->ym = -0x5FF;
+				break;
 			}
 
 			break;
@@ -752,7 +750,9 @@ void ActNpc169(NPCHAR *npc)
 			gMC.x = npc->x;
 			gMC.y = npc->y;
 
-			if (++npc->ani_wait > 2)
+			++npc->ani_wait;
+
+			if (npc->ani_wait > 2)
 			{
 				npc->ani_wait = 0;
 				++npc->ani_no;
@@ -761,7 +761,9 @@ void ActNpc169(NPCHAR *npc)
 			if (npc->ani_no > 6)
 				npc->ani_no = 5;
 
-			if (++npc->act_wait > 100)
+			++npc->act_wait;
+
+			if (npc->act_wait > 100)
 				npc->act_no = 20;
 
 			break;
@@ -794,7 +796,9 @@ void ActNpc169(NPCHAR *npc)
 			npc->ani_no = 7;
 			// Fallthrough
 		case 21:
-			if (++npc->act_wait < 50)
+			++npc->act_wait;
+
+			if (npc->act_wait < 50)
 				break;
 
 			npc->act_no = 0;
