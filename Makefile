@@ -1,4 +1,4 @@
-WINDRES = windres
+WINDRES ?= windres
 
 BUILD_DIRECTORY = game
 ASSETS_DIRECTORY = assets
@@ -36,7 +36,7 @@ ifeq ($(DEBUG_SAVE), 1)
 	CXXFLAGS += -DDEBUG_SAVE
 endif
 
-CXXFLAGS += -std=c++98 -MMD -MP -MF $@.d
+CXXFLAGS += -std=c++98 -Wall -Wextra -pedantic -MMD -MP -MF $@.d
 LIBS += -lkernel32 -lgdi32 -lddraw -ldinput -ldsound -lversion -lshlwapi -limm32 -lwinmm -ldxguid
 
 ifeq ($(STATIC), 1)
