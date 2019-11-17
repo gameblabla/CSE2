@@ -1,7 +1,7 @@
-NATIVECC = cc
-NATIVECXX = c++
-WINDRES = windres
-PKG_CONFIG = pkg-config
+NATIVECC ?= cc
+NATIVECXX ?= c++
+WINDRES ?= windres
+PKG_CONFIG ?= pkg-config
 
 BUILD_DIRECTORY = game
 ASSETS_DIRECTORY = assets

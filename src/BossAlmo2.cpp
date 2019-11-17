@@ -27,11 +27,11 @@ static void ActBossCharA_Head(NPCHAR *npc)
 			npc->act_no = 11;
 			npc->ani_no = 2;
 			npc->bits = NPC_IGNORE_SOLIDITY;
-			npc->view.front = 0x4800;
-			npc->view.top = 0x7000;
+			npc->view.front = 36 * 0x200;
+			npc->view.top = 56 * 0x200;
 			// Fallthrough
 		case 11:
-			npc->x = gBoss[0].x - 0x4800;
+			npc->x = gBoss[0].x - (36 * 0x200);
 			npc->y = gBoss[0].y;
 			break;
 
@@ -40,7 +40,9 @@ static void ActBossCharA_Head(NPCHAR *npc)
 			npc->act_wait = 112;
 			// Fallthrough
 		case 51:
-			if (--npc->act_wait == 0)
+			--npc->act_wait;
+
+			if (npc->act_wait == 0)
 			{
 				npc->act_no = 100;
 				npc->ani_no = 3;
@@ -56,7 +58,7 @@ static void ActBossCharA_Head(NPCHAR *npc)
 	npc->rect = rect[npc->ani_no];
 
 	if (npc->act_no == 51)
-		npc->rect.bottom = npc->act_wait + npc->rect.top;
+		npc->rect.bottom = npc->rect.top + npc->act_wait;
 }
 
 static void ActBossCharA_Tail(NPCHAR *npc)
@@ -73,11 +75,11 @@ static void ActBossCharA_Tail(NPCHAR *npc)
 			npc->act_no = 11;
 			npc->ani_no = 0;
 			npc->bits = NPC_IGNORE_SOLIDITY;
-			npc->view.front = 0x5800;
-			npc->view.top = 0x7000;
+			npc->view.front = 44 * 0x200;
+			npc->view.top = 56 * 0x200;
 			// Fallthrough
 		case 11:
-			npc->x = gBoss[0].x + 0x5800;
+			npc->x = gBoss[0].x + (44 * 0x200);
 			npc->y = gBoss[0].y;
 			break;
 
@@ -86,7 +88,9 @@ static void ActBossCharA_Tail(NPCHAR *npc)
 			npc->act_wait = 112;
 			// Fallthrough
 		case 51:
-			if (--npc->act_wait == 0)
+			--npc->act_wait;
+
+			if (npc->act_wait == 0)
 			{
 				npc->act_no = 100;
 				npc->ani_no = 2;
@@ -102,7 +106,7 @@ static void ActBossCharA_Tail(NPCHAR *npc)
 	npc->rect = rect[npc->ani_no];
 
 	if (npc->act_no == 51)
-		npc->rect.bottom = npc->act_wait + npc->rect.top;
+		npc->rect.bottom = npc->rect.top + npc->act_wait;
 }
 
 static void ActBossCharA_Face(NPCHAR *npc)
@@ -135,22 +139,24 @@ static void ActBossCharA_Face(NPCHAR *npc)
 			npc->act_wait = 100;
 			// Fallthrough
 		case 31:
-			if (++npc->act_wait > 300)
+			++npc->act_wait;
+
+			if (npc->act_wait > 300)
 				npc->act_wait = 0;
 
-			if (npc->act_wait > 250 && (npc->act_wait % 0x10) == 1)
+			if (npc->act_wait > 250 && npc->act_wait % 0x10 == 1)
 				PlaySoundObject(26, 1);
 
-			if (npc->act_wait > 250 && (npc->act_wait % 0x10) == 7)
+			if (npc->act_wait > 250 && npc->act_wait % 0x10 == 7)
 			{
-				SetNpChar(293, npc->x, npc->y, 0, 0, 0, 0, 0x80);
+				SetNpChar(293, npc->x, npc->y, 0, 0, 0, NULL, 0x80);
 				PlaySoundObject(101, 1);
 			}
 
 			if (npc->act_wait == 200)
 				PlaySoundObject(116, 1);
 
-			if (npc->act_wait > 200 && npc->act_wait % 2)
+			if (npc->act_wait > 200 && npc->act_wait % 2 != 0)
 				npc->ani_no = 4;
 			else
 				npc->ani_no = 3;
@@ -158,12 +164,12 @@ static void ActBossCharA_Face(NPCHAR *npc)
 			break;
 	}
 
-	npc->view.back = 0x4800;
-	npc->view.front = 0x4800;
-	npc->view.top = 0x2800;
+	npc->view.back = 36 * 0x200;
+	npc->view.front = 36 * 0x200;
+	npc->view.top = 20 * 0x200;
 
-	npc->x = gBoss[0].x - 0x4800;
-	npc->y = gBoss[0].y + 0x800;
+	npc->x = gBoss[0].x - (36 * 0x200);
+	npc->y = gBoss[0].y + (4 * 0x200);
 
 	npc->bits = NPC_IGNORE_SOLIDITY;
 
@@ -238,13 +244,13 @@ static void ActBossCharA_Mini(NPCHAR *npc)
 
 	if (npc->act_no < 50)
 	{
-		if (npc->count1)
+		if (npc->count1 != 0)
 			deg = npc->count2 + 0x80;
 		else
 			deg = npc->count2 + 0x180;
 
-		npc->x = npc->pNpc->x - 0x1000 + 0x30 * GetCos(deg / 2);
-		npc->y = npc->pNpc->y + 0x50 * GetSin(deg / 2);
+		npc->x = npc->pNpc->x - (8 * 0x200) + (GetCos(deg / 2) * 0x30);
+		npc->y = npc->pNpc->y + (GetSin(deg / 2) * 0x50);
 	}
 
 	npc->rect = rect[npc->ani_no];
@@ -256,22 +262,22 @@ static void ActBossCharA_Hit(NPCHAR *npc)
 	{
 		case 0:
 			npc->x = gBoss[0].x;
-			npc->y = gBoss[0].y - 0x4000;
+			npc->y = gBoss[0].y - (32 * 0x200);
 			break;
 
 		case 1:
-			npc->x = gBoss[0].x + 0x3800;
+			npc->x = gBoss[0].x + (28 * 0x200);
 			npc->y = gBoss[0].y;
 			break;
 
 		case 2:
-			npc->x = gBoss[0].x + 0x800;
-			npc->y = gBoss[0].y + 0x4000;
+			npc->x = gBoss[0].x + (4 * 0x200);
+			npc->y = gBoss[0].y + (32 * 0x200);
 			break;
 
 		case 3:
-			npc->x = gBoss[0].x - 0x3800;
-			npc->y = gBoss[0].y + 0x800;
+			npc->x = gBoss[0].x - (28 * 0x200);
+			npc->y = gBoss[0].y + (4 * 0x200);
 			break;
 	}
 }
@@ -298,8 +304,8 @@ void ActBossChar_Undead(void)
 			npc->bits = (NPC_INVULNERABLE | NPC_IGNORE_SOLIDITY | NPC_SHOW_DAMAGE);
 			npc->life = 700;
 			npc->hit_voice = 114;
-			npc->x = 0x4A000;
-			npc->y = 0xF000;
+			npc->x = 592 * 0x200;
+			npc->y = 120 * 0x200;
 			npc->xm = 0;
 			npc->ym = 0;
 			npc->code_event = 1000;
@@ -318,28 +324,28 @@ void ActBossChar_Undead(void)
 			gBoss[8].bits = NPC_IGNORE_SOLIDITY;
 			gBoss[8].view.front = 0;
 			gBoss[8].view.top = 0;
-			gBoss[8].hit.back = 0x5000;
-			gBoss[8].hit.top = 0x2000;
-			gBoss[8].hit.bottom = 0x2000;
+			gBoss[8].hit.back = 40 * 0x200;
+			gBoss[8].hit.top = 16 * 0x200;
+			gBoss[8].hit.bottom = 16 * 0x200;
 			gBoss[8].count1 = 0;
 
 			gBoss[9] = gBoss[8];
-			gBoss[9].hit.back = 0x4800;
-			gBoss[9].hit.top = 0x3000;
-			gBoss[9].hit.bottom = 0x3000;
+			gBoss[9].hit.back = 36 * 0x200;
+			gBoss[9].hit.top = 24 * 0x200;
+			gBoss[9].hit.bottom = 24 * 0x200;
 			gBoss[9].count1 = 1;
 
 			gBoss[10] = gBoss[8];
-			gBoss[10].hit.back = 0x5800;
-			gBoss[10].hit.top = 0x1000;
-			gBoss[10].hit.bottom = 0x1000;
+			gBoss[10].hit.back = 44 * 0x200;
+			gBoss[10].hit.top = 8 * 0x200;
+			gBoss[10].hit.bottom = 8 * 0x200;
 			gBoss[10].count1 = 2;
 
 			gBoss[11] = gBoss[8];
 			gBoss[11].cond |= 0x10;
-			gBoss[11].hit.back = 0x2800;
-			gBoss[11].hit.top = 0x2800;
-			gBoss[11].hit.bottom = 0x2800;
+			gBoss[11].hit.back = 20 * 0x200;
+			gBoss[11].hit.top = 20 * 0x200;
+			gBoss[11].hit.bottom = 20 * 0x200;
 			gBoss[11].count1 = 3;
 
 			gBoss[1].cond = 0x80;
@@ -347,11 +353,11 @@ void ActBossChar_Undead(void)
 			gBoss[1].bits = (NPC_IGNORE_SOLIDITY | NPC_SHOOTABLE);
 			gBoss[1].life = 1000;
 			gBoss[1].hit_voice = 54;
-			gBoss[1].hit.back = 0x3000;
-			gBoss[1].hit.top = 0x2000;
-			gBoss[1].hit.bottom = 0x2000;
-			gBoss[1].view.front = 0x4000;
-			gBoss[1].view.top = 0x2800;
+			gBoss[1].hit.back = 24 * 0x200;
+			gBoss[1].hit.top = 16 * 0x200;
+			gBoss[1].hit.bottom = 16 * 0x200;
+			gBoss[1].view.front = 32 * 0x200;
+			gBoss[1].view.top = 20 * 0x200;
 			gBoss[1].pNpc = npc;
 
 			gBoss[2] = gBoss[1];
@@ -403,21 +409,24 @@ void ActBossChar_Undead(void)
 		case 201:
 			++npc->act_wait;
 
-			if ((npc->direct == 2 || npc->ani_no > 0 || npc->life < 200) && npc->act_wait > 200)
+			if (npc->direct == 2 || npc->ani_no > 0 || npc->life < 200)
 			{
-				++npc->count1;
-				PlaySoundObject(115, 1);
+				if (npc->act_wait > 200)
+				{
+					++npc->count1;
+					PlaySoundObject(115, 1);
 
-				if (npc->life < 200)
-				{
-					npc->act_no = 230;
-				}
-				else
-				{
-					if (npc->count1 > 2)
-						npc->act_no = 220;
+					if (npc->life < 200)
+					{
+						npc->act_no = 230;
+					}
 					else
-						npc->act_no = 210;
+					{
+						if (npc->count1 > 2)
+							npc->act_no = 220;
+						else
+							npc->act_no = 210;
+					}
 				}
 			}
 
@@ -437,7 +446,7 @@ void ActBossChar_Undead(void)
 		case 211:
 			++flash;
 
-			if (npc->shock && flash / 2 % 2)
+			if (npc->shock != 0 && flash / 2 % 2)
 			{
 				gBoss[4].ani_no = 1;
 				gBoss[5].ani_no = 1;
@@ -448,7 +457,9 @@ void ActBossChar_Undead(void)
 				gBoss[5].ani_no = 0;
 			}
 
-			if (++npc->act_wait % 100 == 1)
+			++npc->act_wait;
+
+			if (npc->act_wait % 100 == 1)
 			{
 				gCurlyShoot_wait = Random(80, 100);
 				gCurlyShoot_x = gBoss[11].x;
@@ -458,10 +469,10 @@ void ActBossChar_Undead(void)
 			if (npc->act_wait < 300)
 			{
 				if (npc->act_wait % 120 == 1)
-					SetNpChar(288, npc->x - 0x4000, npc->y - 0x2000, 0, 0, 1, 0, 0x20);
+					SetNpChar(288, npc->x - (32 * 0x200), npc->y - (16 * 0x200), 0, 0, 1, NULL, 0x20);
 
 				if (npc->act_wait % 120 == 61)
-					SetNpChar(288, npc->x - 0x4000, npc->y + 0x2000, 0, 0, 3, 0, 0x20);
+					SetNpChar(288, npc->x - (32 * 0x200), npc->y + (16 * 0x200), 0, 0, 3, NULL, 0x20);
 			}
 
 			if (npc->life < life - 50 || npc->act_wait > 400)
@@ -484,7 +495,9 @@ void ActBossChar_Undead(void)
 			bShock = TRUE;
 			// Fallthrough
 		case 221:
-			if (++npc->act_wait % 40 == 1)
+			++npc->act_wait;
+
+			if (npc->act_wait % 40 == 1)
 			{
 				switch (Random(0, 3))
 				{
@@ -507,13 +520,13 @@ void ActBossChar_Undead(void)
 				}
 
 				PlaySoundObject(25, 1);
-				SetNpChar(285, x - 0x2000, y, 0, 0, 0, 0, 0x100);
-				SetNpChar(285, x - 0x2000, y, 0, 0, 0x400, 0, 0x100);
+				SetNpChar(285, x - (16 * 0x200), y, 0, 0, 0, NULL, 0x100);
+				SetNpChar(285, x - (16 * 0x200), y, 0, 0, 0x400, NULL, 0x100);
 			}
 
 			++flash;
 
-			if (npc->shock && flash / 2 % 2)
+			if (npc->shock != 0 && flash / 2 % 2)
 			{
 				gBoss[4].ani_no = 1;
 				gBoss[5].ani_no = 1;
@@ -542,12 +555,12 @@ void ActBossChar_Undead(void)
 
 			PlaySoundObject(25, 1);
 
-			SetNpChar(285, gBoss[3].x - 0x2000, gBoss[3].y, 0, 0, 0, 0, 0x100);
-			SetNpChar(285, gBoss[3].x - 0x2000, gBoss[3].y, 0, 0, 0x400, 0, 0x100);
-			SetNpChar(285, gBoss[3].x, gBoss[3].y - 0x2000, 0, 0, 0, 0, 0x100);
-			SetNpChar(285, gBoss[3].x, gBoss[3].y - 0x2000, 0, 0, 0x400, 0, 0x100);
-			SetNpChar(285, gBoss[3].x, gBoss[3].y + 0x2000, 0, 0, 0, 0, 0x100);
-			SetNpChar(285, gBoss[3].x, gBoss[3].y + 0x2000, 0, 0, 0x400, 0, 0x100);
+			SetNpChar(285, gBoss[3].x - (16 * 0x200), gBoss[3].y, 0, 0, 0, NULL, 0x100);
+			SetNpChar(285, gBoss[3].x - (16 * 0x200), gBoss[3].y, 0, 0, 0x400, NULL, 0x100);
+			SetNpChar(285, gBoss[3].x, gBoss[3].y - (16 * 0x200), 0, 0, 0, NULL, 0x100);
+			SetNpChar(285, gBoss[3].x, gBoss[3].y - (16 * 0x200), 0, 0, 0x400, NULL, 0x100);
+			SetNpChar(285, gBoss[3].x, gBoss[3].y + (16 * 0x200), 0, 0, 0, NULL, 0x100);
+			SetNpChar(285, gBoss[3].x, gBoss[3].y + (16 * 0x200), 0, 0, 0x400, NULL, 0x100);
 
 			life = npc->life;
 			bShock = TRUE;
@@ -555,7 +568,7 @@ void ActBossChar_Undead(void)
 		case 231:
 			++flash;
 
-			if (npc->shock && flash / 2 % 2)
+			if (npc->shock != 0 && flash / 2 % 2)
 			{
 				gBoss[4].ani_no = 1;
 				gBoss[5].ani_no = 1;
@@ -574,10 +587,10 @@ void ActBossChar_Undead(void)
 			}
 
 			if (npc->act_wait % 120 == 1)
-				SetNpChar(288, npc->x - 0x4000, npc->y - 0x2000, 0, 0, 1, 0, 0x20);
+				SetNpChar(288, npc->x - (32 * 0x200), npc->y - (16 * 0x200), 0, 0, 1, NULL, 0x20);
 
 			if (npc->act_wait % 120 == 61)
-				SetNpChar(288, npc->x - 0x4000, npc->y + 0x2000, 0, 0, 3, 0, 0x20);
+				SetNpChar(288, npc->x - (32 * 0x200), npc->y + (16 * 0x200), 0, 0, 3, NULL, 0x20);
 
 			break;
 
@@ -597,7 +610,7 @@ void ActBossChar_Undead(void)
 			SetQuake(20);
 
 			for (i = 0; i < 100; ++i)
-				SetNpChar(4, npc->x + (Random(-0x80, 0x80) * 0x200), npc->y + (Random(-0x40, 0x40) * 0x200), Random(-0x80, 0x80) * 0x200, Random(-0x80, 0x80) * 0x200, 0, 0, 0);
+				SetNpChar(4, npc->x + (Random(-128, 128) * 0x200), npc->y + (Random(-64, 64) * 0x200), Random(-128, 128) * 0x200, Random(-128, 128) * 0x200, 0, NULL, 0);
 
 			DeleteNpCharCode(282, 1);
 			gBoss[11].bits &= ~NPC_SHOOTABLE;
@@ -608,8 +621,8 @@ void ActBossChar_Undead(void)
 		case 501:
 			++npc->act_wait;
 
-			if (npc->act_wait % 0x10)
-				SetNpChar(4, npc->x + (Random(-0x40, 0x40) * 0x200), npc->y + (Random(-0x20, 0x20) * 0x200), Random(-0x80, 0x80) * 0x200, Random(-0x80, 0x80) * 0x200, 0, 0, 0x100);
+			if (npc->act_wait % 0x10 != 0)
+				SetNpChar(4, npc->x + (Random(-64, 64) * 0x200), npc->y + (Random(-32, 32) * 0x200), Random(-128, 128) * 0x200, Random(-128, 128) * 0x200, 0, NULL, 0x100);
 
 			npc->x += 0x40;
 			npc->y += 0x80;
@@ -630,7 +643,7 @@ void ActBossChar_Undead(void)
 			if (gBoss[0].act_wait % 8 == 0)
 				PlaySoundObject(44, 1);
 
-			SetDestroyNpChar(gBoss[0].x + (Random(-0x48, 0x48) * 0x200), gBoss[0].y + (Random(-0x40, 0x40) * 0x200), 1, 1);
+			SetDestroyNpChar(gBoss[0].x + (Random(-72, 72) * 0x200), gBoss[0].y + (Random(-64, 64) * 0x200), 1, 1);
 
 			if (gBoss[0].act_wait > 100)
 			{
@@ -675,14 +688,14 @@ void ActBossChar_Undead(void)
 		PlaySoundObject(26, 1);
 
 		for (i = 0; i < 8; ++i)
-			SetNpChar(4, gBoss[4].x + (Random(-0x20, 0x10) * 0x200), gBoss[4].y, Random(-0x200, 0x200), Random(-0x100, 0x100), 0, 0, 0x100);
+			SetNpChar(4, gBoss[4].x + (Random(-32, 16) * 0x200), gBoss[4].y, Random(-0x200, 0x200), Random(-0x100, 0x100), 0, NULL, 0x100);
 	}
 
 	if (npc->act_no >= 200 && npc->act_no < 300)
 	{
-		if (npc->x < 0x18000)
+		if (npc->x < 192 * 0x200)
 			npc->direct = 2;
-		if (npc->x > (gMap.width - 4) * 0x2000)
+		if (npc->x > (gMap.width - 4) * 0x2000)	// Pixel is inconsistent: the assembly code indicates he really used '0x2000' instead of '0x200 * 0x10', which he usually uses
 			npc->direct = 0;
 
 		if (npc->direct == 0)
@@ -697,14 +710,16 @@ void ActBossChar_Undead(void)
 		case 211:
 		case 221:
 		case 231:
-			if (++npc->count2 == 150)
+			++npc->count2;
+
+			if (npc->count2 == 150)
 			{
 				npc->count2 = 0;
-				SetNpChar(282, (gMap.width * 0x200 * 0x10) + 0x40, (Random(-1, 3) + 10) * 0x2000, 0, 0, 0, 0, 0x30);
+				SetNpChar(282, (gMap.width * 0x200 * 0x10) + 0x40, (Random(-1, 3) + 10) * 0x2000, 0, 0, 0, NULL, 0x30);
 			}
 			else if (npc->count2 == 75)
 			{
-				SetNpChar(282, (gMap.width * 0x200 * 0x10) + 0x40, (Random(-3, 0) + 3) * 0x2000, 0, 0, 0, 0, 0x30);
+				SetNpChar(282, (gMap.width * 0x200 * 0x10) + 0x40, (Random(-3, 0) + 3) * 0x2000, 0, 0, 0, NULL, 0x30);
 			}
 
 			break;

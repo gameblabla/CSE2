@@ -11,7 +11,7 @@
 #define CARET_MAX 0x40
 CARET gCrt[CARET_MAX];
 
-void InitCaret()
+void InitCaret(void)
 {
 	memset(gCrt, 0, sizeof(gCrt));
 }
@@ -37,7 +37,7 @@ void ActCaret01(CARET *crt)
 		{88, 24, 96, 32},
 	};
 
-	if (!crt->act_no)
+	if (crt->act_no == 0)
 	{
 		crt->act_no = 1;
 		crt->xm = Random(-0x400, 0x400);
@@ -165,7 +165,7 @@ void ActCaret04(CARET *crt)
 			crt->cond = 0;
 	}
 
-	crt->rect = rect[3 * crt->direct + crt->ani_no];
+	crt->rect = rect[(crt->direct * 3) + crt->ani_no];
 }
 
 void ActCaret05(CARET *crt)
@@ -220,16 +220,16 @@ void ActCaret07(CARET *crt)
 	switch (crt->direct)
 	{
 		case 0:
-			crt->x -= 0x400;
+			crt->x -= 2 * 0x200;
 			break;
 		case 1:
-			crt->y -= 0x400;
+			crt->y -= 2 * 0x200;
 			break;
 		case 2:
-			crt->x += 0x400;
+			crt->x += 2 * 0x200;
 			break;
 		case 3:
-			crt->y += 0x400;
+			crt->y += 2 * 0x200;
 			break;
 	}
 }
@@ -279,7 +279,7 @@ void ActCaret10(CARET *crt)
 	if (crt->direct == 0)
 	{
 		if (crt->ani_wait < 20)
-			crt->y -= 0x400;
+			crt->y -= 2 * 0x200;
 
 		if (crt->ani_wait == 80)
 			crt->cond = 0;
@@ -287,7 +287,7 @@ void ActCaret10(CARET *crt)
 	else
 	{
 		if (crt->ani_wait < 20)
-			crt->y -= 0x200;
+			crt->y -= 1 * 0x200;
 
 		if (crt->ani_wait == 80)
 			crt->cond = 0;
@@ -303,12 +303,12 @@ void ActCaret11(CARET *crt)
 {
 	unsigned char deg;
 
-	if (!crt->act_no)
+	if (crt->act_no == 0)
 	{
 		crt->act_no = 1;
 		deg = Random(0, 0xFF);
-		crt->xm = 2 * GetCos(deg);
-		crt->ym = 2 * GetSin(deg);
+		crt->xm = GetCos(deg) * 2;
+		crt->ym = GetSin(deg) * 2;
 	}
 
 	crt->x += crt->xm;
@@ -378,8 +378,8 @@ void ActCaret13(CARET *crt)
 	switch (crt->direct)
 	{
 		case 0:
-			crt->xm = 4 * crt->xm / 5;
-			crt->ym = 4 * crt->ym / 5;
+			crt->xm = (crt->xm * 4) / 5;
+			crt->ym = (crt->ym * 4) / 5;
 			break;
 	}
 
@@ -392,7 +392,7 @@ void ActCaret13(CARET *crt)
 	crt->rect = rcLeft[crt->ani_wait / 2 % 2];
 
 	if (crt->direct == 5)
-		crt->x -= 0x800;
+		crt->x -= 4 * 0x200;
 }
 
 void ActCaret14(CARET *crt)
@@ -444,7 +444,7 @@ void ActCaret16(CARET *crt)
 	};
 
 	if (++crt->ani_wait < 10)
-		crt->y -= 0x400;
+		crt->y -= 2 * 0x200;
 
 	if (crt->ani_wait == 40)
 		crt->cond = 0;
@@ -513,12 +513,12 @@ CARETFUNCTION gpCaretFuncTbl[] =
 	ActCaret17,
 };
 
-void ActCaret()
+void ActCaret(void)
 {
 	int i;
 	int code;
 
-	for (i = 0; i < CARET_MAX; i++)
+	for (i = 0; i < CARET_MAX; ++i)
 	{
 		if (gCrt[i].cond & 0x80)
 		{
@@ -530,14 +530,16 @@ void ActCaret()
 
 void PutCaret(int fx, int fy)
 {
-	for (int i = 0; i < CARET_MAX; i++)
+	int i;
+
+	for (i = 0; i < CARET_MAX; ++i)
 	{
 		if (gCrt[i].cond & 0x80)
 		{
 			PutBitmap3(
 				&grcGame,
-				(gCrt[i].x - gCrt[i].view_left) / 0x200 - fx / 0x200,
-				(gCrt[i].y - gCrt[i].view_top) / 0x200 - fy / 0x200,
+				((gCrt[i].x - gCrt[i].view_left) / 0x200) - (fx / 0x200),
+				((gCrt[i].y - gCrt[i].view_top) / 0x200) - (fy / 0x200),
 				&gCrt[i].rect,
 				SURFACE_ID_CARET);
 		}
@@ -547,7 +549,7 @@ void PutCaret(int fx, int fy)
 void SetCaret(int x, int y, int code, int dir)
 {
 	int c;
-	for (c = 0; c < CARET_MAX; c++)
+	for (c = 0; c < CARET_MAX; ++c)
 		if (gCrt[c].cond == 0)
 			break;
 

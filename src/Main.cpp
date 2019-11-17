@@ -158,7 +158,7 @@ int main(int argc, char *argv[])
 	}
 
 	// Set gamepad inputs
-	for (i = 0; i < 8; i++)
+	for (i = 0; i < 8; ++i)
 	{
 		switch (conf.joystick_button[i])
 		{
@@ -277,7 +277,7 @@ int main(int argc, char *argv[])
 
 	// Draw loading screen
 	CortBox(&rcFull, 0x000000);
-	PutBitmap3(&rcFull, (WINDOW_WIDTH - 64) / 2, (WINDOW_HEIGHT - 8) / 2, &rcLoading, SURFACE_ID_LOADING);
+	PutBitmap3(&rcFull, (WINDOW_WIDTH / 2) - 32, (WINDOW_HEIGHT / 2) - 4, &rcLoading, SURFACE_ID_LOADING);
 
 	// Draw to screen
 	if (!Flip_SystemTask())
@@ -287,34 +287,32 @@ int main(int argc, char *argv[])
 		SDL_DestroyWindow(window);
 		return 1;
 	}
-	else
+
+	// Initialize sound
+	InitDirectSound();
+
+	// Initialize joystick
+	if (conf.bJoystick && InitDirectInput())
 	{
-		// Initialize sound
-		InitDirectSound();
-
-		// Initialize joystick
-		if (conf.bJoystick && InitDirectInput())
-		{
-			ResetJoystickStatus();
-			gbUseJoystick = TRUE;
-		}
-
-		// Initialize stuff
-		InitTextObject(conf.font_name);
-		InitTriangleTable();
-
-		// Run game code
-		Game();
-
-		// End stuff
-		EndTextObject();
-		EndDirectSound();
-		EndDirectDraw();
-
-        SDL_FreeCursor(cursor);
-        SDL_FreeSurface(cursor_surface);
-		SDL_DestroyWindow(window);
+		ResetJoystickStatus();
+		gbUseJoystick = TRUE;
 	}
+
+	// Initialize stuff
+	InitTextObject(conf.font_name);
+	InitTriangleTable();
+
+	// Run game code
+	Game();
+
+	// End stuff
+	EndTextObject();
+	EndDirectSound();
+	EndDirectDraw();
+
+	SDL_FreeCursor(cursor);
+	SDL_FreeSurface(cursor_surface);
+	SDL_DestroyWindow(window);
 
 	return 1;
 }
@@ -601,13 +599,11 @@ void JoystickProc(void)
 		gKey &= ~gKeyDown;
 
 	// Clear held buttons
-	for (i = 0; i < 8; i++)
+	for (i = 0; i < 8; ++i)
 		gKey &= ~gJoystickButtonTable[i];
 
 	// Set held buttons
-	for (i = 0; i < 8; i++)
-	{
+	for (i = 0; i < 8; ++i)
 		if (status.bButton[i])
 			gKey |= gJoystickButtonTable[i];
-	}
 }

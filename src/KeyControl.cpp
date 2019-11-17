@@ -18,7 +18,7 @@ long gKeyUp = KEY_UP;
 long gKeyRight = KEY_RIGHT;
 long gKeyDown = KEY_DOWN;
 
-void GetTrg()
+void GetTrg(void)
 {
 	static int key_old;
 	gKeyTrg = gKey ^ key_old;

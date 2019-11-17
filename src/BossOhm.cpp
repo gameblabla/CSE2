@@ -13,7 +13,7 @@
 #include "NpChar.h"
 #include "Sound.h"
 
-static void ActBoss01_12()
+static void ActBoss01_12(void)
 {
 	int i;
 
@@ -27,22 +27,22 @@ static void ActBoss01_12()
 
 	for (i = 1; i < 3; ++i)
 	{
-		gBoss[i].y = (gBoss[0].y + gBoss[i + 2].y - 0x1000) / 2;
+		gBoss[i].y = (gBoss[0].y + gBoss[i + 2].y - (8 * 0x200)) / 2;
 
 		if (gBoss[i].direct == 0)
 		{
-			gBoss[i].x = gBoss[0].x - 0x2000;
+			gBoss[i].x = gBoss[0].x - (16 * 0x200);
 			gBoss[i].rect = rcLeft[gBoss[i].ani_no];
 		}
 		else
 		{
 			gBoss[i].rect = rcRight[gBoss[i].ani_no];
-			gBoss[i].x = gBoss[0].x + 0x2000;
+			gBoss[i].x = gBoss[0].x + (16 * 0x200);
 		}
 	}
 }
 
-static void ActBoss01_34()
+static void ActBoss01_34(void)
 {
 	int i;
 
@@ -67,25 +67,25 @@ static void ActBoss01_34()
 				gBoss[i].y = gBoss[0].y;
 
 				if (i == 3)
-					gBoss[i].x = gBoss[0].x - 0x2000;
+					gBoss[i].x = gBoss[0].x - (16 * 0x200);
 				if (i == 4)
-					gBoss[i].x = gBoss[0].x + 0x2000;
+					gBoss[i].x = gBoss[0].x + (16 * 0x200);
 
 				break;
 
 			case 3:
-				gBoss[i].tgt_y = gBoss[0].y + 0x3000;
+				gBoss[i].tgt_y = gBoss[0].y + (24 * 0x200);
 
 				if (i == 3)
-					gBoss[i].x = gBoss[0].x - 0x2000;
+					gBoss[i].x = gBoss[0].x - (16 * 0x200);
 				if (i == 4)
-					gBoss[i].x = gBoss[0].x + 0x2000;
+					gBoss[i].x = gBoss[0].x + (16 * 0x200);
 
 				gBoss[i].y += (gBoss[i].tgt_y - gBoss[i].y) / 2;
 				break;
 		}
 
-		if ((gBoss[i].flag & 8) || gBoss[i].y <= gBoss[i].tgt_y)
+		if (gBoss[i].flag & 8 || gBoss[i].y <= gBoss[i].tgt_y)
 			gBoss[i].ani_no = 0;
 		else
 			gBoss[i].ani_no = 1;
@@ -97,17 +97,17 @@ static void ActBoss01_34()
 	}
 }
 
-static void ActBoss01_5()
+static void ActBoss01_5(void)
 {
 	switch (gBoss[5].act_no)
 	{
 		case 0:
 			gBoss[5].bits |= (NPC_SOLID_SOFT | NPC_IGNORE_SOLIDITY);
 
-			gBoss[5].hit.front = 0x2800;
-			gBoss[5].hit.top = 0x4800;
-			gBoss[5].hit.back = 0x2800;
-			gBoss[5].hit.bottom = 0x2000;
+			gBoss[5].hit.front = 20 * 0x200;
+			gBoss[5].hit.top = 36 * 0x200;
+			gBoss[5].hit.back = 20 * 0x200;
+			gBoss[5].hit.bottom = 16 * 0x200;
 
 			gBoss[5].act_no = 1;
 			// Fallthrough
@@ -118,28 +118,28 @@ static void ActBoss01_5()
 	}
 }
 
-void ActBossChar_Omega()
+void ActBossChar_Omega(void)
 {
 	switch (gBoss[0].act_no)
 	{
 		case 0:
-			gBoss[0].x = 0x1B6000;
-			gBoss[0].y = 0x20000;
+			gBoss[0].x = 219 * 0x10 * 0x200;
+			gBoss[0].y = 16 * 0x10 * 0x200;
 
-			gBoss[0].view.front = 0x5000;
-			gBoss[0].view.top = 0x5000;
-			gBoss[0].view.back = 0x5000;
-			gBoss[0].view.bottom = 0x2000;
+			gBoss[0].view.front = 40 * 0x200;
+			gBoss[0].view.top = 40 * 0x200;
+			gBoss[0].view.back = 40 * 0x200;
+			gBoss[0].view.bottom = 16 * 0x200;
 
 			gBoss[0].tgt_x = gBoss[0].x;
 			gBoss[0].tgt_y = gBoss[0].y;
 
 			gBoss[0].hit_voice = 52;
 
-			gBoss[0].hit.front = 0x1000;
-			gBoss[0].hit.top = 0x3000;
-			gBoss[0].hit.back = 0x1000;
-			gBoss[0].hit.bottom = 0x2000;
+			gBoss[0].hit.front = 8 * 0x200;
+			gBoss[0].hit.top = 24 * 0x200;
+			gBoss[0].hit.back = 8 * 0x200;
+			gBoss[0].hit.bottom = 16 * 0x200;
 
 			gBoss[0].bits = (NPC_IGNORE_SOLIDITY | NPC_EVENT_WHEN_KILLED | NPC_SHOW_DAMAGE);
 			gBoss[0].size = 3;
@@ -149,10 +149,10 @@ void ActBossChar_Omega()
 
 			gBoss[1].cond = 0x80;
 
-			gBoss[1].view.front = 0x1800;
-			gBoss[1].view.top = 0x1000;
-			gBoss[1].view.back = 0x1800;
-			gBoss[1].view.bottom = 0x1000;
+			gBoss[1].view.front = 12 * 0x200;
+			gBoss[1].view.top = 8 * 0x200;
+			gBoss[1].view.back = 12 * 0x200;
+			gBoss[1].view.bottom = 8 * 0x200;
 
 			gBoss[1].bits = NPC_IGNORE_SOLIDITY;
 
@@ -163,28 +163,28 @@ void ActBossChar_Omega()
 
 			gBoss[3].cond = 0x80;
 
-			gBoss[3].view.front = 0x3000;
-			gBoss[3].view.top = 0x2000;
-			gBoss[3].view.back = 0x2000;
-			gBoss[3].view.bottom = 0x2000;
+			gBoss[3].view.front = 24 * 0x200;
+			gBoss[3].view.top = 16 * 0x200;
+			gBoss[3].view.back = 16 * 0x200;
+			gBoss[3].view.bottom = 16 * 0x200;
 
 			gBoss[3].hit_voice = 52;
 
-			gBoss[3].hit.front = 0x1000;
-			gBoss[3].hit.top = 0x1000;
-			gBoss[3].hit.back = 0x1000;
-			gBoss[3].hit.bottom = 0x1000;
+			gBoss[3].hit.front = 8 * 0x200;
+			gBoss[3].hit.top = 8 * 0x200;
+			gBoss[3].hit.back = 8 * 0x200;
+			gBoss[3].hit.bottom = 8 * 0x200;
 
 			gBoss[3].bits = NPC_IGNORE_SOLIDITY;
 
-			gBoss[3].x = gBoss[0].x - 0x2000;
+			gBoss[3].x = gBoss[0].x - (16 * 0x200);
 			gBoss[3].y = gBoss[0].y;
 			gBoss[3].direct = 0;
 
 			gBoss[4] = gBoss[3];
 
 			gBoss[4].direct = 2;
-			gBoss[3].x = gBoss[0].x + 0x2000;
+			gBoss[3].x = gBoss[0].x + (16 * 0x200);
 			gBoss[5].cond = 0x80;
 			break;
 
@@ -195,7 +195,7 @@ void ActBossChar_Omega()
 			// Fallthrough
 		case 30:
 			SetQuake(2);
-			gBoss[0].y -= 0x200;
+			gBoss[0].y -= 1 * 0x200;
 
 			if (++gBoss[0].act_wait % 4 == 0)
 				PlaySoundObject(26, 1);
@@ -217,23 +217,29 @@ void ActBossChar_Omega()
 
 				gBoss[3].act_no = 3;
 				gBoss[4].act_no = 3;
-				gBoss[5].hit.top = 0x2000;
+				gBoss[5].hit.top = 16 * 0x200;
 			}
+
 			break;
 
 		case 40:
-			if (++gBoss[0].act_wait == 48)
+			++gBoss[0].act_wait;
+
+			if (gBoss[0].act_wait == 48)
 			{
 				gBoss[0].act_wait = 0;
 				gBoss[0].act_no = 50;
 				gBoss[0].count1 = 0;
-				gBoss[5].hit.top = 0x2000;
+				gBoss[5].hit.top = 16 * 0x200;
 				PlaySoundObject(102, 1);
 			}
+
 			break;
 
 		case 50: // Open mouth
-			if (++gBoss[0].count1 > 2)
+			++gBoss[0].count1;
+
+			if (gBoss[0].count1 > 2)
 			{
 				gBoss[0].count1 = 0;
 				++gBoss[0].count2;
@@ -244,18 +250,21 @@ void ActBossChar_Omega()
 				gBoss[0].act_no = 60;
 				gBoss[0].act_wait = 0;
 				gBoss[0].bits |= NPC_SHOOTABLE;
-				gBoss[0].hit.front = 0x2000;
-				gBoss[0].hit.back = 0x2000;
+				gBoss[0].hit.front = 16 * 0x200;
+				gBoss[0].hit.back = 16 * 0x200;
 			}
+
 			break;
 
 		case 60: // Shoot out of mouth
-			if (++gBoss[0].act_wait > 20 && gBoss[0].act_wait < 80 && !(gBoss[0].act_wait % 3))
+			++gBoss[0].act_wait;
+
+			if (gBoss[0].act_wait > 20 && gBoss[0].act_wait < 80 && !(gBoss[0].act_wait % 3))
 			{
 				if (Random(0, 9) < 8)
-					SetNpChar(48, gBoss[0].x, gBoss[0].y - 0x2000, Random(-0x100, 0x100), -0x333, 0, NULL, 0x100);
+					SetNpChar(48, gBoss[0].x, gBoss[0].y - (16 * 0x200), Random(-0x100, 0x100), -0x333, 0, NULL, 0x100);
 				else
-					SetNpChar(48, gBoss[0].x, gBoss[0].y - 0x2000, Random(-0x100, 0x100), -0x333, 2, NULL, 0x100);
+					SetNpChar(48, gBoss[0].x, gBoss[0].y - (16 * 0x200), Random(-0x100, 0x100), -0x333, 2, NULL, 0x100);
 
 				PlaySoundObject(39, 1);
 			}
@@ -266,10 +275,13 @@ void ActBossChar_Omega()
 				gBoss[0].act_no = 70;
 				PlaySoundObject(102, 1);
 			}
+
 			break;
 
 		case 70: // Close mouth
-			if (++gBoss[0].count1 > 2)
+			++gBoss[0].count1;
+
+			if (gBoss[0].count1 > 2)
 			{
 				gBoss[0].count1 = 0;
 				--gBoss[0].count2;
@@ -288,27 +300,33 @@ void ActBossChar_Omega()
 
 				gBoss[0].bits &= ~NPC_SHOOTABLE;
 
-				gBoss[0].hit.front = 0x3000;
-				gBoss[0].hit.back = 0x3000;
-				gBoss[5].hit.top = 0x4800;
+				gBoss[0].hit.front = 24 * 0x200;
+				gBoss[0].hit.back = 24 * 0x200;
+				gBoss[5].hit.top = 36 * 0x200;
 
 				gBoss[0].damage = 0;
 			}
+
 			break;
 
 		case 80:
-			if (++gBoss[0].act_wait == 48)
+			++gBoss[0].act_wait;
+
+			if (gBoss[0].act_wait == 48)
 			{
 				gBoss[0].act_wait = 0;
 				gBoss[0].act_no = 90;
 			}
+
 			break;
 
 		case 90: // Go back into the ground
 			SetQuake(2);
-			gBoss[0].y += 0x200;
+			gBoss[0].y += 1 * 0x200;
 
-			if (++gBoss[0].act_wait % 4 == 0)
+			++gBoss[0].act_wait;
+
+			if (gBoss[0].act_wait % 4 == 0)
 				PlaySoundObject(26, 1);
 
 			if (gBoss[0].act_wait == 48)
@@ -316,21 +334,27 @@ void ActBossChar_Omega()
 				gBoss[0].act_wait = 0;
 				gBoss[0].act_no = 100;
 			}
+
 			break;
 
 		case 100: // Move to proper position for coming out of the ground
-			if (++gBoss[0].act_wait == 120)
+			++gBoss[0].act_wait;
+
+			if (gBoss[0].act_wait == 120)
 			{
 				gBoss[0].act_wait = 0;
 				gBoss[0].act_no = 30;
 
-				gBoss[0].x = gBoss[0].tgt_x + (Random(-0x40, 0x40) * 0x200);
+				gBoss[0].x = gBoss[0].tgt_x + (Random(-64, 64) * 0x200);
 				gBoss[0].y = gBoss[0].tgt_y;
 			}
+
 			break;
 
 		case 110:
-			if (++gBoss[0].count1 > 2)
+			++gBoss[0].count1;
+
+			if (gBoss[0].count1 > 2)
 			{
 				gBoss[0].count1 = 0;
 				++gBoss[0].count2;
@@ -340,13 +364,16 @@ void ActBossChar_Omega()
 			{
 				gBoss[0].act_no = 120;
 				gBoss[0].act_wait = 0;
-				gBoss[0].hit.front = 0x2000;
-				gBoss[0].hit.back = 0x2000;
+				gBoss[0].hit.front = 16 * 0x200;
+				gBoss[0].hit.back = 16 * 0x200;
 			}
+
 			break;
 
 		case 120:
-			if (++gBoss[0].act_wait == 50 || CountArmsBullet(6))
+			++gBoss[0].act_wait;
+
+			if (gBoss[0].act_wait == 50 || CountArmsBullet(6))
 			{
 				gBoss[0].act_no = 130;
 				PlaySoundObject(102, 1);
@@ -356,13 +383,16 @@ void ActBossChar_Omega()
 
 			if (gBoss[0].act_wait < 30 && !(gBoss[0].act_wait % 5))
 			{
-				SetNpChar(48, gBoss[0].x, gBoss[0].y - 0x2000, Random(-341, 341), -0x333, 0, NULL, 0x100);
+				SetNpChar(48, gBoss[0].x, gBoss[0].y - (16 * 0x200), Random(-341, 341), -0x333, 0, NULL, 0x100);
 				PlaySoundObject(39, 1);
 			}
+
 			break;
 
 		case 130:
-			if (++gBoss[0].count1 > 2)
+			++gBoss[0].count1;
+
+			if (gBoss[0].count1 > 2)
 			{
 				gBoss[0].count1 = 0;
 				--gBoss[0].count2;
@@ -371,13 +401,13 @@ void ActBossChar_Omega()
 			if (gBoss[0].count2 == 1)
 				gBoss[0].damage = 20;
 
-			if (!gBoss[0].count2)
+			if (gBoss[0].count2 == 0)
 			{
 				gBoss[0].act_no = 140;
 				gBoss[0].bits |= NPC_SHOOTABLE;
 
-				gBoss[0].hit.front = 0x2000;
-				gBoss[0].hit.back = 0x2000;
+				gBoss[0].hit.front = 16 * 0x200;
+				gBoss[0].hit.back = 16 * 0x200;
 
 				gBoss[0].ym = -0x5FF;
 
@@ -391,8 +421,9 @@ void ActBossChar_Omega()
 					gBoss[0].xm = -0x100;
 
 				gBoss[0].damage = 0;
-				gBoss[5].hit.top = 0x4800;
+				gBoss[5].hit.top = 36 * 0x200;
 			}
+
 			break;
 
 		case 140:
@@ -414,7 +445,7 @@ void ActBossChar_Omega()
 				gBoss[0].act_wait = 0;
 				gBoss[0].count1 = 0;
 
-				gBoss[5].hit.top = 0x2000;
+				gBoss[5].hit.top = 16 * 0x200;
 				gBoss[5].damage = 0;
 
 				PlaySoundObject(26, 1);
@@ -422,12 +453,15 @@ void ActBossChar_Omega()
 
 				SetQuake(30);
 			}
+
 			break;
 
 		case 150:
 			SetQuake(2);
 
-			if (++gBoss[0].act_wait % 12 == 0)
+			++gBoss[0].act_wait;
+
+			if (gBoss[0].act_wait % 12 == 0)
 				PlaySoundObject(52, 1);
 
 			SetDestroyNpChar(gBoss[0].x + (Random(-0x30, 0x30) * 0x200), gBoss[0].y + (Random(-0x30, 0x18) * 0x200), 1, 1);
@@ -439,12 +473,15 @@ void ActBossChar_Omega()
 				SetFlash(gBoss[0].x, gBoss[0].y, 1);
 				PlaySoundObject(35, 1);
 			}
+
 			break;
 
 		case 160:
 			SetQuake(40);
 
-			if (++gBoss[0].act_wait > 50)
+			++gBoss[0].act_wait;
+
+			if (gBoss[0].act_wait > 50)
 			{
 				gBoss[0].cond = 0;
 				gBoss[1].cond = 0;
@@ -453,6 +490,7 @@ void ActBossChar_Omega()
 				gBoss[4].cond = 0;
 				gBoss[5].cond = 0;
 			}
+
 			break;
 	}
 

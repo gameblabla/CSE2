@@ -2,6 +2,9 @@
 
 #include "WindowsWrapper.h"
 
+// TODO - When I add bitmask constants for gMC.flags...
+// 0x100 is a 'player is underwater' flag
+
 struct MYCHAR
 {
 	unsigned char cond;
@@ -52,15 +55,15 @@ struct MYCHAR
 	int lifeBr_count;
 	int air;
 	int air_get;
-	signed char sprash;
-	signed char ques;
+	signed char sprash; // This is explicitly a char, but used like a BOOL
+	signed char ques;   // Same for this variable as well
 	signed char boost_sw;
 	int boost_cnt;
 };
 
 extern MYCHAR gMC;
 
-void InitMyChar();
+void InitMyChar(void);
 void AnimationMyChar(BOOL bKey);
 void ShowMyChar(BOOL bShow);
 void PutMyChar(int fx, int fy);
@@ -69,14 +72,14 @@ void ActMyChar(BOOL bKey);
 void GetMyCharPosition(int *x, int *y);
 void SetMyCharPosition(int x, int y);
 void MoveMyChar(int x, int y);
-void ZeroMyCharXMove();
-int GetUnitMyChar();
+void ZeroMyCharXMove(void);
+int GetUnitMyChar(void);
 void SetMyCharDirect(unsigned char dir);
 void ChangeMyUnit(unsigned char a);
-void PitMyChar();
+void PitMyChar(void);
 void EquipItem(int flag, BOOL b);
-void ResetCheck();
+void ResetCheck(void);
 void SetNoise(int no, int freq);
-void CutNoise();
-void ResetNoise();
-void SleepNoise();
+void CutNoise(void);
+void ResetNoise(void);
+void SleepNoise(void);

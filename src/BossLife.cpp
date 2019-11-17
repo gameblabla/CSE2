@@ -60,27 +60,26 @@ void PutBossLife(void)
 	if (*gBL.pLife < 1)
 	{
 		gBL.flag = FALSE;
+		return;
+	}
+
+	rcLife.right = (*gBL.pLife * 198) / gBL.max;
+
+	if (gBL.br > *gBL.pLife)
+	{
+		if (++gBL.count > 30)
+			--gBL.br;
 	}
 	else
 	{
-		rcLife.right = 198 * *gBL.pLife / gBL.max;
-
-		if (gBL.br > *gBL.pLife)
-		{
-			if (++gBL.count > 30)
-				--gBL.br;
-		}
-		else
-		{
-			gBL.count = 0;
-		}
-
-		rcBr.right = 198 * gBL.br / gBL.max;
-
-		PutBitmap3(&grcGame, (WINDOW_WIDTH - 256) / 2, WINDOW_HEIGHT - 20, &rcBox1, SURFACE_ID_TEXT_BOX);
-		PutBitmap3(&grcGame, (WINDOW_WIDTH - 256) / 2, WINDOW_HEIGHT - 12, &rcBox2, SURFACE_ID_TEXT_BOX);
-		PutBitmap3(&grcGame, (WINDOW_WIDTH - 176) / 2, WINDOW_HEIGHT - 16, &rcBr, SURFACE_ID_TEXT_BOX);
-		PutBitmap3(&grcGame, (WINDOW_WIDTH - 176) / 2, WINDOW_HEIGHT - 16, &rcLife, SURFACE_ID_TEXT_BOX);
-		PutBitmap3(&grcGame, (WINDOW_WIDTH - 240) / 2, WINDOW_HEIGHT - 16, &rcText, SURFACE_ID_TEXT_BOX);
+		gBL.count = 0;
 	}
+
+	rcBr.right = (gBL.br * 198) / gBL.max;
+
+	PutBitmap3(&grcGame, (WINDOW_WIDTH / 2) - 128, WINDOW_HEIGHT - 20, &rcBox1, SURFACE_ID_TEXT_BOX);
+	PutBitmap3(&grcGame, (WINDOW_WIDTH / 2) - 128, WINDOW_HEIGHT - 12, &rcBox2, SURFACE_ID_TEXT_BOX);
+	PutBitmap3(&grcGame, (WINDOW_WIDTH / 2) - 88, WINDOW_HEIGHT - 16, &rcBr, SURFACE_ID_TEXT_BOX);
+	PutBitmap3(&grcGame, (WINDOW_WIDTH / 2) - 88, WINDOW_HEIGHT - 16, &rcLife, SURFACE_ID_TEXT_BOX);
+	PutBitmap3(&grcGame, (WINDOW_WIDTH / 2) - 120, WINDOW_HEIGHT - 16, &rcText, SURFACE_ID_TEXT_BOX);
 }

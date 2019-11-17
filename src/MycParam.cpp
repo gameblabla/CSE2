@@ -88,13 +88,13 @@ void AddExpMyChar(int x)
 	}
 }
 
-void ZeroExpMyChar()
+void ZeroExpMyChar(void)
 {
 	gArmsData[gSelectedArms].level = 1;
 	gArmsData[gSelectedArms].exp = 0;
 }
 
-BOOL IsMaxExpMyChar()
+BOOL IsMaxExpMyChar(void)
 {
 	if (gArmsData[gSelectedArms].level == 3)
 	{
@@ -110,10 +110,10 @@ BOOL IsMaxExpMyChar()
 void DamageMyChar(int damage)
 {
 #ifdef FIX_BUGS
-	if ((g_GameFlags & 2) == 0)
+	if (!(g_GameFlags & 2))
 #else
 	// I'm preeeetty sure this is a typo. The Linux port optimised it out.
-	if ((g_GameFlags | 2) == 0)
+	if (!(g_GameFlags | 2))
 #endif
 		return;
 
@@ -127,7 +127,8 @@ void DamageMyChar(int damage)
 
 	if (gMC.unit == 1)
 	{
-		// Another weird case where there *has* to be an empty 'if' here to produce the same assembly
+		// Another weird case where there *has* to be an empty 'if' here to produce the same assembly.
+		// Chances are there used to be some commented-out code here.
 	}
 	else
 	{
@@ -144,7 +145,7 @@ void DamageMyChar(int damage)
 	if (gMC.equip & 4)
 		gArmsData[gSelectedArms].exp -= damage;
 	else
-		gArmsData[gSelectedArms].exp -= 2 * damage;
+		gArmsData[gSelectedArms].exp -= damage * 2;
 
 	while (gArmsData[gSelectedArms].exp < 0)
 	{
@@ -179,9 +180,11 @@ void DamageMyChar(int damage)
 	}
 }
 
-void ZeroArmsEnergy_All()
+void ZeroArmsEnergy_All(void)
 {
-	for (int a = 0; a < ARMS_MAX; a++)
+	int a;
+
+	for (a = 0; a < ARMS_MAX; a++)
 	{
 		gArmsData[a].level = 1;
 		gArmsData[a].exp = 0;
@@ -190,9 +193,10 @@ void ZeroArmsEnergy_All()
 
 void AddBulletMyChar(int no, int val)
 {
-	int a = 0;
+	int a;
 
 	// Missile Launcher
+	a = 0;
 	while (a < ARMS_MAX && gArmsData[a].code != 5)
 		++a;
 
@@ -289,8 +293,8 @@ void PutArmsEnergy(BOOL flash)
 	}
 	else
 	{
-		if (exp_next)
-			rcExpVal.right += 40 * exp_now / exp_next;
+		if (exp_next != 0)
+			rcExpVal.right += (exp_now * 40) / exp_next;
 		else
 			rcExpVal.right = 0;
 
@@ -302,7 +306,7 @@ void PutArmsEnergy(BOOL flash)
 		PutBitmap3(&rcView, gArmsEnergyX + 24, 32, &rcExpFlash, SURFACE_ID_TEXT_BOX);
 }
 
-void PutActiveArmsList()
+void PutActiveArmsList(void)
 {
 	int x;
 	int a;
@@ -316,23 +320,23 @@ void PutActiveArmsList()
 	if (arms_num == 0)
 		return;
 
-	for (a = 0; a < arms_num; a++)
+	for (a = 0; a < arms_num; ++a)
 	{
 		// Get X position to draw at
-		x = 16 * (a - gSelectedArms) + gArmsEnergyX;
+		x = ((a - gSelectedArms) * 16) + gArmsEnergyX;
 
 		if (x < 8)
-			x += 48 + (16 * arms_num);
+			x += 48 + (arms_num * 16);
 		else if (x >= 24)
 			x += 48;
 
-		if (x >= 72 + (16 * (arms_num - 1)))
-			x -= 48 + (16 * arms_num);
+		if (x >= 72 + ((arms_num - 1) * 16))
+			x -= 48 + (arms_num * 16);
 		if (x < 72 && x >= 24)
 			x -= 48;
 
 		// Draw icon
-		rect.left = 16 * gArmsData[a].code;
+		rect.left = gArmsData[a].code * 16;
 		rect.right = rect.left + 16;
 		PutBitmap3(&grcGame, x, 16, &rect, SURFACE_ID_ARMS_IMAGE);
 	}
@@ -344,7 +348,7 @@ void PutMyLife(BOOL flash)
 	RECT rcLife = {0, 24, 232, 32};
 	RECT rcBr = {0, 32, 232, 40};
 
-	if (flash == TRUE && (gMC.shock / 2) % 2)
+	if (flash == TRUE && gMC.shock / 2 % 2)
 		return;
 
 	if (gMC.lifeBr < gMC.life)
@@ -362,8 +366,8 @@ void PutMyLife(BOOL flash)
 
 	// Draw bar
 	rcCase.right = 64;
-	rcLife.right = 40 * gMC.life / gMC.max_life - 1;
-	rcBr.right = 40 * gMC.lifeBr / gMC.max_life - 1;
+	rcLife.right = ((gMC.life * 40) / gMC.max_life) - 1;
+	rcBr.right = ((gMC.lifeBr * 40) / gMC.max_life) - 1;
 
 	PutBitmap3(&grcGame, 16, 40, &rcCase, SURFACE_ID_TEXT_BOX);
 	PutBitmap3(&grcGame, 40, 40, &rcBr, SURFACE_ID_TEXT_BOX);
@@ -381,7 +385,7 @@ void PutMyAir(int x, int y)
 	if (gMC.equip & 0x10)
 		return;
 
-	if (gMC.air_get)
+	if (gMC.air_get != 0)
 	{
 		// Draw how much air is left
 		if (gMC.air_get % 6 < 4)
@@ -433,7 +437,7 @@ void PutTimeCounter(int x, int y)
 	}
 }
 
-BOOL SaveTimeCounter()
+BOOL SaveTimeCounter(void)
 {
 	unsigned char *p;
 	int i;
@@ -473,7 +477,7 @@ BOOL SaveTimeCounter()
 	}
 
 	// Save new time
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < 4; ++i)
 	{
 		rec.counter[i] = time_count;
 		rec.random[i] = Random(0, 250) + i;
@@ -502,7 +506,7 @@ BOOL SaveTimeCounter()
 	return TRUE;
 }
 
-int LoadTimeCounter()
+int LoadTimeCounter(void)
 {
 	unsigned char *p;
 	int i;
@@ -529,7 +533,7 @@ int LoadTimeCounter()
 	fclose(fp);
 
 	// Decode from checksum
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < 4; ++i)
 	{
 		p = (unsigned char*)&rec.counter[i];
 		p[0] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[i]) : (rec.random[i] / 2);

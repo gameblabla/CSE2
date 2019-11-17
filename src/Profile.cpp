@@ -25,16 +25,17 @@
 const char *gDefaultName = "Profile.dat";
 const char *gProfileCode = "Do041220";
 
-BOOL IsProfile()
+BOOL IsProfile(void)
 {
 	char path[MAX_PATH];
 	sprintf(path, "%s/%s", gModulePath, gDefaultName);
 
-	FILE *fp = fopen(path, "rb");
-	if (fp == NULL)
+	FILE *file = fopen(path, "rb");
+
+	if (file == NULL)
 		return FALSE;
 
-	fclose(fp);
+	fclose(file);
 	return TRUE;
 }
 
@@ -46,7 +47,7 @@ BOOL SaveProfile(const char *name)
 	char path[MAX_PATH];
 
 	// Get path
-	if (name)
+	if (name != NULL)
 		sprintf(path, "%s/%s", gModulePath, name);
 	else
 		sprintf(path, "%s/%s", gModulePath, gDefaultName);
@@ -120,18 +121,18 @@ BOOL SaveProfile(const char *name)
 
 BOOL LoadProfile(const char *name)
 {
-	// Get path
 	char path[MAX_PATH];
+	PROFILE profile;
+	FILE *fp;
 
-	if (name)
+	// Get path
+	if (name != NULL)
 		sprintf(path, "%s", name);
 	else
 		sprintf(path, "%s/%s", gModulePath, gDefaultName);
 
 	// Open file
-	PROFILE profile;
-
-	FILE *fp = fopen(path, "rb");
+	fp = fopen(path, "rb");
 	if (fp == NULL)
 		return FALSE;
 
@@ -213,9 +214,9 @@ BOOL LoadProfile(const char *name)
 	gMC.x = profile.x;
 	gMC.y = profile.y;
 
-	gMC.rect_arms.left = 24 * (gArmsData[gSelectedArms].code % 10);
+	gMC.rect_arms.left = (gArmsData[gSelectedArms].code % 10) * 24;
 	gMC.rect_arms.right = gMC.rect_arms.left + 24;
-	gMC.rect_arms.top = 32 * (gArmsData[gSelectedArms].code / 10);
+	gMC.rect_arms.top = (gArmsData[gSelectedArms].code / 10) * 32;
 	gMC.rect_arms.bottom = gMC.rect_arms.top + 16;
 
 	// Reset stuff
@@ -227,6 +228,7 @@ BOOL LoadProfile(const char *name)
 	InitStar();
 	ClearValueView();
 	gCurlyShoot_wait = 0;
+
 	return TRUE;
 }
 

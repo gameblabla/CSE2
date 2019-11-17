@@ -10,7 +10,7 @@ struct CONFIG
 	long attack_button_mode;
 	long ok_button_mode;
 	long display_mode;
-	long bJoystick;
+	BOOL bJoystick;
 	long joystick_button[8];
 };
 

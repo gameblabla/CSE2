@@ -26,7 +26,7 @@ ITEM gItemData[ITEM_MAX];
 static BOOL gCampActive;
 static int gCampTitleY;
 
-void ClearArmsData()
+void ClearArmsData(void)
 {
 #ifdef FIX_BUGS
 	gSelectedArms = 0; // Should probably be done in order to avoid potential problems with the selected weapon being invalid (like is done in SubArmsData)
@@ -35,7 +35,7 @@ void ClearArmsData()
 	memset(gArmsData, 0, sizeof(gArmsData));
 }
 
-void ClearItemData()
+void ClearItemData(void)
 {
 	memset(gItemData, 0, sizeof(gItemData));
 }
@@ -173,7 +173,7 @@ BOOL SubItemData(long code)
 }
 
 /// Update the inventory cursor
-void MoveCampCursor()
+void MoveCampCursor(void)
 {
 	// Compute the current amount of weapons and items
 	int arms_num = 0;
@@ -186,10 +186,10 @@ void MoveCampCursor()
 	if (arms_num == 0 && item_num == 0)
 		return;	// Empty inventory
 
-	/// True if we're currently changing cursor position
+	// True if we're currently changing cursor position
 	BOOL bChange = FALSE;
 
-	if (gCampActive == FALSE)
+	if (!gCampActive)
 	{
 		// Handle selected weapon
 		if (gKeyTrg & gKeyLeft)
@@ -207,7 +207,7 @@ void MoveCampCursor()
 		if (gKeyTrg & (gKeyUp | gKeyDown))
 		{
 			// If there are any items, we're changing to the items section, since the weapons section has only 1 row
-			if (item_num)
+			if (item_num != 0)
 				gCampActive = TRUE;
 
 			bChange = TRUE;
@@ -228,7 +228,7 @@ void MoveCampCursor()
 			if (gSelectedItem % 6 == 0)
 				gSelectedItem += 5;
 			else
-				--gSelectedItem;
+				gSelectedItem -= 1;
 
 			bChange = TRUE;
 		}
@@ -236,11 +236,11 @@ void MoveCampCursor()
 		if (gKeyTrg & gKeyRight)
 		{
 			if (gSelectedItem == item_num - 1)
-				gSelectedItem = 6 * (gSelectedItem / 6);	// Round down to multiple of 6
+				gSelectedItem = (gSelectedItem / 6) * 6;	// Round down to multiple of 6
 			else if (gSelectedItem % 6 == 5)
 				gSelectedItem -= 5;	// Loop around row
 			else
-				++gSelectedItem;
+				gSelectedItem += 1;
 
 			bChange = TRUE;
 		}
@@ -269,7 +269,7 @@ void MoveCampCursor()
 			gSelectedItem = item_num - 1;	// Don't allow selecting a non-existing item
 
 		if (gCampActive && gKeyTrg & gKeyOk)
-			StartTextScript(gItemData[gSelectedItem].code + 6000);
+			StartTextScript(6000 + gItemData[gSelectedItem].code);
 	}
 
 	if (bChange)
@@ -279,8 +279,8 @@ void MoveCampCursor()
 			// Switch to a weapon
 			PlaySoundObject(SND_SWITCH_WEAPON, 1);
 
-			if (arms_num)
-				StartTextScript(gArmsData[gSelectedArms].code + 1000);
+			if (arms_num != 0)
+				StartTextScript(1000 + gArmsData[gSelectedArms].code);
 			else
 				StartTextScript(1000);
 		}
@@ -289,8 +289,8 @@ void MoveCampCursor()
 			// Switch to an item
 			PlaySoundObject(SND_YES_NO_CHANGE_CHOICE, 1);
 
-			if (item_num)
-				StartTextScript(gItemData[gSelectedItem].code + 5000);
+			if (item_num != 0)
+				StartTextScript(5000 + gItemData[gSelectedItem].code);
 			else
 				StartTextScript(5000);
 		}
@@ -298,7 +298,7 @@ void MoveCampCursor()
 }
 
 /// Draw the inventory
-void PutCampObject()
+void PutCampObject(void)
 {
 	int i;
 
@@ -333,27 +333,27 @@ void PutCampObject()
 	RECT rcBoxBottom = {0, 16, 244, 24};
 
 	// Draw box
-	PutBitmap3(&rcView, (WINDOW_WIDTH - 244) / 2, (WINDOW_HEIGHT - 224) / 2, &rcBoxTop, SURFACE_ID_TEXT_BOX);
+	PutBitmap3(&rcView, (WINDOW_WIDTH / 2) - 122, (WINDOW_HEIGHT / 2) - 112, &rcBoxTop, SURFACE_ID_TEXT_BOX);
 	for (i = 1; i < 18; ++i)
-		PutBitmap3(&rcView, (WINDOW_WIDTH - 244) / 2, ((WINDOW_HEIGHT - 240) / 2) + (8 * (i + 1)), &rcBoxBody, SURFACE_ID_TEXT_BOX);
-	PutBitmap3(&rcView, (WINDOW_WIDTH - 244) / 2, ((WINDOW_HEIGHT - 240) / 2) + (8 * (i + 1)), &rcBoxBottom, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&rcView, (WINDOW_WIDTH / 2) - 122, ((WINDOW_HEIGHT / 2) - 120) + ((i + 1) * 8), &rcBoxBody, SURFACE_ID_TEXT_BOX);
+	PutBitmap3(&rcView, (WINDOW_WIDTH / 2) - 122, ((WINDOW_HEIGHT / 2) - 120) + ((i + 1) * 8), &rcBoxBottom, SURFACE_ID_TEXT_BOX);
 
 	// Move titles
-	if (gCampTitleY > (WINDOW_HEIGHT - 208) / 2)
+	if (gCampTitleY > (WINDOW_HEIGHT / 2) - 104)
 		--gCampTitleY;
 
 	// Draw titles
-	PutBitmap3(&rcView, (WINDOW_WIDTH - 224) / 2, gCampTitleY, &rcTitle1, SURFACE_ID_TEXT_BOX);
-	PutBitmap3(&rcView, (WINDOW_WIDTH - 224) / 2, gCampTitleY + 52, &rcTitle2, SURFACE_ID_TEXT_BOX);
+	PutBitmap3(&rcView, (WINDOW_WIDTH / 2) - 112, gCampTitleY, &rcTitle1, SURFACE_ID_TEXT_BOX);
+	PutBitmap3(&rcView, (WINDOW_WIDTH / 2) - 112, gCampTitleY + 52, &rcTitle2, SURFACE_ID_TEXT_BOX);
 
 	// Draw arms cursor
 	static unsigned int flash;
 	++flash;
 
 	if (gCampActive == FALSE)
-		PutBitmap3(&rcView, 40 * gSelectedArms + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT / 2) - 96, &rcCur1[(flash / 2) % 2], SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&rcView, (gSelectedArms * 40) + (WINDOW_WIDTH / 2) - 112, (WINDOW_HEIGHT / 2) - 96, &rcCur1[(flash / 2) % 2], SURFACE_ID_TEXT_BOX);
 	else
-		PutBitmap3(&rcView, 40 * gSelectedArms + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT / 2) - 96, &rcCur1[1], SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&rcView, (gSelectedArms * 40) + (WINDOW_WIDTH / 2) - 112, (WINDOW_HEIGHT / 2) - 96, &rcCur1[1], SURFACE_ID_TEXT_BOX);
 
 	// Draw weapons
 	for (i = 0; i < ARMS_MAX; ++i)
@@ -368,30 +368,30 @@ void PutCampObject()
 		rcArms.bottom = rcArms.top + 16;
 
 		// Draw the icon, slash and "Lv"
-		PutBitmap3(&rcView, 40 * i + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT - 192) / 2, &rcArms, SURFACE_ID_ARMS_IMAGE);
-		PutBitmap3(&rcView, 40 * i + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT - 128) / 2, &rcPer, SURFACE_ID_TEXT_BOX);
-		PutBitmap3(&rcView, 40 * i + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT - 160) / 2, &rcLv, SURFACE_ID_TEXT_BOX);
-		PutNumber4(40 * i + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT - 160) / 2, gArmsData[i].level, FALSE);
+		PutBitmap3(&rcView, (i * 40) + (WINDOW_WIDTH / 2) - 112, (WINDOW_HEIGHT / 2) - 96, &rcArms, SURFACE_ID_ARMS_IMAGE);
+		PutBitmap3(&rcView, (i * 40) + (WINDOW_WIDTH / 2) - 112, (WINDOW_HEIGHT / 2) - 64, &rcPer, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&rcView, (i * 40) + (WINDOW_WIDTH / 2) - 112, (WINDOW_HEIGHT / 2) - 80, &rcLv, SURFACE_ID_TEXT_BOX);
+		PutNumber4((i * 40) + (WINDOW_WIDTH / 2) - 112, (WINDOW_HEIGHT / 2) - 80, gArmsData[i].level, FALSE);
 
 		// Draw ammo
 		if (gArmsData[i].max_num)
 		{
-			PutNumber4(40 * i + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT - 144) / 2, gArmsData[i].num, FALSE);
-			PutNumber4(40 * i + (WINDOW_WIDTH - 224) / 2, (WINDOW_HEIGHT - 128) / 2, gArmsData[i].max_num, FALSE);
+			PutNumber4((i * 40) + (WINDOW_WIDTH / 2) - 112, (WINDOW_HEIGHT / 2) - 72, gArmsData[i].num, FALSE);
+			PutNumber4((i * 40) + (WINDOW_WIDTH / 2) - 112, (WINDOW_HEIGHT / 2) - 64, gArmsData[i].max_num, FALSE);
 		}
 		else
 		{
 			// Weapon doesn't use ammunition
-			PutBitmap3(&rcView, 40 * i + (WINDOW_WIDTH - 192) / 2, (WINDOW_HEIGHT - 144) / 2, &rcNone, SURFACE_ID_TEXT_BOX);
-			PutBitmap3(&rcView, 40 * i + (WINDOW_WIDTH - 192) / 2, (WINDOW_HEIGHT - 128) / 2, &rcNone, SURFACE_ID_TEXT_BOX);
+			PutBitmap3(&rcView, (i * 40) + (WINDOW_WIDTH - 192) / 2, (WINDOW_HEIGHT / 2) - 72, &rcNone, SURFACE_ID_TEXT_BOX);
+			PutBitmap3(&rcView, (i * 40) + (WINDOW_WIDTH - 192) / 2, (WINDOW_HEIGHT / 2) - 64, &rcNone, SURFACE_ID_TEXT_BOX);
 		}
 	}
 
 	// Draw items cursor
 	if (gCampActive == TRUE)
-		PutBitmap3(&rcView, 32 * (gSelectedItem % 6) + (WINDOW_WIDTH - 224) / 2, 16 * (gSelectedItem / 6) + (WINDOW_HEIGHT - 88) / 2, &rcCur2[(flash / 2) % 2], SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&rcView, ((gSelectedItem % 6) * 32) + (WINDOW_WIDTH / 2) - 112, ((gSelectedItem / 6) * 16) + (WINDOW_HEIGHT / 2) - 44, &rcCur2[flash / 2 % 2], SURFACE_ID_TEXT_BOX);
 	else
-		PutBitmap3(&rcView, 32 * (gSelectedItem % 6) + (WINDOW_WIDTH - 224) / 2, 16 * (gSelectedItem / 6) + (WINDOW_HEIGHT - 88) / 2, &rcCur2[1], SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&rcView, ((gSelectedItem % 6) * 32) + (WINDOW_WIDTH / 2) - 112, ((gSelectedItem / 6) * 16) + (WINDOW_HEIGHT / 2) - 44, &rcCur2[1], SURFACE_ID_TEXT_BOX);
 
 	for (i = 0; i < ITEM_MAX; ++i)
 	{
@@ -399,16 +399,16 @@ void PutCampObject()
 			break;	// Invalid item
 
 		// Get rect for next item
-		rcItem.left = 32 * (gItemData[i].code % 8);
+		rcItem.left = (gItemData[i].code % 8) * 32;
 		rcItem.right = rcItem.left + 32;
-		rcItem.top = 16 * (gItemData[i].code / 8);
+		rcItem.top = (gItemData[i].code / 8) * 16;
 		rcItem.bottom = rcItem.top + 16;
 
-		PutBitmap3(&rcView, 32 * (i % 6) + (WINDOW_WIDTH - 224) / 2, 16 * (i / 6) + (WINDOW_HEIGHT - 88) / 2, &rcItem, SURFACE_ID_ITEM_IMAGE);
+		PutBitmap3(&rcView, ((i % 6) * 32) + (WINDOW_WIDTH / 2) - 112, ((i / 6) * 16) + (WINDOW_HEIGHT / 2) - 44, &rcItem, SURFACE_ID_ITEM_IMAGE);
 	}
 }
 
-int CampLoop()
+int CampLoop(void)
 {
 	int arms_num;
 	char old_script_path[MAX_PATH];
@@ -421,7 +421,7 @@ int CampLoop()
 	// Load the inventory script
 	LoadTextScript2("ArmsItem.tsc");
 
-	gCampTitleY = (WINDOW_HEIGHT - 192) / 2;
+	gCampTitleY = (WINDOW_HEIGHT / 2) - 96;
 
 	// Put the cursor on the first weapon
 	gCampActive = FALSE;
@@ -432,10 +432,10 @@ int CampLoop()
 	while (gArmsData[arms_num].code != 0)
 		++arms_num;
 
-	if (arms_num)
-		StartTextScript(gArmsData[gSelectedArms].code + 1000);
+	if (arms_num != 0)
+		StartTextScript(1000 + gArmsData[gSelectedArms].code);
 	else
-		StartTextScript(gItemData[gSelectedItem].code + 5000);
+		StartTextScript(5000 + gItemData[gSelectedItem].code);
 
 	for (;;)
 	{
@@ -500,7 +500,9 @@ int CampLoop()
 
 BOOL CheckItem(long a)
 {
-	for (int i = 0; i < ITEM_MAX; ++i)
+	int i;
+
+	for (i = 0; i < ITEM_MAX; ++i)
 		if (gItemData[i].code == a)
 			return TRUE;	// Found
 
@@ -509,7 +511,9 @@ BOOL CheckItem(long a)
 
 BOOL CheckArms(long a)
 {
-	for (int i = 0; i < ARMS_MAX; ++i)
+	int i;
+
+	for (i = 0; i < ARMS_MAX; ++i)
 		if (gArmsData[i].code == a)
 			return TRUE;	// Found
 
@@ -542,9 +546,11 @@ BOOL ChargeArmsEnergy(long num)
 	return TRUE;	// Always successfull
 }
 
-void FullArmsEnergy()
+void FullArmsEnergy(void)
 {
-	for (int a = 0; a < ARMS_MAX; a++)
+	int a;
+
+	for (a = 0; a < ARMS_MAX; ++a)
 	{
 		if (gArmsData[a].code == 0)
 			continue;	// Don't change empty weapons
@@ -553,7 +559,7 @@ void FullArmsEnergy()
 	}
 }
 
-int RotationArms()
+int RotationArms(void)
 {
 	// Get amount of weapons
 	int arms_num = 0;
@@ -585,7 +591,7 @@ int RotationArms()
 	return gArmsData[gSelectedArms].code;
 }
 
-int RotationArmsRev()
+int RotationArmsRev(void)
 {
 	// Get amount of weapons
 	int arms_num = 0;
@@ -598,7 +604,9 @@ int RotationArmsRev()
 	ResetSpurCharge();
 
 	// Select previous valid weapon
-	if (--gSelectedArms < 0)
+	--gSelectedArms;
+
+	if (gSelectedArms < 0)
 		gSelectedArms = arms_num - 1;
 
 	while (gSelectedArms < arms_num)
@@ -615,7 +623,7 @@ int RotationArmsRev()
 	return gArmsData[gSelectedArms].code;
 }
 
-void ChangeToFirstArms()
+void ChangeToFirstArms(void)
 {
 	gSelectedArms = 0;
 	gArmsEnergyX = 32;

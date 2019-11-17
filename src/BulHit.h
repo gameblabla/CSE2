@@ -1,3 +1,3 @@
 #pragma once
 
-void HitBulletMap();
+void HitBulletMap(void);
