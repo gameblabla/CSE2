@@ -26,8 +26,6 @@ equivalents.
 #include "PixTone.h"
 #include "Tags.h"
 
-#define FREQUENCY 44100
-
 LPDIRECTSOUND       lpDS;            // DirectSoundオブジェクト (DirectSound object)
 LPDIRECTSOUNDBUFFER lpPRIMARYBUFFER; // 一時バッファ (Temporary buffer)
 LPDIRECTSOUNDBUFFER lpSECONDARYBUFFER[SE_MAX]; 
