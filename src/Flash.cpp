@@ -136,7 +136,7 @@ void ActFlash_Flash(void)
 
 void ActFlash(int flx, int fly)
 {
-	if (flash.flag == FALSE)
+	if (!flash.flag)
 		return;
 
 	switch (flash.mode)
@@ -152,7 +152,7 @@ void ActFlash(int flx, int fly)
 
 void PutFlash(void)
 {
-	if (flash.flag == FALSE)
+	if (!flash.flag)
 		return;
 
 	CortBox(&flash.rect1, gFlashColor);

@@ -19,12 +19,13 @@ static int gStageSelectTitleY;
 
 void ClearPermitStage(void)
 {
-	memset(gPermitStage, 0, 0x40);
+	memset(gPermitStage, 0, sizeof(gPermitStage));
 }
 
 BOOL AddPermitStage(int index, int event)
 {
 	int i = 0;
+
 	while (i < 8)
 	{
 		if (gPermitStage[i].index == index)
@@ -48,6 +49,7 @@ BOOL AddPermitStage(int index, int event)
 BOOL SubPermitStage(int index)
 {
 	int i;
+
 	for (i = 0; i < 8; ++i)
 		if (gPermitStage[i].index == index)
 			break;
@@ -59,10 +61,8 @@ BOOL SubPermitStage(int index)
 #endif
 		return FALSE;
 
-	for (i += 1; i < 8; ++i)
-	{
+	for (++i; i < 8; ++i)
 		gPermitStage[i - 1] = gPermitStage[i];
-	}
 
 	gPermitStage[i - 1].index = 0;
 	gPermitStage[i - 1].event = 0;
@@ -72,11 +72,14 @@ BOOL SubPermitStage(int index)
 
 void MoveStageSelectCursor(void)
 {
-	int stage_num = 0;
+	int stage_num;
+	int stage_x;
+
+	stage_num = 0;
 	while (gPermitStage[stage_num].index != 0)
 		++stage_num;
 
-	int stage_x = (WINDOW_WIDTH - 40 * stage_num) / 2;	// Unused
+	stage_x = (WINDOW_WIDTH - (stage_num * 40)) / 2;	// Unused
 
 	if (stage_num == 0)
 		return;
@@ -93,10 +96,10 @@ void MoveStageSelectCursor(void)
 	if (gSelectedStage > stage_num - 1)
 		gSelectedStage = 0;
 
-	if ((gKeyLeft | gKeyRight) & gKeyTrg)
+	if (gKeyTrg & (gKeyLeft | gKeyRight))
 		StartTextScript(gPermitStage[gSelectedStage].index + 1000);
 
-	if ((gKeyLeft | gKeyRight) & gKeyTrg)
+	if (gKeyTrg & (gKeyLeft | gKeyRight))
 		PlaySoundObject(1, 1);
 }
 
@@ -129,23 +132,23 @@ void PutStageSelectObject(void)
 
 	++flash;
 
-	if (stage_num)
+	if (stage_num != 0)
 	{
-		stage_x = (WINDOW_WIDTH - 40 * stage_num) / 2;
+		stage_x = (WINDOW_WIDTH - (stage_num * 40)) / 2;
 
-		PutBitmap3(&rcView, PixelToScreenCoord(stage_x + 40 * gSelectedStage), PixelToScreenCoord((WINDOW_HEIGHT / 2) - 56), &rcCur[(flash >> 1) % 2], SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&rcView, PixelToScreenCoord(stage_x + (gSelectedStage * 40)), PixelToScreenCoord((WINDOW_HEIGHT / 2) - 56), &rcCur[flash / 2 % 2], SURFACE_ID_TEXT_BOX);
 
 		for (i = 0; i < 8; ++i)
 		{
 			if (gPermitStage[i].index == 0)
 				break;
 
-			rcStage.left = 32 * (gPermitStage[i].index % 8);
+			rcStage.left = (gPermitStage[i].index % 8) * 32;
 			rcStage.right = rcStage.left + 32;
-			rcStage.top = 16 * (gPermitStage[i].index / 8);
+			rcStage.top = (gPermitStage[i].index / 8) * 16;
 			rcStage.bottom = rcStage.top + 16;
 
-			PutBitmap3(&rcView, PixelToScreenCoord(stage_x + 40 * i), PixelToScreenCoord((WINDOW_HEIGHT / 2) - 56), &rcStage, SURFACE_ID_STAGE_ITEM);
+			PutBitmap3(&rcView, PixelToScreenCoord(stage_x + (i * 40)), PixelToScreenCoord((WINDOW_HEIGHT / 2) - 56), &rcStage, SURFACE_ID_STAGE_ITEM);
 		}
 	}
 }

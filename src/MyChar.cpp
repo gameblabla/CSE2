@@ -22,21 +22,21 @@ MYCHAR gMC;
 int noise_no;
 unsigned int noise_freq;
 
-void InitMyChar()
+void InitMyChar(void)
 {
 	memset(&gMC, 0, sizeof(MYCHAR));
 	gMC.cond = 0x80;
 	gMC.direct = 2;
 
-	gMC.view.back = 0x1000;
-	gMC.view.top = 0x1000;
-	gMC.view.front = 0x1000;
-	gMC.view.bottom = 0x1000;
+	gMC.view.back = 8 * 0x200;
+	gMC.view.top = 8 * 0x200;
+	gMC.view.front = 8 * 0x200;
+	gMC.view.bottom = 8 * 0x200;
 
-	gMC.hit.back = 0xA00;
-	gMC.hit.top = 0x1000;
-	gMC.hit.front = 0xA00;
-	gMC.hit.bottom = 0x1000;
+	gMC.hit.back = 5 * 0x200;
+	gMC.hit.top = 8 * 0x200;
+	gMC.hit.front = 5 * 0x200;
+	gMC.hit.bottom = 8 * 0x200;
 
 	gMC.life = 3;
 	gMC.max_life = 3;
@@ -84,13 +84,14 @@ void AnimationMyChar(BOOL bKey)
 		{
 			gMC.ani_no = 11;
 		}
-		else if (gKey & gKeyUp && (gKeyRight | gKeyLeft) & gKey && bKey)
+		else if (gKey & gKeyUp && gKey & (gKeyLeft | gKeyRight) && bKey)
 		{
 			gMC.cond |= 4;
 
 			if (++gMC.ani_wait > 4)
 			{
 				gMC.ani_wait = 0;
+
 				if (++gMC.ani_no == 7 || gMC.ani_no == 9)
 					PlaySoundObject(24, 1);
 			}
@@ -98,13 +99,14 @@ void AnimationMyChar(BOOL bKey)
 			if (gMC.ani_no > 9 || gMC.ani_no < 6)
 				gMC.ani_no = 6;
 		}
-		else if ((gKeyRight | gKeyLeft) & gKey && bKey)
+		else if (gKey & (gKeyLeft | gKeyRight) && bKey)
 		{
 			gMC.cond |= 4;
 
 			if (++gMC.ani_wait > 4)
 			{
 				gMC.ani_wait = 0;
+
 				if (++gMC.ani_no == 2 || gMC.ani_no == 4)
 					PlaySoundObject(24, 1);
 			}
@@ -163,13 +165,13 @@ void PutMyChar(int fx, int fy)
 {
 	int arms_offset_y;
 
-	if ((gMC.cond & 0x80) == 0 || (gMC.cond & 2))
+	if (!(gMC.cond & 0x80) || gMC.cond & 2)
 		return;
 
 	// Draw weapon
-	gMC.rect_arms.left = 24 * (gArmsData[gSelectedArms].code % 13);
+	gMC.rect_arms.left = (gArmsData[gSelectedArms].code % 13) * 24;
 	gMC.rect_arms.right = gMC.rect_arms.left + 24;
-	gMC.rect_arms.top = 96 * (gArmsData[gSelectedArms].code / 13);
+	gMC.rect_arms.top = (gArmsData[gSelectedArms].code / 13) * 96;
 	gMC.rect_arms.bottom = gMC.rect_arms.top + 16;
 
 	if (gMC.direct == 2)
@@ -213,7 +215,7 @@ void PutMyChar(int fx, int fy)
 			&gMC.rect_arms,
 			SURFACE_ID_ARMS);
 
-	if ((gMC.shock / 2) % 2)
+	if (gMC.shock / 2 % 2)
 		return;
 
 	// Draw player
@@ -285,7 +287,7 @@ void ActMyChar_Normal(BOOL bKey)
 	}
 
 	// Don't create "?" effect
-	gMC.ques = 0;
+	gMC.ques = FALSE;
 
 	// If can't control player, stop boosting
 	if (!bKey)
@@ -313,14 +315,14 @@ void ActMyChar_Normal(BOOL bKey)
 		// Move in direction held
 		if (bKey)
 		{
-			if (gKeyTrg == gKeyDown && gKey == gKeyDown && (gMC.cond & 1) == 0 && (g_GameFlags & 4) == 0)
+			if (gKeyTrg == gKeyDown && gKey == gKeyDown && !(gMC.cond & 1) && !(g_GameFlags & 4))
 			{
 				gMC.cond |= 1;
-				gMC.ques = 1;
+				gMC.ques = TRUE;
 			}
 			else if (gKey == gKeyDown)
 			{
-				
+				// There probably used to be commented-out code here
 			}
 			else
 			{
@@ -360,12 +362,13 @@ void ActMyChar_Normal(BOOL bKey)
 		// Start boosting
 		if (bKey)
 		{
-			if (gMC.equip & 0x21 && gKeyTrg & gKeyJump && gMC.boost_cnt)
+			if (gMC.equip & 0x21 && gKeyTrg & gKeyJump && gMC.boost_cnt != 0)
 			{
 				// Booster 0.8
 				if (gMC.equip & 1)
 				{
 					gMC.boost_sw = 1;
+
 					if (gMC.ym > 0x100)
 						gMC.ym /= 2;
 				}
@@ -419,7 +422,7 @@ void ActMyChar_Normal(BOOL bKey)
 		}
 
 		// Slow down when stopped boosting (Booster 2.0)
-		if (gMC.equip & 0x20 && gMC.boost_sw && (!(gKey & gKeyJump) || !gMC.boost_cnt))
+		if (gMC.equip & 0x20 && gMC.boost_sw != 0 && (!(gKey & gKeyJump) || gMC.boost_cnt == 0))
 		{
 			if (gMC.boost_sw == 1)
 				gMC.xm /= 2;
@@ -428,7 +431,7 @@ void ActMyChar_Normal(BOOL bKey)
 		}
 
 		// Stop boosting
-		if (!gMC.boost_cnt || !(gKey & gKeyJump))
+		if (gMC.boost_cnt == 0 || !(gKey & gKeyJump))
 			gMC.boost_sw = 0;
 	}
 
@@ -441,17 +444,17 @@ void ActMyChar_Normal(BOOL bKey)
 		else
 			gMC.up = FALSE;
 
-		if (gKey & gKeyDown && (gMC.flag & 8) == 0)
+		if (gKey & gKeyDown && !(gMC.flag & 8))
 			gMC.down = TRUE;
 		else
 			gMC.down = FALSE;
 
-		if (gKeyTrg & gKeyJump
-			&& (gMC.flag & 8 || gMC.flag & 0x10 || gMC.flag & 0x20))
+		if (gKeyTrg & gKeyJump && (gMC.flag & 8 || gMC.flag & 0x10 || gMC.flag & 0x20))
 		{
 			if (gMC.flag & 0x2000)
 			{
-				// Another weird empty case needed for accurate assembly
+				// Another weird empty case needed for accurate assembly.
+				// There probably used to be some commented-out code here.
 			}
 			else
 			{
@@ -462,11 +465,11 @@ void ActMyChar_Normal(BOOL bKey)
 	}
 
 	// Stop interacting when moved
-	if (bKey && (gKeyShot | gKeyJump | gKeyUp | gKeyRight | gKeyLeft) & gKey)
+	if (bKey && gKey & (gKeyLeft | gKeyRight | gKeyUp | gKeyJump | gKeyShot))
 		gMC.cond &= ~1;
 
 	// Booster losing fuel
-	if (gMC.boost_sw && gMC.boost_cnt)
+	if (gMC.boost_sw != 0 && gMC.boost_cnt != 0)
 		--gMC.boost_cnt;
 
 	// Wind / current forces
@@ -480,7 +483,7 @@ void ActMyChar_Normal(BOOL bKey)
 		gMC.ym += 0x55;
 
 	// Booster 2.0 forces and effects
-	if (gMC.equip & 0x20 && gMC.boost_sw)
+	if (gMC.equip & 0x20 && gMC.boost_sw != 0)
 	{
 		if (gMC.boost_sw == 1)
 		{
@@ -489,7 +492,7 @@ void ActMyChar_Normal(BOOL bKey)
 				gMC.ym = -0x100;
 
 			// Move in direction facing
-			if (!gMC.direct)
+			if (gMC.direct == 0)
 				gMC.xm -= 0x20;
 			if (gMC.direct == 2)
 				gMC.xm += 0x20;
@@ -497,10 +500,10 @@ void ActMyChar_Normal(BOOL bKey)
 			// Boost particles (and sound)
 			if (gKeyTrg & gKeyJump || gMC.boost_cnt % 3 == 1)
 			{
-				if (!gMC.direct)
-					SetCaret(gMC.x + 0x400, gMC.y + 0x400, 7, 2);
+				if (gMC.direct == 0)
+					SetCaret(gMC.x + (2 * 0x200), gMC.y + (2 * 0x200), 7, 2);
 				if (gMC.direct == 2)
-					SetCaret(gMC.x - 0x400, gMC.y + 0x400, 7, 0);
+					SetCaret(gMC.x - (2 * 0x200), gMC.y + (2 * 0x200), 7, 0);
 
 				PlaySoundObject(113, 1);
 			}
@@ -513,14 +516,14 @@ void ActMyChar_Normal(BOOL bKey)
 			// Boost particles (and sound)
 			if (gKeyTrg & gKeyJump || gMC.boost_cnt % 3 == 1)
 			{
-				SetCaret(gMC.x, gMC.y + 0xC00, 7, 3);
+				SetCaret(gMC.x, gMC.y + (6 * 0x200), 7, 3);
 				PlaySoundObject(113, 1);
 			}
 		}
 		else if (gMC.boost_sw == 3 && (gKeyTrg & gKeyJump || gMC.boost_cnt % 3 == 1))
 		{
 			// Boost particles (and sound)
-			SetCaret(gMC.x, gMC.y - 0xC00, 7, 1);
+			SetCaret(gMC.x, gMC.y - (6 * 0x200), 7, 1);
 			PlaySoundObject(113, 1);
 		}
 	}
@@ -530,14 +533,14 @@ void ActMyChar_Normal(BOOL bKey)
 		gMC.ym += gravity1;
 	}
 	// Booster 0.8
-	else if (gMC.equip & 1 && gMC.boost_sw && gMC.ym > -0x400)
+	else if (gMC.equip & 1 && gMC.boost_sw != 0 && gMC.ym > -0x400)
 	{
 		// Upwards force
 		gMC.ym -= 0x20;
 
-		if (!(gMC.boost_cnt % 3))
+		if (gMC.boost_cnt % 3 == 0)
 		{
-			SetCaret(gMC.x, gMC.hit.bottom / 2 + gMC.y, 7, 3);
+			SetCaret(gMC.x, gMC.y + (gMC.hit.bottom / 2), 7, 3);
 			PlaySoundObject(113, 1);
 		}
 
@@ -573,13 +576,13 @@ void ActMyChar_Normal(BOOL bKey)
 
 	if (0)
 	{
-		// There used to be an if here that didn't do anything, but the compiler optimised it out.
-		// We only know this was here because empty ifs mess with the register usage.
+		// There used to be an if-statement here that didn't do anything, but the compiler optimised it out.
+		// We only know this was here because empty if-statements affect the register usage.
 		// Since there's no code, we have no idea what the original condition actually was.
 	}
 
 	// Limit speed
-	if ((gMC.flag & 0x100) && (gMC.flag & 0xF000) == 0)
+	if (gMC.flag & 0x100 && !(gMC.flag & 0xF000))
 	{
 		if (gMC.xm < -0x2FF)
 			gMC.xm = -0x2FF;
@@ -606,17 +609,18 @@ void ActMyChar_Normal(BOOL bKey)
 	if (!gMC.sprash && gMC.flag & 0x100)
 	{
 		int dir;
+
 		if (gMC.flag & 0x800)
 			dir = 2;
 		else
 			dir = 0;
 
-		if ((gMC.flag & 8) == 0 && gMC.ym > 0x200)
+		if (!(gMC.flag & 8) && gMC.ym > 0x200)
 		{
-			for (a = 0; a < 8; a++)
+			for (a = 0; a < 8; ++a)
 			{
 				x = gMC.x + (Random(-8, 8) * 0x200);
-				SetNpChar(73, x, gMC.y, gMC.xm + Random(-0x200, 0x200), Random(-0x200, 0x80) - gMC.ym / 2, dir, 0, 0);
+				SetNpChar(73, x, gMC.y, gMC.xm + Random(-0x200, 0x200), Random(-0x200, 0x80) - (gMC.ym / 2), dir, NULL, 0);
 			}
 
 			PlaySoundObject(56, 1);
@@ -625,21 +629,21 @@ void ActMyChar_Normal(BOOL bKey)
 		{
 			if (gMC.xm > 0x200 || gMC.xm < -0x200)
 			{
-				for (a = 0; a < 8; a++)
+				for (a = 0; a < 8; ++a)
 				{
 					x = gMC.x + (Random(-8, 8) * 0x200);
-					SetNpChar(73, x, gMC.y, gMC.xm + Random(-0x200, 0x200), Random(-0x200, 0x80), dir, 0, 0);
+					SetNpChar(73, x, gMC.y, gMC.xm + Random(-0x200, 0x200), Random(-0x200, 0x80), dir, NULL, 0);
 				}
 
 				PlaySoundObject(56, 1);
 			}
 		}
 
-		gMC.sprash = 1;
+		gMC.sprash = TRUE;
 	}
 
 	if (!(gMC.flag & 0x100))
-		gMC.sprash = 0;
+		gMC.sprash = FALSE;
 
 	// Spike damage
 	if (gMC.flag & 0x400)
@@ -701,7 +705,7 @@ void ActMyChar_Stream(BOOL bKey)
 
 	if (bKey)
 	{
-		if (gKey & (gKeyRight | gKeyLeft))
+		if (gKey & (gKeyLeft | gKeyRight))
 		{
 			if (gKey & gKeyLeft)
 				gMC.xm -= 0x100;
@@ -722,7 +726,7 @@ void ActMyChar_Stream(BOOL bKey)
 			gMC.xm += 0x80;
 		}
 
-		if (gKey & (gKeyDown | gKeyUp))
+		if (gKey & (gKeyUp | gKeyDown))
 		{
 			if (gKey & gKeyUp)
 				gMC.ym -= 0x100;
@@ -763,7 +767,7 @@ void ActMyChar_Stream(BOOL bKey)
 	if (gMC.ym < -0x200 && gMC.flag & 2)
 		SetCaret(gMC.x, gMC.y - gMC.hit.top, 13, 5);
 	if (gMC.ym > 0x200 && gMC.flag & 8)
-		SetCaret(gMC.x, gMC.hit.bottom + gMC.y, 13, 5);
+		SetCaret(gMC.x, gMC.y + gMC.hit.bottom, 13, 5);
 
 	if (gMC.xm > 0x400)
 		gMC.xm = 0x400;
@@ -775,7 +779,7 @@ void ActMyChar_Stream(BOOL bKey)
 	if (gMC.ym < -0x400)
 		gMC.ym = -0x400;
 
-	if ((gKey & (gKeyUp | gKeyLeft)) == (gKeyLeft | gKeyUp))
+	if ((gKey & (gKeyLeft | gKeyUp)) == (gKeyLeft | gKeyUp))
 	{
 		if (gMC.xm < -780)
 			gMC.xm = -780;
@@ -783,7 +787,7 @@ void ActMyChar_Stream(BOOL bKey)
 			gMC.ym = -780;
 	}
 
-	if ((gKey & (gKeyUp | gKeyRight)) == (gKeyRight | gKeyUp))
+	if ((gKey & (gKeyRight | gKeyUp)) == (gKeyRight | gKeyUp))
 	{
 		if (gMC.xm > 780)
 			gMC.xm = 780;
@@ -791,7 +795,7 @@ void ActMyChar_Stream(BOOL bKey)
 			gMC.ym = -780;
 	}
 
-	if ((gKey & (gKeyDown | gKeyLeft)) == (gKeyLeft | gKeyDown))
+	if ((gKey & (gKeyLeft | gKeyDown)) == (gKeyLeft | gKeyDown))
 	{
 		if (gMC.xm < -780)
 			gMC.xm = -780;
@@ -799,7 +803,7 @@ void ActMyChar_Stream(BOOL bKey)
 			gMC.ym = 780;
 	}
 
-	if ((gKey & (gKeyDown | gKeyRight)) == (gKeyRight | gKeyDown))
+	if ((gKey & (gKeyRight | gKeyDown)) == (gKeyRight | gKeyDown))
 	{
 		if (gMC.xm > 780)
 			gMC.xm = 780;
@@ -811,7 +815,7 @@ void ActMyChar_Stream(BOOL bKey)
 	gMC.y += gMC.ym;
 }
 
-void AirProcess()
+void AirProcess(void)
 {
 	if (gMC.equip & 0x10)
 	{
@@ -820,7 +824,7 @@ void AirProcess()
 	}
 	else
 	{
-		if ((gMC.flag & 0x100) == 0)
+		if (!(gMC.flag & 0x100))
 		{
 			gMC.air = 1000;
 		}
@@ -852,26 +856,27 @@ void AirProcess()
 		{
 			gMC.air_get = 60;
 		}
-		else if (gMC.air_get)
+		else
 		{
-			--gMC.air_get;
+			if (gMC.air_get != 0)
+				--gMC.air_get;
 		}
 	}
 }
 
 void ActMyChar(BOOL bKey)
 {
-	if ((gMC.cond & 0x80) == 0)
+	if (!(gMC.cond & 0x80))
 		return;
 
-	if (gMC.exp_wait)
+	if (gMC.exp_wait != 0)
 		--gMC.exp_wait;
 
-	if (gMC.shock)
+	if (gMC.shock != 0)
 	{
 		--gMC.shock;
 	}
-	else if (gMC.exp_count)
+	else if (gMC.exp_count != 0)
 	{
 		SetValueView(&gMC.x, &gMC.y, gMC.exp_count);
 		gMC.exp_count = 0;
@@ -882,6 +887,7 @@ void ActMyChar(BOOL bKey)
 		case 0:
 			if (!(g_GameFlags & 4) && bKey)
 				AirProcess();
+
 			ActMyChar_Normal(bKey);
 			break;
 
@@ -919,12 +925,12 @@ void MoveMyChar(int x, int y)
 	gMC.y = y;
 }
 
-void ZeroMyCharXMove()
+void ZeroMyCharXMove(void)
 {
 	gMC.xm = 0;
 }
 
-int GetUnitMyChar()
+int GetUnitMyChar(void)
 {
 	return gMC.unit;
 }
@@ -946,7 +952,8 @@ void SetMyCharDirect(unsigned char dir)
 		else
 		{
 			int i;
-			for (i = 0; i < NPC_MAX; i++)
+
+			for (i = 0; i < NPC_MAX; ++i)
 				if (gNPC[i].code_event == dir)
 					break;
 
@@ -969,9 +976,9 @@ void ChangeMyUnit(unsigned char a)
 	gMC.unit = a;
 }
 
-void PitMyChar()
+void PitMyChar(void)
 {
-	gMC.y += 0x4000;
+	gMC.y += 2 * 0x10 * 0x200;	// Shove player two tiles down. I wonder what this was meant for?
 }
 
 void EquipItem(int flag, BOOL b)
@@ -982,7 +989,7 @@ void EquipItem(int flag, BOOL b)
 		gMC.equip &= ~flag;
 }
 
-void ResetCheck()
+void ResetCheck(void)
 {
 	gMC.cond &= ~1;
 }
@@ -1007,7 +1014,7 @@ void SetNoise(int no, int freq)
 	}
 }
 
-void CutNoise()
+void CutNoise(void)
 {
 	noise_no = 0;
 	PlaySoundObject(40, 0);
@@ -1015,7 +1022,7 @@ void CutNoise()
 	PlaySoundObject(58, 0);
 }
 
-void ResetNoise()
+void ResetNoise(void)
 {
 	switch (noise_no)
 	{
@@ -1032,7 +1039,7 @@ void ResetNoise()
 	}
 }
 
-void SleepNoise()
+void SleepNoise(void)
 {
 	PlaySoundObject(40, 0);
 	PlaySoundObject(41, 0);

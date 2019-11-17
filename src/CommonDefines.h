@@ -12,9 +12,6 @@
 #define TILES_TO_UNITS(x) ((int)((x) * (0x200 * 0x10)))
 #define UNITS_TO_TILES(x) ((int)((x) / (0x200 * 0x10)))
 
-#define SECONDS_TO_FRAMES(x) ((int)((x) * 50))
-#define FRAMES_TO_SECONDS(x) ((int)((x) / 50))
-
 enum Collisions
 {
 	COLL_LEFT_WALL = 1,     // Touching a left wall

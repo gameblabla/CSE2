@@ -29,8 +29,8 @@ struct NPC_TABLE
 extern NPC_TABLE *gNpcTable;
 
 BOOL LoadNpcTable(const char *path);
-void ReleaseNpcTable();
+void ReleaseNpcTable(void);
 
-//NPC Function table
+// NPC Function table
 typedef void (*NPCFUNCTION)(NPCHAR*);
-extern NPCFUNCTION gpNpcFuncTbl[];
+extern const NPCFUNCTION gpNpcFuncTbl[];

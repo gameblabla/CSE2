@@ -2,4 +2,4 @@
 
 #include "WindowsWrapper.h"
 
-BOOL LoadGenericData();
+BOOL LoadGenericData(void);

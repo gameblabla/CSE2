@@ -156,8 +156,10 @@ BOOL StartDirectDraw(SDL_Window *window, int lMagnification)
 
 void EndDirectDraw(void)
 {
+	int i;
+
 	// Release all surfaces
-	for (int i = 0; i < SURFACE_ID_MAX; ++i)
+	for (i = 0; i < SURFACE_ID_MAX; ++i)
 	{
 		if (surf[i] != NULL)
 		{
@@ -642,6 +644,7 @@ BOOL DummiedOutLogFunction(int unknown)
 
 int RestoreSurfaces(void)	// Guessed function name - this doesn't exist in the Linux port
 {
+	int s;
 	RECT rect;
 	int surfaces_regenerated = 0;
 
@@ -655,7 +658,7 @@ int RestoreSurfaces(void)	// Guessed function name - this doesn't exist in the L
 		DummiedOutLogFunction(0x62);
 	}
 
-	for (int s = 0; s < SURFACE_ID_MAX; ++s )
+	for (s = 0; s < SURFACE_ID_MAX; ++s)
 	{
 		if (surf[s] != NULL)
 		{

@@ -26,9 +26,11 @@ STRIP Strip[MAX_STRIP];
 ILLUSTRATION Illust;
 
 // Update casts
-void ActionStripper()
+void ActionStripper(void)
 {
-	for (int s = 0; s < MAX_STRIP; s++)
+	int s;
+
+	for (s = 0; s < MAX_STRIP; ++s)
 	{
 		// Move up
 		if (Strip[s].flag & 0x80 && Credit.mode)
@@ -40,26 +42,27 @@ void ActionStripper()
 }
 
 // Draw casts
-void PutStripper()
+void PutStripper(void)
 {
 	RECT rc;
+	int s;
 
-	for (int s = 0; s < MAX_STRIP; s++)
+	for (s = 0; s < MAX_STRIP; ++s)
 	{
 		if (Strip[s].flag & 0x80)
 		{
 			// Draw text
 			rc.left = 0;
 			rc.right = 320;
-			rc.top = s * 0x10;
-			rc.bottom = rc.top + 0x10;
+			rc.top = s * 16;
+			rc.bottom = rc.top + 16;
 
 			PutBitmap3(&grcFull, SubpixelToScreenCoord(Strip[s].x) + PixelToScreenCoord((WINDOW_WIDTH - 320) / 2), SubpixelToScreenCoord(Strip[s].y), &rc, SURFACE_ID_CREDIT_CAST);
 
 			// Draw character
-			rc.left = 24 * (Strip[s].cast % 13);
+			rc.left = (Strip[s].cast % 13) * 24;
 			rc.right = rc.left + 24;
-			rc.top = 24 * (Strip[s].cast / 13);
+			rc.top = (Strip[s].cast / 13) * 24;
 			rc.bottom = rc.top + 24;
 
 			PutBitmap3(&grcFull, SubpixelToScreenCoord(Strip[s].x) + PixelToScreenCoord(((WINDOW_WIDTH - 320) / 2) - 24), SubpixelToScreenCoord(Strip[s].y) - PixelToScreenCoord(8), &rc, SURFACE_ID_CASTS);
@@ -73,7 +76,7 @@ void SetStripper(int x, int y, const char *text, int cast)
 	RECT rc;
 	int s;
 
-	for (s = 0; s < MAX_STRIP; s++)
+	for (s = 0; s < MAX_STRIP; ++s)
 		if (!(Strip[s].flag & 0x80))
 			break;
 
@@ -90,26 +93,27 @@ void SetStripper(int x, int y, const char *text, int cast)
 	// Draw text
 	rc.left = 0;
 	rc.right = 320;
-	rc.top = s * 0x10;
-	rc.bottom = rc.top + 0x10;
+	rc.top = s * 16;
+	rc.bottom = rc.top + 16;
 
 	CortBox2(&rc, 0, SURFACE_ID_CREDIT_CAST);
 	PutText2(0, rc.top, text, RGB(0xFF, 0xFF, 0xFE), SURFACE_ID_CREDIT_CAST);
 }
 
 // Regenerate cast text
-void RestoreStripper()
+void RestoreStripper(void)
 {
 	RECT rc;
+	int s;
 
-	for (int s = 0; s < MAX_STRIP; s++)
+	for (s = 0; s < MAX_STRIP; ++s)
 	{
 		if (Strip[s].flag & 0x80)
 		{
 			rc.left = 0;
 			rc.right = 320;
-			rc.top = s * 0x10;
-			rc.bottom = rc.top + 0x10;
+			rc.top = s * 16;
+			rc.bottom = rc.top + 16;
 
 			CortBox2(&rc, 0, SURFACE_ID_CREDIT_CAST);
 			PutText2(0, rc.top, Strip[s].str, RGB(0xFF, 0xFF, 0xFE), SURFACE_ID_CREDIT_CAST);
@@ -118,30 +122,30 @@ void RestoreStripper()
 }
 
 // Handle the illustration
-void ActionIllust()
+void ActionIllust(void)
 {
 	switch (Illust.act_no)
 	{
 		case 0: // Off-screen to the left
-			Illust.x = -0x14000;
+			Illust.x = -160 * 0x200;
 			break;
 
 		case 1: // Move in from the left
-			Illust.x += 0x5000;
+			Illust.x += 40 * 0x200;
 			if (Illust.x > 0)
 				Illust.x = 0;
 			break;
 
 		case 2: // Move out from the right
 			Illust.x -= 0x5000;
-			if (Illust.x < -0x14000)
-				Illust.x = -0x14000;
+			if (Illust.x < -160 * 0x200)
+				Illust.x = -160 * 0x200;
 			break;
 	}
 }
 
 // Draw illustration
-void PutIllust()
+void PutIllust(void)
 {
 	RECT rcIllust = {0, 0, 160, 240};
 #if WINDOW_WIDTH != 320 || WINDOW_HEIGHT != 240
@@ -162,16 +166,16 @@ void ReloadIllust(int a)
 }
 
 // Initialize and release credits
-void InitCreditScript()
+void InitCreditScript(void)
 {
 	// Clear script state and casts
 	memset(&Credit, 0, sizeof(CREDIT));
 	memset(Strip, 0, sizeof(Strip));
 }
 
-void ReleaseCreditScript()
+void ReleaseCreditScript(void)
 {
-	if (Credit.pData)
+	if (Credit.pData != NULL)
 	{
 		// Free script data
 		free(Credit.pData);
@@ -182,10 +186,10 @@ void ReleaseCreditScript()
 const char *credit_script = "Credit.tsc";
 
 // Start playing credits
-BOOL StartCreditScript()
+BOOL StartCreditScript(void)
 {
 	// Clear previously existing credits data
-	if (Credit.pData)
+	if (Credit.pData != NULL)
 	{
 		free(Credit.pData);
 		Credit.pData = NULL;
@@ -224,7 +228,7 @@ BOOL StartCreditScript()
 	Credit.offset = 0;
 	Credit.wait = 0;
 	Credit.mode = 1;
-	Illust.x = -0x14000;
+	Illust.x = -160 * 0x200;
 	Illust.act_no = 0;
 
 	// Modify cliprect
@@ -246,7 +250,7 @@ BOOL StartCreditScript()
 }
 
 // Update credits
-void ActionCredit()
+void ActionCredit(void)
 {
 	if (Credit.offset >= Credit.size)
 		return;
@@ -261,11 +265,12 @@ void ActionCredit()
 		case 2:
 			if (--Credit.wait <= 0)
 				Credit.mode = 1;
+			break;
 	}
 }
 
 // Parse credits
-void ActionCredit_Read()
+void ActionCredit_Read(void)
 {
 	int a, b, len;
 	char text[40];
@@ -435,7 +440,7 @@ void SetCreditIllust(int a)
 }
 
 // Slide illustration off-screen
-void CutCreditIllust()
+void CutCreditIllust(void)
 {
 	Illust.act_no = 2;
 }
@@ -443,8 +448,10 @@ void CutCreditIllust()
 // Scene of the island falling
 int Scene_DownIsland(int mode)
 {
+	int wait;
+
 	// Setup background
-	RECT rc_frame = {(WINDOW_WIDTH - 160) / 2, (WINDOW_HEIGHT - 80) / 2, (WINDOW_WIDTH + 160) / 2, (WINDOW_HEIGHT + 80) / 2};
+	RECT rc_frame = {(WINDOW_WIDTH / 2) - 80, (WINDOW_HEIGHT / 2) - 40, (WINDOW_WIDTH / 2) + 80, (WINDOW_HEIGHT / 2) + 40};
 	RECT rc_sky = {0, 0, 160, 80};
 	RECT rc_ground = {160, 48, 320, 80};
 
@@ -452,10 +459,10 @@ int Scene_DownIsland(int mode)
 	RECT rc_sprite = {160, 0, 200, 24};
 
 	ISLAND_SPRITE sprite;
-	sprite.x = 0x15000;
-	sprite.y = 0x8000;
+	sprite.x = 168 * 0x200;
+	sprite.y = 64 * 0x200;
 
-	for (int wait = 0; wait < 900; wait++)
+	for (wait = 0; wait < 900; ++wait)
 	{
 		// Get pressed keys
 		GetTrg();
@@ -506,9 +513,9 @@ int Scene_DownIsland(int mode)
 
 		// Draw scene
 		CortBox(&grcFull, 0);
-		PutBitmap3(&rc_frame, PixelToScreenCoord(80 + (WINDOW_WIDTH - 320) / 2), PixelToScreenCoord(80 + (WINDOW_HEIGHT - 240) / 2), &rc_sky, SURFACE_ID_LEVEL_SPRITESET_1);
-		PutBitmap3(&rc_frame, SubpixelToScreenCoord(sprite.x) - PixelToScreenCoord(20) + PixelToScreenCoord((WINDOW_WIDTH - 320) / 2), SubpixelToScreenCoord(sprite.y) - PixelToScreenCoord(12) + PixelToScreenCoord((WINDOW_HEIGHT - 240) / 2), &rc_sprite, SURFACE_ID_LEVEL_SPRITESET_1);
-		PutBitmap3(&rc_frame, PixelToScreenCoord(80 + (WINDOW_WIDTH - 320) / 2), PixelToScreenCoord(128 + (WINDOW_HEIGHT - 240) / 2), &rc_ground, SURFACE_ID_LEVEL_SPRITESET_1);
+		PutBitmap3(&rc_frame, PixelToScreenCoord(80 + ((WINDOW_WIDTH - 320) / 2)), PixelToScreenCoord(80 + ((WINDOW_HEIGHT - 240) / 2)), &rc_sky, SURFACE_ID_LEVEL_SPRITESET_1);
+		PutBitmap3(&rc_frame, SubpixelToScreenCoord(sprite.x) - PixelToScreenCoord(20 + ((WINDOW_WIDTH - 320) / 2)), PixelToScreenCoord((sprite.y / 0x200) - 12 + ((WINDOW_HEIGHT - 240) / 2)), &rc_sprite, SURFACE_ID_LEVEL_SPRITESET_1);
+		PutBitmap3(&rc_frame, PixelToScreenCoord(80 + ((WINDOW_WIDTH - 320) / 2)), PixelToScreenCoord(128 + ((WINDOW_HEIGHT - 240) / 2)), &rc_ground, SURFACE_ID_LEVEL_SPRITESET_1);
 		PutTimeCounter(16, 8);
 
 		// Draw window

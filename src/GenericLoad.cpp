@@ -161,7 +161,7 @@ static BOOL LoadPixToneFile(const char *filename, PIXTONEPARAMETER *pixtone_para
 	return success;
 }
 
-BOOL LoadGenericData()
+BOOL LoadGenericData(void)
 {
 	char str[0x40];
 	BOOL bError;
@@ -200,55 +200,51 @@ BOOL LoadGenericData()
 		bError = TRUE;
 
 	if (bError)
-	{
 		return FALSE;
-	}
-	else
+
+	MakeSurface_Generic(WINDOW_WIDTH, WINDOW_HEIGHT, SURFACE_ID_SCREEN_GRAB, TRUE);
+	MakeSurface_Generic(320, 240, SURFACE_ID_LEVEL_BACKGROUND, FALSE);
+	MakeSurface_Generic(WINDOW_WIDTH, WINDOW_HEIGHT, SURFACE_ID_MAP, TRUE);
+	MakeSurface_Generic(320, 240, SURFACE_ID_CASTS, FALSE);
+	MakeSurface_Generic(256, 256, SURFACE_ID_LEVEL_TILESET, FALSE);
+	MakeSurface_Generic(160, 16, SURFACE_ID_ROOM_NAME, FALSE);
+	MakeSurface_Generic(40, 240, SURFACE_ID_VALUE_VIEW, FALSE);
+	MakeSurface_Generic(320, 240, SURFACE_ID_LEVEL_SPRITESET_1, FALSE);
+	MakeSurface_Generic(320, 240, SURFACE_ID_LEVEL_SPRITESET_2, FALSE);
+	MakeSurface_Generic(320, 16 * (MAX_STRIP - 1), SURFACE_ID_CREDIT_CAST, FALSE);
+
+	pt_size = 0;
+
+	for (unsigned int i = 0; i < sizeof(gPtpTable) / sizeof(gPtpTable[0]); ++i)
 	{
-		MakeSurface_Generic(WINDOW_WIDTH, WINDOW_HEIGHT, SURFACE_ID_SCREEN_GRAB, TRUE);
-		MakeSurface_Generic(320, 240, SURFACE_ID_LEVEL_BACKGROUND, FALSE);
-		MakeSurface_Generic(WINDOW_WIDTH, WINDOW_HEIGHT, SURFACE_ID_MAP, TRUE);
-		MakeSurface_Generic(320, 240, SURFACE_ID_CASTS, FALSE);
-		MakeSurface_Generic(256, 256, SURFACE_ID_LEVEL_TILESET, FALSE);
-		MakeSurface_Generic(160, 16, SURFACE_ID_ROOM_NAME, FALSE);
-		MakeSurface_Generic(40, 240, SURFACE_ID_VALUE_VIEW, FALSE);
-		MakeSurface_Generic(320, 240, SURFACE_ID_LEVEL_SPRITESET_1, FALSE);
-		MakeSurface_Generic(320, 240, SURFACE_ID_LEVEL_SPRITESET_2, FALSE);
-		MakeSurface_Generic(320, 16 * MAX_STRIP, SURFACE_ID_CREDIT_CAST, FALSE);
+		char path[MAX_PATH];
+		sprintf(path, "%s/%s", gDataPath, gPtpTable[i].path);
 
-		pt_size = 0;
-
-		for (unsigned int i = 0; i < sizeof(gPtpTable) / sizeof(gPtpTable[0]); ++i)
+		switch (gPtpTable[i].type)
 		{
-			char path[MAX_PATH];
-			sprintf(path, "%s/%s", gDataPath, gPtpTable[i].path);
+			case SOUND_TYPE_PIXTONE:
+				PIXTONEPARAMETER pixtone_parameters[4];
 
-			switch (gPtpTable[i].type)
-			{
-				case SOUND_TYPE_PIXTONE:
-					PIXTONEPARAMETER pixtone_parameters[4];
+				if (LoadPixToneFile(path, pixtone_parameters))
+				{
+					int ptp_num = 0;
+					while (pixtone_parameters[ptp_num].use && ptp_num < 4)
+						++ptp_num;
 
-					if (LoadPixToneFile(path, pixtone_parameters))
-					{
-						int ptp_num = 0;
-						while (pixtone_parameters[ptp_num].use && ptp_num < 4)
-							++ptp_num;
+					pt_size += MakePixToneObject(pixtone_parameters, ptp_num, gPtpTable[i].slot);
+				}
 
-						pt_size += MakePixToneObject(pixtone_parameters, ptp_num, gPtpTable[i].slot);
-					}
-
-					break;
+				break;
 
 #ifdef EXTRA_SOUND_FORMATS
-				case SOUND_TYPE_OTHER:
-					ExtraSound_LoadSFX(path, gPtpTable[i].slot);
-					break;
+			case SOUND_TYPE_OTHER:
+				ExtraSound_LoadSFX(path, gPtpTable[i].slot);
+				break;
 #endif
-			}
 		}
-
-		sprintf(str, "PixTone = %d byte", pt_size);
-		// There must have been some kind of console print function here or something
-		return TRUE;
 	}
+
+	sprintf(str, "PixTone = %d byte", pt_size);
+	// There must have been some kind of console print function here or something
+	return TRUE;
 }

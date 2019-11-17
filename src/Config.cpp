@@ -46,7 +46,7 @@ BOOL LoadConfigData(CONFIG *conf)
 	fclose(fp);
 
 	// Check if version is not correct, and return if it failed
-	if (strcmp(conf->proof, config_magic) != 0)
+	if (strcmp(conf->proof, config_magic))
 	{
 		memset(conf, 0, sizeof(CONFIG));
 		return FALSE;
@@ -64,7 +64,7 @@ void DefaultConfigData(CONFIG *conf)
 	// conf->display_mode = 1;
 
 	// Reset joystick settings (as these can't simply be set to 0)
-	conf->bJoystick = 1;
+	conf->bJoystick = TRUE;
 	conf->joystick_button[0] = 2;
 	conf->joystick_button[1] = 1;
 	conf->joystick_button[2] = 5;

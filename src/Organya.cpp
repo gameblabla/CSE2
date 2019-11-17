@@ -403,7 +403,7 @@ void PlayDramObject(unsigned char key, int mode, signed char track)
 	}
 }
 
-OrgData::OrgData()
+OrgData::OrgData(void)
 {
 	int i;
 
@@ -700,7 +700,7 @@ long play_p;
 NOTELIST *play_np[MAXTRACK];
 long now_leng[MAXMELODY];
 
-void OrgData::PlayData()
+void OrgData::PlayData(void)
 {
 	int i;
 
@@ -851,7 +851,7 @@ BOOL ChangeOrganyaVolume(signed int volume)
 	return TRUE;
 }
 
-void StopOrganyaMusic()
+void StopOrganyaMusic(void)
 {
 	if (!audio_backend_initialised)
 		return;
@@ -869,12 +869,12 @@ void StopOrganyaMusic()
 //	Sleep(100);	// TODO - Emulate this
 }
 
-void SetOrganyaFadeout()
+void SetOrganyaFadeout(void)
 {
 	bFadeout = TRUE;
 }
 
-void EndOrganya()
+void EndOrganya(void)
 {
 	if (!audio_backend_initialised)
 		return;

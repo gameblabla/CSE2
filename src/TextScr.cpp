@@ -36,11 +36,11 @@
 #include "Stage.h"
 #include "Tags.h"
 
-#define IS_COMMAND(c1, c2, c3) (gTS.data[gTS.p_read + 1] == (c1) && gTS.data[gTS.p_read + 2] == (c2) && gTS.data[gTS.p_read + 3] == (c3))
-
 #define TSC_BUFFER_SIZE 0x5000
 
 #define TEXT_LEFT (WINDOW_WIDTH / 2 - 108)
+
+#define IS_COMMAND(c1, c2, c3) (gTS.data[gTS.p_read + 1] == (c1) && gTS.data[gTS.p_read + 2] == (c2) && gTS.data[gTS.p_read + 3] == (c3))
 
 TEXT_SCRIPT gTS;
 
@@ -55,25 +55,27 @@ static unsigned long nod_color;
 
 unsigned int gMIMCurrentNum = 0;
 
-//Initialize and end tsc
-BOOL InitTextScript2()
+// Initialize and end tsc
+BOOL InitTextScript2(void)
 {
+	int i;
+
 #ifdef FIX_BUGS
 	nod_color = GetCortBoxColor(RGB(0xFF, 0xFF, 0xFE));
 #endif
 
-	//Clear flags
+	// Clear flags
 	gTS.mode = 0;
-	g_GameFlags &= ~0x04;
+	g_GameFlags &= ~4;
 
-	//Create line surfaces
-	for (int i = 0; i < 4; i++)
-		MakeSurface_Generic(gRect_line.right, gRect_line.bottom, (SurfaceID)(i + SURFACE_ID_TEXT_LINE1), FALSE);
+	// Create line surfaces
+	for (i = 0; i < 4; ++i)
+		MakeSurface_Generic(gRect_line.right, gRect_line.bottom, (SurfaceID)(SURFACE_ID_TEXT_LINE1 + i), FALSE);
 
-	//Clear text
+	// Clear text
 	memset(text, 0, sizeof(text));
 
-	//Allocate script buffer
+	// Allocate script buffer
 	gTS.data = (char*)malloc(TSC_BUFFER_SIZE);
 
 	if (gTS.data == NULL)
@@ -82,44 +84,47 @@ BOOL InitTextScript2()
 		return TRUE;
 }
 
-void EndTextScript()
+void EndTextScript(void)
 {
-	//Free TSC buffer
+	int i;
+
+	// Free TSC buffer
 	free(gTS.data);
 
-	//Release buffers
+	// Release buffers
 	ReleaseSurface(SURFACE_ID_TEXT_BOX);
-	for (int i = 0; i < 4; i++)
-		ReleaseSurface((SurfaceID)(i + SURFACE_ID_TEXT_LINE1));
+	for (i = 0; i < 4; ++i)
+		ReleaseSurface((SurfaceID)(SURFACE_ID_TEXT_LINE1 + i));
 }
 
-//Decrypt .tsc
-void EncryptionBinaryData2(unsigned char *pData, int size)
+// Decrypt .tsc
+void EncryptionBinaryData2(unsigned char *pData, long size)
 {
 	int val1;
 	int work;
 	int i;
+	int half;
 
-	int half = size / 2;
+	half = size / 2;
 	if (pData[half] == 0)
 		val1 = -7;
 	else
-		val1 = (pData[half] % 256) * -1;
+		val1 = (pData[half] % 0x100) * -1;
 
-	for (i = 0; i < size; i++)
+	for (i = 0; i < size; ++i)
 	{
 		work = pData[i];
 		work += val1;
 
 		if (i != half)
-			pData[i] = work % 256;
+			pData[i] = work % 0x100;
 	}
 }
 
-//Load generic .tsc
+// Load generic .tsc
 BOOL LoadTextScript2(const char *name)
 {
-	//Get path
+	// Get path
 	char path[260];
 	sprintf(path, "%s/%s", gDataPath, name);
 
@@ -127,28 +132,29 @@ BOOL LoadTextScript2(const char *name)
 	if (gTS.size == -1)
 		return FALSE;
 
-	//Open file
+	// Open file
 	FILE *fp = fopen(path, "rb");
 	if (fp == NULL)
 		return FALSE;
 
-	//Read data
+	// Read data
 	fread(gTS.data, 1, gTS.size, fp);
 	gTS.data[gTS.size] = 0;
 	fclose(fp);
 
-	//Set path
+	// Set path
 	strcpy(gTS.path, name);
 
-	//Decrypt data
+	// Decrypt data
 	EncryptionBinaryData2((unsigned char*)gTS.data, gTS.size);
+
 	return TRUE;
 }
 
-//Load stage .tsc
+// Load stage .tsc
 BOOL LoadTextScript_Stage(const char *name)
 {
-	//Open Head.tsc
+	// Open Head.tsc
 	char path[MAX_PATH];
 	sprintf(path, "%s/%s", gDataPath, "Head.tsc");
 
@@ -160,13 +166,13 @@ BOOL LoadTextScript_Stage(const char *name)
 	if (fp == NULL)
 		return FALSE;
 
-	//Read Head.tsc
+	// Read Head.tsc
 	fread(gTS.data, 1, head_size, fp);
 	EncryptionBinaryData2((unsigned char*)gTS.data, head_size);
 	gTS.data[head_size] = 0;
 	fclose(fp);
 
-	//Open stage's .tsc
+	// Open stage's .tsc
 	sprintf(path, "%s/%s", gDataPath, name);
 
 	long body_size = GetFileSizeLong(path);
@@ -177,25 +183,26 @@ BOOL LoadTextScript_Stage(const char *name)
 	if (fp == NULL)
 		return FALSE;
 
-	//Read stage's tsc
+	// Read stage's tsc
 	fread(&gTS.data[head_size], 1, body_size, fp);
 	EncryptionBinaryData2((unsigned char*)&gTS.data[head_size], body_size);
 	gTS.data[head_size + body_size] = 0;
 	fclose(fp);
 
-	//Set parameters
+	// Set parameters
 	gTS.size = head_size + body_size;
 	strcpy(gTS.path, name);
+
 	return TRUE;
 }
 
-//Get current path
+// Get current path
 void GetTextScriptPath(char *path)
 {
 	strcpy(path, gTS.path);
 }
 
-//Get 4 digit number from TSC data
+// Get 4 digit number from TSC data
 int GetTextScriptNo(int a)
 {
 	int b = 0;
@@ -206,10 +213,12 @@ int GetTextScriptNo(int a)
 	return b;
 }
 
-//Start TSC event
+// Start TSC event
 BOOL StartTextScript(int no)
 {
-	//Reset state
+	//int i;
+
+	// Reset state
 	gTS.mode = 1;
 	g_GameFlags |= 5;
 	gTS.line = 0;
@@ -229,26 +238,26 @@ BOOL StartTextScript(int no)
 	gTS.rcText.bottom = gTS.rcText.top + 48;
 
 	/* This is present in the Linux port, but not the Windows version (1.0.0.6, at least)
-	//Clear text lines
-	for (int i = 0; i < 4; i++)
+	// Clear text lines
+	for (i = 0; i < 4; ++i)
 	{
-		gTS.ypos_line[i] = 16 * i;
-		CortBox2(&gRect_line, 0x000000, (SurfaceID)(i + SURFACE_ID_TEXT_LINE1));
+		gTS.ypos_line[i] = i * 16;
+		CortBox2(&gRect_line, 0x000000, (SurfaceID)(SURFACE_ID_TEXT_LINE1 + i));
 		memset(text[i], 0, sizeof(text[0]));
 	}*/
 
-	//Find where event starts
+	// Find where event starts
 	gTS.p_read = 0;
 	while (1)
 	{
-		//Check if we are still in the proper range
+		// Check if we are still in the proper range
 		if (gTS.data[gTS.p_read] == '\0')
 			return FALSE;
 
-		//Check if we are at an event
+		// Check if we are at an event
 		if (gTS.data[gTS.p_read] == '#')
 		{
-			//Check if this is our event
+			// Check if this is our event
 			int event_no = GetTextScriptNo(++gTS.p_read);
 
 			if (no == event_no)
@@ -260,7 +269,7 @@ BOOL StartTextScript(int no)
 		++gTS.p_read;
 	}
 
-	//Advance until new-line
+	// Advance until new-line
 	while (gTS.data[gTS.p_read] != '\n')
 		++gTS.p_read;
 	++gTS.p_read;
@@ -270,34 +279,36 @@ BOOL StartTextScript(int no)
 
 BOOL JumpTextScript(int no)
 {
-	//Set state
+	int i;
+
+	// Set state
 	gTS.mode = 1;
-	g_GameFlags |= 4u;
+	g_GameFlags |= 4;
 	gTS.line = 0;
 	gTS.p_write = 0;
 	gTS.wait = 4;
 	gTS.wait_beam = 0;
 
-	//Clear text lines
-	for (int i = 0; i < 4; i++)
+	// Clear text lines
+	for (i = 0; i < 4; ++i)
 	{
-		gTS.ypos_line[i] = 16 * i;
-		CortBox2(&gRect_line, 0x000000, (SurfaceID)(i + SURFACE_ID_TEXT_LINE1));
+		gTS.ypos_line[i] = i * 16;
+		CortBox2(&gRect_line, 0x000000, (SurfaceID)(SURFACE_ID_TEXT_LINE1 + i));
 		memset(text[i], 0, sizeof(text[0]));
 	}
 
-	//Find where event starts
+	// Find where event starts
 	gTS.p_read = 0;
 	while(1)
 	{
-		//Check if we are still in the proper range
+		// Check if we are still in the proper range
 		if (gTS.data[gTS.p_read] == '\0')
 			return FALSE;
 
-		//Check if we are at an event
+		// Check if we are at an event
 		if (gTS.data[gTS.p_read] == '#')
 		{
-			//Check if this is our event
+			// Check if this is our event
 			int event_no = GetTextScriptNo(++gTS.p_read);
 
 			if (no == event_no)
@@ -309,7 +320,7 @@ BOOL JumpTextScript(int no)
 		++gTS.p_read;
 	}
 
-	//Advance until new-line
+	// Advance until new-line
 	while (gTS.data[gTS.p_read] != '\n')
 		++gTS.p_read;
 	++gTS.p_read;
@@ -317,29 +328,29 @@ BOOL JumpTextScript(int no)
 	return TRUE;
 }
 
-//End event
-void StopTextScript()
+// End event
+void StopTextScript(void)
 {
-	//End TSC and reset flags
+	// End TSC and reset flags
 	gTS.mode = 0;
 	g_GameFlags &= ~4;
 	g_GameFlags |= 3;
 	gTS.flags = 0;
 }
 
-//Prepare a new line
-void CheckNewLine()
+// Prepare a new line
+void CheckNewLine(void)
 {
 	if (gTS.ypos_line[gTS.line % 4] == 48)
 	{
 		gTS.mode = 3;
 		g_GameFlags |= 4;
-		CortBox2(&gRect_line, 0, (SurfaceID)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
+		CortBox2(&gRect_line, 0, (SurfaceID)(SURFACE_ID_TEXT_LINE1 + (gTS.line % 4)));
 		memset(text[gTS.line % 4], 0, sizeof(text[0]));
 	}
 }
 
-//Type a number into the text buffer
+// Type a number into the text buffer
 void SetNumberTextScript(int index)
 {
 	int a;
@@ -349,71 +360,73 @@ void SetNumberTextScript(int index)
 	int offset;
 	char str[5];
 
-	//Get digit table
+	// Get digit table
 	int table[3];
 	table[0] = 1000;
 	table[1] = 100;
 	table[2] = 10;
 
-	//Get number to print
+	// Get number to print
 	a = gNumberTextScript[index];
 
 	bZero = FALSE;
 	offset = 0;
 
-	//Trim leading zeroes
-	for (i = 0; i < 3; i++)
+	// Trim leading zeroes
+	for (i = 0; i < 3; ++i)
 	{
-		if (a / table[i] || bZero != FALSE)
+		if (a / table[i] || bZero)
 		{
 			b = a / table[i];
-			str[offset] = (char)b + '0';
+			str[offset] = '0' + (char)b;
 			bZero = TRUE;
 			a -= b * table[i];
 			++offset;
 		}
 	}
 
-	//Set last digit of string, and add null terminator
-	str[offset] = (char)a + '0';
-	str[offset + 1] = 0;
+	// Set last digit of string, and add null terminator
+	str[offset] = '0' + (char)a;
+	str[offset + 1] = '\0';
 
-	//Append number to line
-	PutText2(6 * gTS.p_write, 0, str, RGB(0xFF, 0xFF, 0xFE), (SurfaceID)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
+	// Append number to line
+	PutText2(gTS.p_write * 6, 0, str, RGB(0xFF, 0xFF, 0xFE), (SurfaceID)(SURFACE_ID_TEXT_LINE1 + (gTS.line % 4)));
 	strcat(text[gTS.line % 4], str);
 
-	//Play sound and reset blinking cursor
+	// Play sound and reset blinking cursor
 	PlaySoundObject(2, 1);
 	gTS.wait_beam = 0;
 
-	//Check if should move to next line (prevent a memory overflow, come on guys, this isn't a leftover of pixel trying to make text wrapping)
-	gTS.p_write += (unsigned int)strlen(str);
+	// Check if should move to next line (prevent a memory overflow, come on guys, this isn't a leftover of pixel trying to make text wrapping)
+	gTS.p_write += (int)strlen(str);
 
 	if (gTS.p_write >= 35)
 	{
 		gTS.p_write = 0;
-		gTS.line++;
+		++gTS.line;
 		CheckNewLine();
 	}
 }
 
-//Clear text lines
-void ClearTextLine()
+// Clear text lines
+void ClearTextLine(void)
 {
+	int i;
+
 	gTS.line = 0;
 	gTS.p_write = 0;
 	gTS.offsetY = 0;
 
-	for (int i = 0; i < 4; i++)
+	for (i = 0; i < 4; ++i)
 	{
-		gTS.ypos_line[i] = 16 * i;
-		CortBox2(&gRect_line, 0x000000, (SurfaceID)(i + SURFACE_ID_TEXT_LINE1));
+		gTS.ypos_line[i] = i * 16;
+		CortBox2(&gRect_line, 0x000000, (SurfaceID)(SURFACE_ID_TEXT_LINE1 + i));
 		memset(text[i], 0, sizeof(text[0]));
 	}
 }
 
-//Draw textbox and whatever else
-void PutTextScript()
+// Draw textbox and whatever else
+void PutTextScript(void)
 {
 	RECT rcFace;
 	RECT rcItemBox1;
@@ -433,7 +446,7 @@ void PutTextScript()
 	if ((gTS.flags & 1) == 0)
 		return;
 
-	//Set textbox position
+	// Set textbox position
 	if (gTS.flags & 0x20)
 	{
 		gTS.rcText.top = 32;
@@ -445,22 +458,22 @@ void PutTextScript()
 		gTS.rcText.bottom = gTS.rcText.top + 48;
 	}
 
-	//Draw textbox
+	// Draw textbox
 	if (gTS.flags & 2)
 	{
 		RECT rcFrame1 = {0, 0, 244, 8};
 		RECT rcFrame2 = {0, 8, 244, 16};
 		RECT rcFrame3 = {0, 16, 244, 24};
 
-		PutBitmap3(&grcFull, PixelToScreenCoord(WINDOW_WIDTH / 2 - 122), PixelToScreenCoord(gTS.rcText.top - 10), &rcFrame1, SURFACE_ID_TEXT_BOX);
-		for (i = 1; i < 7; i++)
-			PutBitmap3(&grcFull, PixelToScreenCoord(WINDOW_WIDTH / 2 - 122), PixelToScreenCoord(8 * i + gTS.rcText.top - 10), &rcFrame2, SURFACE_ID_TEXT_BOX);
-		PutBitmap3(&grcFull, PixelToScreenCoord(WINDOW_WIDTH / 2 - 122), PixelToScreenCoord(8 * i + gTS.rcText.top - 10), &rcFrame3, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&grcFull, PixelToScreenCoord((WINDOW_WIDTH / 2) - 122), PixelToScreenCoord(gTS.rcText.top - 10), &rcFrame1, SURFACE_ID_TEXT_BOX);
+		for (i = 1; i < 7; ++i)
+			PutBitmap3(&grcFull, PixelToScreenCoord((WINDOW_WIDTH / 2) - 122), PixelToScreenCoord((i * 8) + gTS.rcText.top - 10), &rcFrame2, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&grcFull, PixelToScreenCoord((WINDOW_WIDTH / 2) - 122), PixelToScreenCoord((i * 8) + gTS.rcText.top - 10), &rcFrame3, SURFACE_ID_TEXT_BOX);
 	}
 
-	//Draw face picture
-	rcFace.left = 48 * (gTS.face % 6);
-	rcFace.top = 48 * (gTS.face / 6);
+	// Draw face picture
+	rcFace.left = (gTS.face % 6) * 48;
+	rcFace.top = (gTS.face / 6) * 48;
 	rcFace.right = rcFace.left + 48;
 	rcFace.bottom = rcFace.top + 48;
 
@@ -476,19 +489,19 @@ void PutTextScript()
 	PutBitmap3(&gTS.rcText, SubpixelToScreenCoord(gTS.face_x), PixelToScreenCoord(gTS.rcText.top - 3), &rcFace, SURFACE_ID_FACE);
 #endif
 
-	//Draw text
-	if (gTS.face)
+	// Draw text
+	if (gTS.face != 0)
 		text_offset = 56;
 	else
 		text_offset = 0;
 
-	for (i = 0; i < 4; i++)
-		PutBitmap3(&gTS.rcText, PixelToScreenCoord(text_offset + TEXT_LEFT), PixelToScreenCoord(gTS.offsetY + gTS.ypos_line[i] + gTS.rcText.top), &gRect_line, (SurfaceID)(i + SURFACE_ID_TEXT_LINE1));
+	for (i = 0; i < 4; ++i)
+		PutBitmap3(&gTS.rcText, PixelToScreenCoord(TEXT_LEFT + text_offset), PixelToScreenCoord(gTS.offsetY + gTS.ypos_line[i] + gTS.rcText.top), &gRect_line, (SurfaceID)(SURFACE_ID_TEXT_LINE1 + i));
 
-	//Draw NOD cursor
+	// Draw NOD cursor
 	if ((gTS.wait_beam++ % 20 > 12) && gTS.mode == 2)
 	{
-		rect.left = TEXT_LEFT + 6 * gTS.p_write + text_offset;
+		rect.left = TEXT_LEFT + (gTS.p_write * 6) + text_offset;
 		rect.top = gTS.ypos_line[gTS.line % 4] + gTS.rcText.top + gTS.offsetY;
 		rect.right = rect.left + 5;
 		rect.bottom = rect.top + 11;
@@ -499,7 +512,7 @@ void PutTextScript()
 		// the way Pixel would do it (he only calls GetCortBoxColor
 		// once, during init functions, so our fix does it that way
 		// instead).
-		//CortBox(&rect, GetCortBoxColor(RGB(0xFF, 0xFF, 0xFE));
+		// CortBox(&rect, GetCortBoxColor(RGB(0xFF, 0xFF, 0xFE));
 #else
 		// This accidentally uses a BGR value directly, without
 		// running it though GetCortBoxColor first
@@ -507,32 +520,32 @@ void PutTextScript()
 #endif
 	}
 
-	//Draw GIT
+	// Draw GIT
 	SET_RECT(rcItemBox1, 0, 0, 72, 16)
 	SET_RECT(rcItemBox2, 0, 8, 72, 24)
 	SET_RECT(rcItemBox3, 240, 0, 244, 8)
 	SET_RECT(rcItemBox4, 240, 8, 244, 16)
 	SET_RECT(rcItemBox5, 240, 16, 244, 24)
 
-	if (gTS.item)
+	if (gTS.item != 0)
 	{
-		PutBitmap3(&grcFull, PixelToScreenCoord((WINDOW_WIDTH - 80) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 112), &rcItemBox1, SURFACE_ID_TEXT_BOX);
-		PutBitmap3(&grcFull, PixelToScreenCoord((WINDOW_WIDTH - 80) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 96), &rcItemBox2, SURFACE_ID_TEXT_BOX);
-		PutBitmap3(&grcFull, PixelToScreenCoord((WINDOW_WIDTH + 64) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 112), &rcItemBox3, SURFACE_ID_TEXT_BOX);
-		PutBitmap3(&grcFull, PixelToScreenCoord((WINDOW_WIDTH + 64) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 104), &rcItemBox4, SURFACE_ID_TEXT_BOX);
-		PutBitmap3(&grcFull, PixelToScreenCoord((WINDOW_WIDTH + 64) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 96), &rcItemBox4, SURFACE_ID_TEXT_BOX);
-		PutBitmap3(&grcFull, PixelToScreenCoord((WINDOW_WIDTH + 64) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 88), &rcItemBox5, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&grcFull, PixelToScreenCoord((WINDOW_WIDTH / 2) - 40), PixelToScreenCoord(WINDOW_HEIGHT - 112), &rcItemBox1, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&grcFull, PixelToScreenCoord((WINDOW_WIDTH / 2) - 40), PixelToScreenCoord(WINDOW_HEIGHT - 96), &rcItemBox2, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&grcFull, PixelToScreenCoord((WINDOW_WIDTH / 2) + 32), PixelToScreenCoord(WINDOW_HEIGHT - 112), &rcItemBox3, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&grcFull, PixelToScreenCoord((WINDOW_WIDTH / 2) + 32), PixelToScreenCoord(WINDOW_HEIGHT - 104), &rcItemBox4, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&grcFull, PixelToScreenCoord((WINDOW_WIDTH / 2) + 32), PixelToScreenCoord(WINDOW_HEIGHT - 96), &rcItemBox4, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&grcFull, PixelToScreenCoord((WINDOW_WIDTH / 2) + 32), PixelToScreenCoord(WINDOW_HEIGHT - 88), &rcItemBox5, SURFACE_ID_TEXT_BOX);
 
 		if (gTS.item_y < WINDOW_HEIGHT - 104)
 			++gTS.item_y;
 
 		if (gTS.item < 1000)
 		{
-			rect.left = 16 * (gTS.item % 16);
+			rect.left = (gTS.item % 16) * 16;
 			rect.right = rect.left + 16;
-			rect.top = 16 * (gTS.item / 16);
+			rect.top = (gTS.item / 16) * 16;
 			rect.bottom = rect.top + 16;
-			PutBitmap3(&grcFull, PixelToScreenCoord((WINDOW_WIDTH - 24) / 2), PixelToScreenCoord(gTS.item_y), &rect, SURFACE_ID_ARMS_IMAGE);
+			PutBitmap3(&grcFull, PixelToScreenCoord((WINDOW_WIDTH / 2) - 12), PixelToScreenCoord(gTS.item_y), &rect, SURFACE_ID_ARMS_IMAGE);
 		}
 		else
 		{
@@ -540,11 +553,11 @@ void PutTextScript()
 			rect.right = rect.left + 32;
 			rect.top = 16 * ((gTS.item - 1000) / 8);
 			rect.bottom = rect.top + 16;
-			PutBitmap3(&grcFull, PixelToScreenCoord((WINDOW_WIDTH - 40) / 2), PixelToScreenCoord(gTS.item_y), &rect, SURFACE_ID_ITEM_IMAGE);
+			PutBitmap3(&grcFull, PixelToScreenCoord((WINDOW_WIDTH / 2) - 20), PixelToScreenCoord(gTS.item_y), &rect, SURFACE_ID_ITEM_IMAGE);
 		}
 	}
 
-	//Draw Yes / No selection
+	// Draw Yes / No selection
 	SET_RECT(rect_yesno, 152, 48, 244, 80)
 	SET_RECT(rect_cur, 112, 88, 128, 104)
 
@@ -555,14 +568,14 @@ void PutTextScript()
 		else
 			i = WINDOW_HEIGHT - 96;
 
-		PutBitmap3(&grcFull, PixelToScreenCoord((WINDOW_WIDTH + 112) / 2), PixelToScreenCoord(i), &rect_yesno, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&grcFull, PixelToScreenCoord((WINDOW_WIDTH / 2) + 56), PixelToScreenCoord(i), &rect_yesno, SURFACE_ID_TEXT_BOX);
 		if (gTS.wait == 16)
-			PutBitmap3(&grcFull, PixelToScreenCoord(41 * gTS.select + (WINDOW_WIDTH + 102) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 86), &rect_cur, SURFACE_ID_TEXT_BOX);
+			PutBitmap3(&grcFull, PixelToScreenCoord((gTS.select * 41) + (WINDOW_WIDTH / 2) + 51), PixelToScreenCoord(WINDOW_HEIGHT - 86), &rect_cur, SURFACE_ID_TEXT_BOX);
 	}
 }
 
-//Parse TSC
-int TextScriptProc()
+// Parse TSC
+int TextScriptProc(void)
 {
 	BOOL bExit;
 	char c[3];
@@ -574,11 +587,11 @@ int TextScriptProc()
 
 	switch (gTS.mode)
 	{
-		case 1: //PARSE
-			//Type out (faster if ok or cancel are held)
+		case 1: // PARSE
+			// Type out (faster if ok or cancel are held)
 			++gTS.wait;
 
-			if (!(g_GameFlags & 2) && (gKeyCancel | gKeyOk) & gKey)
+			if (!(g_GameFlags & 2) && gKey & (gKeyOk | gKeyCancel))
 				gTS.wait += 4;
 
 			if (gTS.wait < 4)
@@ -586,10 +599,10 @@ int TextScriptProc()
 
 			gTS.wait = 0;
 
-			//Parsing time
+			// Parsing time
 			bExit = FALSE;
 
-			while (bExit == FALSE)
+			while (!bExit)
 			{
 				if (gTS.data[gTS.p_read] == '<')
 				{
@@ -712,6 +725,7 @@ int TextScriptProc()
 						w = GetTextScriptNo(gTS.p_read + 9);
 						x = GetTextScriptNo(gTS.p_read + 14);
 						y = GetTextScriptNo(gTS.p_read + 19);
+
 						if (!TransferStage(z, w, x, y))
 						{
 							#ifdef JAPANESE
@@ -1140,7 +1154,7 @@ int TextScriptProc()
 						x = GetTextScriptNo(gTS.p_read + 9);
 						y = GetTextScriptNo(gTS.p_read + 14);
 						z = GetTextScriptNo(gTS.p_read + 19);
-						SetNpChar(w, x * 0x200 * 0x10, y * 0x200 * 0x10, 0, 0, z, 0, 0x100);
+						SetNpChar(w, x * 0x200 * 0x10, y * 0x200 * 0x10, 0, 0, z, NULL, 0x100);
 						gTS.p_read += 23;
 					}
 					else if (IS_COMMAND('M','N','P'))
@@ -1171,7 +1185,7 @@ int TextScriptProc()
 					{
 						z = GetTextScriptNo(gTS.p_read + 4);
 
-						if (z)
+						if (z != 0)
 							StartBossLife(z);
 						else
 							StartBossLife2();
@@ -1213,7 +1227,7 @@ int TextScriptProc()
 					else if (IS_COMMAND('F','A','C'))
 					{
 						z = GetTextScriptNo(gTS.p_read + 4);
-						if (gTS.face != (signed char)z)
+						if (gTS.face != (signed char)z)	// Not sure why these casts are here, but they're needed for the same assembly code to be produced
 						{
 							gTS.face = (signed char)z;
 							gTS.face_x = (WINDOW_WIDTH / 2 - 156) * 0x200;
@@ -1298,7 +1312,7 @@ int TextScriptProc()
 				{
 					if (gTS.data[gTS.p_read] == '\r')
 					{
-						//Go to new-line
+						// Go to new-line
 						gTS.p_read += 2;
 						gTS.p_write = 0;
 
@@ -1310,34 +1324,34 @@ int TextScriptProc()
 					}
 					else if (gTS.flags & 0x10)
 					{
-						//SAT/CAT/TUR printing
+						// SAT/CAT/TUR printing
 						x = gTS.p_read;
-						//Break if reaches command, or new-line
+						// Break if reaches command, or new-line
 						while (gTS.data[x] != '<' && gTS.data[x] != '\r')
 						{
-							//Skip if SHIFT-JIS
+							// Skip if SHIFT-JIS
 							if (gTS.data[x] & 0x80)
 								++x;
 
 							++x;
 						}
 
-						//Get text to copy
+						// Get text to copy
 						y = x - gTS.p_read;
 						memcpy(str, &gTS.data[gTS.p_read], y);
-						str[y] = 0;
+						str[y] = '\0';
 
 						gTS.p_write = x;
 
-						//Print text
-						PutText2(0, 0, str, RGB(0xFF, 0xFF, 0xFE), (SurfaceID)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
+						// Print text
+						PutText2(0, 0, str, RGB(0xFF, 0xFF, 0xFE), (SurfaceID)(SURFACE_ID_TEXT_LINE1 + (gTS.line % 4)));
 					#ifdef FIX_BUGS
 						strcpy(text[gTS.line % 4], str);
 					#else
-						sprintf(text[gTS.line % 4], str);	// No point to using an sprintf here, and it makes Clang mad
+						sprintf(text[gTS.line % 4], str);	// No point in using an sprintf here, and it makes Clang mad
 					#endif
 
-						//Check if should move to next line (prevent a memory overflow, come on guys, this isn't a leftover of pixel trying to make text wrapping)
+						// Check if should move to next line (prevent a memory overflow, come on guys, this isn't a leftover of pixel trying to make text wrapping)
 						gTS.p_read += y;
 
 						if (gTS.p_write >= 35)
@@ -1347,7 +1361,7 @@ int TextScriptProc()
 					}
 					else
 					{
-						//Get text to print
+						// Get text to print
 						c[0] = gTS.data[gTS.p_read];
 
 						if (c[0] & 0x80)
@@ -1360,21 +1374,21 @@ int TextScriptProc()
 							c[1] = '\0';
 						}
 
-						//Print text
+						// Print text
 						if (c[0] == '=')
 						{
-							Surface2Surface(6 * gTS.p_write, 2, &rcSymbol, (SurfaceID)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1), SURFACE_ID_TEXT_BOX);
+							Surface2Surface(gTS.p_write * 6, 2, &rcSymbol, (SurfaceID)(SURFACE_ID_TEXT_LINE1 + (gTS.line % 4)), SURFACE_ID_TEXT_BOX);
 						}
 						else
 						{
-							PutText2(6 * gTS.p_write, 0, c, RGB(0xFF, 0xFF, 0xFE), (SurfaceID)(gTS.line % 4 + SURFACE_ID_TEXT_LINE1));
+							PutText2(gTS.p_write * 6, 0, c, RGB(0xFF, 0xFF, 0xFE), (SurfaceID)(SURFACE_ID_TEXT_LINE1 + (gTS.line % 4)));
 						}
 
 						strcat(text[gTS.line % 4], c);
 						PlaySoundObject(2, 1);
 						gTS.wait_beam = 0;
 
-						//Offset read and write positions
+						// Offset read and write positions
 						if (c[0] & 0x80)
 						{
 							gTS.p_read += 2;
@@ -1382,8 +1396,8 @@ int TextScriptProc()
 						}
 						else
 						{
-							gTS.p_read++;
-							gTS.p_write++;
+							gTS.p_read += 1;
+							gTS.p_write += 1;
 						}
 
 						if (gTS.p_write >= 35)
@@ -1400,17 +1414,17 @@ int TextScriptProc()
 			}
 			break;
 
-		case 2: //NOD
-			if ((gKeyCancel | gKeyOk) & gKeyTrg)
+		case 2: // NOD
+			if (gKeyTrg & (gKeyOk | gKeyCancel))
 				gTS.mode = 1;
 			break;
 
-		case 3: //NEW LINE
-			for (i = 0; i < 4; i++)
+		case 3: // NEW LINE
+			for (i = 0; i < 4; ++i)
 			{
 				gTS.ypos_line[i] -= 4;
 
-				if (!gTS.ypos_line[i])
+				if (gTS.ypos_line[i] == 0)
 					gTS.mode = 1;
 
 				if (gTS.ypos_line[i] == -16)
@@ -1418,7 +1432,7 @@ int TextScriptProc()
 			}
 			break;
 
-		case 4: //WAI
+		case 4: // WAI
 			if (gTS.wait_next == 9999)
 				break;
 
@@ -1432,28 +1446,30 @@ int TextScriptProc()
 			gTS.wait_beam = 0;
 			break;
 
-		case 5: //FAI/FAO
+		case 5: // FAI/FAO
 			if (GetFadeActive())
 				break;
 
 			gTS.mode = 1;
 			gTS.wait_beam = 0;
 			break;
-		case 7: //WAS
+
+		case 7: // WAS
 			if ((gMC.flag & 8) == 0)
-			break;
+				break;
 
 			gTS.mode = 1;
 			gTS.wait_beam = 0;
 			break;
-		case 6: //YNJ
+
+		case 6: // YNJ
 			if (gTS.wait < 16)
 			{
-				gTS.wait++;
+				++gTS.wait;
 			}
 			else
 			{
-				//Select option
+				// Select option
 				if (gKeyTrg & gKeyOk)
 				{
 					PlaySoundObject(18, 1);
@@ -1468,13 +1484,13 @@ int TextScriptProc()
 						gTS.wait_beam = 0;
 					}
 				}
-				//Yes
+				// Yes
 				else if (gKeyTrg & gKeyLeft)
 				{
 					gTS.select = 0;
 					PlaySoundObject(1, 1);
 				}
-				//No
+				// No
 				else if (gKeyTrg & gKeyRight)
 				{
 					gTS.select = 1;
@@ -1488,14 +1504,17 @@ int TextScriptProc()
 		g_GameFlags &= ~4;
 	else
 		g_GameFlags |= 4;
+
 	return 1;
 }
 
-void RestoreTextScript()
+void RestoreTextScript(void)
 {
-	for (int i = 0; i < 4; ++i)
+	int i;
+
+	for (i = 0; i < 4; ++i)
 	{
-		CortBox2(&gRect_line, 0x000000, (SurfaceID)(i + SURFACE_ID_TEXT_LINE1));
-		PutText2(0, 0, text[i], RGB(0xFF, 0xFF, 0xFE), (SurfaceID)(i + SURFACE_ID_TEXT_LINE1));
+		CortBox2(&gRect_line, 0x000000, (SurfaceID)(SURFACE_ID_TEXT_LINE1 + i));
+		PutText2(0, 0, text[i], RGB(0xFF, 0xFF, 0xFE), (SurfaceID)(SURFACE_ID_TEXT_LINE1 + i));
 	}
 }

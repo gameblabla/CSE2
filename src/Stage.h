@@ -66,4 +66,4 @@ extern MusicID gMusicNo;
 BOOL LoadStageTable();
 BOOL TransferStage(int no, int w, int x, int y);
 void ChangeMusic(MusicID no);
-void ReCallMusic();
+void ReCallMusic(void);

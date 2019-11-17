@@ -226,17 +226,19 @@ BOOL LoadStageTable()
 
 BOOL TransferStage(int no, int w, int x, int y)
 {
-	//Move character
+	BOOL bError;
+	char path_dir[20];
+	char path[MAX_PATH];
+
+	// Move character
 	SetMyCharPosition(x * 0x10 * 0x200, y * 0x10 * 0x200);
 
-	BOOL bError = FALSE;
+	bError = FALSE;
 
-	//Get path
-	char path_dir[20];
+	// Get path
 	strcpy(path_dir, "Stage");
 
-	//Load tileset
-	char path[MAX_PATH];
+	// Load tileset
 	sprintf(path, "%s/Prt%s", path_dir, gTMT[no].parts);
 	if (!ReloadBitmap_File(path, SURFACE_ID_LEVEL_TILESET))
 		bError = TRUE;
@@ -245,30 +247,30 @@ BOOL TransferStage(int no, int w, int x, int y)
 	if (!LoadAttributeData(path))
 		bError = TRUE;
 
-	//Load tilemap
+	// Load tilemap
 	sprintf(path, "%s/%s.pxm", path_dir, gTMT[no].map);
 	if (!LoadMapData2(path))
 		bError = TRUE;
 
-	//Load NPCs
+	// Load NPCs
 	sprintf(path, "%s/%s.pxe", path_dir, gTMT[no].map);
 	if (!LoadEvent(path))
 		bError = TRUE;
 
-	//Load script
+	// Load script
 	sprintf(path, "%s/%s.tsc", path_dir, gTMT[no].map);
 	if (!LoadTextScript_Stage(path))
 		bError = TRUE;
 
-	//Load background
+	// Load background
 	sprintf(path, "%s", gTMT[no].back);
 	if (!InitBack(path, gTMT[no].bkType))
 		bError = TRUE;
 
-	//Get path
+	// Get path
 	strcpy(path_dir, "Npc");
 
-	//Load NPC sprite sheets
+	// Load NPC sprite sheets
 	sprintf(path, "%s/Npc%s", path_dir, gTMT[no].npc);
 	if (!ReloadBitmap_File(path, SURFACE_ID_LEVEL_SPRITESET_1))
 		bError = TRUE;
@@ -280,7 +282,7 @@ BOOL TransferStage(int no, int w, int x, int y)
 	if (bError)
 		return FALSE;
 
-	//Load map name
+	// Load map name
 	ReadyMapName(gTMT[no].name);
 
 	StartTextScript(w);
@@ -292,6 +294,7 @@ BOOL TransferStage(int no, int w, int x, int y)
 	InitBossChar(gTMT[no].boss_no);
 	ResetFlash();
 	gStageNo = no;
+
 	return TRUE;
 }
 
@@ -307,8 +310,7 @@ const struct
 	const char *path;
 	int type;
 	bool loop;
-} gMusicTable[42] =
-{
+} gMusicTable[42] = {
 	{"Resource/ORG/XXXX.org", MUSIC_TYPE_ORGANYA, true},
 	{"Resource/ORG/Wanpaku.org", MUSIC_TYPE_ORGANYA, true},
 	{"Resource/ORG/Anzen.org", MUSIC_TYPE_ORGANYA, true},
@@ -362,7 +364,7 @@ void ChangeMusic(MusicID no)
 	if (no != MUS_SILENCE && no == gMusicNo)
 		return;
 
-	//Stop and keep track of old song
+	// Stop and keep track of old song
 	gOldPos = GetOrganyaPosition();
 	gOldNo = gMusicNo;
 	StopOrganyaMusic();
@@ -376,10 +378,10 @@ void ChangeMusic(MusicID no)
 	switch (gMusicTable[no].type)
 	{
 		case MUSIC_TYPE_ORGANYA:
-			//Load .org
+			// Load .org
 			LoadOrganya(path);
 
-			//Reset position, volume, and then play the song
+			// Reset position, volume, and then play the song
 			ChangeOrganyaVolume(100);
 			SetOrganyaPosition(0);
 			PlayOrganyaMusic();
@@ -399,9 +401,9 @@ void ChangeMusic(MusicID no)
 	gMusicNo = no;
 }
 
-void ReCallMusic()
+void ReCallMusic(void)
 {
-	//Stop old song
+	// Stop old song
 	StopOrganyaMusic();
 #ifdef EXTRA_SOUND_FORMATS
 	ExtraSound_PauseMusic();
@@ -410,12 +412,12 @@ void ReCallMusic()
 	switch (gMusicTable[gOldNo].type)
 	{
 		case MUSIC_TYPE_ORGANYA:
-			//Load .org that was playing before
+			// Load .org that was playing before
 			char path[MAX_PATH];
 			sprintf(path, "%s/%s", gDataPath, gMusicTable[gOldNo].path);
 			LoadOrganya(path);
 
-			//Reset position, volume, and then play the song
+			// Reset position, volume, and then play the song
 			SetOrganyaPosition(gOldPos);
 			ChangeOrganyaVolume(100);
 			PlayOrganyaMusic();

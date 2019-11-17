@@ -6,7 +6,7 @@
 
 struct CREDIT
 {
-	int size;
+	long size;
 	char *pData;
 	int offset;
 	int wait;
@@ -37,19 +37,19 @@ struct ISLAND_SPRITE
 
 #define MAX_STRIP ((WINDOW_HEIGHT / 16) + 1)
 
-void ActionStripper();
-void PutStripper();
+void ActionStripper(void);
+void PutStripper(void);
 void SetStripper(int x, int y, const char *text, int cast);
-void RestoreStripper();
-void ActionIllust();
-void PutIllust();
+void RestoreStripper(void);
+void ActionIllust(void);
+void PutIllust(void);
 void ReloadIllust(int a);
-void InitCreditScript();
-void ReleaseCreditScript();
-BOOL StartCreditScript();
-void ActionCredit();
-void ActionCredit_Read();
+void InitCreditScript(void);
+void ReleaseCreditScript(void);
+BOOL StartCreditScript(void);
+void ActionCredit(void);
+void ActionCredit_Read(void);
 int GetScriptNumber(const char *text);
 void SetCreditIllust(int a);
-void CutCreditIllust();
+void CutCreditIllust(void);
 int Scene_DownIsland(int mode);

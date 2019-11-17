@@ -55,7 +55,7 @@ BOOL bContinue;
 int Random(int min, int max)
 {
 	const int range = max - min + 1;
-	return min + msvc_rand() % range;
+	return (msvc_rand() % range) + min;
 }
 
 void PutNumber4(int x, int y, int value, BOOL bZero)
@@ -453,19 +453,19 @@ int ModeTitle(void)
 		CortBox(&grcGame, back_color);
 
 		// Draw version
-		PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 120) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 24), &rcVersion, SURFACE_ID_TEXT_BOX);
-		PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 8) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 24), &rcPeriod, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH / 2) - 60), PixelToScreenCoord(WINDOW_HEIGHT - 24), &rcVersion, SURFACE_ID_TEXT_BOX);
+		PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH / 2) - 4), PixelToScreenCoord(WINDOW_HEIGHT - 24), &rcPeriod, SURFACE_ID_TEXT_BOX);
 
-		PutNumber4((WINDOW_WIDTH - 40) / 2, WINDOW_HEIGHT - 24, v1, FALSE);
-		PutNumber4((WINDOW_WIDTH - 8) / 2, WINDOW_HEIGHT - 24, v2, FALSE);
-		PutNumber4((WINDOW_WIDTH + 24) / 2, WINDOW_HEIGHT - 24, v3, FALSE);
-		PutNumber4((WINDOW_WIDTH + 56) / 2, WINDOW_HEIGHT - 24, v4, FALSE);
+		PutNumber4((WINDOW_WIDTH / 2) - 20, WINDOW_HEIGHT - 24, v1, FALSE);
+		PutNumber4((WINDOW_WIDTH / 2) - 4, WINDOW_HEIGHT - 24, v2, FALSE);
+		PutNumber4((WINDOW_WIDTH / 2) + 12, WINDOW_HEIGHT - 24, v3, FALSE);
+		PutNumber4((WINDOW_WIDTH / 2) + 28, WINDOW_HEIGHT - 24, v4, FALSE);
 
 		// Draw main title
-		PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 144) / 2), PixelToScreenCoord(40), &rcTitle, SURFACE_ID_TITLE);
-		PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 48) / 2), PixelToScreenCoord((WINDOW_HEIGHT + 16) / 2), &rcNew, SURFACE_ID_TITLE);
-		PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 48) / 2), PixelToScreenCoord((WINDOW_HEIGHT + 56) / 2), &rcContinue, SURFACE_ID_TITLE);
-		PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 160) / 2), PixelToScreenCoord(WINDOW_HEIGHT - 48), &rcPixel, SURFACE_ID_PIXEL);
+		PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH / 2) - 72), PixelToScreenCoord(40), &rcTitle, SURFACE_ID_TITLE);
+		PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH / 2) - 24), PixelToScreenCoord((WINDOW_HEIGHT / 2) + 8), &rcNew, SURFACE_ID_TITLE);
+		PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH / 2) - 24), PixelToScreenCoord((WINDOW_HEIGHT / 2) + 28), &rcContinue, SURFACE_ID_TITLE);
+		PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH / 2) - 80), PixelToScreenCoord(WINDOW_HEIGHT - 48), &rcPixel, SURFACE_ID_PIXEL);
 
 		// Draw character cursor
 		switch (char_type)
@@ -493,15 +493,15 @@ int ModeTitle(void)
 		}
 
 		if (!bContinue)
-			char_y = (WINDOW_HEIGHT + 14) / 2;
+			char_y = (WINDOW_HEIGHT / 2) + 7;
 		else
-			char_y = (WINDOW_HEIGHT + 54) / 2;
+			char_y = (WINDOW_HEIGHT / 2) + 27;
 
 		// Pixel being redundant
 		if (!bContinue)
-			PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 88) / 2), PixelToScreenCoord(char_y), &char_rc, char_surf);
+			PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH / 2) - 44), PixelToScreenCoord(char_y), &char_rc, char_surf);
 		else
-			PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 88) / 2), PixelToScreenCoord(char_y), &char_rc, char_surf);
+			PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH / 2) - 44), PixelToScreenCoord(char_y), &char_rc, char_surf);
 
 		// Draw carets
 		PutCaret(0, 0);
@@ -568,7 +568,7 @@ int ModeAction(void)
 
 	if (bContinue)
 	{
-		if (!LoadProfile(NULL) && !InitializeGame())	// ...Shouldn't that '&&' be a '||'?
+		if (!LoadProfile(NULL) && !InitializeGame())
 			return 0;
 	}
 	else
@@ -716,7 +716,7 @@ int ModeAction(void)
 		{
 			PutMyLife(TRUE);
 			PutArmsEnergy(TRUE);
-			PutMyAir((WINDOW_WIDTH - 80) / 2, (WINDOW_HEIGHT - 32) / 2);
+			PutMyAir((WINDOW_WIDTH / 2) - 40, (WINDOW_HEIGHT / 2) - 16);
 			PutActiveArmsList();
 		}
 

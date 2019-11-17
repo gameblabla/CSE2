@@ -26,7 +26,7 @@ struct CARET
 	RECT rect;
 };
 
-void InitCaret();
-void ActCaret();
+void InitCaret(void);
+void ActCaret(void);
 void PutCaret(int fx, int fy);
 void SetCaret(int x, int y, int code, int dir);

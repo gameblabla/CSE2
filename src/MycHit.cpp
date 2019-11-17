@@ -14,12 +14,12 @@
 #include "Sound.h"
 #include "TextScr.h"
 
-void ResetMyCharFlag()
+void ResetMyCharFlag(void)
 {
 	gMC.flag = 0;
 }
 
-void PutlittleStar()
+void PutlittleStar(void)
 {
 	if (!(gMC.cond & 2) && gMC.ym < -0x200)
 	{
@@ -407,7 +407,7 @@ int JudgeHitMyCharVectDown(int x, int y)
 	return hit;
 }
 
-void HitMyCharMap()
+void HitMyCharMap(void)
 {
 	int i;
 
@@ -428,7 +428,7 @@ void HitMyCharMap()
 	offy[3] = 1;
 
 	unsigned char atrb[4];
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < 4; ++i)
 	{
 		atrb[i] = GetAttribute(x + offx[i], y + offy[i]);
 
@@ -581,7 +581,7 @@ void HitMyCharMap()
 		}
 	}
 
-	if (gMC.y > gWaterY + 0x800)
+	if (gMC.y > gWaterY + (4 * 0x200))
 		gMC.flag |= 0x100;
 }
 
@@ -589,8 +589,8 @@ int JudgeHitMyCharNPC(NPCHAR *npc)
 {
 	int hit = 0;
 
-	if (gMC.y - gMC.hit.top < npc->y + npc->hit.bottom - 0x600
-		&& gMC.y + gMC.hit.bottom > npc->y - npc->hit.top + 0x600
+	if (gMC.y - gMC.hit.top < npc->y + npc->hit.bottom - (3 * 0x200)
+		&& gMC.y + gMC.hit.bottom > npc->y - npc->hit.top + (3 * 0x200)
 		&& gMC.x - gMC.hit.back < npc->x + npc->hit.back
 		&& gMC.x - gMC.hit.back > npc->x)
 	{
@@ -599,8 +599,8 @@ int JudgeHitMyCharNPC(NPCHAR *npc)
 		hit |= 1;
 	}
 
-	if (gMC.y - gMC.hit.top < npc->y + npc->hit.bottom - 0x600
-		&& gMC.y + gMC.hit.bottom > npc->y - npc->hit.top + 0x600
+	if (gMC.y - gMC.hit.top < npc->y + npc->hit.bottom - (3 * 0x200)
+		&& gMC.y + gMC.hit.bottom > npc->y - npc->hit.top + (3 * 0x200)
 		&& gMC.x + gMC.hit.back - 0x200 > npc->x - npc->hit.back
 		&& gMC.x + gMC.hit.back - 0x200 < npc->x)
 	{
@@ -609,8 +609,8 @@ int JudgeHitMyCharNPC(NPCHAR *npc)
 		hit |= 4;
 	}
 
-	if (gMC.x - gMC.hit.back < npc->x + npc->hit.back - 0x600
-		&& gMC.x + gMC.hit.back > npc->x - npc->hit.back + 0x600
+	if (gMC.x - gMC.hit.back < npc->x + npc->hit.back - (3 * 0x200)
+		&& gMC.x + gMC.hit.back > npc->x - npc->hit.back + (3 * 0x200)
 		&& gMC.y - gMC.hit.top < npc->y + npc->hit.bottom
 		&& gMC.y - gMC.hit.top > npc->y)
 	{
@@ -619,10 +619,10 @@ int JudgeHitMyCharNPC(NPCHAR *npc)
 		hit |= 2;
 	}
 
-	if (gMC.x - gMC.hit.back < npc->x + npc->hit.back - 0x600
-		&& gMC.x + gMC.hit.back > npc->x - npc->hit.back + 0x600
+	if (gMC.x - gMC.hit.back < npc->x + npc->hit.back - (3 * 0x200)
+		&& gMC.x + gMC.hit.back > npc->x - npc->hit.back + (3 * 0x200)
 		&& gMC.y + gMC.hit.bottom > npc->y - npc->hit.top
-		&& gMC.hit.bottom + gMC.y < npc->y + 0x600)
+		&& gMC.hit.bottom + gMC.y < npc->y + (3 * 0x200))
 	{
 		if (npc->bits & NPC_BOUNCY)
 		{
@@ -637,6 +637,7 @@ int JudgeHitMyCharNPC(NPCHAR *npc)
 			hit |= 8;
 		}
 	}
+
 	return hit;
 }
 
@@ -644,18 +645,18 @@ unsigned char JudgeHitMyCharNPC3(NPCHAR *npc)
 {
 	if (npc->direct == 0)
 	{
-		if (gMC.x + 0x400 > npc->x - npc->hit.front
-			&& gMC.x - 0x400 < npc->x + npc->hit.back
-			&& gMC.y + 0x400 > npc->y - npc->hit.top
-			&& gMC.y - 0x400 < npc->y + npc->hit.bottom)
+		if (gMC.x + (2 * 0x200) > npc->x - npc->hit.front
+			&& gMC.x - (2 * 0x200) < npc->x + npc->hit.back
+			&& gMC.y + (2 * 0x200) > npc->y - npc->hit.top
+			&& gMC.y - (2 * 0x200) < npc->y + npc->hit.bottom)
 			return 1;
 	}
 	else
 	{
-		if (gMC.x + 0x400 > npc->x - npc->hit.back
-			&& gMC.x - 0x400 < npc->x + npc->hit.front
-			&& gMC.y + 0x400 > npc->y - npc->hit.top
-			&& gMC.y - 0x400 < npc->y + npc->hit.bottom)
+		if (gMC.x + (2 * 0x200) > npc->x - npc->hit.back
+			&& gMC.x - (2 * 0x200) < npc->x + npc->hit.front
+			&& gMC.y + (2 * 0x200) > npc->y - npc->hit.top
+			&& gMC.y - (2 * 0x200) < npc->y + npc->hit.bottom)
 			return 1;
 	}
 
@@ -698,7 +699,7 @@ int JudgeHitMyCharNPC4(NPCHAR *npc)
 			{
 				if (gMC.ym < npc->ym)
 				{
-					gMC.y = npc->hit.bottom + npc->y + gMC.hit.top + 0x200;
+					gMC.y = npc->y + npc->hit.bottom + gMC.hit.top + 0x200;
 					gMC.ym = npc->ym;
 				}
 				else
@@ -710,9 +711,9 @@ int JudgeHitMyCharNPC4(NPCHAR *npc)
 				hit |= 2;
 			}
 
-			if (gMC.y + gMC.hit.bottom > npc->y - npc->hit.top && gMC.hit.bottom + gMC.y < npc->y + 0x600)
+			if (gMC.y + gMC.hit.bottom > npc->y - npc->hit.top && gMC.hit.bottom + gMC.y < npc->y + (3 * 0x200))
 			{
-				if (gMC.ym - npc->ym > 0x400)
+				if (gMC.ym - npc->ym > 2 * 0x200)
 					PlaySoundObject(23, 1);
 
 				if (gMC.unit == 1)
@@ -744,7 +745,7 @@ int JudgeHitMyCharNPC4(NPCHAR *npc)
 				if (gMC.xm < npc->xm)
 					gMC.xm = npc->xm;
 
-				gMC.x = npc->hit.back + npc->x + gMC.hit.back;
+				gMC.x = npc->x + npc->hit.back + gMC.hit.back;
 
 				hit |= 1;
 			}
@@ -764,18 +765,18 @@ int JudgeHitMyCharNPC4(NPCHAR *npc)
 	return hit;
 }
 
-void HitMyCharNpChar()
+void HitMyCharNpChar(void)
 {
 	int i;
 
 	int hit = 0;
 
-	if ((gMC.cond & 0x80) == 0 || (gMC.cond & 2))
+	if (!(gMC.cond & 0x80) || gMC.cond & 2)
 		return;
 
-	for (i = 0; i < NPC_MAX; i++)
+	for (i = 0; i < NPC_MAX; ++i)
 	{
-		if ((gNPC[i].cond & 0x80) == 0)
+		if (!(gNPC[i].cond & 0x80))
 			continue;
 
 		hit = 0;
@@ -796,21 +797,21 @@ void HitMyCharNpChar()
 		}
 
 		// Special NPCs (pickups)
-		if (hit && gNPC[i].code_char == 1)
+		if (hit != 0 && gNPC[i].code_char == 1)
 		{
 			PlaySoundObject(14, 1);
 			AddExpMyChar(gNPC[i].exp);
 			gNPC[i].cond = 0;
 		}
 
-		if (hit && gNPC[i].code_char == 86)
+		if (hit != 0 && gNPC[i].code_char == 86)
 		{
 			PlaySoundObject(42, 1);
 			AddBulletMyChar(gNPC[i].code_event, gNPC[i].exp);
 			gNPC[i].cond = 0;
 		}
 
-		if (hit && gNPC[i].code_char == 87)
+		if (hit != 0 && gNPC[i].code_char == 87)
 		{
 			PlaySoundObject(20, 1);
 			AddLifeMyChar(gNPC[i].exp);
@@ -818,11 +819,11 @@ void HitMyCharNpChar()
 		}
 
 		// Run event on contact
-		if ((g_GameFlags & 4) == 0 && hit && gNPC[i].bits & NPC_EVENT_WHEN_TOUCHED)
+		if (!(g_GameFlags & 4) && hit != 0 && gNPC[i].bits & NPC_EVENT_WHEN_TOUCHED)
 			StartTextScript(gNPC[i].code_event);
 
 		// NPC damage
-		if (g_GameFlags & 2 && (gNPC[i].bits & NPC_INTERACTABLE) == 0)
+		if (g_GameFlags & 2 && !(gNPC[i].bits & NPC_INTERACTABLE))
 		{
 			if (gNPC[i].bits & NPC_REAR_AND_TOP_DONT_HURT)
 			{
@@ -835,18 +836,18 @@ void HitMyCharNpChar()
 				if (hit & 2 && gNPC[i].ym > 0)
 					DamageMyChar(gNPC[i].damage);
 			}
-			else if (hit && gNPC[i].damage && !(g_GameFlags & 4))
+			else if (hit != 0 && gNPC[i].damage && !(g_GameFlags & 4))
 			{
 				DamageMyChar(gNPC[i].damage);
 			}
 		}
 
 		// Interaction
-		if ((g_GameFlags & 4) == 0 && hit && gMC.cond & 1 && gNPC[i].bits & NPC_INTERACTABLE)
+		if (!(g_GameFlags & 4) && hit != 0 && gMC.cond & 1 && gNPC[i].bits & NPC_INTERACTABLE)
 		{
 			StartTextScript(gNPC[i].code_event);
 			gMC.xm = 0;
-			gMC.ques = 0;
+			gMC.ques = FALSE;
 		}
 	}
 
@@ -855,16 +856,18 @@ void HitMyCharNpChar()
 		SetCaret(gMC.x, gMC.y, 9, 0);
 }
 
-void HitMyCharBoss()
+void HitMyCharBoss(void)
 {
+	int b;
+
 	int hit = 0;
 
-	if ((gMC.cond & 0x80) == 0 || (gMC.cond & 2))
+	if (!(gMC.cond & 0x80) || gMC.cond & 2)
 		return;
 
-	for (int b = 0; b < BOSS_MAX; b++)
+	for (b = 0; b < BOSS_MAX; ++b)
 	{
-		if ((gBoss[b].cond & 0x80) == 0)
+		if (!(gBoss[b].cond & 0x80))
 			continue;
 
 		hit = 0;
@@ -884,10 +887,10 @@ void HitMyCharBoss()
 			hit = JudgeHitMyCharNPC3(&gBoss[b]);
 		}
 
-		if (!(g_GameFlags & 4) && hit && gBoss[b].bits & NPC_EVENT_WHEN_TOUCHED)
+		if (!(g_GameFlags & 4) && hit != 0 && gBoss[b].bits & NPC_EVENT_WHEN_TOUCHED)
 		{
 			StartTextScript(gBoss[b].code_event);
-			gMC.ques = 0;
+			gMC.ques = FALSE;
 		}
 
 		if (gBoss[b].bits & NPC_REAR_AND_TOP_DONT_HURT)
@@ -897,16 +900,16 @@ void HitMyCharBoss()
 			if (hit & 1 && gBoss[b].xm > 0)
 				DamageMyChar(gBoss[b].damage);
 		}
-		else if (hit && gBoss[b].damage && !(g_GameFlags & 4))
+		else if (hit != 0 && gBoss[b].damage != 0 && !(g_GameFlags & 4))
 		{
 			DamageMyChar(gBoss[b].damage);
 		}
 
-		if (!(g_GameFlags & 4) && hit && (gMC.cond & 1) && gBoss[b].bits & NPC_INTERACTABLE)
+		if (!(g_GameFlags & 4) && hit != 0 && gMC.cond & 1 && gBoss[b].bits & NPC_INTERACTABLE)
 		{
 			StartTextScript(gBoss[b].code_event);
 			gMC.xm = 0;
-			gMC.ques = 0;
+			gMC.ques = FALSE;
 		}
 	}
 

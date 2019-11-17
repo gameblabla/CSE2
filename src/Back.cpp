@@ -21,7 +21,7 @@ static unsigned long color_black;
 // TODO - Another function that has an incorrect stack frame
 BOOL InitBack(const char *fName, int type)
 {
-	// Unused, hilariously
+	// Unused
 	color_black = GetCortBoxColor(RGB(0, 0, 0x10));
 
 	// Get width and height
@@ -66,20 +66,21 @@ BOOL InitBack(const char *fName, int type)
 	}
 
 	// Set background stuff and load texture
-	gBack.flag = 1;
+	gBack.flag = TRUE;
 	if (!ReloadBitmap_File(fName, SURFACE_ID_LEVEL_BACKGROUND))
 		return FALSE;
+
 	gBack.type = type;
-	gWaterY = 0x1E0000;
+	gWaterY = 240 * 0x10 * 0x200;
 	return TRUE;
 }
 
-void ActBack()
+void ActBack(void)
 {
 	switch (gBack.type)
 	{
 		case 5:
-			gBack.fx += 0xC00;
+			gBack.fx += 6 * 0x200;
 			break;
 
 		case 6:
@@ -166,14 +167,14 @@ void PutBack(int fx, int fy)
 			rect.bottom = 176;
 			rect.left = 0;
 			rect.right = 320;
-			for (x = -((2 * gBack.fx % 320) * 0x200); x < WINDOW_WIDTH * 0x200; x += 320 * 0x200)
+			for (x = -(((gBack.fx * 2) % 320) * 0x200); x < WINDOW_WIDTH * 0x200; x += 320 * 0x200)
 				PutBitmap4(&grcGame, SubpixelToScreenCoord(x), PixelToScreenCoord(146), &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
 			rect.top = 176;
 			rect.bottom = 240;
 			rect.left = 0;
 			rect.right = 320;
-			for (x = -((4 * gBack.fx % 320) * 0x200); x < WINDOW_WIDTH * 0x200; x += 320 * 0x200)
+			for (x = -(((gBack.fx * 4) % 320) * 0x200); x < WINDOW_WIDTH * 0x200; x += 320 * 0x200)
 				PutBitmap4(&grcGame, SubpixelToScreenCoord(x), PixelToScreenCoord(176), &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
 			break;
@@ -201,7 +202,7 @@ void PutFront(int fx, int fy)
 			y_1 = 0;
 			y_2 = y_1 + 32;
 
-			for (y = y_1; y < y_2; y++)
+			for (y = y_1; y < y_2; ++y)
 			{
 				ypos = SubpixelToScreenCoord(y * 32 * 0x200) - SubpixelToScreenCoord(fy) + SubpixelToScreenCoord(gWaterY);
 
@@ -211,7 +212,7 @@ void PutFront(int fx, int fy)
 				if (ypos > PixelToScreenCoord(WINDOW_HEIGHT))
 					break;
 
-				for (x = x_1; x < x_2; x++)
+				for (x = x_1; x < x_2; ++x)
 				{
 					xpos = SubpixelToScreenCoord(x * 32 * 0x200) - SubpixelToScreenCoord(fx);
 					PutBitmap3(&grcGame, xpos, ypos, &rcWater[1], SURFACE_ID_LEVEL_BACKGROUND);
@@ -220,5 +221,6 @@ void PutFront(int fx, int fy)
 				}
 			}
 
+			break;
 	}
 }

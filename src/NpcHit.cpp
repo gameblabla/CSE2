@@ -294,9 +294,9 @@ void HitNpCharMap()
 	offy[7] = 2;
 	offy[8] = 2;
 
-	for (i = 0; i < NPC_MAX; i++)
+	for (i = 0; i < NPC_MAX; ++i)
 	{
-		if ((gNPC[i].cond & 0x80) == 0)
+		if (!(gNPC[i].cond & 0x80))
 			continue;
 
 		if (gNPC[i].bits & NPC_IGNORE_SOLIDITY)
@@ -317,7 +317,7 @@ void HitNpCharMap()
 
 		gNPC[i].flag = 0;
 
-		for (j = 0; j < judg; j++)
+		for (j = 0; j < judg; ++j)
 		{
 			switch (GetAttribute(x + offx[j], y + offy[j]))
 			{
@@ -480,7 +480,7 @@ void LoseNpChar(NPCHAR *npc, BOOL bVanish)
 	}
 
 	// Create drop
-	if (npc->exp)
+	if (npc->exp != 0)
 	{
 		int val;
 
@@ -511,6 +511,7 @@ void LoseNpChar(NPCHAR *npc, BOOL bVanish)
 			default:
 				// Spawn weapon energy
 				SetExpObjects(npc->x, npc->y, npc->exp);
+				break;
 		}
 	}
 
@@ -531,23 +532,23 @@ void LoseNpChar(NPCHAR *npc, BOOL bVanish)
 	}
 }
 
-void HitNpCharBullet()
+void HitNpCharBullet(void)
 {
 	int n;
 	int b;
 	BOOL bHit;
 
-	for (n = 0; n < NPC_MAX; n++)
+	for (n = 0; n < NPC_MAX; ++n)
 	{
-		if ((gNPC[n].cond & 0x80) == 0)
+		if (!(gNPC[n].cond & 0x80))
 			continue;
 
 		if (gNPC[n].bits & NPC_SHOOTABLE && gNPC[n].bits & NPC_INTERACTABLE)
 			continue;
 
-		for (b = 0; b < BULLET_MAX; b++)
+		for (b = 0; b < BULLET_MAX; ++b)
 		{
-			if ((gBul[b].cond & 0x80) == 0)
+			if (!(gBul[b].cond & 0x80))
 				continue;
 
 			if (gBul[b].damage == -1)
@@ -611,7 +612,7 @@ void HitNpCharBullet()
 				{
 					// Strange empty case that's needed for accurate assembly
 				}
-				else if ((gBul[b].bbits & 0x10) == 0)
+				else if (!(gBul[b].bbits & 0x10))
 				{
 					// Hit invulnerable NPC
 					SetCaret((gBul[b].x + gNPC[n].x) / 2, (gBul[b].y + gNPC[n].y) / 2, 2, 2);
@@ -628,4 +629,3 @@ void HitNpCharBullet()
 			LoseNpChar(&gNPC[n], TRUE);
 	}
 }
-

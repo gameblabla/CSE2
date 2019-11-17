@@ -8,14 +8,14 @@
 
 #include "Random.h"
 
-static signed char gWaveModelTable[6][256];
+static signed char gWaveModelTable[6][0x100];
 
 void MakeWaveTables(void)
 {
 	int i, a;
 
 	// Sine wave
-	for (i = 0; i < 256; ++i)
+	for (i = 0; i < 0x100; ++i)
 	{
 		gWaveModelTable[0][i] = (signed char)(sin(i * 6.283184 / 256.0) * 64.0);
 		a = gWaveModelTable[0][i];
@@ -57,7 +57,7 @@ void MakeWaveTables(void)
 
 	// White noise wave
 	msvc_srand(0);
-	for (i = 0; i < 256; ++i)
+	for (i = 0; i < 0x100; ++i)
 		gWaveModelTable[5][i] = (signed char)(msvc_rand() & 0xFF) / 2;
 }
 
@@ -109,7 +109,7 @@ BOOL MakePixelWaveData(const PIXTONEPARAMETER *ptp, unsigned char *pData)
 	}
 
 	dEnvelope = ptp->pointCy;
-	while (i < 256)
+	while (i < 0x100)
 	{
 		envelopeTable[i] = (signed char)dEnvelope;
 		dEnvelope = (double)dEnvelope - ptp->pointCy / (double)(256 - ptp->pointCx);
@@ -137,9 +137,9 @@ BOOL MakePixelWaveData(const PIXTONEPARAMETER *ptp, unsigned char *pData)
 
 	for (i = 0; i < ptp->size; ++i)
 	{
-		a = (int)dMain % 256;
-		b = (int)dPitch % 256;
-		c = (int)dVolume % 256;
+		a = (int)dMain % 0x100;
+		b = (int)dPitch % 0x100;
+		c = (int)dVolume % 0x100;
 		d = (int)((double)(i * 0x100) / ptp->size);
 		pData[i] = gWaveModelTable[ptp->oMain.model][a]
 		         * ptp->oMain.top

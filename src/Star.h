@@ -1,5 +1,5 @@
 #pragma once
 
-void InitStar();
-void ActStar();
+void InitStar(void);
+void ActStar(void);
 void PutStar(int fx, int fy);

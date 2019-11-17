@@ -39,8 +39,10 @@ BOOL InitDirectInput(void)
 // The original name for this function is unknown
 BOOL HookAllDirectInputDevices(void)
 {
+	int i;
+
 	// Open first available joystick
-	for (int i = 0; i < SDL_NumJoysticks(); i++)
+	for (i = 0; i < SDL_NumJoysticks(); ++i)
 	{
 		joystick = SDL_JoystickOpen(i);
 

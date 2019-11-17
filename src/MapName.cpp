@@ -6,6 +6,13 @@
 #include "Draw.h"
 #include "WindowsWrapper.h"
 
+typedef struct MAP_NAME
+{
+	BOOL flag;
+	int wait;
+	char name[0x20];
+} MAP_NAME;
+
 MAP_NAME gMapName;
 RECT rc = { 0, 0, 160, 12 };
 
@@ -67,7 +74,7 @@ void ReadyMapName(const char *str)
 	};
 
 	// Reset map name flags
-	gMapName.flag = 0;
+	gMapName.flag = FALSE;
 	gMapName.wait = 0;
 
 	if (!strcmp(str, "u"))
@@ -84,13 +91,13 @@ void ReadyMapName(const char *str)
 	// Draw the text to the surface
 	a = (int)strlen(gMapName.name);
 	CortBox2(&rc, 0, SURFACE_ID_ROOM_NAME);
-	PutText2((160 - 6 * a) / 2 + 6, 1, gMapName.name, RGB(0x11, 0x00, 0x22), SURFACE_ID_ROOM_NAME);
-	PutText2((160 - 6 * a) / 2 + 6, 0, gMapName.name, RGB(0xFF, 0xFF, 0xFE), SURFACE_ID_ROOM_NAME);
+	PutText2(((160 - (a * 6)) / 2) + 6, 1, gMapName.name, RGB(0x11, 0x00, 0x22), SURFACE_ID_ROOM_NAME);
+	PutText2(((160 - (a * 6)) / 2) + 6, 0, gMapName.name, RGB(0xFF, 0xFF, 0xFE), SURFACE_ID_ROOM_NAME);
 }
 
 void PutMapName(BOOL bMini)
 {
-	// 'unused_rect' isn't the original name. The Linux port optimised this out, so there's no name for it.
+	// 'unused_rect' isn't the original name. The Linux port optimised this out, so there's no known name for it.
 	RECT unused_rect = {0, 0, 160, 16};
 
 	if (bMini)
@@ -103,28 +110,28 @@ void PutMapName(BOOL bMini)
 		rcBack.bottom = 24;
 
 		CortBox(&rcBack, 0x000000);
-		PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 172) / 2), PixelToScreenCoord(10), &rc, SURFACE_ID_ROOM_NAME);
+		PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH / 2) - 86), PixelToScreenCoord(10), &rc, SURFACE_ID_ROOM_NAME);
 	}
 	else if (gMapName.flag)
 	{
 		// MNA
-		PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH - 172) / 2), PixelToScreenCoord((WINDOW_HEIGHT - 80) / 2), &rc, SURFACE_ID_ROOM_NAME);
+		PutBitmap3(&grcGame, PixelToScreenCoord((WINDOW_WIDTH / 2) - 86), PixelToScreenCoord((WINDOW_HEIGHT / 2) - 40), &rc, SURFACE_ID_ROOM_NAME);
 		if (++gMapName.wait > 160)
-			gMapName.flag = 0;
+			gMapName.flag = FALSE;
 	}
 }
 
-void StartMapName()
+void StartMapName(void)
 {
-	gMapName.flag = 1;
+	gMapName.flag = TRUE;
 	gMapName.wait = 0;
 }
 
-void RestoreMapName()
+void RestoreMapName(void)
 {
 	int len = (int)strlen(gMapName.name);
 
 	CortBox2(&rc, 0, SURFACE_ID_ROOM_NAME);
-	PutText2((160 - 6 * len) / 2 + 6, 1, gMapName.name, RGB(0x11, 0x00, 0x22), SURFACE_ID_ROOM_NAME);
-	PutText2((160 - 6 * len) / 2 + 6, 0, gMapName.name, RGB(0xFF, 0xFF, 0xFE), SURFACE_ID_ROOM_NAME);
+	PutText2(((160 - (len * 6)) / 2) + 6, 1, gMapName.name, RGB(0x11, 0x00, 0x22), SURFACE_ID_ROOM_NAME);
+	PutText2(((160 - (len * 6)) / 2) + 6, 0, gMapName.name, RGB(0xFF, 0xFF, 0xFE), SURFACE_ID_ROOM_NAME);
 }

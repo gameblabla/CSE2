@@ -52,4 +52,4 @@ extern long gKeyUp;
 extern long gKeyRight;
 extern long gKeyDown;
 
-void GetTrg();
+void GetTrg(void);

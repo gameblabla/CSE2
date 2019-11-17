@@ -22,7 +22,7 @@ MAP_DATA gMap;
 
 static const char *code_pxma = "PXM";
 
-BOOL InitMapData2()
+BOOL InitMapData2(void)
 {
 	gMap.data = (unsigned char*)malloc(PXM_BUFFER_SIZE);
 	return TRUE;
@@ -45,33 +45,27 @@ BOOL LoadMapData2(const char *path_map)
 	char check[3];
 	fread(check, 1, 3, fp);
 
-	if (memcmp(check, code_pxma, 3) != 0)
+	if (memcmp(check, code_pxma, 3))
 	{
 		fclose(fp);
 		return FALSE;
 	}
-	else
-	{
-		fread(&dum, 1, 1, fp);
-		// Get width and height
-		gMap.width = File_ReadLE16(fp);
-		gMap.length = File_ReadLE16(fp);
 
-		if (gMap.data == NULL)
-		{
-			fclose(fp);
-			return FALSE;
-		}
-		else
-		{
-			// Read tile data
-			fread(gMap.data, 1, gMap.length * gMap.width, fp);
-			fclose(fp);
-			return TRUE;
-		}
+	fread(&dum, 1, 1, fp);
+	// Get width and height
+	gMap.width = File_ReadLE16(fp);
+	gMap.length = File_ReadLE16(fp);
+
+	if (gMap.data == NULL)
+	{
+		fclose(fp);
+		return FALSE;
 	}
 
-	return FALSE;
+	// Read tile data
+	fread(gMap.data, 1, gMap.width * gMap.length, fp);
+	fclose(fp);
+	return TRUE;
 }
 
 BOOL LoadAttributeData(const char *path_atrb)
@@ -85,28 +79,30 @@ BOOL LoadAttributeData(const char *path_atrb)
 		return FALSE;
 
 	// Read data
-	fread(gMap.atrb, 1, 0x100, fp);
+	fread(gMap.atrb, 1, sizeof(gMap.atrb), fp);
 	fclose(fp);
 	return TRUE;
 }
 
-void EndMapData()
+void EndMapData(void)
 {
 	free(gMap.data);
 }
 
-void ReleasePartsImage()
+void ReleasePartsImage(void)
 {
 	ReleaseSurface(SURFACE_ID_LEVEL_TILESET);
 }
 
 void GetMapData(unsigned char **data, short *mw, short *ml)
 {
-	if (data)
+	if (data != NULL)
 		*data = gMap.data;
-	if (mw)
+
+	if (mw != NULL)
 		*mw = gMap.width;
-	if (ml)
+
+	if (ml != NULL)
 		*ml = gMap.length;
 }
 
@@ -115,7 +111,7 @@ unsigned char GetAttribute(int x, int y)
 	if (x < 0 || y < 0 || x >= gMap.width || y >= gMap.length)
 		return 0;
 
-	const size_t a = *(gMap.data + x + (y * gMap.width));	// Yes, the original code really does do this
+	const size_t a = *(gMap.data + x + (y * gMap.width));	// Yes, the original code really does do this instead of a regular array access
 	return gMap.atrb[a];
 }
 
@@ -131,13 +127,15 @@ void ShiftMapParts(int x, int y)
 
 BOOL ChangeMapParts(int x, int y, unsigned char no)
 {
+	int i;
+
 	if (*(gMap.data + x + (y * gMap.width)) == no)
 		return FALSE;
 
 	*(gMap.data + x + (y * gMap.width)) = no;
 
-	for (int i = 0; i < 3; i++)
-		SetNpChar(4, x * 0x200 * 0x10, y * 0x200 * 0x10, 0, 0, 0, 0, 0);
+	for (i = 0; i < 3; ++i)
+		SetNpChar(4, x * 0x200 * 0x10, y * 0x200 * 0x10, 0, 0, 0, NULL, 0);
 
 	return TRUE;
 }
@@ -157,27 +155,27 @@ void PutStage_Back(int fx, int fy)
 	// Get range to draw
 	num_x = MIN(gMap.width, ((WINDOW_WIDTH + (16 - 1)) / 16) + 1);
 	num_y = MIN(gMap.length, ((WINDOW_HEIGHT + (16 - 1)) / 16) + 1);
-	put_x = MAX(0, (fx / 0x200 + 8) / 16);
-	put_y = MAX(0, (fy / 0x200 + 8) / 16);
+	put_x = MAX(0, ((fx / 0x200) + 8) / 16);
+	put_y = MAX(0, ((fy / 0x200) + 8) / 16);
 
-	for (j = put_y; j < put_y + num_y; j++)
+	for (j = put_y; j < put_y + num_y; ++j)
 	{
-		for (i = put_x; i < put_x + num_x; i++)
+		for (i = put_x; i < put_x + num_x; ++i)
 		{
 			// Get attribute
-			offset = i + j * gMap.width;
+			offset = (j * gMap.width) + i;
 			atrb = GetAttribute(i, j);
 
 			if (atrb >= 0x20)
 				continue;
 
 			// Draw tile
-			rect.left = 16 * (gMap.data[offset] % 16);
-			rect.top = 16 * (gMap.data[offset] / 16);
+			rect.left = (gMap.data[offset] % 16) * 16;
+			rect.top = (gMap.data[offset] / 16) * 16;
 			rect.right = rect.left + 16;
 			rect.bottom = rect.top + 16;
 
-			PutBitmap3(&grcGame, PixelToScreenCoord(i * 16 - 8) - SubpixelToScreenCoord(fx), PixelToScreenCoord(j * 16 - 8) - SubpixelToScreenCoord(fy), &rect, SURFACE_ID_LEVEL_TILESET);
+			PutBitmap3(&grcGame, PixelToScreenCoord((i * 16) - 8) - SubpixelToScreenCoord(fx), PixelToScreenCoord((j * 16) - 8) - SubpixelToScreenCoord(fy), &rect, SURFACE_ID_LEVEL_TILESET);
 		}
 	}
 }
@@ -198,30 +196,30 @@ void PutStage_Front(int fx, int fy)
 	// Get range to draw
 	num_x = MIN(gMap.width, ((WINDOW_WIDTH + (16 - 1)) / 16) + 1);
 	num_y = MIN(gMap.length, ((WINDOW_HEIGHT + (16 - 1)) / 16) + 1);
-	put_x = MAX(0, (fx / 0x200 + 8) / 16);
-	put_y = MAX(0, (fy / 0x200 + 8) / 16);
+	put_x = MAX(0, ((fx / 0x200) + 8) / 16);
+	put_y = MAX(0, ((fy / 0x200) + 8) / 16);
 
-	for (j = put_y; j < put_y + num_y; j++)
+	for (j = put_y; j < put_y + num_y; ++j)
 	{
-		for (i = put_x; i < put_x + num_x; i++)
+		for (i = put_x; i < put_x + num_x; ++i)
 		{
 			// Get attribute
-			offset = i + j * gMap.width;
+			offset = (j * gMap.width) + i;
 			atrb = GetAttribute(i, j);
 
 			if (atrb < 0x40 || atrb >= 0x80)
 				continue;
 
 			// Draw tile
-			rect.left = 16 * (gMap.data[offset] % 16);
-			rect.top = 16 * (gMap.data[offset] / 16);
+			rect.left = (gMap.data[offset] % 16) * 16;
+			rect.top = (gMap.data[offset] / 16) * 16;
 			rect.right = rect.left + 16;
 			rect.bottom = rect.top + 16;
 
-			PutBitmap3(&grcGame, PixelToScreenCoord(i * 16 - 8) - SubpixelToScreenCoord(fx), PixelToScreenCoord(j * 16 - 8) - SubpixelToScreenCoord(fy), &rect, SURFACE_ID_LEVEL_TILESET);
+			PutBitmap3(&grcGame, PixelToScreenCoord((i * 16) - 8) - SubpixelToScreenCoord(fx), PixelToScreenCoord((j * 16) - 8) - SubpixelToScreenCoord(fy), &rect, SURFACE_ID_LEVEL_TILESET);
 
 			if (atrb == 0x43)
-				PutBitmap3(&grcGame, PixelToScreenCoord(i * 16 - 8) - SubpixelToScreenCoord(fx), PixelToScreenCoord(j * 16 - 8) - SubpixelToScreenCoord(fy), &rcSnack, SURFACE_ID_NPC_SYM);
+				PutBitmap3(&grcGame, PixelToScreenCoord((i * 16) - 8) - SubpixelToScreenCoord(fx), PixelToScreenCoord((j * 16) - 8) - SubpixelToScreenCoord(fy), &rcSnack, SURFACE_ID_NPC_SYM);
 		}
 	}
 }
@@ -245,15 +243,15 @@ void PutMapDataVector(int fx, int fy)
 	// Get range to draw
 	num_x = MIN(gMap.width, ((WINDOW_WIDTH + (16 - 1)) / 16) + 1);
 	num_y = MIN(gMap.length, ((WINDOW_HEIGHT + (16 - 1)) / 16) + 1);
-	put_x = MAX(0, (fx / 0x200 + 8) / 16);
-	put_y = MAX(0, (fy / 0x200 + 8) / 16);
+	put_x = MAX(0, ((fx / 0x200) + 8) / 16);
+	put_y = MAX(0, ((fy / 0x200) + 8) / 16);
 
-	for (j = put_y; j < put_y + num_y; j++)
+	for (j = put_y; j < put_y + num_y; ++j)
 	{
-		for (i = put_x; i < put_x + num_x; i++)
+		for (i = put_x; i < put_x + num_x; ++i)
 		{
 			// Get attribute
-			offset = i + j * gMap.width;
+			offset = (j * gMap.width) + i;
 			atrb = GetAttribute(i, j);
 
 			if (atrb != 0x80
@@ -275,6 +273,7 @@ void PutMapDataVector(int fx, int fy)
 					rect.top = 48;
 					rect.bottom = rect.top + 16;
 					break;
+
 				case 129:
 				case 161:
 					rect.left = 224;
@@ -282,6 +281,7 @@ void PutMapDataVector(int fx, int fy)
 					rect.top = 48 + (count % 16);
 					rect.bottom = rect.top + 16;
 					break;
+
 				case 130:
 				case 162:
 					rect.left = 240 - (count % 16);
@@ -289,6 +289,7 @@ void PutMapDataVector(int fx, int fy)
 					rect.top = 48;
 					rect.bottom = rect.top + 16;
 					break;
+
 				case 131:
 				case 163:
 					rect.left = 224;
@@ -298,7 +299,7 @@ void PutMapDataVector(int fx, int fy)
 					break;
 			}
 
-			PutBitmap3(&grcGame, PixelToScreenCoord(i * 16 - 8) - SubpixelToScreenCoord(fx), PixelToScreenCoord(j * 16 - 8) - SubpixelToScreenCoord(fy), &rect, SURFACE_ID_CARET);
+			PutBitmap3(&grcGame, PixelToScreenCoord((i * 16) - 8) - SubpixelToScreenCoord(fx), PixelToScreenCoord((j * 16) - 8) - SubpixelToScreenCoord(fy), &rect, SURFACE_ID_CARET);
 		}
 	}
 }

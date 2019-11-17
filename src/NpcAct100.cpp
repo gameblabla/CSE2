@@ -1,5 +1,7 @@
 #include "NpcAct.h"
 
+#include <stddef.h>
+
 #include "WindowsWrapper.h"
 
 #include "Bullet.h"
@@ -22,7 +24,7 @@ void ActNpc100(NPCHAR *npc)
 	switch (npc->act_no)
 	{
 		case 0:
-			npc->y += 0x2000;
+			npc->y += 16 * 0x200;
 			npc->act_no = 1;
 			break;
 	}
@@ -67,7 +69,7 @@ void ActNpc102(NPCHAR *npc)
 	if (npc->act_no == 0)
 	{
 		npc->act_no = 1;
-		npc->y += 0x1000;
+		npc->y += 8 * 0x200;
 	}
 
 	if (++npc->ani_wait > 0)
@@ -137,6 +139,8 @@ void ActNpc103(NPCHAR *npc)
 // Frog
 void ActNpc104(NPCHAR *npc)
 {
+	BOOL bJump;
+
 	RECT rcLeft[3] = {
 		{0, 112, 32, 144},
 		{32, 112, 64, 144},
@@ -169,10 +173,8 @@ void ActNpc104(NPCHAR *npc)
 				npc->act_no = 3;
 				break;
 			}
-			else
-			{
-				npc->bits &= ~NPC_IGNORE_SOLIDITY;
-			}
+
+			npc->bits &= ~NPC_IGNORE_SOLIDITY;
 			// Fallthrough
 		case 1:
 			++npc->act_wait;
@@ -247,16 +249,17 @@ void ActNpc104(NPCHAR *npc)
 			break;
 	}
 
-	BOOL bJump = FALSE;
+	bJump = FALSE;
 
 	if (npc->act_no < 10 && npc->act_no != 3 && npc->act_wait > 10)
 	{
 		if (npc->shock)
 			bJump = TRUE;
 
-		if (npc->x < gMC.x - 0x14000 || npc->x > gMC.x + 0x14000 || npc->y < gMC.y - 0x8000 || npc->y > gMC.y + 0x8000)
+		if (npc->x < gMC.x - (160 * 0x200) || npc->x > gMC.x + (160 * 0x200) || npc->y < gMC.y - (64 * 0x200) || npc->y > gMC.y + (64 * 0x200))
 		{
-			// For some reason this blank space is needed for the function to compile accurately
+			// This blank space is needed for the function to produce the same assembly.
+			// Chances are there used to be some commented-out code here.
 		}
 		else
 		{
@@ -310,7 +313,7 @@ void ActNpc105(NPCHAR *npc)
 		npc->cond = 0;
 
 	if (npc->act_wait < 5)
-		npc->y -= 0x200;
+		npc->y -= 1 * 0x200;
 
 	npc->rect = rect[npc->ani_no];
 }
@@ -321,7 +324,7 @@ void ActNpc106(NPCHAR *npc)
 	switch (npc->act_no)
 	{
 		case 0:
-			SetNpChar(105, npc->x, npc->y - 0x1000, 0, 0, 0, 0, 0x180);
+			SetNpChar(105, npc->x, npc->y - (8 * 0x200), 0, 0, 0, NULL, 0x180);
 			npc->act_no = 1;
 			break;
 	}
@@ -348,7 +351,7 @@ void ActNpc107(NPCHAR *npc)
 			npc->ani_wait = 0;
 
 			for (i = 0; i < 4; ++i)
-				SetNpChar(4, npc->x, npc->y, Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+				SetNpChar(4, npc->x, npc->y, Random(-341, 341), Random(-0x600, 0), 0, NULL, 0x100);
 
 			// Fallthrough
 		case 11:
@@ -385,12 +388,12 @@ void ActNpc107(NPCHAR *npc)
 		case 15:
 			if (npc->act_wait / 2 % 2)
 			{
-				npc->x += 0x200;
+				npc->x += 1 * 0x200;
 				PlaySoundObject(11, 1);
 			}
 			else
 			{
-				npc->x -= 0x200;
+				npc->x -= 1 * 0x200;
 			}
 
 			if (++npc->act_wait > 50)
@@ -405,7 +408,7 @@ void ActNpc107(NPCHAR *npc)
 			PlaySoundObject(12, 1);
 
 			for (i = 0; i < 8; ++i)
-				SetNpChar(4, npc->x, npc->y, Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+				SetNpChar(4, npc->x, npc->y, Random(-341, 341), Random(-0x600, 0), 0, NULL, 0x100);
 
 			// Fallthrough
 		case 17:
@@ -439,7 +442,7 @@ void ActNpc107(NPCHAR *npc)
 				PlaySoundObject(12, 1);
 
 				for (i = 0; i < 4; ++i)
-					SetNpChar(4, npc->x, npc->y, Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+					SetNpChar(4, npc->x, npc->y, Random(-341, 341), Random(-0x600, 0), 0, NULL, 0x100);
 			}
 
 			break;
@@ -547,7 +550,7 @@ void ActNpc109(NPCHAR *npc)
 	switch (npc->act_no)
 	{
 		case 0:
-			if (--npc->act_wait)
+			if (--npc->act_wait != 0)
 				npc->act_no = 1;
 
 			npc->ani_no = 0;
@@ -561,7 +564,7 @@ void ActNpc109(NPCHAR *npc)
 				npc->ani_no = 1;
 			}
 
-			if (npc->x - 0x4000 < gMC.x && npc->x + 0x4000 > gMC.x && npc->y - 0x4000 < gMC.y && npc->y + 0x2000 > gMC.y)
+			if (npc->x - (32 * 0x200) < gMC.x && npc->x + (32 * 0x200) > gMC.x && npc->y - (32 * 0x200) < gMC.y && npc->y + (16 * 0x200) > gMC.y)
 			{
 				if (npc->x > gMC.x)
 					npc->direct = 0;
@@ -585,7 +588,7 @@ void ActNpc109(NPCHAR *npc)
 			PlaySoundObject(12, 1);
 
 			for (i = 0; i < 8; ++i)
-				SetNpChar(4, npc->x, npc->y, Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+				SetNpChar(4, npc->x, npc->y, Random(-341, 341), Random(-0x600, 0), 0, NULL, 0x100);
 
 			break;
 	}
@@ -605,6 +608,8 @@ void ActNpc109(NPCHAR *npc)
 // Puchi
 void ActNpc110(NPCHAR *npc)
 {
+	BOOL bJump;
+
 	RECT rcLeft[3] = {
 		{96, 128, 112, 144},
 		{112, 128, 128, 144},
@@ -627,7 +632,7 @@ void ActNpc110(NPCHAR *npc)
 
 			if (npc->direct == 4)
 			{
-				if (Random(0, 1) != 0)
+				if (Random(0, 1))
 					npc->direct = 0;
 				else
 					npc->direct = 2;
@@ -638,10 +643,8 @@ void ActNpc110(NPCHAR *npc)
 
 				break;
 			}
-			else
-			{
-				npc->bits &= ~NPC_IGNORE_SOLIDITY;
-			}
+
+			npc->bits &= ~NPC_IGNORE_SOLIDITY;
 			// Fallthrough
 		case 1:
 			++npc->act_wait;
@@ -716,16 +719,17 @@ void ActNpc110(NPCHAR *npc)
 			break;
 	}
 
-	BOOL bJump = FALSE;
+	bJump = FALSE;
 
 	if (npc->act_no < 10 && npc->act_no != 3 && npc->act_wait > 10)
 	{
 		if (npc->shock)
 			bJump = TRUE;
 
-		if (npc->x < gMC.x - 0x14000 || npc->x > gMC.x + 0x14000 || npc->y < gMC.y - 0x8000 || npc->y > gMC.y + 0x8000)
+		if (npc->x < gMC.x - (160 * 0x200) || npc->x > gMC.x + (160 * 0x200) || npc->y < gMC.y - (64 * 0x200) || npc->y > gMC.y + (64 * 0x200))
 		{
-			// For some reason this blank space is needed for the function to compile accurately
+			// This blank space is needed for the function to produce the same assembly.
+			// Chances are there used to be some commented-out code here.
 		}
 		else
 		{
@@ -783,7 +787,7 @@ void ActNpc111(NPCHAR *npc)
 		case 0:
 			npc->act_no = 1;
 			npc->ani_no = 0;
-			npc->y -= 0x2000;
+			npc->y -= 16 * 0x200;
 			break;
 
 		case 1:
@@ -799,7 +803,7 @@ void ActNpc111(NPCHAR *npc)
 
 		case 2:
 			if (npc->ym > 0)
-				npc->hit.bottom = 0x2000;
+				npc->hit.bottom = 16 * 0x200;
 
 			if (npc->flag & 8)
 			{
@@ -840,7 +844,9 @@ void ActNpc111(NPCHAR *npc)
 
 	npc->rect.top += 32 * gMIMCurrentNum;
 	npc->rect.bottom += 32 * gMIMCurrentNum;
+
 #ifndef ENABLE_MIM_DISABLE_EQUIP_40_GRAPHICS
+	// Use a different sprite if the player is wearing the Mimiga Mask
 	if (gMC.equip & 0x40)
 	{
 		npc->rect.top += 32;
@@ -850,7 +856,7 @@ void ActNpc111(NPCHAR *npc)
 
 	if (npc->act_no == 4)
 	{
-		npc->rect.bottom = npc->rect.top + npc->act_wait / 4;
+		npc->rect.bottom = npc->rect.top + (npc->act_wait / 4);
 
 		if (npc->act_wait / 2 % 2)
 			++npc->rect.left;
@@ -876,8 +882,8 @@ void ActNpc112(NPCHAR *npc)
 			npc->act_no = 1;
 			npc->ani_no = 0;
 			npc->ani_wait = 0;
-			npc->x += 0x2000;
-			npc->y += 0x1000;
+			npc->x += 16 * 0x200;
+			npc->y += 8 * 0x200;
 			PlaySoundObject(29, 1);
 			// Fallthrough
 		case 1:
@@ -894,7 +900,7 @@ void ActNpc112(NPCHAR *npc)
 			{
 				npc->act_no = 3;
 				npc->ani_no = 1;
-				npc->hit.bottom = 0x1000;
+				npc->hit.bottom = 8 * 0x200;
 			}
 
 			break;
@@ -921,6 +927,7 @@ void ActNpc112(NPCHAR *npc)
 	npc->rect.top += 32 * gMIMCurrentNum;
 	npc->rect.bottom += 32 * gMIMCurrentNum;
 #ifndef ENABLE_MIM_DISABLE_EQUIP_40_GRAPHICS
+	// Use a different sprite if the player is wearing the Mimiga Mask
 	if (gMC.equip & 0x40)
 	{
 		npc->rect.top += 32;
@@ -930,7 +937,7 @@ void ActNpc112(NPCHAR *npc)
 
 	if (npc->act_no == 1)
 	{
-		npc->rect.bottom = npc->rect.top + npc->act_wait / 4;
+		npc->rect.bottom = npc->rect.top + (npc->act_wait / 4);
 
 		if (npc->act_wait / 2 % 2)
 			++npc->rect.left;
@@ -1002,9 +1009,9 @@ void ActNpc113(NPCHAR *npc)
 				npc->ani_no = 2;
 
 			if (npc->direct == 0)
-				npc->x -= 0x200;
+				npc->x -= 1 * 0x200;
 			else
-				npc->x += 0x200;
+				npc->x += 1 * 0x200;
 
 			break;
 
@@ -1016,9 +1023,9 @@ void ActNpc113(NPCHAR *npc)
 			npc->act_no = 31;
 			npc->ani_no = 0;
 			npc->ani_wait = 0;
-			npc->hit.bottom = 0x2000;
-			npc->x -= 0x2000;
-			npc->y += 0x1000;
+			npc->hit.bottom = 16 * 0x200;
+			npc->x -= 16 * 0x200;
+			npc->y += 8 * 0x200;
 			PlaySoundObject(29, 1);
 			// Fallthrough
 		case 31:
@@ -1035,7 +1042,7 @@ void ActNpc113(NPCHAR *npc)
 			{
 				npc->act_no = 33;
 				npc->ani_no = 1;
-				npc->hit.bottom = 0x1000;
+				npc->hit.bottom = 8 * 0x200;
 			}
 
 			break;
@@ -1061,7 +1068,7 @@ void ActNpc113(NPCHAR *npc)
 
 	if (npc->act_no == 31)
 	{
-		npc->rect.bottom = npc->rect.top + npc->act_wait / 4;
+		npc->rect.bottom = npc->rect.top + (npc->act_wait / 4);
 
 		if (npc->act_wait / 2 % 2)
 			++npc->rect.left;
@@ -1071,6 +1078,8 @@ void ActNpc113(NPCHAR *npc)
 // Press
 void ActNpc114(NPCHAR *npc)
 {
+	int i;
+
 	RECT rcLeft[3] = {
 		{144, 112, 160, 136},
 		{160, 112, 176, 136},
@@ -1081,15 +1090,19 @@ void ActNpc114(NPCHAR *npc)
 	{
 		case 0:
 			npc->act_no = 1;
-			npc->y -= 0x800;
+			npc->y -= 4 * 0x200;
 			// Fallthrough
 		case 1:
 			if (npc->flag & 8)
-				break;
-
-			npc->act_no = 10;
-			npc->ani_wait = 0;
-			npc->ani_no = 1;
+			{
+				// Chances are there used to be commented-out code here
+			}
+			else
+			{
+				npc->act_no = 10;
+				npc->ani_wait = 0;
+				npc->ani_no = 1;
+			}
 
 			break;
 
@@ -1118,8 +1131,8 @@ void ActNpc114(NPCHAR *npc)
 			{
 				if (npc->ani_no > 1)
 				{
-					for (int i = 0; i < 4; ++i)
-						SetNpChar(4, npc->x, npc->y, Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+					for (i = 0; i < 4; ++i)
+						SetNpChar(4, npc->x, npc->y, Random(-341, 341), Random(-0x600, 0), 0, NULL, 0x100);
 
 					PlaySoundObject(26, 1);
 					SetQuake(10);
@@ -1175,7 +1188,7 @@ void ActNpc115(NPCHAR *npc)
 			npc->count1 = 0;
 			// Fallthrough
 		case 1:
-			if (gMC.x < npc->x + 0xC000 && gMC.x > npc->x - 0xC000 && gMC.y < npc->y + 0x4000 && gMC.y > npc->y - 0xC000)
+			if (gMC.x < npc->x + (96 * 0x200) && gMC.x > npc->x - (96 * 0x200) && gMC.y < npc->y + (32 * 0x200) && gMC.y > npc->y - (96 * 0x200))
 				npc->act_no = 10;
 
 			if (npc->shock)
@@ -1250,7 +1263,7 @@ void ActNpc115(NPCHAR *npc)
 				npc->ani_wait = 0;
 				npc->damage = 0;
 
-				if (gMC.x > npc->x + 0x12000 || gMC.x < npc->x - 0x12000 || gMC.y > npc->y + 0x6000 || gMC.y < npc->y - 0x12000)
+				if (gMC.x > npc->x + (144 * 0x200) || gMC.x < npc->x - (144 * 0x200) || gMC.y > npc->y + (48 * 0x200) || gMC.y < npc->y - (144 * 0x200))
 					npc->act_no = 0;
 			}
 
@@ -1258,7 +1271,7 @@ void ActNpc115(NPCHAR *npc)
 
 		case 30:
 			for (i = 0; i < 8; ++i)
-				SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, 0, 0x100);
+				SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, NULL, 0x100);
 
 			npc->ani_no = 0;
 			npc->act_no = 0;
@@ -1362,14 +1375,14 @@ void ActNpc117(NPCHAR *npc)
 		case 3:
 			if (0)
 			{
-				// There used to be an if here that didn't do anything, but the compiler optimised it out.
-				// We only know this was here because empty ifs mess with the register usage.
+				// There used to be an if-statement here that didn't do anything, but the compiler optimised it out.
+				// We only know this was here because empty if-statements affect the assembly's register usage.
 				// Since there's no code, we have no idea what the original condition actually was.
 			}
 
 			if (0)
 			{
-				// Another empty if
+				// Another empty if-statement
 			}
 
 			npc->act_no = 4;
@@ -1404,8 +1417,8 @@ void ActNpc117(NPCHAR *npc)
 		case 6:
 			if (0)
 			{
-				// There used to be an if here that didn't do anything, but the compiler optimised it out.
-				// We only know this was here because empty ifs mess with the register usage.
+				// There used to be an if-statement here that didn't do anything, but the compiler optimised it out.
+				// We only know this was here because empty if-statements affect the assembly's register usage.
 				// Since there's no code, we have no idea what the original condition actually was.
 			}
 
@@ -1434,11 +1447,11 @@ void ActNpc117(NPCHAR *npc)
 				npc->ani_no = 1;
 
 			if (npc->direct == 0)
-				npc->x -= 0x200;
+				npc->x -= 1 * 0x200;
 			else
-				npc->x += 0x200;
+				npc->x += 1 * 0x200;
 
-			if (gMC.x < npc->x + 0x2800 && gMC.x > npc->x - 0x2800)
+			if (gMC.x < npc->x + (20 * 0x200) && gMC.x > npc->x - (20 * 0x200))
 				npc->act_no = 0;
 
 			break;
@@ -1468,7 +1481,7 @@ void ActNpc117(NPCHAR *npc)
 
 			npc->ym += 0x40;
 
-			if (npc->act_wait++ && npc->flag & 8)
+			if (npc->act_wait++ != 0 && npc->flag & 8)
 				npc->act_no = 32;
 
 			break;
@@ -1574,7 +1587,7 @@ void ActNpc118(NPCHAR *npc)
 			npc->bits &= ~NPC_INVULNERABLE;
 			// Fallthrough
 		case 11:
-			if (npc->act_wait)
+			if (npc->act_wait != 0)
 				--npc->act_wait;
 			else
 				npc->act_no = 13;
@@ -1606,7 +1619,7 @@ void ActNpc118(NPCHAR *npc)
 			else
 				npc->xm += 0x40;
 
-			if (npc->act_wait)
+			if (npc->act_wait != 0)
 			{
 				--npc->act_wait;
 			}
@@ -1626,7 +1639,7 @@ void ActNpc118(NPCHAR *npc)
 			else
 				npc->direct = 2;
 
-			npc->xm = 8 * npc->xm / 9;
+			npc->xm = (npc->xm * 8) / 9;
 
 			if (++npc->ani_no > 1)
 				npc->ani_no = 0;
@@ -1647,13 +1660,13 @@ void ActNpc118(NPCHAR *npc)
 					if (bUpper)
 					{
 						npc->ani_no = 2;
-						SetNpChar(123, npc->x, npc->y - 0x1000, 0, 0, 1, 0, 0x100);
+						SetNpChar(123, npc->x, npc->y - (8 * 0x200), 0, 0, 1, NULL, 0x100);
 					}
 					else
 					{
 						npc->ani_no = 0;
-						SetNpChar(123, npc->x - 0x1000, npc->y + 0x800, 0, 0, 0, 0, 0x100);
-						npc->x += 0x200;
+						SetNpChar(123, npc->x - (8 * 0x200), npc->y + (4 * 0x200), 0, 0, 0, NULL, 0x100);
+						npc->x += 1 * 0x200;
 					}
 				}
 				else
@@ -1661,13 +1674,13 @@ void ActNpc118(NPCHAR *npc)
 					if (bUpper)
 					{
 						npc->ani_no = 2;
-						SetNpChar(123, npc->x, npc->y - 0x1000, 0, 0, 1, 0, 0x100);
+						SetNpChar(123, npc->x, npc->y - (8 * 0x200), 0, 0, 1, NULL, 0x100);
 					}
 					else
 					{
 						npc->ani_no = 0;
-						SetNpChar(123, npc->x + 0x1000, npc->y + 0x800, 0, 0, 2, 0, 0x100);
-						npc->x -= 0x200;
+						SetNpChar(123, npc->x + (8 * 0x200), npc->y + (4 * 0x200), 0, 0, 2, NULL, 0x100);
+						npc->x -= 1 * 0x200;
 					}
 				}
 			}
