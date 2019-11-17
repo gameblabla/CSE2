@@ -149,6 +149,6 @@ BOOL IsEnableBitmap(const char *path)
 
 	if (memcmp(str, extra_text, len))
 		return FALSE;
-	else
-		return TRUE;
+
+	return TRUE;
 }
