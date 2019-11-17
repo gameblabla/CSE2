@@ -42,15 +42,15 @@ void PutBossChar(int fx, int fy)
 	{
 		if (gBoss[b].cond & 0x80)
 		{
-			if (gBoss[b].shock)
+			if (gBoss[b].shock != 0)
 			{
-				a = 2 * (gBoss[b].shock / 2 % 2) - 1;
+				a = ((gBoss[b].shock / 2 % 2) * 2) - 1;
 			}
 			else
 			{
 				a = 0;
 
-				if (gBoss[b].bits & NPC_SHOW_DAMAGE && gBoss[b].damage_view)
+				if (gBoss[b].bits & NPC_SHOW_DAMAGE && gBoss[b].damage_view != 0)
 				{
 					SetValueView(&gBoss[b].x, &gBoss[b].y, gBoss[b].damage_view);
 					gBoss[b].damage_view = 0;
@@ -65,8 +65,8 @@ void PutBossChar(int fx, int fy)
 
 			PutBitmap3(
 				&grcGame,
-				(gBoss[b].x - side) / 0x200 - fx / 0x200 + a,
-				(gBoss[b].y - gBoss[b].view.top) / 0x200 - fy / 0x200,
+				((gBoss[b].x - side) / 0x200) - (fx / 0x200) + a,
+				((gBoss[b].y - gBoss[b].view.top) / 0x200) - (fy / 0x200),
 				&gBoss[b].rect,
 				SURFACE_ID_LEVEL_SPRITESET_2);
 		}
@@ -78,7 +78,7 @@ void SetBossCharActNo(int a)
 	gBoss[0].act_no = a;
 }
 
-void HitBossBullet()
+void HitBossBullet(void)
 {
 	BOOL bHit;
 	int bul;
@@ -87,12 +87,12 @@ void HitBossBullet()
 
 	for (bos = 0; bos < BOSS_MAX; ++bos)
 	{
-		if ((gBoss[bos].cond & 0x80) == 0)
+		if (!(gBoss[bos].cond & 0x80))
 			continue;
 
 		for (bul = 0; bul < BULLET_MAX; ++bul)
 		{
-			if ((gBul[bul].cond & 0x80) == 0)
+			if (!(gBul[bul].cond & 0x80))
 				continue;
 
 			if (gBul[bul].damage == -1)
@@ -129,7 +129,7 @@ void HitBossBullet()
 					{
 						gBoss[bos_].life = bos_;
 
-						if ((gMC.cond & 0x80) && gBoss[bos_].bits & NPC_EVENT_WHEN_KILLED)
+						if (gMC.cond & 0x80 && gBoss[bos_].bits & NPC_EVENT_WHEN_KILLED)
 						{
 							StartTextScript(gBoss[bos_].code_event);
 						}
@@ -168,7 +168,9 @@ void HitBossBullet()
 						gBoss[bos_].damage_view -= gBul[bul].damage;
 					}
 
-					if (--gBul[bul].life < 1)
+					--gBul[bul].life;
+
+					if (gBul[bul].life < 1)
 						gBul[bul].cond = 0;
 				}
 				else if (gBul[bul].code_bullet == 13
@@ -182,7 +184,7 @@ void HitBossBullet()
 				}
 				else
 				{
-					if ((gBul[bul].bbits & 0x10) == 0)
+					if (!(gBul[bul].bbits & 0x10))
 					{
 						SetCaret(gBul[bul].x, gBul[bul].y, 2, 2);
 						PlaySoundObject(31, 1);
@@ -195,7 +197,7 @@ void HitBossBullet()
 	}
 }
 
-void ActBossChar_0()
+void ActBossChar_0(void)
 {
 	;
 }
@@ -214,12 +216,12 @@ BOSSFUNCTION gpBossFuncTbl[10] =
 	ActBossChar_Ballos
 };
 
-void ActBossChar()
+void ActBossChar(void)
 {
 	int bos;
 	int code_char;
 
-	if ((gBoss[0].cond & 0x80) == 0)
+	if (!(gBoss[0].cond & 0x80))
 		return;
 
 	code_char = gBoss[0].code_char;
@@ -231,7 +233,7 @@ void ActBossChar()
 			--gBoss[bos].shock;
 }
 
-void HitBossMap()
+void HitBossMap(void)
 {
 	int offx[16];
 	int offy[16];
@@ -279,7 +281,7 @@ void HitBossMap()
 	{
 		int judg;
 
-		if ((gBoss[b].cond & 0x80) == 0)
+		if (!(gBoss[b].cond & 0x80))
 			continue;
 
 		if (gBoss[b].bits & NPC_IGNORE_SOLIDITY)
