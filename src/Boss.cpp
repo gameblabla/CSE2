@@ -199,7 +199,7 @@ void HitBossBullet(void)
 
 void ActBossChar_0(void)
 {
-	;
+	
 }
 
 BOSSFUNCTION gpBossFuncTbl[10] =
