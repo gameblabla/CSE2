@@ -15,8 +15,10 @@ void MakeWaveTables(void)
 	// Sine wave
 	for (i = 0; i < 0x100; ++i)
 	{
-		gWaveModelTable[0][i] = (signed char)(sin(i * 6.283184 / 256.0) * 64.0);
-		a = gWaveModelTable[0][i];
+		int unknown;
+
+		gWaveModelTable[0][i] = (signed char)(sin((i * 6.283184) / 256.0) * 64.0);
+		unknown = gWaveModelTable[0][i];	// I have no idea what this line was meant to do
 	}
 
 	// Triangle wave
@@ -29,23 +31,23 @@ void MakeWaveTables(void)
 	for (a = 0; i < 0xC0; ++i)
 	{
 		// Downwards
-		gWaveModelTable[1][i] = 0x40 - (a * 0x40) / 0x40;
+		gWaveModelTable[1][i] = 0x40 - ((a * 0x40) / 0x40);
 		++a;
 	}
 	for (a = 0; i < 0x100; ++i)
 	{
 		// Back up
-		gWaveModelTable[1][i] = (a * 0x40) / 0x40 - 0x40;
+		gWaveModelTable[1][i] = ((a * 0x40) / 0x40) - 0x40;
 		++a;
 	}
 
 	// Saw up wave
 	for (i = 0; i < 0x100; ++i)
-		gWaveModelTable[2][i] = i / 2 - 0x40;
+		gWaveModelTable[2][i] = (i / 2) - 0x40;
 
 	// Saw down wave
 	for (i = 0; i < 0x100; ++i)
-		gWaveModelTable[3][i] = 0x40 - i / 2;
+		gWaveModelTable[3][i] = 0x40 - (i / 2);
 
 	// Square wave
 	for (i = 0; i < 0x80; ++i)
@@ -86,7 +88,7 @@ BOOL MakePixelWaveData(const PIXTONEPARAMETER *ptp, unsigned char *pData)
 	while (i < ptp->pointAx)
 	{
 		envelopeTable[i] = (signed char)dEnvelope;
-		dEnvelope = ((double)ptp->pointAy - ptp->initial) / ptp->pointAx + dEnvelope;
+		dEnvelope = (((double)ptp->pointAy - ptp->initial) / ptp->pointAx) + dEnvelope;
 		++i;
 	}
 
@@ -94,7 +96,7 @@ BOOL MakePixelWaveData(const PIXTONEPARAMETER *ptp, unsigned char *pData)
 	while (i < ptp->pointBx)
 	{
 		envelopeTable[i] = (signed char)dEnvelope;
-		dEnvelope = ((double)ptp->pointBy - ptp->pointAy) / (double)(ptp->pointBx - ptp->pointAx) + dEnvelope;
+		dEnvelope = (((double)ptp->pointBy - ptp->pointAy) / (double)(ptp->pointBx - ptp->pointAx)) + dEnvelope;
 		++i;
 	}
 
@@ -110,7 +112,7 @@ BOOL MakePixelWaveData(const PIXTONEPARAMETER *ptp, unsigned char *pData)
 	while (i < 0x100)
 	{
 		envelopeTable[i] = (signed char)dEnvelope;
-		dEnvelope = (double)dEnvelope - ptp->pointCy / (double)(256 - ptp->pointCx);
+		dEnvelope = dEnvelope - (ptp->pointCy / (double)(0x100 - ptp->pointCx));
 		++i;
 	}
 
@@ -142,7 +144,7 @@ BOOL MakePixelWaveData(const PIXTONEPARAMETER *ptp, unsigned char *pData)
 		pData[i] = gWaveModelTable[ptp->oMain.model][a]
 		         * ptp->oMain.top
 		         / 64
-		         * (gWaveModelTable[ptp->oVolume.model][c] * ptp->oVolume.top / 64 + 64)
+		         * (((gWaveModelTable[ptp->oVolume.model][c] * ptp->oVolume.top) / 64) + 64)
 		         / 64
 		         * envelopeTable[d]
 		         / 64
