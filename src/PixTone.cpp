@@ -15,10 +15,8 @@ void MakeWaveTables(void)
 	// Sine wave
 	for (i = 0; i < 0x100; ++i)
 	{
-		int unknown;
-
 		gWaveModelTable[0][i] = (signed char)(sin((i * 6.283184) / 256.0) * 64.0);
-		unknown = gWaveModelTable[0][i];	// I have no idea what this line was meant to do
+		a = gWaveModelTable[0][i];	// I have no idea what this line was meant to do
 	}
 
 	// Triangle wave
