@@ -72,15 +72,21 @@ ifeq ($(WARNINGS_FATAL), 1)
 	ALL_CXXFLAGS += -Werror
 endif
 
-ALL_CFLAGS += -std=c99 -MMD -MP -MF $@.d `pkg-config sdl2 --cflags` `pkg-config freetype2 --cflags` -Iexternal
-ALL_CXXFLAGS += -std=c++11 -MMD -MP -MF $@.d `pkg-config sdl2 --cflags` `pkg-config freetype2 --cflags` -Iexternal
+ALL_CFLAGS += -std=c99 -MMD -MP -MF $@.d
+CSE2_CFLAGS += `pkg-config sdl2 --cflags` `pkg-config freetype2 --cflags` -Iexternal
+
+ALL_CXXFLAGS += -std=c++11 -MMD -MP -MF $@.d
+CSE2_CXXFLAGS += `pkg-config sdl2 --cflags` `pkg-config freetype2 --cflags` -Iexternal
+
 DEFINES += -DLODEPNG_NO_COMPILE_ENCODER -DLODEPNG_NO_COMPILE_ERROR_TEXT -DLODEPNG_NO_COMPILE_CPP
 
 ifeq ($(STATIC), 1)
 	ALL_LDFLAGS += -static
-	ALL_LIBS += `pkg-config sdl2 --libs --static` `pkg-config freetype2 --libs --static` -lfreetype
+	CSE2_LIBS += `pkg-config sdl2 --libs --static` `pkg-config freetype2 --libs --static` -lfreetype
+	DOCONFIG_LIBS += `fltk-config --cxxflags --libs --ldstaticflags`
 else
-	ALL_LIBS += `pkg-config sdl2 --libs` `pkg-config freetype2 --libs`
+	CSE2_LIBS += `pkg-config sdl2 --libs` `pkg-config freetype2 --libs`
+	DOCONFIG_LIBS += `fltk-config --cxxflags --libs --ldflags`
 endif
 
 SOURCES = \
@@ -248,21 +254,21 @@ endif
 
 ifeq ($(RENDERER), OpenGL3)
 	SOURCES += src/Backends/Rendering/OpenGL3
-	ALL_CFLAGS += `pkg-config glew --cflags`
-	ALL_CXXFLAGS += `pkg-config glew --cflags`
+	CSE2_CFLAGS += `pkg-config glew --cflags`
+	CSE2_CXXFLAGS += `pkg-config glew --cflags`
 
 	ifeq ($(STATIC), 1)
-		ALL_CFLAGS += -DGLEW_STATIC
-		ALL_CXXFLAGS += -DGLEW_STATIC
-		ALL_LIBS += `pkg-config glew --libs --static`
+		CSE2_CFLAGS += -DGLEW_STATIC
+		CSE2_CXXFLAGS += -DGLEW_STATIC
+		CSE2_LIBS += `pkg-config glew --libs --static`
 	else
-		ALL_LIBS += `pkg-config glew --libs`
+		CSE2_LIBS += `pkg-config glew --libs`
 	endif
 
 	ifeq ($(WINDOWS), 1)
-		ALL_LIBS += -lopengl32
+		CSE2_LIBS += -lopengl32
 	else
-		ALL_LIBS += -lGL
+		CSE2_LIBS += -lGL
 	endif
 else ifeq ($(RENDERER), SDLTexture)
 	SOURCES += src/Backends/Rendering/SDLTexture
@@ -291,22 +297,22 @@ $(BUILD_DIRECTORY)/data: $(DATA_DIRECTORY)
 $(BUILD_DIRECTORY)/$(FILENAME): $(OBJECTS)
 	@mkdir -p $(@D)
 	@echo Linking $@
-	@$(CXX) $(ALL_CXXFLAGS) $(ALL_LDFLAGS) $^ -o $@ $(ALL_LIBS)
+	@$(CXX) $(ALL_CXXFLAGS) $(CSE2_CXXFLAGS) $(ALL_LDFLAGS) $^ -o $@ $(ALL_LIBS) $(CSE2_LIBS)
 
 obj/$(FILENAME)/%.o: %.c
 	@mkdir -p $(@D)
 	@echo Compiling $<
-	@$(CC) $(ALL_CFLAGS) $(DEFINES) $< -o $@ -c
+	@$(CC) $(ALL_CFLAGS) $(CSE2_CFLAGS) $(DEFINES) $< -o $@ -c
 
 obj/$(FILENAME)/%.o: %.cpp
 	@mkdir -p $(@D)
 	@echo Compiling $<
-	@$(CXX) $(ALL_CXXFLAGS) $(DEFINES) $< -o $@ -c
+	@$(CXX) $(ALL_CXXFLAGS) $(CSE2_CXXFLAGS) $(DEFINES) $< -o $@ -c
 
 obj/$(FILENAME)/src/Resource.o: src/Resource.cpp $(addprefix src/Resource/, $(addsuffix .h, $(RESOURCES)))
 	@mkdir -p $(@D)
 	@echo Compiling $<
-	@$(CXX) $(ALL_CXXFLAGS) $(DEFINES) $< -o $@ -c
+	@$(CXX) $(ALL_CXXFLAGS) $(CSE2_CXXFLAGS) $(DEFINES) $< -o $@ -c
 
 src/Resource/%.h: $(ASSETS_DIRECTORY)/resources/% obj/bin2h
 	@mkdir -p $(@D)
@@ -328,11 +334,7 @@ obj/$(FILENAME)/windows_resources.o: $(ASSETS_DIRECTORY)/resources/CSE2.rc $(ASS
 $(BUILD_DIRECTORY)/$(DOCONFIG_FILENAME): DoConfig/DoConfig.cpp
 	@mkdir -p $(@D)
 	@echo Linking $@
-ifeq ($(STATIC), 1)
-	@$(CXX) -O3 -s -std=c++98 -static $^ -o $@ `fltk-config --cxxflags --libs --ldstaticflags`
-else
-	@$(CXX) -O3 -s -std=c++98 $^ -o $@ `fltk-config --cxxflags --libs --ldflags`
-endif
+	@$(CXX) $(ALL_CXXFLAGS) $(ALL_LDFLAGS) $^ -o $@ $(DOCONFIG_LIBS)
 
 # TODO
 clean:
