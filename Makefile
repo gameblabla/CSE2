@@ -1,25 +1,28 @@
-NATIVECC ?= cc
-NATIVECXX ?= c++
-WINDRES ?= windres
-PKG_CONFIG ?= pkg-config
+NATIVECC = cc
+NATIVECXX = c++
+WINDRES = windres
 
 BUILD_DIRECTORY = game
 ASSETS_DIRECTORY = assets
 
 # Default options
-RENDERER ?= SDLTexture
+RENDERER = SDLTexture
+
+ALL_CXXFLAGS = $(CXXFLAGS)
+ALL_LDFLAGS = $(LDFLAGS)
+ALL_LIBS = $(LIBS)
 
 ifeq ($(WINDOWS), 1)
 	EXE_EXTENSION = .exe
 endif
 
 ifeq ($(RELEASE), 1)
-	CXXFLAGS = -O3
-	LDFLAGS = -s
+	ALL_CXXFLAGS += -O3
+	ALL_LDFLAGS += -s
 	FILENAME_DEF = CSE2$(EXE_EXTENSION)
 	DOCONFIG_FILENAME_DEF = DoConfig$(EXE_EXTENSION)
 else
-	CXXFLAGS = -Og -ggdb3
+	ALL_CXXFLAGS += -Og -ggdb3
 	FILENAME_DEF = CSE2_debug$(EXE_EXTENSION)
 	DOCONFIG_FILENAME_DEF = DoConfig_debug$(EXE_EXTENSION)
 endif
@@ -27,7 +30,7 @@ endif
 ifeq ($(JAPANESE), 1)
 	DATA_DIRECTORY = $(ASSETS_DIRECTORY)/data_jp
 
-	CXXFLAGS += -DJAPANESE
+	ALL_CXXFLAGS += -DJAPANESE
 else
 	DATA_DIRECTORY = $(ASSETS_DIRECTORY)/data_en
 endif
@@ -36,21 +39,21 @@ FILENAME ?= $(FILENAME_DEF)
 DOCONFIG_FILENAME ?= $(DOCONFIG_FILENAME_DEF)
 
 ifeq ($(FIX_BUGS), 1)
-	CXXFLAGS += -DFIX_BUGS
+	ALL_CXXFLAGS += -DFIX_BUGS
 endif
 
 ifeq ($(DEBUG_SAVE), 1)
-	CXXFLAGS += -DDEBUG_SAVE
+	ALL_CXXFLAGS += -DDEBUG_SAVE
 endif
 
 ifeq ($(WARNINGS), 1)
-	CXXFLAGS += -Wall -Wextra -pedantic
+	ALL_CXXFLAGS += -Wall -Wextra -pedantic
 endif
 
 ifeq ($(WARNINGS_ALL), 1)
 	ifneq ($(findstring clang,$(CXX)),)
 		# Use clang-specific flag -Weverything
-		CXXFLAGS += -Weverything
+		ALL_CXXFLAGS += -Weverything
 	else
 		# This is indented with spaces because otherwise it doesn't compile (make doesn't like tabs there for some reason)
         $(warning Couldn\'t activate all warnings (Unsupported compiler))
@@ -58,16 +61,16 @@ ifeq ($(WARNINGS_ALL), 1)
 endif
 
 ifeq ($(WARNINGS_FATAL), 1)
-	CXXFLAGS += -Werror
+	ALL_CXXFLAGS += -Werror
 endif
 
-CXXFLAGS += -std=c++98 -MMD -MP -MF $@.d `$(PKG_CONFIG) sdl2 --cflags` `$(PKG_CONFIG) freetype2 --cflags`
+ALL_CXXFLAGS += -std=c++98 -MMD -MP -MF $@.d `pkg-config sdl2 --cflags` `pkg-config freetype2 --cflags`
 
 ifeq ($(STATIC), 1)
-	LDFLAGS += -static
-	LIBS += `$(PKG_CONFIG) sdl2 --libs --static` `$(PKG_CONFIG) freetype2 --libs --static` -lfreetype
+	ALL_LDFLAGS += -static
+	ALL_LIBS += `pkg-config sdl2 --libs --static` `pkg-config freetype2 --libs --static` -lfreetype
 else
-	LIBS += `$(PKG_CONFIG) sdl2 --libs` `$(PKG_CONFIG) freetype2 --libs`
+	ALL_LIBS += `pkg-config sdl2 --libs` `pkg-config freetype2 --libs`
 endif
 
 SOURCES = \
@@ -220,19 +223,19 @@ endif
 
 ifeq ($(RENDERER), OpenGL3)
 	SOURCES += src/Backends/Rendering/OpenGL3
-	CXXFLAGS += `$(PKG_CONFIG) glew --cflags`
+	ALL_CXXFLAGS += `pkg-config glew --cflags`
 
 	ifeq ($(STATIC), 1)
-		CXXFLAGS += -DGLEW_STATIC
-		LIBS += `$(PKG_CONFIG) glew --libs --static`
+		ALL_CXXFLAGS += -DGLEW_STATIC
+		ALL_LIBS += `pkg-config glew --libs --static`
 	else
-		LIBS += `$(PKG_CONFIG) glew --libs`
+		ALL_LIBS += `pkg-config glew --libs`
 	endif
 
 	ifeq ($(WINDOWS), 1)
-		LIBS += -lopengl32
+		ALL_LIBS += -lopengl32
 	else
-		LIBS += -lGL
+		ALL_LIBS += -lGL
 	endif
 else ifeq ($(RENDERER), SDLTexture)
 	SOURCES += src/Backends/Rendering/SDLTexture
@@ -262,17 +265,17 @@ $(BUILD_DIRECTORY)/data: $(DATA_DIRECTORY)
 $(BUILD_DIRECTORY)/$(FILENAME): $(OBJECTS)
 	@mkdir -p $(@D)
 	@echo Linking $@
-	@$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -o $@ $(LIBS)
+	@$(CXX) $(ALL_CXXFLAGS) $(ALL_LDFLAGS) $^ -o $@ $(ALL_LIBS)
 
 obj/$(FILENAME)/%.o: %.cpp
 	@mkdir -p $(@D)
 	@echo Compiling $<
-	@$(CXX) $(CXXFLAGS) $< -o $@ -c
+	@$(CXX) $(ALL_CXXFLAGS) $< -o $@ -c
 
 obj/$(FILENAME)/src/Resource.o: src/Resource.cpp $(addprefix src/Resource/, $(addsuffix .h, $(RESOURCES)))
 	@mkdir -p $(@D)
 	@echo Compiling $<
-	@$(CXX) $(CXXFLAGS) $< -o $@ -c
+	@$(CXX) $(ALL_CXXFLAGS) $< -o $@ -c
 
 src/Resource/%.h: $(ASSETS_DIRECTORY)/resources/% obj/bin2h
 	@mkdir -p $(@D)
