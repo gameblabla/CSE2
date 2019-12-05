@@ -1,21 +1,25 @@
-WINDRES ?= windres
+WINDRES = windres
 
 BUILD_DIRECTORY = game
 ASSETS_DIRECTORY = assets
 
+ALL_CXXFLAGS = $(CXXFLAGS)
+ALL_LDFLAGS = $(LDFLAGS)
+ALL_LIBS = $(LIBS)
+
 ifeq ($(RELEASE), 1)
-	CXXFLAGS = -O3
-	LDFLAGS = -s
+	ALL_CXXFLAGS += -O3
+	ALL_LDFLAGS += -s
 	FILENAME_DEF = CSE2.exe
 else
-	CXXFLAGS = -Og -ggdb3
+	ALL_CXXFLAGS += -Og -ggdb3
 	FILENAME_DEF = CSE2_debug.exe
 endif
 
 ifeq ($(JAPANESE), 1)
 	DATA_DIRECTORY = $(ASSETS_DIRECTORY)/data_jp
 
-	CXXFLAGS += -DJAPANESE
+	ALL_CXXFLAGS += -DJAPANESE
 else
 	DATA_DIRECTORY = $(ASSETS_DIRECTORY)/data_en
 endif
@@ -23,24 +27,24 @@ endif
 FILENAME ?= $(FILENAME_DEF)
 
 ifeq ($(FIX_BUGS), 1)
-	CXXFLAGS += -DFIX_BUGS
+	ALL_CXXFLAGS += -DFIX_BUGS
 endif
 
 ifeq ($(CONSOLE), 1)
-	CXXFLAGS += -mconsole
+	ALL_CXXFLAGS += -mconsole
 else
-	CXXFLAGS += -mwindows
+	ALL_CXXFLAGS += -mwindows
 endif
 
 ifeq ($(DEBUG_SAVE), 1)
-	CXXFLAGS += -DDEBUG_SAVE
+	ALL_CXXFLAGS += -DDEBUG_SAVE
 endif
 
-CXXFLAGS += -std=c++98 -Wall -Wextra -pedantic -MMD -MP -MF $@.d
-LIBS += -lkernel32 -lgdi32 -lddraw -ldinput -ldsound -lversion -lshlwapi -limm32 -lwinmm -ldxguid
+ALL_CXXFLAGS += -std=c++98 -Wall -Wextra -pedantic -MMD -MP -MF $@.d
+ALL_LIBS += -lkernel32 -lgdi32 -lddraw -ldinput -ldsound -lversion -lshlwapi -limm32 -lwinmm -ldxguid
 
 ifeq ($(STATIC), 1)
-	LDFLAGS += -static
+	ALL_LDFLAGS += -static
 endif
 
 SOURCES = \
@@ -197,12 +201,12 @@ $(BUILD_DIRECTORY)/data: $(DATA_DIRECTORY)
 $(BUILD_DIRECTORY)/$(FILENAME): $(OBJECTS)
 	@mkdir -p $(@D)
 	@echo Linking $@
-	@$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -o $@ $(LIBS)
+	@$(CXX) $(ALL_CXXFLAGS) $(ALL_LDFLAGS) $^ -o $@ $(ALL_LIBS)
 
 obj/$(FILENAME)/%.o: %.cpp
 	@mkdir -p $(@D)
 	@echo Compiling $<
-	@$(CXX) $(CXXFLAGS) $< -o $@ -c
+	@$(CXX) $(ALL_CXXFLAGS) $< -o $@ -c
 
 include $(wildcard $(DEPENDENCIES))
 
