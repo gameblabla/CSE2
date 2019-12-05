@@ -72,20 +72,20 @@ ifeq ($(WARNINGS_FATAL), 1)
 endif
 
 ALL_CFLAGS += -std=c99 -MMD -MP -MF $@.d
-CSE2_CFLAGS += `pkg-config sdl2 --cflags` `pkg-config freetype2 --cflags` -Iexternal
+CSE2_CFLAGS += $(shell pkg-config sdl2 --cflags) $(shell pkg-config freetype2 --cflags) -Iexternal
 
 ALL_CXXFLAGS += -std=c++11 -MMD -MP -MF $@.d
-CSE2_CXXFLAGS += `pkg-config sdl2 --cflags` `pkg-config freetype2 --cflags` -Iexternal
+CSE2_CXXFLAGS += $(shell pkg-config sdl2 --cflags) $(shell pkg-config freetype2 --cflags) -Iexternal
 
 DEFINES += -DLODEPNG_NO_COMPILE_ENCODER -DLODEPNG_NO_COMPILE_ERROR_TEXT -DLODEPNG_NO_COMPILE_CPP
 
 ifeq ($(STATIC), 1)
   ALL_LDFLAGS += -static
-  CSE2_LIBS += `pkg-config sdl2 --libs --static` `pkg-config freetype2 --libs --static` -lfreetype
-  DOCONFIG_LIBS += `fltk-config --cxxflags --libs --ldstaticflags`
+  CSE2_LIBS += $(shell pkg-config sdl2 --libs --static) $(shell pkg-config freetype2 --libs --static) -lfreetype
+  DOCONFIG_LIBS += $(shell fltk-config --cxxflags --libs --ldstaticflags)
 else
-  CSE2_LIBS += `pkg-config sdl2 --libs` `pkg-config freetype2 --libs`
-  DOCONFIG_LIBS += `fltk-config --cxxflags --libs --ldflags`
+  CSE2_LIBS += $(shell pkg-config sdl2 --libs) $(shell pkg-config freetype2 --libs)
+  DOCONFIG_LIBS += $(shell fltk-config --cxxflags --libs --ldflags)
 endif
 
 SOURCES = \
@@ -200,13 +200,13 @@ ifeq ($(AUDIO_TRACKER), 1)
 
   DEFINES += -DUSE_LIBXMPLITE
 
-  ALL_CFLAGS += `pkg-config libxmp-lite --cflags`
-  ALL_CXXFLAGS += `pkg-config libxmp-lite --cflags`
+  ALL_CFLAGS += $(shell pkg-config libxmp-lite --cflags)
+  ALL_CXXFLAGS += $(shell pkg-config libxmp-lite --cflags)
 
   ifeq ($(STATIC), 1)
-    ALL_LIBS += `pkg-config libxmp-lite --libs --static`
+    ALL_LIBS += $(shell pkg-config libxmp-lite --libs --static)
   else
-    ALL_LIBS += `pkg-config libxmp-lite --libs`
+    ALL_LIBS += $(shell pkg-config libxmp-lite --libs)
   endif
 endif
 
@@ -253,15 +253,15 @@ endif
 
 ifeq ($(RENDERER), OpenGL3)
   SOURCES += src/Backends/Rendering/OpenGL3
-  CSE2_CFLAGS += `pkg-config glew --cflags`
-  CSE2_CXXFLAGS += `pkg-config glew --cflags`
+  CSE2_CFLAGS += $(shell pkg-config glew --cflags)
+  CSE2_CXXFLAGS += $(shell pkg-config glew --cflags)
 
   ifeq ($(STATIC), 1)
     CSE2_CFLAGS += -DGLEW_STATIC
     CSE2_CXXFLAGS += -DGLEW_STATIC
-    CSE2_LIBS += `pkg-config glew --libs --static`
+    CSE2_LIBS += $(shell pkg-config glew --libs --static)
   else
-    CSE2_LIBS += `pkg-config glew --libs`
+    CSE2_LIBS += $(shell pkg-config glew --libs)
   endif
 
   ifeq ($(WINDOWS), 1)
