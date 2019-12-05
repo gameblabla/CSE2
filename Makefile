@@ -55,7 +55,7 @@ ifeq ($(WARNINGS_ALL), 1)
     # Use clang-specific flag -Weverything
     ALL_CXXFLAGS += -Weverything
   else
-    $(warning Couldn\'t activate all warnings (Unsupported compiler))
+    $(warning Couldn't activate all warnings (unsupported compiler))
   endif
 endif
 
