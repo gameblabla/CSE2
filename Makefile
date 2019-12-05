@@ -246,7 +246,7 @@ else ifeq ($(RENDERER), SDLSurface)
 else ifeq ($(RENDERER), Software)
   SOURCES += src/Backends/Rendering/Software
 else
-  @echo Invalid RENDERER selected; this build will fail
+  $(error Invalid RENDERER selected)
 endif
 
 OBJECTS = $(addprefix obj/$(FILENAME)/, $(addsuffix .o, $(SOURCES)))
@@ -257,7 +257,7 @@ ifeq ($(WINDOWS), 1)
 endif
 
 all: $(BUILD_DIRECTORY)/$(FILENAME) $(BUILD_DIRECTORY)/data $(BUILD_DIRECTORY)/$(DOCONFIG_FILENAME)
-	@echo Finished
+	$(info Finished)
 
 $(BUILD_DIRECTORY)/data: $(DATA_DIRECTORY)
 	@mkdir -p $(@D)
@@ -266,39 +266,39 @@ $(BUILD_DIRECTORY)/data: $(DATA_DIRECTORY)
 
 $(BUILD_DIRECTORY)/$(FILENAME): $(OBJECTS)
 	@mkdir -p $(@D)
-	@echo Linking $@
+	$(info Linking $@)
 	@$(CXX) $(ALL_CXXFLAGS) $(CSE2_CXXFLAGS) $(ALL_LDFLAGS) $^ -o $@ $(ALL_LIBS) $(CSE2_LIBS)
 
 obj/$(FILENAME)/%.o: %.cpp
 	@mkdir -p $(@D)
-	@echo Compiling $<
+	$(info Compiling $<)
 	@$(CXX) $(ALL_CXXFLAGS) $(CSE2_CXXFLAGS) $< -o $@ -c
 
 obj/$(FILENAME)/src/Resource.o: src/Resource.cpp $(addprefix src/Resource/, $(addsuffix .h, $(RESOURCES)))
 	@mkdir -p $(@D)
-	@echo Compiling $<
+	$(info Compiling $<)
 	@$(CXX) $(ALL_CXXFLAGS) $(CSE2_CXXFLAGS) $< -o $@ -c
 
 src/Resource/%.h: $(ASSETS_DIRECTORY)/resources/% obj/bin2h
 	@mkdir -p $(@D)
-	@echo Converting $<
+	$(info Converting $<)
 	@obj/bin2h $< $@
 
 obj/bin2h: bin2h/bin2h.c
 	@mkdir -p $(@D)
-	@echo Compiling $^
+	$(info Compiling $^)
 	@$(NATIVECC) -O3 -s -std=c90 -Wall -Wextra -pedantic $^ -o $@
 
 include $(wildcard $(DEPENDENCIES))
 
 obj/$(FILENAME)/windows_resources.o: $(ASSETS_DIRECTORY)/resources/CSE2.rc $(ASSETS_DIRECTORY)/resources/resource1.h $(ASSETS_DIRECTORY)/resources/afxres.h $(ASSETS_DIRECTORY)/resources/ICON/0.ico
 	@mkdir -p $(@D)
-	@echo Compiling Windows resource file $<
+	$(info Compiling Windows resource file $<)
 	@$(WINDRES) $< $@
 
 $(BUILD_DIRECTORY)/$(DOCONFIG_FILENAME): DoConfig/DoConfig.cpp
 	@mkdir -p $(@D)
-	@echo Linking $@
+	$(info Linking $@)
 	@$(CXX) $(ALL_CXXFLAGS) $(ALL_LDFLAGS) $^ -o $@ $(DOCONFIG_LIBS)
 
 # TODO
