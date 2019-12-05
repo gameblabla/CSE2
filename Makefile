@@ -20,8 +20,8 @@ ifeq ($(WINDOWS), 1)
 endif
 
 ifeq ($(RELEASE), 1)
-	ALL_CFLAGS += -O3
-	ALL_CXXFLAGS += -O3
+	ALL_CFLAGS += -O3 -DNDEBUG
+	ALL_CXXFLAGS += -O3 -DNDEBUG
 	ALL_LDFLAGS += -s
 	FILENAME_DEF = CSE2$(EXE_EXTENSION)
 	DOCONFIG_FILENAME_DEF = DoConfig$(EXE_EXTENSION)
@@ -248,9 +248,11 @@ endif
 
 ifeq ($(RENDERER), OpenGL3)
 	SOURCES += src/Backends/Rendering/OpenGL3
+	ALL_CFLAGS += `pkg-config glew --cflags`
 	ALL_CXXFLAGS += `pkg-config glew --cflags`
 
 	ifeq ($(STATIC), 1)
+		ALL_CFLAGS += -DGLEW_STATIC
 		ALL_CXXFLAGS += -DGLEW_STATIC
 		ALL_LIBS += `pkg-config glew --libs --static`
 	else
