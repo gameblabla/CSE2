@@ -191,7 +191,7 @@ DEPENDENCIES = $(addprefix obj/$(FILENAME)/, $(addsuffix .o.d, $(SOURCES)))
 OBJECTS += obj/$(FILENAME)/windows_resources.o
 
 all: $(BUILD_DIRECTORY)/$(FILENAME) $(BUILD_DIRECTORY)/data
-	@echo Finished
+	$(info Finished)
 
 $(BUILD_DIRECTORY)/data: $(DATA_DIRECTORY)
 	@mkdir -p $(@D)
@@ -200,19 +200,19 @@ $(BUILD_DIRECTORY)/data: $(DATA_DIRECTORY)
 
 $(BUILD_DIRECTORY)/$(FILENAME): $(OBJECTS)
 	@mkdir -p $(@D)
-	@echo Linking $@
+	$(info Linking $@)
 	@$(CXX) $(ALL_CXXFLAGS) $(ALL_LDFLAGS) $^ -o $@ $(ALL_LIBS)
 
 obj/$(FILENAME)/%.o: %.cpp
 	@mkdir -p $(@D)
-	@echo Compiling $<
+	$(info Compiling $<)
 	@$(CXX) $(ALL_CXXFLAGS) $< -o $@ -c
 
 include $(wildcard $(DEPENDENCIES))
 
 obj/$(FILENAME)/windows_resources.o: $(ASSETS_DIRECTORY)/resources/CSE2.rc $(ASSETS_DIRECTORY)/resources/resource1.h $(ASSETS_DIRECTORY)/resources/afxres.h $(addprefix $(ASSETS_DIRECTORY)/resources/, $(RESOURCES))
 	@mkdir -p $(@D)
-	@echo Compiling Windows resource file $<
+	$(info Compiling Windows resource file $<)
 	@$(WINDRES) $< $@
 
 # TODO
