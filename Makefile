@@ -65,15 +65,15 @@ ifeq ($(WARNINGS_FATAL), 1)
 endif
 
 ALL_CXXFLAGS += -std=c++98 -MMD -MP -MF $@.d
-CSE2_CXXFLAGS += `pkg-config sdl2 --cflags` `pkg-config freetype2 --cflags`
+CSE2_CXXFLAGS += $(shell pkg-config sdl2 --cflags) $(shell pkg-config freetype2 --cflags)
 
 ifeq ($(STATIC), 1)
 	ALL_LDFLAGS += -static
-	CSE2_LIBS += `pkg-config sdl2 --libs --static` `pkg-config freetype2 --libs --static` -lfreetype
-	DOCONFIG_LIBS += `fltk-config --cxxflags --libs --ldstaticflags`
+	CSE2_LIBS += $(shell pkg-config sdl2 --libs --static) $(shell pkg-config freetype2 --libs --static) -lfreetype
+	DOCONFIG_LIBS += $(shell fltk-config --cxxflags --libs --ldstaticflags)
 else
-	CSE2_LIBS += `pkg-config sdl2 --libs` `pkg-config freetype2 --libs`
-	DOCONFIG_LIBS += `fltk-config --cxxflags --libs --ldflags`
+	CSE2_LIBS += $(shell pkg-config sdl2 --libs) $(shell pkg-config freetype2 --libs)
+	DOCONFIG_LIBS += $(shell fltk-config --cxxflags --libs --ldflags)
 endif
 
 SOURCES = \
@@ -226,13 +226,13 @@ endif
 
 ifeq ($(RENDERER), OpenGL3)
 	SOURCES += src/Backends/Rendering/OpenGL3
-	CSE2_CXXFLAGS += `pkg-config glew --cflags`
+	CSE2_CXXFLAGS += $(shell pkg-config glew --cflags)
 
 	ifeq ($(STATIC), 1)
 		CSE2_CXXFLAGS += -DGLEW_STATIC
-		CSE2_LIBS += `pkg-config glew --libs --static`
+		CSE2_LIBS += $(shell pkg-config glew --libs --static)
 	else
-		CSE2_LIBS += `pkg-config glew --libs`
+		CSE2_LIBS += $(shell pkg-config glew --libs)
 	endif
 
 	ifeq ($(WINDOWS), 1)
