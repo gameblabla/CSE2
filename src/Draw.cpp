@@ -46,7 +46,7 @@ static FontObject *font;
 // This doesn't exist in the Linux port, so none of these symbol names are accurate
 static struct
 {
-	char name[20];
+	char name[50];
 	unsigned int width;
 	unsigned int height;
 	SurfaceType type;
