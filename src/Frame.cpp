@@ -18,21 +18,21 @@ void MoveFrame3(void)
 	if (g_GameFlags & 8)
 	{
 		// Use the original camera boundaries during the credits
-		gFrame.x += (*gFrame.tgt_x - (320 * 0x200 / 2) - gFrame.x) / gFrame.wait;
-		gFrame.y += (*gFrame.tgt_y - (240 * 0x200 / 2) - gFrame.y) / gFrame.wait;
+		const int x_delta = -((WINDOW_WIDTH - 320) / 2) * 0x200;
+		const int y_delta = -((WINDOW_HEIGHT - 240) / 2) * 0x200;
 
-		if (gFrame.x < 0)
-			gFrame.x = 0;
-		if (gFrame.y < 0)
-			gFrame.y = 0;
+		gFrame.x += (x_delta + *gFrame.tgt_x - (320 * 0x200 / 2) - gFrame.x) / gFrame.wait;
+		gFrame.y += (y_delta + *gFrame.tgt_y - (240 * 0x200 / 2) - gFrame.y) / gFrame.wait;
 
-		if (gFrame.x > (((map_w - 1) * 16) - 320) * 0x200)
-			gFrame.x = (((map_w - 1) * 16) - 320) * 0x200;
-		if (gFrame.y > (((map_l - 1) * 16) - 240) * 0x200)
-			gFrame.y = (((map_l - 1) * 16) - 240) * 0x200;
+		if (gFrame.x < x_delta)
+			gFrame.x = x_delta;
+		if (gFrame.y < y_delta)
+			gFrame.y = y_delta;
 
-		gFrame.x -= ((WINDOW_WIDTH - 320) / 2) * 0x200;
-		gFrame.y -= ((WINDOW_HEIGHT - 240) / 2) * 0x200;
+		if (gFrame.x > x_delta + (((map_w - 1) * 16) - 320) * 0x200)
+			gFrame.x = x_delta + (((map_w - 1) * 16) - 320) * 0x200;
+		if (gFrame.y > y_delta + (((map_l - 1) * 16) - 240) * 0x200)
+			gFrame.y = y_delta + (((map_l - 1) * 16) - 240) * 0x200;
 	}
 	else
 	{
@@ -128,18 +128,18 @@ void SetFramePosition(int fx, int fy)
 	if (g_GameFlags & 8)
 	{
 		// Use the original camera boundaries during the credits
-		if (gFrame.x < 0)
-			gFrame.x = 0;
-		if (gFrame.y < 0)
-			gFrame.y = 0;
+		const int x_delta = -((WINDOW_WIDTH - 320) / 2) * 0x200;
+		const int y_delta = -((WINDOW_HEIGHT - 240) / 2) * 0x200;
 
-		if (gFrame.x > (((map_w - 1) * 16) - 320) * 0x200)
-			gFrame.x = (((map_w - 1) * 16) - 320) * 0x200;
-		if (gFrame.y > (((map_l - 1) * 16) - 240) * 0x200)
-			gFrame.y = (((map_l - 1) * 16) - 240) * 0x200;
+		if (gFrame.x < x_delta)
+			gFrame.x = x_delta;
+		if (gFrame.y < y_delta)
+			gFrame.y = y_delta;
 
-		gFrame.x -= ((WINDOW_WIDTH - 320) / 2) * 0x200;
-		gFrame.y -= ((WINDOW_HEIGHT - 240) / 2) * 0x200;
+		if (gFrame.x > x_delta + (((map_w - 1) * 16) - 320) * 0x200)
+			gFrame.x = x_delta + (((map_w - 1) * 16) - 320) * 0x200;
+		if (gFrame.y > y_delta + (((map_l - 1) * 16) - 240) * 0x200)
+			gFrame.y = y_delta + (((map_l - 1) * 16) - 240) * 0x200;
 	}
 	else
 	{
@@ -201,18 +201,18 @@ void SetFrameMyChar(void)
 	if (g_GameFlags & 8)
 	{
 		// Use the original camera boundaries during the credits
-		if (gFrame.x < 0)
-			gFrame.x = 0;
-		if (gFrame.y < 0)
-			gFrame.y = 0;
+		const int x_delta = -((WINDOW_WIDTH - 320) / 2) * 0x200;
+		const int y_delta = -((WINDOW_HEIGHT - 240) / 2) * 0x200;
 
-		if (gFrame.x > (((map_w - 1) * 16) - 320) * 0x200)
-			gFrame.x = (((map_w - 1) * 16) - 320) * 0x200;
-		if (gFrame.y > (((map_l - 1) * 16) - 240) * 0x200)
-			gFrame.y = (((map_l - 1) * 16) - 240) * 0x200;
+		if (gFrame.x < x_delta)
+			gFrame.x = x_delta;
+		if (gFrame.y < y_delta)
+			gFrame.y = y_delta;
 
-		gFrame.x -= ((WINDOW_WIDTH - 320) / 2) * 0x200;
-		gFrame.y -= ((WINDOW_HEIGHT - 240) / 2) * 0x200;
+		if (gFrame.x > x_delta + (((map_w - 1) * 16) - 320) * 0x200)
+			gFrame.x = x_delta + (((map_w - 1) * 16) - 320) * 0x200;
+		if (gFrame.y > y_delta + (((map_l - 1) * 16) - 240) * 0x200)
+			gFrame.y = y_delta + (((map_l - 1) * 16) - 240) * 0x200;
 	}
 	else
 	{
