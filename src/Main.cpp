@@ -212,7 +212,7 @@ int main(int argc, char *argv[])
 			if (window == NULL)
 				return 0;
 
-			StartDirectDraw(window, conf.display_mode, conf.b60fps);
+			StartDirectDraw(window, conf.display_mode, conf.b60fps, conf.bVsync);
 
 			break;
 
@@ -226,7 +226,7 @@ int main(int argc, char *argv[])
 			if (window == NULL)
 				return 0;
 
-			StartDirectDraw(window, 0, conf.b60fps);
+			StartDirectDraw(window, 0, conf.b60fps, conf.bVsync);
 			bFullscreen = TRUE;
 
 			SDL_ShowCursor(SDL_DISABLE);

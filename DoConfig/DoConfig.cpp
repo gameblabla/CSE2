@@ -33,6 +33,7 @@ struct data
 	unsigned char useJoy[4];
 	unsigned char buttons[8][4];
 	unsigned char fps[4];
+	unsigned char vsync[4];
 };
 
 class RadioRow
@@ -101,6 +102,7 @@ Fl_Round_Button *okayattack;
 
 Fl_Choice *displaychoice;
 Fl_Choice *frameratechoice;
+Fl_Check_Button *vsyncchoice;
 Fl_Check_Button *joychoice;
 
 Fl_Group *joystuffcontainer;
@@ -132,6 +134,7 @@ void read_Config()
 
 	displaychoice->value(CharsToLong(config.display));
 	frameratechoice->value(CharsToLong(config.fps));
+	vsyncchoice->value(CharsToLong(config.vsync));
 	joychoice->value(CharsToLong(config.useJoy));
 
 	if (!CharsToLong(config.useJoy))
@@ -156,6 +159,7 @@ void write_Config(Fl_Widget *, void *)
 
 	LongToChars(displaychoice->value(), config.display);
 	LongToChars(frameratechoice->value(), config.fps);
+	LongToChars(vsyncchoice->value(), config.vsync);
 	LongToChars(joychoice->value(), config.useJoy);
 	for (int i = 0; i < 8; i++)
 	{
@@ -228,7 +232,9 @@ int main(int argc, char *argv[])
 		{0}};
 	frameratechoice->menu(screens2);
 
-	joychoice = new Fl_Check_Button(205, 130, 185, 20, "Use Joypad");
+	vsyncchoice = new Fl_Check_Button(205, 130, 185, 20, "V-sync");
+
+	joychoice = new Fl_Check_Button(10, 130, 185, 20, "Use Joypad");
 	joychoice->callback(&activatejoy);
 
 	joystuffcontainer = new Fl_Group(10, 160, 380, 200);

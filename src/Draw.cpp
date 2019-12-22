@@ -112,7 +112,7 @@ SDL_Window* CreateWindow(const char *title, int width, int height)
 	return Backend_CreateWindow(title, width, height);
 }
 
-BOOL StartDirectDraw(SDL_Window *window, int lMagnification, BOOL b60fps)
+BOOL StartDirectDraw(SDL_Window *window, int lMagnification, BOOL b60fps, BOOL bVsync)
 {
 	gb60fps = b60fps;
 
@@ -139,13 +139,16 @@ BOOL StartDirectDraw(SDL_Window *window, int lMagnification, BOOL b60fps)
 	// Ugly way to round the magnification up to the nearest multiple of SPRITE_SCALE (we can't use 2x sprites at 1x or 3x internal resolution)
 	magnification = ((magnification + (SPRITE_SCALE - 1)) / SPRITE_SCALE) * SPRITE_SCALE;
 
-	// Check if vsync is possible
-	int display_index = SDL_GetWindowDisplayIndex(window);
-	if (display_index >= 0)
+	// If v-sync is requested, check if it's available
+	if (bVsync)
 	{
-		SDL_DisplayMode display_mode;
-		if (!SDL_GetCurrentDisplayMode(display_index, &display_mode))
-			gbVsync = display_mode.refresh_rate == (b60fps ? 60 : 50);
+		int display_index = SDL_GetWindowDisplayIndex(window);
+		if (display_index >= 0)
+		{
+			SDL_DisplayMode display_mode;
+			if (SDL_GetCurrentDisplayMode(display_index, &display_mode) == 0)
+				gbVsync = display_mode.refresh_rate == (b60fps ? 60 : 50);
+		}
 	}
 
 	framebuffer = Backend_Init(window, WINDOW_WIDTH * magnification, WINDOW_HEIGHT * magnification, gbVsync);

@@ -13,6 +13,7 @@ struct CONFIG
 	BOOL bJoystick;
 	long joystick_button[8];
 	BOOL b60fps;
+	BOOL bVsync;
 };
 
 BOOL LoadConfigData(CONFIG *conf);

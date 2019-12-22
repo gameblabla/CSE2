@@ -45,6 +45,9 @@ BOOL LoadConfigData(CONFIG *conf)
 	// Read framerate toggle
 	conf->b60fps = File_ReadLE32(fp);
 
+	// Read vsync toggle
+	conf->bVsync = File_ReadLE32(fp);
+
 	// Close file
 	fclose(fp);
 
