@@ -53,14 +53,15 @@ static struct
 	BOOL bSystem;	// Basically a 'do not regenerate' flag
 } surface_metadata[SURFACE_ID_MAX];
 
-static BOOL vsync;
+static BOOL gbVsync;
+static BOOL gb60fps;
 
 BOOL Flip_SystemTask(void)
 {
 	static unsigned long timePrev;
 	static unsigned long timeNow;
 
-	if (vsync)
+	if (gbVsync)
 	{
 		if (!SystemTask())
 			return FALSE;
@@ -71,6 +72,9 @@ BOOL Flip_SystemTask(void)
 		const unsigned int frameDelays[3] = {17, 16, 17};
 		static unsigned int frame;
 
+		const unsigned int delay = gb60fps ? frameDelays[frame % 3] : 20;
+		++frame;
+
 		while (TRUE)
 		{
 			if (!SystemTask())
@@ -79,7 +83,7 @@ BOOL Flip_SystemTask(void)
 			// Framerate limiter
 			timeNow = SDL_GetTicks();
 
-			if (timeNow >= timePrev + frameDelays[frame % 3])
+			if (timeNow >= timePrev + delay)
 				break;
 
 			SDL_Delay(1);
@@ -88,9 +92,7 @@ BOOL Flip_SystemTask(void)
 		if (timeNow >= timePrev + 100)
 			timePrev = timeNow;	// If the timer is freakishly out of sync, panic and reset it, instead of spamming frames for who-knows how long
 		else
-			timePrev += frameDelays[frame % 3];
-
-		++frame;
+			timePrev += delay;
 	}
 
 	Backend_DrawScreen();
@@ -110,8 +112,10 @@ SDL_Window* CreateWindow(const char *title, int width, int height)
 	return Backend_CreateWindow(title, width, height);
 }
 
-BOOL StartDirectDraw(SDL_Window *window, int lMagnification)
+BOOL StartDirectDraw(SDL_Window *window, int lMagnification, BOOL b60fps)
 {
+	gb60fps = b60fps;
+
 	memset(surface_metadata, 0, sizeof(surface_metadata));
 
 	switch (lMagnification)
@@ -141,10 +145,10 @@ BOOL StartDirectDraw(SDL_Window *window, int lMagnification)
 	{
 		SDL_DisplayMode display_mode;
 		if (!SDL_GetCurrentDisplayMode(display_index, &display_mode))
-			vsync = display_mode.refresh_rate == 60;
+			gbVsync = display_mode.refresh_rate == (b60fps ? 60 : 50);
 	}
 
-	framebuffer = Backend_Init(window, WINDOW_WIDTH * magnification, WINDOW_HEIGHT * magnification, vsync);
+	framebuffer = Backend_Init(window, WINDOW_WIDTH * magnification, WINDOW_HEIGHT * magnification, gbVsync);
 
 	if (framebuffer == NULL)
 		return FALSE;

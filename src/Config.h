@@ -12,6 +12,7 @@ struct CONFIG
 	long display_mode;
 	BOOL bJoystick;
 	long joystick_button[8];
+	BOOL b60fps;
 };
 
 BOOL LoadConfigData(CONFIG *conf);

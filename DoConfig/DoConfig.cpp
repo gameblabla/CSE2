@@ -19,7 +19,7 @@
 #include <cstring>
 #include <fstream>
 
-#define MAGIC "DOUKUTSU20041206"
+#define MAGIC "CSE2E   20191222"
 #define FONT "Courier New"
 
 struct data
@@ -32,6 +32,7 @@ struct data
 	unsigned char display[4];
 	unsigned char useJoy[4];
 	unsigned char buttons[8][4];
+	unsigned char fps[4];
 };
 
 class RadioRow
@@ -68,11 +69,11 @@ RadioRow::RadioRow(char offset)
 	char *temp = new char[2];
 	temp[0] = '1' + offset;
 	temp[1] = '\0';
-	this->group = new Fl_Group(140 + offset * 30, 150, 30, 180);
+	this->group = new Fl_Group(140 + offset * 30, 180, 30, 180);
 	this->group->label(temp);
 	this->group->align(FL_ALIGN_TOP_LEFT);
 	for (int i = 0; i < 6; i++)
-		this->buttons[i] = new Fl_Radio_Round_Button(140 + offset * 30, 150 + 30 * i, 30, 30);
+		this->buttons[i] = new Fl_Radio_Round_Button(140 + offset * 30, 180 + 30 * i, 30, 30);
 	this->group->end();
 }
 
@@ -99,6 +100,7 @@ Fl_Round_Button *okayjump;
 Fl_Round_Button *okayattack;
 
 Fl_Choice *displaychoice;
+Fl_Choice *frameratechoice;
 Fl_Check_Button *joychoice;
 
 Fl_Group *joystuffcontainer;
@@ -123,11 +125,13 @@ void read_Config()
 	fd.open(config_path, std::ios::in | std::ios::binary);
 	fd.read((char *)&config, sizeof(config));
 	fd.close();
+	strcpy(config.magic, MAGIC);
 	CharsToLong(config.move) ? movegt->setonly() : movear->setonly();
 	CharsToLong(config.attack) ? buttonzx->setonly() : buttonxz->setonly();
 	CharsToLong(config.okay) ? okayattack->setonly() : okayjump->setonly();
 
 	displaychoice->value(CharsToLong(config.display));
+	frameratechoice->value(CharsToLong(config.fps));
 	joychoice->value(CharsToLong(config.useJoy));
 
 	if (!CharsToLong(config.useJoy))
@@ -151,6 +155,7 @@ void write_Config(Fl_Widget *, void *)
 	LongToChars(okayattack->value(), config.okay);
 
 	LongToChars(displaychoice->value(), config.display);
+	LongToChars(frameratechoice->value(), config.fps);
 	LongToChars(joychoice->value(), config.useJoy);
 	for (int i = 0; i < 8; i++)
 	{
@@ -183,7 +188,7 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	Fl_Window *mainw = new Fl_Window(400, 380, "DoConfig - Doukutsu Monogatari Settings");
+	Fl_Window *mainw = new Fl_Window(400, 410, "DoConfig - Doukutsu Monogatari Settings");
 
 	Fl_Group *movegroup = new Fl_Group(10, 10, 185, 50);
 	movegroup->box(FL_THIN_DOWN_BOX);
@@ -216,10 +221,17 @@ int main(int argc, char *argv[])
 		{0}};
 	displaychoice->menu(screens);
 
-	joychoice = new Fl_Check_Button(205, 100, 185, 20, "Use Joypad");
+	frameratechoice = new Fl_Choice(205, 100, 185, 20);
+	Fl_Menu_Item screens2[] = {
+		{"50FPS"},
+		{"60FPS"},
+		{0}};
+	frameratechoice->menu(screens2);
+
+	joychoice = new Fl_Check_Button(205, 130, 185, 20, "Use Joypad");
 	joychoice->callback(&activatejoy);
 
-	joystuffcontainer = new Fl_Group(10, 130, 380, 200);
+	joystuffcontainer = new Fl_Group(10, 160, 380, 200);
 	joystuffcontainer->box(FL_THIN_DOWN_BOX);
 	for (int i = 0; i < 8; i++)
 	{
@@ -227,42 +239,42 @@ int main(int argc, char *argv[])
 	}
 
 	// There's no Label class alright? I'll switch it as soon as one is introduced.
-	Fl_Group *labeljump = new Fl_Group(10, 150, 10, 20);
+	Fl_Group *labeljump = new Fl_Group(10, 180, 10, 20);
 	labeljump->label("Jump:");
 	labeljump->align(FL_ALIGN_RIGHT);
 	labeljump->end();
 
-	Fl_Group *labelattack = new Fl_Group(10, 180, 10, 20);
+	Fl_Group *labelattack = new Fl_Group(10, 210, 10, 20);
 	labelattack->label("Attack:");
 	labelattack->align(FL_ALIGN_RIGHT);
 	labelattack->end();
 
-	Fl_Group *labelweaponup = new Fl_Group(10, 210, 10, 20);
+	Fl_Group *labelweaponup = new Fl_Group(10, 240, 10, 20);
 	labelweaponup->label("Weapon+:");
 	labelweaponup->align(FL_ALIGN_RIGHT);
 	labelweaponup->end();
 
-	Fl_Group *labelweapondown = new Fl_Group(10, 240, 10, 20);
+	Fl_Group *labelweapondown = new Fl_Group(10, 270, 10, 20);
 	labelweapondown->label("Weapon-:");
 	labelweapondown->align(FL_ALIGN_RIGHT);
 	labelweapondown->end();
 
-	Fl_Group *labelitem = new Fl_Group(10, 270, 10, 20);
+	Fl_Group *labelitem = new Fl_Group(10, 300, 10, 20);
 	labelitem->label("Items:");
 	labelitem->align(FL_ALIGN_RIGHT);
 	labelitem->end();
 
-	Fl_Group *labelmap = new Fl_Group(10, 300, 10, 20);
+	Fl_Group *labelmap = new Fl_Group(10, 330, 10, 20);
 	labelmap->label("Map:");
 	labelmap->align(FL_ALIGN_RIGHT);
 	labelmap->end();
 
 	joystuffcontainer->end();
 
-	Fl_Button *okaybutton = new Fl_Button(10, 340, 185, 30, "Okay");
+	Fl_Button *okaybutton = new Fl_Button(10, 370, 185, 30, "Okay");
 	okaybutton->callback(&write_Config);
 
-	Fl_Button *cancelbutton = new Fl_Button(205, 340, 185, 30, "Cancel");
+	Fl_Button *cancelbutton = new Fl_Button(205, 370, 185, 30, "Cancel");
 	cancelbutton->callback(&quit);
 
 	mainw->end();

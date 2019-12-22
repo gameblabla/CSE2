@@ -9,7 +9,7 @@
 #include "Tags.h"
 
 static const char* const config_filename = "Config.dat";	// Not the original name
-static const char* const config_magic = "DOUKUTSU20041206";	// Not the original name
+static const char* const config_magic = "CSE2E   20191222";	// Not the original name
 
 BOOL LoadConfigData(CONFIG *conf)
 {
@@ -41,6 +41,9 @@ BOOL LoadConfigData(CONFIG *conf)
 	conf->bJoystick = File_ReadLE32(fp);
 	for (int button = 0; button < 8; button++)
 		conf->joystick_button[button] = File_ReadLE32(fp);
+
+	// Read framerate toggle
+	conf->b60fps = File_ReadLE32(fp);
 
 	// Close file
 	fclose(fp);
