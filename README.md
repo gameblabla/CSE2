@@ -22,10 +22,10 @@ This branch adds several enhancements including:
 * Fixed text blending, utilising the aforementioned alpha support
 * All resource files moved to the data folder
 * [Booster's Lab](https://github.com/taedixon/boosters-lab) support (open 'data/mrmap.bin')
-* 60FPS
+* 60FPS toggle
 * Widescreen
 * Vastly-improved fullscreen
-* Automatic vsync (only enabled on 60hz monitors)
+* V-sync toggle
 * Smooth sprite movement, through the removal of the design choice that locks sprites to a 320x240 grid when drawn (can be re-enabled by disabling SMOOTH_SPRITE_MOVEMENT)
 * Bugfixes enabled by default
 * Pixtone sounds split to .pxt files
