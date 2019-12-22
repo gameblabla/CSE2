@@ -420,7 +420,6 @@ BOOL ReloadBitmap_Resource(const char *name, SurfaceID surf_no)
 BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 {
 	char path[MAX_PATH];
-	sprintf(path, "%s/%s.pbm", gDataPath, name);
 
 #ifdef FIX_BUGS
 	if (surf_no >= SURFACE_ID_MAX)
@@ -432,7 +431,13 @@ BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 		return FALSE;
 	}
 
-	SDL_Surface *surface = SDL_LoadBMP(path);
+	SDL_Surface *surface = NULL;
+	const char *bmp_file_extensions[] = {"pbm", "bmp"};
+	for (size_t i = 0; i < sizeof(bmp_file_extensions) / sizeof(bmp_file_extensions[0]) && surface == NULL; ++i)
+	{
+		sprintf(path, "%s/%s.%s", gDataPath, name, bmp_file_extensions[i]);
+		surface = SDL_LoadBMP(path);
+	}
 
 	if (surface != NULL)
 	{

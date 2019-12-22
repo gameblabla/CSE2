@@ -26,9 +26,14 @@ BOOL InitBack(const char *fName, int type)
 
 	// Get width and height
 	char path[MAX_PATH];
-	sprintf(path, "%s/%s.pbm", gDataPath, fName);
 
-	FILE *fp = fopen(path, "rb");
+	FILE *fp = NULL;
+	const char *bmp_file_extensions[] = {"pbm", "bmp"};
+	for (size_t i = 0; i < sizeof(bmp_file_extensions) / sizeof(bmp_file_extensions[0]) && fp == NULL; ++i)
+	{
+		sprintf(path, "%s/%s.%s", gDataPath, fName, bmp_file_extensions[i]);
+		fp = fopen(path, "rb");
+	}
 
 	if (fp != NULL)
 	{
