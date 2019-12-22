@@ -514,7 +514,7 @@ int Scene_DownIsland(int mode)
 		// Draw scene
 		CortBox(&grcFull, 0);
 		PutBitmap3(&rc_frame, PixelToScreenCoord(80 + ((WINDOW_WIDTH - 320) / 2)), PixelToScreenCoord(80 + ((WINDOW_HEIGHT - 240) / 2)), &rc_sky, SURFACE_ID_LEVEL_SPRITESET_1);
-		PutBitmap3(&rc_frame, SubpixelToScreenCoord(sprite.x) - PixelToScreenCoord(20 + ((WINDOW_WIDTH - 320) / 2)), PixelToScreenCoord((sprite.y / 0x200) - 12 + ((WINDOW_HEIGHT - 240) / 2)), &rc_sprite, SURFACE_ID_LEVEL_SPRITESET_1);
+		PutBitmap3(&rc_frame, SubpixelToScreenCoord(sprite.x) - PixelToScreenCoord(20) + PixelToScreenCoord((WINDOW_WIDTH - 320) / 2), SubpixelToScreenCoord(sprite.y) - PixelToScreenCoord(12) + PixelToScreenCoord((WINDOW_HEIGHT - 240) / 2), &rc_sprite, SURFACE_ID_LEVEL_SPRITESET_1);
 		PutBitmap3(&rc_frame, PixelToScreenCoord(80 + ((WINDOW_WIDTH - 320) / 2)), PixelToScreenCoord(128 + ((WINDOW_HEIGHT - 240) / 2)), &rc_ground, SURFACE_ID_LEVEL_SPRITESET_1);
 		PutTimeCounter(16, 8);
 
