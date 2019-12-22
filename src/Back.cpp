@@ -65,6 +65,10 @@ BOOL InitBack(const char *fName, int type)
 		fclose(fp);
 	}
 
+	// Adjust background sizes to account for higher sprite resolutions
+	gBack.partsW /= SPRITE_SCALE;
+	gBack.partsH /= SPRITE_SCALE;
+
 	// Set background stuff and load texture
 	gBack.flag = TRUE;
 	if (!ReloadBitmap_File(fName, SURFACE_ID_LEVEL_BACKGROUND))
