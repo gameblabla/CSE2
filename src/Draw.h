@@ -18,6 +18,8 @@ extern RECT grcFull;
 extern int magnification;
 extern BOOL fullscreen;
 
+extern BOOL gb60fps;
+
 typedef enum SurfaceID
 {
 	SURFACE_ID_TITLE = 0,

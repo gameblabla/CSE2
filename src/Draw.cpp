@@ -35,6 +35,8 @@ RECT grcFull = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 int magnification;
 BOOL fullscreen;
 
+BOOL gb60fps;
+
 static Backend_Surface *framebuffer;
 
 static Backend_Surface *surf[SURFACE_ID_MAX];
@@ -54,7 +56,6 @@ static struct
 } surface_metadata[SURFACE_ID_MAX];
 
 static BOOL gbVsync;
-static BOOL gb60fps;
 
 BOOL Flip_SystemTask(void)
 {
