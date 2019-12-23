@@ -20,6 +20,9 @@ equivalents.
 #include "WindowsWrapper.h"
 
 #include "Backends/Audio.h"
+#ifdef EXTRA_SOUND_FORMATS
+#include "ExtraSoundFormats.h"
+#endif
 #include "Organya.h"
 #include "PixTone.h"
 #include "Tags.h"
@@ -224,6 +227,12 @@ void PlaySoundObject(int no, int mode)
 				break;
 		}
 	}
+#ifdef EXTRA_SOUND_FORMATS
+	else
+	{
+		ExtraSound_PlaySFX(no, mode);
+	}
+#endif
 }
 
 void ChangeSoundFrequency(int no, unsigned long rate)	// 100がMIN9999がMAXで2195?がﾉｰﾏﾙ (100 is MIN, 9999 is MAX, and 2195 is normal)
