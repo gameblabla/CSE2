@@ -6,10 +6,10 @@
 
 #include "CommonDefines.h"
 #include "Draw.h"
-#include "Escape.h"
 #include "Game.h"
 #include "KeyControl.h"
 #include "Main.h"
+#include "Pause.h"
 #include "Shoot.h"
 #include "Sound.h"
 #include "TextScr.h"
@@ -444,7 +444,7 @@ int CampLoop(void)
 		// Handle ESC
 		if (gKeyTrg & KEY_ESCAPE)
 		{
-			switch (Call_Escape())
+			switch (Call_Pause())
 			{
 				case 0:
 					return 0;	// Quit game

@@ -18,7 +18,6 @@
 #include "CommonDefines.h"
 #include "Draw.h"
 #include "Ending.h"
-#include "Escape.h"
 #include "Fade.h"
 #include "Flags.h"
 #include "Flash.h"
@@ -36,6 +35,7 @@
 #include "NpChar.h"
 #include "NpcHit.h"
 #include "NpcTbl.h"
+#include "Pause.h"
 #include "Profile.h"
 #include "Random.h"
 #include "SelStage.h"
@@ -211,7 +211,7 @@ int ModeOpening()
 		// Escape menu
 		if (gKey & KEY_ESCAPE)
 		{
-			switch (Call_Escape())
+			switch (Call_Pause())
 			{
 				case 0:
 					return 0;
@@ -422,7 +422,7 @@ int ModeTitle(void)
 
 		if (gKey & KEY_ESCAPE)
 		{
-			switch (Call_Escape())
+			switch (Call_Pause())
 			{
 				case 0:
 					return 0;
@@ -585,7 +585,7 @@ int ModeAction(void)
 		// Escape menu
 		if (gKey & KEY_ESCAPE)
 		{
-			switch (Call_Escape())
+			switch (Call_Pause())
 			{
 				case 0:
 					return 0;

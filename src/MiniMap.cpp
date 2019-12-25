@@ -6,12 +6,12 @@
 
 #include "CommonDefines.h"
 #include "Draw.h"
-#include "Escape.h"
 #include "KeyControl.h"
 #include "Main.h"
 #include "Map.h"
 #include "MapName.h"
 #include "MyChar.h"
+#include "Pause.h"
 #include "Stage.h"
 
 char gMapping[0x80];
@@ -94,7 +94,7 @@ int MiniMapLoop(void)
 
 		if (gKey & KEY_ESCAPE)
 		{
-			switch (Call_Escape())
+			switch (Call_Pause())
 			{
 				case 0:
 					return 0;
@@ -138,7 +138,7 @@ int MiniMapLoop(void)
 
 		if (gKey & KEY_ESCAPE)
 		{
-			switch (Call_Escape())
+			switch (Call_Pause())
 			{
 				case 0:
 					return 0;
@@ -181,7 +181,7 @@ int MiniMapLoop(void)
 
 		if (gKey & KEY_ESCAPE)
 		{
-			switch (Call_Escape())
+			switch (Call_Pause())
 			{
 				case 0:
 					return 0;

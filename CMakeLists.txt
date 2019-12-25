@@ -114,8 +114,6 @@ add_executable(CSE2
 	src/Draw.h
 	src/Ending.cpp
 	src/Ending.h
-	src/Escape.cpp
-	src/Escape.h
 	src/Fade.cpp
 	src/Fade.h
 	src/File.cpp
@@ -181,6 +179,8 @@ add_executable(CSE2
 	src/NpcTbl.h
 	src/Organya.cpp
 	src/Organya.h
+	src/Pause.cpp
+	src/Pause.h
 	src/PixTone.cpp
 	src/PixTone.h
 	src/Profile.cpp

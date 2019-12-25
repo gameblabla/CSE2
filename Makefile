@@ -109,7 +109,6 @@ SOURCES = \
   src/Config \
   src/Draw \
   src/Ending \
-  src/Escape \
   src/Fade \
   src/File \
   src/Flags \
@@ -152,6 +151,7 @@ SOURCES = \
   src/NpcHit \
   src/NpcTbl \
   src/Organya \
+  src/Pause \
   src/PixTone \
   src/Profile \
   src/Random \

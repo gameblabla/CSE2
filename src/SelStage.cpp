@@ -6,9 +6,9 @@
 
 #include "CommonDefines.h"
 #include "Draw.h"
-#include "Escape.h"
 #include "KeyControl.h"
 #include "Main.h"
+#include "Pause.h"
 #include "Sound.h"
 #include "TextScr.h"
 
@@ -172,7 +172,7 @@ int StageSelectLoop(int *p_event)
 
 		if (gKey & KEY_ESCAPE)
 		{
-			switch (Call_Escape())
+			switch (Call_Pause())
 			{
 				case 0:
 					return 0;

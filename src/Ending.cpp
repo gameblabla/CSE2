@@ -7,7 +7,6 @@
 #include "WindowsWrapper.h"
 
 #include "Draw.h"
-#include "Escape.h"
 #include "Flags.h"
 #include "Generic.h"
 #include "KeyControl.h"
@@ -17,6 +16,7 @@
 #include "ExtraSoundFormats.h"
 #endif
 #include "Organya.h"
+#include "Pause.h"
 #include "Stage.h"
 #include "TextScr.h"
 #include "Tags.h"
@@ -470,7 +470,7 @@ int Scene_DownIsland(int mode)
 		// Escape menu
 		if (gKey & 0x8000)
 		{
-			switch (Call_Escape())
+			switch (Call_Pause())
 			{
 				case 0:
 					return 0;
