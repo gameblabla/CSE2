@@ -3,6 +3,7 @@
 #include "WindowsWrapper.h"
 
 #include "CommonDefines.h"
+#include "Config.h"
 #include "Draw.h"
 #include "KeyControl.h"
 #include "Main.h"
@@ -24,7 +25,7 @@ static const RECT rcMyChar[4] = {
 	{32, 16, 48, 32},
 };
 
-static int EnterOptionsMenu(Option *options, size_t total_options)
+static int EnterOptionsMenu(Option *options, size_t total_options, int x_offset)
 {
 	unsigned int selected_option = 0;
 
@@ -72,7 +73,7 @@ static int EnterOptionsMenu(Option *options, size_t total_options)
 
 		for (size_t i = 0; i < total_options; ++i)
 		{
-			const int x = (WINDOW_WIDTH / 2) - 20;
+			const int x = (WINDOW_WIDTH / 2) + x_offset;
 			const int y = (WINDOW_HEIGHT / 2) - (((total_options - 1) * 20) / 2) + (i * 20);
 
 			if (i == selected_option)
@@ -125,7 +126,7 @@ static int Callback_Vsync(Option *option, long key)
 {
 	(void)key;
 
-	const char *strings[] = {"Off", "On"};
+	const char *strings[] = {"Off (needs restart)", "On (needs restart)"};
 
 	option->value = (option->value + 1) % (sizeof(strings) / sizeof(strings[0]));
 
@@ -137,7 +138,7 @@ static int Callback_Vsync(Option *option, long key)
 
 static int Callback_Resolution(Option *option, long key)
 {
-	const char *strings[] = {"Fullscreen", "Windowed 426x240", "Windowed 852x480", "Windowed 1278x720", "Windowed 1704x960"};
+	const char *strings[] = {"Fullscreen (needs restart)", "Windowed 426x240 (needs restart)", "Windowed 852x480 (needs restart)", "Windowed 1278x720 (needs restart)", "Windowed 1704x960 (needs restart)"};
 
 	if (key & gKeyLeft)
 		--option->value;
@@ -184,11 +185,51 @@ static int Callback_Options(Option *option, long key)
 		{"Resolution", NULL, 0, Callback_Resolution}
 	};
 
+	CONFIG conf;
+	if (!LoadConfigData(&conf))
+		DefaultConfigData(&conf);
+
+	options[1].value = conf.b60fps;
+	options[1].attribute = conf.b60fps ? "60FPS" : "50FPS";
+
+	options[2].value = conf.bVsync;
+	options[2].attribute = conf.bVsync ? "On" : "Off";
+
+	options[3].value = conf.display_mode;
+	switch (conf.display_mode)
+	{
+		case 0:
+			options[3].attribute = "Fullscreen";
+			break;
+
+		case 1:
+			options[3].attribute = "Windowed 426x240";
+			break;
+
+		case 2:
+			options[3].attribute = "Windowed 852x480";
+			break;
+
+		case 3:
+			options[3].attribute = "Windowed 1278x720";
+			break;
+
+		case 4:
+			options[3].attribute = "Windowed 1704x960";
+			break;
+	}
+
 	PlaySoundObject(5, 1);
 
-	const int return_value = EnterOptionsMenu(options, sizeof(options) / sizeof(options[0]));
+	const int return_value = EnterOptionsMenu(options, sizeof(options) / sizeof(options[0]), -60);
 
 	PlaySoundObject(5, 1);
+
+	conf.b60fps = options[1].value;
+	conf.bVsync = options[2].value;
+	conf.display_mode = options[3].value;
+
+	SaveConfigData(&conf);
 
 	return return_value;
 }
@@ -214,7 +255,7 @@ int Call_Pause(void)
 
 	PlaySoundObject(5, 1);
 
-	int return_value = EnterOptionsMenu(options, sizeof(options) / sizeof(options[0]));
+	int return_value = EnterOptionsMenu(options, sizeof(options) / sizeof(options[0]), -30);
 
 	if (return_value == -1)
 		return_value = 1;
