@@ -10,6 +10,8 @@
 #include "Organya.h"
 #include "Sound.h"
 
+#include "SDL.h"
+
 typedef struct Option
 {
 	const char *name;
@@ -38,10 +40,29 @@ static int EnterOptionsMenu(Option *options, size_t total_options, int x_offset)
 		// Get pressed keys
 		GetTrg();
 
-		if (gKeyTrg & (KEY_ESCAPE | gKeyCancel))
+		if (gKeyTrg & KEY_ESCAPE)
+		{
+			return_value = -2;
+			break;
+		}
+
+		if (gKeyTrg & gKeyCancel)
 		{
 			return_value = -1;
 			break;
+		}
+
+		if (gKeyTrg & (gKeyUp | gKeyDown))
+		{
+			if (gKeyTrg & gKeyDown)
+				if (selected_option++ == total_options - 1)
+					selected_option = 0;
+
+			if (gKeyTrg & gKeyUp)
+				if (selected_option-- == 0)
+					selected_option = total_options - 1;
+
+			PlaySoundObject(1, 1);
 		}
 
 		if (gKeyTrg & (gKeyOk | gKeyLeft | gKeyRight))
@@ -50,19 +71,6 @@ static int EnterOptionsMenu(Option *options, size_t total_options, int x_offset)
 
 			if (return_value != -1)
 				break;
-		}
-
-		if (gKeyTrg & (gKeyUp | gKeyDown))
-		{
-			if (gKeyTrg & gKeyDown)
-				++selected_option;
-
-			if (gKeyTrg & gKeyUp)
-				--selected_option;
-
-			selected_option %= total_options;
-
-			PlaySoundObject(1, 1);
 		}
 
 		if (++anime >= 40)
@@ -82,7 +90,7 @@ static int EnterOptionsMenu(Option *options, size_t total_options, int x_offset)
 			PutText(x, y - (9 / 2), options[i].name, RGB(0xFF, 0xFF, 0xFF));
 
 			if (options[i].attribute != NULL)
-				PutText(x + 60, y - (9 / 2), options[i].attribute, RGB(0xFF, 0xFF, 0xFF));
+				PutText(x + 100, y - (9 / 2), options[i].attribute, RGB(0xFF, 0xFF, 0xFF));
 		}
 
 		PutFramePerSecound();
@@ -98,12 +106,72 @@ static int EnterOptionsMenu(Option *options, size_t total_options, int x_offset)
 	return return_value;
 }
 
+static int Callback_Null(Option *option, long key)
+{
+	(void)option;
+
+	if (!(key & gKeyOk))
+		return -1;
+
+	int total_keys;
+	const Uint8 *state = SDL_GetKeyboardState(&total_keys);
+
+	Uint8 *old_state = (Uint8*)malloc(total_keys);
+
+	memcpy(old_state, state, total_keys);
+
+	for (;;)
+	{
+		// Get pressed keys
+		GetTrg();
+
+		for (int i = 0; i < total_keys; ++i)
+		{
+			if (((old_state[i] ^ state[i]) & state[i]) == 1)
+			{
+				option->attribute = SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)i));
+				return -1;
+			}
+		}
+
+		memcpy(old_state, state, total_keys);
+
+		PutFramePerSecound();
+
+		if (!Flip_SystemTask())
+		{
+			// Quit if window is closed
+			return 0;
+		}
+	}
+}
+
 static int Callback_Controls(Option *option, long key)
 {
 	(void)option;
-	(void)key;
 
-	return -1;
+	if (!(key & gKeyOk))
+		return -1;
+
+	Option options[] = {
+		{"OK", NULL, 0, Callback_Null},
+		{"Cancel", NULL, 0, Callback_Null},
+		{"Jump", NULL, 0, Callback_Null},
+		{"Shoot", NULL, 0, Callback_Null},
+		{"Previous weapon", NULL, 0, Callback_Null},
+		{"Next weapon", NULL, 0, Callback_Null},
+		{"Inventory", NULL, 0, Callback_Null},
+		{"Map", NULL, 0, Callback_Null},
+		{"Pause", NULL, 0, Callback_Null}
+	};
+
+	PlaySoundObject(5, 1);
+
+	const int return_value = EnterOptionsMenu(options, sizeof(options) / sizeof(options[0]), -80);
+
+	PlaySoundObject(5, 1);
+
+	return return_value;
 }
 
 static int Callback_Framerate(Option *option, long key)
@@ -158,7 +226,9 @@ static int Callback_Resolution(Option *option, long key)
 static int Callback_Resume(Option *option, long key)
 {
 	(void)option;
-	(void)key;
+
+	if (!(key & gKeyOk))
+		return -1;
 
 	PlaySoundObject(18, 1);
 	return 1;
@@ -167,7 +237,9 @@ static int Callback_Resume(Option *option, long key)
 static int Callback_Reset(Option *option, long key)
 {
 	(void)option;
-	(void)key;
+
+	if (!(key & gKeyOk))
+		return -1;
 
 	PlaySoundObject(18, 1);
 	return 2;
@@ -176,7 +248,9 @@ static int Callback_Reset(Option *option, long key)
 static int Callback_Options(Option *option, long key)
 {
 	(void)option;
-	(void)key;
+
+	if (!(key & gKeyOk))
+		return -1;
 
 	Option options[] = {
 		{"Controls", NULL, 0, Callback_Controls},
@@ -221,7 +295,7 @@ static int Callback_Options(Option *option, long key)
 
 	PlaySoundObject(5, 1);
 
-	const int return_value = EnterOptionsMenu(options, sizeof(options) / sizeof(options[0]), -60);
+	const int return_value = EnterOptionsMenu(options, sizeof(options) / sizeof(options[0]), -80);
 
 	PlaySoundObject(5, 1);
 
@@ -237,7 +311,9 @@ static int Callback_Options(Option *option, long key)
 static int Callback_Quit(Option *option, long key)
 {
 	(void)option;
-	(void)key;
+
+	if (!(key & gKeyOk))
+		return -1;
 
 	return 0;
 }
@@ -257,7 +333,7 @@ int Call_Pause(void)
 
 	int return_value = EnterOptionsMenu(options, sizeof(options) / sizeof(options[0]), -30);
 
-	if (return_value == -1)
+	if (return_value == -1 || return_value == -2)
 		return_value = 1;
 
 //	PlaySoundObject(18, 1);
