@@ -15,10 +15,10 @@
 typedef struct Option
 {
 	const char *name;
-	const char *attribute;
-	long value;
 	int (*callback)(Option *option, long key);
 	void *user_data;
+	const char *attribute;
+	long value;
 } Option;
 
 static const RECT rcMyChar[4] = {
@@ -170,19 +170,19 @@ static int Callback_Controls(Option *option, long key)
 		return -1;
 
 	Option options[] = {
-		{"Up", NULL, 0, Callback_Null, &gScancodeUp},
-		{"Down", NULL, 0, Callback_Null, &gScancodeDown},
-		{"Left", NULL, 0, Callback_Null, &gScancodeLeft},
-		{"Right", NULL, 0, Callback_Null, &gScancodeRight},
-		{"OK", NULL, 0, Callback_Null, &gScancodeOk},
-		{"Cancel", NULL, 0, Callback_Null, &gScancodeCancel},
-		{"Jump", NULL, 0, Callback_Null, &gScancodeJump},
-		{"Shoot", NULL, 0, Callback_Null, &gScancodeShot},
-		{"Previous weapon", NULL, 0, Callback_Null, &gScancodeArmsRev},
-		{"Next weapon", NULL, 0, Callback_Null, &gScancodeArms},
-		{"Inventory", NULL, 0, Callback_Null, &gScancodeItem},
-		{"Map", NULL, 0, Callback_Null, &gScancodeMap},
-		{"Pause", NULL, 0, Callback_Null, &gScancodePause}
+		{"Up", Callback_Null, &gScancodeUp},
+		{"Down", Callback_Null, &gScancodeDown},
+		{"Left", Callback_Null, &gScancodeLeft},
+		{"Right", Callback_Null, &gScancodeRight},
+		{"OK", Callback_Null, &gScancodeOk},
+		{"Cancel", Callback_Null, &gScancodeCancel},
+		{"Jump", Callback_Null, &gScancodeJump},
+		{"Shoot", Callback_Null, &gScancodeShot},
+		{"Previous weapon", Callback_Null, &gScancodeArmsRev},
+		{"Next weapon", Callback_Null, &gScancodeArms},
+		{"Inventory", Callback_Null, &gScancodeItem},
+		{"Map", Callback_Null, &gScancodeMap},
+		{"Pause", Callback_Null, &gScancodePause}
 	};
 
 	PlaySoundObject(5, 1);
@@ -273,10 +273,10 @@ static int Callback_Options(Option *option, long key)
 		return -1;
 
 	Option options[] = {
-		{"Controls", NULL, 0, Callback_Controls, NULL},
-		{"Framerate", NULL, 0, Callback_Framerate, NULL},
-		{"V-sync", NULL, 0, Callback_Vsync, NULL},
-		{"Resolution", NULL, 0, Callback_Resolution, NULL}
+		{"Controls", Callback_Controls},
+		{"Framerate", Callback_Framerate},
+		{"V-sync", Callback_Vsync},
+		{"Resolution", Callback_Resolution}
 	};
 
 	CONFIG conf;
@@ -341,10 +341,10 @@ static int Callback_Quit(Option *option, long key)
 int Call_Pause(void)
 {
 	Option options[] = {
-		{"Resume", NULL, 0, Callback_Resume, NULL},
-		{"Reset", NULL, 0, Callback_Reset, NULL},
-		{"Options", NULL, 0, Callback_Options, NULL},
-		{"Quit", NULL, 0, Callback_Quit, NULL}
+		{"Resume", Callback_Resume},
+		{"Reset", Callback_Reset},
+		{"Options", Callback_Options},
+		{"Quit", Callback_Quit}
 	};
 
 	int return_value = EnterOptionsMenu(options, sizeof(options) / sizeof(options[0]), -30, FALSE);
