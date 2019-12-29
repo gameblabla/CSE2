@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "SDL.h"
+
 #include "WindowsWrapper.h"
 
 #include "CommonDefines.h"
@@ -13,8 +15,6 @@
 #include "Main.h"
 #include "Organya.h"
 #include "Sound.h"
-
-#include "SDL.h"
 
 typedef struct Option
 {
@@ -146,8 +146,7 @@ static int Callback_KeyRebind(Option *option, long key)
 				option->attribute = (char*)malloc(strlen(key_name));
 				strcpy((char*)option->attribute, key_name);
 
-				int *scancode = (int*)option->user_data;
-				*scancode = i;
+				*(int*)option->user_data = i;
 
 				PlaySoundObject(18, 1);
 				free(old_state);
