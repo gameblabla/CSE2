@@ -38,6 +38,20 @@ int gJoystickButtonTable[8];
 BOOL bFullscreen;
 BOOL gbUseJoystick = FALSE;
 
+int gScancodeOk = SDL_SCANCODE_Z;
+int gScancodeCancel = SDL_SCANCODE_X;
+int gScancodeJump = SDL_SCANCODE_Z;
+int gScancodeShot = SDL_SCANCODE_X;
+int gScancodeArms = SDL_SCANCODE_S;
+int gScancodeArmsRev = SDL_SCANCODE_A;
+int gScancodeItem = SDL_SCANCODE_Q;
+int gScancodeMap = SDL_SCANCODE_W;
+int gScancodeUp = SDL_SCANCODE_UP;
+int gScancodeDown = SDL_SCANCODE_DOWN;
+int gScancodeLeft = SDL_SCANCODE_LEFT;
+int gScancodeRight = SDL_SCANCODE_RIGHT;
+int gScancodePause = SDL_SCANCODE_ESCAPE;
+
 static BOOL bFps = FALSE;
 static BOOL bActive = TRUE;
 
@@ -108,60 +122,6 @@ int main(int argc, char *argv[])
 	CONFIG conf;
 	if (!LoadConfigData(&conf))
 		DefaultConfigData(&conf);
-
-	// Apply keybinds
-	// Swap X and Z buttons
-	switch (conf.attack_button_mode)
-	{
-		case 0:
-			gKeyJump = KEY_Z;
-			gKeyShot = KEY_X;
-			break;
-
-		case 1:
-			gKeyJump = KEY_X;
-			gKeyShot = KEY_Z;
-			break;
-	}
-
-	// Swap Okay and Cancel buttons
-	switch (conf.ok_button_mode)
-	{
-		case 0:
-			gKeyOk = gKeyJump;
-			gKeyCancel = gKeyShot;
-			break;
-
-		case 1:
-			gKeyOk = gKeyShot;
-			gKeyCancel = gKeyJump;
-			break;
-	}
-
-	// Swap left and right weapon switch keys
-	if (CheckFileExists("s_reverse"))
-	{
-		gKeyArms = KEY_ARMSREV;
-		gKeyArmsRev = KEY_ARMS;
-	}
-
-	// Alternate movement keys
-	switch (conf.move_button_mode)
-	{
-		case 0:
-			gKeyLeft = KEY_LEFT;
-			gKeyUp = KEY_UP;
-			gKeyRight = KEY_RIGHT;
-			gKeyDown = KEY_DOWN;
-			break;
-
-		case 1:
-			gKeyLeft = KEY_ALT_LEFT;
-			gKeyUp = KEY_ALT_UP;
-			gKeyRight = KEY_ALT_RIGHT;
-			gKeyDown = KEY_ALT_DOWN;
-			break;
-	}
 
 	// Set gamepad inputs
 	for (i = 0; i < 8; ++i)
@@ -358,172 +318,72 @@ BOOL SystemTask(void)
 		switch (event.type)
 		{
 			case SDL_KEYDOWN:
-				switch (event.key.keysym.sym)
-				{
-					case SDLK_ESCAPE:
-						gKey |= KEY_ESCAPE;
-						break;
-
-					case SDLK_w:
+				if (event.key.keysym.scancode == gScancodePause)
+					gKey |= KEY_ESCAPE;
+				if (event.key.keysym.scancode == gScancodeMap)
 						gKey |= KEY_MAP;
-						break;
-
-					case SDLK_LEFT:
+				if (event.key.keysym.scancode == gScancodeLeft)
 						gKey |= KEY_LEFT;
-						break;
-
-					case SDLK_RIGHT:
+				if (event.key.keysym.scancode == gScancodeRight)
 						gKey |= KEY_RIGHT;
-						break;
-
-					case SDLK_UP:
+				if (event.key.keysym.scancode == gScancodeUp)
 						gKey |= KEY_UP;
-						break;
-
-					case SDLK_DOWN:
+				if (event.key.keysym.scancode == gScancodeDown)
 						gKey |= KEY_DOWN;
-						break;
-
-					case SDLK_x:
-						gKey |= KEY_X;
-						break;
-
-					case SDLK_z:
-						gKey |= KEY_Z;
-						break;
-
-					case SDLK_s:
+				if (event.key.keysym.scancode == gScancodeShot)
+						gKey |= KEY_SHOT;
+				if (event.key.keysym.scancode == gScancodeJump)
+						gKey |= KEY_JUMP;
+				if (event.key.keysym.scancode == gScancodeArms)
 						gKey |= KEY_ARMS;
-						break;
-
-					case SDLK_a:
+				if (event.key.keysym.scancode == gScancodeArmsRev)
 						gKey |= KEY_ARMSREV;
-						break;
-
-					case SDLK_LSHIFT:
-					case SDLK_RSHIFT:
-						gKey |= KEY_SHIFT;
-						break;
-
-					case SDLK_F1:
+				if (event.key.keysym.scancode == SDL_SCANCODE_F1)
 						gKey |= KEY_F1;
-						break;
-
-					case SDLK_F2:
+				if (event.key.keysym.scancode == SDL_SCANCODE_F2)
 						gKey |= KEY_F2;
-						break;
-
-					case SDLK_q:
+				if (event.key.keysym.scancode == gScancodeItem)
 						gKey |= KEY_ITEM;
-						break;
-
-					case SDLK_COMMA:
-						gKey |= KEY_ALT_LEFT;
-						break;
-
-					case SDLK_PERIOD:
-						gKey |= KEY_ALT_DOWN;
-						break;
-
-					case SDLK_SLASH:
-						gKey |= KEY_ALT_RIGHT;
-						break;
-
-					case SDLK_l:
-						gKey |= KEY_L;
-						break;
-
-					case SDLK_PLUS:
-						gKey |= KEY_PLUS;
-						break;
-
-					case SDLK_F5:
+				if (event.key.keysym.scancode == SDL_SCANCODE_F5)
 						gbUseJoystick = FALSE;
-						break;
-				}
+				if (event.key.keysym.scancode == gScancodeCancel)
+						gKey |= KEY_CANCEL;
+				if (event.key.keysym.scancode == gScancodeOk)
+						gKey |= KEY_OK;
 
 				break;
 
 			case SDL_KEYUP:
-				switch (event.key.keysym.sym)
-				{
-					case SDLK_ESCAPE:
+				if (event.key.keysym.scancode == gScancodePause)
 						gKey &= ~KEY_ESCAPE;
-						break;
-
-					case SDLK_w:
+				if (event.key.keysym.scancode == gScancodeMap)
 						gKey &= ~KEY_MAP;
-						break;
-
-					case SDLK_LEFT:
+				if (event.key.keysym.scancode == gScancodeLeft)
 						gKey &= ~KEY_LEFT;
-						break;
-
-					case SDLK_RIGHT:
+				if (event.key.keysym.scancode == gScancodeRight)
 						gKey &= ~KEY_RIGHT;
-						break;
-
-					case SDLK_UP:
+				if (event.key.keysym.scancode == gScancodeUp)
 						gKey &= ~KEY_UP;
-						break;
-
-					case SDLK_DOWN:
+				if (event.key.keysym.scancode == gScancodeDown)
 						gKey &= ~KEY_DOWN;
-						break;
-
-					case SDLK_x:
-						gKey &= ~KEY_X;
-						break;
-
-					case SDLK_z:
-						gKey &= ~KEY_Z;
-						break;
-
-					case SDLK_s:
+				if (event.key.keysym.scancode == gScancodeShot)
+						gKey &= ~KEY_SHOT;
+				if (event.key.keysym.scancode == gScancodeJump)
+						gKey &= ~KEY_JUMP;
+				if (event.key.keysym.scancode == gScancodeArms)
 						gKey &= ~KEY_ARMS;
-						break;
-
-					case SDLK_a:
+				if (event.key.keysym.scancode == gScancodeArmsRev)
 						gKey &= ~KEY_ARMSREV;
-						break;
-
-					case SDLK_LSHIFT:
-					case SDLK_RSHIFT:
-						gKey &= ~KEY_SHIFT;
-						break;
-
-					case SDLK_F1:
+				if (event.key.keysym.scancode == SDL_SCANCODE_F1)
 						gKey &= ~KEY_F1;
-						break;
-
-					case SDLK_F2:
+				if (event.key.keysym.scancode == SDL_SCANCODE_F2)
 						gKey &= ~KEY_F2;
-						break;
-
-					case SDLK_q:
+				if (event.key.keysym.scancode == gScancodeItem)
 						gKey &= ~KEY_ITEM;
-						break;
-
-					case SDLK_COMMA:
-						gKey &= ~KEY_ALT_LEFT;
-						break;
-
-					case SDLK_PERIOD:
-						gKey &= ~KEY_ALT_DOWN;
-						break;
-
-					case SDLK_SLASH:
-						gKey &= ~KEY_ALT_RIGHT;
-						break;
-
-					case SDLK_l:
-						gKey &= ~KEY_L;
-						break;
-
-					case SDLK_PLUS:
-						gKey &= ~KEY_PLUS;
-						break;
-				}
+				if (event.key.keysym.scancode == gScancodeCancel)
+						gKey &= ~KEY_CANCEL;
+				if (event.key.keysym.scancode == gScancodeOk)
+						gKey &= ~KEY_OK;
 
 				break;
 

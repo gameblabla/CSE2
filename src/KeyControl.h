@@ -9,29 +9,22 @@ enum KeyBind
 	KEY_DOWN =      0x00000008,
 	//Map key
 	KEY_MAP =       0x00000010,
-	//Okay and cancel / Jump and Shoot keys
-	KEY_X =         0x00000020,
-	KEY_Z =         0x00000040,
+	//Jump and Shoot keys
+	KEY_SHOT =      0x00000020,
+	KEY_JUMP =      0x00000040,
 	//Left and right weapon switch keys
 	KEY_ARMS =      0x00000080,
 	KEY_ARMSREV =   0x00000100,
-	//Unused?
-	KEY_SHIFT =     0x00000200,
 	//Function keys
 	KEY_F1 =        0x00000400,
 	KEY_F2 =        0x00000800,
 	//Inventory
 	KEY_ITEM =      0x00001000,
+	//Okay and cancel keys
+	KEY_OK =        0x00002000,
+	KEY_CANCEL =    0x00004000,
 	//Escape key
 	KEY_ESCAPE =	0x00008000,
-	//The alt movement keys go in the order of left, up, right and down
-	KEY_ALT_LEFT =  0x00010000,
-	KEY_ALT_DOWN =  0x00020000,
-	KEY_ALT_RIGHT = 0x00040000,
-	KEY_ALT_UP =    0x00180000,
-	//Alt up actually has 2 seperate keys, but they're kind of merged together
-	KEY_L =         0x00080000,
-	KEY_PLUS =      0x00100000
 };
 
 extern long gKey;

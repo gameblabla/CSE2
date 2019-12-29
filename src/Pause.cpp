@@ -18,6 +18,7 @@ typedef struct Option
 	const char *attribute;
 	long value;
 	int (*callback)(Option *option, long key);
+	void *user_data;
 } Option;
 
 static const RECT rcMyChar[4] = {
@@ -27,7 +28,7 @@ static const RECT rcMyChar[4] = {
 	{32, 16, 48, 32},
 };
 
-static int EnterOptionsMenu(Option *options, size_t total_options, int x_offset)
+static int EnterOptionsMenu(Option *options, size_t total_options, int x_offset, BOOL submenu)
 {
 	unsigned int selected_option = 0;
 
@@ -40,7 +41,7 @@ static int EnterOptionsMenu(Option *options, size_t total_options, int x_offset)
 		// Get pressed keys
 		GetTrg();
 
-		if (gKeyTrg & KEY_ESCAPE)
+		if (!submenu && gKeyTrg & KEY_ESCAPE)
 		{
 			return_value = -2;
 			break;
@@ -103,6 +104,9 @@ static int EnterOptionsMenu(Option *options, size_t total_options, int x_offset)
 		}
 	}
 
+	if (!submenu && (return_value == -1 || return_value == -2))
+		return_value = 1;
+
 	return return_value;
 }
 
@@ -112,6 +116,8 @@ static int Callback_Null(Option *option, long key)
 
 	if (!(key & gKeyOk))
 		return -1;
+
+	PlaySoundObject(5, 1);
 
 	int total_keys;
 	const Uint8 *state = SDL_GetKeyboardState(&total_keys);
@@ -130,11 +136,21 @@ static int Callback_Null(Option *option, long key)
 			if (((old_state[i] ^ state[i]) & state[i]) == 1)
 			{
 				option->attribute = SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)i));
+				int *scancode = (int*)option->user_data;
+				*scancode = i;
+
+				PlaySoundObject(18, 1);
 				return -1;
 			}
 		}
 
 		memcpy(old_state, state, total_keys);
+
+		CortBox(&grcFull, 0x000000);
+
+		const char *string = "Press a key to bind to this action:";
+		PutText((WINDOW_WIDTH / 2) - ((strlen(string) * 5) / 2), (WINDOW_HEIGHT / 2) - 10, string, RGB(0xFF, 0xFF, 0xFF));
+		PutText((WINDOW_WIDTH / 2) - ((strlen(option->name) * 5) / 2), (WINDOW_HEIGHT / 2) + 10, option->name, RGB(0xFF, 0xFF, 0xFF));
 
 		PutFramePerSecound();
 
@@ -154,20 +170,24 @@ static int Callback_Controls(Option *option, long key)
 		return -1;
 
 	Option options[] = {
-		{"OK", NULL, 0, Callback_Null},
-		{"Cancel", NULL, 0, Callback_Null},
-		{"Jump", NULL, 0, Callback_Null},
-		{"Shoot", NULL, 0, Callback_Null},
-		{"Previous weapon", NULL, 0, Callback_Null},
-		{"Next weapon", NULL, 0, Callback_Null},
-		{"Inventory", NULL, 0, Callback_Null},
-		{"Map", NULL, 0, Callback_Null},
-		{"Pause", NULL, 0, Callback_Null}
+		{"Up", NULL, 0, Callback_Null, &gScancodeUp},
+		{"Down", NULL, 0, Callback_Null, &gScancodeDown},
+		{"Left", NULL, 0, Callback_Null, &gScancodeLeft},
+		{"Right", NULL, 0, Callback_Null, &gScancodeRight},
+		{"OK", NULL, 0, Callback_Null, &gScancodeOk},
+		{"Cancel", NULL, 0, Callback_Null, &gScancodeCancel},
+		{"Jump", NULL, 0, Callback_Null, &gScancodeJump},
+		{"Shoot", NULL, 0, Callback_Null, &gScancodeShot},
+		{"Previous weapon", NULL, 0, Callback_Null, &gScancodeArmsRev},
+		{"Next weapon", NULL, 0, Callback_Null, &gScancodeArms},
+		{"Inventory", NULL, 0, Callback_Null, &gScancodeItem},
+		{"Map", NULL, 0, Callback_Null, &gScancodeMap},
+		{"Pause", NULL, 0, Callback_Null, &gScancodePause}
 	};
 
 	PlaySoundObject(5, 1);
 
-	const int return_value = EnterOptionsMenu(options, sizeof(options) / sizeof(options[0]), -80);
+	const int return_value = EnterOptionsMenu(options, sizeof(options) / sizeof(options[0]), -80, TRUE);
 
 	PlaySoundObject(5, 1);
 
@@ -253,10 +273,10 @@ static int Callback_Options(Option *option, long key)
 		return -1;
 
 	Option options[] = {
-		{"Controls", NULL, 0, Callback_Controls},
-		{"Framerate", NULL, 0, Callback_Framerate},
-		{"V-sync", NULL, 0, Callback_Vsync},
-		{"Resolution", NULL, 0, Callback_Resolution}
+		{"Controls", NULL, 0, Callback_Controls, NULL},
+		{"Framerate", NULL, 0, Callback_Framerate, NULL},
+		{"V-sync", NULL, 0, Callback_Vsync, NULL},
+		{"Resolution", NULL, 0, Callback_Resolution, NULL}
 	};
 
 	CONFIG conf;
@@ -295,7 +315,7 @@ static int Callback_Options(Option *option, long key)
 
 	PlaySoundObject(5, 1);
 
-	const int return_value = EnterOptionsMenu(options, sizeof(options) / sizeof(options[0]), -80);
+	const int return_value = EnterOptionsMenu(options, sizeof(options) / sizeof(options[0]), -80, TRUE);
 
 	PlaySoundObject(5, 1);
 
@@ -321,24 +341,13 @@ static int Callback_Quit(Option *option, long key)
 int Call_Pause(void)
 {
 	Option options[] = {
-		{"Resume", NULL, 0, Callback_Resume},
-		{"Reset", NULL, 0, Callback_Reset},
-		{"Options", NULL, 0, Callback_Options},
-		{"Quit", NULL, 0, Callback_Quit}
+		{"Resume", NULL, 0, Callback_Resume, NULL},
+		{"Reset", NULL, 0, Callback_Reset, NULL},
+		{"Options", NULL, 0, Callback_Options, NULL},
+		{"Quit", NULL, 0, Callback_Quit, NULL}
 	};
 
-	StopOrganyaMusic();
-
-	PlaySoundObject(5, 1);
-
-	int return_value = EnterOptionsMenu(options, sizeof(options) / sizeof(options[0]), -30);
-
-	if (return_value == -1 || return_value == -2)
-		return_value = 1;
-
-//	PlaySoundObject(18, 1);
-
-	PlayOrganyaMusic();
+	int return_value = EnterOptionsMenu(options, sizeof(options) / sizeof(options[0]), -30, FALSE);
 
 	gKeyTrg = gKey = 0;
 

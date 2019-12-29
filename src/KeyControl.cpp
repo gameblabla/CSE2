@@ -3,15 +3,15 @@
 long gKey;
 long gKeyTrg;
 
-long gKeyJump = KEY_Z;
-long gKeyShot = KEY_X;
+long gKeyJump = KEY_JUMP;
+long gKeyShot = KEY_SHOT;
 long gKeyArms = KEY_ARMS;
 long gKeyArmsRev = KEY_ARMSREV;
 long gKeyItem = KEY_ITEM;
 long gKeyMap = KEY_MAP;
 
-long gKeyOk = KEY_Z;
-long gKeyCancel = KEY_X;
+long gKeyOk = KEY_OK;
+long gKeyCancel = KEY_CANCEL;
 
 long gKeyLeft = KEY_LEFT;
 long gKeyUp = KEY_UP;
