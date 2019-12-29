@@ -1,5 +1,9 @@
 #include "Pause.h"
 
+#include <stddef.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "WindowsWrapper.h"
 
 #include "CommonDefines.h"
@@ -110,7 +114,7 @@ static int EnterOptionsMenu(Option *options, size_t total_options, int x_offset,
 	return return_value;
 }
 
-static int Callback_Null(Option *option, long key)
+static int Callback_KeyRebind(Option *option, long key)
 {
 	(void)option;
 
@@ -135,11 +139,18 @@ static int Callback_Null(Option *option, long key)
 		{
 			if (((old_state[i] ^ state[i]) & state[i]) == 1)
 			{
-				option->attribute = SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)i));
+				const char *key_name = SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)i));
+
+				free((char*)option->attribute);
+
+				option->attribute = (char*)malloc(strlen(key_name));
+				strcpy((char*)option->attribute, key_name);
+
 				int *scancode = (int*)option->user_data;
 				*scancode = i;
 
 				PlaySoundObject(18, 1);
+				free(old_state);
 				return -1;
 			}
 		}
@@ -157,6 +168,7 @@ static int Callback_Null(Option *option, long key)
 		if (!Flip_SystemTask())
 		{
 			// Quit if window is closed
+			free(old_state);
 			return 0;
 		}
 	}
@@ -170,24 +182,27 @@ static int Callback_Controls(Option *option, long key)
 		return -1;
 
 	Option options[] = {
-		{"Up", Callback_Null, &gScancodeUp},
-		{"Down", Callback_Null, &gScancodeDown},
-		{"Left", Callback_Null, &gScancodeLeft},
-		{"Right", Callback_Null, &gScancodeRight},
-		{"OK", Callback_Null, &gScancodeOk},
-		{"Cancel", Callback_Null, &gScancodeCancel},
-		{"Jump", Callback_Null, &gScancodeJump},
-		{"Shoot", Callback_Null, &gScancodeShot},
-		{"Previous weapon", Callback_Null, &gScancodeArmsRev},
-		{"Next weapon", Callback_Null, &gScancodeArms},
-		{"Inventory", Callback_Null, &gScancodeItem},
-		{"Map", Callback_Null, &gScancodeMap},
-		{"Pause", Callback_Null, &gScancodePause}
+		{"Up", Callback_KeyRebind, &gScancodeUp},
+		{"Down", Callback_KeyRebind, &gScancodeDown},
+		{"Left", Callback_KeyRebind, &gScancodeLeft},
+		{"Right", Callback_KeyRebind, &gScancodeRight},
+		{"OK", Callback_KeyRebind, &gScancodeOk},
+		{"Cancel", Callback_KeyRebind, &gScancodeCancel},
+		{"Jump", Callback_KeyRebind, &gScancodeJump},
+		{"Shoot", Callback_KeyRebind, &gScancodeShot},
+		{"Previous weapon", Callback_KeyRebind, &gScancodeArmsRev},
+		{"Next weapon", Callback_KeyRebind, &gScancodeArms},
+		{"Inventory", Callback_KeyRebind, &gScancodeItem},
+		{"Map", Callback_KeyRebind, &gScancodeMap},
+		{"Pause", Callback_KeyRebind, &gScancodePause}
 	};
 
 	PlaySoundObject(5, 1);
 
 	const int return_value = EnterOptionsMenu(options, sizeof(options) / sizeof(options[0]), -80, TRUE);
+
+	for (size_t i = 0; i < sizeof(options) / sizeof(options[0]); ++i)
+		free((char*)option->attribute);
 
 	PlaySoundObject(5, 1);
 
