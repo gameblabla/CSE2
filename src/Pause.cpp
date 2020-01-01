@@ -16,6 +16,8 @@
 #include "Organya.h"
 #include "Sound.h"
 
+#define MAX_OPTIONS ((WINDOW_HEIGHT / 20) - 4)	// The maximum number of options we can fit on-screen at once
+
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
@@ -45,7 +47,7 @@ static const RECT rcMyChar[4] = {
 	{32, 16, 48, 32},
 };
 
-static int EnterOptionsMenu(Option *options, size_t total_options, int x_offset, BOOL submenu)
+static int EnterOptionsMenu(const char *title, Option *options, size_t total_options, int x_offset, BOOL submenu)
 {
 	int selected_option = 0;
 	int scroll = 0;
@@ -59,18 +61,21 @@ static int EnterOptionsMenu(Option *options, size_t total_options, int x_offset,
 		// Get pressed keys
 		GetTrg();
 
+		// Allow unpausing by pressing the pause button only when in the main pause menu (not submenus)
 		if (!submenu && gKeyTrg & KEY_ESCAPE)
 		{
 			return_value = -2;
 			break;
 		}
 
+		// Go back one submenu when the 'cancel' button is pressed
 		if (gKeyTrg & gKeyCancel)
 		{
 			return_value = -1;
 			break;
 		}
 
+		// Handling up/down input
 		if (gKeyTrg & (gKeyUp | gKeyDown))
 		{
 			const int old_selection = selected_option;
@@ -83,41 +88,50 @@ static int EnterOptionsMenu(Option *options, size_t total_options, int x_offset,
 				if (selected_option-- == 0)
 					selected_option = total_options - 1;
 
+			// Update the menu-scrolling, if there are more options than can be fit on the screen
 			if (selected_option < old_selection)
 				scroll = MAX(0, MIN(scroll, selected_option - 1));
 
 			if (selected_option > old_selection)
-				scroll = MIN(total_options - 8 - 1 - 1, MAX(scroll, selected_option - 8));
+				scroll = MIN(total_options - MAX_OPTIONS, MAX(scroll, selected_option - (MAX_OPTIONS - 2)));
 
 			PlaySoundObject(1, 1);
 		}
 
+		// Run option callback if OK/left/right buttons are pressed
 		if (gKeyTrg & (gKeyOk | gKeyLeft | gKeyRight))
 		{
 			return_value = options[selected_option].callback(options, total_options, selected_option, gKeyTrg);
 
+			// If the callback returned -1, it's time to exit this submenu
 			if (return_value != -1)
 				break;
 		}
 
+		// Update Quote animation counter
 		if (++anime >= 40)
 			anime = 0;
 
 		// Draw screen
 		CortBox(&grcFull, 0x000000);
 
-		const size_t visible_options = MIN(10, total_options);
+		PutText((WINDOW_WIDTH / 2) - ((strlen(title) * 5) / 2), 20, title, RGB(0xFF, 0xFF, 0xFF));
+
+		const size_t visible_options = MIN(MAX_OPTIONS, total_options);
 
 		for (int i = scroll; i < scroll + visible_options; ++i)
 		{
 			const int x = (WINDOW_WIDTH / 2) + x_offset;
-			const int y = (WINDOW_HEIGHT / 2) - (((visible_options - 1) * 20) / 2) + ((i - scroll) * 20);
+			const int y = (WINDOW_HEIGHT / 2) + (10 * 0) - (((visible_options - 1) * 20) / 2) + ((i - scroll) * 20);
 
+			// Draw Quote next to the selected option
 			if (i == selected_option)
 				PutBitmap3(&grcGame, PixelToScreenCoord(x - 20), PixelToScreenCoord(y - 8), &rcMyChar[anime / 10 % 4], SURFACE_ID_MY_CHAR);
 
+			// Draw option name
 			PutText(x, y - (9 / 2), options[i].name, RGB(0xFF, 0xFF, 0xFF));
 
+			// Draw option value, if it has one
 			if (options[i].attribute != NULL)
 				PutText(x + 100, y - (9 / 2), options[i].attribute, RGB(0xFF, 0xFF, 0xFF));
 		}
@@ -132,6 +146,7 @@ static int EnterOptionsMenu(Option *options, size_t total_options, int x_offset,
 		}
 	}
 
+	// Filter internal return values to something Cave Story can understand
 	if (!submenu && (return_value == -1 || return_value == -2))
 		return_value = 1;
 
@@ -179,9 +194,6 @@ static int Callback_KeyRebind(Option *options, size_t total_options, size_t sele
 
 	for (;;)
 	{
-		// Get pressed keys
-		GetTrg();
-
 		for (int scancode = 0; scancode < total_keys; ++scancode)
 		{
 			if (((old_state[scancode] ^ state[scancode]) & state[scancode]) == 1)
@@ -198,6 +210,7 @@ static int Callback_KeyRebind(Option *options, size_t total_options, size_t sele
 
 						*controls[(size_t)options[other_option].user_data].scancode = options[other_option].value;
 						*controls[(size_t)options[selected_option].user_data].scancode = options[selected_option].value;
+
 						conf.key_bindings[other_option] = options[other_option].value;
 						conf.key_bindings[selected_option] = options[selected_option].value;
 
@@ -229,6 +242,7 @@ static int Callback_KeyRebind(Option *options, size_t total_options, size_t sele
 
 		memcpy(old_state, state, total_keys);
 
+		// Draw screen
 		CortBox(&grcFull, 0x000000);
 
 		const char *string = "Press a key to bind to this action:";
@@ -274,7 +288,7 @@ static int Callback_Controls(Option *options, size_t total_options, size_t selec
 
 	PlaySoundObject(5, 1);
 
-	const int return_value = EnterOptionsMenu(submenu_options, sizeof(submenu_options) / sizeof(submenu_options[0]), -80, TRUE);
+	const int return_value = EnterOptionsMenu("CONTROLS", submenu_options, sizeof(submenu_options) / sizeof(submenu_options[0]), -60, TRUE);
 
 	PlaySoundObject(5, 1);
 
@@ -415,7 +429,7 @@ static int Callback_Options(Option *options, size_t total_options, size_t select
 
 	PlaySoundObject(5, 1);
 
-	const int return_value = EnterOptionsMenu(submenu_options, sizeof(submenu_options) / sizeof(submenu_options[0]), -80, TRUE);
+	const int return_value = EnterOptionsMenu("OPTIONS", submenu_options, sizeof(submenu_options) / sizeof(submenu_options[0]), -70, TRUE);
 
 	PlaySoundObject(5, 1);
 
@@ -449,7 +463,7 @@ int Call_Pause(void)
 		{"Quit", Callback_Quit}
 	};
 
-	int return_value = EnterOptionsMenu(options, sizeof(options) / sizeof(options[0]), -30, FALSE);
+	int return_value = EnterOptionsMenu("PAUSED", options, sizeof(options) / sizeof(options[0]), -14, FALSE);
 
 	gKeyTrg = gKey = 0;
 
