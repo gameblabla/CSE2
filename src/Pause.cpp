@@ -19,7 +19,7 @@
 typedef struct Option
 {
 	const char *name;
-	int (*callback)(Option *options, size_t total_options, size_t index, long key);
+	int (*callback)(Option *options, size_t total_options, size_t selected_option, long key);
 	void *user_data;
 	const char *attribute;
 	long value;
@@ -139,7 +139,7 @@ static int EnterOptionsMenu(Option *options, size_t total_options, int x_offset,
 	return return_value;
 }
 
-static int Callback_KeyRebind(Option *options, size_t total_options, size_t index, long key)
+static int Callback_KeyRebind(Option *options, size_t total_options, size_t selected_option, long key)
 {
 	if (!(key & gKeyOk))
 		return -1;
@@ -158,30 +158,30 @@ static int Callback_KeyRebind(Option *options, size_t total_options, size_t inde
 		// Get pressed keys
 		GetTrg();
 
-		for (int i = 0; i < total_keys; ++i)
+		for (int scancode = 0; scancode < total_keys; ++scancode)
 		{
-			if (((old_state[i] ^ state[i]) & state[i]) == 1)
+			if (((old_state[scancode] ^ state[scancode]) & state[scancode]) == 1)
 			{
-				const char *key_name = SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)i));
+				const char *key_name = SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)scancode));
 
 				// If another key in the game group uses this key, swap them
-				for (size_t j = 0; j < total_options; ++j)
+				for (size_t other_option = 0; other_option < total_options; ++other_option)
 				{
-					if (j != index && controls[j].groups & controls[index].groups && options[j].value == i)
+					if (other_option != selected_option && controls[other_option].groups & controls[selected_option].groups && options[other_option].value == scancode)
 					{
-						options[j].value = options[index].value;
-						options[index].value = i;
+						options[other_option].value = options[selected_option].value;
+						options[selected_option].value = scancode;
 
-						*controls[(size_t)options[j].user_data].scancode = options[j].value;
-						*controls[(size_t)options[index].user_data].scancode = options[index].value;
-						conf.key_bindings[j] = options[j].value;
-						conf.key_bindings[index] = options[index].value;
+						*controls[(size_t)options[other_option].user_data].scancode = options[other_option].value;
+						*controls[(size_t)options[selected_option].user_data].scancode = options[selected_option].value;
+						conf.key_bindings[other_option] = options[other_option].value;
+						conf.key_bindings[selected_option] = options[selected_option].value;
 
-						free((char*)options[j].attribute);
-						options[j].attribute = options[index].attribute;
+						free((char*)options[other_option].attribute);
+						options[other_option].attribute = options[selected_option].attribute;
 
-						options[index].attribute = (char*)malloc(strlen(key_name));
-						strcpy((char*)options[index].attribute, key_name);
+						options[selected_option].attribute = (char*)malloc(strlen(key_name));
+						strcpy((char*)options[selected_option].attribute, key_name);
 
 						PlaySoundObject(18, 1);
 						free(old_state);
@@ -192,14 +192,14 @@ static int Callback_KeyRebind(Option *options, size_t total_options, size_t inde
 				}
 
 				// Otherwise just overwrite the selected key
-				free((char*)options[index].attribute);
+				free((char*)options[selected_option].attribute);
 
-				options[index].attribute = (char*)malloc(strlen(key_name));
-				strcpy((char*)options[index].attribute, key_name);
+				options[selected_option].attribute = (char*)malloc(strlen(key_name));
+				strcpy((char*)options[selected_option].attribute, key_name);
 
-				options[index].value = i;
-				*controls[(size_t)options[index].user_data].scancode = options[index].value;
-				conf.key_bindings[index] = options[index].value;
+				options[selected_option].value = scancode;
+				*controls[(size_t)options[selected_option].user_data].scancode = options[selected_option].value;
+				conf.key_bindings[selected_option] = options[selected_option].value;
 
 				PlaySoundObject(18, 1);
 				free(old_state);
@@ -215,7 +215,7 @@ static int Callback_KeyRebind(Option *options, size_t total_options, size_t inde
 
 		const char *string = "Press a key to bind to this action:";
 		PutText((WINDOW_WIDTH / 2) - ((strlen(string) * 5) / 2), (WINDOW_HEIGHT / 2) - 10, string, RGB(0xFF, 0xFF, 0xFF));
-		PutText((WINDOW_WIDTH / 2) - ((strlen(options[index].name) * 5) / 2), (WINDOW_HEIGHT / 2) + 10, options[index].name, RGB(0xFF, 0xFF, 0xFF));
+		PutText((WINDOW_WIDTH / 2) - ((strlen(options[selected_option].name) * 5) / 2), (WINDOW_HEIGHT / 2) + 10, options[selected_option].name, RGB(0xFF, 0xFF, 0xFF));
 
 		PutFramePerSecound();
 
@@ -228,11 +228,11 @@ static int Callback_KeyRebind(Option *options, size_t total_options, size_t inde
 	}
 }
 
-static int Callback_Controls(Option *options, size_t total_options, size_t index, long key)
+static int Callback_Controls(Option *options, size_t total_options, size_t selected_option, long key)
 {
 	(void)options;
 	(void)total_options;
-	(void)index;
+	(void)selected_option;
 
 	if (!(key & gKeyOk))
 		return -1;
@@ -263,64 +263,64 @@ static int Callback_Controls(Option *options, size_t total_options, size_t index
 	return return_value;
 }
 
-static int Callback_Framerate(Option *options, size_t total_options, size_t index, long key)
+static int Callback_Framerate(Option *options, size_t total_options, size_t selected_option, long key)
 {
 	(void)total_options;
 	(void)key;
 
 	const char *strings[] = {"50FPS", "60FPS"};
 
-	options[index].value = (options[index].value + 1) % (sizeof(strings) / sizeof(strings[0]));
+	options[selected_option].value = (options[selected_option].value + 1) % (sizeof(strings) / sizeof(strings[0]));
 	
-	gb60fps = options[index].value;
+	gb60fps = options[selected_option].value;
 
-	options[index].attribute = strings[options[index].value];
+	options[selected_option].attribute = strings[options[selected_option].value];
 
 	PlaySoundObject(SND_SWITCH_WEAPON, 1);
 	return -1;
 }
 
-static int Callback_Vsync(Option *options, size_t total_options, size_t index, long key)
+static int Callback_Vsync(Option *options, size_t total_options, size_t selected_option, long key)
 {
 	(void)total_options;
 	(void)key;
 
 	const char *strings[] = {"Off (needs restart)", "On (needs restart)"};
 
-	options[index].value = (options[index].value + 1) % (sizeof(strings) / sizeof(strings[0]));
+	options[selected_option].value = (options[selected_option].value + 1) % (sizeof(strings) / sizeof(strings[0]));
 
-	options[index].attribute = strings[options[index].value];
+	options[selected_option].attribute = strings[options[selected_option].value];
 
 	PlaySoundObject(SND_SWITCH_WEAPON, 1);
 	return -1;
 }
 
-static int Callback_Resolution(Option *options, size_t total_options, size_t index, long key)
+static int Callback_Resolution(Option *options, size_t total_options, size_t selected_option, long key)
 {
 	(void)total_options;
 
 	const char *strings[] = {"Fullscreen (needs restart)", "Windowed 426x240 (needs restart)", "Windowed 852x480 (needs restart)", "Windowed 1278x720 (needs restart)", "Windowed 1704x960 (needs restart)"};
 
 	if (key & gKeyLeft)
-		--options[index].value;
+		--options[selected_option].value;
 	else
-		++options[index].value;
+		++options[selected_option].value;
 
-	options[index].value %= (sizeof(strings) / sizeof(strings[0]));
+	options[selected_option].value %= (sizeof(strings) / sizeof(strings[0]));
 
-	gb60fps = options[index].value;
+	gb60fps = options[selected_option].value;
 
-	options[index].attribute = strings[options[index].value];
+	options[selected_option].attribute = strings[options[selected_option].value];
 
 	PlaySoundObject(SND_SWITCH_WEAPON, 1);
 	return -1;
 }
 
-static int Callback_Resume(Option *options, size_t total_options, size_t index, long key)
+static int Callback_Resume(Option *options, size_t total_options, size_t selected_option, long key)
 {
 	(void)options;
 	(void)total_options;
-	(void)index;
+	(void)selected_option;
 
 	if (!(key & gKeyOk))
 		return -1;
@@ -329,11 +329,11 @@ static int Callback_Resume(Option *options, size_t total_options, size_t index, 
 	return 1;
 }
 
-static int Callback_Reset(Option *options, size_t total_options, size_t index, long key)
+static int Callback_Reset(Option *options, size_t total_options, size_t selected_option, long key)
 {
 	(void)options;
 	(void)total_options;
-	(void)index;
+	(void)selected_option;
 
 	if (!(key & gKeyOk))
 		return -1;
@@ -342,11 +342,11 @@ static int Callback_Reset(Option *options, size_t total_options, size_t index, l
 	return 2;
 }
 
-static int Callback_Options(Option *options, size_t total_options, size_t index, long key)
+static int Callback_Options(Option *options, size_t total_options, size_t selected_option, long key)
 {
 	(void)options;
 	(void)total_options;
-	(void)index;
+	(void)selected_option;
 
 	if (!(key & gKeyOk))
 		return -1;
@@ -406,11 +406,11 @@ static int Callback_Options(Option *options, size_t total_options, size_t index,
 	return return_value;
 }
 
-static int Callback_Quit(Option *options, size_t total_options, size_t index, long key)
+static int Callback_Quit(Option *options, size_t total_options, size_t selected_option, long key)
 {
 	(void)options;
 	(void)total_options;
-	(void)index;
+	(void)selected_option;
 
 	if (!(key & gKeyOk))
 		return -1;
