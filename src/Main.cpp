@@ -335,10 +335,13 @@ BOOL SystemTask(void)
 			case SDL_KEYDOWN:
 				if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
 					gKey |= KEY_ESCAPE;
-				if (event.key.keysym.scancode == SDL_SCANCODE_F1)
+				else if (event.key.keysym.scancode == SDL_SCANCODE_F1)
 					gKey |= KEY_F1;
-				if (event.key.keysym.scancode == SDL_SCANCODE_F2)
+				else if (event.key.keysym.scancode == SDL_SCANCODE_F2)
 					gKey |= KEY_F2;
+				else if (event.key.keysym.scancode == SDL_SCANCODE_F5)
+					gbUseJoystick = FALSE;
+
 				if (event.key.keysym.scancode == gScancodeMap)
 					gKey |= KEY_MAP;
 				if (event.key.keysym.scancode == gScancodeLeft)
@@ -359,8 +362,6 @@ BOOL SystemTask(void)
 					gKey |= KEY_ARMSREV;
 				if (event.key.keysym.scancode == gScancodeItem)
 					gKey |= KEY_ITEM;
-				if (event.key.keysym.scancode == SDL_SCANCODE_F5)
-					gbUseJoystick = FALSE;
 				if (event.key.keysym.scancode == gScancodeCancel)
 					gKey |= KEY_CANCEL;
 				if (event.key.keysym.scancode == gScancodeOk)
@@ -373,10 +374,11 @@ BOOL SystemTask(void)
 			case SDL_KEYUP:
 				if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
 					gKey &= ~KEY_ESCAPE;
-				if (event.key.keysym.scancode == SDL_SCANCODE_F1)
+				else if (event.key.keysym.scancode == SDL_SCANCODE_F1)
 					gKey &= ~KEY_F1;
-				if (event.key.keysym.scancode == SDL_SCANCODE_F2)
+				else if (event.key.keysym.scancode == SDL_SCANCODE_F2)
 					gKey &= ~KEY_F2;
+
 				if (event.key.keysym.scancode == gScancodeMap)
 					gKey &= ~KEY_MAP;
 				if (event.key.keysym.scancode == gScancodeLeft)
