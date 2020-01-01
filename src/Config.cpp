@@ -48,6 +48,10 @@ BOOL LoadConfigData(CONFIG *conf)
 	// Read vsync toggle
 	conf->bVsync = fgetc(fp);
 
+	// Read key-bindings
+	for (size_t i = 0; i < sizeof(conf->key_bindings) / sizeof(conf->key_bindings[0]); ++i)
+		conf->key_bindings[i] = File_ReadLE32(fp);
+
 	// Close file
 	fclose(fp);
 
@@ -94,6 +98,10 @@ BOOL SaveConfigData(const CONFIG *conf)
 
 	// Read vsync toggle
 	fputc(conf->bVsync, fp);
+
+	// Read key-bindings
+	for (size_t i = 0; i < sizeof(conf->key_bindings) / sizeof(conf->key_bindings[0]); ++i)
+		File_WriteLE32(conf->key_bindings[i], fp);
 
 	// Close file
 	fclose(fp);

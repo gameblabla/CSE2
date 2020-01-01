@@ -123,6 +123,21 @@ int main(int argc, char *argv[])
 	if (!LoadConfigData(&conf))
 		DefaultConfigData(&conf);
 
+	// Set key-bindings
+	gScancodeUp = conf.key_bindings[0];
+	gScancodeDown = conf.key_bindings[1];
+	gScancodeLeft = conf.key_bindings[2];
+	gScancodeRight = conf.key_bindings[3];
+	gScancodeOk = conf.key_bindings[4];
+	gScancodeCancel = conf.key_bindings[5];
+	gScancodeJump = conf.key_bindings[6];
+	gScancodeShot = conf.key_bindings[7];
+	gScancodeArmsRev = conf.key_bindings[8];
+	gScancodeArms = conf.key_bindings[9];
+	gScancodeItem = conf.key_bindings[10];
+	gScancodeMap = conf.key_bindings[11];
+	gScancodePause = conf.key_bindings[12];
+
 	// Set gamepad inputs
 	for (i = 0; i < 8; ++i)
 	{
