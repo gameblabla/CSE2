@@ -16,6 +16,9 @@
 #include "Organya.h"
 #include "Sound.h"
 
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+
 typedef struct Option
 {
 	const char *name;
@@ -42,25 +45,10 @@ static const RECT rcMyChar[4] = {
 	{32, 16, 48, 32},
 };
 
-static Control controls[] = {
-	{"Up", &gScancodeUp, (1 << 0) | (1 << 1)},
-	{"Down", &gScancodeDown, (1 << 0) | (1 << 1)},
-	{"Left", &gScancodeLeft, (1 << 0) | (1 << 1)},
-	{"Right", &gScancodeRight, (1 << 0) | (1 << 1)},
-	{"OK", &gScancodeOk, 1 << 1},
-	{"Cancel", &gScancodeCancel, 1 << 1},
-	{"Jump", &gScancodeJump, 1 << 0},
-	{"Shoot", &gScancodeShot, 1 << 0},
-	{"Previous weapon", &gScancodeArmsRev, 1 << 0},
-	{"Next weapon", &gScancodeArms, 1 << 0},
-	{"Inventory", &gScancodeItem, 1 << 0},
-	{"Map", &gScancodeMap, 1 << 0},
-	{"Pause", &gScancodePause, 1 << 0}
-};
-
 static int EnterOptionsMenu(Option *options, size_t total_options, int x_offset, BOOL submenu)
 {
-	size_t selected_option = 0;
+	int selected_option = 0;
+	int scroll = 0;
 
 	unsigned int anime = 0;
 
@@ -85,6 +73,8 @@ static int EnterOptionsMenu(Option *options, size_t total_options, int x_offset,
 
 		if (gKeyTrg & (gKeyUp | gKeyDown))
 		{
+			const int old_selection = selected_option;
+
 			if (gKeyTrg & gKeyDown)
 				if (selected_option++ == total_options - 1)
 					selected_option = 0;
@@ -92,6 +82,12 @@ static int EnterOptionsMenu(Option *options, size_t total_options, int x_offset,
 			if (gKeyTrg & gKeyUp)
 				if (selected_option-- == 0)
 					selected_option = total_options - 1;
+
+			if (selected_option < old_selection)
+				scroll = MAX(0, MIN(scroll, selected_option - 1));
+
+			if (selected_option > old_selection)
+				scroll = MIN(total_options - 8 - 1 - 1, MAX(scroll, selected_option - 8));
 
 			PlaySoundObject(1, 1);
 		}
@@ -110,10 +106,12 @@ static int EnterOptionsMenu(Option *options, size_t total_options, int x_offset,
 		// Draw screen
 		CortBox(&grcFull, 0x000000);
 
-		for (size_t i = 0; i < total_options; ++i)
+		const size_t visible_options = MIN(10, total_options);
+
+		for (int i = scroll; i < scroll + visible_options; ++i)
 		{
 			const int x = (WINDOW_WIDTH / 2) + x_offset;
-			const int y = (WINDOW_HEIGHT / 2) - (((total_options - 1) * 20) / 2) + (i * 20);
+			const int y = (WINDOW_HEIGHT / 2) - (((visible_options - 1) * 20) / 2) + ((i - scroll) * 20);
 
 			if (i == selected_option)
 				PutBitmap3(&grcGame, PixelToScreenCoord(x - 20), PixelToScreenCoord(y - 8), &rcMyChar[anime / 10 % 4], SURFACE_ID_MY_CHAR);
@@ -139,6 +137,31 @@ static int EnterOptionsMenu(Option *options, size_t total_options, int x_offset,
 
 	return return_value;
 }
+
+/********************
+ * Controls menu
+ ********************/
+
+/*
+ * The bitfield on the right determines which 'group' the
+ * control belongs to - if two controls are in the same group,
+ * they cannot be bound to the same key.
+ */
+static Control controls[] = {
+	{"Up", &gScancodeUp, (1 << 0) | (1 << 1)},
+	{"Down", &gScancodeDown, (1 << 0) | (1 << 1)},
+	{"Left", &gScancodeLeft, (1 << 0) | (1 << 1)},
+	{"Right", &gScancodeRight, (1 << 0) | (1 << 1)},
+	{"OK", &gScancodeOk, 1 << 1},
+	{"Cancel", &gScancodeCancel, 1 << 1},
+	{"Jump", &gScancodeJump, 1 << 0},
+	{"Shoot", &gScancodeShot, 1 << 0},
+	{"Previous weapon", &gScancodeArmsRev, 1 << 0},
+	{"Next weapon", &gScancodeArms, 1 << 0},
+	{"Inventory", &gScancodeItem, 1 << 0},
+	{"Map", &gScancodeMap, 1 << 0},
+	{"Pause", &gScancodePause, 1 << 0}
+};
 
 static int Callback_KeyRebind(Option *options, size_t total_options, size_t selected_option, long key)
 {
@@ -223,6 +246,10 @@ static int Callback_KeyRebind(Option *options, size_t total_options, size_t sele
 	}
 }
 
+/********************
+ * Options menu
+ ********************/
+
 static int Callback_Controls(Option *options, size_t total_options, size_t selected_option, long key)
 {
 	(void)options;
@@ -306,6 +333,10 @@ static int Callback_Resolution(Option *options, size_t total_options, size_t sel
 	PlaySoundObject(SND_SWITCH_WEAPON, 1);
 	return -1;
 }
+
+/********************
+ * Pause menu
+ ********************/
 
 static int Callback_Resume(Option *options, size_t total_options, size_t selected_option, long key)
 {
