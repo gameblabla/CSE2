@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "SDL.h"
+
 #include "WindowsWrapper.h"
 
 #include "Config.h"
@@ -129,4 +131,19 @@ void DefaultConfigData(CONFIG *conf)
 	conf->joystick_button[5] = 4;
 	conf->joystick_button[6] = 6;
 	conf->joystick_button[7] = 3;
+
+	// Set default key bindings too
+	conf->key_bindings[0] = SDL_SCANCODE_UP;
+	conf->key_bindings[1] = SDL_SCANCODE_DOWN;
+	conf->key_bindings[2] = SDL_SCANCODE_LEFT;
+	conf->key_bindings[3] = SDL_SCANCODE_RIGHT;
+	conf->key_bindings[4] = SDL_SCANCODE_Z;
+	conf->key_bindings[5] = SDL_SCANCODE_X;
+	conf->key_bindings[6] = SDL_SCANCODE_Z;
+	conf->key_bindings[7] = SDL_SCANCODE_X;
+	conf->key_bindings[8] = SDL_SCANCODE_S;
+	conf->key_bindings[9] = SDL_SCANCODE_A;
+	conf->key_bindings[10] = SDL_SCANCODE_Q;
+	conf->key_bindings[11] = SDL_SCANCODE_W;
+	conf->key_bindings[12] = SDL_SCANCODE_ESCAPE;
 }
