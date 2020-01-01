@@ -126,7 +126,7 @@ static int EnterOptionsMenu(const char *title, Option *options, size_t total_opt
 
 			// Draw Quote next to the selected option
 			if (i == selected_option)
-				PutBitmap3(&grcGame, PixelToScreenCoord(x - 20), PixelToScreenCoord(y - 8), &rcMyChar[anime / 10 % 4], SURFACE_ID_MY_CHAR);
+				PutBitmap3(&grcFull, PixelToScreenCoord(x - 20), PixelToScreenCoord(y - 8), &rcMyChar[anime / 10 % 4], SURFACE_ID_MY_CHAR);
 
 			// Draw option name
 			PutText(x, y - (9 / 2), options[i].name, RGB(0xFF, 0xFF, 0xFF));
