@@ -143,7 +143,6 @@ static int Callback_KeyRebind(Option *options, size_t total_options, size_t inde
 {
 	if (!(key & gKeyOk))
 		return -1;
-		printf("Entered\n");
 
 	PlaySoundObject(5, 1);
 
