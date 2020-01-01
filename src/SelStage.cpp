@@ -6,6 +6,7 @@
 
 #include "CommonDefines.h"
 #include "Draw.h"
+#include "Escape.h"
 #include "KeyControl.h"
 #include "Main.h"
 #include "Pause.h"
@@ -170,9 +171,20 @@ int StageSelectLoop(int *p_event)
 	{
 		GetTrg();
 
-		if (gKey & KEY_ESCAPE)
+		if (gKey & KEY_PAUSE)
 		{
 			switch (Call_Pause())
+			{
+				case 0:
+					return 0;
+				case 2:
+					return 2;
+			}
+		}
+
+		if (gKey & KEY_ESCAPE)
+		{
+			switch (Call_Escape())
 			{
 				case 0:
 					return 0;

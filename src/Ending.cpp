@@ -7,6 +7,7 @@
 #include "WindowsWrapper.h"
 
 #include "Draw.h"
+#include "Escape.h"
 #include "Flags.h"
 #include "Generic.h"
 #include "KeyControl.h"
@@ -467,10 +468,21 @@ int Scene_DownIsland(int mode)
 		// Get pressed keys
 		GetTrg();
 
+		if (gKey & KEY_PAUSE)
+		{
+			switch (Call_Pause())
+			{
+				case 0:
+					return 0;
+				case 2:
+					return 2;
+			}
+		}
+
 		// Escape menu
 		if (gKey & 0x8000)
 		{
-			switch (Call_Pause())
+			switch (Call_Escape())
 			{
 				case 0:
 					return 0;

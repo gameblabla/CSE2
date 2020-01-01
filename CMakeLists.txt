@@ -114,6 +114,8 @@ add_executable(CSE2
 	src/Draw.h
 	src/Ending.cpp
 	src/Ending.h
+	src/Escape.cpp
+	src/Escape.h
 	src/Fade.cpp
 	src/Fade.h
 	src/File.cpp

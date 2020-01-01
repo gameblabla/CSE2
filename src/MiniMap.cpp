@@ -6,6 +6,7 @@
 
 #include "CommonDefines.h"
 #include "Draw.h"
+#include "Escape.h"
 #include "KeyControl.h"
 #include "Main.h"
 #include "Map.h"
@@ -92,9 +93,20 @@ int MiniMapLoop(void)
 	{
 		GetTrg();
 
-		if (gKey & KEY_ESCAPE)
+		if (gKey & KEY_PAUSE)
 		{
 			switch (Call_Pause())
+			{
+				case 0:
+					return 0;
+				case 2:
+					return 2;
+			}
+		}
+
+		if (gKey & KEY_ESCAPE)
+		{
+			switch (Call_Escape())
 			{
 				case 0:
 					return 0;
@@ -136,9 +148,20 @@ int MiniMapLoop(void)
 		if (gKeyTrg & (gKeyOk | gKeyCancel))
 			break;
 
-		if (gKey & KEY_ESCAPE)
+		if (gKey & KEY_PAUSE)
 		{
 			switch (Call_Pause())
+			{
+				case 0:
+					return 0;
+				case 2:
+					return 2;
+			}
+		}
+
+		if (gKey & KEY_ESCAPE)
+		{
+			switch (Call_Escape())
 			{
 				case 0:
 					return 0;
@@ -179,9 +202,20 @@ int MiniMapLoop(void)
 	{
 		GetTrg();
 
-		if (gKey & KEY_ESCAPE)
+		if (gKey & KEY_PAUSE)
 		{
 			switch (Call_Pause())
+			{
+				case 0:
+					return 0;
+				case 2:
+					return 2;
+			}
+		}
+
+		if (gKey & KEY_ESCAPE)
+		{
+			switch (Call_Escape())
 			{
 				case 0:
 					return 0;

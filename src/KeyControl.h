@@ -24,7 +24,9 @@ enum KeyBind
 	KEY_OK =        0x00002000,
 	KEY_CANCEL =    0x00004000,
 	//Escape key
-	KEY_ESCAPE =	0x00008000,
+	KEY_ESCAPE =    0x00008000,
+	//Pause key
+	KEY_PAUSE =     0x00010000,
 };
 
 extern long gKey;

@@ -333,72 +333,76 @@ BOOL SystemTask(void)
 		switch (event.type)
 		{
 			case SDL_KEYDOWN:
-				if (event.key.keysym.scancode == gScancodePause)
+				if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
 					gKey |= KEY_ESCAPE;
-				if (event.key.keysym.scancode == gScancodeMap)
-						gKey |= KEY_MAP;
-				if (event.key.keysym.scancode == gScancodeLeft)
-						gKey |= KEY_LEFT;
-				if (event.key.keysym.scancode == gScancodeRight)
-						gKey |= KEY_RIGHT;
-				if (event.key.keysym.scancode == gScancodeUp)
-						gKey |= KEY_UP;
-				if (event.key.keysym.scancode == gScancodeDown)
-						gKey |= KEY_DOWN;
-				if (event.key.keysym.scancode == gScancodeShot)
-						gKey |= KEY_SHOT;
-				if (event.key.keysym.scancode == gScancodeJump)
-						gKey |= KEY_JUMP;
-				if (event.key.keysym.scancode == gScancodeArms)
-						gKey |= KEY_ARMS;
-				if (event.key.keysym.scancode == gScancodeArmsRev)
-						gKey |= KEY_ARMSREV;
 				if (event.key.keysym.scancode == SDL_SCANCODE_F1)
-						gKey |= KEY_F1;
+					gKey |= KEY_F1;
 				if (event.key.keysym.scancode == SDL_SCANCODE_F2)
-						gKey |= KEY_F2;
+					gKey |= KEY_F2;
+				if (event.key.keysym.scancode == gScancodeMap)
+					gKey |= KEY_MAP;
+				if (event.key.keysym.scancode == gScancodeLeft)
+					gKey |= KEY_LEFT;
+				if (event.key.keysym.scancode == gScancodeRight)
+					gKey |= KEY_RIGHT;
+				if (event.key.keysym.scancode == gScancodeUp)
+					gKey |= KEY_UP;
+				if (event.key.keysym.scancode == gScancodeDown)
+					gKey |= KEY_DOWN;
+				if (event.key.keysym.scancode == gScancodeShot)
+					gKey |= KEY_SHOT;
+				if (event.key.keysym.scancode == gScancodeJump)
+					gKey |= KEY_JUMP;
+				if (event.key.keysym.scancode == gScancodeArms)
+					gKey |= KEY_ARMS;
+				if (event.key.keysym.scancode == gScancodeArmsRev)
+					gKey |= KEY_ARMSREV;
 				if (event.key.keysym.scancode == gScancodeItem)
-						gKey |= KEY_ITEM;
+					gKey |= KEY_ITEM;
 				if (event.key.keysym.scancode == SDL_SCANCODE_F5)
-						gbUseJoystick = FALSE;
+					gbUseJoystick = FALSE;
 				if (event.key.keysym.scancode == gScancodeCancel)
-						gKey |= KEY_CANCEL;
+					gKey |= KEY_CANCEL;
 				if (event.key.keysym.scancode == gScancodeOk)
-						gKey |= KEY_OK;
+					gKey |= KEY_OK;
+				if (event.key.keysym.scancode == gScancodePause)
+					gKey |= KEY_PAUSE;
 
 				break;
 
 			case SDL_KEYUP:
-				if (event.key.keysym.scancode == gScancodePause)
-						gKey &= ~KEY_ESCAPE;
-				if (event.key.keysym.scancode == gScancodeMap)
-						gKey &= ~KEY_MAP;
-				if (event.key.keysym.scancode == gScancodeLeft)
-						gKey &= ~KEY_LEFT;
-				if (event.key.keysym.scancode == gScancodeRight)
-						gKey &= ~KEY_RIGHT;
-				if (event.key.keysym.scancode == gScancodeUp)
-						gKey &= ~KEY_UP;
-				if (event.key.keysym.scancode == gScancodeDown)
-						gKey &= ~KEY_DOWN;
-				if (event.key.keysym.scancode == gScancodeShot)
-						gKey &= ~KEY_SHOT;
-				if (event.key.keysym.scancode == gScancodeJump)
-						gKey &= ~KEY_JUMP;
-				if (event.key.keysym.scancode == gScancodeArms)
-						gKey &= ~KEY_ARMS;
-				if (event.key.keysym.scancode == gScancodeArmsRev)
-						gKey &= ~KEY_ARMSREV;
+				if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
+					gKey &= ~KEY_ESCAPE;
 				if (event.key.keysym.scancode == SDL_SCANCODE_F1)
-						gKey &= ~KEY_F1;
+					gKey &= ~KEY_F1;
 				if (event.key.keysym.scancode == SDL_SCANCODE_F2)
-						gKey &= ~KEY_F2;
+					gKey &= ~KEY_F2;
+				if (event.key.keysym.scancode == gScancodeMap)
+					gKey &= ~KEY_MAP;
+				if (event.key.keysym.scancode == gScancodeLeft)
+					gKey &= ~KEY_LEFT;
+				if (event.key.keysym.scancode == gScancodeRight)
+					gKey &= ~KEY_RIGHT;
+				if (event.key.keysym.scancode == gScancodeUp)
+					gKey &= ~KEY_UP;
+				if (event.key.keysym.scancode == gScancodeDown)
+					gKey &= ~KEY_DOWN;
+				if (event.key.keysym.scancode == gScancodeShot)
+					gKey &= ~KEY_SHOT;
+				if (event.key.keysym.scancode == gScancodeJump)
+					gKey &= ~KEY_JUMP;
+				if (event.key.keysym.scancode == gScancodeArms)
+					gKey &= ~KEY_ARMS;
+				if (event.key.keysym.scancode == gScancodeArmsRev)
+					gKey &= ~KEY_ARMSREV;
 				if (event.key.keysym.scancode == gScancodeItem)
-						gKey &= ~KEY_ITEM;
+					gKey &= ~KEY_ITEM;
 				if (event.key.keysym.scancode == gScancodeCancel)
-						gKey &= ~KEY_CANCEL;
+					gKey &= ~KEY_CANCEL;
 				if (event.key.keysym.scancode == gScancodeOk)
-						gKey &= ~KEY_OK;
+					gKey &= ~KEY_OK;
+				if (event.key.keysym.scancode == gScancodePause)
+					gKey &= ~KEY_PAUSE;
 
 				break;
 
