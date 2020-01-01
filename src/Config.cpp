@@ -11,7 +11,7 @@
 #include "Tags.h"
 
 static const char* const config_filename = "Config.dat";	// Not the original name
-static const char* const config_magic = "CSE2E   20191225";	// Not the original name
+static const char* const config_magic = "CSE2E   20200101";	// Not the original name
 
 BOOL LoadConfigData(CONFIG *conf)
 {
