@@ -30,6 +30,7 @@ typedef struct Control
 	const char *name;
 	int *scancode;
 	int groups;
+	char bound_name[20];
 } Control;
 
 static CONFIG conf;
@@ -41,7 +42,7 @@ static const RECT rcMyChar[4] = {
 	{32, 16, 48, 32},
 };
 
-static const Control controls[] = {
+static Control controls[] = {
 	{"Up", &gScancodeUp, (1 << 0) | (1 << 1)},
 	{"Down", &gScancodeDown, (1 << 0) | (1 << 1)},
 	{"Left", &gScancodeLeft, (1 << 0) | (1 << 1)},
@@ -177,11 +178,8 @@ static int Callback_KeyRebind(Option *options, size_t total_options, size_t sele
 						conf.key_bindings[other_option] = options[other_option].value;
 						conf.key_bindings[selected_option] = options[selected_option].value;
 
-						free((char*)options[other_option].attribute);
-						options[other_option].attribute = options[selected_option].attribute;
-
-						options[selected_option].attribute = (char*)malloc(strlen(key_name));
-						strcpy((char*)options[selected_option].attribute, key_name);
+						memcpy(controls[other_option].bound_name, controls[selected_option].bound_name, sizeof(controls[0].bound_name));
+						strncpy(controls[selected_option].bound_name, key_name, sizeof(controls[0].bound_name) - 1);
 
 						PlaySoundObject(18, 1);
 						free(old_state);
@@ -192,10 +190,7 @@ static int Callback_KeyRebind(Option *options, size_t total_options, size_t sele
 				}
 
 				// Otherwise just overwrite the selected key
-				free((char*)options[selected_option].attribute);
-
-				options[selected_option].attribute = (char*)malloc(strlen(key_name));
-				strcpy((char*)options[selected_option].attribute, key_name);
+				strncpy(controls[selected_option].bound_name, key_name, sizeof(controls[0].bound_name) - 1);
 
 				options[selected_option].value = scancode;
 				*controls[(size_t)options[selected_option].user_data].scancode = options[selected_option].value;
@@ -244,19 +239,15 @@ static int Callback_Controls(Option *options, size_t total_options, size_t selec
 		submenu_options[i].name = controls[i].name;
 		submenu_options[i].callback = Callback_KeyRebind;
 		submenu_options[i].user_data = (void*)i;
+		submenu_options[i].attribute = controls[i].bound_name;
 		submenu_options[i].value = conf.key_bindings[i];
 
-		const char *key_name = SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)submenu_options[i].value));
-		submenu_options[i].attribute = (char*)malloc(strlen(key_name));
-		strcpy((char*)submenu_options[i].attribute, key_name);
+		strncpy(controls[i].bound_name, SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)submenu_options[i].value)), sizeof(controls[0].bound_name) - 1);
 	}
 
 	PlaySoundObject(5, 1);
 
 	const int return_value = EnterOptionsMenu(submenu_options, sizeof(submenu_options) / sizeof(submenu_options[0]), -80, TRUE);
-
-	for (size_t i = 0; i < sizeof(submenu_options) / sizeof(submenu_options[0]); ++i)
-		free((char*)submenu_options[i].attribute);
 
 	PlaySoundObject(5, 1);
 
