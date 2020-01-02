@@ -171,8 +171,8 @@ static Control controls[] = {
 	{"Cancel", &gScancodeCancel, 1 << 1},
 	{"Jump", &gScancodeJump, 1 << 0},
 	{"Shoot", &gScancodeShot, 1 << 0},
-	{"Previous weapon", &gScancodeArmsRev, 1 << 0},
 	{"Next weapon", &gScancodeArms, 1 << 0},
+	{"Previous weapon", &gScancodeArmsRev, 1 << 0},
 	{"Inventory", &gScancodeItem, 1 << 0},
 	{"Map", &gScancodeMap, 1 << 0},
 	{"Pause", &gScancodePause, 1 << 0}
