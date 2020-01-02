@@ -64,7 +64,7 @@ static int EnterOptionsMenu(const char *title, Option *options, size_t total_opt
 		// Allow unpausing by pressing the pause button only when in the main pause menu (not submenus)
 		if (!submenu && gKeyTrg & KEY_PAUSE)
 		{
-			return_value = -2;
+			return_value = 1;
 			break;
 		}
 
@@ -147,7 +147,7 @@ static int EnterOptionsMenu(const char *title, Option *options, size_t total_opt
 	}
 
 	// Filter internal return values to something Cave Story can understand
-	if (!submenu && (return_value == -1 || return_value == -2))
+	if (!submenu && return_value == -1)
 		return_value = 1;
 
 	return return_value;
