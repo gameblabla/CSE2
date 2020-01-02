@@ -205,14 +205,11 @@ static int Callback_KeyRebind(Option *options, size_t total_options, size_t sele
 				{
 					if (other_option != selected_option && controls[other_option].groups & controls[selected_option].groups && options[other_option].value == scancode)
 					{
-						options[other_option].value = options[selected_option].value;
-						options[selected_option].value = scancode;
+						*controls[other_option].scancode = *controls[selected_option].scancode;
+						*controls[selected_option].scancode = scancode;
 
-						*controls[(size_t)options[other_option].user_data].scancode = options[other_option].value;
-						*controls[(size_t)options[selected_option].user_data].scancode = options[selected_option].value;
-
-						conf.key_bindings[other_option] = options[other_option].value;
-						conf.key_bindings[selected_option] = options[selected_option].value;
+						conf.key_bindings[other_option] = *controls[other_option].scancode;
+						conf.key_bindings[selected_option] = *controls[selected_option].scancode;
 
 						memcpy(controls[other_option].bound_name, controls[selected_option].bound_name, sizeof(controls[0].bound_name));
 						strncpy(controls[selected_option].bound_name, key_name, sizeof(controls[0].bound_name) - 1);
@@ -228,9 +225,8 @@ static int Callback_KeyRebind(Option *options, size_t total_options, size_t sele
 				// Otherwise just overwrite the selected key
 				strncpy(controls[selected_option].bound_name, key_name, sizeof(controls[0].bound_name) - 1);
 
-				options[selected_option].value = scancode;
-				*controls[(size_t)options[selected_option].user_data].scancode = options[selected_option].value;
-				conf.key_bindings[selected_option] = options[selected_option].value;
+				*controls[selected_option].scancode = scancode;
+				conf.key_bindings[selected_option] = *controls[selected_option].scancode;
 
 				PlaySoundObject(18, 1);
 				free(old_state);
@@ -260,10 +256,6 @@ static int Callback_KeyRebind(Option *options, size_t total_options, size_t sele
 	}
 }
 
-/********************
- * Options menu
- ********************/
-
 static int Callback_Controls(Option *options, size_t total_options, size_t selected_option, long key)
 {
 	(void)options;
@@ -279,11 +271,9 @@ static int Callback_Controls(Option *options, size_t total_options, size_t selec
 	{
 		submenu_options[i].name = controls[i].name;
 		submenu_options[i].callback = Callback_KeyRebind;
-		submenu_options[i].user_data = (void*)i;
 		submenu_options[i].attribute = controls[i].bound_name;
-		submenu_options[i].value = conf.key_bindings[i];
 
-		strncpy(controls[i].bound_name, SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)submenu_options[i].value)), sizeof(controls[0].bound_name) - 1);
+		strncpy(controls[i].bound_name, SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)*controls[i].scancode)), sizeof(controls[0].bound_name) - 1);
 	}
 
 	PlaySoundObject(5, 1);
@@ -294,6 +284,10 @@ static int Callback_Controls(Option *options, size_t total_options, size_t selec
 
 	return return_value;
 }
+
+/********************
+ * Options menu
+ ********************/
 
 static int Callback_Framerate(Option *options, size_t total_options, size_t selected_option, long key)
 {
@@ -346,36 +340,6 @@ static int Callback_Resolution(Option *options, size_t total_options, size_t sel
 
 	PlaySoundObject(SND_SWITCH_WEAPON, 1);
 	return -1;
-}
-
-/********************
- * Pause menu
- ********************/
-
-static int Callback_Resume(Option *options, size_t total_options, size_t selected_option, long key)
-{
-	(void)options;
-	(void)total_options;
-	(void)selected_option;
-
-	if (!(key & gKeyOk))
-		return -1;
-
-	PlaySoundObject(18, 1);
-	return 1;
-}
-
-static int Callback_Reset(Option *options, size_t total_options, size_t selected_option, long key)
-{
-	(void)options;
-	(void)total_options;
-	(void)selected_option;
-
-	if (!(key & gKeyOk))
-		return -1;
-
-	PlaySoundObject(18, 1);
-	return 2;
 }
 
 static int Callback_Options(Option *options, size_t total_options, size_t selected_option, long key)
@@ -440,6 +404,36 @@ static int Callback_Options(Option *options, size_t total_options, size_t select
 	SaveConfigData(&conf);
 
 	return return_value;
+}
+
+/********************
+ * Pause menu
+ ********************/
+
+static int Callback_Resume(Option *options, size_t total_options, size_t selected_option, long key)
+{
+	(void)options;
+	(void)total_options;
+	(void)selected_option;
+
+	if (!(key & gKeyOk))
+		return -1;
+
+	PlaySoundObject(18, 1);
+	return 1;
+}
+
+static int Callback_Reset(Option *options, size_t total_options, size_t selected_option, long key)
+{
+	(void)options;
+	(void)total_options;
+	(void)selected_option;
+
+	if (!(key & gKeyOk))
+		return -1;
+
+	PlaySoundObject(18, 1);
+	return 2;
 }
 
 static int Callback_Quit(Option *options, size_t total_options, size_t selected_option, long key)
