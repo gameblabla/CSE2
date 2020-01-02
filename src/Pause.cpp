@@ -205,11 +205,8 @@ static int Callback_KeyRebind(Option *options, size_t total_options, size_t sele
 				{
 					if (other_option != selected_option && controls[other_option].groups & controls[selected_option].groups && options[other_option].value == scancode)
 					{
-						*controls[other_option].scancode = *controls[selected_option].scancode;
-						*controls[selected_option].scancode = scancode;
-
-						conf.key_bindings[other_option] = *controls[other_option].scancode;
-						conf.key_bindings[selected_option] = *controls[selected_option].scancode;
+						conf.key_bindings[other_option] = *controls[other_option].scancode = *controls[selected_option].scancode;
+						conf.key_bindings[selected_option] = *controls[selected_option].scancode = scancode;
 
 						memcpy(controls[other_option].bound_name, controls[selected_option].bound_name, sizeof(controls[0].bound_name));
 						strncpy(controls[selected_option].bound_name, key_name, sizeof(controls[0].bound_name) - 1);
@@ -225,8 +222,7 @@ static int Callback_KeyRebind(Option *options, size_t total_options, size_t sele
 				// Otherwise just overwrite the selected key
 				strncpy(controls[selected_option].bound_name, key_name, sizeof(controls[0].bound_name) - 1);
 
-				*controls[selected_option].scancode = scancode;
-				conf.key_bindings[selected_option] = *controls[selected_option].scancode;
+				conf.key_bindings[selected_option] = *controls[selected_option].scancode = scancode;
 
 				PlaySoundObject(18, 1);
 				free(old_state);
