@@ -383,7 +383,7 @@ static int Callback_ControlsController(Option *options, size_t total_options, si
 
 	PlaySoundObject(5, 1);
 
-	const int return_value = EnterOptionsMenu("CONTROLS (CONTROLLER)", submenu_options, sizeof(submenu_options) / sizeof(submenu_options[0]), -70, TRUE);
+	const int return_value = EnterOptionsMenu("CONTROLS (GAMEPAD)", submenu_options, sizeof(submenu_options) / sizeof(submenu_options[0]), -70, TRUE);
 
 	PlaySoundObject(5, 1);
 
@@ -458,7 +458,7 @@ static int Callback_Options(Option *options, size_t total_options, size_t select
 
 	Option submenu_options[] = {
 		{"Controls (keyboard)", Callback_ControlsKeyboard},
-		{"Controls (controller)", Callback_ControlsController},
+		{"Controls (gamepad)", Callback_ControlsController},
 		{"Framerate", Callback_Framerate},
 		{"V-sync", Callback_Vsync},
 		{"Resolution", Callback_Resolution}
