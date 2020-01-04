@@ -382,7 +382,7 @@ void PutMyAir(int x, int y)
 		{112, 80, 144, 88},
 	};
 
-	if (gPHYArray[16])
+	if (gMC.no_splash_or_air_limit_underwater)
 		return;
 
 	if (gMC.equip & 0x10)

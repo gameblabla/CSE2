@@ -5,6 +5,18 @@
 // TODO - When I add bitmask constants for gMC.flags...
 // 0x100 is a 'player is underwater' flag
 
+typedef struct MYCHAR_PHYSICS
+{
+	int max_dash;
+	int max_move;
+	int gravity1;
+	int gravity2;
+	int dash1;
+	int dash2;
+	int resist;
+	int jump;
+} MYCHAR_PHYSICS;
+
 struct MYCHAR
 {
 	unsigned char cond;
@@ -59,6 +71,10 @@ struct MYCHAR
 	signed char ques;   // Same for this variable as well
 	signed char boost_sw;
 	int boost_cnt;
+	// Custom
+	MYCHAR_PHYSICS physics_normal;
+	MYCHAR_PHYSICS physics_underwater;
+	int no_splash_or_air_limit_underwater; // Determines whether the behaviours in which entering water causes a splash, being in water draws the air timer and being in water decreases your air are enabled (0 means it's enabled, non-0 means it's disabled)
 };
 
 extern MYCHAR gMC;

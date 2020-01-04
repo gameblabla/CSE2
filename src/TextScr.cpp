@@ -55,28 +55,6 @@ static unsigned long nod_color;
 
 unsigned int gMIMCurrentNum = 0;
 
-// This is initialized with the values the game uses in vanilla
-int gPHYArray[17] =
-{
-	0x32C,	// Default value for max_dash normally
-	0x5FF,	// Default value for max_move normally
-	0x50,	// Default value for gravity1 normally
-	0x20,	// Default value for gravity2 normally
-	0x55,	// Default value for dash1 normally
-	0x20,	// Default value for dash2 normally
-	0x33,	// Default value for resist normally
-	0x500,	// Default value for jump normally
-	0x196,	// Default value for max_dash underwater
-	0x2FF,	// Default value for max_move underwater
-	0x28,	// Default value for gravity1 underwater
-	0x10,	// Default value for gravity2 underwater
-	0x2A,	// Default value for dash1 underwater
-	0x10,	// Default value for dash2 underwater
-	0x19,	// Default value for resist underwater
-	0x280,	// Default value for jump underwater
-	0,	// Actually a boolean. This enables normal water behaviour, as in vanilla
-};
-
 // Initialize and end tsc
 BOOL InitTextScript2(void)
 {
@@ -711,11 +689,80 @@ int TextScriptProc(void)
 					}
 					else if (IS_COMMAND('P','H','Y'))
 					{
-						y = GetTextScriptNo(gTS.p_read + 4);
-						if (y < 17)
+						x = GetTextScriptNo(gTS.p_read + 4);
+						y = GetTextScriptNo(gTS.p_read + 9);
+
+						switch (x)
 						{
-							gPHYArray[y] = GetTextScriptNo(gTS.p_read + 9);
+							case 0:
+								gMC.physics_normal.max_dash = y;
+								break;
+
+							case 1:
+								gMC.physics_normal.max_move = y;
+								break;
+
+							case 2:
+								gMC.physics_normal.gravity1 = y;
+								break;
+
+							case 3:
+								gMC.physics_normal.gravity2 = y;
+								break;
+
+							case 4:
+								gMC.physics_normal.dash1 = y;
+								break;
+
+							case 5:
+								gMC.physics_normal.dash2 = y;
+								break;
+
+							case 6:
+								gMC.physics_normal.resist = y;
+								break;
+
+							case 7:
+								gMC.physics_normal.jump = y;
+								break;
+
+							case 8:
+								gMC.physics_underwater.max_dash = y;
+								break;
+
+							case 9:
+								gMC.physics_underwater.max_move = y;
+								break;
+
+							case 10:
+								gMC.physics_underwater.gravity1 = y;
+								break;
+
+							case 11:
+								gMC.physics_underwater.gravity2 = y;
+								break;
+
+							case 12:
+								gMC.physics_underwater.dash1 = y;
+								break;
+
+							case 13:
+								gMC.physics_underwater.dash2 = y;
+								break;
+
+							case 14:
+								gMC.physics_underwater.resist = y;
+								break;
+
+							case 15:
+								gMC.physics_underwater.jump = y;
+								break;
+
+							case 16:
+								gMC.no_splash_or_air_limit_underwater = y;
+								break;
 						}
+
 						gTS.p_read += 13;
 					}
 					else if (IS_COMMAND('T','A','M'))

@@ -41,6 +41,27 @@ void InitMyChar(void)
 	gMC.life = 3;
 	gMC.max_life = 3;
 	gMC.unit = 0;
+
+	// This is initialized with the values the game uses in vanilla
+	gMC.physics_normal.max_dash = 0x32C;
+	gMC.physics_normal.max_move = 0x5FF;
+	gMC.physics_normal.gravity1 = 0x50;
+	gMC.physics_normal.gravity2 = 0x20;
+	gMC.physics_normal.dash1 = 0x55;
+	gMC.physics_normal.dash2 = 0x20;
+	gMC.physics_normal.resist = 0x33;
+	gMC.physics_normal.jump = 0x500;
+
+	gMC.physics_underwater.max_dash = 0x196;
+	gMC.physics_underwater.max_move = 0x2FF;
+	gMC.physics_underwater.gravity1 = 0x28;
+	gMC.physics_underwater.gravity2 = 0x10;
+	gMC.physics_underwater.dash1 = 0x2A;
+	gMC.physics_underwater.dash2 = 0x10;
+	gMC.physics_underwater.resist = 0x19;
+	gMC.physics_underwater.jump = 0x280;
+
+	gMC.no_splash_or_air_limit_underwater = 0;
 }
 
 void AnimationMyChar(BOOL bKey)
@@ -248,7 +269,7 @@ void PutMyChar(int fx, int fy)
 void ActMyChar_Normal(BOOL bKey)
 {
 	// Get speeds and accelerations
-	int max_move;	// Unused
+	int max_move;
 	int max_dash;
 	int gravity1;
 	int gravity2;
@@ -260,23 +281,19 @@ void ActMyChar_Normal(BOOL bKey)
 	int a;
 	int x;
 
+	MYCHAR_PHYSICS *physics;
+
 	if (gMC.cond & 2)
 		return;
 
-	int *currentPhysics;
-	if (gMC.flag & 0x100)
-		currentPhysics = &gPHYArray[8];	// Underwater
-	else
-		currentPhysics = &gPHYArray[0];	// Normal conditions
-
-	max_dash = currentPhysics[0];
-	max_move = currentPhysics[1];
-	gravity1 = currentPhysics[2];
-	gravity2 = currentPhysics[3];
-	dash1 = currentPhysics[4];
-	dash2 = currentPhysics[5];
-	resist = currentPhysics[6];
-	jump = currentPhysics[7];
+	physics = (gMC.flag & 0x100) ? &gMC.physics_underwater : &gMC.physics_normal;
+	max_dash = physics->max_dash;
+	gravity1 = physics->gravity1;
+	gravity2 = physics->gravity2;
+	dash1 = physics->dash1;
+	dash2 = physics->dash2;
+	resist = physics->resist;
+	jump = physics->jump;
 
 	// Don't create "?" effect
 	gMC.ques = FALSE;
@@ -574,24 +591,23 @@ void ActMyChar_Normal(BOOL bKey)
 	}
 
 	// Limit speed
-	int speedLimit;
-	if ((!(gMC.flag & 0x100) || gMC.flag & (0x8000 | 0x4000 | 0x2000 | 0x1000)))
-		speedLimit = gPHYArray[1];	// Normal conditions
+	if (gMC.flag & 0x100 && !(gMC.flag & (0x8000 | 0x4000 | 0x2000 | 0x1000)))
+		max_move = gMC.physics_underwater.max_move;	// Underwater or in wind
 	else
-		speedLimit = gPHYArray[9];	// Underwater or in wind
+		max_move = gMC.physics_normal.max_move;	// Normal conditions
 
-	if (gMC.xm < -speedLimit)
-		gMC.xm = -speedLimit;
-	if (gMC.ym < -speedLimit)
-		gMC.ym = -speedLimit;
+	if (gMC.xm < -max_move)
+		gMC.xm = -max_move;
+	if (gMC.ym < -max_move)
+		gMC.ym = -max_move;
 
-	if (gMC.xm > speedLimit)
-		gMC.xm = speedLimit;
-	if (gMC.ym > speedLimit)
-		gMC.ym = speedLimit;
+	if (gMC.xm > max_move)
+		gMC.xm = max_move;
+	if (gMC.ym > max_move)
+		gMC.ym = max_move;
 
 	// Water splashing
-	if (!gPHYArray[16] && !gMC.sprash && gMC.flag & 0x100)
+	if (!gMC.no_splash_or_air_limit_underwater && !gMC.sprash && gMC.flag & 0x100)
 	{
 		int dir;
 
@@ -809,7 +825,7 @@ void AirProcess(void)
 	}
 	else
 	{
-		if (!(gMC.flag & 0x100) || gPHYArray[16])
+		if (!(gMC.flag & 0x100) || gMC.no_splash_or_air_limit_underwater)
 		{
 			gMC.air = 1000;
 		}
