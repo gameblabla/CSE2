@@ -195,7 +195,7 @@ static int Callback_InputRebindKeyboard(Option *options, size_t total_options, s
 	char timeout_string[2];
 	timeout_string[1] = '\0';
 
-	for (unsigned int timeout = 60 * 5; timeout != 0; --timeout)
+	for (unsigned int timeout = (60 * 5) - 1; timeout != 0; --timeout)
 	{
 		for (int scancode = 0; scancode < total_keys; ++scancode)
 		{
@@ -303,7 +303,7 @@ static int Callback_InputRebindController(Option *options, size_t total_options,
 	char timeout_string[2];
 	timeout_string[1] = '\0';
 
-	for (unsigned int timeout = 60 * 5; timeout != 0; --timeout)
+	for (unsigned int timeout = (60 * 5) - 1; timeout != 0; --timeout)
 	{
 		JOYSTICK_STATUS state;
 		memset(&state, 0, sizeof(JOYSTICK_STATUS));
