@@ -249,7 +249,7 @@ static BOOL ScaleAndUploadSurface(SDL_Surface *surface, SurfaceID surf_no)
 			}
 
 			for (int i = 1; i < magnification_scaled; ++i)
-				memcpy(dst_row + i * pitch, dst_row, converted_surface->w * magnification * 4);
+				memcpy(dst_row + i * pitch, dst_row, converted_surface->w * magnification_scaled * 4);
 		}
 	}
 
