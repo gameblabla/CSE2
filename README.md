@@ -39,6 +39,7 @@ Also included are enhancements specifically for modders:
 * Extra TSC commands (TODO: link docs for these and the Creepy Curly NPC)
   * <MS4
   * <MIM
+  * <PHY
 * "Creepy Curly" NPC (will likely be removed in the future)
 
 ![Screenshot](screenshot.png)
