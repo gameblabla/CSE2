@@ -178,7 +178,7 @@ static const Control controls[] = {
 
 static char bound_name_buffers[sizeof(controls) / sizeof(controls[0])][20];
 
-static int Callback_InputRebindKeyboard(Option *options, size_t total_options, size_t selected_option, long key)
+static int Callback_ControlsKeyboard_Rebind(Option *options, size_t total_options, size_t selected_option, long key)
 {
 	if (!(key & gKeyOk))
 		return -1;
@@ -274,7 +274,7 @@ static int Callback_ControlsKeyboard(Option *options, size_t total_options, size
 	for (size_t i = 0; i < sizeof(controls) / sizeof(controls[0]); ++i)
 	{
 		submenu_options[i].name = controls[i].name;
-		submenu_options[i].callback = Callback_InputRebindKeyboard;
+		submenu_options[i].callback = Callback_ControlsKeyboard_Rebind;
 		submenu_options[i].attribute = bound_name_buffers[i];
 
 		strncpy(bound_name_buffers[i], SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)bindings[controls[i].binding_index].keyboard)), sizeof(bound_name_buffers[0]) - 1);
@@ -289,7 +289,7 @@ static int Callback_ControlsKeyboard(Option *options, size_t total_options, size
 	return return_value;
 }
 
-static int Callback_InputRebindController(Option *options, size_t total_options, size_t selected_option, long key)
+static int Callback_ControlsController_Rebind(Option *options, size_t total_options, size_t selected_option, long key)
 {
 	if (!(key & gKeyOk))
 		return -1;
@@ -383,7 +383,7 @@ static int Callback_ControlsController(Option *options, size_t total_options, si
 	for (size_t i = 0; i < sizeof(controls) / sizeof(controls[0]); ++i)
 	{
 		submenu_options[i].name = controls[i].name;
-		submenu_options[i].callback = Callback_InputRebindController;
+		submenu_options[i].callback = Callback_ControlsController_Rebind;
 		submenu_options[i].attribute = bound_name_buffers[i];
 
 		snprintf(bound_name_buffers[i], sizeof(bound_name_buffers[0]), "Button %d", bindings[controls[i].binding_index].controller);
