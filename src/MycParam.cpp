@@ -382,6 +382,9 @@ void PutMyAir(int x, int y)
 		{112, 80, 144, 88},
 	};
 
+	if (gPHYArray[16])
+		return;
+
 	if (gMC.equip & 0x10)
 		return;
 

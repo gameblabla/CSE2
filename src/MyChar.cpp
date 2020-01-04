@@ -263,28 +263,20 @@ void ActMyChar_Normal(BOOL bKey)
 	if (gMC.cond & 2)
 		return;
 
+	int *currentPhysics;
 	if (gMC.flag & 0x100)
-	{
-		max_dash = 0x196;
-		max_move = 0x2FF;
-		gravity1 = 0x28;
-		gravity2 = 0x10;
-		jump = 0x280;
-		dash1 = 0x2A;
-		dash2 = 0x10;
-		resist = 0x19;
-	}
+		currentPhysics = &gPHYArray[8];	// Underwater
 	else
-	{
-		max_dash = 0x32C;
-		max_move = 0x5FF;
-		gravity1 = 0x50;
-		gravity2 = 0x20;
-		jump = 0x500;
-		dash1 = 0x55;
-		dash2 = 0x20;
-		resist = 0x33;
-	}
+		currentPhysics = &gPHYArray[0];	// Normal conditions
+
+	max_dash = currentPhysics[0];
+	max_move = currentPhysics[1];
+	gravity1 = currentPhysics[2];
+	gravity2 = currentPhysics[3];
+	dash1 = currentPhysics[4];
+	dash2 = currentPhysics[5];
+	resist = currentPhysics[6];
+	jump = currentPhysics[7];
 
 	// Don't create "?" effect
 	gMC.ques = FALSE;
@@ -582,31 +574,24 @@ void ActMyChar_Normal(BOOL bKey)
 	}
 
 	// Limit speed
-	if (gMC.flag & 0x100 && !(gMC.flag & 0xF000))
-	{
-		if (gMC.xm < -0x2FF)
-			gMC.xm = -0x2FF;
-		if (gMC.xm > 0x2FF)
-			gMC.xm = 0x2FF;
-		if (gMC.ym < -0x2FF)
-			gMC.ym = -0x2FF;
-		if (gMC.ym > 0x2FF)
-			gMC.ym = 0x2FF;
-	}
+	int speedLimit;
+	if ((!(gMC.flag & 0x100) || gMC.flag & (0x8000 | 0x4000 | 0x2000 | 0x1000)))
+		speedLimit = gPHYArray[1];	// Normal conditions
 	else
-	{
-		if (gMC.xm < -0x5FF)
-			gMC.xm = -0x5FF;
-		if (gMC.xm > 0x5FF)
-			gMC.xm = 0x5FF;
-		if (gMC.ym < -0x5FF)
-			gMC.ym = -0x5FF;
-		if (gMC.ym > 0x5FF)
-			gMC.ym = 0x5FF;
-	}
+		speedLimit = gPHYArray[9];	// Underwater or in wind
+
+	if (gMC.xm < -speedLimit)
+		gMC.xm = -speedLimit;
+	if (gMC.ym < -speedLimit)
+		gMC.ym = -speedLimit;
+
+	if (gMC.xm > speedLimit)
+		gMC.xm = speedLimit;
+	if (gMC.ym > speedLimit)
+		gMC.ym = speedLimit;
 
 	// Water splashing
-	if (!gMC.sprash && gMC.flag & 0x100)
+	if (!gPHYArray[16] && !gMC.sprash && gMC.flag & 0x100)
 	{
 		int dir;
 
@@ -824,7 +809,7 @@ void AirProcess(void)
 	}
 	else
 	{
-		if (!(gMC.flag & 0x100))
+		if (!(gMC.flag & 0x100) || gPHYArray[16])
 		{
 			gMC.air = 1000;
 		}
