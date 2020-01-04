@@ -191,6 +191,10 @@ static int Callback_InputRebindKeyboard(Option *options, size_t total_options, s
 
 	memcpy(old_state, state, total_keys);
 
+	unsigned int timeout = 60 * 5;
+	char timeout_string[2];
+	timeout_string[1] = '\0';
+
 	for (;;)
 	{
 		for (int scancode = 0; scancode < total_keys; ++scancode)
@@ -239,6 +243,12 @@ static int Callback_InputRebindKeyboard(Option *options, size_t total_options, s
 		const char *string = "Press a key to bind to this action:";
 		PutText((WINDOW_WIDTH / 2) - ((strlen(string) * 5) / 2), (WINDOW_HEIGHT / 2) - 10, string, RGB(0xFF, 0xFF, 0xFF));
 		PutText((WINDOW_WIDTH / 2) - ((strlen(options[selected_option].name) * 5) / 2), (WINDOW_HEIGHT / 2) + 10, options[selected_option].name, RGB(0xFF, 0xFF, 0xFF));
+
+		if (--timeout == 0)
+			return -1;
+
+		timeout_string[0] = '0' + (timeout / 60) + 1;
+		PutText((WINDOW_WIDTH / 2) - (5 / 2), (WINDOW_HEIGHT / 2) + 60, timeout_string, RGB(0xFF, 0xFF, 0xFF));
 
 		PutFramePerSecound();
 
@@ -289,23 +299,22 @@ static int Callback_InputRebindController(Option *options, size_t total_options,
 
 	JOYSTICK_STATUS old_state;
 	memset(&old_state, 0, sizeof(JOYSTICK_STATUS));
-	if (!GetJoystickStatus(&old_state))
-		printf("Very bad\n");
+	GetJoystickStatus(&old_state);
+
+	unsigned int timeout = 60 * 5;
+	char timeout_string[2];
+	timeout_string[1] = '\0';
 
 	for (;;)
 	{
 		JOYSTICK_STATUS state;
 		memset(&state, 0, sizeof(JOYSTICK_STATUS));
-		if (!GetJoystickStatus(&state))
-			printf("Very bad\n");
+		GetJoystickStatus(&state);
 
 		for (int button = 0; button < MAX_JOYSTICK_BUTTONS; ++button)
 		{
-//			printf("Button %d = new %d = old %d\n", button, state.bButton[button], old_state.bButton[button]);
 			if (!old_state.bButton[button] && state.bButton[button])
 			{
-		//		const char *key_name = SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)scancode));
-
 				// If another key in the game group uses this key, swap them
 				for (size_t other_option = 0; other_option < total_options; ++other_option)
 				{
@@ -318,7 +327,6 @@ static int Callback_InputRebindController(Option *options, size_t total_options,
 						snprintf(controls[selected_option].bound_name, sizeof(controls[0].bound_name), "Button %d", button);
 
 						PlaySoundObject(18, 1);
-						//free(old_state);
 
 						gKeyTrg = gKey = 0;	// Prevent weird key-ghosting by doing this
 						return -1;
@@ -327,14 +335,12 @@ static int Callback_InputRebindController(Option *options, size_t total_options,
 
 				// Otherwise just overwrite the selected key
 				snprintf(controls[selected_option].bound_name, sizeof(controls[0].bound_name), "Button %d", button);
-//				strncpy(controls[selected_option].bound_name, key_name, sizeof(controls[0].bound_name) - 1);
 
 				long mask;
 
 				bindings[controls[selected_option].binding_index].controller = button;
 
 				PlaySoundObject(18, 1);
-//				free(old_state);
 
 				gKeyTrg = gKey = 0;	// Prevent weird key-ghosting by doing this
 				return -1;
@@ -346,16 +352,21 @@ static int Callback_InputRebindController(Option *options, size_t total_options,
 		// Draw screen
 		CortBox(&grcFull, 0x000000);
 
-		const char *string = "Press a key to bind to this action:";
+		const char *string = "Press a button to bind to this action:";
 		PutText((WINDOW_WIDTH / 2) - ((strlen(string) * 5) / 2), (WINDOW_HEIGHT / 2) - 10, string, RGB(0xFF, 0xFF, 0xFF));
 		PutText((WINDOW_WIDTH / 2) - ((strlen(options[selected_option].name) * 5) / 2), (WINDOW_HEIGHT / 2) + 10, options[selected_option].name, RGB(0xFF, 0xFF, 0xFF));
+
+		if (--timeout == 0)
+			return -1;
+
+		timeout_string[0] = '0' + (timeout / 60) + 1;
+		PutText((WINDOW_WIDTH / 2) - (5 / 2), (WINDOW_HEIGHT / 2) + 60, timeout_string, RGB(0xFF, 0xFF, 0xFF));
 
 		PutFramePerSecound();
 
 		if (!Flip_SystemTask())
 		{
 			// Quit if window is closed
-//			free(old_state);
 			return 0;
 		}
 	}
