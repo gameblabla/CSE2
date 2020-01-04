@@ -152,8 +152,7 @@ typedef struct Control
 {
 	const char *name;
 	size_t binding_index;
-	int groups;
-	char bound_name_buffer[20];
+	unsigned char groups;
 } Control;
 
 /*
@@ -161,7 +160,7 @@ typedef struct Control
  * control belongs to - if two controls are in the same group,
  * they cannot be bound to the same key.
  */
-static Control controls[] = {
+static const Control controls[] = {
 	{"Up", BINDING_UP, (1 << 0) | (1 << 1)},
 	{"Down", BINDING_DOWN, (1 << 0) | (1 << 1)},
 	{"Left", BINDING_LEFT, (1 << 0) | (1 << 1)},
@@ -176,6 +175,8 @@ static Control controls[] = {
 	{"Map", BINDING_MAP, 1 << 0},
 	{"Pause", BINDING_PAUSE, 1 << 0}
 };
+
+static char bound_name_buffers[sizeof(controls) / sizeof(controls[0])][20];
 
 static int Callback_InputRebindKeyboard(Option *options, size_t total_options, size_t selected_option, long key)
 {
@@ -199,7 +200,7 @@ static int Callback_InputRebindKeyboard(Option *options, size_t total_options, s
 	{
 		for (int scancode = 0; scancode < total_keys; ++scancode)
 		{
-			if (((old_state[scancode] ^ state[scancode]) & state[scancode]) == 1)
+			if (!old_state[scancode] && state[scancode])
 			{
 				const char *key_name = SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)scancode));
 
@@ -211,26 +212,26 @@ static int Callback_InputRebindKeyboard(Option *options, size_t total_options, s
 						bindings[controls[other_option].binding_index].keyboard = bindings[controls[selected_option].binding_index].keyboard;
 						bindings[controls[selected_option].binding_index].keyboard = scancode;
 
-						memcpy(controls[other_option].bound_name_buffer, controls[selected_option].bound_name_buffer, sizeof(controls[0].bound_name_buffer));
-						strncpy(controls[selected_option].bound_name_buffer, key_name, sizeof(controls[0].bound_name_buffer) - 1);
+						memcpy(bound_name_buffers[other_option], bound_name_buffers[selected_option], sizeof(bound_name_buffers[0]));
+						strncpy(bound_name_buffers[selected_option], key_name, sizeof(bound_name_buffers[0]) - 1);
 
 						PlaySoundObject(18, 1);
 						free(old_state);
 
-						gKeyTrg = gKey = 0;	// Prevent weird key-ghosting by doing this
+						gKeyTrg = gKey = 0;	// Prevent weird input-ghosting by doing this
 						return -1;
 					}
 				}
 
-				// Otherwise just overwrite the selected key
-				strncpy(controls[selected_option].bound_name_buffer, key_name, sizeof(controls[0].bound_name_buffer) - 1);
+				// Otherwise just overwrite the selected control
+				strncpy(bound_name_buffers[selected_option], key_name, sizeof(bound_name_buffers[0]) - 1);
 
 				bindings[controls[selected_option].binding_index].keyboard = scancode;
 
 				PlaySoundObject(18, 1);
 				free(old_state);
 
-				gKeyTrg = gKey = 0;	// Prevent weird key-ghosting by doing this
+				gKeyTrg = gKey = 0;	// Prevent weird input-ghosting by doing this
 				return -1;
 			}
 		}
@@ -244,9 +245,6 @@ static int Callback_InputRebindKeyboard(Option *options, size_t total_options, s
 		PutText((WINDOW_WIDTH / 2) - ((strlen(string) * 5) / 2), (WINDOW_HEIGHT / 2) - 10, string, RGB(0xFF, 0xFF, 0xFF));
 		PutText((WINDOW_WIDTH / 2) - ((strlen(options[selected_option].name) * 5) / 2), (WINDOW_HEIGHT / 2) + 10, options[selected_option].name, RGB(0xFF, 0xFF, 0xFF));
 
-		if (--timeout == 0)
-			return -1;
-
 		timeout_string[0] = '0' + (timeout / 60) + 1;
 		PutText((WINDOW_WIDTH / 2) - (5 / 2), (WINDOW_HEIGHT / 2) + 60, timeout_string, RGB(0xFF, 0xFF, 0xFF));
 
@@ -258,6 +256,9 @@ static int Callback_InputRebindKeyboard(Option *options, size_t total_options, s
 			free(old_state);
 			return 0;
 		}
+
+		if (--timeout == 0)
+			return -1;
 	}
 }
 
@@ -276,9 +277,9 @@ static int Callback_ControlsKeyboard(Option *options, size_t total_options, size
 	{
 		submenu_options[i].name = controls[i].name;
 		submenu_options[i].callback = Callback_InputRebindKeyboard;
-		submenu_options[i].attribute = controls[i].bound_name_buffer;
+		submenu_options[i].attribute = bound_name_buffers[i];
 
-		strncpy(controls[i].bound_name_buffer, SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)bindings[controls[i].binding_index].keyboard)), sizeof(controls[0].bound_name_buffer) - 1);
+		strncpy(bound_name_buffers[i], SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)bindings[controls[i].binding_index].keyboard)), sizeof(bound_name_buffers[0]) - 1);
 	}
 
 	PlaySoundObject(5, 1);
@@ -323,18 +324,18 @@ static int Callback_InputRebindController(Option *options, size_t total_options,
 						bindings[controls[other_option].binding_index].controller = bindings[controls[selected_option].binding_index].controller;
 						bindings[controls[selected_option].binding_index].controller = button;
 
-						memcpy(controls[other_option].bound_name_buffer, controls[selected_option].bound_name_buffer, sizeof(controls[0].bound_name_buffer));
-						snprintf(controls[selected_option].bound_name_buffer, sizeof(controls[0].bound_name_buffer), "Button %d", button);
+						memcpy(bound_name_buffers[other_option], bound_name_buffers[selected_option], sizeof(bound_name_buffers[0]));
+						snprintf(bound_name_buffers[selected_option], sizeof(bound_name_buffers[0]), "Button %d", button);
 
 						PlaySoundObject(18, 1);
 
-						gKeyTrg = gKey = 0;	// Prevent weird key-ghosting by doing this
+						gKeyTrg = gKey = 0;	// Prevent weird input-ghosting by doing this
 						return -1;
 					}
 				}
 
-				// Otherwise just overwrite the selected key
-				snprintf(controls[selected_option].bound_name_buffer, sizeof(controls[0].bound_name_buffer), "Button %d", button);
+				// Otherwise just overwrite the selected control
+				snprintf(bound_name_buffers[selected_option], sizeof(bound_name_buffers[0]), "Button %d", button);
 
 				long mask;
 
@@ -342,7 +343,7 @@ static int Callback_InputRebindController(Option *options, size_t total_options,
 
 				PlaySoundObject(18, 1);
 
-				gKeyTrg = gKey = 0;	// Prevent weird key-ghosting by doing this
+				gKeyTrg = gKey = 0;	// Prevent weird input-ghosting by doing this
 				return -1;
 			}
 		}
@@ -356,9 +357,6 @@ static int Callback_InputRebindController(Option *options, size_t total_options,
 		PutText((WINDOW_WIDTH / 2) - ((strlen(string) * 5) / 2), (WINDOW_HEIGHT / 2) - 10, string, RGB(0xFF, 0xFF, 0xFF));
 		PutText((WINDOW_WIDTH / 2) - ((strlen(options[selected_option].name) * 5) / 2), (WINDOW_HEIGHT / 2) + 10, options[selected_option].name, RGB(0xFF, 0xFF, 0xFF));
 
-		if (--timeout == 0)
-			return -1;
-
 		timeout_string[0] = '0' + (timeout / 60) + 1;
 		PutText((WINDOW_WIDTH / 2) - (5 / 2), (WINDOW_HEIGHT / 2) + 60, timeout_string, RGB(0xFF, 0xFF, 0xFF));
 
@@ -369,6 +367,9 @@ static int Callback_InputRebindController(Option *options, size_t total_options,
 			// Quit if window is closed
 			return 0;
 		}
+
+		if (--timeout == 0)
+			return -1;
 	}
 }
 
@@ -387,9 +388,9 @@ static int Callback_ControlsController(Option *options, size_t total_options, si
 	{
 		submenu_options[i].name = controls[i].name;
 		submenu_options[i].callback = Callback_InputRebindController;
-		submenu_options[i].attribute = controls[i].bound_name_buffer;
+		submenu_options[i].attribute = bound_name_buffers[i];
 
-		snprintf(controls[i].bound_name_buffer, sizeof(controls[0].bound_name_buffer), "Button %d", bindings[controls[i].binding_index].controller);
+		snprintf(bound_name_buffers[i], sizeof(bound_name_buffers[0]), "Button %d", bindings[controls[i].binding_index].controller);
 	}
 
 	PlaySoundObject(5, 1);
