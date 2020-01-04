@@ -84,7 +84,7 @@ BOOL HookAllDirectInputDevices(HWND hWnd)
 	directinput_objects.lpDI = lpDI;
 
 	lpDI->AddRef();
-	lpDI->EnumDevices(4, EnumDevices_Callback, &directinput_objects, 1);
+	lpDI->EnumDevices(DIDEVTYPE_JOYSTICK, EnumDevices_Callback, &directinput_objects, DIEDFL_ATTACHEDONLY);
 
 	if (directinput_objects.lpDI != NULL)
 	{
