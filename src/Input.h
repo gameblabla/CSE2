@@ -2,13 +2,15 @@
 
 #include "WindowsWrapper.h"
 
+#define MAX_JOYSTICK_BUTTONS 32
+
 struct JOYSTICK_STATUS
 {
 	BOOL bLeft;
 	BOOL bRight;
 	BOOL bUp;
 	BOOL bDown;
-	BOOL bButton[32];
+	BOOL bButton[MAX_JOYSTICK_BUTTONS];
 };
 
 void ReleaseDirectInput(void);

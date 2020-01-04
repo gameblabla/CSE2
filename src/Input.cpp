@@ -61,8 +61,8 @@ BOOL GetJoystickStatus(JOYSTICK_STATUS *status)
 		return FALSE;
 
 	int numButtons = SDL_JoystickNumButtons(joystick);
-	if (numButtons > 32)
-		numButtons = 32;
+	if (numButtons > MAX_JOYSTICK_BUTTONS)
+		numButtons = MAX_JOYSTICK_BUTTONS;
 
 	for (int i = 0; i < numButtons; ++i)
 	{

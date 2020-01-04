@@ -11,7 +11,7 @@
 #include "Tags.h"
 
 static const char* const config_filename = "Config.dat";	// Not the original name
-static const char* const config_magic = "CSE2E   20200101";	// Not the original name
+static const char* const config_magic = "CSE2E   20200104";	// Not the original name
 
 BOOL LoadConfigData(CONFIG *conf)
 {
@@ -41,7 +41,7 @@ BOOL LoadConfigData(CONFIG *conf)
 
 	// Read joystick configuration (if enabled, and mappings)
 	conf->bJoystick = fgetc(fp);
-	for (int button = 0; button < 8; button++)
+	for (int button = 0; button < MAX_JOYSTICK_BUTTONS; button++)
 		conf->joystick_button[button] = fgetc(fp);
 
 	// Read framerate toggle
@@ -92,7 +92,7 @@ BOOL SaveConfigData(const CONFIG *conf)
 
 	// Read joystick configuration (if enabled, and mappings)
 	fputc(conf->bJoystick, fp);
-	for (int button = 0; button < 8; button++)
+	for (int button = 0; button < MAX_JOYSTICK_BUTTONS; button++)
 		fputc(conf->joystick_button[button], fp);
 
 	// Read framerate toggle
@@ -131,6 +131,7 @@ void DefaultConfigData(CONFIG *conf)
 	conf->joystick_button[5] = 4;
 	conf->joystick_button[6] = 6;
 	conf->joystick_button[7] = 3;
+	// The other buttons are just left as 0 (unbound)
 
 	// Set default key bindings too
 	conf->key_bindings[0] = SDL_SCANCODE_UP;

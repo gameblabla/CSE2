@@ -33,7 +33,7 @@
 char gModulePath[MAX_PATH];
 char gDataPath[MAX_PATH];
 
-int gJoystickButtonTable[8];
+int gJoystickButtonTable[MAX_JOYSTICK_BUTTONS];
 
 BOOL bFullscreen;
 BOOL gbUseJoystick = FALSE;
@@ -139,7 +139,7 @@ int main(int argc, char *argv[])
 	gScancodePause = conf.key_bindings[12];
 
 	// Set gamepad inputs
-	for (i = 0; i < 8; ++i)
+	for (i = 0; i < MAX_JOYSTICK_BUTTONS; ++i)
 	{
 		switch (conf.joystick_button[i])
 		{
@@ -482,11 +482,11 @@ void JoystickProc(void)
 		gKey &= ~gKeyDown;
 
 	// Clear held buttons
-	for (i = 0; i < 8; ++i)
+	for (i = 0; i < MAX_JOYSTICK_BUTTONS; ++i)
 		gKey &= ~gJoystickButtonTable[i];
 
 	// Set held buttons
-	for (i = 0; i < 8; ++i)
+	for (i = 0; i < MAX_JOYSTICK_BUTTONS; ++i)
 		if (status.bButton[i])
 			gKey |= gJoystickButtonTable[i];
 }
