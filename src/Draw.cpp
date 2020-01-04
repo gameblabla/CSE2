@@ -41,8 +41,6 @@ static Backend_Surface *framebuffer;
 
 static Backend_Surface *surf[SURFACE_ID_MAX];
 
-static SDL_PixelFormat *rgba32_pixel_format;	// Needed because SDL2 is stupid
-
 static FontObject *font;
 
 // This doesn't exist in the Linux port, so none of these symbol names are accurate
@@ -157,8 +155,6 @@ BOOL StartDirectDraw(SDL_Window *window, int lMagnification, BOOL b60fps, BOOL b
 	if (framebuffer == NULL)
 		return FALSE;
 
-	rgba32_pixel_format = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA32);
-
 	return TRUE;
 }
 
@@ -177,8 +173,6 @@ void EndDirectDraw(void)
 	}
 
 	framebuffer = NULL;
-
-	SDL_FreeFormat(rgba32_pixel_format);
 
 	Backend_Deinit();
 
@@ -199,7 +193,7 @@ void ReleaseSurface(SurfaceID s)
 
 static BOOL ScaleAndUploadSurface(SDL_Surface *surface, SurfaceID surf_no)
 {
-	SDL_Surface *converted_surface = SDL_ConvertSurface(surface, rgba32_pixel_format, 0);
+	SDL_Surface *converted_surface = SDL_ConvertSurfaceFormat(surface, SDL_PIXELFORMAT_RGBA32, 0);
 
 	SDL_FreeSurface(surface);
 	free(surface->userdata);

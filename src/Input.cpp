@@ -60,17 +60,24 @@ BOOL GetJoystickStatus(JOYSTICK_STATUS *status)
 	if (joystick == NULL)
 		return FALSE;
 
+	// The original Input.cpp assumed there were 32 buttons (because of DirectInput's 'DIJOYSTATE' struct)
 	int numButtons = SDL_JoystickNumButtons(joystick);
 	if (numButtons > MAX_JOYSTICK_BUTTONS)
 		numButtons = MAX_JOYSTICK_BUTTONS;
 
-	for (int i = 0; i < numButtons; ++i)
+	// Read whatever buttons actually exist
+	int i;
+	for (i = 0; i < numButtons; ++i)
 	{
 		if (SDL_JoystickGetButton(joystick, i) != 0)
 			status->bButton[i] = TRUE;
 		else
 			status->bButton[i] = FALSE;
 	}
+
+	// Blank the buttons that do not
+	for (; i < 32; ++i)
+		status->bButton[i] = FALSE;
 
 	status->bDown = FALSE;
 	status->bRight = FALSE;
