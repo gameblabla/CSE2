@@ -24,7 +24,7 @@ option(SMOOTH_SPRITE_MOVEMENT "Removes the grid that all sprites are locked to, 
 option(WARNINGS "Enable common compiler warnings (for gcc-compatible compilers and MSVC only)" OFF)
 option(WARNINGS_ALL "Enable ALL compiler warnings (for clang and MSVC only)" OFF)
 option(WARNINGS_FATAL "Stop compilation on any compiler warning (for gcc-compatible compilers and MSVC only)" OFF)
-option(FORCE_LOCAL_LIBS "Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones" OFF)
+option(FORCE_LOCAL_LIBS "Compile the built-in versions of SDL2 and FreeType instead of using the system-provided ones" OFF)
 
 
 list(APPEND CMAKE_MODULE_PATH
