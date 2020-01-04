@@ -28,8 +28,8 @@ This branch adds several enhancements including:
 * V-sync toggle
 * Smooth sprite movement, through the removal of the design choice that locks sprites to a 320x240 grid when drawn (can be re-enabled by disabling SMOOTH_SPRITE_MOVEMENT)
 * Bugfixes enabled by default
-* Pixtone sounds split to .pxt files
-* Support for Ogg Vorbis, FLAC, .it, .xm, .mod, .s3m, and Pxtone audio formats for music and SFX
+* PixTone sounds split to .pxt files
+* Support for Ogg Vorbis, FLAC, .it, .xm, .mod, .s3m, and PxTone audio formats for music and SFX
 * Support for high-resolution sprites (see SPRITE_SCALE in CommonDefines.h)
 * Extra TSC commands (TODO: link docs for these and the Creepy Curly NPC)
   * <MS4
@@ -60,7 +60,6 @@ Many months of copypasting and tinkering later, here is the result.
 
 * SDL2
 * Freetype
-* FLTK
 * GLEW (if the OpenGL rendering backend is selected)
 * libxmp-lite (only if AUDIO_TRACKER is enabled)
 
