@@ -17,24 +17,29 @@ Branch | Description
 Cave Story Engine 2 is a decompilation of Cave Story.
 
 This branch adds several enhancements including:
+* Widescreen
+* Vastly-improved fullscreen
+* Window-resizing
+* Smooth sprite movement, through the removal of the design choice that locks sprites to a 320x240 grid when drawn (can be re-enabled by disabling SMOOTH_SPRITE_MOVEMENT)
+* Options menu:
+  * Control remapping (keyboard and gamepad)
+  * V-sync toggle
+  * 60FPS toggle
+* Bugfixes enabled by default
+
+Also included are enhancements specifically for modders:
 * PNG support
 * Full alpha blending support
 * Fixed text blending, utilising the aforementioned alpha support
 * All resource files moved to the data folder
 * [Booster's Lab](https://github.com/taedixon/boosters-lab) support (open 'data/mrmap.bin')
-* 60FPS toggle
-* Widescreen
-* Vastly-improved fullscreen
-* V-sync toggle
-* Smooth sprite movement, through the removal of the design choice that locks sprites to a 320x240 grid when drawn (can be re-enabled by disabling SMOOTH_SPRITE_MOVEMENT)
-* Bugfixes enabled by default
 * PixTone sounds split to .pxt files
 * Support for Ogg Vorbis, FLAC, .it, .xm, .mod, .s3m, and PxTone audio formats for music and SFX
 * Support for high-resolution sprites (see SPRITE_SCALE in CommonDefines.h)
 * Extra TSC commands (TODO: link docs for these and the Creepy Curly NPC)
   * <MS4
   * <MIM
-* "Creepy Curly" NPC
+* "Creepy Curly" NPC (will likely be removed in the future)
 
 ![Screenshot](screenshot.png)
 
