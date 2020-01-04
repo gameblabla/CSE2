@@ -24,12 +24,10 @@ ifeq ($(RELEASE), 1)
   ALL_CXXFLAGS += -O3 -DNDEBUG
   ALL_LDFLAGS += -s
   FILENAME_DEF = CSE2$(EXE_EXTENSION)
-  DOCONFIG_FILENAME_DEF = DoConfig$(EXE_EXTENSION)
 else
   ALL_CFLAGS += -Og -ggdb3
   ALL_CXXFLAGS += -Og -ggdb3
   FILENAME_DEF = CSE2_debug$(EXE_EXTENSION)
-  DOCONFIG_FILENAME_DEF = DoConfig_debug$(EXE_EXTENSION)
 endif
 
 ifeq ($(JAPANESE), 1)
@@ -41,7 +39,6 @@ else
 endif
 
 FILENAME ?= $(FILENAME_DEF)
-DOCONFIG_FILENAME ?= $(DOCONFIG_FILENAME_DEF)
 
 ifeq ($(FIX_BUGS), 1)
   DEFINES += -DFIX_BUGS
@@ -82,10 +79,8 @@ DEFINES += -DLODEPNG_NO_COMPILE_ENCODER -DLODEPNG_NO_COMPILE_ERROR_TEXT -DLODEPN
 ifeq ($(STATIC), 1)
   ALL_LDFLAGS += -static
   CSE2_LIBS += $(shell pkg-config sdl2 --libs --static) $(shell pkg-config freetype2 --libs --static) -lfreetype
-  DOCONFIG_LIBS += $(shell fltk-config --cxxflags --libs --ldstaticflags)
 else
   CSE2_LIBS += $(shell pkg-config sdl2 --libs) $(shell pkg-config freetype2 --libs)
-  DOCONFIG_LIBS += $(shell fltk-config --cxxflags --libs --ldflags)
 endif
 
 SOURCES = \
@@ -284,7 +279,7 @@ ifeq ($(WINDOWS), 1)
   OBJECTS += obj/$(FILENAME)/windows_resources.o
 endif
 
-all: $(BUILD_DIRECTORY)/$(FILENAME) $(BUILD_DIRECTORY)/data $(BUILD_DIRECTORY)/$(DOCONFIG_FILENAME)
+all: $(BUILD_DIRECTORY)/$(FILENAME) $(BUILD_DIRECTORY)/data
 	$(info Finished)
 
 $(BUILD_DIRECTORY)/data: $(DATA_DIRECTORY)
@@ -328,11 +323,6 @@ obj/$(FILENAME)/windows_resources.o: $(ASSETS_DIRECTORY)/resources/CSE2.rc $(ASS
 	@mkdir -p $(@D)
 	$(info Compiling Windows resource file $<)
 	@$(WINDRES) $< $@
-
-$(BUILD_DIRECTORY)/$(DOCONFIG_FILENAME): DoConfig/DoConfig.cpp
-	@mkdir -p $(@D)
-	$(info Linking $@)
-	@$(CXX) $(ALL_CXXFLAGS) $(ALL_LDFLAGS) $^ -o $@ $(DOCONFIG_LIBS)
 
 # TODO
 clean:

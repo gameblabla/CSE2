@@ -593,21 +593,3 @@ if(AUDIO_TRACKER)
 		target_link_libraries(CSE2 libxmp-lite)
 	endif()
 endif()
-
-##
-# DoConfig
-##
-
-add_subdirectory("DoConfig")
-
-# Name debug builds "DoConfig_debug", to distinguish them
-set_target_properties(DoConfig PROPERTIES DEBUG_OUTPUT_NAME "DoConfig_debug")
-
-# Send executable to the build_en/build_jp directory
-set_target_properties(DoConfig PROPERTIES
-	RUNTIME_OUTPUT_DIRECTORY ${BUILD_DIRECTORY}
-	RUNTIME_OUTPUT_DIRECTORY_RELEASE ${BUILD_DIRECTORY}
-	RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${BUILD_DIRECTORY}
-	RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${BUILD_DIRECTORY}
-	RUNTIME_OUTPUT_DIRECTORY_DEBUG ${BUILD_DIRECTORY}
-)
