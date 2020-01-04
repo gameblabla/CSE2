@@ -202,6 +202,7 @@ static BOOL ScaleAndUploadSurface(SDL_Surface *surface, SurfaceID surf_no)
 	SDL_Surface *converted_surface = SDL_ConvertSurface(surface, rgba32_pixel_format, 0);
 
 	SDL_FreeSurface(surface);
+	free(surface->userdata);
 
 	if (converted_surface == NULL)
 		return FALSE;
@@ -253,7 +254,6 @@ static BOOL ScaleAndUploadSurface(SDL_Surface *surface, SurfaceID surf_no)
 	}
 
 	Backend_UnlockSurface(surf[surf_no]);
-	free(converted_surface->userdata);
 	SDL_FreeSurface(converted_surface);
 
 	return TRUE;
