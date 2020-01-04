@@ -120,7 +120,7 @@ void EncryptionBinaryData2(unsigned char *pData, long size)
 BOOL LoadTextScript2(const char *name)
 {
 	// Get path
-	char path[260];
+	char path[MAX_PATH];
 	sprintf(path, "%s/%s", gDataPath, name);
 
 	gTS.size = GetFileSizeLong(path);
