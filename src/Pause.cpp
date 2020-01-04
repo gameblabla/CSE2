@@ -40,7 +40,7 @@ static const RECT rcMyChar[4] = {
 
 static int EnterOptionsMenu(const char *title, Option *options, size_t total_options, int x_offset, BOOL submenu)
 {
-	int selected_option = 0;
+	size_t selected_option = 0;
 	int scroll = 0;
 
 	unsigned int anime = 0;
@@ -69,7 +69,7 @@ static int EnterOptionsMenu(const char *title, Option *options, size_t total_opt
 		// Handling up/down input
 		if (gKeyTrg & (gKeyUp | gKeyDown))
 		{
-			const int old_selection = selected_option;
+			const size_t old_selection = selected_option;
 
 			if (gKeyTrg & gKeyDown)
 				if (selected_option++ == total_options - 1)
@@ -81,10 +81,10 @@ static int EnterOptionsMenu(const char *title, Option *options, size_t total_opt
 
 			// Update the menu-scrolling, if there are more options than can be fit on the screen
 			if (selected_option < old_selection)
-				scroll = MAX(0, MIN(scroll, selected_option - 1));
+				scroll = MAX(0, MIN(scroll, (int)selected_option - 1));
 
 			if (selected_option > old_selection)
-				scroll = MIN(total_options - MAX_OPTIONS, MAX(scroll, selected_option - (MAX_OPTIONS - 2)));
+				scroll = MIN(MAX(0, (int)total_options - MAX_OPTIONS), MAX(scroll, (int)selected_option - (MAX_OPTIONS - 2)));
 
 			PlaySoundObject(1, 1);
 		}
@@ -110,7 +110,7 @@ static int EnterOptionsMenu(const char *title, Option *options, size_t total_opt
 
 		const size_t visible_options = MIN(MAX_OPTIONS, total_options);
 
-		for (int i = scroll; i < scroll + visible_options; ++i)
+		for (size_t i = scroll; i < scroll + visible_options; ++i)
 		{
 			const int x = (WINDOW_WIDTH / 2) + x_offset;
 			const int y = (WINDOW_HEIGHT / 2) + (10 * 0) - (((visible_options - 1) * 20) / 2) + ((i - scroll) * 20);
@@ -446,11 +446,11 @@ static int Callback_Options(Option *options, size_t total_options, size_t select
 		return -1;
 
 	Option submenu_options[] = {
-		{"Controls (keyboard)", Callback_ControlsKeyboard},
-		{"Controls (gamepad)", Callback_ControlsController},
-		{"Framerate", Callback_Framerate},
-		{"V-sync", Callback_Vsync},
-		{"Resolution", Callback_Resolution}
+		{"Controls (keyboard)", Callback_ControlsKeyboard, NULL, NULL, 0},
+		{"Controls (gamepad)", Callback_ControlsController, NULL, NULL, 0},
+		{"Framerate", Callback_Framerate, NULL, NULL, 0},
+		{"V-sync", Callback_Vsync, NULL, NULL, 0},
+		{"Resolution", Callback_Resolution, NULL, NULL, 0}
 	};
 
 	CONFIG conf;
@@ -549,10 +549,10 @@ static int Callback_Quit(Option *options, size_t total_options, size_t selected_
 int Call_Pause(void)
 {
 	Option options[] = {
-		{"Resume", Callback_Resume},
-		{"Reset", Callback_Reset},
-		{"Options", Callback_Options},
-		{"Quit", Callback_Quit}
+		{"Resume", Callback_Resume, NULL, NULL, 0},
+		{"Reset", Callback_Reset, NULL, NULL, 0},
+		{"Options", Callback_Options, NULL, NULL, 0},
+		{"Quit", Callback_Quit, NULL, NULL, 0}
 	};
 
 	int return_value = EnterOptionsMenu("PAUSED", options, sizeof(options) / sizeof(options[0]), -14, FALSE);

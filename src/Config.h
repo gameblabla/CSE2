@@ -24,7 +24,7 @@ enum
 
 typedef struct CONFIG_BINDING
 {
-	unsigned long keyboard;
+	int keyboard;
 	unsigned char controller;
 } CONFIG_BINDING;
 
