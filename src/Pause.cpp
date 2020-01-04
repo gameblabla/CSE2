@@ -11,6 +11,7 @@
 #include "CommonDefines.h"
 #include "Config.h"
 #include "Draw.h"
+#include "Input.h"
 #include "KeyControl.h"
 #include "Main.h"
 #include "Organya.h"
@@ -29,14 +30,6 @@ typedef struct Option
 	const char *attribute;
 	long value;
 } Option;
-
-typedef struct Control
-{
-	const char *name;
-	int *scancode;
-	int groups;
-	char bound_name[20];
-} Control;
 
 static CONFIG conf;
 
@@ -157,28 +150,37 @@ static int EnterOptionsMenu(const char *title, Option *options, size_t total_opt
  * Controls menu
  ********************/
 
+typedef struct Control
+{
+	const char *name;
+	int *scancode;
+	int *button;
+	int groups;
+	char bound_name[20];
+} Control;
+
 /*
  * The bitfield on the right determines which 'group' the
  * control belongs to - if two controls are in the same group,
  * they cannot be bound to the same key.
  */
 static Control controls[] = {
-	{"Up", &gScancodeUp, (1 << 0) | (1 << 1)},
-	{"Down", &gScancodeDown, (1 << 0) | (1 << 1)},
-	{"Left", &gScancodeLeft, (1 << 0) | (1 << 1)},
-	{"Right", &gScancodeRight, (1 << 0) | (1 << 1)},
-	{"OK", &gScancodeOk, 1 << 1},
-	{"Cancel", &gScancodeCancel, 1 << 1},
-	{"Jump", &gScancodeJump, 1 << 0},
-	{"Shoot", &gScancodeShot, 1 << 0},
-	{"Next weapon", &gScancodeArms, 1 << 0},
-	{"Previous weapon", &gScancodeArmsRev, 1 << 0},
-	{"Inventory", &gScancodeItem, 1 << 0},
-	{"Map", &gScancodeMap, 1 << 0},
-	{"Pause", &gScancodePause, 1 << 0}
+	{"Up", &gKeyUp_Scancode, &gKeyUp_Button, (1 << 0) | (1 << 1)},
+	{"Down", &gKeyDown_Scancode, &gKeyDown_Button, (1 << 0) | (1 << 1)},
+	{"Left", &gKeyLeft_Scancode, &gKeyLeft_Button, (1 << 0) | (1 << 1)},
+	{"Right", &gKeyRight_Scancode, &gKeyRight_Button, (1 << 0) | (1 << 1)},
+	{"OK", &gKeyOk_Scancode, &gKeyOk_Button, 1 << 1},
+	{"Cancel", &gKeyCancel_Scancode, &gKeyCancel_Button, 1 << 1},
+	{"Jump", &gKeyJump_Scancode, &gKeyJump_Button, 1 << 0},
+	{"Shoot", &gKeyShot_Scancode, &gKeyShot_Button, 1 << 0},
+	{"Next weapon", &gKeyArms_Scancode, &gKeyArms_Button, 1 << 0},
+	{"Previous weapon", &gKeyArmsRev_Scancode, &gKeyArmsRev_Button, 1 << 0},
+	{"Inventory", &gKeyItem_Scancode, &gKeyItem_Button, 1 << 0},
+	{"Map", &gKeyMap_Scancode, &gKeyMap_Button, 1 << 0},
+	{"Pause", &gKeyPause_Scancode, &gKeyPause_Button, 1 << 0}
 };
 
-static int Callback_KeyRebind(Option *options, size_t total_options, size_t selected_option, long key)
+static int Callback_InputRebindKeyboard(Option *options, size_t total_options, size_t selected_option, long key)
 {
 	if (!(key & gKeyOk))
 		return -1;
@@ -203,7 +205,7 @@ static int Callback_KeyRebind(Option *options, size_t total_options, size_t sele
 				// If another key in the game group uses this key, swap them
 				for (size_t other_option = 0; other_option < total_options; ++other_option)
 				{
-					if (other_option != selected_option && controls[other_option].groups & controls[selected_option].groups && options[other_option].value == scancode)
+					if (other_option != selected_option && controls[other_option].groups & controls[selected_option].groups && *controls[other_option].scancode == scancode)
 					{
 						conf.key_bindings[other_option] = *controls[other_option].scancode = *controls[selected_option].scancode;
 						conf.key_bindings[selected_option] = *controls[selected_option].scancode = scancode;
@@ -252,7 +254,7 @@ static int Callback_KeyRebind(Option *options, size_t total_options, size_t sele
 	}
 }
 
-static int Callback_Controls(Option *options, size_t total_options, size_t selected_option, long key)
+static int Callback_ControlsKeyboard(Option *options, size_t total_options, size_t selected_option, long key)
 {
 	(void)options;
 	(void)total_options;
@@ -266,7 +268,7 @@ static int Callback_Controls(Option *options, size_t total_options, size_t selec
 	for (size_t i = 0; i < sizeof(controls) / sizeof(controls[0]); ++i)
 	{
 		submenu_options[i].name = controls[i].name;
-		submenu_options[i].callback = Callback_KeyRebind;
+		submenu_options[i].callback = Callback_InputRebindKeyboard;
 		submenu_options[i].attribute = controls[i].bound_name;
 
 		strncpy(controls[i].bound_name, SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)*controls[i].scancode)), sizeof(controls[0].bound_name) - 1);
@@ -274,7 +276,117 @@ static int Callback_Controls(Option *options, size_t total_options, size_t selec
 
 	PlaySoundObject(5, 1);
 
-	const int return_value = EnterOptionsMenu("CONTROLS", submenu_options, sizeof(submenu_options) / sizeof(submenu_options[0]), -60, TRUE);
+	const int return_value = EnterOptionsMenu("CONTROLS (KEYBOARD)", submenu_options, sizeof(submenu_options) / sizeof(submenu_options[0]), -60, TRUE);
+
+	PlaySoundObject(5, 1);
+
+	return return_value;
+}
+
+static int Callback_InputRebindController(Option *options, size_t total_options, size_t selected_option, long key)
+{
+	if (!(key & gKeyOk))
+		return -1;
+
+	PlaySoundObject(5, 1);
+
+	JOYSTICK_STATUS old_state;
+	memset(&old_state, 0, sizeof(JOYSTICK_STATUS));
+	if (!GetJoystickStatus(&old_state))
+		printf("Very bad\n");
+
+	for (;;)
+	{
+		JOYSTICK_STATUS state;
+		memset(&state, 0, sizeof(JOYSTICK_STATUS));
+		if (!GetJoystickStatus(&state))
+			printf("Very bad\n");
+
+		for (int button = 0; button < MAX_JOYSTICK_BUTTONS; ++button)
+		{
+//			printf("Button %d = new %d = old %d\n", button, state.bButton[button], old_state.bButton[button]);
+			if (!old_state.bButton[button] && state.bButton[button])
+			{
+		//		const char *key_name = SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)scancode));
+
+				// If another key in the game group uses this key, swap them
+				for (size_t other_option = 0; other_option < total_options; ++other_option)
+				{
+					if (other_option != selected_option && controls[other_option].groups & controls[selected_option].groups && *controls[other_option].button == button)
+					{
+						conf.button_bindings[other_option] = *controls[other_option].button = *controls[selected_option].button;
+						conf.button_bindings[selected_option] = *controls[selected_option].button = button;
+
+						memcpy(controls[other_option].bound_name, controls[selected_option].bound_name, sizeof(controls[0].bound_name));
+						snprintf(controls[selected_option].bound_name, sizeof(controls[0].bound_name), "Button %d", button);
+
+						PlaySoundObject(18, 1);
+						//free(old_state);
+
+						gKeyTrg = gKey = 0;	// Prevent weird key-ghosting by doing this
+						return -1;
+					}
+				}
+
+				// Otherwise just overwrite the selected key
+				snprintf(controls[selected_option].bound_name, sizeof(controls[0].bound_name), "Button %d", button);
+//				strncpy(controls[selected_option].bound_name, key_name, sizeof(controls[0].bound_name) - 1);
+
+				long mask;
+
+				conf.button_bindings[selected_option] = *controls[selected_option].button = button;
+
+				PlaySoundObject(18, 1);
+//				free(old_state);
+
+				gKeyTrg = gKey = 0;	// Prevent weird key-ghosting by doing this
+				return -1;
+			}
+		}
+
+		old_state = state;
+
+		// Draw screen
+		CortBox(&grcFull, 0x000000);
+
+		const char *string = "Press a key to bind to this action:";
+		PutText((WINDOW_WIDTH / 2) - ((strlen(string) * 5) / 2), (WINDOW_HEIGHT / 2) - 10, string, RGB(0xFF, 0xFF, 0xFF));
+		PutText((WINDOW_WIDTH / 2) - ((strlen(options[selected_option].name) * 5) / 2), (WINDOW_HEIGHT / 2) + 10, options[selected_option].name, RGB(0xFF, 0xFF, 0xFF));
+
+		PutFramePerSecound();
+
+		if (!Flip_SystemTask())
+		{
+			// Quit if window is closed
+//			free(old_state);
+			return 0;
+		}
+	}
+}
+
+static int Callback_ControlsController(Option *options, size_t total_options, size_t selected_option, long key)
+{
+	(void)options;
+	(void)total_options;
+	(void)selected_option;
+
+	if (!(key & gKeyOk))
+		return -1;
+
+	Option submenu_options[sizeof(controls) / sizeof(controls[0])];
+
+	for (size_t i = 0; i < sizeof(controls) / sizeof(controls[0]); ++i)
+	{
+		submenu_options[i].name = controls[i].name;
+		submenu_options[i].callback = Callback_InputRebindController;
+		submenu_options[i].attribute = controls[i].bound_name;
+
+		snprintf(controls[i].bound_name, sizeof(controls[0].bound_name), "Button %d", *controls[i].button);
+	}
+
+	PlaySoundObject(5, 1);
+
+	const int return_value = EnterOptionsMenu("CONTROLS (CONTROLLER)", submenu_options, sizeof(submenu_options) / sizeof(submenu_options[0]), -70, TRUE);
 
 	PlaySoundObject(5, 1);
 
@@ -348,7 +460,8 @@ static int Callback_Options(Option *options, size_t total_options, size_t select
 		return -1;
 
 	Option submenu_options[] = {
-		{"Controls", Callback_Controls},
+		{"Controls (keyboard)", Callback_ControlsKeyboard},
+		{"Controls (controller)", Callback_ControlsController},
 		{"Framerate", Callback_Framerate},
 		{"V-sync", Callback_Vsync},
 		{"Resolution", Callback_Resolution}
@@ -357,33 +470,33 @@ static int Callback_Options(Option *options, size_t total_options, size_t select
 	if (!LoadConfigData(&conf))
 		DefaultConfigData(&conf);
 
-	submenu_options[1].value = conf.b60fps;
-	submenu_options[1].attribute = conf.b60fps ? "60FPS" : "50FPS";
+	submenu_options[2].value = conf.b60fps;
+	submenu_options[2].attribute = conf.b60fps ? "60FPS" : "50FPS";
 
-	submenu_options[2].value = conf.bVsync;
-	submenu_options[2].attribute = conf.bVsync ? "On" : "Off";
+	submenu_options[3].value = conf.bVsync;
+	submenu_options[3].attribute = conf.bVsync ? "On" : "Off";
 
-	submenu_options[3].value = conf.display_mode;
+	submenu_options[4].value = conf.display_mode;
 	switch (conf.display_mode)
 	{
 		case 0:
-			submenu_options[3].attribute = "Fullscreen";
+			submenu_options[4].attribute = "Fullscreen";
 			break;
 
 		case 1:
-			submenu_options[3].attribute = "Windowed 426x240";
+			submenu_options[4].attribute = "Windowed 426x240";
 			break;
 
 		case 2:
-			submenu_options[3].attribute = "Windowed 852x480";
+			submenu_options[4].attribute = "Windowed 852x480";
 			break;
 
 		case 3:
-			submenu_options[3].attribute = "Windowed 1278x720";
+			submenu_options[4].attribute = "Windowed 1278x720";
 			break;
 
 		case 4:
-			submenu_options[3].attribute = "Windowed 1704x960";
+			submenu_options[4].attribute = "Windowed 1704x960";
 			break;
 	}
 
@@ -393,9 +506,9 @@ static int Callback_Options(Option *options, size_t total_options, size_t select
 
 	PlaySoundObject(5, 1);
 
-	conf.b60fps = submenu_options[1].value;
-	conf.bVsync = submenu_options[2].value;
-	conf.display_mode = submenu_options[3].value;
+	conf.b60fps = submenu_options[2].value;
+	conf.bVsync = submenu_options[3].value;
+	conf.display_mode = submenu_options[4].value;
 
 	SaveConfigData(&conf);
 

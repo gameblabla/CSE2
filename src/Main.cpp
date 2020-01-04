@@ -33,24 +33,36 @@
 char gModulePath[MAX_PATH];
 char gDataPath[MAX_PATH];
 
-int gJoystickButtonTable[MAX_JOYSTICK_BUTTONS];
-
 BOOL bFullscreen;
 BOOL gbUseJoystick = FALSE;
 
-int gScancodeOk = SDL_SCANCODE_Z;
-int gScancodeCancel = SDL_SCANCODE_X;
-int gScancodeJump = SDL_SCANCODE_Z;
-int gScancodeShot = SDL_SCANCODE_X;
-int gScancodeArms = SDL_SCANCODE_S;
-int gScancodeArmsRev = SDL_SCANCODE_A;
-int gScancodeItem = SDL_SCANCODE_Q;
-int gScancodeMap = SDL_SCANCODE_W;
-int gScancodeUp = SDL_SCANCODE_UP;
-int gScancodeDown = SDL_SCANCODE_DOWN;
-int gScancodeLeft = SDL_SCANCODE_LEFT;
-int gScancodeRight = SDL_SCANCODE_RIGHT;
-int gScancodePause = SDL_SCANCODE_ESCAPE;
+int gKeyOk_Scancode = SDL_SCANCODE_Z;
+int gKeyCancel_Scancode = SDL_SCANCODE_X;
+int gKeyJump_Scancode = SDL_SCANCODE_Z;
+int gKeyShot_Scancode = SDL_SCANCODE_X;
+int gKeyArms_Scancode = SDL_SCANCODE_S;
+int gKeyArmsRev_Scancode = SDL_SCANCODE_A;
+int gKeyItem_Scancode = SDL_SCANCODE_Q;
+int gKeyMap_Scancode = SDL_SCANCODE_W;
+int gKeyUp_Scancode = SDL_SCANCODE_UP;
+int gKeyDown_Scancode = SDL_SCANCODE_DOWN;
+int gKeyLeft_Scancode = SDL_SCANCODE_LEFT;
+int gKeyRight_Scancode = SDL_SCANCODE_RIGHT;
+int gKeyPause_Scancode = SDL_SCANCODE_ESCAPE;
+
+int gKeyOk_Button;
+int gKeyCancel_Button;
+int gKeyJump_Button;
+int gKeyShot_Button;
+int gKeyArms_Button;
+int gKeyArmsRev_Button;
+int gKeyItem_Button;
+int gKeyMap_Button;
+int gKeyUp_Button;
+int gKeyDown_Button;
+int gKeyLeft_Button;
+int gKeyRight_Button;
+int gKeyPause_Button;
 
 static BOOL bFps = FALSE;
 static BOOL bActive = TRUE;
@@ -124,50 +136,34 @@ int main(int argc, char *argv[])
 		DefaultConfigData(&conf);
 
 	// Set key-bindings
-	gScancodeUp = conf.key_bindings[0];
-	gScancodeDown = conf.key_bindings[1];
-	gScancodeLeft = conf.key_bindings[2];
-	gScancodeRight = conf.key_bindings[3];
-	gScancodeOk = conf.key_bindings[4];
-	gScancodeCancel = conf.key_bindings[5];
-	gScancodeJump = conf.key_bindings[6];
-	gScancodeShot = conf.key_bindings[7];
-	gScancodeArmsRev = conf.key_bindings[8];
-	gScancodeArms = conf.key_bindings[9];
-	gScancodeItem = conf.key_bindings[10];
-	gScancodeMap = conf.key_bindings[11];
-	gScancodePause = conf.key_bindings[12];
+	gKeyUp_Scancode = conf.key_bindings[0];
+	gKeyDown_Scancode = conf.key_bindings[1];
+	gKeyLeft_Scancode = conf.key_bindings[2];
+	gKeyRight_Scancode = conf.key_bindings[3];
+	gKeyOk_Scancode = conf.key_bindings[4];
+	gKeyCancel_Scancode = conf.key_bindings[5];
+	gKeyJump_Scancode = conf.key_bindings[6];
+	gKeyShot_Scancode = conf.key_bindings[7];
+	gKeyArmsRev_Scancode = conf.key_bindings[8];
+	gKeyArms_Scancode = conf.key_bindings[9];
+	gKeyItem_Scancode = conf.key_bindings[10];
+	gKeyMap_Scancode = conf.key_bindings[11];
+	gKeyPause_Scancode = conf.key_bindings[12];
 
 	// Set gamepad inputs
-	for (i = 0; i < MAX_JOYSTICK_BUTTONS; ++i)
-	{
-		switch (conf.joystick_button[i])
-		{
-			case 1:
-				gJoystickButtonTable[i] = gKeyJump;
-				break;
-
-			case 2:
-				gJoystickButtonTable[i] = gKeyShot;
-				break;
-
-			case 3:
-				gJoystickButtonTable[i] = gKeyArms;
-				break;
-
-			case 6:
-				gJoystickButtonTable[i] = gKeyArmsRev;
-				break;
-
-			case 4:
-				gJoystickButtonTable[i] = gKeyItem;
-				break;
-
-			case 5:
-				gJoystickButtonTable[i] = gKeyMap;
-				break;
-		}
-	}
+	gKeyUp_Button = conf.button_bindings[0];
+	gKeyDown_Button = conf.button_bindings[1];
+	gKeyLeft_Button = conf.button_bindings[2];
+	gKeyRight_Button = conf.button_bindings[3];
+	gKeyOk_Button = conf.button_bindings[4];
+	gKeyCancel_Button = conf.button_bindings[5];
+	gKeyJump_Button = conf.button_bindings[6];
+	gKeyShot_Button = conf.button_bindings[7];
+	gKeyArmsRev_Button = conf.button_bindings[8];
+	gKeyArms_Button = conf.button_bindings[9];
+	gKeyItem_Button = conf.button_bindings[10];
+	gKeyMap_Button = conf.button_bindings[11];
+	gKeyPause_Button = conf.button_bindings[12];
 
 	RECT unused_rect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
@@ -342,31 +338,31 @@ BOOL SystemTask(void)
 				else if (event.key.keysym.scancode == SDL_SCANCODE_F5)
 					gbUseJoystick = FALSE;
 
-				if (event.key.keysym.scancode == gScancodeMap)
+				if (event.key.keysym.scancode == gKeyMap_Scancode)
 					gKey |= KEY_MAP;
-				if (event.key.keysym.scancode == gScancodeLeft)
+				if (event.key.keysym.scancode == gKeyLeft_Scancode)
 					gKey |= KEY_LEFT;
-				if (event.key.keysym.scancode == gScancodeRight)
+				if (event.key.keysym.scancode == gKeyRight_Scancode)
 					gKey |= KEY_RIGHT;
-				if (event.key.keysym.scancode == gScancodeUp)
+				if (event.key.keysym.scancode == gKeyUp_Scancode)
 					gKey |= KEY_UP;
-				if (event.key.keysym.scancode == gScancodeDown)
+				if (event.key.keysym.scancode == gKeyDown_Scancode)
 					gKey |= KEY_DOWN;
-				if (event.key.keysym.scancode == gScancodeShot)
+				if (event.key.keysym.scancode == gKeyShot_Scancode)
 					gKey |= KEY_SHOT;
-				if (event.key.keysym.scancode == gScancodeJump)
+				if (event.key.keysym.scancode == gKeyJump_Scancode)
 					gKey |= KEY_JUMP;
-				if (event.key.keysym.scancode == gScancodeArms)
+				if (event.key.keysym.scancode == gKeyArms_Scancode)
 					gKey |= KEY_ARMS;
-				if (event.key.keysym.scancode == gScancodeArmsRev)
+				if (event.key.keysym.scancode == gKeyArmsRev_Scancode)
 					gKey |= KEY_ARMSREV;
-				if (event.key.keysym.scancode == gScancodeItem)
+				if (event.key.keysym.scancode == gKeyItem_Scancode)
 					gKey |= KEY_ITEM;
-				if (event.key.keysym.scancode == gScancodeCancel)
+				if (event.key.keysym.scancode == gKeyCancel_Scancode)
 					gKey |= KEY_CANCEL;
-				if (event.key.keysym.scancode == gScancodeOk)
+				if (event.key.keysym.scancode == gKeyOk_Scancode)
 					gKey |= KEY_OK;
-				if (event.key.keysym.scancode == gScancodePause)
+				if (event.key.keysym.scancode == gKeyPause_Scancode)
 					gKey |= KEY_PAUSE;
 
 				break;
@@ -379,31 +375,31 @@ BOOL SystemTask(void)
 				else if (event.key.keysym.scancode == SDL_SCANCODE_F2)
 					gKey &= ~KEY_F2;
 
-				if (event.key.keysym.scancode == gScancodeMap)
+				if (event.key.keysym.scancode == gKeyMap_Scancode)
 					gKey &= ~KEY_MAP;
-				if (event.key.keysym.scancode == gScancodeLeft)
+				if (event.key.keysym.scancode == gKeyLeft_Scancode)
 					gKey &= ~KEY_LEFT;
-				if (event.key.keysym.scancode == gScancodeRight)
+				if (event.key.keysym.scancode == gKeyRight_Scancode)
 					gKey &= ~KEY_RIGHT;
-				if (event.key.keysym.scancode == gScancodeUp)
+				if (event.key.keysym.scancode == gKeyUp_Scancode)
 					gKey &= ~KEY_UP;
-				if (event.key.keysym.scancode == gScancodeDown)
+				if (event.key.keysym.scancode == gKeyDown_Scancode)
 					gKey &= ~KEY_DOWN;
-				if (event.key.keysym.scancode == gScancodeShot)
+				if (event.key.keysym.scancode == gKeyShot_Scancode)
 					gKey &= ~KEY_SHOT;
-				if (event.key.keysym.scancode == gScancodeJump)
+				if (event.key.keysym.scancode == gKeyJump_Scancode)
 					gKey &= ~KEY_JUMP;
-				if (event.key.keysym.scancode == gScancodeArms)
+				if (event.key.keysym.scancode == gKeyArms_Scancode)
 					gKey &= ~KEY_ARMS;
-				if (event.key.keysym.scancode == gScancodeArmsRev)
+				if (event.key.keysym.scancode == gKeyArmsRev_Scancode)
 					gKey &= ~KEY_ARMSREV;
-				if (event.key.keysym.scancode == gScancodeItem)
+				if (event.key.keysym.scancode == gKeyItem_Scancode)
 					gKey &= ~KEY_ITEM;
-				if (event.key.keysym.scancode == gScancodeCancel)
+				if (event.key.keysym.scancode == gKeyCancel_Scancode)
 					gKey &= ~KEY_CANCEL;
-				if (event.key.keysym.scancode == gScancodeOk)
+				if (event.key.keysym.scancode == gKeyOk_Scancode)
 					gKey &= ~KEY_OK;
-				if (event.key.keysym.scancode == gScancodePause)
+				if (event.key.keysym.scancode == gKeyPause_Scancode)
 					gKey &= ~KEY_PAUSE;
 
 				break;
@@ -454,39 +450,96 @@ void JoystickProc(void)
 {
 	int i;
 	JOYSTICK_STATUS status;
+	static JOYSTICK_STATUS old_status;
 
 	if (!GetJoystickStatus(&status))
 		return;
 
-	gKey &= (KEY_ESCAPE | KEY_F2 | KEY_F1);
+//	gKey &= (KEY_ESCAPE | KEY_F2 | KEY_F1);
 
 	// Set movement buttons
-	if (status.bLeft)
+	if (status.bLeft && !old_status.bLeft)
 		gKey |= gKeyLeft;
-	else
+	else if (!status.bLeft && old_status.bLeft)
 		gKey &= ~gKeyLeft;
 
-	if (status.bRight)
+	if (status.bRight && !old_status.bRight)
 		gKey |= gKeyRight;
-	else
+	else if (!status.bRight && old_status.bRight)
 		gKey &= ~gKeyRight;
 
-	if (status.bUp)
+	if (status.bUp && !old_status.bUp)
 		gKey |= gKeyUp;
-	else
+	else if (!status.bUp && old_status.bUp)
 		gKey &= ~gKeyUp;
 
-	if (status.bDown)
+	if (status.bDown && !old_status.bDown)
 		gKey |= gKeyDown;
-	else
+	else if (!status.bDown && old_status.bDown)
 		gKey &= ~gKeyDown;
-
-	// Clear held buttons
-	for (i = 0; i < MAX_JOYSTICK_BUTTONS; ++i)
-		gKey &= ~gJoystickButtonTable[i];
 
 	// Set held buttons
 	for (i = 0; i < MAX_JOYSTICK_BUTTONS; ++i)
-		if (status.bButton[i])
-			gKey |= gJoystickButtonTable[i];
+	{
+		if (status.bButton[i] && !old_status.bButton[i])
+		{
+			if (i == gKeyMap_Button)
+				gKey |= KEY_MAP;
+			if (i == gKeyLeft_Button)
+				gKey |= KEY_LEFT;
+			if (i == gKeyRight_Button)
+				gKey |= KEY_RIGHT;
+			if (i == gKeyUp_Button)
+				gKey |= KEY_UP;
+			if (i == gKeyDown_Button)
+				gKey |= KEY_DOWN;
+			if (i == gKeyShot_Button)
+				gKey |= KEY_SHOT;
+			if (i == gKeyJump_Button)
+				gKey |= KEY_JUMP;
+			if (i == gKeyArms_Button)
+				gKey |= KEY_ARMS;
+			if (i == gKeyArmsRev_Button)
+				gKey |= KEY_ARMSREV;
+			if (i == gKeyItem_Button)
+				gKey |= KEY_ITEM;
+			if (i == gKeyCancel_Button)
+				gKey |= KEY_CANCEL;
+			if (i == gKeyOk_Button)
+				gKey |= KEY_OK;
+			if (i == gKeyPause_Button)
+				gKey |= KEY_PAUSE;
+		}
+		else if (!status.bButton[i] && old_status.bButton[i])
+		{
+			if (i == gKeyMap_Button)
+				gKey &= ~KEY_MAP;
+			if (i == gKeyLeft_Button)
+				gKey &= ~KEY_LEFT;
+			if (i == gKeyRight_Button)
+				gKey &= ~KEY_RIGHT;
+			if (i == gKeyUp_Button)
+				gKey &= ~KEY_UP;
+			if (i == gKeyDown_Button)
+				gKey &= ~KEY_DOWN;
+			if (i == gKeyShot_Button)
+				gKey &= ~KEY_SHOT;
+			if (i == gKeyJump_Button)
+				gKey &= ~KEY_JUMP;
+			if (i == gKeyArms_Button)
+				gKey &= ~KEY_ARMS;
+			if (i == gKeyArmsRev_Button)
+				gKey &= ~KEY_ARMSREV;
+			if (i == gKeyItem_Button)
+				gKey &= ~KEY_ITEM;
+			if (i == gKeyCancel_Button)
+				gKey &= ~KEY_CANCEL;
+			if (i == gKeyOk_Button)
+				gKey &= ~KEY_OK;
+			if (i == gKeyPause_Button)
+				gKey &= ~KEY_PAUSE;
+		}
+	}
+
+	old_status = status;
 }
