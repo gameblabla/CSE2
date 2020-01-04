@@ -44,12 +44,11 @@ BOOL LoadConfigData(CONFIG *conf)
 	conf->bVsync = fgetc(fp);
 
 	// Read key-bindings
-	for (size_t i = 0; i < sizeof(conf->key_bindings) / sizeof(conf->key_bindings[0]); ++i)
-		conf->key_bindings[i] = File_ReadLE32(fp);
-
-	// Read button-bindings
-	for (size_t i = 0; i < sizeof(conf->button_bindings) / sizeof(conf->button_bindings[0]); ++i)
-		conf->button_bindings[i] = fgetc(fp);
+	for (size_t i = 0; i < BINDING_TOTAL; ++i)
+	{
+		conf->bindings[i].keyboard = File_ReadLE32(fp);
+		conf->bindings[i].controller = fgetc(fp);
+	}
 
 	// Close file
 	fclose(fp);
@@ -92,12 +91,11 @@ BOOL SaveConfigData(const CONFIG *conf)
 	fputc(conf->bVsync, fp);
 
 	// Read key-bindings
-	for (size_t i = 0; i < sizeof(conf->key_bindings) / sizeof(conf->key_bindings[0]); ++i)
-		File_WriteLE32(conf->key_bindings[i], fp);
-
-	// Read button-bindings
-	for (size_t i = 0; i < sizeof(conf->button_bindings) / sizeof(conf->button_bindings[0]); ++i)
-		fputc(conf->button_bindings[i], fp);
+	for (size_t i = 0; i < BINDING_TOTAL; ++i)
+	{
+		File_WriteLE32(conf->bindings[i].keyboard, fp);
+		fputc(conf->bindings[i].controller, fp);
+	}
 
 	// Close file
 	fclose(fp);
@@ -116,28 +114,19 @@ void DefaultConfigData(CONFIG *conf)
 	// conf->display_mode = 1;
 
 	conf->bJoystick = TRUE;
-/*	conf->joystick_button[0] = 2;
-	conf->joystick_button[1] = 1;
-	conf->joystick_button[2] = 5;
-	conf->joystick_button[3] = 6;
-	conf->joystick_button[4] = 3;
-	conf->joystick_button[5] = 4;
-	conf->joystick_button[6] = 6;
-	conf->joystick_button[7] = 3;
-*/
 
-	// Set default key bindings too
-	conf->key_bindings[0] = SDL_SCANCODE_UP;
-	conf->key_bindings[1] = SDL_SCANCODE_DOWN;
-	conf->key_bindings[2] = SDL_SCANCODE_LEFT;
-	conf->key_bindings[3] = SDL_SCANCODE_RIGHT;
-	conf->key_bindings[4] = SDL_SCANCODE_Z;
-	conf->key_bindings[5] = SDL_SCANCODE_X;
-	conf->key_bindings[6] = SDL_SCANCODE_Z;
-	conf->key_bindings[7] = SDL_SCANCODE_X;
-	conf->key_bindings[8] = SDL_SCANCODE_S;
-	conf->key_bindings[9] = SDL_SCANCODE_A;
-	conf->key_bindings[10] = SDL_SCANCODE_Q;
-	conf->key_bindings[11] = SDL_SCANCODE_W;
-	conf->key_bindings[12] = SDL_SCANCODE_ESCAPE;
+	// Set default key bindings
+	conf->bindings[BINDING_UP].keyboard = SDL_SCANCODE_UP;
+	conf->bindings[BINDING_DOWN].keyboard = SDL_SCANCODE_DOWN;
+	conf->bindings[BINDING_LEFT].keyboard = SDL_SCANCODE_LEFT;
+	conf->bindings[BINDING_RIGHT].keyboard = SDL_SCANCODE_RIGHT;
+	conf->bindings[BINDING_OK].keyboard = SDL_SCANCODE_Z;
+	conf->bindings[BINDING_CANCEL].keyboard = SDL_SCANCODE_X;
+	conf->bindings[BINDING_JUMP].keyboard = SDL_SCANCODE_Z;
+	conf->bindings[BINDING_SHOT].keyboard = SDL_SCANCODE_X;
+	conf->bindings[BINDING_ARMSREV].keyboard = SDL_SCANCODE_S;
+	conf->bindings[BINDING_ARMS].keyboard = SDL_SCANCODE_A;
+	conf->bindings[BINDING_ITEM].keyboard = SDL_SCANCODE_Q;
+	conf->bindings[BINDING_MAP].keyboard = SDL_SCANCODE_W;
+	conf->bindings[BINDING_PAUSE].keyboard = SDL_SCANCODE_ESCAPE;
 }
