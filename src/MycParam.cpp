@@ -382,10 +382,8 @@ void PutMyAir(int x, int y)
 		{112, 80, 144, 88},
 	};
 
-#ifdef ENABLE_PHY
 	if (gPHYArray[16])
 		return;
-#endif
 
 	if (gMC.equip & 0x10)
 		return;

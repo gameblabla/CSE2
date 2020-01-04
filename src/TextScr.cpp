@@ -55,9 +55,27 @@ static unsigned long nod_color;
 
 unsigned int gMIMCurrentNum = 0;
 
-#ifdef ENABLE_PHY
-int gPHYArray[17];
-#endif
+// This is initialized with the values the game uses in vanilla
+int gPHYArray[17] =
+{
+	0x32C,	// Default value for max_dash normally
+	0x5FF,	// Default value for max_move normally
+	0x50,	// Default value for gravity1 normally
+	0x20,	// Default value for gravity2 normally
+	0x500,	// Default value for jump normally
+	0x55,	// Default value for dash1 normally
+	0x20,	// Default value for dash2 normally
+	0x33,	// Default value for resist normally
+	0x196,	// Default value for max_dash underwater
+	0x2FF,	// Default value for max_move underwater
+	0x28,	// Default value for gravity1 underwater
+	0x10,	// Default value for gravity2 underwater
+	0x280,	// Default value for jump underwater
+	0x2A,	// Default value for dash1 underwater
+	0x10,	// Default value for dash2 underwater
+	0x19,	// Default value for resist underwater
+	0,	// Actually a boolean. This enables normal water behaviour, as in vanilla
+};
 
 // Initialize and end tsc
 BOOL InitTextScript2(void)
@@ -691,7 +709,6 @@ int TextScriptProc(void)
 						ZeroArmsEnergy_All();
 						gTS.p_read += 4;
 					}
-#ifdef ENABLE_PHY
 					else if (IS_COMMAND('P','H','Y'))
 					{
 						y = GetTextScriptNo(gTS.p_read + 4);
@@ -701,7 +718,6 @@ int TextScriptProc(void)
 						}
 						gTS.p_read += 13;
 					}
-#endif
 					else if (IS_COMMAND('T','A','M'))
 					{
 						x = GetTextScriptNo(gTS.p_read + 4);

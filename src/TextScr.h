@@ -69,9 +69,7 @@ int TextScriptProc(void);
 void RestoreTextScript(void);
 
 
-#ifdef ENABLE_PHY
 /// Array used by <PHY to contain the values of the different variables it may contain. The first 8 values contain the values for normal physics and the last 8 for when the character is underwater.
 /// The values are, in order : max_dash, max_move, gravity1, gravity2, dash1, dash2, resist, jump
-/// The seventeenth value determines whether water causes a splash or triggers the air timer
+/// The seventeenth value determines whether the behaviours in which entering water causes a splash, being in water draws the air timer and being in water decreases your air are enabled (0 means it's enabled, non-0 means it's disabled)
 extern int gPHYArray[17];
-#endif
