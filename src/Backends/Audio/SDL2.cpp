@@ -15,7 +15,7 @@
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
-#define clamp(x, y, z) MIN(MAX((x), (y)), (z))
+#define CLAMP(x, y, z) MIN(MAX((x), (y)), (z))
 
 struct AudioBackend_Sound
 {
@@ -43,7 +43,7 @@ static unsigned long output_frequency;
 static double MillibelToScale(long volume)
 {
 	// Volume is in hundredths of decibels, from 0 to -10000
-	volume = clamp(volume, -10000, 0);
+	volume = CLAMP(volume, -10000, 0);
 	return pow(10.0, volume / 2000.0);
 }
 

@@ -156,7 +156,7 @@ void PutStageSelectObject(void)
 
 int StageSelectLoop(int *p_event)
 {
-	char old_script_path[260];
+	char old_script_path[MAX_PATH];
 
 	RECT rcView = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 

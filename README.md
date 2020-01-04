@@ -66,7 +66,7 @@ Many months of copypasting and tinkering later, here is the result.
 
 * SDL2
 * Freetype
-* GLEW (if the OpenGL rendering backend is selected)
+* GLEW (if the OpenGL3 rendering backend is selected)
 * libxmp-lite (only if AUDIO_TRACKER is enabled)
 
 ## Building
