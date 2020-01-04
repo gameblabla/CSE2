@@ -76,7 +76,7 @@ BOOL GetJoystickStatus(JOYSTICK_STATUS *status)
 	}
 
 	// Blank the buttons that do not
-	for (; i < 32; ++i)
+	for (; i < MAX_JOYSTICK_BUTTONS; ++i)
 		status->bButton[i] = FALSE;
 
 	status->bDown = FALSE;

@@ -288,8 +288,8 @@ static int Callback_ControlsController_Rebind(Option *options, size_t total_opti
 	PlaySoundObject(5, 1);
 
 	JOYSTICK_STATUS old_state;
-	memset(&old_state, 0, sizeof(JOYSTICK_STATUS));
-	GetJoystickStatus(&old_state);
+	if (!GetJoystickStatus(&old_state))
+		memset(&old_state, 0, sizeof(JOYSTICK_STATUS));
 
 	char timeout_string[2];
 	timeout_string[1] = '\0';
@@ -297,8 +297,8 @@ static int Callback_ControlsController_Rebind(Option *options, size_t total_opti
 	for (unsigned int timeout = (60 * 5) - 1; timeout != 0; --timeout)
 	{
 		JOYSTICK_STATUS state;
-		memset(&state, 0, sizeof(JOYSTICK_STATUS));
-		GetJoystickStatus(&state);
+		if (!GetJoystickStatus(&state))
+			memset(&state, 0, sizeof(JOYSTICK_STATUS));
 
 		for (int button = 0; button < MAX_JOYSTICK_BUTTONS; ++button)
 		{
