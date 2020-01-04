@@ -43,7 +43,7 @@ Many months of copypasting and tinkering later, here is the result.
 * SDL2
 * Freetype
 * FLTK
-* GLEW (if the OpenGL rendering backend is selected)
+* GLEW (if the OpenGL3 rendering backend is selected)
 
 ## Building
 
