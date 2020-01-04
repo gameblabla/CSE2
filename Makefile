@@ -104,6 +104,7 @@ SOURCES = \
   src/Config \
   src/Draw \
   src/Ending \
+  src/Escape \
   src/Fade \
   src/File \
   src/Flags \
