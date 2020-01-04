@@ -209,23 +209,14 @@ static int Callback_ControlsKeyboard_Rebind(Option *options, size_t total_option
 					if (other_option != selected_option && controls[other_option].groups & controls[selected_option].groups && bindings[controls[other_option].binding_index].keyboard == scancode)
 					{
 						bindings[controls[other_option].binding_index].keyboard = bindings[controls[selected_option].binding_index].keyboard;
-						bindings[controls[selected_option].binding_index].keyboard = scancode;
-
 						memcpy(bound_name_buffers[other_option], bound_name_buffers[selected_option], sizeof(bound_name_buffers[0]));
-						strncpy(bound_name_buffers[selected_option], key_name, sizeof(bound_name_buffers[0]) - 1);
-
-						PlaySoundObject(18, 1);
-						free(old_state);
-
-						gKeyTrg = gKey = 0;	// Prevent weird input-ghosting by doing this
-						return -1;
+						break;
 					}
 				}
 
 				// Otherwise just overwrite the selected control
-				strncpy(bound_name_buffers[selected_option], key_name, sizeof(bound_name_buffers[0]) - 1);
-
 				bindings[controls[selected_option].binding_index].keyboard = scancode;
+				strncpy(bound_name_buffers[selected_option], key_name, sizeof(bound_name_buffers[0]) - 1);
 
 				PlaySoundObject(18, 1);
 				free(old_state);
@@ -319,24 +310,14 @@ static int Callback_ControlsController_Rebind(Option *options, size_t total_opti
 					if (other_option != selected_option && controls[other_option].groups & controls[selected_option].groups && bindings[controls[other_option].binding_index].controller == button)
 					{
 						bindings[controls[other_option].binding_index].controller = bindings[controls[selected_option].binding_index].controller;
-						bindings[controls[selected_option].binding_index].controller = button;
-
 						memcpy(bound_name_buffers[other_option], bound_name_buffers[selected_option], sizeof(bound_name_buffers[0]));
-						snprintf(bound_name_buffers[selected_option], sizeof(bound_name_buffers[0]), "Button %d", button);
-
-						PlaySoundObject(18, 1);
-
-						gKeyTrg = gKey = 0;	// Prevent weird input-ghosting by doing this
-						return -1;
+						break;
 					}
 				}
 
 				// Otherwise just overwrite the selected control
-				snprintf(bound_name_buffers[selected_option], sizeof(bound_name_buffers[0]), "Button %d", button);
-
-				long mask;
-
 				bindings[controls[selected_option].binding_index].controller = button;
+				snprintf(bound_name_buffers[selected_option], sizeof(bound_name_buffers[0]), "Button %d", button);
 
 				PlaySoundObject(18, 1);
 
