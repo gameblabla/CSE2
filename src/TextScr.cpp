@@ -62,18 +62,18 @@ int gPHYArray[17] =
 	0x5FF,	// Default value for max_move normally
 	0x50,	// Default value for gravity1 normally
 	0x20,	// Default value for gravity2 normally
-	0x500,	// Default value for jump normally
 	0x55,	// Default value for dash1 normally
 	0x20,	// Default value for dash2 normally
 	0x33,	// Default value for resist normally
+	0x500,	// Default value for jump normally
 	0x196,	// Default value for max_dash underwater
 	0x2FF,	// Default value for max_move underwater
 	0x28,	// Default value for gravity1 underwater
 	0x10,	// Default value for gravity2 underwater
-	0x280,	// Default value for jump underwater
 	0x2A,	// Default value for dash1 underwater
 	0x10,	// Default value for dash2 underwater
 	0x19,	// Default value for resist underwater
+	0x280,	// Default value for jump underwater
 	0,	// Actually a boolean. This enables normal water behaviour, as in vanilla
 };
 
