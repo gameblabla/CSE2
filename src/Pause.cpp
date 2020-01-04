@@ -153,7 +153,7 @@ typedef struct Control
 	const char *name;
 	size_t binding_index;
 	int groups;
-	char bound_name[20];
+	char bound_name_buffer[20];
 } Control;
 
 /*
@@ -203,7 +203,7 @@ static int Callback_InputRebindKeyboard(Option *options, size_t total_options, s
 			{
 				const char *key_name = SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)scancode));
 
-				// If another key in the game group uses this key, swap them
+				// If another control in the same group uses this key, swap them
 				for (size_t other_option = 0; other_option < total_options; ++other_option)
 				{
 					if (other_option != selected_option && controls[other_option].groups & controls[selected_option].groups && bindings[controls[other_option].binding_index].keyboard == scancode)
@@ -211,8 +211,8 @@ static int Callback_InputRebindKeyboard(Option *options, size_t total_options, s
 						bindings[controls[other_option].binding_index].keyboard = bindings[controls[selected_option].binding_index].keyboard;
 						bindings[controls[selected_option].binding_index].keyboard = scancode;
 
-						memcpy(controls[other_option].bound_name, controls[selected_option].bound_name, sizeof(controls[0].bound_name));
-						strncpy(controls[selected_option].bound_name, key_name, sizeof(controls[0].bound_name) - 1);
+						memcpy(controls[other_option].bound_name_buffer, controls[selected_option].bound_name_buffer, sizeof(controls[0].bound_name_buffer));
+						strncpy(controls[selected_option].bound_name_buffer, key_name, sizeof(controls[0].bound_name_buffer) - 1);
 
 						PlaySoundObject(18, 1);
 						free(old_state);
@@ -223,7 +223,7 @@ static int Callback_InputRebindKeyboard(Option *options, size_t total_options, s
 				}
 
 				// Otherwise just overwrite the selected key
-				strncpy(controls[selected_option].bound_name, key_name, sizeof(controls[0].bound_name) - 1);
+				strncpy(controls[selected_option].bound_name_buffer, key_name, sizeof(controls[0].bound_name_buffer) - 1);
 
 				bindings[controls[selected_option].binding_index].keyboard = scancode;
 
@@ -276,9 +276,9 @@ static int Callback_ControlsKeyboard(Option *options, size_t total_options, size
 	{
 		submenu_options[i].name = controls[i].name;
 		submenu_options[i].callback = Callback_InputRebindKeyboard;
-		submenu_options[i].attribute = controls[i].bound_name;
+		submenu_options[i].attribute = controls[i].bound_name_buffer;
 
-		strncpy(controls[i].bound_name, SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)bindings[controls[i].binding_index].keyboard)), sizeof(controls[0].bound_name) - 1);
+		strncpy(controls[i].bound_name_buffer, SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)bindings[controls[i].binding_index].keyboard)), sizeof(controls[0].bound_name_buffer) - 1);
 	}
 
 	PlaySoundObject(5, 1);
@@ -315,7 +315,7 @@ static int Callback_InputRebindController(Option *options, size_t total_options,
 		{
 			if (!old_state.bButton[button] && state.bButton[button])
 			{
-				// If another key in the game group uses this key, swap them
+				// If another control in the same group uses this button, swap them
 				for (size_t other_option = 0; other_option < total_options; ++other_option)
 				{
 					if (other_option != selected_option && controls[other_option].groups & controls[selected_option].groups && bindings[controls[other_option].binding_index].controller == button)
@@ -323,8 +323,8 @@ static int Callback_InputRebindController(Option *options, size_t total_options,
 						bindings[controls[other_option].binding_index].controller = bindings[controls[selected_option].binding_index].controller;
 						bindings[controls[selected_option].binding_index].controller = button;
 
-						memcpy(controls[other_option].bound_name, controls[selected_option].bound_name, sizeof(controls[0].bound_name));
-						snprintf(controls[selected_option].bound_name, sizeof(controls[0].bound_name), "Button %d", button);
+						memcpy(controls[other_option].bound_name_buffer, controls[selected_option].bound_name_buffer, sizeof(controls[0].bound_name_buffer));
+						snprintf(controls[selected_option].bound_name_buffer, sizeof(controls[0].bound_name_buffer), "Button %d", button);
 
 						PlaySoundObject(18, 1);
 
@@ -334,7 +334,7 @@ static int Callback_InputRebindController(Option *options, size_t total_options,
 				}
 
 				// Otherwise just overwrite the selected key
-				snprintf(controls[selected_option].bound_name, sizeof(controls[0].bound_name), "Button %d", button);
+				snprintf(controls[selected_option].bound_name_buffer, sizeof(controls[0].bound_name_buffer), "Button %d", button);
 
 				long mask;
 
@@ -387,9 +387,9 @@ static int Callback_ControlsController(Option *options, size_t total_options, si
 	{
 		submenu_options[i].name = controls[i].name;
 		submenu_options[i].callback = Callback_InputRebindController;
-		submenu_options[i].attribute = controls[i].bound_name;
+		submenu_options[i].attribute = controls[i].bound_name_buffer;
 
-		snprintf(controls[i].bound_name, sizeof(controls[0].bound_name), "Button %d", bindings[controls[i].binding_index].controller);
+		snprintf(controls[i].bound_name_buffer, sizeof(controls[0].bound_name_buffer), "Button %d", bindings[controls[i].binding_index].controller);
 	}
 
 	PlaySoundObject(5, 1);
