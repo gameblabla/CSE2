@@ -192,11 +192,10 @@ static int Callback_InputRebindKeyboard(Option *options, size_t total_options, s
 
 	memcpy(old_state, state, total_keys);
 
-	unsigned int timeout = 60 * 5;
 	char timeout_string[2];
 	timeout_string[1] = '\0';
 
-	for (;;)
+	for (unsigned int timeout = 60 * 5; timeout != 0; --timeout)
 	{
 		for (int scancode = 0; scancode < total_keys; ++scancode)
 		{
@@ -256,10 +255,9 @@ static int Callback_InputRebindKeyboard(Option *options, size_t total_options, s
 			free(old_state);
 			return 0;
 		}
-
-		if (--timeout == 0)
-			return -1;
 	}
+
+	return -1;
 }
 
 static int Callback_ControlsKeyboard(Option *options, size_t total_options, size_t selected_option, long key)
@@ -302,11 +300,10 @@ static int Callback_InputRebindController(Option *options, size_t total_options,
 	memset(&old_state, 0, sizeof(JOYSTICK_STATUS));
 	GetJoystickStatus(&old_state);
 
-	unsigned int timeout = 60 * 5;
 	char timeout_string[2];
 	timeout_string[1] = '\0';
 
-	for (;;)
+	for (unsigned int timeout = 60 * 5; timeout != 0; --timeout)
 	{
 		JOYSTICK_STATUS state;
 		memset(&state, 0, sizeof(JOYSTICK_STATUS));
@@ -367,10 +364,9 @@ static int Callback_InputRebindController(Option *options, size_t total_options,
 			// Quit if window is closed
 			return 0;
 		}
-
-		if (--timeout == 0)
-			return -1;
 	}
+
+	return -1;
 }
 
 static int Callback_ControlsController(Option *options, size_t total_options, size_t selected_option, long key)
