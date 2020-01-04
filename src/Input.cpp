@@ -18,10 +18,11 @@ void ReleaseDirectInput(void)
 	// Close opened joystick (if exists)
 	if (joystick != NULL)
 	{
-		SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
 		SDL_JoystickClose(joystick);
 		joystick = NULL;
 	}
+
+	SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
 }
 
 BOOL HookAllDirectInputDevices(void);

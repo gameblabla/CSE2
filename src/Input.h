@@ -2,9 +2,6 @@
 
 #include "WindowsWrapper.h"
 
-extern BOOL gbUseJoystick;
-extern int gJoystickButtonTable[8];
-
 struct JOYSTICK_STATUS
 {
 	BOOL bLeft;
