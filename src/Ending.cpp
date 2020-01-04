@@ -462,7 +462,7 @@ int Scene_DownIsland(HWND hWnd, int mode)
 		GetTrg();
 
 		// Escape menu
-		if (gKey & 0x8000)
+		if (gKey & KEY_ESCAPE)
 		{
 			switch (Call_Escape(hWnd))
 			{
