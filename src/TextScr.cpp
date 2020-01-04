@@ -614,11 +614,6 @@ int TextScriptProc(void)
 						gTS.face = 0;
 						bExit = TRUE;
 					}
-					else if (IS_COMMAND('M','I','M'))
-					{
-						gMIMCurrentNum = GetTextScriptNo(gTS.p_read + 4);
-						gTS.p_read += 8;
-					}
 					else if (IS_COMMAND('L','I','+'))
 					{
 						x = GetTextScriptNo(gTS.p_read + 4);
@@ -686,84 +681,6 @@ int TextScriptProc(void)
 					{
 						ZeroArmsEnergy_All();
 						gTS.p_read += 4;
-					}
-					else if (IS_COMMAND('P','H','Y'))
-					{
-						x = GetTextScriptNo(gTS.p_read + 4);
-						y = GetTextScriptNo(gTS.p_read + 9);
-
-						switch (x)
-						{
-							case 0:
-								gMC.physics_normal.max_dash = y;
-								break;
-
-							case 1:
-								gMC.physics_normal.max_move = y;
-								break;
-
-							case 2:
-								gMC.physics_normal.gravity1 = y;
-								break;
-
-							case 3:
-								gMC.physics_normal.gravity2 = y;
-								break;
-
-							case 4:
-								gMC.physics_normal.dash1 = y;
-								break;
-
-							case 5:
-								gMC.physics_normal.dash2 = y;
-								break;
-
-							case 6:
-								gMC.physics_normal.resist = y;
-								break;
-
-							case 7:
-								gMC.physics_normal.jump = y;
-								break;
-
-							case 8:
-								gMC.physics_underwater.max_dash = y;
-								break;
-
-							case 9:
-								gMC.physics_underwater.max_move = y;
-								break;
-
-							case 10:
-								gMC.physics_underwater.gravity1 = y;
-								break;
-
-							case 11:
-								gMC.physics_underwater.gravity2 = y;
-								break;
-
-							case 12:
-								gMC.physics_underwater.dash1 = y;
-								break;
-
-							case 13:
-								gMC.physics_underwater.dash2 = y;
-								break;
-
-							case 14:
-								gMC.physics_underwater.resist = y;
-								break;
-
-							case 15:
-								gMC.physics_underwater.jump = y;
-								break;
-
-							case 16:
-								gMC.no_splash_or_air_limit_underwater = y;
-								break;
-						}
-
-						gTS.p_read += 13;
 					}
 					else if (IS_COMMAND('T','A','M'))
 					{
@@ -1367,6 +1284,89 @@ int TextScriptProc(void)
 						}
 
 						gTS.p_read += 8;
+					}
+					else if (IS_COMMAND('M','I','M'))
+					{
+						gMIMCurrentNum = GetTextScriptNo(gTS.p_read + 4);
+						gTS.p_read += 8;
+					}
+					else if (IS_COMMAND('P','H','Y'))
+					{
+						x = GetTextScriptNo(gTS.p_read + 4);
+						y = GetTextScriptNo(gTS.p_read + 9);
+
+						switch (x)
+						{
+							case 0:
+								gMC.physics_normal.max_dash = y;
+								break;
+
+							case 1:
+								gMC.physics_normal.max_move = y;
+								break;
+
+							case 2:
+								gMC.physics_normal.gravity1 = y;
+								break;
+
+							case 3:
+								gMC.physics_normal.gravity2 = y;
+								break;
+
+							case 4:
+								gMC.physics_normal.dash1 = y;
+								break;
+
+							case 5:
+								gMC.physics_normal.dash2 = y;
+								break;
+
+							case 6:
+								gMC.physics_normal.resist = y;
+								break;
+
+							case 7:
+								gMC.physics_normal.jump = y;
+								break;
+
+							case 8:
+								gMC.physics_underwater.max_dash = y;
+								break;
+
+							case 9:
+								gMC.physics_underwater.max_move = y;
+								break;
+
+							case 10:
+								gMC.physics_underwater.gravity1 = y;
+								break;
+
+							case 11:
+								gMC.physics_underwater.gravity2 = y;
+								break;
+
+							case 12:
+								gMC.physics_underwater.dash1 = y;
+								break;
+
+							case 13:
+								gMC.physics_underwater.dash2 = y;
+								break;
+
+							case 14:
+								gMC.physics_underwater.resist = y;
+								break;
+
+							case 15:
+								gMC.physics_underwater.jump = y;
+								break;
+
+							case 16:
+								gMC.no_splash_or_air_limit_underwater = y;
+								break;
+						}
+
+						gTS.p_read += 13;
 					}
 					else if (IS_COMMAND('E','S','C'))
 					{
