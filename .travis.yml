@@ -14,7 +14,7 @@ language: cpp
 # Cache compiled object files with ccache
 cache: ccache
 
-osx_image: xcode11.2
+osx_image: xcode11.3
 
 compiler:
     - gcc
