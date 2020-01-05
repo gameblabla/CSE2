@@ -146,7 +146,7 @@ BOOL __stdcall EnumDevices_Callback(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef)
 
 	char string[0x100];
 #ifdef FIX_BUGS
-	sprintf(string, "DeviceGUID = %lx-%hx-%hx-%hhx%hhx-%hhx%hhx%hhx%hhx%hhx%hhx\n", lpddi->guidInstance.Data1, lpddi->guidInstance.Data2, lpddi->guidInstance.Data3, lpddi->guidInstance.Data4[0], lpddi->guidInstance.Data4[1], lpddi->guidInstance.Data4[2], lpddi->guidInstance.Data4[3], lpddi->guidInstance.Data4[4], lpddi->guidInstance.Data4[5], lpddi->guidInstance.Data4[6], lpddi->guidInstance.Data4[7]);
+	sprintf(string, "DeviceGUID = %08lX-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X\n", lpddi->guidInstance.Data1, lpddi->guidInstance.Data2, lpddi->guidInstance.Data3, lpddi->guidInstance.Data4[0], lpddi->guidInstance.Data4[1], lpddi->guidInstance.Data4[2], lpddi->guidInstance.Data4[3], lpddi->guidInstance.Data4[4], lpddi->guidInstance.Data4[5], lpddi->guidInstance.Data4[6], lpddi->guidInstance.Data4[7]);
 #else
 	sprintf(string, "DeviceGUID = %x\n", lpddi->guidInstance);	// Tries to print a struct as an int
 #endif
