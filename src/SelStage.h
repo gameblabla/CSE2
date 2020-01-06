@@ -2,11 +2,15 @@
 
 #include "WindowsWrapper.h"
 
-struct PERMIT_STAGE
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef struct PERMIT_STAGE
 {
 	int index;
 	int event;
-};
+} PERMIT_STAGE;
 
 extern PERMIT_STAGE gPermitStage[8];
 
@@ -16,3 +20,7 @@ BOOL SubPermitStage(int index);
 void MoveStageSelectCursor(void);
 void PutStageSelectObject(void);
 int StageSelectLoop(int *p_event);
+
+#ifdef __cplusplus
+}
+#endif

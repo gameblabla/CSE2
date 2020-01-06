@@ -19,8 +19,6 @@ static const char *version_string =
 // TODO - Inaccurate stack frame
 INT_PTR __stdcall VersionDialog(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
-	(void)lParam;
-
 	char string_buffer[104];
 
 	int year;
@@ -31,6 +29,8 @@ INT_PTR __stdcall VersionDialog(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lPara
 	int version2;
 	int version3;
 	int version4;
+
+	(void)lParam;
 
 	switch (Msg)
 	{
@@ -104,9 +104,9 @@ INT_PTR __stdcall DebugMuteDialog(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lPa
 
 INT_PTR __stdcall DebugSaveDialog(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
-	(void)lParam;
-
 	char string[100];
+
+	(void)lParam;
 
 	switch (Msg)
 	{

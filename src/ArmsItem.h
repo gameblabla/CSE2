@@ -11,7 +11,7 @@ extern "C" {
 // "Num" often means "ammo" here
 
 /// Weapon struct
-struct ARMS
+typedef struct ARMS
 {
 	/// ID of the weapon
 	int code;
@@ -27,13 +27,13 @@ struct ARMS
 
 	/// Current ammunition
 	int num;
-};
+} ARMS;
 
-struct ITEM
+typedef struct ITEM
 {
 	/// ID of the item
 	int code;
-};
+} ITEM;
 
 
 // Limits for the amount of weapons and items
