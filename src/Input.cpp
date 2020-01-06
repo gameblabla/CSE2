@@ -19,11 +19,11 @@ typedef struct DirectInputPair
 	LPDIRECTINPUTDEVICE2A device;
 } DirectInputPair;
 
-static LPDIRECTINPUTDEVICE2A joystick;
-static LPDIRECTINPUTA lpDI;
-
-static int joystick_neutral_x;
-static int joystick_neutral_y;
+// The original names for these variables are unknown
+static LPDIRECTINPUTA lpDI = NULL;
+static LPDIRECTINPUTDEVICE2A joystick = NULL;
+static int joystick_neutral_x = 0;
+static int joystick_neutral_y = 0;
 
 void ReleaseDirectInput(void)
 {
@@ -40,7 +40,7 @@ void ReleaseDirectInput(void)
 	}
 }
 
-// The original name for this function is unknown
+// The original name for this function and its variables are unknown
 BOOL SetDeviceAquire(BOOL aquire)
 {
 	if (aquire == TRUE)
@@ -57,6 +57,7 @@ BOOL SetDeviceAquire(BOOL aquire)
 	return TRUE;
 }
 
+// It looks like Pixel declared his functions early, so he could forward-reference
 BOOL HookAllDirectInputDevices(HWND hWnd);
 BOOL __stdcall EnumDevices_Callback(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef);
 
@@ -75,7 +76,7 @@ BOOL InitDirectInput(HINSTANCE hinst, HWND hWnd)
 	return TRUE;
 }
 
-// The original name for this function is unknown
+// The original name for this function and its variables are unknown
 BOOL HookAllDirectInputDevices(HWND hWnd)
 {
 	DirectInputPair directinput_objects;
@@ -83,7 +84,8 @@ BOOL HookAllDirectInputDevices(HWND hWnd)
 	directinput_objects.device = NULL;
 	directinput_objects.lpDI = lpDI;
 
-	lpDI->AddRef();
+	directinput_objects.lpDI->AddRef();
+
 	lpDI->EnumDevices(DIDEVTYPE_JOYSTICK, EnumDevices_Callback, &directinput_objects, DIEDFL_ATTACHEDONLY);
 
 	if (directinput_objects.lpDI != NULL)
@@ -108,7 +110,7 @@ BOOL HookAllDirectInputDevices(HWND hWnd)
 	return TRUE;
 }
 
-// The original name for this function is unknown
+// The original name for this function and its variables are unknown
 BOOL __stdcall EnumDevices_Callback(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef)
 {
 	static int already_ran;
