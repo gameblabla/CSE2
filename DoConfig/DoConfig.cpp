@@ -19,9 +19,6 @@
 #include <cstring>
 #include <fstream>
 
-#define MAGIC "DOUKUTSU20041206"
-#define FONT "Courier New"
-
 struct data
 {
 	char magic[32];
@@ -46,9 +43,12 @@ private:
 	Fl_Radio_Round_Button *buttons[6];
 };
 
+static const char MAGIC[32] = "DOUKUTSU20041206";
+static const char FONT[64] = "Courier New";
+
 static char config_path[FILENAME_MAX];
 
-static data config = {MAGIC, FONT};
+static data config;
 
 static unsigned long CharsToLong(unsigned char *chars)
 {
@@ -123,6 +123,15 @@ void read_Config()
 	fd.open(config_path, std::ios::in | std::ios::binary);
 	fd.read((char *)&config, sizeof(config));
 	fd.close();
+
+	// If Config.dat's magic value doesn't match, create a blank default Config.dat instead
+	if (memcmp(config.magic, MAGIC, sizeof(config.magic)))
+	{
+		memset(&config, 0, sizeof(config));
+		strcpy(config.magic, MAGIC);
+		strcpy(config.font, FONT);
+	}
+
 	CharsToLong(config.move) ? movegt->setonly() : movear->setonly();
 	CharsToLong(config.attack) ? buttonzx->setonly() : buttonxz->setonly();
 	CharsToLong(config.okay) ? okayattack->setonly() : okayjump->setonly();
