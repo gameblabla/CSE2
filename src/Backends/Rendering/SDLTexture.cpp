@@ -154,7 +154,7 @@ unsigned char* Backend_LockSurface(Backend_Surface *surface, unsigned int *pitch
 
 	*pitch = surface->width * 3;
 
-	surface->pixels = (unsigned char*)malloc(surface->width * surface->height * 3);
+	surface->pixels = (unsigned char*)calloc(surface->width * surface->height * 3, 1);	// Make sure these are initialized
 
 	return surface->pixels;
 }
