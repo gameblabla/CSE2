@@ -155,9 +155,10 @@ int ModeOpening()
 		{
 			switch (Call_Escape())
 			{
-				case 0:
+				case enum_ESCRETURN_exit:
 					return 0;
-				case 2:
+
+				case enum_ESCRETURN_restart:
 					return 1;
 			}
 		}
@@ -198,9 +199,10 @@ int ModeOpening()
 		// Update Text Script
 		switch (TextScriptProc())
 		{
-			case 0:
+			case enum_ESCRETURN_exit:
 				return 0;
-			case 2:
+
+			case enum_ESCRETURN_restart:
 				return 1;
 		}
 
@@ -365,9 +367,10 @@ int ModeTitle(void)
 		{
 			switch (Call_Escape())
 			{
-				case 0:
+				case enum_ESCRETURN_exit:
 					return 0;
-				case 2:
+
+				case enum_ESCRETURN_restart:
 					return 1;
 			}
 		}
@@ -528,9 +531,10 @@ int ModeAction(void)
 		{
 			switch (Call_Escape())
 			{
-				case 0:
+				case enum_ESCRETURN_exit:
 					return 0;
-				case 2:
+
+				case enum_ESCRETURN_restart:
 					return 1;
 			}
 		}
@@ -608,9 +612,10 @@ int ModeAction(void)
 
 				switch (CampLoop())
 				{
-					case 0:
+					case enum_ESCRETURN_exit:
 						return 0;
-					case 2:
+
+					case enum_ESCRETURN_restart:
 						return 1;
 				}
 
@@ -622,9 +627,10 @@ int ModeAction(void)
 
 				switch (MiniMapLoop())
 				{
-					case 0:
+					case enum_ESCRETURN_exit:
 						return 0;
-					case 2:
+
+					case enum_ESCRETURN_restart:
 						return 1;
 				}
 			}
@@ -642,9 +648,10 @@ int ModeAction(void)
 		{
 			switch (TextScriptProc())
 			{
-				case 0:
+				case enum_ESCRETURN_exit:
 					return 0;
-				case 2:
+
+				case enum_ESCRETURN_restart:
 					return 1;
 			}
 		}

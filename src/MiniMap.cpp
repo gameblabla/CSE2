@@ -96,10 +96,11 @@ int MiniMapLoop(void)
 		{
 			switch (Call_Escape())
 			{
-				case 0:
-					return 0;
-				case 2:
-					return 2;
+				case enum_ESCRETURN_exit:
+					return enum_ESCRETURN_exit;
+
+				case enum_ESCRETURN_restart:
+					return enum_ESCRETURN_restart;
 			}
 		}
 
@@ -115,7 +116,7 @@ int MiniMapLoop(void)
 
 		PutFramePerSecound();
 		if (!Flip_SystemTask())
-			return 0;
+			return enum_ESCRETURN_exit;
 	}
 
 	rcMiniMap.left = 0;
@@ -140,10 +141,11 @@ int MiniMapLoop(void)
 		{
 			switch (Call_Escape())
 			{
-				case 0:
-					return 0;
-				case 2:
-					return 2;
+				case enum_ESCRETURN_exit:
+					return enum_ESCRETURN_exit;
+
+				case enum_ESCRETURN_restart:
+					return enum_ESCRETURN_restart;
 			}
 		}
 
@@ -172,7 +174,7 @@ int MiniMapLoop(void)
 
 		PutFramePerSecound();
 		if (!Flip_SystemTask())
-			return 0;
+			return enum_ESCRETURN_exit;
 	}
 
 	for (f = 8; f >= -1; --f)
@@ -183,10 +185,11 @@ int MiniMapLoop(void)
 		{
 			switch (Call_Escape())
 			{
-				case 0:
-					return 0;
-				case 2:
-					return 2;
+				case enum_ESCRETURN_exit:
+					return enum_ESCRETURN_exit;
+
+				case enum_ESCRETURN_restart:
+					return enum_ESCRETURN_restart;
 			}
 		}
 
@@ -202,10 +205,10 @@ int MiniMapLoop(void)
 
 		PutFramePerSecound();
 		if (!Flip_SystemTask())
-			return 0;
+			return enum_ESCRETURN_exit;
 	}
 
-	return 1;
+	return enum_ESCRETURN_continue;
 }
 
 BOOL IsMapping(void)

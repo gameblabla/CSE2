@@ -174,10 +174,11 @@ int StageSelectLoop(int *p_event)
 		{
 			switch (Call_Escape())
 			{
-				case 0:
-					return 0;
-				case 2:
-					return 2;
+				case enum_ESCRETURN_exit:
+					return enum_ESCRETURN_exit;
+
+				case enum_ESCRETURN_restart:
+					return enum_ESCRETURN_restart;
 			}
 		}
 
@@ -185,10 +186,11 @@ int StageSelectLoop(int *p_event)
 
 		switch (TextScriptProc())
 		{
-			case 0:
-				return 0;
-			case 2:
-				return 2;
+			case enum_ESCRETURN_exit:
+				return enum_ESCRETURN_exit;
+
+			case enum_ESCRETURN_restart:
+				return enum_ESCRETURN_restart;
 		}
 
 #ifdef FIX_BUGS
@@ -210,16 +212,16 @@ int StageSelectLoop(int *p_event)
 			StopTextScript();
 			LoadTextScript_Stage(old_script_path);
 			*p_event = 0;
-			return 1;
+			return enum_ESCRETURN_continue;
 		}
 
 		PutFramePerSecound();
 
 		if (!Flip_SystemTask())
-			return 0;
+			return enum_ESCRETURN_exit;
 	}
 
 	LoadTextScript_Stage(old_script_path);
 	*p_event = gPermitStage[gSelectedStage].event;
-	return 1;
+	return enum_ESCRETURN_continue;
 }

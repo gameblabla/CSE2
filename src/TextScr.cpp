@@ -12,6 +12,7 @@
 #include "CommonDefines.h"
 #include "Draw.h"
 #include "Ending.h"
+#include "Escape.h"
 #include "Fade.h"
 #include "Flags.h"
 #include "Flash.h"
@@ -724,7 +725,7 @@ int TextScriptProc(void)
 							SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Failed to load stage", NULL);
 							#endif
 
-							return 0;
+							return enum_ESCRETURN_exit;
 						}
 					}
 					else if (IS_COMMAND('M','O','V'))
@@ -1059,10 +1060,11 @@ int TextScriptProc(void)
 
 						switch (MiniMapLoop())
 						{
-							case 0:
-								return 0;
-							case 2:
-								return 2;
+							case enum_ESCRETURN_exit:
+								return enum_ESCRETURN_exit;
+
+							case enum_ESCRETURN_restart:
+								return enum_ESCRETURN_restart;
 						}
 					}
 					else if (IS_COMMAND('S','L','P'))
@@ -1071,10 +1073,11 @@ int TextScriptProc(void)
 
 						switch (StageSelectLoop(&z))
 						{
-							case 0:
-								return 0;
-							case 2:
-								return 2;
+							case enum_ESCRETURN_exit:
+								return enum_ESCRETURN_exit;
+
+							case enum_ESCRETURN_restart:
+								return enum_ESCRETURN_restart;
 						}
 
 						JumpTextScript(z);
@@ -1256,17 +1259,18 @@ int TextScriptProc(void)
 
 						switch (Scene_DownIsland(z))
 						{
-							case 0:
-								return 0;
-							case 2:
-								return 2;
+							case enum_ESCRETURN_exit:
+								return enum_ESCRETURN_exit;
+
+							case enum_ESCRETURN_restart:
+								return enum_ESCRETURN_restart;
 						}
 
 						gTS.p_read += 8;
 					}
 					else if (IS_COMMAND('E','S','C'))
 					{
-						return 2;
+						return enum_ESCRETURN_restart;
 					}
 					else
 					{
@@ -1279,7 +1283,7 @@ int TextScriptProc(void)
 						SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", str_0, NULL);
 						#endif
 
-						return 0;
+						return enum_ESCRETURN_exit;
 					}
 				}
 				else
@@ -1479,7 +1483,7 @@ int TextScriptProc(void)
 	else
 		g_GameFlags |= 4;
 
-	return 1;
+	return enum_ESCRETURN_continue;
 }
 
 void RestoreTextScript(void)

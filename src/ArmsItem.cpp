@@ -446,10 +446,11 @@ int CampLoop(void)
 		{
 			switch (Call_Escape())
 			{
-				case 0:
-					return 0;	// Quit game
-				case 2:
-					return 2;	// Go to game intro
+				case enum_ESCRETURN_exit:
+					return enum_ESCRETURN_exit;	// Quit game
+
+				case enum_ESCRETURN_restart:
+					return enum_ESCRETURN_restart;	// Go to game intro
 			}
 		}
 
@@ -458,10 +459,11 @@ int CampLoop(void)
 
 		switch (TextScriptProc())
 		{
-			case 0:
-				return 0;	// Quit game
-			case 2:
-				return 2;	// Go to game intro
+			case enum_ESCRETURN_exit:
+				return enum_ESCRETURN_exit;	// Quit game
+
+			case enum_ESCRETURN_restart:
+				return enum_ESCRETURN_restart;	// Go to game intro
 		}
 
 		// Get currently displayed image
@@ -489,13 +491,13 @@ int CampLoop(void)
 		}
 
 		if (!Flip_SystemTask())
-			return 0;	// Quit game
+			return enum_ESCRETURN_exit;	// Quit game
 	}
 
 	// Resume original script
 	LoadTextScript_Stage(old_script_path);
 	gArmsEnergyX = 32; // Displays weapon rotation animation in case the weapon was changed
-	return 1;	// Go to game
+	return enum_ESCRETURN_continue;	// Go to game
 }
 
 BOOL CheckItem(long a)
