@@ -29,9 +29,6 @@ BOOL InitDirectInput(void)
 {
 	SDL_InitSubSystem(SDL_INIT_JOYSTICK);
 
-	if (!HookAllDirectInputDevices())
-		return FALSE;
-
 	return TRUE;
 }
 
