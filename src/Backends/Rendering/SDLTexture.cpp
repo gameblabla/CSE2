@@ -303,6 +303,7 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 	}
 
 	SDL_UpdateTexture(glyph->texture, NULL, buffer, width * 4);
+	free(buffer);
 
 	glyph->width = width;
 	glyph->height = height;
