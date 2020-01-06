@@ -152,9 +152,10 @@ int ModeOpening(HWND hWnd)
 		{
 			switch (Call_Escape(ghWnd))
 			{
-				case 0:
+				case enum_ESCRETURN_exit:
 					return 0;
-				case 2:
+
+				case enum_ESCRETURN_restart:
 					return 1;
 			}
 		}
@@ -195,9 +196,10 @@ int ModeOpening(HWND hWnd)
 		// Update Text Script
 		switch (TextScriptProc())
 		{
-			case 0:
+			case enum_ESCRETURN_exit:
 				return 0;
-			case 2:
+
+			case enum_ESCRETURN_restart:
 				return 1;
 		}
 
@@ -362,9 +364,10 @@ int ModeTitle(HWND hWnd)
 		{
 			switch (Call_Escape(ghWnd))
 			{
-				case 0:
+				case enum_ESCRETURN_exit:
 					return 0;
-				case 2:
+
+				case enum_ESCRETURN_restart:
 					return 1;
 			}
 		}
@@ -525,9 +528,10 @@ int ModeAction(HWND hWnd)
 		{
 			switch (Call_Escape(ghWnd))
 			{
-				case 0:
+				case enum_ESCRETURN_exit:
 					return 0;
-				case 2:
+
+				case enum_ESCRETURN_restart:
 					return 1;
 			}
 		}
@@ -605,9 +609,10 @@ int ModeAction(HWND hWnd)
 
 				switch (CampLoop())
 				{
-					case 0:
+					case enum_ESCRETURN_exit:
 						return 0;
-					case 2:
+
+					case enum_ESCRETURN_restart:
 						return 1;
 				}
 
@@ -619,9 +624,10 @@ int ModeAction(HWND hWnd)
 
 				switch (MiniMapLoop())
 				{
-					case 0:
+					case enum_ESCRETURN_exit:
 						return 0;
-					case 2:
+
+					case enum_ESCRETURN_restart:
 						return 1;
 				}
 			}
@@ -639,9 +645,10 @@ int ModeAction(HWND hWnd)
 		{
 			switch (TextScriptProc())
 			{
-				case 0:
+				case enum_ESCRETURN_exit:
 					return 0;
-				case 2:
+
+				case enum_ESCRETURN_restart:
 					return 1;
 			}
 		}
