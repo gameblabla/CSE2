@@ -2,6 +2,10 @@
 
 #include "WindowsWrapper.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // TODO - When I add bitmask constants for gMC.flags...
 // 0x100 is a 'player is underwater' flag
 
@@ -17,7 +21,7 @@ typedef struct MYCHAR_PHYSICS
 	int jump;
 } MYCHAR_PHYSICS;
 
-struct MYCHAR
+typedef struct MYCHAR
 {
 	unsigned char cond;
 	unsigned int flag;
@@ -75,7 +79,7 @@ struct MYCHAR
 	MYCHAR_PHYSICS physics_normal;
 	MYCHAR_PHYSICS physics_underwater;
 	int no_splash_or_air_limit_underwater; // Determines whether the behaviours in which entering water causes a splash, being in water draws the air timer and being in water decreases your air are enabled (0 means it's enabled, non-0 means it's disabled)
-};
+} MYCHAR;
 
 extern MYCHAR gMC;
 
@@ -99,3 +103,7 @@ void SetNoise(int no, int freq);
 void CutNoise(void);
 void ResetNoise(void);
 void SleepNoise(void);
+
+#ifdef __cplusplus
+}
+#endif

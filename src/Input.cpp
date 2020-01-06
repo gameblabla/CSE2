@@ -8,10 +8,10 @@
 
 #include "WindowsWrapper.h"
 
-static SDL_Joystick *joystick;
-
-static int joystick_neutral_x;
-static int joystick_neutral_y;
+// The original names for these variables are unknown
+static SDL_Joystick *joystick = NULL;
+static int joystick_neutral_x = 0;
+static int joystick_neutral_y = 0;
 
 void ReleaseDirectInput(void)
 {
@@ -25,19 +25,14 @@ void ReleaseDirectInput(void)
 	SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
 }
 
-BOOL HookAllDirectInputDevices(void);
-
 BOOL InitDirectInput(void)
 {
 	SDL_InitSubSystem(SDL_INIT_JOYSTICK);
 
-	if (!HookAllDirectInputDevices())
-		return FALSE;
-
 	return TRUE;
 }
 
-// The original name for this function is unknown
+// The original name for this function and its variables are unknown
 BOOL HookAllDirectInputDevices(void)
 {
 	int i;
@@ -66,8 +61,8 @@ BOOL GetJoystickStatus(JOYSTICK_STATUS *status)
 		numButtons = MAX_JOYSTICK_BUTTONS;
 
 	// Read whatever buttons actually exist
-	int i;
-	for (i = 0; i < numButtons; ++i)
+	int i = 0;
+	for (; i < numButtons; ++i)
 	{
 		if (SDL_JoystickGetButton(joystick, i) != 0)
 			status->bButton[i] = TRUE;

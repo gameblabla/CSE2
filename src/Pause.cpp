@@ -11,6 +11,7 @@
 #include "CommonDefines.h"
 #include "Config.h"
 #include "Draw.h"
+#include "Escape.h"
 #include "Input.h"
 #include "KeyControl.h"
 #include "Main.h"
@@ -55,7 +56,7 @@ static int EnterOptionsMenu(const char *title, Option *options, size_t total_opt
 		// Allow unpausing by pressing the pause button only when in the main pause menu (not submenus)
 		if (!submenu && gKeyTrg & KEY_PAUSE)
 		{
-			return_value = 1;
+			return_value = enum_ESCRETURN_continue;
 			break;
 		}
 
@@ -132,14 +133,14 @@ static int EnterOptionsMenu(const char *title, Option *options, size_t total_opt
 		if (!Flip_SystemTask())
 		{
 			// Quit if window is closed
-			return_value = 0;
+			return_value = enum_ESCRETURN_exit;
 			break;
 		}
 	}
 
 	// Filter internal return values to something Cave Story can understand
 	if (!submenu && return_value == -1)
-		return_value = 1;
+		return_value = enum_ESCRETURN_continue;
 
 	return return_value;
 }
@@ -244,7 +245,7 @@ static int Callback_ControlsKeyboard_Rebind(Option *options, size_t total_option
 		{
 			// Quit if window is closed
 			free(old_state);
-			return 0;
+			return enum_ESCRETURN_exit;
 		}
 	}
 
@@ -343,7 +344,7 @@ static int Callback_ControlsController_Rebind(Option *options, size_t total_opti
 		if (!Flip_SystemTask())
 		{
 			// Quit if window is closed
-			return 0;
+			return enum_ESCRETURN_exit;
 		}
 	}
 
@@ -518,7 +519,7 @@ static int Callback_Resume(Option *options, size_t total_options, size_t selecte
 		return -1;
 
 	PlaySoundObject(18, 1);
-	return 1;
+	return enum_ESCRETURN_continue;
 }
 
 static int Callback_Reset(Option *options, size_t total_options, size_t selected_option, long key)
@@ -531,7 +532,7 @@ static int Callback_Reset(Option *options, size_t total_options, size_t selected
 		return -1;
 
 	PlaySoundObject(18, 1);
-	return 2;
+	return enum_ESCRETURN_restart;
 }
 
 static int Callback_Quit(Option *options, size_t total_options, size_t selected_option, long key)
@@ -543,7 +544,7 @@ static int Callback_Quit(Option *options, size_t total_options, size_t selected_
 	if (!(key & gKeyOk))
 		return -1;
 
-	return 0;
+	return enum_ESCRETURN_exit;
 }
 
 int Call_Pause(void)

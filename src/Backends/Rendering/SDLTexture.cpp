@@ -147,6 +147,9 @@ Backend_Surface* Backend_CreateSurface(unsigned int width, unsigned int height)
 	surface->next = surface_list_head;
 	surface_list_head = surface;
 
+	if (surface->next != NULL)
+		surface->next->prev = surface;
+
 	return surface;
 }
 

@@ -472,10 +472,11 @@ int Scene_DownIsland(int mode)
 		{
 			switch (Call_Pause())
 			{
-				case 0:
-					return 0;
-				case 2:
-					return 2;
+				case enum_ESCRETURN_exit:
+					return enum_ESCRETURN_exit;
+
+				case enum_ESCRETURN_restart:
+					return enum_ESCRETURN_restart;
 			}
 		}
 
@@ -484,10 +485,11 @@ int Scene_DownIsland(int mode)
 		{
 			switch (Call_Escape())
 			{
-				case 0:
-					return 0;
-				case 2:
-					return 2;
+				case enum_ESCRETURN_exit:
+					return enum_ESCRETURN_exit;
+
+				case enum_ESCRETURN_restart:
+					return enum_ESCRETURN_restart;
 			}
 		}
 
@@ -533,8 +535,8 @@ int Scene_DownIsland(int mode)
 		// Draw window
 		PutFramePerSecound();
 		if (!Flip_SystemTask())
-			return 0;
+			return enum_ESCRETURN_exit;
 	}
 
-	return 1;
+	return enum_ESCRETURN_continue;
 }
