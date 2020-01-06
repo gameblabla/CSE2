@@ -1,4 +1,4 @@
-#pragma once
+	#pragma once
 
 #ifdef FIX_BUGS
 // The original source code forgot to set this (you can tell because, in the original EXE,

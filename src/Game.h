@@ -2,6 +2,10 @@
 
 #include "WindowsWrapper.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 enum GameFlagsValues
 {
 	// To be continued
@@ -33,3 +37,7 @@ int Random(int min, int max);
 void PutNumber4(int x, int y, int value, BOOL bZero);
 
 BOOL Game(HWND hWnd);
+
+#ifdef __cplusplus
+}
+#endif

@@ -324,6 +324,12 @@
 			</File>
 			<File
 				RelativePath="..\src\Star.cpp">
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="1"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\src\TextScr.cpp">

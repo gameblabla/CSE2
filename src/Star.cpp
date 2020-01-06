@@ -119,13 +119,13 @@ void ActStar(void)
 
 void PutStar(int fx, int fy)
 {
-	int i;
-
 	RECT rc[3] = {
 		{192, 0, 200, 8},
 		{192, 8, 200, 16},
 		{192, 16, 200, 24},
 	};
+
+	int i;
 
 	if (gMC.cond & 2)
 		return;
