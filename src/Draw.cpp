@@ -160,8 +160,6 @@ static BOOL ScaleAndUploadSurface(SDL_Surface *surface, SurfaceID surf_no)
 {
 	SDL_Surface *converted_surface = SDL_ConvertSurfaceFormat(surface, SDL_PIXELFORMAT_RGB24, 0);
 
-	SDL_FreeSurface(surface);
-
 	if (converted_surface == NULL)
 		return FALSE;
 
@@ -243,6 +241,7 @@ BOOL MakeSurface_Resource(const char *name, SurfaceID surf_no)
 	if (!ScaleAndUploadSurface(surface, surf_no))
 	{
 		Backend_FreeSurface(surf[surf_no]);
+		SDL_FreeSurface(surface);
 		return FALSE;
 	}
 
@@ -251,6 +250,7 @@ BOOL MakeSurface_Resource(const char *name, SurfaceID surf_no)
 	surface_metadata[surf_no].height = surface->h;
 	surface_metadata[surf_no].bSystem = FALSE;
 	strcpy(surface_metadata[surf_no].name, name);
+	SDL_FreeSurface(surface);
 
 	return TRUE;
 }
@@ -302,6 +302,7 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 	if (!ScaleAndUploadSurface(surface, surf_no))
 	{
 		Backend_FreeSurface(surf[surf_no]);
+		SDL_FreeSurface(surface);
 		return FALSE;
 	}
 
@@ -310,6 +311,7 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 	surface_metadata[surf_no].height = surface->h;
 	surface_metadata[surf_no].bSystem = FALSE;
 	strcpy(surface_metadata[surf_no].name, name);
+	SDL_FreeSurface(surface);
 
 	return TRUE;
 }
@@ -327,7 +329,12 @@ BOOL ReloadBitmap_Resource(const char *name, SurfaceID surf_no)
 	SDL_Surface *surface = SDL_LoadBMP_RW(fp, 1);
 
 	if (!ScaleAndUploadSurface(surface, surf_no))
+	{
+		SDL_FreeSurface(surface);
 		return FALSE;
+	}
+
+	SDL_FreeSurface(surface);
 
 	surface_metadata[surf_no].type = SURFACE_SOURCE_RESOURCE;
 	strcpy(surface_metadata[surf_no].name, name);
@@ -366,8 +373,12 @@ BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 	}
 
 	if (!ScaleAndUploadSurface(surface, surf_no))
+	{
+		SDL_FreeSurface(surface);
 		return FALSE;
+	}
 
+	SDL_FreeSurface(surface);
 	surface_metadata[surf_no].type = SURFACE_SOURCE_FILE;
 	strcpy(surface_metadata[surf_no].name, name);
 
