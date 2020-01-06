@@ -2,6 +2,10 @@
 
 #include "WindowsWrapper.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct MAP_DATA
 {
 	unsigned char *data;
@@ -25,3 +29,7 @@ BOOL ChangeMapParts(int x, int y, unsigned char no);
 void PutStage_Back(int fx, int fy);
 void PutStage_Front(int fx, int fy);
 void PutMapDataVector(int fx, int fy);
+
+#ifdef __cplusplus
+}
+#endif

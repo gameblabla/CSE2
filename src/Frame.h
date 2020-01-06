@@ -1,6 +1,10 @@
 #pragma once
 
-struct FRAME
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef struct FRAME
 {
 	int x;
 	int y;
@@ -9,7 +13,7 @@ struct FRAME
 	int wait;
 	int quake;
 	int quake2;
-};
+} FRAME;
 
 extern FRAME gFrame;
 
@@ -23,3 +27,7 @@ void SetFrameTargetBoss(int no, int wait);
 void SetQuake(int time);
 void SetQuake2(int time);
 void ResetQuake(void);
+
+#ifdef __cplusplus
+}
+#endif

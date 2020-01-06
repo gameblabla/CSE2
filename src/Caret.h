@@ -2,6 +2,10 @@
 
 #include "WindowsWrapper.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct CARET_TABLE
 {
 	int view_left;
@@ -30,3 +34,7 @@ void InitCaret(void);
 void ActCaret(void);
 void PutCaret(int fx, int fy);
 void SetCaret(int x, int y, int code, int dir);
+
+#ifdef __cplusplus
+}
+#endif

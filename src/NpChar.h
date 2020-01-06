@@ -5,6 +5,10 @@
 
 #include "Draw.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define NPC_MAX 0x200
 
 enum NPCCond
@@ -51,7 +55,7 @@ enum NPCNames
 	// To be continued
 };
 
-struct NPCHAR
+typedef struct NPCHAR
 {
 	unsigned char cond;
 	int flag;
@@ -98,8 +102,8 @@ struct NPCHAR
 	unsigned char shock;
 	int damage_view;
 	int damage;
-	NPCHAR *pNpc;
-};
+	struct NPCHAR *pNpc;
+} NPCHAR;
 
 struct EVENT
 {
@@ -140,3 +144,7 @@ void GetNpCharPosition(int *x, int *y, int i);
 BOOL IsNpCharCode(int code);
 BOOL GetNpCharAlive(int code_event);
 int CountAliveNpChar(void);
+
+#ifdef __cplusplus
+}
+#endif

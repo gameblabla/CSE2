@@ -1,4 +1,4 @@
-	#pragma once
+#pragma once
 
 #ifdef FIX_BUGS
 // The original source code forgot to set this (you can tell because, in the original EXE,
@@ -8,6 +8,10 @@
 #include <dsound.h>
 
 #include "WindowsWrapper.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define MAXTRACK 16
 #define MAXMELODY 8
@@ -27,3 +31,7 @@ void StopOrganyaMusic(void);
 void SetOrganyaFadeout(void);
 BOOL StartOrganya(LPDIRECTSOUND lpDS, const char *wave_filename);
 void EndOrganya(void);
+
+#ifdef __cplusplus
+}
+#endif

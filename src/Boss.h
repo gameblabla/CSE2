@@ -2,6 +2,10 @@
 
 #include "NpChar.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define BOSS_MAX 20
 extern NPCHAR gBoss[BOSS_MAX];
 
@@ -14,3 +18,7 @@ void SetBossCharActNo(int a);
 void HitBossBullet(void);
 void ActBossChar(void);
 void HitBossMap(void);
+
+#ifdef __cplusplus
+}
+#endif

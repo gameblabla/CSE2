@@ -2,7 +2,11 @@
 
 #include "WindowsWrapper.h"
 
-enum MusicID
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef enum MusicID
 {
 	MUS_SILENCE = 0x0,
 	MUS_MISCHIEVOUS_ROBOT = 0x1,
@@ -46,9 +50,9 @@ enum MusicID
 	MUS_SEAL_CHAMBER = 0x27,
 	MUS_TOROKOS_THEME = 0x28,
 	MUS_WHITE = 0x29
-};
+} MusicID;
 
-struct STAGE_TABLE
+typedef struct STAGE_TABLE
 {
 	char parts[0x20];
 	char map[0x20];
@@ -58,7 +62,7 @@ struct STAGE_TABLE
 	char boss[0x20];
 	signed char boss_no;
 	char name[0x20];
-};
+} STAGE_TABLE;
 
 extern int gStageNo;
 extern MusicID gMusicNo;
@@ -66,3 +70,7 @@ extern MusicID gMusicNo;
 BOOL TransferStage(int no, int w, int x, int y);
 void ChangeMusic(MusicID no);
 void ReCallMusic(void);
+
+#ifdef __cplusplus
+}
+#endif
