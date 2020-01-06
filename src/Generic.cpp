@@ -6,7 +6,7 @@
 
 #include "WindowsWrapper.h"
 
-#include "Tags.h"
+#include "Main.h"
 
 void GetCompileDate(int *year, int *month, int *day)
 {

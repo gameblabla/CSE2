@@ -22,9 +22,9 @@ equivalents.
 
 #include "WindowsWrapper.h"
 
+#include "Main.h"
 #include "Organya.h"
 #include "PixTone.h"
-#include "Tags.h"
 
 LPDIRECTSOUND       lpDS;            // DirectSoundオブジェクト (DirectSound object)
 LPDIRECTSOUNDBUFFER lpPRIMARYBUFFER; // 一時バッファ (Temporary buffer)

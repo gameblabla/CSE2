@@ -12,13 +12,13 @@
 #include "Flags.h"
 #include "Frame.h"
 #include "Game.h"
+#include "Main.h"
 #include "MiniMap.h"
 #include "MyChar.h"
 #include "NpChar.h"
 #include "SelStage.h"
 #include "Stage.h"
 #include "Star.h"
-#include "Tags.h"
 #include "ValueView.h"
 
 const char *gDefaultName = "Profile.dat";

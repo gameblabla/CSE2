@@ -32,7 +32,6 @@
 #include "SelStage.h"
 #include "Sound.h"
 #include "Stage.h"
-#include "Tags.h"
 
 #define TSC_BUFFER_SIZE 0x5000
 

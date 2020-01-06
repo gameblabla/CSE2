@@ -11,10 +11,10 @@
 #include "Draw.h"
 #include "Flags.h"
 #include "Game.h"
+#include "Main.h"
 #include "MyChar.h"
 #include "NpcTbl.h"
 #include "Sound.h"
-#include "Tags.h"
 #include "ValueView.h"
 
 NPCHAR gNPC[NPC_MAX];

@@ -14,7 +14,6 @@
 #include "Generic.h"
 #include "Main.h"
 #include "MapName.h"
-#include "Tags.h"
 #include "TextScr.h"
 
 typedef enum SurfaceType

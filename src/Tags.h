@@ -1,14 +1,4 @@
 #pragma once
 
-#include "WindowsWrapper.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-extern char gModulePath[MAX_PATH];
-extern char gDataPath[MAX_PATH];
-
-#ifdef __cplusplus
-}
-#endif
+// Apparently this used to contain a bunch of structs?
+// For now, the structs are in header files matching their purpose.
