@@ -64,8 +64,8 @@ BOOL GetJoystickStatus(JOYSTICK_STATUS *status)
 		numButtons = 32;
 
 	// Read whatever buttons actually exist
-	int i;
-	for (i = 0; i < numButtons; ++i)
+	int i = 0;
+	for (; i < numButtons; ++i)
 	{
 		if (SDL_JoystickGetButton(joystick, i) != 0)
 			status->bButton[i] = TRUE;
