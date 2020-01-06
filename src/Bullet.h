@@ -2,7 +2,11 @@
 
 #include "WindowsWrapper.h"
 
-struct BULLET
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef struct BULLET
 {
 	int flag;
 	int code_bullet;
@@ -36,9 +40,9 @@ struct BULLET
 		int back;
 		int bottom;
 	} view;
-};
+} BULLET;
 
-struct BULLET_TABLE
+typedef struct BULLET_TABLE
 {
 	signed char damage;
 	signed char life;
@@ -55,7 +59,7 @@ struct BULLET_TABLE
 		int back;
 		int bottom;
 	} view;
-};
+} BULLET_TABLE;
 
 #define BULLET_MAX 0x40
 extern BULLET gBul[BULLET_MAX];
@@ -69,3 +73,7 @@ void PutBullet(int fx, int fy);
 void SetBullet(int no, int x, int y, int dir);
 void ActBullet(void);
 BOOL IsActiveSomeBullet(void);
+
+#ifdef __cplusplus
+}
+#endif

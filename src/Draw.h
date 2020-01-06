@@ -4,6 +4,10 @@
 
 #include "WindowsWrapper.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef RGB
 #define RGB(r,g,b) ((r) | ((g) << 8) | ((b) << 16))
 #endif
@@ -72,3 +76,7 @@ void InitTextObject(const char *font_name);
 void PutText(int x, int y, const char *text, unsigned long color);
 void PutText2(int x, int y, const char *text, unsigned long color, SurfaceID surf_no);
 void EndTextObject(void);
+
+#ifdef __cplusplus
+}
+#endif
