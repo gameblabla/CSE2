@@ -120,8 +120,10 @@ void EncryptionBinaryData2(unsigned char *pData, long size)
 // Load generic .tsc
 BOOL LoadTextScript2(const char *name)
 {
-	// Get path
 	char path[MAX_PATH];
+	FILE *fp;
+
+	// Get path
 	sprintf(path, "%s\\%s", gDataPath, name);
 
 	gTS.size = GetFileSizeLong(path);
@@ -129,7 +131,7 @@ BOOL LoadTextScript2(const char *name)
 		return FALSE;
 
 	// Open file
-	FILE *fp = fopen(path, "rb");
+	fp = fopen(path, "rb");
 	if (fp == NULL)
 		return FALSE;
 
@@ -150,15 +152,19 @@ BOOL LoadTextScript2(const char *name)
 // Load stage .tsc
 BOOL LoadTextScript_Stage(const char *name)
 {
-	// Open Head.tsc
 	char path[MAX_PATH];
+	FILE *fp;
+	long head_size;
+	long body_size;
+
+	// Open Head.tsc
 	sprintf(path, "%s\\%s", gDataPath, "Head.tsc");
 
-	long head_size = GetFileSizeLong(path);
+	head_size = GetFileSizeLong(path);
 	if (head_size == INVALID_FILE_SIZE)
 		return FALSE;
 
-	FILE *fp = fopen(path, "rb");
+	fp = fopen(path, "rb");
 	if (fp == NULL)
 		return FALSE;
 
@@ -171,7 +177,7 @@ BOOL LoadTextScript_Stage(const char *name)
 	// Open stage's .tsc
 	sprintf(path, "%s\\%s", gDataPath, name);
 
-	long body_size = GetFileSizeLong(path);
+	body_size = GetFileSizeLong(path);
 	if (body_size == INVALID_FILE_SIZE)
 		return FALSE;
 

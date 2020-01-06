@@ -2,16 +2,20 @@
 
 #include "WindowsWrapper.h"
 
-struct ARMS_LEVEL
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef struct ARMS_LEVEL
 {
 	int exp[3];
-};
+} ARMS_LEVEL;
 
-struct REC
+typedef struct REC
 {
 	long counter[4];
 	unsigned char random[4];
-};
+} REC;
 
 extern ARMS_LEVEL gArmsLevelTable[14];
 
@@ -30,3 +34,7 @@ void PutMyAir(int x, int y);
 void PutTimeCounter(int x, int y);
 BOOL SaveTimeCounter(void);
 int LoadTimeCounter(void);
+
+#ifdef __cplusplus
+}
+#endif

@@ -4,6 +4,10 @@
 
 #include "CommonDefines.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct CREDIT
 {
 	long size;
@@ -53,3 +57,7 @@ int GetScriptNumber(const char *text);
 void SetCreditIllust(int a);
 void CutCreditIllust(void);
 int Scene_DownIsland(HWND hWnd, int mode);
+
+#ifdef __cplusplus
+}
+#endif

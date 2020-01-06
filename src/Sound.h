@@ -11,6 +11,10 @@
 
 #include "PixTone.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define SE_MAX 160	// According to the Organya source code release, this is the real name for this constant
 
 enum SoundEffectNames
@@ -42,3 +46,7 @@ void ChangeSoundFrequency(int no, DWORD rate);
 void ChangeSoundVolume(int no, long volume);
 void ChangeSoundPan(int no, long pan);
 int MakePixToneObject(const PIXTONEPARAMETER *ptp, int ptp_num, int no);
+
+#ifdef __cplusplus
+}
+#endif

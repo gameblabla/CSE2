@@ -6,7 +6,7 @@
 extern "C" {
 #endif
 
-struct TEXT_SCRIPT
+typedef struct TEXT_SCRIPT
 {
 	// Path (reload when exit teleporter menu/inventory)
 	char path[MAX_PATH];
@@ -55,7 +55,7 @@ struct TEXT_SCRIPT
 
 	// NOD cursor blink
 	unsigned char wait_beam;
-};
+} TEXT_SCRIPT;
 
 BOOL InitTextScript2(void);
 void EndTextScript(void);

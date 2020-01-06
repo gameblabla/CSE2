@@ -20,6 +20,7 @@
 #include "Organya.h"
 #include "Profile.h"
 #include "Sound.h"
+#include "Tags.h"
 #include "Triangle.h"
 
 LRESULT __stdcall WindowProcedure(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
