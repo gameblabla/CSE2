@@ -118,6 +118,8 @@ void ActNpc041(NPCHAR *npc)
 // Sue
 void ActNpc042(NPCHAR *npc)
 {
+	int n;
+
 	RECT rcLeft[13] = {
 		{0, 0, 16, 16},
 		{16, 0, 32, 16},
@@ -149,8 +151,6 @@ void ActNpc042(NPCHAR *npc)
 		{112, 48, 128, 64},
 		{160, 48, 176, 64},
 	};
-
-	int n;
 
 	switch (npc->act_no)
 	{
@@ -870,8 +870,7 @@ void ActNpc048(NPCHAR *npc)
 void ActNpc049(NPCHAR *npc)
 {
 	unsigned char deg;
-	int ym;
-	int xm;
+	int xm, ym;
 
 	if (npc->act_no >= 10 && npc->pNpc->code_char == 3)
 	{
@@ -1916,8 +1915,8 @@ void ActNpc058(NPCHAR *npc)
 			if ((++npc->count2 % 8) == 0 && npc->x < gMC.x + (160 * 0x200) && npc->x > gMC.x - (160 * 0x200))	// TODO: Maybe do something about this for widescreen
 			{
 				unsigned char deg;
-				int ym;
 				int xm;
+				int ym;
 
 				deg = GetArktan(npc->x - gMC.x, npc->y - gMC.y);
 				deg += (unsigned char)Random(-6, 6);

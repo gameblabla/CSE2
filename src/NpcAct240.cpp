@@ -318,12 +318,14 @@ void ActNpc243(NPCHAR *npc)
 // Lava drop
 void ActNpc244(NPCHAR *npc)
 {
+	RECT rc = {96, 0, 104, 16};
+	BOOL bHit;
+
 	int i;
 
-	RECT rc = {96, 0, 104, 16};
 	npc->ym += 0x40;
 
-	BOOL bHit = FALSE;
+	bHit = FALSE;
 
 	if (npc->flag & 0xFF)
 		bHit = TRUE;
@@ -411,13 +413,13 @@ void ActNpc245(NPCHAR *npc)
 // Press (proximity)
 void ActNpc246(NPCHAR *npc)
 {
-	int i;
-
 	RECT rcLeft[3] = {
 		{144, 112, 160, 136},
 		{160, 112, 176, 136},
 		{176, 112, 192, 136},
 	};
+
+	int i;
 
 	switch (npc->act_no)
 	{
@@ -504,8 +506,7 @@ void ActNpc246(NPCHAR *npc)
 void ActNpc247(NPCHAR *npc)
 {
 	unsigned char deg;
-	int ym;
-	int xm;
+	int xm, ym;
 
 	RECT rcLeft[9] = {
 		{0, 0, 16, 16},

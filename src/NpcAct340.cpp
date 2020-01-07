@@ -592,13 +592,14 @@ void ActNpc341(NPCHAR *npc)
 void ActNpc342(NPCHAR *npc)
 {
 	static int flash;
-	unsigned char deg;
 
 	RECT rc[3] = {
 		{240, 48, 280, 88},
 		{240, 88, 280, 128},
 		{280, 48, 320, 88},
 	};
+
+	unsigned char deg;
 
 	if (npc->act_no < 1000 && npc->pNpc->act_no >= 1000)
 		npc->act_no = 1000;
@@ -905,14 +906,14 @@ void ActNpc344(NPCHAR *npc)
 // Ballos skull projectile
 void ActNpc345(NPCHAR *npc)
 {
-	int i;
-
 	RECT rc[4] = {
 		{128, 176, 144, 192},
 		{144, 176, 160, 192},
 		{160, 176, 176, 192},
 		{176, 176, 192, 192},
 	};
+
+	int i;
 
 	switch (npc->act_no)
 	{
@@ -974,9 +975,8 @@ void ActNpc345(NPCHAR *npc)
 // Ballos 4 orbiting platform
 void ActNpc346(NPCHAR *npc)
 {
-	unsigned char deg;
-
 	RECT rc = {240, 0, 272, 16};
+	unsigned char deg;
 
 	if (npc->act_no < 1000 && npc->pNpc->act_no >= 1000)
 		npc->act_no = 1000;
@@ -1724,9 +1724,7 @@ void ActNpc353(NPCHAR *npc)
 // Invisible deathtrap wall
 void ActNpc354(NPCHAR *npc)
 {
-	int i;
-	int x;
-	int y;
+	int i, x, y;
 
 	switch (npc->act_no)
 	{

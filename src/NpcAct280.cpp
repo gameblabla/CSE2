@@ -129,6 +129,7 @@ void ActNpc281(NPCHAR *npc)
 // Mini Undead Core (active)
 void ActNpc282(NPCHAR *npc)
 {
+	// Yes, Pixel spelt this wrong (should be 'rc')
 	RECT tc[3] = {
 		{256, 80, 320, 120},
 		{256, 0, 320, 40},
@@ -203,9 +204,7 @@ void ActNpc282(NPCHAR *npc)
 // Misery (transformed)
 void ActNpc283(NPCHAR *npc)
 {
-	int x;
-	int y;
-	int direct;
+	int x, y, direct;
 
 	RECT rcLeft[11] = {
 		{0, 64, 32, 96},
@@ -966,14 +965,13 @@ void ActNpc284(NPCHAR *npc)
 void ActNpc285(NPCHAR *npc)
 {
 	RECT rc = {232, 104, 248, 120};
+	unsigned char deg;
 
 	if (npc->x < 0 || npc->x > gMap.width * 0x10 * 0x200)
 	{
 		VanishNpChar(npc);
 		return;
 	}
-
-	unsigned char deg;
 
 	switch (npc->act_no)
 	{
@@ -1422,9 +1420,7 @@ void ActNpc293(NPCHAR *npc)
 // Quake + falling block generator
 void ActNpc294(NPCHAR *npc)
 {
-	int x;
-	int y;
-	int dir;
+	int x, y, dir;
 
 	switch (npc->act_no)
 	{
@@ -1567,10 +1563,7 @@ void ActNpc295(NPCHAR *npc)
 // Cloud generator
 void ActNpc296(NPCHAR *npc)
 {
-	int x;
-	int y;
-	int dir;
-	int pri;
+	int x, y, dir, pri;
 
 	if (++npc->act_wait > 16)
 	{

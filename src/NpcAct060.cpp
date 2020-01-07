@@ -199,6 +199,8 @@ void ActNpc060(NPCHAR *npc)
 // King
 void ActNpc061(NPCHAR *npc)
 {
+	int i;
+
 	RECT rcLeft[11] = {
 		{224, 32, 240, 48},
 		{240, 32, 256, 48},
@@ -226,8 +228,6 @@ void ActNpc061(NPCHAR *npc)
 		{0, 0, 0, 0},
 		{112, 32, 128, 48},
 	};
-
-	int i;
 
 	switch (npc->act_no)
 	{
