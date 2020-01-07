@@ -178,29 +178,29 @@ void Backend_RestoreSurface(Backend_Surface *surface)
 	surface->lost = FALSE;
 }
 
-unsigned char* Backend_LockSurface(Backend_Surface *surface, unsigned int *pitch)
+unsigned char* Backend_LockSurface(Backend_Surface *surface, unsigned int *pitch, unsigned int width, unsigned int height)
 {
 	if (surface == NULL)
 		return NULL;
 
-	*pitch = surface->width * 4;
+	*pitch = width * 4;
 
-	surface->pixels = (unsigned char*)malloc(surface->width * surface->height * 4);
+	surface->pixels = (unsigned char*)malloc(width * height * 4);
 
 	return surface->pixels;
 }
 
-void Backend_UnlockSurface(Backend_Surface *surface)
+void Backend_UnlockSurface(Backend_Surface *surface, unsigned int width, unsigned int height)
 {
 	if (surface == NULL)
 		return;
 
 	// Pre-multiply the colour channels with the alpha, so blending works correctly
-	for (unsigned int y = 0; y < surface->height; ++y)
+	for (unsigned int y = 0; y < height; ++y)
 	{
-		unsigned char *pixels = surface->pixels + y * surface->width * 4;
+		unsigned char *pixels = surface->pixels + y * width * 4;
 
-		for (unsigned int x = 0; x < surface->width; ++x)
+		for (unsigned int x = 0; x < width; ++x)
 		{
 			pixels[0] = (pixels[0] * pixels[3]) / 0xFF;
 			pixels[1] = (pixels[1] * pixels[3]) / 0xFF;
@@ -209,7 +209,8 @@ void Backend_UnlockSurface(Backend_Surface *surface)
 		}
 	}
 
-	SDL_UpdateTexture(surface->texture, NULL, surface->pixels, surface->width * 4);
+	SDL_Rect rect = {0, 0, (int)width, (int)height};
+	SDL_UpdateTexture(surface->texture, &rect, surface->pixels, width * 4);
 
 	free(surface->pixels);
 }
@@ -313,6 +314,7 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 	}
 
 	SDL_UpdateTexture(glyph->texture, NULL, buffer, width * 4);
+	free(buffer);
 
 	glyph->width = width;
 	glyph->height = height;

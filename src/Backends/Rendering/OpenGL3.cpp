@@ -427,18 +427,18 @@ void Backend_RestoreSurface(Backend_Surface *surface)
 	(void)surface;
 }
 
-unsigned char* Backend_LockSurface(Backend_Surface *surface, unsigned int *pitch)
+unsigned char* Backend_LockSurface(Backend_Surface *surface, unsigned int *pitch, unsigned int width, unsigned int height)
 {
 	if (surface == NULL)
 		return NULL;
 
-	surface->pixels = (unsigned char*)malloc(surface->width * surface->height * 4);
-	*pitch = surface->width * 4;
+	surface->pixels = (unsigned char*)malloc(width * height * 4);
+	*pitch = width * 4;
 
 	return surface->pixels;
 }
 
-void Backend_UnlockSurface(Backend_Surface *surface)
+void Backend_UnlockSurface(Backend_Surface *surface, unsigned int width, unsigned int height)
 {
 	if (surface == NULL)
 		return;
@@ -446,9 +446,9 @@ void Backend_UnlockSurface(Backend_Surface *surface)
 	// Pre-multiply the colour channels with the alpha, so blending works correctly
 	unsigned char *pixels = surface->pixels;
 
-	for (unsigned int y = 0; y < surface->height; ++y)
+	for (unsigned int y = 0; y < height; ++y)
 	{
-		for (unsigned int x = 0; x < surface->width; ++x)
+		for (unsigned int x = 0; x < width; ++x)
 		{
 			pixels[0] = (pixels[0] * pixels[3]) / 0xFF;
 			pixels[1] = (pixels[1] * pixels[3]) / 0xFF;
@@ -461,7 +461,7 @@ void Backend_UnlockSurface(Backend_Surface *surface)
 	glGetIntegerv(GL_TEXTURE_BINDING_2D, &previously_bound_texture);
 
 	glBindTexture(GL_TEXTURE_2D, surface->texture_id);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, surface->width, surface->height, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
 	free(surface->pixels);
 
 	glBindTexture(GL_TEXTURE_2D, previously_bound_texture);

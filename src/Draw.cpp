@@ -195,15 +195,12 @@ static BOOL ScaleAndUploadSurface(SDL_Surface *surface, SurfaceID surf_no)
 {
 	SDL_Surface *converted_surface = SDL_ConvertSurfaceFormat(surface, SDL_PIXELFORMAT_RGBA32, 0);
 
-	SDL_FreeSurface(surface);
-	free(surface->userdata);
-
 	if (converted_surface == NULL)
 		return FALSE;
 
 	// IF YOU WANT TO ADD HD SPRITES, THIS IS THE CODE YOU SHOULD EDIT
 	unsigned int pitch;
-	unsigned char *pixels = Backend_LockSurface(surf[surf_no], &pitch);
+	unsigned char *pixels = Backend_LockSurface(surf[surf_no], &pitch, converted_surface->w * magnification, converted_surface->h * magnification);
 
 	const int magnification_scaled = magnification / SPRITE_SCALE;
 
@@ -247,7 +244,7 @@ static BOOL ScaleAndUploadSurface(SDL_Surface *surface, SurfaceID surf_no)
 		}
 	}
 
-	Backend_UnlockSurface(surf[surf_no]);
+	Backend_UnlockSurface(surf[surf_no], converted_surface->w * magnification, converted_surface->h * magnification);
 	SDL_FreeSurface(converted_surface);
 
 	return TRUE;
@@ -269,6 +266,7 @@ BOOL MakeSurface_Resource(const char *name, SurfaceID surf_no)
 		return FALSE;
 
 	SDL_Surface *surface;
+	unsigned char *image_buffer = NULL;
 
 	if (data[0] == 'B' && data[1] == 'M')
 	{
@@ -277,12 +275,15 @@ BOOL MakeSurface_Resource(const char *name, SurfaceID surf_no)
 	}
 	else
 	{
-		unsigned char *image_buffer;
 		unsigned int image_width;
 		unsigned int image_height;
 
 		lodepng_decode32(&image_buffer, &image_width, &image_height, data, size);
 		surface = SDL_CreateRGBSurfaceWithFormatFrom(image_buffer, image_width, image_height, 32, image_width * 4, SDL_PIXELFORMAT_RGBA32);
+
+		if (surface == NULL)
+			return FALSE;
+
 		surface->userdata = image_buffer;
 	}
 
@@ -291,12 +292,17 @@ BOOL MakeSurface_Resource(const char *name, SurfaceID surf_no)
 	if (surf[surf_no] == NULL)
 	{
 		SDL_FreeSurface(surface);
+		free(image_buffer);
+
 		return FALSE;
 	}
 
 	if (!ScaleAndUploadSurface(surface, surf_no))
 	{
 		Backend_FreeSurface(surf[surf_no]);
+		SDL_FreeSurface(surface);
+		free(image_buffer);
+
 		return FALSE;
 	}
 
@@ -305,6 +311,8 @@ BOOL MakeSurface_Resource(const char *name, SurfaceID surf_no)
 	surface_metadata[surf_no].height = surface->h;
 	surface_metadata[surf_no].bSystem = FALSE;
 	strcpy(surface_metadata[surf_no].name, name);
+	SDL_FreeSurface(surface);
+	free(image_buffer);
 
 	return TRUE;
 }
@@ -338,13 +346,14 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 		surface = SDL_LoadBMP(path);
 	}
 
+	unsigned char *image_buffer = NULL;
+
 	if (surface != NULL)
 	{
 		SDL_SetColorKey(surface, SDL_TRUE, SDL_MapRGB(surface->format, 0, 0, 0));	// Assumes the colour key will always be #000000 (black)
 	}
 	else
 	{
-		unsigned char *image_buffer;
 		unsigned int image_width;
 		unsigned int image_height;
 
@@ -357,6 +366,8 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 			PrintBitmapError(path, 1);
 			return FALSE;
 		}
+
+		surface->userdata = image_buffer;
 	}
 
 	surf[surf_no] = Backend_CreateSurface(surface->w * magnification, surface->h * magnification);
@@ -364,12 +375,15 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 	if (surf[surf_no] == NULL)
 	{
 		SDL_FreeSurface(surface);
+		free(image_buffer);
 		return FALSE;
 	}
 
 	if (!ScaleAndUploadSurface(surface, surf_no))
 	{
 		Backend_FreeSurface(surf[surf_no]);
+		SDL_FreeSurface(surface);
+		free(image_buffer);
 		return FALSE;
 	}
 
@@ -378,6 +392,9 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 	surface_metadata[surf_no].height = surface->h;
 	surface_metadata[surf_no].bSystem = FALSE;
 	strcpy(surface_metadata[surf_no].name, name);
+
+	SDL_FreeSurface(surface);
+	free(image_buffer);
 
 	return TRUE;
 }
@@ -392,6 +409,7 @@ BOOL ReloadBitmap_Resource(const char *name, SurfaceID surf_no)
 	const unsigned char *data = FindResource(name, "BITMAP", &size);
 
 	SDL_Surface *surface;
+	unsigned char *image_buffer = NULL;
 
 	if (data[0] == 'B' && data[1] == 'M')
 	{
@@ -400,7 +418,6 @@ BOOL ReloadBitmap_Resource(const char *name, SurfaceID surf_no)
 	}
 	else
 	{
-		unsigned char *image_buffer;
 		unsigned int image_width;
 		unsigned int image_height;
 
@@ -410,7 +427,14 @@ BOOL ReloadBitmap_Resource(const char *name, SurfaceID surf_no)
 	}
 
 	if (!ScaleAndUploadSurface(surface, surf_no))
+	{
+		SDL_FreeSurface(surface);
+		free(image_buffer);
 		return FALSE;
+	}
+
+	SDL_FreeSurface(surface);
+	free(image_buffer);
 
 	surface_metadata[surf_no].type = SURFACE_SOURCE_RESOURCE;
 	strcpy(surface_metadata[surf_no].name, name);
@@ -441,13 +465,14 @@ BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 		surface = SDL_LoadBMP(path);
 	}
 
+	unsigned char *image_buffer = NULL;
+
 	if (surface != NULL)
 	{
 		SDL_SetColorKey(surface, SDL_TRUE, SDL_MapRGB(surface->format, 0, 0, 0));	// Assumes the colour key will always be #000000 (black)
 	}
 	else
 	{
-		unsigned char *image_buffer;
 		unsigned int image_width;
 		unsigned int image_height;
 
@@ -465,7 +490,14 @@ BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 	}
 
 	if (!ScaleAndUploadSurface(surface, surf_no))
+	{
+		SDL_FreeSurface(surface);
+		free(image_buffer);
 		return FALSE;
+	}
+
+	SDL_FreeSurface(surface);
+	free(image_buffer);
 
 	surface_metadata[surf_no].type = SURFACE_SOURCE_FILE;
 	strcpy(surface_metadata[surf_no].name, name);
