@@ -516,9 +516,7 @@ int LoadTimeCounter(void)
 		time_count = 0;
 		return 0;
 	}
-	else
-	{
-		time_count = rec.counter[0];
-		return time_count;
-	}
+
+	time_count = rec.counter[0];
+	return time_count;
 }
