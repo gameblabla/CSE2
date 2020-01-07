@@ -9,10 +9,6 @@
 
 #include "WindowsWrapper.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define MAXTRACK 16
 #define MAXMELODY 8
 #define MAXDRAM 8
@@ -31,7 +27,3 @@ void StopOrganyaMusic(void);
 void SetOrganyaFadeout(void);
 BOOL StartOrganya(LPDIRECTSOUND lpDS, const char *wave_filename);
 void EndOrganya(void);
-
-#ifdef __cplusplus
-}
-#endif

@@ -1,9 +1,5 @@
 #pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 typedef struct FRAME
 {
 	int x;
@@ -27,7 +23,3 @@ void SetFrameTargetBoss(int no, int wait);
 void SetQuake(int time);
 void SetQuake2(int time);
 void ResetQuake(void);
-
-#ifdef __cplusplus
-}
-#endif

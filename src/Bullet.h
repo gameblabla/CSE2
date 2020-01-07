@@ -2,10 +2,6 @@
 
 #include "WindowsWrapper.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 typedef struct BULLET
 {
 	int flag;
@@ -73,7 +69,3 @@ void PutBullet(int fx, int fy);
 void SetBullet(int no, int x, int y, int dir);
 void ActBullet(void);
 BOOL IsActiveSomeBullet(void);
-
-#ifdef __cplusplus
-}
-#endif

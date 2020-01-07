@@ -5,10 +5,6 @@
 
 #include "Draw.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define NPC_MAX 0x200
 
 enum NPCCond
@@ -144,7 +140,3 @@ void GetNpCharPosition(int *x, int *y, int i);
 BOOL IsNpCharCode(int code);
 BOOL GetNpCharAlive(int code_event);
 int CountAliveNpChar(void);
-
-#ifdef __cplusplus
-}
-#endif

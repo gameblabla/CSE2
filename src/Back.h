@@ -2,10 +2,6 @@
 
 #include "WindowsWrapper.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 typedef struct BACK
 {
 	BOOL flag;	// Basically unused
@@ -24,7 +20,3 @@ BOOL InitBack(const char *fName, int type);
 void ActBack(void);
 void PutBack(int fx, int fy);
 void PutFront(int fx, int fy);
-
-#ifdef __cplusplus
-}
-#endif

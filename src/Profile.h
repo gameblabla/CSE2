@@ -6,10 +6,6 @@
 #include "SelStage.h"
 #include "Stage.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 typedef struct PROFILE
 {
 	char code[8];
@@ -39,7 +35,3 @@ BOOL IsProfile(void);
 BOOL SaveProfile(const char *name);
 BOOL LoadProfile(const char *name);
 BOOL InitializeGame(HWND hWnd);
-
-#ifdef __cplusplus
-}
-#endif

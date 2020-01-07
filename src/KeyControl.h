@@ -1,9 +1,5 @@
 #pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 enum KeyBind
 {
 	//The movement keys go in the order of left, right, up and down
@@ -57,7 +53,3 @@ extern long gKeyRight;
 extern long gKeyDown;
 
 void GetTrg(void);
-
-#ifdef __cplusplus
-}
-#endif

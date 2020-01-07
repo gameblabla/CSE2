@@ -2,10 +2,6 @@
 
 #include "WindowsWrapper.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 typedef struct PIXTONEPARAMETER2
 {
 	int model;
@@ -32,7 +28,3 @@ typedef struct PIXTONEPARAMETER
 
 void MakeWaveTables(void);
 BOOL MakePixelWaveData(const PIXTONEPARAMETER *ptp, unsigned char *pData);
-
-#ifdef __cplusplus
-}
-#endif

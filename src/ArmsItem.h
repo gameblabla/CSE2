@@ -2,10 +2,6 @@
 
 #include "WindowsWrapper.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 // "Arms" is a synonym of "weapon" here
 // "Code" means "ID" here
 // "Num" often means "ammo" here
@@ -114,7 +110,3 @@ int RotationArmsRev(void);
 
 /// Change the current weapon to be the first one and play the usual rotation animation
 void ChangeToFirstArms(void);
-
-#ifdef __cplusplus
-}
-#endif

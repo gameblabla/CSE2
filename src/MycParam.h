@@ -2,10 +2,6 @@
 
 #include "WindowsWrapper.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 typedef struct ARMS_LEVEL
 {
 	int exp[3];
@@ -34,7 +30,3 @@ void PutMyAir(int x, int y);
 void PutTimeCounter(int x, int y);
 BOOL SaveTimeCounter(void);
 int LoadTimeCounter(void);
-
-#ifdef __cplusplus
-}
-#endif

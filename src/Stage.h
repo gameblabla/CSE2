@@ -2,10 +2,6 @@
 
 #include "WindowsWrapper.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 typedef enum MusicID
 {
 	MUS_SILENCE = 0x0,
@@ -70,7 +66,3 @@ extern MusicID gMusicNo;
 BOOL TransferStage(int no, int w, int x, int y);
 void ChangeMusic(MusicID no);
 void ReCallMusic(void);
-
-#ifdef __cplusplus
-}
-#endif

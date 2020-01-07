@@ -2,10 +2,6 @@
 
 #include "WindowsWrapper.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 typedef struct TEXT_SCRIPT
 {
 	// Path (reload when exit teleporter menu/inventory)
@@ -68,7 +64,3 @@ void StopTextScript(void);
 void PutTextScript(void);
 int TextScriptProc(void);
 void RestoreTextScript(void);
-
-#ifdef __cplusplus
-}
-#endif
