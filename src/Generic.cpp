@@ -11,26 +11,28 @@
 void GetCompileDate(int *year, int *month, int *day)
 {
 	int i;
-	const char *months[13];
-	char month_string[0x10];
+	char strMonth[0x10];
 
-	months[0] = "XXX";
-	months[1] = "Jan";
-	months[2] = "Feb";
-	months[3] = "Mar";
-	months[4] = "Apr";
-	months[5] = "May";
-	months[6] = "Jun";
-	months[7] = "Jul";
-	months[8] = "Aug";
-	months[9] = "Sep";
-	months[10] = "Oct";
-	months[11] = "Nov";
-	months[12] = "Dec";
-	sscanf(__DATE__, "%s %d %d", month_string, day, year);	// The expansion of __DATE__ is not reproductible. TODO : Think about changing this to be reproductible
+	const char *table[13] = {
+		"XXX",
+		"Jan",
+		"Feb",
+		"Mar",
+		"Apr",
+		"May",
+		"Jun",
+		"Jul",
+		"Aug",
+		"Sep",
+		"Oct",
+		"Nov",
+		"Dec",
+	};
+
+	sscanf(__DATE__, "%s %d %d", strMonth, day, year);	// The expansion of __DATE__ is not reproductible. TODO : Think about changing this to be reproductible
 
 	for (i = 0; i < 12; ++i)	// This being 12 instead of 13 might be a bug, but it works anyway by accident
-		if (!memcmp(&month_string, months[i], 3))
+		if (!memcmp(&strMonth, table[i], 3))
 			break;
 
 	*month = i;
@@ -413,14 +415,17 @@ BOOL SaveWindowRect(HWND hWnd, const char *filename)
 	return TRUE;
 }
 
+const char *extra_text = "(C)Pixel";
+
 BOOL IsEnableBitmap(const char *path)
 {
+	FILE *fp;
+	long len;
 	char str[16];
-	static const char *extra_text = "(C)Pixel";
 
-	const long len = (long)strlen(extra_text);
+	len = (long)strlen(extra_text);
 
-	FILE *fp = fopen(path, "rb");
+	fp = fopen(path, "rb");
 
 	if (fp == NULL)
 		return FALSE;
