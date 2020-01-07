@@ -95,8 +95,7 @@ static void ActBossCharT_DragonBody(NPCHAR *npc)
 static void ActBossCharT_DragonHead(NPCHAR *npc)
 {
 	unsigned char deg;
-	int ym;
-	int xm;
+	int xm, ym;
 
 	RECT rcLeft[4] = {
 		{0, 80, 40, 112},
