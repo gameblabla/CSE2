@@ -12,10 +12,10 @@
 #include "Draw.h"
 #include "File.h"
 #include "Game.h"
+#include "Main.h"
 #include "MyChar.h"
 #include "NpChar.h"
 #include "Sound.h"
-#include "Tags.h"
 #include "TextScr.h"
 #include "ValueView.h"
 

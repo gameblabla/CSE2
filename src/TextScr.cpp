@@ -32,7 +32,6 @@
 #include "SelStage.h"
 #include "Sound.h"
 #include "Stage.h"
-#include "Tags.h"
 
 #define TSC_BUFFER_SIZE 0x5000
 
@@ -42,7 +41,6 @@
 
 TEXT_SCRIPT gTS;
 
-int gNumberTextScript[4];
 char text[4][0x40];
 
 RECT gRect_line = {0, 0, 216, 16};
@@ -89,6 +87,7 @@ void EndTextScript(void)
 
 	// Release buffers
 	ReleaseSurface(SURFACE_ID_TEXT_BOX);
+
 	for (i = 0; i < 4; ++i)
 		ReleaseSurface((SurfaceID)(SURFACE_ID_TEXT_LINE1 + i));
 }
@@ -96,12 +95,14 @@ void EndTextScript(void)
 // Decrypt .tsc
 void EncryptionBinaryData2(unsigned char *pData, long size)
 {
-	int val1;
-	int work;
 	int i;
+	int work;
+
 	int half;
+	int val1;
 
 	half = size / 2;
+
 	if (pData[half] == 0)
 		val1 = -7;
 	else
@@ -120,8 +121,10 @@ void EncryptionBinaryData2(unsigned char *pData, long size)
 // Load generic .tsc
 BOOL LoadTextScript2(const char *name)
 {
-	// Get path
+	FILE *fp;
 	char path[MAX_PATH];
+
+	// Get path
 	sprintf(path, "%s/%s", gDataPath, name);
 
 	gTS.size = GetFileSizeLong(path);
@@ -129,7 +132,7 @@ BOOL LoadTextScript2(const char *name)
 		return FALSE;
 
 	// Open file
-	FILE *fp = fopen(path, "rb");
+	fp = fopen(path, "rb");
 	if (fp == NULL)
 		return FALSE;
 
@@ -150,15 +153,19 @@ BOOL LoadTextScript2(const char *name)
 // Load stage .tsc
 BOOL LoadTextScript_Stage(const char *name)
 {
-	// Open Head.tsc
+	FILE *fp;
 	char path[MAX_PATH];
+	long head_size;
+	long body_size;
+
+	// Open Head.tsc
 	sprintf(path, "%s/%s", gDataPath, "Head.tsc");
 
-	long head_size = GetFileSizeLong(path);
+	head_size = GetFileSizeLong(path);
 	if (head_size == -1)
 		return FALSE;
 
-	FILE *fp = fopen(path, "rb");
+	fp = fopen(path, "rb");
 	if (fp == NULL)
 		return FALSE;
 
@@ -171,7 +178,7 @@ BOOL LoadTextScript_Stage(const char *name)
 	// Open stage's .tsc
 	sprintf(path, "%s/%s", gDataPath, name);
 
-	long body_size = GetFileSizeLong(path);
+	body_size = GetFileSizeLong(path);
 	if (body_size == -1)
 		return FALSE;
 
@@ -295,6 +302,7 @@ BOOL JumpTextScript(int no)
 
 	// Find where event starts
 	gTS.p_read = 0;
+
 	while(1)
 	{
 		// Check if we are still in the proper range
@@ -319,6 +327,7 @@ BOOL JumpTextScript(int no)
 	// Advance until new-line
 	while (gTS.data[gTS.p_read] != '\n')
 		++gTS.p_read;
+
 	++gTS.p_read;
 
 	return TRUE;
@@ -346,15 +355,17 @@ void CheckNewLine(void)
 	}
 }
 
+int gNumberTextScript[4];
+
 // Type a number into the text buffer
 void SetNumberTextScript(int index)
 {
+	char str[5];
+	BOOL bZero;
 	int a;
 	int b;
-	int i;
-	BOOL bZero;
 	int offset;
-	char str[5];
+	int i;
 
 	// Get digit table
 	int table[3];
@@ -424,15 +435,7 @@ void ClearTextLine(void)
 // Draw textbox and whatever else
 void PutTextScript(void)
 {
-	RECT rcFace;
-	RECT rcItemBox1;
-	RECT rcItemBox2;
-	RECT rcItemBox3;
-	RECT rcItemBox4;
-	RECT rcItemBox5;
 	int i;
-	RECT rect_yesno;
-	RECT rect_cur;
 	RECT rect;
 	int text_offset;
 
@@ -468,6 +471,7 @@ void PutTextScript(void)
 	}
 
 	// Draw face picture
+	RECT rcFace;
 	rcFace.left = (gTS.face % 6) * 48;
 	rcFace.top = (gTS.face / 6) * 48;
 	rcFace.right = rcFace.left + 48;
@@ -517,11 +521,11 @@ void PutTextScript(void)
 	}
 
 	// Draw GIT
-	SET_RECT(rcItemBox1, 0, 0, 72, 16)
-	SET_RECT(rcItemBox2, 0, 8, 72, 24)
-	SET_RECT(rcItemBox3, 240, 0, 244, 8)
-	SET_RECT(rcItemBox4, 240, 8, 244, 16)
-	SET_RECT(rcItemBox5, 240, 16, 244, 24)
+	RECT rcItemBox1 = {0, 0, 72, 16};
+	RECT rcItemBox2 = {0, 8, 72, 24};
+	RECT rcItemBox3 = {240, 0, 244, 8};
+	RECT rcItemBox4 = {240, 8, 244, 16};
+	RECT rcItemBox5 = {240, 16, 244, 24};
 
 	if (gTS.item != 0)
 	{
@@ -554,8 +558,8 @@ void PutTextScript(void)
 	}
 
 	// Draw Yes / No selection
-	SET_RECT(rect_yesno, 152, 48, 244, 80)
-	SET_RECT(rect_cur, 112, 88, 128, 104)
+	RECT rect_yesno = {152, 48, 244, 80};
+	RECT rect_cur = {112, 88, 128, 104};
 
 	if (gTS.mode == 6)
 	{
@@ -573,11 +577,12 @@ void PutTextScript(void)
 // Parse TSC
 int TextScriptProc(void)
 {
-	BOOL bExit;
-	char c[3];
-	int w, x, y, z;
 	int i;
+	char c[3];
 	char str[72];
+	int w, x, y, z;
+
+	BOOL bExit;
 
 	RECT rcSymbol = {64, 48, 72, 56};
 

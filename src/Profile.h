@@ -6,7 +6,7 @@
 #include "SelStage.h"
 #include "Stage.h"
 
-struct PROFILE
+typedef struct PROFILE
 {
 	char code[8];
 	int stage;
@@ -29,7 +29,7 @@ struct PROFILE
 	signed char permit_mapping[0x80];
 	char FLAG[4];
 	unsigned char flags[1000];
-};
+} PROFILE;
 
 BOOL IsProfile(void);
 BOOL SaveProfile(const char *name);

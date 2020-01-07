@@ -2,16 +2,12 @@
 
 #include "WindowsWrapper.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 // "Arms" is a synonym of "weapon" here
 // "Code" means "ID" here
 // "Num" often means "ammo" here
 
 /// Weapon struct
-struct ARMS
+typedef struct ARMS
 {
 	/// ID of the weapon
 	int code;
@@ -27,13 +23,13 @@ struct ARMS
 
 	/// Current ammunition
 	int num;
-};
+} ARMS;
 
-struct ITEM
+typedef struct ITEM
 {
 	/// ID of the item
 	int code;
-};
+} ITEM;
 
 
 // Limits for the amount of weapons and items
@@ -114,7 +110,3 @@ int RotationArmsRev(void);
 
 /// Change the current weapon to be the first one and play the usual rotation animation
 void ChangeToFirstArms(void);
-
-#ifdef __cplusplus
-}
-#endif

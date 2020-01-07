@@ -10,9 +10,9 @@
 #include "File.h"
 #include "Frame.h"
 #include "Game.h"
+#include "Main.h"
 #include "Map.h"
 #include "Stage.h"
-#include "Tags.h"
 
 BACK gBack;
 int gWaterY;

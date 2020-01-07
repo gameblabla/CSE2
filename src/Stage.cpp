@@ -246,9 +246,9 @@ const char *gMusicTable[42] = {
 	"WHITE"
 };
 
+MusicID gMusicNo;
 unsigned int gOldPos;
 MusicID gOldNo;
-MusicID gMusicNo;
 
 void ChangeMusic(MusicID no)
 {

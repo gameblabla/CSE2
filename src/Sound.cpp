@@ -20,9 +20,9 @@ equivalents.
 #include "WindowsWrapper.h"
 
 #include "Backends/Audio.h"
+#include "Main.h"
 #include "Organya.h"
 #include "PixTone.h"
-#include "Tags.h"
 
 BOOL audio_backend_initialised;
 AudioBackend_Sound *lpSECONDARYBUFFER[SE_MAX];

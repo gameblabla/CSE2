@@ -16,7 +16,6 @@
 #include "Organya.h"
 #include "Stage.h"
 #include "TextScr.h"
-#include "Tags.h"
 
 CREDIT Credit;
 STRIP Strip[MAX_STRIP];

@@ -10,8 +10,8 @@
 #include "CommonDefines.h"
 #include "Draw.h"
 #include "File.h"
+#include "Main.h"
 #include "NpChar.h"
-#include "Tags.h"
 
 #define PXM_BUFFER_SIZE 0x4B000
 

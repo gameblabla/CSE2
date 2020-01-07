@@ -2,7 +2,7 @@
 
 #include "WindowsWrapper.h"
 
-struct BACK
+typedef struct BACK
 {
 	BOOL flag;	// Basically unused
 	int partsW;
@@ -11,7 +11,7 @@ struct BACK
 	int numY;
 	int type;
 	int fx;
-};
+} BACK;
 
 extern BACK gBack;
 extern int gWaterY;
