@@ -10,9 +10,9 @@
 #ifdef EXTRA_SOUND_FORMATS
 #include "ExtraSoundFormats.h"
 #endif
+#include "Main.h"
 #include "PixTone.h"
 #include "Sound.h"
-#include "Tags.h"
 
 enum
 {

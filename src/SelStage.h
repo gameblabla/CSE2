@@ -2,11 +2,11 @@
 
 #include "WindowsWrapper.h"
 
-struct PERMIT_STAGE
+typedef struct PERMIT_STAGE
 {
 	int index;
 	int event;
-};
+} PERMIT_STAGE;
 
 extern PERMIT_STAGE gPermitStage[8];
 

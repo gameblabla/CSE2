@@ -14,6 +14,7 @@
 #include "File.h"
 #include "Flash.h"
 #include "Frame.h"
+#include "Main.h"
 #include "Map.h"
 #include "MapName.h"
 #include "MyChar.h"
@@ -22,7 +23,6 @@
 #ifdef EXTRA_SOUND_FORMATS
 #include "ExtraSoundFormats.h"
 #endif
-#include "Tags.h"
 #include "TextScr.h"
 #include "ValueView.h"
 
@@ -355,9 +355,9 @@ const struct
 	{"Resource/ORG/White.org", MUSIC_TYPE_ORGANYA, true}
 };
 
+MusicID gMusicNo;
 unsigned int gOldPos;
 MusicID gOldNo;
-MusicID gMusicNo;
 
 void ChangeMusic(MusicID no)
 {

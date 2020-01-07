@@ -2,7 +2,7 @@
 
 #include "WindowsWrapper.h"
 
-struct VALUEVIEW
+typedef struct VALUEVIEW
 {
   BOOL flag;
   int *px;
@@ -11,7 +11,7 @@ struct VALUEVIEW
   int value;
   int count;
   RECT rect;
-};
+} VALUEVIEW;
 
 void ClearValueView(void);
 void SetValueView(int *px, int *py, int value);

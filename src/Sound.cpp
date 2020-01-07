@@ -23,9 +23,9 @@ equivalents.
 #ifdef EXTRA_SOUND_FORMATS
 #include "ExtraSoundFormats.h"
 #endif
+#include "Main.h"
 #include "Organya.h"
 #include "PixTone.h"
-#include "Tags.h"
 
 BOOL audio_backend_initialised;
 AudioBackend_Sound *lpSECONDARYBUFFER[SE_MAX];

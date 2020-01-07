@@ -2,15 +2,15 @@
 
 #include "WindowsWrapper.h"
 
-struct PIXTONEPARAMETER2
+typedef struct PIXTONEPARAMETER2
 {
 	int model;
 	double num;
 	int top;
 	int offset;
-};
+} PIXTONEPARAMETER2;
 
-struct PIXTONEPARAMETER
+typedef struct PIXTONEPARAMETER
 {
 	int use;
 	int size;
@@ -24,7 +24,7 @@ struct PIXTONEPARAMETER
 	int pointBy;
 	int pointCx;
 	int pointCy;
-};
+} PIXTONEPARAMETER;
 
 void MakeWaveTables(void);
 BOOL MakePixelWaveData(const PIXTONEPARAMETER *ptp, unsigned char *pData);

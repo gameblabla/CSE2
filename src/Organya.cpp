@@ -15,8 +15,8 @@
 
 #include "Backends/Audio.h"
 #include "File.h"
+#include "Main.h"
 #include "Sound.h"
-#include "Tags.h"
 
 #define PANDUMMY 0xFF
 #define VOLDUMMY 0xFF

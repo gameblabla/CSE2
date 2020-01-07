@@ -44,7 +44,6 @@
 #include "Sound.h"
 #include "Stage.h"
 #include "Star.h"
-#include "Tags.h"
 #include "TextScr.h"
 #include "ValueView.h"
 

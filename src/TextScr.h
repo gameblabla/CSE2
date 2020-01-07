@@ -2,7 +2,7 @@
 
 #include "WindowsWrapper.h"
 
-struct TEXT_SCRIPT
+typedef struct TEXT_SCRIPT
 {
 	// Path (reload when exit teleporter menu/inventory)
 	char path[MAX_PATH];
@@ -51,7 +51,7 @@ struct TEXT_SCRIPT
 
 	// NOD cursor blink
 	unsigned char wait_beam;
-};
+} TEXT_SCRIPT;
 
 /// Contains the latest value given through <MIM
 extern unsigned int gMIMCurrentNum;

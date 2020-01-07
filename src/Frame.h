@@ -1,6 +1,6 @@
 #pragma once
 
-struct FRAME
+typedef struct FRAME
 {
 	int x;
 	int y;
@@ -9,7 +9,7 @@ struct FRAME
 	int wait;
 	int quake;
 	int quake2;
-};
+} FRAME;
 
 extern FRAME gFrame;
 

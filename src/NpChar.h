@@ -51,7 +51,7 @@ enum NPCNames
 	// To be continued
 };
 
-struct NPCHAR
+typedef struct NPCHAR
 {
 	unsigned char cond;
 	int flag;
@@ -98,8 +98,8 @@ struct NPCHAR
 	unsigned char shock;
 	int damage_view;
 	int damage;
-	NPCHAR *pNpc;
-};
+	struct NPCHAR *pNpc;
+} NPCHAR;
 
 struct EVENT
 {

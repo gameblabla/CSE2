@@ -2,10 +2,6 @@
 
 #include "WindowsWrapper.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 // TODO - When I add bitmask constants for gMC.flags...
 // 0x100 is a 'player is underwater' flag
 
@@ -103,7 +99,3 @@ void SetNoise(int no, int freq);
 void CutNoise(void);
 void ResetNoise(void);
 void SleepNoise(void);
-
-#ifdef __cplusplus
-}
-#endif
