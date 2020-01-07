@@ -8,14 +8,12 @@ short gTan[0x21];
 void InitTriangleTable(void)
 {
 	int i;
-	float a;
-	float b;
 
 	// Sine
 	for (i = 0; i < 0x100; ++i)
-	{
 		gSin[i] = (int)(sin(i * 6.2831998 / 256.0) * 512.0);
-	}
+
+	float a, b;
 
 	// Tangent
 	for (i = 0; i < 0x21; ++i)
@@ -39,8 +37,8 @@ int GetCos(unsigned char deg)
 
 unsigned char GetArktan(int x, int y)
 {
-	unsigned char a;
 	short k;
+	unsigned char a;
 
 	x *= -1;
 	y *= -1;
