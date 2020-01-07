@@ -27,11 +27,9 @@ const char *gProfileCode = "Do041220";
 BOOL IsProfile(void)
 {
 	char path[MAX_PATH];
-	HANDLE hFile;
-
 	sprintf(path, "%s\\%s", gModulePath, gDefaultName);
 
-	hFile = CreateFileA(path, 0, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE hFile = CreateFileA(path, 0, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hFile == INVALID_HANDLE_VALUE)
 		return FALSE;
 
@@ -41,9 +39,10 @@ BOOL IsProfile(void)
 
 BOOL SaveProfile(const char *name)
 {
-	PROFILE profile;
 	FILE *fp;
+	PROFILE profile;
 	const char *FLAG = "FLAG";
+
 	char path[MAX_PATH];
 
 	// Get path
@@ -89,9 +88,9 @@ BOOL SaveProfile(const char *name)
 
 BOOL LoadProfile(const char *name)
 {
-	char path[MAX_PATH];
-	PROFILE profile;
 	FILE *fp;
+	PROFILE profile;
+	char path[MAX_PATH];
 
 	// Get path
 	if (name != NULL)
