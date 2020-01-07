@@ -147,32 +147,32 @@ void Backend_RestoreSurface(Backend_Surface *surface)
 	surface->lost = FALSE;
 }
 
-unsigned char* Backend_LockSurface(Backend_Surface *surface, unsigned int *pitch)
+unsigned char* Backend_LockSurface(Backend_Surface *surface, unsigned int *pitch, unsigned int width, unsigned int height)
 {
 	if (surface == NULL)
 		return NULL;
 
-	*pitch = surface->width * 3;
+	*pitch = width * 3;
 
-	surface->pixels = (unsigned char*)calloc(surface->width * surface->height * 3, 1);	// Make sure these are initialized
+	surface->pixels = (unsigned char*)malloc(width * height * 3);
 
 	return surface->pixels;
 }
 
-void Backend_UnlockSurface(Backend_Surface *surface)
+void Backend_UnlockSurface(Backend_Surface *surface, unsigned int width, unsigned int height)
 {
 	if (surface == NULL)
 		return;
 
-	unsigned char *buffer = (unsigned char*)malloc(surface->width * surface->height * 4);
-	unsigned char *buffer_pointer = buffer;
+	unsigned char *buffer = (unsigned char*)malloc(width * height * 4);
 	const unsigned char *src_pixel = surface->pixels;
 
 	// Convert the SDL_Surface's colour-keyed pixels to RGBA32
-	for (unsigned int y = 0; y < surface->height; ++y)
+	for (unsigned int y = 0; y < height; ++y)
 	{
+		unsigned char *buffer_pointer = &buffer[y * width * 4];
 
-		for (unsigned int x = 0; x < surface->width; ++x)
+		for (unsigned int x = 0; x < width; ++x)
 		{
 			*buffer_pointer++ = src_pixel[0];
 			*buffer_pointer++ = src_pixel[1];
@@ -189,7 +189,8 @@ void Backend_UnlockSurface(Backend_Surface *surface)
 
 	free(surface->pixels);
 
-	SDL_UpdateTexture(surface->texture, NULL, buffer, surface->width * 4);
+	SDL_Rect rect = {0, 0, width, height};
+	SDL_UpdateTexture(surface->texture, &rect, buffer, width * 4);
 
 	free(buffer);
 }

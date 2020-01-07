@@ -105,7 +105,7 @@ void Backend_RestoreSurface(Backend_Surface *surface)
 	(void)surface;
 }
 
-unsigned char* Backend_LockSurface(Backend_Surface *surface, unsigned int *pitch)
+unsigned char* Backend_LockSurface(Backend_Surface *surface, unsigned int *pitch, unsigned int width, unsigned int height)
 {
 	if (surface == NULL)
 		return NULL;
@@ -114,7 +114,7 @@ unsigned char* Backend_LockSurface(Backend_Surface *surface, unsigned int *pitch
 	return (unsigned char*)surface->sdlsurface->pixels;
 }
 
-void Backend_UnlockSurface(Backend_Surface *surface)
+void Backend_UnlockSurface(Backend_Surface *surface, unsigned int width, unsigned int height)
 {
 	(void)surface;
 }

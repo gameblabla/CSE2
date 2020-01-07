@@ -165,7 +165,7 @@ static BOOL ScaleAndUploadSurface(SDL_Surface *surface, SurfaceID surf_no)
 
 	// IF YOU WANT TO ADD HD SPRITES, THIS IS THE CODE YOU SHOULD EDIT
 	unsigned int pitch;
-	unsigned char *pixels = Backend_LockSurface(surf[surf_no], &pitch);
+	unsigned char *pixels = Backend_LockSurface(surf[surf_no], &pitch, converted_surface->w * magnification, converted_surface->h * magnification);
 
 	if (magnification == 1)
 	{
@@ -206,7 +206,7 @@ static BOOL ScaleAndUploadSurface(SDL_Surface *surface, SurfaceID surf_no)
 		}
 	}
 
-	Backend_UnlockSurface(surf[surf_no]);
+	Backend_UnlockSurface(surf[surf_no], converted_surface->w * magnification, converted_surface->h * magnification);
 	SDL_FreeSurface(converted_surface);
 
 	return TRUE;

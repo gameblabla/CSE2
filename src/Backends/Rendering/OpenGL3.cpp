@@ -474,17 +474,17 @@ void Backend_RestoreSurface(Backend_Surface *surface)
 	(void)surface;
 }
 
-unsigned char* Backend_LockSurface(Backend_Surface *surface, unsigned int *pitch)
+unsigned char* Backend_LockSurface(Backend_Surface *surface, unsigned int *pitch, unsigned int width, unsigned int height)
 {
 	if (surface == NULL)
 		return NULL;
 
-	surface->pixels = (unsigned char*)malloc(surface->width * surface->height * 3);
-	*pitch = surface->width * 3;
+	surface->pixels = (unsigned char*)malloc(width * height * 3);
+	*pitch = width * 3;
 	return surface->pixels;
 }
 
-void Backend_UnlockSurface(Backend_Surface *surface)
+void Backend_UnlockSurface(Backend_Surface *surface, unsigned int width, unsigned int height)
 {
 	if (surface == NULL)
 		return;
@@ -493,7 +493,7 @@ void Backend_UnlockSurface(Backend_Surface *surface)
 	glGetIntegerv(GL_TEXTURE_BINDING_2D, &previously_bound_texture);
 
 	glBindTexture(GL_TEXTURE_2D, surface->texture_id);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, surface->width, surface->height, GL_RGB, GL_UNSIGNED_BYTE, surface->pixels);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, surface->pixels);
 	free(surface->pixels);
 
 	glBindTexture(GL_TEXTURE_2D, previously_bound_texture);
