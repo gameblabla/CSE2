@@ -155,9 +155,8 @@ static const PIXTONEPARAMETER gPtpTable[139] =
 
 BOOL LoadGenericData(void)
 {
-	char str[0x40];
-	BOOL bError;
 	int pt_size;
+	BOOL bError;
 
 	MakeSurface_Resource("PIXEL", SURFACE_ID_PIXEL);
 
@@ -293,6 +292,8 @@ BOOL LoadGenericData(void)
 	pt_size += MakePixToneObject(&gPtpTable[136], 1, 3);
 	pt_size += MakePixToneObject(&gPtpTable[137], 1, 6);
 	pt_size += MakePixToneObject(&gPtpTable[138], 1, 7);
+
+	char str[0x40];
 	sprintf(str, "PixTone = %d byte", pt_size);
 	// There must have been some kind of console print function here or something
 	return TRUE;
