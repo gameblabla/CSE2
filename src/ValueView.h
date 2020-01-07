@@ -2,10 +2,6 @@
 
 #include "WindowsWrapper.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 typedef struct VALUEVIEW
 {
   BOOL flag;
@@ -21,7 +17,3 @@ void ClearValueView(void);
 void SetValueView(int *px, int *py, int value);
 void ActValueView(void);
 void PutValueView(int flx, int fly);
-
-#ifdef __cplusplus
-}
-#endif
