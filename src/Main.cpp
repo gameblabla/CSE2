@@ -27,14 +27,14 @@ LRESULT __stdcall WindowProcedure(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lPa
 char gModulePath[MAX_PATH];
 char gDataPath[MAX_PATH];
 
-int gJoystickButtonTable[8];
-
 HWND ghWnd;
 BOOL bFullscreen;
 BOOL gbUseJoystick = FALSE;
 
-static BOOL bFps = FALSE;
+int gJoystickButtonTable[8];
+
 static BOOL bActive = TRUE;
+static BOOL bFps = FALSE;
 
 static HANDLE hObject;
 static HANDLE hMutex;
