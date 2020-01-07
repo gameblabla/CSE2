@@ -409,10 +409,12 @@ int JudgeHitMyCharVectDown(int x, int y)
 
 void HitMyCharMap(void)
 {
+	int x, y;
 	int i;
+	unsigned char atrb[4];
 
-	int x = gMC.x / 0x10 / 0x200;
-	int y = gMC.y / 0x10 / 0x200;
+	x = gMC.x / 0x10 / 0x200;
+	y = gMC.y / 0x10 / 0x200;
 
 	int offx[4];
 	int offy[4];
@@ -427,7 +429,6 @@ void HitMyCharMap(void)
 	offy[2] = 1;
 	offy[3] = 1;
 
-	unsigned char atrb[4];
 	for (i = 0; i < 4; ++i)
 	{
 		atrb[i] = GetAttribute(x + offx[i], y + offy[i]);
@@ -666,12 +667,12 @@ unsigned char JudgeHitMyCharNPC3(NPCHAR *npc)
 int JudgeHitMyCharNPC4(NPCHAR *npc)
 {
 	// TODO: comment this
+	int hit = 0;
+
+	float fy1;
 	float fx1;
 	float fx2;
-	float fy1;
 	float fy2;
-
-	int hit = 0;
 
 	if (npc->x > gMC.x)
 		fx1 = (float)(npc->x - gMC.x);
@@ -768,7 +769,6 @@ int JudgeHitMyCharNPC4(NPCHAR *npc)
 void HitMyCharNpChar(void)
 {
 	int i;
-
 	int hit = 0;
 
 	if (!(gMC.cond & 0x80) || gMC.cond & 2)
@@ -859,7 +859,6 @@ void HitMyCharNpChar(void)
 void HitMyCharBoss(void)
 {
 	int b;
-
 	int hit = 0;
 
 	if (!(gMC.cond & 0x80) || gMC.cond & 2)
