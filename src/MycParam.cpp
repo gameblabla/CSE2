@@ -34,8 +34,6 @@ ARMS_LEVEL gArmsLevelTable[14] =
 	{{40, 60, 200}}
 };
 
-int time_count;
-
 void AddExpMyChar(int x)
 {
 	int lv = gArmsData[gSelectedArms].level - 1;
@@ -93,9 +91,11 @@ void ZeroExpMyChar(void)
 
 BOOL IsMaxExpMyChar(void)
 {
+	int arms_code;
+
 	if (gArmsData[gSelectedArms].level == 3)
 	{
-		int arms_code = gArmsData[gSelectedArms].code;
+		arms_code = gArmsData[gSelectedArms].code;
 
 		if (gArmsData[gSelectedArms].exp >= gArmsLevelTable[arms_code].exp[2])
 			return TRUE;
@@ -232,15 +232,7 @@ void AddMaxLifeMyChar(int val)
 
 void PutArmsEnergy(BOOL flash)
 {
-	RECT rcExpBox;
-	RECT rcExpVal;
-	RECT rcExpMax;
-	RECT rcExpFlash;
-
-	int lv;
-	int arms_code;
-	int exp_now;
-	int exp_next;
+	static unsigned char add_flash;
 
 	RECT rcPer = {72, 48, 80, 56};
 	RECT rcLv = {80, 80, 96, 88};
@@ -272,15 +264,15 @@ void PutArmsEnergy(BOOL flash)
 	PutBitmap3(&rcView, gArmsEnergyX, 32, &rcLv, SURFACE_ID_TEXT_BOX);
 	PutNumber4(gArmsEnergyX - 8, 32, gArmsData[gSelectedArms].level, FALSE);
 
-	SET_RECT(rcExpBox, 0, 72, 40, 80)
-	SET_RECT(rcExpVal, 0, 80, 0, 88)
-	SET_RECT(rcExpMax, 40, 72, 80, 80)
-	SET_RECT(rcExpFlash, 40, 80, 80, 88)
+	RECT rcExpBox = {0, 72, 40, 80};
+	RECT rcExpVal = {0, 80, 0, 88};
+	RECT rcExpMax = {40, 72, 80, 80};
+	RECT rcExpFlash = {40, 80, 80, 88};
 
-	lv = gArmsData[gSelectedArms].level - 1;
-	arms_code = gArmsData[gSelectedArms].code;
-	exp_now = gArmsData[gSelectedArms].exp;
-	exp_next = gArmsLevelTable[arms_code].exp[lv];
+	int lv = gArmsData[gSelectedArms].level - 1;
+	int arms_code = gArmsData[gSelectedArms].code;
+	int exp_now = gArmsData[gSelectedArms].exp;
+	int exp_next = gArmsLevelTable[arms_code].exp[lv];
 
 	PutBitmap3(&rcView, gArmsEnergyX + 24, 32, &rcExpBox, SURFACE_ID_TEXT_BOX);
 
@@ -298,7 +290,6 @@ void PutArmsEnergy(BOOL flash)
 		PutBitmap3(&rcView, gArmsEnergyX + 24, 32, &rcExpVal, SURFACE_ID_TEXT_BOX);
 	}
 
-	static unsigned char add_flash;
 	if (gMC.exp_wait && ((add_flash++ / 2) % 2))
 		PutBitmap3(&rcView, gArmsEnergyX + 24, 32, &rcExpFlash, SURFACE_ID_TEXT_BOX);
 }
@@ -307,10 +298,9 @@ void PutActiveArmsList(void)
 {
 	int x;
 	int a;
-	int arms_num;
 	RECT rect = {0, 0, 0, 16};
 
-	arms_num = 0;
+	int arms_num = 0;
 	while (gArmsData[arms_num].code != 0)
 		++arms_num;
 
@@ -396,6 +386,8 @@ void PutMyAir(int x, int y)
 	}
 }
 
+int time_count;
+
 void PutTimeCounter(int x, int y)
 {
 	RECT rcTime[3] = {
@@ -436,20 +428,20 @@ void PutTimeCounter(int x, int y)
 
 BOOL SaveTimeCounter(void)
 {
-	unsigned char *p;
 	int i;
-
+	unsigned char *p;
 	REC rec;
+	FILE *fp;
+	char path[MAX_PATH];
 
 	// Quit if player doesn't have the Nikumaru Counter
 	if (!(gMC.equip & 0x100))
 		return TRUE;
 
 	// Get last time
-	char path[MAX_PATH];
 	sprintf(path, "%s\\290.rec", gModulePath);
 
-	FILE *fp = fopen(path, "rb");
+	fp = fopen(path, "rb");
 	if (fp)
 	{
 		// Read data
@@ -491,18 +483,18 @@ BOOL SaveTimeCounter(void)
 
 int LoadTimeCounter(void)
 {
-	unsigned char *p;
 	int i;
+	unsigned char *p;
+	REC rec;
+	FILE *fp;
+	char path[MAX_PATH];
 
 	// Open file
-	char path[MAX_PATH];
 	sprintf(path, "%s\\290.rec", gModulePath);
 
-	FILE *fp = fopen(path, "rb");
+	fp = fopen(path, "rb");
 	if (!fp)
 		return 0;
-
-	REC rec;
 
 	// Read data
 	fread(&rec, sizeof(REC), 1, fp);
