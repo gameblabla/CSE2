@@ -47,12 +47,12 @@ int JudgeHitBulletBlock(int x, int y, BULLET *bul)
 
 int JudgeHitBulletBlock2(int x, int y, unsigned char *atrb, BULLET *bul)
 {
-	int i;
-	int workX;
-	int workY;
-	int hit = 0;
-
 	BOOL block[4];
+	int workX, workY;
+	int hit, i;
+
+	hit = 0;
+
 	if (bul->bbits & 0x40)
 	{
 		for (i = 0; i < 4; ++i)
@@ -324,11 +324,10 @@ int JudgeHitBulletTriangleH(int x, int y, BULLET *bul)
 
 void HitBulletMap(void)
 {
-	int i;
-	int j;
-	int x;
-	int y;
+	int x, y;
 	unsigned char atrb[4];
+
+	int i, j;
 
 	for (i = 0; i < BULLET_MAX; ++i)
 	{
