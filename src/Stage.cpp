@@ -27,6 +27,9 @@
 #endif
 
 int gStageNo;
+MusicID gMusicNo;
+unsigned int gOldPos;
+MusicID gOldNo;
 
 // Note: Pixel made numerous capitalisation errors when making this table.
 // This isn't a problem for Windows, because of its case-insensitive filesystem.
@@ -130,9 +133,9 @@ const STAGE_TABLE gTMT[95] = {
 
 BOOL TransferStage(int no, int w, int x, int y)
 {
-	BOOL bError;
-	char path_dir[20];
 	char path[MAX_PATH];
+	char path_dir[20];
+	BOOL bError;
 
 	// Move character
 	SetMyCharPosition(x * 0x10 * 0x200, y * 0x10 * 0x200);
@@ -247,10 +250,6 @@ const char *gMusicTable[42] = {
 	"TOROKO",
 	"WHITE"
 };
-
-MusicID gMusicNo;
-unsigned int gOldPos;
-MusicID gOldNo;
 
 void ChangeMusic(MusicID no)
 {
