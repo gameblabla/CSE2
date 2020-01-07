@@ -10,12 +10,10 @@
 
 void ActBossChar_Press(void)
 {
+	NPCHAR *npc = gBoss;
 	static unsigned char flash;
-
 	int i;
 	int x;
-
-	NPCHAR *npc = gBoss;
 
 	switch (npc->act_no)
 	{
