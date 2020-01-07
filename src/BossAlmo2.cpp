@@ -178,13 +178,13 @@ static void ActBossCharA_Face(NPCHAR *npc)
 
 static void ActBossCharA_Mini(NPCHAR *npc)
 {
-	int deg;
-
 	RECT rect[3] = {
 		{256, 0, 320, 40},
 		{256, 40, 320, 80},
 		{256, 80, 320, 120},
 	};
+
+	int deg;
 
 	if (npc->cond == 0)
 		return;
@@ -284,16 +284,14 @@ static void ActBossCharA_Hit(NPCHAR *npc)
 
 void ActBossChar_Undead(void)
 {
-	int i;
-	int x;
-	int y;
-
-	static int life;
-	static unsigned char flash;
-
 	NPCHAR *npc = gBoss;
 
+	static unsigned char flash;
 	BOOL bShock = FALSE;
+	int x, y;
+	int i;
+
+	static int life;
 
 	switch (npc->act_no)
 	{
