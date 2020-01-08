@@ -63,7 +63,6 @@ BOOL Flip_SystemTask(void)
 	{
 		if (!SystemTask())
 			return FALSE;
-		
 	}
 	else
 	{

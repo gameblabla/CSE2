@@ -37,7 +37,7 @@ MusicID gMusicNo;
 unsigned int gOldPos;
 MusicID gOldNo;
 
-static const STAGE_TABLE gTMTDefault[95] = {
+const STAGE_TABLE gTMTDefault[95] = {
 	STAGE_ENTRY("0", "0", 4, "bk0", "Guest", "0", 0, "Null", "\x96\xB3"),	// 無
 	STAGE_ENTRY("Pens", "Pens1", 1, "bkBlue", "Guest", "0", 0, "Arthur's House", "\x83\x41\x81\x5B\x83\x54\x81\x5B\x82\xCC\x89\xC6"),	// アーサーの家
 	STAGE_ENTRY("Eggs", "Eggs", 1, "bkGreen", "Eggs1", "Ravil", 0, "Egg Corridor", "\x83\x5E\x83\x7D\x83\x53\x89\xF1\x98\x4C"),	// タマゴ回廊
@@ -135,7 +135,7 @@ static const STAGE_TABLE gTMTDefault[95] = {
 	STAGE_ENTRY("Oside", "Clock", 6, "bkMoon", "Moon", "0", 0, "Clock Room", "\x8E\x9E\x8C\x76\x89\xAE"),	// 時計屋
 };
 
-static const STAGE_TABLE *gTMT = gTMTDefault;
+const STAGE_TABLE *gTMT = gTMTDefault;
 
 BOOL LoadStageTable()
 {
