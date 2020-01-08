@@ -44,8 +44,8 @@ void ActionStripper(void)
 // Draw casts
 void PutStripper(void)
 {
-	RECT rc;
 	int s;
+	RECT rc;
 
 	for (s = 0; s < MAX_STRIP; ++s)
 	{
@@ -73,8 +73,8 @@ void PutStripper(void)
 // Create a cast object
 void SetStripper(int x, int y, const char *text, int cast)
 {
-	RECT rc;
 	int s;
+	RECT rc;
 
 	for (s = 0; s < MAX_STRIP; ++s)
 		if (!(Strip[s].flag & 0x80))
@@ -103,8 +103,8 @@ void SetStripper(int x, int y, const char *text, int cast)
 // Regenerate cast text
 void RestoreStripper(void)
 {
-	RECT rc;
 	int s;
+	RECT rc;
 
 	for (s = 0; s < MAX_STRIP; ++s)
 	{
@@ -165,6 +165,8 @@ void ReloadIllust(int a)
 	ReloadBitmap_File(path, SURFACE_ID_CREDITS_IMAGE);
 }
 
+const char *credit_script = "Credit.tsc";
+
 // Initialize and release credits
 void InitCreditScript(void)
 {
@@ -183,11 +185,12 @@ void ReleaseCreditScript(void)
 	}
 }
 
-const char *credit_script = "Credit.tsc";
-
 // Start playing credits
 BOOL StartCreditScript(void)
 {
+	FILE *fp;
+	char path[MAX_PATH];
+
 	// Clear previously existing credits data
 	if (Credit.pData != NULL)
 	{
@@ -196,7 +199,6 @@ BOOL StartCreditScript(void)
 	}
 
 	// Open file
-	char path[MAX_PATH];
 	sprintf(path, "%s/%s", gDataPath, credit_script);
 
 	Credit.size = GetFileSizeLong(path);
@@ -208,7 +210,7 @@ BOOL StartCreditScript(void)
 	if (Credit.pData == NULL)
 		return FALSE;
 
-	FILE *fp = fopen(path, "rb");
+	fp = fopen(path, "rb");
 	if (fp == NULL)
 	{
 		free(Credit.pData);
@@ -448,6 +450,7 @@ void CutCreditIllust(void)
 // Scene of the island falling
 int Scene_DownIsland(int mode)
 {
+	ISLAND_SPRITE sprite;
 	int wait;
 
 	// Setup background
@@ -458,7 +461,6 @@ int Scene_DownIsland(int mode)
 	// Setup island
 	RECT rc_sprite = {160, 0, 200, 24};
 
-	ISLAND_SPRITE sprite;
 	sprite.x = 168 * 0x200;
 	sprite.y = 64 * 0x200;
 

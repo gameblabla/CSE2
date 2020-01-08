@@ -135,13 +135,11 @@ static void ActBossChar_HARA(NPCHAR *npc)	// "Hara" = "belly" or "stomach" (acco
 
 void ActBossChar_Ballos(void)
 {
-	static unsigned char flash;
-
-	int i;
-	int x;
-	int y;
-
 	NPCHAR *npc = gBoss;
+
+	static unsigned char flash;
+	int i;
+	int x, y;
 
 	switch (npc->act_no)
 	{

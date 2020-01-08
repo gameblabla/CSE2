@@ -116,6 +116,8 @@ BOOL InitSoundObject(LPCSTR resname, int no)
 	return TRUE;
 }
 
+// Completely unused function for loading a .wav file as a sound effect.
+// Some say that sounds heard in CS Beta footage don't sound like PixTone...
 BOOL LoadSoundObject(LPCSTR file_name, int no)
 {
 	char path[MAX_PATH];
@@ -262,10 +264,9 @@ void ChangeSoundPan(int no, long pan)	// 512がMAXで256がﾉｰﾏﾙ (512 is 
 // TODO - The stack frame for this function is inaccurate
 int MakePixToneObject(const PIXTONEPARAMETER *ptp, int ptp_num, int no)
 {
-	int i;
-	int j;
-	const PIXTONEPARAMETER *ptp_pointer;
 	int sample_count;
+	int i, j;
+	const PIXTONEPARAMETER *ptp_pointer;
 	unsigned char *pcm_buffer;
 	unsigned char *mixed_pcm_buffer;
 

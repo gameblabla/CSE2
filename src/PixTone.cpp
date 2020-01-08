@@ -8,11 +8,13 @@
 
 #include "Random.h"
 
-static signed char gWaveModelTable[6][0x100];
+signed char gWaveModelTable[6][0x100];
 
 void MakeWaveTables(void)
 {
-	int i, a;
+	int i;
+
+	int a;
 
 	// Sine wave
 	for (i = 0; i < 0x100; ++i)
@@ -61,24 +63,28 @@ void MakeWaveTables(void)
 		gWaveModelTable[5][i] = (signed char)(msvc_rand() & 0xFF) / 2;
 }
 
+//BOOL wave_tables_made;
+
 BOOL MakePixelWaveData(const PIXTONEPARAMETER *ptp, unsigned char *pData)
 {
 	int i;
-	double dEnvelope;
+	int a, b, c, d;
+
 	double dPitch;
 	double dMain;
 	double dVolume;
-	double d1;
-	double d2;
-	double d3;
-	int a;
-	int b;
-	int c;
-	int d;
+
+	double dEnvelope;
 	signed char envelopeTable[0x100];
 
+	double d1, d2, d3;
+
 	// The Linux port added a cute optimisation here, where MakeWaveTables is only called once during the game's execution
-	MakeWaveTables();
+	//if (wave_tables_made != TRUE)
+	//{
+		MakeWaveTables();
+	//	wave_tables_made = TRUE;
+	//}
 
 	memset(envelopeTable, 0, sizeof(envelopeTable));
 

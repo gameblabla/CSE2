@@ -102,8 +102,7 @@ void ActBack(void)
 
 void PutBack(int fx, int fy)
 {
-	int x;
-	int y;
+	int x, y;
 	RECT rect = {0, 0, gBack.partsW, gBack.partsH};
 
 	switch (gBack.type)
@@ -192,16 +191,13 @@ void PutBack(int fx, int fy)
 
 void PutFront(int fx, int fy)
 {
-	int x;
-	int y;
-	int xpos;
-	int ypos;
-	int x_1;
-	int x_2;
-	int y_1;
-	int y_2;
+	int xpos, ypos;
 
 	RECT rcWater[2] = {{0, 0, 32, 16}, {0, 16, 32, 48}};
+
+	int x, y;
+	int x_1, x_2;
+	int y_1, y_2;
 
 	switch (gBack.type)
 	{

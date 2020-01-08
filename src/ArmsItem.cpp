@@ -15,17 +15,18 @@
 #include "Sound.h"
 #include "TextScr.h"
 
-int gArmsEnergyX = 16;
+ARMS gArmsData[ARMS_MAX];
+ITEM gItemData[ITEM_MAX];
 
 int gSelectedArms;
 int gSelectedItem;
 
-ARMS gArmsData[ARMS_MAX];
-ITEM gItemData[ITEM_MAX];
+static int gCampTitleY;
 
 /// True if we're in the items section of the inventory (not in the weapons section) (only relevant when the inventory is open)
 static BOOL gCampActive;
-static int gCampTitleY;
+
+int gArmsEnergyX = 16;
 
 void ClearArmsData(void)
 {
@@ -176,6 +177,8 @@ BOOL SubItemData(long code)
 /// Update the inventory cursor
 void MoveCampCursor(void)
 {
+	BOOL bChange;
+
 	// Compute the current amount of weapons and items
 	int arms_num = 0;
 	int item_num = 0;
@@ -188,7 +191,7 @@ void MoveCampCursor(void)
 		return;	// Empty inventory
 
 	// True if we're currently changing cursor position
-	BOOL bChange = FALSE;
+	bChange = FALSE;
 
 	if (!gCampActive)
 	{
@@ -301,6 +304,8 @@ void MoveCampCursor(void)
 /// Draw the inventory
 void PutCampObject(void)
 {
+	static unsigned int flash;
+
 	int i;
 
 	/// Rect for the current weapon
@@ -348,7 +353,6 @@ void PutCampObject(void)
 	PutBitmap3(&rcView, PixelToScreenCoord((WINDOW_WIDTH / 2) - 112), PixelToScreenCoord(gCampTitleY + 52), &rcTitle2, SURFACE_ID_TEXT_BOX);
 
 	// Draw arms cursor
-	static unsigned int flash;
 	++flash;
 
 	if (gCampActive == FALSE)
@@ -411,7 +415,6 @@ void PutCampObject(void)
 
 int CampLoop(void)
 {
-	int arms_num;
 	char old_script_path[MAX_PATH];
 
 	RECT rcView = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
@@ -429,7 +432,7 @@ int CampLoop(void)
 	gSelectedItem = 0;
 
 	// Compute current amount of weapons
-	arms_num = 0;
+	int arms_num = 0;
 	while (gArmsData[arms_num].code != 0)
 		++arms_num;
 

@@ -42,8 +42,7 @@ void ClearFade(void)
 
 void StartFadeOut(signed char dir)
 {
-	int x;
-	int y;
+	int x, y;
 
 	gFade.mode = 2;
 	gFade.count = 0;
@@ -62,8 +61,7 @@ void StartFadeOut(signed char dir)
 
 void StartFadeIn(signed char dir)
 {
-	int x;
-	int y;
+	int x, y;
 
 	gFade.mode = 1;
 	gFade.count = 0;
@@ -84,8 +82,7 @@ void StartFadeIn(signed char dir)
 
 void ProcFade(void)
 {
-	int x;
-	int y;
+	int x, y;
 
 	switch (gFade.mode)
 	{
@@ -236,8 +233,7 @@ void ProcFade(void)
 
 void PutFade(void)
 {
-	int x;
-	int y;
+	int x, y;
 
 	RECT rect;
 	rect.top = 0;

@@ -1078,13 +1078,13 @@ void ActNpc113(NPCHAR *npc)
 // Press
 void ActNpc114(NPCHAR *npc)
 {
-	int i;
-
 	RECT rcLeft[3] = {
 		{144, 112, 160, 136},
 		{160, 112, 176, 136},
 		{176, 112, 192, 136},
 	};
+
+	int i;
 
 	switch (npc->act_no)
 	{
@@ -1534,6 +1534,9 @@ void ActNpc118(NPCHAR *npc)
 #ifdef ENABLE_OVERRIDE_NPC_118_TO_CREEPY_CURLY
 	return ActNpc381(npc);
 #endif
+
+	BOOL bUpper;
+
 	RECT rcLeft[9] = {
 		{0, 32, 32, 56},
 		{32, 32, 64, 56},
@@ -1558,7 +1561,7 @@ void ActNpc118(NPCHAR *npc)
 		{160, 56, 192, 80},
 	};
 
-	BOOL bUpper = FALSE;
+	bUpper = FALSE;
 
 	if (npc->direct == 0 && npc->x < gMC.x)
 		bUpper = TRUE;

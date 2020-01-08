@@ -10,67 +10,6 @@
 #include "Generic.h"
 #include "NpcAct.h"
 
-NPC_TABLE *gNpcTable;
-
-BOOL LoadNpcTable(const char *path)
-{
-	FILE *fp;
-	int n;
-	int num;
-	size_t size;
-
-	size = GetFileSizeLong(path);	// TODO - Investigate whether GetFileSizeLong actually returns an unsigned long or not
-	if (size == -1)
-		return FALSE;
-
-	num = (int)(size / 0x18);
-
-	gNpcTable = (NPC_TABLE*)malloc(num * sizeof(NPC_TABLE));
-	if (gNpcTable == NULL)
-		return FALSE;
-
-	fp = fopen(path, "rb");
-	if (fp == NULL)
-	{
-		free(gNpcTable);
-		gNpcTable = NULL;
-		return FALSE;
-	}
-
-	for (n = 0; n < num; ++n) // bits
-		gNpcTable[n].bits = File_ReadLE16(fp);
-	for (n = 0; n < num; ++n) // life
-		gNpcTable[n].life = File_ReadLE16(fp);
-	for (n = 0; n < num; ++n) // surf
-		fread(&gNpcTable[n].surf, 1, 1, fp);
-	for (n = 0; n < num; ++n) // destroy_voice
-		fread(&gNpcTable[n].destroy_voice, 1, 1, fp);
-	for (n = 0; n < num; ++n) // hit_voice
-		fread(&gNpcTable[n].hit_voice, 1, 1, fp);
-	for (n = 0; n < num; ++n) // size
-		fread(&gNpcTable[n].size, 1, 1, fp);
-	for (n = 0; n < num; ++n) // exp
-		gNpcTable[n].exp = File_ReadLE32(fp);
-	for (n = 0; n < num; ++n) // damage
-		gNpcTable[n].damage = File_ReadLE32(fp);
-	for (n = 0; n < num; ++n) // hit
-		fread(&gNpcTable[n].hit, 4, 1, fp);
-	for (n = 0; n < num; ++n) // view
-		fread(&gNpcTable[n].view, 4, 1, fp);
-
-	fclose(fp);
-	return TRUE;
-}
-
-void ReleaseNpcTable(void)
-{
-	if (gNpcTable != NULL)
-	{
-		free(gNpcTable);
-		gNpcTable = NULL;
-	}
-}
-
 // Npc function table
 const NPCFUNCTION gpNpcFuncTbl[382] = {
 	ActNpc000,
@@ -456,3 +395,64 @@ const NPCFUNCTION gpNpcFuncTbl[382] = {
 	nullptr,	// 380
 	ActNpc381,
 };
+
+NPC_TABLE *gNpcTable;
+
+BOOL LoadNpcTable(const char *path)
+{
+	FILE *fp;
+	int n;
+	size_t size;
+	int num;
+
+	size = GetFileSizeLong(path);	// TODO - Investigate whether GetFileSizeLong actually returns an unsigned long or not
+	if (size == -1)
+		return FALSE;
+
+	num = (int)(size / 0x18);
+
+	gNpcTable = (NPC_TABLE*)malloc(num * sizeof(NPC_TABLE));
+	if (gNpcTable == NULL)
+		return FALSE;
+
+	fp = fopen(path, "rb");
+	if (fp == NULL)
+	{
+		free(gNpcTable);
+		gNpcTable = NULL;
+		return FALSE;
+	}
+
+	for (n = 0; n < num; ++n) // bits
+		gNpcTable[n].bits = File_ReadLE16(fp);
+	for (n = 0; n < num; ++n) // life
+		gNpcTable[n].life = File_ReadLE16(fp);
+	for (n = 0; n < num; ++n) // surf
+		fread(&gNpcTable[n].surf, 1, 1, fp);
+	for (n = 0; n < num; ++n) // destroy_voice
+		fread(&gNpcTable[n].destroy_voice, 1, 1, fp);
+	for (n = 0; n < num; ++n) // hit_voice
+		fread(&gNpcTable[n].hit_voice, 1, 1, fp);
+	for (n = 0; n < num; ++n) // size
+		fread(&gNpcTable[n].size, 1, 1, fp);
+	for (n = 0; n < num; ++n) // exp
+		gNpcTable[n].exp = File_ReadLE32(fp);
+	for (n = 0; n < num; ++n) // damage
+		gNpcTable[n].damage = File_ReadLE32(fp);
+	for (n = 0; n < num; ++n) // hit
+		fread(&gNpcTable[n].hit, 4, 1, fp);
+	for (n = 0; n < num; ++n) // view
+		fread(&gNpcTable[n].view, 4, 1, fp);
+
+	fclose(fp);
+	return TRUE;
+}
+
+void ReleaseNpcTable(void)
+{
+	if (gNpcTable != NULL)
+	{
+		free(gNpcTable);
+		gNpcTable = NULL;
+	}
+}

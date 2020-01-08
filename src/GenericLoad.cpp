@@ -163,9 +163,8 @@ static BOOL LoadPixToneFile(const char *filename, PIXTONEPARAMETER *pixtone_para
 
 BOOL LoadGenericData(void)
 {
-	char str[0x40];
-	BOOL bError;
 	int pt_size;
+	BOOL bError;
 
 	bError = FALSE;
 	if (!MakeSurface_File("Resource/BITMAP/pixel", SURFACE_ID_PIXEL))
@@ -244,6 +243,7 @@ BOOL LoadGenericData(void)
 		}
 	}
 
+	char str[0x40];
 	sprintf(str, "PixTone = %d byte", pt_size);
 	// There must have been some kind of console print function here or something
 	return TRUE;

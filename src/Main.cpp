@@ -38,8 +38,8 @@ BOOL gbUseJoystick = FALSE;
 
 CONFIG_BINDING bindings[BINDING_TOTAL];
 
-static BOOL bFps = FALSE;
 static BOOL bActive = TRUE;
+static BOOL bFps = FALSE;
 
 static int windowWidth;
 static int windowHeight;

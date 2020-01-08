@@ -129,9 +129,9 @@ void StartMapName(void)
 
 void RestoreMapName(void)
 {
-	int len = (int)strlen(gMapName.name);
+	int a = (int)strlen(gMapName.name);
 
 	CortBox2(&rc, 0, SURFACE_ID_ROOM_NAME);
-	PutText2(((160 - (len * 6)) / 2) + 6, 1, gMapName.name, RGB(0x11, 0x00, 0x22), SURFACE_ID_ROOM_NAME);
-	PutText2(((160 - (len * 6)) / 2) + 6, 0, gMapName.name, RGB(0xFF, 0xFF, 0xFE), SURFACE_ID_ROOM_NAME);
+	PutText2(((160 - (a * 6)) / 2) + 6, 1, gMapName.name, RGB(0x11, 0x00, 0x22), SURFACE_ID_ROOM_NAME);
+	PutText2(((160 - (a * 6)) / 2) + 6, 0, gMapName.name, RGB(0xFF, 0xFF, 0xFE), SURFACE_ID_ROOM_NAME);
 }

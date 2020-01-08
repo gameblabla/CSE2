@@ -31,7 +31,6 @@ BOOL IsProfile(void)
 	sprintf(path, "%s/%s", gModulePath, gDefaultName);
 
 	FILE *file = fopen(path, "rb");
-
 	if (file == NULL)
 		return FALSE;
 
@@ -41,9 +40,10 @@ BOOL IsProfile(void)
 
 BOOL SaveProfile(const char *name)
 {
-	PROFILE profile;
 	FILE *fp;
+	PROFILE profile;
 	const char *FLAG = "FLAG";
+
 	char path[MAX_PATH];
 
 	// Get path
@@ -121,9 +121,9 @@ BOOL SaveProfile(const char *name)
 
 BOOL LoadProfile(const char *name)
 {
-	char path[MAX_PATH];
-	PROFILE profile;
 	FILE *fp;
+	PROFILE profile;
+	char path[MAX_PATH];
 
 	// Get path
 	if (name != NULL)

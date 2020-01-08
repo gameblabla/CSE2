@@ -20,7 +20,7 @@
 
 MAP_DATA gMap;
 
-static const char *code_pxma = "PXM";
+const char *code_pxma = "PXM";
 
 BOOL InitMapData2(void)
 {
@@ -30,19 +30,19 @@ BOOL InitMapData2(void)
 
 BOOL LoadMapData2(const char *path_map)
 {
-	unsigned char dum;
+	FILE *fp;
+	char check[3];
+	char path[MAX_PATH];
 
 	// Get path
-	char path[MAX_PATH];
 	sprintf(path, "%s/%s", gDataPath, path_map);
 
 	// Open file
-	FILE *fp = fopen(path, "rb");
+	fp = fopen(path, "rb");
 	if (fp == NULL)
 		return FALSE;
 
 	// Make sure file begins with "PXM"
-	char check[3];
 	fread(check, 1, 3, fp);
 
 	if (memcmp(check, code_pxma, 3))
@@ -51,6 +51,7 @@ BOOL LoadMapData2(const char *path_map)
 		return FALSE;
 	}
 
+	unsigned char dum;
 	fread(&dum, 1, 1, fp);
 	// Get width and height
 	gMap.width = File_ReadLE16(fp);
@@ -70,11 +71,13 @@ BOOL LoadMapData2(const char *path_map)
 
 BOOL LoadAttributeData(const char *path_atrb)
 {
-	// Open file
+	FILE *fp;
 	char path[MAX_PATH];
+
+	// Open file
 	sprintf(path, "%s/%s", gDataPath, path_atrb);
 
-	FILE *fp = fopen(path, "rb");
+	fp = fopen(path, "rb");
 	if (fp == NULL)
 		return FALSE;
 
@@ -108,10 +111,12 @@ void GetMapData(unsigned char **data, short *mw, short *ml)
 
 unsigned char GetAttribute(int x, int y)
 {
+	size_t a;
+
 	if (x < 0 || y < 0 || x >= gMap.width || y >= gMap.length)
 		return 0;
 
-	const size_t a = *(gMap.data + x + (y * gMap.width));	// Yes, the original code really does do this instead of a regular array access
+	a = *(gMap.data + x + (y * gMap.width));	// Yes, the original code really does do this instead of a regular array access
 	return gMap.atrb[a];
 }
 
@@ -142,21 +147,17 @@ BOOL ChangeMapParts(int x, int y, unsigned char no)
 
 void PutStage_Back(int fx, int fy)
 {
-	int num_y;
-	int put_x;
-	int put_y;
-	int i;
-	int j;
-	int offset;
-	int atrb;
+	int i, j;
 	RECT rect;
-	int num_x;
+	int offset;
 
 	// Get range to draw
-	num_x = MIN(gMap.width, ((WINDOW_WIDTH + (16 - 1)) / 16) + 1);
-	num_y = MIN(gMap.length, ((WINDOW_HEIGHT + (16 - 1)) / 16) + 1);
-	put_x = MAX(0, ((fx / 0x200) + 8) / 16);
-	put_y = MAX(0, ((fy / 0x200) + 8) / 16);
+	int num_x = MIN(gMap.width, ((WINDOW_WIDTH + (16 - 1)) / 16) + 1);
+	int num_y = MIN(gMap.length, ((WINDOW_HEIGHT + (16 - 1)) / 16) + 1);
+	int put_x = MAX(0, ((fx / 0x200) + 8) / 16);
+	int put_y = MAX(0, ((fy / 0x200) + 8) / 16);
+
+	int atrb;
 
 	for (j = put_y; j < put_y + num_y; ++j)
 	{
@@ -183,21 +184,17 @@ void PutStage_Back(int fx, int fy)
 void PutStage_Front(int fx, int fy)
 {
 	RECT rcSnack = {256, 48, 272, 64};
-	int num_y;
-	int put_x;
-	int put_y;
-	int j;
-	int i;
-	int offset;
-	int atrb;
+	int i, j;
 	RECT rect;
-	int num_x;
+	int offset;
 
 	// Get range to draw
-	num_x = MIN(gMap.width, ((WINDOW_WIDTH + (16 - 1)) / 16) + 1);
-	num_y = MIN(gMap.length, ((WINDOW_HEIGHT + (16 - 1)) / 16) + 1);
-	put_x = MAX(0, ((fx / 0x200) + 8) / 16);
-	put_y = MAX(0, ((fy / 0x200) + 8) / 16);
+	int num_x = MIN(gMap.width, ((WINDOW_WIDTH + (16 - 1)) / 16) + 1);
+	int num_y = MIN(gMap.length, ((WINDOW_HEIGHT + (16 - 1)) / 16) + 1);
+	int put_x = MAX(0, ((fx / 0x200) + 8) / 16);
+	int put_y = MAX(0, ((fy / 0x200) + 8) / 16);
+
+	int atrb;
 
 	for (j = put_y; j < put_y + num_y; ++j)
 	{
@@ -226,18 +223,20 @@ void PutStage_Front(int fx, int fy)
 
 void PutMapDataVector(int fx, int fy)
 {
+	int i, j;
+	RECT rect;
+	int offset;
+
+	int num_x;
 	int num_y;
 	int put_x;
 	int put_y;
-	int i;
-	int j;
-	int offset;
+
+	static unsigned char count = 0;
+
 	int atrb;
-	RECT rect;
-	int num_x;
 
 	// Animate the wind
-	static unsigned char count = 0;
 	count += 2;
 
 	// Get range to draw

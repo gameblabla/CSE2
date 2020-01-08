@@ -38,6 +38,8 @@ void PutBossChar(int fx, int fy)
 	char a = 0;
 	int b;
 
+	int side;
+
 	for (b = BOSS_MAX - 1; b >= 0; --b)
 	{
 		if (gBoss[b].cond & 0x80)
@@ -57,7 +59,6 @@ void PutBossChar(int fx, int fy)
 				}
 			}
 
-			int side;
 			if (gBoss[b].direct == 0)
 				side = gBoss[b].view.front;
 			else
@@ -218,8 +219,8 @@ BOSSFUNCTION gpBossFuncTbl[10] =
 
 void ActBossChar(void)
 {
-	int bos;
 	int code_char;
+	int bos;
 
 	if (!(gBoss[0].cond & 0x80))
 		return;
@@ -235,13 +236,12 @@ void ActBossChar(void)
 
 void HitBossMap(void)
 {
+	int x, y;
+	unsigned char atrb[16];
+	int judg;
 	int offx[16];
 	int offy[16];
-	unsigned char atrb[16];
-	int b;
-	int j;
-	int x;
-	int y;
+	int b, j;
 
 	offx[0] = 0;
 	offx[1] = 1;
@@ -279,8 +279,6 @@ void HitBossMap(void)
 
 	for (b = 0; b < BOSS_MAX; ++b)
 	{
-		int judg;
-
 		if (!(gBoss[b].cond & 0x80))
 			continue;
 

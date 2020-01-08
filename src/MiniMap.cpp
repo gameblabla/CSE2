@@ -15,8 +15,6 @@
 #include "Pause.h"
 #include "Stage.h"
 
-char gMapping[0x80];
-
 void WriteMiniMapLine(int line)
 {
 	int x;
@@ -78,16 +76,17 @@ void WriteMiniMapLine(int line)
 
 int MiniMapLoop(void)
 {
-	int f;
-	int line;
-	unsigned char my_wait;
-
-	RECT rcMiniMap;
+	int f, line;
 	RECT rcView;
+	RECT rcMiniMap;
 
+	int my_x;
+	int my_y;
+	unsigned char my_wait;
 	RECT my_rect = {0, 57, 1, 58};
-	int my_x = ((gMC.x / 0x200) + 8) / 16;
-	int my_y = ((gMC.y / 0x200) + 8) / 16;
+
+	my_x = ((gMC.x / 0x200) + 8) / 16;
+	my_y = ((gMC.y / 0x200) + 8) / 16;
 
 	for (f = 0; f <= 8; ++f)
 	{
@@ -247,6 +246,8 @@ int MiniMapLoop(void)
 
 	return enum_ESCRETURN_continue;
 }
+
+char gMapping[0x80];
 
 BOOL IsMapping(void)
 {

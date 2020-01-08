@@ -11,7 +11,6 @@
 #include "Sound.h"
 
 int empty;
-int spur_charge;
 
 void ShootBullet_Frontia1(int level)
 {
@@ -250,6 +249,7 @@ void ShootBullet_FireBall(int level)
 void ShootBullet_Machinegun1(int level)
 {
 	int bul_no;
+	static int wait;
 
 	if (CountArmsBullet(4) > 4)
 		return;
@@ -355,7 +355,6 @@ void ShootBullet_Machinegun1(int level)
 	}
 	else
 	{
-		static int wait = 0;
 		++wait;
 
 		if (gMC.equip & 8)
@@ -896,6 +895,8 @@ void ShootBullet_Nemesis(int level)
 	}
 }
 
+int spur_charge;
+
 void ResetSpurCharge(void)
 {
 	spur_charge = 0;
@@ -906,9 +907,9 @@ void ResetSpurCharge(void)
 
 void ShootBullet_Spur(int level)
 {
-	static BOOL bMax;
-	BOOL bShot;
 	int bul_no;
+	BOOL bShot;
+	static BOOL bMax;
 
 	bShot = FALSE;
 
@@ -1058,11 +1059,12 @@ void ShootBullet_Spur(int level)
 
 void ShootBullet(void)
 {
+	static int soft_rensha;	// 'rensha' is Japanese for 'rapid-fire', apparently
+
 	if (empty != 0)
 		--empty;
 
 	// Only let the player shoot every 4 frames
-	static int soft_rensha;	// 'rensha' is Japanese for 'rapid-fire', apparently
 	if (soft_rensha != 0)
 		--soft_rensha;
 

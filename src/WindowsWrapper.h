@@ -20,10 +20,4 @@ struct RECT
 	long bottom;
 };
 
-#define SET_RECT(rect, l, t, r, b) \
-	rect.left = l; \
-	rect.top = t; \
-	rect.right = r; \
-	rect.bottom = b;
-
 #define MAX_PATH FILENAME_MAX

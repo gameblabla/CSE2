@@ -19,8 +19,7 @@
 // Curly AI
 void ActNpc180(NPCHAR *npc)
 {
-	int xx;
-	int yy;
+	int xx, yy;
 
 	RECT rcLeft[11] = {
 		{0, 96, 16, 112},
@@ -978,12 +977,12 @@ void ActNpc189(NPCHAR *npc)
 // Broken robot
 void ActNpc190(NPCHAR *npc)
 {
-	int i;
-
 	RECT rect[2] = {
 		{192, 32, 208, 48},
 		{208, 32, 224, 48},
 	};
+
+	int i;
 
 	switch (npc->act_no)
 	{
