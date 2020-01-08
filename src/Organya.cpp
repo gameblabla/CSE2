@@ -304,11 +304,11 @@ signed char wave_data[100][0x100];
 
 BOOL InitWaveData100(void)
 {
-	char path[MAX_PATH];
-	sprintf(path, "%s/Resource/WAVE/Wave.dat", gDataPath);
-
 	if (!audio_backend_initialised)
 		return FALSE;
+
+	char path[MAX_PATH];
+	sprintf(path, "%s/Resource/WAVE/Wave.dat", gDataPath);
 
 	FILE *fp = fopen(path, "rb");
 
