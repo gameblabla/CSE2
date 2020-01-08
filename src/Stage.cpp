@@ -27,6 +27,9 @@
 #endif
 
 int gStageNo;
+MusicID gMusicNo;
+unsigned int gOldPos;
+MusicID gOldNo;
 
 const STAGE_TABLE gTMT[95] = {
 	STAGE_ENTRY("0", "0", 4, "bk0", "Guest", "0", 0, "Null", "\x96\xB3"),	// 無
@@ -128,9 +131,9 @@ const STAGE_TABLE gTMT[95] = {
 
 BOOL TransferStage(int no, int w, int x, int y)
 {
-	BOOL bError;
-	char path_dir[20];
 	char path[MAX_PATH];
+	char path_dir[20];
+	BOOL bError;
 
 	// Move character
 	SetMyCharPosition(x * 0x10 * 0x200, y * 0x10 * 0x200);
@@ -245,10 +248,6 @@ const char *gMusicTable[42] = {
 	"TOROKO",
 	"WHITE"
 };
-
-MusicID gMusicNo;
-unsigned int gOldPos;
-MusicID gOldNo;
 
 void ChangeMusic(MusicID no)
 {

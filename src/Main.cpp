@@ -27,13 +27,13 @@
 char gModulePath[MAX_PATH];
 char gDataPath[MAX_PATH];
 
-int gJoystickButtonTable[8];
-
 BOOL bFullscreen;
 BOOL gbUseJoystick = FALSE;
 
-static BOOL bFps = FALSE;
+int gJoystickButtonTable[8];
+
 static BOOL bActive = TRUE;
+static BOOL bFps = FALSE;
 
 static int windowWidth;
 static int windowHeight;

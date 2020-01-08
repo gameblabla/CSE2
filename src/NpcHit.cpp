@@ -264,15 +264,15 @@ void JudgeHitNpCharWater(NPCHAR *npc, int x, int y)
 	npc->flag |= hit;
 }
 
-void HitNpCharMap()
+void HitNpCharMap(void)
 {
-	int judg, x, y;
+	int x, y;
+	int judg;
 
 	int offx[9];
 	int offy[9];
 
-	int i;
-	int j;
+	int i, j;
 
 	offx[0] = 0;
 	offx[1] = 1;
@@ -460,6 +460,8 @@ void HitNpCharMap()
 
 void LoseNpChar(NPCHAR *npc, BOOL bVanish)
 {
+	int val;
+
 	// Play death sound
 	PlaySoundObject(npc->destroy_voice, 1);
 
@@ -482,8 +484,6 @@ void LoseNpChar(NPCHAR *npc, BOOL bVanish)
 	// Create drop
 	if (npc->exp != 0)
 	{
-		int val;
-
 		switch (Random(1, 5))
 		{
 			case 1:
@@ -534,8 +534,7 @@ void LoseNpChar(NPCHAR *npc, BOOL bVanish)
 
 void HitNpCharBullet(void)
 {
-	int n;
-	int b;
+	int n, b;
 	BOOL bHit;
 
 	for (n = 0; n < NPC_MAX; ++n)

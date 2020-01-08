@@ -917,8 +917,7 @@ void ActNpc009(NPCHAR *npc)
 void ActNpc010(NPCHAR *npc)
 {
 	unsigned char deg;
-	int ym;
-	int xm;
+	int xm, ym;
 
 	switch (npc->act_no)
 	{
@@ -1075,8 +1074,7 @@ void ActNpc011(NPCHAR *npc)
 void ActNpc012(NPCHAR *npc)
 {
 	int i;
-	int x;
-	int y;
+	int x, y;
 
 	switch (npc->act_no)
 	{
@@ -1429,13 +1427,13 @@ void ActNpc013(NPCHAR *npc)
 // Santa's Key
 void ActNpc014(NPCHAR *npc)
 {
-	int i;
-
 	RECT rect[3] = {
 		{192, 0, 208, 16},
 		{208, 0, 224, 16},
 		{224, 0, 240, 16},
 	};
+
+	int i;
 
 	switch (npc->act_no)
 	{
@@ -1474,13 +1472,13 @@ void ActNpc014(NPCHAR *npc)
 // Chest (closed)
 void ActNpc015(NPCHAR *npc)
 {
-	int i;
-
 	RECT rcLeft[3] = {
 		{240, 0, 256, 16},
 		{256, 0, 272, 16},
 		{272, 0, 288, 16},
 	};
+
+	int i;
 
 	switch (npc->act_no)
 	{
@@ -1533,8 +1531,6 @@ void ActNpc015(NPCHAR *npc)
 // Save point
 void ActNpc016(NPCHAR *npc)
 {
-	int i;
-
 	RECT rect[8] = {
 		{96, 16, 112, 32},
 		{112, 16, 128, 32},
@@ -1545,6 +1541,8 @@ void ActNpc016(NPCHAR *npc)
 		{192, 16, 208, 32},
 		{208, 16, 224, 32},
 	};
+
+	int i;
 
 	switch (npc->act_no)
 	{

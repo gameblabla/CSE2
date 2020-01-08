@@ -112,12 +112,13 @@ void GetFramePosition(int *fx, int *fy)
 
 void SetFramePosition(int fx, int fy)
 {
+	short map_w, map_l;
+
 	// End quake
 	gFrame.quake = 0;
 	gFrame.quake2 = 0;
 
 	// Move frame position
-	short map_w, map_l;
 	GetMapData(0, &map_w, &map_l);
 
 	gFrame.x = fx;
@@ -186,11 +187,12 @@ void SetFramePosition(int fx, int fy)
 
 void SetFrameMyChar(void)
 {
-	// Move frame position
 	int mc_x, mc_y;
+	short map_w, map_l;
+
+	// Move frame position
 	GetMyCharPosition(&mc_x, &mc_y);
 
-	short map_w, map_l;
 	GetMapData(0, &map_w, &map_l);
 
 	gFrame.x = mc_x - ((WINDOW_WIDTH / 2) * 0x200);

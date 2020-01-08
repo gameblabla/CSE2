@@ -186,8 +186,7 @@ void ActNpc262(NPCHAR *npc)
 void ActNpc263(NPCHAR *npc)
 {
 	int deg;
-	int xm;
-	int ym;
+	int xm, ym;
 
 	RECT rcLeft[9] = {
 		{0, 0, 24, 32},
@@ -469,9 +468,8 @@ void ActNpc263(NPCHAR *npc)
 // Doctor red wave (projectile)
 void ActNpc264(NPCHAR *npc)
 {
-	unsigned char deg;
-
 	RECT rc = {288, 0, 304, 16};
+	unsigned char deg;
 
 	if (npc->x < 0 || npc->x > gMap.width * 0x10 * 0x200)
 	{
@@ -597,8 +595,7 @@ void ActNpc267(NPCHAR *npc)
 		{40, 160, 80, 208},
 	};
 
-	int ym;
-	int xm;
+	int xm, ym;
 	int i;
 
 	switch (npc->act_no)
@@ -1133,8 +1130,7 @@ void ActNpc267(NPCHAR *npc)
 void ActNpc268(NPCHAR *npc)
 {
 	unsigned char deg;
-	int ym;
-	int xm;
+	int xm, ym;
 
 	RECT rcLeft[10] = {
 		{0, 0, 40, 40},
@@ -1631,8 +1627,7 @@ void ActNpc274(NPCHAR *npc)
 	};
 
 	unsigned char deg;
-	int ym;
-	int xm;
+	int xm, ym;
 
 	switch (npc->act_no)
 	{
@@ -1825,8 +1820,7 @@ void ActNpc276(NPCHAR *npc)
 	};
 
 	unsigned char deg;
-	int ym;
-	int xm;
+	int xm, ym;
 
 	switch (npc->act_no)
 	{
@@ -2158,12 +2152,12 @@ void ActNpc278(NPCHAR *npc)
 // Falling block (large)
 void ActNpc279(NPCHAR *npc)
 {
-	int i;
-
 	RECT rc[2] = {
 		{0, 16, 32, 48},
 		{16, 0, 32, 16},
 	};
+
+	int i;
 
 	switch (npc->act_no)
 	{

@@ -877,8 +877,7 @@ void ActNpc088(NPCHAR *npc)
 {
 	int i;
 	unsigned char deg;
-	int xm;
-	int ym;
+	int xm, ym;
 
 	RECT rcLeft[12] = {
 		{0, 0, 40, 40},

@@ -220,7 +220,7 @@ void ActNpc322(NPCHAR *npc)
 			switch (npc->act_wait)
 			{
 				// Interestingly, this NPC counts down at 50 frames per second,
-				// while the NPC206 (the Egg Corridor Counter Bomb), counts at 60.
+				// while NPC206 (the Egg Corridor Counter Bomb), counts at 60.
 				case 50 * 0:
 					SetNpChar(207, npc->x + (4 * 0x200), npc->y, 0, 0, 0, NULL, 0x180);
 					break;
@@ -801,13 +801,13 @@ void ActNpc331(NPCHAR *npc)
 // Ballos shockwave
 void ActNpc332(NPCHAR *npc)
 {
-	int xm;
-
 	RECT rc[3] = {
 		{144, 96, 168, 120},
 		{168, 96, 192, 120},
 		{192, 96, 216, 120},
 	};
+
+	int xm;
 
 	switch (npc->act_no)
 	{

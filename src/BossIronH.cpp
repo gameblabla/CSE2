@@ -11,10 +11,9 @@
 
 void ActBossChar_Ironhead(void)
 {
-	static unsigned char flash;
 	int i;
-
 	NPCHAR *npc = gBoss;
+	static unsigned char flash;
 
 	switch (npc->act_no)
 	{

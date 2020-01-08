@@ -132,10 +132,9 @@ static void ActBossChar02_02(void)
 // Main boss AI
 void ActBossChar_Frog(void)
 {
-	int i;
 	unsigned char deg;
-	int ym;
-	int xm;
+	int xm, ym;
+	int i;
 
 	// Rects 1-4 are for when Balfrog is a frog, 5-8 for when he reverts into Balrog and goes into the ceiling
 	RECT rcLeft[9] = {

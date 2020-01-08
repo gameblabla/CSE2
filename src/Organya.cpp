@@ -97,15 +97,7 @@ typedef struct OrgData
 
 unsigned short organya_timer;
 
-ORGDATA org_data;
-
 AudioBackend_Sound *lpORGANBUFFER[8][8][2] = {NULL};
-
-int gTrackVol[MAXTRACK];
-int gOrgVolume = 100;
-BOOL bFadeout = FALSE;
-BOOL g_mute[MAXTRACK];	// Used by the debug Mute menu
-
 
 /////////////////////////////////////////////
 //■オルガーニャ■■■■■■■■■■■■/////// (Organya)
@@ -119,7 +111,7 @@ typedef struct
 	short oct_size;
 } OCTWAVE;
 
-static const OCTWAVE oct_wave[8] =
+OCTWAVE oct_wave[8] =
 {
 	{ 256,  1,  4 }, // 0 Oct
 	{ 256,  2,  8 }, // 1 Oct
@@ -187,7 +179,7 @@ BOOL MakeSoundObject8(signed char *wavep, signed char track, signed char pipi)
 	return TRUE;
 }
 
-static const short freq_tbl[12] = {262, 277, 294, 311, 330, 349, 370, 392, 415, 440, 466, 494};
+short freq_tbl[12] = {262, 277, 294, 311, 330, 349, 370, 392, 415, 440, 466, 494};
 
 void ChangeOrganFrequency(unsigned char key, signed char track, long a)
 {
@@ -199,7 +191,8 @@ void ChangeOrganFrequency(unsigned char key, signed char track, long a)
 			AudioBackend_SetSoundFrequency(lpORGANBUFFER[track][j][i], ((oct_wave[j].wave_size * freq_tbl[key]) * oct_wave[j].oct_par) / 8 + (a - 1000));	// 1000を+αのデフォルト値とする (1000 is the default value for + α)
 }
 
-const short pan_tbl[13] = {0, 43, 86, 129, 172, 215, 256, 297, 340, 383, 426, 469, 512};
+BOOL g_mute[MAXTRACK];	// Used by the debug Mute menu
+short pan_tbl[13] = {0, 43, 86, 129, 172, 215, 256, 297, 340, 383, 426, 469, 512};
 unsigned char old_key[MAXTRACK] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};	// 再生中の音 (Sound being played)
 unsigned char key_on[MAXTRACK];	// キースイッチ (Key switch)
 unsigned char key_twin[MAXTRACK];	// 今使っているキー(連続時のノイズ防止の為に二つ用意) (Currently used keys (prepared for continuous noise prevention))
@@ -400,11 +393,11 @@ void PlayDramObject(unsigned char key, int mode, signed char track)
 	}
 }
 
+ORGDATA org_data;
+
 OrgData::OrgData(void)
 {
-	int i;
-
-	for (i = 0; i < MAXTRACK; i++)
+	for (int i = 0; i < MAXTRACK; i++)
 	{
 		info.tdata[i].note_list = NULL;
 		info.tdata[i].note_p = NULL;
@@ -421,8 +414,7 @@ void OrgData::InitOrgData(void)
 	info.repeat_x = info.dot * info.line * 0;
 	info.end_x = info.dot * info.line * 255;
 
-	int i;
-	for (i = 0; i < MAXTRACK; i++)
+	for (int i = 0; i < MAXTRACK; i++)
 	{
 		info.tdata[i].freq = 1000;
 		info.tdata[i].wave_no = 0;
@@ -539,8 +531,8 @@ void OrgData::ReleaseNote(void)
 	}
 }
 
-static const char pass[7] = "Org-01";
-static const char pass2[7] = "Org-02";	// Pipi
+char pass[7] = "Org-01";
+char pass2[7] = "Org-02";	// Pipi
 
 BOOL OrgData::InitMusicData(const char *path)
 {
@@ -691,37 +683,41 @@ void OrgData::GetMusicInfo(MUSICINFO *mi)
 }
 
 // Play data
-long play_p;
-NOTELIST *play_np[MAXTRACK];
+long PlayPos;	// Called 'play_p' in the source code release
+NOTELIST *np[MAXTRACK];
 long now_leng[MAXMELODY];
+
+int Volume = 100;
+int TrackVol[MAXTRACK];
+BOOL bFadeout = FALSE;
 
 void OrgData::PlayData(void)
 {
 	int i;
 
 	// Handle fading out
-	if (bFadeout && gOrgVolume)
-		gOrgVolume -= 2;
-	if (gOrgVolume < 0)
-		gOrgVolume = 0;
+	if (bFadeout && Volume)
+		Volume -= 2;
+	if (Volume < 0)
+		Volume = 0;
 
 	// メロディの再生 (Play melody)
 	for (i = 0; i < MAXMELODY; i++)
 	{
-		if (play_np[i] != NULL && play_p == play_np[i]->x)
+		if (np[i] != NULL && PlayPos == np[i]->x)
 		{
-			if (!g_mute[i] && play_np[i]->y != KEYDUMMY)	// 音が来た。 (The sound has come.)
+			if (!g_mute[i] && np[i]->y != KEYDUMMY)	// 音が来た。 (The sound has come.)
 			{
-				PlayOrganObject(play_np[i]->y, -1, i, info.tdata[i].freq);
-				now_leng[i] = play_np[i]->length;
+				PlayOrganObject(np[i]->y, -1, i, info.tdata[i].freq);
+				now_leng[i] = np[i]->length;
 			}
 
-			if (play_np[i]->pan != PANDUMMY)
-				ChangeOrganPan(play_np[i]->y, play_np[i]->pan, i);
-			if (play_np[i]->volume != VOLDUMMY)
-				gTrackVol[i] = play_np[i]->volume;
+			if (np[i]->pan != PANDUMMY)
+				ChangeOrganPan(np[i]->y, np[i]->pan, i);
+			if (np[i]->volume != VOLDUMMY)
+				TrackVol[i] = np[i]->volume;
 
-			play_np[i] = play_np[i]->to;	// 次の音符を指す (Points to the next note)
+			np[i] = np[i]->to;	// 次の音符を指す (Points to the next note)
 		}
 
 		if (now_leng[i] == 0)
@@ -730,36 +726,36 @@ void OrgData::PlayData(void)
 		if (now_leng[i] > 0)
 			now_leng[i]--;
 
-		if (play_np[i])
-			ChangeOrganVolume(play_np[i]->y, gTrackVol[i] * gOrgVolume / 0x7F, i);
+		if (np[i])
+			ChangeOrganVolume(np[i]->y, TrackVol[i] * Volume / 0x7F, i);
 	}
 
 	// ドラムの再生 (Drum playback)
 	for (i = MAXMELODY; i < MAXTRACK; i++)
 	{
-		if (play_np[i] != NULL && play_p == play_np[i]->x)	// 音が来た。 (The sound has come.)
+		if (np[i] != NULL && PlayPos == np[i]->x)	// 音が来た。 (The sound has come.)
 		{
-			if (play_np[i]->y != KEYDUMMY && !g_mute[i])	// ならす (Tame)
-				PlayDramObject(play_np[i]->y, 1, i - MAXMELODY);
+			if (np[i]->y != KEYDUMMY && !g_mute[i])	// ならす (Tame)
+				PlayDramObject(np[i]->y, 1, i - MAXMELODY);
 
-			if (play_np[i]->pan != PANDUMMY)
-				ChangeDramPan(play_np[i]->pan, i - MAXMELODY);
-			if (play_np[i]->volume != VOLDUMMY)
-				gTrackVol[i] = play_np[i]->volume;
+			if (np[i]->pan != PANDUMMY)
+				ChangeDramPan(np[i]->pan, i - MAXMELODY);
+			if (np[i]->volume != VOLDUMMY)
+				TrackVol[i] = np[i]->volume;
 
-			play_np[i] = play_np[i]->to;	// 次の音符を指す (Points to the next note)
+			np[i] = np[i]->to;	// 次の音符を指す (Points to the next note)
 		}
 
-		if (play_np[i])
-			ChangeDramVolume(gTrackVol[i] * gOrgVolume / 0x7F, i - MAXMELODY);
+		if (np[i])
+			ChangeDramVolume(TrackVol[i] * Volume / 0x7F, i - MAXMELODY);
 	}
 
 	// Looping
-	play_p++;
-	if (play_p >= info.end_x)
+	PlayPos++;
+	if (PlayPos >= info.end_x)
 	{
-		play_p = info.repeat_x;
-		SetPlayPointer(play_p);
+		PlayPos = info.repeat_x;
+		SetPlayPointer(PlayPos);
 	}
 }
 
@@ -767,12 +763,12 @@ void OrgData::SetPlayPointer(long x)
 {
 	for (int i = 0; i < MAXTRACK; i++)
 	{
-		play_np[i] = info.tdata[i].note_list;
-		while (play_np[i] != NULL && play_np[i]->x < x)
-			play_np[i] = play_np[i]->to;	// 見るべき音符を設定 (Set note to watch)
+		np[i] = info.tdata[i].note_list;
+		while (np[i] != NULL && np[i]->x < x)
+			np[i] = np[i]->to;	// 見るべき音符を設定 (Set note to watch)
 	}
 
-	play_p = x;
+	PlayPos = x;
 }
 
 // Start and end organya
@@ -798,7 +794,7 @@ BOOL LoadOrganya(const char *name)
 	if (!org_data.InitMusicData(name))
 		return FALSE;
 
-	gOrgVolume = 100;
+	Volume = 100;
 	bFadeout = 0;
 
 #ifdef FIX_BUGS
@@ -814,7 +810,7 @@ void SetOrganyaPosition(unsigned int x)
 		return;
 
 	org_data.SetPlayPointer(x);
-	gOrgVolume = 100;
+	Volume = 100;
 	bFadeout = FALSE;
 }
 
@@ -823,7 +819,7 @@ unsigned int GetOrganyaPosition(void)
 	if (!audio_backend_initialised)
 		return 0 ;
 
-	return play_p;
+	return PlayPos;
 }
 
 void PlayOrganyaMusic(void)
@@ -842,7 +838,7 @@ BOOL ChangeOrganyaVolume(signed int volume)
 	if (volume < 0 || volume > 100)
 		return FALSE;
 
-	gOrgVolume = volume;
+	Volume = volume;
 	return TRUE;
 }
 

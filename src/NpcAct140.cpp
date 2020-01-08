@@ -764,9 +764,8 @@ void ActNpc146(NPCHAR *npc)
 // Critter (purple)
 void ActNpc147(NPCHAR *npc)
 {
+	int xm, ym;
 	unsigned char deg;
-	int xm;
-	int ym;
 
 	RECT rcLeft[6] = {
 		{0, 96, 16, 112},
@@ -1349,7 +1348,7 @@ void ActNpc152(NPCHAR *npc)
 	npc->rect = rc;
 }
 
-static const RECT grcKitL[21] = {
+const RECT grcKitL[21] = {
 	{0, 0, 24, 24},
 	{24, 0, 48, 24},
 	{48, 0, 72, 24},
@@ -1373,7 +1372,7 @@ static const RECT grcKitL[21] = {
 	{96, 48, 120, 72}
 };
 
-static const RECT grcKitR[21] = {
+const RECT grcKitR[21] = {
 	{0, 24, 24, 48},
 	{24, 24, 48, 48},
 	{48, 24, 72, 48},
@@ -1624,8 +1623,7 @@ void ActNpc154(NPCHAR *npc)
 void ActNpc155(NPCHAR *npc)
 {
 	unsigned char deg;
-	int ym;
-	int xm;
+	int xm, ym;
 
 	if (npc->x > gMC.x + (((WINDOW_WIDTH / 2) + 160) * 0x200) || npc->x < gMC.x - (((WINDOW_WIDTH / 2) + 160) * 0x200) || npc->y > gMC.y + (((WINDOW_HEIGHT / 2) + 120) * 0x200) || npc->y < gMC.y - (((WINDOW_HEIGHT / 2) + 120) * 0x200))
 		return;

@@ -1096,10 +1096,9 @@ void ActNpc035(NPCHAR *npc)
 // Balrog (hover)
 void ActNpc036(NPCHAR *npc)
 {
-	unsigned char deg;
-	int ym;
-	int xm;
 	int i;
+	unsigned char deg;
+	int xm, ym;
 
 	switch (npc->act_no)
 	{

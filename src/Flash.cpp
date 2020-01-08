@@ -37,7 +37,7 @@ void SetFlash(int x, int y, int mode)
 
 void ActFlash_Explosion(int flx, int fly)
 {
-	int left, right, top, bottom;
+	int left, top, right, bottom;
 
 	switch (flash.act_no)
 	{

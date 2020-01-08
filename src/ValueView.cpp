@@ -19,17 +19,11 @@ void ClearValueView(void)
 
 void SetValueView(int *px, int *py, int value)
 {
-	int index;
 	BOOL minus;
 	int v;
-	int width;
-	int dig[4];
-	int fig[4];
-	BOOL sw;
+
+	int index;
 	int i;
-	RECT rect[20];
-	RECT rcPlus;
-	RECT rcMinus;
 
 	for (i = 0; i < VALUEVIEW_MAX; ++i)
 	{
@@ -77,6 +71,8 @@ void SetValueView(int *px, int *py, int value)
 	// Get width
 	v = value;
 
+	int width;
+
 	if (value > 999)
 		width = 40;
 	else if (value > 99)
@@ -95,28 +91,32 @@ void SetValueView(int *px, int *py, int value)
 	gVV[index].rect.right = 40;
 	gVV[index].rect.bottom = 8 * (index + 1);
 
-	SET_RECT(rect[0], 0, 56, 8, 64);
-	SET_RECT(rect[1], 8, 56, 16, 64);
-	SET_RECT(rect[2], 16, 56, 24, 64);
-	SET_RECT(rect[3], 24, 56, 32, 64);
-	SET_RECT(rect[4], 32, 56, 40, 64);
-	SET_RECT(rect[5], 40, 56, 48, 64);
-	SET_RECT(rect[6], 48, 56, 56, 64);
-	SET_RECT(rect[7], 56, 56, 64, 64);
-	SET_RECT(rect[8], 64, 56, 72, 64);
-	SET_RECT(rect[9], 72, 56, 80, 64);
-	SET_RECT(rect[10], 0, 64, 8, 72);
-	SET_RECT(rect[11], 8, 64, 16, 72);
-	SET_RECT(rect[12], 16, 64, 24, 72);
-	SET_RECT(rect[13], 24, 64, 32, 72);
-	SET_RECT(rect[14], 32, 64, 40, 72);
-	SET_RECT(rect[15], 40, 64, 48, 72);
-	SET_RECT(rect[16], 48, 64, 56, 72);
-	SET_RECT(rect[17], 56, 64, 64, 72);
-	SET_RECT(rect[18], 64, 64, 72, 72);
-	SET_RECT(rect[19], 72, 64, 80, 72);
+	RECT rect[20] = {
+		{0, 56, 8, 64},
+		{8, 56, 16, 64},
+		{16, 56, 24, 64},
+		{24, 56, 32, 64},
+		{32, 56, 40, 64},
+		{40, 56, 48, 64},
+		{48, 56, 56, 64},
+		{56, 56, 64, 64},
+		{64, 56, 72, 64},
+		{72, 56, 80, 64},
+		{0, 64, 8, 72},
+		{8, 64, 16, 72},
+		{16, 64, 24, 72},
+		{24, 64, 32, 72},
+		{32, 64, 40, 72},
+		{40, 64, 48, 72},
+		{48, 64, 56, 72},
+		{56, 64, 64, 72},
+		{64, 64, 72, 72},
+		{72, 64, 80, 72},
+	};
 
 	// Get digits
+	int dig[4];
+	int fig[4];
 	dig[0] = 1;
 	dig[1] = 10;
 	dig[2] = 100;
@@ -133,10 +133,10 @@ void SetValueView(int *px, int *py, int value)
 		}
 	}
 
-	sw = FALSE;
+	BOOL sw = FALSE;
 
-	SET_RECT(rcPlus, 32, 48, 40, 56);
-	SET_RECT(rcMinus, 40, 48, 48, 56);
+	RECT rcPlus = {32, 48, 40, 56};
+	RECT rcMinus = {40, 48, 48, 56};
 
 	// Draw value
 	CortBox2(&gVV[index].rect, 0x000000, SURFACE_ID_VALUE_VIEW);
@@ -182,8 +182,8 @@ void ActValueView(void)
 
 void PutValueView(int flx, int fly)
 {
-	int v;
 	int offset_x;
+	int v;
 
 	for (v = 0; v < VALUEVIEW_MAX; ++v)
 	{

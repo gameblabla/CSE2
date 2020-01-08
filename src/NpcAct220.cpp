@@ -1129,10 +1129,10 @@ void ActNpc236(NPCHAR *npc)
 // Gunfish projectile
 void ActNpc237(NPCHAR *npc)
 {
+	RECT rc = {312, 32, 320, 40};
+
 	int i;
 	BOOL bHit;
-
-	RECT rc = {312, 32, 320, 40};
 
 	switch (npc->act_no)
 	{

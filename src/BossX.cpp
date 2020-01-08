@@ -212,8 +212,6 @@ static void ActBossChar03_01(NPCHAR *npc)
 
 static void ActBossChar03_02(NPCHAR *npc)
 {
-	int direct;
-
 	RECT rect[4] = {
 		{0, 128, 72, 160},
 		{72, 128, 144, 160},
@@ -221,8 +219,8 @@ static void ActBossChar03_02(NPCHAR *npc)
 		{72, 160, 144, 192},
 	};
 
-	int x;
-	int y;
+	int direct;
+	int x, y;
 
 	switch (npc->act_no)
 	{
@@ -360,9 +358,8 @@ static void ActBossChar03_03(NPCHAR *npc)
 
 static void ActBossChar03_04(NPCHAR *npc)
 {
+	int xm, ym;
 	unsigned char deg;
-	int ym;
-	int xm;
 
 	RECT rect[8] = {
 		{0, 192, 16, 208},
@@ -436,13 +433,13 @@ static void ActBossChar03_04(NPCHAR *npc)
 
 static void ActBossChar03_face(NPCHAR *npc)
 {
-	static unsigned char flash;
-
 	RECT rect[3] = {
 		{216, 0, 320, 48},
 		{216, 48, 320, 96},
 		{216, 144, 320, 192},
 	};
+
+	static unsigned char flash;
 
 	switch (npc->act_no)
 	{
@@ -484,7 +481,6 @@ static void ActBossChar03_face(NPCHAR *npc)
 void ActBossChar_MonstX(void)
 {
 	int i;
-
 	NPCHAR *npc = gBoss;
 
 	switch (npc->act_no)

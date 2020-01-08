@@ -19,9 +19,6 @@
 
 MYCHAR gMC;
 
-int noise_no;
-unsigned int noise_freq;
-
 void InitMyChar(void)
 {
 	memset(&gMC, 0, sizeof(MYCHAR));
@@ -253,8 +250,7 @@ void ActMyChar_Normal(BOOL bKey)
 	int dash2;
 	int resist;
 
-	int a;
-	int x;
+	int a, x;
 
 	if (gMC.cond & 2)
 		return;
@@ -933,6 +929,8 @@ int GetUnitMyChar(void)
 
 void SetMyCharDirect(unsigned char dir)
 {
+	int i;
+
 	if (dir == 3)
 	{
 		gMC.cond |= 1;
@@ -947,8 +945,6 @@ void SetMyCharDirect(unsigned char dir)
 		}
 		else
 		{
-			int i;
-
 			for (i = 0; i < NPC_MAX; ++i)
 				if (gNPC[i].code_event == dir)
 					break;
@@ -989,6 +985,9 @@ void ResetCheck(void)
 {
 	gMC.cond &= ~1;
 }
+
+int noise_no;
+unsigned int noise_freq;
 
 void SetNoise(int no, int freq)
 {

@@ -14,8 +14,8 @@
 
 PERMIT_STAGE gPermitStage[8];
 
-static int gSelectedStage;
-static int gStageSelectTitleY;
+int gSelectedStage;
+int gStageSelectTitleY;
 
 void ClearPermitStage(void)
 {
@@ -107,6 +107,9 @@ void PutStageSelectObject(void)
 {
 	static unsigned int flash;
 
+	int i;
+	RECT rcStage;
+
 	RECT rcView = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
 	RECT rcCur[2] = {
@@ -116,10 +119,8 @@ void PutStageSelectObject(void)
 
 	RECT rcTitle1 = {80, 64, 144, 72};
 
-	int i;
 	int stage_num;
 	int stage_x;
-	RECT rcStage;
 
 	if (gStageSelectTitleY > (WINDOW_HEIGHT / 2) - 74)
 		--gStageSelectTitleY;

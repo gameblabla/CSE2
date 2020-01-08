@@ -53,14 +53,13 @@ void SetUniqueParameter(NPCHAR *npc)
 
 BOOL LoadEvent(const char *path_event)
 {
+	int i, n;
 	FILE *fp;
 	int count;
-	int i;
-	int n;
-	EVENT eve;
-	char path[MAX_PATH];
 	char code[4];
+	EVENT eve;
 
+	char path[MAX_PATH];
 	sprintf(path, "%s/%s", gDataPath, path_event);
 
 	fp = fopen(path, "rb");
@@ -195,8 +194,10 @@ void SetDestroyNpCharUp(int x, int y, int w, int num)
 
 void SetExpObjects(int x, int y, int exp)
 {
+	int n;
 	int sub_exp;
-	int n = 0x100;
+
+	n = 0x100;
 	while (exp)
 	{
 		while (n < NPC_MAX && gNPC[n].cond)
@@ -316,8 +317,10 @@ BOOL SetLifeObject(int x, int y, int val)
 
 void VanishNpChar(NPCHAR *npc)
 {
-	int x = npc->x;
-	int y = npc->y;
+	int x, y;
+
+	x = npc->x;
+	y = npc->y;
 	memset(npc, 0, sizeof(NPCHAR));
 	npc->count1 = 0;
 	npc->x = x;
@@ -335,12 +338,12 @@ void PutNpChar(int fx, int fy)
 	int n;
 	signed char a = 0;
 
+	int side;
+
 	for (n = 0; n < NPC_MAX; ++n)
 	{
 		if (gNPC[n].cond & 0x80)
 		{
-			int side;
-
 			if (gNPC[n].shock)
 			{
 				a = 2 * ((gNPC[n].shock / 2) % 2) - 1;
@@ -373,12 +376,13 @@ void PutNpChar(int fx, int fy)
 void ActNpChar(void)
 {
 	int i;
+	int code_char;
 
 	for (i = 0; i < NPC_MAX; ++i)
 	{
 		if (gNPC[i].cond & 0x80)
 		{
-			int code_char = gNPC[i].code_char;
+			code_char = gNPC[i].code_char;
 
 			gpNpcFuncTbl[code_char](&gNPC[i]);
 

@@ -35,6 +35,8 @@ void ActNpc300(NPCHAR *npc)
 // Fish missile (Misery)
 void ActNpc301(NPCHAR *npc)
 {
+	int dir;
+
 	RECT rect[8] = {
 		{144, 0, 160, 16},
 		{160, 0, 176, 16},
@@ -45,8 +47,6 @@ void ActNpc301(NPCHAR *npc)
 		{176, 16, 192, 32},
 		{192, 16, 208, 32},
 	};
-
-	int dir;
 
 	switch (npc->act_no)
 	{
@@ -102,6 +102,8 @@ void ActNpc301(NPCHAR *npc)
 // Camera focus marker
 void ActNpc302(NPCHAR *npc)
 {
+	int n;
+
 	switch (npc->act_no)
 	{
 		case 10:
@@ -143,18 +145,16 @@ void ActNpc302(NPCHAR *npc)
 
 			if (npc->direct != 0)
 			{
-				int i;
-
-				for (i = 0xAA; i < 0x200; ++i)
+				for (n = 0xAA; n < 0x200; ++n)
 				{
-					if (gNPC[i].cond & 0x80 && gNPC[i].code_event == npc->direct)
+					if (gNPC[n].cond & 0x80 && gNPC[n].code_event == npc->direct)
 					{
-						npc->pNpc = &gNPC[i];
+						npc->pNpc = &gNPC[n];
 						break;
 					}
 				}
 
-				if (i == 0x200)
+				if (n == 0x200)
 				{
 					npc->cond = 0;
 					break;
@@ -401,6 +401,8 @@ void ActNpc307(NPCHAR *npc)
 // Stumpy
 void ActNpc308(NPCHAR *npc)
 {
+	unsigned char deg;
+
 	RECT rcLeft[2] = {
 		{128, 112, 144, 128},
 		{144, 112, 160, 128},
@@ -410,8 +412,6 @@ void ActNpc308(NPCHAR *npc)
 		{128, 128, 144, 144},
 		{144, 128, 160, 144},
 	};
-
-	unsigned char deg;
 
 	switch (npc->act_no)
 	{
