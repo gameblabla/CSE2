@@ -31,7 +31,6 @@ BOOL IsProfile(void)
 	sprintf(path, "%s/%s", gModulePath, gDefaultName);
 
 	FILE *file = fopen(path, "rb");
-
 	if (file == NULL)
 		return FALSE;
 
