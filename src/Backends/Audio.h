@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stddef.h>
+
 #include "../WindowsWrapper.h"
 
 typedef struct AudioBackend_Sound AudioBackend_Sound;
