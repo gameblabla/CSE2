@@ -8,3 +8,6 @@
 # Do not change external files
 external/**	-text
 DoConfig/fltk/**	-text
+
+# TSC files are not text, but 'git diff' likes to think they are
+*.tsc	binary
