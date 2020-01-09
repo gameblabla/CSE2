@@ -170,8 +170,8 @@ static const Control controls[] = {
 	{"Cancel", BINDING_CANCEL, 1 << 1},
 	{"Jump", BINDING_JUMP, 1 << 0},
 	{"Shoot", BINDING_SHOT, 1 << 0},
-	{"Next weapon", BINDING_ARMS, 1 << 0},
-	{"Previous weapon", BINDING_ARMSREV, 1 << 0},
+	{"Next Weapon", BINDING_ARMS, 1 << 0},
+	{"Previous Weapon", BINDING_ARMSREV, 1 << 0},
 	{"Inventory", BINDING_ITEM, 1 << 0},
 	{"Map", BINDING_MAP, 1 << 0},
 	{"Pause", BINDING_PAUSE, 1 << 0}
@@ -447,8 +447,8 @@ static int Callback_Options(Option *options, size_t total_options, size_t select
 		return -1;
 
 	Option submenu_options[] = {
-		{"Controls (keyboard)", Callback_ControlsKeyboard, NULL, NULL, 0},
-		{"Controls (gamepad)", Callback_ControlsController, NULL, NULL, 0},
+		{"Controls (Keyboard)", Callback_ControlsKeyboard, NULL, NULL, 0},
+		{"Controls (Gamepad)", Callback_ControlsController, NULL, NULL, 0},
 		{"Framerate", Callback_Framerate, NULL, NULL, 0},
 		{"V-sync", Callback_Vsync, NULL, NULL, 0},
 		{"Resolution", Callback_Resolution, NULL, NULL, 0}
