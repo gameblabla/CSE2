@@ -9,33 +9,36 @@
 ####
 
 # Exclude devilution-comparer assembly output
-devilution/orig.asm
-devilution/compare.asm
+/devilution/orig.asm
+/devilution/compare.asm
 
 # Exclude MSVC IntelliSense database
-vs2003/CSE2.ncb
+/vs2003/CSE2.ncb
 
 # Exclude MSVC Solution User Options file
-vs2003/CSE2.suo
+/vs2003/CSE2.suo
 
 # Exclude MSVC build folders
-vs2003/Debug
-vs2003/Release
-vs2003/Debug (Japanese)
-vs2003/Release (Japanese)
+/vs2003/Debug
+/vs2003/Release
+/vs2003/Debug (Japanese)
+/vs2003/Release (Japanese)
 
 # Exclude Visual Studio 2017 files
-vs2017/Debug
-vs2017/Release
-vs2017/Debug (Japanese)
-vs2017/Release (Japanese)
-vs2017/x64
-vs2017/.vs
-vs2017/CSE2.vcxproj.user
+/vs2017/Debug
+/vs2017/Release
+/vs2017/Debug (Japanese)
+/vs2017/Release (Japanese)
+/vs2017/x64
+/vs2017/.vs
+/vs2017/CSE2.vcxproj.user
 
 ####
 # Portable branch
 ####
 
 # Exclude converted resource files
-src/Resource
+/src/Resource
+
+# Exclude the (recommended) CMake build directory
+/build
