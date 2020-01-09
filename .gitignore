@@ -1,11 +1,44 @@
 # Exclude obj directory (object files for Makefile build)
 /obj
 
-# Exclude converted resource files
-src/Resource
-
 # Exclude build output directory
 /game
 
+####
+# Accurate branch
+####
+
+# Exclude devilution-comparer assembly output
+/devilution/orig.asm
+/devilution/compare.asm
+
+# Exclude MSVC IntelliSense database
+/vs2003/CSE2.ncb
+
+# Exclude MSVC Solution User Options file
+/vs2003/CSE2.suo
+
+# Exclude MSVC build folders
+/vs2003/Debug
+/vs2003/Release
+/vs2003/Debug (Japanese)
+/vs2003/Release (Japanese)
+
+# Exclude Visual Studio 2017 files
+/vs2017/Debug
+/vs2017/Release
+/vs2017/Debug (Japanese)
+/vs2017/Release (Japanese)
+/vs2017/x64
+/vs2017/.vs
+/vs2017/CSE2.vcxproj.user
+
+####
+# Portable branch
+####
+
+# Exclude converted resource files
+/src/Resource
+
 # Exclude the (recommended) CMake build directory
-build/*
+/build
