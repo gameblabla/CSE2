@@ -4,6 +4,10 @@
 # Exclude build output directory
 /game
 
+####
+# Accurate branch
+####
+
 # Exclude devilution-comparer assembly output
 devilution/orig.asm
 devilution/compare.asm
@@ -28,3 +32,10 @@ vs2017/Release (Japanese)
 vs2017/x64
 vs2017/.vs
 vs2017/CSE2.vcxproj.user
+
+####
+# Portable branch
+####
+
+# Exclude converted resource files
+src/Resource
