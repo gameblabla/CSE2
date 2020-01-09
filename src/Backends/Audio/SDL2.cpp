@@ -78,28 +78,21 @@ static void MixSounds(float *stream, unsigned int frames_total)
 		{
 			float *steam_pointer = stream;
 
-			unsigned int frames_done = 0;
-
-			while (frames_done != frames_total)
+			for (unsigned int frames_done = 0; frames_done < frames_total; ++frames_done)
 			{
-				const unsigned int frames_to_do = MIN((unsigned int)ceil((sound->frames - sound->position) / sound->advance_delta), frames_total - frames_done);
+				// Get two samples, and normalise them to 0-1
+				const float sample1 = (sound->samples[(size_t)sound->position] - 128.0f) / 128.0f;
+				const float sample2 = (sound->samples[(size_t)sound->position + 1] - 128.0f) / 128.0f;
 
-				for (unsigned int i = 0; i < frames_to_do; ++i)
-				{
-					// Get two samples, and normalise them to 0-1
-					const float sample1 = (sound->samples[(size_t)sound->position] - 128.0f) / 128.0f;
-					const float sample2 = (sound->samples[(size_t)sound->position + 1] - 128.0f) / 128.0f;
+				// Perform linear interpolation
+				const float interpolated_sample = sample1 + ((sample2 - sample1) * (float)fmod(sound->position, 1.0));
 
-					// Perform linear interpolation
-					const float interpolated_sample = sample1 + ((sample2 - sample1) * (float)fmod(sound->position, 1.0));
+				*steam_pointer++ += interpolated_sample * sound->volume_l;
+				*steam_pointer++ += interpolated_sample * sound->volume_r;
 
-					*steam_pointer++ += interpolated_sample * sound->volume_l;
-					*steam_pointer++ += interpolated_sample * sound->volume_r;
+				sound->position += sound->advance_delta;
 
-					sound->position += sound->advance_delta;
-				}
-
-				if ((size_t)sound->position >= sound->frames)
+				if (sound->position >= sound->frames)
 				{
 					if (sound->looping)
 					{
@@ -112,8 +105,6 @@ static void MixSounds(float *stream, unsigned int frames_total)
 						break;
 					}
 				}
-
-				frames_done += frames_to_do;
 			}
 		}
 	}
