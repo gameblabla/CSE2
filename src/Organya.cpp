@@ -822,7 +822,7 @@ void SetOrganyaPosition(unsigned int x)
 unsigned int GetOrganyaPosition(void)
 {
 	if (!audio_backend_initialised)
-		return 0 ;
+		return 0;
 
 	return PlayPos;
 }
