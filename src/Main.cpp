@@ -96,6 +96,7 @@ unsigned long GetFramePerSecound(void)
 	return frames_this_second;
 }
 
+// TODO - Inaccurate stack frame
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
 	(void)hPrevInstance;
@@ -418,6 +419,7 @@ BOOL DragAndDropHandler(HWND hWnd, WPARAM wParam)
 	return TRUE;
 }
 
+// TODO - Inaccurate stack frame
 LRESULT __stdcall WindowProcedure(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	BOOL window_focus;
