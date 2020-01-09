@@ -368,7 +368,10 @@ static int Callback_ControlsController(Option *options, size_t total_options, si
 		submenu_options[i].callback = Callback_ControlsController_Rebind;
 		submenu_options[i].attribute = bound_name_buffers[i];
 
-		snprintf(bound_name_buffers[i], sizeof(bound_name_buffers[0]), "Button %d", bindings[controls[i].binding_index].controller);
+		if (bindings[controls[i].binding_index].controller == 0xFF)
+			strncpy(bound_name_buffers[i], "[Unbound]", sizeof(bound_name_buffers[0]));
+		else
+			snprintf(bound_name_buffers[i], sizeof(bound_name_buffers[0]), "Button %d", bindings[controls[i].binding_index].controller);
 	}
 
 	PlaySoundObject(5, 1);

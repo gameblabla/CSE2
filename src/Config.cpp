@@ -113,7 +113,21 @@ void DefaultConfigData(CONFIG *conf)
 	// Fun fact: The Linux port added this line:
 	// conf->display_mode = 1;
 
+	// Reset joystick settings (as these can't simply be set to 0)
 	conf->bJoystick = TRUE;
+	conf->bindings[BINDING_UP].controller = 0xFF;
+	conf->bindings[BINDING_DOWN].controller = 0xFF;
+	conf->bindings[BINDING_LEFT].controller = 0xFF;
+	conf->bindings[BINDING_RIGHT].controller = 0xFF;
+	conf->bindings[BINDING_OK].controller = 1;
+	conf->bindings[BINDING_CANCEL].controller = 0;
+	conf->bindings[BINDING_JUMP].controller = 1;
+	conf->bindings[BINDING_SHOT].controller = 0;
+	conf->bindings[BINDING_ARMSREV].controller = 3;
+	conf->bindings[BINDING_ARMS].controller = 4;
+	conf->bindings[BINDING_ITEM].controller = 5;
+	conf->bindings[BINDING_MAP].controller = 2;
+	conf->bindings[BINDING_PAUSE].controller = 0xFF;
 
 	// Set default key bindings
 	conf->bindings[BINDING_UP].keyboard = SDL_SCANCODE_UP;
