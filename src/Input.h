@@ -2,7 +2,9 @@
 
 #include "WindowsWrapper.h"
 
-#define MAX_JOYSTICK_BUTTONS 32
+// Was originally 32, like older versions of DirectInput, but since
+// later versions support up to 128, let's use that instead
+#define MAX_JOYSTICK_BUTTONS 128
 
 struct JOYSTICK_STATUS
 {
