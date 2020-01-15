@@ -59,6 +59,8 @@ Name | Function
 `WARNINGS_ALL=1` | Enable ALL compiler warnings (clang only)
 `WARNINGS_FATAL=1` | Make all compiler warnings errors
 
+Once built, the executables and assets can be found in the newly-generated `game` folder.
+
 ## Licensing
 
 Being a decompilation, the majority of the code in this project belongs to Daisuke "Pixel" Amaya - not us. We've yet to agree on a license for our own code.
