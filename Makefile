@@ -8,6 +8,7 @@ ASSETS_DIRECTORY = assets
 # Default options
 RENDERER = SDLTexture
 
+ALL_CFLAGS = $(CFLAGS)
 ALL_CXXFLAGS = $(CXXFLAGS)
 ALL_LDFLAGS = $(LDFLAGS)
 ALL_LIBS = $(LIBS)
@@ -17,11 +18,13 @@ ifeq ($(WINDOWS), 1)
 endif
 
 ifeq ($(RELEASE), 1)
+  ALL_CFLAGS += -O3 -DNDEBUG
   ALL_CXXFLAGS += -O3 -DNDEBUG
   ALL_LDFLAGS += -s
   FILENAME_DEF = CSE2$(EXE_EXTENSION)
   DOCONFIG_FILENAME_DEF = DoConfig$(EXE_EXTENSION)
 else
+  ALL_CFLAGS += -Og -ggdb3
   ALL_CXXFLAGS += -Og -ggdb3
   FILENAME_DEF = CSE2_debug$(EXE_EXTENSION)
   DOCONFIG_FILENAME_DEF = DoConfig_debug$(EXE_EXTENSION)
@@ -30,7 +33,7 @@ endif
 ifeq ($(JAPANESE), 1)
   DATA_DIRECTORY = $(ASSETS_DIRECTORY)/data_jp
 
-  CSE2_CXXFLAGS += -DJAPANESE
+  DEFINES += -DJAPANESE
 else
   DATA_DIRECTORY = $(ASSETS_DIRECTORY)/data_en
 endif
@@ -39,20 +42,22 @@ FILENAME ?= $(FILENAME_DEF)
 DOCONFIG_FILENAME ?= $(DOCONFIG_FILENAME_DEF)
 
 ifeq ($(FIX_BUGS), 1)
-  CSE2_CXXFLAGS += -DFIX_BUGS
+  DEFINES += -DFIX_BUGS
 endif
 
 ifeq ($(DEBUG_SAVE), 1)
-  CSE2_CXXFLAGS += -DDEBUG_SAVE
+  DEFINES += -DDEBUG_SAVE
 endif
 
 ifeq ($(WARNINGS), 1)
+  ALL_CFLAGS += -Wall -Wextra -pedantic
   ALL_CXXFLAGS += -Wall -Wextra -pedantic
 endif
 
 ifeq ($(WARNINGS_ALL), 1)
   ifneq ($(findstring clang,$(CXX)),)
     # Use clang-specific flag -Weverything
+    ALL_CFLAGS += -Weverything
     ALL_CXXFLAGS += -Weverything
   else
     $(warning Couldn't activate all warnings (unsupported compiler))
@@ -60,8 +65,12 @@ ifeq ($(WARNINGS_ALL), 1)
 endif
 
 ifeq ($(WARNINGS_FATAL), 1)
+  ALL_CFLAGS += -Werror
   ALL_CXXFLAGS += -Werror
 endif
+
+ALL_CFLAGS += -std=c99 -MMD -MP -MF $@.d
+CSE2_CFLAGS += $(shell pkg-config sdl2 --cflags) $(shell pkg-config freetype2 --cflags)
 
 ALL_CXXFLAGS += -std=c++98 -MMD -MP -MF $@.d
 CSE2_CXXFLAGS += $(shell pkg-config sdl2 --cflags) $(shell pkg-config freetype2 --cflags)
@@ -225,6 +234,7 @@ endif
 
 ifeq ($(RENDERER), OpenGL3)
   SOURCES += src/Backends/Rendering/OpenGL3 external/glad/src/glad
+  CSE2_CFLAGS += -Iexternal/glad/include
   CSE2_CXXFLAGS += -Iexternal/glad/include
 
   ifeq ($(WINDOWS), 1)
@@ -262,15 +272,20 @@ $(BUILD_DIRECTORY)/$(FILENAME): $(OBJECTS)
 	$(info Linking $@)
 	@$(CXX) $(ALL_CXXFLAGS) $(CSE2_CXXFLAGS) $(ALL_LDFLAGS) $^ -o $@ $(ALL_LIBS) $(CSE2_LIBS)
 
+obj/$(FILENAME)/%.o: %.c
+	@mkdir -p $(@D)
+	$(info Compiling $<)
+	@$(CC) $(ALL_CFLAGS) $(CSE2_CFLAGS) $(DEFINES) $< -o $@ -c
+
 obj/$(FILENAME)/%.o: %.cpp
 	@mkdir -p $(@D)
 	$(info Compiling $<)
-	@$(CXX) $(ALL_CXXFLAGS) $(CSE2_CXXFLAGS) $< -o $@ -c
+	@$(CXX) $(ALL_CXXFLAGS) $(CSE2_CXXFLAGS) $(DEFINES) $< -o $@ -c
 
 obj/$(FILENAME)/src/Resource.o: src/Resource.cpp $(addprefix src/Resource/, $(addsuffix .h, $(RESOURCES)))
 	@mkdir -p $(@D)
 	$(info Compiling $<)
-	@$(CXX) $(ALL_CXXFLAGS) $(CSE2_CXXFLAGS) $< -o $@ -c
+	@$(CXX) $(ALL_CXXFLAGS) $(CSE2_CXXFLAGS) $(DEFINES) $< -o $@ -c
 
 src/Resource/%.h: $(ASSETS_DIRECTORY)/resources/% obj/bin2h
 	@mkdir -p $(@D)
