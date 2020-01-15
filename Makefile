@@ -283,7 +283,7 @@ obj/$(FILENAME)/%.cpp.o: %.cpp
 	$(info Compiling $<)
 	@$(CXX) $(ALL_CXXFLAGS) $(CSE2_CXXFLAGS) $(DEFINES) $< -o $@ -c
 
-obj/$(FILENAME)/src/Resource.o: src/Resource.cpp $(addprefix src/Resource/, $(addsuffix .h, $(RESOURCES)))
+obj/$(FILENAME)/src/Resource.cpp.o: src/Resource.cpp $(addprefix src/Resource/, $(addsuffix .h, $(RESOURCES)))
 	@mkdir -p $(@D)
 	$(info Compiling $<)
 	@$(CXX) $(ALL_CXXFLAGS) $(CSE2_CXXFLAGS) $(DEFINES) $< -o $@ -c
