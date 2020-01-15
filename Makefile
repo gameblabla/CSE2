@@ -40,7 +40,24 @@ ifeq ($(DEBUG_SAVE), 1)
   ALL_CXXFLAGS += -DDEBUG_SAVE
 endif
 
-ALL_CXXFLAGS += -std=c++98 -Wall -Wextra -pedantic -MMD -MP -MF $@.d
+ifeq ($(WARNINGS), 1)
+  ALL_CXXFLAGS += -Wall -Wextra -pedantic
+endif
+
+ifeq ($(WARNINGS_ALL), 1)
+  ifneq ($(findstring clang,$(CXX)),)
+    # Use clang-specific flag -Weverything
+    ALL_CXXFLAGS += -Weverything
+  else
+    $(warning Couldn't activate all warnings (unsupported compiler))
+  endif
+endif
+
+ifeq ($(WARNINGS_FATAL), 1)
+  ALL_CXXFLAGS += -Werror
+endif
+
+ALL_CXXFLAGS += -std=c++98 -MMD -MP -MF $@.d
 ALL_LIBS += -lkernel32 -lgdi32 -lddraw -ldinput -ldsound -lversion -lshlwapi -limm32 -lwinmm -ldxguid
 
 ifeq ($(STATIC), 1)

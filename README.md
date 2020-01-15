@@ -55,6 +55,9 @@ Name | Function
 `JAPANESE=1` | Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
 `FIX_BUGS=1` | Fix various bugs in the game
 `DEBUG_SAVE=1` | Re-enable the dummied-out 'Debug Save' option, and the ability to drag-and-drop save files onto the window
+`WARNINGS=1` | Enable common warnings
+`WARNINGS_ALL=1` | Enable ALL warnings (clang only)
+`WARNINGS_FATAL=1` | Make all warnings errors
 
 ## Licensing
 
