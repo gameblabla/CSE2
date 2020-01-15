@@ -21,11 +21,10 @@ option(AUDIO_TRACKER "Enable support for .it, .xm, .mod, .s3m music/SFX" OFF)
 option(AUDIO_PXTONE "Enable support for PxTone music/SFX (not to be confused with PixTone)" OFF)
 option(SMOOTH_SPRITE_MOVEMENT "Removes the grid that all sprites are locked to, allowing them to move smoothly at higher resolutions" ON)
 
-option(WARNINGS "Enable common compiler warnings (for gcc-compatible compilers and MSVC only)" OFF)
-option(WARNINGS_ALL "Enable ALL compiler warnings (for clang and MSVC only)" OFF)
-option(WARNINGS_FATAL "Stop compilation on any compiler warning (for gcc-compatible compilers and MSVC only)" OFF)
+option(WARNINGS "Enable common compiler warnings (for GCC-compatible compilers and MSVC only)" OFF)
+option(WARNINGS_ALL "Enable ALL compiler warnings (for Clang and MSVC only)" OFF)
+option(WARNINGS_FATAL "Stop compilation on any compiler warning (for GCC-compatible compilers and MSVC only)" OFF)
 option(FORCE_LOCAL_LIBS "Compile the built-in versions of SDL2 and FreeType instead of using the system-provided ones" OFF)
-
 
 list(APPEND CMAKE_MODULE_PATH
 	"${CMAKE_SOURCE_DIR}/cmake"
@@ -39,13 +38,13 @@ message(STATUS "Compiler ID : ${CMAKE_CXX_COMPILER_ID}")
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 	# Using Clang (this is a match so that we also get "AppleClang" which is the Apple-provided Clang
 	set(COMPILER_IS_CLANG true)
-	message(STATUS "Compiling with clang")
+	message(STATUS "Compiling with Clang")
 endif()
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	# Using GCC
 	set(COMPILER_IS_GCC true)
-	message(STATUS "Compiling with gcc")
+	message(STATUS "Compiling with GCC")
 endif()
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")

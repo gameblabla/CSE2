@@ -95,9 +95,9 @@ Name | Function
 `-DAUDIO_TRACKER=ON` | Enable support for .it, .xm, .mod, .s3m music/SFX
 `-DAUDIO_PXTONE=ON` | Enable support for PxTone music/SFX (not to be confused with PixTone)
 `-DSMOOTH_SPRITE_MOVEMENT=ON` | Enabled by default - Removes the grid that all sprites are locked to, allowing them to move smoothly at higher resolutions
-`-DWARNINGS=ON` | Enable common compiler warnings (for gcc-compatible compilers and MSVC only)
-`-DWARNINGS_ALL=ON` | Enable ALL compiler warnings (for clang and MSVC only)
-`-DWARNINGS_FATAL=ON` | Stop compilation on any compiler warning (for gcc-compatible compilers and MSVC only)
+`-DWARNINGS=ON` | Enable common compiler warnings (for GCC-compatible compilers and MSVC only)
+`-DWARNINGS_ALL=ON` | Enable ALL compiler warnings (for Clang and MSVC only)
+`-DWARNINGS_FATAL=ON` | Stop compilation on any compiler warning (for GCC-compatible compilers and MSVC only)
 `-DFORCE_LOCAL_LIBS=ON` | Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones
 
 Then compile CSE2 with this command:
@@ -133,7 +133,7 @@ Name | Function
 `AUDIO_PXTONE=1` | Enable support for PxTone music/SFX (not to be confused with PixTone)
 `SMOOTH_SPRITE_MOVEMENT=1` | Enabled by default - Removes the grid that all sprites are locked to, allowing them to move smoothly at higher resolutions
 `WARNINGS=1` | Enable common compiler warnings
-`WARNINGS_ALL=1` | Enable ALL compiler warnings (clang only)
+`WARNINGS_ALL=1` | Enable ALL compiler warnings (Clang only)
 `WARNINGS_FATAL=1` | Make all compiler warnings errors
 
 Once built, the executables and assets can be found in the newly-generated `game` folder.
