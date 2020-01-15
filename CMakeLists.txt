@@ -497,19 +497,8 @@ else()
 endif()
 
 if(RENDERER MATCHES "OpenGL3")
-	if(NOT FORCE_LOCAL_LIBS)
-		find_package(GLEW)
-	endif()
-
-	if(TARGET GLEW::GLEW)
-		message(STATUS "Using system GLEW")
-		target_link_libraries(CSE2 GLEW::GLEW)
-	else()
-		# Compile it ourselves
-		message(STATUS "Using local GLEW")
-		target_sources(CSE2 PRIVATE "external/glew/glew.c" "external/glew/GL/glew.h")
-		target_include_directories(CSE2 PRIVATE "external/glew")
-	endif()
+	target_sources(CSE2 PRIVATE "external/glad/src/glad.cpp" "external/glad/include/glad/glad.h" "external/glad/include/KHR/khrplatform.h")
+	target_include_directories(CSE2 PRIVATE "external/glad/include")
 
 	find_package(OpenGL REQUIRED)
 	target_link_libraries(CSE2 OpenGL::GL)

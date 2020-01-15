@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <GL/glew.h>
+#include <glad/glad.h>
 #include "SDL.h"
 
 #include "../../WindowsWrapper.h"
@@ -170,7 +170,7 @@ void main() \
 	fragment = colour * texture(tex, texture_coordinates); \
 } \
 ";
-
+/*
 static void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void* userParam)
 {
 	(void)source;
@@ -182,7 +182,7 @@ static void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GL
 	if (severity != GL_DEBUG_SEVERITY_NOTIFICATION)
 		printf("OpenGL debug: %s\n", message);
 }
-
+*/
 static GLuint CompileShader(const char *vertex_shader_source, const char *fragment_shader_source)
 {
 	GLint shader_status;
@@ -288,15 +288,15 @@ Backend_Surface* Backend_Init(SDL_Window *p_window)
 
 	context = SDL_GL_CreateContext(window);
 
-	if (glewInit() != GLEW_OK)
+	if (!gladLoadGL())
 		return NULL;
 
 	// Check if the platform supports OpenGL 3.2
-	if (!GLEW_VERSION_3_2)
+	if (!GLAD_GL_VERSION_3_2)
 		return NULL;
 
-	glEnable(GL_DEBUG_OUTPUT);
-	glDebugMessageCallback(MessageCallback, 0);
+//	glEnable(GL_DEBUG_OUTPUT);
+//	glDebugMessageCallback(MessageCallback, 0);
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);

@@ -224,20 +224,13 @@ else
 endif
 
 ifeq ($(RENDERER), OpenGL3)
-  SOURCES += src/Backends/Rendering/OpenGL3
-  CSE2_CXXFLAGS += $(shell pkg-config glew --cflags)
-
-  ifeq ($(STATIC), 1)
-    CSE2_CXXFLAGS += -DGLEW_STATIC
-    CSE2_LIBS += $(shell pkg-config glew --libs --static)
-  else
-    CSE2_LIBS += $(shell pkg-config glew --libs)
-  endif
+  SOURCES += src/Backends/Rendering/OpenGL3 external/glad/src/glad
+  CSE2_CXXFLAGS += -Iexternal/glad/include
 
   ifeq ($(WINDOWS), 1)
     CSE2_LIBS += -lopengl32
   else
-    CSE2_LIBS += -lGL
+    CSE2_LIBS += -lGL -ldl
   endif
 else ifeq ($(RENDERER), SDLTexture)
   SOURCES += src/Backends/Rendering/SDLTexture
