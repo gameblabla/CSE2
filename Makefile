@@ -165,35 +165,35 @@ SOURCES = \
 
 ifneq (,$(filter 1,$(AUDIO_OGG)$(AUDIO_FLAC) $(AUDIO_TRACKER) $(AUDIO_PXTONE)))
   SOURCES += \
-    src/ExtraSoundFormats \
-    external/clownaudio/decoder \
-    external/clownaudio/miniaudio \
-    external/clownaudio/mixer \
-    external/clownaudio/decoders/memory_file \
-    external/clownaudio/decoders/misc_utilities \
-    external/clownaudio/decoders/predecode \
-    external/clownaudio/decoders/split
+    src/ExtraSoundFormats.cpp \
+    external/clownaudio/decoder.c \
+    external/clownaudio/miniaudio.c \
+    external/clownaudio/mixer.c \
+    external/clownaudio/decoders/memory_file.c \
+    external/clownaudio/decoders/misc_utilities.c \
+    external/clownaudio/decoders/predecode.c \
+    external/clownaudio/decoders/split.c
 
   DEFINES += -DEXTRA_SOUND_FORMATS
 endif
 
 ifeq ($(AUDIO_OGG), 1)
   SOURCES += \
-    external/clownaudio/decoders/stb_vorbis
+    external/clownaudio/decoders/stb_vorbis.c
 
   DEFINES += -DUSE_STB_VORBIS
 endif
 
 ifeq ($(AUDIO_FLAC), 1)
   SOURCES += \
-    external/clownaudio/decoders/dr_flac
+    external/clownaudio/decoders/dr_flac.c
 
   DEFINES += -DUSE_DR_FLAC
 endif
 
 ifeq ($(AUDIO_TRACKER), 1)
   SOURCES += \
-    external/clownaudio/decoders/libxmp-lite
+    external/clownaudio/decoders/libxmp-lite.c
 
   DEFINES += -DUSE_LIBXMPLITE
 
@@ -209,29 +209,29 @@ endif
 
 ifeq ($(AUDIO_PXTONE), 1)
   SOURCES += \
-    external/clownaudio/decoders/pxtone \
-    external/clownaudio/decoders/libs/pxtone/pxtnDelay \
-    external/clownaudio/decoders/libs/pxtone/pxtnDescriptor \
-    external/clownaudio/decoders/libs/pxtone/pxtnError \
-    external/clownaudio/decoders/libs/pxtone/pxtnEvelist \
-    external/clownaudio/decoders/libs/pxtone/pxtnMaster \
-    external/clownaudio/decoders/libs/pxtone/pxtnMem \
-    external/clownaudio/decoders/libs/pxtone/pxtnOverDrive \
-    external/clownaudio/decoders/libs/pxtone/pxtnPulse_Frequency \
-    external/clownaudio/decoders/libs/pxtone/pxtnPulse_Noise \
-    external/clownaudio/decoders/libs/pxtone/pxtnPulse_NoiseBuilder \
-    external/clownaudio/decoders/libs/pxtone/pxtnPulse_Oggv \
-    external/clownaudio/decoders/libs/pxtone/pxtnPulse_Oscillator \
-    external/clownaudio/decoders/libs/pxtone/pxtnPulse_PCM \
-    external/clownaudio/decoders/libs/pxtone/pxtnService \
-    external/clownaudio/decoders/libs/pxtone/pxtnService_moo \
-    external/clownaudio/decoders/libs/pxtone/pxtnText \
-    external/clownaudio/decoders/libs/pxtone/pxtnUnit \
-    external/clownaudio/decoders/libs/pxtone/pxtnWoice \
-    external/clownaudio/decoders/libs/pxtone/pxtnWoice_io \
-    external/clownaudio/decoders/libs/pxtone/pxtnWoicePTV \
-    external/clownaudio/decoders/libs/pxtone/pxtoneNoise \
-    external/clownaudio/decoders/libs/pxtone/shim
+    external/clownaudio/decoders/pxtone.c \
+    external/clownaudio/decoders/libs/pxtone/pxtnDelay.cpp \
+    external/clownaudio/decoders/libs/pxtone/pxtnDescriptor.cpp \
+    external/clownaudio/decoders/libs/pxtone/pxtnError.cpp \
+    external/clownaudio/decoders/libs/pxtone/pxtnEvelist.cpp \
+    external/clownaudio/decoders/libs/pxtone/pxtnMaster.cpp \
+    external/clownaudio/decoders/libs/pxtone/pxtnMem.cpp \
+    external/clownaudio/decoders/libs/pxtone/pxtnOverDrive.cpp \
+    external/clownaudio/decoders/libs/pxtone/pxtnPulse_Frequency.cpp \
+    external/clownaudio/decoders/libs/pxtone/pxtnPulse_Noise.cpp \
+    external/clownaudio/decoders/libs/pxtone/pxtnPulse_NoiseBuilder.cpp \
+    external/clownaudio/decoders/libs/pxtone/pxtnPulse_Oggv.cpp \
+    external/clownaudio/decoders/libs/pxtone/pxtnPulse_Oscillator.cpp \
+    external/clownaudio/decoders/libs/pxtone/pxtnPulse_PCM.cpp \
+    external/clownaudio/decoders/libs/pxtone/pxtnService.cpp \
+    external/clownaudio/decoders/libs/pxtone/pxtnService_moo.cpp \
+    external/clownaudio/decoders/libs/pxtone/pxtnText.cpp \
+    external/clownaudio/decoders/libs/pxtone/pxtnUnit.cpp \
+    external/clownaudio/decoders/libs/pxtone/pxtnWoice.cpp \
+    external/clownaudio/decoders/libs/pxtone/pxtnWoice_io.cpp \
+    external/clownaudio/decoders/libs/pxtone/pxtnWoicePTV.cpp \
+    external/clownaudio/decoders/libs/pxtone/pxtoneNoise.cpp \
+    external/clownaudio/decoders/libs/pxtone/shim.cpp
 
   DEFINES += -DUSE_PXTONE
 endif
