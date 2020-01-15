@@ -57,7 +57,7 @@ endif
 
 ifeq ($(WARNINGS_ALL), 1)
   ifneq ($(findstring clang,$(CXX)),)
-    # Use clang-specific flag -Weverything
+    # Use Clang-specific flag -Weverything
     ALL_CFLAGS += -Weverything
     ALL_CXXFLAGS += -Weverything
   else
