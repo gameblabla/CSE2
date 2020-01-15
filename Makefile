@@ -1,6 +1,7 @@
 NATIVECC = cc
 NATIVECXX = c++
 WINDRES = windres
+PKGCONFIG = pkg-config
 
 BUILD_DIRECTORY = game
 ASSETS_DIRECTORY = assets
@@ -70,17 +71,17 @@ ifeq ($(WARNINGS_FATAL), 1)
 endif
 
 ALL_CFLAGS += -std=c99 -MMD -MP -MF $@.d
-CSE2_CFLAGS += $(shell pkg-config sdl2 --cflags) $(shell pkg-config freetype2 --cflags)
+CSE2_CFLAGS += $(shell $(PKGCONFIG) sdl2 --cflags) $(shell $(PKGCONFIG) freetype2 --cflags)
 
 ALL_CXXFLAGS += -std=c++98 -MMD -MP -MF $@.d
-CSE2_CXXFLAGS += $(shell pkg-config sdl2 --cflags) $(shell pkg-config freetype2 --cflags)
+CSE2_CXXFLAGS += $(shell $(PKGCONFIG) sdl2 --cflags) $(shell $(PKGCONFIG) freetype2 --cflags)
 
 ifeq ($(STATIC), 1)
   ALL_LDFLAGS += -static
-  CSE2_LIBS += $(shell pkg-config sdl2 --libs --static) $(shell pkg-config freetype2 --libs --static) -lfreetype
+  CSE2_LIBS += $(shell $(PKGCONFIG) sdl2 --libs --static) $(shell $(PKGCONFIG) freetype2 --libs --static) -lfreetype
   DOCONFIG_LIBS += $(shell fltk-config --cxxflags --libs --ldstaticflags)
 else
-  CSE2_LIBS += $(shell pkg-config sdl2 --libs) $(shell pkg-config freetype2 --libs)
+  CSE2_LIBS += $(shell $(PKGCONFIG) sdl2 --libs) $(shell $(PKGCONFIG) freetype2 --libs)
   DOCONFIG_LIBS += $(shell fltk-config --cxxflags --libs --ldflags)
 endif
 
