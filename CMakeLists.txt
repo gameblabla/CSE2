@@ -497,7 +497,7 @@ else()
 endif()
 
 if(RENDERER MATCHES "OpenGL3")
-	target_sources(CSE2 PRIVATE "external/glad/src/glad.cpp" "external/glad/include/glad/glad.h" "external/glad/include/KHR/khrplatform.h")
+	target_sources(CSE2 PRIVATE "external/glad/src/glad.c" "external/glad/include/glad/glad.h" "external/glad/include/KHR/khrplatform.h")
 	target_include_directories(CSE2 PRIVATE "external/glad/include")
 
 	find_package(OpenGL REQUIRED)
