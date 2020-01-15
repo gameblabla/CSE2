@@ -101,9 +101,9 @@ Name | Function
 `RENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default)
 `RENDERER=SDLSurface` | Use the software-rendered SDL2 Surface API renderer
 `RENDERER=Software` | Use the hand-written software renderer
-`WARNINGS=1` | Enable common warnings
-`WARNINGS_ALL=1` | Enable ALL warnings (clang/MSVC only)
-`WARNINGS_FATAL=1` | Make all warnings errors
+`WARNINGS=1` | Enable common compiler warnings
+`WARNINGS_ALL=1` | Enable ALL compiler warnings (clang/MSVC only)
+`WARNINGS_FATAL=1` | Make all compiler warnings errors
 
 Once built, the executables and assets can be found in the newly-generated `game` folder.
 

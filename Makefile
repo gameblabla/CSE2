@@ -85,79 +85,79 @@ else
 endif
 
 SOURCES = \
-  src/ArmsItem \
-  src/Back \
-  src/Boss \
-  src/BossAlmo1 \
-  src/BossAlmo2 \
-  src/BossBallos \
-  src/BossFrog \
-  src/BossIronH \
-  src/BossLife \
-  src/BossOhm \
-  src/BossPress \
-  src/BossTwinD \
-  src/BossX \
-  src/BulHit \
-  src/Bullet \
-  src/Caret \
-  src/Config \
-  src/Draw \
-  src/Ending \
-  src/Escape \
-  src/Fade \
-  src/File \
-  src/Flags \
-  src/Flash \
-  src/Font \
-  src/Frame \
-  src/Game \
-  src/Generic \
-  src/GenericLoad \
-  src/Input \
-  src/KeyControl \
-  src/Main \
-  src/Map \
-  src/MapName \
-  src/MiniMap \
-  src/MyChar \
-  src/MycHit \
-  src/MycParam \
-  src/NpcAct000 \
-  src/NpcAct020 \
-  src/NpcAct040 \
-  src/NpcAct060 \
-  src/NpcAct080 \
-  src/NpcAct100 \
-  src/NpcAct120 \
-  src/NpcAct140 \
-  src/NpcAct160 \
-  src/NpcAct180 \
-  src/NpcAct200 \
-  src/NpcAct220 \
-  src/NpcAct240 \
-  src/NpcAct260 \
-  src/NpcAct280 \
-  src/NpcAct300 \
-  src/NpcAct320 \
-  src/NpcAct340 \
-  src/NpChar \
-  src/NpcHit \
-  src/NpcTbl \
-  src/Organya \
-  src/PixTone \
-  src/Profile \
-  src/Random \
-  src/Resource \
-  src/SelStage \
-  src/Shoot \
-  src/Sound \
-  src/Stage \
-  src/Star \
-  src/TextScr \
-  src/Triangle \
-  src/ValueView \
-  src/Backends/Audio/SDL2
+  src/ArmsItem.cpp \
+  src/Back.cpp \
+  src/Boss.cpp \
+  src/BossAlmo1.cpp \
+  src/BossAlmo2.cpp \
+  src/BossBallos.cpp \
+  src/BossFrog.cpp \
+  src/BossIronH.cpp \
+  src/BossLife.cpp \
+  src/BossOhm.cpp \
+  src/BossPress.cpp \
+  src/BossTwinD.cpp \
+  src/BossX.cpp \
+  src/BulHit.cpp \
+  src/Bullet.cpp \
+  src/Caret.cpp \
+  src/Config.cpp \
+  src/Draw.cpp \
+  src/Ending.cpp \
+  src/Escape.cpp \
+  src/Fade.cpp \
+  src/File.cpp \
+  src/Flags.cpp \
+  src/Flash.cpp \
+  src/Font.cpp \
+  src/Frame.cpp \
+  src/Game.cpp \
+  src/Generic.cpp \
+  src/GenericLoad.cpp \
+  src/Input.cpp \
+  src/KeyControl.cpp \
+  src/Main.cpp \
+  src/Map.cpp \
+  src/MapName.cpp \
+  src/MiniMap.cpp \
+  src/MyChar.cpp \
+  src/MycHit.cpp \
+  src/MycParam.cpp \
+  src/NpcAct000.cpp \
+  src/NpcAct020.cpp \
+  src/NpcAct040.cpp \
+  src/NpcAct060.cpp \
+  src/NpcAct080.cpp \
+  src/NpcAct100.cpp \
+  src/NpcAct120.cpp \
+  src/NpcAct140.cpp \
+  src/NpcAct160.cpp \
+  src/NpcAct180.cpp \
+  src/NpcAct200.cpp \
+  src/NpcAct220.cpp \
+  src/NpcAct240.cpp \
+  src/NpcAct260.cpp \
+  src/NpcAct280.cpp \
+  src/NpcAct300.cpp \
+  src/NpcAct320.cpp \
+  src/NpcAct340.cpp \
+  src/NpChar.cpp \
+  src/NpcHit.cpp \
+  src/NpcTbl.cpp \
+  src/Organya.cpp \
+  src/PixTone.cpp \
+  src/Profile.cpp \
+  src/Random.cpp \
+  src/Resource.cpp \
+  src/SelStage.cpp \
+  src/Shoot.cpp \
+  src/Sound.cpp \
+  src/Stage.cpp \
+  src/Star.cpp \
+  src/TextScr.cpp \
+  src/Triangle.cpp \
+  src/ValueView.cpp \
+  src/Backends/Audio/SDL2.cpp
 
 RESOURCES = \
   BITMAP/Credit01.bmp \
@@ -233,7 +233,7 @@ else
 endif
 
 ifeq ($(RENDERER), OpenGL3)
-  SOURCES += src/Backends/Rendering/OpenGL3 external/glad/src/glad
+  SOURCES += src/Backends/Rendering/OpenGL3.cpp external/glad/src/glad.c
   CSE2_CFLAGS += -Iexternal/glad/include
   CSE2_CXXFLAGS += -Iexternal/glad/include
 
@@ -243,11 +243,11 @@ ifeq ($(RENDERER), OpenGL3)
     CSE2_LIBS += -lGL -ldl
   endif
 else ifeq ($(RENDERER), SDLTexture)
-  SOURCES += src/Backends/Rendering/SDLTexture
+  SOURCES += src/Backends/Rendering/SDLTexture.cpp
 else ifeq ($(RENDERER), SDLSurface)
-  SOURCES += src/Backends/Rendering/SDLSurface
+  SOURCES += src/Backends/Rendering/SDLSurface.cpp
 else ifeq ($(RENDERER), Software)
-  SOURCES += src/Backends/Rendering/Software
+  SOURCES += src/Backends/Rendering/Software.cpp
 else
   $(error Invalid RENDERER selected)
 endif
@@ -272,12 +272,12 @@ $(BUILD_DIRECTORY)/$(FILENAME): $(OBJECTS)
 	$(info Linking $@)
 	@$(CXX) $(ALL_CXXFLAGS) $(CSE2_CXXFLAGS) $(ALL_LDFLAGS) $^ -o $@ $(ALL_LIBS) $(CSE2_LIBS)
 
-obj/$(FILENAME)/%.o: %.c
+obj/$(FILENAME)/%.c.o: %.c
 	@mkdir -p $(@D)
 	$(info Compiling $<)
 	@$(CC) $(ALL_CFLAGS) $(CSE2_CFLAGS) $(DEFINES) $< -o $@ -c
 
-obj/$(FILENAME)/%.o: %.cpp
+obj/$(FILENAME)/%.cpp.o: %.cpp
 	@mkdir -p $(@D)
 	$(info Compiling $<)
 	@$(CXX) $(ALL_CXXFLAGS) $(CSE2_CXXFLAGS) $(DEFINES) $< -o $@ -c
