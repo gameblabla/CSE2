@@ -56,7 +56,7 @@ Name | Function
 `FIX_BUGS=1` | Fix various bugs in the game
 `DEBUG_SAVE=1` | Re-enable the dummied-out 'Debug Save' option, and the ability to drag-and-drop save files onto the window
 `WARNINGS=1` | Enable common compiler warnings
-`WARNINGS_ALL=1` | Enable ALL compiler warnings (clang only)
+`WARNINGS_ALL=1` | Enable ALL compiler warnings (Clang only)
 `WARNINGS_FATAL=1` | Make all compiler warnings errors
 
 Once built, the executables and assets can be found in the newly-generated `game` folder.
