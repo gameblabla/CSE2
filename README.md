@@ -66,7 +66,6 @@ Many months of copypasting and tinkering later, here is the result.
 
 * SDL2
 * Freetype
-* GLEW (if the OpenGL3 rendering backend is selected)
 * libxmp-lite (only if AUDIO_TRACKER is enabled)
 
 ## Building
@@ -133,9 +132,9 @@ Name | Function
 `AUDIO_TRACKER=1` | Enable support for .it, .xm, .mod, .s3m music/SFX
 `AUDIO_PXTONE=1` | Enable support for PxTone music/SFX (not to be confused with PixTone)
 `SMOOTH_SPRITE_MOVEMENT=1` | Enabled by default - Removes the grid that all sprites are locked to, allowing them to move smoothly at higher resolutions
-`WARNINGS=1` | Enable common warnings
-`WARNINGS_ALL=1` | Enable ALL warnings (clang/MSVC only)
-`WARNINGS_FATAL=1` | Make all warnings errors
+`WARNINGS=1` | Enable common compiler warnings
+`WARNINGS_ALL=1` | Enable ALL compiler warnings (clang only)
+`WARNINGS_FATAL=1` | Make all compiler warnings errors
 
 Once built, the executables and assets can be found in the newly-generated `game` folder.
 

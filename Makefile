@@ -1,6 +1,7 @@
 NATIVECC = cc
 NATIVECXX = c++
 WINDRES = windres
+PKGCONFIG = pkg-config
 
 BUILD_DIRECTORY = game
 ASSETS_DIRECTORY = assets
@@ -69,98 +70,98 @@ ifeq ($(WARNINGS_FATAL), 1)
 endif
 
 ALL_CFLAGS += -std=c99 -MMD -MP -MF $@.d
-CSE2_CFLAGS += $(shell pkg-config sdl2 --cflags) $(shell pkg-config freetype2 --cflags) -Iexternal
+CSE2_CFLAGS += $(shell $(PKGCONFIG) sdl2 --cflags) $(shell $(PKGCONFIG) freetype2 --cflags) -Iexternal
 
 ALL_CXXFLAGS += -std=c++11 -MMD -MP -MF $@.d
-CSE2_CXXFLAGS += $(shell pkg-config sdl2 --cflags) $(shell pkg-config freetype2 --cflags) -Iexternal
+CSE2_CXXFLAGS += $(shell $(PKGCONFIG) sdl2 --cflags) $(shell $(PKGCONFIG) freetype2 --cflags) -Iexternal
 
 DEFINES += -DLODEPNG_NO_COMPILE_ENCODER -DLODEPNG_NO_COMPILE_ERROR_TEXT -DLODEPNG_NO_COMPILE_CPP
 
 ifeq ($(STATIC), 1)
   ALL_LDFLAGS += -static
-  CSE2_LIBS += $(shell pkg-config sdl2 --libs --static) $(shell pkg-config freetype2 --libs --static) -lfreetype
+  CSE2_LIBS += $(shell $(PKGCONFIG) sdl2 --libs --static) $(shell $(PKGCONFIG) freetype2 --libs --static) -lfreetype
 else
-  CSE2_LIBS += $(shell pkg-config sdl2 --libs) $(shell pkg-config freetype2 --libs)
+  CSE2_LIBS += $(shell $(PKGCONFIG) sdl2 --libs) $(shell $(PKGCONFIG) freetype2 --libs)
 endif
 
 SOURCES = \
-  external/lodepng/lodepng \
-  src/ArmsItem \
-  src/Back \
-  src/Boss \
-  src/BossAlmo1 \
-  src/BossAlmo2 \
-  src/BossBallos \
-  src/BossFrog \
-  src/BossIronH \
-  src/BossLife \
-  src/BossOhm \
-  src/BossPress \
-  src/BossTwinD \
-  src/BossX \
-  src/BulHit \
-  src/Bullet \
-  src/Caret \
-  src/Config \
-  src/Draw \
-  src/Ending \
-  src/Escape \
-  src/Fade \
-  src/File \
-  src/Flags \
-  src/Flash \
-  src/Font \
-  src/Frame \
-  src/Game \
-  src/Generic \
-  src/GenericLoad \
-  src/Input \
-  src/KeyControl \
-  src/Main \
-  src/Map \
-  src/MapName \
-  src/MiniMap \
-  src/MyChar \
-  src/MycHit \
-  src/MycParam \
-  src/NpcAct000 \
-  src/NpcAct020 \
-  src/NpcAct040 \
-  src/NpcAct060 \
-  src/NpcAct080 \
-  src/NpcAct100 \
-  src/NpcAct120 \
-  src/NpcAct140 \
-  src/NpcAct160 \
-  src/NpcAct180 \
-  src/NpcAct200 \
-  src/NpcAct220 \
-  src/NpcAct240 \
-  src/NpcAct260 \
-  src/NpcAct280 \
-  src/NpcAct300 \
-  src/NpcAct320 \
-  src/NpcAct340 \
-  src/NpcAct360 \
-  src/NpcAct380 \
-  src/NpChar \
-  src/NpcHit \
-  src/NpcTbl \
-  src/Organya \
-  src/Pause \
-  src/PixTone \
-  src/Profile \
-  src/Random \
-  src/Resource \
-  src/SelStage \
-  src/Shoot \
-  src/Sound \
-  src/Stage \
-  src/Star \
-  src/TextScr \
-  src/Triangle \
-  src/ValueView \
-  src/Backends/Audio/SDL2
+  external/lodepng/lodepng.cpp \
+  src/ArmsItem.cpp \
+  src/Back.cpp \
+  src/Boss.cpp \
+  src/BossAlmo1.cpp \
+  src/BossAlmo2.cpp \
+  src/BossBallos.cpp \
+  src/BossFrog.cpp \
+  src/BossIronH.cpp \
+  src/BossLife.cpp \
+  src/BossOhm.cpp \
+  src/BossPress.cpp \
+  src/BossTwinD.cpp \
+  src/BossX.cpp \
+  src/BulHit.cpp \
+  src/Bullet.cpp \
+  src/Caret.cpp \
+  src/Config.cpp \
+  src/Draw.cpp \
+  src/Ending.cpp \
+  src/Escape.cpp \
+  src/Fade.cpp \
+  src/File.cpp \
+  src/Flags.cpp \
+  src/Flash.cpp \
+  src/Font.cpp \
+  src/Frame.cpp \
+  src/Game.cpp \
+  src/Generic.cpp \
+  src/GenericLoad.cpp \
+  src/Input.cpp \
+  src/KeyControl.cpp \
+  src/Main.cpp \
+  src/Map.cpp \
+  src/MapName.cpp \
+  src/MiniMap.cpp \
+  src/MyChar.cpp \
+  src/MycHit.cpp \
+  src/MycParam.cpp \
+  src/NpcAct000.cpp \
+  src/NpcAct020.cpp \
+  src/NpcAct040.cpp \
+  src/NpcAct060.cpp \
+  src/NpcAct080.cpp \
+  src/NpcAct100.cpp \
+  src/NpcAct120.cpp \
+  src/NpcAct140.cpp \
+  src/NpcAct160.cpp \
+  src/NpcAct180.cpp \
+  src/NpcAct200.cpp \
+  src/NpcAct220.cpp \
+  src/NpcAct240.cpp \
+  src/NpcAct260.cpp \
+  src/NpcAct280.cpp \
+  src/NpcAct300.cpp \
+  src/NpcAct320.cpp \
+  src/NpcAct340.cpp \
+  src/NpcAct360.cpp \
+  src/NpcAct380.cpp \
+  src/NpChar.cpp \
+  src/NpcHit.cpp \
+  src/NpcTbl.cpp \
+  src/Organya.cpp \
+  src/Pause.cpp \
+  src/PixTone.cpp \
+  src/Profile.cpp \
+  src/Random.cpp \
+  src/Resource.cpp \
+  src/SelStage.cpp \
+  src/Shoot.cpp \
+  src/Sound.cpp \
+  src/Stage.cpp \
+  src/Star.cpp \
+  src/TextScr.cpp \
+  src/Triangle.cpp \
+  src/ValueView.cpp \
+  src/Backends/Audio/SDL2.cpp
 
 ifneq (,$(filter 1,$(AUDIO_OGG)$(AUDIO_FLAC) $(AUDIO_TRACKER) $(AUDIO_PXTONE)))
   SOURCES += \
@@ -196,13 +197,13 @@ ifeq ($(AUDIO_TRACKER), 1)
 
   DEFINES += -DUSE_LIBXMPLITE
 
-  ALL_CFLAGS += $(shell pkg-config libxmp-lite --cflags)
-  ALL_CXXFLAGS += $(shell pkg-config libxmp-lite --cflags)
+  ALL_CFLAGS += $(shell $(PKGCONFIG) libxmp-lite --cflags)
+  ALL_CXXFLAGS += $(shell $(PKGCONFIG) libxmp-lite --cflags)
 
   ifeq ($(STATIC), 1)
-    ALL_LIBS += $(shell pkg-config libxmp-lite --libs --static)
+    ALL_LIBS += $(shell $(PKGCONFIG) libxmp-lite --libs --static)
   else
-    ALL_LIBS += $(shell pkg-config libxmp-lite --libs)
+    ALL_LIBS += $(shell $(PKGCONFIG) libxmp-lite --libs)
   endif
 endif
 
@@ -248,27 +249,19 @@ else
 endif
 
 ifeq ($(RENDERER), OpenGL3)
-  SOURCES += src/Backends/Rendering/OpenGL3
-  CSE2_CFLAGS += $(shell pkg-config glew --cflags)
-  CSE2_CXXFLAGS += $(shell pkg-config glew --cflags)
-
-  ifeq ($(STATIC), 1)
-    CSE2_CFLAGS += -DGLEW_STATIC
-    CSE2_CXXFLAGS += -DGLEW_STATIC
-    CSE2_LIBS += $(shell pkg-config glew --libs --static)
-  else
-    CSE2_LIBS += $(shell pkg-config glew --libs)
-  endif
+  SOURCES += src/Backends/Rendering/OpenGL3.cpp external/glad/src/glad.c
+  CSE2_CFLAGS += -Iexternal/glad/include
+  CSE2_CXXFLAGS += -Iexternal/glad/include
 
   ifeq ($(WINDOWS), 1)
     CSE2_LIBS += -lopengl32
   else
-    CSE2_LIBS += -lGL
+    CSE2_LIBS += -lGL -ldl
   endif
 else ifeq ($(RENDERER), SDLTexture)
-  SOURCES += src/Backends/Rendering/SDLTexture
+  SOURCES += src/Backends/Rendering/SDLTexture.cpp
 else ifeq ($(RENDERER), Software)
-  SOURCES += src/Backends/Rendering/Software
+  SOURCES += src/Backends/Rendering/Software.cpp
 else
   $(error Invalid RENDERER selected)
 endif
@@ -293,12 +286,12 @@ $(BUILD_DIRECTORY)/$(FILENAME): $(OBJECTS)
 	$(info Linking $@)
 	@$(CXX) $(ALL_CXXFLAGS) $(CSE2_CXXFLAGS) $(ALL_LDFLAGS) $^ -o $@ $(ALL_LIBS) $(CSE2_LIBS)
 
-obj/$(FILENAME)/%.o: %.c
+obj/$(FILENAME)/%.c.o: %.c
 	@mkdir -p $(@D)
 	$(info Compiling $<)
 	@$(CC) $(ALL_CFLAGS) $(CSE2_CFLAGS) $(DEFINES) $< -o $@ -c
 
-obj/$(FILENAME)/%.o: %.cpp
+obj/$(FILENAME)/%.cpp.o: %.cpp
 	@mkdir -p $(@D)
 	$(info Compiling $<)
 	@$(CXX) $(ALL_CXXFLAGS) $(CSE2_CXXFLAGS) $(DEFINES) $< -o $@ -c
