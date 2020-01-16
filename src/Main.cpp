@@ -95,6 +95,8 @@ int main(int argc, char *argv[])
 
 	int i;
 
+	SDL_Init(SDL_INIT_EVENTS);
+
 	// Get executable's path
 	char *base_path = SDL_GetBasePath();
 	size_t base_path_length = strlen(base_path);
@@ -114,7 +116,7 @@ int main(int argc, char *argv[])
 
 	RECT unused_rect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
-	SDL_Init(SDL_INIT_EVENTS);
+	SDL_InitSubSystem(SDL_INIT_VIDEO);
 
 	SDL_Window *window;
 
