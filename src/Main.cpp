@@ -132,7 +132,13 @@ int main(int argc, char *argv[])
 			if (window == NULL)
 				return 0;
 
+		#ifdef FIX_BUGS
+			if (!StartDirectDraw(window, conf.display_mode, conf.b60fps, conf.bVsync))
+				return 0;
+		#else
+			// Doesn't handle StartDirectDraw failing
 			StartDirectDraw(window, conf.display_mode, conf.b60fps, conf.bVsync);
+		#endif
 
 			break;
 
@@ -146,7 +152,14 @@ int main(int argc, char *argv[])
 			if (window == NULL)
 				return 0;
 
+		#ifdef FIX_BUGS
+			if (!StartDirectDraw(window, 0, conf.b60fps, conf.bVsync))
+				return 0;
+		#else
+			// Doesn't handle StartDirectDraw failing
 			StartDirectDraw(window, 0, conf.b60fps, conf.bVsync);
+		#endif
+
 			bFullscreen = TRUE;
 
 			SDL_ShowCursor(SDL_DISABLE);

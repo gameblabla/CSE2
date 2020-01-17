@@ -220,9 +220,15 @@ Backend_Surface* Backend_Init(SDL_Window *p_window, unsigned int internal_screen
 
 	context = SDL_GL_CreateContext(window);
 
+	if (context == NULL)
+		return NULL;
+
+	if (SDL_GL_MakeCurrent(window, context) < 0)
+		return NULL;
+
 	SDL_GL_SetSwapInterval(vsync);	// TODO - Handle this failing
 
-	if (!gladLoadGL())
+	if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress))
 		return NULL;
 
 	// Check if the platform supports OpenGL 3.2
