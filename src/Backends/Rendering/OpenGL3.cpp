@@ -368,8 +368,8 @@ Backend_Surface* Backend_Init(SDL_Window *p_window)
 					if (program_glyph_normal != 0)
 						glDeleteProgram(program_glyph_normal);
 
-					if (program_texture_colour_key != 0)
-						glDeleteProgram(program_texture_colour_key);
+					if (program_colour_fill != 0)
+						glDeleteProgram(program_colour_fill);
 
 					if (program_texture_colour_key != 0)
 						glDeleteProgram(program_texture_colour_key);
