@@ -231,8 +231,8 @@ Backend_Surface* Backend_Init(SDL_Window *p_window, unsigned int internal_screen
 				// Check if the platform supports OpenGL 3.2
 				if (GLAD_GL_VERSION_3_2)
 				{
-					//	glEnable(GL_DEBUG_OUTPUT);
-					//	glDebugMessageCallback(MessageCallback, 0);
+					//glEnable(GL_DEBUG_OUTPUT);
+					//glDebugMessageCallback(MessageCallback, 0);
 
 					// We're using pre-multiplied alpha so we can blend onto textures that have their own alpha
 					// http://apoorvaj.io/alpha-compositing-opengl-blending-and-premultiplied-alpha.html
@@ -261,46 +261,50 @@ Backend_Surface* Backend_Init(SDL_Window *p_window, unsigned int internal_screen
 					program_glyph = CompileShader(vertex_shader_texture, fragment_shader_glyph);
 
 					if (program_texture == 0 || program_colour_fill == 0 || program_glyph == 0)
+					{
 						printf("Failed to compile shaders\n");
+					}
+					else
+					{
+						// Get shader uniforms
+						program_colour_fill_uniform_colour = glGetUniformLocation(program_colour_fill, "colour");
+						program_glyph_uniform_colour = glGetUniformLocation(program_glyph, "colour");
 
-					// Get shader uniforms
-					program_colour_fill_uniform_colour = glGetUniformLocation(program_colour_fill, "colour");
-					program_glyph_uniform_colour = glGetUniformLocation(program_glyph, "colour");
+						// Set up framebuffer (used for surface-to-surface blitting)
+						glGenFramebuffers(1, &framebuffer_id);
+						glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
 
-					// Set up framebuffer (used for surface-to-surface blitting)
-					glGenFramebuffers(1, &framebuffer_id);
-					glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
+						// Set up framebuffer screen texture (used for screen-to-surface blitting)
+						glGenTextures(1, &framebuffer.texture_id);
+						glBindTexture(GL_TEXTURE_2D, framebuffer.texture_id);
+						glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, internal_screen_width, internal_screen_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-					// Set up framebuffer screen texture (used for screen-to-surface blitting)
-					glGenTextures(1, &framebuffer.texture_id);
-					glBindTexture(GL_TEXTURE_2D, framebuffer.texture_id);
-					glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, internal_screen_width, internal_screen_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+						framebuffer.width = internal_screen_width;
+						framebuffer.height = internal_screen_height;
 
-					framebuffer.width = internal_screen_width;
-					framebuffer.height = internal_screen_height;
+						glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebuffer.texture_id, 0);
+						glViewport(0, 0, framebuffer.width, framebuffer.height);
 
-					glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebuffer.texture_id, 0);
-					glViewport(0, 0, framebuffer.width, framebuffer.height);
+						return &framebuffer;
+					}
 
-					return &framebuffer;
+					if (program_glyph != 0)
+						glDeleteProgram(program_glyph);
+
+					if (program_colour_fill != 0)
+						glDeleteProgram(program_colour_fill);
+
+					if (program_texture != 0)
+						glDeleteProgram(program_texture);
+
+					glDeleteBuffers(1, &vertex_buffer_id);
+					glDeleteVertexArrays(1, &vertex_array_id);
 				}
-
-				if (program_glyph != 0)
-					glDeleteProgram(program_glyph);
-
-				if (program_colour_fill != 0)
-					glDeleteProgram(program_colour_fill);
-
-				if (program_texture != 0)
-					glDeleteProgram(program_texture);
-
-				glDeleteBuffers(1, &vertex_buffer_id);
-				glDeleteVertexArrays(1, &vertex_array_id);
 			}
 		}
 
