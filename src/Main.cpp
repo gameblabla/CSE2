@@ -226,7 +226,7 @@ int main(int argc, char *argv[])
 			}
 			else
 			{
-				if !(StartDirectDraw(window, 1))
+				if (!StartDirectDraw(window, 1))
 					return 0;
 			}
 		#else
