@@ -218,10 +218,24 @@ int main(int argc, char *argv[])
 			if (window == NULL)
 				return 0;
 
+		#ifdef FIX_BUGS
+			if (conf.display_mode == 1)
+			{
+				if (!StartDirectDraw(window, 0))
+					return 0;
+			}
+			else
+			{
+				if !(StartDirectDraw(window, 1))
+					return 0;
+			}
+		#else
+			// Doesn't handle StartDirectDraw failing
 			if (conf.display_mode == 1)
 				StartDirectDraw(window, 0);
 			else
 				StartDirectDraw(window, 1);
+		#endif
 
 			break;
 
@@ -237,7 +251,14 @@ int main(int argc, char *argv[])
 			if (window == NULL)
 				return 0;
 
+		#ifdef FIX_BUGS
+			if (!StartDirectDraw(window, 2))
+				return 0;
+		#else
+			// Doesn't handle StartDirectDraw failing
 			StartDirectDraw(window, 2);
+		#endif
+
 			bFullscreen = TRUE;
 
 			SDL_ShowCursor(SDL_DISABLE);
