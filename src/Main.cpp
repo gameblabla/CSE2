@@ -275,10 +275,24 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 
 			hMenu = GetMenu(hWnd);
 
+		#ifdef FIX_BUGS
+			if (conf.display_mode == 1)
+			{
+				if (!StartDirectDraw(hWnd, 0, 0))
+					return 0;
+			}
+			else
+			{
+				if !(StartDirectDraw(hWnd, 1, 0))
+					return 0;
+			}
+		#else
+			// Doesn't handle StartDirectDraw failing
 			if (conf.display_mode == 1)
 				StartDirectDraw(hWnd, 0, 0);
 			else
 				StartDirectDraw(hWnd, 1, 0);
+		#endif
 
 			break;
 
@@ -322,7 +336,14 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 					break;
 			}
 
+		#ifdef FIX_BUGS
+			if (!StartDirectDraw(hWnd, 2, depth))
+				return 0;
+		#else
+			// Doesn't handle StartDirectDraw failing
 			StartDirectDraw(hWnd, 2, depth);
+		#endif
+
 			bFullscreen = TRUE;
 
 			ShowCursor(FALSE);
