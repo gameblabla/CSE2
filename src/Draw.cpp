@@ -63,13 +63,13 @@ BOOL Flip_SystemTask(void)
 		// Framerate limiter
 		timeNow = SDL_GetTicks();
 
-		if (timeNow >= timePrev + FRAMERATE)
+		if (SDL_TICKS_PASSED(timeNow, timePrev + FRAMERATE))
 			break;
 
 		SDL_Delay(1);
 	}
 
-	if (timeNow >= timePrev + 100)
+	if (SDL_TICKS_PASSED(timeNow, timePrev + 100))
 		timePrev = timeNow;	// If the timer is freakishly out of sync, panic and reset it, instead of spamming frames for who-knows how long
 	else
 		timePrev += FRAMERATE;
