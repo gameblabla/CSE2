@@ -2,15 +2,10 @@
 
 #include <stdio.h>
 
-typedef int BOOL;
+typedef bool BOOL;
 
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-#ifndef TRUE
-#define TRUE 1
-#endif
+#define FALSE false
+#define TRUE true
 
 struct RECT
 {
