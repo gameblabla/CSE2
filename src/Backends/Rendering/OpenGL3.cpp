@@ -88,7 +88,7 @@ static const GLchar *vertex_shader_plain = " \
 attribute vec2 input_vertex_coordinates; \
 void main() \
 { \
-	gl_Position = vec4(input_vertex_coordinates.x, input_vertex_coordinates.y, 0.0, 1.0); \
+	gl_Position = vec4(input_vertex_coordinates.xy, 0.0, 1.0); \
 } \
 ";
 
@@ -100,7 +100,7 @@ varying vec2 texture_coordinates; \
 void main() \
 { \
 	texture_coordinates = input_texture_coordinates; \
-	gl_Position = vec4(input_vertex_coordinates.x, input_vertex_coordinates.y, 0.0, 1.0); \
+	gl_Position = vec4(input_vertex_coordinates.xy, 0.0, 1.0); \
 } \
 ";
 
@@ -133,8 +133,7 @@ uniform vec4 colour; \
 varying vec2 texture_coordinates; \
 void main() \
 { \
-	float alpha = texture2D(tex, texture_coordinates).r; \
-	gl_FragColor = colour * vec4(alpha, alpha, alpha, alpha); \
+	gl_FragColor = colour * texture2D(tex, texture_coordinates).r; \
 } \
 ";
 #else
@@ -143,7 +142,7 @@ static const GLchar *vertex_shader_plain = " \
 in vec2 input_vertex_coordinates; \
 void main() \
 { \
-	gl_Position = vec4(input_vertex_coordinates.x, input_vertex_coordinates.y, 0.0, 1.0); \
+	gl_Position = vec4(input_vertex_coordinates.xy, 0.0, 1.0); \
 } \
 ";
 
@@ -155,7 +154,7 @@ out vec2 texture_coordinates; \
 void main() \
 { \
 	texture_coordinates = input_texture_coordinates; \
-	gl_Position = vec4(input_vertex_coordinates.x, input_vertex_coordinates.y, 0.0, 1.0); \
+	gl_Position = vec4(input_vertex_coordinates.xy, 0.0, 1.0); \
 } \
 ";
 
@@ -188,8 +187,7 @@ in vec2 texture_coordinates; \
 out vec4 fragment; \
 void main() \
 { \
-	float alpha = texture(tex, texture_coordinates).r; \
-	fragment = colour * vec4(alpha, alpha, alpha, alpha); \
+	fragment = colour * texture(tex, texture_coordinates).r; \
 } \
 ";
 #endif
