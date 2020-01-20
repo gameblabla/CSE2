@@ -464,11 +464,7 @@ Backend_Surface* Backend_Init(SDL_Window *p_window)
 					program_glyph_subpixel_part1 = CompileShader(vertex_shader_texture, fragment_shader_glyph_subpixel_part1);
 					program_glyph_subpixel_part2 = CompileShader(vertex_shader_texture, fragment_shader_glyph_subpixel_part2);
 
-					if (program_texture == 0 || program_texture_colour_key == 0 || program_colour_fill == 0 || program_glyph_normal == 0 || program_glyph_subpixel_part1 == 0 || program_glyph_subpixel_part2 == 0)
-					{
-						printf("Failed to compile shaders\n");
-					}
-					else
+					if (program_texture != 0 && program_texture_colour_key != 0 && program_colour_fill != 0 && program_glyph_normal != 0 && program_glyph_subpixel_part1 != 0 && program_glyph_subpixel_part2 != 0)
 					{
 						// Get shader uniforms
 						program_colour_fill_uniform_colour = glGetUniformLocation(program_colour_fill, "colour");
@@ -836,72 +832,80 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 {
 	Backend_Glyph *glyph = (Backend_Glyph*)malloc(sizeof(Backend_Glyph));
 
-	if (glyph == NULL)
-		return NULL;
-
-	const unsigned int destination_pitch = (width + 3) & ~3;	// Round up to the nearest 4 (OpenGL needs this)
-
-	unsigned char *buffer = (unsigned char*)malloc(destination_pitch * height);
-
-	switch (pixel_mode)
+	if (glyph != NULL)
 	{
-		case FONT_PIXEL_MODE_LCD:
-		case FONT_PIXEL_MODE_GRAY:
-			for (unsigned int y = 0; y < height; ++y)
+		const unsigned int destination_pitch = (width + 3) & ~3;	// Round up to the nearest 4 (OpenGL needs this)
+
+		unsigned char *buffer = (unsigned char*)malloc(destination_pitch * height);
+
+		if (buffer != NULL)
+		{
+			switch (pixel_mode)
 			{
-				const unsigned char *source_pointer = pixels + y * pitch;
-				unsigned char *destination_pointer = buffer + y * destination_pitch;
-				memcpy(destination_pointer, source_pointer, width);
+				case FONT_PIXEL_MODE_LCD:
+				case FONT_PIXEL_MODE_GRAY:
+					for (unsigned int y = 0; y < height; ++y)
+					{
+						const unsigned char *source_pointer = pixels + y * pitch;
+						unsigned char *destination_pointer = buffer + y * destination_pitch;
+						memcpy(destination_pointer, source_pointer, width);
+					}
+
+					break;
+
+				case FONT_PIXEL_MODE_MONO:
+					for (unsigned int y = 0; y < height; ++y)
+					{
+						const unsigned char *source_pointer = pixels + y * pitch;
+						unsigned char *destination_pointer = buffer + y * destination_pitch;
+
+						for (unsigned int x = 0; x < width; ++x)
+							*destination_pointer++ = (*source_pointer++ ? 0xFF : 0);
+					}
+
+					break;
 			}
 
-			break;
+			GLint previously_bound_texture;
+			glGetIntegerv(GL_TEXTURE_BINDING_2D, &previously_bound_texture);
 
-		case FONT_PIXEL_MODE_MONO:
-			for (unsigned int y = 0; y < height; ++y)
-			{
-				const unsigned char *source_pointer = pixels + y * pitch;
-				unsigned char *destination_pointer = buffer + y * destination_pitch;
+			glGenTextures(1, &glyph->texture_id);
+			glBindTexture(GL_TEXTURE_2D, glyph->texture_id);
+		#ifdef USE_OPENGLES2
+			if (pixel_mode == FONT_PIXEL_MODE_LCD)
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width / 3, height, 0, GL_RGB, GL_UNSIGNED_BYTE, buffer);
+			else
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, width, height, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, buffer);
+		#else
+			if (pixel_mode == FONT_PIXEL_MODE_LCD)
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width / 3, height, 0, GL_RGB, GL_UNSIGNED_BYTE, buffer);
+			else
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, buffer);
+		#endif
 
-				for (unsigned int x = 0; x < width; ++x)
-					*destination_pointer++ = (*source_pointer++ ? 0xFF : 0);
-			}
+			free(buffer);
 
-			break;
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		#ifndef USE_OPENGLES2
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+		#endif
+
+			glBindTexture(GL_TEXTURE_2D, previously_bound_texture);
+
+			glyph->width = (pixel_mode == FONT_PIXEL_MODE_LCD ? width / 3 : width);
+			glyph->height = height;
+			glyph->pixel_mode = pixel_mode;
+
+			return glyph;
+		}
+
+		free(glyph);
 	}
 
-	GLint previously_bound_texture;
-	glGetIntegerv(GL_TEXTURE_BINDING_2D, &previously_bound_texture);
-
-	glGenTextures(1, &glyph->texture_id);
-	glBindTexture(GL_TEXTURE_2D, glyph->texture_id);
-#ifdef USE_OPENGLES2
-	if (pixel_mode == FONT_PIXEL_MODE_LCD)
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width / 3, height, 0, GL_RGB, GL_UNSIGNED_BYTE, buffer);
-	else
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, width, height, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, buffer);
-#else
-	if (pixel_mode == FONT_PIXEL_MODE_LCD)
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width / 3, height, 0, GL_RGB, GL_UNSIGNED_BYTE, buffer);
-	else
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, buffer);
-#endif
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-#ifndef USE_OPENGLES2
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-#endif
-
-	glyph->width = (pixel_mode == FONT_PIXEL_MODE_LCD ? width / 3 : width);
-	glyph->height = height;
-	glyph->pixel_mode = pixel_mode;
-
-	free(buffer);
-
-	glBindTexture(GL_TEXTURE_2D, previously_bound_texture);
-
-	return glyph;
+	return NULL;
 }
 
 void Backend_UnloadGlyph(Backend_Glyph *glyph)
