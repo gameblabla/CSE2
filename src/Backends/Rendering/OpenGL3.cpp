@@ -1,3 +1,5 @@
+// Dual OpenGL 3.2 and OpenGL ES 2.0 renderer
+
 #include "../Rendering.h"
 
 #include <stddef.h>
@@ -5,7 +7,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef USE_OPENGLES2
+#include <GLES2/gl2.h>
+#else
 #include <glad/glad.h>
+#endif
+
 #include "SDL.h"
 
 #include "../../WindowsWrapper.h"
@@ -67,7 +74,9 @@ static GLint program_colour_fill_uniform_colour;
 static GLint program_glyph_normal_uniform_colour;
 static GLint program_glyph_subpixel_part2_uniform_colour;
 
+#ifndef USE_OPENGLES2
 static GLuint vertex_array_id;
+#endif
 static GLuint vertex_buffer_id;
 static GLuint framebuffer_id;
 
@@ -78,6 +87,100 @@ static RenderMode last_render_mode;
 
 static Backend_Surface framebuffer;
 
+#ifdef USE_OPENGLES2
+static const GLchar *vertex_shader_plain = " \
+#version 100\n \
+attribute vec2 input_vertex_coordinates; \
+void main() \
+{ \
+	gl_Position = vec4(input_vertex_coordinates.x, input_vertex_coordinates.y, 0.0, 1.0); \
+} \
+";
+
+static const GLchar *vertex_shader_texture = " \
+#version 100\n \
+attribute vec2 input_vertex_coordinates; \
+attribute vec2 input_texture_coordinates; \
+varying vec2 texture_coordinates; \
+void main() \
+{ \
+	texture_coordinates = input_texture_coordinates; \
+	gl_Position = vec4(input_vertex_coordinates.x, input_vertex_coordinates.y, 0.0, 1.0); \
+} \
+";
+
+static const GLchar *fragment_shader_texture = " \
+#version 100\n \
+precision mediump float; \
+uniform sampler2D tex; \
+varying vec2 texture_coordinates; \
+void main() \
+{ \
+	gl_FragColor = texture2D(tex, texture_coordinates); \
+} \
+";
+
+static const GLchar *fragment_shader_texture_colour_key = " \
+#version 100\n \
+precision mediump float; \
+uniform sampler2D tex; \
+varying vec2 texture_coordinates; \
+void main() \
+{ \
+	vec4 colour = texture2D(tex, texture_coordinates); \
+\
+	if (colour.xyz == vec3(0.0f, 0.0f, 0.0f)) \
+		discard; \
+\
+	gl_FragColor = colour; \
+} \
+";
+
+static const GLchar *fragment_shader_colour_fill = " \
+#version 100\n \
+precision mediump float; \
+uniform vec4 colour; \
+void main() \
+{ \
+	gl_FragColor = colour; \
+} \
+";
+
+static const GLchar *fragment_shader_glyph_normal = " \
+#version 100\n \
+precision mediump float; \
+uniform sampler2D tex; \
+uniform vec4 colour; \
+varying vec2 texture_coordinates; \
+void main() \
+{ \
+	gl_FragColor = colour * vec4(1.0, 1.0, 1.0, texture2D(tex, texture_coordinates).r); \
+} \
+";
+
+static const GLchar *fragment_shader_glyph_subpixel_part1 = " \
+#version 100\n \
+precision mediump float; \
+uniform sampler2D tex; \
+varying vec2 texture_coordinates; \
+void main() \
+{ \
+	gl_FragColor = texture2D(tex, texture_coordinates); \
+} \
+";
+
+static const GLchar *fragment_shader_glyph_subpixel_part2 = " \
+#version 100\n \
+precision mediump float; \
+uniform sampler2D tex; \
+uniform vec4 colour; \
+varying vec2 texture_coordinates; \
+void main() \
+{ \
+	gl_FragColor = colour * texture2D(tex, texture_coordinates); \
+} \
+";
+#else
 static const GLchar *vertex_shader_plain = " \
 #version 150 core\n \
 in vec2 input_vertex_coordinates; \
@@ -170,6 +273,7 @@ void main() \
 	fragment = colour * texture(tex, texture_coordinates); \
 } \
 ";
+#endif
 /*
 static void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void* userParam)
 {
@@ -195,7 +299,12 @@ static GLuint CompileShader(const char *vertex_shader_source, const char *fragme
 
 	glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &shader_status);
 	if (shader_status != GL_TRUE)
+	{
+		char buffer[0x200];
+		glGetShaderInfoLog(vertex_shader, sizeof(buffer), NULL, buffer);
+		printf("Vertex shader: %s", buffer);
 		return 0;
+	}
 
 	glAttachShader(program_id, vertex_shader);
 
@@ -205,7 +314,12 @@ static GLuint CompileShader(const char *vertex_shader_source, const char *fragme
 
 	glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &shader_status);
 	if (shader_status != GL_TRUE)
+	{
+		char buffer[0x200];
+		glGetShaderInfoLog(fragment_shader, sizeof(buffer), NULL, buffer);
+		printf("Fragment shader: %s", buffer);
 		return 0;
+	}
 
 	glAttachShader(program_id, fragment_shader);
 
@@ -216,7 +330,12 @@ static GLuint CompileShader(const char *vertex_shader_source, const char *fragme
 
 	glGetProgramiv(program_id, GL_LINK_STATUS, &shader_status);
 	if (shader_status != GL_TRUE)
+	{
+		char buffer[0x200];
+		glGetProgramInfoLog(program_id, sizeof(buffer), NULL, buffer);
+		printf("Shader linker: %s", buffer);
 		return 0;
+	}
 
 	return program_id;
 }
@@ -271,10 +390,17 @@ static void FlushVertexBuffer(void)
 
 SDL_Window* Backend_CreateWindow(const char *title, int width, int height)
 {
+#ifdef USE_OPENGLES2
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+#else
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+#endif
 
 	return SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL);
 }
@@ -292,20 +418,33 @@ Backend_Surface* Backend_Init(SDL_Window *p_window)
 	{
 		if (SDL_GL_MakeCurrent(window, context) == 0)
 		{
+		#ifndef USE_OPENGLES2
 			if (gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress))
+		#endif
 			{
+			#ifndef USE_OPENGLES2
 				// Check if the platform supports OpenGL 3.2
 				if (GLAD_GL_VERSION_3_2)
+			#endif
 				{
+				#ifndef NDEBUG
+					printf("GL_VENDOR = %s\n", glGetString(GL_VENDOR));
+					printf("GL_RENDERER = %s\n", glGetString(GL_RENDERER));
+					printf("GL_VERSION = %s\n", glGetString(GL_VERSION));
+					printf("GL_SHADING_LANGUAGE_VERSION = %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
+				#endif
+
 					//glEnable(GL_DEBUG_OUTPUT);
 					//glDebugMessageCallback(MessageCallback, 0);
 
 					glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 					glClear(GL_COLOR_BUFFER_BIT);
 
+				#ifndef USE_OPENGLES2
 					// Set up Vertex Array Object
 					glGenVertexArrays(1, &vertex_array_id);
 					glBindVertexArray(vertex_array_id);
+				#endif
 
 					// Set up Vertex Buffer Object
 					glGenBuffers(1, &vertex_buffer_id);
@@ -343,12 +482,18 @@ Backend_Surface* Backend_Init(SDL_Window *p_window)
 						// Set up framebuffer screen texture (used for screen-to-surface blitting)
 						glGenTextures(1, &framebuffer.texture_id);
 						glBindTexture(GL_TEXTURE_2D, framebuffer.texture_id);
+					#ifdef USE_OPENGLES2
+						glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, window_width, window_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+					#else
 						glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, window_width, window_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+					#endif
 						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+					#ifndef USE_OPENGLES2
 						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+					#endif
 
 						framebuffer.width = window_width;
 						framebuffer.height = window_height;
@@ -378,7 +523,9 @@ Backend_Surface* Backend_Init(SDL_Window *p_window)
 						glDeleteProgram(program_texture);
 
 					glDeleteBuffers(1, &vertex_buffer_id);
+				#ifndef USE_OPENGLES2
 					glDeleteVertexArrays(1, &vertex_array_id);
+				#endif
 				}
 			}
 		}
@@ -400,7 +547,9 @@ void Backend_Deinit(void)
 	glDeleteProgram(program_texture_colour_key);
 	glDeleteProgram(program_texture);
 	glDeleteBuffers(1, &vertex_buffer_id);
+#ifndef USE_OPENGLES2
 	glDeleteVertexArrays(1, &vertex_array_id);
+#endif
 	SDL_GL_DeleteContext(context);
 }
 
@@ -475,12 +624,18 @@ Backend_Surface* Backend_CreateSurface(unsigned int width, unsigned int height)
 
 	glGenTextures(1, &surface->texture_id);
 	glBindTexture(GL_TEXTURE_2D, surface->texture_id);
+#ifdef USE_OPENGLES2
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+#else
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+#endif
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+#ifndef USE_OPENGLES2
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+#endif
 
 	surface->width = width;
 	surface->height = height;
@@ -684,19 +839,42 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 	if (glyph == NULL)
 		return NULL;
 
+#ifdef USE_OPENGLES2
+	const unsigned int destination_pitch = ((width * 3) + 3) & ~3;	// Round up to the nearest 4 (OpenGL needs this)
+#else
 	const unsigned int destination_pitch = (width + 3) & ~3;	// Round up to the nearest 4 (OpenGL needs this)
+#endif
 
 	unsigned char *buffer = (unsigned char*)malloc(destination_pitch * height);
 
 	switch (pixel_mode)
 	{
 		case FONT_PIXEL_MODE_LCD:
-		case FONT_PIXEL_MODE_GRAY:
 			for (unsigned int y = 0; y < height; ++y)
 			{
 				const unsigned char *source_pointer = pixels + y * pitch;
 				unsigned char *destination_pointer = buffer + y * destination_pitch;
 				memcpy(destination_pointer, source_pointer, width);
+			}
+
+			break;
+
+		case FONT_PIXEL_MODE_GRAY:
+			for (unsigned int y = 0; y < height; ++y)
+			{
+				const unsigned char *source_pointer = pixels + y * pitch;
+				unsigned char *destination_pointer = buffer + y * destination_pitch;
+
+			#ifdef USE_OPENGLES2
+				for (unsigned int x = 0; x < width; ++x)
+				{
+					*destination_pointer++ = *source_pointer++;
+					*destination_pointer++ = 0;
+					*destination_pointer++ = 0;
+				}
+			#else
+				memcpy(destination_pointer, source_pointer, width);
+			#endif
 			}
 
 			break;
@@ -708,7 +886,13 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 				unsigned char *destination_pointer = buffer + y * destination_pitch;
 
 				for (unsigned int x = 0; x < width; ++x)
+				{
 					*destination_pointer++ = (*source_pointer++ ? 0xFF : 0);
+				#ifdef USE_OPENGLES2
+					*destination_pointer++ = 0;
+					*destination_pointer++ = 0;
+				#endif
+				}
 			}
 
 			break;
@@ -719,15 +903,25 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 
 	glGenTextures(1, &glyph->texture_id);
 	glBindTexture(GL_TEXTURE_2D, glyph->texture_id);
+#ifdef USE_OPENGLES2
+	if (pixel_mode == FONT_PIXEL_MODE_LCD)
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width / 3, height, 0, GL_RGB, GL_UNSIGNED_BYTE, buffer);
+	else
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, buffer);	// OpenGL ES 2.0 doesn't support GL_RED
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, buffer);
+#else
 	if (pixel_mode == FONT_PIXEL_MODE_LCD)
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width / 3, height, 0, GL_RGB, GL_UNSIGNED_BYTE, buffer);
 	else
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, buffer);
+#endif
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+#ifndef USE_OPENGLES2
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+#endif
 
 	glyph->width = (pixel_mode == FONT_PIXEL_MODE_LCD ? width / 3 : width);
 	glyph->height = height;

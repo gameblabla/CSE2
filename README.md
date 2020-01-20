@@ -64,6 +64,7 @@ Name | Function
 `-DFIX_BUGS=ON` | Fix various bugs in the game
 `-DDEBUG_SAVE=ON` | Re-enable the ability to drag-and-drop save files onto the window
 `-DRENDERER=OpenGL3` | Use the hardware-accelerated OpenGL 3.2 renderer
+`-DRENDERER=OpenGLES2` | Use the hardware-accelerated OpenGL ES 2.0 renderer
 `-DRENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default)
 `-DRENDERER=SDLSurface` | Use the software-rendered SDL2 Surface API renderer
 `-DRENDERER=Software` | Use the handwritten software renderer
@@ -97,6 +98,7 @@ Name | Function
 `WINDOWS=1` | Build for Windows
 `DEBUG_SAVE=1` | Re-enable the ability to drag-and-drop save files onto the window
 `RENDERER=OpenGL3` | Use the hardware-accelerated OpenGL 3.2 renderer
+`RENDERER=OpenGLES2` | Use the hardware-accelerated OpenGL ES 2.0 renderer
 `RENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default)
 `RENDERER=SDLSurface` | Use the software-rendered SDL2 Surface API renderer
 `RENDERER=Software` | Use the hand-written software renderer

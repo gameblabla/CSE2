@@ -14,7 +14,7 @@ set(ASSETS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/assets")
 option(JAPANESE "Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)" OFF)
 option(FIX_BUGS "Fix various bugs in the game" OFF)
 option(DEBUG_SAVE "Re-enable the ability to drag-and-drop save files onto the window" OFF)
-set(RENDERER "SDLTexture" CACHE STRING "Which renderer the game should use: 'OpenGL3' for an OpenGL 3.2 renderer, 'SDLTexture' for SDL2's hardware-accelerated Texture API, 'SDLSurface' for SDL2's software-rendered Surface API, or 'Software' for a handwritten software renderer")
+set(RENDERER "SDLTexture" CACHE STRING "Which renderer the game should use: 'OpenGL3' for an OpenGL 3.2 renderer, 'OpenGLES2' for an OpenGL ES 2.0 renderer, 'SDLTexture' for SDL2's hardware-accelerated Texture API, 'SDLSurface' for SDL2's software-rendered Surface API, or 'Software' for a handwritten software renderer")
 
 option(WARNINGS "Enable common compiler warnings (for GCC-compatible compilers and MSVC only)" OFF)
 option(WARNINGS_ALL "Enable ALL compiler warnings (for Clang and MSVC only)" OFF)
@@ -337,6 +337,8 @@ endif()
 
 if(RENDERER MATCHES "OpenGL3")
 	target_sources(CSE2 PRIVATE "src/Backends/Rendering/OpenGL3.cpp")
+elseif(RENDERER MATCHES "OpenGLES2")
+	target_sources(CSE2 PRIVATE "src/Backends/Rendering/OpenGLES2.cpp")
 elseif(RENDERER MATCHES "SDLTexture")
 	target_sources(CSE2 PRIVATE "src/Backends/Rendering/SDLTexture.cpp")
 elseif(RENDERER MATCHES "SDLSurface")
@@ -502,6 +504,12 @@ if(RENDERER MATCHES "OpenGL3")
 
 	find_package(OpenGL REQUIRED)
 	target_link_libraries(CSE2 OpenGL::GL)
+endif()
+
+if(RENDERER MATCHES "OpenGLES2")
+	find_package(OpenGLES2 REQUIRED)
+	target_include_directories(CSE2 PRIVATE ${OPENGLES2_INCLUDE_DIR})
+	target_link_libraries(CSE2 ${OPENGLES2_LIBRARIES})
 endif()
 
 ##
