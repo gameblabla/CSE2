@@ -48,8 +48,6 @@ static struct
 	BOOL bSystem;	// Basically a 'do not regenerate' flag
 } surface_metadata[SURFACE_ID_MAX];
 
-#define FRAMERATE 20
-
 BOOL Flip_SystemTask(void)
 {
 	static unsigned long timePrev;
@@ -63,7 +61,7 @@ BOOL Flip_SystemTask(void)
 		// Framerate limiter
 		timeNow = SDL_GetTicks();
 
-		if (SDL_TICKS_PASSED(timeNow, timePrev + FRAMERATE))
+		if (SDL_TICKS_PASSED(timeNow, timePrev + 20))
 			break;
 
 		SDL_Delay(1);
@@ -72,7 +70,7 @@ BOOL Flip_SystemTask(void)
 	if (SDL_TICKS_PASSED(timeNow, timePrev + 100))
 		timePrev = timeNow;	// If the timer is freakishly out of sync, panic and reset it, instead of spamming frames for who-knows how long
 	else
-		timePrev += FRAMERATE;
+		timePrev += 20;
 
 	Backend_DrawScreen();
 
