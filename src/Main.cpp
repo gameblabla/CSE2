@@ -133,11 +133,11 @@ int main(int argc, char *argv[])
 				return 0;
 
 		#ifdef FIX_BUGS
-			if (!StartDirectDraw(window, conf.display_mode, conf.b60fps, conf.bVsync))
+			if (!StartDirectDraw(window, conf.display_mode, conf.b60fps, conf.bSmoothScrolling, conf.bVsync))
 				return 0;
 		#else
 			// Doesn't handle StartDirectDraw failing
-			StartDirectDraw(window, conf.display_mode, conf.b60fps, conf.bVsync);
+			StartDirectDraw(window, conf.display_mode, conf.b60fps, conf.bSmoothScrolling, conf.bVsync);
 		#endif
 
 			break;
@@ -153,11 +153,11 @@ int main(int argc, char *argv[])
 				return 0;
 
 		#ifdef FIX_BUGS
-			if (!StartDirectDraw(window, 0, conf.b60fps, conf.bVsync))
+			if (!StartDirectDraw(window, 0, conf.b60fps, conf.bSmoothScrolling, conf.bVsync))
 				return 0;
 		#else
 			// Doesn't handle StartDirectDraw failing
-			StartDirectDraw(window, 0, conf.b60fps, conf.bVsync);
+			StartDirectDraw(window, 0, conf.b60fps, conf.bSmoothScrolling, conf.bVsync);
 		#endif
 
 			bFullscreen = TRUE;

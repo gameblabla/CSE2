@@ -110,9 +110,10 @@ SDL_Window* CreateWindow(const char *title, int width, int height)
 	return Backend_CreateWindow(title, width, height);
 }
 
-BOOL StartDirectDraw(SDL_Window *window, int lMagnification, BOOL b60fps, BOOL bVsync)
+BOOL StartDirectDraw(SDL_Window *window, int lMagnification, BOOL b60fps, BOOL bSmoothScrolling, BOOL bVsync)
 {
 	gb60fps = b60fps;
+	gbSmoothScrolling = bSmoothScrolling;
 
 	memset(surface_metadata, 0, sizeof(surface_metadata));
 
