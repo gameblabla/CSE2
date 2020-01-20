@@ -1,6 +1,9 @@
 #include "../Rendering.h"
 
 #include <stddef.h>
+#ifndef NDEBUG
+#include <stdio.h>
+#endif
 #include <stdlib.h>
 #include <string.h>
 
@@ -41,10 +44,27 @@ SDL_Window* Backend_CreateWindow(const char *title, int width, int height)
 
 Backend_Surface* Backend_Init(SDL_Window *window, unsigned int internal_screen_width, unsigned int internal_screen_height, BOOL vsync)
 {
+#ifndef NDEBUG
+	puts("Available SDL2 render drivers:");
+
+	for (int i = 0; i < SDL_GetNumRenderDrivers(); ++i)
+	{
+		SDL_RendererInfo info;
+		SDL_GetRenderDriverInfo(i, &info);
+		puts(info.name);
+	}
+#endif
+
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE | (vsync ? SDL_RENDERER_PRESENTVSYNC : 0));
 
 	if (renderer == NULL)
 		return NULL;
+
+#ifndef NDEBUG
+	SDL_RendererInfo info;
+	SDL_GetRendererInfo(renderer, &info);
+	printf("Selected SDL2 render driver: %s\n", info.name);
+#endif
 
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
 	texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STREAMING, internal_screen_width, internal_screen_height);
