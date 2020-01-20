@@ -8,9 +8,9 @@ if((${CMAKE_VERSION} VERSION_EQUAL 3.11) OR (${CMAKE_VERSION} VERSION_GREATER 3.
 	cmake_policy(SET CMP0072 NEW)
 endif()
 
-option(WARNINGS "Enable common compiler warnings (for gcc-compatible compilers and MSVC only)" OFF)
-option(WARNINGS_ALL "Enable ALL compiler warnings (for clang and MSVC only)" OFF)
-option(WARNINGS_FATAL "Stop compilation on any compiler warning (for gcc-compatible compilers and MSVC only)" OFF)
+option(WARNINGS "Enable common compiler warnings (for GCC-compatible compilers and MSVC only)" OFF)
+option(WARNINGS_ALL "Enable ALL compiler warnings (for Clang and MSVC only)" OFF)
+option(WARNINGS_FATAL "Stop compilation on any compiler warning (for GCC-compatible compilers and MSVC only)" OFF)
 option(FORCE_LOCAL_LIBS "Compile the built-in version of FLTK instead of using the system-provided one" OFF)
 
 project(DoConfig LANGUAGES CXX)
@@ -21,13 +21,13 @@ message(STATUS "Compiler ID : ${CMAKE_CXX_COMPILER_ID}")
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 	# Using Clang (this is a match so that we also get "AppleClang" which is the Apple-provided Clang
 	set(COMPILER_IS_CLANG true)
-	message(STATUS "Compiling with clang")
+	message(STATUS "Compiling with Clang")
 endif()
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	# Using GCC
 	set(COMPILER_IS_GCC true)
-	message(STATUS "Compiling with gcc")
+	message(STATUS "Compiling with GCC")
 endif()
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
