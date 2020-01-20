@@ -19,6 +19,7 @@ extern int magnification;
 extern BOOL fullscreen;
 
 extern BOOL gb60fps;
+extern BOOL gbSmoothScrolling;
 
 typedef enum SurfaceID
 {

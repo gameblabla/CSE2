@@ -35,6 +35,7 @@ int magnification;
 BOOL fullscreen;
 
 BOOL gb60fps;
+BOOL gbSmoothScrolling;
 
 static Backend_Surface *framebuffer;
 
@@ -734,11 +735,10 @@ int RestoreSurfaces(void)	// Guessed function name - this doesn't exist in the L
 
 int SubpixelToScreenCoord(int coord)
 {
-#ifdef SMOOTH_SPRITE_MOVEMENT
-	return (coord * magnification) / 0x200;
-#else
-	return (coord / (0x200 / SPRITE_SCALE)) * (magnification / SPRITE_SCALE);
-#endif
+	if (gbSmoothScrolling)
+		return (coord * magnification) / 0x200;
+	else
+		return (coord / (0x200 / SPRITE_SCALE)) * (magnification / SPRITE_SCALE);
 }
 
 int PixelToScreenCoord(int coord)

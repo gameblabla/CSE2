@@ -36,6 +36,7 @@ struct CONFIG
 	BOOL bJoystick;
 	BOOL b60fps;
 	BOOL bVsync;
+	BOOL bSmoothScrolling;
 	CONFIG_BINDING bindings[BINDING_TOTAL];
 };
 

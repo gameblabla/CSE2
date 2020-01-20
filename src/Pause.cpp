@@ -440,6 +440,23 @@ static int Callback_Resolution(Option *options, size_t total_options, size_t sel
 	return -1;
 }
 
+static int Callback_SmoothScrolling(Option *options, size_t total_options, size_t selected_option, long key)
+{
+	(void)total_options;
+	(void)key;
+
+	const char *strings[] = {"Off", "On"};
+
+	options[selected_option].value = (options[selected_option].value + 1) % (sizeof(strings) / sizeof(strings[0]));
+
+	gbSmoothScrolling = options[selected_option].value;
+
+	options[selected_option].attribute = strings[options[selected_option].value];
+
+	PlaySoundObject(SND_SWITCH_WEAPON, 1);
+	return -1;
+}
+
 static int Callback_Options(Option *options, size_t total_options, size_t selected_option, long key)
 {
 	(void)options;
@@ -454,7 +471,8 @@ static int Callback_Options(Option *options, size_t total_options, size_t select
 		{"Controls (Gamepad)", Callback_ControlsController, NULL, NULL, 0},
 		{"Framerate", Callback_Framerate, NULL, NULL, 0},
 		{"V-sync", Callback_Vsync, NULL, NULL, 0},
-		{"Resolution", Callback_Resolution, NULL, NULL, 0}
+		{"Resolution", Callback_Resolution, NULL, NULL, 0},
+		{"Smooth Scrolling", Callback_SmoothScrolling, NULL, NULL, 0}
 	};
 
 	CONFIG conf;
@@ -491,6 +509,9 @@ static int Callback_Options(Option *options, size_t total_options, size_t select
 			break;
 	}
 
+	submenu_options[5].value = conf.bSmoothScrolling;
+	submenu_options[5].attribute = conf.bSmoothScrolling ? "On" : "Off";
+
 	PlaySoundObject(5, 1);
 
 	const int return_value = EnterOptionsMenu("OPTIONS", submenu_options, sizeof(submenu_options) / sizeof(submenu_options[0]), -70, TRUE);
@@ -500,6 +521,7 @@ static int Callback_Options(Option *options, size_t total_options, size_t select
 	conf.b60fps = submenu_options[2].value;
 	conf.bVsync = submenu_options[3].value;
 	conf.display_mode = submenu_options[4].value;
+	conf.bSmoothScrolling = submenu_options[5].value;
 
 	memcpy(conf.bindings, bindings, sizeof(bindings));
 

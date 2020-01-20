@@ -11,7 +11,7 @@
 #include "Main.h"
 
 static const char* const config_filename = "Config.dat";	// Not the original name
-static const char* const config_magic = "CSE2E   20200104";	// Not the original name
+static const char* const config_magic = "CSE2E   20200120";	// Not the original name
 
 BOOL LoadConfigData(CONFIG *conf)
 {
@@ -31,7 +31,7 @@ BOOL LoadConfigData(CONFIG *conf)
 	fread(conf->proof, sizeof(conf->proof), 1, fp);
 	fread(conf->font_name, sizeof(conf->font_name), 1, fp);
 
-	// Read display mode (320x240, 640x480, 24-bit fullscreen, 32-bit fullscreen) TODO: add more things?
+	// Read display mode
 	conf->display_mode = fgetc(fp);
 
 	// Read 'joystick enabled' flag
@@ -42,6 +42,9 @@ BOOL LoadConfigData(CONFIG *conf)
 
 	// Read vsync toggle
 	conf->bVsync = fgetc(fp);
+
+	// Read smooth-scrolling toggle
+	conf->bSmoothScrolling = fgetc(fp);
 
 	// Read key-bindings
 	for (size_t i = 0; i < BINDING_TOTAL; ++i)
@@ -74,23 +77,26 @@ BOOL SaveConfigData(const CONFIG *conf)
 	if (fp == NULL)
 		return FALSE;
 
-	// Read the version id and font name
+	// Write the version id and font name
 	fwrite(conf->proof, sizeof(conf->proof), 1, fp);
 	fwrite(conf->font_name, sizeof(conf->font_name), 1, fp);
 
-	// Read display mode (320x240, 640x480, 24-bit fullscreen, 32-bit fullscreen) TODO: add more things?
+	// Write display mode
 	fputc(conf->display_mode, fp);
 
-	// Read 'joystick enabled' flag
+	// Write 'joystick enabled' flag
 	fputc(conf->bJoystick, fp);
 
-	// Read framerate toggle
+	// Write framerate toggle
 	fputc(conf->b60fps, fp);
 
-	// Read vsync toggle
+	// Write vsync toggle
 	fputc(conf->bVsync, fp);
 
-	// Read key-bindings
+	// Write smooth-scrolling toggle
+	fputc(conf->bSmoothScrolling, fp);
+
+	// Write key-bindings
 	for (size_t i = 0; i < BINDING_TOTAL; ++i)
 	{
 		File_WriteLE32(conf->bindings[i].keyboard, fp);

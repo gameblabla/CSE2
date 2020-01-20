@@ -9,7 +9,6 @@ ASSETS_DIRECTORY = assets
 # Default options
 FIX_BUGS = 1
 RENDERER = SDLTexture
-SMOOTH_SPRITE_MOVEMENT ?= 1
 
 ALL_CFLAGS = $(CFLAGS)
 ALL_CXXFLAGS = $(CXXFLAGS)
@@ -234,10 +233,6 @@ ifeq ($(AUDIO_PXTONE), 1)
     external/clownaudio/decoders/libs/pxtone/shim.cpp
 
   DEFINES += -DUSE_PXTONE
-endif
-
-ifeq ($(SMOOTH_SPRITE_MOVEMENT), 1)
-  DEFINES += -DSMOOTH_SPRITE_MOVEMENT
 endif
 
 RESOURCES = 
