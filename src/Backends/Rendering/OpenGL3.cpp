@@ -755,11 +755,7 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 	if (glyph == NULL)
 		return NULL;
 
-#ifdef USE_OPENGLES2
-	const unsigned int destination_pitch = ((width * 3) + 3) & ~3;	// Round up to the nearest 4 (OpenGL needs this)
-#else
 	const unsigned int destination_pitch = (width + 3) & ~3;	// Round up to the nearest 4 (OpenGL needs this)
-#endif
 
 	unsigned char *buffer = (unsigned char*)malloc(destination_pitch * height);
 
@@ -771,16 +767,7 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 				const unsigned char *source_pointer = pixels + y * pitch;
 				unsigned char *destination_pointer = buffer + y * destination_pitch;
 
-			#ifdef USE_OPENGLES2
-				for (unsigned int x = 0; x < width; ++x)
-				{
-					*destination_pointer++ = *source_pointer++;
-					*destination_pointer++ = 0;
-					*destination_pointer++ = 0;
-				}
-			#else
 				memcpy(destination_pointer, source_pointer, width);
-			#endif
 			}
 
 			break;
@@ -792,13 +779,7 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 				unsigned char *destination_pointer = buffer + y * destination_pitch;
 
 				for (unsigned int x = 0; x < width; ++x)
-				{
 					*destination_pointer++ = (*source_pointer++ ? 0xFF : 0);
-				#ifdef USE_OPENGLES2
-					*destination_pointer++ = 0;
-					*destination_pointer++ = 0;
-				#endif
-				}
 			}
 
 			break;
@@ -810,7 +791,7 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 	glGenTextures(1, &glyph->texture_id);
 	glBindTexture(GL_TEXTURE_2D, glyph->texture_id);
 #ifdef USE_OPENGLES2
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, buffer);	// OpenGL ES 2.0 doesn't support GL_RED
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, width, height, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, buffer);
 #else
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, buffer);
 #endif
