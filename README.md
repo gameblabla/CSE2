@@ -88,6 +88,7 @@ Name | Function
 `-DFIX_BUGS=ON` | Enabled by default - Fix various bugs in the game
 `-DDEBUG_SAVE=ON` | Re-enable the ability to drag-and-drop save files onto the window
 `-DRENDERER=OpenGL3` | Use the hardware-accelerated OpenGL 3.2 renderer
+`-DRENDERER=OpenGLES2` | Use the hardware-accelerated OpenGL ES 2.0 renderer
 `-DRENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default)
 `-DRENDERER=Software` | Use the handwritten software renderer
 `-DAUDIO_OGG=ON` | Enable support for Ogg Vorbis music/SFX
@@ -124,6 +125,7 @@ Name | Function
 `WINDOWS=1` | Build for Windows
 `DEBUG_SAVE=1` | Re-enable the ability to drag-and-drop save files onto the window
 `RENDERER=OpenGL3` | Use the hardware-accelerated OpenGL 3.2 renderer
+`RENDERER=OpenGLES2` | Use the hardware-accelerated OpenGL ES 2.0 renderer
 `RENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default)
 `RENDERER=Software` | Use the hand-written software renderer
 `AUDIO_OGG=1` | Enable support for Ogg Vorbis music/SFX

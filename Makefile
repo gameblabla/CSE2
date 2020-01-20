@@ -253,6 +253,11 @@ ifeq ($(RENDERER), OpenGL3)
   else
     CSE2_LIBS += -lGL -ldl
   endif
+else ifeq ($(RENDERER), OpenGLES2)
+  SOURCES += src/Backends/Rendering/OpenGLES2.cpp
+  CSE2_CFLAGS += $(shell $(PKGCONFIG) --cflags glesv2)
+  CSE2_CXXFLAGS += $(shell $(PKGCONFIG) --cflags glesv2)
+  CSE2_LIBS += $(shell $(PKGCONFIG) --libs glesv2)
 else ifeq ($(RENDERER), SDLTexture)
   SOURCES += src/Backends/Rendering/SDLTexture.cpp
 else ifeq ($(RENDERER), Software)
