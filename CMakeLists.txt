@@ -21,6 +21,10 @@ option(WARNINGS_ALL "Enable ALL compiler warnings (for Clang and MSVC only)" OFF
 option(WARNINGS_FATAL "Stop compilation on any compiler warning (for GCC-compatible compilers and MSVC only)" OFF)
 option(FORCE_LOCAL_LIBS "Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones" OFF)
 
+list(APPEND CMAKE_MODULE_PATH
+	"${CMAKE_SOURCE_DIR}/cmake"
+)
+
 project(CSE2 LANGUAGES C CXX)
 
 message(STATUS "Compiler ID : ${CMAKE_CXX_COMPILER_ID}")
