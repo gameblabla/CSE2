@@ -316,10 +316,10 @@ Backend_Surface* Backend_Init(SDL_Window *p_window, unsigned int internal_screen
 			if (gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress))
 		#endif
 			{
-		#ifndef USE_OPENGLES2
+			#ifndef USE_OPENGLES2
 				// Check if the platform supports OpenGL 3.2
 				if (GLAD_GL_VERSION_3_2)
-		#endif
+			#endif
 				{
 				#ifndef NDEBUG
 					printf("GL_VENDOR = %s\n", glGetString(GL_VENDOR));
