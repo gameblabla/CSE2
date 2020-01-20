@@ -839,42 +839,19 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 	if (glyph == NULL)
 		return NULL;
 
-#ifdef USE_OPENGLES2
-	const unsigned int destination_pitch = ((width * 3) + 3) & ~3;	// Round up to the nearest 4 (OpenGL needs this)
-#else
 	const unsigned int destination_pitch = (width + 3) & ~3;	// Round up to the nearest 4 (OpenGL needs this)
-#endif
 
 	unsigned char *buffer = (unsigned char*)malloc(destination_pitch * height);
 
 	switch (pixel_mode)
 	{
 		case FONT_PIXEL_MODE_LCD:
-			for (unsigned int y = 0; y < height; ++y)
-			{
-				const unsigned char *source_pointer = pixels + y * pitch;
-				unsigned char *destination_pointer = buffer + y * destination_pitch;
-				memcpy(destination_pointer, source_pointer, width);
-			}
-
-			break;
-
 		case FONT_PIXEL_MODE_GRAY:
 			for (unsigned int y = 0; y < height; ++y)
 			{
 				const unsigned char *source_pointer = pixels + y * pitch;
 				unsigned char *destination_pointer = buffer + y * destination_pitch;
-
-			#ifdef USE_OPENGLES2
-				for (unsigned int x = 0; x < width; ++x)
-				{
-					*destination_pointer++ = *source_pointer++;
-					*destination_pointer++ = 0;
-					*destination_pointer++ = 0;
-				}
-			#else
 				memcpy(destination_pointer, source_pointer, width);
-			#endif
 			}
 
 			break;
@@ -886,13 +863,7 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 				unsigned char *destination_pointer = buffer + y * destination_pitch;
 
 				for (unsigned int x = 0; x < width; ++x)
-				{
 					*destination_pointer++ = (*source_pointer++ ? 0xFF : 0);
-				#ifdef USE_OPENGLES2
-					*destination_pointer++ = 0;
-					*destination_pointer++ = 0;
-				#endif
-				}
 			}
 
 			break;
@@ -907,8 +878,7 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 	if (pixel_mode == FONT_PIXEL_MODE_LCD)
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width / 3, height, 0, GL_RGB, GL_UNSIGNED_BYTE, buffer);
 	else
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, buffer);	// OpenGL ES 2.0 doesn't support GL_RED
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, buffer);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, width, height, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, buffer);
 #else
 	if (pixel_mode == FONT_PIXEL_MODE_LCD)
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width / 3, height, 0, GL_RGB, GL_UNSIGNED_BYTE, buffer);
