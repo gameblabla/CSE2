@@ -1,6 +1,9 @@
 #include "../Rendering.h"
 
 #include <stddef.h>
+#ifndef NDEBUG
+#include <stdio.h>
+#endif
 #include <stdlib.h>
 
 #include "SDL.h"
@@ -58,10 +61,27 @@ SDL_Window* Backend_CreateWindow(const char *title, int width, int height)
 
 Backend_Surface* Backend_Init(SDL_Window *window)
 {
+#ifndef NDEBUG
+	puts("Available SDL2 render drivers:");
+
+	for (int i = 0; i < SDL_GetNumRenderDrivers(); ++i)
+	{
+		SDL_RendererInfo info;
+		SDL_GetRenderDriverInfo(i, &info);
+		puts(info.name);
+	}
+#endif
+
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
 
 	if (renderer == NULL)
 		return NULL;
+
+#ifndef NDEBUG
+	SDL_RendererInfo info;
+	SDL_GetRendererInfo(renderer, &info);
+	printf("Selected SDL2 render driver: %s\n", info.name);
+#endif
 
 	int width, height;
 	SDL_GetRendererOutputSize(renderer, &width, &height);
