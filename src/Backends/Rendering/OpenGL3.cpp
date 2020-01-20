@@ -790,6 +790,9 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 		#else
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, buffer);
 		#endif
+
+			free(buffer);
+
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -798,7 +801,7 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 		#endif
 
-			free(buffer);
+			glBindTexture(GL_TEXTURE_2D, previously_bound_texture);
 
 			glyph->width = width;
 			glyph->height = height;
