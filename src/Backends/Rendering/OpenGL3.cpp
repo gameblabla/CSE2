@@ -93,7 +93,7 @@ static const GLchar *vertex_shader_plain = " \
 attribute vec2 input_vertex_coordinates; \
 void main() \
 { \
-	gl_Position = vec4(input_vertex_coordinates.x, input_vertex_coordinates.y, 0.0, 1.0); \
+	gl_Position = vec4(input_vertex_coordinates.xy, 0.0, 1.0); \
 } \
 ";
 
@@ -105,7 +105,7 @@ varying vec2 texture_coordinates; \
 void main() \
 { \
 	texture_coordinates = input_texture_coordinates; \
-	gl_Position = vec4(input_vertex_coordinates.x, input_vertex_coordinates.y, 0.0, 1.0); \
+	gl_Position = vec4(input_vertex_coordinates.xy, 0.0, 1.0); \
 } \
 ";
 
@@ -186,7 +186,7 @@ static const GLchar *vertex_shader_plain = " \
 in vec2 input_vertex_coordinates; \
 void main() \
 { \
-	gl_Position = vec4(input_vertex_coordinates.x, input_vertex_coordinates.y, 0.0, 1.0); \
+	gl_Position = vec4(input_vertex_coordinates.xy, 0.0, 1.0); \
 } \
 ";
 
@@ -198,7 +198,7 @@ out vec2 texture_coordinates; \
 void main() \
 { \
 	texture_coordinates = input_texture_coordinates; \
-	gl_Position = vec4(input_vertex_coordinates.x, input_vertex_coordinates.y, 0.0, 1.0); \
+	gl_Position = vec4(input_vertex_coordinates.xy, 0.0, 1.0); \
 } \
 ";
 
