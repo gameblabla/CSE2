@@ -70,14 +70,15 @@ BOOL InitDirectInput(HINSTANCE hinst, HWND hWnd)
 #endif
 		return FALSE;
 
-	if (!HookAllDirectInputDevices(hWnd))
+	if (!HookDirectInputDevice(hWnd))
 		return FALSE;
 
 	return TRUE;
 }
 
-// The original name for this function and its variables are unknown
-BOOL HookAllDirectInputDevices(HWND hWnd)
+// The original name for this function and its variables are unknown.
+// This function finds and hooks the first available DirectInput device.
+BOOL HookDirectInputDevice(HWND hWnd)
 {
 	DirectInputPair directinput_objects;
 
@@ -110,7 +111,7 @@ BOOL HookAllDirectInputDevices(HWND hWnd)
 	return TRUE;
 }
 
-// The original name for this function and its variables are unknown
+// The original names for this function and its variables are unknown
 BOOL __stdcall EnumDevices_Callback(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef)
 {
 	static int already_ran;
@@ -126,7 +127,7 @@ BOOL __stdcall EnumDevices_Callback(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef)
 	if (directinput_objects->lpDI->CreateDevice(lpddi->guidInstance, &device, NULL) != DI_OK)
 	{
 		directinput_objects->device = NULL;
-		return TRUE;
+		return DIENUM_CONTINUE;
 	}
 
 	static LPDIRECTINPUTDEVICE2A _joystick;
@@ -135,7 +136,7 @@ BOOL __stdcall EnumDevices_Callback(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef)
 	if (FAILED(res))
 	{
 		joystick = NULL;
-		return TRUE;
+		return DIENUM_CONTINUE;
 	}
 
 	if (device != NULL)
@@ -154,7 +155,7 @@ BOOL __stdcall EnumDevices_Callback(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef)
 #endif
 	OutputDebugStringA(string);
 
-	return FALSE;
+	return DIENUM_STOP;
 }
 
 BOOL GetJoystickStatus(JOYSTICK_STATUS *status)
