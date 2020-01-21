@@ -25,6 +25,9 @@ void ReleaseDirectInput(void)
 	SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
 }
 
+// It looks like Pixel declared his functions early, so he could forward-reference
+BOOL HookDirectInputDevice(void);
+
 BOOL InitDirectInput(void)
 {
 	SDL_InitSubSystem(SDL_INIT_JOYSTICK);
@@ -40,6 +43,11 @@ BOOL InitDirectInput(void)
 BOOL HookDirectInputDevice(void)
 {
 	int i;
+
+#ifndef NDEBUG
+	for (i = 0; i < SDL_NumJoysticks(); ++i)
+		printf("Joystick #%d name: %s\n", i, SDL_JoystickNameForIndex(i));
+#endif
 
 	// Open first available joystick
 	for (i = 0; i < SDL_NumJoysticks(); ++i)
