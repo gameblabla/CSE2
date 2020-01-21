@@ -29,11 +29,15 @@ BOOL InitDirectInput(void)
 {
 	SDL_InitSubSystem(SDL_INIT_JOYSTICK);
 
+	if (!HookDirectInputDevice())
+		return FALSE;
+
 	return TRUE;
 }
 
-// The original name for this function and its variables are unknown
-BOOL HookAllDirectInputDevices(void)
+// The original name for this function and its variables are unknown.
+// This function finds and hooks the first available DirectInput device (or SDL Joystick, in this case).
+BOOL HookDirectInputDevice(void)
 {
 	int i;
 
