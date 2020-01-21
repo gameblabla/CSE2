@@ -116,6 +116,11 @@ int main(int argc, char *argv[])
 
 	RECT unused_rect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
+#ifdef _WIN32
+	SDL_SetHint(SDL_HINT_WINDOWS_INTRESOURCE_ICON, "0");
+	SDL_SetHint(SDL_HINT_WINDOWS_INTRESOURCE_ICON_SMALL, "1");
+#endif
+
 	SDL_InitSubSystem(SDL_INIT_VIDEO);
 
 	SDL_Window *window;
@@ -176,12 +181,14 @@ int main(int argc, char *argv[])
 	unsigned int image_height;
 	char image_path[MAX_PATH];
 
+#ifndef _WIN32	// On Windows, we use native icons instead (so we can give the taskbar and window separate icons, like the original EXE does)
 	sprintf(image_path, "%s/Resource/ICON/ICON_MINI.png", gDataPath);
 	lodepng_decode32_file(&image_buffer, &image_width, &image_height, image_path);
 	SDL_Surface *icon_surface = SDL_CreateRGBSurfaceWithFormatFrom(image_buffer, image_width, image_height, 32, image_width * 4, SDL_PIXELFORMAT_RGBA32);
 	SDL_SetWindowIcon(window, icon_surface);
 	SDL_FreeSurface(icon_surface);
 	free(image_buffer);
+#endif
 
 	sprintf(image_path, "%s/Resource/CURSOR/CURSOR_NORMAL.png", gDataPath);
 	lodepng_decode32_file(&image_buffer, &image_width, &image_height, image_path);
