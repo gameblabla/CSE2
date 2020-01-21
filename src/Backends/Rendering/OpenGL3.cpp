@@ -17,6 +17,8 @@
 
 #include "../../WindowsWrapper.h"
 
+#define TOTAL_VBOS 2
+
 typedef enum RenderMode
 {
 	MODE_BLANK,
@@ -77,7 +79,7 @@ static GLint program_glyph_subpixel_part2_uniform_colour;
 #ifndef USE_OPENGLES2
 static GLuint vertex_array_id;
 #endif
-static GLuint vertex_buffer_id;
+static GLuint vertex_buffer_ids[TOTAL_VBOS];
 static GLuint framebuffer_id;
 
 static VertexBufferSlot *local_vertex_buffer;
@@ -358,17 +360,25 @@ static VertexBufferSlot* GetVertexBufferSlot(void)
 
 static void FlushVertexBuffer(void)
 {
-	static unsigned long vertex_buffer_size = 0;
+	static unsigned long vertex_buffer_size[TOTAL_VBOS];
+	static unsigned int current_vertex_buffer = 0;
 
-	if (local_vertex_buffer_size > vertex_buffer_size)
+	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_ids[current_vertex_buffer]);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, vertex_coordinate));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texture_coordinate));
+
+	if (local_vertex_buffer_size > vertex_buffer_size[current_vertex_buffer])
 	{
-		vertex_buffer_size = local_vertex_buffer_size;
-		glBufferData(GL_ARRAY_BUFFER, vertex_buffer_size * sizeof(VertexBufferSlot), local_vertex_buffer, GL_STREAM_DRAW);
+		vertex_buffer_size[current_vertex_buffer] = local_vertex_buffer_size;
+		glBufferData(GL_ARRAY_BUFFER, vertex_buffer_size[current_vertex_buffer] * sizeof(VertexBufferSlot), local_vertex_buffer, GL_STREAM_DRAW);
 	}
 	else
 	{
 		glBufferSubData(GL_ARRAY_BUFFER, 0, current_vertex_buffer_slot * sizeof(VertexBufferSlot), local_vertex_buffer);
 	}
+
+	if (++current_vertex_buffer >= TOTAL_VBOS)
+		current_vertex_buffer = 0;
 
 	if (last_render_mode == MODE_DRAW_GLYPH_LCD)
 	{
@@ -453,14 +463,11 @@ Backend_Surface* Backend_Init(SDL_Window *p_window)
 					glBindVertexArray(vertex_array_id);
 				#endif
 
-					// Set up Vertex Buffer Object
-					glGenBuffers(1, &vertex_buffer_id);
-					glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_id);
+					// Set up Vertex Buffer Objects
+					glGenBuffers(TOTAL_VBOS, vertex_buffer_ids);
 
 					// Set up the vertex attributes
 					glEnableVertexAttribArray(1);
-					glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, vertex_coordinate));
-					glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texture_coordinate));
 
 					// Set up our shaders
 					program_texture = CompileShader(vertex_shader_texture, fragment_shader_texture);
@@ -524,7 +531,7 @@ Backend_Surface* Backend_Init(SDL_Window *p_window)
 					if (program_texture != 0)
 						glDeleteProgram(program_texture);
 
-					glDeleteBuffers(1, &vertex_buffer_id);
+					glDeleteBuffers(TOTAL_VBOS, vertex_buffer_ids);
 				#ifndef USE_OPENGLES2
 					glDeleteVertexArrays(1, &vertex_array_id);
 				#endif
@@ -550,7 +557,7 @@ void Backend_Deinit(void)
 	glDeleteProgram(program_colour_fill);
 	glDeleteProgram(program_texture_colour_key);
 	glDeleteProgram(program_texture);
-	glDeleteBuffers(1, &vertex_buffer_id);
+	glDeleteBuffers(TOTAL_VBOS, vertex_buffer_ids);
 #ifndef USE_OPENGLES2
 	glDeleteVertexArrays(1, &vertex_array_id);
 #endif
