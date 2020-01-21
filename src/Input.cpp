@@ -25,6 +25,9 @@ void ReleaseDirectInput(void)
 	SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
 }
 
+// It looks like Pixel declared his functions early, so he could forward-reference
+BOOL HookDirectInputDevice(void);
+
 BOOL InitDirectInput(void)
 {
 	SDL_InitSubSystem(SDL_INIT_JOYSTICK);
