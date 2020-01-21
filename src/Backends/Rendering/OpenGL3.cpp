@@ -532,6 +532,8 @@ Backend_Surface* Backend_Init(SDL_Window *p_window)
 
 void Backend_Deinit(void)
 {
+	free(vertex_buffer);
+
 	glDeleteTextures(1, &framebuffer.texture_id);
 	glDeleteFramebuffers(1, &framebuffer_id);
 	glDeleteProgram(program_glyph_subpixel_part2);
