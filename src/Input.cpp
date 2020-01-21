@@ -44,6 +44,11 @@ BOOL HookDirectInputDevice(void)
 {
 	int i;
 
+#ifndef NDEBUG
+	for (i = 0; i < SDL_NumJoysticks(); ++i)
+		printf("Joystick #%d name: %s\n", i, SDL_JoystickNameForIndex(i));
+#endif
+
 	// Open first available joystick
 	for (i = 0; i < SDL_NumJoysticks(); ++i)
 	{
