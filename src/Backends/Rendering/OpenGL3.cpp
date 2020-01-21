@@ -19,6 +19,9 @@
 
 #define TOTAL_VBOS 2
 
+#define ATTRIBUTE_INPUT_VERTEX_COORDINATES 1
+#define ATTRIBUTE_INPUT_TEXTURE_COORDINATES 2
+
 typedef enum RenderMode
 {
 	MODE_BLANK,
@@ -243,8 +246,8 @@ static GLuint CompileShader(const char *vertex_shader_source, const char *fragme
 
 	glAttachShader(program_id, fragment_shader);
 
-	glBindAttribLocation(program_id, 1, "input_vertex_coordinates");
-	glBindAttribLocation(program_id, 2, "input_texture_coordinates");
+	glBindAttribLocation(program_id, ATTRIBUTE_INPUT_VERTEX_COORDINATES, "input_vertex_coordinates");
+	glBindAttribLocation(program_id, ATTRIBUTE_INPUT_TEXTURE_COORDINATES, "input_texture_coordinates");
 
 	glLinkProgram(program_id);
 
@@ -281,8 +284,8 @@ static void FlushVertexBuffer(void)
 	static unsigned int current_vertex_buffer = 0;
 
 	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_ids[current_vertex_buffer]);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, vertex_coordinate));
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texture_coordinate));
+	glVertexAttribPointer(ATTRIBUTE_INPUT_VERTEX_COORDINATES, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, vertex_coordinate));
+	glVertexAttribPointer(ATTRIBUTE_INPUT_TEXTURE_COORDINATES, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texture_coordinate));
 
 	if (local_vertex_buffer_size > vertex_buffer_size[current_vertex_buffer])
 	{
