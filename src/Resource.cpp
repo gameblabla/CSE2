@@ -32,7 +32,9 @@
 #else
 #include "Resource/FONT/LiberationMono.ttf.h"
 #endif
+#ifndef _WIN32
 #include "Resource/ICON/ICON_MINI.bmp.h"
+#endif
 #include "Resource/ORG/Access.org.h"
 #include "Resource/ORG/Anzen.org.h"
 #include "Resource/ORG/Balcony.org.h"
@@ -113,7 +115,9 @@ static const struct
 #else
 	{"FONT", "FONT", rLiberationMono, sizeof(rLiberationMono)},
 #endif
+#ifndef _WIN32
 	{"ICON", "ICON_MINI", rICON_MINI, sizeof(rICON_MINI)},
+#endif
 	{"ORG", "ACCESS", rAccess, sizeof(rAccess)},
 	{"ORG", "ANZEN", rAnzen, sizeof(rAnzen)},
 	{"ORG", "BALCONY", rBalcony, sizeof(rBalcony)},

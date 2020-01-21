@@ -221,7 +221,6 @@ set(RESOURCES
 	BITMAP/Credit18.bmp
 	CURSOR/CURSOR_IKA.bmp
 	CURSOR/CURSOR_NORMAL.bmp
-	ICON/ICON_MINI.bmp
 	ORG/Access.org
 	ORG/Anzen.org
 	ORG/Balcony.org
@@ -275,6 +274,10 @@ if(JAPANESE)
 else()
 	set(DATA_DIRECTORY "${ASSETS_DIRECTORY}/data_en")
 	list(APPEND RESOURCES "BITMAP/pixel.bmp" "FONT/LiberationMono.ttf")
+endif()
+
+if(NOT WIN32)
+	list(APPEND RESOURCES "ICON/ICON_MINI.bmp")
 endif()
 
 if(FIX_BUGS)
