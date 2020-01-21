@@ -17,6 +17,8 @@
 
 #include "../../WindowsWrapper.h"
 
+#define TOTAL_VBOS 2
+
 typedef enum RenderMode
 {
 	MODE_BLANK,
@@ -72,10 +74,11 @@ static GLint program_glyph_uniform_colour;
 #ifndef USE_OPENGLES2
 static GLuint vertex_array_id;
 #endif
-static GLuint vertex_buffer_id;
+static GLuint vertex_buffer_ids[TOTAL_VBOS];
 static GLuint framebuffer_id;
 
-static VertexBufferSlot *vertex_buffer;
+static VertexBufferSlot *local_vertex_buffer;
+static unsigned long local_vertex_buffer_size;
 static unsigned long current_vertex_buffer_slot;
 
 static RenderMode last_render_mode;
@@ -259,25 +262,41 @@ static GLuint CompileShader(const char *vertex_shader_source, const char *fragme
 
 static VertexBufferSlot* GetVertexBufferSlot(void)
 {
-	static unsigned long max_slots = 0;
-
-	if (current_vertex_buffer_slot >= max_slots)
+	if (current_vertex_buffer_slot >= local_vertex_buffer_size)
 	{
-		if (max_slots == 0)
-			max_slots = 1;
+		if (local_vertex_buffer_size == 0)
+			local_vertex_buffer_size = 1;
 		else
-			max_slots <<= 1;
+			local_vertex_buffer_size <<= 1;
 
-		vertex_buffer = (VertexBufferSlot*)realloc(vertex_buffer, max_slots * sizeof(VertexBufferSlot));
-		glBufferData(GL_ARRAY_BUFFER, max_slots * sizeof(VertexBufferSlot), NULL, GL_STREAM_DRAW);
+		local_vertex_buffer = (VertexBufferSlot*)realloc(local_vertex_buffer, local_vertex_buffer_size * sizeof(VertexBufferSlot));
 	}
 
-	return &vertex_buffer[current_vertex_buffer_slot++];
+	return &local_vertex_buffer[current_vertex_buffer_slot++];
 }
 
 static void FlushVertexBuffer(void)
 {
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(VertexBufferSlot) * current_vertex_buffer_slot, vertex_buffer);
+	static unsigned long vertex_buffer_size[TOTAL_VBOS];
+	static unsigned int current_vertex_buffer = 0;
+
+	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_ids[current_vertex_buffer]);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, vertex_coordinate));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texture_coordinate));
+
+	if (local_vertex_buffer_size > vertex_buffer_size[current_vertex_buffer])
+	{
+		vertex_buffer_size[current_vertex_buffer] = local_vertex_buffer_size;
+		glBufferData(GL_ARRAY_BUFFER, vertex_buffer_size[current_vertex_buffer] * sizeof(VertexBufferSlot), local_vertex_buffer, GL_STREAM_DRAW);
+	}
+	else
+	{
+		glBufferSubData(GL_ARRAY_BUFFER, 0, current_vertex_buffer_slot * sizeof(VertexBufferSlot), local_vertex_buffer);
+	}
+
+	if (++current_vertex_buffer >= TOTAL_VBOS)
+		current_vertex_buffer = 0;
+
 	glDrawArrays(GL_TRIANGLES, 0, 6 * current_vertex_buffer_slot);
 
 	current_vertex_buffer_slot = 0;
@@ -343,15 +362,11 @@ Backend_Surface* Backend_Init(SDL_Window *p_window, unsigned int internal_screen
 					glBindVertexArray(vertex_array_id);
 				#endif
 
-					// Set up Vertex Buffer Object
-					glGenBuffers(1, &vertex_buffer_id);
-					glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_id);
-					glBufferData(GL_ARRAY_BUFFER, 1 * sizeof(VertexBufferSlot), NULL, GL_STREAM_DRAW);
+					// Set up Vertex Buffer Objects
+					glGenBuffers(TOTAL_VBOS, vertex_buffer_ids);
 
 					// Set up the vertex attributes
 					glEnableVertexAttribArray(1);
-					glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, vertex_coordinate));
-					glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texture_coordinate));
 
 					// Set up our shaders
 					program_texture = CompileShader(vertex_shader_texture, fragment_shader_texture);
@@ -402,7 +417,7 @@ Backend_Surface* Backend_Init(SDL_Window *p_window, unsigned int internal_screen
 					if (program_texture != 0)
 						glDeleteProgram(program_texture);
 
-					glDeleteBuffers(1, &vertex_buffer_id);
+					glDeleteBuffers(TOTAL_VBOS, vertex_buffer_ids);
 				#ifndef USE_OPENGLES2
 					glDeleteVertexArrays(1, &vertex_array_id);
 				#endif
@@ -418,12 +433,14 @@ Backend_Surface* Backend_Init(SDL_Window *p_window, unsigned int internal_screen
 
 void Backend_Deinit(void)
 {
+	free(local_vertex_buffer);
+
 	glDeleteTextures(1, &framebuffer.texture_id);
 	glDeleteFramebuffers(1, &framebuffer_id);
 	glDeleteProgram(program_glyph);
 	glDeleteProgram(program_colour_fill);
 	glDeleteProgram(program_texture);
-	glDeleteBuffers(1, &vertex_buffer_id);
+	glDeleteBuffers(TOTAL_VBOS, vertex_buffer_ids);
 #ifndef USE_OPENGLES2
 	glDeleteVertexArrays(1, &vertex_array_id);
 #endif
@@ -521,6 +538,9 @@ Backend_Surface* Backend_CreateSurface(unsigned int width, unsigned int height)
 	if (surface == NULL)
 		return NULL;
 
+	GLint previously_bound_texture;
+	glGetIntegerv(GL_TEXTURE_BINDING_2D, &previously_bound_texture);
+
 	glGenTextures(1, &surface->texture_id);
 	glBindTexture(GL_TEXTURE_2D, surface->texture_id);
 #ifdef USE_OPENGLES2
@@ -535,6 +555,8 @@ Backend_Surface* Backend_CreateSurface(unsigned int width, unsigned int height)
 #ifndef USE_OPENGLES2
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 #endif
+
+	glBindTexture(GL_TEXTURE_2D, previously_bound_texture);
 
 	surface->width = width;
 	surface->height = height;
@@ -717,8 +739,6 @@ void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned cha
 		glDisableVertexAttribArray(2);
 
 		glUniform4f(program_colour_fill_uniform_colour, red / 255.0f, green / 255.0f, blue / 255.0f, alpha / 255.0f);
-
-		current_vertex_buffer_slot = 0;
 	}
 
 	const GLfloat vertex_left = (rect->left * (2.0f / surface->width)) - 1.0f;
