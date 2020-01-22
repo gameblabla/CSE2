@@ -7,6 +7,8 @@
 
 #include "../../WindowsWrapper.h"
 
+#include "../../Resource.h"
+
 typedef struct Backend_Surface
 {
 	SDL_Surface *sdlsurface;
@@ -36,28 +38,41 @@ static void RectToSDLRect(const RECT *rect, SDL_Rect *sdl_rect)
 		sdl_rect->h = 0;
 }
 
-SDL_Window* Backend_CreateWindow(const char *title, int width, int height)
+Backend_Surface* Backend_Init(const char *title, int width, int height, BOOL fullscreen)
 {
-	return SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, 0);
-}
+	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, 0);
 
-Backend_Surface* Backend_Init(SDL_Window *p_window)
-{
-	window = p_window;
+	if (window != NULL)
+	{
+	#ifndef _WIN32	// On Windows, we use native icons instead (so we can give the taskbar and window separate icons, like the original EXE does)
+		size_t resource_size;
+		const unsigned char *resource_data = FindResource("ICON_MINI", "ICON", &resource_size);
+		SDL_RWops *rwops = SDL_RWFromConstMem(resource_data, resource_size);
+		SDL_Surface *icon_surface = SDL_LoadBMP_RW(rwops, 1);
+		SDL_SetWindowIcon(window, icon_surface);
+		SDL_FreeSurface(icon_surface);
+	#endif
 
-	window_sdlsurface = SDL_GetWindowSurface(window);
+		if (fullscreen)
+			SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 
-	framebuffer.sdlsurface = SDL_CreateRGBSurfaceWithFormat(0, window_sdlsurface->w, window_sdlsurface->h, 0, SDL_PIXELFORMAT_RGB24);
+		window_sdlsurface = SDL_GetWindowSurface(window);
 
-	if (framebuffer.sdlsurface == NULL)
-		return NULL;
+		framebuffer.sdlsurface = SDL_CreateRGBSurfaceWithFormat(0, window_sdlsurface->w, window_sdlsurface->h, 0, SDL_PIXELFORMAT_RGB24);
 
-	return &framebuffer;
+		if (framebuffer.sdlsurface != NULL)
+			return &framebuffer;
+
+		SDL_DestroyWindow(window);
+	}
+
+	return NULL;
 }
 
 void Backend_Deinit(void)
 {
 	SDL_FreeSurface(framebuffer.sdlsurface);
+	SDL_DestroyWindow(window);
 }
 
 void Backend_DrawScreen(void)
