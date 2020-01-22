@@ -84,6 +84,7 @@ You can also add the following flags:
 
 Name | Function
 --------|--------
+`-DLTO=ON` | Enable link-time optimisation
 `-DJAPANESE=ON` | Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
 `-DFIX_BUGS=ON` | Enabled by default - Fix various bugs in the game
 `-DDEBUG_SAVE=ON` | Re-enable the ability to drag-and-drop save files onto the window
@@ -120,6 +121,7 @@ Name | Function
 --------|--------
 `RELEASE=1` | Compile a release build (optimised, stripped, etc.)
 `STATIC=1` | Produce a statically-linked executable (good for Windows builds, so you don't need to bundle DLL files)
+`LTO=1` | Enable link-time optimisation
 `JAPANESE=1` | Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
 `FIX_BUGS=1` | Enabled by default - Fix various bugs in the game
 `WINDOWS=1` | Build for Windows

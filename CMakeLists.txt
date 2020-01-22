@@ -20,6 +20,7 @@ option(AUDIO_FLAC "Enable support for FLAC music/SFX" OFF)
 option(AUDIO_TRACKER "Enable support for .it, .xm, .mod, .s3m music/SFX" OFF)
 option(AUDIO_PXTONE "Enable support for PxTone music/SFX (not to be confused with PixTone)" OFF)
 
+option(LTO "Enable link-time optimisation" OFF)
 option(WARNINGS "Enable common compiler warnings (for GCC-compatible compilers and MSVC only)" OFF)
 option(WARNINGS_ALL "Enable ALL compiler warnings (for Clang and MSVC only)" OFF)
 option(WARNINGS_FATAL "Stop compilation on any compiler warning (for GCC-compatible compilers and MSVC only)" OFF)
@@ -494,7 +495,7 @@ add_custom_command(TARGET CSE2 POST_BUILD
 )
 
 # Enable link-time optimisation if available
-if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+if(LTO)
 	if((${CMAKE_VERSION} VERSION_EQUAL 3.9) OR (${CMAKE_VERSION} VERSION_GREATER 3.9))
 		include(CheckIPOSupported)
 		check_ipo_supported(RESULT result)
