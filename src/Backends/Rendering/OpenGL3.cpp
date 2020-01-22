@@ -366,6 +366,9 @@ static void FlushVertexBuffer(void)
 	static unsigned long vertex_buffer_size[TOTAL_VBOS];
 	static unsigned int current_vertex_buffer = 0;
 
+	if (current_vertex_buffer_slot == 0)
+		return;
+
 	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_ids[current_vertex_buffer]);
 	glVertexAttribPointer(ATTRIBUTE_INPUT_VERTEX_COORDINATES, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, vertex_coordinate));
 	glVertexAttribPointer(ATTRIBUTE_INPUT_TEXTURE_COORDINATES, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texture_coordinate));
