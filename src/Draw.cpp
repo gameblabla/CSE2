@@ -84,7 +84,7 @@ BOOL Flip_SystemTask(void)
 	return TRUE;
 }
 
-SDL_Window* CreateWindow(const char *title, int width, int height)
+BOOL StartDirectDraw(const char *title, int width, int height, int lMagnification)
 {
 #ifndef NDEBUG
 	puts("Available SDL2 video drivers:");
@@ -95,11 +95,6 @@ SDL_Window* CreateWindow(const char *title, int width, int height)
 	printf("Selected SDL2 video driver: %s\n", SDL_GetCurrentVideoDriver());
 #endif
 
-	return Backend_CreateWindow(title, width, height);
-}
-
-BOOL StartDirectDraw(SDL_Window *window, int lMagnification)
-{
 	memset(surface_metadata, 0, sizeof(surface_metadata));
 
 	switch (lMagnification)
@@ -117,11 +112,10 @@ BOOL StartDirectDraw(SDL_Window *window, int lMagnification)
 		case 2:
 			magnification = 2;
 			fullscreen = TRUE;
-			SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 			break;
 	}
 
-	framebuffer = Backend_Init(window);
+	framebuffer = Backend_Init(title, width, height, fullscreen);
 
 	if (framebuffer == NULL)
 		return FALSE;

@@ -193,14 +193,12 @@ int main(int argc, char *argv[])
 
 	RECT unused_rect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
-#ifdef _WIN32
+#ifdef _WIN32	// On Windows, we use native icons instead (so we can give the taskbar and window separate icons, like the original EXE does)
 	SDL_SetHint(SDL_HINT_WINDOWS_INTRESOURCE_ICON, "0");
 	SDL_SetHint(SDL_HINT_WINDOWS_INTRESOURCE_ICON_SMALL, "1");
 #endif
 
 	SDL_InitSubSystem(SDL_INIT_VIDEO);
-
-	SDL_Window *window;
 
 	switch (conf.display_mode)
 	{
@@ -218,28 +216,23 @@ int main(int argc, char *argv[])
 				windowHeight = WINDOW_HEIGHT * 2;
 			}
 
-			window = CreateWindow(lpWindowName, windowWidth, windowHeight);
-
-			if (window == NULL)
-				return 0;
-
 		#ifdef FIX_BUGS
 			if (conf.display_mode == 1)
 			{
-				if (!StartDirectDraw(window, 0))
+				if (!StartDirectDraw(lpWindowName, windowWidth, windowHeight, 0))
 					return 0;
 			}
 			else
 			{
-				if (!StartDirectDraw(window, 1))
+				if (!StartDirectDraw(lpWindowName, windowWidth, windowHeight, 1))
 					return 0;
 			}
 		#else
 			// Doesn't handle StartDirectDraw failing
 			if (conf.display_mode == 1)
-				StartDirectDraw(window, 0);
+				StartDirectDraw(lpWindowName, windowWidth, windowHeight, 0);
 			else
-				StartDirectDraw(window, 1);
+				StartDirectDraw(lpWindowName, windowWidth, windowHeight, 1);
 		#endif
 
 			break;
@@ -251,17 +244,12 @@ int main(int argc, char *argv[])
 			windowWidth = WINDOW_WIDTH * 2;
 			windowHeight = WINDOW_HEIGHT * 2;
 
-			window = CreateWindow(lpWindowName, windowWidth, windowHeight);
-
-			if (window == NULL)
-				return 0;
-
 		#ifdef FIX_BUGS
-			if (!StartDirectDraw(window, 2))
+			if (!StartDirectDraw(lpWindowName, windowWidth, windowHeight, 2))
 				return 0;
 		#else
 			// Doesn't handle StartDirectDraw failing
-			StartDirectDraw(window, 2);
+			StartDirectDraw(lpWindowName, windowWidth, windowHeight, 2);
 		#endif
 
 			bFullscreen = TRUE;
@@ -274,21 +262,10 @@ int main(int argc, char *argv[])
 	SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
 #endif
 
-	// Set up the window icon and cursor
-	const unsigned char *resource_data;
+	// Set up the cursor
 	size_t resource_size;
-	SDL_RWops *rwops;
-
-#ifndef _WIN32	// On Windows, we use native icons instead (so we can give the taskbar and window separate icons, like the original EXE does)
-	resource_data = FindResource("ICON_MINI", "ICON", &resource_size);
-	rwops = SDL_RWFromConstMem(resource_data, resource_size);
-	SDL_Surface *icon_surface = SDL_LoadBMP_RW(rwops, 1);
-	SDL_SetWindowIcon(window, icon_surface);
-	SDL_FreeSurface(icon_surface);
-#endif
-
-	resource_data = FindResource("CURSOR_NORMAL", "CURSOR", &resource_size);
-	rwops = SDL_RWFromConstMem(resource_data, resource_size);
+	const unsigned char *resource_data = FindResource("CURSOR_NORMAL", "CURSOR", &resource_size);
+	SDL_RWops *rwops = SDL_RWFromConstMem(resource_data, resource_size);
 	SDL_Surface *cursor_surface = SDL_LoadBMP_RW(rwops, 1);
 	SDL_SetColorKey(cursor_surface, SDL_TRUE, SDL_MapRGB(cursor_surface->format, 0xFF, 0, 0xFF));
 	SDL_Cursor *cursor = SDL_CreateColorCursor(cursor_surface, 0, 0);
@@ -315,7 +292,6 @@ int main(int argc, char *argv[])
 	{
         SDL_FreeCursor(cursor);
         SDL_FreeSurface(cursor_surface);
-		SDL_DestroyWindow(window);
 		return 1;
 	}
 
@@ -343,7 +319,6 @@ int main(int argc, char *argv[])
 
 	SDL_FreeCursor(cursor);
 	SDL_FreeSurface(cursor_surface);
-	SDL_DestroyWindow(window);
 
 	return 1;
 }

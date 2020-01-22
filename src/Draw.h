@@ -51,8 +51,7 @@ typedef enum SurfaceID
 } SurfaceID;
 
 BOOL Flip_SystemTask(void);
-SDL_Window* CreateWindow(const char *title, int width, int height);
-BOOL StartDirectDraw(SDL_Window *window, int lMagnification);
+BOOL StartDirectDraw(const char *title, int width, int height, int lMagnification);
 void EndDirectDraw(void);
 void ReleaseSurface(SurfaceID s);
 BOOL MakeSurface_Resource(const char *name, SurfaceID surf_no);

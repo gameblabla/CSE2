@@ -14,8 +14,7 @@ typedef enum FontPixelMode
 typedef struct Backend_Surface Backend_Surface;
 typedef struct Backend_Glyph Backend_Glyph;
 
-SDL_Window* Backend_CreateWindow(const char *title, int width, int height);
-Backend_Surface* Backend_Init(SDL_Window *window);
+Backend_Surface* Backend_Init(const char *title, int width, int height, BOOL fullscreen);
 void Backend_Deinit(void);
 void Backend_DrawScreen(void);
 Backend_Surface* Backend_CreateSurface(unsigned int width, unsigned int height);
