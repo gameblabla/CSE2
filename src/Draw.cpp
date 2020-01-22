@@ -105,7 +105,7 @@ BOOL Flip_SystemTask(void)
 	return TRUE;
 }
 
-SDL_Window* CreateWindow(const char *title, int width, int height)
+BOOL StartDirectDraw(const char *title, int lMagnification, BOOL b60fps, BOOL bSmoothScrolling, BOOL bVsync)
 {
 #ifndef NDEBUG
 	puts("Available SDL2 video drivers:");
@@ -116,11 +116,6 @@ SDL_Window* CreateWindow(const char *title, int width, int height)
 	printf("Selected SDL2 video driver: %s\n", SDL_GetCurrentVideoDriver());
 #endif
 
-	return Backend_CreateWindow(title, width, height);
-}
-
-BOOL StartDirectDraw(SDL_Window *window, int lMagnification, BOOL b60fps, BOOL bSmoothScrolling, BOOL bVsync)
-{
 	gb60fps = b60fps;
 	gbSmoothScrolling = bSmoothScrolling;
 
@@ -134,12 +129,11 @@ BOOL StartDirectDraw(SDL_Window *window, int lMagnification, BOOL b60fps, BOOL b
 			break;
 
 		case 0:
-			SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+			SDL_DisplayMode display_mode;
+			if (SDL_GetDesktopDisplayMode(0, &display_mode) < 0)
+				return FALSE;
 
-			int width, height;
-			SDL_GetWindowSize(window, &width, &height);
-			magnification = width / WINDOW_WIDTH < height / WINDOW_HEIGHT ? width / WINDOW_WIDTH : height / WINDOW_HEIGHT;
-
+			magnification = display_mode.w / WINDOW_WIDTH < display_mode.h / WINDOW_HEIGHT ? display_mode.w / WINDOW_WIDTH : display_mode.h / WINDOW_HEIGHT;
 			fullscreen = TRUE;
 			break;
 	}
@@ -150,16 +144,12 @@ BOOL StartDirectDraw(SDL_Window *window, int lMagnification, BOOL b60fps, BOOL b
 	// If v-sync is requested, check if it's available
 	if (bVsync)
 	{
-		int display_index = SDL_GetWindowDisplayIndex(window);
-		if (display_index >= 0)
-		{
-			SDL_DisplayMode display_mode;
-			if (SDL_GetCurrentDisplayMode(display_index, &display_mode) == 0)
-				gbVsync = display_mode.refresh_rate == (b60fps ? 60 : 50);
-		}
+		SDL_DisplayMode display_mode;
+		if (SDL_GetDesktopDisplayMode(0, &display_mode) == 0)
+			gbVsync = display_mode.refresh_rate == (b60fps ? 60 : 50);
 	}
 
-	framebuffer = Backend_Init(window, WINDOW_WIDTH * magnification, WINDOW_HEIGHT * magnification, gbVsync);
+	framebuffer = Backend_Init(title, WINDOW_WIDTH * magnification, WINDOW_HEIGHT * magnification, fullscreen, gbVsync);
 
 	if (framebuffer == NULL)
 		return FALSE;

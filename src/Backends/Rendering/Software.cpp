@@ -9,7 +9,12 @@
 
 #include "SDL.h"
 
+#include "lodepng/lodepng.h"
+
 #include "../../WindowsWrapper.h"
+
+#include "../../Main.h"
+#include "../../Resource.h"
 
 #undef MIN
 #undef MAX
@@ -32,17 +37,13 @@ typedef struct Backend_Glyph
 	FontPixelMode pixel_mode;
 } Backend_Glyph;
 
+static SDL_Window *window;
 static SDL_Renderer *renderer;
 static SDL_Texture *texture;
 
 static Backend_Surface framebuffer;
 
-SDL_Window* Backend_CreateWindow(const char *title, int width, int height)
-{
-	return SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_RESIZABLE);
-}
-
-Backend_Surface* Backend_Init(SDL_Window *window, unsigned int internal_screen_width, unsigned int internal_screen_height, BOOL vsync)
+Backend_Surface* Backend_Init(const char *title, unsigned int internal_screen_width, unsigned int internal_screen_height, BOOL fullscreen, BOOL vsync)
 {
 #ifndef NDEBUG
 	puts("Available SDL2 render drivers:");
@@ -55,43 +56,70 @@ Backend_Surface* Backend_Init(SDL_Window *window, unsigned int internal_screen_w
 	}
 #endif
 
-#if SDL_VERSION_ATLEAST(2,0,10)
-	SDL_SetHint(SDL_HINT_RENDER_BATCHING, "1");	// We never interfere with the renderer, so don't let SDL implicitly disable batching
-#endif
+	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, internal_screen_width, internal_screen_height, SDL_WINDOW_RESIZABLE);
 
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE | (vsync ? SDL_RENDERER_PRESENTVSYNC : 0));
-
-	if (renderer == NULL)
-		return NULL;
-
-#ifndef NDEBUG
-	SDL_RendererInfo info;
-	SDL_GetRendererInfo(renderer, &info);
-	printf("Selected SDL2 render driver: %s\n", info.name);
-#endif
-
-	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
-	texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STREAMING, internal_screen_width, internal_screen_height);
-	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
-
-	if (texture == NULL)
+	if (window != NULL)
 	{
-		SDL_DestroyRenderer(renderer);
-		return NULL;
+	#ifndef _WIN32	// On Windows, we use native icons instead (so we can give the taskbar and window separate icons, like the original EXE does)
+		char image_path[MAX_PATH];
+		sprintf(image_path, "%s/Resource/ICON/ICON_MINI.png", gDataPath);
+
+		unsigned char *image_buffer;
+		unsigned int image_width;
+		unsigned int image_height;
+		lodepng_decode32_file(&image_buffer, &image_width, &image_height, image_path);
+
+		SDL_Surface *icon_surface = SDL_CreateRGBSurfaceWithFormatFrom(image_buffer, image_width, image_height, 32, image_width * 4, SDL_PIXELFORMAT_RGBA32);
+		SDL_SetWindowIcon(window, icon_surface);
+		SDL_FreeSurface(icon_surface);
+		free(image_buffer);
+	#endif
+
+		if (fullscreen)
+			SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+
+	#if SDL_VERSION_ATLEAST(2,0,10)
+		SDL_SetHint(SDL_HINT_RENDER_BATCHING, "1");	// We never interfere with the renderer, so don't let SDL implicitly disable batching
+	#endif
+
+		renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE | (vsync ? SDL_RENDERER_PRESENTVSYNC : 0));
+
+		if (renderer != NULL)
+		{
+		#ifndef NDEBUG
+			SDL_RendererInfo info;
+			SDL_GetRendererInfo(renderer, &info);
+			printf("Selected SDL2 render driver: %s\n", info.name);
+		#endif
+
+			SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+			texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STREAMING, internal_screen_width, internal_screen_height);
+			SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+
+			if (texture != NULL)
+			{
+				SDL_LockTexture(texture, NULL, (void**)&framebuffer.pixels, (int*)&framebuffer.pitch);
+
+				framebuffer.width = internal_screen_width;
+				framebuffer.height = internal_screen_height;
+
+				return &framebuffer;
+			}
+
+			SDL_DestroyRenderer(renderer);
+		}
+
+		SDL_DestroyWindow(window);
 	}
 
-	SDL_LockTexture(texture, NULL, (void**)&framebuffer.pixels, (int*)&framebuffer.pitch);
-
-	framebuffer.width = internal_screen_width;
-	framebuffer.height = internal_screen_height;
-
-	return &framebuffer;
+	return NULL;
 }
 
 void Backend_Deinit(void)
 {
 	SDL_DestroyTexture(texture);
 	SDL_DestroyRenderer(renderer);
+	SDL_DestroyWindow(window);
 }
 
 void Backend_DrawScreen(void)
