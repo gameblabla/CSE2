@@ -16,6 +16,7 @@ option(FIX_BUGS "Fix various bugs in the game" OFF)
 option(DEBUG_SAVE "Re-enable the ability to drag-and-drop save files onto the window" OFF)
 set(RENDERER "SDLTexture" CACHE STRING "Which renderer the game should use: 'OpenGL3' for an OpenGL 3.2 renderer, 'OpenGLES2' for an OpenGL ES 2.0 renderer, 'SDLTexture' for SDL2's hardware-accelerated Texture API, 'SDLSurface' for SDL2's software-rendered Surface API, or 'Software' for a handwritten software renderer")
 
+option(LTO "Enable link-time optimisation" OFF)
 option(WARNINGS "Enable common compiler warnings (for GCC-compatible compilers and MSVC only)" OFF)
 option(WARNINGS_ALL "Enable ALL compiler warnings (for Clang and MSVC only)" OFF)
 option(WARNINGS_FATAL "Stop compilation on any compiler warning (for GCC-compatible compilers and MSVC only)" OFF)
@@ -444,7 +445,7 @@ add_custom_command(TARGET CSE2 POST_BUILD
 )
 
 # Enable link-time optimisation if available
-if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+if(LTO)
 	if((${CMAKE_VERSION} VERSION_EQUAL 3.9) OR (${CMAKE_VERSION} VERSION_GREATER 3.9))
 		include(CheckIPOSupported)
 		check_ipo_supported(RESULT result)
