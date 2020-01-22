@@ -74,6 +74,10 @@ Backend_Surface* Backend_Init(SDL_Window *window, unsigned int internal_screen_w
 	}
 #endif
 
+#if SDL_VERSION_ATLEAST(2,0,10)
+	SDL_SetHint(SDL_HINT_RENDER_BATCHING, "1");	// We never interfere with the renderer, so don't let SDL implicitly disable batching
+#endif
+
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE | (vsync ? SDL_RENDERER_PRESENTVSYNC : 0));
 
 	if (renderer == NULL)
