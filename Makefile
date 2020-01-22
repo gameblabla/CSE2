@@ -32,6 +32,7 @@ else
 endif
 
 ifeq ($(LTO), 1)
+  ALL_CFLAGS += -flto
   ALL_CXXFLAGS += -flto
 endif
 
