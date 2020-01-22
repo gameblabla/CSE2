@@ -52,6 +52,7 @@ Name | Function
 --------|--------
 `RELEASE=1` | Compile a release build (optimised, stripped, etc.)
 `STATIC=1` | Produce a statically-linked executable (so you don't need to bundle DLL files)
+`LTO=1` | Enable link-time optimisation
 `JAPANESE=1` | Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
 `FIX_BUGS=1` | Fix various bugs in the game
 `DEBUG_SAVE=1` | Re-enable the dummied-out 'Debug Save' option, and the ability to drag-and-drop save files onto the window
