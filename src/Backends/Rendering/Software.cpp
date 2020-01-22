@@ -8,6 +8,8 @@
 
 #include "../../WindowsWrapper.h"
 
+#include "../../Resource.h"
+
 #undef MIN
 #undef MAX
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
@@ -34,33 +36,48 @@ static SDL_Surface *window_sdlsurface;
 static SDL_Surface *framebuffer_sdlsurface;
 static Backend_Surface framebuffer;
 
-SDL_Window* Backend_CreateWindow(const char *title, int width, int height)
+Backend_Surface* Backend_Init(const char *title, int width, int height, BOOL fullscreen)
 {
-	return SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, 0);
-}
+	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, 0);
 
-Backend_Surface* Backend_Init(SDL_Window *p_window)
-{
-	window = p_window;
+	if (window != NULL)
+	{
+	#ifndef _WIN32	// On Windows, we use native icons instead (so we can give the taskbar and window separate icons, like the original EXE does)
+		size_t resource_size;
+		const unsigned char *resource_data = FindResource("ICON_MINI", "ICON", &resource_size);
+		SDL_RWops *rwops = SDL_RWFromConstMem(resource_data, resource_size);
+		SDL_Surface *icon_surface = SDL_LoadBMP_RW(rwops, 1);
+		SDL_SetWindowIcon(window, icon_surface);
+		SDL_FreeSurface(icon_surface);
+	#endif
 
-	window_sdlsurface = SDL_GetWindowSurface(window);
+		if (fullscreen)
+			SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 
-	framebuffer_sdlsurface = SDL_CreateRGBSurfaceWithFormat(0, window_sdlsurface->w, window_sdlsurface->h, 0, SDL_PIXELFORMAT_RGB24);
+		window_sdlsurface = SDL_GetWindowSurface(window);
 
-	if (framebuffer_sdlsurface == NULL)
-		return NULL;
+		framebuffer_sdlsurface = SDL_CreateRGBSurfaceWithFormat(0, window_sdlsurface->w, window_sdlsurface->h, 0, SDL_PIXELFORMAT_RGB24);
 
-	framebuffer.pixels = (unsigned char*)framebuffer_sdlsurface->pixels;
-	framebuffer.width = framebuffer_sdlsurface->w;
-	framebuffer.height = framebuffer_sdlsurface->h;
-	framebuffer.pitch = framebuffer_sdlsurface->pitch;
+		if (framebuffer_sdlsurface != NULL)
+		{
+			framebuffer.pixels = (unsigned char*)framebuffer_sdlsurface->pixels;
+			framebuffer.width = framebuffer_sdlsurface->w;
+			framebuffer.height = framebuffer_sdlsurface->h;
+			framebuffer.pitch = framebuffer_sdlsurface->pitch;
 
-	return &framebuffer;
+			return &framebuffer;
+		}
+
+		SDL_DestroyWindow(window);
+	}
+
+	return NULL;
 }
 
 void Backend_Deinit(void)
 {
 	SDL_FreeSurface(framebuffer_sdlsurface);
+	SDL_DestroyWindow(window);
 }
 
 void Backend_DrawScreen(void)
