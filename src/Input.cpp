@@ -58,7 +58,7 @@ BOOL SetDeviceAquire(BOOL aquire)
 }
 
 // It looks like Pixel declared his functions early, so he could forward-reference
-BOOL HookAllDirectInputDevices(HWND hWnd);
+BOOL HookDirectInputDevice(HWND hWnd);
 BOOL __stdcall EnumDevices_Callback(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef);
 
 BOOL InitDirectInput(HINSTANCE hinst, HWND hWnd)
