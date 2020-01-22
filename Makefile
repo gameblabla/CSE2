@@ -31,6 +31,10 @@ else
   DOCONFIG_FILENAME_DEF = DoConfig_debug$(EXE_EXTENSION)
 endif
 
+ifeq ($(LTO), 1)
+  ALL_CXXFLAGS += -flto
+endif
+
 ifeq ($(JAPANESE), 1)
   DATA_DIRECTORY = $(ASSETS_DIRECTORY)/data_jp
 
