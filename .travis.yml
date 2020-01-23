@@ -8,22 +8,6 @@ dist: bionic
 # Enable C++ language support
 language: cpp
 
-before_cache:
-    - |-
-        case $TRAVIS_OS_NAME in
-          windows)
-            # https://unix.stackexchange.com/a/137322/107554
-            $msys2 pacman --sync --clean --noconfirm
-            ;;
-        esac
-
-# Cache compiled object files with ccache
-cache:
-    ccache
-    directories:
-    - $HOME/AppData/Local/Temp/chocolatey
-    - /C/tools/msys64
-
 compiler:
     - gcc
 
@@ -83,6 +67,22 @@ before_install:
     - $mingw64 echo ${CXX}
     - $mingw64 ${CC} --version
     - $mingw64 ${CXX} --version
+
+before_cache:
+    - |-
+        case $TRAVIS_OS_NAME in
+          windows)
+            # https://unix.stackexchange.com/a/137322/107554
+            $msys2 pacman --sync --clean --noconfirm
+            ;;
+        esac
+
+# Cache compiled object files with ccache
+cache:
+#    ccache
+    directories:
+    - $HOME/AppData/Local/Temp/chocolatey
+    - /C/tools/msys64
 
 install:
     # Get number of cores (or 2 by default if somehow none of these are available somehow)
