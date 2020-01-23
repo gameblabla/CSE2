@@ -248,6 +248,10 @@ else
   RESOURCES += FONT/LiberationMono.ttf
 endif
 
+ifneq ($(WINDOWS), 1)
+  RESOURCES += ICON/ICON_MINI.png
+endif
+
 ifeq ($(RENDERER), OpenGL3)
   SOURCES += src/Backends/Rendering/OpenGL3.cpp external/glad/src/glad.c
   CSE2_CFLAGS += -Iexternal/glad/include
