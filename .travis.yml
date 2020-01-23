@@ -170,14 +170,19 @@ install:
 
 before_script:
     # Make build directory and generate CMake build files
-    - mkdir -p ${CMAKE_BUILD_DIR} && cd ${CMAKE_BUILD_DIR}
-    - $mingw32 cmake .. -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE -DFIX_BUGS=ON -DWARNINGS=ON -DWARNINGS_ALL=ON
-    - cd ..
 
     - |
       if [ "${TRAVIS_OS_NAME}" == "windows" ]; then
+        mkdir -p ${CMAKE_BUILD_DIR} && cd ${CMAKE_BUILD_DIR}
+        $mingw32 cmake .. -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE -DFIX_BUGS=ON -DWARNINGS=ON -DWARNINGS_ALL=ON -G"Unix Makefiles"
+        cd ..
+
         mkdir -p ${CMAKE_BUILD_DIR2} && cd ${CMAKE_BUILD_DIR2}
-        $mingw64 cmake .. -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE -DFIX_BUGS=ON -DWARNINGS=ON -DWARNINGS_ALL=ON
+        $mingw64 cmake .. -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE -DFIX_BUGS=ON -DWARNINGS=ON -DWARNINGS_ALL=ON -G"Unix Makefiles"
+        cd ..
+      else
+        mkdir -p ${CMAKE_BUILD_DIR} && cd ${CMAKE_BUILD_DIR}
+        cmake .. -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE -DFIX_BUGS=ON -DWARNINGS=ON -DWARNINGS_ALL=ON
         cd ..
       fi
 
