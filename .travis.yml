@@ -72,8 +72,8 @@ before_install:
     # Display build type
     - echo $MAKE_BUILD_TYPE
 
-	# Define CC and CXX
-    if ["$SIXTY_FOUR_BIT" == "true"
+    # Define CC and CXX
+    if ["$SIXTY_FOUR_BIT" == "true"]; then
       export CC="x86_64-w64-mingw32-gcc"
       export CXX="x86_64-w64-mingw32-g++"
     else
@@ -86,7 +86,7 @@ before_install:
       if [ "$TRAVIS_OS_NAME" = "windows" ]; then
         export WINDRES="windres"
       else
-        if ["$SIXTY_FOUR_BIT" == "true"
+        if ["$SIXTY_FOUR_BIT" == "true" ]; then
           export WINDRES="x86_64-w64-mingw32-windres"
         else
           export WINDRES="i686-w64-mingw32-windres"
