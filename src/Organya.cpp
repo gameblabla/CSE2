@@ -551,11 +551,11 @@ BOOL OrgData::NoteAlloc(unsigned short alloc)
 				if (info.tdata[i].note_p != NULL)
 				{
 					free(info.tdata[i].note_p);
-#ifdef FIX_BUGS
+				#ifdef FIX_BUGS
 					info.tdata[i].note_p = NULL;
-#else
+				#else
 					info.tdata[j].note_p = NULL;	// Uses j instead of i
-#endif
+				#endif
 				}
 			}
 
