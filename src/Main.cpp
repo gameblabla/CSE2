@@ -283,7 +283,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 			}
 			else
 			{
-				if !(StartDirectDraw(hWnd, 1, 0))
+				if (!StartDirectDraw(hWnd, 1, 0))
 					return 0;
 			}
 		#else
