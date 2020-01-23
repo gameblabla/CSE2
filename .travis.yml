@@ -73,13 +73,14 @@ before_install:
     - echo $MAKE_BUILD_TYPE
 
     # Define CC and CXX
-    if ["$SIXTY_FOUR_BIT" == "true"]; then
-      export CC="x86_64-w64-mingw32-gcc"
-      export CXX="x86_64-w64-mingw32-g++"
-    else
-      export CC="i686-w64-mingw32-gcc"
-      export CXX="i686-w64-mingw32-g++"
-    fi
+    - |
+      if ["$SIXTY_FOUR_BIT" == "true"]; then
+        export CC="x86_64-w64-mingw32-gcc"
+        export CXX="x86_64-w64-mingw32-g++"
+      else
+        export CC="i686-w64-mingw32-gcc"
+        export CXX="i686-w64-mingw32-g++"
+      fi
 
     # Define WINDRES
     - |
