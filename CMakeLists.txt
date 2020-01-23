@@ -31,25 +31,25 @@ project(CSE2 LANGUAGES C CXX)
 message(STATUS "Compiler ID : ${CMAKE_CXX_COMPILER_ID}")
 
 # Has to be placed after "project()"
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 	# Using Clang (this is a match so that we also get "AppleClang" which is the Apple-provided Clang
 	set(COMPILER_IS_CLANG true)
 	message(STATUS "Compiling with Clang")
 endif()
 
-if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	# Using GCC
 	set(COMPILER_IS_GCC true)
 	message(STATUS "Compiling with GCC")
 endif()
 
-if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
 	# Using Intel C++
 	set(COMPILER_IS_ICC true)
 	message(STATUS "Compiling with ICC")
 endif()
 
-if (COMPILER_IS_CLANG OR COMPILER_IS_GCC OR COMPILER_IS_ICC)
+if(COMPILER_IS_CLANG OR COMPILER_IS_GCC OR COMPILER_IS_ICC)
 	set(COMPILER_IS_GCC_COMPATIBLE true)
 	message(STATUS "Compiling with a GCC-compatible compiler")
 endif()
@@ -289,10 +289,10 @@ if(DEBUG_SAVE)
 	target_compile_definitions(CSE2 PRIVATE DEBUG_SAVE)
 endif()
 
-if (WARNINGS)
+if(WARNINGS)
 	# HACK : Replace this with CMake provided stuff when possible (when CMake makes avoiding this possible (it isn't currently))
 
-	if (MSVC)
+	if(MSVC)
 		# Force to always compile with /W4 on MSVC
 
 		# Can't do this with target_compile_options
@@ -331,10 +331,10 @@ if (WARNINGS_ALL)
 	endif()
 endif()
 
-if (WARNINGS_FATAL)
+if(WARNINGS_FATAL)
 	# HACK : Replace this with CMake provided stuff when possible (when CMake makes avoiding this possible (it isn't currently))
 
-	if (MSVC)
+	if(MSVC)
 		target_compile_options(CSE2 PRIVATE /WX)
 	elseif(COMPILER_IS_GCC_COMPATIBLE)
 		target_compile_options(CSE2 PRIVATE -Werror)
