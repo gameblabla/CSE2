@@ -29,38 +29,36 @@ addons:
         - mingw-w64
 
 env:
-    - MAKE_BUILD_TYPE=RELEASE=0 SIXTY_FOUR_BIT=false
-    - MAKE_BUILD_TYPE=RELEASE=1 SIXTY_FOUR_BIT=false
-    - MAKE_BUILD_TYPE=RELEASE=0 SIXTY_FOUR_BIT=true
-    - MAKE_BUILD_TYPE=RELEASE=1 SIXTY_FOUR_BIT=true
+    - BUILD_TYPE=RELEASE=0 SIXTY_FOUR_BIT=false
+    - BUILD_TYPE=RELEASE=1 SIXTY_FOUR_BIT=false
+    - BUILD_TYPE=RELEASE=0 SIXTY_FOUR_BIT=true
+    - BUILD_TYPE=RELEASE=1 SIXTY_FOUR_BIT=true
 
 before_install:
     # Setup MSYS2
-    - |-
-        case $TRAVIS_OS_NAME in
-          windows)
-            [[ ! -f C:/tools/msys64/msys2_shell.cmd ]] && rm -rf C:/tools/msys64
-            choco uninstall -y mingw
-            choco upgrade --no-progress -y msys2
-            export msys2='cmd //C RefreshEnv.cmd '
-            export msys2+='& set MSYS=winsymlinks:nativestrict '
-            export msys2+='& C:\\tools\\msys64\\msys2_shell.cmd -defterm -no-start'
-            if [ "$SIXTY_FOUR_BIT" == "true" ]; then
-                export mingw="$msys2 -mingw64 -full-path -here -c "\"\$@"\" --"
-            else
-                export mingw="$msys2 -mingw32 -full-path -here -c "\"\$@"\" --"
-            fi
-            export msys2+=" -msys2 -c "\"\$@"\" --"
-            if [ "$SIXTY_FOUR_BIT" == "true" ]; then
-                $msys2 pacman --sync --noconfirm --needed make mingw-w64-x86_64-toolchain
-            else
-                $msys2 pacman --sync --noconfirm --needed make mingw-w64-i686-toolchain
-            fi
-            taskkill //IM gpg-agent.exe //F  # https://travis-ci.community/t/4967
-            export PATH=/C/tools/msys64/mingw64/bin:$PATH
-            export MAKE=mingw32-make  # so that Autotools can find it
-            ;;
-        esac
+    - |
+      if [ "$TRAVIS_OS_NAME" == "windows" ]
+        [[ ! -f C:/tools/msys64/msys2_shell.cmd ]] && rm -rf C:/tools/msys64
+        choco uninstall -y mingw
+        choco upgrade --no-progress -y msys2
+        export msys2='cmd //C RefreshEnv.cmd '
+        export msys2+='& set MSYS=winsymlinks:nativestrict '
+        export msys2+='& C:\\tools\\msys64\\msys2_shell.cmd -defterm -no-start'
+        if [ "$SIXTY_FOUR_BIT" == "true" ]; then
+            export mingw="$msys2 -mingw64 -full-path -here -c "\"\$@"\" --"
+        else
+            export mingw="$msys2 -mingw32 -full-path -here -c "\"\$@"\" --"
+        fi
+        export msys2+=" -msys2 -c "\"\$@"\" --"
+        if [ "$SIXTY_FOUR_BIT" == "true" ]; then
+            $msys2 pacman --sync --noconfirm --needed make mingw-w64-x86_64-toolchain
+        else
+            $msys2 pacman --sync --noconfirm --needed make mingw-w64-i686-toolchain
+        fi
+        taskkill //IM gpg-agent.exe //F  # https://travis-ci.community/t/4967
+        export PATH=/C/tools/msys64/mingw64/bin:$PATH
+        export MAKE=mingw32-make  # so that Autotools can find it
+      fi
 
     # Set URL for Discord send script
     - DISCORD_SEND_SCRIPT_URL=https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
@@ -73,7 +71,7 @@ before_install:
     - echo $TRAVIS_OS_NAME
 
     # Display build type
-    - echo $MAKE_BUILD_TYPE
+    - echo $BUILD_TYPE
 
     # Define CC and CXX
     - |
@@ -87,7 +85,7 @@ before_install:
 
     # Define WINDRES
     - |
-      if [ "$TRAVIS_OS_NAME" = "windows" ]; then
+      if [ "$TRAVIS_OS_NAME" == "windows" ]; then
         export WINDRES="windres"
       else
         if [ "$SIXTY_FOUR_BIT" == "true" ]; then
@@ -104,13 +102,11 @@ before_install:
     - $mingw ${CXX} --version
 
 before_cache:
-    - |-
-        case $TRAVIS_OS_NAME in
-          windows)
-            # https://unix.stackexchange.com/a/137322/107554
-            $msys2 pacman --sync --clean --noconfirm
-            ;;
-        esac
+    - |
+      if [ "$TRAVIS_OS_NAME" == "windows" ]; then
+        # https://unix.stackexchange.com/a/137322/107554
+        $msys2 pacman --sync --clean --noconfirm
+      fi
 
 cache:
     directories:
@@ -124,7 +120,7 @@ install:
 
 script:
     # Build
-    - $mingw make -j ${JOBS} FIX_BUGS=1 ${MAKE_BUILD_TYPE} WARNINGS=1 WARNINGS_ALL=1 WINDOWS=1 STATIC=1
+    - $mingw make -j ${JOBS} FIX_BUGS=1 ${BUILD_TYPE} WARNINGS=1 WARNINGS_ALL=1 WINDOWS=1 STATIC=1
 
 after_success:
     # Send success notification to Discord through DISCORD_WEBHOOK_URL
