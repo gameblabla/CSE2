@@ -50,7 +50,7 @@ before_install:
     - echo $BUILD_TYPE
 
     # Point CC and CXX to MinGW-w64
-    - export CXX="x86_64-w64-mingw32-g++" CC="x86_64-w64-mingw32-gcc" WINDRES="x86_64-w64-mingw32-windres"
+    - export CXX="x86_64-w64-mingw32-g++" CC="x86_64-w64-mingw32-gcc"
 
     # /usr/bin/gcc points to an older compiler on both Linux and macOS.
 #    - if [ "$CXX" = "g++" ]; then export CXX="g++-9" CC="gcc-9"; fi
@@ -68,7 +68,7 @@ install:
     - echo $JOBS
 
 script:
-    - make -j ${JOBS} FIX_BUGS=1 RELEASE=1 WARNINGS=1 WARNINGS_ALL=1 WINDOWS=1
+    - make -j ${JOBS} FIX_BUGS=1 RELEASE=1 WARNINGS=1 WARNINGS_ALL=1 WINDOWS=1 WINDRES="x86_64-w64-mingw32-windres"
 
 after_success:
     # Send success notification to Discord through DISCORD_WEBHOOK_URL
