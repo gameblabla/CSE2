@@ -130,7 +130,7 @@ script:
     - make -j ${JOBS} FIX_BUGS=1 ${MAKE_BUILD_TYPE} WARNINGS=1 WARNINGS_ALL=1
     - cd ${CMAKE_BUILD_DIR}
 
-	# Windows build
+    # Windows build
     - |
       if [ "$TRAVIS_OS_NAME" = "linux" ]; then
         if [ "$CXX" = "g++" ]; then
