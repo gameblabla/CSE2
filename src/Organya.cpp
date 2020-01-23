@@ -514,11 +514,7 @@ BOOL OrgData::SetMusicInfo(MUSICINFO *mi, unsigned long flag)
 		for (i = 0; i < MAXMELODY; i++)
 		{
 			info.tdata[i].freq = mi->tdata[i].freq;
-		#ifdef FIX_BUGS
-			info.tdata[i].pipi = mi->tdata[i].pipi;
-		#else
-			info.tdata[i].pipi = info.tdata[i].pipi;	 // Just sets info.tdata[i].pipi to itself
-		#endif
+			info.tdata[i].pipi = info.tdata[i].pipi;	 // Just sets info.tdata[i].pipi to itself (SETPIPI already sets pipi, so maybe this line shouldn't be here in the first place)
 		}
 	}
 
