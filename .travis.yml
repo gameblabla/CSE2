@@ -2,9 +2,6 @@
 git:
     depth: 5
 
-# No need for sudo
-sudo: false
-
 # Bionic is the most recent version of Ubuntu I can get to work properly
 dist: bionic
 
