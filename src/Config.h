@@ -33,7 +33,6 @@ struct CONFIG
 	char proof[0x20];
 	char font_name[0x40];
 	unsigned char display_mode;
-	BOOL bJoystick;
 	BOOL b60fps;
 	BOOL bVsync;
 	BOOL bSmoothScrolling;

@@ -11,7 +11,7 @@
 #include "Main.h"
 
 static const char* const config_filename = "Config.dat";	// Not the original name
-static const char* const config_magic = "CSE2E   20200120";	// Not the original name
+static const char* const config_magic = "CSE2E   20200123";	// Not the original name
 
 BOOL LoadConfigData(CONFIG *conf)
 {
@@ -33,9 +33,6 @@ BOOL LoadConfigData(CONFIG *conf)
 
 	// Read display mode
 	conf->display_mode = fgetc(fp);
-
-	// Read 'joystick enabled' flag
-	conf->bJoystick = fgetc(fp);
 
 	// Read framerate toggle
 	conf->b60fps = fgetc(fp);
@@ -84,9 +81,6 @@ BOOL SaveConfigData(const CONFIG *conf)
 	// Write display mode
 	fputc(conf->display_mode, fp);
 
-	// Write 'joystick enabled' flag
-	fputc(conf->bJoystick, fp);
-
 	// Write framerate toggle
 	fputc(conf->b60fps, fp);
 
@@ -120,7 +114,6 @@ void DefaultConfigData(CONFIG *conf)
 	// conf->display_mode = 1;
 
 	// Reset joystick settings (as these can't simply be set to 0)
-	conf->bJoystick = TRUE;
 	conf->bindings[BINDING_UP].controller = 0xFF;
 	conf->bindings[BINDING_DOWN].controller = 0xFF;
 	conf->bindings[BINDING_LEFT].controller = 0xFF;

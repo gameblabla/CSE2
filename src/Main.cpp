@@ -202,7 +202,7 @@ int main(int argc, char *argv[])
 	InitDirectSound();
 
 	// Initialize joystick
-	if (conf.bJoystick && InitDirectInput())
+	if (InitDirectInput())
 	{
 		ResetJoystickStatus();
 		gbUseJoystick = TRUE;
