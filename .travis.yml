@@ -29,7 +29,7 @@ addons:
         - sourceline: 'ppa:ubuntu-toolchain-r/test'
     packages:
         - make
-        - g++-mingw-w64-x86-64
+        - mingw-w64
 
 #env:
 #    - BUILD_TYPE=Debug
@@ -47,10 +47,7 @@ before_install:
     - echo $TRAVIS_OS_NAME
 
     # Display build type
-    - echo $BUILD_TYPE
-
-    # Point CC and CXX to MinGW-w64 (and also WINDRES)
-    - export CXX="x86_64-w64-mingw32-g++" CC="x86_64-w64-mingw32-gcc" WINDRES="x86_64-w64-mingw32-windres"
+#    - echo $BUILD_TYPE
 
     # Display compilers name/version
     - echo ${CC}
@@ -64,7 +61,11 @@ install:
     - echo $JOBS
 
 script:
-    - make -j ${JOBS} FIX_BUGS=1 RELEASE=1 WARNINGS=1 WARNINGS_ALL=1 WINDOWS=1
+    # Compile 32-bit build
+    - make -j ${JOBS} FIX_BUGS=1 RELEASE=1 WARNINGS=1 WARNINGS_ALL=1 WINDOWS=1 CC=i686-w64-mingw32-gcc CXX=i686-w64-mingw32-g++ WINDRES=i686-w64-mingw32-windres
+
+    # Compile 64-bit build
+    - make -j ${JOBS} FIX_BUGS=1 RELEASE=1 WARNINGS=1 WARNINGS_ALL=1 WINDOWS=1 CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ WINDRES=x86_64-w64-mingw32-windres
 
 after_success:
     # Send success notification to Discord through DISCORD_WEBHOOK_URL
