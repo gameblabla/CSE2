@@ -76,16 +76,16 @@ before_install:
     # Display compilers name/version
     - if [ "$TRAVIS_OS_NAME" = "windows" ];
       then
-        $mingw32 echo ${CC};
-        $mingw32 echo ${CXX};
-        $mingw32 ${CC} --version;
-        $mingw32 ${CXX} --version;
+        $mingw32 echo ${CC}
+        $mingw32 echo ${CXX}
+        $mingw32 ${CC} --version
+        $mingw32 ${CXX} --version
 
-        $mingw64 echo ${CC};
-        $mingw64 echo ${CXX};
-        $mingw64 ${CC} --version;
-        $mingw64 ${CXX} --version;
-      else
+        $mingw64 echo ${CC}
+        $mingw64 echo ${CXX}
+        $mingw64 ${CC} --version
+        $mingw64 ${CXX} --version
+      ;else
         echo ${CC};
         echo ${CXX};
         ${CC} --version;
