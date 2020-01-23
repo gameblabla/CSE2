@@ -95,10 +95,10 @@ before_install:
       fi
 
     # Display compilers name/version
-    $mingw echo ${CC}
-    $mingw echo ${CXX}
-    $mingw ${CC} --version
-    $mingw ${CXX} --version
+    - $mingw echo ${CC}
+    - $mingw echo ${CXX}
+    - $mingw ${CC} --version
+    - $mingw ${CXX} --version
 
 before_cache:
     - |-
