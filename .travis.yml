@@ -115,7 +115,7 @@ before_install:
         ${CC} --version
         ${CXX} --version
         cmake --version
-      endif
+      fi
 
 before_cache:
     - |-
