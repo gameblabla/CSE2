@@ -23,6 +23,7 @@ compiler:
 os:
     - linux
     - osx
+    - windows
 
 addons:
   apt:
@@ -55,6 +56,26 @@ env:
     - MAKE_BUILD_TYPE=RELEASE=1 CMAKE_BUILD_TYPE=RelWithDebInfo
 
 before_install:
+    # Setup MSYS2
+    - |-
+        case $TRAVIS_OS_NAME in
+          windows)
+            [[ ! -f C:/tools/msys64/msys2_shell.cmd ]] && rm -rf C:/tools/msys64
+            choco uninstall -y mingw
+            choco upgrade --no-progress -y msys2
+            export msys2='cmd //C RefreshEnv.cmd '
+            export msys2+='& set MSYS=winsymlinks:nativestrict '
+            export msys2+='& C:\\tools\\msys64\\msys2_shell.cmd -defterm -no-start'
+            export mingw32="$msys2 -mingw32 -full-path -here -c "\"\$@"\" --"
+            export mingw64="$msys2 -mingw64 -full-path -here -c "\"\$@"\" --"
+            export msys2+=" -msys2 -c "\"\$@"\" --"
+            $msys2 pacman --sync --noconfirm --needed make mingw-w64-i686-toolchain mingw-w64-x86_64-toolchain mingw-w64-i686-clang mingw-w64-x86_64-clang mingw-w64-i686-cmake mingw-w64-x86_64-cmake mingw-w64-x86_64-SDL2 mingw-w64-i686-SDL2 mingw-w64-i686-freetype mingw-w64-x86_64-freetype mingw-w64-i686-fltk mingw-w64-x86_64-fltk
+            taskkill //IM gpg-agent.exe //F  # https://travis-ci.community/t/4967
+            export PATH=/C/tools/msys64/mingw64/bin:$PATH
+            export MAKE=mingw32-make  # so that Autotools can find it
+            ;;
+        esac
+
     # Set URL for Discord send script
     - DISCORD_SEND_SCRIPT_URL=https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
     - DISCORD_SEND_SCRIPT_FILENAME=discordSendNotification.sh
@@ -87,11 +108,40 @@ before_install:
       fi
 
     # Display compilers/cmake name/version
-    - echo ${CC}
-    - echo ${CXX}
-    - ${CC} --version
-    - ${CXX} --version
-    - cmake --version
+    - |
+      if [ "$TRAVIS_OS_NAME" == "windows" ]; then
+        $mingw32 echo ${CC}
+        $mingw32 echo ${CXX}
+        $mingw32 ${CC} --version
+        $mingw32 ${CXX} --version
+        $mingw32 cmake --version
+
+        $mingw64 echo ${CC}
+        $mingw64 echo ${CXX}
+        $mingw64 ${CC} --version
+        $mingw64 ${CXX} --version
+        $mingw64 cmake --version
+      else
+        echo ${CC}
+        echo ${CXX}
+        ${CC} --version
+        ${CXX} --version
+        cmake --version
+      fi
+
+before_cache:
+    - |-
+        case $TRAVIS_OS_NAME in
+          windows)
+            # https://unix.stackexchange.com/a/137322/107554
+            $msys2 pacman --sync --clean --noconfirm
+            ;;
+        esac
+
+cache:
+    directories:
+    - $HOME/AppData/Local/Temp/chocolatey
+    - /C/tools/msys64
 
 install:
     # Get number of cores (or 2 by default if somehow none of these are available somehow)
@@ -100,6 +150,9 @@ install:
 
     # Recommanded build directory
     - CMAKE_BUILD_DIR=build
+
+    # Extra build directory for 64-bit Windows builds
+    - CMAKE_BUILD_DIR2=build_mingw64
 
     # Install ccache on OSX
     - |
@@ -118,16 +171,35 @@ install:
 before_script:
     # Make build directory and generate CMake build files
     - mkdir -p ${CMAKE_BUILD_DIR} && cd ${CMAKE_BUILD_DIR}
-    - cmake .. -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE -DFIX_BUGS=ON -DWARNINGS=ON -DWARNINGS_ALL=ON
+    - $mingw32 cmake .. -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE -DFIX_BUGS=ON -DWARNINGS=ON -DWARNINGS_ALL=ON
+    - cd ..
+
+    - |
+      if [ "${TRAVIS_OS_NAME}" == "windows" ]; then
+        mkdir -p ${CMAKE_BUILD_DIR2} && cd ${CMAKE_BUILD_DIR2}
+        $mingw64 cmake .. -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE -DFIX_BUGS=ON -DWARNINGS=ON -DWARNINGS_ALL=ON
+        cd ..
+      fi
 
 script:
     # CMake build
-    - cmake --build . --config ${CMAKE_BUILD_TYPE} --parallel ${JOBS}
+    - cd ${CMAKE_BUILD_DIR}
+    - $mingw32 cmake --build . --config ${CMAKE_BUILD_TYPE} --parallel ${JOBS}
+    - cd ..
 
     # Make build
-    - cd ..
-    - make -j ${JOBS} FIX_BUGS=1 ${MAKE_BUILD_TYPE} WARNINGS=1 WARNINGS_ALL=1
-    - cd ${CMAKE_BUILD_DIR}
+    - $mingw32 make -j ${JOBS} FIX_BUGS=1 ${MAKE_BUILD_TYPE} WARNINGS=1 WARNINGS_ALL=1
+
+    - |
+      if [ "${TRAVIS_OS_NAME}" == "windows" ]; then
+        # CMake build
+        cd ${CMAKE_BUILD_DIR}
+        $mingw64 cmake --build . --config ${CMAKE_BUILD_TYPE} --parallel ${JOBS}
+        cd ..
+
+        # Make build
+        $mingw64 make -j ${JOBS} FIX_BUGS=1 ${MAKE_BUILD_TYPE} WARNINGS=1 WARNINGS_ALL=1
+      fi
 
 after_success:
     # Send success notification to Discord through DISCORD_WEBHOOK_URL
