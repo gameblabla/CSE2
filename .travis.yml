@@ -8,8 +8,18 @@ dist: bionic
 # Enable C++ language support
 language: cpp
 
+before_cache:
+    - |-
+        case $TRAVIS_OS_NAME in
+          windows)
+            # https://unix.stackexchange.com/a/137322/107554
+            $msys2 pacman --sync --clean --noconfirm
+            ;;
+        esac
+
 # Cache compiled object files with ccache
-cache: ccache
+cache:
+    ccache
     directories:
     - $HOME/AppData/Local/Temp/chocolatey
     - /C/tools/msys64
@@ -97,12 +107,3 @@ after_failure:
     - travis_retry wget ${DISCORD_SEND_SCRIPT_URL} -O ${DISCORD_SEND_SCRIPT_FILENAME}
     - chmod +x ${DISCORD_SEND_SCRIPT_FILENAME}
     - ./${DISCORD_SEND_SCRIPT_FILENAME} failure $DISCORD_WEBHOOK_URL
-
-before_cache:
-    - |-
-        case $TRAVIS_OS_NAME in
-          windows)
-            # https://unix.stackexchange.com/a/137322/107554
-            $msys2 pacman --sync --clean --noconfirm
-            ;;
-        esac
