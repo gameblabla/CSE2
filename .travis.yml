@@ -173,6 +173,7 @@ before_script:
 script:
     # CMake build
     - cd ${CMAKE_BUILD_DIR}
+    - ls
     - $mingw32 cmake --build . --config $CMAKE_BUILD_TYPE --parallel $JOBS
     - cd ..
 
@@ -182,12 +183,12 @@ script:
     - |
       if [ "${TRAVIS_OS_NAME}" == "windows" ]; then
         # CMake build
-        cd ${CMAKE_BUILD_DIR}
-        $mingw64 cmake --build . --config $CMAKE_BUILD_TYPE2 --parallel $JOBS
+        cd ${CMAKE_BUILD_DIR2}
+        $mingw64 cmake --build . --config $CMAKE_BUILD_TYPE --parallel $JOBS
         cd ..
 
         # Make build
-        $mingw64 make -j $JOBS FIX_BUGS=1 $MAKE_BUILD_TYPE2 WARNINGS=1 WARNINGS_ALL=1
+        $mingw64 make -j $JOBS FIX_BUGS=1 $MAKE_BUILD_TYPE WARNINGS=1 WARNINGS_ALL=1
       fi
 
 after_success:
