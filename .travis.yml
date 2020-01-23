@@ -26,10 +26,8 @@ addons:
         - mingw-w64
 
 env:
-    - MAKE_BUILD_TYPE=RELEASE=0
-    - MAKE_BUILD_TYPE=RELEASE=1
-    - SIXTY_FOUR_BIT=false
-    - SIXTY_FOUR_BIT=true
+    - MAKE_BUILD_TYPE=RELEASE=0 SIXTY_FOUR_BIT=false
+    - MAKE_BUILD_TYPE=RELEASE=1 SIXTY_FOUR_BIT=true
 
 before_install:
     # Setup MSYS2
