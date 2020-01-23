@@ -63,34 +63,6 @@ before_install:
     # Display build type
     - echo $MAKE_BUILD_TYPE
 
-    # Define WINDRES
-    - |
-      if [ "$TRAVIS_OS_NAME" = "windows" ]; then
-        export WINDRES32="windres"
-        export WINDRES64="windres"
-      else
-        export WINDRES32="i686-w64-mingw32-windres"
-        export WINDRES64="x86_64-w64-mingw32-windres"
-      fi
-
-    # Display compilers name/version
-    - |
-      if [ "$TRAVIS_OS_NAME" = "windows" ]; then
-        $mingw32 echo ${CC}
-        $mingw32 echo ${CXX}
-        $mingw32 ${CC} --version
-        $mingw32 ${CXX} --version
-
-        $mingw64 echo ${CC}
-        $mingw64 echo ${CXX}
-        $mingw64 ${CC} --version
-        $mingw64 ${CXX} --version
-      else
-        echo ${CC}
-        echo ${CXX}
-        ${CC} --version
-        ${CXX} --version
-      fi
 
 before_cache:
     - |-
