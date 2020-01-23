@@ -172,8 +172,10 @@ before_script:
 
 script:
     # CMake build
-    - cd ${CMAKE_BUILD_DIR}
     - ls
+    - ls ${CMAKE_BUILD_DIR}
+    - ls ${CMAKE_BUILD_DIR2}
+    - cd ${CMAKE_BUILD_DIR}
     - $mingw32 cmake --build . --config $CMAKE_BUILD_TYPE --parallel $JOBS
     - cd ..
 
