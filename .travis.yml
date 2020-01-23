@@ -16,7 +16,6 @@ cache: ccache
 
 compiler:
     - gcc
-#    - clang
 
 os:
     - linux
@@ -45,6 +44,9 @@ before_install:
 
     # Display Travis OS name
     - echo $TRAVIS_OS_NAME
+
+    # Display build type
+    - echo $MAKE_BUILD_TYPE
 
     # Display compilers name/version
     - echo ${CC}
