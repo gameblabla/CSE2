@@ -156,15 +156,7 @@ install:
 before_script:
     # Make build directory and generate CMake build files
     - |
-      if [ "${TRAVIS_OS_NAME}" == "windows" ]; then
-        mkdir -p ${CMAKE_BUILD_DIR} && cd ${CMAKE_BUILD_DIR}
-        $mingw32 cmake .. -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE -DFIX_BUGS=ON -DWARNINGS=ON -DWARNINGS_ALL=ON -G"Unix Makefiles"
-        cd ..
-
-        mkdir -p ${CMAKE_BUILD_DIR2} && cd ${CMAKE_BUILD_DIR2}
-        $mingw64 cmake .. -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE -DFIX_BUGS=ON -DWARNINGS=ON -DWARNINGS_ALL=ON -G"MSYS Makefiles"
-        cd ..
-      else
+      if [ "${TRAVIS_OS_NAME}" != "windows" ]; then
         mkdir -p ${CMAKE_BUILD_DIR} && cd ${CMAKE_BUILD_DIR}
         cmake .. -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE -DFIX_BUGS=ON -DWARNINGS=ON -DWARNINGS_ALL=ON
         cd ..
@@ -172,24 +164,17 @@ before_script:
 
 script:
     # CMake build
-    - ls
-    - ls ${CMAKE_BUILD_DIR}
-    - ls ${CMAKE_BUILD_DIR2}
-    - cd ${CMAKE_BUILD_DIR}
-    - $mingw32 cmake --build . --config $CMAKE_BUILD_TYPE --parallel $JOBS
-    - cd ..
+    - if [ "${TRAVIS_OS_NAME}" != "windows" ]; then
+        cd ${CMAKE_BUILD_DIR}
+        $mingw32 cmake --build . --config $CMAKE_BUILD_TYPE --parallel $JOBS
+        cd ..
+      fi
 
     # Make build
     - $mingw32 make -j $JOBS FIX_BUGS=1 $MAKE_BUILD_TYPE WARNINGS=1 WARNINGS_ALL=1
 
     - |
       if [ "${TRAVIS_OS_NAME}" == "windows" ]; then
-        # CMake build
-        cd ${CMAKE_BUILD_DIR2}
-        $mingw64 cmake --build . --config $CMAKE_BUILD_TYPE --parallel $JOBS
-        cd ..
-
-        # Make build
         $mingw64 make -j $JOBS FIX_BUGS=1 $MAKE_BUILD_TYPE WARNINGS=1 WARNINGS_ALL=1
       fi
 
