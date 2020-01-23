@@ -1102,12 +1102,12 @@ void DrawText(FontObject *font_object, Backend_Surface *surface, int x, int y, u
 
 			CachedGlyph *glyph = GetGlyphCached(font_object, unicode_value);
 
-			if (glyph)
+			if (glyph != NULL)
 			{
 				const int letter_x = x + pen_x + glyph->x;
 				const int letter_y = y + glyph->y;
 
-				if (glyph->backend)
+				if (glyph->backend != NULL)
 					Backend_DrawGlyph(surface, glyph->backend, letter_x, letter_y, colours);
 
 				pen_x += glyph->x_advance;
