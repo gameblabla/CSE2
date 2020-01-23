@@ -40,13 +40,11 @@ before_install:
             export msys2='cmd //C RefreshEnv.cmd '
             export msys2+='& set MSYS=winsymlinks:nativestrict '
             export msys2+='& C:\\tools\\msys64\\msys2_shell.cmd -defterm -no-start'
-            export mingw64="$msys2 -mingw32 -full-path -here -c "\"\$@"\" --"
+            export mingw32="$msys2 -mingw32 -full-path -here -c "\"\$@"\" --"
             export mingw64="$msys2 -mingw64 -full-path -here -c "\"\$@"\" --"
             export msys2+=" -msys2 -c "\"\$@"\" --"
             $msys2 pacman --sync --noconfirm --needed make mingw-w64-i686-toolchain mingw-w64-x86_64-toolchain
             taskkill //IM gpg-agent.exe //F  # https://travis-ci.community/t/4967
-#            export PATH=/C/tools/msys64/mingw64/bin:$PATH
-#            export MAKE=mingw32-make  # so that Autotools can find it
             ;;
         esac
 
@@ -63,6 +61,34 @@ before_install:
     # Display build type
     - echo $MAKE_BUILD_TYPE
 
+    # Define WINDRES
+    - |
+      if [ "$TRAVIS_OS_NAME" = "windows" ]; then
+        WINDRES32="windres"
+        WINDRES64="windres"
+      else
+        WINDRES32="i686-w64-mingw32-windres"
+        WINDRES64="x86_64-w64-mingw32-windres"
+      fi
+
+    # Display compilers name/version
+    - |
+      if [ "$TRAVIS_OS_NAME" = "windows" ]; then
+        $mingw32 echo ${CC}
+        $mingw32 echo ${CXX}
+        $mingw32 ${CC} --version
+        $mingw32 ${CXX} --version
+
+        $mingw64 echo ${CC}
+        $mingw64 echo ${CXX}
+        $mingw64 ${CC} --version
+        $mingw64 ${CXX} --version
+      else
+        echo ${CC}
+        echo ${CXX}
+        ${CC} --version
+        ${CXX} --version
+      fi
 
 before_cache:
     - |-
