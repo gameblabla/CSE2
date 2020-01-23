@@ -66,7 +66,7 @@ before_install:
             export mingw32="$msys2 -mingw32 -full-path -here -c "\"\$@"\" --"
             export mingw64="$msys2 -mingw64 -full-path -here -c "\"\$@"\" --"
             export msys2+=" -msys2 -c "\"\$@"\" --"
-            $msys2 pacman --sync --noconfirm --needed make mingw-w64-i686-toolchain mingw-w64-x86_64-toolchain mingw-w64-i686-clang mingw-w64-x86_64-clang mingw-w64-i686-cmake mingw-w64-x86_64-cmake mingw-w64-x86_64-SDL2 mingw-w64-i686-SDL2 mingw-w64-i686-freetype mingw-w64-x86_64-freetype mingw-w64-i686-fltk mingw-w64-x86_64-fltk
+            $msys2 pacman --sync --noconfirm --needed make mingw-w64-i686-toolchain mingw-w64-x86_64-toolchain mingw-w64-i686-clang mingw-w64-x86_64-clang mingw-w64-i686-make mingw-w64-x86_64-make mingw-w64-i686-cmake mingw-w64-x86_64-cmake mingw-w64-i686-SDL2 mingw-w64-x86_64-SDL2 mingw-w64-i686-freetype mingw-w64-x86_64-freetype mingw-w64-i686-fltk mingw-w64-x86_64-fltk
             taskkill //IM gpg-agent.exe //F  # https://travis-ci.community/t/4967
             export PATH=/C/tools/msys64/mingw64/bin:$PATH
             export MAKE=mingw32-make  # so that Autotools can find it
@@ -158,7 +158,7 @@ before_script:
     - |
       if [ "${TRAVIS_OS_NAME}" == "windows" ]; then
         mkdir -p ${CMAKE_BUILD_DIR} && cd ${CMAKE_BUILD_DIR}
-        $mingw32 cmake .. -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE -DFIX_BUGS=ON -DWARNINGS=ON -DWARNINGS_ALL=ON -G"MSYS Makefiles"
+        $mingw32 cmake .. -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE -DFIX_BUGS=ON -DWARNINGS=ON -DWARNINGS_ALL=ON -G"Unix Makefiles"
         cd ..
 
         mkdir -p ${CMAKE_BUILD_DIR2} && cd ${CMAKE_BUILD_DIR2}
