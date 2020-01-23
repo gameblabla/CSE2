@@ -228,6 +228,10 @@ else()
 	list(APPEND RESOURCES "FONT/LiberationMono.ttf")
 endif()
 
+if(NOT WIN32)
+	list(APPEND RESOURCES "ICON/ICON_MINI.png")
+endif()
+
 if(FIX_BUGS)
 	target_compile_definitions(CSE2 PRIVATE FIX_BUGS)
 endif()

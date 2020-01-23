@@ -19,7 +19,6 @@
 
 #include "../../WindowsWrapper.h"
 
-#include "../../Main.h"
 #include "../../Resource.h"
 
 #define TOTAL_VBOS 2
@@ -332,13 +331,13 @@ Backend_Surface* Backend_Init(const char *title, unsigned int internal_screen_wi
 	if (window != NULL)
 	{
 	#ifndef _WIN32	// On Windows, we use native icons instead (so we can give the taskbar and window separate icons, like the original EXE does)
-		char image_path[MAX_PATH];
-		sprintf(image_path, "%s/Resource/ICON/ICON_MINI.png", gDataPath);
+		size_t resource_size;
+		const unsigned char *resource_data = FindResource("ICON_MINI", "ICON", &resource_size);
 
 		unsigned char *image_buffer;
 		unsigned int image_width;
 		unsigned int image_height;
-		lodepng_decode32_file(&image_buffer, &image_width, &image_height, image_path);
+		lodepng_decode32(&image_buffer, &image_width, &image_height, resource_data, resource_size);
 
 		SDL_Surface *icon_surface = SDL_CreateRGBSurfaceWithFormatFrom(image_buffer, image_width, image_height, 32, image_width * 4, SDL_PIXELFORMAT_RGBA32);
 		SDL_SetWindowIcon(window, icon_surface);

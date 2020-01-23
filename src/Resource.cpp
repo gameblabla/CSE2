@@ -8,6 +8,9 @@
 #else
 #include "Resource/FONT/LiberationMono.ttf.h"
 #endif
+#ifndef _WIN32
+#include "Resource/ICON/ICON_MINI.png.h"
+#endif
 
 static const struct
 {
@@ -20,6 +23,9 @@ static const struct
 	{"FONT", "FONT", rNotoSansMonoCJKjp, sizeof(rNotoSansMonoCJKjp)},
 #else
 	{"FONT", "FONT", rLiberationMono, sizeof(rLiberationMono)},
+#endif
+#ifndef _WIN32
+	{"ICON", "ICON_MINI", rICON_MINI, sizeof(rICON_MINI)},
 #endif
 };
 
