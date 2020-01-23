@@ -109,25 +109,13 @@ before_install:
 
     # Display compilers/cmake name/version
     - |
-      if [ "$TRAVIS_OS_NAME" == "windows" ]; then
-        $mingw32 echo ${CC}
-        $mingw32 echo ${CXX}
-        $mingw32 ${CC} --version
-        $mingw32 ${CXX} --version
-        $mingw32 cmake --version
-
-        $mingw64 echo ${CC}
-        $mingw64 echo ${CXX}
-        $mingw64 ${CC} --version
-        $mingw64 ${CXX} --version
-        $mingw64 cmake --version
-      else
+      if [ "$TRAVIS_OS_NAME" != "windows" ]; then
         echo ${CC}
         echo ${CXX}
         ${CC} --version
         ${CXX} --version
         cmake --version
-      fi
+      endif
 
 before_cache:
     - |-
@@ -170,7 +158,6 @@ install:
 
 before_script:
     # Make build directory and generate CMake build files
-
     - |
       if [ "${TRAVIS_OS_NAME}" == "windows" ]; then
         mkdir -p ${CMAKE_BUILD_DIR} && cd ${CMAKE_BUILD_DIR}
@@ -189,21 +176,21 @@ before_script:
 script:
     # CMake build
     - cd ${CMAKE_BUILD_DIR}
-    - $mingw32 cmake --build . --config ${CMAKE_BUILD_TYPE} --parallel ${JOBS}
+    - $mingw32 cmake --build . --config $CMAKE_BUILD_TYPE --parallel $JOBS
     - cd ..
 
     # Make build
-    - $mingw32 make -j ${JOBS} FIX_BUGS=1 ${MAKE_BUILD_TYPE} WARNINGS=1 WARNINGS_ALL=1
+    - $mingw32 make -j $JOBS FIX_BUGS=1 $MAKE_BUILD_TYPE WARNINGS=1 WARNINGS_ALL=1
 
     - |
       if [ "${TRAVIS_OS_NAME}" == "windows" ]; then
         # CMake build
         cd ${CMAKE_BUILD_DIR}
-        $mingw64 cmake --build . --config ${CMAKE_BUILD_TYPE} --parallel ${JOBS}
+        $mingw64 cmake --build . --config $CMAKE_BUILD_TYPE2 --parallel $JOBS
         cd ..
 
         # Make build
-        $mingw64 make -j ${JOBS} FIX_BUGS=1 ${MAKE_BUILD_TYPE} WARNINGS=1 WARNINGS_ALL=1
+        $mingw64 make -j $JOBS FIX_BUGS=1 $MAKE_BUILD_TYPE2 WARNINGS=1 WARNINGS_ALL=1
       fi
 
 after_success:
