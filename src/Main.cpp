@@ -41,9 +41,6 @@ CONFIG_BINDING bindings[BINDING_TOTAL];
 static BOOL bActive = TRUE;
 static BOOL bFps = FALSE;
 
-static int windowWidth;
-static int windowHeight;
-
 #ifdef JAPANESE
 static const char *lpWindowName = "洞窟物語";	// "Cave Story"
 #else
@@ -92,8 +89,6 @@ int main(int argc, char *argv[])
 {
 	(void)argc;
 	(void)argv;
-
-	int i;
 
 	SDL_Init(SDL_INIT_EVENTS);
 
