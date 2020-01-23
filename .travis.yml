@@ -2,9 +2,6 @@
 git:
     depth: 5
 
-# No need for sudo
-sudo: false
-
 # Bionic is the most recent version of Ubuntu I can get to work properly
 dist: bionic
 
@@ -31,6 +28,7 @@ addons:
           key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
         - sourceline: 'ppa:ubuntu-toolchain-r/test'
     packages:
+        - make
         - cmake
         - gcc-9
         - g++-9
@@ -40,6 +38,7 @@ addons:
 #        - libxmp-dev  # Needed by AUDIO_TRACKER
   homebrew:
     packages:
+        - make
         - cmake
         - gcc@9
         - llvm@9
@@ -49,8 +48,10 @@ addons:
     update: true
 
 env:
-    - BUILD_TYPE=Debug
-    - BUILD_TYPE=RelWithDebInfo
+    - BUILD_SYSTEM=make BUILD_TYPE=RELEASE=0
+    - BUILD_SYSTEM=cmake BUILD_TYPE=Debug
+    - BUILD_SYSTEM=make BUILD_TYPE=RELEASE=1
+    - BUILD_SYSTEM=cmake BUILD_TYPE=RelWithDebInfo
 
 before_install:
     # Set URL for Discord send script
@@ -64,6 +65,7 @@ before_install:
     - echo $TRAVIS_OS_NAME
 
     # Display build type
+    - echo $BUILD_SYSTEM
     - echo $BUILD_TYPE
 
     # The following Homebrew packages aren't linked by default, and need to be prepended to the path explicitly.
@@ -106,25 +108,26 @@ install:
           export PATH="/usr/local/opt/ccache/libexec:$PATH"
       fi
 
-    # Install required libraries
-    - mkdir travisLibs && cd travisLibs
-
-    # Finished installing required libraries
-    - cd ..
-
 before_script:
-    # Make build directory and generate CMake build files
-    - mkdir -p ${CMAKE_BUILD_DIR} && cd ${CMAKE_BUILD_DIR}
-    - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DFIX_BUGS=ON -DWARNINGS=ON -DWARNINGS_ALL=ON
+    - |
+      if [ "$BUILD_SYSTEM" == "cmake" ]; then
+        # Make build directory and generate CMake build files
+        mkdir -p ${CMAKE_BUILD_DIR} && cd ${CMAKE_BUILD_DIR}
+        cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DFIX_BUGS=ON -DWARNINGS=ON -DWARNINGS_ALL=ON
+        cd ..
+      fi
 
 script:
-    # CMake build
-    - cmake --build . --config ${BUILD_TYPE} --parallel ${JOBS}
-
-    # Make build
-    - cd ..
-    - make -j ${JOBS} FIX_BUGS=1 RELEASE=1 WARNINGS=1 WARNINGS_ALL=1
-    - cd ${CMAKE_BUILD_DIR}
+    - |
+      if [ "$BUILD_SYSTEM" == "cmake" ]; then
+        # CMake build
+        cd ${CMAKE_BUILD_DIR}
+        cmake --build . --config $BUILD_TYPE --parallel $JOBS
+        cd ..
+      else
+        # Make build
+        make -j $JOBS FIX_BUGS=1 $BUILD_TYPE WARNINGS=1 WARNINGS_ALL=1
+      fi
 
 after_success:
     # Send success notification to Discord through DISCORD_WEBHOOK_URL
