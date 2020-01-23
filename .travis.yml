@@ -65,17 +65,17 @@ before_install:
 
     # Define WINDRES
     - if [ "$TRAVIS_OS_NAME" = "windows" ];
-      then;
+      then
         export WINDRES32="windres"
         export WINDRES64="windres"
-      else;
+      else
         export WINDRES32="i686-w64-mingw32-windres"
         export WINDRES64="x86_64-w64-mingw32-windres"
       fi
 
     # Display compilers name/version
     - if [ "$TRAVIS_OS_NAME" = "windows" ];
-      then;
+      then
         $mingw32 echo ${CC};
         $mingw32 echo ${CXX};
         $mingw32 ${CC} --version;
@@ -85,7 +85,7 @@ before_install:
         $mingw64 echo ${CXX};
         $mingw64 ${CC} --version;
         $mingw64 ${CXX} --version;
-      else;
+      else
         echo ${CC};
         echo ${CXX};
         ${CC} --version;
