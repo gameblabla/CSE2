@@ -38,6 +38,7 @@ addons:
         - libsdl2-dev
         - libfreetype6-dev
         - libfltk1.3-dev
+#        - libxmp-dev  # Needed by AUDIO_TRACKER
   homebrew:
     packages:
         - cmake
@@ -46,6 +47,7 @@ addons:
         - sdl2
         - freetype
         - fltk
+#        - libxmp-lite
     update: true
 
 env:
