@@ -278,8 +278,6 @@ BOOL SystemTask(void)
 					gKey |= KEY_F1;
 				else if (event.key.keysym.scancode == SDL_SCANCODE_F2)
 					gKey |= KEY_F2;
-				else if (event.key.keysym.scancode == SDL_SCANCODE_F5)
-					gbUseJoystick = FALSE;
 
 				if (event.key.keysym.scancode == bindings[BINDING_MAP].keyboard)
 					gKey |= KEY_MAP;
