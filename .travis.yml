@@ -31,7 +31,7 @@ addons:
         - make
         - mingw-w64
 
-#env:
+env:
     - MAKE_BUILD_TYPE=RELEASE=0
     - MAKE_BUILD_TYPE=RELEASE=1
 
