@@ -164,7 +164,8 @@ before_script:
 
 script:
     # CMake build
-    - if [ "${TRAVIS_OS_NAME}" != "windows" ]; then
+    - |
+      if [ "${TRAVIS_OS_NAME}" != "windows" ]; then
         cd ${CMAKE_BUILD_DIR}
         $mingw32 cmake --build . --config $CMAKE_BUILD_TYPE --parallel $JOBS
         cd ..
