@@ -8,6 +8,9 @@ dist: bionic
 # Enable C++ language support
 language: cpp
 
+# Cache compiled object files with ccache
+cache: ccache
+
 compiler:
     - gcc
 
@@ -109,9 +112,7 @@ before_cache:
             ;;
         esac
 
-# Cache compiled object files with ccache
 cache:
-#    ccache
     directories:
     - $HOME/AppData/Local/Temp/chocolatey
     - /C/tools/msys64
