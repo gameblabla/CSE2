@@ -10,12 +10,16 @@ language: cpp
 
 # Cache compiled object files with ccache
 cache: ccache
+    directories:
+    - $HOME/AppData/Local/Temp/chocolatey
+    - /C/tools/msys64
 
 compiler:
     - gcc
 
 os:
     - linux
+    - windows
 
 addons:
   apt:
@@ -32,6 +36,25 @@ env:
     - MAKE_BUILD_TYPE=RELEASE=1
 
 before_install:
+    # Setup MSYS2
+    - |-
+        case $TRAVIS_OS_NAME in
+          windows)
+            [[ ! -f C:/tools/msys64/msys2_shell.cmd ]] && rm -rf C:/tools/msys64
+            choco uninstall -y mingw
+            choco upgrade --no-progress -y msys2
+            export msys2='cmd //C RefreshEnv.cmd '
+            export msys2+='& set MSYS=winsymlinks:nativestrict '
+            export msys2+='& C:\\tools\\msys64\\msys2_shell.cmd -defterm -no-start'
+            export mingw64="$msys2 -mingw64 -full-path -here -c "\"\$@"\" --"
+            export msys2+=" -msys2 -c "\"\$@"\" --"
+            $msys2 pacman --sync --noconfirm --needed mingw-w64-i686-toolchain mingw-w64-x86_64-toolchain
+            taskkill //IM gpg-agent.exe //F  # https://travis-ci.community/t/4967
+            export PATH=/C/tools/msys64/mingw64/bin:$PATH
+            export MAKE=mingw32-make  # so that Autotools can find it
+            ;;
+        esac
+
     # Set URL for Discord send script
     - DISCORD_SEND_SCRIPT_URL=https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
     - DISCORD_SEND_SCRIPT_FILENAME=discordSendNotification.sh
@@ -46,10 +69,10 @@ before_install:
     - echo $MAKE_BUILD_TYPE
 
     # Display compilers name/version
-    - echo ${CC}
-    - echo ${CXX}
-    - ${CC} --version
-    - ${CXX} --version
+    - $mingw64 echo ${CC}
+    - $mingw64 echo ${CXX}
+    - $mingw64 ${CC} --version
+    - $mingw64 ${CXX} --version
 
 install:
     # Get number of cores (or 2 by default if somehow none of these are available somehow)
@@ -58,10 +81,10 @@ install:
 
 script:
     # Compile 32-bit build
-    - make -j ${JOBS} FIX_BUGS=1 ${MAKE_BUILD_TYPE} WARNINGS=1 WARNINGS_ALL=1 WINDOWS=1 STATIC=1 CC=i686-w64-mingw32-gcc CXX=i686-w64-mingw32-g++ WINDRES=i686-w64-mingw32-windres
+    - $mingw64 make -j ${JOBS} FIX_BUGS=1 ${MAKE_BUILD_TYPE} WARNINGS=1 WARNINGS_ALL=1 WINDOWS=1 STATIC=1 CC=i686-w64-mingw32-gcc CXX=i686-w64-mingw32-g++ WINDRES=i686-w64-mingw32-windres
 
     # Compile 64-bit build
-    - make -j ${JOBS} FIX_BUGS=1 ${MAKE_BUILD_TYPE} WARNINGS=1 WARNINGS_ALL=1 WINDOWS=1 STATIC=1 CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ WINDRES=x86_64-w64-mingw32-windres
+    - $mingw64 make -j ${JOBS} FIX_BUGS=1 ${MAKE_BUILD_TYPE} WARNINGS=1 WARNINGS_ALL=1 WINDOWS=1 STATIC=1 CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ WINDRES=x86_64-w64-mingw32-windres
 
 after_success:
     # Send success notification to Discord through DISCORD_WEBHOOK_URL
@@ -74,3 +97,12 @@ after_failure:
     - travis_retry wget ${DISCORD_SEND_SCRIPT_URL} -O ${DISCORD_SEND_SCRIPT_FILENAME}
     - chmod +x ${DISCORD_SEND_SCRIPT_FILENAME}
     - ./${DISCORD_SEND_SCRIPT_FILENAME} failure $DISCORD_WEBHOOK_URL
+
+before_cache:
+    - |-
+        case $TRAVIS_OS_NAME in
+          windows)
+            # https://unix.stackexchange.com/a/137322/107554
+            $msys2 pacman --sync --clean --noconfirm
+            ;;
+        esac
