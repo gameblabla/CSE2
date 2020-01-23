@@ -36,7 +36,6 @@ addons:
         - gcc-9
         - g++-9
         - clang-9
-        - mingw-w64
         - libsdl2-dev
         - libfreetype6-dev
         - libfltk1.3-dev
@@ -129,18 +128,6 @@ script:
     - cd ..
     - make -j ${JOBS} FIX_BUGS=1 ${MAKE_BUILD_TYPE} WARNINGS=1 WARNINGS_ALL=1
     - cd ${CMAKE_BUILD_DIR}
-
-    # Windows build
-    - |
-      if [ "$TRAVIS_OS_NAME" = "linux" ]; then
-        if [ "$CXX" = "g++" ]; then
-          # Compile 32-bit build
-          make -j ${JOBS} FIX_BUGS=1 ${MAKE_BUILD_TYPE} WARNINGS=1 WARNINGS_ALL=1 WINDOWS=1 STATIC=1 CC=i686-w64-mingw32-gcc CXX=i686-w64-mingw32-g++ WINDRES=i686-w64-mingw32-windres
-
-          # Compile 64-bit build
-          make -j ${JOBS} FIX_BUGS=1 ${MAKE_BUILD_TYPE} WARNINGS=1 WARNINGS_ALL=1 WINDOWS=1 STATIC=1 CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ WINDRES=x86_64-w64-mingw32-windres
-        fi
-      fi
 
 after_success:
     # Send success notification to Discord through DISCORD_WEBHOOK_URL
