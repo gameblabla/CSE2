@@ -37,8 +37,8 @@ addons:
 
 before_install:
     # Set URL for Discord send script
-#    - DISCORD_SEND_SCRIPT_URL=https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
-#    - DISCORD_SEND_SCRIPT_FILENAME=discordSendNotification.sh
+    - DISCORD_SEND_SCRIPT_URL=https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
+    - DISCORD_SEND_SCRIPT_FILENAME=discordSendNotification.sh
 
     # Display available disk space
     - df -h
@@ -49,18 +49,14 @@ before_install:
     # Display build type
     - echo $BUILD_TYPE
 
-    # Point CC and CXX to MinGW-w64
-    - export CXX="x86_64-w64-mingw32-g++" CC="x86_64-w64-mingw32-gcc"
+    # Point CC and CXX to MinGW-w64 (and also WINDRES)
+    - export CXX="x86_64-w64-mingw32-g++" CC="x86_64-w64-mingw32-gcc" WINDRES="x86_64-w64-mingw32-windres"
 
-    # /usr/bin/gcc points to an older compiler on both Linux and macOS.
-#    - if [ "$CXX" = "g++" ]; then export CXX="g++-9" CC="gcc-9"; fi
-
-    # Display compilers/cmake name/version
+    # Display compilers name/version
     - echo ${CC}
     - echo ${CXX}
     - ${CC} --version
     - ${CXX} --version
-#    - cmake --version
 
 install:
     # Get number of cores (or 2 by default if somehow none of these are available somehow)
@@ -68,16 +64,16 @@ install:
     - echo $JOBS
 
 script:
-    - make -j ${JOBS} FIX_BUGS=1 RELEASE=1 WARNINGS=1 WARNINGS_ALL=1 WINDOWS=1 WINDRES="x86_64-w64-mingw32-windres"
+    - make -j ${JOBS} FIX_BUGS=1 RELEASE=1 WARNINGS=1 WARNINGS_ALL=1 WINDOWS=1
 
 after_success:
     # Send success notification to Discord through DISCORD_WEBHOOK_URL
-#    - travis_retry wget ${DISCORD_SEND_SCRIPT_URL} -O ${DISCORD_SEND_SCRIPT_FILENAME}
-#    - chmod +x ${DISCORD_SEND_SCRIPT_FILENAME}
-#    - ./${DISCORD_SEND_SCRIPT_FILENAME} success $DISCORD_WEBHOOK_URL
+    - travis_retry wget ${DISCORD_SEND_SCRIPT_URL} -O ${DISCORD_SEND_SCRIPT_FILENAME}
+    - chmod +x ${DISCORD_SEND_SCRIPT_FILENAME}
+    - ./${DISCORD_SEND_SCRIPT_FILENAME} success $DISCORD_WEBHOOK_URL
 
 after_failure:
     # Send failure notification to Discord through DISCORD_WEBHOOK_URL
-#    - travis_retry wget ${DISCORD_SEND_SCRIPT_URL} -O ${DISCORD_SEND_SCRIPT_FILENAME}
-#    - chmod +x ${DISCORD_SEND_SCRIPT_FILENAME}
-#    - ./${DISCORD_SEND_SCRIPT_FILENAME} failure $DISCORD_WEBHOOK_URL
+    - travis_retry wget ${DISCORD_SEND_SCRIPT_URL} -O ${DISCORD_SEND_SCRIPT_FILENAME}
+    - chmod +x ${DISCORD_SEND_SCRIPT_FILENAME}
+    - ./${DISCORD_SEND_SCRIPT_FILENAME} failure $DISCORD_WEBHOOK_URL

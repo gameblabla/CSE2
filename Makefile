@@ -1,4 +1,4 @@
-WINDRES = windres
+WINDRES ?= windres
 
 BUILD_DIRECTORY = game
 ASSETS_DIRECTORY = assets
