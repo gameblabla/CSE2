@@ -21,8 +21,8 @@ compiler:
     - clang
 
 os:
-    - linux
-    - osx
+#    - linux
+#    - osx
     - windows
 
 addons:
