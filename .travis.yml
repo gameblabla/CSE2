@@ -31,15 +31,18 @@ addons:
           key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
         - sourceline: 'ppa:ubuntu-toolchain-r/test'
     packages:
+        - make
         - cmake
         - gcc-9
         - g++-9
         - clang-9
+        - mingw-w64
         - libsdl2-dev
         - libfreetype6-dev
         - libfltk1.3-dev
   homebrew:
     packages:
+        - make
         - cmake
         - gcc@9
         - llvm@9
@@ -49,8 +52,8 @@ addons:
     update: true
 
 env:
-    - BUILD_TYPE=Debug
-    - BUILD_TYPE=RelWithDebInfo
+    - MAKE_BUILD_TYPE=RELEASE=0 CMAKE_BUILD_TYPE=Debug
+    - MAKE_BUILD_TYPE=RELEASE=1 CMAKE_BUILD_TYPE=RelWithDebInfo
 
 before_install:
     # Set URL for Discord send script
@@ -64,7 +67,8 @@ before_install:
     - echo $TRAVIS_OS_NAME
 
     # Display build type
-    - echo $BUILD_TYPE
+    - echo $MAKE_BUILD_TYPE
+    - echo $CMAKE_BUILD_TYPE
 
     # The following Homebrew packages aren't linked by default, and need to be prepended to the path explicitly.
     - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
@@ -115,16 +119,28 @@ install:
 before_script:
     # Make build directory and generate CMake build files
     - mkdir -p ${CMAKE_BUILD_DIR} && cd ${CMAKE_BUILD_DIR}
-    - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DFIX_BUGS=ON -DWARNINGS=ON -DWARNINGS_ALL=ON
+    - cmake .. -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE -DFIX_BUGS=ON -DWARNINGS=ON -DWARNINGS_ALL=ON
 
 script:
     # CMake build
-    - cmake --build . --config ${BUILD_TYPE} --parallel ${JOBS}
+    - cmake --build . --config ${CMAKE_BUILD_TYPE} --parallel ${JOBS}
 
     # Make build
     - cd ..
-    - make -j ${JOBS} FIX_BUGS=1 RELEASE=1 WARNINGS=1 WARNINGS_ALL=1
+    - make -j ${JOBS} FIX_BUGS=1 ${MAKE_BUILD_TYPE} WARNINGS=1 WARNINGS_ALL=1
     - cd ${CMAKE_BUILD_DIR}
+
+	# Windows build
+    - |
+      if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+        if [ "$CXX" = "g++" ]; then
+          # Compile 32-bit build
+          make -j ${JOBS} FIX_BUGS=1 ${MAKE_BUILD_TYPE} WARNINGS=1 WARNINGS_ALL=1 WINDOWS=1 STATIC=1 CC=i686-w64-mingw32-gcc CXX=i686-w64-mingw32-g++ WINDRES=i686-w64-mingw32-windres
+
+          # Compile 64-bit build
+          make -j ${JOBS} FIX_BUGS=1 ${MAKE_BUILD_TYPE} WARNINGS=1 WARNINGS_ALL=1 WINDOWS=1 STATIC=1 CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ WINDRES=x86_64-w64-mingw32-windres
+        fi
+      fi
 
 after_success:
     # Send success notification to Discord through DISCORD_WEBHOOK_URL
