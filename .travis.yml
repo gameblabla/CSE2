@@ -37,7 +37,7 @@ env:
 before_install:
     # Setup MSYS2
     - |
-      if [ "$TRAVIS_OS_NAME" == "windows" ]
+      if [ "$TRAVIS_OS_NAME" == "windows" ]; then
         [[ ! -f C:/tools/msys64/msys2_shell.cmd ]] && rm -rf C:/tools/msys64
         choco uninstall -y mingw
         choco upgrade --no-progress -y msys2
