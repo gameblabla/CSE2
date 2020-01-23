@@ -64,8 +64,8 @@ before_install:
     - echo $MAKE_BUILD_TYPE
 
     # Define WINDRES
-    - if [ "$TRAVIS_OS_NAME" = "windows" ];
-      then
+    - |
+      if [ "$TRAVIS_OS_NAME" = "windows" ]; then
         export WINDRES32="windres"
         export WINDRES64="windres"
       else
