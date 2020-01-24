@@ -26,13 +26,13 @@ void ReleaseDirectInput(void)
 }
 
 // It looks like Pixel declared his functions early, so he could forward-reference
-BOOL HookDirectInputDevice(void);
+BOOL FindAndOpenDirectInputDevice(void);
 
 BOOL InitDirectInput(void)
 {
 	SDL_InitSubSystem(SDL_INIT_JOYSTICK);
 
-	if (!HookDirectInputDevice())
+	if (!FindAndOpenDirectInputDevice())
 		return FALSE;
 
 	return TRUE;
@@ -40,7 +40,7 @@ BOOL InitDirectInput(void)
 
 // The original name for this function and its variables are unknown.
 // This function finds and hooks the first available DirectInput device (or SDL Joystick, in this case).
-BOOL HookDirectInputDevice(void)
+BOOL FindAndOpenDirectInputDevice(void)
 {
 	int i;
 
