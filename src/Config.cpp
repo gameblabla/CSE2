@@ -137,8 +137,8 @@ void DefaultConfigData(CONFIG *conf)
 	conf->bindings[BINDING_CANCEL].keyboard = SDL_SCANCODE_X;
 	conf->bindings[BINDING_JUMP].keyboard = SDL_SCANCODE_Z;
 	conf->bindings[BINDING_SHOT].keyboard = SDL_SCANCODE_X;
-	conf->bindings[BINDING_ARMSREV].keyboard = SDL_SCANCODE_S;
-	conf->bindings[BINDING_ARMS].keyboard = SDL_SCANCODE_A;
+	conf->bindings[BINDING_ARMSREV].keyboard = SDL_SCANCODE_A;
+	conf->bindings[BINDING_ARMS].keyboard = SDL_SCANCODE_S;
 	conf->bindings[BINDING_ITEM].keyboard = SDL_SCANCODE_Q;
 	conf->bindings[BINDING_MAP].keyboard = SDL_SCANCODE_W;
 	conf->bindings[BINDING_PAUSE].keyboard = SDL_SCANCODE_ESCAPE;
