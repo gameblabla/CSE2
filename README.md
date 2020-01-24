@@ -62,7 +62,7 @@ Name | Function
 `WARNINGS_ALL=1` | Enable ALL compiler warnings (Clang only)
 `WARNINGS_FATAL=1` | Make all compiler warnings errors
 
-Once built, the executables and assets can be found in the newly-generated `game` folder.
+Once built, the executable can be found in the `game_english`/`game_japanese` folder, depending on the selected language.
 
 ## Licensing
 

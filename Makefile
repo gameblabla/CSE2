@@ -1,6 +1,5 @@
 WINDRES ?= windres
 
-BUILD_DIRECTORY = game
 ASSETS_DIRECTORY = assets
 
 ALL_CXXFLAGS = $(CXXFLAGS)
@@ -21,11 +20,11 @@ ifeq ($(LTO), 1)
 endif
 
 ifeq ($(JAPANESE), 1)
-  DATA_DIRECTORY = $(ASSETS_DIRECTORY)/data_jp
+  BUILD_DIRECTORY = game_japanese
 
   ALL_CXXFLAGS += -DJAPANESE
 else
-  DATA_DIRECTORY = $(ASSETS_DIRECTORY)/data_en
+  BUILD_DIRECTORY = game_english
 endif
 
 FILENAME ?= $(FILENAME_DEF)
@@ -211,13 +210,8 @@ DEPENDENCIES = $(addprefix obj/$(FILENAME)/, $(addsuffix .o.d, $(SOURCES)))
 
 OBJECTS += obj/$(FILENAME)/windows_resources.o
 
-all: $(BUILD_DIRECTORY)/$(FILENAME) $(BUILD_DIRECTORY)/data
+all: $(BUILD_DIRECTORY)/$(FILENAME)
 	$(info Finished)
-
-$(BUILD_DIRECTORY)/data: $(DATA_DIRECTORY)
-	@mkdir -p $(@D)
-	@rm -rf $(BUILD_DIRECTORY)/data
-	@cp -r $(DATA_DIRECTORY) $(BUILD_DIRECTORY)/data
 
 $(BUILD_DIRECTORY)/$(FILENAME): $(OBJECTS)
 	@mkdir -p $(@D)
