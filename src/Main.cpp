@@ -34,7 +34,6 @@ char gModulePath[MAX_PATH];
 char gDataPath[MAX_PATH];
 
 BOOL bFullscreen;
-BOOL gbUseJoystick = FALSE;
 
 CONFIG_BINDING bindings[BINDING_TOTAL];
 
@@ -378,10 +377,7 @@ BOOL SystemTask(void)
 					joystick = SDL_JoystickOpen(event.jdevice.which);
 
 					if (joystick != NULL)
-					{
 						ResetJoystickStatus();
-						gbUseJoystick = TRUE;
-					}
 				}
 
 				break;
@@ -395,7 +391,6 @@ BOOL SystemTask(void)
 				{
 					SDL_JoystickClose(joystick);
 					joystick = NULL;
-					gbUseJoystick = FALSE;
 				}
 
 				break;
@@ -403,8 +398,7 @@ BOOL SystemTask(void)
 	}
 
 	// Run joystick code
-	if (gbUseJoystick)
-		JoystickProc();
+	JoystickProc();
 
 	return TRUE;
 }
@@ -416,7 +410,7 @@ void JoystickProc(void)
 	static JOYSTICK_STATUS old_status;
 
 	if (!GetJoystickStatus(&status))
-		return;
+		memset(&status, 0, sizeof(status));
 
 //	gKey &= (KEY_ESCAPE | KEY_F2 | KEY_F1);
 
