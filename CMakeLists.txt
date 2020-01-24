@@ -8,7 +8,6 @@ if((${CMAKE_VERSION} VERSION_EQUAL 3.11) OR (${CMAKE_VERSION} VERSION_GREATER 3.
 	cmake_policy(SET CMP0072 NEW)
 endif()
 
-set(BUILD_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/game")
 set(ASSETS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/assets")
 
 option(JAPANESE "Enable the Japanese-language build" OFF)
@@ -220,11 +219,11 @@ target_compile_definitions(CSE2 PRIVATE LODEPNG_NO_COMPILE_ENCODER LODEPNG_NO_CO
 
 # Handle options
 if(JAPANESE)
-	set(DATA_DIRECTORY "${ASSETS_DIRECTORY}/data_jp")
+	set(BUILD_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/game_japanese")
 	list(APPEND RESOURCES "FONT/NotoSansMonoCJKjp.otf")
 	target_compile_definitions(CSE2 PRIVATE JAPANESE)
 else()
-	set(DATA_DIRECTORY "${ASSETS_DIRECTORY}/data_en")
+	set(BUILD_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/game_english")
 	list(APPEND RESOURCES "FONT/LiberationMono.ttf")
 endif()
 
@@ -490,12 +489,6 @@ set_target_properties(CSE2 PROPERTIES
 	RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${BUILD_DIRECTORY}
 	RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${BUILD_DIRECTORY}
 	RUNTIME_OUTPUT_DIRECTORY_DEBUG ${BUILD_DIRECTORY}
-)
-
-# Copy data folder to build directory
-add_custom_command(TARGET CSE2 POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E remove_directory "${BUILD_DIRECTORY}/data"
-	COMMAND ${CMAKE_COMMAND} -E copy_directory "${DATA_DIRECTORY}" "${BUILD_DIRECTORY}/data"
 )
 
 # Enable link-time optimisation if available

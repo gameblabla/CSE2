@@ -1,8 +1,25 @@
 # Exclude obj directory (object files for Makefile build)
 /obj
 
-# Exclude build output directory
-/game
+# Exclude executables (English)
+/game_english/CSE2_debug.exe
+/game_english/DoConfig_debug.exe
+/game_english/CSE2.exe
+/game_english/DoConfig.exe
+/game_english/CSE2_debug
+/game_english/DoConfig_debug
+/game_english/CSE2
+/game_english/DoConfig
+
+# Exclude executables (Japanese)
+/game_japanese/CSE2_debug.exe
+/game_japanese/DoConfig_debug.exe
+/game_japanese/CSE2.exe
+/game_japanese/DoConfig.exe
+/game_japanese/CSE2_debug
+/game_japanese/DoConfig_debug
+/game_japanese/CSE2
+/game_japanese/DoConfig
 
 ####
 # Accurate branch
