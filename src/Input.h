@@ -1,5 +1,7 @@
 #pragma once
 
+#include "SDL.h"
+
 #include "WindowsWrapper.h"
 
 // Was originally 32, like older versions of DirectInput, but since
@@ -15,7 +17,9 @@ struct JOYSTICK_STATUS
 	BOOL bButton[MAX_JOYSTICK_BUTTONS];
 };
 
+extern SDL_Joystick *joystick;
+
 void ReleaseDirectInput(void);
-BOOL InitDirectInput(void);
+void InitDirectInput(void);
 BOOL GetJoystickStatus(JOYSTICK_STATUS *status);
 BOOL ResetJoystickStatus(void);

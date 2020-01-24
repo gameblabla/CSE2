@@ -197,11 +197,7 @@ int main(int argc, char *argv[])
 	InitDirectSound();
 
 	// Initialize joystick
-	if (InitDirectInput())
-	{
-		ResetJoystickStatus();
-		gbUseJoystick = TRUE;
-	}
+	InitDirectInput();
 
 	// Initialize stuff
 	InitTextObject(conf.font_name);
@@ -372,6 +368,37 @@ BOOL SystemTask(void)
 				Backend_HandleRenderTargetLoss();
 				break;
 
+			case SDL_JOYDEVICEADDED:
+			#ifndef NDEBUG
+				printf("Joystick connected:\nIndex - %d\nName - '%s'\n", event.jdevice.which, SDL_JoystickNameForIndex(event.jdevice.which));
+			#endif
+
+				if (joystick == NULL)
+				{
+					joystick = SDL_JoystickOpen(event.jdevice.which);
+
+					if (joystick != NULL)
+					{
+						ResetJoystickStatus();
+						gbUseJoystick = TRUE;
+					}
+				}
+
+				break;
+
+			case SDL_JOYDEVICEREMOVED:
+				#ifndef NDEBUG
+					puts("Joystick disconnected");
+				#endif
+
+				if (SDL_JoystickFromInstanceID(event.jdevice.which) == joystick)
+				{
+					SDL_JoystickClose(joystick);
+					joystick = NULL;
+					gbUseJoystick = FALSE;
+				}
+
+				break;
 		}
 	}
 
