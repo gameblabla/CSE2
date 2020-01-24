@@ -3,7 +3,6 @@ NATIVECXX ?= c++
 WINDRES ?= windres
 PKGCONFIG ?= pkg-config
 
-BUILD_DIRECTORY = game
 ASSETS_DIRECTORY = assets
 
 # Default options
@@ -37,11 +36,11 @@ ifeq ($(LTO), 1)
 endif
 
 ifeq ($(JAPANESE), 1)
-  DATA_DIRECTORY = $(ASSETS_DIRECTORY)/data_jp
+  BUILD_DIRECTORY = game_japanese
 
   DEFINES += -DJAPANESE
 else
-  DATA_DIRECTORY = $(ASSETS_DIRECTORY)/data_en
+  BUILD_DIRECTORY = game_english
 endif
 
 FILENAME ?= $(FILENAME_DEF)
@@ -273,13 +272,8 @@ ifeq ($(WINDOWS), 1)
   OBJECTS += obj/$(FILENAME)/windows_resources.o
 endif
 
-all: $(BUILD_DIRECTORY)/$(FILENAME) $(BUILD_DIRECTORY)/data $(BUILD_DIRECTORY)/$(DOCONFIG_FILENAME)
+all: $(BUILD_DIRECTORY)/$(FILENAME) $(BUILD_DIRECTORY)/$(DOCONFIG_FILENAME)
 	$(info Finished)
-
-$(BUILD_DIRECTORY)/data: $(DATA_DIRECTORY)
-	@mkdir -p $(@D)
-	@rm -rf $(BUILD_DIRECTORY)/data
-	@cp -r $(DATA_DIRECTORY) $(BUILD_DIRECTORY)/data
 
 $(BUILD_DIRECTORY)/$(FILENAME): $(OBJECTS)
 	@mkdir -p $(@D)
