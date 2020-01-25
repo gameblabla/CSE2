@@ -19,7 +19,7 @@
 
 #include "../../Resource.h"
 
-#define TOTAL_VBOS 2
+#define TOTAL_VBOS 8
 
 #define ATTRIBUTE_INPUT_VERTEX_COORDINATES 1
 #define ATTRIBUTE_INPUT_TEXTURE_COORDINATES 2
