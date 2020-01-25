@@ -426,11 +426,15 @@ static int Callback_Resolution(Option *options, size_t total_options, size_t sel
 	const char *strings[] = {"Fullscreen (needs restart)", "Windowed 426x240 (needs restart)", "Windowed 852x480 (needs restart)", "Windowed 1278x720 (needs restart)", "Windowed 1704x960 (needs restart)"};
 
 	if (key & gKeyLeft)
-		--options[selected_option].value;
+	{
+		if (--options[selected_option].value < 0)
+			options[selected_option].value = (sizeof(strings) / sizeof(strings[0])) - 1;
+	}
 	else
-		++options[selected_option].value;
-
-	options[selected_option].value %= (sizeof(strings) / sizeof(strings[0]));
+	{
+		if (++options[selected_option].value > (sizeof(strings) / sizeof(strings[0])) - 1)
+			options[selected_option].value = 0;
+	}
 
 	gb60fps = options[selected_option].value;
 
