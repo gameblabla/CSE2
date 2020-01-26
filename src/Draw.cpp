@@ -223,7 +223,7 @@ BOOL MakeSurface_Resource(const char *name, SurfaceID surf_no)
 	if (data == NULL)
 		return FALSE;
 
-	int width, height;
+	unsigned int width, height;
 	unsigned char *image_buffer = DecodeBitmap(data, size, &width, &height);
 
 	if (image_buffer == NULL)
@@ -291,7 +291,7 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 		return FALSE;
 	}
 
-	int width, height;
+	unsigned int width, height;
 	unsigned char *image_buffer = DecodeBitmap(data, size, &width, &height);
 
 	free(data);
@@ -339,7 +339,7 @@ BOOL ReloadBitmap_Resource(const char *name, SurfaceID surf_no)
 	if (data == NULL)
 		return FALSE;
 
-	int width, height;
+	unsigned int width, height;
 	unsigned char *image_buffer = DecodeBitmap(data, size, &width, &height);
 
 	if (!ScaleAndUploadSurface(image_buffer, width, height, surf_no))
@@ -387,7 +387,7 @@ BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 		return FALSE;
 	}
 
-	int width, height;
+	unsigned int width, height;
 	unsigned char *image_buffer = DecodeBitmap(data, size, &width, &height);
 
 	free(data);

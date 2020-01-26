@@ -8,9 +8,9 @@
 #define STBI_NO_LINEAR
 #include "stb_image.h"
 
-unsigned char* DecodeBitmap(const unsigned char *in_buffer, size_t in_buffer_size, int *width, int *height)
+unsigned char* DecodeBitmap(const unsigned char *in_buffer, size_t in_buffer_size, unsigned int *width, unsigned int *height)
 {
-	return stbi_load_from_memory(in_buffer, in_buffer_size, width, height, NULL, 3);
+	return stbi_load_from_memory(in_buffer, in_buffer_size, (int*)width, (int*)height, NULL, 3);
 }
 
 void FreeBitmap(unsigned char *buffer)
