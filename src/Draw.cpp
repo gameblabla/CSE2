@@ -294,6 +294,8 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 	int width, height;
 	unsigned char *image_buffer = DecodeBitmap(data, size, &width, &height);
 
+	free(data);
+
 	if (image_buffer == NULL)
 	{
 		PrintBitmapError(path, 1);
@@ -387,6 +389,8 @@ BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 
 	int width, height;
 	unsigned char *image_buffer = DecodeBitmap(data, size, &width, &height);
+
+	free(data);
 
 	if (image_buffer == NULL)
 	{
