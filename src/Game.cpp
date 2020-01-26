@@ -110,7 +110,7 @@ void PutNumber4(int x, int y, int value, BOOL bZero)
 	}
 }
 
-int ModeOpening()
+int ModeOpening(void)
 {
 	int frame_x;
 	int frame_y;
