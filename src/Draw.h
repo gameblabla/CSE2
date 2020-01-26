@@ -1,7 +1,5 @@
 #pragma once
 
-#include "SDL.h"
-
 #include "WindowsWrapper.h"
 
 extern RECT grcGame;

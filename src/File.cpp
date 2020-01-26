@@ -4,9 +4,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-long LoadFileToMemory(const char *file_path, unsigned char **file_buffer)
+unsigned char* LoadFileToMemory(const char *file_path, size_t *file_size)
 {
-	long returned_size = -1;
+	unsigned char *buffer = NULL;
 
 	FILE *file = fopen(file_path, "rb");
 
@@ -14,17 +14,23 @@ long LoadFileToMemory(const char *file_path, unsigned char **file_buffer)
 	{
 		if (!fseek(file, 0, SEEK_END))
 		{
-			const long file_size = ftell(file);
+			const long _file_size = ftell(file);
 
-			if (file_size >= 0)
+			if (_file_size >= 0)
 			{
 				rewind(file);
-				*file_buffer = (unsigned char*)malloc(file_size);
+				buffer = (unsigned char*)malloc(_file_size);
 
-				if (*file_buffer != NULL)
+				if (buffer != NULL)
 				{
-					if (fread(*file_buffer, file_size, 1, file) == 1)
-						returned_size = file_size;
+					if (fread(buffer, _file_size, 1, file) == 1)
+					{
+						fclose(file);
+						*file_size = (size_t)_file_size;
+						return buffer;
+					}
+
+					free(buffer);
 				}
 			}
 		}
@@ -32,7 +38,7 @@ long LoadFileToMemory(const char *file_path, unsigned char **file_buffer)
 		fclose(file);
 	}
 
-	return returned_size;
+	return NULL;
 }
 
 unsigned short File_ReadBE16(FILE *stream)

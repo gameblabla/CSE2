@@ -142,21 +142,21 @@ BOOL LoadStageTable(void)
 	char path[MAX_PATH];
 
 	unsigned char *file_buffer;
-	long file_size;
+	size_t file_size;
 
 	// Try to load stage.tbl
 	sprintf(path, "%s/stage.tbl", gDataPath);
-	file_size = LoadFileToMemory(path, &file_buffer);
+	file_buffer = LoadFileToMemory(path, &file_size);
 
-	if (file_size != -1)
+	if (file_buffer != NULL)
 	{
-		const long entry_count = file_size / 0xE5;
+		const unsigned long entry_count = file_size / 0xE5;
 
 		STAGE_TABLE *pTMT = (STAGE_TABLE*)malloc(entry_count * sizeof(STAGE_TABLE));
 
 		if (pTMT != NULL)
 		{
-			for (long i = 0; i < entry_count; ++i)
+			for (unsigned long i = 0; i < entry_count; ++i)
 			{
 				unsigned char *entry = file_buffer + i * 0xE5;
 
@@ -184,17 +184,17 @@ BOOL LoadStageTable(void)
 
 	// Try to load mrmap.bin
 	sprintf(path, "%s/mrmap.bin", gDataPath);
-	file_size = LoadFileToMemory(path, &file_buffer);
+	file_buffer = LoadFileToMemory(path, &file_size);
 
-	if (file_size != -1)
+	if (file_buffer != NULL)
 	{
-		const long entry_count = file_buffer[0] | (file_buffer[1] << 8) | (file_buffer[2] << 16) | (file_buffer[3] << 24);
+		const unsigned long entry_count = file_buffer[0] | (file_buffer[1] << 8) | (file_buffer[2] << 16) | (file_buffer[3] << 24);
 
 		STAGE_TABLE *pTMT = (STAGE_TABLE*)malloc(entry_count * sizeof(STAGE_TABLE));
 
 		if (pTMT != NULL)
 		{
-			for (long i = 0; i < entry_count; ++i)
+			for (unsigned long i = 0; i < entry_count; ++i)
 			{
 				// For compatibility with Booster's Lab, we store our stage table in "MOD_MR" format.
 				// This way, BL will load the sprites as PNG files instead of BMP.

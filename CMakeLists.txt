@@ -77,6 +77,8 @@ add_executable(CSE2
 	src/ArmsItem.h
 	src/Back.cpp
 	src/Back.h
+	src/Bitmap.cpp
+	src/Bitmap.h
 	src/Boss.cpp
 	src/Boss.h
 	src/BossAlmo1.cpp

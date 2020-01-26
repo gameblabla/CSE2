@@ -1,8 +1,9 @@
 #pragma once
 
+#include <stddef.h>
 #include <stdio.h>
 
-long LoadFileToMemory(const char *file_path, unsigned char **file_buffer);
+unsigned char* LoadFileToMemory(const char *file_path, size_t *file_size);
 
 unsigned short File_ReadBE16(FILE *stream);
 unsigned long File_ReadBE32(FILE *stream);

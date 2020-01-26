@@ -12,8 +12,10 @@
 #include "WindowsWrapper.h"
 
 #include "Backends/Rendering.h"
+#include "Bitmap.h"
 #include "CommonDefines.h"
 #include "Ending.h"
+#include "File.h"
 #include "Font.h"
 #include "Generic.h"
 #include "Main.h"
@@ -190,41 +192,36 @@ void ReleaseSurface(SurfaceID s)
 	memset(&surface_metadata[s], 0, sizeof(surface_metadata[0]));
 }
 
-static BOOL ScaleAndUploadSurface(SDL_Surface *surface, SurfaceID surf_no)
+static BOOL ScaleAndUploadSurface(const unsigned char *image_buffer, int width, int height, SurfaceID surf_no)
 {
-	SDL_Surface *converted_surface = SDL_ConvertSurfaceFormat(surface, SDL_PIXELFORMAT_RGBA32, 0);
-
-	if (converted_surface == NULL)
-		return FALSE;
-
 	const int magnification_scaled = magnification / SPRITE_SCALE;
 
 	unsigned int pitch;
-	unsigned char *pixels = Backend_LockSurface(surf[surf_no], &pitch, converted_surface->w * magnification_scaled, converted_surface->h * magnification_scaled);
+	unsigned char *pixels = Backend_LockSurface(surf[surf_no], &pitch, width * magnification_scaled, height * magnification_scaled);
 
 	if (magnification_scaled == 1)
 	{
 		// Just copy the pixels the way they are
-		for (int y = 0; y < converted_surface->h; ++y)
+		for (int y = 0; y < height; ++y)
 		{
-			const unsigned char *src_row = (unsigned char*)converted_surface->pixels + y * converted_surface->pitch;
+			const unsigned char *src_row = &image_buffer[y * width * 4];
 			unsigned char *dst_row = &pixels[y * pitch];
 
-			memcpy(dst_row, src_row, converted_surface->w * 4);
+			memcpy(dst_row, src_row, width * 4);
 		}
 	}
 	else
 	{
 		// Upscale the bitmap to the game's internal resolution
-		for (int y = 0; y < converted_surface->h; ++y)
+		for (int y = 0; y < height; ++y)
 		{
-			const unsigned char *src_row = (unsigned char*)converted_surface->pixels + y * converted_surface->pitch;
+			const unsigned char *src_row = &image_buffer[y * width * 4];
 			unsigned char *dst_row = &pixels[y * pitch * magnification_scaled];
 
 			const unsigned char *src_ptr = src_row;
 			unsigned char *dst_ptr = dst_row;
 
-			for (int x = 0; x < converted_surface->w; ++x)
+			for (int x = 0; x < width; ++x)
 			{
 				for (int i = 0; i < magnification_scaled; ++i)
 				{
@@ -238,12 +235,11 @@ static BOOL ScaleAndUploadSurface(SDL_Surface *surface, SurfaceID surf_no)
 			}
 
 			for (int i = 1; i < magnification_scaled; ++i)
-				memcpy(dst_row + i * pitch, dst_row, converted_surface->w * magnification_scaled * 4);
+				memcpy(dst_row + i * pitch, dst_row, width * magnification_scaled * 4);
 		}
 	}
 
-	Backend_UnlockSurface(surf[surf_no], converted_surface->w * magnification_scaled, converted_surface->h * magnification_scaled);
-	SDL_FreeSurface(converted_surface);
+	Backend_UnlockSurface(surf[surf_no], width * magnification_scaled, height * magnification_scaled);
 
 	return TRUE;
 }
@@ -263,54 +259,57 @@ BOOL MakeSurface_Resource(const char *name, SurfaceID surf_no)
 	if (data == NULL)
 		return FALSE;
 
-	SDL_Surface *surface;
-	unsigned char *image_buffer = NULL;
+	int width, height;
+	unsigned char *image_buffer;
+	BOOL is_bmp = (data[0] == 'B' && data[1] == 'M');
 
-	if (data[0] == 'B' && data[1] == 'M')
+	if (is_bmp)
 	{
-		SDL_RWops *fp = SDL_RWFromConstMem(data, size);
-		surface = SDL_LoadBMP_RW(fp, 1);
+		image_buffer = DecodeBitmap(data, size, &width, &height);
+
+		if (image_buffer == NULL)
+			return FALSE;
 	}
 	else
 	{
-		unsigned int image_width;
-		unsigned int image_height;
-
-		lodepng_decode32(&image_buffer, &image_width, &image_height, data, size);
-		surface = SDL_CreateRGBSurfaceWithFormatFrom(image_buffer, image_width, image_height, 32, image_width * 4, SDL_PIXELFORMAT_RGBA32);
-
-		if (surface == NULL)
+		if (lodepng_decode32(&image_buffer, (unsigned int*)&width, (unsigned int*)&height, data, size) != 0)
 			return FALSE;
-
-		surface->userdata = image_buffer;
 	}
 
-	surf[surf_no] = Backend_CreateSurface(surface->w * magnification, surface->h * magnification);
+	surf[surf_no] = Backend_CreateSurface(width * magnification, height * magnification);
 
 	if (surf[surf_no] == NULL)
 	{
-		SDL_FreeSurface(surface);
-		free(image_buffer);
+		if (is_bmp)
+			FreeBitmap(image_buffer);
+		else
+			free(image_buffer);
 
 		return FALSE;
 	}
 
-	if (!ScaleAndUploadSurface(surface, surf_no))
+	if (!ScaleAndUploadSurface(image_buffer, width, height, surf_no))
 	{
 		Backend_FreeSurface(surf[surf_no]);
-		SDL_FreeSurface(surface);
-		free(image_buffer);
+
+		if (is_bmp)
+			FreeBitmap(image_buffer);
+		else
+			free(image_buffer);
 
 		return FALSE;
 	}
 
 	surface_metadata[surf_no].type = SURFACE_SOURCE_RESOURCE;
-	surface_metadata[surf_no].width = surface->w;
-	surface_metadata[surf_no].height = surface->h;
+	surface_metadata[surf_no].width = width;
+	surface_metadata[surf_no].height = height;
 	surface_metadata[surf_no].bSystem = FALSE;
 	strcpy(surface_metadata[surf_no].name, name);
-	SDL_FreeSurface(surface);
-	free(image_buffer);
+
+	if (is_bmp)
+		FreeBitmap(image_buffer);
+	else
+		free(image_buffer);
 
 	return TRUE;
 }
@@ -336,63 +335,94 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 		return FALSE;
 	}
 
-	SDL_Surface *surface = NULL;
+	int width, height;
+	unsigned char *image_buffer = NULL;
+	BOOL is_bmp;
+
 	const char *bmp_file_extensions[] = {"pbm", "bmp"};
-	for (size_t i = 0; i < sizeof(bmp_file_extensions) / sizeof(bmp_file_extensions[0]) && surface == NULL; ++i)
+	for (size_t i = 0; i < sizeof(bmp_file_extensions) / sizeof(bmp_file_extensions[0]); ++i)
 	{
 		sprintf(path, "%s/%s.%s", gDataPath, name, bmp_file_extensions[i]);
-		surface = SDL_LoadBMP(path);
+
+		size_t size;
+		unsigned char *data = LoadFileToMemory(path, &size);
+
+		if (data != NULL)
+		{
+			image_buffer = DecodeBitmap(data, size, &width, &height);
+
+			free(data);
+
+			if (image_buffer != NULL)
+				break;
+		}
 	}
 
-	unsigned char *image_buffer = NULL;
-
-	if (surface != NULL)
+	if (image_buffer != NULL)
 	{
-		SDL_SetColorKey(surface, SDL_TRUE, SDL_MapRGB(surface->format, 0, 0, 0));	// Assumes the colour key will always be #000000 (black)
+		is_bmp = TRUE;
+
+		//SDL_SetColorKey(surface, SDL_TRUE, SDL_MapRGB(surface->format, 0, 0, 0));	// Assumes the colour key will always be #000000 (black)
 	}
 	else
 	{
-		unsigned int image_width;
-		unsigned int image_height;
+		is_bmp = FALSE;
 
 		sprintf(path, "%s/%s.png", gDataPath, name);
-		lodepng_decode32_file(&image_buffer, &image_width, &image_height, path);
-		surface = SDL_CreateRGBSurfaceWithFormatFrom(image_buffer, image_width, image_height, 32, image_width * 4, SDL_PIXELFORMAT_RGBA32);
 
-		if (surface == NULL)
+		size_t size;
+		unsigned char *data = LoadFileToMemory(path, &size);
+
+		if (data == NULL)
 		{
 			PrintBitmapError(path, 1);
 			return FALSE;
 		}
 
-		surface->userdata = image_buffer;
+		if (lodepng_decode32(&image_buffer, (unsigned int*)&width, (unsigned int*)&height, data, size) != 0)
+		{
+			free(data);
+			PrintBitmapError(path, 1);
+			return FALSE;
+		}
+
+		free(data);
 	}
 
-	surf[surf_no] = Backend_CreateSurface(surface->w * magnification, surface->h * magnification);
+	surf[surf_no] = Backend_CreateSurface(width * magnification, height * magnification);
 
 	if (surf[surf_no] == NULL)
 	{
-		SDL_FreeSurface(surface);
-		free(image_buffer);
+		if (is_bmp)
+			FreeBitmap(image_buffer);
+		else
+			free(image_buffer);
+
 		return FALSE;
 	}
 
-	if (!ScaleAndUploadSurface(surface, surf_no))
+	if (!ScaleAndUploadSurface(image_buffer, width, height, surf_no))
 	{
 		Backend_FreeSurface(surf[surf_no]);
-		SDL_FreeSurface(surface);
-		free(image_buffer);
+
+		if (is_bmp)
+			FreeBitmap(image_buffer);
+		else
+			free(image_buffer);
+
 		return FALSE;
 	}
 
 	surface_metadata[surf_no].type = SURFACE_SOURCE_FILE;
-	surface_metadata[surf_no].width = surface->w;
-	surface_metadata[surf_no].height = surface->h;
+	surface_metadata[surf_no].width = width;
+	surface_metadata[surf_no].height = height;
 	surface_metadata[surf_no].bSystem = FALSE;
 	strcpy(surface_metadata[surf_no].name, name);
 
-	SDL_FreeSurface(surface);
-	free(image_buffer);
+	if (is_bmp)
+		FreeBitmap(image_buffer);
+	else
+		free(image_buffer);
 
 	return TRUE;
 }
@@ -406,33 +436,37 @@ BOOL ReloadBitmap_Resource(const char *name, SurfaceID surf_no)
 	size_t size;
 	const unsigned char *data = FindResource(name, "BITMAP", &size);
 
-	SDL_Surface *surface;
-	unsigned char *image_buffer = NULL;
+	int width, height;
+	unsigned char *image_buffer;
+	BOOL is_bmp = (data[0] == 'B' && data[1] == 'M');
 
-	if (data[0] == 'B' && data[1] == 'M')
+	if (is_bmp)
 	{
-		SDL_RWops *fp = SDL_RWFromConstMem(data, size);
-		surface = SDL_LoadBMP_RW(fp, 1);
+		image_buffer = DecodeBitmap(data, size, &width, &height);
+
+		if (image_buffer == NULL)
+			return FALSE;
 	}
 	else
 	{
-		unsigned int image_width;
-		unsigned int image_height;
-
-		lodepng_decode32(&image_buffer, &image_width, &image_height, data, size);
-		surface = SDL_CreateRGBSurfaceWithFormatFrom(image_buffer, image_width, image_height, 32, image_width * 4, SDL_PIXELFORMAT_RGBA32);
-		surface->userdata = image_buffer;
+		if (lodepng_decode32(&image_buffer, (unsigned int*)&width, (unsigned int*)&height, data, size) != 0)
+			return FALSE;
 	}
 
-	if (!ScaleAndUploadSurface(surface, surf_no))
+	if (!ScaleAndUploadSurface(image_buffer, width, height, surf_no))
 	{
-		SDL_FreeSurface(surface);
-		free(image_buffer);
+		if (is_bmp)
+			FreeBitmap(image_buffer);
+		else
+			free(image_buffer);
+
 		return FALSE;
 	}
 
-	SDL_FreeSurface(surface);
-	free(image_buffer);
+	if (is_bmp)
+		FreeBitmap(image_buffer);
+	else
+		free(image_buffer);
 
 	surface_metadata[surf_no].type = SURFACE_SOURCE_RESOURCE;
 	strcpy(surface_metadata[surf_no].name, name);
@@ -455,47 +489,74 @@ BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 		return FALSE;
 	}
 
-	SDL_Surface *surface = NULL;
+	int width, height;
+	unsigned char *image_buffer = NULL;
+	BOOL is_bmp;
+
 	const char *bmp_file_extensions[] = {"pbm", "bmp"};
-	for (size_t i = 0; i < sizeof(bmp_file_extensions) / sizeof(bmp_file_extensions[0]) && surface == NULL; ++i)
+	for (size_t i = 0; i < sizeof(bmp_file_extensions) / sizeof(bmp_file_extensions[0]); ++i)
 	{
 		sprintf(path, "%s/%s.%s", gDataPath, name, bmp_file_extensions[i]);
-		surface = SDL_LoadBMP(path);
+
+		size_t size;
+		unsigned char *data = LoadFileToMemory(path, &size);
+
+		if (data != NULL)
+		{
+			image_buffer = DecodeBitmap(data, size, &width, &height);
+
+			free(data);
+
+			if (image_buffer != NULL)
+				break;
+		}
 	}
 
-	unsigned char *image_buffer = NULL;
-
-	if (surface != NULL)
+	if (image_buffer != NULL)
 	{
-		SDL_SetColorKey(surface, SDL_TRUE, SDL_MapRGB(surface->format, 0, 0, 0));	// Assumes the colour key will always be #000000 (black)
+		is_bmp = TRUE;
+
+		//SDL_SetColorKey(surface, SDL_TRUE, SDL_MapRGB(surface->format, 0, 0, 0));	// Assumes the colour key will always be #000000 (black)
 	}
 	else
 	{
-		unsigned int image_width;
-		unsigned int image_height;
+		is_bmp = FALSE;
 
 		sprintf(path, "%s/%s.png", gDataPath, name);
-		lodepng_decode32_file(&image_buffer, &image_width, &image_height, path);
-		surface = SDL_CreateRGBSurfaceWithFormatFrom(image_buffer, image_width, image_height, 32, image_width * 4, SDL_PIXELFORMAT_RGBA32);
 
-		if (surface == NULL)
+		size_t size;
+		unsigned char *data = LoadFileToMemory(path, &size);
+
+		if (data == NULL)
 		{
 			PrintBitmapError(path, 1);
 			return FALSE;
 		}
 
-		surface->userdata = image_buffer;
+		if (lodepng_decode32(&image_buffer, (unsigned int*)&width, (unsigned int*)&height, data, size) != 0)
+		{
+			free(data);
+			PrintBitmapError(path, 1);
+			return FALSE;
+		}
+
+		free(data);
 	}
 
-	if (!ScaleAndUploadSurface(surface, surf_no))
+	if (!ScaleAndUploadSurface(image_buffer, width, height, surf_no))
 	{
-		SDL_FreeSurface(surface);
-		free(image_buffer);
+		if (is_bmp)
+			FreeBitmap(image_buffer);
+		else
+			free(image_buffer);
+
 		return FALSE;
 	}
 
-	SDL_FreeSurface(surface);
-	free(image_buffer);
+	if (is_bmp)
+		FreeBitmap(image_buffer);
+	else
+		free(image_buffer);
 
 	surface_metadata[surf_no].type = SURFACE_SOURCE_FILE;
 	strcpy(surface_metadata[surf_no].name, name);
