@@ -334,6 +334,9 @@ BOOL ReloadBitmap_Resource(const char *name, SurfaceID surf_no)
 	size_t size;
 	const unsigned char *data = FindResource(name, "BITMAP", &size);
 
+	if (data == NULL)
+		return FALSE;
+
 	int width, height;
 	unsigned char *image_buffer = DecodeBitmap(data, size, &width, &height);
 
