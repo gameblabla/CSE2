@@ -75,10 +75,10 @@ ifeq ($(WARNINGS_FATAL), 1)
 endif
 
 ALL_CFLAGS += -std=c99 -MMD -MP -MF $@.d
-CSE2_CFLAGS += $(shell $(PKGCONFIG) sdl2 --cflags) $(shell $(PKGCONFIG) freetype2 --cflags)
+CSE2_CFLAGS += $(shell $(PKGCONFIG) sdl2 --cflags) $(shell $(PKGCONFIG) freetype2 --cflags) -Iexternal
 
 ALL_CXXFLAGS += -std=c++98 -MMD -MP -MF $@.d
-CSE2_CXXFLAGS += $(shell $(PKGCONFIG) sdl2 --cflags) $(shell $(PKGCONFIG) freetype2 --cflags)
+CSE2_CXXFLAGS += $(shell $(PKGCONFIG) sdl2 --cflags) $(shell $(PKGCONFIG) freetype2 --cflags) -Iexternal
 
 ifeq ($(STATIC), 1)
   ALL_LDFLAGS += -static
