@@ -1098,10 +1098,10 @@ FontObject* LoadFont(const char *font_filename, unsigned int cell_width, unsigne
 {
 	FontObject *font_object = NULL;
 
-	unsigned char *file_buffer;
-	const long file_size = LoadFileToMemory(font_filename, &file_buffer);
+	size_t file_size;
+	unsigned char *file_buffer = LoadFileToMemory(font_filename, &file_size);
 
-	if (file_size != -1)
+	if (file_buffer != NULL)
 	{
 		font_object = LoadFontFromData(file_buffer, file_size, cell_width, cell_height);
 		free(file_buffer);

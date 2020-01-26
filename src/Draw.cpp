@@ -282,10 +282,10 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 		return FALSE;
 	}
 
-	unsigned char *data;
-	long size = LoadFileToMemory(path, &data);
+	size_t size;
+	unsigned char *data = LoadFileToMemory(path, &size);
 
-	if (size == -1)
+	if (data == NULL)
 	{
 		PrintBitmapError(path, 1);
 		return FALSE;
@@ -373,10 +373,10 @@ BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 		return FALSE;
 	}
 
-	unsigned char *data;
-	long size = LoadFileToMemory(path, &data);
+	size_t size;
+	unsigned char *data = LoadFileToMemory(path, &size);
 
-	if (size == -1)
+	if (data == NULL)
 	{
 		PrintBitmapError(path, 1);
 		return FALSE;
