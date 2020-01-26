@@ -445,7 +445,7 @@ BOOL SaveTimeCounter(void)
 	sprintf(path, "%s/290.rec", gModulePath);
 
 	fp = fopen(path, "rb");
-	if (fp)
+	if (fp != NULL)
 	{
 		// Read data
 		rec.counter[0] = File_ReadLE32(fp);
@@ -510,7 +510,7 @@ int LoadTimeCounter(void)
 	sprintf(path, "%s/290.rec", gModulePath);
 
 	fp = fopen(path, "rb");
-	if (!fp)
+	if (fp == NULL)
 		return 0;
 
 	// Read data
