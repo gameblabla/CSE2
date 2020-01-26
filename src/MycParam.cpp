@@ -2,8 +2,6 @@
 
 #include <stdio.h>
 
-#include "SDL.h"
-
 #include "WindowsWrapper.h"
 
 #include "ArmsItem.h"
@@ -432,7 +430,7 @@ void PutTimeCounter(int x, int y)
 BOOL SaveTimeCounter(void)
 {
 	int i;
-	unsigned char *p;
+	unsigned char p[4];
 	REC rec;
 	FILE *fp;
 	char path[MAX_PATH];
@@ -458,11 +456,13 @@ BOOL SaveTimeCounter(void)
 		rec.random[3] = fgetc(fp);
 		fclose(fp);
 
-		p = (unsigned char*)&rec.counter[0];
-		p[0] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[0]) : (rec.random[0] / 2);
-		p[1] -= rec.random[0];
-		p[2] -= rec.random[0];
-		p[3] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[0] / 2) : (rec.random[0]);
+		p[0] = (unsigned char)(rec.counter[0] - rec.random[0]);
+		p[1] = (unsigned char)((rec.counter[0] >> 8) - rec.random[0]);
+		p[2] = (unsigned char)((rec.counter[0] >> 16) - rec.random[0]);
+		p[3] = (unsigned char)((rec.counter[0] >> 24) - rec.random[0] / 2);
+
+		rec.counter[0] = p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24);
+
 		// If this is faster than our new time, quit
 		if (rec.counter[0] < time_count)
 			return TRUE;
@@ -474,11 +474,12 @@ BOOL SaveTimeCounter(void)
 		rec.counter[i] = time_count;
 		rec.random[i] = Random(0, 250) + i;
 
-		p = (unsigned char*)&rec.counter[i];
-		p[0] += (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[i]) : (rec.random[i] / 2);
-		p[1] += rec.random[i];
-		p[2] += rec.random[i];
-		p[3] += (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[i] / 2) : (rec.random[i]);
+		p[0] = (unsigned char)(rec.counter[i] + rec.random[i]);
+		p[1] = (unsigned char)((rec.counter[i] >> 8) + rec.random[i]);
+		p[2] = (unsigned char)((rec.counter[i] >> 16) + rec.random[i]);
+		p[3] = (unsigned char)((rec.counter[i] >> 24) + rec.random[i] / 2);
+
+		rec.counter[i] = p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24);
 	}
 
 	fp = fopen(path, "wb");
@@ -501,7 +502,7 @@ BOOL SaveTimeCounter(void)
 int LoadTimeCounter(void)
 {
 	int i;
-	unsigned char *p;
+	unsigned char p[4];
 	REC rec;
 	FILE *fp;
 	char path[MAX_PATH];
@@ -527,11 +528,12 @@ int LoadTimeCounter(void)
 	// Decode from checksum
 	for (i = 0; i < 4; ++i)
 	{
-		p = (unsigned char*)&rec.counter[i];
-		p[0] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[i]) : (rec.random[i] / 2);
-		p[1] -= rec.random[i];
-		p[2] -= rec.random[i];
-		p[3] -= (SDL_BYTEORDER == SDL_LIL_ENDIAN) ? (rec.random[i] / 2) : (rec.random[i]);
+		p[0] = (unsigned char)(rec.counter[i] - rec.random[i]);
+		p[1] = (unsigned char)((rec.counter[i] >> 8) - rec.random[i]);
+		p[2] = (unsigned char)((rec.counter[i] >> 16) - rec.random[i]);
+		p[3] = (unsigned char)((rec.counter[i] >> 24) - rec.random[i] / 2);
+
+		rec.counter[i] = p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24);
 	}
 
 	// Verify checksum's result
