@@ -92,6 +92,7 @@ endif
 SOURCES = \
   src/ArmsItem.cpp \
   src/Back.cpp \
+  src/Bitmap.cpp \
   src/Boss.cpp \
   src/BossAlmo1.cpp \
   src/BossAlmo2.cpp \
