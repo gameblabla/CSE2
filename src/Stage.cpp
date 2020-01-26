@@ -154,11 +154,7 @@ BOOL LoadStageTable(void)
 
 		STAGE_TABLE *pTMT = (STAGE_TABLE*)malloc(entry_count * sizeof(STAGE_TABLE));
 
-		if (pTMT == NULL)
-		{
-			free(file_buffer);
-		}
-		else
+		if (pTMT != NULL)
 		{
 			for (long i = 0; i < entry_count; ++i)
 			{
@@ -182,6 +178,8 @@ BOOL LoadStageTable(void)
 			free(file_buffer);
 			return TRUE;
 		}
+
+		free(file_buffer);
 	}
 
 	// Try to load mrmap.bin
@@ -194,11 +192,7 @@ BOOL LoadStageTable(void)
 
 		STAGE_TABLE *pTMT = (STAGE_TABLE*)malloc(entry_count * sizeof(STAGE_TABLE));
 
-		if (pTMT == NULL)
-		{
-			free(file_buffer);
-		}
-		else
+		if (pTMT != NULL)
 		{
 			for (long i = 0; i < entry_count; ++i)
 			{
@@ -221,6 +215,7 @@ BOOL LoadStageTable(void)
 			return TRUE;
 		}
 
+		free(file_buffer);
 	}
 
 	printf("Failed to load stage.tbl/mrmap.bin\n");
