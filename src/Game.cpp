@@ -169,7 +169,7 @@ void PutBlackBars(int fx, int fy)
 	CortBox(&rect, 0);
 }
 
-int ModeOpening()
+int ModeOpening(void)
 {
 	int frame_x;
 	int frame_y;
