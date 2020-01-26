@@ -137,7 +137,7 @@ const STAGE_TABLE gTMTDefault[95] = {
 
 const STAGE_TABLE *gTMT = gTMTDefault;
 
-BOOL LoadStageTable()
+BOOL LoadStageTable(void)
 {
 	char path[MAX_PATH];
 
