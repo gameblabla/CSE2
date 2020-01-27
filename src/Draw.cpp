@@ -259,7 +259,7 @@ BOOL MakeSurface_Resource(const char *name, SurfaceID surf_no)
 	if (data == NULL)
 		return FALSE;
 
-	int width, height;
+	unsigned int width, height;
 	unsigned char *image_buffer;
 	BOOL is_bmp = (data[0] == 'B' && data[1] == 'M');
 
@@ -272,7 +272,7 @@ BOOL MakeSurface_Resource(const char *name, SurfaceID surf_no)
 	}
 	else
 	{
-		if (lodepng_decode32(&image_buffer, (unsigned int*)&width, (unsigned int*)&height, data, size) != 0)
+		if (lodepng_decode32(&image_buffer, &width, &height, data, size) != 0)
 			return FALSE;
 	}
 
@@ -335,7 +335,7 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 		return FALSE;
 	}
 
-	int width, height;
+	unsigned int width, height;
 	unsigned char *image_buffer = NULL;
 	BOOL is_bmp;
 
@@ -379,7 +379,7 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 			return FALSE;
 		}
 
-		if (lodepng_decode32(&image_buffer, (unsigned int*)&width, (unsigned int*)&height, data, size) != 0)
+		if (lodepng_decode32(&image_buffer, &width, &height, data, size) != 0)
 		{
 			free(data);
 			PrintBitmapError(path, 1);
@@ -436,7 +436,7 @@ BOOL ReloadBitmap_Resource(const char *name, SurfaceID surf_no)
 	size_t size;
 	const unsigned char *data = FindResource(name, "BITMAP", &size);
 
-	int width, height;
+	unsigned int width, height;
 	unsigned char *image_buffer;
 	BOOL is_bmp = (data[0] == 'B' && data[1] == 'M');
 
@@ -449,7 +449,7 @@ BOOL ReloadBitmap_Resource(const char *name, SurfaceID surf_no)
 	}
 	else
 	{
-		if (lodepng_decode32(&image_buffer, (unsigned int*)&width, (unsigned int*)&height, data, size) != 0)
+		if (lodepng_decode32(&image_buffer, &width, &height, data, size) != 0)
 			return FALSE;
 	}
 
@@ -489,7 +489,7 @@ BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 		return FALSE;
 	}
 
-	int width, height;
+	unsigned int width, height;
 	unsigned char *image_buffer = NULL;
 	BOOL is_bmp;
 
@@ -533,7 +533,7 @@ BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 			return FALSE;
 		}
 
-		if (lodepng_decode32(&image_buffer, (unsigned int*)&width, (unsigned int*)&height, data, size) != 0)
+		if (lodepng_decode32(&image_buffer, &width, &height, data, size) != 0)
 		{
 			free(data);
 			PrintBitmapError(path, 1);

@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "SDL.h"
+
 #include "WindowsWrapper.h"
 
 #include "ArmsItem.h"
