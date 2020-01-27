@@ -13,7 +13,6 @@
 #include "Bitmap.h"
 #include "CommonDefines.h"
 #include "Ending.h"
-#include "File.h"
 #include "Font.h"
 #include "Generic.h"
 #include "Main.h"
@@ -282,19 +281,8 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 		return FALSE;
 	}
 
-	size_t size;
-	unsigned char *data = LoadFileToMemory(path, &size);
-
-	if (data == NULL)
-	{
-		PrintBitmapError(path, 1);
-		return FALSE;
-	}
-
 	unsigned int width, height;
-	unsigned char *image_buffer = DecodeBitmap(data, size, &width, &height);
-
-	free(data);
+	unsigned char *image_buffer = DecodeBitmapFromFile(path, &width, &height);
 
 	if (image_buffer == NULL)
 	{
@@ -378,19 +366,8 @@ BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 		return FALSE;
 	}
 
-	size_t size;
-	unsigned char *data = LoadFileToMemory(path, &size);
-
-	if (data == NULL)
-	{
-		PrintBitmapError(path, 1);
-		return FALSE;
-	}
-
 	unsigned int width, height;
-	unsigned char *image_buffer = DecodeBitmap(data, size, &width, &height);
-
-	free(data);
+	unsigned char *image_buffer = DecodeBitmapFromFile(path, &width, &height);
 
 	if (image_buffer == NULL)
 	{
