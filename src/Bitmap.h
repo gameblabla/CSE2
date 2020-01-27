@@ -2,5 +2,7 @@
 
 #include <stddef.h>
 
-unsigned char* DecodeBitmap(const unsigned char *in_buffer, size_t in_buffer_size, unsigned int *width, unsigned int *height);
+#include "WindowsWrapper.h"
+
+unsigned char* DecodeBitmap(const unsigned char *in_buffer, size_t in_buffer_size, unsigned int *width, unsigned int *height, BOOL colour_key);
 void FreeBitmap(unsigned char *buffer);

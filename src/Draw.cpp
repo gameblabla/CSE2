@@ -7,8 +7,6 @@
 
 #include "SDL.h"
 
-#include "lodepng/lodepng.h"
-
 #include "WindowsWrapper.h"
 
 #include "Backends/Rendering.h"
@@ -260,43 +258,23 @@ BOOL MakeSurface_Resource(const char *name, SurfaceID surf_no)
 		return FALSE;
 
 	unsigned int width, height;
-	unsigned char *image_buffer;
-	BOOL is_bmp = (data[0] == 'B' && data[1] == 'M');
+	unsigned char *image_buffer = DecodeBitmap(data, size, &width, &height, FALSE);
 
-	if (is_bmp)
-	{
-		image_buffer = DecodeBitmap(data, size, &width, &height);
-
-		if (image_buffer == NULL)
-			return FALSE;
-	}
-	else
-	{
-		if (lodepng_decode32(&image_buffer, &width, &height, data, size) != 0)
-			return FALSE;
-	}
+	if (image_buffer == NULL)
+		return FALSE;
 
 	surf[surf_no] = Backend_CreateSurface(width * magnification, height * magnification);
 
 	if (surf[surf_no] == NULL)
 	{
-		if (is_bmp)
-			FreeBitmap(image_buffer);
-		else
-			free(image_buffer);
-
+		FreeBitmap(image_buffer);
 		return FALSE;
 	}
 
 	if (!ScaleAndUploadSurface(image_buffer, width, height, surf_no))
 	{
 		Backend_FreeSurface(surf[surf_no]);
-
-		if (is_bmp)
-			FreeBitmap(image_buffer);
-		else
-			free(image_buffer);
-
+		FreeBitmap(image_buffer);
 		return FALSE;
 	}
 
@@ -306,10 +284,7 @@ BOOL MakeSurface_Resource(const char *name, SurfaceID surf_no)
 	surface_metadata[surf_no].bSystem = FALSE;
 	strcpy(surface_metadata[surf_no].name, name);
 
-	if (is_bmp)
-		FreeBitmap(image_buffer);
-	else
-		free(image_buffer);
+	FreeBitmap(image_buffer);
 
 	return TRUE;
 }
@@ -337,19 +312,18 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 
 	unsigned int width, height;
 	unsigned char *image_buffer = NULL;
-	BOOL is_bmp;
 
-	const char *bmp_file_extensions[] = {"pbm", "bmp"};
-	for (size_t i = 0; i < sizeof(bmp_file_extensions) / sizeof(bmp_file_extensions[0]); ++i)
+	const char *file_extensions[] = {"pbm", "bmp", "png"};
+	for (size_t i = 0; i < sizeof(file_extensions) / sizeof(file_extensions[0]); ++i)
 	{
-		sprintf(path, "%s/%s.%s", gDataPath, name, bmp_file_extensions[i]);
+		sprintf(path, "%s/%s.%s", gDataPath, name, file_extensions[i]);
 
 		size_t size;
 		unsigned char *data = LoadFileToMemory(path, &size);
 
 		if (data != NULL)
 		{
-			image_buffer = DecodeBitmap(data, size, &width, &height);
+			image_buffer = DecodeBitmap(data, size, &width, &height, TRUE);
 
 			free(data);
 
@@ -358,58 +332,24 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 		}
 	}
 
-	if (image_buffer != NULL)
+	if (image_buffer == NULL)
 	{
-		is_bmp = TRUE;
-
-		//SDL_SetColorKey(surface, SDL_TRUE, SDL_MapRGB(surface->format, 0, 0, 0));	// Assumes the colour key will always be #000000 (black)
-	}
-	else
-	{
-		is_bmp = FALSE;
-
-		sprintf(path, "%s/%s.png", gDataPath, name);
-
-		size_t size;
-		unsigned char *data = LoadFileToMemory(path, &size);
-
-		if (data == NULL)
-		{
-			PrintBitmapError(path, 1);
-			return FALSE;
-		}
-
-		if (lodepng_decode32(&image_buffer, &width, &height, data, size) != 0)
-		{
-			free(data);
-			PrintBitmapError(path, 1);
-			return FALSE;
-		}
-
-		free(data);
+		PrintBitmapError(path, 1);
+		return FALSE;
 	}
 
 	surf[surf_no] = Backend_CreateSurface(width * magnification, height * magnification);
 
 	if (surf[surf_no] == NULL)
 	{
-		if (is_bmp)
-			FreeBitmap(image_buffer);
-		else
-			free(image_buffer);
-
+		FreeBitmap(image_buffer);
 		return FALSE;
 	}
 
 	if (!ScaleAndUploadSurface(image_buffer, width, height, surf_no))
 	{
 		Backend_FreeSurface(surf[surf_no]);
-
-		if (is_bmp)
-			FreeBitmap(image_buffer);
-		else
-			free(image_buffer);
-
+		FreeBitmap(image_buffer);
 		return FALSE;
 	}
 
@@ -419,10 +359,7 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 	surface_metadata[surf_no].bSystem = FALSE;
 	strcpy(surface_metadata[surf_no].name, name);
 
-	if (is_bmp)
-		FreeBitmap(image_buffer);
-	else
-		free(image_buffer);
+	FreeBitmap(image_buffer);
 
 	return TRUE;
 }
@@ -437,36 +374,18 @@ BOOL ReloadBitmap_Resource(const char *name, SurfaceID surf_no)
 	const unsigned char *data = FindResource(name, "BITMAP", &size);
 
 	unsigned int width, height;
-	unsigned char *image_buffer;
-	BOOL is_bmp = (data[0] == 'B' && data[1] == 'M');
+	unsigned char *image_buffer = DecodeBitmap(data, size, &width, &height, FALSE);
 
-	if (is_bmp)
-	{
-		image_buffer = DecodeBitmap(data, size, &width, &height);
-
-		if (image_buffer == NULL)
-			return FALSE;
-	}
-	else
-	{
-		if (lodepng_decode32(&image_buffer, &width, &height, data, size) != 0)
-			return FALSE;
-	}
+	if (image_buffer == NULL)
+		return FALSE;
 
 	if (!ScaleAndUploadSurface(image_buffer, width, height, surf_no))
 	{
-		if (is_bmp)
-			FreeBitmap(image_buffer);
-		else
-			free(image_buffer);
-
+		FreeBitmap(image_buffer);
 		return FALSE;
 	}
 
-	if (is_bmp)
-		FreeBitmap(image_buffer);
-	else
-		free(image_buffer);
+	FreeBitmap(image_buffer);
 
 	surface_metadata[surf_no].type = SURFACE_SOURCE_RESOURCE;
 	strcpy(surface_metadata[surf_no].name, name);
@@ -491,19 +410,18 @@ BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 
 	unsigned int width, height;
 	unsigned char *image_buffer = NULL;
-	BOOL is_bmp;
 
-	const char *bmp_file_extensions[] = {"pbm", "bmp"};
-	for (size_t i = 0; i < sizeof(bmp_file_extensions) / sizeof(bmp_file_extensions[0]); ++i)
+	const char *file_extensions[] = {"pbm", "bmp", "png"};
+	for (size_t i = 0; i < sizeof(file_extensions) / sizeof(file_extensions[0]); ++i)
 	{
-		sprintf(path, "%s/%s.%s", gDataPath, name, bmp_file_extensions[i]);
+		sprintf(path, "%s/%s.%s", gDataPath, name, file_extensions[i]);
 
 		size_t size;
 		unsigned char *data = LoadFileToMemory(path, &size);
 
 		if (data != NULL)
 		{
-			image_buffer = DecodeBitmap(data, size, &width, &height);
+			image_buffer = DecodeBitmap(data, size, &width, &height, TRUE);
 
 			free(data);
 
@@ -512,51 +430,19 @@ BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 		}
 	}
 
-	if (image_buffer != NULL)
+	if (image_buffer == NULL)
 	{
-		is_bmp = TRUE;
-
-		//SDL_SetColorKey(surface, SDL_TRUE, SDL_MapRGB(surface->format, 0, 0, 0));	// Assumes the colour key will always be #000000 (black)
-	}
-	else
-	{
-		is_bmp = FALSE;
-
-		sprintf(path, "%s/%s.png", gDataPath, name);
-
-		size_t size;
-		unsigned char *data = LoadFileToMemory(path, &size);
-
-		if (data == NULL)
-		{
-			PrintBitmapError(path, 1);
-			return FALSE;
-		}
-
-		if (lodepng_decode32(&image_buffer, &width, &height, data, size) != 0)
-		{
-			free(data);
-			PrintBitmapError(path, 1);
-			return FALSE;
-		}
-
-		free(data);
+		PrintBitmapError(path, 1);
+		return FALSE;
 	}
 
 	if (!ScaleAndUploadSurface(image_buffer, width, height, surf_no))
 	{
-		if (is_bmp)
-			FreeBitmap(image_buffer);
-		else
-			free(image_buffer);
-
+		FreeBitmap(image_buffer);
 		return FALSE;
 	}
 
-	if (is_bmp)
-		FreeBitmap(image_buffer);
-	else
-		free(image_buffer);
+	FreeBitmap(image_buffer);
 
 	surface_metadata[surf_no].type = SURFACE_SOURCE_FILE;
 	strcpy(surface_metadata[surf_no].name, name);
