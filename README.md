@@ -41,7 +41,7 @@ Many months of copypasting and tinkering later, here is the result.
 *Note: with CMake, if these are not found, they will be built locally*
 
 * SDL2
-* Freetype
+* FreeType
 * FLTK
 
 ## Building
