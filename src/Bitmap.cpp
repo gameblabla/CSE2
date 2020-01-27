@@ -5,12 +5,17 @@
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_ONLY_BMP
 #define STBI_ONLY_PNG
-#define STBI_NO_STDIO
 #define STBI_NO_LINEAR
 #include "stb_image.h"
 
-#include "File.h"
 #include "WindowsWrapper.h"
+
+static void DoColourKey(unsigned char *image_buffer, unsigned int width, unsigned int height)
+{
+	for (size_t i = 0; i < width * height; ++i)
+		if (image_buffer[(i * 4) + 0] == 0 && image_buffer[(i * 4) + 1] == 0 && image_buffer[(i * 4) + 2] == 0)
+			image_buffer[(i * 4) + 3] = 0;
+}
 
 unsigned char* DecodeBitmap(const unsigned char *in_buffer, size_t in_buffer_size, unsigned int *width, unsigned int *height, BOOL colour_key)
 {
@@ -20,30 +25,24 @@ unsigned char* DecodeBitmap(const unsigned char *in_buffer, size_t in_buffer_siz
 	if (image_buffer == NULL)
 		return NULL;
 
+	// If image has no alpha channel, then perform colour-keying (set #000000 to transparent)
 	if (colour_key && channels_in_file == 3)
-	{
-		// If image has no alpha channel, then perform colour-keying (set #000000 to transparent)
-		for (size_t i = 0; i < *width * *height; ++i)
-			if (image_buffer[(i * 4) + 0] == 0 && image_buffer[(i * 4) + 1] == 0 && image_buffer[(i * 4) + 2] == 0)
-				image_buffer[(i * 4) + 3] = 0;
-	}
+		DoColourKey(image_buffer, *width, *height);
 
 	return image_buffer;
 }
 
 unsigned char* DecodeBitmapFromFile(const char *path, unsigned int *width, unsigned int *height, BOOL colour_key)
 {
-	unsigned char *image_buffer = NULL;
+	int channels_in_file;
+	unsigned char *image_buffer = stbi_load(path, (int*)width, (int*)height, &channels_in_file, 4);
 
-	size_t size;
-	unsigned char *data = LoadFileToMemory(path, &size);
+	if (image_buffer == NULL)
+		return NULL;
 
-	if (data != NULL)
-	{
-		image_buffer = DecodeBitmap(data, size, width, height, colour_key);
-
-		free(data);
-	}
+	// If image has no alpha channel, then perform colour-keying (set #000000 to transparent)
+	if (colour_key && channels_in_file == 3)
+		DoColourKey(image_buffer, *width, *height);
 
 	return image_buffer;
 }
