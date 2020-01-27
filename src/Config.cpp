@@ -126,7 +126,7 @@ void DefaultConfigData(CONFIG *conf)
 	conf->bindings[BINDING_ARMS].controller = 4;
 	conf->bindings[BINDING_ITEM].controller = 5;
 	conf->bindings[BINDING_MAP].controller = 2;
-	conf->bindings[BINDING_PAUSE].controller = 0xFF;
+	conf->bindings[BINDING_PAUSE].controller = 6;
 
 	// Set default key bindings
 	conf->bindings[BINDING_UP].keyboard = SDL_SCANCODE_UP;
