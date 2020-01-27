@@ -65,7 +65,7 @@ Many months of copypasting and tinkering later, here is the result.
 *Note: with CMake, if these are not found, they will be built locally*
 
 * SDL2
-* Freetype
+* FreeType
 * libxmp-lite (only if AUDIO_TRACKER is enabled)
 
 ## Building
