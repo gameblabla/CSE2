@@ -9,6 +9,7 @@
 #define STBI_NO_LINEAR
 #include "stb_image.h"
 
+#include "File.h"
 #include "WindowsWrapper.h"
 
 unsigned char* DecodeBitmap(const unsigned char *in_buffer, size_t in_buffer_size, unsigned int *width, unsigned int *height, BOOL colour_key)
@@ -25,6 +26,23 @@ unsigned char* DecodeBitmap(const unsigned char *in_buffer, size_t in_buffer_siz
 		for (size_t i = 0; i < *width * *height; ++i)
 			if (image_buffer[(i * 4) + 0] == 0 && image_buffer[(i * 4) + 1] == 0 && image_buffer[(i * 4) + 2] == 0)
 				image_buffer[(i * 4) + 3] = 0;
+	}
+
+	return image_buffer;
+}
+
+unsigned char* DecodeBitmapFromFile(const char *path, unsigned int *width, unsigned int *height, BOOL colour_key)
+{
+	unsigned char *image_buffer = NULL;
+
+	size_t size;
+	unsigned char *data = LoadFileToMemory(path, &size);
+
+	if (data != NULL)
+	{
+		image_buffer = DecodeBitmap(data, size, width, height, colour_key);
+
+		free(data);
 	}
 
 	return image_buffer;
