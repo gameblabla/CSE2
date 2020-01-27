@@ -71,8 +71,6 @@ endif()
 ##
 
 add_executable(CSE2
-	external/lodepng/lodepng.cpp
-	external/lodepng/lodepng.h
 	src/ArmsItem.cpp
 	src/ArmsItem.h
 	src/Back.cpp
@@ -217,7 +215,6 @@ set(RESOURCES
 )
 
 target_include_directories(CSE2 PRIVATE "external")
-target_compile_definitions(CSE2 PRIVATE LODEPNG_NO_COMPILE_ENCODER LODEPNG_NO_COMPILE_ERROR_TEXT LODEPNG_NO_COMPILE_CPP)
 
 # Handle options
 if(JAPANESE)

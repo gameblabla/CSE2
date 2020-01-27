@@ -15,10 +15,9 @@
 
 #include "SDL.h"
 
-#include "lodepng/lodepng.h"
-
 #include "../../WindowsWrapper.h"
 
+#include "../../Bitmap.h"
 #include "../../Resource.h"
 
 #define TOTAL_VBOS 8
@@ -334,10 +333,9 @@ Backend_Surface* Backend_Init(const char *title, unsigned int internal_screen_wi
 		size_t resource_size;
 		const unsigned char *resource_data = FindResource("ICON_MINI", "ICON", &resource_size);
 
-		unsigned char *image_buffer;
 		unsigned int image_width;
 		unsigned int image_height;
-		lodepng_decode32(&image_buffer, &image_width, &image_height, resource_data, resource_size);
+		unsigned char *image_buffer = DecodeBitmap(resource_data, resource_size, &image_width, &image_height, FALSE);
 
 		SDL_Surface *icon_surface = SDL_CreateRGBSurfaceWithFormatFrom(image_buffer, image_width, image_height, 32, image_width * 4, SDL_PIXELFORMAT_RGBA32);
 		SDL_SetWindowIcon(window, icon_surface);

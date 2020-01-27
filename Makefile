@@ -78,8 +78,6 @@ CSE2_CFLAGS += $(shell $(PKGCONFIG) sdl2 --cflags) $(shell $(PKGCONFIG) freetype
 ALL_CXXFLAGS += -std=c++11 -MMD -MP -MF $@.d
 CSE2_CXXFLAGS += $(shell $(PKGCONFIG) sdl2 --cflags) $(shell $(PKGCONFIG) freetype2 --cflags) -Iexternal
 
-DEFINES += -DLODEPNG_NO_COMPILE_ENCODER -DLODEPNG_NO_COMPILE_ERROR_TEXT -DLODEPNG_NO_COMPILE_CPP
-
 ifeq ($(STATIC), 1)
   ALL_LDFLAGS += -static
   CSE2_LIBS += $(shell $(PKGCONFIG) sdl2 --libs --static) $(shell $(PKGCONFIG) freetype2 --libs --static) -lfreetype
@@ -88,7 +86,6 @@ else
 endif
 
 SOURCES = \
-  external/lodepng/lodepng.cpp \
   src/ArmsItem.cpp \
   src/Back.cpp \
   src/Bitmap.cpp \

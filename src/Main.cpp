@@ -7,11 +7,10 @@
 
 #include "SDL.h"
 
-#include "lodepng/lodepng.h"
-
 #include "WindowsWrapper.h"
 
 #include "Backends/Rendering.h"
+#include "Bitmap.h"
 #include "CommonDefines.h"
 #include "Config.h"
 #include "Draw.h"
@@ -157,10 +156,9 @@ int main(int argc, char *argv[])
 	char image_path[MAX_PATH];
 	sprintf(image_path, "%s/Resource/CURSOR/CURSOR_NORMAL.png", gDataPath);
 
-	unsigned char *image_buffer;
 	unsigned int image_width;
 	unsigned int image_height;
-	lodepng_decode32_file(&image_buffer, &image_width, &image_height, image_path);
+	unsigned char *image_buffer = DecodeBitmapFromFile(image_path, &image_width, &image_height, FALSE);
 
 	SDL_Surface *cursor_surface = SDL_CreateRGBSurfaceWithFormatFrom(image_buffer, image_width, image_height, 32, image_width * 4, SDL_PIXELFORMAT_RGBA32);
 	SDL_SetColorKey(cursor_surface, SDL_TRUE, SDL_MapRGB(cursor_surface->format, 0xFF, 0, 0xFF));
