@@ -110,8 +110,8 @@ int main(int argc, char *argv[])
 	RECT unused_rect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
 #ifdef _WIN32	// On Windows, we use native icons instead (so we can give the taskbar and window separate icons, like the original EXE does)
-	SDL_SetHint(SDL_HINT_WINDOWS_INTRESOURCE_ICON, "0");
-	SDL_SetHint(SDL_HINT_WINDOWS_INTRESOURCE_ICON_SMALL, "1");
+	SDL_SetHint(SDL_HINT_WINDOWS_INTRESOURCE_ICON, "101");
+	SDL_SetHint(SDL_HINT_WINDOWS_INTRESOURCE_ICON_SMALL, "102");
 #endif
 
 	SDL_InitSubSystem(SDL_INIT_VIDEO);
