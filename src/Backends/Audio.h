@@ -22,3 +22,5 @@ void AudioBackend_RewindSound(AudioBackend_Sound *sound);
 void AudioBackend_SetSoundFrequency(AudioBackend_Sound *sound, unsigned int frequency);
 void AudioBackend_SetSoundVolume(AudioBackend_Sound *sound, long volume);
 void AudioBackend_SetSoundPan(AudioBackend_Sound *sound, long pan);
+
+void AudioBackend_SetOrganyaTimer(unsigned short timer);

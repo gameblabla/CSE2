@@ -6,8 +6,6 @@
 #define MAXMELODY 8
 #define MAXDRAM 8
 
-extern unsigned short organya_timer;
-
 extern BOOL g_mute[MAXTRACK];	// Used by the debug Mute menu
 
 BOOL MakeOrganyaWave(signed char track, signed char wave_no, signed char pipi);
