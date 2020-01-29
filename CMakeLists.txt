@@ -16,6 +16,8 @@ option(DEBUG_SAVE "Re-enable the ability to drag-and-drop save files onto the wi
 set(RENDERER "SDLTexture" CACHE STRING "Which renderer the game should use: 'OpenGL3' for an OpenGL 3.2 renderer, 'OpenGLES2' for an OpenGL ES 2.0 renderer, 'SDLTexture' for SDL2's hardware-accelerated Texture API, 'SDLSurface' for SDL2's software-rendered Surface API, or 'Software' for a handwritten software renderer")
 
 option(LTO "Enable link-time optimisation" OFF)
+option(NATIVE_OPTIMIZATIONS "Enable processor-specific optimisations (executable might not work on other architectures) (GCC-compatible compilers only)" OFF)
+
 option(WARNINGS "Enable common compiler warnings (for GCC-compatible compilers and MSVC only)" OFF)
 option(WARNINGS_ALL "Enable ALL compiler warnings (for Clang and MSVC only)" OFF)
 option(WARNINGS_FATAL "Stop compilation on any compiler warning (for GCC-compatible compilers and MSVC only)" OFF)
@@ -446,6 +448,25 @@ if(LTO)
 		check_ipo_supported(RESULT result)
 		if(result)
 			set_target_properties(CSE2 PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
+		endif()
+	endif()
+endif()
+
+# Enable -march=native if available
+if(NATIVE_OPTIMIZATIONS)
+	include(CheckCXXCompilerFlag)
+	CHECK_CXX_COMPILER_FLAG("-march=native" COMPILER_SUPPORTS_MARCH_NATIVE)	# GCC flag
+	if(COMPILER_SUPPORTS_MARCH_NATIVE)
+		target_compile_options(CSE2 PRIVATE -march=native)
+	else()
+		CHECK_CXX_COMPILER_FLAG("-xHost" COMPILER_SUPPORTS_XHOST)	# ICC (Linux) flag
+		CHECK_CXX_COMPILER_FLAG("/QxHost" COMPILER_SUPPORTS_QXHOST)	# ICC (Windows) flag
+		if(COMPILER_SUPPORTS_XHOST)
+			target_compile_options(CSE2 PRIVATE -xHost)
+		elseif(COMPILER_SUPPORTS_QXHOST)
+			target_compile_options(CSE2 PRIVATE /QxHost)
+		else()
+			message(WARNING "Couldn't activate native optimizations ! (Unsupported compiler)")
 		endif()
 	endif()
 endif()

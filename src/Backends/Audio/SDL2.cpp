@@ -12,6 +12,7 @@
 
 #include "../../Organya.h"
 #include "../../WindowsWrapper.h"
+#include "../../CommonDefines.h"
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -70,7 +71,8 @@ static void SetSoundPan(AudioBackend_Sound *sound, long pan)
 	sound->volume_r = sound->pan_r * sound->volume;
 }
 
-static void MixSounds(float *stream, unsigned int frames_total)
+// Most CPU-intensive function in the game (2/3rd CPU time consumption in my experience), so marked with attrHot so the compiler considers it a hot spot (as it is) when optimizing
+attrHot static void MixSounds(float *stream, unsigned int frames_total)
 {
 	for (AudioBackend_Sound *sound = sound_list_head; sound != NULL; sound = sound->next)
 	{
@@ -85,7 +87,7 @@ static void MixSounds(float *stream, unsigned int frames_total)
 				const float sample2 = (sound->samples[(size_t)sound->position + 1] - 128.0f) / 128.0f;
 
 				// Perform linear interpolation
-				const float interpolated_sample = sample1 + ((sample2 - sample1) * (float)fmod(sound->position, 1.0));
+				const float interpolated_sample = sample1 + ((sample2 - sample1) * (float)fmod((float)sound->position, 1.0f));
 
 				*steam_pointer++ += interpolated_sample * sound->volume_l;
 				*steam_pointer++ += interpolated_sample * sound->volume_r;
