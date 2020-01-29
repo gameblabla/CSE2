@@ -10,10 +10,6 @@
 #define TILES_TO_UNITS(x) ((int)((x) * (0x200 * 0x10)))
 #define UNITS_TO_TILES(x) ((int)((x) / (0x200 * 0x10)))
 
-#ifdef __GNUC__
-#define attrHot __attribute__((hot))
-#endif
-
 enum Collisions
 {
 	COLL_LEFT_WALL = 1,     // Touching a left wall
