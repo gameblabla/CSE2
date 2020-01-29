@@ -98,7 +98,7 @@ attrHot static void MixSounds(float *stream, unsigned int frames_total)
 				{
 					if (sound->looping)
 					{
-						sound->position = fmod(sound->position, sound->frames);
+						sound->position = fmod(sound->position, (double)sound->frames);
 					}
 					else
 					{
