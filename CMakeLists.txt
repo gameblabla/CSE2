@@ -455,11 +455,19 @@ endif()
 # Enable -march=native if available
 if(NATIVE_OPTIMIZATIONS)
 	include(CheckCXXCompilerFlag)
-	CHECK_CXX_COMPILER_FLAG("-march=native" COMPILER_SUPPORTS_MARCH_NATIVE)
+	CHECK_CXX_COMPILER_FLAG("-march=native" COMPILER_SUPPORTS_MARCH_NATIVE)	# GCC flag
 	if(COMPILER_SUPPORTS_MARCH_NATIVE)
 		target_compile_options(CSE2 PRIVATE -march=native)
 	else()
-		message(WARNING "Couldn't activate native optimizations ! (Unsupported compiler)")
+		CHECK_CXX_COMPILER_FLAG("-xHost" COMPILER_SUPPORTS_XHOST)	# ICC (Linux) flag
+		CHECK_CXX_COMPILER_FLAG("/QxHost" COMPILER_SUPPORTS_QXHOST)	# ICC (Windows) flag
+		if(COMPILER_SUPPORTS_XHOST)
+			target_compile_options(CSE2 PRIVATE -xHost)
+		elseif(COMPILER_SUPPORTS_QXHOST)
+			target_compile_options(CSE2 PRIVATE /QxHost)
+		else()
+			message(WARNING "Couldn't activate native optimizations ! (Unsupported compiler)")
+		endif()
 	endif()
 endif()
 
