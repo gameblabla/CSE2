@@ -95,8 +95,6 @@ typedef struct OrgData
 	BOOL InitMusicData(const char *path);
 } ORGDATA;
 
-unsigned short organya_timer;
-
 AudioBackend_Sound *lpORGANBUFFER[8][8][2] = {NULL};
 
 /////////////////////////////////////////////
@@ -827,7 +825,7 @@ void PlayOrganyaMusic(void)
 	if (!audio_backend_initialised)
 		return;
 
-	organya_timer = org_data.info.wait;
+	AudioBackend_SetOrganyaTimer(org_data.info.wait);
 }
 
 BOOL ChangeOrganyaVolume(signed int volume)
@@ -847,7 +845,7 @@ void StopOrganyaMusic(void)
 	if (!audio_backend_initialised)
 		return;
 
-	organya_timer = 0;
+	AudioBackend_SetOrganyaTimer(0);
 
 	// Stop notes
 	for (int i = 0; i < MAXMELODY; i++)
@@ -870,7 +868,7 @@ void EndOrganya(void)
 	if (!audio_backend_initialised)
 		return;
 
-	organya_timer = 0;
+	AudioBackend_SetOrganyaTimer(0);
 
 	// Release everything related to org
 	org_data.ReleaseNote();

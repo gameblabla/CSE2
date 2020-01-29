@@ -44,6 +44,8 @@ static SDL_AudioDeviceID device_id;
 
 static unsigned long output_frequency;
 
+static unsigned short organya_timer;
+
 static double MillibelToScale(long volume)
 {
 	// Volume is in hundredths of decibels, from 0 to -10000
@@ -348,6 +350,15 @@ void AudioBackend_SetSoundPan(AudioBackend_Sound *sound, long pan)
 	SDL_LockAudioDevice(device_id);
 
 	SetSoundPan(sound, pan);
+
+	SDL_UnlockAudioDevice(device_id);
+}
+
+void AudioBackend_SetOrganyaTimer(unsigned short timer)
+{
+	SDL_LockAudioDevice(device_id);
+
+	organya_timer = timer;
 
 	SDL_UnlockAudioDevice(device_id);
 }
