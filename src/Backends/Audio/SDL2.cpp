@@ -12,7 +12,6 @@
 
 #include "../../Organya.h"
 #include "../../WindowsWrapper.h"
-#include "../../CommonDefines.h"
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
