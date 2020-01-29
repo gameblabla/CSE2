@@ -87,7 +87,7 @@ attrHot static void MixSounds(float *stream, unsigned int frames_total)
 				const float sample2 = (sound->samples[(size_t)sound->position + 1] - 128.0f) / 128.0f;
 
 				// Perform linear interpolation
-				const float interpolated_sample = sample1 + ((sample2 - sample1) * fmodf(sound->position, 1.0));
+				const float interpolated_sample = sample1 + ((sample2 - sample1) * (float)fmod((float)sound->position, 1.0f));
 
 				*steam_pointer++ += interpolated_sample * sound->volume_l;
 				*steam_pointer++ += interpolated_sample * sound->volume_r;
@@ -98,7 +98,7 @@ attrHot static void MixSounds(float *stream, unsigned int frames_total)
 				{
 					if (sound->looping)
 					{
-						sound->position = fmodf(sound->position, sound->frames);
+						sound->position = fmod(sound->position, sound->frames);
 					}
 					else
 					{
