@@ -20,6 +20,8 @@ option(AUDIO_TRACKER "Enable support for .it, .xm, .mod, .s3m music/SFX" OFF)
 option(AUDIO_PXTONE "Enable support for PxTone music/SFX (not to be confused with PixTone)" OFF)
 
 option(LTO "Enable link-time optimisation" OFF)
+option(NATIVE_OPTIMIZATIONS "Enable processor-specific optimisations (executable might not work on other architectures) (GCC-compatible compilers only)" OFF)
+
 option(WARNINGS "Enable common compiler warnings (for GCC-compatible compilers and MSVC only)" OFF)
 option(WARNINGS_ALL "Enable ALL compiler warnings (for Clang and MSVC only)" OFF)
 option(WARNINGS_FATAL "Stop compilation on any compiler warning (for GCC-compatible compilers and MSVC only)" OFF)
@@ -497,6 +499,25 @@ if(LTO)
 		check_ipo_supported(RESULT result)
 		if(result)
 			set_target_properties(CSE2 PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
+		endif()
+	endif()
+endif()
+
+# Enable -march=native if available
+if(NATIVE_OPTIMIZATIONS)
+	include(CheckCXXCompilerFlag)
+	CHECK_CXX_COMPILER_FLAG("-march=native" COMPILER_SUPPORTS_MARCH_NATIVE)	# GCC flag
+	if(COMPILER_SUPPORTS_MARCH_NATIVE)
+		target_compile_options(CSE2 PRIVATE -march=native)
+	else()
+		CHECK_CXX_COMPILER_FLAG("-xHost" COMPILER_SUPPORTS_XHOST)	# ICC (Linux) flag
+		CHECK_CXX_COMPILER_FLAG("/QxHost" COMPILER_SUPPORTS_QXHOST)	# ICC (Windows) flag
+		if(COMPILER_SUPPORTS_XHOST)
+			target_compile_options(CSE2 PRIVATE -xHost)
+		elseif(COMPILER_SUPPORTS_QXHOST)
+			target_compile_options(CSE2 PRIVATE /QxHost)
+		else()
+			message(WARNING "Couldn't activate native optimizations ! (Unsupported compiler)")
 		endif()
 	endif()
 endif()
