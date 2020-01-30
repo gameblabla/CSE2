@@ -66,7 +66,7 @@ void MakeWaveTables(void)
 
 //BOOL wave_tables_made;
 
-ATTRIBUTE_HOT BOOL MakePixelWaveData(const PIXTONEPARAMETER *ptp, unsigned char *pData)
+ATTRIBUTE_HOT ATTRIBUTE_OPTIMIZE("-ffast-math") BOOL MakePixelWaveData(const PIXTONEPARAMETER *ptp, unsigned char *pData)
 {
 	int i;
 	int a, b, c, d;
