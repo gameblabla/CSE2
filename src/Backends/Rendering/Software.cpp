@@ -7,6 +7,7 @@
 #include "SDL.h"
 
 #include "../../WindowsWrapper.h"
+#include "../../Attributes.h"
 
 #include "../../Resource.h"
 
@@ -156,7 +157,7 @@ void Backend_UnlockSurface(Backend_Surface *surface, unsigned int width, unsigne
 	(void)height;
 }
 
-void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL colour_key)
+ATTRIBUTE_HOT void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL colour_key)
 {
 	if (source_surface == NULL || destination_surface == NULL)
 		return;
