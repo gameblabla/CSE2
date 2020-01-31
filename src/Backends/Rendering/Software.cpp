@@ -207,6 +207,9 @@ ATTRIBUTE_HOT void Backend_Blit(Backend_Surface *source_surface, const RECT *rec
 	// Do the actual blitting
 	if (colour_key)
 	{
+#ifdef USE_OPENMP
+#pragma omp for
+#endif
 		for (long j = 0; j < rect_clamped.bottom - rect_clamped.top; ++j)
 		{
 			unsigned char *source_pointer = &source_surface->pixels[((rect_clamped.top + j) * source_surface->pitch) + (rect_clamped.left * 3)];
@@ -214,7 +217,7 @@ ATTRIBUTE_HOT void Backend_Blit(Backend_Surface *source_surface, const RECT *rec
 
 			for (long i = 0; i < rect_clamped.right - rect_clamped.left; ++i)
 			{
-				if (source_pointer[0] == 0 && source_pointer[1] == 0 && source_pointer[2] == 0)	// Assumes the colour key will always be #000000 (black)
+				if (UNLIKELY(source_pointer[0] == 0 && source_pointer[1] == 0 && source_pointer[2] == 0))	// Assumes the colour key will always be #000000 (black)
 				{
 					source_pointer += 3;
 					destination_pointer += 3;
