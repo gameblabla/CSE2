@@ -527,7 +527,7 @@ if(RENDERER MATCHES "OpenGL3")
 	target_include_directories(CSE2 PRIVATE "external/glad/include")
 
 	find_package(OpenGL REQUIRED)
-	target_link_libraries(CSE2 OpenGL::GL)
+	target_link_libraries(CSE2 OpenGL::GL ${CMAKE_DL_LIBS})
 endif()
 
 if(RENDERER MATCHES "OpenGLES2")
