@@ -240,7 +240,7 @@ ATTRIBUTE_HOT void Backend_Blit(Backend_Surface *source_surface, const RECT *rec
 	}
 }
 
-void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
+ATTRIBUTE_HOT void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
 {
 	if (surface == NULL)
 		return;
