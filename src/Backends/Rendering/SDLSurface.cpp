@@ -173,12 +173,7 @@ void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned cha
 	SDL_FillRect(surface->sdlsurface, &destination_rect, SDL_MapRGB(surface->sdlsurface->format, red, green, blue));
 }
 
-BOOL Backend_SupportsSubpixelGlyphs(void)
-{
-	return FALSE;	// SDL_Surfaces don't have per-component alpha
-}
-
-Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch, FontPixelMode pixel_mode)
+Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch)
 {
 	Backend_Glyph *glyph = (Backend_Glyph*)malloc(sizeof(Backend_Glyph));
 
@@ -193,45 +188,18 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 		return NULL;
 	}
 
-	switch (pixel_mode)
+	for (unsigned int y = 0; y < height; ++y)
 	{
-		case FONT_PIXEL_MODE_LCD:
-			// Unsupported
-			break;
+		const unsigned char *source_pointer = pixels + y * pitch;
+		unsigned char *destination_pointer = (unsigned char*)glyph->sdlsurface->pixels + y * glyph->sdlsurface->pitch;
 
-		case FONT_PIXEL_MODE_GRAY:
-			for (unsigned int y = 0; y < height; ++y)
-			{
-				const unsigned char *source_pointer = pixels + y * pitch;
-				unsigned char *destination_pointer = (unsigned char*)glyph->sdlsurface->pixels + y * glyph->sdlsurface->pitch;
-
-				for (unsigned int x = 0; x < width; ++x)
-				{
-					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = *source_pointer++;
-				}
-			}
-
-			break;
-
-		case FONT_PIXEL_MODE_MONO:
-			for (unsigned int y = 0; y < height; ++y)
-			{
-				const unsigned char *source_pointer = pixels + y * pitch;
-				unsigned char *destination_pointer = (unsigned char*)glyph->sdlsurface->pixels + y * glyph->sdlsurface->pitch;
-
-				for (unsigned int x = 0; x < width; ++x)
-				{
-					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = *source_pointer++ ? 0xFF : 0;
-				}
-			}
-
-			break;
+		for (unsigned int x = 0; x < width; ++x)
+		{
+			*destination_pointer++ = 0xFF;
+			*destination_pointer++ = 0xFF;
+			*destination_pointer++ = 0xFF;
+			*destination_pointer++ = *source_pointer++;
+		}
 	}
 
 	return glyph;
@@ -270,6 +238,11 @@ void Backend_DrawGlyph(Backend_Glyph *glyph, long x, long y)
 	SDL_SetSurfaceColorMod(glyph->sdlsurface, glyph_colour_channels[0], glyph_colour_channels[1], glyph_colour_channels[2]);
 
 	SDL_BlitSurface(glyph->sdlsurface, NULL, glyph_destination_sdlsurface, &rect);
+}
+
+void Backend_FlushGlyphs(void)
+{
+	
 }
 
 void Backend_HandleRenderTargetLoss(void)

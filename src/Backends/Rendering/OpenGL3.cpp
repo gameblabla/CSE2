@@ -75,13 +75,10 @@ static SDL_GLContext context;
 static GLuint program_texture;
 static GLuint program_texture_colour_key;
 static GLuint program_colour_fill;
-static GLuint program_glyph_normal;
-static GLuint program_glyph_subpixel_part1;
-static GLuint program_glyph_subpixel_part2;
+static GLuint program_glyph;
 
 static GLint program_colour_fill_uniform_colour;
-static GLint program_glyph_normal_uniform_colour;
-static GLint program_glyph_subpixel_part2_uniform_colour;
+static GLint program_glyph_uniform_colour;
 
 #ifndef USE_OPENGLES2
 static GLuint vertex_array_id;
@@ -161,7 +158,7 @@ void main() \
 } \
 ";
 
-static const GLchar *fragment_shader_glyph_normal = " \
+static const GLchar *fragment_shader_glyph = " \
 #version 100\n \
 precision mediump float; \
 uniform sampler2D tex; \
@@ -170,29 +167,6 @@ varying vec2 texture_coordinates; \
 void main() \
 { \
 	gl_FragColor = colour * vec4(1.0, 1.0, 1.0, texture2D(tex, texture_coordinates).r); \
-} \
-";
-
-static const GLchar *fragment_shader_glyph_subpixel_part1 = " \
-#version 100\n \
-precision mediump float; \
-uniform sampler2D tex; \
-varying vec2 texture_coordinates; \
-void main() \
-{ \
-	gl_FragColor = texture2D(tex, texture_coordinates); \
-} \
-";
-
-static const GLchar *fragment_shader_glyph_subpixel_part2 = " \
-#version 100\n \
-precision mediump float; \
-uniform sampler2D tex; \
-uniform vec4 colour; \
-varying vec2 texture_coordinates; \
-void main() \
-{ \
-	gl_FragColor = colour * texture2D(tex, texture_coordinates); \
 } \
 ";
 #else
@@ -254,7 +228,7 @@ void main() \
 } \
 ";
 
-static const GLchar *fragment_shader_glyph_normal = " \
+static const GLchar *fragment_shader_glyph = " \
 #version 150 core\n \
 uniform sampler2D tex; \
 uniform vec4 colour; \
@@ -263,29 +237,6 @@ out vec4 fragment; \
 void main() \
 { \
 	fragment = colour * vec4(1.0, 1.0, 1.0, texture(tex, texture_coordinates).r); \
-} \
-";
-
-static const GLchar *fragment_shader_glyph_subpixel_part1 = " \
-#version 150 core\n \
-uniform sampler2D tex; \
-in vec2 texture_coordinates; \
-out vec4 fragment; \
-void main() \
-{ \
-	fragment = texture(tex, texture_coordinates); \
-} \
-";
-
-static const GLchar *fragment_shader_glyph_subpixel_part2 = " \
-#version 150 core\n \
-uniform sampler2D tex; \
-uniform vec4 colour; \
-in vec2 texture_coordinates; \
-out vec4 fragment; \
-void main() \
-{ \
-	fragment = colour * texture(tex, texture_coordinates); \
 } \
 ";
 #endif
@@ -427,8 +378,8 @@ static void GlyphBatch_Draw(spritebatch_sprite_t* sprites, int count, int textur
 		last_green = glyph_colour_channels[1];
 		last_blue = glyph_colour_channels[2];
 
-		glUseProgram(program_glyph_normal);
-		glUniform4f(program_glyph_normal_uniform_colour, glyph_colour_channels[0] / 255.0f, glyph_colour_channels[1] / 255.0f, glyph_colour_channels[2] / 255.0f, 1.0f);
+		glUseProgram(program_glyph);
+		glUniform4f(program_glyph_uniform_colour, glyph_colour_channels[0] / 255.0f, glyph_colour_channels[1] / 255.0f, glyph_colour_channels[2] / 255.0f, 1.0f);
 
 		// Point our framebuffer to the destination texture
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, glyph_destination_surface->texture_id, 0);
@@ -613,16 +564,13 @@ Backend_Surface* Backend_Init(const char *title, int width, int height, BOOL ful
 						program_texture = CompileShader(vertex_shader_texture, fragment_shader_texture);
 						program_texture_colour_key = CompileShader(vertex_shader_texture, fragment_shader_texture_colour_key);
 						program_colour_fill = CompileShader(vertex_shader_plain, fragment_shader_colour_fill);
-						program_glyph_normal = CompileShader(vertex_shader_texture, fragment_shader_glyph_normal);
-						program_glyph_subpixel_part1 = CompileShader(vertex_shader_texture, fragment_shader_glyph_subpixel_part1);
-						program_glyph_subpixel_part2 = CompileShader(vertex_shader_texture, fragment_shader_glyph_subpixel_part2);
+						program_glyph = CompileShader(vertex_shader_texture, fragment_shader_glyph);
 
-						if (program_texture != 0 && program_texture_colour_key != 0 && program_colour_fill != 0 && program_glyph_normal != 0 && program_glyph_subpixel_part1 != 0 && program_glyph_subpixel_part2 != 0)
+						if (program_texture != 0 && program_texture_colour_key != 0 && program_colour_fill != 0 && program_glyph != 0)
 						{
 							// Get shader uniforms
 							program_colour_fill_uniform_colour = glGetUniformLocation(program_colour_fill, "colour");
-							program_glyph_normal_uniform_colour = glGetUniformLocation(program_glyph_normal, "colour");
-							program_glyph_subpixel_part2_uniform_colour = glGetUniformLocation(program_glyph_subpixel_part2, "colour");
+							program_glyph_uniform_colour = glGetUniformLocation(program_glyph, "colour");
 
 							// Set up framebuffer (used for surface-to-surface blitting)
 							glGenFramebuffers(1, &framebuffer_id);
@@ -662,14 +610,8 @@ Backend_Surface* Backend_Init(const char *title, int width, int height, BOOL ful
 							return &framebuffer;
 						}
 
-						if (program_glyph_subpixel_part2 != 0)
-							glDeleteProgram(program_glyph_subpixel_part2);
-
-						if (program_glyph_subpixel_part1 != 0)
-							glDeleteProgram(program_glyph_subpixel_part1);
-
-						if (program_glyph_normal != 0)
-							glDeleteProgram(program_glyph_normal);
+						if (program_glyph != 0)
+							glDeleteProgram(program_glyph);
 
 						if (program_colour_fill != 0)
 							glDeleteProgram(program_colour_fill);
@@ -727,9 +669,7 @@ void Backend_Deinit(void)
 
 	glDeleteTextures(1, &framebuffer.texture_id);
 	glDeleteFramebuffers(1, &framebuffer_id);
-	glDeleteProgram(program_glyph_subpixel_part2);
-	glDeleteProgram(program_glyph_subpixel_part1);
-	glDeleteProgram(program_glyph_normal);
+	glDeleteProgram(program_glyph);
 	glDeleteProgram(program_colour_fill);
 	glDeleteProgram(program_texture_colour_key);
 	glDeleteProgram(program_texture);
@@ -1016,11 +956,6 @@ void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned cha
 	vertex_buffer_slot->vertices[1][1].vertex_coordinate.y = vertex_bottom;
 	vertex_buffer_slot->vertices[1][2].vertex_coordinate.x = vertex_left;
 	vertex_buffer_slot->vertices[1][2].vertex_coordinate.y = vertex_bottom;
-}
-
-BOOL Backend_SupportsSubpixelGlyphs(void)
-{
-	return TRUE;
 }
 
 Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch)
