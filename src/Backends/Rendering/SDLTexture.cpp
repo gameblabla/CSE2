@@ -65,7 +65,7 @@ static void RectToSDLRect(const RECT *rect, SDL_Rect *sdl_rect)
 }
 
 // Blit the glyphs in the batch
-static void GlyphBatch_Draw(spritebatch_sprite_t* sprites, int count, int texture_w, int texture_h, void* udata)
+static void GlyphBatch_Draw(spritebatch_sprite_t *sprites, int count, int texture_w, int texture_h, void *udata)
 {
 	(void)udata;
 
@@ -85,7 +85,7 @@ static void GlyphBatch_Draw(spritebatch_sprite_t* sprites, int count, int textur
 }
 
 // Upload the glyph's pixels
-static void GlyphBatch_GetPixels(SPRITEBATCH_U64 image_id, void* buffer, int bytes_to_fill, void* udata)
+static void GlyphBatch_GetPixels(SPRITEBATCH_U64 image_id, void *buffer, int bytes_to_fill, void *udata)
 {
 	(void)udata;
 
@@ -95,7 +95,7 @@ static void GlyphBatch_GetPixels(SPRITEBATCH_U64 image_id, void* buffer, int byt
 }
 
 // Create a texture atlas, and upload pixels to it
-static SPRITEBATCH_U64 GlyphBatch_CreateTexture(void* pixels, int w, int h, void* udata)
+static SPRITEBATCH_U64 GlyphBatch_CreateTexture(void *pixels, int w, int h, void *udata)
 {
 	(void)udata;
 
@@ -107,7 +107,7 @@ static SPRITEBATCH_U64 GlyphBatch_CreateTexture(void* pixels, int w, int h, void
 }
 
 // Destroy texture atlas
-static void GlyphBatch_DestroyTexture(SPRITEBATCH_U64 texture_id, void* udata)
+static void GlyphBatch_DestroyTexture(SPRITEBATCH_U64 texture_id, void *udata)
 {
 	(void)udata;
 
@@ -201,6 +201,7 @@ Backend_Surface* Backend_Init(const char *title, int width, int height, BOOL ful
 
 void Backend_Deinit(void)
 {
+	spritebatch_term(glyph_batcher);
 	SDL_DestroyTexture(framebuffer.texture);
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);

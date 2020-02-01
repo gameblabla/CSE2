@@ -7,7 +7,6 @@
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
-#include FT_LCD_FILTER_H
 #include FT_BITMAP_H
 
 #include "WindowsWrapper.h"
@@ -43,9 +42,6 @@ typedef struct FontObject
 	FT_Library library;
 	FT_Face face;
 	unsigned char *data;
-#ifndef DISABLE_FONT_ANTIALIASING
-	BOOL lcd_mode;
-#endif
 	CachedGlyph *glyph_list_head;
 } FontObject;
 
@@ -973,7 +969,7 @@ static CachedGlyph* GetGlyphCached(FontObject *font_object, unsigned long unicod
 		unsigned int glyph_index = FT_Get_Char_Index(font_object->face, unicode_value);
 
 #ifndef DISABLE_FONT_ANTIALIASING
-		FT_Load_Glyph(font_object->face, glyph_index, FT_LOAD_RENDER | (font_object->lcd_mode ? FT_LOAD_TARGET_LCD : 0));
+		FT_Load_Glyph(font_object->face, glyph_index, FT_LOAD_RENDER);
 #else
 		FT_Load_Glyph(font_object->face, glyph_index, FT_LOAD_RENDER | FT_LOAD_MONOCHROME);
 #endif
@@ -987,28 +983,9 @@ static CachedGlyph* GetGlyphCached(FontObject *font_object, unsigned long unicod
 		FT_Bitmap_New(&bitmap);
 		FT_Bitmap_Convert(font_object->library, &font_object->face->glyph->bitmap, &bitmap, 1);
 
-		FontPixelMode pixel_mode;
 		switch (font_object->face->glyph->bitmap.pixel_mode)
 		{
-			case FT_PIXEL_MODE_LCD:
-				pixel_mode = FONT_PIXEL_MODE_LCD;
-
-				for (unsigned int y = 0; y < bitmap.rows; ++y)
-				{
-					unsigned char *pixel_pointer = bitmap.buffer + y * bitmap.pitch;
-
-					for (unsigned int x = 0; x < bitmap.width; ++x)
-					{
-						*pixel_pointer = GammaCorrect(*pixel_pointer);
-						++pixel_pointer;
-					}
-				}
-
-				break;
-
 			case FT_PIXEL_MODE_GRAY:
-				pixel_mode = FONT_PIXEL_MODE_GRAY;
-
 				for (unsigned int y = 0; y < bitmap.rows; ++y)
 				{
 					unsigned char *pixel_pointer = bitmap.buffer + y * bitmap.pitch;
@@ -1023,11 +1000,21 @@ static CachedGlyph* GetGlyphCached(FontObject *font_object, unsigned long unicod
 				break;
 
 			case FT_PIXEL_MODE_MONO:
-				pixel_mode = FONT_PIXEL_MODE_MONO;
+				for (unsigned int y = 0; y < bitmap.rows; ++y)
+				{
+					unsigned char *pixel_pointer = bitmap.buffer + y * bitmap.pitch;
+
+					for (unsigned int x = 0; x < bitmap.width; ++x)
+					{
+						*pixel_pointer = *pixel_pointer ? 0xFF : 0;
+						++pixel_pointer;
+					}
+				}
+
 				break;
 		}
 
-		glyph->backend = Backend_LoadGlyph(bitmap.buffer, bitmap.width, bitmap.rows, bitmap.pitch, pixel_mode);
+		glyph->backend = Backend_LoadGlyph(bitmap.buffer, bitmap.width, bitmap.rows, bitmap.pitch);
 
 		FT_Bitmap_Done(font_object->library, &bitmap);
 	}
@@ -1059,10 +1046,6 @@ FontObject* LoadFontFromData(const unsigned char *data, size_t data_size, unsign
 	{
 		if (FT_Init_FreeType(&font_object->library) == 0)
 		{
-#ifndef DISABLE_FONT_ANTIALIASING
-			font_object->lcd_mode = Backend_SupportsSubpixelGlyphs() && FT_Library_SetLcdFilter(font_object->library, FT_LCD_FILTER_DEFAULT) != FT_Err_Unimplemented_Feature;
-#endif
-
 			font_object->data = (unsigned char*)malloc(data_size);
 
 			if (font_object->data != NULL)
