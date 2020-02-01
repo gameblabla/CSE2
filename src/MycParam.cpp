@@ -271,6 +271,9 @@ void PutArmsEnergy(BOOL flash)
 	RECT rcExpFlash = {40, 80, 80, 88};
 
 	int lv = gArmsData[gSelectedArms].level - 1;
+	if (lv < 0)	// Detect the case where the level is 0 (no weapon)
+		lv = 0;	// Set lv to a safe value
+
 	int arms_code = gArmsData[gSelectedArms].code;
 	int exp_now = gArmsData[gSelectedArms].exp;
 	int exp_next = gArmsLevelTable[arms_code].exp[lv];

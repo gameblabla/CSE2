@@ -117,7 +117,10 @@ void ActCaret02(CARET *crt)
 			}
 
 			if (crt->ani_no > 3)
+			{
 				crt->cond = 0;
+				return;	// Avoid unconditional UB at rect_left[crt->ani_no]
+			}
 
 			crt->rect = rect_left[crt->ani_no];
 			break;
@@ -130,7 +133,10 @@ void ActCaret02(CARET *crt)
 			}
 
 			if (crt->ani_no > 3)
+			{
 				crt->cond = 0;
+				return;	// Avoid unconditional UB at rect_right[crt->ani_no]
+			}
 
 			crt->rect = rect_right[crt->ani_no];
 			break;
@@ -158,7 +164,10 @@ void ActCaret03(CARET *crt)
 	{
 		crt->ani_wait = 0;
 		if (++crt->ani_no > 3)
+		{
 			crt->cond = 0;
+			return;	// Return now, or the access to rect[crt->ani_no] we do is UB
+		}
 	}
 
 	crt->rect = rect[crt->ani_no];
@@ -207,11 +216,14 @@ void ActCaret05(CARET *crt)
 		++crt->ani_no;
 	}
 
-	if (crt->ani_no > 6)
-		crt->cond = 0;
-
 	crt->x += 0x80;
 	crt->y -= 0x80;
+
+	if (crt->ani_no > 6)
+	{
+		crt->cond = 0;
+		return;	// Return now, or the access to rect[crt->ani_no] we do is UB
+	}
 
 	crt->rect = rect[crt->ani_no];
 }
@@ -349,7 +361,10 @@ void ActCaret11(CARET *crt)
 	{
 		crt->ani_wait = 0;
 		if (++crt->ani_no > 6)
+		{
 			crt->cond = 0;
+			return;	// Avoid unconditional UB at rcRight[crt->ani_no]
+		}
 	}
 
 	crt->rect = rcRight[crt->ani_no];
@@ -366,7 +381,10 @@ void ActCaret12(CARET *crt)
 	{
 		crt->ani_wait = 0;
 		if (++crt->ani_no > 1)
+		{
 			crt->cond = 0;
+			return;	// Return now, or the access to rcLeft[crt->ani_no] we do is UB
+		}
 	}
 
 	crt->rect = rcLeft[crt->ani_no];
