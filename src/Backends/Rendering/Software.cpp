@@ -65,8 +65,16 @@ Backend_Surface* Backend_Init(const char *title, int width, int height, BOOL ful
 
 			return &framebuffer;
 		}
+		else
+		{
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal error (software rendering backend)", "Could not create framebuffer surface", window);
+		}
 
 		SDL_DestroyWindow(window);
+	}
+	else
+	{
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal error (software rendering backend)", "Could not create window", NULL);
 	}
 
 	return NULL;

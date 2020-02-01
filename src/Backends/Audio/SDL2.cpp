@@ -163,7 +163,10 @@ static void Callback(void *user_data, Uint8 *stream_uint8, int len)
 BOOL AudioBackend_Init(void)
 {
 	if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
+	{
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal error (SDL2 audio backend)", "'SDL_InitSubSystem(SDL_INIT_AUDIO)' failed", NULL);
 		return FALSE;
+	}
 
 #ifndef NDEBUG
 	puts("Available SDL2 audio drivers:");
@@ -185,7 +188,10 @@ BOOL AudioBackend_Init(void)
 	output_frequency = obtained_specification.freq;
 
 	if (device_id == 0)
+	{
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal error (SDL2 audio backend)", "'SDL_OpenAudioDevice' failed", NULL);
 		return FALSE;
+	}
 
 	SDL_PauseAudioDevice(device_id, 0);
 

@@ -310,7 +310,7 @@ static GLuint CompileShader(const char *vertex_shader_source, const char *fragme
 	{
 		char buffer[0x200];
 		glGetShaderInfoLog(vertex_shader, sizeof(buffer), NULL, buffer);
-		printf("Vertex shader: %s", buffer);
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Vertex shader error", buffer, window);
 		return 0;
 	}
 
@@ -325,7 +325,7 @@ static GLuint CompileShader(const char *vertex_shader_source, const char *fragme
 	{
 		char buffer[0x200];
 		glGetShaderInfoLog(fragment_shader, sizeof(buffer), NULL, buffer);
-		printf("Fragment shader: %s", buffer);
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fragment shader error", buffer, window);
 		return 0;
 	}
 
@@ -341,7 +341,7 @@ static GLuint CompileShader(const char *vertex_shader_source, const char *fragme
 	{
 		char buffer[0x200];
 		glGetProgramInfoLog(program_id, sizeof(buffer), NULL, buffer);
-		printf("Shader linker: %s", buffer);
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Shader linker error", buffer, window);
 		return 0;
 	}
 
@@ -455,13 +455,11 @@ Backend_Surface* Backend_Init(const char *title, int width, int height, BOOL ful
 			{
 			#ifndef USE_OPENGLES2
 				if (gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress))
-			#endif
 				{
-				#ifndef USE_OPENGLES2
 					// Check if the platform supports OpenGL 3.2
 					if (GLAD_GL_VERSION_3_2)
-				#endif
 					{
+			#endif
 					#ifndef NDEBUG
 						printf("GL_VENDOR = %s\n", glGetString(GL_VENDOR));
 						printf("GL_RENDERER = %s\n", glGetString(GL_RENDERER));
@@ -552,14 +550,36 @@ Backend_Surface* Backend_Init(const char *title, int width, int height, BOOL ful
 					#ifndef USE_OPENGLES2
 						glDeleteVertexArrays(1, &vertex_array_id);
 					#endif
+			#ifndef USE_OPENGLES2
+					}
+					else
+					{
+						SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal error (OpenGL rendering backend)", "Your system does not support OpenGL 3.2", window);
 					}
 				}
+				else
+				{
+					SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal error (OpenGL rendering backend)", "Could not load OpenGL functions", window);
+				}
+			#endif
+			}
+			else
+			{
+				SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal error (OpenGL rendering backend)", "SDL_GL_MakeCurrent failed", window);
 			}
 
 			SDL_GL_DeleteContext(context);
 		}
+		else
+		{
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal error (OpenGL rendering backend)", "Could not create OpenGL context", window);
+		}
 
 		SDL_DestroyWindow(window);
+	}
+	else
+	{
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal error (OpenGL rendering backend)", "Could not create window", NULL);
 	}
 
 	return NULL;
