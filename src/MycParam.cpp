@@ -269,6 +269,7 @@ void PutArmsEnergy(BOOL flash)
 	RECT rcExpMax = {40, 72, 80, 80};
 	RECT rcExpFlash = {40, 80, 80, 88};
 
+	// Note that this can result in '-1', causing the following array accesses to be out-of-bounds
 	int lv = gArmsData[gSelectedArms].level - 1;
 	int arms_code = gArmsData[gSelectedArms].code;
 	int exp_now = gArmsData[gSelectedArms].exp;
