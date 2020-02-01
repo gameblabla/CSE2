@@ -28,6 +28,7 @@ void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned cha
 BOOL Backend_SupportsSubpixelGlyphs(void);
 Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch, FontPixelMode pixel_mode);
 void Backend_UnloadGlyph(Backend_Glyph *glyph);
-void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours);
+void Backend_PrepareToDrawGlyphs(Backend_Surface *destination_surface, const unsigned char *colour_channels);
+void Backend_DrawGlyph(Backend_Glyph *glyph, long x, long y);
 void Backend_HandleRenderTargetLoss(void);
 void Backend_HandleWindowResize(void);

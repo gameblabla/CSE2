@@ -42,6 +42,8 @@ static Backend_Surface framebuffer;
 
 static Backend_Surface *surface_list_head;
 
+static unsigned char glyph_colour_channels[3];
+
 static void RectToSDLRect(const RECT *rect, SDL_Rect *sdl_rect)
 {
 	sdl_rect->x = (int)rect->left;
@@ -376,20 +378,29 @@ void Backend_UnloadGlyph(Backend_Glyph *glyph)
 	free(glyph);
 }
 
-void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
+void Backend_PrepareToDrawGlyphs(Backend_Surface *destination_surface, const unsigned char *colour_channels)
+{
+	if (destination_surface == NULL)
+		return;
+
+	SDL_SetRenderTarget(renderer, destination_surface->texture);
+
+	memcpy(glyph_colour_channels, colour_channels, sizeof(glyph_colour_channels));
+}
+
+void Backend_DrawGlyph(Backend_Glyph *glyph, long x, long y)
 {
 	// The SDL_Texture side of things uses alpha, not a colour-key, so the bug where the font is blended
 	// with the colour key doesn't occur.
 
-	if (glyph == NULL || surface == NULL)
+	if (glyph == NULL)
 		return;
 
 	SDL_Rect destination_rect = {(int)x, (int)y, (int)glyph->width, (int)glyph->height};
 
 	// Blit the texture
-	SDL_SetTextureColorMod(glyph->texture, colours[0], colours[1], colours[2]);
+	SDL_SetTextureColorMod(glyph->texture, glyph_colour_channels[0], glyph_colour_channels[1], glyph_colour_channels[2]);
 	SDL_SetTextureBlendMode(glyph->texture, SDL_BLENDMODE_BLEND);
-	SDL_SetRenderTarget(renderer, surface->texture);
 	SDL_RenderCopy(renderer, glyph->texture, NULL, &destination_rect);
 }
 

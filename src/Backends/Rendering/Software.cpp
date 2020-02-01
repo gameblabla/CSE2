@@ -34,6 +34,9 @@ static SDL_Surface *window_sdlsurface;
 static SDL_Surface *framebuffer_sdlsurface;
 static Backend_Surface framebuffer;
 
+static unsigned char glyph_colour_channels[3];
+static Backend_Surface *glyph_destination_surface;
+
 Backend_Surface* Backend_Init(const char *title, int width, int height, BOOL fullscreen)
 {
 	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, 0);
@@ -371,28 +374,38 @@ void Backend_UnloadGlyph(Backend_Glyph *glyph)
 	free(glyph);
 }
 
-void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
+void Backend_PrepareToDrawGlyphs(Backend_Surface *destination_surface, const unsigned char *colour_channels)
 {
-	if (glyph == NULL || surface == NULL)
+	if (destination_surface == NULL)
+		return;
+
+	glyph_destination_surface = destination_surface;
+
+	memcpy(glyph_colour_channels, colour_channels, sizeof(glyph_colour_channels));
+}
+
+void Backend_DrawGlyph(Backend_Glyph *glyph, long x, long y)
+{
+	if (glyph == NULL)
 		return;
 
 	switch (glyph->pixel_mode)
 	{
 		case FONT_PIXEL_MODE_LCD:
-			for (unsigned int iy = MAX(-y, 0); y + iy < MIN(y + glyph->height, surface->height); ++iy)
+			for (unsigned int iy = MAX(-y, 0); y + iy < MIN(y + glyph->height, glyph_destination_surface->height); ++iy)
 			{
-				for (unsigned int ix = MAX(-x, 0); x + ix < MIN(x + glyph->width, surface->width); ++ix)
+				for (unsigned int ix = MAX(-x, 0); x + ix < MIN(x + glyph->width, glyph_destination_surface->width); ++ix)
 				{
 					const float *font_pixel = (float*)glyph->pixels + (iy * glyph->width + ix) * 3;
 
 					if (font_pixel[0] || font_pixel[1] || font_pixel[2])
 					{
-						unsigned char *bitmap_pixel = surface->pixels + (y + iy) * surface->pitch + (x + ix) * 3;
+						unsigned char *bitmap_pixel = glyph_destination_surface->pixels + (y + iy) * glyph_destination_surface->pitch + (x + ix) * 3;
 
 						for (unsigned int j = 0; j < 3; ++j)
 						{
 							const float alpha = font_pixel[j];
-							bitmap_pixel[j] = (unsigned char)((colours[j] * alpha) + (bitmap_pixel[j] * (1.0f - alpha)));	// Alpha blending
+							bitmap_pixel[j] = (unsigned char)((glyph_colour_channels[j] * alpha) + (bitmap_pixel[j] * (1.0f - alpha)));	// Alpha blending
 						}
 					}
 				}
@@ -401,18 +414,18 @@ void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, l
 			break;
 
 		case FONT_PIXEL_MODE_GRAY:
-			for (unsigned int iy = MAX(-y, 0); y + iy < MIN(y + glyph->height, surface->height); ++iy)
+			for (unsigned int iy = MAX(-y, 0); y + iy < MIN(y + glyph->height, glyph_destination_surface->height); ++iy)
 			{
-				for (unsigned int ix = MAX(-x, 0); x + ix < MIN(x + glyph->width, surface->width); ++ix)
+				for (unsigned int ix = MAX(-x, 0); x + ix < MIN(x + glyph->width, glyph_destination_surface->width); ++ix)
 				{
 					const float alpha = ((float*)glyph->pixels)[iy * glyph->width + ix];
 
 					if (alpha)
 					{
-						unsigned char *bitmap_pixel = surface->pixels + (y + iy) * surface->pitch + (x + ix) * 3;
+						unsigned char *bitmap_pixel = glyph_destination_surface->pixels + (y + iy) * glyph_destination_surface->pitch + (x + ix) * 3;
 
 						for (unsigned int j = 0; j < 3; ++j)
-							bitmap_pixel[j] = (unsigned char)((colours[j] * alpha) + (bitmap_pixel[j] * (1.0f - alpha)));	// Alpha blending
+							bitmap_pixel[j] = (unsigned char)((glyph_colour_channels[j] * alpha) + (bitmap_pixel[j] * (1.0f - alpha)));	// Alpha blending
 					}
 				}
 			}
@@ -420,16 +433,16 @@ void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, l
 			break;
 
 		case FONT_PIXEL_MODE_MONO:
-			for (unsigned int iy = MAX(-y, 0); y + iy < MIN(y + glyph->height, surface->height); ++iy)
+			for (unsigned int iy = MAX(-y, 0); y + iy < MIN(y + glyph->height, glyph_destination_surface->height); ++iy)
 			{
-				for (unsigned int ix = MAX(-x, 0); x + ix < MIN(x + glyph->width, surface->width); ++ix)
+				for (unsigned int ix = MAX(-x, 0); x + ix < MIN(x + glyph->width, glyph_destination_surface->width); ++ix)
 				{
 					if (((unsigned char*)glyph->pixels)[iy * glyph->width + ix])
 					{
-						unsigned char *bitmap_pixel = surface->pixels + (y + iy) * surface->pitch + (x + ix) * 3;
+						unsigned char *bitmap_pixel = glyph_destination_surface->pixels + (y + iy) * glyph_destination_surface->pitch + (x + ix) * 3;
 
 						for (unsigned int j = 0; j < 3; ++j)
-							bitmap_pixel[j] = colours[j];
+							bitmap_pixel[j] = glyph_colour_channels[j];
 					}
 				}
 			}

@@ -1114,7 +1114,9 @@ void DrawText(FontObject *font_object, Backend_Surface *surface, int x, int y, u
 {
 	if (font_object != NULL)
 	{
-		const unsigned char colours[3] = {(unsigned char)colour, (unsigned char)(colour >> 8), (unsigned char)(colour >> 16)};
+		const unsigned char colour_channels[3] = {(unsigned char)colour, (unsigned char)(colour >> 8), (unsigned char)(colour >> 16)};
+
+		Backend_PrepareToDrawGlyphs(surface, colour_channels);
 
 		unsigned int pen_x = 0;
 
@@ -1139,7 +1141,7 @@ void DrawText(FontObject *font_object, Backend_Surface *surface, int x, int y, u
 				const int letter_y = y + glyph->y;
 
 				if (glyph->backend != NULL)
-					Backend_DrawGlyph(surface, glyph->backend, letter_x, letter_y, colours);
+					Backend_DrawGlyph(glyph->backend, letter_x, letter_y);
 
 				pen_x += glyph->x_advance;
 			}

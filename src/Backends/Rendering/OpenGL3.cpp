@@ -95,6 +95,9 @@ static RenderMode last_render_mode;
 
 static Backend_Surface framebuffer;
 
+static unsigned char glyph_colour_channels[3];
+static Backend_Surface *glyph_destination_surface;
+
 #ifdef USE_OPENGLES2
 static const GLchar *vertex_shader_plain = " \
 #version 100\n \
@@ -976,7 +979,17 @@ void Backend_UnloadGlyph(Backend_Glyph *glyph)
 	free(glyph);
 }
 
-void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
+void Backend_PrepareToDrawGlyphs(Backend_Surface *destination_surface, const unsigned char *colour_channels)
+{
+	if (destination_surface == NULL)
+		return;
+
+	glyph_destination_surface = destination_surface;
+
+	memcpy(glyph_colour_channels, colour_channels, sizeof(glyph_colour_channels));
+}
+
+void Backend_DrawGlyph(Backend_Glyph *glyph, long x, long y)
 {
 	static Backend_Surface *last_surface;
 	static Backend_Glyph *last_glyph;
@@ -984,36 +997,36 @@ void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, l
 	static unsigned char last_green;
 	static unsigned char last_blue;
 
-	if (glyph == NULL || surface == NULL)
+	if (glyph == NULL || glyph_destination_surface == NULL)
 		return;
 
 	const RenderMode render_mode = (glyph->pixel_mode == FONT_PIXEL_MODE_LCD ? MODE_DRAW_GLYPH_LCD : MODE_DRAW_GLYPH);
 
-	if (last_render_mode != render_mode || last_surface != surface || last_glyph != glyph || last_red != colours[0] || last_green != colours[1] || last_blue != colours[2])
+	if (last_render_mode != render_mode || last_surface != glyph_destination_surface || last_glyph != glyph || last_red != glyph_colour_channels[0] || last_green != glyph_colour_channels[1] || last_blue != glyph_colour_channels[2])
 	{
 		FlushVertexBuffer();
 
 		last_render_mode = render_mode;
-		last_surface = surface;
+		last_surface = glyph_destination_surface;
 		last_glyph = glyph;
-		last_red = colours[0];
-		last_green = colours[1];
-		last_blue = colours[2];
+		last_red = glyph_colour_channels[0];
+		last_green = glyph_colour_channels[1];
+		last_blue = glyph_colour_channels[2];
 
 		if (glyph->pixel_mode == FONT_PIXEL_MODE_LCD)
 		{
 			glUseProgram(program_glyph_subpixel_part2);
-			glUniform4f(program_glyph_subpixel_part2_uniform_colour, colours[0] / 255.0f, colours[1] / 255.0f, colours[2] / 255.0f, 1.0f);
+			glUniform4f(program_glyph_subpixel_part2_uniform_colour, glyph_colour_channels[0] / 255.0f, glyph_colour_channels[1] / 255.0f, glyph_colour_channels[2] / 255.0f, 1.0f);
 		}
 		else
 		{
 			glUseProgram(program_glyph_normal);
-			glUniform4f(program_glyph_normal_uniform_colour, colours[0] / 255.0f, colours[1] / 255.0f, colours[2] / 255.0f, 1.0f);
+			glUniform4f(program_glyph_normal_uniform_colour, glyph_colour_channels[0] / 255.0f, glyph_colour_channels[1] / 255.0f, glyph_colour_channels[2] / 255.0f, 1.0f);
 		}
 
 		// Point our framebuffer to the destination texture
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, surface->texture_id, 0);
-		glViewport(0, 0, surface->width, surface->height);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, glyph_destination_surface->texture_id, 0);
+		glViewport(0, 0, glyph_destination_surface->width, glyph_destination_surface->height);
 
 		glEnable(GL_BLEND);
 
@@ -1023,10 +1036,10 @@ void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, l
 		glBindTexture(GL_TEXTURE_2D, glyph->texture_id);
 	}
 
-	const GLfloat vertex_left = (x * (2.0f / surface->width)) - 1.0f;
-	const GLfloat vertex_right = ((x + glyph->width) * (2.0f / surface->width)) - 1.0f;
-	const GLfloat vertex_top = (y * (2.0f / surface->height)) - 1.0f;
-	const GLfloat vertex_bottom = ((y + glyph->height) * (2.0f / surface->height)) - 1.0f;
+	const GLfloat vertex_left = (x * (2.0f / glyph_destination_surface->width)) - 1.0f;
+	const GLfloat vertex_right = ((x + glyph->width) * (2.0f / glyph_destination_surface->width)) - 1.0f;
+	const GLfloat vertex_top = (y * (2.0f / glyph_destination_surface->height)) - 1.0f;
+	const GLfloat vertex_bottom = ((y + glyph->height) * (2.0f / glyph_destination_surface->height)) - 1.0f;
 
 	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot();
 

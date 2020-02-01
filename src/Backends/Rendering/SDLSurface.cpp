@@ -24,6 +24,9 @@ static SDL_Surface *window_sdlsurface;
 
 static Backend_Surface framebuffer;
 
+static unsigned char glyph_colour_channels[3];
+static SDL_Surface *glyph_destination_sdlsurface;
+
 static void RectToSDLRect(const RECT *rect, SDL_Rect *sdl_rect)
 {
 	sdl_rect->x = (int)rect->left;
@@ -243,9 +246,19 @@ void Backend_UnloadGlyph(Backend_Glyph *glyph)
 	free(glyph);
 }
 
-void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
+void Backend_PrepareToDrawGlyphs(Backend_Surface *destination_surface, const unsigned char *colour_channels)
 {
-	if (glyph == NULL || surface == NULL)
+	if (destination_surface == NULL)
+		return;
+
+	glyph_destination_sdlsurface = destination_surface->sdlsurface;
+
+	memcpy(glyph_colour_channels, colour_channels, sizeof(glyph_colour_channels));
+}
+
+void Backend_DrawGlyph(Backend_Glyph *glyph, long x, long y)
+{
+	if (glyph == NULL)
 		return;
 
 	SDL_Rect rect;
@@ -254,9 +267,9 @@ void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, l
 	rect.w = glyph->sdlsurface->w;
 	rect.h = glyph->sdlsurface->h;
 
-	SDL_SetSurfaceColorMod(glyph->sdlsurface, colours[0], colours[1], colours[2]);
+	SDL_SetSurfaceColorMod(glyph->sdlsurface, glyph_colour_channels[0], glyph_colour_channels[1], glyph_colour_channels[2]);
 
-	SDL_BlitSurface(glyph->sdlsurface, NULL, surface->sdlsurface, &rect);
+	SDL_BlitSurface(glyph->sdlsurface, NULL, glyph_destination_sdlsurface, &rect);
 }
 
 void Backend_HandleRenderTargetLoss(void)
