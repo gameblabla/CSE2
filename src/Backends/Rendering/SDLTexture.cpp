@@ -78,7 +78,9 @@ static void GlyphBatch_Draw(spritebatch_sprite_t *sprites, int count, int textur
 
 	for (int i = 0; i < count; ++i)
 	{
-		SDL_Rect destination_rect = {(int)sprites[i].x, (int)sprites[i].y, texture_w, texture_h};
+		Backend_Glyph *glyph = (Backend_Glyph*)sprites[i].image_id;
+
+		SDL_Rect destination_rect = {(int)sprites[i].x, (int)sprites[i].y, glyph->width, glyph->height};
 
 		SDL_RenderCopy(renderer, texture_atlas, NULL, &destination_rect);
 	}
@@ -166,6 +168,7 @@ Backend_Surface* Backend_Init(const char *title, int width, int height, BOOL ful
 				framebuffer.width = width;
 				framebuffer.height = height;
 
+				// Set-up glyph-batcher
 				spritebatch_config_t config;
 				spritebatch_set_default_config(&config);
 				config.batch_callback = GlyphBatch_Draw;
@@ -201,7 +204,7 @@ Backend_Surface* Backend_Init(const char *title, int width, int height, BOOL ful
 
 void Backend_Deinit(void)
 {
-	spritebatch_term(glyph_batcher);
+	spritebatch_term(&glyph_batcher);
 	SDL_DestroyTexture(framebuffer.texture);
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
@@ -359,7 +362,7 @@ BOOL Backend_SupportsSubpixelGlyphs(void)
 	return FALSE;	// SDL_Textures don't have per-component alpha
 }
 
-Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch, FontPixelMode pixel_mode)
+Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch)
 {
 	Backend_Glyph *glyph = (Backend_Glyph*)malloc(sizeof(Backend_Glyph));
 
@@ -376,44 +379,17 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 
 	unsigned char *destination_pointer = glyph->pixels;
 
-	switch (pixel_mode)
+	for (unsigned int y = 0; y < height; ++y)
 	{
-		case FONT_PIXEL_MODE_LCD:
-			// Unsupported
-			break;
+		const unsigned char *source_pointer = pixels + y * pitch;
 
-		case FONT_PIXEL_MODE_GRAY:
-
-			for (unsigned int y = 0; y < height; ++y)
-			{
-				const unsigned char *source_pointer = pixels + y * pitch;
-
-				for (unsigned int x = 0; x < width; ++x)
-				{
-					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = *source_pointer++;
-				}
-			}
-
-			break;
-
-		case FONT_PIXEL_MODE_MONO:
-			for (unsigned int y = 0; y < height; ++y)
-			{
-				const unsigned char *source_pointer = pixels + y * pitch;
-
-				for (unsigned int x = 0; x < width; ++x)
-				{
-					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = 0xFF;
-					*destination_pointer++ = *source_pointer++ ? 0xFF : 0;
-				}
-			}
-
-			break;
+		for (unsigned int x = 0; x < width; ++x)
+		{
+			*destination_pointer++ = 0xFF;
+			*destination_pointer++ = 0xFF;
+			*destination_pointer++ = 0xFF;
+			*destination_pointer++ = *source_pointer++;
+		}
 	}
 
 	glyph->width = width;
