@@ -30,5 +30,6 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 void Backend_UnloadGlyph(Backend_Glyph *glyph);
 void Backend_PrepareToDrawGlyphs(Backend_Surface *destination_surface, const unsigned char *colour_channels);
 void Backend_DrawGlyph(Backend_Glyph *glyph, long x, long y);
+void Backend_FlushGlyphs(void);
 void Backend_HandleRenderTargetLoss(void);
 void Backend_HandleWindowResize(void);

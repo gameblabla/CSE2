@@ -8,6 +8,10 @@
 
 #include "SDL.h"
 
+#define SPRITEBATCH_IMPLEMENTATION
+#include <limits.h>	// Needed by `cute_spritebatch.h` for `INT_MAX`
+#include "cute_spritebatch.h"
+
 #include "../../WindowsWrapper.h"
 
 #include "../../Draw.h"
@@ -30,7 +34,7 @@ typedef struct Backend_Surface
 
 typedef struct Backend_Glyph
 {
-	SDL_Texture *texture;
+	unsigned char *pixels;
 	unsigned int width;
 	unsigned int height;
 } Backend_Glyph;
@@ -44,6 +48,8 @@ static Backend_Surface *surface_list_head;
 
 static unsigned char glyph_colour_channels[3];
 
+static spritebatch_t glyph_batcher;
+
 static void RectToSDLRect(const RECT *rect, SDL_Rect *sdl_rect)
 {
 	sdl_rect->x = (int)rect->left;
@@ -56,6 +62,56 @@ static void RectToSDLRect(const RECT *rect, SDL_Rect *sdl_rect)
 
 	if (sdl_rect->h < 0)
 		sdl_rect->h = 0;
+}
+
+// Blit the glyphs in the batch
+static void GlyphBatch_Draw(spritebatch_sprite_t* sprites, int count, int texture_w, int texture_h, void* udata)
+{
+	(void)udata;
+
+	SDL_Texture *texture_atlas = (SDL_Texture*)sprites[0].texture_id;
+
+	// The SDL_Texture side of things uses alpha, not a colour-key, so the bug where the font is blended
+	// with the colour key doesn't occur.
+	SDL_SetTextureColorMod(texture_atlas, glyph_colour_channels[0], glyph_colour_channels[1], glyph_colour_channels[2]);
+	SDL_SetTextureBlendMode(texture_atlas, SDL_BLENDMODE_BLEND);
+
+	for (int i = 0; i < count; ++i)
+	{
+		SDL_Rect destination_rect = {(int)sprites[i].x, (int)sprites[i].y, texture_w, texture_h};
+
+		SDL_RenderCopy(renderer, texture_atlas, NULL, &destination_rect);
+	}
+}
+
+// Upload the glyph's pixels
+static void GlyphBatch_GetPixels(SPRITEBATCH_U64 image_id, void* buffer, int bytes_to_fill, void* udata)
+{
+	(void)udata;
+
+	Backend_Glyph *glyph = (Backend_Glyph*)image_id;
+
+	memcpy(buffer, glyph->pixels, bytes_to_fill);
+}
+
+// Create a texture atlas, and upload pixels to it
+static SPRITEBATCH_U64 GlyphBatch_CreateTexture(void* pixels, int w, int h, void* udata)
+{
+	(void)udata;
+
+	SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STATIC, w, h);
+
+	SDL_UpdateTexture(texture, NULL, pixels, w * 4);
+
+	return (SPRITEBATCH_U64)texture;
+}
+
+// Destroy texture atlas
+static void GlyphBatch_DestroyTexture(SPRITEBATCH_U64 texture_id, void* udata)
+{
+	(void)udata;
+
+	SDL_DestroyTexture((SDL_Texture*)texture_id);
 }
 
 Backend_Surface* Backend_Init(const char *title, int width, int height, BOOL fullscreen)
@@ -109,6 +165,14 @@ Backend_Surface* Backend_Init(const char *title, int width, int height, BOOL ful
 			{
 				framebuffer.width = width;
 				framebuffer.height = height;
+
+				spritebatch_config_t config;
+				spritebatch_set_default_config(&config);
+				config.batch_callback = GlyphBatch_Draw;
+				config.get_pixels_callback = GlyphBatch_GetPixels;
+				config.generate_texture_callback = GlyphBatch_CreateTexture;
+				config.delete_texture_callback = GlyphBatch_DestroyTexture;
+				spritebatch_init(&glyph_batcher, &config, NULL);
 
 				return &framebuffer;
 			}
@@ -301,24 +365,15 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 	if (glyph == NULL)
 		return NULL;
 
-	glyph->texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STATIC, width, height);
+	glyph->pixels = (unsigned char*)malloc(width * height * 4);
 
-	if (glyph->texture == NULL)
+	if (glyph->pixels == NULL)
 	{
 		free(glyph);
 		return NULL;
 	}
 
-	unsigned char *buffer = (unsigned char*)malloc(width * height * 4);
-
-	if (buffer == NULL)
-	{
-		SDL_DestroyTexture(glyph->texture);
-		free(glyph);
-		return NULL;
-	}
-
-	unsigned char *destination_pointer = buffer;
+	unsigned char *destination_pointer = glyph->pixels;
 
 	switch (pixel_mode)
 	{
@@ -360,9 +415,6 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 			break;
 	}
 
-	SDL_UpdateTexture(glyph->texture, NULL, buffer, width * 4);
-	free(buffer);
-
 	glyph->width = width;
 	glyph->height = height;
 
@@ -374,7 +426,7 @@ void Backend_UnloadGlyph(Backend_Glyph *glyph)
 	if (glyph == NULL)
 		return;
 
-	SDL_DestroyTexture(glyph->texture);
+	free(glyph->pixels);
 	free(glyph);
 }
 
@@ -390,18 +442,14 @@ void Backend_PrepareToDrawGlyphs(Backend_Surface *destination_surface, const uns
 
 void Backend_DrawGlyph(Backend_Glyph *glyph, long x, long y)
 {
-	// The SDL_Texture side of things uses alpha, not a colour-key, so the bug where the font is blended
-	// with the colour key doesn't occur.
+	spritebatch_push(&glyph_batcher, (SPRITEBATCH_U64)glyph, glyph->width, glyph->height, x, y, 1.0f, 1.0f, 0.0f, 0.0f, 0);
+}
 
-	if (glyph == NULL)
-		return;
-
-	SDL_Rect destination_rect = {(int)x, (int)y, (int)glyph->width, (int)glyph->height};
-
-	// Blit the texture
-	SDL_SetTextureColorMod(glyph->texture, glyph_colour_channels[0], glyph_colour_channels[1], glyph_colour_channels[2]);
-	SDL_SetTextureBlendMode(glyph->texture, SDL_BLENDMODE_BLEND);
-	SDL_RenderCopy(renderer, glyph->texture, NULL, &destination_rect);
+void Backend_FlushGlyphs(void)
+{
+	spritebatch_tick(&glyph_batcher);
+	spritebatch_defrag(&glyph_batcher);
+	spritebatch_flush(&glyph_batcher);
 }
 
 void Backend_HandleRenderTargetLoss(void)

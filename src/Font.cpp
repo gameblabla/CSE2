@@ -1146,6 +1146,8 @@ void DrawText(FontObject *font_object, Backend_Surface *surface, int x, int y, u
 				pen_x += glyph->x_advance;
 			}
 		}
+
+		Backend_FlushGlyphs();
 	}
 }
 

@@ -1072,6 +1072,11 @@ void Backend_DrawGlyph(Backend_Glyph *glyph, long x, long y)
 	vertex_buffer_slot->vertices[1][2].vertex_coordinate.y = vertex_bottom;
 }
 
+void Backend_FlushGlyphs(void)
+{
+	
+}
+
 void Backend_HandleRenderTargetLoss(void)
 {
 	// No problem for us

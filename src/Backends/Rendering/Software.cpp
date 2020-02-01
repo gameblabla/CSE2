@@ -451,6 +451,11 @@ void Backend_DrawGlyph(Backend_Glyph *glyph, long x, long y)
 	}
 }
 
+void Backend_FlushGlyphs(void)
+{
+	
+}
+
 void Backend_HandleRenderTargetLoss(void)
 {
 	// No problem for us
