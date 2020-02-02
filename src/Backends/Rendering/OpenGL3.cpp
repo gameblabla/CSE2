@@ -397,7 +397,6 @@ static void GlyphBatch_Draw(spritebatch_sprite_t *sprites, int count, int textur
 	}
 
 	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot(count);
-	printf("%d\n", count);
 
 	for (int i = 0; i < count; ++i)
 	{
@@ -459,9 +458,6 @@ static void GlyphBatch_GetPixels(SPRITEBATCH_U64 image_id, void* buffer, int byt
 static SPRITEBATCH_U64 GlyphBatch_CreateTexture(void *pixels, int w, int h, void *udata)
 {
 	(void)udata;
-
-//	printf("%d\n", w);
-//	printf("%d\n\n", h);
 
 	GLint previously_bound_texture;
 	glGetIntegerv(GL_TEXTURE_BINDING_2D, &previously_bound_texture);
@@ -611,7 +607,9 @@ Backend_Surface* Backend_Init(const char *title, int width, int height, BOOL ful
 							spritebatch_config_t config;
 							spritebatch_set_default_config(&config);
 							config.pixel_stride = 1;
-							config.lonely_buffer_count_till_flush = 0; // Start making atlases immediately
+							config.atlas_width_in_pixels = 256;
+							config.atlas_height_in_pixels = 256;
+							config.lonely_buffer_count_till_flush = 4; // Start making atlases immediately
 							config.ticks_to_decay_texture = 100;       // If a glyph hasn't been used for the past 100 draws, destroy it
 							config.batch_callback = GlyphBatch_Draw;
 							config.get_pixels_callback = GlyphBatch_GetPixels;

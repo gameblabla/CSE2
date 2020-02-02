@@ -173,7 +173,9 @@ Backend_Surface* Backend_Init(const char *title, int width, int height, BOOL ful
 				spritebatch_config_t config;
 				spritebatch_set_default_config(&config);
 				config.pixel_stride = 4;
-				config.lonely_buffer_count_till_flush = 0; // Start making atlases immediately
+				config.atlas_width_in_pixels = 256;
+				config.atlas_height_in_pixels = 256;
+				config.lonely_buffer_count_till_flush = 4; // Start making atlases immediately
 				config.ticks_to_decay_texture = 100;       // If a glyph hasn't been used for the past 100 draws, destroy it
 				config.batch_callback = GlyphBatch_Draw;
 				config.get_pixels_callback = GlyphBatch_GetPixels;
