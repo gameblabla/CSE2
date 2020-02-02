@@ -80,9 +80,10 @@ static void GlyphBatch_Draw(spritebatch_sprite_t *sprites, int count, int textur
 	{
 		Backend_Glyph *glyph = (Backend_Glyph*)sprites[i].image_id;
 
+		SDL_Rect source_rect = {(int)(texture_w * sprites[i].minx), (int)(texture_h * sprites[i].maxy), glyph->width, glyph->height};
 		SDL_Rect destination_rect = {(int)sprites[i].x, (int)sprites[i].y, glyph->width, glyph->height};
 
-		SDL_RenderCopy(renderer, texture_atlas, NULL, &destination_rect);
+		SDL_RenderCopy(renderer, texture_atlas, &source_rect, &destination_rect);
 	}
 }
 
@@ -171,6 +172,9 @@ Backend_Surface* Backend_Init(const char *title, int width, int height, BOOL ful
 				// Set-up glyph-batcher
 				spritebatch_config_t config;
 				spritebatch_set_default_config(&config);
+				config.pixel_stride = 4;
+				config.lonely_buffer_count_till_flush = 0; // Start making atlases immediately
+				config.ticks_to_decay_texture = 100;       // If a glyph hasn't been used for the past 100 draws, destroy it
 				config.batch_callback = GlyphBatch_Draw;
 				config.get_pixels_callback = GlyphBatch_GetPixels;
 				config.generate_texture_callback = GlyphBatch_CreateTexture;

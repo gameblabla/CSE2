@@ -50,6 +50,7 @@ typedef struct Backend_Glyph
 	unsigned char *pixels;
 	unsigned int width;
 	unsigned int height;
+	unsigned int pitch;
 } Backend_Glyph;
 
 typedef struct Coordinate2D
@@ -306,19 +307,21 @@ static GLuint CompileShader(const char *vertex_shader_source, const char *fragme
 	return program_id;
 }
 
-static VertexBufferSlot* GetVertexBufferSlot(void)
+static VertexBufferSlot* GetVertexBufferSlot(unsigned int slots_needed)
 {
-	if (current_vertex_buffer_slot >= local_vertex_buffer_size)
+	if (current_vertex_buffer_slot + slots_needed > local_vertex_buffer_size)
 	{
-		if (local_vertex_buffer_size == 0)
-			local_vertex_buffer_size = 1;
-		else
+		local_vertex_buffer_size = 1;
+
+		while (current_vertex_buffer_slot + slots_needed > local_vertex_buffer_size)
 			local_vertex_buffer_size <<= 1;
 
 		local_vertex_buffer = (VertexBufferSlot*)realloc(local_vertex_buffer, local_vertex_buffer_size * sizeof(VertexBufferSlot));
 	}
 
-	return &local_vertex_buffer[current_vertex_buffer_slot++];
+	current_vertex_buffer_slot += slots_needed;
+
+	return &local_vertex_buffer[current_vertex_buffer_slot - slots_needed];
 }
 
 static void FlushVertexBuffer(void)
@@ -352,7 +355,7 @@ static void FlushVertexBuffer(void)
 }
 
 // Blit the glyphs in the batch
-static void GlyphBatch_Draw(spritebatch_sprite_t* sprites, int count, int texture_w, int texture_h, void* udata)
+static void GlyphBatch_Draw(spritebatch_sprite_t *sprites, int count, int texture_w, int texture_h, void *udata)
 {
 	static Backend_Surface *last_surface;
 	static GLuint last_texture_id;
@@ -393,12 +396,15 @@ static void GlyphBatch_Draw(spritebatch_sprite_t* sprites, int count, int textur
 		glBindTexture(GL_TEXTURE_2D, texture_id);
 	}
 
+	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot(count);
+	printf("%d\n", count);
+
 	for (int i = 0; i < count; ++i)
 	{
 		Backend_Glyph *glyph = (Backend_Glyph*)sprites[i].image_id;
 
 		const GLfloat texture_left = sprites[i].minx;
-		const GLfloat texture_right = sprites[i].maxx;
+		const GLfloat texture_right = texture_left + ((GLfloat)glyph->width / (GLfloat)texture_w);	// Account for pitch
 		const GLfloat texture_top = sprites[i].maxy;
 		const GLfloat texture_bottom = sprites[i].miny;
 
@@ -406,8 +412,6 @@ static void GlyphBatch_Draw(spritebatch_sprite_t* sprites, int count, int textur
 		const GLfloat vertex_right = ((sprites[i].x + glyph->width) * (2.0f / glyph_destination_surface->width)) - 1.0f;
 		const GLfloat vertex_top = (sprites[i].y * (2.0f / glyph_destination_surface->height)) - 1.0f;
 		const GLfloat vertex_bottom = ((sprites[i].y + glyph->height) * (2.0f / glyph_destination_surface->height)) - 1.0f;
-
-		VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot();
 
 		vertex_buffer_slot->vertices[0][0].texture_coordinate.x = texture_left;
 		vertex_buffer_slot->vertices[0][0].texture_coordinate.y = texture_top;
@@ -436,6 +440,8 @@ static void GlyphBatch_Draw(spritebatch_sprite_t* sprites, int count, int textur
 		vertex_buffer_slot->vertices[1][1].vertex_coordinate.y = vertex_bottom;
 		vertex_buffer_slot->vertices[1][2].vertex_coordinate.x = vertex_left;
 		vertex_buffer_slot->vertices[1][2].vertex_coordinate.y = vertex_bottom;
+
+		++vertex_buffer_slot;
 	}
 }
 
@@ -450,9 +456,12 @@ static void GlyphBatch_GetPixels(SPRITEBATCH_U64 image_id, void* buffer, int byt
 }
 
 // Create a texture atlas, and upload pixels to it
-static SPRITEBATCH_U64 GlyphBatch_CreateTexture(void* pixels, int w, int h, void* udata)
+static SPRITEBATCH_U64 GlyphBatch_CreateTexture(void *pixels, int w, int h, void *udata)
 {
 	(void)udata;
+
+//	printf("%d\n", w);
+//	printf("%d\n\n", h);
 
 	GLint previously_bound_texture;
 	glGetIntegerv(GL_TEXTURE_BINDING_2D, &previously_bound_texture);
@@ -480,7 +489,7 @@ static SPRITEBATCH_U64 GlyphBatch_CreateTexture(void* pixels, int w, int h, void
 }
 
 // Destroy texture atlas
-static void GlyphBatch_DestroyTexture(SPRITEBATCH_U64 texture_id, void* udata)
+static void GlyphBatch_DestroyTexture(SPRITEBATCH_U64 texture_id, void *udata)
 {
 	(void)udata;
 
@@ -601,6 +610,9 @@ Backend_Surface* Backend_Init(const char *title, int width, int height, BOOL ful
 							// Set-up glyph-batcher
 							spritebatch_config_t config;
 							spritebatch_set_default_config(&config);
+							config.pixel_stride = 1;
+							config.lonely_buffer_count_till_flush = 0; // Start making atlases immediately
+							config.ticks_to_decay_texture = 100;       // If a glyph hasn't been used for the past 100 draws, destroy it
 							config.batch_callback = GlyphBatch_Draw;
 							config.get_pixels_callback = GlyphBatch_GetPixels;
 							config.generate_texture_callback = GlyphBatch_CreateTexture;
@@ -701,7 +713,7 @@ void Backend_DrawScreen(void)
 	// Draw framebuffer to screen
 	glBindTexture(GL_TEXTURE_2D, framebuffer.texture_id);
 
-	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot();
+	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot(1);
 
 	vertex_buffer_slot->vertices[0][0].texture_coordinate.x = 0.0f;
 	vertex_buffer_slot->vertices[0][0].texture_coordinate.y = 1.0f;
@@ -868,7 +880,7 @@ void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Sur
 	const GLfloat vertex_top = (y * (2.0f / destination_surface->height)) - 1.0f;
 	const GLfloat vertex_bottom = ((y + (rect->bottom - rect->top)) * (2.0f / destination_surface->height)) - 1.0f;
 
-	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot();
+	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot(1);
 
 	vertex_buffer_slot->vertices[0][0].texture_coordinate.x = texture_left;
 	vertex_buffer_slot->vertices[0][0].texture_coordinate.y = texture_top;
@@ -941,7 +953,7 @@ void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned cha
 	const GLfloat vertex_top = (rect->top * (2.0f / surface->height)) - 1.0f;
 	const GLfloat vertex_bottom = (rect->bottom * (2.0f / surface->height)) - 1.0f;
 
-	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot();
+	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot(1);
 
 	vertex_buffer_slot->vertices[0][0].vertex_coordinate.x = vertex_left;
 	vertex_buffer_slot->vertices[0][0].vertex_coordinate.y = vertex_top;
@@ -964,16 +976,16 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 
 	if (glyph != NULL)
 	{
-		const unsigned int destination_pitch = (width + 3) & ~3;	// Round up to the nearest 4 (OpenGL needs this)
+		glyph->pitch = (width + 3) & ~3;	// Round up to the nearest 4 (OpenGL needs this)
 
-		glyph->pixels = (unsigned char*)malloc(destination_pitch * height);
+		glyph->pixels = (unsigned char*)malloc(glyph->pitch * height);
 
 		if (glyph->pixels != NULL)
 		{
 			for (unsigned int y = 0; y < height; ++y)
 			{
 				const unsigned char *source_pointer = &pixels[y * pitch];
-				unsigned char *destination_pointer = &glyph->pixels[y * destination_pitch];
+				unsigned char *destination_pointer = &glyph->pixels[y * glyph->pitch];
 				memcpy(destination_pointer, source_pointer, width);
 			}
 
@@ -1007,7 +1019,7 @@ void Backend_PrepareToDrawGlyphs(Backend_Surface *destination_surface, const uns
 
 void Backend_DrawGlyph(Backend_Glyph *glyph, long x, long y)
 {
-	spritebatch_push(&glyph_batcher, (SPRITEBATCH_U64)glyph, glyph->width, glyph->height, x, y, 1.0f, 1.0f, 0.0f, 0.0f, 0);
+	spritebatch_push(&glyph_batcher, (SPRITEBATCH_U64)glyph, glyph->pitch, glyph->height, x, y, 1.0f, 1.0f, 0.0f, 0.0f, 0);
 }
 
 void Backend_FlushGlyphs(void)
