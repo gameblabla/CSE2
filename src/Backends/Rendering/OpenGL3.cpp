@@ -264,6 +264,7 @@ static GLuint CompileShader(const char *vertex_shader_source, const char *fragme
 
 	GLuint program_id = glCreateProgram();
 
+	// Compile vertex shader
 	GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertex_shader, 1, &vertex_shader_source, NULL);
 	glCompileShader(vertex_shader);
@@ -279,6 +280,7 @@ static GLuint CompileShader(const char *vertex_shader_source, const char *fragme
 
 	glAttachShader(program_id, vertex_shader);
 
+	// Compile fragment shader
 	GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fragment_shader, 1, &fragment_shader_source, NULL);
 	glCompileShader(fragment_shader);
@@ -294,6 +296,7 @@ static GLuint CompileShader(const char *vertex_shader_source, const char *fragme
 
 	glAttachShader(program_id, fragment_shader);
 
+	// Link shaders
 	glBindAttribLocation(program_id, ATTRIBUTE_INPUT_VERTEX_COORDINATES, "input_vertex_coordinates");
 	glBindAttribLocation(program_id, ATTRIBUTE_INPUT_TEXTURE_COORDINATES, "input_texture_coordinates");
 
@@ -317,6 +320,7 @@ static GLuint CompileShader(const char *vertex_shader_source, const char *fragme
 
 static VertexBufferSlot* GetVertexBufferSlot(unsigned int slots_needed)
 {
+	// Check if buffer needs expanding
 	if (current_vertex_buffer_slot + slots_needed > local_vertex_buffer_size)
 	{
 		local_vertex_buffer_size = 1;
@@ -340,10 +344,12 @@ static void FlushVertexBuffer(void)
 	if (current_vertex_buffer_slot == 0)
 		return;
 
+	// Select new VBO
 	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_ids[current_vertex_buffer]);
 	glVertexAttribPointer(ATTRIBUTE_INPUT_VERTEX_COORDINATES, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, vertex_coordinate));
 	glVertexAttribPointer(ATTRIBUTE_INPUT_TEXTURE_COORDINATES, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texture_coordinate));
 
+	// Upload vertex buffer to VBO, growing it if necessary
 	if (local_vertex_buffer_size > vertex_buffer_size[current_vertex_buffer])
 	{
 		vertex_buffer_size[current_vertex_buffer] = local_vertex_buffer_size;
@@ -382,6 +388,7 @@ static void GlyphBatch_Draw(spritebatch_sprite_t *sprites, int count, int textur
 
 	GLuint texture_id = (GLuint)sprites[0].texture_id;
 
+	// Flush vertex data if a context-change is needed
 	if (last_render_mode != MODE_DRAW_GLYPH || last_surface != glyph_destination_surface || last_texture_id != texture_id || last_red != glyph_colour_channels[0] || last_green != glyph_colour_channels[1] || last_blue != glyph_colour_channels[2])
 	{
 		FlushVertexBuffer();
@@ -408,6 +415,7 @@ static void GlyphBatch_Draw(spritebatch_sprite_t *sprites, int count, int textur
 		glBindTexture(GL_TEXTURE_2D, texture_id);
 	}
 
+	// Add data to the vertex queue
 	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot(count);
 
 	for (int i = 0; i < count; ++i)
@@ -415,7 +423,7 @@ static void GlyphBatch_Draw(spritebatch_sprite_t *sprites, int count, int textur
 		Backend_Glyph *glyph = (Backend_Glyph*)sprites[i].image_id;
 
 		const GLfloat texture_left = sprites[i].minx;
-		const GLfloat texture_right = texture_left + ((GLfloat)glyph->width / (GLfloat)texture_w);	// Account for pitch
+		const GLfloat texture_right = texture_left + ((GLfloat)glyph->width / (GLfloat)texture_w);	// Account for width not matching pitch
 		const GLfloat texture_top = sprites[i].maxy;
 		const GLfloat texture_bottom = sprites[i].miny;
 
@@ -869,6 +877,7 @@ void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Sur
 
 	const RenderMode render_mode = (colour_key ? MODE_DRAW_SURFACE_WITH_TRANSPARENCY : MODE_DRAW_SURFACE);
 
+	// Flush vertex data if a context-change is needed
 	if (last_render_mode != render_mode || last_source_surface != source_surface || last_destination_surface != destination_surface)
 	{
 		FlushVertexBuffer();
@@ -892,6 +901,7 @@ void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Sur
 		glBindTexture(GL_TEXTURE_2D, source_surface->texture_id);
 	}
 
+	// Add data to the vertex queue
 	const GLfloat texture_left = (GLfloat)rect->left / (GLfloat)source_surface->width;
 	const GLfloat texture_right = (GLfloat)rect->right / (GLfloat)source_surface->width;
 	const GLfloat texture_top = (GLfloat)rect->top / (GLfloat)source_surface->height;
@@ -946,6 +956,7 @@ void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned cha
 	if (rect->right - rect->left < 0 || rect->bottom - rect->top < 0)
 		return;
 
+	// Flush vertex data if a context-change is needed
 	if (last_render_mode != MODE_COLOUR_FILL || last_surface != surface || last_red != red || last_green != green || last_blue != blue)
 	{
 		FlushVertexBuffer();
@@ -970,6 +981,7 @@ void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned cha
 		glUniform4f(program_colour_fill_uniform_colour, red / 255.0f, green / 255.0f, blue / 255.0f, 1.0f);
 	}
 
+	// Add data to the vertex queue
 	const GLfloat vertex_left = (rect->left * (2.0f / surface->width)) - 1.0f;
 	const GLfloat vertex_right = (rect->right * (2.0f / surface->width)) - 1.0f;
 	const GLfloat vertex_top = (rect->top * (2.0f / surface->height)) - 1.0f;
