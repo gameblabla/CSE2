@@ -254,6 +254,10 @@ static void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GL
 		printf("OpenGL debug: %s\n", message);
 }
 */
+// ====================
+// Shader compilation
+// ====================
+
 static GLuint CompileShader(const char *vertex_shader_source, const char *fragment_shader_source)
 {
 	GLint shader_status;
@@ -307,6 +311,10 @@ static GLuint CompileShader(const char *vertex_shader_source, const char *fragme
 	return program_id;
 }
 
+// ====================
+// Vertex buffer management
+// ====================
+
 static VertexBufferSlot* GetVertexBufferSlot(unsigned int slots_needed)
 {
 	if (current_vertex_buffer_slot + slots_needed > local_vertex_buffer_size)
@@ -353,6 +361,10 @@ static void FlushVertexBuffer(void)
 
 	current_vertex_buffer_slot = 0;
 }
+
+// ====================
+// Glyph-batching
+// ====================
 
 // Blit the glyphs in the batch
 static void GlyphBatch_Draw(spritebatch_sprite_t *sprites, int count, int texture_w, int texture_h, void *udata)
@@ -491,6 +503,10 @@ static void GlyphBatch_DestroyTexture(SPRITEBATCH_U64 texture_id, void *udata)
 
 	glDeleteTextures(1, (GLuint*)&texture_id);
 }
+
+// ====================
+// Render-backend initialisation
+// ====================
 
 Backend_Surface* Backend_Init(const char *title, int width, int height, BOOL fullscreen)
 {
@@ -753,6 +769,10 @@ void Backend_DrawScreen(void)
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
 }
 
+// ====================
+// Surface management
+// ====================
+
 Backend_Surface* Backend_CreateSurface(unsigned int width, unsigned int height)
 {
 	Backend_Surface *surface = (Backend_Surface*)malloc(sizeof(Backend_Surface));
@@ -831,6 +851,10 @@ void Backend_UnlockSurface(Backend_Surface *surface, unsigned int width, unsigne
 
 	glBindTexture(GL_TEXTURE_2D, previously_bound_texture);
 }
+
+// ====================
+// Drawing
+// ====================
 
 void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL colour_key)
 {
@@ -968,6 +992,10 @@ void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned cha
 	vertex_buffer_slot->vertices[1][2].vertex_coordinate.y = vertex_bottom;
 }
 
+// ====================
+// Glyph management
+// ====================
+
 Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch)
 {
 	Backend_Glyph *glyph = (Backend_Glyph*)malloc(sizeof(Backend_Glyph));
@@ -1026,6 +1054,10 @@ void Backend_FlushGlyphs(void)
 	spritebatch_defrag(&glyph_batcher);
 	spritebatch_flush(&glyph_batcher);
 }
+
+// ====================
+// Misc.
+// ====================
 
 void Backend_HandleRenderTargetLoss(void)
 {
