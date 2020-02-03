@@ -366,9 +366,7 @@ BOOL SystemTask(void)
 				break;
 
 			case SDL_JOYDEVICEADDED:
-			#ifndef NDEBUG
 				printf("Joystick connected:\nIndex - %d\nName - '%s'\n", event.jdevice.which, SDL_JoystickNameForIndex(event.jdevice.which));
-			#endif
 
 				if (joystick == NULL)
 				{
@@ -381,9 +379,7 @@ BOOL SystemTask(void)
 				break;
 
 			case SDL_JOYDEVICEREMOVED:
-				#ifndef NDEBUG
-					puts("Joystick disconnected");
-				#endif
+				puts("Joystick disconnected");
 
 				if (SDL_JoystickFromInstanceID(event.jdevice.which) == joystick)
 				{

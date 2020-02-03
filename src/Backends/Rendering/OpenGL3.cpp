@@ -537,11 +537,9 @@ Backend_Surface* Backend_Init(const char *title, unsigned int internal_screen_wi
 					if (GLAD_GL_VERSION_3_2)
 					{
 			#endif
-					#ifndef NDEBUG
 						printf("GL_VENDOR = %s\n", glGetString(GL_VENDOR));
 						printf("GL_RENDERER = %s\n", glGetString(GL_RENDERER));
 						printf("GL_VERSION = %s\n", glGetString(GL_VERSION));
-					#endif
 
 						// Set up blending (only used for font-rendering)
 						glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

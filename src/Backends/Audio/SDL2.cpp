@@ -2,9 +2,7 @@
 
 #include <math.h>
 #include <stddef.h>
-#ifndef NDEBUG
 #include <stdio.h>
-#endif
 #include <stdlib.h>
 #include <string.h>
 
@@ -175,12 +173,10 @@ BOOL AudioBackend_Init(void)
 		return FALSE;
 	}
 
-#ifndef NDEBUG
 	puts("Available SDL2 audio drivers:");
 
 	for (int i = 0; i < SDL_GetNumAudioDrivers(); ++i)
 		puts(SDL_GetAudioDriver(i));
-#endif
 
 	SDL_AudioSpec specification;
 	specification.freq = 44100;
@@ -206,9 +202,7 @@ BOOL AudioBackend_Init(void)
 
 	SDL_PauseAudioDevice(device_id, 0);
 
-#ifndef NDEBUG
 	printf("Selected SDL2 audio driver: %s\n", SDL_GetCurrentAudioDriver());
-#endif
 
 	return TRUE;
 }
