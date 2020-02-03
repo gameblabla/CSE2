@@ -30,7 +30,6 @@ typedef struct Backend_Glyph
 	void *pixels;
 	unsigned int width;
 	unsigned int height;
-	FontPixelMode pixel_mode;
 } Backend_Glyph;
 
 static SDL_Window *window;
@@ -38,6 +37,9 @@ static SDL_Renderer *renderer;
 static SDL_Texture *texture;
 
 static Backend_Surface framebuffer;
+
+static unsigned char glyph_colour_channels[3];
+static Backend_Surface *glyph_destination_surface;
 
 Backend_Surface* Backend_Init(const char *title, unsigned int internal_screen_width, unsigned int internal_screen_height, BOOL fullscreen, BOOL vsync)
 {
@@ -365,63 +367,33 @@ void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned cha
 	}
 }
 
-Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch, FontPixelMode pixel_mode)
+Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch)
 {
 	Backend_Glyph *glyph = (Backend_Glyph*)malloc(sizeof(Backend_Glyph));
 
 	if (glyph == NULL)
 		return NULL;
 
-	switch (pixel_mode)
+	glyph->pixels = malloc(width * height * sizeof(float));
+
+	if (glyph->pixels == NULL)
 	{
-		case FONT_PIXEL_MODE_GRAY:
-		{
-			glyph->pixels = malloc(width * height * sizeof(float));
+		free(glyph);
+		return NULL;
+	}
 
-			if (glyph->pixels == NULL)
-			{
-				free(glyph);
-				return NULL;
-			}
+	float *destination_pointer = (float*)glyph->pixels;
 
-			float *destination_pointer = (float*)glyph->pixels;
+	for (unsigned int y = 0; y < height; ++y)
+	{
+		const unsigned char *source_pointer = pixels + y * pitch;
 
-			for (unsigned int y = 0; y < height; ++y)
-			{
-				const unsigned char *source_pointer = pixels + y * pitch;
-
-				for (unsigned int x = 0; x < width; ++x)
-					*destination_pointer++ = *source_pointer++ / 255.0f;
-			}
-
-			break;
-		}
-
-		case FONT_PIXEL_MODE_MONO:
-		{
-			glyph->pixels = malloc(width * height);
-
-			if (glyph->pixels == NULL)
-			{
-				free(glyph);
-				return NULL;
-			}
-
-			for (unsigned int y = 0; y < height; ++y)
-			{
-				const unsigned char *source_pointer = pixels + y * pitch;
-				unsigned char *destination_pointer = (unsigned char*)glyph->pixels + y * width;
-
-				memcpy(destination_pointer, source_pointer, width);
-			}
-
-			break;
-		}
+		for (unsigned int x = 0; x < width; ++x)
+			*destination_pointer++ = *source_pointer++ / 255.0f;
 	}
 
 	glyph->width = width;
 	glyph->height = height;
-	glyph->pixel_mode = pixel_mode;
 
 	return glyph;
 }
@@ -435,56 +407,46 @@ void Backend_UnloadGlyph(Backend_Glyph *glyph)
 	free(glyph);
 }
 
-void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
+void Backend_PrepareToDrawGlyphs(Backend_Surface *destination_surface, const unsigned char *colour_channels)
 {
-	if (glyph == NULL || surface == NULL)
+	if (destination_surface == NULL)
 		return;
 
-	switch (glyph->pixel_mode)
+	glyph_destination_surface = destination_surface;
+
+	memcpy(glyph_colour_channels, colour_channels, sizeof(glyph_colour_channels));
+}
+
+void Backend_DrawGlyph(Backend_Glyph *glyph, long x, long y)
+{
+	if (glyph == NULL)
+		return;
+
+	for (unsigned int iy = MAX(-y, 0); y + iy < MIN(y + glyph->height, glyph_destination_surface->height); ++iy)
 	{
-		case FONT_PIXEL_MODE_GRAY:
-			for (unsigned int iy = MAX(-y, 0); y + iy < MIN(y + glyph->height, surface->height); ++iy)
+		for (unsigned int ix = MAX(-x, 0); x + ix < MIN(x + glyph->width, glyph_destination_surface->width); ++ix)
+		{
+			const float src_alpha = ((float*)glyph->pixels)[iy * glyph->width + ix];
+
+			if (src_alpha)
 			{
-				for (unsigned int ix = MAX(-x, 0); x + ix < MIN(x + glyph->width, surface->width); ++ix)
-				{
-					const float src_alpha = ((float*)glyph->pixels)[iy * glyph->width + ix];
+				unsigned char *bitmap_pixel = glyph_destination_surface->pixels + (y + iy) * glyph_destination_surface->pitch + (x + ix) * 4;
 
-					if (src_alpha)
-					{
-						unsigned char *bitmap_pixel = surface->pixels + (y + iy) * surface->pitch + (x + ix) * 4;
+				const float dst_alpha = bitmap_pixel[3] / 255.0f;
+				const float out_alpha = src_alpha + dst_alpha * (1.0f - src_alpha);
 
-						const float dst_alpha = bitmap_pixel[3] / 255.0f;
-						const float out_alpha = src_alpha + dst_alpha * (1.0f - src_alpha);
+				for (unsigned int j = 0; j < 3; ++j)
+					bitmap_pixel[j] = (unsigned char)((glyph_colour_channels[j] * src_alpha + bitmap_pixel[j] * dst_alpha * (1.0f - src_alpha)) / out_alpha);	// Alpha blending			// Gamma-corrected alpha blending
 
-						for (unsigned int j = 0; j < 3; ++j)
-							bitmap_pixel[j] = (unsigned char)((colours[j] * src_alpha + bitmap_pixel[j] * dst_alpha * (1.0f - src_alpha)) / out_alpha);	// Alpha blending			// Gamma-corrected alpha blending
-
-						bitmap_pixel[3] = (unsigned char)(out_alpha * 255.0f);
-					}
-				}
+				bitmap_pixel[3] = (unsigned char)(out_alpha * 255.0f);
 			}
-
-			break;
-
-		case FONT_PIXEL_MODE_MONO:
-			for (unsigned int iy = MAX(-y, 0); y + iy < MIN(y + glyph->height, surface->height); ++iy)
-			{
-				for (unsigned int ix = MAX(-x, 0); x + ix < MIN(x + glyph->width, surface->width); ++ix)
-				{
-					if (((unsigned char*)glyph->pixels)[iy * glyph->width + ix])
-					{
-						unsigned char *bitmap_pixel = surface->pixels + (y + iy) * surface->pitch + (x + ix) * 4;
-
-						for (unsigned int j = 0; j < 3; ++j)
-							bitmap_pixel[j] = colours[j];
-
-						bitmap_pixel[3] = 0xFF;
-					}
-				}
-			}
-
-			break;
+		}
 	}
+}
+
+void Backend_FlushGlyphs(void)
+{
+	
 }
 
 void Backend_HandleRenderTargetLoss(void)

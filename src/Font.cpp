@@ -7,7 +7,6 @@
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
-#include FT_LCD_FILTER_H
 #include FT_BITMAP_H
 
 #include "WindowsWrapper.h"
@@ -976,12 +975,9 @@ static CachedGlyph* GetGlyphCached(FontObject *font_object, unsigned long unicod
 		FT_Bitmap_New(&bitmap);
 		FT_Bitmap_Convert(font_object->library, &font_object->face->glyph->bitmap, &bitmap, 1);
 
-		FontPixelMode pixel_mode;
 		switch (font_object->face->glyph->bitmap.pixel_mode)
 		{
 			case FT_PIXEL_MODE_GRAY:
-				pixel_mode = FONT_PIXEL_MODE_GRAY;
-
 				for (unsigned int y = 0; y < bitmap.rows; ++y)
 				{
 					unsigned char *pixel_pointer = bitmap.buffer + y * bitmap.pitch;
@@ -996,11 +992,21 @@ static CachedGlyph* GetGlyphCached(FontObject *font_object, unsigned long unicod
 				break;
 
 			case FT_PIXEL_MODE_MONO:
-				pixel_mode = FONT_PIXEL_MODE_MONO;
+				for (unsigned int y = 0; y < bitmap.rows; ++y)
+				{
+					unsigned char *pixel_pointer = bitmap.buffer + y * bitmap.pitch;
+
+					for (unsigned int x = 0; x < bitmap.width; ++x)
+					{
+						*pixel_pointer = *pixel_pointer ? 0xFF : 0;
+						++pixel_pointer;
+					}
+				}
+
 				break;
 		}
 
-		glyph->backend = Backend_LoadGlyph(bitmap.buffer, bitmap.width, bitmap.rows, bitmap.pitch, pixel_mode);
+		glyph->backend = Backend_LoadGlyph(bitmap.buffer, bitmap.width, bitmap.rows, bitmap.pitch);
 
 		FT_Bitmap_Done(font_object->library, &bitmap);
 	}
@@ -1083,7 +1089,9 @@ void DrawText(FontObject *font_object, Backend_Surface *surface, int x, int y, u
 {
 	if (font_object != NULL)
 	{
-		const unsigned char colours[3] = {(unsigned char)colour, (unsigned char)(colour >> 8), (unsigned char)(colour >> 16)};
+		const unsigned char colour_channels[3] = {(unsigned char)colour, (unsigned char)(colour >> 8), (unsigned char)(colour >> 16)};
+
+		Backend_PrepareToDrawGlyphs(surface, colour_channels);
 
 		unsigned int pen_x = 0;
 
@@ -1108,11 +1116,13 @@ void DrawText(FontObject *font_object, Backend_Surface *surface, int x, int y, u
 				const int letter_y = y + glyph->y;
 
 				if (glyph->backend != NULL)
-					Backend_DrawGlyph(surface, glyph->backend, letter_x, letter_y, colours);
+					Backend_DrawGlyph(glyph->backend, letter_x, letter_y);
 
 				pen_x += glyph->x_advance;
 			}
 		}
+
+		Backend_FlushGlyphs();
 	}
 }
 

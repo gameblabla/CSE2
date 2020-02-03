@@ -8,6 +8,10 @@
 
 #include "SDL.h"
 
+#define SPRITEBATCH_IMPLEMENTATION
+#include <limits.h>	// Needed by `cute_spritebatch.h` for `INT_MAX`
+#include "cute_spritebatch.h"
+
 #include "../../WindowsWrapper.h"
 
 #include "../../Bitmap.h"
@@ -31,7 +35,7 @@ typedef struct Backend_Surface
 
 typedef struct Backend_Glyph
 {
-	SDL_Texture *texture;
+	unsigned char *pixels;
 	unsigned int width;
 	unsigned int height;
 } Backend_Glyph;
@@ -42,6 +46,10 @@ static SDL_Renderer *renderer;
 static Backend_Surface framebuffer;
 
 static Backend_Surface *surface_list_head;
+
+static unsigned char glyph_colour_channels[3];
+
+static spritebatch_t glyph_batcher;
 
 static SDL_BlendMode premultiplied_blend_mode;
 
@@ -57,6 +65,59 @@ static void RectToSDLRect(const RECT *rect, SDL_Rect *sdl_rect)
 
 	if (sdl_rect->h < 0)
 		sdl_rect->h = 0;
+}
+
+// Blit the glyphs in the batch
+static void GlyphBatch_Draw(spritebatch_sprite_t *sprites, int count, int texture_w, int texture_h, void *udata)
+{
+	(void)udata;
+
+	SDL_Texture *texture_atlas = (SDL_Texture*)sprites[0].texture_id;
+
+	// The SDL_Texture side of things uses alpha, not a colour-key, so the bug where the font is blended
+	// with the colour key doesn't occur.
+	SDL_SetTextureColorMod(texture_atlas, glyph_colour_channels[0], glyph_colour_channels[1], glyph_colour_channels[2]);
+	SDL_SetTextureBlendMode(texture_atlas, SDL_BLENDMODE_BLEND);
+
+	for (int i = 0; i < count; ++i)
+	{
+		Backend_Glyph *glyph = (Backend_Glyph*)sprites[i].image_id;
+
+		SDL_Rect source_rect = {(int)(texture_w * sprites[i].minx), (int)(texture_h * sprites[i].maxy), (int)glyph->width, (int)glyph->height};
+		SDL_Rect destination_rect = {(int)sprites[i].x, (int)sprites[i].y, (int)glyph->width, (int)glyph->height};
+
+		SDL_RenderCopy(renderer, texture_atlas, &source_rect, &destination_rect);
+	}
+}
+
+// Upload the glyph's pixels
+static void GlyphBatch_GetPixels(SPRITEBATCH_U64 image_id, void *buffer, int bytes_to_fill, void *udata)
+{
+	(void)udata;
+
+	Backend_Glyph *glyph = (Backend_Glyph*)image_id;
+
+	memcpy(buffer, glyph->pixels, bytes_to_fill);
+}
+
+// Create a texture atlas, and upload pixels to it
+static SPRITEBATCH_U64 GlyphBatch_CreateTexture(void *pixels, int w, int h, void *udata)
+{
+	(void)udata;
+
+	SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STATIC, w, h);
+
+	SDL_UpdateTexture(texture, NULL, pixels, w * 4);
+
+	return (SPRITEBATCH_U64)texture;
+}
+
+// Destroy texture atlas
+static void GlyphBatch_DestroyTexture(SPRITEBATCH_U64 texture_id, void *udata)
+{
+	(void)udata;
+
+	SDL_DestroyTexture((SDL_Texture*)texture_id);
 }
 
 Backend_Surface* Backend_Init(const char *title, unsigned int internal_screen_width, unsigned int internal_screen_height, BOOL fullscreen, BOOL vsync)
@@ -119,6 +180,20 @@ Backend_Surface* Backend_Init(const char *title, unsigned int internal_screen_wi
 				// Set up our premultiplied-alpha blend mode
 				premultiplied_blend_mode = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
 
+				// Set-up glyph-batcher
+				spritebatch_config_t config;
+				spritebatch_set_default_config(&config);
+				config.pixel_stride = 4;
+				config.atlas_width_in_pixels = 256;
+				config.atlas_height_in_pixels = 256;
+				config.lonely_buffer_count_till_flush = 4; // Start making atlases immediately
+				config.ticks_to_decay_texture = 100;       // If a glyph hasn't been used for the past 100 draws, destroy it
+				config.batch_callback = GlyphBatch_Draw;
+				config.get_pixels_callback = GlyphBatch_GetPixels;
+				config.generate_texture_callback = GlyphBatch_CreateTexture;
+				config.delete_texture_callback = GlyphBatch_DestroyTexture;
+				spritebatch_init(&glyph_batcher, &config, NULL);
+
 				return &framebuffer;
 			}
 			else
@@ -146,6 +221,7 @@ Backend_Surface* Backend_Init(const char *title, unsigned int internal_screen_wi
 
 void Backend_Deinit(void)
 {
+	spritebatch_term(&glyph_batcher);
 	SDL_DestroyTexture(framebuffer.texture);
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
@@ -308,74 +384,37 @@ void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned cha
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 }
 
-Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch, FontPixelMode pixel_mode)
+Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch)
 {
 	Backend_Glyph *glyph = (Backend_Glyph*)malloc(sizeof(Backend_Glyph));
 
 	if (glyph == NULL)
 		return NULL;
 
-	glyph->texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STATIC, width, height);
+	glyph->pixels = (unsigned char*)malloc(width * height * 4);
 
-	if (glyph->texture == NULL)
+	if (glyph->pixels == NULL)
 	{
 		free(glyph);
 		return NULL;
 	}
 
-	unsigned char *buffer = (unsigned char*)malloc(width * height * 4);
+	unsigned char *destination_pointer = glyph->pixels;
 
-	if (buffer == NULL)
+	for (unsigned int y = 0; y < height; ++y)
 	{
-		SDL_DestroyTexture(glyph->texture);
-		free(glyph);
-		return NULL;
+		const unsigned char *source_pointer = pixels + y * pitch;
+
+		for (unsigned int x = 0; x < width; ++x)
+		{
+			const unsigned char alpha = *source_pointer++;
+
+			*destination_pointer++ = alpha;
+			*destination_pointer++ = alpha;
+			*destination_pointer++ = alpha;
+			*destination_pointer++ = alpha;
+		}
 	}
-
-	unsigned char *destination_pointer = buffer;
-
-	switch (pixel_mode)
-	{
-		case FONT_PIXEL_MODE_GRAY:
-
-			for (unsigned int y = 0; y < height; ++y)
-			{
-				const unsigned char *source_pointer = pixels + y * pitch;
-
-				for (unsigned int x = 0; x < width; ++x)
-				{
-					const unsigned char alpha = *source_pointer++;
-
-					*destination_pointer++ = alpha;
-					*destination_pointer++ = alpha;
-					*destination_pointer++ = alpha;
-					*destination_pointer++ = alpha;
-				}
-			}
-
-			break;
-
-		case FONT_PIXEL_MODE_MONO:
-			for (unsigned int y = 0; y < height; ++y)
-			{
-				const unsigned char *source_pointer = pixels + y * pitch;
-
-				for (unsigned int x = 0; x < width; ++x)
-				{
-					const unsigned char alpha = *source_pointer++ ? 0xFF : 0;
-
-					*destination_pointer++ = alpha;
-					*destination_pointer++ = alpha;
-					*destination_pointer++ = alpha;
-					*destination_pointer++ = alpha;
-				}
-			}
-
-			break;
-	}
-
-	SDL_UpdateTexture(glyph->texture, NULL, buffer, width * 4);
-	free(buffer);
 
 	glyph->width = width;
 	glyph->height = height;
@@ -388,22 +427,30 @@ void Backend_UnloadGlyph(Backend_Glyph *glyph)
 	if (glyph == NULL)
 		return;
 
-	SDL_DestroyTexture(glyph->texture);
+	free(glyph->pixels);
 	free(glyph);
 }
 
-void Backend_DrawGlyph(Backend_Surface *surface, Backend_Glyph *glyph, long x, long y, const unsigned char *colours)
+void Backend_PrepareToDrawGlyphs(Backend_Surface *destination_surface, const unsigned char *colour_channels)
 {
-	if (glyph == NULL || surface == NULL)
+	if (destination_surface == NULL)
 		return;
 
-	SDL_Rect destination_rect = {(int)x, (int)y, (int)glyph->width, (int)glyph->height};
+	SDL_SetRenderTarget(renderer, destination_surface->texture);
 
-	// Blit the texture
-	SDL_SetTextureColorMod(glyph->texture, colours[0], colours[1], colours[2]);
-	SDL_SetTextureBlendMode(glyph->texture, premultiplied_blend_mode);
-	SDL_SetRenderTarget(renderer, surface->texture);
-	SDL_RenderCopy(renderer, glyph->texture, NULL, &destination_rect);
+	memcpy(glyph_colour_channels, colour_channels, sizeof(glyph_colour_channels));
+}
+
+void Backend_DrawGlyph(Backend_Glyph *glyph, long x, long y)
+{
+	spritebatch_push(&glyph_batcher, (SPRITEBATCH_U64)glyph, glyph->width, glyph->height, x, y, 1.0f, 1.0f, 0.0f, 0.0f, 0);
+}
+
+void Backend_FlushGlyphs(void)
+{
+	spritebatch_tick(&glyph_batcher);
+	spritebatch_defrag(&glyph_batcher);
+	spritebatch_flush(&glyph_batcher);
 }
 
 void Backend_HandleRenderTargetLoss(void)
