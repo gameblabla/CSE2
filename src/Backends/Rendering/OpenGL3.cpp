@@ -92,6 +92,8 @@ static unsigned long local_vertex_buffer_size;
 static unsigned long current_vertex_buffer_slot;
 
 static RenderMode last_render_mode;
+static GLuint last_source_texture;
+static GLuint last_destination_texture;
 
 static Backend_Surface framebuffer;
 
@@ -375,8 +377,6 @@ static void FlushVertexBuffer(void)
 // Blit the glyphs in the batch
 static void GlyphBatch_Draw(spritebatch_sprite_t *sprites, int count, int texture_w, int texture_h, void *udata)
 {
-	static Backend_Surface *last_surface;
-	static GLuint last_texture_id;
 	static unsigned char last_red;
 	static unsigned char last_green;
 	static unsigned char last_blue;
@@ -389,13 +389,13 @@ static void GlyphBatch_Draw(spritebatch_sprite_t *sprites, int count, int textur
 	GLuint texture_id = (GLuint)sprites[0].texture_id;
 
 	// Flush vertex data if a context-change is needed
-	if (last_render_mode != MODE_DRAW_GLYPH || last_surface != glyph_destination_surface || last_texture_id != texture_id || last_red != glyph_colour_channels[0] || last_green != glyph_colour_channels[1] || last_blue != glyph_colour_channels[2])
+	if (last_render_mode != MODE_DRAW_GLYPH || last_destination_texture != glyph_destination_surface->texture_id || last_source_texture != texture_id || last_red != glyph_colour_channels[0] || last_green != glyph_colour_channels[1] || last_blue != glyph_colour_channels[2])
 	{
 		FlushVertexBuffer();
 
 		last_render_mode = MODE_DRAW_GLYPH;
-		last_surface = glyph_destination_surface;
-		last_texture_id = texture_id;
+		last_destination_texture = glyph_destination_surface->texture_id;
+		last_source_texture = texture_id;
 		last_red = glyph_colour_channels[0];
 		last_green = glyph_colour_channels[1];
 		last_blue = glyph_colour_channels[2];
@@ -509,7 +509,13 @@ static void GlyphBatch_DestroyTexture(SPRITEBATCH_U64 texture_id, void *udata)
 {
 	(void)udata;
 
-	glDeleteTextures(1, (GLuint*)&texture_id);
+	GLuint gl_texture_id = (GLuint)texture_id;
+
+	// Flush the vertex buffer if we're about to destroy its texture
+	if (gl_texture_id == last_source_texture || gl_texture_id == last_destination_texture)
+		FlushVertexBuffer();
+
+	glDeleteTextures(1, &gl_texture_id);
 }
 
 // ====================
@@ -719,6 +725,8 @@ void Backend_DrawScreen(void)
 {
 	FlushVertexBuffer();
 	last_render_mode = MODE_BLANK;
+	last_source_texture = 0;
+	last_destination_texture = 0;
 
 	glUseProgram(program_texture);
 
@@ -819,6 +827,10 @@ void Backend_FreeSurface(Backend_Surface *surface)
 	if (surface == NULL)
 		return;
 
+	// Flush the vertex buffer if we're about to destroy its texture
+	if (surface->texture_id == last_source_texture || surface->texture_id == last_destination_texture)
+		FlushVertexBuffer();
+
 	glDeleteTextures(1, &surface->texture_id);
 	free(surface);
 }
@@ -850,6 +862,10 @@ void Backend_UnlockSurface(Backend_Surface *surface, unsigned int width, unsigne
 	if (surface == NULL)
 		return;
 
+	// Flush the vertex buffer if we're about to modify its texture
+	if (surface->texture_id == last_source_texture || surface->texture_id == last_destination_texture)
+		FlushVertexBuffer();
+
 	GLint previously_bound_texture;
 	glGetIntegerv(GL_TEXTURE_BINDING_2D, &previously_bound_texture);
 
@@ -866,9 +882,6 @@ void Backend_UnlockSurface(Backend_Surface *surface, unsigned int width, unsigne
 
 void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL colour_key)
 {
-	static Backend_Surface *last_source_surface;
-	static Backend_Surface *last_destination_surface;
-
 	if (source_surface == NULL || destination_surface == NULL)
 		return;
 
@@ -878,13 +891,13 @@ void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Sur
 	const RenderMode render_mode = (colour_key ? MODE_DRAW_SURFACE_WITH_TRANSPARENCY : MODE_DRAW_SURFACE);
 
 	// Flush vertex data if a context-change is needed
-	if (last_render_mode != render_mode || last_source_surface != source_surface || last_destination_surface != destination_surface)
+	if (last_render_mode != render_mode || last_source_texture != source_surface->texture_id || last_destination_texture != destination_surface->texture_id)
 	{
 		FlushVertexBuffer();
 
 		last_render_mode = render_mode;
-		last_source_surface = source_surface;
-		last_destination_surface = destination_surface;
+		last_source_texture = source_surface->texture_id;
+		last_destination_texture = destination_surface->texture_id;
 
 		// Point our framebuffer to the destination texture
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, destination_surface->texture_id, 0);
@@ -945,7 +958,6 @@ void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Sur
 
 void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
 {
-	static Backend_Surface *last_surface;
 	static unsigned char last_red;
 	static unsigned char last_green;
 	static unsigned char last_blue;
@@ -957,12 +969,13 @@ void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned cha
 		return;
 
 	// Flush vertex data if a context-change is needed
-	if (last_render_mode != MODE_COLOUR_FILL || last_surface != surface || last_red != red || last_green != green || last_blue != blue)
+	if (last_render_mode != MODE_COLOUR_FILL || last_destination_texture != surface->texture_id || last_red != red || last_green != green || last_blue != blue)
 	{
 		FlushVertexBuffer();
 
 		last_render_mode = MODE_COLOUR_FILL;
-		last_surface = surface;
+		last_source_texture = 0;
+		last_destination_texture = surface->texture_id;
 		last_red = red;
 		last_green = green;
 		last_blue = blue;
