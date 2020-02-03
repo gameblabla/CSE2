@@ -80,8 +80,8 @@ static void GlyphBatch_Draw(spritebatch_sprite_t *sprites, int count, int textur
 	{
 		Backend_Glyph *glyph = (Backend_Glyph*)sprites[i].image_id;
 
-		SDL_Rect source_rect = {(int)(texture_w * sprites[i].minx), (int)(texture_h * sprites[i].maxy), glyph->width, glyph->height};
-		SDL_Rect destination_rect = {(int)sprites[i].x, (int)sprites[i].y, glyph->width, glyph->height};
+		SDL_Rect source_rect = {(int)(texture_w * sprites[i].minx), (int)(texture_h * sprites[i].maxy), (int)glyph->width, (int)glyph->height};
+		SDL_Rect destination_rect = {(int)sprites[i].x, (int)sprites[i].y, (int)glyph->width, (int)glyph->height};
 
 		SDL_RenderCopy(renderer, texture_atlas, &source_rect, &destination_rect);
 	}
