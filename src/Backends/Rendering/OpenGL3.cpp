@@ -479,9 +479,6 @@ static SPRITEBATCH_U64 GlyphBatch_CreateTexture(void *pixels, int w, int h, void
 {
 	(void)udata;
 
-	GLint previously_bound_texture;
-	glGetIntegerv(GL_TEXTURE_BINDING_2D, &previously_bound_texture);
-
 	GLuint texture_id;
 	glGenTextures(1, &texture_id);
 	glBindTexture(GL_TEXTURE_2D, texture_id);
@@ -499,7 +496,7 @@ static SPRITEBATCH_U64 GlyphBatch_CreateTexture(void *pixels, int w, int h, void
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 #endif
 
-	glBindTexture(GL_TEXTURE_2D, previously_bound_texture);
+	glBindTexture(GL_TEXTURE_2D, last_source_texture);
 
 	return (SPRITEBATCH_U64)texture_id;
 }
@@ -796,9 +793,6 @@ Backend_Surface* Backend_CreateSurface(unsigned int width, unsigned int height)
 	if (surface == NULL)
 		return NULL;
 
-	GLint previously_bound_texture;
-	glGetIntegerv(GL_TEXTURE_BINDING_2D, &previously_bound_texture);
-
 	glGenTextures(1, &surface->texture_id);
 	glBindTexture(GL_TEXTURE_2D, surface->texture_id);
 #ifdef USE_OPENGLES2
@@ -814,7 +808,7 @@ Backend_Surface* Backend_CreateSurface(unsigned int width, unsigned int height)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 #endif
 
-	glBindTexture(GL_TEXTURE_2D, previously_bound_texture);
+	glBindTexture(GL_TEXTURE_2D, last_source_texture);
 
 	surface->width = width;
 	surface->height = height;
@@ -866,14 +860,11 @@ void Backend_UnlockSurface(Backend_Surface *surface, unsigned int width, unsigne
 	if (surface->texture_id == last_source_texture || surface->texture_id == last_destination_texture)
 		FlushVertexBuffer();
 
-	GLint previously_bound_texture;
-	glGetIntegerv(GL_TEXTURE_BINDING_2D, &previously_bound_texture);
-
 	glBindTexture(GL_TEXTURE_2D, surface->texture_id);
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, surface->pixels);
 	free(surface->pixels);
 
-	glBindTexture(GL_TEXTURE_2D, previously_bound_texture);
+	glBindTexture(GL_TEXTURE_2D, last_source_texture);
 }
 
 // ====================
