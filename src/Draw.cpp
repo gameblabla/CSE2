@@ -87,14 +87,12 @@ BOOL Flip_SystemTask(void)
 
 BOOL StartDirectDraw(const char *title, int width, int height, int lMagnification)
 {
-#ifndef NDEBUG
 	puts("Available SDL2 video drivers:");
 
 	for (int i = 0; i < SDL_GetNumVideoDrivers(); ++i)
 		puts(SDL_GetVideoDriver(i));
 
 	printf("Selected SDL2 video driver: %s\n", SDL_GetCurrentVideoDriver());
-#endif
 
 	memset(surface_metadata, 0, sizeof(surface_metadata));
 

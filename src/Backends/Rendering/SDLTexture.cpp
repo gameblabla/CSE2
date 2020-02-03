@@ -1,9 +1,7 @@
 #include "../Rendering.h"
 
 #include <stddef.h>
-#ifndef NDEBUG
 #include <stdio.h>
-#endif
 #include <stdlib.h>
 
 #include "SDL.h"
@@ -119,7 +117,6 @@ static void GlyphBatch_DestroyTexture(SPRITEBATCH_U64 texture_id, void *udata)
 
 Backend_Surface* Backend_Init(const char *title, int width, int height, BOOL fullscreen)
 {
-#ifndef NDEBUG
 	puts("Available SDL2 render drivers:");
 
 	for (int i = 0; i < SDL_GetNumRenderDrivers(); ++i)
@@ -128,7 +125,6 @@ Backend_Surface* Backend_Init(const char *title, int width, int height, BOOL ful
 		SDL_GetRenderDriverInfo(i, &info);
 		puts(info.name);
 	}
-#endif
 
 	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, 0);
 
@@ -154,11 +150,9 @@ Backend_Surface* Backend_Init(const char *title, int width, int height, BOOL ful
 
 		if (renderer != NULL)
 		{
-		#ifndef NDEBUG
 			SDL_RendererInfo info;
 			SDL_GetRendererInfo(renderer, &info);
 			printf("Selected SDL2 render driver: %s\n", info.name);
-		#endif
 
 			int width, height;
 			SDL_GetRendererOutputSize(renderer, &width, &height);
