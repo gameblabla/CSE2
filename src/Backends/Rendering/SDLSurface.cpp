@@ -41,9 +41,9 @@ static void RectToSDLRect(const RECT *rect, SDL_Rect *sdl_rect)
 		sdl_rect->h = 0;
 }
 
-Backend_Surface* Backend_Init(const char *title, int width, int height, BOOL fullscreen)
+Backend_Surface* Backend_Init(const char *window_title, int window_width, int window_height, BOOL fullscreen)
 {
-	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, 0);
+	window = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, window_width, window_height, 0);
 
 	if (window != NULL)
 	{

@@ -519,7 +519,7 @@ static void GlyphBatch_DestroyTexture(SPRITEBATCH_U64 texture_id, void *udata)
 // Render-backend initialisation
 // ====================
 
-Backend_Surface* Backend_Init(const char *title, int width, int height, BOOL fullscreen)
+Backend_Surface* Backend_Init(const char *window_title, int window_width, int window_height, BOOL fullscreen)
 {
 #ifdef USE_OPENGLES2
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
@@ -533,7 +533,7 @@ Backend_Surface* Backend_Init(const char *title, int width, int height, BOOL ful
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 #endif
 
-	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL);
+	window = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, window_width, window_height, SDL_WINDOW_OPENGL);
 
 	if (window != NULL)
 	{
@@ -548,9 +548,6 @@ Backend_Surface* Backend_Init(const char *title, int width, int height, BOOL ful
 
 		if (fullscreen)
 			SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
-
-		int window_width, window_height;
-		SDL_GetWindowSize(window, &window_width, &window_height);
 
 		context = SDL_GL_CreateContext(window);
 
