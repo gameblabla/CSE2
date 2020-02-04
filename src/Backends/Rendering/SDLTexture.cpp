@@ -170,7 +170,6 @@ Backend_Surface* Backend_Init(const char *title, int width, int height, BOOL ful
 				config.atlas_width_in_pixels = 256;
 				config.atlas_height_in_pixels = 256;
 				config.lonely_buffer_count_till_flush = 4; // Start making atlases immediately
-				config.ticks_to_decay_texture = 100;       // If a glyph hasn't been used for the past 100 draws, destroy it
 				config.batch_callback = GlyphBatch_Draw;
 				config.get_pixels_callback = GlyphBatch_GetPixels;
 				config.generate_texture_callback = GlyphBatch_CreateTexture;
@@ -212,6 +211,8 @@ void Backend_Deinit(void)
 
 void Backend_DrawScreen(void)
 {
+	spritebatch_tick(&glyph_batcher);
+
 	SDL_SetRenderTarget(renderer, NULL);
 	SDL_RenderCopy(renderer, framebuffer.texture, NULL, NULL);
 	SDL_RenderPresent(renderer);
@@ -419,7 +420,6 @@ void Backend_DrawGlyph(Backend_Glyph *glyph, long x, long y)
 
 void Backend_FlushGlyphs(void)
 {
-	spritebatch_tick(&glyph_batcher);
 	spritebatch_defrag(&glyph_batcher);
 	spritebatch_flush(&glyph_batcher);
 }
