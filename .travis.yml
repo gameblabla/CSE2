@@ -48,10 +48,26 @@ addons:
     update: true
 
 env:
-    - BUILD_SYSTEM=make BUILD_TYPE=RELEASE=0
-    - BUILD_SYSTEM=cmake BUILD_TYPE=Debug
-    - BUILD_SYSTEM=make BUILD_TYPE=RELEASE=1
-    - BUILD_SYSTEM=cmake BUILD_TYPE=RelWithDebInfo
+    - BUILD_SYSTEM=make BUILD_TYPE=RELEASE=0 RENDERER=Software
+    - BUILD_SYSTEM=cmake BUILD_TYPE=Debug RENDERER=Software
+    - BUILD_SYSTEM=make BUILD_TYPE=RELEASE=1 RENDERER=Software
+    - BUILD_SYSTEM=cmake BUILD_TYPE=RelWithDebInfo RENDERER=Software
+    - BUILD_SYSTEM=make BUILD_TYPE=RELEASE=0 RENDERER=SDLSurface
+    - BUILD_SYSTEM=cmake BUILD_TYPE=Debug RENDERER=SDLSurface
+    - BUILD_SYSTEM=make BUILD_TYPE=RELEASE=1 RENDERER=SDLSurface
+    - BUILD_SYSTEM=cmake BUILD_TYPE=RelWithDebInfo RENDERER=SDLSurface
+    - BUILD_SYSTEM=make BUILD_TYPE=RELEASE=0 RENDERER=SDLTexture
+    - BUILD_SYSTEM=cmake BUILD_TYPE=Debug RENDERER=SDLTexture
+    - BUILD_SYSTEM=make BUILD_TYPE=RELEASE=1 RENDERER=SDLTexture
+    - BUILD_SYSTEM=cmake BUILD_TYPE=RelWithDebInfo RENDERER=SDLTexture
+    - BUILD_SYSTEM=make BUILD_TYPE=RELEASE=0 RENDERER=OpenGL3
+    - BUILD_SYSTEM=cmake BUILD_TYPE=Debug RENDERER=OpenGL3
+    - BUILD_SYSTEM=make BUILD_TYPE=RELEASE=1 RENDERER=OpenGL3
+    - BUILD_SYSTEM=cmake BUILD_TYPE=RelWithDebInfo RENDERER=OpenGL3
+    - BUILD_SYSTEM=make BUILD_TYPE=RELEASE=0 RENDERER=OpenGLES2
+    - BUILD_SYSTEM=cmake BUILD_TYPE=Debug RENDERER=OpenGLES2
+    - BUILD_SYSTEM=make BUILD_TYPE=RELEASE=1 RENDERER=OpenGLES2
+    - BUILD_SYSTEM=cmake BUILD_TYPE=RelWithDebInfo RENDERER=OpenGLES2
 
 before_install:
     # Set URL for Discord send script
@@ -113,7 +129,7 @@ before_script:
       if [ "$BUILD_SYSTEM" == "cmake" ]; then
         # Make build directory and generate CMake build files
         mkdir -p ${CMAKE_BUILD_DIR} && cd ${CMAKE_BUILD_DIR}
-        cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DFIX_BUGS=ON -DWARNINGS=ON -DWARNINGS_ALL=ON
+        cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DFIX_BUGS=ON -DWARNINGS=ON -DWARNINGS_ALL=ON -DRENDERER=$RENDERER
         cd ..
       fi
 
@@ -126,7 +142,7 @@ script:
         cd ..
       else
         # Make build
-        make -j $JOBS FIX_BUGS=1 $BUILD_TYPE WARNINGS=1 WARNINGS_ALL=1
+        make -j $JOBS FIX_BUGS=1 $BUILD_TYPE WARNINGS=1 WARNINGS_ALL=1 RENDERER=$RENDERER
       fi
 
 after_success:
