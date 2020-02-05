@@ -517,7 +517,7 @@ static void GlyphBatch_DestroyTexture(SPRITEBATCH_U64 texture_id, void *udata)
 // Render-backend initialisation
 // ====================
 
-Backend_Surface* Backend_Init(const char *window_title, int window_width, int window_height, BOOL fullscreen)
+Backend_Surface* Backend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
 {
 #ifdef USE_OPENGLES2
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
@@ -531,7 +531,7 @@ Backend_Surface* Backend_Init(const char *window_title, int window_width, int wi
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 #endif
 
-	window = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, window_width, window_height, SDL_WINDOW_OPENGL);
+	window = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screen_width, screen_height, SDL_WINDOW_OPENGL);
 
 	if (window != NULL)
 	{
@@ -605,9 +605,9 @@ Backend_Surface* Backend_Init(const char *window_title, int window_width, int wi
 							glGenTextures(1, &framebuffer.texture_id);
 							glBindTexture(GL_TEXTURE_2D, framebuffer.texture_id);
 						#ifdef USE_OPENGLES2
-							glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, window_width, window_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+							glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, screen_width, screen_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 						#else
-							glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, window_width, window_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+							glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, screen_width, screen_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 						#endif
 							glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 							glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -617,8 +617,8 @@ Backend_Surface* Backend_Init(const char *window_title, int window_width, int wi
 							glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 						#endif
 
-							framebuffer.width = window_width;
-							framebuffer.height = window_height;
+							framebuffer.width = screen_width;
+							framebuffer.height = screen_height;
 
 							glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebuffer.texture_id, 0);
 							glViewport(0, 0, framebuffer.width, framebuffer.height);

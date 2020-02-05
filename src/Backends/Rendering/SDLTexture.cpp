@@ -115,7 +115,7 @@ static void GlyphBatch_DestroyTexture(SPRITEBATCH_U64 texture_id, void *udata)
 	SDL_DestroyTexture((SDL_Texture*)texture_id);
 }
 
-Backend_Surface* Backend_Init(const char *window_title, int window_width, int window_height, BOOL fullscreen)
+Backend_Surface* Backend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
 {
 	puts("Available SDL2 render drivers:");
 
@@ -126,7 +126,7 @@ Backend_Surface* Backend_Init(const char *window_title, int window_width, int wi
 		puts(info.name);
 	}
 
-	window = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, window_width, window_height, 0);
+	window = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screen_width, screen_height, 0);
 
 	if (window != NULL)
 	{
@@ -154,12 +154,12 @@ Backend_Surface* Backend_Init(const char *window_title, int window_width, int wi
 			SDL_GetRendererInfo(renderer, &info);
 			printf("Selected SDL2 render driver: %s\n", info.name);
 
-			framebuffer.texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, window_width, window_height);
+			framebuffer.texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, screen_width, screen_height);
 
 			if (framebuffer.texture != NULL)
 			{
-				framebuffer.width = window_width;
-				framebuffer.height = window_height;
+				framebuffer.width = screen_width;
+				framebuffer.height = screen_height;
 
 				// Set-up glyph-batcher
 				spritebatch_config_t config;

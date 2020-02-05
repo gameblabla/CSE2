@@ -36,9 +36,9 @@ static Backend_Surface framebuffer;
 static unsigned char glyph_colour_channels[3];
 static Backend_Surface *glyph_destination_surface;
 
-Backend_Surface* Backend_Init(const char *window_title, int window_width, int window_height, BOOL fullscreen)
+Backend_Surface* Backend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
 {
-	window = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, window_width, window_height, 0);
+	window = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screen_width, screen_height, 0);
 
 	if (window != NULL)
 	{
