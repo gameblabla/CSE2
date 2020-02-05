@@ -69,6 +69,12 @@ env:
     - BUILD_SYSTEM=make BUILD_TYPE=RELEASE=1 RENDERER=OpenGLES2
     - BUILD_SYSTEM=cmake BUILD_TYPE=RelWithDebInfo RENDERER=OpenGLES2
 
+jobs:
+  exclude:
+    # Because Apple loves sabotaging OpenGL
+    - os: osx
+      env: BUILD_SYSTEM=make RENDERER=OpenGL3
+
 before_install:
     # Set URL for Discord send script
     - DISCORD_SEND_SCRIPT_URL=https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
