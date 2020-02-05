@@ -29,10 +29,14 @@ addons:
         - mingw-w64
 
 env:
-    - BUILD_TYPE=RELEASE=0 SIXTY_FOUR_BIT=false
-    - BUILD_TYPE=RELEASE=1 SIXTY_FOUR_BIT=false
-    - BUILD_TYPE=RELEASE=0 SIXTY_FOUR_BIT=true
-    - BUILD_TYPE=RELEASE=1 SIXTY_FOUR_BIT=true
+    - SIXTY_FOUR_BIT=false FIX_BUGS=0 JAPANESE=0
+    - SIXTY_FOUR_BIT=false FIX_BUGS=0 JAPANESE=1
+    - SIXTY_FOUR_BIT=false FIX_BUGS=1 JAPANESE=0
+    - SIXTY_FOUR_BIT=false FIX_BUGS=1 JAPANESE=1
+    - SIXTY_FOUR_BIT=true FIX_BUGS=0 JAPANESE=0
+    - SIXTY_FOUR_BIT=true FIX_BUGS=0 JAPANESE=1
+    - SIXTY_FOUR_BIT=true FIX_BUGS=1 JAPANESE=0
+    - SIXTY_FOUR_BIT=true FIX_BUGS=1 JAPANESE=1
 
 before_install:
     # Setup MSYS2
@@ -69,9 +73,6 @@ before_install:
 
     # Display Travis OS name
     - echo $TRAVIS_OS_NAME
-
-    # Display build type
-    - echo $BUILD_TYPE
 
     # Define CC and CXX
     - |
@@ -120,7 +121,7 @@ install:
 
 script:
     # Build
-    - $mingw make -j ${JOBS} FIX_BUGS=1 ${BUILD_TYPE} WARNINGS=1 WARNINGS_ALL=1 WINDOWS=1 STATIC=1
+    - $mingw make -j ${JOBS} FIX_BUGS=${FIX_BUGS} JAPANESE=${JAPANESE} RELEASE=1 WARNINGS=1 WARNINGS_ALL=1 WINDOWS=1 STATIC=1
 
 after_success:
     # Send success notification to Discord through DISCORD_WEBHOOK_URL
