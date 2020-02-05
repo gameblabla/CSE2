@@ -69,7 +69,7 @@ env:
     - BUILD_SYSTEM=make BUILD_TYPE=RELEASE=1 RENDERER=OpenGLES2
     - BUILD_SYSTEM=cmake BUILD_TYPE=RelWithDebInfo RENDERER=OpenGLES2
 
-jobs:
+matrix:
   exclude:
     # Because Apple loves sabotaging OpenGL
     - os: osx
