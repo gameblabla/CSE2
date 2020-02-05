@@ -49,12 +49,10 @@ addons:
 
 env:
     - BUILD_SYSTEM=make RENDERER=Software
-    - BUILD_SYSTEM=make RENDERER=SDLSurface
     - BUILD_SYSTEM=make RENDERER=SDLTexture
     - BUILD_SYSTEM=make RENDERER=OpenGL3
     - BUILD_SYSTEM=make RENDERER=OpenGLES2
     - BUILD_SYSTEM=cmake RENDERER=Software
-    - BUILD_SYSTEM=cmake RENDERER=SDLSurface
     - BUILD_SYSTEM=cmake RENDERER=SDLTexture
     - BUILD_SYSTEM=cmake RENDERER=OpenGL3
     - BUILD_SYSTEM=cmake RENDERER=OpenGLES2
