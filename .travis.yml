@@ -48,10 +48,22 @@ addons:
     update: true
 
 env:
-    - BUILD_SYSTEM=make BUILD_TYPE=RELEASE=0
-    - BUILD_SYSTEM=cmake BUILD_TYPE=Debug
-    - BUILD_SYSTEM=make BUILD_TYPE=RELEASE=1
-    - BUILD_SYSTEM=cmake BUILD_TYPE=RelWithDebInfo
+    - BUILD_SYSTEM=make RENDERER=Software
+    - BUILD_SYSTEM=make RENDERER=SDLSurface
+    - BUILD_SYSTEM=make RENDERER=SDLTexture
+    - BUILD_SYSTEM=make RENDERER=OpenGL3
+    - BUILD_SYSTEM=make RENDERER=OpenGLES2
+    - BUILD_SYSTEM=cmake RENDERER=Software
+    - BUILD_SYSTEM=cmake RENDERER=SDLSurface
+    - BUILD_SYSTEM=cmake RENDERER=SDLTexture
+    - BUILD_SYSTEM=cmake RENDERER=OpenGL3
+    - BUILD_SYSTEM=cmake RENDERER=OpenGLES2
+
+jobs:
+  exclude:
+    # Apple's OpenGL is in a non-standard location, so this build doesn't work
+    - os: osx
+      env: BUILD_SYSTEM=make RENDERER=OpenGL3
 
 before_install:
     # Set URL for Discord send script
@@ -66,7 +78,6 @@ before_install:
 
     # Display build type
     - echo $BUILD_SYSTEM
-    - echo $BUILD_TYPE
 
     # The following Homebrew packages aren't linked by default, and need to be prepended to the path explicitly.
     - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
@@ -113,7 +124,7 @@ before_script:
       if [ "$BUILD_SYSTEM" == "cmake" ]; then
         # Make build directory and generate CMake build files
         mkdir -p ${CMAKE_BUILD_DIR} && cd ${CMAKE_BUILD_DIR}
-        cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DFIX_BUGS=ON -DWARNINGS=ON -DWARNINGS_ALL=ON
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DFIX_BUGS=ON -DWARNINGS=ON -DWARNINGS_ALL=ON -DRENDERER=$RENDERER
         cd ..
       fi
 
@@ -122,11 +133,11 @@ script:
       if [ "$BUILD_SYSTEM" == "cmake" ]; then
         # CMake build
         cd ${CMAKE_BUILD_DIR}
-        cmake --build . --config $BUILD_TYPE --parallel $JOBS
+        cmake --build . --config Release --parallel $JOBS
         cd ..
       else
         # Make build
-        make -j $JOBS FIX_BUGS=1 $BUILD_TYPE WARNINGS=1 WARNINGS_ALL=1
+        make -j $JOBS FIX_BUGS=1 RELEASE=1 WARNINGS=1 WARNINGS_ALL=1 RENDERER=$RENDERER
       fi
 
 after_success:
