@@ -70,10 +70,11 @@ env:
     - BUILD_SYSTEM=cmake BUILD_TYPE=RelWithDebInfo RENDERER=OpenGLES2
 
 matrix:
-  exclude:
-    # Because Apple loves sabotaging OpenGL
-    - os: osx
-      env: BUILD_SYSTEM=make RENDERER=OpenGL3
+    exclude:
+        - os: osx
+          env: BUILD_SYSTEM=make BUILD_TYPE=RELEASE=0 RENDERER=OpenGL3
+        - os: osx
+          env: BUILD_SYSTEM=make BUILD_TYPE=RELEASE=1 RENDERER=OpenGL3
 
 before_install:
     # Set URL for Discord send script
