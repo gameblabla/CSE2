@@ -69,10 +69,11 @@ env:
     - BUILD_SYSTEM=make BUILD_TYPE=RELEASE=1 RENDERER=OpenGLES2
     - BUILD_SYSTEM=cmake BUILD_TYPE=RelWithDebInfo RENDERER=OpenGLES2
 
-matrix:
+jobs:
     exclude:
         - os: osx
           env: BUILD_SYSTEM=make BUILD_TYPE=RELEASE=0 RENDERER=OpenGL3
+
         - os: osx
           env: BUILD_SYSTEM=make BUILD_TYPE=RELEASE=1 RENDERER=OpenGL3
 
