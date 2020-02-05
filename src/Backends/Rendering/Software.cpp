@@ -39,7 +39,7 @@ static Backend_Surface framebuffer;
 static unsigned char glyph_colour_channels[3];
 static Backend_Surface *glyph_destination_surface;
 
-Backend_Surface* Backend_Init(const char *title, unsigned int internal_screen_width, unsigned int internal_screen_height, BOOL fullscreen, BOOL vsync)
+Backend_Surface* Backend_Init(const char *window_title, unsigned int internal_screen_width, unsigned int internal_screen_height, BOOL fullscreen, BOOL vsync)
 {
 	puts("Available SDL2 render drivers:");
 
@@ -50,7 +50,7 @@ Backend_Surface* Backend_Init(const char *title, unsigned int internal_screen_wi
 		puts(info.name);
 	}
 
-	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, internal_screen_width, internal_screen_height, SDL_WINDOW_RESIZABLE);
+	window = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, internal_screen_width, internal_screen_height, SDL_WINDOW_RESIZABLE);
 
 	if (window != NULL)
 	{

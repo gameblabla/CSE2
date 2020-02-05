@@ -7,7 +7,7 @@
 typedef struct Backend_Surface Backend_Surface;
 typedef struct Backend_Glyph Backend_Glyph;
 
-Backend_Surface* Backend_Init(const char *title, unsigned int internal_screen_width, unsigned int internal_screen_height, BOOL fullscreen, BOOL vsync);
+Backend_Surface* Backend_Init(const char *window_title, unsigned int internal_screen_width, unsigned int internal_screen_height, BOOL fullscreen, BOOL vsync);
 void Backend_Deinit(void);
 void Backend_DrawScreen(void);
 Backend_Surface* Backend_CreateSurface(unsigned int width, unsigned int height);

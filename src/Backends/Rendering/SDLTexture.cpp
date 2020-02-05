@@ -118,7 +118,7 @@ static void GlyphBatch_DestroyTexture(SPRITEBATCH_U64 texture_id, void *udata)
 	SDL_DestroyTexture((SDL_Texture*)texture_id);
 }
 
-Backend_Surface* Backend_Init(const char *title, unsigned int internal_screen_width, unsigned int internal_screen_height, BOOL fullscreen, BOOL vsync)
+Backend_Surface* Backend_Init(const char *window_title, unsigned int internal_screen_width, unsigned int internal_screen_height, BOOL fullscreen, BOOL vsync)
 {
 	puts("Available SDL2 render drivers:");
 
@@ -129,7 +129,7 @@ Backend_Surface* Backend_Init(const char *title, unsigned int internal_screen_wi
 		puts(info.name);
 	}
 
-	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, internal_screen_width, internal_screen_height, SDL_WINDOW_RESIZABLE);
+	window = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, internal_screen_width, internal_screen_height, SDL_WINDOW_RESIZABLE);
 
 	if (window != NULL)
 	{

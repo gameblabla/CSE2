@@ -400,35 +400,33 @@ static void GlyphBatch_Draw(spritebatch_sprite_t *sprites, int count, int textur
 		const GLfloat vertex_top = (sprites[i].y * (2.0f / glyph_destination_surface->height)) - 1.0f;
 		const GLfloat vertex_bottom = ((sprites[i].y + glyph->height) * (2.0f / glyph_destination_surface->height)) - 1.0f;
 
-		vertex_buffer_slot->vertices[0][0].texture_coordinate.x = texture_left;
-		vertex_buffer_slot->vertices[0][0].texture_coordinate.y = texture_top;
-		vertex_buffer_slot->vertices[0][1].texture_coordinate.x = texture_right;
-		vertex_buffer_slot->vertices[0][1].texture_coordinate.y = texture_top;
-		vertex_buffer_slot->vertices[0][2].texture_coordinate.x = texture_right;
-		vertex_buffer_slot->vertices[0][2].texture_coordinate.y = texture_bottom;
+		vertex_buffer_slot[i].vertices[0][0].texture_coordinate.x = texture_left;
+		vertex_buffer_slot[i].vertices[0][0].texture_coordinate.y = texture_top;
+		vertex_buffer_slot[i].vertices[0][1].texture_coordinate.x = texture_right;
+		vertex_buffer_slot[i].vertices[0][1].texture_coordinate.y = texture_top;
+		vertex_buffer_slot[i].vertices[0][2].texture_coordinate.x = texture_right;
+		vertex_buffer_slot[i].vertices[0][2].texture_coordinate.y = texture_bottom;
 
-		vertex_buffer_slot->vertices[1][0].texture_coordinate.x = texture_left;
-		vertex_buffer_slot->vertices[1][0].texture_coordinate.y = texture_top;
-		vertex_buffer_slot->vertices[1][1].texture_coordinate.x = texture_right;
-		vertex_buffer_slot->vertices[1][1].texture_coordinate.y = texture_bottom;
-		vertex_buffer_slot->vertices[1][2].texture_coordinate.x = texture_left;
-		vertex_buffer_slot->vertices[1][2].texture_coordinate.y = texture_bottom;
+		vertex_buffer_slot[i].vertices[1][0].texture_coordinate.x = texture_left;
+		vertex_buffer_slot[i].vertices[1][0].texture_coordinate.y = texture_top;
+		vertex_buffer_slot[i].vertices[1][1].texture_coordinate.x = texture_right;
+		vertex_buffer_slot[i].vertices[1][1].texture_coordinate.y = texture_bottom;
+		vertex_buffer_slot[i].vertices[1][2].texture_coordinate.x = texture_left;
+		vertex_buffer_slot[i].vertices[1][2].texture_coordinate.y = texture_bottom;
 
-		vertex_buffer_slot->vertices[0][0].vertex_coordinate.x = vertex_left;
-		vertex_buffer_slot->vertices[0][0].vertex_coordinate.y = vertex_top;
-		vertex_buffer_slot->vertices[0][1].vertex_coordinate.x = vertex_right;
-		vertex_buffer_slot->vertices[0][1].vertex_coordinate.y = vertex_top;
-		vertex_buffer_slot->vertices[0][2].vertex_coordinate.x = vertex_right;
-		vertex_buffer_slot->vertices[0][2].vertex_coordinate.y = vertex_bottom;
+		vertex_buffer_slot[i].vertices[0][0].vertex_coordinate.x = vertex_left;
+		vertex_buffer_slot[i].vertices[0][0].vertex_coordinate.y = vertex_top;
+		vertex_buffer_slot[i].vertices[0][1].vertex_coordinate.x = vertex_right;
+		vertex_buffer_slot[i].vertices[0][1].vertex_coordinate.y = vertex_top;
+		vertex_buffer_slot[i].vertices[0][2].vertex_coordinate.x = vertex_right;
+		vertex_buffer_slot[i].vertices[0][2].vertex_coordinate.y = vertex_bottom;
 
-		vertex_buffer_slot->vertices[1][0].vertex_coordinate.x = vertex_left;
-		vertex_buffer_slot->vertices[1][0].vertex_coordinate.y = vertex_top;
-		vertex_buffer_slot->vertices[1][1].vertex_coordinate.x = vertex_right;
-		vertex_buffer_slot->vertices[1][1].vertex_coordinate.y = vertex_bottom;
-		vertex_buffer_slot->vertices[1][2].vertex_coordinate.x = vertex_left;
-		vertex_buffer_slot->vertices[1][2].vertex_coordinate.y = vertex_bottom;
-
-		++vertex_buffer_slot;
+		vertex_buffer_slot[i].vertices[1][0].vertex_coordinate.x = vertex_left;
+		vertex_buffer_slot[i].vertices[1][0].vertex_coordinate.y = vertex_top;
+		vertex_buffer_slot[i].vertices[1][1].vertex_coordinate.x = vertex_right;
+		vertex_buffer_slot[i].vertices[1][1].vertex_coordinate.y = vertex_bottom;
+		vertex_buffer_slot[i].vertices[1][2].vertex_coordinate.x = vertex_left;
+		vertex_buffer_slot[i].vertices[1][2].vertex_coordinate.y = vertex_bottom;
 	}
 }
 
@@ -487,7 +485,7 @@ static void GlyphBatch_DestroyTexture(SPRITEBATCH_U64 texture_id, void *udata)
 // Render-backend initialisation
 // ====================
 
-Backend_Surface* Backend_Init(const char *title, unsigned int internal_screen_width, unsigned int internal_screen_height, BOOL fullscreen, BOOL vsync)
+Backend_Surface* Backend_Init(const char *window_title, unsigned int internal_screen_width, unsigned int internal_screen_height, BOOL fullscreen, BOOL vsync)
 {
 #ifdef USE_OPENGLES2
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
@@ -501,7 +499,7 @@ Backend_Surface* Backend_Init(const char *title, unsigned int internal_screen_wi
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 #endif
 
-	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, internal_screen_width, internal_screen_height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+	window = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, internal_screen_width, internal_screen_height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
 	if (window != NULL)
 	{
