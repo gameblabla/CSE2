@@ -73,7 +73,10 @@ void ActCaret01(CARET *crt)
 	{
 		crt->ani_wait = 0;
 		if (++crt->ani_no > 3)
+		{
 			crt->cond = 0;
+			return;	// Prevent UB at rc[crt->ani_no] when crt->ani_no == 4
+		}
 	}
 
 	if (crt->direct == 0)
@@ -245,7 +248,10 @@ void ActCaret07(CARET *crt)
 		crt->ani_wait = 0;
 
 		if (++crt->ani_no > 6)
+		{
 			crt->cond = 0;
+			return;	// Prevent UB at rcLeft[crt->ani_no] when crt->ani_no == 6
+		}
 	}
 
 	crt->rect = rcLeft[crt->ani_no];
@@ -449,7 +455,10 @@ void ActCaret14(CARET *crt)
 		crt->ani_wait = 0;
 
 		if (++crt->ani_no > 4)
+		{
 			crt->cond = 0;
+			return;	// Prevent UB at rect[crt->ani_no] when crt->ani_no == 5
+		}
 	}
 
 	crt->rect = rect[crt->ani_no];
@@ -469,7 +478,10 @@ void ActCaret15(CARET *crt)
 		crt->ani_wait = 0;
 
 		if (++crt->ani_no > 3)
+		{
 			crt->cond = 0;
+			return;	// Prevent UB at rcLeft[crt->ani_no] when crt->ani_no == 4
+		}
 	}
 
 	crt->rect = rcLeft[crt->ani_no];
