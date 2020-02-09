@@ -17,6 +17,8 @@
 
 #ifdef __GNUC__
 #define ATTR_HOT __attribute__((hot))
+#else
+#define ATTR_HOT
 #endif
 
 struct AudioBackend_Sound
