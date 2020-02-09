@@ -7,7 +7,6 @@
 #include "SDL.h"
 
 #define SPRITEBATCH_IMPLEMENTATION
-#include <limits.h>	// Needed by `cute_spritebatch.h` for `INT_MAX`
 #include "cute_spritebatch.h"
 
 #include "../../WindowsWrapper.h"
