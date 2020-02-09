@@ -16,7 +16,6 @@
 #include "SDL.h"
 
 #define SPRITEBATCH_IMPLEMENTATION
-#include <limits.h>	// Needed by `cute_spritebatch.h` for `INT_MAX`
 #include "cute_spritebatch.h"
 
 #include "../../WindowsWrapper.h"
@@ -431,7 +430,7 @@ static void GlyphBatch_Draw(spritebatch_sprite_t *sprites, int count, int textur
 }
 
 // Upload the glyph's pixels
-static void GlyphBatch_GetPixels(SPRITEBATCH_U64 image_id, void* buffer, int bytes_to_fill, void* udata)
+static void GlyphBatch_GetPixels(SPRITEBATCH_U64 image_id, void *buffer, int bytes_to_fill, void *udata)
 {
 	(void)udata;
 
