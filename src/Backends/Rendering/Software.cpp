@@ -23,7 +23,7 @@ typedef struct Backend_Surface
 
 typedef struct Backend_Glyph
 {
-	float *pixels;
+	unsigned char *pixels;
 	unsigned int width;
 	unsigned int height;
 } Backend_Glyph;
@@ -304,7 +304,7 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 	if (glyph == NULL)
 		return NULL;
 
-	glyph->pixels = (float*)malloc(width * height * sizeof(float));
+	glyph->pixels = (unsigned char*)malloc(width * height);
 
 	if (glyph->pixels == NULL)
 	{
@@ -312,15 +312,10 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 		return NULL;
 	}
 
-	float *destination_pointer = glyph->pixels;
+	unsigned char *destination_pointer = glyph->pixels;
 
 	for (unsigned int y = 0; y < height; ++y)
-	{
-		const unsigned char *source_pointer = &pixels[y * pitch];
-
-		for (unsigned int x = 0; x < width; ++x)
-			*destination_pointer++ = *source_pointer++ / 255.0f;
-	}
+		memcpy(&glyph->pixels[y * width], &pixels[y * pitch], width);
 
 	glyph->width = width;
 	glyph->height = height;
@@ -356,10 +351,12 @@ void Backend_DrawGlyph(Backend_Glyph *glyph, long x, long y)
 	{
 		for (unsigned int ix = MAX(-x, 0); x + ix < MIN(x + glyph->width, glyph_destination_surface->width); ++ix)
 		{
-			const float alpha = glyph->pixels[iy * glyph->width + ix];
+			unsigned char alpha_int = glyph->pixels[iy * glyph->width + ix];
 
-			if (alpha != 0.0f)
+			if (alpha_int != 0)
 			{
+				float alpha = alpha_int / 255.0f;
+
 				unsigned char *bitmap_pixel = glyph_destination_surface->pixels + (y + iy) * glyph_destination_surface->pitch + (x + ix) * 3;
 
 				for (unsigned int j = 0; j < 3; ++j)
