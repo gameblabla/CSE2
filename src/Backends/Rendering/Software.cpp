@@ -351,11 +351,11 @@ void Backend_DrawGlyph(Backend_Glyph *glyph, long x, long y)
 	{
 		for (unsigned int ix = MAX(-x, 0); x + ix < MIN(x + glyph->width, glyph_destination_surface->width); ++ix)
 		{
-			unsigned char alpha_int = glyph->pixels[iy * glyph->width + ix];
+			const unsigned char alpha_int = glyph->pixels[iy * glyph->width + ix];
 
 			if (alpha_int != 0)
 			{
-				float alpha = alpha_int / 255.0f;
+				const float alpha = alpha_int / 255.0f;
 
 				unsigned char *bitmap_pixel = glyph_destination_surface->pixels + (y + iy) * glyph_destination_surface->pitch + (x + ix) * 3;
 
