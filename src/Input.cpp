@@ -87,7 +87,11 @@ BOOL FindAndOpenDirectInputDevice(HWND hWnd)
 
 	directinput_objects.lpDI->AddRef();
 
+#if defined(_MSC_VER) && _MSC_VER >= 1500
+	lpDI->EnumDevices(DI8DEVTYPE_JOYSTICK, EnumDevices_Callback, &directinput_objects, DIEDFL_ATTACHEDONLY);
+#else
 	lpDI->EnumDevices(DIDEVTYPE_JOYSTICK, EnumDevices_Callback, &directinput_objects, DIEDFL_ATTACHEDONLY);
+#endif
 
 	if (directinput_objects.lpDI != NULL)
 	{
