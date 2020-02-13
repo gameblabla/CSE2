@@ -477,13 +477,6 @@ if(NOT FORCE_LOCAL_LIBS)
 	find_package(SDL2)
 endif()
 
-# Enable OpenMP if available
-find_package(OpenMP)
-if (OpenMP_CXX_FOUND)
-	target_link_libraries(CSE2 OpenMP::OpenMP_CXX)
-	target_compile_definitions(CSE2 PRIVATE USE_OPENMP)
-endif()
-
 if(TARGET SDL2::SDL2)
 	# CMake-generated config (Arch, vcpkg, Raspbian)
 	message(STATUS "Using system SDL2")
