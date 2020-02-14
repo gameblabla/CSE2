@@ -16,8 +16,6 @@
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define CLAMP(x, y, z) MIN(MAX((x), (y)), (z))
 
-#else
-#define ATTR_HOT
 struct AudioBackend_Sound
 {
 	unsigned char *samples;
