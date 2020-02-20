@@ -145,7 +145,7 @@ void SetFramePosition(int fx, int fy)
 	else
 	{
 		// Widescreen/tallscreen-safe behaviour
-		if (map_w * 16 < WINDOW_WIDTH)
+		if ((map_w - 1) * 16 < WINDOW_WIDTH)
 		{
 			gFrame.x = -(((WINDOW_WIDTH - ((map_w - 1) * 16)) * 0x200) / 2);
 		}
@@ -158,7 +158,7 @@ void SetFramePosition(int fx, int fy)
 				gFrame.x = (((map_w - 1) * 16) - WINDOW_WIDTH) * 0x200;
 		}
 
-		if (map_l * 16 < WINDOW_HEIGHT)
+		if ((map_l - 1) * 16 < WINDOW_HEIGHT)
 		{
 			gFrame.y = -(((WINDOW_HEIGHT - ((map_l - 1) * 16)) * 0x200) / 2);
 		}
@@ -219,7 +219,7 @@ void SetFrameMyChar(void)
 	else
 	{
 		// Widescreen/tallscreen-safe behaviour
-		if (map_w * 16 < WINDOW_WIDTH)
+		if ((map_w - 1) * 16 < WINDOW_WIDTH)
 		{
 			gFrame.x = -(((WINDOW_WIDTH - ((map_w - 1) * 16)) * 0x200) / 2);
 		}
@@ -232,7 +232,7 @@ void SetFrameMyChar(void)
 				gFrame.x = (((map_w - 1) * 16) - WINDOW_WIDTH) * 0x200;
 		}
 
-		if (map_l * 16 < WINDOW_HEIGHT)
+		if ((map_l - 1) * 16 < WINDOW_HEIGHT)
 		{
 			gFrame.y = -(((WINDOW_HEIGHT - ((map_l - 1) * 16)) * 0x200) / 2);
 		}
