@@ -177,31 +177,29 @@ BOOL AudioBackend_Init(void)
 	config.playback.channels = 2;
 	config.sampleRate = 44100;
 	config.dataCallback = Callback;
-	//config.pUserData = NULL;
+	config.pUserData = NULL;
 
 	output_frequency = 44100;
 
-	if (ma_device_init(NULL, &config, &device) != MA_SUCCESS)
+	if (ma_device_init(NULL, &config, &device) == MA_SUCCESS)
 	{
-		printf("Fail\n");
-		return FALSE;
+		if (ma_mutex_init(device.pContext, &mutex) == MA_SUCCESS)
+		{
+			if (ma_mutex_init(device.pContext, &organya_mutex) == MA_SUCCESS)
+			{
+				if (ma_device_start(&device) == MA_SUCCESS)
+					return TRUE;
+
+				ma_mutex_uninit(&organya_mutex);
+			}
+
+			ma_mutex_uninit(&mutex);
+		}
+
+		ma_device_uninit(&device);
 	}
 
-	if (ma_mutex_init(device.pContext, &mutex) != MA_SUCCESS)
-	{
-		printf("Fail2\n");
-		return FALSE;
-	}
-
-	if (ma_mutex_init(device.pContext, &organya_mutex) != MA_SUCCESS)
-	{
-		printf("Fail3\n");
-		return FALSE;
-	}
-
-	ma_device_start(&device);
-
-	return TRUE;
+	return FALSE;
 }
 
 void AudioBackend_Deinit(void)
