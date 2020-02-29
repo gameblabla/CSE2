@@ -8,6 +8,7 @@ ASSETS_DIRECTORY = assets
 # Default options
 FIX_BUGS = 1
 RENDERER = SDLTexture
+AUDIO_BACKEND = SDL2
 
 ALL_CFLAGS = $(CFLAGS)
 ALL_CXXFLAGS = $(CXXFLAGS)
@@ -166,8 +167,7 @@ SOURCES = \
   src/Star.cpp \
   src/TextScr.cpp \
   src/Triangle.cpp \
-  src/ValueView.cpp \
-  src/Backends/Audio/SDL2.cpp
+  src/ValueView.cpp
 
 ifneq (,$(filter 1,$(AUDIO_OGG)$(AUDIO_FLAC) $(AUDIO_TRACKER) $(AUDIO_PXTONE)))
   SOURCES += \
@@ -275,6 +275,15 @@ else ifeq ($(RENDERER), Software)
   SOURCES += src/Backends/Rendering/Software.cpp
 else
   $(error Invalid RENDERER selected)
+endif
+
+ifeq ($(AUDIO_BACKEND), SDL2)
+  SOURCES += src/Backends/Audio/SDL2.cpp
+else ifeq ($(AUDIO_BACKEND), miniaudio)
+  SOURCES += src/Backends/Audio/miniaudio.cpp
+  CSE2_LIBS += -ldl -lm -lpthread
+else
+  $(error Invalid AUDIO_BACKEND selected)
 endif
 
 OBJECTS = $(addprefix obj/$(FILENAME)/, $(addsuffix .o, $(SOURCES)))

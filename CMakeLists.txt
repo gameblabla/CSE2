@@ -14,6 +14,7 @@ option(JAPANESE "Enable the Japanese-language build" OFF)
 option(FIX_BUGS "Fix various bugs in the game" ON)
 option(DEBUG_SAVE "Re-enable the ability to drag-and-drop save files onto the window" OFF)
 set(RENDERER "SDLTexture" CACHE STRING "Which renderer the game should use: 'OpenGL3' for an OpenGL 3.2 renderer, 'OpenGLES2' for an OpenGL ES 2.0 renderer, 'SDLTexture' for SDL2's hardware-accelerated Texture API, or 'Software' for a handwritten software renderer")
+set(AUDIO_BACKEND "SDL2" CACHE STRING "Which audio backend the game should use: 'SDL2' or 'miniaudio'")
 option(AUDIO_OGG "Enable support for Ogg Vorbis music/SFX" OFF)
 option(AUDIO_FLAC "Enable support for FLAC music/SFX" OFF)
 option(AUDIO_TRACKER "Enable support for .it, .xm, .mod, .s3m music/SFX" OFF)
@@ -209,7 +210,6 @@ add_executable(CSE2
 	src/ValueView.h
 	src/WindowsWrapper.h
 	src/Backends/Rendering.h
-	src/Backends/Audio/SDL2.cpp
 	src/Backends/Audio.h
 )
 
@@ -411,6 +411,29 @@ if(AUDIO_PXTONE)
 	target_compile_definitions(CSE2 PRIVATE USE_PXTONE)
 endif()
 
+if(AUDIO_BACKEND MATCHES "SDL2")
+	target_sources(CSE2 PRIVATE "src/Backends/Audio/SDL2.cpp")
+elseif(AUDIO_BACKEND MATCHES "miniaudio")
+	target_sources(CSE2 PRIVATE "src/Backends/Audio/miniaudio.cpp")
+
+	# Link libdl, libm, and libpthread
+	include(CheckLibraryExists)
+
+	check_library_exists(m pow "" LIBM)
+	if(LIBM)
+		target_link_libraries(CSE2 PRIVATE m)
+	endif()
+
+	check_library_exists(pthread pthread_create "" LIBPTHREAD)
+	if(LIBPTHREAD)
+		target_link_libraries(CSE2 PRIVATE pthread)
+	endif()
+
+	target_link_libraries(CSE2 PRIVATE ${CMAKE_DL_LIBS})
+else()
+	message(FATAL_ERROR "Invalid AUDIO_BACKEND selected")
+endif()
+
 # Make some tweaks if we're targetting Windows
 if(WIN32)
 	target_sources(CSE2 PRIVATE "${ASSETS_DIRECTORY}/resources/CSE2.rc")
@@ -531,16 +554,16 @@ endif()
 if(TARGET SDL2::SDL2)
 	# CMake-generated config (Arch, vcpkg, Raspbian)
 	message(STATUS "Using system SDL2")
-	target_link_libraries(CSE2 SDL2::SDL2 SDL2::SDL2main)
+	target_link_libraries(CSE2 PRIVATE SDL2::SDL2 SDL2::SDL2main)
 elseif(TARGET SDL2::SDL2-static)
 	# CMake-generated config (Arch, vcpkg, Raspbian)
 	message(STATUS "Using system SDL2")
-	target_link_libraries(CSE2 SDL2::SDL2-static SDL2::SDL2main)
+	target_link_libraries(CSE2 PRIVATE SDL2::SDL2-static SDL2::SDL2main)
 elseif(SDL2_FOUND)
 	# Autotools-generated config (MSYS2)
 	message(STATUS "Using system SDL2")
 	target_include_directories(CSE2 PRIVATE ${SDL2_INCLUDE_DIRS})
-	target_link_libraries(CSE2 ${SDL2_LIBRARIES})
+	target_link_libraries(CSE2 PRIVATE ${SDL2_LIBRARIES})
 else()
 	# Compile it ourselves
 	message(STATUS "Using local SDL2")
@@ -549,7 +572,7 @@ else()
 		set(LIBC ON)	# Needed to prevent possible 'symbol already defined' errors
 	endif()
 	add_subdirectory("external/SDL2" EXCLUDE_FROM_ALL)
-	target_link_libraries(CSE2 SDL2-static SDL2main)
+	target_link_libraries(CSE2 PRIVATE SDL2-static SDL2main)
 endif()
 
 if(NOT FORCE_LOCAL_LIBS)
@@ -559,7 +582,7 @@ endif()
 if(FREETYPE_FOUND)
 	message(STATUS "Using system FreeType")
 	target_include_directories(CSE2 PRIVATE ${FREETYPE_INCLUDE_DIRS})
-	target_link_libraries(CSE2 ${FREETYPE_LIBRARIES})
+	target_link_libraries(CSE2 PRIVATE ${FREETYPE_LIBRARIES})
 else()
 	# Compile it ourselves
 	message(STATUS "Using local FreeType")
@@ -570,7 +593,7 @@ else()
 		set(CMAKE_DISABLE_FIND_PACKAGE_BZip2 ON)
 	endif()
 	add_subdirectory("external/freetype" EXCLUDE_FROM_ALL)
-	target_link_libraries(CSE2 freetype)
+	target_link_libraries(CSE2 PRIVATE freetype)
 endif()
 
 if(RENDERER MATCHES "OpenGL3")
@@ -578,13 +601,13 @@ if(RENDERER MATCHES "OpenGL3")
 	target_include_directories(CSE2 PRIVATE "external/glad/include")
 
 	find_package(OpenGL REQUIRED)
-	target_link_libraries(CSE2 OpenGL::GL ${CMAKE_DL_LIBS})
+	target_link_libraries(CSE2 PRIVATE OpenGL::GL ${CMAKE_DL_LIBS})
 endif()
 
 if(RENDERER MATCHES "OpenGLES2")
 	find_package(OpenGLES2 REQUIRED)
 	target_include_directories(CSE2 PRIVATE ${OPENGLES2_INCLUDE_DIR})
-	target_link_libraries(CSE2 ${OPENGLES2_LIBRARIES})
+	target_link_libraries(CSE2 PRIVATE ${OPENGLES2_LIBRARIES})
 endif()
 
 if(AUDIO_TRACKER)

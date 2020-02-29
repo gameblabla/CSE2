@@ -93,6 +93,8 @@ Name | Function
 `-DRENDERER=OpenGLES2` | Use the hardware-accelerated OpenGL ES 2.0 renderer
 `-DRENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default)
 `-DRENDERER=Software` | Use the handwritten software renderer
+`-DAUDIO_BACKEND=SDL2` | Use the SDL2-driven software audio-mixer
+`-DAUDIO_BACKEND=miniaudio` | Use the miniaudio-driven software audio-mixer
 `-DAUDIO_OGG=ON` | Enable support for Ogg Vorbis music/SFX
 `-DAUDIO_FLAC=ON` | Enable support for FLAC music/SFX
 `-DAUDIO_TRACKER=ON` | Enable support for .it, .xm, .mod, .s3m music/SFX
@@ -132,6 +134,8 @@ Name | Function
 `RENDERER=OpenGLES2` | Use the hardware-accelerated OpenGL ES 2.0 renderer
 `RENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default)
 `RENDERER=Software` | Use the hand-written software renderer
+`AUDIO_BACKEND=SDL2` | Use the SDL2-driven software audio-mixer
+`AUDIO_BACKEND=miniaudio` | Use the miniaudio-driven software audio-mixer
 `AUDIO_OGG=1` | Enable support for Ogg Vorbis music/SFX
 `AUDIO_FLAC=1` | Enable support for FLAC music/SFX
 `AUDIO_TRACKER=1` | Enable support for .it, .xm, .mod, .s3m music/SFX
