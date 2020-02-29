@@ -89,6 +89,7 @@ Name | Function
 `-DJAPANESE=ON` | Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
 `-DFIX_BUGS=ON` | Enabled by default - Fix various bugs in the game
 `-DDEBUG_SAVE=ON` | Re-enable the ability to drag-and-drop save files onto the window
+<<<<<<< HEAD
 `-DRENDERER=OpenGL3` | Use the hardware-accelerated OpenGL 3.2 renderer
 `-DRENDERER=OpenGLES2` | Use the hardware-accelerated OpenGL ES 2.0 renderer
 `-DRENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default)
@@ -99,6 +100,15 @@ Name | Function
 `-DAUDIO_FLAC=ON` | Enable support for FLAC music/SFX
 `-DAUDIO_TRACKER=ON` | Enable support for .it, .xm, .mod, .s3m music/SFX
 `-DAUDIO_PXTONE=ON` | Enable support for PxTone music/SFX (not to be confused with PixTone)
+=======
+`-DBACKEND_RENDERER=OpenGL3` | Use the hardware-accelerated OpenGL 3.2 renderer
+`-DBACKEND_RENDERER=OpenGLES2` | Use the hardware-accelerated OpenGL ES 2.0 renderer
+`-DBACKEND_RENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default)
+`-DBACKEND_RENDERER=SDLSurface` | Use the software-rendered SDL2 Surface API renderer
+`-DBACKEND_RENDERER=Software` | Use the handwritten software renderer
+`-DBACKEND_AUDIO=SDL2` | Use the SDL2-driven software audio-mixer
+`-DBACKEND_AUDIO=miniaudio` | Use the miniaudio-driven software audio-mixer
+>>>>>>> portable
 `-DWARNINGS=ON` | Enable common compiler warnings (for GCC-compatible compilers and MSVC only)
 `-DWARNINGS_ALL=ON` | Enable ALL compiler warnings (for Clang and MSVC only)
 `-DWARNINGS_FATAL=ON` | Stop compilation on any compiler warning (for GCC-compatible compilers and MSVC only)
@@ -130,6 +140,7 @@ Name | Function
 `FIX_BUGS=1` | Enabled by default - Fix various bugs in the game
 `WINDOWS=1` | Build for Windows
 `DEBUG_SAVE=1` | Re-enable the ability to drag-and-drop save files onto the window
+<<<<<<< HEAD
 `RENDERER=OpenGL3` | Use the hardware-accelerated OpenGL 3.2 renderer
 `RENDERER=OpenGLES2` | Use the hardware-accelerated OpenGL ES 2.0 renderer
 `RENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default)
@@ -140,6 +151,15 @@ Name | Function
 `AUDIO_FLAC=1` | Enable support for FLAC music/SFX
 `AUDIO_TRACKER=1` | Enable support for .it, .xm, .mod, .s3m music/SFX
 `AUDIO_PXTONE=1` | Enable support for PxTone music/SFX (not to be confused with PixTone)
+=======
+`BACKEND_RENDERER=OpenGL3` | Use the hardware-accelerated OpenGL 3.2 renderer
+`BACKEND_RENDERER=OpenGLES2` | Use the hardware-accelerated OpenGL ES 2.0 renderer
+`BACKEND_RENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default)
+`BACKEND_RENDERER=SDLSurface` | Use the software-rendered SDL2 Surface API renderer
+`BACKEND_RENDERER=Software` | Use the hand-written software renderer
+`BACKEND_AUDIO=SDL2` | Use the SDL2-driven software audio-mixer
+`BACKEND_AUDIO=miniaudio` | Use the miniaudio-driven software audio-mixer
+>>>>>>> portable
 `WARNINGS=1` | Enable common compiler warnings
 `WARNINGS_ALL=1` | Enable ALL compiler warnings (Clang only)
 `WARNINGS_FATAL=1` | Make all compiler warnings errors

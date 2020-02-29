@@ -13,8 +13,8 @@ set(ASSETS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/assets")
 option(JAPANESE "Enable the Japanese-language build" OFF)
 option(FIX_BUGS "Fix various bugs in the game" ON)
 option(DEBUG_SAVE "Re-enable the ability to drag-and-drop save files onto the window" OFF)
-set(RENDERER "SDLTexture" CACHE STRING "Which renderer the game should use: 'OpenGL3' for an OpenGL 3.2 renderer, 'OpenGLES2' for an OpenGL ES 2.0 renderer, 'SDLTexture' for SDL2's hardware-accelerated Texture API, or 'Software' for a handwritten software renderer")
-set(AUDIO_BACKEND "SDL2" CACHE STRING "Which audio backend the game should use: 'SDL2' or 'miniaudio'")
+set(BACKEND_RENDERER "SDLTexture" CACHE STRING "Which renderer the game should use: 'OpenGL3' for an OpenGL 3.2 renderer, 'OpenGLES2' for an OpenGL ES 2.0 renderer, 'SDLTexture' for SDL2's hardware-accelerated Texture API, or 'Software' for a handwritten software renderer")
+set(BACKEND_AUDIO "SDL2" CACHE STRING "Which audio backend the game should use: 'SDL2' or 'miniaudio'")
 option(AUDIO_OGG "Enable support for Ogg Vorbis music/SFX" OFF)
 option(AUDIO_FLAC "Enable support for FLAC music/SFX" OFF)
 option(AUDIO_TRACKER "Enable support for .it, .xm, .mod, .s3m music/SFX" OFF)
@@ -294,16 +294,39 @@ if(WARNINGS_FATAL)
 	endif()
 endif()
 
-if(RENDERER MATCHES "OpenGL3")
+if(BACKEND_RENDERER MATCHES "OpenGL3")
 	target_sources(CSE2 PRIVATE "src/Backends/Rendering/OpenGL3.cpp")
-elseif(RENDERER MATCHES "OpenGLES2")
+elseif(BACKEND_RENDERER MATCHES "OpenGLES2")
 	target_sources(CSE2 PRIVATE "src/Backends/Rendering/OpenGLES2.cpp")
-elseif(RENDERER MATCHES "SDLTexture")
+elseif(BACKEND_RENDERER MATCHES "SDLTexture")
 	target_sources(CSE2 PRIVATE "src/Backends/Rendering/SDLTexture.cpp")
-elseif(RENDERER MATCHES "Software")
+elseif(BACKEND_RENDERER MATCHES "Software")
 	target_sources(CSE2 PRIVATE "src/Backends/Rendering/Software.cpp")
 else()
-	message(FATAL_ERROR "Invalid RENDERER selected")
+	message(FATAL_ERROR "Invalid BACKEND_RENDERER selected")
+endif()
+
+if(BACKEND_AUDIO MATCHES "SDL2")
+	target_sources(CSE2 PRIVATE "src/Backends/Audio/SDL2.cpp")
+elseif(BACKEND_AUDIO MATCHES "miniaudio")
+	target_sources(CSE2 PRIVATE "src/Backends/Audio/miniaudio.cpp")
+
+	# Link libdl, libm, and libpthread
+	include(CheckLibraryExists)
+
+	check_library_exists(m pow "" LIBM)
+	if(LIBM)
+		target_link_libraries(CSE2 PRIVATE m)
+	endif()
+
+	check_library_exists(pthread pthread_create "" LIBPTHREAD)
+	if(LIBPTHREAD)
+		target_link_libraries(CSE2 PRIVATE pthread)
+	endif()
+
+	target_link_libraries(CSE2 PRIVATE ${CMAKE_DL_LIBS})
+else()
+	message(FATAL_ERROR "Invalid BACKEND_AUDIO selected")
 endif()
 
 if(AUDIO_OGG OR AUDIO_FLAC OR AUDIO_TRACKER OR AUDIO_PXTONE)
@@ -409,29 +432,6 @@ if(AUDIO_PXTONE)
 	)
 
 	target_compile_definitions(CSE2 PRIVATE USE_PXTONE)
-endif()
-
-if(AUDIO_BACKEND MATCHES "SDL2")
-	target_sources(CSE2 PRIVATE "src/Backends/Audio/SDL2.cpp")
-elseif(AUDIO_BACKEND MATCHES "miniaudio")
-	target_sources(CSE2 PRIVATE "src/Backends/Audio/miniaudio.cpp")
-
-	# Link libdl, libm, and libpthread
-	include(CheckLibraryExists)
-
-	check_library_exists(m pow "" LIBM)
-	if(LIBM)
-		target_link_libraries(CSE2 PRIVATE m)
-	endif()
-
-	check_library_exists(pthread pthread_create "" LIBPTHREAD)
-	if(LIBPTHREAD)
-		target_link_libraries(CSE2 PRIVATE pthread)
-	endif()
-
-	target_link_libraries(CSE2 PRIVATE ${CMAKE_DL_LIBS})
-else()
-	message(FATAL_ERROR "Invalid AUDIO_BACKEND selected")
 endif()
 
 # Make some tweaks if we're targetting Windows
@@ -596,7 +596,7 @@ else()
 	target_link_libraries(CSE2 PRIVATE freetype)
 endif()
 
-if(RENDERER MATCHES "OpenGL3")
+if(BACKEND_RENDERER MATCHES "OpenGL3")
 	target_sources(CSE2 PRIVATE "external/glad/src/glad.c" "external/glad/include/glad/glad.h" "external/glad/include/KHR/khrplatform.h")
 	target_include_directories(CSE2 PRIVATE "external/glad/include")
 
@@ -604,7 +604,7 @@ if(RENDERER MATCHES "OpenGL3")
 	target_link_libraries(CSE2 PRIVATE OpenGL::GL ${CMAKE_DL_LIBS})
 endif()
 
-if(RENDERER MATCHES "OpenGLES2")
+if(BACKEND_RENDERER MATCHES "OpenGLES2")
 	find_package(OpenGLES2 REQUIRED)
 	target_include_directories(CSE2 PRIVATE ${OPENGLES2_INCLUDE_DIR})
 	target_link_libraries(CSE2 PRIVATE ${OPENGLES2_LIBRARIES})

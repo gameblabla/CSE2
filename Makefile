@@ -7,8 +7,8 @@ ASSETS_DIRECTORY = assets
 
 # Default options
 FIX_BUGS = 1
-RENDERER = SDLTexture
-AUDIO_BACKEND = SDL2
+BACKEND_RENDERER = SDLTexture
+BACKEND_AUDIO = SDL2
 
 ALL_CFLAGS = $(CFLAGS)
 ALL_CXXFLAGS = $(CXXFLAGS)
@@ -254,7 +254,7 @@ ifneq ($(WINDOWS), 1)
   RESOURCES += ICON/ICON_MINI.png
 endif
 
-ifeq ($(RENDERER), OpenGL3)
+ifeq ($(BACKEND_RENDERER), OpenGL3)
   SOURCES += src/Backends/Rendering/OpenGL3.cpp external/glad/src/glad.c
   CSE2_CFLAGS += -Iexternal/glad/include
   CSE2_CXXFLAGS += -Iexternal/glad/include
@@ -264,26 +264,26 @@ ifeq ($(RENDERER), OpenGL3)
   else
     CSE2_LIBS += -lGL -ldl
   endif
-else ifeq ($(RENDERER), OpenGLES2)
+else ifeq ($(BACKEND_RENDERER), OpenGLES2)
   SOURCES += src/Backends/Rendering/OpenGLES2.cpp
   CSE2_CFLAGS += $(shell $(PKGCONFIG) --cflags glesv2)
   CSE2_CXXFLAGS += $(shell $(PKGCONFIG) --cflags glesv2)
   CSE2_LIBS += $(shell $(PKGCONFIG) --libs glesv2)
-else ifeq ($(RENDERER), SDLTexture)
+else ifeq ($(BACKEND_RENDERER), SDLTexture)
   SOURCES += src/Backends/Rendering/SDLTexture.cpp
-else ifeq ($(RENDERER), Software)
+else ifeq ($(BACKEND_RENDERER), Software)
   SOURCES += src/Backends/Rendering/Software.cpp
 else
-  $(error Invalid RENDERER selected)
+  $(error Invalid BACKEND_RENDERER selected)
 endif
 
-ifeq ($(AUDIO_BACKEND), SDL2)
+ifeq ($(BACKEND_AUDIO), SDL2)
   SOURCES += src/Backends/Audio/SDL2.cpp
-else ifeq ($(AUDIO_BACKEND), miniaudio)
+else ifeq ($(BACKEND_AUDIO), miniaudio)
   SOURCES += src/Backends/Audio/miniaudio.cpp
   CSE2_LIBS += -ldl -lm -lpthread
 else
-  $(error Invalid AUDIO_BACKEND selected)
+  $(error Invalid BACKEND_AUDIO selected)
 endif
 
 OBJECTS = $(addprefix obj/$(FILENAME)/, $(addsuffix .o, $(SOURCES)))
