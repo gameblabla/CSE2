@@ -14,7 +14,7 @@ option(JAPANESE "Enable the Japanese-language build (instead of the unofficial A
 option(FIX_BUGS "Fix various bugs in the game" OFF)
 option(DEBUG_SAVE "Re-enable the ability to drag-and-drop save files onto the window" OFF)
 set(RENDERER "SDLTexture" CACHE STRING "Which renderer the game should use: 'OpenGL3' for an OpenGL 3.2 renderer, 'OpenGLES2' for an OpenGL ES 2.0 renderer, 'SDLTexture' for SDL2's hardware-accelerated Texture API, 'SDLSurface' for SDL2's software-rendered Surface API, or 'Software' for a handwritten software renderer")
-set(AUDIO_BACKEND "SDL2" CACHE STRING "Which audio backend the game should use: 'SDL2', 'miniaudio'")
+set(AUDIO_BACKEND "SDL2" CACHE STRING "Which audio backend the game should use: 'SDL2' or 'miniaudio'")
 
 option(LTO "Enable link-time optimisation" OFF)
 option(NATIVE_OPTIMIZATIONS "Enable processor-specific optimisations (executable might not work on other architectures) (GCC-compatible compilers only)" OFF)
