@@ -364,6 +364,21 @@ if(AUDIO_BACKEND MATCHES "SDL2")
 	target_sources(CSE2 PRIVATE "src/Backends/Audio/SDL2.cpp")
 elseif(AUDIO_BACKEND MATCHES "miniaudio")
 	target_sources(CSE2 PRIVATE "src/Backends/Audio/miniaudio.cpp")
+
+	# Link libdl, libm, and libpthread
+	include(CheckLibraryExists)
+
+	check_library_exists(m pow "" LIBM)
+	if(LIBM)
+		target_link_libraries(CSE2 PRIVATE m)
+	endif()
+
+	check_library_exists(pthread pthread_create "" LIBPTHREAD)
+	if(LIBPTHREAD)
+		target_link_libraries(CSE2 PRIVATE pthread)
+	endif()
+
+	target_link_libraries(CSE2 PRIVATE ${CMAKE_DL_LIBS})
 else()
 	message(FATAL_ERROR "Invalid AUDIO_BACKEND selected")
 endif()
