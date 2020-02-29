@@ -70,6 +70,8 @@ Name | Function
 `-DRENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default)
 `-DRENDERER=SDLSurface` | Use the software-rendered SDL2 Surface API renderer
 `-DRENDERER=Software` | Use the handwritten software renderer
+`-DAUDIO_BACKEND=SDL2` | Use the SDL2-driven software audio-mixer
+`-DAUDIO_BACKEND=miniaudio` | Use the miniaudio-driven software audio-mixer
 `-DWARNINGS=ON` | Enable common compiler warnings (for GCC-compatible compilers and MSVC only)
 `-DWARNINGS_ALL=ON` | Enable ALL compiler warnings (for Clang and MSVC only)
 `-DWARNINGS_FATAL=ON` | Stop compilation on any compiler warning (for GCC-compatible compilers and MSVC only)
@@ -106,6 +108,8 @@ Name | Function
 `RENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default)
 `RENDERER=SDLSurface` | Use the software-rendered SDL2 Surface API renderer
 `RENDERER=Software` | Use the hand-written software renderer
+`AUDIO_BACKEND=SDL2` | Use the SDL2-driven software audio-mixer
+`AUDIO_BACKEND=miniaudio` | Use the miniaudio-driven software audio-mixer
 `WARNINGS=1` | Enable common compiler warnings
 `WARNINGS_ALL=1` | Enable ALL compiler warnings (Clang only)
 `WARNINGS_FATAL=1` | Make all compiler warnings errors
