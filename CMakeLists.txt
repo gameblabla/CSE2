@@ -14,6 +14,7 @@ option(JAPANESE "Enable the Japanese-language build (instead of the unofficial A
 option(FIX_BUGS "Fix various bugs in the game" OFF)
 option(DEBUG_SAVE "Re-enable the ability to drag-and-drop save files onto the window" OFF)
 set(RENDERER "SDLTexture" CACHE STRING "Which renderer the game should use: 'OpenGL3' for an OpenGL 3.2 renderer, 'OpenGLES2' for an OpenGL ES 2.0 renderer, 'SDLTexture' for SDL2's hardware-accelerated Texture API, 'SDLSurface' for SDL2's software-rendered Surface API, or 'Software' for a handwritten software renderer")
+set(AUDIO_BACKEND "SDL2" CACHE STRING "Which audio backend the game should use: 'SDL2', 'miniaudio'")
 
 option(LTO "Enable link-time optimisation" OFF)
 option(NATIVE_OPTIMIZATIONS "Enable processor-specific optimisations (executable might not work on other architectures) (GCC-compatible compilers only)" OFF)
@@ -201,7 +202,6 @@ add_executable(CSE2
 	src/ValueView.h
 	src/WindowsWrapper.h
 	src/Backends/Rendering.h
-	src/Backends/Audio/SDL2.cpp
 	src/Backends/Audio.h
 )
 
@@ -358,6 +358,14 @@ elseif(RENDERER MATCHES "Software")
 	target_sources(CSE2 PRIVATE "src/Backends/Rendering/Software.cpp")
 else()
 	message(FATAL_ERROR "Invalid RENDERER selected")
+endif()
+
+if(AUDIO_BACKEND MATCHES "SDL2")
+	target_sources(CSE2 PRIVATE "src/Backends/Audio/SDL2.cpp")
+elseif(AUDIO_BACKEND MATCHES "miniaudio")
+	target_sources(CSE2 PRIVATE "src/Backends/Audio/miniaudio.cpp")
+else()
+	message(FATAL_ERROR "Invalid AUDIO_BACKEND selected")
 endif()
 
 # Make some tweaks if we're targetting Windows
