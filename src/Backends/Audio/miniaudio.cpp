@@ -10,6 +10,9 @@
 #define MA_NO_DECODING
 #include "miniaudio.h"
 
+#ifdef EXTRA_SOUND_FORMATS
+#include "../../ExtraSoundFormats.h"
+#endif
 #include "../../Organya.h"
 #include "../../WindowsWrapper.h"
 
@@ -123,6 +126,10 @@ ATTR_HOT static void MixSounds(float *stream, unsigned int frames_total)
 	}
 
 	ma_mutex_unlock(&mutex);
+
+#ifdef EXTRA_SOUND_FORMATS
+	ExtraSound_Mix(stream, frames_total);
+#endif
 }
 
 static void Callback(ma_device *device, void *output_stream, const void *input_stream, ma_uint32 frames_total)
@@ -187,8 +194,16 @@ BOOL AudioBackend_Init(void)
 		{
 			if (ma_mutex_init(device.pContext, &organya_mutex) == MA_SUCCESS)
 			{
+			#ifdef EXTRA_SOUND_FORMATS
+				ExtraSound_Init(output_frequency);
+			#endif
+
 				if (ma_device_start(&device) == MA_SUCCESS)
 					return TRUE;
+
+			#ifdef EXTRA_SOUND_FORMATS
+				ExtraSound_Deinit();
+			#endif
 
 				ma_mutex_uninit(&organya_mutex);
 			}
@@ -205,6 +220,10 @@ BOOL AudioBackend_Init(void)
 void AudioBackend_Deinit(void)
 {
 	ma_device_stop(&device);
+
+#ifdef EXTRA_SOUND_FORMATS
+	ExtraSound_Deinit();
+#endif
 
 	ma_mutex_uninit(&organya_mutex);
 
