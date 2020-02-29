@@ -122,7 +122,7 @@ endif()
 if(FLTK_FOUND)
 	message(STATUS "Using system FLTK")
 	target_include_directories(DoConfig PRIVATE ${FLTK_INCLUDE_DIR})
-	target_link_libraries(DoConfig ${FLTK_LIBRARIES})
+	target_link_libraries(DoConfig PRIVATE ${FLTK_LIBRARIES})
 else()
 	# Compile it ourselves
 	message(STATUS "Using local FLTK")
@@ -139,7 +139,7 @@ else()
 	add_subdirectory("fltk" EXCLUDE_FROM_ALL)
 	get_target_property(DIRS fltk INCLUDE_DIRECTORIES)	# FLTK doesn't mark its includes as PUBLIC or INTERFACE, so we have to do this stupidity
 	target_include_directories(DoConfig PRIVATE ${DIRS})
-	target_link_libraries(DoConfig fltk)
+	target_link_libraries(DoConfig PRIVATE fltk)
 endif()
 
 # Enable link-time optimisation if available
