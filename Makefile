@@ -173,12 +173,15 @@ ifneq (,$(filter 1,$(AUDIO_OGG)$(AUDIO_FLAC) $(AUDIO_TRACKER) $(AUDIO_PXTONE)))
   SOURCES += \
     src/ExtraSoundFormats.cpp \
     external/clownaudio/decoder.c \
-    external/clownaudio/miniaudio.c \
     external/clownaudio/mixer.c \
     external/clownaudio/decoders/memory_file.c \
     external/clownaudio/decoders/misc_utilities.c \
     external/clownaudio/decoders/predecode.c \
     external/clownaudio/decoders/split.c
+
+  ifneq ($(BACKEND_AUDIO), miniaudio)
+    SOURCES += external/clownaudio/miniaudio.c
+  endif
 
   DEFINES += -DEXTRA_SOUND_FORMATS
 endif
