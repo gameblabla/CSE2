@@ -3,6 +3,7 @@
 #include "WindowsWrapper.h"
 
 #include "ArmsItem.h"
+#include "MyChar.h"
 #include "SelStage.h"
 #include "Stage.h"
 
@@ -29,6 +30,15 @@ typedef struct PROFILE
 	signed char permit_mapping[0x80];
 	char FLAG[4];
 	unsigned char flags[1000];
+
+	// Custom
+	char extra_code[0x10];
+	// <MIM
+	unsigned int MIMCurrentNum;
+	// <PHY
+	MYCHAR_PHYSICS physics_normal;
+	MYCHAR_PHYSICS physics_underwater;
+	int no_splash_or_air_limit_underwater;
 } PROFILE;
 
 BOOL IsProfile(void);

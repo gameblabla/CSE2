@@ -22,10 +22,12 @@
 #include "SelStage.h"
 #include "Stage.h"
 #include "Star.h"
+#include "TextScr.h"
 #include "ValueView.h"
 
 const char *gDefaultName = "Profile.dat";
 const char *gProfileCode = "Do041220";
+const char *gProfileCodeExtra = "CSE2E   20200304";
 
 BOOL IsProfile(void)
 {
@@ -81,6 +83,12 @@ BOOL SaveProfile(const char *name)
 	memcpy(profile.permitstage, gPermitStage, sizeof(profile.permitstage));
 	memcpy(profile.permit_mapping, gMapping, sizeof(profile.permit_mapping));
 	memcpy(profile.flags, gFlagNPC, sizeof(profile.flags));
+	// Custom
+	memcpy(profile.extra_code, gProfileCodeExtra, sizeof(profile.extra_code));
+	profile.MIMCurrentNum = gMIMCurrentNum;
+	profile.physics_normal = gMC.physics_normal;
+	profile.physics_underwater = gMC.physics_underwater;
+	profile.no_splash_or_air_limit_underwater = gMC.no_splash_or_air_limit_underwater;
 
 	// Write to file
 	fwrite(profile.code, 8, 1, fp);
@@ -116,6 +124,26 @@ BOOL SaveProfile(const char *name)
 	fwrite(profile.permit_mapping, 0x80, 1, fp);
 	fwrite(FLAG, 4, 1, fp);
 	fwrite(profile.flags, 1000, 1, fp);
+	// Custom
+	fwrite(gProfileCodeExtra, 0x10, 1, fp);
+	File_WriteLE32(profile.MIMCurrentNum, fp);
+	File_WriteLE32(profile.physics_normal.max_dash, fp);
+	File_WriteLE32(profile.physics_normal.max_move, fp);
+	File_WriteLE32(profile.physics_normal.gravity1, fp);
+	File_WriteLE32(profile.physics_normal.gravity2, fp);
+	File_WriteLE32(profile.physics_normal.dash1, fp);
+	File_WriteLE32(profile.physics_normal.dash2, fp);
+	File_WriteLE32(profile.physics_normal.resist, fp);
+	File_WriteLE32(profile.physics_normal.jump, fp);
+	File_WriteLE32(profile.physics_underwater.max_dash, fp);
+	File_WriteLE32(profile.physics_underwater.max_move, fp);
+	File_WriteLE32(profile.physics_underwater.gravity1, fp);
+	File_WriteLE32(profile.physics_underwater.gravity2, fp);
+	File_WriteLE32(profile.physics_underwater.dash1, fp);
+	File_WriteLE32(profile.physics_underwater.dash2, fp);
+	File_WriteLE32(profile.physics_underwater.resist, fp);
+	File_WriteLE32(profile.physics_underwater.jump, fp);
+	File_WriteLE32(profile.no_splash_or_air_limit_underwater, fp);
 
 	fclose(fp);
 	return TRUE;
@@ -184,6 +212,35 @@ BOOL LoadProfile(const char *name)
 	fread(profile.permit_mapping, 0x80, 1, fp);
 	fread(profile.FLAG, 4, 1, fp);
 	fread(profile.flags, 1000, 1, fp);
+
+	// Custom
+	fread(profile.extra_code, 0x10, 1, fp);
+
+	if (memcmp(profile.extra_code, gProfileCodeExtra, 0x10) == 0)
+	{
+		profile.MIMCurrentNum = File_ReadLE32(fp);
+
+		profile.physics_normal.max_dash = File_ReadLE32(fp);
+		profile.physics_normal.max_move = File_ReadLE32(fp);
+		profile.physics_normal.gravity1 = File_ReadLE32(fp);
+		profile.physics_normal.gravity2 = File_ReadLE32(fp);
+		profile.physics_normal.dash1 = File_ReadLE32(fp);
+		profile.physics_normal.dash2 = File_ReadLE32(fp);
+		profile.physics_normal.resist = File_ReadLE32(fp);
+		profile.physics_normal.jump = File_ReadLE32(fp);
+
+		profile.physics_underwater.max_dash = File_ReadLE32(fp);
+		profile.physics_underwater.max_move = File_ReadLE32(fp);
+		profile.physics_underwater.gravity1 = File_ReadLE32(fp);
+		profile.physics_underwater.gravity2 = File_ReadLE32(fp);
+		profile.physics_underwater.dash1 = File_ReadLE32(fp);
+		profile.physics_underwater.dash2 = File_ReadLE32(fp);
+		profile.physics_underwater.resist = File_ReadLE32(fp);
+		profile.physics_underwater.jump = File_ReadLE32(fp);
+
+		profile.no_splash_or_air_limit_underwater = File_ReadLE32(fp);
+	}
+
 	fclose(fp);
 
 	// Set things
@@ -220,6 +277,15 @@ BOOL LoadProfile(const char *name)
 	gMC.rect_arms.right = gMC.rect_arms.left + 24;
 	gMC.rect_arms.top = (gArmsData[gSelectedArms].code / 10) * 32;
 	gMC.rect_arms.bottom = gMC.rect_arms.top + 16;
+
+	// Custom
+	if (memcmp(profile.extra_code, gProfileCodeExtra, 0x10) == 0)
+	{
+		gMIMCurrentNum = profile.MIMCurrentNum;
+		gMC.physics_normal = profile.physics_normal;
+		gMC.physics_underwater = profile.physics_underwater;
+		gMC.no_splash_or_air_limit_underwater = profile.no_splash_or_air_limit_underwater;
+	}
 
 	// Reset stuff
 	ClearFade();
