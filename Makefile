@@ -284,7 +284,11 @@ ifeq ($(BACKEND_AUDIO), SDL2)
   SOURCES += src/Backends/Audio/SDL2.cpp
 else ifeq ($(BACKEND_AUDIO), miniaudio)
   SOURCES += src/Backends/Audio/miniaudio.cpp external/miniaudio.c
-  CSE2_LIBS += -ldl -lm -lpthread
+  CSE2_LIBS += -lm -lpthread
+
+  ifneq ($(WINDOWS), 1)
+    CSE2_LIBS += -ldl
+  endif
 else
   $(error Invalid BACKEND_AUDIO selected)
 endif
