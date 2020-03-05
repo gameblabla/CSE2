@@ -210,7 +210,7 @@ add_executable(CSE2
 	"src/ValueView.h"
 	"src/WindowsWrapper.h"
 	"src/Backends/Rendering.h"
-	"src/Backends/Audio.h
+	"src/Backends/Audio.h"
 )
 
 set(RESOURCES
