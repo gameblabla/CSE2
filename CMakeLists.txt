@@ -346,7 +346,7 @@ if(AUDIO_OGG OR AUDIO_FLAC OR AUDIO_TRACKER OR AUDIO_PXTONE)
 		"external/clownaudio/decoders/predecode.c"
 		"external/clownaudio/decoders/predecode.h"
 		"external/clownaudio/decoders/split.c"
-		"external/clownaudio/decoders/split.h
+		"external/clownaudio/decoders/split.h"
 	)
 
 	if(NOT BACKEND_AUDIO MATCHES "miniaudio")
@@ -620,11 +620,11 @@ if(AUDIO_TRACKER)
 
 	if(libxmp-lite_FOUND)
 		message(STATUS "Using system libxmp-lite")
-		target_link_libraries(CSE2 libxmp-lite)
+		target_link_libraries(CSE2 PRIVATE libxmp-lite)
 	else()
 		# Compile it ourselves
 		message(STATUS "Using local libxmp-lite")
 		add_subdirectory("external/libxmp-lite" EXCLUDE_FROM_ALL)
-		target_link_libraries(CSE2 libxmp-lite)
+		target_link_libraries(CSE2 PRIVATE libxmp-lite)
 	endif()
 endif()
