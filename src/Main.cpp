@@ -22,6 +22,23 @@
 #include "Sound.h"
 #include "Triangle.h"
 
+// Visual Studio 6 is missing these, so define them here just in case
+#ifndef VK_OEM_PLUS
+#define VK_OEM_PLUS 0xBB
+#endif
+
+#ifndef VK_OEM_COMMA
+#define VK_OEM_COMMA 0xBC
+#endif
+
+#ifndef VK_OEM_PERIOD
+#define VK_OEM_PERIOD 0xBE
+#endif
+
+#ifndef VK_OEM_2
+#define VK_OEM_2 0xBF
+#endif
+
 LRESULT __stdcall WindowProcedure(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 
 char gModulePath[MAX_PATH];
@@ -676,12 +693,12 @@ LRESULT __stdcall WindowProcedure(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lPa
 			switch (LOWORD(wParam))
 			{
 				case 40001:
-					if (DialogBoxParamA(ghInstance, "DLG_YESNO", hWnd, QuitDialog, (LPARAM)"Quit?") == 1)
+					if (DialogBoxParamA(ghInstance, "DLG_YESNO", hWnd, (DLGPROC)QuitDialog, (LPARAM)"Quit?") == 1)
 						PostMessageA(hWnd, WM_CLOSE, 0, 0);
 					break;
 
 				case 40002:
-					DialogBoxParamA(ghInstance, "DLG_ABOUT", hWnd, VersionDialog, 0);
+					DialogBoxParamA(ghInstance, "DLG_ABOUT", hWnd, (DLGPROC)VersionDialog, 0);
 					break;
 
 				case 40004:
@@ -690,11 +707,11 @@ LRESULT __stdcall WindowProcedure(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lPa
 					break;
 
 				case 40005:
-					DialogBoxParamA(ghInstance, "DLG_SAVE", hWnd, DebugSaveDialog, 0);
+					DialogBoxParamA(ghInstance, "DLG_SAVE", hWnd, (DLGPROC)DebugSaveDialog, 0);
 					break;
 
 				case 40007:
-					DialogBoxParamA(ghInstance, "DLG_MUTE", hWnd, DebugMuteDialog, 0);
+					DialogBoxParamA(ghInstance, "DLG_MUTE", hWnd, (DLGPROC)DebugMuteDialog, 0);
 					break;
 			}
 
