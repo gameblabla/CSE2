@@ -373,8 +373,6 @@ set_target_properties(CSE2 PROPERTIES
 # Dependencies #
 ################
 
-# Find dependencies
-
 if(NOT FORCE_LOCAL_LIBS)
 	find_package(SDL2)
 endif()
