@@ -19,10 +19,6 @@ ifeq ($(LTO), 1)
   ALL_CXXFLAGS += -flto
 endif
 
-ifeq ($(NATIVE_OPTIMIZATIONS), 1)
-  ALL_CXXFLAGS += -march=native
-endif
-
 ifeq ($(JAPANESE), 1)
   BUILD_DIRECTORY = game_japanese
 
@@ -37,31 +33,8 @@ ifeq ($(FIX_BUGS), 1)
   ALL_CXXFLAGS += -DFIX_BUGS
 endif
 
-ifeq ($(CONSOLE), 1)
-  ALL_CXXFLAGS += -mconsole
-else
-  ALL_CXXFLAGS += -mwindows
-endif
-
 ifeq ($(DEBUG_SAVE), 1)
   ALL_CXXFLAGS += -DDEBUG_SAVE
-endif
-
-ifeq ($(WARNINGS), 1)
-  ALL_CXXFLAGS += -Wall -Wextra -pedantic
-endif
-
-ifeq ($(WARNINGS_ALL), 1)
-  ifneq ($(findstring clang,$(CXX)),)
-    # Use Clang-specific flag -Weverything
-    ALL_CXXFLAGS += -Weverything
-  else
-    $(warning Couldn't activate all warnings (unsupported compiler))
-  endif
-endif
-
-ifeq ($(WARNINGS_FATAL), 1)
-  ALL_CXXFLAGS += -Werror
 endif
 
 ALL_CXXFLAGS += -std=c++98 -MMD -MP -MF $@.d

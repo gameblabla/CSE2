@@ -59,13 +59,9 @@ You can also add the following flags:
 Name | Function
 --------|--------
 `-DLTO=ON` | Enable link-time optimisation
-`-DNATIVE_OPTIMIZATIONS=ON` | Enable processor-specific optimisations (executable might not work on other architectures) (GCC-compatible compilers only)
 `-DJAPANESE=ON` | Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
 `-DFIX_BUGS=ON` | Fix various bugs in the game
 `-DDEBUG_SAVE=ON` | Re-enable the dummied-out 'Debug Save' option, and the ability to drag-and-drop save files onto the window
-`-DWARNINGS=ON` | Enable common compiler warnings (for GCC-compatible compilers and MSVC only)
-`-DWARNINGS_ALL=ON` | Enable ALL compiler warnings (for Clang and MSVC only)
-`-DWARNINGS_FATAL=ON` | Stop compilation on any compiler warning (for GCC-compatible compilers and MSVC only)
 
 You can pass your own compiler flags with `-DCMAKE_C_FLAGS` and `-DCMAKE_CXX_FLAGS`.
 
@@ -88,13 +84,9 @@ Name | Function
 `RELEASE=1` | Compile a release build (optimised, stripped, etc.)
 `STATIC=1` | Produce a statically-linked executable (so you don't need to bundle DLL files)
 `LTO=1` | Enable link-time optimisation
-`NATIVE_OPTIMIZATIONS=1` | Enable processor-specific optimisations (executable might not work on other architectures)
 `JAPANESE=1` | Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
 `FIX_BUGS=1` | Fix various bugs in the game
 `DEBUG_SAVE=1` | Re-enable the dummied-out 'Debug Save' option, and the ability to drag-and-drop save files onto the window
-`WARNINGS=1` | Enable common compiler warnings
-`WARNINGS_ALL=1` | Enable ALL compiler warnings (Clang only)
-`WARNINGS_FATAL=1` | Make all compiler warnings errors
 
 You can pass your own compiler flags by defining `CXXFLAGS`.
 
