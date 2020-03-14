@@ -58,11 +58,11 @@ You can also add the following flags:
 
 Name | Function
 --------|--------
-`-DLTO=ON` | Enable link-time optimisation
-`-DMSVC_LINK_STATIC_RUNTIME=ON | Link the static MSVC runtime library
 `-DJAPANESE=ON` | Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
 `-DFIX_BUGS=ON` | Fix various bugs in the game
 `-DDEBUG_SAVE=ON` | Re-enable the dummied-out 'Debug Save' option, and the ability to drag-and-drop save files onto the window
+`-DLTO=ON` | Enable link-time optimisation
+`-DMSVC_LINK_STATIC_RUNTIME=ON | Link the static MSVC runtime library
 
 You can pass your own compiler flags with `-DCMAKE_C_FLAGS` and `-DCMAKE_CXX_FLAGS`.
 
@@ -82,11 +82,11 @@ Run 'make' in this folder, preferably with some of the following settings:
 
 Name | Function
 --------|--------
-`RELEASE=1` | Compile a release build (optimised, stripped, etc.)
-`STATIC=1` | Produce a statically-linked executable (so you don't need to bundle DLL files)
 `JAPANESE=1` | Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
 `FIX_BUGS=1` | Fix various bugs in the game
 `DEBUG_SAVE=1` | Re-enable the dummied-out 'Debug Save' option, and the ability to drag-and-drop save files onto the window
+`RELEASE=1` | Compile a release build (optimised, stripped, etc.)
+`STATIC=1` | Produce a statically-linked executable (so you don't need to bundle DLL files)
 
 You can pass your own compiler flags by defining `CXXFLAGS`.
 
