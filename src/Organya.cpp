@@ -22,13 +22,6 @@
 
 #include "Sound.h"
 
-// Visual Studio 6 is missing this
-#ifdef _MSC_VER
-#ifndef DWORD_PTR
-#define DWORD_PTR DWORD
-#endif
-#endif
-
 #define PANDUMMY 0xFF
 #define VOLDUMMY 0xFF
 #define KEYDUMMY 0xFF

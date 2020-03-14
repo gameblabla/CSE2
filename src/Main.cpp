@@ -22,23 +22,6 @@
 #include "Sound.h"
 #include "Triangle.h"
 
-// Visual Studio 6 is missing these, so define them here just in case
-#ifndef VK_OEM_PLUS
-#define VK_OEM_PLUS 0xBB
-#endif
-
-#ifndef VK_OEM_COMMA
-#define VK_OEM_COMMA 0xBC
-#endif
-
-#ifndef VK_OEM_PERIOD
-#define VK_OEM_PERIOD 0xBE
-#endif
-
-#ifndef VK_OEM_2
-#define VK_OEM_2 0xBF
-#endif
-
 LRESULT __stdcall WindowProcedure(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 
 char gModulePath[MAX_PATH];
