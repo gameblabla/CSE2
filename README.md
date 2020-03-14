@@ -85,11 +85,9 @@ You can also add the following flags:
 Name | Function
 --------|--------
 `-DLTO=ON` | Enable link-time optimisation
-`-DNATIVE_OPTIMIZATIONS=ON` | Enable processor-specific optimisations (executable might not work on other architectures) (GCC-compatible compilers only)
 `-DJAPANESE=ON` | Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
 `-DFIX_BUGS=ON` | Enabled by default - Fix various bugs in the game
 `-DDEBUG_SAVE=ON` | Re-enable the ability to drag-and-drop save files onto the window
-<<<<<<< HEAD
 `-DRENDERER=OpenGL3` | Use the hardware-accelerated OpenGL 3.2 renderer
 `-DRENDERER=OpenGLES2` | Use the hardware-accelerated OpenGL ES 2.0 renderer
 `-DRENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default)
@@ -100,21 +98,11 @@ Name | Function
 `-DAUDIO_FLAC=ON` | Enable support for FLAC music/SFX
 `-DAUDIO_TRACKER=ON` | Enable support for .it, .xm, .mod, .s3m music/SFX
 `-DAUDIO_PXTONE=ON` | Enable support for PxTone music/SFX (not to be confused with PixTone)
-=======
-`-DBACKEND_RENDERER=OpenGL3` | Use the hardware-accelerated OpenGL 3.2 renderer
-`-DBACKEND_RENDERER=OpenGLES2` | Use the hardware-accelerated OpenGL ES 2.0 renderer
-`-DBACKEND_RENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default)
-`-DBACKEND_RENDERER=SDLSurface` | Use the software-rendered SDL2 Surface API renderer
-`-DBACKEND_RENDERER=Software` | Use the handwritten software renderer
-`-DBACKEND_AUDIO=SDL2` | Use the SDL2-driven software audio-mixer
-`-DBACKEND_AUDIO=miniaudio` | Use the miniaudio-driven software audio-mixer
->>>>>>> portable
-`-DWARNINGS=ON` | Enable common compiler warnings (for GCC-compatible compilers and MSVC only)
-`-DWARNINGS_ALL=ON` | Enable ALL compiler warnings (for Clang and MSVC only)
-`-DWARNINGS_FATAL=ON` | Stop compilation on any compiler warning (for GCC-compatible compilers and MSVC only)
-`-DFORCE_LOCAL_LIBS=ON` | Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones
+`-DFORCE_LOCAL_LIBS=ON` | Compile the built-in versions of SDL2 and FreeType instead of using the system-provided ones
 
-Then compile CSE2 with this command:
+You can pass your own compiler flags with `-DCMAKE_C_FLAGS` and `-DCMAKE_CXX_FLAGS`.
+
+You can then compile CSE2 with this command:
 
 ```
 cmake --build . --config Release
@@ -122,7 +110,7 @@ cmake --build . --config Release
 
 If you're a Visual Studio user, you can open the generated `CSE2.sln` file instead.
 
-Once built, the executables and assets can be found in the newly-generated `game` folder.
+Once built, the executables can be found in the `game_english`/`game_japanese` folder, depending on the selected language.
 
 ### Makefile
 
@@ -135,12 +123,10 @@ Name | Function
 `RELEASE=1` | Compile a release build (optimised, stripped, etc.)
 `STATIC=1` | Produce a statically-linked executable (good for Windows builds, so you don't need to bundle DLL files)
 `LTO=1` | Enable link-time optimisation
-`NATIVE_OPTIMIZATIONS=1` | Enable processor-specific optimisations (executable might not work on other architectures)
 `JAPANESE=1` | Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
 `FIX_BUGS=1` | Enabled by default - Fix various bugs in the game
 `WINDOWS=1` | Build for Windows
 `DEBUG_SAVE=1` | Re-enable the ability to drag-and-drop save files onto the window
-<<<<<<< HEAD
 `RENDERER=OpenGL3` | Use the hardware-accelerated OpenGL 3.2 renderer
 `RENDERER=OpenGLES2` | Use the hardware-accelerated OpenGL ES 2.0 renderer
 `RENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default)
@@ -151,18 +137,8 @@ Name | Function
 `AUDIO_FLAC=1` | Enable support for FLAC music/SFX
 `AUDIO_TRACKER=1` | Enable support for .it, .xm, .mod, .s3m music/SFX
 `AUDIO_PXTONE=1` | Enable support for PxTone music/SFX (not to be confused with PixTone)
-=======
-`BACKEND_RENDERER=OpenGL3` | Use the hardware-accelerated OpenGL 3.2 renderer
-`BACKEND_RENDERER=OpenGLES2` | Use the hardware-accelerated OpenGL ES 2.0 renderer
-`BACKEND_RENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default)
-`BACKEND_RENDERER=SDLSurface` | Use the software-rendered SDL2 Surface API renderer
-`BACKEND_RENDERER=Software` | Use the hand-written software renderer
-`BACKEND_AUDIO=SDL2` | Use the SDL2-driven software audio-mixer
-`BACKEND_AUDIO=miniaudio` | Use the miniaudio-driven software audio-mixer
->>>>>>> portable
-`WARNINGS=1` | Enable common compiler warnings
-`WARNINGS_ALL=1` | Enable ALL compiler warnings (Clang only)
-`WARNINGS_FATAL=1` | Make all compiler warnings errors
+
+You can pass your own compiler flags by defining `CXXFLAGS`.
 
 Once built, the executable can be found in the `game_english`/`game_japanese` folder, depending on the selected language.
 
