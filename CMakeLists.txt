@@ -196,10 +196,6 @@ else()
 	list(APPEND RESOURCES "FONT/LiberationMono.ttf")
 endif()
 
-if(NOT WIN32)
-	list(APPEND RESOURCES "ICON/ICON_MINI.png")
-endif()
-
 if(FIX_BUGS)
 	target_compile_definitions(CSE2 PRIVATE FIX_BUGS)
 endif()
@@ -386,6 +382,11 @@ if(MSVC)
 	target_compile_options(CSE2 PRIVATE "/utf-8")
 endif()
 
+# On Windows, we use native icons instead
+if(NOT WIN32)
+	list(APPEND RESOURCES "ICON/ICON_MINI.png")
+endif()
+
 
 ##################
 # Misc. settings #
@@ -425,23 +426,21 @@ set_target_properties(CSE2 PROPERTIES
 # Dependencies #
 ################
 
-# Find dependencies
-
 if(NOT FORCE_LOCAL_LIBS)
 #	find_package(SDL2)
 endif()
 
 if(TARGET SDL2::SDL2)
 	# CMake-generated config (Arch, vcpkg, Raspbian)
-	message(STATUS "Using system SDL2")
+	message(STATUS "Using system SDL2 (CMake, dynamic)")
 	target_link_libraries(CSE2 PRIVATE SDL2::SDL2 SDL2::SDL2main)
 elseif(TARGET SDL2::SDL2-static)
 	# CMake-generated config (Arch, vcpkg, Raspbian)
-	message(STATUS "Using system SDL2")
+	message(STATUS "Using system SDL2 (CMake, static)")
 	target_link_libraries(CSE2 PRIVATE SDL2::SDL2-static SDL2::SDL2main)
 elseif(SDL2_FOUND)
 	# Autotools-generated config (MSYS2)
-	message(STATUS "Using system SDL2")
+	message(STATUS "Using system SDL2 (Autotools)")
 	target_include_directories(CSE2 PRIVATE ${SDL2_INCLUDE_DIRS})
 	target_link_libraries(CSE2 PRIVATE ${SDL2_LIBRARIES})
 else()
@@ -521,9 +520,6 @@ ExternalProject_Add(bin2h
 	CMAKE_ARGS
 		-DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
 		-DCMAKE_BUILD_TYPE=Release
-		-DWARNINGS=${WARNINGS}
-		-DWARNINGS_ALL=${WARNINGS_ALL}
-		-DWARNINGS_FATAL=${WARNINGS_FATAL}
 	INSTALL_COMMAND
 		${CMAKE_COMMAND} --build . --config Release --target install
 )
