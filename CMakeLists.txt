@@ -250,10 +250,6 @@ else()
 	list(APPEND RESOURCES "BITMAP/pixel.bmp" "FONT/LiberationMono.ttf")
 endif()
 
-if(NOT WIN32)
-	list(APPEND RESOURCES "ICON/ICON_MINI.bmp")
-endif()
-
 if(FIX_BUGS)
 	target_compile_definitions(CSE2 PRIVATE FIX_BUGS)
 endif()
@@ -332,6 +328,11 @@ if(MSVC)
 
 	# Make it so source files are recognized as UTF-8 by MSVC
 	target_compile_options(CSE2 PRIVATE "/utf-8")
+endif()
+
+# On Windows, we use native icons instead
+if(NOT WIN32)
+	list(APPEND RESOURCES "ICON/ICON_MINI.bmp")
 endif()
 
 
@@ -452,9 +453,6 @@ ExternalProject_Add(bin2h
 	CMAKE_ARGS
 		-DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
 		-DCMAKE_BUILD_TYPE=Release
-		-DWARNINGS=${WARNINGS}
-		-DWARNINGS_ALL=${WARNINGS_ALL}
-		-DWARNINGS_FATAL=${WARNINGS_FATAL}
 	INSTALL_COMMAND
 		${CMAKE_COMMAND} --build . --config Release --target install
 )
