@@ -1,12 +1,4 @@
-cmake_minimum_required(VERSION 3.7.2)
-
-if((${CMAKE_VERSION} VERSION_EQUAL 3.9) OR (${CMAKE_VERSION} VERSION_GREATER 3.9))
-	cmake_policy(SET CMP0069 NEW)
-endif()
-
-if((${CMAKE_VERSION} VERSION_EQUAL 3.11) OR (${CMAKE_VERSION} VERSION_GREATER 3.11))
-	cmake_policy(SET CMP0072 NEW)
-endif()
+cmake_minimum_required(VERSION 3.12)
 
 set(ASSETS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/assets")
 
