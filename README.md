@@ -60,7 +60,6 @@ You can also add the following flags:
 
 Name | Function
 --------|--------
-`-DLTO=ON` | Enable link-time optimisation
 `-DJAPANESE=ON` | Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
 `-DFIX_BUGS=ON` | Fix various bugs in the game
 `-DDEBUG_SAVE=ON` | Re-enable the ability to drag-and-drop save files onto the window
@@ -71,6 +70,8 @@ Name | Function
 `-DBACKEND_RENDERER=Software` | Use the handwritten software renderer
 `-DBACKEND_AUDIO=SDL2` | Use the SDL2-driven software audio-mixer
 `-DBACKEND_AUDIO=miniaudio` | Use the miniaudio-driven software audio-mixer
+`-DLTO=ON` | Enable link-time optimisation
+`-DMSVC_LINK_STATIC_RUNTIME=ON | Link the static MSVC runtime library
 `-DFORCE_LOCAL_LIBS=ON` | Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones
 
 You can pass your own compiler flags with `-DCMAKE_C_FLAGS` and `-DCMAKE_CXX_FLAGS`.
@@ -93,11 +94,8 @@ Run 'make' in this folder, preferably with some of the following settings:
 
 Name | Function
 --------|--------
-`RELEASE=1` | Compile a release build (optimised, stripped, etc.)
-`STATIC=1` | Produce a statically-linked executable (good for Windows builds, so you don't need to bundle DLL files)
 `JAPANESE=1` | Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
 `FIX_BUGS=1` | Fix various bugs in the game
-`WINDOWS=1` | Build for Windows
 `DEBUG_SAVE=1` | Re-enable the ability to drag-and-drop save files onto the window
 `BACKEND_RENDERER=OpenGL3` | Use the hardware-accelerated OpenGL 3.2 renderer
 `BACKEND_RENDERER=OpenGLES2` | Use the hardware-accelerated OpenGL ES 2.0 renderer
@@ -106,6 +104,9 @@ Name | Function
 `BACKEND_RENDERER=Software` | Use the hand-written software renderer
 `BACKEND_AUDIO=SDL2` | Use the SDL2-driven software audio-mixer
 `BACKEND_AUDIO=miniaudio` | Use the miniaudio-driven software audio-mixer
+`RELEASE=1` | Compile a release build (optimised, stripped, etc.)
+`STATIC=1` | Produce a statically-linked executable (good for Windows builds, so you don't need to bundle DLL files)
+`WINDOWS=1` | Build for Windows
 
 You can pass your own compiler flags by defining `CXXFLAGS`.
 
