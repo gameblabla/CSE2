@@ -1,6 +1,16 @@
 cmake_minimum_required(VERSION 3.12)
 
+
+#############
+# Constants #
+#############
+
 set(ASSETS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/assets")
+
+
+###########
+# Options #
+###########
 
 option(JAPANESE "Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)" OFF)
 option(FIX_BUGS "Fix various bugs in the game" OFF)
@@ -13,26 +23,15 @@ option(MSVC_LINK_STATIC_RUNTIME "Link the static MSVC runtime library" OFF)
 
 option(FORCE_LOCAL_LIBS "Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones" OFF)
 
-list(APPEND CMAKE_MODULE_PATH
-	"${CMAKE_SOURCE_DIR}/cmake"
-)
+
+#########
+# Setup #
+#########
 
 project(CSE2 LANGUAGES C CXX)
 
-if(MSVC AND MSVC_LINK_STATIC_RUNTIME)
-	# Statically-link the CRT (vcpkg static libs do this)
-	foreach(flag_var CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELWITHDEBINFO CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
-		if(${flag_var} MATCHES "/MD")
-			string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
-		endif()
-	endforeach()
-endif()
-
-##
-# CSE2
-##
-
-add_executable(CSE2
+add_executable(CSE2 WIN32
+	"${ASSETS_DIRECTORY}/resources/CSE2.rc"
 	"src/ArmsItem.cpp"
 	"src/ArmsItem.h"
 	"src/Back.cpp"
@@ -233,7 +232,15 @@ set(RESOURCES
 	"WAVE/Wave.dat"
 )
 
-# Handle options
+list(APPEND CMAKE_MODULE_PATH
+	"${CMAKE_SOURCE_DIR}/cmake"
+)
+
+
+###################
+# Option handling #
+###################
+
 if(JAPANESE)
 	set(BUILD_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/game_japanese")
 	list(APPEND RESOURCES "BITMAP/pixel_jp.bmp" "FONT/NotoSansMonoCJKjp.otf")
@@ -253,6 +260,27 @@ endif()
 
 if(DEBUG_SAVE)
 	target_compile_definitions(CSE2 PRIVATE DEBUG_SAVE)
+endif()
+
+if(LTO)
+	include(CheckIPOSupported)
+
+	check_ipo_supported(RESULT result)
+
+	if(result)
+		set_target_properties(CSE2 PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
+	endif()
+endif()
+
+# This is messy as hell, and has been replaced by CMAKE_MSVC_RUNTIME_LIBRARY,
+# but that's a very recent CMake addition, so we're still doing it this way for now
+if(MSVC AND MSVC_LINK_STATIC_RUNTIME)
+	# Statically-link the CRT (vcpkg static libs do this)
+	foreach(flag_var CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELWITHDEBINFO CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+		if(${flag_var} MATCHES "/MD")
+			string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
+		endif()
+	endforeach()
 endif()
 
 if(BACKEND_RENDERER MATCHES "OpenGL3")
@@ -292,11 +320,10 @@ else()
 	message(FATAL_ERROR "Invalid BACKEND_AUDIO selected")
 endif()
 
-# Make some tweaks if we're targetting Windows
-if(WIN32)
-	target_sources(CSE2 PRIVATE "${ASSETS_DIRECTORY}/resources/CSE2.rc")
-	set_target_properties(CSE2 PROPERTIES WIN32_EXECUTABLE YES)	# Disable the console window
-endif()
+
+##########
+# Tweaks #
+##########
 
 # Make some tweaks if we're using MSVC
 if(MSVC)
@@ -308,43 +335,9 @@ if(MSVC)
 endif()
 
 
-# Build bin2h externally, so it isn't cross-compiled when CSE2 is (Emscripten, cross-GCC, MinGW on Linux, etc.)
-include(ExternalProject)
-
-ExternalProject_Add(bin2h
-	SOURCE_DIR "${CMAKE_SOURCE_DIR}/bin2h"
-	DOWNLOAD_COMMAND ""
-	UPDATE_COMMAND ""
-	BUILD_BYPRODUCTS "<INSTALL_DIR>/bin/bin2h"
-	CMAKE_ARGS
-		-DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
-		-DCMAKE_BUILD_TYPE=Release
-		-DWARNINGS=${WARNINGS}
-		-DWARNINGS_ALL=${WARNINGS_ALL}
-		-DWARNINGS_FATAL=${WARNINGS_FATAL}
-	INSTALL_COMMAND
-		${CMAKE_COMMAND} --build . --config Release --target install
-)
-
-ExternalProject_Get_Property(bin2h INSTALL_DIR)
-
-add_executable(bin2h_tool IMPORTED)
-add_dependencies(bin2h_tool bin2h)
-set_target_properties(bin2h_tool PROPERTIES IMPORTED_LOCATION "${INSTALL_DIR}/bin/bin2h")
-
-# Convert resources to header files
-foreach(FILENAME IN LISTS RESOURCES)
-	set(IN_DIR "${ASSETS_DIRECTORY}/resources")
-	set(OUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/Resource")
-	get_filename_component(DIRECTORY "${FILENAME}" DIRECTORY)
-	add_custom_command(
-		OUTPUT "${OUT_DIR}/${FILENAME}.h"
-		COMMAND ${CMAKE_COMMAND} -E make_directory "${OUT_DIR}/${DIRECTORY}"
-		COMMAND bin2h_tool "${IN_DIR}/${FILENAME}" "${OUT_DIR}/${FILENAME}.h"
-		DEPENDS bin2h_tool "${IN_DIR}/${FILENAME}"
-		)
-	target_sources(CSE2 PRIVATE "${OUT_DIR}/${FILENAME}.h")
-endforeach()
+##################
+# Misc. settings #
+##################
 
 # Force strict C90
 set_target_properties(CSE2 PROPERTIES
@@ -375,16 +368,10 @@ set_target_properties(CSE2 PROPERTIES
 	RUNTIME_OUTPUT_DIRECTORY_DEBUG ${BUILD_DIRECTORY}
 )
 
-# Enable link-time optimisation if available
-if(LTO)
-	if((${CMAKE_VERSION} VERSION_EQUAL 3.9) OR (${CMAKE_VERSION} VERSION_GREATER 3.9))
-		include(CheckIPOSupported)
-		check_ipo_supported(RESULT result)
-		if(result)
-			set_target_properties(CSE2 PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
-		endif()
-	endif()
-endif()
+
+################
+# Dependencies #
+################
 
 # Find dependencies
 
@@ -451,9 +438,53 @@ if(BACKEND_RENDERER MATCHES "OpenGLES2")
 	target_link_libraries(CSE2 PRIVATE ${OPENGLES2_LIBRARIES})
 endif()
 
-##
-# DoConfig
-##
+
+#######################
+# Resource conversion #
+#######################
+
+# Build bin2h externally, so it isn't cross-compiled when CSE2 is (Emscripten, cross-GCC, MinGW on Linux, etc.)
+include(ExternalProject)
+
+ExternalProject_Add(bin2h
+	SOURCE_DIR "${CMAKE_SOURCE_DIR}/bin2h"
+	DOWNLOAD_COMMAND ""
+	UPDATE_COMMAND ""
+	BUILD_BYPRODUCTS "<INSTALL_DIR>/bin/bin2h"
+	CMAKE_ARGS
+		-DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+		-DCMAKE_BUILD_TYPE=Release
+		-DWARNINGS=${WARNINGS}
+		-DWARNINGS_ALL=${WARNINGS_ALL}
+		-DWARNINGS_FATAL=${WARNINGS_FATAL}
+	INSTALL_COMMAND
+		${CMAKE_COMMAND} --build . --config Release --target install
+)
+
+ExternalProject_Get_Property(bin2h INSTALL_DIR)
+
+add_executable(bin2h_tool IMPORTED)
+add_dependencies(bin2h_tool bin2h)
+set_target_properties(bin2h_tool PROPERTIES IMPORTED_LOCATION "${INSTALL_DIR}/bin/bin2h")
+
+# Convert resources to header files
+foreach(FILENAME IN LISTS RESOURCES)
+	set(IN_DIR "${ASSETS_DIRECTORY}/resources")
+	set(OUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/Resource")
+	get_filename_component(DIRECTORY "${FILENAME}" DIRECTORY)
+	add_custom_command(
+		OUTPUT "${OUT_DIR}/${FILENAME}.h"
+		COMMAND ${CMAKE_COMMAND} -E make_directory "${OUT_DIR}/${DIRECTORY}"
+		COMMAND bin2h_tool "${IN_DIR}/${FILENAME}" "${OUT_DIR}/${FILENAME}.h"
+		DEPENDS bin2h_tool "${IN_DIR}/${FILENAME}"
+		)
+	target_sources(CSE2 PRIVATE "${OUT_DIR}/${FILENAME}.h")
+endforeach()
+
+
+############
+# DoConfig #
+############
 
 add_subdirectory("DoConfig")
 
