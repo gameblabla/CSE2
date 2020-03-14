@@ -26,7 +26,8 @@ option(MSVC_LINK_STATIC_RUNTIME "Link the static MSVC runtime library" OFF)
 
 project(CSE2 LANGUAGES C CXX)
 
-add_executable(CSE2
+add_executable(CSE2 WIN32
+	"${ASSETS_DIRECTORY}/resources/CSE2.rc"
 	"src/ArmsItem.cpp"
 	"src/ArmsItem.h"
 	"src/Back.cpp"
@@ -197,12 +198,6 @@ endif()
 ##########
 # Tweaks #
 ##########
-
-# Make some tweaks if we're targetting Windows
-#if(WIN32)
-	target_sources(CSE2 PRIVATE "${ASSETS_DIRECTORY}/resources/CSE2.rc")
-	set_target_properties(CSE2 PROPERTIES WIN32_EXECUTABLE YES)	# Disable the console window
-#endif()
 
 # Make some tweaks if we're using MSVC
 if(MSVC)
