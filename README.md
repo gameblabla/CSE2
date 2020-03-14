@@ -108,7 +108,7 @@ Name | Function
 `STATIC=1` | Produce a statically-linked executable (good for Windows builds, so you don't need to bundle DLL files)
 `WINDOWS=1` | Build for Windows
 
-You can pass your own compiler flags by defining `CXXFLAGS`.
+You can pass your own compiler flags by defining `CFLAGS` and `CXXFLAGS`.
 
 Once built, the executables can be found in the `game_english`/`game_japanese` folder, depending on the selected language.
 
