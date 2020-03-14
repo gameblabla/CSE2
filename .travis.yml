@@ -124,7 +124,7 @@ before_script:
       if [ "$BUILD_SYSTEM" == "cmake" ]; then
         # Make build directory and generate CMake build files
         mkdir -p ${CMAKE_BUILD_DIR} && cd ${CMAKE_BUILD_DIR}
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DFIX_BUGS=ON -DRENDERER=$RENDERER -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic"
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DFIX_BUGS=ON -DRENDERER=$RENDERER -DCMAKE_C_FLAGS="-Wall -Wextra -pedantic" -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic"
         cd ..
       fi
 
@@ -137,7 +137,7 @@ script:
         cd ..
       else
         # Make build
-        make -j $JOBS FIX_BUGS=1 RELEASE=1 RENDERER=$RENDERER CXXFLAGS="-Wall -Wextra -pedantic"
+        make -j $JOBS FIX_BUGS=1 RELEASE=1 RENDERER=$RENDERER CFLAGS="-Wall -Wextra -pedantic" CXXFLAGS="-Wall -Wextra -pedantic"
       fi
 
 after_success:
