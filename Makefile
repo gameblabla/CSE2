@@ -60,26 +60,6 @@ ifeq ($(DEBUG_SAVE), 1)
   DEFINES += -DDEBUG_SAVE
 endif
 
-ifeq ($(WARNINGS), 1)
-  ALL_CFLAGS += -Wall -Wextra -pedantic
-  ALL_CXXFLAGS += -Wall -Wextra -pedantic
-endif
-
-ifeq ($(WARNINGS_ALL), 1)
-  ifneq ($(findstring clang,$(CXX)),)
-    # Use Clang-specific flag -Weverything
-    ALL_CFLAGS += -Weverything
-    ALL_CXXFLAGS += -Weverything
-  else
-    $(warning Couldn't activate all warnings (unsupported compiler))
-  endif
-endif
-
-ifeq ($(WARNINGS_FATAL), 1)
-  ALL_CFLAGS += -Werror
-  ALL_CXXFLAGS += -Werror
-endif
-
 ALL_CFLAGS += -std=c99 -MMD -MP -MF $@.d
 CSE2_CFLAGS += $(shell $(PKGCONFIG) sdl2 --cflags) $(shell $(PKGCONFIG) freetype2 --cflags) -Iexternal
 
