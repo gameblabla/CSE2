@@ -11,10 +11,10 @@ add_executable(DoConfig WIN32 "DoConfig.cpp" "icon.rc")
 # Make some tweaks if we're using MSVC
 if(MSVC)
 	# Disable warnings that normally fire up on MSVC when using "unsafe" functions instead of using MSVC's "safe" _s functions
-	target_compile_definitions(CSE2 PRIVATE _CRT_SECURE_NO_WARNINGS)
+	target_compile_definitions(DoConfig PRIVATE _CRT_SECURE_NO_WARNINGS)
 
 	# Make it so source files are recognized as UTF-8 by MSVC
-	target_compile_options(CSE2 PRIVATE "/utf-8")
+	target_compile_options(DoConfig PRIVATE "/utf-8")
 endif()
 
 if(LTO)
@@ -23,7 +23,7 @@ if(LTO)
 	check_ipo_supported(RESULT result)
 
 	if(result)
-		set_target_properties(CSE2 PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
+		set_target_properties(DoConfig PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
 	endif()
 endif()
 
