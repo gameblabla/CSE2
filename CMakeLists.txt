@@ -8,6 +8,7 @@ option(DEBUG_SAVE "Re-enable the ability to drag-and-drop save files onto the wi
 
 option(LTO "Enable link-time optimisation" OFF)
 option(NATIVE_OPTIMIZATIONS "Enable processor-specific optimisations (executable might not work on other architectures) (GCC-compatible compilers only)" OFF)
+option(MSVC_LINK_STATIC_RUNTIME "Link the static MSVC runtime library" OFF)
 
 option(WARNINGS "Enable common compiler warnings (for GCC-compatible compilers and MSVC only)" OFF)
 option(WARNINGS_ALL "Enable ALL compiler warnings (for Clang and MSVC only)" OFF)
@@ -41,7 +42,7 @@ if(COMPILER_IS_CLANG OR COMPILER_IS_GCC OR COMPILER_IS_ICC)
 	message(STATUS "Compiling with a GCC-compatible compiler")
 endif()
 
-if(MSVC)
+if(MSVC AND MSVC_LINK_STATIC_RUNTIME)
 	# Statically-link the CRT (vcpkg static libs do this)
 	foreach(flag_var CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELWITHDEBINFO CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
 		if(${flag_var} MATCHES "/MD")
