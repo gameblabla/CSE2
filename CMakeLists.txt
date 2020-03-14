@@ -1,6 +1,16 @@
 cmake_minimum_required(VERSION 3.12)
 
+
+#############
+# Constants #
+#############
+
 set(ASSETS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/assets")
+
+
+###########
+# Options #
+###########
 
 option(JAPANESE "Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)" OFF)
 option(FIX_BUGS "Fix various bugs in the game" OFF)
@@ -9,20 +19,12 @@ option(DEBUG_SAVE "Re-enable the dummied-out 'Debug Save' option, and the abilit
 option(LTO "Enable link-time optimisation" OFF)
 option(MSVC_LINK_STATIC_RUNTIME "Link the static MSVC runtime library" OFF)
 
+
+#########
+# Setup #
+#########
+
 project(CSE2 LANGUAGES C CXX)
-
-if(MSVC AND MSVC_LINK_STATIC_RUNTIME)
-	# Statically-link the CRT (vcpkg static libs do this)
-	foreach(flag_var CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELWITHDEBINFO CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
-		if(${flag_var} MATCHES "/MD")
-			string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
-		endif()
-	endforeach()
-endif()
-
-##
-# CSE2
-##
 
 add_executable(CSE2
 	"src/ArmsItem.cpp"
@@ -150,7 +152,11 @@ add_executable(CSE2
 	"src/WindowsWrapper.h"
 )
 
-# Handle options
+
+###################
+# Option handling #
+###################
+
 if(JAPANESE)
 	set(BUILD_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/game_japanese")
 	target_compile_definitions(CSE2 PRIVATE JAPANESE)
@@ -166,6 +172,32 @@ if(DEBUG_SAVE)
 	target_compile_definitions(CSE2 PRIVATE DEBUG_SAVE)
 endif()
 
+if(LTO)
+	include(CheckIPOSupported)
+
+	check_ipo_supported(RESULT result)
+
+	if(result)
+		set_target_properties(CSE2 PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
+	endif()
+endif()
+
+# This is messy as hell, and has been replaced by CMAKE_MSVC_RUNTIME_LIBRARY,
+# but that's a very recent CMake addition, so we're still doing it this way for now
+if(MSVC AND MSVC_LINK_STATIC_RUNTIME)
+	# Statically-link the CRT (vcpkg static libs do this)
+	foreach(flag_var CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELWITHDEBINFO CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+		if(${flag_var} MATCHES "/MD")
+			string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
+		endif()
+	endforeach()
+endif()
+
+
+##########
+# Tweaks #
+##########
+
 # Make some tweaks if we're targetting Windows
 #if(WIN32)
 	target_sources(CSE2 PRIVATE "${ASSETS_DIRECTORY}/resources/CSE2.rc")
@@ -180,6 +212,11 @@ if(MSVC)
 	# Make it so source files are recognized as UTF-8 by MSVC
 	target_compile_options(CSE2 PRIVATE "/utf-8")
 endif()
+
+
+##################
+# Misc. settings #
+##################
 
 # Force strict C90
 set_target_properties(CSE2 PROPERTIES
@@ -207,16 +244,10 @@ set_target_properties(CSE2 PROPERTIES
 	RUNTIME_OUTPUT_DIRECTORY_DEBUG ${BUILD_DIRECTORY}
 )
 
-# Enable link-time optimisation if available
-if(LTO)
-	include(CheckIPOSupported)
 
-	check_ipo_supported(RESULT result)
-
-	if(result)
-		set_target_properties(CSE2 PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
-	endif()
-endif()
+################
+# Dependencies #
+################
 
 # Link libraries
 target_link_libraries(CSE2 PRIVATE ddraw.lib dsound.lib Version.lib ShLwApi.Lib Imm32.lib WinMM.lib dxguid.lib)
