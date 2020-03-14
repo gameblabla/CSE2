@@ -6,16 +6,49 @@ option(JAPANESE "Enable the Japanese-language build" OFF)
 option(FIX_BUGS "Fix various bugs in the game" ON)
 option(DEBUG_SAVE "Re-enable the ability to drag-and-drop save files onto the window" OFF)
 
+option(LTO "Enable link-time optimisation" OFF)
+option(NATIVE_OPTIMIZATIONS "Enable processor-specific optimisations (executable might not work on other architectures) (GCC-compatible compilers only)" OFF)
+
+option(WARNINGS "Enable common compiler warnings (for GCC-compatible compilers and MSVC only)" OFF)
+option(WARNINGS_ALL "Enable ALL compiler warnings (for Clang and MSVC only)" OFF)
+option(WARNINGS_FATAL "Stop compilation on any compiler warning (for GCC-compatible compilers and MSVC only)" OFF)
+
 project(CSE2 LANGUAGES C CXX)
 
-#if(MSVC)
+message(STATUS "Compiler ID : ${CMAKE_CXX_COMPILER_ID}")
+
+# Has to be placed after "project()"
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+	# Using Clang (this is a match so that we also get "AppleClang" which is the Apple-provided Clang
+	set(COMPILER_IS_CLANG true)
+	message(STATUS "Compiling with Clang")
+endif()
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+	# Using GCC
+	set(COMPILER_IS_GCC true)
+	message(STATUS "Compiling with GCC")
+endif()
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
+	# Using Intel C++
+	set(COMPILER_IS_ICC true)
+	message(STATUS "Compiling with ICC")
+endif()
+
+if(COMPILER_IS_CLANG OR COMPILER_IS_GCC OR COMPILER_IS_ICC)
+	set(COMPILER_IS_GCC_COMPATIBLE true)
+	message(STATUS "Compiling with a GCC-compatible compiler")
+endif()
+
+if(MSVC)
 	# Statically-link the CRT (vcpkg static libs do this)
-#	foreach(flag_var CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELWITHDEBINFO CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
-#		if(${flag_var} MATCHES "/MD")
-#			string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
-#		endif()
-#	endforeach()
-#endif()
+	foreach(flag_var CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELWITHDEBINFO CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+		if(${flag_var} MATCHES "/MD")
+			string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
+		endif()
+	endforeach()
+endif()
 
 ##
 # CSE2
@@ -163,6 +196,60 @@ if(DEBUG_SAVE)
 	target_compile_definitions(CSE2 PRIVATE DEBUG_SAVE)
 endif()
 
+if(WARNINGS)
+	# HACK : Replace this with CMake provided stuff when possible (when CMake makes avoiding this possible (it isn't currently))
+
+	if(MSVC)
+		# Force to always compile with /W4 on MSVC
+
+		# Can't do this with target_compile_options
+		# if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
+		# 	string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+		# else()
+		# 	target_compile_options(CSE2 PRIVATE /W4)
+		# endif()
+
+		target_compile_options(CSE2 PRIVATE /W4)
+	elseif(COMPILER_IS_GCC_COMPATIBLE)
+		target_compile_options(CSE2 PRIVATE -Wall -Wextra -pedantic)
+	else()
+		message(WARNING "Could not activate warnings ! (Unsupported compiler)")
+	endif()
+endif()
+
+if (WARNINGS_ALL)
+	# HACK : Replace this with CMake provided stuff when possible (when CMake makes avoiding this possible (it isn't currently))
+
+	if (MSVC)
+		# Force to always compile with /Wall on MSVC
+
+		# Can't do this with target_compile_options
+		# if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
+		# 	string(REGEX REPLACE "/W[0-4]" "/Wall" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+		# else()
+		# 	target_compile_options(CSE2 PRIVATE /Wall)
+		# endif()
+
+		target_compile_options(CSE2 PRIVATE /Wall)
+	elseif(COMPILER_IS_CLANG)
+		target_compile_options(CSE2 PRIVATE -Weverything)
+	else()
+		message(WARNING "Could not activate all warnings ! (Unsupported compiler)")
+	endif()
+endif()
+
+if(WARNINGS_FATAL)
+	# HACK : Replace this with CMake provided stuff when possible (when CMake makes avoiding this possible (it isn't currently))
+
+	if(MSVC)
+		target_compile_options(CSE2 PRIVATE /WX)
+	elseif(COMPILER_IS_GCC_COMPATIBLE)
+		target_compile_options(CSE2 PRIVATE -Werror)
+	else()
+		message(WARNING "Could not activate fatal warnings ! (Unsupported compiler)")
+	endif()
+endif()
+
 # Make some tweaks if we're targetting Windows
 #if(WIN32)
 	target_sources(CSE2 PRIVATE "${ASSETS_DIRECTORY}/resources/CSE2.rc")
@@ -171,11 +258,10 @@ endif()
 
 # Make some tweaks if we're using MSVC
 if(MSVC)
-	target_compile_definitions(CSE2 PRIVATE _CRT_SECURE_NO_WARNINGS)	# Disable warnings that normally fire up on MSVC when using "unsafe" functions instead of using MSVC's "safe" _s functions
-endif()
+	# Disable warnings that normally fire up on MSVC when using "unsafe" functions instead of using MSVC's "safe" _s functions
+	target_compile_definitions(CSE2 PRIVATE _CRT_SECURE_NO_WARNINGS)
 
-# Make it so source files are recognized as UTF-8 by MSVC
-if(MSVC)
+	# Make it so source files are recognized as UTF-8 by MSVC
 	target_compile_options(CSE2 PRIVATE "/utf-8")
 endif()
 
@@ -204,6 +290,36 @@ set_target_properties(CSE2 PROPERTIES
 	RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${BUILD_DIRECTORY}
 	RUNTIME_OUTPUT_DIRECTORY_DEBUG ${BUILD_DIRECTORY}
 )
+
+# Enable link-time optimisation if available
+if(LTO)
+	if((${CMAKE_VERSION} VERSION_EQUAL 3.9) OR (${CMAKE_VERSION} VERSION_GREATER 3.9))
+		include(CheckIPOSupported)
+		check_ipo_supported(RESULT result)
+		if(result)
+			set_target_properties(CSE2 PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
+		endif()
+	endif()
+endif()
+
+# Enable -march=native if available
+if(NATIVE_OPTIMIZATIONS)
+	include(CheckCXXCompilerFlag)
+	CHECK_CXX_COMPILER_FLAG("-march=native" COMPILER_SUPPORTS_MARCH_NATIVE)	# GCC flag
+	if(COMPILER_SUPPORTS_MARCH_NATIVE)
+		target_compile_options(CSE2 PRIVATE -march=native)
+	else()
+		CHECK_CXX_COMPILER_FLAG("-xHost" COMPILER_SUPPORTS_XHOST)	# ICC (Linux) flag
+		CHECK_CXX_COMPILER_FLAG("/QxHost" COMPILER_SUPPORTS_QXHOST)	# ICC (Windows) flag
+		if(COMPILER_SUPPORTS_XHOST)
+			target_compile_options(CSE2 PRIVATE -xHost)
+		elseif(COMPILER_SUPPORTS_QXHOST)
+			target_compile_options(CSE2 PRIVATE /QxHost)
+		else()
+			message(WARNING "Couldn't activate native optimizations ! (Unsupported compiler)")
+		endif()
+	endif()
+endif()
 
 # Link libraries
 target_link_libraries(CSE2 PRIVATE ddraw.lib dsound.lib Version.lib ShLwApi.Lib Imm32.lib WinMM.lib dxguid.lib)
