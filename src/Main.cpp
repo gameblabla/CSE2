@@ -22,7 +22,7 @@
 #include "Sound.h"
 #include "Triangle.h"
 
-LRESULT __stdcall WindowProcedure(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
+LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 
 char gModulePath[MAX_PATH];
 char gDataPath[MAX_PATH];
@@ -97,7 +97,7 @@ unsigned long GetFramePerSecound(void)
 }
 
 // TODO - Inaccurate stack frame
-int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
 	(void)hPrevInstance;
 	(void)lpCmdLine;
@@ -441,7 +441,7 @@ BOOL DragAndDropHandler(HWND hWnd, WPARAM wParam)
 }
 
 // TODO - Inaccurate stack frame
-LRESULT __stdcall WindowProcedure(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	BOOL window_focus;
 	HMENU hMenu;
