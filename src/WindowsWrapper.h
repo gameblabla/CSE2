@@ -1,5 +1,7 @@
 #pragma once
 
+#include <windows.h>
+
 // Visual Studio 6 is missing these, so define them here
 #ifdef _MSC_VER
 	#ifndef VK_OEM_PLUS
@@ -22,5 +24,3 @@
 	#define DWORD_PTR DWORD
 	#endif
 #endif
-
-#include <windows.h>
