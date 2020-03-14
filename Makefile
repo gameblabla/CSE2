@@ -15,10 +15,6 @@ else
   FILENAME_DEF = CSE2_debug.exe
 endif
 
-ifeq ($(LTO), 1)
-  ALL_CXXFLAGS += -flto
-endif
-
 ifeq ($(JAPANESE), 1)
   BUILD_DIRECTORY = game_japanese
 
