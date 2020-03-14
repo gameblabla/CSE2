@@ -347,9 +347,9 @@ set_target_properties(CSE2 PROPERTIES
 	C_EXTENSIONS OFF
 )
 
-# Force strict C++98
+# Force strict C++11
 set_target_properties(CSE2 PROPERTIES
-	CXX_STANDARD 98
+	CXX_STANDARD 11
 	CXX_STANDARD_REQUIRED ON
 	CXX_EXTENSIONS OFF
 )
