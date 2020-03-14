@@ -17,7 +17,7 @@ static const char *version_string =
 	;
 
 // TODO - Inaccurate stack frame
-INT_PTR CALLBACK VersionDialog(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
+DLGPROC_RET CALLBACK VersionDialog(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	char string_buffer[104];
 
@@ -58,7 +58,7 @@ INT_PTR CALLBACK VersionDialog(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 	return FALSE;
 }
 
-INT_PTR CALLBACK DebugMuteDialog(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
+DLGPROC_RET CALLBACK DebugMuteDialog(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	(void)lParam;
 
@@ -102,7 +102,7 @@ INT_PTR CALLBACK DebugMuteDialog(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lPar
 	return FALSE;
 }
 
-INT_PTR CALLBACK DebugSaveDialog(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
+DLGPROC_RET CALLBACK DebugSaveDialog(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	char string[100];
 
@@ -135,7 +135,7 @@ INT_PTR CALLBACK DebugSaveDialog(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lPar
 	return FALSE;
 }
 
-INT_PTR CALLBACK QuitDialog(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
+DLGPROC_RET CALLBACK QuitDialog(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (Msg)
 	{

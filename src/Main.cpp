@@ -676,12 +676,12 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lPar
 			switch (LOWORD(wParam))
 			{
 				case 40001:
-					if (DialogBoxParamA(ghInstance, "DLG_YESNO", hWnd, (DLGPROC)QuitDialog, (LPARAM)"Quit?") == 1)
+					if (DialogBoxParamA(ghInstance, "DLG_YESNO", hWnd, QuitDialog, (LPARAM)"Quit?") == 1)
 						PostMessageA(hWnd, WM_CLOSE, 0, 0);
 					break;
 
 				case 40002:
-					DialogBoxParamA(ghInstance, "DLG_ABOUT", hWnd, (DLGPROC)VersionDialog, 0);
+					DialogBoxParamA(ghInstance, "DLG_ABOUT", hWnd, VersionDialog, 0);
 					break;
 
 				case 40004:
@@ -690,11 +690,11 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lPar
 					break;
 
 				case 40005:
-					DialogBoxParamA(ghInstance, "DLG_SAVE", hWnd, (DLGPROC)DebugSaveDialog, 0);
+					DialogBoxParamA(ghInstance, "DLG_SAVE", hWnd, DebugSaveDialog, 0);
 					break;
 
 				case 40007:
-					DialogBoxParamA(ghInstance, "DLG_MUTE", hWnd, (DLGPROC)DebugMuteDialog, 0);
+					DialogBoxParamA(ghInstance, "DLG_MUTE", hWnd, DebugMuteDialog, 0);
 					break;
 			}
 

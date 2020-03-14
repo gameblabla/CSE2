@@ -3,7 +3,7 @@
 #include <windows.h>
 
 // Visual Studio 6 is missing these, so define them here
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && _MSC_VER <= 1200
 	#ifndef VK_OEM_PLUS
 	#define VK_OEM_PLUS 0xBB
 	#endif
@@ -23,4 +23,9 @@
 	#ifndef DWORD_PTR
 	#define DWORD_PTR DWORD
 	#endif
+
+	// DLGPROC went from returning BOOL to INT_PTR in later versions, and VC6 doesn't like that
+	#define DLGPROC_RET BOOL
+#else
+	#define DLGPROC_RET INT_PTR
 #endif
