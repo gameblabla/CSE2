@@ -67,7 +67,9 @@ Name | Function
 `-DWARNINGS_ALL=ON` | Enable ALL compiler warnings (for Clang and MSVC only)
 `-DWARNINGS_FATAL=ON` | Stop compilation on any compiler warning (for GCC-compatible compilers and MSVC only)
 
-Then compile CSE2 with this command:
+You can pass your own compiler flags with `-DCMAKE_C_FLAGS` and `-DCMAKE_CXX_FLAGS`.
+
+You can then compile CSE2 with this command:
 
 ```
 cmake --build . --config Release
@@ -93,6 +95,8 @@ Name | Function
 `WARNINGS=1` | Enable common compiler warnings
 `WARNINGS_ALL=1` | Enable ALL compiler warnings (Clang only)
 `WARNINGS_FATAL=1` | Make all compiler warnings errors
+
+You can pass your own compiler flags by defining `CXXFLAGS`.
 
 Once built, the executable can be found in the `game_english`/`game_japanese` folder, depending on the selected language.
 
