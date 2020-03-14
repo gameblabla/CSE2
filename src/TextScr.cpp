@@ -724,7 +724,7 @@ int TextScriptProc(void)
 
 						if (!TransferStage(z, w, x, y))
 						{
-							MessageBoxA(ghWnd, "\x83\x58\x83\x65\x81\x5B\x83\x57\x82\xCC\x93\xC7\x82\xDD\x8D\x9E\x82\xDD\x82\xC9\x8E\xB8\x94\x73", "\x83\x47\x83\x89\x81\x5B", MB_OK);	// 'ステージの読み込みに失敗' and 'エラー' ('Failed to load stage' and 'Error') in Shift-JIS
+							MessageBoxA(ghWnd, "\x83\x58\x83\x65\x81\x5B\x83\x57\x82\xCC\x93\xC7\x82\xDD\x8D\x9E\x82\xDD\x82\xC9\x8E\xB8\x94\x73", "\x83\x47\x83\x89\x81\x5B", MB_OK);	/* 'ステージの読み込みに失敗' and 'エラー' ('Failed to load stage' and 'Error') in Shift-JIS */
 							return enum_ESCRETURN_exit;
 						}
 					}
@@ -1275,8 +1275,8 @@ int TextScriptProc(void)
 					else
 					{
 						char str_0[0x40];
-						sprintf(str_0, "\x95\x73\x96\xBE\x82\xCC\x83\x52\x81\x5B\x83\x68:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);	// '不明のコード:<%c%c%c' (Unknown code:<%c%c%c) in Shift-JIS
-						MessageBoxA(NULL, str_0, "\x83\x47\x83\x89\x81\x5B", MB_OK);	// 'エラー' (Error) in Shift-JIS
+						sprintf(str_0, "\x95\x73\x96\xBE\x82\xCC\x83\x52\x81\x5B\x83\x68:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);	/* '不明のコード:<%c%c%c' (Unknown code:<%c%c%c) in Shift-JIS */
+						MessageBoxA(NULL, str_0, "\x83\x47\x83\x89\x81\x5B", MB_OK);	/* 'エラー' (Error) in Shift-JIS */
 						return enum_ESCRETURN_exit;
 					}
 				}

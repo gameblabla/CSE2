@@ -688,7 +688,7 @@ BOOL Game(HWND hWnd)
 
 	if (!LoadGenericData())
 	{
-		MessageBoxA(hWnd, "\x94\xC4\x97\x70\x83\x74\x83\x40\x83\x43\x83\x8B\x82\xAA\x93\xC7\x82\xDF\x82\xC8\x82\xA2", "\x83\x47\x83\x89\x81\x5B", MB_OK);	// '汎用ファイルが読めない' and 'エラー' ('Couldn't read general purpose files' and 'Error') in Shift-JIS
+		MessageBoxA(hWnd, "\x94\xC4\x97\x70\x83\x74\x83\x40\x83\x43\x83\x8B\x82\xAA\x93\xC7\x82\xDF\x82\xC8\x82\xA2", "\x83\x47\x83\x89\x81\x5B", MB_OK);	/* '汎用ファイルが読めない' and 'エラー' ('Couldn't read general purpose files' and 'Error') in Shift-JIS */
 		return FALSE;
 	}
 
@@ -699,7 +699,7 @@ BOOL Game(HWND hWnd)
 
 	if (!LoadNpcTable(path))
 	{
-		MessageBoxA(hWnd, "\x4E\x50\x43\x83\x65\x81\x5B\x83\x75\x83\x8B\x82\xAA\x93\xC7\x82\xDF\x82\xC8\x82\xA2", "\x83\x47\x83\x89\x81\x5B", MB_OK);	// 'NPCテーブルが読めない' and 'エラー' ('Couldn't read the NPC table' and 'Error') in Shift-JIS
+		MessageBoxA(hWnd, "\x4E\x50\x43\x83\x65\x81\x5B\x83\x75\x83\x8B\x82\xAA\x93\xC7\x82\xDF\x82\xC8\x82\xA2", "\x83\x47\x83\x89\x81\x5B", MB_OK);	/* 'NPCテーブルが読めない' and 'エラー' ('Couldn't read the NPC table' and 'Error') in Shift-JIS */
 		return FALSE;
 	}
 
