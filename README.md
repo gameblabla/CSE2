@@ -59,6 +59,7 @@ You can also add the following flags:
 Name | Function
 --------|--------
 `-DLTO=ON` | Enable link-time optimisation
+`-DMSVC_LINK_STATIC_RUNTIME=ON | Link the static MSVC runtime library
 `-DJAPANESE=ON` | Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
 `-DFIX_BUGS=ON` | Fix various bugs in the game
 `-DDEBUG_SAVE=ON` | Re-enable the dummied-out 'Debug Save' option, and the ability to drag-and-drop save files onto the window
