@@ -4,7 +4,7 @@ set(ASSETS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/assets")
 
 option(JAPANESE "Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)" OFF)
 option(FIX_BUGS "Fix various bugs in the game" OFF)
-option(DEBUG_SAVE "Re-enable the ability to drag-and-drop save files onto the window" OFF)
+option(DEBUG_SAVE "Re-enable the dummied-out 'Debug Save' option, and the ability to drag-and-drop save files onto the window" OFF)
 
 option(LTO "Enable link-time optimisation" OFF)
 option(NATIVE_OPTIMIZATIONS "Enable processor-specific optimisations (executable might not work on other architectures) (GCC-compatible compilers only)" OFF)

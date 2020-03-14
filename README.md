@@ -46,6 +46,37 @@ As proven by the original `Doukutsu.exe`'s [Rich Header](http://bytepointer.com/
 
 Project files for Visual Studio 2017 can be found in the 'vs2017' folder.
 
+### CMake (Visual Studio & MinGW-w64)
+
+In this folder, create another folder called 'build', then switch to the command-line (Visual Studio users should open the [Developer Command Prompt](https://docs.microsoft.com/en-us/dotnet/framework/tools/developer-command-prompt-for-vs)) and `cd` into it. After that, generate the files for your build system with:
+
+```
+cmake .. -DCMAKE_BUILD_TYPE=Release
+```
+
+You can also add the following flags:
+
+Name | Function
+--------|--------
+`-DLTO=ON` | Enable link-time optimisation
+`-DNATIVE_OPTIMIZATIONS=ON` | Enable processor-specific optimisations (executable might not work on other architectures) (GCC-compatible compilers only)
+`-DJAPANESE=ON` | Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
+`-DFIX_BUGS=ON` | Fix various bugs in the game
+`-DDEBUG_SAVE=ON` | Re-enable the dummied-out 'Debug Save' option, and the ability to drag-and-drop save files onto the window
+`-DWARNINGS=ON` | Enable common compiler warnings (for GCC-compatible compilers and MSVC only)
+`-DWARNINGS_ALL=ON` | Enable ALL compiler warnings (for Clang and MSVC only)
+`-DWARNINGS_FATAL=ON` | Stop compilation on any compiler warning (for GCC-compatible compilers and MSVC only)
+
+Then compile CSE2 with this command:
+
+```
+cmake --build . --config Release
+```
+
+If you're a Visual Studio user, you can open the generated `CSE2.sln` file instead.
+
+Once built, the executable can be found in the `game_english`/`game_japanese` folder, depending on the selected language.
+
 ### Makefile (MinGW-w64)
 
 Run 'make' in this folder, preferably with some of the following settings:
