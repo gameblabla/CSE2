@@ -427,7 +427,7 @@ set_target_properties(CSE2 PROPERTIES
 ################
 
 if(NOT FORCE_LOCAL_LIBS)
-#	find_package(SDL2)
+	find_package(SDL2)
 endif()
 
 if(TARGET SDL2::SDL2)
