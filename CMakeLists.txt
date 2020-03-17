@@ -243,11 +243,11 @@ list(APPEND CMAKE_MODULE_PATH
 
 if(JAPANESE)
 	set(BUILD_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/game_japanese")
-	list(APPEND RESOURCES "BITMAP/pixel_jp.bmp" "FONT/NotoSansMonoCJKjp.otf")
+	list(APPEND RESOURCES "BITMAP/pixel_jp.bmp")
 	target_compile_definitions(CSE2 PRIVATE JAPANESE)
 else()
 	set(BUILD_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/game_english")
-	list(APPEND RESOURCES "BITMAP/pixel.bmp" "FONT/LiberationMono.ttf")
+	list(APPEND RESOURCES "BITMAP/pixel.bmp")
 endif()
 
 if(FIX_BUGS)

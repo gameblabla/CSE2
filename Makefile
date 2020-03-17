@@ -206,10 +206,8 @@ RESOURCES = \
 
 ifeq ($(JAPANESE), 1)
   RESOURCES += BITMAP/pixel_jp.bmp
-  RESOURCES += FONT/NotoSansMonoCJKjp.otf
 else
   RESOURCES += BITMAP/pixel.bmp
-  RESOURCES += FONT/LiberationMono.ttf
 endif
 
 ifneq ($(WINDOWS), 1)

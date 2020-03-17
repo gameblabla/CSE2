@@ -27,11 +27,6 @@
 #endif
 #include "Resource/CURSOR/CURSOR_IKA.bmp.h"
 #include "Resource/CURSOR/CURSOR_NORMAL.bmp.h"
-#ifdef JAPANESE
-#include "Resource/FONT/NotoSansMonoCJKjp.otf.h"
-#else
-#include "Resource/FONT/LiberationMono.ttf.h"
-#endif
 #ifndef _WIN32
 #include "Resource/ICON/ICON_MINI.bmp.h"
 #endif
@@ -110,11 +105,6 @@ static const struct
 #endif
 	{"CURSOR", "CURSOR_IKA", rCURSOR_IKA, sizeof(rCURSOR_IKA)},
 	{"CURSOR", "CURSOR_NORMAL", rCURSOR_NORMAL, sizeof(rCURSOR_NORMAL)},
-#ifdef JAPANESE
-	{"FONT", "FONT", rNotoSansMonoCJKjp, sizeof(rNotoSansMonoCJKjp)},
-#else
-	{"FONT", "FONT", rLiberationMono, sizeof(rLiberationMono)},
-#endif
 #ifndef _WIN32
 	{"ICON", "ICON_MINI", rICON_MINI, sizeof(rICON_MINI)},
 #endif

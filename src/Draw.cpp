@@ -618,10 +618,10 @@ void InitTextObject(const char *name)
 {
 	(void)name;	// Unused in this branch
 
-	size_t size;
-	const unsigned char *data = FindResource("FONT", "FONT", &size);
+	char path[MAX_PATH];
+	sprintf(path, "%s/Font/font", gDataPath);
 
-	font = LoadFontFromData(data, size, 8 * magnification, 9 * magnification);
+	font = LoadFont(path, 8 * magnification, 9 * magnification);
 }
 
 void PutText(int x, int y, const char *text, unsigned long color)
