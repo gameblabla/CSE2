@@ -189,11 +189,9 @@ list(APPEND CMAKE_MODULE_PATH
 
 if(JAPANESE)
 	set(BUILD_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/game_japanese")
-	list(APPEND RESOURCES "FONT/NotoSansMonoCJKjp.otf")
 	target_compile_definitions(CSE2 PRIVATE JAPANESE)
 else()
 	set(BUILD_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/game_english")
-	list(APPEND RESOURCES "FONT/LiberationMono.ttf")
 endif()
 
 if(FIX_BUGS)

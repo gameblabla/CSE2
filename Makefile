@@ -236,12 +236,6 @@ endif
 
 RESOURCES = 
 
-ifeq ($(JAPANESE), 1)
-  RESOURCES += FONT/NotoSansMonoCJKjp.otf
-else
-  RESOURCES += FONT/LiberationMono.ttf
-endif
-
 ifneq ($(WINDOWS), 1)
   RESOURCES += ICON/ICON_MINI.png
 endif
