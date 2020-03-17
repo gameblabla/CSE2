@@ -1,5 +1,5 @@
 /*
- *  (C) 2018-2019 Clownacy
+ *  (C) 2018-2020 Clownacy
  *
  *  This software is provided 'as-is', without any express or implied
  *  warranty.  In no event will the authors be held liable for any damages
@@ -28,7 +28,7 @@
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
-struct BackendStream
+struct ClownAudio_Stream
 {
 	void (*user_callback)(void*, float*, size_t);
 	void *user_data;
@@ -53,19 +53,19 @@ static unsigned int NextPowerOfTwo(unsigned int value)
 
 static void Callback(void *user_data, Uint8 *output_buffer_uint8, int bytes_to_do)
 {
-	BackendStream *stream = (BackendStream*)user_data;
-	const unsigned long frames_to_do = bytes_to_do / (sizeof(short) * STREAM_CHANNEL_COUNT);
+	ClownAudio_Stream *stream = (ClownAudio_Stream*)user_data;
+	const unsigned long frames_to_do = bytes_to_do / (sizeof(short) * CLOWNAUDIO_STREAM_CHANNEL_COUNT);
 
 	// This playback backend doesn't support float32, so we have to convert the samples to S16
 	short *output_buffer_pointer = (short*)output_buffer_uint8;
 	for (unsigned long frames_done = 0; frames_done < frames_to_do; frames_done += 0x1000)
 	{
-		float read_buffer[0x1000 * STREAM_CHANNEL_COUNT];
+		float read_buffer[0x1000 * CLOWNAUDIO_STREAM_CHANNEL_COUNT];
 
 		stream->user_callback(stream->user_data, read_buffer, MIN(0x1000, frames_to_do - frames_done));
 
 		float *read_buffer_pointer = read_buffer;
-		for (unsigned long i = 0; i < frames_to_do * STREAM_CHANNEL_COUNT; ++i)
+		for (unsigned long i = 0; i < frames_to_do * CLOWNAUDIO_STREAM_CHANNEL_COUNT; ++i)
 		{
 			float sample = *read_buffer_pointer++;
 
@@ -79,7 +79,7 @@ static void Callback(void *user_data, Uint8 *output_buffer_uint8, int bytes_to_d
 	}
 }
 
-bool Backend_Init(void)
+CLOWNAUDIO_EXPORT bool ClownAudio_InitPlayback(void)
 {
 	bool success = true;
 
@@ -92,24 +92,24 @@ bool Backend_Init(void)
 	return success;
 }
 
-void Backend_Deinit(void)
+CLOWNAUDIO_EXPORT void ClownAudio_DeinitPlayback(void)
 {
 	if (!sdl_already_init)
 		SDL_QuitSubSystem(SDL_INIT_AUDIO);
 }
 
-BackendStream* Backend_CreateStream(void (*user_callback)(void*, float*, size_t), void *user_data)
+CLOWNAUDIO_EXPORT ClownAudio_Stream* ClownAudio_CreateStream(void (*user_callback)(void*, float*, size_t), void *user_data)
 {
-	BackendStream *stream = (BackendStream*)malloc(sizeof(BackendStream));
+	ClownAudio_Stream *stream = (ClownAudio_Stream*)malloc(sizeof(ClownAudio_Stream));
 
 	if (stream != NULL)
 	{
 		SDL_AudioSpec want;
 		memset(&want, 0, sizeof(want));
-		want.freq = STREAM_SAMPLE_RATE;
+		want.freq = CLOWNAUDIO_STREAM_SAMPLE_RATE;
 		want.format = AUDIO_S16;
-		want.channels = STREAM_CHANNEL_COUNT;
-		want.samples = NextPowerOfTwo(((STREAM_SAMPLE_RATE * 10) / 1000) * STREAM_CHANNEL_COUNT);	// A low-latency buffer of 10 milliseconds
+		want.channels = CLOWNAUDIO_STREAM_CHANNEL_COUNT;
+		want.samples = NextPowerOfTwo(((CLOWNAUDIO_STREAM_SAMPLE_RATE * 10) / 1000) * CLOWNAUDIO_STREAM_CHANNEL_COUNT);	// A low-latency buffer of 10 milliseconds
 		want.callback = Callback;
 		want.userdata = stream;
 
@@ -129,7 +129,7 @@ BackendStream* Backend_CreateStream(void (*user_callback)(void*, float*, size_t)
 	return NULL;
 }
 
-bool Backend_DestroyStream(BackendStream *stream)
+CLOWNAUDIO_EXPORT bool ClownAudio_DestroyStream(ClownAudio_Stream *stream)
 {
 	if (stream != NULL)
 	{
@@ -140,7 +140,7 @@ bool Backend_DestroyStream(BackendStream *stream)
 	return true;
 }
 
-bool Backend_SetVolume(BackendStream *stream, float volume)
+CLOWNAUDIO_EXPORT bool ClownAudio_SetStreamVolume(ClownAudio_Stream *stream, float volume)
 {
 	if (stream != NULL)
 		stream->volume = volume * volume;
@@ -148,7 +148,7 @@ bool Backend_SetVolume(BackendStream *stream, float volume)
 	return true;
 }
 
-bool Backend_PauseStream(BackendStream *stream)
+CLOWNAUDIO_EXPORT bool ClownAudio_PauseStream(ClownAudio_Stream *stream)
 {
 	if (stream != NULL)
 		SDL_PauseAudio(-1);
@@ -156,7 +156,7 @@ bool Backend_PauseStream(BackendStream *stream)
 	return true;
 }
 
-bool Backend_ResumeStream(BackendStream *stream)
+CLOWNAUDIO_EXPORT bool ClownAudio_ResumeStream(ClownAudio_Stream *stream)
 {
 	if (stream != NULL)
 		SDL_PauseAudio(0);

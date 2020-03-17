@@ -1,5 +1,5 @@
 /*
- *  (C) 2018-2019 Clownacy
+ *  (C) 2018-2020 Clownacy
  *
  *  This software is provided 'as-is', without any express or implied
  *  warranty.  In no event will the authors be held liable for any damages
@@ -25,7 +25,7 @@
 
 #include "portaudio.h"
 
-struct BackendStream
+struct ClownAudio_Stream
 {
 	void (*user_callback)(void*, float*, size_t);
 	void *user_data;
@@ -40,36 +40,36 @@ static int Callback(const void *input_buffer, void *output_buffer_void, unsigned
 	(void)time_info;
 	(void)status_flags;
 
-	BackendStream *stream = (BackendStream*)user_data;
+	ClownAudio_Stream *stream = (ClownAudio_Stream*)user_data;
 	float *output_buffer = (float*)output_buffer_void;
 
 	stream->user_callback(stream->user_data, output_buffer, frames_to_do);
 
 	// Handle volume in software, since PortAudio's API doesn't have volume control
 	if (stream->volume != 1.0f)
-		for (unsigned long i = 0; i < frames_to_do * STREAM_CHANNEL_COUNT; ++i)
+		for (unsigned long i = 0; i < frames_to_do * CLOWNAUDIO_STREAM_CHANNEL_COUNT; ++i)
 			output_buffer[i] *= stream->volume;
 
 	return 0;
 }
 
-bool Backend_Init(void)
+CLOWNAUDIO_EXPORT bool ClownAudio_InitPlayback(void)
 {
 	return Pa_Initialize() == paNoError;
 }
 
-void Backend_Deinit(void)
+CLOWNAUDIO_EXPORT void ClownAudio_DeinitPlayback(void)
 {
 	Pa_Terminate();
 }
 
-BackendStream* Backend_CreateStream(void (*user_callback)(void*, float*, size_t), void *user_data)
+CLOWNAUDIO_EXPORT ClownAudio_Stream* ClownAudio_CreateStream(void (*user_callback)(void*, float*, size_t), void *user_data)
 {
-	BackendStream *stream = (BackendStream*)malloc(sizeof(BackendStream));
+	ClownAudio_Stream *stream = (ClownAudio_Stream*)malloc(sizeof(ClownAudio_Stream));
 
 	if (stream != NULL)
 	{
-		if (Pa_OpenDefaultStream(&stream->pa_stream, 0, STREAM_CHANNEL_COUNT, paFloat32, STREAM_SAMPLE_RATE, paFramesPerBufferUnspecified, Callback, stream ) == paNoError)
+		if (Pa_OpenDefaultStream(&stream->pa_stream, 0, CLOWNAUDIO_STREAM_CHANNEL_COUNT, paFloat32, CLOWNAUDIO_STREAM_SAMPLE_RATE, paFramesPerBufferUnspecified, Callback, stream ) == paNoError)
 		{
 			stream->user_callback = user_callback;
 			stream->user_data = user_data;
@@ -85,7 +85,7 @@ BackendStream* Backend_CreateStream(void (*user_callback)(void*, float*, size_t)
 	return NULL;
 }
 
-bool Backend_DestroyStream(BackendStream *stream)
+CLOWNAUDIO_EXPORT bool ClownAudio_DestroyStream(ClownAudio_Stream *stream)
 {
 	bool success = true;
 
@@ -98,7 +98,7 @@ bool Backend_DestroyStream(BackendStream *stream)
 	return success;
 }
 
-bool Backend_SetVolume(BackendStream *stream, float volume)
+CLOWNAUDIO_EXPORT bool ClownAudio_SetStreamVolume(ClownAudio_Stream *stream, float volume)
 {
 	if (stream != NULL)
 		stream->volume = volume * volume;
@@ -106,7 +106,7 @@ bool Backend_SetVolume(BackendStream *stream, float volume)
 	return true;
 }
 
-bool Backend_PauseStream(BackendStream *stream)
+CLOWNAUDIO_EXPORT bool ClownAudio_PauseStream(ClownAudio_Stream *stream)
 {
 	bool success = true;
 
@@ -116,7 +116,7 @@ bool Backend_PauseStream(BackendStream *stream)
 	return success;
 }
 
-bool Backend_ResumeStream(BackendStream *stream)
+CLOWNAUDIO_EXPORT bool ClownAudio_ResumeStream(ClownAudio_Stream *stream)
 {
 	bool success = true;
 

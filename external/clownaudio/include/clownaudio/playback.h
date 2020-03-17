@@ -1,5 +1,5 @@
 /*
- *  (C) 2018-2019 Clownacy
+ *  (C) 2018-2020 Clownacy
  *
  *  This software is provided 'as-is', without any express or implied
  *  warranty.  In no event will the authors be held liable for any damages
@@ -20,17 +20,30 @@
 
 #pragma once
 
+#ifndef __cplusplus
+#include <stdbool.h>
+#endif
 #include <stddef.h>
 
-#define STREAM_SAMPLE_RATE 48000
-#define STREAM_CHANNEL_COUNT 2
+#include "clownaudio_export.h"
 
-typedef struct BackendStream BackendStream;
+#define CLOWNAUDIO_STREAM_SAMPLE_RATE 48000
+#define CLOWNAUDIO_STREAM_CHANNEL_COUNT 2
 
-bool Backend_Init(void);
-void Backend_Deinit(void);
-BackendStream* Backend_CreateStream(void (*callback)(void*, float*, size_t), void *user_data);
-bool Backend_DestroyStream(BackendStream *stream);
-bool Backend_SetVolume(BackendStream *stream, float volume);
-bool Backend_PauseStream(BackendStream *stream);
-bool Backend_ResumeStream(BackendStream *stream);
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef struct ClownAudio_Stream ClownAudio_Stream;
+
+CLOWNAUDIO_EXPORT bool ClownAudio_InitPlayback(void);
+CLOWNAUDIO_EXPORT void ClownAudio_DeinitPlayback(void);
+CLOWNAUDIO_EXPORT ClownAudio_Stream* ClownAudio_CreateStream(void (*callback)(void*, float*, size_t), void *user_data);
+CLOWNAUDIO_EXPORT bool ClownAudio_DestroyStream(ClownAudio_Stream *stream);
+CLOWNAUDIO_EXPORT bool ClownAudio_SetStreamVolume(ClownAudio_Stream *stream, float volume);
+CLOWNAUDIO_EXPORT bool ClownAudio_PauseStream(ClownAudio_Stream *stream);
+CLOWNAUDIO_EXPORT bool ClownAudio_ResumeStream(ClownAudio_Stream *stream);
+
+#ifdef __cplusplus
+}
+#endif

@@ -46,7 +46,6 @@ SDL2_CFLAGS = $(shell pkg-config sdl2 --cflags)
 SDL2_LIBS = $(shell pkg-config sdl2 --libs --static)
 
 CLOWNAUDIO_SOURCES = \
-  clownaudio.cpp \
   miniaudio.cpp \
   mixer.cpp \
   decoding/decoder_selector.cpp \

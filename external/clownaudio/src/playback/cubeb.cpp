@@ -1,5 +1,5 @@
 /*
- *  (C) 2018-2019 Clownacy
+ *  (C) 2018-2020 Clownacy
  *
  *  This software is provided 'as-is', without any express or implied
  *  warranty.  In no event will the authors be held liable for any damages
@@ -28,7 +28,7 @@
 
 #include <cubeb/cubeb.h>
 
-struct BackendStream
+struct ClownAudio_Stream
 {
 	void (*user_callback)(void*, float*, size_t);
 	void *user_data;
@@ -43,7 +43,7 @@ static long DataCallback(cubeb_stream *c_stream, void *user_data, void const *in
 	(void)c_stream;
 	(void)input_buffer;
 
-	BackendStream *stream = (BackendStream*)user_data;
+	ClownAudio_Stream *stream = (ClownAudio_Stream*)user_data;
 
 	stream->user_callback(stream->user_data, (float*)output_buffer, frames_to_do);
 
@@ -57,7 +57,7 @@ static void StateCallback(cubeb_stream *stream, void *user_data, cubeb_state sta
 	(void)state;
 }
 
-bool Backend_Init(void)
+CLOWNAUDIO_EXPORT bool ClownAudio_InitPlayback(void)
 {
 #ifdef _WIN32
 	CoInitializeEx(NULL, COINIT_MULTITHREADED);	// Cubeb needs us to init COM
@@ -66,7 +66,7 @@ bool Backend_Init(void)
 	return cubeb_init(&cubeb_context, NULL, NULL) == CUBEB_OK;
 }
 
-void Backend_Deinit(void)
+CLOWNAUDIO_EXPORT void ClownAudio_DeinitPlayback(void)
 {
 	cubeb_destroy(cubeb_context);
 
@@ -75,20 +75,20 @@ void Backend_Deinit(void)
 #endif
 }
 
-BackendStream* Backend_CreateStream(void (*user_callback)(void*, float*, size_t), void *user_data)
+CLOWNAUDIO_EXPORT ClownAudio_Stream* ClownAudio_CreateStream(void (*user_callback)(void*, float*, size_t), void *user_data)
 {
 	cubeb_stream_params output_params;
 	output_params.format = CUBEB_SAMPLE_FLOAT32LE;
-	output_params.rate = STREAM_SAMPLE_RATE;
+	output_params.rate = CLOWNAUDIO_STREAM_SAMPLE_RATE;
 	output_params.prefs = CUBEB_STREAM_PREF_NONE;
-	output_params.channels = STREAM_CHANNEL_COUNT;
-	output_params.layout = STREAM_CHANNEL_COUNT == 2 ? CUBEB_LAYOUT_STEREO : CUBEB_LAYOUT_MONO;
+	output_params.channels = CLOWNAUDIO_STREAM_CHANNEL_COUNT;
+	output_params.layout = CLOWNAUDIO_STREAM_CHANNEL_COUNT == 2 ? CUBEB_LAYOUT_STEREO : CUBEB_LAYOUT_MONO;
 
 	uint32_t latency_frames;
 
 	if (cubeb_get_min_latency(cubeb_context, &output_params, &latency_frames) == CUBEB_OK)
 	{
-		BackendStream *stream = (BackendStream*)malloc(sizeof(BackendStream));
+		ClownAudio_Stream *stream = (ClownAudio_Stream*)malloc(sizeof(ClownAudio_Stream));
 
 		if (stream != NULL)
 		{
@@ -111,7 +111,7 @@ BackendStream* Backend_CreateStream(void (*user_callback)(void*, float*, size_t)
 	return NULL;
 }
 
-bool Backend_DestroyStream(BackendStream *stream)
+CLOWNAUDIO_EXPORT bool ClownAudio_DestroyStream(ClownAudio_Stream *stream)
 {
 	bool success = true;
 
@@ -131,7 +131,7 @@ bool Backend_DestroyStream(BackendStream *stream)
 	return success;
 }
 
-bool Backend_SetVolume(BackendStream *stream, float volume)
+CLOWNAUDIO_EXPORT bool ClownAudio_SetStreamVolume(ClownAudio_Stream *stream, float volume)
 {
 	bool success = true;
 
@@ -141,7 +141,7 @@ bool Backend_SetVolume(BackendStream *stream, float volume)
 	return success;
 }
 
-bool Backend_PauseStream(BackendStream *stream)
+CLOWNAUDIO_EXPORT bool ClownAudio_PauseStream(ClownAudio_Stream *stream)
 {
 	bool success = true;
 
@@ -151,7 +151,7 @@ bool Backend_PauseStream(BackendStream *stream)
 	return success;
 }
 
-bool Backend_ResumeStream(BackendStream *stream)
+CLOWNAUDIO_EXPORT bool ClownAudio_ResumeStream(ClownAudio_Stream *stream)
 {
 	bool success = true;
 
