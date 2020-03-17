@@ -305,52 +305,53 @@ enum
 //Music
 const struct
 {
-	const char *path;
+	const char *intro_file_path;
+	const char *loop_file_path;
 	int type;
 	bool loop;
 } gMusicTable[42] = {
-	{"Resource/ORG/XXXX.org", MUSIC_TYPE_ORGANYA, true},
-	{"Resource/ORG/Wanpaku.org", MUSIC_TYPE_ORGANYA, true},
-	{"Resource/ORG/Anzen.org", MUSIC_TYPE_ORGANYA, true},
-	{"Resource/ORG/Gameover.org", MUSIC_TYPE_ORGANYA, false},
-	{"Resource/ORG/Gravity.org", MUSIC_TYPE_ORGANYA, true},
-	{"Resource/ORG/Weed.org", MUSIC_TYPE_ORGANYA, true},
-	{"Resource/ORG/MDown2.org", MUSIC_TYPE_ORGANYA, true},
-	{"Resource/ORG/FireEye.org", MUSIC_TYPE_ORGANYA, true},
-	{"Resource/ORG/Vivi.org", MUSIC_TYPE_ORGANYA, true},
-	{"Resource/ORG/Mura.org", MUSIC_TYPE_ORGANYA, true},
-	{"Resource/ORG/Fanfale1.org", MUSIC_TYPE_ORGANYA, false},
-	{"Resource/ORG/Ginsuke.org", MUSIC_TYPE_ORGANYA, true},
-	{"Resource/ORG/Cemetery.org", MUSIC_TYPE_ORGANYA, true},
-	{"Resource/ORG/Plant.org", MUSIC_TYPE_ORGANYA, true},
-	{"Resource/ORG/Kodou.org", MUSIC_TYPE_ORGANYA, true},
-	{"Resource/ORG/Fanfale3.org", MUSIC_TYPE_ORGANYA, false},
-	{"Resource/ORG/Fanfale2.org", MUSIC_TYPE_ORGANYA, false},
-	{"Resource/ORG/Dr.org", MUSIC_TYPE_ORGANYA, true},
-	{"Resource/ORG/Escape.org", MUSIC_TYPE_ORGANYA, true},
-	{"Resource/ORG/Jenka.org", MUSIC_TYPE_ORGANYA, true},
-	{"Resource/ORG/Maze.org", MUSIC_TYPE_ORGANYA, true},
-	{"Resource/ORG/Access.org", MUSIC_TYPE_ORGANYA, true},
-	{"Resource/ORG/ironH.org", MUSIC_TYPE_ORGANYA, true},
-	{"Resource/ORG/Grand.org", MUSIC_TYPE_ORGANYA, true},
-	{"Resource/ORG/Curly.org", MUSIC_TYPE_ORGANYA, true},
-	{"Resource/ORG/Oside.org", MUSIC_TYPE_ORGANYA, true},
-	{"Resource/ORG/Requiem.org", MUSIC_TYPE_ORGANYA, true},
-	{"Resource/ORG/Wanpak2.org", MUSIC_TYPE_ORGANYA, true},
-	{"Resource/ORG/quiet.org", MUSIC_TYPE_ORGANYA, true},
-	{"Resource/ORG/LastCave.org", MUSIC_TYPE_ORGANYA, true},
-	{"Resource/ORG/Balcony.org", MUSIC_TYPE_ORGANYA, true},
-	{"Resource/ORG/LastBtl.org", MUSIC_TYPE_ORGANYA, true},
-	{"Resource/ORG/LastBtl3.org", MUSIC_TYPE_ORGANYA, true},
-	{"Resource/ORG/Ending.org", MUSIC_TYPE_ORGANYA, true},
-	{"Resource/ORG/Zonbie.org", MUSIC_TYPE_ORGANYA, true},
-	{"Resource/ORG/BreakDown.org", MUSIC_TYPE_ORGANYA, true},
-	{"Resource/ORG/Hell.org", MUSIC_TYPE_ORGANYA, true},
-	{"Resource/ORG/Jenka2.org", MUSIC_TYPE_ORGANYA, true},
-	{"Resource/ORG/Marine.org", MUSIC_TYPE_ORGANYA, true},
-	{"Resource/ORG/Ballos.org", MUSIC_TYPE_ORGANYA, true},
-	{"Resource/ORG/Toroko.org", MUSIC_TYPE_ORGANYA, false},
-	{"Resource/ORG/White.org", MUSIC_TYPE_ORGANYA, true}
+	{"Resource/ORG/XXXX.org", NULL, MUSIC_TYPE_ORGANYA, true},
+	{"Resource/ORG/Wanpaku.org", NULL, MUSIC_TYPE_ORGANYA, true},
+	{"Resource/ORG/Anzen.org", NULL, MUSIC_TYPE_ORGANYA, true},
+	{"Resource/ORG/Gameover.org", NULL, MUSIC_TYPE_ORGANYA, false},
+	{"Resource/ORG/Gravity.org", NULL, MUSIC_TYPE_ORGANYA, true},
+	{"Resource/ORG/Weed.org", NULL, MUSIC_TYPE_ORGANYA, true},
+	{"Resource/ORG/MDown2.org", NULL, MUSIC_TYPE_ORGANYA, true},
+	{"Resource/ORG/FireEye.org", NULL, MUSIC_TYPE_ORGANYA, true},
+	{"Resource/ORG/Vivi.org", NULL, MUSIC_TYPE_ORGANYA, true},
+	{"Resource/ORG/Mura.org", NULL, MUSIC_TYPE_ORGANYA, true},
+	{"Resource/ORG/Fanfale1.org", NULL, MUSIC_TYPE_ORGANYA, false},
+	{"Resource/ORG/Ginsuke.org", NULL, MUSIC_TYPE_ORGANYA, true},
+	{"Resource/ORG/Cemetery.org", NULL, MUSIC_TYPE_ORGANYA, true},
+	{"Resource/ORG/Plant.org", NULL, MUSIC_TYPE_ORGANYA, true},
+	{"Resource/ORG/Kodou.org", NULL, MUSIC_TYPE_ORGANYA, true},
+	{"Resource/ORG/Fanfale3.org", NULL, MUSIC_TYPE_ORGANYA, false},
+	{"Resource/ORG/Fanfale2.org", NULL, MUSIC_TYPE_ORGANYA, false},
+	{"Resource/ORG/Dr.org", NULL, MUSIC_TYPE_ORGANYA, true},
+	{"Resource/ORG/Escape.org", NULL, MUSIC_TYPE_ORGANYA, true},
+	{"Resource/ORG/Jenka.org", NULL, MUSIC_TYPE_ORGANYA, true},
+	{"Resource/ORG/Maze.org", NULL, MUSIC_TYPE_ORGANYA, true},
+	{"Resource/ORG/Access.org", NULL, MUSIC_TYPE_ORGANYA, true},
+	{"Resource/ORG/ironH.org", NULL, MUSIC_TYPE_ORGANYA, true},
+	{"Resource/ORG/Grand.org", NULL, MUSIC_TYPE_ORGANYA, true},
+	{"Resource/ORG/Curly.org", NULL, MUSIC_TYPE_ORGANYA, true},
+	{"Resource/ORG/Oside.org", NULL, MUSIC_TYPE_ORGANYA, true},
+	{"Resource/ORG/Requiem.org", NULL, MUSIC_TYPE_ORGANYA, true},
+	{"Resource/ORG/Wanpak2.org", NULL, MUSIC_TYPE_ORGANYA, true},
+	{"Resource/ORG/quiet.org", NULL, MUSIC_TYPE_ORGANYA, true},
+	{"Resource/ORG/LastCave.org", NULL, MUSIC_TYPE_ORGANYA, true},
+	{"Resource/ORG/Balcony.org", NULL, MUSIC_TYPE_ORGANYA, true},
+	{"Resource/ORG/LastBtl.org", NULL, MUSIC_TYPE_ORGANYA, true},
+	{"Resource/ORG/LastBtl3.org", NULL, MUSIC_TYPE_ORGANYA, true},
+	{"Resource/ORG/Ending.org", NULL, MUSIC_TYPE_ORGANYA, true},
+	{"Resource/ORG/Zonbie.org", NULL, MUSIC_TYPE_ORGANYA, true},
+	{"Resource/ORG/BreakDown.org", NULL, MUSIC_TYPE_ORGANYA, true},
+	{"Resource/ORG/Hell.org", NULL, MUSIC_TYPE_ORGANYA, true},
+	{"Resource/ORG/Jenka2.org", NULL, MUSIC_TYPE_ORGANYA, true},
+	{"Resource/ORG/Marine.org", NULL, MUSIC_TYPE_ORGANYA, true},
+	{"Resource/ORG/Ballos.org", NULL, MUSIC_TYPE_ORGANYA, true},
+	{"Resource/ORG/Toroko.org", NULL, MUSIC_TYPE_ORGANYA, false},
+	{"Resource/ORG/White.org", NULL, MUSIC_TYPE_ORGANYA, true}
 };
 
 void ChangeMusic(MusicID no)
@@ -366,14 +367,17 @@ void ChangeMusic(MusicID no)
 	ExtraSound_PauseMusic();
 #endif
 
-	char path[MAX_PATH];
-	sprintf(path, "%s/%s", gDataPath, gMusicTable[no].path);
+	char intro_file_path[MAX_PATH];
+	sprintf(intro_file_path, "%s/%s", gDataPath, gMusicTable[no].intro_file_path);
+
+	char loop_file_path[MAX_PATH];
+	sprintf(loop_file_path, "%s/%s", gDataPath, gMusicTable[no].loop_file_path);
 
 	switch (gMusicTable[no].type)
 	{
 		case MUSIC_TYPE_ORGANYA:
 			// Load .org
-			LoadOrganya(path);
+			LoadOrganya(intro_file_path);
 
 			// Reset position, volume, and then play the song
 			ChangeOrganyaVolume(100);
@@ -381,13 +385,13 @@ void ChangeMusic(MusicID no)
 			PlayOrganyaMusic();
 
 #ifdef EXTRA_SOUND_FORMATS
-			ExtraSound_LoadMusic(NULL, false);	// Play a null song so any current song gets pushed back to the backup slot
+			ExtraSound_LoadMusic(NULL, NULL, false);	// Play a null song so any current song gets pushed back to the backup slot
 #endif
 			break;
 
 #ifdef EXTRA_SOUND_FORMATS
 		case MUSIC_TYPE_OTHER:
-			ExtraSound_LoadMusic(path, gMusicTable[no].loop);
+			ExtraSound_LoadMusic(intro_file_path, loop_file_path, gMusicTable[no].loop);
 			break;
 #endif
 	}
@@ -408,7 +412,7 @@ void ReCallMusic(void)
 		case MUSIC_TYPE_ORGANYA:
 			// Load .org that was playing before
 			char path[MAX_PATH];
-			sprintf(path, "%s/%s", gDataPath, gMusicTable[gOldNo].path);
+			sprintf(path, "%s/%s", gDataPath, gMusicTable[gOldNo].intro_file_path);
 			LoadOrganya(path);
 
 			// Reset position, volume, and then play the song

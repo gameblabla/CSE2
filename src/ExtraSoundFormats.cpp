@@ -71,7 +71,7 @@ void ExtraSound_Stop(void)
 	playing = false;
 }
 
-void ExtraSound_LoadMusic(const char *path, bool loop)
+void ExtraSound_LoadMusic(const char *intro_file_path, const char *loop_file_path, bool loop)
 {
 	if (previous_song.valid)
 	{
@@ -84,13 +84,11 @@ void ExtraSound_LoadMusic(const char *path, bool loop)
 
 	previous_song = song;
 
-	if (path != NULL)
+	if (intro_file_path != NULL || loop_file_path != NULL)
 	{
-		size_t file_buffer_size;
-
 		ClownAudio_SoundDataConfig data_config;
 		ClownAudio_InitSoundDataConfig(&data_config);
-		song.sound_data = ClownAudio_LoadSoundDataFromFiles(path, NULL, &data_config);
+		song.sound_data = ClownAudio_LoadSoundDataFromFiles(intro_file_path, loop_file_path, &data_config);
 
 		if (song.sound_data != NULL)
 		{
