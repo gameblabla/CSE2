@@ -25,7 +25,9 @@
 #endif
 #include <stddef.h>
 
+#if !defined(CLOWNAUDIO_EXPORT) && !defined(CLOWNAUDIO_NO_EXPORT)
 #include "clownaudio_export.h"
+#endif
 
 #define CLOWNAUDIO_STREAM_SAMPLE_RATE 48000
 #define CLOWNAUDIO_STREAM_CHANNEL_COUNT 2

@@ -426,11 +426,10 @@ endif()
 ####################
 
 # Include the public headers
-target_include_directories(clownaudio INTERFACE
+target_include_directories(clownaudio PUBLIC
 	"$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
 	"$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
 )
-target_include_directories(clownaudio PRIVATE "include/clownaudio")
 
 # Export symbols
 include(GenerateExportHeader)

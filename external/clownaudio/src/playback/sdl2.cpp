@@ -18,7 +18,7 @@
  *  3. This notice may not be removed or altered from any source distribution.
  */
 
-#include "playback.h"
+#include "clownaudio/playback.h"
 
 #include <stddef.h>
 #include <stdlib.h>
