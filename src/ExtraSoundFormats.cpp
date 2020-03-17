@@ -9,25 +9,19 @@
 
 #include "clownaudio/mixer.h"
 
-typedef struct Song
+typedef struct SoundSlot
 {
 	bool valid;
 	ClownAudio_SoundData *sound;
 	ClownAudio_Sound instance;
-} Song;
-
-typedef struct SFX
-{
-	ClownAudio_SoundData *sound;
-	ClownAudio_Sound instance;
-} SFX;
+} SoundSlot;
 
 static ClownAudio_Mixer *mixer;
 
-static Song song;
-static Song previous_song;
+static SoundSlot song;
+static SoundSlot previous_song;
 
-static SFX *sfx_list[SE_MAX];
+static SoundSlot sfx_list[SE_MAX];
 
 static bool playing = true;
 
@@ -56,12 +50,11 @@ void ExtraSound_Deinit(void)
 	// Free SFX
 	for (unsigned int i = 0; i < SE_MAX; ++i)
 	{
-		if (sfx_list[i] != NULL)
+		if (sfx_list[i].valid)
 		{
-			ClownAudio_DestroySound(mixer, sfx_list[i]->instance);
-			ClownAudio_UnloadSoundData(sfx_list[i]->sound);
-			free(sfx_list[i]);
-			sfx_list[i] = NULL;
+			ClownAudio_DestroySound(mixer, sfx_list[i].instance);
+			ClownAudio_UnloadSoundData(sfx_list[i].sound);
+			sfx_list[i].valid = false;
 		}
 	}
 
@@ -153,63 +146,58 @@ void ExtraSound_FadeOutMusic(void)
 
 void ExtraSound_LoadSFX(const char *path, int id)
 {
-	if (sfx_list[id] != NULL)
+	if (sfx_list[id].valid)
 	{
-		ClownAudio_DestroySound(mixer, sfx_list[id]->instance);
-		ClownAudio_UnloadSoundData(sfx_list[id]->sound);
-	}
-	else
-	{
-		sfx_list[id] = (SFX*)malloc(sizeof(SFX));
+		ClownAudio_DestroySound(mixer, sfx_list[id].instance);
+		ClownAudio_UnloadSoundData(sfx_list[id].sound);
 	}
 
-	if (sfx_list[id] != NULL)
+	size_t file_buffer_size;
+
+	ClownAudio_SoundDataConfig data_config;
+	ClownAudio_InitSoundDataConfig(&data_config);
+	data_config.predecode = true;
+	sfx_list[id].sound = ClownAudio_LoadSoundDataFromFiles(path, NULL, &data_config);
+
+	if (sfx_list[id].sound != NULL)
 	{
-		size_t file_buffer_size;
+		ClownAudio_SoundConfig sound_config;
+		ClownAudio_InitSoundConfig(&sound_config);
+		sound_config.do_not_free_when_done = true;
+		sfx_list[id].instance = ClownAudio_CreateSound(mixer, sfx_list[id].sound, &sound_config);
 
-		ClownAudio_SoundDataConfig data_config;
-		ClownAudio_InitSoundDataConfig(&data_config);
-		data_config.predecode = true;
-		sfx_list[id]->sound = ClownAudio_LoadSoundDataFromFiles(path, NULL, &data_config);
-
-		if (sfx_list[id]->sound != NULL)
+		if (sfx_list[id].instance != 0)
 		{
-			ClownAudio_SoundConfig sound_config;
-			ClownAudio_InitSoundConfig(&sound_config);
-			sound_config.do_not_free_when_done = true;
-			sfx_list[id]->instance = ClownAudio_CreateSound(mixer, sfx_list[id]->sound, &sound_config);
-
-			if (sfx_list[id]->instance != 0)
-				return;
-
-			ClownAudio_UnloadSoundData(sfx_list[id]->sound);
+			sfx_list[id].valid = true;
+			return;
 		}
 
-		free(sfx_list[id]);
-		sfx_list[id] = NULL;
+		ClownAudio_UnloadSoundData(sfx_list[id].sound);
 	}
+
+	sfx_list[id].valid = false;
 }
 
 void ExtraSound_PlaySFX(int id, int mode)
 {
-	if (sfx_list[id] != NULL)
+	if (sfx_list[id].valid)
 	{
 		switch (mode)
 		{
 			case 0:
-				ClownAudio_PauseSound(mixer, sfx_list[id]->instance);
+				ClownAudio_PauseSound(mixer, sfx_list[id].instance);
 				break;
 
 			case 1:
-				ClownAudio_PauseSound(mixer, sfx_list[id]->instance);
-				ClownAudio_RewindSound(mixer, sfx_list[id]->instance);
-				ClownAudio_SetSoundLoop(mixer, sfx_list[id]->instance, false);
-				ClownAudio_UnpauseSound(mixer, sfx_list[id]->instance);
+				ClownAudio_PauseSound(mixer, sfx_list[id].instance);
+				ClownAudio_RewindSound(mixer, sfx_list[id].instance);
+				ClownAudio_SetSoundLoop(mixer, sfx_list[id].instance, false);
+				ClownAudio_UnpauseSound(mixer, sfx_list[id].instance);
 				break;
 
 			case -1:
-				ClownAudio_SetSoundLoop(mixer, sfx_list[id]->instance, true);
-				ClownAudio_UnpauseSound(mixer, sfx_list[id]->instance);
+				ClownAudio_SetSoundLoop(mixer, sfx_list[id].instance, true);
+				ClownAudio_UnpauseSound(mixer, sfx_list[id].instance);
 				break;
 		}
 	}
