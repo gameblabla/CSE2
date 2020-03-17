@@ -15,7 +15,7 @@ set(ASSETS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/assets")
 option(JAPANESE "Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)" OFF)
 option(FIX_BUGS "Fix various bugs in the game" ON)
 option(DEBUG_SAVE "Re-enable the ability to drag-and-drop save files onto the window" OFF)
-option(EXTRA_SOUND_FORMATS "Adds support for extra music/SFX formats using the clownaudio library (see CLOWNAUDIO_X options to toggle specific formats)" OFF)
+option(EXTRA_SOUND_FORMATS "Adds support for extra music/SFX formats using the clownaudio library (use CLOWNAUDIO_X options to toggle specific formats)" OFF)
 set(BACKEND_RENDERER "SDLTexture" CACHE STRING "Which renderer the game should use: 'OpenGL3' for an OpenGL 3.2 renderer, 'OpenGLES2' for an OpenGL ES 2.0 renderer, 'SDLTexture' for SDL2's hardware-accelerated Texture API, or 'Software' for a handwritten software renderer")
 set(BACKEND_AUDIO "SDL2" CACHE STRING "Which audio backend the game should use: 'SDL2' or 'miniaudio'")
 
