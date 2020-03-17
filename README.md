@@ -87,10 +87,6 @@ Name | Function
 `-DJAPANESE=ON` | Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
 `-DFIX_BUGS=ON` | Enabled by default - Fix various bugs in the game
 `-DDEBUG_SAVE=ON` | Re-enable the ability to drag-and-drop save files onto the window
-`-DAUDIO_OGG=ON` | Enable support for Ogg Vorbis music/SFX
-`-DAUDIO_FLAC=ON` | Enable support for FLAC music/SFX
-`-DAUDIO_TRACKER=ON` | Enable support for .it, .xm, .mod, .s3m music/SFX
-`-DAUDIO_PXTONE=ON` | Enable support for PxTone music/SFX (not to be confused with PixTone)
 `-DRENDERER=OpenGL3` | Use the hardware-accelerated OpenGL 3.2 renderer
 `-DRENDERER=OpenGLES2` | Use the hardware-accelerated OpenGL ES 2.0 renderer
 `-DRENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default)
@@ -100,6 +96,11 @@ Name | Function
 `-DLTO=ON` | Enable link-time optimisation
 `-DMSVC_LINK_STATIC_RUNTIME=ON` | Link the static MSVC runtime library
 `-DFORCE_LOCAL_LIBS=ON` | Compile the built-in versions of SDL2 and FreeType instead of using the system-provided ones
+`-DEXTRA_SOUND_FORMATS=ON` | Enable support for alternate music/SFX formats, include Ogg Vorbis, FLAC, and PxTone (not to be confused with PixTone)
+`-DCLOWNAUDIO_STB_VORBIS=ON` | Enable support for Ogg Vorbis music/SFX
+`-DCLOWNAUDIO_DR_FLAC=ON` | Enable support for FLAC music/SFX
+`-DCLOWNAUDIO_LIBXMPLITE=ON` | Enable support for .it, .xm, .mod, .s3m music/SFX
+`-DCLOWNAUDIO_PXTONE=ON` | Enable support for PxTone music/SFX (not to be confused with PixTone)
 
 You can pass your own compiler flags with `-DCMAKE_C_FLAGS` and `-DCMAKE_CXX_FLAGS`.
 
@@ -130,13 +131,13 @@ Name | Function
 `RENDERER=Software` | Use the hand-written software renderer
 `AUDIO_BACKEND=SDL2` | Use the SDL2-driven software audio-mixer
 `AUDIO_BACKEND=miniaudio` | Use the miniaudio-driven software audio-mixer
+`RELEASE=1` | Compile a release build (optimised, stripped, etc.)
+`STATIC=1` | Produce a statically-linked executable (good for Windows builds, so you don't need to bundle DLL files)
+`WINDOWS=1` | Build for Windows
 `AUDIO_OGG=1` | Enable support for Ogg Vorbis music/SFX
 `AUDIO_FLAC=1` | Enable support for FLAC music/SFX
 `AUDIO_TRACKER=1` | Enable support for .it, .xm, .mod, .s3m music/SFX
 `AUDIO_PXTONE=1` | Enable support for PxTone music/SFX (not to be confused with PixTone)
-`RELEASE=1` | Compile a release build (optimised, stripped, etc.)
-`STATIC=1` | Produce a statically-linked executable (good for Windows builds, so you don't need to bundle DLL files)
-`WINDOWS=1` | Build for Windows
 
 You can pass your own compiler flags by defining `CFLAGS` and `CXXFLAGS`.
 
