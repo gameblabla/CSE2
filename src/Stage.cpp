@@ -391,7 +391,7 @@ void ChangeMusic(MusicID no)
 
 #ifdef EXTRA_SOUND_FORMATS
 		case MUSIC_TYPE_OTHER:
-			ExtraSound_LoadMusic(intro_file_path, loop_file_path, gMusicTable[no].loop);
+			ExtraSound_LoadMusic(gMusicTable[no].intro_file_path != NULL ? intro_file_path : NULL, gMusicTable[no].loop_file_path != NULL ? loop_file_path : NULL, gMusicTable[no].loop);
 			break;
 #endif
 	}
