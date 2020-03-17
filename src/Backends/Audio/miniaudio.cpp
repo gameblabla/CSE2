@@ -6,7 +6,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define MINIAUDIO_IMPLEMENTATION
 #define MA_NO_DECODING
+#define MA_API static
 #include "miniaudio.h"
 
 #include "../../Organya.h"
