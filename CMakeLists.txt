@@ -266,6 +266,7 @@ if(AUDIO_OGG OR AUDIO_FLAC OR AUDIO_TRACKER OR AUDIO_PXTONE)
 		"src/ExtraSoundFormats.h"
 		"external/clownaudio/decoder.c"
 		"external/clownaudio/decoder.h"
+		"external/clownaudio/miniaudio.c"
 		"external/clownaudio/miniaudio.h"
 		"external/clownaudio/mixer.c"
 		"external/clownaudio/mixer.h"
@@ -279,10 +280,6 @@ if(AUDIO_OGG OR AUDIO_FLAC OR AUDIO_TRACKER OR AUDIO_PXTONE)
 		"external/clownaudio/decoders/split.c"
 		"external/clownaudio/decoders/split.h"
 	)
-
-	if(NOT BACKEND_AUDIO MATCHES "miniaudio")
-		target_sources(CSE2 PRIVATE "external/clownaudio/miniaudio.c")
-	endif()
 
 	target_compile_definitions(CSE2 PRIVATE EXTRA_SOUND_FORMATS)
 endif()
