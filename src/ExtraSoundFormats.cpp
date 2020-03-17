@@ -20,7 +20,6 @@ typedef struct SFX
 {
 	ClownAudio_SoundData *sound;
 	ClownAudio_Sound instance;
-	bool looping;
 } SFX;
 
 static ClownAudio_Mixer *mixer;
@@ -165,10 +164,8 @@ void ExtraSound_LoadSFX(const char *path, int id)
 
 		ClownAudio_SoundConfig sound_config;
 		ClownAudio_InitSoundConfig(&sound_config);
-//		sound_config.do_not_free_when_done = true;
+		sound_config.do_not_free_when_done = true;
 		sfx_list[id]->instance = ClownAudio_CreateSound(mixer, sfx_list[id]->sound, &sound_config);
-
-		sfx_list[id]->looping = false;
 	}
 }
 
@@ -183,29 +180,15 @@ void ExtraSound_PlaySFX(int id, int mode)
 				break;
 
 			case 1:
-				sfx_list[id]->looping = false;
-				ClownAudio_DestroySound(mixer, sfx_list[id]->instance);
-
-				ClownAudio_SoundConfig sound_config;
-				ClownAudio_InitSoundConfig(&sound_config);
-				sfx_list[id]->instance = ClownAudio_CreateSound(mixer, sfx_list[id]->sound, &sound_config);
+				ClownAudio_PauseSound(mixer, sfx_list[id]->instance);
+				ClownAudio_RewindSound(mixer, sfx_list[id]->instance);
+				ClownAudio_SetSoundLoop(mixer, sfx_list[id]->instance, false);
 				ClownAudio_UnpauseSound(mixer, sfx_list[id]->instance);
 				break;
 
 			case -1:
-				if (sfx_list[id]->looping == false)
-				{
-					sfx_list[id]->looping = true;
-					ClownAudio_DestroySound(mixer, sfx_list[id]->instance);
-
-					ClownAudio_SoundConfig sound_config;
-					ClownAudio_InitSoundConfig(&sound_config);
-					sound_config.loop = true;
-					sfx_list[id]->instance = ClownAudio_CreateSound(mixer, sfx_list[id]->sound, &sound_config);
-				}
-
+				ClownAudio_SetSoundLoop(mixer, sfx_list[id]->instance, true);
 				ClownAudio_UnpauseSound(mixer, sfx_list[id]->instance);
-
 				break;
 		}
 	}
