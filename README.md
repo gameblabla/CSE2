@@ -71,7 +71,7 @@ Name | Function
 `-DBACKEND_AUDIO=SDL2` | Use the SDL2-driven software audio-mixer
 `-DBACKEND_AUDIO=miniaudio` | Use the miniaudio-driven software audio-mixer
 `-DLTO=ON` | Enable link-time optimisation
-`-DMSVC_LINK_STATIC_RUNTIME=ON | Link the static MSVC runtime library
+`-DMSVC_LINK_STATIC_RUNTIME=ON` | Link the static MSVC runtime library
 `-DFORCE_LOCAL_LIBS=ON` | Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones
 
 You can pass your own compiler flags with `-DCMAKE_C_FLAGS` and `-DCMAKE_CXX_FLAGS`.
