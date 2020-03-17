@@ -2,7 +2,6 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdio.h>
 #include <stdlib.h>
 
 #include "Sound.h"
@@ -97,7 +96,7 @@ void ExtraSound_LoadMusic(const char *intro_file_path, const char *loop_file_pat
 			sound_config.loop = loop;
 			song.sound = ClownAudio_CreateSound(mixer, song.sound_data, &sound_config);
 
-			if (song.sound)
+			if (song.sound != 0)
 			{
 				ClownAudio_UnpauseSound(mixer, song.sound);
 
@@ -119,6 +118,7 @@ void ExtraSound_LoadPreviousMusic(void)
 	{
 		ClownAudio_DestroySound(mixer, song.sound);
 		ClownAudio_UnloadSoundData(song.sound_data);
+		song.valid = false;
 	}
 
 	if (previous_song.valid)
