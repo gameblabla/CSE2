@@ -56,7 +56,7 @@ void ExtraSound_Deinit(void)
 	// Free SFX
 	for (unsigned int i = 0; i < SE_MAX; ++i)
 	{
-		if (sfx_list[i])
+		if (sfx_list[i] != NULL)
 		{
 			ClownAudio_DestroySound(mixer, sfx_list[i]->instance);
 			ClownAudio_UnloadSoundData(sfx_list[i]->sound);
@@ -101,14 +101,24 @@ void ExtraSound_LoadMusic(const char *path, bool loop)
 		ClownAudio_InitSoundDataConfig(&data_config);
 		song.sound = ClownAudio_LoadSoundDataFromFiles(path, NULL, &data_config);
 
-		ClownAudio_SoundConfig sound_config;
-		ClownAudio_InitSoundConfig(&sound_config);
-		sound_config.loop = loop;
-		song.instance = ClownAudio_CreateSound(mixer, song.sound, &sound_config);
+		if (song.sound != NULL)
+		{
+			ClownAudio_SoundConfig sound_config;
+			ClownAudio_InitSoundConfig(&sound_config);
+			sound_config.loop = loop;
+			song.instance = ClownAudio_CreateSound(mixer, song.sound, &sound_config);
 
-		ClownAudio_UnpauseSound(mixer, song.instance);
+			if (song.instance)
+			{
+				ClownAudio_UnpauseSound(mixer, song.instance);
 
-		song.valid = true;
+				song.valid = true;
+
+				return;
+			}
+
+			ClownAudio_UnloadSoundData(song.sound);
+		}
 	}
 }
 
@@ -162,10 +172,21 @@ void ExtraSound_LoadSFX(const char *path, int id)
 		data_config.predecode = true;
 		sfx_list[id]->sound = ClownAudio_LoadSoundDataFromFiles(path, NULL, &data_config);
 
-		ClownAudio_SoundConfig sound_config;
-		ClownAudio_InitSoundConfig(&sound_config);
-		sound_config.do_not_free_when_done = true;
-		sfx_list[id]->instance = ClownAudio_CreateSound(mixer, sfx_list[id]->sound, &sound_config);
+		if (sfx_list[id]->sound != NULL)
+		{
+			ClownAudio_SoundConfig sound_config;
+			ClownAudio_InitSoundConfig(&sound_config);
+			sound_config.do_not_free_when_done = true;
+			sfx_list[id]->instance = ClownAudio_CreateSound(mixer, sfx_list[id]->sound, &sound_config);
+
+			if (sfx_list[id]->instance != 0)
+				return;
+
+			ClownAudio_UnloadSoundData(sfx_list[id]->sound);
+		}
+
+		free(sfx_list[id]);
+		sfx_list[id] = NULL;
 	}
 }
 
