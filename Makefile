@@ -172,18 +172,37 @@ endif
 
 ifeq ($(AUDIO_TRACKER), 1)
   SOURCES += \
-    external/clownaudio/src/decoding/decoders/libxmp-lite.cpp
+    external/clownaudio/src/decoding/decoders/libxmp-lite.cpp \
+    external/clownaudio/src/decoding/decoders/libs/libxmp-lite/src/control.c \
+    external/clownaudio/src/decoding/decoders/libs/libxmp-lite/src/dataio.c \
+    external/clownaudio/src/decoding/decoders/libs/libxmp-lite/src/effects.c \
+    external/clownaudio/src/decoding/decoders/libs/libxmp-lite/src/filter.c \
+    external/clownaudio/src/decoding/decoders/libs/libxmp-lite/src/format.c \
+    external/clownaudio/src/decoding/decoders/libs/libxmp-lite/src/hio.c \
+    external/clownaudio/src/decoding/decoders/libs/libxmp-lite/src/lfo.c \
+    external/clownaudio/src/decoding/decoders/libs/libxmp-lite/src/load.c \
+    external/clownaudio/src/decoding/decoders/libs/libxmp-lite/src/load_helpers.c \
+    external/clownaudio/src/decoding/decoders/libs/libxmp-lite/src/memio.c \
+    external/clownaudio/src/decoding/decoders/libs/libxmp-lite/src/mix_all.c \
+    external/clownaudio/src/decoding/decoders/libs/libxmp-lite/src/mixer.c \
+    external/clownaudio/src/decoding/decoders/libs/libxmp-lite/src/period.c \
+    external/clownaudio/src/decoding/decoders/libs/libxmp-lite/src/player.c \
+    external/clownaudio/src/decoding/decoders/libs/libxmp-lite/src/read_event.c \
+    external/clownaudio/src/decoding/decoders/libs/libxmp-lite/src/scan.c \
+    external/clownaudio/src/decoding/decoders/libs/libxmp-lite/src/smix.c \
+    external/clownaudio/src/decoding/decoders/libs/libxmp-lite/src/virtual.c \
+    external/clownaudio/src/decoding/decoders/libs/libxmp-lite/src/loaders/common.c \
+    external/clownaudio/src/decoding/decoders/libs/libxmp-lite/src/loaders/it_load.c \
+    external/clownaudio/src/decoding/decoders/libs/libxmp-lite/src/loaders/itsex.c \
+    external/clownaudio/src/decoding/decoders/libs/libxmp-lite/src/loaders/mod_load.c \
+    external/clownaudio/src/decoding/decoders/libs/libxmp-lite/src/loaders/s3m_load.c \
+    external/clownaudio/src/decoding/decoders/libs/libxmp-lite/src/loaders/sample.c \
+    external/clownaudio/src/decoding/decoders/libs/libxmp-lite/src/loaders/xm_load.c
 
-  DEFINES += -DUSE_LIBXMPLITE
+  DEFINES += -DUSE_LIBXMPLITE -DLIBXMP_CORE_PLAYER=1
 
-  ALL_CFLAGS += $(shell $(PKGCONFIG) libxmp-lite --cflags)
-  ALL_CXXFLAGS += $(shell $(PKGCONFIG) libxmp-lite --cflags)
-
-  ifeq ($(STATIC), 1)
-    ALL_LIBS += $(shell $(PKGCONFIG) libxmp-lite --libs --static)
-  else
-    ALL_LIBS += $(shell $(PKGCONFIG) libxmp-lite --libs)
-  endif
+  ALL_CFLAGS += -Iexternal/clownaudio/src/decoding/decoders/libs/libxmp-lite/include/libxmp-lite
+  ALL_CXXFLAGS += -Iexternal/clownaudio/src/decoding/decoders/libs/libxmp-lite/include/libxmp-lite
 endif
 
 ifeq ($(AUDIO_PXTONE), 1)
