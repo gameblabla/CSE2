@@ -37,8 +37,6 @@
 #include "Sound.h"
 #include "Stage.h"
 
-#define TSC_BUFFER_SIZE 0x5000
-
 #define TEXT_LEFT (WINDOW_WIDTH / 2 - 108)
 
 #define IS_COMMAND(c1, c2, c3) (gTS.data[gTS.p_read + 1] == (c1) && gTS.data[gTS.p_read + 2] == (c2) && gTS.data[gTS.p_read + 3] == (c3))
@@ -75,13 +73,7 @@ BOOL InitTextScript2(void)
 	// Clear text
 	memset(text, 0, sizeof(text));
 
-	// Allocate script buffer
-	gTS.data = (char*)malloc(TSC_BUFFER_SIZE);
-
-	if (gTS.data == NULL)
-		return FALSE;
-	else
-		return TRUE;
+	return TRUE;
 }
 
 void EndTextScript(void)
@@ -137,6 +129,11 @@ BOOL LoadTextScript2(const char *name)
 	if (gTS.size == -1)
 		return FALSE;
 
+	free(gTS.data);
+	gTS.data = (char *)malloc(gTS.size + 1);
+	if (!gTS.data)
+		return FALSE;
+
 	// Open file
 	fp = fopen(path, "rb");
 	if (fp == NULL)
@@ -159,44 +156,48 @@ BOOL LoadTextScript2(const char *name)
 // Load stage .tsc
 BOOL LoadTextScript_Stage(const char *name)
 {
-	FILE *fp;
+	FILE *fpHead, *fpBody;
 	char path[MAX_PATH];
 	long head_size;
 	long body_size;
 
-	// Open Head.tsc
+	// Open Head.tsc and the stage's .tsc
 	sprintf(path, "%s/%s", gDataPath, "Head.tsc");
 
 	head_size = GetFileSizeLong(path);
 	if (head_size == -1)
 		return FALSE;
 
-	fp = fopen(path, "rb");
-	if (fp == NULL)
+	fpHead = fopen(path, "rb");
+	if (fpHead == NULL)
 		return FALSE;
 
-	// Read Head.tsc
-	fread(gTS.data, 1, head_size, fp);
-	EncryptionBinaryData2((unsigned char*)gTS.data, head_size);
-	gTS.data[head_size] = 0;
-	fclose(fp);
-
-	// Open stage's .tsc
 	sprintf(path, "%s/%s", gDataPath, name);
 
 	body_size = GetFileSizeLong(path);
 	if (body_size == -1)
 		return FALSE;
 
-	fp = fopen(path, "rb");
-	if (fp == NULL)
+	fpBody = fopen(path, "rb");
+	if (fpBody == NULL)
 		return FALSE;
 
+	free(gTS.data);
+	gTS.data = (char *)malloc(head_size + body_size + 1);
+	if (!gTS.data)
+		return FALSE;
+
+	// Read Head.tsc
+	fread(gTS.data, 1, head_size, fpHead);
+	EncryptionBinaryData2((unsigned char*)gTS.data, head_size);
+	gTS.data[head_size] = 0;
+	fclose(fpHead);
+
 	// Read stage's tsc
-	fread(&gTS.data[head_size], 1, body_size, fp);
+	fread(&gTS.data[head_size], 1, body_size, fpBody);
 	EncryptionBinaryData2((unsigned char*)&gTS.data[head_size], body_size);
 	gTS.data[head_size + body_size] = 0;
-	fclose(fp);
+	fclose(fpBody);
 
 	// Set parameters
 	gTS.size = head_size + body_size;
