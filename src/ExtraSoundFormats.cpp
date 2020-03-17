@@ -12,14 +12,12 @@
 typedef struct Song
 {
 	bool valid;
-	unsigned char *file_buffer;
 	ClownAudio_SoundData *sound;
 	ClownAudio_Sound instance;
 } Song;
 
 typedef struct SFX
 {
-	unsigned char *file_buffer;
 	ClownAudio_SoundData *sound;
 	ClownAudio_Sound instance;
 	bool looping;
@@ -33,33 +31,6 @@ static Song previous_song;
 static SFX *sfx_list[SE_MAX];
 
 static bool playing = true;
-
-static bool LoadFileToMemory(const char *path, unsigned char **buffer, size_t *size)
-{
-	bool success = false;
-
-	FILE *file = fopen(path, "rb");
-
-	if (file != NULL)
-	{
-		fseek(file, 0, SEEK_END);
-		*size = ftell(file);
-		rewind(file);
-
-		*buffer = (unsigned char*)malloc(*size);
-
-		if (buffer != NULL)
-		{
-			fread(buffer, 1, *size, file);
-
-			success = true;
-		}
-
-		fclose(file);
-	}
-
-	return success;
-}
 
 void ExtraSound_Init(unsigned int sample_rate)
 {
@@ -127,21 +98,18 @@ void ExtraSound_LoadMusic(const char *path, bool loop)
 	{
 		size_t file_buffer_size;
 
-		if (LoadFileToMemory(path, &song.file_buffer, &file_buffer_size))
-		{
-			ClownAudio_SoundDataConfig data_config;
-			ClownAudio_InitSoundDataConfig(&data_config);
-			song.sound = ClownAudio_LoadSoundDataFromMemory(song.file_buffer, file_buffer_size, NULL, 0, &data_config);
+		ClownAudio_SoundDataConfig data_config;
+		ClownAudio_InitSoundDataConfig(&data_config);
+		song.sound = ClownAudio_LoadSoundDataFromFiles(path, NULL, &data_config);
 
-			ClownAudio_SoundConfig sound_config;
-			ClownAudio_InitSoundConfig(&sound_config);
-			sound_config.loop = loop;
-			song.instance = ClownAudio_CreateSound(mixer, song.sound, &sound_config);
+		ClownAudio_SoundConfig sound_config;
+		ClownAudio_InitSoundConfig(&sound_config);
+		sound_config.loop = loop;
+		song.instance = ClownAudio_CreateSound(mixer, song.sound, &sound_config);
 
-			ClownAudio_UnpauseSound(mixer, song.instance);
+		ClownAudio_UnpauseSound(mixer, song.instance);
 
-			song.valid = true;
-		}
+		song.valid = true;
 	}
 }
 
@@ -190,20 +158,17 @@ void ExtraSound_LoadSFX(const char *path, int id)
 	{
 		size_t file_buffer_size;
 
-		if (LoadFileToMemory(path, &sfx_list[id]->file_buffer, &file_buffer_size))
-		{
-			ClownAudio_SoundDataConfig data_config;
-			ClownAudio_InitSoundDataConfig(&data_config);
-			data_config.predecode = true;
-			sfx_list[id]->sound = ClownAudio_LoadSoundDataFromMemory(sfx_list[id]->file_buffer, file_buffer_size, NULL, 0, &data_config);
+		ClownAudio_SoundDataConfig data_config;
+		ClownAudio_InitSoundDataConfig(&data_config);
+		data_config.predecode = true;
+		sfx_list[id]->sound = ClownAudio_LoadSoundDataFromFiles(path, NULL, &data_config);
 
-			ClownAudio_SoundConfig sound_config;
-			ClownAudio_InitSoundConfig(&sound_config);
-	//		sound_config.do_not_free_when_done = true;
-			sfx_list[id]->instance = ClownAudio_CreateSound(mixer, sfx_list[id]->sound, &sound_config);
+		ClownAudio_SoundConfig sound_config;
+		ClownAudio_InitSoundConfig(&sound_config);
+//		sound_config.do_not_free_when_done = true;
+		sfx_list[id]->instance = ClownAudio_CreateSound(mixer, sfx_list[id]->sound, &sound_config);
 
-			sfx_list[id]->looping = false;
-		}
+		sfx_list[id]->looping = false;
 	}
 }
 
