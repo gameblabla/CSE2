@@ -15,10 +15,7 @@ set(ASSETS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/assets")
 option(JAPANESE "Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)" OFF)
 option(FIX_BUGS "Fix various bugs in the game" OFF)
 option(DEBUG_SAVE "Re-enable the ability to drag-and-drop save files onto the window" OFF)
-option(AUDIO_OGG "Enable support for Ogg Vorbis music/SFX" OFF)
-option(AUDIO_FLAC "Enable support for FLAC music/SFX" OFF)
-option(AUDIO_TRACKER "Enable support for .it, .xm, .mod, .s3m music/SFX" OFF)
-option(AUDIO_PXTONE "Enable support for PxTone music/SFX (not to be confused with PixTone)" OFF)
+option(EXTRA_SOUND_FORMATS "Adds support for extra music/SFX formats using the clownaudio library (see CLOWNAUDIO_X options to toggle specific formats)" OFF)
 set(BACKEND_RENDERER "SDLTexture" CACHE STRING "Which renderer the game should use: 'OpenGL3' for an OpenGL 3.2 renderer, 'OpenGLES2' for an OpenGL ES 2.0 renderer, 'SDLTexture' for SDL2's hardware-accelerated Texture API, or 'Software' for a handwritten software renderer")
 set(BACKEND_AUDIO "SDL2" CACHE STRING "Which audio backend the game should use: 'SDL2' or 'miniaudio'")
 
@@ -260,109 +257,18 @@ else()
 	message(FATAL_ERROR "Invalid BACKEND_AUDIO selected")
 endif()
 
-if(AUDIO_OGG OR AUDIO_FLAC OR AUDIO_TRACKER OR AUDIO_PXTONE)
+if(EXTRA_SOUND_FORMATS)
 	target_sources(CSE2 PRIVATE
 		"src/ExtraSoundFormats.cpp"
 		"src/ExtraSoundFormats.h"
-		"external/clownaudio/decoder.c"
-		"external/clownaudio/decoder.h"
-		"external/clownaudio/miniaudio.c"
-		"external/clownaudio/miniaudio.h"
-		"external/clownaudio/mixer.c"
-		"external/clownaudio/mixer.h"
-		"external/clownaudio/decoders/common.h"
-		"external/clownaudio/decoders/memory_file.c"
-		"external/clownaudio/decoders/memory_file.h"
-		"external/clownaudio/decoders/misc_utilities.c"
-		"external/clownaudio/decoders/misc_utilities.h"
-		"external/clownaudio/decoders/predecode.c"
-		"external/clownaudio/decoders/predecode.h"
-		"external/clownaudio/decoders/split.c"
-		"external/clownaudio/decoders/split.h"
 	)
 
 	target_compile_definitions(CSE2 PRIVATE EXTRA_SOUND_FORMATS)
-endif()
 
-if(AUDIO_OGG)
-	target_sources(CSE2 PRIVATE
-		"external/clownaudio/decoders/stb_vorbis.c"
-		"external/clownaudio/decoders/stb_vorbis.h"
-		"external/clownaudio/decoders/libs/stb_vorbis.h"
-	)
-
-	target_compile_definitions(CSE2 PRIVATE USE_STB_VORBIS)
-endif()
-
-if(AUDIO_FLAC)
-	target_sources(CSE2 PRIVATE
-		"external/clownaudio/decoders/dr_flac.c"
-		"external/clownaudio/decoders/dr_flac.h"
-		"external/clownaudio/decoders/libs/dr_flac.h"
-	)
-
-	target_compile_definitions(CSE2 PRIVATE USE_DR_FLAC)
-endif()
-
-if(AUDIO_TRACKER)
-	target_sources(CSE2 PRIVATE
-		"external/clownaudio/decoders/libxmp-lite.c"
-		"external/clownaudio/decoders/libxmp-lite.h"
-	)
-
-	target_compile_definitions(CSE2 PRIVATE USE_LIBXMPLITE)
-endif()
-
-if(AUDIO_PXTONE)
-	target_sources(CSE2 PRIVATE
-		"external/clownaudio/decoders/pxtone.c"
-		"external/clownaudio/decoders/pxtone.h"
-		"external/clownaudio/decoders/libs/pxtone/pxtn.h"
-		"external/clownaudio/decoders/libs/pxtone/pxtnDelay.cpp"
-		"external/clownaudio/decoders/libs/pxtone/pxtnDelay.h"
-		"external/clownaudio/decoders/libs/pxtone/pxtnDescriptor.cpp"
-		"external/clownaudio/decoders/libs/pxtone/pxtnDescriptor.h"
-		"external/clownaudio/decoders/libs/pxtone/pxtnError.cpp"
-		"external/clownaudio/decoders/libs/pxtone/pxtnError.h"
-		"external/clownaudio/decoders/libs/pxtone/pxtnEvelist.cpp"
-		"external/clownaudio/decoders/libs/pxtone/pxtnEvelist.h"
-		"external/clownaudio/decoders/libs/pxtone/pxtnMaster.cpp"
-		"external/clownaudio/decoders/libs/pxtone/pxtnMaster.h"
-		"external/clownaudio/decoders/libs/pxtone/pxtnMax.h"
-		"external/clownaudio/decoders/libs/pxtone/pxtnMem.cpp"
-		"external/clownaudio/decoders/libs/pxtone/pxtnMem.h"
-		"external/clownaudio/decoders/libs/pxtone/pxtnOverDrive.cpp"
-		"external/clownaudio/decoders/libs/pxtone/pxtnOverDrive.h"
-		"external/clownaudio/decoders/libs/pxtone/pxtnPulse_Frequency.cpp"
-		"external/clownaudio/decoders/libs/pxtone/pxtnPulse_Frequency.h"
-		"external/clownaudio/decoders/libs/pxtone/pxtnPulse_Noise.cpp"
-		"external/clownaudio/decoders/libs/pxtone/pxtnPulse_Noise.h"
-		"external/clownaudio/decoders/libs/pxtone/pxtnPulse_NoiseBuilder.cpp"
-		"external/clownaudio/decoders/libs/pxtone/pxtnPulse_NoiseBuilder.h"
-		"external/clownaudio/decoders/libs/pxtone/pxtnPulse_Oggv.cpp"
-		"external/clownaudio/decoders/libs/pxtone/pxtnPulse_Oggv.h"
-		"external/clownaudio/decoders/libs/pxtone/pxtnPulse_Oscillator.cpp"
-		"external/clownaudio/decoders/libs/pxtone/pxtnPulse_Oscillator.h"
-		"external/clownaudio/decoders/libs/pxtone/pxtnPulse_PCM.cpp"
-		"external/clownaudio/decoders/libs/pxtone/pxtnPulse_PCM.h"
-		"external/clownaudio/decoders/libs/pxtone/pxtnService.cpp"
-		"external/clownaudio/decoders/libs/pxtone/pxtnService.h"
-		"external/clownaudio/decoders/libs/pxtone/pxtnService_moo.cpp"
-		"external/clownaudio/decoders/libs/pxtone/pxtnText.cpp"
-		"external/clownaudio/decoders/libs/pxtone/pxtnText.h"
-		"external/clownaudio/decoders/libs/pxtone/pxtnUnit.cpp"
-		"external/clownaudio/decoders/libs/pxtone/pxtnUnit.h"
-		"external/clownaudio/decoders/libs/pxtone/pxtnWoice.cpp"
-		"external/clownaudio/decoders/libs/pxtone/pxtnWoice.h"
-		"external/clownaudio/decoders/libs/pxtone/pxtnWoice_io.cpp"
-		"external/clownaudio/decoders/libs/pxtone/pxtnWoicePTV.cpp"
-		"external/clownaudio/decoders/libs/pxtone/pxtoneNoise.cpp"
-		"external/clownaudio/decoders/libs/pxtone/pxtoneNoise.h"
-		"external/clownaudio/decoders/libs/pxtone/shim.cpp"
-		"external/clownaudio/decoders/libs/pxtone/shim.h"
-	)
-
-	target_compile_definitions(CSE2 PRIVATE USE_PXTONE)
+	# Link clownaudio
+	set(CLOWNAUDIO_NO_PLAYBACK ON CACHE INTERNAL "obligatory string")	# Disable clownaudio's playback capabilities
+	add_subdirectory("external/clownaudio" EXCLUDE_FROM_ALL)
+	target_link_libraries(CSE2 PRIVATE clownaudio)
 endif()
 
 
@@ -486,21 +392,6 @@ if(BACKEND_RENDERER MATCHES "OpenGLES2")
 	target_link_libraries(CSE2 PRIVATE ${OPENGLES2_LIBRARIES})
 endif()
 
-if(AUDIO_TRACKER)
-	if(NOT FORCE_LOCAL_LIBS)
-		find_package(LibXMPLite)
-	endif()
-
-	if(libxmp-lite_FOUND)
-		message(STATUS "Using system libxmp-lite")
-		target_link_libraries(CSE2 PRIVATE libxmp-lite)
-	else()
-		# Compile it ourselves
-		message(STATUS "Using local libxmp-lite")
-		add_subdirectory("external/libxmp-lite" EXCLUDE_FROM_ALL)
-		target_link_libraries(CSE2 PRIVATE libxmp-lite)
-	endif()
-endif()
 
 #######################
 # Resource conversion #

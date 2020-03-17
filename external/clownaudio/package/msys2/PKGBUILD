@@ -1,0 +1,82 @@
+pkgbase=mingw-w64-clownaudio-git
+pkgname=${MINGW_PACKAGE_PREFIX}-clownaudio-git
+pkgver=r231.79004cd
+pkgrel=1
+pkgdesc='Stereo audio engine supporting various formats'
+arch=('any')
+url='https://github.com/Clownacy/clownaudio'
+license=('zlib', 'MIT', 'LGPL2', 'custom')
+depends=(
+	"${MINGW_PACKAGE_PREFIX}-libvorbis"
+	"${MINGW_PACKAGE_PREFIX}-flac"
+	"${MINGW_PACKAGE_PREFIX}-opusfile"
+)
+makedepends=("${MINGW_PACKAGE_PREFIX}-cmake")
+options=('strip' 'staticlibs')
+source=("git+https://github.com/Clownacy/clownaudio.git")
+sha256sums=('SKIP')
+
+pkgver() {
+  cd "${srcdir}/clownaudio"
+  printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
+prepare() {
+  mkdir -p "${srcdir}/clownaudio/build-static-${MINGW_CHOST}"
+  mkdir -p "${srcdir}/clownaudio/build-shared-${MINGW_CHOST}"
+}
+
+build() {
+  cd "${srcdir}/clownaudio/build-static-${MINGW_CHOST}"
+
+  MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
+  ${MINGW_PREFIX}/bin/cmake .. \
+    -G"MSYS Makefiles" \
+    -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DBUILD_SHARED_LIBS=OFF \
+    -DCLOWNAUDIO_LIBVORBIS=ON \
+    -DCLOWNAUDIO_STB_VORBIS=OFF \
+    -DCLOWNAUDIO_DR_MP3=ON \
+    -DCLOWNAUDIO_LIBOPUS=ON \
+    -DCLOWNAUDIO_LIBFLAC=ON \
+    -DCLOWNAUDIO_DR_FLAC=OFF \
+    -DCLOWNAUDIO_DR_WAV=ON \
+    -DCLOWNAUDIO_LIBSNDFILE=OFF \
+    -DCLOWNAUDIO_LIBOPENMPT=OFF \
+    -DCLOWNAUDIO_LIBXMPLITE=ON \
+    -DCLOWNAUDIO_PXTONE=ON \
+    -DCLOWNAUDIO_SNES_SPC=ON \
+    -DCLOWNAUDIO_BACKEND=miniaudio
+
+  make
+
+  cd "${srcdir}/clownaudio/build-shared-${MINGW_CHOST}"
+
+  MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
+  ${MINGW_PREFIX}/bin/cmake .. \
+    -G"MSYS Makefiles" \
+    -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DBUILD_SHARED_LIBS=ON \
+    -DCLOWNAUDIO_LIBVORBIS=ON \
+    -DCLOWNAUDIO_STB_VORBIS=OFF \
+    -DCLOWNAUDIO_DR_MP3=ON \
+    -DCLOWNAUDIO_LIBOPUS=ON \
+    -DCLOWNAUDIO_LIBFLAC=ON \
+    -DCLOWNAUDIO_DR_FLAC=OFF \
+    -DCLOWNAUDIO_DR_WAV=ON \
+    -DCLOWNAUDIO_LIBSNDFILE=OFF \
+    -DCLOWNAUDIO_LIBOPENMPT=OFF \
+    -DCLOWNAUDIO_LIBXMPLITE=ON \
+    -DCLOWNAUDIO_PXTONE=ON \
+    -DCLOWNAUDIO_SNES_SPC=ON \
+    -DCLOWNAUDIO_BACKEND=miniaudio
+
+  make
+}
+
+package() {
+  make -C "${srcdir}/clownaudio/build-static-${MINGW_CHOST}" DESTDIR="$pkgdir" install
+  make -C "${srcdir}/clownaudio/build-shared-${MINGW_CHOST}" DESTDIR="$pkgdir" install
+}

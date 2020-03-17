@@ -1,0 +1,36 @@
+@PACKAGE_INIT@
+
+if(NOT @BUILD_SHARED_LIBS@)
+	if(@CLOWNAUDIO_LIBVORBIS@)
+		find_package(PkgConfig REQUIRED)
+		pkg_check_modules(vorbisfile REQUIRED IMPORTED_TARGET vorbisfile)
+	endif()
+
+	if(@CLOWNAUDIO_LIBFLAC@)
+		find_package(PkgConfig REQUIRED)
+		pkg_check_modules(flac REQUIRED IMPORTED_TARGET flac)
+	endif()
+
+	if(@CLOWNAUDIO_LIBOPUS@)
+		find_package(PkgConfig REQUIRED)
+		pkg_check_modules(opusfile REQUIRED IMPORTED_TARGET opusfile)
+	endif()
+
+	if(@CLOWNAUDIO_LIBSNDFILE@)
+		find_package(PkgConfig REQUIRED)
+		pkg_check_modules(sndfile REQUIRED IMPORTED_TARGET sndfile)
+	endif()
+
+	if(@CLOWNAUDIO_LIBOPENMPT@)
+		find_package(PkgConfig REQUIRED)
+		pkg_check_modules(libopenmpt REQUIRED IMPORTED_TARGET libopenmpt)
+	endif()
+
+	if(@libxmp-lite_FOUND@)
+		find_package(PkgConfig REQUIRED)
+		pkg_check_modules(libxmp-lite REQUIRED IMPORTED_TARGET libxmp-lite)
+	endif()
+endif()
+
+include("${CMAKE_CURRENT_LIST_DIR}/clownaudioTargets.cmake")
+check_required_components(clownaudio)
