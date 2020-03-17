@@ -73,8 +73,6 @@ void ExtraSound_Stop(void)
 
 void ExtraSound_LoadMusic(const char *path, bool loop)
 {
-	song.valid = false;
-
 	if (previous_song.valid)
 	{
 		ClownAudio_DestroySound(mixer, previous_song.sound);
@@ -113,6 +111,8 @@ void ExtraSound_LoadMusic(const char *path, bool loop)
 			ClownAudio_UnloadSoundData(song.sound_data);
 		}
 	}
+
+	song.valid = false;
 }
 
 void ExtraSound_LoadPreviousMusic(void)
