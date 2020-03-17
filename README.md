@@ -66,7 +66,6 @@ Many months of copypasting and tinkering later, here is the result.
 
 * SDL2
 * FreeType
-* libxmp-lite (only if AUDIO_TRACKER is enabled)
 
 ## Building
 
