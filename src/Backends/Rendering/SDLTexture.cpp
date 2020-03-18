@@ -312,7 +312,7 @@ void Backend_UnlockSurface(Backend_Surface *surface, unsigned int width, unsigne
 
 	free(surface->pixels);
 
-	SDL_Rect rect = {0, 0, width, height};
+	SDL_Rect rect = {0, 0, (int)width, (int)height};
 	SDL_UpdateTexture(surface->texture, &rect, buffer, width * 4);
 
 	free(buffer);
