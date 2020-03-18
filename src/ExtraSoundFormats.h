@@ -12,4 +12,5 @@ void ExtraSound_PauseMusic(void);
 void ExtraSound_FadeOutMusic(void);
 void ExtraSound_LoadSFX(const char *path, int id);
 void ExtraSound_PlaySFX(int id, int mode);
+void ExtraSound_SetSFXFrequency(int id, unsigned long frequency);
 void ExtraSound_Mix(float *buffer, unsigned long frames);

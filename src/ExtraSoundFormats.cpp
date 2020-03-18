@@ -201,6 +201,12 @@ void ExtraSound_PlaySFX(int id, int mode)
 	}
 }
 
+void ExtraSound_SetSFXFrequency(int id, unsigned long frequency)
+{
+	if (sfx_list[id].valid)
+		ClownAudio_SetSoundSampleRate(mixer, sfx_list[id].sound, frequency, frequency);
+}
+
 void ExtraSound_Mix(float *buffer, unsigned long frames)
 {
 	if (playing)

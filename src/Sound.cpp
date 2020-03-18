@@ -242,7 +242,12 @@ void ChangeSoundFrequency(int no, unsigned long rate)	// 100がMIN9999がMAXで2
 	if (!audio_backend_initialised)
 		return;
 
-	AudioBackend_SetSoundFrequency(lpSECONDARYBUFFER[no], (rate * 10) + 100);
+	if (lpSECONDARYBUFFER[no] != NULL)
+		AudioBackend_SetSoundFrequency(lpSECONDARYBUFFER[no], (rate * 10) + 100);
+#ifdef EXTRA_SOUND_FORMATS
+	else
+		ExtraSound_SetSFXFrequency(no, (rate * 10) + 100);
+#endif
 }
 
 void ChangeSoundVolume(int no, long volume)	// 300がMAXで300がﾉｰﾏﾙ (300 is MAX and 300 is normal)
