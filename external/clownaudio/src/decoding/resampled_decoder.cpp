@@ -132,12 +132,12 @@ size_t ResampledDecoder_GetSamples(ResampledDecoder *resampled_decoder, void *bu
 	{
 		if (resampled_decoder->buffer_done == resampled_decoder->buffer_end)
 		{
+			resampled_decoder->buffer_done = 0;
+
 			resampled_decoder->buffer_end = DecoderSelector_GetSamples(resampled_decoder->decoder, resampled_decoder->buffer, RESAMPLE_BUFFER_SIZE / resampled_decoder->size_of_in_frame);
 
 			if (resampled_decoder->buffer_end == 0)
 				return frames_done;	// Sample end
-
-			resampled_decoder->buffer_done = 0;
 		}
 
 		ma_uint64 frames_in = resampled_decoder->buffer_end - resampled_decoder->buffer_done;

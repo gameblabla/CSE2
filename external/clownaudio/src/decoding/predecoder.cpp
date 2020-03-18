@@ -90,12 +90,12 @@ PredecoderData* Predecoder_DecodeData(const DecoderSpec *in_spec, const DecoderS
 				{
 					if (in_buffer_done == in_buffer_end)
 					{
+						in_buffer_done = 0;
+
 						in_buffer_end = decoder_get_samples_function(decoder, in_buffer, 0x1000 / size_of_in_frame);
 
 						if (in_buffer_end == 0)
 							break;
-
-						in_buffer_done = 0;
 					}
 
 					ma_uint64 frames_in = in_buffer_end - in_buffer_done;
