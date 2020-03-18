@@ -20,14 +20,14 @@ ifneq ($(RELEASE),)
 else
   CFLAGS = -Og -ggdb3
 endif
-ALL_CFLAGS = -std=c99 -MMD -MP -MF $@.d $(CFLAGS)
+ALL_CFLAGS = -std=c99 -MMD -MP -MF $@.d -DCLOWNAUDIO_EXPORT= -DCLOWNAUDIO_NO_EXPORT= -I $(CFLAGS)
 
 ifneq ($(RELEASE),)
   CXXFLAGS = -O2 -flto
 else
   CXXFLAGS = -Og -ggdb3
 endif
-ALL_CXXFLAGS = -std=c++98 -MMD -MP -MF $@.d $(CXXFLAGS)
+ALL_CXXFLAGS = -std=c++98 -MMD -MP -MF $@.d -DCLOWNAUDIO_EXPORT= -DCLOWNAUDIO_NO_EXPORT= $(CXXFLAGS)
 
 ifneq ($(RELEASE),)
   LDFLAGS = -s
@@ -244,12 +244,12 @@ obj/test.o: test.cpp
 obj/clownaudio/%.c.o: $(CLOWNAUDIO_DIR)/%.c
 	$(info Compiling $<)
 	@mkdir -p $(@D)
-	@$(CC) $(ALL_CFLAGS) -Wall -Wextra -pedantic -I. -I../include/clownaudio $< -o $@ -c
+	@$(CC) $(ALL_CFLAGS) -Wall -Wextra -pedantic -I. -I../include $< -o $@ -c
 
 obj/clownaudio/%.cpp.o: $(CLOWNAUDIO_DIR)/%.cpp
 	$(info Compiling $<)
 	@mkdir -p $(@D)
-	@$(CXX) $(ALL_CXXFLAGS) -Wall -Wextra -pedantic -I. -I../include/clownaudio $< -o $@ -c
+	@$(CXX) $(ALL_CXXFLAGS) -Wall -Wextra -pedantic -I. -I../include $< -o $@ -c
 
 obj/libxmp-lite/%.o: $(CLOWNAUDIO_DIR)/decoding/decoders/libs/libxmp-lite/%
 	$(info Compiling $<)

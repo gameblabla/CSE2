@@ -83,25 +83,28 @@ PredecoderData* Predecoder_DecodeData(const DecoderSpec *in_spec, const DecoderS
 				const size_t size_of_in_frame = ma_get_bytes_per_sample(FormatToMiniaudioFormat(in_spec->format)) * in_spec->channel_count;
 				const size_t size_of_out_frame = ma_get_bytes_per_sample(FormatToMiniaudioFormat(out_spec->format)) * out_spec->channel_count;
 
-				size_t in_buffer_remaining = 0;
+				size_t in_buffer_end = 0;
+				size_t in_buffer_done = 0;
 
 				for (;;)
 				{
-					if (in_buffer_remaining == 0)
+					if (in_buffer_done == in_buffer_end)
 					{
-						in_buffer_remaining = decoder_get_samples_function(decoder, in_buffer, 0x1000 / size_of_in_frame);
+						in_buffer_end = decoder_get_samples_function(decoder, in_buffer, 0x1000 / size_of_in_frame);
 
-						if (in_buffer_remaining == 0)
+						if (in_buffer_end == 0)
 							break;
+
+						in_buffer_done = 0;
 					}
 
-					ma_uint64 frames_in = in_buffer_remaining;
+					ma_uint64 frames_in = in_buffer_end - in_buffer_done;
 					ma_uint64 frames_out = 0x1000 / size_of_out_frame;
-					ma_data_converter_process_pcm_frames(&converter, &in_buffer[0x1000 - (in_buffer_remaining * size_of_in_frame)], &frames_in, out_buffer, &frames_out);
+					ma_data_converter_process_pcm_frames(&converter, &in_buffer[in_buffer_done * size_of_in_frame], &frames_in, out_buffer, &frames_out);
 
 					MemoryStream_Write(memory_stream, out_buffer, size_of_out_frame, frames_out);
 
-					in_buffer_remaining -= frames_in;
+					in_buffer_done += frames_in;
 				}
 
 				predecoder_data->decoded_data = MemoryStream_GetBuffer(memory_stream);

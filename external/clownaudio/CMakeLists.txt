@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 
-option(BUILD_SHARED_LIBS "Build shared library" OFF)
+option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 option(CLOWNAUDIO_LIBVORBIS "Enable the libvorbis decoder backend" OFF)
 option(CLOWNAUDIO_STB_VORBIS "Enable the stb_vorbis decoder backend" ON)
 option(CLOWNAUDIO_DR_MP3 "Enable the dr_mp3 decoder backend" ON)
@@ -14,7 +14,9 @@ option(CLOWNAUDIO_LIBXMPLITE "Enable the libxmp-lite decoder backend" OFF)
 option(CLOWNAUDIO_PXTONE "Enable the PxTone decoder backend" OFF)
 option(CLOWNAUDIO_SNES_SPC "Enable the snes_spc decoder backend" OFF)
 option(CLOWNAUDIO_NO_PLAYBACK "Disables playback capabilities" OFF)
-set(CLOWNAUDIO_BACKEND "miniaudio" CACHE STRING "Which playback backend to use: supported options are 'miniaudio', 'SDL1', 'SDL2', 'Cubeb', and 'PortAudio'")
+if(NOT CLOWNAUDIO_NO_PLAYBACK)
+	set(CLOWNAUDIO_BACKEND "miniaudio" CACHE STRING "Which playback backend to use: supported options are 'miniaudio', 'SDL1', 'SDL2', 'Cubeb', and 'PortAudio'")
+endif()
 
 project(clownaudio VERSION 0.2 DESCRIPTION "Stereo audio engine supporting various formats" LANGUAGES C CXX)
 
