@@ -186,6 +186,8 @@ CLOWNAUDIO_EXPORT ClownAudio_Mixer* ClownAudio_CreateMixer(unsigned long sample_
 
 		mixer->sample_rate = sample_rate;
 
+		mixer->sound_allocator = 0;
+
 		MutexInit(&mixer->mutex);
 	}
 
@@ -207,10 +209,15 @@ CLOWNAUDIO_EXPORT ClownAudio_SoundData* ClownAudio_LoadSoundDataFromMemory(const
 	{
 		sound_data->split_decoder_data = SplitDecoder_LoadData(file_buffer1, file_size1, file_buffer2, file_size2, config->predecode);
 
-		sound_data->file_buffers[0] = NULL;
-		sound_data->file_buffers[1] = NULL;
+		if (sound_data->split_decoder_data != NULL)
+		{
+			sound_data->file_buffers[0] = NULL;
+			sound_data->file_buffers[1] = NULL;
 
-		return sound_data;
+			return sound_data;
+		}
+
+		free(sound_data);
 	}
 
 	return NULL;
@@ -231,10 +238,15 @@ CLOWNAUDIO_EXPORT ClownAudio_SoundData* ClownAudio_LoadSoundDataFromFiles(const 
 			{
 				sound_data->split_decoder_data = SplitDecoder_LoadData(file_buffers[0], file_buffer_sizes[0], file_buffers[1], file_buffer_sizes[1], config->predecode);
 
-				sound_data->file_buffers[0] = file_buffers[0];
-				sound_data->file_buffers[1] = file_buffers[1];
+				if (sound_data->split_decoder_data != NULL)
+				{
+					sound_data->file_buffers[0] = file_buffers[0];
+					sound_data->file_buffers[1] = file_buffers[1];
 
-				return sound_data;
+					return sound_data;
+				}
+
+				free(file_buffers[1]);
 			}
 
 			free(file_buffers[0]);
@@ -248,45 +260,51 @@ CLOWNAUDIO_EXPORT ClownAudio_SoundData* ClownAudio_LoadSoundDataFromFiles(const 
 
 CLOWNAUDIO_EXPORT void ClownAudio_UnloadSoundData(ClownAudio_SoundData *sound_data)
 {
-	SplitDecoder_UnloadData(sound_data->split_decoder_data);
+	if (sound_data != NULL)
+	{
+		SplitDecoder_UnloadData(sound_data->split_decoder_data);
 
-	free(sound_data->file_buffers[0]);
-	free(sound_data->file_buffers[1]);
+		free(sound_data->file_buffers[0]);
+		free(sound_data->file_buffers[1]);
+	}
 }
 
 CLOWNAUDIO_EXPORT ClownAudio_Sound ClownAudio_CreateSound(ClownAudio_Mixer *mixer, ClownAudio_SoundData *sound_data, ClownAudio_SoundConfig *config)
 {
 	ClownAudio_Sound sound = 0;
 
-	DecoderSpec wanted_spec, spec;
-	wanted_spec.sample_rate = mixer->sample_rate;
-	wanted_spec.channel_count = CHANNEL_COUNT;
-	wanted_spec.format = DECODER_FORMAT_F32;
-
-	SplitDecoder *split_decoder = SplitDecoder_Create(sound_data->split_decoder_data, config->loop, &wanted_spec, &spec);
-
-	if (split_decoder != NULL)
+	if (sound_data != NULL)
 	{
-		do
+		DecoderSpec wanted_spec, spec;
+		wanted_spec.sample_rate = mixer->sample_rate;
+		wanted_spec.channel_count = CHANNEL_COUNT;
+		wanted_spec.format = DECODER_FORMAT_F32;
+
+		SplitDecoder *split_decoder = SplitDecoder_Create(sound_data->split_decoder_data, config->loop, &wanted_spec, &spec);
+
+		if (split_decoder != NULL)
 		{
-			sound = ++mixer->sound_allocator;
-		} while (sound == 0);	// Do not let it allocate 0 - it is an error value
+			do
+			{
+				sound = ++mixer->sound_allocator;
+			} while (sound == 0);	// Do not let it allocate 0 - it is an error value
 
-		Channel *channel = (Channel*)malloc(sizeof(Channel));
+			Channel *channel = (Channel*)malloc(sizeof(Channel));
 
-		channel->split_decoder = split_decoder;
-		channel->volume_left = 1.0f;
-		channel->volume_right = 1.0f;
-		channel->sound = sound;
-		channel->paused = true;
-		channel->free_when_done = !config->do_not_free_when_done;
-		channel->fade_out_counter_max = 0;
-		channel->fade_in_counter_max = 0;
+			channel->split_decoder = split_decoder;
+			channel->volume_left = 1.0f;
+			channel->volume_right = 1.0f;
+			channel->sound = sound;
+			channel->paused = true;
+			channel->free_when_done = !config->do_not_free_when_done;
+			channel->fade_out_counter_max = 0;
+			channel->fade_in_counter_max = 0;
 
-		MutexLock(&mixer->mutex);
-		channel->next = mixer->channel_list_head;
-		mixer->channel_list_head = channel;
-		MutexUnlock(&mixer->mutex);
+			MutexLock(&mixer->mutex);
+			channel->next = mixer->channel_list_head;
+			mixer->channel_list_head = channel;
+			MutexUnlock(&mixer->mutex);
+		}
 	}
 
 	return sound;

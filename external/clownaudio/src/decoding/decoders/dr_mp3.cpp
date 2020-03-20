@@ -34,21 +34,24 @@ Decoder_DR_MP3* Decoder_DR_MP3_Create(const unsigned char *data, size_t data_siz
 	(void)loop;	// This is ignored in simple decoders
 	(void)wanted_spec;
 
-	drmp3 *instance = (drmp3*)malloc(sizeof(drmp3));
-
-	if (instance != NULL)
+	if ((data[0] == 0xFF && data[1] == 0xFB) || (data[0] == 0x49 && data[1] == 0x44 && data[2] == 0x33))
 	{
-		if (drmp3_init_memory(instance, data, data_size, NULL, NULL))
+		drmp3 *instance = (drmp3*)malloc(sizeof(drmp3));
+
+		if (instance != NULL)
 		{
-			spec->sample_rate = instance->sampleRate;
-			spec->channel_count = instance->channels;
-			spec->format = DECODER_FORMAT_F32;
-			spec->is_complex = false;
+			if (drmp3_init_memory(instance, data, data_size, NULL, NULL))
+			{
+				spec->sample_rate = instance->sampleRate;
+				spec->channel_count = instance->channels;
+				spec->format = DECODER_FORMAT_F32;
+				spec->is_complex = false;
 
-			return (Decoder_DR_MP3*)instance;
+				return (Decoder_DR_MP3*)instance;
+			}
+
+			free(instance);
 		}
-
-		free(instance);
 	}
 
 	return NULL;

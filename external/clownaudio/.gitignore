@@ -1,4 +1,8 @@
 /build
+/example/build
+/example/obj
+/example/test
+/example/test.exe
 /test/build
 /test/obj
 /test/test

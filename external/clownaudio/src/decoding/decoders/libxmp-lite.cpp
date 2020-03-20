@@ -22,11 +22,14 @@
 
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define BUILDING_STATIC
 #include <xmp.h>
 
 #include "common.h"
+
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
 
 #define SAMPLE_RATE 48000
 #define CHANNEL_COUNT 2
@@ -35,6 +38,9 @@ struct Decoder_libXMPLite
 {
 	xmp_context context;
 	bool loop;
+	xmp_frame_info frame_info;
+	size_t buffer_done;
+	size_t buffer_size;
 };
 
 Decoder_libXMPLite* Decoder_libXMPLite_Create(const unsigned char *data, size_t data_size, bool loop, const DecoderSpec *wanted_spec, DecoderSpec *spec)
@@ -53,6 +59,8 @@ Decoder_libXMPLite* Decoder_libXMPLite_Create(const unsigned char *data, size_t 
 		{
 			decoder->context = context;
 			decoder->loop = loop;
+			decoder->buffer_done = 0;
+			decoder->buffer_size = 0;
 
 			spec->sample_rate = SAMPLE_RATE;
 			spec->channel_count = CHANNEL_COUNT;
@@ -81,12 +89,38 @@ void Decoder_libXMPLite_Destroy(Decoder_libXMPLite *decoder)
 
 void Decoder_libXMPLite_Rewind(Decoder_libXMPLite *decoder)
 {
-	xmp_seek_time(decoder->context, 0);
+	xmp_restart_module(decoder->context);
+	xmp_play_frame(decoder->context);
+	xmp_get_frame_info(decoder->context, &decoder->frame_info);
 }
 
 size_t Decoder_libXMPLite_GetSamples(Decoder_libXMPLite *decoder, void *buffer, size_t frames_to_do)
 {
-	xmp_play_buffer(decoder->context, buffer, frames_to_do * CHANNEL_COUNT * sizeof(short), !decoder->loop);
+	size_t frames_done = 0;
+	while (frames_done != frames_to_do)
+	{
+		if (decoder->buffer_done == decoder->buffer_size)
+		{
+			decoder->buffer_done = 0;
+
+			xmp_play_frame(decoder->context);
+
+			xmp_get_frame_info(decoder->context, &decoder->frame_info);
+
+			decoder->buffer_size = decoder->frame_info.buffer_size / (CHANNEL_COUNT * sizeof(short));
+		}
+
+		if (!decoder->loop)
+			if (decoder->frame_info.loop_count != 0)
+				return frames_done;
+
+		size_t frames = MIN(frames_to_do - frames_done, decoder->buffer_size - decoder->buffer_done);
+
+		memcpy(&((short*)buffer)[frames_done * CHANNEL_COUNT], &((short*)decoder->frame_info.buffer)[decoder->buffer_done * CHANNEL_COUNT], frames * CHANNEL_COUNT * sizeof(short));
+
+		decoder->buffer_done += frames;
+		frames_done += frames;
+	}
 
 	return frames_to_do;
 }
