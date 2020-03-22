@@ -54,13 +54,11 @@ static struct
 	BOOL bSystem;	// Basically a 'do not regenerate' flag
 } surface_metadata[SURFACE_ID_MAX];
 
-// The original names for these variables are unknown
 static int client_x;
 static int client_y;
 
 #define FRAMERATE 20
 
-// The original name for this function is unknown
 void SetClientOffset(int width, int height)
 {
 	client_x = width;
