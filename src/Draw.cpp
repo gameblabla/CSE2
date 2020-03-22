@@ -556,7 +556,7 @@ void BackupSurface(SurfaceID surf_no, const RECT *rect)
 void PutBitmap3(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID surf_no) // Transparency
 {
 	static RECT rcWork;
-	static RECT dst_rect;
+	static RECT rcSet;
 
 	rcWork = *rect;
 
