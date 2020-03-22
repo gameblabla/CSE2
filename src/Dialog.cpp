@@ -40,7 +40,7 @@ DLGPROC_RET CALLBACK VersionDialog(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lP
 			sprintf(string_buffer, version_string, version1, version2, version3, version4, year, month, day);
 			SetDlgItemTextA(hWnd, 1011, string_buffer);
 
-			CenterWindow(hWnd);
+			CenteringWindowByParent(hWnd);
 
 			return TRUE;
 
@@ -65,7 +65,7 @@ DLGPROC_RET CALLBACK DebugMuteDialog(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM 
 	switch (Msg)
 	{
 		case WM_INITDIALOG:
-			CenterWindow(hWnd);
+			CenteringWindowByParent(hWnd);
 			CheckDlgButton(hWnd, 1010, g_mute[0] != 0);
 			CheckDlgButton(hWnd, 1018, g_mute[1] != 0);
 			CheckDlgButton(hWnd, 1019, g_mute[2] != 0);
@@ -112,7 +112,7 @@ DLGPROC_RET CALLBACK DebugSaveDialog(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM 
 	{
 		case WM_INITDIALOG:
 			SetDlgItemTextA(hWnd, 1008, "000.dat");
-			CenterWindow(hWnd);
+			CenteringWindowByParent(hWnd);
 			return TRUE;
 
 		case WM_COMMAND:
@@ -141,7 +141,7 @@ DLGPROC_RET CALLBACK QuitDialog(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lPara
 	{
 		case WM_INITDIALOG:
 			SetDlgItemTextA(hWnd, 1009, (LPCSTR)lParam);
-			CenterWindow(hWnd);
+			CenteringWindowByParent(hWnd);
 			return TRUE;
 
 		case WM_COMMAND:

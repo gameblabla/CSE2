@@ -44,7 +44,7 @@ typedef enum SurfaceID
 	SURFACE_ID_MAX = 40
 } SurfaceID;
 
-void SetWindowPadding(int width, int height);
+void SetClientOffset(int width, int height);
 BOOL Flip_SystemTask(HWND hWnd);
 BOOL StartDirectDraw(HWND hWnd, int lMagnification, int lColourDepth);
 void EndDirectDraw(HWND hWnd);

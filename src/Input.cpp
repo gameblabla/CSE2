@@ -40,8 +40,8 @@ void ReleaseDirectInput(void)
 	}
 }
 
-// The original name for this function and its variables are unknown
-BOOL SetDeviceAquire(BOOL aquire)
+// The original name for this function's variables are unknown
+BOOL ActivateDirectInput(BOOL aquire)
 {
 	if (aquire == TRUE)
 	{
@@ -176,7 +176,7 @@ BOOL GetJoystickStatus(JOYSTICK_STATUS *status)
 	if (res != DI_OK)
 	{
 		if (res == DIERR_INPUTLOST)
-			SetDeviceAquire(FALSE);
+			ActivateDirectInput(FALSE);
 		else
 			return FALSE;
 	}
@@ -221,7 +221,7 @@ BOOL ResetJoystickStatus(void)
 	if (res != DI_OK)
 	{
 		if (res == DIERR_INPUTLOST)
-			SetDeviceAquire(FALSE);
+			ActivateDirectInput(FALSE);
 		else
 			return FALSE;
 	}

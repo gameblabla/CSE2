@@ -61,7 +61,7 @@ static int y_offset;
 #define FRAMERATE 20
 
 // The original name for this function is unknown
-void SetWindowPadding(int width, int height)
+void SetClientOffset(int width, int height)
 {
 	x_offset = width;
 	y_offset = height;
@@ -296,7 +296,7 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 
 	if (!IsEnableBitmap(path))
 	{
-		PrintBitmapError(path, 0);
+		ErrorLog(path, 0);
 		return FALSE;
 	}
 
@@ -306,20 +306,20 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 	if (surf_no > SURFACE_ID_MAX)
 #endif
 	{
-		PrintBitmapError("surface no", surf_no);
+		ErrorLog("surface no", surf_no);
 		return FALSE;
 	}
 
 	if (surf[surf_no] != NULL)
 	{
-		PrintBitmapError("existing", surf_no);
+		ErrorLog("existing", surf_no);
 		return FALSE;
 	}
 
 	HANDLE handle = LoadImageA(GetModuleHandleA(NULL), path, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 	if (handle == NULL)
 	{
-		PrintBitmapError(path, 1);
+		ErrorLog(path, 1);
 		return FALSE;
 	}
 
@@ -434,7 +434,7 @@ BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 
 	if (!IsEnableBitmap(path))
 	{
-		PrintBitmapError(path, 0);
+		ErrorLog(path, 0);
 		return FALSE;
 	}
 
@@ -444,14 +444,14 @@ BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 	if (surf_no > SURFACE_ID_MAX)
 #endif
 	{
-		PrintBitmapError("surface no", surf_no);
+		ErrorLog("surface no", surf_no);
 		return FALSE;
 	}
 
 	HANDLE handle = LoadImageA(GetModuleHandleA(NULL), path, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 	if (handle == NULL)
 	{
-		PrintBitmapError(path, 1);
+		ErrorLog(path, 1);
 		return FALSE;
 	}
 

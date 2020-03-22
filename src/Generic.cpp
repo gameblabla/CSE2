@@ -85,7 +85,7 @@ fail:
 
 // This seems to be broken in recent Windows (Sndvol32.exe was renamed 'SndVol.exe')
 // TODO - Inaccurate stack frame
-BOOL OpenVolumeConfiguration(HWND hWnd)
+BOOL OpenSoundVolume(HWND hWnd)
 {
 #ifdef FIX_BUGS
 	char path[MAX_PATH];
@@ -152,7 +152,7 @@ BOOL OpenVolumeConfiguration(HWND hWnd)
 #endif
 }
 
-void DeleteDebugLog(void)
+void DeleteLog(void)
 {
 	char path[MAX_PATH];
 
@@ -160,7 +160,7 @@ void DeleteDebugLog(void)
 	DeleteFileA(path);
 }
 
-BOOL PrintDebugLog(const char *string, int value1, int value2, int value3)
+BOOL WriteLog(const char *string, int value1, int value2, int value3)
 {
 	char path[MAX_PATH];
 	FILE *fp;
@@ -184,7 +184,7 @@ uses this code.
 This is just speculation, but this *might* have been used in those prototypes
 Pixel released to testers, to prevent them from running after a certain date.
 */
-int CheckTime(SYSTEMTIME *system_time_low, SYSTEMTIME *system_time_high)
+int GetDateLimit(SYSTEMTIME *system_time_low, SYSTEMTIME *system_time_high)
 {
 	FILETIME FileTime1;
 	FILETIME FileTime2;
@@ -205,7 +205,7 @@ int CheckTime(SYSTEMTIME *system_time_low, SYSTEMTIME *system_time_high)
 	return 0;
 }
 
-BOOL CheckFileExists(const char *name)
+BOOL IsKeyFile(const char *name)
 {
 	char path[MAX_PATH];
 
@@ -236,7 +236,7 @@ long GetFileSizeLong(const char *path)
 	return len;
 }
 
-BOOL PrintBitmapError(const char *string, int value)
+BOOL ErrorLog(const char *string, int value)
 {
 	char path[MAX_PATH];
 	FILE *fp;
@@ -267,7 +267,7 @@ BOOL IsShiftJIS(unsigned char c)
 }
 
 // TODO - Inaccurate stack frame
-BOOL CenterWindow(HWND hWnd)
+BOOL CenteringWindowByParent(HWND hWnd)
 {
 	RECT window_rect;
 	HWND parent_hwnd;

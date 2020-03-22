@@ -158,7 +158,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 
 	// Swap left and right weapon switch keys
-	if (CheckFileExists("s_reverse"))
+	if (IsKeyFile("s_reverse"))
 	{
 		gKeyArms = KEY_ARMSREV;
 		gKeyArmsRev = KEY_ARMS;
@@ -262,7 +262,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			x = (GetSystemMetrics(SM_CXSCREEN) - nWidth) / 2;
 			y = (GetSystemMetrics(SM_CYSCREEN) - nHeight) / 2;
 
-			SetWindowPadding(GetSystemMetrics(SM_CXFIXEDFRAME) + 1, GetSystemMetrics(SM_CYFIXEDFRAME) + GetSystemMetrics(SM_CYCAPTION) + GetSystemMetrics(SM_CYMENU) + 1);
+			SetClientOffset(GetSystemMetrics(SM_CXFIXEDFRAME) + 1, GetSystemMetrics(SM_CYFIXEDFRAME) + GetSystemMetrics(SM_CYCAPTION) + GetSystemMetrics(SM_CYMENU) + 1);
 
 			hWnd = CreateWindowExA(WS_EX_LEFT | WS_EX_LTRREADING | WS_EX_RIGHTSCROLLBAR, lpWindowName, lpWindowName, WS_MINIMIZEBOX | WS_SYSMENU | WS_BORDER | WS_DLGFRAME | WS_VISIBLE, x, y, nWidth, nHeight, NULL, NULL, hInstance, NULL);
 			ghWnd = hWnd;
@@ -309,7 +309,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			windowWidth = WINDOW_WIDTH * 2;
 			windowHeight = WINDOW_HEIGHT * 2;
 
-			SetWindowPadding(0, 0);
+			SetClientOffset(0, 0);
 
 			hWnd = CreateWindowExA(WS_EX_LEFT | WS_EX_LTRREADING | WS_EX_RIGHTSCROLLBAR, lpWindowName, lpWindowName, WS_SYSMENU | WS_VISIBLE | WS_POPUP, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), NULL, NULL, hInstance, NULL);
 			ghWnd = hWnd;
@@ -457,11 +457,11 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lPar
 			DrawMenuBar(hWnd);
 
 			hMenu = GetMenu(hWnd);
-			if (!CheckFileExists("mute"))
+			if (!IsKeyFile("mute"))
 				DeleteMenu(hMenu, 40007, MF_BYCOMMAND);
 			DrawMenuBar(hWnd);
 
-			if (CheckFileExists("fps"))
+			if (IsKeyFile("fps"))
 				bFps = TRUE;
 
 			if (!bFullscreen)
@@ -685,7 +685,7 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lPar
 					break;
 
 				case 40004:
-					if (!OpenVolumeConfiguration(hWnd))
+					if (!OpenSoundVolume(hWnd))
 						MessageBoxA(hWnd, "\x83\x7B\x83\x8A\x83\x85\x81\x5B\x83\x80\x90\xDD\x92\xE8\x82\xF0\x8B\x4E\x93\xAE\x82\xC5\x82\xAB\x82\xDC\x82\xB9\x82\xF1\x82\xC5\x82\xB5\x82\xBD", lpWindowName, 0);	// 'ボリューム設定を起動できませんでした' (Could not launch volume configuration) in Shift-JIS
 					break;
 
