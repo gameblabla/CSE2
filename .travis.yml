@@ -16,7 +16,7 @@ compiler:
 
 os:
     - linux
-    - windows
+#    - windows
 
 addons:
   apt:
