@@ -55,16 +55,16 @@ static struct
 } surface_metadata[SURFACE_ID_MAX];
 
 // The original names for these variables are unknown
-static int x_offset;
-static int y_offset;
+static int client_x;
+static int client_y;
 
 #define FRAMERATE 20
 
 // The original name for this function is unknown
 void SetClientOffset(int width, int height)
 {
-	x_offset = width;
-	y_offset = height;
+	client_x = width;
+	client_y = height;
 }
 
 BOOL Flip_SystemTask(HWND hWnd)
@@ -93,8 +93,8 @@ BOOL Flip_SystemTask(HWND hWnd)
 
 	static RECT dst_rect;
 	GetWindowRect(hWnd, &dst_rect);
-	dst_rect.left += x_offset;
-	dst_rect.top += y_offset;
+	dst_rect.left += client_x;
+	dst_rect.top += client_y;
 	dst_rect.right = dst_rect.left + scaled_window_width;
 	dst_rect.bottom = dst_rect.top + scaled_window_height;
 
@@ -555,111 +555,111 @@ void BackupSurface(SurfaceID surf_no, const RECT *rect)
 
 void PutBitmap3(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID surf_no) // Transparency
 {
-	static RECT src_rect;
+	static RECT rcWork;
 	static RECT dst_rect;
 
-	src_rect = *rect;
+	rcWork = *rect;
 
 	if (x + rect->right - rect->left > rcView->right)
-		src_rect.right -= (x + rect->right - rect->left) - rcView->right;
+		rcWork.right -= (x + rect->right - rect->left) - rcView->right;
 
 	if (x < rcView->left)
 	{
-		src_rect.left += rcView->left - x;
+		rcWork.left += rcView->left - x;
 		x = rcView->left;
 	}
 
 	if (y + rect->bottom - rect->top > rcView->bottom)
-		src_rect.bottom -= (y + rect->bottom - rect->top) - rcView->bottom;
+		rcWork.bottom -= (y + rect->bottom - rect->top) - rcView->bottom;
 
 	if (y < rcView->top)
 	{
-		src_rect.top += rcView->top - y;
+		rcWork.top += rcView->top - y;
 		y = rcView->top;
 	}
 
-	dst_rect.left = x;
-	dst_rect.top = y;
-	dst_rect.right = x + src_rect.right - src_rect.left;
-	dst_rect.bottom = y + src_rect.bottom - src_rect.top;
+	rcSet.left = x;
+	rcSet.top = y;
+	rcSet.right = x + rcWork.right - rcWork.left;
+	rcSet.bottom = y + rcWork.bottom - rcWork.top;
 
-	src_rect.left *= magnification;
-	src_rect.top *= magnification;
-	src_rect.right *= magnification;
-	src_rect.bottom *= magnification;
+	rcWork.left *= magnification;
+	rcWork.top *= magnification;
+	rcWork.right *= magnification;
+	rcWork.bottom *= magnification;
 
-	dst_rect.left *= magnification;
-	dst_rect.top *= magnification;
-	dst_rect.right *= magnification;
-	dst_rect.bottom *= magnification;
+	rcSet.left *= magnification;
+	rcSet.top *= magnification;
+	rcSet.right *= magnification;
+	rcSet.bottom *= magnification;
 
-	backbuffer->Blt(&dst_rect, surf[surf_no], &src_rect, DDBLT_KEYSRC | DDBLT_WAIT, NULL);
+	backbuffer->Blt(&rcSet, surf[surf_no], &rcWork, DDBLT_KEYSRC | DDBLT_WAIT, NULL);
 }
 
 void PutBitmap4(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID surf_no) // No Transparency
 {
-	static RECT src_rect;
-	static RECT dst_rect;
+	static RECT rcWork;
+	static RECT rcSet;
 
-	src_rect = *rect;
+	rcWork = *rect;
 
 	if (x + rect->right - rect->left > rcView->right)
-		src_rect.right -= (x + rect->right - rect->left) - rcView->right;
+		rcWork.right -= (x + rect->right - rect->left) - rcView->right;
 
 	if (x < rcView->left)
 	{
-		src_rect.left += rcView->left - x;
+		rcWork.left += rcView->left - x;
 		x = rcView->left;
 	}
 
 	if (y + rect->bottom - rect->top > rcView->bottom)
-		src_rect.bottom -= (y + rect->bottom - rect->top) - rcView->bottom;
+		rcWork.bottom -= (y + rect->bottom - rect->top) - rcView->bottom;
 
 	if (y < rcView->top)
 	{
-		src_rect.top += rcView->top - y;
+		rcWork.top += rcView->top - y;
 		y = rcView->top;
 	}
 
-	dst_rect.left = x;
-	dst_rect.top = y;
-	dst_rect.right = x + src_rect.right - src_rect.left;
-	dst_rect.bottom = y + src_rect.bottom - src_rect.top;
+	rcSet.left = x;
+	rcSet.top = y;
+	rcSet.right = x + rcWork.right - rcWork.left;
+	rcSet.bottom = y + rcWork.bottom - rcWork.top;
 
-	src_rect.left *= magnification;
-	src_rect.top *= magnification;
-	src_rect.right *= magnification;
-	src_rect.bottom *= magnification;
+	rcWork.left *= magnification;
+	rcWork.top *= magnification;
+	rcWork.right *= magnification;
+	rcWork.bottom *= magnification;
 
-	dst_rect.left *= magnification;
-	dst_rect.top *= magnification;
-	dst_rect.right *= magnification;
-	dst_rect.bottom *= magnification;
+	rcSet.left *= magnification;
+	rcSet.top *= magnification;
+	rcSet.right *= magnification;
+	rcSet.bottom *= magnification;
 
-	backbuffer->Blt(&dst_rect, surf[surf_no], &src_rect, DDBLT_WAIT, NULL);
+	backbuffer->Blt(&rcSet, surf[surf_no], &rcWork, DDBLT_WAIT, NULL);
 }
 
 void Surface2Surface(int x, int y, const RECT *rect, int to, int from)
 {
-	static RECT src_rect;
-	static RECT dst_rect;
+	static RECT rcWork;
+	static RECT rcSet;
 
-	src_rect.left = rect->left * magnification;
-	src_rect.top = rect->top * magnification;
-	src_rect.right = rect->right * magnification;
-	src_rect.bottom = rect->bottom * magnification;
+	rcWork.left = rect->left * magnification;
+	rcWork.top = rect->top * magnification;
+	rcWork.right = rect->right * magnification;
+	rcWork.bottom = rect->bottom * magnification;
 
-	dst_rect.left = x;
-	dst_rect.top = y;
-	dst_rect.right = x + rect->right - rect->left;
-	dst_rect.bottom = y + rect->bottom - rect->top;
+	rcSet.left = x;
+	rcSet.top = y;
+	rcSet.right = x + rect->right - rect->left;
+	rcSet.bottom = y + rect->bottom - rect->top;
 
-	dst_rect.left *= magnification;
-	dst_rect.top *= magnification;
-	dst_rect.right *= magnification;
-	dst_rect.bottom *= magnification;
+	rcSet.left *= magnification;
+	rcSet.top *= magnification;
+	rcSet.right *= magnification;
+	rcSet.bottom *= magnification;
 
-	surf[to]->Blt(&dst_rect, surf[from], &src_rect, DDBLT_KEYSRC | DDBLT_WAIT, NULL);
+	surf[to]->Blt(&rcSet, surf[from], &rcWork, DDBLT_KEYSRC | DDBLT_WAIT, NULL);
 }
 
 // This converts a colour to the 'native' format by writing it
