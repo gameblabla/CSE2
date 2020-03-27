@@ -202,36 +202,40 @@ void ActNpc061(NPCHAR *npc)
 	int i;
 
 	RECT rcLeft[11] = {
-		{224, 32, 240, 48},
-		{240, 32, 256, 48},
-		{256, 32, 272, 48},
-		{272, 32, 288, 48},
-		{288, 32, 304, 48},
-		{224, 32, 240, 48},
-		{304, 32, 320, 48},
-		{224, 32, 240, 48},
-		{272, 32, 288, 48},
-		{0, 0, 0, 0},
-		{112, 32, 128, 48},
+		// NpcRegu
+		{224, 32, 240, 48}, //  0 - Stood
+		{240, 32, 256, 48}, //  1 - Blinking
+		{256, 32, 272, 48}, //  2 - Injured - falling backwards
+		{272, 32, 288, 48}, //  3 - Lying down
+		{288, 32, 304, 48}, //  4 - Walking - frame 1
+		{224, 32, 240, 48}, //  5 - Walking - frame 2
+		{304, 32, 320, 48}, //  6 - Walking - frame 3
+		{224, 32, 240, 48}, //  7 - Walking - frame 4
+		{272, 32, 288, 48}, //  8 - Dying - frame 1
+		{0, 0, 0, 0},       //  9 - Dying - frame 2
+		// NpcSym
+		{112, 32, 128, 48}, // 10 - King's sword
 	};
 
 	RECT rcRight[11] = {
-		{224, 48, 240, 64},
-		{240, 48, 256, 64},
-		{256, 48, 272, 64},
-		{272, 48, 288, 64},
-		{288, 48, 304, 64},
-		{224, 48, 240, 64},
-		{304, 48, 320, 64},
-		{224, 48, 240, 64},
-		{272, 48, 288, 64},
-		{0, 0, 0, 0},
-		{112, 32, 128, 48},
+		// NpcRegu
+		{224, 48, 240, 64}, //  0 - Stood
+		{240, 48, 256, 64}, //  1 - Blinking
+		{256, 48, 272, 64}, //  2 - Injured - falling backwards
+		{272, 48, 288, 64}, //  3 - Lying down
+		{288, 48, 304, 64}, //  4 - Walking - frame 1
+		{224, 48, 240, 64}, //  5 - Walking - frame 2
+		{304, 48, 320, 64}, //  6 - Walking - frame 3
+		{224, 48, 240, 64}, //  7 - Walking - frame 4
+		{272, 48, 288, 64}, //  8 - Dying - frame 1
+		{0, 0, 0, 0},       //  9 - Dying - frame 2
+		// NpcSym
+		{112, 32, 128, 48}, // 10 - King's sword
 	};
 
 	switch (npc->act_no)
 	{
-		case 0:
+		case 0: // Stood
 			npc->act_no = 1;
 			npc->ani_no = 0;
 			npc->ani_wait = 0;
@@ -247,7 +251,7 @@ void ActNpc061(NPCHAR *npc)
 
 			break;
 
-		case 2:
+		case 2: // Blink
 			if (++npc->act_wait > 8)
 			{
 				npc->act_no = 1;
@@ -256,12 +260,12 @@ void ActNpc061(NPCHAR *npc)
 
 			break;
 
-		case 5:
+		case 5: // Lying down
 			npc->ani_no = 3;
 			npc->xm = 0;
 			break;
 
-		case 6:
+		case 6: // Being knocked-back
 			npc->act_no = 7;
 			npc->act_wait = 0;
 			npc->ani_wait = 0;
@@ -275,12 +279,14 @@ void ActNpc061(NPCHAR *npc)
 			else
 				npc->xm = 0x200;
 
+			// If touching ground, enter 'lying down' state (the `act_wait` check is probably
+			// so he doesn't do it before he even leaves the ground in the first place)
 			if (npc->act_wait++ != 0 && npc->flag & 8)
 				npc->act_no = 5;
 
 			break;
 
-		case 8:
+		case 8: // Walking
 			npc->act_no = 9;
 			npc->ani_no = 4;
 			npc->ani_wait = 0;
@@ -302,7 +308,7 @@ void ActNpc061(NPCHAR *npc)
 
 			break;
 
-		case 10:
+		case 10: // Running
 			npc->act_no = 11;
 			npc->ani_no = 4;
 			npc->ani_wait = 0;
@@ -324,13 +330,13 @@ void ActNpc061(NPCHAR *npc)
 
 			break;
 
-		case 20:
-			SetNpChar(145, 0, 0, 0, 0, 2, npc, 0x100);
+		case 20: // Spawn his sword, before entering his 'idle' state
+			SetNpChar(NPC_KINGS_SWORD, 0, 0, 0, 0, 2, npc, 0x100);
 			npc->ani_no = 0;
 			npc->act_no = 0;
 			break;
 
-		case 30:
+		case 30: // Flying through air after being attacked by Misery
 			npc->act_no = 31;
 			npc->act_wait = 0;
 			npc->ani_wait = 0;
@@ -358,7 +364,7 @@ void ActNpc061(NPCHAR *npc)
 
 			break;
 
-		case 40:
+		case 40: // Dying
 			npc->act_no = 42;
 			npc->act_wait = 0;
 			npc->ani_no = 8;
@@ -371,7 +377,7 @@ void ActNpc061(NPCHAR *npc)
 			if (++npc->act_wait > 100)
 			{
 				for (i = 0; i < 4; ++i)
-					SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, NULL, 0x100);
+					SetNpChar(NPC_SMOKE, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, NULL, 0x100);
 
 				npc->act_no = 50;
 				npc->surf = SURFACE_ID_NPC_SYM;
@@ -380,7 +386,7 @@ void ActNpc061(NPCHAR *npc)
 
 			break;
 
-		case 60:
+		case 60: // Leap (used to attack Balrog in the Sand Zone storehouse)
 			npc->ani_no = 6;
 			npc->act_no = 61;
 			npc->ym = -0x5FF;
@@ -388,7 +394,7 @@ void ActNpc061(NPCHAR *npc)
 			npc->count2 = 1;
 			break;
 
-		case 61:
+		case 61: // Leap - part 2
 			npc->ym += 0x40;
 
 			if (npc->flag & 8)
@@ -401,6 +407,7 @@ void ActNpc061(NPCHAR *npc)
 			break;
 	}
 
+	// Apply gravity and speed-caps during most states
 	if (npc->act_no < 30 || npc->act_no >= 40)
 	{
 		npc->ym += 0x40;
