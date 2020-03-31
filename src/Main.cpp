@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "SDL.h"
@@ -220,12 +221,12 @@ int main(int argc, char *argv[])
 			if (conf.display_mode == 1)
 			{
 				if (!StartDirectDraw(lpWindowName, windowWidth, windowHeight, 0))
-					return 0;
+					return EXIT_FAILURE;
 			}
 			else
 			{
 				if (!StartDirectDraw(lpWindowName, windowWidth, windowHeight, 1))
-					return 0;
+					return EXIT_FAILURE;
 			}
 		#else
 			// Doesn't handle StartDirectDraw failing
@@ -246,7 +247,7 @@ int main(int argc, char *argv[])
 
 		#ifdef FIX_BUGS
 			if (!StartDirectDraw(lpWindowName, windowWidth, windowHeight, 2))
-				return 0;
+				return EXIT_FAILURE;
 		#else
 			// Doesn't handle StartDirectDraw failing
 			StartDirectDraw(lpWindowName, windowWidth, windowHeight, 2);
@@ -292,7 +293,7 @@ int main(int argc, char *argv[])
 	{
         SDL_FreeCursor(cursor);
         SDL_FreeSurface(cursor_surface);
-		return 1;
+		return EXIT_SUCCESS;
 	}
 
 	// Initialize sound
@@ -320,7 +321,7 @@ int main(int argc, char *argv[])
 	SDL_FreeCursor(cursor);
 	SDL_FreeSurface(cursor_surface);
 
-	return 1;
+	return EXIT_SUCCESS;
 }
 
 void InactiveWindow(void)
