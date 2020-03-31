@@ -3,7 +3,7 @@
 #define MINIAUDIO_IMPLEMENTATION
 #define MA_NO_DECODING
 #define MA_API static
-#include "miniaudio.h"
+#include "../../../external/miniaudio.h"
 
 #include "../../Organya.h"
 #include "../../WindowsWrapper.h"

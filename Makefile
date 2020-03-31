@@ -51,10 +51,10 @@ ifeq ($(DEBUG_SAVE), 1)
 endif
 
 ALL_CFLAGS += -std=c99 -MMD -MP -MF $@.d
-CSE2_CFLAGS += $(shell $(PKGCONFIG) sdl2 --cflags) $(shell $(PKGCONFIG) freetype2 --cflags) -Iexternal
+CSE2_CFLAGS += $(shell $(PKGCONFIG) sdl2 --cflags) $(shell $(PKGCONFIG) freetype2 --cflags)
 
 ALL_CXXFLAGS += -std=c++98 -MMD -MP -MF $@.d
-CSE2_CXXFLAGS += $(shell $(PKGCONFIG) sdl2 --cflags) $(shell $(PKGCONFIG) freetype2 --cflags) -Iexternal
+CSE2_CXXFLAGS += $(shell $(PKGCONFIG) sdl2 --cflags) $(shell $(PKGCONFIG) freetype2 --cflags)
 
 ifeq ($(STATIC), 1)
   ALL_LDFLAGS += -static
@@ -216,8 +216,6 @@ endif
 
 ifeq ($(BACKEND_RENDERER), OpenGL3)
   SOURCES += src/Backends/Rendering/OpenGL3.cpp external/glad/src/glad.c
-  CSE2_CFLAGS += -Iexternal/glad/include
-  CSE2_CXXFLAGS += -Iexternal/glad/include
 
   ifeq ($(WINDOWS), 1)
     CSE2_LIBS += -lopengl32

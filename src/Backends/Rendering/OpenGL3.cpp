@@ -10,13 +10,13 @@
 #ifdef USE_OPENGLES2
 #include <GLES2/gl2.h>
 #else
-#include <glad/glad.h>
+#include "../../../external/glad/include/glad/glad.h"
 #endif
 
 #include "SDL.h"
 
 #define SPRITEBATCH_IMPLEMENTATION
-#include "cute_spritebatch.h"
+#include "../../../external/cute_spritebatch.h"
 
 #include "../../WindowsWrapper.h"
 
