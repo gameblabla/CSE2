@@ -17,6 +17,7 @@ option(FIX_BUGS "Fix various bugs in the game" OFF)
 option(DEBUG_SAVE "Re-enable the ability to drag-and-drop save files onto the window" OFF)
 set(BACKEND_RENDERER "SDLTexture" CACHE STRING "Which renderer the game should use: 'OpenGL3' for an OpenGL 3.2 renderer, 'OpenGLES2' for an OpenGL ES 2.0 renderer, 'SDLTexture' for SDL2's hardware-accelerated Texture API, 'SDLSurface' for SDL2's software-rendered Surface API, or 'Software' for a handwritten software renderer")
 set(BACKEND_AUDIO "SDL2" CACHE STRING "Which audio backend the game should use: 'SDL2' or 'miniaudio'")
+set(BACKEND_CONTROLLER "SDL2" CACHE STRING "Which controller backend the game should use: 'SDL2' or 'GLFW3'")
 
 option(LTO "Enable link-time optimisation" OFF)
 option(MSVC_LINK_STATIC_RUNTIME "Link the static MSVC runtime library" OFF)
@@ -163,7 +164,6 @@ add_executable(CSE2 WIN32
 	"src/ValueView.cpp"
 	"src/ValueView.h"
 	"src/WindowsWrapper.h"
-	"src/Backends/Controller/SDL2.cpp"
 	"src/Backends/Platform/SDL2.cpp"
 	"src/Backends/Audio.h"
 	"src/Backends/Controller.h"
@@ -318,6 +318,12 @@ elseif(BACKEND_AUDIO MATCHES "miniaudio")
 	target_link_libraries(CSE2 PRIVATE ${CMAKE_DL_LIBS})
 else()
 	message(FATAL_ERROR "Invalid BACKEND_AUDIO selected")
+endif()
+
+if(BACKEND_CONTROLLER MATCHES "SDL2")
+	target_sources(CSE2 PRIVATE "src/Backends/Controller/SDL2.cpp")
+elseif(BACKEND_CONTROLLER MATCHES "GLFW3")
+	target_sources(CSE2 PRIVATE "src/Backends/Controller/GLFW3.cpp")
 endif()
 
 
