@@ -236,9 +236,9 @@ else()
 endif()
 
 if(BACKEND_AUDIO MATCHES "SDL2")
-	target_sources(CSE2 PRIVATE "src/Backends/Audio/SDL2.cpp")
+	target_sources(CSE2 PRIVATE "src/Backends/Audio/SDL2.cpp" "src/Backends/Audio/SoftwareMixer.cpp" "src/Backends/Audio/SoftwareMixer.h")
 elseif(BACKEND_AUDIO MATCHES "miniaudio")
-	target_sources(CSE2 PRIVATE "src/Backends/Audio/miniaudio.cpp")
+	target_sources(CSE2 PRIVATE "src/Backends/Audio/miniaudio.cpp" "src/Backends/Audio/SoftwareMixer.cpp" "src/Backends/Audio/SoftwareMixer.h")
 
 	# Link libdl, libm, and libpthread
 	include(CheckLibraryExists)
