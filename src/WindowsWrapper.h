@@ -1,8 +1,9 @@
 #pragma once
 
 #ifdef _WIN32
-#include <windef.h>
-#include <wingdi.h>
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#undef FindResource
 #else
 
 #include <stdio.h>
