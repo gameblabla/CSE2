@@ -136,7 +136,7 @@ int main(int argc, char *argv[])
 	}
 
 	// Swap left and right weapon switch keys
-	if (CheckFileExists("s_reverse"))
+	if (IsKeyFile("s_reverse"))
 	{
 		gKeyArms = KEY_ARMSREV;
 		gKeyArmsRev = KEY_ARMS;
@@ -271,7 +271,7 @@ int main(int argc, char *argv[])
 	SDL_Cursor *cursor = SDL_CreateColorCursor(cursor_surface, 0, 0);
 	SDL_SetCursor(cursor);
 
-	if (CheckFileExists("fps"))
+	if (IsKeyFile("fps"))
 		bFps = TRUE;
 
 	// Set rects

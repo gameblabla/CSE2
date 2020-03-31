@@ -259,7 +259,7 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 
 	if (!IsEnableBitmap(path))
 	{
-		PrintBitmapError(path, 0);
+		ErrorLog(path, 0);
 		return FALSE;
 	}
 
@@ -269,13 +269,13 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 	if (surf_no > SURFACE_ID_MAX)
 #endif
 	{
-		PrintBitmapError("surface no", surf_no);
+		ErrorLog("surface no", surf_no);
 		return FALSE;
 	}
 
 	if (surf[surf_no] != NULL)
 	{
-		PrintBitmapError("existing", surf_no);
+		ErrorLog("existing", surf_no);
 		return FALSE;
 	}
 
@@ -284,7 +284,7 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 
 	if (image_buffer == NULL)
 	{
-		PrintBitmapError(path, 1);
+		ErrorLog(path, 1);
 		return FALSE;
 	}
 
@@ -350,7 +350,7 @@ BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 
 	if (!IsEnableBitmap(path))
 	{
-		PrintBitmapError(path, 0);
+		ErrorLog(path, 0);
 		return FALSE;
 	}
 
@@ -360,7 +360,7 @@ BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 	if (surf_no > SURFACE_ID_MAX)
 #endif
 	{
-		PrintBitmapError("surface no", surf_no);
+		ErrorLog("surface no", surf_no);
 		return FALSE;
 	}
 
@@ -369,7 +369,7 @@ BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 
 	if (image_buffer == NULL)
 	{
-		PrintBitmapError(path, 1);
+		ErrorLog(path, 1);
 		return FALSE;
 	}
 
@@ -431,78 +431,78 @@ void BackupSurface(SurfaceID surf_no, const RECT *rect)
 
 void PutBitmap3(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID surf_no) // Transparency
 {
-	static RECT src_rect;
+	static RECT rcWork;
 
-	src_rect = *rect;
+	rcWork = *rect;
 
 	if (x + rect->right - rect->left > rcView->right)
-		src_rect.right -= (x + rect->right - rect->left) - rcView->right;
+		rcWork.right -= (x + rect->right - rect->left) - rcView->right;
 
 	if (x < rcView->left)
 	{
-		src_rect.left += rcView->left - x;
+		rcWork.left += rcView->left - x;
 		x = rcView->left;
 	}
 
 	if (y + rect->bottom - rect->top > rcView->bottom)
-		src_rect.bottom -= (y + rect->bottom - rect->top) - rcView->bottom;
+		rcWork.bottom -= (y + rect->bottom - rect->top) - rcView->bottom;
 
 	if (y < rcView->top)
 	{
-		src_rect.top += rcView->top - y;
+		rcWork.top += rcView->top - y;
 		y = rcView->top;
 	}
 
-	src_rect.left *= magnification;
-	src_rect.top *= magnification;
-	src_rect.right *= magnification;
-	src_rect.bottom *= magnification;
+	rcWork.left *= magnification;
+	rcWork.top *= magnification;
+	rcWork.right *= magnification;
+	rcWork.bottom *= magnification;
 
-	Backend_Blit(surf[surf_no], &src_rect, framebuffer, x * magnification, y * magnification, TRUE);
+	Backend_Blit(surf[surf_no], &rcWork, framebuffer, x * magnification, y * magnification, TRUE);
 }
 
 void PutBitmap4(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID surf_no) // No Transparency
 {
-	static RECT src_rect;
+	static RECT rcWork;
 
-	src_rect = *rect;
+	rcWork = *rect;
 
 	if (x + rect->right - rect->left > rcView->right)
-		src_rect.right -= (x + rect->right - rect->left) - rcView->right;
+		rcWork.right -= (x + rect->right - rect->left) - rcView->right;
 
 	if (x < rcView->left)
 	{
-		src_rect.left += rcView->left - x;
+		rcWork.left += rcView->left - x;
 		x = rcView->left;
 	}
 
 	if (y + rect->bottom - rect->top > rcView->bottom)
-		src_rect.bottom -= (y + rect->bottom - rect->top) - rcView->bottom;
+		rcWork.bottom -= (y + rect->bottom - rect->top) - rcView->bottom;
 
 	if (y < rcView->top)
 	{
-		src_rect.top += rcView->top - y;
+		rcWork.top += rcView->top - y;
 		y = rcView->top;
 	}
 
-	src_rect.left *= magnification;
-	src_rect.top *= magnification;
-	src_rect.right *= magnification;
-	src_rect.bottom *= magnification;
+	rcWork.left *= magnification;
+	rcWork.top *= magnification;
+	rcWork.right *= magnification;
+	rcWork.bottom *= magnification;
 
-	Backend_Blit(surf[surf_no], &src_rect, framebuffer, x * magnification, y * magnification, FALSE);
+	Backend_Blit(surf[surf_no], &rcWork, framebuffer, x * magnification, y * magnification, FALSE);
 }
 
 void Surface2Surface(int x, int y, const RECT *rect, int to, int from)
 {
-	static RECT src_rect;
+	static RECT rcWork;
 
-	src_rect.left = rect->left * magnification;
-	src_rect.top = rect->top * magnification;
-	src_rect.right = rect->right * magnification;
-	src_rect.bottom = rect->bottom * magnification;
+	rcWork.left = rect->left * magnification;
+	rcWork.top = rect->top * magnification;
+	rcWork.right = rect->right * magnification;
+	rcWork.bottom = rect->bottom * magnification;
 
-	Backend_Blit(surf[from], &src_rect, surf[to], x * magnification, y * magnification, TRUE);
+	Backend_Blit(surf[from], &rcWork, surf[to], x * magnification, y * magnification, TRUE);
 }
 
 unsigned long GetCortBoxColor(unsigned long col)
