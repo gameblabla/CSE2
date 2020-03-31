@@ -7,7 +7,8 @@
 
 #include "WindowsWrapper.h"
 
-#include "Backends/Rendering.h"
+#include "Backends/Platform.h"
+#include "Backends/Window.h"
 #include "Bitmap.h"
 #include "CommonDefines.h"
 #include "Ending.h"
@@ -58,15 +59,15 @@ BOOL Flip_SystemTask(void)
 			return FALSE;
 
 		// Framerate limiter
-		timeNow = SDL_GetTicks();
+		timeNow = PlatformBackend_GetTicks();
 
-		if (SDL_TICKS_PASSED(timeNow, timePrev + 20))
+		if (timeNow >= timePrev + 20)
 			break;
 
-		SDL_Delay(1);
+		PlatformBackend_Delay(1);
 	}
 
-	if (SDL_TICKS_PASSED(timeNow, timePrev + 100))
+	if (timeNow >= timePrev + 100)
 		timePrev = timeNow;	// If the timer is freakishly out of sync, panic and reset it, instead of spamming frames for who-knows how long
 	else
 		timePrev += 20;

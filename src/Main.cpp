@@ -63,11 +63,11 @@ unsigned long GetFramePerSecound(void)
 
 	if (need_new_base_tick)
 	{
-		base_tick = SDL_GetTicks();
+		base_tick = PlatformBackend_GetTicks();
 		need_new_base_tick = FALSE;
 	}
 
-	current_tick = SDL_GetTicks();
+	current_tick = PlatformBackend_GetTicks();
 	++current_frame;
 
 	if (base_tick + 1000 <= current_tick)
@@ -91,7 +91,19 @@ int main(int argc, char *argv[])
 	PlatformBackend_Init();
 
 	// Get executable's path
-	PlatformBackend_GetBasePath(gModulePath);
+	if (!PlatformBackend_GetBasePath(gModulePath))
+	{
+		strcpy(gModulePath, argv[0]);
+
+		for (size_t i = strlen(gModulePath);; --i)
+		{
+			if (i == 0 || gModulePath[i] == '\\' || gModulePath[i] == '/')
+			{
+				gModulePath[i] = '\0';
+				break;
+			}
+		}
+	}
 
 	// Get path of the data folder
 	strcpy(gDataPath, gModulePath);
@@ -308,6 +320,9 @@ int main(int argc, char *argv[])
 	SDL_FreeCursor(cursor);
 	SDL_FreeSurface(cursor_surface);
 */
+
+	PlatformBackend_Deinit();
+
 	return EXIT_SUCCESS;
 }
 

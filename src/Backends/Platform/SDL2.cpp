@@ -2,7 +2,7 @@
 
 #include "SDL.h"
 
-#include "../Rendering.h"
+#include "../Window.h"
 
 #include "../../WindowsWrapper.h"
 
@@ -25,13 +25,20 @@ void PlatformBackend_Init(void)
 	SDL_InitSubSystem(SDL_INIT_VIDEO);
 }
 
-void PlatformBackend_GetBasePath(char *string_buffer)
+void PlatformBackend_Deinit(void)
+{
+	SDL_Quit();
+}
+
+BOOL PlatformBackend_GetBasePath(char *string_buffer)
 {
 	char *base_path = SDL_GetBasePath();
 	size_t base_path_length = strlen(base_path);
 	base_path[base_path_length - 1] = '\0';
 	strcpy(string_buffer, base_path);
 	SDL_free(base_path);
+
+	return TRUE;
 }
 
 BOOL PlatformBackend_SystemTask(void)
@@ -261,4 +268,9 @@ void PlatformBackend_ShowMessageBox(const char *title, const char *message)
 unsigned long PlatformBackend_GetTicks(void)
 {
 	return SDL_GetTicks();
+}
+
+void PlatformBackend_Delay(unsigned int ticks)
+{
+	SDL_Delay(ticks);
 }

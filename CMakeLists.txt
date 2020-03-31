@@ -18,6 +18,7 @@ option(DEBUG_SAVE "Re-enable the ability to drag-and-drop save files onto the wi
 set(BACKEND_RENDERER "SDLTexture" CACHE STRING "Which renderer the game should use: 'OpenGL3' for an OpenGL 3.2 renderer, 'OpenGLES2' for an OpenGL ES 2.0 renderer, 'SDLTexture' for SDL2's hardware-accelerated Texture API, 'SDLSurface' for SDL2's software-rendered Surface API, or 'Software' for a handwritten software renderer")
 set(BACKEND_AUDIO "SDL2" CACHE STRING "Which audio backend the game should use: 'SDL2' or 'miniaudio'")
 set(BACKEND_CONTROLLER "SDL2" CACHE STRING "Which controller backend the game should use: 'SDL2' or 'GLFW3'")
+set(BACKEND_PLATFORM "SDL2" CACHE STRING "Which platform backend the game should use: 'SDL2' or 'GLFW3'")
 
 option(LTO "Enable link-time optimisation" OFF)
 option(MSVC_LINK_STATIC_RUNTIME "Link the static MSVC runtime library" OFF)
@@ -164,7 +165,6 @@ add_executable(CSE2 WIN32
 	"src/ValueView.cpp"
 	"src/ValueView.h"
 	"src/WindowsWrapper.h"
-	"src/Backends/Platform/SDL2.cpp"
 	"src/Backends/Audio.h"
 	"src/Backends/Controller.h"
 	"src/Backends/Platform.h"
@@ -326,6 +326,20 @@ elseif(BACKEND_CONTROLLER MATCHES "GLFW3")
 	target_sources(CSE2 PRIVATE "src/Backends/Controller/GLFW3.cpp")
 endif()
 
+if(BACKEND_PLATFORM MATCHES "SDL2")
+	target_sources(CSE2 PRIVATE "src/Backends/Platform/SDL2.cpp")
+elseif(BACKEND_PLATFORM MATCHES "GLFW3")
+	target_sources(CSE2 PRIVATE "src/Backends/Platform/GLFW3.cpp")
+endif()
+
+if(BACKEND_PLATFORM MATCHES "SDL2" AND BACKEND_RENDERER MATCHES "OpenGL3")
+	target_sources(CSE2 PRIVATE "src/Backends/Window/SDL2-OpenGL3.cpp")
+elseif(BACKEND_PLATFORM MATCHES "GLFW3" AND BACKEND_RENDERER MATCHES "OpenGL3")
+	target_sources(CSE2 PRIVATE "src/Backends/Window/GLFW3-OpenGL3.cpp")
+else()
+	message(FATAL_ERROR "Invalid BACKEND_PLATFORM/BACKEND_RENDERER combination")
+endif()
+
 
 ##########
 # Tweaks #
@@ -381,32 +395,39 @@ set_target_properties(CSE2 PROPERTIES
 # Dependencies #
 ################
 
-if(NOT FORCE_LOCAL_LIBS)
-	find_package(SDL2)
+if(BACKEND_PLATFORM MATCHES "GLFW3")
+	find_package(glfw3 REQUIRED)
+	target_link_libraries(CSE2 PRIVATE glfw)
 endif()
 
-if(TARGET SDL2::SDL2)
-	# CMake-generated config (Arch, vcpkg, Raspbian)
-	message(STATUS "Using system SDL2 (CMake, dynamic)")
-	target_link_libraries(CSE2 PRIVATE SDL2::SDL2 SDL2::SDL2main)
-elseif(TARGET SDL2::SDL2-static)
-	# CMake-generated config (Arch, vcpkg, Raspbian)
-	message(STATUS "Using system SDL2 (CMake, static)")
-	target_link_libraries(CSE2 PRIVATE SDL2::SDL2-static SDL2::SDL2main)
-elseif(SDL2_FOUND)
-	# Autotools-generated config (MSYS2)
-	message(STATUS "Using system SDL2 (Autotools)")
-	target_include_directories(CSE2 PRIVATE ${SDL2_INCLUDE_DIRS})
-	target_link_libraries(CSE2 PRIVATE ${SDL2_LIBRARIES})
-else()
-	# Compile it ourselves
-	message(STATUS "Using local SDL2")
-	set(SDL_SHARED_ENABLED_BY_DEFAULT OFF)
-	if(MSVC)
-		set(LIBC ON)	# Needed to prevent possible 'symbol already defined' errors
+if(BACKEND_PLATFORM MATCHES "SDL2" OR BACKEND_AUDIO MATCHES "SDL2")
+	if(NOT FORCE_LOCAL_LIBS)
+		find_package(SDL2)
 	endif()
-	add_subdirectory("external/SDL2" EXCLUDE_FROM_ALL)
-	target_link_libraries(CSE2 PRIVATE SDL2-static SDL2main)
+
+	if(TARGET SDL2::SDL2)
+		# CMake-generated config (Arch, vcpkg, Raspbian)
+		message(STATUS "Using system SDL2 (CMake, dynamic)")
+		target_link_libraries(CSE2 PRIVATE SDL2::SDL2 SDL2::SDL2main)
+	elseif(TARGET SDL2::SDL2-static)
+		# CMake-generated config (Arch, vcpkg, Raspbian)
+		message(STATUS "Using system SDL2 (CMake, static)")
+		target_link_libraries(CSE2 PRIVATE SDL2::SDL2-static SDL2::SDL2main)
+	elseif(SDL2_FOUND)
+		# Autotools-generated config (MSYS2)
+		message(STATUS "Using system SDL2 (Autotools)")
+		target_include_directories(CSE2 PRIVATE ${SDL2_INCLUDE_DIRS})
+		target_link_libraries(CSE2 PRIVATE ${SDL2_LIBRARIES})
+	else()
+		# Compile it ourselves
+		message(STATUS "Using local SDL2")
+		set(SDL_SHARED_ENABLED_BY_DEFAULT OFF)
+		if(MSVC)
+			set(LIBC ON)	# Needed to prevent possible 'symbol already defined' errors
+		endif()
+		add_subdirectory("external/SDL2" EXCLUDE_FROM_ALL)
+		target_link_libraries(CSE2 PRIVATE SDL2-static SDL2main)
+	endif()
 endif()
 
 if(NOT FORCE_LOCAL_LIBS)
