@@ -53,7 +53,7 @@ endif
 ALL_CFLAGS += -std=c99 -MMD -MP -MF $@.d
 CSE2_CFLAGS += $(shell $(PKGCONFIG) sdl2 --cflags) $(shell $(PKGCONFIG) freetype2 --cflags)
 
-ALL_CXXFLAGS += -std=c++98 -MMD -MP -MF $@.d
+ALL_CXXFLAGS += -std=c++11 -MMD -MP -MF $@.d
 CSE2_CXXFLAGS += $(shell $(PKGCONFIG) sdl2 --cflags) $(shell $(PKGCONFIG) freetype2 --cflags)
 
 ifeq ($(STATIC), 1)
