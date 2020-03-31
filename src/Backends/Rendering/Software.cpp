@@ -1,6 +1,7 @@
 #include "../Rendering.h"
 
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -38,6 +39,13 @@ static Backend_Surface *glyph_destination_surface;
 
 Backend_Surface* Backend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
 {
+	puts("Available SDL2 video drivers:");
+
+	for (int i = 0; i < SDL_GetNumVideoDrivers(); ++i)
+		puts(SDL_GetVideoDriver(i));
+
+	printf("Selected SDL2 video driver: %s\n", SDL_GetCurrentVideoDriver());
+
 	window = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screen_width, screen_height, 0);
 
 	if (window != NULL)

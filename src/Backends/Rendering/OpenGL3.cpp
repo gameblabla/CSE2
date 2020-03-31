@@ -518,6 +518,13 @@ static void GlyphBatch_DestroyTexture(SPRITEBATCH_U64 texture_id, void *udata)
 
 Backend_Surface* Backend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
 {
+	puts("Available SDL2 video drivers:");
+
+	for (int i = 0; i < SDL_GetNumVideoDrivers(); ++i)
+		puts(SDL_GetVideoDriver(i));
+
+	printf("Selected SDL2 video driver: %s\n", SDL_GetCurrentVideoDriver());
+
 #ifdef USE_OPENGLES2
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);

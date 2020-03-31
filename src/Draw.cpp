@@ -5,8 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "SDL.h"
-
 #include "WindowsWrapper.h"
 
 #include "Backends/Rendering.h"
@@ -87,13 +85,6 @@ BOOL Flip_SystemTask(void)
 
 BOOL StartDirectDraw(const char *title, int width, int height, int lMagnification)
 {
-	puts("Available SDL2 video drivers:");
-
-	for (int i = 0; i < SDL_GetNumVideoDrivers(); ++i)
-		puts(SDL_GetVideoDriver(i));
-
-	printf("Selected SDL2 video driver: %s\n", SDL_GetCurrentVideoDriver());
-
 	memset(surface_metadata, 0, sizeof(surface_metadata));
 
 	switch (lMagnification)
