@@ -4,10 +4,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "SDL.h"
-
 #include "WindowsWrapper.h"
 
+#include "Backends/Platform.h"
 #include "ArmsItem.h"
 #include "BossLife.h"
 #include "Fade.h"
@@ -248,9 +247,9 @@ BOOL InitializeGame(void)
 	if (!TransferStage(13, 200, 10, 8))
 	{
 #ifdef JAPANESE
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", "ステージの読み込みに失敗", NULL);
+		PlatformBackend_ShowMessageBox("エラー", "ステージの読み込みに失敗");
 #else
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Failed to load stage", NULL);
+		PlatformBackend_ShowMessageBox("Error", "Failed to load stage");
 #endif
 
 		return FALSE;

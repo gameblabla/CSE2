@@ -252,3 +252,8 @@ BOOL PlatformBackend_SystemTask(void)
 
 	return TRUE;
 }
+
+void PlatformBackend_ShowMessageBox(const char *title, const char *message)
+{
+	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, message, NULL);
+}

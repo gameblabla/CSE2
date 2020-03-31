@@ -4,10 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "SDL.h"
-
 #include "WindowsWrapper.h"
 
+#include "Backends/Platform.h"
 #include "ArmsItem.h"
 #include "Boss.h"
 #include "BossLife.h"
@@ -727,9 +726,9 @@ int TextScriptProc(void)
 						if (!TransferStage(z, w, x, y))
 						{
 							#ifdef JAPANESE
-							SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", "ステージの読み込みに失敗", NULL);
+							PlatformBackend_ShowMessageBox("エラー", "ステージの読み込みに失敗");
 							#else
-							SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Failed to load stage", NULL);
+							PlatformBackend_ShowMessageBox("Error", "Failed to load stage");
 							#endif
 
 							return enum_ESCRETURN_exit;
@@ -1284,10 +1283,10 @@ int TextScriptProc(void)
 						char str_0[0x40];
 						#ifdef JAPANESE
 						sprintf(str_0, "不明のコード:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);
-						SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", str_0, NULL);
+						PlatformBackend_ShowMessageBox("エラー", str_0);
 						#else
 						sprintf(str_0, "Unknown code:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);
-						SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", str_0, NULL);
+						PlatformBackend_ShowMessageBox("Error", str_0);
 						#endif
 
 						return enum_ESCRETURN_exit;
