@@ -49,10 +49,10 @@ ifeq ($(DEBUG_SAVE), 1)
 endif
 
 ALL_CFLAGS += -std=c99 -MMD -MP -MF $@.d
-CSE2_CFLAGS += $(shell $(PKGCONFIG) sdl2 --cflags) $(shell $(PKGCONFIG) freetype2 --cflags) -Iexternal
+CSE2_CFLAGS += $(shell $(PKGCONFIG) sdl2 --cflags) $(shell $(PKGCONFIG) freetype2 --cflags)
 
 ALL_CXXFLAGS += -std=c++11 -MMD -MP -MF $@.d
-CSE2_CXXFLAGS += $(shell $(PKGCONFIG) sdl2 --cflags) $(shell $(PKGCONFIG) freetype2 --cflags) -Iexternal
+CSE2_CXXFLAGS += $(shell $(PKGCONFIG) sdl2 --cflags) $(shell $(PKGCONFIG) freetype2 --cflags)
 
 ifeq ($(STATIC), 1)
   ALL_LDFLAGS += -static
@@ -242,8 +242,6 @@ endif
 
 ifeq ($(BACKEND_RENDERER), OpenGL3)
   SOURCES += src/Backends/Rendering/OpenGL3.cpp external/glad/src/glad.c
-  CSE2_CFLAGS += -Iexternal/glad/include
-  CSE2_CXXFLAGS += -Iexternal/glad/include
 
   ifeq ($(WINDOWS), 1)
     CSE2_LIBS += -lopengl32
@@ -264,9 +262,9 @@ else
 endif
 
 ifeq ($(BACKEND_AUDIO), SDL2)
-  SOURCES += src/Backends/Audio/SDL2.cpp
+  SOURCES += src/Backends/Audio/SDL2.cpp src/Backends/Audio/SoftwareMixer.cpp
 else ifeq ($(BACKEND_AUDIO), miniaudio)
-  SOURCES += src/Backends/Audio/miniaudio.cpp external/miniaudio.c
+  SOURCES += src/Backends/Audio/miniaudio.cpp src/Backends/Audio/SoftwareMixer.cpp
   CSE2_LIBS += -lm -lpthread
 
   ifneq ($(WINDOWS), 1)

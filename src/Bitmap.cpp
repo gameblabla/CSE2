@@ -7,7 +7,7 @@
 #define STBI_ONLY_BMP
 #define STBI_ONLY_PNG
 #define STBI_NO_LINEAR
-#include "stb_image.h"
+#include "../external/stb_image.h"
 
 #include "WindowsWrapper.h"
 
