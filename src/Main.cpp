@@ -165,7 +165,7 @@ int main(int argc, char *argv[])
 	SDL_Cursor *cursor = SDL_CreateColorCursor(cursor_surface, 0, 0);
 	SDL_SetCursor(cursor);
 
-	if (CheckFileExists("fps"))
+	if (IsKeyFile("fps"))
 		bFps = TRUE;
 
 	// Set rects
