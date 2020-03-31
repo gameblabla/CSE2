@@ -257,3 +257,8 @@ void PlatformBackend_ShowMessageBox(const char *title, const char *message)
 {
 	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, message, NULL);
 }
+
+unsigned long PlatformBackend_GetTicks(void)
+{
+	return SDL_GetTicks();
+}
