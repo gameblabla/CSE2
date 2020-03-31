@@ -163,8 +163,10 @@ add_executable(CSE2 WIN32
 	"src/ValueView.cpp"
 	"src/ValueView.h"
 	"src/WindowsWrapper.h"
-	"src/Backends/Rendering.h"
+	"src/Backends/Platform/SDL2.cpp"
 	"src/Backends/Audio.h"
+	"src/Backends/Platform.h"
+	"src/Backends/Rendering.h"
 )
 
 set(RESOURCES
