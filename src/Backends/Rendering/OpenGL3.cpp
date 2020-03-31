@@ -409,7 +409,7 @@ static void GlyphBatch_Draw(spritebatch_sprite_t *sprites, int count, int textur
 		glEnable(GL_BLEND);
 
 		// Enable texture coordinates, since this uses textures
-		glEnableVertexAttribArray(2);
+		glEnableVertexAttribArray(ATTRIBUTE_INPUT_TEXTURE_COORDINATES);
 
 		glBindTexture(GL_TEXTURE_2D, texture_id);
 	}
@@ -582,7 +582,7 @@ Backend_Surface* Backend_Init(const char *window_title, int screen_width, int sc
 						glGenBuffers(TOTAL_VBOS, vertex_buffer_ids);
 
 						// Set up the vertex attributes
-						glEnableVertexAttribArray(1);
+						glEnableVertexAttribArray(ATTRIBUTE_INPUT_VERTEX_COORDINATES);
 
 						// Set up our shaders
 						program_texture = CompileShader(vertex_shader_texture, fragment_shader_texture);
@@ -723,7 +723,7 @@ void Backend_DrawScreen(void)
 	glDisable(GL_BLEND);
 
 	// Enable texture coordinates, since this uses textures
-	glEnableVertexAttribArray(2);
+	glEnableVertexAttribArray(ATTRIBUTE_INPUT_TEXTURE_COORDINATES);
 
 	// Target actual screen, and not our framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -893,7 +893,7 @@ void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Sur
 		glDisable(GL_BLEND);
 
 		// Enable texture coordinates, since this uses textures
-		glEnableVertexAttribArray(2);
+		glEnableVertexAttribArray(ATTRIBUTE_INPUT_TEXTURE_COORDINATES);
 
 		glBindTexture(GL_TEXTURE_2D, source_surface->texture_id);
 	}
@@ -973,7 +973,7 @@ void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned cha
 		glDisable(GL_BLEND);
 
 		// Disable texture coordinate array, since this doesn't use textures
-		glDisableVertexAttribArray(2);
+		glDisableVertexAttribArray(ATTRIBUTE_INPUT_TEXTURE_COORDINATES);
 
 		glUniform4f(program_colour_fill_uniform_colour, red / 255.0f, green / 255.0f, blue / 255.0f, 1.0f);
 	}
