@@ -1,5 +1,8 @@
 #include "../Audio.h"
 
+#include <stddef.h>
+#include <stdio.h>
+
 #include "SDL.h"
 
 #ifdef EXTRA_SOUND_FORMATS

@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
 
 		#ifdef FIX_BUGS
 			if (!StartDirectDraw(lpWindowName, conf.display_mode, conf.b60fps, conf.bSmoothScrolling, conf.bVsync))
-				return 0;
+				return EXIT_FAILURE;
 		#else
 			// Doesn't handle StartDirectDraw failing
 			StartDirectDraw(lpWindowName, conf.display_mode, conf.b60fps, conf.bSmoothScrolling, conf.bVsync);
@@ -136,7 +136,7 @@ int main(int argc, char *argv[])
 
 		#ifdef FIX_BUGS
 			if (!StartDirectDraw(lpWindowName, 0, conf.b60fps, conf.bSmoothScrolling, conf.bVsync))
-				return 0;
+				return EXIT_FAILURE;
 		#else
 			// Doesn't handle StartDirectDraw failing
 			StartDirectDraw(lpWindowName, 0, conf.b60fps, conf.bSmoothScrolling, conf.bVsync);
@@ -187,7 +187,7 @@ int main(int argc, char *argv[])
         SDL_FreeCursor(cursor);
         SDL_FreeSurface(cursor_surface);
 		free(image_buffer);
-		return 1;
+		return EXIT_SUCCESS;
 	}
 
 	// Initialize sound
@@ -212,7 +212,7 @@ int main(int argc, char *argv[])
 	SDL_FreeSurface(cursor_surface);
 	free(image_buffer);
 
-	return 1;
+	return EXIT_SUCCESS;
 }
 
 void InactiveWindow(void)

@@ -4,8 +4,9 @@
 #define RGBA(r,g,b,a) ((r) | ((g) << 8) | ((b) << 16) | ((a) << 24))
 
 #ifdef _WIN32
-#include <windef.h>
-#include <wingdi.h>
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#undef FindResource
 #else
 
 #include <stdio.h>

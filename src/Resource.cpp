@@ -17,6 +17,7 @@ static const struct
 #ifndef _WIN32
 	{"ICON", "ICON_MINI", rICON_MINI, sizeof(rICON_MINI)},
 #endif
+	{"DUMMY", "DUMMY", NULL, 0}	// Just here to prevent errors in the event the array is otherwise empty
 };
 
 const unsigned char* FindResource(const char *name, const char *type, size_t *size)

@@ -1,5 +1,7 @@
 #include "../Audio.h"
 
+#include <stddef.h>
+
 #define MINIAUDIO_IMPLEMENTATION
 #define MA_NO_DECODING
 #define MA_API static
