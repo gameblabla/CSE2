@@ -155,6 +155,7 @@ void ExtraSound_LoadSFX(const char *path, int id)
 	ClownAudio_SoundDataConfig data_config;
 	ClownAudio_InitSoundDataConfig(&data_config);
 	data_config.predecode = true;
+	data_config.dynamic_sample_rate = true;
 	sfx_list[id].sound_data = ClownAudio_LoadSoundDataFromFiles(path, NULL, &data_config);
 
 	if (sfx_list[id].sound_data != NULL)
@@ -162,6 +163,7 @@ void ExtraSound_LoadSFX(const char *path, int id)
 		ClownAudio_SoundConfig sound_config;
 		ClownAudio_InitSoundConfig(&sound_config);
 		sound_config.do_not_free_when_done = true;
+		sound_config.dynamic_sample_rate = true;
 		sfx_list[id].sound = ClownAudio_CreateSound(mixer, sfx_list[id].sound_data, &sound_config);
 
 		if (sfx_list[id].sound != 0)
