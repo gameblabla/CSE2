@@ -16,6 +16,9 @@ SDL_Window *window;
 
 BOOL bActive = TRUE;
 
+static SDL_Surface *cursor_surface;
+static SDL_Cursor *cursor;
+
 void PlatformBackend_Init(void)
 {
 	SDL_Init(SDL_INIT_EVENTS);
@@ -37,6 +40,12 @@ void PlatformBackend_Init(void)
 
 void PlatformBackend_Deinit(void)
 {
+	if (cursor != NULL)
+		SDL_FreeCursor(cursor);
+
+	if (cursor_surface != NULL)
+		SDL_FreeSurface(cursor_surface);
+
 	SDL_Quit();
 }
 
@@ -66,6 +75,14 @@ void PlatformBackend_SetWindowIcon(const unsigned char *rgb_pixels, unsigned int
 	SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormatFrom((void*)rgb_pixels, width, height, 0, width * 3, SDL_PIXELFORMAT_RGB24);
 	SDL_SetWindowIcon(window, surface);
 	SDL_FreeSurface(surface);
+}
+
+void PlatformBackend_SetCursor(const unsigned char *rgb_pixels, unsigned int width, unsigned int height)
+{
+	cursor_surface = SDL_CreateRGBSurfaceWithFormatFrom((void*)rgb_pixels, width, height, 0, width * 3, SDL_PIXELFORMAT_RGB24);
+	SDL_SetColorKey(cursor_surface, SDL_TRUE, SDL_MapRGB(cursor_surface->format, 0xFF, 0, 0xFF));
+	cursor = SDL_CreateColorCursor(cursor_surface, 0, 0);
+	SDL_SetCursor(cursor);
 }
 
 BOOL PlatformBackend_SystemTask(void)

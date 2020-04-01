@@ -18,9 +18,11 @@
 #include "../../Profile.h"
 #include "../../Resource.h"
 
+GLFWwindow *window;
+
 BOOL bActive = TRUE;
 
-GLFWwindow *window;
+static GLFWcursor* cursor;
 
 static void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
@@ -222,6 +224,9 @@ void PlatformBackend_Init(void)
 
 void PlatformBackend_Deinit(void)
 {
+	if (cursor != NULL)
+		glfwDestroyCursor(cursor);
+
 	glfwTerminate();
 }
 
@@ -270,6 +275,43 @@ void PlatformBackend_SetWindowIcon(const unsigned char *rgb_pixels, unsigned int
 	}
 }
 
+void PlatformBackend_SetCursor(const unsigned char *rgb_pixels, unsigned int width, unsigned int height)
+{
+	unsigned char *rgba_pixels = (unsigned char*)malloc(width * height * 4);
+
+	const unsigned char *rgb_pointer = rgb_pixels;
+	unsigned char *rgba_pointer = rgba_pixels;
+
+	if (rgba_pixels != NULL)
+	{
+		for (unsigned int y = 0; y < height; ++y)
+		{
+			for (unsigned int x = 0; x < width; ++x)
+			{
+				if (rgb_pointer[0] == 0xFF && rgb_pointer[1] == 0 && rgb_pointer[2] == 0xFF)
+				{
+					*rgba_pointer++ = *rgb_pointer++;
+					*rgba_pointer++ = *rgb_pointer++;
+					*rgba_pointer++ = *rgb_pointer++;
+					*rgba_pointer++ = 0;
+				}
+				else
+				{
+					*rgba_pointer++ = *rgb_pointer++;
+					*rgba_pointer++ = *rgb_pointer++;
+					*rgba_pointer++ = *rgb_pointer++;
+					*rgba_pointer++ = 0xFF;
+				}
+			}
+		}
+
+		GLFWimage glfw_image = {(int)width, (int)height, rgba_pixels};
+		cursor = glfwCreateCursor(&glfw_image, 0, 0);
+		glfwSetCursor(window, cursor);
+
+		free(rgba_pixels);
+	}
+}
 
 BOOL PlatformBackend_SystemTask(void)
 {

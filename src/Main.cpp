@@ -223,8 +223,6 @@ int main(int argc, char *argv[])
 			{
 				if (!StartDirectDraw(lpWindowName, windowWidth, windowHeight, 0))
 				{
-					//SDL_FreeCursor(cursor);
-					//SDL_FreeSurface(cursor_surface);
 					PlatformBackend_Deinit();
 					return EXIT_FAILURE;
 				}
@@ -233,8 +231,6 @@ int main(int argc, char *argv[])
 			{
 				if (!StartDirectDraw(lpWindowName, windowWidth, windowHeight, 1))
 				{
-					//SDL_FreeCursor(cursor);
-					//SDL_FreeSurface(cursor_surface);
 					PlatformBackend_Deinit();
 					return EXIT_FAILURE;
 				}
@@ -285,25 +281,29 @@ int main(int argc, char *argv[])
 	size_t window_icon_resource_size;
 	const unsigned char *window_icon_resource_data = FindResource("ICON_MINI", "ICON", &window_icon_resource_size);
 
-	unsigned int width, height;
-	unsigned char *rgb_pixels = DecodeBitmap(window_icon_resource_data, window_icon_resource_size, &width, &height);
+	unsigned int window_icon_width, window_icon_height;
+	unsigned char *window_icon_rgb_pixels = DecodeBitmap(window_icon_resource_data, window_icon_resource_size, &window_icon_width, &window_icon_height);
 
-	if (rgb_pixels != NULL)
+	if (window_icon_rgb_pixels != NULL)
 	{
-		PlatformBackend_SetWindowIcon(rgb_pixels, width, height);
-		FreeBitmap(rgb_pixels);
+		PlatformBackend_SetWindowIcon(window_icon_rgb_pixels, window_icon_width, window_icon_height);
+		FreeBitmap(window_icon_rgb_pixels);
 	}
 #endif
-/*
+
 	// Set up the cursor
-	size_t resource_size;
-	const unsigned char *resource_data = FindResource("CURSOR_NORMAL", "CURSOR", &resource_size);
-	SDL_RWops *rwops = SDL_RWFromConstMem(resource_data, resource_size);
-	SDL_Surface *cursor_surface = SDL_LoadBMP_RW(rwops, 1);
-	SDL_SetColorKey(cursor_surface, SDL_TRUE, SDL_MapRGB(cursor_surface->format, 0xFF, 0, 0xFF));
-	SDL_Cursor *cursor = SDL_CreateColorCursor(cursor_surface, 0, 0);
-	SDL_SetCursor(cursor);
-*/
+	size_t cursor_resource_size;
+	const unsigned char *cursor_resource_data = FindResource("CURSOR_NORMAL", "CURSOR", &cursor_resource_size);
+
+	unsigned int cursor_width, cursor_height;
+	unsigned char *cursor_rgb_pixels = DecodeBitmap(cursor_resource_data, cursor_resource_size, &cursor_width, &cursor_height);
+
+	if (cursor_rgb_pixels != NULL)
+	{
+		PlatformBackend_SetCursor(cursor_rgb_pixels, cursor_width, cursor_height);
+		FreeBitmap(cursor_rgb_pixels);
+	}
+
 	if (IsKeyFile("fps"))
 		bFps = TRUE;
 
@@ -323,8 +323,6 @@ int main(int argc, char *argv[])
 	// Draw to screen
 	if (!Flip_SystemTask())
 	{
-		//SDL_FreeCursor(cursor);
-		//SDL_FreeSurface(cursor_surface);
 		PlatformBackend_Deinit();
 		return EXIT_SUCCESS;
 	}
@@ -350,10 +348,6 @@ int main(int argc, char *argv[])
 	EndTextObject();
 	EndDirectSound();
 	EndDirectDraw();
-/*
-	SDL_FreeCursor(cursor);
-	SDL_FreeSurface(cursor_surface);
-*/
 
 	PlatformBackend_Deinit();
 
