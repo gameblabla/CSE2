@@ -71,6 +71,7 @@ Name | Function
 `-DBACKEND_AUDIO=SDL2` | Use the SDL2-driven software audio-mixer
 `-DBACKEND_AUDIO=miniaudio` | Use the miniaudio-driven software audio-mixer
 `-DLTO=ON` | Enable link-time optimisation
+`-DPKG_CONFIG_STATIC_LIBS=ON` | On platforms with pkg-config, static-link the dependencies (good for Windows builds, so you don't need to bundle DLL files)
 `-DMSVC_LINK_STATIC_RUNTIME=ON` | Link the static MSVC runtime library
 `-DFORCE_LOCAL_LIBS=ON` | Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones
 
