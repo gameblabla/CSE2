@@ -255,8 +255,6 @@ int main(int argc, char *argv[])
 		#ifdef FIX_BUGS
 			if (!StartDirectDraw(lpWindowName, windowWidth, windowHeight, 2))
 			{
-				//SDL_FreeCursor(cursor);
-				//SDL_FreeSurface(cursor_surface);
 				PlatformBackend_Deinit();
 				return EXIT_FAILURE;
 			}
