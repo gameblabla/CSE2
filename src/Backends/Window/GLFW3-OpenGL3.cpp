@@ -53,7 +53,7 @@ BOOL WindowBackend_OpenGL_CreateWindow(const char *window_title, int *screen_wid
 		glfwMakeContextCurrent(window);
 
 			#ifndef USE_OPENGLES2
-				if (gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+				if (gladLoadGLLoader(glfwGetProcAddress))
 				{
 					// Check if the platform supports OpenGL 3.2
 					if (GLAD_GL_VERSION_3_2)

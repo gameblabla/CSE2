@@ -43,7 +43,7 @@ BOOL WindowBackend_OpenGL_CreateWindow(const char *window_title, int *screen_wid
 			if (SDL_GL_MakeCurrent(window, context) == 0)
 			{
 			#ifndef USE_OPENGLES2
-				if (gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress))
+				if (gladLoadGLLoader(SDL_GL_GetProcAddress))
 				{
 					// Check if the platform supports OpenGL 3.2
 					if (GLAD_GL_VERSION_3_2)
