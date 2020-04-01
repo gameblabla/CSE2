@@ -18,7 +18,7 @@ option(DEBUG_SAVE "Re-enable the ability to drag-and-drop save files onto the wi
 set(BACKEND_RENDERER "SDLTexture" CACHE STRING "Which renderer the game should use: 'OpenGL3' for an OpenGL 3.2 renderer, 'OpenGLES2' for an OpenGL ES 2.0 renderer, 'SDLTexture' for SDL2's hardware-accelerated Texture API, 'SDLSurface' for SDL2's software-rendered Surface API, or 'Software' for a handwritten software renderer")
 set(BACKEND_AUDIO "SDL2" CACHE STRING "Which audio backend the game should use: 'SDL2' or 'miniaudio'")
 
-option(STATIC_LINKAGE "On platforms with pkg-config, static-link the dependencies" OFF)
+option(PKG_CONFIG_STATIC_LIBS "On platforms with pkg-config, static-link the dependencies" OFF)
 option(LTO "Enable link-time optimisation" OFF)
 option(MSVC_LINK_STATIC_RUNTIME "Link the static MSVC runtime library (Visual Studio only)" OFF)
 
@@ -259,7 +259,7 @@ if(DEBUG_SAVE)
 	target_compile_definitions(CSE2 PRIVATE DEBUG_SAVE)
 endif()
 
-if(STATIC_LINKAGE)
+if(PKG_CONFIG_STATIC_LIBS)
 	target_link_options(CSE2 PRIVATE "-static")
 endif()
 
@@ -390,7 +390,7 @@ endif()
 
 if(sdl2_FOUND)
 	# pkg-config
-	if (STATIC_LINKAGE)
+	if (PKG_CONFIG_STATIC_LIBS)
 		message(STATUS "Using system SDL2 (pkg-config, static)")
 		target_compile_options(CSE2 PRIVATE ${sdl2_STATIC_CFLAGS})
 		target_link_libraries(CSE2 PRIVATE ${sdl2_STATIC_LIBRARIES})
@@ -433,7 +433,7 @@ endif()
 
 if(freetype2_FOUND)
 	# pkg-config
-	if (STATIC_LINKAGE)
+	if (PKG_CONFIG_STATIC_LIBS)
 		message(STATUS "Using system FreeType (pkg-config, static)")
 		target_compile_options(CSE2 PRIVATE ${freetype2_STATIC_CFLAGS})
 		target_link_libraries(CSE2 PRIVATE ${freetype2_STATIC_LIBRARIES})
