@@ -1,18 +1,19 @@
 #include "../Window.h"
 
+#include <stddef.h>
+#include <stdlib.h>
+
 #ifdef USE_OPENGLES2
 #include <GLES2/gl2.h>
 #else
 #include "../../../external/glad/include/glad/glad.h"
 #endif
-
 #include <GLFW/glfw3.h>
-
-#include <stddef.h>
 
 #include "../../WindowsWrapper.h"
 
 #include "../Platform.h"
+#include "../../Bitmap.h"
 #include "../../Resource.h"
 
 // Horrible hacks
@@ -54,16 +55,44 @@ BOOL WindowBackend_OpenGL_CreateWindow(const char *window_title, int *screen_wid
 	window = glfwCreateWindow(*screen_width, *screen_height, window_title, monitor, NULL);
 
 	if (window != NULL)
-	{/*
+	{
 	#ifndef _WIN32	// On Windows, we use native icons instead (so we can give the taskbar and window separate icons, like the original EXE does)
 		size_t resource_size;
 		const unsigned char *resource_data = FindResource("ICON_MINI", "ICON", &resource_size);
-		SDL_RWops *rwops = SDL_RWFromConstMem(resource_data, resource_size);
-		SDL_Surface *icon_surface = SDL_LoadBMP_RW(rwops, 1);
-		SDL_SetWindowIcon(window, icon_surface);
-		SDL_FreeSurface(icon_surface);
+
+		unsigned int width, height;
+		unsigned char *rgb_pixels = DecodeBitmap(resource_data, resource_size, &width, &height);
+
+		if (rgb_pixels != NULL)
+		{
+			unsigned char *rgba_pixels = (unsigned char*)malloc(width * height * 4);
+
+			unsigned char *rgb_pointer = rgb_pixels;
+			unsigned char *rgba_pointer = rgba_pixels;
+
+			if (rgba_pixels != NULL)
+			{
+				for (unsigned int y = 0; y < height; ++y)
+				{
+					for (unsigned int x = 0; x < width; ++x)
+					{
+						*rgba_pointer++ = *rgb_pointer++;
+						*rgba_pointer++ = *rgb_pointer++;
+						*rgba_pointer++ = *rgb_pointer++;
+						*rgba_pointer++ = 0xFF;
+					}
+				}
+
+				GLFWimage glfw_image = {(int)width, (int)height, rgba_pixels};
+				glfwSetWindowIcon(window, 1, &glfw_image);
+
+				free(rgba_pixels);
+			}
+
+			FreeBitmap(rgb_pixels);
+		}
 	#endif
-*/
+
 
 		glfwMakeContextCurrent(window);
 

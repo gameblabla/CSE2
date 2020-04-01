@@ -1,14 +1,13 @@
 #include "../Window.h"
 
+#include <stddef.h>
+
 #ifdef USE_OPENGLES2
 #include <GLES2/gl2.h>
 #else
 #include "../../../external/glad/include/glad/glad.h"
 #endif
-
 #include "SDL.h"
-
-#include <stddef.h>
 
 #include "../../WindowsWrapper.h"
 
