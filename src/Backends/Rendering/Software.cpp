@@ -28,7 +28,8 @@ typedef struct Backend_Glyph
 	unsigned int height;
 } Backend_Glyph;
 
-static SDL_Window *window;
+extern SDL_Window *window;
+
 static SDL_Surface *window_sdlsurface;
 static SDL_Surface *framebuffer_sdlsurface;
 static Backend_Surface framebuffer;
@@ -369,8 +370,11 @@ void Backend_HandleRenderTargetLoss(void)
 	// No problem for us
 }
 
-void Backend_HandleWindowResize(void)
+void Backend_HandleWindowResize(unsigned int width, unsigned int height)
 {
+	(void)width;
+	(void)height;
+
 	// https://wiki.libsdl.org/SDL_GetWindowSurface
 	// We need to fetch a new surface pointer
 	window_sdlsurface = SDL_GetWindowSurface(window);

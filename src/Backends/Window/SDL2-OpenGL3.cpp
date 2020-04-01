@@ -14,7 +14,7 @@
 #include "../Platform.h"
 #include "../../Resource.h"
 
-SDL_Window *window;
+extern SDL_Window *window;
 
 static SDL_GLContext context;
 

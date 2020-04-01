@@ -12,7 +12,7 @@
 #include "../../Profile.h"
 #include "../../Resource.h"
 
-extern SDL_Window *window;
+SDL_Window *window;
 
 BOOL bActive = TRUE;
 

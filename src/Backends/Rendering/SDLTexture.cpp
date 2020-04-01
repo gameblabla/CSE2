@@ -11,7 +11,7 @@
 
 #include "../../WindowsWrapper.h"
 
-#inclide "../Platform.h"
+#include "../Platform.h"
 #include "../../Draw.h"
 #include "../../Ending.h"
 #include "../../MapName.h"
@@ -36,7 +36,8 @@ typedef struct Backend_Glyph
 	unsigned int height;
 } Backend_Glyph;
 
-static SDL_Window *window;
+extern SDL_Window *window;
+
 static SDL_Renderer *renderer;
 
 static Backend_Surface framebuffer;
@@ -420,7 +421,10 @@ void Backend_HandleRenderTargetLoss(void)
 		surface->lost = TRUE;
 }
 
-void Backend_HandleWindowResize(void)
+void Backend_HandleWindowResize(unsigned int width, unsigned int height)
 {
+	(void)width;
+	(void)height;
+
 	// No problem for us
 }
