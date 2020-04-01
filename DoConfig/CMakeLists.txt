@@ -29,7 +29,7 @@ endif()
 
 # Find FLTK
 if(NOT FORCE_LOCAL_LIBS)
-	set(FLTK_SKIP_FLUID ON)	# Do not require fltk-fluid (the UI designer)
+	set(FLTK_SKIP_FLUID ON CACHE INTERNAL "" FORCE)	# Do not require fltk-fluid (the UI designer)
 	find_package(FLTK)
 endif()
 
@@ -44,11 +44,11 @@ else()
 	# FLTK only appends to it, so the leftover junk gets fed into a bunch
 	# of important functions. THAT was no fun to debug.
 	set(FLTK_LIBRARIES)
-	set(OPTION_BUILD_EXAMPLES OFF)	# Needed to prevent a name collision
+	set(OPTION_BUILD_EXAMPLES OFF CACHE INTERNAL "" FORCE)	# Needed to prevent a name collision
 	if(FORCE_LOCAL_LIBS)
-		set(OPTION_USE_SYSTEM_ZLIB OFF)
-		set(OPTION_USE_SYSTEM_LIBJPEG OFF)
-		set(OPTION_USE_SYSTEM_LIBPNG OFF)
+		set(OPTION_USE_SYSTEM_ZLIB OFF CACHE INTERNAL "" FORCE)
+		set(OPTION_USE_SYSTEM_LIBJPEG OFF CACHE INTERNAL "" FORCE)
+		set(OPTION_USE_SYSTEM_LIBPNG OFF CACHE INTERNAL "" FORCE)
 	endif()
 	add_subdirectory("fltk" EXCLUDE_FROM_ALL)
 	get_target_property(DIRS fltk INCLUDE_DIRECTORIES)	# FLTK doesn't mark its includes as PUBLIC or INTERFACE, so we have to do this stupidity
