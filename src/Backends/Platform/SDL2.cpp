@@ -42,15 +42,7 @@ void PlatformBackend_Deinit(void)
 
 void PlatformBackend_PostWindowCreation(void)
 {
-	// Set up window icon
-#ifndef _WIN32	// On Windows, we use native icons instead (so we can give the taskbar and window separate icons, like the original EXE does)
-	size_t resource_size;
-	const unsigned char *resource_data = FindResource("ICON_MINI", "ICON", &resource_size);
-	SDL_RWops *rwops = SDL_RWFromConstMem(resource_data, resource_size);
-	SDL_Surface *icon_surface = SDL_LoadBMP_RW(rwops, 1);
-	SDL_SetWindowIcon(window, icon_surface);
-	SDL_FreeSurface(icon_surface);
-#endif
+	
 }
 
 BOOL PlatformBackend_GetBasePath(char *string_buffer)
@@ -67,6 +59,13 @@ BOOL PlatformBackend_GetBasePath(char *string_buffer)
 void PlatformBackend_HideMouse(void)
 {
 	SDL_ShowCursor(SDL_DISABLE);
+}
+
+void PlatformBackend_SetWindowIcon(const unsigned char *rgb_pixels, unsigned int width, unsigned int height)
+{
+	SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormatFrom((void*)rgb_pixels, width, height, 0, width * 3, SDL_PIXELFORMAT_RGB24);
+	SDL_SetWindowIcon(window, surface);
+	SDL_FreeSurface(surface);
 }
 
 BOOL PlatformBackend_SystemTask(void)

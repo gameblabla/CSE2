@@ -9,6 +9,7 @@
 
 #include "Backends/Platform.h"
 #include "Backends/Rendering.h"
+#include "Bitmap.h"
 #include "CommonDefines.h"
 #include "Config.h"
 #include "Draw.h"
@@ -276,6 +277,22 @@ int main(int argc, char *argv[])
 
 #ifdef DEBUG_SAVE
 	//SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
+#endif
+
+	// Set up window icon
+	// TODO - GLFW_ICON
+#ifndef _WIN32	// On Windows, we use native icons instead (so we can give the taskbar and window separate icons, like the original EXE does)
+	size_t window_icon_resource_size;
+	const unsigned char *window_icon_resource_data = FindResource("ICON_MINI", "ICON", &window_icon_resource_size);
+
+	unsigned int width, height;
+	unsigned char *rgb_pixels = DecodeBitmap(window_icon_resource_data, window_icon_resource_size, &width, &height);
+
+	if (rgb_pixels != NULL)
+	{
+		PlatformBackend_SetWindowIcon(rgb_pixels, width, height);
+		FreeBitmap(rgb_pixels);
+	}
 #endif
 /*
 	// Set up the cursor
