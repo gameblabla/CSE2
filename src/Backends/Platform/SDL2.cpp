@@ -10,6 +10,9 @@
 #include "../../Main.h"
 #include "../../Organya.h"
 #include "../../Profile.h"
+#include "../../Resource.h"
+
+extern SDL_Window *window;
 
 BOOL bActive = TRUE;
 
@@ -23,11 +26,31 @@ void PlatformBackend_Init(void)
 #endif
 
 	SDL_InitSubSystem(SDL_INIT_VIDEO);
+
+	puts("Available SDL2 video drivers:");
+
+	for (int i = 0; i < SDL_GetNumVideoDrivers(); ++i)
+		puts(SDL_GetVideoDriver(i));
+
+	printf("Selected SDL2 video driver: %s\n", SDL_GetCurrentVideoDriver());
 }
 
 void PlatformBackend_Deinit(void)
 {
 	SDL_Quit();
+}
+
+void PlatformBackend_PostWindowCreation(void)
+{
+	// Set up window icon
+#ifndef _WIN32	// On Windows, we use native icons instead (so we can give the taskbar and window separate icons, like the original EXE does)
+	size_t resource_size;
+	const unsigned char *resource_data = FindResource("ICON_MINI", "ICON", &resource_size);
+	SDL_RWops *rwops = SDL_RWFromConstMem(resource_data, resource_size);
+	SDL_Surface *icon_surface = SDL_LoadBMP_RW(rwops, 1);
+	SDL_SetWindowIcon(window, icon_surface);
+	SDL_FreeSurface(icon_surface);
+#endif
 }
 
 BOOL PlatformBackend_GetBasePath(char *string_buffer)
@@ -240,7 +263,7 @@ BOOL PlatformBackend_SystemTask(void)
 
 					case SDL_WINDOWEVENT_RESIZED:
 					case SDL_WINDOWEVENT_SIZE_CHANGED:
-						Backend_HandleWindowResize();
+						Backend_HandleWindowResize(event.window.data1, event.window.data2);
 						break;
 				}
 
@@ -262,7 +285,7 @@ BOOL PlatformBackend_SystemTask(void)
 
 void PlatformBackend_ShowMessageBox(const char *title, const char *message)
 {
-	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, message, NULL);
+	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, message, window);
 }
 
 unsigned long PlatformBackend_GetTicks(void)

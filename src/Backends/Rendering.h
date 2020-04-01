@@ -23,4 +23,4 @@ void Backend_PrepareToDrawGlyphs(Backend_Surface *destination_surface, const uns
 void Backend_DrawGlyph(Backend_Glyph *glyph, long x, long y);
 void Backend_FlushGlyphs(void);
 void Backend_HandleRenderTargetLoss(void);
-void Backend_HandleWindowResize(void);
+void Backend_HandleWindowResize(unsigned int width, unsigned int height);

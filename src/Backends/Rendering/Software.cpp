@@ -1,7 +1,6 @@
 #include "../Rendering.h"
 
 #include <stddef.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -9,7 +8,7 @@
 
 #include "../../WindowsWrapper.h"
 
-#include "../../Resource.h"
+#include "../Platform.h"
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -39,26 +38,10 @@ static Backend_Surface *glyph_destination_surface;
 
 Backend_Surface* Backend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
 {
-	puts("Available SDL2 video drivers:");
-
-	for (int i = 0; i < SDL_GetNumVideoDrivers(); ++i)
-		puts(SDL_GetVideoDriver(i));
-
-	printf("Selected SDL2 video driver: %s\n", SDL_GetCurrentVideoDriver());
-
 	window = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screen_width, screen_height, 0);
 
 	if (window != NULL)
 	{
-	#ifndef _WIN32	// On Windows, we use native icons instead (so we can give the taskbar and window separate icons, like the original EXE does)
-		size_t resource_size;
-		const unsigned char *resource_data = FindResource("ICON_MINI", "ICON", &resource_size);
-		SDL_RWops *rwops = SDL_RWFromConstMem(resource_data, resource_size);
-		SDL_Surface *icon_surface = SDL_LoadBMP_RW(rwops, 1);
-		SDL_SetWindowIcon(window, icon_surface);
-		SDL_FreeSurface(icon_surface);
-	#endif
-
 		if (fullscreen)
 			SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 
@@ -73,18 +56,20 @@ Backend_Surface* Backend_Init(const char *window_title, int screen_width, int sc
 			framebuffer.height = framebuffer_sdlsurface->h;
 			framebuffer.pitch = framebuffer_sdlsurface->pitch;
 
+			PlatformBackend_PostWindowCreation();
+
 			return &framebuffer;
 		}
 		else
 		{
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal error (software rendering backend)", "Could not create framebuffer surface", window);
+			PlatformBackend_ShowMessageBox("Fatal error (software rendering backend)", "Could not create framebuffer surface");
 		}
 
 		SDL_DestroyWindow(window);
 	}
 	else
 	{
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal error (software rendering backend)", "Could not create window", NULL);
+		PlatformBackend_ShowMessageBox("Fatal error (software rendering backend)", "Could not create window");
 	}
 
 	return NULL;

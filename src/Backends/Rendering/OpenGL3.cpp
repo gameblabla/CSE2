@@ -1029,7 +1029,8 @@ void Backend_HandleRenderTargetLoss(void)
 	// No problem for us
 }
 
-void Backend_HandleWindowResize(void)
+void Backend_HandleWindowResize(unsigned int width, unsigned int height)
 {
-	// No problem for us
+	actual_screen_width = width;
+	actual_screen_height = height;
 }

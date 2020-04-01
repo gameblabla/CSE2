@@ -1,8 +1,8 @@
 #include "../Rendering.h"
 
 #include <stddef.h>
-#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "SDL.h"
 
@@ -11,10 +11,10 @@
 
 #include "../../WindowsWrapper.h"
 
+#inclide "../Platform.h"
 #include "../../Draw.h"
 #include "../../Ending.h"
 #include "../../MapName.h"
-#include "../../Resource.h"
 #include "../../TextScr.h"
 
 typedef struct Backend_Surface
@@ -116,13 +116,6 @@ static void GlyphBatch_DestroyTexture(SPRITEBATCH_U64 texture_id, void *udata)
 
 Backend_Surface* Backend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
 {
-	puts("Available SDL2 video drivers:");
-
-	for (int i = 0; i < SDL_GetNumVideoDrivers(); ++i)
-		puts(SDL_GetVideoDriver(i));
-
-	printf("Selected SDL2 video driver: %s\n", SDL_GetCurrentVideoDriver());
-
 	puts("Available SDL2 render drivers:");
 
 	for (int i = 0; i < SDL_GetNumRenderDrivers(); ++i)
@@ -136,15 +129,6 @@ Backend_Surface* Backend_Init(const char *window_title, int screen_width, int sc
 
 	if (window != NULL)
 	{
-	#ifndef _WIN32	// On Windows, we use native icons instead (so we can give the taskbar and window separate icons, like the original EXE does)
-		size_t resource_size;
-		const unsigned char *resource_data = FindResource("ICON_MINI", "ICON", &resource_size);
-		SDL_RWops *rwops = SDL_RWFromConstMem(resource_data, resource_size);
-		SDL_Surface *icon_surface = SDL_LoadBMP_RW(rwops, 1);
-		SDL_SetWindowIcon(window, icon_surface);
-		SDL_FreeSurface(icon_surface);
-	#endif
-
 		if (fullscreen)
 			SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 
@@ -179,6 +163,8 @@ Backend_Surface* Backend_Init(const char *window_title, int screen_width, int sc
 				config.generate_texture_callback = GlyphBatch_CreateTexture;
 				config.delete_texture_callback = GlyphBatch_DestroyTexture;
 				spritebatch_init(&glyph_batcher, &config, NULL);
+
+				PlatformBackend_PostWindowCreation();
 
 				return &framebuffer;
 			}

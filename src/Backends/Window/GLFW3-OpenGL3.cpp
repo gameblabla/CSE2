@@ -13,15 +13,9 @@
 #include "../../WindowsWrapper.h"
 
 #include "../Platform.h"
-#include "../../Bitmap.h"
-#include "../../Resource.h"
 
 // Horrible hacks
 GLFWwindow *window;
-
-void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
-void WindowFocusCallback(GLFWwindow *window, int focused);
-void WindowSizeCallback(GLFWwindow *window, int width, int height);
 
 BOOL WindowBackend_OpenGL_CreateWindow(const char *window_title, int *screen_width, int *screen_height, BOOL fullscreen)
 {
@@ -56,44 +50,6 @@ BOOL WindowBackend_OpenGL_CreateWindow(const char *window_title, int *screen_wid
 
 	if (window != NULL)
 	{
-	#ifndef _WIN32	// On Windows, we use native icons instead (so we can give the taskbar and window separate icons, like the original EXE does)
-		size_t resource_size;
-		const unsigned char *resource_data = FindResource("ICON_MINI", "ICON", &resource_size);
-
-		unsigned int width, height;
-		unsigned char *rgb_pixels = DecodeBitmap(resource_data, resource_size, &width, &height);
-
-		if (rgb_pixels != NULL)
-		{
-			unsigned char *rgba_pixels = (unsigned char*)malloc(width * height * 4);
-
-			unsigned char *rgb_pointer = rgb_pixels;
-			unsigned char *rgba_pointer = rgba_pixels;
-
-			if (rgba_pixels != NULL)
-			{
-				for (unsigned int y = 0; y < height; ++y)
-				{
-					for (unsigned int x = 0; x < width; ++x)
-					{
-						*rgba_pointer++ = *rgb_pointer++;
-						*rgba_pointer++ = *rgb_pointer++;
-						*rgba_pointer++ = *rgb_pointer++;
-						*rgba_pointer++ = 0xFF;
-					}
-				}
-
-				GLFWimage glfw_image = {(int)width, (int)height, rgba_pixels};
-				glfwSetWindowIcon(window, 1, &glfw_image);
-
-				free(rgba_pixels);
-			}
-
-			FreeBitmap(rgb_pixels);
-		}
-	#endif
-
-
 		glfwMakeContextCurrent(window);
 
 			#ifndef USE_OPENGLES2
@@ -103,9 +59,7 @@ BOOL WindowBackend_OpenGL_CreateWindow(const char *window_title, int *screen_wid
 					if (GLAD_GL_VERSION_3_2)
 					{
 			#endif
-						glfwSetKeyCallback(window, KeyCallback);
-						glfwSetWindowFocusCallback(window, WindowFocusCallback);
-						glfwSetWindowSizeCallback(window, WindowSizeCallback);
+						PlatformBackend_PostWindowCreation();
 
 						return TRUE;
 			#ifndef USE_OPENGLES2

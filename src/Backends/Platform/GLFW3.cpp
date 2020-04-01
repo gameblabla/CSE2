@@ -1,6 +1,8 @@
 #include "../Platform.h"
 
 #include <chrono>
+#include <stddef.h>
+#include <stdlib.h>
 #include <thread>
 
 #include <GLFW/glfw3.h>
@@ -9,16 +11,18 @@
 
 #include "../../WindowsWrapper.h"
 
+#include "../../Bitmap.h"
 #include "../../KeyControl.h"
 #include "../../Main.h"
 #include "../../Organya.h"
 #include "../../Profile.h"
+#include "../../Resource.h"
 
 BOOL bActive = TRUE;
 
 extern GLFWwindow *window;
 
-void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
+static void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
 	(void)window;
 	(void)scancode;
@@ -194,7 +198,7 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods
 	}
 }
 
-void WindowFocusCallback(GLFWwindow *window, int focused)
+static void WindowFocusCallback(GLFWwindow *window, int focused)
 {
 	(void)window;
 
@@ -204,13 +208,11 @@ void WindowFocusCallback(GLFWwindow *window, int focused)
 		InactiveWindow();
 }
 
-void WindowSizeCallback(GLFWwindow *window, int width, int height)
+static void WindowSizeCallback(GLFWwindow *window, int width, int height)
 {
 	(void)window;
-	(void)width;
-	(void)height;
 
-	Backend_HandleWindowResize();
+	Backend_HandleWindowResize(width, height);
 }
 
 void PlatformBackend_Init(void)
@@ -221,6 +223,54 @@ void PlatformBackend_Init(void)
 void PlatformBackend_Deinit(void)
 {
 	glfwTerminate();
+}
+
+void PlatformBackend_PostWindowCreation(void)
+{
+	// Hook callbacks
+	glfwSetKeyCallback(window, KeyCallback);
+	glfwSetWindowFocusCallback(window, WindowFocusCallback);
+	glfwSetWindowSizeCallback(window, WindowSizeCallback);
+
+	// Set up window icon
+
+	// TODO - GLFW_ICON
+#ifndef _WIN32	// On Windows, we use native icons instead (so we can give the taskbar and window separate icons, like the original EXE does)
+	size_t resource_size;
+	const unsigned char *resource_data = FindResource("ICON_MINI", "ICON", &resource_size);
+
+	unsigned int width, height;
+	unsigned char *rgb_pixels = DecodeBitmap(resource_data, resource_size, &width, &height);
+
+	if (rgb_pixels != NULL)
+	{
+		unsigned char *rgba_pixels = (unsigned char*)malloc(width * height * 4);
+
+		unsigned char *rgb_pointer = rgb_pixels;
+		unsigned char *rgba_pointer = rgba_pixels;
+
+		if (rgba_pixels != NULL)
+		{
+			for (unsigned int y = 0; y < height; ++y)
+			{
+				for (unsigned int x = 0; x < width; ++x)
+				{
+					*rgba_pointer++ = *rgb_pointer++;
+					*rgba_pointer++ = *rgb_pointer++;
+					*rgba_pointer++ = *rgb_pointer++;
+					*rgba_pointer++ = 0xFF;
+				}
+			}
+
+			GLFWimage glfw_image = {(int)width, (int)height, rgba_pixels};
+			glfwSetWindowIcon(window, 1, &glfw_image);
+
+			free(rgba_pixels);
+		}
+
+		FreeBitmap(rgb_pixels);
+	}
+#endif
 }
 
 BOOL PlatformBackend_GetBasePath(char *string_buffer)
