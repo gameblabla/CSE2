@@ -217,6 +217,13 @@ static void WindowSizeCallback(GLFWwindow *window, int width, int height)
 	Backend_HandleWindowResize(width, height);
 }
 
+static void DragAndDropCallback(GLFWwindow *window, int count, const char **paths)
+{
+	(void)window;
+
+	LoadProfile(paths[0]);
+}
+
 void PlatformBackend_Init(void)
 {
 	glfwInit();
@@ -311,6 +318,11 @@ void PlatformBackend_SetCursor(const unsigned char *rgb_pixels, unsigned int wid
 
 		free(rgba_pixels);
 	}
+}
+
+void PlaybackBackend_EnableDragAndDrop(void)
+{
+	glfwSetDropCallback(window, DragAndDropCallback);
 }
 
 BOOL PlatformBackend_SystemTask(void)

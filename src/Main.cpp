@@ -270,7 +270,7 @@ int main(int argc, char *argv[])
 	}
 
 #ifdef DEBUG_SAVE
-	//SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
+	PlaybackBackend_EnableDragAndDrop();
 #endif
 
 	// Set up window icon

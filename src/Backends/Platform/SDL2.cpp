@@ -85,6 +85,11 @@ void PlatformBackend_SetCursor(const unsigned char *rgb_pixels, unsigned int wid
 	SDL_SetCursor(cursor);
 }
 
+void PlaybackBackend_EnableDragAndDrop(void)
+{
+	SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
+}
+
 BOOL PlatformBackend_SystemTask(void)
 {
 	while (SDL_PollEvent(NULL) || !bActive)
