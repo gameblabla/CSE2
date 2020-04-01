@@ -32,13 +32,10 @@ BOOL WindowBackend_OpenGL_CreateWindow(const char *window_title, int *screen_wid
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 #endif
 
-	window = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, *screen_width, *screen_height, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+	window = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, *screen_width, *screen_height, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | (fullscreen ? SDL_WINDOW_FULLSCREEN : 0));
 
 	if (window != NULL)
 	{
-		if (fullscreen)
-			SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
-
 		context = SDL_GL_CreateContext(window);
 
 		if (context != NULL)
