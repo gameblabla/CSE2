@@ -33,7 +33,7 @@ option(FORCE_LOCAL_LIBS "Compile the built-in versions of SDL2, FreeType, and FL
 
 project(CSE2 LANGUAGES C CXX)
 
-add_executable(CSE2 WIN32
+add_executable(CSE2
 	"${ASSETS_DIRECTORY}/resources/CSE2.rc"
 	"src/ArmsItem.cpp"
 	"src/ArmsItem.h"
