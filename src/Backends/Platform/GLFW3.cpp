@@ -279,6 +279,11 @@ BOOL PlatformBackend_GetBasePath(char *string_buffer)
 	return FALSE;
 }
 
+void PlatformBackend_HideMouse(void)
+{
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+}
+
 BOOL PlatformBackend_SystemTask(void)
 {
 	if (glfwWindowShouldClose(window))

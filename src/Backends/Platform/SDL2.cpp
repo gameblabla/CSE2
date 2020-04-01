@@ -64,6 +64,11 @@ BOOL PlatformBackend_GetBasePath(char *string_buffer)
 	return TRUE;
 }
 
+void PlatformBackend_HideMouse(void)
+{
+	SDL_ShowCursor(SDL_DISABLE);
+}
+
 BOOL PlatformBackend_SystemTask(void)
 {
 	while (SDL_PollEvent(NULL) || !bActive)

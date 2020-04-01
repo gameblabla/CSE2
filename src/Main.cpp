@@ -93,6 +93,7 @@ int main(int argc, char *argv[])
 	// Get executable's path
 	if (!PlatformBackend_GetBasePath(gModulePath))
 	{
+		// Fall back on argv[0] if the backend cannot provide a path
 		strcpy(gModulePath, argv[0]);
 
 		for (size_t i = strlen(gModulePath);; --i)
@@ -269,7 +270,7 @@ int main(int argc, char *argv[])
 
 			bFullscreen = TRUE;
 
-			//SDL_ShowCursor(SDL_DISABLE);
+			PlatformBackend_HideMouse();
 			break;
 	}
 
