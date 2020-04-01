@@ -38,11 +38,13 @@ Many months of copypasting and tinkering later, here is the result.
 
 ## Dependencies
 
-*Note: with CMake, if these are not found, they will be built locally*
-
 * SDL2
 * FreeType
 * FLTK
+
+In CMake builds, if these are not found, they will be built locally.
+
+In addition, `pkg-config` is required for Makefile builds, and CMake builds that require static-linkage.
 
 ## Building
 
@@ -90,8 +92,6 @@ If you're a Visual Studio user, you can open the generated `CSE2.sln` file inste
 Once built, the executables can be found in the `game_english`/`game_japanese` folder, depending on the selected language.
 
 ### Makefile \[deprecated - use CMake instead\]
-
-*Note: this requires pkg-config*
 
 Run 'make' in this folder, preferably with some of the following settings:
 
