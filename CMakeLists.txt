@@ -15,12 +15,14 @@ set(ASSETS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/assets")
 option(JAPANESE "Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)" OFF)
 option(FIX_BUGS "Fix various bugs in the game" OFF)
 option(DEBUG_SAVE "Re-enable the ability to drag-and-drop save files onto the window" OFF)
+
 set(BACKEND_RENDERER "SDLTexture" CACHE STRING "Which renderer the game should use: 'OpenGL3' for an OpenGL 3.2 renderer, 'OpenGLES2' for an OpenGL ES 2.0 renderer, 'SDLTexture' for SDL2's hardware-accelerated Texture API, 'SDLSurface' for SDL2's software-rendered Surface API, or 'Software' for a handwritten software renderer")
 set(BACKEND_AUDIO "SDL2" CACHE STRING "Which audio backend the game should use: 'SDL2' or 'miniaudio'")
 set(BACKEND_PLATFORM "SDL2" CACHE STRING "Which platform backend the game should use: 'SDL2' or 'GLFW3'")
 
 option(LTO "Enable link-time optimisation" OFF)
-option(MSVC_LINK_STATIC_RUNTIME "Link the static MSVC runtime library" OFF)
+option(PKG_CONFIG_STATIC_LIBS "On platforms with pkg-config, static-link the dependencies (good for Windows builds, so you don't need to bundle DLL files)" OFF)
+option(MSVC_LINK_STATIC_RUNTIME "Link the static MSVC runtime library (Visual Studio only)" OFF)
 
 option(FORCE_LOCAL_LIBS "Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones" OFF)
 
@@ -261,6 +263,10 @@ if(DEBUG_SAVE)
 	target_compile_definitions(CSE2 PRIVATE DEBUG_SAVE)
 endif()
 
+if(PKG_CONFIG_STATIC_LIBS)
+	target_link_options(CSE2 PRIVATE "-static")
+endif()
+
 if(LTO)
 	include(CheckIPOSupported)
 
@@ -395,6 +401,10 @@ set_target_properties(CSE2 PROPERTIES
 # Dependencies #
 ################
 
+if(NOT FORCE_LOCAL_LIBS)
+	find_package(PkgConfig QUIET)
+endif()
+
 if(BACKEND_PLATFORM MATCHES "GLFW3")
 	find_package(glfw3 REQUIRED)
 	target_link_libraries(CSE2 PRIVATE glfw)
@@ -403,9 +413,24 @@ endif()
 if(BACKEND_PLATFORM MATCHES "SDL2" OR BACKEND_AUDIO MATCHES "SDL2")
 	if(NOT FORCE_LOCAL_LIBS)
 		find_package(SDL2)
+
+		if (PKG_CONFIG_FOUND)
+			pkg_check_modules(sdl2 QUIET sdl2)
+		endif()
 	endif()
 
-	if(TARGET SDL2::SDL2)
+	if(sdl2_FOUND)
+		# pkg-config
+		if (PKG_CONFIG_STATIC_LIBS)
+			message(STATUS "Using system SDL2 (pkg-config, static)")
+			target_compile_options(CSE2 PRIVATE ${sdl2_STATIC_CFLAGS})
+			target_link_libraries(CSE2 PRIVATE ${sdl2_STATIC_LIBRARIES})
+		else()
+			message(STATUS "Using system SDL2 (pkg-config, dynamic)")
+			target_compile_options(CSE2 PRIVATE ${sdl2_CFLAGS})
+			target_link_libraries(CSE2 PRIVATE ${sdl2_LIBRARIES})
+		endif()
+	elseif(TARGET SDL2::SDL2)
 		# CMake-generated config (Arch, vcpkg, Raspbian)
 		message(STATUS "Using system SDL2 (CMake, dynamic)")
 		target_link_libraries(CSE2 PRIVATE SDL2::SDL2 SDL2::SDL2main)
@@ -423,19 +448,32 @@ if(BACKEND_PLATFORM MATCHES "SDL2" OR BACKEND_AUDIO MATCHES "SDL2")
 		message(STATUS "Using local SDL2")
 		set(SDL_SHARED_ENABLED_BY_DEFAULT OFF)
 		if(MSVC)
-			set(LIBC ON CACHE INTERNAL "" FORCE)	# Needed to prevent possible 'symbol already defined' errors
+				set(LIBC ON CACHE INTERNAL "" FORCE)	# Needed to prevent possible 'symbol already defined' errors
 		endif()
-		add_subdirectory("external/SDL2" EXCLUDE_FROM_ALL)
-		target_link_libraries(CSE2 PRIVATE SDL2-static SDL2main)
 	endif()
 endif()
 
 if(NOT FORCE_LOCAL_LIBS)
 	find_package(Freetype)
+
+	if (PKG_CONFIG_FOUND)
+		pkg_check_modules(freetype2 QUIET freetype2)
+	endif()
 endif()
 
-if(FREETYPE_FOUND)
-	message(STATUS "Using system FreeType")
+if(freetype2_FOUND)
+	# pkg-config
+	if (PKG_CONFIG_STATIC_LIBS)
+		message(STATUS "Using system FreeType (pkg-config, static)")
+		target_compile_options(CSE2 PRIVATE ${freetype2_STATIC_CFLAGS})
+		target_link_libraries(CSE2 PRIVATE ${freetype2_STATIC_LIBRARIES})
+	else()
+		message(STATUS "Using system FreeType (pkg-config, dynamic)")
+		target_compile_options(CSE2 PRIVATE ${freetype2_CFLAGS})
+		target_link_libraries(CSE2 PRIVATE ${freetype2_LIBRARIES})
+	endif()
+elseif(FREETYPE_FOUND)
+	message(STATUS "Using system FreeType (CMake)")
 	target_include_directories(CSE2 PRIVATE ${FREETYPE_INCLUDE_DIRS})
 	target_link_libraries(CSE2 PRIVATE ${FREETYPE_LIBRARIES})
 else()

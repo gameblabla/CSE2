@@ -152,6 +152,7 @@ static const struct
 	{"ORG", "ZONBIE", rZonbie, sizeof(rZonbie)},
 
 	{"WAVE", "WAVE100", rWave, sizeof(rWave)},
+	{"DUMMY", "DUMMY", NULL, 0}	// Just here to prevent errors in the event the array is otherwise empty
 };
 
 const unsigned char* FindResource(const char *name, const char *type, size_t *size)
