@@ -9,8 +9,8 @@ Branch | Description
 [accurate](https://www.github.com/Clownacy/Cave-Story-Engine-2/tree/accurate) | The main decompilation branch. The code intended to be as close to the original as possible, down to all the bugs and platform-dependencies.
 [portable](https://www.github.com/Clownacy/Cave-Story-Engine-2/tree/portable) | This branch ports the engine to SDL2, and addresses numerous portability issues, allowing it to run on other platforms.
 [enhanced](https://www.github.com/Clownacy/Cave-Story-Engine-2/tree/enhanced) | Based on the portable branch, this adds several enhancements to the engine, and makes it more accessible to modders.
-[emscripten](https://www.github.com/Clownacy/Cave-Story-Engine-2/tree/emscripten) | Modifies the engine to build with Emscripten, [allowing it to run in web browsers](http://sonicresearch.org/clownacy/cave.html).
-[wii](https://www.github.com/Clownacy/Cave-Story-Engine-2/tree/wii) | Ports the engine to the Nintendo Wii.
+[emscripten](https://www.github.com/Clownacy/Cave-Story-Engine-2/tree/emscripten) | Modifies the engine to build with Emscripten, [allowing it to run in web browsers](http://sonicresearch.org/clownacy/cave.html) (no longer maintained).
+[wii](https://www.github.com/Clownacy/Cave-Story-Engine-2/tree/wii) | Ports the engine to the Nintendo Wii (no longer maintained).
 
 # Cave Story Engine 2
 
@@ -42,17 +42,19 @@ Of course, project files for Visual Studio .NET 2003 are available, and can be f
 
 As proven by the original `Doukutsu.exe`'s [Rich Header](http://bytepointer.com/articles/the_microsoft_rich_header.htm), Pixel used Visual Studio .NET 2003 to create Cave Story. This means these project files allow us to check the accuracy of the decompilation by comparing the generated assembly code to that of the original executable. The tool for this can be found in the 'devilution' folder.
 
-### Visual Studio 2017 (and later)
+### Visual Studio 2017 (and later) \[deprecated - use CMake instead\]
 
 Project files for Visual Studio 2017 can be found in the 'vs2017' folder.
 
 ### CMake (Visual Studio & MinGW-w64)
 
-In this folder, create another folder called 'build', then switch to the command-line (Visual Studio users should open the [Developer Command Prompt](https://docs.microsoft.com/en-us/dotnet/framework/tools/developer-command-prompt-for-vs)) and `cd` into it. After that, generate the files for your build system with:
+Switch to the terminal (Visual Studio users should open the [Developer Command Prompt](https://docs.microsoft.com/en-us/dotnet/framework/tools/developer-command-prompt-for-vs)) and `cd` into this folder. After that, generate the files for your build system with:
 
 ```
-cmake .. -DCMAKE_BUILD_TYPE=Release
+cmake -B build -DCMAKE_BUILD_TYPE=Release
 ```
+
+MSYS2 users may want to append `-G"MSYS Makefiles"` to this command, also.
 
 You can also add the following flags:
 
@@ -62,21 +64,21 @@ Name | Function
 `-DFIX_BUGS=ON` | Fix various bugs in the game
 `-DDEBUG_SAVE=ON` | Re-enable the dummied-out 'Debug Save' option, and the ability to drag-and-drop save files onto the window
 `-DLTO=ON` | Enable link-time optimisation
-`-DMSVC_LINK_STATIC_RUNTIME=ON` | Link the static MSVC runtime library
+`-DMSVC_LINK_STATIC_RUNTIME=ON` | Link the static MSVC runtime library (Visual Studio only)
 
 You can pass your own compiler flags with `-DCMAKE_C_FLAGS` and `-DCMAKE_CXX_FLAGS`.
 
 You can then compile CSE2 with this command:
 
 ```
-cmake --build . --config Release
+cmake --build build --config Release
 ```
 
-If you're a Visual Studio user, you can open the generated `CSE2.sln` file instead.
+If you're a Visual Studio user, you can open the generated `CSE2.sln` file instead, which can be found in the `build` folder.
 
 Once built, the executable can be found in the `game_english`/`game_japanese` folder, depending on the selected language.
 
-### Makefile (MinGW-w64)
+### Makefile (MinGW-w64) \[deprecated - use CMake instead\]
 
 Run 'make' in this folder, preferably with some of the following settings:
 
@@ -94,4 +96,4 @@ Once built, the executable can be found in the `game_english`/`game_japanese` fo
 
 ## Licensing
 
-Being a decompilation, the majority of the code in this project belongs to Daisuke "Pixel" Amaya - not us. We've yet to agree on a license for our own code.
+Being a decompilation, the majority of the code in this project belongs to Daisuke "Pixel" Amaya - not us. We've yet to agree on a licence for our own code.
