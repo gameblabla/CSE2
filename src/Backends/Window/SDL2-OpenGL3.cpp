@@ -17,7 +17,7 @@
 static SDL_Window *window;
 static SDL_GLContext context;
 
-BOOL WindowBackend_OpenGL_CreateWindow(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
+BOOL WindowBackend_OpenGL_CreateWindow(const char *window_title, int *screen_width, int *screen_height, BOOL fullscreen)
 {
 	puts("Available SDL2 video drivers:");
 
@@ -38,7 +38,7 @@ BOOL WindowBackend_OpenGL_CreateWindow(const char *window_title, int screen_widt
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 #endif
 
-	window = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screen_width, screen_height, SDL_WINDOW_OPENGL);
+	window = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, *screen_width, *screen_height, SDL_WINDOW_OPENGL);
 
 	if (window != NULL)
 	{
