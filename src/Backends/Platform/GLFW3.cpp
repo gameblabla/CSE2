@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <thread>
 
@@ -20,7 +21,7 @@
 
 BOOL bActive = TRUE;
 
-extern GLFWwindow *window;
+GLFWwindow *window;
 
 static void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
@@ -286,10 +287,11 @@ BOOL PlatformBackend_SystemTask(void)
 		return FALSE;
 	}
 
+	glfwPollEvents();
+
 	while (!bActive)
 		glfwWaitEvents();
 
-	glfwPollEvents();
 /*
 	while (SDL_PollEvent(NULL) || !bActive)
 	{
@@ -318,7 +320,7 @@ BOOL PlatformBackend_SystemTask(void)
 
 void PlatformBackend_ShowMessageBox(const char *title, const char *message)
 {
-	//SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, message, NULL);
+	printf("ShowMessageBox - '%s' - '%s'\n", title, message);
 }
 
 unsigned long PlatformBackend_GetTicks(void)

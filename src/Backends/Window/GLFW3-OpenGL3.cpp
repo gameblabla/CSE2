@@ -14,8 +14,8 @@
 
 #include "../Platform.h"
 
-// Horrible hacks
-GLFWwindow *window;
+// Horrible hack
+extern GLFWwindow *window;
 
 BOOL WindowBackend_OpenGL_CreateWindow(const char *window_title, int *screen_width, int *screen_height, BOOL fullscreen)
 {
