@@ -417,7 +417,7 @@ if(BACKEND_PLATFORM MATCHES "GLFW3")
 		endif()
 	endif()
 
-	if(TARGET PkgConfig::glfw)
+	if(TARGET PkgConfig::glfw3)
 		# pkg-config
 		if (PKG_CONFIG_STATIC_LIBS)
 			message(STATUS "Using system GLFW3 (pkg-config, static)")
