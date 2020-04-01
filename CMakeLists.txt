@@ -33,7 +33,7 @@ option(FORCE_LOCAL_LIBS "Compile the built-in versions of SDL2, FreeType, and FL
 
 project(CSE2 LANGUAGES C CXX)
 
-add_executable(CSE2
+add_executable(CSE2 WIN32
 	"${ASSETS_DIRECTORY}/resources/CSE2.rc"
 	"src/ArmsItem.cpp"
 	"src/ArmsItem.h"
@@ -358,6 +358,9 @@ if(MSVC)
 
 	# Make it so source files are recognized as UTF-8 by MSVC
 	target_compile_options(CSE2 PRIVATE "/utf-8")
+
+	# Use `main` instead of `WinMain`
+	set_target_properties(CSE2 PROPERTIES LINK_FLAGS "/ENTRY:mainCRTStartup")
 endif()
 
 # On Windows, we use native icons instead
@@ -464,11 +467,11 @@ if(BACKEND_PLATFORM MATCHES "SDL2" OR BACKEND_AUDIO MATCHES "SDL2")
 	elseif(TARGET SDL2::SDL2)
 		# CMake-generated config (Arch, vcpkg, Raspbian)
 		message(STATUS "Using system SDL2 (CMake, dynamic)")
-		target_link_libraries(CSE2 PRIVATE SDL2::SDL2 SDL2::SDL2main)
+		target_link_libraries(CSE2 PRIVATE SDL2::SDL2)
 	elseif(TARGET SDL2::SDL2-static)
 		# CMake-generated config (Arch, vcpkg, Raspbian)
 		message(STATUS "Using system SDL2 (CMake, static)")
-		target_link_libraries(CSE2 PRIVATE SDL2::SDL2-static SDL2::SDL2main)
+		target_link_libraries(CSE2 PRIVATE SDL2::SDL2-static)
 	elseif(SDL2_FOUND)
 		# Autotools-generated config (MSYS2)
 		message(STATUS "Using system SDL2 (Autotools)")
@@ -482,7 +485,7 @@ if(BACKEND_PLATFORM MATCHES "SDL2" OR BACKEND_AUDIO MATCHES "SDL2")
 				set(LIBC ON CACHE INTERNAL "" FORCE)	# Needed to prevent possible 'symbol already defined' errors
 		endif()
 		add_subdirectory("external/SDL2" EXCLUDE_FROM_ALL)
-		target_link_libraries(CSE2 PRIVATE SDL2-static SDL2main)
+		target_link_libraries(CSE2 PRIVATE SDL2-static)
 	endif()
 endif()
 
