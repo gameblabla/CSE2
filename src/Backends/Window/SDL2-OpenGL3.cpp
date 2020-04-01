@@ -17,7 +17,7 @@
 static SDL_Window *window;
 static SDL_GLContext context;
 
-Backend_Surface* Backend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
+BOOL WindowBackend_OpenGL_CreateWindow(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
 {
 	puts("Available SDL2 video drivers:");
 
@@ -67,7 +67,7 @@ Backend_Surface* Backend_Init(const char *window_title, int screen_width, int sc
 					if (GLAD_GL_VERSION_3_2)
 					{
 			#endif
-						return RenderBackend_Init(screen_width, screen_height);
+						return TRUE;
 			#ifndef USE_OPENGLES2
 					}
 					else
@@ -100,98 +100,16 @@ Backend_Surface* Backend_Init(const char *window_title, int screen_width, int sc
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal error (OpenGL rendering backend)", "Could not create window", NULL);
 	}
 
-	return NULL;
+	return FALSE;
 }
 
-void Backend_Deinit(void)
+void WindowBackend_OpenGL_DestroyWindow(void)
 {
-	RenderBackend_Deinit();
-
 	SDL_GL_DeleteContext(context);
 	SDL_DestroyWindow(window);
 }
 
-void Backend_DrawScreen(void)
+void WindowBackend_OpenGL_Display(void)
 {
-	RenderBackend_DrawScreen();
-
 	SDL_GL_SwapWindow(window);
-
-	RenderBackend_ClearScreen();
-}
-
-Backend_Surface* Backend_CreateSurface(unsigned int width, unsigned int height)
-{
-	return RenderBackend_CreateSurface(width, height);
-
-}
-
-void Backend_FreeSurface(Backend_Surface *surface)
-{
-	RenderBackend_FreeSurface(surface);
-}
-
-BOOL Backend_IsSurfaceLost(Backend_Surface *surface)
-{
-	return RenderBackend_IsSurfaceLost(surface);
-}
-
-void Backend_RestoreSurface(Backend_Surface *surface)
-{
-	RenderBackend_RestoreSurface(surface);
-}
-
-unsigned char* Backend_LockSurface(Backend_Surface *surface, unsigned int *pitch, unsigned int width, unsigned int height)
-{
-	return RenderBackend_LockSurface(surface, pitch, width, height);
-}
-
-void Backend_UnlockSurface(Backend_Surface *surface, unsigned int width, unsigned int height)
-{
-	RenderBackend_UnlockSurface(surface, width, height);
-}
-
-void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL colour_key)
-{
-	RenderBackend_Blit(source_surface, rect, destination_surface, x, y, colour_key);
-}
-
-void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
-{
-	RenderBackend_ColourFill(surface, rect, red, green, blue);
-}
-
-Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch)
-{
-	return RenderBackend_LoadGlyph(pixels, width, height, pitch);
-}
-
-void Backend_UnloadGlyph(Backend_Glyph *glyph)
-{
-	RenderBackend_UnloadGlyph(glyph);
-}
-
-void Backend_PrepareToDrawGlyphs(Backend_Surface *destination_surface, const unsigned char *colour_channels)
-{
-	RenderBackend_PrepareToDrawGlyphs(destination_surface, colour_channels);
-}
-
-void Backend_DrawGlyph(Backend_Glyph *glyph, long x, long y)
-{
-	RenderBackend_DrawGlyph(glyph, x, y);
-}
-
-void Backend_FlushGlyphs(void)
-{
-	RenderBackend_FlushGlyphs();
-}
-
-void Backend_HandleRenderTargetLoss(void)
-{
-	RenderBackend_HandleRenderTargetLoss();
-}
-
-void Backend_HandleWindowResize(void)
-{
-	RenderBackend_HandleWindowResize();
 }

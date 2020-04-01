@@ -210,7 +210,7 @@ void WindowSizeCallback(GLFWwindow *window, int width, int height)
 	(void)width;
 	(void)height;
 
-	RenderBackend_HandleWindowResize();
+	Backend_HandleWindowResize();
 }
 
 void PlatformBackend_Init(void)

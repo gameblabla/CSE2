@@ -13,7 +13,7 @@
 
 #include "Draw.h"
 #include "File.h"
-#include "Backends/Window.h"
+#include "Backends/Rendering.h"
 
 // Cave Story wasn't intended to use font anti-aliasing. It's only because Microsoft enabled it
 // by default from Windows Vista onwards that the game started using it.

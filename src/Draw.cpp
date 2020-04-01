@@ -8,7 +8,7 @@
 #include "WindowsWrapper.h"
 
 #include "Backends/Platform.h"
-#include "Backends/Window.h"
+#include "Backends/Rendering.h"
 #include "Bitmap.h"
 #include "CommonDefines.h"
 #include "Ending.h"

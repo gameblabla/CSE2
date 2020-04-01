@@ -220,12 +220,22 @@ int main(int argc, char *argv[])
 			if (conf.display_mode == 1)
 			{
 				if (!StartDirectDraw(lpWindowName, windowWidth, windowHeight, 0))
+				{
+					//SDL_FreeCursor(cursor);
+					//SDL_FreeSurface(cursor_surface);
+					PlatformBackend_Deinit();
 					return EXIT_FAILURE;
+				}
 			}
 			else
 			{
 				if (!StartDirectDraw(lpWindowName, windowWidth, windowHeight, 1))
+				{
+					//SDL_FreeCursor(cursor);
+					//SDL_FreeSurface(cursor_surface);
+					PlatformBackend_Deinit();
 					return EXIT_FAILURE;
+				}
 			}
 		#else
 			// Doesn't handle StartDirectDraw failing
@@ -246,7 +256,12 @@ int main(int argc, char *argv[])
 
 		#ifdef FIX_BUGS
 			if (!StartDirectDraw(lpWindowName, windowWidth, windowHeight, 2))
+			{
+				//SDL_FreeCursor(cursor);
+				//SDL_FreeSurface(cursor_surface);
+				PlatformBackend_Deinit();
 				return EXIT_FAILURE;
+			}
 		#else
 			// Doesn't handle StartDirectDraw failing
 			StartDirectDraw(lpWindowName, windowWidth, windowHeight, 2);
@@ -290,8 +305,9 @@ int main(int argc, char *argv[])
 	// Draw to screen
 	if (!Flip_SystemTask())
 	{
-//        SDL_FreeCursor(cursor);
- //       SDL_FreeSurface(cursor_surface);
+		//SDL_FreeCursor(cursor);
+		//SDL_FreeSurface(cursor_surface);
+		PlatformBackend_Deinit();
 		return EXIT_SUCCESS;
 	}
 

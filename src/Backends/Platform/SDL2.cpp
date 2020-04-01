@@ -2,7 +2,7 @@
 
 #include "SDL.h"
 
-#include "../Window.h"
+#include "../Rendering.h"
 
 #include "../../WindowsWrapper.h"
 

@@ -513,108 +513,111 @@ static void GlyphBatch_DestroyTexture(SPRITEBATCH_U64 texture_id, void *udata)
 // Render-backend initialisation
 // ====================
 
-Backend_Surface* RenderBackend_Init(int screen_width, int screen_height)
+Backend_Surface* Backend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
 {
-	printf("GL_VENDOR = %s\n", glGetString(GL_VENDOR));
-	printf("GL_RENDERER = %s\n", glGetString(GL_RENDERER));
-	printf("GL_VERSION = %s\n", glGetString(GL_VERSION));
-
-	// Set up blending (only used for font-rendering)
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	//glEnable(GL_DEBUG_OUTPUT);
-	//glDebugMessageCallback(MessageCallback, 0);
-
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
-
-#ifndef USE_OPENGLES2
-	// Set up Vertex Array Object
-	glGenVertexArrays(1, &vertex_array_id);
-	glBindVertexArray(vertex_array_id);
-#endif
-
-	// Set up Vertex Buffer Objects
-	glGenBuffers(TOTAL_VBOS, vertex_buffer_ids);
-
-	// Set up the vertex attributes
-	glEnableVertexAttribArray(ATTRIBUTE_INPUT_VERTEX_COORDINATES);
-
-	// Set up our shaders
-	program_texture = CompileShader(vertex_shader_texture, fragment_shader_texture);
-	program_texture_colour_key = CompileShader(vertex_shader_texture, fragment_shader_texture_colour_key);
-	program_colour_fill = CompileShader(vertex_shader_plain, fragment_shader_colour_fill);
-	program_glyph = CompileShader(vertex_shader_texture, fragment_shader_glyph);
-
-	if (program_texture != 0 && program_texture_colour_key != 0 && program_colour_fill != 0 && program_glyph != 0)
+	if (WindowBackend_OpenGL_CreateWindow(window_title, screen_width, screen_height, fullscreen))
 	{
-		// Get shader uniforms
-		program_colour_fill_uniform_colour = glGetUniformLocation(program_colour_fill, "colour");
-		program_glyph_uniform_colour = glGetUniformLocation(program_glyph, "colour");
+		printf("GL_VENDOR = %s\n", glGetString(GL_VENDOR));
+		printf("GL_RENDERER = %s\n", glGetString(GL_RENDERER));
+		printf("GL_VERSION = %s\n", glGetString(GL_VERSION));
 
-		// Set up framebuffer (used for surface-to-surface blitting)
-		glGenFramebuffers(1, &framebuffer_id);
-		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
+		// Set up blending (only used for font-rendering)
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		// Set up framebuffer screen texture (used for screen-to-surface blitting)
-		glGenTextures(1, &framebuffer.texture_id);
-		glBindTexture(GL_TEXTURE_2D, framebuffer.texture_id);
-	#ifdef USE_OPENGLES2
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, screen_width, screen_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-	#else
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, screen_width, screen_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-	#endif
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		//glEnable(GL_DEBUG_OUTPUT);
+		//glDebugMessageCallback(MessageCallback, 0);
+
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+
 	#ifndef USE_OPENGLES2
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+		// Set up Vertex Array Object
+		glGenVertexArrays(1, &vertex_array_id);
+		glBindVertexArray(vertex_array_id);
 	#endif
 
-		framebuffer.width = screen_width;
-		framebuffer.height = screen_height;
+		// Set up Vertex Buffer Objects
+		glGenBuffers(TOTAL_VBOS, vertex_buffer_ids);
 
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebuffer.texture_id, 0);
-		glViewport(0, 0, framebuffer.width, framebuffer.height);
+		// Set up the vertex attributes
+		glEnableVertexAttribArray(ATTRIBUTE_INPUT_VERTEX_COORDINATES);
 
-		// Set-up glyph-batcher
-		spritebatch_config_t config;
-		spritebatch_set_default_config(&config);
-		config.pixel_stride = 1;
-		config.atlas_width_in_pixels = 256;
-		config.atlas_height_in_pixels = 256;
-		config.lonely_buffer_count_till_flush = 4; // Start making atlases immediately
-		config.batch_callback = GlyphBatch_Draw;
-		config.get_pixels_callback = GlyphBatch_GetPixels;
-		config.generate_texture_callback = GlyphBatch_CreateTexture;
-		config.delete_texture_callback = GlyphBatch_DestroyTexture;
-		spritebatch_init(&glyph_batcher, &config, NULL);
+		// Set up our shaders
+		program_texture = CompileShader(vertex_shader_texture, fragment_shader_texture);
+		program_texture_colour_key = CompileShader(vertex_shader_texture, fragment_shader_texture_colour_key);
+		program_colour_fill = CompileShader(vertex_shader_plain, fragment_shader_colour_fill);
+		program_glyph = CompileShader(vertex_shader_texture, fragment_shader_glyph);
 
-		return &framebuffer;
+		if (program_texture != 0 && program_texture_colour_key != 0 && program_colour_fill != 0 && program_glyph != 0)
+		{
+			// Get shader uniforms
+			program_colour_fill_uniform_colour = glGetUniformLocation(program_colour_fill, "colour");
+			program_glyph_uniform_colour = glGetUniformLocation(program_glyph, "colour");
+
+			// Set up framebuffer (used for surface-to-surface blitting)
+			glGenFramebuffers(1, &framebuffer_id);
+			glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
+
+			// Set up framebuffer screen texture (used for screen-to-surface blitting)
+			glGenTextures(1, &framebuffer.texture_id);
+			glBindTexture(GL_TEXTURE_2D, framebuffer.texture_id);
+		#ifdef USE_OPENGLES2
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, screen_width, screen_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		#else
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, screen_width, screen_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		#endif
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		#ifndef USE_OPENGLES2
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+		#endif
+
+			framebuffer.width = screen_width;
+			framebuffer.height = screen_height;
+
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebuffer.texture_id, 0);
+			glViewport(0, 0, framebuffer.width, framebuffer.height);
+
+			// Set-up glyph-batcher
+			spritebatch_config_t config;
+			spritebatch_set_default_config(&config);
+			config.pixel_stride = 1;
+			config.atlas_width_in_pixels = 256;
+			config.atlas_height_in_pixels = 256;
+			config.lonely_buffer_count_till_flush = 4; // Start making atlases immediately
+			config.batch_callback = GlyphBatch_Draw;
+			config.get_pixels_callback = GlyphBatch_GetPixels;
+			config.generate_texture_callback = GlyphBatch_CreateTexture;
+			config.delete_texture_callback = GlyphBatch_DestroyTexture;
+			spritebatch_init(&glyph_batcher, &config, NULL);
+
+			return &framebuffer;
+		}
+
+		if (program_glyph != 0)
+			glDeleteProgram(program_glyph);
+
+		if (program_colour_fill != 0)
+			glDeleteProgram(program_colour_fill);
+
+		if (program_texture_colour_key != 0)
+			glDeleteProgram(program_texture_colour_key);
+
+		if (program_texture != 0)
+			glDeleteProgram(program_texture);
+
+		glDeleteBuffers(TOTAL_VBOS, vertex_buffer_ids);
+	#ifndef USE_OPENGLES2
+		glDeleteVertexArrays(1, &vertex_array_id);
+	#endif
 	}
-
-	if (program_glyph != 0)
-		glDeleteProgram(program_glyph);
-
-	if (program_colour_fill != 0)
-		glDeleteProgram(program_colour_fill);
-
-	if (program_texture_colour_key != 0)
-		glDeleteProgram(program_texture_colour_key);
-
-	if (program_texture != 0)
-		glDeleteProgram(program_texture);
-
-	glDeleteBuffers(TOTAL_VBOS, vertex_buffer_ids);
-#ifndef USE_OPENGLES2
-	glDeleteVertexArrays(1, &vertex_array_id);
-#endif
 
 	return NULL;
 }
 
-void RenderBackend_Deinit(void)
+void Backend_Deinit(void)
 {
 	free(local_vertex_buffer);
 
@@ -630,9 +633,11 @@ void RenderBackend_Deinit(void)
 #ifndef USE_OPENGLES2
 	glDeleteVertexArrays(1, &vertex_array_id);
 #endif
+
+	WindowBackend_OpenGL_DestroyWindow();
 }
 
-void RenderBackend_DrawScreen(void)
+void Backend_DrawScreen(void)
 {
 	spritebatch_tick(&glyph_batcher);
 
@@ -688,22 +693,21 @@ void RenderBackend_DrawScreen(void)
 
 	FlushVertexBuffer();
 
-	// Switch back to our framebuffer
-	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
-}
+	WindowBackend_OpenGL_Display();
 
-void RenderBackend_ClearScreen(void)
-{
 	// According to https://www.khronos.org/opengl/wiki/Common_Mistakes#Swap_Buffers
 	// the buffer should always be cleared, even if it seems unnecessary
 	glClear(GL_COLOR_BUFFER_BIT);
+
+	// Switch back to our framebuffer
+	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
 }
 
 // ====================
 // Surface management
 // ====================
 
-Backend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned int height)
+Backend_Surface* Backend_CreateSurface(unsigned int width, unsigned int height)
 {
 	Backend_Surface *surface = (Backend_Surface*)malloc(sizeof(Backend_Surface));
 
@@ -733,7 +737,7 @@ Backend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned int he
 	return surface;
 }
 
-void RenderBackend_FreeSurface(Backend_Surface *surface)
+void Backend_FreeSurface(Backend_Surface *surface)
 {
 	if (surface == NULL)
 		return;
@@ -746,19 +750,19 @@ void RenderBackend_FreeSurface(Backend_Surface *surface)
 	free(surface);
 }
 
-BOOL RenderBackend_IsSurfaceLost(Backend_Surface *surface)
+BOOL Backend_IsSurfaceLost(Backend_Surface *surface)
 {
 	(void)surface;
 
 	return FALSE;
 }
 
-void RenderBackend_RestoreSurface(Backend_Surface *surface)
+void Backend_RestoreSurface(Backend_Surface *surface)
 {
 	(void)surface;
 }
 
-unsigned char* RenderBackend_LockSurface(Backend_Surface *surface, unsigned int *pitch, unsigned int width, unsigned int height)
+unsigned char* Backend_LockSurface(Backend_Surface *surface, unsigned int *pitch, unsigned int width, unsigned int height)
 {
 	if (surface == NULL)
 		return NULL;
@@ -768,7 +772,7 @@ unsigned char* RenderBackend_LockSurface(Backend_Surface *surface, unsigned int 
 	return surface->pixels;
 }
 
-void RenderBackend_UnlockSurface(Backend_Surface *surface, unsigned int width, unsigned int height)
+void Backend_UnlockSurface(Backend_Surface *surface, unsigned int width, unsigned int height)
 {
 	if (surface == NULL)
 		return;
@@ -788,7 +792,7 @@ void RenderBackend_UnlockSurface(Backend_Surface *surface, unsigned int width, u
 // Drawing
 // ====================
 
-void RenderBackend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL colour_key)
+void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL colour_key)
 {
 	if (source_surface == NULL || destination_surface == NULL)
 		return;
@@ -864,7 +868,7 @@ void RenderBackend_Blit(Backend_Surface *source_surface, const RECT *rect, Backe
 	vertex_buffer_slot->vertices[1][2].vertex_coordinate.y = vertex_bottom;
 }
 
-void RenderBackend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
+void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
 {
 	static unsigned char last_red;
 	static unsigned char last_green;
@@ -929,7 +933,7 @@ void RenderBackend_ColourFill(Backend_Surface *surface, const RECT *rect, unsign
 // Glyph management
 // ====================
 
-Backend_Glyph* RenderBackend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch)
+Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch)
 {
 	Backend_Glyph *glyph = (Backend_Glyph*)malloc(sizeof(Backend_Glyph));
 
@@ -960,7 +964,7 @@ Backend_Glyph* RenderBackend_LoadGlyph(const unsigned char *pixels, unsigned int
 	return NULL;
 }
 
-void RenderBackend_UnloadGlyph(Backend_Glyph *glyph)
+void Backend_UnloadGlyph(Backend_Glyph *glyph)
 {
 	if (glyph == NULL)
 		return;
@@ -969,19 +973,19 @@ void RenderBackend_UnloadGlyph(Backend_Glyph *glyph)
 	free(glyph);
 }
 
-void RenderBackend_PrepareToDrawGlyphs(Backend_Surface *destination_surface, const unsigned char *colour_channels)
+void Backend_PrepareToDrawGlyphs(Backend_Surface *destination_surface, const unsigned char *colour_channels)
 {
 	glyph_destination_surface = destination_surface;
 
 	memcpy(glyph_colour_channels, colour_channels, sizeof(glyph_colour_channels));
 }
 
-void RenderBackend_DrawGlyph(Backend_Glyph *glyph, long x, long y)
+void Backend_DrawGlyph(Backend_Glyph *glyph, long x, long y)
 {
 	spritebatch_push(&glyph_batcher, (SPRITEBATCH_U64)glyph, glyph->pitch, glyph->height, x, y, 1.0f, 1.0f, 0.0f, 0.0f, 0);
 }
 
-void RenderBackend_FlushGlyphs(void)
+void Backend_FlushGlyphs(void)
 {
 	spritebatch_defrag(&glyph_batcher);
 	spritebatch_flush(&glyph_batcher);
@@ -991,12 +995,12 @@ void RenderBackend_FlushGlyphs(void)
 // Misc.
 // ====================
 
-void RenderBackend_HandleRenderTargetLoss(void)
+void Backend_HandleRenderTargetLoss(void)
 {
 	// No problem for us
 }
 
-void RenderBackend_HandleWindowResize(void)
+void Backend_HandleWindowResize(void)
 {
 	// No problem for us
 }
