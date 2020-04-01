@@ -410,11 +410,11 @@ if(BACKEND_PLATFORM MATCHES "GLFW3")
 		find_package(glfw3)
 
 		if (PKG_CONFIG_FOUND)
-			pkg_check_modules(glfw3 QUIET glfw3)
+			pkg_check_modules(glfw3 QUIET IMPORTED_TARGET glfw3)
 		endif()
 	endif()
 
-	if(glfw3_FOUND)
+	if(TARGET PkgConfig::glfw)
 		# pkg-config
 		if (PKG_CONFIG_STATIC_LIBS)
 			message(STATUS "Using system GLFW3 (pkg-config, static)")
@@ -430,7 +430,14 @@ if(BACKEND_PLATFORM MATCHES "GLFW3")
 		message(STATUS "Using system GLFW3 (CMake)")
 		target_link_libraries(CSE2 PRIVATE glfw)
 	else()
-		message(FATAL_ERROR "Couldn't find GLFW3")
+		# Compile it ourselves
+		message(STATUS "Using local GLFW3")
+		set(GLFW_BUILD_EXAMPLES OFF CACHE INTERNAL "" FORCE)
+		set(GLFW_BUILD_TESTS OFF CACHE INTERNAL "" FORCE)
+		set(GLFW_BUILD_DOCS OFF CACHE INTERNAL "" FORCE)
+		set(GLFW_INSTALL OFF CACHE INTERNAL "" FORCE)
+		add_subdirectory("external/glfw" EXCLUDE_FROM_ALL)
+		target_link_libraries(CSE2 PRIVATE glfw)
 	endif()
 endif()
 
@@ -439,11 +446,11 @@ if(BACKEND_PLATFORM MATCHES "SDL2" OR BACKEND_AUDIO MATCHES "SDL2")
 		find_package(SDL2)
 
 		if (PKG_CONFIG_FOUND)
-			pkg_check_modules(sdl2 QUIET sdl2)
+			pkg_check_modules(sdl2 QUIET IMPORTED_TARGET sdl2)
 		endif()
 	endif()
 
-	if(sdl2_FOUND)
+	if(TARGET PkgConfig::sdl2)
 		# pkg-config
 		if (PKG_CONFIG_STATIC_LIBS)
 			message(STATUS "Using system SDL2 (pkg-config, static)")
@@ -474,6 +481,8 @@ if(BACKEND_PLATFORM MATCHES "SDL2" OR BACKEND_AUDIO MATCHES "SDL2")
 		if(MSVC)
 				set(LIBC ON CACHE INTERNAL "" FORCE)	# Needed to prevent possible 'symbol already defined' errors
 		endif()
+		add_subdirectory("external/SDL2" EXCLUDE_FROM_ALL)
+		target_link_libraries(CSE2 PRIVATE SDL2-static SDL2main)
 	endif()
 endif()
 
@@ -481,11 +490,11 @@ if(NOT FORCE_LOCAL_LIBS)
 	find_package(Freetype)
 
 	if (PKG_CONFIG_FOUND)
-		pkg_check_modules(freetype2 QUIET freetype2)
+		pkg_check_modules(freetype2 QUIET IMPORTED_TARGET freetype2)
 	endif()
 endif()
 
-if(freetype2_FOUND)
+if(TARGET PkgConfig::freetype2)
 	# pkg-config
 	if (PKG_CONFIG_STATIC_LIBS)
 		message(STATUS "Using system FreeType (pkg-config, static)")
