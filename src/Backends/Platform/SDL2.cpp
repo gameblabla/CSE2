@@ -1,5 +1,9 @@
 #include "../Platform.h"
 
+#include <stddef.h>
+#include <stdio.h>
+#include <string.h>
+
 #include "SDL.h"
 
 #include "../Rendering.h"
@@ -57,6 +61,7 @@ void PlatformBackend_PostWindowCreation(void)
 BOOL PlatformBackend_GetBasePath(char *string_buffer)
 {
 	char *base_path = SDL_GetBasePath();
+	// Trim the trailing '/'
 	size_t base_path_length = strlen(base_path);
 	base_path[base_path_length - 1] = '\0';
 	strcpy(string_buffer, base_path);
