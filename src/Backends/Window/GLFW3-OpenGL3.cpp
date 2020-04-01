@@ -22,7 +22,7 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods
 void WindowFocusCallback(GLFWwindow *window, int focused);
 void WindowSizeCallback(GLFWwindow *window, int width, int height);
 
-BOOL WindowBackend_OpenGL_CreateWindow(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
+BOOL WindowBackend_OpenGL_CreateWindow(const char *window_title, int *screen_width, int *screen_height, BOOL fullscreen)
 {
 #ifdef USE_OPENGLES2
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
@@ -36,7 +36,22 @@ BOOL WindowBackend_OpenGL_CreateWindow(const char *window_title, int screen_widt
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 #endif
 
-	window = glfwCreateWindow(screen_width, screen_height, window_title, NULL, NULL);
+	GLFWmonitor *monitor = NULL;
+
+	if (fullscreen)
+	{
+		monitor = glfwGetPrimaryMonitor();
+
+		if (monitor != NULL)
+		{
+			const GLFWvidmode *mode = glfwGetVideoMode(monitor);
+
+			*screen_width = mode->width;
+			*screen_height = mode->height;
+		}
+	}
+
+	window = glfwCreateWindow(*screen_width, *screen_height, window_title, monitor, NULL);
 
 	if (window != NULL)
 	{/*
@@ -49,16 +64,6 @@ BOOL WindowBackend_OpenGL_CreateWindow(const char *window_title, int screen_widt
 		SDL_FreeSurface(icon_surface);
 	#endif
 */
-
-		if (fullscreen)
-		{
-		  GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-            if (monitor)
-            {
-                const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-                glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
-            }
-		}
 
 		glfwMakeContextCurrent(window);
 

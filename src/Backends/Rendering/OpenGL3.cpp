@@ -98,6 +98,9 @@ static Backend_Surface *glyph_destination_surface;
 
 static spritebatch_t glyph_batcher;
 
+static int actual_screen_width;
+static int actual_screen_height;
+
 #ifdef USE_OPENGLES2
 static const GLchar *vertex_shader_plain = " \
 #version 100\n \
@@ -515,7 +518,10 @@ static void GlyphBatch_DestroyTexture(SPRITEBATCH_U64 texture_id, void *udata)
 
 Backend_Surface* Backend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
 {
-	if (WindowBackend_OpenGL_CreateWindow(window_title, screen_width, screen_height, fullscreen))
+	actual_screen_width = screen_width;
+	actual_screen_height = screen_height;
+
+	if (WindowBackend_OpenGL_CreateWindow(window_title, &actual_screen_width, &actual_screen_height, fullscreen))
 	{
 		printf("GL_VENDOR = %s\n", glGetString(GL_VENDOR));
 		printf("GL_RENDERER = %s\n", glGetString(GL_RENDERER));
@@ -656,7 +662,30 @@ void Backend_DrawScreen(void)
 	// Target actual screen, and not our framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	glViewport(0, 0, framebuffer.width, framebuffer.height);
+	// Do some viewport trickery, to fit the framebuffer in the center of the screen
+	GLint x;
+	GLint y;
+	GLsizei width;
+	GLsizei height;
+
+	if (actual_screen_width > actual_screen_height)
+	{
+		y = 0;
+		height = actual_screen_height;
+
+		width = framebuffer.width * ((float)actual_screen_height / (float)framebuffer.height);
+		x = (actual_screen_width - width) / 2;
+	}
+	else
+	{
+		x = 0;
+		width = actual_screen_width;
+
+		height = framebuffer.height * ((float)actual_screen_width / (float)framebuffer.width);
+		y = (actual_screen_height - height) / 2;
+	}
+
+	glViewport(x, y, width, height);
 
 	// Draw framebuffer to screen
 	glBindTexture(GL_TEXTURE_2D, framebuffer.texture_id);
