@@ -28,6 +28,8 @@ const char *proof = "DOUKUTSU20041206";
 
 int main(int argc, char *argv[])
 {
+	(void)argc;
+
 	char base_directory[0x400];
 
 	strcpy(base_directory, argv[0]);
