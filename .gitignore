@@ -1,6 +1,9 @@
 # Exclude obj directory (object files for Makefile build)
 /obj
 
+# Exclude the (recommended) CMake build directory
+/build
+
 # Exclude executables
 /game_english/CSE2_debug.exe
 /game_english/DoConfig_debug.exe
@@ -53,6 +56,3 @@
 
 # Exclude converted resource files
 /src/Resource
-
-# Exclude the (recommended) CMake build directory
-/build
