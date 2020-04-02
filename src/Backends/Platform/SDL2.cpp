@@ -27,11 +27,6 @@ void PlatformBackend_Init(void)
 {
 	SDL_Init(SDL_INIT_EVENTS);
 
-#ifdef _WIN32	// On Windows, we use native icons instead (so we can give the taskbar and window separate icons, like the original EXE does)
-	SDL_SetHint(SDL_HINT_WINDOWS_INTRESOURCE_ICON, "101");
-	SDL_SetHint(SDL_HINT_WINDOWS_INTRESOURCE_ICON_SMALL, "102");
-#endif
-
 	SDL_InitSubSystem(SDL_INIT_VIDEO);
 
 	puts("Available SDL2 video drivers:");

@@ -66,8 +66,7 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-101                       ICON                    "ICON/0.ico"
-102                       ICON                    "ICON/ICON_MINI.ico"
+GLFW_ICON                 ICON                    "ICON/GLFW_ICON.ico"
 #endif    // Japanese resources
 /////////////////////////////////////////////////////////////////////////////
 
