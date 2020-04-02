@@ -75,6 +75,8 @@ int main(int argc, char *argv[])
 
 					IMGUI_CHECKVERSION();
 					ImGui::CreateContext();
+					ImGuiIO &io = ImGui::GetIO();
+					io.IniFilename = NULL;	// Disable `imgui.ini`
 
 					ImGui_ImplGlfw_InitForOpenGL(window, true);
 					ImGui_ImplOpenGL3_Init(glsl_version);

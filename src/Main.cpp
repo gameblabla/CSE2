@@ -273,7 +273,6 @@ int main(int argc, char *argv[])
 #endif
 
 	// Set up window icon
-	// TODO - GLFW_ICON
 #ifndef _WIN32	// On Windows, we use native icons instead (so we can give the taskbar and window separate icons, like the original EXE does)
 	size_t window_icon_resource_size;
 	const unsigned char *window_icon_resource_data = FindResource("ICON_MINI", "ICON", &window_icon_resource_size);
