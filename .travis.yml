@@ -109,10 +109,14 @@ install:
 
 before_script:
     # Make build directory and generate CMake build files
-    - cmake -B ${CMAKE_BUILD_DIR} -DCMAKE_BUILD_TYPE=Release -DFIX_BUGS=ON -DBACKEND_PLATFORM=$PLATFORM -DBACKEND_AUDIO=$AUDIO -DBACKEND_RENDERER=$RENDERER -DCMAKE_C_FLAGS="-Wall -Wextra -pedantic" -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic"
+    - mkdir -p ${CMAKE_BUILD_DIR} && cd ${CMAKE_BUILD_DIR}
+    - cmake .. -DCMAKE_BUILD_TYPE=Release -DFIX_BUGS=ON -DBACKEND_PLATFORM=$PLATFORM -DBACKEND_AUDIO=$AUDIO -DBACKEND_RENDERER=$RENDERER -DCMAKE_C_FLAGS="-Wall -Wextra -pedantic" -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic"
+    - cd ..
 
 script:
-    - cmake --build ${CMAKE_BUILD_DIR} --config Release --parallel $JOBS
+    - cd ${CMAKE_BUILD_DIR}
+    - cmake --build . --config Release --parallel $JOBS
+    - cd ..
 
 after_success:
     # Send success notification to Discord through DISCORD_WEBHOOK_URL
