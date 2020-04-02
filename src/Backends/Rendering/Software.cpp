@@ -9,7 +9,7 @@
 #include "../../WindowsWrapper.h"
 #include "../../Attributes.h"
 
-#include "../../Resource.h"
+#include "../Platform.h"
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -29,7 +29,8 @@ typedef struct Backend_Glyph
 	unsigned int height;
 } Backend_Glyph;
 
-static SDL_Window *window;
+extern SDL_Window *window;
+
 static SDL_Surface *window_sdlsurface;
 static SDL_Surface *framebuffer_sdlsurface;
 static Backend_Surface framebuffer;
@@ -43,15 +44,6 @@ Backend_Surface* Backend_Init(const char *window_title, int screen_width, int sc
 
 	if (window != NULL)
 	{
-	#ifndef _WIN32	// On Windows, we use native icons instead (so we can give the taskbar and window separate icons, like the original EXE does)
-		size_t resource_size;
-		const unsigned char *resource_data = FindResource("ICON_MINI", "ICON", &resource_size);
-		SDL_RWops *rwops = SDL_RWFromConstMem(resource_data, resource_size);
-		SDL_Surface *icon_surface = SDL_LoadBMP_RW(rwops, 1);
-		SDL_SetWindowIcon(window, icon_surface);
-		SDL_FreeSurface(icon_surface);
-	#endif
-
 		if (fullscreen)
 			SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 
@@ -66,18 +58,20 @@ Backend_Surface* Backend_Init(const char *window_title, int screen_width, int sc
 			framebuffer.height = framebuffer_sdlsurface->h;
 			framebuffer.pitch = framebuffer_sdlsurface->pitch;
 
+			PlatformBackend_PostWindowCreation();
+
 			return &framebuffer;
 		}
 		else
 		{
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal error (software rendering backend)", "Could not create framebuffer surface", window);
+			PlatformBackend_ShowMessageBox("Fatal error (software rendering backend)", "Could not create framebuffer surface");
 		}
 
 		SDL_DestroyWindow(window);
 	}
 	else
 	{
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal error (software rendering backend)", "Could not create window", NULL);
+		PlatformBackend_ShowMessageBox("Fatal error (software rendering backend)", "Could not create window");
 	}
 
 	return NULL;
@@ -377,8 +371,11 @@ void Backend_HandleRenderTargetLoss(void)
 	// No problem for us
 }
 
-void Backend_HandleWindowResize(void)
+void Backend_HandleWindowResize(unsigned int width, unsigned int height)
 {
+	(void)width;
+	(void)height;
+
 	// https://wiki.libsdl.org/SDL_GetWindowSurface
 	// We need to fetch a new surface pointer
 	window_sdlsurface = SDL_GetWindowSurface(window);

@@ -47,7 +47,7 @@ BOOL GetCompileVersion(int *v1, int *v2, int *v3, int *v4)
 	return TRUE;
 }
 
-void DeleteDebugLog(void)
+void DeleteLog(void)
 {
 	char path[MAX_PATH];
 
@@ -55,7 +55,7 @@ void DeleteDebugLog(void)
 	remove(path);
 }
 
-BOOL PrintDebugLog(const char *string, int value1, int value2, int value3)
+BOOL WriteLog(const char *string, int value1, int value2, int value3)
 {
 	char path[MAX_PATH];
 	FILE *fp;
@@ -71,7 +71,7 @@ BOOL PrintDebugLog(const char *string, int value1, int value2, int value3)
 	return TRUE;
 }
 
-BOOL CheckFileExists(const char *name)
+BOOL IsKeyFile(const char *name)
 {
 	char path[MAX_PATH];
 
@@ -103,7 +103,7 @@ long GetFileSizeLong(const char *path)
 	return len;
 }
 
-BOOL PrintBitmapError(const char *string, int value)
+BOOL ErrorLog(const char *string, int value)
 {
 	char path[MAX_PATH];
 	FILE *fp;

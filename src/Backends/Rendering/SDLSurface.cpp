@@ -2,12 +2,13 @@
 
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "SDL.h"
 
 #include "../../WindowsWrapper.h"
 
-#include "../../Resource.h"
+#include "../Platform.h"
 
 typedef struct Backend_Surface
 {
@@ -19,7 +20,8 @@ typedef struct Backend_Glyph
 	SDL_Surface *sdlsurface;
 } Backend_Glyph;
 
-static SDL_Window *window;
+extern SDL_Window *window;
+
 static SDL_Surface *window_sdlsurface;
 
 static Backend_Surface framebuffer;
@@ -47,15 +49,6 @@ Backend_Surface* Backend_Init(const char *window_title, int screen_width, int sc
 
 	if (window != NULL)
 	{
-	#ifndef _WIN32	// On Windows, we use native icons instead (so we can give the taskbar and window separate icons, like the original EXE does)
-		size_t resource_size;
-		const unsigned char *resource_data = FindResource("ICON_MINI", "ICON", &resource_size);
-		SDL_RWops *rwops = SDL_RWFromConstMem(resource_data, resource_size);
-		SDL_Surface *icon_surface = SDL_LoadBMP_RW(rwops, 1);
-		SDL_SetWindowIcon(window, icon_surface);
-		SDL_FreeSurface(icon_surface);
-	#endif
-
 		if (fullscreen)
 			SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 
@@ -64,9 +57,15 @@ Backend_Surface* Backend_Init(const char *window_title, int screen_width, int sc
 		framebuffer.sdlsurface = SDL_CreateRGBSurfaceWithFormat(0, window_sdlsurface->w, window_sdlsurface->h, 0, SDL_PIXELFORMAT_RGB24);
 
 		if (framebuffer.sdlsurface != NULL)
+		{
+			PlatformBackend_PostWindowCreation();
+
 			return &framebuffer;
+		}
 		else
+		{
 			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal error (SDLSurface rendering backend)", "Could not create framebuffer surface", window);
+		}
 
 		SDL_DestroyWindow(window);
 	}
@@ -250,8 +249,11 @@ void Backend_HandleRenderTargetLoss(void)
 	// No problem for us
 }
 
-void Backend_HandleWindowResize(void)
+void Backend_HandleWindowResize(unsigned int width, unsigned int height)
 {
+	(void)width;
+	(void)height;
+
 	// https://wiki.libsdl.org/SDL_GetWindowSurface
 	// We need to fetch a new surface pointer
 	window_sdlsurface = SDL_GetWindowSurface(window);

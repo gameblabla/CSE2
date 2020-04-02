@@ -2,13 +2,14 @@
 
 #include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-
-#include "SDL.h"
 
 #include "WindowsWrapper.h"
 
+#include "Backends/Platform.h"
 #include "Backends/Rendering.h"
+#include "Bitmap.h"
 #include "CommonDefines.h"
 #include "Config.h"
 #include "Draw.h"
@@ -32,7 +33,6 @@ BOOL gbUseJoystick = FALSE;
 
 int gJoystickButtonTable[8];
 
-static BOOL bActive = TRUE;
 static BOOL bFps = FALSE;
 
 static int windowWidth;
@@ -64,11 +64,11 @@ unsigned long GetFramePerSecound(void)
 
 	if (need_new_base_tick)
 	{
-		base_tick = SDL_GetTicks();
+		base_tick = PlatformBackend_GetTicks();
 		need_new_base_tick = FALSE;
 	}
 
-	current_tick = SDL_GetTicks();
+	current_tick = PlatformBackend_GetTicks();
 	++current_frame;
 
 	if (base_tick + 1000 <= current_tick)
@@ -85,18 +85,26 @@ unsigned long GetFramePerSecound(void)
 int main(int argc, char *argv[])
 {
 	(void)argc;
-	(void)argv;
 
 	int i;
 
-	SDL_Init(SDL_INIT_EVENTS);
+	PlatformBackend_Init();
 
 	// Get executable's path
-	char *base_path = SDL_GetBasePath();
-	size_t base_path_length = strlen(base_path);
-	base_path[base_path_length - 1] = '\0';
-	strcpy(gModulePath, base_path);
-	SDL_free(base_path);
+	if (!PlatformBackend_GetBasePath(gModulePath))
+	{
+		// Fall back on argv[0] if the backend cannot provide a path
+		strcpy(gModulePath, argv[0]);
+
+		for (size_t i = strlen(gModulePath);; --i)
+		{
+			if (i == 0 || gModulePath[i] == '\\' || gModulePath[i] == '/')
+			{
+				gModulePath[i] = '\0';
+				break;
+			}
+		}
+	}
 
 	// Get path of the data folder
 	strcpy(gDataPath, gModulePath);
@@ -136,7 +144,7 @@ int main(int argc, char *argv[])
 	}
 
 	// Swap left and right weapon switch keys
-	if (CheckFileExists("s_reverse"))
+	if (IsKeyFile("s_reverse"))
 	{
 		gKeyArms = KEY_ARMSREV;
 		gKeyArmsRev = KEY_ARMS;
@@ -193,13 +201,6 @@ int main(int argc, char *argv[])
 
 	RECT unused_rect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
-#ifdef _WIN32	// On Windows, we use native icons instead (so we can give the taskbar and window separate icons, like the original EXE does)
-	SDL_SetHint(SDL_HINT_WINDOWS_INTRESOURCE_ICON, "101");
-	SDL_SetHint(SDL_HINT_WINDOWS_INTRESOURCE_ICON_SMALL, "102");
-#endif
-
-	SDL_InitSubSystem(SDL_INIT_VIDEO);
-
 	switch (conf.display_mode)
 	{
 		case 1:
@@ -220,12 +221,18 @@ int main(int argc, char *argv[])
 			if (conf.display_mode == 1)
 			{
 				if (!StartDirectDraw(lpWindowName, windowWidth, windowHeight, 0))
-					return 0;
+				{
+					PlatformBackend_Deinit();
+					return EXIT_FAILURE;
+				}
 			}
 			else
 			{
 				if (!StartDirectDraw(lpWindowName, windowWidth, windowHeight, 1))
-					return 0;
+				{
+					PlatformBackend_Deinit();
+					return EXIT_FAILURE;
+				}
 			}
 		#else
 			// Doesn't handle StartDirectDraw failing
@@ -246,7 +253,10 @@ int main(int argc, char *argv[])
 
 		#ifdef FIX_BUGS
 			if (!StartDirectDraw(lpWindowName, windowWidth, windowHeight, 2))
-				return 0;
+			{
+				PlatformBackend_Deinit();
+				return EXIT_FAILURE;
+			}
 		#else
 			// Doesn't handle StartDirectDraw failing
 			StartDirectDraw(lpWindowName, windowWidth, windowHeight, 2);
@@ -254,24 +264,43 @@ int main(int argc, char *argv[])
 
 			bFullscreen = TRUE;
 
-			SDL_ShowCursor(SDL_DISABLE);
+			PlatformBackend_HideMouse();
 			break;
 	}
 
 #ifdef DEBUG_SAVE
-	SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
+	PlaybackBackend_EnableDragAndDrop();
+#endif
+
+	// Set up window icon
+#ifndef _WIN32	// On Windows, we use native icons instead (so we can give the taskbar and window separate icons, like the original EXE does)
+	size_t window_icon_resource_size;
+	const unsigned char *window_icon_resource_data = FindResource("ICON_MINI", "ICON", &window_icon_resource_size);
+
+	unsigned int window_icon_width, window_icon_height;
+	unsigned char *window_icon_rgb_pixels = DecodeBitmap(window_icon_resource_data, window_icon_resource_size, &window_icon_width, &window_icon_height);
+
+	if (window_icon_rgb_pixels != NULL)
+	{
+		PlatformBackend_SetWindowIcon(window_icon_rgb_pixels, window_icon_width, window_icon_height);
+		FreeBitmap(window_icon_rgb_pixels);
+	}
 #endif
 
 	// Set up the cursor
-	size_t resource_size;
-	const unsigned char *resource_data = FindResource("CURSOR_NORMAL", "CURSOR", &resource_size);
-	SDL_RWops *rwops = SDL_RWFromConstMem(resource_data, resource_size);
-	SDL_Surface *cursor_surface = SDL_LoadBMP_RW(rwops, 1);
-	SDL_SetColorKey(cursor_surface, SDL_TRUE, SDL_MapRGB(cursor_surface->format, 0xFF, 0, 0xFF));
-	SDL_Cursor *cursor = SDL_CreateColorCursor(cursor_surface, 0, 0);
-	SDL_SetCursor(cursor);
+	size_t cursor_resource_size;
+	const unsigned char *cursor_resource_data = FindResource("CURSOR_NORMAL", "CURSOR", &cursor_resource_size);
 
-	if (CheckFileExists("fps"))
+	unsigned int cursor_width, cursor_height;
+	unsigned char *cursor_rgb_pixels = DecodeBitmap(cursor_resource_data, cursor_resource_size, &cursor_width, &cursor_height);
+
+	if (cursor_rgb_pixels != NULL)
+	{
+		PlatformBackend_SetCursor(cursor_rgb_pixels, cursor_width, cursor_height);
+		FreeBitmap(cursor_rgb_pixels);
+	}
+
+	if (IsKeyFile("fps"))
 		bFps = TRUE;
 
 	// Set rects
@@ -290,9 +319,8 @@ int main(int argc, char *argv[])
 	// Draw to screen
 	if (!Flip_SystemTask())
 	{
-        SDL_FreeCursor(cursor);
-        SDL_FreeSurface(cursor_surface);
-		return 1;
+		PlatformBackend_Deinit();
+		return EXIT_SUCCESS;
 	}
 
 	// Initialize sound
@@ -317,10 +345,9 @@ int main(int argc, char *argv[])
 	EndDirectSound();
 	EndDirectDraw();
 
-	SDL_FreeCursor(cursor);
-	SDL_FreeSurface(cursor_surface);
+	PlatformBackend_Deinit();
 
-	return 1;
+	return EXIT_SUCCESS;
 }
 
 void InactiveWindow(void)
@@ -352,219 +379,8 @@ void JoystickProc(void);
 
 BOOL SystemTask(void)
 {
-	while (SDL_PollEvent(NULL) || !bActive)
-	{
-		SDL_Event event;
-
-		if (!SDL_WaitEvent(&event))
-			return FALSE;
-
-		switch (event.type)
-		{
-			case SDL_KEYDOWN:
-				switch (event.key.keysym.sym)
-				{
-					case SDLK_ESCAPE:
-						gKey |= KEY_ESCAPE;
-						break;
-
-					case SDLK_w:
-						gKey |= KEY_MAP;
-						break;
-
-					case SDLK_LEFT:
-						gKey |= KEY_LEFT;
-						break;
-
-					case SDLK_RIGHT:
-						gKey |= KEY_RIGHT;
-						break;
-
-					case SDLK_UP:
-						gKey |= KEY_UP;
-						break;
-
-					case SDLK_DOWN:
-						gKey |= KEY_DOWN;
-						break;
-
-					case SDLK_x:
-						gKey |= KEY_X;
-						break;
-
-					case SDLK_z:
-						gKey |= KEY_Z;
-						break;
-
-					case SDLK_s:
-						gKey |= KEY_ARMS;
-						break;
-
-					case SDLK_a:
-						gKey |= KEY_ARMSREV;
-						break;
-
-					case SDLK_LSHIFT:
-					case SDLK_RSHIFT:
-						gKey |= KEY_SHIFT;
-						break;
-
-					case SDLK_F1:
-						gKey |= KEY_F1;
-						break;
-
-					case SDLK_F2:
-						gKey |= KEY_F2;
-						break;
-
-					case SDLK_q:
-						gKey |= KEY_ITEM;
-						break;
-
-					case SDLK_COMMA:
-						gKey |= KEY_ALT_LEFT;
-						break;
-
-					case SDLK_PERIOD:
-						gKey |= KEY_ALT_DOWN;
-						break;
-
-					case SDLK_SLASH:
-						gKey |= KEY_ALT_RIGHT;
-						break;
-
-					case SDLK_l:
-						gKey |= KEY_L;
-						break;
-
-					case SDLK_PLUS:
-						gKey |= KEY_PLUS;
-						break;
-
-					case SDLK_F5:
-						gbUseJoystick = FALSE;
-						break;
-				}
-
-				break;
-
-			case SDL_KEYUP:
-				switch (event.key.keysym.sym)
-				{
-					case SDLK_ESCAPE:
-						gKey &= ~KEY_ESCAPE;
-						break;
-
-					case SDLK_w:
-						gKey &= ~KEY_MAP;
-						break;
-
-					case SDLK_LEFT:
-						gKey &= ~KEY_LEFT;
-						break;
-
-					case SDLK_RIGHT:
-						gKey &= ~KEY_RIGHT;
-						break;
-
-					case SDLK_UP:
-						gKey &= ~KEY_UP;
-						break;
-
-					case SDLK_DOWN:
-						gKey &= ~KEY_DOWN;
-						break;
-
-					case SDLK_x:
-						gKey &= ~KEY_X;
-						break;
-
-					case SDLK_z:
-						gKey &= ~KEY_Z;
-						break;
-
-					case SDLK_s:
-						gKey &= ~KEY_ARMS;
-						break;
-
-					case SDLK_a:
-						gKey &= ~KEY_ARMSREV;
-						break;
-
-					case SDLK_LSHIFT:
-					case SDLK_RSHIFT:
-						gKey &= ~KEY_SHIFT;
-						break;
-
-					case SDLK_F1:
-						gKey &= ~KEY_F1;
-						break;
-
-					case SDLK_F2:
-						gKey &= ~KEY_F2;
-						break;
-
-					case SDLK_q:
-						gKey &= ~KEY_ITEM;
-						break;
-
-					case SDLK_COMMA:
-						gKey &= ~KEY_ALT_LEFT;
-						break;
-
-					case SDLK_PERIOD:
-						gKey &= ~KEY_ALT_DOWN;
-						break;
-
-					case SDLK_SLASH:
-						gKey &= ~KEY_ALT_RIGHT;
-						break;
-
-					case SDLK_l:
-						gKey &= ~KEY_L;
-						break;
-
-					case SDLK_PLUS:
-						gKey &= ~KEY_PLUS;
-						break;
-				}
-
-				break;
-
-			case SDL_DROPFILE:
-				LoadProfile(event.drop.file);
-				SDL_free(event.drop.file);
-				break;
-
-			case SDL_WINDOWEVENT:
-				switch (event.window.event)
-				{
-					case SDL_WINDOWEVENT_FOCUS_LOST:
-						InactiveWindow();
-						break;
-
-					case SDL_WINDOWEVENT_FOCUS_GAINED:
-						ActiveWindow();
-						break;
-
-					case SDL_WINDOWEVENT_RESIZED:
-					case SDL_WINDOWEVENT_SIZE_CHANGED:
-						Backend_HandleWindowResize();
-						break;
-				}
-
-				break;
-
-			case SDL_QUIT:
-				StopOrganyaMusic();
-				return FALSE;
-
-			case SDL_RENDER_TARGETS_RESET:
-				Backend_HandleRenderTargetLoss();
-				break;
-
-		}
-	}
+	if (!PlatformBackend_SystemTask())
+		return FALSE;
 
 	// Run joystick code
 	if (gbUseJoystick)

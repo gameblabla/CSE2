@@ -3,9 +3,10 @@
 #include <stddef.h>
 
 #define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_STATIC
 #define STBI_ONLY_BMP
 #define STBI_NO_LINEAR
-#include "stb_image.h"
+#include "../external/stb_image.h"
 
 unsigned char* DecodeBitmap(const unsigned char *in_buffer, size_t in_buffer_size, unsigned int *width, unsigned int *height)
 {

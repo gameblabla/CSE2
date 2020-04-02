@@ -1,7 +1,5 @@
 #pragma once
 
-#include "SDL.h"
-
 #include "../WindowsWrapper.h"
 
 typedef struct Backend_Surface Backend_Surface;
@@ -10,6 +8,7 @@ typedef struct Backend_Glyph Backend_Glyph;
 Backend_Surface* Backend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen);
 void Backend_Deinit(void);
 void Backend_DrawScreen(void);
+void Backend_ClearScreen(void);
 Backend_Surface* Backend_CreateSurface(unsigned int width, unsigned int height);
 void Backend_FreeSurface(Backend_Surface *surface);
 BOOL Backend_IsSurfaceLost(Backend_Surface *surface);
@@ -24,4 +23,4 @@ void Backend_PrepareToDrawGlyphs(Backend_Surface *destination_surface, const uns
 void Backend_DrawGlyph(Backend_Glyph *glyph, long x, long y);
 void Backend_FlushGlyphs(void);
 void Backend_HandleRenderTargetLoss(void);
-void Backend_HandleWindowResize(void);
+void Backend_HandleWindowResize(unsigned int width, unsigned int height);

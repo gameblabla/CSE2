@@ -3,18 +3,19 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "SDL.h"
 
 #define SPRITEBATCH_IMPLEMENTATION
-#include "cute_spritebatch.h"
+#include "../../../external/cute_spritebatch.h"
 
 #include "../../WindowsWrapper.h"
 
+#include "../Platform.h"
 #include "../../Draw.h"
 #include "../../Ending.h"
 #include "../../MapName.h"
-#include "../../Resource.h"
 #include "../../TextScr.h"
 
 typedef struct Backend_Surface
@@ -36,7 +37,8 @@ typedef struct Backend_Glyph
 	unsigned int height;
 } Backend_Glyph;
 
-static SDL_Window *window;
+extern SDL_Window *window;
+
 static SDL_Renderer *renderer;
 
 static Backend_Surface framebuffer;
@@ -129,15 +131,6 @@ Backend_Surface* Backend_Init(const char *window_title, int screen_width, int sc
 
 	if (window != NULL)
 	{
-	#ifndef _WIN32	// On Windows, we use native icons instead (so we can give the taskbar and window separate icons, like the original EXE does)
-		size_t resource_size;
-		const unsigned char *resource_data = FindResource("ICON_MINI", "ICON", &resource_size);
-		SDL_RWops *rwops = SDL_RWFromConstMem(resource_data, resource_size);
-		SDL_Surface *icon_surface = SDL_LoadBMP_RW(rwops, 1);
-		SDL_SetWindowIcon(window, icon_surface);
-		SDL_FreeSurface(icon_surface);
-	#endif
-
 		if (fullscreen)
 			SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 
@@ -172,6 +165,8 @@ Backend_Surface* Backend_Init(const char *window_title, int screen_width, int sc
 				config.generate_texture_callback = GlyphBatch_CreateTexture;
 				config.delete_texture_callback = GlyphBatch_DestroyTexture;
 				spritebatch_init(&glyph_batcher, &config, NULL);
+
+				PlatformBackend_PostWindowCreation();
 
 				return &framebuffer;
 			}
@@ -312,7 +307,7 @@ void Backend_UnlockSurface(Backend_Surface *surface, unsigned int width, unsigne
 
 	free(surface->pixels);
 
-	SDL_Rect rect = {0, 0, width, height};
+	SDL_Rect rect = {0, 0, (int)width, (int)height};
 	SDL_UpdateTexture(surface->texture, &rect, buffer, width * 4);
 
 	free(buffer);
@@ -427,7 +422,10 @@ void Backend_HandleRenderTargetLoss(void)
 		surface->lost = TRUE;
 }
 
-void Backend_HandleWindowResize(void)
+void Backend_HandleWindowResize(unsigned int width, unsigned int height)
 {
+	(void)width;
+	(void)height;
+
 	// No problem for us
 }

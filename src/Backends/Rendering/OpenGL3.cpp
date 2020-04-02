@@ -10,16 +10,16 @@
 #ifdef USE_OPENGLES2
 #include <GLES2/gl2.h>
 #else
-#include <glad/glad.h>
+#include "../../../external/glad/include/glad/glad.h"
 #endif
 
-#include "SDL.h"
-
 #define SPRITEBATCH_IMPLEMENTATION
-#include "cute_spritebatch.h"
+#include "../../../external/cute_spritebatch.h"
 
 #include "../../WindowsWrapper.h"
 
+#include "../Platform.h"
+#include "../Window.h"
 #include "../../Resource.h"
 
 #define TOTAL_VBOS 8
@@ -69,9 +69,6 @@ typedef struct VertexBufferSlot
 	Vertex vertices[2][3];
 } VertexBufferSlot;
 
-static SDL_Window *window;
-static SDL_GLContext context;
-
 static GLuint program_texture;
 static GLuint program_texture_colour_key;
 static GLuint program_colour_fill;
@@ -100,6 +97,9 @@ static unsigned char glyph_colour_channels[3];
 static Backend_Surface *glyph_destination_surface;
 
 static spritebatch_t glyph_batcher;
+
+static int actual_screen_width;
+static int actual_screen_height;
 
 #ifdef USE_OPENGLES2
 static const GLchar *vertex_shader_plain = " \
@@ -275,7 +275,7 @@ static GLuint CompileShader(const char *vertex_shader_source, const char *fragme
 	{
 		char buffer[0x200];
 		glGetShaderInfoLog(vertex_shader, sizeof(buffer), NULL, buffer);
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Vertex shader error", buffer, window);
+		PlatformBackend_ShowMessageBox("Vertex shader error", buffer);
 		return 0;
 	}
 
@@ -291,7 +291,7 @@ static GLuint CompileShader(const char *vertex_shader_source, const char *fragme
 	{
 		char buffer[0x200];
 		glGetShaderInfoLog(fragment_shader, sizeof(buffer), NULL, buffer);
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fragment shader error", buffer, window);
+		PlatformBackend_ShowMessageBox("Fragment shader error", buffer);
 		return 0;
 	}
 
@@ -308,7 +308,7 @@ static GLuint CompileShader(const char *vertex_shader_source, const char *fragme
 	{
 		char buffer[0x200];
 		glGetProgramInfoLog(program_id, sizeof(buffer), NULL, buffer);
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Shader linker error", buffer, window);
+		PlatformBackend_ShowMessageBox("Shader linker error", buffer);
 		return 0;
 	}
 
@@ -409,7 +409,7 @@ static void GlyphBatch_Draw(spritebatch_sprite_t *sprites, int count, int textur
 		glEnable(GL_BLEND);
 
 		// Enable texture coordinates, since this uses textures
-		glEnableVertexAttribArray(2);
+		glEnableVertexAttribArray(ATTRIBUTE_INPUT_TEXTURE_COORDINATES);
 
 		glBindTexture(GL_TEXTURE_2D, texture_id);
 	}
@@ -518,172 +518,106 @@ static void GlyphBatch_DestroyTexture(SPRITEBATCH_U64 texture_id, void *udata)
 
 Backend_Surface* Backend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
 {
-#ifdef USE_OPENGLES2
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-#else
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-#endif
+	actual_screen_width = screen_width;
+	actual_screen_height = screen_height;
 
-	window = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screen_width, screen_height, SDL_WINDOW_OPENGL);
-
-	if (window != NULL)
+	if (WindowBackend_OpenGL_CreateWindow(window_title, &actual_screen_width, &actual_screen_height, fullscreen))
 	{
-	#ifndef _WIN32	// On Windows, we use native icons instead (so we can give the taskbar and window separate icons, like the original EXE does)
-		size_t resource_size;
-		const unsigned char *resource_data = FindResource("ICON_MINI", "ICON", &resource_size);
-		SDL_RWops *rwops = SDL_RWFromConstMem(resource_data, resource_size);
-		SDL_Surface *icon_surface = SDL_LoadBMP_RW(rwops, 1);
-		SDL_SetWindowIcon(window, icon_surface);
-		SDL_FreeSurface(icon_surface);
+		printf("GL_VENDOR = %s\n", glGetString(GL_VENDOR));
+		printf("GL_RENDERER = %s\n", glGetString(GL_RENDERER));
+		printf("GL_VERSION = %s\n", glGetString(GL_VERSION));
+
+		// Set up blending (only used for font-rendering)
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		//glEnable(GL_DEBUG_OUTPUT);
+		//glDebugMessageCallback(MessageCallback, 0);
+
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+
+	#ifndef USE_OPENGLES2
+		// Set up Vertex Array Object
+		glGenVertexArrays(1, &vertex_array_id);
+		glBindVertexArray(vertex_array_id);
 	#endif
 
-		if (fullscreen)
-			SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+		// Set up Vertex Buffer Objects
+		glGenBuffers(TOTAL_VBOS, vertex_buffer_ids);
 
-		context = SDL_GL_CreateContext(window);
+		// Set up the vertex attributes
+		glEnableVertexAttribArray(ATTRIBUTE_INPUT_VERTEX_COORDINATES);
 
-		if (context != NULL)
+		// Set up our shaders
+		program_texture = CompileShader(vertex_shader_texture, fragment_shader_texture);
+		program_texture_colour_key = CompileShader(vertex_shader_texture, fragment_shader_texture_colour_key);
+		program_colour_fill = CompileShader(vertex_shader_plain, fragment_shader_colour_fill);
+		program_glyph = CompileShader(vertex_shader_texture, fragment_shader_glyph);
+
+		if (program_texture != 0 && program_texture_colour_key != 0 && program_colour_fill != 0 && program_glyph != 0)
 		{
-			if (SDL_GL_MakeCurrent(window, context) == 0)
-			{
-			#ifndef USE_OPENGLES2
-				if (gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress))
-				{
-					// Check if the platform supports OpenGL 3.2
-					if (GLAD_GL_VERSION_3_2)
-					{
-			#endif
-						printf("GL_VENDOR = %s\n", glGetString(GL_VENDOR));
-						printf("GL_RENDERER = %s\n", glGetString(GL_RENDERER));
-						printf("GL_VERSION = %s\n", glGetString(GL_VERSION));
+			// Get shader uniforms
+			program_colour_fill_uniform_colour = glGetUniformLocation(program_colour_fill, "colour");
+			program_glyph_uniform_colour = glGetUniformLocation(program_glyph, "colour");
 
-						// Set up blending (only used for font-rendering)
-						glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			// Set up framebuffer (used for surface-to-surface blitting)
+			glGenFramebuffers(1, &framebuffer_id);
+			glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
 
-						//glEnable(GL_DEBUG_OUTPUT);
-						//glDebugMessageCallback(MessageCallback, 0);
+			// Set up framebuffer screen texture (used for screen-to-surface blitting)
+			glGenTextures(1, &framebuffer.texture_id);
+			glBindTexture(GL_TEXTURE_2D, framebuffer.texture_id);
+		#ifdef USE_OPENGLES2
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, screen_width, screen_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		#else
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, screen_width, screen_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		#endif
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		#ifndef USE_OPENGLES2
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+		#endif
 
-						glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-						glClear(GL_COLOR_BUFFER_BIT);
+			framebuffer.width = screen_width;
+			framebuffer.height = screen_height;
 
-					#ifndef USE_OPENGLES2
-						// Set up Vertex Array Object
-						glGenVertexArrays(1, &vertex_array_id);
-						glBindVertexArray(vertex_array_id);
-					#endif
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebuffer.texture_id, 0);
+			glViewport(0, 0, framebuffer.width, framebuffer.height);
 
-						// Set up Vertex Buffer Objects
-						glGenBuffers(TOTAL_VBOS, vertex_buffer_ids);
+			// Set-up glyph-batcher
+			spritebatch_config_t config;
+			spritebatch_set_default_config(&config);
+			config.pixel_stride = 1;
+			config.atlas_width_in_pixels = 256;
+			config.atlas_height_in_pixels = 256;
+			config.lonely_buffer_count_till_flush = 4; // Start making atlases immediately
+			config.batch_callback = GlyphBatch_Draw;
+			config.get_pixels_callback = GlyphBatch_GetPixels;
+			config.generate_texture_callback = GlyphBatch_CreateTexture;
+			config.delete_texture_callback = GlyphBatch_DestroyTexture;
+			spritebatch_init(&glyph_batcher, &config, NULL);
 
-						// Set up the vertex attributes
-						glEnableVertexAttribArray(1);
-
-						// Set up our shaders
-						program_texture = CompileShader(vertex_shader_texture, fragment_shader_texture);
-						program_texture_colour_key = CompileShader(vertex_shader_texture, fragment_shader_texture_colour_key);
-						program_colour_fill = CompileShader(vertex_shader_plain, fragment_shader_colour_fill);
-						program_glyph = CompileShader(vertex_shader_texture, fragment_shader_glyph);
-
-						if (program_texture != 0 && program_texture_colour_key != 0 && program_colour_fill != 0 && program_glyph != 0)
-						{
-							// Get shader uniforms
-							program_colour_fill_uniform_colour = glGetUniformLocation(program_colour_fill, "colour");
-							program_glyph_uniform_colour = glGetUniformLocation(program_glyph, "colour");
-
-							// Set up framebuffer (used for surface-to-surface blitting)
-							glGenFramebuffers(1, &framebuffer_id);
-							glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
-
-							// Set up framebuffer screen texture (used for screen-to-surface blitting)
-							glGenTextures(1, &framebuffer.texture_id);
-							glBindTexture(GL_TEXTURE_2D, framebuffer.texture_id);
-						#ifdef USE_OPENGLES2
-							glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, screen_width, screen_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-						#else
-							glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, screen_width, screen_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-						#endif
-							glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-							glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-							glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-							glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-						#ifndef USE_OPENGLES2
-							glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-						#endif
-
-							framebuffer.width = screen_width;
-							framebuffer.height = screen_height;
-
-							glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebuffer.texture_id, 0);
-							glViewport(0, 0, framebuffer.width, framebuffer.height);
-
-							// Set-up glyph-batcher
-							spritebatch_config_t config;
-							spritebatch_set_default_config(&config);
-							config.pixel_stride = 1;
-							config.atlas_width_in_pixels = 256;
-							config.atlas_height_in_pixels = 256;
-							config.lonely_buffer_count_till_flush = 4; // Start making atlases immediately
-							config.batch_callback = GlyphBatch_Draw;
-							config.get_pixels_callback = GlyphBatch_GetPixels;
-							config.generate_texture_callback = GlyphBatch_CreateTexture;
-							config.delete_texture_callback = GlyphBatch_DestroyTexture;
-							spritebatch_init(&glyph_batcher, &config, NULL);
-
-							return &framebuffer;
-						}
-
-						if (program_glyph != 0)
-							glDeleteProgram(program_glyph);
-
-						if (program_colour_fill != 0)
-							glDeleteProgram(program_colour_fill);
-
-						if (program_texture_colour_key != 0)
-							glDeleteProgram(program_texture_colour_key);
-
-						if (program_texture != 0)
-							glDeleteProgram(program_texture);
-
-						glDeleteBuffers(TOTAL_VBOS, vertex_buffer_ids);
-					#ifndef USE_OPENGLES2
-						glDeleteVertexArrays(1, &vertex_array_id);
-					#endif
-			#ifndef USE_OPENGLES2
-					}
-					else
-					{
-						SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal error (OpenGL rendering backend)", "Your system does not support OpenGL 3.2", window);
-					}
-				}
-				else
-				{
-					SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal error (OpenGL rendering backend)", "Could not load OpenGL functions", window);
-				}
-			#endif
-			}
-			else
-			{
-				SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal error (OpenGL rendering backend)", "SDL_GL_MakeCurrent failed", window);
-			}
-
-			SDL_GL_DeleteContext(context);
-		}
-		else
-		{
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal error (OpenGL rendering backend)", "Could not create OpenGL context", window);
+			return &framebuffer;
 		}
 
-		SDL_DestroyWindow(window);
-	}
-	else
-	{
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal error (OpenGL rendering backend)", "Could not create window", NULL);
+		if (program_glyph != 0)
+			glDeleteProgram(program_glyph);
+
+		if (program_colour_fill != 0)
+			glDeleteProgram(program_colour_fill);
+
+		if (program_texture_colour_key != 0)
+			glDeleteProgram(program_texture_colour_key);
+
+		if (program_texture != 0)
+			glDeleteProgram(program_texture);
+
+		glDeleteBuffers(TOTAL_VBOS, vertex_buffer_ids);
+	#ifndef USE_OPENGLES2
+		glDeleteVertexArrays(1, &vertex_array_id);
+	#endif
 	}
 
 	return NULL;
@@ -705,8 +639,8 @@ void Backend_Deinit(void)
 #ifndef USE_OPENGLES2
 	glDeleteVertexArrays(1, &vertex_array_id);
 #endif
-	SDL_GL_DeleteContext(context);
-	SDL_DestroyWindow(window);
+
+	WindowBackend_OpenGL_DestroyWindow();
 }
 
 void Backend_DrawScreen(void)
@@ -723,12 +657,35 @@ void Backend_DrawScreen(void)
 	glDisable(GL_BLEND);
 
 	// Enable texture coordinates, since this uses textures
-	glEnableVertexAttribArray(2);
+	glEnableVertexAttribArray(ATTRIBUTE_INPUT_TEXTURE_COORDINATES);
 
 	// Target actual screen, and not our framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	glViewport(0, 0, framebuffer.width, framebuffer.height);
+	// Do some viewport trickery, to fit the framebuffer in the center of the screen
+	GLint x;
+	GLint y;
+	GLsizei width;
+	GLsizei height;
+
+	if (actual_screen_width > actual_screen_height)
+	{
+		y = 0;
+		height = actual_screen_height;
+
+		width = framebuffer.width * ((float)actual_screen_height / (float)framebuffer.height);
+		x = (actual_screen_width - width) / 2;
+	}
+	else
+	{
+		x = 0;
+		width = actual_screen_width;
+
+		height = framebuffer.height * ((float)actual_screen_width / (float)framebuffer.width);
+		y = (actual_screen_height - height) / 2;
+	}
+
+	glViewport(x, y, width, height);
 
 	// Draw framebuffer to screen
 	glBindTexture(GL_TEXTURE_2D, framebuffer.texture_id);
@@ -765,7 +722,7 @@ void Backend_DrawScreen(void)
 
 	FlushVertexBuffer();
 
-	SDL_GL_SwapWindow(window);
+	WindowBackend_OpenGL_Display();
 
 	// According to https://www.khronos.org/opengl/wiki/Common_Mistakes#Swap_Buffers
 	// the buffer should always be cleared, even if it seems unnecessary
@@ -893,7 +850,7 @@ void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Sur
 		glDisable(GL_BLEND);
 
 		// Enable texture coordinates, since this uses textures
-		glEnableVertexAttribArray(2);
+		glEnableVertexAttribArray(ATTRIBUTE_INPUT_TEXTURE_COORDINATES);
 
 		glBindTexture(GL_TEXTURE_2D, source_surface->texture_id);
 	}
@@ -973,7 +930,7 @@ void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned cha
 		glDisable(GL_BLEND);
 
 		// Disable texture coordinate array, since this doesn't use textures
-		glDisableVertexAttribArray(2);
+		glDisableVertexAttribArray(ATTRIBUTE_INPUT_TEXTURE_COORDINATES);
 
 		glUniform4f(program_colour_fill_uniform_colour, red / 255.0f, green / 255.0f, blue / 255.0f, 1.0f);
 	}
@@ -1072,7 +1029,8 @@ void Backend_HandleRenderTargetLoss(void)
 	// No problem for us
 }
 
-void Backend_HandleWindowResize(void)
+void Backend_HandleWindowResize(unsigned int width, unsigned int height)
 {
-	// No problem for us
+	actual_screen_width = width;
+	actual_screen_height = height;
 }

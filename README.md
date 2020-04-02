@@ -9,8 +9,8 @@ Branch | Description
 [accurate](https://www.github.com/Clownacy/Cave-Story-Engine-2/tree/accurate) | The main decompilation branch. The code intended to be as close to the original as possible, down to all the bugs and platform-dependencies.
 [portable](https://www.github.com/Clownacy/Cave-Story-Engine-2/tree/portable) | This branch ports the engine to SDL2, and addresses numerous portability issues, allowing it to run on other platforms.
 [enhanced](https://www.github.com/Clownacy/Cave-Story-Engine-2/tree/enhanced) | Based on the portable branch, this adds several enhancements to the engine, and makes it more accessible to modders.
-[emscripten](https://www.github.com/Clownacy/Cave-Story-Engine-2/tree/emscripten) | Modifies the engine to build with Emscripten, [allowing it to run in web browsers](http://sonicresearch.org/clownacy/cave.html).
-[wii](https://www.github.com/Clownacy/Cave-Story-Engine-2/tree/wii) | Ports the engine to the Nintendo Wii.
+[emscripten](https://www.github.com/Clownacy/Cave-Story-Engine-2/tree/emscripten) | Modifies the engine to build with Emscripten, [allowing it to run in web browsers](http://sonicresearch.org/clownacy/cave.html) (no longer maintained).
+[wii](https://www.github.com/Clownacy/Cave-Story-Engine-2/tree/wii) | Ports the engine to the Nintendo Wii (no longer maintained).
 
 # Cave Story Engine 2 (Portable)
 
@@ -38,80 +38,59 @@ Many months of copypasting and tinkering later, here is the result.
 
 ## Dependencies
 
-*Note: with CMake, if these are not found, they will be built locally*
-
 * SDL2
+* GLFW3
 * FreeType
-* FLTK
+
+In CMake builds, if these are not found, they will be built locally.
+
+In addition, `pkg-config` is required for builds that require static-linkage.
 
 ## Building
 
-### CMake
+This project uses CMake, allowing it to be built with a range of compilers.
 
-This project primarily uses CMake, allowing it to be built with a range of compilers.
-
-In this folder, create another folder called 'build', then switch to the command-line (Visual Studio users should open the [Developer Command Prompt](https://docs.microsoft.com/en-us/dotnet/framework/tools/developer-command-prompt-for-vs)) and `cd` into it. After that, generate the files for your build system with:
+Switch to the terminal (Visual Studio users should open the [Developer Command Prompt](https://docs.microsoft.com/en-us/dotnet/framework/tools/developer-command-prompt-for-vs)) and `cd` into this folder. After that, generate the files for your build system with:
 
 ```
-cmake .. -DCMAKE_BUILD_TYPE=Release
+cmake -B build -DCMAKE_BUILD_TYPE=Release
 ```
+
+MSYS2 users may want to append `-G"MSYS Makefiles"` to this command, also.
 
 You can also add the following flags:
 
 Name | Function
 --------|--------
-`-DLTO=ON` | Enable link-time optimisation
-`-DNATIVE_OPTIMIZATIONS=ON` | Enable processor-specific optimisations (executable might not work on other architectures) (GCC-compatible compilers only)
 `-DJAPANESE=ON` | Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
 `-DFIX_BUGS=ON` | Fix various bugs in the game
 `-DDEBUG_SAVE=ON` | Re-enable the ability to drag-and-drop save files onto the window
-`-DRENDERER=OpenGL3` | Use the hardware-accelerated OpenGL 3.2 renderer
-`-DRENDERER=OpenGLES2` | Use the hardware-accelerated OpenGL ES 2.0 renderer
-`-DRENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default)
-`-DRENDERER=SDLSurface` | Use the software-rendered SDL2 Surface API renderer
-`-DRENDERER=Software` | Use the handwritten software renderer
-`-DWARNINGS=ON` | Enable common compiler warnings (for GCC-compatible compilers and MSVC only)
-`-DWARNINGS_ALL=ON` | Enable ALL compiler warnings (for Clang and MSVC only)
-`-DWARNINGS_FATAL=ON` | Stop compilation on any compiler warning (for GCC-compatible compilers and MSVC only)
-`-DFORCE_LOCAL_LIBS=ON` | Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones
+`-DBACKEND_RENDERER=OpenGL3` | Use the hardware-accelerated OpenGL 3.2 renderer
+`-DBACKEND_RENDERER=OpenGLES2` | Use the hardware-accelerated OpenGL ES 2.0 renderer
+`-DBACKEND_RENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default) (note: requires `-DBACKEND_PLATFORM=SDL2`)
+`-DBACKEND_RENDERER=SDLSurface` | Use the software-rendered SDL2 Surface API renderer (note: requires `-DBACKEND_PLATFORM=SDL2`)
+`-DBACKEND_RENDERER=Software` | Use the handwritten software renderer (note: requires `-DBACKEND_PLATFORM=SDL2`)
+`-DBACKEND_AUDIO=SDL2` | Use the SDL2-driven software audio-mixer
+`-DBACKEND_AUDIO=miniaudio` | Use the miniaudio-driven software audio-mixer
+`-DBACKEND_PLATFORM=SDL2` | Use SDL2 for windowing and OS-abstraction
+`-DBACKEND_PLATFORM=GLFW3` | Use GLFW3 for windowing and OS-abstraction
+`-DLTO=ON` | Enable link-time optimisation
+`-DPKG_CONFIG_STATIC_LIBS=ON` | On platforms with pkg-config, static-link the dependencies (good for Windows builds, so you don't need to bundle DLL files)
+`-DMSVC_LINK_STATIC_RUNTIME=ON` | Link the static MSVC runtime library (Visual Studio only)
+`-DFORCE_LOCAL_LIBS=ON` | Compile the built-in versions of SDL2, GLFW3, and FreeType instead of using the system-provided ones
 
-Then compile CSE2 with this command:
+You can pass your own compiler flags with `-DCMAKE_C_FLAGS` and `-DCMAKE_CXX_FLAGS`.
+
+You can then compile CSE2 with this command:
 
 ```
-cmake --build . --config Release
+cmake --build build --config Release
 ```
 
-If you're a Visual Studio user, you can open the generated `CSE2.sln` file instead.
-
-Once built, the executables and assets can be found in the newly-generated `game` folder.
-
-### Makefile
-
-*Note: this requires pkg-config*
-
-Run 'make' in this folder, preferably with some of the following settings:
-
-Name | Function
---------|--------
-`RELEASE=1` | Compile a release build (optimised, stripped, etc.)
-`STATIC=1` | Produce a statically-linked executable (good for Windows builds, so you don't need to bundle DLL files)
-`LTO=1` | Enable link-time optimisation
-`NATIVE_OPTIMIZATIONS=1` | Enable processor-specific optimisations (executable might not work on other architectures)
-`JAPANESE=1` | Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
-`FIX_BUGS=1` | Fix various bugs in the game
-`WINDOWS=1` | Build for Windows
-`DEBUG_SAVE=1` | Re-enable the ability to drag-and-drop save files onto the window
-`RENDERER=OpenGL3` | Use the hardware-accelerated OpenGL 3.2 renderer
-`RENDERER=OpenGLES2` | Use the hardware-accelerated OpenGL ES 2.0 renderer
-`RENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default)
-`RENDERER=SDLSurface` | Use the software-rendered SDL2 Surface API renderer
-`RENDERER=Software` | Use the hand-written software renderer
-`WARNINGS=1` | Enable common compiler warnings
-`WARNINGS_ALL=1` | Enable ALL compiler warnings (Clang only)
-`WARNINGS_FATAL=1` | Make all compiler warnings errors
+If you're a Visual Studio user, you can open the generated `CSE2.sln` file instead, which can be found in the `build` folder.
 
 Once built, the executables can be found in the `game_english`/`game_japanese` folder, depending on the selected language.
 
 ## Licensing
 
-Being a decompilation, the majority of the code in this project belongs to Daisuke "Pixel" Amaya - not us. We've yet to agree on a license for our own code.
+Being a decompilation, the majority of the code in this project belongs to Daisuke "Pixel" Amaya - not us. We've yet to agree on a licence for our own code.

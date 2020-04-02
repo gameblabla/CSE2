@@ -1,173 +1,110 @@
-cmake_minimum_required(VERSION 3.7.2)
+cmake_minimum_required(VERSION 3.12)
 
-if((${CMAKE_VERSION} VERSION_EQUAL 3.9) OR (${CMAKE_VERSION} VERSION_GREATER 3.9))
-	cmake_policy(SET CMP0069 NEW)
+option(PKG_CONFIG_STATIC_LIBS "On platforms with pkg-config, static-link the dependencies (good for Windows builds, so you don't need to bundle DLL files)" OFF)
+option(MSVC_LINK_STATIC_RUNTIME "Link the static MSVC runtime library (Visual Studio only)" OFF)
+
+option(FORCE_LOCAL_LIBS "Compile the built-in version of GLFW3 instead of using the system-provided one" OFF)
+
+project(DoConfig LANGUAGES C CXX)
+
+add_executable(DoConfig WIN32
+	"icon.rc"
+	"../external/glad/include/glad/glad.h"
+	"../external/glad/include/KHR/khrplatform.h"
+	"../external/glad/src/glad.c"
+	"DoConfig.cpp"
+	"imgui/imconfig.h"
+	"imgui/imgui.cpp"
+	"imgui/imgui.h"
+	"imgui/imgui_demo.cpp"
+	"imgui/imgui_draw.cpp"
+	"imgui/imgui_impl_glfw.cpp"
+	"imgui/imgui_impl_glfw.h"
+	"imgui/imgui_impl_opengl3.cpp"
+	"imgui/imgui_impl_opengl3.h"
+	"imgui/imgui_internal.h"
+	"imgui/imgui_widgets.cpp"
+	"imgui/imstb_rectpack.h"
+	"imgui/imstb_textedit.h"
+	"imgui/imstb_truetype.h"
+)
+
+set_target_properties(DoConfig PROPERTIES
+	C_STANDARD 90
+	C_STANDARD_REQUIRED ON
+	C_EXTENSIONS OFF
+	CXX_STANDARD 98
+	CXX_STANDARD_REQUIRED ON
+	CXX_EXTENSIONS OFF
+)
+
+target_link_libraries(DoConfig PRIVATE ${CMAKE_DL_LIBS})
+
+target_include_directories(DoConfig PRIVATE "../external/glad/include")
+target_compile_definitions(DoConfig PRIVATE IMGUI_IMPL_OPENGL_LOADER_GLAD)
+
+if(PKG_CONFIG_STATIC_LIBS)
+	target_link_options(DoConfig PRIVATE "-static")
 endif()
 
-if((${CMAKE_VERSION} VERSION_EQUAL 3.11) OR (${CMAKE_VERSION} VERSION_GREATER 3.11))
-	cmake_policy(SET CMP0072 NEW)
-endif()
-
-option(LTO "Enable link-time optimisation" OFF)
-option(NATIVE_OPTIMIZATIONS "Enable processor-specific optimisations (executable might not work on other architectures) (GCC-compatible compilers only)" OFF)
-
-option(WARNINGS "Enable common compiler warnings (for GCC-compatible compilers and MSVC only)" OFF)
-option(WARNINGS_ALL "Enable ALL compiler warnings (for Clang and MSVC only)" OFF)
-option(WARNINGS_FATAL "Stop compilation on any compiler warning (for GCC-compatible compilers and MSVC only)" OFF)
-option(FORCE_LOCAL_LIBS "Compile the built-in version of FLTK instead of using the system-provided one" OFF)
-
-project(DoConfig LANGUAGES CXX)
-
-message(STATUS "Compiler ID : ${CMAKE_CXX_COMPILER_ID}")
-
-# Has to be placed after "project()"
-if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-	# Using Clang (this is a match so that we also get "AppleClang" which is the Apple-provided Clang
-	set(COMPILER_IS_CLANG true)
-	message(STATUS "Compiling with Clang")
-endif()
-
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-	# Using GCC
-	set(COMPILER_IS_GCC true)
-	message(STATUS "Compiling with GCC")
-endif()
-
-if(CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
-	# Using Intel C++
-	set(COMPILER_IS_ICC true)
-	message(STATUS "Compiling with ICC")
-endif()
-
-if(COMPILER_IS_CLANG OR COMPILER_IS_GCC OR COMPILER_IS_ICC)
-	set(COMPILER_IS_GCC_COMPATIBLE true)
-	message(STATUS "Compiling with a GCC-compatible compiler")
-endif()
-
-add_executable(DoConfig "DoConfig.cpp" "icon.rc")
-
-if(WARNINGS)
-	# HACK : Replace this with CMake provided stuff when possible (when CMake makes avoiding this possible (it isn't currently))
-
-	if(MSVC)
-		# Force to always compile with /W4 on MSVC
-
-		# Can't do this with target_compile_options
-		# if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
-		# 	string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-		# else()
-		# 	target_compile_options(DoConfig PRIVATE /W4)
-		# endif()
-
-		target_compile_options(DoConfig PRIVATE /W4)
-	elseif(COMPILER_IS_GCC_COMPATIBLE)
-		target_compile_options(DoConfig PRIVATE -Wall -Wextra -pedantic)
-	else()
-		message(WARNING "Could not activate warnings ! (Unsupported compiler)")
-	endif()
-endif()
-
-if(WARNINGS_ALL)
-	# HACK : Replace this with CMake provided stuff when possible (when CMake makes avoiding this possible (it isn't currently))
-
-	if(MSVC)
-		# Force to always compile with /Wall on MSVC
-
-		# Can't do this with target_compile_options
-		# if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
-		# 	string(REGEX REPLACE "/W[0-4]" "/Wall" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-		# else()
-		# 	target_compile_options(DoConfig PRIVATE /Wall)
-		# endif()
-
-		target_compile_options(DoConfig PRIVATE /Wall)
-	elseif(COMPILER_IS_CLANG)
-		target_compile_options(DoConfig PRIVATE -Weverything)
-	else()
-		message(WARNING "Could not activate all warnings ! (Unsupported compiler)")
-	endif()
-endif()
-
-if(WARNINGS_FATAL)
-	# HACK : Replace this with CMake provided stuff when possible (when CMake makes avoiding this possible (it isn't currently))
-
-	if(MSVC)
-		target_compile_options(DoConfig PRIVATE /WX)
-	elseif(COMPILER_IS_GCC_COMPATIBLE)
-		target_compile_options(DoConfig PRIVATE -Werror)
-	else()
-		message(WARNING "Could not activate fatal warnings ! (Unsupported compiler)")
-	endif()
-endif()
-
-# Windows tweak
-if(WIN32)
-	set_target_properties(DoConfig PROPERTIES WIN32_EXECUTABLE YES)	# Disable the console window
-endif()
-
-# MSVC tweak
 if(MSVC)
-	target_compile_definitions(DoConfig PRIVATE _CRT_SECURE_NO_WARNINGS)	# Disable warnings that normally fire up on MSVC when using "unsafe" functions instead of using MSVC's "safe" _s functions
+	# Disable warnings that normally fire up on MSVC when using "unsafe" functions instead of using MSVC's "safe" _s functions
+	target_compile_definitions(DoConfig PRIVATE _CRT_SECURE_NO_WARNINGS)
+
+	# Use `main` instead of `WinMain`
+	set_target_properties(DoConfig PROPERTIES LINK_FLAGS "/ENTRY:mainCRTStartup")
+
+	# This is messy as hell, and has been replaced by CMAKE_MSVC_RUNTIME_LIBRARY,
+	# but that's a very recent CMake addition, so we're still doing it this way for now
+	if(MSVC_LINK_STATIC_RUNTIME)
+		# Statically-link the CRT (vcpkg static libs do this)
+		foreach(flag_var CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELWITHDEBINFO CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+			if(${flag_var} MATCHES "/MD")
+				string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
+			endif()
+		endforeach()
+	endif()
 endif()
 
-# Make it so source files are recognized as UTF-8 by MSVC
-add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 
-# Find FLTK
+################
+# Dependencies #
+################
+
 if(NOT FORCE_LOCAL_LIBS)
-	set(FLTK_SKIP_FLUID ON)	# Do not require fltk-fluid (the UI designer)
-	find_package(FLTK)
+	find_package(PkgConfig QUIET)
 endif()
 
-if(FLTK_FOUND)
-	message(STATUS "Using system FLTK")
-	target_include_directories(DoConfig PRIVATE ${FLTK_INCLUDE_DIR})
-	target_link_libraries(DoConfig ${FLTK_LIBRARIES})
+if(NOT FORCE_LOCAL_LIBS)
+	find_package(glfw3)
+
+	if (PKG_CONFIG_FOUND)
+		pkg_check_modules(glfw3 QUIET IMPORTED_TARGET glfw3)
+	endif()
+endif()
+
+if(TARGET PkgConfig::glfw3)
+	# pkg-config
+	if (PKG_CONFIG_STATIC_LIBS)
+		message(STATUS "Using system GLFW3 (pkg-config, static)")
+		target_compile_options(DoConfig PRIVATE ${glfw3_STATIC_CFLAGS})
+		target_link_libraries(DoConfig PRIVATE ${glfw3_STATIC_LINK_LIBRARIES})
+	else()
+		message(STATUS "Using system GLFW3 (pkg-config, dynamic)")
+		target_compile_options(DoConfig PRIVATE ${glfw3_CFLAGS})
+		target_link_libraries(DoConfig PRIVATE ${glfw3_LINK_LIBRARIES})
+	endif()
+elseif(TARGET glfw)
+	# CMake
+	message(STATUS "Using system GLFW3 (CMake)")
+	target_link_libraries(DoConfig PRIVATE glfw)
 else()
 	# Compile it ourselves
-	message(STATUS "Using local FLTK")
-	# Clear this or it will cause an error during FLTK's configuration.
-	# FLTK only appends to it, so the leftover junk gets fed into a bunch
-	# of important functions. THAT was no fun to debug.
-	set(FLTK_LIBRARIES)
-	set(OPTION_BUILD_EXAMPLES OFF)	# Needed to prevent a name collision
-	if(FORCE_LOCAL_LIBS)
-		set(OPTION_USE_SYSTEM_ZLIB OFF)
-		set(OPTION_USE_SYSTEM_LIBJPEG OFF)
-		set(OPTION_USE_SYSTEM_LIBPNG OFF)
-	endif()
-	add_subdirectory("fltk" EXCLUDE_FROM_ALL)
-	get_target_property(DIRS fltk INCLUDE_DIRECTORIES)	# FLTK doesn't mark its includes as PUBLIC or INTERFACE, so we have to do this stupidity
-	target_include_directories(DoConfig PRIVATE ${DIRS})
-	target_link_libraries(DoConfig fltk)
-endif()
-
-# Enable link-time optimisation if available
-if(LTO)
-	if((${CMAKE_VERSION} VERSION_EQUAL 3.9) OR (${CMAKE_VERSION} VERSION_GREATER 3.9))
-		include(CheckIPOSupported)
-		check_ipo_supported(RESULT result)
-		if(result)
-			set_target_properties(DoConfig PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
-		endif()
-	endif()
-endif()
-
-# Enable -march=native if available
-if(NATIVE_OPTIMIZATIONS)
-	include(CheckCXXCompilerFlag)
-	CHECK_CXX_COMPILER_FLAG("-march=native" COMPILER_SUPPORTS_MARCH_NATIVE)	# GCC flag
-	if(COMPILER_SUPPORTS_MARCH_NATIVE)
-		target_compile_options(DoConfig PRIVATE -march=native)
-	else()
-		CHECK_CXX_COMPILER_FLAG("-xHost" COMPILER_SUPPORTS_XHOST)	# ICC (Linux) flag
-		CHECK_CXX_COMPILER_FLAG("/QxHost" COMPILER_SUPPORTS_QXHOST)	# ICC (Windows) flag
-		if(COMPILER_SUPPORTS_XHOST)
-			target_compile_options(DoConfig PRIVATE -xHost)
-		elseif(COMPILER_SUPPORTS_QXHOST)
-			target_compile_options(DoConfig PRIVATE /QxHost)
-		else()
-			message(WARNING "Couldn't activate native optimizations ! (Unsupported compiler)")
-		endif()
-	endif()
+	message(STATUS "Using local GLFW3")
+	set(GLFW_BUILD_EXAMPLES OFF CACHE INTERNAL "" FORCE)
+	set(GLFW_BUILD_TESTS OFF CACHE INTERNAL "" FORCE)
+	set(GLFW_BUILD_DOCS OFF CACHE INTERNAL "" FORCE)
+	set(GLFW_INSTALL OFF CACHE INTERNAL "" FORCE)
+	add_subdirectory("../external/glfw" "glfw" EXCLUDE_FROM_ALL)
+	target_link_libraries(DoConfig PRIVATE glfw)
 endif()
