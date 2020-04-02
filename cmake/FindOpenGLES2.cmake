@@ -19,6 +19,21 @@
 # Win32, Apple, and Android are not tested!
 # Linux tested and works
 
+macro(create_search_paths PREFIX)
+  foreach(dir ${${PREFIX}_PREFIX_PATH})
+    set(${PREFIX}_INC_SEARCH_PATH ${${PREFIX}_INC_SEARCH_PATH}
+      ${dir}/include ${dir}/Include ${dir}/include/${PREFIX} ${dir}/Headers)
+    set(${PREFIX}_LIB_SEARCH_PATH ${${PREFIX}_LIB_SEARCH_PATH}
+      ${dir}/lib ${dir}/Lib ${dir}/lib/${PREFIX} ${dir}/Libs)
+    set(${PREFIX}_BIN_SEARCH_PATH ${${PREFIX}_BIN_SEARCH_PATH}
+      ${dir}/bin)
+  endforeach(dir)
+  if(ANDROID)
+	set(${PREFIX}_LIB_SEARCH_PATH ${${PREFIX}_LIB_SEARCH_PATH} ${OGRE_DEPENDENCIES_DIR}/lib/${ANDROID_ABI})
+  endif()
+  set(${PREFIX}_FRAMEWORK_SEARCH_PATH ${${PREFIX}_PREFIX_PATH})
+endmacro(create_search_paths)
+
 if(WIN32)
 	if(CYGWIN)
 		find_path(OPENGLES2_INCLUDE_DIR GLES2/gl2.h)
