@@ -48,11 +48,13 @@ addons:
     update: true
 
 env:
-    - RENDERER=Software
-    - RENDERER=SDLSurface
-    - RENDERER=SDLTexture
-    - RENDERER=OpenGL3
-    - RENDERER=OpenGLES2
+    - PLATFORM=SDL2 AUDIO=SDL2 RENDERER=Software
+    - PLATFORM=SDL2 AUDIO=SDL2 RENDERER=SDLSurface
+    - PLATFORM=SDL2 AUDIO=SDL2 RENDERER=SDLTexture
+    - PLATFORM=SDL2 AUDIO=SDL2 RENDERER=OpenGL3
+    - PLATFORM=SDL2 AUDIO=SDL2 RENDERER=OpenGLES2
+    - PLATFORM=GLFW3 AUDIO=miniaudio RENDERER=OpenGL3
+    - PLATFORM=GLFW3 AUDIO=miniaudio RENDERER=OpenGLES2
 
 before_install:
     # Set URL for Discord send script
@@ -107,7 +109,7 @@ install:
 
 before_script:
     # Make build directory and generate CMake build files
-    - cmake -B ${CMAKE_BUILD_DIR} -DCMAKE_BUILD_TYPE=Release -DFIX_BUGS=ON -DBACKEND_RENDERER=$RENDERER -DCMAKE_C_FLAGS="-Wall -Wextra -pedantic" -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic"
+    - cmake -B ${CMAKE_BUILD_DIR} -DCMAKE_BUILD_TYPE=Release -DFIX_BUGS=ON -DBACKEND_PLATFORM=$PLATFORM -DBACKEND_AUDIO=$AUDIO -DBACKEND_RENDERER=$RENDERER -DCMAKE_C_FLAGS="-Wall -Wextra -pedantic" -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic"
 
 script:
     - cmake --build ${CMAKE_BUILD_DIR} --config Release --parallel $JOBS
