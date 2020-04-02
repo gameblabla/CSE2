@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.12)
 
+option(FORCE_LOCAL_LIBS "Compile the built-in version of GLFW3 instead of using the system-provided one" OFF)
+
 project(DoConfig LANGUAGES C CXX)
 
 add_executable(DoConfig WIN32
@@ -40,11 +42,51 @@ target_compile_definitions(DoConfig PRIVATE IMGUI_IMPL_OPENGL_LOADER_GLAD)
 
 if(MSVC)
 	# Disable warnings that normally fire up on MSVC when using "unsafe" functions instead of using MSVC's "safe" _s functions
-	target_compile_definitions(CSE2 PRIVATE _CRT_SECURE_NO_WARNINGS)
+	target_compile_definitions(DoConfig PRIVATE _CRT_SECURE_NO_WARNINGS)
 
 	# Use `main` instead of `WinMain`
-	set_target_properties(CSE2 PROPERTIES LINK_FLAGS "/ENTRY:mainCRTStartup")
+	set_target_properties(DoConfig PROPERTIES LINK_FLAGS "/ENTRY:mainCRTStartup")
 endif()
 
-find_package(glfw3 REQUIRED)
-target_link_libraries(DoConfig PRIVATE glfw)
+
+################
+# Dependencies #
+################
+
+if(NOT FORCE_LOCAL_LIBS)
+	find_package(PkgConfig QUIET)
+endif()
+
+if(NOT FORCE_LOCAL_LIBS)
+	find_package(glfw3)
+
+	if (PKG_CONFIG_FOUND)
+		pkg_check_modules(glfw3 QUIET IMPORTED_TARGET glfw3)
+	endif()
+endif()
+
+if(TARGET PkgConfig::glfw3)
+	# pkg-config
+	if (PKG_CONFIG_STATIC_LIBS)
+		message(STATUS "Using system GLFW3 (pkg-config, static)")
+		target_compile_options(DoConfig PRIVATE ${glfw3_STATIC_CFLAGS})
+		target_link_libraries(DoConfig PRIVATE ${glfw3_STATIC_LIBRARIES})
+	else()
+		message(STATUS "Using system GLFW3 (pkg-config, dynamic)")
+		target_compile_options(DoConfig PRIVATE ${glfw3_CFLAGS})
+		target_link_libraries(DoConfig PRIVATE ${glfw3_LIBRARIES})
+	endif()
+elseif(TARGET glfw)
+	# CMake
+	message(STATUS "Using system GLFW3 (CMake)")
+	target_link_libraries(DoConfig PRIVATE glfw)
+else()
+	# Compile it ourselves
+	message(STATUS "Using local GLFW3")
+	set(GLFW_BUILD_EXAMPLES OFF CACHE INTERNAL "" FORCE)
+	set(GLFW_BUILD_TESTS OFF CACHE INTERNAL "" FORCE)
+	set(GLFW_BUILD_DOCS OFF CACHE INTERNAL "" FORCE)
+	set(GLFW_INSTALL OFF CACHE INTERNAL "" FORCE)
+	add_subdirectory("../external/glfw" "glfw" EXCLUDE_FROM_ALL)
+	target_link_libraries(DoConfig PRIVATE glfw)
+endif()
