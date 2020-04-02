@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "glad/glad.h"
 #include <GLFW/glfw3.h>
@@ -11,8 +12,35 @@
 #define WINDOW_WIDTH 360
 #define WINDOW_HEIGHT 290
 
+struct Config
+{
+	char proof[0x20];
+	char font_name[0x40];
+	int move_button_mode;
+	int attack_button_mode;
+	int ok_button_mode;
+	int display_mode;
+	bool bJoystick;
+	int joystick_button[8];
+};
+
+const char *proof = "DOUKUTSU20041206";
+
 int main(int argc, char *argv[])
 {
+	char base_directory[0x400];
+
+	strcpy(base_directory, argv[0]);
+
+	for (size_t i = strlen(base_directory);; --i)
+	{
+		if (i == 0 || base_directory[i] == '\\' || base_directory[i] == '/')
+		{
+			base_directory[i] = '\0';
+			break;
+		}
+	}
+
 	/////////////////////
 	// Initialise GLFW //
 	/////////////////////
@@ -49,6 +77,54 @@ int main(int argc, char *argv[])
 					ImGui_ImplGlfw_InitForOpenGL(window, true);
 					ImGui_ImplOpenGL3_Init(glsl_version);
 
+					/////////////////////
+					// Load Config.dat //
+					/////////////////////
+
+					Config configuration;
+
+					char config_path[0x400];
+					sprintf(config_path, "%s/Config.dat", base_directory);
+
+					FILE *file = fopen(config_path, "rb");
+
+					if (file != NULL)
+					{
+						// Read from file
+						fread(configuration.proof, 1, sizeof(configuration.proof), file);
+						fread(configuration.font_name, 1, sizeof(configuration.font_name), file);
+						configuration.move_button_mode = fgetc(file);
+						fseek(file, 3, SEEK_CUR);
+						configuration.attack_button_mode = fgetc(file);
+						fseek(file, 3, SEEK_CUR);
+						configuration.ok_button_mode = fgetc(file);
+						fseek(file, 3, SEEK_CUR);
+						configuration.display_mode = fgetc(file);
+						fseek(file, 3, SEEK_CUR);
+						configuration.bJoystick = fgetc(file);
+
+						for (unsigned int i = 0; i < 8; ++i)
+						{
+							const int decode_table[6] = {0, 1, 2, 4, 5, 3};
+
+							fseek(file, 3, SEEK_CUR);
+							configuration.joystick_button[i] = decode_table[fgetc(file)];
+						}
+
+						fclose(file);
+					}
+
+					if (file == NULL || memcmp(configuration.proof, proof, strlen(proof)))
+					{
+						// Reset to defaults
+						memset(&configuration, 0, sizeof(configuration));
+						strcpy(configuration.proof, proof);
+						strcpy(configuration.font_name, "Courier New");
+
+						for (unsigned int i = 0; i < 8; ++i)
+							configuration.joystick_button[i] = i % 6;
+					}
+
 					//////////////
 					// Mainloop //
 					//////////////
@@ -71,29 +147,24 @@ int main(int argc, char *argv[])
 								ImGui::TableNextRow();
 
 								ImGui::TableSetColumnIndex(0);
-								static int movement = 0;
-								ImGui::RadioButton("Arrows for Movement", &movement, 0);
-								ImGui::RadioButton("<>? for Movement", &movement, 1);
+								ImGui::RadioButton("Arrows for Movement", &configuration.move_button_mode, 0);
+								ImGui::RadioButton("<>? for Movement", &configuration.move_button_mode, 1);
 
 								ImGui::TableSetColumnIndex(1);
-								static int okay = 0;
-								ImGui::RadioButton("Jump=Okay", &okay, 0);
-								ImGui::RadioButton("Attack=Okay", &okay, 1);
+								ImGui::RadioButton("Jump=Okay", &configuration.ok_button_mode, 0);
+								ImGui::RadioButton("Attack=Okay", &configuration.ok_button_mode, 1);
 
 								ImGui::TableNextRow();
 
 								ImGui::TableSetColumnIndex(0);
-								static int buttons = 0;
-								ImGui::RadioButton("Z=Jump; X=Attack", &buttons, 0);
-								ImGui::RadioButton("X=Jump; Z=Attack", &buttons, 1);
+								ImGui::RadioButton("Z=Jump; X=Attack", &configuration.attack_button_mode, 0);
+								ImGui::RadioButton("X=Jump; Z=Attack", &configuration.attack_button_mode, 1);
 
 								ImGui::TableSetColumnIndex(1);
 								ImGui::SetNextItemWidth(-1.0f);
 								const char *items[] = {"Fullscreen 16-bit", "Windowed 320x240", "Windowed 640x480", "Fullscreen 24-bit", "Fullscreen 32-bit"};
-								static int item_current = 0;
-								ImGui::Combo("", &item_current, items, IM_ARRAYSIZE(items));
-								static bool joypad;
-								ImGui::Checkbox("Use Joypad", &joypad);
+								ImGui::Combo("", &configuration.display_mode, items, IM_ARRAYSIZE(items));
+								ImGui::Checkbox("Use Joypad", &configuration.bJoystick);
 
 								ImGui::EndTable();
 							}
@@ -130,10 +201,9 @@ int main(int argc, char *argv[])
 											else
 											{
 												static char name_buffer[5] = {'#', '#', '0', '0', '\0'};
-												static int button_bindings[8];
 												name_buffer[2] = '0' + x;
 												name_buffer[3] = '0' + y;
-												ImGui::RadioButton(name_buffer, &button_bindings[x - 1], y - 1);
+												ImGui::RadioButton(name_buffer, &configuration.joystick_button[x - 1], y - 1);
 											}
 										}
 									}
@@ -141,9 +211,56 @@ int main(int argc, char *argv[])
 
 								ImGui::EndTable();
 
-								ImGui::Button("Okay", ImVec2(ImGui::GetContentRegionAvail().x / 2, 0.0f));
+								if (ImGui::Button("Okay", ImVec2(ImGui::GetContentRegionAvail().x / 2, 0.0f)))
+								{
+									glfwSetWindowShouldClose(window, 1);
+
+									// Save to file
+									FILE *file = fopen(config_path, "wb");
+
+									if (file != NULL)
+									{
+										fwrite(configuration.proof, 1, sizeof(configuration.proof), file);
+										fwrite(configuration.font_name, 1, sizeof(configuration.font_name), file);
+										fputc(configuration.move_button_mode, file);
+										fputc(0, file);
+										fputc(0, file);
+										fputc(0, file);
+										fputc(configuration.attack_button_mode, file);
+										fputc(0, file);
+										fputc(0, file);
+										fputc(0, file);
+										fputc(configuration.ok_button_mode, file);
+										fputc(0, file);
+										fputc(0, file);
+										fputc(0, file);
+										fputc(configuration.display_mode, file);
+										fputc(0, file);
+										fputc(0, file);
+										fputc(0, file);
+										fputc(configuration.bJoystick, file);
+										fputc(0, file);
+										fputc(0, file);
+										fputc(0, file);
+
+										for (unsigned int i = 0; i < 8; ++i)
+										{
+											const int encode_table[6] = {0, 1, 2, 5, 3, 4};
+
+											fputc(encode_table[configuration.joystick_button[i]], file);
+											fputc(0, file);
+											fputc(0, file);
+											fputc(0, file);
+										}
+
+										fclose(file);
+									}
+								}
+
 								ImGui::SameLine();
-								ImGui::Button("Cancel", ImVec2(ImGui::GetContentRegionAvail().x, 0.0f));
+
+								if (ImGui::Button("Cancel", ImVec2(ImGui::GetContentRegionAvail().x, 0.0f)))
+									glfwSetWindowShouldClose(window, 1);
 							}
 
 						ImGui::End();
