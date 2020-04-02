@@ -47,15 +47,6 @@
 /vs2003/Debug (Japanese)
 /vs2003/Release (Japanese)
 
-# Exclude Visual Studio 2017 files
-/vs2017/Debug
-/vs2017/Release
-/vs2017/Debug (Japanese)
-/vs2017/Release (Japanese)
-/vs2017/x64
-/vs2017/.vs
-/vs2017/CSE2.vcxproj.user
-
 ####
 # Portable branch
 ####

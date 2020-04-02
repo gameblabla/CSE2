@@ -42,10 +42,6 @@ Of course, project files for Visual Studio .NET 2003 are available, and can be f
 
 As proven by the original `Doukutsu.exe`'s [Rich Header](http://bytepointer.com/articles/the_microsoft_rich_header.htm), Pixel used Visual Studio .NET 2003 to create Cave Story. This means these project files allow us to check the accuracy of the decompilation by comparing the generated assembly code to that of the original executable. The tool for this can be found in the 'devilution' folder.
 
-### Visual Studio 2017 (and later) \[deprecated - use CMake instead\]
-
-Project files for Visual Studio 2017 can be found in the 'vs2017' folder.
-
 ### CMake (Visual Studio & MinGW-w64)
 
 Switch to the terminal (Visual Studio users should open the [Developer Command Prompt](https://docs.microsoft.com/en-us/dotnet/framework/tools/developer-command-prompt-for-vs)) and `cd` into this folder. After that, generate the files for your build system with:
