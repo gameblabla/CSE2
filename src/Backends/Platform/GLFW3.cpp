@@ -252,6 +252,8 @@ void PlatformBackend_PostWindowCreation(void)
 
 BOOL PlatformBackend_GetBasePath(char *string_buffer)
 {
+	(void)string_buffer;
+
 	// GLFW3 doesn't seem to have a mechanism for this
 	return FALSE;
 }
