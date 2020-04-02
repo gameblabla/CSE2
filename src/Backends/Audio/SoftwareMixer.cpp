@@ -5,16 +5,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "../../Attributes.h"
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define CLAMP(x, y, z) MIN(MAX((x), (y)), (z))
-
-#ifdef __GNUC__
-#define ATTR_HOT __attribute__((hot))
-#else
-#define ATTR_HOT
-#endif
 
 struct Mixer_Sound
 {
@@ -144,7 +139,7 @@ void Mixer_SetSoundPan(Mixer_Sound *sound, long pan)
 }
 
 // Most CPU-intensive function in the game (2/3rd CPU time consumption in my experience), so marked with attrHot so the compiler considers it a hot spot (as it is) when optimizing
-ATTR_HOT void Mixer_MixSounds(float *stream, unsigned int frames_total)
+ATTRIBUTE_HOT void Mixer_MixSounds(float *stream, unsigned int frames_total)
 {
 	for (Mixer_Sound *sound = sound_list_head; sound != NULL; sound = sound->next)
 	{
