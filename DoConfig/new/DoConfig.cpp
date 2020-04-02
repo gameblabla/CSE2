@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
 							const int decode_table[6] = {0, 1, 2, 4, 5, 3};
 
 							fseek(file, 3, SEEK_CUR);
-							configuration.joystick_button[i] = decode_table[fgetc(file)];
+							configuration.joystick_button[i] = decode_table[fgetc(file) - 1];
 						}
 
 						fclose(file);
@@ -195,7 +195,7 @@ int main(int argc, char *argv[])
 
 											if (x == 0)
 											{
-												const char *inputs[6] = {"Jump:   ", "Attack: ", "Weapon+:", "Weapon-:", "Items:  ", "Map:    "};
+												const char *inputs[6] = {"Jump:", "Attack:", "Weapon+:", "Weapon-:", "Items:", "Map:"};
 												ImGui::Text(inputs[y - 1]);
 											}
 											else
@@ -247,7 +247,7 @@ int main(int argc, char *argv[])
 										{
 											const int encode_table[6] = {0, 1, 2, 5, 3, 4};
 
-											fputc(encode_table[configuration.joystick_button[i]], file);
+											fputc(encode_table[configuration.joystick_button[i]] + 1, file);
 											fputc(0, file);
 											fputc(0, file);
 											fputc(0, file);
