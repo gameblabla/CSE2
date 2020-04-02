@@ -1,57 +1,50 @@
 cmake_minimum_required(VERSION 3.12)
 
-option(LTO "Enable link-time optimisation" OFF)
+project(DoConfig LANGUAGES C CXX)
 
-option(FORCE_LOCAL_LIBS "Compile the built-in version of FLTK instead of using the system-provided one" OFF)
+add_executable(DoConfig WIN32
+	"icon.rc"
+	"../../external/glad/include/glad/glad.h"
+	"../../external/glad/include/KHR/khrplatform.h"
+	"../../external/glad/src/glad.c"
+	"DoConfig.cpp"
+	"imgui/imconfig.h"
+	"imgui/imgui.cpp"
+	"imgui/imgui.h"
+	"imgui/imgui_demo.cpp"
+	"imgui/imgui_draw.cpp"
+	"imgui/imgui_impl_glfw.cpp"
+	"imgui/imgui_impl_glfw.h"
+	"imgui/imgui_impl_opengl3.cpp"
+	"imgui/imgui_impl_opengl3.h"
+	"imgui/imgui_internal.h"
+	"imgui/imgui_widgets.cpp"
+	"imgui/imstb_rectpack.h"
+	"imgui/imstb_textedit.h"
+	"imgui/imstb_truetype.h"
+)
 
-project(DoConfig LANGUAGES CXX)
+set_target_properties(DoConfig PROPERTIES
+	C_STANDARD 90
+	C_STANDARD_REQUIRED ON
+	C_EXTENSIONS OFF
+	CXX_STANDARD 98
+	CXX_STANDARD_REQUIRED ON
+	CXX_EXTENSIONS OFF
+)
 
-add_executable(DoConfig WIN32 "DoConfig.cpp" "icon.rc")
+target_link_libraries(DoConfig PRIVATE ${CMAKE_DL_LIBS})
 
-# Make some tweaks if we're using MSVC
+target_include_directories(DoConfig PRIVATE "../../external/glad/include")
+target_compile_definitions(DoConfig PRIVATE IMGUI_IMPL_OPENGL_LOADER_GLAD)
+
 if(MSVC)
 	# Disable warnings that normally fire up on MSVC when using "unsafe" functions instead of using MSVC's "safe" _s functions
-	target_compile_definitions(DoConfig PRIVATE _CRT_SECURE_NO_WARNINGS)
+	target_compile_definitions(CSE2 PRIVATE _CRT_SECURE_NO_WARNINGS)
 
-	# Make it so source files are recognized as UTF-8 by MSVC
-	target_compile_options(DoConfig PRIVATE "/utf-8")
+	# Use `main` instead of `WinMain`
+	set_target_properties(CSE2 PROPERTIES LINK_FLAGS "/ENTRY:mainCRTStartup")
 endif()
 
-if(LTO)
-	include(CheckIPOSupported)
-
-	check_ipo_supported(RESULT result)
-
-	if(result)
-		set_target_properties(DoConfig PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
-	endif()
-endif()
-
-# Find FLTK
-if(NOT FORCE_LOCAL_LIBS)
-	set(FLTK_SKIP_FLUID ON CACHE INTERNAL "" FORCE)	# Do not require fltk-fluid (the UI designer)
-	find_package(FLTK)
-endif()
-
-if(FLTK_FOUND)
-	message(STATUS "Using system FLTK")
-	target_include_directories(DoConfig PRIVATE ${FLTK_INCLUDE_DIR})
-	target_link_libraries(DoConfig PRIVATE ${FLTK_LIBRARIES})
-else()
-	# Compile it ourselves
-	message(STATUS "Using local FLTK")
-	# Clear this or it will cause an error during FLTK's configuration.
-	# FLTK only appends to it, so the leftover junk gets fed into a bunch
-	# of important functions. THAT was no fun to debug.
-	set(FLTK_LIBRARIES)
-	set(OPTION_BUILD_EXAMPLES OFF CACHE INTERNAL "" FORCE)	# Needed to prevent a name collision
-	if(FORCE_LOCAL_LIBS)
-		set(OPTION_USE_SYSTEM_ZLIB OFF CACHE INTERNAL "" FORCE)
-		set(OPTION_USE_SYSTEM_LIBJPEG OFF CACHE INTERNAL "" FORCE)
-		set(OPTION_USE_SYSTEM_LIBPNG OFF CACHE INTERNAL "" FORCE)
-	endif()
-	add_subdirectory("fltk" EXCLUDE_FROM_ALL)
-	get_target_property(DIRS fltk INCLUDE_DIRECTORIES)	# FLTK doesn't mark its includes as PUBLIC or INTERFACE, so we have to do this stupidity
-	target_include_directories(DoConfig PRIVATE ${DIRS})
-	target_link_libraries(DoConfig PRIVATE fltk)
-endif()
+find_package(glfw3 REQUIRED)
+target_link_libraries(DoConfig PRIVATE glfw)

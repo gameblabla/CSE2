@@ -1,283 +1,286 @@
-/* This program is free software. It comes without any warranty, to
- * the extent permitted by applicable law. You can redistribute it
- * and/or modify it under the terms of the Do What The F*** You Want
- * To Public License, Version 2, as published by Sam Hocevar. See
- * http://sam.zoy.org/wtfpl/COPYING for more details. */
+#include <stddef.h>
+#include <stdio.h>
+#include <string.h>
 
-#include "FL/Fl.H"
-#include "FL/Fl_Check_Button.H"
-#include "FL/Fl_Choice.H"
-#include "FL/Fl_Radio_Round_Button.H"
-#include "FL/Fl_Window.H"
-#include <FL/Enumerations.H>
-#include <FL/Fl_Button.H>
-#include <FL/Fl_Group.H>
-#include <FL/Fl_Menu_Item.H>
-#include <FL/Fl_Round_Button.H>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <fstream>
+#include "glad/glad.h"
+#include <GLFW/glfw3.h>
 
-struct data
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
+
+#define WINDOW_WIDTH 360
+#define WINDOW_HEIGHT 290
+
+struct Config
 {
-	char magic[32];
-	char font[64];
-	unsigned char move[4];
-	unsigned char attack[4];
-	unsigned char okay[4];
-	unsigned char display[4];
-	unsigned char useJoy[4];
-	unsigned char buttons[8][4];
+	char proof[0x20];
+	char font_name[0x40];
+	int move_button_mode;
+	int attack_button_mode;
+	int ok_button_mode;
+	int display_mode;
+	bool bJoystick;
+	int joystick_button[8];
 };
 
-class RadioRow
-{
-public:
-	RadioRow(char offset);
-	int value();
-	void value(int input);
-
-private:
-	Fl_Group *group;
-	Fl_Radio_Round_Button *buttons[6];
-};
-
-static const char MAGIC[32] = "DOUKUTSU20041206";
-static const char FONT[64] = "Courier New";
-
-static char config_path[FILENAME_MAX];
-
-static data config;
-
-static unsigned long CharsToLong(unsigned char *chars)
-{
-	return (chars[3] << 24) | (chars[2] << 16) | (chars[1] << 8) | chars[0];
-}
-
-static void LongToChars(unsigned long long_var, unsigned char *chars)
-{
-	chars[0] = long_var & 0xFF;
-	chars[1] = (long_var >> 8) & 0xFF;
-	chars[2] = (long_var >> 16) & 0xFF;
-	chars[3] = (long_var >> 24) & 0xFF;
-}
-
-RadioRow::RadioRow(char offset)
-{
-	char *temp = new char[2];
-	temp[0] = '1' + offset;
-	temp[1] = '\0';
-	this->group = new Fl_Group(140 + offset * 30, 150, 30, 180);
-	this->group->label(temp);
-	this->group->align(FL_ALIGN_TOP_LEFT);
-	for (int i = 0; i < 6; i++)
-		this->buttons[i] = new Fl_Radio_Round_Button(140 + offset * 30, 150 + 30 * i, 30, 30);
-	this->group->end();
-}
-
-int RadioRow::value()
-{
-	for (int i = 0; i < 6; i++)
-		if (this->buttons[i]->value())
-			return i;
-	return 0;
-}
-
-void RadioRow::value(int input)
-{
-	this->buttons[input]->setonly();
-}
-
-Fl_Round_Button *movear;
-Fl_Round_Button *movegt;
-
-Fl_Round_Button *buttonxz;
-Fl_Round_Button *buttonzx;
-
-Fl_Round_Button *okayjump;
-Fl_Round_Button *okayattack;
-
-Fl_Choice *displaychoice;
-Fl_Check_Button *joychoice;
-
-Fl_Group *joystuffcontainer;
-RadioRow *joyRows[8];
-
-void quit(Fl_Widget *, void *)
-{
-	std::exit(0);
-}
-
-void activatejoy(Fl_Widget *, void *)
-{
-	if (joystuffcontainer->active())
-		joystuffcontainer->deactivate();
-	else
-		joystuffcontainer->activate();
-}
-
-void read_Config()
-{
-	std::fstream fd;
-	fd.open(config_path, std::ios::in | std::ios::binary);
-	fd.read((char *)&config, sizeof(config));
-	fd.close();
-
-	// If Config.dat's magic value doesn't match, create a blank default Config.dat instead
-	if (memcmp(config.magic, MAGIC, sizeof(config.magic)))
-	{
-		memset(&config, 0, sizeof(config));
-		strcpy(config.magic, MAGIC);
-		strcpy(config.font, FONT);
-	}
-
-	CharsToLong(config.move) ? movegt->setonly() : movear->setonly();
-	CharsToLong(config.attack) ? buttonzx->setonly() : buttonxz->setonly();
-	CharsToLong(config.okay) ? okayattack->setonly() : okayjump->setonly();
-
-	displaychoice->value(CharsToLong(config.display));
-	joychoice->value(CharsToLong(config.useJoy));
-
-	if (!CharsToLong(config.useJoy))
-		joystuffcontainer->deactivate();
-
-	for (int i = 0; i < 8; i++)
-	{
-		const unsigned long button = CharsToLong(config.buttons[i]);
-		if (button < 6 && button > 0)
-		{
-			const unsigned int button_lookup[6] = {0, 1, 2, 4, 5, 3};
-			joyRows[i]->value(button_lookup[button - 1]);
-		}
-	}
-}
-
-void write_Config(Fl_Widget *, void *)
-{
-	LongToChars(movegt->value(), config.move);
-	LongToChars(buttonzx->value(), config.attack);
-	LongToChars(okayattack->value(), config.okay);
-
-	LongToChars(displaychoice->value(), config.display);
-	LongToChars(joychoice->value(), config.useJoy);
-	for (int i = 0; i < 8; i++)
-	{
-		const unsigned int button_lookup[6] = {0, 1, 2, 5, 3, 4};
-		LongToChars(button_lookup[joyRows[i]->value()] + 1, config.buttons[i]);
-	}
-	std::fstream fd;
-	fd.open(config_path, std::ios::out | std::ios::binary);
-	fd.write((char *)&config, sizeof(config));
-	fd.close();
-	exit(0);
-}
+const char *proof = "DOUKUTSU20041206";
 
 int main(int argc, char *argv[])
 {
-	strcpy(config_path, argv[0]);
+	char base_directory[0x400];
 
-	for (size_t i = strlen(config_path);; --i)
+	strcpy(base_directory, argv[0]);
+
+	for (size_t i = strlen(base_directory);; --i)
 	{
-		if (i == 0)
+		if (i == 0 || base_directory[i] == '\\' || base_directory[i] == '/')
 		{
-			strcpy(config_path, "Config.dat");
-			break;
-		}
-		else if (config_path[i] == '\\' || config_path[i] == '/')
-		{
-			config_path[i] = '\0';
-			strcat(config_path, "/Config.dat");
+			base_directory[i] = '\0';
 			break;
 		}
 	}
 
-	Fl_Window *mainw = new Fl_Window(400, 380, "DoConfig - Doukutsu Monogatari Settings");
+	/////////////////////
+	// Initialise GLFW //
+	/////////////////////
 
-	Fl_Group *movegroup = new Fl_Group(10, 10, 185, 50);
-	movegroup->box(FL_THIN_DOWN_BOX);
-	movear = new Fl_Radio_Round_Button(10, 10, 185, 20, "Arrows for Movement");
-	movear->setonly();
-	movegt = new Fl_Radio_Round_Button(10, 40, 185, 20, "<>? for Movement");
-	movegroup->end();
-
-	Fl_Group *buttongroup = new Fl_Group(10, 70, 185, 50);
-	buttongroup->box(FL_THIN_DOWN_BOX);
-	buttonxz = new Fl_Radio_Round_Button(10, 70, 185, 20, "Z=Jump; X=Attack");
-	buttonxz->setonly();
-	buttonzx = new Fl_Radio_Round_Button(10, 100, 185, 20, "X=Jump; Z=Attack");
-	buttongroup->end();
-
-	Fl_Group *okaygroup = new Fl_Group(205, 10, 185, 50);
-	okaygroup->box(FL_THIN_DOWN_BOX);
-	okayjump = new Fl_Radio_Round_Button(205, 10, 185, 20, "Jump=Okay");
-	okayjump->setonly();
-	okayattack = new Fl_Radio_Round_Button(205, 40, 185, 20, "Attack=Okay");
-	okaygroup->end();
-
-	displaychoice = new Fl_Choice(205, 70, 185, 20);
-	Fl_Menu_Item screens[] = {
-		{"Fullscreen 16-bit"},
-		{"Windowed 320x240"},
-		{"Windowed 640x480"},
-		{"Fullscreen 24-bit"},
-		{"Fullscreen 32-bit"},
-		{0}};
-	displaychoice->menu(screens);
-
-	joychoice = new Fl_Check_Button(205, 100, 185, 20, "Use Joypad");
-	joychoice->callback(&activatejoy);
-
-	joystuffcontainer = new Fl_Group(10, 130, 380, 200);
-	joystuffcontainer->box(FL_THIN_DOWN_BOX);
-	for (int i = 0; i < 8; i++)
+	if (glfwInit())
 	{
-		joyRows[i] = new RadioRow(i);
+		const char *glsl_version = "#version 150 core";
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
+
+		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+
+		GLFWwindow *window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "DoConfig - Doukutsu Monogatari Settings", NULL, NULL);
+
+		if (window != NULL)
+		{
+			glfwMakeContextCurrent(window);
+			glfwSwapInterval(1);
+
+			if (gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+			{
+				// Check if the platform supports OpenGL 3.2
+				if (GLAD_GL_VERSION_3_2)
+				{
+					///////////////////////////
+					// Initialise Dear ImGui //
+					///////////////////////////
+
+					IMGUI_CHECKVERSION();
+					ImGui::CreateContext();
+
+					ImGui_ImplGlfw_InitForOpenGL(window, true);
+					ImGui_ImplOpenGL3_Init(glsl_version);
+
+					/////////////////////
+					// Load Config.dat //
+					/////////////////////
+
+					Config configuration;
+
+					char config_path[0x400];
+					sprintf(config_path, "%s/Config.dat", base_directory);
+
+					FILE *file = fopen(config_path, "rb");
+
+					if (file != NULL)
+					{
+						// Read from file
+						fread(configuration.proof, 1, sizeof(configuration.proof), file);
+						fread(configuration.font_name, 1, sizeof(configuration.font_name), file);
+						configuration.move_button_mode = fgetc(file);
+						fseek(file, 3, SEEK_CUR);
+						configuration.attack_button_mode = fgetc(file);
+						fseek(file, 3, SEEK_CUR);
+						configuration.ok_button_mode = fgetc(file);
+						fseek(file, 3, SEEK_CUR);
+						configuration.display_mode = fgetc(file);
+						fseek(file, 3, SEEK_CUR);
+						configuration.bJoystick = fgetc(file);
+
+						for (unsigned int i = 0; i < 8; ++i)
+						{
+							const int decode_table[6] = {0, 1, 2, 4, 5, 3};
+
+							fseek(file, 3, SEEK_CUR);
+							configuration.joystick_button[i] = decode_table[fgetc(file) - 1];
+						}
+
+						fclose(file);
+					}
+
+					if (file == NULL || memcmp(configuration.proof, proof, strlen(proof)))
+					{
+						// Reset to defaults
+						memset(&configuration, 0, sizeof(configuration));
+						strcpy(configuration.proof, proof);
+						strcpy(configuration.font_name, "Courier New");
+
+						for (unsigned int i = 0; i < 8; ++i)
+							configuration.joystick_button[i] = i % 6;
+					}
+
+					//////////////
+					// Mainloop //
+					//////////////
+
+					while (!glfwWindowShouldClose(window))
+					{
+						glfwPollEvents();
+
+						ImGui_ImplOpenGL3_NewFrame();
+						ImGui_ImplGlfw_NewFrame();
+						ImGui::NewFrame();
+
+						ImGui::SetNextWindowPos(ImVec2(0, 0));
+						ImGui::SetNextWindowSize(ImVec2(WINDOW_WIDTH, WINDOW_HEIGHT));
+
+						ImGui::Begin("Main window", NULL, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
+
+							if (ImGui::BeginTable("Block1", 2, ImGuiTableFlags_Borders))
+							{
+								ImGui::TableNextRow();
+
+								ImGui::TableSetColumnIndex(0);
+								ImGui::RadioButton("Arrows for Movement", &configuration.move_button_mode, 0);
+								ImGui::RadioButton("<>? for Movement", &configuration.move_button_mode, 1);
+
+								ImGui::TableSetColumnIndex(1);
+								ImGui::RadioButton("Jump=Okay", &configuration.ok_button_mode, 0);
+								ImGui::RadioButton("Attack=Okay", &configuration.ok_button_mode, 1);
+
+								ImGui::TableNextRow();
+
+								ImGui::TableSetColumnIndex(0);
+								ImGui::RadioButton("Z=Jump; X=Attack", &configuration.attack_button_mode, 0);
+								ImGui::RadioButton("X=Jump; Z=Attack", &configuration.attack_button_mode, 1);
+
+								ImGui::TableSetColumnIndex(1);
+								ImGui::SetNextItemWidth(-1.0f);
+								const char *items[] = {"Fullscreen 16-bit", "Windowed 320x240", "Windowed 640x480", "Fullscreen 24-bit", "Fullscreen 32-bit"};
+								ImGui::Combo("", &configuration.display_mode, items, IM_ARRAYSIZE(items));
+								ImGui::Checkbox("Use Joypad", &configuration.bJoystick);
+
+								ImGui::EndTable();
+							}
+
+							// Joypad binding
+
+							if (ImGui::BeginTable("Joypad binding", 9))
+							{
+								ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed, 60.0f);
+
+								for (int y = 0; y < 7; ++y)
+								{
+									ImGui::TableNextRow();
+
+									if (y == 0)
+									{
+										for (int x = 1; x < 9; ++x)
+										{
+											ImGui::TableSetColumnIndex(x);
+											ImGui::Text(" %d", x);
+										}
+									}
+									else
+									{
+										for (int x = 0; x < 9; ++x)
+										{
+											ImGui::TableSetColumnIndex(x);
+
+											if (x == 0)
+											{
+												const char *inputs[6] = {"Jump:", "Attack:", "Weapon+:", "Weapon-:", "Items:", "Map:"};
+												ImGui::Text(inputs[y - 1]);
+											}
+											else
+											{
+												static char name_buffer[5] = {'#', '#', '0', '0', '\0'};
+												name_buffer[2] = '0' + x;
+												name_buffer[3] = '0' + y;
+												ImGui::RadioButton(name_buffer, &configuration.joystick_button[x - 1], y - 1);
+											}
+										}
+									}
+								}
+
+								ImGui::EndTable();
+
+								if (ImGui::Button("Okay", ImVec2(ImGui::GetContentRegionAvail().x / 2, 0.0f)))
+								{
+									glfwSetWindowShouldClose(window, 1);
+
+									// Save to file
+									FILE *file = fopen(config_path, "wb");
+
+									if (file != NULL)
+									{
+										fwrite(configuration.proof, 1, sizeof(configuration.proof), file);
+										fwrite(configuration.font_name, 1, sizeof(configuration.font_name), file);
+										fputc(configuration.move_button_mode, file);
+										fputc(0, file);
+										fputc(0, file);
+										fputc(0, file);
+										fputc(configuration.attack_button_mode, file);
+										fputc(0, file);
+										fputc(0, file);
+										fputc(0, file);
+										fputc(configuration.ok_button_mode, file);
+										fputc(0, file);
+										fputc(0, file);
+										fputc(0, file);
+										fputc(configuration.display_mode, file);
+										fputc(0, file);
+										fputc(0, file);
+										fputc(0, file);
+										fputc(configuration.bJoystick, file);
+										fputc(0, file);
+										fputc(0, file);
+										fputc(0, file);
+
+										for (unsigned int i = 0; i < 8; ++i)
+										{
+											const int encode_table[6] = {0, 1, 2, 5, 3, 4};
+
+											fputc(encode_table[configuration.joystick_button[i]] + 1, file);
+											fputc(0, file);
+											fputc(0, file);
+											fputc(0, file);
+										}
+
+										fclose(file);
+									}
+								}
+
+								ImGui::SameLine();
+
+								if (ImGui::Button("Cancel", ImVec2(ImGui::GetContentRegionAvail().x, 0.0f)))
+									glfwSetWindowShouldClose(window, 1);
+							}
+
+						ImGui::End();
+
+						ImGui::Render();
+						glClear(GL_COLOR_BUFFER_BIT);
+						ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+						glfwSwapBuffers(window);
+					}
+				}
+			}
+		}
+
+		ImGui_ImplOpenGL3_Shutdown();
+		ImGui_ImplGlfw_Shutdown();
+		ImGui::DestroyContext();
+
+		glfwDestroyWindow(window);
+		glfwTerminate();
 	}
 
-	// There's no Label class alright? I'll switch it as soon as one is introduced.
-	Fl_Group *labeljump = new Fl_Group(10, 150, 10, 20);
-	labeljump->label("Jump:");
-	labeljump->align(FL_ALIGN_RIGHT);
-	labeljump->end();
-
-	Fl_Group *labelattack = new Fl_Group(10, 180, 10, 20);
-	labelattack->label("Attack:");
-	labelattack->align(FL_ALIGN_RIGHT);
-	labelattack->end();
-
-	Fl_Group *labelweaponup = new Fl_Group(10, 210, 10, 20);
-	labelweaponup->label("Weapon+:");
-	labelweaponup->align(FL_ALIGN_RIGHT);
-	labelweaponup->end();
-
-	Fl_Group *labelweapondown = new Fl_Group(10, 240, 10, 20);
-	labelweapondown->label("Weapon-:");
-	labelweapondown->align(FL_ALIGN_RIGHT);
-	labelweapondown->end();
-
-	Fl_Group *labelitem = new Fl_Group(10, 270, 10, 20);
-	labelitem->label("Items:");
-	labelitem->align(FL_ALIGN_RIGHT);
-	labelitem->end();
-
-	Fl_Group *labelmap = new Fl_Group(10, 300, 10, 20);
-	labelmap->label("Map:");
-	labelmap->align(FL_ALIGN_RIGHT);
-	labelmap->end();
-
-	joystuffcontainer->end();
-
-	Fl_Button *okaybutton = new Fl_Button(10, 340, 185, 30, "Okay");
-	okaybutton->callback(&write_Config);
-
-	Fl_Button *cancelbutton = new Fl_Button(205, 340, 185, 30, "Cancel");
-	cancelbutton->callback(&quit);
-
-	mainw->end();
-	mainw->show(argc, argv);
-
-	read_Config();
-	Fl::option(Fl::OPTION_VISIBLE_FOCUS, false);
-	return Fl::run();
+	return 0;
 }
