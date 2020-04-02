@@ -4,9 +4,9 @@ project(DoConfig LANGUAGES C CXX)
 
 add_executable(DoConfig WIN32
 	"icon.rc"
-	"../../external/glad/include/glad/glad.h"
-	"../../external/glad/include/KHR/khrplatform.h"
-	"../../external/glad/src/glad.c"
+	"../external/glad/include/glad/glad.h"
+	"../external/glad/include/KHR/khrplatform.h"
+	"../external/glad/src/glad.c"
 	"DoConfig.cpp"
 	"imgui/imconfig.h"
 	"imgui/imgui.cpp"
@@ -35,7 +35,7 @@ set_target_properties(DoConfig PROPERTIES
 
 target_link_libraries(DoConfig PRIVATE ${CMAKE_DL_LIBS})
 
-target_include_directories(DoConfig PRIVATE "../../external/glad/include")
+target_include_directories(DoConfig PRIVATE "../external/glad/include")
 target_compile_definitions(DoConfig PRIVATE IMGUI_IMPL_OPENGL_LOADER_GLAD)
 
 if(MSVC)
