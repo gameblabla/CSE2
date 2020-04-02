@@ -48,9 +48,7 @@ In addition, `pkg-config` is required for Makefile builds, and CMake builds that
 
 ## Building
 
-### CMake
-
-This project primarily uses CMake, allowing it to be built with a range of compilers.
+This project uses CMake, allowing it to be built with a range of compilers.
 
 Switch to the terminal (Visual Studio users should open the [Developer Command Prompt](https://docs.microsoft.com/en-us/dotnet/framework/tools/developer-command-prompt-for-vs)) and `cd` into this folder. After that, generate the files for your build system with:
 
@@ -88,30 +86,6 @@ cmake --build build --config Release
 ```
 
 If you're a Visual Studio user, you can open the generated `CSE2.sln` file instead, which can be found in the `build` folder.
-
-Once built, the executables can be found in the `game_english`/`game_japanese` folder, depending on the selected language.
-
-### Makefile \[deprecated - use CMake instead\]
-
-Run 'make' in this folder, preferably with some of the following settings:
-
-Name | Function
---------|--------
-`JAPANESE=1` | Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
-`FIX_BUGS=1` | Fix various bugs in the game
-`DEBUG_SAVE=1` | Re-enable the ability to drag-and-drop save files onto the window
-`BACKEND_RENDERER=OpenGL3` | Use the hardware-accelerated OpenGL 3.2 renderer
-`BACKEND_RENDERER=OpenGLES2` | Use the hardware-accelerated OpenGL ES 2.0 renderer
-`BACKEND_RENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default)
-`BACKEND_RENDERER=SDLSurface` | Use the software-rendered SDL2 Surface API renderer
-`BACKEND_RENDERER=Software` | Use the hand-written software renderer
-`BACKEND_AUDIO=SDL2` | Use the SDL2-driven software audio-mixer
-`BACKEND_AUDIO=miniaudio` | Use the miniaudio-driven software audio-mixer
-`RELEASE=1` | Compile a release build (optimised, stripped, etc.)
-`STATIC=1` | Produce a statically-linked executable (good for Windows builds, so you don't need to bundle DLL files)
-`WINDOWS=1` | Build for Windows
-
-You can pass your own compiler flags by defining `CFLAGS` and `CXXFLAGS`.
 
 Once built, the executables can be found in the `game_english`/`game_japanese` folder, depending on the selected language.
 
