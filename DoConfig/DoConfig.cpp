@@ -198,7 +198,7 @@ int main(int argc, char *argv[])
 											if (x == 0)
 											{
 												const char *inputs[6] = {"Jump:", "Attack:", "Weapon+:", "Weapon-:", "Items:", "Map:"};
-												ImGui::Text(inputs[y - 1]);
+												ImGui::Text("%s", inputs[y - 1]);
 											}
 											else
 											{
