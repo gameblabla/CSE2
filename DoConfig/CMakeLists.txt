@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.12)
 
+option(PKG_CONFIG_STATIC_LIBS "On platforms with pkg-config, static-link the dependencies (good for Windows builds, so you don't need to bundle DLL files)" OFF)
+option(MSVC_LINK_STATIC_RUNTIME "Link the static MSVC runtime library (Visual Studio only)" OFF)
+
 option(FORCE_LOCAL_LIBS "Compile the built-in version of GLFW3 instead of using the system-provided one" OFF)
 
 project(DoConfig LANGUAGES C CXX)
@@ -40,12 +43,27 @@ target_link_libraries(DoConfig PRIVATE ${CMAKE_DL_LIBS})
 target_include_directories(DoConfig PRIVATE "../external/glad/include")
 target_compile_definitions(DoConfig PRIVATE IMGUI_IMPL_OPENGL_LOADER_GLAD)
 
+if(PKG_CONFIG_STATIC_LIBS)
+	target_link_options(DoConfig PRIVATE "-static")
+endif()
+
 if(MSVC)
 	# Disable warnings that normally fire up on MSVC when using "unsafe" functions instead of using MSVC's "safe" _s functions
 	target_compile_definitions(DoConfig PRIVATE _CRT_SECURE_NO_WARNINGS)
 
 	# Use `main` instead of `WinMain`
 	set_target_properties(DoConfig PROPERTIES LINK_FLAGS "/ENTRY:mainCRTStartup")
+
+	# This is messy as hell, and has been replaced by CMAKE_MSVC_RUNTIME_LIBRARY,
+	# but that's a very recent CMake addition, so we're still doing it this way for now
+	if(MSVC_LINK_STATIC_RUNTIME)
+		# Statically-link the CRT (vcpkg static libs do this)
+		foreach(flag_var CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELWITHDEBINFO CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+			if(${flag_var} MATCHES "/MD")
+				string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
+			endif()
+		endforeach()
+	endif()
 endif()
 
 
