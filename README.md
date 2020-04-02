@@ -39,12 +39,12 @@ Many months of copypasting and tinkering later, here is the result.
 ## Dependencies
 
 * SDL2
+* GLFW3
 * FreeType
-* FLTK
 
 In CMake builds, if these are not found, they will be built locally.
 
-In addition, `pkg-config` is required for Makefile builds, and CMake builds that require static-linkage.
+In addition, `pkg-config` is required for builds that require static-linkage.
 
 ## Building
 
@@ -67,15 +67,17 @@ Name | Function
 `-DDEBUG_SAVE=ON` | Re-enable the ability to drag-and-drop save files onto the window
 `-DBACKEND_RENDERER=OpenGL3` | Use the hardware-accelerated OpenGL 3.2 renderer
 `-DBACKEND_RENDERER=OpenGLES2` | Use the hardware-accelerated OpenGL ES 2.0 renderer
-`-DBACKEND_RENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default)
-`-DBACKEND_RENDERER=SDLSurface` | Use the software-rendered SDL2 Surface API renderer
-`-DBACKEND_RENDERER=Software` | Use the handwritten software renderer
+`-DBACKEND_RENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default) (note: requires `-DBACKEND_PLATFORM=SDL2`)
+`-DBACKEND_RENDERER=SDLSurface` | Use the software-rendered SDL2 Surface API renderer (note: requires `-DBACKEND_PLATFORM=SDL2`)
+`-DBACKEND_RENDERER=Software` | Use the handwritten software renderer (note: requires `-DBACKEND_PLATFORM=SDL2`)
 `-DBACKEND_AUDIO=SDL2` | Use the SDL2-driven software audio-mixer
 `-DBACKEND_AUDIO=miniaudio` | Use the miniaudio-driven software audio-mixer
+`-DBACKEND_PLATFORM=SDL2` | Use SDL2 for windowing and OS-abstraction
+`-DBACKEND_PLATFORM=GLFW3` | Use GLFW3 for windowing and OS-abstraction
 `-DLTO=ON` | Enable link-time optimisation
 `-DPKG_CONFIG_STATIC_LIBS=ON` | On platforms with pkg-config, static-link the dependencies (good for Windows builds, so you don't need to bundle DLL files)
 `-DMSVC_LINK_STATIC_RUNTIME=ON` | Link the static MSVC runtime library (Visual Studio only)
-`-DFORCE_LOCAL_LIBS=ON` | Compile the built-in versions of SDL2, FreeType, and FLTK instead of using the system-provided ones
+`-DFORCE_LOCAL_LIBS=ON` | Compile the built-in versions of SDL2, GLFW3, and FreeType instead of using the system-provided ones
 
 You can pass your own compiler flags with `-DCMAKE_C_FLAGS` and `-DCMAKE_CXX_FLAGS`.
 
