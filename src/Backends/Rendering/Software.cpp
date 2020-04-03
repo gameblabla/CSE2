@@ -9,7 +9,7 @@
 #include "../../WindowsWrapper.h"
 
 #include "../Platform.h"
-#include "SDL2.h"
+#include "../SDL2/SDL2.h"
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
