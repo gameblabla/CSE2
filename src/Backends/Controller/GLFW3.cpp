@@ -14,6 +14,8 @@ BOOL ControllerBackend_Init(void)
 
 BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
 {
+	(void)status;
+
 	return FALSE;
 }
 
