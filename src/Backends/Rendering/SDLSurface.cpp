@@ -9,6 +9,7 @@
 #include "../../WindowsWrapper.h"
 
 #include "../Platform.h"
+#include "SDL2.h"
 
 typedef struct Backend_Surface
 {
@@ -19,8 +20,6 @@ typedef struct Backend_Glyph
 {
 	SDL_Surface *sdlsurface;
 } Backend_Glyph;
-
-extern SDL_Window *window;
 
 static SDL_Surface *window_sdlsurface;
 

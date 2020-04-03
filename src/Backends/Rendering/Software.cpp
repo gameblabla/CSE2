@@ -9,6 +9,7 @@
 #include "../../WindowsWrapper.h"
 
 #include "../Platform.h"
+#include "SDL2.h"
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -27,8 +28,6 @@ typedef struct Backend_Glyph
 	unsigned int width;
 	unsigned int height;
 } Backend_Glyph;
-
-extern SDL_Window *window;
 
 static SDL_Surface *window_sdlsurface;
 static SDL_Surface *framebuffer_sdlsurface;
