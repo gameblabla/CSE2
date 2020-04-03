@@ -380,6 +380,7 @@ static void GlyphBatch_Draw(spritebatch_sprite_t *sprites, int count, int textur
 	static unsigned char last_green;
 	static unsigned char last_blue;
 
+	(void)texture_h;
 	(void)udata;
 
 	if (glyph_destination_surface == NULL)
