@@ -1,4 +1,4 @@
-#include "../Window.h"
+#include "../Window-OpenGL.h"
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -13,9 +13,7 @@
 #include "../../WindowsWrapper.h"
 
 #include "../Platform.h"
-
-// Horrible hack
-extern GLFWwindow *window;
+#include "GLFW3.h"
 
 BOOL WindowBackend_OpenGL_CreateWindow(const char *window_title, int *screen_width, int *screen_height, BOOL fullscreen)
 {

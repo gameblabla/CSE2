@@ -19,7 +19,7 @@
 #include "../../WindowsWrapper.h"
 
 #include "../Platform.h"
-#include "../Window.h"
+#include "../Window-OpenGL.h"
 #include "../../Resource.h"
 
 #define TOTAL_VBOS 8

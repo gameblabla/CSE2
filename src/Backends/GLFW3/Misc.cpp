@@ -12,6 +12,7 @@
 
 #include "../../WindowsWrapper.h"
 
+#include "GLFW3.h"
 #include "../../KeyControl.h"
 #include "../../Main.h"
 #include "../../Organya.h"

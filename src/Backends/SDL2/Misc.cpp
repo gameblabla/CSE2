@@ -10,6 +10,7 @@
 
 #include "../../WindowsWrapper.h"
 
+#include "../SDL2.h"
 #include "../../KeyControl.h"
 #include "../../Main.h"
 #include "../../Organya.h"
