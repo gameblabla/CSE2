@@ -526,7 +526,8 @@ else()
 endif()
 
 if(BACKEND_RENDERER MATCHES "OpenGL3")
-	target_sources(CSE2 PRIVATE "external/glad/src/glad.c" "external/glad/include/glad/glad.h" "external/glad/include/KHR/khrplatform.h")
+	add_subdirectory("external/glad" EXCLUDE_FROM_ALL)
+	target_link_libraries(CSE2 PRIVATE glad)
 
 	find_package(OpenGL REQUIRED)
 	target_link_libraries(CSE2 PRIVATE OpenGL::GL ${CMAKE_DL_LIBS})
