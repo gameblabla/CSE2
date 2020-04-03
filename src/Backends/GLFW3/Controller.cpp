@@ -27,7 +27,11 @@ BOOL ControllerBackend_Init(void)
 
 	for (int i = GLFW_JOYSTICK_1; i < GLFW_JOYSTICK_LAST; ++i)
 	{
+#if GLFW_VERSION_MAJOR > 3 || (GLFW_VERSION_MAJOR == 3 && GLFW_VERSION_MINOR >= 3)
 		if (glfwJoystickPresent(i) == GLFW_TRUE && glfwJoystickIsGamepad(i) == GLFW_TRUE)
+#else
+		if (glfwJoystickPresent(i) == GLFW_TRUE)
+#endif
 		{
 			printf("Joystick #%d selected\n", i);
 			joystick_connected = TRUE;
@@ -44,7 +48,11 @@ BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
 	if (!joystick_connected)
 		return FALSE;
 
+#if GLFW_VERSION_MAJOR > 3 || (GLFW_VERSION_MAJOR == 3 && GLFW_VERSION_MINOR >= 3)
 	if (glfwJoystickPresent(connected_joystick_id) == GLFW_FALSE || glfwJoystickIsGamepad(connected_joystick_id) == GLFW_FALSE)
+#else
+	if (glfwJoystickPresent(connected_joystick_id) == GLFW_FALSE)
+#endif
 		return FALSE;
 
 	int total_axis;
@@ -75,7 +83,11 @@ BOOL ControllerBackend_ResetJoystickStatus(void)
 	if (!joystick_connected)
 		return FALSE;
 
+#if GLFW_VERSION_MAJOR > 3 || (GLFW_VERSION_MAJOR == 3 && GLFW_VERSION_MINOR >= 3)
 	if (glfwJoystickPresent(connected_joystick_id) == GLFW_FALSE || glfwJoystickIsGamepad(connected_joystick_id) == GLFW_FALSE)
+#else
+	if (glfwJoystickPresent(connected_joystick_id) == GLFW_FALSE)
+#endif
 		return FALSE;
 
 	int total_axis;
