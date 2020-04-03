@@ -13,7 +13,7 @@
 #include "../../WindowsWrapper.h"
 
 #include "../Platform.h"
-#include "SDL2/SDL2.h"
+#include "../SDL2/SDL2.h"
 #include "../../Draw.h"
 #include "../../Ending.h"
 #include "../../MapName.h"
