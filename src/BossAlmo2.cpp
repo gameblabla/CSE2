@@ -610,7 +610,7 @@ void ActBossChar_Undead(void)
 			for (i = 0; i < 100; ++i)
 				SetNpChar(4, npc->x + (Random(-128, 128) * 0x200), npc->y + (Random(-64, 64) * 0x200), Random(-128, 128) * 0x200, Random(-128, 128) * 0x200, 0, NULL, 0);
 
-			DeleteNpCharCode(282, 1);
+			DeleteNpCharCode(282, TRUE);
 			gBoss[11].bits &= ~NPC_SHOOTABLE;
 
 			for (i = 0; i < 12; ++i)
@@ -663,8 +663,8 @@ void ActBossChar_Undead(void)
 				for (i = 0; i < 20; ++i)
 					gBoss[i].cond = 0;
 
-				DeleteNpCharCode(158, 1);
-				DeleteNpCharCode(301, 1);
+				DeleteNpCharCode(158, TRUE);
+				DeleteNpCharCode(301, TRUE);
 			}
 
 			break;

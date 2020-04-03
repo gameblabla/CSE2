@@ -858,7 +858,7 @@ void ActBossChar_MonstX(void)
 				for (i = 0; i < 20; ++i)
 					gBoss[i].cond = 0;
 
-				DeleteNpCharCode(158, 1);
+				DeleteNpCharCode(158, TRUE);
 				SetNpChar(159, npc->x, npc->y - (24 * 0x200), 0, 0, 0, NULL, 0);
 			}
 

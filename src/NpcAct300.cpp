@@ -1339,7 +1339,7 @@ void ActNpc313(NPCHAR *npc)
 			npc->ani_no = 8;
 			npc->tgt_x = npc->x;
 			npc->damage = 0;
-			DeleteNpCharCode(315, 1);
+			DeleteNpCharCode(315, TRUE);
 			// Fallthrough
 		case 501:
 			npc->ym += 0x20;

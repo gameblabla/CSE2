@@ -116,7 +116,7 @@ void ActNpc281(NPCHAR *npc)
 		case 21:
 			if (++npc->act_wait > 250)
 			{
-				DeleteNpCharCode(270, 0);
+				DeleteNpCharCode(270, FALSE);
 				npc->act_no = 22;
 			}
 
@@ -689,7 +689,7 @@ void ActNpc284(NPCHAR *npc)
 			npc->view.top = 16 * 0x200;
 			npc->view.back = 16 * 0x200;
 			npc->view.front = 16 * 0x200;
-			DeleteNpCharCode(257, 1);
+			DeleteNpCharCode(257, TRUE);
 			break;
 
 		case 20:

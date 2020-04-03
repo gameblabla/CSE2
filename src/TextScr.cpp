@@ -1092,7 +1092,7 @@ int TextScriptProc(void)
 					else if (IS_COMMAND('D','N','A'))
 					{
 						z = GetTextScriptNo(gTS.p_read + 4);
-						DeleteNpCharCode(z, 1);
+						DeleteNpCharCode(z, TRUE);
 						gTS.p_read += 8;
 					}
 					else if (IS_COMMAND('B','O','A'))

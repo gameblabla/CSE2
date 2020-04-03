@@ -518,6 +518,6 @@ void ActBossChar_Omega(void)
 		gBoss[0].act_wait = 0;
 		gBoss[0].damage = 0;
 		gBoss[5].damage = 0;
-		DeleteNpCharCode(48, 1);
+		DeleteNpCharCode(48, TRUE);
 	}
 }
