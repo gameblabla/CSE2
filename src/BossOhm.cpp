@@ -1,6 +1,6 @@
 #include "BossOhm.h"
 
-#include <string.h>
+#include <stddef.h>
 
 #include "WindowsWrapper.h"
 
@@ -381,7 +381,7 @@ void ActBossChar_Omega(void)
 				gBoss[0].count1 = 0;
 			}
 
-			if (gBoss[0].act_wait < 30 && !(gBoss[0].act_wait % 5))
+			if (gBoss[0].act_wait < 30 && gBoss[0].act_wait % 5 == 0)
 			{
 				SetNpChar(48, gBoss[0].x, gBoss[0].y - (16 * 0x200), Random(-341, 341), -0x333, 0, NULL, 0x100);
 				PlaySoundObject(39, 1);

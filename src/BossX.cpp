@@ -1,5 +1,7 @@
 #include "BossX.h"
 
+#include <stddef.h>
+
 #include "WindowsWrapper.h"
 
 #include "Boss.h"
@@ -259,7 +261,7 @@ static void ActBossChar03_02(NPCHAR *npc)
 					break;
 			}
 
-			SetNpChar(158, npc->x + x, npc->y + y, 0, 0, direct, 0, 0x100);
+			SetNpChar(158, npc->x + x, npc->y + y, 0, 0, direct, NULL, 0x100);
 			PlaySoundObject(39, 1);
 			npc->act_wait = 120;
 

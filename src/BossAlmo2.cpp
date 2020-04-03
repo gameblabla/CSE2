@@ -1,5 +1,7 @@
 #include "BossAlmo2.h"
 
+#include <stddef.h>
+
 #include "WindowsWrapper.h"
 
 #include "Boss.h"
