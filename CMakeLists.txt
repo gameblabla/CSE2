@@ -530,7 +530,7 @@ if(BACKEND_RENDERER MATCHES "OpenGL3")
 	target_link_libraries(CSE2 PRIVATE glad)
 
 	find_package(OpenGL REQUIRED)
-	target_link_libraries(CSE2 PRIVATE OpenGL::GL ${CMAKE_DL_LIBS})
+	target_link_libraries(CSE2 PRIVATE OpenGL::GL)
 endif()
 
 if(BACKEND_RENDERER MATCHES "OpenGLES2")

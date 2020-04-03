@@ -70,14 +70,11 @@ endif()
 
 # glad
 
-if(NOT TARGET glad)
-	add_subdirectory("../external/glad" "glad" EXCLUDE_FROM_ALL)
-endif()
-
+add_subdirectory("../external/glad" "glad" EXCLUDE_FROM_ALL)
 target_link_libraries(DoConfig PRIVATE glad)
 
 find_package(OpenGL REQUIRED)
-target_link_libraries(DoConfig PRIVATE OpenGL::GL ${CMAKE_DL_LIBS})
+target_link_libraries(DoConfig PRIVATE OpenGL::GL)
 
 # GLFW3
 
