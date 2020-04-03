@@ -12,7 +12,7 @@
 #include "../../WindowsWrapper.h"
 
 #include "../Platform.h"
-#include "../SDL2.h"
+#include "SDL2.h"
 #include "../../Resource.h"
 
 static SDL_GLContext context;
