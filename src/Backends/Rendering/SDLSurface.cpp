@@ -130,6 +130,9 @@ void Backend_RestoreSurface(Backend_Surface *surface)
 
 unsigned char* Backend_LockSurface(Backend_Surface *surface, unsigned int *pitch, unsigned int width, unsigned int height)
 {
+	(void)width;
+	(void)height;
+
 	if (surface == NULL)
 		return NULL;
 
@@ -140,6 +143,8 @@ unsigned char* Backend_LockSurface(Backend_Surface *surface, unsigned int *pitch
 void Backend_UnlockSurface(Backend_Surface *surface, unsigned int width, unsigned int height)
 {
 	(void)surface;
+	(void)width;
+	(void)height;
 }
 
 void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL colour_key)
