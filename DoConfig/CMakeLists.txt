@@ -76,6 +76,9 @@ endif()
 
 target_link_libraries(DoConfig PRIVATE glad)
 
+find_package(OpenGL REQUIRED)
+target_link_libraries(DoConfig PRIVATE OpenGL::GL ${CMAKE_DL_LIBS})
+
 # GLFW3
 
 if(NOT FORCE_LOCAL_LIBS)
