@@ -2,7 +2,6 @@
 
 #include <stddef.h>
 #include <stdio.h>
-#include <string.h>
 
 #include "SDL.h"
 
@@ -54,7 +53,10 @@ BOOL FindAndOpenDirectInputDevice(void)
 
 		// Break as soon as a joystick is properly opened
 		if (joystick != NULL)
+		{
+			printf("Joystick #%d selected\n", i);
 			return TRUE;
+		}
 	}
 
 	return FALSE;

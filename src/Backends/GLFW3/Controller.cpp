@@ -1,5 +1,7 @@
 #include "../Controller.h"
 
+#include <stdio.h>
+
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
@@ -20,16 +22,21 @@ void ControllerBackend_Deinit(void)
 BOOL ControllerBackend_Init(void)
 {
 	for (int i = GLFW_JOYSTICK_1; i < GLFW_JOYSTICK_LAST; ++i)
+		if (glfwJoystickPresent(i) == GLFW_TRUE)
+			printf("Joystick #%d name: %s\n", i, glfwGetJoystickName(i));
+
+	for (int i = GLFW_JOYSTICK_1; i < GLFW_JOYSTICK_LAST; ++i)
 	{
 		if (glfwJoystickPresent(i) == GLFW_TRUE && glfwJoystickIsGamepad(i) == GLFW_TRUE)
 		{
+			printf("Joystick #%d selected\n", i);
 			joystick_connected = TRUE;
 			connected_joystick_id = i;
-			break;
+			return TRUE;
 		}
 	}
 
-	return joystick_connected;
+	return FALSE;
 }
 
 BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
