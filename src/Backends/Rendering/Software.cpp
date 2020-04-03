@@ -306,8 +306,6 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 		return NULL;
 	}
 
-	unsigned char *destination_pointer = glyph->pixels;
-
 	for (unsigned int y = 0; y < height; ++y)
 		memcpy(&glyph->pixels[y * width], &pixels[y * pitch], width);
 
