@@ -11,8 +11,38 @@
 
 static BOOL joystick_connected;
 static int connected_joystick_id;
-static float joystick_neutral_x;
-static float joystick_neutral_y;
+
+static void JoystickCallback(int joystick_id, int event)
+{
+	switch (event)
+	{
+		case GLFW_CONNECTED:
+			printf("Joystick #%d connected - %s\n", joystick_id, glfwGetJoystickName(joystick_id));
+
+			if (!joystick_connected)
+			{
+#if GLFW_VERSION_MAJOR > 3 || (GLFW_VERSION_MAJOR == 3 && GLFW_VERSION_MINOR >= 3)
+				if (glfwJoystickIsGamepad(joystick_id) == GLFW_TRUE)	// Avoid selecting things like laptop touchpads
+#endif
+				{
+					printf("Joystick #%d selected\n", joystick_id);
+					joystick_connected = TRUE;
+					connected_joystick_id = joystick_id;
+				}
+			}
+
+			break;
+
+		case GLFW_DISCONNECTED:
+			if (joystick_connected && joystick_id == connected_joystick_id)
+			{
+				printf("Joystick #%d disconnected\n", connected_joystick_id);
+				joystick_connected = FALSE;
+			}
+
+			break;
+	}
+}
 
 void ControllerBackend_Deinit(void)
 {
@@ -23,24 +53,11 @@ BOOL ControllerBackend_Init(void)
 {
 	for (int i = GLFW_JOYSTICK_1; i < GLFW_JOYSTICK_LAST; ++i)
 		if (glfwJoystickPresent(i) == GLFW_TRUE)
-			printf("Joystick #%d name: %s\n", i, glfwGetJoystickName(i));
+			JoystickCallback(i, GLFW_CONNECTED);
 
-	for (int i = GLFW_JOYSTICK_1; i < GLFW_JOYSTICK_LAST; ++i)
-	{
-#if GLFW_VERSION_MAJOR > 3 || (GLFW_VERSION_MAJOR == 3 && GLFW_VERSION_MINOR >= 3)
-		if (glfwJoystickPresent(i) == GLFW_TRUE && glfwJoystickIsGamepad(i) == GLFW_TRUE)
-#else
-		if (glfwJoystickPresent(i) == GLFW_TRUE)
-#endif
-		{
-			printf("Joystick #%d selected\n", i);
-			joystick_connected = TRUE;
-			connected_joystick_id = i;
-			return TRUE;
-		}
-	}
+	glfwSetJoystickCallback(JoystickCallback);
 
-	return FALSE;
+	return TRUE;
 }
 
 BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
@@ -48,20 +65,13 @@ BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
 	if (!joystick_connected)
 		return FALSE;
 
-#if GLFW_VERSION_MAJOR > 3 || (GLFW_VERSION_MAJOR == 3 && GLFW_VERSION_MINOR >= 3)
-	if (glfwJoystickPresent(connected_joystick_id) == GLFW_FALSE || glfwJoystickIsGamepad(connected_joystick_id) == GLFW_FALSE)
-#else
-	if (glfwJoystickPresent(connected_joystick_id) == GLFW_FALSE)
-#endif
-		return FALSE;
-
 	int total_axis;
 	const float *axis = glfwGetJoystickAxes(connected_joystick_id, &total_axis);
 
-	status->bLeft = axis[0] < joystick_neutral_x - DEADZONE;
-	status->bRight = axis[0] > joystick_neutral_x + DEADZONE;
-	status->bUp = axis[1] < joystick_neutral_x - DEADZONE;
-	status->bDown = axis[1] > joystick_neutral_x + DEADZONE;
+	status->bLeft = axis[0] < -DEADZONE;
+	status->bRight = axis[0] > DEADZONE;
+	status->bUp = axis[1] < -DEADZONE;
+	status->bDown = axis[1] > DEADZONE;
 
 	int total_buttons;
 	const unsigned char *buttons = glfwGetJoystickButtons(connected_joystick_id, &total_buttons);
@@ -82,19 +92,6 @@ BOOL ControllerBackend_ResetJoystickStatus(void)
 {
 	if (!joystick_connected)
 		return FALSE;
-
-#if GLFW_VERSION_MAJOR > 3 || (GLFW_VERSION_MAJOR == 3 && GLFW_VERSION_MINOR >= 3)
-	if (glfwJoystickPresent(connected_joystick_id) == GLFW_FALSE || glfwJoystickIsGamepad(connected_joystick_id) == GLFW_FALSE)
-#else
-	if (glfwJoystickPresent(connected_joystick_id) == GLFW_FALSE)
-#endif
-		return FALSE;
-
-	int total_axis;
-	const float *axis = glfwGetJoystickAxes(connected_joystick_id, &total_axis);
-
-	joystick_neutral_x = axis[0];
-	joystick_neutral_y = axis[1];
 
 	return TRUE;
 }
