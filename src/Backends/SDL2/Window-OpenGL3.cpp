@@ -1,4 +1,5 @@
 #include "../Window-OpenGL.h"
+#include "Window.h"
 
 #include <stddef.h>
 
@@ -12,8 +13,9 @@
 #include "../../WindowsWrapper.h"
 
 #include "../Misc.h"
-#include "Misc.h"
 #include "../../Resource.h"
+
+SDL_Window *window;
 
 static SDL_GLContext context;
 

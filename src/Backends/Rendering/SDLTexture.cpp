@@ -13,7 +13,7 @@
 #include "../../WindowsWrapper.h"
 
 #include "../Misc.h"
-#include "../SDL2/Misc.h"
+#include "../SDL2/Window.h"
 #include "../../Draw.h"
 #include "../../Ending.h"
 #include "../../MapName.h"
@@ -37,6 +37,8 @@ typedef struct RenderBackend_Glyph
 	unsigned int width;
 	unsigned int height;
 } RenderBackend_Glyph;
+
+SDL_Window *window;
 
 static SDL_Renderer *renderer;
 

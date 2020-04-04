@@ -1,5 +1,4 @@
 #include "../Misc.h"
-#include "Misc.h"
 
 #include <stddef.h>
 #include <stdio.h>
@@ -10,6 +9,7 @@
 #include "../../WindowsWrapper.h"
 
 #include "Controller.h"
+#include "Window.h"
 #include "../Rendering.h"
 #include "../../Main.h"
 #include "../../Organya.h"
@@ -20,8 +20,6 @@
 	case SDL_KEY: \
 		backend_keyboard_state[BACKEND_KEY] = event.key.type == SDL_KEYDOWN; \
 		break;
-
-SDL_Window *window;
 
 BOOL bActive = TRUE;
 BOOL backend_keyboard_state[BACKEND_KEYBOARD_TOTAL];

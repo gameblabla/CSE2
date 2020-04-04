@@ -338,13 +338,13 @@ if(BACKEND_PLATFORM MATCHES "SDL2")
 		"src/Backends/SDL2/Controller.cpp"
 		"src/Backends/SDL2/Controller.h"
 		"src/Backends/SDL2/Misc.cpp"
-		"src/Backends/SDL2/Misc.h"
+		"src/Backends/SDL2/Window.h"
 	)
 elseif(BACKEND_PLATFORM MATCHES "GLFW3")
 	target_sources(CSE2 PRIVATE
 		"src/Backends/GLFW3/Controller.cpp"
 		"src/Backends/GLFW3/Misc.cpp"
-		"src/Backends/GLFW3/Misc.h"
+		"src/Backends/GLFW3/Window.h"
 	)
 endif()
 

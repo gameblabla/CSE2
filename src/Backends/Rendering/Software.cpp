@@ -9,7 +9,7 @@
 #include "../../WindowsWrapper.h"
 
 #include "../Misc.h"
-#include "../SDL2/Misc.h"
+#include "../SDL2/Window.h"
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -35,6 +35,8 @@ static RenderBackend_Surface framebuffer;
 
 static unsigned char glyph_colour_channels[3];
 static RenderBackend_Surface *glyph_destination_surface;
+
+SDL_Window *window;
 
 RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
 {

@@ -9,7 +9,7 @@
 #include "../../WindowsWrapper.h"
 
 #include "../Misc.h"
-#include "../SDL2/Misc.h"
+#include "../SDL2/Window.h"
 
 typedef struct RenderBackend_Surface
 {
@@ -20,6 +20,8 @@ typedef struct RenderBackend_Glyph
 {
 	SDL_Surface *sdlsurface;
 } RenderBackend_Glyph;
+
+SDL_Window *window;
 
 static SDL_Surface *window_sdlsurface;
 

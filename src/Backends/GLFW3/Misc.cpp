@@ -1,5 +1,4 @@
 #include "../Misc.h"
-#include "Misc.h"
 
 #include <chrono>
 #include <stddef.h>
@@ -12,6 +11,7 @@
 
 #include "../../WindowsWrapper.h"
 
+#include "Window.h"
 #include "../Rendering.h"
 #include "../../Main.h"
 #include "../../Organya.h"
@@ -22,8 +22,6 @@
 	case GLFW_KEY: \
 		backend_keyboard_state[BACKEND_KEY] = action == GLFW_PRESS; \
 		break;
-
-GLFWwindow *window;
 
 BOOL bActive = TRUE;
 BOOL backend_keyboard_state[BACKEND_KEYBOARD_TOTAL];
