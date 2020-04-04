@@ -29,7 +29,7 @@ static void JoystickCallback(int joystick_id, int event)
 				const float *axes = glfwGetJoystickAxes(joystick_id, &total_axes);
 
 				int total_buttons;
-				const unsigned char *buttons = glfwGetJoystickButtons(connected_joystick_id, &total_buttons);
+				const unsigned char *buttons = glfwGetJoystickButtons(joystick_id, &total_buttons);
 
 				if (total_axes >= 2 && total_buttons >= 6)
 				{
