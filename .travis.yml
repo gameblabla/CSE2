@@ -56,6 +56,18 @@ env:
     - PLATFORM=GLFW3 AUDIO=miniaudio RENDERER=OpenGL3
     - PLATFORM=GLFW3 AUDIO=miniaudio RENDERER=OpenGLES2
 
+jobs:
+  exclude:
+    # macOS doesn't support OpenGLES2, apparently
+    - os: osx
+      env: PLATFORM=SDL2 AUDIO=SDL2 RENDERER=OpenGLES2
+    - os: osx
+      env: PLATFORM=GLFW3 AUDIO=miniaudio RENDERER=OpenGLES2
+    # GCC is mysteriously broken when trying to parse macOS headers for miniaudio
+    - os: osx
+      compiler: gcc
+      env: PLATFORM=GLFW3 AUDIO=miniaudio RENDERER=OpenGL3
+
 before_install:
     # Set URL for Discord send script
     - DISCORD_SEND_SCRIPT_URL=https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh

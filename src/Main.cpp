@@ -7,7 +7,7 @@
 
 #include "WindowsWrapper.h"
 
-#include "Backends/Platform.h"
+#include "Backends/Misc.h"
 #include "Backends/Rendering.h"
 #include "Bitmap.h"
 #include "CommonDefines.h"
@@ -64,11 +64,11 @@ unsigned long GetFramePerSecound(void)
 
 	if (need_new_base_tick)
 	{
-		base_tick = PlatformBackend_GetTicks();
+		base_tick = Backend_GetTicks();
 		need_new_base_tick = FALSE;
 	}
 
-	current_tick = PlatformBackend_GetTicks();
+	current_tick = Backend_GetTicks();
 	++current_frame;
 
 	if (base_tick + 1000 <= current_tick)
@@ -88,10 +88,10 @@ int main(int argc, char *argv[])
 
 	int i;
 
-	PlatformBackend_Init();
+	Backend_Init();
 
 	// Get executable's path
-	if (!PlatformBackend_GetBasePath(gModulePath))
+	if (!Backend_GetBasePath(gModulePath))
 	{
 		// Fall back on argv[0] if the backend cannot provide a path
 		strcpy(gModulePath, argv[0]);
@@ -222,7 +222,7 @@ int main(int argc, char *argv[])
 			{
 				if (!StartDirectDraw(lpWindowName, windowWidth, windowHeight, 0))
 				{
-					PlatformBackend_Deinit();
+					Backend_Deinit();
 					return EXIT_FAILURE;
 				}
 			}
@@ -230,7 +230,7 @@ int main(int argc, char *argv[])
 			{
 				if (!StartDirectDraw(lpWindowName, windowWidth, windowHeight, 1))
 				{
-					PlatformBackend_Deinit();
+					Backend_Deinit();
 					return EXIT_FAILURE;
 				}
 			}
@@ -254,7 +254,7 @@ int main(int argc, char *argv[])
 		#ifdef FIX_BUGS
 			if (!StartDirectDraw(lpWindowName, windowWidth, windowHeight, 2))
 			{
-				PlatformBackend_Deinit();
+				Backend_Deinit();
 				return EXIT_FAILURE;
 			}
 		#else
@@ -264,7 +264,7 @@ int main(int argc, char *argv[])
 
 			bFullscreen = TRUE;
 
-			PlatformBackend_HideMouse();
+			Backend_HideMouse();
 			break;
 	}
 
@@ -282,7 +282,7 @@ int main(int argc, char *argv[])
 
 	if (window_icon_rgb_pixels != NULL)
 	{
-		PlatformBackend_SetWindowIcon(window_icon_rgb_pixels, window_icon_width, window_icon_height);
+		Backend_SetWindowIcon(window_icon_rgb_pixels, window_icon_width, window_icon_height);
 		FreeBitmap(window_icon_rgb_pixels);
 	}
 #endif
@@ -296,7 +296,7 @@ int main(int argc, char *argv[])
 
 	if (cursor_rgb_pixels != NULL)
 	{
-		PlatformBackend_SetCursor(cursor_rgb_pixels, cursor_width, cursor_height);
+		Backend_SetCursor(cursor_rgb_pixels, cursor_width, cursor_height);
 		FreeBitmap(cursor_rgb_pixels);
 	}
 
@@ -319,7 +319,7 @@ int main(int argc, char *argv[])
 	// Draw to screen
 	if (!Flip_SystemTask())
 	{
-		PlatformBackend_Deinit();
+		Backend_Deinit();
 		return EXIT_SUCCESS;
 	}
 
@@ -345,7 +345,7 @@ int main(int argc, char *argv[])
 	EndDirectSound();
 	EndDirectDraw();
 
-	PlatformBackend_Deinit();
+	Backend_Deinit();
 
 	return EXIT_SUCCESS;
 }
@@ -379,8 +379,180 @@ void JoystickProc(void);
 
 BOOL SystemTask(void)
 {
-	if (!PlatformBackend_SystemTask())
+	if (!Backend_SystemTask())
 		return FALSE;
+
+	for (unsigned int i = 0; i < BACKEND_KEYBOARD_TOTAL; ++i)
+	{
+		if ((backend_keyboard_state[i] ^ backend_previous_keyboard_state[i]) & backend_keyboard_state[i])
+		{
+			switch (i)
+			{
+				case BACKEND_KEYBOARD_ESCAPE:
+					gKey |= KEY_ESCAPE;
+					break;
+
+				case BACKEND_KEYBOARD_W:
+					gKey |= KEY_MAP;
+					break;
+
+				case BACKEND_KEYBOARD_LEFT:
+					gKey |= KEY_LEFT;
+					break;
+
+				case BACKEND_KEYBOARD_RIGHT:
+					gKey |= KEY_RIGHT;
+					break;
+
+				case BACKEND_KEYBOARD_UP:
+					gKey |= KEY_UP;
+					break;
+
+				case BACKEND_KEYBOARD_DOWN:
+					gKey |= KEY_DOWN;
+					break;
+
+				case BACKEND_KEYBOARD_X:
+					gKey |= KEY_X;
+					break;
+
+				case BACKEND_KEYBOARD_Z:
+					gKey |= KEY_Z;
+					break;
+
+				case BACKEND_KEYBOARD_S:
+					gKey |= KEY_ARMS;
+					break;
+
+				case BACKEND_KEYBOARD_A:
+					gKey |= KEY_ARMSREV;
+					break;
+
+				case BACKEND_KEYBOARD_LEFT_SHIFT:
+				case BACKEND_KEYBOARD_RIGHT_SHIFT:
+					gKey |= KEY_SHIFT;
+					break;
+
+				case BACKEND_KEYBOARD_F1:
+					gKey |= KEY_F1;
+					break;
+
+				case BACKEND_KEYBOARD_F2:
+					gKey |= KEY_F2;
+					break;
+
+				case BACKEND_KEYBOARD_Q:
+					gKey |= KEY_ITEM;
+					break;
+
+				case BACKEND_KEYBOARD_COMMA:
+					gKey |= KEY_ALT_LEFT;
+					break;
+
+				case BACKEND_KEYBOARD_PERIOD:
+					gKey |= KEY_ALT_DOWN;
+					break;
+
+				case BACKEND_KEYBOARD_FORWARD_SLASH:
+					gKey |= KEY_ALT_RIGHT;
+					break;
+
+				case BACKEND_KEYBOARD_L:
+					gKey |= KEY_L;
+					break;
+
+				case BACKEND_KEYBOARD_EQUALS:
+					gKey |= KEY_PLUS;
+					break;
+
+				case BACKEND_KEYBOARD_F5:
+					gbUseJoystick = FALSE;
+					break;
+			}
+		}
+		else if ((backend_keyboard_state[i] ^ backend_previous_keyboard_state[i]) & backend_previous_keyboard_state[i])
+		{
+			switch (i)
+			{
+				case BACKEND_KEYBOARD_ESCAPE:
+					gKey &= ~KEY_ESCAPE;
+					break;
+
+				case BACKEND_KEYBOARD_W:
+					gKey &= ~KEY_MAP;
+					break;
+
+				case BACKEND_KEYBOARD_LEFT:
+					gKey &= ~KEY_LEFT;
+					break;
+
+				case BACKEND_KEYBOARD_RIGHT:
+					gKey &= ~KEY_RIGHT;
+					break;
+
+				case BACKEND_KEYBOARD_UP:
+					gKey &= ~KEY_UP;
+					break;
+
+				case BACKEND_KEYBOARD_DOWN:
+					gKey &= ~KEY_DOWN;
+					break;
+
+				case BACKEND_KEYBOARD_X:
+					gKey &= ~KEY_X;
+					break;
+
+				case BACKEND_KEYBOARD_Z:
+					gKey &= ~KEY_Z;
+					break;
+
+				case BACKEND_KEYBOARD_S:
+					gKey &= ~KEY_ARMS;
+					break;
+
+				case BACKEND_KEYBOARD_A:
+					gKey &= ~KEY_ARMSREV;
+					break;
+
+				case BACKEND_KEYBOARD_LEFT_SHIFT:
+				case BACKEND_KEYBOARD_RIGHT_SHIFT:
+					gKey &= ~KEY_SHIFT;
+					break;
+
+				case BACKEND_KEYBOARD_F1:
+					gKey &= ~KEY_F1;
+					break;
+
+				case BACKEND_KEYBOARD_F2:
+					gKey &= ~KEY_F2;
+					break;
+
+				case BACKEND_KEYBOARD_Q:
+					gKey &= ~KEY_ITEM;
+					break;
+
+				case BACKEND_KEYBOARD_COMMA:
+					gKey &= ~KEY_ALT_LEFT;
+					break;
+
+				case BACKEND_KEYBOARD_PERIOD:
+					gKey &= ~KEY_ALT_DOWN;
+					break;
+
+				case BACKEND_KEYBOARD_FORWARD_SLASH:
+					gKey &= ~KEY_ALT_RIGHT;
+					break;
+
+				case BACKEND_KEYBOARD_L:
+					gKey &= ~KEY_L;
+					break;
+
+				case BACKEND_KEYBOARD_EQUALS:
+					gKey &= ~KEY_PLUS;
+					break;
+			}
+		}
+	}
 
 	// Run joystick code
 	if (gbUseJoystick)

@@ -7,7 +7,7 @@
 
 #include "WindowsWrapper.h"
 
-#include "Backends/Platform.h"
+#include "Backends/Misc.h"
 #include "Backends/Rendering.h"
 #include "Bitmap.h"
 #include "CommonDefines.h"
@@ -32,9 +32,9 @@ RECT grcFull = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 int magnification;
 BOOL fullscreen;
 
-static Backend_Surface *framebuffer;
+static RenderBackend_Surface *framebuffer;
 
-static Backend_Surface *surf[SURFACE_ID_MAX];
+static RenderBackend_Surface *surf[SURFACE_ID_MAX];
 
 static FontObject *font;
 
@@ -59,12 +59,12 @@ BOOL Flip_SystemTask(void)
 			return FALSE;
 
 		// Framerate limiter
-		timeNow = PlatformBackend_GetTicks();
+		timeNow = Backend_GetTicks();
 
 		if (timeNow >= timePrev + 20)
 			break;
 
-		PlatformBackend_Delay(1);
+		Backend_Delay(1);
 	}
 
 	if (timeNow >= timePrev + 100)
@@ -72,7 +72,7 @@ BOOL Flip_SystemTask(void)
 	else
 		timePrev += 20;
 
-	Backend_DrawScreen();
+	RenderBackend_DrawScreen();
 
 	if (RestoreSurfaces())
 	{
@@ -106,7 +106,7 @@ BOOL StartDirectDraw(const char *title, int width, int height, int lMagnificatio
 			break;
 	}
 
-	framebuffer = Backend_Init(title, width, height, fullscreen);
+	framebuffer = RenderBackend_Init(title, width, height, fullscreen);
 
 	if (framebuffer == NULL)
 		return FALSE;
@@ -123,14 +123,14 @@ void EndDirectDraw(void)
 	{
 		if (surf[i] != NULL)
 		{
-			Backend_FreeSurface(surf[i]);
+			RenderBackend_FreeSurface(surf[i]);
 			surf[i] = NULL;
 		}
 	}
 
 	framebuffer = NULL;
 
-	Backend_Deinit();
+	RenderBackend_Deinit();
 
 	memset(surface_metadata, 0, sizeof(surface_metadata));
 }
@@ -140,7 +140,7 @@ void ReleaseSurface(SurfaceID s)
 	// Release the surface we want to release
 	if (surf[s] != NULL)
 	{
-		Backend_FreeSurface(surf[s]);
+		RenderBackend_FreeSurface(surf[s]);
 		surf[s] = NULL;
 	}
 
@@ -151,7 +151,7 @@ static BOOL ScaleAndUploadSurface(const unsigned char *image_buffer, int width, 
 {
 	// IF YOU WANT TO ADD HD SPRITES, THIS IS THE CODE YOU SHOULD EDIT
 	unsigned int pitch;
-	unsigned char *pixels = Backend_LockSurface(surf[surf_no], &pitch, width * magnification, height * magnification);
+	unsigned char *pixels = RenderBackend_LockSurface(surf[surf_no], &pitch, width * magnification, height * magnification);
 
 	if (magnification == 1)
 	{
@@ -192,7 +192,7 @@ static BOOL ScaleAndUploadSurface(const unsigned char *image_buffer, int width, 
 		}
 	}
 
-	Backend_UnlockSurface(surf[surf_no], width * magnification, height * magnification);
+	RenderBackend_UnlockSurface(surf[surf_no], width * magnification, height * magnification);
 
 	return TRUE;
 }
@@ -218,7 +218,7 @@ BOOL MakeSurface_Resource(const char *name, SurfaceID surf_no)
 	if (image_buffer == NULL)
 		return FALSE;
 
-	surf[surf_no] = Backend_CreateSurface(width * magnification, height * magnification);
+	surf[surf_no] = RenderBackend_CreateSurface(width * magnification, height * magnification);
 
 	if (surf[surf_no] == NULL)
 	{
@@ -228,7 +228,7 @@ BOOL MakeSurface_Resource(const char *name, SurfaceID surf_no)
 
 	if (!ScaleAndUploadSurface(image_buffer, width, height, surf_no))
 	{
-		Backend_FreeSurface(surf[surf_no]);
+		RenderBackend_FreeSurface(surf[surf_no]);
 		FreeBitmap(image_buffer);
 		return FALSE;
 	}
@@ -280,7 +280,7 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 		return FALSE;
 	}
 
-	surf[surf_no] = Backend_CreateSurface(width * magnification, height * magnification);
+	surf[surf_no] = RenderBackend_CreateSurface(width * magnification, height * magnification);
 
 	if (surf[surf_no] == NULL)
 	{
@@ -290,7 +290,7 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 
 	if (!ScaleAndUploadSurface(image_buffer, width, height, surf_no))
 	{
-		Backend_FreeSurface(surf[surf_no]);
+		RenderBackend_FreeSurface(surf[surf_no]);
 		FreeBitmap(image_buffer);
 		return FALSE;
 	}
@@ -391,7 +391,7 @@ BOOL MakeSurface_Generic(int bxsize, int bysize, SurfaceID surf_no, BOOL bSystem
 	if (surf[surf_no] != NULL)
 		return FALSE;
 
-	surf[surf_no] = Backend_CreateSurface(bxsize * magnification, bysize * magnification);
+	surf[surf_no] = RenderBackend_CreateSurface(bxsize * magnification, bysize * magnification);
 
 	if (surf[surf_no] == NULL)
 		return FALSE;
@@ -418,7 +418,7 @@ void BackupSurface(SurfaceID surf_no, const RECT *rect)
 	scaled_rect.right = rect->right * magnification;
 	scaled_rect.bottom = rect->bottom * magnification;
 
-	Backend_Blit(framebuffer, &scaled_rect, surf[surf_no], scaled_rect.left, scaled_rect.top, FALSE);
+	RenderBackend_Blit(framebuffer, &scaled_rect, surf[surf_no], scaled_rect.left, scaled_rect.top, FALSE);
 }
 
 void PutBitmap3(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID surf_no) // Transparency
@@ -450,7 +450,7 @@ void PutBitmap3(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID su
 	rcWork.right *= magnification;
 	rcWork.bottom *= magnification;
 
-	Backend_Blit(surf[surf_no], &rcWork, framebuffer, x * magnification, y * magnification, TRUE);
+	RenderBackend_Blit(surf[surf_no], &rcWork, framebuffer, x * magnification, y * magnification, TRUE);
 }
 
 void PutBitmap4(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID surf_no) // No Transparency
@@ -482,7 +482,7 @@ void PutBitmap4(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID su
 	rcWork.right *= magnification;
 	rcWork.bottom *= magnification;
 
-	Backend_Blit(surf[surf_no], &rcWork, framebuffer, x * magnification, y * magnification, FALSE);
+	RenderBackend_Blit(surf[surf_no], &rcWork, framebuffer, x * magnification, y * magnification, FALSE);
 }
 
 void Surface2Surface(int x, int y, const RECT *rect, int to, int from)
@@ -494,7 +494,7 @@ void Surface2Surface(int x, int y, const RECT *rect, int to, int from)
 	rcWork.right = rect->right * magnification;
 	rcWork.bottom = rect->bottom * magnification;
 
-	Backend_Blit(surf[from], &rcWork, surf[to], x * magnification, y * magnification, TRUE);
+	RenderBackend_Blit(surf[from], &rcWork, surf[to], x * magnification, y * magnification, TRUE);
 }
 
 unsigned long GetCortBoxColor(unsigned long col)
@@ -515,7 +515,7 @@ void CortBox(const RECT *rect, unsigned long col)
 	const unsigned char green = (col >> 8) & 0xFF;
 	const unsigned char blue = (col >> 16) & 0xFF;
 
-	Backend_ColourFill(framebuffer, &dst_rect, red, green, blue);
+	RenderBackend_ColourFill(framebuffer, &dst_rect, red, green, blue);
 }
 
 void CortBox2(const RECT *rect, unsigned long col, SurfaceID surf_no)
@@ -532,7 +532,7 @@ void CortBox2(const RECT *rect, unsigned long col, SurfaceID surf_no)
 	const unsigned char green = (col >> 8) & 0xFF;
 	const unsigned char blue = (col >> 16) & 0xFF;
 
-	Backend_ColourFill(surf[surf_no], &dst_rect, red, green, blue);
+	RenderBackend_ColourFill(surf[surf_no], &dst_rect, red, green, blue);
 }
 
 BOOL DummiedOutLogFunction(int unknown)
@@ -560,10 +560,10 @@ int RestoreSurfaces(void)	// Guessed function name - this doesn't exist in the L
 	if (framebuffer == NULL)
 		return surfaces_regenerated;
 
-	if (Backend_IsSurfaceLost(framebuffer))
+	if (RenderBackend_IsSurfaceLost(framebuffer))
 	{
 		++surfaces_regenerated;
-		Backend_RestoreSurface(framebuffer);
+		RenderBackend_RestoreSurface(framebuffer);
 		DummiedOutLogFunction(0x62);
 	}
 
@@ -571,10 +571,10 @@ int RestoreSurfaces(void)	// Guessed function name - this doesn't exist in the L
 	{
 		if (surf[s] != NULL)
 		{
-			if (Backend_IsSurfaceLost(surf[s]))
+			if (RenderBackend_IsSurfaceLost(surf[s]))
 			{
 				++surfaces_regenerated;
-				Backend_RestoreSurface(surf[s]);
+				RenderBackend_RestoreSurface(surf[s]);
 				DummiedOutLogFunction(0x30 + s);
 
 				if (!surface_metadata[s].bSystem)

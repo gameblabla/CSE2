@@ -168,7 +168,7 @@ add_executable(CSE2 WIN32
 	"src/WindowsWrapper.h"
 	"src/Backends/Audio.h"
 	"src/Backends/Controller.h"
-	"src/Backends/Platform.h"
+	"src/Backends/Misc.h"
 	"src/Backends/Rendering.h"
 )
 
@@ -303,9 +303,17 @@ else()
 endif()
 
 if(BACKEND_AUDIO MATCHES "SDL2")
-	target_sources(CSE2 PRIVATE "src/Backends/Audio/SDL2.cpp" "src/Backends/Audio/SoftwareMixer.cpp" "src/Backends/Audio/SoftwareMixer.h")
+	target_sources(CSE2 PRIVATE
+		"src/Backends/Audio/SDL2.cpp"
+		"src/Backends/Audio/SoftwareMixer.cpp"
+		"src/Backends/Audio/SoftwareMixer.h"
+	)
 elseif(BACKEND_AUDIO MATCHES "miniaudio")
-	target_sources(CSE2 PRIVATE "src/Backends/Audio/miniaudio.cpp" "src/Backends/Audio/SoftwareMixer.cpp" "src/Backends/Audio/SoftwareMixer.h")
+	target_sources(CSE2 PRIVATE
+		"src/Backends/Audio/miniaudio.cpp"
+		"src/Backends/Audio/SoftwareMixer.cpp"
+		"src/Backends/Audio/SoftwareMixer.h"
+	)
 
 	# Link libdl, libm, and libpthread
 	include(CheckLibraryExists)
@@ -326,22 +334,31 @@ else()
 endif()
 
 if(BACKEND_PLATFORM MATCHES "SDL2")
-	target_sources(CSE2 PRIVATE "src/Backends/Platform/SDL2.cpp" "src/Backends/Controller/SDL2.cpp")
+	target_sources(CSE2 PRIVATE
+		"src/Backends/SDL2/Controller.cpp"
+		"src/Backends/SDL2/Controller.h"
+		"src/Backends/SDL2/Misc.cpp"
+		"src/Backends/SDL2/Window.h"
+	)
 elseif(BACKEND_PLATFORM MATCHES "GLFW3")
-	target_sources(CSE2 PRIVATE "src/Backends/Platform/GLFW3.cpp" "src/Backends/Controller/GLFW3.cpp")
+	target_sources(CSE2 PRIVATE
+		"src/Backends/GLFW3/Controller.cpp"
+		"src/Backends/GLFW3/Misc.cpp"
+		"src/Backends/GLFW3/Window.h"
+	)
 endif()
 
 if(BACKEND_PLATFORM MATCHES "SDL2" AND BACKEND_RENDERER MATCHES "OpenGL3")
-	target_sources(CSE2 PRIVATE "src/Backends/Window/SDL2-OpenGL3.cpp")
+	target_sources(CSE2 PRIVATE "src/Backends/SDL2/Window-OpenGL3.cpp")
 elseif(BACKEND_PLATFORM MATCHES "SDL2" AND BACKEND_RENDERER MATCHES "OpenGLES2")
-	target_sources(CSE2 PRIVATE "src/Backends/Window/SDL2-OpenGLES2.cpp")
+	target_sources(CSE2 PRIVATE "src/Backends/SDL2/Window-OpenGLES2.cpp")
 elseif(BACKEND_PLATFORM MATCHES "SDL2" AND BACKEND_RENDERER MATCHES "SDLTexture")
 elseif(BACKEND_PLATFORM MATCHES "SDL2" AND BACKEND_RENDERER MATCHES "SDLSurface")
 elseif(BACKEND_PLATFORM MATCHES "SDL2" AND BACKEND_RENDERER MATCHES "Software")
 elseif(BACKEND_PLATFORM MATCHES "GLFW3" AND BACKEND_RENDERER MATCHES "OpenGL3")
-	target_sources(CSE2 PRIVATE "src/Backends/Window/GLFW3-OpenGL3.cpp")
+	target_sources(CSE2 PRIVATE "src/Backends/GLFW3/Window-OpenGL3.cpp")
 elseif(BACKEND_PLATFORM MATCHES "GLFW3" AND BACKEND_RENDERER MATCHES "OpenGLES2")
-	target_sources(CSE2 PRIVATE "src/Backends/Window/GLFW3-OpenGLES2.cpp")
+	target_sources(CSE2 PRIVATE "src/Backends/GLFW3/Window-OpenGLES2.cpp")
 else()
 	message(FATAL_ERROR "Invalid BACKEND_PLATFORM/BACKEND_RENDERER combination")
 endif()
@@ -526,10 +543,11 @@ else()
 endif()
 
 if(BACKEND_RENDERER MATCHES "OpenGL3")
-	target_sources(CSE2 PRIVATE "external/glad/src/glad.c" "external/glad/include/glad/glad.h" "external/glad/include/KHR/khrplatform.h")
+	add_subdirectory("external/glad" EXCLUDE_FROM_ALL)
+	target_link_libraries(CSE2 PRIVATE glad)
 
 	find_package(OpenGL REQUIRED)
-	target_link_libraries(CSE2 PRIVATE OpenGL::GL ${CMAKE_DL_LIBS})
+	target_link_libraries(CSE2 PRIVATE OpenGL::GL)
 endif()
 
 if(BACKEND_RENDERER MATCHES "OpenGLES2")

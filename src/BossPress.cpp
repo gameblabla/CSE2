@@ -152,8 +152,8 @@ void ActBossChar_Press(void)
 			npc->act_wait = 0;
 			npc->count1 = 0;
 
-			DeleteNpCharCode(325, 1);
-			DeleteNpCharCode(330, 1);
+			DeleteNpCharCode(325, TRUE);
+			DeleteNpCharCode(330, TRUE);
 			// Fallthrough
 		case 501:
 			if (++npc->act_wait % 0x10 == 0)

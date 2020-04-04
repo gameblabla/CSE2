@@ -9,9 +9,6 @@ project(DoConfig LANGUAGES C CXX)
 
 add_executable(DoConfig WIN32
 	"icon.rc"
-	"../external/glad/include/glad/glad.h"
-	"../external/glad/include/KHR/khrplatform.h"
-	"../external/glad/src/glad.c"
 	"DoConfig.cpp"
 	"imgui/imconfig.h"
 	"imgui/imgui.cpp"
@@ -70,6 +67,16 @@ endif()
 ################
 # Dependencies #
 ################
+
+# glad
+
+add_subdirectory("../external/glad" "glad" EXCLUDE_FROM_ALL)
+target_link_libraries(DoConfig PRIVATE glad)
+
+find_package(OpenGL REQUIRED)
+target_link_libraries(DoConfig PRIVATE OpenGL::GL)
+
+# GLFW3
 
 if(NOT FORCE_LOCAL_LIBS)
 	find_package(PkgConfig QUIET)

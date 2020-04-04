@@ -1,5 +1,7 @@
 #include "BossX.h"
 
+#include <stddef.h>
+
 #include "WindowsWrapper.h"
 
 #include "Boss.h"
@@ -259,7 +261,7 @@ static void ActBossChar03_02(NPCHAR *npc)
 					break;
 			}
 
-			SetNpChar(158, npc->x + x, npc->y + y, 0, 0, direct, 0, 0x100);
+			SetNpChar(158, npc->x + x, npc->y + y, 0, 0, direct, NULL, 0x100);
 			PlaySoundObject(39, 1);
 			npc->act_wait = 120;
 
@@ -858,7 +860,7 @@ void ActBossChar_MonstX(void)
 				for (i = 0; i < 20; ++i)
 					gBoss[i].cond = 0;
 
-				DeleteNpCharCode(158, 1);
+				DeleteNpCharCode(158, TRUE);
 				SetNpChar(159, npc->x, npc->y - (24 * 0x200), 0, 0, 0, NULL, 0);
 			}
 

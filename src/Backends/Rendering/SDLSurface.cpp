@@ -8,23 +8,24 @@
 
 #include "../../WindowsWrapper.h"
 
-#include "../Platform.h"
+#include "../Misc.h"
+#include "../SDL2/Window.h"
 
-typedef struct Backend_Surface
+typedef struct RenderBackend_Surface
 {
 	SDL_Surface *sdlsurface;
-} Backend_Surface;
+} RenderBackend_Surface;
 
-typedef struct Backend_Glyph
+typedef struct RenderBackend_Glyph
 {
 	SDL_Surface *sdlsurface;
-} Backend_Glyph;
+} RenderBackend_Glyph;
 
-extern SDL_Window *window;
+SDL_Window *window;
 
 static SDL_Surface *window_sdlsurface;
 
-static Backend_Surface framebuffer;
+static RenderBackend_Surface framebuffer;
 
 static unsigned char glyph_colour_channels[3];
 static SDL_Surface *glyph_destination_sdlsurface;
@@ -43,7 +44,7 @@ static void RectToSDLRect(const RECT *rect, SDL_Rect *sdl_rect)
 		sdl_rect->h = 0;
 }
 
-Backend_Surface* Backend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
+RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
 {
 	window = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screen_width, screen_height, 0);
 
@@ -58,7 +59,7 @@ Backend_Surface* Backend_Init(const char *window_title, int screen_width, int sc
 
 		if (framebuffer.sdlsurface != NULL)
 		{
-			PlatformBackend_PostWindowCreation();
+			Backend_PostWindowCreation();
 
 			return &framebuffer;
 		}
@@ -77,21 +78,21 @@ Backend_Surface* Backend_Init(const char *window_title, int screen_width, int sc
 	return NULL;
 }
 
-void Backend_Deinit(void)
+void RenderBackend_Deinit(void)
 {
 	SDL_FreeSurface(framebuffer.sdlsurface);
 	SDL_DestroyWindow(window);
 }
 
-void Backend_DrawScreen(void)
+void RenderBackend_DrawScreen(void)
 {
 	SDL_BlitSurface(framebuffer.sdlsurface, NULL, window_sdlsurface, NULL);
 	SDL_UpdateWindowSurface(window);
 }
 
-Backend_Surface* Backend_CreateSurface(unsigned int width, unsigned int height)
+RenderBackend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned int height)
 {
-	Backend_Surface *surface = (Backend_Surface*)malloc(sizeof(Backend_Surface));
+	RenderBackend_Surface *surface = (RenderBackend_Surface*)malloc(sizeof(RenderBackend_Surface));
 
 	if (surface == NULL)
 		return NULL;
@@ -107,7 +108,7 @@ Backend_Surface* Backend_CreateSurface(unsigned int width, unsigned int height)
 	return surface;
 }
 
-void Backend_FreeSurface(Backend_Surface *surface)
+void RenderBackend_FreeSurface(RenderBackend_Surface *surface)
 {
 	if (surface == NULL)
 		return;
@@ -116,20 +117,23 @@ void Backend_FreeSurface(Backend_Surface *surface)
 	free(surface);
 }
 
-BOOL Backend_IsSurfaceLost(Backend_Surface *surface)
+BOOL RenderBackend_IsSurfaceLost(RenderBackend_Surface *surface)
 {
 	(void)surface;
 
 	return FALSE;
 }
 
-void Backend_RestoreSurface(Backend_Surface *surface)
+void RenderBackend_RestoreSurface(RenderBackend_Surface *surface)
 {
 	(void)surface;
 }
 
-unsigned char* Backend_LockSurface(Backend_Surface *surface, unsigned int *pitch, unsigned int width, unsigned int height)
+unsigned char* RenderBackend_LockSurface(RenderBackend_Surface *surface, unsigned int *pitch, unsigned int width, unsigned int height)
 {
+	(void)width;
+	(void)height;
+
 	if (surface == NULL)
 		return NULL;
 
@@ -137,12 +141,14 @@ unsigned char* Backend_LockSurface(Backend_Surface *surface, unsigned int *pitch
 	return (unsigned char*)surface->sdlsurface->pixels;
 }
 
-void Backend_UnlockSurface(Backend_Surface *surface, unsigned int width, unsigned int height)
+void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, unsigned int width, unsigned int height)
 {
 	(void)surface;
+	(void)width;
+	(void)height;
 }
 
-void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL colour_key)
+void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RECT *rect, RenderBackend_Surface *destination_surface, long x, long y, BOOL colour_key)
 {
 	if (source_surface == NULL || destination_surface == NULL)
 		return;
@@ -161,7 +167,7 @@ void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Sur
 	SDL_BlitSurface(source_surface->sdlsurface, &source_rect, destination_surface->sdlsurface, &destination_rect);
 }
 
-void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
+void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
 {
 	if (surface == NULL)
 		return;
@@ -172,9 +178,9 @@ void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned cha
 	SDL_FillRect(surface->sdlsurface, &destination_rect, SDL_MapRGB(surface->sdlsurface->format, red, green, blue));
 }
 
-Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch)
+RenderBackend_Glyph* RenderBackend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch)
 {
-	Backend_Glyph *glyph = (Backend_Glyph*)malloc(sizeof(Backend_Glyph));
+	RenderBackend_Glyph *glyph = (RenderBackend_Glyph*)malloc(sizeof(RenderBackend_Glyph));
 
 	if (glyph == NULL)
 		return NULL;
@@ -204,7 +210,7 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 	return glyph;
 }
 
-void Backend_UnloadGlyph(Backend_Glyph *glyph)
+void RenderBackend_UnloadGlyph(RenderBackend_Glyph *glyph)
 {
 	if (glyph == NULL)
 		return;
@@ -213,7 +219,7 @@ void Backend_UnloadGlyph(Backend_Glyph *glyph)
 	free(glyph);
 }
 
-void Backend_PrepareToDrawGlyphs(Backend_Surface *destination_surface, const unsigned char *colour_channels)
+void RenderBackend_PrepareToDrawGlyphs(RenderBackend_Surface *destination_surface, const unsigned char *colour_channels)
 {
 	if (destination_surface == NULL)
 		return;
@@ -223,7 +229,7 @@ void Backend_PrepareToDrawGlyphs(Backend_Surface *destination_surface, const uns
 	memcpy(glyph_colour_channels, colour_channels, sizeof(glyph_colour_channels));
 }
 
-void Backend_DrawGlyph(Backend_Glyph *glyph, long x, long y)
+void RenderBackend_DrawGlyph(RenderBackend_Glyph *glyph, long x, long y)
 {
 	if (glyph == NULL)
 		return;
@@ -239,17 +245,17 @@ void Backend_DrawGlyph(Backend_Glyph *glyph, long x, long y)
 	SDL_BlitSurface(glyph->sdlsurface, NULL, glyph_destination_sdlsurface, &rect);
 }
 
-void Backend_FlushGlyphs(void)
+void RenderBackend_FlushGlyphs(void)
 {
 	
 }
 
-void Backend_HandleRenderTargetLoss(void)
+void RenderBackend_HandleRenderTargetLoss(void)
 {
 	// No problem for us
 }
 
-void Backend_HandleWindowResize(unsigned int width, unsigned int height)
+void RenderBackend_HandleWindowResize(unsigned int width, unsigned int height)
 {
 	(void)width;
 	(void)height;
