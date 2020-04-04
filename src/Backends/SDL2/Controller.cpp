@@ -12,18 +12,6 @@ static SDL_Joystick *joystick = NULL;
 static int joystick_neutral_x = 0;
 static int joystick_neutral_y = 0;
 
-void ControllerBackend_Deinit(void)
-{
-	// Close opened joystick (if exists)
-	if (joystick != NULL)
-	{
-		SDL_JoystickClose(joystick);
-		joystick = NULL;
-	}
-
-	SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
-}
-
 // It looks like Pixel declared his functions early, so he could forward-reference
 BOOL FindAndOpenDirectInputDevice(void);
 
@@ -35,6 +23,18 @@ BOOL ControllerBackend_Init(void)
 		return FALSE;
 
 	return TRUE;
+}
+
+void ControllerBackend_Deinit(void)
+{
+	// Close opened joystick (if exists)
+	if (joystick != NULL)
+	{
+		SDL_JoystickClose(joystick);
+		joystick = NULL;
+	}
+
+	SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
 }
 
 // The original name for this function and its variables are unknown.

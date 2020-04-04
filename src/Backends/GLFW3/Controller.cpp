@@ -57,16 +57,6 @@ static void JoystickCallback(int joystick_id, int event)
 	}
 }
 
-void ControllerBackend_Deinit(void)
-{
-	glfwSetJoystickCallback(NULL);
-
-	joystick_connected = FALSE;
-	connected_joystick_id = 0;
-	joystick_neutral_x = 0;
-	joystick_neutral_y = 0;
-}
-
 BOOL ControllerBackend_Init(void)
 {
 	// Connect joysticks that are already plugged-in
@@ -78,6 +68,16 @@ BOOL ControllerBackend_Init(void)
 	glfwSetJoystickCallback(JoystickCallback);
 
 	return TRUE;
+}
+
+void ControllerBackend_Deinit(void)
+{
+	glfwSetJoystickCallback(NULL);
+
+	joystick_connected = FALSE;
+	connected_joystick_id = 0;
+	joystick_neutral_x = 0;
+	joystick_neutral_y = 0;
 }
 
 BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
