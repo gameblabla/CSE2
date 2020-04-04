@@ -25,7 +25,7 @@ static void JoystickCallback(int joystick_id, int event)
 			if (!joystick_connected)
 			{
 				int total_axis;
-				const float *axis = glfwGetJoystickAxes(connected_joystick_id, &total_axis);
+				const float *axis = glfwGetJoystickAxes(joystick_id, &total_axis);
 
 				if (total_axis >= 2)
 				{
