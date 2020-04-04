@@ -326,9 +326,9 @@ else()
 endif()
 
 if(BACKEND_PLATFORM MATCHES "SDL2")
-	target_sources(CSE2 PRIVATE "src/Backends/SDL2/Controller.cpp" "src/Backends/SDL2/Misc.cpp" "src/Backends/SDL2/SDL2.h")
+	target_sources(CSE2 PRIVATE "src/Backends/SDL2/Controller.cpp" "src/Backends/SDL2/Misc.cpp" "src/Backends/SDL2/Platform.h")
 elseif(BACKEND_PLATFORM MATCHES "GLFW3")
-	target_sources(CSE2 PRIVATE "src/Backends/GLFW3/Controller.cpp" "src/Backends/GLFW3/Misc.cpp" "src/Backends/GLFW3/GLFW3.h")
+	target_sources(CSE2 PRIVATE "src/Backends/GLFW3/Controller.cpp" "src/Backends/GLFW3/Misc.cpp" "src/Backends/GLFW3/Platform.h")
 endif()
 
 if(BACKEND_PLATFORM MATCHES "SDL2" AND BACKEND_RENDERER MATCHES "OpenGL3")
