@@ -303,9 +303,17 @@ else()
 endif()
 
 if(BACKEND_AUDIO MATCHES "SDL2")
-	target_sources(CSE2 PRIVATE "src/Backends/Audio/SDL2.cpp" "src/Backends/Audio/SoftwareMixer.cpp" "src/Backends/Audio/SoftwareMixer.h")
+	target_sources(CSE2 PRIVATE
+		"src/Backends/Audio/SDL2.cpp"
+		"src/Backends/Audio/SoftwareMixer.cpp"
+		"src/Backends/Audio/SoftwareMixer.h"
+	)
 elseif(BACKEND_AUDIO MATCHES "miniaudio")
-	target_sources(CSE2 PRIVATE "src/Backends/Audio/miniaudio.cpp" "src/Backends/Audio/SoftwareMixer.cpp" "src/Backends/Audio/SoftwareMixer.h")
+	target_sources(CSE2 PRIVATE
+		"src/Backends/Audio/miniaudio.cpp"
+		"src/Backends/Audio/SoftwareMixer.cpp"
+		"src/Backends/Audio/SoftwareMixer.h"
+	)
 
 	# Link libdl, libm, and libpthread
 	include(CheckLibraryExists)
@@ -326,9 +334,18 @@ else()
 endif()
 
 if(BACKEND_PLATFORM MATCHES "SDL2")
-	target_sources(CSE2 PRIVATE "src/Backends/SDL2/Controller.cpp" "src/Backends/SDL2/Misc.cpp" "src/Backends/SDL2/Platform.h")
+	target_sources(CSE2 PRIVATE
+		"src/Backends/SDL2/Controller.cpp"
+		"src/Backends/SDL2/Controller.h"
+		"src/Backends/SDL2/Platform.cpp"
+		"src/Backends/SDL2/Platform.h"
+	)
 elseif(BACKEND_PLATFORM MATCHES "GLFW3")
-	target_sources(CSE2 PRIVATE "src/Backends/GLFW3/Controller.cpp" "src/Backends/GLFW3/Misc.cpp" "src/Backends/GLFW3/Platform.h")
+	target_sources(CSE2 PRIVATE
+		"src/Backends/GLFW3/Controller.cpp"
+		"src/Backends/GLFW3/Platform.cpp"
+		"src/Backends/GLFW3/Platform.h"
+	)
 endif()
 
 if(BACKEND_PLATFORM MATCHES "SDL2" AND BACKEND_RENDERER MATCHES "OpenGL3")
