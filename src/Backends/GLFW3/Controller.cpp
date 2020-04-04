@@ -12,8 +12,6 @@
 
 static BOOL joystick_connected;
 static int connected_joystick_id;
-static int joystick_neutral_x;
-static int joystick_neutral_y;
 
 static void JoystickCallback(int joystick_id, int event)
 {
@@ -36,10 +34,6 @@ static void JoystickCallback(int joystick_id, int event)
 						printf("Joystick #%d selected\n", joystick_id);
 						joystick_connected = TRUE;
 						connected_joystick_id = joystick_id;
-
-						// Reset default stick positions (this is performed in ResetJoystickStatus in vanilla Cave Story
-						joystick_neutral_x = axis[0];
-						joystick_neutral_y = axis[1];
 					}
 				}
 			}
@@ -76,8 +70,6 @@ void ControllerBackend_Deinit(void)
 
 	joystick_connected = FALSE;
 	connected_joystick_id = 0;
-	joystick_neutral_x = 0;
-	joystick_neutral_y = 0;
 }
 
 BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
@@ -85,29 +77,73 @@ BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
 	if (!joystick_connected)
 		return FALSE;
 
-	// Read axis
-	int total_axis;
-	const float *axis = glfwGetJoystickAxes(connected_joystick_id, &total_axis);
+	const size_t button_limit = sizeof(status->bButton) / sizeof(status->bButton[0]);
 
-	status->bLeft = axis[0] < joystick_neutral_x - DEADZONE;
-	status->bRight = axis[0] > joystick_neutral_x + DEADZONE;
-	status->bUp = axis[1] < joystick_neutral_y - DEADZONE;
-	status->bDown = axis[1] > joystick_neutral_y + DEADZONE;
-
-	// Read buttons
 	int total_buttons;
 	const unsigned char *buttons = glfwGetJoystickButtons(connected_joystick_id, &total_buttons);
+	total_buttons = 0;
 
-	// The original `Input.cpp` assumed there were 32 buttons (because of DirectInput's `DIJOYSTATE` struct)
-	if (total_buttons > 32)
-		total_buttons = 32;
+	int total_axes;
+	const float *axes = glfwGetJoystickAxes(connected_joystick_id, &total_axes);
 
-	// Read whatever buttons actually exist
+	int total_hats;
+	const unsigned char *hats = glfwGetJoystickHats(connected_joystick_id, &total_hats);
+
+	status->bLeft = axes[0] < -DEADZONE;
+	status->bRight = axes[0] > DEADZONE;
+	status->bUp = axes[1] < -DEADZONE;
+	status->bDown = axes[1] > DEADZONE;
+
+
+	unsigned int buttons_done = 0;
+
 	for (int i = 0; i < total_buttons; ++i)
-		status->bButton[i] = buttons[i] == GLFW_PRESS;
+	{
+		status->bButton[buttons_done] = buttons[i] == GLFW_PRESS;
+
+		if (++buttons_done >= button_limit)
+			break;
+	}
+
+	for (int i = 0; i < total_axes; ++i)
+	{
+		status->bButton[buttons_done] = axes[i] < -DEADZONE;
+		printf("\n%d %d\n", buttons_done, button_limit);
+		if (++buttons_done >= button_limit)
+			break;
+
+		status->bButton[buttons_done] = axes[i] > DEADZONE;
+		printf("%d\n", buttons_done);
+
+		if (++buttons_done >= button_limit)
+			break;
+	}
+
+	for (int i = 0; i < total_axes; ++i)
+	{
+		status->bButton[buttons_done] = hats[i] == GLFW_HAT_UP;
+
+		if (++buttons_done >= button_limit)
+			break;
+
+		status->bButton[buttons_done] = hats[i] == GLFW_HAT_RIGHT;
+
+		if (++buttons_done >= button_limit)
+			break;
+
+		status->bButton[buttons_done] = hats[i] == GLFW_HAT_DOWN;
+
+		if (++buttons_done >= button_limit)
+			break;
+
+		status->bButton[buttons_done] = hats[i] == GLFW_HAT_LEFT;
+
+		if (++buttons_done >= button_limit)
+			break;
+	}
 
 	// Blank the buttons that do not
-	for (int i = total_buttons; i < 32; ++i)
+	for (size_t i = buttons_done; i < button_limit; ++i)
 		status->bButton[i] = FALSE;
 
 	return TRUE;
@@ -117,8 +153,6 @@ BOOL ControllerBackend_ResetJoystickStatus(void)
 {
 	if (!joystick_connected)
 		return FALSE;
-
-	// The code that would normally run here has been moved to JoystickCallback, to better-support hotplugging
 
 	return TRUE;
 }

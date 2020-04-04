@@ -35,9 +35,8 @@ BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
 	if (joystick == NULL)
 		return FALSE;
 
-	const size_t button_limit = sizeof(status->bButton) / sizeof(status->bButton);
+	const size_t button_limit = sizeof(status->bButton) / sizeof(status->bButton[0]);
 
-	// Read axis
 	const Sint16 joystick_x = SDL_JoystickGetAxis(joystick, 0);
 	const Sint16 joystick_y = SDL_JoystickGetAxis(joystick, 1);
 
@@ -56,67 +55,67 @@ BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
 	{
 		status->bButton[buttons_done] = SDL_JoystickGetButton(joystick, i);
 
-		if (++buttons_done < button_limit)
+		if (++buttons_done >= button_limit)
 			break;
 	}
 
-	for (int i = 0; i < total_axes && buttons_done < button_limit; ++i)
+	for (int i = 0; i < total_axes; ++i)
 	{
 		Sint16 axis = SDL_JoystickGetAxis(joystick, i);
 
 		status->bButton[buttons_done] = axis < -DEADZONE;
 
-		if (++buttons_done < button_limit)
+		if (++buttons_done >= button_limit)
 			break;
 
 		status->bButton[buttons_done] = axis > DEADZONE;
 
-		if (++buttons_done < button_limit)
+		if (++buttons_done >= button_limit)
 			break;
 	}
 
-	for (int i = 0; i < total_axes && buttons_done < button_limit; ++i)
+	for (int i = 0; i < total_axes; ++i)
 	{
 		Uint8 hat = SDL_JoystickGetHat(joystick, i);
 
 		status->bButton[buttons_done] = hat == SDL_HAT_UP;
 
-		if (++buttons_done < button_limit)
+		if (++buttons_done >= button_limit)
 			break;
 
 		status->bButton[buttons_done] = hat == SDL_HAT_RIGHT;
 
-		if (++buttons_done < button_limit)
+		if (++buttons_done >= button_limit)
 			break;
 
 		status->bButton[buttons_done] = hat == SDL_HAT_DOWN;
 
-		if (++buttons_done < button_limit)
+		if (++buttons_done >= button_limit)
 			break;
 
 		status->bButton[buttons_done] = hat == SDL_HAT_LEFT;
 
-		if (++buttons_done < button_limit)
+		if (++buttons_done >= button_limit)
 			break;
 
 		status->bButton[buttons_done] = hat == SDL_HAT_RIGHTUP;
 
-		if (++buttons_done < button_limit)
+		if (++buttons_done >= button_limit)
 			break;
 
 		status->bButton[buttons_done] = hat == SDL_HAT_RIGHTDOWN;
 
-		if (++buttons_done < button_limit)
+		if (++buttons_done >= button_limit)
 			break;
 
 		status->bButton[buttons_done] = hat == SDL_HAT_LEFTUP;
 
-		if (++buttons_done < button_limit)
+		if (++buttons_done >= button_limit)
 			break;
 
 		status->bButton[buttons_done] = hat == SDL_HAT_LEFTDOWN;
 
-		if (++buttons_done < button_limit)
+		if (++buttons_done >= button_limit)
 			break;
 	}
 
