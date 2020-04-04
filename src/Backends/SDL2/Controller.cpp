@@ -8,11 +8,11 @@
 
 #include "../../WindowsWrapper.h"
 
+#define DEADZONE 10000;
+
 static SDL_Joystick *joystick;
 static int joystick_neutral_x;
 static int joystick_neutral_y;
-
-void ControllerBackend_JoystickCallback(int joystick_id, BOOL connected);
 
 BOOL ControllerBackend_Init(void)
 {
@@ -37,6 +37,15 @@ BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
 	if (joystick == NULL)
 		return FALSE;
 
+	// Read axis
+	const Sint16 joystick_x = SDL_JoystickGetAxis(joystick, 0);
+	const Sint16 joystick_y = SDL_JoystickGetAxis(joystick, 1);
+
+	status->bLeft = joystick_x < joystick_neutral_x - DEADZONE;
+	status->bRight = joystick_x > joystick_neutral_x + DEADZONE;
+	status->bUp = joystick_y < joystick_neutral_y - DEADZONE;
+	status->bDown = joystick_y > joystick_neutral_y + DEADZONE;
+
 	// The original `Input.cpp` assumed there were 32 buttons (because of DirectInput's `DIJOYSTATE` struct)
 	int numButtons = SDL_JoystickNumButtons(joystick);
 	if (numButtons > 32)
@@ -49,14 +58,6 @@ BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
 	// Blank the buttons that do not
 	for (int i = numButtons; i < 32; ++i)
 		status->bButton[i] = FALSE;
-
-	const Sint16 joystick_x = SDL_JoystickGetAxis(joystick, 0);
-	const Sint16 joystick_y = SDL_JoystickGetAxis(joystick, 1);
-
-	status->bLeft = joystick_x < joystick_neutral_x - 10000;
-	status->bRight = joystick_x > joystick_neutral_x + 10000;
-	status->bUp = joystick_y < joystick_neutral_y - 10000;
-	status->bDown = joystick_y > joystick_neutral_y + 10000;
 
 	return TRUE;
 }

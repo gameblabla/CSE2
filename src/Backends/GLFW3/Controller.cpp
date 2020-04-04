@@ -102,9 +102,11 @@ BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
 	if (total_buttons > 32)
 		total_buttons = 32;
 
+	// Read whatever buttons actually exist
 	for (int i = 0; i < total_buttons; ++i)
 		status->bButton[i] = buttons[i] == GLFW_PRESS;
 
+	// Blank the buttons that do not
 	for (int i = total_buttons; i < 32; ++i)
 		status->bButton[i] = FALSE;
 
