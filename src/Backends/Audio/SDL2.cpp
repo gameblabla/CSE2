@@ -5,7 +5,7 @@
 
 #include "SDL.h"
 
-#include "../Platform.h"
+#include "../Misc.h"
 #include "../../Organya.h"
 #include "../../WindowsWrapper.h"
 
@@ -66,7 +66,7 @@ BOOL AudioBackend_Init(void)
 {
 	if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
 	{
-		PlatformBackend_ShowMessageBox("Fatal error (SDL2 audio backend)", "'SDL_InitSubSystem(SDL_INIT_AUDIO)' failed");
+		Backend_ShowMessageBox("Fatal error (SDL2 audio backend)", "'SDL_InitSubSystem(SDL_INIT_AUDIO)' failed");
 		return FALSE;
 	}
 
@@ -90,7 +90,7 @@ BOOL AudioBackend_Init(void)
 
 	if (device_id == 0)
 	{
-		PlatformBackend_ShowMessageBox("Fatal error (SDL2 audio backend)", "'SDL_OpenAudioDevice' failed");
+		Backend_ShowMessageBox("Fatal error (SDL2 audio backend)", "'SDL_OpenAudioDevice' failed");
 		return FALSE;
 	}
 
