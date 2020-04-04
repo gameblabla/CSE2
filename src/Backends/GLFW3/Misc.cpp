@@ -13,7 +13,7 @@
 
 #include "../../WindowsWrapper.h"
 
-#include "GLFW3.h"
+#include "Platform.h"
 #include "../../Main.h"
 #include "../../Organya.h"
 #include "../../Profile.h"

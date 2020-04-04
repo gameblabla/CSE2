@@ -10,7 +10,7 @@
 
 #include "../../WindowsWrapper.h"
 
-#include "SDL2.h"
+#include "Platform.h"
 #include "../../Main.h"
 #include "../../Organya.h"
 #include "../../Profile.h"

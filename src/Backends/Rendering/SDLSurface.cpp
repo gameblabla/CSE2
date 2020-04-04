@@ -9,7 +9,7 @@
 #include "../../WindowsWrapper.h"
 
 #include "../Platform.h"
-#include "../SDL2/SDL2.h"
+#include "../SDL2/Platform.h"
 
 typedef struct Backend_Surface
 {
