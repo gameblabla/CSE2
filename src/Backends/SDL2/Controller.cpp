@@ -7,27 +7,32 @@
 
 #include "../../WindowsWrapper.h"
 
-// The original names for these variables are unknown
-static SDL_Joystick *joystick = NULL;
-static int joystick_neutral_x = 0;
-static int joystick_neutral_y = 0;
-
-// It looks like Pixel declared his functions early, so he could forward-reference
-BOOL FindAndOpenDirectInputDevice(void);
+static SDL_Joystick *joystick;
+static int joystick_neutral_x;
+static int joystick_neutral_y;
 
 BOOL ControllerBackend_Init(void)
 {
 	SDL_InitSubSystem(SDL_INIT_JOYSTICK);
 
-	if (!FindAndOpenDirectInputDevice())
-		return FALSE;
+	for (int i = 0; i < SDL_NumJoysticks(); ++i)
+	{
+		printf("Joystick #%d connected - %s\n", i, SDL_JoystickNameForIndex(i));
+
+		if (joystick == NULL)
+		{
+			joystick = SDL_JoystickOpen(i);
+
+			if (joystick != NULL)
+				printf("Joystick #%d selected\n", i);
+		}
+	}
 
 	return TRUE;
 }
 
 void ControllerBackend_Deinit(void)
 {
-	// Close opened joystick (if exists)
 	if (joystick != NULL)
 	{
 		SDL_JoystickClose(joystick);
@@ -35,31 +40,6 @@ void ControllerBackend_Deinit(void)
 	}
 
 	SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
-}
-
-// The original name for this function and its variables are unknown.
-// This function finds and hooks the first available DirectInput device (or SDL Joystick, in this case).
-BOOL FindAndOpenDirectInputDevice(void)
-{
-	int i;
-
-	for (i = 0; i < SDL_NumJoysticks(); ++i)
-		printf("Joystick #%d name: %s\n", i, SDL_JoystickNameForIndex(i));
-
-	// Open first available joystick
-	for (i = 0; i < SDL_NumJoysticks(); ++i)
-	{
-		joystick = SDL_JoystickOpen(i);
-
-		// Break as soon as a joystick is properly opened
-		if (joystick != NULL)
-		{
-			printf("Joystick #%d selected\n", i);
-			return TRUE;
-		}
-	}
-
-	return FALSE;
 }
 
 BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
