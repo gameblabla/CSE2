@@ -115,7 +115,7 @@ static void GlyphBatch_DestroyTexture(SPRITEBATCH_U64 texture_id, void *udata)
 	SDL_DestroyTexture((SDL_Texture*)texture_id);
 }
 
-Backend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
+RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
 {
 	puts("Available SDL2 render drivers:");
 
@@ -209,7 +209,7 @@ void RenderBackend_DrawScreen(void)
 	SDL_RenderPresent(renderer);
 }
 
-Backend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned int height)
+RenderBackend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned int height)
 {
 	RenderBackend_Surface *surface = (RenderBackend_Surface*)malloc(sizeof(RenderBackend_Surface));
 
@@ -349,7 +349,7 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RECT *rect, 
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 }
 
-Backend_Glyph* RenderBackend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch)
+RenderBackend_Glyph* RenderBackend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch)
 {
 	RenderBackend_Glyph *glyph = (RenderBackend_Glyph*)malloc(sizeof(RenderBackend_Glyph));
 

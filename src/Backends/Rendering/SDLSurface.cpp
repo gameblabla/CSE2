@@ -42,7 +42,7 @@ static void RectToSDLRect(const RECT *rect, SDL_Rect *sdl_rect)
 		sdl_rect->h = 0;
 }
 
-Backend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
+RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
 {
 	window = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screen_width, screen_height, 0);
 
@@ -88,7 +88,7 @@ void RenderBackend_DrawScreen(void)
 	SDL_UpdateWindowSurface(window);
 }
 
-Backend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned int height)
+RenderBackend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned int height)
 {
 	RenderBackend_Surface *surface = (RenderBackend_Surface*)malloc(sizeof(RenderBackend_Surface));
 
@@ -176,7 +176,7 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RECT *rect, 
 	SDL_FillRect(surface->sdlsurface, &destination_rect, SDL_MapRGB(surface->sdlsurface->format, red, green, blue));
 }
 
-Backend_Glyph* RenderBackend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch)
+RenderBackend_Glyph* RenderBackend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch)
 {
 	RenderBackend_Glyph *glyph = (RenderBackend_Glyph*)malloc(sizeof(RenderBackend_Glyph));
 

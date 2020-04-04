@@ -36,7 +36,7 @@ static RenderBackend_Surface framebuffer;
 static unsigned char glyph_colour_channels[3];
 static RenderBackend_Surface *glyph_destination_surface;
 
-Backend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
+RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
 {
 	window = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screen_width, screen_height, 0);
 
@@ -87,7 +87,7 @@ void RenderBackend_DrawScreen(void)
 	SDL_UpdateWindowSurface(window);
 }
 
-Backend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned int height)
+RenderBackend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned int height)
 {
 	RenderBackend_Surface *surface = (RenderBackend_Surface*)malloc(sizeof(RenderBackend_Surface));
 
@@ -290,7 +290,7 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RECT *rect, 
 	}
 }
 
-Backend_Glyph* RenderBackend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch)
+RenderBackend_Glyph* RenderBackend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch)
 {
 	RenderBackend_Glyph *glyph = (RenderBackend_Glyph*)malloc(sizeof(RenderBackend_Glyph));
 
