@@ -1003,7 +1003,7 @@ void ActNpc267(NPCHAR *npc)
 			break;
 
 		case 500:
-			DeleteNpCharCode(269, 1);
+			DeleteNpCharCode(269, TRUE);
 			npc->bits &= ~NPC_SHOOTABLE;
 			npc->ani_no = 4;
 			npc->ym += 0x20;

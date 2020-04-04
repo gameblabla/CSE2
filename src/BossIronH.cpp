@@ -167,9 +167,9 @@ void ActBossChar_Ironhead(void)
 			for (i = 0; i < 0x20; ++i)
 				SetNpChar(4, npc->x + (Random(-128, 128) * 0x200), npc->y + (Random(-64, 64) * 0x200), Random(-128, 128) * 0x200, Random(-128, 128) * 0x200, 0, NULL, 0x100);
 
-			DeleteNpCharCode(197, 1);
-			DeleteNpCharCode(271, 1);
-			DeleteNpCharCode(272, 1);
+			DeleteNpCharCode(197, TRUE);
+			DeleteNpCharCode(271, TRUE);
+			DeleteNpCharCode(272, TRUE);
 			// Fallthrough
 		case 1001:
 			npc->tgt_x -= 1 * 0x200;

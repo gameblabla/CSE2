@@ -51,7 +51,7 @@ void ActNpc160(NPCHAR *npc)
 
 			if (npc->flag & 8)
 			{
-				DeleteNpCharCode(161, 1);
+				DeleteNpCharCode(161, TRUE);
 
 				for (i = 0; i < 4; ++i)
 					SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, NULL, 0x100);
@@ -245,7 +245,7 @@ void ActNpc162(NPCHAR *npc)
 	switch (npc->act_no)
 	{
 		case 0:
-			DeleteNpCharCode(161, 1);
+			DeleteNpCharCode(161, TRUE);
 			PlaySoundObject(72, 1);
 
 			for (i = 0; i < 10; ++i)
@@ -315,7 +315,7 @@ void ActNpc162(NPCHAR *npc)
 			if (++npc->count1 < 60)
 				break;
 
-			DeleteNpCharCode(161, 1);
+			DeleteNpCharCode(161, TRUE);
 			npc->cond = 0;
 
 			break;

@@ -1314,8 +1314,8 @@ void ActNpc012(NPCHAR *npc)
 				npc->ani_no = 3;
 				npc->ym = -0x800;
 				npc->bits |= NPC_IGNORE_SOLIDITY;
-				DeleteNpCharCode(150, 0);
-				DeleteNpCharCode(117, 0);
+				DeleteNpCharCode(150, FALSE);
+				DeleteNpCharCode(117, FALSE);
 				SetNpChar(355, 0, 0, 0, 0, 0, npc, 0x100);
 				SetNpChar(355, 0, 0, 0, 0, 1, npc, 0x100);
 			}

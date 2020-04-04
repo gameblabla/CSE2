@@ -524,7 +524,7 @@ void ActBossChar_Twin(void)
 		case 1020:
 			if (++gBoss[0].act_wait > 50)
 			{
-				DeleteNpCharCode(211, 1);
+				DeleteNpCharCode(211, TRUE);
 				gBoss[0].cond = 0;
 				gBoss[1].cond = 0;
 				gBoss[2].cond = 0;

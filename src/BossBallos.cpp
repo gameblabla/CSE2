@@ -1,5 +1,7 @@
 #include "BossBallos.h"
 
+#include <stddef.h>
+
 #include "WindowsWrapper.h"
 
 #include "Boss.h"
@@ -469,7 +471,7 @@ void ActBossChar_Ballos(void)
 			npc->act_wait = 0;
 			npc->xm = 0;
 			npc->ym = 0;
-			DeleteNpCharCode(339, 0);
+			DeleteNpCharCode(339, FALSE);
 			// Fallthrough
 		case 401:
 			npc->y += ((159 * 0x200) - npc->y) / 8;
@@ -674,8 +676,8 @@ void ActBossChar_Ballos(void)
 				gBoss[4].cond = 0;
 				gBoss[5].cond = 0;
 
-				DeleteNpCharCode(350, 1);
-				DeleteNpCharCode(348, 1);
+				DeleteNpCharCode(350, TRUE);
+				DeleteNpCharCode(348, TRUE);
 			}
 
 			break;
