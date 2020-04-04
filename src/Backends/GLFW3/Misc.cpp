@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <thread>
 
 #include <GLFW/glfw3.h>
@@ -13,15 +14,31 @@
 #include "../../WindowsWrapper.h"
 
 #include "GLFW3.h"
-#include "../../KeyControl.h"
 #include "../../Main.h"
 #include "../../Organya.h"
 #include "../../Profile.h"
 #include "../../Resource.h"
 
+#define DO_KEY(GLFW_KEY, BACKEND_KEY) \
+	case GLFW_KEY: \
+		switch (action) \
+		{ \
+			case GLFW_PRESS: \
+				backend_keyboard_state[BACKEND_KEY] = TRUE; \
+				break; \
+ \
+			case GLFW_RELEASE: \
+				backend_keyboard_state[BACKEND_KEY] = FALSE; \
+				break; \
+		} \
+ \
+		break;
+
 GLFWwindow *window;
 
 BOOL bActive = TRUE;
+BOOL backend_keyboard_state[BACKEND_KEYBOARD_TOTAL];
+BOOL backend_previous_keyboard_state[BACKEND_KEYBOARD_TOTAL];
 
 static GLFWcursor* cursor;
 
@@ -33,171 +50,87 @@ static void KeyCallback(GLFWwindow *window, int key, int scancode, int action, i
 
 	switch (action)
 	{
+		case GLFW_RELEASE:
 		case GLFW_PRESS:
 			switch (key)
 			{
-				case GLFW_KEY_ESCAPE:
-					gKey |= KEY_ESCAPE;
-					break;
+				DO_KEY(GLFW_KEY_A, BACKEND_KEYBOARD_A)
+				DO_KEY(GLFW_KEY_B, BACKEND_KEYBOARD_B)
+				DO_KEY(GLFW_KEY_C, BACKEND_KEYBOARD_C)
+				DO_KEY(GLFW_KEY_D, BACKEND_KEYBOARD_D)
+				DO_KEY(GLFW_KEY_E, BACKEND_KEYBOARD_E)
+				DO_KEY(GLFW_KEY_F, BACKEND_KEYBOARD_F)
+				DO_KEY(GLFW_KEY_G, BACKEND_KEYBOARD_G)
+				DO_KEY(GLFW_KEY_H, BACKEND_KEYBOARD_H)
+				DO_KEY(GLFW_KEY_I, BACKEND_KEYBOARD_I)
+				DO_KEY(GLFW_KEY_J, BACKEND_KEYBOARD_J)
+				DO_KEY(GLFW_KEY_K, BACKEND_KEYBOARD_K)
+				DO_KEY(GLFW_KEY_L, BACKEND_KEYBOARD_L)
+				DO_KEY(GLFW_KEY_M, BACKEND_KEYBOARD_M)
+				DO_KEY(GLFW_KEY_N, BACKEND_KEYBOARD_N)
+				DO_KEY(GLFW_KEY_O, BACKEND_KEYBOARD_O)
+				DO_KEY(GLFW_KEY_P, BACKEND_KEYBOARD_P)
+				DO_KEY(GLFW_KEY_Q, BACKEND_KEYBOARD_Q)
+				DO_KEY(GLFW_KEY_R, BACKEND_KEYBOARD_R)
+				DO_KEY(GLFW_KEY_S, BACKEND_KEYBOARD_S)
+				DO_KEY(GLFW_KEY_T, BACKEND_KEYBOARD_T)
+				DO_KEY(GLFW_KEY_U, BACKEND_KEYBOARD_U)
+				DO_KEY(GLFW_KEY_V, BACKEND_KEYBOARD_V)
+				DO_KEY(GLFW_KEY_W, BACKEND_KEYBOARD_W)
+				DO_KEY(GLFW_KEY_X, BACKEND_KEYBOARD_X)
+				DO_KEY(GLFW_KEY_Y, BACKEND_KEYBOARD_Y)
+				DO_KEY(GLFW_KEY_Z, BACKEND_KEYBOARD_Z)
+				DO_KEY(GLFW_KEY_0, BACKEND_KEYBOARD_0)
+				DO_KEY(GLFW_KEY_1, BACKEND_KEYBOARD_1)
+				DO_KEY(GLFW_KEY_2, BACKEND_KEYBOARD_2)
+				DO_KEY(GLFW_KEY_3, BACKEND_KEYBOARD_3)
+				DO_KEY(GLFW_KEY_4, BACKEND_KEYBOARD_4)
+				DO_KEY(GLFW_KEY_5, BACKEND_KEYBOARD_5)
+				DO_KEY(GLFW_KEY_6, BACKEND_KEYBOARD_6)
+				DO_KEY(GLFW_KEY_7, BACKEND_KEYBOARD_7)
+				DO_KEY(GLFW_KEY_8, BACKEND_KEYBOARD_8)
+				DO_KEY(GLFW_KEY_9, BACKEND_KEYBOARD_9)
+				DO_KEY(GLFW_KEY_F1, BACKEND_KEYBOARD_F1)
+				DO_KEY(GLFW_KEY_F2, BACKEND_KEYBOARD_F2)
+				DO_KEY(GLFW_KEY_F3, BACKEND_KEYBOARD_F3)
+				DO_KEY(GLFW_KEY_F4, BACKEND_KEYBOARD_F4)
+				DO_KEY(GLFW_KEY_F5, BACKEND_KEYBOARD_F5)
+				DO_KEY(GLFW_KEY_F6, BACKEND_KEYBOARD_F6)
+				DO_KEY(GLFW_KEY_F7, BACKEND_KEYBOARD_F7)
+				DO_KEY(GLFW_KEY_F8, BACKEND_KEYBOARD_F8)
+				DO_KEY(GLFW_KEY_F9, BACKEND_KEYBOARD_F9)
+				DO_KEY(GLFW_KEY_F10, BACKEND_KEYBOARD_F10)
+				DO_KEY(GLFW_KEY_F11, BACKEND_KEYBOARD_F11)
+				DO_KEY(GLFW_KEY_F12, BACKEND_KEYBOARD_F12)
+				DO_KEY(GLFW_KEY_UP, BACKEND_KEYBOARD_UP)
+				DO_KEY(GLFW_KEY_DOWN, BACKEND_KEYBOARD_DOWN)
+				DO_KEY(GLFW_KEY_LEFT, BACKEND_KEYBOARD_LEFT)
+				DO_KEY(GLFW_KEY_RIGHT, BACKEND_KEYBOARD_RIGHT)
+				DO_KEY(GLFW_KEY_ESCAPE, BACKEND_KEYBOARD_ESCAPE)
+				DO_KEY(GLFW_KEY_GRAVE_ACCENT, BACKEND_KEYBOARD_BACK_QUOTE)
+				DO_KEY(GLFW_KEY_TAB, BACKEND_KEYBOARD_TAB)
+				DO_KEY(GLFW_KEY_CAPS_LOCK, BACKEND_KEYBOARD_CAPS_LOCK)
+				DO_KEY(GLFW_KEY_LEFT_SHIFT, BACKEND_KEYBOARD_LEFT_SHIFT)
+				DO_KEY(GLFW_KEY_LEFT_CONTROL, BACKEND_KEYBOARD_LEFT_CTRL)
+				DO_KEY(GLFW_KEY_LEFT_ALT, BACKEND_KEYBOARD_LEFT_ALT)
+				DO_KEY(GLFW_KEY_SPACE, BACKEND_KEYBOARD_SPACE)
+				DO_KEY(GLFW_KEY_RIGHT_ALT, BACKEND_KEYBOARD_RIGHT_ALT)
+				DO_KEY(GLFW_KEY_RIGHT_CONTROL, BACKEND_KEYBOARD_RIGHT_CTRL)
+				DO_KEY(GLFW_KEY_RIGHT_SHIFT, BACKEND_KEYBOARD_RIGHT_SHIFT)
+				DO_KEY(GLFW_KEY_ENTER, BACKEND_KEYBOARD_ENTER)
+				DO_KEY(GLFW_KEY_BACKSPACE, BACKEND_KEYBOARD_BACKSPACE)
+				DO_KEY(GLFW_KEY_MINUS, BACKEND_KEYBOARD_MINUS)
+				DO_KEY(GLFW_KEY_EQUAL, BACKEND_KEYBOARD_EQUALS)
+				DO_KEY(GLFW_KEY_LEFT_BRACKET, BACKEND_KEYBOARD_LEFT_BRACKET)
+				DO_KEY(GLFW_KEY_RIGHT_BRACKET, BACKEND_KEYBOARD_RIGHT_BRACKET)
+				DO_KEY(GLFW_KEY_BACKSLASH, BACKEND_KEYBOARD_BACK_SLASH)
+				DO_KEY(GLFW_KEY_SEMICOLON, BACKEND_KEYBOARD_SEMICOLON)
+				DO_KEY(GLFW_KEY_APOSTROPHE, BACKEND_KEYBOARD_APOSTROPHE)
+				DO_KEY(GLFW_KEY_COMMA, BACKEND_KEYBOARD_COMMA)
+				DO_KEY(GLFW_KEY_PERIOD, BACKEND_KEYBOARD_PERIOD)
+				DO_KEY(GLFW_KEY_SLASH, BACKEND_KEYBOARD_FORWARD_SLASH)
 
-				case GLFW_KEY_W:
-					gKey |= KEY_MAP;
-					break;
-
-				case GLFW_KEY_LEFT:
-					gKey |= KEY_LEFT;
-					break;
-
-				case GLFW_KEY_RIGHT:
-					gKey |= KEY_RIGHT;
-					break;
-
-				case GLFW_KEY_UP:
-					gKey |= KEY_UP;
-					break;
-
-				case GLFW_KEY_DOWN:
-					gKey |= KEY_DOWN;
-					break;
-
-				case GLFW_KEY_X:
-					gKey |= KEY_X;
-					break;
-
-				case GLFW_KEY_Z:
-					gKey |= KEY_Z;
-					break;
-
-				case GLFW_KEY_S:
-					gKey |= KEY_ARMS;
-					break;
-
-				case GLFW_KEY_A:
-					gKey |= KEY_ARMSREV;
-					break;
-
-				case GLFW_KEY_LEFT_SHIFT:
-				case GLFW_KEY_RIGHT_SHIFT:
-					gKey |= KEY_SHIFT;
-					break;
-
-				case GLFW_KEY_F1:
-					gKey |= KEY_F1;
-					break;
-
-				case GLFW_KEY_F2:
-					gKey |= KEY_F2;
-					break;
-
-				case GLFW_KEY_Q:
-					gKey |= KEY_ITEM;
-					break;
-
-				case GLFW_KEY_COMMA:
-					gKey |= KEY_ALT_LEFT;
-					break;
-
-				case GLFW_KEY_PERIOD:
-					gKey |= KEY_ALT_DOWN;
-					break;
-
-				case GLFW_KEY_SLASH:
-					gKey |= KEY_ALT_RIGHT;
-					break;
-
-				case GLFW_KEY_L:
-					gKey |= KEY_L;
-					break;
-
-				case GLFW_KEY_EQUAL:
-					gKey |= KEY_PLUS;
-					break;
-
-				case GLFW_KEY_F5:
-					gbUseJoystick = FALSE;
-					break;
-			}
-
-			break;
-
-		case GLFW_RELEASE:
-			switch (key)
-			{
-				case GLFW_KEY_ESCAPE:
-					gKey &= ~KEY_ESCAPE;
-					break;
-
-				case GLFW_KEY_W:
-					gKey &= ~KEY_MAP;
-					break;
-
-				case GLFW_KEY_LEFT:
-					gKey &= ~KEY_LEFT;
-					break;
-
-				case GLFW_KEY_RIGHT:
-					gKey &= ~KEY_RIGHT;
-					break;
-
-				case GLFW_KEY_UP:
-					gKey &= ~KEY_UP;
-					break;
-
-				case GLFW_KEY_DOWN:
-					gKey &= ~KEY_DOWN;
-					break;
-
-				case GLFW_KEY_X:
-					gKey &= ~KEY_X;
-					break;
-
-				case GLFW_KEY_Z:
-					gKey &= ~KEY_Z;
-					break;
-
-				case GLFW_KEY_S:
-					gKey &= ~KEY_ARMS;
-					break;
-
-				case GLFW_KEY_A:
-					gKey &= ~KEY_ARMSREV;
-					break;
-
-				case GLFW_KEY_LEFT_SHIFT:
-				case GLFW_KEY_RIGHT_SHIFT:
-					gKey &= ~KEY_SHIFT;
-					break;
-
-				case GLFW_KEY_F1:
-					gKey &= ~KEY_F1;
-					break;
-
-				case GLFW_KEY_F2:
-					gKey &= ~KEY_F2;
-					break;
-
-				case GLFW_KEY_Q:
-					gKey &= ~KEY_ITEM;
-					break;
-
-				case GLFW_KEY_COMMA:
-					gKey &= ~KEY_ALT_LEFT;
-					break;
-
-				case GLFW_KEY_PERIOD:
-					gKey &= ~KEY_ALT_DOWN;
-					break;
-
-				case GLFW_KEY_SLASH:
-					gKey &= ~KEY_ALT_RIGHT;
-					break;
-
-				case GLFW_KEY_L:
-					gKey &= ~KEY_L;
-					break;
-
-				case GLFW_KEY_EQUAL:
-					gKey &= ~KEY_PLUS;
+				default:
 					break;
 			}
 
@@ -343,6 +276,8 @@ BOOL PlatformBackend_SystemTask(void)
 		StopOrganyaMusic();
 		return FALSE;
 	}
+
+	memcpy(backend_previous_keyboard_state, backend_keyboard_state, sizeof(backend_keyboard_state));
 
 	glfwPollEvents();
 

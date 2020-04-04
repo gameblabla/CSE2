@@ -382,6 +382,178 @@ BOOL SystemTask(void)
 	if (!PlatformBackend_SystemTask())
 		return FALSE;
 
+	for (unsigned int i = 0; i < BACKEND_KEYBOARD_TOTAL; ++i)
+	{
+		if ((backend_keyboard_state[i] ^ backend_previous_keyboard_state[i]) & backend_keyboard_state[i])
+		{
+			switch (i)
+			{
+				case BACKEND_KEYBOARD_ESCAPE:
+					gKey |= KEY_ESCAPE;
+					break;
+
+				case BACKEND_KEYBOARD_W:
+					gKey |= KEY_MAP;
+					break;
+
+				case BACKEND_KEYBOARD_LEFT:
+					gKey |= KEY_LEFT;
+					break;
+
+				case BACKEND_KEYBOARD_RIGHT:
+					gKey |= KEY_RIGHT;
+					break;
+
+				case BACKEND_KEYBOARD_UP:
+					gKey |= KEY_UP;
+					break;
+
+				case BACKEND_KEYBOARD_DOWN:
+					gKey |= KEY_DOWN;
+					break;
+
+				case BACKEND_KEYBOARD_X:
+					gKey |= KEY_X;
+					break;
+
+				case BACKEND_KEYBOARD_Z:
+					gKey |= KEY_Z;
+					break;
+
+				case BACKEND_KEYBOARD_S:
+					gKey |= KEY_ARMS;
+					break;
+
+				case BACKEND_KEYBOARD_A:
+					gKey |= KEY_ARMSREV;
+					break;
+
+				case BACKEND_KEYBOARD_LEFT_SHIFT:
+				case BACKEND_KEYBOARD_RIGHT_SHIFT:
+					gKey |= KEY_SHIFT;
+					break;
+
+				case BACKEND_KEYBOARD_F1:
+					gKey |= KEY_F1;
+					break;
+
+				case BACKEND_KEYBOARD_F2:
+					gKey |= KEY_F2;
+					break;
+
+				case BACKEND_KEYBOARD_Q:
+					gKey |= KEY_ITEM;
+					break;
+
+				case BACKEND_KEYBOARD_COMMA:
+					gKey |= KEY_ALT_LEFT;
+					break;
+
+				case BACKEND_KEYBOARD_PERIOD:
+					gKey |= KEY_ALT_DOWN;
+					break;
+
+				case BACKEND_KEYBOARD_FORWARD_SLASH:
+					gKey |= KEY_ALT_RIGHT;
+					break;
+
+				case BACKEND_KEYBOARD_L:
+					gKey |= KEY_L;
+					break;
+
+				case BACKEND_KEYBOARD_EQUALS:
+					gKey |= KEY_PLUS;
+					break;
+
+				case BACKEND_KEYBOARD_F5:
+					gbUseJoystick = FALSE;
+					break;
+			}
+		}
+		else if ((backend_keyboard_state[i] ^ backend_previous_keyboard_state[i]) & backend_previous_keyboard_state[i])
+		{
+			switch (i)
+			{
+				case BACKEND_KEYBOARD_ESCAPE:
+					gKey &= ~KEY_ESCAPE;
+					break;
+
+				case BACKEND_KEYBOARD_W:
+					gKey &= ~KEY_MAP;
+					break;
+
+				case BACKEND_KEYBOARD_LEFT:
+					gKey &= ~KEY_LEFT;
+					break;
+
+				case BACKEND_KEYBOARD_RIGHT:
+					gKey &= ~KEY_RIGHT;
+					break;
+
+				case BACKEND_KEYBOARD_UP:
+					gKey &= ~KEY_UP;
+					break;
+
+				case BACKEND_KEYBOARD_DOWN:
+					gKey &= ~KEY_DOWN;
+					break;
+
+				case BACKEND_KEYBOARD_X:
+					gKey &= ~KEY_X;
+					break;
+
+				case BACKEND_KEYBOARD_Z:
+					gKey &= ~KEY_Z;
+					break;
+
+				case BACKEND_KEYBOARD_S:
+					gKey &= ~KEY_ARMS;
+					break;
+
+				case BACKEND_KEYBOARD_A:
+					gKey &= ~KEY_ARMSREV;
+					break;
+
+				case BACKEND_KEYBOARD_LEFT_SHIFT:
+				case BACKEND_KEYBOARD_RIGHT_SHIFT:
+					gKey &= ~KEY_SHIFT;
+					break;
+
+				case BACKEND_KEYBOARD_F1:
+					gKey &= ~KEY_F1;
+					break;
+
+				case BACKEND_KEYBOARD_F2:
+					gKey &= ~KEY_F2;
+					break;
+
+				case BACKEND_KEYBOARD_Q:
+					gKey &= ~KEY_ITEM;
+					break;
+
+				case BACKEND_KEYBOARD_COMMA:
+					gKey &= ~KEY_ALT_LEFT;
+					break;
+
+				case BACKEND_KEYBOARD_PERIOD:
+					gKey &= ~KEY_ALT_DOWN;
+					break;
+
+				case BACKEND_KEYBOARD_FORWARD_SLASH:
+					gKey &= ~KEY_ALT_RIGHT;
+					break;
+
+				case BACKEND_KEYBOARD_L:
+					gKey &= ~KEY_L;
+					break;
+
+				case BACKEND_KEYBOARD_EQUALS:
+					gKey &= ~KEY_PLUS;
+					break;
+			}
+		}
+	}
+
 	// Run joystick code
 	if (gbUseJoystick)
 		JoystickProc();
