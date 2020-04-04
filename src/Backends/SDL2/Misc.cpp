@@ -1,4 +1,5 @@
 #include "../Platform.h"
+#include "Platform.h"
 
 #include <stddef.h>
 #include <stdio.h>
@@ -6,11 +7,10 @@
 
 #include "SDL.h"
 
-#include "../Rendering.h"
-
 #include "../../WindowsWrapper.h"
 
-#include "Platform.h"
+#include "Controller.h"
+#include "../Rendering.h"
 #include "../../Main.h"
 #include "../../Organya.h"
 #include "../../Profile.h"
@@ -194,6 +194,14 @@ BOOL PlatformBackend_SystemTask(void)
 						break;
 				}
 
+				break;
+
+			case SDL_JOYDEVICEADDED:
+				ControllerBackend_JoystickConnect(event.jdevice.which);
+				break;
+
+			case SDL_JOYDEVICEREMOVED:
+				ControllerBackend_JoystickDisconnect(event.jdevice.which);
 				break;
 
 			case SDL_DROPFILE:

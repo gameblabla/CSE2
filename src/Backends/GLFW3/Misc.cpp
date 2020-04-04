@@ -1,4 +1,5 @@
 #include "../Platform.h"
+#include "Platform.h"
 
 #include <chrono>
 #include <stddef.h>
@@ -9,11 +10,9 @@
 
 #include <GLFW/glfw3.h>
 
-#include "../Rendering.h"
-
 #include "../../WindowsWrapper.h"
 
-#include "Platform.h"
+#include "../Rendering.h"
 #include "../../Main.h"
 #include "../../Organya.h"
 #include "../../Profile.h"
