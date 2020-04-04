@@ -102,11 +102,11 @@ BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
 	int total_hats;
 	const unsigned char *hats = glfwGetJoystickHats(connected_joystick_id, &total_hats);
 
-	// Handle direction inputs
-	status->bLeft = axes[0] < -DEADZONE;
-	status->bRight = axes[0] > DEADZONE;
-	status->bUp = axes[1] < -DEADZONE;
-	status->bDown = axes[1] > DEADZONE;
+	// Handle directional inputs
+	status->bLeft = axes[0] < axis_neutrals[0] - DEADZONE;
+	status->bRight = axes[0] > axis_neutrals[0] + DEADZONE;
+	status->bUp = axes[1] < axis_neutrals[1] - DEADZONE;
+	status->bDown = axes[1] > axis_neutrals[1] + DEADZONE;
 
 	// Handle button inputs
 	unsigned int buttons_done = 0;
