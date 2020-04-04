@@ -35,6 +35,7 @@ endif
 
 ALL_CXXFLAGS += -std=c++98 -MMD -MP -MF $@.d
 ALL_LIBS += -lkernel32 -lgdi32 -lddraw -ldinput -ldsound -lversion -lshlwapi -limm32 -lwinmm -ldxguid
+ALL_LDFLAGS += -mwindows
 
 ifeq ($(STATIC), 1)
   ALL_LDFLAGS += -static
