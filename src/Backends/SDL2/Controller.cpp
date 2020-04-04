@@ -11,8 +11,6 @@
 #define DEADZONE 10000;
 
 static SDL_Joystick *joystick;
-static int joystick_neutral_x;
-static int joystick_neutral_y;
 
 BOOL ControllerBackend_Init(void)
 {
@@ -43,10 +41,10 @@ BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
 	const Sint16 joystick_x = SDL_JoystickGetAxis(joystick, 0);
 	const Sint16 joystick_y = SDL_JoystickGetAxis(joystick, 1);
 
-	status->bLeft = joystick_x < joystick_neutral_x - DEADZONE;
-	status->bRight = joystick_x > joystick_neutral_x + DEADZONE;
-	status->bUp = joystick_y < joystick_neutral_y - DEADZONE;
-	status->bDown = joystick_y > joystick_neutral_y + DEADZONE;
+	status->bLeft = joystick_x < -DEADZONE;
+	status->bRight = joystick_x > DEADZONE;
+	status->bUp = joystick_y < -DEADZONE;
+	status->bDown = joystick_y > DEADZONE;
 
 	int total_buttons = SDL_JoystickNumButtons(joystick);
 	int total_axes = SDL_JoystickNumAxes(joystick);
@@ -134,8 +132,6 @@ BOOL ControllerBackend_ResetJoystickStatus(void)
 	if (joystick == NULL)
 		return FALSE;
 
-	// The code that would normally run here has been moved to JoystickCallback, to better-support hotplugging
-
 	return TRUE;
 }
 
@@ -148,13 +144,7 @@ void ControllerBackend_JoystickConnect(Sint32 joystick_id)
 		joystick = SDL_JoystickOpen(joystick_id);
 
 		if (joystick != NULL)
-		{
 			printf("Joystick #%d selected\n", joystick_id);
-
-			// Reset default stick positions (this is performed in ResetJoystickStatus in vanilla Cave Story
-			joystick_neutral_x = SDL_JoystickGetAxis(joystick, 0);
-			joystick_neutral_y = SDL_JoystickGetAxis(joystick, 1);
-		}
 	}
 }
 
