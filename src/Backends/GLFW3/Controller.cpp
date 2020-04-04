@@ -25,10 +25,10 @@ static void JoystickCallback(int joystick_id, int event)
 
 			if (!joystick_connected)
 			{
-				int total_axis;
-				const float *axis = glfwGetJoystickAxes(joystick_id, &total_axis);
+				int total_axes;
+				const float *axes = glfwGetJoystickAxes(joystick_id, &total_axes);
 
-				if (total_axis >= 2)
+				if (total_axes >= 2)
 				{
 #if GLFW_VERSION_MAJOR > 3 || (GLFW_VERSION_MAJOR == 3 && GLFW_VERSION_MINOR >= 3)
 					if (glfwJoystickIsGamepad(joystick_id) == GLFW_TRUE)	// Avoid selecting things like laptop touchpads
@@ -39,9 +39,6 @@ static void JoystickCallback(int joystick_id, int event)
 						connected_joystick_id = joystick_id;
 
 						// Set up neutral axes
-						int total_axes;
-						const float *axes = glfwGetJoystickAxes(connected_joystick_id, &total_axes);
-
 						axis_neutrals = (float*)malloc(sizeof(float) * total_axes);
 
 						for (int i = 0; i < total_axes; ++i)
@@ -104,13 +101,13 @@ BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
 	const unsigned char *hats = glfwGetJoystickHats(connected_joystick_id, &total_hats);
 
 	// Handle direction inputs
-	if (axes >= 1)
+	if (total_axes >= 1)
 	{
 		status->bLeft = axes[0] < -DEADZONE;
 		status->bRight = axes[0] > DEADZONE;
 	}
 
-	if (axes >= 2)
+	if (total_axes >= 2)
 	{
 		status->bUp = axes[1] < -DEADZONE;
 		status->bDown = axes[1] > DEADZONE;
