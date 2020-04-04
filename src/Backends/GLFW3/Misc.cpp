@@ -21,17 +21,7 @@
 
 #define DO_KEY(GLFW_KEY, BACKEND_KEY) \
 	case GLFW_KEY: \
-		switch (action) \
-		{ \
-			case GLFW_PRESS: \
-				backend_keyboard_state[BACKEND_KEY] = TRUE; \
-				break; \
- \
-			case GLFW_RELEASE: \
-				backend_keyboard_state[BACKEND_KEY] = FALSE; \
-				break; \
-		} \
- \
+		backend_keyboard_state[BACKEND_KEY] = action == GLFW_PRESS; \
 		break;
 
 GLFWwindow *window;
