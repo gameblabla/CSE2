@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
@@ -12,6 +13,8 @@
 
 static BOOL joystick_connected;
 static int connected_joystick_id;
+
+static float *axis_neutrals;
 
 static void JoystickCallback(int joystick_id, int event)
 {
@@ -34,6 +37,15 @@ static void JoystickCallback(int joystick_id, int event)
 						printf("Joystick #%d selected\n", joystick_id);
 						joystick_connected = TRUE;
 						connected_joystick_id = joystick_id;
+
+						// Set up neutral axes
+						int total_axes;
+						const float *axes = glfwGetJoystickAxes(connected_joystick_id, &total_axes);
+
+						axis_neutrals = (float*)malloc(sizeof(float) * total_axes);
+
+						for (int i = 0; i < total_axes; ++i)
+							axis_neutrals[i] = axes[i];
 					}
 				}
 			}
@@ -45,6 +57,8 @@ static void JoystickCallback(int joystick_id, int event)
 			{
 				printf("Joystick #%d disconnected\n", connected_joystick_id);
 				joystick_connected = FALSE;
+
+				free(axis_neutrals);
 			}
 
 			break;
@@ -89,14 +103,23 @@ BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
 	int total_hats;
 	const unsigned char *hats = glfwGetJoystickHats(connected_joystick_id, &total_hats);
 
-	status->bLeft = axes[0] < -DEADZONE;
-	status->bRight = axes[0] > DEADZONE;
-	status->bUp = axes[1] < -DEADZONE;
-	status->bDown = axes[1] > DEADZONE;
+	// Handle direction inputs
+	if (axes >= 1)
+	{
+		status->bLeft = axes[0] < -DEADZONE;
+		status->bRight = axes[0] > DEADZONE;
+	}
 
+	if (axes >= 2)
+	{
+		status->bUp = axes[1] < -DEADZONE;
+		status->bDown = axes[1] > DEADZONE;
+	}
 
+	// Handle button inputs
 	unsigned int buttons_done = 0;
 
+	// Start with the joystick buttons
 	for (int i = 0; i < total_buttons; ++i)
 	{
 		status->bButton[buttons_done] = buttons[i] == GLFW_PRESS;
@@ -105,20 +128,21 @@ BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
 			break;
 	}
 
+	// Then the joystick axes
 	for (int i = 0; i < total_axes; ++i)
 	{
-		status->bButton[buttons_done] = axes[i] < -DEADZONE;
-		printf("\n%d %d\n", buttons_done, button_limit);
+		status->bButton[buttons_done] = axes[i] < axis_neutrals[i] - DEADZONE;
+
 		if (++buttons_done >= button_limit)
 			break;
 
-		status->bButton[buttons_done] = axes[i] > DEADZONE;
-		printf("%d\n", buttons_done);
+		status->bButton[buttons_done] = axes[i] > axis_neutrals[i] + DEADZONE;
 
 		if (++buttons_done >= button_limit)
 			break;
 	}
 
+	// Then the joystick hats
 	for (int i = 0; i < total_axes; ++i)
 	{
 		status->bButton[buttons_done] = hats[i] == GLFW_HAT_UP;
@@ -142,7 +166,7 @@ BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
 			break;
 	}
 
-	// Blank the buttons that do not
+	// Blank any remaining buttons
 	for (size_t i = buttons_done; i < button_limit; ++i)
 		status->bButton[i] = FALSE;
 
