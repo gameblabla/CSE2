@@ -84,6 +84,9 @@ void ControllerBackend_Deinit(void)
 
 	joystick_connected = FALSE;
 	connected_joystick_id = 0;
+
+	free(axis_neutrals);
+	axis_neutrals = NULL;
 }
 
 BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
