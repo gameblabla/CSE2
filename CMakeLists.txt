@@ -168,7 +168,7 @@ add_executable(CSE2 WIN32
 	"src/WindowsWrapper.h"
 	"src/Backends/Audio.h"
 	"src/Backends/Controller.h"
-	"src/Backends/Platform.h"
+	"src/Backends/Misc.h"
 	"src/Backends/Rendering.h"
 )
 
@@ -337,14 +337,14 @@ if(BACKEND_PLATFORM MATCHES "SDL2")
 	target_sources(CSE2 PRIVATE
 		"src/Backends/SDL2/Controller.cpp"
 		"src/Backends/SDL2/Controller.h"
-		"src/Backends/SDL2/Platform.cpp"
-		"src/Backends/SDL2/Platform.h"
+		"src/Backends/SDL2/Misc.cpp"
+		"src/Backends/SDL2/Misc.h"
 	)
 elseif(BACKEND_PLATFORM MATCHES "GLFW3")
 	target_sources(CSE2 PRIVATE
 		"src/Backends/GLFW3/Controller.cpp"
-		"src/Backends/GLFW3/Platform.cpp"
-		"src/Backends/GLFW3/Platform.h"
+		"src/Backends/GLFW3/Misc.cpp"
+		"src/Backends/GLFW3/Misc.h"
 	)
 endif()
 

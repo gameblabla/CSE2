@@ -8,8 +8,8 @@
 
 #include "../../WindowsWrapper.h"
 
-#include "../Platform.h"
-#include "../SDL2/Platform.h"
+#include "../Misc.h"
+#include "../SDL2/Misc.h"
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -56,20 +56,20 @@ Backend_Surface* RenderBackend_Init(const char *window_title, int screen_width, 
 			framebuffer.height = framebuffer_sdlsurface->h;
 			framebuffer.pitch = framebuffer_sdlsurface->pitch;
 
-			PlatformBackend_PostWindowCreation();
+			Backend_PostWindowCreation();
 
 			return &framebuffer;
 		}
 		else
 		{
-			PlatformBackend_ShowMessageBox("Fatal error (software rendering backend)", "Could not create framebuffer surface");
+			Backend_ShowMessageBox("Fatal error (software rendering backend)", "Could not create framebuffer surface");
 		}
 
 		SDL_DestroyWindow(window);
 	}
 	else
 	{
-		PlatformBackend_ShowMessageBox("Fatal error (software rendering backend)", "Could not create window");
+		Backend_ShowMessageBox("Fatal error (software rendering backend)", "Could not create window");
 	}
 
 	return NULL;

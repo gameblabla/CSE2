@@ -12,8 +12,8 @@
 
 #include "../../WindowsWrapper.h"
 
-#include "../Platform.h"
-#include "../SDL2/Platform.h"
+#include "../Misc.h"
+#include "../SDL2/Misc.h"
 #include "../../Draw.h"
 #include "../../Ending.h"
 #include "../../MapName.h"
@@ -165,7 +165,7 @@ Backend_Surface* RenderBackend_Init(const char *window_title, int screen_width, 
 				config.delete_texture_callback = GlyphBatch_DestroyTexture;
 				spritebatch_init(&glyph_batcher, &config, NULL);
 
-				PlatformBackend_PostWindowCreation();
+				Backend_PostWindowCreation();
 
 				return &framebuffer;
 			}

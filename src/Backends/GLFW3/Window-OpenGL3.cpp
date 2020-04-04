@@ -12,8 +12,8 @@
 
 #include "../../WindowsWrapper.h"
 
-#include "../Platform.h"
-#include "Platform.h"
+#include "../Misc.h"
+#include "Misc.h"
 
 BOOL WindowBackend_OpenGL_CreateWindow(const char *window_title, int *screen_width, int *screen_height, BOOL fullscreen)
 {
@@ -57,19 +57,19 @@ BOOL WindowBackend_OpenGL_CreateWindow(const char *window_title, int *screen_wid
 					if (GLAD_GL_VERSION_3_2)
 					{
 			#endif
-						PlatformBackend_PostWindowCreation();
+						Backend_PostWindowCreation();
 
 						return TRUE;
 			#ifndef USE_OPENGLES2
 					}
 					else
 					{
-						PlatformBackend_ShowMessageBox("Fatal error (OpenGL rendering backend)", "Your system does not support OpenGL 3.2");
+						Backend_ShowMessageBox("Fatal error (OpenGL rendering backend)", "Your system does not support OpenGL 3.2");
 					}
 				}
 				else
 				{
-					PlatformBackend_ShowMessageBox("Fatal error (OpenGL rendering backend)", "Could not load OpenGL functions");
+					Backend_ShowMessageBox("Fatal error (OpenGL rendering backend)", "Could not load OpenGL functions");
 				}
 			#endif
 
@@ -77,7 +77,7 @@ BOOL WindowBackend_OpenGL_CreateWindow(const char *window_title, int *screen_wid
 	}
 	else
 	{
-		PlatformBackend_ShowMessageBox("Fatal error (OpenGL rendering backend)", "Could not create window");
+		Backend_ShowMessageBox("Fatal error (OpenGL rendering backend)", "Could not create window");
 	}
 
 	return FALSE;

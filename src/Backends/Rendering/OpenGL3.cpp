@@ -18,7 +18,7 @@
 
 #include "../../WindowsWrapper.h"
 
-#include "../Platform.h"
+#include "../Misc.h"
 #include "../Window-OpenGL.h"
 #include "../../Resource.h"
 
@@ -275,7 +275,7 @@ static GLuint CompileShader(const char *vertex_shader_source, const char *fragme
 	{
 		char buffer[0x200];
 		glGetShaderInfoLog(vertex_shader, sizeof(buffer), NULL, buffer);
-		PlatformBackend_ShowMessageBox("Vertex shader error", buffer);
+		Backend_ShowMessageBox("Vertex shader error", buffer);
 		return 0;
 	}
 
@@ -291,7 +291,7 @@ static GLuint CompileShader(const char *vertex_shader_source, const char *fragme
 	{
 		char buffer[0x200];
 		glGetShaderInfoLog(fragment_shader, sizeof(buffer), NULL, buffer);
-		PlatformBackend_ShowMessageBox("Fragment shader error", buffer);
+		Backend_ShowMessageBox("Fragment shader error", buffer);
 		return 0;
 	}
 
@@ -308,7 +308,7 @@ static GLuint CompileShader(const char *vertex_shader_source, const char *fragme
 	{
 		char buffer[0x200];
 		glGetProgramInfoLog(program_id, sizeof(buffer), NULL, buffer);
-		PlatformBackend_ShowMessageBox("Shader linker error", buffer);
+		Backend_ShowMessageBox("Shader linker error", buffer);
 		return 0;
 	}
 

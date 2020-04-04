@@ -1,5 +1,5 @@
-#include "../Platform.h"
-#include "Platform.h"
+#include "../Misc.h"
+#include "Misc.h"
 
 #include <chrono>
 #include <stddef.h>
@@ -152,12 +152,12 @@ static void DragAndDropCallback(GLFWwindow *window, int count, const char **path
 	LoadProfile(paths[0]);
 }
 
-void PlatformBackend_Init(void)
+void Backend_Init(void)
 {
 	glfwInit();
 }
 
-void PlatformBackend_Deinit(void)
+void Backend_Deinit(void)
 {
 	if (cursor != NULL)
 		glfwDestroyCursor(cursor);
@@ -165,7 +165,7 @@ void PlatformBackend_Deinit(void)
 	glfwTerminate();
 }
 
-void PlatformBackend_PostWindowCreation(void)
+void Backend_PostWindowCreation(void)
 {
 	// Hook callbacks
 	glfwSetKeyCallback(window, KeyCallback);
@@ -173,7 +173,7 @@ void PlatformBackend_PostWindowCreation(void)
 	glfwSetWindowSizeCallback(window, WindowSizeCallback);
 }
 
-BOOL PlatformBackend_GetBasePath(char *string_buffer)
+BOOL Backend_GetBasePath(char *string_buffer)
 {
 	(void)string_buffer;
 
@@ -181,12 +181,12 @@ BOOL PlatformBackend_GetBasePath(char *string_buffer)
 	return FALSE;
 }
 
-void PlatformBackend_HideMouse(void)
+void Backend_HideMouse(void)
 {
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 }
 
-void PlatformBackend_SetWindowIcon(const unsigned char *rgb_pixels, unsigned int width, unsigned int height)
+void Backend_SetWindowIcon(const unsigned char *rgb_pixels, unsigned int width, unsigned int height)
 {
 	// Convert to RGBA, since that's the only think GLFW3 accepts
 	unsigned char *rgba_pixels = (unsigned char*)malloc(width * height * 4);
@@ -214,7 +214,7 @@ void PlatformBackend_SetWindowIcon(const unsigned char *rgb_pixels, unsigned int
 	}
 }
 
-void PlatformBackend_SetCursor(const unsigned char *rgb_pixels, unsigned int width, unsigned int height)
+void Backend_SetCursor(const unsigned char *rgb_pixels, unsigned int width, unsigned int height)
 {
 	// Convert to RGBA, since that's the only think GLFW3 accepts
 	unsigned char *rgba_pixels = (unsigned char*)malloc(width * height * 4);
@@ -258,7 +258,7 @@ void PlaybackBackend_EnableDragAndDrop(void)
 	glfwSetDropCallback(window, DragAndDropCallback);
 }
 
-BOOL PlatformBackend_SystemTask(void)
+BOOL Backend_SystemTask(void)
 {
 	if (glfwWindowShouldClose(window))
 	{
@@ -276,18 +276,18 @@ BOOL PlatformBackend_SystemTask(void)
 	return TRUE;
 }
 
-void PlatformBackend_ShowMessageBox(const char *title, const char *message)
+void Backend_ShowMessageBox(const char *title, const char *message)
 {
 	// GLFW3 doesn't have a message box
 	printf("ShowMessageBox - '%s' - '%s'\n", title, message);
 }
 
-unsigned long PlatformBackend_GetTicks(void)
+unsigned long Backend_GetTicks(void)
 {
 	return (unsigned long)(glfwGetTime() * 1000.0);
 }
 
-void PlatformBackend_Delay(unsigned int ticks)
+void Backend_Delay(unsigned int ticks)
 {
 	// GLFW3 doesn't have a delay function, so here's some butt-ugly C++11
 	std::this_thread::sleep_for(std::chrono::milliseconds(ticks));

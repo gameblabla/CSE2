@@ -1,5 +1,5 @@
-#include "../Platform.h"
-#include "Platform.h"
+#include "../Misc.h"
+#include "Misc.h"
 
 #include <stddef.h>
 #include <stdio.h>
@@ -30,7 +30,7 @@ BOOL backend_previous_keyboard_state[BACKEND_KEYBOARD_TOTAL];
 static SDL_Surface *cursor_surface;
 static SDL_Cursor *cursor;
 
-void PlatformBackend_Init(void)
+void Backend_Init(void)
 {
 	SDL_Init(SDL_INIT_EVENTS);
 
@@ -44,7 +44,7 @@ void PlatformBackend_Init(void)
 	printf("Selected SDL2 video driver: %s\n", SDL_GetCurrentVideoDriver());
 }
 
-void PlatformBackend_Deinit(void)
+void Backend_Deinit(void)
 {
 	if (cursor != NULL)
 		SDL_FreeCursor(cursor);
@@ -55,12 +55,12 @@ void PlatformBackend_Deinit(void)
 	SDL_Quit();
 }
 
-void PlatformBackend_PostWindowCreation(void)
+void Backend_PostWindowCreation(void)
 {
 	
 }
 
-BOOL PlatformBackend_GetBasePath(char *string_buffer)
+BOOL Backend_GetBasePath(char *string_buffer)
 {
 	char *base_path = SDL_GetBasePath();
 	// Trim the trailing '/'
@@ -72,19 +72,19 @@ BOOL PlatformBackend_GetBasePath(char *string_buffer)
 	return TRUE;
 }
 
-void PlatformBackend_HideMouse(void)
+void Backend_HideMouse(void)
 {
 	SDL_ShowCursor(SDL_DISABLE);
 }
 
-void PlatformBackend_SetWindowIcon(const unsigned char *rgb_pixels, unsigned int width, unsigned int height)
+void Backend_SetWindowIcon(const unsigned char *rgb_pixels, unsigned int width, unsigned int height)
 {
 	SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormatFrom((void*)rgb_pixels, width, height, 0, width * 3, SDL_PIXELFORMAT_RGB24);
 	SDL_SetWindowIcon(window, surface);
 	SDL_FreeSurface(surface);
 }
 
-void PlatformBackend_SetCursor(const unsigned char *rgb_pixels, unsigned int width, unsigned int height)
+void Backend_SetCursor(const unsigned char *rgb_pixels, unsigned int width, unsigned int height)
 {
 	cursor_surface = SDL_CreateRGBSurfaceWithFormatFrom((void*)rgb_pixels, width, height, 0, width * 3, SDL_PIXELFORMAT_RGB24);
 	SDL_SetColorKey(cursor_surface, SDL_TRUE, SDL_MapRGB(cursor_surface->format, 0xFF, 0, 0xFF));
@@ -97,7 +97,7 @@ void PlaybackBackend_EnableDragAndDrop(void)
 	SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
 }
 
-BOOL PlatformBackend_SystemTask(void)
+BOOL Backend_SystemTask(void)
 {
 	memcpy(backend_previous_keyboard_state, backend_keyboard_state, sizeof(backend_keyboard_state));
 
@@ -242,17 +242,17 @@ BOOL PlatformBackend_SystemTask(void)
 	return TRUE;
 }
 
-void PlatformBackend_ShowMessageBox(const char *title, const char *message)
+void Backend_ShowMessageBox(const char *title, const char *message)
 {
 	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, message, window);
 }
 
-unsigned long PlatformBackend_GetTicks(void)
+unsigned long Backend_GetTicks(void)
 {
 	return SDL_GetTicks();
 }
 
-void PlatformBackend_Delay(unsigned int ticks)
+void Backend_Delay(unsigned int ticks)
 {
 	SDL_Delay(ticks);
 }

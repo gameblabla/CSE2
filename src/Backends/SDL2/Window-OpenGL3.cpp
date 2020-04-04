@@ -11,8 +11,8 @@
 
 #include "../../WindowsWrapper.h"
 
-#include "../Platform.h"
-#include "Platform.h"
+#include "../Misc.h"
+#include "Misc.h"
 #include "../../Resource.h"
 
 static SDL_GLContext context;
@@ -48,39 +48,39 @@ BOOL WindowBackend_OpenGL_CreateWindow(const char *window_title, int *screen_wid
 					if (GLAD_GL_VERSION_3_2)
 					{
 			#endif
-						PlatformBackend_PostWindowCreation();
+						Backend_PostWindowCreation();
 
 						return TRUE;
 			#ifndef USE_OPENGLES2
 					}
 					else
 					{
-						PlatformBackend_ShowMessageBox("Fatal error (OpenGL rendering backend)", "Your system does not support OpenGL 3.2");
+						Backend_ShowMessageBox("Fatal error (OpenGL rendering backend)", "Your system does not support OpenGL 3.2");
 					}
 				}
 				else
 				{
-					PlatformBackend_ShowMessageBox("Fatal error (OpenGL rendering backend)", "Could not load OpenGL functions");
+					Backend_ShowMessageBox("Fatal error (OpenGL rendering backend)", "Could not load OpenGL functions");
 				}
 			#endif
 			}
 			else
 			{
-				PlatformBackend_ShowMessageBox("Fatal error (OpenGL rendering backend)", "SDL_GL_MakeCurrent failed");
+				Backend_ShowMessageBox("Fatal error (OpenGL rendering backend)", "SDL_GL_MakeCurrent failed");
 			}
 
 			SDL_GL_DeleteContext(context);
 		}
 		else
 		{
-			PlatformBackend_ShowMessageBox("Fatal error (OpenGL rendering backend)", "Could not create OpenGL context");
+			Backend_ShowMessageBox("Fatal error (OpenGL rendering backend)", "Could not create OpenGL context");
 		}
 
 		SDL_DestroyWindow(window);
 	}
 	else
 	{
-		PlatformBackend_ShowMessageBox("Fatal error (OpenGL rendering backend)", "Could not create window");
+		Backend_ShowMessageBox("Fatal error (OpenGL rendering backend)", "Could not create window");
 	}
 
 	return FALSE;

@@ -6,7 +6,7 @@
 
 #include "WindowsWrapper.h"
 
-#include "Backends/Platform.h"
+#include "Backends/Misc.h"
 #include "ArmsItem.h"
 #include "BossLife.h"
 #include "Fade.h"
@@ -247,9 +247,9 @@ BOOL InitializeGame(void)
 	if (!TransferStage(13, 200, 10, 8))
 	{
 #ifdef JAPANESE
-		PlatformBackend_ShowMessageBox("エラー", "ステージの読み込みに失敗");
+		Backend_ShowMessageBox("エラー", "ステージの読み込みに失敗");
 #else
-		PlatformBackend_ShowMessageBox("Error", "Failed to load stage");
+		Backend_ShowMessageBox("Error", "Failed to load stage");
 #endif
 
 		return FALSE;

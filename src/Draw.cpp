@@ -7,7 +7,7 @@
 
 #include "WindowsWrapper.h"
 
-#include "Backends/Platform.h"
+#include "Backends/Misc.h"
 #include "Backends/Rendering.h"
 #include "Bitmap.h"
 #include "CommonDefines.h"
@@ -59,12 +59,12 @@ BOOL Flip_SystemTask(void)
 			return FALSE;
 
 		// Framerate limiter
-		timeNow = PlatformBackend_GetTicks();
+		timeNow = Backend_GetTicks();
 
 		if (timeNow >= timePrev + 20)
 			break;
 
-		PlatformBackend_Delay(1);
+		Backend_Delay(1);
 	}
 
 	if (timeNow >= timePrev + 100)
