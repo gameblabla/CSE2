@@ -37,6 +37,8 @@ BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
 	if (joystick == NULL)
 		return FALSE;
 
+	const size_t button_limit = sizeof(status->bButton) / sizeof(status->bButton);
+
 	// Read axis
 	const Sint16 joystick_x = SDL_JoystickGetAxis(joystick, 0);
 	const Sint16 joystick_y = SDL_JoystickGetAxis(joystick, 1);
@@ -46,17 +48,82 @@ BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
 	status->bUp = joystick_y < joystick_neutral_y - DEADZONE;
 	status->bDown = joystick_y > joystick_neutral_y + DEADZONE;
 
-	// The original `Input.cpp` assumed there were 32 buttons (because of DirectInput's `DIJOYSTATE` struct)
-	int numButtons = SDL_JoystickNumButtons(joystick);
-	if (numButtons > 32)
-		numButtons = 32;
+	int total_buttons = SDL_JoystickNumButtons(joystick);
+	int total_axes = SDL_JoystickNumAxes(joystick);
+	int total_hats = SDL_JoystickNumHats(joystick);
 
-	// Read whatever buttons actually exist
-	for (int i = 0; i < numButtons; ++i)
-		status->bButton[i] = SDL_JoystickGetButton(joystick, i);
+	unsigned int buttons_done = 0;
+
+	for (int i = 0; i < total_buttons; ++i)
+	{
+		status->bButton[buttons_done] = SDL_JoystickGetButton(joystick, i);
+
+		if (++buttons_done < button_limit)
+			break;
+	}
+
+	for (int i = 0; i < total_axes && buttons_done < button_limit; ++i)
+	{
+		Sint16 axis = SDL_JoystickGetAxis(joystick, i);
+
+		status->bButton[buttons_done] = axis < -DEADZONE;
+
+		if (++buttons_done < button_limit)
+			break;
+
+		status->bButton[buttons_done] = axis > DEADZONE;
+
+		if (++buttons_done < button_limit)
+			break;
+	}
+
+	for (int i = 0; i < total_axes && buttons_done < button_limit; ++i)
+	{
+		Uint8 hat = SDL_JoystickGetHat(joystick, i);
+
+		status->bButton[buttons_done] = hat == SDL_HAT_UP;
+
+		if (++buttons_done < button_limit)
+			break;
+
+		status->bButton[buttons_done] = hat == SDL_HAT_RIGHT;
+
+		if (++buttons_done < button_limit)
+			break;
+
+		status->bButton[buttons_done] = hat == SDL_HAT_DOWN;
+
+		if (++buttons_done < button_limit)
+			break;
+
+		status->bButton[buttons_done] = hat == SDL_HAT_LEFT;
+
+		if (++buttons_done < button_limit)
+			break;
+
+		status->bButton[buttons_done] = hat == SDL_HAT_RIGHTUP;
+
+		if (++buttons_done < button_limit)
+			break;
+
+		status->bButton[buttons_done] = hat == SDL_HAT_RIGHTDOWN;
+
+		if (++buttons_done < button_limit)
+			break;
+
+		status->bButton[buttons_done] = hat == SDL_HAT_LEFTUP;
+
+		if (++buttons_done < button_limit)
+			break;
+
+		status->bButton[buttons_done] = hat == SDL_HAT_LEFTDOWN;
+
+		if (++buttons_done < button_limit)
+			break;
+	}
 
 	// Blank the buttons that do not
-	for (int i = numButtons; i < 32; ++i)
+	for (size_t i = buttons_done; i < button_limit; ++i)
 		status->bButton[i] = FALSE;
 
 	return TRUE;
