@@ -67,7 +67,7 @@ BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
 	if (joystick == NULL)
 		return FALSE;
 
-	// The original Input.cpp assumed there were 32 buttons (because of DirectInput's 'DIJOYSTATE' struct)
+	// The original `Input.cpp` assumed there were 32 buttons (because of DirectInput's `DIJOYSTATE` struct)
 	int numButtons = SDL_JoystickNumButtons(joystick);
 	if (numButtons > 32)
 		numButtons = 32;

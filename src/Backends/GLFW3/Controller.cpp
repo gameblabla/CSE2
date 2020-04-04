@@ -1,5 +1,6 @@
 #include "../Controller.h"
 
+#include <stddef.h>
 #include <stdio.h>
 
 #define GLFW_INCLUDE_NONE
@@ -58,7 +59,12 @@ static void JoystickCallback(int joystick_id, int event)
 
 void ControllerBackend_Deinit(void)
 {
-	
+	glfwSetJoystickCallback(NULL);
+
+	joystick_connected = FALSE;
+	connected_joystick_id = 0;
+	joystick_neutral_x = 0;
+	joystick_neutral_y = 0;
 }
 
 BOOL ControllerBackend_Init(void)
@@ -92,6 +98,7 @@ BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
 	int total_buttons;
 	const unsigned char *buttons = glfwGetJoystickButtons(connected_joystick_id, &total_buttons);
 
+	// The original `Input.cpp` assumed there were 32 buttons (because of DirectInput's `DIJOYSTATE` struct)
 	if (total_buttons > 32)
 		total_buttons = 32;
 
