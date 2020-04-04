@@ -137,22 +137,22 @@ BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
 	// Then the joystick hats
 	for (int i = 0; i < total_axes; ++i)
 	{
-		status->bButton[buttons_done] = hats[i] == GLFW_HAT_UP;
+		status->bButton[buttons_done] = hats[i] & GLFW_HAT_UP;
 
 		if (++buttons_done >= button_limit)
 			break;
 
-		status->bButton[buttons_done] = hats[i] == GLFW_HAT_RIGHT;
+		status->bButton[buttons_done] = hats[i] & GLFW_HAT_RIGHT;
 
 		if (++buttons_done >= button_limit)
 			break;
 
-		status->bButton[buttons_done] = hats[i] == GLFW_HAT_DOWN;
+		status->bButton[buttons_done] = hats[i] & GLFW_HAT_DOWN;
 
 		if (++buttons_done >= button_limit)
 			break;
 
-		status->bButton[buttons_done] = hats[i] == GLFW_HAT_LEFT;
+		status->bButton[buttons_done] = hats[i] & GLFW_HAT_LEFT;
 
 		if (++buttons_done >= button_limit)
 			break;

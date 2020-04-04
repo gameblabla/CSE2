@@ -78,42 +78,22 @@ BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
 	{
 		Uint8 hat = SDL_JoystickGetHat(joystick, i);
 
-		status->bButton[buttons_done] = hat == SDL_HAT_UP;
+		status->bButton[buttons_done] = hat == SDL_HAT_UP || hat == SDL_HAT_LEFTUP || hat == SDL_HAT_RIGHTUP;
 
 		if (++buttons_done >= button_limit)
 			break;
 
-		status->bButton[buttons_done] = hat == SDL_HAT_RIGHT;
+		status->bButton[buttons_done] = hat == SDL_HAT_RIGHT || hat == SDL_HAT_RIGHTUP || hat == SDL_HAT_RIGHTDOWN;
 
 		if (++buttons_done >= button_limit)
 			break;
 
-		status->bButton[buttons_done] = hat == SDL_HAT_DOWN;
+		status->bButton[buttons_done] = hat == SDL_HAT_DOWN || hat == SDL_HAT_LEFTDOWN || hat == SDL_HAT_RIGHTDOWN;
 
 		if (++buttons_done >= button_limit)
 			break;
 
-		status->bButton[buttons_done] = hat == SDL_HAT_LEFT;
-
-		if (++buttons_done >= button_limit)
-			break;
-
-		status->bButton[buttons_done] = hat == SDL_HAT_RIGHTUP;
-
-		if (++buttons_done >= button_limit)
-			break;
-
-		status->bButton[buttons_done] = hat == SDL_HAT_RIGHTDOWN;
-
-		if (++buttons_done >= button_limit)
-			break;
-
-		status->bButton[buttons_done] = hat == SDL_HAT_LEFTUP;
-
-		if (++buttons_done >= button_limit)
-			break;
-
-		status->bButton[buttons_done] = hat == SDL_HAT_LEFTDOWN;
+		status->bButton[buttons_done] = hat == SDL_HAT_LEFT || hat == SDL_HAT_LEFTUP || hat == SDL_HAT_LEFTDOWN;
 
 		if (++buttons_done >= button_limit)
 			break;
