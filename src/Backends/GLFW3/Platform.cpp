@@ -141,7 +141,7 @@ static void WindowSizeCallback(GLFWwindow *window, int width, int height)
 {
 	(void)window;
 
-	Backend_HandleWindowResize(width, height);
+	RenderBackend_HandleWindowResize(width, height);
 }
 
 static void DragAndDropCallback(GLFWwindow *window, int count, const char **paths)

@@ -222,7 +222,7 @@ BOOL PlatformBackend_SystemTask(void)
 
 					case SDL_WINDOWEVENT_RESIZED:
 					case SDL_WINDOWEVENT_SIZE_CHANGED:
-						Backend_HandleWindowResize(event.window.data1, event.window.data2);
+						RenderBackend_HandleWindowResize(event.window.data1, event.window.data2);
 						break;
 				}
 
@@ -233,7 +233,7 @@ BOOL PlatformBackend_SystemTask(void)
 				return FALSE;
 
 			case SDL_RENDER_TARGETS_RESET:
-				Backend_HandleRenderTargetLoss();
+				RenderBackend_HandleRenderTargetLoss();
 				break;
 
 		}

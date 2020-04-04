@@ -19,7 +19,7 @@
 #include "../../MapName.h"
 #include "../../TextScr.h"
 
-typedef struct Backend_Surface
+typedef struct RenderBackend_Surface
 {
 	SDL_Texture *texture;
 	unsigned char *pixels;
@@ -27,22 +27,22 @@ typedef struct Backend_Surface
 	unsigned int height;
 	BOOL lost;
 
-	struct Backend_Surface *next;
-	struct Backend_Surface *prev;
-} Backend_Surface;
+	struct RenderBackend_Surface *next;
+	struct RenderBackend_Surface *prev;
+} RenderBackend_Surface;
 
-typedef struct Backend_Glyph
+typedef struct RenderBackend_Glyph
 {
 	unsigned char *pixels;
 	unsigned int width;
 	unsigned int height;
-} Backend_Glyph;
+} RenderBackend_Glyph;
 
 static SDL_Renderer *renderer;
 
-static Backend_Surface framebuffer;
+static RenderBackend_Surface framebuffer;
 
-static Backend_Surface *surface_list_head;
+static RenderBackend_Surface *surface_list_head;
 
 static unsigned char glyph_colour_channels[3];
 
@@ -76,7 +76,7 @@ static void GlyphBatch_Draw(spritebatch_sprite_t *sprites, int count, int textur
 
 	for (int i = 0; i < count; ++i)
 	{
-		Backend_Glyph *glyph = (Backend_Glyph*)sprites[i].image_id;
+		RenderBackend_Glyph *glyph = (RenderBackend_Glyph*)sprites[i].image_id;
 
 		SDL_Rect source_rect = {(int)(texture_w * sprites[i].minx), (int)(texture_h * sprites[i].maxy), (int)glyph->width, (int)glyph->height};
 		SDL_Rect destination_rect = {(int)sprites[i].x, (int)sprites[i].y, (int)glyph->width, (int)glyph->height};
@@ -90,7 +90,7 @@ static void GlyphBatch_GetPixels(SPRITEBATCH_U64 image_id, void *buffer, int byt
 {
 	(void)udata;
 
-	Backend_Glyph *glyph = (Backend_Glyph*)image_id;
+	RenderBackend_Glyph *glyph = (RenderBackend_Glyph*)image_id;
 
 	memcpy(buffer, glyph->pixels, bytes_to_fill);
 }
@@ -115,7 +115,7 @@ static void GlyphBatch_DestroyTexture(SPRITEBATCH_U64 texture_id, void *udata)
 	SDL_DestroyTexture((SDL_Texture*)texture_id);
 }
 
-Backend_Surface* Backend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
+Backend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
 {
 	puts("Available SDL2 render drivers:");
 
@@ -192,7 +192,7 @@ Backend_Surface* Backend_Init(const char *window_title, int screen_width, int sc
 	return NULL;
 }
 
-void Backend_Deinit(void)
+void RenderBackend_Deinit(void)
 {
 	spritebatch_term(&glyph_batcher);
 	SDL_DestroyTexture(framebuffer.texture);
@@ -200,7 +200,7 @@ void Backend_Deinit(void)
 	SDL_DestroyWindow(window);
 }
 
-void Backend_DrawScreen(void)
+void RenderBackend_DrawScreen(void)
 {
 	spritebatch_tick(&glyph_batcher);
 
@@ -209,9 +209,9 @@ void Backend_DrawScreen(void)
 	SDL_RenderPresent(renderer);
 }
 
-Backend_Surface* Backend_CreateSurface(unsigned int width, unsigned int height)
+Backend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned int height)
 {
-	Backend_Surface *surface = (Backend_Surface*)malloc(sizeof(Backend_Surface));
+	RenderBackend_Surface *surface = (RenderBackend_Surface*)malloc(sizeof(RenderBackend_Surface));
 
 	if (surface == NULL)
 		return NULL;
@@ -239,7 +239,7 @@ Backend_Surface* Backend_CreateSurface(unsigned int width, unsigned int height)
 	return surface;
 }
 
-void Backend_FreeSurface(Backend_Surface *surface)
+void RenderBackend_FreeSurface(RenderBackend_Surface *surface)
 {
 	if (surface == NULL)
 		return;
@@ -254,17 +254,17 @@ void Backend_FreeSurface(Backend_Surface *surface)
 	free(surface);
 }
 
-BOOL Backend_IsSurfaceLost(Backend_Surface *surface)
+BOOL RenderBackend_IsSurfaceLost(RenderBackend_Surface *surface)
 {
 	return surface->lost;
 }
 
-void Backend_RestoreSurface(Backend_Surface *surface)
+void RenderBackend_RestoreSurface(RenderBackend_Surface *surface)
 {
 	surface->lost = FALSE;
 }
 
-unsigned char* Backend_LockSurface(Backend_Surface *surface, unsigned int *pitch, unsigned int width, unsigned int height)
+unsigned char* RenderBackend_LockSurface(RenderBackend_Surface *surface, unsigned int *pitch, unsigned int width, unsigned int height)
 {
 	if (surface == NULL)
 		return NULL;
@@ -276,7 +276,7 @@ unsigned char* Backend_LockSurface(Backend_Surface *surface, unsigned int *pitch
 	return surface->pixels;
 }
 
-void Backend_UnlockSurface(Backend_Surface *surface, unsigned int width, unsigned int height)
+void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, unsigned int width, unsigned int height)
 {
 	if (surface == NULL)
 		return;
@@ -312,7 +312,7 @@ void Backend_UnlockSurface(Backend_Surface *surface, unsigned int width, unsigne
 	free(buffer);
 }
 
-void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL colour_key)
+void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RECT *rect, RenderBackend_Surface *destination_surface, long x, long y, BOOL colour_key)
 {
 	if (source_surface == NULL || destination_surface == NULL)
 		return;
@@ -328,7 +328,7 @@ void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Sur
 	SDL_RenderCopy(renderer, source_surface->texture, &source_rect, &destination_rect);
 }
 
-void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
+void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
 {
 	if (surface == NULL)
 		return;
@@ -349,9 +349,9 @@ void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned cha
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 }
 
-Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch)
+Backend_Glyph* RenderBackend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch)
 {
-	Backend_Glyph *glyph = (Backend_Glyph*)malloc(sizeof(Backend_Glyph));
+	RenderBackend_Glyph *glyph = (RenderBackend_Glyph*)malloc(sizeof(RenderBackend_Glyph));
 
 	if (glyph == NULL)
 		return NULL;
@@ -385,7 +385,7 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 	return glyph;
 }
 
-void Backend_UnloadGlyph(Backend_Glyph *glyph)
+void RenderBackend_UnloadGlyph(RenderBackend_Glyph *glyph)
 {
 	if (glyph == NULL)
 		return;
@@ -394,7 +394,7 @@ void Backend_UnloadGlyph(Backend_Glyph *glyph)
 	free(glyph);
 }
 
-void Backend_PrepareToDrawGlyphs(Backend_Surface *destination_surface, const unsigned char *colour_channels)
+void RenderBackend_PrepareToDrawGlyphs(RenderBackend_Surface *destination_surface, const unsigned char *colour_channels)
 {
 	if (destination_surface == NULL)
 		return;
@@ -404,24 +404,24 @@ void Backend_PrepareToDrawGlyphs(Backend_Surface *destination_surface, const uns
 	memcpy(glyph_colour_channels, colour_channels, sizeof(glyph_colour_channels));
 }
 
-void Backend_DrawGlyph(Backend_Glyph *glyph, long x, long y)
+void RenderBackend_DrawGlyph(RenderBackend_Glyph *glyph, long x, long y)
 {
 	spritebatch_push(&glyph_batcher, (SPRITEBATCH_U64)glyph, glyph->width, glyph->height, x, y, 1.0f, 1.0f, 0.0f, 0.0f, 0);
 }
 
-void Backend_FlushGlyphs(void)
+void RenderBackend_FlushGlyphs(void)
 {
 	spritebatch_defrag(&glyph_batcher);
 	spritebatch_flush(&glyph_batcher);
 }
 
-void Backend_HandleRenderTargetLoss(void)
+void RenderBackend_HandleRenderTargetLoss(void)
 {
-	for (Backend_Surface *surface = surface_list_head; surface != NULL; surface = surface->next)
+	for (RenderBackend_Surface *surface = surface_list_head; surface != NULL; surface = surface->next)
 		surface->lost = TRUE;
 }
 
-void Backend_HandleWindowResize(unsigned int width, unsigned int height)
+void RenderBackend_HandleWindowResize(unsigned int width, unsigned int height)
 {
 	(void)width;
 	(void)height;
