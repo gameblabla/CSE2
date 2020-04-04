@@ -11,6 +11,8 @@
 
 static BOOL joystick_connected;
 static int connected_joystick_id;
+static int joystick_neutral_x;
+static int joystick_neutral_y;
 
 static void JoystickCallback(int joystick_id, int event)
 {
@@ -21,13 +23,23 @@ static void JoystickCallback(int joystick_id, int event)
 
 			if (!joystick_connected)
 			{
-#if GLFW_VERSION_MAJOR > 3 || (GLFW_VERSION_MAJOR == 3 && GLFW_VERSION_MINOR >= 3)
-				if (glfwJoystickIsGamepad(joystick_id) == GLFW_TRUE)	// Avoid selecting things like laptop touchpads
-#endif
+				int total_axis;
+				const float *axis = glfwGetJoystickAxes(connected_joystick_id, &total_axis);
+
+				if (total_axis >= 2)
 				{
-					printf("Joystick #%d selected\n", joystick_id);
-					joystick_connected = TRUE;
-					connected_joystick_id = joystick_id;
+#if GLFW_VERSION_MAJOR > 3 || (GLFW_VERSION_MAJOR == 3 && GLFW_VERSION_MINOR >= 3)
+					if (glfwJoystickIsGamepad(joystick_id) == GLFW_TRUE)	// Avoid selecting things like laptop touchpads
+#endif
+					{
+						printf("Joystick #%d selected\n", joystick_id);
+						joystick_connected = TRUE;
+						connected_joystick_id = joystick_id;
+
+						// Reset default stick positions (this is performed in ResetJoystickStatus in vanilla Cave Story
+						joystick_neutral_x = axis[0];
+						joystick_neutral_y = axis[1];
+					}
 				}
 			}
 
@@ -51,10 +63,12 @@ void ControllerBackend_Deinit(void)
 
 BOOL ControllerBackend_Init(void)
 {
+	// Connect joysticks that are already plugged-in
 	for (int i = GLFW_JOYSTICK_1; i < GLFW_JOYSTICK_LAST; ++i)
 		if (glfwJoystickPresent(i) == GLFW_TRUE)
 			JoystickCallback(i, GLFW_CONNECTED);
 
+	// Set-up the callback for future (dis)connections
 	glfwSetJoystickCallback(JoystickCallback);
 
 	return TRUE;
@@ -65,14 +79,16 @@ BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
 	if (!joystick_connected)
 		return FALSE;
 
+	// Read axis
 	int total_axis;
 	const float *axis = glfwGetJoystickAxes(connected_joystick_id, &total_axis);
 
-	status->bLeft = axis[0] < -DEADZONE;
-	status->bRight = axis[0] > DEADZONE;
-	status->bUp = axis[1] < -DEADZONE;
-	status->bDown = axis[1] > DEADZONE;
+	status->bLeft = axis[0] < joystick_neutral_x - DEADZONE;
+	status->bRight = axis[0] > joystick_neutral_x + DEADZONE;
+	status->bUp = axis[1] < joystick_neutral_y - DEADZONE;
+	status->bDown = axis[1] > joystick_neutral_y + DEADZONE;
 
+	// Read buttons
 	int total_buttons;
 	const unsigned char *buttons = glfwGetJoystickButtons(connected_joystick_id, &total_buttons);
 
@@ -92,6 +108,8 @@ BOOL ControllerBackend_ResetJoystickStatus(void)
 {
 	if (!joystick_connected)
 		return FALSE;
+
+	// The code that would normally run here has been moved to JoystickCallback, to better-support hotplugging
 
 	return TRUE;
 }
