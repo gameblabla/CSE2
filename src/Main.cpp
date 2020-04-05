@@ -390,9 +390,12 @@ BOOL SystemTask(void)
 	if (!Backend_SystemTask())
 		return FALSE;
 
+	BOOL keyboard_state[BACKEND_KEYBOARD_TOTAL];
+	Backend_GetKeyboardState(keyboard_state);
+
 	for (unsigned int i = 0; i < BACKEND_KEYBOARD_TOTAL; ++i)
 	{
-		if (backend_keyboard_state[i] && !previous_keyboard_state[i])
+		if (keyboard_state[i] && !previous_keyboard_state[i])
 		{
 			switch (i)
 			{
@@ -478,7 +481,7 @@ BOOL SystemTask(void)
 					break;
 			}
 		}
-		else if (!backend_keyboard_state[i] && previous_keyboard_state[i])
+		else if (!keyboard_state[i] && previous_keyboard_state[i])
 		{
 			switch (i)
 			{
@@ -562,7 +565,7 @@ BOOL SystemTask(void)
 		}
 	}
 
-	memcpy(previous_keyboard_state, backend_keyboard_state, sizeof(backend_keyboard_state));
+	memcpy(previous_keyboard_state, keyboard_state, sizeof(keyboard_state));
 
 	// Run joystick code
 	if (gbUseJoystick)
