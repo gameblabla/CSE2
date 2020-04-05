@@ -1,5 +1,13 @@
 #include "KeyControl.h"
 
+#include "WindowsWrapper.h"
+
+#include "Backends/Misc.h"
+#include "Input.h"
+
+BOOL gKeyboardState[BACKEND_KEYBOARD_TOTAL];
+JOYSTICK_STATUS gJoystickState;
+
 long gKey;
 long gKeyTrg;
 

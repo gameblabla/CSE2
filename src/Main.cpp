@@ -276,12 +276,11 @@ BOOL SystemTask(void)
 	if (!Backend_SystemTask())
 		return FALSE;
 
-	BOOL keyboard_state[BACKEND_KEYBOARD_TOTAL];
-	Backend_GetKeyboardState(keyboard_state);
+	Backend_GetKeyboardState(gKeyboardState);
 
 	for (unsigned int i = 0; i < BACKEND_KEYBOARD_TOTAL; ++i)
 	{
-		if (keyboard_state[i] && !previous_keyboard_state[i])
+		if (gKeyboardState[i] && !previous_keyboard_state[i])
 		{
 			if (i == BACKEND_KEYBOARD_ESCAPE)
 				gKey |= KEY_ESCAPE;
@@ -317,7 +316,7 @@ BOOL SystemTask(void)
 			if (i == bindings[BINDING_PAUSE].keyboard)
 				gKey |= KEY_PAUSE;
 		}
-		else if (!keyboard_state[i] && previous_keyboard_state[i])
+		else if (!gKeyboardState[i] && previous_keyboard_state[i])
 		{
 			if (i == BACKEND_KEYBOARD_ESCAPE)
 				gKey &= ~KEY_ESCAPE;
@@ -355,7 +354,7 @@ BOOL SystemTask(void)
 		}
 	}
 
-	memcpy(previous_keyboard_state, keyboard_state, sizeof(keyboard_state));
+	memcpy(previous_keyboard_state, gKeyboardState, sizeof(gKeyboardState));
 
 	// Run joystick code
 	JoystickProc();
@@ -366,16 +365,15 @@ BOOL SystemTask(void)
 void JoystickProc(void)
 {
 	int i;
-	JOYSTICK_STATUS status;
 	static JOYSTICK_STATUS old_status;
 
-	if (!GetJoystickStatus(&status))
-		memset(&status, 0, sizeof(status));
+	if (!GetJoystickStatus(&gJoystickState))
+		memset(&gJoystickState, 0, sizeof(gJoystickState));
 
 	// Set held buttons
-	for (i = 0; i < sizeof(status.bButton) / sizeof(status.bButton[0]); ++i)
+	for (i = 0; i < sizeof(gJoystickState.bButton) / sizeof(gJoystickState.bButton[0]); ++i)
 	{
-		if (status.bButton[i] && !old_status.bButton[i])
+		if (gJoystickState.bButton[i] && !old_status.bButton[i])
 		{
 			if (i == bindings[BINDING_MAP].controller)
 				gKey |= KEY_MAP;
@@ -404,7 +402,7 @@ void JoystickProc(void)
 			if (i == bindings[BINDING_PAUSE].controller)
 				gKey |= KEY_PAUSE;
 		}
-		else if (!status.bButton[i] && old_status.bButton[i])
+		else if (!gJoystickState.bButton[i] && old_status.bButton[i])
 		{
 			if (i == bindings[BINDING_MAP].controller)
 				gKey &= ~KEY_MAP;
@@ -435,5 +433,5 @@ void JoystickProc(void)
 		}
 	}
 
-	old_status = status;
+	old_status = gJoystickState;
 }

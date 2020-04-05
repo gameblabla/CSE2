@@ -1,5 +1,10 @@
 #pragma once
 
+#include "WindowsWrapper.h"
+
+#include "Backends/Misc.h"
+#include "Input.h"
+
 enum KeyBind
 {
 	//The movement keys go in the order of left, right, up and down
@@ -28,6 +33,9 @@ enum KeyBind
 	//Pause key
 	KEY_PAUSE =     0x00010000,
 };
+
+extern BOOL gKeyboardState[BACKEND_KEYBOARD_TOTAL];
+extern JOYSTICK_STATUS gJoystickState;
 
 extern long gKey;
 extern long gKeyTrg;

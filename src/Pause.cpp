@@ -7,13 +7,10 @@
 
 #include "WindowsWrapper.h"
 
-#include "Backends/Controller.h"
-#include "Backends/Misc.h"
 #include "CommonDefines.h"
 #include "Config.h"
 #include "Draw.h"
 #include "Escape.h"
-#include "Input.h"
 #include "KeyControl.h"
 #include "Main.h"
 #include "Organya.h"
@@ -424,13 +421,13 @@ static int Callback_ControlsKeyboard_Rebind(Option *options, size_t total_option
 	timeout_string[1] = '\0';
 
 	BOOL previous_keyboard_state[BACKEND_KEYBOARD_TOTAL];
-	memcpy(previous_keyboard_state, backend_keyboard_state, sizeof(backend_keyboard_state));
+	memcpy(previous_keyboard_state, gKeyboardState, sizeof(gKeyboardState));
 
 	for (unsigned int timeout = (60 * 5) - 1; timeout != 0; --timeout)
 	{
 		for (int scancode = 0; scancode < BACKEND_KEYBOARD_TOTAL; ++scancode)
 		{
-			if (!previous_keyboard_state[scancode] && backend_keyboard_state[scancode])
+			if (!previous_keyboard_state[scancode] && gKeyboardState[scancode])
 			{
 				const char *key_name = GetKeyName(scancode);
 
@@ -456,7 +453,7 @@ static int Callback_ControlsKeyboard_Rebind(Option *options, size_t total_option
 			}
 		}
 
-		memcpy(previous_keyboard_state, backend_keyboard_state, sizeof(backend_keyboard_state));
+		memcpy(previous_keyboard_state, gKeyboardState, sizeof(gKeyboardState));
 
 		// Draw screen
 		CortBox(&grcFull, 0x000000);
@@ -516,22 +513,16 @@ static int Callback_ControlsController_Rebind(Option *options, size_t total_opti
 
 	PlaySoundObject(5, 1);
 
-	JOYSTICK_STATUS old_state;
-	if (!GetJoystickStatus(&old_state))
-		memset(&old_state, 0, sizeof(JOYSTICK_STATUS));
+	JOYSTICK_STATUS old_state = gJoystickState;
 
 	char timeout_string[2];
 	timeout_string[1] = '\0';
 
 	for (unsigned int timeout = (60 * 5) - 1; timeout != 0; --timeout)
 	{
-		JOYSTICK_STATUS state;
-		if (!GetJoystickStatus(&state))
-			memset(&state, 0, sizeof(JOYSTICK_STATUS));
-
-		for (int button = 0; button < sizeof(state.bButton) / sizeof(state.bButton[0]); ++button)
+		for (int button = 0; button < sizeof(gJoystickState.bButton) / sizeof(gJoystickState.bButton[0]); ++button)
 		{
-			if (!old_state.bButton[button] && state.bButton[button])
+			if (!old_state.bButton[button] && gJoystickState.bButton[button])
 			{
 				// If another control in the same group uses this button, swap them
 				for (size_t other_option = 0; other_option < total_options; ++other_option)
@@ -555,7 +546,7 @@ static int Callback_ControlsController_Rebind(Option *options, size_t total_opti
 			}
 		}
 
-		old_state = state;
+		old_state = gJoystickState;
 
 		// Draw screen
 		CortBox(&grcFull, 0x000000);
