@@ -97,8 +97,6 @@ void PlaybackBackend_EnableDragAndDrop(void)
 
 BOOL Backend_SystemTask(void)
 {
-	memcpy(backend_previous_keyboard_state, backend_keyboard_state, sizeof(backend_keyboard_state));
-
 	while (SDL_PollEvent(NULL) || !bActive)
 	{
 		SDL_Event event;

@@ -264,8 +264,6 @@ BOOL Backend_SystemTask(void)
 		return FALSE;
 	}
 
-	memcpy(backend_previous_keyboard_state, backend_keyboard_state, sizeof(backend_keyboard_state));
-
 	glfwPollEvents();
 
 	while (!bActive)
