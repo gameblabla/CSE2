@@ -9,13 +9,8 @@
 
 #include "../../WindowsWrapper.h"
 
-<<<<<<< HEAD
-#include "../../Bitmap.h"
-#include "../../Resource.h"
-=======
 #include "../Misc.h"
 #include "../SDL2/Window.h"
->>>>>>> portable
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -35,28 +30,17 @@ typedef struct RenderBackend_Glyph
 	unsigned int height;
 } RenderBackend_Glyph;
 
-<<<<<<< HEAD
-static SDL_Window *window;
 static SDL_Renderer *renderer;
 static SDL_Texture *texture;
 
-static Backend_Surface framebuffer;
-=======
-static SDL_Surface *window_sdlsurface;
-static SDL_Surface *framebuffer_sdlsurface;
 static RenderBackend_Surface framebuffer;
->>>>>>> portable
 
 static unsigned char glyph_colour_channels[3];
 static RenderBackend_Surface *glyph_destination_surface;
 
-<<<<<<< HEAD
-Backend_Surface* Backend_Init(const char *window_title, unsigned int internal_screen_width, unsigned int internal_screen_height, BOOL fullscreen, BOOL vsync)
-=======
 SDL_Window *window;
 
-RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
->>>>>>> portable
+RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen, BOOL vsync)
 {
 	puts("Available SDL2 render drivers:");
 
@@ -67,27 +51,10 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 		puts(info.name);
 	}
 
-	window = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, internal_screen_width, internal_screen_height, SDL_WINDOW_RESIZABLE);
+	window = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screen_width, screen_height, SDL_WINDOW_RESIZABLE);
 
 	if (window != NULL)
 	{
-<<<<<<< HEAD
-	#ifndef _WIN32	// On Windows, we use native icons instead (so we can give the taskbar and window separate icons, like the original EXE does)
-		size_t resource_size;
-		const unsigned char *resource_data = FindResource("ICON_MINI", "ICON", &resource_size);
-
-		unsigned int image_width;
-		unsigned int image_height;
-		unsigned char *image_buffer = DecodeBitmap(resource_data, resource_size, &image_width, &image_height, FALSE);
-
-		SDL_Surface *icon_surface = SDL_CreateRGBSurfaceWithFormatFrom(image_buffer, image_width, image_height, 32, image_width * 4, SDL_PIXELFORMAT_RGBA32);
-		SDL_SetWindowIcon(window, icon_surface);
-		SDL_FreeSurface(icon_surface);
-		free(image_buffer);
-	#endif
-
-=======
->>>>>>> portable
 		if (fullscreen)
 			SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 
@@ -104,26 +71,22 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 			printf("Selected SDL2 render driver: %s\n", info.name);
 
 			SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
-			texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STREAMING, internal_screen_width, internal_screen_height);
+			texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STREAMING, screen_width, screen_height);
 			SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
 
 			if (texture != NULL)
 			{
 				SDL_LockTexture(texture, NULL, (void**)&framebuffer.pixels, (int*)&framebuffer.pitch);
 
-<<<<<<< HEAD
-				framebuffer.width = internal_screen_width;
-				framebuffer.height = internal_screen_height;
+				Backend_PostWindowCreation();
+
+				framebuffer.width = screen_width;
+				framebuffer.height = screen_height;
 
 				return &framebuffer;
 			}
 
 			SDL_DestroyRenderer(renderer);
-=======
-			Backend_PostWindowCreation();
-
-			return &framebuffer;
->>>>>>> portable
 		}
 		else
 		{
@@ -244,11 +207,7 @@ void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, unsigned int wi
 	(void)height;
 }
 
-<<<<<<< HEAD
-void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL alpha_blend)
-=======
-void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RECT *rect, RenderBackend_Surface *destination_surface, long x, long y, BOOL colour_key)
->>>>>>> portable
+void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RECT *rect, RenderBackend_Surface *destination_surface, long x, long y, BOOL alpha_blend)
 {
 	if (source_surface == NULL || destination_surface == NULL)
 		return;
@@ -332,11 +291,7 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RECT *rect,
 	}
 }
 
-<<<<<<< HEAD
-void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha)
-=======
-void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
->>>>>>> portable
+void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha)
 {
 	if (surface == NULL)
 		return;
@@ -479,14 +434,5 @@ void RenderBackend_HandleRenderTargetLoss(void)
 
 void RenderBackend_HandleWindowResize(unsigned int width, unsigned int height)
 {
-<<<<<<< HEAD
 	// No problem for us
-=======
-	(void)width;
-	(void)height;
-
-	// https://wiki.libsdl.org/SDL_GetWindowSurface
-	// We need to fetch a new surface pointer
-	window_sdlsurface = SDL_GetWindowSurface(window);
->>>>>>> portable
 }
