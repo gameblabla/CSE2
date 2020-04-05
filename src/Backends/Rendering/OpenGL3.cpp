@@ -495,8 +495,9 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 		printf("GL_RENDERER = %s\n", glGetString(GL_RENDERER));
 		printf("GL_VERSION = %s\n", glGetString(GL_VERSION));
 
-		// Set up blending (only used for font-rendering)
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		// We're using pre-multiplied alpha so we can blend onto textures that have their own alpha
+		// http://apoorvaj.io/alpha-compositing-opengl-blending-and-premultiplied-alpha.html
+		glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
 		//glEnable(GL_DEBUG_OUTPUT);
 		//glDebugMessageCallback(MessageCallback, 0);
