@@ -19,12 +19,13 @@ option(EXTRA_SOUND_FORMATS "Adds support for extra music/SFX formats using the c
 
 set(BACKEND_RENDERER "SDLTexture" CACHE STRING "Which renderer the game should use: 'OpenGL3' for an OpenGL 3.2 renderer, 'OpenGLES2' for an OpenGL ES 2.0 renderer, 'SDLTexture' for SDL2's hardware-accelerated Texture API, or 'Software' for a handwritten software renderer")
 set(BACKEND_AUDIO "SDL2" CACHE STRING "Which audio backend the game should use: 'SDL2' or 'miniaudio'")
+set(BACKEND_PLATFORM "SDL2" CACHE STRING "Which platform backend the game should use: 'SDL2' or 'GLFW3'")
 
 option(LTO "Enable link-time optimisation" OFF)
 option(PKG_CONFIG_STATIC_LIBS "On platforms with pkg-config, static-link the dependencies (good for Windows builds, so you don't need to bundle DLL files)" OFF)
 option(MSVC_LINK_STATIC_RUNTIME "Link the static MSVC runtime library (Visual Studio only)" OFF)
 
-option(FORCE_LOCAL_LIBS "Compile the built-in versions of SDL2 and FreeType instead of using the system-provided ones" OFF)
+option(FORCE_LOCAL_LIBS "Compile the built-in versions of SDL2, GLFW3, and FreeType instead of using the system-provided ones" OFF)
 
 
 #########
@@ -170,8 +171,10 @@ add_executable(CSE2 WIN32
 	"src/ValueView.cpp"
 	"src/ValueView.h"
 	"src/WindowsWrapper.h"
-	"src/Backends/Rendering.h"
 	"src/Backends/Audio.h"
+	"src/Backends/Controller.h"
+	"src/Backends/Misc.h"
+	"src/Backends/Rendering.h"
 )
 
 set(RESOURCES
@@ -239,9 +242,17 @@ else()
 endif()
 
 if(BACKEND_AUDIO MATCHES "SDL2")
-	target_sources(CSE2 PRIVATE "src/Backends/Audio/SDL2.cpp" "src/Backends/Audio/SoftwareMixer.cpp" "src/Backends/Audio/SoftwareMixer.h")
+	target_sources(CSE2 PRIVATE
+		"src/Backends/Audio/SDL2.cpp"
+		"src/Backends/Audio/SoftwareMixer.cpp"
+		"src/Backends/Audio/SoftwareMixer.h"
+	)
 elseif(BACKEND_AUDIO MATCHES "miniaudio")
-	target_sources(CSE2 PRIVATE "src/Backends/Audio/miniaudio.cpp" "src/Backends/Audio/SoftwareMixer.cpp" "src/Backends/Audio/SoftwareMixer.h")
+	target_sources(CSE2 PRIVATE
+		"src/Backends/Audio/miniaudio.cpp"
+		"src/Backends/Audio/SoftwareMixer.cpp"
+		"src/Backends/Audio/SoftwareMixer.h"
+	)
 
 	# Link libdl, libm, and libpthread
 	include(CheckLibraryExists)
@@ -259,6 +270,36 @@ elseif(BACKEND_AUDIO MATCHES "miniaudio")
 	target_link_libraries(CSE2 PRIVATE ${CMAKE_DL_LIBS})
 else()
 	message(FATAL_ERROR "Invalid BACKEND_AUDIO selected")
+endif()
+
+if(BACKEND_PLATFORM MATCHES "SDL2")
+	target_sources(CSE2 PRIVATE
+		"src/Backends/SDL2/Controller.cpp"
+		"src/Backends/SDL2/Controller.h"
+		"src/Backends/SDL2/Misc.cpp"
+		"src/Backends/SDL2/Window.h"
+	)
+elseif(BACKEND_PLATFORM MATCHES "GLFW3")
+	target_sources(CSE2 PRIVATE
+		"src/Backends/GLFW3/Controller.cpp"
+		"src/Backends/GLFW3/Misc.cpp"
+		"src/Backends/GLFW3/Window.h"
+	)
+endif()
+
+if(BACKEND_PLATFORM MATCHES "SDL2" AND BACKEND_RENDERER MATCHES "OpenGL3")
+	target_sources(CSE2 PRIVATE "src/Backends/SDL2/Window-OpenGL3.cpp")
+elseif(BACKEND_PLATFORM MATCHES "SDL2" AND BACKEND_RENDERER MATCHES "OpenGLES2")
+	target_sources(CSE2 PRIVATE "src/Backends/SDL2/Window-OpenGLES2.cpp")
+elseif(BACKEND_PLATFORM MATCHES "SDL2" AND BACKEND_RENDERER MATCHES "SDLTexture")
+elseif(BACKEND_PLATFORM MATCHES "SDL2" AND BACKEND_RENDERER MATCHES "SDLSurface")
+elseif(BACKEND_PLATFORM MATCHES "SDL2" AND BACKEND_RENDERER MATCHES "Software")
+elseif(BACKEND_PLATFORM MATCHES "GLFW3" AND BACKEND_RENDERER MATCHES "OpenGL3")
+	target_sources(CSE2 PRIVATE "src/Backends/GLFW3/Window-OpenGL3.cpp")
+elseif(BACKEND_PLATFORM MATCHES "GLFW3" AND BACKEND_RENDERER MATCHES "OpenGLES2")
+	target_sources(CSE2 PRIVATE "src/Backends/GLFW3/Window-OpenGLES2.cpp")
+else()
+	message(FATAL_ERROR "Invalid BACKEND_PLATFORM/BACKEND_RENDERER combination")
 endif()
 
 if(EXTRA_SOUND_FORMATS)
@@ -287,6 +328,9 @@ if(MSVC)
 
 	# Make it so source files are recognized as UTF-8 by MSVC
 	target_compile_options(CSE2 PRIVATE "/utf-8")
+
+	# Use `main` instead of `WinMain`
+	set_target_properties(CSE2 PROPERTIES LINK_FLAGS "/ENTRY:mainCRTStartup")
 endif()
 
 # On Windows, we use native icons instead
@@ -334,67 +378,105 @@ if(NOT FORCE_LOCAL_LIBS)
 	find_package(PkgConfig QUIET)
 endif()
 
-if(NOT FORCE_LOCAL_LIBS)
-	find_package(SDL2)
+if(BACKEND_PLATFORM MATCHES "GLFW3")
+	if(NOT FORCE_LOCAL_LIBS)
+		find_package(glfw3)
 
-	if (PKG_CONFIG_FOUND)
-		pkg_check_modules(sdl2 QUIET sdl2)
+		if (PKG_CONFIG_FOUND)
+			pkg_check_modules(glfw3 QUIET IMPORTED_TARGET glfw3)
+		endif()
+	endif()
+
+	if(TARGET PkgConfig::glfw3)
+		# pkg-config
+		if (PKG_CONFIG_STATIC_LIBS)
+			message(STATUS "Using system GLFW3 (pkg-config, static)")
+			target_compile_options(CSE2 PRIVATE ${glfw3_STATIC_CFLAGS})
+			target_link_libraries(CSE2 PRIVATE ${glfw3_STATIC_LINK_LIBRARIES})
+		else()
+			message(STATUS "Using system GLFW3 (pkg-config, dynamic)")
+			target_compile_options(CSE2 PRIVATE ${glfw3_CFLAGS})
+			target_link_libraries(CSE2 PRIVATE ${glfw3_LINK_LIBRARIES})
+		endif()
+	elseif(TARGET glfw)
+		# CMake
+		message(STATUS "Using system GLFW3 (CMake)")
+		target_link_libraries(CSE2 PRIVATE glfw)
+	else()
+		# Compile it ourselves
+		message(STATUS "Using local GLFW3")
+		set(GLFW_BUILD_EXAMPLES OFF CACHE INTERNAL "" FORCE)
+		set(GLFW_BUILD_TESTS OFF CACHE INTERNAL "" FORCE)
+		set(GLFW_BUILD_DOCS OFF CACHE INTERNAL "" FORCE)
+		set(GLFW_INSTALL OFF CACHE INTERNAL "" FORCE)
+		add_subdirectory("external/glfw" EXCLUDE_FROM_ALL)
+		target_link_libraries(CSE2 PRIVATE glfw)
 	endif()
 endif()
 
-if(sdl2_FOUND)
-	# pkg-config
-	if (PKG_CONFIG_STATIC_LIBS)
-		message(STATUS "Using system SDL2 (pkg-config, static)")
-		target_compile_options(CSE2 PRIVATE ${sdl2_STATIC_CFLAGS})
-		target_link_libraries(CSE2 PRIVATE ${sdl2_STATIC_LIBRARIES})
+if(BACKEND_PLATFORM MATCHES "SDL2" OR BACKEND_AUDIO MATCHES "SDL2")
+	if(NOT FORCE_LOCAL_LIBS)
+		find_package(SDL2)
+
+		if (PKG_CONFIG_FOUND)
+			pkg_check_modules(sdl2 QUIET IMPORTED_TARGET sdl2)
+		endif()
+	endif()
+
+	if(TARGET PkgConfig::sdl2)
+		# pkg-config
+		if (PKG_CONFIG_STATIC_LIBS)
+			message(STATUS "Using system SDL2 (pkg-config, static)")
+			target_compile_options(CSE2 PRIVATE ${sdl2_STATIC_CFLAGS})
+			target_link_libraries(CSE2 PRIVATE ${sdl2_STATIC_LINK_LIBRARIES})
+		else()
+			message(STATUS "Using system SDL2 (pkg-config, dynamic)")
+			target_compile_options(CSE2 PRIVATE ${sdl2_CFLAGS})
+			target_link_libraries(CSE2 PRIVATE ${sdl2_LINK_LIBRARIES})
+		endif()
+	elseif(TARGET SDL2::SDL2)
+		# CMake-generated config (Arch, vcpkg, Raspbian)
+		message(STATUS "Using system SDL2 (CMake, dynamic)")
+		target_link_libraries(CSE2 PRIVATE SDL2::SDL2)
+	elseif(TARGET SDL2::SDL2-static)
+		# CMake-generated config (Arch, vcpkg, Raspbian)
+		message(STATUS "Using system SDL2 (CMake, static)")
+		target_link_libraries(CSE2 PRIVATE SDL2::SDL2-static)
+	elseif(SDL2_FOUND)
+		# Autotools-generated config (MSYS2)
+		message(STATUS "Using system SDL2 (Autotools)")
+		target_include_directories(CSE2 PRIVATE ${SDL2_INCLUDE_DIRS})
+		target_link_libraries(CSE2 PRIVATE ${SDL2_LIBRARIES})
 	else()
-		message(STATUS "Using system SDL2 (pkg-config, dynamic)")
-		target_compile_options(CSE2 PRIVATE ${sdl2_CFLAGS})
-		target_link_libraries(CSE2 PRIVATE ${sdl2_LIBRARIES})
+		# Compile it ourselves
+		message(STATUS "Using local SDL2")
+		set(SDL_SHARED_ENABLED_BY_DEFAULT OFF)
+		if(MSVC)
+				set(LIBC ON CACHE INTERNAL "" FORCE)	# Needed to prevent possible 'symbol already defined' errors
+		endif()
+		add_subdirectory("external/SDL2" EXCLUDE_FROM_ALL)
+		target_link_libraries(CSE2 PRIVATE SDL2-static)
 	endif()
-elseif(TARGET SDL2::SDL2)
-	# CMake-generated config (Arch, vcpkg, Raspbian)
-	message(STATUS "Using system SDL2 (CMake, dynamic)")
-	target_link_libraries(CSE2 PRIVATE SDL2::SDL2 SDL2::SDL2main)
-elseif(TARGET SDL2::SDL2-static)
-	# CMake-generated config (Arch, vcpkg, Raspbian)
-	message(STATUS "Using system SDL2 (CMake, static)")
-	target_link_libraries(CSE2 PRIVATE SDL2::SDL2-static SDL2::SDL2main)
-elseif(SDL2_FOUND)
-	# Autotools-generated config (MSYS2)
-	message(STATUS "Using system SDL2 (Autotools)")
-	target_include_directories(CSE2 PRIVATE ${SDL2_INCLUDE_DIRS})
-	target_link_libraries(CSE2 PRIVATE ${SDL2_LIBRARIES})
-else()
-	# Compile it ourselves
-	message(STATUS "Using local SDL2")
-	set(SDL_SHARED_ENABLED_BY_DEFAULT OFF)
-	if(MSVC)
-		set(LIBC ON)	# Needed to prevent possible 'symbol already defined' errors
-	endif()
-	add_subdirectory("external/SDL2" EXCLUDE_FROM_ALL)
-	target_link_libraries(CSE2 PRIVATE SDL2-static SDL2main)
 endif()
 
 if(NOT FORCE_LOCAL_LIBS)
 	find_package(Freetype)
 
 	if (PKG_CONFIG_FOUND)
-		pkg_check_modules(freetype2 QUIET freetype2)
+		pkg_check_modules(freetype2 QUIET IMPORTED_TARGET freetype2)
 	endif()
 endif()
 
-if(freetype2_FOUND)
+if(TARGET PkgConfig::freetype2)
 	# pkg-config
 	if (PKG_CONFIG_STATIC_LIBS)
 		message(STATUS "Using system FreeType (pkg-config, static)")
 		target_compile_options(CSE2 PRIVATE ${freetype2_STATIC_CFLAGS})
-		target_link_libraries(CSE2 PRIVATE ${freetype2_STATIC_LIBRARIES})
+		target_link_libraries(CSE2 PRIVATE ${freetype2_STATIC_LINK_LIBRARIES})
 	else()
 		message(STATUS "Using system FreeType (pkg-config, dynamic)")
 		target_compile_options(CSE2 PRIVATE ${freetype2_CFLAGS})
-		target_link_libraries(CSE2 PRIVATE ${freetype2_LIBRARIES})
+		target_link_libraries(CSE2 PRIVATE ${freetype2_LINK_LIBRARIES})
 	endif()
 elseif(FREETYPE_FOUND)
 	message(STATUS "Using system FreeType (CMake)")
@@ -404,20 +486,21 @@ else()
 	# Compile it ourselves
 	message(STATUS "Using local FreeType")
 	if(FORCE_LOCAL_LIBS)
-		set(CMAKE_DISABLE_FIND_PACKAGE_HarfBuzz ON)
-		set(CMAKE_DISABLE_FIND_PACKAGE_ZLIB ON)
-		set(CMAKE_DISABLE_FIND_PACKAGE_PNG ON)
-		set(CMAKE_DISABLE_FIND_PACKAGE_BZip2 ON)
+		set(CMAKE_DISABLE_FIND_PACKAGE_HarfBuzz ON CACHE INTERNAL "" FORCE)
+		set(CMAKE_DISABLE_FIND_PACKAGE_ZLIB ON CACHE INTERNAL "" FORCE)
+		set(CMAKE_DISABLE_FIND_PACKAGE_PNG ON CACHE INTERNAL "" FORCE)
+		set(CMAKE_DISABLE_FIND_PACKAGE_BZip2 ON CACHE INTERNAL "" FORCE)
 	endif()
 	add_subdirectory("external/freetype" EXCLUDE_FROM_ALL)
 	target_link_libraries(CSE2 PRIVATE freetype)
 endif()
 
 if(BACKEND_RENDERER MATCHES "OpenGL3")
-	target_sources(CSE2 PRIVATE "external/glad/src/glad.c" "external/glad/include/glad/glad.h" "external/glad/include/KHR/khrplatform.h")
+	add_subdirectory("external/glad" EXCLUDE_FROM_ALL)
+	target_link_libraries(CSE2 PRIVATE glad)
 
 	find_package(OpenGL REQUIRED)
-	target_link_libraries(CSE2 PRIVATE OpenGL::GL ${CMAKE_DL_LIBS})
+	target_link_libraries(CSE2 PRIVATE OpenGL::GL)
 endif()
 
 if(BACKEND_RENDERER MATCHES "OpenGLES2")

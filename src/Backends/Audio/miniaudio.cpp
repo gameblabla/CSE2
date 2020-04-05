@@ -83,7 +83,7 @@ BOOL AudioBackend_Init(void)
 	config.playback.pDeviceID = NULL;
 	config.playback.format = ma_format_f32;
 	config.playback.channels = 2;
-	config.sampleRate = 0;
+	config.sampleRate = 0;	// Let miniaudio decide what sample rate to use
 	config.dataCallback = Callback;
 	config.pUserData = NULL;
 

@@ -34,6 +34,7 @@ addons:
         - g++-9
         - clang-9
         - libsdl2-dev
+        - libglfw3-dev
         - libfreetype6-dev
   homebrew:
     packages:
@@ -42,26 +43,29 @@ addons:
         - gcc@9
         - llvm@9
         - sdl2
+        - glfw
         - freetype
     update: true
 
 env:
-    - BUILD_SYSTEM=make RENDERER=Software
-    - BUILD_SYSTEM=make RENDERER=SDLTexture
-    - BUILD_SYSTEM=make RENDERER=OpenGL3
-    - BUILD_SYSTEM=make RENDERER=OpenGLES2
-    - BUILD_SYSTEM=cmake RENDERER=Software
-    - BUILD_SYSTEM=cmake RENDERER=SDLTexture
-    - BUILD_SYSTEM=cmake RENDERER=OpenGL3
-    - BUILD_SYSTEM=cmake RENDERER=OpenGLES2
+    - PLATFORM=SDL2 AUDIO=SDL2 RENDERER=Software
+    - PLATFORM=SDL2 AUDIO=SDL2 RENDERER=SDLTexture
+    - PLATFORM=SDL2 AUDIO=SDL2 RENDERER=OpenGL3
+    - PLATFORM=SDL2 AUDIO=SDL2 RENDERER=OpenGLES2
+    - PLATFORM=GLFW3 AUDIO=miniaudio RENDERER=OpenGL3
+    - PLATFORM=GLFW3 AUDIO=miniaudio RENDERER=OpenGLES2
 
 jobs:
   exclude:
-    # Apple's OpenGL is in a non-standard location, so these builds don't work
+    # macOS doesn't support OpenGLES2, apparently
     - os: osx
-      env: BUILD_SYSTEM=make RENDERER=OpenGL3
+      env: PLATFORM=SDL2 AUDIO=SDL2 RENDERER=OpenGLES2
     - os: osx
-      env: BUILD_SYSTEM=make RENDERER=OpenGLES2
+      env: PLATFORM=GLFW3 AUDIO=miniaudio RENDERER=OpenGLES2
+    # GCC is mysteriously broken when trying to parse macOS headers for miniaudio
+    - os: osx
+      compiler: gcc
+      env: PLATFORM=GLFW3 AUDIO=miniaudio RENDERER=OpenGL3
 
 before_install:
     # Set URL for Discord send script
@@ -73,9 +77,6 @@ before_install:
 
     # Display Travis OS name
     - echo $TRAVIS_OS_NAME
-
-    # Display build type
-    - echo $BUILD_SYSTEM
 
     # The following Homebrew packages aren't linked by default, and need to be prepended to the path explicitly.
     - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
@@ -118,25 +119,15 @@ install:
       fi
 
 before_script:
-    - |
-      if [ "$BUILD_SYSTEM" == "cmake" ]; then
-        # Make build directory and generate CMake build files
-        mkdir -p ${CMAKE_BUILD_DIR} && cd ${CMAKE_BUILD_DIR}
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DFIX_BUGS=ON -DRENDERER=$RENDERER -DCMAKE_C_FLAGS="-Wall -Wextra -pedantic" -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic"
-        cd ..
-      fi
+    # Make build directory and generate CMake build files
+    - mkdir -p ${CMAKE_BUILD_DIR} && cd ${CMAKE_BUILD_DIR}
+    - cmake .. -DCMAKE_BUILD_TYPE=Release -DFIX_BUGS=ON -DBACKEND_PLATFORM=$PLATFORM -DBACKEND_AUDIO=$AUDIO -DBACKEND_RENDERER=$RENDERER -DCMAKE_C_FLAGS="-Wall -Wextra -pedantic" -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic"
+    - cd ..
 
 script:
-    - |
-      if [ "$BUILD_SYSTEM" == "cmake" ]; then
-        # CMake build
-        cd ${CMAKE_BUILD_DIR}
-        cmake --build . --config Release --parallel $JOBS
-        cd ..
-      else
-        # Make build
-        make -j $JOBS FIX_BUGS=1 RELEASE=1 RENDERER=$RENDERER CFLAGS="-Wall -Wextra -pedantic" CXXFLAGS="-Wall -Wextra -pedantic"
-      fi
+    - cd ${CMAKE_BUILD_DIR}
+    - cmake --build . --config Release --parallel $JOBS
+    - cd ..
 
 after_success:
     # Send success notification to Discord through DISCORD_WEBHOOK_URL

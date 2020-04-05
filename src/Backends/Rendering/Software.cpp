@@ -9,37 +9,54 @@
 
 #include "../../WindowsWrapper.h"
 
+<<<<<<< HEAD
 #include "../../Bitmap.h"
 #include "../../Resource.h"
+=======
+#include "../Misc.h"
+#include "../SDL2/Window.h"
+>>>>>>> portable
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
-typedef struct Backend_Surface
+typedef struct RenderBackend_Surface
 {
 	unsigned char *pixels;
 	unsigned int width;
 	unsigned int height;
 	unsigned int pitch;
-} Backend_Surface;
+} RenderBackend_Surface;
 
-typedef struct Backend_Glyph
+typedef struct RenderBackend_Glyph
 {
 	unsigned char *pixels;
 	unsigned int width;
 	unsigned int height;
-} Backend_Glyph;
+} RenderBackend_Glyph;
 
+<<<<<<< HEAD
 static SDL_Window *window;
 static SDL_Renderer *renderer;
 static SDL_Texture *texture;
 
 static Backend_Surface framebuffer;
+=======
+static SDL_Surface *window_sdlsurface;
+static SDL_Surface *framebuffer_sdlsurface;
+static RenderBackend_Surface framebuffer;
+>>>>>>> portable
 
 static unsigned char glyph_colour_channels[3];
-static Backend_Surface *glyph_destination_surface;
+static RenderBackend_Surface *glyph_destination_surface;
 
+<<<<<<< HEAD
 Backend_Surface* Backend_Init(const char *window_title, unsigned int internal_screen_width, unsigned int internal_screen_height, BOOL fullscreen, BOOL vsync)
+=======
+SDL_Window *window;
+
+RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
+>>>>>>> portable
 {
 	puts("Available SDL2 render drivers:");
 
@@ -54,6 +71,7 @@ Backend_Surface* Backend_Init(const char *window_title, unsigned int internal_sc
 
 	if (window != NULL)
 	{
+<<<<<<< HEAD
 	#ifndef _WIN32	// On Windows, we use native icons instead (so we can give the taskbar and window separate icons, like the original EXE does)
 		size_t resource_size;
 		const unsigned char *resource_data = FindResource("ICON_MINI", "ICON", &resource_size);
@@ -68,6 +86,8 @@ Backend_Surface* Backend_Init(const char *window_title, unsigned int internal_sc
 		free(image_buffer);
 	#endif
 
+=======
+>>>>>>> portable
 		if (fullscreen)
 			SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 
@@ -91,6 +111,7 @@ Backend_Surface* Backend_Init(const char *window_title, unsigned int internal_sc
 			{
 				SDL_LockTexture(texture, NULL, (void**)&framebuffer.pixels, (int*)&framebuffer.pitch);
 
+<<<<<<< HEAD
 				framebuffer.width = internal_screen_width;
 				framebuffer.height = internal_screen_height;
 
@@ -98,30 +119,35 @@ Backend_Surface* Backend_Init(const char *window_title, unsigned int internal_sc
 			}
 
 			SDL_DestroyRenderer(renderer);
+=======
+			Backend_PostWindowCreation();
+
+			return &framebuffer;
+>>>>>>> portable
 		}
 		else
 		{
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal error (software rendering backend)", "Could not create framebuffer surface", window);
+			Backend_ShowMessageBox("Fatal error (software rendering backend)", "Could not create framebuffer surface");
 		}
 
 		SDL_DestroyWindow(window);
 	}
 	else
 	{
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal error (software rendering backend)", "Could not create window", NULL);
+		Backend_ShowMessageBox("Fatal error (software rendering backend)", "Could not create window");
 	}
 
 	return NULL;
 }
 
-void Backend_Deinit(void)
+void RenderBackend_Deinit(void)
 {
 	SDL_DestroyTexture(texture);
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 }
 
-void Backend_DrawScreen(void)
+void RenderBackend_DrawScreen(void)
 {
 	SDL_UnlockTexture(texture);
 
@@ -156,9 +182,9 @@ void Backend_DrawScreen(void)
 	SDL_LockTexture(texture, NULL, (void**)&framebuffer.pixels, (int*)&framebuffer.pitch);
 }
 
-Backend_Surface* Backend_CreateSurface(unsigned int width, unsigned int height)
+RenderBackend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned int height)
 {
-	Backend_Surface *surface = (Backend_Surface*)malloc(sizeof(Backend_Surface));
+	RenderBackend_Surface *surface = (RenderBackend_Surface*)malloc(sizeof(RenderBackend_Surface));
 
 	if (surface == NULL)
 		return NULL;
@@ -178,7 +204,7 @@ Backend_Surface* Backend_CreateSurface(unsigned int width, unsigned int height)
 	return surface;
 }
 
-void Backend_FreeSurface(Backend_Surface *surface)
+void RenderBackend_FreeSurface(RenderBackend_Surface *surface)
 {
 	if (surface == NULL)
 		return;
@@ -187,19 +213,19 @@ void Backend_FreeSurface(Backend_Surface *surface)
 	free(surface);
 }
 
-BOOL Backend_IsSurfaceLost(Backend_Surface *surface)
+BOOL RenderBackend_IsSurfaceLost(RenderBackend_Surface *surface)
 {
 	(void)surface;
 
 	return FALSE;
 }
 
-void Backend_RestoreSurface(Backend_Surface *surface)
+void RenderBackend_RestoreSurface(RenderBackend_Surface *surface)
 {
 	(void)surface;
 }
 
-unsigned char* Backend_LockSurface(Backend_Surface *surface, unsigned int *pitch, unsigned int width, unsigned int height)
+unsigned char* RenderBackend_LockSurface(RenderBackend_Surface *surface, unsigned int *pitch, unsigned int width, unsigned int height)
 {
 	(void)width;
 	(void)height;
@@ -211,14 +237,18 @@ unsigned char* Backend_LockSurface(Backend_Surface *surface, unsigned int *pitch
 	return surface->pixels;
 }
 
-void Backend_UnlockSurface(Backend_Surface *surface, unsigned int width, unsigned int height)
+void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, unsigned int width, unsigned int height)
 {
 	(void)surface;
 	(void)width;
 	(void)height;
 }
 
+<<<<<<< HEAD
 void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Surface *destination_surface, long x, long y, BOOL alpha_blend)
+=======
+void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RECT *rect, RenderBackend_Surface *destination_surface, long x, long y, BOOL colour_key)
+>>>>>>> portable
 {
 	if (source_surface == NULL || destination_surface == NULL)
 		return;
@@ -302,7 +332,11 @@ void Backend_Blit(Backend_Surface *source_surface, const RECT *rect, Backend_Sur
 	}
 }
 
+<<<<<<< HEAD
 void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha)
+=======
+void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
+>>>>>>> portable
 {
 	if (surface == NULL)
 		return;
@@ -361,9 +395,9 @@ void Backend_ColourFill(Backend_Surface *surface, const RECT *rect, unsigned cha
 	}
 }
 
-Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch)
+RenderBackend_Glyph* RenderBackend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch)
 {
-	Backend_Glyph *glyph = (Backend_Glyph*)malloc(sizeof(Backend_Glyph));
+	RenderBackend_Glyph *glyph = (RenderBackend_Glyph*)malloc(sizeof(RenderBackend_Glyph));
 
 	if (glyph == NULL)
 		return NULL;
@@ -376,8 +410,6 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 		return NULL;
 	}
 
-	unsigned char *destination_pointer = glyph->pixels;
-
 	for (unsigned int y = 0; y < height; ++y)
 		memcpy(&glyph->pixels[y * width], &pixels[y * pitch], width);
 
@@ -387,7 +419,7 @@ Backend_Glyph* Backend_LoadGlyph(const unsigned char *pixels, unsigned int width
 	return glyph;
 }
 
-void Backend_UnloadGlyph(Backend_Glyph *glyph)
+void RenderBackend_UnloadGlyph(RenderBackend_Glyph *glyph)
 {
 	if (glyph == NULL)
 		return;
@@ -396,7 +428,7 @@ void Backend_UnloadGlyph(Backend_Glyph *glyph)
 	free(glyph);
 }
 
-void Backend_PrepareToDrawGlyphs(Backend_Surface *destination_surface, const unsigned char *colour_channels)
+void RenderBackend_PrepareToDrawGlyphs(RenderBackend_Surface *destination_surface, const unsigned char *colour_channels)
 {
 	if (destination_surface == NULL)
 		return;
@@ -406,7 +438,7 @@ void Backend_PrepareToDrawGlyphs(Backend_Surface *destination_surface, const uns
 	memcpy(glyph_colour_channels, colour_channels, sizeof(glyph_colour_channels));
 }
 
-void Backend_DrawGlyph(Backend_Glyph *glyph, long x, long y)
+void RenderBackend_DrawGlyph(RenderBackend_Glyph *glyph, long x, long y)
 {
 	if (glyph == NULL)
 		return;
@@ -435,17 +467,26 @@ void Backend_DrawGlyph(Backend_Glyph *glyph, long x, long y)
 	}
 }
 
-void Backend_FlushGlyphs(void)
+void RenderBackend_FlushGlyphs(void)
 {
 	
 }
 
-void Backend_HandleRenderTargetLoss(void)
+void RenderBackend_HandleRenderTargetLoss(void)
 {
 	// No problem for us
 }
 
-void Backend_HandleWindowResize(void)
+void RenderBackend_HandleWindowResize(unsigned int width, unsigned int height)
 {
+<<<<<<< HEAD
 	// No problem for us
+=======
+	(void)width;
+	(void)height;
+
+	// https://wiki.libsdl.org/SDL_GetWindowSurface
+	// We need to fetch a new surface pointer
+	window_sdlsurface = SDL_GetWindowSurface(window);
+>>>>>>> portable
 }

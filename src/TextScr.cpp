@@ -4,10 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "SDL.h"
-
 #include "WindowsWrapper.h"
 
+#include "Backends/Misc.h"
 #include "ArmsItem.h"
 #include "Boss.h"
 #include "BossLife.h"
@@ -732,9 +731,9 @@ int TextScriptProc(void)
 						if (!TransferStage(z, w, x, y))
 						{
 							#ifdef JAPANESE
-							SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", "ステージの読み込みに失敗", NULL);
+							Backend_ShowMessageBox("エラー", "ステージの読み込みに失敗");
 							#else
-							SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Failed to load stage", NULL);
+							Backend_ShowMessageBox("Error", "Failed to load stage");
 							#endif
 
 							return enum_ESCRETURN_exit;
@@ -1120,7 +1119,7 @@ int TextScriptProc(void)
 					else if (IS_COMMAND('D','N','A'))
 					{
 						z = GetTextScriptNo(gTS.p_read + 4);
-						DeleteNpCharCode(z, 1);
+						DeleteNpCharCode(z, TRUE);
 						gTS.p_read += 8;
 					}
 					else if (IS_COMMAND('B','O','A'))
@@ -1388,10 +1387,10 @@ int TextScriptProc(void)
 						char str_0[0x40];
 						#ifdef JAPANESE
 						sprintf(str_0, "不明のコード:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);
-						SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", str_0, NULL);
+						Backend_ShowMessageBox("エラー", str_0);
 						#else
 						sprintf(str_0, "Unknown code:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);
-						SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", str_0, NULL);
+						Backend_ShowMessageBox("Error", str_0);
 						#endif
 
 						return enum_ESCRETURN_exit;

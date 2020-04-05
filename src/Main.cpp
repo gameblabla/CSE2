@@ -5,10 +5,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "SDL.h"
-
 #include "WindowsWrapper.h"
 
+#include "Backends/Misc.h"
 #include "Backends/Rendering.h"
 #include "Bitmap.h"
 #include "CommonDefines.h"
@@ -36,7 +35,6 @@ BOOL bFullscreen;
 
 CONFIG_BINDING bindings[BINDING_TOTAL];
 
-static BOOL bActive = TRUE;
 static BOOL bFps = FALSE;
 
 #ifdef JAPANESE
@@ -65,11 +63,11 @@ unsigned long GetFramePerSecound(void)
 
 	if (need_new_base_tick)
 	{
-		base_tick = SDL_GetTicks();
+		base_tick = Backend_GetTicks();
 		need_new_base_tick = FALSE;
 	}
 
-	current_tick = SDL_GetTicks();
+	current_tick = Backend_GetTicks();
 	++current_frame;
 
 	if (base_tick + 1000 <= current_tick)
@@ -86,16 +84,26 @@ unsigned long GetFramePerSecound(void)
 int main(int argc, char *argv[])
 {
 	(void)argc;
-	(void)argv;
 
-	SDL_Init(SDL_INIT_EVENTS);
+	int i;
+
+	Backend_Init();
 
 	// Get executable's path
-	char *base_path = SDL_GetBasePath();
-	size_t base_path_length = strlen(base_path);
-	base_path[base_path_length - 1] = '\0';
-	strcpy(gModulePath, base_path);
-	SDL_free(base_path);
+	if (!Backend_GetBasePath(gModulePath))
+	{
+		// Fall back on argv[0] if the backend cannot provide a path
+		strcpy(gModulePath, argv[0]);
+
+		for (size_t i = strlen(gModulePath);; --i)
+		{
+			if (i == 0 || gModulePath[i] == '\\' || gModulePath[i] == '/')
+			{
+				gModulePath[i] = '\0';
+				break;
+			}
+		}
+	}
 
 	// Get path of the data folder
 	strcpy(gDataPath, gModulePath);
@@ -109,13 +117,6 @@ int main(int argc, char *argv[])
 
 	RECT unused_rect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
-#ifdef _WIN32	// On Windows, we use native icons instead (so we can give the taskbar and window separate icons, like the original EXE does)
-	SDL_SetHint(SDL_HINT_WINDOWS_INTRESOURCE_ICON, "101");
-	SDL_SetHint(SDL_HINT_WINDOWS_INTRESOURCE_ICON_SMALL, "102");
-#endif
-
-	SDL_InitSubSystem(SDL_INIT_VIDEO);
-
 	switch (conf.display_mode)
 	{
 		default:
@@ -123,7 +124,10 @@ int main(int argc, char *argv[])
 
 		#ifdef FIX_BUGS
 			if (!StartDirectDraw(lpWindowName, conf.display_mode, conf.b60fps, conf.bSmoothScrolling, conf.bVsync))
+			{
+				Backend_Deinit();
 				return EXIT_FAILURE;
+			}
 		#else
 			// Doesn't handle StartDirectDraw failing
 			StartDirectDraw(lpWindowName, conf.display_mode, conf.b60fps, conf.bSmoothScrolling, conf.bVsync);
@@ -136,7 +140,10 @@ int main(int argc, char *argv[])
 
 		#ifdef FIX_BUGS
 			if (!StartDirectDraw(lpWindowName, 0, conf.b60fps, conf.bSmoothScrolling, conf.bVsync))
+			{
+				Backend_Deinit();
 				return EXIT_FAILURE;
+			}
 		#else
 			// Doesn't handle StartDirectDraw failing
 			StartDirectDraw(lpWindowName, 0, conf.b60fps, conf.bSmoothScrolling, conf.bVsync);
@@ -144,26 +151,41 @@ int main(int argc, char *argv[])
 
 			bFullscreen = TRUE;
 
-			SDL_ShowCursor(SDL_DISABLE);
+			Backend_HideMouse();
 			break;
 	}
 
 #ifdef DEBUG_SAVE
-	SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
+	PlaybackBackend_EnableDragAndDrop();
+#endif
+
+	// Set up window icon
+#ifndef _WIN32	// On Windows, we use native icons instead (so we can give the taskbar and window separate icons, like the original EXE does)
+	size_t window_icon_resource_size;
+	const unsigned char *window_icon_resource_data = FindResource("ICON_MINI", "ICON", &window_icon_resource_size);
+
+	unsigned int window_icon_width, window_icon_height;
+	unsigned char *window_icon_rgb_pixels = DecodeBitmap(window_icon_resource_data, window_icon_resource_size, &window_icon_width, &window_icon_height, FALSE);
+
+	if (window_icon_rgb_pixels != NULL)
+	{
+		Backend_SetWindowIcon(window_icon_rgb_pixels, window_icon_width, window_icon_height);
+		FreeBitmap(window_icon_rgb_pixels);
+	}
 #endif
 
 	// Set up the cursor
-	char image_path[MAX_PATH];
-	sprintf(image_path, "%s/Resource/CURSOR/CURSOR_NORMAL.png", gDataPath);
+	size_t cursor_resource_size;
+	const unsigned char *cursor_resource_data = FindResource("CURSOR_NORMAL", "CURSOR", &cursor_resource_size);
 
-	unsigned int image_width;
-	unsigned int image_height;
-	unsigned char *image_buffer = DecodeBitmapFromFile(image_path, &image_width, &image_height, FALSE);
+	unsigned int cursor_width, cursor_height;
+	unsigned char *cursor_rgb_pixels = DecodeBitmap(cursor_resource_data, cursor_resource_size, &cursor_width, &cursor_height, FALSE);
 
-	SDL_Surface *cursor_surface = SDL_CreateRGBSurfaceWithFormatFrom(image_buffer, image_width, image_height, 32, image_width * 4, SDL_PIXELFORMAT_RGBA32);
-	SDL_SetColorKey(cursor_surface, SDL_TRUE, SDL_MapRGB(cursor_surface->format, 0xFF, 0, 0xFF));
-	SDL_Cursor *cursor = SDL_CreateColorCursor(cursor_surface, 0, 0);
-	SDL_SetCursor(cursor);
+	if (cursor_rgb_pixels != NULL)
+	{
+		Backend_SetCursor(cursor_rgb_pixels, cursor_width, cursor_height);
+		FreeBitmap(cursor_rgb_pixels);
+	}
 
 	if (IsKeyFile("fps"))
 		bFps = TRUE;
@@ -184,9 +206,7 @@ int main(int argc, char *argv[])
 	// Draw to screen
 	if (!Flip_SystemTask())
 	{
-        SDL_FreeCursor(cursor);
-        SDL_FreeSurface(cursor_surface);
-		free(image_buffer);
+		Backend_Deinit();
 		return EXIT_SUCCESS;
 	}
 
@@ -208,9 +228,7 @@ int main(int argc, char *argv[])
 	EndDirectSound();
 	EndDirectDraw();
 
-	SDL_FreeCursor(cursor);
-	SDL_FreeSurface(cursor_surface);
-	free(image_buffer);
+	Backend_Deinit();
 
 	return EXIT_SUCCESS;
 }
@@ -250,144 +268,82 @@ void JoystickProc(void);
 
 BOOL SystemTask(void)
 {
-	while (SDL_PollEvent(NULL) || !bActive)
+	if (!Backend_SystemTask())
+		return FALSE;
+
+	for (unsigned int i = 0; i < BACKEND_KEYBOARD_TOTAL; ++i)
 	{
-		SDL_Event event;
-
-		if (!SDL_WaitEvent(&event))
-			return FALSE;
-
-		switch (event.type)
+		if ((backend_keyboard_state[i] ^ backend_previous_keyboard_state[i]) & backend_keyboard_state[i])
 		{
-			case SDL_KEYDOWN:
-				if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
-					gKey |= KEY_ESCAPE;
-				else if (event.key.keysym.scancode == SDL_SCANCODE_F1)
-					gKey |= KEY_F1;
-				else if (event.key.keysym.scancode == SDL_SCANCODE_F2)
-					gKey |= KEY_F2;
+			if (i == BACKEND_KEYBOARD_ESCAPE)
+				gKey |= KEY_ESCAPE;
+			else if (i == BACKEND_KEYBOARD_F1)
+				gKey |= KEY_F1;
+			else if (i == BACKEND_KEYBOARD_F2)
+				gKey |= KEY_F2;
 
-				if (event.key.keysym.scancode == bindings[BINDING_MAP].keyboard)
-					gKey |= KEY_MAP;
-				if (event.key.keysym.scancode == bindings[BINDING_LEFT].keyboard)
-					gKey |= KEY_LEFT;
-				if (event.key.keysym.scancode == bindings[BINDING_RIGHT].keyboard)
-					gKey |= KEY_RIGHT;
-				if (event.key.keysym.scancode == bindings[BINDING_UP].keyboard)
-					gKey |= KEY_UP;
-				if (event.key.keysym.scancode == bindings[BINDING_DOWN].keyboard)
-					gKey |= KEY_DOWN;
-				if (event.key.keysym.scancode == bindings[BINDING_SHOT].keyboard)
-					gKey |= KEY_SHOT;
-				if (event.key.keysym.scancode == bindings[BINDING_JUMP].keyboard)
-					gKey |= KEY_JUMP;
-				if (event.key.keysym.scancode == bindings[BINDING_ARMS].keyboard)
-					gKey |= KEY_ARMS;
-				if (event.key.keysym.scancode == bindings[BINDING_ARMSREV].keyboard)
-					gKey |= KEY_ARMSREV;
-				if (event.key.keysym.scancode == bindings[BINDING_ITEM].keyboard)
-					gKey |= KEY_ITEM;
-				if (event.key.keysym.scancode == bindings[BINDING_CANCEL].keyboard)
-					gKey |= KEY_CANCEL;
-				if (event.key.keysym.scancode == bindings[BINDING_OK].keyboard)
-					gKey |= KEY_OK;
-				if (event.key.keysym.scancode == bindings[BINDING_PAUSE].keyboard)
-					gKey |= KEY_PAUSE;
+			if (i == bindings[BINDING_MAP].keyboard)
+				gKey |= KEY_MAP;
+			if (i == bindings[BINDING_LEFT].keyboard)
+				gKey |= KEY_LEFT;
+			if (i == bindings[BINDING_RIGHT].keyboard)
+				gKey |= KEY_RIGHT;
+			if (i == bindings[BINDING_UP].keyboard)
+				gKey |= KEY_UP;
+			if (i == bindings[BINDING_DOWN].keyboard)
+				gKey |= KEY_DOWN;
+			if (i == bindings[BINDING_SHOT].keyboard)
+				gKey |= KEY_SHOT;
+			if (i == bindings[BINDING_JUMP].keyboard)
+				gKey |= KEY_JUMP;
+			if (i == bindings[BINDING_ARMS].keyboard)
+				gKey |= KEY_ARMS;
+			if (i == bindings[BINDING_ARMSREV].keyboard)
+				gKey |= KEY_ARMSREV;
+			if (i == bindings[BINDING_ITEM].keyboard)
+				gKey |= KEY_ITEM;
+			if (i == bindings[BINDING_CANCEL].keyboard)
+				gKey |= KEY_CANCEL;
+			if (i == bindings[BINDING_OK].keyboard)
+				gKey |= KEY_OK;
+			if (i == bindings[BINDING_PAUSE].keyboard)
+				gKey |= KEY_PAUSE;
+		}
+		if ((backend_keyboard_state[i] ^ backend_previous_keyboard_state[i]) & backend_previous_keyboard_state[i])
+		{
+			if (i == BACKEND_KEYBOARD_ESCAPE)
+				gKey &= ~KEY_ESCAPE;
+			else if (i == BACKEND_KEYBOARD_F1)
+				gKey &= ~KEY_F1;
+			else if (i == BACKEND_KEYBOARD_F2)
+				gKey &= ~KEY_F2;
 
-				break;
-
-			case SDL_KEYUP:
-				if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
-					gKey &= ~KEY_ESCAPE;
-				else if (event.key.keysym.scancode == SDL_SCANCODE_F1)
-					gKey &= ~KEY_F1;
-				else if (event.key.keysym.scancode == SDL_SCANCODE_F2)
-					gKey &= ~KEY_F2;
-
-				if (event.key.keysym.scancode == bindings[BINDING_MAP].keyboard)
-					gKey &= ~KEY_MAP;
-				if (event.key.keysym.scancode == bindings[BINDING_LEFT].keyboard)
-					gKey &= ~KEY_LEFT;
-				if (event.key.keysym.scancode == bindings[BINDING_RIGHT].keyboard)
-					gKey &= ~KEY_RIGHT;
-				if (event.key.keysym.scancode == bindings[BINDING_UP].keyboard)
-					gKey &= ~KEY_UP;
-				if (event.key.keysym.scancode == bindings[BINDING_DOWN].keyboard)
-					gKey &= ~KEY_DOWN;
-				if (event.key.keysym.scancode == bindings[BINDING_SHOT].keyboard)
-					gKey &= ~KEY_SHOT;
-				if (event.key.keysym.scancode == bindings[BINDING_JUMP].keyboard)
-					gKey &= ~KEY_JUMP;
-				if (event.key.keysym.scancode == bindings[BINDING_ARMS].keyboard)
-					gKey &= ~KEY_ARMS;
-				if (event.key.keysym.scancode == bindings[BINDING_ARMSREV].keyboard)
-					gKey &= ~KEY_ARMSREV;
-				if (event.key.keysym.scancode == bindings[BINDING_ITEM].keyboard)
-					gKey &= ~KEY_ITEM;
-				if (event.key.keysym.scancode == bindings[BINDING_CANCEL].keyboard)
-					gKey &= ~KEY_CANCEL;
-				if (event.key.keysym.scancode == bindings[BINDING_OK].keyboard)
-					gKey &= ~KEY_OK;
-				if (event.key.keysym.scancode == bindings[BINDING_PAUSE].keyboard)
-					gKey &= ~KEY_PAUSE;
-
-				break;
-
-			case SDL_DROPFILE:
-				LoadProfile(event.drop.file);
-				SDL_free(event.drop.file);
-				break;
-
-			case SDL_WINDOWEVENT:
-				switch (event.window.event)
-				{
-					case SDL_WINDOWEVENT_FOCUS_LOST:
-						InactiveWindow();
-						break;
-
-					case SDL_WINDOWEVENT_FOCUS_GAINED:
-						ActiveWindow();
-						break;
-
-					case SDL_WINDOWEVENT_RESIZED:
-					case SDL_WINDOWEVENT_SIZE_CHANGED:
-						Backend_HandleWindowResize();
-						break;
-				}
-
-				break;
-
-			case SDL_QUIT:
-				StopOrganyaMusic();
-				return FALSE;
-
-			case SDL_RENDER_TARGETS_RESET:
-				Backend_HandleRenderTargetLoss();
-				break;
-
-			case SDL_JOYDEVICEADDED:
-				printf("Joystick connected:\nIndex - %d\nName - '%s'\n", event.jdevice.which, SDL_JoystickNameForIndex(event.jdevice.which));
-
-				if (joystick == NULL)
-				{
-					joystick = SDL_JoystickOpen(event.jdevice.which);
-
-					if (joystick != NULL)
-						ResetJoystickStatus();
-				}
-
-				break;
-
-			case SDL_JOYDEVICEREMOVED:
-				puts("Joystick disconnected");
-
-				if (SDL_JoystickFromInstanceID(event.jdevice.which) == joystick)
-				{
-					SDL_JoystickClose(joystick);
-					joystick = NULL;
-				}
-
-				break;
+			if (i == bindings[BINDING_MAP].keyboard)
+				gKey &= ~KEY_MAP;
+			if (i == bindings[BINDING_LEFT].keyboard)
+				gKey &= ~KEY_LEFT;
+			if (i == bindings[BINDING_RIGHT].keyboard)
+				gKey &= ~KEY_RIGHT;
+			if (i == bindings[BINDING_UP].keyboard)
+				gKey &= ~KEY_UP;
+			if (i == bindings[BINDING_DOWN].keyboard)
+				gKey &= ~KEY_DOWN;
+			if (i == bindings[BINDING_SHOT].keyboard)
+				gKey &= ~KEY_SHOT;
+			if (i == bindings[BINDING_JUMP].keyboard)
+				gKey &= ~KEY_JUMP;
+			if (i == bindings[BINDING_ARMS].keyboard)
+				gKey &= ~KEY_ARMS;
+			if (i == bindings[BINDING_ARMSREV].keyboard)
+				gKey &= ~KEY_ARMSREV;
+			if (i == bindings[BINDING_ITEM].keyboard)
+				gKey &= ~KEY_ITEM;
+			if (i == bindings[BINDING_CANCEL].keyboard)
+				gKey &= ~KEY_CANCEL;
+			if (i == bindings[BINDING_OK].keyboard)
+				gKey &= ~KEY_OK;
+			if (i == bindings[BINDING_PAUSE].keyboard)
+				gKey &= ~KEY_PAUSE;
 		}
 	}
 
@@ -430,7 +386,7 @@ void JoystickProc(void)
 		gKey &= ~gKeyDown;
 
 	// Set held buttons
-	for (i = 0; i < MAX_JOYSTICK_BUTTONS; ++i)
+	for (i = 0; i < sizeof(status.bButton) / sizeof(status.bButton[0]); ++i)
 	{
 		if (status.bButton[i] && !old_status.bButton[i])
 		{

@@ -5,10 +5,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "SDL.h"
-
 #include "WindowsWrapper.h"
 
+#include "Backends/Controller.h"
+#include "Backends/Misc.h"
 #include "CommonDefines.h"
 #include "Config.h"
 #include "Draw.h"
@@ -39,6 +39,239 @@ static const RECT rcMyChar[4] = {
 	{0, 16, 16, 32},
 	{32, 16, 48, 32},
 };
+
+static const char* GetKeyName(int key)
+{
+	switch (key)
+	{
+		case BACKEND_KEYBOARD_A:
+			return "A";
+
+		case BACKEND_KEYBOARD_B:
+			return "B";
+
+		case BACKEND_KEYBOARD_C:
+			return "C";
+
+		case BACKEND_KEYBOARD_D:
+			return "D";
+
+		case BACKEND_KEYBOARD_E:
+			return "E";
+
+		case BACKEND_KEYBOARD_F:
+			return "F";
+
+		case BACKEND_KEYBOARD_G:
+			return "G";
+
+		case BACKEND_KEYBOARD_H:
+			return "H";
+
+		case BACKEND_KEYBOARD_I:
+			return "I";
+
+		case BACKEND_KEYBOARD_J:
+			return "J";
+
+		case BACKEND_KEYBOARD_K:
+			return "K";
+
+		case BACKEND_KEYBOARD_L:
+			return "L";
+
+		case BACKEND_KEYBOARD_M:
+			return "M";
+
+		case BACKEND_KEYBOARD_N:
+			return "N";
+
+		case BACKEND_KEYBOARD_O:
+			return "O";
+
+		case BACKEND_KEYBOARD_P:
+			return "P";
+
+		case BACKEND_KEYBOARD_Q:
+			return "Q";
+
+		case BACKEND_KEYBOARD_R:
+			return "R";
+
+		case BACKEND_KEYBOARD_S:
+			return "S";
+
+		case BACKEND_KEYBOARD_T:
+			return "T";
+
+		case BACKEND_KEYBOARD_U:
+			return "U";
+
+		case BACKEND_KEYBOARD_V:
+			return "V";
+
+		case BACKEND_KEYBOARD_W:
+			return "W";
+
+		case BACKEND_KEYBOARD_X:
+			return "X";
+
+		case BACKEND_KEYBOARD_Y:
+			return "Y";
+
+		case BACKEND_KEYBOARD_Z:
+			return "Z";
+
+		case BACKEND_KEYBOARD_0:
+			return "0";
+
+		case BACKEND_KEYBOARD_1:
+			return "1";
+
+		case BACKEND_KEYBOARD_2:
+			return "2";
+
+		case BACKEND_KEYBOARD_3:
+			return "3";
+
+		case BACKEND_KEYBOARD_4:
+			return "4";
+
+		case BACKEND_KEYBOARD_5:
+			return "5";
+
+		case BACKEND_KEYBOARD_6:
+			return "6";
+
+		case BACKEND_KEYBOARD_7:
+			return "7";
+
+		case BACKEND_KEYBOARD_8:
+			return "8";
+
+		case BACKEND_KEYBOARD_9:
+			return "9";
+
+		case BACKEND_KEYBOARD_F1:
+			return "F1";
+
+		case BACKEND_KEYBOARD_F2:
+			return "F2";
+
+		case BACKEND_KEYBOARD_F3:
+			return "F3";
+
+		case BACKEND_KEYBOARD_F4:
+			return "F4";
+
+		case BACKEND_KEYBOARD_F5:
+			return "F5";
+
+		case BACKEND_KEYBOARD_F6:
+			return "F6";
+
+		case BACKEND_KEYBOARD_F7:
+			return "F7";
+
+		case BACKEND_KEYBOARD_F8:
+			return "F8";
+
+		case BACKEND_KEYBOARD_F9:
+			return "F9";
+
+		case BACKEND_KEYBOARD_F10:
+			return "F10";
+
+		case BACKEND_KEYBOARD_F11:
+			return "F11";
+
+		case BACKEND_KEYBOARD_F12:
+			return "F12";
+
+		case BACKEND_KEYBOARD_UP:
+			return "Up";
+
+		case BACKEND_KEYBOARD_DOWN:
+			return "Down";
+
+		case BACKEND_KEYBOARD_LEFT:
+			return "Left";
+
+		case BACKEND_KEYBOARD_RIGHT:
+			return "Right";
+
+		case BACKEND_KEYBOARD_ESCAPE:
+			return "Escape";
+
+		case BACKEND_KEYBOARD_BACK_QUOTE:
+			return "Back Quote";
+
+		case BACKEND_KEYBOARD_TAB:
+			return "Tab";
+
+		case BACKEND_KEYBOARD_CAPS_LOCK:
+			return "Caps Lock";
+
+		case BACKEND_KEYBOARD_LEFT_SHIFT:
+			return "Left Shift";
+
+		case BACKEND_KEYBOARD_LEFT_CTRL:
+			return "Left Ctrl";
+
+		case BACKEND_KEYBOARD_LEFT_ALT:
+			return "Left Alt";
+
+		case BACKEND_KEYBOARD_SPACE:
+			return "Space";
+
+		case BACKEND_KEYBOARD_RIGHT_ALT:
+			return "Right Alt";
+
+		case BACKEND_KEYBOARD_RIGHT_CTRL:
+			return "Right Ctrl";
+
+		case BACKEND_KEYBOARD_RIGHT_SHIFT:
+			return "Right Shift";
+
+		case BACKEND_KEYBOARD_ENTER:
+			return "Enter";
+
+		case BACKEND_KEYBOARD_BACKSPACE:
+			return "Backspace";
+
+		case BACKEND_KEYBOARD_MINUS:
+			return "-";
+
+		case BACKEND_KEYBOARD_EQUALS:
+			return "=";
+
+		case BACKEND_KEYBOARD_LEFT_BRACKET:
+			return "[";
+
+		case BACKEND_KEYBOARD_RIGHT_BRACKET:
+			return "]";
+
+		case BACKEND_KEYBOARD_BACK_SLASH:
+			return "\\";
+
+		case BACKEND_KEYBOARD_SEMICOLON:
+			return ";";
+
+		case BACKEND_KEYBOARD_APOSTROPHE:
+			return "'";
+
+		case BACKEND_KEYBOARD_COMMA:
+			return ",";
+
+		case BACKEND_KEYBOARD_PERIOD:
+			return ".";
+
+		case BACKEND_KEYBOARD_FORWARD_SLASH:
+			return "/";
+	}
+
+	return "Unknown";
+}
 
 static int EnterOptionsMenu(const char *title, Option *options, size_t total_options, int x_offset, BOOL submenu)
 {
@@ -187,23 +420,16 @@ static int Callback_ControlsKeyboard_Rebind(Option *options, size_t total_option
 
 	PlaySoundObject(5, 1);
 
-	int total_keys;
-	const Uint8 *state = SDL_GetKeyboardState(&total_keys);
-
-	Uint8 *old_state = (Uint8*)malloc(total_keys);
-
-	memcpy(old_state, state, total_keys);
-
 	char timeout_string[2];
 	timeout_string[1] = '\0';
 
 	for (unsigned int timeout = (60 * 5) - 1; timeout != 0; --timeout)
 	{
-		for (int scancode = 0; scancode < total_keys; ++scancode)
+		for (int scancode = 0; scancode < BACKEND_KEYBOARD_TOTAL; ++scancode)
 		{
-			if (!old_state[scancode] && state[scancode])
+			if (!backend_previous_keyboard_state[scancode] && backend_keyboard_state[scancode])
 			{
-				const char *key_name = SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)scancode));
+				const char *key_name = GetKeyName(scancode);
 
 				// If another control in the same group uses this key, swap them
 				for (size_t other_option = 0; other_option < total_options; ++other_option)
@@ -221,14 +447,11 @@ static int Callback_ControlsKeyboard_Rebind(Option *options, size_t total_option
 				strncpy(bound_name_buffers[selected_option], key_name, sizeof(bound_name_buffers[0]) - 1);
 
 				PlaySoundObject(18, 1);
-				free(old_state);
 
 				gKeyTrg = gKey = 0;	// Prevent weird input-ghosting by doing this
 				return -1;
 			}
 		}
-
-		memcpy(old_state, state, total_keys);
 
 		// Draw screen
 		CortBox(&grcFull, 0x000000);
@@ -245,7 +468,6 @@ static int Callback_ControlsKeyboard_Rebind(Option *options, size_t total_option
 		if (!Flip_SystemTask())
 		{
 			// Quit if window is closed
-			free(old_state);
 			return enum_ESCRETURN_exit;
 		}
 	}
@@ -270,7 +492,7 @@ static int Callback_ControlsKeyboard(Option *options, size_t total_options, size
 		submenu_options[i].callback = Callback_ControlsKeyboard_Rebind;
 		submenu_options[i].attribute = bound_name_buffers[i];
 
-		strncpy(bound_name_buffers[i], SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)bindings[controls[i].binding_index].keyboard)), sizeof(bound_name_buffers[0]) - 1);
+		strncpy(bound_name_buffers[i], GetKeyName(bindings[controls[i].binding_index].keyboard), sizeof(bound_name_buffers[0]) - 1);
 	}
 
 	PlaySoundObject(5, 1);
@@ -302,7 +524,7 @@ static int Callback_ControlsController_Rebind(Option *options, size_t total_opti
 		if (!GetJoystickStatus(&state))
 			memset(&state, 0, sizeof(JOYSTICK_STATUS));
 
-		for (int button = 0; button < MAX_JOYSTICK_BUTTONS; ++button)
+		for (int button = 0; button < sizeof(state.bButton) / sizeof(state.bButton[0]); ++button)
 		{
 			if (!old_state.bButton[button] && state.bButton[button])
 			{

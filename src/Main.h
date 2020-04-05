@@ -15,4 +15,7 @@ extern CONFIG_BINDING bindings[BINDING_TOTAL];
 void PutFramePerSecound(void);
 unsigned long GetFramePerSecound(void);
 
+void InactiveWindow(void);
+void ActiveWindow(void);
+
 BOOL SystemTask(void);

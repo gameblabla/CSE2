@@ -2,10 +2,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "SDL.h"
-
 #include "WindowsWrapper.h"
 
+#include "Backends/Misc.h"
 #include "Config.h"
 #include "File.h"
 #include "Main.h"
@@ -129,17 +128,17 @@ void DefaultConfigData(CONFIG *conf)
 	conf->bindings[BINDING_PAUSE].controller = 6;
 
 	// Set default key bindings
-	conf->bindings[BINDING_UP].keyboard = SDL_SCANCODE_UP;
-	conf->bindings[BINDING_DOWN].keyboard = SDL_SCANCODE_DOWN;
-	conf->bindings[BINDING_LEFT].keyboard = SDL_SCANCODE_LEFT;
-	conf->bindings[BINDING_RIGHT].keyboard = SDL_SCANCODE_RIGHT;
-	conf->bindings[BINDING_OK].keyboard = SDL_SCANCODE_Z;
-	conf->bindings[BINDING_CANCEL].keyboard = SDL_SCANCODE_X;
-	conf->bindings[BINDING_JUMP].keyboard = SDL_SCANCODE_Z;
-	conf->bindings[BINDING_SHOT].keyboard = SDL_SCANCODE_X;
-	conf->bindings[BINDING_ARMSREV].keyboard = SDL_SCANCODE_A;
-	conf->bindings[BINDING_ARMS].keyboard = SDL_SCANCODE_S;
-	conf->bindings[BINDING_ITEM].keyboard = SDL_SCANCODE_Q;
-	conf->bindings[BINDING_MAP].keyboard = SDL_SCANCODE_W;
-	conf->bindings[BINDING_PAUSE].keyboard = SDL_SCANCODE_ESCAPE;
+	conf->bindings[BINDING_UP].keyboard = BACKEND_KEYBOARD_UP;
+	conf->bindings[BINDING_DOWN].keyboard = BACKEND_KEYBOARD_DOWN;
+	conf->bindings[BINDING_LEFT].keyboard = BACKEND_KEYBOARD_LEFT;
+	conf->bindings[BINDING_RIGHT].keyboard = BACKEND_KEYBOARD_RIGHT;
+	conf->bindings[BINDING_OK].keyboard = BACKEND_KEYBOARD_Z;
+	conf->bindings[BINDING_CANCEL].keyboard = BACKEND_KEYBOARD_X;
+	conf->bindings[BINDING_JUMP].keyboard = BACKEND_KEYBOARD_Z;
+	conf->bindings[BINDING_SHOT].keyboard = BACKEND_KEYBOARD_X;
+	conf->bindings[BINDING_ARMSREV].keyboard = BACKEND_KEYBOARD_A;
+	conf->bindings[BINDING_ARMS].keyboard = BACKEND_KEYBOARD_S;
+	conf->bindings[BINDING_ITEM].keyboard = BACKEND_KEYBOARD_Q;
+	conf->bindings[BINDING_MAP].keyboard = BACKEND_KEYBOARD_W;
+	conf->bindings[BINDING_PAUSE].keyboard = BACKEND_KEYBOARD_ESCAPE;
 }

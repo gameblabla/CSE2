@@ -4,10 +4,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "SDL.h"
-
 #include "WindowsWrapper.h"
 
+#include "Backends/Misc.h"
 #include "ArmsItem.h"
 #include "Back.h"
 #include "Boss.h"
@@ -287,8 +286,8 @@ int ModeOpening(void)
 		++gCounter;
 	}
 
-	wait = SDL_GetTicks();
-	while (SDL_GetTicks() < wait + 500)
+	wait = Backend_GetTicks();
+	while (Backend_GetTicks() < wait + 500)
 	{
 		CortBox(&grcGame, 0x000000);
 		PutFramePerSecound();
@@ -545,8 +544,8 @@ int ModeTitle(void)
 	ChangeMusic(MUS_SILENCE);
 
 	// Black screen when option is selected
-	wait = SDL_GetTicks();
-	while (SDL_GetTicks() < wait + 1000)
+	wait = Backend_GetTicks();
+	while (Backend_GetTicks() < wait + 1000)
 	{
 		CortBox(&grcGame, 0);
 		PutFramePerSecound();
@@ -789,9 +788,9 @@ BOOL Game(void)
 	if (!LoadGenericData())
 	{
 #ifdef JAPANESE
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", "汎用ファイルが読めない", NULL);
+		Backend_ShowMessageBox("エラー", "汎用ファイルが読めない");
 #else
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Couldn't read general purpose files", NULL);
+		Backend_ShowMessageBox("Error", "Couldn't read general purpose files");
 #endif
 
 		return FALSE;
@@ -805,9 +804,9 @@ BOOL Game(void)
 	if (!LoadNpcTable(path))
 	{
 #ifdef JAPANESE
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "エラー", "NPCテーブルが読めない", NULL);
+		Backend_ShowMessageBox("エラー", "NPCテーブルが読めない");
 #else
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Couldn't read the NPC table", NULL);
+		Backend_ShowMessageBox("Error", "Couldn't read the NPC table");
 #endif
 
 		return FALSE;

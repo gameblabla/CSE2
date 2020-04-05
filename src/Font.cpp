@@ -24,7 +24,7 @@ typedef struct CachedGlyph
 	int x;
 	int y;
 	int x_advance;
-	Backend_Glyph *backend;
+	RenderBackend_Glyph *backend;
 
 	struct CachedGlyph *next;
 } CachedGlyph;
@@ -1006,7 +1006,7 @@ static CachedGlyph* GetGlyphCached(FontObject *font_object, unsigned long unicod
 				break;
 		}
 
-		glyph->backend = Backend_LoadGlyph(bitmap.buffer, bitmap.width, bitmap.rows, bitmap.pitch);
+		glyph->backend = RenderBackend_LoadGlyph(bitmap.buffer, bitmap.width, bitmap.rows, bitmap.pitch);
 
 		FT_Bitmap_Done(font_object->library, &bitmap);
 	}
@@ -1021,7 +1021,7 @@ static void UnloadCachedGlyphs(FontObject *font_object)
 	{
 		CachedGlyph *next_glyph = glyph->next;
 
-		Backend_UnloadGlyph(glyph->backend);
+		RenderBackend_UnloadGlyph(glyph->backend);
 		free(glyph);
 
 		glyph = next_glyph;
@@ -1085,13 +1085,13 @@ FontObject* LoadFont(const char *font_filename, unsigned int cell_width, unsigne
 	return font_object;
 }
 
-void DrawText(FontObject *font_object, Backend_Surface *surface, int x, int y, unsigned long colour, const char *string)
+void DrawText(FontObject *font_object, RenderBackend_Surface *surface, int x, int y, unsigned long colour, const char *string)
 {
 	if (font_object != NULL)
 	{
 		const unsigned char colour_channels[3] = {(unsigned char)colour, (unsigned char)(colour >> 8), (unsigned char)(colour >> 16)};
 
-		Backend_PrepareToDrawGlyphs(surface, colour_channels);
+		RenderBackend_PrepareToDrawGlyphs(surface, colour_channels);
 
 		unsigned int pen_x = 0;
 
@@ -1116,13 +1116,13 @@ void DrawText(FontObject *font_object, Backend_Surface *surface, int x, int y, u
 				const int letter_y = y + glyph->y;
 
 				if (glyph->backend != NULL)
-					Backend_DrawGlyph(glyph->backend, letter_x, letter_y);
+					RenderBackend_DrawGlyph(glyph->backend, letter_x, letter_y);
 
 				pen_x += glyph->x_advance;
 			}
 		}
 
-		Backend_FlushGlyphs();
+		RenderBackend_FlushGlyphs();
 	}
 }
 

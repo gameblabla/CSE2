@@ -63,17 +63,16 @@ Many months of copypasting and tinkering later, here is the result.
 ## Dependencies
 
 * SDL2
+* GLFW3
 * FreeType
 
 In CMake builds, if these are not found, they will be built locally.
 
-In addition, `pkg-config` is required for Makefile builds, and CMake builds that require static-linkage.
+In addition, `pkg-config` is required for builds that require static-linkage.
 
 ## Building
 
-### CMake
-
-This project primarily uses CMake, allowing it to be built with a range of compilers.
+This project uses CMake, allowing it to be built with a range of compilers.
 
 Switch to the terminal (Visual Studio users should open the [Developer Command Prompt](https://docs.microsoft.com/en-us/dotnet/framework/tools/developer-command-prompt-for-vs)) and `cd` into this folder. After that, generate the files for your build system with:
 
@@ -92,14 +91,16 @@ Name | Function
 `-DDEBUG_SAVE=ON` | Re-enable the ability to drag-and-drop save files onto the window
 `-DBACKEND_RENDERER=OpenGL3` | Use the hardware-accelerated OpenGL 3.2 renderer
 `-DBACKEND_RENDERER=OpenGLES2` | Use the hardware-accelerated OpenGL ES 2.0 renderer
-`-DBACKEND_RENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default)
-`-DBACKEND_RENDERER=Software` | Use the handwritten software renderer
+`-DBACKEND_RENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default) (note: requires `-DBACKEND_PLATFORM=SDL2`)
+`-DBACKEND_RENDERER=Software` | Use the handwritten software renderer (note: requires `-DBACKEND_PLATFORM=SDL2`)
 `-DBACKEND_AUDIO=SDL2` | Use the SDL2-driven software audio-mixer
 `-DBACKEND_AUDIO=miniaudio` | Use the miniaudio-driven software audio-mixer
+`-DBACKEND_PLATFORM=SDL2` | Use SDL2 for windowing and OS-abstraction
+`-DBACKEND_PLATFORM=GLFW3` | Use GLFW3 for windowing and OS-abstraction
 `-DLTO=ON` | Enable link-time optimisation
 `-DPKG_CONFIG_STATIC_LIBS=ON` | On platforms with pkg-config, static-link the dependencies (good for Windows builds, so you don't need to bundle DLL files)
 `-DMSVC_LINK_STATIC_RUNTIME=ON` | Link the static MSVC runtime library (Visual Studio only)
-`-DFORCE_LOCAL_LIBS=ON` | Compile the built-in versions of SDL2 and FreeType instead of using the system-provided ones
+`-DFORCE_LOCAL_LIBS=ON` | Compile the built-in versions of SDL2, GLFW3, and FreeType instead of using the system-provided ones
 `-DEXTRA_SOUND_FORMATS=ON` | Enable support for alternate music/SFX formats, include Ogg Vorbis, FLAC, and PxTone (not to be confused with PixTone)
 `-DCLOWNAUDIO_STB_VORBIS=ON` | Enable support for Ogg Vorbis music/SFX
 `-DCLOWNAUDIO_DR_FLAC=ON` | Enable support for FLAC music/SFX
@@ -117,33 +118,6 @@ cmake --build build --config Release
 If you're a Visual Studio user, you can open the generated `CSE2.sln` file instead, which can be found in the `build` folder.
 
 Once built, the executables can be found in the `game_english`/`game_japanese` folder, depending on the selected language.
-
-### Makefile \[deprecated - use CMake instead\]
-
-Run 'make' in this folder, preferably with some of the following settings:
-
-Name | Function
---------|--------
-`JAPANESE=1` | Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
-`FIX_BUGS=1` | Enabled by default - Fix various bugs in the game
-`DEBUG_SAVE=1` | Re-enable the ability to drag-and-drop save files onto the window
-`BACKEND_RENDERER=OpenGL3` | Use the hardware-accelerated OpenGL 3.2 renderer
-`BACKEND_RENDERER=OpenGLES2` | Use the hardware-accelerated OpenGL ES 2.0 renderer
-`BACKEND_RENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default)
-`BACKEND_RENDERER=Software` | Use the hand-written software renderer
-`BACKEND_AUDIO=SDL2` | Use the SDL2-driven software audio-mixer
-`BACKEND_AUDIO=miniaudio` | Use the miniaudio-driven software audio-mixer
-`RELEASE=1` | Compile a release build (optimised, stripped, etc.)
-`STATIC=1` | Produce a statically-linked executable (good for Windows builds, so you don't need to bundle DLL files)
-`WINDOWS=1` | Build for Windows
-`AUDIO_OGG=1` | Enable support for Ogg Vorbis music/SFX
-`AUDIO_FLAC=1` | Enable support for FLAC music/SFX
-`AUDIO_TRACKER=1` | Enable support for .it, .xm, .mod, .s3m music/SFX
-`AUDIO_PXTONE=1` | Enable support for PxTone music/SFX (not to be confused with PixTone)
-
-You can pass your own compiler flags by defining `CFLAGS` and `CXXFLAGS`.
-
-Once built, the executable can be found in the `game_english`/`game_japanese` folder, depending on the selected language.
 
 ## Licensing
 

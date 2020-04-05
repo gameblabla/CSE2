@@ -100,53 +100,72 @@ void PutBullet(int fx, int fy)
 	}
 }
 
-BULLET_TABLE gBulTbl[46] =
-{
+BULLET_TABLE gBulTbl[46] = {
+	// Null
 	{0, 0, 0, 0, 0, 0, 0, 0, {0, 0, 0, 0}},
+	// Snake
 	{4, 1, 20, 36, 4, 4, 2, 2, {8, 8, 8, 8}},
 	{6, 1, 23, 36, 4, 4, 2, 2, {8, 8, 8, 8}},
 	{8, 1, 30, 36, 4, 4, 2, 2, {8, 8, 8, 8}},
+	// Polar Star
 	{1, 1, 8, 32, 6, 6, 2, 2, {8, 8, 8, 8}},
 	{2, 1, 12, 32, 6, 6, 2, 2, {8, 8, 8, 8}},
 	{4, 1, 16, 32, 6, 6, 2, 2, {8, 8, 8, 8}},
+	// Fireball
 	{2, 2, 100, 8, 8, 16, 4, 2, {8, 8, 8, 8}},
 	{3, 2, 100, 8, 4, 4, 4, 2, {8, 8, 8, 8}},
 	{3, 2, 100, 8, 4, 4, 4, 2, {8, 8, 8, 8}},
+	// Machine Gun
 	{2, 1, 20, 32, 2, 2, 2, 2, {8, 8, 8, 8}},
 	{4, 1, 20, 32, 2, 2, 2, 2, {8, 8, 8, 8}},
 	{6, 1, 20, 32, 2, 2, 2, 2, {8, 8, 8, 8}},
+	// Missile Launcher
 	{0, 10, 50, 40, 2, 2, 2, 2, {8, 8, 8, 8}},
 	{0, 10, 70, 40, 4, 4, 4, 4, {8, 8, 8, 8}},
 	{0, 10, 90, 40, 4, 4, 0, 0, {8, 8, 8, 8}},
+	// Missile Launcher explosion
 	{1, 100, 100, 20, 16, 16, 0, 0, {0, 0, 0, 0}},
 	{1, 100, 100, 20, 16, 16, 0, 0, {0, 0, 0, 0}},
 	{1, 100, 100, 20, 16, 16, 0, 0, {0, 0, 0, 0}},
+	// Bubbler
 	{1, 1, 20, 8, 2, 2, 2, 2, {4, 4, 4, 4}},
 	{2, 1, 20, 8, 2, 2, 2, 2, {4, 4, 4, 4}},
 	{2, 1, 20, 8, 4, 4, 4, 4, {4, 4, 4, 4}},
+	// Bubbler level 3 thorns
 	{3, 1, 32, 32, 2, 2, 2, 2, {4, 4, 4, 4}},
+	// Blade slashes
 	{0, 100, 0, 36, 8, 8, 8, 8, {12, 12, 12, 12}},
+	// Falling spike that deals 127 damage
 	{127, 1, 2, 4, 8, 4, 8, 4, {0, 0, 0, 0}},
+	// Blade
 	{15, 1, 30, 36, 8, 8, 4, 2, {8, 8, 8, 8}},
 	{6, 3, 18, 36, 10, 10, 4, 2, {12, 12, 12, 12}},
 	{1, 100, 30, 36, 6, 6, 4, 4, {12, 12, 12, 12}},
+	// Super Missile Launcher
 	{0, 10, 30, 40, 2, 2, 2, 2, {8, 8, 8, 8}},
 	{0, 10, 40, 40, 4, 4, 4, 4, {8, 8, 8, 8}},
 	{0, 10, 40, 40, 4, 4, 0, 0, {8, 8, 8, 8}},
+	// Super Missile Launcher explosion
 	{2, 100, 100, 20, 12, 12, 0, 0, {0, 0, 0, 0}},
 	{2, 100, 100, 20, 12, 12, 0, 0, {0, 0, 0, 0}},
 	{2, 100, 100, 20, 12, 12, 0, 0, {0, 0, 0, 0}},
+	// Nemesis
 	{4, 4, 20, 32, 4, 4, 3, 3, {8, 8, 24, 8}},
 	{4, 2, 20, 32, 2, 2, 2, 2, {8, 8, 24, 8}},
 	{1, 1, 20, 32, 2, 2, 2, 2, {8, 8, 24, 8}},
+	// Spur
 	{4, 4, 30, 64, 6, 6, 3, 3, {8, 8, 8, 8}},
 	{8, 8, 30, 64, 6, 6, 3, 3, {8, 8, 8, 8}},
 	{12, 12, 30, 64, 6, 6, 3, 3, {8, 8, 8, 8}},
+	// Spur trail
 	{3, 100, 30, 32, 6, 6, 3, 3, {4, 4, 4, 4}},
 	{6, 100, 30, 32, 6, 6, 3, 3, {4, 4, 4, 4}},
 	{11, 100, 30, 32, 6, 6, 3, 3, {4, 4, 4, 4}},
+	// Curly's Nemesis
 	{4, 4, 20, 32, 4, 4, 3, 3, {8, 8, 24, 8}},
+	// Screen-nuke that kills all enemies
 	{0, 4, 4, 4, 0, 0, 0, 0, {0, 0, 0, 0}},
+	// Whimsical Star
 	{1, 1, 1, 36, 1, 1, 1, 1, {1, 1, 1, 1}}
 };
 
@@ -2258,6 +2277,7 @@ void ActBullet(void)
 
 			switch (gBul[i].code_bullet)
 			{
+				// Snake
 				case 1:
 					ActBullet_Frontia1(&gBul[i]);
 					break;
@@ -2267,6 +2287,8 @@ void ActBullet(void)
 				case 3:
 					ActBullet_Frontia2(&gBul[i], 3);
 					break;
+
+				// Polar Star
 				case 4:
 					ActBullet_PoleStar(&gBul[i], 1);
 					break;
@@ -2276,6 +2298,8 @@ void ActBullet(void)
 				case 6:
 					ActBullet_PoleStar(&gBul[i], 3);
 					break;
+
+				// Fireball
 				case 7:
 					ActBullet_FireBall(&gBul[i], 1);
 					break;
@@ -2285,6 +2309,8 @@ void ActBullet(void)
 				case 9:
 					ActBullet_FireBall(&gBul[i], 3);
 					break;
+
+				// Machine Gun
 				case 10:
 					ActBullet_MachineGun(&gBul[i], 1);
 					break;
@@ -2294,6 +2320,8 @@ void ActBullet(void)
 				case 12:
 					ActBullet_MachineGun(&gBul[i], 3);
 					break;
+
+				// Missile Launcher
 				case 13:
 					ActBullet_Missile(&gBul[i], 1);
 					break;
@@ -2303,6 +2331,8 @@ void ActBullet(void)
 				case 15:
 					ActBullet_Missile(&gBul[i], 3);
 					break;
+
+				// Missile Launcher explosion
 				case 16:
 					ActBullet_Bom(&gBul[i], 1);
 					break;
@@ -2312,6 +2342,8 @@ void ActBullet(void)
 				case 18:
 					ActBullet_Bom(&gBul[i], 3);
 					break;
+
+				// Bubbler
 				case 19:
 					ActBullet_Bubblin1(&gBul[i]);
 					break;
@@ -2321,15 +2353,23 @@ void ActBullet(void)
 				case 21:
 					ActBullet_Bubblin3(&gBul[i]);
 					break;
+
+				// Bubbler level 3 spines
 				case 22:
 					ActBullet_Spine(&gBul[i]);
 					break;
+
+				// Blade slashes
 				case 23:
 					ActBullet_Edge(&gBul[i]);
 					break;
+
+				// Falling spike that deals 127 damage
 				case 24:
 					ActBullet_Drop(&gBul[i]);
 					break;
+
+				// Blade
 				case 25:
 					ActBullet_Sword1(&gBul[i]);
 					break;
@@ -2339,6 +2379,8 @@ void ActBullet(void)
 				case 27:
 					ActBullet_Sword3(&gBul[i]);
 					break;
+
+				// Super Missile Launcher
 				case 28:
 					ActBullet_SuperMissile(&gBul[i], 1);
 					break;
@@ -2348,6 +2390,8 @@ void ActBullet(void)
 				case 30:
 					ActBullet_SuperMissile(&gBul[i], 3);
 					break;
+
+				// Super Missile Launcher explosion
 				case 31:
 					ActBullet_SuperBom(&gBul[i], 1);
 					break;
@@ -2357,6 +2401,8 @@ void ActBullet(void)
 				case 33:
 					ActBullet_SuperBom(&gBul[i], 3);
 					break;
+
+				// Nemesis
 				case 34:	// Identical to case 43
 					ActBullet_Nemesis(&gBul[i], 1);
 					break;
@@ -2366,6 +2412,8 @@ void ActBullet(void)
 				case 36:
 					ActBullet_Nemesis(&gBul[i], 3);
 					break;
+
+				// Spur
 				case 37:
 					ActBullet_Spur(&gBul[i], 1);
 					break;
@@ -2375,6 +2423,8 @@ void ActBullet(void)
 				case 39:
 					ActBullet_Spur(&gBul[i], 3);
 					break;
+
+				// Spur trail
 				case 40:
 					ActBullet_SpurTail(&gBul[i], 1);
 					break;
@@ -2384,12 +2434,18 @@ void ActBullet(void)
 				case 42:
 					ActBullet_SpurTail(&gBul[i], 3);
 					break;
+
+				// Curly's Nemesis
 				case 43:	// Identical to case 34
 					ActBullet_Nemesis(&gBul[i], 1);
 					break;
+
+				// Screen-nuke that kills all enemies
 				case 44:
 					ActBullet_EnemyClear(&gBul[i]);
 					break;
+
+				// Whimsical Star
 				case 45:
 					ActBullet_Star(&gBul[i]);
 					break;

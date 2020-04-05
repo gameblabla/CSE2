@@ -5,6 +5,7 @@
 
 #include "SDL.h"
 
+#include "../Misc.h"
 #ifdef EXTRA_SOUND_FORMATS
 #include "../../ExtraSoundFormats.h"
 #endif
@@ -72,7 +73,7 @@ BOOL AudioBackend_Init(void)
 {
 	if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
 	{
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal error (SDL2 audio backend)", "'SDL_InitSubSystem(SDL_INIT_AUDIO)' failed", NULL);
+		Backend_ShowMessageBox("Fatal error (SDL2 audio backend)", "'SDL_InitSubSystem(SDL_INIT_AUDIO)' failed");
 		return FALSE;
 	}
 
@@ -82,10 +83,10 @@ BOOL AudioBackend_Init(void)
 		puts(SDL_GetAudioDriver(i));
 
 	SDL_AudioSpec specification;
-	specification.freq = 44100;
+	specification.freq = 48000;
 	specification.format = AUDIO_F32;
 	specification.channels = 2;
-	specification.samples = 0x400;	// Roughly 10 milliseconds for 44100Hz
+	specification.samples = 0x400;	// Roughly 10 milliseconds for 48000Hz
 	specification.callback = Callback;
 	specification.userdata = NULL;
 
@@ -96,7 +97,7 @@ BOOL AudioBackend_Init(void)
 
 	if (device_id == 0)
 	{
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal error (SDL2 audio backend)", "'SDL_OpenAudioDevice' failed", NULL);
+		Backend_ShowMessageBox("Fatal error (SDL2 audio backend)", "'SDL_OpenAudioDevice' failed");
 		return FALSE;
 	}
 

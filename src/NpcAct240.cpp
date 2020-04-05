@@ -778,7 +778,7 @@ void ActNpc247(NPCHAR *npc)
 			npc->xm = 0;
 			npc->ym = 0;
 
-			DeleteNpCharCode(252, 1);
+			DeleteNpCharCode(252, TRUE);
 
 			SetNpChar(4, npc->x, npc->y, 0, 0, 0, NULL, 0x100);
 			SetNpChar(4, npc->x, npc->y, 0, 0, 0, NULL, 0x100);
