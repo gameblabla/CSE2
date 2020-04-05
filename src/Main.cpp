@@ -770,7 +770,7 @@ void JoystickProc(void)
 	if (!GetJoystickStatus(&status))
 		return;
 
-	gKey &= (KEY_ESCAPE | KEY_F2 | KEY_F1);
+	gKey &= (KEY_ESCAPE | KEY_F1 | KEY_F2);
 
 	// Set movement buttons
 	if (status.bLeft)
