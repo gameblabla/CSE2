@@ -242,7 +242,7 @@ BOOL MakeSurface_Resource(const char *name, SurfaceID surf_no)
 		return FALSE;
 
 	unsigned int width, height;
-	unsigned char *image_buffer = DecodeBitmap(data, size, &width, &height, FALSE);
+	unsigned char *image_buffer = DecodeBitmapWithAlpha(data, size, &width, &height, FALSE);
 
 	if (image_buffer == NULL)
 		return FALSE;
@@ -302,7 +302,7 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 	{
 		sprintf(path, "%s/%s.%s", gDataPath, name, file_extensions[i]);
 
-		image_buffer = DecodeBitmapFromFile(path, &width, &height, TRUE);
+		image_buffer = DecodeBitmapWithAlphaFromFile(path, &width, &height, TRUE);
 
 		if (image_buffer != NULL)
 			break;
@@ -350,7 +350,7 @@ BOOL ReloadBitmap_Resource(const char *name, SurfaceID surf_no)
 	const unsigned char *data = FindResource(name, "BITMAP", &size);
 
 	unsigned int width, height;
-	unsigned char *image_buffer = DecodeBitmap(data, size, &width, &height, FALSE);
+	unsigned char *image_buffer = DecodeBitmapWithAlpha(data, size, &width, &height, FALSE);
 
 	if (image_buffer == NULL)
 		return FALSE;
@@ -392,7 +392,7 @@ BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 	{
 		sprintf(path, "%s/%s.%s", gDataPath, name, file_extensions[i]);
 
-		image_buffer = DecodeBitmapFromFile(path, &width, &height, TRUE);
+		image_buffer = DecodeBitmapWithAlphaFromFile(path, &width, &height, TRUE);
 
 		if (image_buffer != NULL)
 			break;

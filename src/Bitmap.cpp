@@ -18,7 +18,7 @@ static void DoColourKey(unsigned char *image_buffer, unsigned int width, unsigne
 			image_buffer[(i * 4) + 3] = 0;
 }
 
-unsigned char* DecodeBitmap(const unsigned char *in_buffer, size_t in_buffer_size, unsigned int *width, unsigned int *height, BOOL colour_key)
+unsigned char* DecodeBitmapWithAlpha(const unsigned char *in_buffer, size_t in_buffer_size, unsigned int *width, unsigned int *height, BOOL colour_key)
 {
 	int channels_in_file;
 	unsigned char *image_buffer = stbi_load_from_memory(in_buffer, in_buffer_size, (int*)width, (int*)height, &channels_in_file, 4);
@@ -33,7 +33,7 @@ unsigned char* DecodeBitmap(const unsigned char *in_buffer, size_t in_buffer_siz
 	return image_buffer;
 }
 
-unsigned char* DecodeBitmapFromFile(const char *path, unsigned int *width, unsigned int *height, BOOL colour_key)
+unsigned char* DecodeBitmapWithAlphaFromFile(const char *path, unsigned int *width, unsigned int *height, BOOL colour_key)
 {
 	int channels_in_file;
 	unsigned char *image_buffer = stbi_load(path, (int*)width, (int*)height, &channels_in_file, 4);
@@ -46,6 +46,16 @@ unsigned char* DecodeBitmapFromFile(const char *path, unsigned int *width, unsig
 		DoColourKey(image_buffer, *width, *height);
 
 	return image_buffer;
+}
+
+unsigned char* DecodeBitmap(const unsigned char *in_buffer, size_t in_buffer_size, unsigned int *width, unsigned int *height)
+{
+	return stbi_load_from_memory(in_buffer, in_buffer_size, (int*)width, (int*)height, NULL, 3);
+}
+
+unsigned char* DecodeBitmapFromFile(const char *path, unsigned int *width, unsigned int *height)
+{
+	return stbi_load(path, (int*)width, (int*)height, NULL, 3);
 }
 
 void FreeBitmap(unsigned char *buffer)

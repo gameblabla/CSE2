@@ -167,7 +167,7 @@ int main(int argc, char *argv[])
 	if (window_icon_resource_data != NULL)
 	{
 		unsigned int window_icon_width, window_icon_height;
-		unsigned char *window_icon_rgb_pixels = DecodeBitmap(window_icon_resource_data, window_icon_resource_size, &window_icon_width, &window_icon_height, FALSE);
+		unsigned char *window_icon_rgb_pixels = DecodeBitmap(window_icon_resource_data, window_icon_resource_size, &window_icon_width, &window_icon_height);
 
 		if (window_icon_rgb_pixels != NULL)
 		{
@@ -182,7 +182,7 @@ int main(int argc, char *argv[])
 	sprintf(cursor_path, "%s/Resource/CURSOR/CURSOR_IKA.png", gDataPath);
 
 	unsigned int cursor_width, cursor_height;
-	unsigned char *cursor_rgb_pixels = DecodeBitmapFromFile(cursor_path, &cursor_width, &cursor_height, FALSE);
+	unsigned char *cursor_rgb_pixels = DecodeBitmapFromFile(cursor_path, &cursor_width, &cursor_height);
 
 	if (cursor_rgb_pixels != NULL)
 	{
