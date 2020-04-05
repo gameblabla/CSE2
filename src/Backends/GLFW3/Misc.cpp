@@ -20,12 +20,12 @@
 
 #define DO_KEY(GLFW_KEY, BACKEND_KEY) \
 	case GLFW_KEY: \
-		backend_keyboard_state[BACKEND_KEY] = action == GLFW_PRESS; \
+		keyboard_state[BACKEND_KEY] = action == GLFW_PRESS; \
 		break;
 
 BOOL bActive = TRUE;
-BOOL backend_keyboard_state[BACKEND_KEYBOARD_TOTAL];
-BOOL backend_previous_keyboard_state[BACKEND_KEYBOARD_TOTAL];
+
+static BOOL keyboard_state[BACKEND_KEYBOARD_TOTAL];
 
 static GLFWcursor* cursor;
 
@@ -264,14 +264,17 @@ BOOL Backend_SystemTask(void)
 		return FALSE;
 	}
 
-	memcpy(backend_previous_keyboard_state, backend_keyboard_state, sizeof(backend_keyboard_state));
-
 	glfwPollEvents();
 
 	while (!bActive)
 		glfwWaitEvents();
 
 	return TRUE;
+}
+
+void Backend_GetKeyboardState(BOOL *out_keyboard_state)
+{
+	memcpy(out_keyboard_state, keyboard_state, sizeof(keyboard_state));
 }
 
 void Backend_ShowMessageBox(const char *title, const char *message)
