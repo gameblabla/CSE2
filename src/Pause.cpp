@@ -423,11 +423,14 @@ static int Callback_ControlsKeyboard_Rebind(Option *options, size_t total_option
 	char timeout_string[2];
 	timeout_string[1] = '\0';
 
+	BOOL previous_keyboard_state[BACKEND_KEYBOARD_TOTAL];
+	memcpy(previous_keyboard_state, backend_keyboard_state, sizeof(backend_keyboard_state));
+
 	for (unsigned int timeout = (60 * 5) - 1; timeout != 0; --timeout)
 	{
 		for (int scancode = 0; scancode < BACKEND_KEYBOARD_TOTAL; ++scancode)
 		{
-			if (!backend_previous_keyboard_state[scancode] && backend_keyboard_state[scancode])
+			if (!previous_keyboard_state[scancode] && backend_keyboard_state[scancode])
 			{
 				const char *key_name = GetKeyName(scancode);
 
@@ -452,6 +455,8 @@ static int Callback_ControlsKeyboard_Rebind(Option *options, size_t total_option
 				return -1;
 			}
 		}
+
+		memcpy(previous_keyboard_state, backend_keyboard_state, sizeof(backend_keyboard_state));
 
 		// Draw screen
 		CortBox(&grcFull, 0x000000);
