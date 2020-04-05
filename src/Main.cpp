@@ -179,7 +179,7 @@ int main(int argc, char *argv[])
 
 	// Set up the cursor
 	char cursor_path[MAX_PATH];
-	sprintf(cursor_path, "%s/Resource/CURSOR/CURSOR_IKA.png", gDataPath);
+	sprintf(cursor_path, "%s/Resource/CURSOR/CURSOR_NORMAL.png", gDataPath);
 
 	unsigned int cursor_width, cursor_height;
 	unsigned char *cursor_rgb_pixels = DecodeBitmapFromFile(cursor_path, &cursor_width, &cursor_height);
