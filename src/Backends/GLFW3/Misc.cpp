@@ -212,43 +212,11 @@ void Backend_SetWindowIcon(const unsigned char *rgb_pixels, unsigned int width, 
 	}
 }
 
-void Backend_SetCursor(const unsigned char *rgb_pixels, unsigned int width, unsigned int height)
+void Backend_SetCursor(const unsigned char *rgba_pixels, unsigned int width, unsigned int height)
 {
-	// Convert to RGBA, since that's the only think GLFW3 accepts
-	unsigned char *rgba_pixels = (unsigned char*)malloc(width * height * 4);
-
-	const unsigned char *rgb_pointer = rgb_pixels;
-	unsigned char *rgba_pointer = rgba_pixels;
-
-	if (rgba_pixels != NULL)
-	{
-		for (unsigned int y = 0; y < height; ++y)
-		{
-			for (unsigned int x = 0; x < width; ++x)
-			{
-				if (rgb_pointer[0] == 0xFF && rgb_pointer[1] == 0 && rgb_pointer[2] == 0xFF)	// Colour-key
-				{
-					*rgba_pointer++ = *rgb_pointer++;
-					*rgba_pointer++ = *rgb_pointer++;
-					*rgba_pointer++ = *rgb_pointer++;
-					*rgba_pointer++ = 0;
-				}
-				else
-				{
-					*rgba_pointer++ = *rgb_pointer++;
-					*rgba_pointer++ = *rgb_pointer++;
-					*rgba_pointer++ = *rgb_pointer++;
-					*rgba_pointer++ = 0xFF;
-				}
-			}
-		}
-
-		GLFWimage glfw_image = {(int)width, (int)height, rgba_pixels};
-		cursor = glfwCreateCursor(&glfw_image, 0, 0);
-		glfwSetCursor(window, cursor);
-
-		free(rgba_pixels);
-	}
+	GLFWimage glfw_image = {(int)width, (int)height, (unsigned char*)rgba_pixels};
+	cursor = glfwCreateCursor(&glfw_image, 0, 0);
+	glfwSetCursor(window, cursor);
 }
 
 void PlaybackBackend_EnableDragAndDrop(void)

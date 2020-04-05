@@ -100,7 +100,7 @@ void Backend_PostWindowCreation(void);
 BOOL Backend_GetBasePath(char *string_buffer);
 void Backend_HideMouse(void);
 void Backend_SetWindowIcon(const unsigned char *rgb_pixels, unsigned int width, unsigned int height);
-void Backend_SetCursor(const unsigned char *rgb_pixels, unsigned int width, unsigned int height);
+void Backend_SetCursor(const unsigned char *rgba_pixels, unsigned int width, unsigned int height);
 void PlaybackBackend_EnableDragAndDrop(void);
 BOOL Backend_SystemTask(void);
 void Backend_ShowMessageBox(const char *title, const char *message);

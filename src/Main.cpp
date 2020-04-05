@@ -182,12 +182,12 @@ int main(int argc, char *argv[])
 	sprintf(cursor_path, "%s/Resource/CURSOR/CURSOR_NORMAL.png", gDataPath);
 
 	unsigned int cursor_width, cursor_height;
-	unsigned char *cursor_rgb_pixels = DecodeBitmapFromFile(cursor_path, &cursor_width, &cursor_height);
+	unsigned char *cursor_rgba_pixels = DecodeBitmapWithAlphaFromFile(cursor_path, &cursor_width, &cursor_height, FALSE);
 
-	if (cursor_rgb_pixels != NULL)
+	if (cursor_rgba_pixels != NULL)
 	{
-		Backend_SetCursor(cursor_rgb_pixels, cursor_width, cursor_height);
-		FreeBitmap(cursor_rgb_pixels);
+		Backend_SetCursor(cursor_rgba_pixels, cursor_width, cursor_height);
+		FreeBitmap(cursor_rgba_pixels);
 	}
 
 	if (IsKeyFile("fps"))
