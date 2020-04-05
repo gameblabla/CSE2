@@ -201,7 +201,7 @@ static const char* GetKeyName(int key)
 			return "Escape";
 
 		case BACKEND_KEYBOARD_BACK_QUOTE:
-			return "Back Quote";
+			return "`";
 
 		case BACKEND_KEYBOARD_TAB:
 			return "Tab";
