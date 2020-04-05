@@ -426,18 +426,18 @@ if(BACKEND_PLATFORM MATCHES "SDL2" OR BACKEND_AUDIO MATCHES "SDL2")
 		# pkg-config
 		if (PKG_CONFIG_STATIC_LIBS)
 			message(STATUS "Using system SDL2 (pkg-config, static)")
-			# Do not link libSDL3main.a, otherwise we get weird linker errors about SDL_main not being found.
+			# Do not link libSDL2main.a, otherwise we get weird linker errors about SDL_main not being found.
 			# We don't need SDL2's WinMain->main shim anyway, so we can just ignore it.
 			list(REMOVE_ITEM sdl2_STATIC_CFLAGS "-Dmain=SDL_main")
-			list(REMOVE_ITEM sdl2_STATIC_LDFLAGS "-lSDLmain")
+			list(REMOVE_ITEM sdl2_STATIC_LDFLAGS "-lSDL2main")
 			target_compile_options(CSE2 PRIVATE ${sdl2_STATIC_CFLAGS})
 			target_link_libraries(CSE2 PRIVATE ${sdl2_STATIC_LDFLAGS})
 		else()
 			message(STATUS "Using system SDL2 (pkg-config, dynamic)")
-			# Do not link libSDL3main.a, otherwise we get weird linker errors about SDL_main not being found.
+			# Do not link libSDL2main.a, otherwise we get weird linker errors about SDL_main not being found.
 			# We don't need SDL2's WinMain->main shim anyway, so we can just ignore it.
 			list(REMOVE_ITEM sdl2_CFLAGS "-Dmain=SDL_main")
-			list(REMOVE_ITEM sdl2_LDFLAGS "-lSDLmain")
+			list(REMOVE_ITEM sdl2_LDFLAGS "-lSDL2main")
 			target_compile_options(CSE2 PRIVATE ${sdl2_CFLAGS})
 			target_link_libraries(CSE2 PRIVATE ${sdl2_LDFLAGS})
 		endif()
