@@ -277,13 +277,16 @@ int main(int argc, char *argv[])
 	size_t window_icon_resource_size;
 	const unsigned char *window_icon_resource_data = FindResource("ICON_MINI", "ICON", &window_icon_resource_size);
 
-	unsigned int window_icon_width, window_icon_height;
-	unsigned char *window_icon_rgb_pixels = DecodeBitmap(window_icon_resource_data, window_icon_resource_size, &window_icon_width, &window_icon_height);
-
-	if (window_icon_rgb_pixels != NULL)
+	if (window_icon_resource_data != NULL)
 	{
-		Backend_SetWindowIcon(window_icon_rgb_pixels, window_icon_width, window_icon_height);
-		FreeBitmap(window_icon_rgb_pixels);
+		unsigned int window_icon_width, window_icon_height;
+		unsigned char *window_icon_rgb_pixels = DecodeBitmap(window_icon_resource_data, window_icon_resource_size, &window_icon_width, &window_icon_height);
+
+		if (window_icon_rgb_pixels != NULL)
+		{
+			Backend_SetWindowIcon(window_icon_rgb_pixels, window_icon_width, window_icon_height);
+			FreeBitmap(window_icon_rgb_pixels);
+		}
 	}
 #endif
 
@@ -291,13 +294,16 @@ int main(int argc, char *argv[])
 	size_t cursor_resource_size;
 	const unsigned char *cursor_resource_data = FindResource("CURSOR_NORMAL", "CURSOR", &cursor_resource_size);
 
-	unsigned int cursor_width, cursor_height;
-	unsigned char *cursor_rgb_pixels = DecodeBitmap(cursor_resource_data, cursor_resource_size, &cursor_width, &cursor_height);
-
-	if (cursor_rgb_pixels != NULL)
+	if (cursor_resource_data != NULL)
 	{
-		Backend_SetCursor(cursor_rgb_pixels, cursor_width, cursor_height);
-		FreeBitmap(cursor_rgb_pixels);
+		unsigned int cursor_width, cursor_height;
+		unsigned char *cursor_rgb_pixels = DecodeBitmap(cursor_resource_data, cursor_resource_size, &cursor_width, &cursor_height);
+
+		if (cursor_rgb_pixels != NULL)
+		{
+			Backend_SetCursor(cursor_rgb_pixels, cursor_width, cursor_height);
+			FreeBitmap(cursor_rgb_pixels);
+		}
 	}
 
 	if (IsKeyFile("fps"))
