@@ -102,8 +102,10 @@ BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
 	int total_axes;
 	const float *axes = glfwGetJoystickAxes(connected_joystick_id, &total_axes);
 
+#if GLFW_VERSION_MAJOR > 3 || (GLFW_VERSION_MAJOR == 3 && GLFW_VERSION_MINOR >= 3)
 	int total_hats;
 	const unsigned char *hats = glfwGetJoystickHats(connected_joystick_id, &total_hats);
+#endif
 
 	// Handle directional inputs
 	status->bLeft = axes[0] < axis_neutrals[0] - DEADZONE;
@@ -137,6 +139,7 @@ BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
 			break;
 	}
 
+#if GLFW_VERSION_MAJOR > 3 || (GLFW_VERSION_MAJOR == 3 && GLFW_VERSION_MINOR >= 3)
 	// Then the joystick hats
 	for (int i = 0; i < total_axes; ++i)
 	{
@@ -160,6 +163,7 @@ BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
 		if (++buttons_done >= button_limit)
 			break;
 	}
+#endif
 
 	// Blank any remaining buttons
 	for (size_t i = buttons_done; i < button_limit; ++i)
