@@ -271,12 +271,14 @@ void JoystickProc(void);
 
 BOOL SystemTask(void)
 {
+	static BOOL previous_keyboard_state[BACKEND_KEYBOARD_TOTAL];
+
 	if (!Backend_SystemTask())
 		return FALSE;
 
 	for (unsigned int i = 0; i < BACKEND_KEYBOARD_TOTAL; ++i)
 	{
-		if (backend_keyboard_state[i] && !backend_previous_keyboard_state[i])
+		if (backend_keyboard_state[i] && !previous_keyboard_state[i])
 		{
 			if (i == BACKEND_KEYBOARD_ESCAPE)
 				gKey |= KEY_ESCAPE;
@@ -312,7 +314,7 @@ BOOL SystemTask(void)
 			if (i == bindings[BINDING_PAUSE].keyboard)
 				gKey |= KEY_PAUSE;
 		}
-		else if (!backend_keyboard_state[i] && backend_previous_keyboard_state[i])
+		else if (!backend_keyboard_state[i] && previous_keyboard_state[i])
 		{
 			if (i == BACKEND_KEYBOARD_ESCAPE)
 				gKey &= ~KEY_ESCAPE;
@@ -349,6 +351,8 @@ BOOL SystemTask(void)
 				gKey &= ~KEY_PAUSE;
 		}
 	}
+
+	memcpy(previous_keyboard_state, backend_keyboard_state, sizeof(backend_keyboard_state));
 
 	// Run joystick code
 	JoystickProc();

@@ -92,7 +92,6 @@ typedef struct Backend_DisplayMode
 
 extern BOOL bActive;
 extern BOOL backend_keyboard_state[BACKEND_KEYBOARD_TOTAL];
-extern BOOL backend_previous_keyboard_state[BACKEND_KEYBOARD_TOTAL];
 
 void Backend_Init(void);
 void Backend_Deinit(void);
