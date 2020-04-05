@@ -384,7 +384,7 @@ BOOL SystemTask(void)
 
 	for (unsigned int i = 0; i < BACKEND_KEYBOARD_TOTAL; ++i)
 	{
-		if ((backend_keyboard_state[i] ^ backend_previous_keyboard_state[i]) & backend_keyboard_state[i])
+		if (backend_keyboard_state[i] && !backend_previous_keyboard_state[i])
 		{
 			switch (i)
 			{
@@ -470,7 +470,7 @@ BOOL SystemTask(void)
 					break;
 			}
 		}
-		else if ((backend_keyboard_state[i] ^ backend_previous_keyboard_state[i]) & backend_previous_keyboard_state[i])
+		else if (!backend_keyboard_state[i] && backend_previous_keyboard_state[i])
 		{
 			switch (i)
 			{
