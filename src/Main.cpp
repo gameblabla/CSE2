@@ -451,7 +451,7 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lPar
 		case WM_CREATE:
 			hMenu = GetMenu(hWnd);
 		#ifdef DEBUG_SAVE
-			if (!CheckFileExists("save"))	// Chances are a line like this used to exist
+			if (!IsKeyFile("save"))	// Chances are a line like this used to exist
 		#endif
 				DeleteMenu(hMenu, 40005, MF_BYCOMMAND);
 			DrawMenuBar(hWnd);
