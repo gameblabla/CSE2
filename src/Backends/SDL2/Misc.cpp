@@ -254,3 +254,13 @@ void Backend_Delay(unsigned int ticks)
 {
 	SDL_Delay(ticks);
 }
+
+void Backend_GetDisplayMode(Backend_DisplayMode *display_mode)
+{
+	SDL_DisplayMode sdl_display_mode;
+	SDL_GetDesktopDisplayMode(0, &sdl_display_mode);
+
+	display_mode->width = sdl_display_mode.w;
+	display_mode->height = sdl_display_mode.h;
+	display_mode->refresh_rate = sdl_display_mode.refresh_rate;
+}

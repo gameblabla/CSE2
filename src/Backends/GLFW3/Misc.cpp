@@ -290,3 +290,14 @@ void Backend_Delay(unsigned int ticks)
 	// GLFW3 doesn't have a delay function, so here's some butt-ugly C++11
 	std::this_thread::sleep_for(std::chrono::milliseconds(ticks));
 }
+
+void Backend_GetDisplayMode(Backend_DisplayMode *display_mode)
+{
+	GLFWmonitor *monitor = glfwGetPrimaryMonitor();
+
+	const GLFWvidmode *mode = glfwGetVideoMode(monitor);
+
+	display_mode->width = mode->width;
+	display_mode->height = mode->height;
+	display_mode->refresh_rate = mode->refreshRate;
+}

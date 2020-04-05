@@ -108,6 +108,9 @@ BOOL StartDirectDraw(const char *title, int lMagnification, BOOL b60fps, BOOL bS
 	gb60fps = b60fps;
 	gbSmoothScrolling = bSmoothScrolling;
 
+	Backend_DisplayMode display_mode;
+	Backend_GetDisplayMode(&display_mode);
+
 	memset(surface_metadata, 0, sizeof(surface_metadata));
 
 	switch (lMagnification)
@@ -118,27 +121,18 @@ BOOL StartDirectDraw(const char *title, int lMagnification, BOOL b60fps, BOOL bS
 			break;
 
 		case 0:
-			magnification = 3;//lMagnification;
-//			SDL_DisplayMode display_mode;
-//			if (SDL_GetDesktopDisplayMode(0, &display_mode) < 0)
-//				return FALSE;
-
-//			magnification = display_mode.w / WINDOW_WIDTH < display_mode.h / WINDOW_HEIGHT ? display_mode.w / WINDOW_WIDTH : display_mode.h / WINDOW_HEIGHT;
-			fullscreen = FALSE;
+			magnification = display_mode.width / WINDOW_WIDTH < display_mode.height / WINDOW_HEIGHT ? display_mode.width / WINDOW_WIDTH : display_mode.height / WINDOW_HEIGHT;
+			fullscreen = TRUE;
 			break;
 	}
 
 	// Ugly way to round the magnification up to the nearest multiple of SPRITE_SCALE (we can't use 2x sprites at 1x or 3x internal resolution)
 	magnification = ((magnification + (SPRITE_SCALE - 1)) / SPRITE_SCALE) * SPRITE_SCALE;
-/* TODO - move this to backend probably
+
 	// If v-sync is requested, check if it's available
 	if (bVsync)
-	{
-		SDL_DisplayMode display_mode;
-		if (SDL_GetDesktopDisplayMode(0, &display_mode) == 0)
-			gbVsync = display_mode.refresh_rate == (b60fps ? 60 : 50);
-	}
-*/
+		gbVsync = display_mode.refresh_rate == (b60fps ? 60 : 50);
+
 	framebuffer = RenderBackend_Init(title, WINDOW_WIDTH * magnification, WINDOW_HEIGHT * magnification, fullscreen, gbVsync);
 
 	if (framebuffer == NULL)

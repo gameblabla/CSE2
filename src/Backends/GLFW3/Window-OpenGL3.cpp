@@ -17,7 +17,7 @@
 
 GLFWwindow *window;
 
-BOOL WindowBackend_OpenGL_CreateWindow(const char *window_title, int *screen_width, int *screen_height, BOOL fullscreen)
+BOOL WindowBackend_OpenGL_CreateWindow(const char *window_title, int *screen_width, int *screen_height, BOOL fullscreen, BOOL vsync)
 {
 #ifdef USE_OPENGLES2
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
@@ -59,6 +59,9 @@ BOOL WindowBackend_OpenGL_CreateWindow(const char *window_title, int *screen_wid
 					if (GLAD_GL_VERSION_3_2)
 					{
 			#endif
+						if (vsync)
+							glfwSwapInterval(1);
+
 						Backend_PostWindowCreation();
 
 						return TRUE;

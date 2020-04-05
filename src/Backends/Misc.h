@@ -83,6 +83,13 @@ enum
 	BACKEND_KEYBOARD_TOTAL
 };
 
+typedef struct Backend_DisplayMode
+{
+	unsigned int width;
+	unsigned int height;
+	unsigned int refresh_rate;
+} Backend_DisplayMode;
+
 extern BOOL bActive;
 extern BOOL backend_keyboard_state[BACKEND_KEYBOARD_TOTAL];
 extern BOOL backend_previous_keyboard_state[BACKEND_KEYBOARD_TOTAL];
@@ -99,4 +106,4 @@ BOOL Backend_SystemTask(void);
 void Backend_ShowMessageBox(const char *title, const char *message);
 unsigned long Backend_GetTicks(void);
 void Backend_Delay(unsigned int ticks);
-const char* Backend_GetKeyName(int key);
+void Backend_GetDisplayMode(Backend_DisplayMode *display_mode);
