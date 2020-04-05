@@ -42,7 +42,7 @@ Many months of copypasting and tinkering later, here is the result.
 * GLFW3
 * FreeType
 
-In CMake builds, if these are not found, they will be built locally.
+If these are not found, they will be built locally.
 
 In addition, `pkg-config` is required for builds that require static-linkage.
 
@@ -56,7 +56,7 @@ Switch to the terminal (Visual Studio users should open the [Developer Command P
 cmake -B build -DCMAKE_BUILD_TYPE=Release
 ```
 
-MSYS2 users may want to append `-G"MSYS Makefiles"` to this command, also.
+MSYS2 users may want to append `-G"MSYS Makefiles" -DPKG_CONFIG_STATIC_LIBS=ON` to this command, also.
 
 You can also add the following flags:
 
