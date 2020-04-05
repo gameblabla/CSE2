@@ -18,12 +18,12 @@
 
 #define DO_KEY(SDL_KEY, BACKEND_KEY) \
 	case SDL_KEY: \
-		backend_keyboard_state[BACKEND_KEY] = event.key.type == SDL_KEYDOWN; \
+		keyboard_state[BACKEND_KEY] = event.key.type == SDL_KEYDOWN; \
 		break;
 
 BOOL bActive = TRUE;
-BOOL backend_keyboard_state[BACKEND_KEYBOARD_TOTAL];
-BOOL backend_previous_keyboard_state[BACKEND_KEYBOARD_TOTAL];
+
+static BOOL keyboard_state[BACKEND_KEYBOARD_TOTAL];
 
 static SDL_Surface *cursor_surface;
 static SDL_Cursor *cursor;
@@ -235,6 +235,11 @@ BOOL Backend_SystemTask(void)
 	}
 
 	return TRUE;
+}
+
+void Backend_GetKeyboardState(BOOL *out_keyboard_state)
+{
+	memcpy(out_keyboard_state, keyboard_state, sizeof(keyboard_state));
 }
 
 void Backend_ShowMessageBox(const char *title, const char *message)

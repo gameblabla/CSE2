@@ -91,7 +91,6 @@ typedef struct Backend_DisplayMode
 } Backend_DisplayMode;
 
 extern BOOL bActive;
-extern BOOL backend_keyboard_state[BACKEND_KEYBOARD_TOTAL];
 
 void Backend_Init(void);
 void Backend_Deinit(void);
@@ -102,6 +101,7 @@ void Backend_SetWindowIcon(const unsigned char *rgb_pixels, unsigned int width, 
 void Backend_SetCursor(const unsigned char *rgba_pixels, unsigned int width, unsigned int height);
 void PlaybackBackend_EnableDragAndDrop(void);
 BOOL Backend_SystemTask(void);
+void Backend_GetKeyboardState(BOOL *keyboard_state);
 void Backend_ShowMessageBox(const char *title, const char *message);
 unsigned long Backend_GetTicks(void);
 void Backend_Delay(unsigned int ticks);
