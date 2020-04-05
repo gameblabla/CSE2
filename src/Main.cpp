@@ -164,13 +164,16 @@ int main(int argc, char *argv[])
 	size_t window_icon_resource_size;
 	const unsigned char *window_icon_resource_data = FindResource("ICON_MINI", "ICON", &window_icon_resource_size);
 
-	unsigned int window_icon_width, window_icon_height;
-	unsigned char *window_icon_rgb_pixels = DecodeBitmap(window_icon_resource_data, window_icon_resource_size, &window_icon_width, &window_icon_height, FALSE);
-
-	if (window_icon_rgb_pixels != NULL)
+	if (window_icon_resource_data != NULL)
 	{
-		Backend_SetWindowIcon(window_icon_rgb_pixels, window_icon_width, window_icon_height);
-		FreeBitmap(window_icon_rgb_pixels);
+		unsigned int window_icon_width, window_icon_height;
+		unsigned char *window_icon_rgb_pixels = DecodeBitmap(window_icon_resource_data, window_icon_resource_size, &window_icon_width, &window_icon_height, FALSE);
+
+		if (window_icon_rgb_pixels != NULL)
+		{
+			Backend_SetWindowIcon(window_icon_rgb_pixels, window_icon_width, window_icon_height);
+			FreeBitmap(window_icon_rgb_pixels);
+		}
 	}
 #endif
 
@@ -273,7 +276,7 @@ BOOL SystemTask(void)
 
 	for (unsigned int i = 0; i < BACKEND_KEYBOARD_TOTAL; ++i)
 	{
-		if ((backend_keyboard_state[i] ^ backend_previous_keyboard_state[i]) & backend_keyboard_state[i])
+		if (backend_keyboard_state[i] && !backend_previous_keyboard_state[i])
 		{
 			if (i == BACKEND_KEYBOARD_ESCAPE)
 				gKey |= KEY_ESCAPE;
@@ -309,7 +312,7 @@ BOOL SystemTask(void)
 			if (i == bindings[BINDING_PAUSE].keyboard)
 				gKey |= KEY_PAUSE;
 		}
-		if ((backend_keyboard_state[i] ^ backend_previous_keyboard_state[i]) & backend_previous_keyboard_state[i])
+		else if (!backend_keyboard_state[i] && backend_previous_keyboard_state[i])
 		{
 			if (i == BACKEND_KEYBOARD_ESCAPE)
 				gKey &= ~KEY_ESCAPE;
