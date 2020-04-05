@@ -175,11 +175,11 @@ int main(int argc, char *argv[])
 #endif
 
 	// Set up the cursor
-	size_t cursor_resource_size;
-	const unsigned char *cursor_resource_data = FindResource("CURSOR_NORMAL", "CURSOR", &cursor_resource_size);
+	char cursor_path[MAX_PATH];
+	sprintf(cursor_path, "%s/Resource/CURSOR/CURSOR_IKA.png", gDataPath);
 
 	unsigned int cursor_width, cursor_height;
-	unsigned char *cursor_rgb_pixels = DecodeBitmap(cursor_resource_data, cursor_resource_size, &cursor_width, &cursor_height, FALSE);
+	unsigned char *cursor_rgb_pixels = DecodeBitmapFromFile(cursor_path, &cursor_width, &cursor_height, FALSE);
 
 	if (cursor_rgb_pixels != NULL)
 	{
