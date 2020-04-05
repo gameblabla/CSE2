@@ -39,15 +39,6 @@ BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
 
 	const size_t button_limit = sizeof(status->bButton) / sizeof(status->bButton[0]);
 
-	// Handle directional inputs
-	const Sint16 joystick_x = SDL_JoystickGetAxis(joystick, 0);
-	const Sint16 joystick_y = SDL_JoystickGetAxis(joystick, 1);
-
-	status->bLeft = joystick_x < axis_neutrals[0] - DEADZONE;
-	status->bRight = joystick_x > axis_neutrals[0] + DEADZONE;
-	status->bUp = joystick_y < axis_neutrals[1] - DEADZONE;
-	status->bDown = joystick_y > axis_neutrals[1] + DEADZONE;
-
 	// Handle button inputs
 	int total_buttons = SDL_JoystickNumButtons(joystick);
 	int total_axes = SDL_JoystickNumAxes(joystick);
@@ -134,7 +125,7 @@ void ControllerBackend_JoystickConnect(Sint32 joystick_id)
 			int total_axes = SDL_JoystickNumAxes(joystick);
 			int total_buttons = SDL_JoystickNumButtons(joystick);
 
-			if (total_axes >= 2 && total_buttons >= 6)
+			if (total_buttons >= 6)
 			{
 				printf("Joystick #%d selected\n", joystick_id);
 

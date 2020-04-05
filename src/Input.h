@@ -4,10 +4,6 @@
 
 struct JOYSTICK_STATUS
 {
-	BOOL bLeft;
-	BOOL bRight;
-	BOOL bUp;
-	BOOL bDown;
 	BOOL bButton[128];	// The original `Input.cpp` assumed there were 32 buttons (because of DirectInput's `DIJOYSTATE` struct)
 };
 

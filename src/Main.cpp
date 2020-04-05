@@ -362,29 +362,6 @@ void JoystickProc(void)
 	if (!GetJoystickStatus(&status))
 		memset(&status, 0, sizeof(status));
 
-//	gKey &= (KEY_ESCAPE | KEY_F2 | KEY_F1);
-
-	// Set movement buttons
-	if (status.bLeft && !old_status.bLeft)
-		gKey |= gKeyLeft;
-	else if (!status.bLeft && old_status.bLeft)
-		gKey &= ~gKeyLeft;
-
-	if (status.bRight && !old_status.bRight)
-		gKey |= gKeyRight;
-	else if (!status.bRight && old_status.bRight)
-		gKey &= ~gKeyRight;
-
-	if (status.bUp && !old_status.bUp)
-		gKey |= gKeyUp;
-	else if (!status.bUp && old_status.bUp)
-		gKey &= ~gKeyUp;
-
-	if (status.bDown && !old_status.bDown)
-		gKey |= gKeyDown;
-	else if (!status.bDown && old_status.bDown)
-		gKey &= ~gKeyDown;
-
 	// Set held buttons
 	for (i = 0; i < sizeof(status.bButton) / sizeof(status.bButton[0]); ++i)
 	{
