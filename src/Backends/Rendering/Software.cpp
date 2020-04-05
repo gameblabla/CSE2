@@ -414,7 +414,7 @@ void RenderBackend_DrawGlyph(RenderBackend_Glyph *glyph, long x, long y)
 				const float out_alpha = src_alpha + dst_alpha * (1.0f - src_alpha);
 
 				for (unsigned int j = 0; j < 3; ++j)
-					bitmap_pixel[j] = (unsigned char)((glyph_colour_channels[j] * src_alpha + bitmap_pixel[j] * dst_alpha * (1.0f - src_alpha)) / out_alpha);	// Alpha blending			// Gamma-corrected alpha blending
+					bitmap_pixel[j] = (unsigned char)((glyph_colour_channels[j] * src_alpha + bitmap_pixel[j] * dst_alpha * (1.0f - src_alpha)) / out_alpha);	// Alpha blending
 
 				bitmap_pixel[3] = (unsigned char)(out_alpha * 255.0f);
 			}
