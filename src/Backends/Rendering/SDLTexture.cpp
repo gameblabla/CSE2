@@ -76,7 +76,7 @@ static void GlyphBatch_Draw(spritebatch_sprite_t *sprites, int count, int textur
 	// The SDL_Texture side of things uses alpha, not a colour-key, so the bug where the font is blended
 	// with the colour key doesn't occur.
 	SDL_SetTextureColorMod(texture_atlas, glyph_colour_channels[0], glyph_colour_channels[1], glyph_colour_channels[2]);
-	SDL_SetTextureBlendMode(texture_atlas, SDL_BLENDMODE_BLEND);
+	SDL_SetTextureBlendMode(texture_atlas, premultiplied_blend_mode);
 
 	for (int i = 0; i < count; ++i)
 	{
