@@ -1434,6 +1434,5 @@ void ActNpc199(NPCHAR *npc)
 	npc->x += npc->xm;
 	npc->y += npc->ym;
 
-	// Note that 'npc->ani_no' can exceed the size of 'rect'
 	npc->rect = rect[npc->ani_no];
 }

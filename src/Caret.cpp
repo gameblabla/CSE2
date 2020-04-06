@@ -79,8 +79,6 @@ void ActCaret01(CARET *crt)
 		}
 	}
 
-	// Note that 'crt->ani_no' can exceed the size of 'rcLeft' and 'rcRight'
-
 	if (crt->direct == 0)
 		crt->rect = rcLeft[crt->ani_no];
 	else
@@ -255,8 +253,6 @@ void ActCaret07(CARET *crt)
 			return;	// Prevent UB at rcLeft[crt->ani_no] when crt->ani_no == 6
 		}
 	}
-
-	// Note that 'crt->ani_no' can exceed the size of rcLeft
 
 	crt->rect = rcLeft[crt->ani_no];
 
@@ -465,8 +461,6 @@ void ActCaret14(CARET *crt)
 		}
 	}
 
-	// Note that 'crt->ani_no' can exceed the size of 'rect'
-
 	crt->rect = rect[crt->ani_no];
 }
 
@@ -489,8 +483,6 @@ void ActCaret15(CARET *crt)
 			return;	// Prevent UB at rcLeft[crt->ani_no] when crt->ani_no == 4
 		}
 	}
-
-	// Note that 'crt->ani_no' can exceed the size of 'rcLeft'
 
 	crt->rect = rcLeft[crt->ani_no];
 }
