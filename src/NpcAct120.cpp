@@ -588,6 +588,8 @@ void ActNpc127(NPCHAR *npc)
 			npc->cond = 0;
 	}
 
+	// Note that 'npc->ani_no' can exceed the size of 'rcH' and 'rcV'
+
 	if (npc->direct == 0)
 		npc->rect = rcH[npc->ani_no];
 	else
@@ -648,6 +650,8 @@ void ActNpc128(NPCHAR *npc)
 	if (++npc->ani_no > 4)
 		npc->cond = 0;
 
+	// Note that 'npc->ani_no' can exceed the bounds of 'rcLeft', 'rcUp', 'rcRight' and 'rcDown'
+
 	switch (npc->direct)
 	{
 		case 0:
@@ -701,6 +705,8 @@ void ActNpc129(NPCHAR *npc)
 	}
 
 	npc->y += npc->ym;
+
+	// Note that '(npc->direct * 3) + npc->ani_no' can exceed the size of 'rect'
 
 	npc->rect = rect[(npc->direct * 3) + npc->ani_no];
 }
