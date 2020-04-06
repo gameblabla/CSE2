@@ -134,8 +134,6 @@ add_executable(CSE2 WIN32
 	"src/NpcAct300.cpp"
 	"src/NpcAct320.cpp"
 	"src/NpcAct340.cpp"
-	"src/NpcAct360.cpp"
-	"src/NpcAct380.cpp"
 	"src/NpChar.cpp"
 	"src/NpChar.h"
 	"src/NpcHit.cpp"

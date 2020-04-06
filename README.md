@@ -40,7 +40,6 @@ Also included are enhancements specifically for modders:
   * <MS4
   * <MIM
   * <PHY
-* "Creepy Curly" NPC (will likely be removed in the future)
 
 ![Screenshot](screenshot.png)
 
