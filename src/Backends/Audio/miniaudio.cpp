@@ -118,11 +118,11 @@ void AudioBackend_Deinit(void)
 	ma_device_uninit(&device);
 }
 
-AudioBackend_Sound* AudioBackend_CreateSound(unsigned int frequency, size_t frames)
+AudioBackend_Sound* AudioBackend_CreateSound(unsigned int frequency, const unsigned char *samples, size_t length)
 {
 	ma_mutex_lock(&mutex);
 
-	Mixer_Sound *sound = Mixer_CreateSound(frequency, frames);
+	Mixer_Sound *sound = Mixer_CreateSound(frequency, samples, length);
 
 	ma_mutex_unlock(&mutex);
 
@@ -137,24 +137,6 @@ void AudioBackend_DestroySound(AudioBackend_Sound *sound)
 	ma_mutex_lock(&mutex);
 
 	Mixer_DestroySound((Mixer_Sound*)sound);
-
-	ma_mutex_unlock(&mutex);
-}
-
-unsigned char* AudioBackend_LockSound(AudioBackend_Sound *sound, size_t *size)
-{
-	if (sound == NULL)
-		return NULL;
-
-	ma_mutex_lock(&mutex);
-
-	return Mixer_LockSound((Mixer_Sound*)sound, size);
-}
-
-void AudioBackend_UnlockSound(AudioBackend_Sound *sound)
-{
-	if (sound == NULL)
-		return;
 
 	ma_mutex_unlock(&mutex);
 }

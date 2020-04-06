@@ -275,11 +275,6 @@ int MakePixToneObject(const PIXTONEPARAMETER *ptp, int ptp_num, int no)
 		++ptp_pointer;
 	}
 
-	lpSECONDARYBUFFER[no] = AudioBackend_CreateSound(22050, sample_count);
-
-	if (lpSECONDARYBUFFER[no] == NULL)
-		return -1;
-
 	pcm_buffer = mixed_pcm_buffer = NULL;
 
 	pcm_buffer = (unsigned char*)malloc(sample_count);
@@ -331,17 +326,16 @@ int MakePixToneObject(const PIXTONEPARAMETER *ptp, int ptp_num, int no)
 	mixed_pcm_buffer[0] = mixed_pcm_buffer[0];
 	mixed_pcm_buffer[sample_count - 1] = mixed_pcm_buffer[sample_count - 1];
 
-	unsigned char *buffer = AudioBackend_LockSound(lpSECONDARYBUFFER[no], NULL);
-
-	memcpy(buffer, mixed_pcm_buffer, sample_count);
-
-	AudioBackend_UnlockSound(lpSECONDARYBUFFER[no]);
+	lpSECONDARYBUFFER[no] = AudioBackend_CreateSound(22050, mixed_pcm_buffer, sample_count);
 
 	if (pcm_buffer != NULL)
 		free(pcm_buffer);
 
 	if (mixed_pcm_buffer != NULL)
 		free(mixed_pcm_buffer);
+
+	if (lpSECONDARYBUFFER[no] == NULL)
+		return -1;
 
 	return sample_count;
 }

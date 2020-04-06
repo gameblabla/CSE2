@@ -108,11 +108,11 @@ void AudioBackend_Deinit(void)
 	SDL_QuitSubSystem(SDL_INIT_AUDIO);
 }
 
-AudioBackend_Sound* AudioBackend_CreateSound(unsigned int frequency, size_t frames)
+AudioBackend_Sound* AudioBackend_CreateSound(unsigned int frequency, const unsigned char *samples, size_t length)
 {
 	SDL_LockAudioDevice(device_id);
 
-	Mixer_Sound *sound = Mixer_CreateSound(frequency, frames);
+	Mixer_Sound *sound = Mixer_CreateSound(frequency, samples, length);
 
 	SDL_UnlockAudioDevice(device_id);
 
@@ -129,24 +129,6 @@ void AudioBackend_DestroySound(AudioBackend_Sound *sound)
 	Mixer_DestroySound((Mixer_Sound*)sound);
 
 	SDL_UnlockAudioDevice(device_id);
-}
-
-unsigned char* AudioBackend_LockSound(AudioBackend_Sound *sound, size_t *size)
-{
-	if (sound == NULL)
-		return NULL;
-
-	SDL_LockAudioDevice(device_id);
-
-	return Mixer_LockSound((Mixer_Sound*)sound, size);
-}
-
-void AudioBackend_UnlockSound(AudioBackend_Sound *sound)
-{
-	if (sound == NULL)
-		return;
-
-	SDL_UnlockAudioDevice(device_id);	
 }
 
 void AudioBackend_PlaySound(AudioBackend_Sound *sound, BOOL looping)

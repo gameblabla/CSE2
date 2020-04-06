@@ -46,14 +46,14 @@ void Mixer_Init(unsigned long frequency)
 	output_frequency = frequency;
 }
 
-Mixer_Sound* Mixer_CreateSound(unsigned int frequency, size_t frames)
+Mixer_Sound* Mixer_CreateSound(unsigned int frequency, const unsigned char *samples, size_t length)
 {
 	Mixer_Sound *sound = (Mixer_Sound*)malloc(sizeof(Mixer_Sound));
 
 	if (sound == NULL)
 		return NULL;
 
-	sound->samples = (unsigned char*)malloc(frames + 1);
+	sound->samples = (unsigned char*)malloc(length + 1);
 
 	if (sound->samples == NULL)
 	{
@@ -61,7 +61,9 @@ Mixer_Sound* Mixer_CreateSound(unsigned int frequency, size_t frames)
 		return NULL;
 	}
 
-	sound->frames = frames;
+	memcpy(sound->samples, samples, length);
+
+	sound->frames = length;
 	sound->playing = false;
 	sound->position = 0.0;
 
@@ -87,14 +89,6 @@ void Mixer_DestroySound(Mixer_Sound *sound)
 			break;
 		}
 	}
-}
-
-unsigned char* Mixer_LockSound(Mixer_Sound *sound, size_t *size)
-{
-	if (size != NULL)
-		*size = sound->frames;
-
-	return sound->samples;
 }
 
 void Mixer_PlaySound(Mixer_Sound *sound, bool looping)
