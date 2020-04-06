@@ -1,6 +1,6 @@
 #include "SoftwareMixer.h"
 
-#include <cmath>
+#include <math.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -150,12 +150,15 @@ ATTRIBUTE_HOT void Mixer_MixSounds(float *stream, unsigned int frames_total)
 
 			for (unsigned int frames_done = 0; frames_done < frames_total; ++frames_done)
 			{
+				const size_t position_integral = (size_t)sound->position;
+				const double position_fractional = sound->position - position_integral;
+
 				// Get two samples, and normalise them to 0-1
-				const float sample1 = (sound->samples[(size_t)sound->position] - 128.0f) / 128.0f;
-				const float sample2 = (sound->samples[(size_t)sound->position + 1] - 128.0f) / 128.0f;
+				const float sample1 = (sound->samples[position_integral] - 128.0f) / 128.0f;
+				const float sample2 = (sound->samples[position_integral + 1] - 128.0f) / 128.0f;
 
 				// Perform linear interpolation
-				const float interpolated_sample = sample1 + (sample2 - sample1) * (sound->position - std::trunc(sound->position));
+				const float interpolated_sample = sample1 + (sample2 - sample1) * position_fractional;
 
 				*steam_pointer++ += interpolated_sample * sound->volume_l;
 				*steam_pointer++ += interpolated_sample * sound->volume_r;
