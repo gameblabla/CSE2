@@ -245,7 +245,9 @@ void Backend_SetCursor(const unsigned char *rgb_pixels, unsigned int width, unsi
 
 		GLFWimage glfw_image = {(int)width, (int)height, rgba_pixels};
 		cursor = glfwCreateCursor(&glfw_image, 0, 0);
-		glfwSetCursor(window, cursor);
+
+		if (cursor != NULL)
+			glfwSetCursor(window, cursor);
 
 		free(rgba_pixels);
 	}
