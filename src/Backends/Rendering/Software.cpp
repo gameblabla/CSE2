@@ -7,6 +7,7 @@
 #include "SDL.h"
 
 #include "../../WindowsWrapper.h"
+#include "../../Attributes.h"
 
 #include "../Misc.h"
 #include "../SDL2/Window.h"
@@ -151,7 +152,7 @@ void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, unsigned int wi
 	(void)height;
 }
 
-void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RECT *rect, RenderBackend_Surface *destination_surface, long x, long y, BOOL colour_key)
+ATTRIBUTE_HOT void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RECT *rect, RenderBackend_Surface *destination_surface, long x, long y, BOOL colour_key)
 {
 	if (source_surface == NULL || destination_surface == NULL)
 		return;
@@ -208,7 +209,7 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RECT *rect,
 
 			for (long i = 0; i < rect_clamped.right - rect_clamped.left; ++i)
 			{
-				if (source_pointer[0] == 0 && source_pointer[1] == 0 && source_pointer[2] == 0)	// Assumes the colour key will always be #000000 (black)
+				if (UNLIKELY(source_pointer[0] == 0 && source_pointer[1] == 0 && source_pointer[2] == 0))	// Assumes the colour key will always be #000000 (black)
 				{
 					source_pointer += 3;
 					destination_pointer += 3;
@@ -234,7 +235,7 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RECT *rect,
 	}
 }
 
-void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
+ATTRIBUTE_HOT void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
 {
 	if (surface == NULL)
 		return;

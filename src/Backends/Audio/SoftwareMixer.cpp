@@ -1,20 +1,15 @@
 #include "SoftwareMixer.h"
 
-#include <math.h>
+#include <cmath>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "../../Attributes.h"
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define CLAMP(x, y, z) MIN(MAX((x), (y)), (z))
-
-#ifdef __GNUC__
-#define ATTR_HOT __attribute__((hot))
-#else
-#define ATTR_HOT
-#endif
 
 struct Mixer_Sound
 {
@@ -144,7 +139,7 @@ void Mixer_SetSoundPan(Mixer_Sound *sound, long pan)
 }
 
 // Most CPU-intensive function in the game (2/3rd CPU time consumption in my experience), so marked with attrHot so the compiler considers it a hot spot (as it is) when optimizing
-ATTR_HOT void Mixer_MixSounds(float *stream, unsigned int frames_total)
+ATTRIBUTE_HOT void Mixer_MixSounds(float *stream, unsigned int frames_total)
 {
 	for (Mixer_Sound *sound = sound_list_head; sound != NULL; sound = sound->next)
 	{
@@ -159,7 +154,7 @@ ATTR_HOT void Mixer_MixSounds(float *stream, unsigned int frames_total)
 				const float sample2 = (sound->samples[(size_t)sound->position + 1] - 128.0f) / 128.0f;
 
 				// Perform linear interpolation
-				const float interpolated_sample = sample1 + ((sample2 - sample1) * fmod(sound->position, 1.0));
+				const float interpolated_sample = sample1 + (sample2 - sample1) * (sound->position - std::trunc(sound->position));
 
 				*steam_pointer++ += interpolated_sample * sound->volume_l;
 				*steam_pointer++ += interpolated_sample * sound->volume_r;
@@ -170,7 +165,7 @@ ATTR_HOT void Mixer_MixSounds(float *stream, unsigned int frames_total)
 				{
 					if (sound->looping)
 					{
-						sound->position = fmod(sound->position, (double)sound->frames);
+						sound->position = std::fmod(sound->position, (double)sound->frames);
 					}
 					else
 					{

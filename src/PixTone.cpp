@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "Attributes.h"
 #include "WindowsWrapper.h"
 
 #include "Random.h"
@@ -65,7 +66,7 @@ void MakeWaveTables(void)
 
 //BOOL wave_tables_made;
 
-BOOL MakePixelWaveData(const PIXTONEPARAMETER *ptp, unsigned char *pData)
+ATTRIBUTE_HOT BOOL MakePixelWaveData(const PIXTONEPARAMETER *ptp, unsigned char *pData)
 {
 	int i;
 	int a, b, c, d;

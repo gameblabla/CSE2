@@ -8,6 +8,7 @@
 #include "../Misc.h"
 #include "../../Organya.h"
 #include "../../WindowsWrapper.h"
+#include "../../Attributes.h"
 
 #include "SoftwareMixer.h"
 
