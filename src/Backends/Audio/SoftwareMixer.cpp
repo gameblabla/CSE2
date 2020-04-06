@@ -14,7 +14,7 @@
 
 struct Mixer_Sound
 {
-	unsigned char *samples;
+	signed char *samples;
 	size_t frames;
 	double position;
 	double advance_delta;
@@ -53,7 +53,7 @@ Mixer_Sound* Mixer_CreateSound(unsigned int frequency, const unsigned char *samp
 	if (sound == NULL)
 		return NULL;
 
-	sound->samples = (unsigned char*)malloc(length + 1);
+	sound->samples = (signed char*)malloc(length + 1);
 
 	if (sound->samples == NULL)
 	{
@@ -61,7 +61,8 @@ Mixer_Sound* Mixer_CreateSound(unsigned int frequency, const unsigned char *samp
 		return NULL;
 	}
 
-	memcpy(sound->samples, samples, length);
+	for (size_t i = 0; i < length; ++i)
+		sound->samples[i] = samples[i] - 0x80;	// Convert from unsigned 8-bit PCM to signed
 
 	sound->frames = length;
 	sound->playing = false;
@@ -96,7 +97,7 @@ void Mixer_PlaySound(Mixer_Sound *sound, bool looping)
 	sound->playing = true;
 	sound->looping = looping;
 
-	sound->samples[sound->frames] = looping ? sound->samples[0] : 0x80;	// For the linear interpolator
+	sound->samples[sound->frames] = looping ? sound->samples[0] : 0;	// For the linear interpolator
 }
 
 void Mixer_StopSound(Mixer_Sound *sound)
@@ -148,8 +149,8 @@ ATTRIBUTE_HOT void Mixer_MixSounds(float *stream, unsigned int frames_total)
 				const float position_fractional = sound->position - position_integral;
 
 				// Get two samples, and normalise them to 0-1
-				const float sample1 = (sound->samples[position_integral] - 128.0f) / 128.0f;
-				const float sample2 = (sound->samples[position_integral + 1] - 128.0f) / 128.0f;
+				const float sample1 = sound->samples[position_integral] / 128.0f;
+				const float sample2 = sound->samples[position_integral + 1] / 128.0f;
 
 				// Perform linear interpolation
 				const float interpolated_sample = sample1 + (sample2 - sample1) * position_fractional;
