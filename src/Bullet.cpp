@@ -1640,7 +1640,10 @@ void ActBullet_Edge(BULLET *bul)
 				bul->damage = 1;
 
 			if (bul->ani_no > 4)
+			{
 				bul->cond = 0;
+				return;	// Prevent UB at rc[bul->ani_no] when bul->ani_no == 5
+			}
 
 			break;
 	}
