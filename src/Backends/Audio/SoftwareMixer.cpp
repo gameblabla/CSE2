@@ -169,7 +169,7 @@ ATTRIBUTE_HOT void Mixer_MixSounds(float *stream, unsigned int frames_total)
 				{
 					if (sound->looping)
 					{
-						sound->position = std::fmod(sound->position, (double)sound->frames);
+						sound->position = fmod(sound->position, (double)sound->frames);
 					}
 					else
 					{
