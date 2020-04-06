@@ -753,6 +753,7 @@ void ActNpc146(NPCHAR *npc)
 			{
 				SetDestroyNpChar(npc->x, npc->y, 0x1000, 8);
 				npc->cond = 0;
+				return;	// Prevent UB at rect[npc->ani_no] when npc->ani_no == 5
 			}
 
 			break;
