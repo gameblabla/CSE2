@@ -1,9 +1,35 @@
+==============
+= Cave Story =
+==============
+
+None of us are lawyers, but to my understanding...
+
+Being a decompilation, much of CSE2's code belongs to Daisuke "Pixel" Amaya.
+There was no licence supplied with the original freeware release, so presumably
+this code defaults to 'All Rights Reserved'.
+
+...I dunno - how many of *you* are fluent in international copyright law?
+
+
+=======================
+= Cave Story Engine 2 =
+=======================
+
+Currently we don't have a licence for our code. But, considering CSE2 is
+intended for modders, you can probably get away with using it for that without
+any of us getting mad over it.
+
+It might be worth crediting us, just to be safe - I (Clownacy) don't mind, but
+GarbielRavier does.
+
+
 ============
-= Freetype =
+= FreeType =
 ============
 
 Portions of this software are copyright © 2006-2019 The FreeType
 Project (www.freetype.org).  All rights reserved.
+
 
 ==============
 = Dear Imgui =
