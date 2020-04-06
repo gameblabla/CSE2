@@ -7,10 +7,10 @@
 #include "SDL.h"
 
 #include "../../WindowsWrapper.h"
-#include "../../Attributes.h"
 
 #include "../Misc.h"
 #include "../SDL2/Window.h"
+#include "../../Attributes.h"
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))

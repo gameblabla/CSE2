@@ -4,9 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "Attributes.h"
 #include "WindowsWrapper.h"
 
+#include "Attributes.h"
 #include "Random.h"
 
 signed char gWaveModelTable[6][0x100];
