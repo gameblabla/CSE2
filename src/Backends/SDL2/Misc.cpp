@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "SDL.h"
@@ -25,6 +26,7 @@ BOOL bActive = TRUE;
 
 static BOOL keyboard_state[BACKEND_KEYBOARD_TOTAL];
 
+static unsigned char *cursor_surface_pixels;
 static SDL_Surface *cursor_surface;
 static SDL_Cursor *cursor;
 
@@ -49,6 +51,8 @@ void Backend_Deinit(void)
 
 	if (cursor_surface != NULL)
 		SDL_FreeSurface(cursor_surface);
+
+	free(cursor_surface_pixels);
 
 	SDL_Quit();
 }
@@ -78,15 +82,30 @@ void Backend_HideMouse(void)
 void Backend_SetWindowIcon(const unsigned char *rgb_pixels, unsigned int width, unsigned int height)
 {
 	SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormatFrom((void*)rgb_pixels, width, height, 0, width * 3, SDL_PIXELFORMAT_RGB24);
-	SDL_SetWindowIcon(window, surface);
-	SDL_FreeSurface(surface);
+
+	if (surface != NULL)
+	{
+		SDL_SetWindowIcon(window, surface);
+		SDL_FreeSurface(surface);
+	}
 }
 
 void Backend_SetCursor(const unsigned char *rgba_pixels, unsigned int width, unsigned int height)
 {
-	cursor_surface = SDL_CreateRGBSurfaceWithFormatFrom((void*)rgba_pixels, width, height, 0, width * 4, SDL_PIXELFORMAT_RGBA32);
-	cursor = SDL_CreateColorCursor(cursor_surface, 0, 0);
-	SDL_SetCursor(cursor);
+	cursor_surface_pixels = (unsigned char*)malloc(width * height * 4);
+
+	if (cursor_surface_pixels != NULL)
+	{
+		cursor_surface = SDL_CreateRGBSurfaceWithFormatFrom(cursor_surface_pixels, width, height, 0, width * 4, SDL_PIXELFORMAT_RGBA32);
+
+		if (cursor_surface != NULL)
+		{
+			cursor = SDL_CreateColorCursor(cursor_surface, 0, 0);
+
+			if (cursor != NULL)
+				SDL_SetCursor(cursor);
+		}
+	}
 }
 
 void PlaybackBackend_EnableDragAndDrop(void)

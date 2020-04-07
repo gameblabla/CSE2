@@ -5,9 +5,8 @@
 typedef struct Mixer_Sound Mixer_Sound;
 
 void Mixer_Init(unsigned long frequency);
-Mixer_Sound* Mixer_CreateSound(unsigned int frequency, size_t frames);
+Mixer_Sound* Mixer_CreateSound(unsigned int frequency, const unsigned char *samples, size_t length);
 void Mixer_DestroySound(Mixer_Sound *sound);
-unsigned char* Mixer_LockSound(Mixer_Sound *sound, size_t *size);
 void Mixer_PlaySound(Mixer_Sound *sound, bool looping);
 void Mixer_StopSound(Mixer_Sound *sound);
 void Mixer_RewindSound(Mixer_Sound *sound);

@@ -146,13 +146,12 @@ BOOL MakeSoundObject8(signed char *wavep, signed char track, signed char pipi)
 			else
 				data_size = wave_size;
 
-			lpORGANBUFFER[track][j][k] = AudioBackend_CreateSound(22050, data_size);
+			wp = (unsigned char*)malloc(data_size);
 
-			if (lpORGANBUFFER[track][j][k] == NULL)
+			if (wp == NULL)
 				return FALSE;
 
 			// Get wave data
-			wp = AudioBackend_LockSound(lpORGANBUFFER[track][j][k], NULL);
 			wp_sub = wp;
 			wav_tp = 0;
 
@@ -170,7 +169,13 @@ BOOL MakeSoundObject8(signed char *wavep, signed char track, signed char pipi)
 				wp_sub++;
 			}
 
-			AudioBackend_UnlockSound(lpORGANBUFFER[track][j][k]);
+			lpORGANBUFFER[track][j][k] = AudioBackend_CreateSound(22050, wp, data_size);
+
+			free(wp);
+
+			if (lpORGANBUFFER[track][j][k] == NULL)
+				return FALSE;
+
 			AudioBackend_RewindSound(lpORGANBUFFER[track][j][k]);
 		}
 	}

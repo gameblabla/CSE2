@@ -216,7 +216,9 @@ void Backend_SetCursor(const unsigned char *rgba_pixels, unsigned int width, uns
 {
 	GLFWimage glfw_image = {(int)width, (int)height, (unsigned char*)rgba_pixels};
 	cursor = glfwCreateCursor(&glfw_image, 0, 0);
-	glfwSetCursor(window, cursor);
+
+	if (cursor != NULL)
+		glfwSetCursor(window, cursor);
 }
 
 void PlaybackBackend_EnableDragAndDrop(void)

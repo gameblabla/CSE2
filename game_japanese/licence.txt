@@ -1,0 +1,58 @@
+==============
+= Cave Story =
+==============
+
+None of us are lawyers, but to my understanding...
+
+Being a decompilation, much of CSE2's code belongs to Daisuke "Pixel" Amaya.
+There was no licence supplied with the original freeware release, so presumably
+this code defaults to 'All Rights Reserved'.
+
+...I dunno - how many of *you* are fluent in international copyright law?
+
+
+=======================
+= Cave Story Engine 2 =
+=======================
+
+Currently we don't have a licence for our code. But, considering CSE2 is
+intended for modders, you can probably get away with using it for that without
+any of us getting mad over it.
+
+It might be worth crediting us, just to be safe - I (Clownacy) don't mind, but
+GarbielRavier does.
+
+
+============
+= FreeType =
+============
+
+Portions of this software are copyright © 2006-2019 The FreeType
+Project (www.freetype.org).  All rights reserved.
+
+
+==============
+= Dear Imgui =
+==============
+
+The MIT License (MIT)
+
+Copyright (c) 2014-2020 Omar Cornut
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
