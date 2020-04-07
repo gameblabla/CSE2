@@ -33,11 +33,21 @@ typedef enum CallbackAction
 typedef struct Option
 {
 	const char *name;
-	int (*callback)(Option *options, size_t total_options, size_t selected_option, CallbackAction action);
+	int (*callback)(struct OptionsMenu *parent_menu, size_t this_option, CallbackAction action);
 	void *user_data;
 	const char *attribute;
 	long value;
 } Option;
+
+typedef struct OptionsMenu
+{
+	const char *title;
+	const char *subtitle;
+	struct Option *options;
+	size_t total_options;
+	int x_offset;
+	BOOL submenu;
+} OptionsMenu;
 
 static const RECT rcMyChar[4] = {
 	{0, 16, 16, 32},
@@ -279,7 +289,7 @@ static const char* GetKeyName(int key)
 	return "Unknown";
 }
 
-static int EnterOptionsMenu(const char *title, Option *options, size_t total_options, int x_offset, BOOL submenu)
+static int EnterOptionsMenu(OptionsMenu *options_menu)
 {
 	size_t selected_option = 0;
 	int scroll = 0;
@@ -289,9 +299,9 @@ static int EnterOptionsMenu(const char *title, Option *options, size_t total_opt
 	int return_value;
 
 	// Initialise options
-	for (size_t i = 0; i < total_options; ++i)
+	for (size_t i = 0; i < options_menu->total_options; ++i)
 	{
-		return_value = options[i].callback(options, total_options, i, ACTION_INIT);
+		return_value = options_menu->options[i].callback(options_menu, i, ACTION_INIT);
 
 		// If the callback returned -1, it's time to exit this submenu
 		if (return_value != -1)
@@ -304,7 +314,7 @@ static int EnterOptionsMenu(const char *title, Option *options, size_t total_opt
 		GetTrg();
 
 		// Allow unpausing by pressing the pause button only when in the main pause menu (not submenus)
-		if (!submenu && gKeyTrg & KEY_PAUSE)
+		if (!options_menu->submenu && gKeyTrg & KEY_PAUSE)
 		{
 			return_value = enum_ESCRETURN_continue;
 			break;
@@ -323,25 +333,25 @@ static int EnterOptionsMenu(const char *title, Option *options, size_t total_opt
 			const size_t old_selection = selected_option;
 
 			if (gKeyTrg & gKeyDown)
-				if (selected_option++ == total_options - 1)
+				if (selected_option++ == options_menu->total_options - 1)
 					selected_option = 0;
 
 			if (gKeyTrg & gKeyUp)
 				if (selected_option-- == 0)
-					selected_option = total_options - 1;
+					selected_option = options_menu->total_options - 1;
 
 			// Update the menu-scrolling, if there are more options than can be fit on the screen
 			if (selected_option < old_selection)
 				scroll = MAX(0, MIN(scroll, (int)selected_option - 1));
 
 			if (selected_option > old_selection)
-				scroll = MIN(MAX(0, (int)total_options - MAX_OPTIONS), MAX(scroll, (int)selected_option - (MAX_OPTIONS - 2)));
+				scroll = MIN(MAX(0, (int)options_menu->total_options - MAX_OPTIONS), MAX(scroll, (int)selected_option - (MAX_OPTIONS - 2)));
 
 			PlaySoundObject(1, 1);
 		}
 
 		// Run option callbacks
-		for (size_t i = 0; i < total_options; ++i)
+		for (size_t i = 0; i < options_menu->total_options; ++i)
 		{
 			CallbackAction action = ACTION_UPDATE;
 
@@ -355,7 +365,7 @@ static int EnterOptionsMenu(const char *title, Option *options, size_t total_opt
 					action = ACTION_RIGHT;
 			}
 
-			return_value = options[i].callback(options, total_options, i, action);
+			return_value = options_menu->options[i].callback(options_menu, i, action);
 
 			// If the callback returned -1, it's time to exit this submenu
 			if (return_value != -1)
@@ -372,13 +382,13 @@ static int EnterOptionsMenu(const char *title, Option *options, size_t total_opt
 		// Draw screen
 		CortBox(&grcFull, 0x000000);
 
-		PutText((WINDOW_WIDTH / 2) - ((strlen(title) * 5) / 2), 20, title, RGB(0xFF, 0xFF, 0xFF));
+		PutText((WINDOW_WIDTH / 2) - ((strlen(options_menu->title) * 5) / 2), 20, options_menu->title, RGB(0xFF, 0xFF, 0xFF));
 
-		const size_t visible_options = MIN(MAX_OPTIONS, total_options);
+		const size_t visible_options = MIN(MAX_OPTIONS, options_menu->total_options);
 
 		for (size_t i = scroll; i < scroll + visible_options; ++i)
 		{
-			const int x = (WINDOW_WIDTH / 2) + x_offset;
+			const int x = (WINDOW_WIDTH / 2) + options_menu->x_offset;
 			const int y = (WINDOW_HEIGHT / 2) + (10 * 0) - (((visible_options - 1) * 20) / 2) + ((i - scroll) * 20);
 
 			// Draw Quote next to the selected option
@@ -386,11 +396,11 @@ static int EnterOptionsMenu(const char *title, Option *options, size_t total_opt
 				PutBitmap3(&grcFull, PixelToScreenCoord(x - 20), PixelToScreenCoord(y - 8), &rcMyChar[anime / 10 % 4], SURFACE_ID_MY_CHAR);
 
 			// Draw option name
-			PutText(x, y - (9 / 2), options[i].name, RGB(0xFF, 0xFF, 0xFF));
+			PutText(x, y - (9 / 2), options_menu->options[i].name, RGB(0xFF, 0xFF, 0xFF));
 
 			// Draw option value, if it has one
-			if (options[i].attribute != NULL)
-				PutText(x + 100, y - (9 / 2), options[i].attribute, RGB(0xFF, 0xFF, 0xFF));
+			if (options_menu->options[i].attribute != NULL)
+				PutText(x + 100, y - (9 / 2), options_menu->options[i].attribute, RGB(0xFF, 0xFF, 0xFF));
 		}
 
 		PutFramePerSecound();
@@ -404,7 +414,7 @@ static int EnterOptionsMenu(const char *title, Option *options, size_t total_opt
 	}
 
 	// Filter internal return values to something Cave Story can understand
-	if (!submenu && return_value == -1)
+	if (!options_menu->submenu && return_value == -1)
 		return_value = enum_ESCRETURN_continue;
 
 	return return_value;
@@ -444,7 +454,7 @@ static const Control controls[] = {
 
 static char bound_name_buffers[sizeof(controls) / sizeof(controls[0])][20];
 
-static int Callback_ControlsKeyboard_Rebind(Option *options, size_t total_options, size_t selected_option, CallbackAction action)
+static int Callback_ControlsKeyboard_Rebind(OptionsMenu *parent_menu, size_t this_option, CallbackAction action)
 {
 	switch (action)
 	{
@@ -452,7 +462,7 @@ static int Callback_ControlsKeyboard_Rebind(Option *options, size_t total_option
 			break;
 
 		case ACTION_INIT:
-			strncpy(bound_name_buffers[selected_option], GetKeyName(bindings[controls[selected_option].binding_index].keyboard), sizeof(bound_name_buffers[0]) - 1);
+			strncpy(bound_name_buffers[this_option], GetKeyName(bindings[controls[this_option].binding_index].keyboard), sizeof(bound_name_buffers[0]) - 1);
 			break;
 
 		case ACTION_OK:
@@ -473,19 +483,19 @@ static int Callback_ControlsKeyboard_Rebind(Option *options, size_t total_option
 						const char *key_name = GetKeyName(scancode);
 
 						// If another control in the same group uses this key, swap them
-						for (size_t other_option = 0; other_option < total_options; ++other_option)
+						for (size_t other_option = 0; other_option < parent_menu->total_options; ++other_option)
 						{
-							if (other_option != selected_option && controls[other_option].groups & controls[selected_option].groups && bindings[controls[other_option].binding_index].keyboard == scancode)
+							if (other_option != this_option && controls[other_option].groups & controls[this_option].groups && bindings[controls[other_option].binding_index].keyboard == scancode)
 							{
-								bindings[controls[other_option].binding_index].keyboard = bindings[controls[selected_option].binding_index].keyboard;
-								memcpy(bound_name_buffers[other_option], bound_name_buffers[selected_option], sizeof(bound_name_buffers[0]));
+								bindings[controls[other_option].binding_index].keyboard = bindings[controls[this_option].binding_index].keyboard;
+								memcpy(bound_name_buffers[other_option], bound_name_buffers[this_option], sizeof(bound_name_buffers[0]));
 								break;
 							}
 						}
 
 						// Otherwise just overwrite the selected control
-						bindings[controls[selected_option].binding_index].keyboard = scancode;
-						strncpy(bound_name_buffers[selected_option], key_name, sizeof(bound_name_buffers[0]) - 1);
+						bindings[controls[this_option].binding_index].keyboard = scancode;
+						strncpy(bound_name_buffers[this_option], key_name, sizeof(bound_name_buffers[0]) - 1);
 
 						PlaySoundObject(18, 1);
 
@@ -501,7 +511,7 @@ static int Callback_ControlsKeyboard_Rebind(Option *options, size_t total_option
 
 				const char *string = "Press a key to bind to this action:";
 				PutText((WINDOW_WIDTH / 2) - ((strlen(string) * 5) / 2), (WINDOW_HEIGHT / 2) - 10, string, RGB(0xFF, 0xFF, 0xFF));
-				PutText((WINDOW_WIDTH / 2) - ((strlen(options[selected_option].name) * 5) / 2), (WINDOW_HEIGHT / 2) + 10, options[selected_option].name, RGB(0xFF, 0xFF, 0xFF));
+				PutText((WINDOW_WIDTH / 2) - ((strlen(parent_menu->options[this_option].name) * 5) / 2), (WINDOW_HEIGHT / 2) + 10, parent_menu->options[this_option].name, RGB(0xFF, 0xFF, 0xFF));
 
 				timeout_string[0] = '0' + (timeout / 60) + 1;
 				PutText((WINDOW_WIDTH / 2) - (5 / 2), (WINDOW_HEIGHT / 2) + 60, timeout_string, RGB(0xFF, 0xFF, 0xFF));
@@ -521,34 +531,41 @@ static int Callback_ControlsKeyboard_Rebind(Option *options, size_t total_option
 	return -1;
 }
 
-static int Callback_ControlsKeyboard(Option *options, size_t total_options, size_t selected_option, CallbackAction action)
+static int Callback_ControlsKeyboard(OptionsMenu *parent_menu, size_t this_option, CallbackAction action)
 {
-	(void)options;
-	(void)total_options;
-	(void)selected_option;
+	(void)parent_menu;
 
 	if (action != ACTION_OK)
 		return -1;
 
-	Option submenu_options[sizeof(controls) / sizeof(controls[0])];
+	Option options[sizeof(controls) / sizeof(controls[0])];
 
 	for (size_t i = 0; i < sizeof(controls) / sizeof(controls[0]); ++i)
 	{
-		submenu_options[i].name = controls[i].name;
-		submenu_options[i].callback = Callback_ControlsKeyboard_Rebind;
-		submenu_options[i].attribute = bound_name_buffers[i];
+		options[i].name = controls[i].name;
+		options[i].callback = Callback_ControlsKeyboard_Rebind;
+		options[i].attribute = bound_name_buffers[i];
 	}
+
+	OptionsMenu options_menu = {
+		"CONTROLS (KEYBOARD)",
+		NULL,
+		options,
+		sizeof(options) / sizeof(options[0]),
+		-60,
+		TRUE
+	};
 
 	PlaySoundObject(5, 1);
 
-	const int return_value = EnterOptionsMenu("CONTROLS (KEYBOARD)", submenu_options, sizeof(submenu_options) / sizeof(submenu_options[0]), -60, TRUE);
+	const int return_value = EnterOptionsMenu(&options_menu);
 
 	PlaySoundObject(5, 1);
 
 	return return_value;
 }
 
-static int Callback_ControlsController_Rebind(Option *options, size_t total_options, size_t selected_option, CallbackAction action)
+static int Callback_ControlsController_Rebind(OptionsMenu *parent_menu, size_t this_option, CallbackAction action)
 {
 	switch (action)
 	{
@@ -556,10 +573,10 @@ static int Callback_ControlsController_Rebind(Option *options, size_t total_opti
 			break;
 
 		case ACTION_INIT:
-			if (bindings[controls[selected_option].binding_index].controller == 0xFF)
-				strncpy(bound_name_buffers[selected_option], "[Unbound]", sizeof(bound_name_buffers[0]));
+			if (bindings[controls[this_option].binding_index].controller == 0xFF)
+				strncpy(bound_name_buffers[this_option], "[Unbound]", sizeof(bound_name_buffers[0]));
 			else
-				snprintf(bound_name_buffers[selected_option], sizeof(bound_name_buffers[0]), "Button %d", bindings[controls[selected_option].binding_index].controller);
+				snprintf(bound_name_buffers[this_option], sizeof(bound_name_buffers[0]), "Button %d", bindings[controls[this_option].binding_index].controller);
 
 			break;
 
@@ -578,19 +595,19 @@ static int Callback_ControlsController_Rebind(Option *options, size_t total_opti
 					if (!old_state.bButton[button] && gJoystickState.bButton[button])
 					{
 						// If another control in the same group uses this button, swap them
-						for (size_t other_option = 0; other_option < total_options; ++other_option)
+						for (size_t other_option = 0; other_option < parent_menu->total_options; ++other_option)
 						{
-							if (other_option != selected_option && controls[other_option].groups & controls[selected_option].groups && bindings[controls[other_option].binding_index].controller == button)
+							if (other_option != this_option && controls[other_option].groups & controls[this_option].groups && bindings[controls[other_option].binding_index].controller == button)
 							{
-								bindings[controls[other_option].binding_index].controller = bindings[controls[selected_option].binding_index].controller;
-								memcpy(bound_name_buffers[other_option], bound_name_buffers[selected_option], sizeof(bound_name_buffers[0]));
+								bindings[controls[other_option].binding_index].controller = bindings[controls[this_option].binding_index].controller;
+								memcpy(bound_name_buffers[other_option], bound_name_buffers[this_option], sizeof(bound_name_buffers[0]));
 								break;
 							}
 						}
 
 						// Otherwise just overwrite the selected control
-						bindings[controls[selected_option].binding_index].controller = button;
-						snprintf(bound_name_buffers[selected_option], sizeof(bound_name_buffers[0]), "Button %d", button);
+						bindings[controls[this_option].binding_index].controller = button;
+						snprintf(bound_name_buffers[this_option], sizeof(bound_name_buffers[0]), "Button %d", button);
 
 						PlaySoundObject(18, 1);
 
@@ -606,7 +623,7 @@ static int Callback_ControlsController_Rebind(Option *options, size_t total_opti
 
 				const char *string = "Press a button to bind to this action:";
 				PutText((WINDOW_WIDTH / 2) - ((strlen(string) * 5) / 2), (WINDOW_HEIGHT / 2) - 10, string, RGB(0xFF, 0xFF, 0xFF));
-				PutText((WINDOW_WIDTH / 2) - ((strlen(options[selected_option].name) * 5) / 2), (WINDOW_HEIGHT / 2) + 10, options[selected_option].name, RGB(0xFF, 0xFF, 0xFF));
+				PutText((WINDOW_WIDTH / 2) - ((strlen(parent_menu->options[this_option].name) * 5) / 2), (WINDOW_HEIGHT / 2) + 10, parent_menu->options[this_option].name, RGB(0xFF, 0xFF, 0xFF));
 
 				timeout_string[0] = '0' + (timeout / 60) + 1;
 				PutText((WINDOW_WIDTH / 2) - (5 / 2), (WINDOW_HEIGHT / 2) + 60, timeout_string, RGB(0xFF, 0xFF, 0xFF));
@@ -626,27 +643,34 @@ static int Callback_ControlsController_Rebind(Option *options, size_t total_opti
 	return -1;
 }
 
-static int Callback_ControlsController(Option *options, size_t total_options, size_t selected_option, CallbackAction action)
+static int Callback_ControlsController(OptionsMenu *parent_menu, size_t this_option, CallbackAction action)
 {
-	(void)options;
-	(void)total_options;
-	(void)selected_option;
+	(void)parent_menu;
 
 	if (action != ACTION_OK)
 		return -1;
 
-	Option submenu_options[sizeof(controls) / sizeof(controls[0])];
+	Option options[sizeof(controls) / sizeof(controls[0])];
 
 	for (size_t i = 0; i < sizeof(controls) / sizeof(controls[0]); ++i)
 	{
-		submenu_options[i].name = controls[i].name;
-		submenu_options[i].callback = Callback_ControlsController_Rebind;
-		submenu_options[i].attribute = bound_name_buffers[i];
+		options[i].name = controls[i].name;
+		options[i].callback = Callback_ControlsController_Rebind;
+		options[i].attribute = bound_name_buffers[i];
 	}
+
+	OptionsMenu options_menu = {
+		"CONTROLS (GAMEPAD)",
+		NULL,
+		options,
+		sizeof(options) / sizeof(options[0]),
+		-70,
+		TRUE
+	};
 
 	PlaySoundObject(5, 1);
 
-	const int return_value = EnterOptionsMenu("CONTROLS (GAMEPAD)", submenu_options, sizeof(submenu_options) / sizeof(submenu_options[0]), -70, TRUE);
+	const int return_value = EnterOptionsMenu(&options_menu);
 
 	PlaySoundObject(5, 1);
 
@@ -657,10 +681,8 @@ static int Callback_ControlsController(Option *options, size_t total_options, si
 // Options menu //
 //////////////////
 
-static int Callback_Framerate(Option *options, size_t total_options, size_t selected_option, CallbackAction action)
+static int Callback_Framerate(OptionsMenu *parent_menu, size_t this_option, CallbackAction action)
 {
-	(void)total_options;
-
 	const char *strings[] = {"50FPS", "60FPS"};
 
 	switch (action)
@@ -668,15 +690,15 @@ static int Callback_Framerate(Option *options, size_t total_options, size_t sele
 		case ACTION_OK:
 		case ACTION_LEFT:
 		case ACTION_RIGHT:
-			options[selected_option].value = (options[selected_option].value + 1) % (sizeof(strings) / sizeof(strings[0]));
+			parent_menu->options[this_option].value = (parent_menu->options[this_option].value + 1) % (sizeof(strings) / sizeof(strings[0]));
 
-			gb60fps = options[selected_option].value;
+			gb60fps = parent_menu->options[this_option].value;
 
 			PlaySoundObject(SND_SWITCH_WEAPON, 1);
 
 			// Fallthrough
 		case ACTION_INIT:
-			options[selected_option].attribute = strings[options[selected_option].value];
+			parent_menu->options[this_option].attribute = strings[parent_menu->options[this_option].value];
 			break;
 
 		case ACTION_UPDATE:
@@ -686,10 +708,8 @@ static int Callback_Framerate(Option *options, size_t total_options, size_t sele
 	return -1;
 }
 
-static int Callback_Vsync(Option *options, size_t total_options, size_t selected_option, CallbackAction action)
+static int Callback_Vsync(OptionsMenu *parent_menu, size_t this_option, CallbackAction action)
 {
-	(void)total_options;
-
 	const char *strings[] = {"Off (needs restart)", "On (needs restart)"};
 
 	switch (action)
@@ -697,13 +717,13 @@ static int Callback_Vsync(Option *options, size_t total_options, size_t selected
 		case ACTION_OK:
 		case ACTION_LEFT:
 		case ACTION_RIGHT:
-			options[selected_option].value = (options[selected_option].value + 1) % (sizeof(strings) / sizeof(strings[0]));
+			parent_menu->options[this_option].value = (parent_menu->options[this_option].value + 1) % (sizeof(strings) / sizeof(strings[0]));
 
 			PlaySoundObject(SND_SWITCH_WEAPON, 1);
 
 			// Fallthrough
 		case ACTION_INIT:
-			options[selected_option].attribute = strings[options[selected_option].value];
+			parent_menu->options[this_option].attribute = strings[parent_menu->options[this_option].value];
 			break;
 
 		case ACTION_UPDATE:
@@ -713,10 +733,8 @@ static int Callback_Vsync(Option *options, size_t total_options, size_t selected
 	return -1;
 }
 
-static int Callback_Resolution(Option *options, size_t total_options, size_t selected_option, CallbackAction action)
+static int Callback_Resolution(OptionsMenu *parent_menu, size_t this_option, CallbackAction action)
 {
-	(void)total_options;
-
 	const char *strings[] = {"Fullscreen (needs restart)", "Windowed 426x240 (needs restart)", "Windowed 852x480 (needs restart)", "Windowed 1278x720 (needs restart)", "Windowed 1704x960 (needs restart)"};
 
 	switch (action)
@@ -726,22 +744,22 @@ static int Callback_Resolution(Option *options, size_t total_options, size_t sel
 		case ACTION_RIGHT:
 			if (action == ACTION_LEFT)
 			{
-				if (--options[selected_option].value < 0)
-					options[selected_option].value = (sizeof(strings) / sizeof(strings[0])) - 1;
+				if (--parent_menu->options[this_option].value < 0)
+					parent_menu->options[this_option].value = (sizeof(strings) / sizeof(strings[0])) - 1;
 			}
 			else
 			{
-				if (++options[selected_option].value > (sizeof(strings) / sizeof(strings[0])) - 1)
-					options[selected_option].value = 0;
+				if (++parent_menu->options[this_option].value > (sizeof(strings) / sizeof(strings[0])) - 1)
+					parent_menu->options[this_option].value = 0;
 			}
 
-			gb60fps = options[selected_option].value;
+			gb60fps = parent_menu->options[this_option].value;
 
 			PlaySoundObject(SND_SWITCH_WEAPON, 1);
 
 			// Fallthrough
 		case ACTION_INIT:
-			options[selected_option].attribute = strings[options[selected_option].value];
+			parent_menu->options[this_option].attribute = strings[parent_menu->options[this_option].value];
 			break;
 
 		case ACTION_UPDATE:
@@ -751,10 +769,8 @@ static int Callback_Resolution(Option *options, size_t total_options, size_t sel
 	return -1;
 }
 
-static int Callback_SmoothScrolling(Option *options, size_t total_options, size_t selected_option, CallbackAction action)
+static int Callback_SmoothScrolling(OptionsMenu *parent_menu, size_t this_option, CallbackAction action)
 {
-	(void)total_options;
-
 	const char *strings[] = {"Off", "On"};
 
 	switch (action)
@@ -762,15 +778,15 @@ static int Callback_SmoothScrolling(Option *options, size_t total_options, size_
 		case ACTION_OK:
 		case ACTION_LEFT:
 		case ACTION_RIGHT:
-			options[selected_option].value = (options[selected_option].value + 1) % (sizeof(strings) / sizeof(strings[0]));
+			parent_menu->options[this_option].value = (parent_menu->options[this_option].value + 1) % (sizeof(strings) / sizeof(strings[0]));
 
-			gbSmoothScrolling = options[selected_option].value;
+			gbSmoothScrolling = parent_menu->options[this_option].value;
 
 			PlaySoundObject(SND_SWITCH_WEAPON, 1);
 
 			// Fallthrough
 		case ACTION_INIT:
-			options[selected_option].attribute = strings[options[selected_option].value];
+			parent_menu->options[this_option].attribute = strings[parent_menu->options[this_option].value];
 			break;
 
 		case ACTION_UPDATE:
@@ -780,16 +796,14 @@ static int Callback_SmoothScrolling(Option *options, size_t total_options, size_
 	return -1;
 }
 
-static int Callback_Options(Option *options, size_t total_options, size_t selected_option, CallbackAction action)
+static int Callback_Options(OptionsMenu *parent_menu, size_t this_option, CallbackAction action)
 {
-	(void)options;
-	(void)total_options;
-	(void)selected_option;
+	(void)parent_menu;
 
 	if (action != ACTION_OK)
 		return -1;
 
-	Option submenu_options[] = {
+	Option options[] = {
 		{"Controls (Keyboard)", Callback_ControlsKeyboard, NULL, NULL, 0},
 		{"Controls (Gamepad)", Callback_ControlsController, NULL, NULL, 0},
 		{"Framerate", Callback_Framerate, NULL, NULL, 0},
@@ -798,25 +812,34 @@ static int Callback_Options(Option *options, size_t total_options, size_t select
 		{"Smooth Scrolling", Callback_SmoothScrolling, NULL, NULL, 0}
 	};
 
+	OptionsMenu options_menu = {
+		"OPTIONS",
+		NULL,
+		options,
+		sizeof(options) / sizeof(options[0]),
+		-70,
+		TRUE
+	};
+
 	CONFIG conf;
 	if (!LoadConfigData(&conf))
 		DefaultConfigData(&conf);
 
-	submenu_options[2].value = conf.b60fps;
-	submenu_options[3].value = conf.bVsync;
-	submenu_options[4].value = conf.display_mode;
-	submenu_options[5].value = conf.bSmoothScrolling;
+	options[2].value = conf.b60fps;
+	options[3].value = conf.bVsync;
+	options[4].value = conf.display_mode;
+	options[5].value = conf.bSmoothScrolling;
 
 	PlaySoundObject(5, 1);
 
-	const int return_value = EnterOptionsMenu("OPTIONS", submenu_options, sizeof(submenu_options) / sizeof(submenu_options[0]), -70, TRUE);
+	const int return_value = EnterOptionsMenu(&options_menu);
 
 	PlaySoundObject(5, 1);
 
-	conf.b60fps = submenu_options[2].value;
-	conf.bVsync = submenu_options[3].value;
-	conf.display_mode = submenu_options[4].value;
-	conf.bSmoothScrolling = submenu_options[5].value;
+	conf.b60fps = options[2].value;
+	conf.bVsync = options[3].value;
+	conf.display_mode = options[4].value;
+	conf.bSmoothScrolling = options[5].value;
 
 	memcpy(conf.bindings, bindings, sizeof(bindings));
 
@@ -829,11 +852,9 @@ static int Callback_Options(Option *options, size_t total_options, size_t select
 // Pause menu //
 ////////////////
 
-static int Callback_Resume(Option *options, size_t total_options, size_t selected_option, CallbackAction action)
+static int Callback_Resume(OptionsMenu *parent_menu, size_t this_option, CallbackAction action)
 {
-	(void)options;
-	(void)total_options;
-	(void)selected_option;
+	(void)parent_menu;
 
 	if (action != ACTION_OK)
 		return -1;
@@ -842,11 +863,9 @@ static int Callback_Resume(Option *options, size_t total_options, size_t selecte
 	return enum_ESCRETURN_continue;
 }
 
-static int Callback_Reset(Option *options, size_t total_options, size_t selected_option, CallbackAction action)
+static int Callback_Reset(OptionsMenu *parent_menu, size_t this_option, CallbackAction action)
 {
-	(void)options;
-	(void)total_options;
-	(void)selected_option;
+	(void)parent_menu;
 
 	if (action != ACTION_OK)
 		return -1;
@@ -855,11 +874,9 @@ static int Callback_Reset(Option *options, size_t total_options, size_t selected
 	return enum_ESCRETURN_restart;
 }
 
-static int Callback_Quit(Option *options, size_t total_options, size_t selected_option, CallbackAction action)
+static int Callback_Quit(OptionsMenu *parent_menu, size_t this_option, CallbackAction action)
 {
-	(void)options;
-	(void)total_options;
-	(void)selected_option;
+	(void)parent_menu;
 
 	if (action != ACTION_OK)
 		return -1;
@@ -876,7 +893,16 @@ int Call_Pause(void)
 		{"Quit", Callback_Quit, NULL, NULL, 0}
 	};
 
-	int return_value = EnterOptionsMenu("PAUSED", options, sizeof(options) / sizeof(options[0]), -14, FALSE);
+	OptionsMenu options_menu = {
+		"PAUSED",
+		NULL,
+		options,
+		sizeof(options) / sizeof(options[0]),
+		-14,
+		FALSE
+	};
+
+	int return_value = EnterOptionsMenu(&options_menu);
 
 	gKeyTrg = gKey = 0;
 
