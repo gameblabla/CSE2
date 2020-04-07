@@ -30,21 +30,29 @@ static unsigned char *cursor_surface_pixels;
 static SDL_Surface *cursor_surface;
 static SDL_Cursor *cursor;
 
-void Backend_Init(void)
+BOOL Backend_Init(void)
 {
-	SDL_Init(SDL_INIT_EVENTS);
+	if (SDL_Init(SDL_INIT_EVENTS) == 0)
+	{
+		if (SDL_InitSubSystem(SDL_INIT_VIDEO) == 0)
+		{
+			puts("Available SDL2 video drivers:");
 
-	SDL_InitSubSystem(SDL_INIT_VIDEO);
+			for (int i = 0; i < SDL_GetNumVideoDrivers(); ++i)
+				puts(SDL_GetVideoDriver(i));
 
-	puts("Available SDL2 video drivers:");
+			const char *driver = SDL_GetCurrentVideoDriver();
 
-	for (int i = 0; i < SDL_GetNumVideoDrivers(); ++i)
-		puts(SDL_GetVideoDriver(i));
+			if (driver != NULL)
+				printf("Selected SDL2 video driver: %s\n", driver);
 
-	const char *driver = SDL_GetCurrentVideoDriver();
+			return TRUE;
+		}
 
-	if (driver != NULL)
-		printf("Selected SDL2 video driver: %s\n", driver);
+		SDL_Quit();
+	}
+
+	return FALSE;
 }
 
 void Backend_Deinit(void)

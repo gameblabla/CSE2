@@ -150,9 +150,12 @@ static void DragAndDropCallback(GLFWwindow *window, int count, const char **path
 	LoadProfile(paths[0]);
 }
 
-void Backend_Init(void)
+BOOL Backend_Init(void)
 {
-	glfwInit();
+	if (glfwInit() == GL_TRUE)
+		return TRUE;
+	else
+		return FALSE;
 }
 
 void Backend_Deinit(void)
