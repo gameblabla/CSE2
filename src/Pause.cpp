@@ -49,6 +49,8 @@ typedef struct OptionsMenu
 	BOOL submenu;
 } OptionsMenu;
 
+static BOOL restart_required;
+
 static const RECT rcMyChar[4] = {
 	{0, 16, 16, 32},
 	{16, 16, 32, 32},
@@ -385,7 +387,7 @@ static int EnterOptionsMenu(OptionsMenu *options_menu)
 		PutText((WINDOW_WIDTH / 2) - ((strlen(options_menu->title) * 5) / 2), 20, options_menu->title, RGB(0xFF, 0xFF, 0xFF));
 
 		if (options_menu->subtitle != NULL)
-			PutText((WINDOW_WIDTH / 2) - ((strlen(options_menu->subtitle) * 5) / 2), 40, options_menu->subtitle, RGB(0xFF, 0xFF, 0xFF));
+			PutText((WINDOW_WIDTH / 2) - ((strlen(options_menu->subtitle) * 5) / 2), 34, options_menu->subtitle, RGB(0xFF, 0xFF, 0xFF));
 
 		const size_t visible_options = MIN(MAX_OPTIONS, options_menu->total_options);
 
@@ -713,13 +715,16 @@ static int Callback_Framerate(OptionsMenu *parent_menu, size_t this_option, Call
 
 static int Callback_Vsync(OptionsMenu *parent_menu, size_t this_option, CallbackAction action)
 {
-	const char *strings[] = {"Off (needs restart)", "On (needs restart)"};
+	const char *strings[] = {"Off", "On"};
 
 	switch (action)
 	{
 		case ACTION_OK:
 		case ACTION_LEFT:
 		case ACTION_RIGHT:
+			restart_required = TRUE;
+			parent_menu->subtitle = "RESTART REQUIRED";
+
 			parent_menu->options[this_option].value = (parent_menu->options[this_option].value + 1) % (sizeof(strings) / sizeof(strings[0]));
 
 			PlaySoundObject(SND_SWITCH_WEAPON, 1);
@@ -738,13 +743,16 @@ static int Callback_Vsync(OptionsMenu *parent_menu, size_t this_option, Callback
 
 static int Callback_Resolution(OptionsMenu *parent_menu, size_t this_option, CallbackAction action)
 {
-	const char *strings[] = {"Fullscreen (needs restart)", "Windowed 426x240 (needs restart)", "Windowed 852x480 (needs restart)", "Windowed 1278x720 (needs restart)", "Windowed 1704x960 (needs restart)"};
+	const char *strings[] = {"Fullscreen", "Windowed 426x240", "Windowed 852x480", "Windowed 1278x720", "Windowed 1704x960"};
 
 	switch (action)
 	{
 		case ACTION_OK:
 		case ACTION_LEFT:
 		case ACTION_RIGHT:
+			restart_required = TRUE;
+			parent_menu->subtitle = "RESTART REQUIRED";
+
 			if (action == ACTION_LEFT)
 			{
 				if (--parent_menu->options[this_option].value < 0)
@@ -817,7 +825,7 @@ static int Callback_Options(OptionsMenu *parent_menu, size_t this_option, Callba
 
 	OptionsMenu options_menu = {
 		"OPTIONS",
-		NULL,
+		restart_required ? "RESTART REQUIRED" : NULL,
 		options,
 		sizeof(options) / sizeof(options[0]),
 		-70,
