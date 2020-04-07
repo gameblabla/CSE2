@@ -40,6 +40,7 @@ Also included are enhancements specifically for modders:
   * <MS4
   * <MIM
   * <PHY
+* No TSC script size limit (the vanilla limit is around 0x5000 bytes)
 
 ![Screenshot](screenshot.png)
 
