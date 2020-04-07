@@ -279,12 +279,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			if (conf.display_mode == 1)
 			{
 				if (!StartDirectDraw(hWnd, 0, 0))
+				{
+					ReleaseMutex(hMutex);
 					return 0;
+				}
 			}
 			else
 			{
 				if (!StartDirectDraw(hWnd, 1, 0))
+				{
+					ReleaseMutex(hMutex);
 					return 0;
+				}
 			}
 		#else
 			// Doesn't handle StartDirectDraw failing
@@ -338,7 +344,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 		#ifdef FIX_BUGS
 			if (!StartDirectDraw(hWnd, 2, depth))
+			{
+				ReleaseMutex(hMutex);
 				return 0;
+			}
 		#else
 			// Doesn't handle StartDirectDraw failing
 			StartDirectDraw(hWnd, 2, depth);
