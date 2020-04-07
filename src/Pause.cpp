@@ -384,6 +384,9 @@ static int EnterOptionsMenu(OptionsMenu *options_menu)
 
 		PutText((WINDOW_WIDTH / 2) - ((strlen(options_menu->title) * 5) / 2), 20, options_menu->title, RGB(0xFF, 0xFF, 0xFF));
 
+		if (options_menu->subtitle != NULL)
+			PutText((WINDOW_WIDTH / 2) - ((strlen(options_menu->subtitle) * 5) / 2), 40, options_menu->subtitle, RGB(0xFF, 0xFF, 0xFF));
+
 		const size_t visible_options = MIN(MAX_OPTIONS, options_menu->total_options);
 
 		for (size_t i = scroll; i < scroll + visible_options; ++i)
