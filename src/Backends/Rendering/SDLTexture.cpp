@@ -173,14 +173,14 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 			}
 			else
 			{
-				SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal error (SDLTexture rendering backend)", "Could not create framebuffer", window);
+				Backend_ShowMessageBox("Fatal error (SDLTexture rendering backend)", "Could not create framebuffer");
 			}
 
 			SDL_DestroyRenderer(renderer);
 		}
 		else
 		{
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal error (SDLTexture rendering backend)", "Could not create renderer", window);
+			Backend_ShowMessageBox("Fatal error (SDLTexture rendering backend)", "Could not create renderer");
 		}
 
 
@@ -188,7 +188,7 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 	}
 	else
 	{
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal error (SDLTexture rendering backend)", "Could not create window", NULL);
+		Backend_ShowMessageBox("Fatal error (SDLTexture rendering backend)", "Could not create window");
 	}
 
 	return NULL;

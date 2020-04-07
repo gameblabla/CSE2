@@ -65,14 +65,14 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 		}
 		else
 		{
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal error (SDLSurface rendering backend)", "Could not create framebuffer surface", window);
+			Backend_ShowMessageBox("Fatal error (SDLSurface rendering backend)", "Could not create framebuffer surface");
 		}
 
 		SDL_DestroyWindow(window);
 	}
 	else
 	{
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal error (SDLSurface rendering backend)", "Could not create window", NULL);
+		Backend_ShowMessageBox("Fatal error (SDLSurface rendering backend)", "Could not create window");
 	}
 
 	return NULL;
