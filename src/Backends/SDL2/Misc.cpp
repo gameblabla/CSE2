@@ -271,6 +271,7 @@ void Backend_GetKeyboardState(BOOL *out_keyboard_state)
 
 void Backend_ShowMessageBox(const char *title, const char *message)
 {
+	printf("ShowMessageBox - '%s' - '%s'\n", title, message);
 	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, message, window);
 }
 
