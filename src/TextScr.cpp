@@ -141,7 +141,7 @@ BOOL LoadTextScript2(const char *name)
 
 	// Read data
 	fread(gTS.data, 1, gTS.size, fp);
-	gTS.data[gTS.size] = 0;
+	gTS.data[gTS.size] = '\0';
 	fclose(fp);
 
 	// Set path
@@ -190,12 +190,12 @@ BOOL LoadTextScript_Stage(const char *name)
 	// Read Head.tsc
 	fread(gTS.data, 1, head_size, fp_head);
 	EncryptionBinaryData2((unsigned char*)gTS.data, head_size);
-	gTS.data[head_size] = 0;
+	gTS.data[head_size] = '\0';
 	fclose(fp_head);
 
 	fread(&gTS.data[head_size], 1, body_size, fp_body);
 	EncryptionBinaryData2((unsigned char*)&gTS.data[head_size], body_size);
-	gTS.data[head_size + body_size] = 0;
+	gTS.data[head_size + body_size] = '\0';
 	fclose(fp_body);
 
 	// Set parameters
