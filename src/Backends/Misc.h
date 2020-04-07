@@ -92,7 +92,7 @@ typedef struct Backend_DisplayMode
 
 extern BOOL bActive;
 
-void Backend_Init(void);
+BOOL Backend_Init(void);
 void Backend_Deinit(void);
 void Backend_PostWindowCreation(void);
 BOOL Backend_GetBasePath(char *string_buffer);

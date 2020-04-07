@@ -85,7 +85,8 @@ int main(int argc, char *argv[])
 {
 	(void)argc;
 
-	Backend_Init();
+	if (!Backend_Init())
+		return EXIT_FAILURE;
 
 	// Get executable's path
 	if (!Backend_GetBasePath(gModulePath))
