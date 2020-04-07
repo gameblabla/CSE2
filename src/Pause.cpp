@@ -291,9 +291,8 @@ static const char* GetKeyName(int key)
 	return "Unknown";
 }
 
-static int EnterOptionsMenu(OptionsMenu *options_menu)
+static int EnterOptionsMenu(OptionsMenu *options_menu, size_t selected_option)
 {
-	size_t selected_option = 0;
 	int scroll = 0;
 
 	unsigned int anime = 0;
@@ -563,7 +562,7 @@ static int Callback_ControlsKeyboard(OptionsMenu *parent_menu, size_t this_optio
 
 	PlaySoundObject(5, 1);
 
-	const int return_value = EnterOptionsMenu(&options_menu);
+	const int return_value = EnterOptionsMenu(&options_menu, 0);
 
 	PlaySoundObject(5, 1);
 
@@ -675,7 +674,7 @@ static int Callback_ControlsController(OptionsMenu *parent_menu, size_t this_opt
 
 	PlaySoundObject(5, 1);
 
-	const int return_value = EnterOptionsMenu(&options_menu);
+	const int return_value = EnterOptionsMenu(&options_menu, 0);
 
 	PlaySoundObject(5, 1);
 
@@ -843,7 +842,7 @@ static int Callback_Options(OptionsMenu *parent_menu, size_t this_option, Callba
 
 	PlaySoundObject(5, 1);
 
-	const int return_value = EnterOptionsMenu(&options_menu);
+	const int return_value = EnterOptionsMenu(&options_menu, 0);
 
 	PlaySoundObject(5, 1);
 
@@ -863,6 +862,56 @@ static int Callback_Options(OptionsMenu *parent_menu, size_t this_option, Callba
 // Pause menu //
 ////////////////
 
+static int PromptAreYouSure(void)
+{
+	struct FunctionHolder
+	{
+		static int Callback_Yes(OptionsMenu *parent_menu, size_t this_option, CallbackAction action)
+		{
+			(void)parent_menu;
+			(void)this_option;
+
+			if (action != ACTION_OK)
+				return -1;
+
+			return 1;
+		}
+
+		static int Callback_No(OptionsMenu *parent_menu, size_t this_option, CallbackAction action)
+		{
+			(void)parent_menu;
+			(void)this_option;
+
+			if (action != ACTION_OK)
+				return -1;
+
+			return 0;
+		}
+	};
+
+	Option options[] = {
+		{"Yes", FunctionHolder::Callback_Yes, NULL, NULL, 0},
+		{"No", FunctionHolder::Callback_No, NULL, NULL, 0}
+	};
+
+	OptionsMenu options_menu = {
+		"ARE YOU SURE?",
+		"UNSAVED PROGRESS WILL BE LOST",
+		options,
+		sizeof(options) / sizeof(options[0]),
+		-10,
+		TRUE
+	};
+
+	PlaySoundObject(5, 1);
+
+	int return_value = EnterOptionsMenu(&options_menu, 1);
+
+	PlaySoundObject(18, 1);
+
+	return return_value;
+}
+
 static int Callback_Resume(OptionsMenu *parent_menu, size_t this_option, CallbackAction action)
 {
 	(void)parent_menu;
@@ -881,8 +930,20 @@ static int Callback_Reset(OptionsMenu *parent_menu, size_t this_option, Callback
 	if (action != ACTION_OK)
 		return -1;
 
-	PlaySoundObject(18, 1);
-	return enum_ESCRETURN_restart;
+	int return_value = -1;
+
+	switch (PromptAreYouSure())
+	{
+		case 0:
+			return_value = -1;
+			break;
+
+		case 1:
+			return_value = enum_ESCRETURN_restart;
+			break;
+	}
+
+	return return_value;
 }
 
 static int Callback_Quit(OptionsMenu *parent_menu, size_t this_option, CallbackAction action)
@@ -892,7 +953,20 @@ static int Callback_Quit(OptionsMenu *parent_menu, size_t this_option, CallbackA
 	if (action != ACTION_OK)
 		return -1;
 
-	return enum_ESCRETURN_exit;
+	int return_value = -1;
+
+	switch (PromptAreYouSure())
+	{
+		case 0:
+			return_value = -1;
+			break;
+
+		case 1:
+			return_value = enum_ESCRETURN_exit;
+			break;
+	}
+
+	return return_value;
 }
 
 int Call_Pause(void)
@@ -913,7 +987,7 @@ int Call_Pause(void)
 		FALSE
 	};
 
-	int return_value = EnterOptionsMenu(&options_menu);
+	int return_value = EnterOptionsMenu(&options_menu, 0);
 
 	gKeyTrg = gKey = 0;
 
