@@ -41,7 +41,10 @@ void Backend_Init(void)
 	for (int i = 0; i < SDL_GetNumVideoDrivers(); ++i)
 		puts(SDL_GetVideoDriver(i));
 
-	printf("Selected SDL2 video driver: %s\n", SDL_GetCurrentVideoDriver());
+	const char *driver = SDL_GetCurrentVideoDriver();
+
+	if (driver != NULL)
+		printf("Selected SDL2 video driver: %s\n", driver);
 }
 
 void Backend_Deinit(void)
