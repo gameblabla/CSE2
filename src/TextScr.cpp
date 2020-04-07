@@ -140,7 +140,7 @@ BOOL LoadTextScript2(const char *name)
 
 	// Read data. Note that gTS.size may exceed the size of 'gTS.data' (TSC_BUFFER_SIZE)
 	fread(gTS.data, 1, gTS.size, fp);
-	gTS.data[gTS.size] = 0;
+	gTS.data[gTS.size] = '\0';
 	fclose(fp);
 
 	// Set path
@@ -174,7 +174,7 @@ BOOL LoadTextScript_Stage(const char *name)
 	// Read Head.tsc. Note that head_size may exceed the size of 'gTS.data' (TSC_BUFFER_SIZE)
 	fread(gTS.data, 1, head_size, fp);
 	EncryptionBinaryData2((unsigned char*)gTS.data, head_size);
-	gTS.data[head_size] = 0;
+	gTS.data[head_size] = '\0';
 	fclose(fp);
 
 	// Open stage's .tsc
@@ -191,7 +191,7 @@ BOOL LoadTextScript_Stage(const char *name)
 	// Read stage's tsc. Note that head_size + body_size may exceed the size of 'gTS.data' (TSC_BUFFER_SIZE)
 	fread(&gTS.data[head_size], 1, body_size, fp);
 	EncryptionBinaryData2((unsigned char*)&gTS.data[head_size], body_size);
-	gTS.data[head_size + body_size] = 0;
+	gTS.data[head_size + body_size] = '\0';
 	fclose(fp);
 
 	// Set parameters
