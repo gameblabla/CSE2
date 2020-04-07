@@ -11,6 +11,7 @@
 
 #include "../Misc.h"
 #include "../SDL2/Window.h"
+#include "../../Attributes.h"
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -207,7 +208,7 @@ void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, unsigned int wi
 	(void)height;
 }
 
-void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RECT *rect, RenderBackend_Surface *destination_surface, long x, long y, BOOL alpha_blend)
+ATTRIBUTE_HOT void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RECT *rect, RenderBackend_Surface *destination_surface, long x, long y, BOOL alpha_blend)
 {
 	if (source_surface == NULL || destination_surface == NULL)
 		return;
@@ -291,7 +292,7 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RECT *rect,
 	}
 }
 
-void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha)
+ATTRIBUTE_HOT void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha)
 {
 	if (surface == NULL)
 		return;

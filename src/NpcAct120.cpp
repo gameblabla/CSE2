@@ -585,7 +585,10 @@ void ActNpc127(NPCHAR *npc)
 	{
 		npc->ani_wait = 0;
 		if (++npc->ani_no > 2)
+		{
 			npc->cond = 0;
+			return; // Prevent UB at rc[npc->ani_no] when npc->ani_no == 3
+		}
 	}
 
 	if (npc->direct == 0)
@@ -646,7 +649,10 @@ void ActNpc128(NPCHAR *npc)
 	}
 
 	if (++npc->ani_no > 4)
+	{
 		npc->cond = 0;
+		return;	// Prevent UB at rc[npc->ani_no] when npc->ani_no == 5
+	}
 
 	switch (npc->direct)
 	{
@@ -697,7 +703,10 @@ void ActNpc129(NPCHAR *npc)
 		npc->ani_wait = 0;
 
 		if (++npc->ani_no > 2)
+		{
 			npc->cond = 0;
+			return;	// Prevent UB at rect[(npc->direct * 3) + npc->ani_no] when npc->direct == 5 and npc->ani_no == 3
+		}
 	}
 
 	npc->y += npc->ym;

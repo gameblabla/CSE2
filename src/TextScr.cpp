@@ -37,6 +37,7 @@
 #include "Sound.h"
 #include "Stage.h"
 
+// This limits the size of a .tsc script to 0x5000 bytes (the game will crash above this)
 #define TEXT_LEFT (WINDOW_WIDTH / 2 - 108)
 
 #define IS_COMMAND(c1, c2, c3) (gTS.data[gTS.p_read + 1] == (c1) && gTS.data[gTS.p_read + 2] == (c2) && gTS.data[gTS.p_read + 3] == (c3))
@@ -139,7 +140,7 @@ BOOL LoadTextScript2(const char *name)
 	if (fp == NULL)
 		return FALSE;
 
-	// Read data
+	// Read data. Note that gTS.size may exceed the size of 'gTS.data' (TSC_BUFFER_SIZE)
 	fread(gTS.data, 1, gTS.size, fp);
 	gTS.data[gTS.size] = 0;
 	fclose(fp);
@@ -193,7 +194,6 @@ BOOL LoadTextScript_Stage(const char *name)
 	gTS.data[head_size] = 0;
 	fclose(fpHead);
 
-	// Read stage's tsc
 	fread(&gTS.data[head_size], 1, body_size, fpBody);
 	EncryptionBinaryData2((unsigned char*)&gTS.data[head_size], body_size);
 	gTS.data[head_size + body_size] = 0;
