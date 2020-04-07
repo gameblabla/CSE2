@@ -383,17 +383,22 @@ static int EnterOptionsMenu(OptionsMenu *options_menu, size_t selected_option)
 		// Draw screen
 		CortBox(&grcFull, 0x000000);
 
-		PutText((WINDOW_WIDTH / 2) - ((strlen(options_menu->title) * 5) / 2), 20, options_menu->title, RGB(0xFF, 0xFF, 0xFF));
-
-		if (options_menu->subtitle != NULL)
-			PutText((WINDOW_WIDTH / 2) - ((strlen(options_menu->subtitle) * 5) / 2), 34, options_menu->subtitle, RGB(0xFF, 0xFF, 0xFF));
-
 		const size_t visible_options = MIN(MAX_OPTIONS, options_menu->total_options);
+
+		int y = (WINDOW_HEIGHT / 2) - ((visible_options * 20) / 2) - (40 / 2);
+
+		// Draw title
+		PutText((WINDOW_WIDTH / 2) - ((strlen(options_menu->title) * 5) / 2), y, options_menu->title, RGB(0xFF, 0xFF, 0xFF));
+
+		// Draw subtitle
+		if (options_menu->subtitle != NULL)
+			PutText((WINDOW_WIDTH / 2) - ((strlen(options_menu->subtitle) * 5) / 2), y + 14, options_menu->subtitle, RGB(0xFF, 0xFF, 0xFF));
+
+		y += 40;
 
 		for (size_t i = scroll; i < scroll + visible_options; ++i)
 		{
 			const int x = (WINDOW_WIDTH / 2) + options_menu->x_offset;
-			const int y = (WINDOW_HEIGHT / 2) + (10 * 0) - (((visible_options - 1) * 20) / 2) + ((i - scroll) * 20);
 
 			// Draw Quote next to the selected option
 			if (i == selected_option)
@@ -405,6 +410,8 @@ static int EnterOptionsMenu(OptionsMenu *options_menu, size_t selected_option)
 			// Draw option value, if it has one
 			if (options_menu->options[i].attribute != NULL)
 				PutText(x + 100, y - (9 / 2), options_menu->options[i].attribute, RGB(0xFF, 0xFF, 0xFF));
+
+			y += 20;
 		}
 
 		PutFramePerSecound();
