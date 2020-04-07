@@ -96,6 +96,8 @@ void Backend_SetCursor(const unsigned char *rgb_pixels, unsigned int width, unsi
 
 	if (cursor_surface_pixels != NULL)
 	{
+		memcpy(cursor_surface_pixels, rgb_pixels, width * height * 3);
+
 		cursor_surface = SDL_CreateRGBSurfaceWithFormatFrom(cursor_surface_pixels, width, height, 0, width * 3, SDL_PIXELFORMAT_RGB24);
 
 		if (cursor_surface != NULL)
