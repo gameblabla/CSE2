@@ -131,8 +131,8 @@ BOOL LoadTextScript2(const char *name)
 		return FALSE;
 
 	free(gTS.data);
-	gTS.data = (char *)malloc(gTS.size + 1);
-	if (!gTS.data)
+	gTS.data = (char*)malloc(gTS.size + 1);
+	if (gTS.data == NULL)
 		return FALSE;
 
 	// Open file
@@ -157,7 +157,7 @@ BOOL LoadTextScript2(const char *name)
 // Load stage .tsc
 BOOL LoadTextScript_Stage(const char *name)
 {
-	FILE *fpHead, *fpBody;
+	FILE *fp_head, *fp_body;
 	char path[MAX_PATH];
 	long head_size;
 	long body_size;
@@ -169,8 +169,8 @@ BOOL LoadTextScript_Stage(const char *name)
 	if (head_size == -1)
 		return FALSE;
 
-	fpHead = fopen(path, "rb");
-	if (fpHead == NULL)
+	fp_head = fopen(path, "rb");
+	if (fp_head == NULL)
 		return FALSE;
 
 	sprintf(path, "%s/%s", gDataPath, name);
@@ -179,25 +179,25 @@ BOOL LoadTextScript_Stage(const char *name)
 	if (body_size == -1)
 		return FALSE;
 
-	fpBody = fopen(path, "rb");
-	if (fpBody == NULL)
+	fp_body = fopen(path, "rb");
+	if (fp_body == NULL)
 		return FALSE;
 
 	free(gTS.data);
-	gTS.data = (char *)malloc(head_size + body_size + 1);
-	if (!gTS.data)
+	gTS.data = (char*)malloc(head_size + body_size + 1);
+	if (gTS.data == NULL)
 		return FALSE;
 
 	// Read Head.tsc
-	fread(gTS.data, 1, head_size, fpHead);
+	fread(gTS.data, 1, head_size, fp_head);
 	EncryptionBinaryData2((unsigned char*)gTS.data, head_size);
 	gTS.data[head_size] = 0;
-	fclose(fpHead);
+	fclose(fp_head);
 
-	fread(&gTS.data[head_size], 1, body_size, fpBody);
+	fread(&gTS.data[head_size], 1, body_size, fp_body);
 	EncryptionBinaryData2((unsigned char*)&gTS.data[head_size], body_size);
 	gTS.data[head_size + body_size] = 0;
-	fclose(fpBody);
+	fclose(fp_body);
 
 	// Set parameters
 	gTS.size = head_size + body_size;
