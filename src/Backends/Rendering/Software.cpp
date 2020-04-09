@@ -34,7 +34,7 @@ static RenderBackend_Surface framebuffer;
 static unsigned char glyph_colour_channels[3];
 static RenderBackend_Surface *glyph_destination_surface;
 
-RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen, BOOL vsync)
+RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen, BOOL *vsync)
 {
 	size_t pitch;
 	framebuffer.pixels = WindowBackend_Software_CreateWindow(window_title, screen_width, screen_height, fullscreen, vsync, &pitch);

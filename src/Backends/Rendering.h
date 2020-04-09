@@ -5,7 +5,7 @@
 typedef struct RenderBackend_Surface RenderBackend_Surface;
 typedef struct RenderBackend_Glyph RenderBackend_Glyph;
 
-RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen, BOOL vsync);
+RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen, BOOL *vsync);
 void RenderBackend_Deinit(void);
 void RenderBackend_DrawScreen(void);
 RenderBackend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned int height);

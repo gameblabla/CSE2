@@ -26,7 +26,7 @@ static float framebuffer_y_ratio;
 
 static GLuint screen_texture_id;
 
-unsigned char* WindowBackend_Software_CreateWindow(const char *window_title, int screen_width, int screen_height, BOOL fullscreen, BOOL vsync, size_t *pitch)
+unsigned char* WindowBackend_Software_CreateWindow(const char *window_title, int screen_width, int screen_height, BOOL fullscreen, BOOL *vsync, size_t *pitch)
 {
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 1);
@@ -56,7 +56,7 @@ unsigned char* WindowBackend_Software_CreateWindow(const char *window_title, int
 	{
 		glfwMakeContextCurrent(window);
 
-		if (vsync)
+		if (*vsync)
 			glfwSwapInterval(1);
 
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);

@@ -484,12 +484,12 @@ static void GlyphBatch_DestroyTexture(SPRITEBATCH_U64 texture_id, void *udata)
 // Render-backend initialisation
 // ====================
 
-RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen, BOOL vsync)
+RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen, BOOL *vsync)
 {
 	actual_screen_width = screen_width;
 	actual_screen_height = screen_height;
 
-	if (WindowBackend_OpenGL_CreateWindow(window_title, &actual_screen_width, &actual_screen_height, fullscreen, vsync))
+	if (WindowBackend_OpenGL_CreateWindow(window_title, &actual_screen_width, &actual_screen_height, fullscreen, *vsync))
 	{
 		printf("GL_VENDOR = %s\n", glGetString(GL_VENDOR));
 		printf("GL_RENDERER = %s\n", glGetString(GL_RENDERER));
