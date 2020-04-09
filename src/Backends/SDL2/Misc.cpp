@@ -49,8 +49,12 @@ BOOL Backend_Init(void)
 			return TRUE;
 		}
 
+		Backend_ShowMessageBox("Fatal error", "Could not initialise SDL2 video subsystem");
+
 		SDL_Quit();
 	}
+
+	Backend_ShowMessageBox("Fatal error", "Could not initialise SDL2");
 
 	return FALSE;
 }
