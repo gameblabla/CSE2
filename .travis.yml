@@ -67,6 +67,9 @@ jobs:
     - os: osx
       compiler: gcc
       env: PLATFORM=GLFW3 AUDIO=miniaudio RENDERER=OpenGL3
+    - os: osx
+      compiler: gcc
+      env: PLATFORM=GLFW3 AUDIO=miniaudio RENDERER=Software
 
 before_install:
     # Set URL for Discord send script
