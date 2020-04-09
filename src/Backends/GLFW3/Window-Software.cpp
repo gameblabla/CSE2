@@ -132,7 +132,7 @@ void WindowBackend_Software_HandleWindowResize(unsigned int width, unsigned int 
 	GLsizei viewport_width;
 	GLsizei viewport_height;
 
-	if (width > height)
+	if ((float)width / (float)height > (float)framebuffer_width / (float)framebuffer_height)
 	{
 		viewport_y = 0;
 		viewport_height = height;

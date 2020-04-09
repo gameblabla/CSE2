@@ -669,7 +669,7 @@ void RenderBackend_DrawScreen(void)
 	GLsizei width;
 	GLsizei height;
 
-	if (actual_screen_width > actual_screen_height)
+	if ((float)actual_screen_width / (float)actual_screen_height > (float)framebuffer.width / (float)framebuffer.height)
 	{
 		y = 0;
 		height = actual_screen_height;
