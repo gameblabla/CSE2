@@ -71,7 +71,7 @@ Name | Function
 `-DBACKEND_RENDERER=OpenGLES2` | Use the hardware-accelerated OpenGL ES 2.0 renderer
 `-DBACKEND_RENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default) (note: requires `-DBACKEND_PLATFORM=SDL2`)
 `-DBACKEND_RENDERER=SDLSurface` | Use the software-rendered SDL2 Surface API renderer (note: requires `-DBACKEND_PLATFORM=SDL2`)
-`-DBACKEND_RENDERER=Software` | Use the handwritten software renderer (note: requires `-DBACKEND_PLATFORM=SDL2`)
+`-DBACKEND_RENDERER=Software` | Use the handwritten software renderer
 `-DBACKEND_AUDIO=SDL2` | Use the SDL2-driven software audio-mixer
 `-DBACKEND_AUDIO=miniaudio` | Use the miniaudio-driven software audio-mixer
 `-DBACKEND_PLATFORM=SDL2` | Use SDL2 for windowing and OS-abstraction
