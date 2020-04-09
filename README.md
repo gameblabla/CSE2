@@ -18,8 +18,6 @@ Cave Story Engine 2 is a decompilation of Cave Story.
 
 This branch adds several enhancements including:
 * Widescreen
-* Vastly-improved fullscreen
-* Window-resizing
 * Options menu:
   * Control remapping (keyboard and gamepad)
   * V-sync toggle
