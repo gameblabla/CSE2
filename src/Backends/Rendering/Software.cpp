@@ -5,12 +5,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "SDL.h"
-
 #include "../../WindowsWrapper.h"
 
 #include "../Misc.h"
-#include "../SDL2/Window.h"
+#include "../Window-Software.h"
 #include "../../Attributes.h"
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
@@ -31,119 +29,30 @@ typedef struct RenderBackend_Glyph
 	unsigned int height;
 } RenderBackend_Glyph;
 
-static SDL_Renderer *renderer;
-static SDL_Texture *texture;
-
 static RenderBackend_Surface framebuffer;
 
 static unsigned char glyph_colour_channels[3];
 static RenderBackend_Surface *glyph_destination_surface;
 
-SDL_Window *window;
-
 RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen, BOOL vsync)
 {
-	puts("Available SDL2 render drivers:");
+	size_t pitch;
+	framebuffer.pixels = WindowBackend_Software_CreateWindow(window_title, screen_width, screen_height, fullscreen, vsync, &pitch);
+	framebuffer.width = screen_width;
+	framebuffer.height = screen_height;
+	framebuffer.pitch = pitch;
 
-	for (int i = 0; i < SDL_GetNumRenderDrivers(); ++i)
-	{
-		SDL_RendererInfo info;
-		SDL_GetRenderDriverInfo(i, &info);
-		puts(info.name);
-	}
-
-	window = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screen_width, screen_height, SDL_WINDOW_RESIZABLE);
-
-	if (window != NULL)
-	{
-		if (fullscreen)
-			SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
-
-	#if SDL_VERSION_ATLEAST(2,0,10)
-		SDL_SetHint(SDL_HINT_RENDER_BATCHING, "1");	// We never interfere with the renderer, so don't let SDL implicitly disable batching
-	#endif
-
-		renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE | (vsync ? SDL_RENDERER_PRESENTVSYNC : 0));
-
-		if (renderer != NULL)
-		{
-			SDL_RendererInfo info;
-			SDL_GetRendererInfo(renderer, &info);
-			printf("Selected SDL2 render driver: %s\n", info.name);
-
-			SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
-			texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STREAMING, screen_width, screen_height);
-			SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
-
-			if (texture != NULL)
-			{
-				SDL_LockTexture(texture, NULL, (void**)&framebuffer.pixels, (int*)&framebuffer.pitch);
-
-				Backend_PostWindowCreation();
-
-				framebuffer.width = screen_width;
-				framebuffer.height = screen_height;
-
-				return &framebuffer;
-			}
-
-			SDL_DestroyRenderer(renderer);
-		}
-		else
-		{
-			Backend_ShowMessageBox("Fatal error (software rendering backend)", "Could not create framebuffer surface");
-		}
-
-		SDL_DestroyWindow(window);
-	}
-	else
-	{
-		Backend_ShowMessageBox("Fatal error (software rendering backend)", "Could not create window");
-	}
-
-	return NULL;
+	return &framebuffer;
 }
 
 void RenderBackend_Deinit(void)
 {
-	SDL_DestroyTexture(texture);
-	SDL_DestroyRenderer(renderer);
-	SDL_DestroyWindow(window);
+	WindowBackend_Software_DestroyWindow();
 }
 
 void RenderBackend_DrawScreen(void)
 {
-	SDL_UnlockTexture(texture);
-
-	int renderer_width, renderer_height;
-	SDL_GetRendererOutputSize(renderer, &renderer_width, &renderer_height);
-
-	int texture_width, texture_height;
-	SDL_QueryTexture(texture, NULL, NULL, &texture_width, &texture_height);
-
-	SDL_Rect dst_rect;
-	if ((float)renderer_width / texture_width < (float)renderer_height / texture_height)
-	{
-		dst_rect.w = renderer_width;
-		dst_rect.h = (int)(texture_height * (float)renderer_width / texture_width);
-		dst_rect.x = 0;
-		dst_rect.y = (renderer_height - dst_rect.h) / 2;
-	}
-	else
-	{
-		dst_rect.w = (int)(texture_width * (float)renderer_height / texture_height);
-		dst_rect.h = renderer_height;
-		dst_rect.x = (renderer_width - dst_rect.w) / 2;
-		dst_rect.y = 0;
-	}
-
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
-	SDL_RenderClear(renderer);
-	SDL_RenderCopy(renderer, texture, NULL, &dst_rect);
-
-	SDL_RenderPresent(renderer);
-
-	SDL_LockTexture(texture, NULL, (void**)&framebuffer.pixels, (int*)&framebuffer.pitch);
+	WindowBackend_Software_Display();
 }
 
 RenderBackend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned int height)
@@ -435,5 +344,5 @@ void RenderBackend_HandleRenderTargetLoss(void)
 
 void RenderBackend_HandleWindowResize(unsigned int width, unsigned int height)
 {
-	// No problem for us
+	WindowBackend_Software_HandleWindowResize(width, height);
 }
