@@ -68,6 +68,8 @@ If these are not found, they will be built locally.
 
 In addition, `pkg-config` is required for builds that require static-linkage.
 
+A list of dependencies for specific platforms can be found [on the wiki](https://github.com/Clownacy/Cave-Story-Engine-2/wiki/Dependency-lists).
+
 ## Building
 
 This project uses CMake, allowing it to be built with a range of compilers.
