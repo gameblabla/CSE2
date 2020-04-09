@@ -154,8 +154,10 @@ BOOL Backend_Init(void)
 {
 	if (glfwInit() == GL_TRUE)
 		return TRUE;
-	else
-		return FALSE;
+
+	Backend_ShowMessageBox("Fatal error", "Could not initialise GLFW3");
+
+	return FALSE;
 }
 
 void Backend_Deinit(void)
