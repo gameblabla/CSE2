@@ -556,9 +556,6 @@ endif()
 if(BACKEND_RENDERER MATCHES "OpenGL3")
 	add_subdirectory("external/glad" EXCLUDE_FROM_ALL)
 	target_link_libraries(CSE2 PRIVATE glad)
-
-	find_package(OpenGL REQUIRED)
-	target_link_libraries(CSE2 PRIVATE OpenGL::GL)
 endif()
 
 if(BACKEND_RENDERER MATCHES "OpenGLES2")
@@ -567,7 +564,7 @@ if(BACKEND_RENDERER MATCHES "OpenGLES2")
 	target_link_libraries(CSE2 PRIVATE ${OPENGLES2_LIBRARIES})
 endif()
 
-if(BACKEND_PLATFORM MATCHES "GLFW3" AND BACKEND_RENDERER MATCHES "Software")
+if(BACKEND_RENDERER MATCHES "OpenGL3" OR (BACKEND_PLATFORM MATCHES "GLFW3" AND BACKEND_RENDERER MATCHES "Software"))
 	find_package(OpenGL REQUIRED)
 	target_link_libraries(CSE2 PRIVATE OpenGL::GL)
 endif()
