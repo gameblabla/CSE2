@@ -60,6 +60,8 @@ unsigned char* WindowBackend_Software_CreateWindow(const char *window_title, int
 
 		glEnable(GL_TEXTURE_2D);
 
+		WindowBackend_Software_HandleWindowResize(screen_width, screen_height);
+
 		// Create screen texture
 		glGenTextures(1, &screen_texture_id);
 		glBindTexture(GL_TEXTURE_2D, screen_texture_id);
