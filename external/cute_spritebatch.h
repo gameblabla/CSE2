@@ -123,7 +123,6 @@
 		SPRITEBATCH_ASSERT
 		SPRITEBATCH_ATLAS_FLIP_Y_AXIS_FOR_UV
 		SPRITEBATCH_ATLAS_EMPTY_COLOR
-		SPRITEBATCH_ALLOCA
 		SPRITEBATCH_LOG
 
 	Revision history:
@@ -134,6 +133,7 @@
 		                  inverted get pixels callback to let users have an easier time
 		                  with memory management, added support for pixel padding along
 		                  the edges of all textures (useful for certain shader effects)
+	        1.02 (04/09/2020) Compilation fix for FreeBSD - Remove unused alloca header and define
 */
 
 #ifndef SPRITEBATCH_H
@@ -463,15 +463,6 @@ struct spritebatch_t
 
 #ifndef SPRITEBATCH_ATLAS_EMPTY_COLOR
 	#define SPRITEBATCH_ATLAS_EMPTY_COLOR 0x000000FF
-#endif
-
-#ifndef SPRITEBATCH_ALLOCA
-	#ifdef _WIN32
-		#include <malloc.h>
-	#else
-		#include <alloca.h>
-	#endif
-	#define SPRITEBATCH_ALLOCA(ctx, size) alloca(size)
 #endif
 
 #ifndef SPRITEBATCH_LOG
