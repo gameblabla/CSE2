@@ -303,6 +303,13 @@ void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, unsigned int wi
 		return;
 
 	unsigned char *buffer = (unsigned char*)malloc(width * height * 4);
+
+	if (!buffer)
+	{
+		Backend_PrintError("Couldn't allocate memory for surface buffer : %s", SDL_GetError());
+		return;
+	}
+
 	const unsigned char *src_pixel = surface->pixels;
 
 	// Convert the SDL_Surface's colour-keyed pixels to RGBA32
@@ -328,7 +335,8 @@ void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, unsigned int wi
 	free(surface->pixels);
 
 	SDL_Rect rect = {0, 0, (int)width, (int)height};
-	SDL_UpdateTexture(surface->texture, &rect, buffer, width * 4);
+	if (SDL_UpdateTexture(surface->texture, &rect, buffer, width * 4) < 0)
+		Backend_PrintError("Couldn't update part of texture : %s", SDL_GetError());
 
 	free(buffer);
 }
@@ -344,9 +352,14 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RECT *rect,
 	SDL_Rect destination_rect = {(int)x, (int)y, source_rect.w, source_rect.h};
 
 	// Blit the texture
-	SDL_SetTextureBlendMode(source_surface->texture, colour_key ? SDL_BLENDMODE_BLEND : SDL_BLENDMODE_NONE);
-	SDL_SetRenderTarget(renderer, destination_surface->texture);
-	SDL_RenderCopy(renderer, source_surface->texture, &source_rect, &destination_rect);
+	if (SDL_SetTextureBlendMode(source_surface->texture, colour_key ? SDL_BLENDMODE_BLEND : SDL_BLENDMODE_NONE) < 0)
+		Backend_PrintError("Couldn't set texture blend mode : %s", SDL_GetError());
+
+	if (SDL_SetRenderTarget(renderer, destination_surface->texture) < 0)
+		Backend_PrintError("Couldn't set current rendering target : %s", SDL_GetError());
+
+	if (SDL_RenderCopy(renderer, source_surface->texture, &source_rect, &destination_rect) < 0)
+		Backend_PrintError("Couldn't copy part of texture to rendering target : %s", SDL_GetError());
 }
 
 void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
@@ -357,17 +370,27 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RECT *rect, 
 	SDL_Rect sdl_rect;
 	RectToSDLRect(rect, &sdl_rect);
 
+	uint8_t alpha = SDL_ALPHA_OPAQUE;
+
 	// Check colour-key
 	if (red == 0 && green == 0 && blue == 0)
-		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
-	else
-		SDL_SetRenderDrawColor(renderer, red, green, blue, SDL_ALPHA_OPAQUE);
+		alpha = 0;
+
+	if (SDL_SetRenderDrawColor(renderer, red, green, blue, alpha) < 0)
+		Backend_PrintError("Couldn't set color for drawing operations : %s", SDL_GetError());
 
 	// Draw colour
-	SDL_SetRenderTarget(renderer, surface->texture);
-	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
-	SDL_RenderFillRect(renderer, &sdl_rect);
-	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+	if (SDL_SetRenderTarget(renderer, surface->texture) < 0)
+		Backend_PrintError("Couldn't set texture current rendering target : %s", SDL_GetError());
+
+	if (SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE) < 0)
+		Backend_PrintError("Couldn't disable blending for drawing operations : %s", SDL_GetError());
+
+	if (SDL_RenderFillRect(renderer, &sdl_rect) < 0)
+		Backend_PrintError("Couldn't fill rectangle on current rendering target : %s", SDL_GetError());
+
+	if (SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND) < 0)
+		Backend_PrintError("Couldn't enable alpha blending for drawing operations : %s", SDL_GetError());
 }
 
 RenderBackend_Glyph* RenderBackend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch)
@@ -420,7 +443,8 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_Surface *destination_surfac
 	if (destination_surface == NULL)
 		return;
 
-	SDL_SetRenderTarget(renderer, destination_surface->texture);
+	if (SDL_SetRenderTarget(renderer, destination_surface->texture) < 0)
+		Backend_PrintError("Couldn't set texture as current rendering target : %s", SDL_GetError());
 
 	memcpy(glyph_colour_channels, colour_channels, sizeof(glyph_colour_channels));
 }
