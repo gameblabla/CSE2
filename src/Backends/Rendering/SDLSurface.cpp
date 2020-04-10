@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 
 #include "SDL.h"
 
@@ -51,28 +52,38 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 	if (window != NULL)
 	{
 		if (fullscreen)
-			SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+		{
+			if (SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN) < 0)
+				Backend_PrintError("Could not set window to fullscreen: %s", SDL_GetError());
+		}
 
 		window_sdlsurface = SDL_GetWindowSurface(window);
-
-		framebuffer.sdlsurface = SDL_CreateRGBSurfaceWithFormat(0, window_sdlsurface->w, window_sdlsurface->h, 0, SDL_PIXELFORMAT_RGB24);
-
-		if (framebuffer.sdlsurface != NULL)
+		if (!window_sdlsurface)
 		{
-			Backend_PostWindowCreation();
-
-			return &framebuffer;
+			std::string error_message = std::string("Could not get SDL surface of the window: ") + SDL_GetError();
+			Backend_ShowMessageBox("Fatal error (SDLSurface rendering backend)", error_message.c_str());
 		}
 		else
 		{
-			Backend_ShowMessageBox("Fatal error (SDLSurface rendering backend)", "Could not create framebuffer surface");
+			framebuffer.sdlsurface = SDL_CreateRGBSurfaceWithFormat(0, window_sdlsurface->w, window_sdlsurface->h, 0, SDL_PIXELFORMAT_RGB24);
+
+			if (framebuffer.sdlsurface != NULL)
+			{
+				Backend_PostWindowCreation();
+
+				return &framebuffer;
+			}
+
+			std::string error_message = std::string("Could not create framebuffer surface : ") + SDL_GetError();
+			Backend_ShowMessageBox("Fatal error (SDLSurface rendering backend)", error_message.c_str());
 		}
 
 		SDL_DestroyWindow(window);
 	}
 	else
 	{
-		Backend_ShowMessageBox("Fatal error (SDLSurface rendering backend)", "Could not create window");
+		std::string error_message = std::string("Could not create window : ") + SDL_GetError();
+		Backend_ShowMessageBox("Fatal error (SDLSurface rendering backend)", error_message.c_str());
 	}
 
 	return NULL;
@@ -86,8 +97,11 @@ void RenderBackend_Deinit(void)
 
 void RenderBackend_DrawScreen(void)
 {
-	SDL_BlitSurface(framebuffer.sdlsurface, NULL, window_sdlsurface, NULL);
-	SDL_UpdateWindowSurface(window);
+	if (SDL_BlitSurface(framebuffer.sdlsurface, NULL, window_sdlsurface, NULL) < 0)
+		Backend_PrintError("Couldn't blit framebuffer surface to window surface: %s", SDL_GetError());
+
+	if (SDL_UpdateWindowSurface(window) < 0)
+		Backend_PrintError("Couldn't put window surface on screen: %s", SDL_GetError());
 }
 
 RenderBackend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned int height)
@@ -162,9 +176,12 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RECT *rect,
 	destination_rect.w = source_rect.w;
 	destination_rect.h = source_rect.h;
 
-	SDL_SetColorKey(source_surface->sdlsurface, colour_key ? SDL_TRUE : SDL_FALSE, SDL_MapRGB(source_surface->sdlsurface->format, 0, 0, 0)); // Assumes the colour key will always be #000000 (black)
+	// Assumes the colour key will always be #000000 (black)
+	if (SDL_SetColorKey(source_surface->sdlsurface, colour_key ? SDL_TRUE : SDL_FALSE, SDL_MapRGB(source_surface->sdlsurface->format, 0, 0, 0)) < 0)
+		Backend_PrintError("Couldn't set color key of surface: %s", SDL_GetError());
 
-	SDL_BlitSurface(source_surface->sdlsurface, &source_rect, destination_surface->sdlsurface, &destination_rect);
+	if (SDL_BlitSurface(source_surface->sdlsurface, &source_rect, destination_surface->sdlsurface, &destination_rect) < 0)
+		Backend_PrintError("Couldn't blit surface: %s", SDL_GetError());
 }
 
 void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
@@ -175,7 +192,8 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RECT *rect, 
 	SDL_Rect destination_rect;
 	RectToSDLRect(rect, &destination_rect);
 
-	SDL_FillRect(surface->sdlsurface, &destination_rect, SDL_MapRGB(surface->sdlsurface->format, red, green, blue));
+	if (SDL_FillRect(surface->sdlsurface, &destination_rect, SDL_MapRGB(surface->sdlsurface->format, red, green, blue)) < 0)
+		Backend_PrintError("Couldn't fill rectangle with color: %s", SDL_GetError());
 }
 
 RenderBackend_Glyph* RenderBackend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch)
@@ -189,6 +207,7 @@ RenderBackend_Glyph* RenderBackend_LoadGlyph(const unsigned char *pixels, unsign
 
 	if (glyph->sdlsurface == NULL)
 	{
+		Backend_PrintError("Couldn't create RBG surface: %s", SDL_GetError());
 		free(glyph);
 		return NULL;
 	}
@@ -240,9 +259,11 @@ void RenderBackend_DrawGlyph(RenderBackend_Glyph *glyph, long x, long y)
 	rect.w = glyph->sdlsurface->w;
 	rect.h = glyph->sdlsurface->h;
 
-	SDL_SetSurfaceColorMod(glyph->sdlsurface, glyph_colour_channels[0], glyph_colour_channels[1], glyph_colour_channels[2]);
+	if (SDL_SetSurfaceColorMod(glyph->sdlsurface, glyph_colour_channels[0], glyph_colour_channels[1], glyph_colour_channels[2]) < 0)
+		Backend_PrintError("Couldn't set color value: %s", SDL_GetError());
 
-	SDL_BlitSurface(glyph->sdlsurface, NULL, glyph_destination_sdlsurface, &rect);
+	if (SDL_BlitSurface(glyph->sdlsurface, NULL, glyph_destination_sdlsurface, &rect) < 0)
+		Backend_PrintError("Couldn't blit glyph indivual surface to final glyph surface: %s", SDL_GetError());
 }
 
 void RenderBackend_FlushGlyphs(void)
@@ -263,4 +284,7 @@ void RenderBackend_HandleWindowResize(unsigned int width, unsigned int height)
 	// https://wiki.libsdl.org/SDL_GetWindowSurface
 	// We need to fetch a new surface pointer
 	window_sdlsurface = SDL_GetWindowSurface(window);
+
+	if (!window_sdlsurface)
+		Backend_PrintError("Couldn't get SDL surface for window after resize: %s", SDL_GetError());
 }

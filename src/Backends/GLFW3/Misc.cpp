@@ -1,6 +1,7 @@
 #include "../Misc.h"
 
 #include <chrono>
+#include <stdarg.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,6 +18,7 @@
 #include "../../Organya.h"
 #include "../../Profile.h"
 #include "../../Resource.h"
+#include "../../Attributes.h"
 
 #define DO_KEY(GLFW_KEY, BACKEND_KEY) \
 	case GLFW_KEY: \
@@ -288,6 +290,26 @@ void Backend_ShowMessageBox(const char *title, const char *message)
 {
 	// GLFW3 doesn't have a message box
 	printf("ShowMessageBox - '%s' - '%s'\n", title, message);
+}
+
+ATTRIBUTE_FORMAT_PRINTF(1, 2) void Backend_PrintError(const char *format, ...)
+{
+	va_list argumentList;
+	va_start(argumentList, format);
+	fputs("ERROR: ", stderr);
+	vfprintf(stderr, format, argumentList);
+	fputc('\n', stderr);
+	va_end(argumentList);
+}
+
+ATTRIBUTE_FORMAT_PRINTF(1, 2) void Backend_PrintInfo(const char *format, ...)
+{
+	va_list argumentList;
+	va_start(argumentList, format);
+	fputs("INFO: ", stdout);
+	vprintf(format, argumentList);
+	putchar('\n');
+	va_end(argumentList);
 }
 
 unsigned long Backend_GetTicks(void)

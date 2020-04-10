@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../WindowsWrapper.h"
+#include "../Attributes.h"
 
 enum
 {
@@ -96,5 +97,7 @@ void PlaybackBackend_EnableDragAndDrop(void);
 BOOL Backend_SystemTask(void);
 void Backend_GetKeyboardState(BOOL *keyboard_state);
 void Backend_ShowMessageBox(const char *title, const char *message);
+ATTRIBUTE_FORMAT_PRINTF(1, 2) void Backend_PrintError(const char *format, ...);
+ATTRIBUTE_FORMAT_PRINTF(1, 2) void Backend_PrintInfo(const char *format, ...);
 unsigned long Backend_GetTicks(void);
 void Backend_Delay(unsigned int ticks);

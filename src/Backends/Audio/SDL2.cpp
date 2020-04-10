@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 #include <stdio.h>
+#include <string>
 
 #include "SDL.h"
 
@@ -66,7 +67,8 @@ BOOL AudioBackend_Init(void)
 {
 	if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
 	{
-		Backend_ShowMessageBox("Fatal error (SDL2 audio backend)", "'SDL_InitSubSystem(SDL_INIT_AUDIO)' failed");
+		std::string errorMessage = std::string("'SDL_InitSubSystem(SDL_INIT_AUDIO)' failed : ") + SDL_GetError();
+		Backend_ShowMessageBox("Fatal error (SDL2 audio backend)", errorMessage.c_str());
 		return FALSE;
 	}
 
@@ -85,14 +87,15 @@ BOOL AudioBackend_Init(void)
 
 	SDL_AudioSpec obtained_specification;
 	device_id = SDL_OpenAudioDevice(NULL, 0, &specification, &obtained_specification, SDL_AUDIO_ALLOW_FREQUENCY_CHANGE);
-	output_frequency = obtained_specification.freq;
-	Mixer_Init(obtained_specification.freq);
-
 	if (device_id == 0)
 	{
-		Backend_ShowMessageBox("Fatal error (SDL2 audio backend)", "'SDL_OpenAudioDevice' failed");
+		std::string error_message = std::string("'SDL_OpenAudioDevice' failed : ") + SDL_GetError();
+		Backend_ShowMessageBox("Fatal error (SDL2 audio backend)", error_message.c_str());
 		return FALSE;
 	}
+
+	output_frequency = obtained_specification.freq;
+	Mixer_Init(obtained_specification.freq);
 
 	SDL_PauseAudioDevice(device_id, 0);
 

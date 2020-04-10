@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 
 #include "SDL.h"
 
@@ -73,8 +74,11 @@ static void GlyphBatch_Draw(spritebatch_sprite_t *sprites, int count, int textur
 
 	// The SDL_Texture side of things uses alpha, not a colour-key, so the bug where the font is blended
 	// with the colour key doesn't occur.
-	SDL_SetTextureColorMod(texture_atlas, glyph_colour_channels[0], glyph_colour_channels[1], glyph_colour_channels[2]);
-	SDL_SetTextureBlendMode(texture_atlas, SDL_BLENDMODE_BLEND);
+	if (SDL_SetTextureColorMod(texture_atlas, glyph_colour_channels[0], glyph_colour_channels[1], glyph_colour_channels[2]) < 0)
+		Backend_PrintError("Couldn't set additional color value: %s", SDL_GetError());
+
+	if (SDL_SetTextureBlendMode(texture_atlas, SDL_BLENDMODE_BLEND) < 0)
+		Backend_PrintError("Couldn't set texture blend mode: %s", SDL_GetError());
 
 	for (int i = 0; i < count; ++i)
 	{
@@ -83,7 +87,8 @@ static void GlyphBatch_Draw(spritebatch_sprite_t *sprites, int count, int textur
 		SDL_Rect source_rect = {(int)(texture_w * sprites[i].minx), (int)(texture_h * sprites[i].maxy), (int)glyph->width, (int)glyph->height};
 		SDL_Rect destination_rect = {(int)sprites[i].x, (int)sprites[i].y, (int)glyph->width, (int)glyph->height};
 
-		SDL_RenderCopy(renderer, texture_atlas, &source_rect, &destination_rect);
+		if (SDL_RenderCopy(renderer, texture_atlas, &source_rect, &destination_rect) < 0)
+			Backend_PrintError("Couldn't copy glyph texture portion to renderer: %s", SDL_GetError());
 	}
 }
 
@@ -104,7 +109,11 @@ static SPRITEBATCH_U64 GlyphBatch_CreateTexture(void *pixels, int w, int h, void
 
 	SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STATIC, w, h);
 
-	SDL_UpdateTexture(texture, NULL, pixels, w * 4);
+	if (!texture)
+		Backend_PrintError("Couldn't create texture for renderer: %s", SDL_GetError());
+
+	if (SDL_UpdateTexture(texture, NULL, pixels, w * 4) < 0)
+		Backend_PrintError("Couldn't update texture : %s", SDL_GetError());
 
 	return (SPRITEBATCH_U64)texture;
 }
@@ -119,13 +128,15 @@ static void GlyphBatch_DestroyTexture(SPRITEBATCH_U64 texture_id, void *udata)
 
 RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
 {
-	puts("Available SDL2 render drivers:");
+	Backend_PrintInfo("Available SDL2 render drivers:");
 
 	for (int i = 0; i < SDL_GetNumRenderDrivers(); ++i)
 	{
 		SDL_RendererInfo info;
-		SDL_GetRenderDriverInfo(i, &info);
-		puts(info.name);
+		if (SDL_GetRenderDriverInfo(i, &info) < 0)
+			Backend_PrintError("Couldn't get render driver information : %s", SDL_GetError());
+		else
+			Backend_PrintInfo("%s", info.name);
 	}
 
 	window = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screen_width, screen_height, 0);
@@ -133,7 +144,10 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 	if (window != NULL)
 	{
 		if (fullscreen)
-			SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+		{
+			if (SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN) < 0)
+				Backend_PrintError("Couldn't set window to fullscreen: %s", SDL_GetError());
+		}
 
 	#if SDL_VERSION_ATLEAST(2,0,10)
 		SDL_SetHint(SDL_HINT_RENDER_BATCHING, "1");	// We never interfere with the renderer, so don't let SDL implicitly disable batching
@@ -144,8 +158,10 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 		if (renderer != NULL)
 		{
 			SDL_RendererInfo info;
-			SDL_GetRendererInfo(renderer, &info);
-			printf("Selected SDL2 render driver: %s\n", info.name);
+			if (SDL_GetRendererInfo(renderer, &info) < 0)
+				Backend_PrintError("Couldn't get selected render driver information : %s", SDL_GetError());
+			else
+				Backend_PrintInfo("Selected SDL2 render driver: %s", info.name);
 
 			framebuffer.texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, screen_width, screen_height);
 
@@ -173,14 +189,16 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 			}
 			else
 			{
-				Backend_ShowMessageBox("Fatal error (SDLTexture rendering backend)", "Could not create framebuffer");
+				std::string error_message = std::string("Could not create framebuffer: ") + SDL_GetError();
+				Backend_ShowMessageBox("Fatal error (SDLTexture rendering backend)", error_message.c_str());
 			}
 
 			SDL_DestroyRenderer(renderer);
 		}
 		else
 		{
-			Backend_ShowMessageBox("Fatal error (SDLTexture rendering backend)", "Could not create renderer");
+			std::string error_message = std::string("Could not create renderer: ") + SDL_GetError();
+			Backend_ShowMessageBox("Fatal error (SDLTexture rendering backend)", error_message.c_str());
 		}
 
 
@@ -188,7 +206,8 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 	}
 	else
 	{
-		Backend_ShowMessageBox("Fatal error (SDLTexture rendering backend)", "Could not create window");
+		std::string error_message = std::string("Could not create window: ") + SDL_GetError();
+		Backend_ShowMessageBox("Fatal error (SDLTexture rendering backend)", error_message.c_str());
 	}
 
 	return NULL;
