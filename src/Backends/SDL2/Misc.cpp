@@ -86,7 +86,7 @@ void Backend_PostWindowCreation(void)
 BOOL Backend_GetBasePath(char *string_buffer)
 {
 	char *base_path = SDL_GetBasePath();
-	if (!base_path)
+	if (base_path == NULL)
 		return FALSE;
 
 	// Trim the trailing '/'
