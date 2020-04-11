@@ -181,11 +181,16 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 				config.get_pixels_callback = GlyphBatch_GetPixels;
 				config.generate_texture_callback = GlyphBatch_CreateTexture;
 				config.delete_texture_callback = GlyphBatch_DestroyTexture;
-				spritebatch_init(&glyph_batcher, &config, NULL);
+				if (spritebatch_init(&glyph_batcher, &config, NULL) == 0)
+				{
+					Backend_PostWindowCreation();
 
-				Backend_PostWindowCreation();
-
-				return &framebuffer;
+					return &framebuffer;
+				}
+				else
+				{
+					Backend_ShowMessageBox("Fatal error (SDLTexture rendering backend)", "Failed to initialize spritebatch");
+				}
 			}
 			else
 			{
@@ -225,8 +230,12 @@ void RenderBackend_DrawScreen(void)
 {
 	spritebatch_tick(&glyph_batcher);
 
-	SDL_SetRenderTarget(renderer, NULL);
-	SDL_RenderCopy(renderer, framebuffer.texture, NULL, NULL);
+	if (SDL_SetRenderTarget(renderer, NULL) < 0)
+		Backend_PrintError("Couldn't set default render target as the current rendering target: %s", SDL_GetError());
+
+	if (SDL_RenderCopy(renderer, framebuffer.texture, NULL, NULL) < 0)
+		Backend_PrintError("Failed to copy framebuffer texture to default render target: %s", SDL_GetError());
+
 	SDL_RenderPresent(renderer);
 }
 
@@ -451,12 +460,15 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_Surface *destination_surfac
 
 void RenderBackend_DrawGlyph(RenderBackend_Glyph *glyph, long x, long y)
 {
-	spritebatch_push(&glyph_batcher, (SPRITEBATCH_U64)glyph, glyph->width, glyph->height, x, y, 1.0f, 1.0f, 0.0f, 0.0f, 0);
+	if (spritebatch_push(&glyph_batcher, (SPRITEBATCH_U64)glyph, glyph->width, glyph->height, x, y, 1.0f, 1.0f, 0.0f, 0.0f, 0) != 1)
+		Backend_PrintError("Failed to push glyph to batcher");
 }
 
 void RenderBackend_FlushGlyphs(void)
 {
-	spritebatch_defrag(&glyph_batcher);
+	if (spritebatch_defrag(&glyph_batcher) != 1)
+		Backend_PrintError("Couldn't defrag textures");
+
 	spritebatch_flush(&glyph_batcher);
 }
 
