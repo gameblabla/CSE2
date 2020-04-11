@@ -45,7 +45,7 @@ static void JoystickCallback(int joystick_id, int event)
 						// Set up neutral axes
 						axis_neutrals = (float*)malloc(sizeof(float) * total_axes);
 
-						if (axis_neutrals)
+						if (axis_neutrals != NULL)
 						{
 							for (int i = 0; i < total_axes; ++i)
 								axis_neutrals[i] = axes[i];
