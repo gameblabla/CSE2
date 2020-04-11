@@ -72,7 +72,7 @@ BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
 	}
 
 	// Then the joystick hats
-	for (int i = 0; i < total_axes; ++i)
+	for (int i = 0; i < total_hats; ++i)
 	{
 		Uint8 hat = SDL_JoystickGetHat(joystick, i);
 
