@@ -379,7 +379,7 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RECT *rect, 
 	SDL_Rect sdl_rect;
 	RectToSDLRect(rect, &sdl_rect);
 
-	uint8_t alpha = SDL_ALPHA_OPAQUE;
+	Uint8 alpha = SDL_ALPHA_OPAQUE;
 
 	// Check colour-key
 	if (red == 0 && green == 0 && blue == 0)
