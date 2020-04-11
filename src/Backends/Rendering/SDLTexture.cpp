@@ -109,7 +109,7 @@ static SPRITEBATCH_U64 GlyphBatch_CreateTexture(void *pixels, int w, int h, void
 
 	SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STATIC, w, h);
 
-	if (!texture)
+	if (texture == NULL)
 		Backend_PrintError("Couldn't create texture for renderer: %s", SDL_GetError());
 
 	if (SDL_UpdateTexture(texture, NULL, pixels, w * 4) < 0)
