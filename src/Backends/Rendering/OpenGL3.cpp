@@ -252,7 +252,7 @@ static void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GL
 	(void)userParam;
 
 	if (severity != GL_DEBUG_SEVERITY_NOTIFICATION)
-		printf("OpenGL debug: %s\n", message);
+		Backend_PrintInfo("OpenGL debug: %s", message);
 }
 */
 // ====================
