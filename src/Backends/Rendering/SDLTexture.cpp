@@ -313,7 +313,7 @@ void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, unsigned int wi
 
 	unsigned char *buffer = (unsigned char*)malloc(width * height * 4);
 
-	if (!buffer)
+	if (buffer == NULL)
 	{
 		Backend_PrintError("Couldn't allocate memory for surface buffer: %s", SDL_GetError());
 		return;
