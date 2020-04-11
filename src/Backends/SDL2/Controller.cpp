@@ -172,15 +172,11 @@ void ControllerBackend_JoystickConnect(Sint32 joystick_id)
 
 				// Set up neutral axes
 				axis_neutrals = (Sint16*)malloc(sizeof(Sint16) * total_axes);
-				if (axis_neutrals)
-				{
+				if (axis_neutrals != NULL)
 					for (int i = 0; i < total_axes; ++i)
 						axis_neutrals[i] = SDL_JoystickGetAxis(joystick, i);
-				}
 				else
-				{
 					Backend_PrintError("Couldn't allocate memory for neutral axes");
-				}
 			}
 			else
 			{
