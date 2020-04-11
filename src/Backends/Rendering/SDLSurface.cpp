@@ -58,12 +58,7 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 		}
 
 		window_sdlsurface = SDL_GetWindowSurface(window);
-		if (!window_sdlsurface)
-		{
-			std::string error_message = std::string("Could not get SDL surface of the window: ") + SDL_GetError();
-			Backend_ShowMessageBox("Fatal error (SDLSurface rendering backend)", error_message.c_str());
-		}
-		else
+		if (window_sdlsurface != NULL)
 		{
 			framebuffer.sdlsurface = SDL_CreateRGBSurfaceWithFormat(0, window_sdlsurface->w, window_sdlsurface->h, 0, SDL_PIXELFORMAT_RGB24);
 
@@ -75,6 +70,11 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 			}
 
 			std::string error_message = std::string("Could not create framebuffer surface: ") + SDL_GetError();
+			Backend_ShowMessageBox("Fatal error (SDLSurface rendering backend)", error_message.c_str());
+		}
+		else
+		{
+			std::string error_message = std::string("Could not get SDL surface of the window: ") + SDL_GetError();
 			Backend_ShowMessageBox("Fatal error (SDLSurface rendering backend)", error_message.c_str());
 		}
 
