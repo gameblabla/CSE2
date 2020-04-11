@@ -46,11 +46,11 @@ BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
 
 	// Handle directional inputs
 	const Sint16 joystick_x = SDL_JoystickGetAxis(joystick, 0);
-	if (!joystick_x)
+	if (joystick_x == 0)
 		Backend_PrintError("Failed to get current state of X axis control on joystick: %s", SDL_GetError());
 
 	const Sint16 joystick_y = SDL_JoystickGetAxis(joystick, 1);
-	if (!joystick_y)
+	if (joystick_y == 0)
 		Backend_PrintError("Failed to get current state of Y axis control on joystick: %s", SDL_GetError());
 
 	status->bLeft = joystick_x < axis_neutrals[0] - DEADZONE;
