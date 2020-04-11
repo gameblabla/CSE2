@@ -142,8 +142,10 @@ BOOL ControllerBackend_ResetJoystickStatus(void)
 void ControllerBackend_JoystickConnect(Sint32 joystick_id)
 {
 	const char *joystick_name = SDL_JoystickNameForIndex(joystick_id);
-	if (joystick_name)
+	if (joystick_name != NULL)
+	{
 		Backend_PrintInfo("Joystick #%d connected - %s", joystick_id, joystick_name);
+	}
 	else
 	{
 		Backend_PrintError("Couldn't get joystick name: %s", SDL_GetError());
