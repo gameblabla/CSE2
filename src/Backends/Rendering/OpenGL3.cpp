@@ -520,6 +520,8 @@ static void GlyphBatch_DestroyTexture(SPRITEBATCH_U64 texture_id, void *udata)
 	glDeleteTextures(1, &gl_texture_id);
 }
 
+#ifndef USE_OPENGLES2
+
 static const char *GetOpenGLErrorCodeDescription(GLenum error_code)
 {
 	switch (error_code)
@@ -570,13 +572,18 @@ static void PostGLCallCallback(const char *name, void *function_pointer, int len
 		Backend_PrintError("Error %d in %s: %s", error_code, name, GetOpenGLErrorCodeDescription(error_code));
 }
 
+#endif
+
 // ====================
 // Render-backend initialisation
 // ====================
 
 RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
 {
+#ifndef USE_OPENGLES2
 	glad_set_post_callback(PostGLCallCallback);
+#endif
+
 	actual_screen_width = screen_width;
 	actual_screen_height = screen_height;
 
