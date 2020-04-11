@@ -67,12 +67,12 @@ BOOL AudioBackend_Init(void)
 {
 	if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
 	{
-		std::string errorMessage = std::string("'SDL_InitSubSystem(SDL_INIT_AUDIO)' failed : ") + SDL_GetError();
+		std::string errorMessage = std::string("'SDL_InitSubSystem(SDL_INIT_AUDIO)' failed: ") + SDL_GetError();
 		Backend_ShowMessageBox("Fatal error (SDL2 audio backend)", errorMessage.c_str());
 		return FALSE;
 	}
 
-	puts("Available SDL2 audio drivers:");
+	Backend_PrintInfo("Available SDL2 audio drivers:");
 
 	for (int i = 0; i < SDL_GetNumAudioDrivers(); ++i)
 		puts(SDL_GetAudioDriver(i));
@@ -89,7 +89,7 @@ BOOL AudioBackend_Init(void)
 	device_id = SDL_OpenAudioDevice(NULL, 0, &specification, &obtained_specification, SDL_AUDIO_ALLOW_FREQUENCY_CHANGE);
 	if (device_id == 0)
 	{
-		std::string error_message = std::string("'SDL_OpenAudioDevice' failed : ") + SDL_GetError();
+		std::string error_message = std::string("'SDL_OpenAudioDevice' failed: ") + SDL_GetError();
 		Backend_ShowMessageBox("Fatal error (SDL2 audio backend)", error_message.c_str());
 		return FALSE;
 	}
@@ -99,7 +99,7 @@ BOOL AudioBackend_Init(void)
 
 	SDL_PauseAudioDevice(device_id, 0);
 
-	printf("Selected SDL2 audio driver: %s\n", SDL_GetCurrentAudioDriver());
+	Backend_PrintInfo("Selected SDL2 audio driver: %s", SDL_GetCurrentAudioDriver());
 
 	return TRUE;
 }

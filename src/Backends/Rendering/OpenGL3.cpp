@@ -567,7 +567,7 @@ static void PostGLCallCallback(const char *name, void *function_pointer, int len
 	GLenum error_code = glad_glGetError();	// Manually use glad_glGetError. Otherwise, glad_debug_glGetError would be called and we'd get infinite recursion into this function
 
 	if (error_code != GL_NO_ERROR)
-		Backend_PrintError("Error %d in %s : %s", error_code, name, GetOpenGLErrorCodeDescription(error_code));
+		Backend_PrintError("Error %d in %s: %s", error_code, name, GetOpenGLErrorCodeDescription(error_code));
 }
 
 // ====================

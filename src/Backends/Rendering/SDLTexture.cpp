@@ -113,7 +113,7 @@ static SPRITEBATCH_U64 GlyphBatch_CreateTexture(void *pixels, int w, int h, void
 		Backend_PrintError("Couldn't create texture for renderer: %s", SDL_GetError());
 
 	if (SDL_UpdateTexture(texture, NULL, pixels, w * 4) < 0)
-		Backend_PrintError("Couldn't update texture : %s", SDL_GetError());
+		Backend_PrintError("Couldn't update texture: %s", SDL_GetError());
 
 	return (SPRITEBATCH_U64)texture;
 }
@@ -134,7 +134,7 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 	{
 		SDL_RendererInfo info;
 		if (SDL_GetRenderDriverInfo(i, &info) < 0)
-			Backend_PrintError("Couldn't get render driver information : %s", SDL_GetError());
+			Backend_PrintError("Couldn't get render driver information: %s", SDL_GetError());
 		else
 			Backend_PrintInfo("%s", info.name);
 	}
@@ -159,7 +159,7 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 		{
 			SDL_RendererInfo info;
 			if (SDL_GetRendererInfo(renderer, &info) < 0)
-				Backend_PrintError("Couldn't get selected render driver information : %s", SDL_GetError());
+				Backend_PrintError("Couldn't get selected render driver information: %s", SDL_GetError());
 			else
 				Backend_PrintInfo("Selected SDL2 render driver: %s", info.name);
 
@@ -315,7 +315,7 @@ void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, unsigned int wi
 
 	if (!buffer)
 	{
-		Backend_PrintError("Couldn't allocate memory for surface buffer : %s", SDL_GetError());
+		Backend_PrintError("Couldn't allocate memory for surface buffer: %s", SDL_GetError());
 		return;
 	}
 
@@ -345,7 +345,7 @@ void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, unsigned int wi
 
 	SDL_Rect rect = {0, 0, (int)width, (int)height};
 	if (SDL_UpdateTexture(surface->texture, &rect, buffer, width * 4) < 0)
-		Backend_PrintError("Couldn't update part of texture : %s", SDL_GetError());
+		Backend_PrintError("Couldn't update part of texture: %s", SDL_GetError());
 
 	free(buffer);
 }
@@ -362,13 +362,13 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RECT *rect,
 
 	// Blit the texture
 	if (SDL_SetTextureBlendMode(source_surface->texture, colour_key ? SDL_BLENDMODE_BLEND : SDL_BLENDMODE_NONE) < 0)
-		Backend_PrintError("Couldn't set texture blend mode : %s", SDL_GetError());
+		Backend_PrintError("Couldn't set texture blend mode: %s", SDL_GetError());
 
 	if (SDL_SetRenderTarget(renderer, destination_surface->texture) < 0)
-		Backend_PrintError("Couldn't set current rendering target : %s", SDL_GetError());
+		Backend_PrintError("Couldn't set current rendering target: %s", SDL_GetError());
 
 	if (SDL_RenderCopy(renderer, source_surface->texture, &source_rect, &destination_rect) < 0)
-		Backend_PrintError("Couldn't copy part of texture to rendering target : %s", SDL_GetError());
+		Backend_PrintError("Couldn't copy part of texture to rendering target: %s", SDL_GetError());
 }
 
 void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
@@ -386,20 +386,20 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RECT *rect, 
 		alpha = 0;
 
 	if (SDL_SetRenderDrawColor(renderer, red, green, blue, alpha) < 0)
-		Backend_PrintError("Couldn't set color for drawing operations : %s", SDL_GetError());
+		Backend_PrintError("Couldn't set color for drawing operations: %s", SDL_GetError());
 
 	// Draw colour
 	if (SDL_SetRenderTarget(renderer, surface->texture) < 0)
-		Backend_PrintError("Couldn't set texture current rendering target : %s", SDL_GetError());
+		Backend_PrintError("Couldn't set texture current rendering target: %s", SDL_GetError());
 
 	if (SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE) < 0)
-		Backend_PrintError("Couldn't disable blending for drawing operations : %s", SDL_GetError());
+		Backend_PrintError("Couldn't disable blending for drawing operations: %s", SDL_GetError());
 
 	if (SDL_RenderFillRect(renderer, &sdl_rect) < 0)
-		Backend_PrintError("Couldn't fill rectangle on current rendering target : %s", SDL_GetError());
+		Backend_PrintError("Couldn't fill rectangle on current rendering target: %s", SDL_GetError());
 
 	if (SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND) < 0)
-		Backend_PrintError("Couldn't enable alpha blending for drawing operations : %s", SDL_GetError());
+		Backend_PrintError("Couldn't enable alpha blending for drawing operations: %s", SDL_GetError());
 }
 
 RenderBackend_Glyph* RenderBackend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch)
@@ -453,7 +453,7 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_Surface *destination_surfac
 		return;
 
 	if (SDL_SetRenderTarget(renderer, destination_surface->texture) < 0)
-		Backend_PrintError("Couldn't set texture as current rendering target : %s", SDL_GetError());
+		Backend_PrintError("Couldn't set texture as current rendering target: %s", SDL_GetError());
 
 	memcpy(glyph_colour_channels, colour_channels, sizeof(glyph_colour_channels));
 }

@@ -74,7 +74,7 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 				return &framebuffer;
 			}
 
-			std::string error_message = std::string("Could not create framebuffer surface : ") + SDL_GetError();
+			std::string error_message = std::string("Could not create framebuffer surface: ") + SDL_GetError();
 			Backend_ShowMessageBox("Fatal error (SDLSurface rendering backend)", error_message.c_str());
 		}
 
@@ -82,7 +82,7 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 	}
 	else
 	{
-		std::string error_message = std::string("Could not create window : ") + SDL_GetError();
+		std::string error_message = std::string("Could not create window: ") + SDL_GetError();
 		Backend_ShowMessageBox("Fatal error (SDLSurface rendering backend)", error_message.c_str());
 	}
 

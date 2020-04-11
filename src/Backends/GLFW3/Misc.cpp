@@ -154,7 +154,7 @@ static void DragAndDropCallback(GLFWwindow *window, int count, const char **path
 
 static void ErrorCallback(int code, const char *description)
 {
-	Backend_PrintError("GLFW error received (%d) : %s", code, description);
+	Backend_PrintError("GLFW error received (%d): %s", code, description);
 }
 
 BOOL Backend_Init(void)
