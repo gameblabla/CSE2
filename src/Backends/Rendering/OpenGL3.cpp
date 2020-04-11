@@ -330,7 +330,7 @@ static VertexBufferSlot* GetVertexBufferSlot(unsigned int slots_needed)
 			local_vertex_buffer_size <<= 1;
 
 		VertexBufferSlot *reallocResult = (VertexBufferSlot *)realloc(local_vertex_buffer, local_vertex_buffer_size * sizeof(VertexBufferSlot));
-		if (reallocResult)
+		if (reallocResult != NULL)
 		{
 			local_vertex_buffer = reallocResult;
 		}
