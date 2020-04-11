@@ -331,7 +331,9 @@ static VertexBufferSlot* GetVertexBufferSlot(unsigned int slots_needed)
 
 		VertexBufferSlot *reallocResult = (VertexBufferSlot *)realloc(local_vertex_buffer, local_vertex_buffer_size * sizeof(VertexBufferSlot));
 		if (reallocResult)
+		{
 			local_vertex_buffer = reallocResult;
+		}
 		else
 		{
 			Backend_PrintError("Couldn't expand vertex buffer");
