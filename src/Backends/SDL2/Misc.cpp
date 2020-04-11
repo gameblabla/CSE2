@@ -37,7 +37,7 @@ BOOL Backend_Init(void)
 	{
 		if (SDL_InitSubSystem(SDL_INIT_VIDEO) == 0)
 		{
-			Backend_PrintInfo("Available SDL2 video drivers:");
+			Backend_PrintInfo("Available SDL video drivers:");
 
 			for (int i = 0; i < SDL_GetNumVideoDrivers(); ++i)
 				Backend_PrintInfo("%s", SDL_GetVideoDriver(i));
@@ -45,21 +45,21 @@ BOOL Backend_Init(void)
 			const char *driver = SDL_GetCurrentVideoDriver();
 
 			if (driver != NULL)
-				Backend_PrintInfo("Selected SDL2 video driver: %s", driver);
+				Backend_PrintInfo("Selected SDL video driver: %s", driver);
 			else
-				Backend_PrintError("No SDL2 video driver initialized !");
+				Backend_PrintError("No SDL video driver initialized !");
 
 			return TRUE;
 		}
 
-		std::string error_message = std::string("Could not initialise SDL2 video subsystem: ") + SDL_GetError();
+		std::string error_message = std::string("Could not initialise SDL video subsystem: ") + SDL_GetError();
 		Backend_ShowMessageBox("Fatal error", error_message.c_str());
 
 		SDL_Quit();
 		return FALSE;
 	}
 
-	std::string error_message = std::string("Could not initialise SDL2: ") + SDL_GetError();
+	std::string error_message = std::string("Could not initialise SDL: ") + SDL_GetError();
 	Backend_ShowMessageBox("Fatal error", error_message.c_str());
 
 	return FALSE;

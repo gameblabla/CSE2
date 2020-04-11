@@ -19,7 +19,7 @@ BOOL ControllerBackend_Init(void)
 {
 	if (SDL_InitSubSystem(SDL_INIT_JOYSTICK) < 0)
 	{
-		Backend_PrintError("Couldn't initialise joystack SDL2 subsystem: %s", SDL_GetError());
+		Backend_PrintError("Couldn't initialise joystick SDL subsystem: %s", SDL_GetError());
 		return FALSE;
 	}
 

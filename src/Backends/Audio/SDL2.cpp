@@ -72,7 +72,7 @@ BOOL AudioBackend_Init(void)
 		return FALSE;
 	}
 
-	Backend_PrintInfo("Available SDL2 audio drivers:");
+	Backend_PrintInfo("Available SDL audio drivers:");
 
 	for (int i = 0; i < SDL_GetNumAudioDrivers(); ++i)
 		Backend_PrintInfo("%s", SDL_GetAudioDriver(i));
@@ -99,7 +99,7 @@ BOOL AudioBackend_Init(void)
 
 	SDL_PauseAudioDevice(device_id, 0);
 
-	Backend_PrintInfo("Selected SDL2 audio driver: %s", SDL_GetCurrentAudioDriver());
+	Backend_PrintInfo("Selected SDL audio driver: %s", SDL_GetCurrentAudioDriver());
 
 	return TRUE;
 }

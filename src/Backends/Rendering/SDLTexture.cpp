@@ -128,7 +128,7 @@ static void GlyphBatch_DestroyTexture(SPRITEBATCH_U64 texture_id, void *udata)
 
 RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
 {
-	Backend_PrintInfo("Available SDL2 render drivers:");
+	Backend_PrintInfo("Available SDL render drivers:");
 
 	for (int i = 0; i < SDL_GetNumRenderDrivers(); ++i)
 	{
@@ -161,7 +161,7 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 			if (SDL_GetRendererInfo(renderer, &info) < 0)
 				Backend_PrintError("Couldn't get selected render driver information: %s", SDL_GetError());
 			else
-				Backend_PrintInfo("Selected SDL2 render driver: %s", info.name);
+				Backend_PrintInfo("Selected SDL render driver: %s", info.name);
 
 			framebuffer.texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, screen_width, screen_height);
 
