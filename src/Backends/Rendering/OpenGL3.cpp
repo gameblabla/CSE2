@@ -289,7 +289,7 @@ static GLuint CompileShader(const char *vertex_shader_source, const char *fragme
 	glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &shader_status);
 	if (shader_status != GL_TRUE)
 	{
-		char buffer[0x200];
+		char buffer[0x400];
 		glGetShaderInfoLog(fragment_shader, sizeof(buffer), NULL, buffer);
 		Backend_ShowMessageBox("Fragment shader error", buffer);
 		return 0;
@@ -306,7 +306,7 @@ static GLuint CompileShader(const char *vertex_shader_source, const char *fragme
 	glGetProgramiv(program_id, GL_LINK_STATUS, &shader_status);
 	if (shader_status != GL_TRUE)
 	{
-		char buffer[0x200];
+		char buffer[0x400];
 		glGetProgramInfoLog(program_id, sizeof(buffer), NULL, buffer);
 		Backend_ShowMessageBox("Shader linker error", buffer);
 		return 0;
@@ -329,7 +329,14 @@ static VertexBufferSlot* GetVertexBufferSlot(unsigned int slots_needed)
 		while (current_vertex_buffer_slot + slots_needed > local_vertex_buffer_size)
 			local_vertex_buffer_size <<= 1;
 
-		local_vertex_buffer = (VertexBufferSlot*)realloc(local_vertex_buffer, local_vertex_buffer_size * sizeof(VertexBufferSlot));
+		VertexBufferSlot *reallocResult = (VertexBufferSlot *)realloc(local_vertex_buffer, local_vertex_buffer_size * sizeof(VertexBufferSlot));
+		if (reallocResult)
+			local_vertex_buffer = reallocResult;
+		else
+		{
+			Backend_PrintError("Couldn't expand vertex buffer");
+			return NULL;
+		}
 	}
 
 	current_vertex_buffer_slot += slots_needed;
@@ -513,20 +520,72 @@ static void GlyphBatch_DestroyTexture(SPRITEBATCH_U64 texture_id, void *udata)
 	glDeleteTextures(1, &gl_texture_id);
 }
 
+static const char *GetOpenGLErrorCodeDescription(GLenum error_code)
+{
+	switch (error_code)
+	{
+		case GL_NO_ERROR:
+			return "No error";
+
+		case GL_INVALID_ENUM:
+			return "An unacceptable value was specified for enumerated argument";
+
+		case GL_INVALID_VALUE:
+			return "A numeric argument is out of range";
+
+		case GL_INVALID_OPERATION:
+			return "The specified operation is not allowed in the current state";
+
+		case GL_INVALID_FRAMEBUFFER_OPERATION:
+			return "The framebuffer object is not complete";
+
+		case GL_OUT_OF_MEMORY:
+			return "There is not enough memory left to execute the command";
+
+		/*
+		 * For some reason glad does not define these even though they are there in OpenGL 3.2
+		 */
+
+/*
+		case GL_STACK_UNDERFLOW:
+			return "An attempt has been made to perform an operation that would cause an internal stack to underflow";
+
+		case GL_STACK_OVERFLOW:
+			return "An attempt has been made to perform an operation that would cause an internal stack to overflow";
+*/
+
+		default:
+			return "Unknown error";
+	}
+}
+
+static void PostGLCallCallback(const char *name, void *function_pointer, int length_arguments, ...)
+{
+	(void)function_pointer;
+	(void)length_arguments;
+
+	GLenum error_code = glad_glGetError();	// Manually use glad_glGetError. Otherwise, glad_debug_glGetError would be called and we'd get infinite recursion into this function
+
+	if (error_code != GL_NO_ERROR)
+		Backend_PrintError("Error %d in %s : %s", error_code, name, GetOpenGLErrorCodeDescription(error_code));
+}
+
 // ====================
 // Render-backend initialisation
 // ====================
 
 RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
 {
+	glad_set_post_callback(PostGLCallCallback);
 	actual_screen_width = screen_width;
 	actual_screen_height = screen_height;
 
 	if (WindowBackend_OpenGL_CreateWindow(window_title, &actual_screen_width, &actual_screen_height, fullscreen))
 	{
-		printf("GL_VENDOR = %s\n", glGetString(GL_VENDOR));
-		printf("GL_RENDERER = %s\n", glGetString(GL_RENDERER));
-		printf("GL_VERSION = %s\n", glGetString(GL_VERSION));
+		Backend_PrintInfo("GL_VENDOR = %s", glGetString(GL_VENDOR));
+		Backend_PrintInfo("GL_RENDERER = %s", glGetString(GL_RENDERER));
+		Backend_PrintInfo("GL_VERSION = %s", glGetString(GL_VERSION));
+		Backend_PrintInfo("GL_SHADING_LANGUAGE_VERSION = %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
 		// Set up blending (only used for font-rendering)
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
