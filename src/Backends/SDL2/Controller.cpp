@@ -7,6 +7,7 @@
 #include "SDL.h"
 
 #include "../../WindowsWrapper.h"
+#include "../Misc.h"
 
 #define DEADZONE 10000;
 
@@ -16,7 +17,11 @@ static Sint16 *axis_neutrals;
 
 BOOL ControllerBackend_Init(void)
 {
-	SDL_InitSubSystem(SDL_INIT_JOYSTICK);
+	if (SDL_InitSubSystem(SDL_INIT_JOYSTICK) < 0)
+	{
+		Backend_PrintError("Couldn't initialise joystack SDL2 subsystem : %s", SDL_GetError());
+		return FALSE;
+	}
 
 	return TRUE;
 }
@@ -41,7 +46,12 @@ BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
 
 	// Handle directional inputs
 	const Sint16 joystick_x = SDL_JoystickGetAxis(joystick, 0);
+	if (!joystick_x)
+		Backend_PrintError("Failed to get current state of X axis control on joystick : %s", SDL_GetError());
+
 	const Sint16 joystick_y = SDL_JoystickGetAxis(joystick, 1);
+	if (!joystick_y)
+		Backend_PrintError("Failed to get current state of Y axis control on joystick : %s", SDL_GetError());
 
 	status->bLeft = joystick_x < axis_neutrals[0] - DEADZONE;
 	status->bRight = joystick_x > axis_neutrals[0] + DEADZONE;
@@ -50,8 +60,16 @@ BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
 
 	// Handle button inputs
 	int total_buttons = SDL_JoystickNumButtons(joystick);
+	if (total_buttons < 0)
+		Backend_PrintError("Failed to get number of buttons on joystick : %s", SDL_GetError());
+
 	int total_axes = SDL_JoystickNumAxes(joystick);
+	if (total_axes < 0)
+		Backend_PrintError("Failed to get number of general axis controls on joystick : %s", SDL_GetError());
+
 	int total_hats = SDL_JoystickNumHats(joystick);
+	if (total_hats < 0)
+		Backend_PrintError("Failed to get number of POV hats on joystick : %s", SDL_GetError());
 
 	unsigned int buttons_done = 0;
 
@@ -81,7 +99,7 @@ BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
 	}
 
 	// Then the joystick hats
-	for (int i = 0; i < total_axes; ++i)
+	for (int i = 0; i < total_hats; ++i)
 	{
 		Uint8 hat = SDL_JoystickGetHat(joystick, i);
 
