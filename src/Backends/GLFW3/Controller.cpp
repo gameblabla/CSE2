@@ -8,6 +8,7 @@
 #include <GLFW/glfw3.h>
 
 #include "../../WindowsWrapper.h"
+#include "../Misc.h"
 
 #define DEADZONE (10000.0f / 32767.0f)
 
@@ -21,7 +22,7 @@ static void JoystickCallback(int joystick_id, int event)
 	switch (event)
 	{
 		case GLFW_CONNECTED:
-			printf("Joystick #%d connected - %s\n", joystick_id, glfwGetJoystickName(joystick_id));
+			Backend_PrintInfo("Joystick #%d connected - %s", joystick_id, glfwGetJoystickName(joystick_id));
 
 			if (!joystick_connected)
 			{
@@ -44,8 +45,13 @@ static void JoystickCallback(int joystick_id, int event)
 						// Set up neutral axes
 						axis_neutrals = (float*)malloc(sizeof(float) * total_axes);
 
-						for (int i = 0; i < total_axes; ++i)
-							axis_neutrals[i] = axes[i];
+						if (axis_neutrals)
+						{
+							for (int i = 0; i < total_axes; ++i)
+								axis_neutrals[i] = axes[i];
+						}
+						else
+							Backend_PrintError("Couldn't allocate memory for axis");
 					}
 				}
 			}
@@ -55,7 +61,7 @@ static void JoystickCallback(int joystick_id, int event)
 		case GLFW_DISCONNECTED:
 			if (joystick_connected && joystick_id == connected_joystick_id)
 			{
-				printf("Joystick #%d disconnected\n", connected_joystick_id);
+				Backend_PrintInfo("Joystick #%d disconnected", connected_joystick_id);
 				joystick_connected = FALSE;
 
 				free(axis_neutrals);

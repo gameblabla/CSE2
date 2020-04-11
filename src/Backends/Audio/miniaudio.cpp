@@ -9,6 +9,7 @@
 
 #include "../../Organya.h"
 #include "../../WindowsWrapper.h"
+#include "../Misc.h"
 
 #include "SoftwareMixer.h"
 
@@ -80,13 +81,19 @@ BOOL AudioBackend_Init(void)
 	config.dataCallback = Callback;
 	config.pUserData = NULL;
 
-	if (ma_device_init(NULL, &config, &device) == MA_SUCCESS)
+	ma_result return_value;
+
+	return_value = ma_device_init(NULL, &config, &device);
+	if (return_value == MA_SUCCESS)
 	{
-		if (ma_mutex_init(device.pContext, &mutex) == MA_SUCCESS)
+		return_value = ma_mutex_init(device.pContext, &mutex);
+		if (return_value == MA_SUCCESS)
 		{
-			if (ma_mutex_init(device.pContext, &organya_mutex) == MA_SUCCESS)
+			return_value = ma_mutex_init(device.pContext, &organya_mutex);
+			if (return_value == MA_SUCCESS)
 			{
-				if (ma_device_start(&device) == MA_SUCCESS)
+				return_value = ma_device_start(&device);
+				if (return_value == MA_SUCCESS)
 				{
 					output_frequency = device.sampleRate;
 
@@ -94,22 +101,43 @@ BOOL AudioBackend_Init(void)
 
 					return TRUE;
 				}
+				else
+				{
+					Backend_PrintError("Failed to start playback device: %s", ma_result_description(return_value));
+				}
 
 				ma_mutex_uninit(&organya_mutex);
+			}
+			else
+			{
+				Backend_PrintError("Failed to create organya mutex: %s", ma_result_description(return_value));
 			}
 
 			ma_mutex_uninit(&mutex);
 		}
+		else
+		{
+			Backend_PrintError("Failed to create mutex: %s", ma_result_description(return_value));
+		}
 
 		ma_device_uninit(&device);
 	}
+	else
+	{
+		Backend_PrintError("Failed to initialize playback device: %s", ma_result_description(return_value));
+	}
+
 
 	return FALSE;
 }
 
 void AudioBackend_Deinit(void)
 {
-	ma_device_stop(&device);
+	ma_result return_value;
+	return_value = ma_device_stop(&device);
+
+	if (return_value != MA_SUCCESS)
+		Backend_PrintError("Failed to stop playback device: %s", ma_result_description(return_value));
 
 	ma_mutex_uninit(&organya_mutex);
 
