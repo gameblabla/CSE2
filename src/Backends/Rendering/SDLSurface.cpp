@@ -285,6 +285,6 @@ void RenderBackend_HandleWindowResize(unsigned int width, unsigned int height)
 	// We need to fetch a new surface pointer
 	window_sdlsurface = SDL_GetWindowSurface(window);
 
-	if (!window_sdlsurface)
+	if (window_sdlsurface == NULL)
 		Backend_PrintError("Couldn't get SDL surface for window after resize: %s", SDL_GetError());
 }
