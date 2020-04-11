@@ -75,7 +75,7 @@ BOOL AudioBackend_Init(void)
 	Backend_PrintInfo("Available SDL2 audio drivers:");
 
 	for (int i = 0; i < SDL_GetNumAudioDrivers(); ++i)
-		puts(SDL_GetAudioDriver(i));
+		Backend_PrintInfo("%s", SDL_GetAudioDriver(i));
 
 	SDL_AudioSpec specification;
 	specification.freq = 48000;
