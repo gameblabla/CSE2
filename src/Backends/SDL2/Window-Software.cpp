@@ -23,10 +23,8 @@ unsigned char* WindowBackend_Software_CreateWindow(const char *window_title, int
 	if (window != NULL)
 	{
 		if (fullscreen)
-		{
 			if (SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN) < 0)
 				Backend_PrintError("Couldn't set window to fullscree: %s", SDL_GetError());
-		}
 
 		window_sdlsurface = SDL_GetWindowSurface(window);
 
