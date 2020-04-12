@@ -65,6 +65,7 @@ static void Callback(void *user_data, Uint8 *stream_uint8, int len)
 
 BOOL AudioBackend_Init(void)
 {
+	Backend_PrintInfo("Initializing SDL2 audio backend...");
 	if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
 	{
 		std::string errorMessage = std::string("'SDL_InitSubSystem(SDL_INIT_AUDIO)' failed: ") + SDL_GetError();
@@ -101,14 +102,17 @@ BOOL AudioBackend_Init(void)
 
 	Backend_PrintInfo("Selected SDL audio driver: %s", SDL_GetCurrentAudioDriver());
 
+	Backend_PrintInfo("Succesfully initialized SDL2 audio backend");
 	return TRUE;
 }
 
 void AudioBackend_Deinit(void)
 {
+	Backend_PrintInfo("De-initializing SDL2 audio backend...");
 	SDL_CloseAudioDevice(device_id);
 
 	SDL_QuitSubSystem(SDL_INIT_AUDIO);
+	Backend_PrintInfo("Finished de-initializing SDL2 audio backend");
 }
 
 AudioBackend_Sound* AudioBackend_CreateSound(unsigned int frequency, const unsigned char *samples, size_t length)

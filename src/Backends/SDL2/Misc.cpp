@@ -33,6 +33,7 @@ static SDL_Cursor *cursor;
 
 BOOL Backend_Init(void)
 {
+	Backend_PrintInfo("Initializing SDL2 platform backend...");
 	if (SDL_Init(SDL_INIT_EVENTS) == 0)
 	{
 		if (SDL_InitSubSystem(SDL_INIT_VIDEO) == 0)
@@ -49,6 +50,7 @@ BOOL Backend_Init(void)
 			else
 				Backend_PrintError("No SDL video driver initialized !");
 
+			Backend_PrintInfo("Successfully initialized SDL2 platform backend");
 			return TRUE;
 		}
 
@@ -67,6 +69,7 @@ BOOL Backend_Init(void)
 
 void Backend_Deinit(void)
 {
+	Backend_PrintInfo("De-initializing SDL2 platform backend...");
 	if (cursor != NULL)
 		SDL_FreeCursor(cursor);
 
@@ -76,6 +79,7 @@ void Backend_Deinit(void)
 	free(cursor_surface_pixels);
 
 	SDL_Quit();
+	Backend_PrintInfo("Finished de-initializing SDL2 platform backend...");
 }
 
 void Backend_PostWindowCreation(void)

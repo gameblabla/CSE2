@@ -73,6 +73,7 @@ static void Callback(ma_device *device, void *output_stream, const void *input_s
 
 BOOL AudioBackend_Init(void)
 {
+	Backend_PrintInfo("Initializing miniaudio audio backend...");
 	ma_device_config config = ma_device_config_init(ma_device_type_playback);
 	config.playback.pDeviceID = NULL;
 	config.playback.format = ma_format_f32;
@@ -99,6 +100,7 @@ BOOL AudioBackend_Init(void)
 
 					Mixer_Init(device.sampleRate);
 
+					Backend_PrintInfo("Successfully initialized miniaudio audio backend");
 					return TRUE;
 				}
 				else
@@ -133,6 +135,7 @@ BOOL AudioBackend_Init(void)
 
 void AudioBackend_Deinit(void)
 {
+	Backend_PrintInfo("De-initializing miniaudio audio backend...");
 	ma_result return_value;
 	return_value = ma_device_stop(&device);
 
@@ -144,6 +147,7 @@ void AudioBackend_Deinit(void)
 	ma_mutex_uninit(&mutex);
 
 	ma_device_uninit(&device);
+	Backend_PrintInfo("Finished de-initializing miniaudio audio backend...");
 }
 
 AudioBackend_Sound* AudioBackend_CreateSound(unsigned int frequency, const unsigned char *samples, size_t length)

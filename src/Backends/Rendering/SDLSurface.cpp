@@ -47,6 +47,7 @@ static void RectToSDLRect(const RECT *rect, SDL_Rect *sdl_rect)
 
 RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
 {
+	Backend_PrintInfo("Initializing SDLSurface rendering backend...");
 	window = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screen_width, screen_height, 0);
 
 	if (window != NULL)
@@ -66,6 +67,7 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 			{
 				Backend_PostWindowCreation();
 
+				Backend_PrintInfo("Successfully initialized SDLSurface rendering backend");
 				return &framebuffer;
 			}
 
@@ -91,8 +93,10 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 
 void RenderBackend_Deinit(void)
 {
+	Backend_PrintInfo("De-initializing SDLSurface rendering backend...");
 	SDL_FreeSurface(framebuffer.sdlsurface);
 	SDL_DestroyWindow(window);
+	Backend_PrintInfo("Finished de-initializing SDLSurface rendering backend");
 }
 
 void RenderBackend_DrawScreen(void)

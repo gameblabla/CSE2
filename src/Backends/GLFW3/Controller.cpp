@@ -71,6 +71,7 @@ static void JoystickCallback(int joystick_id, int event)
 
 BOOL ControllerBackend_Init(void)
 {
+	Backend_PrintInfo("Initializing GLFW controller backend...");
 	// Connect joysticks that are already plugged-in
 	for (int i = GLFW_JOYSTICK_1; i < GLFW_JOYSTICK_LAST; ++i)
 		if (glfwJoystickPresent(i) == GLFW_TRUE)
@@ -79,11 +80,13 @@ BOOL ControllerBackend_Init(void)
 	// Set-up the callback for future (dis)connections
 	glfwSetJoystickCallback(JoystickCallback);
 
+	Backend_PrintInfo("Sucessfully initialized GLFW controller backend");
 	return TRUE;
 }
 
 void ControllerBackend_Deinit(void)
 {
+	Backend_PrintInfo("De-initializing GLFW controller backend...");
 	glfwSetJoystickCallback(NULL);
 
 	joystick_connected = FALSE;
@@ -91,6 +94,7 @@ void ControllerBackend_Deinit(void)
 
 	free(axis_neutrals);
 	axis_neutrals = NULL;
+	Backend_PrintInfo("Finished de-initializing GLFW controller backend");
 }
 
 BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)

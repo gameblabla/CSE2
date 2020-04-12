@@ -583,7 +583,10 @@ static void PostGLCallCallback(const char *name, void *function_pointer, int len
 RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
 {
 #ifndef USE_OPENGLES2
+	Backend_PrintInfo("Initializing OpenGL3 rendering backend...");
 	glad_set_post_callback(PostGLCallCallback);
+#else
+	Backend_PrintInfo("Initializing OpenGLES2 rendering backend...");
 #endif
 
 	actual_screen_width = screen_width;
@@ -668,6 +671,12 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 			config.delete_texture_callback = GlyphBatch_DestroyTexture;
 			spritebatch_init(&glyph_batcher, &config, NULL);
 
+#ifndef USE_OPENGLES2
+			Backend_PrintInfo("Successfully initialized OpenGL3 rendering backend");
+#else
+			Backend_PrintInfo("Successfully initialized OpenGLES2 rendering backend");
+#endif
+
 			return &framebuffer;
 		}
 
@@ -694,6 +703,11 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 
 void RenderBackend_Deinit(void)
 {
+#ifndef USE_OPENGLES2
+	Backend_PrintInfo("De-initializing OpenGL3 rendering backend...");
+#else
+	Backend_PrintInfo("De-initializing OpenGLES2 rendering backend...");
+#endif
 	free(local_vertex_buffer);
 
 	spritebatch_term(&glyph_batcher);
@@ -710,6 +724,12 @@ void RenderBackend_Deinit(void)
 #endif
 
 	WindowBackend_OpenGL_DestroyWindow();
+
+#ifndef USE_OPENGLES2
+	Backend_PrintInfo("Finished de-initializing OpenGL3 rendering backend");
+#else
+	Backend_PrintInfo("Finished de-initializing OpenGLES2 rendering backend");
+#endif
 }
 
 void RenderBackend_DrawScreen(void)

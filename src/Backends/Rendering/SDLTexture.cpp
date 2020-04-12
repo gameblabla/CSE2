@@ -128,6 +128,7 @@ static void GlyphBatch_DestroyTexture(SPRITEBATCH_U64 texture_id, void *udata)
 
 RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
 {
+	Backend_PrintInfo("Initializing SDLTexture rendering backend...");
 	Backend_PrintInfo("Available SDL render drivers:");
 
 	for (int i = 0; i < SDL_GetNumRenderDrivers(); ++i)
@@ -185,6 +186,7 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 				{
 					Backend_PostWindowCreation();
 
+					Backend_PrintInfo("Successfully initialized SDLTexture rendering backend");
 					return &framebuffer;
 				}
 				else
@@ -220,10 +222,12 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 
 void RenderBackend_Deinit(void)
 {
+	Backend_PrintInfo("De-initializing SDLTexture rendering backend...");
 	spritebatch_term(&glyph_batcher);
 	SDL_DestroyTexture(framebuffer.texture);
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
+	Backend_PrintInfo("Finished de-initializing SDLTexture rendering backend...");
 }
 
 void RenderBackend_DrawScreen(void)

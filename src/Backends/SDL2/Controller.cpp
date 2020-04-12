@@ -17,17 +17,20 @@ static Sint16 *axis_neutrals;
 
 BOOL ControllerBackend_Init(void)
 {
+	Backend_PrintInfo("Initializing SDL2 controller backend...");
 	if (SDL_InitSubSystem(SDL_INIT_JOYSTICK) < 0)
 	{
 		Backend_PrintError("Couldn't initialise joystick SDL subsystem: %s", SDL_GetError());
 		return FALSE;
 	}
 
+	Backend_PrintInfo("Successfully initialized SDL2 controller backend");
 	return TRUE;
 }
 
 void ControllerBackend_Deinit(void)
 {
+	Backend_PrintInfo("De-initializing SDL2 controller backend...");
 	if (joystick != NULL)
 	{
 		SDL_JoystickClose(joystick);
@@ -35,6 +38,7 @@ void ControllerBackend_Deinit(void)
 	}
 
 	SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
+	Backend_PrintInfo("Finished de-initializing SDL2 controller backend");
 }
 
 BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
