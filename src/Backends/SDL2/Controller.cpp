@@ -7,8 +7,9 @@
 #include "SDL.h"
 
 #include "../../WindowsWrapper.h"
+#include "../Misc.h"
 
-#define DEADZONE 10000;
+#define DEADZONE 10000
 
 static SDL_Joystick *joystick;
 
@@ -16,13 +17,20 @@ static Sint16 *axis_neutrals;
 
 BOOL ControllerBackend_Init(void)
 {
-	SDL_InitSubSystem(SDL_INIT_JOYSTICK);
+	Backend_PrintInfo("Initializing SDL2 controller backend...");
+	if (SDL_InitSubSystem(SDL_INIT_JOYSTICK) < 0)
+	{
+		Backend_PrintError("Couldn't initialise joystick SDL subsystem: %s", SDL_GetError());
+		return FALSE;
+	}
 
+	Backend_PrintInfo("Successfully initialized SDL2 controller backend");
 	return TRUE;
 }
 
 void ControllerBackend_Deinit(void)
 {
+	Backend_PrintInfo("De-initializing SDL2 controller backend...");
 	if (joystick != NULL)
 	{
 		SDL_JoystickClose(joystick);
@@ -30,6 +38,7 @@ void ControllerBackend_Deinit(void)
 	}
 
 	SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
+	Backend_PrintInfo("Finished de-initializing SDL2 controller backend");
 }
 
 BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
@@ -41,7 +50,12 @@ BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
 
 	// Handle directional inputs
 	const Sint16 joystick_x = SDL_JoystickGetAxis(joystick, 0);
+	if (joystick_x == 0)
+		Backend_PrintError("Failed to get current state of X axis control on joystick: %s", SDL_GetError());
+
 	const Sint16 joystick_y = SDL_JoystickGetAxis(joystick, 1);
+	if (joystick_y == 0)
+		Backend_PrintError("Failed to get current state of Y axis control on joystick: %s", SDL_GetError());
 
 	status->bLeft = joystick_x < axis_neutrals[0] - DEADZONE;
 	status->bRight = joystick_x > axis_neutrals[0] + DEADZONE;
@@ -50,8 +64,16 @@ BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
 
 	// Handle button inputs
 	int total_buttons = SDL_JoystickNumButtons(joystick);
+	if (total_buttons < 0)
+		Backend_PrintError("Failed to get number of buttons on joystick: %s", SDL_GetError());
+
 	int total_axes = SDL_JoystickNumAxes(joystick);
+	if (total_axes < 0)
+		Backend_PrintError("Failed to get number of general axis controls on joystick: %s", SDL_GetError());
+
 	int total_hats = SDL_JoystickNumHats(joystick);
+	if (total_hats < 0)
+		Backend_PrintError("Failed to get number of POV hats on joystick: %s", SDL_GetError());
 
 	unsigned int buttons_done = 0;
 
@@ -123,7 +145,16 @@ BOOL ControllerBackend_ResetJoystickStatus(void)
 
 void ControllerBackend_JoystickConnect(Sint32 joystick_id)
 {
-	printf("Joystick #%d connected - %s\n", joystick_id, SDL_JoystickNameForIndex(joystick_id));
+	const char *joystick_name = SDL_JoystickNameForIndex(joystick_id);
+	if (joystick_name != NULL)
+	{
+		Backend_PrintInfo("Joystick #%d connected - %s", joystick_id, joystick_name);
+	}
+	else
+	{
+		Backend_PrintError("Couldn't get joystick name: %s", SDL_GetError());
+		Backend_PrintInfo("Joystick #%d connected - Name unknown", joystick_id);
+	}
 
 	if (joystick == NULL)
 	{
@@ -132,17 +163,24 @@ void ControllerBackend_JoystickConnect(Sint32 joystick_id)
 		if (joystick != NULL)
 		{
 			int total_axes = SDL_JoystickNumAxes(joystick);
+			if (total_axes < 0)
+				Backend_PrintError("Couldn't get number of general axis control on connected joystick: %s", SDL_GetError());
+
 			int total_buttons = SDL_JoystickNumButtons(joystick);
+			if (total_buttons < 0)
+				Backend_PrintError("Couldn't get number of buttons on connected joystick: %s", SDL_GetError());
 
 			if (total_axes >= 2 && total_buttons >= 6)
 			{
-				printf("Joystick #%d selected\n", joystick_id);
+				Backend_PrintInfo("Joystick #%d selected", joystick_id);
 
 				// Set up neutral axes
 				axis_neutrals = (Sint16*)malloc(sizeof(Sint16) * total_axes);
-
-				for (int i = 0; i < total_axes; ++i)
-					axis_neutrals[i] = SDL_JoystickGetAxis(joystick, i);
+				if (axis_neutrals != NULL)
+					for (int i = 0; i < total_axes; ++i)
+						axis_neutrals[i] = SDL_JoystickGetAxis(joystick, i);
+				else
+					Backend_PrintError("Couldn't allocate memory for neutral axes");
 			}
 			else
 			{
@@ -150,14 +188,22 @@ void ControllerBackend_JoystickConnect(Sint32 joystick_id)
 				joystick = NULL;
 			}
 		}
+		else
+		{
+			Backend_PrintError("Couldn't open joystick for use: %s", SDL_GetError());
+		}
 	}
 }
 
 void ControllerBackend_JoystickDisconnect(Sint32 joystick_id)
 {
-	if (joystick_id == SDL_JoystickInstanceID(joystick))
+	SDL_JoystickID current_joystick_id = SDL_JoystickInstanceID(joystick);
+	if (current_joystick_id < 0)
+		Backend_PrintError("Couldn't get instance ID for current joystick: %s", SDL_GetError());
+
+	if (joystick_id == current_joystick_id)
 	{
-		printf("Joystick #%d disconnected\n", joystick_id);
+		Backend_PrintInfo("Joystick #%d disconnected", joystick_id);
 		SDL_JoystickClose(joystick);
 		joystick = NULL;
 

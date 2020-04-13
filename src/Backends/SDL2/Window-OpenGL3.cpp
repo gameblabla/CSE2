@@ -2,6 +2,7 @@
 #include "Window.h"
 
 #include <stddef.h>
+#include <string>
 
 #ifdef USE_OPENGLES2
 #include <GLES2/gl2.h>
@@ -22,15 +23,29 @@ static SDL_GLContext context;
 BOOL WindowBackend_OpenGL_CreateWindow(const char *window_title, int *screen_width, int *screen_height, BOOL fullscreen)
 {
 #ifdef USE_OPENGLES2
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+	if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES) < 0)
+		Backend_PrintError("Couldn't set OpenGL context type to ES: %s", SDL_GetError());
+
+	if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0) < 0)
+		Backend_PrintError("Couldn't set OpenGL context flags to 0: %s", SDL_GetError());
+
+	if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2) < 0)
+		Backend_PrintError("Couldn't set OpenGL major version to 2: %s", SDL_GetError());
+
+	if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0) < 0)
+		Backend_PrintError("Couldn't set OpenGL minor version to 0: %s", SDL_GetError());
 #else
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+	if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE) < 0)
+		Backend_PrintError("Couldn't set OpenGL context type to core: %s", SDL_GetError());
+
+	if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG) < 0)
+		Backend_PrintError("Couldn't set OpenGL forward compatibility: %s", SDL_GetError());
+
+	if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3) < 0)
+		Backend_PrintError("Couldn't set OpenGL major version to 3: %s", SDL_GetError());
+
+	if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2) < 0)
+		Backend_PrintError("Couldn't set OpenGL minor verison to 2: %s", SDL_GetError());
 #endif
 
 	window = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, *screen_width, *screen_height, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | (fullscreen ? SDL_WINDOW_FULLSCREEN : 0));
@@ -62,12 +77,13 @@ BOOL WindowBackend_OpenGL_CreateWindow(const char *window_title, int *screen_wid
 				}
 				else
 				{
-					Backend_ShowMessageBox("Fatal error (OpenGL rendering backend)", "Could not load OpenGL functions");
+					Backend_ShowMessageBox("Fatal error (OpenGL rendering backend)", "Couldn't load OpenGL functions");
 				}
 			#endif
 			}
 			else
 			{
+				std::string error_message = std::string("Couldn't setup OpenGL context for rendering: ") + SDL_GetError();
 				Backend_ShowMessageBox("Fatal error (OpenGL rendering backend)", "SDL_GL_MakeCurrent failed");
 			}
 
@@ -75,6 +91,7 @@ BOOL WindowBackend_OpenGL_CreateWindow(const char *window_title, int *screen_wid
 		}
 		else
 		{
+			std::string error_message = std::string("Couldn't create OpenGL context: %s", SDL_GetError());
 			Backend_ShowMessageBox("Fatal error (OpenGL rendering backend)", "Could not create OpenGL context");
 		}
 
@@ -82,7 +99,8 @@ BOOL WindowBackend_OpenGL_CreateWindow(const char *window_title, int *screen_wid
 	}
 	else
 	{
-		Backend_ShowMessageBox("Fatal error (OpenGL rendering backend)", "Could not create window");
+		std::string error_message = std::string("Could not create window: ") + SDL_GetError();
+		Backend_ShowMessageBox("Fatal error (OpenGL rendering backend)", error_message.c_str());
 	}
 
 	return FALSE;

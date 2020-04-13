@@ -1,6 +1,7 @@
 #include "../Misc.h"
 
 #include <chrono>
+#include <stdarg.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,6 +18,7 @@
 #include "../../Organya.h"
 #include "../../Profile.h"
 #include "../../Resource.h"
+#include "../../Attributes.h"
 
 #define DO_KEY(GLFW_KEY, BACKEND_KEY) \
 	case GLFW_KEY: \
@@ -150,10 +152,21 @@ static void DragAndDropCallback(GLFWwindow *window, int count, const char **path
 	LoadProfile(paths[0]);
 }
 
+static void ErrorCallback(int code, const char *description)
+{
+	Backend_PrintError("GLFW error received (%d): %s", code, description);
+}
+
 BOOL Backend_Init(void)
 {
+	Backend_PrintInfo("Initializing GLFW platform backend...");
+	glfwSetErrorCallback(ErrorCallback);
+
 	if (glfwInit() == GL_TRUE)
+	{
+		Backend_PrintInfo("Successfully initialized GLFW platform backend");
 		return TRUE;
+	}
 
 	Backend_ShowMessageBox("Fatal error", "Could not initialise GLFW3");
 
@@ -162,10 +175,12 @@ BOOL Backend_Init(void)
 
 void Backend_Deinit(void)
 {
+	Backend_PrintInfo("De-initializing GLFW platform backend...");
 	if (cursor != NULL)
 		glfwDestroyCursor(cursor);
 
 	glfwTerminate();
+	Backend_PrintInfo("Finished de-initializing GLFW platform backend ");
 }
 
 void Backend_PostWindowCreation(void)
@@ -288,6 +303,26 @@ void Backend_ShowMessageBox(const char *title, const char *message)
 {
 	// GLFW3 doesn't have a message box
 	printf("ShowMessageBox - '%s' - '%s'\n", title, message);
+}
+
+ATTRIBUTE_FORMAT_PRINTF(1, 2) void Backend_PrintError(const char *format, ...)
+{
+	va_list argumentList;
+	va_start(argumentList, format);
+	fputs("ERROR: ", stderr);
+	vfprintf(stderr, format, argumentList);
+	fputc('\n', stderr);
+	va_end(argumentList);
+}
+
+ATTRIBUTE_FORMAT_PRINTF(1, 2) void Backend_PrintInfo(const char *format, ...)
+{
+	va_list argumentList;
+	va_start(argumentList, format);
+	fputs("INFO: ", stdout);
+	vprintf(format, argumentList);
+	putchar('\n');
+	va_end(argumentList);
 }
 
 unsigned long Backend_GetTicks(void)

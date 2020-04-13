@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 
 #include "SDL.h"
 
@@ -32,35 +33,43 @@ static SDL_Cursor *cursor;
 
 BOOL Backend_Init(void)
 {
+	Backend_PrintInfo("Initializing SDL2 platform backend...");
 	if (SDL_Init(SDL_INIT_EVENTS) == 0)
 	{
 		if (SDL_InitSubSystem(SDL_INIT_VIDEO) == 0)
 		{
-			puts("Available SDL2 video drivers:");
+			Backend_PrintInfo("Available SDL video drivers:");
 
 			for (int i = 0; i < SDL_GetNumVideoDrivers(); ++i)
-				puts(SDL_GetVideoDriver(i));
+				Backend_PrintInfo("%s", SDL_GetVideoDriver(i));
 
 			const char *driver = SDL_GetCurrentVideoDriver();
 
 			if (driver != NULL)
-				printf("Selected SDL2 video driver: %s\n", driver);
+				Backend_PrintInfo("Selected SDL video driver: %s", driver);
+			else
+				Backend_PrintError("No SDL video driver initialized !");
 
+			Backend_PrintInfo("Successfully initialized SDL2 platform backend");
 			return TRUE;
 		}
 
-		Backend_ShowMessageBox("Fatal error", "Could not initialise SDL2 video subsystem");
+		std::string error_message = std::string("Could not initialise SDL video subsystem: ") + SDL_GetError();
+		Backend_ShowMessageBox("Fatal error", error_message.c_str());
 
 		SDL_Quit();
+		return FALSE;
 	}
 
-	Backend_ShowMessageBox("Fatal error", "Could not initialise SDL2");
+	std::string error_message = std::string("Could not initialise SDL: ") + SDL_GetError();
+	Backend_ShowMessageBox("Fatal error", error_message.c_str());
 
 	return FALSE;
 }
 
 void Backend_Deinit(void)
 {
+	Backend_PrintInfo("De-initializing SDL2 platform backend...");
 	if (cursor != NULL)
 		SDL_FreeCursor(cursor);
 
@@ -70,6 +79,7 @@ void Backend_Deinit(void)
 	free(cursor_surface_pixels);
 
 	SDL_Quit();
+	Backend_PrintInfo("Finished de-initializing SDL2 platform backend...");
 }
 
 void Backend_PostWindowCreation(void)
@@ -80,6 +90,9 @@ void Backend_PostWindowCreation(void)
 BOOL Backend_GetBasePath(char *string_buffer)
 {
 	char *base_path = SDL_GetBasePath();
+	if (base_path == NULL)
+		return FALSE;
+
 	// Trim the trailing '/'
 	size_t base_path_length = strlen(base_path);
 	base_path[base_path_length - 1] = '\0';
@@ -103,6 +116,10 @@ void Backend_SetWindowIcon(const unsigned char *rgb_pixels, unsigned int width, 
 		SDL_SetWindowIcon(window, surface);
 		SDL_FreeSurface(surface);
 	}
+	else
+	{
+		Backend_PrintError("Couldn't create RGB surface for window icon: %s", SDL_GetError());
+	}
 }
 
 void Backend_SetCursor(const unsigned char *rgb_pixels, unsigned int width, unsigned int height)
@@ -125,6 +142,10 @@ void Backend_SetCursor(const unsigned char *rgb_pixels, unsigned int width, unsi
 					SDL_SetCursor(cursor);
 			}
 		}
+	}
+	else
+	{
+		Backend_PrintError("Failed to allocate memory for cursor surface");
 	}
 }
 
@@ -283,8 +304,29 @@ void Backend_GetKeyboardState(BOOL *out_keyboard_state)
 
 void Backend_ShowMessageBox(const char *title, const char *message)
 {
-	printf("ShowMessageBox - '%s' - '%s'\n", title, message);
-	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, message, window);
+	fprintf(stderr, "ShowMessageBox - '%s' - '%s'\n", title, message);
+	if (SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, message, window) != 0)
+		Backend_PrintError("Was also unable to display a message box containing the error: %s", SDL_GetError());
+}
+
+ATTRIBUTE_FORMAT_PRINTF(1, 2) void Backend_PrintError(const char *format, ...)
+{
+	va_list argumentList;
+	va_start(argumentList, format);
+	fputs("ERROR: ", stderr);
+	vfprintf(stderr, format, argumentList);
+	fputc('\n', stderr);
+	va_end(argumentList);
+}
+
+ATTRIBUTE_FORMAT_PRINTF(1, 2) void Backend_PrintInfo(const char *format, ...)
+{
+	va_list argumentList;
+	va_start(argumentList, format);
+	fputs("INFO: ", stdout);
+	vprintf(format, argumentList);
+	putchar('\n');
+	va_end(argumentList);
 }
 
 unsigned long Backend_GetTicks(void)

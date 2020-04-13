@@ -71,7 +71,7 @@ BOOL WindowBackend_OpenGL_CreateWindow(const char *window_title, int *screen_wid
 				}
 				else
 				{
-					Backend_ShowMessageBox("Fatal error (OpenGL rendering backend)", "Could not load OpenGL functions");
+					Backend_ShowMessageBox("Fatal error (OpenGL rendering backend)", "Could not initialize OpenGL context");
 				}
 			#endif
 

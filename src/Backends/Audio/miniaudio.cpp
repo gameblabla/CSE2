@@ -9,6 +9,7 @@
 
 #include "../../Organya.h"
 #include "../../WindowsWrapper.h"
+#include "../Misc.h"
 
 #include "SoftwareMixer.h"
 
@@ -72,6 +73,7 @@ static void Callback(ma_device *device, void *output_stream, const void *input_s
 
 BOOL AudioBackend_Init(void)
 {
+	Backend_PrintInfo("Initializing miniaudio audio backend...");
 	ma_device_config config = ma_device_config_init(ma_device_type_playback);
 	config.playback.pDeviceID = NULL;
 	config.playback.format = ma_format_f32;
@@ -80,42 +82,72 @@ BOOL AudioBackend_Init(void)
 	config.dataCallback = Callback;
 	config.pUserData = NULL;
 
-	if (ma_device_init(NULL, &config, &device) == MA_SUCCESS)
+	ma_result return_value;
+
+	return_value = ma_device_init(NULL, &config, &device);
+	if (return_value == MA_SUCCESS)
 	{
-		if (ma_mutex_init(device.pContext, &mutex) == MA_SUCCESS)
+		return_value = ma_mutex_init(device.pContext, &mutex);
+		if (return_value == MA_SUCCESS)
 		{
-			if (ma_mutex_init(device.pContext, &organya_mutex) == MA_SUCCESS)
+			return_value = ma_mutex_init(device.pContext, &organya_mutex);
+			if (return_value == MA_SUCCESS)
 			{
-				if (ma_device_start(&device) == MA_SUCCESS)
+				return_value = ma_device_start(&device);
+				if (return_value == MA_SUCCESS)
 				{
 					output_frequency = device.sampleRate;
 
 					Mixer_Init(device.sampleRate);
 
+					Backend_PrintInfo("Successfully initialized miniaudio audio backend");
 					return TRUE;
+				}
+				else
+				{
+					Backend_PrintError("Failed to start playback device: %s", ma_result_description(return_value));
 				}
 
 				ma_mutex_uninit(&organya_mutex);
 			}
+			else
+			{
+				Backend_PrintError("Failed to create organya mutex: %s", ma_result_description(return_value));
+			}
 
 			ma_mutex_uninit(&mutex);
+		}
+		else
+		{
+			Backend_PrintError("Failed to create mutex: %s", ma_result_description(return_value));
 		}
 
 		ma_device_uninit(&device);
 	}
+	else
+	{
+		Backend_PrintError("Failed to initialize playback device: %s", ma_result_description(return_value));
+	}
+
 
 	return FALSE;
 }
 
 void AudioBackend_Deinit(void)
 {
-	ma_device_stop(&device);
+	Backend_PrintInfo("De-initializing miniaudio audio backend...");
+	ma_result return_value;
+	return_value = ma_device_stop(&device);
+
+	if (return_value != MA_SUCCESS)
+		Backend_PrintError("Failed to stop playback device: %s", ma_result_description(return_value));
 
 	ma_mutex_uninit(&organya_mutex);
 
 	ma_mutex_uninit(&mutex);
 
 	ma_device_uninit(&device);
+	Backend_PrintInfo("Finished de-initializing miniaudio audio backend...");
 }
 
 AudioBackend_Sound* AudioBackend_CreateSound(unsigned int frequency, const unsigned char *samples, size_t length)

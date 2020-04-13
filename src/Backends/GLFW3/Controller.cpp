@@ -8,6 +8,7 @@
 #include <GLFW/glfw3.h>
 
 #include "../../WindowsWrapper.h"
+#include "../Misc.h"
 
 #define DEADZONE (10000.0f / 32767.0f)
 
@@ -21,7 +22,7 @@ static void JoystickCallback(int joystick_id, int event)
 	switch (event)
 	{
 		case GLFW_CONNECTED:
-			printf("Joystick #%d connected - %s\n", joystick_id, glfwGetJoystickName(joystick_id));
+			Backend_PrintInfo("Joystick #%d connected - %s", joystick_id, glfwGetJoystickName(joystick_id));
 
 			if (!joystick_connected)
 			{
@@ -44,8 +45,11 @@ static void JoystickCallback(int joystick_id, int event)
 						// Set up neutral axes
 						axis_neutrals = (float*)malloc(sizeof(float) * total_axes);
 
-						for (int i = 0; i < total_axes; ++i)
-							axis_neutrals[i] = axes[i];
+						if (axis_neutrals != NULL)
+							for (int i = 0; i < total_axes; ++i)
+								axis_neutrals[i] = axes[i];
+						else
+							Backend_PrintError("Couldn't allocate memory for axis");
 					}
 				}
 			}
@@ -55,7 +59,7 @@ static void JoystickCallback(int joystick_id, int event)
 		case GLFW_DISCONNECTED:
 			if (joystick_connected && joystick_id == connected_joystick_id)
 			{
-				printf("Joystick #%d disconnected\n", connected_joystick_id);
+				Backend_PrintInfo("Joystick #%d disconnected", connected_joystick_id);
 				joystick_connected = FALSE;
 
 				free(axis_neutrals);
@@ -67,6 +71,7 @@ static void JoystickCallback(int joystick_id, int event)
 
 BOOL ControllerBackend_Init(void)
 {
+	Backend_PrintInfo("Initializing GLFW controller backend...");
 	// Connect joysticks that are already plugged-in
 	for (int i = GLFW_JOYSTICK_1; i < GLFW_JOYSTICK_LAST; ++i)
 		if (glfwJoystickPresent(i) == GLFW_TRUE)
@@ -75,11 +80,13 @@ BOOL ControllerBackend_Init(void)
 	// Set-up the callback for future (dis)connections
 	glfwSetJoystickCallback(JoystickCallback);
 
+	Backend_PrintInfo("Sucessfully initialized GLFW controller backend");
 	return TRUE;
 }
 
 void ControllerBackend_Deinit(void)
 {
+	Backend_PrintInfo("De-initializing GLFW controller backend...");
 	glfwSetJoystickCallback(NULL);
 
 	joystick_connected = FALSE;
@@ -87,6 +94,7 @@ void ControllerBackend_Deinit(void)
 
 	free(axis_neutrals);
 	axis_neutrals = NULL;
+	Backend_PrintInfo("Finished de-initializing GLFW controller backend");
 }
 
 BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
