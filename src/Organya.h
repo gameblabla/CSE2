@@ -20,4 +20,3 @@ void StopOrganyaMusic(void);
 void SetOrganyaFadeout(void);
 BOOL StartOrganya(const char *wave_filename);
 void EndOrganya(void);
-void UpdateOrganya(void);

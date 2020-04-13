@@ -7,8 +7,6 @@
 
 #include "SDL.h"
 
-#include "../../WindowsWrapper.h"
-
 #include "../Misc.h"
 
 SDL_Window *window;
@@ -16,7 +14,7 @@ SDL_Window *window;
 static SDL_Surface *window_sdlsurface;
 static SDL_Surface *framebuffer_sdlsurface;
 
-unsigned char* WindowBackend_Software_CreateWindow(const char *window_title, int screen_width, int screen_height, BOOL fullscreen, size_t *pitch)
+unsigned char* WindowBackend_Software_CreateWindow(const char *window_title, int screen_width, int screen_height, bool fullscreen, size_t *pitch)
 {
 	window = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screen_width, screen_height, 0);
 

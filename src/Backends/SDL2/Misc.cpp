@@ -1,14 +1,11 @@
 #include "../Misc.h"
 
 #include <stddef.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <string>
 
 #include "SDL.h"
-
-#include "../../WindowsWrapper.h"
 
 #include "Controller.h"
 #include "Window.h"
@@ -23,13 +20,13 @@
 		keyboard_state[BACKEND_KEY] = event.key.type == SDL_KEYDOWN; \
 		break;
 
-static BOOL keyboard_state[BACKEND_KEYBOARD_TOTAL];
+static bool keyboard_state[BACKEND_KEYBOARD_TOTAL];
 
 static unsigned char *cursor_surface_pixels;
 static SDL_Surface *cursor_surface;
 static SDL_Cursor *cursor;
 
-BOOL Backend_Init(void)
+bool Backend_Init(void)
 {
 	if (SDL_Init(SDL_INIT_EVENTS) == 0)
 	{
@@ -46,7 +43,7 @@ BOOL Backend_Init(void)
 			{
 				Backend_PrintInfo("Selected SDL video driver: %s", driver);
 
-				return TRUE;
+				return true;
 			}
 			else
 			{
@@ -67,7 +64,7 @@ BOOL Backend_Init(void)
 		Backend_ShowMessageBox("Fatal error", error_message.c_str());
 	}
 
-	return FALSE;
+	return false;
 }
 
 void Backend_Deinit(void)
@@ -88,11 +85,11 @@ void Backend_PostWindowCreation(void)
 	
 }
 
-BOOL Backend_GetBasePath(char *string_buffer)
+bool Backend_GetBasePath(char *string_buffer)
 {
 	char *base_path = SDL_GetBasePath();
 	if (base_path == NULL)
-		return FALSE;
+		return false;
 
 	// Trim the trailing '/'
 	size_t base_path_length = strlen(base_path);
@@ -100,7 +97,7 @@ BOOL Backend_GetBasePath(char *string_buffer)
 	strcpy(string_buffer, base_path);
 	SDL_free(base_path);
 
-	return TRUE;
+	return true;
 }
 
 void Backend_HideMouse(void)
@@ -155,14 +152,14 @@ void PlaybackBackend_EnableDragAndDrop(void)
 	SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
 }
 
-BOOL Backend_SystemTask(BOOL active)
+bool Backend_SystemTask(bool active)
 {
 	if (SDL_PollEvent(NULL) || !active)
 	{
 		SDL_Event event;
 
 		if (!SDL_WaitEvent(&event))
-			return FALSE;
+			return false;
 
 		switch (event.type)
 		{
@@ -286,7 +283,7 @@ BOOL Backend_SystemTask(BOOL active)
 
 			case SDL_QUIT:
 				StopOrganyaMusic();
-				return FALSE;
+				return false;
 
 			case SDL_RENDER_TARGETS_RESET:
 				RenderBackend_HandleRenderTargetLoss();
@@ -295,10 +292,10 @@ BOOL Backend_SystemTask(BOOL active)
 		}
 	}
 
-	return TRUE;
+	return true;
 }
 
-void Backend_GetKeyboardState(BOOL *out_keyboard_state)
+void Backend_GetKeyboardState(bool *out_keyboard_state)
 {
 	memcpy(out_keyboard_state, keyboard_state, sizeof(keyboard_state));
 }

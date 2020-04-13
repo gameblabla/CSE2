@@ -11,8 +11,6 @@
 #endif
 #include "SDL.h"
 
-#include "../../WindowsWrapper.h"
-
 #include "../Misc.h"
 #include "../../Resource.h"
 
@@ -20,7 +18,7 @@ SDL_Window *window;
 
 static SDL_GLContext context;
 
-BOOL WindowBackend_OpenGL_CreateWindow(const char *window_title, int *screen_width, int *screen_height, BOOL fullscreen)
+bool WindowBackend_OpenGL_CreateWindow(const char *window_title, int *screen_width, int *screen_height, bool fullscreen)
 {
 #ifdef USE_OPENGLES2
 	if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES) < 0)
@@ -67,7 +65,7 @@ BOOL WindowBackend_OpenGL_CreateWindow(const char *window_title, int *screen_wid
 			#endif
 						Backend_PostWindowCreation();
 
-						return TRUE;
+						return true;
 			#ifndef USE_OPENGLES2
 					}
 					else
@@ -103,7 +101,7 @@ BOOL WindowBackend_OpenGL_CreateWindow(const char *window_title, int *screen_wid
 		Backend_ShowMessageBox("Fatal error (OpenGL rendering backend)", error_message.c_str());
 	}
 
-	return FALSE;
+	return false;
 }
 
 void WindowBackend_OpenGL_DestroyWindow(void)

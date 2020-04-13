@@ -412,7 +412,7 @@ BOOL MakeSurface_Generic(int bxsize, int bysize, SurfaceID surf_no, BOOL bSystem
 
 void BackupSurface(SurfaceID surf_no, const RECT *rect)
 {
-	static RECT scaled_rect;
+	static RenderBackend_Rect scaled_rect;
 	scaled_rect.left = rect->left * magnification;
 	scaled_rect.top = rect->top * magnification;
 	scaled_rect.right = rect->right * magnification;
@@ -423,9 +423,12 @@ void BackupSurface(SurfaceID surf_no, const RECT *rect)
 
 void PutBitmap3(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID surf_no) // Transparency
 {
-	static RECT rcWork;
+	static RenderBackend_Rect rcWork;
 
-	rcWork = *rect;
+	rcWork.left = rect->left;
+	rcWork.top = rect->top;
+	rcWork.right = rect->right;
+	rcWork.bottom = rect->bottom;
 
 	if (x + rect->right - rect->left > rcView->right)
 		rcWork.right -= (x + rect->right - rect->left) - rcView->right;
@@ -455,9 +458,12 @@ void PutBitmap3(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID su
 
 void PutBitmap4(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID surf_no) // No Transparency
 {
-	static RECT rcWork;
+	static RenderBackend_Rect rcWork;
 
-	rcWork = *rect;
+	rcWork.left = rect->left;
+	rcWork.top = rect->top;
+	rcWork.right = rect->right;
+	rcWork.bottom = rect->bottom;
 
 	if (x + rect->right - rect->left > rcView->right)
 		rcWork.right -= (x + rect->right - rect->left) - rcView->right;
@@ -487,7 +493,7 @@ void PutBitmap4(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID su
 
 void Surface2Surface(int x, int y, const RECT *rect, int to, int from)
 {
-	static RECT rcWork;
+	static RenderBackend_Rect rcWork;
 
 	rcWork.left = rect->left * magnification;
 	rcWork.top = rect->top * magnification;
@@ -505,7 +511,7 @@ unsigned long GetCortBoxColor(unsigned long col)
 
 void CortBox(const RECT *rect, unsigned long col)
 {
-	static RECT dst_rect;
+	static RenderBackend_Rect dst_rect;
 	dst_rect.left = rect->left * magnification;
 	dst_rect.top = rect->top * magnification;
 	dst_rect.right = rect->right * magnification;
@@ -520,7 +526,7 @@ void CortBox(const RECT *rect, unsigned long col)
 
 void CortBox2(const RECT *rect, unsigned long col, SurfaceID surf_no)
 {
-	static RECT dst_rect;
+	static RenderBackend_Rect dst_rect;
 	dst_rect.left = rect->left * magnification;
 	dst_rect.top = rect->top * magnification;
 	dst_rect.right = rect->right * magnification;

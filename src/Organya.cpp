@@ -398,6 +398,11 @@ void PlayDramObject(unsigned char key, int mode, signed char track)
 
 ORGDATA org_data;
 
+static void OrganyaCallback(void)
+{
+	org_data.PlayData();
+}
+
 OrgData::OrgData(void)
 {
 	for (int i = 0; i < MAXTRACK; i++)
@@ -830,7 +835,7 @@ void PlayOrganyaMusic(void)
 	if (!audio_backend_initialised)
 		return;
 
-	AudioBackend_SetOrganyaTimer(org_data.info.wait);
+	AudioBackend_SetOrganyaCallback(OrganyaCallback, org_data.info.wait);
 }
 
 BOOL ChangeOrganyaVolume(signed int volume)
@@ -850,7 +855,7 @@ void StopOrganyaMusic(void)
 	if (!audio_backend_initialised)
 		return;
 
-	AudioBackend_SetOrganyaTimer(0);
+	AudioBackend_SetOrganyaCallback(NULL, 0);
 
 	// Stop notes
 	for (int i = 0; i < MAXMELODY; i++)
@@ -873,7 +878,7 @@ void EndOrganya(void)
 	if (!audio_backend_initialised)
 		return;
 
-	AudioBackend_SetOrganyaTimer(0);
+	AudioBackend_SetOrganyaCallback(NULL, 0);
 
 	// Release everything related to org
 	org_data.ReleaseNote();
@@ -883,9 +888,4 @@ void EndOrganya(void)
 		PlayOrganObject(0, 0, i, 0);
 		ReleaseOrganyaObject(i);
 	}
-}
-
-void UpdateOrganya(void)
-{
-	org_data.PlayData();
 }

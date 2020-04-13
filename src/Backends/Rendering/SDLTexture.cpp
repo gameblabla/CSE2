@@ -1,7 +1,6 @@
 #include "../Rendering.h"
 
 #include <stddef.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <string>
@@ -26,7 +25,7 @@ typedef struct RenderBackend_Surface
 	unsigned char *pixels;
 	unsigned int width;
 	unsigned int height;
-	BOOL lost;
+	bool lost;
 
 	struct RenderBackend_Surface *next;
 	struct RenderBackend_Surface *prev;
@@ -51,7 +50,7 @@ static unsigned char glyph_colour_channels[3];
 
 static spritebatch_t glyph_batcher;
 
-static void RectToSDLRect(const RECT *rect, SDL_Rect *sdl_rect)
+static void RectToSDLRect(const RenderBackend_Rect *rect, SDL_Rect *sdl_rect)
 {
 	sdl_rect->x = (int)rect->left;
 	sdl_rect->y = (int)rect->top;
@@ -126,7 +125,7 @@ static void GlyphBatch_DestroyTexture(SPRITEBATCH_U64 texture_id, void *udata)
 	SDL_DestroyTexture((SDL_Texture*)texture_id);
 }
 
-RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
+RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, bool fullscreen)
 {
 	Backend_PrintInfo("Available SDL render drivers:");
 
@@ -254,7 +253,7 @@ RenderBackend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned 
 
 	surface->width = width;
 	surface->height = height;
-	surface->lost = FALSE;
+	surface->lost = false;
 
 	// Add to linked-list
 	surface->prev = NULL;
@@ -282,14 +281,14 @@ void RenderBackend_FreeSurface(RenderBackend_Surface *surface)
 	free(surface);
 }
 
-BOOL RenderBackend_IsSurfaceLost(RenderBackend_Surface *surface)
+bool RenderBackend_IsSurfaceLost(RenderBackend_Surface *surface)
 {
 	return surface->lost;
 }
 
 void RenderBackend_RestoreSurface(RenderBackend_Surface *surface)
 {
-	surface->lost = FALSE;
+	surface->lost = false;
 }
 
 unsigned char* RenderBackend_LockSurface(RenderBackend_Surface *surface, unsigned int *pitch, unsigned int width, unsigned int height)
@@ -349,7 +348,7 @@ void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, unsigned int wi
 	free(buffer);
 }
 
-void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RECT *rect, RenderBackend_Surface *destination_surface, long x, long y, BOOL colour_key)
+void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBackend_Rect *rect, RenderBackend_Surface *destination_surface, long x, long y, bool colour_key)
 {
 	if (source_surface == NULL || destination_surface == NULL)
 		return;
@@ -370,7 +369,7 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RECT *rect,
 		Backend_PrintError("Couldn't copy part of texture to rendering target: %s", SDL_GetError());
 }
 
-void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
+void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBackend_Rect *rect, unsigned char red, unsigned char green, unsigned char blue)
 {
 	if (surface == NULL)
 		return;
@@ -474,7 +473,7 @@ void RenderBackend_FlushGlyphs(void)
 void RenderBackend_HandleRenderTargetLoss(void)
 {
 	for (RenderBackend_Surface *surface = surface_list_head; surface != NULL; surface = surface->next)
-		surface->lost = TRUE;
+		surface->lost = true;
 }
 
 void RenderBackend_HandleWindowResize(unsigned int width, unsigned int height)

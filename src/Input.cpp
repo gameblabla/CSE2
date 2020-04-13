@@ -19,7 +19,7 @@ BOOL InitDirectInput(void)
 
 BOOL GetJoystickStatus(JOYSTICK_STATUS *status)
 {
-	BOOL *buttons;
+	bool *buttons;
 	unsigned int button_count;
 
 	short *axes;
@@ -63,7 +63,7 @@ BOOL GetJoystickStatus(JOYSTICK_STATUS *status)
 
 BOOL ResetJoystickStatus(void)
 {
-	BOOL *buttons;
+	bool *buttons;
 	unsigned int button_count;
 
 	short *axes;

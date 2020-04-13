@@ -4,8 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../../WindowsWrapper.h"
-
 #include "../Misc.h"
 #include "../Window-Software.h"
 #include "../../Attributes.h"
@@ -33,7 +31,7 @@ static RenderBackend_Surface framebuffer;
 static unsigned char glyph_colour_channels[3];
 static RenderBackend_Surface *glyph_destination_surface;
 
-RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
+RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, bool fullscreen)
 {
 	size_t pitch;
 	framebuffer.pixels = WindowBackend_Software_CreateWindow(window_title, screen_width, screen_height, fullscreen, &pitch);
@@ -91,11 +89,11 @@ void RenderBackend_FreeSurface(RenderBackend_Surface *surface)
 	free(surface);
 }
 
-BOOL RenderBackend_IsSurfaceLost(RenderBackend_Surface *surface)
+bool RenderBackend_IsSurfaceLost(RenderBackend_Surface *surface)
 {
 	(void)surface;
 
-	return FALSE;
+	return false;
 }
 
 void RenderBackend_RestoreSurface(RenderBackend_Surface *surface)
@@ -122,12 +120,12 @@ void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, unsigned int wi
 	(void)height;
 }
 
-ATTRIBUTE_HOT void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RECT *rect, RenderBackend_Surface *destination_surface, long x, long y, BOOL colour_key)
+ATTRIBUTE_HOT void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBackend_Rect *rect, RenderBackend_Surface *destination_surface, long x, long y, bool colour_key)
 {
 	if (source_surface == NULL || destination_surface == NULL)
 		return;
 
-	RECT rect_clamped;
+	RenderBackend_Rect rect_clamped;
 
 	rect_clamped.left = rect->left;
 	rect_clamped.top = rect->top;
@@ -205,12 +203,12 @@ ATTRIBUTE_HOT void RenderBackend_Blit(RenderBackend_Surface *source_surface, con
 	}
 }
 
-ATTRIBUTE_HOT void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
+ATTRIBUTE_HOT void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBackend_Rect *rect, unsigned char red, unsigned char green, unsigned char blue)
 {
 	if (surface == NULL)
 		return;
 
-	RECT rect_clamped;
+	RenderBackend_Rect rect_clamped;
 
 	rect_clamped.left = rect->left;
 	rect_clamped.top = rect->top;

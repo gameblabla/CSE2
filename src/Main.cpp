@@ -395,7 +395,7 @@ BOOL SystemTask(void)
 			return FALSE;
 	} while(!bActive);
 
-	BOOL keyboard_state[BACKEND_KEYBOARD_TOTAL];
+	bool keyboard_state[BACKEND_KEYBOARD_TOTAL];
 	Backend_GetKeyboardState(keyboard_state);
 
 	for (unsigned int i = 0; i < BACKEND_KEYBOARD_TOTAL; ++i)

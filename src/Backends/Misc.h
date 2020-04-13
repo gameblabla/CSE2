@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../Attributes.h"
-#include "../WindowsWrapper.h"
 
 enum
 {
@@ -84,16 +83,16 @@ enum
 	BACKEND_KEYBOARD_TOTAL
 };
 
-BOOL Backend_Init(void);
+bool Backend_Init(void);
 void Backend_Deinit(void);
 void Backend_PostWindowCreation(void);
-BOOL Backend_GetBasePath(char *string_buffer);
+bool Backend_GetBasePath(char *string_buffer);
 void Backend_HideMouse(void);
 void Backend_SetWindowIcon(const unsigned char *rgb_pixels, unsigned int width, unsigned int height);
 void Backend_SetCursor(const unsigned char *rgb_pixels, unsigned int width, unsigned int height);
 void PlaybackBackend_EnableDragAndDrop(void);
-BOOL Backend_SystemTask(BOOL active);
-void Backend_GetKeyboardState(BOOL *keyboard_state);
+bool Backend_SystemTask(bool active);
+void Backend_GetKeyboardState(bool *keyboard_state);
 void Backend_ShowMessageBox(const char *title, const char *message);
 ATTRIBUTE_FORMAT_PRINTF(1, 2) void Backend_PrintError(const char *format, ...);
 ATTRIBUTE_FORMAT_PRINTF(1, 2) void Backend_PrintInfo(const char *format, ...);

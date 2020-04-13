@@ -11,13 +11,11 @@
 #endif
 #include <GLFW/glfw3.h>
 
-#include "../../WindowsWrapper.h"
-
 #include "../Misc.h"
 
 GLFWwindow *window;
 
-BOOL WindowBackend_OpenGL_CreateWindow(const char *window_title, int *screen_width, int *screen_height, BOOL fullscreen)
+bool WindowBackend_OpenGL_CreateWindow(const char *window_title, int *screen_width, int *screen_height, BOOL fullscreen)
 {
 #ifdef USE_OPENGLES2
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
@@ -61,7 +59,7 @@ BOOL WindowBackend_OpenGL_CreateWindow(const char *window_title, int *screen_wid
 			#endif
 						Backend_PostWindowCreation();
 
-						return TRUE;
+						return true;
 			#ifndef USE_OPENGLES2
 					}
 					else
@@ -82,7 +80,7 @@ BOOL WindowBackend_OpenGL_CreateWindow(const char *window_title, int *screen_wid
 		Backend_ShowMessageBox("Fatal error (OpenGL rendering backend)", "Could not create window");
 	}
 
-	return FALSE;
+	return false;
 }
 
 void WindowBackend_OpenGL_DestroyWindow(void)

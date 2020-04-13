@@ -7,8 +7,6 @@
 
 #include "SDL.h"
 
-#include "../../WindowsWrapper.h"
-
 #include "../Misc.h"
 #include "../SDL2/Window.h"
 
@@ -31,7 +29,7 @@ static RenderBackend_Surface framebuffer;
 static unsigned char glyph_colour_channels[3];
 static SDL_Surface *glyph_destination_sdlsurface;
 
-static void RectToSDLRect(const RECT *rect, SDL_Rect *sdl_rect)
+static void RectToSDLRect(const RenderBackend_Rect *rect, SDL_Rect *sdl_rect)
 {
 	sdl_rect->x = (int)rect->left;
 	sdl_rect->y = (int)rect->top;
@@ -45,7 +43,7 @@ static void RectToSDLRect(const RECT *rect, SDL_Rect *sdl_rect)
 		sdl_rect->h = 0;
 }
 
-RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
+RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, bool fullscreen)
 {
 	window = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screen_width, screen_height, 0);
 
@@ -130,11 +128,11 @@ void RenderBackend_FreeSurface(RenderBackend_Surface *surface)
 	free(surface);
 }
 
-BOOL RenderBackend_IsSurfaceLost(RenderBackend_Surface *surface)
+bool RenderBackend_IsSurfaceLost(RenderBackend_Surface *surface)
 {
 	(void)surface;
 
-	return FALSE;
+	return false;
 }
 
 void RenderBackend_RestoreSurface(RenderBackend_Surface *surface)
@@ -161,7 +159,7 @@ void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, unsigned int wi
 	(void)height;
 }
 
-void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RECT *rect, RenderBackend_Surface *destination_surface, long x, long y, BOOL colour_key)
+void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBackend_Rect *rect, RenderBackend_Surface *destination_surface, long x, long y, bool colour_key)
 {
 	if (source_surface == NULL || destination_surface == NULL)
 		return;
@@ -183,7 +181,7 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RECT *rect,
 		Backend_PrintError("Couldn't blit surface: %s", SDL_GetError());
 }
 
-void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
+void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBackend_Rect *rect, unsigned char red, unsigned char green, unsigned char blue)
 {
 	if (surface == NULL)
 		return;

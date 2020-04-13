@@ -10,8 +10,6 @@
 
 #include <GLFW/glfw3.h>
 
-#include "../../WindowsWrapper.h"
-
 #include "Window.h"
 #include "../Rendering.h"
 #include "../../Attributes.h"
@@ -25,7 +23,7 @@
 		keyboard_state[BACKEND_KEY] = action == GLFW_PRESS; \
 		break;
 
-static BOOL keyboard_state[BACKEND_KEYBOARD_TOTAL];
+static bool keyboard_state[BACKEND_KEYBOARD_TOTAL];
 
 static GLFWcursor* cursor;
 
@@ -155,16 +153,16 @@ static void ErrorCallback(int code, const char *description)
 	Backend_PrintError("GLFW error received (%d): %s", code, description);
 }
 
-BOOL Backend_Init(void)
+bool Backend_Init(void)
 {
 	glfwSetErrorCallback(ErrorCallback);
 
 	if (glfwInit() == GL_TRUE)
-		return TRUE;
+		return true;
 
 	Backend_ShowMessageBox("Fatal error", "Could not initialise GLFW3");
 
-	return FALSE;
+	return false;
 }
 
 void Backend_Deinit(void)
@@ -183,12 +181,12 @@ void Backend_PostWindowCreation(void)
 	glfwSetWindowSizeCallback(window, WindowSizeCallback);
 }
 
-BOOL Backend_GetBasePath(char *string_buffer)
+bool Backend_GetBasePath(char *string_buffer)
 {
 	(void)string_buffer;
 
 	// GLFW3 doesn't seem to have a mechanism for this
-	return FALSE;
+	return false;
 }
 
 void Backend_HideMouse(void)
@@ -270,12 +268,12 @@ void PlaybackBackend_EnableDragAndDrop(void)
 	glfwSetDropCallback(window, DragAndDropCallback);
 }
 
-BOOL Backend_SystemTask(BOOL active)
+bool Backend_SystemTask(bool active)
 {
 	if (glfwWindowShouldClose(window))
 	{
 		StopOrganyaMusic();
-		return FALSE;
+		return false;
 	}
 
 	if (active)
@@ -283,10 +281,10 @@ BOOL Backend_SystemTask(BOOL active)
 	else
 		glfwWaitEvents();
 
-	return TRUE;
+	return true;
 }
 
-void Backend_GetKeyboardState(BOOL *out_keyboard_state)
+void Backend_GetKeyboardState(bool *out_keyboard_state)
 {
 	memcpy(out_keyboard_state, keyboard_state, sizeof(keyboard_state));
 }

@@ -3,7 +3,6 @@
 #include "../Rendering.h"
 
 #include <stddef.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -584,7 +583,7 @@ static void PostGLCallCallback(const char *name, void *function_pointer, int len
 // Render-backend initialisation
 // ====================
 
-RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
+RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, bool fullscreen)
 {
 #ifndef USE_OPENGLES2
 	glad_set_post_callback(PostGLCallCallback);
@@ -855,11 +854,11 @@ void RenderBackend_FreeSurface(RenderBackend_Surface *surface)
 	free(surface);
 }
 
-BOOL RenderBackend_IsSurfaceLost(RenderBackend_Surface *surface)
+bool RenderBackend_IsSurfaceLost(RenderBackend_Surface *surface)
 {
 	(void)surface;
 
-	return FALSE;
+	return false;
 }
 
 void RenderBackend_RestoreSurface(RenderBackend_Surface *surface)
@@ -897,7 +896,7 @@ void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, unsigned int wi
 // Drawing
 // ====================
 
-void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RECT *rect, RenderBackend_Surface *destination_surface, long x, long y, BOOL colour_key)
+void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBackend_Rect *rect, RenderBackend_Surface *destination_surface, long x, long y, bool colour_key)
 {
 	if (source_surface == NULL || destination_surface == NULL)
 		return;
@@ -976,7 +975,7 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RECT *rect,
 	}
 }
 
-void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
+void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBackend_Rect *rect, unsigned char red, unsigned char green, unsigned char blue)
 {
 	static unsigned char last_red;
 	static unsigned char last_green;
