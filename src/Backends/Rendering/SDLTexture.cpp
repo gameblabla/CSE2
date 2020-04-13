@@ -144,10 +144,8 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 	if (window != NULL)
 	{
 		if (fullscreen)
-		{
 			if (SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN) < 0)
 				Backend_PrintError("Couldn't set window to fullscreen: %s", SDL_GetError());
-		}
 
 	#if SDL_VERSION_ATLEAST(2,0,10)
 		SDL_SetHint(SDL_HINT_RENDER_BATCHING, "1");	// We never interfere with the renderer, so don't let SDL implicitly disable batching
@@ -344,6 +342,7 @@ void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, unsigned int wi
 	free(surface->pixels);
 
 	SDL_Rect rect = {0, 0, (int)width, (int)height};
+
 	if (SDL_UpdateTexture(surface->texture, &rect, buffer, width * 4) < 0)
 		Backend_PrintError("Couldn't update part of texture: %s", SDL_GetError());
 
