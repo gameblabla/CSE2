@@ -44,7 +44,7 @@ static void JoystickCallback(int joystick_id, int event)
 							for (int i = 0; i < total_axes; ++i)
 								axis_neutrals[i] = axes[i];
 
-							printf("Joystick #%d selected\n", joystick_id);
+							Backend_PrintInfo("Joystick #%d selected\n", joystick_id);
 							joystick_connected = true;
 							connected_joystick_id = joystick_id;
 						}
