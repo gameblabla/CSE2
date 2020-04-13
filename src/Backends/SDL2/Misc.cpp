@@ -23,8 +23,6 @@
 		keyboard_state[BACKEND_KEY] = event.key.type == SDL_KEYDOWN; \
 		break;
 
-BOOL bActive = TRUE;
-
 static BOOL keyboard_state[BACKEND_KEYBOARD_TOTAL];
 
 static unsigned char *cursor_surface_pixels;
@@ -157,9 +155,9 @@ void PlaybackBackend_EnableDragAndDrop(void)
 	SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
 }
 
-BOOL Backend_SystemTask(void)
+BOOL Backend_SystemTask(BOOL active)
 {
-	while (SDL_PollEvent(NULL) || !bActive)
+	if (SDL_PollEvent(NULL) || !active)
 	{
 		SDL_Event event;
 

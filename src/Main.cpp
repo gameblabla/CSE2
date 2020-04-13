@@ -33,6 +33,7 @@ BOOL gbUseJoystick = FALSE;
 
 int gJoystickButtonTable[8];
 
+static BOOL bActive = TRUE;
 static BOOL bFps = FALSE;
 
 static int windowWidth;
@@ -388,8 +389,11 @@ BOOL SystemTask(void)
 {
 	static BOOL previous_keyboard_state[BACKEND_KEYBOARD_TOTAL];
 
-	if (!Backend_SystemTask())
-		return FALSE;
+	do
+	{
+		if (!Backend_SystemTask(bActive))
+			return FALSE;
+	} while(!bActive);
 
 	BOOL keyboard_state[BACKEND_KEYBOARD_TOTAL];
 	Backend_GetKeyboardState(keyboard_state);

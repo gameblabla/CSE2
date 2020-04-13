@@ -84,8 +84,6 @@ enum
 	BACKEND_KEYBOARD_TOTAL
 };
 
-extern BOOL bActive;
-
 BOOL Backend_Init(void);
 void Backend_Deinit(void);
 void Backend_PostWindowCreation(void);
@@ -94,7 +92,7 @@ void Backend_HideMouse(void);
 void Backend_SetWindowIcon(const unsigned char *rgb_pixels, unsigned int width, unsigned int height);
 void Backend_SetCursor(const unsigned char *rgb_pixels, unsigned int width, unsigned int height);
 void PlaybackBackend_EnableDragAndDrop(void);
-BOOL Backend_SystemTask(void);
+BOOL Backend_SystemTask(BOOL active);
 void Backend_GetKeyboardState(BOOL *keyboard_state);
 void Backend_ShowMessageBox(const char *title, const char *message);
 ATTRIBUTE_FORMAT_PRINTF(1, 2) void Backend_PrintError(const char *format, ...);

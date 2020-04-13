@@ -25,8 +25,6 @@
 		keyboard_state[BACKEND_KEY] = action == GLFW_PRESS; \
 		break;
 
-BOOL bActive = TRUE;
-
 static BOOL keyboard_state[BACKEND_KEYBOARD_TOTAL];
 
 static GLFWcursor* cursor;
@@ -272,7 +270,7 @@ void PlaybackBackend_EnableDragAndDrop(void)
 	glfwSetDropCallback(window, DragAndDropCallback);
 }
 
-BOOL Backend_SystemTask(void)
+BOOL Backend_SystemTask(BOOL active)
 {
 	if (glfwWindowShouldClose(window))
 	{
@@ -280,9 +278,9 @@ BOOL Backend_SystemTask(void)
 		return FALSE;
 	}
 
-	glfwPollEvents();
-
-	while (!bActive)
+	if (active)
+		glfwPollEvents();
+	else
 		glfwWaitEvents();
 
 	return TRUE;
