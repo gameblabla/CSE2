@@ -7,8 +7,8 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
-#include "../../WindowsWrapper.h"
 #include "../Misc.h"
+#include "../../WindowsWrapper.h"
 
 #define DEADZONE (10000.0f / 32767.0f)
 

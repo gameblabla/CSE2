@@ -7,9 +7,9 @@
 #define MA_API static
 #include "../../../external/miniaudio.h"
 
+#include "../Misc.h"
 #include "../../Organya.h"
 #include "../../WindowsWrapper.h"
-#include "../Misc.h"
 
 #include "SoftwareMixer.h"
 
@@ -84,15 +84,19 @@ BOOL AudioBackend_Init(void)
 	ma_result return_value;
 
 	return_value = ma_device_init(NULL, &config, &device);
+
 	if (return_value == MA_SUCCESS)
 	{
 		return_value = ma_mutex_init(device.pContext, &mutex);
+
 		if (return_value == MA_SUCCESS)
 		{
 			return_value = ma_mutex_init(device.pContext, &organya_mutex);
+
 			if (return_value == MA_SUCCESS)
 			{
 				return_value = ma_device_start(&device);
+
 				if (return_value == MA_SUCCESS)
 				{
 					output_frequency = device.sampleRate;
@@ -133,8 +137,7 @@ BOOL AudioBackend_Init(void)
 
 void AudioBackend_Deinit(void)
 {
-	ma_result return_value;
-	return_value = ma_device_stop(&device);
+	ma_result return_value = ma_device_stop(&device);
 
 	if (return_value != MA_SUCCESS)
 		Backend_PrintError("Failed to stop playback device: %s", ma_result_description(return_value));
