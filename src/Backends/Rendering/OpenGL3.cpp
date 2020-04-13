@@ -329,10 +329,11 @@ static VertexBufferSlot* GetVertexBufferSlot(unsigned int slots_needed)
 		while (current_vertex_buffer_slot + slots_needed > local_vertex_buffer_size)
 			local_vertex_buffer_size <<= 1;
 
-		VertexBufferSlot *reallocResult = (VertexBufferSlot *)realloc(local_vertex_buffer, local_vertex_buffer_size * sizeof(VertexBufferSlot));
-		if (reallocResult != NULL)
+		VertexBufferSlot *realloc_result = (VertexBufferSlot*)realloc(local_vertex_buffer, local_vertex_buffer_size * sizeof(VertexBufferSlot));
+
+		if (realloc_result != NULL)
 		{
-			local_vertex_buffer = reallocResult;
+			local_vertex_buffer = realloc_result;
 		}
 		else
 		{
@@ -427,47 +428,50 @@ static void GlyphBatch_Draw(spritebatch_sprite_t *sprites, int count, int textur
 	// Add data to the vertex queue
 	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot(count);
 
-	for (int i = 0; i < count; ++i)
+	if (vertex_buffer_slot != NULL)
 	{
-		RenderBackend_Glyph *glyph = (RenderBackend_Glyph*)sprites[i].image_id;
+		for (int i = 0; i < count; ++i)
+		{
+			RenderBackend_Glyph *glyph = (RenderBackend_Glyph*)sprites[i].image_id;
 
-		const GLfloat texture_left = sprites[i].minx;
-		const GLfloat texture_right = texture_left + ((GLfloat)glyph->width / (GLfloat)texture_w);	// Account for width not matching pitch
-		const GLfloat texture_top = sprites[i].maxy;
-		const GLfloat texture_bottom = sprites[i].miny;
+			const GLfloat texture_left = sprites[i].minx;
+			const GLfloat texture_right = texture_left + ((GLfloat)glyph->width / (GLfloat)texture_w);	// Account for width not matching pitch
+			const GLfloat texture_top = sprites[i].maxy;
+			const GLfloat texture_bottom = sprites[i].miny;
 
-		const GLfloat vertex_left = (sprites[i].x * (2.0f / glyph_destination_surface->width)) - 1.0f;
-		const GLfloat vertex_right = ((sprites[i].x + glyph->width) * (2.0f / glyph_destination_surface->width)) - 1.0f;
-		const GLfloat vertex_top = (sprites[i].y * (2.0f / glyph_destination_surface->height)) - 1.0f;
-		const GLfloat vertex_bottom = ((sprites[i].y + glyph->height) * (2.0f / glyph_destination_surface->height)) - 1.0f;
+			const GLfloat vertex_left = (sprites[i].x * (2.0f / glyph_destination_surface->width)) - 1.0f;
+			const GLfloat vertex_right = ((sprites[i].x + glyph->width) * (2.0f / glyph_destination_surface->width)) - 1.0f;
+			const GLfloat vertex_top = (sprites[i].y * (2.0f / glyph_destination_surface->height)) - 1.0f;
+			const GLfloat vertex_bottom = ((sprites[i].y + glyph->height) * (2.0f / glyph_destination_surface->height)) - 1.0f;
 
-		vertex_buffer_slot[i].vertices[0][0].texture_coordinate.x = texture_left;
-		vertex_buffer_slot[i].vertices[0][0].texture_coordinate.y = texture_top;
-		vertex_buffer_slot[i].vertices[0][1].texture_coordinate.x = texture_right;
-		vertex_buffer_slot[i].vertices[0][1].texture_coordinate.y = texture_top;
-		vertex_buffer_slot[i].vertices[0][2].texture_coordinate.x = texture_right;
-		vertex_buffer_slot[i].vertices[0][2].texture_coordinate.y = texture_bottom;
+			vertex_buffer_slot[i].vertices[0][0].texture_coordinate.x = texture_left;
+			vertex_buffer_slot[i].vertices[0][0].texture_coordinate.y = texture_top;
+			vertex_buffer_slot[i].vertices[0][1].texture_coordinate.x = texture_right;
+			vertex_buffer_slot[i].vertices[0][1].texture_coordinate.y = texture_top;
+			vertex_buffer_slot[i].vertices[0][2].texture_coordinate.x = texture_right;
+			vertex_buffer_slot[i].vertices[0][2].texture_coordinate.y = texture_bottom;
 
-		vertex_buffer_slot[i].vertices[1][0].texture_coordinate.x = texture_left;
-		vertex_buffer_slot[i].vertices[1][0].texture_coordinate.y = texture_top;
-		vertex_buffer_slot[i].vertices[1][1].texture_coordinate.x = texture_right;
-		vertex_buffer_slot[i].vertices[1][1].texture_coordinate.y = texture_bottom;
-		vertex_buffer_slot[i].vertices[1][2].texture_coordinate.x = texture_left;
-		vertex_buffer_slot[i].vertices[1][2].texture_coordinate.y = texture_bottom;
+			vertex_buffer_slot[i].vertices[1][0].texture_coordinate.x = texture_left;
+			vertex_buffer_slot[i].vertices[1][0].texture_coordinate.y = texture_top;
+			vertex_buffer_slot[i].vertices[1][1].texture_coordinate.x = texture_right;
+			vertex_buffer_slot[i].vertices[1][1].texture_coordinate.y = texture_bottom;
+			vertex_buffer_slot[i].vertices[1][2].texture_coordinate.x = texture_left;
+			vertex_buffer_slot[i].vertices[1][2].texture_coordinate.y = texture_bottom;
 
-		vertex_buffer_slot[i].vertices[0][0].vertex_coordinate.x = vertex_left;
-		vertex_buffer_slot[i].vertices[0][0].vertex_coordinate.y = vertex_top;
-		vertex_buffer_slot[i].vertices[0][1].vertex_coordinate.x = vertex_right;
-		vertex_buffer_slot[i].vertices[0][1].vertex_coordinate.y = vertex_top;
-		vertex_buffer_slot[i].vertices[0][2].vertex_coordinate.x = vertex_right;
-		vertex_buffer_slot[i].vertices[0][2].vertex_coordinate.y = vertex_bottom;
+			vertex_buffer_slot[i].vertices[0][0].vertex_coordinate.x = vertex_left;
+			vertex_buffer_slot[i].vertices[0][0].vertex_coordinate.y = vertex_top;
+			vertex_buffer_slot[i].vertices[0][1].vertex_coordinate.x = vertex_right;
+			vertex_buffer_slot[i].vertices[0][1].vertex_coordinate.y = vertex_top;
+			vertex_buffer_slot[i].vertices[0][2].vertex_coordinate.x = vertex_right;
+			vertex_buffer_slot[i].vertices[0][2].vertex_coordinate.y = vertex_bottom;
 
-		vertex_buffer_slot[i].vertices[1][0].vertex_coordinate.x = vertex_left;
-		vertex_buffer_slot[i].vertices[1][0].vertex_coordinate.y = vertex_top;
-		vertex_buffer_slot[i].vertices[1][1].vertex_coordinate.x = vertex_right;
-		vertex_buffer_slot[i].vertices[1][1].vertex_coordinate.y = vertex_bottom;
-		vertex_buffer_slot[i].vertices[1][2].vertex_coordinate.x = vertex_left;
-		vertex_buffer_slot[i].vertices[1][2].vertex_coordinate.y = vertex_bottom;
+			vertex_buffer_slot[i].vertices[1][0].vertex_coordinate.x = vertex_left;
+			vertex_buffer_slot[i].vertices[1][0].vertex_coordinate.y = vertex_top;
+			vertex_buffer_slot[i].vertices[1][1].vertex_coordinate.x = vertex_right;
+			vertex_buffer_slot[i].vertices[1][1].vertex_coordinate.y = vertex_bottom;
+			vertex_buffer_slot[i].vertices[1][2].vertex_coordinate.x = vertex_left;
+			vertex_buffer_slot[i].vertices[1][2].vertex_coordinate.y = vertex_bottom;
+		}
 	}
 }
 
@@ -761,33 +765,36 @@ void RenderBackend_DrawScreen(void)
 
 	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot(1);
 
-	vertex_buffer_slot->vertices[0][0].texture_coordinate.x = 0.0f;
-	vertex_buffer_slot->vertices[0][0].texture_coordinate.y = 1.0f;
-	vertex_buffer_slot->vertices[0][1].texture_coordinate.x = 1.0f;
-	vertex_buffer_slot->vertices[0][1].texture_coordinate.y = 1.0f;
-	vertex_buffer_slot->vertices[0][2].texture_coordinate.x = 1.0f;
-	vertex_buffer_slot->vertices[0][2].texture_coordinate.y = 0.0f;
+	if (vertex_buffer_slot != NULL)
+	{
+		vertex_buffer_slot->vertices[0][0].texture_coordinate.x = 0.0f;
+		vertex_buffer_slot->vertices[0][0].texture_coordinate.y = 1.0f;
+		vertex_buffer_slot->vertices[0][1].texture_coordinate.x = 1.0f;
+		vertex_buffer_slot->vertices[0][1].texture_coordinate.y = 1.0f;
+		vertex_buffer_slot->vertices[0][2].texture_coordinate.x = 1.0f;
+		vertex_buffer_slot->vertices[0][2].texture_coordinate.y = 0.0f;
 
-	vertex_buffer_slot->vertices[1][0].texture_coordinate.x = 0.0f;
-	vertex_buffer_slot->vertices[1][0].texture_coordinate.y = 1.0f;
-	vertex_buffer_slot->vertices[1][1].texture_coordinate.x = 1.0f;
-	vertex_buffer_slot->vertices[1][1].texture_coordinate.y = 0.0f;
-	vertex_buffer_slot->vertices[1][2].texture_coordinate.x = 0.0f;
-	vertex_buffer_slot->vertices[1][2].texture_coordinate.y = 0.0f;
+		vertex_buffer_slot->vertices[1][0].texture_coordinate.x = 0.0f;
+		vertex_buffer_slot->vertices[1][0].texture_coordinate.y = 1.0f;
+		vertex_buffer_slot->vertices[1][1].texture_coordinate.x = 1.0f;
+		vertex_buffer_slot->vertices[1][1].texture_coordinate.y = 0.0f;
+		vertex_buffer_slot->vertices[1][2].texture_coordinate.x = 0.0f;
+		vertex_buffer_slot->vertices[1][2].texture_coordinate.y = 0.0f;
 
-	vertex_buffer_slot->vertices[0][0].vertex_coordinate.x = -1.0f;
-	vertex_buffer_slot->vertices[0][0].vertex_coordinate.y = -1.0f;
-	vertex_buffer_slot->vertices[0][1].vertex_coordinate.x = 1.0f;
-	vertex_buffer_slot->vertices[0][1].vertex_coordinate.y = -1.0f;
-	vertex_buffer_slot->vertices[0][2].vertex_coordinate.x = 1.0f;
-	vertex_buffer_slot->vertices[0][2].vertex_coordinate.y = 1.0f;
+		vertex_buffer_slot->vertices[0][0].vertex_coordinate.x = -1.0f;
+		vertex_buffer_slot->vertices[0][0].vertex_coordinate.y = -1.0f;
+		vertex_buffer_slot->vertices[0][1].vertex_coordinate.x = 1.0f;
+		vertex_buffer_slot->vertices[0][1].vertex_coordinate.y = -1.0f;
+		vertex_buffer_slot->vertices[0][2].vertex_coordinate.x = 1.0f;
+		vertex_buffer_slot->vertices[0][2].vertex_coordinate.y = 1.0f;
 
-	vertex_buffer_slot->vertices[1][0].vertex_coordinate.x = -1.0f;
-	vertex_buffer_slot->vertices[1][0].vertex_coordinate.y = -1.0f;
-	vertex_buffer_slot->vertices[1][1].vertex_coordinate.x = 1.0f;
-	vertex_buffer_slot->vertices[1][1].vertex_coordinate.y = 1.0f;
-	vertex_buffer_slot->vertices[1][2].vertex_coordinate.x = -1.0f;
-	vertex_buffer_slot->vertices[1][2].vertex_coordinate.y = 1.0f;
+		vertex_buffer_slot->vertices[1][0].vertex_coordinate.x = -1.0f;
+		vertex_buffer_slot->vertices[1][0].vertex_coordinate.y = -1.0f;
+		vertex_buffer_slot->vertices[1][1].vertex_coordinate.x = 1.0f;
+		vertex_buffer_slot->vertices[1][1].vertex_coordinate.y = 1.0f;
+		vertex_buffer_slot->vertices[1][2].vertex_coordinate.x = -1.0f;
+		vertex_buffer_slot->vertices[1][2].vertex_coordinate.y = 1.0f;
+	}
 
 	FlushVertexBuffer();
 
@@ -937,33 +944,36 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RECT *rect,
 
 	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot(1);
 
-	vertex_buffer_slot->vertices[0][0].texture_coordinate.x = texture_left;
-	vertex_buffer_slot->vertices[0][0].texture_coordinate.y = texture_top;
-	vertex_buffer_slot->vertices[0][1].texture_coordinate.x = texture_right;
-	vertex_buffer_slot->vertices[0][1].texture_coordinate.y = texture_top;
-	vertex_buffer_slot->vertices[0][2].texture_coordinate.x = texture_right;
-	vertex_buffer_slot->vertices[0][2].texture_coordinate.y = texture_bottom;
+	if (vertex_buffer_slot != NULL)
+	{
+		vertex_buffer_slot->vertices[0][0].texture_coordinate.x = texture_left;
+		vertex_buffer_slot->vertices[0][0].texture_coordinate.y = texture_top;
+		vertex_buffer_slot->vertices[0][1].texture_coordinate.x = texture_right;
+		vertex_buffer_slot->vertices[0][1].texture_coordinate.y = texture_top;
+		vertex_buffer_slot->vertices[0][2].texture_coordinate.x = texture_right;
+		vertex_buffer_slot->vertices[0][2].texture_coordinate.y = texture_bottom;
 
-	vertex_buffer_slot->vertices[1][0].texture_coordinate.x = texture_left;
-	vertex_buffer_slot->vertices[1][0].texture_coordinate.y = texture_top;
-	vertex_buffer_slot->vertices[1][1].texture_coordinate.x = texture_right;
-	vertex_buffer_slot->vertices[1][1].texture_coordinate.y = texture_bottom;
-	vertex_buffer_slot->vertices[1][2].texture_coordinate.x = texture_left;
-	vertex_buffer_slot->vertices[1][2].texture_coordinate.y = texture_bottom;
+		vertex_buffer_slot->vertices[1][0].texture_coordinate.x = texture_left;
+		vertex_buffer_slot->vertices[1][0].texture_coordinate.y = texture_top;
+		vertex_buffer_slot->vertices[1][1].texture_coordinate.x = texture_right;
+		vertex_buffer_slot->vertices[1][1].texture_coordinate.y = texture_bottom;
+		vertex_buffer_slot->vertices[1][2].texture_coordinate.x = texture_left;
+		vertex_buffer_slot->vertices[1][2].texture_coordinate.y = texture_bottom;
 
-	vertex_buffer_slot->vertices[0][0].vertex_coordinate.x = vertex_left;
-	vertex_buffer_slot->vertices[0][0].vertex_coordinate.y = vertex_top;
-	vertex_buffer_slot->vertices[0][1].vertex_coordinate.x = vertex_right;
-	vertex_buffer_slot->vertices[0][1].vertex_coordinate.y = vertex_top;
-	vertex_buffer_slot->vertices[0][2].vertex_coordinate.x = vertex_right;
-	vertex_buffer_slot->vertices[0][2].vertex_coordinate.y = vertex_bottom;
+		vertex_buffer_slot->vertices[0][0].vertex_coordinate.x = vertex_left;
+		vertex_buffer_slot->vertices[0][0].vertex_coordinate.y = vertex_top;
+		vertex_buffer_slot->vertices[0][1].vertex_coordinate.x = vertex_right;
+		vertex_buffer_slot->vertices[0][1].vertex_coordinate.y = vertex_top;
+		vertex_buffer_slot->vertices[0][2].vertex_coordinate.x = vertex_right;
+		vertex_buffer_slot->vertices[0][2].vertex_coordinate.y = vertex_bottom;
 
-	vertex_buffer_slot->vertices[1][0].vertex_coordinate.x = vertex_left;
-	vertex_buffer_slot->vertices[1][0].vertex_coordinate.y = vertex_top;
-	vertex_buffer_slot->vertices[1][1].vertex_coordinate.x = vertex_right;
-	vertex_buffer_slot->vertices[1][1].vertex_coordinate.y = vertex_bottom;
-	vertex_buffer_slot->vertices[1][2].vertex_coordinate.x = vertex_left;
-	vertex_buffer_slot->vertices[1][2].vertex_coordinate.y = vertex_bottom;
+		vertex_buffer_slot->vertices[1][0].vertex_coordinate.x = vertex_left;
+		vertex_buffer_slot->vertices[1][0].vertex_coordinate.y = vertex_top;
+		vertex_buffer_slot->vertices[1][1].vertex_coordinate.x = vertex_right;
+		vertex_buffer_slot->vertices[1][1].vertex_coordinate.y = vertex_bottom;
+		vertex_buffer_slot->vertices[1][2].vertex_coordinate.x = vertex_left;
+		vertex_buffer_slot->vertices[1][2].vertex_coordinate.y = vertex_bottom;
+	}
 }
 
 void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RECT *rect, unsigned char red, unsigned char green, unsigned char blue)
@@ -1012,19 +1022,22 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RECT *rect, 
 
 	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot(1);
 
-	vertex_buffer_slot->vertices[0][0].vertex_coordinate.x = vertex_left;
-	vertex_buffer_slot->vertices[0][0].vertex_coordinate.y = vertex_top;
-	vertex_buffer_slot->vertices[0][1].vertex_coordinate.x = vertex_right;
-	vertex_buffer_slot->vertices[0][1].vertex_coordinate.y = vertex_top;
-	vertex_buffer_slot->vertices[0][2].vertex_coordinate.x = vertex_right;
-	vertex_buffer_slot->vertices[0][2].vertex_coordinate.y = vertex_bottom;
+	if (vertex_buffer_slot != NULL)
+	{
+		vertex_buffer_slot->vertices[0][0].vertex_coordinate.x = vertex_left;
+		vertex_buffer_slot->vertices[0][0].vertex_coordinate.y = vertex_top;
+		vertex_buffer_slot->vertices[0][1].vertex_coordinate.x = vertex_right;
+		vertex_buffer_slot->vertices[0][1].vertex_coordinate.y = vertex_top;
+		vertex_buffer_slot->vertices[0][2].vertex_coordinate.x = vertex_right;
+		vertex_buffer_slot->vertices[0][2].vertex_coordinate.y = vertex_bottom;
 
-	vertex_buffer_slot->vertices[1][0].vertex_coordinate.x = vertex_left;
-	vertex_buffer_slot->vertices[1][0].vertex_coordinate.y = vertex_top;
-	vertex_buffer_slot->vertices[1][1].vertex_coordinate.x = vertex_right;
-	vertex_buffer_slot->vertices[1][1].vertex_coordinate.y = vertex_bottom;
-	vertex_buffer_slot->vertices[1][2].vertex_coordinate.x = vertex_left;
-	vertex_buffer_slot->vertices[1][2].vertex_coordinate.y = vertex_bottom;
+		vertex_buffer_slot->vertices[1][0].vertex_coordinate.x = vertex_left;
+		vertex_buffer_slot->vertices[1][0].vertex_coordinate.y = vertex_top;
+		vertex_buffer_slot->vertices[1][1].vertex_coordinate.x = vertex_right;
+		vertex_buffer_slot->vertices[1][1].vertex_coordinate.y = vertex_bottom;
+		vertex_buffer_slot->vertices[1][2].vertex_coordinate.x = vertex_left;
+		vertex_buffer_slot->vertices[1][2].vertex_coordinate.y = vertex_bottom;
+	}
 }
 
 // ====================
