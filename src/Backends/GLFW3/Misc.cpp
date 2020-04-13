@@ -14,11 +14,11 @@
 
 #include "Window.h"
 #include "../Rendering.h"
+#include "../../Attributes.h"
 #include "../../Main.h"
 #include "../../Organya.h"
 #include "../../Profile.h"
 #include "../../Resource.h"
-#include "../../Attributes.h"
 
 #define DO_KEY(GLFW_KEY, BACKEND_KEY) \
 	case GLFW_KEY: \

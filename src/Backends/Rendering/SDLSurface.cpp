@@ -52,12 +52,11 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 	if (window != NULL)
 	{
 		if (fullscreen)
-		{
 			if (SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN) < 0)
 				Backend_PrintError("Could not set window to fullscreen: %s", SDL_GetError());
-		}
 
 		window_sdlsurface = SDL_GetWindowSurface(window);
+
 		if (window_sdlsurface != NULL)
 		{
 			framebuffer.sdlsurface = SDL_CreateRGBSurfaceWithFormat(0, window_sdlsurface->w, window_sdlsurface->h, 0, SDL_PIXELFORMAT_RGB24);

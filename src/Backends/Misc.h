@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../WindowsWrapper.h"
 #include "../Attributes.h"
+#include "../WindowsWrapper.h"
 
 enum
 {
