@@ -97,93 +97,75 @@ void ControllerBackend_Deinit(void)
 	axis_neutrals = NULL;
 }
 
-BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
+BOOL ControllerBackend_GetJoystickStatus(BOOL **buttons, unsigned int *button_count, short **axes, unsigned int *axis_count)
 {
 	if (!joystick_connected)
 		return FALSE;
 
-	const size_t button_limit = sizeof(status->bButton) / sizeof(status->bButton[0]);
+	int total_glfw_buttons;
+	const unsigned char *glfw_buttons = glfwGetJoystickButtons(connected_joystick_id, &total_glfw_buttons);
 
-	int total_buttons;
-	const unsigned char *buttons = glfwGetJoystickButtons(connected_joystick_id, &total_buttons);
+	int total_glfw_axes;
+	const float *glfw_axes = glfwGetJoystickAxes(connected_joystick_id, &total_glfw_axes);
 
-	int total_axes;
-	const float *axes = glfwGetJoystickAxes(connected_joystick_id, &total_axes);
-
+	int total_glfw_hats = 0;
 #if GLFW_VERSION_MAJOR > 3 || (GLFW_VERSION_MAJOR == 3 && GLFW_VERSION_MINOR >= 3)
-	int total_hats;
-	const unsigned char *hats = glfwGetJoystickHats(connected_joystick_id, &total_hats);
+	const unsigned char *glfw_hats = glfwGetJoystickHats(connected_joystick_id, &total_glfw_hats);
 #endif
 
-	// Handle directional inputs
-	status->bLeft = axes[0] < axis_neutrals[0] - DEADZONE;
-	status->bRight = axes[0] > axis_neutrals[0] + DEADZONE;
-	status->bUp = axes[1] < axis_neutrals[1] - DEADZONE;
-	status->bDown = axes[1] > axis_neutrals[1] + DEADZONE;
+	*button_count = total_glfw_buttons + total_glfw_axes * 2 + total_glfw_hats * 4;
+	*axis_count = total_glfw_axes;
 
-	// Handle button inputs
-	unsigned int buttons_done = 0;
+	static BOOL *button_buffer = NULL;
+	static short *axis_buffer = NULL;
+
+	BOOL *new_button_buffer = (BOOL*)realloc(button_buffer, *button_count * sizeof(BOOL));
+	short *new_axis_buffer = (short*)realloc(axis_buffer, *axis_count * sizeof(short));
+
+	if (new_button_buffer == NULL || new_axis_buffer == NULL)
+		return FALSE;
+
+	button_buffer = new_button_buffer;
+	axis_buffer = new_axis_buffer;
+
+	//////////////////////////
+	// Handle button inputs //
+	//////////////////////////
+
+	unsigned int current_button = 0;
 
 	// Start with the joystick buttons
-	for (int i = 0; i < total_buttons; ++i)
-	{
-		status->bButton[buttons_done] = buttons[i] == GLFW_PRESS;
-
-		if (++buttons_done >= button_limit)
-			break;
-	}
+	for (int i = 0; i < total_glfw_buttons; ++i)
+		button_buffer[current_button++] = glfw_buttons[i] == GLFW_PRESS;
 
 	// Then the joystick axes
-	for (int i = 0; i < total_axes; ++i)
+	for (int i = 0; i < total_glfw_axes; ++i)
 	{
-		status->bButton[buttons_done] = axes[i] < axis_neutrals[i] - DEADZONE;
-
-		if (++buttons_done >= button_limit)
-			break;
-
-		status->bButton[buttons_done] = axes[i] > axis_neutrals[i] + DEADZONE;
-
-		if (++buttons_done >= button_limit)
-			break;
+		button_buffer[current_button++] = glfw_axes[i] < axis_neutrals[i] - DEADZONE;
+		button_buffer[current_button++] = glfw_axes[i] > axis_neutrals[i] + DEADZONE;
 	}
 
 #if GLFW_VERSION_MAJOR > 3 || (GLFW_VERSION_MAJOR == 3 && GLFW_VERSION_MINOR >= 3)
 	// Then the joystick hats
-	for (int i = 0; i < total_axes; ++i)
+	for (int i = 0; i < total_glfw_hats; ++i)
 	{
-		status->bButton[buttons_done] = hats[i] & GLFW_HAT_UP;
-
-		if (++buttons_done >= button_limit)
-			break;
-
-		status->bButton[buttons_done] = hats[i] & GLFW_HAT_RIGHT;
-
-		if (++buttons_done >= button_limit)
-			break;
-
-		status->bButton[buttons_done] = hats[i] & GLFW_HAT_DOWN;
-
-		if (++buttons_done >= button_limit)
-			break;
-
-		status->bButton[buttons_done] = hats[i] & GLFW_HAT_LEFT;
-
-		if (++buttons_done >= button_limit)
-			break;
+		button_buffer[current_button++] = glfw_hats[i] & GLFW_HAT_UP;
+		button_buffer[current_button++] = glfw_hats[i] & GLFW_HAT_RIGHT;
+		button_buffer[current_button++] = glfw_hats[i] & GLFW_HAT_DOWN;
+		button_buffer[current_button++] = glfw_hats[i] & GLFW_HAT_LEFT;
 	}
 #endif
 
-	// Blank any remaining buttons
-	for (size_t i = buttons_done; i < button_limit; ++i)
-		status->bButton[i] = FALSE;
+	*buttons = button_buffer;
 
-	return TRUE;
-}
+	////////////////////////
+	// Handle axis inputs //
+	////////////////////////
 
-BOOL ControllerBackend_ResetJoystickStatus(void)
-{
-	if (!joystick_connected)
-		return FALSE;
+	for (int i = 0; i < total_glfw_axes; ++i)
+		axis_buffer[i] = (short)(glfw_axes[i] * 0x7FFF);
+
+	*axes = axis_buffer;
 
 	return TRUE;
 }

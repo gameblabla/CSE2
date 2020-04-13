@@ -37,104 +37,78 @@ void ControllerBackend_Deinit(void)
 	SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
 }
 
-BOOL ControllerBackend_GetJoystickStatus(JOYSTICK_STATUS *status)
+BOOL ControllerBackend_GetJoystickStatus(BOOL **buttons, unsigned int *button_count, short **axes, unsigned int *axis_count)
 {
 	if (joystick == NULL)
 		return FALSE;
 
-	const size_t button_limit = sizeof(status->bButton) / sizeof(status->bButton[0]);
-
-	// Handle directional inputs
-	const Sint16 joystick_x = SDL_JoystickGetAxis(joystick, 0);
-	if (joystick_x == 0)
-		Backend_PrintError("Failed to get current state of X axis control on joystick: %s", SDL_GetError());
-
-	const Sint16 joystick_y = SDL_JoystickGetAxis(joystick, 1);
-	if (joystick_y == 0)
-		Backend_PrintError("Failed to get current state of Y axis control on joystick: %s", SDL_GetError());
-
-	status->bLeft = joystick_x < axis_neutrals[0] - DEADZONE;
-	status->bRight = joystick_x > axis_neutrals[0] + DEADZONE;
-	status->bUp = joystick_y < axis_neutrals[1] - DEADZONE;
-	status->bDown = joystick_y > axis_neutrals[1] + DEADZONE;
-
-	// Handle button inputs
-	int total_buttons = SDL_JoystickNumButtons(joystick);
-	if (total_buttons < 0)
+	int total_sdl_buttons = SDL_JoystickNumButtons(joystick);
+	if (total_sdl_buttons < 0)
 		Backend_PrintError("Failed to get number of buttons on joystick: %s", SDL_GetError());
 
-	int total_axes = SDL_JoystickNumAxes(joystick);
-	if (total_axes < 0)
+	int total_sdl_axes = SDL_JoystickNumAxes(joystick);
+	if (total_sdl_axes < 0)
 		Backend_PrintError("Failed to get number of general axis controls on joystick: %s", SDL_GetError());
 
-	int total_hats = SDL_JoystickNumHats(joystick);
-	if (total_hats < 0)
+	int total_sdl_hats = SDL_JoystickNumHats(joystick);
+	if (total_sdl_hats < 0)
 		Backend_PrintError("Failed to get number of POV hats on joystick: %s", SDL_GetError());
 
-	unsigned int buttons_done = 0;
+	*button_count = total_sdl_buttons + total_sdl_axes * 2 + total_sdl_hats * 4;
+	*axis_count = total_sdl_axes;
+
+	static BOOL *button_buffer = NULL;
+	static short *axis_buffer = NULL;
+
+	BOOL *new_button_buffer = (BOOL*)realloc(button_buffer, *button_count * sizeof(BOOL));
+	short *new_axis_buffer = (short*)realloc(axis_buffer, *axis_count * sizeof(short));
+
+	if (new_button_buffer == NULL || new_axis_buffer == NULL)
+		return FALSE;
+
+	button_buffer = new_button_buffer;
+	axis_buffer = new_axis_buffer;
+
+	//////////////////////////
+	// Handle button inputs //
+	//////////////////////////
+
+	unsigned int current_button = 0;
 
 	// Start with the joystick buttons
-	for (int i = 0; i < total_buttons; ++i)
-	{
-		status->bButton[buttons_done] = SDL_JoystickGetButton(joystick, i);
-
-		if (++buttons_done >= button_limit)
-			break;
-	}
+	for (int i = 0; i < total_sdl_buttons; ++i)
+		button_buffer[current_button++] = SDL_JoystickGetButton(joystick, i);
 
 	// Then the joystick axes
-	for (int i = 0; i < total_axes; ++i)
+	for (int i = 0; i < total_sdl_axes; ++i)
 	{
 		Sint16 axis = SDL_JoystickGetAxis(joystick, i);
 
-		status->bButton[buttons_done] = axis < axis_neutrals[i] - DEADZONE;
-
-		if (++buttons_done >= button_limit)
-			break;
-
-		status->bButton[buttons_done] = axis > axis_neutrals[i] + DEADZONE;
-
-		if (++buttons_done >= button_limit)
-			break;
+		button_buffer[current_button++] = axis < axis_neutrals[i] - DEADZONE;
+		button_buffer[current_button++] = axis > axis_neutrals[i] + DEADZONE;
 	}
 
 	// Then the joystick hats
-	for (int i = 0; i < total_hats; ++i)
+	for (int i = 0; i < total_sdl_hats; ++i)
 	{
 		Uint8 hat = SDL_JoystickGetHat(joystick, i);
 
-		status->bButton[buttons_done] = hat == SDL_HAT_UP || hat == SDL_HAT_LEFTUP || hat == SDL_HAT_RIGHTUP;
-
-		if (++buttons_done >= button_limit)
-			break;
-
-		status->bButton[buttons_done] = hat == SDL_HAT_RIGHT || hat == SDL_HAT_RIGHTUP || hat == SDL_HAT_RIGHTDOWN;
-
-		if (++buttons_done >= button_limit)
-			break;
-
-		status->bButton[buttons_done] = hat == SDL_HAT_DOWN || hat == SDL_HAT_LEFTDOWN || hat == SDL_HAT_RIGHTDOWN;
-
-		if (++buttons_done >= button_limit)
-			break;
-
-		status->bButton[buttons_done] = hat == SDL_HAT_LEFT || hat == SDL_HAT_LEFTUP || hat == SDL_HAT_LEFTDOWN;
-
-		if (++buttons_done >= button_limit)
-			break;
+		button_buffer[current_button++] = hat == SDL_HAT_UP || hat == SDL_HAT_LEFTUP || hat == SDL_HAT_RIGHTUP;
+		button_buffer[current_button++] = hat == SDL_HAT_RIGHT || hat == SDL_HAT_RIGHTUP || hat == SDL_HAT_RIGHTDOWN;
+		button_buffer[current_button++] = hat == SDL_HAT_DOWN || hat == SDL_HAT_LEFTDOWN || hat == SDL_HAT_RIGHTDOWN;
+		button_buffer[current_button++] = hat == SDL_HAT_LEFT || hat == SDL_HAT_LEFTUP || hat == SDL_HAT_LEFTDOWN;
 	}
 
-	// Blank any remaining buttons
-	for (size_t i = buttons_done; i < button_limit; ++i)
-		status->bButton[i] = FALSE;
+	*buttons = button_buffer;
 
-	return TRUE;
-}
+	////////////////////////
+	// Handle axis inputs //
+	////////////////////////
 
-BOOL ControllerBackend_ResetJoystickStatus(void)
-{
-	if (joystick == NULL)
-		return FALSE;
+	for (int i = 0; i < total_sdl_axes; ++i)
+		axis_buffer[i] = SDL_JoystickGetAxis(joystick, i);
+
+	*axes = axis_buffer;
 
 	return TRUE;
 }
