@@ -7,7 +7,6 @@
 #include "SDL.h"
 
 #include "../Misc.h"
-#include "../../WindowsWrapper.h"
 
 #define DEADZONE 10000
 
@@ -15,15 +14,15 @@ static SDL_Joystick *joystick;
 
 static Sint16 *axis_neutrals;
 
-BOOL ControllerBackend_Init(void)
+bool ControllerBackend_Init(void)
 {
 	if (SDL_InitSubSystem(SDL_INIT_JOYSTICK) < 0)
 	{
 		Backend_PrintError("Couldn't initialise joystick SDL subsystem: %s", SDL_GetError());
-		return FALSE;
+		return false;
 	}
 
-	return TRUE;
+	return true;
 }
 
 void ControllerBackend_Deinit(void)
@@ -37,10 +36,10 @@ void ControllerBackend_Deinit(void)
 	SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
 }
 
-BOOL ControllerBackend_GetJoystickStatus(BOOL **buttons, unsigned int *button_count, short **axes, unsigned int *axis_count)
+bool ControllerBackend_GetJoystickStatus(bool **buttons, unsigned int *button_count, short **axes, unsigned int *axis_count)
 {
 	if (joystick == NULL)
-		return FALSE;
+		return false;
 
 	int total_sdl_buttons = SDL_JoystickNumButtons(joystick);
 	if (total_sdl_buttons < 0)
@@ -57,14 +56,14 @@ BOOL ControllerBackend_GetJoystickStatus(BOOL **buttons, unsigned int *button_co
 	*button_count = total_sdl_buttons + total_sdl_axes * 2 + total_sdl_hats * 4;
 	*axis_count = total_sdl_axes;
 
-	static BOOL *button_buffer = NULL;
+	static bool *button_buffer = NULL;
 	static short *axis_buffer = NULL;
 
-	BOOL *new_button_buffer = (BOOL*)realloc(button_buffer, *button_count * sizeof(BOOL));
+	bool *new_button_buffer = (bool*)realloc(button_buffer, *button_count * sizeof(bool));
 	short *new_axis_buffer = (short*)realloc(axis_buffer, *axis_count * sizeof(short));
 
 	if (new_button_buffer == NULL || new_axis_buffer == NULL)
-		return FALSE;
+		return false;
 
 	button_buffer = new_button_buffer;
 	axis_buffer = new_axis_buffer;
@@ -110,7 +109,7 @@ BOOL ControllerBackend_GetJoystickStatus(BOOL **buttons, unsigned int *button_co
 
 	*axes = axis_buffer;
 
-	return TRUE;
+	return true;
 }
 
 void ControllerBackend_JoystickConnect(Sint32 joystick_id)

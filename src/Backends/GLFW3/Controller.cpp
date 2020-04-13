@@ -8,11 +8,10 @@
 #include <GLFW/glfw3.h>
 
 #include "../Misc.h"
-#include "../../WindowsWrapper.h"
 
 #define DEADZONE (10000.0f / 32767.0f)
 
-static BOOL joystick_connected;
+static bool joystick_connected;
 static int connected_joystick_id;
 
 static float *axis_neutrals;
@@ -47,7 +46,7 @@ static void JoystickCallback(int joystick_id, int event)
 								axis_neutrals[i] = axes[i];
 
 							printf("Joystick #%d selected\n", joystick_id);
-							joystick_connected = TRUE;
+							joystick_connected = true;
 							connected_joystick_id = joystick_id;
 						}
 						else
@@ -64,7 +63,7 @@ static void JoystickCallback(int joystick_id, int event)
 			if (joystick_connected && joystick_id == connected_joystick_id)
 			{
 				Backend_PrintInfo("Joystick #%d disconnected", connected_joystick_id);
-				joystick_connected = FALSE;
+				joystick_connected = false;
 
 				free(axis_neutrals);
 			}
@@ -73,7 +72,7 @@ static void JoystickCallback(int joystick_id, int event)
 	}
 }
 
-BOOL ControllerBackend_Init(void)
+bool ControllerBackend_Init(void)
 {
 	// Connect joysticks that are already plugged-in
 	for (int i = GLFW_JOYSTICK_1; i < GLFW_JOYSTICK_LAST; ++i)
@@ -83,24 +82,24 @@ BOOL ControllerBackend_Init(void)
 	// Set-up the callback for future (dis)connections
 	glfwSetJoystickCallback(JoystickCallback);
 
-	return TRUE;
+	return true;
 }
 
 void ControllerBackend_Deinit(void)
 {
 	glfwSetJoystickCallback(NULL);
 
-	joystick_connected = FALSE;
+	joystick_connected = false;
 	connected_joystick_id = 0;
 
 	free(axis_neutrals);
 	axis_neutrals = NULL;
 }
 
-BOOL ControllerBackend_GetJoystickStatus(BOOL **buttons, unsigned int *button_count, short **axes, unsigned int *axis_count)
+bool ControllerBackend_GetJoystickStatus(bool **buttons, unsigned int *button_count, short **axes, unsigned int *axis_count)
 {
 	if (!joystick_connected)
-		return FALSE;
+		return false;
 
 	int total_glfw_buttons;
 	const unsigned char *glfw_buttons = glfwGetJoystickButtons(connected_joystick_id, &total_glfw_buttons);
@@ -116,14 +115,14 @@ BOOL ControllerBackend_GetJoystickStatus(BOOL **buttons, unsigned int *button_co
 	*button_count = total_glfw_buttons + total_glfw_axes * 2 + total_glfw_hats * 4;
 	*axis_count = total_glfw_axes;
 
-	static BOOL *button_buffer = NULL;
+	static bool *button_buffer = NULL;
 	static short *axis_buffer = NULL;
 
-	BOOL *new_button_buffer = (BOOL*)realloc(button_buffer, *button_count * sizeof(BOOL));
+	bool *new_button_buffer = (bool*)realloc(button_buffer, *button_count * sizeof(bool));
 	short *new_axis_buffer = (short*)realloc(axis_buffer, *axis_count * sizeof(short));
 
 	if (new_button_buffer == NULL || new_axis_buffer == NULL)
-		return FALSE;
+		return false;
 
 	button_buffer = new_button_buffer;
 	axis_buffer = new_axis_buffer;
@@ -167,5 +166,5 @@ BOOL ControllerBackend_GetJoystickStatus(BOOL **buttons, unsigned int *button_co
 
 	*axes = axis_buffer;
 
-	return TRUE;
+	return true;
 }
