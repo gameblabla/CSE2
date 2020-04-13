@@ -6,8 +6,8 @@
 
 #include "SDL.h"
 
-#include "../../WindowsWrapper.h"
 #include "../Misc.h"
+#include "../../WindowsWrapper.h"
 
 #define DEADZONE 10000
 
@@ -142,6 +142,7 @@ BOOL ControllerBackend_ResetJoystickStatus(void)
 void ControllerBackend_JoystickConnect(Sint32 joystick_id)
 {
 	const char *joystick_name = SDL_JoystickNameForIndex(joystick_id);
+
 	if (joystick_name != NULL)
 	{
 		Backend_PrintInfo("Joystick #%d connected - %s", joystick_id, joystick_name);
@@ -172,17 +173,22 @@ void ControllerBackend_JoystickConnect(Sint32 joystick_id)
 
 				// Set up neutral axes
 				axis_neutrals = (Sint16*)malloc(sizeof(Sint16) * total_axes);
+
 				if (axis_neutrals != NULL)
+				{
 					for (int i = 0; i < total_axes; ++i)
 						axis_neutrals[i] = SDL_JoystickGetAxis(joystick, i);
+
+					return;
+				}
 				else
+				{
 					Backend_PrintError("Couldn't allocate memory for neutral axes");
+				}
 			}
-			else
-			{
-				SDL_JoystickClose(joystick);
-				joystick = NULL;
-			}
+
+			SDL_JoystickClose(joystick);
+			joystick = NULL;
 		}
 		else
 		{

@@ -45,22 +45,29 @@ BOOL Backend_Init(void)
 			const char *driver = SDL_GetCurrentVideoDriver();
 
 			if (driver != NULL)
+			{
 				Backend_PrintInfo("Selected SDL video driver: %s", driver);
-			else
-				Backend_PrintError("No SDL video driver initialized !");
 
-			return TRUE;
+				return TRUE;
+			}
+			else
+			{
+				Backend_PrintError("No SDL video driver initialized!");
+			}
+		}
+		else
+		{
+			std::string error_message = std::string("Could not initialise SDL video subsystem: ") + SDL_GetError();
+			Backend_ShowMessageBox("Fatal error", error_message.c_str());
 		}
 
-		std::string error_message = std::string("Could not initialise SDL video subsystem: ") + SDL_GetError();
-		Backend_ShowMessageBox("Fatal error", error_message.c_str());
-
 		SDL_Quit();
-		return FALSE;
 	}
-
-	std::string error_message = std::string("Could not initialise SDL: ") + SDL_GetError();
-	Backend_ShowMessageBox("Fatal error", error_message.c_str());
+	else
+	{
+		std::string error_message = std::string("Could not initialise SDL: ") + SDL_GetError();
+		Backend_ShowMessageBox("Fatal error", error_message.c_str());
+	}
 
 	return FALSE;
 }
@@ -301,6 +308,7 @@ void Backend_GetKeyboardState(BOOL *out_keyboard_state)
 void Backend_ShowMessageBox(const char *title, const char *message)
 {
 	fprintf(stderr, "ShowMessageBox - '%s' - '%s'\n", title, message);
+
 	if (SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, message, window) != 0)
 		Backend_PrintError("Was also unable to display a message box containing the error: %s", SDL_GetError());
 }
