@@ -35,29 +35,18 @@ static RenderBackend_Surface *glyph_destination_surface;
 
 RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, BOOL fullscreen)
 {
-	Backend_PrintInfo("Initializing Software rendering backend...");
 	size_t pitch;
 	framebuffer.pixels = WindowBackend_Software_CreateWindow(window_title, screen_width, screen_height, fullscreen, &pitch);
 	framebuffer.width = screen_width;
 	framebuffer.height = screen_height;
 	framebuffer.pitch = pitch;
 
-	if (framebuffer.pixels)
-	{
-		Backend_PrintInfo("Successfully initialized Software rendering backend");
-		return &framebuffer;
-	}
-	else
-	{
-		Backend_PrintError("Failed to create window");
-	}
+	return &framebuffer;
 }
 
 void RenderBackend_Deinit(void)
 {
-	Backend_PrintInfo("De-initializing Software rendering backend...");
 	WindowBackend_Software_DestroyWindow();
-	Backend_PrintInfo("Finished de-initializing Software rendering backend");
 }
 
 void RenderBackend_DrawScreen(void)

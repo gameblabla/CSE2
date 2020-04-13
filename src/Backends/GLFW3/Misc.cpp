@@ -159,14 +159,10 @@ static void ErrorCallback(int code, const char *description)
 
 BOOL Backend_Init(void)
 {
-	Backend_PrintInfo("Initializing GLFW platform backend...");
 	glfwSetErrorCallback(ErrorCallback);
 
 	if (glfwInit() == GL_TRUE)
-	{
-		Backend_PrintInfo("Successfully initialized GLFW platform backend");
 		return TRUE;
-	}
 
 	Backend_ShowMessageBox("Fatal error", "Could not initialise GLFW3");
 
@@ -175,12 +171,10 @@ BOOL Backend_Init(void)
 
 void Backend_Deinit(void)
 {
-	Backend_PrintInfo("De-initializing GLFW platform backend...");
 	if (cursor != NULL)
 		glfwDestroyCursor(cursor);
 
 	glfwTerminate();
-	Backend_PrintInfo("Finished de-initializing GLFW platform backend ");
 }
 
 void Backend_PostWindowCreation(void)
