@@ -15,6 +15,7 @@ set(ASSETS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/assets")
 option(JAPANESE "Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)" OFF)
 option(FIX_BUGS "Fix various bugs in the game" OFF)
 option(DEBUG_SAVE "Re-enable the ability to drag-and-drop save files onto the window" OFF)
+option(BUILD_DOCONFIG "Compile a DoConfig clone tool - not useful for console ports" ON)
 
 set(BACKEND_RENDERER "SDLTexture" CACHE STRING "Which renderer the game should use: 'OpenGL3' for an OpenGL 3.2 renderer, 'OpenGLES2' for an OpenGL ES 2.0 renderer, 'SDLTexture' for SDL2's hardware-accelerated Texture API, 'SDLSurface' for SDL2's software-rendered Surface API, or 'Software' for a handwritten software renderer")
 set(BACKEND_AUDIO "SDL2" CACHE STRING "Which audio backend the game should use: 'SDL2', 'miniaudio', or 'Null'")
@@ -625,16 +626,18 @@ endforeach()
 # DoConfig #
 ############
 
-add_subdirectory("DoConfig")
+if(BUILD_DOCONFIG)
+	add_subdirectory("DoConfig")
 
-# Name debug builds "DoConfig_debug", to distinguish them
-set_target_properties(DoConfig PROPERTIES DEBUG_OUTPUT_NAME "DoConfig_debug")
+	# Name debug builds "DoConfig_debug", to distinguish them
+	set_target_properties(DoConfig PROPERTIES DEBUG_OUTPUT_NAME "DoConfig_debug")
 
-# Send executable to the build_en/build_jp directory
-set_target_properties(DoConfig PROPERTIES
-	RUNTIME_OUTPUT_DIRECTORY ${BUILD_DIRECTORY}
-	RUNTIME_OUTPUT_DIRECTORY_RELEASE ${BUILD_DIRECTORY}
-	RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${BUILD_DIRECTORY}
-	RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${BUILD_DIRECTORY}
-	RUNTIME_OUTPUT_DIRECTORY_DEBUG ${BUILD_DIRECTORY}
-)
+	# Send executable to the build_en/build_jp directory
+	set_target_properties(DoConfig PROPERTIES
+		RUNTIME_OUTPUT_DIRECTORY ${BUILD_DIRECTORY}
+		RUNTIME_OUTPUT_DIRECTORY_RELEASE ${BUILD_DIRECTORY}
+		RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${BUILD_DIRECTORY}
+		RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${BUILD_DIRECTORY}
+		RUNTIME_OUTPUT_DIRECTORY_DEBUG ${BUILD_DIRECTORY}
+	)
+endif()
