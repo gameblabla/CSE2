@@ -41,6 +41,12 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 	framebuffer.height = screen_height;
 	framebuffer.pitch = pitch;
 
+	if (framebuffer.pixels == NULL)
+	{
+		Backend_PrintError("Failed to create window");
+		return NULL;
+	}
+
 	return &framebuffer;
 }
 
