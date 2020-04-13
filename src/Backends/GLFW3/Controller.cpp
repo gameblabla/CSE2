@@ -38,18 +38,22 @@ static void JoystickCallback(int joystick_id, int event)
 					if (glfwJoystickIsGamepad(joystick_id) == GLFW_TRUE)	// Avoid selecting things like laptop touchpads
 #endif
 					{
-						printf("Joystick #%d selected\n", joystick_id);
-						joystick_connected = TRUE;
-						connected_joystick_id = joystick_id;
-
 						// Set up neutral axes
 						axis_neutrals = (float*)malloc(sizeof(float) * total_axes);
 
 						if (axis_neutrals != NULL)
+						{
 							for (int i = 0; i < total_axes; ++i)
 								axis_neutrals[i] = axes[i];
+
+							printf("Joystick #%d selected\n", joystick_id);
+							joystick_connected = TRUE;
+							connected_joystick_id = joystick_id;
+						}
 						else
-							Backend_PrintError("Couldn't allocate memory for axis");
+						{
+							Backend_PrintError("Couldn't allocate memory for joystick axes");
+						}
 					}
 				}
 			}
