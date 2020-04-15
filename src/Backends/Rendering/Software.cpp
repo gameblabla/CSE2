@@ -172,7 +172,7 @@ ATTRIBUTE_HOT void RenderBackend_Blit(RenderBackend_Surface *source_surface, con
 	{
 		for (long j = 0; j < rect_clamped.bottom - rect_clamped.top; ++j)
 		{
-			unsigned char *source_pointer = &source_surface->pixels[((rect_clamped.top + j) * source_surface->pitch) + (rect_clamped.left * 3)];
+			const unsigned char *source_pointer = &source_surface->pixels[((rect_clamped.top + j) * source_surface->pitch) + (rect_clamped.left * 3)];
 			unsigned char *destination_pointer = &destination_surface->pixels[((y + j) * destination_surface->pitch) + (x * 3)];
 
 			for (long i = 0; i < rect_clamped.right - rect_clamped.left; ++i)
@@ -193,12 +193,15 @@ ATTRIBUTE_HOT void RenderBackend_Blit(RenderBackend_Surface *source_surface, con
 	}
 	else
 	{
+		const unsigned char *source_pointer = &source_surface->pixels[(rect_clamped.top * source_surface->pitch) + (rect_clamped.left * 3)];
+		unsigned char *destination_pointer = &destination_surface->pixels[(y * destination_surface->pitch) + (x * 3)];
+
 		for (long j = 0; j < rect_clamped.bottom - rect_clamped.top; ++j)
 		{
-			unsigned char *source_pointer = &source_surface->pixels[((rect_clamped.top + j) * source_surface->pitch) + (rect_clamped.left * 3)];
-			unsigned char *destination_pointer = &destination_surface->pixels[((y + j) * destination_surface->pitch) + (x * 3)];
-
 			memcpy(destination_pointer, source_pointer, (rect_clamped.right - rect_clamped.left) * 3);
+
+			source_pointer += source_surface->pitch;
+			destination_pointer += destination_surface->pitch;
 		}
 	}
 }
