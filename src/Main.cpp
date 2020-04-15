@@ -35,6 +35,7 @@ BOOL bFullscreen;
 
 CONFIG_BINDING bindings[BINDING_TOTAL];
 
+static BOOL bActive = TRUE;
 static BOOL bFps = FALSE;
 
 #ifdef JAPANESE
@@ -272,8 +273,11 @@ BOOL SystemTask(void)
 {
 	static BOOL previous_keyboard_state[BACKEND_KEYBOARD_TOTAL];
 
-	if (!Backend_SystemTask())
-		return FALSE;
+	do
+	{
+		if (!Backend_SystemTask(bActive))
+			return FALSE;
+	} while(!bActive);
 
 	Backend_GetKeyboardState(gKeyboardState);
 

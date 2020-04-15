@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../WindowsWrapper.h"
+#include "../Attributes.h"
 
 enum
 {
@@ -90,19 +90,19 @@ typedef struct Backend_DisplayMode
 	unsigned int refresh_rate;
 } Backend_DisplayMode;
 
-extern BOOL bActive;
-
-BOOL Backend_Init(void);
+bool Backend_Init(void);
 void Backend_Deinit(void);
 void Backend_PostWindowCreation(void);
-BOOL Backend_GetBasePath(char *string_buffer);
+bool Backend_GetBasePath(char *string_buffer);
 void Backend_HideMouse(void);
 void Backend_SetWindowIcon(const unsigned char *rgb_pixels, unsigned int width, unsigned int height);
 void Backend_SetCursor(const unsigned char *rgba_pixels, unsigned int width, unsigned int height);
 void PlaybackBackend_EnableDragAndDrop(void);
-BOOL Backend_SystemTask(void);
-void Backend_GetKeyboardState(BOOL *keyboard_state);
+bool Backend_SystemTask(bool active);
+void Backend_GetKeyboardState(bool *keyboard_state);
 void Backend_ShowMessageBox(const char *title, const char *message);
+ATTRIBUTE_FORMAT_PRINTF(1, 2) void Backend_PrintError(const char *format, ...);
+ATTRIBUTE_FORMAT_PRINTF(1, 2) void Backend_PrintInfo(const char *format, ...);
 unsigned long Backend_GetTicks(void);
 void Backend_Delay(unsigned int ticks);
 void Backend_GetDisplayMode(Backend_DisplayMode *display_mode);

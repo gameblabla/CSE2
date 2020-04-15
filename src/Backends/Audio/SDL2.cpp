@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 #include <stdio.h>
+#include <string>
 
 #include "SDL.h"
 
@@ -9,8 +10,6 @@
 #ifdef EXTRA_SOUND_FORMATS
 #include "../../ExtraSoundFormats.h"
 #endif
-#include "../../Organya.h"
-#include "../../WindowsWrapper.h"
 
 #include "SoftwareMixer.h"
 
@@ -20,7 +19,8 @@ static SDL_AudioDeviceID device_id;
 
 static unsigned long output_frequency;
 
-static unsigned short organya_timer;
+static void (*organya_callback)(void);
+static unsigned int organya_callback_milliseconds;
 
 static void Callback(void *user_data, Uint8 *stream_uint8, int len)
 {
@@ -32,7 +32,7 @@ static void Callback(void *user_data, Uint8 *stream_uint8, int len)
 	for (unsigned int i = 0; i < frames_total * 2; ++i)
 		stream[i] = 0.0f;
 
-	if (organya_timer == 0)
+	if (organya_callback_milliseconds == 0)
 	{
 		Mixer_MixSounds(stream, frames_total);
 	}
@@ -51,8 +51,8 @@ static void Callback(void *user_data, Uint8 *stream_uint8, int len)
 
 			if (organya_countdown == 0)
 			{
-				organya_countdown = (organya_timer * output_frequency) / 1000;	// organya_timer is in milliseconds, so convert it to audio frames
-				UpdateOrganya();
+				organya_countdown = (organya_callback_milliseconds * output_frequency) / 1000;	// organya_timer is in milliseconds, so convert it to audio frames
+				organya_callback();
 			}
 
 			const unsigned int frames_to_do = MIN(organya_countdown, frames_total - frames_done);
@@ -69,18 +69,19 @@ static void Callback(void *user_data, Uint8 *stream_uint8, int len)
 #endif
 }
 
-BOOL AudioBackend_Init(void)
+bool AudioBackend_Init(void)
 {
 	if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
 	{
-		Backend_ShowMessageBox("Fatal error (SDL2 audio backend)", "'SDL_InitSubSystem(SDL_INIT_AUDIO)' failed");
-		return FALSE;
+		std::string errorMessage = std::string("'SDL_InitSubSystem(SDL_INIT_AUDIO)' failed: ") + SDL_GetError();
+		Backend_ShowMessageBox("Fatal error (SDL2 audio backend)", errorMessage.c_str());
+		return false;
 	}
 
-	puts("Available SDL2 audio drivers:");
+	Backend_PrintInfo("Available SDL audio drivers:");
 
 	for (int i = 0; i < SDL_GetNumAudioDrivers(); ++i)
-		puts(SDL_GetAudioDriver(i));
+		Backend_PrintInfo("%s", SDL_GetAudioDriver(i));
 
 	SDL_AudioSpec specification;
 	specification.freq = 48000;
@@ -92,14 +93,15 @@ BOOL AudioBackend_Init(void)
 
 	SDL_AudioSpec obtained_specification;
 	device_id = SDL_OpenAudioDevice(NULL, 0, &specification, &obtained_specification, SDL_AUDIO_ALLOW_FREQUENCY_CHANGE);
-	output_frequency = obtained_specification.freq;
-	Mixer_Init(obtained_specification.freq);
-
 	if (device_id == 0)
 	{
-		Backend_ShowMessageBox("Fatal error (SDL2 audio backend)", "'SDL_OpenAudioDevice' failed");
-		return FALSE;
+		std::string error_message = std::string("'SDL_OpenAudioDevice' failed: ") + SDL_GetError();
+		Backend_ShowMessageBox("Fatal error (SDL2 audio backend)", error_message.c_str());
+		return false;
 	}
+
+	output_frequency = obtained_specification.freq;
+	Mixer_Init(obtained_specification.freq);
 
 #ifdef EXTRA_SOUND_FORMATS
 	ExtraSound_Init(output_frequency);
@@ -107,9 +109,9 @@ BOOL AudioBackend_Init(void)
 
 	SDL_PauseAudioDevice(device_id, 0);
 
-	printf("Selected SDL2 audio driver: %s\n", SDL_GetCurrentAudioDriver());
+	Backend_PrintInfo("Selected SDL audio driver: %s", SDL_GetCurrentAudioDriver());
 
-	return TRUE;
+	return true;
 }
 
 void AudioBackend_Deinit(void)
@@ -146,7 +148,7 @@ void AudioBackend_DestroySound(AudioBackend_Sound *sound)
 	SDL_UnlockAudioDevice(device_id);
 }
 
-void AudioBackend_PlaySound(AudioBackend_Sound *sound, BOOL looping)
+void AudioBackend_PlaySound(AudioBackend_Sound *sound, bool looping)
 {
 	if (sound == NULL)
 		return;
@@ -218,11 +220,12 @@ void AudioBackend_SetSoundPan(AudioBackend_Sound *sound, long pan)
 	SDL_UnlockAudioDevice(device_id);
 }
 
-void AudioBackend_SetOrganyaTimer(unsigned short timer)
+void AudioBackend_SetOrganyaCallback(void (*callback)(void), unsigned int milliseconds)
 {
 	SDL_LockAudioDevice(device_id);
 
-	organya_timer = timer;
+	organya_callback = callback;
+	organya_callback_milliseconds = milliseconds;
 
 	SDL_UnlockAudioDevice(device_id);
 }

@@ -1,6 +1,7 @@
 #include "../Misc.h"
 
 #include <chrono>
+#include <stdarg.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,10 +10,9 @@
 
 #include <GLFW/glfw3.h>
 
-#include "../../WindowsWrapper.h"
-
 #include "Window.h"
 #include "../Rendering.h"
+#include "../../Attributes.h"
 #include "../../Main.h"
 #include "../../Organya.h"
 #include "../../Profile.h"
@@ -23,9 +23,7 @@
 		keyboard_state[BACKEND_KEY] = action == GLFW_PRESS; \
 		break;
 
-BOOL bActive = TRUE;
-
-static BOOL keyboard_state[BACKEND_KEYBOARD_TOTAL];
+static bool keyboard_state[BACKEND_KEYBOARD_TOTAL];
 
 static GLFWcursor* cursor;
 
@@ -150,14 +148,21 @@ static void DragAndDropCallback(GLFWwindow *window, int count, const char **path
 	LoadProfile(paths[0]);
 }
 
-BOOL Backend_Init(void)
+static void ErrorCallback(int code, const char *description)
 {
+	Backend_PrintError("GLFW error received (%d): %s", code, description);
+}
+
+bool Backend_Init(void)
+{
+	glfwSetErrorCallback(ErrorCallback);
+
 	if (glfwInit() == GL_TRUE)
-		return TRUE;
+		return true;
 
 	Backend_ShowMessageBox("Fatal error", "Could not initialise GLFW3");
 
-	return FALSE;
+	return false;
 }
 
 void Backend_Deinit(void)
@@ -176,12 +181,12 @@ void Backend_PostWindowCreation(void)
 	glfwSetWindowSizeCallback(window, WindowSizeCallback);
 }
 
-BOOL Backend_GetBasePath(char *string_buffer)
+bool Backend_GetBasePath(char *string_buffer)
 {
 	(void)string_buffer;
 
 	// GLFW3 doesn't seem to have a mechanism for this
-	return FALSE;
+	return false;
 }
 
 void Backend_HideMouse(void)
@@ -231,23 +236,23 @@ void PlaybackBackend_EnableDragAndDrop(void)
 	glfwSetDropCallback(window, DragAndDropCallback);
 }
 
-BOOL Backend_SystemTask(void)
+bool Backend_SystemTask(bool active)
 {
 	if (glfwWindowShouldClose(window))
 	{
 		StopOrganyaMusic();
-		return FALSE;
+		return false;
 	}
 
-	glfwPollEvents();
-
-	while (!bActive)
+	if (active)
+		glfwPollEvents();
+	else
 		glfwWaitEvents();
 
-	return TRUE;
+	return true;
 }
 
-void Backend_GetKeyboardState(BOOL *out_keyboard_state)
+void Backend_GetKeyboardState(bool *out_keyboard_state)
 {
 	memcpy(out_keyboard_state, keyboard_state, sizeof(keyboard_state));
 }
@@ -256,6 +261,26 @@ void Backend_ShowMessageBox(const char *title, const char *message)
 {
 	// GLFW3 doesn't have a message box
 	printf("ShowMessageBox - '%s' - '%s'\n", title, message);
+}
+
+ATTRIBUTE_FORMAT_PRINTF(1, 2) void Backend_PrintError(const char *format, ...)
+{
+	va_list argumentList;
+	va_start(argumentList, format);
+	fputs("ERROR: ", stderr);
+	vfprintf(stderr, format, argumentList);
+	fputc('\n', stderr);
+	va_end(argumentList);
+}
+
+ATTRIBUTE_FORMAT_PRINTF(1, 2) void Backend_PrintInfo(const char *format, ...)
+{
+	va_list argumentList;
+	va_start(argumentList, format);
+	fputs("INFO: ", stdout);
+	vprintf(format, argumentList);
+	putchar('\n');
+	va_end(argumentList);
 }
 
 unsigned long Backend_GetTicks(void)

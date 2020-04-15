@@ -11,8 +11,6 @@
 #endif
 #include <GLFW/glfw3.h>
 
-#include "../../WindowsWrapper.h"
-
 #include "../Misc.h"
 
 GLFWwindow *window;
@@ -26,7 +24,7 @@ static float framebuffer_y_ratio;
 
 static GLuint screen_texture_id;
 
-unsigned char* WindowBackend_Software_CreateWindow(const char *window_title, int screen_width, int screen_height, BOOL fullscreen, BOOL *vsync, size_t *pitch)
+unsigned char* WindowBackend_Software_CreateWindow(const char *window_title, int screen_width, int screen_height, bool fullscreen, bool *vsync, size_t *pitch)
 {
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 1);
@@ -77,7 +75,7 @@ unsigned char* WindowBackend_Software_CreateWindow(const char *window_title, int
 		while (framebuffer_texture_height < framebuffer_height)
 			framebuffer_texture_height <<= 1;
 
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, framebuffer_texture_width, framebuffer_texture_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, framebuffer_texture_width, framebuffer_texture_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 

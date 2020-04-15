@@ -10,8 +10,7 @@
 #ifdef EXTRA_SOUND_FORMATS
 #include "../../ExtraSoundFormats.h"
 #endif
-#include "../../Organya.h"
-#include "../../WindowsWrapper.h"
+#include "../Misc.h"
 
 #include "SoftwareMixer.h"
 
@@ -23,7 +22,8 @@ static ma_mutex organya_mutex;
 
 static unsigned long output_frequency;
 
-static unsigned short organya_timer;
+static void (*organya_callback)(void);
+static unsigned int organya_callback_milliseconds;
 
 static void Callback(ma_device *device, void *output_stream, const void *input_stream, ma_uint32 frames_total)
 {
@@ -34,7 +34,7 @@ static void Callback(ma_device *device, void *output_stream, const void *input_s
 
 	ma_mutex_lock(&organya_mutex);
 
-	if (organya_timer == 0)
+	if (organya_callback_milliseconds == 0)
 	{
 		ma_mutex_lock(&mutex);
 		Mixer_MixSounds(stream, frames_total);
@@ -55,8 +55,8 @@ static void Callback(ma_device *device, void *output_stream, const void *input_s
 
 			if (organya_countdown == 0)
 			{
-				organya_countdown = (organya_timer * output_frequency) / 1000;	// organya_timer is in milliseconds, so convert it to audio frames
-				UpdateOrganya();
+				organya_countdown = (organya_callback_milliseconds * output_frequency) / 1000;	// organya_timer is in milliseconds, so convert it to audio frames
+				organya_callback();
 			}
 
 			const unsigned int frames_to_do = MIN(organya_countdown, frames_total - frames_done);
@@ -77,7 +77,7 @@ static void Callback(ma_device *device, void *output_stream, const void *input_s
 #endif
 }
 
-BOOL AudioBackend_Init(void)
+bool AudioBackend_Init(void)
 {
 	ma_device_config config = ma_device_config_init(ma_device_type_playback);
 	config.playback.pDeviceID = NULL;
@@ -87,23 +87,37 @@ BOOL AudioBackend_Init(void)
 	config.dataCallback = Callback;
 	config.pUserData = NULL;
 
-	if (ma_device_init(NULL, &config, &device) == MA_SUCCESS)
+	ma_result return_value;
+
+	return_value = ma_device_init(NULL, &config, &device);
+
+	if (return_value == MA_SUCCESS)
 	{
-		if (ma_mutex_init(device.pContext, &mutex) == MA_SUCCESS)
+		return_value = ma_mutex_init(device.pContext, &mutex);
+
+		if (return_value == MA_SUCCESS)
 		{
-			if (ma_mutex_init(device.pContext, &organya_mutex) == MA_SUCCESS)
+			return_value = ma_mutex_init(device.pContext, &organya_mutex);
+
+			if (return_value == MA_SUCCESS)
 			{
 			#ifdef EXTRA_SOUND_FORMATS
 				ExtraSound_Init(output_frequency);
 			#endif
 
-				if (ma_device_start(&device) == MA_SUCCESS)
+				return_value = ma_device_start(&device);
+
+				if (return_value == MA_SUCCESS)
 				{
 					output_frequency = device.sampleRate;
 
 					Mixer_Init(device.sampleRate);
 
-					return TRUE;
+					return true;
+				}
+				else
+				{
+					Backend_PrintError("Failed to start playback device: %s", ma_result_description(return_value));
 				}
 
 			#ifdef EXTRA_SOUND_FORMATS
@@ -112,19 +126,35 @@ BOOL AudioBackend_Init(void)
 
 				ma_mutex_uninit(&organya_mutex);
 			}
+			else
+			{
+				Backend_PrintError("Failed to create organya mutex: %s", ma_result_description(return_value));
+			}
 
 			ma_mutex_uninit(&mutex);
+		}
+		else
+		{
+			Backend_PrintError("Failed to create mutex: %s", ma_result_description(return_value));
 		}
 
 		ma_device_uninit(&device);
 	}
+	else
+	{
+		Backend_PrintError("Failed to initialize playback device: %s", ma_result_description(return_value));
+	}
 
-	return FALSE;
+
+	return false;
 }
 
 void AudioBackend_Deinit(void)
 {
-	ma_device_stop(&device);
+	ma_result return_value = ma_device_stop(&device);
+
+	if (return_value != MA_SUCCESS)
+		Backend_PrintError("Failed to stop playback device: %s", ma_result_description(return_value));
 
 #ifdef EXTRA_SOUND_FORMATS
 	ExtraSound_Deinit();
@@ -160,7 +190,7 @@ void AudioBackend_DestroySound(AudioBackend_Sound *sound)
 	ma_mutex_unlock(&mutex);
 }
 
-void AudioBackend_PlaySound(AudioBackend_Sound *sound, BOOL looping)
+void AudioBackend_PlaySound(AudioBackend_Sound *sound, bool looping)
 {
 	if (sound == NULL)
 		return;
@@ -232,11 +262,12 @@ void AudioBackend_SetSoundPan(AudioBackend_Sound *sound, long pan)
 	ma_mutex_unlock(&mutex);
 }
 
-void AudioBackend_SetOrganyaTimer(unsigned short timer)
+void AudioBackend_SetOrganyaCallback(void (*callback)(void), unsigned int milliseconds)
 {
 	ma_mutex_lock(&organya_mutex);
 
-	organya_timer = timer;
+	organya_callback = callback;
+	organya_callback_milliseconds = milliseconds;
 
 	ma_mutex_unlock(&organya_mutex);
 }

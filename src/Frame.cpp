@@ -14,7 +14,7 @@ void MoveFrame3(void)
 	short map_w, map_l;
 	GetMapData(0, &map_w, &map_l);
 
-#if WINDOW_WIDTH != 320 || WINDOW_HEIGHT != 240	// TODO - Really need to make this a compiler flag (also, should probably move this stuff to the enhanced branch)
+#if WINDOW_WIDTH != 320 || WINDOW_HEIGHT != 240
 	if (g_GameFlags & 8)
 	{
 		// Use the original camera boundaries during the credits

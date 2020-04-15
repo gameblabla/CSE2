@@ -1,13 +1,11 @@
 #include "../Misc.h"
 
 #include <stddef.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 
 #include "SDL.h"
-
-#include "../../WindowsWrapper.h"
 
 #include "Controller.h"
 #include "Window.h"
@@ -22,41 +20,51 @@
 		keyboard_state[BACKEND_KEY] = event.key.type == SDL_KEYDOWN; \
 		break;
 
-BOOL bActive = TRUE;
-
-static BOOL keyboard_state[BACKEND_KEYBOARD_TOTAL];
+static bool keyboard_state[BACKEND_KEYBOARD_TOTAL];
 
 static unsigned char *cursor_surface_pixels;
 static SDL_Surface *cursor_surface;
 static SDL_Cursor *cursor;
 
-BOOL Backend_Init(void)
+bool Backend_Init(void)
 {
 	if (SDL_Init(SDL_INIT_EVENTS) == 0)
 	{
 		if (SDL_InitSubSystem(SDL_INIT_VIDEO) == 0)
 		{
-			puts("Available SDL2 video drivers:");
+			Backend_PrintInfo("Available SDL video drivers:");
 
 			for (int i = 0; i < SDL_GetNumVideoDrivers(); ++i)
-				puts(SDL_GetVideoDriver(i));
+				Backend_PrintInfo("%s", SDL_GetVideoDriver(i));
 
 			const char *driver = SDL_GetCurrentVideoDriver();
 
 			if (driver != NULL)
-				printf("Selected SDL2 video driver: %s\n", driver);
+			{
+				Backend_PrintInfo("Selected SDL video driver: %s", driver);
 
-			return TRUE;
+				return true;
+			}
+			else
+			{
+				Backend_PrintError("No SDL video driver initialized!");
+			}
 		}
-
-		Backend_ShowMessageBox("Fatal error", "Could not initialise SDL2 video subsystem");
+		else
+		{
+			std::string error_message = std::string("Could not initialise SDL video subsystem: ") + SDL_GetError();
+			Backend_ShowMessageBox("Fatal error", error_message.c_str());
+		}
 
 		SDL_Quit();
 	}
+	else
+	{
+		std::string error_message = std::string("Could not initialise SDL: ") + SDL_GetError();
+		Backend_ShowMessageBox("Fatal error", error_message.c_str());
+	}
 
-	Backend_ShowMessageBox("Fatal error", "Could not initialise SDL2");
-
-	return FALSE;
+	return false;
 }
 
 void Backend_Deinit(void)
@@ -77,16 +85,19 @@ void Backend_PostWindowCreation(void)
 	
 }
 
-BOOL Backend_GetBasePath(char *string_buffer)
+bool Backend_GetBasePath(char *string_buffer)
 {
 	char *base_path = SDL_GetBasePath();
+	if (base_path == NULL)
+		return false;
+
 	// Trim the trailing '/'
 	size_t base_path_length = strlen(base_path);
 	base_path[base_path_length - 1] = '\0';
 	strcpy(string_buffer, base_path);
 	SDL_free(base_path);
 
-	return TRUE;
+	return true;
 }
 
 void Backend_HideMouse(void)
@@ -102,6 +113,10 @@ void Backend_SetWindowIcon(const unsigned char *rgb_pixels, unsigned int width, 
 	{
 		SDL_SetWindowIcon(window, surface);
 		SDL_FreeSurface(surface);
+	}
+	else
+	{
+		Backend_PrintError("Couldn't create RGB surface for window icon: %s", SDL_GetError());
 	}
 }
 
@@ -123,6 +138,10 @@ void Backend_SetCursor(const unsigned char *rgba_pixels, unsigned int width, uns
 				SDL_SetCursor(cursor);
 		}
 	}
+	else
+	{
+		Backend_PrintError("Failed to allocate memory for cursor surface");
+	}
 }
 
 void PlaybackBackend_EnableDragAndDrop(void)
@@ -130,14 +149,14 @@ void PlaybackBackend_EnableDragAndDrop(void)
 	SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
 }
 
-BOOL Backend_SystemTask(void)
+bool Backend_SystemTask(bool active)
 {
-	while (SDL_PollEvent(NULL) || !bActive)
+	if (SDL_PollEvent(NULL) || !active)
 	{
 		SDL_Event event;
 
 		if (!SDL_WaitEvent(&event))
-			return FALSE;
+			return false;
 
 		switch (event.type)
 		{
@@ -261,7 +280,7 @@ BOOL Backend_SystemTask(void)
 
 			case SDL_QUIT:
 				StopOrganyaMusic();
-				return FALSE;
+				return false;
 
 			case SDL_RENDER_TARGETS_RESET:
 				RenderBackend_HandleRenderTargetLoss();
@@ -270,18 +289,40 @@ BOOL Backend_SystemTask(void)
 		}
 	}
 
-	return TRUE;
+	return true;
 }
 
-void Backend_GetKeyboardState(BOOL *out_keyboard_state)
+void Backend_GetKeyboardState(bool *out_keyboard_state)
 {
 	memcpy(out_keyboard_state, keyboard_state, sizeof(keyboard_state));
 }
 
 void Backend_ShowMessageBox(const char *title, const char *message)
 {
-	printf("ShowMessageBox - '%s' - '%s'\n", title, message);
-	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, message, window);
+	fprintf(stderr, "ShowMessageBox - '%s' - '%s'\n", title, message);
+
+	if (SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, message, window) != 0)
+		Backend_PrintError("Was also unable to display a message box containing the error: %s", SDL_GetError());
+}
+
+ATTRIBUTE_FORMAT_PRINTF(1, 2) void Backend_PrintError(const char *format, ...)
+{
+	va_list argumentList;
+	va_start(argumentList, format);
+	fputs("ERROR: ", stderr);
+	vfprintf(stderr, format, argumentList);
+	fputc('\n', stderr);
+	va_end(argumentList);
+}
+
+ATTRIBUTE_FORMAT_PRINTF(1, 2) void Backend_PrintInfo(const char *format, ...)
+{
+	va_list argumentList;
+	va_start(argumentList, format);
+	fputs("INFO: ", stdout);
+	vprintf(format, argumentList);
+	putchar('\n');
+	va_end(argumentList);
 }
 
 unsigned long Backend_GetTicks(void)

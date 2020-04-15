@@ -18,8 +18,8 @@ option(DEBUG_SAVE "Re-enable the ability to drag-and-drop save files onto the wi
 option(EXTRA_SOUND_FORMATS "Adds support for extra music/SFX formats using the clownaudio library (use the CLOWNAUDIO options to toggle specific formats)" OFF)
 
 set(BACKEND_RENDERER "SDLTexture" CACHE STRING "Which renderer the game should use: 'OpenGL3' for an OpenGL 3.2 renderer, 'OpenGLES2' for an OpenGL ES 2.0 renderer, 'SDLTexture' for SDL2's hardware-accelerated Texture API, or 'Software' for a handwritten software renderer")
-set(BACKEND_AUDIO "SDL2" CACHE STRING "Which audio backend the game should use: 'SDL2' or 'miniaudio'")
-set(BACKEND_PLATFORM "SDL2" CACHE STRING "Which platform backend the game should use: 'SDL2' or 'GLFW3'")
+set(BACKEND_AUDIO "SDL2" CACHE STRING "Which audio backend the game should use: 'SDL2', 'miniaudio', or 'Null'")
+set(BACKEND_PLATFORM "SDL2" CACHE STRING "Which platform backend the game should use: 'SDL2', 'GLFW3', 'WiiU', or 'Null'")
 
 option(LTO "Enable link-time optimisation" OFF)
 option(PKG_CONFIG_STATIC_LIBS "On platforms with pkg-config, static-link the dependencies (good for Windows builds, so you don't need to bundle DLL files)" OFF)
@@ -266,6 +266,10 @@ elseif(BACKEND_AUDIO MATCHES "miniaudio")
 	endif()
 
 	target_link_libraries(CSE2 PRIVATE ${CMAKE_DL_LIBS})
+elseif(BACKEND_AUDIO MATCHES "Null")
+	target_sources(CSE2 PRIVATE
+		"src/Backends/Audio/Null.cpp"
+	)
 else()
 	message(FATAL_ERROR "Invalid BACKEND_AUDIO selected")
 endif()
@@ -283,6 +287,16 @@ elseif(BACKEND_PLATFORM MATCHES "GLFW3")
 		"src/Backends/GLFW3/Misc.cpp"
 		"src/Backends/GLFW3/Window.h"
 	)
+elseif(BACKEND_PLATFORM MATCHES "WiiU")
+	target_sources(CSE2 PRIVATE
+		"src/Backends/WiiU/Controller.cpp"
+		"src/Backends/WiiU/Misc.cpp"
+	)
+elseif(BACKEND_PLATFORM MATCHES "Null")
+	target_sources(CSE2 PRIVATE
+		"src/Backends/Null/Controller.cpp"
+		"src/Backends/Null/Misc.cpp"
+	)
 endif()
 
 if(BACKEND_PLATFORM MATCHES "SDL2" AND BACKEND_RENDERER MATCHES "OpenGL3")
@@ -298,6 +312,10 @@ elseif(BACKEND_PLATFORM MATCHES "GLFW3" AND BACKEND_RENDERER MATCHES "OpenGLES2"
 	target_sources(CSE2 PRIVATE "src/Backends/GLFW3/Window-OpenGLES2.cpp")
 elseif(BACKEND_PLATFORM MATCHES "GLFW3" AND BACKEND_RENDERER MATCHES "Software")
 	target_sources(CSE2 PRIVATE "src/Backends/GLFW3/Window-Software.cpp")
+elseif(BACKEND_PLATFORM MATCHES "WiiU" AND BACKEND_RENDERER MATCHES "Software")
+	target_sources(CSE2 PRIVATE "src/Backends/WiiU/Window-Software.cpp")
+elseif(BACKEND_PLATFORM MATCHES "Null" AND BACKEND_RENDERER MATCHES "Software")
+	target_sources(CSE2 PRIVATE "src/Backends/Null/Window-Software.cpp")
 else()
 	message(FATAL_ERROR "Invalid BACKEND_PLATFORM/BACKEND_RENDERER combination")
 endif()
