@@ -14,61 +14,6 @@ void MoveFrame3(void)
 	short map_w, map_l;
 	GetMapData(0, &map_w, &map_l);
 
-#if WINDOW_WIDTH != 320 || WINDOW_HEIGHT != 240	// TODO - Really need to make this a compiler flag (also, should probably move this stuff to the enhanced branch)
-	if (g_GameFlags & 8)
-	{
-		// Use the original camera boundaries during the credits
-		gFrame.x += (*gFrame.tgt_x - (320 * 0x200 / 2) - gFrame.x) / gFrame.wait;
-		gFrame.y += (*gFrame.tgt_y - (240 * 0x200 / 2) - gFrame.y) / gFrame.wait;
-
-		if (gFrame.x / 0x200 < 0)
-			gFrame.x = 0;
-		if (gFrame.y / 0x200 < 0)
-			gFrame.y = 0;
-
-		if (gFrame.x > (((map_w - 1) * 16) - 320) * 0x200)
-			gFrame.x = (((map_w - 1) * 16) - 320) * 0x200;
-		if (gFrame.y > (((map_l - 1) * 16) - 240) * 0x200)
-			gFrame.y = (((map_l - 1) * 16) - 240) * 0x200;
-
-		gFrame.x -= ((WINDOW_WIDTH - 320) / 2) * 0x200;
-		gFrame.y -= ((WINDOW_HEIGHT - 240) / 2) * 0x200;
-	}
-	else
-	{
-		// Widescreen/tallscreen-safe behaviour
-		if ((map_w - 1) * 16 < WINDOW_WIDTH)
-		{
-			gFrame.x = -(((WINDOW_WIDTH - ((map_w - 1) * 16)) * 0x200) / 2);
-		}
-		else
-		{
-			gFrame.x += (*gFrame.tgt_x - (WINDOW_WIDTH * 0x200 / 2) - gFrame.x) / gFrame.wait;
-
-			if (gFrame.x / 0x200 < 0)
-				gFrame.x = 0;
-
-			if (gFrame.x > (((map_w - 1) * 16) - WINDOW_WIDTH) * 0x200)
-				gFrame.x = (((map_w - 1) * 16) - WINDOW_WIDTH) * 0x200;
-		}
-
-		if ((map_l - 1) * 16 < WINDOW_HEIGHT)
-		{
-			gFrame.y = -(((WINDOW_HEIGHT - ((map_l - 1) * 16)) * 0x200) / 2);
-		}
-		else
-		{
-			gFrame.y += (*gFrame.tgt_y - (WINDOW_HEIGHT * 0x200 / 2) - gFrame.y) / gFrame.wait;
-
-			if (gFrame.y / 0x200 < 0)
-				gFrame.y = 0;
-
-			if (gFrame.y > (((map_l - 1) * 16) - WINDOW_HEIGHT) * 0x200)
-				gFrame.y = (((map_l - 1) * 16) - WINDOW_HEIGHT) * 0x200;
-		}
-	}
-#else
-	// Vanilla behaviour
 	gFrame.x += (*gFrame.tgt_x - (WINDOW_WIDTH * 0x200 / 2) - gFrame.x) / gFrame.wait;
 	gFrame.y += (*gFrame.tgt_y - (WINDOW_HEIGHT * 0x200 / 2) - gFrame.y) / gFrame.wait;
 
@@ -81,7 +26,6 @@ void MoveFrame3(void)
 		gFrame.x = (((map_w - 1) * 16) - WINDOW_WIDTH) * 0x200;
 	if (gFrame.y > (((map_l - 1) * 16) - WINDOW_HEIGHT) * 0x200)
 		gFrame.y = (((map_l - 1) * 16) - WINDOW_HEIGHT) * 0x200;
-#endif
 
 	// Quake
 	if (gFrame.quake2)
@@ -125,54 +69,6 @@ void SetFramePosition(int fx, int fy)
 	gFrame.y = fy;
 
 	// Keep in bounds
-#if WINDOW_WIDTH != 320 || WINDOW_HEIGHT != 240
-	if (g_GameFlags & 8)
-	{
-		// Use the original camera boundaries during the credits
-		if (gFrame.x / 0x200 < 0)
-			gFrame.x = 0;
-		if (gFrame.y / 0x200 < 0)
-			gFrame.y = 0;
-
-		if (gFrame.x > (((map_w - 1) * 16) - 320) * 0x200)
-			gFrame.x = (((map_w - 1) * 16) - 320) * 0x200;
-		if (gFrame.y > (((map_l - 1) * 16) - 240) * 0x200)
-			gFrame.y = (((map_l - 1) * 16) - 240) * 0x200;
-
-		gFrame.x -= ((WINDOW_WIDTH - 320) / 2) * 0x200;
-		gFrame.y -= ((WINDOW_HEIGHT - 240) / 2) * 0x200;
-	}
-	else
-	{
-		// Widescreen/tallscreen-safe behaviour
-		if ((map_w - 1) * 16 < WINDOW_WIDTH)
-		{
-			gFrame.x = -(((WINDOW_WIDTH - ((map_w - 1) * 16)) * 0x200) / 2);
-		}
-		else
-		{
-			if (gFrame.x / 0x200 < 0)
-				gFrame.x = 0;
-
-			if (gFrame.x > (((map_w - 1) * 16) - WINDOW_WIDTH) * 0x200)
-				gFrame.x = (((map_w - 1) * 16) - WINDOW_WIDTH) * 0x200;
-		}
-
-		if ((map_l - 1) * 16 < WINDOW_HEIGHT)
-		{
-			gFrame.y = -(((WINDOW_HEIGHT - ((map_l - 1) * 16)) * 0x200) / 2);
-		}
-		else
-		{
-			if (gFrame.y / 0x200 < 0)
-				gFrame.y = 0;
-
-			if (gFrame.y > (((map_l - 1) * 16) - WINDOW_HEIGHT) * 0x200)
-				gFrame.y = (((map_l - 1) * 16) - WINDOW_HEIGHT) * 0x200;
-		}
-	}
-#else
-	// Vanilla behaviour
 	if (gFrame.x / 0x200 < 0)
 		gFrame.x = 0;
 	if (gFrame.y / 0x200 < 0)
@@ -182,7 +78,6 @@ void SetFramePosition(int fx, int fy)
 		gFrame.x = (((map_w - 1) * 16) - WINDOW_WIDTH) * 0x200;
 	if (gFrame.y > (((map_l - 1) * 16) - WINDOW_HEIGHT) * 0x200)
 		gFrame.y = (((map_l - 1) * 16) - WINDOW_HEIGHT) * 0x200;
-#endif
 }
 
 void SetFrameMyChar(void)
@@ -199,54 +94,6 @@ void SetFrameMyChar(void)
 	gFrame.y = mc_y - ((WINDOW_HEIGHT / 2) * 0x200);
 
 	// Keep in bounds
-#if WINDOW_WIDTH != 320 || WINDOW_HEIGHT != 240
-	if (g_GameFlags & 8)
-	{
-		// Use the original camera boundaries during the credits
-		if (gFrame.x / 0x200 < 0)
-			gFrame.x = 0;
-		if (gFrame.y / 0x200 < 0)
-			gFrame.y = 0;
-
-		if (gFrame.x > (((map_w - 1) * 16) - 320) * 0x200)
-			gFrame.x = (((map_w - 1) * 16) - 320) * 0x200;
-		if (gFrame.y > (((map_l - 1) * 16) - 240) * 0x200)
-			gFrame.y = (((map_l - 1) * 16) - 240) * 0x200;
-
-		gFrame.x -= ((WINDOW_WIDTH - 320) / 2) * 0x200;
-		gFrame.y -= ((WINDOW_HEIGHT - 240) / 2) * 0x200;
-	}
-	else
-	{
-		// Widescreen/tallscreen-safe behaviour
-		if ((map_w - 1) * 16 < WINDOW_WIDTH)
-		{
-			gFrame.x = -(((WINDOW_WIDTH - ((map_w - 1) * 16)) * 0x200) / 2);
-		}
-		else
-		{
-			if (gFrame.x / 0x200 < 0)
-				gFrame.x = 0;
-
-			if (gFrame.x > (((map_w - 1) * 16) - WINDOW_WIDTH) * 0x200)
-				gFrame.x = (((map_w - 1) * 16) - WINDOW_WIDTH) * 0x200;
-		}
-
-		if ((map_l - 1) * 16 < WINDOW_HEIGHT)
-		{
-			gFrame.y = -(((WINDOW_HEIGHT - ((map_l - 1) * 16)) * 0x200) / 2);
-		}
-		else
-		{
-			if (gFrame.y / 0x200 < 0)
-				gFrame.y = 0;
-
-			if (gFrame.y > (((map_l - 1) * 16) - WINDOW_HEIGHT) * 0x200)
-				gFrame.y = (((map_l - 1) * 16) - WINDOW_HEIGHT) * 0x200;
-		}
-	}
-#else
-	// Vanilla behaviour
 	if (gFrame.x / 0x200 < 0)
 		gFrame.x = 0;
 	if (gFrame.y / 0x200 < 0)
@@ -256,7 +103,6 @@ void SetFrameMyChar(void)
 		gFrame.x = (((map_w - 1) * 16) - WINDOW_WIDTH) * 0x200;
 	if (gFrame.y > (((map_l - 1) * 16) - WINDOW_HEIGHT) * 0x200)
 		gFrame.y = (((map_l - 1) * 16) - WINDOW_HEIGHT) * 0x200;
-#endif
 }
 
 void SetFrameTargetMyChar(int wait)
