@@ -6,8 +6,6 @@
 //#include <coreinit/cache.h>
 #include <coreinit/screen.h>
 
-static unsigned char *fake_framebuffer;
-
 //static unsigned char *tv_framebuffer;
 static unsigned char *drc_framebuffer;
 
@@ -41,14 +39,11 @@ bool WindowBackend_Software_CreateWindow(const char *window_title, int screen_wi
 //	OSScreenSetBufferEx(SCREEN_TV, tv_framebuffer);
 	OSScreenSetBufferEx(SCREEN_DRC, drc_framebuffer);
 
-	fake_framebuffer = (unsigned char*)malloc(framebuffer_width * framebuffer_height * 4);
-
 	return true;
 }
 
 void WindowBackend_Software_DestroyWindow(void)
 {
-	free(fake_framebuffer);
 	free(drc_framebuffer);
 //	free(tv_framebuffer);
 	OSScreenShutdown();
@@ -56,18 +51,10 @@ void WindowBackend_Software_DestroyWindow(void)
 
 unsigned char* WindowBackend_Software_GetFramebuffer(size_t *pitch)
 {
-	*pitch = framebuffer_width * 4;
-
-	return fake_framebuffer;
-}
-
-void WindowBackend_Software_Display(void)
-{
 	const size_t line_size = (drc_buffer_size / 480) / 2;
 
 	static bool flipflop;
 
-	const unsigned char *in_pointer = fake_framebuffer;
 	unsigned char *out_pointer = drc_framebuffer;
 
 	if (!flipflop)
@@ -76,16 +63,15 @@ void WindowBackend_Software_Display(void)
 	out_pointer += ((854 - framebuffer_width) * 4) / 2;
 	out_pointer += ((480 - framebuffer_height) * line_size) / 2;
 
-	for (size_t y = 0; y < framebuffer_height; ++y)
-	{
-		memcpy(out_pointer, in_pointer, framebuffer_width * 4);
-
-		in_pointer += framebuffer_width * 4;
-		out_pointer += line_size;
-	}
-
 	flipflop = !flipflop;
 
+	*pitch = line_size;
+
+	return out_pointer;
+}
+
+void WindowBackend_Software_Display(void)
+{
 //	DCFlushRange(tv_framebuffer, tv_buffer_size);
 //	DCFlushRange(drc_framebuffer, drc_buffer_size);
 
