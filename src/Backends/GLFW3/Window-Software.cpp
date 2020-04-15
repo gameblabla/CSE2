@@ -72,7 +72,7 @@ unsigned char* WindowBackend_Software_CreateWindow(const char *window_title, int
 		while (framebuffer_texture_height < framebuffer_height)
 			framebuffer_texture_height <<= 1;
 
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, framebuffer_texture_width, framebuffer_texture_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, framebuffer_texture_width, framebuffer_texture_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
