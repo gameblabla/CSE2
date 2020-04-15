@@ -3,7 +3,6 @@
 #include <string.h>
 
 #include <coreinit/thread.h>
-#include <vpad/input.h>
 #include <whb/proc.h>
 #include <whb/sdcard.h>
 
@@ -16,8 +15,6 @@ bool Backend_Init(void)
 	if (!WHBMountSdCard())
 		return FALSE;
 
-	VPADInit();
-
 	tick_delta = OSGetSystemInfo()->busClockSpeed / 4;
 
 	return true;
@@ -25,8 +22,6 @@ bool Backend_Init(void)
 
 void Backend_Deinit(void)
 {
-	VPADShutdown();
-
 	WHBUnmountSdCard();
 
 	WHBProcShutdown();
@@ -76,26 +71,9 @@ bool Backend_SystemTask(bool active)
 	return WHBProcIsRunning();
 }
 
-void Backend_GetKeyboardState(bool *out_keyboard_state)
+void Backend_GetKeyboardState(bool *keyboard_state)
 {
-	static bool keyboard_state[BACKEND_KEYBOARD_TOTAL];
-
-	VPADStatus vpad_status;
-	if (VPADRead(VPAD_CHAN_0, &vpad_status, 1, NULL) == 1)
-	{
-		keyboard_state[BACKEND_KEYBOARD_UP] = vpad_status.hold & (VPAD_BUTTON_UP | VPAD_STICK_L_EMULATION_UP);
-		keyboard_state[BACKEND_KEYBOARD_DOWN] = vpad_status.hold & (VPAD_BUTTON_DOWN | VPAD_STICK_L_EMULATION_DOWN);
-		keyboard_state[BACKEND_KEYBOARD_LEFT] = vpad_status.hold & (VPAD_BUTTON_LEFT | VPAD_STICK_L_EMULATION_LEFT);
-		keyboard_state[BACKEND_KEYBOARD_RIGHT] = vpad_status.hold & (VPAD_BUTTON_RIGHT | VPAD_STICK_L_EMULATION_RIGHT);
-		keyboard_state[BACKEND_KEYBOARD_Z] = vpad_status.hold & VPAD_BUTTON_B;                       // Jump
-		keyboard_state[BACKEND_KEYBOARD_X] = vpad_status.hold & VPAD_BUTTON_Y;                       // Shoot
-		keyboard_state[BACKEND_KEYBOARD_Q] = vpad_status.hold & (VPAD_BUTTON_A | VPAD_BUTTON_PLUS);  // Inventory
-		keyboard_state[BACKEND_KEYBOARD_W] = vpad_status.hold & (VPAD_BUTTON_X | VPAD_BUTTON_MINUS); // Map
-		keyboard_state[BACKEND_KEYBOARD_A] = vpad_status.hold & (VPAD_BUTTON_L | VPAD_BUTTON_ZL | VPAD_STICK_R_EMULATION_LEFT);  // Weapon left
-		keyboard_state[BACKEND_KEYBOARD_S] = vpad_status.hold & (VPAD_BUTTON_R | VPAD_BUTTON_ZR | VPAD_STICK_R_EMULATION_RIGHT); // Weapon right
-	}
-
-	memcpy(out_keyboard_state, keyboard_state, sizeof(keyboard_state));
+	memset(keyboard_state, 0, sizeof(bool) * BACKEND_KEYBOARD_TOTAL);
 }
 
 void Backend_ShowMessageBox(const char *title, const char *message)
