@@ -40,9 +40,9 @@ unsigned char* WindowBackend_Software_CreateWindow(const char *window_title, int
 //	OSScreenSetBufferEx(SCREEN_TV, tv_framebuffer);
 	OSScreenSetBufferEx(SCREEN_DRC, drc_framebuffer);
 
-	fake_framebuffer = (unsigned char*)malloc(screen_width * screen_height * 3);
+	fake_framebuffer = (unsigned char*)malloc(screen_width * screen_height * 4);
 
-	*pitch = screen_width * 3;
+	*pitch = screen_width * 4;
 
 	return fake_framebuffer;
 }
@@ -77,7 +77,7 @@ void WindowBackend_Software_Display(void)
 			*out_pointer++ = *in_pointer++;
 			*out_pointer++ = *in_pointer++;
 			*out_pointer++ = *in_pointer++;
-			*out_pointer++ = 0;
+			*out_pointer++ = *in_pointer++;
 /*			uint32_t colour = 0;
 			colour |= *in_pointer++ << 24;
 			colour |= *in_pointer++ << 16;
