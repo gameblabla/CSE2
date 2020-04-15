@@ -7,7 +7,7 @@ This repo has multiple branches:
 Branch | Description
 --------|--------
 [accurate](https://www.github.com/Clownacy/Cave-Story-Engine-2/tree/accurate) | The main decompilation branch. The code intended to be as close to the original as possible, down to all the bugs and platform-dependencies.
-[portable](https://www.github.com/Clownacy/Cave-Story-Engine-2/tree/portable) | This branch ports the engine to SDL2, and addresses numerous portability issues, allowing it to run on other platforms.
+[portable](https://www.github.com/Clownacy/Cave-Story-Engine-2/tree/portable) | This branch ports the engine away from WinAPI and DirectX, and addresses numerous portability issues, allowing it to run on other platforms.
 [enhanced](https://www.github.com/Clownacy/Cave-Story-Engine-2/tree/enhanced) | Based on the portable branch, this adds several enhancements to the engine, and makes it more accessible to modders.
 [emscripten](https://www.github.com/Clownacy/Cave-Story-Engine-2/tree/emscripten) | Modifies the engine to build with Emscripten, [allowing it to run in web browsers](http://sonicresearch.org/clownacy/cave.html) (no longer maintained).
 [wii](https://www.github.com/Clownacy/Cave-Story-Engine-2/tree/wii) | Ports the engine to the Nintendo Wii (no longer maintained).
@@ -22,19 +22,19 @@ This branch migrates the engine from WinAPI to SDL2, and addresses numerous port
 
 ## Background
 
-In 2007, a Linux port of Cave Story was made by Peter Mackay and Simon Parzer. Details about it can be found in [Peter's old blog](https://web.archive.org/web/20070911202919/http://aaiiee.wordpress.com:80/). This port received an update in 2011, including two shiny new executables. What Peter and Simon didn't realise was that they left huge amounts of debugging information in these executables, including the names of every C++ source file, and the variables and functions they contained.
-
-This was a goldmine of information about not just the game's inner-workings, but its _source code._ This alone made a decompilation viable, but it wasn't the only help we'd get...
-
 When Pixel made Cave Story, he compiled the original Windows EXE with no optimisations. This left the generated assembly code extremely verbose and easy to read. It also made the code very decompiler-friendly, since the assembly could be mapped directly back to the original C(++) code.
 
-A combination of easy-to-decompile code and a near-complete symbol list made much of the decompilation process a copy/paste job, but not all of the game would need decompiling, as some of Cave Story's source code would actually see the light of day...
+Technically, this alone made a decompilation feasible, as was the case for [the Super Mario 64 decompilation project](https://github.com/n64decomp/sm64) - however, there was more to be found...
+
+In 2007, a Linux port of Cave Story was made by Peter Mackay and Simon Parzer. Details about it can be found on [Peter's old blog](https://web.archive.org/web/20070911202919/http://aaiiee.wordpress.com:80/). This port received an update in 2011, including two shiny new executables. What Peter and Simon didn't realise was that they left huge amounts of debugging information in these executables, including the names of every C++ source file, as well as the variables, functions, and structs they contained.
+
+This was a goldmine of information about not just the game's inner-workings, but its _source code._ This is the same lucky-break [the Diablo decompilation project](https://github.com/diasurgical/devilution) had. With it, much of the game's code was pre-documented and explained _for_ us, saving us the effort of doing it ourselves. In fact, the combination of easy-to-decompile code, and a near-full set of function/variable names, reduced much of the decompilation process to mere copy-paste.
+
+To top it all off, some of Cave Story's original source code would eventually see the light of day...
 
 In early 2018, the Organya music engine was [released on GitHub](https://github.com/shbow/organya) by an old friend of Pixel's. On top of providing an insight into Pixel's coding style, this helped with figuring out one of the most complex parts of Cave Story's codebase.
 
-It's because of these findings that a decompilation is possible: [the Mario 64 decompilation project](https://github.com/n64decomp/sm64) had a game that was built with no optimisations, [the Devilution project](https://github.com/diasurgical/devilution) was lucky enough to find a symbol list, so it's a miracle that we have both!
-
-Many months of copypasting and tinkering later, here is the result.
+And... that's it! It's not often that a game this decompilable comes along, so I'm glad that Cave Story was one of them. [Patching a dusty old executable from 2004 has its downsides](https://github.com/Clownacy/Cave-Story-Mod-Loader/blob/master/src/mods/graphics_enhancement/widescreen/patch_camera.c).
 
 ## Dependencies
 
@@ -82,7 +82,7 @@ Name | Function
 `-DBACKEND_PLATFORM=Null` | Use the dummy platform backend (doesn't do anything)
 `-DLTO=ON` | Enable link-time optimisation
 `-DPKG_CONFIG_STATIC_LIBS=ON` | On platforms with pkg-config, static-link the dependencies (good for Windows builds, so you don't need to bundle DLL files)
-`-DMSVC_LINK_STATIC_RUNTIME=ON` | Link the static MSVC runtime library (Visual Studio only)
+`-DMSVC_LINK_STATIC_RUNTIME=ON` | Link the static MSVC runtime library, to reduce the number of required DLL files (Visual Studio only)
 `-DFORCE_LOCAL_LIBS=ON` | Compile the built-in versions of SDL2, GLFW3, and FreeType instead of using the system-provided ones
 
 You can pass your own compiler flags with `-DCMAKE_C_FLAGS` and `-DCMAKE_CXX_FLAGS`.
