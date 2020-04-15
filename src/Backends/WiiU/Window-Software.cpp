@@ -59,7 +59,7 @@ void WindowBackend_Software_Display(void)
 
 	static bool flipflop;
 
-	unsigned char *in_pointer = fake_framebuffer;
+	const unsigned char *in_pointer = fake_framebuffer;
 
 	for (size_t y = 0; y < framebuffer_height; ++y)
 	{
@@ -76,22 +76,10 @@ void WindowBackend_Software_Display(void)
 			*out_pointer++ = *in_pointer++;
 			*out_pointer++ = *in_pointer++;
 			*out_pointer++ = 0;
-/*			uint32_t colour = 0;
-			colour |= *in_pointer++ << 24;
-			colour |= *in_pointer++ << 16;
-			colour |= *in_pointer++ << 8;
-			OSScreenPutPixelEx(SCREEN_DRC, x, y, colour);
-	*/	}
+		}
 	}
 
 	flipflop = !flipflop;
-
-//	static unsigned char accumulator = 0;
-
-//	accumulator += 0x10;
-
-//	for (size_t i = 0; i < buffer_size; ++i)
-//		real_framebuffer[i] = accumulator;
 
 //	DCFlushRange(tv_framebuffer, tv_buffer_size);
 //	DCFlushRange(drc_framebuffer, drc_buffer_size);
