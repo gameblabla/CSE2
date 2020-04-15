@@ -113,10 +113,10 @@ void DefaultConfigData(CONFIG *conf)
 	// conf->display_mode = 1;
 
 	// Reset joystick settings (as these can't simply be set to 0)
-	conf->bindings[BINDING_UP].controller = 0xFF;
-	conf->bindings[BINDING_DOWN].controller = 0xFF;
-	conf->bindings[BINDING_LEFT].controller = 0xFF;
-	conf->bindings[BINDING_RIGHT].controller = 0xFF;
+	conf->bindings[BINDING_UP].controller = 7;
+	conf->bindings[BINDING_DOWN].controller = 8;
+	conf->bindings[BINDING_LEFT].controller = 9;
+	conf->bindings[BINDING_RIGHT].controller = 10;
 	conf->bindings[BINDING_OK].controller = 1;
 	conf->bindings[BINDING_CANCEL].controller = 0;
 	conf->bindings[BINDING_JUMP].controller = 1;
