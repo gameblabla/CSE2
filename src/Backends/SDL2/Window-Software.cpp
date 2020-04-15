@@ -14,7 +14,7 @@ SDL_Window *window;
 static SDL_Surface *window_sdlsurface;
 static SDL_Surface *framebuffer_sdlsurface;
 
-unsigned char* WindowBackend_Software_CreateWindow(const char *window_title, int screen_width, int screen_height, bool fullscreen, size_t *pitch)
+bool WindowBackend_Software_CreateWindow(const char *window_title, int screen_width, int screen_height, bool fullscreen)
 {
 	window = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screen_width, screen_height, 0);
 
@@ -33,11 +33,9 @@ unsigned char* WindowBackend_Software_CreateWindow(const char *window_title, int
 
 			if (framebuffer_sdlsurface != NULL)
 			{
-				*pitch = framebuffer_sdlsurface->pitch;
-
 				Backend_PostWindowCreation();
 
-				return (unsigned char*)framebuffer_sdlsurface->pixels;
+				return true;
 			}
 			else
 			{
@@ -58,13 +56,20 @@ unsigned char* WindowBackend_Software_CreateWindow(const char *window_title, int
 		Backend_ShowMessageBox("Fatal error (software rendering backend)", error_message.c_str());
 	}
 
-	return NULL;
+	return false;
 }
 
 void WindowBackend_Software_DestroyWindow(void)
 {
 	SDL_FreeSurface(framebuffer_sdlsurface);
 	SDL_DestroyWindow(window);
+}
+
+unsigned char* WindowBackend_Software_GetFramebuffer(size_t *pitch)
+{
+	*pitch = framebuffer_sdlsurface->pitch;
+
+	return (unsigned char*)framebuffer_sdlsurface->pixels;
 }
 
 void WindowBackend_Software_Display(void)
