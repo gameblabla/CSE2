@@ -40,7 +40,7 @@ void Backend_PostWindowCreation(void)
 bool Backend_GetBasePath(char *string_buffer)
 {
 	strcpy(string_buffer, WHBGetSdCardMountPath());
-	strcat(string_buffer, "/CSE2");
+	strcat(string_buffer, "/CSE2-portable");
 
 	return true;
 }
