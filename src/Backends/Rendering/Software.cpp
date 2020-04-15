@@ -33,19 +33,22 @@ static RenderBackend_Surface *glyph_destination_surface;
 
 RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, bool fullscreen)
 {
-	size_t pitch;
-	framebuffer.pixels = WindowBackend_Software_CreateWindow(window_title, screen_width, screen_height, fullscreen, &pitch);
-	framebuffer.width = screen_width;
-	framebuffer.height = screen_height;
-	framebuffer.pitch = pitch;
+	if (WindowBackend_Software_CreateWindow(window_title, screen_width, screen_height, fullscreen))
+	{
+		size_t pitch;
+		framebuffer.pixels = WindowBackend_Software_GetFramebuffer(&pitch);
+		framebuffer.width = screen_width;
+		framebuffer.height = screen_height;
+		framebuffer.pitch = pitch;
 
-	if (framebuffer.pixels == NULL)
+		return &framebuffer;
+	}
+	else
 	{
 		Backend_PrintError("Failed to create window");
-		return NULL;
 	}
 
-	return &framebuffer;
+	return NULL;
 }
 
 void RenderBackend_Deinit(void)
@@ -56,6 +59,10 @@ void RenderBackend_Deinit(void)
 void RenderBackend_DrawScreen(void)
 {
 	WindowBackend_Software_Display();
+
+	size_t pitch;
+	framebuffer.pixels = WindowBackend_Software_GetFramebuffer(&pitch);
+	framebuffer.pitch = pitch;
 }
 
 RenderBackend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned int height)
