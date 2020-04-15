@@ -38,8 +38,8 @@ Many months of copypasting and tinkering later, here is the result.
 
 ## Dependencies
 
-* SDL2
-* GLFW3
+* SDL2 (if `BACKEND_AUDIO` or `BACKEND_PLATFORM` are set to `SDL2`)
+* GLFW3 (if `BACKEND_PLATFORM` is set to `GLFW3`)
 * FreeType
 
 If these are not found, they will be built locally.
@@ -96,6 +96,43 @@ cmake --build build --config Release
 If you're a Visual Studio user, you can open the generated `CSE2.sln` file instead, which can be found in the `build` folder.
 
 Once built, the executables can be found in the `game_english`/`game_japanese` folder, depending on the selected language.
+
+### Building for the Wii U
+
+To target the Wii U, you'll need devkitPro, and WUT.
+
+First, add the devkitPPC tools directory to your PATH (because WUT's CMake support is broken, as of writing):
+
+```
+PATH=$PATH:$DEVKITPPC/bin
+```
+
+Then, generate the build files with this command:
+
+```
+cmake -B buildwiiu -DCMAKE_BUILD_TYPE=Release -DFORCE_LOCAL_LIBS=ON -DBACKEND_PLATFORM=WiiU -DBACKEND_RENDERER=Software -DBACKEND_AUDIO=Null -DBUILD_DOCONFIG=OFF -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/wut/share/wut.toolchain.cmake
+```
+
+Finally, build the game with this command:
+
+```
+cmake --build buildwiiu
+```
+
+This will build a binary, but you still need to convert it to an `.rpx` file that can be ran on your Wii U.
+
+First, we need to strip the binary:
+
+```
+powerpc-eabi-strip -g game_english/CSE2
+```
+
+Then, we convert it to an `.rpx`:
+```
+elf2rpl game_english/CSE2 game_english/CSE2.rpx
+```
+
+`game_english/CSE2.rpx` is now ready to be ran on your Wii U. This port expects the data folder to be in a folder called `CSE2` on the root of your SD card.
 
 ## Licensing
 
