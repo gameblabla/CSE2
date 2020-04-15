@@ -16,7 +16,7 @@ static size_t framebuffer_height;
 //static uint32_t tv_buffer_size;
 static uint32_t drc_buffer_size;
 
-unsigned char* WindowBackend_Software_CreateWindow(const char *window_title, int screen_width, int screen_height, bool fullscreen, size_t *pitch)
+bool WindowBackend_Software_CreateWindow(const char *window_title, int screen_width, int screen_height, bool fullscreen)
 {
 	(void)window_title;
 	(void)fullscreen;
@@ -38,11 +38,9 @@ unsigned char* WindowBackend_Software_CreateWindow(const char *window_title, int
 //	OSScreenSetBufferEx(SCREEN_TV, tv_framebuffer);
 	OSScreenSetBufferEx(SCREEN_DRC, drc_framebuffer);
 
-	fake_framebuffer = (unsigned char*)malloc(screen_width * screen_height * 3);
+	fake_framebuffer = (unsigned char*)malloc(framebuffer_width * framebuffer_height * 3);
 
-	*pitch = screen_width * 3;
-
-	return fake_framebuffer;
+	return true;
 }
 
 void WindowBackend_Software_DestroyWindow(void)
@@ -51,6 +49,13 @@ void WindowBackend_Software_DestroyWindow(void)
 	free(drc_framebuffer);
 //	free(tv_framebuffer);
 	OSScreenShutdown();
+}
+
+unsigned char* WindowBackend_Software_GetFramebuffer(size_t *pitch)
+{
+	*pitch = framebuffer_width * 3;
+
+	return fake_framebuffer;
 }
 
 void WindowBackend_Software_Display(void)
