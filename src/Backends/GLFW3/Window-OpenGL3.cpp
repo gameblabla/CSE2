@@ -15,7 +15,7 @@
 
 GLFWwindow *window;
 
-bool WindowBackend_OpenGL_CreateWindow(const char *window_title, int *screen_width, int *screen_height, BOOL fullscreen)
+bool WindowBackend_OpenGL_CreateWindow(const char *window_title, int *screen_width, int *screen_height, bool fullscreen)
 {
 #ifdef USE_OPENGLES2
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
