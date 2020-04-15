@@ -20,7 +20,7 @@ bool WindowBackend_Software_CreateWindow(const char *window_title, int screen_wi
 	(void)window_title;
 	(void)fullscreen;
 
-	*vsync = FALSE;
+	*vsync = false;
 
 	framebuffer_width = screen_width;
 	framebuffer_height = screen_height;
