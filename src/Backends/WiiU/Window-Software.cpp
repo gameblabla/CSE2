@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 
-#include <coreinit/cache.h>
+//#include <coreinit/cache.h>
 #include <coreinit/screen.h>
 
 static unsigned char *fake_framebuffer;
