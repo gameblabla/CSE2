@@ -19,6 +19,8 @@
 #include "Resource.h"
 #include "TextScr.h"
 
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+
 typedef enum SurfaceType
 {
 	SURFACE_SOURCE_NONE = 1,
@@ -121,7 +123,8 @@ BOOL StartDirectDraw(const char *title, int lMagnification, BOOL b60fps, BOOL bS
 			break;
 
 		case 0:
-			magnification = display_mode.width / WINDOW_WIDTH < display_mode.height / WINDOW_HEIGHT ? display_mode.width / WINDOW_WIDTH : display_mode.height / WINDOW_HEIGHT;
+			// Round to the nearest internal resolution
+			magnification = MIN((display_mode.width + (WINDOW_WIDTH / 2)) / WINDOW_WIDTH, (display_mode.height + (WINDOW_HEIGHT / 2)) / WINDOW_HEIGHT);
 			fullscreen = TRUE;
 			break;
 	}
