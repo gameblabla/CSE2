@@ -164,39 +164,55 @@ ATTRIBUTE_HOT void RenderBackend_Blit(RenderBackend_Surface *source_surface, con
 	if (rect_clamped.right - rect_clamped.left <= 0)
 		return;
 
-	for (long j = 0; j < rect_clamped.bottom - rect_clamped.top; ++j)
+	if (alpha_blend)
 	{
-		unsigned char *source_pointer = &source_surface->pixels[((rect_clamped.top + j) * source_surface->pitch) + (rect_clamped.left * 4)];
-		unsigned char *destination_pointer = &destination_surface->pixels[((y + j) * destination_surface->pitch) + (x * 4)];
-
-		for (long i = 0; i < rect_clamped.right - rect_clamped.left; ++i)
+		for (long j = 0; j < rect_clamped.bottom - rect_clamped.top; ++j)
 		{
-			if (source_pointer[3] == 0xFF)
-			{
-				*destination_pointer++ = *source_pointer++;
-				*destination_pointer++ = *source_pointer++;
-				*destination_pointer++ = *source_pointer++;
-				*destination_pointer++ = *source_pointer++;
-			}
-			else if (source_pointer[3] != 0)
-			{
-				const float src_alpha = source_pointer[3] / 255.0f;
-				const float dst_alpha = destination_pointer[3] / 255.0f;
-				const float out_alpha = src_alpha + dst_alpha * (1.0f - src_alpha);
+			const unsigned char *source_pointer = &source_surface->pixels[((rect_clamped.top + j) * source_surface->pitch) + (rect_clamped.left * 4)];
+			unsigned char *destination_pointer = &destination_surface->pixels[((y + j) * destination_surface->pitch) + (x * 4)];
 
-				for (unsigned int j = 0; j < 3; ++j)
-					destination_pointer[j] = (unsigned char)((source_pointer[j] * src_alpha + destination_pointer[j] * dst_alpha * (1.0f - src_alpha)) / out_alpha);
-
-				destination_pointer[3] = (unsigned char)(out_alpha * 255.0f);
-
-				source_pointer += 4;
-				destination_pointer += 4;
-			}
-			else
+			for (long i = 0; i < rect_clamped.right - rect_clamped.left; ++i)
 			{
-				source_pointer += 4;
-				destination_pointer += 4;
+				if (source_pointer[3] == 0xFF)
+				{
+					*destination_pointer++ = *source_pointer++;
+					*destination_pointer++ = *source_pointer++;
+					*destination_pointer++ = *source_pointer++;
+					*destination_pointer++ = *source_pointer++;
+				}
+				else if (source_pointer[3] != 0)
+				{
+					const float src_alpha = source_pointer[3] / 255.0f;
+					const float dst_alpha = destination_pointer[3] / 255.0f;
+					const float out_alpha = src_alpha + dst_alpha * (1.0f - src_alpha);
+
+					for (unsigned int j = 0; j < 3; ++j)
+						destination_pointer[j] = (unsigned char)((source_pointer[j] * src_alpha + destination_pointer[j] * dst_alpha * (1.0f - src_alpha)) / out_alpha);
+
+					destination_pointer[3] = (unsigned char)(out_alpha * 255.0f);
+
+					source_pointer += 4;
+					destination_pointer += 4;
+				}
+				else
+				{
+					source_pointer += 4;
+					destination_pointer += 4;
+				}
 			}
+		}
+	}
+	else
+	{
+		const unsigned char *source_pointer = &source_surface->pixels[(rect_clamped.top * source_surface->pitch) + (rect_clamped.left * 4)];
+		unsigned char *destination_pointer = &destination_surface->pixels[(y * destination_surface->pitch) + (x * 4)];
+
+		for (long j = 0; j < rect_clamped.bottom - rect_clamped.top; ++j)
+		{
+			memcpy(destination_pointer, source_pointer, (rect_clamped.right - rect_clamped.left) * 4);
+
+			source_pointer += source_surface->pitch;
+			destination_pointer += destination_surface->pitch;
 		}
 	}
 }
