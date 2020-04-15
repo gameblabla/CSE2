@@ -1,6 +1,7 @@
 #include "../Window-Software.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 //#include <coreinit/cache.h>
 #include <coreinit/screen.h>
@@ -61,29 +62,20 @@ void WindowBackend_Software_Display(void)
 
 	static bool flipflop;
 
-	unsigned char *in_pointer = fake_framebuffer;
+	const unsigned char *in_pointer = fake_framebuffer;
+	unsigned char *out_pointer = drc_framebuffer;
+
+	if (!flipflop)
+		out_pointer += drc_buffer_size / 2;
+
+	out_pointer += ((854 - framebuffer_width) * 4) / 2;
 
 	for (size_t y = 0; y < framebuffer_height; ++y)
 	{
-		unsigned char *out_pointer = &drc_framebuffer[line_size * y];
+		memcpy(out_pointer, in_pointer, framebuffer_width * 4);
 
-		if (!flipflop)
-			out_pointer += drc_buffer_size / 2;
-
-		out_pointer += ((854 - framebuffer_width) * 4) / 2;
-
-		for (size_t x = 0; x < framebuffer_width; ++x)
-		{
-			*out_pointer++ = *in_pointer++;
-			*out_pointer++ = *in_pointer++;
-			*out_pointer++ = *in_pointer++;
-			*out_pointer++ = *in_pointer++;
-/*			uint32_t colour = 0;
-			colour |= *in_pointer++ << 24;
-			colour |= *in_pointer++ << 16;
-			colour |= *in_pointer++ << 8;
-			OSScreenPutPixelEx(SCREEN_DRC, x, y, colour);
-	*/	}
+		in_pointer += framebuffer_width * 4;
+		out_pointer += line_size;
 	}
 
 	flipflop = !flipflop;
