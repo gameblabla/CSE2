@@ -74,6 +74,7 @@ void WindowBackend_Software_Display(void)
 			out_pointer += drc_buffer_size / 2;
 
 		out_pointer += ((854 - framebuffer_width) * 4) / 2;
+		out_pointer += ((480 - framebuffer_height) * line_size) / 2;
 
 		for (size_t x = 0; x < framebuffer_width; ++x)
 		{
