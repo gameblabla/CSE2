@@ -363,30 +363,3 @@ void ActNpc357(NPCHAR *npc);
 void ActNpc358(NPCHAR *npc);
 void ActNpc359(NPCHAR *npc);
 void ActNpc360(NPCHAR *npc);
-void ActNpc361(NPCHAR *npc);
-void ActNpc362(NPCHAR *npc);
-void ActNpc363(NPCHAR *npc);
-void ActNpc364(NPCHAR *npc);
-void ActNpc365(NPCHAR *npc);
-void ActNpc366(NPCHAR *npc);
-void ActNpc367(NPCHAR *npc);
-void ActNpc368(NPCHAR *npc);
-void ActNpc369(NPCHAR *npc);
-
-// Reserved for future CS+ updates
-/*
-void ActNpc370(NPCHAR *npc);
-void ActNpc371(NPCHAR *npc);
-void ActNpc370(NPCHAR *npc);
-void ActNpc372(NPCHAR *npc);
-void ActNpc373(NPCHAR *npc);
-void ActNpc374(NPCHAR *npc);
-void ActNpc375(NPCHAR *npc);
-void ActNpc376(NPCHAR *npc);
-void ActNpc377(NPCHAR *npc);
-void ActNpc378(NPCHAR *npc);
-void ActNpc379(NPCHAR *npc);
-void ActNpc380(NPCHAR *npc);
-*/
-
-void ActNpc381(NPCHAR *npc);
