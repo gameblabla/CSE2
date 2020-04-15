@@ -133,3 +133,10 @@ void Backend_Delay(unsigned int ticks)
 {
 	OSSleepTicks((ticks * tick_delta) / 1000);
 }
+
+void Backend_GetDisplayMode(Backend_DisplayMode *display_mode)
+{
+	display_mode->width = 854;
+	display_mode->height = 480;
+	display_mode->refresh_rate = 60;
+}

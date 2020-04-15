@@ -16,10 +16,12 @@ static size_t framebuffer_height;
 //static uint32_t tv_buffer_size;
 static uint32_t drc_buffer_size;
 
-unsigned char* WindowBackend_Software_CreateWindow(const char *window_title, int screen_width, int screen_height, bool fullscreen, size_t *pitch)
+unsigned char* WindowBackend_Software_CreateWindow(const char *window_title, int screen_width, int screen_height, bool fullscreen, bool *vsync, size_t *pitch)
 {
 	(void)window_title;
 	(void)fullscreen;
+
+	*vsync = FALSE;
 
 	framebuffer_width = screen_width;
 	framebuffer_height = screen_height;
