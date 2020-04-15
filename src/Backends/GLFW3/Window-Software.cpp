@@ -24,7 +24,7 @@ static float framebuffer_y_ratio;
 
 static GLuint screen_texture_id;
 
-unsigned char* WindowBackend_Software_CreateWindow(const char *window_title, int screen_width, int screen_height, bool fullscreen, bool *vsync, size_t *pitch)
+bool WindowBackend_Software_CreateWindow(const char *window_title, int screen_width, int screen_height, bool fullscreen, bool *vsync)
 {
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 1);
@@ -84,18 +84,16 @@ unsigned char* WindowBackend_Software_CreateWindow(const char *window_title, int
 
 		framebuffer = (unsigned char*)malloc(framebuffer_width * framebuffer_height * 4);
 
-		*pitch = framebuffer_width * 4;
-
 		Backend_PostWindowCreation();
 
-		return framebuffer;
+		return true;
 	}
 	else
 	{
 		Backend_ShowMessageBox("Fatal error (OpenGL rendering backend)", "Could not create window");
 	}
 
-	return NULL;
+	return false;
 }
 
 void WindowBackend_Software_DestroyWindow(void)
@@ -103,6 +101,13 @@ void WindowBackend_Software_DestroyWindow(void)
 	free(framebuffer);
 	glDeleteTextures(1, &screen_texture_id);
 	glfwDestroyWindow(window);
+}
+
+unsigned char* WindowBackend_Software_GetFramebuffer(size_t *pitch)
+{
+	*pitch = framebuffer_width * 4;
+
+	return framebuffer;
 }
 
 void WindowBackend_Software_Display(void)
