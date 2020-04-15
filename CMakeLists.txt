@@ -245,11 +245,11 @@ set_target_properties(CSE2 PROPERTIES
 ################
 
 # Link libraries
-target_link_libraries(CSE2 PRIVATE ddraw.lib dsound.lib version.lib shlwapi.lib imm32.lib winmm.lib dxguid.lib)
+target_link_libraries(CSE2 PRIVATE ddraw dsound version shlwapi imm32 winmm dxguid gdi32)
 
 # Newer MSVC is missing `dinput.lib`
 if(MSVC AND MSVC_VERSION GREATER_EQUAL 1500)
-	target_link_libraries(CSE2 PRIVATE dinput8.lib)
+	target_link_libraries(CSE2 PRIVATE dinput8)
 else()
-	target_link_libraries(CSE2 PRIVATE dinput.lib)
+	target_link_libraries(CSE2 PRIVATE dinput)
 endif()
