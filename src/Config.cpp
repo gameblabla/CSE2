@@ -9,7 +9,7 @@
 #include "File.h"
 #include "Main.h"
 
-static const char* const config_filename = "Config.dat";	// Not the original name
+static const char* const config_filename = "ConfigCSE2E.dat";	// Not the original name
 static const char* const config_magic = "CSE2E   20200123";	// Not the original name
 
 BOOL LoadConfigData(CONFIG *conf)
