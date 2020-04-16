@@ -26,12 +26,7 @@ int gSuperYpos;
 
 const char *gPassPixEve = "PXE";
 
-void InitNpChar(void)
-{
-	memset(gNPC, 0, sizeof(gNPC));
-}
-
-void SetUniqueParameter(NPCHAR *npc)
+static void SetUniqueParameter(NPCHAR *npc)
 {
 	int code = npc->code_char;
 	npc->surf = (SurfaceID)gNpcTable[code].surf;
@@ -48,6 +43,11 @@ void SetUniqueParameter(NPCHAR *npc)
 	npc->view.back = gNpcTable[code].view.back * 0x200;
 	npc->view.top = gNpcTable[code].view.top * 0x200;
 	npc->view.bottom = gNpcTable[code].view.bottom * 0x200;
+}
+
+void InitNpChar(void)
+{
+	memset(gNPC, 0, sizeof(gNPC));
 }
 
 BOOL LoadEvent(const char *path_event)
