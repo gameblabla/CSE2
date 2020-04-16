@@ -67,6 +67,7 @@ void SetClientOffset(int width, int height)
 
 BOOL Flip_SystemTask(HWND hWnd)
 {
+	// TODO - Not the original variable names
 	static DWORD timePrev;
 	static DWORD timeNow;
 
@@ -89,7 +90,7 @@ BOOL Flip_SystemTask(HWND hWnd)
 	else
 		timePrev += FRAMERATE;
 
-	static RECT dst_rect;
+	static RECT dst_rect;	// TODO - Not the original vaiable name
 	GetWindowRect(hWnd, &dst_rect);
 	dst_rect.left += client_x;
 	dst_rect.top += client_y;
@@ -537,12 +538,12 @@ BOOL MakeSurface_Generic(int bxsize, int bysize, SurfaceID surf_no, BOOL bSystem
 
 void BackupSurface(SurfaceID surf_no, const RECT *rect)
 {
-	static DDBLTFX ddbltfx;
+	static DDBLTFX ddbltfx;	// TODO - Not the original variable name
 
 	memset(&ddbltfx, 0, sizeof(DDBLTFX));
 	ddbltfx.dwSize = sizeof(DDBLTFX);
 
-	static RECT scaled_rect;
+	static RECT scaled_rect;	// TODO - Not the original variable name
 	scaled_rect.left = rect->left * magnification;
 	scaled_rect.top = rect->top * magnification;
 	scaled_rect.right = rect->right * magnification;
@@ -698,12 +699,12 @@ unsigned long GetCortBoxColor(COLORREF col)
 
 void CortBox(const RECT *rect, unsigned long col)
 {
-	static DDBLTFX ddbltfx;
+	static DDBLTFX ddbltfx;	// TODO - Not the original variable name
 	memset(&ddbltfx, 0, sizeof(DDBLTFX));
 	ddbltfx.dwSize = sizeof(DDBLTFX);
 	ddbltfx.dwFillColor = col;
 
-	static RECT dst_rect;
+	static RECT dst_rect;	// TODO - Not the original variable name
 	dst_rect.left = rect->left * magnification;
 	dst_rect.top = rect->top * magnification;
 	dst_rect.right = rect->right * magnification;
@@ -714,12 +715,12 @@ void CortBox(const RECT *rect, unsigned long col)
 
 void CortBox2(const RECT *rect, unsigned long col, SurfaceID surf_no)
 {
-	static DDBLTFX ddbltfx;
+	static DDBLTFX ddbltfx;	// TODO - Not the original variable name
 	memset(&ddbltfx, 0, sizeof(DDBLTFX));
 	ddbltfx.dwSize = sizeof(DDBLTFX);
 	ddbltfx.dwFillColor = col;
 
-	static RECT dst_rect;
+	static RECT dst_rect;	// TODO - Not the original variable name
 	dst_rect.left = rect->left * magnification;
 	dst_rect.top = rect->top * magnification;
 	dst_rect.right = rect->right * magnification;
@@ -732,7 +733,7 @@ void CortBox2(const RECT *rect, unsigned long col, SurfaceID surf_no)
 
 // Dummied-out log function
 // According to the Mac port, its name really is just "out".
-BOOL out(int unknown)
+static BOOL out(int unknown)
 {
 	char unknown2[0x100];
 	int unknown3;
@@ -748,7 +749,8 @@ BOOL out(int unknown)
 	return TRUE;
 }
 
-int RestoreSurfaces(void)	// Guessed function name - this doesn't exist in the Linux port
+// TODO - Probably not the original variable name (this is an educated guess)
+int RestoreSurfaces(void)
 {
 	int s;
 	RECT rect;
