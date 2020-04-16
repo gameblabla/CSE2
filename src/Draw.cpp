@@ -730,7 +730,9 @@ void CortBox2(const RECT *rect, unsigned long col, SurfaceID surf_no)
 	surf[surf_no]->Blt(&dst_rect, 0, 0, DDBLT_COLORFILL | DDBLT_WAIT, &ddbltfx);
 }
 
-BOOL DummiedOutLogFunction(int unknown)
+// Dummied-out log function
+// According to the Mac port, its name really is just "out".
+BOOL out(int unknown)
 {
 	char unknown2[0x100];
 	int unknown3;
@@ -762,14 +764,14 @@ int RestoreSurfaces(void)	// Guessed function name - this doesn't exist in the L
 	{
 		++surfaces_regenerated;
 		frontbuffer->Restore();
-		DummiedOutLogFunction(0x66);
+		out(0x66);
 	}
 
 	if (backbuffer->IsLost() == DDERR_SURFACELOST)
 	{
 		++surfaces_regenerated;
 		backbuffer->Restore();
-		DummiedOutLogFunction(0x62);
+		out(0x62);
 	}
 
 	for (s = 0; s < SURFACE_ID_MAX; ++s)
@@ -780,7 +782,7 @@ int RestoreSurfaces(void)	// Guessed function name - this doesn't exist in the L
 			{
 				++surfaces_regenerated;
 				surf[s]->Restore();
-				DummiedOutLogFunction(0x30 + s);
+				out(0x30 + s);
 
 				if (!surface_metadata[s].bSystem)
 				{
