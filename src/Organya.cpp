@@ -760,7 +760,7 @@ BOOL QuitMMTimer();
 /*■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■*/
 UINT ExactTime   = 13;	// 最小精度 (Minimum accuracy)
 UINT TimerID;
-BOOL nameless_flag;
+BOOL bTimer;
 
 /*■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■*/
 // タイマー精度を設定する。 (Set timer accuracy.)
@@ -809,7 +809,7 @@ BOOL StartTimer(DWORD dwTimer)
 	if (ret != TIMERR_NOERROR)
 		return FALSE;
 
-	nameless_flag = TRUE;
+	bTimer = TRUE;
 
 	return TRUE;
 }
@@ -843,7 +843,7 @@ BOOL QuitMMTimer(void)
 {
 	MMRESULT ret;
 
-	if (!nameless_flag)
+	if (!bTimer)
 		return FALSE;
 
 	if(TimerID != TIMERR_NOERROR)
@@ -859,7 +859,7 @@ BOOL QuitMMTimer(void)
 	if (ret != TIMERR_NOERROR)
 		return FALSE;
 
-	nameless_flag = FALSE;
+	bTimer = FALSE;
 
 	return TRUE;
 }
