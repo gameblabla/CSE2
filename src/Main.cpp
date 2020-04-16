@@ -34,7 +34,7 @@ BOOL gbUseJoystick = FALSE;
 int gJoystickButtonTable[8];
 
 static BOOL bActive = TRUE;
-static BOOL bFps = FALSE;
+static BOOL bFPS = FALSE;
 
 static HANDLE hObject;
 static HANDLE hMutex;
@@ -63,7 +63,7 @@ void SetWindowName(HWND hWnd)
 // Framerate stuff
 void PutFramePerSecound(void)
 {
-	if (bFps)
+	if (bFPS)
 	{
 		const unsigned long fps = CountFramePerSecound();
 		PutNumber4(WINDOW_WIDTH - 40, 8, fps, FALSE);
@@ -472,7 +472,7 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lPar
 			DrawMenuBar(hWnd);
 
 			if (IsKeyFile("fps"))
-				bFps = TRUE;
+				bFPS = TRUE;
 
 			if (!bFullscreen)
 				LoadWindowRect(hWnd, "window.rect", FALSE);
