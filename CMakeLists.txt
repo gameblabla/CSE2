@@ -18,7 +18,7 @@ option(DEBUG_SAVE "Re-enable the ability to drag-and-drop save files onto the wi
 option(BUILD_DOCONFIG "Compile a DoConfig clone tool - not useful for console ports" ON)
 
 set(BACKEND_RENDERER "SDLTexture" CACHE STRING "Which renderer the game should use: 'OpenGL3' for an OpenGL 3.2 renderer, 'OpenGLES2' for an OpenGL ES 2.0 renderer, 'SDLTexture' for SDL2's hardware-accelerated Texture API, 'SDLSurface' for SDL2's software-rendered Surface API, or 'Software' for a handwritten software renderer")
-set(BACKEND_AUDIO "SDL2" CACHE STRING "Which audio backend the game should use: 'SDL2', 'miniaudio', or 'Null'")
+set(BACKEND_AUDIO "SDL2" CACHE STRING "Which audio backend the game should use: 'SDL2', 'miniaudio', 'WiiU', or 'Null'")
 set(BACKEND_PLATFORM "SDL2" CACHE STRING "Which platform backend the game should use: 'SDL2', 'GLFW3', 'WiiU', or 'Null'")
 
 option(LTO "Enable link-time optimisation" OFF)
@@ -330,6 +330,10 @@ elseif(BACKEND_AUDIO MATCHES "miniaudio")
 	endif()
 
 	target_link_libraries(CSE2 PRIVATE ${CMAKE_DL_LIBS})
+elseif(BACKEND_AUDIO MATCHES "WiiU")
+	target_sources(CSE2 PRIVATE
+		"src/Backends/Audio/WiiU.cpp"
+	)
 elseif(BACKEND_AUDIO MATCHES "Null")
 	target_sources(CSE2 PRIVATE
 		"src/Backends/Audio/Null.cpp"

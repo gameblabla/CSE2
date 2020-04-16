@@ -75,6 +75,7 @@ Name | Function
 `-DBACKEND_RENDERER=Software` | Use the handwritten software renderer
 `-DBACKEND_AUDIO=SDL2` | Use the SDL2-driven software audio-mixer
 `-DBACKEND_AUDIO=miniaudio` | Use the miniaudio-driven software audio-mixer
+`-DBACKEND_AUDIO=WiiU` | Use the hardware-accelerated audio backend for the Wii U
 `-DBACKEND_AUDIO=Null` | Use the dummy audio backend (doesn't produce any sound)
 `-DBACKEND_PLATFORM=SDL2` | Use SDL2 for windowing and OS-abstraction
 `-DBACKEND_PLATFORM=GLFW3` | Use GLFW3 for windowing and OS-abstraction
