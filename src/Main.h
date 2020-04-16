@@ -9,6 +9,6 @@ extern HWND ghWnd;
 extern BOOL bFullscreen;
 
 void PutFramePerSecound(void);
-unsigned long GetFramePerSecound(void);
+unsigned long CountFramePerSecound(void);
 
 BOOL SystemTask(void);

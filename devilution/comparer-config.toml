@@ -442,7 +442,7 @@ name = "CortBox2"
 addr = 0x40CA80
 
 [[func]]
-name = "DummiedOutLogFunction"
+name = "out"
 addr = 0x40CB30
 
 [[func]]
@@ -791,7 +791,7 @@ name = "PutFramePerSecound"
 addr = 0x412370
 
 [[func]]
-name = "GetFramePerSecound"
+name = "CountFramePerSecound"
 addr = 0x4123A0
 
 [[func]]

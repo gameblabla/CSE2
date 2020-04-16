@@ -51,6 +51,7 @@ static const char *lpWindowName = "\x93\xB4\x8C\x41\x95\xA8\x8C\xEA";	// '洞窟
 static const char *lpWindowName = "Cave Story ~ Doukutsu Monogatari";
 #endif
 
+// The original name for this function is unknown
 void SetWindowName(HWND hWnd)
 {
 	char window_name[0x100];
@@ -64,36 +65,36 @@ void PutFramePerSecound(void)
 {
 	if (bFps)
 	{
-		const unsigned long fps = GetFramePerSecound();
+		const unsigned long fps = CountFramePerSecound();
 		PutNumber4(WINDOW_WIDTH - 40, 8, fps, FALSE);
 	}
 }
 
-unsigned long GetFramePerSecound(void)
+unsigned long CountFramePerSecound(void)
 {
-	unsigned long current_tick;
-	static BOOL need_new_base_tick = TRUE;
-	static unsigned long frames_this_second;
-	static unsigned long current_frame;
-	static unsigned long base_tick;
+	unsigned long current_tick;	// The original name for this variable is unknown
+	static BOOL first = TRUE;
+	static unsigned long max_count;
+	static unsigned long count;
+	static unsigned long wait;
 
-	if (need_new_base_tick)
+	if (first)
 	{
-		base_tick = GetTickCount();
-		need_new_base_tick = FALSE;
+		wait = GetTickCount();
+		first = FALSE;
 	}
 
 	current_tick = GetTickCount();
-	++current_frame;
+	++count;
 
-	if (base_tick + 1000 <= current_tick)
+	if (wait + 1000 <= current_tick)
 	{
-		base_tick += 1000;
-		frames_this_second = current_frame;
-		current_frame = 0;
+		wait += 1000;
+		max_count = count;
+		count = 0;
 	}
 
-	return frames_this_second;
+	return max_count;
 }
 
 // TODO - Inaccurate stack frame
