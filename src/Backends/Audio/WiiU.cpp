@@ -174,8 +174,7 @@ void AudioBackend_PlaySound(AudioBackend_Sound *sound, bool looping)
 			AXVoiceVeData vol = {.volume = sound->volume};
 			AXSetVoiceVe(voice, &vol);
 
-			AXVoiceDeviceMixData mix_data[1][6];
-			memset(mix_data, 0, sizeof(mix_data));
+			static AXVoiceDeviceMixData mix_data[1][6];
 			mix_data[0][0].bus[0].volume = sound->pan_l;
 			mix_data[0][1].bus[0].volume = sound->pan_r;
 
@@ -252,8 +251,7 @@ void AudioBackend_SetSoundPan(AudioBackend_Sound *sound, long pan)
 	sound->pan_l = (unsigned short)(0x8000 * MillibelToScale(-pan));
 	sound->pan_r = (unsigned short)(0x8000 * MillibelToScale(pan));
 
-	AXVoiceDeviceMixData mix_data[1][6];
-	memset(mix_data, 0, sizeof(mix_data));
+	static AXVoiceDeviceMixData mix_data[1][6];
 	mix_data[0][0].bus[0].volume = sound->pan_l;
 	mix_data[0][1].bus[0].volume = sound->pan_r;
 
