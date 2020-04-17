@@ -43,7 +43,7 @@ static unsigned long GetTicksMilliseconds(void)
 {
 	static uint64_t accumulator;
 
-	static unsigned long last_tick;
+	static unsigned long last_tick;	// For some dumbass reason, OSTick is signed, so force unsigned here instead
 
 	unsigned long current_tick = OSGetTick();
 
@@ -94,8 +94,7 @@ bool AudioBackend_Init(void)
 {
 	if (!AXIsInit())
 	{
-		static AXInitParams initparams =
-		{
+		AXInitParams initparams = {
 			.renderer = AX_INIT_RENDERER_48KHZ,
 			.pipeline = AX_INIT_PIPELINE_SINGLE,
 		};
@@ -213,8 +212,9 @@ void AudioBackend_StopSound(AudioBackend_Sound *sound)
 {
 	if (sound->voice != NULL)
 	{
-		AXFreeVoice(sound->voice);
+		AXVoice *voice = sound->voice;
 		sound->voice = NULL;
+		AXFreeVoice(voice);
 	}
 }
 
@@ -241,9 +241,7 @@ void AudioBackend_SetSoundVolume(AudioBackend_Sound *sound, long volume)
 
 	if (sound->voice != NULL)
 	{
-		AXVoiceVeData vol = {
-			.volume = sound->volume,
-		};
+		AXVoiceVeData vol = {.volume = sound->volume};
 
 		AXSetVoiceVe(sound->voice, &vol);
 	}
