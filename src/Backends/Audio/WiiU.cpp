@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include <coreinit/cache.h>
+#include <coreinit/thread.h>
 
 #include <sndcore2/core.h>
 #include <sndcore2/voice.h>
@@ -26,11 +27,67 @@ struct AudioBackend_Sound
 	unsigned short pan_r;
 };
 
+static void (*organya_callback)(void);
+static unsigned int organya_milliseconds;
+
 static double MillibelToScale(long volume)
 {
 	// Volume is in hundredths of a decibel, from 0 to -10000
 	volume = CLAMP(volume, -10000, 0);
 	return pow(10.0, volume / 2000.0);
+}
+
+static unsigned long tick_delta;
+
+static unsigned long GetTicksMilliseconds(void)
+{
+	static uint64_t accumulator;
+
+	static unsigned long last_tick;
+
+	unsigned long current_tick = OSGetTick();
+
+	accumulator += current_tick - last_tick;
+
+	last_tick = current_tick;
+
+	return (accumulator * 1000) / tick_delta;
+}
+
+static int ThreadFunction(int argc, const char *argv[])
+{
+	for (;;)
+	{
+		OSTestThreadCancel();
+
+		if (organya_milliseconds == 0)
+		{
+			OSSleepTicks(1);
+		}
+		else
+		{
+			static unsigned long next_ticks;
+			unsigned long ticks;
+
+			for (;;)
+			{
+				ticks = GetTicksMilliseconds();
+
+				if (ticks >= next_ticks)
+				{
+					next_ticks += organya_milliseconds;
+					break;
+				}
+
+				OSSleepTicks(1);
+			}
+
+			if (organya_callback != NULL)
+				organya_callback();
+		}
+	}
+
+	return 0;
 }
 
 bool AudioBackend_Init(void)
@@ -45,12 +102,20 @@ bool AudioBackend_Init(void)
 
 		AXInitWithParams(&initparams);
 	}
+	tick_delta = OSGetSystemInfo()->busClockSpeed / 4;
+
+	OSRunThread(OSGetDefaultThread(0), ThreadFunction, 0, NULL);
 
 	return true;
 }
 
 void AudioBackend_Deinit(void)
 {
+	OSCancelThread(OSGetDefaultThread(0));
+
+	//int result;
+	//OSJoinThread(&thread, &result);
+
 	AXQuit();
 }
 
@@ -149,6 +214,7 @@ void AudioBackend_StopSound(AudioBackend_Sound *sound)
 {
 	if (sound->voice != NULL)
 	{
+//		AXSetVoiceState(sound->voice, AX_VOICE_STATE_STOPPED);
 		AXFreeVoice(sound->voice);
 		sound->voice = NULL;
 	}
@@ -157,7 +223,10 @@ void AudioBackend_StopSound(AudioBackend_Sound *sound)
 void AudioBackend_RewindSound(AudioBackend_Sound *sound)
 {
 	if (sound->voice != NULL)
+	{
+	//	AXSetVoiceState(sound->voice, AX_VOICE_STATE_STOPPED);
 		AXSetVoiceCurrentOffset(sound->voice, 0);
+	}
 }
 
 void AudioBackend_SetSoundFrequency(AudioBackend_Sound *sound, unsigned int frequency)
@@ -187,9 +256,12 @@ void AudioBackend_SetSoundVolume(AudioBackend_Sound *sound, long volume)
 
 void AudioBackend_SetSoundPan(AudioBackend_Sound *sound, long pan)
 {
+	sound->pan_l = (unsigned short)(0x8000 * MillibelToScale(-pan));
+	sound->pan_r = (unsigned short)(0x8000 * MillibelToScale(pan));
+
 	static AXVoiceDeviceMixData mix_data[1][6];
-	mix_data[0][0].bus[0].volume = (unsigned short)(0x8000 * MillibelToScale(-pan));
-	mix_data[0][1].bus[0].volume = (unsigned short)(0x8000 * MillibelToScale(pan));
+	mix_data[0][0].bus[0].volume = sound->pan_l;
+	mix_data[0][1].bus[0].volume = sound->pan_r;
 
 	if (sound->voice != NULL)
 	{
@@ -200,6 +272,6 @@ void AudioBackend_SetSoundPan(AudioBackend_Sound *sound, long pan)
 
 void AudioBackend_SetOrganyaCallback(void (*callback)(void), unsigned int milliseconds)
 {
-	(void)callback;
-	(void)milliseconds;
+	organya_callback = callback;
+	organya_milliseconds = milliseconds;
 }
