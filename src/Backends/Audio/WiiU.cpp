@@ -62,7 +62,7 @@ static int ThreadFunction(int argc, const char *argv[])
 
 		if (organya_milliseconds == 0)
 		{
-			OSSleepTicks(ticks_per_second / 1000);
+			OSSleepTicks(1);
 		}
 		else
 		{
@@ -79,7 +79,7 @@ static int ThreadFunction(int argc, const char *argv[])
 					break;
 				}
 
-				OSSleepTicks(ticks_per_second / 1000);
+				OSSleepTicks(1);
 			}
 
 			if (organya_callback != NULL)
