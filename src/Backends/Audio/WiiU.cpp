@@ -143,8 +143,6 @@ bool AudioBackend_Init(void)
 
 	OSRunThread(OSGetDefaultThread(0), ThreadFunction, 0, NULL);
 
-//	AXRegisterFrameCallback(FrameCallback);
-
 	return true;
 }
 
