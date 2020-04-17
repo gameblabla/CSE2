@@ -61,7 +61,7 @@ unsigned char* WindowBackend_Software_GetFramebuffer(size_t *pitch)
 
 void WindowBackend_Software_Display(void)
 {
-	const size_t line_size = (drc_buffer_size / 480) / 2;
+	const size_t pitch = (drc_buffer_size / 480) / 2;
 
 	static bool flipflop;
 
@@ -69,17 +69,18 @@ void WindowBackend_Software_Display(void)
 
 	if (framebuffer_width == 320 && framebuffer_height == 240)
 	{
+		const size_t line_size = framebuffer_width * 2 * 4;
+		const size_t line_delta = pitch - line_size;
+
+		unsigned char *out_pointer = drc_framebuffer;
+
+		if (!flipflop)
+			out_pointer += drc_buffer_size / 2;
+
+		out_pointer += ((854 - (framebuffer_width * 2)) * 4) / 2;
+
 		for (size_t y = 0; y < framebuffer_height; ++y)
 		{
-			unsigned char *out_line = &drc_framebuffer[line_size * 2 * y];
-
-			if (!flipflop)
-				out_line += drc_buffer_size / 2;
-
-			out_line += ((854 - (framebuffer_width * 2)) * 4) / 2;
-
-			unsigned char *out_pointer = out_line;
-
 			for (size_t x = 0; x < framebuffer_width; ++x)
 			{
 				*out_pointer++ = in_pointer[0];
@@ -94,21 +95,25 @@ void WindowBackend_Software_Display(void)
 				in_pointer += 3;
 			}
 
-			memcpy(out_line + line_size, out_line, framebuffer_width * 4 * 2);
+			memcpy(out_pointer + line_delta, out_pointer - line_size, line_size);
+
+			out_pointer += line_delta + pitch;
 		}
 	}
 	else
 	{
+		const size_t line_size = framebuffer_width * 4;
+		const size_t line_delta = pitch - line_size;
+
+		unsigned char *out_pointer = drc_framebuffer;
+
+		if (!flipflop)
+			out_pointer += drc_buffer_size / 2;
+
+		out_pointer += ((854 - framebuffer_width) * 4) / 2;
+
 		for (size_t y = 0; y < framebuffer_height; ++y)
 		{
-			unsigned char *out_pointer = &drc_framebuffer[line_size * y];
-
-			if (!flipflop)
-				out_pointer += drc_buffer_size / 2;
-
-			out_pointer += ((854 - framebuffer_width) * 4) / 2;
-			out_pointer += ((480 - framebuffer_height) * line_size) / 2;
-
 			for (size_t x = 0; x < framebuffer_width; ++x)
 			{
 				*out_pointer++ = *in_pointer++;
@@ -116,6 +121,8 @@ void WindowBackend_Software_Display(void)
 				*out_pointer++ = *in_pointer++;
 				*out_pointer++ = 0;
 			}
+
+			out_pointer += line_delta;
 		}
 	}
 
