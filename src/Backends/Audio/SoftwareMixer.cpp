@@ -103,7 +103,6 @@ void Mixer_PlaySound(Mixer_Sound *sound, bool looping)
 void Mixer_StopSound(Mixer_Sound *sound)
 {
 	sound->playing = false;
-	sound->position = 0.0;
 }
 
 void Mixer_RewindSound(Mixer_Sound *sound)
