@@ -6,6 +6,8 @@
 #include <coreinit/cache.h>
 #include <coreinit/screen.h>
 
+#include "../../Attributes.h"
+
 static unsigned char *fake_framebuffer;
 
 //static unsigned char *tv_framebuffer;
@@ -59,7 +61,7 @@ unsigned char* WindowBackend_Software_GetFramebuffer(size_t *pitch)
 	return fake_framebuffer;
 }
 
-void WindowBackend_Software_Display(void)
+ATTRIBUTE_HOT void WindowBackend_Software_Display(void)
 {
 	const size_t pitch = (drc_buffer_size / 480) / 2;
 
@@ -67,7 +69,7 @@ void WindowBackend_Software_Display(void)
 
 	const unsigned char *in_pointer = fake_framebuffer;
 
-	if (framebuffer_width == 320 && framebuffer_height == 240)
+	if (framebuffer_width <= 426 && framebuffer_height <= 240)
 	{
 		const size_t line_size = framebuffer_width * 2 * 4;
 		const size_t line_delta = pitch - line_size;
