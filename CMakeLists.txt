@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10.2)
+cmake_minimum_required(VERSION 3.5.1)
 
 
 #############
@@ -248,7 +248,7 @@ set_target_properties(CSE2 PROPERTIES
 target_link_libraries(CSE2 PRIVATE ddraw dsound version shlwapi imm32 winmm dxguid gdi32)
 
 # Newer MSVC is missing `dinput.lib`
-if(MSVC AND MSVC_VERSION GREATER_EQUAL 1500)
+if(MSVC AND NOT (MSVC_VERSION LESS 1500)):wq
 	target_link_libraries(CSE2 PRIVATE dinput8)
 else()
 	target_link_libraries(CSE2 PRIVATE dinput)
