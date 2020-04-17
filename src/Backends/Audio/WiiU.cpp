@@ -338,11 +338,17 @@ void AudioBackend_SetSoundPan(AudioBackend_Sound *sound, long pan)
 	OSUnlockMutex(&sound_list_mutex);
 }
 
-void AudioBackend_SetOrganyaCallback(void (*callback)(void), unsigned int milliseconds)
+void AudioBackend_SetOrganyaCallback(void (*callback)(void))
+{
+	// As far as thread-safety goes - this is guarded by
+	// `organya_milliseconds`, which is guarded by `organya_mutex`.
+	organya_callback = callback;
+}
+
+void AudioBackend_SetOrganyaTimer(unsigned int milliseconds)
 {
 	OSLockMutex(&organya_mutex);
 
-	organya_callback = callback;
 	organya_milliseconds = milliseconds;
 
 	OSUnlockMutex(&organya_mutex);

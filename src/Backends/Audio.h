@@ -18,4 +18,5 @@ void AudioBackend_SetSoundFrequency(AudioBackend_Sound *sound, unsigned int freq
 void AudioBackend_SetSoundVolume(AudioBackend_Sound *sound, long volume);
 void AudioBackend_SetSoundPan(AudioBackend_Sound *sound, long pan);
 
-void AudioBackend_SetOrganyaCallback(void (*callback)(void), unsigned int milliseconds);
+void AudioBackend_SetOrganyaCallback(void (*callback)(void));
+void AudioBackend_SetOrganyaTimer(unsigned int milliseconds);
