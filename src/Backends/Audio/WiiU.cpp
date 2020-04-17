@@ -35,7 +35,7 @@ static unsigned int organya_milliseconds;
 
 static unsigned long ticks_per_second;
 
-static OSMutex mutex;
+static OSMutex sound_list_mutex;
 static OSMutex organya_mutex;
 
 static AudioBackend_Sound *sound_list_head;
@@ -98,13 +98,13 @@ static int ThreadFunction(int argc, const char *argv[])
 			next_ticks += organya_milliseconds;
 			OSUnlockMutex(&organya_mutex);
 
-			OSLockMutex(&mutex);
+			OSLockMutex(&sound_list_mutex);
 			organya_callback();
-			OSUnlockMutex(&mutex);
+			OSUnlockMutex(&sound_list_mutex);
 		}
 
 		// Free any voices that aren't playing anymore
-		OSLockMutex(&mutex);
+		OSLockMutex(&sound_list_mutex);
 
 		for (AudioBackend_Sound *sound = sound_list_head; sound != NULL; sound = sound->next)
 		{
@@ -118,7 +118,7 @@ static int ThreadFunction(int argc, const char *argv[])
 			}
 		}
 
-		OSUnlockMutex(&mutex);
+		OSUnlockMutex(&sound_list_mutex);
 	}
 
 	return 0;
@@ -138,7 +138,7 @@ bool AudioBackend_Init(void)
 
 	ticks_per_second = OSGetSystemInfo()->busClockSpeed / 4;
 
-	OSInitMutex(&mutex);
+	OSInitMutex(&sound_list_mutex);
 	OSInitMutex(&organya_mutex);
 
 	OSRunThread(OSGetDefaultThread(0), ThreadFunction, 0, NULL);
@@ -179,10 +179,10 @@ AudioBackend_Sound* AudioBackend_CreateSound(unsigned int frequency, const unsig
 			sound->pan_l = 0x8000;
 			sound->pan_r = 0x8000;
 
-			OSLockMutex(&mutex);
+			OSLockMutex(&sound_list_mutex);
 			sound->next = sound_list_head;
 			sound_list_head = sound;
-			OSUnlockMutex(&mutex);
+			OSUnlockMutex(&sound_list_mutex);
 
 			return sound;
 		}
@@ -195,7 +195,7 @@ AudioBackend_Sound* AudioBackend_CreateSound(unsigned int frequency, const unsig
 
 void AudioBackend_DestroySound(AudioBackend_Sound *sound)
 {
-	OSLockMutex(&mutex);
+	OSLockMutex(&sound_list_mutex);
 
 	// Unhook sound from the linked-list
 	for (AudioBackend_Sound **sound_pointer = &sound_list_head; *sound_pointer != NULL; sound_pointer = &(*sound_pointer)->next)
@@ -207,7 +207,7 @@ void AudioBackend_DestroySound(AudioBackend_Sound *sound)
 		}
 	}
 
-	OSUnlockMutex(&mutex);
+	OSUnlockMutex(&sound_list_mutex);
 
 	if (sound->voice != NULL)
 		AXFreeVoice(sound->voice);
@@ -218,7 +218,7 @@ void AudioBackend_DestroySound(AudioBackend_Sound *sound)
 
 void AudioBackend_PlaySound(AudioBackend_Sound *sound, bool looping)
 {
-	OSLockMutex(&mutex);
+	OSLockMutex(&sound_list_mutex);
 
 	if (sound->voice == NULL)
 	{
@@ -265,32 +265,32 @@ void AudioBackend_PlaySound(AudioBackend_Sound *sound, bool looping)
 		AXSetVoiceState(sound->voice, AX_VOICE_STATE_PLAYING);
 	}
 
-	OSUnlockMutex(&mutex);
+	OSUnlockMutex(&sound_list_mutex);
 }
 
 void AudioBackend_StopSound(AudioBackend_Sound *sound)
 {
-	OSLockMutex(&mutex);
+	OSLockMutex(&sound_list_mutex);
 
 	if (sound->voice != NULL)
 		AXSetVoiceState(sound->voice, AX_VOICE_STATE_STOPPED);
 
-	OSUnlockMutex(&mutex);
+	OSUnlockMutex(&sound_list_mutex);
 }
 
 void AudioBackend_RewindSound(AudioBackend_Sound *sound)
 {
-	OSLockMutex(&mutex);
+	OSLockMutex(&sound_list_mutex);
 
 	if (sound->voice != NULL)
 		AXSetVoiceCurrentOffset(sound->voice, 0);
 
-	OSUnlockMutex(&mutex);
+	OSUnlockMutex(&sound_list_mutex);
 }
 
 void AudioBackend_SetSoundFrequency(AudioBackend_Sound *sound, unsigned int frequency)
 {
-	OSLockMutex(&mutex);
+	OSLockMutex(&sound_list_mutex);
 
 	sound->frequency = frequency;
 
@@ -300,12 +300,12 @@ void AudioBackend_SetSoundFrequency(AudioBackend_Sound *sound, unsigned int freq
 		AXSetVoiceSrcRatio(sound->voice, srcratio);
 	}
 
-	OSUnlockMutex(&mutex);
+	OSUnlockMutex(&sound_list_mutex);
 }
 
 void AudioBackend_SetSoundVolume(AudioBackend_Sound *sound, long volume)
 {
-	OSLockMutex(&mutex);
+	OSLockMutex(&sound_list_mutex);
 
 	sound->volume = (unsigned short)(0x8000 * MillibelToScale(volume));
 
@@ -316,12 +316,12 @@ void AudioBackend_SetSoundVolume(AudioBackend_Sound *sound, long volume)
 		AXSetVoiceVe(sound->voice, &vol);
 	}
 
-	OSUnlockMutex(&mutex);
+	OSUnlockMutex(&sound_list_mutex);
 }
 
 void AudioBackend_SetSoundPan(AudioBackend_Sound *sound, long pan)
 {
-	OSLockMutex(&mutex);
+	OSLockMutex(&sound_list_mutex);
 
 	sound->pan_l = (unsigned short)(0x8000 * MillibelToScale(-pan));
 	sound->pan_r = (unsigned short)(0x8000 * MillibelToScale(pan));
@@ -335,7 +335,7 @@ void AudioBackend_SetSoundPan(AudioBackend_Sound *sound, long pan)
 		AXSetVoiceDeviceMix(sound->voice, AX_DEVICE_TYPE_TV, 0, sound->mix_data);
 	}
 
-	OSUnlockMutex(&mutex);
+	OSUnlockMutex(&sound_list_mutex);
 }
 
 void AudioBackend_SetOrganyaCallback(void (*callback)(void), unsigned int milliseconds)
