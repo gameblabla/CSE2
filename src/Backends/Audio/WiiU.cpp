@@ -37,7 +37,7 @@ static double MillibelToScale(long volume)
 	return pow(10.0, volume / 2000.0);
 }
 
-static unsigned long tick_delta;
+static unsigned long ticks_per_second;
 
 static unsigned long GetTicksMilliseconds(void)
 {
@@ -51,7 +51,7 @@ static unsigned long GetTicksMilliseconds(void)
 
 	last_tick = current_tick;
 
-	return (accumulator * 1000) / tick_delta;
+	return (accumulator * 1000) / ticks_per_second;
 }
 
 static int ThreadFunction(int argc, const char *argv[])
@@ -62,7 +62,7 @@ static int ThreadFunction(int argc, const char *argv[])
 
 		if (organya_milliseconds == 0)
 		{
-			OSSleepTicks(1);
+			OSSleepTicks(ticks_per_second / 1000);
 		}
 		else
 		{
@@ -79,7 +79,7 @@ static int ThreadFunction(int argc, const char *argv[])
 					break;
 				}
 
-				OSSleepTicks(1);
+				OSSleepTicks(ticks_per_second / 1000);
 			}
 
 			if (organya_callback != NULL)
@@ -102,7 +102,8 @@ bool AudioBackend_Init(void)
 
 		AXInitWithParams(&initparams);
 	}
-	tick_delta = OSGetSystemInfo()->busClockSpeed / 4;
+
+	ticks_per_second = OSGetSystemInfo()->busClockSpeed / 4;
 
 	OSRunThread(OSGetDefaultThread(0), ThreadFunction, 0, NULL);
 
@@ -113,8 +114,7 @@ void AudioBackend_Deinit(void)
 {
 	OSCancelThread(OSGetDefaultThread(0));
 
-	//int result;
-	//OSJoinThread(&thread, &result);
+	OSJoinThread(OSGetDefaultThread(0), NULL);
 
 	AXQuit();
 }
@@ -168,17 +168,15 @@ void AudioBackend_PlaySound(AudioBackend_Sound *sound, bool looping)
 
 		if (voice != NULL)
 		{
-			AXVoiceOffsets offs;
-			AXVoiceVeData vol = {
-				.volume = sound->volume,
-			};
-
 			AXVoiceBegin(voice);
 
 			AXSetVoiceType(voice, 0);
+
+			AXVoiceVeData vol = {.volume = sound->volume};
 			AXSetVoiceVe(voice, &vol);
 
-			static AXVoiceDeviceMixData mix_data[1][6];
+			AXVoiceDeviceMixData mix_data[1][6];
+			memset(mix_data, 0, sizeof(mix_data));
 			mix_data[0][0].bus[0].volume = sound->pan_l;
 			mix_data[0][1].bus[0].volume = sound->pan_r;
 
@@ -189,6 +187,7 @@ void AudioBackend_PlaySound(AudioBackend_Sound *sound, bool looping)
 			AXSetVoiceSrcRatio(voice, srcratio);
 			AXSetVoiceSrcType(voice, AX_VOICE_SRC_TYPE_LINEAR);
 
+			AXVoiceOffsets offs;
 			offs.dataType = AX_VOICE_FORMAT_LPCM8;
 			offs.endOffset = sound->length;
 			offs.loopingEnabled = AX_VOICE_LOOP_DISABLED;
@@ -214,7 +213,6 @@ void AudioBackend_StopSound(AudioBackend_Sound *sound)
 {
 	if (sound->voice != NULL)
 	{
-//		AXSetVoiceState(sound->voice, AX_VOICE_STATE_STOPPED);
 		AXFreeVoice(sound->voice);
 		sound->voice = NULL;
 	}
@@ -223,10 +221,7 @@ void AudioBackend_StopSound(AudioBackend_Sound *sound)
 void AudioBackend_RewindSound(AudioBackend_Sound *sound)
 {
 	if (sound->voice != NULL)
-	{
-	//	AXSetVoiceState(sound->voice, AX_VOICE_STATE_STOPPED);
 		AXSetVoiceCurrentOffset(sound->voice, 0);
-	}
 }
 
 void AudioBackend_SetSoundFrequency(AudioBackend_Sound *sound, unsigned int frequency)
@@ -259,7 +254,8 @@ void AudioBackend_SetSoundPan(AudioBackend_Sound *sound, long pan)
 	sound->pan_l = (unsigned short)(0x8000 * MillibelToScale(-pan));
 	sound->pan_r = (unsigned short)(0x8000 * MillibelToScale(pan));
 
-	static AXVoiceDeviceMixData mix_data[1][6];
+	AXVoiceDeviceMixData mix_data[1][6];
+	memset(mix_data, 0, sizeof(mix_data));
 	mix_data[0][0].bus[0].volume = sound->pan_l;
 	mix_data[0][1].bus[0].volume = sound->pan_r;
 
