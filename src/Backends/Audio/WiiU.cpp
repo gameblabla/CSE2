@@ -25,6 +25,7 @@ struct AudioBackend_Sound
 	unsigned short volume;
 	unsigned short pan_l;
 	unsigned short pan_r;
+	AXVoiceDeviceMixData mix_data[6];
 };
 
 static void (*organya_callback)(void);
@@ -174,12 +175,12 @@ void AudioBackend_PlaySound(AudioBackend_Sound *sound, bool looping)
 			AXVoiceVeData vol = {.volume = sound->volume};
 			AXSetVoiceVe(voice, &vol);
 
-			static AXVoiceDeviceMixData mix_data[1][6];
-			mix_data[0][0].bus[0].volume = sound->pan_l;
-			mix_data[0][1].bus[0].volume = sound->pan_r;
+			memset(sound->mix_data, 0, sizeof(sound->mix_data));
+			sound->mix_data[0].bus[0].volume = sound->pan_l;
+			sound->mix_data[1].bus[0].volume = sound->pan_r;
 
-			AXSetVoiceDeviceMix(voice, AX_DEVICE_TYPE_DRC, 0, mix_data[0]);
-			AXSetVoiceDeviceMix(voice, AX_DEVICE_TYPE_TV, 0, mix_data[0]);
+			AXSetVoiceDeviceMix(voice, AX_DEVICE_TYPE_DRC, 0, sound->mix_data);
+			AXSetVoiceDeviceMix(voice, AX_DEVICE_TYPE_TV, 0, sound->mix_data);
 
 			float srcratio = (float)sound->frequency / (float)AXGetInputSamplesPerSec();
 			AXSetVoiceSrcRatio(voice, srcratio);
@@ -251,14 +252,13 @@ void AudioBackend_SetSoundPan(AudioBackend_Sound *sound, long pan)
 	sound->pan_l = (unsigned short)(0x8000 * MillibelToScale(-pan));
 	sound->pan_r = (unsigned short)(0x8000 * MillibelToScale(pan));
 
-	static AXVoiceDeviceMixData mix_data[1][6];
-	mix_data[0][0].bus[0].volume = sound->pan_l;
-	mix_data[0][1].bus[0].volume = sound->pan_r;
-
 	if (sound->voice != NULL)
 	{
-		AXSetVoiceDeviceMix(sound->voice, AX_DEVICE_TYPE_DRC, 0, mix_data[0]);
-		AXSetVoiceDeviceMix(sound->voice, AX_DEVICE_TYPE_TV, 0, mix_data[0]);
+		sound->mix_data[0].bus[0].volume = sound->pan_l;
+		sound->mix_data[1].bus[0].volume = sound->pan_r;
+
+		AXSetVoiceDeviceMix(sound->voice, AX_DEVICE_TYPE_DRC, 0, sound->mix_data);
+		AXSetVoiceDeviceMix(sound->voice, AX_DEVICE_TYPE_TV, 0, sound->mix_data);
 	}
 }
 
