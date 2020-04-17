@@ -619,7 +619,23 @@ void InitTextObject(const char *name)
 	char path[MAX_PATH];
 	sprintf(path, "%s/Font/font", gDataPath);
 
-	font = LoadFont(path, 8 * magnification, 9 * magnification);
+	// Get font size
+	unsigned int width, height;
+
+	switch (magnification)
+	{
+		case 1:
+			height = 10;
+			width = 9;
+			break;
+
+		case 2:
+			height = 9;
+			width = 8;
+			break;
+	}
+
+	font = LoadFont(path, width * magnification, height * magnification);
 }
 
 void PutText(int x, int y, const char *text, unsigned long color)
