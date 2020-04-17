@@ -6,8 +6,8 @@
 #include <string.h>
 
 #include <coreinit/cache.h>
+#include <coreinit/mutex.h>
 #include <coreinit/thread.h>
-
 #include <sndcore2/core.h>
 #include <sndcore2/voice.h>
 #include <sndcore2/drcvs.h>
@@ -26,10 +26,19 @@ struct AudioBackend_Sound
 	unsigned short pan_l;
 	unsigned short pan_r;
 	AXVoiceDeviceMixData mix_data[6];
+
+	struct AudioBackend_Sound *next;
 };
 
 static void (*organya_callback)(void);
 static unsigned int organya_milliseconds;
+
+static unsigned long ticks_per_second;
+
+static OSMutex mutex;
+static OSMutex organya_mutex;
+
+static AudioBackend_Sound *sound_list_head;
 
 static double MillibelToScale(long volume)
 {
@@ -38,13 +47,11 @@ static double MillibelToScale(long volume)
 	return pow(10.0, volume / 2000.0);
 }
 
-static unsigned long ticks_per_second;
-
 static unsigned long GetTicksMilliseconds(void)
 {
 	static uint64_t accumulator;
 
-	static unsigned long last_tick;	// For some dumbass reason, OSTick is signed, so force unsigned here instead
+	static unsigned long last_tick;
 
 	unsigned long current_tick = OSGetTick();
 
@@ -61,31 +68,57 @@ static int ThreadFunction(int argc, const char *argv[])
 	{
 		OSTestThreadCancel();
 
+		OSLockMutex(&organya_mutex);
+
 		if (organya_milliseconds == 0)
 		{
-			OSSleepTicks(1);
+			OSUnlockMutex(&organya_mutex);
+
+			// Do nothing
+			OSSleepTicks(ticks_per_second / 1000);
 		}
 		else
 		{
+			OSUnlockMutex(&organya_mutex);
+
+			// Update Organya
 			static unsigned long next_ticks;
-			unsigned long ticks;
 
 			for (;;)
 			{
-				ticks = GetTicksMilliseconds();
+				unsigned long ticks = GetTicksMilliseconds();
 
 				if (ticks >= next_ticks)
-				{
-					next_ticks += organya_milliseconds;
 					break;
-				}
 
-				OSSleepTicks(1);
+				OSSleepTicks(ticks_per_second / 1000);
 			}
 
-			if (organya_callback != NULL)
-				organya_callback();
+			OSLockMutex(&organya_mutex);
+			next_ticks += organya_milliseconds;
+			OSUnlockMutex(&organya_mutex);
+
+			OSLockMutex(&mutex);
+			organya_callback();
+			OSUnlockMutex(&mutex);
 		}
+
+		// Free any voices that aren't playing anymore
+		OSLockMutex(&mutex);
+
+		for (AudioBackend_Sound *sound = sound_list_head; sound != NULL; sound = sound->next)
+		{
+			if (sound->voice != NULL)
+			{
+				if (!AXIsVoiceRunning(sound->voice))
+				{
+					AXFreeVoice(sound->voice);
+					sound->voice = NULL;
+				}
+			}
+		}
+
+		OSUnlockMutex(&mutex);
 	}
 
 	return 0;
@@ -105,7 +138,12 @@ bool AudioBackend_Init(void)
 
 	ticks_per_second = OSGetSystemInfo()->busClockSpeed / 4;
 
+	OSInitMutex(&mutex);
+	OSInitMutex(&organya_mutex);
+
 	OSRunThread(OSGetDefaultThread(0), ThreadFunction, 0, NULL);
+
+//	AXRegisterFrameCallback(FrameCallback);
 
 	return true;
 }
@@ -143,6 +181,11 @@ AudioBackend_Sound* AudioBackend_CreateSound(unsigned int frequency, const unsig
 			sound->pan_l = 0x8000;
 			sound->pan_r = 0x8000;
 
+			OSLockMutex(&mutex);
+			sound->next = sound_list_head;
+			sound_list_head = sound;
+			OSUnlockMutex(&mutex);
+
 			return sound;
 		}
 
@@ -154,7 +197,22 @@ AudioBackend_Sound* AudioBackend_CreateSound(unsigned int frequency, const unsig
 
 void AudioBackend_DestroySound(AudioBackend_Sound *sound)
 {
-	AudioBackend_StopSound(sound);
+	OSLockMutex(&mutex);
+
+	// Unhook sound from the linked-list
+	for (AudioBackend_Sound **sound_pointer = &sound_list_head; *sound_pointer != NULL; sound_pointer = &(*sound_pointer)->next)
+	{
+		if (*sound_pointer == sound)
+		{
+			*sound_pointer = sound->next;
+			break;
+		}
+	}
+
+	OSUnlockMutex(&mutex);
+
+	if (sound->voice != NULL)
+		AXFreeVoice(sound->voice);
 
 	free(sound->samples);
 	free(sound);
@@ -162,6 +220,8 @@ void AudioBackend_DestroySound(AudioBackend_Sound *sound)
 
 void AudioBackend_PlaySound(AudioBackend_Sound *sound, bool looping)
 {
+	OSLockMutex(&mutex);
+
 	if (sound->voice == NULL)
 	{
 		AXVoice *voice = AXAcquireVoice(31, NULL, NULL);
@@ -206,26 +266,34 @@ void AudioBackend_PlaySound(AudioBackend_Sound *sound, bool looping)
 		AXSetVoiceLoop(sound->voice, looping ? AX_VOICE_LOOP_ENABLED : AX_VOICE_LOOP_DISABLED);
 		AXSetVoiceState(sound->voice, AX_VOICE_STATE_PLAYING);
 	}
+
+	OSUnlockMutex(&mutex);
 }
 
 void AudioBackend_StopSound(AudioBackend_Sound *sound)
 {
+	OSLockMutex(&mutex);
+
 	if (sound->voice != NULL)
-	{
-		AXVoice *voice = sound->voice;
-		sound->voice = NULL;
-		AXFreeVoice(voice);
-	}
+		AXSetVoiceState(sound->voice, AX_VOICE_STATE_STOPPED);
+
+	OSUnlockMutex(&mutex);
 }
 
 void AudioBackend_RewindSound(AudioBackend_Sound *sound)
 {
+	OSLockMutex(&mutex);
+
 	if (sound->voice != NULL)
 		AXSetVoiceCurrentOffset(sound->voice, 0);
+
+	OSUnlockMutex(&mutex);
 }
 
 void AudioBackend_SetSoundFrequency(AudioBackend_Sound *sound, unsigned int frequency)
 {
+	OSLockMutex(&mutex);
+
 	sound->frequency = frequency;
 
 	if (sound->voice != NULL)
@@ -233,10 +301,14 @@ void AudioBackend_SetSoundFrequency(AudioBackend_Sound *sound, unsigned int freq
 		float srcratio = (float)frequency / (float)AXGetInputSamplesPerSec();
 		AXSetVoiceSrcRatio(sound->voice, srcratio);
 	}
+
+	OSUnlockMutex(&mutex);
 }
 
 void AudioBackend_SetSoundVolume(AudioBackend_Sound *sound, long volume)
 {
+	OSLockMutex(&mutex);
+
 	sound->volume = (unsigned short)(0x8000 * MillibelToScale(volume));
 
 	if (sound->voice != NULL)
@@ -245,10 +317,14 @@ void AudioBackend_SetSoundVolume(AudioBackend_Sound *sound, long volume)
 
 		AXSetVoiceVe(sound->voice, &vol);
 	}
+
+	OSUnlockMutex(&mutex);
 }
 
 void AudioBackend_SetSoundPan(AudioBackend_Sound *sound, long pan)
 {
+	OSLockMutex(&mutex);
+
 	sound->pan_l = (unsigned short)(0x8000 * MillibelToScale(-pan));
 	sound->pan_r = (unsigned short)(0x8000 * MillibelToScale(pan));
 
@@ -260,10 +336,16 @@ void AudioBackend_SetSoundPan(AudioBackend_Sound *sound, long pan)
 		AXSetVoiceDeviceMix(sound->voice, AX_DEVICE_TYPE_DRC, 0, sound->mix_data);
 		AXSetVoiceDeviceMix(sound->voice, AX_DEVICE_TYPE_TV, 0, sound->mix_data);
 	}
+
+	OSUnlockMutex(&mutex);
 }
 
 void AudioBackend_SetOrganyaCallback(void (*callback)(void), unsigned int milliseconds)
 {
+	OSLockMutex(&organya_mutex);
+
 	organya_callback = callback;
 	organya_milliseconds = milliseconds;
+
+	OSUnlockMutex(&organya_mutex);
 }
