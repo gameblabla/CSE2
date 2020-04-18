@@ -261,8 +261,12 @@ void AudioBackend_PlaySound(AudioBackend_Sound *sound, bool looping)
 
 	if (sound->voice != NULL)
 	{
+		AXVoiceBegin(sound->voice);
+
 		AXSetVoiceLoop(sound->voice, looping ? AX_VOICE_LOOP_ENABLED : AX_VOICE_LOOP_DISABLED);
 		AXSetVoiceState(sound->voice, AX_VOICE_STATE_PLAYING);
+
+		AXVoiceEnd(sound->voice);
 	}
 
 	OSUnlockMutex(&sound_list_mutex);
@@ -273,7 +277,13 @@ void AudioBackend_StopSound(AudioBackend_Sound *sound)
 	OSLockMutex(&sound_list_mutex);
 
 	if (sound->voice != NULL)
+	{
+		AXVoiceBegin(sound->voice);
+
 		AXSetVoiceState(sound->voice, AX_VOICE_STATE_STOPPED);
+
+		AXVoiceEnd(sound->voice);
+	}
 
 	OSUnlockMutex(&sound_list_mutex);
 }
@@ -283,7 +293,13 @@ void AudioBackend_RewindSound(AudioBackend_Sound *sound)
 	OSLockMutex(&sound_list_mutex);
 
 	if (sound->voice != NULL)
+	{
+		AXVoiceBegin(sound->voice);
+
 		AXSetVoiceCurrentOffset(sound->voice, 0);
+
+		AXVoiceEnd(sound->voice);
+	}
 
 	OSUnlockMutex(&sound_list_mutex);
 }
@@ -296,8 +312,12 @@ void AudioBackend_SetSoundFrequency(AudioBackend_Sound *sound, unsigned int freq
 
 	if (sound->voice != NULL)
 	{
+		AXVoiceBegin(sound->voice);
+
 		float srcratio = (float)frequency / (float)AXGetInputSamplesPerSec();
 		AXSetVoiceSrcRatio(sound->voice, srcratio);
+
+		AXVoiceEnd(sound->voice);
 	}
 
 	OSUnlockMutex(&sound_list_mutex);
@@ -311,9 +331,13 @@ void AudioBackend_SetSoundVolume(AudioBackend_Sound *sound, long volume)
 
 	if (sound->voice != NULL)
 	{
+		AXVoiceBegin(sound->voice);
+
 		AXVoiceVeData vol = {.volume = sound->volume};
 
 		AXSetVoiceVe(sound->voice, &vol);
+
+		AXVoiceEnd(sound->voice);
 	}
 
 	OSUnlockMutex(&sound_list_mutex);
@@ -328,11 +352,15 @@ void AudioBackend_SetSoundPan(AudioBackend_Sound *sound, long pan)
 
 	if (sound->voice != NULL)
 	{
+		AXVoiceBegin(sound->voice);
+
 		sound->mix_data[0].bus[0].volume = sound->pan_l;
 		sound->mix_data[1].bus[0].volume = sound->pan_r;
 
 		AXSetVoiceDeviceMix(sound->voice, AX_DEVICE_TYPE_DRC, 0, sound->mix_data);
 		AXSetVoiceDeviceMix(sound->voice, AX_DEVICE_TYPE_TV, 0, sound->mix_data);
+
+		AXVoiceEnd(sound->voice);
 	}
 
 	OSUnlockMutex(&sound_list_mutex);
