@@ -205,11 +205,19 @@ void AudioBackend_SetSoundPan(AudioBackend_Sound *sound, long pan)
 	SDL_UnlockAudioDevice(device_id);
 }
 
-void AudioBackend_SetOrganyaCallback(void (*callback)(void), unsigned int milliseconds)
+void AudioBackend_SetOrganyaCallback(void (*callback)(void))
 {
 	SDL_LockAudioDevice(device_id);
 
 	organya_callback = callback;
+
+	SDL_UnlockAudioDevice(device_id);
+}
+
+void AudioBackend_SetOrganyaTimer(unsigned int milliseconds)
+{
+	SDL_LockAudioDevice(device_id);
+
 	organya_callback_milliseconds = milliseconds;
 
 	SDL_UnlockAudioDevice(device_id);

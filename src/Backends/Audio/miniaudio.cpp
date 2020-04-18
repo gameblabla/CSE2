@@ -243,11 +243,19 @@ void AudioBackend_SetSoundPan(AudioBackend_Sound *sound, long pan)
 	ma_mutex_unlock(&mutex);
 }
 
-void AudioBackend_SetOrganyaCallback(void (*callback)(void), unsigned int milliseconds)
+void AudioBackend_SetOrganyaCallback(void (*callback)(void))
 {
 	ma_mutex_lock(&organya_mutex);
 
 	organya_callback = callback;
+
+	ma_mutex_unlock(&organya_mutex);
+}
+
+void AudioBackend_SetOrganyaTimer(unsigned int milliseconds)
+{
+	ma_mutex_lock(&organya_mutex);
+
 	organya_callback_milliseconds = milliseconds;
 
 	ma_mutex_unlock(&organya_mutex);
