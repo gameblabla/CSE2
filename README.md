@@ -111,7 +111,7 @@ PATH=$PATH:$DEVKITPPC/bin
 Then, generate the build files with this command:
 
 ```
-cmake -B buildwiiu -DCMAKE_BUILD_TYPE=Release -DFORCE_LOCAL_LIBS=ON -DBACKEND_PLATFORM=WiiU -DBACKEND_RENDERER=Software -DBACKEND_AUDIO=Null -DBUILD_DOCONFIG=OFF -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/wut/share/wut.toolchain.cmake
+cmake -B buildwiiu -DCMAKE_BUILD_TYPE=Release -DFORCE_LOCAL_LIBS=ON -DBACKEND_PLATFORM=WiiU -DBACKEND_RENDERER=Software -DBACKEND_AUDIO=WiiU -DBUILD_DOCONFIG=OFF -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/wut/share/wut.toolchain.cmake
 ```
 
 Finally, build the game with this command:
