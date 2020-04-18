@@ -137,7 +137,10 @@ BOOL StartDirectDraw(const char *title, int lMagnification, BOOL b60fps, BOOL bS
 	if (bVsync)
 		gbVsync = display_mode.refresh_rate == (b60fps ? 60 : 50);
 
-	framebuffer = RenderBackend_Init(title, WINDOW_WIDTH * magnification, WINDOW_HEIGHT * magnification, fullscreen, &gbVsync);
+	bool requested_vsync;
+	framebuffer = RenderBackend_Init(title, WINDOW_WIDTH * magnification, WINDOW_HEIGHT * magnification, fullscreen, &requested_vsync);
+
+	gbVsync = requested_vsync;
 
 	if (framebuffer == NULL)
 		return FALSE;
