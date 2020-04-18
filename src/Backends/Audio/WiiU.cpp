@@ -112,7 +112,9 @@ static int ThreadFunction(int argc, const char *argv[])
 			{
 				if (!AXIsVoiceRunning(sound->voice))
 				{
+					AXVoiceBegin(sound->voice);
 					AXFreeVoice(sound->voice);
+					AXVoiceEnd(sound->voice);
 					sound->voice = NULL;
 				}
 			}
@@ -210,7 +212,11 @@ void AudioBackend_DestroySound(AudioBackend_Sound *sound)
 	OSUnlockMutex(&sound_list_mutex);
 
 	if (sound->voice != NULL)
+	{
+		AXVoiceBegin(sound->voice);
 		AXFreeVoice(sound->voice);
+		AXVoiceEnd(sound->voice);
+	}
 
 	free(sound->samples);
 	free(sound);
