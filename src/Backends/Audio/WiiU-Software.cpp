@@ -81,7 +81,7 @@ static void FrameCallback(void)
 	AXVoiceOffsets offsets;
 	AXGetVoiceOffsets(voices[0], &offsets);
 
-	unsigned int current_buffer = offsets.currentOffset / (buffer_length / 2);
+	unsigned int current_buffer = offsets.currentOffset > (buffer_length / 2) ? 1 : 0;
 
 	static unsigned int last_buffer = 1;
 
