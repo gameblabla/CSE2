@@ -19,7 +19,11 @@ bool Backend_Init(void)
 
 	VPADInit();
 
+	WPADInit();
 	KPADInit();
+
+	WPADEnableURCC(1);
+//	WPADEnableWiiRemote(1);
 
 	tick_delta = OSGetSystemInfo()->busClockSpeed / 4;
 
@@ -28,6 +32,8 @@ bool Backend_Init(void)
 
 void Backend_Deinit(void)
 {
+	WPADShutdown();
+
 	VPADShutdown();
 
 	WHBUnmountSdCard();
@@ -99,18 +105,18 @@ void Backend_GetKeyboardState(bool *out_keyboard_state)
 	}
 
 	KPADStatus kpad_status;
-	if (KPADRead(WPAD_CHAN_0, &kpad_status, 1) == 0)
+	if (KPADRead(WPAD_CHAN_0, &kpad_status, 1) == 1)
 	{
-		keyboard_state[BACKEND_KEYBOARD_UP] |= kpad_status.hold & (WPAD_PRO_BUTTON_UP | WPAD_PRO_STICK_L_EMULATION_UP);
-		keyboard_state[BACKEND_KEYBOARD_DOWN] |= kpad_status.hold & (WPAD_PRO_BUTTON_DOWN | WPAD_PRO_STICK_L_EMULATION_DOWN);
-		keyboard_state[BACKEND_KEYBOARD_LEFT] |= kpad_status.hold & (WPAD_PRO_BUTTON_LEFT | WPAD_PRO_STICK_L_EMULATION_LEFT);
-		keyboard_state[BACKEND_KEYBOARD_RIGHT] |= kpad_status.hold & (WPAD_PRO_BUTTON_RIGHT | WPAD_PRO_STICK_L_EMULATION_RIGHT);
-		keyboard_state[BACKEND_KEYBOARD_Z] |= kpad_status.hold & WPAD_PRO_BUTTON_B;                       // Jump
-		keyboard_state[BACKEND_KEYBOARD_X] |= kpad_status.hold & WPAD_PRO_BUTTON_Y;                       // Shoot
-		keyboard_state[BACKEND_KEYBOARD_Q] |= kpad_status.hold & (WPAD_PRO_BUTTON_A | WPAD_PRO_BUTTON_PLUS);  // Inventory
-		keyboard_state[BACKEND_KEYBOARD_W] |= kpad_status.hold & (WPAD_PRO_BUTTON_X | WPAD_PRO_BUTTON_MINUS); // Map
-		keyboard_state[BACKEND_KEYBOARD_A] |= kpad_status.hold & (WPAD_PRO_TRIGGER_L | WPAD_PRO_TRIGGER_ZL | WPAD_PRO_STICK_R_EMULATION_LEFT);  // Weapon left
-		keyboard_state[BACKEND_KEYBOARD_S] |= kpad_status.hold & (WPAD_PRO_TRIGGER_R | WPAD_PRO_TRIGGER_ZR | WPAD_PRO_STICK_R_EMULATION_RIGHT); // Weapon right
+		keyboard_state[BACKEND_KEYBOARD_UP] |= kpad_status.pro.hold & (WPAD_PRO_BUTTON_UP | WPAD_PRO_STICK_L_EMULATION_UP);
+		keyboard_state[BACKEND_KEYBOARD_DOWN] |= kpad_status.pro.hold & (WPAD_PRO_BUTTON_DOWN | WPAD_PRO_STICK_L_EMULATION_DOWN);
+		keyboard_state[BACKEND_KEYBOARD_LEFT] |= kpad_status.pro.hold & (WPAD_PRO_BUTTON_LEFT | WPAD_PRO_STICK_L_EMULATION_LEFT);
+		keyboard_state[BACKEND_KEYBOARD_RIGHT] |= kpad_status.pro.hold & (WPAD_PRO_BUTTON_RIGHT | WPAD_PRO_STICK_L_EMULATION_RIGHT);
+		keyboard_state[BACKEND_KEYBOARD_Z] |= kpad_status.pro.hold & WPAD_PRO_BUTTON_B;                       // Jump
+		keyboard_state[BACKEND_KEYBOARD_X] |= kpad_status.pro.hold & WPAD_PRO_BUTTON_Y;                       // Shoot
+		keyboard_state[BACKEND_KEYBOARD_Q] |= kpad_status.pro.hold & (WPAD_PRO_BUTTON_A | WPAD_PRO_BUTTON_PLUS);  // Inventory
+		keyboard_state[BACKEND_KEYBOARD_W] |= kpad_status.pro.hold & (WPAD_PRO_BUTTON_X | WPAD_PRO_BUTTON_MINUS); // Map
+		keyboard_state[BACKEND_KEYBOARD_A] |= kpad_status.pro.hold & (WPAD_PRO_TRIGGER_L | WPAD_PRO_TRIGGER_ZL | WPAD_PRO_STICK_R_EMULATION_LEFT);  // Weapon left
+		keyboard_state[BACKEND_KEYBOARD_S] |= kpad_status.pro.hold & (WPAD_PRO_TRIGGER_R | WPAD_PRO_TRIGGER_ZR | WPAD_PRO_STICK_R_EMULATION_RIGHT); // Weapon right
 	}
 
 	memcpy(out_keyboard_state, keyboard_state, sizeof(keyboard_state));
