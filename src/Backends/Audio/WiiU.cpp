@@ -18,7 +18,7 @@
 
 struct AudioBackend_Sound
 {
-	unsigned char *samples;
+	signed char *samples;
 	size_t length;
 	AXVoice *voice;
 	unsigned int frequency;
@@ -165,7 +165,7 @@ AudioBackend_Sound* AudioBackend_CreateSound(unsigned int frequency, const unsig
 
 	if (sound != NULL)
 	{
-		unsigned char *samples_copy = (unsigned char*)malloc(length);
+		signed char *samples_copy = (signed char*)malloc(length);
 
 		if (samples_copy != NULL)
 		{
