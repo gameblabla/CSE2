@@ -140,7 +140,7 @@ ATTRIBUTE_HOT void Mixer_MixSounds(float *stream, unsigned int frames_total)
 	{
 		if (sound->playing)
 		{
-			float *steam_pointer = stream;
+			float *stream_pointer = stream;
 
 			for (unsigned int frames_done = 0; frames_done < frames_total; ++frames_done)
 			{
@@ -154,8 +154,8 @@ ATTRIBUTE_HOT void Mixer_MixSounds(float *stream, unsigned int frames_total)
 				// Perform linear interpolation
 				const float interpolated_sample = sample1 + (sample2 - sample1) * position_fractional;
 
-				*steam_pointer++ += interpolated_sample * sound->volume_l;
-				*steam_pointer++ += interpolated_sample * sound->volume_r;
+				*stream_pointer++ += interpolated_sample * sound->volume_l;
+				*stream_pointer++ += interpolated_sample * sound->volume_r;
 
 				sound->position += sound->advance_delta;
 
