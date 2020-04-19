@@ -382,7 +382,7 @@ elseif(BACKEND_PLATFORM MATCHES "GLFW3" AND BACKEND_RENDERER MATCHES "OpenGLES2"
 elseif(BACKEND_PLATFORM MATCHES "GLFW3" AND BACKEND_RENDERER MATCHES "Software")
 	target_sources(CSE2 PRIVATE "src/Backends/GLFW3/Window-Software.cpp")
 elseif(BACKEND_PLATFORM MATCHES "WiiU" AND BACKEND_RENDERER MATCHES "Software")
-	target_sources(CSE2 PRIVATE "src/Backends/WiiU/Window-Software.cpp")
+	target_sources(CSE2 PRIVATE "src/Backends/WiiU/Window-Software-Polygon.cpp")
 elseif(BACKEND_PLATFORM MATCHES "Null" AND BACKEND_RENDERER MATCHES "Software")
 	target_sources(CSE2 PRIVATE "src/Backends/Null/Window-Software.cpp")
 else()
