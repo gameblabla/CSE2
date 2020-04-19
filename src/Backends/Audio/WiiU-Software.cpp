@@ -32,24 +32,8 @@ static size_t buffer_length;
 
 static unsigned long output_frequency;
 
-static unsigned long GetTicksMilliseconds(void)
-{
-	static uint64_t accumulator;
-
-	static unsigned long last_tick;
-
-	unsigned long current_tick = OSGetTick();
-
-	accumulator += current_tick - last_tick;
-
-	last_tick = current_tick;
-
-	return (accumulator * 1000) / ticks_per_second;
-}
-
 static void Callback(void *output_stream, size_t frames_total)
 {
-
 	float *stream = (float*)output_stream;
 
 	OSLockMutex(&organya_mutex);
@@ -122,25 +106,37 @@ static void FrameCallback(void)
 
 		Callback(stream_buffer_float, buffer_length / 2);
 
+
+		short *left_output_buffer = &stream_buffers[0][(buffer_length / 2) * last_half];
+		short *right_output_buffer = &stream_buffers[1][(buffer_length / 2) * last_half];
+
+		float *mixer_buffer_pointer = stream_buffer_float;
+		short *left_output_buffer_pointer = left_output_buffer;
+		short *right_output_buffer_pointer = right_output_buffer;
+
 		for (unsigned int i = 0; i < buffer_length / 2; ++i)
 		{
-			for (unsigned int j = 0; j < 2; ++j)
-			{
-				float sample = stream_buffer_float[(i * 2) + j];
+			float left_sample = *mixer_buffer_pointer++;
+			float right_sample = *mixer_buffer_pointer++;
 
-				// Clamp samples to sane limits
-				if (sample < -1.0f)
-					sample = -1.0f;
-				else if (sample > 1.0f)
-					sample = 1.0f;
+			// Clamp samples to sane limits
+			if (left_sample < -1.0f)
+				left_sample = -1.0f;
+			else if (left_sample > 1.0f)
+				left_sample = 1.0f;
 
-				// Convert to S16
-				stream_buffers[j][((buffer_length / 2) * last_half) + i] = sample * 32767.0f;
-			}
+			if (right_sample < -1.0f)
+				right_sample = -1.0f;
+			else if (right_sample > 1.0f)
+				right_sample = 1.0f;
+
+			// Deinterlate, and convert to S16
+			*left_output_buffer_pointer++ = left_sample * 32767.0f;
+			*right_output_buffer_pointer++ = right_sample * 32767.0f;
 		}
 
-		DCStoreRange(&stream_buffers[0][(buffer_length / 2) * last_half], buffer_length / 2 * sizeof(short));
-		DCStoreRange(&stream_buffers[1][(buffer_length / 2) * last_half], buffer_length / 2 * sizeof(short));
+		DCStoreRange(left_output_buffer, buffer_length / 2 * sizeof(short));
+		DCStoreRange(right_output_buffer, buffer_length / 2 * sizeof(short));
 
 		last_half = half;
 	}
