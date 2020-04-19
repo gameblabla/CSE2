@@ -21,8 +21,6 @@
 static void (*organya_callback)(void);
 static unsigned int organya_callback_milliseconds;
 
-static unsigned long ticks_per_second;
-
 static OSMutex sound_list_mutex;
 static OSMutex organya_mutex;
 
@@ -31,6 +29,7 @@ static AXVoice *voices[2];
 static short *stream_buffers[2];
 static float *stream_buffer_float;
 static size_t buffer_length;
+
 static unsigned long output_frequency;
 
 static unsigned long GetTicksMilliseconds(void)
@@ -117,11 +116,9 @@ static void FrameCallback(void)
 
 	if (half != last_half)
 	{
-		for (unsigned int i = 0; i < buffer_length / 2; ++i)
-		{
-			stream_buffer_float[i * 2 + 0] = 0.0f;
-			stream_buffer_float[i * 2 + 1] = 0.0f;
-		}
+		// Clear the mixer buffer
+		for (unsigned int i = 0; i < buffer_length; ++i)
+			stream_buffer_float[i] = 0.0f;
 
 		Callback(stream_buffer_float, buffer_length / 2);
 
@@ -131,11 +128,13 @@ static void FrameCallback(void)
 			{
 				float sample = stream_buffer_float[(i * 2) + j];
 
+				// Clamp samples to sane limits
 				if (sample < -1.0f)
 					sample = -1.0f;
 				else if (sample > 1.0f)
 					sample = 1.0f;
 
+				// Convert to S16
 				stream_buffers[j][((buffer_length / 2) * last_half) + i] = sample * 32767.0f;
 			}
 		}
@@ -199,8 +198,8 @@ bool AudioBackend_Init(void)
 
 							AXVoiceDeviceMixData mix_data[6];
 							memset(mix_data, 0, sizeof(mix_data));
-							mix_data[0].bus[0].volume = i == 0 ? 0x8000 : 0;
-							mix_data[1].bus[0].volume = i == 1 ? 0x8000 : 0;
+							mix_data[0].bus[0].volume = i == 0 ? 0x8000 : 0;	// Channel 1 goes on the left speaker
+							mix_data[1].bus[0].volume = i == 1 ? 0x8000 : 0;	// Channel 2 goes on the right speaker
 
 							AXSetVoiceDeviceMix(voices[i], AX_DEVICE_TYPE_DRC, 0, mix_data);
 							AXSetVoiceDeviceMix(voices[i], AX_DEVICE_TYPE_TV, 0, mix_data);
