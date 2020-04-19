@@ -26,9 +26,9 @@ static unsigned long ticks_per_second;
 static OSMutex sound_list_mutex;
 static OSMutex organya_mutex;
 
-static AXVoice *voice;
+static AXVoice *voices[2];
 
-static short *stream_buffer;
+static short *stream_buffers[2];
 static float *stream_buffer_float;
 static size_t buffer_length;
 static unsigned long output_frequency;
@@ -100,9 +100,11 @@ static void FrameCallback(void)
 
 	unsigned int half;
 
+	// Just assume both voices are in-sync
+
 	AXVoiceOffsets offsets;
 
-	AXGetVoiceOffsets(voice, &offsets);
+	AXGetVoiceOffsets(voices[0], &offsets);
 
 	if (offsets.currentOffset > (buffer_length / 2))
 	{
@@ -125,17 +127,21 @@ static void FrameCallback(void)
 
 		for (unsigned int i = 0; i < buffer_length / 2; ++i)
 		{
-			float sample = stream_buffer_float[i * 2];
+			for (unsigned int j = 0; j < 2; ++j)
+			{
+				float sample = stream_buffer_float[(i * 2) + j];
 
-			if (sample < -1.0f)
-				sample = -1.0f;
-			else if (sample > 1.0f)
-				sample = 1.0f;
+				if (sample < -1.0f)
+					sample = -1.0f;
+				else if (sample > 1.0f)
+					sample = 1.0f;
 
-			stream_buffer[((buffer_length / 2) * last_half) + i] = sample * 32767.0f;
+				stream_buffers[j][((buffer_length / 2) * last_half) + i] = sample * 32767.0f;
+			}
 		}
 
-		DCStoreRange(&stream_buffer[(buffer_length / 2) * last_half], buffer_length / 2 * sizeof(short));
+		DCStoreRange(&stream_buffers[0][(buffer_length / 2) * last_half], buffer_length / 2 * sizeof(short));
+		DCStoreRange(&stream_buffers[1][(buffer_length / 2) * last_half], buffer_length / 2 * sizeof(short));
 
 		last_half = half;
 	}
@@ -160,49 +166,78 @@ bool AudioBackend_Init(void)
 
 	Mixer_Init(output_frequency);
 
-	voice = AXAcquireVoice(31, NULL, NULL);
+	buffer_length = output_frequency / 100;	// 10ms buffer
 
-	if (voice != NULL)
+	stream_buffer_float = (float*)malloc(buffer_length * sizeof(float) * 2);
+
+	if (stream_buffer_float != NULL)
 	{
-		AXVoiceBegin(voice);
+		stream_buffers[0] = (short*)malloc(buffer_length * sizeof(short));
 
-		AXSetVoiceType(voice, 0);
+		if (stream_buffers[0] != NULL)
+		{
+			stream_buffers[1] = (short*)malloc(buffer_length * sizeof(short));
 
-		AXVoiceVeData vol = {.volume = 0x8000};
-		AXSetVoiceVe(voice, &vol);
+			if (stream_buffers[1] != NULL)
+			{
+				voices[0] = AXAcquireVoice(31, NULL, NULL);
 
-		AXVoiceDeviceMixData mix_data[6];
-		memset(mix_data, 0, sizeof(mix_data));
-		mix_data[0].bus[0].volume = 0x8000;
-		mix_data[1].bus[0].volume = 0x8000;
+				if (voices[0] != NULL)
+				{
+					voices[1] = AXAcquireVoice(31, NULL, NULL);
 
-		AXSetVoiceDeviceMix(voice, AX_DEVICE_TYPE_DRC, 0, mix_data);
-		AXSetVoiceDeviceMix(voice, AX_DEVICE_TYPE_TV, 0, mix_data);
+					if (voices[1] != NULL)
+					{
+						for (unsigned int i = 0; i < 2; ++i)
+						{
+							AXVoiceBegin(voices[i]);
 
-		AXSetVoiceSrcRatio(voice, 1.0f);	// We use the native sample rate
-		AXSetVoiceSrcType(voice, AX_VOICE_SRC_TYPE_NONE);
+							AXSetVoiceType(voices[i], 0);
 
-		buffer_length = output_frequency / 100;	// 10ms buffer
+							AXVoiceVeData vol = {.volume = 0x8000};
+							AXSetVoiceVe(voices[i], &vol);
 
-		stream_buffer = (short*)malloc(buffer_length * sizeof(short));
-		stream_buffer_float = (float*)malloc(buffer_length * sizeof(float) * 2);
+							AXVoiceDeviceMixData mix_data[6];
+							memset(mix_data, 0, sizeof(mix_data));
+							mix_data[0].bus[0].volume = i == 0 ? 0x8000 : 0;
+							mix_data[1].bus[0].volume = i == 1 ? 0x8000 : 0;
 
-		AXVoiceOffsets offs;
-		offs.dataType = AX_VOICE_FORMAT_LPCM16;
-		offs.endOffset = buffer_length;
-		offs.loopingEnabled = AX_VOICE_LOOP_ENABLED;
-		offs.loopOffset = 0;
-		offs.currentOffset = 0;
-		offs.data = stream_buffer;
-		AXSetVoiceOffsets(voice, &offs);
+							AXSetVoiceDeviceMix(voices[i], AX_DEVICE_TYPE_DRC, 0, mix_data);
+							AXSetVoiceDeviceMix(voices[i], AX_DEVICE_TYPE_TV, 0, mix_data);
 
-		AXSetVoiceState(voice, AX_VOICE_STATE_PLAYING);
+							AXSetVoiceSrcRatio(voices[i], 1.0f);	// We use the native sample rate
+							AXSetVoiceSrcType(voices[i], AX_VOICE_SRC_TYPE_NONE);
 
-		AXVoiceEnd(voice);
 
-		AXRegisterAppFrameCallback(FrameCallback);
+							AXVoiceOffsets offs;
+							offs.dataType = AX_VOICE_FORMAT_LPCM16;
+							offs.endOffset = buffer_length;
+							offs.loopingEnabled = AX_VOICE_LOOP_ENABLED;
+							offs.loopOffset = 0;
+							offs.currentOffset = 0;
+							offs.data = stream_buffers[i];
+							AXSetVoiceOffsets(voices[i], &offs);
 
-		return true;
+							AXSetVoiceState(voices[i], AX_VOICE_STATE_PLAYING);
+
+							AXVoiceEnd(voices[i]);
+						}
+
+						AXRegisterAppFrameCallback(FrameCallback);
+
+						return true;
+					}
+
+					AXFreeVoice(voices[0]);
+				}
+
+				free(stream_buffers[1]);
+			}
+
+			free(stream_buffers[0]);
+		}
+
+		free(stream_buffer_float);
 	}
 
 	return false;
@@ -210,7 +245,11 @@ bool AudioBackend_Init(void)
 
 void AudioBackend_Deinit(void)
 {
-	AXFreeVoice(voice);
+	for (unsigned int i = 0; i < 2; ++i)
+	{
+		AXFreeVoice(voices[i]);
+		free(stream_buffers[i]);
+	}
 
 	AXQuit();
 }
