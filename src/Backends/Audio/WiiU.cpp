@@ -25,7 +25,6 @@ struct AudioBackend_Sound
 	unsigned short volume;
 	unsigned short pan_l;
 	unsigned short pan_r;
-	AXVoiceDeviceMixData mix_data[6];
 
 	struct AudioBackend_Sound *next;
 };
@@ -39,6 +38,28 @@ static OSMutex sound_list_mutex;
 static OSMutex organya_mutex;
 
 static AudioBackend_Sound *sound_list_head;
+
+static void CullVoices(void)
+{
+	// Free any voices that aren't playing anymore
+	OSLockMutex(&sound_list_mutex);
+
+	for (AudioBackend_Sound *sound = sound_list_head; sound != NULL; sound = sound->next)
+	{
+		if (sound->voice != NULL)
+		{
+			if (!AXIsVoiceRunning(sound->voice))
+			{
+				AXVoiceBegin(sound->voice);
+				AXFreeVoice(sound->voice);
+				AXVoiceEnd(sound->voice);
+				sound->voice = NULL;
+			}
+		}
+	}
+
+	OSUnlockMutex(&sound_list_mutex);
+}
 
 static double MillibelToScale(long volume)
 {
@@ -102,25 +123,6 @@ static int ThreadFunction(int argc, const char *argv[])
 			organya_callback();
 			OSUnlockMutex(&sound_list_mutex);
 		}
-
-		// Free any voices that aren't playing anymore
-		OSLockMutex(&sound_list_mutex);
-
-		for (AudioBackend_Sound *sound = sound_list_head; sound != NULL; sound = sound->next)
-		{
-			if (sound->voice != NULL)
-			{
-				if (!AXIsVoiceRunning(sound->voice))
-				{
-					AXVoiceBegin(sound->voice);
-					AXFreeVoice(sound->voice);
-					AXVoiceEnd(sound->voice);
-					sound->voice = NULL;
-				}
-			}
-		}
-
-		OSUnlockMutex(&sound_list_mutex);
 	}
 
 	return 0;
@@ -224,6 +226,8 @@ void AudioBackend_DestroySound(AudioBackend_Sound *sound)
 
 void AudioBackend_PlaySound(AudioBackend_Sound *sound, bool looping)
 {
+	CullVoices();
+
 	OSLockMutex(&sound_list_mutex);
 
 	if (sound->voice == NULL)
@@ -239,12 +243,13 @@ void AudioBackend_PlaySound(AudioBackend_Sound *sound, bool looping)
 			AXVoiceVeData vol = {.volume = sound->volume};
 			AXSetVoiceVe(voice, &vol);
 
-			memset(sound->mix_data, 0, sizeof(sound->mix_data));
-			sound->mix_data[0].bus[0].volume = sound->pan_l;
-			sound->mix_data[1].bus[0].volume = sound->pan_r;
+			AXVoiceDeviceMixData mix_data[6];
+			memset(mix_data, 0, sizeof(mix_data));
+			mix_data[0].bus[0].volume = sound->pan_l;
+			mix_data[1].bus[0].volume = sound->pan_r;
 
-			AXSetVoiceDeviceMix(voice, AX_DEVICE_TYPE_DRC, 0, sound->mix_data);
-			AXSetVoiceDeviceMix(voice, AX_DEVICE_TYPE_TV, 0, sound->mix_data);
+			AXSetVoiceDeviceMix(voice, AX_DEVICE_TYPE_DRC, 0, mix_data);
+			AXSetVoiceDeviceMix(voice, AX_DEVICE_TYPE_TV, 0, mix_data);
 
 			float srcratio = (float)sound->frequency / (float)AXGetInputSamplesPerSec();
 			AXSetVoiceSrcRatio(voice, srcratio);
@@ -360,11 +365,13 @@ void AudioBackend_SetSoundPan(AudioBackend_Sound *sound, long pan)
 	{
 		AXVoiceBegin(sound->voice);
 
-		sound->mix_data[0].bus[0].volume = sound->pan_l;
-		sound->mix_data[1].bus[0].volume = sound->pan_r;
+		AXVoiceDeviceMixData mix_data[6];
+		memset(mix_data, 0, sizeof(mix_data));
+		mix_data[0].bus[0].volume = sound->pan_l;
+		mix_data[1].bus[0].volume = sound->pan_r;
 
-		AXSetVoiceDeviceMix(sound->voice, AX_DEVICE_TYPE_DRC, 0, sound->mix_data);
-		AXSetVoiceDeviceMix(sound->voice, AX_DEVICE_TYPE_TV, 0, sound->mix_data);
+		AXSetVoiceDeviceMix(sound->voice, AX_DEVICE_TYPE_DRC, 0, mix_data);
+		AXSetVoiceDeviceMix(sound->voice, AX_DEVICE_TYPE_TV, 0, mix_data);
 
 		AXVoiceEnd(sound->voice);
 	}
