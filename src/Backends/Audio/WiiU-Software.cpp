@@ -94,58 +94,51 @@ static void Callback(void *output_stream, size_t frames_total)
 	OSUnlockMutex(&organya_mutex);
 }
 
-static int ThreadFunction(int argc, const char *argv[])
+static void FrameCallback(void)
 {
-	for (;;)
+	static int last_half = 1;
+
+	unsigned int half;
+
+	AXVoiceOffsets offsets;
+
+	AXGetVoiceOffsets(voice, &offsets);
+
+	if (offsets.currentOffset > (buffer_length / 2))
 	{
-		OSTestThreadCancel();
-
-		static int last_half = 1;
-
-		unsigned int half;
-
-		AXVoiceOffsets offsets;
-
-		AXGetVoiceOffsets(voice, &offsets);
-
-		if (offsets.currentOffset > (buffer_length / 2))
-		{
-			half = 1;
-		}
-		else
-		{
-			half = 0;
-		}
-
-		if (half != last_half)
-		{
-			for (unsigned int i = 0; i < buffer_length / 2; ++i)
-			{
-				stream_buffer_float[i * 2 + 0] = 0.0f;
-				stream_buffer_float[i * 2 + 1] = 0.0f;
-			}
-
-			Callback(stream_buffer_float, buffer_length / 2);
-
-			for (unsigned int i = 0; i < buffer_length / 2; ++i)
-			{
-				float sample = stream_buffer_float[i * 2];
-				
-				if (sample < -1.0f)
-					sample = -1.0f;
-				else if (sample > 1.0f)
-					sample = 1.0f;
-									
-				stream_buffer[((buffer_length / 2) * last_half) + i] = sample * 32767.0f;
-			}
-
-			DCStoreRange(&stream_buffer[(buffer_length / 2) * last_half], buffer_length / 2 * sizeof(short));
-
-			last_half = half;
-		}
+		half = 1;
+	}
+	else
+	{
+		half = 0;
 	}
 
-	return 0;
+	if (half != last_half)
+	{
+		for (unsigned int i = 0; i < buffer_length / 2; ++i)
+		{
+			stream_buffer_float[i * 2 + 0] = 0.0f;
+			stream_buffer_float[i * 2 + 1] = 0.0f;
+		}
+
+		Callback(stream_buffer_float, buffer_length / 2);
+
+		for (unsigned int i = 0; i < buffer_length / 2; ++i)
+		{
+			float sample = stream_buffer_float[i * 2];
+
+			if (sample < -1.0f)
+				sample = -1.0f;
+			else if (sample > 1.0f)
+				sample = 1.0f;
+
+			stream_buffer[((buffer_length / 2) * last_half) + i] = sample * 32767.0f;
+		}
+
+		DCStoreRange(&stream_buffer[(buffer_length / 2) * last_half], buffer_length / 2 * sizeof(short));
+
+		last_half = half;
+	}
 }
 
 bool AudioBackend_Init(void)
@@ -207,9 +200,7 @@ bool AudioBackend_Init(void)
 
 		AXVoiceEnd(voice);
 
-		//AXRegisterAppFrameCallback(FrameCallback);
-
-		OSRunThread(OSGetDefaultThread(0), ThreadFunction, 0, NULL);
+		AXRegisterAppFrameCallback(FrameCallback);
 
 		return true;
 	}
@@ -219,10 +210,6 @@ bool AudioBackend_Init(void)
 
 void AudioBackend_Deinit(void)
 {
-	OSCancelThread(OSGetDefaultThread(0));
-
-	OSJoinThread(OSGetDefaultThread(0), NULL);
-
 	AXFreeVoice(voice);
 
 	AXQuit();
