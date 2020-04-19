@@ -271,7 +271,7 @@ void JoystickProc(void);
 
 BOOL SystemTask(void)
 {
-	static BOOL previous_keyboard_state[BACKEND_KEYBOARD_TOTAL];
+	static bool previous_keyboard_state[BACKEND_KEYBOARD_TOTAL];
 
 	do
 	{
