@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include <coreinit/thread.h>
+#include <padscore/kpad.h>
 #include <vpad/input.h>
 #include <whb/proc.h>
 #include <whb/sdcard.h>
@@ -17,6 +18,8 @@ bool Backend_Init(void)
 		return FALSE;
 
 	VPADInit();
+
+	KPADInit();
 
 	tick_delta = OSGetSystemInfo()->busClockSpeed / 4;
 
@@ -93,6 +96,21 @@ void Backend_GetKeyboardState(bool *out_keyboard_state)
 		keyboard_state[BACKEND_KEYBOARD_W] = vpad_status.hold & (VPAD_BUTTON_X | VPAD_BUTTON_MINUS); // Map
 		keyboard_state[BACKEND_KEYBOARD_A] = vpad_status.hold & (VPAD_BUTTON_L | VPAD_BUTTON_ZL | VPAD_STICK_R_EMULATION_LEFT);  // Weapon left
 		keyboard_state[BACKEND_KEYBOARD_S] = vpad_status.hold & (VPAD_BUTTON_R | VPAD_BUTTON_ZR | VPAD_STICK_R_EMULATION_RIGHT); // Weapon right
+	}
+
+	KPADStatus kpad_status;
+	if (KPADRead(WPAD_CHAN_0, &kpad_status, 1) == 0)
+	{
+		keyboard_state[BACKEND_KEYBOARD_UP] |= kpad_status.hold & (WPAD_PRO_BUTTON_UP | WPAD_PRO_STICK_L_EMULATION_UP);
+		keyboard_state[BACKEND_KEYBOARD_DOWN] |= kpad_status.hold & (WPAD_PRO_BUTTON_DOWN | WPAD_PRO_STICK_L_EMULATION_DOWN);
+		keyboard_state[BACKEND_KEYBOARD_LEFT] |= kpad_status.hold & (WPAD_PRO_BUTTON_LEFT | WPAD_PRO_STICK_L_EMULATION_LEFT);
+		keyboard_state[BACKEND_KEYBOARD_RIGHT] |= kpad_status.hold & (WPAD_PRO_BUTTON_RIGHT | WPAD_PRO_STICK_L_EMULATION_RIGHT);
+		keyboard_state[BACKEND_KEYBOARD_Z] |= kpad_status.hold & WPAD_PRO_BUTTON_B;                       // Jump
+		keyboard_state[BACKEND_KEYBOARD_X] |= kpad_status.hold & WPAD_PRO_BUTTON_Y;                       // Shoot
+		keyboard_state[BACKEND_KEYBOARD_Q] |= kpad_status.hold & (WPAD_PRO_BUTTON_A | WPAD_PRO_BUTTON_PLUS);  // Inventory
+		keyboard_state[BACKEND_KEYBOARD_W] |= kpad_status.hold & (WPAD_PRO_BUTTON_X | WPAD_PRO_BUTTON_MINUS); // Map
+		keyboard_state[BACKEND_KEYBOARD_A] |= kpad_status.hold & (WPAD_PRO_TRIGGER_L | WPAD_PRO_TRIGGER_ZL | WPAD_PRO_STICK_R_EMULATION_LEFT);  // Weapon left
+		keyboard_state[BACKEND_KEYBOARD_S] |= kpad_status.hold & (WPAD_PRO_TRIGGER_R | WPAD_PRO_TRIGGER_ZR | WPAD_PRO_STICK_R_EMULATION_RIGHT); // Weapon right
 	}
 
 	memcpy(out_keyboard_state, keyboard_state, sizeof(keyboard_state));
