@@ -35,7 +35,7 @@ void InitBossChar(int code)
 
 void PutBossChar(int fx, int fy)
 {
-	char a = 0;
+	signed char a = 0;
 	int b;
 
 	int side;
