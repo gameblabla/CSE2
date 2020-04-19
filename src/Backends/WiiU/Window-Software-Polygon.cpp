@@ -58,10 +58,10 @@ bool WindowBackend_Software_CreateWindow(const char *window_title, int screen_wi
 
 			// Initialise vertex position buffer
 			const float vertex_positions[4][2] = {
-				{-1.0f, -1.0f},
-				{-1.0f,  1.0f},
-				{ 1.0f,  1.0f},
-				{ 1.0f, -1.0f}
+				{-640.0f / 854.0f, -1.0f},
+				{-640.0f / 854.0f,  1.0f},
+				{ 640.0f / 854.0f,  1.0f},
+				{ 640.0f / 854.0f, -1.0f}
 			};
 
 			vertex_position_buffer.flags = (GX2RResourceFlags)(GX2R_RESOURCE_BIND_VERTEX_BUFFER |
