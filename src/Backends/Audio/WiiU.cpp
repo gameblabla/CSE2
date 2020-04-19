@@ -199,6 +199,9 @@ AudioBackend_Sound* AudioBackend_CreateSound(unsigned int frequency, const unsig
 
 void AudioBackend_DestroySound(AudioBackend_Sound *sound)
 {
+	if (sound == NULL)
+		return;
+
 	OSLockMutex(&sound_list_mutex);
 
 	// Unhook sound from the linked-list
@@ -226,6 +229,9 @@ void AudioBackend_DestroySound(AudioBackend_Sound *sound)
 
 void AudioBackend_PlaySound(AudioBackend_Sound *sound, bool looping)
 {
+	if (sound == NULL)
+		return;
+
 	CullVoices();
 
 	OSLockMutex(&sound_list_mutex);
@@ -285,6 +291,9 @@ void AudioBackend_PlaySound(AudioBackend_Sound *sound, bool looping)
 
 void AudioBackend_StopSound(AudioBackend_Sound *sound)
 {
+	if (sound == NULL)
+		return;
+
 	OSLockMutex(&sound_list_mutex);
 
 	if (sound->voice != NULL)
@@ -301,6 +310,9 @@ void AudioBackend_StopSound(AudioBackend_Sound *sound)
 
 void AudioBackend_RewindSound(AudioBackend_Sound *sound)
 {
+	if (sound == NULL)
+		return;
+
 	OSLockMutex(&sound_list_mutex);
 
 	if (sound->voice != NULL)
@@ -317,6 +329,9 @@ void AudioBackend_RewindSound(AudioBackend_Sound *sound)
 
 void AudioBackend_SetSoundFrequency(AudioBackend_Sound *sound, unsigned int frequency)
 {
+	if (sound == NULL)
+		return;
+
 	OSLockMutex(&sound_list_mutex);
 
 	sound->frequency = frequency;
@@ -336,6 +351,9 @@ void AudioBackend_SetSoundFrequency(AudioBackend_Sound *sound, unsigned int freq
 
 void AudioBackend_SetSoundVolume(AudioBackend_Sound *sound, long volume)
 {
+	if (sound == NULL)
+		return;
+
 	OSLockMutex(&sound_list_mutex);
 
 	sound->volume = (unsigned short)(0x8000 * MillibelToScale(volume));
@@ -356,6 +374,9 @@ void AudioBackend_SetSoundVolume(AudioBackend_Sound *sound, long volume)
 
 void AudioBackend_SetSoundPan(AudioBackend_Sound *sound, long pan)
 {
+	if (sound == NULL)
+		return;
+
 	OSLockMutex(&sound_list_mutex);
 
 	sound->pan_l = (unsigned short)(0x8000 * MillibelToScale(-pan));
