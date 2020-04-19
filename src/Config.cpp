@@ -8,8 +8,8 @@
 #include "File.h"
 #include "Main.h"
 
-static const char* const config_filename = "Config.dat";	// Not the original name
-static const char* const config_magic = "DOUKUTSU20041206";	// Not the original name
+static const char* const gConfigName = "Config.dat";
+static const char* const gProof = "DOUKUTSU20041206";
 
 BOOL LoadConfigData(CONFIG *conf)
 {
@@ -18,7 +18,7 @@ BOOL LoadConfigData(CONFIG *conf)
 
 	// Get path
 	char path[MAX_PATH];
-	sprintf(path, "%s/%s", gModulePath, config_filename);
+	sprintf(path, "%s/%s", gModulePath, gConfigName);
 
 	// Open file
 	FILE *fp = fopen(path, "rb");
@@ -46,7 +46,7 @@ BOOL LoadConfigData(CONFIG *conf)
 	fclose(fp);
 
 	// Check if version is not correct, and return if it failed
-	if (strcmp(conf->proof, config_magic))
+	if (strcmp(conf->proof, gProof))
 	{
 		memset(conf, 0, sizeof(CONFIG));
 		return FALSE;

@@ -50,6 +50,7 @@ static struct
 
 BOOL Flip_SystemTask(void)
 {
+	// TODO - Not the original variable names
 	static unsigned long timePrev;
 	static unsigned long timeNow;
 
@@ -412,7 +413,7 @@ BOOL MakeSurface_Generic(int bxsize, int bysize, SurfaceID surf_no, BOOL bSystem
 
 void BackupSurface(SurfaceID surf_no, const RECT *rect)
 {
-	static RenderBackend_Rect scaled_rect;
+	static RenderBackend_Rect scaled_rect;	// TODO - Not the original variable name
 	scaled_rect.left = rect->left * magnification;
 	scaled_rect.top = rect->top * magnification;
 	scaled_rect.right = rect->right * magnification;
@@ -511,7 +512,7 @@ unsigned long GetCortBoxColor(unsigned long col)
 
 void CortBox(const RECT *rect, unsigned long col)
 {
-	static RenderBackend_Rect dst_rect;
+	static RenderBackend_Rect dst_rect;	// TODO - Not the original variable name
 	dst_rect.left = rect->left * magnification;
 	dst_rect.top = rect->top * magnification;
 	dst_rect.right = rect->right * magnification;
@@ -526,7 +527,7 @@ void CortBox(const RECT *rect, unsigned long col)
 
 void CortBox2(const RECT *rect, unsigned long col, SurfaceID surf_no)
 {
-	static RenderBackend_Rect dst_rect;
+	static RenderBackend_Rect dst_rect;	// TODO - Not the original variable name
 	dst_rect.left = rect->left * magnification;
 	dst_rect.top = rect->top * magnification;
 	dst_rect.right = rect->right * magnification;
@@ -541,7 +542,9 @@ void CortBox2(const RECT *rect, unsigned long col, SurfaceID surf_no)
 	RenderBackend_ColourFill(surf[surf_no], &dst_rect, red, green, blue);
 }
 
-BOOL DummiedOutLogFunction(int unknown)
+// Dummied-out log function
+// According to the Mac port, its name really is just "out".
+static BOOL out(int unknown)
 {
 	char unknown2[0x100];
 	int unknown3;
@@ -557,7 +560,8 @@ BOOL DummiedOutLogFunction(int unknown)
 	return TRUE;
 }
 
-int RestoreSurfaces(void)	// Guessed function name - this doesn't exist in the Linux port
+// TODO - Probably not the original variable name (this is an educated guess)
+int RestoreSurfaces(void)
 {
 	int s;
 	RECT rect;
@@ -570,7 +574,7 @@ int RestoreSurfaces(void)	// Guessed function name - this doesn't exist in the L
 	{
 		++surfaces_regenerated;
 		RenderBackend_RestoreSurface(framebuffer);
-		DummiedOutLogFunction(0x62);
+		out(0x62);
 	}
 
 	for (s = 0; s < SURFACE_ID_MAX; ++s)
@@ -581,7 +585,7 @@ int RestoreSurfaces(void)	// Guessed function name - this doesn't exist in the L
 			{
 				++surfaces_regenerated;
 				RenderBackend_RestoreSurface(surf[s]);
-				DummiedOutLogFunction(0x30 + s);
+				out(0x30 + s);
 
 				if (!surface_metadata[s].bSystem)
 				{

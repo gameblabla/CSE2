@@ -10,7 +10,7 @@ extern BOOL bFullscreen;
 extern BOOL gbUseJoystick;
 
 void PutFramePerSecound(void);
-unsigned long GetFramePerSecound(void);
+unsigned long CountFramePerSecound(void);
 
 void InactiveWindow(void);
 void ActiveWindow(void);
