@@ -32,10 +32,8 @@ static size_t buffer_length;
 
 static unsigned long output_frequency;
 
-static void Callback(void *output_stream, size_t frames_total)
+static void FillMixerBuffer(float *stream, size_t frames_total)
 {
-	float *stream = (float*)output_stream;
-
 	OSLockMutex(&organya_mutex);
 
 	if (organya_callback_milliseconds == 0)
@@ -79,36 +77,24 @@ static void Callback(void *output_stream, size_t frames_total)
 
 static void FrameCallback(void)
 {
-	static int last_half = 1;
-
-	unsigned int half;
-
 	// Just assume both voices are in-sync
-
 	AXVoiceOffsets offsets;
-
 	AXGetVoiceOffsets(voices[0], &offsets);
 
-	if (offsets.currentOffset > (buffer_length / 2))
-	{
-		half = 1;
-	}
-	else
-	{
-		half = 0;
-	}
+	unsigned int current_buffer = offsets.currentOffset / (buffer_length / 2);
 
-	if (half != last_half)
+	static unsigned int last_buffer = 1;
+
+	if (current_buffer != last_buffer)
 	{
 		// Clear the mixer buffer
 		for (unsigned int i = 0; i < buffer_length; ++i)
 			stream_buffer_float[i] = 0.0f;
 
-		Callback(stream_buffer_float, buffer_length / 2);
+		FillMixerBuffer(stream_buffer_float, buffer_length / 2);
 
-
-		short *left_output_buffer = &stream_buffers[0][(buffer_length / 2) * last_half];
-		short *right_output_buffer = &stream_buffers[1][(buffer_length / 2) * last_half];
+		short *left_output_buffer = &stream_buffers[0][(buffer_length / 2) * last_buffer];
+		short *right_output_buffer = &stream_buffers[1][(buffer_length / 2) * last_buffer];
 
 		float *mixer_buffer_pointer = stream_buffer_float;
 		short *left_output_buffer_pointer = left_output_buffer;
@@ -138,7 +124,7 @@ static void FrameCallback(void)
 		DCStoreRange(left_output_buffer, buffer_length / 2 * sizeof(short));
 		DCStoreRange(right_output_buffer, buffer_length / 2 * sizeof(short));
 
-		last_half = half;
+		last_buffer = current_buffer;
 	}
 }
 
