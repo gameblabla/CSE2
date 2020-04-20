@@ -67,7 +67,7 @@ Name | Function
 `-DJAPANESE=ON` | Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
 `-DFIX_BUGS=ON` | Fix various bugs in the game
 `-DDEBUG_SAVE=ON` | Re-enable the ability to drag-and-drop save files onto the window
-`-DBUILD_DOCONFIG=OFF` | Disable compiling the DoConfig tool (is not useful for console ports)
+`-DDOCONFIG=OFF` | Disable compiling the DoConfig tool (it is not useful for console ports)
 `-DBACKEND_RENDERER=OpenGL3` | Use the hardware-accelerated OpenGL 3.2 renderer
 `-DBACKEND_RENDERER=OpenGLES2` | Use the hardware-accelerated OpenGL ES 2.0 renderer
 `-DBACKEND_RENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default) (note: requires `-DBACKEND_PLATFORM=SDL2`)
@@ -111,7 +111,7 @@ PATH=$PATH:$DEVKITPPC/bin
 Then, generate the build files with this command:
 
 ```
-cmake -B buildwiiu -DCMAKE_BUILD_TYPE=Release -DFORCE_LOCAL_LIBS=ON -DBACKEND_PLATFORM=WiiU -DBACKEND_RENDERER=Software -DBACKEND_AUDIO=WiiU -DBUILD_DOCONFIG=OFF -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/wut/share/wut.toolchain.cmake
+cmake -B buildwiiu -DCMAKE_BUILD_TYPE=Release -DFORCE_LOCAL_LIBS=ON -DBACKEND_PLATFORM=WiiU -DBACKEND_RENDERER=Software -DBACKEND_AUDIO=WiiU -DDOCONFIG=OFF -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/wut/share/wut.toolchain.cmake
 ```
 
 Finally, build the game with this command:
