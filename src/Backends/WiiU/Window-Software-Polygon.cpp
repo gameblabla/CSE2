@@ -112,12 +112,20 @@ bool WindowBackend_Software_CreateWindow(const char *window_title, int screen_wi
 			                                                                   GX2R_RESOURCE_USAGE_CPU_WRITE | GX2R_RESOURCE_USAGE_CPU_READ |
 			                                                                   GX2R_RESOURCE_USAGE_GPU_WRITE | GX2R_RESOURCE_USAGE_GPU_READ)))
 			{
+				// Do some binding
+				GX2SetPixelSampler(&sampler, shader_group.pixelShader->samplerVars[0].location);
+				GX2SetPixelTexture(&screen_texture, shader_group.pixelShader->samplerVars[0].location);
+				GX2RSetAttributeBuffer(&vertex_position_buffer, 0, vertex_position_buffer.elemSize, 0);
+				GX2RSetAttributeBuffer(&texture_coordinate_buffer, 1, texture_coordinate_buffer.elemSize, 0);
+
 				return true;
 			}
 
 			GX2RDestroyBufferEx(&texture_coordinate_buffer, (GX2RResourceFlags)0);
 			GX2RDestroyBufferEx(&vertex_position_buffer, (GX2RResourceFlags)0);
 		}
+
+		WHBGfxFreeShaderGroup(&shader_group);
 
 		WHBGfxShutdown();
 
@@ -133,6 +141,8 @@ void WindowBackend_Software_DestroyWindow(void)
 
 	GX2RDestroyBufferEx(&texture_coordinate_buffer, (GX2RResourceFlags)0);
 	GX2RDestroyBufferEx(&vertex_position_buffer, (GX2RResourceFlags)0);
+
+	WHBGfxFreeShaderGroup(&shader_group);
 
 	WHBGfxShutdown();
 
@@ -172,26 +182,18 @@ ATTRIBUTE_HOT void WindowBackend_Software_Display(void)
 	// Draw to the TV
 	WHBGfxBeginRenderTV();
 	WHBGfxClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	GX2SetPixelTexture(&screen_texture, shader_group.pixelShader->samplerVars[0].location);
-	GX2SetPixelSampler(&sampler, shader_group.pixelShader->samplerVars[0].location);
 	GX2SetFetchShader(&shader_group.fetchShader);
 	GX2SetVertexShader(shader_group.vertexShader);
 	GX2SetPixelShader(shader_group.pixelShader);
-	GX2RSetAttributeBuffer(&vertex_position_buffer, 0, vertex_position_buffer.elemSize, 0);
-	GX2RSetAttributeBuffer(&texture_coordinate_buffer, 1, texture_coordinate_buffer.elemSize, 0);
 	GX2DrawEx(GX2_PRIMITIVE_MODE_QUADS, 4, 0, 1);
 	WHBGfxFinishRenderTV();
 
 	// Draw to the gamepad
 	WHBGfxBeginRenderDRC();
 	WHBGfxClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	GX2SetPixelTexture(&screen_texture, shader_group.pixelShader->samplerVars[0].location);
-	GX2SetPixelSampler(&sampler, shader_group.pixelShader->samplerVars[0].location);
 	GX2SetFetchShader(&shader_group.fetchShader);
 	GX2SetVertexShader(shader_group.vertexShader);
 	GX2SetPixelShader(shader_group.pixelShader);
-	GX2RSetAttributeBuffer(&vertex_position_buffer, 0, vertex_position_buffer.elemSize, 0);
-	GX2RSetAttributeBuffer(&texture_coordinate_buffer, 1, texture_coordinate_buffer.elemSize, 0);
 	GX2DrawEx(GX2_PRIMITIVE_MODE_QUADS, 4, 0, 1);
 	WHBGfxFinishRenderDRC();
 
