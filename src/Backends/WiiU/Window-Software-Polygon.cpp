@@ -34,7 +34,6 @@ static GX2RBuffer texture_coordinate_buffer;
 static GX2Sampler sampler;
 
 static GX2Texture screen_texture;
-static GX2ColorBuffer screen_color_buffer;
 
 bool WindowBackend_Software_CreateWindow(const char *window_title, int screen_width, int screen_height, bool fullscreen)
 {
@@ -96,8 +95,6 @@ bool WindowBackend_Software_CreateWindow(const char *window_title, int screen_wi
 			GX2InitSampler(&sampler, GX2_TEX_CLAMP_MODE_CLAMP, GX2_TEX_XY_FILTER_MODE_POINT);
 
 			// Initialise screen texture
-
-			// Fill-in `screen_texture`
 			screen_texture.surface.width = fake_framebuffer_width;
 			screen_texture.surface.height = fake_framebuffer_height;
 			screen_texture.surface.format = GX2_SURFACE_FORMAT_UNORM_R8_G8_B8_A8;
@@ -111,23 +108,11 @@ bool WindowBackend_Software_CreateWindow(const char *window_title, int screen_wi
 			GX2CalcSurfaceSizeAndAlignment(&screen_texture.surface);
 			GX2InitTextureRegs(&screen_texture);
 
-			// Fill-in `screen_color_buffer`
-			screen_color_buffer.surface = screen_texture.surface;
-			screen_color_buffer.viewNumSlices = 1;
-			GX2InitColorBufferRegs(&screen_color_buffer);
-
-			// Create surface (GPU-side?)
 			if (GX2RCreateSurface(&screen_texture.surface, (GX2RResourceFlags)(GX2R_RESOURCE_BIND_TEXTURE | GX2R_RESOURCE_BIND_COLOR_BUFFER |
 			                                                                   GX2R_RESOURCE_USAGE_CPU_WRITE | GX2R_RESOURCE_USAGE_CPU_READ |
 			                                                                   GX2R_RESOURCE_USAGE_GPU_WRITE | GX2R_RESOURCE_USAGE_GPU_READ)))
 			{
-				// Create the colour buffer (CPU-side?)
-				if (GX2RCreateSurfaceUserMemory(&screen_color_buffer.surface, (uint8_t*)screen_texture.surface.image, (uint8_t*)screen_texture.surface.mipmaps, screen_texture.surface.resourceFlags))
-				{
-					return true;					
-				}
-
-				GX2RDestroySurfaceEx(&screen_texture.surface, (GX2RResourceFlags)0);
+				return true;
 			}
 
 			GX2RDestroyBufferEx(&texture_coordinate_buffer, (GX2RResourceFlags)0);
@@ -144,7 +129,6 @@ bool WindowBackend_Software_CreateWindow(const char *window_title, int screen_wi
 
 void WindowBackend_Software_DestroyWindow(void)
 {
-	GX2RDestroySurfaceEx(&screen_color_buffer.surface, (GX2RResourceFlags)0);
 	GX2RDestroySurfaceEx(&screen_texture.surface, (GX2RResourceFlags)0);
 
 	GX2RDestroyBufferEx(&texture_coordinate_buffer, (GX2RResourceFlags)0);
