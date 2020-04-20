@@ -13,6 +13,8 @@
 /game_english/DoConfig_debug
 /game_english/CSE2
 /game_english/DoConfig
+/game_english/CSE2_debug.rpx
+/game_english/CSE2.rpx
 /game_japanese/CSE2_debug.exe
 /game_japanese/DoConfig_debug.exe
 /game_japanese/CSE2.exe
@@ -21,14 +23,28 @@
 /game_japanese/DoConfig_debug
 /game_japanese/CSE2
 /game_japanese/DoConfig
+/game_japanese/CSE2_debug.rpx
+/game_japanese/CSE2.rpx
 
 # Exclude save data
 /game_english/Config.dat
 /game_english/Profile.dat
 /game_english/290.rec
+/game_english/window.rect
 /game_japanese/Config.dat
 /game_japanese/Profile.dat
 /game_japanese/290.rec
+/game_japanese/window.rect
+
+# Exclude configuration files
+/game_english/fps
+/game_english/mute
+/game_english/save
+/game_english/s_reverse
+/game_japanese/fps
+/game_japanese/mute
+/game_japanese/save
+/game_japanese/s_reverse
 
 ####
 # Accurate branch
