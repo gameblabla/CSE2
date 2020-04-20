@@ -1,0 +1,47 @@
+I'mma give it to you straight: compiling shaders for the Wii U is an absolute
+nightmare.
+
+You see, there are three major steps:
+* Compile the GLSL to assembly
+* Fill in a header by-hand
+* Assemble the assembly + header
+
+To compile, you need AMD's 'GPU ShaderAnalyzer', which is Windows-only:
+https://gpuopen.com/archive/gpu-shaderanalyzer/
+
+You then need to compile for the RV730.
+
+After that, you need to fill-in a header. The only way I was able to figure out
+what little I did was by finding examples on the internet:
+https://github.com/snickerbockers/gx2gl/tree/master/src/shaders
+https://github.com/yawut/SDL/tree/wiiu-2.0.9/src/video/wiiu/shaders
+https://github.com/devkitPro/wut/tree/master/samples/cmake/content
+
+Even now, I don't have a complete idea of exactly what everything means.
+
+Anyway, once you have *that* out of the way, you still need to assemble your
+shaders. For that, you'll need `latte-assembler` - a tool that comes with the
+Decaf emulator.
+
+For me, I needed to clone the entire source tree (and its dependencies) in order
+to build the tool successfully, which is a royal pain in the ass.
+
+For compilation, I used MSYS2+MinGW-w64. There were a couple of compilation
+errors I had to address, but nothing too hard to solve.
+
+Eventually you'll have the assembler built. With it, you can link your `.psh`
+and `.vsh` files into the final `.gsh` blob.
+
+Oh, right. I should warn you - the devs changed latte-assembler's syntax at some
+point, so all the example `.psh`/`.vsh` files I could fine online were
+incompatible. That sucked. The main change was that stuff like 'float2' and
+'float4' were changed to 'vec2' and 'vec4'. Just keep that in mind, and you
+should be okay.
+
+Also, latte-assembler's 'assemble' command was originally named 'compile', and
+the other 'compile' option didn't exist. Keep that in mind if you ever find any
+documentation on how to use the tool.
+
+latte-assembler does have an option to convert straight from GLSL to `.gsh`, but
+this feature is woefully incomplete (it doesn't support `sampler2D`), and not
+worth using.
