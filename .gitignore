@@ -46,9 +46,9 @@
 /game_japanese/save
 /game_japanese/s_reverse
 
-####
-# Accurate branch
-####
+###################
+# Accurate branch #
+###################
 
 # Exclude devilution-comparer assembly output
 /devilution/orig.asm
@@ -66,9 +66,9 @@
 /vs2003/Debug (Japanese)
 /vs2003/Release (Japanese)
 
-####
-# Portable branch
-####
+###################
+# Portable branch #
+###################
 
 # Exclude Wii U build directory
 /buildwiiu
@@ -76,9 +76,9 @@
 # Exclude converted resource files
 /src/Resource
 
-####
-# Enhanced branch
-####
+###################
+# Enhanced branch #
+###################
 
 # Exclude CSE2E configuration file
 /game_english/ConfigCSE2E.dat
