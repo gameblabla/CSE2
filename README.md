@@ -73,11 +73,11 @@ Name | Function
 `-DBACKEND_RENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default) (note: requires `-DBACKEND_PLATFORM=SDL2`)
 `-DBACKEND_RENDERER=SDLSurface` | Use the software-rendered SDL2 Surface API renderer (note: requires `-DBACKEND_PLATFORM=SDL2`)
 `-DBACKEND_RENDERER=Software` | Use the handwritten software renderer
-`-DBACKEND_AUDIO=SDL2` | Use SDL2 to deliver audio
+`-DBACKEND_AUDIO=SDL2` | Use SDL2 to deliver audio (default)
 `-DBACKEND_AUDIO=miniaudio` | Use miniaudio to deliver audio
 `-DBACKEND_AUDIO=WiiU` | Use the Wii U's APIs to deliver audio
 `-DBACKEND_AUDIO=Null` | Don't deliver audio at all
-`-DBACKEND_PLATFORM=SDL2` | Use SDL2 for windowing and OS-abstraction
+`-DBACKEND_PLATFORM=SDL2` | Use SDL2 for windowing and OS-abstraction (default)
 `-DBACKEND_PLATFORM=GLFW3` | Use GLFW3 for windowing and OS-abstraction
 `-DBACKEND_PLATFORM=WiiU` | Use the Wii U's native APIs
 `-DBACKEND_PLATFORM=Null` | Use the dummy platform backend (doesn't do anything)
