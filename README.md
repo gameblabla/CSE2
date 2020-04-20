@@ -16,7 +16,13 @@ Branch | Description
 
 Cave Story Engine 2 is a decompilation of Cave Story.
 
-This branch migrates the engine from WinAPI to SDL2, and addresses numerous portability issues, allowing it to run on other platforms.
+This branch migrates the engine away from WinAPI and DirectX, and addresses numerous portability issues, allowing it to run on other platforms.
+
+Supported platforms include...
+* Windows
+* Linux
+* macOS
+* Wii U
 
 ![Screenshot](screenshot.png)
 
