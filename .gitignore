@@ -70,5 +70,8 @@
 # Portable branch
 ####
 
+# Exclude Wii U build directory
+/buildwiiu
+
 # Exclude converted resource files
 /src/Resource
