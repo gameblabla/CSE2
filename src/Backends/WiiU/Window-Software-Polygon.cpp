@@ -164,6 +164,7 @@ unsigned char* WindowBackend_Software_GetFramebuffer(size_t *pitch)
 
 ATTRIBUTE_HOT void WindowBackend_Software_Display(void)
 {
+	// Convert frame from RGB24 to RGBA32, and upload it to the GPU texture
 	unsigned char *framebuffer = (unsigned char*)GX2RLockSurfaceEx(&screen_texture.surface, 0, (GX2RResourceFlags)0);
 
 	const unsigned char *in_pointer = fake_framebuffer;
@@ -184,6 +185,7 @@ ATTRIBUTE_HOT void WindowBackend_Software_Display(void)
 
 	WHBGfxBeginRender();
 
+	// Draw to the TV
 	WHBGfxBeginRenderTV();
 	WHBGfxClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	GX2SetPixelTexture(&screen_texture, shader_group.pixelShader->samplerVars[0].location);
@@ -196,6 +198,7 @@ ATTRIBUTE_HOT void WindowBackend_Software_Display(void)
 	GX2DrawEx(GX2_PRIMITIVE_MODE_QUADS, 4, 0, 1);
 	WHBGfxFinishRenderTV();
 
+	// Draw to the gamepad
 	WHBGfxBeginRenderDRC();
 	WHBGfxClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	GX2SetPixelTexture(&screen_texture, shader_group.pixelShader->samplerVars[0].location);

@@ -77,11 +77,14 @@ static void FillMixerBuffer(float *stream, size_t frames_total)
 
 static void FrameCallback(void)
 {
-	// Just assume both voices are in-sync
+	// We use a double-buffer: while the Wii U is busy playing one half of the buffer, we update the other.
+	// The buffer is 10ms long in total, and this function runs every 3ms.
+
+	// Just assume both voices are in-sync, and only check the first one
 	AXVoiceOffsets offsets;
 	AXGetVoiceOffsets(voices[0], &offsets);
 
-	unsigned int current_buffer = offsets.currentOffset > (buffer_length / 2) ? 1 : 0;
+	unsigned int current_buffer = offsets.currentOffset > (buffer_length / 2) ? 1 : 0;	// TODO - should probably be '>='
 
 	static unsigned int last_buffer = 1;
 
@@ -91,8 +94,10 @@ static void FrameCallback(void)
 		for (unsigned int i = 0; i < buffer_length; ++i)
 			stream_buffer_float[i] = 0.0f;
 
+		// Fill mixer buffer
 		FillMixerBuffer(stream_buffer_float, buffer_length / 2);
 
+		// Deinterlate samples, convert them to S16, and write them to the double-buffers
 		short *left_output_buffer = &stream_buffers[0][(buffer_length / 2) * last_buffer];
 		short *right_output_buffer = &stream_buffers[1][(buffer_length / 2) * last_buffer];
 
@@ -116,11 +121,12 @@ static void FrameCallback(void)
 			else if (right_sample > 1.0f)
 				right_sample = 1.0f;
 
-			// Deinterlate, and convert to S16
+			// Convert to S16 and store in double-buffers
 			*left_output_buffer_pointer++ = left_sample * 32767.0f;
 			*right_output_buffer_pointer++ = right_sample * 32767.0f;
 		}
 
+		// Make sure the sound hardware can see our data
 		DCStoreRange(left_output_buffer, buffer_length / 2 * sizeof(short));
 		DCStoreRange(right_output_buffer, buffer_length / 2 * sizeof(short));
 
@@ -149,7 +155,12 @@ bool AudioBackend_Init(void)
 
 	buffer_length = output_frequency / 100;	// 10ms buffer
 
-	stream_buffer_float = (float*)malloc(buffer_length * sizeof(float) * 2);
+	// Create and initialise two 'voices': each one will stream its own
+	// audio - one for the left speaker, and one for the right. 
+
+	// The software-mixer outputs interlaced float samples, so create
+	// a buffer for it here.
+	stream_buffer_float = (float*)malloc(buffer_length * sizeof(float) * 2);	// TODO - should probably by divided by two
 
 	if (stream_buffer_float != NULL)
 	{
@@ -189,14 +200,14 @@ bool AudioBackend_Init(void)
 							AXSetVoiceSrcRatio(voices[i], 1.0f);	// We use the native sample rate
 							AXSetVoiceSrcType(voices[i], AX_VOICE_SRC_TYPE_NONE);
 
-
-							AXVoiceOffsets offs;
-							offs.dataType = AX_VOICE_FORMAT_LPCM16;
-							offs.endOffset = buffer_length;
-							offs.loopingEnabled = AX_VOICE_LOOP_ENABLED;
-							offs.loopOffset = 0;
-							offs.currentOffset = 0;
-							offs.data = stream_buffers[i];
+							AXVoiceOffsets offs = {
+								.dataType = AX_VOICE_FORMAT_LPCM16,
+								.loopingEnabled = AX_VOICE_LOOP_ENABLED,
+								.loopOffset = 0,
+								.endOffset = buffer_length,
+								.currentOffset = 0,
+								.data = stream_buffers[i]
+							};
 							AXSetVoiceOffsets(voices[i], &offs);
 
 							AXSetVoiceState(voices[i], AX_VOICE_STATE_PLAYING);
@@ -204,6 +215,9 @@ bool AudioBackend_Init(void)
 							AXVoiceEnd(voices[i]);
 						}
 
+						// Register the frame callback.
+						// Apparently, this fires every 3ms - we will use
+						// it to update the stream buffers when needed.
 						AXRegisterAppFrameCallback(FrameCallback);
 
 						return true;
