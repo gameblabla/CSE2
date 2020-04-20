@@ -130,18 +130,19 @@ void Backend_ShowMessageBox(const char *title, const char *message)
 {
 	(void)title;
 	(void)message;
+	// TODO - We might be able to funnel this into `WHBLogPrintf`...
 }
 
 ATTRIBUTE_FORMAT_PRINTF(1, 2) void Backend_PrintError(const char *format, ...)
 {
 	(void)format;
-	// We might be able to funnel this into `WHBLogPrintf`...
+	// TODO - We might be able to funnel this into `WHBLogPrintf`...
 }
 
 ATTRIBUTE_FORMAT_PRINTF(1, 2) void Backend_PrintInfo(const char *format, ...)
 {
 	(void)format;
-	// We might be able to funnel this into `WHBLogPrintf`...
+	// TODO - We might be able to funnel this into `WHBLogPrintf`...
 }
 
 unsigned long Backend_GetTicks(void)
