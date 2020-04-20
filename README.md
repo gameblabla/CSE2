@@ -73,13 +73,13 @@ Name | Function
 `-DBACKEND_RENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default) (note: requires `-DBACKEND_PLATFORM=SDL2`)
 `-DBACKEND_RENDERER=SDLSurface` | Use the software-rendered SDL2 Surface API renderer (note: requires `-DBACKEND_PLATFORM=SDL2`)
 `-DBACKEND_RENDERER=Software` | Use the handwritten software renderer
-`-DBACKEND_AUDIO=SDL2` | Use the SDL2-driven software audio-mixer
-`-DBACKEND_AUDIO=miniaudio` | Use the miniaudio-driven software audio-mixer
-`-DBACKEND_AUDIO=WiiU` | Use the hardware-accelerated audio backend for the Wii U
-`-DBACKEND_AUDIO=Null` | Use the dummy audio backend (doesn't produce any sound)
+`-DBACKEND_AUDIO=SDL2` | Use SDL2 to deliver audio
+`-DBACKEND_AUDIO=miniaudio` | Use miniaudio to deliver audio
+`-DBACKEND_AUDIO=WiiU` | Use the Wii U's APIs to deliver audio
+`-DBACKEND_AUDIO=Null` | Don't deliver audio at all
 `-DBACKEND_PLATFORM=SDL2` | Use SDL2 for windowing and OS-abstraction
 `-DBACKEND_PLATFORM=GLFW3` | Use GLFW3 for windowing and OS-abstraction
-`-DBACKEND_PLATFORM=WiiU` | Target the Wii U natively
+`-DBACKEND_PLATFORM=WiiU` | Use the Wii U's native APIs
 `-DBACKEND_PLATFORM=Null` | Use the dummy platform backend (doesn't do anything)
 `-DLTO=ON` | Enable link-time optimisation
 `-DPKG_CONFIG_STATIC_LIBS=ON` | On platforms with pkg-config, static-link the dependencies (good for Windows builds, so you don't need to bundle DLL files)
