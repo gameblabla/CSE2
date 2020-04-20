@@ -1,3 +1,16 @@
+#######################
+# Shader combinations #
+#######################
+
+texture.vsh + texture.psh = texture.gsh
+texture.vsh + texture_colour_key.psh = texture_colour_key.gsh
+plain.vsh + colour_fill.psh = colour_fill.gsh
+
+
+##########################
+# How to compile shaders #
+##########################
+
 I'mma give it to you straight: compiling shaders for the Wii U is an absolute
 nightmare.
 

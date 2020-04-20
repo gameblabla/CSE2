@@ -123,9 +123,9 @@ bool WindowBackend_Software_CreateWindow(const char *window_title, int screen_wi
 
 			GX2RDestroyBufferEx(&texture_coordinate_buffer, (GX2RResourceFlags)0);
 			GX2RDestroyBufferEx(&vertex_position_buffer, (GX2RResourceFlags)0);
-		}
 
-		WHBGfxFreeShaderGroup(&shader_group);
+			WHBGfxFreeShaderGroup(&shader_group);
+		}
 
 		WHBGfxShutdown();
 
