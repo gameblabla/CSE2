@@ -420,7 +420,7 @@ void BackupSurface(SurfaceID surf_no, const RECT *rect)
 	scaled_rect.bottom = rect->bottom * magnification;
 
 	// Do not draw invalid RECTs
-	if (rcWork->right <= rcWork->left || rcWork->bottom <= rcWork->top)
+	if (scaled_rect.right <= scaled_rect.left || scaled_rect.bottom <= scaled_rect.top)
 		return;
 
 	RenderBackend_Blit(framebuffer, &scaled_rect, surf[surf_no], scaled_rect.left, scaled_rect.top, FALSE);
@@ -459,7 +459,7 @@ void PutBitmap3(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID su
 	rcWork.bottom *= magnification;
 
 	// Do not draw invalid RECTs
-	if (rcWork->right <= rcWork->left || rcWork->bottom <= rcWork->top)
+	if (rcWork.right <= rcWork.left || rcWork.bottom <= rcWork.top)
 		return;
 
 	RenderBackend_Blit(surf[surf_no], &rcWork, framebuffer, x * magnification, y * magnification, TRUE);
@@ -498,7 +498,7 @@ void PutBitmap4(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID su
 	rcWork.bottom *= magnification;
 
 	// Do not draw invalid RECTs
-	if (rcWork->right <= rcWork->left || rcWork->bottom <= rcWork->top)
+	if (rcWork.right <= rcWork.left || rcWork.bottom <= rcWork.top)
 		return;
 
 	RenderBackend_Blit(surf[surf_no], &rcWork, framebuffer, x * magnification, y * magnification, FALSE);
@@ -514,7 +514,7 @@ void Surface2Surface(int x, int y, const RECT *rect, int to, int from)
 	rcWork.bottom = rect->bottom * magnification;
 
 	// Do not draw invalid RECTs
-	if (rcWork->right <= rcWork->left || rcWork->bottom <= rcWork->top)
+	if (rcWork.right <= rcWork.left || rcWork.bottom <= rcWork.top)
 		return;
 
 	RenderBackend_Blit(surf[from], &rcWork, surf[to], x * magnification, y * magnification, TRUE);
@@ -539,7 +539,7 @@ void CortBox(const RECT *rect, unsigned long col)
 	const unsigned char blue = (col >> 16) & 0xFF;
 
 	// Do not draw invalid RECTs
-	if (dst_rect->right <= dst_rect->left || dst_rect->bottom <= dst_rect->top)
+	if (dst_rect.right <= dst_rect.left || dst_rect.bottom <= dst_rect.top)
 		return;
 
 	RenderBackend_ColourFill(framebuffer, &dst_rect, red, green, blue);
@@ -560,7 +560,7 @@ void CortBox2(const RECT *rect, unsigned long col, SurfaceID surf_no)
 	const unsigned char blue = (col >> 16) & 0xFF;
 
 	// Do not draw invalid RECTs
-	if (dst_rect->right <= dst_rect->left || dst_rect->bottom <= dst_rect->top)
+	if (dst_rect.right <= dst_rect.left || dst_rect.bottom <= dst_rect.top)
 		return;
 
 	RenderBackend_ColourFill(surf[surf_no], &dst_rect, red, green, blue);
