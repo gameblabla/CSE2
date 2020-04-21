@@ -23,11 +23,11 @@ unsigned char* DecodeBitmapFromFile(const char *path, unsigned int *width, unsig
 
 	if (file_buffer != NULL)
 	{
-		unsigned char *pixel_buffer = stbi_load_from_memory(file_buffer, file_size, (int*)width, (int*)height, NULL, 3);
+		unsigned char *image_buffer = stbi_load_from_memory(file_buffer, file_size, (int*)width, (int*)height, NULL, 3);
 
 		free(file_buffer);
 
-		return pixel_buffer;
+		return image_buffer;
 	}
 
 	return NULL;
