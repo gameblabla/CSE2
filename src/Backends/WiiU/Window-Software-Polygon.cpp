@@ -19,7 +19,7 @@
 
 #include "../../Attributes.h"
 
-#include "newshader.gsh.h"
+#include "shaders/texture.gsh.h"
 
 static unsigned char *fake_framebuffer;
 
@@ -49,7 +49,7 @@ bool WindowBackend_Software_CreateWindow(const char *window_title, int screen_wi
 	{
 		WHBGfxInit();
 
-		if (WHBGfxLoadGFDShaderGroup(&shader_group, 0, rnewshader))
+		if (WHBGfxLoadGFDShaderGroup(&shader_group, 0, rtexture))
 		{
 			WHBGfxInitShaderAttribute(&shader_group, "input_vertex_coordinates", 0, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
 			WHBGfxInitShaderAttribute(&shader_group, "input_texture_coordinates", 1, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
