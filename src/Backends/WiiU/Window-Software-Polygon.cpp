@@ -165,6 +165,7 @@ bool WindowBackend_Software_CreateWindow(const char *window_title, int screen_wi
 						break;
 
 					case GX2_TV_SCAN_MODE_720P:
+					case 4:	// Why the hell doesn't WUT have an enum for this? It always returns this value for me!
 						CalculateViewport(1280, 720, &tv_viewport);
 						break;
 
