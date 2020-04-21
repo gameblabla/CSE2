@@ -6,6 +6,7 @@
 #include <string>
 
 #include <gx2/context.h>
+#include <gx2/display.h>
 #include <gx2/draw.h>
 #include <gx2/event.h>
 #include <gx2/registers.h>
@@ -40,6 +41,14 @@ typedef struct RenderBackend_Glyph
 	unsigned int height;
 } RenderBackend_Glyph;
 
+typedef struct Viewport
+{
+	float x;
+	float y;
+	float width;
+	float height;
+} Viewport;
+
 static WHBGfxShaderGroup texture_shader;
 static WHBGfxShaderGroup texture_colour_key_shader;
 static WHBGfxShaderGroup colour_fill_shader;
@@ -55,6 +64,29 @@ static RenderBackend_Surface *framebuffer_surface;
 static GX2ContextState *gx2_context;
 
 static RenderBackend_Surface *glyph_destination_surface;
+
+static Viewport tv_viewport;
+static Viewport drc_viewport;
+
+static void CalculateViewport(unsigned int actual_screen_width, unsigned int actual_screen_height, Viewport *viewport)
+{
+	if ((float)actual_screen_width / (float)actual_screen_height > (float)framebuffer_surface->width / (float)framebuffer_surface->height)
+	{
+		viewport->y = 0.0f;
+		viewport->height = actual_screen_height;
+
+		viewport->width = framebuffer_surface->width * ((float)actual_screen_height / (float)framebuffer_surface->height);
+		viewport->x = (actual_screen_width - viewport->width) / 2;
+	}
+	else
+	{
+		viewport->x = 0.0f;
+		viewport->width = actual_screen_width;
+
+		viewport->height = framebuffer_surface->height * ((float)actual_screen_width / (float)framebuffer_surface->width);
+		viewport->y = (actual_screen_height - viewport->height) / 2;
+	}
+}
 
 RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, bool fullscreen)
 {
@@ -139,6 +171,29 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 										   GX2_BLEND_COMBINE_MODE_ADD);
 		*/
 
+						// Calculate centred viewports
+						switch (GX2GetSystemTVScanMode())
+						{
+							case GX2_TV_SCAN_MODE_NONE:	// lolwut
+								break;
+
+							case GX2_TV_SCAN_MODE_480I:
+							case GX2_TV_SCAN_MODE_480P:
+								CalculateViewport(854, 480, &tv_viewport);
+								break;
+
+							case GX2_TV_SCAN_MODE_720P:
+								CalculateViewport(1280, 720, &tv_viewport);
+								break;
+
+							case GX2_TV_SCAN_MODE_1080I:
+							case GX2_TV_SCAN_MODE_1080P:
+								CalculateViewport(1920, 1080, &tv_viewport);
+								break;
+						}
+
+						CalculateViewport(854, 480, &drc_viewport);
+
 						return framebuffer_surface;
 					}
 
@@ -185,14 +240,14 @@ void RenderBackend_DrawScreen(void)
 
 	// Set buffer to (4:3) full-screen
 	float *position_pointer = (float*)GX2RLockBufferEx(&vertex_position_buffer, (GX2RResourceFlags)0);
-	position_pointer[0] = -640.0f / 854.0f;
+	position_pointer[0] = -1.0f;
 	position_pointer[1] = -1.0f;
-	position_pointer[2] = 640.0f / 854.0f;
+	position_pointer[2] =  1.0f;
 	position_pointer[3] = -1.0f;
-	position_pointer[4] = 640.0f / 854.0f;
-	position_pointer[5] = 1.0f;
-	position_pointer[6] = -640.0f / 854.0f;
-	position_pointer[7] = 1.0f;
+	position_pointer[4] =  1.0f;
+	position_pointer[5] =  1.0f;
+	position_pointer[6] = -1.0f;
+	position_pointer[7] =  1.0f;
 	GX2RUnlockBufferEx(&vertex_position_buffer, (GX2RResourceFlags)0);
 
 	// Set buffer to full-texture
@@ -216,6 +271,9 @@ void RenderBackend_DrawScreen(void)
 
 	WHBGfxBeginRenderTV();
 	WHBGfxClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+	// Set Viewport
+	GX2SetViewport(tv_viewport.x, tv_viewport.y, tv_viewport.width, tv_viewport.height, 0.0f, 1.0f);
 
 	// This might be needed? Not sure.
 //	GX2RInvalidateSurface(&framebuffer_surface->texture.surface, 0, (GX2RResourceFlags)0);
@@ -242,6 +300,9 @@ void RenderBackend_DrawScreen(void)
 
 	WHBGfxBeginRenderDRC();
 	WHBGfxClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+	// Set Viewport
+	GX2SetViewport(drc_viewport.x, drc_viewport.y, drc_viewport.width, drc_viewport.height, 0.0f, 1.0f);
 
 	// This might be needed? Not sure.
 //	GX2RInvalidateSurface(&framebuffer_surface->texture.surface, 0, (GX2RResourceFlags)0);
