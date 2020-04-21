@@ -334,7 +334,7 @@ elseif(BACKEND_AUDIO MATCHES "miniaudio")
 	target_link_libraries(CSE2 PRIVATE ${CMAKE_DL_LIBS})
 elseif(BACKEND_AUDIO MATCHES "WiiU-Hardware")
 	target_sources(CSE2 PRIVATE
-		"src/Backends/Audio/WiiU.cpp"
+		"src/Backends/Audio/WiiU-Hardware.cpp"
 	)
 elseif(BACKEND_AUDIO MATCHES "WiiU-Software")
 	target_sources(CSE2 PRIVATE
