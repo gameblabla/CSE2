@@ -111,7 +111,7 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 					GX2RCreateBuffer(&texture_coordinate_buffer);
 
 					// Initialise sampler
-					GX2InitSampler(&sampler, GX2_TEX_CLAMP_MODE_CLAMP, GX2_TEX_XY_FILTER_MODE_POINT);
+					GX2InitSampler(&sampler, GX2_TEX_CLAMP_MODE_CLAMP, GX2_TEX_XY_FILTER_MODE_LINEAR);
 
 					// Create framebuffer surface
 					framebuffer_surface = RenderBackend_CreateSurface(screen_width, screen_height);
