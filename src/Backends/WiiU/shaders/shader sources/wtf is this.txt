@@ -5,6 +5,7 @@
 texture.vsh + texture.psh = texture.gsh
 texture.vsh + texture_colour_key.psh = texture_colour_key.gsh
 plain.vsh + colour_fill.psh = colour_fill.gsh
+texture.vsh + glyph.psh = glyph.gsh
 
 
 ##########################
