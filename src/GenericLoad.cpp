@@ -1,6 +1,8 @@
 #include "GenericLoad.h"
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "WindowsWrapper.h"
 
@@ -115,45 +117,78 @@ static const struct
 	{155, "PixTone/155.pxt", SOUND_TYPE_PIXTONE}
 };
 
-// Decompiled from PTone103.exe
+// Original decompiled from `PTone103.exe` - has since been modified
 static BOOL LoadPixToneFile(const char *filename, PIXTONEPARAMETER *pixtone_parameters)
 {
 	BOOL success = FALSE;
 
 	FILE *fp = fopen(filename, "r");
 
-	if (fp)
+	if (fp != NULL)
 	{
+		fseek(fp, 0, SEEK_END);
+		const size_t file_size = ftell(fp);
+		rewind(fp);
+
+		char *file_buffer = (char*)malloc(file_size);
+		fread(file_buffer, 1, file_size, fp);
+
+		fclose(fp);
+
+		char *p = file_buffer;
+
 		for (unsigned int i = 0; i < 4; ++i)
 		{
 			float freq;
-			fscanf(fp, "use  :%d\n", &pixtone_parameters[i].use);
-			fscanf(fp, "size :%d\n", &pixtone_parameters[i].size);
-			fscanf(fp, "main_model   :%d\n", &pixtone_parameters[i].oMain.model);
-			fscanf(fp, "main_freq    :%f\n", &freq);
+			int increment;
+			sscanf(p, "use  :%d\n%n", &pixtone_parameters[i].use, &increment);
+			p += increment;
+			sscanf(p, "size :%d\n%n", &pixtone_parameters[i].size, &increment);
+			p += increment;
+			sscanf(p, "main_model   :%d\n%n", &pixtone_parameters[i].oMain.model, &increment);
+			p += increment;
+			sscanf(p, "main_freq    :%f\n%n", &freq, &increment);
+			p += increment;
 			pixtone_parameters[i].oMain.num = freq;
-			fscanf(fp, "main_top     :%d\n", &pixtone_parameters[i].oMain.top);
-			fscanf(fp, "main_offset  :%d\n", &pixtone_parameters[i].oMain.offset);
-			fscanf(fp, "pitch_model  :%d\n", &pixtone_parameters[i].oPitch.model);
-			fscanf(fp, "pitch_freq   :%f\n", &freq);
+			sscanf(p, "main_top     :%d\n%n", &pixtone_parameters[i].oMain.top, &increment);
+			p += increment;
+			sscanf(p, "main_offset  :%d\n%n", &pixtone_parameters[i].oMain.offset, &increment);
+			p += increment;
+			sscanf(p, "pitch_model  :%d\n%n", &pixtone_parameters[i].oPitch.model, &increment);
+			p += increment;
+			sscanf(p, "pitch_freq   :%f\n%n", &freq, &increment);
+			p += increment;
 			pixtone_parameters[i].oPitch.num = freq;
-			fscanf(fp, "pitch_top    :%d\n", &pixtone_parameters[i].oPitch.top);
-			fscanf(fp, "pitch_offset :%d\n", &pixtone_parameters[i].oPitch.offset);
-			fscanf(fp, "volume_model :%d\n", &pixtone_parameters[i].oVolume.model);
-			fscanf(fp, "volume_freq  :%f\n", &freq);
+			sscanf(p, "pitch_top    :%d\n%n", &pixtone_parameters[i].oPitch.top, &increment);
+			p += increment;
+			sscanf(p, "pitch_offset :%d\n%n", &pixtone_parameters[i].oPitch.offset, &increment);
+			p += increment;
+			sscanf(p, "volume_model :%d\n%n", &pixtone_parameters[i].oVolume.model, &increment);
+			p += increment;
+			sscanf(p, "volume_freq  :%f\n%n", &freq, &increment);
+			p += increment;
 			pixtone_parameters[i].oVolume.num = freq;
-			fscanf(fp, "volume_top   :%d\n", &pixtone_parameters[i].oVolume.top);
-			fscanf(fp, "volume_offset:%d\n", &pixtone_parameters[i].oVolume.offset);
-			fscanf(fp, "initialY:%d\n", &pixtone_parameters[i].initial);
-			fscanf(fp, "ax      :%d\n", &pixtone_parameters[i].pointAx);
-			fscanf(fp, "ay      :%d\n", &pixtone_parameters[i].pointAy);
-			fscanf(fp, "bx      :%d\n", &pixtone_parameters[i].pointBx);
-			fscanf(fp, "by      :%d\n", &pixtone_parameters[i].pointBy);
-			fscanf(fp, "cx      :%d\n", &pixtone_parameters[i].pointCx);
-			fscanf(fp, "cy      :%d\n\n", &pixtone_parameters[i].pointCy);
+			sscanf(p, "volume_top   :%d\n%n", &pixtone_parameters[i].oVolume.top, &increment);
+			p += increment;
+			sscanf(p, "volume_offset:%d\n%n", &pixtone_parameters[i].oVolume.offset, &increment);
+			p += increment;
+			sscanf(p, "initialY:%d\n%n", &pixtone_parameters[i].initial, &increment);
+			p += increment;
+			sscanf(p, "ax      :%d\n%n", &pixtone_parameters[i].pointAx, &increment);
+			p += increment;
+			sscanf(p, "ay      :%d\n%n", &pixtone_parameters[i].pointAy, &increment);
+			p += increment;
+			sscanf(p, "bx      :%d\n%n", &pixtone_parameters[i].pointBx, &increment);
+			p += increment;
+			sscanf(p, "by      :%d\n%n", &pixtone_parameters[i].pointBy, &increment);
+			p += increment;
+			sscanf(p, "cx      :%d\n%n", &pixtone_parameters[i].pointCx, &increment);
+			p += increment;
+			sscanf(p, "cy      :%d\n\n%n", &pixtone_parameters[i].pointCy, &increment);
+			p += increment;
 		}
 
-		fclose(fp);
+		free(file_buffer);
 
 		success = TRUE;
 	}
