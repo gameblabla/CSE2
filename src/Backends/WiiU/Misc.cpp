@@ -1,10 +1,14 @@
 #include "../Misc.h"
 
+#include <stdarg.h>
+#include <stdio.h>
 #include <string.h>
 
 #include <coreinit/thread.h>
 #include <padscore/kpad.h>
 #include <vpad/input.h>
+#include <whb/log.h>
+#include <whb/log_udp.h>
 #include <whb/proc.h>
 #include <whb/sdcard.h>
 
@@ -25,6 +29,8 @@ bool Backend_Init(void)
 	// Enable Wii U Pro Controllers to be connected
 	WPADEnableURCC(1);
 
+	WHBLogUdpInit();
+
 	ticks_per_second = OSGetSystemInfo()->busClockSpeed / 4;
 
 	return true;
@@ -32,6 +38,8 @@ bool Backend_Init(void)
 
 void Backend_Deinit(void)
 {
+	WHBLogUdpDeinit();
+
 	WPADShutdown();
 
 	VPADShutdown();
@@ -128,21 +136,33 @@ void Backend_GetKeyboardState(bool *keyboard_state)
 
 void Backend_ShowMessageBox(const char *title, const char *message)
 {
-	(void)title;
-	(void)message;
-	// TODO - We might be able to funnel this into `WHBLogPrintf`...
+	Backend_PrintInfo("ShowMessageBox - %s - %s", title, message);
 }
 
 ATTRIBUTE_FORMAT_PRINTF(1, 2) void Backend_PrintError(const char *format, ...)
 {
-	(void)format;
-	// TODO - We might be able to funnel this into `WHBLogPrintf`...
+	char message_buffer[0x100];
+
+	va_list argument_list;
+	va_start(argument_list, format);
+	vsprintf(message_buffer, format, argument_list);
+	va_end(argument_list);
+
+	WHBLogPrint("ERROR:");
+	WHBLogPrint(message_buffer);
 }
 
 ATTRIBUTE_FORMAT_PRINTF(1, 2) void Backend_PrintInfo(const char *format, ...)
 {
-	(void)format;
-	// TODO - We might be able to funnel this into `WHBLogPrintf`...
+	char message_buffer[0x100];
+
+	va_list argument_list;
+	va_start(argument_list, format);
+	vsprintf(message_buffer, format, argument_list);
+	va_end(argument_list);
+
+	WHBLogPrint("INFO:");
+	WHBLogPrint(message_buffer);
 }
 
 unsigned long Backend_GetTicks(void)
