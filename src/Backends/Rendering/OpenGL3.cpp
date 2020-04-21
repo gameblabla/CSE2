@@ -901,9 +901,6 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBacke
 	if (source_surface == NULL || destination_surface == NULL)
 		return;
 
-	if (rect->right - rect->left < 0 || rect->bottom - rect->top < 0)
-		return;
-
 	const RenderMode render_mode = (colour_key ? MODE_DRAW_SURFACE_WITH_TRANSPARENCY : MODE_DRAW_SURFACE);
 
 	// Flush vertex data if a context-change is needed
@@ -982,9 +979,6 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 	static unsigned char last_blue;
 
 	if (surface == NULL)
-		return;
-
-	if (rect->right - rect->left < 0 || rect->bottom - rect->top < 0)
 		return;
 
 	// Flush vertex data if a context-change is needed
