@@ -280,16 +280,14 @@ RenderBackend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned 
 		GX2CalcSurfaceSizeAndAlignment(&surface->texture.surface);
 		GX2InitTextureRegs(&surface->texture);
 
+		if (GX2RCreateSurface(&surface->texture.surface, (GX2RResourceFlags)(GX2R_RESOURCE_BIND_TEXTURE | GX2R_RESOURCE_BIND_COLOR_BUFFER | GX2R_RESOURCE_USAGE_CPU_WRITE | GX2R_RESOURCE_USAGE_CPU_READ |
+		                                                                     GX2R_RESOURCE_USAGE_GPU_WRITE | GX2R_RESOURCE_USAGE_GPU_READ)))
+		{
 			// Initialise colour buffer (needed so the texture can be drawn to)
 			memset(&surface->colour_buffer, 0, sizeof(surface->colour_buffer));
 			surface->colour_buffer.surface = surface->texture.surface;
 			surface->colour_buffer.viewNumSlices = 1;
 			GX2InitColorBufferRegs(&surface->colour_buffer);
-
-		if (GX2RCreateSurface(&surface->texture.surface, (GX2RResourceFlags)(GX2R_RESOURCE_BIND_TEXTURE | GX2R_RESOURCE_BIND_COLOR_BUFFER |
-		                                                                     GX2R_RESOURCE_USAGE_CPU_WRITE | GX2R_RESOURCE_USAGE_CPU_READ |
-		                                                                     GX2R_RESOURCE_USAGE_GPU_WRITE | GX2R_RESOURCE_USAGE_GPU_READ)))
-		{
 
 			if (GX2RCreateSurfaceUserMemory(&surface->colour_buffer.surface, (uint8_t*)surface->texture.surface.image, (uint8_t*)surface->texture.surface.mipmaps, surface->texture.surface.resourceFlags))
 				return surface;
@@ -329,6 +327,8 @@ unsigned char* RenderBackend_LockSurface(RenderBackend_Surface *surface, unsigne
 {
 	if (surface != NULL)
 	{
+		// Create an RGB24 buffer (this backend uses RGBA32 internally,
+		// so we can't just lock the texture
 		surface->lock_buffer = (unsigned char*)malloc(width * height * 3);
 		*pitch = width * 3;
 
@@ -449,6 +449,7 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 	// Make sure the buffers aren't currently being used before we modify them
 	GX2DrawDone();
 
+	// Set vertex position buffer
 	float *position_pointer = (float*)GX2RLockBufferEx(&vertex_position_buffer, (GX2RResourceFlags)0);
 	position_pointer[0] = rect->left;
 	position_pointer[1] = rect->top;
@@ -458,6 +459,7 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 	position_pointer[5] = rect->bottom;
 	position_pointer[6] = rect->left;
 	position_pointer[7] = rect->bottom;
+
 	for (unsigned int i = 0; i < 8; i += 2)
 	{
 		position_pointer[i + 0] /= surface->width;
@@ -468,22 +470,27 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 		position_pointer[i + 1] *= -2.0f;
 		position_pointer[i + 1] += 1.0f;
 	}
+
 	GX2RUnlockBufferEx(&vertex_position_buffer, (GX2RResourceFlags)0);
 
+	// Draw to the selected texture, instead of the screen
 	GX2SetColorBuffer(&surface->colour_buffer, GX2_RENDER_TARGET_0);
 	GX2SetViewport(0, 0, (float)surface->colour_buffer.surface.width, (float)surface->colour_buffer.surface.height, 0.0f, 1.0f);
 	GX2SetScissor(0, 0, (float)surface->colour_buffer.surface.width, (float)surface->colour_buffer.surface.height);
 
-	float uniform_colours[4] = {red / 255.0f, green / 255.0f, blue / 255.0f, 1.0f};
-
+	// Set the colour-fill... colour
+	const float uniform_colours[4] = {red / 255.0f, green / 255.0f, blue / 255.0f, 1.0f};
 	GX2SetPixelUniformReg(colour_fill_shader.pixelShader->uniformVars[0].offset, 4, (uint32_t*)&uniform_colours);
 
+	// Bind the colour-fill shader
 	GX2SetFetchShader(&colour_fill_shader.fetchShader);
 	GX2SetVertexShader(colour_fill_shader.vertexShader);
 	GX2SetPixelShader(colour_fill_shader.pixelShader);
 
+	// Bind misc. data
 	GX2RSetAttributeBuffer(&vertex_position_buffer, 0, vertex_position_buffer.elemSize, 0);
 
+	// Draw
 	GX2DrawEx(GX2_PRIMITIVE_MODE_QUADS, 4, 0, 1);
 }
 
