@@ -102,8 +102,8 @@ void Backend_GetKeyboardState(bool *keyboard_state)
 	keyboard_state[BACKEND_KEYBOARD_RIGHT] |= vpad_buttons & (VPAD_BUTTON_RIGHT | VPAD_STICK_L_EMULATION_RIGHT);
 	keyboard_state[BACKEND_KEYBOARD_Z] |= vpad_buttons & VPAD_BUTTON_A;                       // Jump
 	keyboard_state[BACKEND_KEYBOARD_X] |= vpad_buttons & VPAD_BUTTON_B;                       // Shoot
-	keyboard_state[BACKEND_KEYBOARD_Q] |= vpad_buttons & (VPAD_BUTTON_Y | VPAD_BUTTON_PLUS);  // Inventory
-	keyboard_state[BACKEND_KEYBOARD_W] |= vpad_buttons & (VPAD_BUTTON_X | VPAD_BUTTON_MINUS); // Map
+	keyboard_state[BACKEND_KEYBOARD_Q] |= vpad_buttons & (VPAD_BUTTON_X | VPAD_BUTTON_PLUS);  // Inventory
+	keyboard_state[BACKEND_KEYBOARD_W] |= vpad_buttons & (VPAD_BUTTON_Y | VPAD_BUTTON_MINUS); // Map
 	keyboard_state[BACKEND_KEYBOARD_A] |= vpad_buttons & (VPAD_BUTTON_L | VPAD_BUTTON_ZL | VPAD_STICK_R_EMULATION_LEFT);  // Weapon left
 	keyboard_state[BACKEND_KEYBOARD_S] |= vpad_buttons & (VPAD_BUTTON_R | VPAD_BUTTON_ZR | VPAD_STICK_R_EMULATION_RIGHT); // Weapon right
 
@@ -120,8 +120,8 @@ void Backend_GetKeyboardState(bool *keyboard_state)
 	keyboard_state[BACKEND_KEYBOARD_RIGHT] |= kpad_buttons & (WPAD_PRO_BUTTON_RIGHT | WPAD_PRO_STICK_L_EMULATION_RIGHT);
 	keyboard_state[BACKEND_KEYBOARD_Z] |= kpad_buttons & WPAD_PRO_BUTTON_A;                           // Jump
 	keyboard_state[BACKEND_KEYBOARD_X] |= kpad_buttons & WPAD_PRO_BUTTON_B;                           // Shoot
-	keyboard_state[BACKEND_KEYBOARD_Q] |= kpad_buttons & (WPAD_PRO_BUTTON_Y | WPAD_PRO_BUTTON_PLUS);  // Inventory
-	keyboard_state[BACKEND_KEYBOARD_W] |= kpad_buttons & (WPAD_PRO_BUTTON_X | WPAD_PRO_BUTTON_MINUS); // Map
+	keyboard_state[BACKEND_KEYBOARD_Q] |= kpad_buttons & (WPAD_PRO_BUTTON_X | WPAD_PRO_BUTTON_PLUS);  // Inventory
+	keyboard_state[BACKEND_KEYBOARD_W] |= kpad_buttons & (WPAD_PRO_BUTTON_Y | WPAD_PRO_BUTTON_MINUS); // Map
 	keyboard_state[BACKEND_KEYBOARD_A] |= kpad_buttons & (WPAD_PRO_TRIGGER_L | WPAD_PRO_TRIGGER_ZL | WPAD_PRO_STICK_R_EMULATION_LEFT);  // Weapon left
 	keyboard_state[BACKEND_KEYBOARD_S] |= kpad_buttons & (WPAD_PRO_TRIGGER_R | WPAD_PRO_TRIGGER_ZR | WPAD_PRO_STICK_R_EMULATION_RIGHT); // Weapon right
 }
