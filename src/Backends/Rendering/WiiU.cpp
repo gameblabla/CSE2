@@ -196,20 +196,40 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 
 						return framebuffer_surface;
 					}
+					else
+					{
+						Backend_PrintError("Couldn't create the framebuffer surface");
+					}
 
 					GX2RDestroyBufferEx(&texture_coordinate_buffer, (GX2RResourceFlags)0);
 					GX2RDestroyBufferEx(&vertex_position_buffer, (GX2RResourceFlags)0);
 
 					WHBGfxFreeShaderGroup(&glyph_shader);
 				}
+				else
+				{
+					Backend_PrintError("Couldn't create the glyph shader");
+				}
 
 				WHBGfxFreeShaderGroup(&colour_fill_shader);
+			}
+			else
+			{
+				Backend_PrintError("Couldn't create the colour-fill shader");
 			}
 
 			WHBGfxFreeShaderGroup(&texture_colour_key_shader);
 		}
+		else
+		{
+			Backend_PrintError("Couldn't create the texture colour-key shader");
+		}
 
 		WHBGfxFreeShaderGroup(&texture_shader);
+	}
+	else
+	{
+		Backend_PrintError("Couldn't create the texture shader");
 	}
 
 	WHBGfxShutdown();
@@ -365,8 +385,15 @@ RenderBackend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned 
 
 			if (GX2RCreateSurfaceUserMemory(&surface->colour_buffer.surface, (uint8_t*)surface->texture.surface.image, (uint8_t*)surface->texture.surface.mipmaps, surface->texture.surface.resourceFlags))
 				return surface;
+			else
+				Backend_PrintError("GX2RCreateSurfaceUserMemory failed in RenderBackend_CreateSurface");
+
 
 			GX2RDestroySurfaceEx(&surface->texture.surface, (GX2RResourceFlags)0);
+		}
+		else
+		{
+			Backend_PrintError("GX2RCreateSurface failedin RenderBackend_CreateSurface");
 		}
 
 		free(surface);
@@ -613,6 +640,10 @@ RenderBackend_Glyph* RenderBackend_LoadGlyph(const unsigned char *pixels, unsign
 			GX2RUnlockSurfaceEx(&glyph->texture.surface, 0, (GX2RResourceFlags)0);
 
 			return glyph;
+		}
+		else
+		{
+			Backend_PrintError("GX2RCreateSurface failed in RenderBackend_LoadGlyph");
 		}
 
 		free(glyph);
