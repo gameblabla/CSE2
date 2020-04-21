@@ -6,7 +6,10 @@
 #define STB_IMAGE_STATIC
 #define STBI_ONLY_BMP
 #define STBI_NO_LINEAR
+#define STBI_NO_STDIO
 #include "../external/stb_image.h"
+
+#include "File.h"
 
 unsigned char* DecodeBitmap(const unsigned char *in_buffer, size_t in_buffer_size, unsigned int *width, unsigned int *height)
 {
@@ -15,7 +18,14 @@ unsigned char* DecodeBitmap(const unsigned char *in_buffer, size_t in_buffer_siz
 
 unsigned char* DecodeBitmapFromFile(const char *path, unsigned int *width, unsigned int *height)
 {
-	return stbi_load(path, (int*)width, (int*)height, NULL, 3);
+	size_t file_size;
+	unsigned char *file_buffer = LoadFileToMemory(path, &file_size);
+
+	unsigned char *pixel_buffer = stbi_load_from_memory(file_buffer, file_size, (int*)width, (int*)height, NULL, 3);
+
+	free(file_buffer);
+
+	return pixel_buffer;
 }
 
 void FreeBitmap(unsigned char *buffer)
