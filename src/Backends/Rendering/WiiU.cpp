@@ -377,7 +377,7 @@ void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, unsigned int wi
 					*out_pointer++ = *in_pointer++;
 					*out_pointer++ = *in_pointer++;
 					*out_pointer++ = *in_pointer++;
-					*out_pointer++ = 0xFF;
+					*out_pointer++ = 0;
 				}
 			}
 
@@ -526,14 +526,14 @@ RenderBackend_Glyph* RenderBackend_LoadGlyph(const unsigned char *pixels, unsign
 		memset(&glyph->texture, 0, sizeof(glyph->texture));
 		glyph->texture.surface.width = width;
 		glyph->texture.surface.height = height;
-		glyph->texture.surface.format = GX2_SURFACE_FORMAT_UNORM_R8_G8_B8_A8;
+		glyph->texture.surface.format = GX2_SURFACE_FORMAT_UNORM_R8;
 		glyph->texture.surface.depth = 1;
 		glyph->texture.surface.dim = GX2_SURFACE_DIM_TEXTURE_2D;
 		glyph->texture.surface.tileMode = GX2_TILE_MODE_LINEAR_ALIGNED;
 		glyph->texture.surface.mipLevels = 1;
 		glyph->texture.viewNumMips = 1;
 		glyph->texture.viewNumSlices = 1;
-		glyph->texture.compMap = 0x00010203;
+		glyph->texture.compMap = 0x00000000;
 		GX2CalcSurfaceSizeAndAlignment(&glyph->texture.surface);
 		GX2InitTextureRegs(&glyph->texture);
 
@@ -545,18 +545,14 @@ RenderBackend_Glyph* RenderBackend_LoadGlyph(const unsigned char *pixels, unsign
 			unsigned char *framebuffer = (unsigned char*)GX2RLockSurfaceEx(&glyph->texture.surface, 0, (GX2RResourceFlags)0);
 
 			const unsigned char *in_pointer = pixels;
+			unsigned char *out_pointer = framebuffer;
 
 			for (size_t y = 0; y < height; ++y)
 			{
-				unsigned char *out_pointer = &framebuffer[glyph->texture.surface.pitch * 4 * y];
+				memcpy(out_pointer, in_pointer, width);
 
-				for (size_t x = 0; x < width; ++x)
-				{
-					*out_pointer++ = *in_pointer++;
-					*out_pointer++ = 0;
-					*out_pointer++ = 0;
-					*out_pointer++ = 0xFF;
-				}
+				in_pointer += width;
+				out_pointer += glyph->texture.surface.pitch;
 			}
 
 			GX2RUnlockSurfaceEx(&glyph->texture.surface, 0, (GX2RResourceFlags)0);
