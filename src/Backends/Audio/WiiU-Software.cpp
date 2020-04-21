@@ -91,7 +91,7 @@ static void FrameCallback(void)
 	if (current_buffer != last_buffer)
 	{
 		// Clear the mixer buffer
-		for (unsigned int i = 0; i < buffer_length; ++i)
+		for (unsigned int i = 0; i < (buffer_length / 2) * 2; ++i)
 			stream_buffer_float[i] = 0.0f;
 
 		// Fill mixer buffer
@@ -122,13 +122,13 @@ static void FrameCallback(void)
 				right_sample = 1.0f;
 
 			// Convert to S16 and store in double-buffers
-			*left_output_buffer_pointer++ = left_sample * 32767.0f;
-			*right_output_buffer_pointer++ = right_sample * 32767.0f;
+			*left_output_buffer_pointer++ = (short)(left_sample * 32767.0f);
+			*right_output_buffer_pointer++ = (short)(right_sample * 32767.0f);
 		}
 
 		// Make sure the sound hardware can see our data
-		DCStoreRange(left_output_buffer, buffer_length / 2 * sizeof(short));
-		DCStoreRange(right_output_buffer, buffer_length / 2 * sizeof(short));
+		DCStoreRange(left_output_buffer, (buffer_length / 2) * sizeof(short));
+		DCStoreRange(right_output_buffer, (buffer_length / 2) * sizeof(short));
 
 		last_buffer = current_buffer;
 	}
@@ -160,7 +160,7 @@ bool AudioBackend_Init(void)
 
 	// The software-mixer outputs interlaced float samples, so create
 	// a buffer for it here.
-	stream_buffer_float = (float*)malloc(buffer_length * sizeof(float) * 2);	// TODO - should probably by divided by two
+	stream_buffer_float = (float*)malloc((buffer_length / 2) * sizeof(float) * 2);
 
 	if (stream_buffer_float != NULL)
 	{
