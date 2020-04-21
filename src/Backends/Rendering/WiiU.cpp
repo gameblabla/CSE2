@@ -30,6 +30,7 @@ typedef struct RenderBackend_Surface
 	GX2ColorBuffer colour_buffer;
 	unsigned int width;
 	unsigned int height;
+	unsigned char *lock_buffer;	// TODO - dumb
 } RenderBackend_Surface;
 
 typedef struct RenderBackend_Glyph
@@ -160,15 +161,14 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 						GX2SetDepthOnlyControl(FALSE, FALSE, GX2_COMPARE_FUNC_ALWAYS);
 
 						// Set custom blending mode for pre-multiplied alpha
-		/*				GX2SetBlendControl(GX2_RENDER_TARGET_0,
-										   GX2_BLEND_MODE_ZERO,
+						GX2SetBlendControl(GX2_RENDER_TARGET_0,
 										   GX2_BLEND_MODE_ONE,
+										   GX2_BLEND_MODE_INV_SRC_ALPHA,
 										   GX2_BLEND_COMBINE_MODE_ADD,
 										   TRUE,
-										   GX2_BLEND_MODE_ZERO,
 										   GX2_BLEND_MODE_ONE,
+										   GX2_BLEND_MODE_INV_SRC_ALPHA,
 										   GX2_BLEND_COMBINE_MODE_ADD);
-		*/
 
 						// Calculate centred viewports
 						switch (GX2GetSystemTVScanMode())
@@ -277,6 +277,9 @@ void RenderBackend_DrawScreen(void)
 	// This might be needed? Not sure.
 //	GX2RInvalidateSurface(&framebuffer_surface->texture.surface, 0, (GX2RResourceFlags)0);
 
+	// Disable blending
+	GX2SetColorControl(GX2_LOGIC_OP_COPY, 0, FALSE, TRUE);
+
 	// Select texture shader
 	GX2SetFetchShader(&texture_shader.fetchShader);
 	GX2SetVertexShader(texture_shader.vertexShader);
@@ -305,6 +308,9 @@ void RenderBackend_DrawScreen(void)
 
 	// This might be needed? Not sure.
 //	GX2RInvalidateSurface(&framebuffer_surface->texture.surface, 0, (GX2RResourceFlags)0);
+
+	// Disable blending
+	GX2SetColorControl(GX2_LOGIC_OP_COPY, 0, FALSE, TRUE);
 
 	// Select texture shader
 	GX2SetFetchShader(&texture_shader.fetchShader);
@@ -400,9 +406,11 @@ unsigned char* RenderBackend_LockSurface(RenderBackend_Surface *surface, unsigne
 {
 	if (surface != NULL)
 	{
+		surface->lock_buffer = (unsigned char*)GX2RLockSurfaceEx(&surface->texture.surface, 0, (GX2RResourceFlags)0);
+
 		*pitch = surface->texture.surface.pitch * 4;
 
-		return (unsigned char*)GX2RLockSurfaceEx(&surface->texture.surface, 0, (GX2RResourceFlags)0);
+		return surface->lock_buffer;
 	}
 
 	return NULL;
@@ -411,7 +419,23 @@ unsigned char* RenderBackend_LockSurface(RenderBackend_Surface *surface, unsigne
 void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, unsigned int width, unsigned int height)
 {
 	if (surface != NULL)
+	{
+		// Pre-multiply the colour channels with the alpha, so blending works correctly
+		for (unsigned int y = 0; y < height; ++y)
+		{
+			unsigned char *pixels = &surface->lock_buffer[surface->texture.surface.pitch * 4 * y];
+
+			for (unsigned int x = 0; x < width; ++x)
+			{
+				pixels[0] = (pixels[0] * pixels[3]) / 0xFF;
+				pixels[1] = (pixels[1] * pixels[3]) / 0xFF;
+				pixels[2] = (pixels[2] * pixels[3]) / 0xFF;
+				pixels += 4;
+			}
+		}
+
 		GX2RUnlockSurfaceEx(&surface->texture.surface, 0, (GX2RResourceFlags)0);
+	}
 }
 
 void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBackend_Rect *rect, RenderBackend_Surface *destination_surface, long x, long y, bool alpha_blend)
@@ -522,6 +546,9 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 	GX2SetColorBuffer(&surface->colour_buffer, GX2_RENDER_TARGET_0);
 	GX2SetViewport(0, 0, (float)surface->colour_buffer.surface.width, (float)surface->colour_buffer.surface.height, 0.0f, 1.0f);
 	GX2SetScissor(0, 0, (float)surface->colour_buffer.surface.width, (float)surface->colour_buffer.surface.height);
+
+	// Disable blending
+	GX2SetColorControl(GX2_LOGIC_OP_COPY, 0, FALSE, TRUE);
 
 	// Set the colour-fill... colour
 	const float uniform_colours[4] = {red / 255.0f, green / 255.0f, blue / 255.0f, alpha / 255.0f};
@@ -691,8 +718,7 @@ void RenderBackend_DrawGlyph(RenderBackend_Glyph *glyph, long x, long y)
 
 void RenderBackend_FlushGlyphs(void)
 {
-	// Disable blending
-	GX2SetColorControl(GX2_LOGIC_OP_COPY, 0, FALSE, TRUE);
+	
 }
 
 void RenderBackend_HandleRenderTargetLoss(void)
