@@ -60,8 +60,12 @@ void AudioBackend_SetSoundPan(AudioBackend_Sound *sound, long pan)
 	(void)pan;
 }
 
-void AudioBackend_SetOrganyaCallback(void (*callback)(void), unsigned int milliseconds)
+void AudioBackend_SetOrganyaCallback(void (*callback)(void))
 {
 	(void)callback;
+}
+
+void AudioBackend_SetOrganyaTimer(unsigned int milliseconds)
+{
 	(void)milliseconds;
 }

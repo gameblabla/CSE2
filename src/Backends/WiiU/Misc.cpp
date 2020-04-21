@@ -6,7 +6,7 @@
 #include <whb/proc.h>
 #include <whb/sdcard.h>
 
-static unsigned long tick_delta;
+static unsigned long ticks_per_second;
 
 bool Backend_Init(void)
 {
@@ -15,7 +15,7 @@ bool Backend_Init(void)
 	if (!WHBMountSdCard())
 		return FALSE;
 
-	tick_delta = OSGetSystemInfo()->busClockSpeed / 4;
+	ticks_per_second = OSGetSystemInfo()->busClockSpeed / 4;
 
 	return true;
 }
@@ -80,16 +80,19 @@ void Backend_ShowMessageBox(const char *title, const char *message)
 {
 	(void)title;
 	(void)message;
+	// TODO - We might be able to funnel this into `WHBLogPrintf`...
 }
 
 ATTRIBUTE_FORMAT_PRINTF(1, 2) void Backend_PrintError(const char *format, ...)
 {
 	(void)format;
+	// TODO - We might be able to funnel this into `WHBLogPrintf`...
 }
 
 ATTRIBUTE_FORMAT_PRINTF(1, 2) void Backend_PrintInfo(const char *format, ...)
 {
 	(void)format;
+	// TODO - We might be able to funnel this into `WHBLogPrintf`...
 }
 
 unsigned long Backend_GetTicks(void)
@@ -104,12 +107,12 @@ unsigned long Backend_GetTicks(void)
 
 	last_tick = current_tick;
 
-	return (accumulator * 1000) / tick_delta;
+	return (accumulator * 1000) / ticks_per_second;
 }
 
 void Backend_Delay(unsigned int ticks)
 {
-	OSSleepTicks((ticks * tick_delta) / 1000);
+	OSSleepTicks((ticks * ticks_per_second) / 1000);
 }
 
 void Backend_GetDisplayMode(Backend_DisplayMode *display_mode)

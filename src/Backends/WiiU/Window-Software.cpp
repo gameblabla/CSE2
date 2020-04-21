@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-//#include <coreinit/cache.h>
+#include <coreinit/cache.h>
 #include <coreinit/screen.h>
 
 //static unsigned char *tv_framebuffer;
@@ -73,7 +73,7 @@ unsigned char* WindowBackend_Software_GetFramebuffer(size_t *pitch)
 void WindowBackend_Software_Display(void)
 {
 //	DCFlushRange(tv_framebuffer, tv_buffer_size);
-//	DCFlushRange(drc_framebuffer, drc_buffer_size);
+	DCFlushRange(drc_framebuffer, drc_buffer_size);
 
 //	OSScreenFlipBuffersEx(SCREEN_TV);
 	OSScreenFlipBuffersEx(SCREEN_DRC);

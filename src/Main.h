@@ -13,7 +13,7 @@ extern BOOL bFullscreen;
 extern CONFIG_BINDING bindings[BINDING_TOTAL];
 
 void PutFramePerSecound(void);
-unsigned long GetFramePerSecound(void);
+unsigned long CountFramePerSecound(void);
 
 void InactiveWindow(void);
 void ActiveWindow(void);

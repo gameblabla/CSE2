@@ -17,8 +17,8 @@ option(FIX_BUGS "Fix various bugs in the game" ON)
 option(DEBUG_SAVE "Re-enable the ability to drag-and-drop save files onto the window" OFF)
 option(EXTRA_SOUND_FORMATS "Adds support for extra music/SFX formats using the clownaudio library (use the CLOWNAUDIO options to toggle specific formats)" OFF)
 
-set(BACKEND_RENDERER "SDLTexture" CACHE STRING "Which renderer the game should use: 'OpenGL3' for an OpenGL 3.2 renderer, 'OpenGLES2' for an OpenGL ES 2.0 renderer, 'SDLTexture' for SDL2's hardware-accelerated Texture API, or 'Software' for a handwritten software renderer")
-set(BACKEND_AUDIO "SDL2" CACHE STRING "Which audio backend the game should use: 'SDL2', 'miniaudio', or 'Null'")
+set(BACKEND_RENDERER "SDLTexture" CACHE STRING "Which renderer the game should use: 'OpenGL3' for an OpenGL 3.2 renderer, 'OpenGLES2' for an OpenGL ES 2.0 renderer, 'SDLTexture' for SDL2's hardware-accelerated Texture API, 'Wii U' for the Wii U's hardware-accelerated GX2 API, or 'Software' for a handwritten software renderer")
+set(BACKEND_AUDIO "SDL2" CACHE STRING "Which audio backend the game should use: 'SDL2', 'miniaudio', 'WiiU-Hardware', 'WiiU-Software', or 'Null'")
 set(BACKEND_PLATFORM "SDL2" CACHE STRING "Which platform backend the game should use: 'SDL2', 'GLFW3', 'WiiU', or 'Null'")
 
 option(LTO "Enable link-time optimisation" OFF)
@@ -233,6 +233,8 @@ elseif(BACKEND_RENDERER MATCHES "OpenGLES2")
 	target_sources(CSE2 PRIVATE "src/Backends/Rendering/OpenGLES2.cpp")
 elseif(BACKEND_RENDERER MATCHES "SDLTexture")
 	target_sources(CSE2 PRIVATE "src/Backends/Rendering/SDLTexture.cpp")
+elseif(BACKEND_RENDERER MATCHES "WiiU")
+	target_sources(CSE2 PRIVATE "src/Backends/Rendering/WiiU.cpp")
 elseif(BACKEND_RENDERER MATCHES "Software")
 	target_sources(CSE2 PRIVATE "src/Backends/Rendering/Software.cpp")
 else()
@@ -266,6 +268,16 @@ elseif(BACKEND_AUDIO MATCHES "miniaudio")
 	endif()
 
 	target_link_libraries(CSE2 PRIVATE ${CMAKE_DL_LIBS})
+elseif(BACKEND_AUDIO MATCHES "WiiU-Hardware")
+	target_sources(CSE2 PRIVATE
+		"src/Backends/Audio/WiiU-Hardware.cpp"
+	)
+elseif(BACKEND_AUDIO MATCHES "WiiU-Software")
+	target_sources(CSE2 PRIVATE
+		"src/Backends/Audio/WiiU-Software.cpp"
+		"src/Backends/Audio/SoftwareMixer.cpp"
+		"src/Backends/Audio/SoftwareMixer.h"
+	)
 elseif(BACKEND_AUDIO MATCHES "Null")
 	target_sources(CSE2 PRIVATE
 		"src/Backends/Audio/Null.cpp"
@@ -312,8 +324,9 @@ elseif(BACKEND_PLATFORM MATCHES "GLFW3" AND BACKEND_RENDERER MATCHES "OpenGLES2"
 	target_sources(CSE2 PRIVATE "src/Backends/GLFW3/Window-OpenGLES2.cpp")
 elseif(BACKEND_PLATFORM MATCHES "GLFW3" AND BACKEND_RENDERER MATCHES "Software")
 	target_sources(CSE2 PRIVATE "src/Backends/GLFW3/Window-Software.cpp")
+elseif(BACKEND_PLATFORM MATCHES "WiiU" AND BACKEND_RENDERER MATCHES "WiiU")
 elseif(BACKEND_PLATFORM MATCHES "WiiU" AND BACKEND_RENDERER MATCHES "Software")
-	target_sources(CSE2 PRIVATE "src/Backends/WiiU/Window-Software.cpp")
+	target_sources(CSE2 PRIVATE "src/Backends/WiiU/Window-Software-Polygon.cpp")
 elseif(BACKEND_PLATFORM MATCHES "Null" AND BACKEND_RENDERER MATCHES "Software")
 	target_sources(CSE2 PRIVATE "src/Backends/Null/Window-Software.cpp")
 else()

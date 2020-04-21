@@ -36,7 +36,7 @@ BOOL bFullscreen;
 CONFIG_BINDING bindings[BINDING_TOTAL];
 
 static BOOL bActive = TRUE;
-static BOOL bFps = FALSE;
+static BOOL bFPS = FALSE;
 
 #ifdef JAPANESE
 static const char *lpWindowName = "洞窟物語";	// "Cave Story"
@@ -47,38 +47,38 @@ static const char *lpWindowName = "Cave Story ~ Doukutsu Monogatari";
 // Framerate stuff
 void PutFramePerSecound(void)
 {
-	if (bFps)
+	if (bFPS)
 	{
-		const unsigned long fps = GetFramePerSecound();
+		const unsigned long fps = CountFramePerSecound();
 		PutNumber4(WINDOW_WIDTH - 40, 8, fps, FALSE);
 	}
 }
 
-unsigned long GetFramePerSecound(void)
+unsigned long CountFramePerSecound(void)
 {
-	unsigned long current_tick;
-	static BOOL need_new_base_tick = TRUE;
-	static unsigned long frames_this_second;
-	static unsigned long current_frame;
-	static unsigned long base_tick;
+	unsigned long current_tick;	// The original name for this variable is unknown
+	static BOOL first = TRUE;
+	static unsigned long max_count;
+	static unsigned long count;
+	static unsigned long wait;
 
-	if (need_new_base_tick)
+	if (first)
 	{
-		base_tick = Backend_GetTicks();
-		need_new_base_tick = FALSE;
+		wait = Backend_GetTicks();
+		first = FALSE;
 	}
 
 	current_tick = Backend_GetTicks();
-	++current_frame;
+	++count;
 
-	if (base_tick + 1000 <= current_tick)
+	if (wait + 1000 <= current_tick)
 	{
-		base_tick += 1000;
-		frames_this_second = current_frame;
-		current_frame = 0;
+		wait += 1000;
+		max_count = count;
+		count = 0;
 	}
 
-	return frames_this_second;
+	return max_count;
 }
 
 // TODO - Inaccurate stack frame
@@ -191,7 +191,7 @@ int main(int argc, char *argv[])
 	}
 
 	if (IsKeyFile("fps"))
-		bFps = TRUE;
+		bFPS = TRUE;
 
 	// Set rects
 	RECT rcLoading = {0, 0, 64, 8};

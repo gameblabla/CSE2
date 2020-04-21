@@ -795,6 +795,8 @@ BOOL StartOrganya(const char *path_wave)	// The argument is ignored for some rea
 
 	org_data.InitOrgData();
 
+	AudioBackend_SetOrganyaCallback(OrganyaCallback);
+
 	return TRUE;
 }
 
@@ -840,7 +842,7 @@ void PlayOrganyaMusic(void)
 	if (!audio_backend_initialised)
 		return;
 
-	AudioBackend_SetOrganyaCallback(OrganyaCallback, org_data.info.wait);
+	AudioBackend_SetOrganyaTimer(org_data.info.wait);
 }
 
 BOOL ChangeOrganyaVolume(signed int volume)
@@ -860,7 +862,7 @@ void StopOrganyaMusic(void)
 	if (!audio_backend_initialised)
 		return;
 
-	AudioBackend_SetOrganyaCallback(NULL, 0);
+	AudioBackend_SetOrganyaTimer(0);
 
 	// Stop notes
 	for (int i = 0; i < MAXMELODY; i++)
@@ -883,7 +885,7 @@ void EndOrganya(void)
 	if (!audio_backend_initialised)
 		return;
 
-	AudioBackend_SetOrganyaCallback(NULL, 0);
+	AudioBackend_SetOrganyaTimer(0);
 
 	// Release everything related to org
 	org_data.ReleaseNote();

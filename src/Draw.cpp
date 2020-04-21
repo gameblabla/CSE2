@@ -57,6 +57,7 @@ static BOOL gbVsync;
 
 BOOL Flip_SystemTask(void)
 {
+	// TODO - Not the original variable names
 	static unsigned long timePrev;
 	static unsigned long timeNow;
 
@@ -462,11 +463,15 @@ BOOL MakeSurface_Generic(int bxsize, int bysize, SurfaceID surf_no, BOOL bSystem
 
 void BackupSurface(SurfaceID surf_no, const RECT *rect)
 {
-	static RenderBackend_Rect scaled_rect;
+	static RenderBackend_Rect scaled_rect;	// TODO - Not the original variable name
 	scaled_rect.left = rect->left * magnification;
 	scaled_rect.top = rect->top * magnification;
 	scaled_rect.right = rect->right * magnification;
 	scaled_rect.bottom = rect->bottom * magnification;
+
+	// Do not draw invalid RECTs
+	if (scaled_rect.right <= scaled_rect.left || scaled_rect.bottom <= scaled_rect.top)
+		return;
 
 	RenderBackend_Blit(framebuffer, &scaled_rect, surf[surf_no], scaled_rect.left, scaled_rect.top, FALSE);
 }
@@ -505,6 +510,10 @@ void PutBitmap3(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID su
 		y = rcViewScaled.top;
 	}
 
+	// Do not draw invalid RECTs
+	if (rcWork.right <= rcWork.left || rcWork.bottom <= rcWork.top)
+		return;
+
 	RenderBackend_Blit(surf[surf_no], &rcWork, framebuffer, x, y, TRUE);
 }
 
@@ -534,6 +543,10 @@ void PutBitmap4(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID su
 		y = rcViewScaled.top;
 	}
 
+	// Do not draw invalid RECTs
+	if (rcWork.right <= rcWork.left || rcWork.bottom <= rcWork.top)
+		return;
+
 	RenderBackend_Blit(surf[surf_no], &rcWork, framebuffer, x, y, FALSE);
 }
 
@@ -546,6 +559,10 @@ void Surface2Surface(int x, int y, const RECT *rect, int to, int from)
 	rcWork.right = rect->right * magnification;
 	rcWork.bottom = rect->bottom * magnification;
 
+	// Do not draw invalid RECTs
+	if (rcWork.right <= rcWork.left || rcWork.bottom <= rcWork.top)
+		return;
+
 	RenderBackend_Blit(surf[from], &rcWork, surf[to], x * magnification, y * magnification, TRUE);
 }
 
@@ -557,7 +574,7 @@ unsigned long GetCortBoxColor(unsigned long col)
 
 void CortBox(const RECT *rect, unsigned long col)
 {
-	static RenderBackend_Rect dst_rect;
+	static RenderBackend_Rect dst_rect;	// TODO - Not the original variable name
 	dst_rect.left = rect->left * magnification;
 	dst_rect.top = rect->top * magnification;
 	dst_rect.right = rect->right * magnification;
@@ -567,12 +584,16 @@ void CortBox(const RECT *rect, unsigned long col)
 	const unsigned char green = (col >> 8) & 0xFF;
 	const unsigned char blue = (col >> 16) & 0xFF;
 
+	// Do not draw invalid RECTs
+	if (dst_rect.right <= dst_rect.left || dst_rect.bottom <= dst_rect.top)
+		return;
+
 	RenderBackend_ColourFill(framebuffer, &dst_rect, red, green, blue, 0xFF);
 }
 
 void CortBox2(const RECT *rect, unsigned long col, SurfaceID surf_no)
 {
-	static RenderBackend_Rect dst_rect;
+	static RenderBackend_Rect dst_rect;	// TODO - Not the original variable name
 	dst_rect.left = rect->left * magnification;
 	dst_rect.top = rect->top * magnification;
 	dst_rect.right = rect->right * magnification;
@@ -585,10 +606,16 @@ void CortBox2(const RECT *rect, unsigned long col, SurfaceID surf_no)
 	const unsigned char blue = (col >> 16) & 0xFF;
 	const unsigned char alpha = (col >> 24) & 0xFF;
 
+	// Do not draw invalid RECTs
+	if (dst_rect.right <= dst_rect.left || dst_rect.bottom <= dst_rect.top)
+		return;
+
 	RenderBackend_ColourFill(surf[surf_no], &dst_rect, red, green, blue, alpha);
 }
 
-BOOL DummiedOutLogFunction(int unknown)
+// Dummied-out log function
+// According to the Mac port, its name really is just "out".
+static BOOL out(int unknown)
 {
 	char unknown2[0x100];
 	int unknown3;
@@ -604,7 +631,8 @@ BOOL DummiedOutLogFunction(int unknown)
 	return TRUE;
 }
 
-int RestoreSurfaces(void)	// Guessed function name - this doesn't exist in the Linux port
+// TODO - Probably not the original variable name (this is an educated guess)
+int RestoreSurfaces(void)
 {
 	int s;
 	RECT rect;
@@ -617,7 +645,7 @@ int RestoreSurfaces(void)	// Guessed function name - this doesn't exist in the L
 	{
 		++surfaces_regenerated;
 		RenderBackend_RestoreSurface(framebuffer);
-		DummiedOutLogFunction(0x62);
+		out(0x62);
 	}
 
 	for (s = 0; s < SURFACE_ID_MAX; ++s)
@@ -628,7 +656,7 @@ int RestoreSurfaces(void)	// Guessed function name - this doesn't exist in the L
 			{
 				++surfaces_regenerated;
 				RenderBackend_RestoreSurface(surf[s]);
-				DummiedOutLogFunction(0x30 + s);
+				out(0x30 + s);
 
 				if (!surface_metadata[s].bSystem)
 				{
@@ -679,7 +707,23 @@ void InitTextObject(const char *name)
 	char path[MAX_PATH];
 	sprintf(path, "%s/Font/font", gDataPath);
 
-	font = LoadFont(path, 8 * magnification, 9 * magnification);
+	// Get font size
+	unsigned int width, height;
+
+	switch (magnification)
+	{
+		case 1:
+			height = 10;
+			width = 9;
+			break;
+
+		case 2:
+			height = 9;
+			width = 8;
+			break;
+	}
+
+	font = LoadFont(path, width * magnification, height * magnification);
 }
 
 void PutText(int x, int y, const char *text, unsigned long color)

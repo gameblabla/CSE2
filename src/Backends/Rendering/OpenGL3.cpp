@@ -486,6 +486,7 @@ static void GlyphBatch_DestroyTexture(SPRITEBATCH_U64 texture_id, void *udata)
 	GLuint gl_texture_id = (GLuint)texture_id;
 
 	// Flush the vertex buffer if we're about to destroy its texture
+	// TODO - This leaves `last_source_texture`/`last_destination_texture` dangling
 	if (gl_texture_id == last_source_texture || gl_texture_id == last_destination_texture)
 		FlushVertexBuffer();
 
@@ -815,6 +816,7 @@ void RenderBackend_FreeSurface(RenderBackend_Surface *surface)
 		return;
 
 	// Flush the vertex buffer if we're about to destroy its texture
+	// TODO - This leaves `last_source_texture`/`last_destination_texture` dangling
 	if (surface->texture_id == last_source_texture || surface->texture_id == last_destination_texture)
 		FlushVertexBuffer();
 
@@ -882,9 +884,6 @@ void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, unsigned int wi
 void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBackend_Rect *rect, RenderBackend_Surface *destination_surface, long x, long y, bool alpha_blend)
 {
 	if (source_surface == NULL || destination_surface == NULL)
-		return;
-
-	if (rect->right - rect->left < 0 || rect->bottom - rect->top < 0)
 		return;
 
 	const RenderMode render_mode = (alpha_blend ? MODE_DRAW_SURFACE_WITH_TRANSPARENCY : MODE_DRAW_SURFACE);
@@ -967,9 +966,6 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 	static unsigned char last_blue;
 
 	if (surface == NULL)
-		return;
-
-	if (rect->right - rect->left < 0 || rect->bottom - rect->top < 0)
 		return;
 
 	// Flush vertex data if a context-change is needed

@@ -97,7 +97,7 @@ void MoveFrame3(void)
 		--gFrame.quake;
 	}
 
-	// This code exists in the Linux port (v1.0.0.4), but not the Windows version (v1.0.0.6)
+	// This code exists in the Linux port (v1.0.0.4), but not the Windows version (v1.0.0.6) or the Mac port
 /*	if (gFrame.x < 0)
 		gFrame.x = 0;
 	if (gFrame.y < 0)
