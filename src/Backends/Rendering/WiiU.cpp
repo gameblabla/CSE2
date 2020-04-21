@@ -55,7 +55,6 @@ static RenderBackend_Surface *framebuffer_surface;
 static GX2ContextState *gx2_context;
 
 static RenderBackend_Surface *glyph_destination_surface;
-static const unsigned char *glyph_colour_channels;
 
 RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, bool fullscreen)
 {
@@ -582,7 +581,10 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_Surface *destination_surfac
 		return;
 
 	glyph_destination_surface = destination_surface;
-	glyph_colour_channels = colour_channels;
+
+	// Set the colour
+	const float uniform_colours[4] = {colour_channels[0] / 255.0f, colour_channels[1] / 255.0f, colour_channels[2] / 255.0f, 1.0f};
+	GX2SetPixelUniformReg(glyph_shader.pixelShader->uniformVars[0].offset, 4, (uint32_t*)&uniform_colours);
 
 	// Enable blending
 	GX2SetColorControl(GX2_LOGIC_OP_COPY, 0xFF, FALSE, TRUE);
@@ -655,10 +657,6 @@ void RenderBackend_DrawGlyph(RenderBackend_Glyph *glyph, long x, long y)
 	GX2SetPixelTexture(&glyph->texture, shader->pixelShader->samplerVars[0].location);
 	GX2RSetAttributeBuffer(&vertex_position_buffer, 0, vertex_position_buffer.elemSize, 0);
 	GX2RSetAttributeBuffer(&texture_coordinate_buffer, 1, texture_coordinate_buffer.elemSize, 0);
-
-	// Set the colour
-	const float uniform_colours[4] = {glyph_colour_channels[0] / 255.0f, glyph_colour_channels[1] / 255.0f, glyph_colour_channels[2] / 255.0f, 1.0f};
-	GX2SetPixelUniformReg(glyph_shader.pixelShader->uniformVars[0].offset, 4, (uint32_t*)&uniform_colours);
 
 	// Draw
 	GX2DrawEx(GX2_PRIMITIVE_MODE_QUADS, 4, 0, 1);
