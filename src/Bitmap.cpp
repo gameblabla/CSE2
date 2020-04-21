@@ -36,11 +36,16 @@ unsigned char* DecodeBitmapWithAlphaFromFile(const char *path, unsigned int *wid
 	size_t file_size;
 	unsigned char *file_buffer = LoadFileToMemory(path, &file_size);
 
-	unsigned char *pixel_buffer = DecodeBitmapWithAlpha(file_buffer, file_size, width, height, colour_key);
+	if (file_buffer != NULL)
+	{
+		unsigned char *image_buffer = DecodeBitmapWithAlpha(file_buffer, file_size, width, height, colour_key);
 
-	free(file_buffer);
+		free(file_buffer);
 
-	return pixel_buffer;
+		return image_buffer;
+	}
+
+	return NULL;
 }
 
 unsigned char* DecodeBitmap(const unsigned char *in_buffer, size_t in_buffer_size, unsigned int *width, unsigned int *height)
