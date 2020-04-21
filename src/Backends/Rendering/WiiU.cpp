@@ -23,7 +23,6 @@
 #include "../WiiU/shaders/colour_fill.gsh.h"
 #include "../WiiU/shaders/glyph.gsh.h"
 #include "../WiiU/shaders/texture.gsh.h"
-#include "../WiiU/shaders/texture_colour_key.gsh.h"
 
 typedef struct RenderBackend_Surface
 {
@@ -31,7 +30,6 @@ typedef struct RenderBackend_Surface
 	GX2ColorBuffer colour_buffer;
 	unsigned int width;
 	unsigned int height;
-	unsigned char *lock_buffer;	// TODO - Dumb
 } RenderBackend_Surface;
 
 typedef struct RenderBackend_Glyph
@@ -50,7 +48,6 @@ typedef struct Viewport
 } Viewport;
 
 static WHBGfxShaderGroup texture_shader;
-static WHBGfxShaderGroup texture_colour_key_shader;
 static WHBGfxShaderGroup colour_fill_shader;
 static WHBGfxShaderGroup glyph_shader;
 
@@ -88,10 +85,12 @@ static void CalculateViewport(unsigned int actual_screen_width, unsigned int act
 	}
 }
 
-RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, bool fullscreen)
+RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, bool fullscreen, bool *vsync)
 {
 	(void)window_title;
 	(void)fullscreen;
+
+	*vsync = true;	// Not optional
 
 	WHBGfxInit();
 
@@ -103,14 +102,14 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 		WHBGfxInitShaderAttribute(&texture_shader, "input_vertex_coordinates", 0, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
 		WHBGfxInitShaderAttribute(&texture_shader, "input_texture_coordinates", 1, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
 		WHBGfxInitFetchShader(&texture_shader);
-
+/*
 		// Texture shader (with colour-key)
 		if (WHBGfxLoadGFDShaderGroup(&texture_colour_key_shader, 0, rtexture_colour_key))
 		{
 			WHBGfxInitShaderAttribute(&texture_colour_key_shader, "input_vertex_coordinates", 0, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
 			WHBGfxInitShaderAttribute(&texture_colour_key_shader, "input_texture_coordinates", 1, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
 			WHBGfxInitFetchShader(&texture_colour_key_shader);
-
+*/
 			// Colour-fill shader
 			if (WHBGfxLoadGFDShaderGroup(&colour_fill_shader, 0, rcolour_fill))
 			{
@@ -205,10 +204,10 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 
 				WHBGfxFreeShaderGroup(&colour_fill_shader);
 			}
-
+/*
 			WHBGfxFreeShaderGroup(&texture_colour_key_shader);
 		}
-
+*/
 		WHBGfxFreeShaderGroup(&texture_shader);
 	}
 
@@ -227,7 +226,7 @@ void RenderBackend_Deinit(void)
 	GX2RDestroyBufferEx(&vertex_position_buffer, (GX2RResourceFlags)0);
 
 	WHBGfxFreeShaderGroup(&colour_fill_shader);
-	WHBGfxFreeShaderGroup(&texture_colour_key_shader);
+//	WHBGfxFreeShaderGroup(&texture_colour_key_shader);
 	WHBGfxFreeShaderGroup(&texture_shader);
 
 	WHBGfxShutdown();
@@ -401,12 +400,9 @@ unsigned char* RenderBackend_LockSurface(RenderBackend_Surface *surface, unsigne
 {
 	if (surface != NULL)
 	{
-		// Create a temporary RGB24 buffer (this backend uses RGBA32
-		// internally, so we can't just use a locked texture)
-		surface->lock_buffer = (unsigned char*)malloc(width * height * 3);
-		*pitch = width * 3;
+		*pitch = surface->texture.surface.pitch * 4;
 
-		return surface->lock_buffer;
+		return (unsigned char*)GX2RLockSurfaceEx(&surface->texture.surface, 0, (GX2RResourceFlags)0);
 	}
 
 	return NULL;
@@ -415,35 +411,10 @@ unsigned char* RenderBackend_LockSurface(RenderBackend_Surface *surface, unsigne
 void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, unsigned int width, unsigned int height)
 {
 	if (surface != NULL)
-	{
-		if (surface->lock_buffer != NULL)
-		{
-			// Convert from RGB24 to RGBA32, and upload it to the GPU texture
-			unsigned char *framebuffer = (unsigned char*)GX2RLockSurfaceEx(&surface->texture.surface, 0, (GX2RResourceFlags)0);
-
-			const unsigned char *in_pointer = surface->lock_buffer;
-
-			for (size_t y = 0; y < height; ++y)
-			{
-				unsigned char *out_pointer = &framebuffer[surface->texture.surface.pitch * 4 * y];
-
-				for (size_t x = 0; x < width; ++x)
-				{
-					*out_pointer++ = *in_pointer++;
-					*out_pointer++ = *in_pointer++;
-					*out_pointer++ = *in_pointer++;
-					*out_pointer++ = 0;
-				}
-			}
-
-			free(surface->lock_buffer);
-
-			GX2RUnlockSurfaceEx(&surface->texture.surface, 0, (GX2RResourceFlags)0);
-		}
-	}
+		GX2RUnlockSurfaceEx(&surface->texture.surface, 0, (GX2RResourceFlags)0);
 }
 
-void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBackend_Rect *rect, RenderBackend_Surface *destination_surface, long x, long y, bool colour_key)
+void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBackend_Rect *rect, RenderBackend_Surface *destination_surface, long x, long y, bool alpha_blend)
 {
 	if (source_surface == NULL || destination_surface == NULL)
 		return;
@@ -497,17 +468,17 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBacke
 	GX2SetViewport(0.0f, 0.0f, (float)destination_surface->colour_buffer.surface.width, (float)destination_surface->colour_buffer.surface.height, 0.0f, 1.0f);
 	GX2SetScissor(0, 0, destination_surface->colour_buffer.surface.width, destination_surface->colour_buffer.surface.height);
 
-	// Select shader
-	WHBGfxShaderGroup *shader = colour_key ? &texture_colour_key_shader : &texture_shader;
+	// Enable (or disable) blending
+	GX2SetColorControl(GX2_LOGIC_OP_COPY, alpha_blend ? 0xFF : 0, FALSE, TRUE);
 
-	// Bind it
-	GX2SetFetchShader(&shader->fetchShader);
-	GX2SetVertexShader(shader->vertexShader);
-	GX2SetPixelShader(shader->pixelShader);
+	// Bind shader
+	GX2SetFetchShader(&texture_shader.fetchShader);
+	GX2SetVertexShader(texture_shader.vertexShader);
+	GX2SetPixelShader(texture_shader.pixelShader);
 
 	// Bind misc. data
-	GX2SetPixelSampler(&sampler, shader->pixelShader->samplerVars[0].location);
-	GX2SetPixelTexture(&source_surface->texture, shader->pixelShader->samplerVars[0].location);
+	GX2SetPixelSampler(&sampler, texture_shader.pixelShader->samplerVars[0].location);
+	GX2SetPixelTexture(&source_surface->texture, texture_shader.pixelShader->samplerVars[0].location);
 	GX2RSetAttributeBuffer(&vertex_position_buffer, 0, vertex_position_buffer.elemSize, 0);
 	GX2RSetAttributeBuffer(&texture_coordinate_buffer, 1, texture_coordinate_buffer.elemSize, 0);
 
@@ -515,7 +486,7 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBacke
 	GX2DrawEx(GX2_PRIMITIVE_MODE_QUADS, 4, 0, 1);
 }
 
-void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBackend_Rect *rect, unsigned char red, unsigned char green, unsigned char blue)
+void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBackend_Rect *rect, unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha)
 {
 	if (surface == NULL)
 		return;
@@ -553,7 +524,7 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 	GX2SetScissor(0, 0, (float)surface->colour_buffer.surface.width, (float)surface->colour_buffer.surface.height);
 
 	// Set the colour-fill... colour
-	const float uniform_colours[4] = {red / 255.0f, green / 255.0f, blue / 255.0f, 1.0f};
+	const float uniform_colours[4] = {red / 255.0f, green / 255.0f, blue / 255.0f, alpha / 255.0f};
 	GX2SetPixelUniformReg(colour_fill_shader.pixelShader->uniformVars[0].offset, 4, (uint32_t*)&uniform_colours);
 
 	// Bind the colour-fill shader
