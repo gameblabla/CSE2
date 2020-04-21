@@ -1,7 +1,5 @@
 #pragma once
 
-#include <stdbool.h>
-
 void ExtraSound_Init(unsigned int sample_rate);
 void ExtraSound_Deinit(void);
 void ExtraSound_Play(void);
