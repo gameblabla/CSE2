@@ -53,11 +53,16 @@ unsigned char* DecodeBitmapFromFile(const char *path, unsigned int *width, unsig
 	size_t file_size;
 	unsigned char *file_buffer = LoadFileToMemory(path, &file_size);
 
-	unsigned char *pixel_buffer = stbi_load_from_memory(file_buffer, file_size, (int*)width, (int*)height, NULL, 3);
+	if (file_buffer != NULL)
+	{
+		unsigned char *image_buffer = stbi_load_from_memory(file_buffer, file_size, (int*)width, (int*)height, NULL, 3);
 
-	free(file_buffer);
+		free(file_buffer);
 
-	return pixel_buffer;
+		return image_buffer;
+	}
+
+	return NULL;
 }
 
 void FreeBitmap(unsigned char *buffer)
