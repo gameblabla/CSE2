@@ -19,7 +19,7 @@
 
 #include "../../Attributes.h"
 
-#include "newshader.gsh.h"
+#include "shaders/texture.gsh.h"
 
 static unsigned char *fake_framebuffer;
 
@@ -35,10 +35,12 @@ static GX2Sampler sampler;
 
 static GX2Texture screen_texture;
 
-bool WindowBackend_Software_CreateWindow(const char *window_title, int screen_width, int screen_height, bool fullscreen)
+bool WindowBackend_Software_CreateWindow(const char *window_title, int screen_width, int screen_height, bool fullscreen, bool *vsync)
 {
 	(void)window_title;
 	(void)fullscreen;
+
+	*vsync = true;	// Not optional
 
 	fake_framebuffer_width = screen_width;
 	fake_framebuffer_height = screen_height;
@@ -49,7 +51,7 @@ bool WindowBackend_Software_CreateWindow(const char *window_title, int screen_wi
 	{
 		WHBGfxInit();
 
-		if (WHBGfxLoadGFDShaderGroup(&shader_group, 0, rnewshader))
+		if (WHBGfxLoadGFDShaderGroup(&shader_group, 0, rtexture))
 		{
 			WHBGfxInitShaderAttribute(&shader_group, "input_vertex_coordinates", 0, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
 			WHBGfxInitShaderAttribute(&shader_group, "input_texture_coordinates", 1, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
@@ -151,30 +153,13 @@ void WindowBackend_Software_DestroyWindow(void)
 
 unsigned char* WindowBackend_Software_GetFramebuffer(size_t *pitch)
 {
-	*pitch = fake_framebuffer_width * 3;
+	*pitch = screen_texture.surface.pitch * 4;
 
-	return fake_framebuffer;
+	return (unsigned char*)GX2RLockSurfaceEx(&screen_texture.surface, 0, (GX2RResourceFlags)0);
 }
 
 ATTRIBUTE_HOT void WindowBackend_Software_Display(void)
 {
-	// Convert frame from RGB24 to RGBA32, and upload it to the GPU texture
-	unsigned char *framebuffer = (unsigned char*)GX2RLockSurfaceEx(&screen_texture.surface, 0, (GX2RResourceFlags)0);
-
-	const unsigned char *in_pointer = fake_framebuffer;
-	unsigned char *out_pointer = framebuffer;
-
-	for (size_t y = 0; y < fake_framebuffer_height; ++y)
-	{
-		for (size_t x = 0; x < fake_framebuffer_width; ++x)
-		{
-			*out_pointer++ = *in_pointer++;
-			*out_pointer++ = *in_pointer++;
-			*out_pointer++ = *in_pointer++;
-			*out_pointer++ = 0;
-		}
-	}
-
 	GX2RUnlockSurfaceEx(&screen_texture.surface, 0, (GX2RResourceFlags)0);
 
 	WHBGfxBeginRender();

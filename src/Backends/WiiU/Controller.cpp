@@ -1,5 +1,7 @@
 #include "../Controller.h"
 
+#include <string.h>
+
 #include <padscore/kpad.h>
 #include <vpad/input.h>
 
@@ -12,8 +14,6 @@ bool ControllerBackend_Init(void)
 
 	// Enable Wii U Pro Controllers to be connected
 	WPADEnableURCC(1);
-
-	ticks_per_second = OSGetSystemInfo()->busClockSpeed / 4;
 
 	return true;
 }
@@ -36,8 +36,8 @@ bool ControllerBackend_GetJoystickStatus(bool **buttons, unsigned int *button_co
 	*button_count = sizeof(button_buffer) / sizeof(button_buffer[0]);
 	*axis_count = sizeof(axis_buffer) / sizeof(axis_buffer[0]);
 
-	memset(button_buffer, 0, sizeof(button_buffer);
-	memset(axis_buffer, 0, sizeof(axis_buffer);
+	memset(button_buffer, 0, sizeof(button_buffer));
+	memset(axis_buffer, 0, sizeof(axis_buffer));
 
 	//////////////////
 	// Read gamepad //
@@ -99,22 +99,22 @@ bool ControllerBackend_GetJoystickStatus(bool **buttons, unsigned int *button_co
 	button_buffer[0] |= kpad_buttons & WPAD_PRO_BUTTON_B;     // Shoot
 	button_buffer[1] |= kpad_buttons & WPAD_PRO_BUTTON_A;     // Jump
 	button_buffer[2] |= kpad_buttons & WPAD_PRO_BUTTON_Y;     // Map
-	button_buffer[3] |= kpad_buttons & WPAD_PRO_BUTTON_ZL;    // Weapon left
-	button_buffer[4] |= kpad_buttons & WPAD_PRO_BUTTON_ZR;    // Weapon right
+	button_buffer[3] |= kpad_buttons & WPAD_PRO_TRIGGER_ZL;    // Weapon left
+	button_buffer[4] |= kpad_buttons & WPAD_PRO_TRIGGER_ZR;    // Weapon right
 	button_buffer[5] |= kpad_buttons & WPAD_PRO_BUTTON_X;     // Inventory
 	button_buffer[6] |= kpad_buttons & WPAD_PRO_BUTTON_PLUS;  // Pause
 	button_buffer[7] |= kpad_buttons & WPAD_PRO_STICK_L_EMULATION_UP;    // Up
 	button_buffer[8] |= kpad_buttons & WPAD_PRO_STICK_L_EMULATION_DOWN;  // Down
 	button_buffer[9] |= kpad_buttons & WPAD_PRO_STICK_L_EMULATION_LEFT;  // Left
 	button_buffer[10] |= kpad_buttons & WPAD_PRO_STICK_L_EMULATION_RIGHT;// Right
-	button_buffer[11] |= kpad_buttons & WPAD_PRO_BUTTON_L;
-	button_buffer[12] |= kpad_buttons & WPAD_PRO_BUTTON_R;
+	button_buffer[11] |= kpad_buttons & WPAD_PRO_TRIGGER_L;
+	button_buffer[12] |= kpad_buttons & WPAD_PRO_TRIGGER_R;
 	button_buffer[13] |= kpad_buttons & WPAD_PRO_BUTTON_MINUS;
 	button_buffer[14] |= kpad_buttons & WPAD_PRO_BUTTON_HOME;
-	button_buffer[15] |= kpad_buttons & WPAD_PRO_BUTTON_SYNC;
+//	button_buffer[15] |= kpad_buttons & WPAD_PRO_BUTTON_SYNC;
 	button_buffer[17] |= kpad_buttons & WPAD_PRO_BUTTON_STICK_L;
 	button_buffer[16] |= kpad_buttons & WPAD_PRO_BUTTON_STICK_R;
-	button_buffer[18] |= kpad_buttons & WPAD_PRO_BUTTON_TV;
+//	button_buffer[18] |= kpad_buttons & WPAD_PRO_BUTTON_TV;
 	button_buffer[23] |= kpad_buttons & WPAD_PRO_BUTTON_LEFT;
 	button_buffer[24] |= kpad_buttons & WPAD_PRO_BUTTON_RIGHT;
 	button_buffer[25] |= kpad_buttons & WPAD_PRO_BUTTON_UP;

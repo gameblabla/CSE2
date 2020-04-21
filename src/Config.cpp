@@ -66,7 +66,7 @@ BOOL SaveConfigData(const CONFIG *conf)
 {
 	// Get path
 	char path[MAX_PATH];
-	sprintf(path, "%s/%s", gModulePath, config_filename);
+	sprintf(path, "%s/%s", gModulePath, gConfigName);
 
 	// Open file
 	FILE *fp = fopen(path, "wb");
@@ -107,7 +107,7 @@ void DefaultConfigData(CONFIG *conf)
 	// Clear old configuration data
 	memset(conf, 0, sizeof(CONFIG));
 
-	strcpy(conf->proof, config_magic);
+	strcpy(conf->proof, gProof);
 
 	// Fun fact: The Linux port added this line:
 	// conf->display_mode = 1;
