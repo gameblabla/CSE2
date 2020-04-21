@@ -8,7 +8,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <gx2/display.h>
 #include <gx2/draw.h>
+#include <gx2/registers.h>
 #include <gx2/sampler.h>
 #include <gx2/texture.h>
 #include <gx2r/buffer.h>
@@ -20,6 +22,14 @@
 #include "../../Attributes.h"
 
 #include "shaders/texture.gsh.h"
+
+typedef struct Viewport
+{
+	float x;
+	float y;
+	float width;
+	float height;
+} Viewport;
 
 static unsigned char *fake_framebuffer;
 
@@ -34,6 +44,29 @@ static GX2RBuffer texture_coordinate_buffer;
 static GX2Sampler sampler;
 
 static GX2Texture screen_texture;
+
+static Viewport tv_viewport;
+static Viewport drc_viewport;
+
+static void CalculateViewport(unsigned int actual_screen_width, unsigned int actual_screen_height, Viewport *viewport)
+{
+	if ((float)actual_screen_width / (float)actual_screen_height > (float)fake_framebuffer_width / (float)fake_framebuffer_height)
+	{
+		viewport->y = 0.0f;
+		viewport->height = actual_screen_height;
+
+		viewport->width = fake_framebuffer_width * ((float)actual_screen_height / (float)fake_framebuffer_height);
+		viewport->x = (actual_screen_width - viewport->width) / 2;
+	}
+	else
+	{
+		viewport->x = 0.0f;
+		viewport->width = actual_screen_width;
+
+		viewport->height = fake_framebuffer_height * ((float)actual_screen_width / (float)fake_framebuffer_width);
+		viewport->y = (actual_screen_height - viewport->height) / 2;
+	}
+}
 
 bool WindowBackend_Software_CreateWindow(const char *window_title, int screen_width, int screen_height, bool fullscreen)
 {
@@ -57,10 +90,10 @@ bool WindowBackend_Software_CreateWindow(const char *window_title, int screen_wi
 
 			// Initialise vertex position buffer
 			const float vertex_positions[4][2] = {
-				{-640.0f / 854.0f,  1.0f},
-				{ 640.0f / 854.0f,  1.0f},
-				{ 640.0f / 854.0f, -1.0f},
-				{-640.0f / 854.0f, -1.0f}
+				{-1.0f,  1.0f},
+				{ 1.0f,  1.0f},
+				{ 1.0f, -1.0f},
+				{-1.0f, -1.0f}
 			};
 
 			vertex_position_buffer.flags = (GX2RResourceFlags)(GX2R_RESOURCE_BIND_VERTEX_BUFFER |
@@ -118,6 +151,29 @@ bool WindowBackend_Software_CreateWindow(const char *window_title, int screen_wi
 				GX2RSetAttributeBuffer(&vertex_position_buffer, 0, vertex_position_buffer.elemSize, 0);
 				GX2RSetAttributeBuffer(&texture_coordinate_buffer, 1, texture_coordinate_buffer.elemSize, 0);
 
+				// Calculate centred viewports
+				switch (GX2GetSystemTVScanMode())
+				{
+					case GX2_TV_SCAN_MODE_NONE:	// lolwut
+						break;
+
+					case GX2_TV_SCAN_MODE_480I:
+					case GX2_TV_SCAN_MODE_480P:
+						CalculateViewport(854, 480, &tv_viewport);
+						break;
+
+					case GX2_TV_SCAN_MODE_720P:
+						CalculateViewport(1280, 720, &tv_viewport);
+						break;
+
+					case GX2_TV_SCAN_MODE_1080I:
+					case GX2_TV_SCAN_MODE_1080P:
+						CalculateViewport(1920, 1080, &tv_viewport);
+						break;
+				}
+
+				CalculateViewport(854, 480, &drc_viewport);
+
 				return true;
 			}
 
@@ -162,10 +218,11 @@ ATTRIBUTE_HOT void WindowBackend_Software_Display(void)
 	unsigned char *framebuffer = (unsigned char*)GX2RLockSurfaceEx(&screen_texture.surface, 0, (GX2RResourceFlags)0);
 
 	const unsigned char *in_pointer = fake_framebuffer;
-	unsigned char *out_pointer = framebuffer;
 
 	for (size_t y = 0; y < fake_framebuffer_height; ++y)
 	{
+		unsigned char *out_pointer = &framebuffer[screen_texture.surface.pitch * 4 * y];
+
 		for (size_t x = 0; x < fake_framebuffer_width; ++x)
 		{
 			*out_pointer++ = *in_pointer++;
@@ -181,6 +238,7 @@ ATTRIBUTE_HOT void WindowBackend_Software_Display(void)
 
 	// Draw to the TV
 	WHBGfxBeginRenderTV();
+	GX2SetViewport(tv_viewport.x, tv_viewport.y, tv_viewport.width, tv_viewport.height, 0.0f, 1.0f);
 	WHBGfxClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	GX2SetFetchShader(&shader_group.fetchShader);
 	GX2SetVertexShader(shader_group.vertexShader);
@@ -190,6 +248,7 @@ ATTRIBUTE_HOT void WindowBackend_Software_Display(void)
 
 	// Draw to the gamepad
 	WHBGfxBeginRenderDRC();
+	GX2SetViewport(drc_viewport.x, drc_viewport.y, drc_viewport.width, drc_viewport.height, 0.0f, 1.0f);
 	WHBGfxClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	GX2SetFetchShader(&shader_group.fetchShader);
 	GX2SetVertexShader(shader_group.vertexShader);
