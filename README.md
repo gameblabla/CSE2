@@ -74,19 +74,21 @@ Name | Function
 `-DFIX_BUGS=ON` | Fix various bugs in the game
 `-DDEBUG_SAVE=ON` | Re-enable the ability to drag-and-drop save files onto the window
 `-DDOCONFIG=OFF` | Disable compiling the DoConfig tool (it is not useful for console ports)
-`-DBACKEND_RENDERER=OpenGL3` | Use the hardware-accelerated OpenGL 3.2 renderer
-`-DBACKEND_RENDERER=OpenGLES2` | Use the hardware-accelerated OpenGL ES 2.0 renderer
-`-DBACKEND_RENDERER=SDLTexture` | Use the hardware-accelerated SDL2 Texture API renderer (default) (note: requires `-DBACKEND_PLATFORM=SDL2`)
-`-DBACKEND_RENDERER=SDLSurface` | Use the software-rendered SDL2 Surface API renderer (note: requires `-DBACKEND_PLATFORM=SDL2`)
-`-DBACKEND_RENDERER=Software` | Use the handwritten software renderer
-`-DBACKEND_AUDIO=SDL2` | Use SDL2 to deliver audio (default)
-`-DBACKEND_AUDIO=miniaudio` | Use miniaudio to deliver audio
-`-DBACKEND_AUDIO=WiiU` | Use the Wii U's APIs to deliver audio
-`-DBACKEND_AUDIO=Null` | Don't deliver audio at all
-`-DBACKEND_PLATFORM=SDL2` | Use SDL2 for windowing and OS-abstraction (default)
-`-DBACKEND_PLATFORM=GLFW3` | Use GLFW3 for windowing and OS-abstraction
-`-DBACKEND_PLATFORM=WiiU` | Use the Wii U's native APIs
-`-DBACKEND_PLATFORM=Null` | Use the dummy platform backend (doesn't do anything)
+`-DBACKEND_RENDERER=OpenGL3` | Render with OpenGL 3.2 (hardware-accelerated)
+`-DBACKEND_RENDERER=OpenGLES2` | Render with OpenGL ES 2.0 (hardware-accelerated)
+`-DBACKEND_RENDERER=SDLTexture` | (Default) Render with SDL2's Texture API (hardware-accelerated) (note: requires `-DBACKEND_PLATFORM=SDL2`)
+`-DBACKEND_RENDERER=SDLSurface` | Render with SDL2's Surface API (software-rendered) (note: requires `-DBACKEND_PLATFORM=SDL2`)
+`-DBACKEND_RENDERER=WiiU` | Render with the Wii U's GX2 API (hardware-accelerated)
+`-DBACKEND_RENDERER=Software` | Render with a handwritten software-renderer
+`-DBACKEND_AUDIO=SDL2` | (Default) Deliver audio with SDL2 (software-mixer)
+`-DBACKEND_AUDIO=miniaudio` | Deliver audio with miniaudio (software-mixer)
+`-DBACKEND_AUDIO=WiiU-Hardware` | Deliver audio with Wii U's AXVoice API (hardware-accelerated) (WARNING - currently broken: voices randomly disappear for unknown reasons)
+`-DBACKEND_AUDIO=WiiU-Software` | Deliver audio with Wii U's AXVoice API (software-mixer)
+`-DBACKEND_AUDIO=Null` | Don't deliver audio at all (WARNING - game will have no audio)
+`-DBACKEND_PLATFORM=SDL2` | (Default) Use SDL2 for miscellaneous platform-dependant operations
+`-DBACKEND_PLATFORM=GLFW3` | Use GLFW3 for miscellaneous platform-dependant operations
+`-DBACKEND_PLATFORM=WiiU` | Use the Wii U's native APIs for miscellaneous platform-dependant operations
+`-DBACKEND_PLATFORM=Null` | Don't do platform-dependant operations at all (WARNING - game will have no video or input)
 `-DLTO=ON` | Enable link-time optimisation
 `-DPKG_CONFIG_STATIC_LIBS=ON` | On platforms with pkg-config, static-link the dependencies (good for Windows builds, so you don't need to bundle DLL files)
 `-DMSVC_LINK_STATIC_RUNTIME=ON` | Link the static MSVC runtime library, to reduce the number of required DLL files (Visual Studio only)
@@ -117,7 +119,7 @@ PATH=$PATH:$DEVKITPPC/bin
 Then, generate the build files with this command:
 
 ```
-cmake -B buildwiiu -DCMAKE_BUILD_TYPE=Release -DFORCE_LOCAL_LIBS=ON -DBACKEND_PLATFORM=WiiU -DBACKEND_RENDERER=Software -DBACKEND_AUDIO=WiiU -DDOCONFIG=OFF -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/wut/share/wut.toolchain.cmake
+cmake -B buildwiiu -DCMAKE_BUILD_TYPE=Release -DFORCE_LOCAL_LIBS=ON -DBACKEND_PLATFORM=WiiU -DBACKEND_RENDERER=WiiU -DBACKEND_AUDIO=WiiU-Software -DDOCONFIG=OFF -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/wut/share/wut.toolchain.cmake
 ```
 
 Finally, build the game with this command:
