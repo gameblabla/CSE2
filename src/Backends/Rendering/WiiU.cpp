@@ -129,14 +129,7 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 									   GX2_BLEND_MODE_ONE,
 									   GX2_BLEND_COMBINE_MODE_ADD);
 	*/
-					// Do some binding
-/*
-					WHBGfxBeginRender();
 
-					// Draw to the gamepad
-					WHBGfxBeginRenderDRC();
-					WHBGfxClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-*/
 					return framebuffer_surface;
 				}
 
@@ -178,15 +171,15 @@ void RenderBackend_DrawScreen(void)
 	// Make sure the buffers aren't currently being used before we modify them
 	GX2DrawDone();
 
-	// Set buffer to full-screen
+	// Set buffer to (4:3) full-screen
 	float *position_pointer = (float*)GX2RLockBufferEx(&vertex_position_buffer, (GX2RResourceFlags)0);
-	position_pointer[0] = -1.0f;
+	position_pointer[0] = -640.0f / 854.0f;
 	position_pointer[1] = -1.0f;
-	position_pointer[2] = 1.0f;
+	position_pointer[2] = 640.0f / 854.0f;
 	position_pointer[3] = -1.0f;
-	position_pointer[4] = 1.0f;
+	position_pointer[4] = 640.0f / 854.0f;
 	position_pointer[5] = 1.0f;
-	position_pointer[6] = -1.0f;
+	position_pointer[6] = -640.0f / 854.0f;
 	position_pointer[7] = 1.0f;
 	GX2RUnlockBufferEx(&vertex_position_buffer, (GX2RResourceFlags)0);
 
@@ -202,45 +195,57 @@ void RenderBackend_DrawScreen(void)
 	texture_coordinate_pointer[7] = 0.0f;
 	GX2RUnlockBufferEx(&texture_coordinate_buffer, (GX2RResourceFlags)0);
 
-
+	// Start drawing
 	WHBGfxBeginRender();
 
-	// Draw to the TV
+	////////////////////
+	// Draw to the TV //
+	////////////////////
+
 	WHBGfxBeginRenderTV();
 	WHBGfxClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 	// This might be needed? Not sure.
 //	GX2RInvalidateSurface(&framebuffer_surface->texture.surface, 0, (GX2RResourceFlags)0);
 
+	// Select texture shader
 	GX2SetFetchShader(&texture_shader.fetchShader);
 	GX2SetVertexShader(texture_shader.vertexShader);
 	GX2SetPixelShader(texture_shader.pixelShader);
 
+	// Bind a few things
 	GX2SetPixelSampler(&sampler, texture_shader.pixelShader->samplerVars[0].location);
 	GX2SetPixelTexture(&framebuffer_surface->texture, texture_shader.pixelShader->samplerVars[0].location);
 	GX2RSetAttributeBuffer(&vertex_position_buffer, 0, vertex_position_buffer.elemSize, 0);
 	GX2RSetAttributeBuffer(&texture_coordinate_buffer, 1, texture_coordinate_buffer.elemSize, 0);
 
+	// Draw
 	GX2DrawEx(GX2_PRIMITIVE_MODE_QUADS, 4, 0, 1);
 
 	WHBGfxFinishRenderTV();
 
-	// Draw to the gamepad
+	/////////////////////////
+	// Draw to the gamepad //
+	/////////////////////////
+
 	WHBGfxBeginRenderDRC();
 	WHBGfxClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 	// This might be needed? Not sure.
 //	GX2RInvalidateSurface(&framebuffer_surface->texture.surface, 0, (GX2RResourceFlags)0);
 
+	// Select texture shader
 	GX2SetFetchShader(&texture_shader.fetchShader);
 	GX2SetVertexShader(texture_shader.vertexShader);
 	GX2SetPixelShader(texture_shader.pixelShader);
 
+	// Bind a few things
 	GX2SetPixelSampler(&sampler, texture_shader.pixelShader->samplerVars[0].location);
 	GX2SetPixelTexture(&framebuffer_surface->texture, texture_shader.pixelShader->samplerVars[0].location);
 	GX2RSetAttributeBuffer(&vertex_position_buffer, 0, vertex_position_buffer.elemSize, 0);
 	GX2RSetAttributeBuffer(&texture_coordinate_buffer, 1, texture_coordinate_buffer.elemSize, 0);
 
+	// Draw
 	GX2DrawEx(GX2_PRIMITIVE_MODE_QUADS, 4, 0, 1);
 
 	WHBGfxFinishRenderDRC();
