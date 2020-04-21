@@ -255,7 +255,7 @@ BOOL MakeSurface_Resource(const char *name, SurfaceID surf_no)
 	if (image_buffer == NULL)
 		return FALSE;
 
-	surf[surf_no] = RenderBackend_CreateSurface(width * magnification, height * magnification);
+	surf[surf_no] = RenderBackend_CreateSurface(width * magnification / SPRITE_SCALE, height * magnification / SPRITE_SCALE);
 
 	if (surf[surf_no] == NULL)
 	{
@@ -322,7 +322,7 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 		return FALSE;
 	}
 
-	surf[surf_no] = RenderBackend_CreateSurface(width * magnification, height * magnification);
+	surf[surf_no] = RenderBackend_CreateSurface(width * magnification / SPRITE_SCALE, height * magnification / SPRITE_SCALE);
 
 	if (surf[surf_no] == NULL)
 	{
