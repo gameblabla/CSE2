@@ -271,8 +271,8 @@ BOOL MakeSurface_Resource(const char *name, SurfaceID surf_no)
 	}
 
 	surface_metadata[surf_no].type = SURFACE_SOURCE_RESOURCE;
-	surface_metadata[surf_no].width = width;
-	surface_metadata[surf_no].height = height;
+	surface_metadata[surf_no].width = width / SPRITE_SCALE;
+	surface_metadata[surf_no].height = height / SPRITE_SCALE;
 	surface_metadata[surf_no].bSystem = FALSE;
 	strcpy(surface_metadata[surf_no].name, name);
 
@@ -338,8 +338,8 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 	}
 
 	surface_metadata[surf_no].type = SURFACE_SOURCE_FILE;
-	surface_metadata[surf_no].width = width;
-	surface_metadata[surf_no].height = height;
+	surface_metadata[surf_no].width = width / SPRITE_SCALE;
+	surface_metadata[surf_no].height = height / SPRITE_SCALE;
 	surface_metadata[surf_no].bSystem = FALSE;
 	strcpy(surface_metadata[surf_no].name, name);
 
