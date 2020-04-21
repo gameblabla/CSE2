@@ -393,7 +393,7 @@ RenderBackend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned 
 		}
 		else
 		{
-			Backend_PrintError("GX2RCreateSurface failedin RenderBackend_CreateSurface");
+			Backend_PrintError("GX2RCreateSurface failed in RenderBackend_CreateSurface");
 		}
 
 		free(surface);
