@@ -20,6 +20,7 @@
 #include "../Misc.h"
 
 #include "../WiiU/colour_fill.gsh.h"
+#include "../WiiU/glyph.gsh.h"
 #include "../WiiU/texture.gsh.h"
 #include "../WiiU/texture_colour_key.gsh.h"
 
@@ -34,11 +35,15 @@ typedef struct RenderBackend_Surface
 
 typedef struct RenderBackend_Glyph
 {
+	GX2Texture texture;
+	unsigned int width;
+	unsigned int height;
 } RenderBackend_Glyph;
 
 static WHBGfxShaderGroup texture_shader;
 static WHBGfxShaderGroup texture_colour_key_shader;
 static WHBGfxShaderGroup colour_fill_shader;
+static WHBGfxShaderGroup glyph_shader;
 
 static GX2RBuffer vertex_position_buffer;
 static GX2RBuffer texture_coordinate_buffer;
@@ -48,6 +53,9 @@ static GX2Sampler sampler;
 static RenderBackend_Surface *framebuffer_surface;
 
 static GX2ContextState *gx2_context;
+
+static RenderBackend_Surface *glyph_destination_surface;
+static const unsigned char *glyph_colour_channels;
 
 RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, bool fullscreen)
 {
@@ -78,63 +86,73 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 				WHBGfxInitShaderAttribute(&colour_fill_shader, "input_vertex_coordinates", 0, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
 				WHBGfxInitFetchShader(&colour_fill_shader);
 
-				// Initialise vertex position buffer
-				vertex_position_buffer.flags = (GX2RResourceFlags)(GX2R_RESOURCE_BIND_VERTEX_BUFFER |
-																   GX2R_RESOURCE_USAGE_CPU_READ |
-																   GX2R_RESOURCE_USAGE_CPU_WRITE |
-																   GX2R_RESOURCE_USAGE_GPU_READ);
-				vertex_position_buffer.elemSize = 2 * sizeof(float);
-				vertex_position_buffer.elemCount = 4;
-				GX2RCreateBuffer(&vertex_position_buffer);
-
-				// Initialise texture coordinate buffer
-				texture_coordinate_buffer.flags = (GX2RResourceFlags)(GX2R_RESOURCE_BIND_VERTEX_BUFFER |
-																	  GX2R_RESOURCE_USAGE_CPU_READ |
-																	  GX2R_RESOURCE_USAGE_CPU_WRITE |
-																	  GX2R_RESOURCE_USAGE_GPU_READ);
-				texture_coordinate_buffer.elemSize = 2 * sizeof(float);
-				texture_coordinate_buffer.elemCount = 4;
-				GX2RCreateBuffer(&texture_coordinate_buffer);
-
-				// Initialise sampler
-				GX2InitSampler(&sampler, GX2_TEX_CLAMP_MODE_CLAMP, GX2_TEX_XY_FILTER_MODE_POINT);
-
-				// Create framebuffer surface
-				framebuffer_surface = RenderBackend_CreateSurface(screen_width, screen_height);
-
-				if (framebuffer_surface != NULL)
+				// Glyph shader
+				if (WHBGfxLoadGFDShaderGroup(&glyph_shader, 0, rglyph))
 				{
-					// Create a 'context' (this voodoo magic can be used to undo `GX2SetColorBuffer`,
-					// allowing us to draw to the screen once again).
-					gx2_context = (GX2ContextState*)aligned_alloc(GX2_CONTEXT_STATE_ALIGNMENT, sizeof(GX2ContextState));
-					memset(gx2_context, 0, sizeof(GX2ContextState));
-					GX2SetupContextStateEx(gx2_context, TRUE);
-					GX2SetContextState(gx2_context);
+					WHBGfxInitShaderAttribute(&glyph_shader, "input_vertex_coordinates", 0, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
+					WHBGfxInitShaderAttribute(&glyph_shader, "input_texture_coordinates", 1, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
+					WHBGfxInitFetchShader(&glyph_shader);
 
-					// Disable depth-test (enabled by default for some reason)
-					GX2SetDepthOnlyControl(FALSE, FALSE, GX2_COMPARE_FUNC_ALWAYS);
+					// Initialise vertex position buffer
+					vertex_position_buffer.flags = (GX2RResourceFlags)(GX2R_RESOURCE_BIND_VERTEX_BUFFER |
+																	   GX2R_RESOURCE_USAGE_CPU_READ |
+																	   GX2R_RESOURCE_USAGE_CPU_WRITE |
+																	   GX2R_RESOURCE_USAGE_GPU_READ);
+					vertex_position_buffer.elemSize = 2 * sizeof(float);
+					vertex_position_buffer.elemCount = 4;
+					GX2RCreateBuffer(&vertex_position_buffer);
+
+					// Initialise texture coordinate buffer
+					texture_coordinate_buffer.flags = (GX2RResourceFlags)(GX2R_RESOURCE_BIND_VERTEX_BUFFER |
+																		  GX2R_RESOURCE_USAGE_CPU_READ |
+																		  GX2R_RESOURCE_USAGE_CPU_WRITE |
+																		  GX2R_RESOURCE_USAGE_GPU_READ);
+					texture_coordinate_buffer.elemSize = 2 * sizeof(float);
+					texture_coordinate_buffer.elemCount = 4;
+					GX2RCreateBuffer(&texture_coordinate_buffer);
+
+					// Initialise sampler
+					GX2InitSampler(&sampler, GX2_TEX_CLAMP_MODE_CLAMP, GX2_TEX_XY_FILTER_MODE_POINT);
+
+					// Create framebuffer surface
+					framebuffer_surface = RenderBackend_CreateSurface(screen_width, screen_height);
+
+					if (framebuffer_surface != NULL)
+					{
+						// Create a 'context' (this voodoo magic can be used to undo `GX2SetColorBuffer`,
+						// allowing us to draw to the screen once again).
+						gx2_context = (GX2ContextState*)aligned_alloc(GX2_CONTEXT_STATE_ALIGNMENT, sizeof(GX2ContextState));
+						memset(gx2_context, 0, sizeof(GX2ContextState));
+						GX2SetupContextStateEx(gx2_context, TRUE);
+						GX2SetContextState(gx2_context);
+
+						// Disable depth-test (enabled by default for some reason)
+						GX2SetDepthOnlyControl(FALSE, FALSE, GX2_COMPARE_FUNC_ALWAYS);
 
 
 
-					// Enable blending
-			//		GX2SetColorControl(GX2_LOGIC_OP_COPY, 0xFF, FALSE, TRUE);
+						// Enable blending
+				//		GX2SetColorControl(GX2_LOGIC_OP_COPY, 0xFF, FALSE, TRUE);
 
-					// Set custom blending mode for pre-multiplied alpha
-	/*				GX2SetBlendControl(GX2_RENDER_TARGET_0,
-									   GX2_BLEND_MODE_ZERO,
-									   GX2_BLEND_MODE_ONE,
-									   GX2_BLEND_COMBINE_MODE_ADD,
-									   TRUE,
-									   GX2_BLEND_MODE_ZERO,
-									   GX2_BLEND_MODE_ONE,
-									   GX2_BLEND_COMBINE_MODE_ADD);
-	*/
+						// Set custom blending mode for pre-multiplied alpha
+		/*				GX2SetBlendControl(GX2_RENDER_TARGET_0,
+										   GX2_BLEND_MODE_ZERO,
+										   GX2_BLEND_MODE_ONE,
+										   GX2_BLEND_COMBINE_MODE_ADD,
+										   TRUE,
+										   GX2_BLEND_MODE_ZERO,
+										   GX2_BLEND_MODE_ONE,
+										   GX2_BLEND_COMBINE_MODE_ADD);
+		*/
 
-					return framebuffer_surface;
+						return framebuffer_surface;
+					}
+
+					GX2RDestroyBufferEx(&texture_coordinate_buffer, (GX2RResourceFlags)0);
+					GX2RDestroyBufferEx(&vertex_position_buffer, (GX2RResourceFlags)0);
+
+					WHBGfxFreeShaderGroup(&glyph_shader);
 				}
-
-				GX2RDestroyBufferEx(&texture_coordinate_buffer, (GX2RResourceFlags)0);
-				GX2RDestroyBufferEx(&vertex_position_buffer, (GX2RResourceFlags)0);
 
 				WHBGfxFreeShaderGroup(&colour_fill_shader);
 			}
@@ -280,7 +298,8 @@ RenderBackend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned 
 		GX2CalcSurfaceSizeAndAlignment(&surface->texture.surface);
 		GX2InitTextureRegs(&surface->texture);
 
-		if (GX2RCreateSurface(&surface->texture.surface, (GX2RResourceFlags)(GX2R_RESOURCE_BIND_TEXTURE | GX2R_RESOURCE_BIND_COLOR_BUFFER | GX2R_RESOURCE_USAGE_CPU_WRITE | GX2R_RESOURCE_USAGE_CPU_READ |
+		if (GX2RCreateSurface(&surface->texture.surface, (GX2RResourceFlags)(GX2R_RESOURCE_BIND_TEXTURE | GX2R_RESOURCE_BIND_COLOR_BUFFER |
+		                                                                     GX2R_RESOURCE_USAGE_CPU_WRITE | GX2R_RESOURCE_USAGE_CPU_READ |
 		                                                                     GX2R_RESOURCE_USAGE_GPU_WRITE | GX2R_RESOURCE_USAGE_GPU_READ)))
 		{
 			// Initialise colour buffer (needed so the texture can be drawn to)
@@ -327,8 +346,8 @@ unsigned char* RenderBackend_LockSurface(RenderBackend_Surface *surface, unsigne
 {
 	if (surface != NULL)
 	{
-		// Create an RGB24 buffer (this backend uses RGBA32 internally,
-		// so we can't just lock the texture
+		// Create a temporary RGB24 buffer (this backend uses RGBA32
+		// internally, so we can't just use a locked texture)
 		surface->lock_buffer = (unsigned char*)malloc(width * height * 3);
 		*pitch = width * 3;
 
@@ -496,30 +515,163 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 
 RenderBackend_Glyph* RenderBackend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch)
 {
+	RenderBackend_Glyph *glyph = (RenderBackend_Glyph*)malloc(sizeof(RenderBackend_Glyph));
+
+	if (glyph != NULL)
+	{
+		glyph->width = width;
+		glyph->height = height;
+
+		// Initialise texture
+		memset(&glyph->texture, 0, sizeof(glyph->texture));
+		glyph->texture.surface.width = width;
+		glyph->texture.surface.height = height;
+		glyph->texture.surface.format = GX2_SURFACE_FORMAT_UNORM_R8_G8_B8_A8;
+		glyph->texture.surface.depth = 1;
+		glyph->texture.surface.dim = GX2_SURFACE_DIM_TEXTURE_2D;
+		glyph->texture.surface.tileMode = GX2_TILE_MODE_LINEAR_ALIGNED;
+		glyph->texture.surface.mipLevels = 1;
+		glyph->texture.viewNumMips = 1;
+		glyph->texture.viewNumSlices = 1;
+		glyph->texture.compMap = 0x00010203;
+		GX2CalcSurfaceSizeAndAlignment(&glyph->texture.surface);
+		GX2InitTextureRegs(&glyph->texture);
+
+		if (GX2RCreateSurface(&glyph->texture.surface, (GX2RResourceFlags)(GX2R_RESOURCE_BIND_TEXTURE | GX2R_RESOURCE_BIND_COLOR_BUFFER |
+		                                                                   GX2R_RESOURCE_USAGE_CPU_WRITE | GX2R_RESOURCE_USAGE_CPU_READ |
+		                                                                   GX2R_RESOURCE_USAGE_GPU_WRITE | GX2R_RESOURCE_USAGE_GPU_READ)))
+		{
+			// Convert from RGB24 to RGBA32, and upload it to the GPU texture
+			unsigned char *framebuffer = (unsigned char*)GX2RLockSurfaceEx(&glyph->texture.surface, 0, (GX2RResourceFlags)0);
+
+			const unsigned char *in_pointer = pixels;
+
+			for (size_t y = 0; y < height; ++y)
+			{
+				unsigned char *out_pointer = &framebuffer[glyph->texture.surface.pitch * 4 * y];
+
+				for (size_t x = 0; x < width; ++x)
+				{
+					*out_pointer++ = *in_pointer++;
+					*out_pointer++ = 0;
+					*out_pointer++ = 0;
+					*out_pointer++ = 0xFF;
+				}
+			}
+
+			GX2RUnlockSurfaceEx(&glyph->texture.surface, 0, (GX2RResourceFlags)0);
+
+			return glyph;
+		}
+
+		free(glyph);
+	}
+
+
 	return NULL;
 }
 
 void RenderBackend_UnloadGlyph(RenderBackend_Glyph *glyph)
 {
-	if (glyph == NULL)
-		return;
+	if (glyph != NULL)
+	{
+		GX2RDestroySurfaceEx(&glyph->texture.surface, (GX2RResourceFlags)0);
+		free(glyph);
+	}
 }
 
 void RenderBackend_PrepareToDrawGlyphs(RenderBackend_Surface *destination_surface, const unsigned char *colour_channels)
 {
 	if (destination_surface == NULL)
 		return;
+
+	glyph_destination_surface = destination_surface;
+	glyph_colour_channels = colour_channels;
+
+	// Enable blending
+	GX2SetColorControl(GX2_LOGIC_OP_COPY, 0xFF, FALSE, TRUE);
 }
 
 void RenderBackend_DrawGlyph(RenderBackend_Glyph *glyph, long x, long y)
 {
 	if (glyph == NULL)
 		return;
+
+	// Make sure the buffers aren't currently being used before we modify them
+	GX2DrawDone();
+
+	// Set vertex position buffer
+	const float destination_left = x;
+	const float destination_top = y;
+	const float destination_right = x + glyph->width;
+	const float destination_bottom = y + glyph->height;
+
+	float *position_pointer = (float*)GX2RLockBufferEx(&vertex_position_buffer, (GX2RResourceFlags)0);
+	position_pointer[0] = destination_left;
+	position_pointer[1] = destination_top;
+	position_pointer[2] = destination_right;
+	position_pointer[3] = destination_top;
+	position_pointer[4] = destination_right;
+	position_pointer[5] = destination_bottom;
+	position_pointer[6] = destination_left;
+	position_pointer[7] = destination_bottom;
+
+	for (unsigned int i = 0; i < 8; i += 2)
+	{
+		position_pointer[i + 0] /= glyph_destination_surface->width;
+		position_pointer[i + 0] *= 2.0f;
+		position_pointer[i + 0] -= 1.0f;
+
+		position_pointer[i + 1] /= glyph_destination_surface->height;
+		position_pointer[i + 1] *= -2.0f;
+		position_pointer[i + 1] += 1.0f;
+	}
+
+	GX2RUnlockBufferEx(&vertex_position_buffer, (GX2RResourceFlags)0);
+
+	// Set texture coordinate buffer
+	float *texture_coordinate_pointer = (float*)GX2RLockBufferEx(&texture_coordinate_buffer, (GX2RResourceFlags)0);
+	texture_coordinate_pointer[0] = 0.0f;
+	texture_coordinate_pointer[1] = 0.0f;
+	texture_coordinate_pointer[2] = 1.0f;
+	texture_coordinate_pointer[3] = 0.0f;
+	texture_coordinate_pointer[4] = 1.0f;
+	texture_coordinate_pointer[5] = 1.0f;
+	texture_coordinate_pointer[6] = 0.0f;
+	texture_coordinate_pointer[7] = 1.0f;
+	GX2RUnlockBufferEx(&texture_coordinate_buffer, (GX2RResourceFlags)0);
+
+	// Draw to the selected texture, instead of the screen
+	GX2SetColorBuffer(&glyph_destination_surface->colour_buffer, GX2_RENDER_TARGET_0);
+	GX2SetViewport(0.0f, 0.0f, (float)glyph_destination_surface->colour_buffer.surface.width, (float)glyph_destination_surface->colour_buffer.surface.height, 0.0f, 1.0f);
+	GX2SetScissor(0, 0, glyph_destination_surface->colour_buffer.surface.width, glyph_destination_surface->colour_buffer.surface.height);
+
+	// Select shader
+	WHBGfxShaderGroup *shader = &glyph_shader;
+
+	// Bind it
+	GX2SetFetchShader(&shader->fetchShader);
+	GX2SetVertexShader(shader->vertexShader);
+	GX2SetPixelShader(shader->pixelShader);
+
+	// Bind misc. data
+	GX2SetPixelSampler(&sampler, shader->pixelShader->samplerVars[0].location);
+	GX2SetPixelTexture(&glyph->texture, shader->pixelShader->samplerVars[0].location);
+	GX2RSetAttributeBuffer(&vertex_position_buffer, 0, vertex_position_buffer.elemSize, 0);
+	GX2RSetAttributeBuffer(&texture_coordinate_buffer, 1, texture_coordinate_buffer.elemSize, 0);
+
+	// Set the colour
+	const float uniform_colours[4] = {glyph_colour_channels[0] / 255.0f, glyph_colour_channels[1] / 255.0f, glyph_colour_channels[2] / 255.0f, 1.0f};
+	GX2SetPixelUniformReg(glyph_shader.pixelShader->uniformVars[0].offset, 4, (uint32_t*)&uniform_colours);
+
+	// Draw
+	GX2DrawEx(GX2_PRIMITIVE_MODE_QUADS, 4, 0, 1);
 }
 
 void RenderBackend_FlushGlyphs(void)
 {
-	
+	// Disable blending
+	GX2SetColorControl(GX2_LOGIC_OP_COPY, 0, FALSE, TRUE);
 }
 
 void RenderBackend_HandleRenderTargetLoss(void)
