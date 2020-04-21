@@ -547,18 +547,24 @@ char pass2[7] = "Org-02";	// Pipi
 
 BOOL OrgData::InitMusicData(const char *path)
 {
+	#define READ_LE16(p) ((p[1] << 8) | p[0]); p += 2
+	#define READ_LE32(p) ((p[3] << 24) | (p[2] << 16) | (p[1] << 8) | p[0]); p += 4
+
 	NOTELIST *np;
 	int i,j;
 	char pass_check[6];
 	char ver = 0;
 	unsigned short note_num[MAXTRACK];
 
-	FILE *fp = fopen(path, "rb");
+	size_t file_size;
+	unsigned char *file_buffer = LoadFileToMemory(path, &file_size);
+	const unsigned char *p = file_buffer;
 
-	if (fp == NULL)
+	if (p == NULL)
 		return FALSE;
 
-	fread(&pass_check[0], 1, 6, fp);
+	memcpy(&pass_check[0], p, 6);
+	p += 6;
 
 	if(memcmp(pass_check, pass, 6) == 0)
 		ver = 1;
@@ -567,31 +573,31 @@ BOOL OrgData::InitMusicData(const char *path)
 
 	if(ver == 0)
 	{
-		fclose(fp);
+		free(file_buffer);
 		return FALSE;
 	}
 
 	// 曲の情報を設定 (Set song information)
-	info.wait = File_ReadLE16(fp);
-	info.line = fgetc(fp);
-	info.dot = fgetc(fp);
-	info.repeat_x = File_ReadLE32(fp);
-	info.end_x = File_ReadLE32(fp);
+	info.wait = READ_LE16(p);
+	info.line = *p++;
+	info.dot = *p++;
+	info.repeat_x = READ_LE32(p);
+	info.end_x = READ_LE32(p);
 
 	for (i = 0; i < MAXTRACK; i++)
 	{
-		info.tdata[i].freq = File_ReadLE16(fp);
+		info.tdata[i].freq = READ_LE16(p);
 
-		info.tdata[i].wave_no = fgetc(fp);
-
-		const unsigned char pipi = fgetc(fp);
+		info.tdata[i].wave_no = *p++;
 
 		if (ver == 1)
 			info.tdata[i].pipi = 0;
 		else
-			info.tdata[i].pipi = pipi;
+			info.tdata[i].pipi = *p;
 
-		note_num[i] = File_ReadLE16(fp);
+		++p;
+
+		note_num[i] = READ_LE16(p);
 	}
 
 	// 音符のロード (Loading notes)
@@ -626,40 +632,40 @@ BOOL OrgData::InitMusicData(const char *path)
 		np = info.tdata[j].note_p;	// Ｘ座標 (X coordinate)
 		for (i = 0; i < note_num[j]; i++)
 		{
-			np->x = File_ReadLE32(fp);
+			np->x = READ_LE32(p);
 			np++;
 		}
 
 		np = info.tdata[j].note_p;	// Ｙ座標 (Y coordinate)
 		for (i = 0; i < note_num[j]; i++)
 		{
-			np->y = fgetc(fp);
+			np->y = *p++;
 			np++;
 		}
 
 		np = info.tdata[j].note_p;	// 長さ (Length)
 		for (i = 0; i < note_num[j]; i++)
 		{
-			np->length = fgetc(fp);
+			np->length = *p++;
 			np++;
 		}
 
 		np = info.tdata[j].note_p;	// ボリューム (Volume)
 		for (i = 0; i < note_num[j]; i++)
 		{
-			np->volume = fgetc(fp);
+			np->volume = *p++;
 			np++;
 		}
 
 		np = info.tdata[j].note_p;	// パン (Pan)
 		for (i = 0; i < note_num[j]; i++)
 		{
-			np->pan = fgetc(fp);
+			np->pan = *p++;
 			np++;
 		}
 	}
 
-	fclose(fp);
+	free(file_buffer);
 
 	// データを有効に (Enable data)
 	for (j = 0; j < MAXMELODY; j++)
