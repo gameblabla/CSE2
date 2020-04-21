@@ -519,6 +519,7 @@ static void GlyphBatch_DestroyTexture(SPRITEBATCH_U64 texture_id, void *udata)
 	GLuint gl_texture_id = (GLuint)texture_id;
 
 	// Flush the vertex buffer if we're about to destroy its texture
+	// TODO - This leaves `last_source_texture`/`last_destination_texture` dangling
 	if (gl_texture_id == last_source_texture || gl_texture_id == last_destination_texture)
 		FlushVertexBuffer();
 
@@ -847,6 +848,7 @@ void RenderBackend_FreeSurface(RenderBackend_Surface *surface)
 		return;
 
 	// Flush the vertex buffer if we're about to destroy its texture
+	// TODO - This leaves `last_source_texture`/`last_destination_texture` dangling
 	if (surface->texture_id == last_source_texture || surface->texture_id == last_destination_texture)
 		FlushVertexBuffer();
 
