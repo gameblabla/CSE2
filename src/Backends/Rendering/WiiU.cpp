@@ -634,7 +634,7 @@ RenderBackend_Glyph* RenderBackend_LoadGlyph(const unsigned char *pixels, unsign
 			{
 				memcpy(out_pointer, in_pointer, width);
 
-				in_pointer += width;
+				in_pointer += pitch;
 				out_pointer += glyph->texture.surface.pitch;
 			}
 
