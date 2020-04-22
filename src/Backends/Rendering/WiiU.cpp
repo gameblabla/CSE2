@@ -432,6 +432,9 @@ void RenderBackend_RestoreSurface(RenderBackend_Surface *surface)
 
 unsigned char* RenderBackend_LockSurface(RenderBackend_Surface *surface, unsigned int *pitch, unsigned int width, unsigned int height)
 {
+	(void)width;
+	(void)height;
+
 	if (surface != NULL)
 	{
 		surface->lock_buffer = (unsigned char*)GX2RLockSurfaceEx(&surface->texture.surface, 0, (GX2RResourceFlags)0);
