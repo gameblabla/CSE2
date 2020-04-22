@@ -447,13 +447,13 @@ void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, unsigned int wi
 		if (surface->lock_buffer != NULL)
 		{
 			// Convert from RGB24 to RGBA32, and upload it to the GPU texture
-			unsigned char *framebuffer = (unsigned char*)GX2RLockSurfaceEx(&surface->texture.surface, 0, (GX2RResourceFlags)0);
+			unsigned char *buffer = (unsigned char*)GX2RLockSurfaceEx(&surface->texture.surface, 0, (GX2RResourceFlags)0);
 
 			const unsigned char *in_pointer = surface->lock_buffer;
 
 			for (size_t y = 0; y < height; ++y)
 			{
-				unsigned char *out_pointer = &framebuffer[surface->texture.surface.pitch * 4 * y];
+				unsigned char *out_pointer = &buffer[surface->texture.surface.pitch * 4 * y];
 
 				for (size_t x = 0; x < width; ++x)
 				{
@@ -732,17 +732,14 @@ void RenderBackend_DrawGlyph(RenderBackend_Glyph *glyph, long x, long y)
 	GX2SetViewport(0.0f, 0.0f, (float)glyph_destination_surface->colour_buffer.surface.width, (float)glyph_destination_surface->colour_buffer.surface.height, 0.0f, 1.0f);
 	GX2SetScissor(0, 0, glyph_destination_surface->colour_buffer.surface.width, glyph_destination_surface->colour_buffer.surface.height);
 
-	// Select shader
-	WHBGfxShaderGroup *shader = &glyph_shader;
-
-	// Bind it
-	GX2SetFetchShader(&shader->fetchShader);
-	GX2SetVertexShader(shader->vertexShader);
-	GX2SetPixelShader(shader->pixelShader);
+	// Select glyph shader
+	GX2SetFetchShader(&glyph_shader.fetchShader);
+	GX2SetVertexShader(glyph_shader.vertexShader);
+	GX2SetPixelShader(glyph_shader.pixelShader);
 
 	// Bind misc. data
-	GX2SetPixelSampler(&sampler, shader->pixelShader->samplerVars[0].location);
-	GX2SetPixelTexture(&glyph->texture, shader->pixelShader->samplerVars[0].location);
+	GX2SetPixelSampler(&sampler, glyph_shader.pixelShader->samplerVars[0].location);
+	GX2SetPixelTexture(&glyph->texture, glyph_shader.pixelShader->samplerVars[0].location);
 	GX2RSetAttributeBuffer(&vertex_position_buffer, 0, vertex_position_buffer.elemSize, 0);
 	GX2RSetAttributeBuffer(&texture_coordinate_buffer, 1, texture_coordinate_buffer.elemSize, 0);
 

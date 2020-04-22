@@ -1,6 +1,7 @@
 #include "Bitmap.h"
 
 #include <stddef.h>
+#include <stdlib.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_STATIC
