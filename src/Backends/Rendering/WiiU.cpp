@@ -620,7 +620,7 @@ RenderBackend_Glyph* RenderBackend_LoadGlyph(const unsigned char *pixels, unsign
 		GX2CalcSurfaceSizeAndAlignment(&glyph->texture.surface);
 		GX2InitTextureRegs(&glyph->texture);
 
-		if (GX2RCreateSurface(&glyph->texture.surface, (GX2RResourceFlags)(GX2R_RESOURCE_BIND_TEXTURE | GX2R_RESOURCE_BIND_COLOR_BUFFER |
+		if (GX2RCreateSurface(&glyph->texture.surface, (GX2RResourceFlags)(GX2R_RESOURCE_BIND_TEXTURE |
 		                                                                   GX2R_RESOURCE_USAGE_CPU_WRITE | GX2R_RESOURCE_USAGE_CPU_READ |
 		                                                                   GX2R_RESOURCE_USAGE_GPU_WRITE | GX2R_RESOURCE_USAGE_GPU_READ)))
 		{
