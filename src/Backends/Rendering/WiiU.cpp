@@ -94,147 +94,154 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 	(void)window_title;
 	(void)fullscreen;
 
-	WHBGfxInit();
-
-	// Initialise the shaders
-
-	// Texture shader
-	if (WHBGfxLoadGFDShaderGroup(&texture_shader, 0, rtexture))
+	if (WHBGfxInit())
 	{
-		WHBGfxInitShaderAttribute(&texture_shader, "input_vertex_coordinates", 0, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
-		WHBGfxInitShaderAttribute(&texture_shader, "input_texture_coordinates", 1, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
-		WHBGfxInitFetchShader(&texture_shader);
+		// Initialise the shaders
 
-		// Texture shader (with colour-key)
-		if (WHBGfxLoadGFDShaderGroup(&texture_colour_key_shader, 0, rtexture_colour_key))
+		// Texture shader
+		if (WHBGfxLoadGFDShaderGroup(&texture_shader, 0, rtexture))
 		{
-			WHBGfxInitShaderAttribute(&texture_colour_key_shader, "input_vertex_coordinates", 0, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
-			WHBGfxInitShaderAttribute(&texture_colour_key_shader, "input_texture_coordinates", 1, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
-			WHBGfxInitFetchShader(&texture_colour_key_shader);
+			WHBGfxInitShaderAttribute(&texture_shader, "input_vertex_coordinates", 0, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
+			WHBGfxInitShaderAttribute(&texture_shader, "input_texture_coordinates", 1, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
+			WHBGfxInitFetchShader(&texture_shader);
 
-			// Colour-fill shader
-			if (WHBGfxLoadGFDShaderGroup(&colour_fill_shader, 0, rcolour_fill))
+			// Texture shader (with colour-key)
+			if (WHBGfxLoadGFDShaderGroup(&texture_colour_key_shader, 0, rtexture_colour_key))
 			{
-				WHBGfxInitShaderAttribute(&colour_fill_shader, "input_vertex_coordinates", 0, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
-				WHBGfxInitFetchShader(&colour_fill_shader);
+				WHBGfxInitShaderAttribute(&texture_colour_key_shader, "input_vertex_coordinates", 0, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
+				WHBGfxInitShaderAttribute(&texture_colour_key_shader, "input_texture_coordinates", 1, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
+				WHBGfxInitFetchShader(&texture_colour_key_shader);
 
-				// Glyph shader
-				if (WHBGfxLoadGFDShaderGroup(&glyph_shader, 0, rglyph))
+				// Colour-fill shader
+				if (WHBGfxLoadGFDShaderGroup(&colour_fill_shader, 0, rcolour_fill))
 				{
-					WHBGfxInitShaderAttribute(&glyph_shader, "input_vertex_coordinates", 0, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
-					WHBGfxInitShaderAttribute(&glyph_shader, "input_texture_coordinates", 1, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
-					WHBGfxInitFetchShader(&glyph_shader);
+					WHBGfxInitShaderAttribute(&colour_fill_shader, "input_vertex_coordinates", 0, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
+					WHBGfxInitFetchShader(&colour_fill_shader);
 
-					// Initialise vertex position buffer
-					vertex_position_buffer.flags = (GX2RResourceFlags)(GX2R_RESOURCE_BIND_VERTEX_BUFFER |
-																	   GX2R_RESOURCE_USAGE_CPU_READ |
-																	   GX2R_RESOURCE_USAGE_CPU_WRITE |
-																	   GX2R_RESOURCE_USAGE_GPU_READ);
-					vertex_position_buffer.elemSize = 2 * sizeof(float);
-					vertex_position_buffer.elemCount = 4;
-					GX2RCreateBuffer(&vertex_position_buffer);
-
-					// Initialise texture coordinate buffer
-					texture_coordinate_buffer.flags = (GX2RResourceFlags)(GX2R_RESOURCE_BIND_VERTEX_BUFFER |
-																		  GX2R_RESOURCE_USAGE_CPU_READ |
-																		  GX2R_RESOURCE_USAGE_CPU_WRITE |
-																		  GX2R_RESOURCE_USAGE_GPU_READ);
-					texture_coordinate_buffer.elemSize = 2 * sizeof(float);
-					texture_coordinate_buffer.elemCount = 4;
-					GX2RCreateBuffer(&texture_coordinate_buffer);
-
-					// Initialise sampler
-					GX2InitSampler(&sampler, GX2_TEX_CLAMP_MODE_CLAMP, GX2_TEX_XY_FILTER_MODE_LINEAR);
-
-					// Create framebuffer surface
-					framebuffer_surface = RenderBackend_CreateSurface(screen_width, screen_height, true);
-
-					if (framebuffer_surface != NULL)
+					// Glyph shader
+					if (WHBGfxLoadGFDShaderGroup(&glyph_shader, 0, rglyph))
 					{
-						// Create a 'context' (this voodoo magic can be used to undo `GX2SetColorBuffer`,
-						// allowing us to draw to the screen once again).
-						gx2_context = (GX2ContextState*)aligned_alloc(GX2_CONTEXT_STATE_ALIGNMENT, sizeof(GX2ContextState));
-						memset(gx2_context, 0, sizeof(GX2ContextState));
-						GX2SetupContextStateEx(gx2_context, TRUE);
-						GX2SetContextState(gx2_context);
+						WHBGfxInitShaderAttribute(&glyph_shader, "input_vertex_coordinates", 0, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
+						WHBGfxInitShaderAttribute(&glyph_shader, "input_texture_coordinates", 1, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
+						WHBGfxInitFetchShader(&glyph_shader);
 
-						// Disable depth-test (enabled by default for some reason)
-						GX2SetDepthOnlyControl(FALSE, FALSE, GX2_COMPARE_FUNC_ALWAYS);
+						// Initialise vertex position buffer
+						vertex_position_buffer.flags = (GX2RResourceFlags)(GX2R_RESOURCE_BIND_VERTEX_BUFFER |
+																		   GX2R_RESOURCE_USAGE_CPU_READ |
+																		   GX2R_RESOURCE_USAGE_CPU_WRITE |
+																		   GX2R_RESOURCE_USAGE_GPU_READ);
+						vertex_position_buffer.elemSize = 2 * sizeof(float);
+						vertex_position_buffer.elemCount = 4;
 
-						// Set custom blending mode for pre-multiplied alpha
-		/*				GX2SetBlendControl(GX2_RENDER_TARGET_0,
-										   GX2_BLEND_MODE_ZERO,
-										   GX2_BLEND_MODE_ONE,
-										   GX2_BLEND_COMBINE_MODE_ADD,
-										   TRUE,
-										   GX2_BLEND_MODE_ZERO,
-										   GX2_BLEND_MODE_ONE,
-										   GX2_BLEND_COMBINE_MODE_ADD);
-		*/
-
-						// Calculate centred viewports
-						switch (GX2GetSystemTVScanMode())
+						if (GX2RCreateBuffer(&vertex_position_buffer))
 						{
-							case GX2_TV_SCAN_MODE_NONE:	// lolwut
-								break;
+							// Initialise texture coordinate buffer
+							texture_coordinate_buffer.flags = (GX2RResourceFlags)(GX2R_RESOURCE_BIND_VERTEX_BUFFER |
+																				  GX2R_RESOURCE_USAGE_CPU_READ |
+																				  GX2R_RESOURCE_USAGE_CPU_WRITE |
+																				  GX2R_RESOURCE_USAGE_GPU_READ);
+							texture_coordinate_buffer.elemSize = 2 * sizeof(float);
+							texture_coordinate_buffer.elemCount = 4;
 
-							case GX2_TV_SCAN_MODE_480I:
-							case GX2_TV_SCAN_MODE_480P:
-								CalculateViewport(854, 480, &tv_viewport);
-								break;
+							if (GX2RCreateBuffer(&texture_coordinate_buffer))
+							{
+								// Initialise sampler
+								GX2InitSampler(&sampler, GX2_TEX_CLAMP_MODE_CLAMP, GX2_TEX_XY_FILTER_MODE_LINEAR);
 
-							case GX2_TV_SCAN_MODE_720P:
-							case 4:	// Why the hell doesn't WUT have an enum for this? It always returns this value for me!
-								CalculateViewport(1280, 720, &tv_viewport);
-								break;
+								// Create framebuffer surface
+								framebuffer_surface = RenderBackend_CreateSurface(screen_width, screen_height, true);
 
-							case GX2_TV_SCAN_MODE_1080I:
-							case GX2_TV_SCAN_MODE_1080P:
-								CalculateViewport(1920, 1080, &tv_viewport);
-								break;
+								if (framebuffer_surface != NULL)
+								{
+									// Create a 'context' (this voodoo magic can be used to undo `GX2SetColorBuffer`,
+									// allowing us to draw to the screen once again)
+									gx2_context = (GX2ContextState*)aligned_alloc(GX2_CONTEXT_STATE_ALIGNMENT, sizeof(GX2ContextState));
+									memset(gx2_context, 0, sizeof(GX2ContextState));
+									GX2SetupContextStateEx(gx2_context, TRUE);
+									GX2SetContextState(gx2_context);
+
+									// Disable depth-test (enabled by default for some reason)
+									GX2SetDepthOnlyControl(FALSE, FALSE, GX2_COMPARE_FUNC_ALWAYS);
+
+									// Calculate centred viewports
+									switch (GX2GetSystemTVScanMode())
+									{
+										case GX2_TV_SCAN_MODE_NONE:	// lolwut
+											break;
+
+										case GX2_TV_SCAN_MODE_480I:
+										case GX2_TV_SCAN_MODE_480P:
+											CalculateViewport(854, 480, &tv_viewport);
+											break;
+
+										case GX2_TV_SCAN_MODE_720P:
+										case 4:	// Why the hell doesn't WUT have an enum for this? It always returns this value for me!
+											CalculateViewport(1280, 720, &tv_viewport);
+											break;
+
+										case GX2_TV_SCAN_MODE_1080I:
+										case GX2_TV_SCAN_MODE_1080P:
+											CalculateViewport(1920, 1080, &tv_viewport);
+											break;
+									}
+
+									CalculateViewport(854, 480, &drc_viewport);
+
+									return framebuffer_surface;
+								}
+								else
+								{
+									Backend_PrintError("Couldn't create the framebuffer surface");
+								}
+
+								GX2RDestroyBufferEx(&texture_coordinate_buffer, (GX2RResourceFlags)0);
+							}
+							else
+							{
+								Backend_PrintError("Couldn't create the texture coordinate buffer");
+							}
+
+							GX2RDestroyBufferEx(&vertex_position_buffer, (GX2RResourceFlags)0);
+						}
+						else
+						{
+							Backend_PrintError("Couldn't create the vertex position buffer");
 						}
 
-						CalculateViewport(854, 480, &drc_viewport);
-
-						return framebuffer_surface;
+						WHBGfxFreeShaderGroup(&glyph_shader);
 					}
 					else
 					{
-						Backend_PrintError("Couldn't create the framebuffer surface");
+						Backend_PrintError("Couldn't create the glyph shader");
 					}
 
-					GX2RDestroyBufferEx(&texture_coordinate_buffer, (GX2RResourceFlags)0);
-					GX2RDestroyBufferEx(&vertex_position_buffer, (GX2RResourceFlags)0);
-
-					WHBGfxFreeShaderGroup(&glyph_shader);
+					WHBGfxFreeShaderGroup(&colour_fill_shader);
 				}
 				else
 				{
-					Backend_PrintError("Couldn't create the glyph shader");
+					Backend_PrintError("Couldn't create the colour-fill shader");
 				}
 
-				WHBGfxFreeShaderGroup(&colour_fill_shader);
+				WHBGfxFreeShaderGroup(&texture_colour_key_shader);
 			}
 			else
 			{
-				Backend_PrintError("Couldn't create the colour-fill shader");
+				Backend_PrintError("Couldn't create the texture colour-key shader");
 			}
 
-			WHBGfxFreeShaderGroup(&texture_colour_key_shader);
+			WHBGfxFreeShaderGroup(&texture_shader);
 		}
 		else
 		{
-			Backend_PrintError("Couldn't create the texture colour-key shader");
+			Backend_PrintError("Couldn't create the texture shader");
 		}
 
-		WHBGfxFreeShaderGroup(&texture_shader);
+		WHBGfxShutdown();
 	}
 	else
 	{
-		Backend_PrintError("Couldn't create the texture shader");
+		Backend_PrintError("WHBGfxInit failed");
 	}
-
-	WHBGfxShutdown();
 
 	return NULL;
 }
@@ -377,8 +384,8 @@ RenderBackend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned 
 		GX2InitTextureRegs(&surface->texture);
 
 		GX2RResourceFlags resource_flags = (GX2RResourceFlags)(GX2R_RESOURCE_BIND_TEXTURE |
-		                                                                     GX2R_RESOURCE_USAGE_CPU_WRITE | GX2R_RESOURCE_USAGE_CPU_READ |
-		                                                                     GX2R_RESOURCE_USAGE_GPU_WRITE | GX2R_RESOURCE_USAGE_GPU_READ);
+		                                                       GX2R_RESOURCE_USAGE_CPU_WRITE | GX2R_RESOURCE_USAGE_CPU_READ |
+		                                                       GX2R_RESOURCE_USAGE_GPU_WRITE | GX2R_RESOURCE_USAGE_GPU_READ);
 
 		if (render_target)
 			resource_flags = (GX2RResourceFlags)(resource_flags | GX2R_RESOURCE_BIND_COLOR_BUFFER);
@@ -771,7 +778,7 @@ void RenderBackend_FlushGlyphs(void)
 
 void RenderBackend_HandleRenderTargetLoss(void)
 {
-	// No problem for us
+	// Doesn't happen on the Wii U
 }
 
 void RenderBackend_HandleWindowResize(unsigned int width, unsigned int height)
@@ -779,5 +786,5 @@ void RenderBackend_HandleWindowResize(unsigned int width, unsigned int height)
 	(void)width;
 	(void)height;
 
-	// No problem for us
+	// Doesn't happen on the Wii U
 }
