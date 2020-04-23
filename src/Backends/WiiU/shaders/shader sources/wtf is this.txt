@@ -47,7 +47,7 @@ Eventually you'll have the assembler built. With it, you can link your `.psh`
 and `.vsh` files into the final `.gsh` blob.
 
 Oh, right. I should warn you - the devs changed latte-assembler's syntax at some
-point, so all the example `.psh`/`.vsh` files I could fine online were
+point, so all the example `.psh`/`.vsh` files I could find online were
 incompatible. That sucked. The main change was that stuff like 'float2' and
 'float4' were changed to 'vec2' and 'vec4'. Just keep that in mind, and you
 should be okay.
