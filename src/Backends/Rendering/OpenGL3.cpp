@@ -780,8 +780,10 @@ void RenderBackend_DrawScreen(void)
 // Surface management
 // ====================
 
-RenderBackend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned int height)
+RenderBackend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned int height, bool render_target)
 {
+	(void)render_target;
+
 	RenderBackend_Surface *surface = (RenderBackend_Surface*)malloc(sizeof(RenderBackend_Surface));
 
 	if (surface == NULL)
