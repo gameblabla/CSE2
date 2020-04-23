@@ -156,38 +156,46 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 									// Create a 'context' (this voodoo magic can be used to undo `GX2SetColorBuffer`,
 									// allowing us to draw to the screen once again)
 									gx2_context = (GX2ContextState*)aligned_alloc(GX2_CONTEXT_STATE_ALIGNMENT, sizeof(GX2ContextState));
-									memset(gx2_context, 0, sizeof(GX2ContextState));
-									GX2SetupContextStateEx(gx2_context, TRUE);
-									GX2SetContextState(gx2_context);
 
-									// Disable depth-test (enabled by default for some reason)
-									GX2SetDepthOnlyControl(FALSE, FALSE, GX2_COMPARE_FUNC_ALWAYS);
-
-									// Calculate centred viewports
-									switch (GX2GetSystemTVScanMode())
+									if (gx2_context != NULL)
 									{
-										case GX2_TV_SCAN_MODE_NONE:	// lolwut
-											break;
+										memset(gx2_context, 0, sizeof(GX2ContextState));
+										GX2SetupContextStateEx(gx2_context, TRUE);
+										GX2SetContextState(gx2_context);
 
-										case GX2_TV_SCAN_MODE_480I:
-										case GX2_TV_SCAN_MODE_480P:
-											CalculateViewport(854, 480, &tv_viewport);
-											break;
+										// Disable depth-test (enabled by default for some reason)
+										GX2SetDepthOnlyControl(FALSE, FALSE, GX2_COMPARE_FUNC_ALWAYS);
 
-										case GX2_TV_SCAN_MODE_720P:
-										case 4:	// Why the hell doesn't WUT have an enum for this? It always returns this value for me!
-											CalculateViewport(1280, 720, &tv_viewport);
-											break;
+										// Calculate centred viewports
+										switch (GX2GetSystemTVScanMode())
+										{
+											case GX2_TV_SCAN_MODE_NONE:	// lolwut
+												break;
 
-										case GX2_TV_SCAN_MODE_1080I:
-										case GX2_TV_SCAN_MODE_1080P:
-											CalculateViewport(1920, 1080, &tv_viewport);
-											break;
+											case GX2_TV_SCAN_MODE_480I:
+											case GX2_TV_SCAN_MODE_480P:
+												CalculateViewport(854, 480, &tv_viewport);
+												break;
+
+											case GX2_TV_SCAN_MODE_720P:
+											case 4:	// Why the hell doesn't WUT have an enum for this? It always returns this value for me!
+												CalculateViewport(1280, 720, &tv_viewport);
+												break;
+
+											case GX2_TV_SCAN_MODE_1080I:
+											case GX2_TV_SCAN_MODE_1080P:
+												CalculateViewport(1920, 1080, &tv_viewport);
+												break;
+										}
+
+										CalculateViewport(854, 480, &drc_viewport);
+
+										return framebuffer_surface;
 									}
-
-									CalculateViewport(854, 480, &drc_viewport);
-
-									return framebuffer_surface;
+									else
+									{
+										Backend_PrintError("Couldn't allocate memory for the GX2 context");
+									}
 								}
 								else
 								{
