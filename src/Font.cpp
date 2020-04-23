@@ -963,63 +963,75 @@ static CachedGlyph* GetGlyphCached(FontObject *font_object, unsigned long unicod
 
 	if (glyph != NULL)
 	{
-		glyph->next = font_object->glyph_list_head;
-		font_object->glyph_list_head = glyph;
-
 		unsigned int glyph_index = FT_Get_Char_Index(font_object->face, unicode_value);
 
 #ifndef DISABLE_FONT_ANTIALIASING
-		FT_Load_Glyph(font_object->face, glyph_index, FT_LOAD_RENDER);
+		if (FT_Load_Glyph(font_object->face, glyph_index, FT_LOAD_RENDER) == 0)
 #else
-		FT_Load_Glyph(font_object->face, glyph_index, FT_LOAD_RENDER | FT_LOAD_MONOCHROME);
+		if (FT_Load_Glyph(font_object->face, glyph_index, FT_LOAD_RENDER | FT_LOAD_MONOCHROME) == 0)
 #endif
-
-		glyph->unicode_value = unicode_value;
-		glyph->x = font_object->face->glyph->bitmap_left;
-		glyph->y = (FT_MulFix(font_object->face->ascender, font_object->face->size->metrics.y_scale) - font_object->face->glyph->metrics.horiBearingY + (64 / 2)) / 64;
-		glyph->x_advance = font_object->face->glyph->advance.x / 64;
-
-		FT_Bitmap bitmap;
-		FT_Bitmap_New(&bitmap);
-		FT_Bitmap_Convert(font_object->library, &font_object->face->glyph->bitmap, &bitmap, 1);
-
-		switch (font_object->face->glyph->bitmap.pixel_mode)
 		{
-			case FT_PIXEL_MODE_GRAY:
-				for (unsigned int y = 0; y < bitmap.rows; ++y)
-				{
-					unsigned char *pixel_pointer = bitmap.buffer + y * bitmap.pitch;
+			glyph->unicode_value = unicode_value;
+			glyph->x = font_object->face->glyph->bitmap_left;
+			glyph->y = (FT_MulFix(font_object->face->ascender, font_object->face->size->metrics.y_scale) - font_object->face->glyph->metrics.horiBearingY + (64 / 2)) / 64;
+			glyph->x_advance = font_object->face->glyph->advance.x / 64;
 
-					for (unsigned int x = 0; x < bitmap.width; ++x)
-					{
-						*pixel_pointer = GammaCorrect((*pixel_pointer * 0xFF) / (bitmap.num_grays - 1));
-						++pixel_pointer;
-					}
+			FT_Bitmap bitmap;
+			FT_Bitmap_New(&bitmap);
+
+			if (FT_Bitmap_Convert(font_object->library, &font_object->face->glyph->bitmap, &bitmap, 1) == 0)
+			{
+				switch (font_object->face->glyph->bitmap.pixel_mode)
+				{
+					case FT_PIXEL_MODE_GRAY:
+						for (unsigned int y = 0; y < bitmap.rows; ++y)
+						{
+							unsigned char *pixel_pointer = bitmap.buffer + y * bitmap.pitch;
+
+							for (unsigned int x = 0; x < bitmap.width; ++x)
+							{
+								*pixel_pointer = GammaCorrect((*pixel_pointer * 0xFF) / (bitmap.num_grays - 1));
+								++pixel_pointer;
+							}
+						}
+
+						break;
+
+					case FT_PIXEL_MODE_MONO:
+						for (unsigned int y = 0; y < bitmap.rows; ++y)
+						{
+							unsigned char *pixel_pointer = bitmap.buffer + y * bitmap.pitch;
+
+							for (unsigned int x = 0; x < bitmap.width; ++x)
+							{
+								*pixel_pointer = *pixel_pointer ? 0xFF : 0;
+								++pixel_pointer;
+							}
+						}
+
+						break;
 				}
 
-				break;
+				glyph->backend = RenderBackend_LoadGlyph(bitmap.buffer, bitmap.width, bitmap.rows, bitmap.pitch);
 
-			case FT_PIXEL_MODE_MONO:
-				for (unsigned int y = 0; y < bitmap.rows; ++y)
+				FT_Bitmap_Done(font_object->library, &bitmap);
+
+				if (glyph->backend != NULL)
 				{
-					unsigned char *pixel_pointer = bitmap.buffer + y * bitmap.pitch;
+					glyph->next = font_object->glyph_list_head;
+					font_object->glyph_list_head = glyph;
 
-					for (unsigned int x = 0; x < bitmap.width; ++x)
-					{
-						*pixel_pointer = *pixel_pointer ? 0xFF : 0;
-						++pixel_pointer;
-					}
+					return glyph;
 				}
+			}
 
-				break;
+			FT_Bitmap_Done(font_object->library, &bitmap);
 		}
 
-		glyph->backend = RenderBackend_LoadGlyph(bitmap.buffer, bitmap.width, bitmap.rows, bitmap.pitch);
-
-		FT_Bitmap_Done(font_object->library, &bitmap);
+		free(glyph);
 	}
 
-	return glyph;
+	return NULL;
 }
 
 static void UnloadCachedGlyphs(FontObject *font_object)
@@ -1095,7 +1107,7 @@ FontObject* LoadFont(const char *font_filename, unsigned int cell_width, unsigne
 
 void DrawText(FontObject *font_object, RenderBackend_Surface *surface, int x, int y, unsigned long colour, const char *string)
 {
-	if (font_object != NULL)
+	if (font_object != NULL && surface != NULL)
 	{
 		const unsigned char colour_channels[3] = {(unsigned char)colour, (unsigned char)(colour >> 8), (unsigned char)(colour >> 16)};
 
