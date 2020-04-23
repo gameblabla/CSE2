@@ -265,6 +265,7 @@ void RenderBackend_Deinit(void)
 	GX2RDestroyBufferEx(&texture_coordinate_buffer, (GX2RResourceFlags)0);
 	GX2RDestroyBufferEx(&vertex_position_buffer, (GX2RResourceFlags)0);
 
+	WHBGfxFreeShaderGroup(&glyph_shader);
 	WHBGfxFreeShaderGroup(&colour_fill_shader);
 	WHBGfxFreeShaderGroup(&texture_colour_key_shader);
 	WHBGfxFreeShaderGroup(&texture_shader);
