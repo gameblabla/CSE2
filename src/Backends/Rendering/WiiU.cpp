@@ -385,7 +385,8 @@ RenderBackend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned 
 		                                                                     GX2R_RESOURCE_USAGE_CPU_WRITE | GX2R_RESOURCE_USAGE_CPU_READ |
 		                                                                     GX2R_RESOURCE_USAGE_GPU_WRITE | GX2R_RESOURCE_USAGE_GPU_READ);
 
-		resource_flags = (GX2RResourceFlags)(resource_flags | GX2R_RESOURCE_BIND_COLOR_BUFFER);
+		if (render_target)
+			resource_flags = (GX2RResourceFlags)(resource_flags | GX2R_RESOURCE_BIND_COLOR_BUFFER);
 
 		if (GX2RCreateSurface(&surface->texture.surface, resource_flags))
 		{
