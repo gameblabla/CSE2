@@ -1,144 +1,269 @@
+// Sexy new backend that bounces the software-rendered frame to the GPU,
+// eliminating V-tearing, and gaining support for rendering to the TV for
+// free!
+
 #include "../Window-Software.h"
 
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <coreinit/cache.h>
-#include <coreinit/screen.h>
+#include <gx2/display.h>
+#include <gx2/draw.h>
+#include <gx2/registers.h>
+#include <gx2/sampler.h>
+#include <gx2/texture.h>
+#include <gx2r/buffer.h>
+#include <gx2r/draw.h>
+#include <gx2r/resource.h>
+#include <gx2r/surface.h>
+#include <whb/gfx.h>
 
 #include "../../Attributes.h"
 
+#include "shaders/texture.gsh.h"
+
+typedef struct Viewport
+{
+	float x;
+	float y;
+	float width;
+	float height;
+} Viewport;
+
 static unsigned char *fake_framebuffer;
 
-//static unsigned char *tv_framebuffer;
-static unsigned char *drc_framebuffer;
+static size_t fake_framebuffer_width;
+static size_t fake_framebuffer_height;
 
-static size_t framebuffer_width;
-static size_t framebuffer_height;
+static WHBGfxShaderGroup shader_group;
 
-//static uint32_t tv_buffer_size;
-static uint32_t drc_buffer_size;
+static GX2RBuffer vertex_position_buffer;
+static GX2RBuffer texture_coordinate_buffer;
+
+static GX2Sampler sampler;
+
+static GX2Texture screen_texture;
+
+static Viewport tv_viewport;
+static Viewport drc_viewport;
+
+static void CalculateViewport(unsigned int actual_screen_width, unsigned int actual_screen_height, Viewport *viewport)
+{
+	if ((float)actual_screen_width / (float)actual_screen_height > (float)fake_framebuffer_width / (float)fake_framebuffer_height)
+	{
+		viewport->y = 0.0f;
+		viewport->height = actual_screen_height;
+
+		viewport->width = fake_framebuffer_width * ((float)actual_screen_height / (float)fake_framebuffer_height);
+		viewport->x = (actual_screen_width - viewport->width) / 2;
+	}
+	else
+	{
+		viewport->x = 0.0f;
+		viewport->width = actual_screen_width;
+
+		viewport->height = fake_framebuffer_height * ((float)actual_screen_width / (float)fake_framebuffer_width);
+		viewport->y = (actual_screen_height - viewport->height) / 2;
+	}
+}
 
 bool WindowBackend_Software_CreateWindow(const char *window_title, int screen_width, int screen_height, bool fullscreen)
 {
 	(void)window_title;
 	(void)fullscreen;
 
-	framebuffer_width = screen_width;
-	framebuffer_height = screen_height;
+	fake_framebuffer_width = screen_width;
+	fake_framebuffer_height = screen_height;
 
-	OSScreenInit();
+	fake_framebuffer = (unsigned char*)malloc(fake_framebuffer_width * fake_framebuffer_height * 3);
 
-	OSScreenEnableEx(SCREEN_TV, FALSE);
-	OSScreenEnableEx(SCREEN_DRC, TRUE);
+	if (fake_framebuffer != NULL)
+	{
+		WHBGfxInit();
 
-//	tv_buffer_size = OSScreenGetBufferSizeEx(SCREEN_TV);
-	drc_buffer_size = OSScreenGetBufferSizeEx(SCREEN_DRC);
+		if (WHBGfxLoadGFDShaderGroup(&shader_group, 0, rtexture))
+		{
+			WHBGfxInitShaderAttribute(&shader_group, "input_vertex_coordinates", 0, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
+			WHBGfxInitShaderAttribute(&shader_group, "input_texture_coordinates", 1, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
+			WHBGfxInitFetchShader(&shader_group);
 
-//	tv_framebuffer = (unsigned char*)aligned_alloc(0x100, tv_buffer_size);	// C11 fun
-	drc_framebuffer = (unsigned char*)aligned_alloc(0x100, drc_buffer_size);	// C11 fun
+			// Initialise vertex position buffer
+			const float vertex_positions[4][2] = {
+				{-1.0f,  1.0f},
+				{ 1.0f,  1.0f},
+				{ 1.0f, -1.0f},
+				{-1.0f, -1.0f}
+			};
 
-//	OSScreenSetBufferEx(SCREEN_TV, tv_framebuffer);
-	OSScreenSetBufferEx(SCREEN_DRC, drc_framebuffer);
+			vertex_position_buffer.flags = (GX2RResourceFlags)(GX2R_RESOURCE_BIND_VERTEX_BUFFER |
+			                                                   GX2R_RESOURCE_USAGE_CPU_READ |
+			                                                   GX2R_RESOURCE_USAGE_CPU_WRITE |
+			                                                   GX2R_RESOURCE_USAGE_GPU_READ);
+			vertex_position_buffer.elemSize = sizeof(vertex_positions[0]);
+			vertex_position_buffer.elemCount = sizeof(vertex_positions) / sizeof(vertex_positions[0]);
+			GX2RCreateBuffer(&vertex_position_buffer);
+			memcpy(GX2RLockBufferEx(&vertex_position_buffer, (GX2RResourceFlags)0), vertex_positions, sizeof(vertex_positions));
+			GX2RUnlockBufferEx(&vertex_position_buffer, (GX2RResourceFlags)0);
 
-	fake_framebuffer = (unsigned char*)malloc(framebuffer_width * framebuffer_height * 3);
+			// Initialise texture coordinate buffer
+			const float texture_coordinates[4][2] = {
+				{0.0f, 0.0f},
+				{1.0f, 0.0f},
+				{1.0f, 1.0f},
+				{0.0f, 1.0f}
+			};
 
-	return true;
+			texture_coordinate_buffer.flags = (GX2RResourceFlags)(GX2R_RESOURCE_BIND_VERTEX_BUFFER |
+			                                                      GX2R_RESOURCE_USAGE_CPU_READ |
+			                                                      GX2R_RESOURCE_USAGE_CPU_WRITE |
+			                                                      GX2R_RESOURCE_USAGE_GPU_READ);
+			texture_coordinate_buffer.elemSize = sizeof(texture_coordinates[0]);
+			texture_coordinate_buffer.elemCount = sizeof(texture_coordinates) / sizeof(texture_coordinates[0]);
+			GX2RCreateBuffer(&texture_coordinate_buffer);
+			memcpy(GX2RLockBufferEx(&texture_coordinate_buffer, (GX2RResourceFlags)0), texture_coordinates, sizeof(texture_coordinates));
+			GX2RUnlockBufferEx(&texture_coordinate_buffer, (GX2RResourceFlags)0);
+
+			// Initialise sampler
+			GX2InitSampler(&sampler, GX2_TEX_CLAMP_MODE_CLAMP, GX2_TEX_XY_FILTER_MODE_POINT);
+
+			// Initialise screen texture
+			screen_texture.surface.width = fake_framebuffer_width;
+			screen_texture.surface.height = fake_framebuffer_height;
+			screen_texture.surface.format = GX2_SURFACE_FORMAT_UNORM_R8_G8_B8_A8;
+			screen_texture.surface.depth = 1;
+			screen_texture.surface.dim = GX2_SURFACE_DIM_TEXTURE_2D;
+			screen_texture.surface.tileMode = GX2_TILE_MODE_LINEAR_ALIGNED;
+			screen_texture.surface.mipLevels = 1;
+			screen_texture.viewNumMips = 1;
+			screen_texture.viewNumSlices = 1;
+			screen_texture.compMap = 0x00010203;
+			GX2CalcSurfaceSizeAndAlignment(&screen_texture.surface);
+			GX2InitTextureRegs(&screen_texture);
+
+			if (GX2RCreateSurface(&screen_texture.surface, (GX2RResourceFlags)(GX2R_RESOURCE_BIND_TEXTURE | GX2R_RESOURCE_BIND_COLOR_BUFFER |
+			                                                                   GX2R_RESOURCE_USAGE_CPU_WRITE | GX2R_RESOURCE_USAGE_CPU_READ |
+			                                                                   GX2R_RESOURCE_USAGE_GPU_WRITE | GX2R_RESOURCE_USAGE_GPU_READ)))
+			{
+				// Do some binding
+				GX2SetPixelSampler(&sampler, shader_group.pixelShader->samplerVars[0].location);
+				GX2SetPixelTexture(&screen_texture, shader_group.pixelShader->samplerVars[0].location);
+				GX2RSetAttributeBuffer(&vertex_position_buffer, 0, vertex_position_buffer.elemSize, 0);
+				GX2RSetAttributeBuffer(&texture_coordinate_buffer, 1, texture_coordinate_buffer.elemSize, 0);
+
+				// Calculate centred viewports
+				switch (GX2GetSystemTVScanMode())
+				{
+					case GX2_TV_SCAN_MODE_NONE:	// lolwut
+						break;
+
+					case GX2_TV_SCAN_MODE_480I:
+					case GX2_TV_SCAN_MODE_480P:
+						CalculateViewport(854, 480, &tv_viewport);
+						break;
+
+					case GX2_TV_SCAN_MODE_720P:
+					case 4:	// Why the hell doesn't WUT have an enum for this? It always returns this value for me!
+						CalculateViewport(1280, 720, &tv_viewport);
+						break;
+
+					case GX2_TV_SCAN_MODE_1080I:
+					case GX2_TV_SCAN_MODE_1080P:
+						CalculateViewport(1920, 1080, &tv_viewport);
+						break;
+				}
+
+				CalculateViewport(854, 480, &drc_viewport);
+
+				return true;
+			}
+
+			GX2RDestroyBufferEx(&texture_coordinate_buffer, (GX2RResourceFlags)0);
+			GX2RDestroyBufferEx(&vertex_position_buffer, (GX2RResourceFlags)0);
+
+			WHBGfxFreeShaderGroup(&shader_group);
+		}
+
+		WHBGfxShutdown();
+
+		free(fake_framebuffer);
+	}
+
+	return false;
 }
 
 void WindowBackend_Software_DestroyWindow(void)
 {
+	GX2RDestroySurfaceEx(&screen_texture.surface, (GX2RResourceFlags)0);
+
+	GX2RDestroyBufferEx(&texture_coordinate_buffer, (GX2RResourceFlags)0);
+	GX2RDestroyBufferEx(&vertex_position_buffer, (GX2RResourceFlags)0);
+
+	WHBGfxFreeShaderGroup(&shader_group);
+
+	WHBGfxShutdown();
+
 	free(fake_framebuffer);
-	free(drc_framebuffer);
-//	free(tv_framebuffer);
-	OSScreenShutdown();
 }
 
 unsigned char* WindowBackend_Software_GetFramebuffer(size_t *pitch)
 {
-	*pitch = framebuffer_width * 3;
+	*pitch = fake_framebuffer_width * 3;
 
 	return fake_framebuffer;
 }
 
 ATTRIBUTE_HOT void WindowBackend_Software_Display(void)
 {
-	const size_t pitch = (drc_buffer_size / 480) / 2;
-
-	static bool flipflop;
+	// Convert frame from RGB24 to RGBA32, and upload it to the GPU texture
+	unsigned char *framebuffer = (unsigned char*)GX2RLockSurfaceEx(&screen_texture.surface, 0, (GX2RResourceFlags)0);
 
 	const unsigned char *in_pointer = fake_framebuffer;
 
-	if (framebuffer_width <= 426 && framebuffer_height <= 240)
+	for (size_t y = 0; y < fake_framebuffer_height; ++y)
 	{
-		const size_t line_size = framebuffer_width * 2 * 4;
-		const size_t line_delta = pitch - line_size;
+		unsigned char *out_pointer = &framebuffer[screen_texture.surface.pitch * 4 * y];
 
-		unsigned char *out_pointer = drc_framebuffer;
-
-		if (!flipflop)
-			out_pointer += drc_buffer_size / 2;
-
-		out_pointer += ((854 - (framebuffer_width * 2)) * 4) / 2;
-
-		for (size_t y = 0; y < framebuffer_height; ++y)
+		for (size_t x = 0; x < fake_framebuffer_width; ++x)
 		{
-			for (size_t x = 0; x < framebuffer_width; ++x)
-			{
-				*out_pointer++ = in_pointer[0];
-				*out_pointer++ = in_pointer[1];
-				*out_pointer++ = in_pointer[2];
-				*out_pointer++ = 0;
-				*out_pointer++ = in_pointer[0];
-				*out_pointer++ = in_pointer[1];
-				*out_pointer++ = in_pointer[2];
-				*out_pointer++ = 0;
-
-				in_pointer += 3;
-			}
-
-			memcpy(out_pointer + line_delta, out_pointer - line_size, line_size);
-
-			out_pointer += line_delta + pitch;
-		}
-	}
-	else
-	{
-		const size_t line_size = framebuffer_width * 4;
-		const size_t line_delta = pitch - line_size;
-
-		unsigned char *out_pointer = drc_framebuffer;
-
-		if (!flipflop)
-			out_pointer += drc_buffer_size / 2;
-
-		out_pointer += ((854 - framebuffer_width) * 4) / 2;
-
-		for (size_t y = 0; y < framebuffer_height; ++y)
-		{
-			for (size_t x = 0; x < framebuffer_width; ++x)
-			{
-				*out_pointer++ = *in_pointer++;
-				*out_pointer++ = *in_pointer++;
-				*out_pointer++ = *in_pointer++;
-				*out_pointer++ = 0;
-			}
-
-			out_pointer += line_delta;
+			*out_pointer++ = *in_pointer++;
+			*out_pointer++ = *in_pointer++;
+			*out_pointer++ = *in_pointer++;
+			*out_pointer++ = 0;
 		}
 	}
 
-	flipflop = !flipflop;
+	GX2RUnlockSurfaceEx(&screen_texture.surface, 0, (GX2RResourceFlags)0);
 
-//	DCStoreRange(tv_framebuffer, tv_buffer_size);
-	DCStoreRange(drc_framebuffer, drc_buffer_size);
+	WHBGfxBeginRender();
 
-//	OSScreenFlipBuffersEx(SCREEN_TV);
-	OSScreenFlipBuffersEx(SCREEN_DRC);
+	// Draw to the TV
+	WHBGfxBeginRenderTV();
+	GX2SetViewport(tv_viewport.x, tv_viewport.y, tv_viewport.width, tv_viewport.height, 0.0f, 1.0f);
+	WHBGfxClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	GX2SetFetchShader(&shader_group.fetchShader);
+	GX2SetVertexShader(shader_group.vertexShader);
+	GX2SetPixelShader(shader_group.pixelShader);
+	GX2DrawEx(GX2_PRIMITIVE_MODE_QUADS, 4, 0, 1);
+	WHBGfxFinishRenderTV();
+
+	// Draw to the gamepad
+	WHBGfxBeginRenderDRC();
+	GX2SetViewport(drc_viewport.x, drc_viewport.y, drc_viewport.width, drc_viewport.height, 0.0f, 1.0f);
+	WHBGfxClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	GX2SetFetchShader(&shader_group.fetchShader);
+	GX2SetVertexShader(shader_group.vertexShader);
+	GX2SetPixelShader(shader_group.pixelShader);
+	GX2DrawEx(GX2_PRIMITIVE_MODE_QUADS, 4, 0, 1);
+	WHBGfxFinishRenderDRC();
+
+	WHBGfxFinishRender();
 }
 
 void WindowBackend_Software_HandleWindowResize(unsigned int width, unsigned int height)
 {
 	(void)width;
 	(void)height;
+
+	// The window doesn't resize on the Wii U
 }
