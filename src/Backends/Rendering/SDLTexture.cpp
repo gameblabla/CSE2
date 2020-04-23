@@ -236,14 +236,14 @@ void RenderBackend_DrawScreen(void)
 	SDL_RenderPresent(renderer);
 }
 
-RenderBackend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned int height)
+RenderBackend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned int height, bool render_target)
 {
 	RenderBackend_Surface *surface = (RenderBackend_Surface*)malloc(sizeof(RenderBackend_Surface));
 
 	if (surface == NULL)
 		return NULL;
 
-	surface->texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, width, height);
+	surface->texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, render_target ? SDL_TEXTUREACCESS_TARGET : 0, width, height);
 
 	if (surface->texture == NULL)
 	{
