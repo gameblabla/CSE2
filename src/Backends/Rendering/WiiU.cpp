@@ -30,7 +30,8 @@ typedef struct RenderBackend_Surface
 	GX2ColorBuffer colour_buffer;
 	unsigned int width;
 	unsigned int height;
-	unsigned char *lock_buffer;	// TODO - dumb
+	bool render_target;
+	unsigned char *lock_buffer;	// TODO - Dumb
 } RenderBackend_Surface;
 
 typedef struct RenderBackend_Glyph
@@ -146,7 +147,7 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 					GX2InitSampler(&sampler, GX2_TEX_CLAMP_MODE_CLAMP, GX2_TEX_XY_FILTER_MODE_LINEAR);
 
 					// Create framebuffer surface
-					framebuffer_surface = RenderBackend_CreateSurface(screen_width, screen_height);
+					framebuffer_surface = RenderBackend_CreateSurface(screen_width, screen_height, true);
 
 					if (framebuffer_surface != NULL)
 					{
@@ -355,7 +356,7 @@ void RenderBackend_DrawScreen(void)
 	GX2SetContextState(gx2_context);
 }
 
-RenderBackend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned int height)
+RenderBackend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned int height, bool render_target)
 {
 	RenderBackend_Surface *surface = (RenderBackend_Surface*)malloc(sizeof(RenderBackend_Surface));
 
@@ -363,6 +364,7 @@ RenderBackend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned 
 	{
 		surface->width = width;
 		surface->height = height;
+		surface->render_target = render_target;
 
 		// Initialise texture
 		memset(&surface->texture, 0, sizeof(surface->texture));
@@ -379,23 +381,34 @@ RenderBackend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned 
 		GX2CalcSurfaceSizeAndAlignment(&surface->texture.surface);
 		GX2InitTextureRegs(&surface->texture);
 
-		if (GX2RCreateSurface(&surface->texture.surface, (GX2RResourceFlags)(GX2R_RESOURCE_BIND_TEXTURE | GX2R_RESOURCE_BIND_COLOR_BUFFER |
+		GX2RResourceFlags resource_flags = (GX2RResourceFlags)(GX2R_RESOURCE_BIND_TEXTURE |
 		                                                                     GX2R_RESOURCE_USAGE_CPU_WRITE | GX2R_RESOURCE_USAGE_CPU_READ |
-		                                                                     GX2R_RESOURCE_USAGE_GPU_WRITE | GX2R_RESOURCE_USAGE_GPU_READ)))
+		                                                                     GX2R_RESOURCE_USAGE_GPU_WRITE | GX2R_RESOURCE_USAGE_GPU_READ);
+
+		resource_flags = (GX2RResourceFlags)(resource_flags | GX2R_RESOURCE_BIND_COLOR_BUFFER);
+
+		if (GX2RCreateSurface(&surface->texture.surface, resource_flags))
 		{
-			// Initialise colour buffer (needed so the texture can be drawn to)
-			memset(&surface->colour_buffer, 0, sizeof(surface->colour_buffer));
-			surface->colour_buffer.surface = surface->texture.surface;
-			surface->colour_buffer.viewNumSlices = 1;
-			GX2InitColorBufferRegs(&surface->colour_buffer);
-
-			if (GX2RCreateSurfaceUserMemory(&surface->colour_buffer.surface, (uint8_t*)surface->texture.surface.image, (uint8_t*)surface->texture.surface.mipmaps, surface->texture.surface.resourceFlags))
+			if (!render_target)
+			{
 				return surface;
+			}
 			else
-				Backend_PrintError("GX2RCreateSurfaceUserMemory failed in RenderBackend_CreateSurface");
+			{
+				// Initialise colour buffer (needed so the texture can be drawn to)
+				memset(&surface->colour_buffer, 0, sizeof(surface->colour_buffer));
+				surface->colour_buffer.surface = surface->texture.surface;
+				surface->colour_buffer.viewNumSlices = 1;
+				GX2InitColorBufferRegs(&surface->colour_buffer);
+
+				if (GX2RCreateSurfaceUserMemory(&surface->colour_buffer.surface, (uint8_t*)surface->texture.surface.image, (uint8_t*)surface->texture.surface.mipmaps, surface->texture.surface.resourceFlags))
+					return surface;
+				else
+					Backend_PrintError("GX2RCreateSurfaceUserMemory failed in RenderBackend_CreateSurface");
 
 
-			GX2RDestroySurfaceEx(&surface->texture.surface, (GX2RResourceFlags)0);
+				GX2RDestroySurfaceEx(&surface->texture.surface, (GX2RResourceFlags)0);
+			}
 		}
 		else
 		{
@@ -412,7 +425,9 @@ void RenderBackend_FreeSurface(RenderBackend_Surface *surface)
 {
 	if (surface != NULL)
 	{
-		GX2RDestroySurfaceEx(&surface->colour_buffer.surface, (GX2RResourceFlags)0);
+		if (surface->render_target)
+			GX2RDestroySurfaceEx(&surface->colour_buffer.surface, (GX2RResourceFlags)0);
+
 		GX2RDestroySurfaceEx(&surface->texture.surface, (GX2RResourceFlags)0);
 		free(surface);
 	}
