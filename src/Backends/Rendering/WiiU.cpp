@@ -196,6 +196,8 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 									{
 										Backend_PrintError("Couldn't allocate memory for the GX2 context");
 									}
+
+									RenderBackend_FreeSurface(framebuffer_surface);
 								}
 								else
 								{
