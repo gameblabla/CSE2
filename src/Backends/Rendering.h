@@ -14,7 +14,7 @@ typedef struct RenderBackend_Rect
 RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, bool fullscreen);
 void RenderBackend_Deinit(void);
 void RenderBackend_DrawScreen(void);
-RenderBackend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned int height);
+RenderBackend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned int height, bool render_target);
 void RenderBackend_FreeSurface(RenderBackend_Surface *surface);
 bool RenderBackend_IsSurfaceLost(RenderBackend_Surface *surface);
 void RenderBackend_RestoreSurface(RenderBackend_Surface *surface);
