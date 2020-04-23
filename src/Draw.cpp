@@ -154,6 +154,9 @@ static BOOL ScaleAndUploadSurface(const unsigned char *image_buffer, int width, 
 	unsigned int pitch;
 	unsigned char *pixels = RenderBackend_LockSurface(surf[surf_no], &pitch, width * magnification, height * magnification);
 
+	if (pixels == NULL)
+		return FALSE;
+
 	if (magnification == 1)
 	{
 		// Just copy the pixels the way they are
