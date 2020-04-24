@@ -30,12 +30,18 @@
  #define MA_NO_DEVICE_IO
 #endif
 
-#include "../miniaudio.h"
-
 #include "decoders/common.h"
 #include "decoders/memory_stream.h"
 
+#include "resampled_decoder.h"
+
 #define CHANNEL_COUNT 2
+
+typedef struct Predecoder
+{
+	ROMemoryStream *memory_stream;
+	bool loop;
+} Predecoder;
 
 struct PredecoderData
 {
@@ -44,23 +50,7 @@ struct PredecoderData
 	unsigned long sample_rate;
 };
 
-struct Predecoder
-{
-	ROMemoryStream *memory_stream;
-	bool loop;
-};
-
-static ma_format FormatToMiniaudioFormat(DecoderFormat format)
-{
-	if (format == DECODER_FORMAT_S16)
-		return ma_format_s16;
-	else if (format == DECODER_FORMAT_S32)
-		return ma_format_s32;
-	else //if (format == DECODER_FORMAT_F32)
-		return ma_format_f32;
-}
-
-PredecoderData* Predecoder_DecodeData(const DecoderSpec *in_spec, const DecoderSpec *out_spec, void *decoder, size_t (*decoder_get_samples_function)(void *decoder, void *buffer, size_t frames_to_do))
+PredecoderData* Predecoder_DecodeData(const DecoderSpec *in_spec, const DecoderSpec *out_spec, DecoderStage *stage)
 {
 	PredecoderData *predecoder_data = NULL;
 
@@ -68,51 +58,48 @@ PredecoderData* Predecoder_DecodeData(const DecoderSpec *in_spec, const DecoderS
 
 	if (memory_stream != NULL)
 	{
-		const ma_data_converter_config config = ma_data_converter_config_init(FormatToMiniaudioFormat(in_spec->format), FormatToMiniaudioFormat(out_spec->format), in_spec->channel_count, out_spec->channel_count, in_spec->sample_rate, in_spec->sample_rate);
+		void *resampled_decoder = ResampledDecoder_Create(stage, false, out_spec, in_spec);
 
-		ma_data_converter converter;
-		if (ma_data_converter_init(&config, &converter) == MA_SUCCESS)
+		if (resampled_decoder != NULL)
 		{
 			predecoder_data = (PredecoderData*)malloc(sizeof(PredecoderData));
 
 			if (predecoder_data != NULL)
 			{
-				unsigned char in_buffer[0x1000];
-				unsigned char out_buffer[0x1000];
+				size_t size_of_frame;
+				switch (out_spec->format)
+				{
+					case DECODER_FORMAT_S16:
+						size_of_frame = sizeof(short) * out_spec->channel_count;
+						break;
 
-				const size_t size_of_in_frame = ma_get_bytes_per_sample(FormatToMiniaudioFormat(in_spec->format)) * in_spec->channel_count;
-				const size_t size_of_out_frame = ma_get_bytes_per_sample(FormatToMiniaudioFormat(out_spec->format)) * out_spec->channel_count;
+					case DECODER_FORMAT_S32:
+						size_of_frame = sizeof(long) * out_spec->channel_count;
+						break;
 
-				size_t in_buffer_end = 0;
-				size_t in_buffer_done = 0;
+					case DECODER_FORMAT_F32:
+						size_of_frame = sizeof(float) * out_spec->channel_count;
+						break;
+				}
 
 				for (;;)
 				{
-					if (in_buffer_done == in_buffer_end)
-					{
-						in_buffer_done = 0;
+					unsigned char buffer[0x1000];
 
-						in_buffer_end = decoder_get_samples_function(decoder, in_buffer, 0x1000 / size_of_in_frame);
+					size_t frames_done = ResampledDecoder_GetSamples(resampled_decoder, buffer, sizeof(buffer) / size_of_frame);
 
-						if (in_buffer_end == 0)
-							break;
-					}
+					if (frames_done == 0)
+						break;
 
-					ma_uint64 frames_in = in_buffer_end - in_buffer_done;
-					ma_uint64 frames_out = 0x1000 / size_of_out_frame;
-					ma_data_converter_process_pcm_frames(&converter, &in_buffer[in_buffer_done * size_of_in_frame], &frames_in, out_buffer, &frames_out);
-
-					MemoryStream_Write(memory_stream, out_buffer, size_of_out_frame, frames_out);
-
-					in_buffer_done += frames_in;
+					MemoryStream_Write(memory_stream, buffer, size_of_frame, frames_done);
 				}
 
 				predecoder_data->decoded_data = MemoryStream_GetBuffer(memory_stream);
 				predecoder_data->decoded_data_size = MemoryStream_GetPosition(memory_stream);
-				predecoder_data->sample_rate = in_spec->sample_rate;
+				predecoder_data->sample_rate = out_spec->sample_rate == 0 ? in_spec->sample_rate : out_spec->sample_rate;
 			}
 
-			ma_data_converter_uninit(&converter);
+			ResampledDecoder_Destroy(resampled_decoder);
 		}
 
 		MemoryStream_Destroy(memory_stream);
@@ -127,7 +114,7 @@ void Predecoder_UnloadData(PredecoderData *data)
 	free(data);
 }
 
-Predecoder* Predecoder_Create(PredecoderData *data, bool loop, const DecoderSpec *wanted_spec, DecoderSpec *spec)
+void* Predecoder_Create(PredecoderData *data, bool loop, const DecoderSpec *wanted_spec, DecoderSpec *spec)
 {
 	(void)wanted_spec;
 
@@ -154,18 +141,24 @@ Predecoder* Predecoder_Create(PredecoderData *data, bool loop, const DecoderSpec
 	return NULL;
 }
 
-void Predecoder_Destroy(Predecoder *predecoder)
+void Predecoder_Destroy(void *predecoder_void)
 {
+	Predecoder *predecoder = (Predecoder*)predecoder_void;
+
 	ROMemoryStream_Destroy(predecoder->memory_stream);
 }
 
-void Predecoder_Rewind(Predecoder *predecoder)
+void Predecoder_Rewind(void *predecoder_void)
 {
+	Predecoder *predecoder = (Predecoder*)predecoder_void;
+
 	ROMemoryStream_Rewind(predecoder->memory_stream);
 }
 
-size_t Predecoder_GetSamples(Predecoder *predecoder, void *buffer_void, size_t frames_to_do)
+size_t Predecoder_GetSamples(void *predecoder_void, void *buffer_void, size_t frames_to_do)
 {
+	Predecoder *predecoder = (Predecoder*)predecoder_void;
+
 	float *buffer = (float*)buffer_void;
 
 	size_t frames_done = 0;
@@ -183,7 +176,9 @@ size_t Predecoder_GetSamples(Predecoder *predecoder, void *buffer_void, size_t f
 	return frames_done;
 }
 
-void Predecoder_SetLoop(Predecoder *predecoder, bool loop)
+void Predecoder_SetLoop(void *predecoder_void, bool loop)
 {
+	Predecoder *predecoder = (Predecoder*)predecoder_void;
+
 	predecoder->loop = loop;
 }

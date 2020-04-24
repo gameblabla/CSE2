@@ -11,7 +11,7 @@ typedef struct SoundSlot
 {
 	bool valid;
 	ClownAudio_SoundData *sound_data;
-	ClownAudio_Sound sound;
+	ClownAudio_SoundID sound_id;
 } SoundSlot;
 
 static ClownAudio_Mixer *mixer;
@@ -33,15 +33,21 @@ void ExtraSound_Deinit(void)
 	// Free songs
 	if (previous_song.valid)
 	{
-		ClownAudio_DestroySound(mixer, previous_song.sound);
-		ClownAudio_UnloadSoundData(previous_song.sound_data);
+		AudioBackend_Lock();
+		ClownAudio_Mixer_DestroySound(mixer, previous_song.sound_id);
+		AudioBackend_Unlock();
+
+		ClownAudio_Mixer_UnloadSoundData(previous_song.sound_data);
 		previous_song.valid = false;
 	}
 
 	if (song.valid)
 	{
-		ClownAudio_DestroySound(mixer, song.sound);
-		ClownAudio_UnloadSoundData(song.sound_data);
+		AudioBackend_Lock();
+		ClownAudio_Mixer_DestroySound(mixer, song.sound_id);
+		AudioBackend_Unlock();
+
+		ClownAudio_Mixer_UnloadSoundData(song.sound_data);
 		song.valid = false;
 	}
 
@@ -50,8 +56,11 @@ void ExtraSound_Deinit(void)
 	{
 		if (sfx_list[i].valid)
 		{
-			ClownAudio_DestroySound(mixer, sfx_list[i].sound);
-			ClownAudio_UnloadSoundData(sfx_list[i].sound_data);
+			AudioBackend_Lock();
+			ClownAudio_Mixer_DestroySound(mixer, sfx_list[i].sound_id);
+			AudioBackend_Unlock();
+
+			ClownAudio_Mixer_UnloadSoundData(sfx_list[i].sound_data);
 			sfx_list[i].valid = false;
 		}
 	}
@@ -73,12 +82,19 @@ void ExtraSound_LoadMusic(const char *intro_file_path, const char *loop_file_pat
 {
 	if (previous_song.valid)
 	{
-		ClownAudio_DestroySound(mixer, previous_song.sound);
-		ClownAudio_UnloadSoundData(previous_song.sound_data);
+		AudioBackend_Lock();
+		ClownAudio_Mixer_DestroySound(mixer, previous_song.sound_id);
+		AudioBackend_Unlock();
+
+		ClownAudio_Mixer_UnloadSoundData(previous_song.sound_data);
 	}
 
 	if (song.valid)
-		ClownAudio_PauseSound(mixer, song.sound);
+	{
+		AudioBackend_Lock();
+		ClownAudio_Mixer_PauseSound(mixer, song.sound_id);
+		AudioBackend_Unlock();
+	}
 
 	previous_song = song;
 
@@ -86,25 +102,28 @@ void ExtraSound_LoadMusic(const char *intro_file_path, const char *loop_file_pat
 	{
 		ClownAudio_SoundDataConfig data_config;
 		ClownAudio_InitSoundDataConfig(&data_config);
-		song.sound_data = ClownAudio_LoadSoundDataFromFiles(intro_file_path, loop_file_path, &data_config);
+		song.sound_data = ClownAudio_Mixer_LoadSoundDataFromFiles(mixer, intro_file_path, loop_file_path, &data_config);
 
 		if (song.sound_data != NULL)
 		{
 			ClownAudio_SoundConfig sound_config;
 			ClownAudio_InitSoundConfig(&sound_config);
 			sound_config.loop = loop;
-			song.sound = ClownAudio_CreateSound(mixer, song.sound_data, &sound_config);
+			ClownAudio_Sound *sound = ClownAudio_Mixer_CreateSound(mixer, song.sound_data, &sound_config);
 
-			if (song.sound != 0)
+			if (sound != NULL)
 			{
-				ClownAudio_UnpauseSound(mixer, song.sound);
+				AudioBackend_Lock();
+				song.sound_id = ClownAudio_Mixer_RegisterSound(mixer, sound);
+				ClownAudio_Mixer_UnpauseSound(mixer, song.sound_id);
+				AudioBackend_Unlock();
 
 				song.valid = true;
 
 				return;
 			}
 
-			ClownAudio_UnloadSoundData(song.sound_data);
+			ClownAudio_Mixer_UnloadSoundData(song.sound_data);
 		}
 	}
 
@@ -115,16 +134,22 @@ void ExtraSound_LoadPreviousMusic(void)
 {
 	if (song.valid)
 	{
-		ClownAudio_DestroySound(mixer, song.sound);
-		ClownAudio_UnloadSoundData(song.sound_data);
+		AudioBackend_Lock();
+		ClownAudio_Mixer_DestroySound(mixer, song.sound_id);
+		AudioBackend_Unlock();
+
+		ClownAudio_Mixer_UnloadSoundData(song.sound_data);
 		song.valid = false;
 	}
 
 	if (previous_song.valid)
 	{
 		song = previous_song;
-		ClownAudio_CancelFade(mixer, song.sound);
-		ClownAudio_UnpauseSound(mixer, song.sound);
+
+		AudioBackend_Lock();
+		ClownAudio_Mixer_CancelFade(mixer, song.sound_id);
+		ClownAudio_Mixer_UnpauseSound(mixer, song.sound_id);
+		AudioBackend_Unlock();
 	}
 
 	previous_song.valid = false;
@@ -133,20 +158,29 @@ void ExtraSound_LoadPreviousMusic(void)
 void ExtraSound_PauseMusic(void)
 {
 	if (song.valid)
-		ClownAudio_PauseSound(mixer, song.sound);
+	{
+		AudioBackend_Lock();
+		ClownAudio_Mixer_PauseSound(mixer, song.sound_id);
+		AudioBackend_Unlock();
+	}
 }
 
 void ExtraSound_FadeOutMusic(void)
 {
-	ClownAudio_FadeOutSound(mixer, song.sound, 5 * 1000);
+	AudioBackend_Lock();
+	ClownAudio_Mixer_FadeOutSound(mixer, song.sound_id, 5 * 1000);
+	AudioBackend_Unlock();
 }
 
 void ExtraSound_LoadSFX(const char *path, int id)
 {
 	if (sfx_list[id].valid)
 	{
-		ClownAudio_DestroySound(mixer, sfx_list[id].sound);
-		ClownAudio_UnloadSoundData(sfx_list[id].sound_data);
+		AudioBackend_Lock();
+		ClownAudio_Mixer_DestroySound(mixer, sfx_list[id].sound_id);
+		AudioBackend_Unlock();
+
+		ClownAudio_Mixer_UnloadSoundData(sfx_list[id].sound_data);
 	}
 
 	size_t file_buffer_size;
@@ -155,7 +189,7 @@ void ExtraSound_LoadSFX(const char *path, int id)
 	ClownAudio_InitSoundDataConfig(&data_config);
 	data_config.predecode = true;
 	data_config.dynamic_sample_rate = true;
-	sfx_list[id].sound_data = ClownAudio_LoadSoundDataFromFiles(path, NULL, &data_config);
+	sfx_list[id].sound_data = ClownAudio_Mixer_LoadSoundDataFromFiles(mixer, path, NULL, &data_config);
 
 	if (sfx_list[id].sound_data != NULL)
 	{
@@ -163,15 +197,19 @@ void ExtraSound_LoadSFX(const char *path, int id)
 		ClownAudio_InitSoundConfig(&sound_config);
 		sound_config.do_not_free_when_done = true;
 		sound_config.dynamic_sample_rate = true;
-		sfx_list[id].sound = ClownAudio_CreateSound(mixer, sfx_list[id].sound_data, &sound_config);
+		ClownAudio_Sound *sound = ClownAudio_Mixer_CreateSound(mixer, sfx_list[id].sound_data, &sound_config);
 
-		if (sfx_list[id].sound != 0)
+		if (sound != NULL)
 		{
+			AudioBackend_Lock();
+			sfx_list[id].sound_id = ClownAudio_Mixer_RegisterSound(mixer, sound);
+			AudioBackend_Unlock();
+
 			sfx_list[id].valid = true;
 			return;
 		}
 
-		ClownAudio_UnloadSoundData(sfx_list[id].sound_data);
+		ClownAudio_Mixer_UnloadSoundData(sfx_list[id].sound_data);
 	}
 
 	sfx_list[id].valid = false;
@@ -181,35 +219,47 @@ void ExtraSound_PlaySFX(int id, int mode)
 {
 	if (sfx_list[id].valid)
 	{
+		AudioBackend_Lock();
+
 		switch (mode)
 		{
 			case 0:
-				ClownAudio_PauseSound(mixer, sfx_list[id].sound);
+				ClownAudio_Mixer_PauseSound(mixer, sfx_list[id].sound_id);
 				break;
 
 			case 1:
-				ClownAudio_PauseSound(mixer, sfx_list[id].sound);
-				ClownAudio_RewindSound(mixer, sfx_list[id].sound);
-				ClownAudio_SetSoundLoop(mixer, sfx_list[id].sound, false);
-				ClownAudio_UnpauseSound(mixer, sfx_list[id].sound);
+				ClownAudio_Mixer_PauseSound(mixer, sfx_list[id].sound_id);
+				ClownAudio_Mixer_RewindSound(mixer, sfx_list[id].sound_id);
+				ClownAudio_Mixer_SetSoundLoop(mixer, sfx_list[id].sound_id, false);
+				ClownAudio_Mixer_UnpauseSound(mixer, sfx_list[id].sound_id);
 				break;
 
 			case -1:
-				ClownAudio_SetSoundLoop(mixer, sfx_list[id].sound, true);
-				ClownAudio_UnpauseSound(mixer, sfx_list[id].sound);
+				ClownAudio_Mixer_SetSoundLoop(mixer, sfx_list[id].sound_id, true);
+				ClownAudio_Mixer_UnpauseSound(mixer, sfx_list[id].sound_id);
 				break;
 		}
+
+		AudioBackend_Unlock();
 	}
 }
 
 void ExtraSound_SetSFXFrequency(int id, unsigned long frequency)
 {
 	if (sfx_list[id].valid)
-		ClownAudio_SetSoundSampleRate(mixer, sfx_list[id].sound, frequency, frequency);
+	{
+		AudioBackend_Lock();
+		ClownAudio_Mixer_SetSoundSampleRate(mixer, sfx_list[id].sound_id, frequency);
+		AudioBackend_Unlock();
+	}
 }
 
 void ExtraSound_Mix(float *buffer, unsigned long frames)
 {
 	if (playing)
-		ClownAudio_MixSamples(mixer, buffer, frames);
+	{
+		AudioBackend_Lock();
+		ClownAudio_Mixer_MixSamples(mixer, buffer, frames);
+		AudioBackend_Unlock();
+	}
 }

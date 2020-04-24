@@ -32,8 +32,12 @@ struct ClownAudio_Stream
 	void *user_data;
 
 	SDL_AudioDeviceID device;
-	float volume;
 };
+
+typedef struct ClownAudio_Mutex
+{
+	SDL_mutex *sdl_mutex;
+} ClownAudio_Mutex;
 
 static bool sdl_already_init;
 
@@ -57,11 +61,6 @@ static void Callback(void *user_data, Uint8 *output_buffer_uint8, int bytes_to_d
 	float *output_buffer = (float*)output_buffer_uint8;
 
 	stream->user_callback(stream->user_data, output_buffer, frames_to_do);
-
-	// Handle volume in software, since SDL2's API doesn't have volume control
-	if (stream->volume != 1.0f)
-		for (unsigned long i = 0; i < frames_to_do * CLOWNAUDIO_STREAM_CHANNEL_COUNT; ++i)
-			output_buffer[i] *= stream->volume;
 }
 
 CLOWNAUDIO_EXPORT bool ClownAudio_InitPlayback(void)
@@ -83,30 +82,31 @@ CLOWNAUDIO_EXPORT void ClownAudio_DeinitPlayback(void)
 		SDL_QuitSubSystem(SDL_INIT_AUDIO);
 }
 
-CLOWNAUDIO_EXPORT ClownAudio_Stream* ClownAudio_CreateStream(void (*user_callback)(void*, float*, size_t), void *user_data)
+CLOWNAUDIO_EXPORT ClownAudio_Stream* ClownAudio_CreateStream(unsigned long *sample_rate, void (*user_callback)(void*, float*, size_t))
 {
 	ClownAudio_Stream *stream = (ClownAudio_Stream*)malloc(sizeof(ClownAudio_Stream));
 
 	if (stream != NULL)
 	{
-		SDL_AudioSpec want;
+		SDL_AudioSpec want, have;
 		memset(&want, 0, sizeof(want));
-		want.freq = CLOWNAUDIO_STREAM_SAMPLE_RATE;
+		want.freq = *sample_rate;
 		want.format = AUDIO_F32;
 		want.channels = CLOWNAUDIO_STREAM_CHANNEL_COUNT;
-		want.samples = NextPowerOfTwo(((CLOWNAUDIO_STREAM_SAMPLE_RATE * 10) / 1000) * CLOWNAUDIO_STREAM_CHANNEL_COUNT);	// A low-latency buffer of 10 milliseconds
+		want.samples = NextPowerOfTwo(((*sample_rate * 10) / 1000) * CLOWNAUDIO_STREAM_CHANNEL_COUNT);	// A low-latency buffer of 10 milliseconds
 		want.callback = Callback;
 		want.userdata = stream;
 
-		SDL_AudioDeviceID device = SDL_OpenAudioDevice(NULL, 0, &want, NULL, 0);
+		SDL_AudioDeviceID device = SDL_OpenAudioDevice(NULL, 0, &want, &have, SDL_AUDIO_ALLOW_FREQUENCY_CHANGE);
 
 		if (device > 0)
 		{
+			*sample_rate = have.freq;
+
 			stream->user_callback = user_callback;
-			stream->user_data = user_data;
+			stream->user_data = NULL;
 
 			stream->device = device;
-			stream->volume = 1.0f;
 
 			return stream;
 		}
@@ -128,12 +128,10 @@ CLOWNAUDIO_EXPORT bool ClownAudio_DestroyStream(ClownAudio_Stream *stream)
 	return true;
 }
 
-CLOWNAUDIO_EXPORT bool ClownAudio_SetStreamVolume(ClownAudio_Stream *stream, float volume)
+CLOWNAUDIO_EXPORT void ClownAudio_SetStreamCallbackData(ClownAudio_Stream *stream, void *user_data)
 {
 	if (stream != NULL)
-		stream->volume = volume * volume;
-
-	return true;
+		stream->user_data = user_data;
 }
 
 CLOWNAUDIO_EXPORT bool ClownAudio_PauseStream(ClownAudio_Stream *stream)
@@ -150,4 +148,14 @@ CLOWNAUDIO_EXPORT bool ClownAudio_ResumeStream(ClownAudio_Stream *stream)
 		SDL_PauseAudioDevice(stream->device, 0);
 
 	return true;
+}
+
+CLOWNAUDIO_EXPORT void ClownAudio_LockStream(ClownAudio_Stream *stream)
+{
+	SDL_LockAudioDevice(stream->device);
+}
+
+CLOWNAUDIO_EXPORT void ClownAudio_UnlockStream(ClownAudio_Stream *stream)
+{
+	SDL_UnlockAudioDevice(stream->device);
 }

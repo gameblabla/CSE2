@@ -38,7 +38,7 @@
 
 #include "common.h"
 
-Decoder_STB_Vorbis* Decoder_STB_Vorbis_Create(const unsigned char *data, size_t data_size, bool loop, const DecoderSpec *wanted_spec, DecoderSpec *spec)
+void* Decoder_STB_Vorbis_Create(const unsigned char *data, size_t data_size, bool loop, const DecoderSpec *wanted_spec, DecoderSpec *spec)
 {
 	(void)loop;	// This is ignored in simple decoders
 	(void)wanted_spec;
@@ -55,20 +55,20 @@ Decoder_STB_Vorbis* Decoder_STB_Vorbis_Create(const unsigned char *data, size_t 
 		spec->is_complex = false;
 	}
 
-	return (Decoder_STB_Vorbis*)instance;
+	return instance;
 }
 
-void Decoder_STB_Vorbis_Destroy(Decoder_STB_Vorbis *decoder)
+void Decoder_STB_Vorbis_Destroy(void *decoder)
 {
 	stb_vorbis_close((stb_vorbis*)decoder);
 }
 
-void Decoder_STB_Vorbis_Rewind(Decoder_STB_Vorbis *decoder)
+void Decoder_STB_Vorbis_Rewind(void *decoder)
 {
 	stb_vorbis_seek_start((stb_vorbis*)decoder);
 }
 
-size_t Decoder_STB_Vorbis_GetSamples(Decoder_STB_Vorbis *decoder, void *buffer, size_t frames_to_do)
+size_t Decoder_STB_Vorbis_GetSamples(void *decoder, void *buffer, size_t frames_to_do)
 {
 	stb_vorbis *instance = (stb_vorbis*)decoder;
 

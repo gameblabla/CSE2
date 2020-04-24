@@ -34,8 +34,11 @@ struct ClownAudio_Stream
 	void *user_data;
 
 	ma_device device;
-	float volume;
+
+	ma_mutex mutex;
 };
+
+static ma_context context;
 
 static void Callback(ma_device *device, void *output_buffer_void, const void *input_buffer, ma_uint32 frames_to_do)
 {
@@ -45,24 +48,19 @@ static void Callback(ma_device *device, void *output_buffer_void, const void *in
 	float *output_buffer = (float*)output_buffer_void;
 
 	stream->user_callback(stream->user_data, output_buffer, frames_to_do);
-
-	// Handle volume in software, since mini_al's API doesn't have volume control
-	if (stream->volume != 1.0f)
-		for (unsigned long i = 0; i < frames_to_do * CLOWNAUDIO_STREAM_CHANNEL_COUNT; ++i)
-			output_buffer[i] *= stream->volume;
 }
 
 CLOWNAUDIO_EXPORT bool ClownAudio_InitPlayback(void)
 {
-	return true;
+	return ma_context_init(NULL, 0, NULL, &context) == MA_SUCCESS;
 }
 
 CLOWNAUDIO_EXPORT void ClownAudio_DeinitPlayback(void)
 {
-	
+    ma_context_uninit(&context);
 }
 
-CLOWNAUDIO_EXPORT ClownAudio_Stream* ClownAudio_CreateStream(void (*user_callback)(void*, float*, size_t), void *user_data)
+CLOWNAUDIO_EXPORT ClownAudio_Stream* ClownAudio_CreateStream(unsigned long *sample_rate, void (*user_callback)(void*, float*, size_t))
 {
 	ClownAudio_Stream *stream = (ClownAudio_Stream*)malloc(sizeof(ClownAudio_Stream));
 
@@ -71,20 +69,23 @@ CLOWNAUDIO_EXPORT ClownAudio_Stream* ClownAudio_CreateStream(void (*user_callbac
 		ma_device_config config = ma_device_config_init(ma_device_type_playback);
 		config.playback.pDeviceID = NULL;
 		config.playback.format = ma_format_f32;
-		config.playback.channels = CLOWNAUDIO_STREAM_CHANNEL_COUNT;
-		config.sampleRate = CLOWNAUDIO_STREAM_SAMPLE_RATE;
+		config.playback.channels = 2;
+		config.sampleRate = 0;	// Use native sample rate
 		config.noPreZeroedOutputBuffer = MA_TRUE;
 		config.dataCallback = Callback;
 		config.pUserData = stream;
 
-		if (ma_device_init(NULL, &config, &stream->device) == MA_SUCCESS)
+		if (ma_device_init(&context, &config, &stream->device) == MA_SUCCESS)
 		{
+			*sample_rate = stream->device.sampleRate;
+
 			stream->user_callback = user_callback;
-			stream->user_data = user_data;
+			stream->user_data = NULL;
 
-			stream->volume = 1.0f;
+			if (ma_mutex_init(&context, &stream->mutex) == MA_SUCCESS)
+				return stream;
 
-			return stream;
+			ma_device_uninit(&stream->device);
 		}
 
 		free(stream);
@@ -104,12 +105,10 @@ CLOWNAUDIO_EXPORT bool ClownAudio_DestroyStream(ClownAudio_Stream *stream)
 	return true;
 }
 
-CLOWNAUDIO_EXPORT bool ClownAudio_SetStreamVolume(ClownAudio_Stream *stream, float volume)
+CLOWNAUDIO_EXPORT void ClownAudio_SetStreamCallbackData(ClownAudio_Stream *stream, void *user_data)
 {
 	if (stream != NULL)
-		stream->volume = volume * volume;
-
-	return true;
+		stream->user_data = user_data;
 }
 
 CLOWNAUDIO_EXPORT bool ClownAudio_PauseStream(ClownAudio_Stream *stream)
@@ -130,4 +129,14 @@ CLOWNAUDIO_EXPORT bool ClownAudio_ResumeStream(ClownAudio_Stream *stream)
 		success = ma_device_start(&stream->device) == MA_SUCCESS;
 
 	return success;
+}
+
+CLOWNAUDIO_EXPORT void ClownAudio_LockStream(ClownAudio_Stream *stream)
+{
+	ma_mutex_lock(&stream->mutex);
+}
+
+CLOWNAUDIO_EXPORT void ClownAudio_UnlockStream(ClownAudio_Stream *stream)
+{
+	ma_mutex_unlock(&stream->mutex);
 }

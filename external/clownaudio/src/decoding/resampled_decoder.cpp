@@ -34,13 +34,11 @@
 
 #include "decoders/common.h"
 
-#include "decoder_selector.h"
-
 #define RESAMPLE_BUFFER_SIZE 0x1000
 
-struct ResampledDecoder
+typedef struct ResampledDecoder
 {
-	DecoderSelector *decoder;
+	DecoderStage next_stage;
 	ma_data_converter converter;
 	unsigned long sample_rate;
 	size_t size_of_in_frame;
@@ -48,7 +46,7 @@ struct ResampledDecoder
 	unsigned char buffer[RESAMPLE_BUFFER_SIZE];
 	size_t buffer_end;
 	size_t buffer_done;
-};
+} ResampledDecoder;
 
 static ma_format FormatToMiniaudioFormat(DecoderFormat format)
 {
@@ -60,39 +58,27 @@ static ma_format FormatToMiniaudioFormat(DecoderFormat format)
 		return ma_format_f32;
 }
 
-ResampledDecoderData* ResampledDecoder_LoadData(const unsigned char *file_buffer, size_t file_size, bool predecode)
+void* ResampledDecoder_Create(DecoderStage *next_stage, bool dynamic_sample_rate, const DecoderSpec *wanted_spec, const DecoderSpec *child_spec)
 {
-	return DecoderSelector_LoadData(file_buffer, file_size, predecode);
-}
+//	DecoderSpec child_spec;
+//	void *decoder = DecoderSelector_Create(data, loop, wanted_spec, &child_spec);
 
-void ResampledDecoder_UnloadData(ResampledDecoderData *data)
-{
-	DecoderSelector_UnloadData(data);
-}
-
-ResampledDecoder* ResampledDecoder_Create(ResampledDecoderData *data, bool loop, const DecoderSpec *wanted_spec, DecoderSpec *spec)
-{
-	DecoderSpec child_spec;
-	DecoderSelector *decoder = DecoderSelector_Create(data, loop, wanted_spec, &child_spec);
-
-	if (decoder != NULL)
+//	if (decoder != NULL)
 	{
 		ResampledDecoder *resampled_decoder = (ResampledDecoder*)malloc(sizeof(ResampledDecoder));
 
 		if (resampled_decoder != NULL)
 		{
-			resampled_decoder->decoder = decoder;
+			resampled_decoder->next_stage = *next_stage;
 
-			ma_data_converter_config config = ma_data_converter_config_init(FormatToMiniaudioFormat(child_spec.format), FormatToMiniaudioFormat(wanted_spec->format), child_spec.channel_count, wanted_spec->channel_count, child_spec.sample_rate, wanted_spec->sample_rate);
-			config.resampling.allowDynamicSampleRate = MA_TRUE;
+			ma_data_converter_config config = ma_data_converter_config_init(FormatToMiniaudioFormat(child_spec->format), FormatToMiniaudioFormat(wanted_spec->format), child_spec->channel_count, wanted_spec->channel_count, child_spec->sample_rate, wanted_spec->sample_rate == 0 ? child_spec->sample_rate : wanted_spec->sample_rate);
+
+			if (dynamic_sample_rate)
+				config.resampling.allowDynamicSampleRate = MA_TRUE;
 
 			if (ma_data_converter_init(&config, &resampled_decoder->converter) == MA_SUCCESS)
 			{
-				spec->sample_rate = wanted_spec->sample_rate;
-				spec->channel_count = wanted_spec->channel_count;
-				spec->format = wanted_spec->format;
-
-				resampled_decoder->size_of_in_frame = ma_get_bytes_per_sample(FormatToMiniaudioFormat(child_spec.format)) * child_spec.channel_count;
+				resampled_decoder->size_of_in_frame = ma_get_bytes_per_sample(FormatToMiniaudioFormat(child_spec->format)) * child_spec->channel_count;
 				resampled_decoder->size_of_out_frame = ma_get_bytes_per_sample(FormatToMiniaudioFormat(wanted_spec->format)) * wanted_spec->channel_count;
 				resampled_decoder->buffer_end = 0;
 				resampled_decoder->buffer_done = 0;
@@ -104,26 +90,32 @@ ResampledDecoder* ResampledDecoder_Create(ResampledDecoderData *data, bool loop,
 			free(resampled_decoder);
 		}
 
-		DecoderSelector_Destroy((DecoderSelector*)decoder);
+		next_stage->Destroy(next_stage->decoder);
 	}
 
 	return NULL;
 }
 
-void ResampledDecoder_Destroy(ResampledDecoder *resampled_decoder)
+void ResampledDecoder_Destroy(void *resampled_decoder_void)
 {
+	ResampledDecoder *resampled_decoder = (ResampledDecoder*)resampled_decoder_void;
+
 	ma_data_converter_uninit(&resampled_decoder->converter);
-	DecoderSelector_Destroy(resampled_decoder->decoder);
+	resampled_decoder->next_stage.Destroy(resampled_decoder->next_stage.decoder);
 	free(resampled_decoder);
 }
 
-void ResampledDecoder_Rewind(ResampledDecoder *resampled_decoder)
+void ResampledDecoder_Rewind(void *resampled_decoder_void)
 {
-	DecoderSelector_Rewind(resampled_decoder->decoder);
+	ResampledDecoder *resampled_decoder = (ResampledDecoder*)resampled_decoder_void;
+
+	resampled_decoder->next_stage.Rewind(resampled_decoder->next_stage.decoder);
 }
 
-size_t ResampledDecoder_GetSamples(ResampledDecoder *resampled_decoder, void *buffer_void, size_t frames_to_do)
+size_t ResampledDecoder_GetSamples(void *resampled_decoder_void, void *buffer_void, size_t frames_to_do)
 {
+	ResampledDecoder *resampled_decoder = (ResampledDecoder*)resampled_decoder_void;
+
 	unsigned char *buffer = (unsigned char*)buffer_void;
 
 	size_t frames_done = 0;
@@ -134,7 +126,7 @@ size_t ResampledDecoder_GetSamples(ResampledDecoder *resampled_decoder, void *bu
 		{
 			resampled_decoder->buffer_done = 0;
 
-			resampled_decoder->buffer_end = DecoderSelector_GetSamples(resampled_decoder->decoder, resampled_decoder->buffer, RESAMPLE_BUFFER_SIZE / resampled_decoder->size_of_in_frame);
+			resampled_decoder->buffer_end = resampled_decoder->next_stage.GetSamples(resampled_decoder->next_stage.decoder, resampled_decoder->buffer, RESAMPLE_BUFFER_SIZE / resampled_decoder->size_of_in_frame);
 
 			if (resampled_decoder->buffer_end == 0)
 				return frames_done;	// Sample end
@@ -151,12 +143,16 @@ size_t ResampledDecoder_GetSamples(ResampledDecoder *resampled_decoder, void *bu
 	return frames_to_do;
 }
 
-void ResampledDecoder_SetLoop(ResampledDecoder *resampled_decoder, bool loop)
+void ResampledDecoder_SetLoop(void *resampled_decoder_void, bool loop)
 {
-	DecoderSelector_SetLoop(resampled_decoder->decoder, loop);
+	ResampledDecoder *resampled_decoder = (ResampledDecoder*)resampled_decoder_void;
+
+	resampled_decoder->next_stage.SetLoop(resampled_decoder->next_stage.decoder, loop);
 }
 
-void ResampledDecoder_SetSampleRate(ResampledDecoder *resampled_decoder, unsigned long sample_rate)
+void ResampledDecoder_SetSampleRate(void *resampled_decoder_void, unsigned long sample_rate)
 {
+	ResampledDecoder *resampled_decoder = (ResampledDecoder*)resampled_decoder_void;
+
 	ma_data_converter_set_rate(&resampled_decoder->converter, sample_rate, resampled_decoder->sample_rate);
 }

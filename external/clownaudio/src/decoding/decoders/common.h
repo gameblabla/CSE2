@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <stddef.h>
+
 typedef enum DecoderFormat
 {
 	DECODER_FORMAT_S16,
@@ -34,3 +36,13 @@ typedef struct DecoderSpec
 	DecoderFormat format;
 	bool is_complex;
 } DecoderSpec;
+
+typedef struct DecoderStage
+{
+	void *decoder;
+
+	void (*Destroy)(void *decoder);
+	void (*Rewind)(void *decoder);
+	size_t (*GetSamples)(void *decoder, void *buffer, size_t frames_to_do);
+	void (*SetLoop)(void *decoder, bool loop);
+} DecoderStage;

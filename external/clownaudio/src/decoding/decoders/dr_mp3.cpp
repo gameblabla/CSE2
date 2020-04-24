@@ -29,7 +29,7 @@
 
 #include "common.h"
 
-Decoder_DR_MP3* Decoder_DR_MP3_Create(const unsigned char *data, size_t data_size, bool loop, const DecoderSpec *wanted_spec, DecoderSpec *spec)
+void* Decoder_DR_MP3_Create(const unsigned char *data, size_t data_size, bool loop, const DecoderSpec *wanted_spec, DecoderSpec *spec)
 {
 	(void)loop;	// This is ignored in simple decoders
 	(void)wanted_spec;
@@ -40,14 +40,14 @@ Decoder_DR_MP3* Decoder_DR_MP3_Create(const unsigned char *data, size_t data_siz
 
 		if (instance != NULL)
 		{
-			if (drmp3_init_memory(instance, data, data_size, NULL, NULL))
+			if (drmp3_init_memory(instance, data, data_size, NULL))
 			{
 				spec->sample_rate = instance->sampleRate;
 				spec->channel_count = instance->channels;
 				spec->format = DECODER_FORMAT_F32;
 				spec->is_complex = false;
 
-				return (Decoder_DR_MP3*)instance;
+				return instance;
 			}
 
 			free(instance);
@@ -57,7 +57,7 @@ Decoder_DR_MP3* Decoder_DR_MP3_Create(const unsigned char *data, size_t data_siz
 	return NULL;
 }
 
-void Decoder_DR_MP3_Destroy(Decoder_DR_MP3 *decoder)
+void Decoder_DR_MP3_Destroy(void *decoder)
 {
 	drmp3 *instance = (drmp3*)decoder;
 
@@ -65,12 +65,12 @@ void Decoder_DR_MP3_Destroy(Decoder_DR_MP3 *decoder)
 	free(instance);
 }
 
-void Decoder_DR_MP3_Rewind(Decoder_DR_MP3 *decoder)
+void Decoder_DR_MP3_Rewind(void *decoder)
 {
 	drmp3_seek_to_pcm_frame((drmp3*)decoder, 0);
 }
 
-size_t Decoder_DR_MP3_GetSamples(Decoder_DR_MP3 *decoder, void *buffer, size_t frames_to_do)
+size_t Decoder_DR_MP3_GetSamples(void *decoder, void *buffer, size_t frames_to_do)
 {
 	return drmp3_read_pcm_frames_f32((drmp3*)decoder, frames_to_do, (float*)buffer);
 }

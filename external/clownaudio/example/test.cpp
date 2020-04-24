@@ -25,17 +25,7 @@
 //#define STB_LEAKCHECK_IMPLEMENTATION
 //#include "stb_leakcheck.h"
 
-#include "clownaudio/mixer.h"
-#include "clownaudio/playback.h"
-
-static void StreamCallback(void *user_data, float *output_buffer, size_t frames_to_do)
-{
-	// Clear buffer (ClownAudio_MixSamples mixes directly with the output buffer)
-	for (size_t i = 0; i < frames_to_do * CLOWNAUDIO_STREAM_CHANNEL_COUNT; ++i)
-		output_buffer[i] = 0.0f;
-
-	ClownAudio_MixSamples((ClownAudio_Mixer*)user_data, output_buffer, frames_to_do);
-}
+#include "clownaudio/clownaudio.h"
 
 int main(int argc, char *argv[])
 {
@@ -45,227 +35,190 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	printf("Initialising playback backend\n");
+	printf("Initialising clownaudio\n");
 	fflush(stdout);
 
-	if (ClownAudio_InitPlayback())
+	if (ClownAudio_Init())
 	{
-		printf("Creating mixer\n");
-		fflush(stdout);
-
-		ClownAudio_Mixer *mixer = ClownAudio_CreateMixer(CLOWNAUDIO_STREAM_SAMPLE_RATE);
-
-		if (mixer != NULL)
+		const char *file_paths[2];
+		if (argc == 3)
 		{
-			printf("Creating stream\n");
+			file_paths[0] = argv[1];
+			file_paths[1] = argv[2];
+		}
+		else if (argc == 2)
+		{
+			file_paths[0] = argv[1];
+			file_paths[1] = NULL;
+		}
+
+		ClownAudio_SoundDataConfig config;
+		ClownAudio_InitSoundDataConfig(&config);
+		ClownAudio_SoundData *sound_data = ClownAudio_LoadSoundDataFromFiles(file_paths[0], file_paths[1], &config);
+
+		if (sound_data != NULL)
+		{
+			printf("Creating sound\n");
 			fflush(stdout);
 
-			ClownAudio_Stream *stream = ClownAudio_CreateStream(StreamCallback, mixer);
+			ClownAudio_SoundConfig config2;
+			ClownAudio_InitSoundConfig(&config2);
+			config2.loop = true;
+			ClownAudio_SoundID instance = ClownAudio_CreateSound(sound_data, &config2);
+			ClownAudio_UnpauseSound(instance);
 
-			if (stream != NULL)
+			if (instance != 0)
 			{
-				ClownAudio_ResumeStream(stream);
-
-				printf("Loading sound data\n");
+				printf("\n"
+					   "Controls:\n"
+					   " q                - Quit\n"
+					   " r                - Rewind sound\n"
+					   " o [duration]     - Fade-out sound (milliseconds)\n"
+					   " i [duration]     - Fade-in sound (milliseconds)\n"
+					   " c                - Cancel fade\n"
+					   " u [rate]         - Set sample-rate (Hz)\n"
+					   " p                - Pause/unpause sound\n"
+					   " v [left] [right] - Set sound volume (0.0-1.0)\n"
+				);
 				fflush(stdout);
 
-				const char *file_paths[2];
-				if (argc == 3)
+				bool pause = false;
+
+				bool exit = false;
+				while (!exit)
 				{
-					file_paths[0] = argv[1];
-					file_paths[1] = argv[2];
-				}
-				else if (argc == 2)
-				{
-					file_paths[0] = argv[1];
-					file_paths[1] = NULL;
-				}
+					char buffer[128];
+					fgets(buffer, sizeof(buffer), stdin);
 
-				ClownAudio_SoundDataConfig config;
-				ClownAudio_InitSoundDataConfig(&config);
-				ClownAudio_SoundData *sound_data = ClownAudio_LoadSoundDataFromFiles(file_paths[0], file_paths[1], &config);
+					char mode;
+					while (sscanf(buffer, "%c", &mode) != 1);
 
-				if (sound_data != NULL)
-				{
-					printf("Creating sound\n");
-					fflush(stdout);
-
-					ClownAudio_SoundConfig config2;
-					ClownAudio_InitSoundConfig(&config2);
-					config2.loop = true;
-					ClownAudio_Sound instance = ClownAudio_CreateSound(mixer, sound_data, &config2);
-					ClownAudio_UnpauseSound(mixer, instance);
-
-					if (instance != 0)
+					switch (mode)
 					{
-						printf("\n"
-							   "Controls:\n"
-							   " q                - Quit\n"
-							   " r                - Rewind sound\n"
-							   " o [duration]     - Fade-out sound (milliseconds)\n"
-							   " i [duration]     - Fade-in sound (milliseconds)\n"
-							   " c                - Cancel fade\n"
-							   " u [rate]         - Set sample-rate (Hz)\n"
-							   " p                - Pause/unpause sound\n"
-							   " v [left] [right] - Set sound volume (0.0-1.0)\n"
-						);
-						fflush(stdout);
+						case 'q':
+							printf("Quitting\n");
+							fflush(stdout);
 
-						bool pause = false;
+							exit = true;
+							break;
 
-						bool exit = false;
-						while (!exit)
+						case 'r':
+							printf("Rewinding sound\n");
+							fflush(stdout);
+
+							ClownAudio_RewindSound(instance);
+							break;
+
+						case 'o':
 						{
-							char buffer[128];
-							fgets(buffer, sizeof(buffer), stdin);
+							unsigned int param;
+							if (sscanf(buffer, "%c %u", &mode, &param) != 2)
+								param = 1000 * 2;
 
-							char mode;
-							while (sscanf(buffer, "%c", &mode) != 1);
+							printf("Fading-out sound over %u milliseconds\n", param);
+							fflush(stdout);
 
-							switch (mode)
-							{
-								case 'q':
-									printf("Quitting\n");
-									fflush(stdout);
-
-									exit = true;
-									break;
-
-								case 'r':
-									printf("Rewinding sound\n");
-									fflush(stdout);
-
-									ClownAudio_RewindSound(mixer, instance);
-									break;
-
-								case 'o':
-								{
-									unsigned int param;
-									if (sscanf(buffer, "%c %u", &mode, &param) != 2)
-										param = 1000 * 2;
-
-									printf("Fading-out sound over %u milliseconds\n", param);
-									fflush(stdout);
-
-									ClownAudio_FadeOutSound(mixer, instance, param);
-									break;
-								}
-
-								case 'i':
-								{
-									unsigned int param;
-									if (sscanf(buffer, "%c %u", &mode, &param) != 2)
-										param = 1000 * 2;
-
-									printf("Fading-in sound over %u milliseconds\n", param);
-									fflush(stdout);
-
-									ClownAudio_FadeInSound(mixer, instance, param);
-									break;
-								}
-
-								case 'c':
-									printf("Cancelling fade\n");
-									fflush(stdout);
-
-									ClownAudio_CancelFade(mixer, instance);
-									break;
-
-								case 'u':
-								{
-									unsigned int param;
-									if (sscanf(buffer, "%c %u", &mode, &param) != 2)
-										param = 8000;
-
-									printf("Setting sample-rate to %uHz\n", param);
-									fflush(stdout);
-
-									ClownAudio_SetSoundSampleRate(mixer, instance, param, param);
-									break;
-								}
-
-								case 'p':
-									if (pause)
-									{
-										printf("Unpausing sound\n");
-										fflush(stdout);
-
-										ClownAudio_UnpauseSound(mixer, instance);
-									}
-									else
-									{
-										printf("Pausing sound\n");
-										fflush(stdout);
-
-										ClownAudio_PauseSound(mixer, instance);
-									}
-
-									pause = !pause;
-
-									break;
-
-								case 'v':
-								{
-									float volume_left, volume_right;
-									int values_read = sscanf(buffer, "%c %f %f", &mode, &volume_left, &volume_right);
-
-									if (values_read == 1)
-										volume_left = volume_right = 1.0f;
-									else if (values_read == 2)
-										volume_right = volume_left;
-
-									printf("Setting volume to %f left, %f right\n", volume_left, volume_right);
-									fflush(stdout);
-
-									ClownAudio_SetSoundVolume(mixer, instance, volume_left, volume_right);
-									break;
-								}
-							}
+							ClownAudio_FadeOutSound(instance, param);
+							break;
 						}
 
-						printf("Destroying sound\n");
-						fflush(stdout);
-						ClownAudio_DestroySound(mixer, instance);
-					}
-					else
-					{
-						printf("Couldn't create sound\n");
-					}
+						case 'i':
+						{
+							unsigned int param;
+							if (sscanf(buffer, "%c %u", &mode, &param) != 2)
+								param = 1000 * 2;
 
-					printf("Unloading sound data\n");
-					fflush(stdout);
-					ClownAudio_UnloadSoundData(sound_data);
-				}
-				else
-				{
-					printf("Couldn't load sound data\n");
+							printf("Fading-in sound over %u milliseconds\n", param);
+							fflush(stdout);
+
+							ClownAudio_FadeInSound(instance, param);
+							break;
+						}
+
+						case 'c':
+							printf("Cancelling fade\n");
+							fflush(stdout);
+
+							ClownAudio_CancelFade(instance);
+							break;
+
+						case 'u':
+						{
+							unsigned int param;
+							if (sscanf(buffer, "%c %u", &mode, &param) != 2)
+								param = 8000;
+
+							printf("Setting sample-rate to %uHz\n", param);
+							fflush(stdout);
+
+							ClownAudio_SetSoundSampleRate(instance, param);
+							break;
+						}
+
+						case 'p':
+							if (pause)
+							{
+								printf("Unpausing sound\n");
+								fflush(stdout);
+
+								ClownAudio_UnpauseSound(instance);
+							}
+							else
+							{
+								printf("Pausing sound\n");
+								fflush(stdout);
+
+								ClownAudio_PauseSound(instance);
+							}
+
+							pause = !pause;
+
+							break;
+
+						case 'v':
+						{
+							float volume_left, volume_right;
+							int values_read = sscanf(buffer, "%c %f %f", &mode, &volume_left, &volume_right);
+
+							if (values_read == 1)
+								volume_left = volume_right = 1.0f;
+							else if (values_read == 2)
+								volume_right = volume_left;
+
+							printf("Setting volume to %f left, %f right\n", volume_left, volume_right);
+							fflush(stdout);
+
+							ClownAudio_SetSoundVolume(instance, volume_left, volume_right);
+							break;
+						}
+					}
 				}
 
-				printf("Destroying stream\n");
+				printf("Destroying sound\n");
 				fflush(stdout);
-				ClownAudio_DestroyStream(stream);
+				ClownAudio_DestroySound(instance);
 			}
 			else
 			{
-				printf("Couldn't create stream\n");
+				printf("Couldn't create sound\n");
 			}
 
-			printf("Destroying mixer\n");
+			printf("Unloading sound data\n");
 			fflush(stdout);
-			ClownAudio_DestroyMixer(mixer);
+			ClownAudio_UnloadSoundData(sound_data);
 		}
 		else
 		{
-			printf("Couldn't create mixer\n");
+			printf("Couldn't load sound data\n");
 		}
 
-		printf("Deinitialising playback backend\n");
+		printf("Deinitialising clownaudio\n");
 		fflush(stdout);
-		ClownAudio_DeinitPlayback();
+		ClownAudio_Deinit();
 	}
 	else
 	{
-		printf("Couldn't initialise playback backend\n");
+		printf("Couldn't initialise clownaudio\n");
 	}
 
 

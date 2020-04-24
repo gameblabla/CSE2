@@ -342,7 +342,7 @@ if(EXTRA_SOUND_FORMATS)
 	target_compile_definitions(CSE2 PRIVATE EXTRA_SOUND_FORMATS)
 
 	# Link clownaudio
-	set(CLOWNAUDIO_NO_PLAYBACK ON CACHE INTERNAL "obligatory string")	# Disable clownaudio's playback capabilities
+	set(CLOWNAUDIO_MIXER_ONLY ON CACHE INTERNAL "")	# Disable clownaudio's playback capabilities (we use CSE2's instead)
 	add_subdirectory("external/clownaudio" EXCLUDE_FROM_ALL)
 	target_link_libraries(CSE2 PRIVATE clownaudio)
 endif()

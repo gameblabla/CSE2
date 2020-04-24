@@ -66,10 +66,10 @@
 
 #define DECODER_FUNCTIONS(name) \
 { \
-	(void*(*)(const unsigned char*,size_t,bool,const DecoderSpec*,DecoderSpec*))Decoder_##name##_Create, \
-	(void(*)(void*))Decoder_##name##_Destroy, \
-	(void(*)(void*))Decoder_##name##_Rewind, \
-	(size_t(*)(void*,void*,size_t))Decoder_##name##_GetSamples \
+	Decoder_##name##_Create, \
+	Decoder_##name##_Destroy, \
+	Decoder_##name##_Rewind, \
+	Decoder_##name##_GetSamples \
 }
 
 typedef enum DecoderType
@@ -87,6 +87,13 @@ typedef struct DecoderFunctions
 	size_t (*GetSamples)(void *decoder, void *buffer, size_t frames_to_do);
 } DecoderFunctions;
 
+typedef struct DecoderSelector
+{
+	void *decoder;
+	DecoderSelectorData *data;
+	bool loop;
+} DecoderSelector;
+
 struct DecoderSelectorData
 {
 	const unsigned char *file_buffer;
@@ -95,13 +102,6 @@ struct DecoderSelectorData
 	const DecoderFunctions *decoder_functions;
 	PredecoderData *predecoder_data;
 	size_t size_of_frame;
-};
-
-struct DecoderSelector
-{
-	void *decoder;
-	DecoderSelectorData *data;
-	bool loop;
 };
 
 static const DecoderFunctions decoder_function_list[] = {
@@ -148,36 +148,39 @@ static const DecoderFunctions decoder_function_list[] = {
 
 static const DecoderFunctions predecoder_functions = {
 	NULL,
-	(void(*)(void*))Predecoder_Destroy,
-	(void(*)(void*))Predecoder_Rewind,
-	(size_t(*)(void*,void*,size_t))Predecoder_GetSamples
+	Predecoder_Destroy,
+	Predecoder_Rewind,
+	Predecoder_GetSamples
 };
 
-DecoderSelectorData* DecoderSelector_LoadData(const unsigned char *file_buffer, size_t file_size, bool predecode)
+DecoderSelectorData* DecoderSelector_LoadData(const unsigned char *file_buffer, size_t file_size, bool predecode, bool must_predecode, const DecoderSpec *wanted_spec)
 {
 	DecoderType decoder_type;
 	const DecoderFunctions *decoder_functions = NULL;
 	PredecoderData *predecoder_data = NULL;
 
-	DecoderSpec wanted_spec, spec;
-
-	wanted_spec.sample_rate = 0;	// Dummy - predecoder doesn't care yet
-	wanted_spec.channel_count = 2;
-	wanted_spec.format = DECODER_FORMAT_F32;
+	DecoderSpec spec;
 
 	// Figure out what format this sound is
 	for (size_t i = 0; i < sizeof(decoder_function_list) / sizeof(decoder_function_list[0]); ++i)
 	{
-		void *decoder = decoder_function_list[i].Create(file_buffer, file_size, false, &wanted_spec, &spec);
+		void *decoder = decoder_function_list[i].Create(file_buffer, file_size, false, wanted_spec, &spec);
 
 		if (decoder != NULL)
 		{
 			decoder_type = spec.is_complex ? DECODER_TYPE_COMPLEX : DECODER_TYPE_SIMPLE;
 			decoder_functions = &decoder_function_list[i];
 
-			if (decoder_type == DECODER_TYPE_SIMPLE && predecode)
+			DecoderStage stage;
+			stage.decoder = decoder;
+			stage.Destroy = decoder_functions->Destroy;
+			stage.Rewind = decoder_functions->Rewind;
+			stage.GetSamples = decoder_functions->GetSamples;
+			stage.SetLoop = NULL;
+
+			if (decoder_type == DECODER_TYPE_SIMPLE && (predecode || must_predecode))
 			{
-				predecoder_data = Predecoder_DecodeData(&spec, &wanted_spec, decoder, decoder_functions->GetSamples);
+				predecoder_data = Predecoder_DecodeData(&spec, wanted_spec, &stage);
 
 				if (predecoder_data != NULL)
 				{
@@ -186,13 +189,11 @@ DecoderSelectorData* DecoderSelector_LoadData(const unsigned char *file_buffer, 
 				}
 			}
 
-			decoder_function_list[i].Destroy(decoder);
-
 			break;
 		}
 	}
 
-	if (decoder_functions != NULL)
+	if (decoder_functions != NULL && (!must_predecode || decoder_type == DECODER_TYPE_PREDECODER))
 	{
 		DecoderSelectorData *data = (DecoderSelectorData*)malloc(sizeof(DecoderSelectorData));
 
@@ -235,7 +236,7 @@ void DecoderSelector_UnloadData(DecoderSelectorData *data)
 	free(data);
 }
 
-DecoderSelector* DecoderSelector_Create(DecoderSelectorData *data, bool loop, const DecoderSpec *wanted_spec, DecoderSpec *spec)
+void* DecoderSelector_Create(DecoderSelectorData *data, bool loop, const DecoderSpec *wanted_spec, DecoderSpec *spec)
 {
 	DecoderSelector *selector = (DecoderSelector*)malloc(sizeof(DecoderSelector));
 
@@ -259,19 +260,25 @@ DecoderSelector* DecoderSelector_Create(DecoderSelectorData *data, bool loop, co
 	return NULL;
 }
 
-void DecoderSelector_Destroy(DecoderSelector *selector)
+void DecoderSelector_Destroy(void *selector_void)
 {
+	DecoderSelector *selector = (DecoderSelector*)selector_void;
+
 	selector->data->decoder_functions->Destroy(selector->decoder);
 	free(selector);
 }
 
-void DecoderSelector_Rewind(DecoderSelector *selector)
+void DecoderSelector_Rewind(void *selector_void)
 {
+	DecoderSelector *selector = (DecoderSelector*)selector_void;
+
 	selector->data->decoder_functions->Rewind(selector->decoder);
 }
 
-size_t DecoderSelector_GetSamples(DecoderSelector *selector, void *buffer, size_t frames_to_do)
+size_t DecoderSelector_GetSamples(void *selector_void, void *buffer, size_t frames_to_do)
 {
+	DecoderSelector *selector = (DecoderSelector*)selector_void;
+
 	size_t frames_done = 0;
 
 	switch (selector->data->decoder_type)
@@ -280,7 +287,7 @@ size_t DecoderSelector_GetSamples(DecoderSelector *selector, void *buffer, size_
 			return 0;
 
 		case DECODER_TYPE_PREDECODER:
-			return Predecoder_GetSamples((Predecoder*)selector->decoder, buffer, frames_to_do);
+			return Predecoder_GetSamples(selector->decoder, buffer, frames_to_do);
 
 		case DECODER_TYPE_COMPLEX:
 			return selector->data->decoder_functions->GetSamples(selector->decoder, buffer, frames_to_do);
@@ -306,12 +313,14 @@ size_t DecoderSelector_GetSamples(DecoderSelector *selector, void *buffer, size_
 	}
 }
 
-void DecoderSelector_SetLoop(DecoderSelector *selector, bool loop)
+void DecoderSelector_SetLoop(void *selector_void, bool loop)
 {
+	DecoderSelector *selector = (DecoderSelector*)selector_void;
+
 	switch (selector->data->decoder_type)
 	{
 		case DECODER_TYPE_PREDECODER:
-			Predecoder_SetLoop((Predecoder*)selector->decoder, loop);
+			Predecoder_SetLoop(selector->decoder, loop);
 			break;
 
 		case DECODER_TYPE_SIMPLE:

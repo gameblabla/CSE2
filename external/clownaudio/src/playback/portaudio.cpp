@@ -23,6 +23,12 @@
 #include <stddef.h>
 #include <stdlib.h>
 
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <pthread.h>
+#endif
+
 #include "portaudio.h"
 
 struct ClownAudio_Stream
@@ -31,7 +37,12 @@ struct ClownAudio_Stream
 	void *user_data;
 
 	PaStream *pa_stream;
-	float volume;
+
+#ifdef _WIN32
+	HANDLE mutex_handle;
+#else
+	pthread_mutex_t pthread_mutex;
+#endif
 };
 
 static int Callback(const void *input_buffer, void *output_buffer_void, unsigned long frames_to_do, const PaStreamCallbackTimeInfo *time_info, PaStreamCallbackFlags status_flags, void *user_data)
@@ -45,12 +56,7 @@ static int Callback(const void *input_buffer, void *output_buffer_void, unsigned
 
 	stream->user_callback(stream->user_data, output_buffer, frames_to_do);
 
-	// Handle volume in software, since PortAudio's API doesn't have volume control
-	if (stream->volume != 1.0f)
-		for (unsigned long i = 0; i < frames_to_do * CLOWNAUDIO_STREAM_CHANNEL_COUNT; ++i)
-			output_buffer[i] *= stream->volume;
-
-	return 0;
+	return paContinue;
 }
 
 CLOWNAUDIO_EXPORT bool ClownAudio_InitPlayback(void)
@@ -63,18 +69,26 @@ CLOWNAUDIO_EXPORT void ClownAudio_DeinitPlayback(void)
 	Pa_Terminate();
 }
 
-CLOWNAUDIO_EXPORT ClownAudio_Stream* ClownAudio_CreateStream(void (*user_callback)(void*, float*, size_t), void *user_data)
+CLOWNAUDIO_EXPORT ClownAudio_Stream* ClownAudio_CreateStream(unsigned long *sample_rate, void (*user_callback)(void*, float*, size_t))
 {
 	ClownAudio_Stream *stream = (ClownAudio_Stream*)malloc(sizeof(ClownAudio_Stream));
 
 	if (stream != NULL)
 	{
-		if (Pa_OpenDefaultStream(&stream->pa_stream, 0, CLOWNAUDIO_STREAM_CHANNEL_COUNT, paFloat32, CLOWNAUDIO_STREAM_SAMPLE_RATE, paFramesPerBufferUnspecified, Callback, stream ) == paNoError)
+		const PaDeviceInfo *device_info = Pa_GetDeviceInfo(Pa_GetDefaultOutputDevice());
+
+		*sample_rate = device_info->defaultSampleRate;
+
+		if (Pa_OpenDefaultStream(&stream->pa_stream, 0, CLOWNAUDIO_STREAM_CHANNEL_COUNT, paFloat32, device_info->defaultSampleRate, paFramesPerBufferUnspecified, Callback, stream ) == paNoError)
 		{
 			stream->user_callback = user_callback;
-			stream->user_data = user_data;
+			stream->user_data = NULL;
 
-			stream->volume = 1.0f;
+		#ifdef _WIN32
+			stream->mutex_handle = CreateEventA(NULL, FALSE, TRUE, NULL);
+		#else
+			pthread_mutex_init(&stream->pthread_mutex, NULL);
+		#endif
 
 			return stream;
 		}
@@ -98,12 +112,10 @@ CLOWNAUDIO_EXPORT bool ClownAudio_DestroyStream(ClownAudio_Stream *stream)
 	return success;
 }
 
-CLOWNAUDIO_EXPORT bool ClownAudio_SetStreamVolume(ClownAudio_Stream *stream, float volume)
+CLOWNAUDIO_EXPORT void ClownAudio_SetStreamCallbackData(ClownAudio_Stream *stream, void *user_data)
 {
 	if (stream != NULL)
-		stream->volume = volume * volume;
-
-	return true;
+		stream->user_data = user_data;
 }
 
 CLOWNAUDIO_EXPORT bool ClownAudio_PauseStream(ClownAudio_Stream *stream)
@@ -124,4 +136,28 @@ CLOWNAUDIO_EXPORT bool ClownAudio_ResumeStream(ClownAudio_Stream *stream)
 		success = Pa_StartStream(stream->pa_stream) == paNoError;
 
 	return success;
+}
+
+CLOWNAUDIO_EXPORT void ClownAudio_LockStream(ClownAudio_Stream *stream)
+{
+	if (stream != NULL)
+	{
+	#ifdef _WIN32
+		WaitForSingleObject(stream->mutex_handle, INFINITE);
+	#else
+		pthread_mutex_lock(&stream->pthread_mutex);
+	#endif
+	}
+}
+
+CLOWNAUDIO_EXPORT void ClownAudio_UnlockStream(ClownAudio_Stream *stream)
+{
+	if (stream != NULL)
+	{
+	#ifdef _WIN32
+		SetEvent(stream->mutex_handle);
+	#else
+		pthread_mutex_unlock(&stream->pthread_mutex);
+	#endif
+	}
 }

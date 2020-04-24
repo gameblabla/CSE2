@@ -24,9 +24,7 @@
 
 #include "common.h"
 
-typedef struct Decoder_DR_MP3 Decoder_DR_MP3;
-
-Decoder_DR_MP3* Decoder_DR_MP3_Create(const unsigned char *data, size_t data_size, bool loop, const DecoderSpec *wanted_spec, DecoderSpec *spec);
-void Decoder_DR_MP3_Destroy(Decoder_DR_MP3 *decoder);
-void Decoder_DR_MP3_Rewind(Decoder_DR_MP3 *decoder);
-size_t Decoder_DR_MP3_GetSamples(Decoder_DR_MP3 *decoder, void *buffer, size_t frames_to_do);
+void* Decoder_DR_MP3_Create(const unsigned char *data, size_t data_size, bool loop, const DecoderSpec *wanted_spec, DecoderSpec *spec);
+void Decoder_DR_MP3_Destroy(void *decoder);
+void Decoder_DR_MP3_Rewind(void *decoder);
+size_t Decoder_DR_MP3_GetSamples(void *decoder, void *buffer, size_t frames_to_do);

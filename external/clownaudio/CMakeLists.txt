@@ -13,8 +13,8 @@ option(CLOWNAUDIO_LIBOPENMPT "Enable the libopenmpt decoder backend" OFF)
 option(CLOWNAUDIO_LIBXMPLITE "Enable the libxmp-lite decoder backend" OFF)
 option(CLOWNAUDIO_PXTONE "Enable the PxTone decoder backend" OFF)
 option(CLOWNAUDIO_SNES_SPC "Enable the snes_spc decoder backend" OFF)
-option(CLOWNAUDIO_NO_PLAYBACK "Disables playback capabilities" OFF)
-if(NOT CLOWNAUDIO_NO_PLAYBACK)
+option(CLOWNAUDIO_MIXER_ONLY "Disables playback capabilities" OFF)
+if(NOT CLOWNAUDIO_MIXER_ONLY)
 	set(CLOWNAUDIO_BACKEND "miniaudio" CACHE STRING "Which playback backend to use: supported options are 'miniaudio', 'SDL1', 'SDL2', 'Cubeb', and 'PortAudio'")
 endif()
 
@@ -38,9 +38,11 @@ add_library(clownaudio
 	"src/decoding/decoders/memory_stream.h"
 )
 
-if(NOT CLOWNAUDIO_NO_PLAYBACK)
+if(NOT CLOWNAUDIO_MIXER_ONLY)
 	target_sources(clownaudio PRIVATE
+		"include/clownaudio/clownaudio.h"
 		"include/clownaudio/playback.h"
+		"src/clownaudio.cpp"
 	)
 endif()
 
@@ -221,7 +223,7 @@ endif()
 # Playback backends
 ####################
 
-if(NOT CLOWNAUDIO_NO_PLAYBACK)
+if(NOT CLOWNAUDIO_MIXER_ONLY)
 	if(CLOWNAUDIO_BACKEND STREQUAL "miniaudio")
 		target_sources(clownaudio PRIVATE "src/playback/miniaudio.cpp")
 		target_compile_definitions(clownaudio PRIVATE MINIAUDIO_ENABLE_DEVICE_IO)
@@ -262,7 +264,7 @@ endif()
 
 # CMake
 
-if(NOT CLOWNAUDIO_NO_PLAYBACK)
+if(NOT CLOWNAUDIO_MIXER_ONLY)
 	if(CLOWNAUDIO_BACKEND STREQUAL "Cubeb")
 		find_package(cubeb REQUIRED)
 
@@ -275,7 +277,7 @@ endif()
 
 find_package(PkgConfig QUIET)
 
-if(NOT CLOWNAUDIO_NO_PLAYBACK)
+if(NOT CLOWNAUDIO_MIXER_ONLY)
 	if(CLOWNAUDIO_BACKEND STREQUAL "SDL1")
 		if (NOT PkgConfig_FOUND)
 			message(FATAL_ERROR "pkg-config is needed by SDL1, but it couldn't be found")
@@ -441,10 +443,10 @@ target_include_directories(clownaudio PUBLIC "$<BUILD_INTERFACE:${CMAKE_BINARY_D
 set_target_properties(clownaudio PROPERTIES C_VISIBILITY_PRESET hidden CXX_VISIBILITY_PRESET hidden VISIBILITY_INLINES_HIDDEN ON)
 
 # Define public header
-if(CLOWNAUDIO_NO_PLAYBACK)
+if(CLOWNAUDIO_MIXER_ONLY)
 	set_target_properties(clownaudio PROPERTIES PUBLIC_HEADER "include/clownaudio/mixer.h;${CMAKE_BINARY_DIR}/export/clownaudio_export.h")
 else()
-	set_target_properties(clownaudio PROPERTIES PUBLIC_HEADER "include/clownaudio/playback.h;include/clownaudio/mixer.h;${CMAKE_BINARY_DIR}/export/clownaudio_export.h")
+	set_target_properties(clownaudio PROPERTIES PUBLIC_HEADER "include/clownaudio/clownaudio.h;include/clownaudio/playback.h;include/clownaudio/mixer.h;${CMAKE_BINARY_DIR}/export/clownaudio_export.h")
 endif()
 
 # Set language standards

@@ -26,7 +26,7 @@
 
 #include "common.h"
 
-Decoder_libOpus* Decoder_libOpus_Create(const unsigned char *data, size_t data_size, bool loop, const DecoderSpec *wanted_spec, DecoderSpec *spec)
+void* Decoder_libOpus_Create(const unsigned char *data, size_t data_size, bool loop, const DecoderSpec *wanted_spec, DecoderSpec *spec)
 {
 	(void)loop;	// This is ignored in simple decoders
 	(void)wanted_spec;
@@ -41,20 +41,20 @@ Decoder_libOpus* Decoder_libOpus_Create(const unsigned char *data, size_t data_s
 		spec->is_complex = false;
 	}
 
-	return (Decoder_libOpus*)backend;
+	return backend;
 }
 
-void Decoder_libOpus_Destroy(Decoder_libOpus *decoder)
+void Decoder_libOpus_Destroy(void *decoder)
 {
 	op_free((OggOpusFile*)decoder);
 }
 
-void Decoder_libOpus_Rewind(Decoder_libOpus *decoder)
+void Decoder_libOpus_Rewind(void *decoder)
 {
 	op_pcm_seek((OggOpusFile*)decoder, 0);
 }
 
-size_t Decoder_libOpus_GetSamples(Decoder_libOpus *decoder, void *buffer, size_t frames_to_do)
+size_t Decoder_libOpus_GetSamples(void *decoder, void *buffer, size_t frames_to_do)
 {
 	return op_read_float_stereo((OggOpusFile*)decoder, (float*)buffer, frames_to_do * 2);	// You tell *me* why that last parameter is in samples and not frames
 }

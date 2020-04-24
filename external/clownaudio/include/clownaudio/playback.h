@@ -29,7 +29,6 @@
 #include "clownaudio_export.h"
 #endif
 
-#define CLOWNAUDIO_STREAM_SAMPLE_RATE 48000
 #define CLOWNAUDIO_STREAM_CHANNEL_COUNT 2
 
 #ifdef __cplusplus
@@ -40,11 +39,13 @@ typedef struct ClownAudio_Stream ClownAudio_Stream;
 
 CLOWNAUDIO_EXPORT bool ClownAudio_InitPlayback(void);
 CLOWNAUDIO_EXPORT void ClownAudio_DeinitPlayback(void);
-CLOWNAUDIO_EXPORT ClownAudio_Stream* ClownAudio_CreateStream(void (*callback)(void*, float*, size_t), void *user_data);
+CLOWNAUDIO_EXPORT ClownAudio_Stream* ClownAudio_CreateStream(unsigned long *sample_rate, void (*user_callback)(void*, float*, size_t));
 CLOWNAUDIO_EXPORT bool ClownAudio_DestroyStream(ClownAudio_Stream *stream);
-CLOWNAUDIO_EXPORT bool ClownAudio_SetStreamVolume(ClownAudio_Stream *stream, float volume);
+CLOWNAUDIO_EXPORT void ClownAudio_SetStreamCallbackData(ClownAudio_Stream *stream, void *user_data);
 CLOWNAUDIO_EXPORT bool ClownAudio_PauseStream(ClownAudio_Stream *stream);
 CLOWNAUDIO_EXPORT bool ClownAudio_ResumeStream(ClownAudio_Stream *stream);
+CLOWNAUDIO_EXPORT void ClownAudio_LockStream(ClownAudio_Stream *stream);
+CLOWNAUDIO_EXPORT void ClownAudio_UnlockStream(ClownAudio_Stream *stream);
 
 #ifdef __cplusplus
 }

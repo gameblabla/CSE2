@@ -32,7 +32,7 @@
 #undef MIN
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
-struct Decoder_libFLAC
+typedef struct Decoder_libFLAC
 {
 	ROMemoryStream *memory_stream;
 	FLAC__StreamDecoder *flac_stream_decoder;
@@ -47,7 +47,7 @@ struct Decoder_libFLAC
 	unsigned char *block_buffer;
 	unsigned long block_buffer_index;
 	unsigned long block_buffer_size;
-};
+} Decoder_libFLAC;
 
 static FLAC__StreamDecoderReadStatus fread_wrapper(const FLAC__StreamDecoder *flac_stream_decoder, FLAC__byte *output, size_t *count, void *user)
 {
@@ -175,7 +175,7 @@ static void ErrorCallback(const FLAC__StreamDecoder *flac_stream_decoder, FLAC__
 	decoder->error = true;
 }
 
-Decoder_libFLAC* Decoder_libFLAC_Create(const unsigned char *data, size_t data_size, bool loop, const DecoderSpec *wanted_spec, DecoderSpec *spec)
+void* Decoder_libFLAC_Create(const unsigned char *data, size_t data_size, bool loop, const DecoderSpec *wanted_spec, DecoderSpec *spec)
 {
 	(void)loop;	// This is ignored in simple decoders
 	(void)wanted_spec;
@@ -216,8 +216,10 @@ Decoder_libFLAC* Decoder_libFLAC_Create(const unsigned char *data, size_t data_s
 	return NULL;
 }
 
-void Decoder_libFLAC_Destroy(Decoder_libFLAC *decoder)
+void Decoder_libFLAC_Destroy(void *decoder_void)
 {
+	Decoder_libFLAC *decoder = (Decoder_libFLAC*)decoder_void;
+
 	FLAC__stream_decoder_finish(decoder->flac_stream_decoder);
 	FLAC__stream_decoder_delete(decoder->flac_stream_decoder);
 	ROMemoryStream_Destroy(decoder->memory_stream);
@@ -225,13 +227,17 @@ void Decoder_libFLAC_Destroy(Decoder_libFLAC *decoder)
 	free(decoder);
 }
 
-void Decoder_libFLAC_Rewind(Decoder_libFLAC *decoder)
+void Decoder_libFLAC_Rewind(void *decoder_void)
 {
+	Decoder_libFLAC *decoder = (Decoder_libFLAC*)decoder_void;
+
 	FLAC__stream_decoder_seek_absolute(decoder->flac_stream_decoder, 0);
 }
 
-size_t Decoder_libFLAC_GetSamples(Decoder_libFLAC *decoder, void *buffer, size_t frames_to_do)
+size_t Decoder_libFLAC_GetSamples(void *decoder_void, void *buffer, size_t frames_to_do)
 {
+	Decoder_libFLAC *decoder = (Decoder_libFLAC*)decoder_void;
+
 	if (decoder->block_buffer_index == decoder->block_buffer_size)
 	{
 		FLAC__stream_decoder_process_single(decoder->flac_stream_decoder);

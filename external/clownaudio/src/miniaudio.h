@@ -1,6 +1,6 @@
 /*
 Audio playback and capture library. Choice of public domain or MIT-0. See license statements at the end of this file.
-miniaudio - v0.10.1 - 2020-03-17
+miniaudio - v0.10.2 - TBD
 
 David Reid - davidreidsoftware@gmail.com
 
@@ -32555,6 +32555,9 @@ static ma_result ma_linear_resampler_set_rate_internal(ma_linear_resampler* pRes
         return MA_INVALID_ARGS;
     }
 
+    pResampler->config.sampleRateIn  = sampleRateIn;
+    pResampler->config.sampleRateOut = sampleRateOut;
+
     /* Simplify the sample rate. */
     gcf = ma_gcf_u32(pResampler->config.sampleRateIn, pResampler->config.sampleRateOut);
     pResampler->config.sampleRateIn  /= gcf;
@@ -35953,7 +35956,7 @@ static MA_INLINE void ma_pcm_deinterleave_s16__optimized(void** dst, const void*
     ma_pcm_deinterleave_s16__reference(dst, src, frameCount, channels);
 }
 
-void ma_pcm_deinterleave_s16(void** dst, const void* src, ma_uint64 frameCount, ma_uint32 channels)
+MA_API void ma_pcm_deinterleave_s16(void** dst, const void* src, ma_uint64 frameCount, ma_uint32 channels)
 {
 #ifdef MA_USE_REFERENCE_CONVERSION_APIS
     ma_pcm_deinterleave_s16__reference(dst, src, frameCount, channels);
@@ -37399,7 +37402,7 @@ static void ma_pcm_interleave_f32__optimized(void* dst, const void** src, ma_uin
     ma_pcm_interleave_f32__reference(dst, src, frameCount, channels);
 }
 
-void ma_pcm_interleave_f32(void* dst, const void** src, ma_uint64 frameCount, ma_uint32 channels)
+MA_API void ma_pcm_interleave_f32(void* dst, const void** src, ma_uint64 frameCount, ma_uint32 channels)
 {
 #ifdef MA_USE_REFERENCE_CONVERSION_APIS
     ma_pcm_interleave_f32__reference(dst, src, frameCount, channels);
@@ -42260,6 +42263,10 @@ The following miscellaneous changes have also been made.
 /*
 REVISION HISTORY
 ================
+v0.10.2 - TBD
+  - Decorate some APIs with MA_API which were missed in the previous version.
+  - Fix a bug in ma_linear_resampler_set_rate() and ma_linear_resampler_set_rate_ratio().
+
 v0.10.1 - 2020-03-17
   - Add MA_API decoration. This can be customized by defining it before including miniaudio.h.
   - Fix a bug where opening a file would return a success code when in fact it failed.

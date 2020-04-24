@@ -21,6 +21,7 @@
 #include "libopenmpt.h"
 
 #include <stddef.h>
+#include <stdlib.h>
 
 #include <libopenmpt/libopenmpt.h>
 
@@ -29,45 +30,69 @@
 #define SAMPLE_RATE 48000
 #define CHANNEL_COUNT 2
 
-Decoder_libOpenMPT* Decoder_libOpenMPT_Create(const unsigned char *data, size_t data_size, bool loop, const DecoderSpec *wanted_spec, DecoderSpec *spec)
+typedef struct Decoder_libOpenMPT
+{
+	openmpt_module *module;
+	unsigned long sample_rate;
+} Decoder_libOpenMPT;
+
+void* Decoder_libOpenMPT_Create(const unsigned char *data, size_t data_size, bool loop, const DecoderSpec *wanted_spec, DecoderSpec *spec)
 {
 	(void)wanted_spec;
 
-	openmpt_module *module = openmpt_module_create_from_memory2(data, data_size, openmpt_log_func_silent, NULL, openmpt_error_func_ignore, NULL, NULL, NULL, NULL);
+	Decoder_libOpenMPT *decoder = (Decoder_libOpenMPT*)malloc(sizeof(Decoder_libOpenMPT));
 
-	if (module != NULL)
+	if (decoder != NULL)
 	{
-		spec->sample_rate = SAMPLE_RATE;
-		spec->channel_count = CHANNEL_COUNT;
-		spec->format = DECODER_FORMAT_F32;
-		spec->is_complex = true;
+		unsigned long sample_rate = wanted_spec->sample_rate == 0 ? SAMPLE_RATE : wanted_spec->sample_rate;
 
-		if (loop)
-			openmpt_module_set_repeat_count(module, -1);
+		decoder->module = openmpt_module_create_from_memory2(data, data_size, openmpt_log_func_silent, NULL, openmpt_error_func_ignore, NULL, NULL, NULL, NULL);
+		decoder->sample_rate = sample_rate;
+
+		if (decoder->module != NULL)
+		{
+			spec->sample_rate = sample_rate;
+			spec->channel_count = CHANNEL_COUNT;
+			spec->format = DECODER_FORMAT_F32;
+			spec->is_complex = true;
+
+			if (loop)
+				openmpt_module_set_repeat_count(decoder->module, -1);
+
+			return decoder;
+		}
+
+		free(decoder);
 	}
 
-	return (Decoder_libOpenMPT*)module;
+	return NULL;
 }
 
-void Decoder_libOpenMPT_Destroy(Decoder_libOpenMPT *decoder)
+void Decoder_libOpenMPT_Destroy(void *decoder_void)
 {
-	openmpt_module_destroy((openmpt_module*)decoder);
+	Decoder_libOpenMPT *decoder = (Decoder_libOpenMPT*)decoder_void;
+
+	openmpt_module_destroy(decoder->module);
 }
 
-void Decoder_libOpenMPT_Rewind(Decoder_libOpenMPT *decoder)
+void Decoder_libOpenMPT_Rewind(void *decoder_void)
 {
-	openmpt_module_set_position_seconds((openmpt_module*)decoder, 0);
+	Decoder_libOpenMPT *decoder = (Decoder_libOpenMPT*)decoder_void;
+
+	openmpt_module_set_position_seconds(decoder->module, 0);
 }
 
-size_t Decoder_libOpenMPT_GetSamples(Decoder_libOpenMPT *decoder, void *buffer_void, size_t frames_to_do)
+size_t Decoder_libOpenMPT_GetSamples(void *decoder_void, void *buffer_void, size_t frames_to_do)
 {
+	Decoder_libOpenMPT *decoder = (Decoder_libOpenMPT*)decoder_void;
+
 	float *buffer = (float*)buffer_void;
 
 	size_t frames_done = 0;
 
 	while (frames_done != frames_to_do)
 	{
-		size_t frames = openmpt_module_read_interleaved_float_stereo((openmpt_module*)decoder, SAMPLE_RATE, frames_to_do - frames_done, &buffer[frames_done * CHANNEL_COUNT]);
+		size_t frames = openmpt_module_read_interleaved_float_stereo(decoder->module, decoder->sample_rate, frames_to_do - frames_done, &buffer[frames_done * CHANNEL_COUNT]);
 
 		if (frames == 0)
 			break;

@@ -25,12 +25,11 @@
 #include "decoders/common.h"
 
 typedef struct DecoderSelectorData DecoderSelectorData;
-typedef struct DecoderSelector DecoderSelector;
 
-DecoderSelectorData* DecoderSelector_LoadData(const unsigned char *data, size_t data_size, bool predecode);
+DecoderSelectorData* DecoderSelector_LoadData(const unsigned char *data, size_t data_size, bool predecode, bool must_predecode, const DecoderSpec *wanted_spec);
 void DecoderSelector_UnloadData(DecoderSelectorData *data);
-DecoderSelector* DecoderSelector_Create(DecoderSelectorData *data, bool loop, const DecoderSpec *wanted_spec, DecoderSpec *spec);
-void DecoderSelector_Destroy(DecoderSelector *selector);
-void DecoderSelector_Rewind(DecoderSelector *selector);
-size_t DecoderSelector_GetSamples(DecoderSelector *selector, void *buffer, size_t frames_to_do);
-void DecoderSelector_SetLoop(DecoderSelector *selector, bool loop);
+void* DecoderSelector_Create(DecoderSelectorData *data, bool loop, const DecoderSpec *wanted_spec, DecoderSpec *spec);
+void DecoderSelector_Destroy(void *selector);
+void DecoderSelector_Rewind(void *selector);
+size_t DecoderSelector_GetSamples(void *selector, void *buffer, size_t frames_to_do);
+void DecoderSelector_SetLoop(void *selector, bool loop);

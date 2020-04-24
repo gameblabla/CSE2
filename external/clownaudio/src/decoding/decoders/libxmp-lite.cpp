@@ -34,16 +34,16 @@
 #define SAMPLE_RATE 48000
 #define CHANNEL_COUNT 2
 
-struct Decoder_libXMPLite
+typedef struct Decoder_libXMPLite
 {
 	xmp_context context;
 	bool loop;
 	xmp_frame_info frame_info;
 	size_t buffer_done;
 	size_t buffer_size;
-};
+} Decoder_libXMPLite;
 
-Decoder_libXMPLite* Decoder_libXMPLite_Create(const unsigned char *data, size_t data_size, bool loop, const DecoderSpec *wanted_spec, DecoderSpec *spec)
+void* Decoder_libXMPLite_Create(const unsigned char *data, size_t data_size, bool loop, const DecoderSpec *wanted_spec, DecoderSpec *spec)
 {
 	(void)wanted_spec;
 
@@ -51,7 +51,9 @@ Decoder_libXMPLite* Decoder_libXMPLite_Create(const unsigned char *data, size_t 
 
 	if (!xmp_load_module_from_memory(context, (void*)data, data_size))
 	{
-		xmp_start_player(context, SAMPLE_RATE, 0);
+		unsigned long sample_rate = wanted_spec->sample_rate == 0 ? SAMPLE_RATE : wanted_spec->sample_rate;
+
+		xmp_start_player(context, sample_rate, 0);
 
 		Decoder_libXMPLite *decoder = (Decoder_libXMPLite*)malloc(sizeof(Decoder_libXMPLite));
 
@@ -62,7 +64,7 @@ Decoder_libXMPLite* Decoder_libXMPLite_Create(const unsigned char *data, size_t 
 			decoder->buffer_done = 0;
 			decoder->buffer_size = 0;
 
-			spec->sample_rate = SAMPLE_RATE;
+			spec->sample_rate = sample_rate;
 			spec->channel_count = CHANNEL_COUNT;
 			spec->format = DECODER_FORMAT_S16;
 			spec->is_complex = true;
@@ -79,23 +81,30 @@ Decoder_libXMPLite* Decoder_libXMPLite_Create(const unsigned char *data, size_t 
 	return NULL;
 }
 
-void Decoder_libXMPLite_Destroy(Decoder_libXMPLite *decoder)
+void Decoder_libXMPLite_Destroy(void *decoder_void)
 {
+	Decoder_libXMPLite *decoder = (Decoder_libXMPLite*)decoder_void;
+
 	xmp_end_player(decoder->context);
 	xmp_release_module(decoder->context);
 	xmp_free_context(decoder->context);
 	free(decoder);
 }
 
-void Decoder_libXMPLite_Rewind(Decoder_libXMPLite *decoder)
+void Decoder_libXMPLite_Rewind(void *decoder_void)
 {
+	Decoder_libXMPLite *decoder = (Decoder_libXMPLite*)decoder_void;
+
 	xmp_restart_module(decoder->context);
-	xmp_play_frame(decoder->context);
-	xmp_get_frame_info(decoder->context, &decoder->frame_info);
+
+	decoder->buffer_done = 0;
+	decoder->buffer_size = 0;
 }
 
-size_t Decoder_libXMPLite_GetSamples(Decoder_libXMPLite *decoder, void *buffer, size_t frames_to_do)
+size_t Decoder_libXMPLite_GetSamples(void *decoder_void, void *buffer, size_t frames_to_do)
 {
+	Decoder_libXMPLite *decoder = (Decoder_libXMPLite*)decoder_void;
+
 	size_t frames_done = 0;
 	while (frames_done != frames_to_do)
 	{

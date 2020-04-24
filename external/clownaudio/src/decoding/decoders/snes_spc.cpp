@@ -29,15 +29,15 @@
 
 #define CHANNEL_COUNT 2
 
-struct Decoder_SNES_SPC
+typedef struct Decoder_SNES_SPC
 {
 	const unsigned char *data;
 	size_t data_size;
 	SNES_SPC *snes_spc;
 	SPC_Filter *filter;
-};
+} Decoder_SNES_SPC;
 
-Decoder_SNES_SPC* Decoder_SNES_SPC_Create(const unsigned char *data, size_t data_size, bool loop, const DecoderSpec *wanted_spec, DecoderSpec *spec)
+void* Decoder_SNES_SPC_Create(const unsigned char *data, size_t data_size, bool loop, const DecoderSpec *wanted_spec, DecoderSpec *spec)
 {
 	(void)loop;	// Unusable, sadly - looping is up to the music file
 	(void)wanted_spec;
@@ -76,22 +76,28 @@ Decoder_SNES_SPC* Decoder_SNES_SPC_Create(const unsigned char *data, size_t data
 	return NULL;
 }
 
-void Decoder_SNES_SPC_Destroy(Decoder_SNES_SPC *decoder)
+void Decoder_SNES_SPC_Destroy(void *decoder_void)
 {
+	Decoder_SNES_SPC *decoder = (Decoder_SNES_SPC*)decoder_void;
+
 	spc_filter_delete(decoder->filter);
 	spc_delete(decoder->snes_spc);
 	free(decoder);
 }
 
-void Decoder_SNES_SPC_Rewind(Decoder_SNES_SPC *decoder)
+void Decoder_SNES_SPC_Rewind(void *decoder_void)
 {
+	Decoder_SNES_SPC *decoder = (Decoder_SNES_SPC*)decoder_void;
+
 	spc_delete(decoder->snes_spc);
 	decoder->snes_spc = spc_new();
 	spc_load_spc(decoder->snes_spc, decoder->data, decoder->data_size);
 }
 
-size_t Decoder_SNES_SPC_GetSamples(Decoder_SNES_SPC *decoder, void *buffer, size_t frames_to_do)
+size_t Decoder_SNES_SPC_GetSamples(void *decoder_void, void *buffer, size_t frames_to_do)
 {
+	Decoder_SNES_SPC *decoder = (Decoder_SNES_SPC*)decoder_void;
+
 	spc_play(decoder->snes_spc, frames_to_do * CHANNEL_COUNT, (short*)buffer);
 
 	spc_filter_run(decoder->filter, (spc_sample_t*)buffer, frames_to_do * CHANNEL_COUNT);
