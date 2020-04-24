@@ -180,21 +180,21 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 										// Calculate centred viewports
 										switch (GX2GetSystemTVScanMode())	
 										{
-											case GX2_TV_SCAN_MODE_NONE:	// lolwut
-												break;
-
-											case GX2_TV_SCAN_MODE_480I:
-											case GX2_TV_SCAN_MODE_480P:
+											// For now, we have to match WUT's broken behaviour (its `GX2TVScanMode`
+											// enum is missing values, and the rest are off-by-one)
+											//case GX2_TV_SCAN_MODE_576I:
+											case GX2_TV_SCAN_MODE_480I:	// Actually 576i
+											case GX2_TV_SCAN_MODE_480P:	// Actually 480i
 												CalculateViewport(854, 480, &tv_viewport);
 												break;
 
-											case GX2_TV_SCAN_MODE_720P:
-											case 4:	// Why the hell doesn't WUT have an enum for this? It always returns this value for me!
+											case GX2_TV_SCAN_MODE_720P:	// Actually 480p
+											default:	// Funnel the *real* 1080p into this
 												CalculateViewport(1280, 720, &tv_viewport);
 												break;
 
-											case GX2_TV_SCAN_MODE_1080I:
-											case GX2_TV_SCAN_MODE_1080P:
+											case GX2_TV_SCAN_MODE_1080I:	// Actually invalid
+											case GX2_TV_SCAN_MODE_1080P:	// Actually 1080i
 												CalculateViewport(1920, 1080, &tv_viewport);
 												break;
 										}
