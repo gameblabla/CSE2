@@ -16,6 +16,7 @@
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
+static ma_context context;
 static ma_device device;
 static ma_mutex mutex;
 static ma_mutex organya_mutex;
