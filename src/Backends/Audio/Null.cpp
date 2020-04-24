@@ -69,3 +69,13 @@ void AudioBackend_SetOrganyaTimer(unsigned int milliseconds)
 {
 	(void)milliseconds;
 }
+
+void AudioBackend_Lock(void)
+{
+	
+}
+
+void AudioBackend_Unlock(void)
+{
+	
+}

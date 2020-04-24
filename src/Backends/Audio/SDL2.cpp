@@ -237,3 +237,13 @@ void AudioBackend_SetOrganyaTimer(unsigned int milliseconds)
 
 	SDL_UnlockAudioDevice(device_id);
 }
+
+void AudioBackend_Lock(void)
+{
+	SDL_LockAudioDevice(device_id);
+}
+
+void AudioBackend_Unlock(void)
+{
+	SDL_UnlockAudioDevice(device_id);
+}

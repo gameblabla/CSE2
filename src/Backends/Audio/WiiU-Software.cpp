@@ -359,3 +359,13 @@ void AudioBackend_SetOrganyaTimer(unsigned int milliseconds)
 
 	OSUnlockMutex(&organya_mutex);
 }
+
+void AudioBackend_Lock(void)
+{
+	OSLockMutex(&sound_list_mutex);
+}
+
+void AudioBackend_Unlock(void)
+{
+	OSUnlockMutex(&sound_list_mutex);
+}
