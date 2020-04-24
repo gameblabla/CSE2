@@ -89,60 +89,71 @@ bool AudioBackend_Init(void)
 
 	ma_result return_value;
 
-	return_value = ma_device_init(NULL, &config, &device);
+	return_value = ma_context_init(NULL, 0, NULL, &context);
 
 	if (return_value == MA_SUCCESS)
 	{
-		return_value = ma_mutex_init(device.pContext, &mutex);
+		return_value = ma_device_init(&context, &config, &device);
 
 		if (return_value == MA_SUCCESS)
 		{
-			return_value = ma_mutex_init(device.pContext, &organya_mutex);
+			return_value = ma_mutex_init(device.pContext, &mutex);
 
 			if (return_value == MA_SUCCESS)
 			{
-			#ifdef EXTRA_SOUND_FORMATS
-				ExtraSound_Init(output_frequency);
-			#endif
-
-				return_value = ma_device_start(&device);
+				return_value = ma_mutex_init(device.pContext, &organya_mutex);
 
 				if (return_value == MA_SUCCESS)
 				{
-					output_frequency = device.sampleRate;
+				#ifdef EXTRA_SOUND_FORMATS
+					ExtraSound_Init(output_frequency);
+				#endif
 
-					Mixer_Init(device.sampleRate);
+					return_value = ma_device_start(&device);
 
-					return true;
+					if (return_value == MA_SUCCESS)
+					{
+						output_frequency = device.sampleRate;
+
+						Mixer_Init(device.sampleRate);
+
+						return true;
+					}
+					else
+					{
+						Backend_PrintError("Failed to start playback device: %s", ma_result_description(return_value));
+					}
+
+				#ifdef EXTRA_SOUND_FORMATS
+					ExtraSound_Deinit();
+				#endif
+
+					ma_mutex_uninit(&organya_mutex);
 				}
 				else
 				{
-					Backend_PrintError("Failed to start playback device: %s", ma_result_description(return_value));
+					Backend_PrintError("Failed to create organya mutex: %s", ma_result_description(return_value));
 				}
 
-			#ifdef EXTRA_SOUND_FORMATS
-				ExtraSound_Deinit();
-			#endif
-
-				ma_mutex_uninit(&organya_mutex);
+				ma_mutex_uninit(&mutex);
 			}
 			else
 			{
-				Backend_PrintError("Failed to create organya mutex: %s", ma_result_description(return_value));
+				Backend_PrintError("Failed to create mutex: %s", ma_result_description(return_value));
 			}
 
-			ma_mutex_uninit(&mutex);
+			ma_device_uninit(&device);
 		}
 		else
 		{
-			Backend_PrintError("Failed to create mutex: %s", ma_result_description(return_value));
+			Backend_PrintError("Failed to initialize playback device: %s", ma_result_description(return_value));
 		}
 
-		ma_device_uninit(&device);
+		ma_context_uninit(&context);
 	}
 	else
 	{
-		Backend_PrintError("Failed to initialize playback device: %s", ma_result_description(return_value));
+		Backend_PrintError("Failed to initialize context: %s", ma_result_description(return_value));
 	}
 
 
@@ -165,6 +176,8 @@ void AudioBackend_Deinit(void)
 	ma_mutex_uninit(&mutex);
 
 	ma_device_uninit(&device);
+
+	ma_context_uninit(&context);
 }
 
 AudioBackend_Sound* AudioBackend_CreateSound(unsigned int frequency, const unsigned char *samples, size_t length)

@@ -196,7 +196,7 @@ void Backend_HideMouse(void)
 
 void Backend_SetWindowIcon(const unsigned char *rgb_pixels, unsigned int width, unsigned int height)
 {
-	// Convert to RGBA, since that's the only think GLFW3 accepts
+	// Convert to RGBA, since that's the only thing GLFW3 accepts
 	unsigned char *rgba_pixels = (unsigned char*)malloc(width * height * 4);
 
 	const unsigned char *rgb_pointer = rgb_pixels;
