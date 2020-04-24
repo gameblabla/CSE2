@@ -12,6 +12,10 @@
 #include <sndcore2/voice.h>
 #include <sndcore2/drcvs.h>
 
+#ifdef EXTRA_SOUND_FORMATS
+#include "../../ExtraSoundFormats.h"
+#endif
+
 #include "SoftwareMixer.h"
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
@@ -73,6 +77,10 @@ static void FillMixerBuffer(float *stream, size_t frames_total)
 	}
 
 	OSUnlockMutex(&organya_mutex);
+
+#ifdef EXTRA_SOUND_FORMATS
+	ExtraSound_Mix(stream, frames_total);
+#endif
 }
 
 static void FrameCallback(void)
@@ -150,6 +158,10 @@ bool AudioBackend_Init(void)
 	OSInitMutex(&organya_mutex);
 
 	output_frequency = AXGetInputSamplesPerSec();
+
+#ifdef EXTRA_SOUND_FORMATS
+	ExtraSound_Init(output_frequency);
+#endif
 
 	Mixer_Init(output_frequency);
 
@@ -240,6 +252,10 @@ bool AudioBackend_Init(void)
 
 void AudioBackend_Deinit(void)
 {
+#ifdef EXTRA_SOUND_FORMATS
+	ExtraSound_Deinit();
+#endif
+
 	for (unsigned int i = 0; i < 2; ++i)
 	{
 		AXFreeVoice(voices[i]);
