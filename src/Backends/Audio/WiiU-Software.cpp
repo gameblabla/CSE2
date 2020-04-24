@@ -92,28 +92,28 @@ static void FrameCallback(void)
 	AXVoiceOffsets offsets;
 	AXGetVoiceOffsets(voices[0], &offsets);
 
-	unsigned int current_buffer = offsets.currentOffset > (buffer_length / 2) ? 1 : 0;	// TODO - should probably be '>='
+	unsigned int current_buffer = offsets.currentOffset > buffer_length ? 1 : 0;	// TODO - should probably be '>='
 
 	static unsigned int last_buffer = 1;
 
 	if (current_buffer != last_buffer)
 	{
 		// Clear the mixer buffer
-		for (unsigned int i = 0; i < (buffer_length / 2) * 2; ++i)
+		for (unsigned int i = 0; i < buffer_length * 2; ++i)
 			stream_buffer_float[i] = 0.0f;
 
 		// Fill mixer buffer
-		FillMixerBuffer(stream_buffer_float, buffer_length / 2);
+		FillMixerBuffer(stream_buffer_float, buffer_length;
 
 		// Deinterlate samples, convert them to S16, and write them to the double-buffers
-		short *left_output_buffer = &stream_buffers[0][(buffer_length / 2) * last_buffer];
-		short *right_output_buffer = &stream_buffers[1][(buffer_length / 2) * last_buffer];
+		short *left_output_buffer = &stream_buffers[0][buffer_length * last_buffer];
+		short *right_output_buffer = &stream_buffers[1][buffer_length * last_buffer];
 
 		float *mixer_buffer_pointer = stream_buffer_float;
 		short *left_output_buffer_pointer = left_output_buffer;
 		short *right_output_buffer_pointer = right_output_buffer;
 
-		for (unsigned int i = 0; i < buffer_length / 2; ++i)
+		for (unsigned int i = 0; i < buffer_length; ++i)
 		{
 			float left_sample = *mixer_buffer_pointer++;
 			float right_sample = *mixer_buffer_pointer++;
@@ -135,8 +135,8 @@ static void FrameCallback(void)
 		}
 
 		// Make sure the sound hardware can see our data
-		DCStoreRange(left_output_buffer, (buffer_length / 2) * sizeof(short));
-		DCStoreRange(right_output_buffer, (buffer_length / 2) * sizeof(short));
+		DCStoreRange(left_output_buffer, buffer_length * sizeof(short));
+		DCStoreRange(right_output_buffer, buffer_length * sizeof(short));
 
 		last_buffer = current_buffer;
 	}
@@ -172,15 +172,15 @@ bool AudioBackend_Init(void)
 
 	// The software-mixer outputs interlaced float samples, so create
 	// a buffer for it here.
-	stream_buffer_float = (float*)malloc((buffer_length / 2) * sizeof(float) * 2);
+	stream_buffer_float = (float*)malloc(buffer_length * sizeof(float) * 2);	// `* 2` because it's an interlaced stereo buffer
 
 	if (stream_buffer_float != NULL)
 	{
-		stream_buffers[0] = (short*)malloc(buffer_length * sizeof(short));
+		stream_buffers[0] = (short*)malloc(buffer_length * sizeof(short) * 2);	// `* 2` because it's a double-buffer
 
 		if (stream_buffers[0] != NULL)
 		{
-			stream_buffers[1] = (short*)malloc(buffer_length * sizeof(short));
+			stream_buffers[1] = (short*)malloc(buffer_length * sizeof(short) * 2);	// `* 2` because it's a double-buffer
 
 			if (stream_buffers[1] != NULL)
 			{
@@ -216,7 +216,7 @@ bool AudioBackend_Init(void)
 								.dataType = AX_VOICE_FORMAT_LPCM16,
 								.loopingEnabled = AX_VOICE_LOOP_ENABLED,
 								.loopOffset = 0,
-								.endOffset = buffer_length,
+								.endOffset = buffer_length * 2,
 								.currentOffset = 0,
 								.data = stream_buffers[i]
 							};
