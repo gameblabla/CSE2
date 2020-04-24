@@ -103,7 +103,7 @@ static void FrameCallback(void)
 			stream_buffer_float[i] = 0.0f;
 
 		// Fill mixer buffer
-		FillMixerBuffer(stream_buffer_float, buffer_length;
+		FillMixerBuffer(stream_buffer_float, buffer_length);
 
 		// Deinterlate samples, convert them to S16, and write them to the double-buffers
 		short *left_output_buffer = &stream_buffers[0][buffer_length * last_buffer];
