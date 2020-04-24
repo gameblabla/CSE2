@@ -106,15 +106,15 @@ bool AudioBackend_Init(void)
 
 				if (return_value == MA_SUCCESS)
 				{
-				#ifdef EXTRA_SOUND_FORMATS
-					ExtraSound_Init(output_frequency);
-				#endif
-
 					return_value = ma_device_start(&device);
 
 					if (return_value == MA_SUCCESS)
 					{
 						output_frequency = device.sampleRate;
+
+					#ifdef EXTRA_SOUND_FORMATS
+						ExtraSound_Init(device.sampleRate);
+					#endif
 
 						Mixer_Init(device.sampleRate);
 
@@ -124,10 +124,6 @@ bool AudioBackend_Init(void)
 					{
 						Backend_PrintError("Failed to start playback device: %s", ma_result_description(return_value));
 					}
-
-				#ifdef EXTRA_SOUND_FORMATS
-					ExtraSound_Deinit();
-				#endif
 
 					ma_mutex_uninit(&organya_mutex);
 				}
