@@ -766,14 +766,14 @@ int RestoreSurfaces(void)
 	{
 		++surfaces_regenerated;
 		frontbuffer->Restore();
-		out(0x66);
+		out('f');	// 'f' for 'frontbuffer'
 	}
 
 	if (backbuffer->IsLost() == DDERR_SURFACELOST)
 	{
 		++surfaces_regenerated;
 		backbuffer->Restore();
-		out(0x62);
+		out('b');	// 'b' for 'backbuffer'
 	}
 
 	for (s = 0; s < SURFACE_ID_MAX; ++s)
@@ -784,7 +784,7 @@ int RestoreSurfaces(void)
 			{
 				++surfaces_regenerated;
 				surf[s]->Restore();
-				out(0x30 + s);
+				out('0' + s);	// The number of the surface lost
 
 				if (!surface_metadata[s].bSystem)
 				{
