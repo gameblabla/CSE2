@@ -145,7 +145,7 @@ ATTRIBUTE_FORMAT_PRINTF(1, 2) void Backend_PrintError(const char *format, ...)
 
 	va_list argument_list;
 	va_start(argument_list, format);
-	vsprintf(message_buffer, format, argument_list);
+	vsnprintf(message_buffer, sizeof(message_buffer), format, argument_list);
 	va_end(argument_list);
 
 	WHBLogPrint("ERROR:");
@@ -158,7 +158,7 @@ ATTRIBUTE_FORMAT_PRINTF(1, 2) void Backend_PrintInfo(const char *format, ...)
 
 	va_list argument_list;
 	va_start(argument_list, format);
-	vsprintf(message_buffer, format, argument_list);
+	vsnprintf(message_buffer, sizeof(message_buffer), format, argument_list);
 	va_end(argument_list);
 
 	WHBLogPrint("INFO:");
