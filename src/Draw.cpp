@@ -721,12 +721,12 @@ void InitTextObject(const char *name)
 			break;
 
 		case 2:
-			height = 9;
-			width = 8;
+			height = 18;
+			width = 16;
 			break;
 	}
 
-	font = LoadFont(path, width * magnification, height * magnification);
+	font = LoadFont(path, width, height);
 }
 
 void PutText(int x, int y, const char *text, unsigned long color)
