@@ -160,7 +160,7 @@ const char* ControllerBackend_GetButtonName(unsigned int button_id)
 	};
 
 	if (button_id >= sizeof(button_names) / sizeof(button_names[0]))
-		return "Invalid";
+		return "Unknown";
 
 	return button_names[button_id];
 }
