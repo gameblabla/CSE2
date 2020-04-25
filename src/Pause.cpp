@@ -781,8 +781,6 @@ static int Callback_Resolution(OptionsMenu *parent_menu, size_t this_option, Cal
 					parent_menu->options[this_option].value = 0;
 			}
 
-			gb60fps = parent_menu->options[this_option].value;
-
 			PlaySoundObject(SND_SWITCH_WEAPON, 1);
 
 			// Fallthrough
