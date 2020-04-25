@@ -123,7 +123,7 @@ BOOL StartDirectDraw(const char *title, int lMagnification, BOOL b60fps, BOOL bS
 			fullscreen = FALSE;
 			break;
 
-		case 0:
+		case 0:	// Fullscreen
 			// Round to the nearest internal resolution
 			magnification = MIN((display_mode.width + (WINDOW_WIDTH / 2)) / WINDOW_WIDTH, (display_mode.height + (WINDOW_HEIGHT / 2)) / WINDOW_HEIGHT);
 			fullscreen = TRUE;
