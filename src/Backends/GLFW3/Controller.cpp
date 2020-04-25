@@ -1,6 +1,7 @@
 #include "../Controller.h"
 
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #define GLFW_INCLUDE_NONE
@@ -166,4 +167,13 @@ bool ControllerBackend_GetJoystickStatus(bool **buttons, unsigned int *button_co
 	*axes = axis_buffer;
 
 	return true;
+}
+
+const char* ControllerBackend_GetButtonName(unsigned int button_id)
+{
+	static char name_buffer[0x10];
+
+	sprintf(name_buffer, "Button #%d", button_id);
+
+	return name_buffer;
 }
