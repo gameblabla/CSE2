@@ -619,7 +619,7 @@ static int Callback_ControlsController_Rebind(OptionsMenu *parent_menu, size_t t
 
 						// Otherwise just overwrite the selected control
 						bindings[controls[this_option].binding_index].controller = button;
-						snprintf(bound_name_buffers[this_option], sizeof(bound_name_buffers[0]), "Button %d", button);
+						strncpy(bound_name_buffers[this_option], ControllerBackend_GetButtonName(button), sizeof(bound_name_buffers[0]));
 
 						PlaySoundObject(18, 1);
 

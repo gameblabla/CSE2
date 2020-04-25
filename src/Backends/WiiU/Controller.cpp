@@ -66,17 +66,17 @@ bool ControllerBackend_GetJoystickStatus(bool **buttons, unsigned int *button_co
 	button_buffer[13] |= vpad_buttons & VPAD_BUTTON_MINUS;
 	button_buffer[14] |= vpad_buttons & VPAD_BUTTON_HOME;
 	button_buffer[15] |= vpad_buttons & VPAD_BUTTON_SYNC;
-	button_buffer[17] |= vpad_buttons & VPAD_BUTTON_STICK_L;
-	button_buffer[16] |= vpad_buttons & VPAD_BUTTON_STICK_R;
+	button_buffer[16] |= vpad_buttons & VPAD_BUTTON_STICK_L;
+	button_buffer[17] |= vpad_buttons & VPAD_BUTTON_STICK_R;
 	button_buffer[18] |= vpad_buttons & VPAD_BUTTON_TV;
-	button_buffer[23] |= vpad_buttons & VPAD_BUTTON_LEFT;
-	button_buffer[24] |= vpad_buttons & VPAD_BUTTON_RIGHT;
-	button_buffer[25] |= vpad_buttons & VPAD_BUTTON_UP;
-	button_buffer[26] |= vpad_buttons & VPAD_BUTTON_DOWN;
-	button_buffer[19] |= vpad_buttons & VPAD_STICK_R_EMULATION_LEFT;
-	button_buffer[20] |= vpad_buttons & VPAD_STICK_R_EMULATION_RIGHT;
-	button_buffer[21] |= vpad_buttons & VPAD_STICK_R_EMULATION_UP;
-	button_buffer[22] |= vpad_buttons & VPAD_STICK_R_EMULATION_DOWN;
+	button_buffer[19] |= vpad_buttons & VPAD_BUTTON_LEFT;
+	button_buffer[20] |= vpad_buttons & VPAD_BUTTON_RIGHT;
+	button_buffer[21] |= vpad_buttons & VPAD_BUTTON_UP;
+	button_buffer[22] |= vpad_buttons & VPAD_BUTTON_DOWN;
+	button_buffer[23] |= vpad_buttons & VPAD_STICK_R_EMULATION_LEFT;
+	button_buffer[24] |= vpad_buttons & VPAD_STICK_R_EMULATION_RIGHT;
+	button_buffer[25] |= vpad_buttons & VPAD_STICK_R_EMULATION_UP;
+	button_buffer[26] |= vpad_buttons & VPAD_STICK_R_EMULATION_DOWN;
 
 	/*
 	// Handle axis inputs
@@ -112,17 +112,17 @@ bool ControllerBackend_GetJoystickStatus(bool **buttons, unsigned int *button_co
 	button_buffer[13] |= kpad_buttons & WPAD_PRO_BUTTON_MINUS;
 	button_buffer[14] |= kpad_buttons & WPAD_PRO_BUTTON_HOME;
 //	button_buffer[15] |= kpad_buttons & WPAD_PRO_BUTTON_SYNC;
-	button_buffer[17] |= kpad_buttons & WPAD_PRO_BUTTON_STICK_L;
-	button_buffer[16] |= kpad_buttons & WPAD_PRO_BUTTON_STICK_R;
+	button_buffer[16] |= kpad_buttons & WPAD_PRO_BUTTON_STICK_L;
+	button_buffer[17] |= kpad_buttons & WPAD_PRO_BUTTON_STICK_R;
 //	button_buffer[18] |= kpad_buttons & WPAD_PRO_BUTTON_TV;
-	button_buffer[23] |= kpad_buttons & WPAD_PRO_BUTTON_LEFT;
-	button_buffer[24] |= kpad_buttons & WPAD_PRO_BUTTON_RIGHT;
-	button_buffer[25] |= kpad_buttons & WPAD_PRO_BUTTON_UP;
-	button_buffer[26] |= kpad_buttons & WPAD_PRO_BUTTON_DOWN;
-	button_buffer[19] |= kpad_buttons & WPAD_PRO_STICK_R_EMULATION_LEFT;
-	button_buffer[20] |= kpad_buttons & WPAD_PRO_STICK_R_EMULATION_RIGHT;
-	button_buffer[21] |= kpad_buttons & WPAD_PRO_STICK_R_EMULATION_UP;
-	button_buffer[22] |= kpad_buttons & WPAD_PRO_STICK_R_EMULATION_DOWN;
+	button_buffer[19] |= kpad_buttons & WPAD_PRO_BUTTON_LEFT;
+	button_buffer[20] |= kpad_buttons & WPAD_PRO_BUTTON_RIGHT;
+	button_buffer[21] |= kpad_buttons & WPAD_PRO_BUTTON_UP;
+	button_buffer[22] |= kpad_buttons & WPAD_PRO_BUTTON_DOWN;
+	button_buffer[23] |= kpad_buttons & WPAD_PRO_STICK_R_EMULATION_LEFT;
+	button_buffer[24] |= kpad_buttons & WPAD_PRO_STICK_R_EMULATION_RIGHT;
+	button_buffer[25] |= kpad_buttons & WPAD_PRO_STICK_R_EMULATION_UP;
+	button_buffer[26] |= kpad_buttons & WPAD_PRO_STICK_R_EMULATION_DOWN;
 
 	return true;
 }
@@ -150,7 +150,7 @@ const char* ControllerBackend_GetButtonName(unsigned int button_id)
 		"Right Stick Button",
 		"TV",
 		"D-Pad Left",
-		"D-Pad Righ",
+		"D-Pad Right",
 		"D-Pad Up",
 		"D-Pad Down",
 		"Right Stick Left",
