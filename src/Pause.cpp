@@ -8,6 +8,7 @@
 #include "WindowsWrapper.h"
 
 #include "Backends/Controller.h"
+#include "Backends/Misc.h"
 #include "CommonDefines.h"
 #include "Config.h"
 #include "Draw.h"
@@ -449,19 +450,19 @@ typedef struct Control
  * they cannot be bound to the same key.
  */
 static const Control controls[] = {
-	{"Up", BINDING_UP, (1 << 0) | (1 << 1)},
-	{"Down", BINDING_DOWN, (1 << 0) | (1 << 1)},
-	{"Left", BINDING_LEFT, (1 << 0) | (1 << 1)},
-	{"Right", BINDING_RIGHT, (1 << 0) | (1 << 1)},
-	{"OK", BINDING_OK, 1 << 1},
-	{"Cancel", BINDING_CANCEL, 1 << 1},
-	{"Jump", BINDING_JUMP, 1 << 0},
-	{"Shoot", BINDING_SHOT, 1 << 0},
-	{"Next Weapon", BINDING_ARMS, 1 << 0},
+	{"Up",              BINDING_UP,     (1 << 0) | (1 << 1)},
+	{"Down",            BINDING_DOWN,   (1 << 0) | (1 << 1)},
+	{"Left",            BINDING_LEFT,   (1 << 0) | (1 << 1)},
+	{"Right",           BINDING_RIGHT,  (1 << 0) | (1 << 1)},
+	{"OK",              BINDING_OK,      1 << 1},
+	{"Cancel",          BINDING_CANCEL,  1 << 1},
+	{"Jump",            BINDING_JUMP,    1 << 0},
+	{"Shoot",           BINDING_SHOT,    1 << 0},
+	{"Next Weapon",     BINDING_ARMS,    1 << 0},
 	{"Previous Weapon", BINDING_ARMSREV, 1 << 0},
-	{"Inventory", BINDING_ITEM, 1 << 0},
-	{"Map", BINDING_MAP, 1 << 0},
-	{"Pause", BINDING_PAUSE, 1 << 0}
+	{"Inventory",       BINDING_ITEM,    1 << 0},
+	{"Map",             BINDING_MAP,     1 << 0},
+	{"Pause",           BINDING_PAUSE,   1 << 0}
 };
 
 static char bound_name_buffers[sizeof(controls) / sizeof(controls[0])][20];
@@ -486,10 +487,12 @@ static int Callback_ControlsKeyboard_Rebind(OptionsMenu *parent_menu, size_t thi
 			BOOL previous_keyboard_state[BACKEND_KEYBOARD_TOTAL];
 			memcpy(previous_keyboard_state, gKeyboardState, sizeof(gKeyboardState));
 
+			// Time-out and exit if the user takes too long (they probably don't want to rebind)
 			for (unsigned int timeout = (60 * 5) - 1; timeout != 0; --timeout)
 			{
 				for (int scancode = 0; scancode < BACKEND_KEYBOARD_TOTAL; ++scancode)
 				{
+					// Wait for user to press a key
 					if (!previous_keyboard_state[scancode] && gKeyboardState[scancode])
 					{
 						const char *key_name = GetKeyName(scancode);
@@ -585,6 +588,7 @@ static int Callback_ControlsController_Rebind(OptionsMenu *parent_menu, size_t t
 			break;
 
 		case ACTION_INIT:
+			// Name each bound button
 			if (bindings[controls[this_option].binding_index].controller == 0xFF)
 				strncpy(bound_name_buffers[this_option], "[Unbound]", sizeof(bound_name_buffers[0]));
 			else
@@ -600,10 +604,12 @@ static int Callback_ControlsController_Rebind(OptionsMenu *parent_menu, size_t t
 			char timeout_string[2];
 			timeout_string[1] = '\0';
 
+			// Time-out and exit if the user takes too long (they probably don't want to rebind)
 			for (unsigned int timeout = (60 * 5) - 1; timeout != 0; --timeout)
 			{
 				for (int button = 0; button < sizeof(gJoystickState.bButton) / sizeof(gJoystickState.bButton[0]); ++button)
 				{
+					// Wait for user to press a button
 					if (!old_state.bButton[button] && gJoystickState.bButton[button])
 					{
 						// If another control in the same group uses this button, swap them
@@ -702,6 +708,7 @@ static int Callback_Framerate(OptionsMenu *parent_menu, size_t this_option, Call
 		case ACTION_OK:
 		case ACTION_LEFT:
 		case ACTION_RIGHT:
+			// Increment value (with wrapping)
 			parent_menu->options[this_option].value = (parent_menu->options[this_option].value + 1) % (sizeof(strings) / sizeof(strings[0]));
 
 			gb60fps = parent_menu->options[this_option].value;
@@ -732,6 +739,7 @@ static int Callback_Vsync(OptionsMenu *parent_menu, size_t this_option, Callback
 			restart_required = TRUE;
 			parent_menu->subtitle = "RESTART REQUIRED";
 
+			// Increment value (with wrapping)
 			parent_menu->options[this_option].value = (parent_menu->options[this_option].value + 1) % (sizeof(strings) / sizeof(strings[0]));
 
 			PlaySoundObject(SND_SWITCH_WEAPON, 1);
@@ -762,11 +770,13 @@ static int Callback_Resolution(OptionsMenu *parent_menu, size_t this_option, Cal
 
 			if (action == ACTION_LEFT)
 			{
+				// Decrement value (with wrapping)
 				if (--parent_menu->options[this_option].value < 0)
 					parent_menu->options[this_option].value = (sizeof(strings) / sizeof(strings[0])) - 1;
 			}
 			else
 			{
+				// Increment value (with wrapping)
 				if (++parent_menu->options[this_option].value > (sizeof(strings) / sizeof(strings[0])) - 1)
 					parent_menu->options[this_option].value = 0;
 			}
@@ -796,6 +806,7 @@ static int Callback_SmoothScrolling(OptionsMenu *parent_menu, size_t this_option
 		case ACTION_OK:
 		case ACTION_LEFT:
 		case ACTION_RIGHT:
+			// Increment value (with wrapping)
 			parent_menu->options[this_option].value = (parent_menu->options[this_option].value + 1) % (sizeof(strings) / sizeof(strings[0]));
 
 			gbSmoothScrolling = parent_menu->options[this_option].value;
@@ -839,6 +850,7 @@ static int Callback_Options(OptionsMenu *parent_menu, size_t this_option, Callba
 		TRUE
 	};
 
+	// Make the options match the configuration data
 	CONFIG conf;
 	if (!LoadConfigData(&conf))
 		DefaultConfigData(&conf);
@@ -854,6 +866,7 @@ static int Callback_Options(OptionsMenu *parent_menu, size_t this_option, Callba
 
 	PlaySoundObject(5, 1);
 
+	// Save our changes to the configuration file
 	conf.b60fps = options[2].value;
 	conf.bVsync = options[3].value;
 	conf.display_mode = options[4].value;
@@ -880,9 +893,9 @@ static int PromptAreYouSure(void)
 			(void)this_option;
 
 			if (action != ACTION_OK)
-				return -1;
+				return -1;	// Go back to previous menu
 
-			return 1;
+			return 1;	// Yes
 		}
 
 		static int Callback_No(OptionsMenu *parent_menu, size_t this_option, CallbackAction action)
@@ -891,9 +904,9 @@ static int PromptAreYouSure(void)
 			(void)this_option;
 
 			if (action != ACTION_OK)
-				return -1;
+				return -1;	// Go back to previous menu
 
-			return 0;
+			return 0;	// No
 		}
 	};
 
@@ -943,11 +956,11 @@ static int Callback_Reset(OptionsMenu *parent_menu, size_t this_option, Callback
 	switch (PromptAreYouSure())
 	{
 		case 0:
-			return_value = -1;
+			return_value = -1;	// Go back to previous menu
 			break;
 
 		case 1:
-			return_value = enum_ESCRETURN_restart;
+			return_value = enum_ESCRETURN_restart;	// Restart game
 			break;
 	}
 
@@ -966,11 +979,11 @@ static int Callback_Quit(OptionsMenu *parent_menu, size_t this_option, CallbackA
 	switch (PromptAreYouSure())
 	{
 		case 0:
-			return_value = -1;
+			return_value = -1;	// Go back to previous menu
 			break;
 
 		case 1:
-			return_value = enum_ESCRETURN_exit;
+			return_value = enum_ESCRETURN_exit;	// Exit game
 			break;
 	}
 
@@ -997,7 +1010,7 @@ int Call_Pause(void)
 
 	int return_value = EnterOptionsMenu(&options_menu, 0);
 
-	gKeyTrg = gKey = 0;
+	gKeyTrg = gKey = 0;	// Avoid input-ghosting
 
 	return return_value;
 }
