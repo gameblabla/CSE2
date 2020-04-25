@@ -7,6 +7,7 @@
 
 #include "WindowsWrapper.h"
 
+#include "Backends/Controller.h"
 #include "CommonDefines.h"
 #include "Config.h"
 #include "Draw.h"
@@ -587,7 +588,7 @@ static int Callback_ControlsController_Rebind(OptionsMenu *parent_menu, size_t t
 			if (bindings[controls[this_option].binding_index].controller == 0xFF)
 				strncpy(bound_name_buffers[this_option], "[Unbound]", sizeof(bound_name_buffers[0]));
 			else
-				snprintf(bound_name_buffers[this_option], sizeof(bound_name_buffers[0]), "Button %d", bindings[controls[this_option].binding_index].controller);
+				strncpy(bound_name_buffers[this_option], ControllerBackend_GetButtonName(bindings[controls[this_option].binding_index].controller), sizeof(bound_name_buffers[0]));
 
 			break;
 

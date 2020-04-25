@@ -126,3 +126,41 @@ bool ControllerBackend_GetJoystickStatus(bool **buttons, unsigned int *button_co
 
 	return true;
 }
+
+const char* ControllerBackend_GetButtonName(unsigned int button_id)
+{
+	const char *button_names[27] = {
+		"B",
+		"A",
+		"Y",
+		"ZL",
+		"ZR",
+		"X",
+		"+",
+		"Left Stick Up",
+		"Left Stick Down",
+		"Left Stick Left",
+		"Left Stick Right",
+		"L",
+		"R",
+		"-",
+		"Home",
+		"Sync",
+		"Left Stick Button",
+		"Right Stick Button",
+		"TV",
+		"D-Pad Left",
+		"D-Pad Righ",
+		"D-Pad Up",
+		"D-Pad Down",
+		"Right Stick Left",
+		"Right Stick Right",
+		"Right Stick Up",
+		"Right Stick Down"
+	};
+
+	if (button_id >= sizeof(button_names) / sizeof(button_names[0]))
+		return "Invalid";
+
+	return button_names[button_id];
+}
