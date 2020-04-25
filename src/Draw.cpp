@@ -37,6 +37,9 @@ BOOL fullscreen;
 BOOL gb60fps;
 BOOL gbSmoothScrolling;
 
+static BOOL gbVsync;
+static unsigned int vsync_fps;
+
 static RenderBackend_Surface *framebuffer;
 
 static RenderBackend_Surface *surf[SURFACE_ID_MAX];
@@ -53,15 +56,13 @@ static struct
 	BOOL bSystem;	// Basically a 'do not regenerate' flag
 } surface_metadata[SURFACE_ID_MAX];
 
-static BOOL gbVsync;
-
 BOOL Flip_SystemTask(void)
 {
 	// TODO - Not the original variable names
 	static unsigned long timePrev;
 	static unsigned long timeNow;
 
-	if (gbVsync)
+	if (gbVsync && vsync_fps == (gb60fps ? 60 : 50))
 	{
 		if (!SystemTask())
 			return FALSE;
@@ -113,6 +114,7 @@ BOOL StartDirectDraw(const char *title, int lMagnification, BOOL b60fps, BOOL bS
 
 	Backend_DisplayMode display_mode;
 	Backend_GetDisplayMode(&display_mode);
+	vsync_fps = display_mode.refresh_rate;
 
 	memset(surface_metadata, 0, sizeof(surface_metadata));
 
@@ -136,7 +138,7 @@ BOOL StartDirectDraw(const char *title, int lMagnification, BOOL b60fps, BOOL bS
 
 	// If v-sync is requested, check if it's available
 	if (bVsync)
-		gbVsync = display_mode.refresh_rate == (b60fps ? 60 : 50);
+		gbVsync = vsync_fps == (b60fps ? 60 : 50);
 
 	bool requested_vsync = gbVsync;
 	framebuffer = RenderBackend_Init(title, WINDOW_WIDTH * magnification, WINDOW_HEIGHT * magnification, fullscreen, &requested_vsync);
