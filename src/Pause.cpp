@@ -36,7 +36,7 @@ typedef struct Option
 	const char *name;
 	int (*callback)(struct OptionsMenu *parent_menu, size_t this_option, CallbackAction action);
 	void *user_data;
-	const char *attribute;
+	const char *value_string;
 	long value;
 } Option;
 
@@ -409,8 +409,8 @@ static int EnterOptionsMenu(OptionsMenu *options_menu, size_t selected_option)
 			PutText(x, y - (9 / 2), options_menu->options[i].name, RGB(0xFF, 0xFF, 0xFF));
 
 			// Draw option value, if it has one
-			if (options_menu->options[i].attribute != NULL)
-				PutText(x + 100, y - (9 / 2), options_menu->options[i].attribute, RGB(0xFF, 0xFF, 0xFF));
+			if (options_menu->options[i].value_string != NULL)
+				PutText(x + 100, y - (9 / 2), options_menu->options[i].value_string, RGB(0xFF, 0xFF, 0xFF));
 
 			y += 20;
 		}
@@ -556,7 +556,7 @@ static int Callback_ControlsKeyboard(OptionsMenu *parent_menu, size_t this_optio
 	{
 		options[i].name = controls[i].name;
 		options[i].callback = Callback_ControlsKeyboard_Rebind;
-		options[i].attribute = bound_name_buffers[i];
+		options[i].value_string = bound_name_buffers[i];
 	}
 
 	OptionsMenu options_menu = {
@@ -668,7 +668,7 @@ static int Callback_ControlsController(OptionsMenu *parent_menu, size_t this_opt
 	{
 		options[i].name = controls[i].name;
 		options[i].callback = Callback_ControlsController_Rebind;
-		options[i].attribute = bound_name_buffers[i];
+		options[i].value_string = bound_name_buffers[i];
 	}
 
 	OptionsMenu options_menu = {
@@ -710,7 +710,7 @@ static int Callback_Framerate(OptionsMenu *parent_menu, size_t this_option, Call
 
 			// Fallthrough
 		case ACTION_INIT:
-			parent_menu->options[this_option].attribute = strings[parent_menu->options[this_option].value];
+			parent_menu->options[this_option].value_string = strings[parent_menu->options[this_option].value];
 			break;
 
 		case ACTION_UPDATE:
@@ -738,7 +738,7 @@ static int Callback_Vsync(OptionsMenu *parent_menu, size_t this_option, Callback
 
 			// Fallthrough
 		case ACTION_INIT:
-			parent_menu->options[this_option].attribute = strings[parent_menu->options[this_option].value];
+			parent_menu->options[this_option].value_string = strings[parent_menu->options[this_option].value];
 			break;
 
 		case ACTION_UPDATE:
@@ -777,7 +777,7 @@ static int Callback_Resolution(OptionsMenu *parent_menu, size_t this_option, Cal
 
 			// Fallthrough
 		case ACTION_INIT:
-			parent_menu->options[this_option].attribute = strings[parent_menu->options[this_option].value];
+			parent_menu->options[this_option].value_string = strings[parent_menu->options[this_option].value];
 			break;
 
 		case ACTION_UPDATE:
@@ -804,7 +804,7 @@ static int Callback_SmoothScrolling(OptionsMenu *parent_menu, size_t this_option
 
 			// Fallthrough
 		case ACTION_INIT:
-			parent_menu->options[this_option].attribute = strings[parent_menu->options[this_option].value];
+			parent_menu->options[this_option].value_string = strings[parent_menu->options[this_option].value];
 			break;
 
 		case ACTION_UPDATE:
