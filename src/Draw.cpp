@@ -720,9 +720,9 @@ void InitTextObject(const char *name)
 			width = 9;
 			break;
 
-		case 2:
-			height = 18;
-			width = 16;
+		default:
+			height = 9 * magnification;
+			width = 8 * magnification;
 			break;
 	}
 
