@@ -106,3 +106,4 @@ ATTRIBUTE_FORMAT_PRINTF(1, 2) void Backend_PrintInfo(const char *format, ...);
 unsigned long Backend_GetTicks(void);
 void Backend_Delay(unsigned int ticks);
 void Backend_GetDisplayMode(Backend_DisplayMode *display_mode);
+bool Backend_IsConsole(void);

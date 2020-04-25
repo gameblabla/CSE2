@@ -832,7 +832,15 @@ static int Callback_Options(OptionsMenu *parent_menu, size_t this_option, Callba
 	if (action != ACTION_OK)
 		return -1;
 
-	Option options[] = {
+	BOOL is_console = Backend_IsConsole();
+
+	Option options_console[] = {
+		{"Controls", Callback_ControlsController, NULL, NULL, 0},
+		{"Framerate", Callback_Framerate, NULL, NULL, 0},
+		{"Smooth Scrolling", Callback_SmoothScrolling, NULL, NULL, 0}
+	};
+
+	Option options_pc[] = {
 		{"Controls (Keyboard)", Callback_ControlsKeyboard, NULL, NULL, 0},
 		{"Controls (Gamepad)", Callback_ControlsController, NULL, NULL, 0},
 		{"Framerate", Callback_Framerate, NULL, NULL, 0},
@@ -844,9 +852,9 @@ static int Callback_Options(OptionsMenu *parent_menu, size_t this_option, Callba
 	OptionsMenu options_menu = {
 		"OPTIONS",
 		restart_required ? "RESTART REQUIRED" : NULL,
-		options,
-		sizeof(options) / sizeof(options[0]),
-		-70,
+		is_console ? options_console : options_pc,
+		is_console ? (sizeof(options_console) / sizeof(options_console[0])) : (sizeof(options_pc) / sizeof(options_pc[0])),
+		is_console ? -60 : -70,
 		TRUE
 	};
 
@@ -855,10 +863,18 @@ static int Callback_Options(OptionsMenu *parent_menu, size_t this_option, Callba
 	if (!LoadConfigData(&conf))
 		DefaultConfigData(&conf);
 
-	options[2].value = conf.b60fps;
-	options[3].value = conf.bVsync;
-	options[4].value = conf.display_mode;
-	options[5].value = conf.bSmoothScrolling;
+	if (is_console)	// TODO - Find a less ugly way to do this
+	{
+		options_console[1].value = conf.b60fps;
+		options_console[2].value = conf.bSmoothScrolling;
+	}
+	else
+	{
+		options_pc[2].value = conf.b60fps;
+		options_pc[3].value = conf.bVsync;
+		options_pc[4].value = conf.display_mode;
+		options_pc[5].value = conf.bSmoothScrolling;
+	}
 
 	PlaySoundObject(5, 1);
 
@@ -867,10 +883,18 @@ static int Callback_Options(OptionsMenu *parent_menu, size_t this_option, Callba
 	PlaySoundObject(5, 1);
 
 	// Save our changes to the configuration file
-	conf.b60fps = options[2].value;
-	conf.bVsync = options[3].value;
-	conf.display_mode = options[4].value;
-	conf.bSmoothScrolling = options[5].value;
+	if (is_console)
+	{
+		conf.b60fps = options_console[1].value;
+		conf.bSmoothScrolling = options_console[2].value;
+	}
+	else
+	{
+		conf.b60fps = options_pc[2].value;
+		conf.bVsync = options_pc[3].value;
+		conf.display_mode = options_pc[4].value;
+		conf.bSmoothScrolling = options_pc[5].value;
+	}
 
 	memcpy(conf.bindings, bindings, sizeof(bindings));
 

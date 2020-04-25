@@ -304,3 +304,8 @@ void Backend_GetDisplayMode(Backend_DisplayMode *display_mode)
 	display_mode->height = mode->height;
 	display_mode->refresh_rate = mode->refreshRate;
 }
+
+bool Backend_IsConsole(void)
+{
+	return false;
+}
