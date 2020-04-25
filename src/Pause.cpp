@@ -484,7 +484,7 @@ static int Callback_ControlsKeyboard_Rebind(OptionsMenu *parent_menu, size_t thi
 			char timeout_string[2];
 			timeout_string[1] = '\0';
 
-			BOOL previous_keyboard_state[BACKEND_KEYBOARD_TOTAL];
+			bool previous_keyboard_state[BACKEND_KEYBOARD_TOTAL];
 			memcpy(previous_keyboard_state, gKeyboardState, sizeof(gKeyboardState));
 
 			// Time-out and exit if the user takes too long (they probably don't want to rebind)
