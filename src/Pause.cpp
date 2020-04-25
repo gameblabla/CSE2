@@ -678,7 +678,7 @@ static int Callback_ControlsController(OptionsMenu *parent_menu, size_t this_opt
 	}
 
 	OptionsMenu options_menu = {
-		"CONTROLS (GAMEPAD)",
+		Backend_IsConsole() ? "CONTROLS" : "CONTROLS (GAMEPAD)",
 		NULL,
 		options,
 		sizeof(options) / sizeof(options[0]),
