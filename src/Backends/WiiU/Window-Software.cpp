@@ -72,7 +72,8 @@ bool WindowBackend_Software_CreateWindow(const char *window_title, int screen_wi
 {
 	(void)window_title;
 	(void)fullscreen;
-	(void)vsync;	// V-sync is always enabled, but let the game pretend it isn't if it wants to, so 50FPS works
+
+	*vsync = true;	// Not optional (blame WUT's libwhb)
 
 	fake_framebuffer_width = screen_width;
 	fake_framebuffer_height = screen_height;
