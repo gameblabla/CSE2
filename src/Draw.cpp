@@ -601,7 +601,7 @@ int RestoreSurfaces(void)
 	{
 		++surfaces_regenerated;
 		RenderBackend_RestoreSurface(framebuffer);
-		out(0x62);
+		out('f');	// 'f' for 'frontbuffer' (or, in this branch's case, 'framebuffer')
 	}
 
 	for (s = 0; s < SURFACE_ID_MAX; ++s)
@@ -612,7 +612,7 @@ int RestoreSurfaces(void)
 			{
 				++surfaces_regenerated;
 				RenderBackend_RestoreSurface(surf[s]);
-				out(0x30 + s);
+				out('0' + s);	// The number of the surface lost
 
 				if (!surface_metadata[s].bSystem)
 				{
