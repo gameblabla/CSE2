@@ -111,7 +111,7 @@ void PutNumber4(int x, int y, int value, BOOL bZero)
 }
 
 // Draws black bars to cover the out-of-bounds parts of the screen
-void PutBlackBars(int fx, int fy)
+static void PutBlackBars(int fx, int fy)
 {
 	RECT rect;
 
@@ -124,6 +124,7 @@ void PutBlackBars(int fx, int fy)
 	int stage_width;
 	int stage_height;
 
+	// Force black-bars in the IronHead battle
 	if (gStageNo == 31)
 	{
 		stage_left = 20 * 16;
