@@ -91,8 +91,7 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 {
 	(void)window_title;
 	(void)fullscreen;
-
-	*vsync = true;	// Not optional
+	(void)vsync;	// V-sync is always enabled, but let the game pretend it isn't if it wants to, so 50FPS works
 
 	if (WHBGfxInit())
 	{
