@@ -173,7 +173,7 @@ const char* ControllerBackend_GetButtonName(unsigned int button_id)
 {
 	static char name_buffer[0x10];
 
-	sprintf(name_buffer, "Button #%d", button_id);
+	snprintf(name_buffer, sizeof(name_buffer), "Button #%d", button_id);
 
 	return name_buffer;
 }
