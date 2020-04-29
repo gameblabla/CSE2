@@ -132,9 +132,12 @@ BOOL StartDirectDraw(const char *title, int lMagnification, BOOL b60fps, BOOL bS
 			break;
 	}
 
-	// Ugly way to round the magnification up to the nearest multiple of SPRITE_SCALE (we can't use 2x sprites at 1x or 3x internal resolution)
-	magnification += SPRITE_SCALE - 1;
+	// Round down to the nearest multiple of SPRITE_SCALE (we can't use 2x sprites at 1x or 3x internal resolution)
 	magnification -= magnification % SPRITE_SCALE;
+
+	// Account for rounding-down to 0
+	if (magnification == 0)
+		magnification = SPRITE_SCALE;
 
 	// If v-sync is requested, check if it's available
 	if (bVsync)
