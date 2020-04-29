@@ -1012,17 +1012,18 @@ static CachedGlyph* GetGlyphCached(FontObject *font_object, unsigned long unicod
 						break;
 				}
 
-				glyph->backend = RenderBackend_LoadGlyph(bitmap.buffer, bitmap.width, bitmap.rows, bitmap.pitch);
+				// Don't bother loading glyphs that don't have an image (causes `cute_spritebatch.h` to freak-out)
+				if (bitmap.width == 0 || bitmap.rows == 0)
+					glyph->backend = NULL;
+				else
+					glyph->backend = RenderBackend_LoadGlyph(bitmap.buffer, bitmap.width, bitmap.rows, bitmap.pitch);
 
 				FT_Bitmap_Done(font_object->library, &bitmap);
 
-				if (glyph->backend != NULL)
-				{
-					glyph->next = font_object->glyph_list_head;
-					font_object->glyph_list_head = glyph;
+				glyph->next = font_object->glyph_list_head;
+				font_object->glyph_list_head = glyph;
 
-					return glyph;
-				}
+				return glyph;
 			}
 
 			FT_Bitmap_Done(font_object->library, &bitmap);
@@ -1041,7 +1042,9 @@ static void UnloadCachedGlyphs(FontObject *font_object)
 	{
 		CachedGlyph *next_glyph = glyph->next;
 
-		RenderBackend_UnloadGlyph(glyph->backend);
+		if (glyph->backend != NULL)
+			RenderBackend_UnloadGlyph(glyph->backend);
+
 		free(glyph);
 
 		glyph = next_glyph;
