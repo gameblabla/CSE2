@@ -683,5 +683,11 @@ BOOL CheckSoundtrackExists(int soundtrack)
 	char path[MAX_PATH];
 	sprintf(path, "%s/%s", gDataPath, music_tables[soundtrack][1].intro_file_path);
 
-	return IsKeyFile(path);
+	FILE *file = fopen(path, "rb");
+
+	if (file == NULL)
+		return FALSE;
+
+	fclose(file);
+	return TRUE;
 }
