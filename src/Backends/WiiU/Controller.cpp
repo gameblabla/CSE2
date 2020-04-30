@@ -50,12 +50,12 @@ bool ControllerBackend_GetJoystickStatus(bool **buttons, unsigned int *button_co
 		vpad_buttons = vpad_status.hold;
 
 	// Handle button inputs
-	button_buffer[0] |= vpad_buttons & VPAD_BUTTON_B;     // Shoot
-	button_buffer[1] |= vpad_buttons & VPAD_BUTTON_A;     // Jump
-	button_buffer[2] |= vpad_buttons & VPAD_BUTTON_Y;     // Map
+	button_buffer[0] |= vpad_buttons & VPAD_BUTTON_Y;     // Shoot
+	button_buffer[1] |= vpad_buttons & VPAD_BUTTON_B;     // Jump
+	button_buffer[2] |= vpad_buttons & VPAD_BUTTON_X;     // Map
 	button_buffer[3] |= vpad_buttons & VPAD_BUTTON_ZL;    // Weapon left
 	button_buffer[4] |= vpad_buttons & VPAD_BUTTON_ZR;    // Weapon right
-	button_buffer[5] |= vpad_buttons & VPAD_BUTTON_X;     // Inventory
+	button_buffer[5] |= vpad_buttons & VPAD_BUTTON_A;     // Inventory
 	button_buffer[6] |= vpad_buttons & VPAD_BUTTON_PLUS;  // Pause
 	button_buffer[7] |= vpad_buttons & VPAD_STICK_L_EMULATION_UP;    // Up
 	button_buffer[8] |= vpad_buttons & VPAD_STICK_L_EMULATION_DOWN;  // Down
