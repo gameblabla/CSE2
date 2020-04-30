@@ -24,6 +24,14 @@
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
+enum
+{
+	CALLBACK_CONTINUE = -1,
+	CALLBACK_PREVIOUS_MENU = -2,
+	CALLBACK_RESET = -3,
+	CALLBACK_EXIT = -4,
+};
+
 typedef enum CallbackAction
 {
 	ACTION_INIT,
@@ -41,6 +49,7 @@ typedef struct Option
 	void *user_data;
 	const char *value_string;
 	long value;
+	BOOL disabled;
 } Option;
 
 typedef struct OptionsMenu
@@ -315,14 +324,14 @@ static int EnterOptionsMenu(OptionsMenu *options_menu, size_t selected_option)
 		// Allow unpausing by pressing the pause button only when in the main pause menu (not submenus)
 		if (!options_menu->submenu && gKeyTrg & KEY_PAUSE)
 		{
-			return_value = enum_ESCRETURN_continue;
+			return_value = CALLBACK_CONTINUE;
 			break;
 		}
 
 		// Go back one submenu when the 'cancel' button is pressed
 		if (gKeyTrg & gKeyCancel)
 		{
-			return_value = -1;
+			return_value = CALLBACK_CONTINUE;
 			break;
 		}
 
@@ -352,26 +361,29 @@ static int EnterOptionsMenu(OptionsMenu *options_menu, size_t selected_option)
 		// Run option callbacks
 		for (size_t i = 0; i < options_menu->total_options; ++i)
 		{
-			CallbackAction action = ACTION_UPDATE;
-
-			if (i == selected_option)
+			if (!options_menu->options[i].disabled)
 			{
-				if (gKeyTrg & gKeyOk)
-					action = ACTION_OK;
-				else if (gKeyTrg & gKeyLeft)
-					action = ACTION_LEFT;
-				else if (gKeyTrg & gKeyRight)
-					action = ACTION_RIGHT;
+				CallbackAction action = ACTION_UPDATE;
+
+				if (i == selected_option)
+				{
+					if (gKeyTrg & gKeyOk)
+						action = ACTION_OK;
+					else if (gKeyTrg & gKeyLeft)
+						action = ACTION_LEFT;
+					else if (gKeyTrg & gKeyRight)
+						action = ACTION_RIGHT;
+				}
+
+				return_value = options_menu->options[i].callback(options_menu, i, action);
+
+				// If the callback returned something other than CALLBACK_CONTINUE, it's time to exit this submenu
+				if (return_value != CALLBACK_CONTINUE)
+					break;
 			}
-
-			return_value = options_menu->options[i].callback(options_menu, i, action);
-
-			// If the callback returned -1, it's time to exit this submenu
-			if (return_value != -1)
-				break;
 		}
 
-		if (return_value != -1)
+		if (return_value != CALLBACK_CONTINUE)
 			break;
 
 		// Update Quote animation counter
@@ -402,12 +414,14 @@ static int EnterOptionsMenu(OptionsMenu *options_menu, size_t selected_option)
 			if (i == selected_option)
 				PutBitmap3(&grcFull, PixelToScreenCoord(x - 20), PixelToScreenCoord(y - 8), &rcMyChar[anime / 10 % 4], SURFACE_ID_MY_CHAR);
 
+			unsigned long option_colour = options_menu->options[i].disabled ? RGB(0x80, 0x80, 0x80) : RGB(0xFF, 0xFF, 0xFF);
+
 			// Draw option name
-			PutText(x, y - (9 / 2), options_menu->options[i].name, RGB(0xFF, 0xFF, 0xFF));
+			PutText(x, y - (9 / 2), options_menu->options[i].name, option_colour);
 
 			// Draw option value, if it has one
 			if (options_menu->options[i].value_string != NULL)
-				PutText(x + 100, y - (9 / 2), options_menu->options[i].value_string, RGB(0xFF, 0xFF, 0xFF));
+				PutText(x + 100, y - (9 / 2), options_menu->options[i].value_string, option_colour);
 
 			y += 20;
 		}
@@ -417,7 +431,7 @@ static int EnterOptionsMenu(OptionsMenu *options_menu, size_t selected_option)
 		if (!Flip_SystemTask())
 		{
 			// Quit if window is closed
-			return_value = enum_ESCRETURN_exit;
+			return_value = CALLBACK_EXIT;
 			break;
 		}
 	}
@@ -425,10 +439,6 @@ static int EnterOptionsMenu(OptionsMenu *options_menu, size_t selected_option)
 	// Deinitialise options
 	for (size_t i = 0; i < options_menu->total_options; ++i)
 		options_menu->options[i].callback(options_menu, i, ACTION_DEINIT);
-
-	// Filter internal return values to something Cave Story can understand
-	if (!options_menu->submenu && return_value == -1)
-		return_value = enum_ESCRETURN_continue;
 
 	return return_value;
 }
@@ -444,11 +454,9 @@ typedef struct Control
 	unsigned char groups;
 } Control;
 
-/*
- * The bitfield on the right determines which 'group' the
- * control belongs to - if two controls are in the same group,
- * they cannot be bound to the same key.
- */
+// The bitfield on the right determines which 'group' the
+// control belongs to - if two controls are in the same group,
+// they cannot be bound to the same key.
 static const Control controls[] = {
 	{"Up",              BINDING_UP,     (1 << 0) | (1 << 1)},
 	{"Down",            BINDING_DOWN,   (1 << 0) | (1 << 1)},
@@ -515,7 +523,7 @@ static int Callback_ControlsKeyboard_Rebind(OptionsMenu *parent_menu, size_t thi
 						PlaySoundObject(18, 1);
 
 						gKeyTrg = gKey = 0;	// Prevent weird input-ghosting by doing this
-						return -1;
+						return CALLBACK_CONTINUE;
 					}
 				}
 
@@ -536,14 +544,14 @@ static int Callback_ControlsKeyboard_Rebind(OptionsMenu *parent_menu, size_t thi
 				if (!Flip_SystemTask())
 				{
 					// Quit if window is closed
-					return enum_ESCRETURN_exit;
+					return CALLBACK_EXIT;
 				}
 			}
 
 			break;
 	}
 
-	return -1;
+	return CALLBACK_CONTINUE;
 }
 
 static int Callback_ControlsKeyboard(OptionsMenu *parent_menu, size_t this_option, CallbackAction action)
@@ -551,7 +559,7 @@ static int Callback_ControlsKeyboard(OptionsMenu *parent_menu, size_t this_optio
 	(void)parent_menu;
 
 	if (action != ACTION_OK)
-		return -1;
+		return CALLBACK_CONTINUE;
 
 	Option options[sizeof(controls) / sizeof(controls[0])];
 
@@ -560,6 +568,7 @@ static int Callback_ControlsKeyboard(OptionsMenu *parent_menu, size_t this_optio
 		options[i].name = controls[i].name;
 		options[i].callback = Callback_ControlsKeyboard_Rebind;
 		options[i].value_string = bound_name_buffers[i];
+		options[i].disabled = FALSE;
 	}
 
 	OptionsMenu options_menu = {
@@ -630,7 +639,7 @@ static int Callback_ControlsController_Rebind(OptionsMenu *parent_menu, size_t t
 						PlaySoundObject(18, 1);
 
 						gKeyTrg = gKey = 0;	// Prevent weird input-ghosting by doing this
-						return -1;
+						return CALLBACK_CONTINUE;
 					}
 				}
 
@@ -651,14 +660,14 @@ static int Callback_ControlsController_Rebind(OptionsMenu *parent_menu, size_t t
 				if (!Flip_SystemTask())
 				{
 					// Quit if window is closed
-					return enum_ESCRETURN_exit;
+					return CALLBACK_EXIT;
 				}
 			}
 
 			break;
 	}
 
-	return -1;
+	return CALLBACK_CONTINUE;
 }
 
 static int Callback_ControlsController(OptionsMenu *parent_menu, size_t this_option, CallbackAction action)
@@ -666,7 +675,7 @@ static int Callback_ControlsController(OptionsMenu *parent_menu, size_t this_opt
 	(void)parent_menu;
 
 	if (action != ACTION_OK)
-		return -1;
+		return CALLBACK_CONTINUE;
 
 	Option options[sizeof(controls) / sizeof(controls[0])];
 
@@ -675,6 +684,7 @@ static int Callback_ControlsController(OptionsMenu *parent_menu, size_t this_opt
 		options[i].name = controls[i].name;
 		options[i].callback = Callback_ControlsController_Rebind;
 		options[i].value_string = bound_name_buffers[i];
+		options[i].disabled = FALSE;
 	}
 
 	OptionsMenu options_menu = {
@@ -733,7 +743,7 @@ static int Callback_Framerate(OptionsMenu *parent_menu, size_t this_option, Call
 			break;
 	}
 
-	return -1;
+	return CALLBACK_CONTINUE;
 }
 
 static int Callback_Vsync(OptionsMenu *parent_menu, size_t this_option, CallbackAction action)
@@ -771,7 +781,7 @@ static int Callback_Vsync(OptionsMenu *parent_menu, size_t this_option, Callback
 			break;
 	}
 
-	return -1;
+	return CALLBACK_CONTINUE;
 }
 
 static int Callback_Resolution(OptionsMenu *parent_menu, size_t this_option, CallbackAction action)
@@ -819,7 +829,7 @@ static int Callback_Resolution(OptionsMenu *parent_menu, size_t this_option, Cal
 			break;
 	}
 
-	return -1;
+	return CALLBACK_CONTINUE;
 }
 
 static int Callback_SmoothScrolling(OptionsMenu *parent_menu, size_t this_option, CallbackAction action)
@@ -856,7 +866,7 @@ static int Callback_SmoothScrolling(OptionsMenu *parent_menu, size_t this_option
 			break;
 	}
 
-	return -1;
+	return CALLBACK_CONTINUE;
 }
 
 static int Callback_Options(OptionsMenu *parent_menu, size_t this_option, CallbackAction action)
@@ -864,7 +874,7 @@ static int Callback_Options(OptionsMenu *parent_menu, size_t this_option, Callba
 	(void)parent_menu;
 
 	if (action != ACTION_OK)
-		return -1;
+		return CALLBACK_CONTINUE;
 
 	// Make the options match the configuration data
 	CONFIG conf;
@@ -874,18 +884,18 @@ static int Callback_Options(OptionsMenu *parent_menu, size_t this_option, Callba
 	BOOL is_console = Backend_IsConsole();
 
 	Option options_console[] = {
-		{"Controls", Callback_ControlsController, NULL, NULL, 0},
-		{"Framerate", Callback_Framerate, &conf, NULL, 0},
-		{"Smooth Scrolling", Callback_SmoothScrolling, &conf, NULL, 0}
+		{"Controls", Callback_ControlsController, NULL, NULL, 0, FALSE},
+		{"Framerate", Callback_Framerate, &conf, NULL, 0, FALSE},
+		{"Smooth Scrolling", Callback_SmoothScrolling, &conf, NULL, 0, FALSE},
 	};
 
 	Option options_pc[] = {
-		{"Controls (Keyboard)", Callback_ControlsKeyboard, NULL, NULL, 0},
-		{"Controls (Gamepad)", Callback_ControlsController, NULL, NULL, 0},
-		{"Framerate", Callback_Framerate, &conf, NULL, 0},
-		{"V-sync", Callback_Vsync, &conf, NULL, 0},
-		{"Resolution", Callback_Resolution, &conf, NULL, 0},
-		{"Smooth Scrolling", Callback_SmoothScrolling, &conf, NULL, 0}
+		{"Controls (Keyboard)", Callback_ControlsKeyboard, NULL, NULL, 0, FALSE},
+		{"Controls (Gamepad)", Callback_ControlsController, NULL, NULL, 0, FALSE},
+		{"Framerate", Callback_Framerate, &conf, NULL, 0, FALSE},
+		{"V-sync", Callback_Vsync, &conf, NULL, 0, FALSE},
+		{"Resolution", Callback_Resolution, &conf, NULL, 0, FALSE},
+		{"Smooth Scrolling", Callback_SmoothScrolling, &conf, NULL, 0, FALSE}
 	};
 
 	OptionsMenu options_menu = {
@@ -925,7 +935,7 @@ static int PromptAreYouSure(void)
 			(void)this_option;
 
 			if (action != ACTION_OK)
-				return -1;	// Go back to previous menu
+				return CALLBACK_CONTINUE;
 
 			return 1;	// Yes
 		}
@@ -936,15 +946,15 @@ static int PromptAreYouSure(void)
 			(void)this_option;
 
 			if (action != ACTION_OK)
-				return -1;	// Go back to previous menu
+				return CALLBACK_CONTINUE;
 
 			return 0;	// No
 		}
 	};
 
 	Option options[] = {
-		{"Yes", FunctionHolder::Callback_Yes, NULL, NULL, 0},
-		{"No", FunctionHolder::Callback_No, NULL, NULL, 0}
+		{"Yes", FunctionHolder::Callback_Yes, NULL, NULL, 0, FALSE},
+		{"No", FunctionHolder::Callback_No, NULL, NULL, 0, FALSE}
 	};
 
 	OptionsMenu options_menu = {
@@ -970,7 +980,7 @@ static int Callback_Resume(OptionsMenu *parent_menu, size_t this_option, Callbac
 	(void)parent_menu;
 
 	if (action != ACTION_OK)
-		return -1;
+		return CALLBACK_CONTINUE;
 
 	PlaySoundObject(18, 1);
 	return enum_ESCRETURN_continue;
@@ -981,18 +991,18 @@ static int Callback_Reset(OptionsMenu *parent_menu, size_t this_option, Callback
 	(void)parent_menu;
 
 	if (action != ACTION_OK)
-		return -1;
+		return CALLBACK_CONTINUE;
 
-	int return_value = -1;
+	int return_value = CALLBACK_CONTINUE;
 
 	switch (PromptAreYouSure())
 	{
 		case 0:
-			return_value = -1;	// Go back to previous menu
+			return_value = CALLBACK_CONTINUE;	// Go back to previous menu
 			break;
 
 		case 1:
-			return_value = enum_ESCRETURN_restart;	// Restart game
+			return_value = CALLBACK_RESET;	// Restart game
 			break;
 	}
 
@@ -1004,18 +1014,18 @@ static int Callback_Quit(OptionsMenu *parent_menu, size_t this_option, CallbackA
 	(void)parent_menu;
 
 	if (action != ACTION_OK)
-		return -1;
+		return CALLBACK_CONTINUE;
 
-	int return_value = -1;
+	int return_value = CALLBACK_CONTINUE;
 
 	switch (PromptAreYouSure())
 	{
 		case 0:
-			return_value = -1;	// Go back to previous menu
+			return_value = CALLBACK_CONTINUE;	// Go back to previous menu
 			break;
 
 		case 1:
-			return_value = enum_ESCRETURN_exit;	// Exit game
+			return_value = CALLBACK_EXIT;	// Exit game
 			break;
 	}
 
@@ -1025,10 +1035,10 @@ static int Callback_Quit(OptionsMenu *parent_menu, size_t this_option, CallbackA
 int Call_Pause(void)
 {
 	Option options[] = {
-		{"Resume", Callback_Resume, NULL, NULL, 0},
-		{"Reset", Callback_Reset, NULL, NULL, 0},
-		{"Options", Callback_Options, NULL, NULL, 0},
-		{"Quit", Callback_Quit, NULL, NULL, 0}
+		{"Resume", Callback_Resume, NULL, NULL, 0, FALSE},
+		{"Reset", Callback_Reset, NULL, NULL, 0, FALSE},
+		{"Options", Callback_Options, NULL, NULL, 0, FALSE},
+		{"Quit", Callback_Quit, NULL, NULL, 0, FALSE}
 	};
 
 	OptionsMenu options_menu = {
@@ -1041,6 +1051,22 @@ int Call_Pause(void)
 	};
 
 	int return_value = EnterOptionsMenu(&options_menu, 0);
+
+	// Filter internal return values to something Cave Story can understand
+	switch (return_value)
+	{
+		case CALLBACK_CONTINUE:
+			return_value = enum_ESCRETURN_continue;
+			break;
+
+		case CALLBACK_RESET:
+			return_value = enum_ESCRETURN_restart;
+			break;
+
+		case CALLBACK_EXIT:
+			return_value = enum_ESCRETURN_exit;
+			break;
+	}
 
 	gKeyTrg = gKey = 0;	// Avoid input-ghosting
 
