@@ -35,9 +35,9 @@
 
 int gStageNo;
 MusicID gMusicNo;
-int gSoundtrack;
 unsigned int gOldPos;
 MusicID gOldNo;
+int gSoundtrack;
 
 const STAGE_TABLE gTMTDefault[95] = {
 	STAGE_ENTRY("0", "0", 4, "bk0", "Guest", "0", 0, "Null", "\x96\xB3"),	/* 無 */
