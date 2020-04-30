@@ -539,12 +539,58 @@ static const MusicListEntry music_table_ridiculon[42] = {
 	{"ogg_ridic/white.ogg", NULL, MUSIC_TYPE_OTHER, true}
 };
 
-static const MusicListEntry *music_tables[5] = {
+static const MusicListEntry music_table_snes[42] = {
+	{NULL, NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg_snes/wanpaku_intro.ogg", "ogg_snes/wanpaku_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg_snes/anzen_intro.ogg", "ogg_snes/anzen_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg_snes/gameover_intro.ogg", "ogg_snes/gameover_loop.ogg", MUSIC_TYPE_OTHER, false},
+	{"ogg_snes/gravity_intro.ogg", "ogg_snes/gravity_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg_snes/weed_intro.ogg", "ogg_snes/weed_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg_snes/mdown2_intro.ogg", "ogg_snes/mdown2_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg_snes/fireeye_intro.ogg", "ogg_snes/fireeye_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg_snes/vivi_intro.ogg", "ogg_snes/vivi_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg_snes/mura_intro.ogg", "ogg_snes/mura_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg_snes/fanfale1_intro.ogg", "ogg_snes/fanfale1_loop.ogg", MUSIC_TYPE_OTHER, false},
+	{"ogg_snes/ginsuke_intro.ogg", "ogg_snes/ginsuke_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg_snes/cemetery_intro.ogg", "ogg_snes/cemetery_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg_snes/plant_intro.ogg", "ogg_snes/plant_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg_snes/kodou_intro.ogg", "ogg_snes/kodou_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg_snes/fanfale3_intro.ogg", "ogg_snes/fanfale3_loop.ogg", MUSIC_TYPE_OTHER, false},
+	{"ogg_snes/fanfale2_intro.ogg", "ogg_snes/fanfale2_loop.ogg", MUSIC_TYPE_OTHER, false},
+	{"ogg_snes/dr_intro.ogg", "ogg_snes/dr_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg_snes/escape_intro.ogg", "ogg_snes/escape_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg_snes/jenka_intro.ogg", "ogg_snes/jenka_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg_snes/maze_intro.ogg", "ogg_snes/maze_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg_snes/access_intro.ogg", "ogg_snes/access_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg_snes/ironh_intro.ogg", "ogg_snes/ironh_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg_snes/grand_intro.ogg", "ogg_snes/grand_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg_snes/curly_intro.ogg", "ogg_snes/curly_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg_snes/oside_intro.ogg", "ogg_snes/oside_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg_snes/requiem_intro.ogg", "ogg_snes/requiem_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg_snes/wanpak2_intro.ogg", "ogg_snes/wanpak2_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg_snes/quiet_intro.ogg", "ogg_snes/quiet_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg_snes/lastcave_intro.ogg", "ogg_snes/lastcave_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg_snes/balcony_intro.ogg", "ogg_snes/balcony_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg_snes/lastbtl.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg_snes/lastbt3_intro.ogg", "ogg_snes/lastbt3_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg_snes/ending_intro.ogg", "ogg_snes/ending_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg_snes/zonbie_intro.ogg", "ogg_snes/zonbie_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg_snes/bdown_intro.ogg", "ogg_snes/bdown_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg_snes/hell_intro.ogg", "ogg_snes/hell_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg_snes/jenka2_intro.ogg", "ogg_snes/jenka2_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg_snes/marine_intro.ogg", "ogg_snes/marine_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg_snes/ballos_intro.ogg", "ogg_snes/ballos_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg_snes/toroko_intro.ogg", "ogg_snes/toroko_loop.ogg", MUSIC_TYPE_OTHER, false},
+	{"ogg_snes/white_intro.ogg", "ogg_snes/white_loop.ogg", MUSIC_TYPE_OTHER, true}
+};
+
+static const MusicListEntry *music_tables[6] = {
 	music_table_organya,
 	music_table_new,
 	music_table_remastered,
 	music_table_famitracks,
-	music_table_ridiculon
+	music_table_ridiculon,
+	music_table_snes
 };
 
 void ChangeMusic(MusicID no)
