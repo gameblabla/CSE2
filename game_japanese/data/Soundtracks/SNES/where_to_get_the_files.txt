@@ -1,0 +1,4 @@
+You can get vince94's SNES soundtrack here:
+https://www.cavestory.org/forums/threads/cave-story-snes-soundtrack-mod.14225/
+
+Extract the contents of the 'Ogg11' folder into this folder.

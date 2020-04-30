@@ -1,0 +1,12 @@
+Welcome to hell.
+
+This is the hardest soundtrack to obtain: it requires extracting files from a Cave Story+ Switch update. The process is long and complicated, and it's been so long since I've done it that I honestly can't remember the steps.
+
+I recall that it involves decrypting a standard CS+ Switch installation package, combining it with the update package, and then extracting its contents. These packages come as '.nsp' files, and can be dumped from a hacked Nintendo Switch.
+
+Because it involves decryption, this process also requires that you obtain the 'title keys' to CS+ and its update data.
+
+I think SciresM's 'hactool' is one of the tools you'll need to do this:
+https://github.com/SciresM/hactool/
+
+When that's all done, extract the contents of the 'data/base/ogg_ridic' folder into this folder.
