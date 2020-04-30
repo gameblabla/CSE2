@@ -1,3 +1,4 @@
+
 #include "Pause.h"
 
 #include <stddef.h>
@@ -26,6 +27,7 @@
 typedef enum CallbackAction
 {
 	ACTION_INIT,
+	ACTION_DEINIT,
 	ACTION_UPDATE,
 	ACTION_OK,
 	ACTION_LEFT,
@@ -303,13 +305,7 @@ static int EnterOptionsMenu(OptionsMenu *options_menu, size_t selected_option)
 
 	// Initialise options
 	for (size_t i = 0; i < options_menu->total_options; ++i)
-	{
-		return_value = options_menu->options[i].callback(options_menu, i, ACTION_INIT);
-
-		// If the callback returned -1, it's time to exit this submenu
-		if (return_value != -1)
-			break;
-	}
+		options_menu->options[i].callback(options_menu, i, ACTION_INIT);
 
 	for (;;)
 	{
@@ -425,6 +421,10 @@ static int EnterOptionsMenu(OptionsMenu *options_menu, size_t selected_option)
 			break;
 		}
 	}
+
+	// Deinitialise options
+	for (size_t i = 0; i < options_menu->total_options; ++i)
+		options_menu->options[i].callback(options_menu, i, ACTION_DEINIT);
 
 	// Filter internal return values to something Cave Story can understand
 	if (!options_menu->submenu && return_value == -1)
@@ -701,10 +701,21 @@ static int Callback_ControlsController(OptionsMenu *parent_menu, size_t this_opt
 
 static int Callback_Framerate(OptionsMenu *parent_menu, size_t this_option, CallbackAction action)
 {
+	CONFIG *conf = (CONFIG*)parent_menu->options[this_option].user_data;
+
 	const char *strings[] = {"50FPS", "60FPS"};
 
 	switch (action)
 	{
+		case ACTION_INIT:
+			parent_menu->options[this_option].value = conf->b60fps;
+			parent_menu->options[this_option].value_string = strings[conf->b60fps];
+			break;
+
+		case ACTION_DEINIT:
+			conf->b60fps = parent_menu->options[this_option].value;
+			break;
+
 		case ACTION_OK:
 		case ACTION_LEFT:
 		case ACTION_RIGHT:
@@ -715,8 +726,6 @@ static int Callback_Framerate(OptionsMenu *parent_menu, size_t this_option, Call
 
 			PlaySoundObject(SND_SWITCH_WEAPON, 1);
 
-			// Fallthrough
-		case ACTION_INIT:
 			parent_menu->options[this_option].value_string = strings[parent_menu->options[this_option].value];
 			break;
 
@@ -729,10 +738,21 @@ static int Callback_Framerate(OptionsMenu *parent_menu, size_t this_option, Call
 
 static int Callback_Vsync(OptionsMenu *parent_menu, size_t this_option, CallbackAction action)
 {
+	CONFIG *conf = (CONFIG*)parent_menu->options[this_option].user_data;
+
 	const char *strings[] = {"Off", "On"};
 
 	switch (action)
 	{
+		case ACTION_INIT:
+			parent_menu->options[this_option].value = conf->bVsync;
+			parent_menu->options[this_option].value_string = strings[conf->bVsync];
+			break;
+
+		case ACTION_DEINIT:
+			conf->bVsync = parent_menu->options[this_option].value;
+			break;
+
 		case ACTION_OK:
 		case ACTION_LEFT:
 		case ACTION_RIGHT:
@@ -744,8 +764,6 @@ static int Callback_Vsync(OptionsMenu *parent_menu, size_t this_option, Callback
 
 			PlaySoundObject(SND_SWITCH_WEAPON, 1);
 
-			// Fallthrough
-		case ACTION_INIT:
 			parent_menu->options[this_option].value_string = strings[parent_menu->options[this_option].value];
 			break;
 
@@ -758,10 +776,21 @@ static int Callback_Vsync(OptionsMenu *parent_menu, size_t this_option, Callback
 
 static int Callback_Resolution(OptionsMenu *parent_menu, size_t this_option, CallbackAction action)
 {
+	CONFIG *conf = (CONFIG*)parent_menu->options[this_option].user_data;
+
 	const char *strings[] = {"Fullscreen", "Windowed 426x240", "Windowed 852x480", "Windowed 1278x720", "Windowed 1704x960"};
 
 	switch (action)
 	{
+		case ACTION_INIT:
+			parent_menu->options[this_option].value = conf->display_mode;
+			parent_menu->options[this_option].value_string = strings[conf->display_mode];
+			break;
+
+		case ACTION_DEINIT:
+			conf->display_mode = parent_menu->options[this_option].value;
+			break;
+
 		case ACTION_OK:
 		case ACTION_LEFT:
 		case ACTION_RIGHT:
@@ -783,8 +812,6 @@ static int Callback_Resolution(OptionsMenu *parent_menu, size_t this_option, Cal
 
 			PlaySoundObject(SND_SWITCH_WEAPON, 1);
 
-			// Fallthrough
-		case ACTION_INIT:
 			parent_menu->options[this_option].value_string = strings[parent_menu->options[this_option].value];
 			break;
 
@@ -797,10 +824,21 @@ static int Callback_Resolution(OptionsMenu *parent_menu, size_t this_option, Cal
 
 static int Callback_SmoothScrolling(OptionsMenu *parent_menu, size_t this_option, CallbackAction action)
 {
+	CONFIG *conf = (CONFIG*)parent_menu->options[this_option].user_data;
+
 	const char *strings[] = {"Off", "On"};
 
 	switch (action)
 	{
+		case ACTION_INIT:
+			parent_menu->options[this_option].value = conf->bSmoothScrolling;
+			parent_menu->options[this_option].value_string = strings[conf->bSmoothScrolling];
+			break;
+
+		case ACTION_DEINIT:
+			conf->bSmoothScrolling = parent_menu->options[this_option].value;
+			break;
+
 		case ACTION_OK:
 		case ACTION_LEFT:
 		case ACTION_RIGHT:
@@ -811,8 +849,6 @@ static int Callback_SmoothScrolling(OptionsMenu *parent_menu, size_t this_option
 
 			PlaySoundObject(SND_SWITCH_WEAPON, 1);
 
-			// Fallthrough
-		case ACTION_INIT:
 			parent_menu->options[this_option].value_string = strings[parent_menu->options[this_option].value];
 			break;
 
@@ -830,21 +866,26 @@ static int Callback_Options(OptionsMenu *parent_menu, size_t this_option, Callba
 	if (action != ACTION_OK)
 		return -1;
 
+	// Make the options match the configuration data
+	CONFIG conf;
+	if (!LoadConfigData(&conf))
+		DefaultConfigData(&conf);
+
 	BOOL is_console = Backend_IsConsole();
 
 	Option options_console[] = {
 		{"Controls", Callback_ControlsController, NULL, NULL, 0},
-		{"Framerate", Callback_Framerate, NULL, NULL, 0},
-		{"Smooth Scrolling", Callback_SmoothScrolling, NULL, NULL, 0}
+		{"Framerate", Callback_Framerate, &conf, NULL, 0},
+		{"Smooth Scrolling", Callback_SmoothScrolling, &conf, NULL, 0}
 	};
 
 	Option options_pc[] = {
 		{"Controls (Keyboard)", Callback_ControlsKeyboard, NULL, NULL, 0},
 		{"Controls (Gamepad)", Callback_ControlsController, NULL, NULL, 0},
-		{"Framerate", Callback_Framerate, NULL, NULL, 0},
-		{"V-sync", Callback_Vsync, NULL, NULL, 0},
-		{"Resolution", Callback_Resolution, NULL, NULL, 0},
-		{"Smooth Scrolling", Callback_SmoothScrolling, NULL, NULL, 0}
+		{"Framerate", Callback_Framerate, &conf, NULL, 0},
+		{"V-sync", Callback_Vsync, &conf, NULL, 0},
+		{"Resolution", Callback_Resolution, &conf, NULL, 0},
+		{"Smooth Scrolling", Callback_SmoothScrolling, &conf, NULL, 0}
 	};
 
 	OptionsMenu options_menu = {
@@ -856,24 +897,6 @@ static int Callback_Options(OptionsMenu *parent_menu, size_t this_option, Callba
 		TRUE
 	};
 
-	// Make the options match the configuration data
-	CONFIG conf;
-	if (!LoadConfigData(&conf))
-		DefaultConfigData(&conf);
-
-	if (is_console)	// TODO - Find a less ugly way to do this
-	{
-		options_console[1].value = conf.b60fps;
-		options_console[2].value = conf.bSmoothScrolling;
-	}
-	else
-	{
-		options_pc[2].value = conf.b60fps;
-		options_pc[3].value = conf.bVsync;
-		options_pc[4].value = conf.display_mode;
-		options_pc[5].value = conf.bSmoothScrolling;
-	}
-
 	PlaySoundObject(5, 1);
 
 	const int return_value = EnterOptionsMenu(&options_menu, 0);
@@ -881,19 +904,6 @@ static int Callback_Options(OptionsMenu *parent_menu, size_t this_option, Callba
 	PlaySoundObject(5, 1);
 
 	// Save our changes to the configuration file
-	if (is_console)
-	{
-		conf.b60fps = options_console[1].value;
-		conf.bSmoothScrolling = options_console[2].value;
-	}
-	else
-	{
-		conf.b60fps = options_pc[2].value;
-		conf.bVsync = options_pc[3].value;
-		conf.display_mode = options_pc[4].value;
-		conf.bSmoothScrolling = options_pc[5].value;
-	}
-
 	memcpy(conf.bindings, bindings, sizeof(bindings));
 
 	SaveConfigData(&conf);
