@@ -1,0 +1,3 @@
+The easiest way to obtain the files for this soundtrack is to get them from the Steam release of Cave Story+:
+
+Extract the contents of its 'data/base/Ogg11' folder into this folder.

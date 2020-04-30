@@ -1,0 +1,6 @@
+To obtain these files, you'll have to extract them from Cave Story+ Switch.
+
+It's been so long since I've done this that I don't remember the steps, but I believe you need SciresM's 'hactool':
+https://github.com/SciresM/hactool/
+
+Extract the contents of the 'data/base/ogg17' folder into this folder.
