@@ -63,6 +63,7 @@ typedef struct STAGE_TABLE
 extern int gStageNo;
 extern MusicID gMusicNo;
 extern int gSoundtrack;
+extern MusicID gOldNo;
 
 BOOL LoadStageTable();
 BOOL TransferStage(int no, int w, int x, int y);

@@ -726,9 +726,11 @@ static int Callback_Soundtrack_Option(OptionsMenu *parent_menu, size_t this_opti
 		case ACTION_OK:
 			conf->soundtrack = gSoundtrack = this_option;
 
-			// Hackish way of restarting the song without overwriting the previous one
+			// Restart the songs, with the new soundtrack setting
 			MusicID current_song = gMusicNo;
-			ReCallMusic();
+			MusicID previous_song = gOldNo;
+			gMusicNo = gOldNo = MUS_SILENCE;
+			ChangeMusic(previous_song);
 			ChangeMusic(current_song);
 
 			return CALLBACK_PREVIOUS_MENU;
