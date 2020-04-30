@@ -630,6 +630,9 @@ void ReCallMusic(void)
 
 BOOL CheckSoundtrackExists(int soundtrack)
 {
+	if (soundtrack >= sizeof(music_tables) / sizeof(music_tables[0]))
+		return FALSE;
+
 	// Just check if the first file exists
 	char path[MAX_PATH];
 	sprintf(path, "%s/%s", gDataPath, music_tables[soundtrack][1].intro_file_path);
