@@ -765,7 +765,7 @@ static int Callback_Soundtrack(OptionsMenu *parent_menu, size_t this_option, Cal
 		NULL,
 		options,
 		sizeof(options) / sizeof(options[0]),
-		-16,
+		-20,
 		TRUE
 	};
 
