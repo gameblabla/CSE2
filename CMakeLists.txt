@@ -15,7 +15,7 @@ set(ASSETS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/assets")
 option(JAPANESE "Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)" OFF)
 option(FIX_BUGS "Fix various bugs in the game" ON)
 option(DEBUG_SAVE "Re-enable the ability to drag-and-drop save files onto the window" OFF)
-option(EXTRA_SOUND_FORMATS "Adds support for extra music/SFX formats using the clownaudio library (use the CLOWNAUDIO options to toggle specific formats)" OFF)
+option(EXTRA_SOUND_FORMATS "Adds support for extra music/SFX formats using the clownaudio library (use the CLOWNAUDIO options to toggle specific formats)" ON)
 
 set(BACKEND_RENDERER "SDLTexture" CACHE STRING "Which renderer the game should use: 'OpenGL3' for an OpenGL 3.2 renderer, 'OpenGLES2' for an OpenGL ES 2.0 renderer, 'SDLTexture' for SDL2's hardware-accelerated Texture API, 'Wii U' for the Wii U's hardware-accelerated GX2 API, or 'Software' for a handwritten software renderer")
 set(BACKEND_AUDIO "SDL2" CACHE STRING "Which audio backend the game should use: 'SDL2', 'miniaudio', 'WiiU-Hardware', 'WiiU-Software', or 'Null'")
@@ -343,6 +343,9 @@ if(EXTRA_SOUND_FORMATS)
 
 	# Link clownaudio
 	set(CLOWNAUDIO_MIXER_ONLY ON CACHE INTERNAL "")	# Disable clownaudio's playback capabilities (we use CSE2's instead)
+	set(CLOWNAUDIO_DR_FLAC OFF CACHE BOOL "")	# Disable FLAC support by default
+	set(CLOWNAUDIO_DR_MP3 OFF CACHE BOOL "")	# Disable MP3 support by default
+	set(CLOWNAUDIO_DR_WAV OFF CACHE BOOL "")	# Disable WAV support by default
 	add_subdirectory("external/clownaudio" EXCLUDE_FROM_ALL)
 	target_link_libraries(CSE2 PRIVATE clownaudio)
 endif()
