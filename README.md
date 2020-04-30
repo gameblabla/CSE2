@@ -22,7 +22,7 @@ This branch builds upon the `portable` branch, adding several enhancements inclu
   * Control remapping (keyboard and gamepad)
   * Soundtrack selection
   * V-sync toggle
-  * 60FPS toggle
+  * 50FPS/60FPS toggle
   * Option to disable the design choice that locks sprites to a 320x240 grid when drawn, making them move smoother
 * Bugfixes enabled by default
 
@@ -35,7 +35,7 @@ Also included are enhancements specifically for modders:
 * PixTone sounds split to .pxt files
 * Support for Ogg Vorbis, FLAC, .it, .xm, .mod, .s3m, and PxTone audio formats for music and SFX
 * Support for high-resolution sprites (see SPRITE_SCALE in CommonDefines.h)
-* Extra TSC commands (TODO: link docs for these and the Creepy Curly NPC)
+* Extra TSC commands (TODO: link docs for these)
   * <MS4
   * <MIM
   * <PHY
