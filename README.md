@@ -20,6 +20,7 @@ This branch builds upon the `portable` branch, adding several enhancements inclu
 * Widescreen
 * Options menu:
   * Control remapping (keyboard and gamepad)
+  * Soundtrack selection
   * V-sync toggle
   * 60FPS toggle
   * Option to disable the design choice that locks sprites to a 320x240 grid when drawn, making them move smoother
