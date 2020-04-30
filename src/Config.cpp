@@ -10,7 +10,7 @@
 #include "Main.h"
 
 static const char* const gConfigName = "ConfigCSE2E.dat";
-static const char* const gProof = "CSE2E   20200123";
+static const char* const gProof = "CSE2E   20200430";
 
 BOOL LoadConfigData(CONFIG *conf)
 {
@@ -41,6 +41,9 @@ BOOL LoadConfigData(CONFIG *conf)
 
 	// Read smooth-scrolling toggle
 	conf->bSmoothScrolling = fgetc(fp);
+
+	// Read soundtrack value
+	conf->soundtrack = fgetc(fp);
 
 	// Read key-bindings
 	for (size_t i = 0; i < BINDING_TOTAL; ++i)
@@ -88,6 +91,9 @@ BOOL SaveConfigData(const CONFIG *conf)
 
 	// Write smooth-scrolling toggle
 	fputc(conf->bSmoothScrolling, fp);
+
+	// Write soundtrack value
+	fputc(conf->soundtrack, fp);
 
 	// Write key-bindings
 	for (size_t i = 0; i < BINDING_TOTAL; ++i)

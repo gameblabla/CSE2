@@ -36,6 +36,7 @@ struct CONFIG
 	BOOL b60fps;
 	BOOL bVsync;
 	BOOL bSmoothScrolling;
+	unsigned char soundtrack;
 	CONFIG_BINDING bindings[BINDING_TOTAL];
 };
 

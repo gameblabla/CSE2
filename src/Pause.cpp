@@ -18,6 +18,7 @@
 #include "Main.h"
 #include "Organya.h"
 #include "Sound.h"
+#include "Stage.h"
 
 #define MAX_OPTIONS ((WINDOW_HEIGHT / 20) - 4)	// The maximum number of options we can fit on-screen at once
 
@@ -705,6 +706,86 @@ static int Callback_ControlsController(OptionsMenu *parent_menu, size_t this_opt
 	return return_value;
 }
 
+/////////////////////
+// Soundtrack menu //
+/////////////////////
+
+static int Callback_Soundtrack_Option(OptionsMenu *parent_menu, size_t this_option, CallbackAction action)
+{
+	CONFIG *conf = (CONFIG*)parent_menu->options[this_option].user_data;
+
+	switch (action)
+	{
+		default:
+			break;
+
+		case ACTION_INIT:
+			parent_menu->options[this_option].disabled = !CheckSoundtrackExists(this_option);
+			break;
+
+		case ACTION_OK:
+			conf->soundtrack = gSoundtrack = this_option;
+
+			// Hackish way of restarting the song without overwriting the previous one
+			MusicID current_song = gMusicNo;
+			ReCallMusic();
+			ChangeMusic(current_song);
+
+			return CALLBACK_PREVIOUS_MENU;
+	}
+
+	return CALLBACK_CONTINUE;
+}
+
+static int Callback_Soundtrack(OptionsMenu *parent_menu, size_t this_option, CallbackAction action)
+{
+	(void)parent_menu;
+
+	CONFIG *conf = (CONFIG*)parent_menu->options[this_option].user_data;
+
+	if (action != ACTION_OK)
+		return CALLBACK_CONTINUE;
+
+	const char *strings[] = {"Organya", "New", "Remastered", "Famitracks", "Ridiculon"};
+
+	Option options[sizeof(strings) / sizeof(strings[0])];
+
+	for (size_t i = 0; i < sizeof(strings) / sizeof(strings[0]); ++i)
+	{
+		options[i].name = strings[i];
+		options[i].callback = Callback_Soundtrack_Option;
+		options[i].user_data = conf;
+		options[i].value_string = NULL;
+	}
+
+	OptionsMenu options_menu = {
+		"SELECT SOUNDTRACK",
+		NULL,
+		options,
+		sizeof(options) / sizeof(options[0]),
+		-16,
+		TRUE
+	};
+
+	PlaySoundObject(5, 1);
+
+	int return_value = EnterOptionsMenu(&options_menu, conf->soundtrack);
+
+	// Check if we just want to go back to the previous menu
+	if (return_value == CALLBACK_PREVIOUS_MENU)
+	{
+		return_value = CALLBACK_CONTINUE;
+
+		PlaySoundObject(18, 1);
+	}
+	else
+	{
+		PlaySoundObject(5, 1);
+	}
+
+	return return_value;
+}
+
 //////////////////
 // Options menu //
 //////////////////
@@ -885,6 +966,7 @@ static int Callback_Options(OptionsMenu *parent_menu, size_t this_option, Callba
 
 	Option options_console[] = {
 		{"Controls", Callback_ControlsController, NULL, NULL, 0, FALSE},
+		{"Soundtrack", Callback_Soundtrack, &conf, NULL, 0, FALSE},
 		{"Framerate", Callback_Framerate, &conf, NULL, 0, FALSE},
 		{"Smooth Scrolling", Callback_SmoothScrolling, &conf, NULL, 0, FALSE},
 	};
@@ -892,6 +974,7 @@ static int Callback_Options(OptionsMenu *parent_menu, size_t this_option, Callba
 	Option options_pc[] = {
 		{"Controls (Keyboard)", Callback_ControlsKeyboard, NULL, NULL, 0, FALSE},
 		{"Controls (Gamepad)", Callback_ControlsController, NULL, NULL, 0, FALSE},
+		{"Soundtrack", Callback_Soundtrack, &conf, NULL, 0, FALSE},
 		{"Framerate", Callback_Framerate, &conf, NULL, 0, FALSE},
 		{"V-sync", Callback_Vsync, &conf, NULL, 0, FALSE},
 		{"Resolution", Callback_Resolution, &conf, NULL, 0, FALSE},

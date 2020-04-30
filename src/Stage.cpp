@@ -14,6 +14,7 @@
 #include "File.h"
 #include "Flash.h"
 #include "Frame.h"
+#include "Generic.h"
 #include "Main.h"
 #include "Map.h"
 #include "MapName.h"
@@ -34,6 +35,7 @@
 
 int gStageNo;
 MusicID gMusicNo;
+int gSoundtrack;
 unsigned int gOldPos;
 MusicID gOldNo;
 
@@ -296,20 +298,23 @@ BOOL TransferStage(int no, int w, int x, int y)
 	return TRUE;
 }
 
+//Music
+
 enum
 {
 	MUSIC_TYPE_ORGANYA,
 	MUSIC_TYPE_OTHER
 };
 
-//Music
-const struct
+typedef struct MusicListEntry
 {
 	const char *intro_file_path;
 	const char *loop_file_path;
 	int type;
 	bool loop;
-} gMusicTable[42] = {
+} MusicListEntry;
+
+static const MusicListEntry music_table_organya[42] = {
 	{"Resource/ORG/XXXX.org", NULL, MUSIC_TYPE_ORGANYA, true},
 	{"Resource/ORG/Wanpaku.org", NULL, MUSIC_TYPE_ORGANYA, true},
 	{"Resource/ORG/Anzen.org", NULL, MUSIC_TYPE_ORGANYA, true},
@@ -354,6 +359,194 @@ const struct
 	{"Resource/ORG/White.org", NULL, MUSIC_TYPE_ORGANYA, true}
 };
 
+static const MusicListEntry music_table_new[42] = {
+	{NULL, NULL, MUSIC_TYPE_OTHER, true},
+	{"Ogg/wanpaku.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"Ogg/anzen.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"Ogg/gameover.ogg", NULL, MUSIC_TYPE_OTHER, false},
+	{"Ogg/gravity.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"Ogg/weed.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"Ogg/mdown2.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"Ogg/fireeye.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"Ogg/vivi.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"Ogg/mura.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"Ogg/fanfale1.ogg", NULL, MUSIC_TYPE_OTHER, false},
+	{"Ogg/ginsuke.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"Ogg/cemetery.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"Ogg/plant.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"Ogg/kodou.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"Ogg/fanfale3.ogg", NULL, MUSIC_TYPE_OTHER, false},
+	{"Ogg/fanfale2.ogg", NULL, MUSIC_TYPE_OTHER, false},
+	{"Ogg/dr.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"Ogg/escape.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"Ogg/jenka.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"Ogg/maze.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"Ogg/access.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"Ogg/ironh.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"Ogg/grand.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"Ogg/curly.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"Ogg/oside.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"Ogg/requiem.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"Ogg/wanpak2.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"Ogg/quiet.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"Ogg/lastcave.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"Ogg/balcony.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"Ogg/lastbtl.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"Ogg/lastbt3.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"Ogg/ending.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"Ogg/zonbie.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"Ogg/bdown.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"Ogg/hell.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"Ogg/jenka2.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"Ogg/marine.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"Ogg/ballos.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"Ogg/toroko.ogg", NULL, MUSIC_TYPE_OTHER, false},
+	{"Ogg/white.ogg", NULL, MUSIC_TYPE_OTHER, true}
+};
+
+static const MusicListEntry music_table_remastered[42] = {
+	{NULL, NULL, MUSIC_TYPE_OTHER, true},
+	{"Ogg11/wanpaku_intro.ogg", "Ogg11/wanpaku_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Ogg11/anzen_intro.ogg", "Ogg11/anzen_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Ogg11/gameover_intro.ogg", "Ogg11/gameover_loop.ogg", MUSIC_TYPE_OTHER, false},
+	{"Ogg11/gravity_intro.ogg", "Ogg11/gravity_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Ogg11/weed_intro.ogg", "Ogg11/weed_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Ogg11/mdown2_intro.ogg", "Ogg11/mdown2_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Ogg11/fireeye_intro.ogg", "Ogg11/fireeye_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Ogg11/vivi_intro.ogg", "Ogg11/vivi_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Ogg11/mura_intro.ogg", "Ogg11/mura_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Ogg11/fanfale1_intro.ogg", "Ogg11/fanfale1_loop.ogg", MUSIC_TYPE_OTHER, false},
+	{"Ogg11/ginsuke_intro.ogg", "Ogg11/ginsuke_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Ogg11/cemetery_intro.ogg", "Ogg11/cemetery_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Ogg11/plant_intro.ogg", "Ogg11/plant_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Ogg11/kodou_intro.ogg", "Ogg11/kodou_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Ogg11/fanfale3_intro.ogg", "Ogg11/fanfale3_loop.ogg", MUSIC_TYPE_OTHER, false},
+	{"Ogg11/fanfale2_intro.ogg", "Ogg11/fanfale2_loop.ogg", MUSIC_TYPE_OTHER, false},
+	{"Ogg11/dr_intro.ogg", "Ogg11/dr_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Ogg11/escape_intro.ogg", "Ogg11/escape_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Ogg11/jenka_intro.ogg", "Ogg11/jenka_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Ogg11/maze_intro.ogg", "Ogg11/maze_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Ogg11/access_intro.ogg", "Ogg11/access_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Ogg11/ironh_intro.ogg", "Ogg11/ironh_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Ogg11/grand_intro.ogg", "Ogg11/grand_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Ogg11/curly_intro.ogg", "Ogg11/curly_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Ogg11/oside_intro.ogg", "Ogg11/oside_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Ogg11/requiem_intro.ogg", "Ogg11/requiem_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Ogg11/wanpak2_intro.ogg", "Ogg11/wanpak2_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Ogg11/quiet_intro.ogg", "Ogg11/quiet_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Ogg11/lastcave_intro.ogg", "Ogg11/lastcave_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Ogg11/balcony_intro.ogg", "Ogg11/balcony_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Ogg11/lastbtl.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"Ogg11/lastbt3_intro.ogg", "Ogg11/lastbt3_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Ogg11/ending_intro.ogg", "Ogg11/ending_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Ogg11/zonbie_intro.ogg", "Ogg11/zonbie_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Ogg11/bdown_intro.ogg", "Ogg11/bdown_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Ogg11/hell_intro.ogg", "Ogg11/hell_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Ogg11/jenka2_intro.ogg", "Ogg11/jenka2_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Ogg11/marine_intro.ogg", "Ogg11/marine_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Ogg11/ballos_intro.ogg", "Ogg11/ballos_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Ogg11/toroko_intro.ogg", "Ogg11/toroko_loop.ogg", MUSIC_TYPE_OTHER, false},
+	{"Ogg11/white_intro.ogg", "Ogg11/white_loop.ogg", MUSIC_TYPE_OTHER, true}
+};
+
+static const MusicListEntry music_table_famitracks[42] = {
+	{NULL, NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg17/wanpaku_intro.ogg", "ogg17/wanpaku_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg17/anzen_intro.ogg", "ogg17/anzen_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg17/gameover.ogg", NULL, MUSIC_TYPE_OTHER, false},
+	{"ogg17/gravity_intro.ogg", "ogg17/gravity_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg17/weed_intro.ogg", "ogg17/weed_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg17/mdown2.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg17/fireeye_intro.ogg", "ogg17/fireeye_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg17/vivi_intro.ogg", "ogg17/vivi_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg17/mura.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg17/fanfale1.ogg", NULL, MUSIC_TYPE_OTHER, false},
+	{"ogg17/ginsuke.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg17/cemetery_intro.ogg", "ogg17/cemetery_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg17/plant_intro.ogg", "ogg17/plant_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg17/kodou_intro.ogg", "ogg17/kodou_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg17/fanfale3.ogg", NULL, MUSIC_TYPE_OTHER, false},
+	{"ogg17/fanfale2.ogg", NULL, MUSIC_TYPE_OTHER, false},
+	{"ogg17/dr.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg17/escape.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg17/jenka_intro.ogg", "ogg17/jenka_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg17/maze.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg17/access.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg17/ironh_intro.ogg", "ogg17/ironh_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg17/grand_intro.ogg", "ogg17/grand_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg17/curly_intro.ogg", "ogg17/curly_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg17/oside_intro.ogg", "ogg17/oside_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg17/requiem_intro.ogg", "ogg17/requiem_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg17/wanpak2_intro.ogg", "ogg17/wanpak2_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg17/quiet_intro.ogg", "ogg17/quiet_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg17/lastcave_intro.ogg", "ogg17/lastcave_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg17/balcony_intro.ogg", "ogg17/balcony_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg17/lastbtl.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg17/lastbt3_intro.ogg", "ogg17/lastbt3_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg17/ending_intro.ogg", "ogg17/ending_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg17/zonbie_intro.ogg", "ogg17/zonbie_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg17/bdown_intro.ogg", "ogg17/bdown_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg17/hell_intro.ogg", "ogg17/hell_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg17/jenka2.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg17/marine.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg17/ballos_intro.ogg", "ogg17/ballos_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"ogg17/toroko.ogg", NULL, MUSIC_TYPE_OTHER, false},
+	{"ogg17/white_intro.ogg", "ogg17/white_loop.ogg", MUSIC_TYPE_OTHER, true}
+};
+
+static const MusicListEntry music_table_ridiculon[42] = {
+	{NULL, NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg_ridic/wanpaku.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg_ridic/anzen.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg_ridic/gameover.ogg", NULL, MUSIC_TYPE_OTHER, false},
+	{"ogg_ridic/gravity.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg_ridic/weed.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg_ridic/mdown2.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg_ridic/fireeye.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg_ridic/vivi.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg_ridic/mura.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg_ridic/fanfale1.ogg", NULL, MUSIC_TYPE_OTHER, false},
+	{"ogg_ridic/ginsuke.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg_ridic/cemetery.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg_ridic/plant.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg_ridic/kodou.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg_ridic/fanfale3.ogg", NULL, MUSIC_TYPE_OTHER, false},
+	{"ogg_ridic/fanfale2.ogg", NULL, MUSIC_TYPE_OTHER, false},
+	{"ogg_ridic/dr.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg_ridic/escape.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg_ridic/jenka.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg_ridic/maze.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg_ridic/access.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg_ridic/ironh.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg_ridic/grand.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg_ridic/curly.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg_ridic/oside.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg_ridic/requiem.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg_ridic/wanpak2.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg_ridic/quiet.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg_ridic/lastcave.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg_ridic/balcony.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg_ridic/lastbtl.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg_ridic/lastbt3.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg_ridic/ending.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg_ridic/zonbie.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg_ridic/bdown.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg_ridic/hell.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg_ridic/jenka2.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg_ridic/marine.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg_ridic/ballos.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"ogg_ridic/toroko.ogg", NULL, MUSIC_TYPE_OTHER, false},
+	{"ogg_ridic/white.ogg", NULL, MUSIC_TYPE_OTHER, true}
+};
+
+static const MusicListEntry *music_tables[5] = {
+	music_table_organya,
+	music_table_new,
+	music_table_remastered,
+	music_table_famitracks,
+	music_table_ridiculon
+};
+
 void ChangeMusic(MusicID no)
 {
 	if (no != MUS_SILENCE && no == gMusicNo)
@@ -367,13 +560,15 @@ void ChangeMusic(MusicID no)
 	ExtraSound_PauseMusic();
 #endif
 
+	const MusicListEntry *music_table = music_tables[gSoundtrack];
+
 	char intro_file_path[MAX_PATH];
-	sprintf(intro_file_path, "%s/%s", gDataPath, gMusicTable[no].intro_file_path);
+	sprintf(intro_file_path, "%s/%s", gDataPath, music_table[no].intro_file_path);
 
 	char loop_file_path[MAX_PATH];
-	sprintf(loop_file_path, "%s/%s", gDataPath, gMusicTable[no].loop_file_path);
+	sprintf(loop_file_path, "%s/%s", gDataPath, music_table[no].loop_file_path);
 
-	switch (gMusicTable[no].type)
+	switch (music_table[no].type)
 	{
 		case MUSIC_TYPE_ORGANYA:
 			// Load .org
@@ -391,7 +586,7 @@ void ChangeMusic(MusicID no)
 
 #ifdef EXTRA_SOUND_FORMATS
 		case MUSIC_TYPE_OTHER:
-			ExtraSound_LoadMusic(gMusicTable[no].intro_file_path != NULL ? intro_file_path : NULL, gMusicTable[no].loop_file_path != NULL ? loop_file_path : NULL, gMusicTable[no].loop);
+			ExtraSound_LoadMusic(music_table[no].intro_file_path != NULL ? intro_file_path : NULL, music_table[no].loop_file_path != NULL ? loop_file_path : NULL, music_table[no].loop);
 			break;
 #endif
 	}
@@ -407,12 +602,14 @@ void ReCallMusic(void)
 	ExtraSound_PauseMusic();
 #endif
 
-	switch (gMusicTable[gOldNo].type)
+	const MusicListEntry *music_table = music_tables[gSoundtrack];
+
+	switch (music_table[gOldNo].type)
 	{
 		case MUSIC_TYPE_ORGANYA:
 			// Load .org that was playing before
 			char path[MAX_PATH];
-			sprintf(path, "%s/%s", gDataPath, gMusicTable[gOldNo].intro_file_path);
+			sprintf(path, "%s/%s", gDataPath, music_table[gOldNo].intro_file_path);
 			LoadOrganya(path);
 
 			// Reset position, volume, and then play the song
@@ -429,4 +626,13 @@ void ReCallMusic(void)
 	}
 
 	gMusicNo = gOldNo;
+}
+
+BOOL CheckSoundtrackExists(int soundtrack)
+{
+	// Just check if the first file exists
+	char path[MAX_PATH];
+	sprintf(path, "%s/%s", gDataPath, music_tables[soundtrack][1].intro_file_path);
+
+	return IsKeyFile(path);
 }

@@ -25,6 +25,7 @@
 #endif
 #include "Profile.h"
 #include "Resource.h"
+#include "Stage.h"
 #include "Sound.h"
 #include "Triangle.h"
 
@@ -112,6 +113,8 @@ int main(int argc, char *argv[])
 	CONFIG conf;
 	if (!LoadConfigData(&conf))
 		DefaultConfigData(&conf);
+
+	gSoundtrack = conf.soundtrack;
 
 	memcpy(bindings, conf.bindings, sizeof(bindings));
 
