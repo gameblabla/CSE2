@@ -43,7 +43,11 @@ void Backend_PostWindowCreation(void)
 bool Backend_GetBasePath(char *string_buffer)
 {
 	strcpy(string_buffer, WHBGetSdCardMountPath());
-	strcat(string_buffer, "/CSE2-enhanced");
+#ifdef JAPANESE
+	strcat(string_buffer, "/CSE2-enhanced-jp");
+#else
+	strcat(string_buffer, "/CSE2-enhanced-en");
+#endif
 
 	return true;
 }
