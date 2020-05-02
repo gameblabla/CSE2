@@ -96,12 +96,12 @@ bool ControllerBackend_GetJoystickStatus(bool **buttons, unsigned int *button_co
 		kpad_buttons = kpad_status.pro.hold;
 
 	// Handle button inputs
-	button_buffer[0] |= kpad_buttons & WPAD_PRO_BUTTON_B;     // Shoot
-	button_buffer[1] |= kpad_buttons & WPAD_PRO_BUTTON_A;     // Jump
-	button_buffer[2] |= kpad_buttons & WPAD_PRO_BUTTON_Y;     // Map
+	button_buffer[0] |= kpad_buttons & WPAD_PRO_BUTTON_Y;     // Shoot
+	button_buffer[1] |= kpad_buttons & WPAD_PRO_BUTTON_B;     // Jump
+	button_buffer[2] |= kpad_buttons & WPAD_PRO_BUTTON_X;     // Map
 	button_buffer[3] |= kpad_buttons & WPAD_PRO_TRIGGER_ZL;    // Weapon left
 	button_buffer[4] |= kpad_buttons & WPAD_PRO_TRIGGER_ZR;    // Weapon right
-	button_buffer[5] |= kpad_buttons & WPAD_PRO_BUTTON_X;     // Inventory
+	button_buffer[5] |= kpad_buttons & WPAD_PRO_BUTTON_A;     // Inventory
 	button_buffer[6] |= kpad_buttons & WPAD_PRO_BUTTON_PLUS;  // Pause
 	button_buffer[7] |= kpad_buttons & WPAD_PRO_STICK_L_EMULATION_UP;    // Up
 	button_buffer[8] |= kpad_buttons & WPAD_PRO_STICK_L_EMULATION_DOWN;  // Down
@@ -130,12 +130,12 @@ bool ControllerBackend_GetJoystickStatus(bool **buttons, unsigned int *button_co
 const char* ControllerBackend_GetButtonName(unsigned int button_id)
 {
 	const char *button_names[27] = {
-		"B",
-		"A",
 		"Y",
+		"B",
+		"X",
 		"ZL",
 		"ZR",
-		"X",
+		"A",
 		"+",
 		"Left Stick Up",
 		"Left Stick Down",
