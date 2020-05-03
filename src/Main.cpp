@@ -23,6 +23,7 @@
 #include "Triangle.h"
 
 LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
+static unsigned long CountFramePerSecound(void);
 
 char gModulePath[MAX_PATH];
 char gDataPath[MAX_PATH];

@@ -17,8 +17,6 @@ void InitCreditScript(void);
 void ReleaseCreditScript(void);
 BOOL StartCreditScript(void);
 void ActionCredit(void);
-void ActionCredit_Read(void);
-int GetScriptNumber(const char *text);
 void SetCreditIllust(int a);
 void CutCreditIllust(void);
 int Scene_DownIsland(HWND hWnd, int mode);

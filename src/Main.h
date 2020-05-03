@@ -12,6 +12,5 @@ extern BOOL gbUseJoystick;
 extern int gJoystickButtonTable[8];
 
 void PutFramePerSecound(void);
-unsigned long CountFramePerSecound(void);
 
 BOOL SystemTask(void);

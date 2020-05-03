@@ -52,6 +52,9 @@ static CREDIT Credit;
 static STRIP Strip[MAX_STRIP];
 static ILLUSTRATION Illust;
 
+static int GetScriptNumber(const char *text);
+static void ActionCredit_Read(void);
+
 // Update casts
 void ActionStripper(void)
 {
