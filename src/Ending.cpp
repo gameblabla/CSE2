@@ -299,7 +299,7 @@ void ActionCredit(void)
 }
 
 // Parse credits
-void ActionCredit_Read(void)
+static void ActionCredit_Read(void)
 {
 	int a, b, len;
 	char text[40];
@@ -449,7 +449,7 @@ void ActionCredit_Read(void)
 }
 
 // Get number from text (4 digit)
-int GetScriptNumber(const char *text)
+static int GetScriptNumber(const char *text)
 {
 	return (text[0] - '0') * 1000 +
 		(text[1] - '0') * 100 +
