@@ -26,23 +26,23 @@ typedef enum SurfaceType
 RECT grcGame = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 RECT grcFull = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
-int magnification;
-BOOL fullscreen;
+static int mag;
+static BOOL fullscreen;	// TODO - Not the original variable name
 
-static LPDIRECTDRAW lpDD;
-static LPDIRECTDRAWSURFACE frontbuffer;
-static LPDIRECTDRAWSURFACE backbuffer;
+static LPDIRECTDRAW lpDD;	// TODO - Not the original variable name
+static LPDIRECTDRAWSURFACE frontbuffer;	// TODO - Not the original variable name
+static LPDIRECTDRAWSURFACE backbuffer;	// TODO - Not the original variable name
 
-static LPDIRECTDRAWCLIPPER clipper;
+static LPDIRECTDRAWCLIPPER clipper;	// TODO - Not the original variable name
 
 static LPDIRECTDRAWSURFACE surf[SURFACE_ID_MAX];
 
-static RECT backbuffer_rect;
+static RECT backbuffer_rect;	// TODO - Not the original variable name
 
-static int scaled_window_width;
-static int scaled_window_height;
+static int scaled_window_width;	// TODO - Not the original variable name
+static int scaled_window_height;	// TODO - Not the original variable name
 
-static HFONT font;
+static HFONT font;	// TODO - Not the original variable name
 
 // This doesn't exist in the Linux port, so none of these symbol names are accurate
 static struct
@@ -121,32 +121,32 @@ BOOL StartDirectDraw(HWND hWnd, int lMagnification, int lColourDepth)
 	switch (lMagnification)
 	{
 		case 0:
-			magnification = 1;
+			mag = 1;
 			fullscreen = FALSE;
 			lpDD->SetCooperativeLevel(hWnd, DDSCL_NORMAL);
 			break;
 
 		case 1:
-			magnification = 2;
+			mag = 2;
 			fullscreen = FALSE;
 			lpDD->SetCooperativeLevel(hWnd, DDSCL_NORMAL);
 			break;
 
 		case 2:
-			magnification = 2;
+			mag = 2;
 			fullscreen = TRUE;
 			lpDD->SetCooperativeLevel(hWnd, DDSCL_FULLSCREEN | DDSCL_EXCLUSIVE);
-			lpDD->SetDisplayMode(WINDOW_WIDTH * magnification, WINDOW_HEIGHT * magnification, lColourDepth);
+			lpDD->SetDisplayMode(WINDOW_WIDTH * mag, WINDOW_HEIGHT * mag, lColourDepth);
 			break;
 	}
 
 	backbuffer_rect.left = 0;
 	backbuffer_rect.top = 0;
-	backbuffer_rect.right = WINDOW_WIDTH * magnification;
-	backbuffer_rect.bottom = WINDOW_HEIGHT * magnification;
+	backbuffer_rect.right = WINDOW_WIDTH * mag;
+	backbuffer_rect.bottom = WINDOW_HEIGHT * mag;
 
-	scaled_window_width = WINDOW_WIDTH * magnification;
-	scaled_window_height = WINDOW_HEIGHT * magnification;
+	scaled_window_width = WINDOW_WIDTH * mag;
+	scaled_window_height = WINDOW_HEIGHT * mag;
 
 	memset(&ddsd, 0, sizeof(DDSURFACEDESC));
 	ddsd.dwSize = sizeof(DDSURFACEDESC);
@@ -161,8 +161,8 @@ BOOL StartDirectDraw(HWND hWnd, int lMagnification, int lColourDepth)
 	ddsd.dwSize = sizeof(DDSURFACEDESC);
 	ddsd.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH;
 	ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN;
-	ddsd.dwWidth = WINDOW_WIDTH * magnification;
-	ddsd.dwHeight = WINDOW_HEIGHT * magnification;
+	ddsd.dwWidth = WINDOW_WIDTH * mag;
+	ddsd.dwHeight = WINDOW_HEIGHT * mag;
 
 	if (lpDD->CreateSurface(&ddsd, &backbuffer, NULL) != DD_OK)
 		return FALSE;
@@ -240,8 +240,8 @@ BOOL MakeSurface_Resource(const char *name, SurfaceID surf_no)
 	ddsd.dwSize = sizeof(DDSURFACEDESC);
 	ddsd.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH;
 	ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN;
-	ddsd.dwWidth = bitmap.bmWidth * magnification;
-	ddsd.dwHeight = bitmap.bmHeight * magnification;
+	ddsd.dwWidth = bitmap.bmWidth * mag;
+	ddsd.dwHeight = bitmap.bmHeight * mag;
 
 	if (lpDD->CreateSurface(&ddsd, &surf[surf_no], NULL) != DD_OK)
 		return FALSE;
@@ -253,8 +253,8 @@ BOOL MakeSurface_Resource(const char *name, SurfaceID surf_no)
 
 	int dst_x = 0;
 	int dst_y = 0;
-	int dst_w = bitmap.bmWidth * magnification;
-	int dst_h = bitmap.bmHeight * magnification;
+	int dst_w = bitmap.bmWidth * mag;
+	int dst_h = bitmap.bmHeight * mag;
 
 	HDC hdc = CreateCompatibleDC(NULL);
 	HGDIOBJ hgdiobj = SelectObject(hdc, handle);
@@ -330,8 +330,8 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 	ddsd.dwSize = sizeof(DDSURFACEDESC);
 	ddsd.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH;
 	ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN;
-	ddsd.dwWidth = bitmap.bmWidth * magnification;
-	ddsd.dwHeight = bitmap.bmHeight * magnification;
+	ddsd.dwWidth = bitmap.bmWidth * mag;
+	ddsd.dwHeight = bitmap.bmHeight * mag;
 
 	lpDD->CreateSurface(&ddsd, &surf[surf_no], NULL);
 
@@ -342,8 +342,8 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 
 	int dst_x = 0;
 	int dst_y = 0;
-	int dst_w = bitmap.bmWidth * magnification;
-	int dst_h = bitmap.bmHeight * magnification;
+	int dst_w = bitmap.bmWidth * mag;
+	int dst_h = bitmap.bmHeight * mag;
 
 	HDC hdc = CreateCompatibleDC(NULL);
 	HGDIOBJ hgdiobj = SelectObject(hdc, handle);
@@ -394,8 +394,8 @@ BOOL ReloadBitmap_Resource(const char *name, SurfaceID surf_no)
 
 	int dst_x = 0;
 	int dst_y = 0;
-	int dst_w = bitmap.bmWidth * magnification;
-	int dst_h = bitmap.bmHeight * magnification;
+	int dst_w = bitmap.bmWidth * mag;
+	int dst_h = bitmap.bmHeight * mag;
 
 	HDC hdc = CreateCompatibleDC(NULL);
 	HGDIOBJ hgdiobj = SelectObject(hdc, handle);
@@ -464,8 +464,8 @@ BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 
 	int dst_x = 0;
 	int dst_y = 0;
-	int dst_w = bitmap.bmWidth * magnification;
-	int dst_h = bitmap.bmHeight * magnification;
+	int dst_w = bitmap.bmWidth * mag;
+	int dst_h = bitmap.bmHeight * mag;
 
 	HDC hdc = CreateCompatibleDC(NULL);
 	HGDIOBJ hgdiobj = SelectObject(hdc, handle);
@@ -511,8 +511,8 @@ BOOL MakeSurface_Generic(int bxsize, int bysize, SurfaceID surf_no, BOOL bSystem
 	else
 		ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN;
 
-	ddsd.dwWidth = bxsize * magnification;
-	ddsd.dwHeight = bysize * magnification;
+	ddsd.dwWidth = bxsize * mag;
+	ddsd.dwHeight = bysize * mag;
 
 	lpDD->CreateSurface(&ddsd, &surf[surf_no], NULL);
 
@@ -523,8 +523,8 @@ BOOL MakeSurface_Generic(int bxsize, int bysize, SurfaceID surf_no, BOOL bSystem
 	surf[surf_no]->SetColorKey(DDCKEY_SRCBLT, &ddcolorkey);
 
 	surface_metadata[surf_no].type = SURFACE_SOURCE_NONE;
-	surface_metadata[surf_no].width = ddsd.dwWidth / magnification;
-	surface_metadata[surf_no].height = ddsd.dwHeight / magnification;
+	surface_metadata[surf_no].width = ddsd.dwWidth / mag;
+	surface_metadata[surf_no].height = ddsd.dwHeight / mag;
 
 	if (bSystem)
 		surface_metadata[surf_no].bSystem = TRUE;
@@ -544,10 +544,10 @@ void BackupSurface(SurfaceID surf_no, const RECT *rect)
 	ddbltfx.dwSize = sizeof(DDBLTFX);
 
 	static RECT scaled_rect;	// TODO - Not the original variable name
-	scaled_rect.left = rect->left * magnification;
-	scaled_rect.top = rect->top * magnification;
-	scaled_rect.right = rect->right * magnification;
-	scaled_rect.bottom = rect->bottom * magnification;
+	scaled_rect.left = rect->left * mag;
+	scaled_rect.top = rect->top * mag;
+	scaled_rect.right = rect->right * mag;
+	scaled_rect.bottom = rect->bottom * mag;
 
 	surf[surf_no]->Blt(&scaled_rect, backbuffer, &scaled_rect, DDBLT_WAIT, &ddbltfx);
 }
@@ -582,15 +582,15 @@ void PutBitmap3(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID su
 	rcSet.right = x + rcWork.right - rcWork.left;
 	rcSet.bottom = y + rcWork.bottom - rcWork.top;
 
-	rcWork.left *= magnification;
-	rcWork.top *= magnification;
-	rcWork.right *= magnification;
-	rcWork.bottom *= magnification;
+	rcWork.left *= mag;
+	rcWork.top *= mag;
+	rcWork.right *= mag;
+	rcWork.bottom *= mag;
 
-	rcSet.left *= magnification;
-	rcSet.top *= magnification;
-	rcSet.right *= magnification;
-	rcSet.bottom *= magnification;
+	rcSet.left *= mag;
+	rcSet.top *= mag;
+	rcSet.right *= mag;
+	rcSet.bottom *= mag;
 
 	backbuffer->Blt(&rcSet, surf[surf_no], &rcWork, DDBLT_KEYSRC | DDBLT_WAIT, NULL);
 }
@@ -625,15 +625,15 @@ void PutBitmap4(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID su
 	rcSet.right = x + rcWork.right - rcWork.left;
 	rcSet.bottom = y + rcWork.bottom - rcWork.top;
 
-	rcWork.left *= magnification;
-	rcWork.top *= magnification;
-	rcWork.right *= magnification;
-	rcWork.bottom *= magnification;
+	rcWork.left *= mag;
+	rcWork.top *= mag;
+	rcWork.right *= mag;
+	rcWork.bottom *= mag;
 
-	rcSet.left *= magnification;
-	rcSet.top *= magnification;
-	rcSet.right *= magnification;
-	rcSet.bottom *= magnification;
+	rcSet.left *= mag;
+	rcSet.top *= mag;
+	rcSet.right *= mag;
+	rcSet.bottom *= mag;
 
 	backbuffer->Blt(&rcSet, surf[surf_no], &rcWork, DDBLT_WAIT, NULL);
 }
@@ -643,20 +643,20 @@ void Surface2Surface(int x, int y, const RECT *rect, int to, int from)
 	static RECT rcWork;
 	static RECT rcSet;
 
-	rcWork.left = rect->left * magnification;
-	rcWork.top = rect->top * magnification;
-	rcWork.right = rect->right * magnification;
-	rcWork.bottom = rect->bottom * magnification;
+	rcWork.left = rect->left * mag;
+	rcWork.top = rect->top * mag;
+	rcWork.right = rect->right * mag;
+	rcWork.bottom = rect->bottom * mag;
 
 	rcSet.left = x;
 	rcSet.top = y;
 	rcSet.right = x + rect->right - rect->left;
 	rcSet.bottom = y + rect->bottom - rect->top;
 
-	rcSet.left *= magnification;
-	rcSet.top *= magnification;
-	rcSet.right *= magnification;
-	rcSet.bottom *= magnification;
+	rcSet.left *= mag;
+	rcSet.top *= mag;
+	rcSet.right *= mag;
+	rcSet.bottom *= mag;
 
 	surf[to]->Blt(&rcSet, surf[from], &rcWork, DDBLT_KEYSRC | DDBLT_WAIT, NULL);
 }
@@ -704,13 +704,13 @@ void CortBox(const RECT *rect, unsigned long col)
 	ddbltfx.dwSize = sizeof(DDBLTFX);
 	ddbltfx.dwFillColor = col;
 
-	static RECT dst_rect;	// TODO - Not the original variable name
-	dst_rect.left = rect->left * magnification;
-	dst_rect.top = rect->top * magnification;
-	dst_rect.right = rect->right * magnification;
-	dst_rect.bottom = rect->bottom * magnification;
+	static RECT rcSet;	// TODO - Not the original variable name
+	rcSet.left = rect->left * mag;
+	rcSet.top = rect->top * mag;
+	rcSet.right = rect->right * mag;
+	rcSet.bottom = rect->bottom * mag;
 
-	backbuffer->Blt(&dst_rect, 0, 0, DDBLT_COLORFILL | DDBLT_WAIT, &ddbltfx);
+	backbuffer->Blt(&rcSet, 0, 0, DDBLT_COLORFILL | DDBLT_WAIT, &ddbltfx);
 }
 
 void CortBox2(const RECT *rect, unsigned long col, SurfaceID surf_no)
@@ -720,15 +720,15 @@ void CortBox2(const RECT *rect, unsigned long col, SurfaceID surf_no)
 	ddbltfx.dwSize = sizeof(DDBLTFX);
 	ddbltfx.dwFillColor = col;
 
-	static RECT dst_rect;	// TODO - Not the original variable name
-	dst_rect.left = rect->left * magnification;
-	dst_rect.top = rect->top * magnification;
-	dst_rect.right = rect->right * magnification;
-	dst_rect.bottom = rect->bottom * magnification;
+	static RECT rcSet;	// TODO - Not the original variable name
+	rcSet.left = rect->left * mag;
+	rcSet.top = rect->top * mag;
+	rcSet.right = rect->right * mag;
+	rcSet.bottom = rect->bottom * mag;
 
 	surface_metadata[surf_no].type = SURFACE_SOURCE_NONE;
 
-	surf[surf_no]->Blt(&dst_rect, 0, 0, DDBLT_COLORFILL | DDBLT_WAIT, &ddbltfx);
+	surf[surf_no]->Blt(&rcSet, 0, 0, DDBLT_COLORFILL | DDBLT_WAIT, &ddbltfx);
 }
 
 // Dummied-out log function
@@ -820,7 +820,7 @@ void InitTextObject(const char *name)
 	// Get font size
 	unsigned int width, height;
 
-	switch (magnification)
+	switch (mag)
 	{
 		case 1:
 			height = 12;
@@ -864,7 +864,7 @@ void PutText(int x, int y, const char *text, unsigned long color)
 	HGDIOBJ hgdiobj = SelectObject(hdc, font);
 	SetBkMode(hdc, 1);
 	SetTextColor(hdc, color);
-	TextOutA(hdc, x * magnification, y * magnification, text, (int)strlen(text));
+	TextOutA(hdc, x * mag, y * mag, text, (int)strlen(text));
 	SelectObject(hdc, hgdiobj);
 	backbuffer->ReleaseDC(hdc);
 }
@@ -876,7 +876,7 @@ void PutText2(int x, int y, const char *text, unsigned long color, SurfaceID sur
 	HGDIOBJ hgdiobj = SelectObject(hdc, font);
 	SetBkMode(hdc, 1);
 	SetTextColor(hdc, color);
-	TextOutA(hdc, x * magnification, y * magnification, text, (int)strlen(text));
+	TextOutA(hdc, x * mag, y * mag, text, (int)strlen(text));
 	SelectObject(hdc, hgdiobj);
 	surf[surf_no]->ReleaseDC(hdc);
 }

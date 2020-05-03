@@ -43,12 +43,12 @@ static HINSTANCE ghInstance;
 static int windowWidth;
 static int windowHeight;
 
-static const char *mutex_name = "Doukutsu";
+static const char* const mutex_name = "Doukutsu";
 
 #ifdef JAPANESE
-static const char *lpWindowName = "\x93\xB4\x8C\x41\x95\xA8\x8C\xEA";	// '洞窟物語' (Cave Story) in Shift-JIS
+static const char* const lpWindowName = "\x93\xB4\x8C\x41\x95\xA8\x8C\xEA";	// '洞窟物語' (Cave Story) in Shift-JIS
 #else
-static const char *lpWindowName = "Cave Story ~ Doukutsu Monogatari";
+static const char* const lpWindowName = "Cave Story ~ Doukutsu Monogatari";
 #endif
 
 // The original name for this function is unknown

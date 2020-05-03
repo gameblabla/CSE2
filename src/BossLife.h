@@ -2,6 +2,17 @@
 
 #include "WindowsWrapper.h"
 
+typedef struct BOSSLIFE	// Not the original struct name
+{
+	BOOL flag;
+	int *pLife;
+	int max;
+	int br;
+	int count;
+} BOSSLIFE;
+
+extern BOSSLIFE gBL;
+
 void InitBossLife(void);
 BOOL StartBossLife(int code_event);
 BOOL StartBossLife2(void);

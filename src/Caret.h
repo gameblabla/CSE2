@@ -2,6 +2,8 @@
 
 #include "WindowsWrapper.h"
 
+#define CARET_MAX 0x40
+
 struct CARET_TABLE
 {
 	int view_left;
@@ -25,6 +27,9 @@ struct CARET
 	int view_top;
 	RECT rect;
 };
+
+extern CARET gCrt[CARET_MAX];
+extern CARET_TABLE gCaretTable[18];
 
 void InitCaret(void);
 void ActCaret(void);

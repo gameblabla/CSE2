@@ -31,6 +31,9 @@ typedef struct PROFILE
 	unsigned char flags[1000];
 } PROFILE;
 
+extern const char* const gDefaultName;
+extern const char* const gProfileCode;
+
 BOOL IsProfile(void);
 BOOL SaveProfile(const char *name);
 BOOL LoadProfile(const char *name);

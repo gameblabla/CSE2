@@ -6,8 +6,6 @@
 
 #include "Draw.h"
 
-#define VALUEVIEW_MAX 0x10
-
 VALUEVIEW gVV[VALUEVIEW_MAX];
 int gVVIndex;
 

@@ -4,37 +4,6 @@
 
 #include "CommonDefines.h"
 
-struct CREDIT
-{
-	long size;
-	char *pData;
-	int offset;
-	int wait;
-	int mode;
-	int start_x;
-};
-
-struct STRIP
-{
-	int flag;
-	int x;
-	int y;
-	int cast;
-	char str[0x40];
-};
-
-struct ILLUSTRATION
-{
-	int act_no;
-	int x;
-};
-
-struct ISLAND_SPRITE
-{
-	int x;
-	int y;
-};
-
 #define MAX_STRIP ((WINDOW_HEIGHT / 16) + 1)
 
 void ActionStripper(void);

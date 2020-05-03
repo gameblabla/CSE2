@@ -62,6 +62,12 @@ typedef struct STAGE_TABLE
 
 extern int gStageNo;
 extern MusicID gMusicNo;
+extern unsigned int gOldPos;
+extern MusicID gOldNo;
+
+extern const STAGE_TABLE gTMT[95];
+
+extern const char* const gMusicTable[42];
 
 BOOL TransferStage(int no, int w, int x, int y);
 void ChangeMusic(MusicID no);

@@ -415,7 +415,7 @@ BOOL SaveWindowRect(HWND hWnd, const char *filename)
 	return TRUE;
 }
 
-const char *extra_text = "(C)Pixel";
+static const char* const extra_text = "(C)Pixel";
 
 BOOL IsEnableBitmap(const char *path)
 {

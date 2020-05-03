@@ -17,9 +17,40 @@
 #include "Stage.h"
 #include "TextScr.h"
 
-CREDIT Credit;
-STRIP Strip[MAX_STRIP];
-ILLUSTRATION Illust;
+struct CREDIT
+{
+	long size;
+	char *pData;
+	int offset;
+	int wait;
+	int mode;
+	int start_x;
+};
+
+struct STRIP
+{
+	int flag;
+	int x;
+	int y;
+	int cast;
+	char str[0x40];
+};
+
+struct ILLUSTRATION
+{
+	int act_no;
+	int x;
+};
+
+struct ISLAND_SPRITE
+{
+	int x;
+	int y;
+};
+
+static CREDIT Credit;
+static STRIP Strip[MAX_STRIP];
+static ILLUSTRATION Illust;
 
 // Update casts
 void ActionStripper(void)

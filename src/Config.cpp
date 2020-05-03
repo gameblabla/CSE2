@@ -7,8 +7,8 @@
 #include "Config.h"
 #include "Main.h"
 
-static const char* const gConfigName = "Config.dat";
-static const char* const gProof = "DOUKUTSU20041206";
+const char* const gConfigName = "Config.dat";
+const char* const gProof = "DOUKUTSU20041206";
 
 BOOL LoadConfigData(CONFIG *conf)
 {

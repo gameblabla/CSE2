@@ -42,9 +42,9 @@
 
 TEXT_SCRIPT gTS;
 
-char text[4][0x40];
+static char text[4][0x40];
 
-RECT gRect_line = {0, 0, 216, 16};
+const RECT gRect_line = {0, 0, 216, 16};
 
 #ifdef FIX_BUGS
 static unsigned long nod_color;

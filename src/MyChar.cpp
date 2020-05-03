@@ -986,8 +986,8 @@ void ResetCheck(void)
 	gMC.cond &= ~1;
 }
 
-int noise_no;
-unsigned int noise_freq;
+static int noise_no;
+static unsigned int noise_freq;
 
 void SetNoise(int no, int freq)
 {

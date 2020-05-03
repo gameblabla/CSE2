@@ -46,7 +46,7 @@
 int g_GameFlags;
 int gCounter;
 
-BOOL bContinue;
+static BOOL bContinue;
 
 int Random(int min, int max)
 {

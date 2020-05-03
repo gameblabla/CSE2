@@ -21,8 +21,8 @@
 #include "Star.h"
 #include "ValueView.h"
 
-const char *gDefaultName = "Profile.dat";
-const char *gProfileCode = "Do041220";
+const char* const gDefaultName = "Profile.dat";
+const char* const gProfileCode = "Do041220";
 
 BOOL IsProfile(void)
 {

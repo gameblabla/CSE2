@@ -7,6 +7,9 @@ extern char gDataPath[MAX_PATH];
 
 extern HWND ghWnd;
 extern BOOL bFullscreen;
+extern BOOL gbUseJoystick;
+
+extern int gJoystickButtonTable[8];
 
 void PutFramePerSecound(void);
 unsigned long CountFramePerSecound(void);

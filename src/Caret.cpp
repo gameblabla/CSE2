@@ -8,7 +8,6 @@
 #include "Game.h"
 #include "Triangle.h"
 
-#define CARET_MAX 0x40
 CARET gCrt[CARET_MAX];
 
 CARET_TABLE gCaretTable[18] = {
@@ -510,7 +509,7 @@ void ActCaret17(CARET *crt)
 }
 
 typedef void (*CARETFUNCTION)(CARET*);
-CARETFUNCTION gpCaretFuncTbl[] =
+CARETFUNCTION gpCaretFuncTbl[18] =
 {
 	ActCaret00,
 	ActCaret01,

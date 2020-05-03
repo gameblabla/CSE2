@@ -10,7 +10,7 @@
 #include "MycParam.h"
 #include "Sound.h"
 
-int empty;
+static int empty;
 
 void ShootBullet_Frontia1(int level)
 {

@@ -2,6 +2,8 @@
 
 #include "WindowsWrapper.h"
 
+#define BULLET_MAX 0x40
+
 typedef struct BULLET
 {
 	int flag;
@@ -57,7 +59,6 @@ typedef struct BULLET_TABLE
 	} view;
 } BULLET_TABLE;
 
-#define BULLET_MAX 0x40
 extern BULLET gBul[BULLET_MAX];
 
 void InitBullet(void);

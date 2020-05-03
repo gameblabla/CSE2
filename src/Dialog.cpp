@@ -10,7 +10,7 @@
 
 // All of the original names for the functions/variables in this file are unknown
 
-static const char *version_string = 
+const char* const gVersionString = 
 	"version.%d.%d.%d.%d\r\n"
 	"2004/12/20 - %04d/%02d/%02d\r\n"
 	"Studio Pixel"
@@ -37,7 +37,7 @@ DLGPROC_RET CALLBACK VersionDialog(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lP
 		case WM_INITDIALOG:
 			GetCompileDate(&year, &month, &day);
 			GetCompileVersion(&version1, &version2, &version3, &version4);
-			sprintf(string_buffer, version_string, version1, version2, version3, version4, year, month, day);
+			sprintf(string_buffer, gVersionString, version1, version2, version3, version4, year, month, day);
 			SetDlgItemTextA(hWnd, 1011, string_buffer);
 
 			CenteringWindowByParent(hWnd);
