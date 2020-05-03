@@ -23,7 +23,6 @@
 #include "Triangle.h"
 
 LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
-static unsigned long CountFramePerSecound(void);
 
 char gModulePath[MAX_PATH];
 char gDataPath[MAX_PATH];
@@ -61,16 +60,6 @@ void SetWindowName(HWND hWnd)
 	SetWindowTextA(hWnd, window_name);
 }
 
-// Framerate stuff
-void PutFramePerSecound(void)
-{
-	if (bFPS)
-	{
-		const unsigned long fps = CountFramePerSecound();
-		PutNumber4(WINDOW_WIDTH - 40, 8, fps, FALSE);
-	}
-}
-
 static unsigned long CountFramePerSecound(void)
 {
 	unsigned long current_tick;	// The original name for this variable is unknown
@@ -96,6 +85,16 @@ static unsigned long CountFramePerSecound(void)
 	}
 
 	return max_count;
+}
+
+// Framerate stuff
+void PutFramePerSecound(void)
+{
+	if (bFPS)
+	{
+		const unsigned long fps = CountFramePerSecound();
+		PutNumber4(WINDOW_WIDTH - 40, 8, fps, FALSE);
+	}
 }
 
 // TODO - Inaccurate stack frame
