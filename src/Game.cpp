@@ -107,7 +107,7 @@ void PutNumber4(int x, int y, int value, BOOL bZero)
 	}
 }
 
-int ModeOpening(HWND hWnd)
+static int ModeOpening(HWND hWnd)
 {
 	int frame_x;
 	int frame_y;
@@ -223,7 +223,7 @@ int ModeOpening(HWND hWnd)
 	return 2;
 }
 
-int ModeTitle(HWND hWnd)
+static int ModeTitle(HWND hWnd)
 {
 	// Set rects
 	RECT rcTitle = {0, 0, 144, 40};
@@ -470,7 +470,7 @@ int ModeTitle(HWND hWnd)
 	return 3;
 }
 
-int ModeAction(HWND hWnd)
+static int ModeAction(HWND hWnd)
 {
 	int frame_x;
 	int frame_y;

@@ -70,7 +70,7 @@ void PutFramePerSecound(void)
 	}
 }
 
-unsigned long CountFramePerSecound(void)
+static unsigned long CountFramePerSecound(void)
 {
 	unsigned long current_tick;	// The original name for this variable is unknown
 	static BOOL first = TRUE;
