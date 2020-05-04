@@ -5,11 +5,9 @@
 extern RECT grcGame;
 extern RECT grcFull;
 
-extern int magnification;
-extern BOOL fullscreen;
-
 extern BOOL gb60fps;
 extern BOOL gbSmoothScrolling;
+extern BOOL gbVsync;
 
 typedef enum SurfaceID
 {

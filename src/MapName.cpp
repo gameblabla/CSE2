@@ -6,15 +6,9 @@
 #include "Draw.h"
 #include "WindowsWrapper.h"
 
-typedef struct MAP_NAME
-{
-	BOOL flag;
-	int wait;
-	char name[0x20];
-} MAP_NAME;
-
 MAP_NAME gMapName;
-RECT rc = { 0, 0, 160, 12 };
+
+static RECT rc = { 0, 0, 160, 12 };
 
 void ReadyMapName(const char *str)
 {

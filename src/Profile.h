@@ -41,6 +41,9 @@ typedef struct PROFILE
 	int no_splash_or_air_limit_underwater;
 } PROFILE;
 
+extern const char* const gDefaultName;
+extern const char* const gProfileCode;
+
 BOOL IsProfile(void);
 BOOL SaveProfile(const char *name);
 BOOL LoadProfile(const char *name);

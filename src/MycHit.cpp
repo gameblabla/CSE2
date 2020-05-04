@@ -19,7 +19,7 @@ void ResetMyCharFlag(void)
 	gMC.flag = 0;
 }
 
-void PutlittleStar(void)
+static void PutlittleStar(void)
 {
 	if (!(gMC.cond & 2) && gMC.ym < -0x200)
 	{

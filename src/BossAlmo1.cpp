@@ -13,7 +13,7 @@
 #include "Sound.h"
 #include "Triangle.h"
 
-static void ActBossChar_Core_Face(NPCHAR *npc)
+void ActBossChar_Core_Face(NPCHAR *npc)
 {
 	RECT rect[4] = {
 		{0, 0, 72, 112},
@@ -64,7 +64,7 @@ static void ActBossChar_Core_Face(NPCHAR *npc)
 		npc->rect.bottom = npc->rect.top + npc->act_wait;
 }
 
-static void ActBossChar_Core_Tail(NPCHAR *npc)
+void ActBossChar_Core_Tail(NPCHAR *npc)
 {
 	RECT rect[3] = {
 		{72, 0, 160, 112},
@@ -114,7 +114,7 @@ static void ActBossChar_Core_Tail(NPCHAR *npc)
 		npc->rect.bottom = npc->rect.top + npc->act_wait;
 }
 
-static void ActBossChar_Core_Mini(NPCHAR *npc)
+void ActBossChar_Core_Mini(NPCHAR *npc)
 {
 	RECT rect[3] = {
 		{256, 0, 320, 40},
@@ -228,7 +228,7 @@ static void ActBossChar_Core_Mini(NPCHAR *npc)
 	npc->rect = rect[npc->ani_no];
 }
 
-static void ActBossChar_Core_Hit(NPCHAR *npc)
+void ActBossChar_Core_Hit(NPCHAR *npc)
 {
 	switch (npc->count1)
 	{

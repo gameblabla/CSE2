@@ -27,7 +27,7 @@ static const struct
 	int slot;
 	const char *path;
 	int type;
-} gPtpTable[] = {
+} ptp_table[] = {
 	// TODO - Name the files
 	{1, "PixTone/001.pxt", SOUND_TYPE_PIXTONE},
 	{2, "PixTone/002.pxt", SOUND_TYPE_PIXTONE},
@@ -249,12 +249,12 @@ BOOL LoadGenericData(void)
 
 	pt_size = 0;
 
-	for (unsigned int i = 0; i < sizeof(gPtpTable) / sizeof(gPtpTable[0]); ++i)
+	for (unsigned int i = 0; i < sizeof(ptp_table) / sizeof(ptp_table[0]); ++i)
 	{
 		char path[MAX_PATH];
-		sprintf(path, "%s/%s", gDataPath, gPtpTable[i].path);
+		sprintf(path, "%s/%s", gDataPath, ptp_table[i].path);
 
-		switch (gPtpTable[i].type)
+		switch (ptp_table[i].type)
 		{
 			case SOUND_TYPE_PIXTONE:
 				PIXTONEPARAMETER pixtone_parameters[4];
@@ -265,14 +265,14 @@ BOOL LoadGenericData(void)
 					while (pixtone_parameters[ptp_num].use && ptp_num < 4)
 						++ptp_num;
 
-					pt_size += MakePixToneObject(pixtone_parameters, ptp_num, gPtpTable[i].slot);
+					pt_size += MakePixToneObject(pixtone_parameters, ptp_num, ptp_table[i].slot);
 				}
 
 				break;
 
 #ifdef EXTRA_SOUND_FORMATS
 			case SOUND_TYPE_OTHER:
-				ExtraSound_LoadSFX(path, gPtpTable[i].slot);
+				ExtraSound_LoadSFX(path, ptp_table[i].slot);
 				break;
 #endif
 		}

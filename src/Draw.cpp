@@ -31,20 +31,20 @@ typedef enum SurfaceType
 RECT grcGame = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 RECT grcFull = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
-int magnification;
-BOOL fullscreen;
+static int mag;
+static BOOL fullscreen;	// TODO - Not the original variable name
 
 BOOL gb60fps;
 BOOL gbSmoothScrolling;
+BOOL gbVsync;
 
-static BOOL gbVsync;
 static unsigned int vsync_fps;
 
-static RenderBackend_Surface *framebuffer;
+static RenderBackend_Surface *framebuffer;	// TODO - Not the original variable name
 
 static RenderBackend_Surface *surf[SURFACE_ID_MAX];
 
-static FontObject *font;
+static FontObject *font;	// TODO - Not the original variable name
 
 // This doesn't exist in the Linux port, so none of these symbol names are accurate
 static struct
@@ -121,30 +121,30 @@ BOOL StartDirectDraw(const char *title, int lMagnification, BOOL b60fps, BOOL bS
 	switch (lMagnification)
 	{
 		default:
-			magnification = lMagnification;
+			mag = lMagnification;
 			fullscreen = FALSE;
 			break;
 
 		case 0:	// Fullscreen
 			// Round to the nearest internal resolution
-			magnification = MIN((display_mode.width + (WINDOW_WIDTH / 2)) / WINDOW_WIDTH, (display_mode.height + (WINDOW_HEIGHT / 2)) / WINDOW_HEIGHT);
+			mag = MIN((display_mode.width + (WINDOW_WIDTH / 2)) / WINDOW_WIDTH, (display_mode.height + (WINDOW_HEIGHT / 2)) / WINDOW_HEIGHT);
 			fullscreen = TRUE;
 			break;
 	}
 
 	// Round down to the nearest multiple of SPRITE_SCALE (we can't use 2x sprites at 1x or 3x internal resolution)
-	magnification -= magnification % SPRITE_SCALE;
+	mag -= mag % SPRITE_SCALE;
 
 	// Account for rounding-down to 0
-	if (magnification == 0)
-		magnification = SPRITE_SCALE;
+	if (mag == 0)
+		mag = SPRITE_SCALE;
 
 	// If v-sync is requested, check if it's available
 	if (bVsync)
 		gbVsync = vsync_fps == (b60fps ? 60 : 50);
 
 	bool requested_vsync = gbVsync;
-	framebuffer = RenderBackend_Init(title, WINDOW_WIDTH * magnification, WINDOW_HEIGHT * magnification, fullscreen, &requested_vsync);
+	framebuffer = RenderBackend_Init(title, WINDOW_WIDTH * mag, WINDOW_HEIGHT * mag, fullscreen, &requested_vsync);
 
 	gbVsync = requested_vsync;
 
@@ -189,7 +189,7 @@ void ReleaseSurface(SurfaceID s)
 
 static BOOL ScaleAndUploadSurface(const unsigned char *image_buffer, int width, int height, SurfaceID surf_no)
 {
-	const int magnification_scaled = magnification / SPRITE_SCALE;
+	const int magnification_scaled = mag / SPRITE_SCALE;
 
 	unsigned int pitch;
 	unsigned char *pixels = RenderBackend_LockSurface(surf[surf_no], &pitch, width * magnification_scaled, height * magnification_scaled);
@@ -263,7 +263,7 @@ BOOL MakeSurface_Resource(const char *name, SurfaceID surf_no)
 	if (image_buffer == NULL)
 		return FALSE;
 
-	surf[surf_no] = RenderBackend_CreateSurface(width * magnification / SPRITE_SCALE, height * magnification / SPRITE_SCALE, false);
+	surf[surf_no] = RenderBackend_CreateSurface(width * mag / SPRITE_SCALE, height * mag / SPRITE_SCALE, false);
 
 	if (surf[surf_no] == NULL)
 	{
@@ -330,7 +330,7 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 		return FALSE;
 	}
 
-	surf[surf_no] = RenderBackend_CreateSurface(width * magnification / SPRITE_SCALE, height * magnification / SPRITE_SCALE, false);
+	surf[surf_no] = RenderBackend_CreateSurface(width * mag / SPRITE_SCALE, height * mag / SPRITE_SCALE, false);
 
 	if (surf[surf_no] == NULL)
 	{
@@ -450,7 +450,7 @@ BOOL MakeSurface_Generic(int bxsize, int bysize, SurfaceID surf_no, BOOL bSystem
 	if (surf[surf_no] != NULL)
 		return FALSE;
 
-	surf[surf_no] = RenderBackend_CreateSurface(bxsize * magnification, bysize * magnification, true);
+	surf[surf_no] = RenderBackend_CreateSurface(bxsize * mag, bysize * mag, true);
 
 	if (surf[surf_no] == NULL)
 		return FALSE;
@@ -471,25 +471,25 @@ BOOL MakeSurface_Generic(int bxsize, int bysize, SurfaceID surf_no, BOOL bSystem
 
 void BackupSurface(SurfaceID surf_no, const RECT *rect)
 {
-	static RenderBackend_Rect scaled_rect;	// TODO - Not the original variable name
-	scaled_rect.left = rect->left * magnification;
-	scaled_rect.top = rect->top * magnification;
-	scaled_rect.right = rect->right * magnification;
-	scaled_rect.bottom = rect->bottom * magnification;
+	static RenderBackend_Rect rcSet;	// TODO - Not the original variable name
+	rcSet.left = rect->left * mag;
+	rcSet.top = rect->top * mag;
+	rcSet.right = rect->right * mag;
+	rcSet.bottom = rect->bottom * mag;
 
 	// Do not draw invalid RECTs
-	if (scaled_rect.right <= scaled_rect.left || scaled_rect.bottom <= scaled_rect.top)
+	if (rcSet.right <= rcSet.left || rcSet.bottom <= rcSet.top)
 		return;
 
-	RenderBackend_Blit(framebuffer, &scaled_rect, surf[surf_no], scaled_rect.left, scaled_rect.top, FALSE);
+	RenderBackend_Blit(framebuffer, &rcSet, surf[surf_no], rcSet.left, rcSet.top, FALSE);
 }
 
 static void ScaleRect(const RECT *rect, RenderBackend_Rect *scaled_rect)
 {
-	scaled_rect->left = rect->left * magnification;
-	scaled_rect->top = rect->top * magnification;
-	scaled_rect->right = rect->right * magnification;
-	scaled_rect->bottom = rect->bottom * magnification;
+	scaled_rect->left = rect->left * mag;
+	scaled_rect->top = rect->top * mag;
+	scaled_rect->right = rect->right * mag;
+	scaled_rect->bottom = rect->bottom * mag;
 }
 
 void PutBitmap3(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID surf_no) // Transparency
@@ -562,16 +562,16 @@ void Surface2Surface(int x, int y, const RECT *rect, int to, int from)
 {
 	static RenderBackend_Rect rcWork;
 
-	rcWork.left = rect->left * magnification;
-	rcWork.top = rect->top * magnification;
-	rcWork.right = rect->right * magnification;
-	rcWork.bottom = rect->bottom * magnification;
+	rcWork.left = rect->left * mag;
+	rcWork.top = rect->top * mag;
+	rcWork.right = rect->right * mag;
+	rcWork.bottom = rect->bottom * mag;
 
 	// Do not draw invalid RECTs
 	if (rcWork.right <= rcWork.left || rcWork.bottom <= rcWork.top)
 		return;
 
-	RenderBackend_Blit(surf[from], &rcWork, surf[to], x * magnification, y * magnification, TRUE);
+	RenderBackend_Blit(surf[from], &rcWork, surf[to], x * mag, y * mag, TRUE);
 }
 
 unsigned long GetCortBoxColor(unsigned long col)
@@ -582,30 +582,30 @@ unsigned long GetCortBoxColor(unsigned long col)
 
 void CortBox(const RECT *rect, unsigned long col)
 {
-	static RenderBackend_Rect dst_rect;	// TODO - Not the original variable name
-	dst_rect.left = rect->left * magnification;
-	dst_rect.top = rect->top * magnification;
-	dst_rect.right = rect->right * magnification;
-	dst_rect.bottom = rect->bottom * magnification;
+	static RenderBackend_Rect rcSet;	// TODO - Not the original variable name
+	rcSet.left = rect->left * mag;
+	rcSet.top = rect->top * mag;
+	rcSet.right = rect->right * mag;
+	rcSet.bottom = rect->bottom * mag;
 
 	const unsigned char red = col & 0xFF;
 	const unsigned char green = (col >> 8) & 0xFF;
 	const unsigned char blue = (col >> 16) & 0xFF;
 
 	// Do not draw invalid RECTs
-	if (dst_rect.right <= dst_rect.left || dst_rect.bottom <= dst_rect.top)
+	if (rcSet.right <= rcSet.left || rcSet.bottom <= rcSet.top)
 		return;
 
-	RenderBackend_ColourFill(framebuffer, &dst_rect, red, green, blue, 0xFF);
+	RenderBackend_ColourFill(framebuffer, &rcSet, red, green, blue, 0xFF);
 }
 
 void CortBox2(const RECT *rect, unsigned long col, SurfaceID surf_no)
 {
-	static RenderBackend_Rect dst_rect;	// TODO - Not the original variable name
-	dst_rect.left = rect->left * magnification;
-	dst_rect.top = rect->top * magnification;
-	dst_rect.right = rect->right * magnification;
-	dst_rect.bottom = rect->bottom * magnification;
+	static RenderBackend_Rect rcSet;	// TODO - Not the original variable name
+	rcSet.left = rect->left * mag;
+	rcSet.top = rect->top * mag;
+	rcSet.right = rect->right * mag;
+	rcSet.bottom = rect->bottom * mag;
 
 	surface_metadata[surf_no].type = SURFACE_SOURCE_NONE;
 
@@ -615,10 +615,10 @@ void CortBox2(const RECT *rect, unsigned long col, SurfaceID surf_no)
 	const unsigned char alpha = (col >> 24) & 0xFF;
 
 	// Do not draw invalid RECTs
-	if (dst_rect.right <= dst_rect.left || dst_rect.bottom <= dst_rect.top)
+	if (rcSet.right <= rcSet.left || rcSet.bottom <= rcSet.top)
 		return;
 
-	RenderBackend_ColourFill(surf[surf_no], &dst_rect, red, green, blue, alpha);
+	RenderBackend_ColourFill(surf[surf_no], &rcSet, red, green, blue, alpha);
 }
 
 // Dummied-out log function
@@ -697,14 +697,14 @@ int RestoreSurfaces(void)
 int SubpixelToScreenCoord(int coord)
 {
 	if (gbSmoothScrolling)
-		return (coord * magnification) / 0x200;
+		return (coord * mag) / 0x200;
 	else
-		return (coord / (0x200 / SPRITE_SCALE)) * (magnification / SPRITE_SCALE);
+		return (coord / (0x200 / SPRITE_SCALE)) * (mag / SPRITE_SCALE);
 }
 
 int PixelToScreenCoord(int coord)
 {
-	return coord * magnification;
+	return coord * mag;
 }
 
 // TODO - Inaccurate stack frame
@@ -718,7 +718,7 @@ void InitTextObject(const char *name)
 	// Get font size
 	unsigned int width, height;
 
-	switch (magnification)
+	switch (mag)
 	{
 		case 1:
 			height = 10;
@@ -726,8 +726,8 @@ void InitTextObject(const char *name)
 			break;
 
 		default:
-			height = 9 * magnification;
-			width = 8 * magnification;
+			height = 9 * mag;
+			width = 8 * mag;
 			break;
 	}
 
@@ -736,12 +736,12 @@ void InitTextObject(const char *name)
 
 void PutText(int x, int y, const char *text, unsigned long color)
 {
-	DrawText(font, framebuffer, x * magnification, y * magnification, color, text);
+	DrawText(font, framebuffer, x * mag, y * mag, color, text);
 }
 
 void PutText2(int x, int y, const char *text, unsigned long color, SurfaceID surf_no)
 {
-	DrawText(font, surf[surf_no], x * magnification, y * magnification, color, text);
+	DrawText(font, surf[surf_no], x * mag, y * mag, color, text);
 }
 
 void EndTextObject(void)

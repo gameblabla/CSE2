@@ -53,6 +53,10 @@ typedef struct TEXT_SCRIPT
 	unsigned char wait_beam;
 } TEXT_SCRIPT;
 
+extern TEXT_SCRIPT gTS;
+
+extern const RECT gRect_line;
+
 /// Contains the latest value given through <MIM
 extern unsigned int gMIMCurrentNum;
 

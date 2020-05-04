@@ -49,7 +49,7 @@
 int g_GameFlags;
 int gCounter;
 
-BOOL bContinue;
+static BOOL bContinue;
 
 int Random(int min, int max)
 {
@@ -169,7 +169,7 @@ static void PutBlackBars(int fx, int fy)
 	CortBox(&rect, 0);
 }
 
-int ModeOpening(void)
+static int ModeOpening(void)
 {
 	int frame_x;
 	int frame_y;
@@ -298,7 +298,7 @@ int ModeOpening(void)
 	return 2;
 }
 
-int ModeTitle(void)
+static int ModeTitle(void)
 {
 	// Set rects
 	RECT rcTitle = {0, 0, 144, 40};
@@ -557,7 +557,7 @@ int ModeTitle(void)
 	return 3;
 }
 
-int ModeAction(void)
+static int ModeAction(void)
 {
 	int frame_x;
 	int frame_y;

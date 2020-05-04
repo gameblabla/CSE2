@@ -133,7 +133,7 @@ BOOL IsShiftJIS(unsigned char c)
 	return FALSE;
 }
 
-const char *extra_text = "(C)Pixel";
+static const char* const extra_text = "(C)Pixel";
 
 BOOL IsEnableBitmap(const char *path)
 {

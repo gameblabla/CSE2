@@ -24,9 +24,9 @@
 #include "TextScr.h"
 #include "ValueView.h"
 
-const char *gDefaultName = "Profile.dat";
-const char *gProfileCode = "Do041220";
-const char *gProfileCodeExtra = "CSE2E   20200304";
+const char* const gDefaultName = "Profile.dat";
+const char* const gProfileCode = "Do041220";
+const char* const gProfileCodeExtra = "CSE2E   20200304";
 
 BOOL IsProfile(void)
 {
