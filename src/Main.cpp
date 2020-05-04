@@ -45,6 +45,7 @@ static const char* const lpWindowName = "洞窟物語";	// "Cave Story"
 static const char* const lpWindowName = "Cave Story ~ Doukutsu Monogatari";
 #endif
 
+// Framerate stuff
 static unsigned long CountFramePerSecound(void)
 {
 	unsigned long current_tick;	// The original name for this variable is unknown
@@ -72,7 +73,6 @@ static unsigned long CountFramePerSecound(void)
 	return max_count;
 }
 
-// Framerate stuff
 void PutFramePerSecound(void)
 {
 	if (bFPS)

@@ -416,17 +416,17 @@ BOOL MakeSurface_Generic(int bxsize, int bysize, SurfaceID surf_no, BOOL bSystem
 
 void BackupSurface(SurfaceID surf_no, const RECT *rect)
 {
-	static RenderBackend_Rect scaled_rect;	// TODO - Not the original variable name
-	scaled_rect.left = rect->left * mag;
-	scaled_rect.top = rect->top * mag;
-	scaled_rect.right = rect->right * mag;
-	scaled_rect.bottom = rect->bottom * mag;
+	static RenderBackend_Rect rcSet;	// TODO - Not the original variable name
+	rcSet.left = rect->left * mag;
+	rcSet.top = rect->top * mag;
+	rcSet.right = rect->right * mag;
+	rcSet.bottom = rect->bottom * mag;
 
 	// Do not draw invalid RECTs
-	if (scaled_rect.right <= scaled_rect.left || scaled_rect.bottom <= scaled_rect.top)
+	if (rcSet.right <= rcSet.left || rcSet.bottom <= rcSet.top)
 		return;
 
-	RenderBackend_Blit(framebuffer, &scaled_rect, surf[surf_no], scaled_rect.left, scaled_rect.top, FALSE);
+	RenderBackend_Blit(framebuffer, &rcSet, surf[surf_no], rcSet.left, rcSet.top, FALSE);
 }
 
 void PutBitmap3(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID surf_no) // Transparency
