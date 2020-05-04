@@ -39,22 +39,13 @@ static BOOL bActive = TRUE;
 static BOOL bFPS = FALSE;
 
 #ifdef JAPANESE
-static const char *lpWindowName = "洞窟物語";	// "Cave Story"
+static const char* const lpWindowName = "洞窟物語";	// "Cave Story"
 #else
-static const char *lpWindowName = "Cave Story ~ Doukutsu Monogatari";
+static const char* const lpWindowName = "Cave Story ~ Doukutsu Monogatari";
 #endif
 
 // Framerate stuff
-void PutFramePerSecound(void)
-{
-	if (bFPS)
-	{
-		const unsigned long fps = CountFramePerSecound();
-		PutNumber4(WINDOW_WIDTH - 40, 8, fps, FALSE);
-	}
-}
-
-unsigned long CountFramePerSecound(void)
+static unsigned long CountFramePerSecound(void)
 {
 	unsigned long current_tick;	// The original name for this variable is unknown
 	static BOOL first = TRUE;
@@ -79,6 +70,15 @@ unsigned long CountFramePerSecound(void)
 	}
 
 	return max_count;
+}
+
+void PutFramePerSecound(void)
+{
+	if (bFPS)
+	{
+		const unsigned long fps = CountFramePerSecound();
+		PutNumber4(WINDOW_WIDTH - 40, 8, fps, FALSE);
+	}
 }
 
 // TODO - Inaccurate stack frame

@@ -21,10 +21,10 @@ ITEM gItemData[ITEM_MAX];
 int gSelectedArms;
 int gSelectedItem;
 
-static int gCampTitleY;
+int gCampTitleY;
 
 /// True if we're in the items section of the inventory (not in the weapons section) (only relevant when the inventory is open)
-static BOOL gCampActive;
+BOOL gCampActive;
 
 int gArmsEnergyX = 16;
 

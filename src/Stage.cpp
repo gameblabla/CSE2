@@ -303,13 +303,13 @@ enum
 };
 
 //Music
-const struct
+static const struct
 {
 	const char *intro_file_path;
 	const char *loop_file_path;
 	int type;
 	bool loop;
-} gMusicTable[42] = {
+} music_table[42] = {
 	{"Resource/ORG/XXXX.org", NULL, MUSIC_TYPE_ORGANYA, true},
 	{"Resource/ORG/Wanpaku.org", NULL, MUSIC_TYPE_ORGANYA, true},
 	{"Resource/ORG/Anzen.org", NULL, MUSIC_TYPE_ORGANYA, true},
@@ -368,12 +368,12 @@ void ChangeMusic(MusicID no)
 #endif
 
 	char intro_file_path[MAX_PATH];
-	sprintf(intro_file_path, "%s/%s", gDataPath, gMusicTable[no].intro_file_path);
+	sprintf(intro_file_path, "%s/%s", gDataPath, music_table[no].intro_file_path);
 
 	char loop_file_path[MAX_PATH];
-	sprintf(loop_file_path, "%s/%s", gDataPath, gMusicTable[no].loop_file_path);
+	sprintf(loop_file_path, "%s/%s", gDataPath, music_table[no].loop_file_path);
 
-	switch (gMusicTable[no].type)
+	switch (music_table[no].type)
 	{
 		case MUSIC_TYPE_ORGANYA:
 			// Load .org
@@ -391,7 +391,7 @@ void ChangeMusic(MusicID no)
 
 #ifdef EXTRA_SOUND_FORMATS
 		case MUSIC_TYPE_OTHER:
-			ExtraSound_LoadMusic(gMusicTable[no].intro_file_path != NULL ? intro_file_path : NULL, gMusicTable[no].loop_file_path != NULL ? loop_file_path : NULL, gMusicTable[no].loop);
+			ExtraSound_LoadMusic(music_table[no].intro_file_path != NULL ? intro_file_path : NULL, music_table[no].loop_file_path != NULL ? loop_file_path : NULL, music_table[no].loop);
 			break;
 #endif
 	}
@@ -407,12 +407,12 @@ void ReCallMusic(void)
 	ExtraSound_PauseMusic();
 #endif
 
-	switch (gMusicTable[gOldNo].type)
+	switch (music_table[gOldNo].type)
 	{
 		case MUSIC_TYPE_ORGANYA:
 			// Load .org that was playing before
 			char path[MAX_PATH];
-			sprintf(path, "%s/%s", gDataPath, gMusicTable[gOldNo].intro_file_path);
+			sprintf(path, "%s/%s", gDataPath, music_table[gOldNo].intro_file_path);
 			LoadOrganya(path);
 
 			// Reset position, volume, and then play the song

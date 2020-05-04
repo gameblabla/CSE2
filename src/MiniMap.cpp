@@ -247,7 +247,7 @@ int MiniMapLoop(void)
 	return enum_ESCRETURN_continue;
 }
 
-char gMapping[0x80];
+signed char gMapping[0x80];
 
 BOOL IsMapping(void)
 {

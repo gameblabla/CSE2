@@ -9,8 +9,8 @@
 #include "File.h"
 #include "Main.h"
 
-static const char* const gConfigName = "ConfigCSE2E.dat";
-static const char* const gProof = "CSE2E   20200123";
+const char* const gConfigName = "ConfigCSE2E.dat";
+const char* const gProof = "CSE2E   20200123";
 
 BOOL LoadConfigData(CONFIG *conf)
 {

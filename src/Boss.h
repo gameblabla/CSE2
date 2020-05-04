@@ -3,6 +3,7 @@
 #include "NpChar.h"
 
 #define BOSS_MAX 20
+
 extern NPCHAR gBoss[BOSS_MAX];
 
 typedef void (*BOSSFUNCTION)(void);

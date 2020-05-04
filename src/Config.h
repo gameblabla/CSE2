@@ -39,6 +39,9 @@ struct CONFIG
 	CONFIG_BINDING bindings[BINDING_TOTAL];
 };
 
+extern const char* const gConfigName;
+extern const char* const gProof;
+
 BOOL LoadConfigData(CONFIG *conf);
 BOOL SaveConfigData(const CONFIG *conf);
 void DefaultConfigData(CONFIG *conf);

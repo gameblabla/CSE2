@@ -119,6 +119,8 @@ extern int gCurlyShoot_y;
 extern int gSuperXpos;
 extern int gSuperYpos;
 
+extern const char* const gPassPixEve;
+
 void InitNpChar(void);
 BOOL LoadEvent(const char *path_event);
 void SetNpChar(int code_char, int x, int y, int xm, int ym, int dir, NPCHAR *npc, int start_index);
