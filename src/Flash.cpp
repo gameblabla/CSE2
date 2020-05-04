@@ -17,7 +17,7 @@ static struct
 	RECT rect2;
 } flash;
 
-static unsigned long gFlashColor;
+unsigned long gFlashColor;
 
 void InitFlash(void)
 {

@@ -7,14 +7,7 @@
 #include "Draw.h"
 #include "NpChar.h"
 
-static struct
-{
-	BOOL flag;
-	int *pLife;
-	int max;
-	int br;
-	int count;
-} gBL;
+BOSSLIFE gBL;
 
 void InitBossLife(void)
 {

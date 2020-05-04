@@ -17,9 +17,40 @@
 #include "Stage.h"
 #include "TextScr.h"
 
-CREDIT Credit;
-STRIP Strip[MAX_STRIP];
-ILLUSTRATION Illust;
+struct CREDIT
+{
+	long size;
+	char *pData;
+	int offset;
+	int wait;
+	int mode;
+	int start_x;
+};
+
+struct STRIP
+{
+	int flag;
+	int x;
+	int y;
+	int cast;
+	char str[0x40];
+};
+
+struct ILLUSTRATION
+{
+	int act_no;
+	int x;
+};
+
+struct ISLAND_SPRITE
+{
+	int x;
+	int y;
+};
+
+static CREDIT Credit;
+static STRIP Strip[MAX_STRIP];
+static ILLUSTRATION Illust;
 
 // Update casts
 void ActionStripper(void)
@@ -247,28 +278,17 @@ BOOL StartCreditScript(void)
 	return TRUE;
 }
 
-// Update credits
-void ActionCredit(void)
+// Get number from text (4 digit)
+static int GetScriptNumber(const char *text)
 {
-	if (Credit.offset >= Credit.size)
-		return;
-
-	// Update script, or if waiting, decrement the wait value
-	switch (Credit.mode)
-	{
-		case 1:
-			ActionCredit_Read();
-			break;
-
-		case 2:
-			if (--Credit.wait <= 0)
-				Credit.mode = 1;
-			break;
-	}
+	return (text[0] - '0') * 1000 +
+		(text[1] - '0') * 100 +
+		(text[2] - '0') * 10 +
+		text[3] - '0';
 }
 
 // Parse credits
-void ActionCredit_Read(void)
+static void ActionCredit_Read(void)
 {
 	int a, b, len;
 	char text[40];
@@ -417,15 +437,25 @@ void ActionCredit_Read(void)
 	}
 }
 
-// Get number from text (4 digit)
-int GetScriptNumber(const char *text)
+// Update credits
+void ActionCredit(void)
 {
-	return (text[0] - '0') * 1000 +
-		(text[1] - '0') * 100 +
-		(text[2] - '0') * 10 +
-		text[3] - '0';
-}
+	if (Credit.offset >= Credit.size)
+		return;
 
+	// Update script, or if waiting, decrement the wait value
+	switch (Credit.mode)
+	{
+		case 1:
+			ActionCredit_Read();
+			break;
+
+		case 2:
+			if (--Credit.wait <= 0)
+				Credit.mode = 1;
+			break;
+	}
+}
 
 // Change illustration
 void SetCreditIllust(int a)

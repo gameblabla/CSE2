@@ -5,9 +5,6 @@
 extern RECT grcGame;
 extern RECT grcFull;
 
-extern int magnification;
-extern BOOL fullscreen;
-
 typedef enum SurfaceID
 {
 	SURFACE_ID_TITLE = 0,

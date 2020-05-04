@@ -53,6 +53,10 @@ typedef struct TEXT_SCRIPT
 	unsigned char wait_beam;
 } TEXT_SCRIPT;
 
+extern TEXT_SCRIPT gTS;
+
+extern const RECT gRect_line;
+
 BOOL InitTextScript2(void);
 void EndTextScript(void);
 void EncryptionBinaryData2(unsigned char *pData, long size);

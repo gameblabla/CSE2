@@ -390,7 +390,7 @@ void PutMyAir(int x, int y)
 	}
 }
 
-int time_count;
+static int time_count;
 
 void PutTimeCounter(int x, int y)
 {

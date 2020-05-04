@@ -7,7 +7,7 @@
 #include "NpChar.h"
 #include "Sound.h"
 
-void Vanish(BULLET *bul)
+static void Vanish(BULLET *bul)
 {
 	if (bul->code_bullet != 37 && bul->code_bullet != 38 && bul->code_bullet != 39)
 		PlaySoundObject(28, 1);

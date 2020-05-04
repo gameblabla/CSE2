@@ -204,7 +204,7 @@ BOOL TransferStage(int no, int w, int x, int y)
 }
 
 // Music
-const char *gMusicTable[42] = {
+const char* const gMusicTable[42] = {
 	"XXXX",
 	"WANPAKU",
 	"ANZEN",

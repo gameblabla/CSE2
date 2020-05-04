@@ -2,6 +2,10 @@
 
 #include "WindowsWrapper.h"
 
+// Limits for the amount of weapons and items
+#define ARMS_MAX 8
+#define ITEM_MAX 0x20
+
 // "Arms" is a synonym of "weapon" here
 // "Code" means "ID" here
 // "Num" often means "ammo" here
@@ -32,26 +36,27 @@ typedef struct ITEM
 } ITEM;
 
 
-// Limits for the amount of weapons and items
-#define ARMS_MAX 8
-#define ITEM_MAX 0x20
-
-
-/// X coordinate for the weapons HUD section. Set it to 32 for the forward weapon rotation "animation", 0 for the reverse weapon rotation "animation" and 16 to immobilise it
-extern int gArmsEnergyX;
-
-
-/// Currently selected weapon
-extern int gSelectedArms;
-
-// Currently selected item
-extern int gSelectedItem;
 
 /// Contains data for all the weapons the character currently has
 extern ARMS gArmsData[ARMS_MAX];
 
 /// Contains data for all the items the character currently has
 extern ITEM gItemData[ITEM_MAX];
+
+/// Currently selected weapon
+extern int gSelectedArms;
+
+/// Currently selected item
+extern int gSelectedItem;
+
+extern int gCampTitleY;
+
+/// True if we're in the items section of the inventory (not in the weapons section) (only relevant when the inventory is open)
+extern BOOL gCampActive;
+
+/// X coordinate for the weapons HUD section. Set it to 32 for the forward weapon rotation "animation", 0 for the reverse weapon rotation "animation" and 16 to immobilise it
+extern int gArmsEnergyX;
+
 
 
 /// Clear the weapons array, reverting it to the default state (no weapons) and adjust variables (initialize weapons basically)

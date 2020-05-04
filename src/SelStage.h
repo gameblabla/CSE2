@@ -10,6 +10,9 @@ typedef struct PERMIT_STAGE
 
 extern PERMIT_STAGE gPermitStage[8];
 
+extern int gSelectedStage;
+extern int gStageSelectTitleY;
+
 void ClearPermitStage(void);
 BOOL AddPermitStage(int index, int event);
 BOOL SubPermitStage(int index);

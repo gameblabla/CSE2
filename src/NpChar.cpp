@@ -25,7 +25,7 @@ int gCurlyShoot_y;
 int gSuperXpos;
 int gSuperYpos;
 
-const char *gPassPixEve = "PXE";
+const char* const gPassPixEve = "PXE";
 
 static void SetUniqueParameter(NPCHAR *npc)
 {

@@ -10,7 +10,7 @@
 #include "PixTone.h"
 #include "Sound.h"
 
-static const PIXTONEPARAMETER gPtpTable[139] =
+const PIXTONEPARAMETER gPtpTable[139] =
 {
 	{1, 5000, {5, 10.0, 32, 0}, {4, 4.0, 32, 0}, {0, 0.0, 63, 0}, 63, 6, 63, 45, 8, 119, 46},
 	{1, 1000, {0, 4.0, 32, 0}, {3, 1.0, 63, 0}, {0, 0.0, 63, 0}, 63, 64, 63, 128, 63, 255, 63},

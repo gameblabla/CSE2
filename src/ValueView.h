@@ -2,6 +2,8 @@
 
 #include "WindowsWrapper.h"
 
+#define VALUEVIEW_MAX 0x10
+
 typedef struct VALUEVIEW
 {
   BOOL flag;
@@ -12,6 +14,9 @@ typedef struct VALUEVIEW
   int count;
   RECT rect;
 } VALUEVIEW;
+
+extern VALUEVIEW gVV[VALUEVIEW_MAX];
+extern int gVVIndex;
 
 void ClearValueView(void);
 void SetValueView(int *px, int *py, int value);

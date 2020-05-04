@@ -14,5 +14,8 @@ struct CONFIG
 	long joystick_button[8];
 };
 
+extern const char* const gConfigName;
+extern const char* const gProof;
+
 BOOL LoadConfigData(CONFIG *conf);
 void DefaultConfigData(CONFIG *conf);
