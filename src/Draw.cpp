@@ -543,13 +543,13 @@ void BackupSurface(SurfaceID surf_no, const RECT *rect)
 	memset(&ddbltfx, 0, sizeof(DDBLTFX));
 	ddbltfx.dwSize = sizeof(DDBLTFX);
 
-	static RECT scaled_rect;	// TODO - Not the original variable name
-	scaled_rect.left = rect->left * mag;
-	scaled_rect.top = rect->top * mag;
-	scaled_rect.right = rect->right * mag;
-	scaled_rect.bottom = rect->bottom * mag;
+	static RECT rcSet;	// TODO - Not the original variable name
+	rcSet.left = rect->left * mag;
+	rcSet.top = rect->top * mag;
+	rcSet.right = rect->right * mag;
+	rcSet.bottom = rect->bottom * mag;
 
-	surf[surf_no]->Blt(&scaled_rect, backbuffer, &scaled_rect, DDBLT_WAIT, &ddbltfx);
+	surf[surf_no]->Blt(&rcSet, backbuffer, &rcSet, DDBLT_WAIT, &ddbltfx);
 }
 
 void PutBitmap3(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID surf_no) // Transparency

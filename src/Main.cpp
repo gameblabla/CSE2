@@ -60,6 +60,7 @@ void SetWindowName(HWND hWnd)
 	SetWindowTextA(hWnd, window_name);
 }
 
+// Framerate stuff
 static unsigned long CountFramePerSecound(void)
 {
 	unsigned long current_tick;	// The original name for this variable is unknown
@@ -87,7 +88,6 @@ static unsigned long CountFramePerSecound(void)
 	return max_count;
 }
 
-// Framerate stuff
 void PutFramePerSecound(void)
 {
 	if (bFPS)
