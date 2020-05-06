@@ -4,8 +4,9 @@
 #include <stdlib.h>
 
 static unsigned char *framebuffer;
+static size_t framebuffer_pitch;
 
-unsigned char* WindowBackend_Software_CreateWindow(const char *window_title, int screen_width, int screen_height, bool fullscreen, size_t *pitch)
+bool WindowBackend_Software_CreateWindow(const char *window_title, int screen_width, int screen_height, bool fullscreen)
 {
 	(void)window_title;
 	(void)fullscreen;
@@ -14,17 +15,24 @@ unsigned char* WindowBackend_Software_CreateWindow(const char *window_title, int
 
 	if (framebuffer != NULL)
 	{
-		*pitch = screen_width * 3;
+		framebuffer_pitch = screen_width * 3;
 
-		return framebuffer;
+		return true;
 	}
 
-	return NULL;
+	return false;
 }
 
 void WindowBackend_Software_DestroyWindow(void)
 {
 	free(framebuffer);
+}
+
+unsigned char* WindowBackend_Software_GetFramebuffer(size_t *pitch)
+{
+	*pitch = framebuffer_pitch;
+
+	return framebuffer;
 }
 
 void WindowBackend_Software_Display(void)
