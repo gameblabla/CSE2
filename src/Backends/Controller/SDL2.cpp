@@ -1,11 +1,11 @@
 #include "../Controller.h"
-#include "Controller.h"
 
 #include <stddef.h>
 
 #include "SDL.h"
 
 #include "../Misc.h"
+#include "../Shared/SDL2.h"
 
 #define DEADZONE 10000
 

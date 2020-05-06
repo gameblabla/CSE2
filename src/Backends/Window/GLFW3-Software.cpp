@@ -1,5 +1,4 @@
 #include "../Window-Software.h"
-#include "Window.h"
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -12,6 +11,7 @@
 #include <GLFW/glfw3.h>
 
 #include "../Misc.h"
+#include "../Shared/GLFW3.h"
 
 GLFWwindow *window;
 

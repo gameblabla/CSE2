@@ -1,5 +1,4 @@
 #include "../Window-OpenGL.h"
-#include "Window.h"
 
 #include <stddef.h>
 #include <string>
@@ -12,6 +11,7 @@
 #include "SDL.h"
 
 #include "../Misc.h"
+#include "../Shared/SDL2.h"
 #include "../../Resource.h"
 
 SDL_Window *window;

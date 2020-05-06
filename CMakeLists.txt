@@ -352,48 +352,47 @@ endif()
 
 if(BACKEND_PLATFORM MATCHES "SDL2")
 	target_sources(CSE2 PRIVATE
-		"src/Backends/SDL2/Controller.cpp"
-		"src/Backends/SDL2/Controller.h"
-		"src/Backends/SDL2/Misc.cpp"
-		"src/Backends/SDL2/Window.h"
+		"src/Backends/Controller/SDL2.cpp"
+		"src/Backends/Platform/SDL2.cpp"
+		"src/Backends/Shared/SDL2.h"
 	)
 elseif(BACKEND_PLATFORM MATCHES "GLFW3")
 	target_sources(CSE2 PRIVATE
-		"src/Backends/GLFW3/Controller.cpp"
-		"src/Backends/GLFW3/Misc.cpp"
-		"src/Backends/GLFW3/Window.h"
+		"src/Backends/Controller/GLFW3.cpp"
+		"src/Backends/Platform/GLFW3.cpp"
+		"src/Backends/Shared/GLFW3.h"
 	)
 elseif(BACKEND_PLATFORM MATCHES "WiiU")
 	target_sources(CSE2 PRIVATE
-		"src/Backends/WiiU/Controller.cpp"
-		"src/Backends/WiiU/Misc.cpp"
+		"src/Backends/Controller/WiiU.cpp"
+		"src/Backends/Platform/WiiU.cpp"
 	)
 elseif(BACKEND_PLATFORM MATCHES "Null")
 	target_sources(CSE2 PRIVATE
-		"src/Backends/Null/Controller.cpp"
-		"src/Backends/Null/Misc.cpp"
+		"src/Backends/Controller/Null.cpp"
+		"src/Backends/Platform/Null.cpp"
 	)
 endif()
 
 if(BACKEND_PLATFORM MATCHES "SDL2" AND BACKEND_RENDERER MATCHES "OpenGL3")
-	target_sources(CSE2 PRIVATE "src/Backends/SDL2/Window-OpenGL3.cpp")
+	target_sources(CSE2 PRIVATE "src/Backends/Window/SDL2-OpenGL3.cpp")
 elseif(BACKEND_PLATFORM MATCHES "SDL2" AND BACKEND_RENDERER MATCHES "OpenGLES2")
-	target_sources(CSE2 PRIVATE "src/Backends/SDL2/Window-OpenGLES2.cpp")
+	target_sources(CSE2 PRIVATE "src/Backends/Window/SDL2-OpenGLES2.cpp")
 elseif(BACKEND_PLATFORM MATCHES "SDL2" AND BACKEND_RENDERER MATCHES "SDLTexture")
 elseif(BACKEND_PLATFORM MATCHES "SDL2" AND BACKEND_RENDERER MATCHES "SDLSurface")
 elseif(BACKEND_PLATFORM MATCHES "SDL2" AND BACKEND_RENDERER MATCHES "Software")
-	target_sources(CSE2 PRIVATE "src/Backends/SDL2/Window-Software.cpp")
+	target_sources(CSE2 PRIVATE "src/Backends/Window/SDL2-Software.cpp")
 elseif(BACKEND_PLATFORM MATCHES "GLFW3" AND BACKEND_RENDERER MATCHES "OpenGL3")
-	target_sources(CSE2 PRIVATE "src/Backends/GLFW3/Window-OpenGL3.cpp")
+	target_sources(CSE2 PRIVATE "src/Backends/Window/GLFW3-OpenGL3.cpp")
 elseif(BACKEND_PLATFORM MATCHES "GLFW3" AND BACKEND_RENDERER MATCHES "OpenGLES2")
-	target_sources(CSE2 PRIVATE "src/Backends/GLFW3/Window-OpenGLES2.cpp")
+	target_sources(CSE2 PRIVATE "src/Backends/Window/GLFW3-OpenGLES2.cpp")
 elseif(BACKEND_PLATFORM MATCHES "GLFW3" AND BACKEND_RENDERER MATCHES "Software")
-	target_sources(CSE2 PRIVATE "src/Backends/GLFW3/Window-Software.cpp")
+	target_sources(CSE2 PRIVATE "src/Backends/Window/GLFW3-Software.cpp")
 elseif(BACKEND_PLATFORM MATCHES "WiiU" AND BACKEND_RENDERER MATCHES "WiiU")
 elseif(BACKEND_PLATFORM MATCHES "WiiU" AND BACKEND_RENDERER MATCHES "Software")
-	target_sources(CSE2 PRIVATE "src/Backends/WiiU/Window-Software.cpp")
+	target_sources(CSE2 PRIVATE "src/Backends/Window/WiiU-Software.cpp")
 elseif(BACKEND_PLATFORM MATCHES "Null" AND BACKEND_RENDERER MATCHES "Software")
-	target_sources(CSE2 PRIVATE "src/Backends/Null/Window-Software.cpp")
+	target_sources(CSE2 PRIVATE "src/Backends/Window/Null-Software.cpp")
 else()
 	message(FATAL_ERROR "Invalid BACKEND_PLATFORM/BACKEND_RENDERER combination")
 endif()
