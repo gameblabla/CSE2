@@ -1,4 +1,4 @@
-#include "../Window-Software.h"
+#include "../Software.h"
 
 #include <stddef.h>
 #include <stdlib.h>

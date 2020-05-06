@@ -1,4 +1,4 @@
-#include "../Window-Software.h"
+#include "../Software.h"
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -6,8 +6,8 @@
 
 #include "SDL.h"
 
-#include "../Misc.h"
-#include "../Shared/SDL2.h"
+#include "../../../Misc.h"
+#include "../../../Shared/SDL2.h"
 
 SDL_Window *window;
 
