@@ -7,9 +7,8 @@
 
 #include "SDL.h"
 
-#include "Controller.h"
-#include "Window.h"
 #include "../Rendering.h"
+#include "../Shared/SDL2.h"
 #include "../../Main.h"
 #include "../../Organya.h"
 #include "../../Profile.h"

@@ -20,9 +20,9 @@
 
 #include "../Misc.h"
 
-#include "../WiiU/shaders/colour_fill.gsh.h"
-#include "../WiiU/shaders/glyph.gsh.h"
-#include "../WiiU/shaders/texture.gsh.h"
+#include "WiiUShaders/colour_fill.gsh.h"
+#include "WiiUShaders/glyph.gsh.h"
+#include "WiiUShaders/texture.gsh.h"
 
 typedef struct RenderBackend_Surface
 {

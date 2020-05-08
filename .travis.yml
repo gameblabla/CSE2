@@ -55,6 +55,7 @@ env:
     - PLATFORM=GLFW3 AUDIO=miniaudio RENDERER=Software
     - PLATFORM=GLFW3 AUDIO=miniaudio RENDERER=OpenGL3
     - PLATFORM=GLFW3 AUDIO=miniaudio RENDERER=OpenGLES2
+    - PLATFORM=Null AUDIO=Null RENDERER=Software
 
 jobs:
   exclude:

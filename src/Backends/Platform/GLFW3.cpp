@@ -10,8 +10,8 @@
 
 #include <GLFW/glfw3.h>
 
-#include "Window.h"
 #include "../Rendering.h"
+#include "../Shared/GLFW3.h"
 #include "../../Attributes.h"
 #include "../../Main.h"
 #include "../../Organya.h"
