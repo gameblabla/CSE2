@@ -73,6 +73,10 @@ endif()
 add_subdirectory("../external/glad" "glad" EXCLUDE_FROM_ALL)
 target_link_libraries(DoConfig PRIVATE glad)
 
+if (CMAKE_VERSION GREATER_EQUAL 3.11)
+	cmake_policy(SET CMP0072 NEW)
+endif()
+
 find_package(OpenGL REQUIRED)
 target_link_libraries(DoConfig PRIVATE OpenGL::GL)
 
