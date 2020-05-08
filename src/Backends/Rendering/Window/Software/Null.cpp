@@ -6,7 +6,7 @@
 static unsigned char *framebuffer;
 static size_t framebuffer_pitch;
 
-bool WindowBackend_Software_CreateWindow(const char *window_title, int screen_width, int screen_height, bool fullscreen)
+bool WindowBackend_Software_CreateWindow(const char *window_title, int screen_width, int screen_height, bool fullscreen, bool *vsync)
 {
 	(void)window_title;
 	(void)fullscreen;
