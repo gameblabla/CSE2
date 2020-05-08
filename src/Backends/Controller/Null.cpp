@@ -19,3 +19,8 @@ bool ControllerBackend_GetJoystickStatus(bool **buttons, unsigned int *button_co
 
 	return false;
 }
+
+const char* ControllerBackend_GetButtonName(unsigned int button_id)
+{
+	return "Null";
+}

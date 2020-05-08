@@ -18,7 +18,7 @@
 #include "../../WindowsWrapper.h"
 
 #include "../Misc.h"
-#include "../Window-OpenGL.h"
+#include "Window/OpenGL.h"
 #include "../../Resource.h"
 
 #define TOTAL_VBOS 8

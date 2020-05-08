@@ -5,7 +5,7 @@
 #include <string.h>
 
 #include "../Misc.h"
-#include "../Window-Software.h"
+#include "Window/Software.h"
 #include "../../Attributes.h"
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))

@@ -21,7 +21,7 @@
 
 #include "../../Attributes.h"
 
-#include "shaders/texture.gsh.h"
+#include "WiiUShaders/texture.gsh.h"
 
 typedef struct Viewport
 {

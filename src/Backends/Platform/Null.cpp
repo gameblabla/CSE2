@@ -87,3 +87,13 @@ void Backend_Delay(unsigned int ticks)
 {
 	(void)ticks;
 }
+
+void Backend_GetDisplayMode(Backend_DisplayMode *display_mode)
+{
+	(void)display_mode;
+}
+
+bool Backend_IsConsole(void)
+{
+	return false;
+}

@@ -1,5 +1,4 @@
-#include "../Window-OpenGL.h"
-#include "Window.h"
+#include "../OpenGL.h"
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -11,7 +10,8 @@
 #endif
 #include <GLFW/glfw3.h>
 
-#include "../Misc.h"
+#include "../../../Misc.h"
+#include "../../../Shared/GLFW3.h"
 
 GLFWwindow *window;
 
