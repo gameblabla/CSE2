@@ -9,7 +9,7 @@
 #include "File.h"
 #include "Main.h"
 
-const char* const gConfigName = "ConfigCSE2E.dat";
+const char* const gConfigName = "ConfigCSE2EL.dat";
 const char* const gProof = "CSE2E   20200123";
 
 BOOL LoadConfigData(CONFIG *conf)
