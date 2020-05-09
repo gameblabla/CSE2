@@ -154,7 +154,7 @@ Then, we convert it to an `.rpx`:
 elf2rpl game_english/CSE2 game_english/CSE2.rpx
 ```
 
-`game_english/CSE2.rpx` is now ready to be ran on your Wii U. This port expects the data folder to be in a folder called `CSE2-enhanced-lite-en`/`CSE2-enhanced-lite-jp` on the root of your SD card.
+`game_english/CSE2.rpx` is now ready to be ran on your Wii U. This port expects the data folder to be in a folder called `CSE2-enhanced-en`/`CSE2-enhanced-jp` on the root of your SD card.
 
 ## Licensing
 

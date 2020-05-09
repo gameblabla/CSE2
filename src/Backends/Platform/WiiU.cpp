@@ -44,9 +44,9 @@ bool Backend_GetBasePath(char *string_buffer)
 {
 	strcpy(string_buffer, WHBGetSdCardMountPath());
 #ifdef JAPANESE
-	strcat(string_buffer, "/CSE2-enhanced-lite-jp");
+	strcat(string_buffer, "/CSE2-enhanced-jp");
 #else
-	strcat(string_buffer, "/CSE2-enhanced-lite-en");
+	strcat(string_buffer, "/CSE2-enhanced-en");
 #endif
 
 	return true;
