@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/Clownacy/Cave-Story-Engine-2.svg?branch=enhanced)](https://travis-ci.com/Clownacy/Cave-Story-Engine-2)
+[![Build Status](https://travis-ci.com/Clownacy/Cave-Story-Engine-2.svg?branch=enhanced-lite)](https://travis-ci.com/Clownacy/Cave-Story-Engine-2)
 
 ## Table of Contents
 
@@ -13,7 +13,7 @@ Branch | Description
 [emscripten](https://www.github.com/Clownacy/Cave-Story-Engine-2/tree/emscripten) | Modifies the engine to build with Emscripten, [allowing it to run in web browsers](http://sonicresearch.org/clownacy/cave.html) (no longer maintained).
 [wii](https://www.github.com/Clownacy/Cave-Story-Engine-2/tree/wii) | Ports the engine to the Nintendo Wii (no longer maintained).
 
-# Cave Story Engine 2 (Enhanced)
+# Cave Story Engine 2 (Enhanced-lite)
 
 Cave Story Engine 2 is a decompilation of Cave Story.
 
