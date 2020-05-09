@@ -62,7 +62,7 @@ the subset of C99 that C++98 allows.
 I prefer compiler-specific code to be avoided, since more-portable code benefits
 all compilers, and keeps the codebase free of clutter.
 
-# `enhanced` branch
+# `enhanced-lite` branch
 This branch deviates the most from the `accurate` branch, focussing less on
 authenticity, and more on improving the base engine.
 
@@ -94,3 +94,24 @@ Keeping the vanilla code intact guarantees CSE2E will accurately-reproduce
 Cave Story's gameplay, avoiding an NXEngine-scenario where the game is riddled
 with inaccuracies, both small and large. This also has the benefit of making it
 easier to merge changes from the other branches.
+
+## Enhancements unrelated to modding
+Some features have made their way into this branch, despite not actually being
+of any direct use to modders - one example of this is the option to disable the
+pixel-alignment effect.
+
+The reason for allowing these features is that, while they are of no direct
+benefit to modders, they are of benefit _to players._ Thus, a mod with these
+features is better than a mod without them. Likewise, the input-rebinding menu
+falls under a similar use.
+
+The line is drawn when a feature comes at a _detriment_ to modders - for
+example, having an option to select an alternative soundtrack (such as the
+Nicalis ones) is nice for the player, but will complicate modding, as, if a mod
+includes custom music, the modder will either have to disable the soundtracks
+they don't support, or they'll have to create multiple versions of each song.
+
+# `enhanced` branch
+This branch is built upon the `enhanced-lite` branch, and follows similar ideals
+to said branch. However, this branch targets players rather than modders,
+allowing a greater range of features to be added.
