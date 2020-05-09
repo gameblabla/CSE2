@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/Clownacy/Cave-Story-Engine-2.svg?branch=enhanced-lite)](https://travis-ci.com/Clownacy/Cave-Story-Engine-2)
+[![Build Status](https://travis-ci.com/Clownacy/Cave-Story-Engine-2.svg?branch=enhanced)](https://travis-ci.com/Clownacy/Cave-Story-Engine-2)
 
 ## Table of Contents
 
@@ -13,34 +13,20 @@ Branch | Description
 [emscripten](https://www.github.com/Clownacy/Cave-Story-Engine-2/tree/emscripten) | Modifies the engine to build with Emscripten, [allowing it to run in web browsers](http://sonicresearch.org/clownacy/cave.html) (no longer maintained).
 [wii](https://www.github.com/Clownacy/Cave-Story-Engine-2/tree/wii) | Ports the engine to the Nintendo Wii (no longer maintained).
 
-# Cave Story Engine 2 (Enhanced-lite)
+# Cave Story Engine 2 (Enhanced)
 
 Cave Story Engine 2 is a decompilation of Cave Story.
 
-This branch builds upon the `portable` branch, adding several enhancements including:
+This branch builds upon the `enhanced-lite` branch, adding several enhancements including:
 * Widescreen
+* Support for alternate soundtracks
 * Options menu:
   * Control remapping (keyboard and gamepad)
   * Soundtrack selection
   * V-sync toggle
   * 50FPS/60FPS toggle
   * Option to disable the design choice that locks sprites to a 320x240 grid when drawn, making them move smoother
-* Bugfixes enabled by default
-
-Also included are enhancements specifically for modders:
-* PNG support
-* Full alpha blending support
-* Fixed text blending, utilising the aforementioned alpha support
-* All resource files moved to the data folder
-* [Booster's Lab](https://github.com/taedixon/boosters-lab) support (open 'data/mrmap.bin')
-* PixTone sounds split to .pxt files
-* Support for Ogg Vorbis, FLAC, .it, .xm, .mod, .s3m, and PxTone audio formats for music and SFX
-* Support for high-resolution sprites (see SPRITE_SCALE in CommonDefines.h)
-* Extra TSC commands (TODO: link docs for these)
-  * <MS4
-  * <MIM
-  * <PHY
-* No TSC script size limit (the vanilla limit is around 0x5000 bytes)
+* Bugfixes
 
 Supported platforms include...
 * Windows
