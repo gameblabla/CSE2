@@ -6,7 +6,9 @@
 #include "SDL.h"
 
 #include "../Misc.h"
+#if SDL_VERSION_ATLEAST(2, 0, 0)
 #include "../Shared/SDL2.h"
+#endif
 
 #define DEADZONE 10000
 
@@ -126,6 +128,7 @@ bool ControllerBackend_GetJoystickStatus(bool **buttons, unsigned int *button_co
 	return true;
 }
 
+#if SDL_VERSION_ATLEAST(2, 0, 0)
 void ControllerBackend_JoystickConnect(Sint32 joystick_id)
 {
 	const char *joystick_name = SDL_JoystickNameForIndex(joystick_id);
@@ -199,3 +202,4 @@ void ControllerBackend_JoystickDisconnect(Sint32 joystick_id)
 		free(axis_neutrals);
 	}
 }
+#endif
