@@ -8,7 +8,8 @@
 
 #include "../../../Misc.h"
 
-static Uint32 window_flags = SDL_HWSURFACE | SDL_DOUBLEBUF;
+static int bits_per_pixel = 24;
+static Uint32 window_flags = SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_ANYFORMAT;
 
 static SDL_Surface *window_sdlsurface;
 static SDL_Surface *framebuffer_sdlsurface;
@@ -20,7 +21,13 @@ bool WindowBackend_Software_CreateWindow(const char *window_title, int screen_wi
 	else
 		window_flags &= ~SDL_FULLSCREEN;
 
-	window_sdlsurface = SDL_SetVideoMode(screen_width, screen_height, 24, window_flags);
+	window_sdlsurface = SDL_SetVideoMode(screen_width, screen_height, bits_per_pixel, window_flags);
+	if (window_sdlsurface == NULL) {
+		Backend_PrintError("Couldn't create 24bpp window: %s", SDL_GetError());
+		bits_per_pixel = 32;
+		window_sdlsurface = SDL_SetVideoMode(screen_width, screen_height, bits_per_pixel, window_flags);
+	}
+
 	if (window_sdlsurface != NULL)
 	{
 		SDL_WM_SetCaption(window_title, NULL);
@@ -70,7 +77,7 @@ void WindowBackend_Software_Display(void)
 
 void WindowBackend_Software_HandleWindowResize(unsigned int width, unsigned int height)
 {
-	window_sdlsurface = SDL_SetVideoMode(width, height, 24, window_flags);
+	window_sdlsurface = SDL_SetVideoMode(width, height, bits_per_pixel, window_flags);
 	if (window_sdlsurface == NULL)
 		Backend_PrintError("Couldn't get SDL surface associated with window: %s", SDL_GetError());
 }
