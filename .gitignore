@@ -76,6 +76,14 @@
 # Exclude converted resource files
 /src/Resource
 
+########################
+# Enhanced-lite branch #
+########################
+
+# Exclude CSE2EL configuration file
+/game_english/ConfigCSE2EL.dat
+/game_japanese/ConfigCSE2EL.dat
+
 ###################
 # Enhanced branch #
 ###################
