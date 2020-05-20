@@ -20,7 +20,7 @@ intended for modders, you can probably get away with using it for that without
 any of us getting mad over it.
 
 It might be worth crediting us, just to be safe - I (Clownacy) don't mind, but
-GarbielRavier does.
+GabrielRavier does.
 
 
 ============
