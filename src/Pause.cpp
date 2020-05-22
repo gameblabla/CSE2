@@ -1078,9 +1078,9 @@ static int Callback_Reset(OptionsMenu *parent_menu, size_t this_option, Callback
 	if (action != ACTION_OK)
 		return CALLBACK_CONTINUE;
 
-	int return_value = CALLBACK_CONTINUE;
+	int return_value = PromptAreYouSure();
 
-	switch (PromptAreYouSure())
+	switch (return_value)
 	{
 		case 0:
 			return_value = CALLBACK_CONTINUE;	// Go back to previous menu
@@ -1101,9 +1101,9 @@ static int Callback_Quit(OptionsMenu *parent_menu, size_t this_option, CallbackA
 	if (action != ACTION_OK)
 		return CALLBACK_CONTINUE;
 
-	int return_value = CALLBACK_CONTINUE;
+	int return_value = PromptAreYouSure();
 
-	switch (PromptAreYouSure())
+	switch (return_value)
 	{
 		case 0:
 			return_value = CALLBACK_CONTINUE;	// Go back to previous menu
