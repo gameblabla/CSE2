@@ -635,7 +635,7 @@ void ChangeMusic(MusicID no)
 			ExtraSound_LoadMusic(music_table[no].intro_file_path != NULL ? intro_file_path : NULL, music_table[no].loop_file_path != NULL ? loop_file_path : NULL, music_table[no].loop);
 
 			// Play a null Organya song so focussing and refocussing the window doesn't cause the old Organya song to start playing again
-			sprintf(intro_file_path, "%s/%s", gDataPath, music_table[0].intro_file_path);
+			sprintf(intro_file_path, "%s/%s", gDataPath, music_table_organya[0].intro_file_path);
 			LoadOrganya(intro_file_path);
 
 			ChangeOrganyaVolume(100);
