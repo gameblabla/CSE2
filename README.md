@@ -24,7 +24,7 @@ This branch builds upon the `portable` branch, adding several enhancements inclu
   * V-sync toggle
   * 50FPS/60FPS toggle
   * Option to disable the design choice that locks sprites to a 320x240 grid when drawn, making them move smoother
-* Bugfixes enabled by default
+* Bugfixes
 
 Also included are enhancements specifically for modders:
 * PNG support
@@ -34,7 +34,7 @@ Also included are enhancements specifically for modders:
 * [Booster's Lab](https://github.com/taedixon/boosters-lab) support (open 'data/mrmap.bin')
 * PixTone sounds split to .pxt files
 * Support for Ogg Vorbis, FLAC, .it, .xm, .mod, .s3m, and PxTone audio formats for music and SFX
-* Support for high-resolution sprites (see SPRITE_SCALE in CommonDefines.h)
+* Support for high-resolution sprites (see `SPRITE_SCALE` in CommonDefines.h)
 * Extra TSC commands (TODO: link docs for these)
   * <MS4
   * <MIM
