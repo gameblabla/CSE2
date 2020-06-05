@@ -1,5 +1,5 @@
 # `accurate` branch
-Being a pure, plain decompilation of the original `Doukusu.exe` file (v1.0.0.6),
+Being a pure, plain decompilation of the original `Doukutsu.exe` file (v1.0.0.6),
 there should not be much to say about this branch's philosophies:
 
 ## Goal
