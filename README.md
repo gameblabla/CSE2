@@ -51,7 +51,7 @@ Switch to the terminal (Visual Studio users should open the [Developer Command P
 cmake -B build -DCMAKE_BUILD_TYPE=Release
 ```
 
-MSYS2 users may want to append `-G"MSYS Makefiles"` to this command, also.
+MSYS2 users should append `-G"MSYS Makefiles"` to this command, also.
 
 You can also add the following flags:
 
