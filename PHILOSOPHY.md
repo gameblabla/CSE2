@@ -1,5 +1,5 @@
 # `accurate` branch
-Being a pure, plain decompilation of the original `Doukusu.exe` file (v1.0.0.6),
+Being a pure, plain decompilation of the original `Doukutsu.exe` file (v1.0.0.6),
 there should not be much to say about this branch's philosophies:
 
 ## Goal
@@ -68,16 +68,21 @@ authenticity, and more on improving the base engine.
 
 ## Goal
 This branch is intended to benefit modders, by providing a feature-rich base for
-mods (think 'GZDoom' rather than 'Chocolate Doom').
+mods, while still keeping the original game's 'feel' (think of the Boom project
+rather than Chocolate Doom or GZDoom).
 
 That said, I want to avoid the codebase becoming an over-engineered mess of
 seldom-used and niche features - only features with a strong reason to be
 included should be added.
 
-Current sources for features include...
-* The "Cave Story Mod Loader" (widescreen, support for Ogg Vorbis music)
+Priority features include ones that already exist in the modding community as
+"EXE hacks", such as...
 * Common custom TSC commands ('<MIM', '<PHY')
-* Other common "EXE hacks" developed by the modding community (custom weapons, money system)
+* Custom weapons
+* A money system
+* The "Cave Story Mod Loader" (widescreen, support for Ogg Vorbis music)
+
+Note that such features should only be added if they see widespread use.
 
 ## Target audience
 While this branch is meant as a base for mods, it is not intended for modders
