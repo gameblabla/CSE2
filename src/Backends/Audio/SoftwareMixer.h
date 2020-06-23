@@ -13,4 +13,4 @@ void Mixer_RewindSound(Mixer_Sound *sound);
 void Mixer_SetSoundFrequency(Mixer_Sound *sound, unsigned int frequency);
 void Mixer_SetSoundVolume(Mixer_Sound *sound, long volume);
 void Mixer_SetSoundPan(Mixer_Sound *sound, long pan);
-void Mixer_MixSounds(float *stream, unsigned int frames_total);
+void Mixer_MixSounds(short *stream, unsigned int frames_total);

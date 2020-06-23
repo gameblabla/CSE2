@@ -23,11 +23,10 @@ static void Callback(void *user_data, Uint8 *stream_uint8, int len)
 {
 	(void)user_data;
 
-	float *stream = (float*)stream_uint8;
-	unsigned int frames_total = len / sizeof(float) / 2;
+	short *stream = (short*)stream_uint8;
+	unsigned int frames_total = len / sizeof(short) / 2;
 
-	for (unsigned int i = 0; i < frames_total * 2; ++i)
-		stream[i] = 0.0f;
+	memset(stream, 0, len);
 
 	if (organya_callback_milliseconds == 0)
 	{
@@ -60,6 +59,17 @@ static void Callback(void *user_data, Uint8 *stream_uint8, int len)
 			organya_countdown -= frames_to_do;
 		}
 	}
+
+	// Clamp output, and convert from 8-bit to 16-bit
+	for (unsigned int i = 0; i < frames_total * 2; ++i)
+	{
+		if (stream[i] > 0x7F)
+			stream[i] = 0x7F00;
+		else if (stream[i] < -0x7F)
+			stream[i] = -0x7F00;
+		else
+			stream[i] <<= 8;
+	}
 }
 
 bool AudioBackend_Init(void)
@@ -78,7 +88,7 @@ bool AudioBackend_Init(void)
 
 	SDL_AudioSpec specification;
 	specification.freq = 48000;
-	specification.format = AUDIO_F32;
+	specification.format = AUDIO_S16;
 	specification.channels = 2;
 	specification.samples = 0x400;	// Roughly 10 milliseconds for 48000Hz
 	specification.callback = Callback;
