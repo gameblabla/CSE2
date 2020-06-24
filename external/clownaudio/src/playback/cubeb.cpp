@@ -32,7 +32,7 @@
 
 struct ClownAudio_Stream
 {
-	void (*user_callback)(void*, float*, size_t);
+	void (*user_callback)(void*, short*, size_t);
 	void *user_data;
 
 	cubeb_stream *cubeb_stream_pointer;
@@ -54,7 +54,7 @@ static long DataCallback(cubeb_stream *c_stream, void *user_data, void const *in
 
 	ClownAudio_Stream *stream = (ClownAudio_Stream*)user_data;
 
-	stream->user_callback(stream->user_data, (float*)output_buffer, frames_to_do);
+	stream->user_callback(stream->user_data, (short*)output_buffer, frames_to_do);
 
 	return frames_to_do;
 }
@@ -84,10 +84,10 @@ CLOWNAUDIO_EXPORT void ClownAudio_DeinitPlayback(void)
 #endif
 }
 
-CLOWNAUDIO_EXPORT ClownAudio_Stream* ClownAudio_CreateStream(unsigned long *sample_rate, void (*user_callback)(void*, float*, size_t))
+CLOWNAUDIO_EXPORT ClownAudio_Stream* ClownAudio_CreateStream(unsigned long *sample_rate, void (*user_callback)(void*, short*, size_t))
 {
 	cubeb_stream_params output_params;
-	output_params.format = CUBEB_SAMPLE_FLOAT32LE;
+	output_params.format = CUBEB_SAMPLE_S16NE;
 	output_params.prefs = CUBEB_STREAM_PREF_NONE;
 	output_params.channels = CLOWNAUDIO_STREAM_CHANNEL_COUNT;
 	output_params.layout = CLOWNAUDIO_STREAM_CHANNEL_COUNT == 2 ? CUBEB_LAYOUT_STEREO : CUBEB_LAYOUT_MONO;

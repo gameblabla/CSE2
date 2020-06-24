@@ -33,7 +33,7 @@
 
 struct ClownAudio_Stream
 {
-	void (*user_callback)(void*, float*, size_t);
+	void (*user_callback)(void*, short*, size_t);
 	void *user_data;
 
 	PaStream *pa_stream;
@@ -52,7 +52,7 @@ static int Callback(const void *input_buffer, void *output_buffer_void, unsigned
 	(void)status_flags;
 
 	ClownAudio_Stream *stream = (ClownAudio_Stream*)user_data;
-	float *output_buffer = (float*)output_buffer_void;
+	short *output_buffer = (short*)output_buffer_void;
 
 	stream->user_callback(stream->user_data, output_buffer, frames_to_do);
 
@@ -69,7 +69,7 @@ CLOWNAUDIO_EXPORT void ClownAudio_DeinitPlayback(void)
 	Pa_Terminate();
 }
 
-CLOWNAUDIO_EXPORT ClownAudio_Stream* ClownAudio_CreateStream(unsigned long *sample_rate, void (*user_callback)(void*, float*, size_t))
+CLOWNAUDIO_EXPORT ClownAudio_Stream* ClownAudio_CreateStream(unsigned long *sample_rate, void (*user_callback)(void*, short*, size_t))
 {
 	ClownAudio_Stream *stream = (ClownAudio_Stream*)malloc(sizeof(ClownAudio_Stream));
 
@@ -79,7 +79,7 @@ CLOWNAUDIO_EXPORT ClownAudio_Stream* ClownAudio_CreateStream(unsigned long *samp
 
 		*sample_rate = device_info->defaultSampleRate;
 
-		if (Pa_OpenDefaultStream(&stream->pa_stream, 0, CLOWNAUDIO_STREAM_CHANNEL_COUNT, paFloat32, device_info->defaultSampleRate, paFramesPerBufferUnspecified, Callback, stream ) == paNoError)
+		if (Pa_OpenDefaultStream(&stream->pa_stream, 0, CLOWNAUDIO_STREAM_CHANNEL_COUNT, paInt16, device_info->defaultSampleRate, paFramesPerBufferUnspecified, Callback, stream ) == paNoError)
 		{
 			stream->user_callback = user_callback;
 			stream->user_data = NULL;

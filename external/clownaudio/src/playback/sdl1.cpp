@@ -30,7 +30,7 @@
 
 struct ClownAudio_Stream
 {
-	void (*user_callback)(void*, float*, size_t);
+	void (*user_callback)(void*, short*, size_t);
 	void *user_data;
 };
 
@@ -53,28 +53,9 @@ static void Callback(void *user_data, Uint8 *output_buffer_uint8, int bytes_to_d
 {
 	ClownAudio_Stream *stream = (ClownAudio_Stream*)user_data;
 	const unsigned long frames_to_do = bytes_to_do / (sizeof(short) * CLOWNAUDIO_STREAM_CHANNEL_COUNT);
+	short *output_buffer = (short*)output_buffer_uint8;
 
-	// This playback backend doesn't support float32, so we have to convert the samples to S16
-	short *output_buffer_pointer = (short*)output_buffer_uint8;
-	for (unsigned long frames_done = 0; frames_done < frames_to_do; frames_done += 0x1000)
-	{
-		float read_buffer[0x1000 * CLOWNAUDIO_STREAM_CHANNEL_COUNT];
-
-		stream->user_callback(stream->user_data, read_buffer, MIN(0x1000, frames_to_do - frames_done));
-
-		float *read_buffer_pointer = read_buffer;
-		for (unsigned long i = 0; i < frames_to_do * CLOWNAUDIO_STREAM_CHANNEL_COUNT; ++i)
-		{
-			float sample = *read_buffer_pointer++;
-
-			if (sample > 1.0f)
-				sample = 1.0f;
-			else if (sample < -1.0f)
-				sample = -1.0f;
-
-			*output_buffer_pointer++ = (short)(sample * 32767.0f);
-		}
-	}
+	stream->user_callback(stream->user_data, output_buffer, frames_to_do);
 }
 
 CLOWNAUDIO_EXPORT bool ClownAudio_InitPlayback(void)
@@ -96,7 +77,7 @@ CLOWNAUDIO_EXPORT void ClownAudio_DeinitPlayback(void)
 		SDL_QuitSubSystem(SDL_INIT_AUDIO);
 }
 
-CLOWNAUDIO_EXPORT ClownAudio_Stream* ClownAudio_CreateStream(unsigned long *sample_rate, void (*user_callback)(void*, float*, size_t))
+CLOWNAUDIO_EXPORT ClownAudio_Stream* ClownAudio_CreateStream(unsigned long *sample_rate, void (*user_callback)(void*, short*, size_t))
 {
 	ClownAudio_Stream *stream = (ClownAudio_Stream*)malloc(sizeof(ClownAudio_Stream));
 
