@@ -629,14 +629,18 @@ static const MusicListEntry music_table_arranged[42] = {
 	{"Soundtracks/Arranged/white_intro.ogg", "Soundtracks/Arranged/white_loop.ogg", MUSIC_TYPE_OTHER, true}
 };
 
-static const MusicListEntry *music_tables[7] = {
-	music_table_organya,
-	music_table_new,
-	music_table_remastered,
-	music_table_famitracks,
-	music_table_ridiculon,
-	music_table_snes,
-	music_table_arranged
+static const struct
+{
+	const MusicListEntry *music_table;
+	unsigned short volume;	// Logarithmic - 0 is silent, 0x80 is half-volume, 0x100 is full-volume (this only affects non-Organya music)
+} soundtracks[7] = {
+	{music_table_organya, 0x100},
+	{music_table_new, 0x80},
+	{music_table_remastered, 0x80},
+	{music_table_famitracks, 0x100},
+	{music_table_ridiculon, 0x100},
+	{music_table_snes, 0x100},
+	{music_table_arranged, 0x200}
 };
 
 void ChangeMusic(MusicID no)
@@ -652,7 +656,7 @@ void ChangeMusic(MusicID no)
 	ExtraSound_PauseMusic();
 #endif
 
-	const MusicListEntry *music_table = music_tables[gSoundtrack];
+	const MusicListEntry *music_table = soundtracks[gSoundtrack].music_table;
 
 	char intro_file_path[MAX_PATH];
 	sprintf(intro_file_path, "%s/%s", gDataPath, music_table[no].intro_file_path);
@@ -702,7 +706,7 @@ void ReCallMusic(void)
 	ExtraSound_PauseMusic();
 #endif
 
-	const MusicListEntry *music_table = music_tables[gSoundtrack];
+	const MusicListEntry *music_table = soundtracks[gSoundtrack].music_table;
 
 	switch (music_table[gOldNo].type)
 	{
@@ -730,12 +734,12 @@ void ReCallMusic(void)
 
 BOOL CheckSoundtrackExists(int soundtrack)
 {
-	if (soundtrack >= sizeof(music_tables) / sizeof(music_tables[0]))
+	if (soundtrack >= sizeof(soundtracks) / sizeof(soundtracks[0]))
 		return FALSE;
 
 	// Just check if the first file exists
 	char path[MAX_PATH];
-	sprintf(path, "%s/%s", gDataPath, music_tables[soundtrack][1].intro_file_path);
+	sprintf(path, "%s/%s", gDataPath, soundtracks[soundtrack].music_table[1].intro_file_path);
 
 	FILE *file = fopen(path, "rb");
 
