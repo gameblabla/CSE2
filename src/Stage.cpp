@@ -635,12 +635,12 @@ static const struct
 	unsigned short volume;	// Logarithmic - 0 is silent, 0x80 is half-volume, 0x100 is full-volume (this only affects non-Organya music)
 } soundtracks[7] = {
 	{music_table_organya, 0x100},
-	{music_table_new, 0x80},
-	{music_table_remastered, 0x80},
-	{music_table_famitracks, 0x100},
-	{music_table_ridiculon, 0x100},
+	{music_table_new, 0xC0},
+	{music_table_remastered, 0xC0},
+	{music_table_famitracks, 0xE0},
+	{music_table_ridiculon, 0xE0},
 	{music_table_snes, 0x100},
-	{music_table_arranged, 0x200}
+	{music_table_arranged, 0x140}
 };
 
 void ChangeMusic(MusicID no)
