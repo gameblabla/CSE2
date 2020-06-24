@@ -20,15 +20,8 @@ static unsigned long output_frequency;
 static void (*organya_callback)(void);
 static unsigned int organya_callback_milliseconds;
 
-static void Callback(void *user_data, Uint8 *stream_uint8, int len)
+static void MixSoundsAndUpdateOrganya(long *stream, size_t frames_total)
 {
-	(void)user_data;
-
-	short *stream = (short*)stream_uint8;
-	unsigned int frames_total = len / sizeof(short) / 2;
-
-	memset(stream, 0, len);
-
 	if (organya_callback_milliseconds == 0)
 	{
 		Mixer_MixSounds(stream, frames_total);
@@ -60,16 +53,38 @@ static void Callback(void *user_data, Uint8 *stream_uint8, int len)
 			organya_countdown -= frames_to_do;
 		}
 	}
+}
 
-	// Clamp output, and convert from 8-bit to 16-bit
-	for (unsigned int i = 0; i < frames_total * 2; ++i)
+static void Callback(void *user_data, Uint8 *stream_uint8, int len)
+{
+	(void)user_data;
+
+	short *stream = (short*)stream_uint8;
+	const size_t frames_total = len / sizeof(short) / 2;
+
+	size_t frames_done = 0;
+
+	while (frames_done != frames_total)
 	{
-		if (stream[i] > 0x7F)
-			stream[i] = 0x7F00;
-		else if (stream[i] < -0x7F)
-			stream[i] = -0x7F00;
-		else
-			stream[i] <<= 8;
+		long mix_buffer[0x800 * 2];	// 2 because stereo
+
+		size_t subframes = MIN(0x800, frames_total - frames_done);
+
+		memset(mix_buffer, 0, subframes * sizeof(long) * 2);
+
+		MixSoundsAndUpdateOrganya(mix_buffer, subframes);
+
+		for (size_t i = 0; i < subframes * 2; ++i)
+		{
+			if (mix_buffer[i] > 0x7FFF)
+				*stream++ = 0x7FFF;
+			else if (mix_buffer[i] < -0x7FFF)
+				*stream++ = -0x7FFF;
+			else
+				*stream++ = mix_buffer[i];
+		}
+
+		frames_done += subframes;
 	}
 }
 

@@ -135,21 +135,21 @@ void Mixer_SetSoundPan(Mixer_Sound *sound, long pan)
 }
 
 // Most CPU-intensive function in the game (2/3rd CPU time consumption in my experience), so marked with ATTRIBUTE_HOT so the compiler considers it a hot spot (as it is) when optimizing
-ATTRIBUTE_HOT void Mixer_MixSounds(short *stream, unsigned int frames_total)
+ATTRIBUTE_HOT void Mixer_MixSounds(long *stream, size_t frames_total)
 {
 	for (Mixer_Sound *sound = sound_list_head; sound != NULL; sound = sound->next)
 	{
 		if (sound->playing)
 		{
-			short *stream_pointer = stream;
+			long *stream_pointer = stream;
 
-			for (unsigned int frames_done = 0; frames_done < frames_total; ++frames_done)
+			for (size_t frames_done = 0; frames_done < frames_total; ++frames_done)
 			{
 				// Perform linear interpolation
 				const unsigned char subsample = sound->sample_offset_remainder >> 8;
 
-				const signed char interpolated_sample = ((sound->samples[sound->position] * (0x100 - subsample)) >> 8)
-				                                      + ((sound->samples[sound->position + 1] * subsample) >> 8);
+				const short interpolated_sample = sound->samples[sound->position] * (0x100 - subsample)
+				                                      + sound->samples[sound->position + 1] * subsample;
 
 				// Mix, and apply volume
 				*stream_pointer++ += (interpolated_sample * sound->volume_l) >> 8;
