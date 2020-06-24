@@ -1,0 +1,4 @@
+You can get DM Dokuro's Cave Story Arranged soundtrack here:
+https://www.reddit.com/r/cavestory/comments/9rz3p4/im_not_really_sure_where_to_post_this_but_i_made/
+
+Extract the contents of the 'Ogg11' folder into this folder.

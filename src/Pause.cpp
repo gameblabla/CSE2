@@ -748,7 +748,7 @@ static int Callback_Soundtrack(OptionsMenu *parent_menu, size_t this_option, Cal
 	if (action != ACTION_OK)
 		return CALLBACK_CONTINUE;
 
-	const char *strings[] = {"Organya", "New", "Remastered", "Famitracks", "Ridiculon", "SNES"};
+	const char *strings[] = {"Organya", "New", "Remastered", "Famitracks", "Ridiculon", "SNES", "Arranged"};
 
 	Option options[sizeof(strings) / sizeof(strings[0])];
 

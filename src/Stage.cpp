@@ -584,13 +584,59 @@ static const MusicListEntry music_table_snes[42] = {
 	{"Soundtracks/SNES/white_intro.ogg", "Soundtracks/SNES/white_loop.ogg", MUSIC_TYPE_OTHER, true}
 };
 
-static const MusicListEntry *music_tables[6] = {
+static const MusicListEntry music_table_arranged[42] = {
+	{NULL, NULL, MUSIC_TYPE_OTHER, true},
+	{"Soundtracks/Arranged/wanpaku_intro.ogg", "Soundtracks/Arranged/wanpaku_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Soundtracks/Arranged/anzen_intro.ogg", "Soundtracks/Arranged/anzen_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Soundtracks/Arranged/gameover_intro.ogg", "Soundtracks/Arranged/gameover_loop.ogg", MUSIC_TYPE_OTHER, false},
+	{"Soundtracks/Arranged/gravity_intro.ogg", "Soundtracks/Arranged/gravity_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Soundtracks/Arranged/weed_intro.ogg", "Soundtracks/Arranged/weed_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Soundtracks/Arranged/mdown2_intro.ogg", "Soundtracks/Arranged/mdown2_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Soundtracks/Arranged/fireeye_intro.ogg", "Soundtracks/Arranged/fireeye_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Soundtracks/Arranged/vivi_intro.ogg", "Soundtracks/Arranged/vivi_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Soundtracks/Arranged/mura_intro.ogg", "Soundtracks/Arranged/mura_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Soundtracks/Arranged/fanfale1_intro.ogg", "Soundtracks/Arranged/fanfale1_loop.ogg", MUSIC_TYPE_OTHER, false},
+	{"Soundtracks/Arranged/ginsuke_intro.ogg", "Soundtracks/Arranged/ginsuke_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Soundtracks/Arranged/cemetery_intro.ogg", "Soundtracks/Arranged/cemetery_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Soundtracks/Arranged/plant_intro.ogg", "Soundtracks/Arranged/plant_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Soundtracks/Arranged/kodou_intro.ogg", "Soundtracks/Arranged/kodou_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Soundtracks/Arranged/fanfale3_intro.ogg", "Soundtracks/Arranged/fanfale3_loop.ogg", MUSIC_TYPE_OTHER, false},
+	{"Soundtracks/Arranged/fanfale2_intro.ogg", "Soundtracks/Arranged/fanfale2_loop.ogg", MUSIC_TYPE_OTHER, false},
+	{"Soundtracks/Arranged/dr_intro.ogg", "Soundtracks/Arranged/dr_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Soundtracks/Arranged/escape_intro.ogg", "Soundtracks/Arranged/escape_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Soundtracks/Arranged/jenka_intro.ogg", "Soundtracks/Arranged/jenka_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Soundtracks/Arranged/maze_intro.ogg", "Soundtracks/Arranged/maze_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Soundtracks/Arranged/access_intro.ogg", "Soundtracks/Arranged/access_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Soundtracks/Arranged/ironh_intro.ogg", "Soundtracks/Arranged/ironh_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Soundtracks/Arranged/grand_intro.ogg", "Soundtracks/Arranged/grand_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Soundtracks/Arranged/curly_intro.ogg", "Soundtracks/Arranged/curly_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Soundtracks/Arranged/oside_intro.ogg", "Soundtracks/Arranged/oside_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Soundtracks/Arranged/requiem_intro.ogg", "Soundtracks/Arranged/requiem_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Soundtracks/Arranged/wanpak2_intro.ogg", "Soundtracks/Arranged/wanpak2_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Soundtracks/Arranged/quiet_intro.ogg", "Soundtracks/Arranged/quiet_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Soundtracks/Arranged/lastcave_intro.ogg", "Soundtracks/Arranged/lastcave_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Soundtracks/Arranged/balcony_intro.ogg", "Soundtracks/Arranged/balcony_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Soundtracks/Arranged/lastbtl.ogg", NULL, MUSIC_TYPE_OTHER, true},
+	{"Soundtracks/Arranged/lastbt3_intro.ogg", "Soundtracks/Arranged/lastbt3_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Soundtracks/Arranged/ending_intro.ogg", "Soundtracks/Arranged/ending_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Soundtracks/Arranged/zonbie_intro.ogg", "Soundtracks/Arranged/zonbie_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Soundtracks/Arranged/bdown_intro.ogg", "Soundtracks/Arranged/bdown_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Soundtracks/Arranged/hell_intro.ogg", "Soundtracks/Arranged/hell_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Soundtracks/Arranged/jenka2_intro.ogg", "Soundtracks/Arranged/jenka2_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Soundtracks/Arranged/marine_intro.ogg", "Soundtracks/Arranged/marine_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Soundtracks/Arranged/ballos_intro.ogg", "Soundtracks/Arranged/ballos_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Soundtracks/Arranged/toroko_intro.ogg", "Soundtracks/Arranged/toroko_loop.ogg", MUSIC_TYPE_OTHER, false},
+	{"Soundtracks/Arranged/white_intro.ogg", "Soundtracks/Arranged/white_loop.ogg", MUSIC_TYPE_OTHER, true}
+};
+
+static const MusicListEntry *music_tables[7] = {
 	music_table_organya,
 	music_table_new,
 	music_table_remastered,
 	music_table_famitracks,
 	music_table_ridiculon,
-	music_table_snes
+	music_table_snes,
+	music_table_arranged
 };
 
 void ChangeMusic(MusicID no)
