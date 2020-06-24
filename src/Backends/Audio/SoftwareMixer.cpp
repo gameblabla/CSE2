@@ -155,7 +155,7 @@ ATTRIBUTE_HOT void Mixer_MixSounds(short *stream, unsigned int frames_total)
 				*stream_pointer++ += (interpolated_sample * sound->volume_l) >> 8;
 				*stream_pointer++ += (interpolated_sample * sound->volume_r) >> 8;
 
-				// Incrememt sample
+				// Increment sample
 				sound->sample_offset_remainder += sound->advance_delta;
 				sound->position += sound->sample_offset_remainder >> 16;
 				sound->sample_offset_remainder &= 0xFFFF;
