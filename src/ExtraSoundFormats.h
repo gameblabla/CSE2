@@ -13,4 +13,6 @@ void ExtraSound_SetMusicVolume(unsigned short volume);	// Logarithmic - 0 is sil
 void ExtraSound_LoadSFX(const char *path, int id);
 void ExtraSound_PlaySFX(int id, int mode);
 void ExtraSound_SetSFXFrequency(int id, unsigned long frequency);
+void ExtraSound_SetSFXVolume(int id, long volume);
+void ExtraSound_SetSFXPan(int id, long pan);
 void ExtraSound_Mix(long *buffer, unsigned long frames);

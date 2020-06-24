@@ -311,7 +311,7 @@ typedef struct MusicListEntry
 	const char *intro_file_path;
 	const char *loop_file_path;
 	int type;
-	bool loop;
+	bool loop;	// Only applicable to non-Organya songs
 } MusicListEntry;
 
 static const MusicListEntry music_table_organya[42] = {
