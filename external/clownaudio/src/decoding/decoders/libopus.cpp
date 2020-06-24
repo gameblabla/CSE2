@@ -53,7 +53,7 @@ void Decoder_libOpus_Rewind(void *decoder)
 	op_pcm_seek((OggOpusFile*)decoder, 0);
 }
 
-size_t Decoder_libOpus_GetSamples(void *decoder, void *buffer, size_t frames_to_do)
+size_t Decoder_libOpus_GetSamples(void *decoder, short *buffer, size_t frames_to_do)
 {
-	return op_read_stereo((OggOpusFile*)decoder, (opus_int16*)buffer, frames_to_do * 2);	// You tell *me* why that last parameter is in samples and not frames
+	return op_read_stereo((OggOpusFile*)decoder, buffer, frames_to_do * 2);	// You tell *me* why that last parameter is in samples and not frames
 }

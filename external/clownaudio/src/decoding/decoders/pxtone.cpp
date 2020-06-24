@@ -110,7 +110,7 @@ void Decoder_PxTone_Rewind(void *decoder_void)
 	decoder->pxtn->moo_preparation(&prep);
 }
 
-size_t Decoder_PxTone_GetSamples(void *decoder_void, void *buffer, size_t frames_to_do)
+size_t Decoder_PxTone_GetSamples(void *decoder_void, short *buffer, size_t frames_to_do)
 {
 	Decoder_PxTone *decoder = (Decoder_PxTone*)decoder_void;
 

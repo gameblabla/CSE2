@@ -70,7 +70,7 @@ PredecoderData* Predecoder_DecodeData(const DecoderSpec *in_spec, const DecoderS
 
 				for (;;)
 				{
-					unsigned char buffer[0x1000];
+					short buffer[0x1000];
 
 					size_t frames_done = ResampledDecoder_GetSamples(resampled_decoder, buffer, sizeof(buffer) / size_of_frame);
 
@@ -140,17 +140,15 @@ void Predecoder_Rewind(void *predecoder_void)
 	ROMemoryStream_Rewind(predecoder->memory_stream);
 }
 
-size_t Predecoder_GetSamples(void *predecoder_void, void *buffer_void, size_t frames_to_do)
+size_t Predecoder_GetSamples(void *predecoder_void, short *buffer, size_t frames_to_do)
 {
 	Predecoder *predecoder = (Predecoder*)predecoder_void;
-
-	float *buffer = (float*)buffer_void;
 
 	size_t frames_done = 0;
 
 	for (;;)
 	{
-		frames_done += ROMemoryStream_Read(predecoder->memory_stream, &buffer[frames_done * CHANNEL_COUNT], sizeof(float) * CHANNEL_COUNT, frames_to_do - frames_done);
+		frames_done += ROMemoryStream_Read(predecoder->memory_stream, &buffer[frames_done * CHANNEL_COUNT], sizeof(short) * CHANNEL_COUNT, frames_to_do - frames_done);
 
 		if (frames_done != frames_to_do && predecoder->loop)
 			Predecoder_Rewind(predecoder);

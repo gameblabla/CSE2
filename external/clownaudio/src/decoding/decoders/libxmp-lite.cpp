@@ -100,7 +100,7 @@ void Decoder_libXMPLite_Rewind(void *decoder_void)
 	decoder->buffer_size = 0;
 }
 
-size_t Decoder_libXMPLite_GetSamples(void *decoder_void, void *buffer, size_t frames_to_do)
+size_t Decoder_libXMPLite_GetSamples(void *decoder_void, short *buffer, size_t frames_to_do)
 {
 	Decoder_libXMPLite *decoder = (Decoder_libXMPLite*)decoder_void;
 
@@ -124,7 +124,7 @@ size_t Decoder_libXMPLite_GetSamples(void *decoder_void, void *buffer, size_t fr
 
 		size_t frames = MIN(frames_to_do - frames_done, decoder->buffer_size - decoder->buffer_done);
 
-		memcpy(&((short*)buffer)[frames_done * CHANNEL_COUNT], &((short*)decoder->frame_info.buffer)[decoder->buffer_done * CHANNEL_COUNT], frames * CHANNEL_COUNT * sizeof(short));
+		memcpy(&buffer[frames_done * CHANNEL_COUNT], &((short*)decoder->frame_info.buffer)[decoder->buffer_done * CHANNEL_COUNT], frames * CHANNEL_COUNT * sizeof(short));
 
 		decoder->buffer_done += frames;
 		frames_done += frames;

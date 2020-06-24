@@ -135,7 +135,7 @@ void Decoder_libVorbis_Rewind(void *decoder_void)
 	ov_time_seek(&decoder->vorbis_file, 0);
 }
 
-size_t Decoder_libVorbis_GetSamples(void *decoder_void, void *buffer, size_t frames_to_do)
+size_t Decoder_libVorbis_GetSamples(void *decoder_void, short *buffer, size_t frames_to_do)
 {
 	Decoder_libVorbis *decoder = (Decoder_libVorbis*)decoder_void;
 

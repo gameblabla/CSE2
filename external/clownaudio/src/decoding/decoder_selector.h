@@ -31,5 +31,5 @@ void DecoderSelector_UnloadData(DecoderSelectorData *data);
 void* DecoderSelector_Create(DecoderSelectorData *data, bool loop, const DecoderSpec *wanted_spec, DecoderSpec *spec);
 void DecoderSelector_Destroy(void *selector);
 void DecoderSelector_Rewind(void *selector);
-size_t DecoderSelector_GetSamples(void *selector, void *buffer, size_t frames_to_do);
+size_t DecoderSelector_GetSamples(void *selector, short *buffer, size_t frames_to_do);
 void DecoderSelector_SetLoop(void *selector, bool loop);

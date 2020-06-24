@@ -35,6 +35,6 @@ typedef struct DecoderStage
 
 	void (*Destroy)(void *decoder);
 	void (*Rewind)(void *decoder);
-	size_t (*GetSamples)(void *decoder, void *buffer, size_t frames_to_do);
+	size_t (*GetSamples)(void *decoder, short *buffer, size_t frames_to_do);
 	void (*SetLoop)(void *decoder, bool loop);
 } DecoderStage;

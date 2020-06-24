@@ -27,4 +27,4 @@
 void* Decoder_PxToneNoise_Create(const unsigned char *data, size_t data_size, bool loop, const DecoderSpec *wanted_spec, DecoderSpec *spec);
 void Decoder_PxToneNoise_Destroy(void *decoder);
 void Decoder_PxToneNoise_Rewind(void *decoder);
-size_t Decoder_PxToneNoise_GetSamples(void *decoder, void *buffer, size_t frames_to_do);
+size_t Decoder_PxToneNoise_GetSamples(void *decoder, short *buffer, size_t frames_to_do);

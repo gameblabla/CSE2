@@ -93,11 +93,11 @@ void Decoder_SNES_SPC_Rewind(void *decoder_void)
 	spc_load_spc(decoder->snes_spc, decoder->data, decoder->data_size);
 }
 
-size_t Decoder_SNES_SPC_GetSamples(void *decoder_void, void *buffer, size_t frames_to_do)
+size_t Decoder_SNES_SPC_GetSamples(void *decoder_void, short *buffer, size_t frames_to_do)
 {
 	Decoder_SNES_SPC *decoder = (Decoder_SNES_SPC*)decoder_void;
 
-	spc_play(decoder->snes_spc, frames_to_do * CHANNEL_COUNT, (short*)buffer);
+	spc_play(decoder->snes_spc, frames_to_do * CHANNEL_COUNT, buffer);
 
 	spc_filter_run(decoder->filter, (spc_sample_t*)buffer, frames_to_do * CHANNEL_COUNT);
 

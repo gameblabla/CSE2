@@ -233,7 +233,7 @@ void Decoder_libFLAC_Rewind(void *decoder_void)
 	FLAC__stream_decoder_seek_absolute(decoder->flac_stream_decoder, 0);
 }
 
-size_t Decoder_libFLAC_GetSamples(void *decoder_void, void *buffer, size_t frames_to_do)
+size_t Decoder_libFLAC_GetSamples(void *decoder_void, short *buffer, size_t frames_to_do)
 {
 	Decoder_libFLAC *decoder = (Decoder_libFLAC*)decoder_void;
 

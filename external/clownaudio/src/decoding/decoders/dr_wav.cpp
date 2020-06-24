@@ -66,7 +66,7 @@ void Decoder_DR_WAV_Rewind(void *decoder)
 	drwav_seek_to_pcm_frame((drwav*)decoder, 0);
 }
 
-size_t Decoder_DR_WAV_GetSamples(void *decoder, void *buffer, size_t frames_to_do)
+size_t Decoder_DR_WAV_GetSamples(void *decoder, short *buffer, size_t frames_to_do)
 {
-	return drwav_read_pcm_frames_s16((drwav*)decoder, frames_to_do, (drwav_int16*)buffer);
+	return drwav_read_pcm_frames_s16((drwav*)decoder, frames_to_do, buffer);
 }
