@@ -1,6 +1,6 @@
 /*
 Audio playback and capture library. Choice of public domain or MIT-0. See license statements at the end of this file.
-miniaudio - v0.10.7 - 2020-05-25
+miniaudio - v0.10.5 - 2020-05-05
 
 David Reid - davidreidsoftware@gmail.com
 
@@ -1318,81 +1318,6 @@ Below are the supported noise types.
 
 
 
-Audio Buffers
-=============
-miniaudio supports reading from a buffer of raw audio data via the `ma_audio_buffer` API. This can read from both memory that's managed by the application, but
-can also handle the memory management for you internally. The way memory is managed is flexible and should support most use cases.
-
-Audio buffers are initialised using the standard configuration system used everywhere in miniaudio:
-
-    ```c
-    ma_audio_buffer_config config = ma_audio_buffer_config_init(format, channels, sizeInFrames, pExistingData, &allocationCallbacks);
-    ma_audio_buffer buffer;
-    result = ma_audio_buffer_init(&config, &buffer);
-    if (result != MA_SUCCESS) {
-        // Error.
-    }
-
-    ...
-
-    ma_audio_buffer_uninit(&buffer);
-    ```
-
-In the example above, the memory pointed to by `pExistingData` will _not_ be copied which is how an application can handle memory allocations themselves. If
-you would rather make a copy of the data, use `ma_audio_buffer_init_copy()`. To uninitialize the buffer, use `ma_audio_buffer_uninit()`.
-
-Sometimes it can be convenient to allocate the memory for the `ma_audio_buffer` structure _and_ the raw audio data in a contiguous block of memory. That is,
-the raw audio data will be located immediately after the `ma_audio_buffer` structure. To do this, use `ma_audio_buffer_alloc_and_init()`:
-
-    ```c
-    ma_audio_buffer* pBuffer
-    result = ma_audio_buffer_alloc_and_init(&config, &pBuffer);
-    if (result != MA_SUCCESS) {
-        // Error
-    }
-
-    ...
-    
-    ma_audio_buffer_uninit_and_free(&buffer);
-    ```
-
-If you initialize the buffer with `ma_audio_buffer_alloc_and_init()` you should uninitialize it with `ma_audio_buffer_uninit_and_free()`.
-
-An audio buffer has a playback cursor just like a decoder. As you read frames from the buffer, the cursor moves forward. It does not automatically loop back to
-the start. To do this, you should inspect the number of frames returned by `ma_audio_buffer_read_pcm_frames()` to determine if the end has been reached, which
-you can know by comparing it with the requested frame count you specified when you called the function. If the return value is less it means the end has been
-reached. In this case you can seem back to the start with `ma_audio_buffer_seek_to_pcm_frame(pAudioBuffer, 0)`. Below is an example for reading data from an
-audio buffer.
-
-    ```c
-    ma_uint64 framesRead = ma_audio_buffer_read_pcm_frames(pAudioBuffer, pFramesOut, desiredFrameCount, isLooping);
-    if (framesRead < desiredFrameCount) {
-        // If not looping, this means the end has been reached. This should never happen in looping mode with valid input.
-    }
-    ```
-
-Sometimes you may want to avoid the cost of data movement between the internal buffer and the output buffer as it's just a copy operation. Instead you can use
-memory mapping to retrieve a pointer to a segment of data:
-
-    ```c
-    void* pMappedFrames;
-    ma_uint64 frameCount = frameCountToTryMapping;
-    ma_result result = ma_audio_buffer_map(pAudioBuffer, &pMappedFrames, &frameCount);
-    if (result == MA_SUCCESS) {
-        // Map was successful. The value in frameCount will be how many frames were _actually_ mapped, which may be less due to the end of the buffer being reached.
-        ma_copy_pcm_frames(pFramesOut, pMappedFrames, frameCount, pAudioBuffer->format, pAudioBuffer->channels);
-
-        // You must unmap the buffer.
-        ma_audio_buffer_unmap(pAudioBuffer, frameCount);
-    }
-    ```
-
-When you use memory mapping, the read cursor is increment by the frame count passed in to `ma_audio_buffer_unmap()`. If you decide not to process every frame
-you can pass in a value smaller than the value returned by `ma_audio_buffer_map()`. The disadvantage to using memory mapping is that it does not handle looping
-for you. You can determine if the buffer is at the end for the purpose of looping with `ma_audio_buffer_at_end()`.
-
-
-
 Ring Buffers
 ============
 miniaudio supports lock free (single producer, single consumer) ring buffers which are exposed via the `ma_rb` and `ma_pcm_rb` APIs. The `ma_rb` API operates
@@ -1533,14 +1458,6 @@ Miscellaneous Notes
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#define MA_STRINGIFY(x)     #x
-#define MA_XSTRINGIFY(x)    MA_STRINGIFY(x)
-
-#define MA_VERSION_MAJOR    0
-#define MA_VERSION_MINOR    10
-#define MA_VERSION_REVISION 7
-#define MA_VERSION_STRING   MA_XSTRINGIFY(MA_VERSION_MAJOR) "." MA_XSTRINGIFY(MA_VERSION_MINOR) "." MA_XSTRINGIFY(MA_VERSION_REVISION)
 
 #if defined(_MSC_VER) && !defined(__clang__)
     #pragma warning(push)
@@ -1972,17 +1889,6 @@ typedef struct
 {
     ma_int32 state;
 } ma_lcg;
-
-
-/*
-Retrieves the version of miniaudio as separated integers. Each component can be NULL if it's not required.
-*/
-MA_API void ma_version(ma_uint32* pMajor, ma_uint32* pMinor, ma_uint32* pRevision);
-
-/*
-Retrieves the version of miniaudio as a string which can be useful for logging purposes.
-*/
-MA_API const char* ma_version_string();
 
 
 /**************************************************************************************************************************************************************
@@ -5261,21 +5167,14 @@ MA_API void ma_copy_pcm_frames(void* dst, const void* src, ma_uint64 frameCount,
 
 /*
 Copies silent frames into the given buffer.
-
-Remarks
--------
-For all formats except `ma_format_u8`, the output buffer will be filled with 0. For `ma_format_u8` it will be filled with 128. The reason for this is that it
-makes more sense for the purpose of mixing to initialize it to the center point.
 */
-MA_API void ma_silence_pcm_frames(void* p, ma_uint64 frameCount, ma_format format, ma_uint32 channels);
-static MA_INLINE void ma_zero_pcm_frames(void* p, ma_uint64 frameCount, ma_format format, ma_uint32 channels) { ma_silence_pcm_frames(p, frameCount, format, channels); }
-
+MA_API void ma_zero_pcm_frames(void* p, ma_uint64 frameCount, ma_format format, ma_uint32 channels);
 
 /*
 Clips f32 samples.
 */
-MA_API void ma_clip_samples_f32(float* p, ma_uint64 sampleCount);
-static MA_INLINE void ma_clip_pcm_frames_f32(float* p, ma_uint64 frameCount, ma_uint32 channels) { ma_clip_samples_f32(p, frameCount*channels); }
+MA_API void ma_clip_samples_f32(float* p, ma_uint32 sampleCount);
+static MA_INLINE void ma_clip_pcm_frames_f32(float* p, ma_uint32 frameCount, ma_uint32 channels) { ma_clip_samples_f32(p, frameCount*channels); }
 
 /*
 Helper for applying a volume factor to samples.
@@ -5320,56 +5219,6 @@ Helper for converting gain in decibels to a linear factor.
 MA_API float ma_gain_db_to_factor(float gain);
 
 #endif  /* MA_NO_DEVICE_IO */
-
-
-typedef void ma_data_source;
-
-typedef struct
-{
-    ma_uint64 (* onRead)(ma_data_source* pDataSource, void* pFramesOut, ma_uint64 frameCount);
-    ma_result (* onSeek)(ma_data_source* pDataSource, ma_uint64 frameIndex);
-    ma_result (* onGetDataFormat)(ma_data_source* pDataSource, ma_format* pFormat, ma_uint32* pChannels);
-} ma_data_source_callbacks;
-
-MA_API ma_uint64 ma_data_source_read_pcm_frames(ma_data_source* pDataSource, void* pFramesOut, ma_uint64 frameCount);
-MA_API ma_result ma_data_source_seek_to_pcm_frame(ma_data_source* pDataSource, ma_uint64 frameIndex);
-MA_API ma_result ma_data_source_get_data_format(ma_data_source* pDataSource, ma_format* pFormat, ma_uint32* pChannels);
-
-
-typedef struct
-{
-    ma_format format;
-    ma_uint32 channels;
-    ma_uint64 sizeInFrames;
-    const void* pData;  /* If set to NULL, will allocate a block of memory for you. */
-    ma_allocation_callbacks allocationCallbacks;
-} ma_audio_buffer_config;
-
-MA_API ma_audio_buffer_config ma_audio_buffer_config_init(ma_format format, ma_uint32 channels, ma_uint64 sizeInFrames, const void* pData, const ma_allocation_callbacks* pAllocationCallbacks);
-
-typedef struct
-{
-    ma_data_source_callbacks ds;
-    ma_format format;
-    ma_uint32 channels;
-    ma_uint64 cursor;
-    ma_uint64 sizeInFrames;
-    const void* pData;
-    ma_allocation_callbacks allocationCallbacks;
-    ma_bool32 ownsData;             /* Used to control whether or not miniaudio owns the data buffer. If set to true, pData will be freed in ma_audio_buffer_uninit(). */
-    ma_uint8 _pExtraData[1];        /* For allocating a buffer with the memory located directly after the other memory of the structure. */
-} ma_audio_buffer;
-
-MA_API ma_result ma_audio_buffer_init(const ma_audio_buffer_config* pConfig, ma_audio_buffer* pAudioBuffer);
-MA_API ma_result ma_audio_buffer_init_copy(const ma_audio_buffer_config* pConfig, ma_audio_buffer* pAudioBuffer);
-MA_API ma_result ma_audio_buffer_alloc_and_init(const ma_audio_buffer_config* pConfig, ma_audio_buffer** ppAudioBuffer);  /* Always copies the data. Doesn't make sense to use this otherwise. Use ma_audio_buffer_uninit_and_free() to uninit. */
-MA_API void ma_audio_buffer_uninit(ma_audio_buffer* pAudioBuffer);
-MA_API void ma_audio_buffer_uninit_and_free(ma_audio_buffer* pAudioBuffer);
-MA_API ma_uint64 ma_audio_buffer_read_pcm_frames(ma_audio_buffer* pAudioBuffer, void* pFramesOut, ma_uint64 frameCount, ma_bool32 loop);
-MA_API ma_result ma_audio_buffer_seek_to_pcm_frame(ma_audio_buffer* pAudioBuffer, ma_uint64 frameIndex);
-MA_API ma_result ma_audio_buffer_map(ma_audio_buffer* pAudioBuffer, void** ppFramesOut, ma_uint64* pFrameCount);
-MA_API ma_result ma_audio_buffer_unmap(ma_audio_buffer* pAudioBuffer, ma_uint64 frameCount);
-MA_API ma_result ma_audio_buffer_at_end(ma_audio_buffer* pAudioBuffer);
 
 
 #if !defined(MA_NO_DECODING) || !defined(MA_NO_ENCODING)
@@ -5429,7 +5278,6 @@ typedef struct
 
 struct ma_decoder
 {
-    ma_data_source_callbacks ds;
     ma_decoder_read_proc onRead;
     ma_decoder_seek_proc onSeek;
     void* pUserData;
@@ -5605,7 +5453,6 @@ MA_API ma_waveform_config ma_waveform_config_init(ma_format format, ma_uint32 ch
 
 typedef struct
 {
-    ma_data_source_callbacks ds;
     ma_waveform_config config;
     double advance;
     double time;
@@ -5613,7 +5460,6 @@ typedef struct
 
 MA_API ma_result ma_waveform_init(const ma_waveform_config* pConfig, ma_waveform* pWaveform);
 MA_API ma_uint64 ma_waveform_read_pcm_frames(ma_waveform* pWaveform, void* pFramesOut, ma_uint64 frameCount);
-MA_API ma_result ma_waveform_seek_to_pcm_frame(ma_waveform* pWaveform, ma_uint64 frameIndex);
 MA_API ma_result ma_waveform_set_amplitude(ma_waveform* pWaveform, double amplitude);
 MA_API ma_result ma_waveform_set_frequency(ma_waveform* pWaveform, double frequency);
 MA_API ma_result ma_waveform_set_sample_rate(ma_waveform* pWaveform, ma_uint32 sampleRate);
@@ -5641,7 +5487,6 @@ MA_API ma_noise_config ma_noise_config_init(ma_format format, ma_uint32 channels
 
 typedef struct
 {
-    ma_data_source_callbacks ds;
     ma_noise_config config;
     ma_lcg lcg;
     union
@@ -6170,27 +6015,6 @@ static ma_format g_maFormatPriorities[] = {
 #if defined(__GNUC__)
     #pragma GCC diagnostic pop
 #endif
-
-
-MA_API void ma_version(ma_uint32* pMajor, ma_uint32* pMinor, ma_uint32* pRevision)
-{
-    if (pMajor) {
-        *pMajor = MA_VERSION_MAJOR;
-    }
-
-    if (pMinor) {
-        *pMinor = MA_VERSION_MINOR;
-    }
-
-    if (pRevision) {
-        *pRevision = MA_VERSION_REVISION;
-    }
-}
-
-MA_API const char* ma_version_string()
-{
-    return MA_VERSION_STRING;
-}
 
 
 /******************************************************************************
@@ -9026,20 +8850,12 @@ MA_API void ma_copy_pcm_frames(void* dst, const void* src, ma_uint64 frameCount,
     ma_copy_memory_64(dst, src, frameCount * ma_get_bytes_per_frame(format, channels));
 }
 
-MA_API void ma_silence_pcm_frames(void* p, ma_uint64 frameCount, ma_format format, ma_uint32 channels)
+MA_API void ma_zero_pcm_frames(void* p, ma_uint64 frameCount, ma_format format, ma_uint32 channels)
 {
-    if (format == ma_format_u8) {
-        ma_uint64 sampleCount = frameCount * channels;
-        ma_uint64 iSample;
-        for (iSample = 0; iSample < sampleCount; iSample += 1) {
-            ((ma_uint8*)p)[iSample] = 128;
-        }
-    } else {
-        ma_zero_memory_64(p, frameCount * ma_get_bytes_per_frame(format, channels));
-    }
+    ma_zero_memory_64(p, frameCount * ma_get_bytes_per_frame(format, channels));
 }
 
-MA_API void ma_clip_samples_f32(float* p, ma_uint64 sampleCount)
+MA_API void ma_clip_samples_f32(float* p, ma_uint32 sampleCount)
 {
     ma_uint32 iSample;
 
@@ -9240,7 +9056,7 @@ static void ma_device__on_data(ma_device* pDevice, void* pFramesOut, const void*
 
     if (pDevice->onData) {
         if (!pDevice->noPreZeroedOutputBuffer && pFramesOut != NULL) {
-            ma_silence_pcm_frames(pFramesOut, frameCount, pDevice->playback.format, pDevice->playback.channels);
+            ma_zero_pcm_frames(pFramesOut, frameCount, pDevice->playback.format, pDevice->playback.channels);
         }
 
         /* Volume control of input makes things a bit awkward because the input buffer is read-only. We'll need to use a temp buffer and loop in this case. */
@@ -9995,7 +9811,7 @@ static ma_result ma_device_read__null(ma_device* pDevice, void* pPCMFrames, ma_u
                 framesToProcess = framesRemaining;
             }
 
-            /* We need to ensure the output buffer is zeroed. */
+            /* We need to ensured the output buffer is zeroed. */
             MA_ZERO_MEMORY(ma_offset_ptr(pPCMFrames, totalPCMFramesProcessed*bpf), framesToProcess*bpf);
 
             pDevice->null_device.currentPeriodFramesRemainingCapture -= framesToProcess;
@@ -16396,22 +16212,7 @@ ALSA Backend
 #ifdef MA_HAS_ALSA
 
 #ifdef MA_NO_RUNTIME_LINKING
-
-/* asoundlib.h marks some functions with "inline" which isn't always supported. Need to emulate it. */
-#if !defined(__cplusplus)
-    #if defined(__STRICT_ANSI__)
-        #if !defined(inline)
-            #define inline __inline__ __attribute__((always_inline))
-            #define MA_INLINE_DEFINED
-        #endif
-    #endif
-#endif
 #include <alsa/asoundlib.h>
-#if defined(MA_INLINE_DEFINED)
-    #undef inline
-    #undef MA_INLINE_DEFINED
-#endif
-
 typedef snd_pcm_uframes_t                       ma_snd_pcm_uframes_t;
 typedef snd_pcm_sframes_t                       ma_snd_pcm_sframes_t;
 typedef snd_pcm_stream_t                        ma_snd_pcm_stream_t;
@@ -16424,7 +16225,6 @@ typedef snd_pcm_format_mask_t                   ma_snd_pcm_format_mask_t;
 typedef snd_pcm_info_t                          ma_snd_pcm_info_t;
 typedef snd_pcm_channel_area_t                  ma_snd_pcm_channel_area_t;
 typedef snd_pcm_chmap_t                         ma_snd_pcm_chmap_t;
-typedef snd_pcm_state_t                         ma_snd_pcm_state_t;
 
 /* snd_pcm_stream_t */
 #define MA_SND_PCM_STREAM_PLAYBACK              SND_PCM_STREAM_PLAYBACK
@@ -16505,7 +16305,6 @@ typedef long                                    ma_snd_pcm_sframes_t;
 typedef int                                     ma_snd_pcm_stream_t;
 typedef int                                     ma_snd_pcm_format_t;
 typedef int                                     ma_snd_pcm_access_t;
-typedef int                                     ma_snd_pcm_state_t;
 typedef struct ma_snd_pcm_t                     ma_snd_pcm_t;
 typedef struct ma_snd_pcm_hw_params_t           ma_snd_pcm_hw_params_t;
 typedef struct ma_snd_pcm_sw_params_t           ma_snd_pcm_sw_params_t;
@@ -16634,7 +16433,7 @@ typedef int                  (* ma_snd_pcm_hw_params_get_access_proc)          (
 typedef int                  (* ma_snd_pcm_hw_params_proc)                     (ma_snd_pcm_t *pcm, ma_snd_pcm_hw_params_t *params);
 typedef size_t               (* ma_snd_pcm_sw_params_sizeof_proc)              (void);
 typedef int                  (* ma_snd_pcm_sw_params_current_proc)             (ma_snd_pcm_t *pcm, ma_snd_pcm_sw_params_t *params);
-typedef int                  (* ma_snd_pcm_sw_params_get_boundary_proc)        (const ma_snd_pcm_sw_params_t *params, ma_snd_pcm_uframes_t* val);
+typedef int                  (* ma_snd_pcm_sw_params_get_boundary_proc)        (ma_snd_pcm_sw_params_t *params, ma_snd_pcm_uframes_t* val);
 typedef int                  (* ma_snd_pcm_sw_params_set_avail_min_proc)       (ma_snd_pcm_t *pcm, ma_snd_pcm_sw_params_t *params, ma_snd_pcm_uframes_t val);
 typedef int                  (* ma_snd_pcm_sw_params_set_start_threshold_proc) (ma_snd_pcm_t *pcm, ma_snd_pcm_sw_params_t *params, ma_snd_pcm_uframes_t val);
 typedef int                  (* ma_snd_pcm_sw_params_set_stop_threshold_proc)  (ma_snd_pcm_t *pcm, ma_snd_pcm_sw_params_t *params, ma_snd_pcm_uframes_t val);
@@ -16642,7 +16441,7 @@ typedef int                  (* ma_snd_pcm_sw_params_proc)                     (
 typedef size_t               (* ma_snd_pcm_format_mask_sizeof_proc)            (void);
 typedef int                  (* ma_snd_pcm_format_mask_test_proc)              (const ma_snd_pcm_format_mask_t *mask, ma_snd_pcm_format_t val);
 typedef ma_snd_pcm_chmap_t * (* ma_snd_pcm_get_chmap_proc)                     (ma_snd_pcm_t *pcm);
-typedef ma_snd_pcm_state_t   (* ma_snd_pcm_state_proc)                         (ma_snd_pcm_t *pcm);
+typedef int                  (* ma_snd_pcm_state_proc)                         (ma_snd_pcm_t *pcm);
 typedef int                  (* ma_snd_pcm_prepare_proc)                       (ma_snd_pcm_t *pcm);
 typedef int                  (* ma_snd_pcm_start_proc)                         (ma_snd_pcm_t *pcm);
 typedef int                  (* ma_snd_pcm_drop_proc)                          (ma_snd_pcm_t *pcm);
@@ -18636,8 +18435,6 @@ static ma_result ma_context_init__alsa(const ma_context_config* pConfig, ma_cont
     pContext->alsa.snd_pcm_hw_params_get_channels_min     = (ma_proc)_snd_pcm_hw_params_get_channels_min;
     pContext->alsa.snd_pcm_hw_params_get_channels_max     = (ma_proc)_snd_pcm_hw_params_get_channels_max;
     pContext->alsa.snd_pcm_hw_params_get_rate             = (ma_proc)_snd_pcm_hw_params_get_rate;
-    pContext->alsa.snd_pcm_hw_params_get_rate_min         = (ma_proc)_snd_pcm_hw_params_get_rate_min;
-    pContext->alsa.snd_pcm_hw_params_get_rate_max         = (ma_proc)_snd_pcm_hw_params_get_rate_max;
     pContext->alsa.snd_pcm_hw_params_get_buffer_size      = (ma_proc)_snd_pcm_hw_params_get_buffer_size;
     pContext->alsa.snd_pcm_hw_params_get_periods          = (ma_proc)_snd_pcm_hw_params_get_periods;
     pContext->alsa.snd_pcm_hw_params_get_access           = (ma_proc)_snd_pcm_hw_params_get_access;
@@ -18711,21 +18508,7 @@ When using compile time linking, each of our ma_* equivalents should use the sam
 reason for this is that it allow us to take advantage of proper type safety.
 */
 #ifdef MA_NO_RUNTIME_LINKING
-
-/* pulseaudio.h marks some functions with "inline" which isn't always supported. Need to emulate it. */
-#if !defined(__cplusplus)
-    #if defined(__STRICT_ANSI__)
-        #if !defined(inline)
-            #define inline __inline__ __attribute__((always_inline))
-            #define MA_INLINE_DEFINED
-        #endif
-    #endif
-#endif
 #include <pulse/pulseaudio.h>
-#if defined(MA_INLINE_DEFINED)
-    #undef inline
-    #undef MA_INLINE_DEFINED
-#endif
 
 #define MA_PA_OK                                       PA_OK
 #define MA_PA_ERR_ACCESS                               PA_ERR_ACCESS
@@ -19811,7 +19594,7 @@ static void ma_pulse_device_state_callback(ma_pa_context* pPulseContext, void* p
     pDevice->pulse.pulseContextState = ((ma_pa_context_get_state_proc)pContext->pulse.pa_context_get_state)(pPulseContext);
 }
 
-static void ma_device_sink_info_callback(ma_pa_context* pPulseContext, const ma_pa_sink_info* pInfo, int endOfList, void* pUserData)
+void ma_device_sink_info_callback(ma_pa_context* pPulseContext, const ma_pa_sink_info* pInfo, int endOfList, void* pUserData)
 {
     ma_pa_sink_info* pInfoOut;
 
@@ -30972,2403 +30755,6 @@ MA_API ma_result ma_device_get_master_gain_db(ma_device* pDevice, float* pGainDB
 
 /**************************************************************************************************************************************************************
 
-Format Conversion
-
-**************************************************************************************************************************************************************/
-
-static MA_INLINE ma_int16 ma_pcm_sample_f32_to_s16(float x)
-{
-    return (ma_int16)(x * 32767.0f);
-}
-
-static MA_INLINE ma_int16 ma_pcm_sample_u8_to_s16_no_scale(ma_uint8 x)
-{
-    return (ma_int16)((ma_int16)x - 128);
-}
-
-static MA_INLINE ma_int64 ma_pcm_sample_s24_to_s32_no_scale(const ma_uint8* x)
-{
-    return (ma_int64)(((ma_uint64)x[0] << 40) | ((ma_uint64)x[1] << 48) | ((ma_uint64)x[2] << 56)) >> 40;  /* Make sure the sign bits are maintained. */
-}
-
-static MA_INLINE void ma_pcm_sample_s32_to_s24_no_scale(ma_int64 x, ma_uint8* s24)
-{
-    s24[0] = (ma_uint8)((x & 0x000000FF) >>  0);
-    s24[1] = (ma_uint8)((x & 0x0000FF00) >>  8);
-    s24[2] = (ma_uint8)((x & 0x00FF0000) >> 16);
-}
-
-
-static MA_INLINE ma_uint8 ma_clip_u8(ma_int16 x)
-{
-    return (ma_uint8)(ma_clamp(x, -128, 127) + 128);
-}
-
-static MA_INLINE ma_int16 ma_clip_s16(ma_int32 x)
-{
-    return (ma_int16)ma_clamp(x, -32768, 32767);
-}
-
-static MA_INLINE ma_int64 ma_clip_s24(ma_int64 x)
-{
-    return (ma_int64)ma_clamp(x, -8388608, 8388607);
-}
-
-static MA_INLINE ma_int32 ma_clip_s32(ma_int64 x)
-{
-    return (ma_int32)ma_clamp(x, -(ma_int64)2147483648, (ma_int64)2147483647);
-}
-
-
-/* u8 */
-MA_API void ma_pcm_u8_to_u8(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    (void)ditherMode;
-    ma_copy_memory_64(dst, src, count * sizeof(ma_uint8));
-}
-
-
-static MA_INLINE void ma_pcm_u8_to_s16__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_int16* dst_s16 = (ma_int16*)dst;
-    const ma_uint8* src_u8 = (const ma_uint8*)src;
-
-    ma_uint64 i;
-    for (i = 0; i < count; i += 1) {
-        ma_int16 x = src_u8[i];
-        x = (ma_int16)(x - 128);
-        x = (ma_int16)(x << 8);
-        dst_s16[i] = x;
-    }
-
-    (void)ditherMode;
-}
-
-static MA_INLINE void ma_pcm_u8_to_s16__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_u8_to_s16__reference(dst, src, count, ditherMode);
-}
-
-#if defined(MA_SUPPORT_SSE2)
-static MA_INLINE void ma_pcm_u8_to_s16__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_u8_to_s16__optimized(dst, src, count, ditherMode);
-}
-#endif
-#if defined(MA_SUPPORT_AVX2)
-static MA_INLINE void ma_pcm_u8_to_s16__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_u8_to_s16__optimized(dst, src, count, ditherMode);
-}
-#endif
-#if defined(MA_SUPPORT_NEON)
-static MA_INLINE void ma_pcm_u8_to_s16__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_u8_to_s16__optimized(dst, src, count, ditherMode);
-}
-#endif
-
-MA_API void ma_pcm_u8_to_s16(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-#ifdef MA_USE_REFERENCE_CONVERSION_APIS
-    ma_pcm_u8_to_s16__reference(dst, src, count, ditherMode);
-#else
-    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
-        if (ma_has_avx2()) {
-            ma_pcm_u8_to_s16__avx2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
-        if (ma_has_sse2()) {
-            ma_pcm_u8_to_s16__sse2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
-        if (ma_has_neon()) {
-            ma_pcm_u8_to_s16__neon(dst, src, count, ditherMode);
-        } else
-    #endif
-        {
-            ma_pcm_u8_to_s16__optimized(dst, src, count, ditherMode);
-        }
-#endif
-}
-
-
-static MA_INLINE void ma_pcm_u8_to_s24__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_uint8* dst_s24 = (ma_uint8*)dst;
-    const ma_uint8* src_u8 = (const ma_uint8*)src;
-
-    ma_uint64 i;
-    for (i = 0; i < count; i += 1) {
-        ma_int16 x = src_u8[i];
-        x = (ma_int16)(x - 128);
-
-        dst_s24[i*3+0] = 0;
-        dst_s24[i*3+1] = 0;
-        dst_s24[i*3+2] = (ma_uint8)((ma_int8)x);
-    }
-
-    (void)ditherMode;
-}
-
-static MA_INLINE void ma_pcm_u8_to_s24__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_u8_to_s24__reference(dst, src, count, ditherMode);
-}
-
-#if defined(MA_SUPPORT_SSE2)
-static MA_INLINE void ma_pcm_u8_to_s24__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_u8_to_s24__optimized(dst, src, count, ditherMode);
-}
-#endif
-#if defined(MA_SUPPORT_AVX2)
-static MA_INLINE void ma_pcm_u8_to_s24__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_u8_to_s24__optimized(dst, src, count, ditherMode);
-}
-#endif
-#if defined(MA_SUPPORT_NEON)
-static MA_INLINE void ma_pcm_u8_to_s24__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_u8_to_s24__optimized(dst, src, count, ditherMode);
-}
-#endif
-
-MA_API void ma_pcm_u8_to_s24(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-#ifdef MA_USE_REFERENCE_CONVERSION_APIS
-    ma_pcm_u8_to_s24__reference(dst, src, count, ditherMode);
-#else
-    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
-        if (ma_has_avx2()) {
-            ma_pcm_u8_to_s24__avx2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
-        if (ma_has_sse2()) {
-            ma_pcm_u8_to_s24__sse2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
-        if (ma_has_neon()) {
-            ma_pcm_u8_to_s24__neon(dst, src, count, ditherMode);
-        } else
-    #endif
-        {
-            ma_pcm_u8_to_s24__optimized(dst, src, count, ditherMode);
-        }
-#endif
-}
-
-
-static MA_INLINE void ma_pcm_u8_to_s32__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_int32* dst_s32 = (ma_int32*)dst;
-    const ma_uint8* src_u8 = (const ma_uint8*)src;
-
-    ma_uint64 i;
-    for (i = 0; i < count; i += 1) {
-        ma_int32 x = src_u8[i];
-        x = x - 128;
-        x = x << 24;
-        dst_s32[i] = x;
-    }
-
-    (void)ditherMode;
-}
-
-static MA_INLINE void ma_pcm_u8_to_s32__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_u8_to_s32__reference(dst, src, count, ditherMode);
-}
-
-#if defined(MA_SUPPORT_SSE2)
-static MA_INLINE void ma_pcm_u8_to_s32__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_u8_to_s32__optimized(dst, src, count, ditherMode);
-}
-#endif
-#if defined(MA_SUPPORT_AVX2)
-static MA_INLINE void ma_pcm_u8_to_s32__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_u8_to_s32__optimized(dst, src, count, ditherMode);
-}
-#endif
-#if defined(MA_SUPPORT_NEON)
-static MA_INLINE void ma_pcm_u8_to_s32__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_u8_to_s32__optimized(dst, src, count, ditherMode);
-}
-#endif
-
-MA_API void ma_pcm_u8_to_s32(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-#ifdef MA_USE_REFERENCE_CONVERSION_APIS
-    ma_pcm_u8_to_s32__reference(dst, src, count, ditherMode);
-#else
-    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
-        if (ma_has_avx2()) {
-            ma_pcm_u8_to_s32__avx2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
-        if (ma_has_sse2()) {
-            ma_pcm_u8_to_s32__sse2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
-        if (ma_has_neon()) {
-            ma_pcm_u8_to_s32__neon(dst, src, count, ditherMode);
-        } else
-    #endif
-        {
-            ma_pcm_u8_to_s32__optimized(dst, src, count, ditherMode);
-        }
-#endif
-}
-
-
-static MA_INLINE void ma_pcm_u8_to_f32__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    float* dst_f32 = (float*)dst;
-    const ma_uint8* src_u8 = (const ma_uint8*)src;
-
-    ma_uint64 i;
-    for (i = 0; i < count; i += 1) {
-        float x = (float)src_u8[i];
-        x = x * 0.00784313725490196078f;    /* 0..255 to 0..2 */
-        x = x - 1;                          /* 0..2 to -1..1 */
-
-        dst_f32[i] = x;
-    }
-
-    (void)ditherMode;
-}
-
-static MA_INLINE void ma_pcm_u8_to_f32__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_u8_to_f32__reference(dst, src, count, ditherMode);
-}
-
-#if defined(MA_SUPPORT_SSE2)
-static MA_INLINE void ma_pcm_u8_to_f32__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_u8_to_f32__optimized(dst, src, count, ditherMode);
-}
-#endif
-#if defined(MA_SUPPORT_AVX2)
-static MA_INLINE void ma_pcm_u8_to_f32__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_u8_to_f32__optimized(dst, src, count, ditherMode);
-}
-#endif
-#if defined(MA_SUPPORT_NEON)
-static MA_INLINE void ma_pcm_u8_to_f32__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_u8_to_f32__optimized(dst, src, count, ditherMode);
-}
-#endif
-
-MA_API void ma_pcm_u8_to_f32(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-#ifdef MA_USE_REFERENCE_CONVERSION_APIS
-    ma_pcm_u8_to_f32__reference(dst, src, count, ditherMode);
-#else
-    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
-        if (ma_has_avx2()) {
-            ma_pcm_u8_to_f32__avx2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
-        if (ma_has_sse2()) {
-            ma_pcm_u8_to_f32__sse2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
-        if (ma_has_neon()) {
-            ma_pcm_u8_to_f32__neon(dst, src, count, ditherMode);
-        } else
-    #endif
-        {
-            ma_pcm_u8_to_f32__optimized(dst, src, count, ditherMode);
-        }
-#endif
-}
-
-
-#ifdef MA_USE_REFERENCE_CONVERSION_APIS
-static MA_INLINE void ma_pcm_interleave_u8__reference(void* dst, const void** src, ma_uint64 frameCount, ma_uint32 channels)
-{
-    ma_uint8* dst_u8 = (ma_uint8*)dst;
-    const ma_uint8** src_u8 = (const ma_uint8**)src;
-
-    ma_uint64 iFrame;
-    for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
-        ma_uint32 iChannel;
-        for (iChannel = 0; iChannel < channels; iChannel += 1) {
-            dst_u8[iFrame*channels + iChannel] = src_u8[iChannel][iFrame];
-        }
-    }
-}
-#else
-static MA_INLINE void ma_pcm_interleave_u8__optimized(void* dst, const void** src, ma_uint64 frameCount, ma_uint32 channels)
-{
-    ma_uint8* dst_u8 = (ma_uint8*)dst;
-    const ma_uint8** src_u8 = (const ma_uint8**)src;
-
-    if (channels == 1) {
-        ma_copy_memory_64(dst, src[0], frameCount * sizeof(ma_uint8));
-    } else if (channels == 2) {
-        ma_uint64 iFrame;
-        for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
-            dst_u8[iFrame*2 + 0] = src_u8[0][iFrame];
-            dst_u8[iFrame*2 + 1] = src_u8[1][iFrame];
-        }
-    } else {
-        ma_uint64 iFrame;
-        for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
-            ma_uint32 iChannel;
-            for (iChannel = 0; iChannel < channels; iChannel += 1) {
-                dst_u8[iFrame*channels + iChannel] = src_u8[iChannel][iFrame];
-            }
-        }
-    }
-}
-#endif
-
-MA_API void ma_pcm_interleave_u8(void* dst, const void** src, ma_uint64 frameCount, ma_uint32 channels)
-{
-#ifdef MA_USE_REFERENCE_CONVERSION_APIS
-    ma_pcm_interleave_u8__reference(dst, src, frameCount, channels);
-#else
-    ma_pcm_interleave_u8__optimized(dst, src, frameCount, channels);
-#endif
-}
-
-
-static MA_INLINE void ma_pcm_deinterleave_u8__reference(void** dst, const void* src, ma_uint64 frameCount, ma_uint32 channels)
-{
-    ma_uint8** dst_u8 = (ma_uint8**)dst;
-    const ma_uint8* src_u8 = (const ma_uint8*)src;
-
-    ma_uint64 iFrame;
-    for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
-        ma_uint32 iChannel;
-        for (iChannel = 0; iChannel < channels; iChannel += 1) {
-            dst_u8[iChannel][iFrame] = src_u8[iFrame*channels + iChannel];
-        }
-    }
-}
-
-static MA_INLINE void ma_pcm_deinterleave_u8__optimized(void** dst, const void* src, ma_uint64 frameCount, ma_uint32 channels)
-{
-    ma_pcm_deinterleave_u8__reference(dst, src, frameCount, channels);
-}
-
-MA_API void ma_pcm_deinterleave_u8(void** dst, const void* src, ma_uint64 frameCount, ma_uint32 channels)
-{
-#ifdef MA_USE_REFERENCE_CONVERSION_APIS
-    ma_pcm_deinterleave_u8__reference(dst, src, frameCount, channels);
-#else
-    ma_pcm_deinterleave_u8__optimized(dst, src, frameCount, channels);
-#endif
-}
-
-
-/* s16 */
-static MA_INLINE void ma_pcm_s16_to_u8__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_uint8* dst_u8 = (ma_uint8*)dst;
-    const ma_int16* src_s16 = (const ma_int16*)src;
-
-    if (ditherMode == ma_dither_mode_none) {
-        ma_uint64 i;
-        for (i = 0; i < count; i += 1) {
-            ma_int16 x = src_s16[i];
-            x = (ma_int16)(x >> 8);
-            x = (ma_int16)(x + 128);
-            dst_u8[i] = (ma_uint8)x;
-        }
-    } else {
-        ma_uint64 i;
-        for (i = 0; i < count; i += 1) {
-            ma_int16 x = src_s16[i];
-
-            /* Dither. Don't overflow. */
-            ma_int32 dither = ma_dither_s32(ditherMode, -0x80, 0x7F);
-            if ((x + dither) <= 0x7FFF) {
-                x = (ma_int16)(x + dither);
-            } else {
-                x = 0x7FFF;
-            }
-
-            x = (ma_int16)(x >> 8);
-            x = (ma_int16)(x + 128);
-            dst_u8[i] = (ma_uint8)x;
-        }
-    }
-}
-
-static MA_INLINE void ma_pcm_s16_to_u8__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s16_to_u8__reference(dst, src, count, ditherMode);
-}
-
-#if defined(MA_SUPPORT_SSE2)
-static MA_INLINE void ma_pcm_s16_to_u8__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s16_to_u8__optimized(dst, src, count, ditherMode);
-}
-#endif
-#if defined(MA_SUPPORT_AVX2)
-static MA_INLINE void ma_pcm_s16_to_u8__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s16_to_u8__optimized(dst, src, count, ditherMode);
-}
-#endif
-#if defined(MA_SUPPORT_NEON)
-static MA_INLINE void ma_pcm_s16_to_u8__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s16_to_u8__optimized(dst, src, count, ditherMode);
-}
-#endif
-
-MA_API void ma_pcm_s16_to_u8(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-#ifdef MA_USE_REFERENCE_CONVERSION_APIS
-    ma_pcm_s16_to_u8__reference(dst, src, count, ditherMode);
-#else
-    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
-        if (ma_has_avx2()) {
-            ma_pcm_s16_to_u8__avx2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
-        if (ma_has_sse2()) {
-            ma_pcm_s16_to_u8__sse2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
-        if (ma_has_neon()) {
-            ma_pcm_s16_to_u8__neon(dst, src, count, ditherMode);
-        } else
-    #endif
-        {
-            ma_pcm_s16_to_u8__optimized(dst, src, count, ditherMode);
-        }
-#endif
-}
-
-
-MA_API void ma_pcm_s16_to_s16(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    (void)ditherMode;
-    ma_copy_memory_64(dst, src, count * sizeof(ma_int16));
-}
-
-
-static MA_INLINE void ma_pcm_s16_to_s24__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_uint8* dst_s24 = (ma_uint8*)dst;
-    const ma_int16* src_s16 = (const ma_int16*)src;
-
-    ma_uint64 i;
-    for (i = 0; i < count; i += 1) {
-        dst_s24[i*3+0] = 0;
-        dst_s24[i*3+1] = (ma_uint8)(src_s16[i] & 0xFF);
-        dst_s24[i*3+2] = (ma_uint8)(src_s16[i] >> 8);
-    }
-
-    (void)ditherMode;
-}
-
-static MA_INLINE void ma_pcm_s16_to_s24__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s16_to_s24__reference(dst, src, count, ditherMode);
-}
-
-#if defined(MA_SUPPORT_SSE2)
-static MA_INLINE void ma_pcm_s16_to_s24__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s16_to_s24__optimized(dst, src, count, ditherMode);
-}
-#endif
-#if defined(MA_SUPPORT_AVX2)
-static MA_INLINE void ma_pcm_s16_to_s24__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s16_to_s24__optimized(dst, src, count, ditherMode);
-}
-#endif
-#if defined(MA_SUPPORT_NEON)
-static MA_INLINE void ma_pcm_s16_to_s24__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s16_to_s24__optimized(dst, src, count, ditherMode);
-}
-#endif
-
-MA_API void ma_pcm_s16_to_s24(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-#ifdef MA_USE_REFERENCE_CONVERSION_APIS
-    ma_pcm_s16_to_s24__reference(dst, src, count, ditherMode);
-#else
-    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
-        if (ma_has_avx2()) {
-            ma_pcm_s16_to_s24__avx2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
-        if (ma_has_sse2()) {
-            ma_pcm_s16_to_s24__sse2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
-        if (ma_has_neon()) {
-            ma_pcm_s16_to_s24__neon(dst, src, count, ditherMode);
-        } else
-    #endif
-        {
-            ma_pcm_s16_to_s24__optimized(dst, src, count, ditherMode);
-        }
-#endif
-}
-
-
-static MA_INLINE void ma_pcm_s16_to_s32__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_int32* dst_s32 = (ma_int32*)dst;
-    const ma_int16* src_s16 = (const ma_int16*)src;
-
-    ma_uint64 i;
-    for (i = 0; i < count; i += 1) {
-        dst_s32[i] = src_s16[i] << 16;
-    }
-
-    (void)ditherMode;
-}
-
-static MA_INLINE void ma_pcm_s16_to_s32__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s16_to_s32__reference(dst, src, count, ditherMode);
-}
-
-#if defined(MA_SUPPORT_SSE2)
-static MA_INLINE void ma_pcm_s16_to_s32__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s16_to_s32__optimized(dst, src, count, ditherMode);
-}
-#endif
-#if defined(MA_SUPPORT_AVX2)
-static MA_INLINE void ma_pcm_s16_to_s32__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s16_to_s32__optimized(dst, src, count, ditherMode);
-}
-#endif
-#if defined(MA_SUPPORT_NEON)
-static MA_INLINE void ma_pcm_s16_to_s32__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s16_to_s32__optimized(dst, src, count, ditherMode);
-}
-#endif
-
-MA_API void ma_pcm_s16_to_s32(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-#ifdef MA_USE_REFERENCE_CONVERSION_APIS
-    ma_pcm_s16_to_s32__reference(dst, src, count, ditherMode);
-#else
-    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
-        if (ma_has_avx2()) {
-            ma_pcm_s16_to_s32__avx2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
-        if (ma_has_sse2()) {
-            ma_pcm_s16_to_s32__sse2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
-        if (ma_has_neon()) {
-            ma_pcm_s16_to_s32__neon(dst, src, count, ditherMode);
-        } else
-    #endif
-        {
-            ma_pcm_s16_to_s32__optimized(dst, src, count, ditherMode);
-        }
-#endif
-}
-
-
-static MA_INLINE void ma_pcm_s16_to_f32__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    float* dst_f32 = (float*)dst;
-    const ma_int16* src_s16 = (const ma_int16*)src;
-
-    ma_uint64 i;
-    for (i = 0; i < count; i += 1) {
-        float x = (float)src_s16[i];
-
-#if 0
-        /* The accurate way. */
-        x = x + 32768.0f;                   /* -32768..32767 to 0..65535 */
-        x = x * 0.00003051804379339284f;    /* 0..65535 to 0..2 */
-        x = x - 1;                          /* 0..2 to -1..1 */
-#else
-        /* The fast way. */
-        x = x * 0.000030517578125f;         /* -32768..32767 to -1..0.999969482421875 */
-#endif
-
-        dst_f32[i] = x;
-    }
-
-    (void)ditherMode;
-}
-
-static MA_INLINE void ma_pcm_s16_to_f32__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s16_to_f32__reference(dst, src, count, ditherMode);
-}
-
-#if defined(MA_SUPPORT_SSE2)
-static MA_INLINE void ma_pcm_s16_to_f32__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s16_to_f32__optimized(dst, src, count, ditherMode);
-}
-#endif
-#if defined(MA_SUPPORT_AVX2)
-static MA_INLINE void ma_pcm_s16_to_f32__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s16_to_f32__optimized(dst, src, count, ditherMode);
-}
-#endif
-#if defined(MA_SUPPORT_NEON)
-static MA_INLINE void ma_pcm_s16_to_f32__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s16_to_f32__optimized(dst, src, count, ditherMode);
-}
-#endif
-
-MA_API void ma_pcm_s16_to_f32(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-#ifdef MA_USE_REFERENCE_CONVERSION_APIS
-    ma_pcm_s16_to_f32__reference(dst, src, count, ditherMode);
-#else
-    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
-        if (ma_has_avx2()) {
-            ma_pcm_s16_to_f32__avx2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
-        if (ma_has_sse2()) {
-            ma_pcm_s16_to_f32__sse2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
-        if (ma_has_neon()) {
-            ma_pcm_s16_to_f32__neon(dst, src, count, ditherMode);
-        } else
-    #endif
-        {
-            ma_pcm_s16_to_f32__optimized(dst, src, count, ditherMode);
-        }
-#endif
-}
-
-
-static MA_INLINE void ma_pcm_interleave_s16__reference(void* dst, const void** src, ma_uint64 frameCount, ma_uint32 channels)
-{
-    ma_int16* dst_s16 = (ma_int16*)dst;
-    const ma_int16** src_s16 = (const ma_int16**)src;
-
-    ma_uint64 iFrame;
-    for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
-        ma_uint32 iChannel;
-        for (iChannel = 0; iChannel < channels; iChannel += 1) {
-            dst_s16[iFrame*channels + iChannel] = src_s16[iChannel][iFrame];
-        }
-    }
-}
-
-static MA_INLINE void ma_pcm_interleave_s16__optimized(void* dst, const void** src, ma_uint64 frameCount, ma_uint32 channels)
-{
-    ma_pcm_interleave_s16__reference(dst, src, frameCount, channels);
-}
-
-MA_API void ma_pcm_interleave_s16(void* dst, const void** src, ma_uint64 frameCount, ma_uint32 channels)
-{
-#ifdef MA_USE_REFERENCE_CONVERSION_APIS
-    ma_pcm_interleave_s16__reference(dst, src, frameCount, channels);
-#else
-    ma_pcm_interleave_s16__optimized(dst, src, frameCount, channels);
-#endif
-}
-
-
-static MA_INLINE void ma_pcm_deinterleave_s16__reference(void** dst, const void* src, ma_uint64 frameCount, ma_uint32 channels)
-{
-    ma_int16** dst_s16 = (ma_int16**)dst;
-    const ma_int16* src_s16 = (const ma_int16*)src;
-
-    ma_uint64 iFrame;
-    for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
-        ma_uint32 iChannel;
-        for (iChannel = 0; iChannel < channels; iChannel += 1) {
-            dst_s16[iChannel][iFrame] = src_s16[iFrame*channels + iChannel];
-        }
-    }
-}
-
-static MA_INLINE void ma_pcm_deinterleave_s16__optimized(void** dst, const void* src, ma_uint64 frameCount, ma_uint32 channels)
-{
-    ma_pcm_deinterleave_s16__reference(dst, src, frameCount, channels);
-}
-
-MA_API void ma_pcm_deinterleave_s16(void** dst, const void* src, ma_uint64 frameCount, ma_uint32 channels)
-{
-#ifdef MA_USE_REFERENCE_CONVERSION_APIS
-    ma_pcm_deinterleave_s16__reference(dst, src, frameCount, channels);
-#else
-    ma_pcm_deinterleave_s16__optimized(dst, src, frameCount, channels);
-#endif
-}
-
-
-/* s24 */
-static MA_INLINE void ma_pcm_s24_to_u8__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_uint8* dst_u8 = (ma_uint8*)dst;
-    const ma_uint8* src_s24 = (const ma_uint8*)src;
-
-    if (ditherMode == ma_dither_mode_none) {
-        ma_uint64 i;
-        for (i = 0; i < count; i += 1) {
-            dst_u8[i] = (ma_uint8)((ma_int8)src_s24[i*3 + 2] + 128);
-        }
-    } else {
-        ma_uint64 i;
-        for (i = 0; i < count; i += 1) {
-            ma_int32 x = (ma_int32)(((ma_uint32)(src_s24[i*3+0]) << 8) | ((ma_uint32)(src_s24[i*3+1]) << 16) | ((ma_uint32)(src_s24[i*3+2])) << 24);
-
-            /* Dither. Don't overflow. */
-            ma_int32 dither = ma_dither_s32(ditherMode, -0x800000, 0x7FFFFF);
-            if ((ma_int64)x + dither <= 0x7FFFFFFF) {
-                x = x + dither;
-            } else {
-                x = 0x7FFFFFFF;
-            }
-            
-            x = x >> 24;
-            x = x + 128;
-            dst_u8[i] = (ma_uint8)x;
-        }
-    }
-}
-
-static MA_INLINE void ma_pcm_s24_to_u8__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s24_to_u8__reference(dst, src, count, ditherMode);
-}
-
-#if defined(MA_SUPPORT_SSE2)
-static MA_INLINE void ma_pcm_s24_to_u8__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s24_to_u8__optimized(dst, src, count, ditherMode);
-}
-#endif
-#if defined(MA_SUPPORT_AVX2)
-static MA_INLINE void ma_pcm_s24_to_u8__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s24_to_u8__optimized(dst, src, count, ditherMode);
-}
-#endif
-#if defined(MA_SUPPORT_NEON)
-static MA_INLINE void ma_pcm_s24_to_u8__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s24_to_u8__optimized(dst, src, count, ditherMode);
-}
-#endif
-
-MA_API void ma_pcm_s24_to_u8(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-#ifdef MA_USE_REFERENCE_CONVERSION_APIS
-    ma_pcm_s24_to_u8__reference(dst, src, count, ditherMode);
-#else
-    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
-        if (ma_has_avx2()) {
-            ma_pcm_s24_to_u8__avx2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
-        if (ma_has_sse2()) {
-            ma_pcm_s24_to_u8__sse2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
-        if (ma_has_neon()) {
-            ma_pcm_s24_to_u8__neon(dst, src, count, ditherMode);
-        } else
-    #endif
-        {
-            ma_pcm_s24_to_u8__optimized(dst, src, count, ditherMode);
-        }
-#endif
-}
-
-
-static MA_INLINE void ma_pcm_s24_to_s16__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_int16* dst_s16 = (ma_int16*)dst;
-    const ma_uint8* src_s24 = (const ma_uint8*)src;
-
-    if (ditherMode == ma_dither_mode_none) {
-        ma_uint64 i;
-        for (i = 0; i < count; i += 1) {
-            ma_uint16 dst_lo =            ((ma_uint16)src_s24[i*3 + 1]);
-            ma_uint16 dst_hi = (ma_uint16)((ma_uint16)src_s24[i*3 + 2] << 8);
-            dst_s16[i] = (ma_int16)(dst_lo | dst_hi);
-        }
-    } else {
-        ma_uint64 i;
-        for (i = 0; i < count; i += 1) {
-            ma_int32 x = (ma_int32)(((ma_uint32)(src_s24[i*3+0]) << 8) | ((ma_uint32)(src_s24[i*3+1]) << 16) | ((ma_uint32)(src_s24[i*3+2])) << 24);
-
-            /* Dither. Don't overflow. */
-            ma_int32 dither = ma_dither_s32(ditherMode, -0x8000, 0x7FFF);
-            if ((ma_int64)x + dither <= 0x7FFFFFFF) {
-                x = x + dither;
-            } else {
-                x = 0x7FFFFFFF;
-            }
-
-            x = x >> 16;
-            dst_s16[i] = (ma_int16)x;
-        }
-    }
-}
-
-static MA_INLINE void ma_pcm_s24_to_s16__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s24_to_s16__reference(dst, src, count, ditherMode);
-}
-
-#if defined(MA_SUPPORT_SSE2)
-static MA_INLINE void ma_pcm_s24_to_s16__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s24_to_s16__optimized(dst, src, count, ditherMode);
-}
-#endif
-#if defined(MA_SUPPORT_AVX2)
-static MA_INLINE void ma_pcm_s24_to_s16__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s24_to_s16__optimized(dst, src, count, ditherMode);
-}
-#endif
-#if defined(MA_SUPPORT_NEON)
-static MA_INLINE void ma_pcm_s24_to_s16__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s24_to_s16__optimized(dst, src, count, ditherMode);
-}
-#endif
-
-MA_API void ma_pcm_s24_to_s16(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-#ifdef MA_USE_REFERENCE_CONVERSION_APIS
-    ma_pcm_s24_to_s16__reference(dst, src, count, ditherMode);
-#else
-    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
-        if (ma_has_avx2()) {
-            ma_pcm_s24_to_s16__avx2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
-        if (ma_has_sse2()) {
-            ma_pcm_s24_to_s16__sse2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
-        if (ma_has_neon()) {
-            ma_pcm_s24_to_s16__neon(dst, src, count, ditherMode);
-        } else
-    #endif
-        {
-            ma_pcm_s24_to_s16__optimized(dst, src, count, ditherMode);
-        }
-#endif
-}
-
-
-MA_API void ma_pcm_s24_to_s24(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    (void)ditherMode;
-
-    ma_copy_memory_64(dst, src, count * 3);
-}
-
-
-static MA_INLINE void ma_pcm_s24_to_s32__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_int32* dst_s32 = (ma_int32*)dst;
-    const ma_uint8* src_s24 = (const ma_uint8*)src;
-
-    ma_uint64 i;
-    for (i = 0; i < count; i += 1) {
-        dst_s32[i] = (ma_int32)(((ma_uint32)(src_s24[i*3+0]) << 8) | ((ma_uint32)(src_s24[i*3+1]) << 16) | ((ma_uint32)(src_s24[i*3+2])) << 24);
-    }
-
-    (void)ditherMode;
-}
-
-static MA_INLINE void ma_pcm_s24_to_s32__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s24_to_s32__reference(dst, src, count, ditherMode);
-}
-
-#if defined(MA_SUPPORT_SSE2)
-static MA_INLINE void ma_pcm_s24_to_s32__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s24_to_s32__optimized(dst, src, count, ditherMode);
-}
-#endif
-#if defined(MA_SUPPORT_AVX2)
-static MA_INLINE void ma_pcm_s24_to_s32__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s24_to_s32__optimized(dst, src, count, ditherMode);
-}
-#endif
-#if defined(MA_SUPPORT_NEON)
-static MA_INLINE void ma_pcm_s24_to_s32__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s24_to_s32__optimized(dst, src, count, ditherMode);
-}
-#endif
-
-MA_API void ma_pcm_s24_to_s32(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-#ifdef MA_USE_REFERENCE_CONVERSION_APIS
-    ma_pcm_s24_to_s32__reference(dst, src, count, ditherMode);
-#else
-    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
-        if (ma_has_avx2()) {
-            ma_pcm_s24_to_s32__avx2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
-        if (ma_has_sse2()) {
-            ma_pcm_s24_to_s32__sse2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
-        if (ma_has_neon()) {
-            ma_pcm_s24_to_s32__neon(dst, src, count, ditherMode);
-        } else
-    #endif
-        {
-            ma_pcm_s24_to_s32__optimized(dst, src, count, ditherMode);
-        }
-#endif
-}
-
-
-static MA_INLINE void ma_pcm_s24_to_f32__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    float* dst_f32 = (float*)dst;
-    const ma_uint8* src_s24 = (const ma_uint8*)src;
-
-    ma_uint64 i;
-    for (i = 0; i < count; i += 1) {
-        float x = (float)(((ma_int32)(((ma_uint32)(src_s24[i*3+0]) << 8) | ((ma_uint32)(src_s24[i*3+1]) << 16) | ((ma_uint32)(src_s24[i*3+2])) << 24)) >> 8);
-
-#if 0
-        /* The accurate way. */
-        x = x + 8388608.0f;                 /* -8388608..8388607 to 0..16777215 */
-        x = x * 0.00000011920929665621f;    /* 0..16777215 to 0..2 */
-        x = x - 1;                          /* 0..2 to -1..1 */
-#else
-        /* The fast way. */
-        x = x * 0.00000011920928955078125f; /* -8388608..8388607 to -1..0.999969482421875 */
-#endif
-
-        dst_f32[i] = x;
-    }
-
-    (void)ditherMode;
-}
-
-static MA_INLINE void ma_pcm_s24_to_f32__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s24_to_f32__reference(dst, src, count, ditherMode);
-}
-
-#if defined(MA_SUPPORT_SSE2)
-static MA_INLINE void ma_pcm_s24_to_f32__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s24_to_f32__optimized(dst, src, count, ditherMode);
-}
-#endif
-#if defined(MA_SUPPORT_AVX2)
-static MA_INLINE void ma_pcm_s24_to_f32__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s24_to_f32__optimized(dst, src, count, ditherMode);
-}
-#endif
-#if defined(MA_SUPPORT_NEON)
-static MA_INLINE void ma_pcm_s24_to_f32__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s24_to_f32__optimized(dst, src, count, ditherMode);
-}
-#endif
-
-MA_API void ma_pcm_s24_to_f32(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-#ifdef MA_USE_REFERENCE_CONVERSION_APIS
-    ma_pcm_s24_to_f32__reference(dst, src, count, ditherMode);
-#else
-    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
-        if (ma_has_avx2()) {
-            ma_pcm_s24_to_f32__avx2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
-        if (ma_has_sse2()) {
-            ma_pcm_s24_to_f32__sse2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
-        if (ma_has_neon()) {
-            ma_pcm_s24_to_f32__neon(dst, src, count, ditherMode);
-        } else
-    #endif
-        {
-            ma_pcm_s24_to_f32__optimized(dst, src, count, ditherMode);
-        }
-#endif
-}
-
-
-static MA_INLINE void ma_pcm_interleave_s24__reference(void* dst, const void** src, ma_uint64 frameCount, ma_uint32 channels)
-{
-    ma_uint8* dst8 = (ma_uint8*)dst;
-    const ma_uint8** src8 = (const ma_uint8**)src;
-
-    ma_uint64 iFrame;
-    for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
-        ma_uint32 iChannel;
-        for (iChannel = 0; iChannel < channels; iChannel += 1) {
-            dst8[iFrame*3*channels + iChannel*3 + 0] = src8[iChannel][iFrame*3 + 0];
-            dst8[iFrame*3*channels + iChannel*3 + 1] = src8[iChannel][iFrame*3 + 1];
-            dst8[iFrame*3*channels + iChannel*3 + 2] = src8[iChannel][iFrame*3 + 2];
-        }
-    }
-}
-
-static MA_INLINE void ma_pcm_interleave_s24__optimized(void* dst, const void** src, ma_uint64 frameCount, ma_uint32 channels)
-{
-    ma_pcm_interleave_s24__reference(dst, src, frameCount, channels);
-}
-
-MA_API void ma_pcm_interleave_s24(void* dst, const void** src, ma_uint64 frameCount, ma_uint32 channels)
-{
-#ifdef MA_USE_REFERENCE_CONVERSION_APIS
-    ma_pcm_interleave_s24__reference(dst, src, frameCount, channels);
-#else
-    ma_pcm_interleave_s24__optimized(dst, src, frameCount, channels);
-#endif
-}
-
-
-static MA_INLINE void ma_pcm_deinterleave_s24__reference(void** dst, const void* src, ma_uint64 frameCount, ma_uint32 channels)
-{
-    ma_uint8** dst8 = (ma_uint8**)dst;
-    const ma_uint8* src8 = (const ma_uint8*)src;
-
-    ma_uint32 iFrame;
-    for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
-        ma_uint32 iChannel;
-        for (iChannel = 0; iChannel < channels; iChannel += 1) {
-            dst8[iChannel][iFrame*3 + 0] = src8[iFrame*3*channels + iChannel*3 + 0];
-            dst8[iChannel][iFrame*3 + 1] = src8[iFrame*3*channels + iChannel*3 + 1];
-            dst8[iChannel][iFrame*3 + 2] = src8[iFrame*3*channels + iChannel*3 + 2];
-        }
-    }
-}
-
-static MA_INLINE void ma_pcm_deinterleave_s24__optimized(void** dst, const void* src, ma_uint64 frameCount, ma_uint32 channels)
-{
-    ma_pcm_deinterleave_s24__reference(dst, src, frameCount, channels);
-}
-
-MA_API void ma_pcm_deinterleave_s24(void** dst, const void* src, ma_uint64 frameCount, ma_uint32 channels)
-{
-#ifdef MA_USE_REFERENCE_CONVERSION_APIS
-    ma_pcm_deinterleave_s24__reference(dst, src, frameCount, channels);
-#else
-    ma_pcm_deinterleave_s24__optimized(dst, src, frameCount, channels);
-#endif
-}
-
-
-
-/* s32 */
-static MA_INLINE void ma_pcm_s32_to_u8__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_uint8* dst_u8 = (ma_uint8*)dst;
-    const ma_int32* src_s32 = (const ma_int32*)src;
-
-    if (ditherMode == ma_dither_mode_none) {
-        ma_uint64 i;
-        for (i = 0; i < count; i += 1) {
-            ma_int32 x = src_s32[i];
-            x = x >> 24;
-            x = x + 128;
-            dst_u8[i] = (ma_uint8)x;
-        }
-    } else {
-        ma_uint64 i;
-        for (i = 0; i < count; i += 1) {
-            ma_int32 x = src_s32[i];
-
-            /* Dither. Don't overflow. */
-            ma_int32 dither = ma_dither_s32(ditherMode, -0x800000, 0x7FFFFF);
-            if ((ma_int64)x + dither <= 0x7FFFFFFF) {
-                x = x + dither;
-            } else {
-                x = 0x7FFFFFFF;
-            }
-            
-            x = x >> 24;
-            x = x + 128;
-            dst_u8[i] = (ma_uint8)x;
-        }
-    }
-}
-
-static MA_INLINE void ma_pcm_s32_to_u8__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s32_to_u8__reference(dst, src, count, ditherMode);
-}
-
-#if defined(MA_SUPPORT_SSE2)
-static MA_INLINE void ma_pcm_s32_to_u8__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s32_to_u8__optimized(dst, src, count, ditherMode);
-}
-#endif
-#if defined(MA_SUPPORT_AVX2)
-static MA_INLINE void ma_pcm_s32_to_u8__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s32_to_u8__optimized(dst, src, count, ditherMode);
-}
-#endif
-#if defined(MA_SUPPORT_NEON)
-static MA_INLINE void ma_pcm_s32_to_u8__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s32_to_u8__optimized(dst, src, count, ditherMode);
-}
-#endif
-
-MA_API void ma_pcm_s32_to_u8(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-#ifdef MA_USE_REFERENCE_CONVERSION_APIS
-    ma_pcm_s32_to_u8__reference(dst, src, count, ditherMode);
-#else
-    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
-        if (ma_has_avx2()) {
-            ma_pcm_s32_to_u8__avx2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
-        if (ma_has_sse2()) {
-            ma_pcm_s32_to_u8__sse2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
-        if (ma_has_neon()) {
-            ma_pcm_s32_to_u8__neon(dst, src, count, ditherMode);
-        } else
-    #endif
-        {
-            ma_pcm_s32_to_u8__optimized(dst, src, count, ditherMode);
-        }
-#endif
-}
-
-
-static MA_INLINE void ma_pcm_s32_to_s16__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_int16* dst_s16 = (ma_int16*)dst;
-    const ma_int32* src_s32 = (const ma_int32*)src;
-
-    if (ditherMode == ma_dither_mode_none) {
-        ma_uint64 i;
-        for (i = 0; i < count; i += 1) {
-            ma_int32 x = src_s32[i];
-            x = x >> 16;
-            dst_s16[i] = (ma_int16)x;
-        }
-    } else {
-        ma_uint64 i;
-        for (i = 0; i < count; i += 1) {
-            ma_int32 x = src_s32[i];
-
-            /* Dither. Don't overflow. */
-            ma_int32 dither = ma_dither_s32(ditherMode, -0x8000, 0x7FFF);
-            if ((ma_int64)x + dither <= 0x7FFFFFFF) {
-                x = x + dither;
-            } else {
-                x = 0x7FFFFFFF;
-            }
-            
-            x = x >> 16;
-            dst_s16[i] = (ma_int16)x;
-        }
-    }
-}
-
-static MA_INLINE void ma_pcm_s32_to_s16__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s32_to_s16__reference(dst, src, count, ditherMode);
-}
-
-#if defined(MA_SUPPORT_SSE2)
-static MA_INLINE void ma_pcm_s32_to_s16__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s32_to_s16__optimized(dst, src, count, ditherMode);
-}
-#endif
-#if defined(MA_SUPPORT_AVX2)
-static MA_INLINE void ma_pcm_s32_to_s16__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s32_to_s16__optimized(dst, src, count, ditherMode);
-}
-#endif
-#if defined(MA_SUPPORT_NEON)
-static MA_INLINE void ma_pcm_s32_to_s16__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s32_to_s16__optimized(dst, src, count, ditherMode);
-}
-#endif
-
-MA_API void ma_pcm_s32_to_s16(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-#ifdef MA_USE_REFERENCE_CONVERSION_APIS
-    ma_pcm_s32_to_s16__reference(dst, src, count, ditherMode);
-#else
-    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
-        if (ma_has_avx2()) {
-            ma_pcm_s32_to_s16__avx2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
-        if (ma_has_sse2()) {
-            ma_pcm_s32_to_s16__sse2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
-        if (ma_has_neon()) {
-            ma_pcm_s32_to_s16__neon(dst, src, count, ditherMode);
-        } else
-    #endif
-        {
-            ma_pcm_s32_to_s16__optimized(dst, src, count, ditherMode);
-        }
-#endif
-}
-
-
-static MA_INLINE void ma_pcm_s32_to_s24__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_uint8* dst_s24 = (ma_uint8*)dst;
-    const ma_int32* src_s32 = (const ma_int32*)src;
-
-    ma_uint64 i;
-    for (i = 0; i < count; i += 1) {
-        ma_uint32 x = (ma_uint32)src_s32[i];
-        dst_s24[i*3+0] = (ma_uint8)((x & 0x0000FF00) >>  8);
-        dst_s24[i*3+1] = (ma_uint8)((x & 0x00FF0000) >> 16);
-        dst_s24[i*3+2] = (ma_uint8)((x & 0xFF000000) >> 24);
-    }
-
-    (void)ditherMode;   /* No dithering for s32 -> s24. */
-}
-
-static MA_INLINE void ma_pcm_s32_to_s24__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s32_to_s24__reference(dst, src, count, ditherMode);
-}
-
-#if defined(MA_SUPPORT_SSE2)
-static MA_INLINE void ma_pcm_s32_to_s24__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s32_to_s24__optimized(dst, src, count, ditherMode);
-}
-#endif
-#if defined(MA_SUPPORT_AVX2)
-static MA_INLINE void ma_pcm_s32_to_s24__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s32_to_s24__optimized(dst, src, count, ditherMode);
-}
-#endif
-#if defined(MA_SUPPORT_NEON)
-static MA_INLINE void ma_pcm_s32_to_s24__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s32_to_s24__optimized(dst, src, count, ditherMode);
-}
-#endif
-
-MA_API void ma_pcm_s32_to_s24(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-#ifdef MA_USE_REFERENCE_CONVERSION_APIS
-    ma_pcm_s32_to_s24__reference(dst, src, count, ditherMode);
-#else
-    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
-        if (ma_has_avx2()) {
-            ma_pcm_s32_to_s24__avx2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
-        if (ma_has_sse2()) {
-            ma_pcm_s32_to_s24__sse2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
-        if (ma_has_neon()) {
-            ma_pcm_s32_to_s24__neon(dst, src, count, ditherMode);
-        } else
-    #endif
-        {
-            ma_pcm_s32_to_s24__optimized(dst, src, count, ditherMode);
-        }
-#endif
-}
-
-
-MA_API void ma_pcm_s32_to_s32(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    (void)ditherMode;
-
-    ma_copy_memory_64(dst, src, count * sizeof(ma_int32));
-}
-
-
-static MA_INLINE void ma_pcm_s32_to_f32__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    float* dst_f32 = (float*)dst;
-    const ma_int32* src_s32 = (const ma_int32*)src;
-
-    ma_uint64 i;
-    for (i = 0; i < count; i += 1) {
-        double x = src_s32[i];
-
-#if 0
-        x = x + 2147483648.0;
-        x = x * 0.0000000004656612873077392578125;
-        x = x - 1;
-#else
-        x = x / 2147483648.0;
-#endif
-
-        dst_f32[i] = (float)x;
-    }
-
-    (void)ditherMode;   /* No dithering for s32 -> f32. */
-}
-
-static MA_INLINE void ma_pcm_s32_to_f32__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s32_to_f32__reference(dst, src, count, ditherMode);
-}
-
-#if defined(MA_SUPPORT_SSE2)
-static MA_INLINE void ma_pcm_s32_to_f32__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s32_to_f32__optimized(dst, src, count, ditherMode);
-}
-#endif
-#if defined(MA_SUPPORT_AVX2)
-static MA_INLINE void ma_pcm_s32_to_f32__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s32_to_f32__optimized(dst, src, count, ditherMode);
-}
-#endif
-#if defined(MA_SUPPORT_NEON)
-static MA_INLINE void ma_pcm_s32_to_f32__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_s32_to_f32__optimized(dst, src, count, ditherMode);
-}
-#endif
-
-MA_API void ma_pcm_s32_to_f32(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-#ifdef MA_USE_REFERENCE_CONVERSION_APIS
-    ma_pcm_s32_to_f32__reference(dst, src, count, ditherMode);
-#else
-    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
-        if (ma_has_avx2()) {
-            ma_pcm_s32_to_f32__avx2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
-        if (ma_has_sse2()) {
-            ma_pcm_s32_to_f32__sse2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
-        if (ma_has_neon()) {
-            ma_pcm_s32_to_f32__neon(dst, src, count, ditherMode);
-        } else
-    #endif
-        {
-            ma_pcm_s32_to_f32__optimized(dst, src, count, ditherMode);
-        }
-#endif
-}
-
-
-static MA_INLINE void ma_pcm_interleave_s32__reference(void* dst, const void** src, ma_uint64 frameCount, ma_uint32 channels)
-{
-    ma_int32* dst_s32 = (ma_int32*)dst;
-    const ma_int32** src_s32 = (const ma_int32**)src;
-
-    ma_uint64 iFrame;
-    for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
-        ma_uint32 iChannel;
-        for (iChannel = 0; iChannel < channels; iChannel += 1) {
-            dst_s32[iFrame*channels + iChannel] = src_s32[iChannel][iFrame];
-        }
-    }
-}
-
-static MA_INLINE void ma_pcm_interleave_s32__optimized(void* dst, const void** src, ma_uint64 frameCount, ma_uint32 channels)
-{
-    ma_pcm_interleave_s32__reference(dst, src, frameCount, channels);
-}
-
-MA_API void ma_pcm_interleave_s32(void* dst, const void** src, ma_uint64 frameCount, ma_uint32 channels)
-{
-#ifdef MA_USE_REFERENCE_CONVERSION_APIS
-    ma_pcm_interleave_s32__reference(dst, src, frameCount, channels);
-#else
-    ma_pcm_interleave_s32__optimized(dst, src, frameCount, channels);
-#endif
-}
-
-
-static MA_INLINE void ma_pcm_deinterleave_s32__reference(void** dst, const void* src, ma_uint64 frameCount, ma_uint32 channels)
-{
-    ma_int32** dst_s32 = (ma_int32**)dst;
-    const ma_int32* src_s32 = (const ma_int32*)src;
-
-    ma_uint64 iFrame;
-    for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
-        ma_uint32 iChannel;
-        for (iChannel = 0; iChannel < channels; iChannel += 1) {
-            dst_s32[iChannel][iFrame] = src_s32[iFrame*channels + iChannel];
-        }
-    }
-}
-
-static MA_INLINE void ma_pcm_deinterleave_s32__optimized(void** dst, const void* src, ma_uint64 frameCount, ma_uint32 channels)
-{
-    ma_pcm_deinterleave_s32__reference(dst, src, frameCount, channels);
-}
-
-MA_API void ma_pcm_deinterleave_s32(void** dst, const void* src, ma_uint64 frameCount, ma_uint32 channels)
-{
-#ifdef MA_USE_REFERENCE_CONVERSION_APIS
-    ma_pcm_deinterleave_s32__reference(dst, src, frameCount, channels);
-#else
-    ma_pcm_deinterleave_s32__optimized(dst, src, frameCount, channels);
-#endif
-}
-
-
-/* f32 */
-static MA_INLINE void ma_pcm_f32_to_u8__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_uint64 i;
-
-    ma_uint8* dst_u8 = (ma_uint8*)dst;
-    const float* src_f32 = (const float*)src;
-
-    float ditherMin = 0;
-    float ditherMax = 0;
-    if (ditherMode != ma_dither_mode_none) {
-        ditherMin = 1.0f / -128;
-        ditherMax = 1.0f /  127;
-    }
-
-    for (i = 0; i < count; i += 1) {
-        float x = src_f32[i];
-        x = x + ma_dither_f32(ditherMode, ditherMin, ditherMax);
-        x = ((x < -1) ? -1 : ((x > 1) ? 1 : x));    /* clip */
-        x = x + 1;                                  /* -1..1 to 0..2 */
-        x = x * 127.5f;                             /* 0..2 to 0..255 */
-
-        dst_u8[i] = (ma_uint8)x;
-    }
-}
-
-static MA_INLINE void ma_pcm_f32_to_u8__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_f32_to_u8__reference(dst, src, count, ditherMode);
-}
-
-#if defined(MA_SUPPORT_SSE2)
-static MA_INLINE void ma_pcm_f32_to_u8__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_f32_to_u8__optimized(dst, src, count, ditherMode);
-}
-#endif
-#if defined(MA_SUPPORT_AVX2)
-static MA_INLINE void ma_pcm_f32_to_u8__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_f32_to_u8__optimized(dst, src, count, ditherMode);
-}
-#endif
-#if defined(MA_SUPPORT_NEON)
-static MA_INLINE void ma_pcm_f32_to_u8__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_f32_to_u8__optimized(dst, src, count, ditherMode);
-}
-#endif
-
-MA_API void ma_pcm_f32_to_u8(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-#ifdef MA_USE_REFERENCE_CONVERSION_APIS
-    ma_pcm_f32_to_u8__reference(dst, src, count, ditherMode);
-#else
-    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
-        if (ma_has_avx2()) {
-            ma_pcm_f32_to_u8__avx2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
-        if (ma_has_sse2()) {
-            ma_pcm_f32_to_u8__sse2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
-        if (ma_has_neon()) {
-            ma_pcm_f32_to_u8__neon(dst, src, count, ditherMode);
-        } else
-    #endif
-        {
-            ma_pcm_f32_to_u8__optimized(dst, src, count, ditherMode);
-        }
-#endif
-}
-
-#ifdef MA_USE_REFERENCE_CONVERSION_APIS
-static MA_INLINE void ma_pcm_f32_to_s16__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_uint64 i;
-
-    ma_int16* dst_s16 = (ma_int16*)dst;
-    const float* src_f32 = (const float*)src;
-
-    float ditherMin = 0;
-    float ditherMax = 0;
-    if (ditherMode != ma_dither_mode_none) {
-        ditherMin = 1.0f / -32768;
-        ditherMax = 1.0f /  32767;
-    }
-
-    for (i = 0; i < count; i += 1) {
-        float x = src_f32[i];
-        x = x + ma_dither_f32(ditherMode, ditherMin, ditherMax);
-        x = ((x < -1) ? -1 : ((x > 1) ? 1 : x));    /* clip */
-
-#if 0
-        /* The accurate way. */
-        x = x + 1;                                  /* -1..1 to 0..2 */
-        x = x * 32767.5f;                           /* 0..2 to 0..65535 */
-        x = x - 32768.0f;                           /* 0...65535 to -32768..32767 */
-#else
-        /* The fast way. */
-        x = x * 32767.0f;                           /* -1..1 to -32767..32767 */
-#endif
-
-        dst_s16[i] = (ma_int16)x;
-    }
-}
-#else
-static MA_INLINE void ma_pcm_f32_to_s16__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_uint64 i;
-    ma_uint64 i4;
-    ma_uint64 count4;
-
-    ma_int16* dst_s16 = (ma_int16*)dst;
-    const float* src_f32 = (const float*)src;
-
-    float ditherMin = 0;
-    float ditherMax = 0;
-    if (ditherMode != ma_dither_mode_none) {
-        ditherMin = 1.0f / -32768;
-        ditherMax = 1.0f /  32767;
-    }
-
-    /* Unrolled. */
-    i = 0;
-    count4 = count >> 2;
-    for (i4 = 0; i4 < count4; i4 += 1) {
-        float d0 = ma_dither_f32(ditherMode, ditherMin, ditherMax);
-        float d1 = ma_dither_f32(ditherMode, ditherMin, ditherMax);
-        float d2 = ma_dither_f32(ditherMode, ditherMin, ditherMax);
-        float d3 = ma_dither_f32(ditherMode, ditherMin, ditherMax);
-        
-        float x0 = src_f32[i+0];
-        float x1 = src_f32[i+1];
-        float x2 = src_f32[i+2];
-        float x3 = src_f32[i+3];
-
-        x0 = x0 + d0;
-        x1 = x1 + d1;
-        x2 = x2 + d2;
-        x3 = x3 + d3;
-
-        x0 = ((x0 < -1) ? -1 : ((x0 > 1) ? 1 : x0));
-        x1 = ((x1 < -1) ? -1 : ((x1 > 1) ? 1 : x1));
-        x2 = ((x2 < -1) ? -1 : ((x2 > 1) ? 1 : x2));
-        x3 = ((x3 < -1) ? -1 : ((x3 > 1) ? 1 : x3));
-
-        x0 = x0 * 32767.0f;
-        x1 = x1 * 32767.0f;
-        x2 = x2 * 32767.0f;
-        x3 = x3 * 32767.0f;
-
-        dst_s16[i+0] = (ma_int16)x0;
-        dst_s16[i+1] = (ma_int16)x1;
-        dst_s16[i+2] = (ma_int16)x2;
-        dst_s16[i+3] = (ma_int16)x3;
-
-        i += 4;
-    }
-
-    /* Leftover. */
-    for (; i < count; i += 1) {
-        float x = src_f32[i];
-        x = x + ma_dither_f32(ditherMode, ditherMin, ditherMax);
-        x = ((x < -1) ? -1 : ((x > 1) ? 1 : x));    /* clip */
-        x = x * 32767.0f;                           /* -1..1 to -32767..32767 */
-
-        dst_s16[i] = (ma_int16)x;
-    }
-}
-
-#if defined(MA_SUPPORT_SSE2)
-static MA_INLINE void ma_pcm_f32_to_s16__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_uint64 i;
-    ma_uint64 i8;
-    ma_uint64 count8;
-    ma_int16* dst_s16;
-    const float* src_f32;
-    float ditherMin;
-    float ditherMax;
-
-    /* Both the input and output buffers need to be aligned to 16 bytes. */
-    if ((((ma_uintptr)dst & 15) != 0) || (((ma_uintptr)src & 15) != 0)) {
-        ma_pcm_f32_to_s16__optimized(dst, src, count, ditherMode);
-        return;
-    }
-
-    dst_s16 = (ma_int16*)dst;
-    src_f32 = (const float*)src;
-
-    ditherMin = 0;
-    ditherMax = 0;
-    if (ditherMode != ma_dither_mode_none) {
-        ditherMin = 1.0f / -32768;
-        ditherMax = 1.0f /  32767;
-    }
-
-    i = 0;
-
-    /* SSE2. SSE allows us to output 8 s16's at a time which means our loop is unrolled 8 times. */
-    count8 = count >> 3;
-    for (i8 = 0; i8 < count8; i8 += 1) {
-        __m128 d0;
-        __m128 d1;
-        __m128 x0;
-        __m128 x1;
-
-        if (ditherMode == ma_dither_mode_none) {
-            d0 = _mm_set1_ps(0);
-            d1 = _mm_set1_ps(0);
-        } else if (ditherMode == ma_dither_mode_rectangle) {
-            d0 = _mm_set_ps(
-                ma_dither_f32_rectangle(ditherMin, ditherMax),
-                ma_dither_f32_rectangle(ditherMin, ditherMax),
-                ma_dither_f32_rectangle(ditherMin, ditherMax),
-                ma_dither_f32_rectangle(ditherMin, ditherMax)
-            );
-            d1 = _mm_set_ps(
-                ma_dither_f32_rectangle(ditherMin, ditherMax),
-                ma_dither_f32_rectangle(ditherMin, ditherMax),
-                ma_dither_f32_rectangle(ditherMin, ditherMax),
-                ma_dither_f32_rectangle(ditherMin, ditherMax)
-            );
-        } else {
-            d0 = _mm_set_ps(
-                ma_dither_f32_triangle(ditherMin, ditherMax),
-                ma_dither_f32_triangle(ditherMin, ditherMax),
-                ma_dither_f32_triangle(ditherMin, ditherMax),
-                ma_dither_f32_triangle(ditherMin, ditherMax)
-            );
-            d1 = _mm_set_ps(
-                ma_dither_f32_triangle(ditherMin, ditherMax),
-                ma_dither_f32_triangle(ditherMin, ditherMax),
-                ma_dither_f32_triangle(ditherMin, ditherMax),
-                ma_dither_f32_triangle(ditherMin, ditherMax)
-            );
-        }
-
-        x0 = *((__m128*)(src_f32 + i) + 0);
-        x1 = *((__m128*)(src_f32 + i) + 1);
-
-        x0 = _mm_add_ps(x0, d0);
-        x1 = _mm_add_ps(x1, d1);
-
-        x0 = _mm_mul_ps(x0, _mm_set1_ps(32767.0f));
-        x1 = _mm_mul_ps(x1, _mm_set1_ps(32767.0f));
-
-        _mm_stream_si128(((__m128i*)(dst_s16 + i)), _mm_packs_epi32(_mm_cvttps_epi32(x0), _mm_cvttps_epi32(x1)));
-        
-        i += 8;
-    }
-
-
-    /* Leftover. */
-    for (; i < count; i += 1) {
-        float x = src_f32[i];
-        x = x + ma_dither_f32(ditherMode, ditherMin, ditherMax);
-        x = ((x < -1) ? -1 : ((x > 1) ? 1 : x));    /* clip */
-        x = x * 32767.0f;                           /* -1..1 to -32767..32767 */
-
-        dst_s16[i] = (ma_int16)x;
-    }
-}
-#endif  /* SSE2 */
-
-#if defined(MA_SUPPORT_AVX2)
-static MA_INLINE void ma_pcm_f32_to_s16__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_uint64 i;
-    ma_uint64 i16;
-    ma_uint64 count16;
-    ma_int16* dst_s16;
-    const float* src_f32;
-    float ditherMin;
-    float ditherMax;
-
-    /* Both the input and output buffers need to be aligned to 32 bytes. */
-    if ((((ma_uintptr)dst & 31) != 0) || (((ma_uintptr)src & 31) != 0)) {
-        ma_pcm_f32_to_s16__optimized(dst, src, count, ditherMode);
-        return;
-    }
-
-    dst_s16 = (ma_int16*)dst;
-    src_f32 = (const float*)src;
-
-    ditherMin = 0;
-    ditherMax = 0;
-    if (ditherMode != ma_dither_mode_none) {
-        ditherMin = 1.0f / -32768;
-        ditherMax = 1.0f /  32767;
-    }
-
-    i = 0;
-
-    /* AVX2. AVX2 allows us to output 16 s16's at a time which means our loop is unrolled 16 times. */
-    count16 = count >> 4;
-    for (i16 = 0; i16 < count16; i16 += 1) {
-        __m256 d0;
-        __m256 d1;
-        __m256 x0;
-        __m256 x1;
-        __m256i i0;
-        __m256i i1;
-        __m256i p0;
-        __m256i p1;
-        __m256i r;
-
-        if (ditherMode == ma_dither_mode_none) {
-            d0 = _mm256_set1_ps(0);
-            d1 = _mm256_set1_ps(0);
-        } else if (ditherMode == ma_dither_mode_rectangle) {
-            d0 = _mm256_set_ps(
-                ma_dither_f32_rectangle(ditherMin, ditherMax),
-                ma_dither_f32_rectangle(ditherMin, ditherMax),
-                ma_dither_f32_rectangle(ditherMin, ditherMax),
-                ma_dither_f32_rectangle(ditherMin, ditherMax),
-                ma_dither_f32_rectangle(ditherMin, ditherMax),
-                ma_dither_f32_rectangle(ditherMin, ditherMax),
-                ma_dither_f32_rectangle(ditherMin, ditherMax),
-                ma_dither_f32_rectangle(ditherMin, ditherMax)
-            );
-            d1 = _mm256_set_ps(
-                ma_dither_f32_rectangle(ditherMin, ditherMax),
-                ma_dither_f32_rectangle(ditherMin, ditherMax),
-                ma_dither_f32_rectangle(ditherMin, ditherMax),
-                ma_dither_f32_rectangle(ditherMin, ditherMax),
-                ma_dither_f32_rectangle(ditherMin, ditherMax),
-                ma_dither_f32_rectangle(ditherMin, ditherMax),
-                ma_dither_f32_rectangle(ditherMin, ditherMax),
-                ma_dither_f32_rectangle(ditherMin, ditherMax)
-            );
-        } else {
-            d0 = _mm256_set_ps(
-                ma_dither_f32_triangle(ditherMin, ditherMax),
-                ma_dither_f32_triangle(ditherMin, ditherMax),
-                ma_dither_f32_triangle(ditherMin, ditherMax),
-                ma_dither_f32_triangle(ditherMin, ditherMax),
-                ma_dither_f32_triangle(ditherMin, ditherMax),
-                ma_dither_f32_triangle(ditherMin, ditherMax),
-                ma_dither_f32_triangle(ditherMin, ditherMax),
-                ma_dither_f32_triangle(ditherMin, ditherMax)
-            );
-            d1 = _mm256_set_ps(
-                ma_dither_f32_triangle(ditherMin, ditherMax),
-                ma_dither_f32_triangle(ditherMin, ditherMax),
-                ma_dither_f32_triangle(ditherMin, ditherMax),
-                ma_dither_f32_triangle(ditherMin, ditherMax),
-                ma_dither_f32_triangle(ditherMin, ditherMax),
-                ma_dither_f32_triangle(ditherMin, ditherMax),
-                ma_dither_f32_triangle(ditherMin, ditherMax),
-                ma_dither_f32_triangle(ditherMin, ditherMax)
-            );
-        }
-
-        x0 = *((__m256*)(src_f32 + i) + 0);
-        x1 = *((__m256*)(src_f32 + i) + 1);
-
-        x0 = _mm256_add_ps(x0, d0);
-        x1 = _mm256_add_ps(x1, d1);
-
-        x0 = _mm256_mul_ps(x0, _mm256_set1_ps(32767.0f));
-        x1 = _mm256_mul_ps(x1, _mm256_set1_ps(32767.0f));
-
-        /* Computing the final result is a little more complicated for AVX2 than SSE2. */
-        i0 = _mm256_cvttps_epi32(x0);
-        i1 = _mm256_cvttps_epi32(x1);
-        p0 = _mm256_permute2x128_si256(i0, i1, 0 | 32);
-        p1 = _mm256_permute2x128_si256(i0, i1, 1 | 48);
-        r  = _mm256_packs_epi32(p0, p1);
-
-        _mm256_stream_si256(((__m256i*)(dst_s16 + i)), r);
-
-        i += 16;
-    }
-
-
-    /* Leftover. */
-    for (; i < count; i += 1) {
-        float x = src_f32[i];
-        x = x + ma_dither_f32(ditherMode, ditherMin, ditherMax);
-        x = ((x < -1) ? -1 : ((x > 1) ? 1 : x));    /* clip */
-        x = x * 32767.0f;                           /* -1..1 to -32767..32767 */
-
-        dst_s16[i] = (ma_int16)x;
-    }
-}
-#endif  /* AVX2 */
-
-#if defined(MA_SUPPORT_NEON)
-static MA_INLINE void ma_pcm_f32_to_s16__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_uint64 i;
-    ma_uint64 i8;
-    ma_uint64 count8;
-    ma_int16* dst_s16;
-    const float* src_f32;
-    float ditherMin;
-    float ditherMax;
-
-    if (!ma_has_neon()) {
-        return ma_pcm_f32_to_s16__optimized(dst, src, count, ditherMode);
-    }
-
-    /* Both the input and output buffers need to be aligned to 16 bytes. */
-    if ((((ma_uintptr)dst & 15) != 0) || (((ma_uintptr)src & 15) != 0)) {
-        ma_pcm_f32_to_s16__optimized(dst, src, count, ditherMode);
-        return;
-    }
-
-    dst_s16 = (ma_int16*)dst;
-    src_f32 = (const float*)src;
-
-    ditherMin = 0;
-    ditherMax = 0;
-    if (ditherMode != ma_dither_mode_none) {
-        ditherMin = 1.0f / -32768;
-        ditherMax = 1.0f /  32767;
-    }
-
-    i = 0;
-
-    /* NEON. NEON allows us to output 8 s16's at a time which means our loop is unrolled 8 times. */
-    count8 = count >> 3;
-    for (i8 = 0; i8 < count8; i8 += 1) {
-        float32x4_t d0;
-        float32x4_t d1;
-        float32x4_t x0;
-        float32x4_t x1;
-        int32x4_t i0;
-        int32x4_t i1;
-
-        if (ditherMode == ma_dither_mode_none) {
-            d0 = vmovq_n_f32(0);
-            d1 = vmovq_n_f32(0);
-        } else if (ditherMode == ma_dither_mode_rectangle) {
-            float d0v[4];
-            d0v[0] = ma_dither_f32_rectangle(ditherMin, ditherMax);
-            d0v[1] = ma_dither_f32_rectangle(ditherMin, ditherMax);
-            d0v[2] = ma_dither_f32_rectangle(ditherMin, ditherMax);
-            d0v[3] = ma_dither_f32_rectangle(ditherMin, ditherMax);
-            d0 = vld1q_f32(d0v);
-
-            float d1v[4];
-            d1v[0] = ma_dither_f32_rectangle(ditherMin, ditherMax);
-            d1v[1] = ma_dither_f32_rectangle(ditherMin, ditherMax);
-            d1v[2] = ma_dither_f32_rectangle(ditherMin, ditherMax);
-            d1v[3] = ma_dither_f32_rectangle(ditherMin, ditherMax);
-            d1 = vld1q_f32(d1v);
-        } else {
-            float d0v[4];
-            d0v[0] = ma_dither_f32_triangle(ditherMin, ditherMax);
-            d0v[1] = ma_dither_f32_triangle(ditherMin, ditherMax);
-            d0v[2] = ma_dither_f32_triangle(ditherMin, ditherMax);
-            d0v[3] = ma_dither_f32_triangle(ditherMin, ditherMax);
-            d0 = vld1q_f32(d0v);
-
-            float d1v[4];
-            d1v[0] = ma_dither_f32_triangle(ditherMin, ditherMax);
-            d1v[1] = ma_dither_f32_triangle(ditherMin, ditherMax);
-            d1v[2] = ma_dither_f32_triangle(ditherMin, ditherMax);
-            d1v[3] = ma_dither_f32_triangle(ditherMin, ditherMax);
-            d1 = vld1q_f32(d1v);
-        }
-
-        x0 = *((float32x4_t*)(src_f32 + i) + 0);
-        x1 = *((float32x4_t*)(src_f32 + i) + 1);
-
-        x0 = vaddq_f32(x0, d0);
-        x1 = vaddq_f32(x1, d1);
-
-        x0 = vmulq_n_f32(x0, 32767.0f);
-        x1 = vmulq_n_f32(x1, 32767.0f);
-
-        i0 = vcvtq_s32_f32(x0);
-        i1 = vcvtq_s32_f32(x1);
-        *((int16x8_t*)(dst_s16 + i)) = vcombine_s16(vqmovn_s32(i0), vqmovn_s32(i1));
-
-        i += 8;
-    }
-
-
-    /* Leftover. */
-    for (; i < count; i += 1) {
-        float x = src_f32[i];
-        x = x + ma_dither_f32(ditherMode, ditherMin, ditherMax);
-        x = ((x < -1) ? -1 : ((x > 1) ? 1 : x));    /* clip */
-        x = x * 32767.0f;                           /* -1..1 to -32767..32767 */
-
-        dst_s16[i] = (ma_int16)x;
-    }
-}
-#endif  /* Neon */
-#endif  /* MA_USE_REFERENCE_CONVERSION_APIS */
-
-MA_API void ma_pcm_f32_to_s16(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-#ifdef MA_USE_REFERENCE_CONVERSION_APIS
-    ma_pcm_f32_to_s16__reference(dst, src, count, ditherMode);
-#else
-    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
-        if (ma_has_avx2()) {
-            ma_pcm_f32_to_s16__avx2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
-        if (ma_has_sse2()) {
-            ma_pcm_f32_to_s16__sse2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
-        if (ma_has_neon()) {
-            ma_pcm_f32_to_s16__neon(dst, src, count, ditherMode);
-        } else
-    #endif
-        {
-            ma_pcm_f32_to_s16__optimized(dst, src, count, ditherMode);
-        }
-#endif
-}
-
-
-static MA_INLINE void ma_pcm_f32_to_s24__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_uint8* dst_s24 = (ma_uint8*)dst;
-    const float* src_f32 = (const float*)src;
-
-    ma_uint64 i;
-    for (i = 0; i < count; i += 1) {
-        ma_int32 r;
-        float x = src_f32[i];
-        x = ((x < -1) ? -1 : ((x > 1) ? 1 : x));    /* clip */
-
-#if 0
-        /* The accurate way. */
-        x = x + 1;                                  /* -1..1 to 0..2 */
-        x = x * 8388607.5f;                         /* 0..2 to 0..16777215 */
-        x = x - 8388608.0f;                         /* 0..16777215 to -8388608..8388607 */
-#else
-        /* The fast way. */
-        x = x * 8388607.0f;                         /* -1..1 to -8388607..8388607 */
-#endif
-
-        r = (ma_int32)x;
-        dst_s24[(i*3)+0] = (ma_uint8)((r & 0x0000FF) >>  0);
-        dst_s24[(i*3)+1] = (ma_uint8)((r & 0x00FF00) >>  8);
-        dst_s24[(i*3)+2] = (ma_uint8)((r & 0xFF0000) >> 16);
-    }
-
-    (void)ditherMode;   /* No dithering for f32 -> s24. */
-}
-
-static MA_INLINE void ma_pcm_f32_to_s24__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_f32_to_s24__reference(dst, src, count, ditherMode);
-}
-
-#if defined(MA_SUPPORT_SSE2)
-static MA_INLINE void ma_pcm_f32_to_s24__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_f32_to_s24__optimized(dst, src, count, ditherMode);
-}
-#endif
-#if defined(MA_SUPPORT_AVX2)
-static MA_INLINE void ma_pcm_f32_to_s24__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_f32_to_s24__optimized(dst, src, count, ditherMode);
-}
-#endif
-#if defined(MA_SUPPORT_NEON)
-static MA_INLINE void ma_pcm_f32_to_s24__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_f32_to_s24__optimized(dst, src, count, ditherMode);
-}
-#endif
-
-MA_API void ma_pcm_f32_to_s24(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-#ifdef MA_USE_REFERENCE_CONVERSION_APIS
-    ma_pcm_f32_to_s24__reference(dst, src, count, ditherMode);
-#else
-    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
-        if (ma_has_avx2()) {
-            ma_pcm_f32_to_s24__avx2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
-        if (ma_has_sse2()) {
-            ma_pcm_f32_to_s24__sse2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
-        if (ma_has_neon()) {
-            ma_pcm_f32_to_s24__neon(dst, src, count, ditherMode);
-        } else
-    #endif
-        {
-            ma_pcm_f32_to_s24__optimized(dst, src, count, ditherMode);
-        }
-#endif
-}
-
-
-static MA_INLINE void ma_pcm_f32_to_s32__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_int32* dst_s32 = (ma_int32*)dst;
-    const float* src_f32 = (const float*)src;
-
-    ma_uint32 i;
-    for (i = 0; i < count; i += 1) {
-        double x = src_f32[i];
-        x = ((x < -1) ? -1 : ((x > 1) ? 1 : x));    /* clip */
-
-#if 0
-        /* The accurate way. */
-        x = x + 1;                                  /* -1..1 to 0..2 */
-        x = x * 2147483647.5;                       /* 0..2 to 0..4294967295 */
-        x = x - 2147483648.0;                       /* 0...4294967295 to -2147483648..2147483647 */
-#else
-        /* The fast way. */
-        x = x * 2147483647.0;                       /* -1..1 to -2147483647..2147483647 */
-#endif
-
-        dst_s32[i] = (ma_int32)x;
-    }
-
-    (void)ditherMode;   /* No dithering for f32 -> s32. */
-}
-
-static MA_INLINE void ma_pcm_f32_to_s32__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_f32_to_s32__reference(dst, src, count, ditherMode);
-}
-
-#if defined(MA_SUPPORT_SSE2)
-static MA_INLINE void ma_pcm_f32_to_s32__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_f32_to_s32__optimized(dst, src, count, ditherMode);
-}
-#endif
-#if defined(MA_SUPPORT_AVX2)
-static MA_INLINE void ma_pcm_f32_to_s32__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_f32_to_s32__optimized(dst, src, count, ditherMode);
-}
-#endif
-#if defined(MA_SUPPORT_NEON)
-static MA_INLINE void ma_pcm_f32_to_s32__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    ma_pcm_f32_to_s32__optimized(dst, src, count, ditherMode);
-}
-#endif
-
-MA_API void ma_pcm_f32_to_s32(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-#ifdef MA_USE_REFERENCE_CONVERSION_APIS
-    ma_pcm_f32_to_s32__reference(dst, src, count, ditherMode);
-#else
-    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
-        if (ma_has_avx2()) {
-            ma_pcm_f32_to_s32__avx2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
-        if (ma_has_sse2()) {
-            ma_pcm_f32_to_s32__sse2(dst, src, count, ditherMode);
-        } else
-    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
-        if (ma_has_neon()) {
-            ma_pcm_f32_to_s32__neon(dst, src, count, ditherMode);
-        } else
-    #endif
-        {
-            ma_pcm_f32_to_s32__optimized(dst, src, count, ditherMode);
-        }
-#endif
-}
-
-
-MA_API void ma_pcm_f32_to_f32(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
-{
-    (void)ditherMode;
-
-    ma_copy_memory_64(dst, src, count * sizeof(float));
-}
-
-
-static void ma_pcm_interleave_f32__reference(void* dst, const void** src, ma_uint64 frameCount, ma_uint32 channels)
-{
-    float* dst_f32 = (float*)dst;
-    const float** src_f32 = (const float**)src;
-
-    ma_uint64 iFrame;
-    for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
-        ma_uint32 iChannel;
-        for (iChannel = 0; iChannel < channels; iChannel += 1) {
-            dst_f32[iFrame*channels + iChannel] = src_f32[iChannel][iFrame];
-        }
-    }
-}
-
-static void ma_pcm_interleave_f32__optimized(void* dst, const void** src, ma_uint64 frameCount, ma_uint32 channels)
-{
-    ma_pcm_interleave_f32__reference(dst, src, frameCount, channels);
-}
-
-MA_API void ma_pcm_interleave_f32(void* dst, const void** src, ma_uint64 frameCount, ma_uint32 channels)
-{
-#ifdef MA_USE_REFERENCE_CONVERSION_APIS
-    ma_pcm_interleave_f32__reference(dst, src, frameCount, channels);
-#else
-    ma_pcm_interleave_f32__optimized(dst, src, frameCount, channels);
-#endif
-}
-
-
-static void ma_pcm_deinterleave_f32__reference(void** dst, const void* src, ma_uint64 frameCount, ma_uint32 channels)
-{
-    float** dst_f32 = (float**)dst;
-    const float* src_f32 = (const float*)src;
-
-    ma_uint64 iFrame;
-    for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
-        ma_uint32 iChannel;
-        for (iChannel = 0; iChannel < channels; iChannel += 1) {
-            dst_f32[iChannel][iFrame] = src_f32[iFrame*channels + iChannel];
-        }
-    }
-}
-
-static void ma_pcm_deinterleave_f32__optimized(void** dst, const void* src, ma_uint64 frameCount, ma_uint32 channels)
-{
-    ma_pcm_deinterleave_f32__reference(dst, src, frameCount, channels);
-}
-
-MA_API void ma_pcm_deinterleave_f32(void** dst, const void* src, ma_uint64 frameCount, ma_uint32 channels)
-{
-#ifdef MA_USE_REFERENCE_CONVERSION_APIS
-    ma_pcm_deinterleave_f32__reference(dst, src, frameCount, channels);
-#else
-    ma_pcm_deinterleave_f32__optimized(dst, src, frameCount, channels);
-#endif
-}
-
-
-MA_API void ma_pcm_convert(void* pOut, ma_format formatOut, const void* pIn, ma_format formatIn, ma_uint64 sampleCount, ma_dither_mode ditherMode)
-{
-    if (formatOut == formatIn) {
-        ma_copy_memory_64(pOut, pIn, sampleCount * ma_get_bytes_per_sample(formatOut));
-        return;
-    }
-
-    switch (formatIn)
-    {
-        case ma_format_u8:
-        {
-            switch (formatOut)
-            {
-                case ma_format_s16: ma_pcm_u8_to_s16(pOut, pIn, sampleCount, ditherMode); return;
-                case ma_format_s24: ma_pcm_u8_to_s24(pOut, pIn, sampleCount, ditherMode); return;
-                case ma_format_s32: ma_pcm_u8_to_s32(pOut, pIn, sampleCount, ditherMode); return;
-                case ma_format_f32: ma_pcm_u8_to_f32(pOut, pIn, sampleCount, ditherMode); return;
-                default: break;
-            }
-        } break;
-
-        case ma_format_s16:
-        {
-            switch (formatOut)
-            {
-                case ma_format_u8:  ma_pcm_s16_to_u8( pOut, pIn, sampleCount, ditherMode); return;
-                case ma_format_s24: ma_pcm_s16_to_s24(pOut, pIn, sampleCount, ditherMode); return;
-                case ma_format_s32: ma_pcm_s16_to_s32(pOut, pIn, sampleCount, ditherMode); return;
-                case ma_format_f32: ma_pcm_s16_to_f32(pOut, pIn, sampleCount, ditherMode); return;
-                default: break;
-            }
-        } break;
-
-        case ma_format_s24:
-        {
-            switch (formatOut)
-            {
-                case ma_format_u8:  ma_pcm_s24_to_u8( pOut, pIn, sampleCount, ditherMode); return;
-                case ma_format_s16: ma_pcm_s24_to_s16(pOut, pIn, sampleCount, ditherMode); return;
-                case ma_format_s32: ma_pcm_s24_to_s32(pOut, pIn, sampleCount, ditherMode); return;
-                case ma_format_f32: ma_pcm_s24_to_f32(pOut, pIn, sampleCount, ditherMode); return;
-                default: break;
-            }
-        } break;
-
-        case ma_format_s32:
-        {
-            switch (formatOut)
-            {
-                case ma_format_u8:  ma_pcm_s32_to_u8( pOut, pIn, sampleCount, ditherMode); return;
-                case ma_format_s16: ma_pcm_s32_to_s16(pOut, pIn, sampleCount, ditherMode); return;
-                case ma_format_s24: ma_pcm_s32_to_s24(pOut, pIn, sampleCount, ditherMode); return;
-                case ma_format_f32: ma_pcm_s32_to_f32(pOut, pIn, sampleCount, ditherMode); return;
-                default: break;
-            }
-        } break;
-
-        case ma_format_f32:
-        {
-            switch (formatOut)
-            {
-                case ma_format_u8:  ma_pcm_f32_to_u8( pOut, pIn, sampleCount, ditherMode); return;
-                case ma_format_s16: ma_pcm_f32_to_s16(pOut, pIn, sampleCount, ditherMode); return;
-                case ma_format_s24: ma_pcm_f32_to_s24(pOut, pIn, sampleCount, ditherMode); return;
-                case ma_format_s32: ma_pcm_f32_to_s32(pOut, pIn, sampleCount, ditherMode); return;
-                default: break;
-            }
-        } break;
-
-        default: break;
-    }
-}
-
-MA_API void ma_convert_pcm_frames_format(void* pOut, ma_format formatOut, const void* pIn, ma_format formatIn, ma_uint64 frameCount, ma_uint32 channels, ma_dither_mode ditherMode)
-{
-    ma_pcm_convert(pOut, formatOut, pIn, formatIn, frameCount * channels, ditherMode);
-}
-
-MA_API void ma_deinterleave_pcm_frames(ma_format format, ma_uint32 channels, ma_uint64 frameCount, const void* pInterleavedPCMFrames, void** ppDeinterleavedPCMFrames)
-{
-    if (pInterleavedPCMFrames == NULL || ppDeinterleavedPCMFrames == NULL) {
-        return; /* Invalid args. */
-    }
-
-    /* For efficiency we do this per format. */
-    switch (format) {
-        case ma_format_s16:
-        {
-            const ma_int16* pSrcS16 = (const ma_int16*)pInterleavedPCMFrames;
-            ma_uint64 iPCMFrame;
-            for (iPCMFrame = 0; iPCMFrame < frameCount; ++iPCMFrame) {
-                ma_uint32 iChannel;
-                for (iChannel = 0; iChannel < channels; ++iChannel) {
-                    ma_int16* pDstS16 = (ma_int16*)ppDeinterleavedPCMFrames[iChannel];
-                    pDstS16[iPCMFrame] = pSrcS16[iPCMFrame*channels+iChannel];
-                }
-            }
-        } break;
-        
-        case ma_format_f32:
-        {
-            const float* pSrcF32 = (const float*)pInterleavedPCMFrames;
-            ma_uint64 iPCMFrame;
-            for (iPCMFrame = 0; iPCMFrame < frameCount; ++iPCMFrame) {
-                ma_uint32 iChannel;
-                for (iChannel = 0; iChannel < channels; ++iChannel) {
-                    float* pDstF32 = (float*)ppDeinterleavedPCMFrames[iChannel];
-                    pDstF32[iPCMFrame] = pSrcF32[iPCMFrame*channels+iChannel];
-                }
-            }
-        } break;
-        
-        default:
-        {
-            ma_uint32 sampleSizeInBytes = ma_get_bytes_per_sample(format);
-            ma_uint64 iPCMFrame;
-            for (iPCMFrame = 0; iPCMFrame < frameCount; ++iPCMFrame) {
-                ma_uint32 iChannel;
-                for (iChannel = 0; iChannel < channels; ++iChannel) {
-                          void* pDst = ma_offset_ptr(ppDeinterleavedPCMFrames[iChannel], iPCMFrame*sampleSizeInBytes);
-                    const void* pSrc = ma_offset_ptr(pInterleavedPCMFrames, (iPCMFrame*channels+iChannel)*sampleSizeInBytes);
-                    memcpy(pDst, pSrc, sampleSizeInBytes);
-                }
-            }
-        } break;
-    }
-}
-
-MA_API void ma_interleave_pcm_frames(ma_format format, ma_uint32 channels, ma_uint64 frameCount, const void** ppDeinterleavedPCMFrames, void* pInterleavedPCMFrames)
-{
-    switch (format)
-    {
-        case ma_format_s16:
-        {
-            ma_int16* pDstS16 = (ma_int16*)pInterleavedPCMFrames;
-            ma_uint64 iPCMFrame;
-            for (iPCMFrame = 0; iPCMFrame < frameCount; ++iPCMFrame) {
-                ma_uint32 iChannel;
-                for (iChannel = 0; iChannel < channels; ++iChannel) {
-                    const ma_int16* pSrcS16 = (const ma_int16*)ppDeinterleavedPCMFrames[iChannel];
-                    pDstS16[iPCMFrame*channels+iChannel] = pSrcS16[iPCMFrame];
-                }
-            }
-        } break;
-        
-        case ma_format_f32:
-        {
-            float* pDstF32 = (float*)pInterleavedPCMFrames;
-            ma_uint64 iPCMFrame;
-            for (iPCMFrame = 0; iPCMFrame < frameCount; ++iPCMFrame) {
-                ma_uint32 iChannel;
-                for (iChannel = 0; iChannel < channels; ++iChannel) {
-                    const float* pSrcF32 = (const float*)ppDeinterleavedPCMFrames[iChannel];
-                    pDstF32[iPCMFrame*channels+iChannel] = pSrcF32[iPCMFrame];
-                }
-            }
-        } break;
-    
-        default:
-        {
-            ma_uint32 sampleSizeInBytes = ma_get_bytes_per_sample(format);
-            ma_uint64 iPCMFrame;
-            for (iPCMFrame = 0; iPCMFrame < frameCount; ++iPCMFrame) {
-                ma_uint32 iChannel;
-                for (iChannel = 0; iChannel < channels; ++iChannel) {
-                          void* pDst = ma_offset_ptr(pInterleavedPCMFrames, (iPCMFrame*channels+iChannel)*sampleSizeInBytes);
-                    const void* pSrc = ma_offset_ptr(ppDeinterleavedPCMFrames[iChannel], iPCMFrame*sampleSizeInBytes);
-                    memcpy(pDst, pSrc, sampleSizeInBytes);
-                }
-            }
-        } break;
-    }
-}
-
-
-/**************************************************************************************************************************************************************
-
 Biquad Filter
 
 **************************************************************************************************************************************************************/
@@ -36674,7 +34060,7 @@ MA_API ma_channel_converter_config ma_channel_converter_config_init(ma_format fo
     return config;
 }
 
-static ma_int32 ma_channel_converter_float_to_fixed(float x)
+static ma_int32 ma_channel_converter_float_to_fp(float x)
 {
     return (ma_int32)(x * (1<<MA_CHANNEL_CONVERTER_FIXED_POINT_SHIFT));
 }
@@ -36718,6 +34104,10 @@ MA_API ma_result ma_channel_converter_init(const ma_channel_converter_config* pC
         return MA_INVALID_ARGS; /* Invalid output channel map. */
     }
 
+    if (pConfig->format != ma_format_s16 && pConfig->format != ma_format_f32) {
+        return MA_INVALID_ARGS; /* Invalid format. */
+    }
+
     pConverter->format      = pConfig->format;
     pConverter->channelsIn  = pConfig->channelsIn;
     pConverter->channelsOut = pConfig->channelsOut;
@@ -36727,10 +34117,10 @@ MA_API ma_result ma_channel_converter_init(const ma_channel_converter_config* pC
 
     for (iChannelIn = 0; iChannelIn < pConverter->channelsIn; iChannelIn += 1) {
         for (iChannelOut = 0; iChannelOut < pConverter->channelsOut; ++iChannelOut) {
-            if (pConverter->format == ma_format_f32) {
+            if (pConverter->format == ma_format_s16) {
                 pConverter->weights.f32[iChannelIn][iChannelOut] = pConfig->weights[iChannelIn][iChannelOut];
             } else {
-                pConverter->weights.s16[iChannelIn][iChannelOut] = ma_channel_converter_float_to_fixed(pConfig->weights[iChannelIn][iChannelOut]);
+                pConverter->weights.s16[iChannelIn][iChannelOut] = ma_channel_converter_float_to_fp(pConfig->weights[iChannelIn][iChannelOut]);
             }
         }
     }
@@ -36837,10 +34227,10 @@ MA_API ma_result ma_channel_converter_init(const ma_channel_converter_config* pC
             ma_channel channelPosOut = pConverter->channelMapOut[iChannelOut];
 
             if (channelPosIn == channelPosOut) {
-                if (pConverter->format == ma_format_f32) {
-                    pConverter->weights.f32[iChannelIn][iChannelOut] = 1;
-                } else {
+                if (pConverter->format == ma_format_s16) {
                     pConverter->weights.s16[iChannelIn][iChannelOut] = (1 << MA_CHANNEL_CONVERTER_FIXED_POINT_SHIFT);
+                } else {
+                    pConverter->weights.f32[iChannelIn][iChannelOut] = 1;
                 }
             }
         }
@@ -36858,10 +34248,10 @@ MA_API ma_result ma_channel_converter_init(const ma_channel_converter_config* pC
                 ma_channel channelPosOut = pConverter->channelMapOut[iChannelOut];
 
                 if (channelPosOut != MA_CHANNEL_NONE && channelPosOut != MA_CHANNEL_MONO && channelPosOut != MA_CHANNEL_LFE) {
-                    if (pConverter->format == ma_format_f32) {
-                        pConverter->weights.f32[iChannelIn][iChannelOut] = 1;
-                    } else {
+                    if (pConverter->format == ma_format_s16) {
                         pConverter->weights.s16[iChannelIn][iChannelOut] = (1 << MA_CHANNEL_CONVERTER_FIXED_POINT_SHIFT);
+                    } else {
+                        pConverter->weights.f32[iChannelIn][iChannelOut] = 1;
                     }
                 }
             }
@@ -36890,10 +34280,10 @@ MA_API ma_result ma_channel_converter_init(const ma_channel_converter_config* pC
                         ma_channel channelPosIn = pConverter->channelMapIn[iChannelIn];
 
                         if (channelPosIn != MA_CHANNEL_NONE && channelPosIn != MA_CHANNEL_MONO && channelPosIn != MA_CHANNEL_LFE) {
-                            if (pConverter->format == ma_format_f32) {
-                                pConverter->weights.f32[iChannelIn][iChannelOut] = monoWeight;
+                            if (pConverter->format == ma_format_s16) {
+                                pConverter->weights.s16[iChannelIn][iChannelOut] = ma_channel_converter_float_to_fp(monoWeight);
                             } else {
-                                pConverter->weights.s16[iChannelIn][iChannelOut] = ma_channel_converter_float_to_fixed(monoWeight);
+                                pConverter->weights.f32[iChannelIn][iChannelOut] = monoWeight;
                             }
                         }
                     }
@@ -36924,13 +34314,13 @@ MA_API ma_result ma_channel_converter_init(const ma_channel_converter_config* pC
                                 }
 
                                 /* Only apply the weight if we haven't already got some contribution from the respective channels. */
-                                if (pConverter->format == ma_format_f32) {
-                                    if (pConverter->weights.f32[iChannelIn][iChannelOut] == 0) {
-                                        pConverter->weights.f32[iChannelIn][iChannelOut] = weight;
+                                if (pConverter->format == ma_format_s16) {
+                                    if (pConverter->weights.s16[iChannelIn][iChannelOut] == 0) {
+                                        pConverter->weights.s16[iChannelIn][iChannelOut] = ma_channel_converter_float_to_fp(weight);
                                     }
                                 } else {
-                                    if (pConverter->weights.s16[iChannelIn][iChannelOut] == 0) {
-                                        pConverter->weights.s16[iChannelIn][iChannelOut] = ma_channel_converter_float_to_fixed(weight);
+                                    if (pConverter->weights.f32[iChannelIn][iChannelOut] == 0) {
+                                        pConverter->weights.f32[iChannelIn][iChannelOut] = weight;
                                     }
                                 }
                             }
@@ -36955,13 +34345,13 @@ MA_API ma_result ma_channel_converter_init(const ma_channel_converter_config* pC
                                 }
 
                                 /* Only apply the weight if we haven't already got some contribution from the respective channels. */
-                                if (pConverter->format == ma_format_f32) {
-                                    if (pConverter->weights.f32[iChannelIn][iChannelOut] == 0) {
-                                        pConverter->weights.f32[iChannelIn][iChannelOut] = weight;
+                                if (pConverter->format == ma_format_s16) {
+                                    if (pConverter->weights.s16[iChannelIn][iChannelOut] == 0) {
+                                        pConverter->weights.s16[iChannelIn][iChannelOut] = ma_channel_converter_float_to_fp(weight);
                                     }
                                 } else {
-                                    if (pConverter->weights.s16[iChannelIn][iChannelOut] == 0) {
-                                        pConverter->weights.s16[iChannelIn][iChannelOut] = ma_channel_converter_float_to_fixed(weight);
+                                    if (pConverter->weights.f32[iChannelIn][iChannelOut] == 0) {
+                                        pConverter->weights.f32[iChannelIn][iChannelOut] = weight;
                                     }
                                 }
                             }
@@ -37010,87 +34400,24 @@ static ma_result ma_channel_converter_process_pcm_frames__simple_shuffle(ma_chan
     MA_ASSERT(pFramesIn  != NULL);
     MA_ASSERT(pConverter->channelsIn == pConverter->channelsOut);
 
-    switch (pConverter->format)
-    {
-        case ma_format_u8:
-        {
-            /* */ ma_uint8* pFramesOutU8 = (      ma_uint8*)pFramesOut;
-            const ma_uint8* pFramesInU8  = (const ma_uint8*)pFramesIn;
+    if (pConverter->format == ma_format_s16) {
+        /* */ ma_int16* pFramesOutS16 = (      ma_int16*)pFramesOut;
+        const ma_int16* pFramesInS16  = (const ma_int16*)pFramesIn;
 
-            for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
-                for (iChannelIn = 0; iChannelIn < pConverter->channelsIn; ++iChannelIn) {
-                    pFramesOutU8[pConverter->shuffleTable[iChannelIn]] = pFramesInU8[iChannelIn];
-                }
-
-                pFramesOutU8 += pConverter->channelsOut;
-                pFramesInU8  += pConverter->channelsIn;
+        for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
+            for (iChannelIn = 0; iChannelIn < pConverter->channelsIn; ++iChannelIn) {
+                pFramesOutS16[pConverter->shuffleTable[iChannelIn]] = pFramesInS16[iChannelIn];
             }
-        } break;
+        }
+    } else {
+        /* */ float* pFramesOutF32 = (      float*)pFramesOut;
+        const float* pFramesInF32  = (const float*)pFramesIn;
 
-        case ma_format_s16:
-        {
-            /* */ ma_int16* pFramesOutS16 = (      ma_int16*)pFramesOut;
-            const ma_int16* pFramesInS16  = (const ma_int16*)pFramesIn;
-
-            for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
-                for (iChannelIn = 0; iChannelIn < pConverter->channelsIn; ++iChannelIn) {
-                    pFramesOutS16[pConverter->shuffleTable[iChannelIn]] = pFramesInS16[iChannelIn];
-                }
-
-                pFramesOutS16 += pConverter->channelsOut;
-                pFramesInS16  += pConverter->channelsIn;
+        for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
+            for (iChannelIn = 0; iChannelIn < pConverter->channelsIn; ++iChannelIn) {
+                pFramesOutF32[pConverter->shuffleTable[iChannelIn]] = pFramesInF32[iChannelIn];
             }
-        } break;
-
-        case ma_format_s24:
-        {
-            /* */ ma_uint8* pFramesOutS24 = (      ma_uint8*)pFramesOut;
-            const ma_uint8* pFramesInS24  = (const ma_uint8*)pFramesIn;
-
-            for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
-                for (iChannelIn = 0; iChannelIn < pConverter->channelsIn; ++iChannelIn) {
-                    ma_uint32 iChannelOut = pConverter->shuffleTable[iChannelIn];
-                    pFramesOutS24[iChannelOut*3 + 0] = pFramesInS24[iChannelIn*3 + 0];
-                    pFramesOutS24[iChannelOut*3 + 1] = pFramesInS24[iChannelIn*3 + 1];
-                    pFramesOutS24[iChannelOut*3 + 2] = pFramesInS24[iChannelIn*3 + 2];
-                }
-
-                pFramesOutS24 += pConverter->channelsOut*3;
-                pFramesInS24  += pConverter->channelsIn*3;
-            }
-        } break;
-
-        case ma_format_s32:
-        {
-            /* */ ma_int32* pFramesOutS32 = (      ma_int32*)pFramesOut;
-            const ma_int32* pFramesInS32  = (const ma_int32*)pFramesIn;
-
-            for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
-                for (iChannelIn = 0; iChannelIn < pConverter->channelsIn; ++iChannelIn) {
-                    pFramesOutS32[pConverter->shuffleTable[iChannelIn]] = pFramesInS32[iChannelIn];
-                }
-
-                pFramesOutS32 += pConverter->channelsOut;
-                pFramesInS32  += pConverter->channelsIn;
-            }
-        } break;
-        
-        case ma_format_f32:
-        {
-            /* */ float* pFramesOutF32 = (      float*)pFramesOut;
-            const float* pFramesInF32  = (const float*)pFramesIn;
-
-            for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
-                for (iChannelIn = 0; iChannelIn < pConverter->channelsIn; ++iChannelIn) {
-                    pFramesOutF32[pConverter->shuffleTable[iChannelIn]] = pFramesInF32[iChannelIn];
-                }
-
-                pFramesOutF32 += pConverter->channelsOut;
-                pFramesInF32  += pConverter->channelsIn;
-            }
-        } break;
-
-        default: return MA_INVALID_OPERATION;   /* Unknown format. */
+        }
     }
 
     return MA_SUCCESS;
@@ -37103,94 +34430,41 @@ static ma_result ma_channel_converter_process_pcm_frames__simple_mono_expansion(
     MA_ASSERT(pConverter != NULL);
     MA_ASSERT(pFramesOut != NULL);
     MA_ASSERT(pFramesIn  != NULL);
-    MA_ASSERT(pConverter->channelsIn == 1);
 
-    switch (pConverter->format)
-    {
-        case ma_format_u8:
-        {
-            /* */ ma_uint8* pFramesOutU8 = (      ma_uint8*)pFramesOut;
-            const ma_uint8* pFramesInU8  = (const ma_uint8*)pFramesIn;
+    if (pConverter->format == ma_format_s16) {
+        /* */ ma_int16* pFramesOutS16 = (      ma_int16*)pFramesOut;
+        const ma_int16* pFramesInS16  = (const ma_int16*)pFramesIn;
 
+        if (pConverter->channelsOut == 2) {
+            for (iFrame = 0; iFrame < frameCount; ++iFrame) {
+                pFramesOutS16[iFrame*2 + 0] = pFramesInS16[iFrame];
+                pFramesOutS16[iFrame*2 + 1] = pFramesInS16[iFrame];
+            }
+        } else {
             for (iFrame = 0; iFrame < frameCount; ++iFrame) {
                 ma_uint32 iChannel;
                 for (iChannel = 0; iChannel < pConverter->channelsOut; iChannel += 1) {
-                    pFramesOutU8[iFrame*pConverter->channelsOut + iChannel] = pFramesInU8[iFrame];
+                    pFramesOutS16[iFrame*pConverter->channelsOut + iChannel] = pFramesInS16[iFrame];
                 }
             }
-        } break;
+        }
+    } else {
+        /* */ float* pFramesOutF32 = (      float*)pFramesOut;
+        const float* pFramesInF32  = (const float*)pFramesIn;
 
-        case ma_format_s16:
-        {
-            /* */ ma_int16* pFramesOutS16 = (      ma_int16*)pFramesOut;
-            const ma_int16* pFramesInS16  = (const ma_int16*)pFramesIn;
-
-            if (pConverter->channelsOut == 2) {
-                for (iFrame = 0; iFrame < frameCount; ++iFrame) {
-                    pFramesOutS16[iFrame*2 + 0] = pFramesInS16[iFrame];
-                    pFramesOutS16[iFrame*2 + 1] = pFramesInS16[iFrame];
-                }
-            } else {
-                for (iFrame = 0; iFrame < frameCount; ++iFrame) {
-                    ma_uint32 iChannel;
-                    for (iChannel = 0; iChannel < pConverter->channelsOut; iChannel += 1) {
-                        pFramesOutS16[iFrame*pConverter->channelsOut + iChannel] = pFramesInS16[iFrame];
-                    }
-                }
+        if (pConverter->channelsOut == 2) {
+            for (iFrame = 0; iFrame < frameCount; ++iFrame) {
+                pFramesOutF32[iFrame*2 + 0] = pFramesInF32[iFrame];
+                pFramesOutF32[iFrame*2 + 1] = pFramesInF32[iFrame];
             }
-        } break;
-
-        case ma_format_s24:
-        {
-            /* */ ma_uint8* pFramesOutS24 = (      ma_uint8*)pFramesOut;
-            const ma_uint8* pFramesInS24  = (const ma_uint8*)pFramesIn;
-
+        } else {
             for (iFrame = 0; iFrame < frameCount; ++iFrame) {
                 ma_uint32 iChannel;
                 for (iChannel = 0; iChannel < pConverter->channelsOut; iChannel += 1) {
-                    ma_uint64 iSampleOut = iFrame*pConverter->channelsOut + iChannel;
-                    ma_uint64 iSampleIn  = iFrame;
-                    pFramesOutS24[iSampleOut*3 + 0] = pFramesInS24[iSampleIn*3 + 0];
-                    pFramesOutS24[iSampleOut*3 + 1] = pFramesInS24[iSampleIn*3 + 1];
-                    pFramesOutS24[iSampleOut*3 + 2] = pFramesInS24[iSampleIn*3 + 2];
+                    pFramesOutF32[iFrame*pConverter->channelsOut + iChannel] = pFramesInF32[iFrame];
                 }
             }
-        } break;
-
-        case ma_format_s32:
-        {
-            /* */ ma_int32* pFramesOutS32 = (      ma_int32*)pFramesOut;
-            const ma_int32* pFramesInS32  = (const ma_int32*)pFramesIn;
-
-            for (iFrame = 0; iFrame < frameCount; ++iFrame) {
-                ma_uint32 iChannel;
-                for (iChannel = 0; iChannel < pConverter->channelsOut; iChannel += 1) {
-                    pFramesOutS32[iFrame*pConverter->channelsOut + iChannel] = pFramesInS32[iFrame];
-                }
-            }
-        } break;
-        
-        case ma_format_f32:
-        {
-            /* */ float* pFramesOutF32 = (      float*)pFramesOut;
-            const float* pFramesInF32  = (const float*)pFramesIn;
-
-            if (pConverter->channelsOut == 2) {
-                for (iFrame = 0; iFrame < frameCount; ++iFrame) {
-                    pFramesOutF32[iFrame*2 + 0] = pFramesInF32[iFrame];
-                    pFramesOutF32[iFrame*2 + 1] = pFramesInF32[iFrame];
-                }
-            } else {
-                for (iFrame = 0; iFrame < frameCount; ++iFrame) {
-                    ma_uint32 iChannel;
-                    for (iChannel = 0; iChannel < pConverter->channelsOut; iChannel += 1) {
-                        pFramesOutF32[iFrame*pConverter->channelsOut + iChannel] = pFramesInF32[iFrame];
-                    }
-                }
-            }
-        } break;
-
-        default: return MA_INVALID_OPERATION;   /* Unknown format. */
+        }
     }
 
     return MA_SUCCESS;
@@ -37206,61 +34480,20 @@ static ma_result ma_channel_converter_process_pcm_frames__stereo_to_mono(ma_chan
     MA_ASSERT(pConverter->channelsIn  == 2);
     MA_ASSERT(pConverter->channelsOut == 1);
 
-    switch (pConverter->format)
-    {
-        case ma_format_u8:
-        {
-            /* */ ma_uint8* pFramesOutU8 = (      ma_uint8*)pFramesOut;
-            const ma_uint8* pFramesInU8  = (const ma_uint8*)pFramesIn;
+    if (pConverter->format == ma_format_s16) {
+        /* */ ma_int16* pFramesOutS16 = (      ma_int16*)pFramesOut;
+        const ma_int16* pFramesInS16  = (const ma_int16*)pFramesIn;
 
-            for (iFrame = 0; iFrame < frameCount; ++iFrame) {
-                pFramesOutU8[iFrame] = ma_clip_u8((ma_pcm_sample_u8_to_s16_no_scale(pFramesInU8[iFrame*2+0]) + ma_pcm_sample_u8_to_s16_no_scale(pFramesInU8[iFrame*2+1])) / 2);
-            }
-        } break;
+        for (iFrame = 0; iFrame < frameCount; ++iFrame) {
+            pFramesOutS16[iFrame] = (ma_int16)(((ma_int32)pFramesInS16[iFrame*2+0] + (ma_int32)pFramesInS16[iFrame*2+1]) / 2);
+        }
+    } else {
+        /* */ float* pFramesOutF32 = (      float*)pFramesOut;
+        const float* pFramesInF32  = (const float*)pFramesIn;
 
-        case ma_format_s16:
-        {
-            /* */ ma_int16* pFramesOutS16 = (      ma_int16*)pFramesOut;
-            const ma_int16* pFramesInS16  = (const ma_int16*)pFramesIn;
-
-            for (iFrame = 0; iFrame < frameCount; ++iFrame) {
-                pFramesOutS16[iFrame] = (ma_int16)(((ma_int32)pFramesInS16[iFrame*2+0] + (ma_int32)pFramesInS16[iFrame*2+1]) / 2);
-            }
-        } break;
-
-        case ma_format_s24:
-        {
-            /* */ ma_uint8* pFramesOutS24 = (      ma_uint8*)pFramesOut;
-            const ma_uint8* pFramesInS24  = (const ma_uint8*)pFramesIn;
-
-            for (iFrame = 0; iFrame < frameCount; ++iFrame) {
-                ma_int64 s24_0 = ma_pcm_sample_s24_to_s32_no_scale(&pFramesInS24[(iFrame*2+0)*3]);
-                ma_int64 s24_1 = ma_pcm_sample_s24_to_s32_no_scale(&pFramesInS24[(iFrame*2+1)*3]);
-                ma_pcm_sample_s32_to_s24_no_scale((s24_0 + s24_1) / 2, &pFramesOutS24[iFrame*3]);
-            }
-        } break;
-
-        case ma_format_s32:
-        {
-            /* */ ma_int32* pFramesOutS32 = (      ma_int32*)pFramesOut;
-            const ma_int32* pFramesInS32  = (const ma_int32*)pFramesIn;
-
-            for (iFrame = 0; iFrame < frameCount; ++iFrame) {
-                pFramesOutS32[iFrame] = (ma_int16)(((ma_int32)pFramesInS32[iFrame*2+0] + (ma_int32)pFramesInS32[iFrame*2+1]) / 2);
-            }
-        } break;
-        
-        case ma_format_f32:
-        {
-            /* */ float* pFramesOutF32 = (      float*)pFramesOut;
-            const float* pFramesInF32  = (const float*)pFramesIn;
-
-            for (iFrame = 0; iFrame < frameCount; ++iFrame) {
-                pFramesOutF32[iFrame] = (pFramesInF32[iFrame*2+0] + pFramesInF32[iFrame*2+0]) * 0.5f;
-            }
-        } break;
-
-        default: return MA_INVALID_OPERATION;   /* Unknown format. */
+        for (iFrame = 0; iFrame < frameCount; ++iFrame) {
+            pFramesOutF32[iFrame] = (pFramesInF32[iFrame*2+0] + pFramesInF32[iFrame*2+0]) * 0.5f;
+        }
     }
 
     return MA_SUCCESS;
@@ -37282,93 +34515,33 @@ static ma_result ma_channel_converter_process_pcm_frames__weights(ma_channel_con
     ma_zero_memory_64(pFramesOut, frameCount * ma_get_bytes_per_frame(pConverter->format, pConverter->channelsOut));
 
     /* Accumulate. */
-    switch (pConverter->format)
-    {
-        case ma_format_u8:
-        {
-            /* */ ma_uint8* pFramesOutU8 = (      ma_uint8*)pFramesOut;
-            const ma_uint8* pFramesInU8  = (const ma_uint8*)pFramesIn;
+    if (pConverter->format == ma_format_s16) {
+        /* */ ma_int16* pFramesOutS16 = (      ma_int16*)pFramesOut;
+        const ma_int16* pFramesInS16  = (const ma_int16*)pFramesIn;
 
-            for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
-                for (iChannelIn = 0; iChannelIn < pConverter->channelsIn; ++iChannelIn) {
-                    for (iChannelOut = 0; iChannelOut < pConverter->channelsOut; ++iChannelOut) {
-                        ma_int16 u8_O = ma_pcm_sample_u8_to_s16_no_scale(pFramesOutU8[iFrame*pConverter->channelsOut + iChannelOut]);
-                        ma_int16 u8_I = ma_pcm_sample_u8_to_s16_no_scale(pFramesInU8 [iFrame*pConverter->channelsIn  + iChannelIn ]);
-                        ma_int32 s    = (ma_int32)ma_clamp(u8_O + ((u8_I * pConverter->weights.s16[iChannelIn][iChannelOut]) >> MA_CHANNEL_CONVERTER_FIXED_POINT_SHIFT), -128, 127);
-                        pFramesOutU8[iFrame*pConverter->channelsOut + iChannelOut] = ma_clip_u8((ma_int16)s);
-                    }
+        for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
+            for (iChannelIn = 0; iChannelIn < pConverter->channelsIn; ++iChannelIn) {
+                for (iChannelOut = 0; iChannelOut < pConverter->channelsOut; ++iChannelOut) {
+                    ma_int32 s = pFramesOutS16[iFrame*pConverter->channelsOut + iChannelOut];
+                    s += (pFramesInS16[iFrame*pConverter->channelsIn + iChannelIn] * pConverter->weights.s16[iChannelIn][iChannelOut]) >> MA_CHANNEL_CONVERTER_FIXED_POINT_SHIFT;
+
+                    pFramesOutS16[iFrame*pConverter->channelsOut + iChannelOut] = (ma_int16)ma_clamp(s, -32768, 32767);
                 }
             }
-        } break;
+        }
+    } else {
+        /* */ float* pFramesOutF32 = (      float*)pFramesOut;
+        const float* pFramesInF32  = (const float*)pFramesIn;
 
-        case ma_format_s16:
-        {
-            /* */ ma_int16* pFramesOutS16 = (      ma_int16*)pFramesOut;
-            const ma_int16* pFramesInS16  = (const ma_int16*)pFramesIn;
-
-            for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
-                for (iChannelIn = 0; iChannelIn < pConverter->channelsIn; ++iChannelIn) {
-                    for (iChannelOut = 0; iChannelOut < pConverter->channelsOut; ++iChannelOut) {
-                        ma_int32 s = pFramesOutS16[iFrame*pConverter->channelsOut + iChannelOut];
-                        s += (pFramesInS16[iFrame*pConverter->channelsIn + iChannelIn] * pConverter->weights.s16[iChannelIn][iChannelOut]) >> MA_CHANNEL_CONVERTER_FIXED_POINT_SHIFT;
-
-                        pFramesOutS16[iFrame*pConverter->channelsOut + iChannelOut] = (ma_int16)ma_clamp(s, -32768, 32767);
-                    }
+        for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
+            for (iChannelIn = 0; iChannelIn < pConverter->channelsIn; ++iChannelIn) {
+                for (iChannelOut = 0; iChannelOut < pConverter->channelsOut; ++iChannelOut) {
+                    pFramesOutF32[iFrame*pConverter->channelsOut + iChannelOut] += pFramesInF32[iFrame*pConverter->channelsIn + iChannelIn] * pConverter->weights.f32[iChannelIn][iChannelOut];
                 }
             }
-        } break;
-
-        case ma_format_s24:
-        {
-            /* */ ma_uint8* pFramesOutS24 = (      ma_uint8*)pFramesOut;
-            const ma_uint8* pFramesInS24  = (const ma_uint8*)pFramesIn;
-
-            for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
-                for (iChannelIn = 0; iChannelIn < pConverter->channelsIn; ++iChannelIn) {
-                    for (iChannelOut = 0; iChannelOut < pConverter->channelsOut; ++iChannelOut) {
-                        ma_int64 s24_O = ma_pcm_sample_s24_to_s32_no_scale(&pFramesOutS24[(iFrame*pConverter->channelsOut + iChannelOut)*3]);
-                        ma_int64 s24_I = ma_pcm_sample_s24_to_s32_no_scale(&pFramesInS24 [(iFrame*pConverter->channelsIn  + iChannelIn )*3]);
-                        ma_int64 s24   = (ma_int32)ma_clamp(s24_O + ((s24_I * pConverter->weights.s16[iChannelIn][iChannelOut]) >> MA_CHANNEL_CONVERTER_FIXED_POINT_SHIFT), -8388608, 8388607);
-                        ma_pcm_sample_s32_to_s24_no_scale(s24, &pFramesOutS24[(iFrame*pConverter->channelsOut + iChannelOut)*3]);
-                    }
-                }
-            }
-        } break;
-
-        case ma_format_s32:
-        {
-            /* */ ma_int32* pFramesOutS32 = (      ma_int32*)pFramesOut;
-            const ma_int32* pFramesInS32  = (const ma_int32*)pFramesIn;
-
-            for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
-                for (iChannelIn = 0; iChannelIn < pConverter->channelsIn; ++iChannelIn) {
-                    for (iChannelOut = 0; iChannelOut < pConverter->channelsOut; ++iChannelOut) {
-                        ma_int64 s = pFramesOutS32[iFrame*pConverter->channelsOut + iChannelOut];
-                        s += (pFramesInS32[iFrame*pConverter->channelsIn + iChannelIn] * pConverter->weights.s16[iChannelIn][iChannelOut]) >> MA_CHANNEL_CONVERTER_FIXED_POINT_SHIFT;
-
-                        pFramesOutS32[iFrame*pConverter->channelsOut + iChannelOut] = (ma_int32)ma_clamp(s, -(ma_int64)2147483648, (ma_int64)2147483647);
-                    }
-                }
-            }
-        } break;
-        
-        case ma_format_f32:
-        {
-            /* */ float* pFramesOutF32 = (      float*)pFramesOut;
-            const float* pFramesInF32  = (const float*)pFramesIn;
-
-            for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
-                for (iChannelIn = 0; iChannelIn < pConverter->channelsIn; ++iChannelIn) {
-                    for (iChannelOut = 0; iChannelOut < pConverter->channelsOut; ++iChannelOut) {
-                        pFramesOutF32[iFrame*pConverter->channelsOut + iChannelOut] += pFramesInF32[iFrame*pConverter->channelsIn + iChannelIn] * pConverter->weights.f32[iChannelIn][iChannelOut];
-                    }
-                }
-            }
-        } break;
-
-        default: return MA_INVALID_OPERATION;   /* Unknown format. */
+        }
     }
-
+    
     return MA_SUCCESS;
 }
 
@@ -38317,6 +35490,2365 @@ MA_API ma_uint64 ma_data_converter_get_output_latency(ma_data_converter* pConver
     }
 
     return 0;   /* No latency without a resampler. */
+}
+
+
+
+/**************************************************************************************************************************************************************
+
+Format Conversion
+
+**************************************************************************************************************************************************************/
+
+static MA_INLINE ma_int16 ma_pcm_sample_f32_to_s16(float x)
+{
+    return (ma_int16)(x * 32767.0f);
+}
+
+/* u8 */
+MA_API void ma_pcm_u8_to_u8(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    (void)ditherMode;
+    ma_copy_memory_64(dst, src, count * sizeof(ma_uint8));
+}
+
+
+static MA_INLINE void ma_pcm_u8_to_s16__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_int16* dst_s16 = (ma_int16*)dst;
+    const ma_uint8* src_u8 = (const ma_uint8*)src;
+
+    ma_uint64 i;
+    for (i = 0; i < count; i += 1) {
+        ma_int16 x = src_u8[i];
+        x = (ma_int16)(x - 128);
+        x = (ma_int16)(x << 8);
+        dst_s16[i] = x;
+    }
+
+    (void)ditherMode;
+}
+
+static MA_INLINE void ma_pcm_u8_to_s16__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_u8_to_s16__reference(dst, src, count, ditherMode);
+}
+
+#if defined(MA_SUPPORT_SSE2)
+static MA_INLINE void ma_pcm_u8_to_s16__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_u8_to_s16__optimized(dst, src, count, ditherMode);
+}
+#endif
+#if defined(MA_SUPPORT_AVX2)
+static MA_INLINE void ma_pcm_u8_to_s16__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_u8_to_s16__optimized(dst, src, count, ditherMode);
+}
+#endif
+#if defined(MA_SUPPORT_NEON)
+static MA_INLINE void ma_pcm_u8_to_s16__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_u8_to_s16__optimized(dst, src, count, ditherMode);
+}
+#endif
+
+MA_API void ma_pcm_u8_to_s16(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+#ifdef MA_USE_REFERENCE_CONVERSION_APIS
+    ma_pcm_u8_to_s16__reference(dst, src, count, ditherMode);
+#else
+    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
+        if (ma_has_avx2()) {
+            ma_pcm_u8_to_s16__avx2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
+        if (ma_has_sse2()) {
+            ma_pcm_u8_to_s16__sse2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
+        if (ma_has_neon()) {
+            ma_pcm_u8_to_s16__neon(dst, src, count, ditherMode);
+        } else
+    #endif
+        {
+            ma_pcm_u8_to_s16__optimized(dst, src, count, ditherMode);
+        }
+#endif
+}
+
+
+static MA_INLINE void ma_pcm_u8_to_s24__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_uint8* dst_s24 = (ma_uint8*)dst;
+    const ma_uint8* src_u8 = (const ma_uint8*)src;
+
+    ma_uint64 i;
+    for (i = 0; i < count; i += 1) {
+        ma_int16 x = src_u8[i];
+        x = (ma_int16)(x - 128);
+
+        dst_s24[i*3+0] = 0;
+        dst_s24[i*3+1] = 0;
+        dst_s24[i*3+2] = (ma_uint8)((ma_int8)x);
+    }
+
+    (void)ditherMode;
+}
+
+static MA_INLINE void ma_pcm_u8_to_s24__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_u8_to_s24__reference(dst, src, count, ditherMode);
+}
+
+#if defined(MA_SUPPORT_SSE2)
+static MA_INLINE void ma_pcm_u8_to_s24__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_u8_to_s24__optimized(dst, src, count, ditherMode);
+}
+#endif
+#if defined(MA_SUPPORT_AVX2)
+static MA_INLINE void ma_pcm_u8_to_s24__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_u8_to_s24__optimized(dst, src, count, ditherMode);
+}
+#endif
+#if defined(MA_SUPPORT_NEON)
+static MA_INLINE void ma_pcm_u8_to_s24__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_u8_to_s24__optimized(dst, src, count, ditherMode);
+}
+#endif
+
+MA_API void ma_pcm_u8_to_s24(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+#ifdef MA_USE_REFERENCE_CONVERSION_APIS
+    ma_pcm_u8_to_s24__reference(dst, src, count, ditherMode);
+#else
+    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
+        if (ma_has_avx2()) {
+            ma_pcm_u8_to_s24__avx2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
+        if (ma_has_sse2()) {
+            ma_pcm_u8_to_s24__sse2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
+        if (ma_has_neon()) {
+            ma_pcm_u8_to_s24__neon(dst, src, count, ditherMode);
+        } else
+    #endif
+        {
+            ma_pcm_u8_to_s24__optimized(dst, src, count, ditherMode);
+        }
+#endif
+}
+
+
+static MA_INLINE void ma_pcm_u8_to_s32__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_int32* dst_s32 = (ma_int32*)dst;
+    const ma_uint8* src_u8 = (const ma_uint8*)src;
+
+    ma_uint64 i;
+    for (i = 0; i < count; i += 1) {
+        ma_int32 x = src_u8[i];
+        x = x - 128;
+        x = x << 24;
+        dst_s32[i] = x;
+    }
+
+    (void)ditherMode;
+}
+
+static MA_INLINE void ma_pcm_u8_to_s32__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_u8_to_s32__reference(dst, src, count, ditherMode);
+}
+
+#if defined(MA_SUPPORT_SSE2)
+static MA_INLINE void ma_pcm_u8_to_s32__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_u8_to_s32__optimized(dst, src, count, ditherMode);
+}
+#endif
+#if defined(MA_SUPPORT_AVX2)
+static MA_INLINE void ma_pcm_u8_to_s32__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_u8_to_s32__optimized(dst, src, count, ditherMode);
+}
+#endif
+#if defined(MA_SUPPORT_NEON)
+static MA_INLINE void ma_pcm_u8_to_s32__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_u8_to_s32__optimized(dst, src, count, ditherMode);
+}
+#endif
+
+MA_API void ma_pcm_u8_to_s32(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+#ifdef MA_USE_REFERENCE_CONVERSION_APIS
+    ma_pcm_u8_to_s32__reference(dst, src, count, ditherMode);
+#else
+    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
+        if (ma_has_avx2()) {
+            ma_pcm_u8_to_s32__avx2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
+        if (ma_has_sse2()) {
+            ma_pcm_u8_to_s32__sse2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
+        if (ma_has_neon()) {
+            ma_pcm_u8_to_s32__neon(dst, src, count, ditherMode);
+        } else
+    #endif
+        {
+            ma_pcm_u8_to_s32__optimized(dst, src, count, ditherMode);
+        }
+#endif
+}
+
+
+static MA_INLINE void ma_pcm_u8_to_f32__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    float* dst_f32 = (float*)dst;
+    const ma_uint8* src_u8 = (const ma_uint8*)src;
+
+    ma_uint64 i;
+    for (i = 0; i < count; i += 1) {
+        float x = (float)src_u8[i];
+        x = x * 0.00784313725490196078f;    /* 0..255 to 0..2 */
+        x = x - 1;                          /* 0..2 to -1..1 */
+
+        dst_f32[i] = x;
+    }
+
+    (void)ditherMode;
+}
+
+static MA_INLINE void ma_pcm_u8_to_f32__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_u8_to_f32__reference(dst, src, count, ditherMode);
+}
+
+#if defined(MA_SUPPORT_SSE2)
+static MA_INLINE void ma_pcm_u8_to_f32__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_u8_to_f32__optimized(dst, src, count, ditherMode);
+}
+#endif
+#if defined(MA_SUPPORT_AVX2)
+static MA_INLINE void ma_pcm_u8_to_f32__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_u8_to_f32__optimized(dst, src, count, ditherMode);
+}
+#endif
+#if defined(MA_SUPPORT_NEON)
+static MA_INLINE void ma_pcm_u8_to_f32__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_u8_to_f32__optimized(dst, src, count, ditherMode);
+}
+#endif
+
+MA_API void ma_pcm_u8_to_f32(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+#ifdef MA_USE_REFERENCE_CONVERSION_APIS
+    ma_pcm_u8_to_f32__reference(dst, src, count, ditherMode);
+#else
+    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
+        if (ma_has_avx2()) {
+            ma_pcm_u8_to_f32__avx2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
+        if (ma_has_sse2()) {
+            ma_pcm_u8_to_f32__sse2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
+        if (ma_has_neon()) {
+            ma_pcm_u8_to_f32__neon(dst, src, count, ditherMode);
+        } else
+    #endif
+        {
+            ma_pcm_u8_to_f32__optimized(dst, src, count, ditherMode);
+        }
+#endif
+}
+
+
+#ifdef MA_USE_REFERENCE_CONVERSION_APIS
+static MA_INLINE void ma_pcm_interleave_u8__reference(void* dst, const void** src, ma_uint64 frameCount, ma_uint32 channels)
+{
+    ma_uint8* dst_u8 = (ma_uint8*)dst;
+    const ma_uint8** src_u8 = (const ma_uint8**)src;
+
+    ma_uint64 iFrame;
+    for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
+        ma_uint32 iChannel;
+        for (iChannel = 0; iChannel < channels; iChannel += 1) {
+            dst_u8[iFrame*channels + iChannel] = src_u8[iChannel][iFrame];
+        }
+    }
+}
+#else
+static MA_INLINE void ma_pcm_interleave_u8__optimized(void* dst, const void** src, ma_uint64 frameCount, ma_uint32 channels)
+{
+    ma_uint8* dst_u8 = (ma_uint8*)dst;
+    const ma_uint8** src_u8 = (const ma_uint8**)src;
+
+    if (channels == 1) {
+        ma_copy_memory_64(dst, src[0], frameCount * sizeof(ma_uint8));
+    } else if (channels == 2) {
+        ma_uint64 iFrame;
+        for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
+            dst_u8[iFrame*2 + 0] = src_u8[0][iFrame];
+            dst_u8[iFrame*2 + 1] = src_u8[1][iFrame];
+        }
+    } else {
+        ma_uint64 iFrame;
+        for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
+            ma_uint32 iChannel;
+            for (iChannel = 0; iChannel < channels; iChannel += 1) {
+                dst_u8[iFrame*channels + iChannel] = src_u8[iChannel][iFrame];
+            }
+        }
+    }
+}
+#endif
+
+MA_API void ma_pcm_interleave_u8(void* dst, const void** src, ma_uint64 frameCount, ma_uint32 channels)
+{
+#ifdef MA_USE_REFERENCE_CONVERSION_APIS
+    ma_pcm_interleave_u8__reference(dst, src, frameCount, channels);
+#else
+    ma_pcm_interleave_u8__optimized(dst, src, frameCount, channels);
+#endif
+}
+
+
+static MA_INLINE void ma_pcm_deinterleave_u8__reference(void** dst, const void* src, ma_uint64 frameCount, ma_uint32 channels)
+{
+    ma_uint8** dst_u8 = (ma_uint8**)dst;
+    const ma_uint8* src_u8 = (const ma_uint8*)src;
+
+    ma_uint64 iFrame;
+    for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
+        ma_uint32 iChannel;
+        for (iChannel = 0; iChannel < channels; iChannel += 1) {
+            dst_u8[iChannel][iFrame] = src_u8[iFrame*channels + iChannel];
+        }
+    }
+}
+
+static MA_INLINE void ma_pcm_deinterleave_u8__optimized(void** dst, const void* src, ma_uint64 frameCount, ma_uint32 channels)
+{
+    ma_pcm_deinterleave_u8__reference(dst, src, frameCount, channels);
+}
+
+MA_API void ma_pcm_deinterleave_u8(void** dst, const void* src, ma_uint64 frameCount, ma_uint32 channels)
+{
+#ifdef MA_USE_REFERENCE_CONVERSION_APIS
+    ma_pcm_deinterleave_u8__reference(dst, src, frameCount, channels);
+#else
+    ma_pcm_deinterleave_u8__optimized(dst, src, frameCount, channels);
+#endif
+}
+
+
+/* s16 */
+static MA_INLINE void ma_pcm_s16_to_u8__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_uint8* dst_u8 = (ma_uint8*)dst;
+    const ma_int16* src_s16 = (const ma_int16*)src;
+
+    if (ditherMode == ma_dither_mode_none) {
+        ma_uint64 i;
+        for (i = 0; i < count; i += 1) {
+            ma_int16 x = src_s16[i];
+            x = (ma_int16)(x >> 8);
+            x = (ma_int16)(x + 128);
+            dst_u8[i] = (ma_uint8)x;
+        }
+    } else {
+        ma_uint64 i;
+        for (i = 0; i < count; i += 1) {
+            ma_int16 x = src_s16[i];
+
+            /* Dither. Don't overflow. */
+            ma_int32 dither = ma_dither_s32(ditherMode, -0x80, 0x7F);
+            if ((x + dither) <= 0x7FFF) {
+                x = (ma_int16)(x + dither);
+            } else {
+                x = 0x7FFF;
+            }
+
+            x = (ma_int16)(x >> 8);
+            x = (ma_int16)(x + 128);
+            dst_u8[i] = (ma_uint8)x;
+        }
+    }
+}
+
+static MA_INLINE void ma_pcm_s16_to_u8__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s16_to_u8__reference(dst, src, count, ditherMode);
+}
+
+#if defined(MA_SUPPORT_SSE2)
+static MA_INLINE void ma_pcm_s16_to_u8__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s16_to_u8__optimized(dst, src, count, ditherMode);
+}
+#endif
+#if defined(MA_SUPPORT_AVX2)
+static MA_INLINE void ma_pcm_s16_to_u8__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s16_to_u8__optimized(dst, src, count, ditherMode);
+}
+#endif
+#if defined(MA_SUPPORT_NEON)
+static MA_INLINE void ma_pcm_s16_to_u8__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s16_to_u8__optimized(dst, src, count, ditherMode);
+}
+#endif
+
+MA_API void ma_pcm_s16_to_u8(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+#ifdef MA_USE_REFERENCE_CONVERSION_APIS
+    ma_pcm_s16_to_u8__reference(dst, src, count, ditherMode);
+#else
+    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
+        if (ma_has_avx2()) {
+            ma_pcm_s16_to_u8__avx2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
+        if (ma_has_sse2()) {
+            ma_pcm_s16_to_u8__sse2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
+        if (ma_has_neon()) {
+            ma_pcm_s16_to_u8__neon(dst, src, count, ditherMode);
+        } else
+    #endif
+        {
+            ma_pcm_s16_to_u8__optimized(dst, src, count, ditherMode);
+        }
+#endif
+}
+
+
+MA_API void ma_pcm_s16_to_s16(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    (void)ditherMode;
+    ma_copy_memory_64(dst, src, count * sizeof(ma_int16));
+}
+
+
+static MA_INLINE void ma_pcm_s16_to_s24__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_uint8* dst_s24 = (ma_uint8*)dst;
+    const ma_int16* src_s16 = (const ma_int16*)src;
+
+    ma_uint64 i;
+    for (i = 0; i < count; i += 1) {
+        dst_s24[i*3+0] = 0;
+        dst_s24[i*3+1] = (ma_uint8)(src_s16[i] & 0xFF);
+        dst_s24[i*3+2] = (ma_uint8)(src_s16[i] >> 8);
+    }
+
+    (void)ditherMode;
+}
+
+static MA_INLINE void ma_pcm_s16_to_s24__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s16_to_s24__reference(dst, src, count, ditherMode);
+}
+
+#if defined(MA_SUPPORT_SSE2)
+static MA_INLINE void ma_pcm_s16_to_s24__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s16_to_s24__optimized(dst, src, count, ditherMode);
+}
+#endif
+#if defined(MA_SUPPORT_AVX2)
+static MA_INLINE void ma_pcm_s16_to_s24__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s16_to_s24__optimized(dst, src, count, ditherMode);
+}
+#endif
+#if defined(MA_SUPPORT_NEON)
+static MA_INLINE void ma_pcm_s16_to_s24__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s16_to_s24__optimized(dst, src, count, ditherMode);
+}
+#endif
+
+MA_API void ma_pcm_s16_to_s24(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+#ifdef MA_USE_REFERENCE_CONVERSION_APIS
+    ma_pcm_s16_to_s24__reference(dst, src, count, ditherMode);
+#else
+    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
+        if (ma_has_avx2()) {
+            ma_pcm_s16_to_s24__avx2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
+        if (ma_has_sse2()) {
+            ma_pcm_s16_to_s24__sse2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
+        if (ma_has_neon()) {
+            ma_pcm_s16_to_s24__neon(dst, src, count, ditherMode);
+        } else
+    #endif
+        {
+            ma_pcm_s16_to_s24__optimized(dst, src, count, ditherMode);
+        }
+#endif
+}
+
+
+static MA_INLINE void ma_pcm_s16_to_s32__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_int32* dst_s32 = (ma_int32*)dst;
+    const ma_int16* src_s16 = (const ma_int16*)src;
+
+    ma_uint64 i;
+    for (i = 0; i < count; i += 1) {
+        dst_s32[i] = src_s16[i] << 16;
+    }
+
+    (void)ditherMode;
+}
+
+static MA_INLINE void ma_pcm_s16_to_s32__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s16_to_s32__reference(dst, src, count, ditherMode);
+}
+
+#if defined(MA_SUPPORT_SSE2)
+static MA_INLINE void ma_pcm_s16_to_s32__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s16_to_s32__optimized(dst, src, count, ditherMode);
+}
+#endif
+#if defined(MA_SUPPORT_AVX2)
+static MA_INLINE void ma_pcm_s16_to_s32__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s16_to_s32__optimized(dst, src, count, ditherMode);
+}
+#endif
+#if defined(MA_SUPPORT_NEON)
+static MA_INLINE void ma_pcm_s16_to_s32__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s16_to_s32__optimized(dst, src, count, ditherMode);
+}
+#endif
+
+MA_API void ma_pcm_s16_to_s32(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+#ifdef MA_USE_REFERENCE_CONVERSION_APIS
+    ma_pcm_s16_to_s32__reference(dst, src, count, ditherMode);
+#else
+    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
+        if (ma_has_avx2()) {
+            ma_pcm_s16_to_s32__avx2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
+        if (ma_has_sse2()) {
+            ma_pcm_s16_to_s32__sse2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
+        if (ma_has_neon()) {
+            ma_pcm_s16_to_s32__neon(dst, src, count, ditherMode);
+        } else
+    #endif
+        {
+            ma_pcm_s16_to_s32__optimized(dst, src, count, ditherMode);
+        }
+#endif
+}
+
+
+static MA_INLINE void ma_pcm_s16_to_f32__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    float* dst_f32 = (float*)dst;
+    const ma_int16* src_s16 = (const ma_int16*)src;
+
+    ma_uint64 i;
+    for (i = 0; i < count; i += 1) {
+        float x = (float)src_s16[i];
+
+#if 0
+        /* The accurate way. */
+        x = x + 32768.0f;                   /* -32768..32767 to 0..65535 */
+        x = x * 0.00003051804379339284f;    /* 0..65535 to 0..2 */
+        x = x - 1;                          /* 0..2 to -1..1 */
+#else
+        /* The fast way. */
+        x = x * 0.000030517578125f;         /* -32768..32767 to -1..0.999969482421875 */
+#endif
+
+        dst_f32[i] = x;
+    }
+
+    (void)ditherMode;
+}
+
+static MA_INLINE void ma_pcm_s16_to_f32__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s16_to_f32__reference(dst, src, count, ditherMode);
+}
+
+#if defined(MA_SUPPORT_SSE2)
+static MA_INLINE void ma_pcm_s16_to_f32__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s16_to_f32__optimized(dst, src, count, ditherMode);
+}
+#endif
+#if defined(MA_SUPPORT_AVX2)
+static MA_INLINE void ma_pcm_s16_to_f32__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s16_to_f32__optimized(dst, src, count, ditherMode);
+}
+#endif
+#if defined(MA_SUPPORT_NEON)
+static MA_INLINE void ma_pcm_s16_to_f32__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s16_to_f32__optimized(dst, src, count, ditherMode);
+}
+#endif
+
+MA_API void ma_pcm_s16_to_f32(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+#ifdef MA_USE_REFERENCE_CONVERSION_APIS
+    ma_pcm_s16_to_f32__reference(dst, src, count, ditherMode);
+#else
+    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
+        if (ma_has_avx2()) {
+            ma_pcm_s16_to_f32__avx2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
+        if (ma_has_sse2()) {
+            ma_pcm_s16_to_f32__sse2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
+        if (ma_has_neon()) {
+            ma_pcm_s16_to_f32__neon(dst, src, count, ditherMode);
+        } else
+    #endif
+        {
+            ma_pcm_s16_to_f32__optimized(dst, src, count, ditherMode);
+        }
+#endif
+}
+
+
+static MA_INLINE void ma_pcm_interleave_s16__reference(void* dst, const void** src, ma_uint64 frameCount, ma_uint32 channels)
+{
+    ma_int16* dst_s16 = (ma_int16*)dst;
+    const ma_int16** src_s16 = (const ma_int16**)src;
+
+    ma_uint64 iFrame;
+    for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
+        ma_uint32 iChannel;
+        for (iChannel = 0; iChannel < channels; iChannel += 1) {
+            dst_s16[iFrame*channels + iChannel] = src_s16[iChannel][iFrame];
+        }
+    }
+}
+
+static MA_INLINE void ma_pcm_interleave_s16__optimized(void* dst, const void** src, ma_uint64 frameCount, ma_uint32 channels)
+{
+    ma_pcm_interleave_s16__reference(dst, src, frameCount, channels);
+}
+
+MA_API void ma_pcm_interleave_s16(void* dst, const void** src, ma_uint64 frameCount, ma_uint32 channels)
+{
+#ifdef MA_USE_REFERENCE_CONVERSION_APIS
+    ma_pcm_interleave_s16__reference(dst, src, frameCount, channels);
+#else
+    ma_pcm_interleave_s16__optimized(dst, src, frameCount, channels);
+#endif
+}
+
+
+static MA_INLINE void ma_pcm_deinterleave_s16__reference(void** dst, const void* src, ma_uint64 frameCount, ma_uint32 channels)
+{
+    ma_int16** dst_s16 = (ma_int16**)dst;
+    const ma_int16* src_s16 = (const ma_int16*)src;
+
+    ma_uint64 iFrame;
+    for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
+        ma_uint32 iChannel;
+        for (iChannel = 0; iChannel < channels; iChannel += 1) {
+            dst_s16[iChannel][iFrame] = src_s16[iFrame*channels + iChannel];
+        }
+    }
+}
+
+static MA_INLINE void ma_pcm_deinterleave_s16__optimized(void** dst, const void* src, ma_uint64 frameCount, ma_uint32 channels)
+{
+    ma_pcm_deinterleave_s16__reference(dst, src, frameCount, channels);
+}
+
+MA_API void ma_pcm_deinterleave_s16(void** dst, const void* src, ma_uint64 frameCount, ma_uint32 channels)
+{
+#ifdef MA_USE_REFERENCE_CONVERSION_APIS
+    ma_pcm_deinterleave_s16__reference(dst, src, frameCount, channels);
+#else
+    ma_pcm_deinterleave_s16__optimized(dst, src, frameCount, channels);
+#endif
+}
+
+
+/* s24 */
+static MA_INLINE void ma_pcm_s24_to_u8__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_uint8* dst_u8 = (ma_uint8*)dst;
+    const ma_uint8* src_s24 = (const ma_uint8*)src;
+
+    if (ditherMode == ma_dither_mode_none) {
+        ma_uint64 i;
+        for (i = 0; i < count; i += 1) {
+            dst_u8[i] = (ma_uint8)((ma_int8)src_s24[i*3 + 2] + 128);
+        }
+    } else {
+        ma_uint64 i;
+        for (i = 0; i < count; i += 1) {
+            ma_int32 x = (ma_int32)(((ma_uint32)(src_s24[i*3+0]) << 8) | ((ma_uint32)(src_s24[i*3+1]) << 16) | ((ma_uint32)(src_s24[i*3+2])) << 24);
+
+            /* Dither. Don't overflow. */
+            ma_int32 dither = ma_dither_s32(ditherMode, -0x800000, 0x7FFFFF);
+            if ((ma_int64)x + dither <= 0x7FFFFFFF) {
+                x = x + dither;
+            } else {
+                x = 0x7FFFFFFF;
+            }
+            
+            x = x >> 24;
+            x = x + 128;
+            dst_u8[i] = (ma_uint8)x;
+        }
+    }
+}
+
+static MA_INLINE void ma_pcm_s24_to_u8__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s24_to_u8__reference(dst, src, count, ditherMode);
+}
+
+#if defined(MA_SUPPORT_SSE2)
+static MA_INLINE void ma_pcm_s24_to_u8__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s24_to_u8__optimized(dst, src, count, ditherMode);
+}
+#endif
+#if defined(MA_SUPPORT_AVX2)
+static MA_INLINE void ma_pcm_s24_to_u8__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s24_to_u8__optimized(dst, src, count, ditherMode);
+}
+#endif
+#if defined(MA_SUPPORT_NEON)
+static MA_INLINE void ma_pcm_s24_to_u8__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s24_to_u8__optimized(dst, src, count, ditherMode);
+}
+#endif
+
+MA_API void ma_pcm_s24_to_u8(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+#ifdef MA_USE_REFERENCE_CONVERSION_APIS
+    ma_pcm_s24_to_u8__reference(dst, src, count, ditherMode);
+#else
+    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
+        if (ma_has_avx2()) {
+            ma_pcm_s24_to_u8__avx2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
+        if (ma_has_sse2()) {
+            ma_pcm_s24_to_u8__sse2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
+        if (ma_has_neon()) {
+            ma_pcm_s24_to_u8__neon(dst, src, count, ditherMode);
+        } else
+    #endif
+        {
+            ma_pcm_s24_to_u8__optimized(dst, src, count, ditherMode);
+        }
+#endif
+}
+
+
+static MA_INLINE void ma_pcm_s24_to_s16__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_int16* dst_s16 = (ma_int16*)dst;
+    const ma_uint8* src_s24 = (const ma_uint8*)src;
+
+    if (ditherMode == ma_dither_mode_none) {
+        ma_uint64 i;
+        for (i = 0; i < count; i += 1) {
+            ma_uint16 dst_lo =            ((ma_uint16)src_s24[i*3 + 1]);
+            ma_uint16 dst_hi = (ma_uint16)((ma_uint16)src_s24[i*3 + 2] << 8);
+            dst_s16[i] = (ma_int16)(dst_lo | dst_hi);
+        }
+    } else {
+        ma_uint64 i;
+        for (i = 0; i < count; i += 1) {
+            ma_int32 x = (ma_int32)(((ma_uint32)(src_s24[i*3+0]) << 8) | ((ma_uint32)(src_s24[i*3+1]) << 16) | ((ma_uint32)(src_s24[i*3+2])) << 24);
+
+            /* Dither. Don't overflow. */
+            ma_int32 dither = ma_dither_s32(ditherMode, -0x8000, 0x7FFF);
+            if ((ma_int64)x + dither <= 0x7FFFFFFF) {
+                x = x + dither;
+            } else {
+                x = 0x7FFFFFFF;
+            }
+
+            x = x >> 16;
+            dst_s16[i] = (ma_int16)x;
+        }
+    }
+}
+
+static MA_INLINE void ma_pcm_s24_to_s16__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s24_to_s16__reference(dst, src, count, ditherMode);
+}
+
+#if defined(MA_SUPPORT_SSE2)
+static MA_INLINE void ma_pcm_s24_to_s16__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s24_to_s16__optimized(dst, src, count, ditherMode);
+}
+#endif
+#if defined(MA_SUPPORT_AVX2)
+static MA_INLINE void ma_pcm_s24_to_s16__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s24_to_s16__optimized(dst, src, count, ditherMode);
+}
+#endif
+#if defined(MA_SUPPORT_NEON)
+static MA_INLINE void ma_pcm_s24_to_s16__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s24_to_s16__optimized(dst, src, count, ditherMode);
+}
+#endif
+
+MA_API void ma_pcm_s24_to_s16(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+#ifdef MA_USE_REFERENCE_CONVERSION_APIS
+    ma_pcm_s24_to_s16__reference(dst, src, count, ditherMode);
+#else
+    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
+        if (ma_has_avx2()) {
+            ma_pcm_s24_to_s16__avx2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
+        if (ma_has_sse2()) {
+            ma_pcm_s24_to_s16__sse2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
+        if (ma_has_neon()) {
+            ma_pcm_s24_to_s16__neon(dst, src, count, ditherMode);
+        } else
+    #endif
+        {
+            ma_pcm_s24_to_s16__optimized(dst, src, count, ditherMode);
+        }
+#endif
+}
+
+
+MA_API void ma_pcm_s24_to_s24(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    (void)ditherMode;
+
+    ma_copy_memory_64(dst, src, count * 3);
+}
+
+
+static MA_INLINE void ma_pcm_s24_to_s32__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_int32* dst_s32 = (ma_int32*)dst;
+    const ma_uint8* src_s24 = (const ma_uint8*)src;
+
+    ma_uint64 i;
+    for (i = 0; i < count; i += 1) {
+        dst_s32[i] = (ma_int32)(((ma_uint32)(src_s24[i*3+0]) << 8) | ((ma_uint32)(src_s24[i*3+1]) << 16) | ((ma_uint32)(src_s24[i*3+2])) << 24);
+    }
+
+    (void)ditherMode;
+}
+
+static MA_INLINE void ma_pcm_s24_to_s32__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s24_to_s32__reference(dst, src, count, ditherMode);
+}
+
+#if defined(MA_SUPPORT_SSE2)
+static MA_INLINE void ma_pcm_s24_to_s32__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s24_to_s32__optimized(dst, src, count, ditherMode);
+}
+#endif
+#if defined(MA_SUPPORT_AVX2)
+static MA_INLINE void ma_pcm_s24_to_s32__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s24_to_s32__optimized(dst, src, count, ditherMode);
+}
+#endif
+#if defined(MA_SUPPORT_NEON)
+static MA_INLINE void ma_pcm_s24_to_s32__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s24_to_s32__optimized(dst, src, count, ditherMode);
+}
+#endif
+
+MA_API void ma_pcm_s24_to_s32(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+#ifdef MA_USE_REFERENCE_CONVERSION_APIS
+    ma_pcm_s24_to_s32__reference(dst, src, count, ditherMode);
+#else
+    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
+        if (ma_has_avx2()) {
+            ma_pcm_s24_to_s32__avx2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
+        if (ma_has_sse2()) {
+            ma_pcm_s24_to_s32__sse2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
+        if (ma_has_neon()) {
+            ma_pcm_s24_to_s32__neon(dst, src, count, ditherMode);
+        } else
+    #endif
+        {
+            ma_pcm_s24_to_s32__optimized(dst, src, count, ditherMode);
+        }
+#endif
+}
+
+
+static MA_INLINE void ma_pcm_s24_to_f32__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    float* dst_f32 = (float*)dst;
+    const ma_uint8* src_s24 = (const ma_uint8*)src;
+
+    ma_uint64 i;
+    for (i = 0; i < count; i += 1) {
+        float x = (float)(((ma_int32)(((ma_uint32)(src_s24[i*3+0]) << 8) | ((ma_uint32)(src_s24[i*3+1]) << 16) | ((ma_uint32)(src_s24[i*3+2])) << 24)) >> 8);
+
+#if 0
+        /* The accurate way. */
+        x = x + 8388608.0f;                 /* -8388608..8388607 to 0..16777215 */
+        x = x * 0.00000011920929665621f;    /* 0..16777215 to 0..2 */
+        x = x - 1;                          /* 0..2 to -1..1 */
+#else
+        /* The fast way. */
+        x = x * 0.00000011920928955078125f; /* -8388608..8388607 to -1..0.999969482421875 */
+#endif
+
+        dst_f32[i] = x;
+    }
+
+    (void)ditherMode;
+}
+
+static MA_INLINE void ma_pcm_s24_to_f32__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s24_to_f32__reference(dst, src, count, ditherMode);
+}
+
+#if defined(MA_SUPPORT_SSE2)
+static MA_INLINE void ma_pcm_s24_to_f32__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s24_to_f32__optimized(dst, src, count, ditherMode);
+}
+#endif
+#if defined(MA_SUPPORT_AVX2)
+static MA_INLINE void ma_pcm_s24_to_f32__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s24_to_f32__optimized(dst, src, count, ditherMode);
+}
+#endif
+#if defined(MA_SUPPORT_NEON)
+static MA_INLINE void ma_pcm_s24_to_f32__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s24_to_f32__optimized(dst, src, count, ditherMode);
+}
+#endif
+
+MA_API void ma_pcm_s24_to_f32(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+#ifdef MA_USE_REFERENCE_CONVERSION_APIS
+    ma_pcm_s24_to_f32__reference(dst, src, count, ditherMode);
+#else
+    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
+        if (ma_has_avx2()) {
+            ma_pcm_s24_to_f32__avx2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
+        if (ma_has_sse2()) {
+            ma_pcm_s24_to_f32__sse2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
+        if (ma_has_neon()) {
+            ma_pcm_s24_to_f32__neon(dst, src, count, ditherMode);
+        } else
+    #endif
+        {
+            ma_pcm_s24_to_f32__optimized(dst, src, count, ditherMode);
+        }
+#endif
+}
+
+
+static MA_INLINE void ma_pcm_interleave_s24__reference(void* dst, const void** src, ma_uint64 frameCount, ma_uint32 channels)
+{
+    ma_uint8* dst8 = (ma_uint8*)dst;
+    const ma_uint8** src8 = (const ma_uint8**)src;
+
+    ma_uint64 iFrame;
+    for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
+        ma_uint32 iChannel;
+        for (iChannel = 0; iChannel < channels; iChannel += 1) {
+            dst8[iFrame*3*channels + iChannel*3 + 0] = src8[iChannel][iFrame*3 + 0];
+            dst8[iFrame*3*channels + iChannel*3 + 1] = src8[iChannel][iFrame*3 + 1];
+            dst8[iFrame*3*channels + iChannel*3 + 2] = src8[iChannel][iFrame*3 + 2];
+        }
+    }
+}
+
+static MA_INLINE void ma_pcm_interleave_s24__optimized(void* dst, const void** src, ma_uint64 frameCount, ma_uint32 channels)
+{
+    ma_pcm_interleave_s24__reference(dst, src, frameCount, channels);
+}
+
+MA_API void ma_pcm_interleave_s24(void* dst, const void** src, ma_uint64 frameCount, ma_uint32 channels)
+{
+#ifdef MA_USE_REFERENCE_CONVERSION_APIS
+    ma_pcm_interleave_s24__reference(dst, src, frameCount, channels);
+#else
+    ma_pcm_interleave_s24__optimized(dst, src, frameCount, channels);
+#endif
+}
+
+
+static MA_INLINE void ma_pcm_deinterleave_s24__reference(void** dst, const void* src, ma_uint64 frameCount, ma_uint32 channels)
+{
+    ma_uint8** dst8 = (ma_uint8**)dst;
+    const ma_uint8* src8 = (const ma_uint8*)src;
+
+    ma_uint32 iFrame;
+    for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
+        ma_uint32 iChannel;
+        for (iChannel = 0; iChannel < channels; iChannel += 1) {
+            dst8[iChannel][iFrame*3 + 0] = src8[iFrame*3*channels + iChannel*3 + 0];
+            dst8[iChannel][iFrame*3 + 1] = src8[iFrame*3*channels + iChannel*3 + 1];
+            dst8[iChannel][iFrame*3 + 2] = src8[iFrame*3*channels + iChannel*3 + 2];
+        }
+    }
+}
+
+static MA_INLINE void ma_pcm_deinterleave_s24__optimized(void** dst, const void* src, ma_uint64 frameCount, ma_uint32 channels)
+{
+    ma_pcm_deinterleave_s24__reference(dst, src, frameCount, channels);
+}
+
+MA_API void ma_pcm_deinterleave_s24(void** dst, const void* src, ma_uint64 frameCount, ma_uint32 channels)
+{
+#ifdef MA_USE_REFERENCE_CONVERSION_APIS
+    ma_pcm_deinterleave_s24__reference(dst, src, frameCount, channels);
+#else
+    ma_pcm_deinterleave_s24__optimized(dst, src, frameCount, channels);
+#endif
+}
+
+
+
+/* s32 */
+static MA_INLINE void ma_pcm_s32_to_u8__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_uint8* dst_u8 = (ma_uint8*)dst;
+    const ma_int32* src_s32 = (const ma_int32*)src;
+
+    if (ditherMode == ma_dither_mode_none) {
+        ma_uint64 i;
+        for (i = 0; i < count; i += 1) {
+            ma_int32 x = src_s32[i];
+            x = x >> 24;
+            x = x + 128;
+            dst_u8[i] = (ma_uint8)x;
+        }
+    } else {
+        ma_uint64 i;
+        for (i = 0; i < count; i += 1) {
+            ma_int32 x = src_s32[i];
+
+            /* Dither. Don't overflow. */
+            ma_int32 dither = ma_dither_s32(ditherMode, -0x800000, 0x7FFFFF);
+            if ((ma_int64)x + dither <= 0x7FFFFFFF) {
+                x = x + dither;
+            } else {
+                x = 0x7FFFFFFF;
+            }
+            
+            x = x >> 24;
+            x = x + 128;
+            dst_u8[i] = (ma_uint8)x;
+        }
+    }
+}
+
+static MA_INLINE void ma_pcm_s32_to_u8__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s32_to_u8__reference(dst, src, count, ditherMode);
+}
+
+#if defined(MA_SUPPORT_SSE2)
+static MA_INLINE void ma_pcm_s32_to_u8__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s32_to_u8__optimized(dst, src, count, ditherMode);
+}
+#endif
+#if defined(MA_SUPPORT_AVX2)
+static MA_INLINE void ma_pcm_s32_to_u8__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s32_to_u8__optimized(dst, src, count, ditherMode);
+}
+#endif
+#if defined(MA_SUPPORT_NEON)
+static MA_INLINE void ma_pcm_s32_to_u8__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s32_to_u8__optimized(dst, src, count, ditherMode);
+}
+#endif
+
+MA_API void ma_pcm_s32_to_u8(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+#ifdef MA_USE_REFERENCE_CONVERSION_APIS
+    ma_pcm_s32_to_u8__reference(dst, src, count, ditherMode);
+#else
+    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
+        if (ma_has_avx2()) {
+            ma_pcm_s32_to_u8__avx2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
+        if (ma_has_sse2()) {
+            ma_pcm_s32_to_u8__sse2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
+        if (ma_has_neon()) {
+            ma_pcm_s32_to_u8__neon(dst, src, count, ditherMode);
+        } else
+    #endif
+        {
+            ma_pcm_s32_to_u8__optimized(dst, src, count, ditherMode);
+        }
+#endif
+}
+
+
+static MA_INLINE void ma_pcm_s32_to_s16__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_int16* dst_s16 = (ma_int16*)dst;
+    const ma_int32* src_s32 = (const ma_int32*)src;
+
+    if (ditherMode == ma_dither_mode_none) {
+        ma_uint64 i;
+        for (i = 0; i < count; i += 1) {
+            ma_int32 x = src_s32[i];
+            x = x >> 16;
+            dst_s16[i] = (ma_int16)x;
+        }
+    } else {
+        ma_uint64 i;
+        for (i = 0; i < count; i += 1) {
+            ma_int32 x = src_s32[i];
+
+            /* Dither. Don't overflow. */
+            ma_int32 dither = ma_dither_s32(ditherMode, -0x8000, 0x7FFF);
+            if ((ma_int64)x + dither <= 0x7FFFFFFF) {
+                x = x + dither;
+            } else {
+                x = 0x7FFFFFFF;
+            }
+            
+            x = x >> 16;
+            dst_s16[i] = (ma_int16)x;
+        }
+    }
+}
+
+static MA_INLINE void ma_pcm_s32_to_s16__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s32_to_s16__reference(dst, src, count, ditherMode);
+}
+
+#if defined(MA_SUPPORT_SSE2)
+static MA_INLINE void ma_pcm_s32_to_s16__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s32_to_s16__optimized(dst, src, count, ditherMode);
+}
+#endif
+#if defined(MA_SUPPORT_AVX2)
+static MA_INLINE void ma_pcm_s32_to_s16__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s32_to_s16__optimized(dst, src, count, ditherMode);
+}
+#endif
+#if defined(MA_SUPPORT_NEON)
+static MA_INLINE void ma_pcm_s32_to_s16__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s32_to_s16__optimized(dst, src, count, ditherMode);
+}
+#endif
+
+MA_API void ma_pcm_s32_to_s16(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+#ifdef MA_USE_REFERENCE_CONVERSION_APIS
+    ma_pcm_s32_to_s16__reference(dst, src, count, ditherMode);
+#else
+    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
+        if (ma_has_avx2()) {
+            ma_pcm_s32_to_s16__avx2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
+        if (ma_has_sse2()) {
+            ma_pcm_s32_to_s16__sse2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
+        if (ma_has_neon()) {
+            ma_pcm_s32_to_s16__neon(dst, src, count, ditherMode);
+        } else
+    #endif
+        {
+            ma_pcm_s32_to_s16__optimized(dst, src, count, ditherMode);
+        }
+#endif
+}
+
+
+static MA_INLINE void ma_pcm_s32_to_s24__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_uint8* dst_s24 = (ma_uint8*)dst;
+    const ma_int32* src_s32 = (const ma_int32*)src;
+
+    ma_uint64 i;
+    for (i = 0; i < count; i += 1) {
+        ma_uint32 x = (ma_uint32)src_s32[i];
+        dst_s24[i*3+0] = (ma_uint8)((x & 0x0000FF00) >>  8);
+        dst_s24[i*3+1] = (ma_uint8)((x & 0x00FF0000) >> 16);
+        dst_s24[i*3+2] = (ma_uint8)((x & 0xFF000000) >> 24);
+    }
+
+    (void)ditherMode;   /* No dithering for s32 -> s24. */
+}
+
+static MA_INLINE void ma_pcm_s32_to_s24__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s32_to_s24__reference(dst, src, count, ditherMode);
+}
+
+#if defined(MA_SUPPORT_SSE2)
+static MA_INLINE void ma_pcm_s32_to_s24__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s32_to_s24__optimized(dst, src, count, ditherMode);
+}
+#endif
+#if defined(MA_SUPPORT_AVX2)
+static MA_INLINE void ma_pcm_s32_to_s24__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s32_to_s24__optimized(dst, src, count, ditherMode);
+}
+#endif
+#if defined(MA_SUPPORT_NEON)
+static MA_INLINE void ma_pcm_s32_to_s24__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s32_to_s24__optimized(dst, src, count, ditherMode);
+}
+#endif
+
+MA_API void ma_pcm_s32_to_s24(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+#ifdef MA_USE_REFERENCE_CONVERSION_APIS
+    ma_pcm_s32_to_s24__reference(dst, src, count, ditherMode);
+#else
+    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
+        if (ma_has_avx2()) {
+            ma_pcm_s32_to_s24__avx2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
+        if (ma_has_sse2()) {
+            ma_pcm_s32_to_s24__sse2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
+        if (ma_has_neon()) {
+            ma_pcm_s32_to_s24__neon(dst, src, count, ditherMode);
+        } else
+    #endif
+        {
+            ma_pcm_s32_to_s24__optimized(dst, src, count, ditherMode);
+        }
+#endif
+}
+
+
+MA_API void ma_pcm_s32_to_s32(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    (void)ditherMode;
+
+    ma_copy_memory_64(dst, src, count * sizeof(ma_int32));
+}
+
+
+static MA_INLINE void ma_pcm_s32_to_f32__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    float* dst_f32 = (float*)dst;
+    const ma_int32* src_s32 = (const ma_int32*)src;
+
+    ma_uint64 i;
+    for (i = 0; i < count; i += 1) {
+        double x = src_s32[i];
+
+#if 0
+        x = x + 2147483648.0;
+        x = x * 0.0000000004656612873077392578125;
+        x = x - 1;
+#else
+        x = x / 2147483648.0;
+#endif
+
+        dst_f32[i] = (float)x;
+    }
+
+    (void)ditherMode;   /* No dithering for s32 -> f32. */
+}
+
+static MA_INLINE void ma_pcm_s32_to_f32__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s32_to_f32__reference(dst, src, count, ditherMode);
+}
+
+#if defined(MA_SUPPORT_SSE2)
+static MA_INLINE void ma_pcm_s32_to_f32__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s32_to_f32__optimized(dst, src, count, ditherMode);
+}
+#endif
+#if defined(MA_SUPPORT_AVX2)
+static MA_INLINE void ma_pcm_s32_to_f32__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s32_to_f32__optimized(dst, src, count, ditherMode);
+}
+#endif
+#if defined(MA_SUPPORT_NEON)
+static MA_INLINE void ma_pcm_s32_to_f32__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_s32_to_f32__optimized(dst, src, count, ditherMode);
+}
+#endif
+
+MA_API void ma_pcm_s32_to_f32(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+#ifdef MA_USE_REFERENCE_CONVERSION_APIS
+    ma_pcm_s32_to_f32__reference(dst, src, count, ditherMode);
+#else
+    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
+        if (ma_has_avx2()) {
+            ma_pcm_s32_to_f32__avx2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
+        if (ma_has_sse2()) {
+            ma_pcm_s32_to_f32__sse2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
+        if (ma_has_neon()) {
+            ma_pcm_s32_to_f32__neon(dst, src, count, ditherMode);
+        } else
+    #endif
+        {
+            ma_pcm_s32_to_f32__optimized(dst, src, count, ditherMode);
+        }
+#endif
+}
+
+
+static MA_INLINE void ma_pcm_interleave_s32__reference(void* dst, const void** src, ma_uint64 frameCount, ma_uint32 channels)
+{
+    ma_int32* dst_s32 = (ma_int32*)dst;
+    const ma_int32** src_s32 = (const ma_int32**)src;
+
+    ma_uint64 iFrame;
+    for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
+        ma_uint32 iChannel;
+        for (iChannel = 0; iChannel < channels; iChannel += 1) {
+            dst_s32[iFrame*channels + iChannel] = src_s32[iChannel][iFrame];
+        }
+    }
+}
+
+static MA_INLINE void ma_pcm_interleave_s32__optimized(void* dst, const void** src, ma_uint64 frameCount, ma_uint32 channels)
+{
+    ma_pcm_interleave_s32__reference(dst, src, frameCount, channels);
+}
+
+MA_API void ma_pcm_interleave_s32(void* dst, const void** src, ma_uint64 frameCount, ma_uint32 channels)
+{
+#ifdef MA_USE_REFERENCE_CONVERSION_APIS
+    ma_pcm_interleave_s32__reference(dst, src, frameCount, channels);
+#else
+    ma_pcm_interleave_s32__optimized(dst, src, frameCount, channels);
+#endif
+}
+
+
+static MA_INLINE void ma_pcm_deinterleave_s32__reference(void** dst, const void* src, ma_uint64 frameCount, ma_uint32 channels)
+{
+    ma_int32** dst_s32 = (ma_int32**)dst;
+    const ma_int32* src_s32 = (const ma_int32*)src;
+
+    ma_uint64 iFrame;
+    for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
+        ma_uint32 iChannel;
+        for (iChannel = 0; iChannel < channels; iChannel += 1) {
+            dst_s32[iChannel][iFrame] = src_s32[iFrame*channels + iChannel];
+        }
+    }
+}
+
+static MA_INLINE void ma_pcm_deinterleave_s32__optimized(void** dst, const void* src, ma_uint64 frameCount, ma_uint32 channels)
+{
+    ma_pcm_deinterleave_s32__reference(dst, src, frameCount, channels);
+}
+
+MA_API void ma_pcm_deinterleave_s32(void** dst, const void* src, ma_uint64 frameCount, ma_uint32 channels)
+{
+#ifdef MA_USE_REFERENCE_CONVERSION_APIS
+    ma_pcm_deinterleave_s32__reference(dst, src, frameCount, channels);
+#else
+    ma_pcm_deinterleave_s32__optimized(dst, src, frameCount, channels);
+#endif
+}
+
+
+/* f32 */
+static MA_INLINE void ma_pcm_f32_to_u8__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_uint64 i;
+
+    ma_uint8* dst_u8 = (ma_uint8*)dst;
+    const float* src_f32 = (const float*)src;
+
+    float ditherMin = 0;
+    float ditherMax = 0;
+    if (ditherMode != ma_dither_mode_none) {
+        ditherMin = 1.0f / -128;
+        ditherMax = 1.0f /  127;
+    }
+
+    for (i = 0; i < count; i += 1) {
+        float x = src_f32[i];
+        x = x + ma_dither_f32(ditherMode, ditherMin, ditherMax);
+        x = ((x < -1) ? -1 : ((x > 1) ? 1 : x));    /* clip */
+        x = x + 1;                                  /* -1..1 to 0..2 */
+        x = x * 127.5f;                             /* 0..2 to 0..255 */
+
+        dst_u8[i] = (ma_uint8)x;
+    }
+}
+
+static MA_INLINE void ma_pcm_f32_to_u8__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_f32_to_u8__reference(dst, src, count, ditherMode);
+}
+
+#if defined(MA_SUPPORT_SSE2)
+static MA_INLINE void ma_pcm_f32_to_u8__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_f32_to_u8__optimized(dst, src, count, ditherMode);
+}
+#endif
+#if defined(MA_SUPPORT_AVX2)
+static MA_INLINE void ma_pcm_f32_to_u8__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_f32_to_u8__optimized(dst, src, count, ditherMode);
+}
+#endif
+#if defined(MA_SUPPORT_NEON)
+static MA_INLINE void ma_pcm_f32_to_u8__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_f32_to_u8__optimized(dst, src, count, ditherMode);
+}
+#endif
+
+MA_API void ma_pcm_f32_to_u8(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+#ifdef MA_USE_REFERENCE_CONVERSION_APIS
+    ma_pcm_f32_to_u8__reference(dst, src, count, ditherMode);
+#else
+    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
+        if (ma_has_avx2()) {
+            ma_pcm_f32_to_u8__avx2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
+        if (ma_has_sse2()) {
+            ma_pcm_f32_to_u8__sse2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
+        if (ma_has_neon()) {
+            ma_pcm_f32_to_u8__neon(dst, src, count, ditherMode);
+        } else
+    #endif
+        {
+            ma_pcm_f32_to_u8__optimized(dst, src, count, ditherMode);
+        }
+#endif
+}
+
+#ifdef MA_USE_REFERENCE_CONVERSION_APIS
+static MA_INLINE void ma_pcm_f32_to_s16__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_uint64 i;
+
+    ma_int16* dst_s16 = (ma_int16*)dst;
+    const float* src_f32 = (const float*)src;
+
+    float ditherMin = 0;
+    float ditherMax = 0;
+    if (ditherMode != ma_dither_mode_none) {
+        ditherMin = 1.0f / -32768;
+        ditherMax = 1.0f /  32767;
+    }
+
+    for (i = 0; i < count; i += 1) {
+        float x = src_f32[i];
+        x = x + ma_dither_f32(ditherMode, ditherMin, ditherMax);
+        x = ((x < -1) ? -1 : ((x > 1) ? 1 : x));    /* clip */
+
+#if 0
+        /* The accurate way. */
+        x = x + 1;                                  /* -1..1 to 0..2 */
+        x = x * 32767.5f;                           /* 0..2 to 0..65535 */
+        x = x - 32768.0f;                           /* 0...65535 to -32768..32767 */
+#else
+        /* The fast way. */
+        x = x * 32767.0f;                           /* -1..1 to -32767..32767 */
+#endif
+
+        dst_s16[i] = (ma_int16)x;
+    }
+}
+#else
+static MA_INLINE void ma_pcm_f32_to_s16__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_uint64 i;
+    ma_uint64 i4;
+    ma_uint64 count4;
+
+    ma_int16* dst_s16 = (ma_int16*)dst;
+    const float* src_f32 = (const float*)src;
+
+    float ditherMin = 0;
+    float ditherMax = 0;
+    if (ditherMode != ma_dither_mode_none) {
+        ditherMin = 1.0f / -32768;
+        ditherMax = 1.0f /  32767;
+    }
+
+    /* Unrolled. */
+    i = 0;
+    count4 = count >> 2;
+    for (i4 = 0; i4 < count4; i4 += 1) {
+        float d0 = ma_dither_f32(ditherMode, ditherMin, ditherMax);
+        float d1 = ma_dither_f32(ditherMode, ditherMin, ditherMax);
+        float d2 = ma_dither_f32(ditherMode, ditherMin, ditherMax);
+        float d3 = ma_dither_f32(ditherMode, ditherMin, ditherMax);
+        
+        float x0 = src_f32[i+0];
+        float x1 = src_f32[i+1];
+        float x2 = src_f32[i+2];
+        float x3 = src_f32[i+3];
+
+        x0 = x0 + d0;
+        x1 = x1 + d1;
+        x2 = x2 + d2;
+        x3 = x3 + d3;
+
+        x0 = ((x0 < -1) ? -1 : ((x0 > 1) ? 1 : x0));
+        x1 = ((x1 < -1) ? -1 : ((x1 > 1) ? 1 : x1));
+        x2 = ((x2 < -1) ? -1 : ((x2 > 1) ? 1 : x2));
+        x3 = ((x3 < -1) ? -1 : ((x3 > 1) ? 1 : x3));
+
+        x0 = x0 * 32767.0f;
+        x1 = x1 * 32767.0f;
+        x2 = x2 * 32767.0f;
+        x3 = x3 * 32767.0f;
+
+        dst_s16[i+0] = (ma_int16)x0;
+        dst_s16[i+1] = (ma_int16)x1;
+        dst_s16[i+2] = (ma_int16)x2;
+        dst_s16[i+3] = (ma_int16)x3;
+
+        i += 4;
+    }
+
+    /* Leftover. */
+    for (; i < count; i += 1) {
+        float x = src_f32[i];
+        x = x + ma_dither_f32(ditherMode, ditherMin, ditherMax);
+        x = ((x < -1) ? -1 : ((x > 1) ? 1 : x));    /* clip */
+        x = x * 32767.0f;                           /* -1..1 to -32767..32767 */
+
+        dst_s16[i] = (ma_int16)x;
+    }
+}
+
+#if defined(MA_SUPPORT_SSE2)
+static MA_INLINE void ma_pcm_f32_to_s16__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_uint64 i;
+    ma_uint64 i8;
+    ma_uint64 count8;
+    ma_int16* dst_s16;
+    const float* src_f32;
+    float ditherMin;
+    float ditherMax;
+
+    /* Both the input and output buffers need to be aligned to 16 bytes. */
+    if ((((ma_uintptr)dst & 15) != 0) || (((ma_uintptr)src & 15) != 0)) {
+        ma_pcm_f32_to_s16__optimized(dst, src, count, ditherMode);
+        return;
+    }
+
+    dst_s16 = (ma_int16*)dst;
+    src_f32 = (const float*)src;
+
+    ditherMin = 0;
+    ditherMax = 0;
+    if (ditherMode != ma_dither_mode_none) {
+        ditherMin = 1.0f / -32768;
+        ditherMax = 1.0f /  32767;
+    }
+
+    i = 0;
+
+    /* SSE2. SSE allows us to output 8 s16's at a time which means our loop is unrolled 8 times. */
+    count8 = count >> 3;
+    for (i8 = 0; i8 < count8; i8 += 1) {
+        __m128 d0;
+        __m128 d1;
+        __m128 x0;
+        __m128 x1;
+
+        if (ditherMode == ma_dither_mode_none) {
+            d0 = _mm_set1_ps(0);
+            d1 = _mm_set1_ps(0);
+        } else if (ditherMode == ma_dither_mode_rectangle) {
+            d0 = _mm_set_ps(
+                ma_dither_f32_rectangle(ditherMin, ditherMax),
+                ma_dither_f32_rectangle(ditherMin, ditherMax),
+                ma_dither_f32_rectangle(ditherMin, ditherMax),
+                ma_dither_f32_rectangle(ditherMin, ditherMax)
+            );
+            d1 = _mm_set_ps(
+                ma_dither_f32_rectangle(ditherMin, ditherMax),
+                ma_dither_f32_rectangle(ditherMin, ditherMax),
+                ma_dither_f32_rectangle(ditherMin, ditherMax),
+                ma_dither_f32_rectangle(ditherMin, ditherMax)
+            );
+        } else {
+            d0 = _mm_set_ps(
+                ma_dither_f32_triangle(ditherMin, ditherMax),
+                ma_dither_f32_triangle(ditherMin, ditherMax),
+                ma_dither_f32_triangle(ditherMin, ditherMax),
+                ma_dither_f32_triangle(ditherMin, ditherMax)
+            );
+            d1 = _mm_set_ps(
+                ma_dither_f32_triangle(ditherMin, ditherMax),
+                ma_dither_f32_triangle(ditherMin, ditherMax),
+                ma_dither_f32_triangle(ditherMin, ditherMax),
+                ma_dither_f32_triangle(ditherMin, ditherMax)
+            );
+        }
+
+        x0 = *((__m128*)(src_f32 + i) + 0);
+        x1 = *((__m128*)(src_f32 + i) + 1);
+
+        x0 = _mm_add_ps(x0, d0);
+        x1 = _mm_add_ps(x1, d1);
+
+        x0 = _mm_mul_ps(x0, _mm_set1_ps(32767.0f));
+        x1 = _mm_mul_ps(x1, _mm_set1_ps(32767.0f));
+
+        _mm_stream_si128(((__m128i*)(dst_s16 + i)), _mm_packs_epi32(_mm_cvttps_epi32(x0), _mm_cvttps_epi32(x1)));
+        
+        i += 8;
+    }
+
+
+    /* Leftover. */
+    for (; i < count; i += 1) {
+        float x = src_f32[i];
+        x = x + ma_dither_f32(ditherMode, ditherMin, ditherMax);
+        x = ((x < -1) ? -1 : ((x > 1) ? 1 : x));    /* clip */
+        x = x * 32767.0f;                           /* -1..1 to -32767..32767 */
+
+        dst_s16[i] = (ma_int16)x;
+    }
+}
+#endif  /* SSE2 */
+
+#if defined(MA_SUPPORT_AVX2)
+static MA_INLINE void ma_pcm_f32_to_s16__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_uint64 i;
+    ma_uint64 i16;
+    ma_uint64 count16;
+    ma_int16* dst_s16;
+    const float* src_f32;
+    float ditherMin;
+    float ditherMax;
+
+    /* Both the input and output buffers need to be aligned to 32 bytes. */
+    if ((((ma_uintptr)dst & 31) != 0) || (((ma_uintptr)src & 31) != 0)) {
+        ma_pcm_f32_to_s16__optimized(dst, src, count, ditherMode);
+        return;
+    }
+
+    dst_s16 = (ma_int16*)dst;
+    src_f32 = (const float*)src;
+
+    ditherMin = 0;
+    ditherMax = 0;
+    if (ditherMode != ma_dither_mode_none) {
+        ditherMin = 1.0f / -32768;
+        ditherMax = 1.0f /  32767;
+    }
+
+    i = 0;
+
+    /* AVX2. AVX2 allows us to output 16 s16's at a time which means our loop is unrolled 16 times. */
+    count16 = count >> 4;
+    for (i16 = 0; i16 < count16; i16 += 1) {
+        __m256 d0;
+        __m256 d1;
+        __m256 x0;
+        __m256 x1;
+        __m256i i0;
+        __m256i i1;
+        __m256i p0;
+        __m256i p1;
+        __m256i r;
+
+        if (ditherMode == ma_dither_mode_none) {
+            d0 = _mm256_set1_ps(0);
+            d1 = _mm256_set1_ps(0);
+        } else if (ditherMode == ma_dither_mode_rectangle) {
+            d0 = _mm256_set_ps(
+                ma_dither_f32_rectangle(ditherMin, ditherMax),
+                ma_dither_f32_rectangle(ditherMin, ditherMax),
+                ma_dither_f32_rectangle(ditherMin, ditherMax),
+                ma_dither_f32_rectangle(ditherMin, ditherMax),
+                ma_dither_f32_rectangle(ditherMin, ditherMax),
+                ma_dither_f32_rectangle(ditherMin, ditherMax),
+                ma_dither_f32_rectangle(ditherMin, ditherMax),
+                ma_dither_f32_rectangle(ditherMin, ditherMax)
+            );
+            d1 = _mm256_set_ps(
+                ma_dither_f32_rectangle(ditherMin, ditherMax),
+                ma_dither_f32_rectangle(ditherMin, ditherMax),
+                ma_dither_f32_rectangle(ditherMin, ditherMax),
+                ma_dither_f32_rectangle(ditherMin, ditherMax),
+                ma_dither_f32_rectangle(ditherMin, ditherMax),
+                ma_dither_f32_rectangle(ditherMin, ditherMax),
+                ma_dither_f32_rectangle(ditherMin, ditherMax),
+                ma_dither_f32_rectangle(ditherMin, ditherMax)
+            );
+        } else {
+            d0 = _mm256_set_ps(
+                ma_dither_f32_triangle(ditherMin, ditherMax),
+                ma_dither_f32_triangle(ditherMin, ditherMax),
+                ma_dither_f32_triangle(ditherMin, ditherMax),
+                ma_dither_f32_triangle(ditherMin, ditherMax),
+                ma_dither_f32_triangle(ditherMin, ditherMax),
+                ma_dither_f32_triangle(ditherMin, ditherMax),
+                ma_dither_f32_triangle(ditherMin, ditherMax),
+                ma_dither_f32_triangle(ditherMin, ditherMax)
+            );
+            d1 = _mm256_set_ps(
+                ma_dither_f32_triangle(ditherMin, ditherMax),
+                ma_dither_f32_triangle(ditherMin, ditherMax),
+                ma_dither_f32_triangle(ditherMin, ditherMax),
+                ma_dither_f32_triangle(ditherMin, ditherMax),
+                ma_dither_f32_triangle(ditherMin, ditherMax),
+                ma_dither_f32_triangle(ditherMin, ditherMax),
+                ma_dither_f32_triangle(ditherMin, ditherMax),
+                ma_dither_f32_triangle(ditherMin, ditherMax)
+            );
+        }
+
+        x0 = *((__m256*)(src_f32 + i) + 0);
+        x1 = *((__m256*)(src_f32 + i) + 1);
+
+        x0 = _mm256_add_ps(x0, d0);
+        x1 = _mm256_add_ps(x1, d1);
+
+        x0 = _mm256_mul_ps(x0, _mm256_set1_ps(32767.0f));
+        x1 = _mm256_mul_ps(x1, _mm256_set1_ps(32767.0f));
+
+        /* Computing the final result is a little more complicated for AVX2 than SSE2. */
+        i0 = _mm256_cvttps_epi32(x0);
+        i1 = _mm256_cvttps_epi32(x1);
+        p0 = _mm256_permute2x128_si256(i0, i1, 0 | 32);
+        p1 = _mm256_permute2x128_si256(i0, i1, 1 | 48);
+        r  = _mm256_packs_epi32(p0, p1);
+
+        _mm256_stream_si256(((__m256i*)(dst_s16 + i)), r);
+
+        i += 16;
+    }
+
+
+    /* Leftover. */
+    for (; i < count; i += 1) {
+        float x = src_f32[i];
+        x = x + ma_dither_f32(ditherMode, ditherMin, ditherMax);
+        x = ((x < -1) ? -1 : ((x > 1) ? 1 : x));    /* clip */
+        x = x * 32767.0f;                           /* -1..1 to -32767..32767 */
+
+        dst_s16[i] = (ma_int16)x;
+    }
+}
+#endif  /* AVX2 */
+
+#if defined(MA_SUPPORT_NEON)
+static MA_INLINE void ma_pcm_f32_to_s16__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_uint64 i;
+    ma_uint64 i8;
+    ma_uint64 count8;
+    ma_int16* dst_s16;
+    const float* src_f32;
+    float ditherMin;
+    float ditherMax;
+
+    if (!ma_has_neon()) {
+        return ma_pcm_f32_to_s16__optimized(dst, src, count, ditherMode);
+    }
+
+    /* Both the input and output buffers need to be aligned to 16 bytes. */
+    if ((((ma_uintptr)dst & 15) != 0) || (((ma_uintptr)src & 15) != 0)) {
+        ma_pcm_f32_to_s16__optimized(dst, src, count, ditherMode);
+        return;
+    }
+
+    dst_s16 = (ma_int16*)dst;
+    src_f32 = (const float*)src;
+
+    ditherMin = 0;
+    ditherMax = 0;
+    if (ditherMode != ma_dither_mode_none) {
+        ditherMin = 1.0f / -32768;
+        ditherMax = 1.0f /  32767;
+    }
+
+    i = 0;
+
+    /* NEON. NEON allows us to output 8 s16's at a time which means our loop is unrolled 8 times. */
+    count8 = count >> 3;
+    for (i8 = 0; i8 < count8; i8 += 1) {
+        float32x4_t d0;
+        float32x4_t d1;
+        float32x4_t x0;
+        float32x4_t x1;
+        int32x4_t i0;
+        int32x4_t i1;
+
+        if (ditherMode == ma_dither_mode_none) {
+            d0 = vmovq_n_f32(0);
+            d1 = vmovq_n_f32(0);
+        } else if (ditherMode == ma_dither_mode_rectangle) {
+            float d0v[4];
+            d0v[0] = ma_dither_f32_rectangle(ditherMin, ditherMax);
+            d0v[1] = ma_dither_f32_rectangle(ditherMin, ditherMax);
+            d0v[2] = ma_dither_f32_rectangle(ditherMin, ditherMax);
+            d0v[3] = ma_dither_f32_rectangle(ditherMin, ditherMax);
+            d0 = vld1q_f32(d0v);
+
+            float d1v[4];
+            d1v[0] = ma_dither_f32_rectangle(ditherMin, ditherMax);
+            d1v[1] = ma_dither_f32_rectangle(ditherMin, ditherMax);
+            d1v[2] = ma_dither_f32_rectangle(ditherMin, ditherMax);
+            d1v[3] = ma_dither_f32_rectangle(ditherMin, ditherMax);
+            d1 = vld1q_f32(d1v);
+        } else {
+            float d0v[4];
+            d0v[0] = ma_dither_f32_triangle(ditherMin, ditherMax);
+            d0v[1] = ma_dither_f32_triangle(ditherMin, ditherMax);
+            d0v[2] = ma_dither_f32_triangle(ditherMin, ditherMax);
+            d0v[3] = ma_dither_f32_triangle(ditherMin, ditherMax);
+            d0 = vld1q_f32(d0v);
+
+            float d1v[4];
+            d1v[0] = ma_dither_f32_triangle(ditherMin, ditherMax);
+            d1v[1] = ma_dither_f32_triangle(ditherMin, ditherMax);
+            d1v[2] = ma_dither_f32_triangle(ditherMin, ditherMax);
+            d1v[3] = ma_dither_f32_triangle(ditherMin, ditherMax);
+            d1 = vld1q_f32(d1v);
+        }
+
+        x0 = *((float32x4_t*)(src_f32 + i) + 0);
+        x1 = *((float32x4_t*)(src_f32 + i) + 1);
+
+        x0 = vaddq_f32(x0, d0);
+        x1 = vaddq_f32(x1, d1);
+
+        x0 = vmulq_n_f32(x0, 32767.0f);
+        x1 = vmulq_n_f32(x1, 32767.0f);
+
+        i0 = vcvtq_s32_f32(x0);
+        i1 = vcvtq_s32_f32(x1);
+        *((int16x8_t*)(dst_s16 + i)) = vcombine_s16(vqmovn_s32(i0), vqmovn_s32(i1));
+
+        i += 8;
+    }
+
+
+    /* Leftover. */
+    for (; i < count; i += 1) {
+        float x = src_f32[i];
+        x = x + ma_dither_f32(ditherMode, ditherMin, ditherMax);
+        x = ((x < -1) ? -1 : ((x > 1) ? 1 : x));    /* clip */
+        x = x * 32767.0f;                           /* -1..1 to -32767..32767 */
+
+        dst_s16[i] = (ma_int16)x;
+    }
+}
+#endif  /* Neon */
+#endif  /* MA_USE_REFERENCE_CONVERSION_APIS */
+
+MA_API void ma_pcm_f32_to_s16(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+#ifdef MA_USE_REFERENCE_CONVERSION_APIS
+    ma_pcm_f32_to_s16__reference(dst, src, count, ditherMode);
+#else
+    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
+        if (ma_has_avx2()) {
+            ma_pcm_f32_to_s16__avx2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
+        if (ma_has_sse2()) {
+            ma_pcm_f32_to_s16__sse2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
+        if (ma_has_neon()) {
+            ma_pcm_f32_to_s16__neon(dst, src, count, ditherMode);
+        } else
+    #endif
+        {
+            ma_pcm_f32_to_s16__optimized(dst, src, count, ditherMode);
+        }
+#endif
+}
+
+
+static MA_INLINE void ma_pcm_f32_to_s24__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_uint8* dst_s24 = (ma_uint8*)dst;
+    const float* src_f32 = (const float*)src;
+
+    ma_uint64 i;
+    for (i = 0; i < count; i += 1) {
+        ma_int32 r;
+        float x = src_f32[i];
+        x = ((x < -1) ? -1 : ((x > 1) ? 1 : x));    /* clip */
+
+#if 0
+        /* The accurate way. */
+        x = x + 1;                                  /* -1..1 to 0..2 */
+        x = x * 8388607.5f;                         /* 0..2 to 0..16777215 */
+        x = x - 8388608.0f;                         /* 0..16777215 to -8388608..8388607 */
+#else
+        /* The fast way. */
+        x = x * 8388607.0f;                         /* -1..1 to -8388607..8388607 */
+#endif
+
+        r = (ma_int32)x;
+        dst_s24[(i*3)+0] = (ma_uint8)((r & 0x0000FF) >>  0);
+        dst_s24[(i*3)+1] = (ma_uint8)((r & 0x00FF00) >>  8);
+        dst_s24[(i*3)+2] = (ma_uint8)((r & 0xFF0000) >> 16);
+    }
+
+    (void)ditherMode;   /* No dithering for f32 -> s24. */
+}
+
+static MA_INLINE void ma_pcm_f32_to_s24__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_f32_to_s24__reference(dst, src, count, ditherMode);
+}
+
+#if defined(MA_SUPPORT_SSE2)
+static MA_INLINE void ma_pcm_f32_to_s24__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_f32_to_s24__optimized(dst, src, count, ditherMode);
+}
+#endif
+#if defined(MA_SUPPORT_AVX2)
+static MA_INLINE void ma_pcm_f32_to_s24__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_f32_to_s24__optimized(dst, src, count, ditherMode);
+}
+#endif
+#if defined(MA_SUPPORT_NEON)
+static MA_INLINE void ma_pcm_f32_to_s24__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_f32_to_s24__optimized(dst, src, count, ditherMode);
+}
+#endif
+
+MA_API void ma_pcm_f32_to_s24(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+#ifdef MA_USE_REFERENCE_CONVERSION_APIS
+    ma_pcm_f32_to_s24__reference(dst, src, count, ditherMode);
+#else
+    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
+        if (ma_has_avx2()) {
+            ma_pcm_f32_to_s24__avx2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
+        if (ma_has_sse2()) {
+            ma_pcm_f32_to_s24__sse2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
+        if (ma_has_neon()) {
+            ma_pcm_f32_to_s24__neon(dst, src, count, ditherMode);
+        } else
+    #endif
+        {
+            ma_pcm_f32_to_s24__optimized(dst, src, count, ditherMode);
+        }
+#endif
+}
+
+
+static MA_INLINE void ma_pcm_f32_to_s32__reference(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_int32* dst_s32 = (ma_int32*)dst;
+    const float* src_f32 = (const float*)src;
+
+    ma_uint32 i;
+    for (i = 0; i < count; i += 1) {
+        double x = src_f32[i];
+        x = ((x < -1) ? -1 : ((x > 1) ? 1 : x));    /* clip */
+
+#if 0
+        /* The accurate way. */
+        x = x + 1;                                  /* -1..1 to 0..2 */
+        x = x * 2147483647.5;                       /* 0..2 to 0..4294967295 */
+        x = x - 2147483648.0;                       /* 0...4294967295 to -2147483648..2147483647 */
+#else
+        /* The fast way. */
+        x = x * 2147483647.0;                       /* -1..1 to -2147483647..2147483647 */
+#endif
+
+        dst_s32[i] = (ma_int32)x;
+    }
+
+    (void)ditherMode;   /* No dithering for f32 -> s32. */
+}
+
+static MA_INLINE void ma_pcm_f32_to_s32__optimized(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_f32_to_s32__reference(dst, src, count, ditherMode);
+}
+
+#if defined(MA_SUPPORT_SSE2)
+static MA_INLINE void ma_pcm_f32_to_s32__sse2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_f32_to_s32__optimized(dst, src, count, ditherMode);
+}
+#endif
+#if defined(MA_SUPPORT_AVX2)
+static MA_INLINE void ma_pcm_f32_to_s32__avx2(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_f32_to_s32__optimized(dst, src, count, ditherMode);
+}
+#endif
+#if defined(MA_SUPPORT_NEON)
+static MA_INLINE void ma_pcm_f32_to_s32__neon(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    ma_pcm_f32_to_s32__optimized(dst, src, count, ditherMode);
+}
+#endif
+
+MA_API void ma_pcm_f32_to_s32(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+#ifdef MA_USE_REFERENCE_CONVERSION_APIS
+    ma_pcm_f32_to_s32__reference(dst, src, count, ditherMode);
+#else
+    #  if MA_PREFERRED_SIMD == MA_SIMD_AVX2
+        if (ma_has_avx2()) {
+            ma_pcm_f32_to_s32__avx2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_SSE2
+        if (ma_has_sse2()) {
+            ma_pcm_f32_to_s32__sse2(dst, src, count, ditherMode);
+        } else
+    #elif MA_PREFERRED_SIMD == MA_SIMD_NEON
+        if (ma_has_neon()) {
+            ma_pcm_f32_to_s32__neon(dst, src, count, ditherMode);
+        } else
+    #endif
+        {
+            ma_pcm_f32_to_s32__optimized(dst, src, count, ditherMode);
+        }
+#endif
+}
+
+
+MA_API void ma_pcm_f32_to_f32(void* dst, const void* src, ma_uint64 count, ma_dither_mode ditherMode)
+{
+    (void)ditherMode;
+
+    ma_copy_memory_64(dst, src, count * sizeof(float));
+}
+
+
+static void ma_pcm_interleave_f32__reference(void* dst, const void** src, ma_uint64 frameCount, ma_uint32 channels)
+{
+    float* dst_f32 = (float*)dst;
+    const float** src_f32 = (const float**)src;
+
+    ma_uint64 iFrame;
+    for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
+        ma_uint32 iChannel;
+        for (iChannel = 0; iChannel < channels; iChannel += 1) {
+            dst_f32[iFrame*channels + iChannel] = src_f32[iChannel][iFrame];
+        }
+    }
+}
+
+static void ma_pcm_interleave_f32__optimized(void* dst, const void** src, ma_uint64 frameCount, ma_uint32 channels)
+{
+    ma_pcm_interleave_f32__reference(dst, src, frameCount, channels);
+}
+
+MA_API void ma_pcm_interleave_f32(void* dst, const void** src, ma_uint64 frameCount, ma_uint32 channels)
+{
+#ifdef MA_USE_REFERENCE_CONVERSION_APIS
+    ma_pcm_interleave_f32__reference(dst, src, frameCount, channels);
+#else
+    ma_pcm_interleave_f32__optimized(dst, src, frameCount, channels);
+#endif
+}
+
+
+static void ma_pcm_deinterleave_f32__reference(void** dst, const void* src, ma_uint64 frameCount, ma_uint32 channels)
+{
+    float** dst_f32 = (float**)dst;
+    const float* src_f32 = (const float*)src;
+
+    ma_uint64 iFrame;
+    for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
+        ma_uint32 iChannel;
+        for (iChannel = 0; iChannel < channels; iChannel += 1) {
+            dst_f32[iChannel][iFrame] = src_f32[iFrame*channels + iChannel];
+        }
+    }
+}
+
+static void ma_pcm_deinterleave_f32__optimized(void** dst, const void* src, ma_uint64 frameCount, ma_uint32 channels)
+{
+    ma_pcm_deinterleave_f32__reference(dst, src, frameCount, channels);
+}
+
+MA_API void ma_pcm_deinterleave_f32(void** dst, const void* src, ma_uint64 frameCount, ma_uint32 channels)
+{
+#ifdef MA_USE_REFERENCE_CONVERSION_APIS
+    ma_pcm_deinterleave_f32__reference(dst, src, frameCount, channels);
+#else
+    ma_pcm_deinterleave_f32__optimized(dst, src, frameCount, channels);
+#endif
+}
+
+
+MA_API void ma_pcm_convert(void* pOut, ma_format formatOut, const void* pIn, ma_format formatIn, ma_uint64 sampleCount, ma_dither_mode ditherMode)
+{
+    if (formatOut == formatIn) {
+        ma_copy_memory_64(pOut, pIn, sampleCount * ma_get_bytes_per_sample(formatOut));
+        return;
+    }
+
+    switch (formatIn)
+    {
+        case ma_format_u8:
+        {
+            switch (formatOut)
+            {
+                case ma_format_s16: ma_pcm_u8_to_s16(pOut, pIn, sampleCount, ditherMode); return;
+                case ma_format_s24: ma_pcm_u8_to_s24(pOut, pIn, sampleCount, ditherMode); return;
+                case ma_format_s32: ma_pcm_u8_to_s32(pOut, pIn, sampleCount, ditherMode); return;
+                case ma_format_f32: ma_pcm_u8_to_f32(pOut, pIn, sampleCount, ditherMode); return;
+                default: break;
+            }
+        } break;
+
+        case ma_format_s16:
+        {
+            switch (formatOut)
+            {
+                case ma_format_u8:  ma_pcm_s16_to_u8( pOut, pIn, sampleCount, ditherMode); return;
+                case ma_format_s24: ma_pcm_s16_to_s24(pOut, pIn, sampleCount, ditherMode); return;
+                case ma_format_s32: ma_pcm_s16_to_s32(pOut, pIn, sampleCount, ditherMode); return;
+                case ma_format_f32: ma_pcm_s16_to_f32(pOut, pIn, sampleCount, ditherMode); return;
+                default: break;
+            }
+        } break;
+
+        case ma_format_s24:
+        {
+            switch (formatOut)
+            {
+                case ma_format_u8:  ma_pcm_s24_to_u8( pOut, pIn, sampleCount, ditherMode); return;
+                case ma_format_s16: ma_pcm_s24_to_s16(pOut, pIn, sampleCount, ditherMode); return;
+                case ma_format_s32: ma_pcm_s24_to_s32(pOut, pIn, sampleCount, ditherMode); return;
+                case ma_format_f32: ma_pcm_s24_to_f32(pOut, pIn, sampleCount, ditherMode); return;
+                default: break;
+            }
+        } break;
+
+        case ma_format_s32:
+        {
+            switch (formatOut)
+            {
+                case ma_format_u8:  ma_pcm_s32_to_u8( pOut, pIn, sampleCount, ditherMode); return;
+                case ma_format_s16: ma_pcm_s32_to_s16(pOut, pIn, sampleCount, ditherMode); return;
+                case ma_format_s24: ma_pcm_s32_to_s24(pOut, pIn, sampleCount, ditherMode); return;
+                case ma_format_f32: ma_pcm_s32_to_f32(pOut, pIn, sampleCount, ditherMode); return;
+                default: break;
+            }
+        } break;
+
+        case ma_format_f32:
+        {
+            switch (formatOut)
+            {
+                case ma_format_u8:  ma_pcm_f32_to_u8( pOut, pIn, sampleCount, ditherMode); return;
+                case ma_format_s16: ma_pcm_f32_to_s16(pOut, pIn, sampleCount, ditherMode); return;
+                case ma_format_s24: ma_pcm_f32_to_s24(pOut, pIn, sampleCount, ditherMode); return;
+                case ma_format_s32: ma_pcm_f32_to_s32(pOut, pIn, sampleCount, ditherMode); return;
+                default: break;
+            }
+        } break;
+
+        default: break;
+    }
+}
+
+MA_API void ma_convert_pcm_frames_format(void* pOut, ma_format formatOut, const void* pIn, ma_format formatIn, ma_uint64 frameCount, ma_uint32 channels, ma_dither_mode ditherMode)
+{
+    ma_pcm_convert(pOut, formatOut, pIn, formatIn, frameCount * channels, ditherMode);
+}
+
+MA_API void ma_deinterleave_pcm_frames(ma_format format, ma_uint32 channels, ma_uint64 frameCount, const void* pInterleavedPCMFrames, void** ppDeinterleavedPCMFrames)
+{
+    if (pInterleavedPCMFrames == NULL || ppDeinterleavedPCMFrames == NULL) {
+        return; /* Invalid args. */
+    }
+
+    /* For efficiency we do this per format. */
+    switch (format) {
+        case ma_format_s16:
+        {
+            const ma_int16* pSrcS16 = (const ma_int16*)pInterleavedPCMFrames;
+            ma_uint64 iPCMFrame;
+            for (iPCMFrame = 0; iPCMFrame < frameCount; ++iPCMFrame) {
+                ma_uint32 iChannel;
+                for (iChannel = 0; iChannel < channels; ++iChannel) {
+                    ma_int16* pDstS16 = (ma_int16*)ppDeinterleavedPCMFrames[iChannel];
+                    pDstS16[iPCMFrame] = pSrcS16[iPCMFrame*channels+iChannel];
+                }
+            }
+        } break;
+        
+        case ma_format_f32:
+        {
+            const float* pSrcF32 = (const float*)pInterleavedPCMFrames;
+            ma_uint64 iPCMFrame;
+            for (iPCMFrame = 0; iPCMFrame < frameCount; ++iPCMFrame) {
+                ma_uint32 iChannel;
+                for (iChannel = 0; iChannel < channels; ++iChannel) {
+                    float* pDstF32 = (float*)ppDeinterleavedPCMFrames[iChannel];
+                    pDstF32[iPCMFrame] = pSrcF32[iPCMFrame*channels+iChannel];
+                }
+            }
+        } break;
+        
+        default:
+        {
+            ma_uint32 sampleSizeInBytes = ma_get_bytes_per_sample(format);
+            ma_uint64 iPCMFrame;
+            for (iPCMFrame = 0; iPCMFrame < frameCount; ++iPCMFrame) {
+                ma_uint32 iChannel;
+                for (iChannel = 0; iChannel < channels; ++iChannel) {
+                          void* pDst = ma_offset_ptr(ppDeinterleavedPCMFrames[iChannel], iPCMFrame*sampleSizeInBytes);
+                    const void* pSrc = ma_offset_ptr(pInterleavedPCMFrames, (iPCMFrame*channels+iChannel)*sampleSizeInBytes);
+                    memcpy(pDst, pSrc, sampleSizeInBytes);
+                }
+            }
+        } break;
+    }
+}
+
+MA_API void ma_interleave_pcm_frames(ma_format format, ma_uint32 channels, ma_uint64 frameCount, const void** ppDeinterleavedPCMFrames, void* pInterleavedPCMFrames)
+{
+    switch (format)
+    {
+        case ma_format_s16:
+        {
+            ma_int16* pDstS16 = (ma_int16*)pInterleavedPCMFrames;
+            ma_uint64 iPCMFrame;
+            for (iPCMFrame = 0; iPCMFrame < frameCount; ++iPCMFrame) {
+                ma_uint32 iChannel;
+                for (iChannel = 0; iChannel < channels; ++iChannel) {
+                    const ma_int16* pSrcS16 = (const ma_int16*)ppDeinterleavedPCMFrames[iChannel];
+                    pDstS16[iPCMFrame*channels+iChannel] = pSrcS16[iPCMFrame];
+                }
+            }
+        } break;
+        
+        case ma_format_f32:
+        {
+            float* pDstF32 = (float*)pInterleavedPCMFrames;
+            ma_uint64 iPCMFrame;
+            for (iPCMFrame = 0; iPCMFrame < frameCount; ++iPCMFrame) {
+                ma_uint32 iChannel;
+                for (iChannel = 0; iChannel < channels; ++iChannel) {
+                    const float* pSrcF32 = (const float*)ppDeinterleavedPCMFrames[iChannel];
+                    pDstF32[iPCMFrame*channels+iChannel] = pSrcF32[iPCMFrame];
+                }
+            }
+        } break;
+    
+        default:
+        {
+            ma_uint32 sampleSizeInBytes = ma_get_bytes_per_sample(format);
+            ma_uint64 iPCMFrame;
+            for (iPCMFrame = 0; iPCMFrame < frameCount; ++iPCMFrame) {
+                ma_uint32 iChannel;
+                for (iChannel = 0; iChannel < channels; ++iChannel) {
+                          void* pDst = ma_offset_ptr(pInterleavedPCMFrames, (iPCMFrame*channels+iChannel)*sampleSizeInBytes);
+                    const void* pSrc = ma_offset_ptr(ppDeinterleavedPCMFrames[iChannel], iPCMFrame*sampleSizeInBytes);
+                    memcpy(pDst, pSrc, sampleSizeInBytes);
+                }
+            }
+        } break;
+    }
 }
 
 
@@ -39884,347 +39416,6 @@ MA_API ma_uint32 ma_get_bytes_per_sample(ma_format format)
 }
 
 
-
-MA_API ma_uint64 ma_data_source_read_pcm_frames(ma_data_source* pDataSource, void* pFramesOut, ma_uint64 frameCount)
-{
-    ma_data_source_callbacks* pCallbacks = (ma_data_source_callbacks*)pDataSource;
-    if (pCallbacks == NULL || pCallbacks->onRead == NULL) {
-        return 0;
-    }
-
-    return pCallbacks->onRead(pDataSource, pFramesOut, frameCount);
-}
-
-MA_API ma_result ma_data_source_seek_to_pcm_frame(ma_data_source* pDataSource, ma_uint64 frameIndex)
-{
-    ma_data_source_callbacks* pCallbacks = (ma_data_source_callbacks*)pDataSource;
-    if (pCallbacks == NULL || pCallbacks->onSeek == NULL) {
-        return MA_INVALID_ARGS;
-    }
-
-    return pCallbacks->onSeek(pDataSource, frameIndex);
-}
-
-MA_API ma_result ma_data_source_get_data_format(ma_data_source* pDataSource, ma_format* pFormat, ma_uint32* pChannels)
-{
-    ma_result result;
-    ma_format format;
-    ma_uint32 channels;
-    ma_data_source_callbacks* pCallbacks = (ma_data_source_callbacks*)pDataSource;
-
-    if (pCallbacks == NULL || pCallbacks->onGetDataFormat == NULL) {
-        return MA_INVALID_ARGS;
-    }
-
-    result = pCallbacks->onGetDataFormat(pDataSource, &format, &channels);
-    if (result != MA_SUCCESS) {
-        return result;
-    }
-
-    if (pFormat != NULL) {
-        *pFormat = format;
-    }
-    if (pChannels != NULL) {
-        *pChannels = channels;
-    }
-
-    return MA_SUCCESS;
-}
-
-
-
-MA_API ma_audio_buffer_config ma_audio_buffer_config_init(ma_format format, ma_uint32 channels, ma_uint64 sizeInFrames, const void* pData, const ma_allocation_callbacks* pAllocationCallbacks)
-{
-    ma_audio_buffer_config config;
-
-    MA_ZERO_OBJECT(&config);
-    config.format = format;
-    config.channels = channels;
-    config.sizeInFrames = sizeInFrames;
-    config.pData = pData;
-    ma_allocation_callbacks_init_copy(&config.allocationCallbacks, pAllocationCallbacks);
-
-    return config;
-}
-
-
-static ma_uint64 ma_audio_buffer__data_source_on_read(ma_data_source* pDataSource, void* pFramesOut, ma_uint64 frameCount)
-{
-    return ma_audio_buffer_read_pcm_frames((ma_audio_buffer*)pDataSource, pFramesOut, frameCount, MA_FALSE);
-}
-
-static ma_result ma_audio_buffer__data_source_on_seek(ma_data_source* pDataSource, ma_uint64 frameIndex)
-{
-    return ma_audio_buffer_seek_to_pcm_frame((ma_audio_buffer*)pDataSource, frameIndex);
-}
-
-static ma_result ma_audio_buffer__data_source_on_get_data_format(ma_data_source* pDataSource, ma_format* pFormat, ma_uint32* pChannels)
-{
-    ma_audio_buffer* pAudioBuffer = (ma_audio_buffer*)pDataSource;
-
-    *pFormat   = pAudioBuffer->format;
-    *pChannels = pAudioBuffer->channels;
-
-    return MA_SUCCESS;
-}
-
-static ma_result ma_audio_buffer_init_ex(const ma_audio_buffer_config* pConfig, ma_bool32 doCopy, ma_audio_buffer* pAudioBuffer)
-{
-    if (pAudioBuffer == NULL) {
-        return MA_INVALID_ARGS;
-    }
-
-    MA_ZERO_MEMORY(pAudioBuffer, sizeof(*pAudioBuffer) - sizeof(pAudioBuffer->_pExtraData));   /* Safety. Don't overwrite the extra data. */
-
-    if (pConfig == NULL) {
-        return MA_INVALID_ARGS;
-    }
-
-    if (pConfig->sizeInFrames == 0) {
-        return MA_INVALID_ARGS; /* Not allowing buffer sizes of 0 frames. */
-    }
-
-    pAudioBuffer->ds.onRead          = ma_audio_buffer__data_source_on_read;
-    pAudioBuffer->ds.onSeek          = ma_audio_buffer__data_source_on_seek;
-    pAudioBuffer->ds.onGetDataFormat = ma_audio_buffer__data_source_on_get_data_format;
-    pAudioBuffer->format             = pConfig->format;
-    pAudioBuffer->channels           = pConfig->channels;
-    pAudioBuffer->cursor             = 0;
-    pAudioBuffer->sizeInFrames       = pConfig->sizeInFrames;
-    pAudioBuffer->pData              = NULL;  /* Set properly later. */
-    ma_allocation_callbacks_init_copy(&pAudioBuffer->allocationCallbacks, &pConfig->allocationCallbacks);
-
-    if (doCopy) {
-        ma_uint64 allocationSizeInBytes;
-        void* pData;
-
-        allocationSizeInBytes = pAudioBuffer->sizeInFrames * ma_get_bytes_per_frame(pAudioBuffer->format, pAudioBuffer->channels);
-        if (allocationSizeInBytes > MA_SIZE_MAX) {
-            return MA_OUT_OF_MEMORY;    /* Too big. */
-        }
-
-        pData = ma__malloc_from_callbacks((size_t)allocationSizeInBytes, &pAudioBuffer->allocationCallbacks);   /* Safe cast to size_t. */
-        if (pData == NULL) {
-            return MA_OUT_OF_MEMORY;
-        }
-
-        if (pConfig->pData != NULL) {
-            ma_copy_pcm_frames(pData, pConfig->pData, pAudioBuffer->sizeInFrames, pAudioBuffer->format, pAudioBuffer->channels);
-        } else {
-            ma_silence_pcm_frames(pData, pAudioBuffer->sizeInFrames, pAudioBuffer->format, pAudioBuffer->channels);
-        }
-
-        pAudioBuffer->pData    = pData;
-        pAudioBuffer->ownsData = MA_TRUE;
-    } else {
-        pAudioBuffer->pData    = pConfig->pData;
-        pAudioBuffer->ownsData = MA_FALSE;
-    }
-
-    return MA_SUCCESS;
-}
-
-static void ma_audio_buffer_uninit_ex(ma_audio_buffer* pAudioBuffer, ma_bool32 doFree)
-{
-    if (pAudioBuffer == NULL) {
-        return;
-    }
-
-    if (pAudioBuffer->ownsData && pAudioBuffer->pData != &pAudioBuffer->_pExtraData[0]) {
-        ma__free_from_callbacks((void*)pAudioBuffer->pData, &pAudioBuffer->allocationCallbacks);    /* Naugty const cast, but OK in this case since we've guarded it with the ownsData check. */
-    }
-
-    if (doFree) {
-        ma_allocation_callbacks allocationCallbacks = pAudioBuffer->allocationCallbacks;
-        ma__free_from_callbacks(pAudioBuffer, &allocationCallbacks);
-    }
-}
-
-MA_API ma_result ma_audio_buffer_init(const ma_audio_buffer_config* pConfig, ma_audio_buffer* pAudioBuffer)
-{
-    return ma_audio_buffer_init_ex(pConfig, MA_FALSE, pAudioBuffer);
-}
-
-MA_API ma_result ma_audio_buffer_init_copy(const ma_audio_buffer_config* pConfig, ma_audio_buffer* pAudioBuffer)
-{
-    return ma_audio_buffer_init_ex(pConfig, MA_TRUE, pAudioBuffer);
-}
-
-MA_API ma_result ma_audio_buffer_alloc_and_init(const ma_audio_buffer_config* pConfig, ma_audio_buffer** ppAudioBuffer)
-{
-    ma_result result;
-    ma_audio_buffer* pAudioBuffer;
-    ma_audio_buffer_config innerConfig; /* We'll be making some changes to the config, so need to make a copy. */
-    ma_uint64 allocationSizeInBytes;
-
-    if (ppAudioBuffer == NULL) {
-        return MA_INVALID_ARGS;
-    }
-
-    *ppAudioBuffer = NULL;  /* Safety. */
-
-    if (pConfig == NULL) {
-        return MA_INVALID_ARGS;
-    }
-
-    innerConfig = *pConfig;
-    ma_allocation_callbacks_init_copy(&innerConfig.allocationCallbacks, &pConfig->allocationCallbacks);
-
-    allocationSizeInBytes = sizeof(*pAudioBuffer) - sizeof(pAudioBuffer->_pExtraData) + (pConfig->sizeInFrames * ma_get_bytes_per_frame(pConfig->format, pConfig->channels));
-    if (allocationSizeInBytes > MA_SIZE_MAX) {
-        return MA_OUT_OF_MEMORY;    /* Too big. */
-    }
-
-    pAudioBuffer = (ma_audio_buffer*)ma__malloc_from_callbacks((size_t)allocationSizeInBytes, &innerConfig.allocationCallbacks);  /* Safe cast to size_t. */
-    if (pAudioBuffer == NULL) {
-        return MA_OUT_OF_MEMORY;
-    }
-
-    if (pConfig->pData != NULL) {
-        ma_copy_pcm_frames(&pAudioBuffer->_pExtraData[0], pConfig->pData, pConfig->sizeInFrames, pConfig->format, pConfig->channels);
-    } else {
-        ma_silence_pcm_frames(&pAudioBuffer->_pExtraData[0], pConfig->sizeInFrames, pConfig->format, pConfig->channels);
-    }
-
-    innerConfig.pData = &pAudioBuffer->_pExtraData[0];
-
-    result = ma_audio_buffer_init_ex(&innerConfig, MA_FALSE, pAudioBuffer);
-    if (result != MA_SUCCESS) {
-        ma__free_from_callbacks(pAudioBuffer, &innerConfig.allocationCallbacks);
-        return result;
-    }
-
-    *ppAudioBuffer = pAudioBuffer;
-
-    return MA_SUCCESS;
-}
-
-MA_API void ma_audio_buffer_uninit(ma_audio_buffer* pAudioBuffer)
-{
-    ma_audio_buffer_uninit_ex(pAudioBuffer, MA_FALSE);
-}
-
-MA_API void ma_audio_buffer_uninit_and_free(ma_audio_buffer* pAudioBuffer)
-{
-    ma_audio_buffer_uninit_ex(pAudioBuffer, MA_TRUE);
-}
-
-MA_API ma_uint64 ma_audio_buffer_read_pcm_frames(ma_audio_buffer* pAudioBuffer, void* pFramesOut, ma_uint64 frameCount, ma_bool32 loop)
-{
-    ma_uint64 totalFramesRead = 0;
-    
-    if (pAudioBuffer == NULL) {
-        return 0;
-    }
-
-    if (frameCount == 0) {
-        return 0;
-    }
-
-    while (totalFramesRead < frameCount) {
-        ma_uint64 framesAvailable = pAudioBuffer->sizeInFrames - pAudioBuffer->cursor;
-        ma_uint64 framesRemaining = frameCount - totalFramesRead;
-        ma_uint64 framesToRead;
-
-        framesToRead = framesRemaining;
-        if (framesToRead > framesAvailable) {
-            framesToRead = framesAvailable;
-        }
-
-        if (pFramesOut != NULL) {
-            ma_copy_pcm_frames(pFramesOut, ma_offset_ptr(pAudioBuffer->pData, pAudioBuffer->cursor * ma_get_bytes_per_frame(pAudioBuffer->format, pAudioBuffer->channels)), frameCount, pAudioBuffer->format, pAudioBuffer->channels);
-        }
-
-        totalFramesRead += framesToRead;
-
-        pAudioBuffer->cursor += framesToRead;
-        if (pAudioBuffer->cursor == pAudioBuffer->sizeInFrames) {
-            if (loop) {
-                pAudioBuffer->cursor = 0;
-            } else {
-                break;  /* We've reached the end and we're not looping. Done. */
-            }
-        }
-
-        MA_ASSERT(pAudioBuffer->cursor < pAudioBuffer->sizeInFrames);
-    }
-
-    return frameCount;
-}
-
-MA_API ma_result ma_audio_buffer_seek_to_pcm_frame(ma_audio_buffer* pAudioBuffer, ma_uint64 frameIndex)
-{
-    if (pAudioBuffer == NULL) {
-        return MA_INVALID_ARGS;
-    }
-
-    if (frameIndex > pAudioBuffer->sizeInFrames) {
-        return MA_INVALID_ARGS;
-    }
-
-    pAudioBuffer->cursor = (size_t)frameIndex;
-
-    return MA_SUCCESS;
-}
-
-MA_API ma_result ma_audio_buffer_map(ma_audio_buffer* pAudioBuffer, void** ppFramesOut, ma_uint64* pFrameCount)
-{
-    ma_uint64 framesAvailable;
-    ma_uint64 frameCount = 0;
-
-    if (ppFramesOut != NULL) {
-        *ppFramesOut = NULL;    /* Safety. */
-    }
-
-    if (pFrameCount != NULL) {
-        frameCount = *pFrameCount;
-        *pFrameCount = 0;       /* Safety. */
-    }
-
-    if (pAudioBuffer == NULL || ppFramesOut == NULL || pFrameCount == NULL) {
-        return MA_INVALID_ARGS;
-    }
-
-    framesAvailable = pAudioBuffer->sizeInFrames - pAudioBuffer->cursor;
-    if (frameCount > framesAvailable) {
-        frameCount = framesAvailable;
-    }
-
-    *ppFramesOut = ma_offset_ptr(pAudioBuffer->pData, pAudioBuffer->cursor * ma_get_bytes_per_frame(pAudioBuffer->format, pAudioBuffer->channels));
-    *pFrameCount = frameCount;
-
-    return MA_SUCCESS;
-}
-
-MA_API ma_result ma_audio_buffer_unmap(ma_audio_buffer* pAudioBuffer, ma_uint64 frameCount)
-{
-    ma_uint64 framesAvailable;
-
-    if (pAudioBuffer == NULL) {
-        return MA_INVALID_ARGS;
-    }
-
-    framesAvailable = pAudioBuffer->sizeInFrames - pAudioBuffer->cursor;
-    if (frameCount > framesAvailable) {
-        return MA_INVALID_ARGS;   /* The frame count was too big. This should never happen in an unmapping. Need to make sure the caller is aware of this. */
-    }
-
-    pAudioBuffer->cursor += frameCount;
-
-    return MA_SUCCESS;
-}
-
-MA_API ma_result ma_audio_buffer_at_end(ma_audio_buffer* pAudioBuffer)
-{
-    if (pAudioBuffer == NULL) {
-        return MA_FALSE;
-    }
-
-    return pAudioBuffer->cursor == pAudioBuffer->sizeInFrames;
-}
-
-
-
 /**************************************************************************************************************************************************************
 
 Decoding
@@ -41132,26 +40323,6 @@ static ma_result ma_decoder__init_allocation_callbacks(const ma_decoder_config* 
     }
 }
 
-static ma_uint64 ma_decoder__data_source_on_read(ma_data_source* pDataSource, void* pFramesOut, ma_uint64 frameCount)
-{
-    return ma_decoder_read_pcm_frames((ma_decoder*)pDataSource, pFramesOut, frameCount);
-}
-
-static ma_result ma_decoder__data_source_on_seek(ma_data_source* pDataSource, ma_uint64 frameIndex)
-{
-    return ma_decoder_seek_to_pcm_frame((ma_decoder*)pDataSource, frameIndex);
-}
-
-static ma_result ma_decoder__data_source_on_get_data_format(ma_data_source* pDataSource, ma_format* pFormat, ma_uint32* pChannels)
-{
-    ma_decoder* pDecoder = (ma_decoder*)pDataSource;
-
-    *pFormat   = pDecoder->outputFormat;
-    *pChannels = pDecoder->outputChannels;
-
-    return MA_SUCCESS;
-}
-
 static ma_result ma_decoder__preinit(ma_decoder_read_proc onRead, ma_decoder_seek_proc onSeek, void* pUserData, const ma_decoder_config* pConfig, ma_decoder* pDecoder)
 {
     ma_result result;
@@ -41167,10 +40338,6 @@ static ma_result ma_decoder__preinit(ma_decoder_read_proc onRead, ma_decoder_see
     if (onRead == NULL || onSeek == NULL) {
         return MA_INVALID_ARGS;
     }
-
-    pDecoder->ds.onRead          = ma_decoder__data_source_on_read;
-    pDecoder->ds.onSeek          = ma_decoder__data_source_on_seek;
-    pDecoder->ds.onGetDataFormat = ma_decoder__data_source_on_get_data_format;
 
     pDecoder->onRead = onRead;
     pDecoder->onSeek = onSeek;
@@ -42523,26 +41690,6 @@ MA_API ma_waveform_config ma_waveform_config_init(ma_format format, ma_uint32 ch
     return config;
 }
 
-static ma_uint64 ma_waveform__data_source_on_read(ma_data_source* pDataSource, void* pFramesOut, ma_uint64 frameCount)
-{
-    return ma_waveform_read_pcm_frames((ma_waveform*)pDataSource, pFramesOut, frameCount);
-}
-
-static ma_result ma_waveform__data_source_on_seek(ma_data_source* pDataSource, ma_uint64 frameIndex)
-{
-    return ma_waveform_seek_to_pcm_frame((ma_waveform*)pDataSource, frameIndex);
-}
-
-static ma_result ma_waveform__data_source_on_get_data_format(ma_data_source* pDataSource, ma_format* pFormat, ma_uint32* pChannels)
-{
-    ma_waveform* pWaveform = (ma_waveform*)pDataSource;
-
-    *pFormat   = pWaveform->config.format;
-    *pChannels = pWaveform->config.channels;
-
-    return MA_SUCCESS;
-}
-
 MA_API ma_result ma_waveform_init(const ma_waveform_config* pConfig, ma_waveform* pWaveform)
 {
     if (pWaveform == NULL) {
@@ -42550,9 +41697,6 @@ MA_API ma_result ma_waveform_init(const ma_waveform_config* pConfig, ma_waveform
     }
 
     MA_ZERO_OBJECT(pWaveform);
-    pWaveform->ds.onRead          = ma_waveform__data_source_on_read;
-    pWaveform->ds.onSeek          = ma_waveform__data_source_on_seek;
-    pWaveform->ds.onGetDataFormat = ma_waveform__data_source_on_get_data_format;
     pWaveform->config  = *pConfig;
     pWaveform->advance = 1.0 / pWaveform->config.sampleRate;
     pWaveform->time    = 0;
@@ -42858,17 +42002,6 @@ MA_API ma_uint64 ma_waveform_read_pcm_frames(ma_waveform* pWaveform, void* pFram
     return frameCount;
 }
 
-MA_API ma_result ma_waveform_seek_to_pcm_frame(ma_waveform* pWaveform, ma_uint64 frameIndex)
-{
-    if (pWaveform == NULL) {
-        return MA_INVALID_ARGS;
-    }
-
-    pWaveform->time = pWaveform->advance * frameIndex;
-
-    return MA_SUCCESS;
-}
-
 
 MA_API ma_noise_config ma_noise_config_init(ma_format format, ma_uint32 channels, ma_noise_type type, ma_int32 seed, double amplitude)
 {
@@ -42888,30 +42021,6 @@ MA_API ma_noise_config ma_noise_config_init(ma_format format, ma_uint32 channels
     return config;
 }
 
-
-static ma_uint64 ma_noise__data_source_on_read(ma_data_source* pDataSource, void* pFramesOut, ma_uint64 frameCount)
-{
-    return ma_noise_read_pcm_frames((ma_noise*)pDataSource, pFramesOut, frameCount);
-}
-
-static ma_result ma_noise__data_source_on_seek(ma_data_source* pDataSource, ma_uint64 frameIndex)
-{
-    /* No-op. Just pretend to be successful. */
-    (void)pDataSource;
-    (void)frameIndex;
-    return MA_SUCCESS;
-}
-
-static ma_result ma_noise__data_source_on_get_data_format(ma_data_source* pDataSource, ma_format* pFormat, ma_uint32* pChannels)
-{
-    ma_noise* pNoise = (ma_noise*)pDataSource;
-
-    *pFormat   = pNoise->config.format;
-    *pChannels = pNoise->config.channels;
-
-    return MA_SUCCESS;
-}
-
 MA_API ma_result ma_noise_init(const ma_noise_config* pConfig, ma_noise* pNoise)
 {
     if (pNoise == NULL) {
@@ -42924,9 +42033,6 @@ MA_API ma_result ma_noise_init(const ma_noise_config* pConfig, ma_noise* pNoise)
         return MA_INVALID_ARGS;
     }
 
-    pNoise->ds.onRead          = ma_noise__data_source_on_read;
-    pNoise->ds.onSeek          = ma_noise__data_source_on_seek;  /* <-- No-op for noise. */
-    pNoise->ds.onGetDataFormat = ma_noise__data_source_on_get_data_format;
     pNoise->config = *pConfig;
     ma_lcg_seed(&pNoise->lcg, pConfig->seed);
 
@@ -43384,27 +42490,6 @@ The following miscellaneous changes have also been made.
 /*
 REVISION HISTORY
 ================
-v0.10.7 - 2020-05-25
-  - Fix a compilation error in the C++ build.
-  - Silence a warning.
-
-v0.10.6 - 2020-05-24
-  - Change ma_clip_samples_f32() and ma_clip_pcm_frames_f32() to take a 64-bit sample/frame count.
-  - Change ma_zero_pcm_frames() to clear to 128 for ma_format_u8.
-  - Add ma_silence_pcm_frames() which replaces ma_zero_pcm_frames(). ma_zero_pcm_frames() will be removed in version 0.11.
-  - Add support for u8, s24 and s32 formats to ma_channel_converter.
-  - Add compile-time and run-time version querying.
-    - MA_VERSION_MINOR
-    - MA_VERSION_MAJOR
-    - MA_VERSION_REVISION
-    - MA_VERSION_STRING
-    - ma_version()
-    - ma_version_string()
-  - Add ma_audio_buffer for reading raw audio data directly from memory.
-  - Fix a bug in shuffle mode in ma_channel_converter.
-  - Fix compilation errors in certain configurations for ALSA and PulseAudio.
-  - The data callback now initializes the output buffer to 128 when the playback sample format is ma_format_u8.
-
 v0.10.5 - 2020-05-05
   - Change ma_zero_pcm_frames() to take a 64-bit frame count.
   - Add ma_copy_pcm_frames().

@@ -28,7 +28,7 @@
 
 struct ClownAudio_Stream
 {
-	void (*user_callback)(void*, float*, size_t);
+	void (*user_callback)(void*, short*, size_t);
 	void *user_data;
 
 	SDL_AudioDeviceID device;
@@ -57,8 +57,8 @@ static unsigned int NextPowerOfTwo(unsigned int value)
 static void Callback(void *user_data, Uint8 *output_buffer_uint8, int bytes_to_do)
 {
 	ClownAudio_Stream *stream = (ClownAudio_Stream*)user_data;
-	const unsigned long frames_to_do = bytes_to_do / (sizeof(float) * CLOWNAUDIO_STREAM_CHANNEL_COUNT);
-	float *output_buffer = (float*)output_buffer_uint8;
+	const unsigned long frames_to_do = bytes_to_do / (sizeof(short) * CLOWNAUDIO_STREAM_CHANNEL_COUNT);
+	short *output_buffer = (short*)output_buffer_uint8;
 
 	stream->user_callback(stream->user_data, output_buffer, frames_to_do);
 }
@@ -82,7 +82,7 @@ CLOWNAUDIO_EXPORT void ClownAudio_DeinitPlayback(void)
 		SDL_QuitSubSystem(SDL_INIT_AUDIO);
 }
 
-CLOWNAUDIO_EXPORT ClownAudio_Stream* ClownAudio_CreateStream(unsigned long *sample_rate, void (*user_callback)(void*, float*, size_t))
+CLOWNAUDIO_EXPORT ClownAudio_Stream* ClownAudio_CreateStream(unsigned long *sample_rate, void (*user_callback)(void*, short*, size_t))
 {
 	ClownAudio_Stream *stream = (ClownAudio_Stream*)malloc(sizeof(ClownAudio_Stream));
 
@@ -91,7 +91,7 @@ CLOWNAUDIO_EXPORT ClownAudio_Stream* ClownAudio_CreateStream(unsigned long *samp
 		SDL_AudioSpec want, have;
 		memset(&want, 0, sizeof(want));
 		want.freq = *sample_rate;
-		want.format = AUDIO_F32;
+		want.format = AUDIO_S16;
 		want.channels = CLOWNAUDIO_STREAM_CHANNEL_COUNT;
 		want.samples = NextPowerOfTwo(((*sample_rate * 10) / 1000) * CLOWNAUDIO_STREAM_CHANNEL_COUNT);	// A low-latency buffer of 10 milliseconds
 		want.callback = Callback;
