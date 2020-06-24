@@ -66,9 +66,9 @@ void Decoder_STB_Vorbis_Rewind(void *decoder)
 	stb_vorbis_seek_start((stb_vorbis*)decoder);
 }
 
-size_t Decoder_STB_Vorbis_GetSamples(void *decoder, void *buffer, size_t frames_to_do)
+size_t Decoder_STB_Vorbis_GetSamples(void *decoder, short *buffer, size_t frames_to_do)
 {
 	stb_vorbis *instance = (stb_vorbis*)decoder;
 
-	return stb_vorbis_get_samples_short_interleaved(instance, instance->channels, (short*)buffer, frames_to_do * instance->channels);
+	return stb_vorbis_get_samples_short_interleaved(instance, instance->channels, buffer, frames_to_do * instance->channels);
 }

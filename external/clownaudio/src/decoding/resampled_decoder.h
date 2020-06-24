@@ -27,6 +27,6 @@
 void* ResampledDecoder_Create(DecoderStage *next_stage, bool dynamic_sample_rate, const DecoderSpec *wanted_spec, const DecoderSpec *child_spec);
 void ResampledDecoder_Destroy(void *resampled_decoder);
 void ResampledDecoder_Rewind(void *resampled_decoder);
-size_t ResampledDecoder_GetSamples(void *resampled_decoder, void *buffer, size_t frames_to_do);
+size_t ResampledDecoder_GetSamples(void *resampled_decoder, short *buffer, size_t frames_to_do);
 void ResampledDecoder_SetLoop(void *resampled_decoder, bool loop);
 void ResampledDecoder_SetSampleRate(void *resampled_decoder, unsigned long sample_rate);

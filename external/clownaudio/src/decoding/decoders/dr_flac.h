@@ -27,4 +27,4 @@
 void* Decoder_DR_FLAC_Create(const unsigned char *data, size_t data_size, bool loop, const DecoderSpec *wanted_spec, DecoderSpec *spec);
 void Decoder_DR_FLAC_Destroy(void *decoder);
 void Decoder_DR_FLAC_Rewind(void *decoder);
-size_t Decoder_DR_FLAC_GetSamples(void *decoder, void *buffer, size_t frames_to_do);
+size_t Decoder_DR_FLAC_GetSamples(void *decoder, short *buffer, size_t frames_to_do);

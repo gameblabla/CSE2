@@ -31,5 +31,5 @@ void Predecoder_UnloadData(PredecoderData *data);
 void* Predecoder_Create(PredecoderData *data, bool loop, const DecoderSpec *wanted_spec, DecoderSpec *spec);
 void Predecoder_Destroy(void *predecoder);
 void Predecoder_Rewind(void *predecoder);
-size_t Predecoder_GetSamples(void *predecoder, void *buffer, size_t frames_to_do);
+size_t Predecoder_GetSamples(void *predecoder, short *buffer, size_t frames_to_do);
 void Predecoder_SetLoop(void *predecoder, bool loop);

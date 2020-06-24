@@ -27,6 +27,6 @@
 void* SplitDecoder_Create(DecoderStage *next_stage_intro, DecoderStage *next_stage_loop);
 void SplitDecoder_Destroy(void *split_decoder);
 void SplitDecoder_Rewind(void *split_decoder);
-size_t SplitDecoder_GetSamples(void *split_decoder, void *buffer, size_t frames_to_do);
+size_t SplitDecoder_GetSamples(void *split_decoder, short *buffer, size_t frames_to_do);
 void SplitDecoder_SetLoop(void *split_decoder, bool loop);
 void SplitDecoder_SetSampleRate(void *split_decoder, unsigned long sample_rate);

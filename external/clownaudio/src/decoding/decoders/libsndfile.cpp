@@ -144,9 +144,9 @@ void Decoder_libSndfile_Rewind(void *decoder_void)
 	sf_seek(decoder->sndfile, 0, SEEK_SET);
 }
 
-size_t Decoder_libSndfile_GetSamples(void *decoder_void, void *buffer, size_t frames_to_do)
+size_t Decoder_libSndfile_GetSamples(void *decoder_void, short *buffer, size_t frames_to_do)
 {
 	Decoder_libSndfile *decoder = (Decoder_libSndfile*)decoder_void;
 
-	return sf_readf_short(decoder->sndfile, (short*)buffer, frames_to_do);
+	return sf_readf_short(decoder->sndfile, buffer, frames_to_do);
 }

@@ -81,11 +81,9 @@ void Decoder_libOpenMPT_Rewind(void *decoder_void)
 	openmpt_module_set_position_seconds(decoder->module, 0);
 }
 
-size_t Decoder_libOpenMPT_GetSamples(void *decoder_void, void *buffer_void, size_t frames_to_do)
+size_t Decoder_libOpenMPT_GetSamples(void *decoder_void, short *buffer, size_t frames_to_do)
 {
 	Decoder_libOpenMPT *decoder = (Decoder_libOpenMPT*)decoder_void;
-
-	int16_t *buffer = (int16_t*)buffer_void;
 
 	size_t frames_done = 0;
 

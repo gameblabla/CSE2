@@ -84,7 +84,7 @@ typedef struct DecoderFunctions
 	void* (*Create)(const unsigned char *data, size_t data_size, bool loop, const DecoderSpec *wanted_spec, DecoderSpec *spec);
 	void (*Destroy)(void *decoder);
 	void (*Rewind)(void *decoder);
-	size_t (*GetSamples)(void *decoder, void *buffer, size_t frames_to_do);
+	size_t (*GetSamples)(void *decoder, short *buffer, size_t frames_to_do);
 } DecoderFunctions;
 
 typedef struct DecoderSelector
@@ -101,7 +101,7 @@ struct DecoderSelectorData
 	DecoderType decoder_type;
 	const DecoderFunctions *decoder_functions;
 	PredecoderData *predecoder_data;
-	size_t size_of_frame;
+	unsigned int channel_count;
 };
 
 static const DecoderFunctions decoder_function_list[] = {
@@ -204,7 +204,7 @@ DecoderSelectorData* DecoderSelector_LoadData(const unsigned char *file_buffer, 
 			data->decoder_type = decoder_type;
 			data->decoder_functions = decoder_functions;
 			data->predecoder_data = predecoder_data;
-			data->size_of_frame = sizeof(short) * spec.channel_count;
+			data->channel_count = spec.channel_count;
 
 			return data;
 		}
@@ -263,7 +263,7 @@ void DecoderSelector_Rewind(void *selector_void)
 	selector->data->decoder_functions->Rewind(selector->decoder);
 }
 
-size_t DecoderSelector_GetSamples(void *selector_void, void *buffer, size_t frames_to_do)
+size_t DecoderSelector_GetSamples(void *selector_void, short *buffer, size_t frames_to_do)
 {
 	DecoderSelector *selector = (DecoderSelector*)selector_void;
 
@@ -284,7 +284,7 @@ size_t DecoderSelector_GetSamples(void *selector_void, void *buffer, size_t fram
 			// Handle looping here, since the simple decoders don't do it by themselves
 			while (frames_done != frames_to_do)
 			{
-				const size_t frames = selector->data->decoder_functions->GetSamples(selector->decoder, (char*)buffer + frames_done * selector->data->size_of_frame, frames_to_do - frames_done);
+				const size_t frames = selector->data->decoder_functions->GetSamples(selector->decoder, &buffer[frames_done * selector->data->channel_count], frames_to_do - frames_done);
 
 				if (frames == 0)
 				{

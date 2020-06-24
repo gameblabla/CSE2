@@ -69,7 +69,7 @@ void Decoder_DR_MP3_Rewind(void *decoder)
 	drmp3_seek_to_pcm_frame((drmp3*)decoder, 0);
 }
 
-size_t Decoder_DR_MP3_GetSamples(void *decoder, void *buffer, size_t frames_to_do)
+size_t Decoder_DR_MP3_GetSamples(void *decoder, short *buffer, size_t frames_to_do)
 {
-	return drmp3_read_pcm_frames_s16((drmp3*)decoder, frames_to_do, (drmp3_int16*)buffer);
+	return drmp3_read_pcm_frames_s16((drmp3*)decoder, frames_to_do, buffer);
 }

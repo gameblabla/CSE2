@@ -55,7 +55,7 @@ void Decoder_DR_FLAC_Rewind(void *decoder)
 	drflac_seek_to_pcm_frame((drflac*)decoder, 0);
 }
 
-size_t Decoder_DR_FLAC_GetSamples(void *decoder, void *buffer, size_t frames_to_do)
+size_t Decoder_DR_FLAC_GetSamples(void *decoder, short *buffer, size_t frames_to_do)
 {
-	return drflac_read_pcm_frames_s16((drflac*)decoder, frames_to_do, (drflac_int16*)buffer);
+	return drflac_read_pcm_frames_s16((drflac*)decoder, frames_to_do, buffer);
 }
