@@ -28,7 +28,7 @@ static void Callback(ma_device *device, void *output_stream, const void *input_s
 	(void)device;
 	(void)input_stream;
 
-	float *stream = (float*)output_stream;
+	short *stream = (short*)output_stream;
 
 	ma_mutex_lock(&organya_mutex);
 
@@ -68,6 +68,17 @@ static void Callback(ma_device *device, void *output_stream, const void *input_s
 		}
 	}
 
+	// Clamp output, and convert from 8-bit to 16-bit
+	for (unsigned int i = 0; i < frames_total * 2; ++i)
+	{
+		if (stream[i] > 0x7F)
+			stream[i] = 0x7F00;
+		else if (stream[i] < -0x7F)
+			stream[i] = -0x7F00;
+		else
+			stream[i] <<= 8;
+	}
+
 	ma_mutex_unlock(&organya_mutex);
 }
 
@@ -75,7 +86,7 @@ bool AudioBackend_Init(void)
 {
 	ma_device_config config = ma_device_config_init(ma_device_type_playback);
 	config.playback.pDeviceID = NULL;
-	config.playback.format = ma_format_f32;
+	config.playback.format = ma_format_s16;
 	config.playback.channels = 2;
 	config.sampleRate = 0;	// Let miniaudio decide what sample rate to use
 	config.dataCallback = Callback;
