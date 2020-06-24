@@ -4,6 +4,10 @@
 
 #define MINIAUDIO_IMPLEMENTATION
 #define MA_NO_DECODING
+#define MA_NO_ENCODING
+#define MA_NO_WAV
+#define MA_NO_FLAC
+#define MA_NO_MP3
 #define MA_API static
 #include "../../../external/miniaudio.h"
 
@@ -119,11 +123,11 @@ bool AudioBackend_Init(void)
 
 		if (return_value == MA_SUCCESS)
 		{
-			return_value = ma_mutex_init(device.pContext, &mutex);
+			return_value = ma_mutex_init(&mutex);
 
 			if (return_value == MA_SUCCESS)
 			{
-				return_value = ma_mutex_init(device.pContext, &organya_mutex);
+				return_value = ma_mutex_init(&organya_mutex);
 
 				if (return_value == MA_SUCCESS)
 				{
