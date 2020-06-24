@@ -308,7 +308,7 @@ static const struct
 	const char *intro_file_path;
 	const char *loop_file_path;
 	int type;
-	bool loop;
+	bool loop;	// Only applicable to non-Organya songs
 } music_table[42] = {
 	{"Resource/ORG/XXXX.org", NULL, MUSIC_TYPE_ORGANYA, true},
 	{"Resource/ORG/Wanpaku.org", NULL, MUSIC_TYPE_ORGANYA, true},
