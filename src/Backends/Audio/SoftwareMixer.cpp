@@ -16,16 +16,16 @@ struct Mixer_Sound
 {
 	signed char *samples;
 	size_t frames;
-	double position;
-	double advance_delta;
+	size_t position;
+	unsigned long sample_offset_remainder;	// 16.16 fixed-point
+	unsigned long advance_delta;
 	bool playing;
 	bool looping;
-	unsigned int frequency;
-	float volume;
-	float pan_l;
-	float pan_r;
-	float volume_l;
-	float volume_r;
+	short volume;
+	short pan_l;
+	short pan_r;
+	short volume_l;
+	short volume_r;
 
 	struct Mixer_Sound *next;
 };
@@ -34,11 +34,11 @@ static Mixer_Sound *sound_list_head;
 
 static unsigned long output_frequency;
 
-static double MillibelToScale(long volume)
+static unsigned short MillibelToScale(long volume)
 {
 	// Volume is in hundredths of a decibel, from 0 to -10000
 	volume = CLAMP(volume, -10000, 0);
-	return pow(10.0, volume / 2000.0);
+	return (unsigned short)(pow(10.0, volume / 2000.0) * 256.0f);
 }
 
 void Mixer_Init(unsigned long frequency)
@@ -66,7 +66,8 @@ Mixer_Sound* Mixer_CreateSound(unsigned int frequency, const unsigned char *samp
 
 	sound->frames = length;
 	sound->playing = false;
-	sound->position = 0.0;
+	sound->position = 0;
+	sound->sample_offset_remainder = 0;
 
 	Mixer_SetSoundFrequency(sound, frequency);
 	Mixer_SetSoundVolume(sound, 0);
@@ -107,68 +108,70 @@ void Mixer_StopSound(Mixer_Sound *sound)
 
 void Mixer_RewindSound(Mixer_Sound *sound)
 {
-	sound->position = 0.0;
+	sound->position = 0;
+	sound->sample_offset_remainder = 0;
 }
 
 void Mixer_SetSoundFrequency(Mixer_Sound *sound, unsigned int frequency)
 {
-	sound->frequency = frequency;
-	sound->advance_delta = (double)frequency / (double)output_frequency;
+	sound->advance_delta = (frequency << 16) / output_frequency;
 }
 
 void Mixer_SetSoundVolume(Mixer_Sound *sound, long volume)
 {
-	sound->volume = (float)MillibelToScale(volume);
+	sound->volume = MillibelToScale(volume);
 
-	sound->volume_l = sound->pan_l * sound->volume;
-	sound->volume_r = sound->pan_r * sound->volume;
+	sound->volume_l = (sound->pan_l * sound->volume) >> 8;
+	sound->volume_r = (sound->pan_r * sound->volume) >> 8;
 }
 
 void Mixer_SetSoundPan(Mixer_Sound *sound, long pan)
 {
-	sound->pan_l = (float)MillibelToScale(-pan);
-	sound->pan_r = (float)MillibelToScale(pan);
+	sound->pan_l = MillibelToScale(-pan);
+	sound->pan_r = MillibelToScale(pan);
 
-	sound->volume_l = sound->pan_l * sound->volume;
-	sound->volume_r = sound->pan_r * sound->volume;
+	sound->volume_l = (sound->pan_l * sound->volume) >> 8;
+	sound->volume_r = (sound->pan_r * sound->volume) >> 8;
 }
 
-// Most CPU-intensive function in the game (2/3rd CPU time consumption in my experience), so marked with attrHot so the compiler considers it a hot spot (as it is) when optimizing
-ATTRIBUTE_HOT void Mixer_MixSounds(float *stream, unsigned int frames_total)
+// Most CPU-intensive function in the game (2/3rd CPU time consumption in my experience), so marked with ATTRIBUTE_HOT so the compiler considers it a hot spot (as it is) when optimizing
+ATTRIBUTE_HOT void Mixer_MixSounds(long *stream, size_t frames_total)
 {
 	for (Mixer_Sound *sound = sound_list_head; sound != NULL; sound = sound->next)
 	{
 		if (sound->playing)
 		{
-			float *stream_pointer = stream;
+			long *stream_pointer = stream;
 
-			for (unsigned int frames_done = 0; frames_done < frames_total; ++frames_done)
+			for (size_t frames_done = 0; frames_done < frames_total; ++frames_done)
 			{
-				const size_t position_integral = (size_t)sound->position;
-				const float position_fractional = sound->position - position_integral;
-
-				// Get two samples, and normalise them to 0-1
-				const float sample1 = sound->samples[position_integral] / 128.0f;
-				const float sample2 = sound->samples[position_integral + 1] / 128.0f;
-
 				// Perform linear interpolation
-				const float interpolated_sample = sample1 + (sample2 - sample1) * position_fractional;
+				const unsigned char subsample = sound->sample_offset_remainder >> 8;
 
-				*stream_pointer++ += interpolated_sample * sound->volume_l;
-				*stream_pointer++ += interpolated_sample * sound->volume_r;
+				const short interpolated_sample = sound->samples[sound->position] * (0x100 - subsample)
+				                                      + sound->samples[sound->position + 1] * subsample;
 
-				sound->position += sound->advance_delta;
+				// Mix, and apply volume
+				*stream_pointer++ += (interpolated_sample * sound->volume_l) >> 8;
+				*stream_pointer++ += (interpolated_sample * sound->volume_r) >> 8;
 
+				// Increment sample
+				sound->sample_offset_remainder += sound->advance_delta;
+				sound->position += sound->sample_offset_remainder >> 16;
+				sound->sample_offset_remainder &= 0xFFFF;
+
+				// Stop or loop sample once it's reached its end
 				if (sound->position >= sound->frames)
 				{
 					if (sound->looping)
 					{
-						sound->position = fmod(sound->position, (double)sound->frames);
+						sound->position %= sound->frames;
 					}
 					else
 					{
 						sound->playing = false;
-						sound->position = 0.0;
+						sound->position = 0;
+						sound->sample_offset_remainder = 0;
 						break;
 					}
 				}

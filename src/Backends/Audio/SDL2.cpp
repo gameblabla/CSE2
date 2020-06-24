@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 #include <stdio.h>
+#include <string.h>
 #include <string>
 
 #include "SDL.h"
@@ -22,16 +23,8 @@ static unsigned long output_frequency;
 static void (*organya_callback)(void);
 static unsigned int organya_callback_milliseconds;
 
-static void Callback(void *user_data, Uint8 *stream_uint8, int len)
+static void MixSoundsAndUpdateOrganya(long *stream, size_t frames_total)
 {
-	(void)user_data;
-
-	float *stream = (float*)stream_uint8;
-	unsigned int frames_total = len / sizeof(float) / 2;
-
-	for (unsigned int i = 0; i < frames_total * 2; ++i)
-		stream[i] = 0.0f;
-
 	if (organya_callback_milliseconds == 0)
 	{
 		Mixer_MixSounds(stream, frames_total);
@@ -63,10 +56,43 @@ static void Callback(void *user_data, Uint8 *stream_uint8, int len)
 			organya_countdown -= frames_to_do;
 		}
 	}
+}
 
-#ifdef EXTRA_SOUND_FORMATS
-	ExtraSound_Mix(stream, frames_total);
-#endif
+static void Callback(void *user_data, Uint8 *stream_uint8, int len)
+{
+	(void)user_data;
+
+	short *stream = (short*)stream_uint8;
+	const size_t frames_total = len / sizeof(short) / 2;
+
+	size_t frames_done = 0;
+
+	while (frames_done != frames_total)
+	{
+		long mix_buffer[0x800 * 2];	// 2 because stereo
+
+		size_t subframes = MIN(0x800, frames_total - frames_done);
+
+		memset(mix_buffer, 0, subframes * sizeof(long) * 2);
+
+		MixSoundsAndUpdateOrganya(mix_buffer, subframes);
+
+	#ifdef EXTRA_SOUND_FORMATS
+		ExtraSound_Mix(stream, frames_total);
+	#endif
+
+		for (size_t i = 0; i < subframes * 2; ++i)
+		{
+			if (mix_buffer[i] > 0x7FFF)
+				*stream++ = 0x7FFF;
+			else if (mix_buffer[i] < -0x7FFF)
+				*stream++ = -0x7FFF;
+			else
+				*stream++ = mix_buffer[i];
+		}
+
+		frames_done += subframes;
+	}
 }
 
 bool AudioBackend_Init(void)
@@ -85,7 +111,7 @@ bool AudioBackend_Init(void)
 
 	SDL_AudioSpec specification;
 	specification.freq = 48000;
-	specification.format = AUDIO_F32;
+	specification.format = AUDIO_S16;
 	specification.channels = 2;
 	specification.samples = 0x400;	// Roughly 10 milliseconds for 48000Hz
 	specification.callback = Callback;
