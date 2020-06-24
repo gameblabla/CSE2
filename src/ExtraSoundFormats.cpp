@@ -115,7 +115,6 @@ void ExtraSound_LoadMusic(const char *intro_file_path, const char *loop_file_pat
 			{
 				AudioBackend_Lock();
 				song.sound_id = ClownAudio_Mixer_RegisterSound(mixer, sound);
-				ClownAudio_Mixer_UnpauseSound(mixer, song.sound_id);
 				AudioBackend_Unlock();
 
 				song.valid = true;
@@ -148,7 +147,6 @@ void ExtraSound_LoadPreviousMusic(void)
 
 		AudioBackend_Lock();
 		ClownAudio_Mixer_CancelFade(mixer, song.sound_id);
-		ClownAudio_Mixer_UnpauseSound(mixer, song.sound_id);
 		AudioBackend_Unlock();
 	}
 
@@ -165,10 +163,29 @@ void ExtraSound_PauseMusic(void)
 	}
 }
 
+void ExtraSound_UnpauseMusic(void)
+{
+	if (song.valid)
+	{
+		AudioBackend_Lock();
+		ClownAudio_Mixer_UnpauseSound(mixer, song.sound_id);
+		AudioBackend_Unlock();
+	}
+}
+
 void ExtraSound_FadeOutMusic(void)
 {
 	AudioBackend_Lock();
 	ClownAudio_Mixer_FadeOutSound(mixer, song.sound_id, 5 * 1000);
+	AudioBackend_Unlock();
+}
+
+void ExtraSound_SetMusicVolume(unsigned short volume)
+{
+	const unsigned short volume_linear = (volume * volume) >> 8;
+
+	AudioBackend_Lock();
+	ClownAudio_Mixer_SetSoundVolume(mixer, song.sound_id, volume_linear, volume_linear);
 	AudioBackend_Unlock();
 }
 
