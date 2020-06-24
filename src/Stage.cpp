@@ -683,6 +683,7 @@ void ChangeMusic(MusicID no)
 #ifdef EXTRA_SOUND_FORMATS
 		case MUSIC_TYPE_OTHER:
 			ExtraSound_LoadMusic(music_table[no].intro_file_path != NULL ? intro_file_path : NULL, music_table[no].loop_file_path != NULL ? loop_file_path : NULL, music_table[no].loop);
+			ExtraSound_SetMusicVolume(soundtracks[gSoundtrack].volume);
 			ExtraSound_UnpauseMusic();
 
 			// Play a null Organya song so focussing and refocussing the window doesn't cause the old Organya song to start playing again
