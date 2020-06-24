@@ -1,5 +1,6 @@
 #include "ExtraSoundFormats.h"
 
+#include <math.h>
 #include <stddef.h>
 #include <stdlib.h>
 
@@ -7,11 +8,17 @@
 
 #include "clownaudio/mixer.h"
 
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+#define CLAMP(x, y, z) MIN(MAX((x), (y)), (z))
+
 typedef struct SoundSlot
 {
 	bool valid;
 	ClownAudio_SoundData *sound_data;
 	ClownAudio_SoundID sound_id;
+	long volume;
+	long pan;
 } SoundSlot;
 
 static ClownAudio_Mixer *mixer;
@@ -22,6 +29,13 @@ static SoundSlot previous_song;
 static SoundSlot sfx_list[SE_MAX];
 
 static bool playing = true;
+
+static unsigned short MillibelToScale(long volume)
+{
+	// Volume is in hundredths of a decibel, from 0 to -10000
+	volume = CLAMP(volume, -10000, 0);
+	return (unsigned short)(pow(10.0, volume / 2000.0) * 256.0f);
+}
 
 void ExtraSound_Init(unsigned int sample_rate)
 {
@@ -222,6 +236,8 @@ void ExtraSound_LoadSFX(const char *path, int id)
 			sfx_list[id].sound_id = ClownAudio_Mixer_RegisterSound(mixer, sound);
 			AudioBackend_Unlock();
 
+			sfx_list[id].volume = 0;
+			sfx_list[id].pan = 0;
 			sfx_list[id].valid = true;
 			return;
 		}
@@ -267,6 +283,38 @@ void ExtraSound_SetSFXFrequency(int id, unsigned long frequency)
 	{
 		AudioBackend_Lock();
 		ClownAudio_Mixer_SetSoundSampleRate(mixer, sfx_list[id].sound_id, frequency);
+		AudioBackend_Unlock();
+	}
+}
+
+void ExtraSound_SetSFXVolume(int id, long volume)
+{
+	if (sfx_list[id].valid)
+	{
+		sfx_list[id].volume = volume;
+
+		const unsigned short volume_scale = MillibelToScale(sfx_list[id].volume);
+		const unsigned short pan_scale_left = MillibelToScale(-sfx_list[id].pan);
+		const unsigned short pan_scale_right = MillibelToScale(sfx_list[id].pan);
+
+		AudioBackend_Lock();
+		ClownAudio_Mixer_SetSoundVolume(mixer, sfx_list[id].sound_id, (pan_scale_left * volume_scale) >> 8, (pan_scale_right * volume_scale) >> 8);
+		AudioBackend_Unlock();
+	}
+}
+
+void ExtraSound_SetSFXPan(int id, long pan)
+{
+	if (sfx_list[id].valid)
+	{
+		sfx_list[id].pan = pan;
+
+		const unsigned short volume_scale = MillibelToScale(sfx_list[id].volume);
+		const unsigned short pan_scale_left = MillibelToScale(-sfx_list[id].pan);
+		const unsigned short pan_scale_right = MillibelToScale(sfx_list[id].pan);
+
+		AudioBackend_Lock();
+		ClownAudio_Mixer_SetSoundVolume(mixer, sfx_list[id].sound_id, (pan_scale_left * volume_scale) >> 8, (pan_scale_right * volume_scale) >> 8);
 		AudioBackend_Unlock();
 	}
 }

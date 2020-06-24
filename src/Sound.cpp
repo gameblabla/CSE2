@@ -255,7 +255,12 @@ void ChangeSoundVolume(int no, long volume)	// 300がMAXで300がﾉｰﾏﾙ (3
 	if (!audio_backend_initialised)
 		return;
 
-	AudioBackend_SetSoundVolume(lpSECONDARYBUFFER[no], (volume - 300) * 8);
+	if (lpSECONDARYBUFFER[no] != NULL)
+		AudioBackend_SetSoundVolume(lpSECONDARYBUFFER[no], (volume - 300) * 8);
+#ifdef EXTRA_SOUND_FORMATS
+	else
+		ExtraSound_SetSFXVolume(no, (volume - 300) * 8);
+#endif
 }
 
 void ChangeSoundPan(int no, long pan)	// 512がMAXで256がﾉｰﾏﾙ (512 is MAX and 256 is normal)
@@ -263,7 +268,12 @@ void ChangeSoundPan(int no, long pan)	// 512がMAXで256がﾉｰﾏﾙ (512 is 
 	if (!audio_backend_initialised)
 		return;
 
-	AudioBackend_SetSoundPan(lpSECONDARYBUFFER[no], (pan - 256) * 10);
+	if (lpSECONDARYBUFFER[no] != NULL)
+		AudioBackend_SetSoundPan(lpSECONDARYBUFFER[no], (pan - 256) * 10);
+#ifdef EXTRA_SOUND_FORMATS
+	else
+		ExtraSound_SetSFXPan(no, (pan - 256) * 10);
+#endif
 }
 
 // TODO - The stack frame for this function is inaccurate
