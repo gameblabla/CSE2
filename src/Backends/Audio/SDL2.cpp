@@ -78,7 +78,7 @@ static void Callback(void *user_data, Uint8 *stream_uint8, int len)
 		MixSoundsAndUpdateOrganya(mix_buffer, subframes);
 
 	#ifdef EXTRA_SOUND_FORMATS
-		ExtraSound_Mix(stream, frames_total);
+		ExtraSound_Mix(mix_buffer, subframes);
 	#endif
 
 		for (size_t i = 0; i < subframes * 2; ++i)

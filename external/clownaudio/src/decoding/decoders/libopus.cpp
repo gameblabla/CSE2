@@ -37,7 +37,6 @@ void* Decoder_libOpus_Create(const unsigned char *data, size_t data_size, bool l
 	{
 		spec->sample_rate = 48000;  // libopusfile always outputs at 48kHz (https://opus-codec.org/docs/opusfile_api-0.7/structOpusHead.html#a73b80a913eca33d829f1667caee80d9e)
 		spec->channel_count = 2;    // We use op_read_float_stereo, so libopusfile will handle conversion if it needs to
-		spec->format = DECODER_FORMAT_F32;
 		spec->is_complex = false;
 	}
 
@@ -56,5 +55,5 @@ void Decoder_libOpus_Rewind(void *decoder)
 
 size_t Decoder_libOpus_GetSamples(void *decoder, void *buffer, size_t frames_to_do)
 {
-	return op_read_float_stereo((OggOpusFile*)decoder, (float*)buffer, frames_to_do * 2);	// You tell *me* why that last parameter is in samples and not frames
+	return op_read_stereo((OggOpusFile*)decoder, (opus_int16*)buffer, frames_to_do * 2);	// You tell *me* why that last parameter is in samples and not frames
 }

@@ -123,25 +123,25 @@ static FLAC__StreamDecoderWriteStatus WriteCallback(const FLAC__StreamDecoder *f
 
 	Decoder_libFLAC *decoder = (Decoder_libFLAC*)user;
 
-	FLAC__int32 *block_buffer_pointer = (FLAC__int32*)decoder->block_buffer;
+	FLAC__int16 *block_buffer_pointer = (FLAC__int16*)decoder->block_buffer;
 	for (unsigned int i = 0; i < frame->header.blocksize; ++i)
 	{
 		for (unsigned int j = 0; j < frame->header.channels; ++j)
 		{
 			const FLAC__int32 sample = buffer[j][i];
 
-			// Downscale/upscale to 32-bit
-			if (decoder->bits_per_sample < 32)
-				*block_buffer_pointer++ = sample << (32 - decoder->bits_per_sample);
-			else if (decoder->bits_per_sample > 32)
-				*block_buffer_pointer++ = sample >> (decoder->bits_per_sample - 32);
+			// Downscale/upscale to 16-bit
+			if (decoder->bits_per_sample < 16)
+				*block_buffer_pointer++ = (FLAC__int16)(sample << (16 - decoder->bits_per_sample));
+			else if (decoder->bits_per_sample > 16)
+				*block_buffer_pointer++ = (FLAC__int16)(sample >> (decoder->bits_per_sample - 16));
 			else
-				*block_buffer_pointer++ = sample;
+				*block_buffer_pointer++ = (FLAC__int16)sample;
 		}
 	}
 
 	decoder->block_buffer_index = 0;
-	decoder->block_buffer_size = (block_buffer_pointer - (FLAC__int32*)decoder->block_buffer) / decoder->channel_count;
+	decoder->block_buffer_size = (block_buffer_pointer - (FLAC__int16*)decoder->block_buffer) / decoder->channel_count;
 
 	return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
 }
@@ -154,13 +154,12 @@ static void MetadataCallback(const FLAC__StreamDecoder *flac_stream_decoder, con
 
 	decoder->spec->sample_rate = metadata->data.stream_info.sample_rate;
 	decoder->spec->channel_count = decoder->channel_count = metadata->data.stream_info.channels;
-	decoder->spec->format = DECODER_FORMAT_S32;	// libFLAC doesn't do float32
 	decoder->spec->is_complex = false;
 
 	decoder->bits_per_sample = metadata->data.stream_info.bits_per_sample;
 
 	// Init block buffer
-	decoder->block_buffer = (unsigned char*)malloc(metadata->data.stream_info.max_blocksize * sizeof(FLAC__int32) * metadata->data.stream_info.channels);
+	decoder->block_buffer = (unsigned char*)malloc(metadata->data.stream_info.max_blocksize * sizeof(FLAC__int16) * metadata->data.stream_info.channels);
 	decoder->block_buffer_index = 0;
 	decoder->block_buffer_size = 0;
 }
@@ -246,7 +245,7 @@ size_t Decoder_libFLAC_GetSamples(void *decoder_void, void *buffer, size_t frame
 			return 0;
 	}
 
-	const unsigned int SIZE_OF_FRAME = sizeof(FLAC__int32) * decoder->channel_count;
+	const unsigned int SIZE_OF_FRAME = sizeof(FLAC__int16) * decoder->channel_count;
 
 	const unsigned long block_frames_to_do = MIN(frames_to_do, decoder->block_buffer_size - decoder->block_buffer_index);
 

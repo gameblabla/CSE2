@@ -188,7 +188,7 @@ int main(int argc, char *argv[])
 							printf("Setting volume to %f left, %f right\n", volume_left, volume_right);
 							fflush(stdout);
 
-							ClownAudio_SetSoundVolume(instance, volume_left, volume_right);
+							ClownAudio_SetSoundVolume(instance, volume_left * 0x100, volume_right * 0x100);
 							break;
 						}
 					}

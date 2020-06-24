@@ -101,7 +101,7 @@ static void FrameCallback(void)
 		MixSoundsAndUpdateOrganya(stream_buffer_long, buffer_length);
 
 	#ifdef EXTRA_SOUND_FORMATS
-		ExtraSound_Mix(stream, frames_total);
+		ExtraSound_Mix(stream_buffer_long, buffer_length);
 	#endif
 
 		// Deinterlate samples, convert them to S16, and write them to the double-buffers

@@ -25,7 +25,6 @@
 #define STB_VORBIS_IMPLEMENTATION
 #define STB_VORBIS_NO_STDIO
 #define STB_VORBIS_NO_PUSHDATA_API
-#define STB_VORBIS_NO_INTEGER_CONVERSION
 
 #ifdef __GNUC__
 #pragma GCC diagnostic push
@@ -51,7 +50,6 @@ void* Decoder_STB_Vorbis_Create(const unsigned char *data, size_t data_size, boo
 
 		spec->sample_rate = vorbis_info.sample_rate;
 		spec->channel_count = vorbis_info.channels;
-		spec->format = DECODER_FORMAT_F32;
 		spec->is_complex = false;
 	}
 
@@ -72,5 +70,5 @@ size_t Decoder_STB_Vorbis_GetSamples(void *decoder, void *buffer, size_t frames_
 {
 	stb_vorbis *instance = (stb_vorbis*)decoder;
 
-	return stb_vorbis_get_samples_float_interleaved(instance, instance->channels, (float*)buffer, frames_to_do * instance->channels);
+	return stb_vorbis_get_samples_short_interleaved(instance, instance->channels, (short*)buffer, frames_to_do * instance->channels);
 }

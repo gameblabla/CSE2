@@ -37,6 +37,8 @@
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define CLAMP(x, min, max) MIN(MAX((x), (min)), (max))
 
+#define SCALE(x, scale) (((x) * (scale)) >> 8)
+
 struct ClownAudio_Mixer
 {
 	ClownAudio_Sound *sound_list_head;
@@ -50,8 +52,8 @@ struct ClownAudio_Sound
 
 	bool paused;
 	bool free_when_done;
-	float volume_left;
-	float volume_right;
+	unsigned short volume_left;
+	unsigned short volume_right;
 	DecoderStage pipeline;
 	void *resampled_decoder;
 	ClownAudio_SoundID id;
@@ -157,7 +159,6 @@ CLOWNAUDIO_EXPORT ClownAudio_SoundData* ClownAudio_Mixer_LoadSoundDataFromMemory
 
 		wanted_spec.sample_rate = config->dynamic_sample_rate ? 0 : mixer->sample_rate;	// Do not change the sample rate when dynamic resampling is enabled
 		wanted_spec.channel_count = CHANNEL_COUNT;
-		wanted_spec.format = DECODER_FORMAT_F32;
 
 		if (file_buffer1 != NULL && file_buffer2 != NULL)
 		{
@@ -244,7 +245,6 @@ CLOWNAUDIO_EXPORT ClownAudio_Sound* ClownAudio_Mixer_CreateSound(ClownAudio_Mixe
 		DecoderSpec wanted_spec;
 		wanted_spec.sample_rate = config->dynamic_sample_rate ? 0 : mixer->sample_rate;	// If 'dynamic_sample_rate' is enabled, make the decoder backend use its own fixed sample rate
 		wanted_spec.channel_count = CHANNEL_COUNT;
-		wanted_spec.format = DECODER_FORMAT_F32;
 
 		// Begin constructing the decoder pipeline
 
@@ -294,7 +294,7 @@ CLOWNAUDIO_EXPORT ClownAudio_Sound* ClownAudio_Mixer_CreateSound(ClownAudio_Mixe
 
 		if (decoder_selectors[0] != NULL && decoder_selectors[1] != NULL)
 		{
-			if (specs[0].sample_rate != specs[1].sample_rate || specs[0].channel_count != specs[1].channel_count || specs[0].format != specs[1].format)
+			if (specs[0].sample_rate != specs[1].sample_rate || specs[0].channel_count != specs[1].channel_count)
 			{
 				DecoderSelector_Destroy(decoder_selectors[0]);
 				DecoderSelector_Destroy(decoder_selectors[1]);
@@ -382,8 +382,8 @@ CLOWNAUDIO_EXPORT ClownAudio_Sound* ClownAudio_Mixer_CreateSound(ClownAudio_Mixe
 
 		sound->pipeline = stage;
 		sound->resampled_decoder = resampled_decoder;
-		sound->volume_left = 1.0f;
-		sound->volume_right = 1.0f;
+		sound->volume_left = 0x100;
+		sound->volume_right = 0x100;
 		sound->paused = true;
 		sound->free_when_done = !config->do_not_free_when_done;
 		sound->fade_out_counter_max = 0;
@@ -518,7 +518,7 @@ CLOWNAUDIO_EXPORT int ClownAudio_Mixer_GetSoundStatus(ClownAudio_Mixer *mixer, C
 	return (sound == NULL) ? -1 : sound->paused;
 }
 
-CLOWNAUDIO_EXPORT void ClownAudio_Mixer_SetSoundVolume(ClownAudio_Mixer *mixer, ClownAudio_SoundID sound_id, float volume_left, float volume_right)
+CLOWNAUDIO_EXPORT void ClownAudio_Mixer_SetSoundVolume(ClownAudio_Mixer *mixer, ClownAudio_SoundID sound_id, unsigned short volume_left, unsigned short volume_right)
 {
 	ClownAudio_Sound *sound = FindSound(mixer, sound_id);
 
@@ -545,37 +545,37 @@ CLOWNAUDIO_EXPORT void ClownAudio_Mixer_SetSoundSampleRate(ClownAudio_Mixer *mix
 		ResampledDecoder_SetSampleRate(sound->resampled_decoder, sample_rate);
 }
 
-CLOWNAUDIO_EXPORT void ClownAudio_Mixer_MixSamples(ClownAudio_Mixer *mixer, float *output_buffer, size_t frames_to_do)
+CLOWNAUDIO_EXPORT void ClownAudio_Mixer_MixSamples(ClownAudio_Mixer *mixer, long *output_buffer, size_t frames_to_do)
 {
 	ClownAudio_Sound **sound_pointer = &mixer->sound_list_head;
 	while (*sound_pointer != NULL)
 	{
 		ClownAudio_Sound *sound = *sound_pointer;
 
-		if (sound->paused == false)
+		if (!sound->paused)
 		{
-			float *output_buffer_pointer = output_buffer;
+			long *output_buffer_pointer = output_buffer;
 
 			size_t frames_done = 0;
 			for (size_t sub_frames_done; frames_done < frames_to_do; frames_done += sub_frames_done)
 			{
-				float read_buffer[0x1000];
+				short read_buffer[0x1000];
 
 				const size_t sub_frames_to_do = MIN(0x1000 / CHANNEL_COUNT, frames_to_do - frames_done);
 				sub_frames_done = sound->pipeline.GetSamples(sound->pipeline.decoder, read_buffer, sub_frames_to_do);
 
-				float *read_buffer_pointer = read_buffer;
+				short *read_buffer_pointer = read_buffer;
 
 				for (size_t i = 0; i < sub_frames_done; ++i)
 				{
-					float fade_volume = 1.0f;
+					unsigned short fade_volume = 0x100;
 
 					// Apply fade-out volume
 					if (sound->fade_out_counter_max != 0)
 					{
-						const float fade_out_volume = sound->fade_counter / (float)sound->fade_out_counter_max;
+						const unsigned short fade_out_volume = (sound->fade_counter << 8) / sound->fade_out_counter_max;
 
-						fade_volume *= (fade_out_volume * fade_out_volume);	// Fade logarithmically
+						fade_volume = SCALE(fade_volume, SCALE(fade_out_volume, fade_out_volume));	// Fade logarithmically
 
 						if (sound->fade_counter != 0)
 							--sound->fade_counter;
@@ -584,17 +584,17 @@ CLOWNAUDIO_EXPORT void ClownAudio_Mixer_MixSamples(ClownAudio_Mixer *mixer, floa
 					// Apply fade-in volume
 					if (sound->fade_in_counter_max != 0)
 					{
-						const float fade_in_volume = (sound->fade_in_counter_max - sound->fade_counter) / (float)sound->fade_in_counter_max;
+						const unsigned short fade_in_volume = ((sound->fade_in_counter_max - sound->fade_counter) << 8) / (float)sound->fade_in_counter_max;
 
-						fade_volume *= (fade_in_volume * fade_in_volume);	// Fade logarithmically
+						fade_volume = SCALE(fade_volume, SCALE(fade_in_volume, fade_in_volume));	// Fade logarithmically
 
 						if (--sound->fade_counter == 0)
 							sound->fade_in_counter_max = 0;
 					}
 
 					// Mix data with output, and apply volume
-					*output_buffer_pointer++ += *read_buffer_pointer++ * sound->volume_left * fade_volume;
-					*output_buffer_pointer++ += *read_buffer_pointer++ * sound->volume_right * fade_volume;
+					*output_buffer_pointer++ += SCALE(SCALE(*read_buffer_pointer++, sound->volume_left), fade_volume);
+					*output_buffer_pointer++ += SCALE(SCALE(*read_buffer_pointer++, sound->volume_right), fade_volume);
 				}
 
 				if (sub_frames_done < sub_frames_to_do)
@@ -621,5 +621,32 @@ CLOWNAUDIO_EXPORT void ClownAudio_Mixer_MixSamples(ClownAudio_Mixer *mixer, floa
 		}
 
 		sound_pointer = &(*sound_pointer)->next;
+	}
+}
+
+CLOWNAUDIO_EXPORT void ClownAudio_Mixer_OutputSamples(ClownAudio_Mixer *mixer, short *output_buffer, size_t frames_to_do)
+{
+	size_t frames_done = 0;
+	while (frames_done < frames_to_do)
+	{
+		long mix_buffer[0x1000];
+
+		const size_t sub_frames_to_do = MIN(0x1000 / CHANNEL_COUNT, frames_to_do - frames_done);
+
+		memset(mix_buffer, 0, sub_frames_to_do * sizeof(long) * CHANNEL_COUNT);
+		ClownAudio_Mixer_MixSamples(mixer, mix_buffer, sub_frames_to_do);
+
+		// Clamp samples to 16-bit range
+		for (size_t i = 0; i < sub_frames_to_do * CHANNEL_COUNT; ++i)
+		{
+			if (mix_buffer[i] > 0x7FFF)
+				*output_buffer++ = 0x7FFF;
+			else if (mix_buffer[i] < -0x7FFF)
+				*output_buffer++ = -0x7FFF;
+			else
+				*output_buffer++ = (short)mix_buffer[i];
+		}
+
+		frames_done += sub_frames_to_do;
 	}
 }

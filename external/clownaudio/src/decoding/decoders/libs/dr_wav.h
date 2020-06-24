@@ -1,6 +1,6 @@
 /*
 WAV audio loader and writer. Choice of public domain or MIT-0. See license statements at the end of this file.
-dr_wav - v0.12.2 - 2020-04-21
+dr_wav - v0.12.6 - 2020-06-23
 
 David Reid - mackron@gmail.com
 
@@ -15,7 +15,7 @@ Version 0.12 includes breaking changes to custom chunk handling.
 
 Changes to Chunk Callback
 -------------------------
-dr_wav supports the ability to fire a callback when a chunk is encounted (except for WAVE and FMT chunks). The callback has been update to include both the
+dr_wav supports the ability to fire a callback when a chunk is encounted (except for WAVE and FMT chunks). The callback has been updated to include both the
 container (RIFF or Wave64) and the FMT chunk which contains information about the format of the data in the wave file.
 
 Previously, there was no direct way to determine the container, and therefore no way discriminate against the different IDs in the chunk header (RIFF and
@@ -138,6 +138,14 @@ Notes
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#define DRWAV_STRINGIFY(x)      #x
+#define DRWAV_XSTRINGIFY(x)     DRWAV_STRINGIFY(x)
+
+#define DRWAV_VERSION_MAJOR     0
+#define DRWAV_VERSION_MINOR     12
+#define DRWAV_VERSION_REVISION  6
+#define DRWAV_VERSION_STRING    DRWAV_XSTRINGIFY(DRWAV_VERSION_MAJOR) "." DRWAV_XSTRINGIFY(DRWAV_VERSION_MINOR) "." DRWAV_XSTRINGIFY(DRWAV_VERSION_REVISION)
 
 #include <stddef.h> /* For size_t. */
 
@@ -278,6 +286,9 @@ typedef drwav_int32 drwav_result;
 
 /* Flags to pass into drwav_init_ex(), etc. */
 #define DRWAV_SEQUENTIAL            0x00000001
+
+DRWAV_API void drwav_version(drwav_uint32* pMajor, drwav_uint32* pMinor, drwav_uint32* pRevision);
+DRWAV_API const char* drwav_version_string();
 
 typedef enum
 {
@@ -663,6 +674,8 @@ bytes of the raw internal sample data.
 Consider using drwav_read_pcm_frames_s16(), drwav_read_pcm_frames_s32() or drwav_read_pcm_frames_f32() for
 reading sample data in a consistent format.
 
+pBufferOut can be NULL in which case a seek will be performed.
+
 Returns the number of bytes actually read.
 */
 DRWAV_API size_t drwav_read_raw(drwav* pWav, size_t bytesToRead, void* pBufferOut);
@@ -678,6 +691,8 @@ you have requested more PCM frames than can possibly fit in the output buffer.
 
 This function will only work when sample data is of a fixed size and uncompressed. If you are
 using a compressed format consider using drwav_read_raw() or drwav_read_pcm_frames_s16/s32/f32().
+
+pBufferOut can be NULL in which case a seek will be performed.
 */
 DRWAV_API drwav_uint64 drwav_read_pcm_frames(drwav* pWav, drwav_uint64 framesToRead, void* pBufferOut);
 DRWAV_API drwav_uint64 drwav_read_pcm_frames_le(drwav* pWav, drwav_uint64 framesToRead, void* pBufferOut);
@@ -717,6 +732,8 @@ DRWAV_API drwav_uint64 drwav_write_pcm_frames_be(drwav* pWav, drwav_uint64 frame
 /*
 Reads a chunk of audio data and converts it to signed 16-bit PCM samples.
 
+pBufferOut can be NULL in which case a seek will be performed.
+
 Returns the number of PCM frames actually read.
 
 If the return value is less than <framesToRead> it means the end of the file has been reached.
@@ -750,6 +767,8 @@ DRWAV_API void drwav_mulaw_to_s16(drwav_int16* pOut, const drwav_uint8* pIn, siz
 /*
 Reads a chunk of audio data and converts it to IEEE 32-bit floating point samples.
 
+pBufferOut can be NULL in which case a seek will be performed.
+
 Returns the number of PCM frames actually read.
 
 If the return value is less than <framesToRead> it means the end of the file has been reached.
@@ -782,6 +801,8 @@ DRWAV_API void drwav_mulaw_to_f32(float* pOut, const drwav_uint8* pIn, size_t sa
 
 /*
 Reads a chunk of audio data and converts it to signed 32-bit PCM samples.
+
+pBufferOut can be NULL in which case a seek will be performed.
 
 Returns the number of PCM frames actually read.
 
@@ -905,18 +926,18 @@ DRWAV_API drwav_int32* drwav_open_memory_and_read_pcm_frames_s32(const void* dat
 DRWAV_API void drwav_free(void* p, const drwav_allocation_callbacks* pAllocationCallbacks);
 
 /* Converts bytes from a wav stream to a sized type of native endian. */
-DRWAV_API drwav_uint16 drwav_bytes_to_u16(const unsigned char* data);
-DRWAV_API drwav_int16 drwav_bytes_to_s16(const unsigned char* data);
-DRWAV_API drwav_uint32 drwav_bytes_to_u32(const unsigned char* data);
-DRWAV_API drwav_int32 drwav_bytes_to_s32(const unsigned char* data);
-DRWAV_API drwav_uint64 drwav_bytes_to_u64(const unsigned char* data);
-DRWAV_API drwav_int64 drwav_bytes_to_s64(const unsigned char* data);
+DRWAV_API drwav_uint16 drwav_bytes_to_u16(const drwav_uint8* data);
+DRWAV_API drwav_int16 drwav_bytes_to_s16(const drwav_uint8* data);
+DRWAV_API drwav_uint32 drwav_bytes_to_u32(const drwav_uint8* data);
+DRWAV_API drwav_int32 drwav_bytes_to_s32(const drwav_uint8* data);
+DRWAV_API drwav_uint64 drwav_bytes_to_u64(const drwav_uint8* data);
+DRWAV_API drwav_int64 drwav_bytes_to_s64(const drwav_uint8* data);
 
 /* Compares a GUID for the purpose of checking the type of a Wave64 chunk. */
 DRWAV_API drwav_bool32 drwav_guid_equal(const drwav_uint8 a[16], const drwav_uint8 b[16]);
 
 /* Compares a four-character-code for the purpose of checking the type of a RIFF chunk. */
-DRWAV_API drwav_bool32 drwav_fourcc_equal(const unsigned char* a, const char* b);
+DRWAV_API drwav_bool32 drwav_fourcc_equal(const drwav_uint8* a, const char* b);
 
 #ifdef __cplusplus
 }
@@ -932,6 +953,9 @@ DRWAV_API drwav_bool32 drwav_fourcc_equal(const unsigned char* a, const char* b)
  ************************************************************************************************************************************************************
  ************************************************************************************************************************************************************/
 #if defined(DR_WAV_IMPLEMENTATION) || defined(DRWAV_IMPLEMENTATION)
+#ifndef dr_wav_c
+#define dr_wav_c
+
 #include <stdlib.h>
 #include <string.h> /* For memcpy(), memset() */
 #include <limits.h> /* For INT_MAX */
@@ -1037,6 +1061,26 @@ DRWAV_API drwav_bool32 drwav_fourcc_equal(const unsigned char* a, const char* b)
     #endif
 #endif
 
+DRWAV_API void drwav_version(drwav_uint32* pMajor, drwav_uint32* pMinor, drwav_uint32* pRevision)
+{
+    if (pMajor) {
+        *pMajor = DRWAV_VERSION_MAJOR;
+    }
+
+    if (pMinor) {
+        *pMinor = DRWAV_VERSION_MINOR;
+    }
+
+    if (pRevision) {
+        *pRevision = DRWAV_VERSION_REVISION;
+    }
+}
+
+DRWAV_API const char* drwav_version_string()
+{
+    return DRWAV_VERSION_STRING;
+}
+
 /*
 These limits are used for basic validation when initializing the decoder. If you exceed these limits, first of all: what on Earth are
 you doing?! (Let me know, I'd be curious!) Second, you can adjust these by #define-ing them before the dr_wav implementation.
@@ -1071,7 +1115,7 @@ static DRWAV_INLINE drwav_bool32 drwav__guid_equal(const drwav_uint8 a[16], cons
     return DRWAV_TRUE;
 }
 
-static DRWAV_INLINE drwav_bool32 drwav__fourcc_equal(const unsigned char* a, const char* b)
+static DRWAV_INLINE drwav_bool32 drwav__fourcc_equal(const drwav_uint8* a, const char* b)
 {
     return
         a[0] == b[0] &&
@@ -1094,39 +1138,39 @@ static DRWAV_INLINE int drwav__is_little_endian(void)
 #endif
 }
 
-static DRWAV_INLINE drwav_uint16 drwav__bytes_to_u16(const unsigned char* data)
+static DRWAV_INLINE drwav_uint16 drwav__bytes_to_u16(const drwav_uint8* data)
 {
     return (data[0] << 0) | (data[1] << 8);
 }
 
-static DRWAV_INLINE drwav_int16 drwav__bytes_to_s16(const unsigned char* data)
+static DRWAV_INLINE drwav_int16 drwav__bytes_to_s16(const drwav_uint8* data)
 {
     return (short)drwav__bytes_to_u16(data);
 }
 
-static DRWAV_INLINE drwav_uint32 drwav__bytes_to_u32(const unsigned char* data)
+static DRWAV_INLINE drwav_uint32 drwav__bytes_to_u32(const drwav_uint8* data)
 {
     return (data[0] << 0) | (data[1] << 8) | (data[2] << 16) | (data[3] << 24);
 }
 
-static DRWAV_INLINE drwav_int32 drwav__bytes_to_s32(const unsigned char* data)
+static DRWAV_INLINE drwav_int32 drwav__bytes_to_s32(const drwav_uint8* data)
 {
     return (drwav_int32)drwav__bytes_to_u32(data);
 }
 
-static DRWAV_INLINE drwav_uint64 drwav__bytes_to_u64(const unsigned char* data)
+static DRWAV_INLINE drwav_uint64 drwav__bytes_to_u64(const drwav_uint8* data)
 {
     return
         ((drwav_uint64)data[0] <<  0) | ((drwav_uint64)data[1] <<  8) | ((drwav_uint64)data[2] << 16) | ((drwav_uint64)data[3] << 24) |
         ((drwav_uint64)data[4] << 32) | ((drwav_uint64)data[5] << 40) | ((drwav_uint64)data[6] << 48) | ((drwav_uint64)data[7] << 56);
 }
 
-static DRWAV_INLINE drwav_int64 drwav__bytes_to_s64(const unsigned char* data)
+static DRWAV_INLINE drwav_int64 drwav__bytes_to_s64(const drwav_uint8* data)
 {
     return (drwav_int64)drwav__bytes_to_u64(data);
 }
 
-static DRWAV_INLINE void drwav__bytes_to_guid(const unsigned char* data, drwav_uint8* guid)
+static DRWAV_INLINE void drwav__bytes_to_guid(const drwav_uint8* data, drwav_uint8* guid)
 {
     int i;
     for (i = 0; i < 16; ++i) {
@@ -1495,7 +1539,7 @@ static drwav_bool32 drwav_init_write__internal(drwav* pWav, const drwav_data_for
 static drwav_result drwav__read_chunk_header(drwav_read_proc onRead, void* pUserData, drwav_container container, drwav_uint64* pRunningBytesReadOut, drwav_chunk_header* pHeaderOut)
 {
     if (container == drwav_container_riff) {
-        unsigned char sizeInBytes[4];
+        drwav_uint8 sizeInBytes[4];
 
         if (onRead(pUserData, pHeaderOut->id.fourcc, 4) != 4) {
             return DRWAV_AT_END;
@@ -1509,7 +1553,7 @@ static drwav_result drwav__read_chunk_header(drwav_read_proc onRead, void* pUser
         pHeaderOut->paddingSize = drwav__chunk_padding_size_riff(pHeaderOut->sizeInBytes);
         *pRunningBytesReadOut += 8;
     } else {
-        unsigned char sizeInBytes[8];
+        drwav_uint8 sizeInBytes[8];
 
         if (onRead(pUserData, pHeaderOut->id.guid, 16) != 16) {
             return DRWAV_AT_END;
@@ -1578,7 +1622,7 @@ static drwav_bool32 drwav__seek_from_start(drwav_seek_proc onSeek, drwav_uint64 
 static drwav_bool32 drwav__read_fmt(drwav_read_proc onRead, drwav_seek_proc onSeek, void* pUserData, drwav_container container, drwav_uint64* pRunningBytesReadOut, drwav_fmt* fmtOut)
 {
     drwav_chunk_header header;
-    unsigned char fmt[16];
+    drwav_uint8 fmt[16];
 
     if (drwav__read_chunk_header(onRead, pUserData, container, pRunningBytesReadOut, &header) != DRWAV_SUCCESS) {
         return DRWAV_FALSE;
@@ -1629,7 +1673,7 @@ static drwav_bool32 drwav__read_fmt(drwav_read_proc onRead, drwav_seek_proc onSe
     memset(fmtOut->subFormat, 0, sizeof(fmtOut->subFormat));
 
     if (header.sizeInBytes > 16) {
-        unsigned char fmt_cbSize[2];
+        drwav_uint8 fmt_cbSize[2];
         int bytesReadSoFar = 0;
 
         if (onRead(pUserData, fmt_cbSize, sizeof(fmt_cbSize)) != sizeof(fmt_cbSize)) {
@@ -1649,7 +1693,7 @@ static drwav_bool32 drwav__read_fmt(drwav_read_proc onRead, drwav_seek_proc onSe
             }
 
             if (fmtOut->formatTag == DR_WAVE_FORMAT_EXTENSIBLE) {
-                unsigned char fmtext[22];
+                drwav_uint8 fmtext[22];
                 if (onRead(pUserData, fmtext, fmtOut->extendedSize) != fmtOut->extendedSize) {
                     return DRWAV_FALSE;    /* Expecting more data. */
                 }
@@ -1771,7 +1815,7 @@ static drwav_bool32 drwav_init__internal(drwav* pWav, drwav_chunk_proc onChunk, 
 
     drwav_uint64 cursor;    /* <-- Keeps track of the byte position so we can seek to specific locations. */
     drwav_bool32 sequential;
-    unsigned char riff[4];
+    drwav_uint8 riff[4];
     drwav_fmt fmt;
     unsigned short translatedFormatTag;
     drwav_uint64 sampleCountFromFactChunk;
@@ -1815,8 +1859,8 @@ static drwav_bool32 drwav_init__internal(drwav* pWav, drwav_chunk_proc onChunk, 
 
 
     if (pWav->container == drwav_container_riff) {
-        unsigned char chunkSizeBytes[4];
-        unsigned char wave[4];
+        drwav_uint8 chunkSizeBytes[4];
+        drwav_uint8 wave[4];
 
         /* RIFF/WAVE */
         if (drwav__on_read(pWav->onRead, pWav->pUserData, chunkSizeBytes, sizeof(chunkSizeBytes), &cursor) != sizeof(chunkSizeBytes)) {
@@ -1835,7 +1879,7 @@ static drwav_bool32 drwav_init__internal(drwav* pWav, drwav_chunk_proc onChunk, 
             return DRWAV_FALSE;    /* Expecting "WAVE". */
         }
     } else {
-        unsigned char chunkSizeBytes[8];
+        drwav_uint8 chunkSizeBytes[8];
         drwav_uint8 wave[16];
 
         /* W64 */
@@ -1984,7 +2028,7 @@ static drwav_bool32 drwav_init__internal(drwav* pWav, drwav_chunk_proc onChunk, 
         /* "smpl" chunk. */
         if (pWav->container == drwav_container_riff) {
             if (drwav__fourcc_equal(header.id.fourcc, "smpl")) {
-                unsigned char smplHeaderData[36];    /* 36 = size of the smpl header section, not including the loop data. */
+                drwav_uint8 smplHeaderData[36];    /* 36 = size of the smpl header section, not including the loop data. */
                 if (chunkSize >= sizeof(smplHeaderData)) {
                     drwav_uint64 bytesJustRead = drwav__on_read(pWav->onRead, pWav->pUserData, smplHeaderData, sizeof(smplHeaderData), &cursor);
                     chunkSize -= bytesJustRead;
@@ -2003,7 +2047,7 @@ static drwav_bool32 drwav_init__internal(drwav* pWav, drwav_chunk_proc onChunk, 
                         pWav->smpl.samplerData       = drwav__bytes_to_u32(smplHeaderData+32);
 
                         for (iLoop = 0; iLoop < pWav->smpl.numSampleLoops && iLoop < drwav_countof(pWav->smpl.loops); ++iLoop) {
-                            unsigned char smplLoopData[24];  /* 24 = size of a loop section in the smpl chunk. */
+                            drwav_uint8 smplLoopData[24];  /* 24 = size of a loop section in the smpl chunk. */
                             bytesJustRead = drwav__on_read(pWav->onRead, pWav->pUserData, smplLoopData, sizeof(smplLoopData), &cursor);
                             chunkSize -= bytesJustRead;
 
@@ -2348,7 +2392,8 @@ DRWAV_API drwav_bool32 drwav_init_write_sequential_pcm_frames(drwav* pWav, const
 
 DRWAV_API drwav_uint64 drwav_target_write_size_bytes(const drwav_data_format* pFormat, drwav_uint64 totalSampleCount)
 {
-    drwav_uint64 targetDataSizeBytes = (drwav_uint64)(totalSampleCount * pFormat->channels * pFormat->bitsPerSample/8.0);
+    /* Casting totalSampleCount to drwav_int64 for VC6 compatibility. No issues in practice because nobody is going to exhaust the whole 63 bits. */
+    drwav_uint64 targetDataSizeBytes = (drwav_uint64)((drwav_int64)totalSampleCount * pFormat->channels * pFormat->bitsPerSample/8.0);
     drwav_uint64 riffChunkSizeBytes;
     drwav_uint64 fileSizeBytes;
 
@@ -3195,7 +3240,7 @@ DRWAV_API drwav_bool32 drwav_init_memory_ex(drwav* pWav, const void* data, size_
         return DRWAV_FALSE;
     }
 
-    pWav->memoryStream.data = (const unsigned char*)data;
+    pWav->memoryStream.data = (const drwav_uint8*)data;
     pWav->memoryStream.dataSize = dataSize;
     pWav->memoryStream.currentReadPos = 0;
 
@@ -3333,7 +3378,7 @@ DRWAV_API size_t drwav_read_raw(drwav* pWav, size_t bytesToRead, void* pBufferOu
 {
     size_t bytesRead;
 
-    if (pWav == NULL || bytesToRead == 0 || pBufferOut == NULL) {
+    if (pWav == NULL || bytesToRead == 0) {
         return 0;
     }
 
@@ -3341,7 +3386,41 @@ DRWAV_API size_t drwav_read_raw(drwav* pWav, size_t bytesToRead, void* pBufferOu
         bytesToRead = (size_t)pWav->bytesRemaining;
     }
 
-    bytesRead = pWav->onRead(pWav->pUserData, pBufferOut, bytesToRead);
+    if (pBufferOut != NULL) {
+        bytesRead = pWav->onRead(pWav->pUserData, pBufferOut, bytesToRead);
+    } else {
+        /* We need to seek. If we fail, we need to read-and-discard to make sure we get a good byte count. */
+        bytesRead = 0;
+        while (bytesRead < bytesToRead) {
+            size_t bytesToSeek = (bytesToRead - bytesRead);
+            if (bytesToSeek > 0x7FFFFFFF) {
+                bytesToSeek = 0x7FFFFFFF;
+            }
+
+            if (pWav->onSeek(pWav->pUserData, (int)bytesToSeek, drwav_seek_origin_current) == DRWAV_FALSE) {
+                break;
+            }
+
+            bytesRead += bytesToSeek;
+        }
+
+        /* When we get here we may need to read-and-discard some data. */
+        while (bytesRead < bytesToRead) {
+            drwav_uint8 buffer[4096];
+            size_t bytesSeeked;
+            size_t bytesToSeek = (bytesToRead - bytesRead);
+            if (bytesToSeek > sizeof(buffer)) {
+                bytesToSeek = sizeof(buffer);
+            }
+
+            bytesSeeked = pWav->onRead(pWav->pUserData, buffer, bytesToSeek);
+            bytesRead += bytesSeeked;
+
+            if (bytesSeeked < bytesToSeek) {
+                break;  /* Reached the end. */
+            }
+        }
+    }
 
     pWav->bytesRemaining -= bytesRead;
     return bytesRead;
@@ -3353,7 +3432,7 @@ DRWAV_API drwav_uint64 drwav_read_pcm_frames_le(drwav* pWav, drwav_uint64 frames
 {
     drwav_uint32 bytesPerFrame;
 
-    if (pWav == NULL || framesToRead == 0 || pBufferOut == NULL) {
+    if (pWav == NULL || framesToRead == 0) {
         return 0;
     }
 
@@ -3378,7 +3457,10 @@ DRWAV_API drwav_uint64 drwav_read_pcm_frames_le(drwav* pWav, drwav_uint64 frames
 DRWAV_API drwav_uint64 drwav_read_pcm_frames_be(drwav* pWav, drwav_uint64 framesToRead, void* pBufferOut)
 {
     drwav_uint64 framesRead = drwav_read_pcm_frames_le(pWav, framesToRead, pBufferOut);
-    drwav__bswap_samples(pBufferOut, framesRead*pWav->channels, drwav_get_bytes_per_pcm_frame(pWav)/pWav->channels, pWav->translatedFormatTag);
+
+    if (pBufferOut != NULL) {
+        drwav__bswap_samples(pBufferOut, framesRead*pWav->channels, drwav_get_bytes_per_pcm_frame(pWav)/pWav->channels, pWav->translatedFormatTag);
+    }
 
     return framesRead;
 }
@@ -3468,7 +3550,7 @@ DRWAV_API drwav_bool32 drwav_seek_to_pcm_frame(drwav* pWav, drwav_uint64 targetF
                 } else if (pWav->translatedFormatTag == DR_WAVE_FORMAT_DVI_ADPCM) {
                     framesRead = drwav_read_pcm_frames_s16__ima(pWav, framesToRead, devnull);
                 } else {
-                    assert(DRWAV_FALSE);    /* If this assertion is triggered it means I've implemented a new compressed format but forgot to add a branch for it here. */
+                    DRWAV_ASSERT(DRWAV_FALSE);  /* If this assertion is triggered it means I've implemented a new compressed format but forgot to add a branch for it here. */
                 }
 
                 if (framesRead != framesToRead) {
@@ -3641,7 +3723,6 @@ static drwav_uint64 drwav_read_pcm_frames_s16__msadpcm(drwav* pWav, drwav_uint64
 
     DRWAV_ASSERT(pWav != NULL);
     DRWAV_ASSERT(framesToRead > 0);
-    DRWAV_ASSERT(pBufferOut != NULL);
 
     /* TODO: Lots of room for optimization here. */
 
@@ -3690,12 +3771,15 @@ static drwav_uint64 drwav_read_pcm_frames_s16__msadpcm(drwav* pWav, drwav_uint64
 
         /* Output anything that's cached. */
         while (framesToRead > 0 && pWav->msadpcm.cachedFrameCount > 0 && pWav->compressed.iCurrentPCMFrame < pWav->totalPCMFrameCount) {
-            drwav_uint32 iSample = 0;
-            for (iSample = 0; iSample < pWav->channels; iSample += 1) {
-                pBufferOut[iSample] = (drwav_int16)pWav->msadpcm.cachedFrames[(drwav_countof(pWav->msadpcm.cachedFrames) - (pWav->msadpcm.cachedFrameCount*pWav->channels)) + iSample];
+            if (pBufferOut != NULL) {
+                drwav_uint32 iSample = 0;
+                for (iSample = 0; iSample < pWav->channels; iSample += 1) {
+                    pBufferOut[iSample] = (drwav_int16)pWav->msadpcm.cachedFrames[(drwav_countof(pWav->msadpcm.cachedFrames) - (pWav->msadpcm.cachedFrameCount*pWav->channels)) + iSample];
+                }
+
+                pBufferOut += pWav->channels;
             }
 
-            pBufferOut      += pWav->channels;
             framesToRead    -= 1;
             totalFramesRead += 1;
             pWav->compressed.iCurrentPCMFrame += 1;
@@ -3816,10 +3900,27 @@ static drwav_uint64 drwav_read_pcm_frames_s16__msadpcm(drwav* pWav, drwav_uint64
 static drwav_uint64 drwav_read_pcm_frames_s16__ima(drwav* pWav, drwav_uint64 framesToRead, drwav_int16* pBufferOut)
 {
     drwav_uint64 totalFramesRead = 0;
+    drwav_uint32 iChannel;
+
+    static drwav_int32 indexTable[16] = {
+        -1, -1, -1, -1, 2, 4, 6, 8,
+        -1, -1, -1, -1, 2, 4, 6, 8
+    };
+
+    static drwav_int32 stepTable[89] = {
+        7,     8,     9,     10,    11,    12,    13,    14,    16,    17, 
+        19,    21,    23,    25,    28,    31,    34,    37,    41,    45, 
+        50,    55,    60,    66,    73,    80,    88,    97,    107,   118, 
+        130,   143,   157,   173,   190,   209,   230,   253,   279,   307,
+        337,   371,   408,   449,   494,   544,   598,   658,   724,   796,
+        876,   963,   1060,  1166,  1282,  1411,  1552,  1707,  1878,  2066, 
+        2272,  2499,  2749,  3024,  3327,  3660,  4026,  4428,  4871,  5358,
+        5894,  6484,  7132,  7845,  8630,  9493,  10442, 11487, 12635, 13899, 
+        15289, 16818, 18500, 20350, 22385, 24623, 27086, 29794, 32767 
+    };
 
     DRWAV_ASSERT(pWav != NULL);
     DRWAV_ASSERT(framesToRead > 0);
-    DRWAV_ASSERT(pBufferOut != NULL);
 
     /* TODO: Lots of room for optimization here. */
 
@@ -3834,6 +3935,12 @@ static drwav_uint64 drwav_read_pcm_frames_s16__ima(drwav* pWav, drwav_uint64 fra
                 }
                 pWav->ima.bytesRemainingInBlock = pWav->fmt.blockAlign - sizeof(header);
 
+                if (header[2] >= drwav_countof(stepTable)) {
+                    pWav->onSeek(pWav->pUserData, pWav->ima.bytesRemainingInBlock, drwav_seek_origin_current);
+                    pWav->ima.bytesRemainingInBlock = 0;
+                    return totalFramesRead; /* Invalid data. */
+                }
+
                 pWav->ima.predictor[0] = drwav__bytes_to_s16(header + 0);
                 pWav->ima.stepIndex[0] = header[2];
                 pWav->ima.cachedFrames[drwav_countof(pWav->ima.cachedFrames) - 1] = pWav->ima.predictor[0];
@@ -3845,6 +3952,12 @@ static drwav_uint64 drwav_read_pcm_frames_s16__ima(drwav* pWav, drwav_uint64 fra
                     return totalFramesRead;
                 }
                 pWav->ima.bytesRemainingInBlock = pWav->fmt.blockAlign - sizeof(header);
+
+                if (header[2] >= drwav_countof(stepTable) || header[6] >= drwav_countof(stepTable)) {
+                    pWav->onSeek(pWav->pUserData, pWav->ima.bytesRemainingInBlock, drwav_seek_origin_current);
+                    pWav->ima.bytesRemainingInBlock = 0;
+                    return totalFramesRead; /* Invalid data. */
+                }
 
                 pWav->ima.predictor[0] = drwav__bytes_to_s16(header + 0);
                 pWav->ima.stepIndex[0] = header[2];
@@ -3859,12 +3972,14 @@ static drwav_uint64 drwav_read_pcm_frames_s16__ima(drwav* pWav, drwav_uint64 fra
 
         /* Output anything that's cached. */
         while (framesToRead > 0 && pWav->ima.cachedFrameCount > 0 && pWav->compressed.iCurrentPCMFrame < pWav->totalPCMFrameCount) {
-            drwav_uint32 iSample;
-            for (iSample = 0; iSample < pWav->channels; iSample += 1) {
-                pBufferOut[iSample] = (drwav_int16)pWav->ima.cachedFrames[(drwav_countof(pWav->ima.cachedFrames) - (pWav->ima.cachedFrameCount*pWav->channels)) + iSample];
+            if (pBufferOut != NULL) {
+                drwav_uint32 iSample;
+                for (iSample = 0; iSample < pWav->channels; iSample += 1) {
+                    pBufferOut[iSample] = (drwav_int16)pWav->ima.cachedFrames[(drwav_countof(pWav->ima.cachedFrames) - (pWav->ima.cachedFrameCount*pWav->channels)) + iSample];
+                }
+                pBufferOut += pWav->channels;
             }
 
-            pBufferOut      += pWav->channels;
             framesToRead    -= 1;
             totalFramesRead += 1;
             pWav->compressed.iCurrentPCMFrame += 1;
@@ -3883,25 +3998,6 @@ static drwav_uint64 drwav_read_pcm_frames_s16__ima(drwav* pWav, drwav_uint64 fra
             if (pWav->ima.bytesRemainingInBlock == 0) {
                 continue;
             } else {
-                static drwav_int32 indexTable[16] = {
-                    -1, -1, -1, -1, 2, 4, 6, 8,
-                    -1, -1, -1, -1, 2, 4, 6, 8
-                };
-
-                static drwav_int32 stepTable[89] = {
-                    7,     8,     9,     10,    11,    12,    13,    14,    16,    17, 
-                    19,    21,    23,    25,    28,    31,    34,    37,    41,    45, 
-                    50,    55,    60,    66,    73,    80,    88,    97,    107,   118, 
-                    130,   143,   157,   173,   190,   209,   230,   253,   279,   307,
-                    337,   371,   408,   449,   494,   544,   598,   658,   724,   796,
-                    876,   963,   1060,  1166,  1282,  1411,  1552,  1707,  1878,  2066, 
-                    2272,  2499,  2749,  3024,  3327,  3660,  4026,  4428,  4871,  5358,
-                    5894,  6484,  7132,  7845,  8630,  9493,  10442, 11487, 12635, 13899, 
-                    15289, 16818, 18500, 20350, 22385, 24623, 27086, 29794, 32767 
-                };
-
-                drwav_uint32 iChannel;
-
                 /*
                 From what I can tell with stereo streams, it looks like every 4 bytes (8 samples) is for one channel. So it goes 4 bytes for the
                 left channel, 4 bytes for the right channel.
@@ -4009,7 +4105,7 @@ static DRWAV_INLINE drwav_int16 drwav__mulaw_to_s16(drwav_uint8 sampleIn)
 
 
 
-static void drwav__pcm_to_s16(drwav_int16* pOut, const unsigned char* pIn, size_t totalSampleCount, unsigned int bytesPerSample)
+static void drwav__pcm_to_s16(drwav_int16* pOut, const drwav_uint8* pIn, size_t totalSampleCount, unsigned int bytesPerSample)
 {
     unsigned int i;
 
@@ -4061,7 +4157,7 @@ static void drwav__pcm_to_s16(drwav_int16* pOut, const unsigned char* pIn, size_
     }
 }
 
-static void drwav__ieee_to_s16(drwav_int16* pOut, const unsigned char* pIn, size_t totalSampleCount, unsigned int bytesPerSample)
+static void drwav__ieee_to_s16(drwav_int16* pOut, const drwav_uint8* pIn, size_t totalSampleCount, unsigned int bytesPerSample)
 {
     if (bytesPerSample == 4) {
         drwav_f32_to_s16(pOut, (const float*)pIn, totalSampleCount);
@@ -4080,10 +4176,10 @@ static drwav_uint64 drwav_read_pcm_frames_s16__pcm(drwav* pWav, drwav_uint64 fra
 {
     drwav_uint32 bytesPerFrame;
     drwav_uint64 totalFramesRead;
-    unsigned char sampleData[4096];
+    drwav_uint8 sampleData[4096];
 
     /* Fast path. */
-    if (pWav->translatedFormatTag == DR_WAVE_FORMAT_PCM && pWav->bitsPerSample == 16) {
+    if ((pWav->translatedFormatTag == DR_WAVE_FORMAT_PCM && pWav->bitsPerSample == 16) || pBufferOut == NULL) {
         return drwav_read_pcm_frames(pWav, framesToRead, pBufferOut);
     }
     
@@ -4113,9 +4209,14 @@ static drwav_uint64 drwav_read_pcm_frames_s16__pcm(drwav* pWav, drwav_uint64 fra
 static drwav_uint64 drwav_read_pcm_frames_s16__ieee(drwav* pWav, drwav_uint64 framesToRead, drwav_int16* pBufferOut)
 {
     drwav_uint64 totalFramesRead;
-    unsigned char sampleData[4096];
+    drwav_uint8 sampleData[4096];
+    drwav_uint32 bytesPerFrame;
 
-    drwav_uint32 bytesPerFrame = drwav_get_bytes_per_pcm_frame(pWav);
+    if (pBufferOut == NULL) {
+        return drwav_read_pcm_frames(pWav, framesToRead, NULL);
+    }
+
+    bytesPerFrame = drwav_get_bytes_per_pcm_frame(pWav);
     if (bytesPerFrame == 0) {
         return 0;
     }
@@ -4141,9 +4242,14 @@ static drwav_uint64 drwav_read_pcm_frames_s16__ieee(drwav* pWav, drwav_uint64 fr
 static drwav_uint64 drwav_read_pcm_frames_s16__alaw(drwav* pWav, drwav_uint64 framesToRead, drwav_int16* pBufferOut)
 {
     drwav_uint64 totalFramesRead;
-    unsigned char sampleData[4096];
+    drwav_uint8 sampleData[4096];
+    drwav_uint32 bytesPerFrame;
 
-    drwav_uint32 bytesPerFrame = drwav_get_bytes_per_pcm_frame(pWav);
+    if (pBufferOut == NULL) {
+        return drwav_read_pcm_frames(pWav, framesToRead, NULL);
+    }
+
+    bytesPerFrame = drwav_get_bytes_per_pcm_frame(pWav);
     if (bytesPerFrame == 0) {
         return 0;
     }
@@ -4169,9 +4275,14 @@ static drwav_uint64 drwav_read_pcm_frames_s16__alaw(drwav* pWav, drwav_uint64 fr
 static drwav_uint64 drwav_read_pcm_frames_s16__mulaw(drwav* pWav, drwav_uint64 framesToRead, drwav_int16* pBufferOut)
 {
     drwav_uint64 totalFramesRead;
-    unsigned char sampleData[4096];
+    drwav_uint8 sampleData[4096];
+    drwav_uint32 bytesPerFrame;
 
-    drwav_uint32 bytesPerFrame = drwav_get_bytes_per_pcm_frame(pWav);
+    if (pBufferOut == NULL) {
+        return drwav_read_pcm_frames(pWav, framesToRead, NULL);
+    }
+
+    bytesPerFrame = drwav_get_bytes_per_pcm_frame(pWav);
     if (bytesPerFrame == 0) {
         return 0;
     }
@@ -4196,8 +4307,12 @@ static drwav_uint64 drwav_read_pcm_frames_s16__mulaw(drwav* pWav, drwav_uint64 f
 
 DRWAV_API drwav_uint64 drwav_read_pcm_frames_s16(drwav* pWav, drwav_uint64 framesToRead, drwav_int16* pBufferOut)
 {
-    if (pWav == NULL || framesToRead == 0 || pBufferOut == NULL) {
+    if (pWav == NULL || framesToRead == 0) {
         return 0;
+    }
+
+    if (pBufferOut == NULL) {
+        return drwav_read_pcm_frames(pWav, framesToRead, NULL);
     }
 
     /* Don't try to read more samples than can potentially fit in the output buffer. */
@@ -4235,7 +4350,7 @@ DRWAV_API drwav_uint64 drwav_read_pcm_frames_s16(drwav* pWav, drwav_uint64 frame
 DRWAV_API drwav_uint64 drwav_read_pcm_frames_s16le(drwav* pWav, drwav_uint64 framesToRead, drwav_int16* pBufferOut)
 {
     drwav_uint64 framesRead = drwav_read_pcm_frames_s16(pWav, framesToRead, pBufferOut);
-    if (!drwav__is_little_endian()) {
+    if (pBufferOut != NULL && drwav__is_little_endian() == DRWAV_FALSE) {
         drwav__bswap_samples_s16(pBufferOut, framesRead*pWav->channels);
     }
 
@@ -4245,7 +4360,7 @@ DRWAV_API drwav_uint64 drwav_read_pcm_frames_s16le(drwav* pWav, drwav_uint64 fra
 DRWAV_API drwav_uint64 drwav_read_pcm_frames_s16be(drwav* pWav, drwav_uint64 framesToRead, drwav_int16* pBufferOut)
 {
     drwav_uint64 framesRead = drwav_read_pcm_frames_s16(pWav, framesToRead, pBufferOut);
-    if (drwav__is_little_endian()) {
+    if (pBufferOut != NULL && drwav__is_little_endian() == DRWAV_TRUE) {
         drwav__bswap_samples_s16(pBufferOut, framesRead*pWav->channels);
     }
 
@@ -4270,7 +4385,7 @@ DRWAV_API void drwav_s24_to_s16(drwav_int16* pOut, const drwav_uint8* pIn, size_
     int r;
     size_t i;
     for (i = 0; i < sampleCount; ++i) {
-        int x = ((int)(((unsigned int)(((const unsigned char*)pIn)[i*3+0]) << 8) | ((unsigned int)(((const unsigned char*)pIn)[i*3+1]) << 16) | ((unsigned int)(((const unsigned char*)pIn)[i*3+2])) << 24)) >> 8;
+        int x = ((int)(((unsigned int)(((const drwav_uint8*)pIn)[i*3+0]) << 8) | ((unsigned int)(((const drwav_uint8*)pIn)[i*3+1]) << 16) | ((unsigned int)(((const drwav_uint8*)pIn)[i*3+2])) << 24)) >> 8;
         r = x >> 8;
         pOut[i] = (short)r;
     }
@@ -4335,7 +4450,7 @@ DRWAV_API void drwav_mulaw_to_s16(drwav_int16* pOut, const drwav_uint8* pIn, siz
 
 
 
-static void drwav__pcm_to_f32(float* pOut, const unsigned char* pIn, size_t sampleCount, unsigned int bytesPerSample)
+static void drwav__pcm_to_f32(float* pOut, const drwav_uint8* pIn, size_t sampleCount, unsigned int bytesPerSample)
 {
     unsigned int i;
 
@@ -4384,7 +4499,7 @@ static void drwav__pcm_to_f32(float* pOut, const unsigned char* pIn, size_t samp
     }
 }
 
-static void drwav__ieee_to_f32(float* pOut, const unsigned char* pIn, size_t sampleCount, unsigned int bytesPerSample)
+static void drwav__ieee_to_f32(float* pOut, const drwav_uint8* pIn, size_t sampleCount, unsigned int bytesPerSample)
 {
     if (bytesPerSample == 4) {
         unsigned int i;
@@ -4406,7 +4521,7 @@ static void drwav__ieee_to_f32(float* pOut, const unsigned char* pIn, size_t sam
 static drwav_uint64 drwav_read_pcm_frames_f32__pcm(drwav* pWav, drwav_uint64 framesToRead, float* pBufferOut)
 {
     drwav_uint64 totalFramesRead;
-    unsigned char sampleData[4096];
+    drwav_uint8 sampleData[4096];
 
     drwav_uint32 bytesPerFrame = drwav_get_bytes_per_pcm_frame(pWav);
     if (bytesPerFrame == 0) {
@@ -4482,7 +4597,7 @@ static drwav_uint64 drwav_read_pcm_frames_f32__ima(drwav* pWav, drwav_uint64 fra
 static drwav_uint64 drwav_read_pcm_frames_f32__ieee(drwav* pWav, drwav_uint64 framesToRead, float* pBufferOut)
 {
     drwav_uint64 totalFramesRead;
-    unsigned char sampleData[4096];
+    drwav_uint8 sampleData[4096];
     drwav_uint32 bytesPerFrame;
 
     /* Fast path. */
@@ -4516,7 +4631,7 @@ static drwav_uint64 drwav_read_pcm_frames_f32__ieee(drwav* pWav, drwav_uint64 fr
 static drwav_uint64 drwav_read_pcm_frames_f32__alaw(drwav* pWav, drwav_uint64 framesToRead, float* pBufferOut)
 {
     drwav_uint64 totalFramesRead;
-    unsigned char sampleData[4096];
+    drwav_uint8 sampleData[4096];
     drwav_uint32 bytesPerFrame = drwav_get_bytes_per_pcm_frame(pWav);
     if (bytesPerFrame == 0) {
         return 0;
@@ -4543,7 +4658,7 @@ static drwav_uint64 drwav_read_pcm_frames_f32__alaw(drwav* pWav, drwav_uint64 fr
 static drwav_uint64 drwav_read_pcm_frames_f32__mulaw(drwav* pWav, drwav_uint64 framesToRead, float* pBufferOut)
 {
     drwav_uint64 totalFramesRead;
-    unsigned char sampleData[4096];
+    drwav_uint8 sampleData[4096];
 
     drwav_uint32 bytesPerFrame = drwav_get_bytes_per_pcm_frame(pWav);
     if (bytesPerFrame == 0) {
@@ -4570,8 +4685,12 @@ static drwav_uint64 drwav_read_pcm_frames_f32__mulaw(drwav* pWav, drwav_uint64 f
 
 DRWAV_API drwav_uint64 drwav_read_pcm_frames_f32(drwav* pWav, drwav_uint64 framesToRead, float* pBufferOut)
 {
-    if (pWav == NULL || framesToRead == 0 || pBufferOut == NULL) {
+    if (pWav == NULL || framesToRead == 0) {
         return 0;
+    }
+
+    if (pBufferOut == NULL) {
+        return drwav_read_pcm_frames(pWav, framesToRead, NULL);
     }
 
     /* Don't try to read more samples than can potentially fit in the output buffer. */
@@ -4609,7 +4728,7 @@ DRWAV_API drwav_uint64 drwav_read_pcm_frames_f32(drwav* pWav, drwav_uint64 frame
 DRWAV_API drwav_uint64 drwav_read_pcm_frames_f32le(drwav* pWav, drwav_uint64 framesToRead, float* pBufferOut)
 {
     drwav_uint64 framesRead = drwav_read_pcm_frames_f32(pWav, framesToRead, pBufferOut);
-    if (!drwav__is_little_endian()) {
+    if (pBufferOut != NULL && drwav__is_little_endian() == DRWAV_FALSE) {
         drwav__bswap_samples_f32(pBufferOut, framesRead*pWav->channels);
     }
 
@@ -4619,7 +4738,7 @@ DRWAV_API drwav_uint64 drwav_read_pcm_frames_f32le(drwav* pWav, drwav_uint64 fra
 DRWAV_API drwav_uint64 drwav_read_pcm_frames_f32be(drwav* pWav, drwav_uint64 framesToRead, float* pBufferOut)
 {
     drwav_uint64 framesRead = drwav_read_pcm_frames_f32(pWav, framesToRead, pBufferOut);
-    if (drwav__is_little_endian()) {
+    if (pBufferOut != NULL && drwav__is_little_endian() == DRWAV_TRUE) {
         drwav__bswap_samples_f32(pBufferOut, framesRead*pWav->channels);
     }
 
@@ -4736,7 +4855,7 @@ DRWAV_API void drwav_mulaw_to_f32(float* pOut, const drwav_uint8* pIn, size_t sa
 
 
 
-static void drwav__pcm_to_s32(drwav_int32* pOut, const unsigned char* pIn, size_t totalSampleCount, unsigned int bytesPerSample)
+static void drwav__pcm_to_s32(drwav_int32* pOut, const drwav_uint8* pIn, size_t totalSampleCount, unsigned int bytesPerSample)
 {
     unsigned int i;
 
@@ -4787,7 +4906,7 @@ static void drwav__pcm_to_s32(drwav_int32* pOut, const unsigned char* pIn, size_
     }
 }
 
-static void drwav__ieee_to_s32(drwav_int32* pOut, const unsigned char* pIn, size_t totalSampleCount, unsigned int bytesPerSample)
+static void drwav__ieee_to_s32(drwav_int32* pOut, const drwav_uint8* pIn, size_t totalSampleCount, unsigned int bytesPerSample)
 {
     if (bytesPerSample == 4) {
         drwav_f32_to_s32(pOut, (const float*)pIn, totalSampleCount);
@@ -4806,7 +4925,7 @@ static void drwav__ieee_to_s32(drwav_int32* pOut, const unsigned char* pIn, size
 static drwav_uint64 drwav_read_pcm_frames_s32__pcm(drwav* pWav, drwav_uint64 framesToRead, drwav_int32* pBufferOut)
 {
     drwav_uint64 totalFramesRead;
-    unsigned char sampleData[4096];
+    drwav_uint8 sampleData[4096];
     drwav_uint32 bytesPerFrame;
 
     /* Fast path. */
@@ -4888,7 +5007,7 @@ static drwav_uint64 drwav_read_pcm_frames_s32__ima(drwav* pWav, drwav_uint64 fra
 static drwav_uint64 drwav_read_pcm_frames_s32__ieee(drwav* pWav, drwav_uint64 framesToRead, drwav_int32* pBufferOut)
 {
     drwav_uint64 totalFramesRead;
-    unsigned char sampleData[4096];
+    drwav_uint8 sampleData[4096];
 
     drwav_uint32 bytesPerFrame = drwav_get_bytes_per_pcm_frame(pWav);
     if (bytesPerFrame == 0) {
@@ -4916,7 +5035,7 @@ static drwav_uint64 drwav_read_pcm_frames_s32__ieee(drwav* pWav, drwav_uint64 fr
 static drwav_uint64 drwav_read_pcm_frames_s32__alaw(drwav* pWav, drwav_uint64 framesToRead, drwav_int32* pBufferOut)
 {
     drwav_uint64 totalFramesRead;
-    unsigned char sampleData[4096];
+    drwav_uint8 sampleData[4096];
 
     drwav_uint32 bytesPerFrame = drwav_get_bytes_per_pcm_frame(pWav);
     if (bytesPerFrame == 0) {
@@ -4944,7 +5063,7 @@ static drwav_uint64 drwav_read_pcm_frames_s32__alaw(drwav* pWav, drwav_uint64 fr
 static drwav_uint64 drwav_read_pcm_frames_s32__mulaw(drwav* pWav, drwav_uint64 framesToRead, drwav_int32* pBufferOut)
 {
     drwav_uint64 totalFramesRead;
-    unsigned char sampleData[4096];
+    drwav_uint8 sampleData[4096];
 
     drwav_uint32 bytesPerFrame = drwav_get_bytes_per_pcm_frame(pWav);
     if (bytesPerFrame == 0) {
@@ -4971,15 +5090,18 @@ static drwav_uint64 drwav_read_pcm_frames_s32__mulaw(drwav* pWav, drwav_uint64 f
 
 DRWAV_API drwav_uint64 drwav_read_pcm_frames_s32(drwav* pWav, drwav_uint64 framesToRead, drwav_int32* pBufferOut)
 {
-    if (pWav == NULL || framesToRead == 0 || pBufferOut == NULL) {
+    if (pWav == NULL || framesToRead == 0) {
         return 0;
+    }
+
+    if (pBufferOut == NULL) {
+        return drwav_read_pcm_frames(pWav, framesToRead, NULL);
     }
 
     /* Don't try to read more samples than can potentially fit in the output buffer. */
     if (framesToRead * pWav->channels * sizeof(drwav_int32) > DRWAV_SIZE_MAX) {
         framesToRead = DRWAV_SIZE_MAX / sizeof(drwav_int32) / pWav->channels;
     }
-
 
     if (pWav->translatedFormatTag == DR_WAVE_FORMAT_PCM) {
         return drwav_read_pcm_frames_s32__pcm(pWav, framesToRead, pBufferOut);
@@ -5011,7 +5133,7 @@ DRWAV_API drwav_uint64 drwav_read_pcm_frames_s32(drwav* pWav, drwav_uint64 frame
 DRWAV_API drwav_uint64 drwav_read_pcm_frames_s32le(drwav* pWav, drwav_uint64 framesToRead, drwav_int32* pBufferOut)
 {
     drwav_uint64 framesRead = drwav_read_pcm_frames_s32(pWav, framesToRead, pBufferOut);
-    if (!drwav__is_little_endian()) {
+    if (pBufferOut != NULL && drwav__is_little_endian() == DRWAV_FALSE) {
         drwav__bswap_samples_s32(pBufferOut, framesRead*pWav->channels);
     }
 
@@ -5021,7 +5143,7 @@ DRWAV_API drwav_uint64 drwav_read_pcm_frames_s32le(drwav* pWav, drwav_uint64 fra
 DRWAV_API drwav_uint64 drwav_read_pcm_frames_s32be(drwav* pWav, drwav_uint64 framesToRead, drwav_int32* pBufferOut)
 {
     drwav_uint64 framesRead = drwav_read_pcm_frames_s32(pWav, framesToRead, pBufferOut);
-    if (drwav__is_little_endian()) {
+    if (pBufferOut != NULL && drwav__is_little_endian() == DRWAV_TRUE) {
         drwav__bswap_samples_s32(pBufferOut, framesRead*pWav->channels);
     }
 
@@ -5521,32 +5643,32 @@ DRWAV_API void drwav_free(void* p, const drwav_allocation_callbacks* pAllocation
     }
 }
 
-DRWAV_API drwav_uint16 drwav_bytes_to_u16(const unsigned char* data)
+DRWAV_API drwav_uint16 drwav_bytes_to_u16(const drwav_uint8* data)
 {
     return drwav__bytes_to_u16(data);
 }
 
-DRWAV_API drwav_int16 drwav_bytes_to_s16(const unsigned char* data)
+DRWAV_API drwav_int16 drwav_bytes_to_s16(const drwav_uint8* data)
 {
     return drwav__bytes_to_s16(data);
 }
 
-DRWAV_API drwav_uint32 drwav_bytes_to_u32(const unsigned char* data)
+DRWAV_API drwav_uint32 drwav_bytes_to_u32(const drwav_uint8* data)
 {
     return drwav__bytes_to_u32(data);
 }
 
-DRWAV_API drwav_int32 drwav_bytes_to_s32(const unsigned char* data)
+DRWAV_API drwav_int32 drwav_bytes_to_s32(const drwav_uint8* data)
 {
     return drwav__bytes_to_s32(data);
 }
 
-DRWAV_API drwav_uint64 drwav_bytes_to_u64(const unsigned char* data)
+DRWAV_API drwav_uint64 drwav_bytes_to_u64(const drwav_uint8* data)
 {
     return drwav__bytes_to_u64(data);
 }
 
-DRWAV_API drwav_int64 drwav_bytes_to_s64(const unsigned char* data)
+DRWAV_API drwav_int64 drwav_bytes_to_s64(const drwav_uint8* data)
 {
     return drwav__bytes_to_s64(data);
 }
@@ -5557,11 +5679,12 @@ DRWAV_API drwav_bool32 drwav_guid_equal(const drwav_uint8 a[16], const drwav_uin
     return drwav__guid_equal(a, b);
 }
 
-DRWAV_API drwav_bool32 drwav_fourcc_equal(const unsigned char* a, const char* b)
+DRWAV_API drwav_bool32 drwav_fourcc_equal(const drwav_uint8* a, const char* b)
 {
     return drwav__fourcc_equal(a, b);
 }
 
+#endif  /* dr_wav_c */
 #endif  /* DR_WAV_IMPLEMENTATION */
 
 /*
@@ -5752,6 +5875,27 @@ two different ways to initialize a drwav object.
 /*
 REVISION HISTORY
 ================
+v0.12.6 - 2020-06-23
+  - Change drwav_read_*() to allow NULL to be passed in as the output buffer which is equivalent to a forward seek.
+  - Fix a buffer overflow when trying to decode invalid IMA-ADPCM files.
+  - Add include guard for the implementation section.
+
+v0.12.5 - 2020-05-27
+  - Minor documentation fix.
+
+v0.12.4 - 2020-05-16
+  - Replace assert() with DRWAV_ASSERT().
+  - Add compile-time and run-time version querying.
+    - DRWAV_VERSION_MINOR
+    - DRWAV_VERSION_MAJOR
+    - DRWAV_VERSION_REVISION
+    - DRWAV_VERSION_STRING
+    - drwav_version()
+    - drwav_version_string()
+
+v0.12.3 - 2020-04-30
+  - Fix compilation errors with VC6.
+
 v0.12.2 - 2020-04-21
   - Fix a bug where drwav_init_file() does not close the file handle after attempting to load an erroneous file.
 

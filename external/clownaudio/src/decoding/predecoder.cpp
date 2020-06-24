@@ -66,21 +66,7 @@ PredecoderData* Predecoder_DecodeData(const DecoderSpec *in_spec, const DecoderS
 
 			if (predecoder_data != NULL)
 			{
-				size_t size_of_frame;
-				switch (out_spec->format)
-				{
-					case DECODER_FORMAT_S16:
-						size_of_frame = sizeof(short) * out_spec->channel_count;
-						break;
-
-					case DECODER_FORMAT_S32:
-						size_of_frame = sizeof(long) * out_spec->channel_count;
-						break;
-
-					case DECODER_FORMAT_F32:
-						size_of_frame = sizeof(float) * out_spec->channel_count;
-						break;
-				}
+				size_t size_of_frame = sizeof(short) * out_spec->channel_count;
 
 				for (;;)
 				{
@@ -130,7 +116,6 @@ void* Predecoder_Create(PredecoderData *data, bool loop, const DecoderSpec *want
 
 			spec->sample_rate = data->sample_rate;
 			spec->channel_count = CHANNEL_COUNT;
-			spec->format = DECODER_FORMAT_F32;
 
 			return predecoder;
 		}

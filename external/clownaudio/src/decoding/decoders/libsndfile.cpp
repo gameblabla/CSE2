@@ -114,7 +114,6 @@ void* Decoder_libSndfile_Create(const unsigned char *data, size_t data_size, boo
 
 				spec->sample_rate = sf_info.samplerate;
 				spec->channel_count = sf_info.channels;
-				spec->format = DECODER_FORMAT_F32;
 				spec->is_complex = false;
 
 				return decoder;
@@ -149,5 +148,5 @@ size_t Decoder_libSndfile_GetSamples(void *decoder_void, void *buffer, size_t fr
 {
 	Decoder_libSndfile *decoder = (Decoder_libSndfile*)decoder_void;
 
-	return sf_readf_float(decoder->sndfile, (float*)buffer, frames_to_do);
+	return sf_readf_short(decoder->sndfile, (short*)buffer, frames_to_do);
 }

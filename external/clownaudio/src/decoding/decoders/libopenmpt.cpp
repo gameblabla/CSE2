@@ -53,7 +53,6 @@ void* Decoder_libOpenMPT_Create(const unsigned char *data, size_t data_size, boo
 		{
 			spec->sample_rate = sample_rate;
 			spec->channel_count = CHANNEL_COUNT;
-			spec->format = DECODER_FORMAT_F32;
 			spec->is_complex = true;
 
 			if (loop)
@@ -86,13 +85,13 @@ size_t Decoder_libOpenMPT_GetSamples(void *decoder_void, void *buffer_void, size
 {
 	Decoder_libOpenMPT *decoder = (Decoder_libOpenMPT*)decoder_void;
 
-	float *buffer = (float*)buffer_void;
+	int16_t *buffer = (int16_t*)buffer_void;
 
 	size_t frames_done = 0;
 
 	while (frames_done != frames_to_do)
 	{
-		size_t frames = openmpt_module_read_interleaved_float_stereo(decoder->module, decoder->sample_rate, frames_to_do - frames_done, &buffer[frames_done * CHANNEL_COUNT]);
+		size_t frames = openmpt_module_read_interleaved_stereo(decoder->module, decoder->sample_rate, frames_to_do - frames_done, &buffer[frames_done * CHANNEL_COUNT]);
 
 		if (frames == 0)
 			break;

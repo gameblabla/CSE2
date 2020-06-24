@@ -63,7 +63,6 @@ void* Decoder_SNES_SPC_Create(const unsigned char *data, size_t data_size, bool 
 
 			spec->sample_rate = spc_sample_rate;
 			spec->channel_count = CHANNEL_COUNT;
-			spec->format = DECODER_FORMAT_S16;
 			spec->is_complex = true;
 
 			return decoder;

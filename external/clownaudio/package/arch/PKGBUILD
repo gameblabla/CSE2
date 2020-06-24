@@ -1,5 +1,5 @@
 pkgname=clownaudio-git
-pkgver=r233.6195b7b
+pkgver=r430.4a508d0
 pkgrel=1
 pkgdesc='Stereo audio engine supporting various formats'
 arch=('any')

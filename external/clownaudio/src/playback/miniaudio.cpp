@@ -30,7 +30,7 @@
 
 struct ClownAudio_Stream
 {
-	void (*user_callback)(void*, float*, size_t);
+	void (*user_callback)(void*, short*, size_t);
 	void *user_data;
 
 	ma_device device;
@@ -45,7 +45,7 @@ static void Callback(ma_device *device, void *output_buffer_void, const void *in
 	(void)input_buffer;
 
 	ClownAudio_Stream *stream = (ClownAudio_Stream*)device->pUserData;
-	float *output_buffer = (float*)output_buffer_void;
+	short *output_buffer = (short*)output_buffer_void;
 
 	stream->user_callback(stream->user_data, output_buffer, frames_to_do);
 }
@@ -60,7 +60,7 @@ CLOWNAUDIO_EXPORT void ClownAudio_DeinitPlayback(void)
     ma_context_uninit(&context);
 }
 
-CLOWNAUDIO_EXPORT ClownAudio_Stream* ClownAudio_CreateStream(unsigned long *sample_rate, void (*user_callback)(void*, float*, size_t))
+CLOWNAUDIO_EXPORT ClownAudio_Stream* ClownAudio_CreateStream(unsigned long *sample_rate, void (*user_callback)(void*, short*, size_t))
 {
 	ClownAudio_Stream *stream = (ClownAudio_Stream*)malloc(sizeof(ClownAudio_Stream));
 
@@ -68,7 +68,7 @@ CLOWNAUDIO_EXPORT ClownAudio_Stream* ClownAudio_CreateStream(unsigned long *samp
 	{
 		ma_device_config config = ma_device_config_init(ma_device_type_playback);
 		config.playback.pDeviceID = NULL;
-		config.playback.format = ma_format_f32;
+		config.playback.format = ma_format_s16;
 		config.playback.channels = 2;
 		config.sampleRate = 0;	// Use native sample rate
 		config.noPreZeroedOutputBuffer = MA_TRUE;
