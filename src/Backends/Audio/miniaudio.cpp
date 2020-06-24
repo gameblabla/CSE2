@@ -4,6 +4,10 @@
 
 #define MINIAUDIO_IMPLEMENTATION
 #define MA_NO_DECODING
+#define MA_NO_ENCODING
+#define MA_NO_WAV
+#define MA_NO_FLAC
+#define MA_NO_MP3
 #define MA_API static
 #include "../../../external/miniaudio.h"
 
@@ -26,13 +30,8 @@ static unsigned long output_frequency;
 static void (*organya_callback)(void);
 static unsigned int organya_callback_milliseconds;
 
-static void Callback(ma_device *device, void *output_stream, const void *input_stream, ma_uint32 frames_total)
+static void MixSoundsAndUpdateOrganya(long *stream, size_t frames_total)
 {
-	(void)device;
-	(void)input_stream;
-
-	float *stream = (float*)output_stream;
-
 	ma_mutex_lock(&organya_mutex);
 
 	if (organya_callback_milliseconds == 0)
@@ -72,17 +71,50 @@ static void Callback(ma_device *device, void *output_stream, const void *input_s
 	}
 
 	ma_mutex_unlock(&organya_mutex);
+}
 
-#ifdef EXTRA_SOUND_FORMATS
-	ExtraSound_Mix(stream, frames_total);
-#endif
+static void Callback(ma_device *device, void *output_stream, const void *input_stream, ma_uint32 frames_total)
+{
+	(void)device;
+	(void)input_stream;
+
+	short *stream = (short*)output_stream;
+
+	size_t frames_done = 0;
+
+	while (frames_done != frames_total)
+	{
+		long mix_buffer[0x800 * 2];	// 2 because stereo
+
+		size_t subframes = MIN(0x800, frames_total - frames_done);
+
+		memset(mix_buffer, 0, subframes * sizeof(long) * 2);
+
+		MixSoundsAndUpdateOrganya(mix_buffer, subframes);
+
+	#ifdef EXTRA_SOUND_FORMATS
+		ExtraSound_Mix(mix_buffer, subframes);
+	#endif
+
+		for (size_t i = 0; i < subframes * 2; ++i)
+		{
+			if (mix_buffer[i] > 0x7FFF)
+				*stream++ = 0x7FFF;
+			else if (mix_buffer[i] < -0x7FFF)
+				*stream++ = -0x7FFF;
+			else
+				*stream++ = mix_buffer[i];
+		}
+
+		frames_done += subframes;
+	}
 }
 
 bool AudioBackend_Init(void)
 {
 	ma_device_config config = ma_device_config_init(ma_device_type_playback);
 	config.playback.pDeviceID = NULL;
-	config.playback.format = ma_format_f32;
+	config.playback.format = ma_format_s16;
 	config.playback.channels = 2;
 	config.sampleRate = 0;	// Let miniaudio decide what sample rate to use
 	config.dataCallback = Callback;
@@ -98,11 +130,11 @@ bool AudioBackend_Init(void)
 
 		if (return_value == MA_SUCCESS)
 		{
-			return_value = ma_mutex_init(device.pContext, &mutex);
+			return_value = ma_mutex_init(&mutex);
 
 			if (return_value == MA_SUCCESS)
 			{
-				return_value = ma_mutex_init(device.pContext, &organya_mutex);
+				return_value = ma_mutex_init(&organya_mutex);
 
 				if (return_value == MA_SUCCESS)
 				{

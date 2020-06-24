@@ -39,7 +39,6 @@ void* Decoder_DR_FLAC_Create(const unsigned char *data, size_t data_size, bool l
 	{
 		spec->sample_rate = backend->sampleRate;
 		spec->channel_count = backend->channels;
-		spec->format = DECODER_FORMAT_S32;
 		spec->is_complex = false;
 	}
 
@@ -58,5 +57,5 @@ void Decoder_DR_FLAC_Rewind(void *decoder)
 
 size_t Decoder_DR_FLAC_GetSamples(void *decoder, void *buffer, size_t frames_to_do)
 {
-	return drflac_read_pcm_frames_s32((drflac*)decoder, frames_to_do, (drflac_int32*)buffer);
+	return drflac_read_pcm_frames_s16((drflac*)decoder, frames_to_do, (drflac_int16*)buffer);
 }

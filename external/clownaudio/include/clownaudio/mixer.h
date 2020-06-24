@@ -150,9 +150,9 @@ CLOWNAUDIO_EXPORT void ClownAudio_Mixer_CancelFade(ClownAudio_Mixer *mixer, Clow
 // Must be guarded with mutex.
 CLOWNAUDIO_EXPORT int ClownAudio_Mixer_GetSoundStatus(ClownAudio_Mixer *mixer, ClownAudio_SoundID sound_id);
 
-// Sets stereo volume - volume is linear, ranging from 0.0f to 1.0f.
+// Sets stereo volume - volume is linear, ranging from 0 (silence) to 0x100 (full volume). Exceeding 0x100 will amplify the volume.
 // Must be guarded with mutex.
-CLOWNAUDIO_EXPORT void ClownAudio_Mixer_SetSoundVolume(ClownAudio_Mixer *mixer, ClownAudio_SoundID sound_id, float volume_left, float volume_right);
+CLOWNAUDIO_EXPORT void ClownAudio_Mixer_SetSoundVolume(ClownAudio_Mixer *mixer, ClownAudio_SoundID sound_id, unsigned short volume_left, unsigned short volume_right);
 
 // Change whether the sound should loop or not. Only certain file formats support this (for example - Ogg Vorbis does, and PxTone doesn't).
 // Must be guarded with mutex.
@@ -168,9 +168,13 @@ CLOWNAUDIO_EXPORT void ClownAudio_Mixer_SetSoundSampleRate(ClownAudio_Mixer *mix
 // Output //
 ////////////
 
-// Output interlaced (L,R ordering) F32 PCM samples into specified buffer.
+// Mix interlaced (L,R ordering) S16 PCM samples into specified S32 buffer (not clamped).
 // Must be guarded with mutex.
-CLOWNAUDIO_EXPORT void ClownAudio_Mixer_MixSamples(ClownAudio_Mixer *mixer, float *output_buffer, size_t frames_to_do);
+CLOWNAUDIO_EXPORT void ClownAudio_Mixer_MixSamples(ClownAudio_Mixer *mixer, long *output_buffer, size_t frames_to_do);
+
+// Output interlaced (L,R ordering) S16 PCM samples into specified S16 buffer (clamped).
+// Must be guarded with mutex.
+CLOWNAUDIO_EXPORT void ClownAudio_Mixer_OutputSamples(ClownAudio_Mixer *mixer, short *output_buffer, size_t frames_to_do);
 
 
 #ifdef __cplusplus

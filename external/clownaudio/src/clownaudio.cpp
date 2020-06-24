@@ -21,6 +21,7 @@
 #include "clownaudio/clownaudio.h"
 
 #include <stddef.h>
+#include <string.h>
 
 #include "clownaudio/mixer.h"
 #include "clownaudio/playback.h"
@@ -28,16 +29,12 @@
 static ClownAudio_Stream *stream;
 static ClownAudio_Mixer *mixer;
 
-static void StreamCallback(void *user_data, float *output_buffer, size_t frames_to_do)
+static void StreamCallback(void *user_data, short *output_buffer, size_t frames_to_do)
 {
 	(void)user_data;
 
-	// Clear buffer (`ClownAudio_MixSamples` mixes directly with the output buffer)
-	for (size_t i = 0; i < frames_to_do * CLOWNAUDIO_STREAM_CHANNEL_COUNT; ++i)
-		output_buffer[i] = 0.0f;
-
 	ClownAudio_LockStream(stream);
-	ClownAudio_Mixer_MixSamples(mixer, output_buffer, frames_to_do);
+	ClownAudio_Mixer_OutputSamples(mixer, output_buffer, frames_to_do);
 	ClownAudio_UnlockStream(stream);
 }
 
@@ -70,6 +67,7 @@ CLOWNAUDIO_EXPORT bool ClownAudio_Init(void)
 
 CLOWNAUDIO_EXPORT void ClownAudio_Deinit(void)
 {
+	ClownAudio_PauseStream(stream);
 	ClownAudio_DestroyMixer(mixer);
 	ClownAudio_DestroyStream(stream);
 	ClownAudio_DeinitPlayback();
@@ -159,7 +157,7 @@ CLOWNAUDIO_EXPORT int ClownAudio_GetSoundStatus(ClownAudio_SoundID sound_id)
 	return status;
 }
 
-CLOWNAUDIO_EXPORT void ClownAudio_SetSoundVolume(ClownAudio_SoundID sound_id, float volume_left, float volume_right)
+CLOWNAUDIO_EXPORT void ClownAudio_SetSoundVolume(ClownAudio_SoundID sound_id, unsigned short volume_left, unsigned short volume_right)
 {
 	ClownAudio_LockStream(stream);
 	ClownAudio_Mixer_SetSoundVolume(mixer, sound_id, volume_left, volume_right);

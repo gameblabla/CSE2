@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/Clownacy/Cave-Story-Engine-2.svg?branch=enhanced)](https://travis-ci.com/Clownacy/Cave-Story-Engine-2)
+[![Build Status](https://travis-ci.com/Clownacy/CSE2.svg?branch=enhanced)](https://travis-ci.com/Clownacy/CSE2)
 
 ## Table of Contents
 
@@ -6,16 +6,16 @@ This repo has multiple branches:
 
 Branch | Description
 --------|--------
-[accurate](https://www.github.com/Clownacy/Cave-Story-Engine-2/tree/accurate) | The main decompilation branch. The code intended to be as close to the original as possible, down to all the bugs and platform-dependencies.
-[portable](https://www.github.com/Clownacy/Cave-Story-Engine-2/tree/portable) | This branch ports the engine away from WinAPI and DirectX, and addresses numerous portability issues, allowing it to run on other platforms.
-[enhanced-lite](https://www.github.com/Clownacy/Cave-Story-Engine-2/tree/enhanced-lite) | Based on the `portable` branch, this branch is **intended for modders**, and adds several enhancements and features to the engine.
-[enhanced](https://www.github.com/Clownacy/Cave-Story-Engine-2/tree/enhanced) | Based on the `enhanced-lite` branch, this branch is **intended for players**, and adds further enhancements and features to the engine.
-[emscripten](https://www.github.com/Clownacy/Cave-Story-Engine-2/tree/emscripten) | Modifies the engine to build with Emscripten, [allowing it to run in web browsers](http://sonicresearch.org/clownacy/cave.html) (no longer maintained).
-[wii](https://www.github.com/Clownacy/Cave-Story-Engine-2/tree/wii) | Ports the engine to the Nintendo Wii (no longer maintained).
+[accurate](https://www.github.com/Clownacy/CSE2/tree/accurate) | The main decompilation branch. The code intended to be as close to the original as possible, down to all the bugs and platform-dependencies.
+[portable](https://www.github.com/Clownacy/CSE2/tree/portable) | This branch ports the engine away from WinAPI and DirectX, and addresses numerous portability issues, allowing it to run on other platforms.
+[enhanced-lite](https://www.github.com/Clownacy/CSE2/tree/enhanced-lite) | Based on the `portable` branch, this branch is **intended for modders**, and adds several enhancements and features to the engine.
+[enhanced](https://www.github.com/Clownacy/CSE2/tree/enhanced) | Based on the `enhanced-lite` branch, this branch is **intended for players**, and adds further enhancements and features to the engine.
+[emscripten](https://www.github.com/Clownacy/CSE2/tree/emscripten) | Modifies the engine to build with Emscripten, [allowing it to run in web browsers](http://sonicresearch.org/clownacy/cave.html) (no longer maintained).
+[wii](https://www.github.com/Clownacy/CSE2/tree/wii) | Ports the engine to the Nintendo Wii (no longer maintained).
 
-# Cave Story Engine 2 (Enhanced)
+# CSE2 (Enhanced)
 
-Cave Story Engine 2 is a decompilation of Cave Story.
+CSE2 is a decompilation of Cave Story.
 
 This branch builds upon the `enhanced-lite` branch, adding several enhancements including:
 * Widescreen
@@ -74,7 +74,7 @@ Switch to the terminal (Visual Studio users should open the [Developer Command P
 cmake -B build -DCMAKE_BUILD_TYPE=Release
 ```
 
-MSYS2 users may want to append `-G"MSYS Makefiles" -DPKG_CONFIG_STATIC_LIBS=ON` to this command, also.
+MSYS2 users should append `-G"MSYS Makefiles" -DPKG_CONFIG_STATIC_LIBS=ON` to this command, also.
 
 You can also add the following flags:
 

@@ -204,19 +204,7 @@ DecoderSelectorData* DecoderSelector_LoadData(const unsigned char *file_buffer, 
 			data->decoder_type = decoder_type;
 			data->decoder_functions = decoder_functions;
 			data->predecoder_data = predecoder_data;
-			data->size_of_frame = spec.channel_count;
-
-			switch (spec.format)
-			{
-				case DECODER_FORMAT_S16:
-					data->size_of_frame *= 2;
-					break;
-
-				case DECODER_FORMAT_S32:
-				case DECODER_FORMAT_F32:
-					data->size_of_frame *= 4;
-					break;
-			}
+			data->size_of_frame = sizeof(short) * spec.channel_count;
 
 			return data;
 		}

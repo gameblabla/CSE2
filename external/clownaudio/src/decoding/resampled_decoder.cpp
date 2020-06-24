@@ -48,16 +48,6 @@ typedef struct ResampledDecoder
 	size_t buffer_done;
 } ResampledDecoder;
 
-static ma_format FormatToMiniaudioFormat(DecoderFormat format)
-{
-	if (format == DECODER_FORMAT_S16)
-		return ma_format_s16;
-	else if (format == DECODER_FORMAT_S32)
-		return ma_format_s32;
-	else //if (format == DECODER_FORMAT_F32)
-		return ma_format_f32;
-}
-
 void* ResampledDecoder_Create(DecoderStage *next_stage, bool dynamic_sample_rate, const DecoderSpec *wanted_spec, const DecoderSpec *child_spec)
 {
 //	DecoderSpec child_spec;
@@ -71,15 +61,15 @@ void* ResampledDecoder_Create(DecoderStage *next_stage, bool dynamic_sample_rate
 		{
 			resampled_decoder->next_stage = *next_stage;
 
-			ma_data_converter_config config = ma_data_converter_config_init(FormatToMiniaudioFormat(child_spec->format), FormatToMiniaudioFormat(wanted_spec->format), child_spec->channel_count, wanted_spec->channel_count, child_spec->sample_rate, wanted_spec->sample_rate == 0 ? child_spec->sample_rate : wanted_spec->sample_rate);
+			ma_data_converter_config config = ma_data_converter_config_init(ma_format_s16, ma_format_s16, child_spec->channel_count, wanted_spec->channel_count, child_spec->sample_rate, wanted_spec->sample_rate == 0 ? child_spec->sample_rate : wanted_spec->sample_rate);
 
 			if (dynamic_sample_rate)
 				config.resampling.allowDynamicSampleRate = MA_TRUE;
 
 			if (ma_data_converter_init(&config, &resampled_decoder->converter) == MA_SUCCESS)
 			{
-				resampled_decoder->size_of_in_frame = ma_get_bytes_per_sample(FormatToMiniaudioFormat(child_spec->format)) * child_spec->channel_count;
-				resampled_decoder->size_of_out_frame = ma_get_bytes_per_sample(FormatToMiniaudioFormat(wanted_spec->format)) * wanted_spec->channel_count;
+				resampled_decoder->size_of_in_frame = ma_get_bytes_per_sample(ma_format_s16) * child_spec->channel_count;
+				resampled_decoder->size_of_out_frame = ma_get_bytes_per_sample(ma_format_s16) * wanted_spec->channel_count;
 				resampled_decoder->buffer_end = 0;
 				resampled_decoder->buffer_done = 0;
 				resampled_decoder->sample_rate = wanted_spec->sample_rate;

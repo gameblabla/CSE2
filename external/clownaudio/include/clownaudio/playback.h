@@ -39,7 +39,7 @@ typedef struct ClownAudio_Stream ClownAudio_Stream;
 
 CLOWNAUDIO_EXPORT bool ClownAudio_InitPlayback(void);
 CLOWNAUDIO_EXPORT void ClownAudio_DeinitPlayback(void);
-CLOWNAUDIO_EXPORT ClownAudio_Stream* ClownAudio_CreateStream(unsigned long *sample_rate, void (*user_callback)(void*, float*, size_t));
+CLOWNAUDIO_EXPORT ClownAudio_Stream* ClownAudio_CreateStream(unsigned long *sample_rate, void (*user_callback)(void*, short*, size_t));
 CLOWNAUDIO_EXPORT bool ClownAudio_DestroyStream(ClownAudio_Stream *stream);
 CLOWNAUDIO_EXPORT void ClownAudio_SetStreamCallbackData(ClownAudio_Stream *stream, void *user_data);
 CLOWNAUDIO_EXPORT bool ClownAudio_PauseStream(ClownAudio_Stream *stream);

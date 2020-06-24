@@ -42,7 +42,6 @@ void* Decoder_DR_WAV_Create(const unsigned char *data, size_t data_size, bool lo
 		{
 			spec->sample_rate = instance->sampleRate;
 			spec->channel_count = instance->channels;
-			spec->format = DECODER_FORMAT_F32;
 			spec->is_complex = false;
 
 			return instance;
@@ -69,5 +68,5 @@ void Decoder_DR_WAV_Rewind(void *decoder)
 
 size_t Decoder_DR_WAV_GetSamples(void *decoder, void *buffer, size_t frames_to_do)
 {
-	return drwav_read_pcm_frames_f32((drwav*)decoder, frames_to_do, (float*)buffer);
+	return drwav_read_pcm_frames_s16((drwav*)decoder, frames_to_do, (drwav_int16*)buffer);
 }

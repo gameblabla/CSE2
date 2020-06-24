@@ -254,7 +254,7 @@ void ExtraSound_SetSFXFrequency(int id, unsigned long frequency)
 	}
 }
 
-void ExtraSound_Mix(float *buffer, unsigned long frames)
+void ExtraSound_Mix(long *buffer, unsigned long frames)
 {
 	if (playing)
 	{

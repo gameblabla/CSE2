@@ -44,7 +44,6 @@ void* Decoder_DR_MP3_Create(const unsigned char *data, size_t data_size, bool lo
 			{
 				spec->sample_rate = instance->sampleRate;
 				spec->channel_count = instance->channels;
-				spec->format = DECODER_FORMAT_F32;
 				spec->is_complex = false;
 
 				return instance;
@@ -72,5 +71,5 @@ void Decoder_DR_MP3_Rewind(void *decoder)
 
 size_t Decoder_DR_MP3_GetSamples(void *decoder, void *buffer, size_t frames_to_do)
 {
-	return drmp3_read_pcm_frames_f32((drmp3*)decoder, frames_to_do, (float*)buffer);
+	return drmp3_read_pcm_frames_s16((drmp3*)decoder, frames_to_do, (drmp3_int16*)buffer);
 }

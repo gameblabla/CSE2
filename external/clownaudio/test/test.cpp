@@ -338,13 +338,13 @@ int main(int argc, char *argv[])
 										ImGui::Spacing();
 
 										if (ImGui::SliderFloat("Master volume", &selected_sound->master_volume, 0.0f, 1.0f, "%.3f", 2.0f))
-											ClownAudio_SetSoundVolume(selected_sound->sound_id, selected_sound->master_volume * selected_sound->volume_left, selected_sound->master_volume * selected_sound->volume_right);
+											ClownAudio_SetSoundVolume(selected_sound->sound_id, selected_sound->master_volume * selected_sound->volume_left * 0x100, selected_sound->master_volume * selected_sound->volume_right * 0x100);
 
 										if (ImGui::SliderFloat("Left volume", &selected_sound->volume_left, 0.0f, 1.0f, "%.3f", 2.0f))
-											ClownAudio_SetSoundVolume(selected_sound->sound_id, selected_sound->master_volume * selected_sound->volume_left, selected_sound->master_volume * selected_sound->volume_right);
+											ClownAudio_SetSoundVolume(selected_sound->sound_id, selected_sound->master_volume * selected_sound->volume_left * 0x100, selected_sound->master_volume * selected_sound->volume_right * 0x100);
 
 										if (ImGui::SliderFloat("Right volume", &selected_sound->volume_right, 0.0f, 1.0f, "%.3f", 2.0f))
-											ClownAudio_SetSoundVolume(selected_sound->sound_id, selected_sound->master_volume * selected_sound->volume_left, selected_sound->master_volume * selected_sound->volume_right);
+											ClownAudio_SetSoundVolume(selected_sound->sound_id, selected_sound->master_volume * selected_sound->volume_left * 0x100, selected_sound->master_volume * selected_sound->volume_right * 0x100);
 
 										ImGui::Spacing();
 

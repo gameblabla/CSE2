@@ -4,7 +4,7 @@
 #define MA_NO_ENCODING
 
 #ifndef MINIAUDIO_ENABLE_DEVICE_IO
- #define MA_NO_DEVICE_IO
+// #define MA_NO_DEVICE_IO	// Needed because miniaudio is broken right now
 #else
  //#define MA_NO_WASAPI
  //#define MA_NO_DSOUND

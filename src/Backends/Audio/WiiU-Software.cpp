@@ -31,12 +31,12 @@ static OSMutex organya_mutex;
 static AXVoice *voices[2];
 
 static short *stream_buffers[2];
-static float *stream_buffer_float;
+static long *stream_buffer_long;
 static size_t buffer_length;
 
 static unsigned long output_frequency;
 
-static void FillMixerBuffer(float *stream, size_t frames_total)
+static void MixSoundsAndUpdateOrganya(long *stream, size_t frames_total)
 {
 	OSLockMutex(&organya_mutex);
 
@@ -77,10 +77,6 @@ static void FillMixerBuffer(float *stream, size_t frames_total)
 	}
 
 	OSUnlockMutex(&organya_mutex);
-
-#ifdef EXTRA_SOUND_FORMATS
-	ExtraSound_Mix(stream, frames_total);
-#endif
 }
 
 static void FrameCallback(void)
@@ -99,39 +95,42 @@ static void FrameCallback(void)
 	if (current_buffer != last_buffer)
 	{
 		// Clear the mixer buffer
-		for (unsigned int i = 0; i < buffer_length * 2; ++i)
-			stream_buffer_float[i] = 0.0f;
+		memset(stream_buffer_long, 0, buffer_length * sizeof(long) * 2);
 
 		// Fill mixer buffer
-		FillMixerBuffer(stream_buffer_float, buffer_length);
+		MixSoundsAndUpdateOrganya(stream_buffer_long, buffer_length);
+
+	#ifdef EXTRA_SOUND_FORMATS
+		ExtraSound_Mix(stream_buffer_long, buffer_length);
+	#endif
 
 		// Deinterlate samples, convert them to S16, and write them to the double-buffers
 		short *left_output_buffer = &stream_buffers[0][buffer_length * last_buffer];
 		short *right_output_buffer = &stream_buffers[1][buffer_length * last_buffer];
 
-		float *mixer_buffer_pointer = stream_buffer_float;
+		long *mixer_buffer_pointer = stream_buffer_long;
 		short *left_output_buffer_pointer = left_output_buffer;
 		short *right_output_buffer_pointer = right_output_buffer;
 
 		for (unsigned int i = 0; i < buffer_length; ++i)
 		{
-			float left_sample = *mixer_buffer_pointer++;
-			float right_sample = *mixer_buffer_pointer++;
+			const long left_sample = *mixer_buffer_pointer++;
+			const long right_sample = *mixer_buffer_pointer++;
 
-			// Clamp samples to sane limits
-			if (left_sample < -1.0f)
-				left_sample = -1.0f;
-			else if (left_sample > 1.0f)
-				left_sample = 1.0f;
+			// Clamp samples to sane limits, convert to S16, and store in double-buffers
+			if (left_sample > 0x7FFF)
+				*left_output_buffer_pointer++ = 0x7FFF;
+			else if (left_sample < -0x7FFF)
+				*left_output_buffer_pointer++ = -0x7FFF;
+			else
+				*left_output_buffer_pointer++ = (short)left_sample;
 
-			if (right_sample < -1.0f)
-				right_sample = -1.0f;
-			else if (right_sample > 1.0f)
-				right_sample = 1.0f;
-
-			// Convert to S16 and store in double-buffers
-			*left_output_buffer_pointer++ = (short)(left_sample * 32767.0f);
-			*right_output_buffer_pointer++ = (short)(right_sample * 32767.0f);
+			if (right_sample > 0x7FFF)
+				*right_output_buffer_pointer++ = 0x7FFF;
+			else if (right_sample < -0x7FFF)
+				*right_output_buffer_pointer++ = -0x7FFF;
+			else
+				*right_output_buffer_pointer++ = (short)right_sample;
 		}
 
 		// Make sure the sound hardware can see our data
@@ -170,11 +169,11 @@ bool AudioBackend_Init(void)
 	// Create and initialise two 'voices': each one will stream its own
 	// audio - one for the left speaker, and one for the right. 
 
-	// The software-mixer outputs interlaced float samples, so create
-	// a buffer for it here.
-	stream_buffer_float = (float*)malloc(buffer_length * sizeof(float) * 2);	// `* 2` because it's an interlaced stereo buffer
+	// The software-mixer outputs interlaced samples into a buffer of `long`s,
+	// so create a buffer for it here.
+	stream_buffer_long = (long*)malloc(buffer_length * sizeof(long) * 2);	// `* 2` because it's an interlaced stereo buffer
 
-	if (stream_buffer_float != NULL)
+	if (stream_buffer_long != NULL)
 	{
 		stream_buffers[0] = (short*)malloc(buffer_length * sizeof(short) * 2);	// `* 2` because it's a double-buffer
 
@@ -244,7 +243,7 @@ bool AudioBackend_Init(void)
 			free(stream_buffers[0]);
 		}
 
-		free(stream_buffer_float);
+		free(stream_buffer_long);
 	}
 
 	return false;

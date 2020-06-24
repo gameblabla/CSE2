@@ -106,7 +106,6 @@ void* Decoder_libVorbis_Create(const unsigned char *data, size_t data_size, bool
 
 				spec->sample_rate = v_info->rate;
 				spec->channel_count = v_info->channels;
-				spec->format = DECODER_FORMAT_F32;
 				spec->is_complex = false;
 
 				return decoder;
@@ -140,20 +139,7 @@ size_t Decoder_libVorbis_GetSamples(void *decoder_void, void *buffer, size_t fra
 {
 	Decoder_libVorbis *decoder = (Decoder_libVorbis*)decoder_void;
 
-	float **source_buffer;
-	size_t frames_done = ov_read_float(&decoder->vorbis_file, &source_buffer, frames_to_do, NULL);
+	const size_t size_of_frame = sizeof(ogg_int16_t) * decoder->channel_count;
 
-	for (unsigned int i = 0; i < decoder->channel_count; ++i)
-	{
-		float *source_buffer_pointer = source_buffer[i];
-		float *destination_buffer_pointer = &((float*)buffer)[i];
-
-		for (size_t j = 0; j < frames_done; ++j)
-		{
-			*destination_buffer_pointer = *source_buffer_pointer++;
-			destination_buffer_pointer += decoder->channel_count;
-		}
-	}
-
-	return frames_done;
+	return ov_read(&decoder->vorbis_file, (char*)buffer, frames_to_do * size_of_frame, 0, 2, 1, NULL) / size_of_frame;
 }
