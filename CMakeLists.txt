@@ -25,7 +25,7 @@ option(LANCZOS_RESAMPLER "Use Lanczos filtering for audio resampling instead of 
 option(FREETYPE_FONTS "Use FreeType2 to render the DejaVu Mono (English) or Migu1M (Japanese) fonts, instead of using pre-rendered copies of Courier New (English) and MS Gothic (Japanese)" OFF)
 
 set(BACKEND_RENDERER "SDLTexture" CACHE STRING "Which renderer the game should use: 'OpenGL3' for an OpenGL 3.2 renderer, 'OpenGLES2' for an OpenGL ES 2.0 renderer, 'SDLTexture' for SDL2's hardware-accelerated Texture API, 'SDLSurface' for SDL2's software-rendered Surface API, 'Wii U' for the Wii U's hardware-accelerated GX2 API, '3DS' for the 3DS's hardware accelerated Citro2D/Citro3D API, or 'Software' for a handwritten software renderer")
-set(BACKEND_AUDIO "SDL2" CACHE STRING "Which audio backend the game should use: 'SDL2', 'miniaudio', 'WiiU-Hardware', 'WiiU-Software', '3DS-Hardware', '3DS-Software', or 'Null'")
+set(BACKEND_AUDIO "SDL2" CACHE STRING "Which audio backend the game should use: 'SDL2', 'SDL1', 'miniaudio', 'WiiU-Hardware', 'WiiU-Software', '3DS-Hardware', '3DS-Software', or 'Null'")
 set(BACKEND_PLATFORM "SDL2" CACHE STRING "Which platform backend the game should use: 'SDL2', 'SDL1', 'GLFW3', 'WiiU', '3DS', or 'Null'")
 
 option(LTO "Enable link-time optimisation" OFF)
@@ -336,6 +336,12 @@ if(BACKEND_AUDIO MATCHES "SDL2")
 		"src/Backends/Audio/SoftwareMixer/Backend.h"
 		"src/Backends/Audio/SoftwareMixer/SDL2.cpp"
 	)
+elseif(BACKEND_AUDIO MATCHES "SDL1")
+	target_sources(CSE2 PRIVATE
+		"src/Backends/Audio/SDL1.cpp"
+		"src/Backends/Audio/SoftwareMixer.cpp"
+		"src/Backends/Audio/SoftwareMixer.h"
+	)
 elseif(BACKEND_AUDIO MATCHES "miniaudio")
 	target_sources(CSE2 PRIVATE
 		"src/Backends/Audio/SoftwareMixer.cpp"
@@ -607,7 +613,11 @@ if(BACKEND_PLATFORM MATCHES "SDL2" OR BACKEND_AUDIO MATCHES "SDL2")
 	endif()
 endif()
 
-if(BACKEND_PLATFORM MATCHES "SDL1")
+if(BACKEND_PLATFORM MATCHES "SDL1" OR BACKEND_AUDIO MATCHES "SDL1")
+	if(BACKEND_PLATFORM MATCHES "SDL2" OR BACKEND_AUDIO MATCHES "SDL2")
+		message(FATAL_ERROR "SDL1 and SDL2 cannot be used simultaneously!")
+	endif()
+
 	find_package(SDL 1.2.15)
 
 	if (PKG_CONFIG_FOUND)
