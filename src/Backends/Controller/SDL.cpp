@@ -6,9 +6,7 @@
 #include "SDL.h"
 
 #include "../Misc.h"
-#if SDL_VERSION_ATLEAST(2, 0, 0)
-#include "../Shared/SDL2.h"
-#endif
+#include "../Shared/SDL.h"
 
 #define DEADZONE 10000
 
@@ -23,6 +21,11 @@ bool ControllerBackend_Init(void)
 		Backend_PrintError("Couldn't initialise joystick SDL subsystem: %s", SDL_GetError());
 		return false;
 	}
+
+#if !SDL_VERSION_ATLEAST(2, 0, 0)
+	if (SDL_NumJoysticks() > 0)
+		ControllerBackend_JoystickConnect(0);
+#endif
 
 	return true;
 }
@@ -128,10 +131,13 @@ bool ControllerBackend_GetJoystickStatus(bool **buttons, unsigned int *button_co
 	return true;
 }
 
-#if SDL_VERSION_ATLEAST(2, 0, 0)
 void ControllerBackend_JoystickConnect(Sint32 joystick_id)
 {
+#if SDL_VERSION_ATLEAST(2, 0, 0)
 	const char *joystick_name = SDL_JoystickNameForIndex(joystick_id);
+#else
+	const char *joystick_name = SDL_JoystickName(joystick_id);
+#endif
 
 	if (joystick_name != NULL)
 	{
@@ -189,6 +195,7 @@ void ControllerBackend_JoystickConnect(Sint32 joystick_id)
 
 void ControllerBackend_JoystickDisconnect(Sint32 joystick_id)
 {
+#if SDL_VERSION_ATLEAST(2, 0, 0)
 	SDL_JoystickID current_joystick_id = SDL_JoystickInstanceID(joystick);
 	if (current_joystick_id < 0)
 		Backend_PrintError("Couldn't get instance ID for current joystick: %s", SDL_GetError());
@@ -201,5 +208,5 @@ void ControllerBackend_JoystickDisconnect(Sint32 joystick_id)
 
 		free(axis_neutrals);
 	}
-}
 #endif
+}

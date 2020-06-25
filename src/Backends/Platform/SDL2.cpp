@@ -10,7 +10,7 @@
 #include "SDL.h"
 
 #include "../Rendering.h"
-#include "../Shared/SDL2.h"
+#include "../Shared/SDL.h"
 #include "../../Attributes.h"
 
 #define DO_KEY(SDL_KEY, BACKEND_KEY) \

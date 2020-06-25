@@ -395,12 +395,13 @@ if(BACKEND_PLATFORM MATCHES "SDL2")
 	target_sources(CSE2 PRIVATE
 		"src/Backends/Controller/SDL.cpp"
 		"src/Backends/Platform/SDL2.cpp"
-		"src/Backends/Shared/SDL2.h"
+		"src/Backends/Shared/SDL.h"
 	)
 elseif(BACKEND_PLATFORM MATCHES "SDL1")
 	target_sources(CSE2 PRIVATE
 		"src/Backends/Controller/SDL.cpp"
 		"src/Backends/Platform/SDL1.cpp"
+		"src/Backends/Shared/SDL.h"
 	)
 elseif(BACKEND_PLATFORM MATCHES "GLFW3")
 	target_sources(CSE2 PRIVATE

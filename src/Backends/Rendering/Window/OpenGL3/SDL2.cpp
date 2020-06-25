@@ -9,7 +9,7 @@
 #include "SDL.h"
 
 #include "../../../Misc.h"
-#include "../../../Shared/SDL2.h"
+#include "../../../Shared/SDL.h"
 
 SDL_Window *window;
 
