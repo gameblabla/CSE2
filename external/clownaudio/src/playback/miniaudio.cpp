@@ -23,9 +23,6 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-#ifndef MINIAUDIO_ENABLE_DEVICE_IO
- #define MA_NO_DEVICE_IO
-#endif
 #include "../miniaudio.h"
 
 struct ClownAudio_Stream
@@ -82,7 +79,7 @@ CLOWNAUDIO_EXPORT ClownAudio_Stream* ClownAudio_CreateStream(unsigned long *samp
 			stream->user_callback = user_callback;
 			stream->user_data = NULL;
 
-			if (ma_mutex_init(&context, &stream->mutex) == MA_SUCCESS)
+			if (ma_mutex_init(&stream->mutex) == MA_SUCCESS)
 				return stream;
 
 			ma_device_uninit(&stream->device);
