@@ -443,7 +443,7 @@ void ActNpc283(NPCHAR *npc)
 			else
 				npc->ani_no = 5;
 
-			if (gMC.equip & 0x20)
+			if (gMC.equip & EQUIP_BOOSTER_2_0)
 			{
 				if (npc->act_wait % 10 == 1)
 				{
@@ -1436,7 +1436,7 @@ void ActNpc294(NPCHAR *npc)
 		case 1:
 			++npc->act_wait;
 
-			if (gMC.equip & 0x20)
+			if (gMC.equip & EQUIP_BOOSTER_2_0)
 			{
 				npc->x = gMC.x + (64 * 0x200);
 
@@ -1456,7 +1456,7 @@ void ActNpc294(NPCHAR *npc)
 
 			if (npc->act_wait > 24)
 			{
-				if (gMC.equip & 0x20)
+				if (gMC.equip & EQUIP_BOOSTER_2_0)
 					x = npc->x + (Random(-14, 14) * 0x200 * 0x10);
 				else
 					x = npc->x + (Random(-11, 11) * 0x200 * 0x10);

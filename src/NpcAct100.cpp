@@ -847,7 +847,7 @@ void ActNpc111(NPCHAR *npc)
 
 #ifndef ENABLE_MIM_DISABLE_EQUIP_40_GRAPHICS
 	// Use a different sprite if the player is wearing the Mimiga Mask
-	if (gMC.equip & 0x40)
+	if (gMC.equip & EQUIP_MIMIGA_MASK)
 	{
 		npc->rect.top += 32;
 		npc->rect.bottom += 32;
@@ -928,7 +928,7 @@ void ActNpc112(NPCHAR *npc)
 	npc->rect.bottom += 32 * gMIMCurrentNum;
 #ifndef ENABLE_MIM_DISABLE_EQUIP_40_GRAPHICS
 	// Use a different sprite if the player is wearing the Mimiga Mask
-	if (gMC.equip & 0x40)
+	if (gMC.equip & EQUIP_MIMIGA_MASK)
 	{
 		npc->rect.top += 32;
 		npc->rect.bottom += 32;
