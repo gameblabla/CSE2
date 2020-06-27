@@ -337,7 +337,7 @@ static int ModeTitle(void)
 #endif
 
 	g_GameFlags = 0;
-	gMC.equip |= 0x100;
+	gMC.equip |= EQUIP_NIKUMARU_COUNTER;	// Give the player the Nikumaru Counter so the timer appears on-screen
 
 	// Start loop
 	wait = 0;
@@ -619,7 +619,7 @@ static int ModeAction(void)
 
 				gMC.cond &= ~1;
 			}
-			else if (gMC.equip & 2 && gKeyTrg & gKeyMap)
+			else if (gMC.equip & EQUIP_MAP && gKeyTrg & gKeyMap)
 			{
 				BackupSurface(SURFACE_ID_SCREEN_GRAB, &grcGame);
 

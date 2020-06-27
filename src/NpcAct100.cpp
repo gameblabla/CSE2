@@ -842,7 +842,7 @@ void ActNpc111(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 
 	// Use a different sprite if the player is wearing the Mimiga Mask
-	if (gMC.equip & 0x40)
+	if (gMC.equip & EQUIP_MIMIGA_MASK)
 	{
 		npc->rect.top += 32;
 		npc->rect.bottom += 32;
@@ -919,7 +919,7 @@ void ActNpc112(NPCHAR *npc)
 		npc->rect = rcRight[npc->ani_no];
 
 	// Use a different sprite if the player is wearing the Mimiga Mask
-	if (gMC.equip & 0x40)
+	if (gMC.equip & EQUIP_MIMIGA_MASK)
 	{
 		npc->rect.top += 32;
 		npc->rect.bottom += 32;

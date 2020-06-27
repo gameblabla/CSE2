@@ -48,7 +48,7 @@ void AddExpMyChar(int x)
 		{
 			gArmsData[gSelectedArms].exp = gArmsLevelTable[arms_code].exp[lv];
 
-			if (gMC.equip & 0x80)
+			if (gMC.equip & EQUIP_WHIMSICAL_STAR)
 			{
 				if (gMC.star < 3)
 					++gMC.star;
@@ -136,11 +136,11 @@ void DamageMyChar(int damage)
 	gMC.life -= (short)damage;
 
 	// Lose a whimsical star
-	if (gMC.equip & 0x80 && gMC.star > 0)
+	if (gMC.equip & EQUIP_WHIMSICAL_STAR && gMC.star > 0)
 		gMC.star = (short)gMC.star - 1;	// For some reason, this does a cast to short. Might not be accurate to the original source code (possibly, Pixel was just being careful about int size/conversion, or this is from some weird macro)
 
 	// Lose experience
-	if (gMC.equip & 4)
+	if (gMC.equip & EQUIP_ARMS_BARRIER)
 		gArmsData[gSelectedArms].exp -= damage;
 	else
 		gArmsData[gSelectedArms].exp -= damage * 2;
@@ -373,7 +373,7 @@ void PutMyAir(int x, int y)
 		{112, 80, 144, 88},
 	};
 
-	if (gMC.equip & 0x10)
+	if (gMC.equip & EQUIP_AIR_TANK)
 		return;
 
 	if (gMC.air_get != 0)
@@ -400,7 +400,7 @@ void PutTimeCounter(int x, int y)
 		{128, 104, 160, 112},
 	};
 
-	if (gMC.equip & 0x100)
+	if (gMC.equip & EQUIP_NIKUMARU_COUNTER)
 	{
 		// Draw clock and increase time
 		if (g_GameFlags & 2)
@@ -439,7 +439,7 @@ BOOL SaveTimeCounter(void)
 	char path[MAX_PATH];
 
 	// Quit if player doesn't have the Nikumaru Counter
-	if (!(gMC.equip & 0x100))
+	if (!(gMC.equip & EQUIP_NIKUMARU_COUNTER))
 		return TRUE;
 
 	// Get last time

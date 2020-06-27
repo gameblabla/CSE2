@@ -217,7 +217,7 @@ void PutMyChar(int fx, int fy)
 
 	// Draw player
 	RECT rect = gMC.rect;
-	if (gMC.equip & 0x40)
+	if (gMC.equip & EQUIP_MIMIGA_MASK)
 	{
 		rect.top += 32;
 		rect.bottom += 32;
@@ -232,7 +232,7 @@ void PutMyChar(int fx, int fy)
 	};
 
 	++gMC.bubble;
-	if (gMC.equip & 0x10 && gMC.flag & 0x100)
+	if (gMC.equip & EQUIP_AIR_TANK && gMC.flag & 0x100)
 		PutBitmap3(&grcGame, (gMC.x / 0x200) - 12 - (fx / 0x200), (gMC.y / 0x200) - 12 - (fy / 0x200), &rcBubble[gMC.bubble / 2 % 2], SURFACE_ID_CARET);
 	else if (gMC.unit == 1)
 		PutBitmap3(&grcGame, (gMC.x / 0x200) - 12 - (fx / 0x200), (gMC.y / 0x200) - 12 - (fy / 0x200), &rcBubble[gMC.bubble / 2 % 2], SURFACE_ID_CARET);
@@ -291,11 +291,11 @@ void ActMyChar_Normal(BOOL bKey)
 		// Stop boosting and refuel
 		gMC.boost_sw = 0;
 
-		if (gMC.equip & 1)
+		if (gMC.equip & EQUIP_BOOSTER_0_8)
 		{
 			gMC.boost_cnt = 50;
 		}
-		else if (gMC.equip & 0x20)
+		else if (gMC.equip & EQUIP_BOOSTER_2_0)
 		{
 			gMC.boost_cnt = 50;
 		}
@@ -354,10 +354,10 @@ void ActMyChar_Normal(BOOL bKey)
 		// Start boosting
 		if (bKey)
 		{
-			if (gMC.equip & 0x21 && gKeyTrg & gKeyJump && gMC.boost_cnt != 0)
+			if (gMC.equip & (EQUIP_BOOSTER_0_8 | EQUIP_BOOSTER_2_0) && gKeyTrg & gKeyJump && gMC.boost_cnt != 0)
 			{
 				// Booster 0.8
-				if (gMC.equip & 1)
+				if (gMC.equip & EQUIP_BOOSTER_0_8)
 				{
 					gMC.boost_sw = 1;
 
@@ -366,7 +366,7 @@ void ActMyChar_Normal(BOOL bKey)
 				}
 
 				// Booster 2.0
-				if (gMC.equip & 0x20)
+				if (gMC.equip & EQUIP_BOOSTER_2_0)
 				{
 					if (gKey & gKeyUp)
 					{
@@ -414,7 +414,7 @@ void ActMyChar_Normal(BOOL bKey)
 		}
 
 		// Slow down when stopped boosting (Booster 2.0)
-		if (gMC.equip & 0x20 && gMC.boost_sw != 0 && (!(gKey & gKeyJump) || gMC.boost_cnt == 0))
+		if (gMC.equip & EQUIP_BOOSTER_2_0 && gMC.boost_sw != 0 && (!(gKey & gKeyJump) || gMC.boost_cnt == 0))
 		{
 			if (gMC.boost_sw == 1)
 				gMC.xm /= 2;
@@ -475,7 +475,7 @@ void ActMyChar_Normal(BOOL bKey)
 		gMC.ym += 0x55;
 
 	// Booster 2.0 forces and effects
-	if (gMC.equip & 0x20 && gMC.boost_sw != 0)
+	if (gMC.equip & EQUIP_BOOSTER_2_0 && gMC.boost_sw != 0)
 	{
 		if (gMC.boost_sw == 1)
 		{
@@ -525,7 +525,7 @@ void ActMyChar_Normal(BOOL bKey)
 		gMC.ym += gravity1;
 	}
 	// Booster 0.8
-	else if (gMC.equip & 1 && gMC.boost_sw != 0 && gMC.ym > -0x400)
+	else if (gMC.equip & EQUIP_BOOSTER_0_8 && gMC.boost_sw != 0 && gMC.ym > -0x400)
 	{
 		// Upwards force
 		gMC.ym -= 0x20;
@@ -809,7 +809,7 @@ void ActMyChar_Stream(BOOL bKey)
 
 void AirProcess(void)
 {
-	if (gMC.equip & 0x10)
+	if (gMC.equip & EQUIP_AIR_TANK)
 	{
 		gMC.air = 1000;
 		gMC.air_get = 0;
