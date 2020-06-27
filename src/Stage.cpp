@@ -591,7 +591,7 @@ static const MusicListEntry music_table_arranged[42] = {
 	{"Soundtracks/Arranged/gameover_intro.ogg", "Soundtracks/Arranged/gameover_loop.ogg", MUSIC_TYPE_OTHER, false},
 	{"Soundtracks/Arranged/gravity_intro.ogg", "Soundtracks/Arranged/gravity_loop.ogg", MUSIC_TYPE_OTHER, true},
 	{"Soundtracks/Arranged/weed_intro.ogg", "Soundtracks/Arranged/weed_loop.ogg", MUSIC_TYPE_OTHER, true},
-	{"Soundtracks/Arranged/mdown2_intro.ogg", "Soundtracks/Arranged/mdown2_loop.ogg", MUSIC_TYPE_OTHER, true},
+	{"Soundtracks/Arranged/mdown2.ogg", NULL, MUSIC_TYPE_OTHER, true},
 	{"Soundtracks/Arranged/fireeye_intro.ogg", "Soundtracks/Arranged/fireeye_loop.ogg", MUSIC_TYPE_OTHER, true},
 	{"Soundtracks/Arranged/vivi_intro.ogg", "Soundtracks/Arranged/vivi_loop.ogg", MUSIC_TYPE_OTHER, true},
 	{"Soundtracks/Arranged/mura_intro.ogg", "Soundtracks/Arranged/mura_loop.ogg", MUSIC_TYPE_OTHER, true},
