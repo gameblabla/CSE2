@@ -357,7 +357,7 @@ void ShootBullet_Machinegun1(int level)
 	{
 		++wait;
 
-		if (gMC.equip & 8)
+		if (gMC.equip & EQUIP_TURBOCHARGE)
 		{
 			if (wait > 1)
 			{
@@ -915,7 +915,7 @@ void ShootBullet_Spur(int level)
 
 	if (gKey & gKeyShot)
 	{
-		if (gMC.equip & 8)
+		if (gMC.equip & EQUIP_TURBOCHARGE)
 			AddExpMyChar(3);
 		else
 			AddExpMyChar(2);
