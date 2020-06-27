@@ -86,6 +86,13 @@ void Backend_PostWindowCreation(void)
 
 bool Backend_GetBasePath(char *string_buffer)
 {
+#ifdef _WIN32
+	// SDL_GetBasePath returns a UTF-8 string, but Windows' fopen uses (extended?) ASCII.
+	// This is apparently a problem for accented characters, as they will make fopen fail.
+	// So, instead, we rely on argv[0], as that will put the accented characters in a
+	// format Windows will understand.
+	return false;
+#else
 	char *base_path = SDL_GetBasePath();
 	if (base_path == NULL)
 		return false;
@@ -97,6 +104,7 @@ bool Backend_GetBasePath(char *string_buffer)
 	SDL_free(base_path);
 
 	return true;
+#endif
 }
 
 void Backend_HideMouse(void)
