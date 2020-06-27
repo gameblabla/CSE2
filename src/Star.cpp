@@ -112,7 +112,7 @@ void ActStar(void)
 		star[i].x += star[i].xm;
 		star[i].y += star[i].ym;
 
-		if (i < gMC.star && (gMC.equip & 0x80) && (g_GameFlags & 2) && a == i)
+		if (i < gMC.star && (gMC.equip & EQUIP_WHIMSICAL_STAR) && (g_GameFlags & 2) && a == i)
 			SetBullet(45, star[a].x, star[a].y, 0);
 	}
 }
@@ -130,7 +130,7 @@ void PutStar(int fx, int fy)
 	if (gMC.cond & 2)
 		return;
 
-	if (!(gMC.equip & 0x80))
+	if (!(gMC.equip & EQUIP_WHIMSICAL_STAR))
 		return;
 
 	for (i = 0; i < 3; ++i)
