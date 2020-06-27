@@ -968,7 +968,7 @@ static CachedGlyph* GetGlyphCached(FontObject *font_object, unsigned long unicod
 #ifndef DISABLE_FONT_ANTIALIASING
 		if (FT_Load_Glyph(font_object->face, glyph_index, FT_LOAD_RENDER) == 0)
 #else
-		if (FT_Load_Glyph(font_object->face, glyph_index, FT_LOAD_RENDER | FT_LOAD_MONOCHROME) == 0)
+		if (FT_Load_Glyph(font_object->face, glyph_index, FT_LOAD_RENDER | FT_LOAD_MONOCHROME | FT_LOAD_TARGET_MONO) == 0)
 #endif
 		{
 			glyph->unicode_value = unicode_value;
