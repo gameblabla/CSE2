@@ -12,6 +12,8 @@
 #include <whb/proc.h>
 #include <whb/sdcard.h>
 
+#include "../../Helpers/Asprintf.h"
+
 static unsigned long ticks_per_second;
 
 bool Backend_Init(void)
@@ -54,15 +56,13 @@ void Backend_PostWindowCreation(void)
 	
 }
 
-bool Backend_GetBasePath(char *string_buffer)
+bool Backend_GetBasePath(char **string_buffer)
 {
-	strcpy(string_buffer, WHBGetSdCardMountPath());
 #ifdef JAPANESE
-	strcat(string_buffer, "/CSE2-portable-jp");
+	*string_buffer = asprintf("%s/CSE-portable-jp", WHBGetSdCardMountPath());
 #else
-	strcat(string_buffer, "/CSE2-portable-en");
+	*string_buffer = asprintf("%s/CSE-portable-en", WHBGetSdCardMountPath());
 #endif
-
 	return true;
 }
 

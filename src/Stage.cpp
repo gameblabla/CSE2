@@ -131,8 +131,6 @@ const STAGE_TABLE gTMT[95] = {
 
 BOOL TransferStage(int no, int w, int x, int y)
 {
-	char path[MAX_PATH];
-	char path_dir[20];
 	BOOL bError;
 
 	// Move character
@@ -141,7 +139,15 @@ BOOL TransferStage(int no, int w, int x, int y)
 	bError = FALSE;
 
 	// Get path
-	strcpy(path_dir, "Stage");
+	char path_dir[sizeof("Stage")] = "Stage";	// Can only be either "Stage" or "Npc", and sizeof("Stage") > sizeof("Npc")
+	/*
+	 *	The size of path should be size of the format string (without the operands) + size of first operand + size of second operand - 2 (no null terminator needed for the first two operands, and sizeof will include the size for the null terminators here)
+	 *	The size of the format string is sizeof("/.pxa") because that's the biggest raw format (omitting the operands) used here
+	 *	Size of first operand is sizeof(path_dir) because that's always the first operand
+	 *	Size of second operand is sizeof(gTMT[no].parts) because all the operands used here (gTMT[no].parts, gTMT[no].map, gTMT[no].npc, gTMT[no].boss) are of the same size
+	 *	sprintf(path, "%s", gTMT[no].back) is irrelevant here because sizeof(gTMT[no].back) is the same as the size of all the operands discussed for the size of the second operand, so gTMT[no].back always fits into the size allocated for the second operand alone
+	 */
+	char path[sizeof("/.pxa") + sizeof(path_dir) + sizeof(gTMT[no].parts) - 2];
 
 	// Load tileset
 	sprintf(path, "%s/Prt%s", path_dir, gTMT[no].parts);

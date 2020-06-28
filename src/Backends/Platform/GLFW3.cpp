@@ -181,7 +181,7 @@ void Backend_PostWindowCreation(void)
 	glfwSetWindowSizeCallback(window, WindowSizeCallback);
 }
 
-bool Backend_GetBasePath(char *string_buffer)
+bool Backend_GetBasePath(char **string_buffer)
 {
 	(void)string_buffer;
 

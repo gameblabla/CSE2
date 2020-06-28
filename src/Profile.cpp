@@ -22,16 +22,14 @@
 #include "Stage.h"
 #include "Star.h"
 #include "ValueView.h"
+#include "Helpers/FopenFormatted.h"
 
 const char* const gDefaultName = "Profile.dat";
 const char* const gProfileCode = "Do041220";
 
 BOOL IsProfile(void)
 {
-	char path[MAX_PATH];
-	sprintf(path, "%s/%s", gModulePath, gDefaultName);
-
-	FILE *file = fopen(path, "rb");
+	FILE *file = fopenFormatted("rb", "%s/%s", gModulePath, gDefaultName);
 	if (file == NULL)
 		return FALSE;
 
@@ -41,24 +39,15 @@ BOOL IsProfile(void)
 
 BOOL SaveProfile(const char *name)
 {
-	FILE *fp;
-	PROFILE profile;
 	const char *FLAG = "FLAG";
 
-	char path[MAX_PATH];
-
-	// Get path
-	if (name != NULL)
-		sprintf(path, "%s/%s", gModulePath, name);
-	else
-		sprintf(path, "%s/%s", gModulePath, gDefaultName);
-
 	// Open file
-	fp = fopen(path, "wb");
+	FILE *fp = fopenFormatted("wb", "%s/%s", gModulePath, ((name != NULL) ? name : gDefaultName));
 	if (fp == NULL)
 		return FALSE;
 
 	// Set up profile
+	PROFILE profile;
 	memset(&profile, 0, sizeof(PROFILE));
 	memcpy(profile.code, gProfileCode, sizeof(profile.code));
 	memcpy(profile.FLAG, FLAG, sizeof(profile.FLAG));
@@ -124,16 +113,13 @@ BOOL LoadProfile(const char *name)
 {
 	FILE *fp;
 	PROFILE profile;
-	char path[MAX_PATH];
-
-	// Get path
-	if (name != NULL)
-		sprintf(path, "%s", name);
-	else
-		sprintf(path, "%s/%s", gModulePath, gDefaultName);
 
 	// Open file
-	fp = fopen(path, "rb");
+	if (name != NULL)
+		fp = fopenFormatted("rb", "%s", name);
+	else
+		fp = fopenFormatted("rb", "%s/%s", gModulePath, gDefaultName);
+
 	if (fp == NULL)
 		return FALSE;
 

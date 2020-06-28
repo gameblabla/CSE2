@@ -13,6 +13,7 @@
 #include "../../Organya.h"
 #include "../../Profile.h"
 #include "../../Resource.h"
+#include "../../Helpers/Strdup.h"
 
 #define DO_KEY(SDL_KEY, BACKEND_KEY) \
 	case SDL_KEY: \
@@ -84,7 +85,7 @@ void Backend_PostWindowCreation(void)
 	
 }
 
-bool Backend_GetBasePath(char *string_buffer)
+bool Backend_GetBasePath(char **string_buffer)
 {
 #ifdef _WIN32
 	// SDL_GetBasePath returns a UTF-8 string, but Windows' fopen uses (extended?) ASCII.
@@ -100,7 +101,7 @@ bool Backend_GetBasePath(char *string_buffer)
 	// Trim the trailing '/'
 	size_t base_path_length = strlen(base_path);
 	base_path[base_path_length - 1] = '\0';
-	strcpy(string_buffer, base_path);
+	*string_buffer = strdup(base_path);
 	SDL_free(base_path);
 
 	return true;

@@ -5,7 +5,7 @@
 typedef struct TEXT_SCRIPT
 {
 	// Path (reload when exit teleporter menu/inventory)
-	char path[MAX_PATH];
+	char *path;
 
 	// Script buffer
 	long size;
@@ -62,7 +62,7 @@ void EndTextScript(void);
 void EncryptionBinaryData2(unsigned char *pData, long size);
 BOOL LoadTextScript2(const char *name);
 BOOL LoadTextScript_Stage(const char *name);
-void GetTextScriptPath(char *path);
+char *GetTextScriptPath();
 BOOL StartTextScript(int no);
 void StopTextScript(void);
 void PutTextScript(void);

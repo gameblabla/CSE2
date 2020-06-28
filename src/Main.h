@@ -2,8 +2,8 @@
 
 #include "WindowsWrapper.h"
 
-extern char gModulePath[MAX_PATH];
-extern char gDataPath[MAX_PATH];
+extern char *gModulePath;
+extern char *gDataPath;
 
 extern BOOL bFullscreen;
 extern BOOL gbUseJoystick;

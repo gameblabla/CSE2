@@ -33,6 +33,8 @@
 #include "SelStage.h"
 #include "Sound.h"
 #include "Stage.h"
+#include "Helpers/Asprintf.h"
+#include "Helpers/Strdup.h"
 
 // This limits the size of a .tsc script to 0x5000 bytes (the game will crash above this)
 #define TSC_BUFFER_SIZE 0x5000
@@ -124,17 +126,22 @@ void EncryptionBinaryData2(unsigned char *pData, long size)
 BOOL LoadTextScript2(const char *name)
 {
 	FILE *fp;
-	char path[MAX_PATH];
+	char *path;
 
 	// Get path
-	sprintf(path, "%s/%s", gDataPath, name);
+	if (asprintf(&path, "%s/%s", gDataPath, name) < 0)
+		return FALSE;
 
 	gTS.size = GetFileSizeLong(path);
 	if (gTS.size == -1)
+	{
+		free(path);
 		return FALSE;
+	}
 
 	// Open file
 	fp = fopen(path, "rb");
+	free(path);
 	if (fp == NULL)
 		return FALSE;
 
@@ -144,7 +151,9 @@ BOOL LoadTextScript2(const char *name)
 	fclose(fp);
 
 	// Set path
-	strcpy(gTS.path, name);
+	if (gTS.path != NULL)
+		free(gTS.path);
+	gTS.path = strdup(name);
 
 	// Decrypt data
 	EncryptionBinaryData2((unsigned char*)gTS.data, gTS.size);
@@ -156,18 +165,23 @@ BOOL LoadTextScript2(const char *name)
 BOOL LoadTextScript_Stage(const char *name)
 {
 	FILE *fp;
-	char path[MAX_PATH];
 	long head_size;
 	long body_size;
 
 	// Open Head.tsc
-	sprintf(path, "%s/%s", gDataPath, "Head.tsc");
+	char *path;
+	if (asprintf(&path, "%s/%s", gDataPath, "Head.tsc") < 0)
+		return FALSE;
 
 	head_size = GetFileSizeLong(path);
 	if (head_size == -1)
+	{
+		free(path);
 		return FALSE;
+	}
 
 	fp = fopen(path, "rb");
+	free(path);
 	if (fp == NULL)
 		return FALSE;
 
@@ -178,13 +192,18 @@ BOOL LoadTextScript_Stage(const char *name)
 	fclose(fp);
 
 	// Open stage's .tsc
-	sprintf(path, "%s/%s", gDataPath, name);
+	if (asprintf(&path, "%s/%s", gDataPath, name) < 0)
+		return FALSE;
 
 	body_size = GetFileSizeLong(path);
 	if (body_size == -1)
+	{
+		free(path);
 		return FALSE;
+	}
 
 	fp = fopen(path, "rb");
+	free(path);
 	if (fp == NULL)
 		return FALSE;
 
@@ -196,15 +215,17 @@ BOOL LoadTextScript_Stage(const char *name)
 
 	// Set parameters
 	gTS.size = head_size + body_size;
-	strcpy(gTS.path, name);
+	if (gTS.path != NULL)
+		free(gTS.path);
+	gTS.path = strdup(name);
 
 	return TRUE;
 }
 
 // Get current path
-void GetTextScriptPath(char *path)
+char *GetTextScriptPath()
 {
-	strcpy(path, gTS.path);
+	return strdup(gTS.path);
 }
 
 // Get 4 digit number from TSC data
@@ -1281,11 +1302,13 @@ int TextScriptProc(void)
 					}
 					else
 					{
-						char str_0[0x40];
+						// The size of str_0 is the size of the format string (includes null terminator so that's the space we'll be using for ours) + the 3 chars from the format string
 						#ifdef JAPANESE
+						char str_0[sizeof("不明のコード:<") + (sizeof(char) * 3)];
 						sprintf(str_0, "不明のコード:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);
 						Backend_ShowMessageBox("エラー", str_0);
 						#else
+						char str_0[sizeof("Unknown code:<%c%c%c") + (sizeof(char) * 3)];
 						sprintf(str_0, "Unknown code:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);
 						Backend_ShowMessageBox("Error", str_0);
 						#endif

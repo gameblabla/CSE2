@@ -24,9 +24,11 @@
 #include "Resource.h"
 #include "Sound.h"
 #include "Triangle.h"
+#include "Helpers/Asprintf.h"
+#include "Helpers/Strdup.h"
 
-char gModulePath[MAX_PATH];
-char gDataPath[MAX_PATH];
+char *gModulePath;
+char *gDataPath;
 
 BOOL bFullscreen;
 BOOL gbUseJoystick = FALSE;
@@ -82,6 +84,24 @@ void PutFramePerSecound(void)
 	}
 }
 
+static int main_out_backend_deinit(int return_value)
+{
+	Backend_Deinit();
+	return return_value;
+}
+
+static int main_out_free_module_path(int return_value)
+{
+	free(gModulePath);
+	return main_out_backend_deinit(return_value);
+}
+
+static int main_out_free_data_path(int return_value)
+{
+	free(gDataPath);
+	return main_out_free_module_path(return_value);
+}
+
 // TODO - Inaccurate stack frame
 int main(int argc, char *argv[])
 {
@@ -93,10 +113,15 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 
 	// Get executable's path
-	if (!Backend_GetBasePath(gModulePath))
+	if (!Backend_GetBasePath(&gModulePath))
 	{
 		// Fall back on argv[0] if the backend cannot provide a path
-		strcpy(gModulePath, argv[0]);
+		gModulePath = strdup(argv[0]);
+		if (!gModulePath)
+		{
+			Backend_PrintError("Could not get executable path (not enough memory)");
+			return main_out_backend_deinit(EXIT_FAILURE);
+		}
 
 		for (size_t i = strlen(gModulePath);; --i)
 		{
@@ -109,8 +134,8 @@ int main(int argc, char *argv[])
 	}
 
 	// Get path of the data folder
-	strcpy(gDataPath, gModulePath);
-	strcat(gDataPath, "/data");
+	if (asprintf(&gDataPath, "%s/data", gModulePath) < 0)
+		return main_out_free_module_path(EXIT_FAILURE);
 
 	CONFIG conf;
 	if (!LoadConfigData(&conf))
@@ -223,18 +248,12 @@ int main(int argc, char *argv[])
 			if (conf.display_mode == 1)
 			{
 				if (!StartDirectDraw(lpWindowName, windowWidth, windowHeight, 0))
-				{
-					Backend_Deinit();
-					return EXIT_FAILURE;
-				}
+					return main_out_free_data_path(EXIT_FAILURE);
 			}
 			else
 			{
 				if (!StartDirectDraw(lpWindowName, windowWidth, windowHeight, 1))
-				{
-					Backend_Deinit();
-					return EXIT_FAILURE;
-				}
+					return main_out_free_data_path(EXIT_FAILURE);
 			}
 		#else
 			// Doesn't handle StartDirectDraw failing
@@ -255,10 +274,7 @@ int main(int argc, char *argv[])
 
 		#ifdef FIX_BUGS
 			if (!StartDirectDraw(lpWindowName, windowWidth, windowHeight, 2))
-			{
-				Backend_Deinit();
-				return EXIT_FAILURE;
-			}
+				return main_out_free_data_path(EXIT_FAILURE);
 		#else
 			// Doesn't handle StartDirectDraw failing
 			StartDirectDraw(lpWindowName, windowWidth, windowHeight, 2);
@@ -326,10 +342,7 @@ int main(int argc, char *argv[])
 
 	// Draw to screen
 	if (!Flip_SystemTask())
-	{
-		Backend_Deinit();
-		return EXIT_SUCCESS;
-	}
+		return main_out_free_data_path(EXIT_SUCCESS);
 
 	// Initialize sound
 	InitDirectSound();
@@ -353,9 +366,7 @@ int main(int argc, char *argv[])
 	EndDirectSound();
 	EndDirectDraw();
 
-	Backend_Deinit();
-
-	return EXIT_SUCCESS;
+	return main_out_free_data_path(EXIT_SUCCESS);
 }
 
 void InactiveWindow(void)

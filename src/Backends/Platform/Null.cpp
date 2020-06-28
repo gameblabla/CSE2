@@ -15,7 +15,7 @@ void Backend_PostWindowCreation(void)
 	
 }
 
-bool Backend_GetBasePath(char *string_buffer)
+bool Backend_GetBasePath(char **string_buffer)
 {
 	(void)string_buffer;
 

@@ -12,6 +12,7 @@
 #include "File.h"
 #include "Main.h"
 #include "NpChar.h"
+#include "Helpers/FopenFormatted.h"
 
 #define PXM_BUFFER_SIZE 0x4B000
 
@@ -29,13 +30,9 @@ BOOL LoadMapData2(const char *path_map)
 {
 	FILE *fp;
 	char check[3];
-	char path[MAX_PATH];
-
-	// Get path
-	sprintf(path, "%s/%s", gDataPath, path_map);
 
 	// Open file
-	fp = fopen(path, "rb");
+	fp = fopenFormatted("rb", "%s/%s", gDataPath, path_map);
 	if (fp == NULL)
 		return FALSE;
 
@@ -69,12 +66,9 @@ BOOL LoadMapData2(const char *path_map)
 BOOL LoadAttributeData(const char *path_atrb)
 {
 	FILE *fp;
-	char path[MAX_PATH];
 
 	// Open file
-	sprintf(path, "%s/%s", gDataPath, path_atrb);
-
-	fp = fopen(path, "rb");
+	fp = fopenFormatted("rb", "%s/%s", gDataPath, path_atrb);
 	if (fp == NULL)
 		return FALSE;
 

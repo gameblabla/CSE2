@@ -1,5 +1,6 @@
 #include "SelStage.h"
 
+#include <stdlib.h>
 #include <string.h>
 
 #include "WindowsWrapper.h"
@@ -156,13 +157,13 @@ void PutStageSelectObject(void)
 
 int StageSelectLoop(int *p_event)
 {
-	char old_script_path[MAX_PATH];
-
 	RECT rcView = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
 	gSelectedStage = 0;
 	BackupSurface(SURFACE_ID_SCREEN_GRAB, &grcFull);
-	GetTextScriptPath(old_script_path);
+	char *old_script_path = GetTextScriptPath();
+	if (!old_script_path)
+		return enum_ESCRETURN_exit;
 	LoadTextScript2("StageSelect.tsc");
 	gStageSelectTitleY = (WINDOW_HEIGHT / 2) - 66;
 	StartTextScript(gPermitStage[gSelectedStage].index + 1000);
@@ -176,9 +177,11 @@ int StageSelectLoop(int *p_event)
 			switch (Call_Escape())
 			{
 				case enum_ESCRETURN_exit:
+					free(old_script_path);
 					return enum_ESCRETURN_exit;
 
 				case enum_ESCRETURN_restart:
+					free(old_script_path);
 					return enum_ESCRETURN_restart;
 			}
 		}
@@ -188,9 +191,11 @@ int StageSelectLoop(int *p_event)
 		switch (TextScriptProc())
 		{
 			case enum_ESCRETURN_exit:
+				free(old_script_path);
 				return enum_ESCRETURN_exit;
 
 			case enum_ESCRETURN_restart:
+				free(old_script_path);
 				return enum_ESCRETURN_restart;
 		}
 
@@ -212,6 +217,7 @@ int StageSelectLoop(int *p_event)
 		{
 			StopTextScript();
 			LoadTextScript_Stage(old_script_path);
+			free(old_script_path);
 			*p_event = 0;
 			return enum_ESCRETURN_continue;
 		}
@@ -219,10 +225,14 @@ int StageSelectLoop(int *p_event)
 		PutFramePerSecound();
 
 		if (!Flip_SystemTask())
+		{
+			free(old_script_path);
 			return enum_ESCRETURN_exit;
+		}
 	}
 
 	LoadTextScript_Stage(old_script_path);
+	free(old_script_path);
 	*p_event = gPermitStage[gSelectedStage].event;
 	return enum_ESCRETURN_continue;
 }

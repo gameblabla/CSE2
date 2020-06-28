@@ -293,8 +293,10 @@ BOOL LoadGenericData(void)
 	pt_size += MakePixToneObject(&gPtpTable[137], 1, 6);
 	pt_size += MakePixToneObject(&gPtpTable[138], 1, 7);
 
-	char str[0x40];
-	sprintf(str, "PixTone = %d byte", pt_size);
-	// There must have been some kind of console print function here or something
+	/*
+	 * 	char str[0x40];
+	 *	sprintf(str, "PixTone = %d byte", pt_size);
+	 *  // There must have been some kind of console print function here or something
+	 */
 	return TRUE;
 }

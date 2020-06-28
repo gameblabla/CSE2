@@ -18,6 +18,7 @@
 #include "MapName.h"
 #include "Resource.h"
 #include "TextScr.h"
+#include "Helpers/Asprintf.h"
 
 typedef enum SurfaceType
 {
@@ -250,12 +251,15 @@ BOOL MakeSurface_Resource(const char *name, SurfaceID surf_no)
 // TODO - Inaccurate stack frame
 BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 {
-	char path[MAX_PATH];
-	sprintf(path, "%s/%s.pbm", gDataPath, name);
+	char *path;
+
+	if (asprintf(&path, "%s/%s.pbm", gDataPath, name) < 0)
+		return FALSE;
 
 	if (!IsEnableBitmap(path))
 	{
 		ErrorLog(path, 0);
+		free(path);
 		return FALSE;
 	}
 
@@ -266,12 +270,14 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 #endif
 	{
 		ErrorLog("surface no", surf_no);
+		free(path);
 		return FALSE;
 	}
 
 	if (surf[surf_no] != NULL)
 	{
 		ErrorLog("existing", surf_no);
+		free(path);
 		return FALSE;
 	}
 
@@ -281,8 +287,10 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 	if (image_buffer == NULL)
 	{
 		ErrorLog(path, 1);
+		free(path);
 		return FALSE;
 	}
+	free(path);
 
 	surf[surf_no] = RenderBackend_CreateSurface(width * mag, height * mag, false);
 
@@ -341,12 +349,14 @@ BOOL ReloadBitmap_Resource(const char *name, SurfaceID surf_no)
 // TODO - Inaccurate stack frame
 BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 {
-	char path[MAX_PATH];
-	sprintf(path, "%s/%s.pbm", gDataPath, name);
+	char *path;
+	if (asprintf(&path, "%s/%s.pbm", gDataPath, name) < 0)
+		return FALSE;
 
 	if (!IsEnableBitmap(path))
 	{
 		ErrorLog(path, 0);
+		free(path);
 		return FALSE;
 	}
 
@@ -357,6 +367,7 @@ BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 #endif
 	{
 		ErrorLog("surface no", surf_no);
+		free(path);
 		return FALSE;
 	}
 
@@ -366,8 +377,10 @@ BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 	if (image_buffer == NULL)
 	{
 		ErrorLog(path, 1);
+		free(path);
 		return FALSE;
 	}
+	free(path);
 
 	if (!ScaleAndUploadSurface(image_buffer, width, height, surf_no))
 	{
@@ -378,7 +391,6 @@ BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 	FreeBitmap(image_buffer);
 	surface_metadata[surf_no].type = SURFACE_SOURCE_FILE;
 	strcpy(surface_metadata[surf_no].name, name);
-
 	return TRUE;
 }
 
@@ -647,8 +659,9 @@ void InitTextObject(const char *name)
 {
 	(void)name;	// Unused in this branch
 
-	char path[MAX_PATH];
-	sprintf(path, "%s/Font/font", gDataPath);
+	char *path;
+	if (asprintf(&path, "%s/Font/font", gDataPath) < 0)
+		return;
 
 	// Get font size
 	unsigned int width, height;
