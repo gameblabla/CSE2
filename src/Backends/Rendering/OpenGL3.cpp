@@ -254,9 +254,9 @@ static void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GL
 		Backend_PrintInfo("OpenGL debug: %s", message);
 }
 */
-// ====================
-// Shader compilation
-// ====================
+////////////////////////
+// Shader compilation //
+////////////////////////
 
 static GLuint CompileShader(const char *vertex_shader_source, const char *fragment_shader_source)
 {
@@ -314,9 +314,9 @@ static GLuint CompileShader(const char *vertex_shader_source, const char *fragme
 	return program_id;
 }
 
-// ====================
-// Vertex buffer management
-// ====================
+//////////////////////////////
+// Vertex buffer management //
+//////////////////////////////
 
 static VertexBufferSlot* GetVertexBufferSlot(unsigned int slots_needed)
 {
@@ -378,9 +378,9 @@ static void FlushVertexBuffer(void)
 	current_vertex_buffer_slot = 0;
 }
 
-// ====================
-// Glyph-batching
-// ====================
+////////////////////
+// Glyph-batching //
+////////////////////
 
 // Blit the glyphs in the batch
 static void GlyphBatch_Draw(spritebatch_sprite_t *sprites, int count, int texture_w, int texture_h, void *udata)
@@ -528,7 +528,7 @@ static void GlyphBatch_DestroyTexture(SPRITEBATCH_U64 texture_id, void *udata)
 
 #ifndef USE_OPENGLES2
 
-static const char *GetOpenGLErrorCodeDescription(GLenum error_code)
+static const char* GetOpenGLErrorCodeDescription(GLenum error_code)
 {
 	switch (error_code)
 	{
@@ -580,9 +580,9 @@ static void PostGLCallCallback(const char *name, void *function_pointer, int len
 
 #endif
 
-// ====================
-// Render-backend initialisation
-// ====================
+///////////////////////////////////
+// Render-backend initialisation //
+///////////////////////////////////
 
 RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, bool fullscreen)
 {
@@ -808,9 +808,9 @@ void RenderBackend_DrawScreen(void)
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
 }
 
-// ====================
-// Surface management
-// ====================
+////////////////////////
+// Surface management //
+////////////////////////
 
 RenderBackend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned int height, bool render_target)
 {
@@ -896,9 +896,9 @@ void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, unsigned int wi
 	glBindTexture(GL_TEXTURE_2D, last_source_texture);
 }
 
-// ====================
-// Drawing
-// ====================
+/////////////
+// Drawing //
+/////////////
 
 void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBackend_Rect *rect, RenderBackend_Surface *destination_surface, long x, long y, bool colour_key)
 {
@@ -1037,9 +1037,9 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 	}
 }
 
-// ====================
-// Glyph management
-// ====================
+//////////////////////
+// Glyph management //
+//////////////////////
 
 RenderBackend_Glyph* RenderBackend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch)
 {
@@ -1099,9 +1099,9 @@ void RenderBackend_FlushGlyphs(void)
 	spritebatch_flush(&glyph_batcher);
 }
 
-// ====================
-// Misc.
-// ====================
+///////////
+// Misc. //
+///////////
 
 void RenderBackend_HandleRenderTargetLoss(void)
 {
