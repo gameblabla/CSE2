@@ -6,6 +6,7 @@
 
 #include "Organya.h"
 
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 
