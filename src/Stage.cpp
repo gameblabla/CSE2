@@ -138,56 +138,41 @@ BOOL TransferStage(int no, int w, int x, int y)
 
 	bError = FALSE;
 
-	// Get path
-	char path_dir[sizeof("Stage")] = "Stage";	// Can only be either "Stage" or "Npc", and sizeof("Stage") > sizeof("Npc")
-	/*
-	 *	The size of path should be size of the format string (without the operands) + size of first operand + size of second operand - 2 (no null terminator needed for the first two operands, and sizeof will include the size for the null terminators here)
-	 *	The size of the format string is sizeof("/.pxa") because that's the biggest raw format (omitting the operands) used here
-	 *	Size of first operand is sizeof(path_dir) because that's always the first operand
-	 *	Size of second operand is sizeof(gTMT[no].parts) because all the operands used here (gTMT[no].parts, gTMT[no].map, gTMT[no].npc, gTMT[no].boss) are of the same size
-	 *	sprintf(path, "%s", gTMT[no].back) is irrelevant here because sizeof(gTMT[no].back) is the same as the size of all the operands discussed for the size of the second operand, so gTMT[no].back always fits into the size allocated for the second operand alone
-	 */
-	char path[sizeof("/.pxa") + sizeof(path_dir) + sizeof(gTMT[no].parts) - 2];
-
 	// Load tileset
-	sprintf(path, "%s/Prt%s", path_dir, gTMT[no].parts);
-	if (!ReloadBitmap_File(path, SURFACE_ID_LEVEL_TILESET))
+	std::string path = std::string{"Stage/Prt"} + gTMT[no].parts;
+	if (!ReloadBitmap_File(path.c_str(), SURFACE_ID_LEVEL_TILESET))
 		bError = TRUE;
 
-	sprintf(path, "%s/%s.pxa", path_dir, gTMT[no].parts);
-	if (!LoadAttributeData(path))
+	path = std::string{"Stage/"} + gTMT[no].parts + ".pxa";
+	if (!LoadAttributeData(path.c_str()))
 		bError = TRUE;
 
 	// Load tilemap
-	sprintf(path, "%s/%s.pxm", path_dir, gTMT[no].map);
-	if (!LoadMapData2(path))
+	path = std::string{"Stage/"} + gTMT[no].map + ".pxm";
+	if (!LoadMapData2(path.c_str()))
 		bError = TRUE;
 
 	// Load NPCs
-	sprintf(path, "%s/%s.pxe", path_dir, gTMT[no].map);
-	if (!LoadEvent(path))
+	path = std::string{"Stage/"} + gTMT[no].map + ".pxe";
+	if (!LoadEvent(path.c_str()))
 		bError = TRUE;
 
 	// Load script
-	sprintf(path, "%s/%s.tsc", path_dir, gTMT[no].map);
-	if (!LoadTextScript_Stage(path))
+	path = std::string{"Stage/"} + gTMT[no].map + ".tsc";
+	if (!LoadTextScript_Stage(path.c_str()))
 		bError = TRUE;
 
 	// Load background
-	sprintf(path, "%s", gTMT[no].back);
-	if (!InitBack(path, gTMT[no].bkType))
+	if (!InitBack(gTMT[no].back, gTMT[no].bkType))
 		bError = TRUE;
-
-	// Get path
-	strcpy(path_dir, "Npc");
 
 	// Load NPC sprite sheets
-	sprintf(path, "%s/Npc%s", path_dir, gTMT[no].npc);
-	if (!ReloadBitmap_File(path, SURFACE_ID_LEVEL_SPRITESET_1))
+	path = std::string{"Npc/Npc"} + gTMT[no].npc;
+	if (!ReloadBitmap_File(path.c_str(), SURFACE_ID_LEVEL_SPRITESET_1))
 		bError = TRUE;
 
-	sprintf(path, "%s/Npc%s", path_dir, gTMT[no].boss);
-	if (!ReloadBitmap_File(path, SURFACE_ID_LEVEL_SPRITESET_2))
+	path = std::string{"Npc/Npc"} + gTMT[no].boss;
+	if (!ReloadBitmap_File(path.c_str(), SURFACE_ID_LEVEL_SPRITESET_2))
 		bError = TRUE;
 
 	if (bError)

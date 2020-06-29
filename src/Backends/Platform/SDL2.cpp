@@ -13,7 +13,6 @@
 #include "../../Organya.h"
 #include "../../Profile.h"
 #include "../../Resource.h"
-#include "../../Helpers/Strdup.h"
 
 #define DO_KEY(SDL_KEY, BACKEND_KEY) \
 	case SDL_KEY: \
@@ -85,13 +84,15 @@ void Backend_PostWindowCreation(void)
 	
 }
 
-bool Backend_GetBasePath(char **string_buffer)
+bool Backend_GetBasePath(std::string *string_buffer)
 {
 #ifdef _WIN32
 	// SDL_GetBasePath returns a UTF-8 string, but Windows' fopen uses (extended?) ASCII.
 	// This is apparently a problem for accented characters, as they will make fopen fail.
 	// So, instead, we rely on argv[0], as that will put the accented characters in a
 	// format Windows will understand.
+	(void)string_buffer;
+
 	return false;
 #else
 	char *base_path = SDL_GetBasePath();
@@ -101,7 +102,7 @@ bool Backend_GetBasePath(char **string_buffer)
 	// Trim the trailing '/'
 	size_t base_path_length = strlen(base_path);
 	base_path[base_path_length - 1] = '\0';
-	*string_buffer = strdup(base_path);
+	*string_buffer = base_path;
 	SDL_free(base_path);
 
 	return true;

@@ -416,12 +416,9 @@ void PutCampObject(void)
 int CampLoop(void)
 {
 	RECT rcView = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
-	int ret = enum_ESCRETURN_continue;
 
 	// Save the current script path (to restore it when we get out of the inventory)
-	char *old_script_path = GetTextScriptPath();
-	if (old_script_path == NULL)
-		return enum_ESCRETURN_exit;
+	std::string old_script_path = GetTextScriptPath();
 
 	// Load the inventory script
 	LoadTextScript2("ArmsItem.tsc");
@@ -452,11 +449,9 @@ int CampLoop(void)
 			switch (Call_Escape())
 			{
 				case enum_ESCRETURN_exit:
-					free(old_script_path);
 					return enum_ESCRETURN_exit;
 
 				case enum_ESCRETURN_restart:
-					free(old_script_path);
 					return enum_ESCRETURN_restart;
 			}
 		}
@@ -467,11 +462,9 @@ int CampLoop(void)
 		switch (TextScriptProc())
 		{
 			case enum_ESCRETURN_exit:
-				free(old_script_path);
 				return enum_ESCRETURN_exit;
 
 			case enum_ESCRETURN_restart:
-				free(old_script_path);
 				return enum_ESCRETURN_restart;
 		}
 
@@ -500,16 +493,12 @@ int CampLoop(void)
 		}
 
 		if (!Flip_SystemTask())
-		{
-			free(old_script_path);
 			return enum_ESCRETURN_exit;
-		}
 	}
 
 	// Resume original script
-	LoadTextScript_Stage(old_script_path);
+	LoadTextScript_Stage(old_script_path.c_str());
 	gArmsEnergyX = 32; // Displays weapon rotation animation in case the weapon was changed
-	free(old_script_path);
 	return enum_ESCRETURN_continue;
 }
 

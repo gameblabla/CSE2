@@ -17,7 +17,6 @@
 #include "NpcTbl.h"
 #include "Sound.h"
 #include "ValueView.h"
-#include "Helpers/FopenFormatted.h"
 
 NPCHAR gNPC[NPC_MAX];
 int gCurlyShoot_wait;
@@ -55,12 +54,11 @@ void InitNpChar(void)
 BOOL LoadEvent(const char *path_event)
 {
 	int i, n;
-	FILE *fp;
 	int count;
 	char code[4];
 	EVENT eve;
 
-	fp = fopenFormatted("rb", "%s/%s", gDataPath, path_event);
+	FILE *fp = fopen((gDataPath + '/' + path_event).c_str(), "rb");
 	if (fp == NULL)
 		return FALSE;
 

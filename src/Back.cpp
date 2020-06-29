@@ -13,7 +13,6 @@
 #include "Main.h"
 #include "Map.h"
 #include "Stage.h"
-#include "Helpers/FopenFormatted.h"
 
 BACK gBack;
 int gWaterY;
@@ -26,7 +25,7 @@ BOOL InitBack(const char *fName, int type)
 	color_black = GetCortBoxColor(RGB(0, 0, 0x10));
 
 	// Get width and height
-	FILE *fp = fopenFormatted("rb", "%s/%s.pbm", gDataPath, fName);
+	FILE *fp = fopen((gDataPath + '/' + fName + ".pbm").c_str(), "rb");
 	if (fp == NULL)
 		return FALSE;
 

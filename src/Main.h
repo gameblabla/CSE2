@@ -1,9 +1,10 @@
 #pragma once
 
 #include "WindowsWrapper.h"
+#include <string>
 
-extern char *gModulePath;
-extern char *gDataPath;
+extern std::string gModulePath;
+extern std::string gDataPath;
 
 extern BOOL bFullscreen;
 extern BOOL gbUseJoystick;

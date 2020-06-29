@@ -44,7 +44,6 @@
 #include "Star.h"
 #include "TextScr.h"
 #include "ValueView.h"
-#include "Helpers/Asprintf.h"
 
 int g_GameFlags;
 int gCounter;
@@ -702,13 +701,9 @@ BOOL Game(void)
 
 	PlaySoundObject(7, -1);
 
-	char *path;
-	if (asprintf(&path, "%s/npc.tbl", gDataPath) < 0)
-		return FALSE;
+	std::string path = gDataPath + "/npc.tbl";
 
-	BOOL load_npc_table_succeeded = LoadNpcTable(path);
-	free(path);
-	if (!load_npc_table_succeeded)
+	if (!LoadNpcTable(path.c_str()))
 	{
 #ifdef JAPANESE
 		Backend_ShowMessageBox("エラー", "NPCテーブルが読めない");

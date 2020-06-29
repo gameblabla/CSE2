@@ -7,7 +7,6 @@
 #include "Config.h"
 #include "File.h"
 #include "Main.h"
-#include "Helpers/FopenFormatted.h"
 
 const char* const gConfigName = "Config.dat";
 const char* const gProof = "DOUKUTSU20041206";
@@ -18,7 +17,7 @@ BOOL LoadConfigData(CONFIG *conf)
 	memset(conf, 0, sizeof(CONFIG));
 
 	// Open file
-	FILE *fp = fopenFormatted("rb", "%s/%s", gModulePath, gConfigName);
+	FILE *fp = fopen((gModulePath + '/' + gConfigName).c_str(), "rb");
 	if (fp == NULL)
 		return FALSE;
 

@@ -33,8 +33,6 @@
 #include "SelStage.h"
 #include "Sound.h"
 #include "Stage.h"
-#include "Helpers/Asprintf.h"
-#include "Helpers/Strdup.h"
 
 // This limits the size of a .tsc script to 0x5000 bytes (the game will crash above this)
 #define TSC_BUFFER_SIZE 0x5000
@@ -126,22 +124,16 @@ void EncryptionBinaryData2(unsigned char *pData, long size)
 BOOL LoadTextScript2(const char *name)
 {
 	FILE *fp;
-	char *path;
 
 	// Get path
-	if (asprintf(&path, "%s/%s", gDataPath, name) < 0)
-		return FALSE;
+	std::string path = gDataPath + '/' + name;
 
-	gTS.size = GetFileSizeLong(path);
+	gTS.size = GetFileSizeLong(path.c_str());
 	if (gTS.size == -1)
-	{
-		free(path);
 		return FALSE;
-	}
 
 	// Open file
-	fp = fopen(path, "rb");
-	free(path);
+	fp = fopen(path.c_str(), "rb");
 	if (fp == NULL)
 		return FALSE;
 
@@ -151,9 +143,7 @@ BOOL LoadTextScript2(const char *name)
 	fclose(fp);
 
 	// Set path
-	if (gTS.path != NULL)
-		free(gTS.path);
-	gTS.path = strdup(name);
+	gTS.path = name;
 
 	// Decrypt data
 	EncryptionBinaryData2((unsigned char*)gTS.data, gTS.size);
@@ -169,19 +159,12 @@ BOOL LoadTextScript_Stage(const char *name)
 	long body_size;
 
 	// Open Head.tsc
-	char *path;
-	if (asprintf(&path, "%s/%s", gDataPath, "Head.tsc") < 0)
-		return FALSE;
-
-	head_size = GetFileSizeLong(path);
+	std::string path = gDataPath + "/Head.tsc";
+	head_size = GetFileSizeLong(path.c_str());
 	if (head_size == -1)
-	{
-		free(path);
 		return FALSE;
-	}
 
-	fp = fopen(path, "rb");
-	free(path);
+	fp = fopen(path.c_str(), "rb");
 	if (fp == NULL)
 		return FALSE;
 
@@ -192,18 +175,12 @@ BOOL LoadTextScript_Stage(const char *name)
 	fclose(fp);
 
 	// Open stage's .tsc
-	if (asprintf(&path, "%s/%s", gDataPath, name) < 0)
-		return FALSE;
-
-	body_size = GetFileSizeLong(path);
+	path = gDataPath + '/' + name;
+	body_size = GetFileSizeLong(path.c_str());
 	if (body_size == -1)
-	{
-		free(path);
 		return FALSE;
-	}
 
-	fp = fopen(path, "rb");
-	free(path);
+	fp = fopen(path.c_str(), "rb");
 	if (fp == NULL)
 		return FALSE;
 
@@ -215,17 +192,15 @@ BOOL LoadTextScript_Stage(const char *name)
 
 	// Set parameters
 	gTS.size = head_size + body_size;
-	if (gTS.path != NULL)
-		free(gTS.path);
-	gTS.path = strdup(name);
+	gTS.path = name;
 
 	return TRUE;
 }
 
 // Get current path
-char *GetTextScriptPath()
+std::string GetTextScriptPath()
 {
-	return strdup(gTS.path);
+	return gTS.path;
 }
 
 // Get 4 digit number from TSC data

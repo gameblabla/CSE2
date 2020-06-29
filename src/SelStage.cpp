@@ -161,9 +161,7 @@ int StageSelectLoop(int *p_event)
 
 	gSelectedStage = 0;
 	BackupSurface(SURFACE_ID_SCREEN_GRAB, &grcFull);
-	char *old_script_path = GetTextScriptPath();
-	if (!old_script_path)
-		return enum_ESCRETURN_exit;
+	std::string old_script_path = GetTextScriptPath();
 	LoadTextScript2("StageSelect.tsc");
 	gStageSelectTitleY = (WINDOW_HEIGHT / 2) - 66;
 	StartTextScript(gPermitStage[gSelectedStage].index + 1000);
@@ -177,11 +175,9 @@ int StageSelectLoop(int *p_event)
 			switch (Call_Escape())
 			{
 				case enum_ESCRETURN_exit:
-					free(old_script_path);
 					return enum_ESCRETURN_exit;
 
 				case enum_ESCRETURN_restart:
-					free(old_script_path);
 					return enum_ESCRETURN_restart;
 			}
 		}
@@ -191,11 +187,9 @@ int StageSelectLoop(int *p_event)
 		switch (TextScriptProc())
 		{
 			case enum_ESCRETURN_exit:
-				free(old_script_path);
 				return enum_ESCRETURN_exit;
 
 			case enum_ESCRETURN_restart:
-				free(old_script_path);
 				return enum_ESCRETURN_restart;
 		}
 
@@ -216,8 +210,7 @@ int StageSelectLoop(int *p_event)
 		else if (gKeyTrg & gKeyCancel)
 		{
 			StopTextScript();
-			LoadTextScript_Stage(old_script_path);
-			free(old_script_path);
+			LoadTextScript_Stage(old_script_path.c_str());
 			*p_event = 0;
 			return enum_ESCRETURN_continue;
 		}
@@ -225,14 +218,10 @@ int StageSelectLoop(int *p_event)
 		PutFramePerSecound();
 
 		if (!Flip_SystemTask())
-		{
-			free(old_script_path);
 			return enum_ESCRETURN_exit;
-		}
 	}
 
-	LoadTextScript_Stage(old_script_path);
-	free(old_script_path);
+	LoadTextScript_Stage(old_script_path.c_str());
 	*p_event = gPermitStage[gSelectedStage].event;
 	return enum_ESCRETURN_continue;
 }

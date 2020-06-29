@@ -16,7 +16,6 @@
 #include "Organya.h"
 #include "Stage.h"
 #include "TextScr.h"
-#include "Helpers/Asprintf.h"
 
 struct CREDIT
 {
@@ -226,27 +225,17 @@ BOOL StartCreditScript(void)
 	}
 
 	// Open file
-	char *path;
-	if (asprintf(&path, "%s/%s", gDataPath, credit_script) < 0)
-		return FALSE;
-
-	Credit.size = GetFileSizeLong(path);
+	std::string path = gDataPath + '/' + credit_script;
+	Credit.size = GetFileSizeLong(path.c_str());
 	if (Credit.size == -1)
-	{
-		free(path);
 		return FALSE;
-	}
 
 	// Allocate buffer data
 	Credit.pData = (char*)malloc(Credit.size);
 	if (Credit.pData == NULL)
-	{
-		free(path);
 		return FALSE;
-	}
 
-	fp = fopen(path, "rb");
-	free(path);
+	fp = fopen(path.c_str(), "rb");
 	if (fp == NULL)
 	{
 		free(Credit.pData);

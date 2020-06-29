@@ -18,7 +18,6 @@
 #include "MapName.h"
 #include "Resource.h"
 #include "TextScr.h"
-#include "Helpers/Asprintf.h"
 
 typedef enum SurfaceType
 {
@@ -251,15 +250,11 @@ BOOL MakeSurface_Resource(const char *name, SurfaceID surf_no)
 // TODO - Inaccurate stack frame
 BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 {
-	char *path;
+	std::string path = gDataPath + '/' + name + ".pbm";
 
-	if (asprintf(&path, "%s/%s.pbm", gDataPath, name) < 0)
-		return FALSE;
-
-	if (!IsEnableBitmap(path))
+	if (!IsEnableBitmap(path.c_str()))
 	{
-		ErrorLog(path, 0);
-		free(path);
+		ErrorLog(path.c_str(), 0);
 		return FALSE;
 	}
 
@@ -270,27 +265,23 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 #endif
 	{
 		ErrorLog("surface no", surf_no);
-		free(path);
 		return FALSE;
 	}
 
 	if (surf[surf_no] != NULL)
 	{
 		ErrorLog("existing", surf_no);
-		free(path);
 		return FALSE;
 	}
 
 	unsigned int width, height;
-	unsigned char *image_buffer = DecodeBitmapFromFile(path, &width, &height);
+	unsigned char *image_buffer = DecodeBitmapFromFile(path.c_str(), &width, &height);
 
 	if (image_buffer == NULL)
 	{
-		ErrorLog(path, 1);
-		free(path);
+		ErrorLog(path.c_str(), 1);
 		return FALSE;
 	}
-	free(path);
 
 	surf[surf_no] = RenderBackend_CreateSurface(width * mag, height * mag, false);
 
@@ -349,14 +340,11 @@ BOOL ReloadBitmap_Resource(const char *name, SurfaceID surf_no)
 // TODO - Inaccurate stack frame
 BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 {
-	char *path;
-	if (asprintf(&path, "%s/%s.pbm", gDataPath, name) < 0)
-		return FALSE;
+	std::string path = gDataPath + '/' + name + ".pbm";
 
-	if (!IsEnableBitmap(path))
+	if (!IsEnableBitmap(path.c_str()))
 	{
-		ErrorLog(path, 0);
-		free(path);
+		ErrorLog(path.c_str(), 0);
 		return FALSE;
 	}
 
@@ -367,20 +355,17 @@ BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 #endif
 	{
 		ErrorLog("surface no", surf_no);
-		free(path);
 		return FALSE;
 	}
 
 	unsigned int width, height;
-	unsigned char *image_buffer = DecodeBitmapFromFile(path, &width, &height);
+	unsigned char *image_buffer = DecodeBitmapFromFile(path.c_str(), &width, &height);
 
 	if (image_buffer == NULL)
 	{
-		ErrorLog(path, 1);
-		free(path);
+		ErrorLog(path.c_str(), 1);
 		return FALSE;
 	}
-	free(path);
 
 	if (!ScaleAndUploadSurface(image_buffer, width, height, surf_no))
 	{
@@ -659,10 +644,6 @@ void InitTextObject(const char *name)
 {
 	(void)name;	// Unused in this branch
 
-	char *path;
-	if (asprintf(&path, "%s/Font/font", gDataPath) < 0)
-		return;
-
 	// Get font size
 	unsigned int width, height;
 
@@ -679,7 +660,7 @@ void InitTextObject(const char *name)
 			break;
 	}
 
-	font = LoadFont(path, width, height);
+	font = LoadFont((gDataPath + "/Font/font").c_str(), width, height);
 }
 
 void PutText(int x, int y, const char *text, unsigned long color)

@@ -22,14 +22,13 @@
 #include "Stage.h"
 #include "Star.h"
 #include "ValueView.h"
-#include "Helpers/FopenFormatted.h"
 
 const char* const gDefaultName = "Profile.dat";
 const char* const gProfileCode = "Do041220";
 
 BOOL IsProfile(void)
 {
-	FILE *file = fopenFormatted("rb", "%s/%s", gModulePath, gDefaultName);
+	FILE *file = fopen((gModulePath + '/' + gDefaultName).c_str(), "rb");
 	if (file == NULL)
 		return FALSE;
 
@@ -42,7 +41,7 @@ BOOL SaveProfile(const char *name)
 	const char *FLAG = "FLAG";
 
 	// Open file
-	FILE *fp = fopenFormatted("wb", "%s/%s", gModulePath, ((name != NULL) ? name : gDefaultName));
+	FILE *fp = fopen((gModulePath + '/' + ((name != NULL) ? name : gDefaultName)).c_str(), "wb");
 	if (fp == NULL)
 		return FALSE;
 
@@ -111,14 +110,14 @@ BOOL SaveProfile(const char *name)
 
 BOOL LoadProfile(const char *name)
 {
-	FILE *fp;
 	PROFILE profile;
 
 	// Open file
+	FILE *fp;
 	if (name != NULL)
-		fp = fopenFormatted("rb", "%s", name);
+		fp = fopen(name, "rb");
 	else
-		fp = fopenFormatted("rb", "%s/%s", gModulePath, gDefaultName);
+		fp = fopen((gModulePath + '/' + gDefaultName).c_str(), "rb");
 
 	if (fp == NULL)
 		return FALSE;

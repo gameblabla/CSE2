@@ -171,14 +171,6 @@ add_executable(CSE2 WIN32
 	"src/Backends/Controller.h"
 	"src/Backends/Misc.h"
 	"src/Backends/Rendering.h"
-	"src/Helpers/Asprintf.cpp"
-	"src/Helpers/Asprintf.h"
-	"src/Helpers/Vasprintf.cpp"
-	"src/Helpers/Vasprintf.h"
-	"src/Helpers/FopenFormatted.cpp"
-	"src/Helpers/FopenFormatted.h"
-	"src/Helpers/Strdup.cpp"
-	"src/Helpers/Strdup.h"
 )
 
 set(RESOURCES
