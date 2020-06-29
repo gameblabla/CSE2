@@ -138,9 +138,9 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 
 						// Initialise vertex position buffer
 						vertex_buffer.flags = (GX2RResourceFlags)(GX2R_RESOURCE_BIND_VERTEX_BUFFER |
-																		   GX2R_RESOURCE_USAGE_CPU_READ |
-																		   GX2R_RESOURCE_USAGE_CPU_WRITE |
-																		   GX2R_RESOURCE_USAGE_GPU_READ);
+						                                          GX2R_RESOURCE_USAGE_CPU_READ |
+						                                          GX2R_RESOURCE_USAGE_CPU_WRITE |
+						                                          GX2R_RESOURCE_USAGE_GPU_READ);
 						vertex_buffer.elemSize = sizeof(Vertex);
 						vertex_buffer.elemCount = 4;
 
