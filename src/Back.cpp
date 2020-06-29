@@ -1,17 +1,12 @@
 #include "Back.h"
 
-#include <stddef.h>
 #include <stdio.h>
 
 #include "WindowsWrapper.h"
 
 #include "CommonDefines.h"
 #include "Draw.h"
-#include "Frame.h"
-#include "Game.h"
 #include "Main.h"
-#include "Map.h"
-#include "Stage.h"
 
 BACK gBack;
 int gWaterY;
