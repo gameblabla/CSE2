@@ -17,15 +17,15 @@ struct Mixer_Sound
 	signed char *samples;
 	size_t frames;
 	size_t position;
-	unsigned long sample_offset_remainder;	// 16.16 fixed-point
-	unsigned long advance_delta;
+	unsigned long sample_offset_remainder;  // 16.16 fixed-point
+	unsigned long advance_delta;            // 16.16 fixed-point
 	bool playing;
 	bool looping;
-	short volume;
-	short pan_l;
-	short pan_r;
-	short volume_l;
-	short volume_r;
+	short volume;    // 8.8 fixed-point
+	short pan_l;     // 8.8 fixed-point
+	short pan_r;     // 8.8 fixed-point
+	short volume_l;  // 8.8 fixed-point
+	short volume_r;  // 8.8 fixed-point
 
 	struct Mixer_Sound *next;
 };

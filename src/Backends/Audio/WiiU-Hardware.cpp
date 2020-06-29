@@ -1,3 +1,8 @@
+// This darned thing doesn't work - sounds just randomly refuse to play,
+// particularly the ones used by Organya.
+
+// If anyone could figure out what causes this, that would be great.
+
 #include "../Audio.h"
 
 #include <math.h>
