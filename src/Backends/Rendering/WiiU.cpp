@@ -100,14 +100,16 @@ static RenderMode last_render_mode;
 static RenderBackend_Surface *last_source_surface;
 static RenderBackend_Surface *last_destination_surface;
 
-static VertexBufferSlot* GetVertexBufferSlot(unsigned int slots_needed)
+static VertexBufferSlot* GetVertexBufferSlot(void)
 {
+	++current_vertex_buffer_slot;
+
 	// Check if buffer needs expanding
-	if (current_vertex_buffer_slot + slots_needed > local_vertex_buffer_size)
+	if (current_vertex_buffer_slot > local_vertex_buffer_size)
 	{
 		local_vertex_buffer_size = 1;
 
-		while (current_vertex_buffer_slot + slots_needed > local_vertex_buffer_size)
+		while (current_vertex_buffer_slot > local_vertex_buffer_size)
 			local_vertex_buffer_size <<= 1;
 
 		VertexBufferSlot *realloc_result = (VertexBufferSlot*)realloc(local_vertex_buffer, local_vertex_buffer_size * sizeof(VertexBufferSlot));
@@ -123,9 +125,7 @@ static VertexBufferSlot* GetVertexBufferSlot(unsigned int slots_needed)
 		}
 	}
 
-	current_vertex_buffer_slot += slots_needed;
-
-	return &local_vertex_buffer[current_vertex_buffer_slot - slots_needed];
+	return &local_vertex_buffer[current_vertex_buffer_slot - 1];
 }
 
 static void FlushVertexBuffer(void)
@@ -368,27 +368,27 @@ void RenderBackend_DrawScreen(void)
 	// Make sure the buffers aren't currently being used before we modify them
 	GX2DrawDone();
 
-	Vertex *vertex_pointer = (Vertex*)GX2RLockBufferEx(&vertex_buffer, (GX2RResourceFlags)0);
+	VertexBufferSlot *vertex_buffer_slot = (VertexBufferSlot*)GX2RLockBufferEx(&vertex_buffer, (GX2RResourceFlags)0);
 
 	// Set buffer to (4:3) full-screen
-	vertex_pointer[0].position.x = -1.0f;
-	vertex_pointer[0].position.y = -1.0f;
-	vertex_pointer[1].position.x =  1.0f;
-	vertex_pointer[1].position.y = -1.0f;
-	vertex_pointer[2].position.x =  1.0f;
-	vertex_pointer[2].position.y =  1.0f;
-	vertex_pointer[3].position.x = -1.0f;
-	vertex_pointer[3].position.y =  1.0f;
+	vertex_buffer_slot->vertices[0].position.x = -1.0f;
+	vertex_buffer_slot->vertices[0].position.y = -1.0f;
+	vertex_buffer_slot->vertices[1].position.x =  1.0f;
+	vertex_buffer_slot->vertices[1].position.y = -1.0f;
+	vertex_buffer_slot->vertices[2].position.x =  1.0f;
+	vertex_buffer_slot->vertices[2].position.y =  1.0f;
+	vertex_buffer_slot->vertices[3].position.x = -1.0f;
+	vertex_buffer_slot->vertices[3].position.y =  1.0f;
 
 	// Set buffer to full-texture
-	vertex_pointer[0].texture.x = 0.0f;
-	vertex_pointer[0].texture.y = 1.0f;
-	vertex_pointer[1].texture.x = 1.0f;
-	vertex_pointer[1].texture.y = 1.0f;
-	vertex_pointer[2].texture.x = 1.0f;
-	vertex_pointer[2].texture.y = 0.0f;
-	vertex_pointer[3].texture.x = 0.0f;
-	vertex_pointer[3].texture.y = 0.0f;
+	vertex_buffer_slot->vertices[0].texture.x = 0.0f;
+	vertex_buffer_slot->vertices[0].texture.y = 1.0f;
+	vertex_buffer_slot->vertices[1].texture.x = 1.0f;
+	vertex_buffer_slot->vertices[1].texture.y = 1.0f;
+	vertex_buffer_slot->vertices[2].texture.x = 1.0f;
+	vertex_buffer_slot->vertices[2].texture.y = 0.0f;
+	vertex_buffer_slot->vertices[3].texture.x = 0.0f;
+	vertex_buffer_slot->vertices[3].texture.y = 0.0f;
 
 	GX2RUnlockBufferEx(&vertex_buffer, (GX2RResourceFlags)0);
 
@@ -630,7 +630,7 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBacke
 		GX2RSetAttributeBuffer(&vertex_buffer, 1, sizeof(Vertex), offsetof(Vertex, texture));
 	}
 
-	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot(1);
+	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot();
 
 	if (vertex_buffer_slot != NULL)
 	{
@@ -714,7 +714,7 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 		GX2RSetAttributeBuffer(&vertex_buffer, 0, sizeof(Vertex), offsetof(Vertex, position));
 	}
 
-	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot(1);
+	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot();
 
 	if (vertex_buffer_slot != NULL)
 	{
@@ -836,7 +836,7 @@ void RenderBackend_DrawGlyph(RenderBackend_Glyph *glyph, long x, long y)
 	// Make sure the buffers aren't currently being used before we modify them
 	GX2DrawDone();
 
-	Vertex *vertex_pointer = (Vertex*)GX2RLockBufferEx(&vertex_buffer, (GX2RResourceFlags)0);
+	VertexBufferSlot *vertex_buffer_slot = (VertexBufferSlot*)GX2RLockBufferEx(&vertex_buffer, (GX2RResourceFlags)0);
 
 	// Set vertex position buffer
 	const float destination_left = x;
@@ -844,35 +844,35 @@ void RenderBackend_DrawGlyph(RenderBackend_Glyph *glyph, long x, long y)
 	const float destination_right = x + glyph->width;
 	const float destination_bottom = y + glyph->height;
 
-	vertex_pointer[0].position.x = destination_left;
-	vertex_pointer[0].position.y = destination_top;
-	vertex_pointer[1].position.x = destination_right;
-	vertex_pointer[1].position.y = destination_top;
-	vertex_pointer[2].position.x = destination_right;
-	vertex_pointer[2].position.y = destination_bottom;
-	vertex_pointer[3].position.x = destination_left;
-	vertex_pointer[3].position.y = destination_bottom;
+	vertex_buffer_slot->vertices[0].position.x = destination_left;
+	vertex_buffer_slot->vertices[0].position.y = destination_top;
+	vertex_buffer_slot->vertices[1].position.x = destination_right;
+	vertex_buffer_slot->vertices[1].position.y = destination_top;
+	vertex_buffer_slot->vertices[2].position.x = destination_right;
+	vertex_buffer_slot->vertices[2].position.y = destination_bottom;
+	vertex_buffer_slot->vertices[3].position.x = destination_left;
+	vertex_buffer_slot->vertices[3].position.y = destination_bottom;
 
 	for (unsigned int i = 0; i < 4; ++i)
 	{
-		vertex_pointer[i].position.x /= glyph_destination_surface->width;
-		vertex_pointer[i].position.x *= 2.0f;
-		vertex_pointer[i].position.x -= 1.0f;
+		vertex_buffer_slot->vertices[i].position.x /= glyph_destination_surface->width;
+		vertex_buffer_slot->vertices[i].position.x *= 2.0f;
+		vertex_buffer_slot->vertices[i].position.x -= 1.0f;
 
-		vertex_pointer[i].position.y /= glyph_destination_surface->height;
-		vertex_pointer[i].position.y *= -2.0f;
-		vertex_pointer[i].position.y += 1.0f;
+		vertex_buffer_slot->vertices[i].position.y /= glyph_destination_surface->height;
+		vertex_buffer_slot->vertices[i].position.y *= -2.0f;
+		vertex_buffer_slot->vertices[i].position.y += 1.0f;
 	}
 
 	// Set texture coordinate buffer
-	vertex_pointer[0].texture.x = 0.0f;
-	vertex_pointer[0].texture.y = 0.0f;
-	vertex_pointer[1].texture.x = 1.0f;
-	vertex_pointer[1].texture.y = 0.0f;
-	vertex_pointer[2].texture.x = 1.0f;
-	vertex_pointer[2].texture.y = 1.0f;
-	vertex_pointer[3].texture.x = 0.0f;
-	vertex_pointer[3].texture.y = 1.0f;
+	vertex_buffer_slot->vertices[0].texture.x = 0.0f;
+	vertex_buffer_slot->vertices[0].texture.y = 0.0f;
+	vertex_buffer_slot->vertices[1].texture.x = 1.0f;
+	vertex_buffer_slot->vertices[1].texture.y = 0.0f;
+	vertex_buffer_slot->vertices[2].texture.x = 1.0f;
+	vertex_buffer_slot->vertices[2].texture.y = 1.0f;
+	vertex_buffer_slot->vertices[3].texture.x = 0.0f;
+	vertex_buffer_slot->vertices[3].texture.y = 1.0f;
 
 	GX2RUnlockBufferEx(&vertex_buffer, (GX2RResourceFlags)0);
 
