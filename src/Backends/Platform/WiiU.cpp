@@ -12,8 +12,6 @@
 #include <whb/proc.h>
 #include <whb/sdcard.h>
 
-#include "../../Helpers/Asprintf.h"
-
 static unsigned long ticks_per_second;
 
 bool Backend_Init(void)

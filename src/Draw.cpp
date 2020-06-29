@@ -250,7 +250,7 @@ BOOL MakeSurface_Resource(const char *name, SurfaceID surf_no)
 // TODO - Inaccurate stack frame
 BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 {
-	std::string path = gDataPath + '/' + name + ".pbm";
+	auto path = gDataPath + '/' + name + ".pbm";
 
 	if (!IsEnableBitmap(path.c_str()))
 	{
@@ -340,7 +340,7 @@ BOOL ReloadBitmap_Resource(const char *name, SurfaceID surf_no)
 // TODO - Inaccurate stack frame
 BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 {
-	std::string path = gDataPath + '/' + name + ".pbm";
+	auto path = gDataPath + '/' + name + ".pbm";
 
 	if (!IsEnableBitmap(path.c_str()))
 	{

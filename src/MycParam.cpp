@@ -441,7 +441,7 @@ BOOL SaveTimeCounter(void)
 		return TRUE;
 
 	// Get last time
-	std::string path = gModulePath + "/290.rec";
+	auto path = gModulePath + "/290.rec";
 
 	FILE *fp = fopen(path.c_str(), "rb");
 	if (fp != NULL)

@@ -126,7 +126,7 @@ BOOL LoadTextScript2(const char *name)
 	FILE *fp;
 
 	// Get path
-	std::string path = gDataPath + '/' + name;
+	auto path = gDataPath + '/' + name;
 
 	gTS.size = GetFileSizeLong(path.c_str());
 	if (gTS.size == -1)
@@ -159,7 +159,7 @@ BOOL LoadTextScript_Stage(const char *name)
 	long body_size;
 
 	// Open Head.tsc
-	std::string path = gDataPath + "/Head.tsc";
+	auto path = gDataPath + "/Head.tsc";
 	head_size = GetFileSizeLong(path.c_str());
 	if (head_size == -1)
 		return FALSE;

@@ -139,7 +139,7 @@ BOOL TransferStage(int no, int w, int x, int y)
 	bError = FALSE;
 
 	// Load tileset
-	std::string path = std::string{"Stage/Prt"} + gTMT[no].parts;
+	auto path = std::string{"Stage/Prt"} + gTMT[no].parts;
 	if (!ReloadBitmap_File(path.c_str(), SURFACE_ID_LEVEL_TILESET))
 		bError = TRUE;
 

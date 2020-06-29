@@ -2,7 +2,6 @@
 
 #include <stddef.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include "WindowsWrapper.h"
@@ -94,7 +93,7 @@ long GetFileSizeLong(const char *path)
 
 BOOL ErrorLog(const char *string, int value)
 {
-	std::string path = gModulePath + "/error.log";
+	auto path = gModulePath + "/error.log";
 
 	if (GetFileSizeLong(path.c_str()) > 0x19000)	// Purge the error log if it gets too big, I guess
 		remove(path.c_str());

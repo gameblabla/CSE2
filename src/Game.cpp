@@ -701,9 +701,7 @@ BOOL Game(void)
 
 	PlaySoundObject(7, -1);
 
-	std::string path = gDataPath + "/npc.tbl";
-
-	if (!LoadNpcTable(path.c_str()))
+	if (!LoadNpcTable((gDataPath + "/npc.tbl").c_str()))
 	{
 #ifdef JAPANESE
 		Backend_ShowMessageBox("エラー", "NPCテーブルが読めない");

@@ -225,7 +225,7 @@ BOOL StartCreditScript(void)
 	}
 
 	// Open file
-	std::string path = gDataPath + '/' + credit_script;
+	auto path = gDataPath + '/' + credit_script;
 	Credit.size = GetFileSizeLong(path.c_str());
 	if (Credit.size == -1)
 		return FALSE;

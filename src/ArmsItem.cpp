@@ -1,6 +1,5 @@
 #include "ArmsItem.h"
 
-#include <stdlib.h>
 #include <string.h>
 
 #include "WindowsWrapper.h"
@@ -418,7 +417,7 @@ int CampLoop(void)
 	RECT rcView = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
 	// Save the current script path (to restore it when we get out of the inventory)
-	std::string old_script_path = GetTextScriptPath();
+	auto old_script_path = GetTextScriptPath();
 
 	// Load the inventory script
 	LoadTextScript2("ArmsItem.tsc");
