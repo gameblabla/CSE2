@@ -50,13 +50,24 @@ typedef struct Viewport
 	float height;
 } Viewport;
 
+typedef struct Coordinate2D
+{
+	float x;
+	float y;
+} Coordinate2D;
+
+typedef struct Vertex
+{
+	Coordinate2D position;
+	Coordinate2D texture;
+} Vertex;
+
 static WHBGfxShaderGroup texture_shader;
 static WHBGfxShaderGroup texture_colour_key_shader;
 static WHBGfxShaderGroup colour_fill_shader;
 static WHBGfxShaderGroup glyph_shader;
 
-static GX2RBuffer vertex_position_buffer;
-static GX2RBuffer texture_coordinate_buffer;
+static GX2RBuffer vertex_buffer;
 
 static GX2Sampler sampler;
 
@@ -126,96 +137,79 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 						WHBGfxInitFetchShader(&glyph_shader);
 
 						// Initialise vertex position buffer
-						vertex_position_buffer.flags = (GX2RResourceFlags)(GX2R_RESOURCE_BIND_VERTEX_BUFFER |
+						vertex_buffer.flags = (GX2RResourceFlags)(GX2R_RESOURCE_BIND_VERTEX_BUFFER |
 																		   GX2R_RESOURCE_USAGE_CPU_READ |
 																		   GX2R_RESOURCE_USAGE_CPU_WRITE |
 																		   GX2R_RESOURCE_USAGE_GPU_READ);
-						vertex_position_buffer.elemSize = 2 * sizeof(float);
-						vertex_position_buffer.elemCount = 4;
+						vertex_buffer.elemSize = sizeof(Vertex);
+						vertex_buffer.elemCount = 4;
 
-						if (GX2RCreateBuffer(&vertex_position_buffer))
+						if (GX2RCreateBuffer(&vertex_buffer))
 						{
-							// Initialise texture coordinate buffer
-							texture_coordinate_buffer.flags = (GX2RResourceFlags)(GX2R_RESOURCE_BIND_VERTEX_BUFFER |
-																				  GX2R_RESOURCE_USAGE_CPU_READ |
-																				  GX2R_RESOURCE_USAGE_CPU_WRITE |
-																				  GX2R_RESOURCE_USAGE_GPU_READ);
-							texture_coordinate_buffer.elemSize = 2 * sizeof(float);
-							texture_coordinate_buffer.elemCount = 4;
+							// Initialise sampler
+							GX2InitSampler(&sampler, GX2_TEX_CLAMP_MODE_CLAMP, GX2_TEX_XY_FILTER_MODE_LINEAR);
 
-							if (GX2RCreateBuffer(&texture_coordinate_buffer))
+							// Create framebuffer surface
+							framebuffer_surface = RenderBackend_CreateSurface(screen_width, screen_height, true);
+
+							if (framebuffer_surface != NULL)
 							{
-								// Initialise sampler
-								GX2InitSampler(&sampler, GX2_TEX_CLAMP_MODE_CLAMP, GX2_TEX_XY_FILTER_MODE_LINEAR);
+								// Create a 'context' (this voodoo magic can be used to undo `GX2SetColorBuffer`,
+								// allowing us to draw to the screen once again)
+								gx2_context = (GX2ContextState*)aligned_alloc(GX2_CONTEXT_STATE_ALIGNMENT, sizeof(GX2ContextState));
 
-								// Create framebuffer surface
-								framebuffer_surface = RenderBackend_CreateSurface(screen_width, screen_height, true);
-
-								if (framebuffer_surface != NULL)
+								if (gx2_context != NULL)
 								{
-									// Create a 'context' (this voodoo magic can be used to undo `GX2SetColorBuffer`,
-									// allowing us to draw to the screen once again)
-									gx2_context = (GX2ContextState*)aligned_alloc(GX2_CONTEXT_STATE_ALIGNMENT, sizeof(GX2ContextState));
+									memset(gx2_context, 0, sizeof(GX2ContextState));
+									GX2SetupContextStateEx(gx2_context, TRUE);
+									GX2SetContextState(gx2_context);
 
-									if (gx2_context != NULL)
+									// Disable depth-test (enabled by default for some reason)
+									GX2SetDepthOnlyControl(FALSE, FALSE, GX2_COMPARE_FUNC_ALWAYS);
+
+									// Calculate centred viewports
+									switch (GX2GetSystemTVScanMode())
 									{
-										memset(gx2_context, 0, sizeof(GX2ContextState));
-										GX2SetupContextStateEx(gx2_context, TRUE);
-										GX2SetContextState(gx2_context);
+										// For now, we have to match WUT's broken behaviour (its `GX2TVScanMode`
+										// enum is missing values, and the rest are off-by-one)
+										//case GX2_TV_SCAN_MODE_576I:
+										case GX2_TV_SCAN_MODE_480I:	// Actually 576i
+										case GX2_TV_SCAN_MODE_480P:	// Actually 480i
+											CalculateViewport(854, 480, &tv_viewport);
+											break;
 
-										// Disable depth-test (enabled by default for some reason)
-										GX2SetDepthOnlyControl(FALSE, FALSE, GX2_COMPARE_FUNC_ALWAYS);
+										case GX2_TV_SCAN_MODE_720P:	// Actually 480p
+										default:	// Funnel the *real* 1080p into this
+											CalculateViewport(1280, 720, &tv_viewport);
+											break;
 
-										// Calculate centred viewports
-										switch (GX2GetSystemTVScanMode())
-										{
-											// For now, we have to match WUT's broken behaviour (its `GX2TVScanMode`
-											// enum is missing values, and the rest are off-by-one)
-											//case GX2_TV_SCAN_MODE_576I:
-											case GX2_TV_SCAN_MODE_480I:	// Actually 576i
-											case GX2_TV_SCAN_MODE_480P:	// Actually 480i
-												CalculateViewport(854, 480, &tv_viewport);
-												break;
-
-											case GX2_TV_SCAN_MODE_720P:	// Actually 480p
-											default:	// Funnel the *real* 1080p into this
-												CalculateViewport(1280, 720, &tv_viewport);
-												break;
-
-											case GX2_TV_SCAN_MODE_1080I:	// Actually invalid
-											case GX2_TV_SCAN_MODE_1080P:	// Actually 1080i
-												CalculateViewport(1920, 1080, &tv_viewport);
-												break;
-										}
-
-										CalculateViewport(854, 480, &drc_viewport);
-
-										return framebuffer_surface;
-									}
-									else
-									{
-										Backend_PrintError("Couldn't allocate memory for the GX2 context");
+										case GX2_TV_SCAN_MODE_1080I:	// Actually invalid
+										case GX2_TV_SCAN_MODE_1080P:	// Actually 1080i
+											CalculateViewport(1920, 1080, &tv_viewport);
+											break;
 									}
 
-									RenderBackend_FreeSurface(framebuffer_surface);
+									CalculateViewport(854, 480, &drc_viewport);
+
+									return framebuffer_surface;
 								}
 								else
 								{
-									Backend_PrintError("Couldn't create the framebuffer surface");
+									Backend_PrintError("Couldn't allocate memory for the GX2 context");
 								}
 
-								GX2RDestroyBufferEx(&texture_coordinate_buffer, (GX2RResourceFlags)0);
+								RenderBackend_FreeSurface(framebuffer_surface);
 							}
 							else
 							{
-								Backend_PrintError("Couldn't create the texture coordinate buffer");
+								Backend_PrintError("Couldn't create the framebuffer surface");
 							}
 
-							GX2RDestroyBufferEx(&vertex_position_buffer, (GX2RResourceFlags)0);
+							GX2RDestroyBufferEx(&vertex_buffer, (GX2RResourceFlags)0);
 						}
 						else
 						{
-							Backend_PrintError("Couldn't create the vertex position buffer");
+							Backend_PrintError("Couldn't create the vertex buffer");
 						}
 
 						WHBGfxFreeShaderGroup(&glyph_shader);
@@ -262,8 +256,7 @@ void RenderBackend_Deinit(void)
 
 	RenderBackend_FreeSurface(framebuffer_surface);
 
-	GX2RDestroyBufferEx(&texture_coordinate_buffer, (GX2RResourceFlags)0);
-	GX2RDestroyBufferEx(&vertex_position_buffer, (GX2RResourceFlags)0);
+	GX2RDestroyBufferEx(&vertex_buffer, (GX2RResourceFlags)0);
 
 	WHBGfxFreeShaderGroup(&glyph_shader);
 	WHBGfxFreeShaderGroup(&colour_fill_shader);
@@ -278,29 +271,29 @@ void RenderBackend_DrawScreen(void)
 	// Make sure the buffers aren't currently being used before we modify them
 	GX2DrawDone();
 
+	Vertex *vertex_pointer = (Vertex*)GX2RLockBufferEx(&vertex_buffer, (GX2RResourceFlags)0);
+
 	// Set buffer to (4:3) full-screen
-	float *position_pointer = (float*)GX2RLockBufferEx(&vertex_position_buffer, (GX2RResourceFlags)0);
-	position_pointer[0] = -1.0f;
-	position_pointer[1] = -1.0f;
-	position_pointer[2] =  1.0f;
-	position_pointer[3] = -1.0f;
-	position_pointer[4] =  1.0f;
-	position_pointer[5] =  1.0f;
-	position_pointer[6] = -1.0f;
-	position_pointer[7] =  1.0f;
-	GX2RUnlockBufferEx(&vertex_position_buffer, (GX2RResourceFlags)0);
+	vertex_pointer[0].position.x = -1.0f;
+	vertex_pointer[0].position.y = -1.0f;
+	vertex_pointer[1].position.x =  1.0f;
+	vertex_pointer[1].position.y = -1.0f;
+	vertex_pointer[2].position.x =  1.0f;
+	vertex_pointer[2].position.y =  1.0f;
+	vertex_pointer[3].position.x = -1.0f;
+	vertex_pointer[3].position.y =  1.0f;
 
 	// Set buffer to full-texture
-	float *texture_coordinate_pointer = (float*)GX2RLockBufferEx(&texture_coordinate_buffer, (GX2RResourceFlags)0);
-	texture_coordinate_pointer[0] = 0.0f;
-	texture_coordinate_pointer[1] = 1.0f;
-	texture_coordinate_pointer[2] = 1.0f;
-	texture_coordinate_pointer[3] = 1.0f;
-	texture_coordinate_pointer[4] = 1.0f;
-	texture_coordinate_pointer[5] = 0.0f;
-	texture_coordinate_pointer[6] = 0.0f;
-	texture_coordinate_pointer[7] = 0.0f;
-	GX2RUnlockBufferEx(&texture_coordinate_buffer, (GX2RResourceFlags)0);
+	vertex_pointer[0].texture.x = 0.0f;
+	vertex_pointer[0].texture.y = 1.0f;
+	vertex_pointer[1].texture.x = 1.0f;
+	vertex_pointer[1].texture.y = 1.0f;
+	vertex_pointer[2].texture.x = 1.0f;
+	vertex_pointer[2].texture.y = 0.0f;
+	vertex_pointer[3].texture.x = 0.0f;
+	vertex_pointer[3].texture.y = 0.0f;
+
+	GX2RUnlockBufferEx(&vertex_buffer, (GX2RResourceFlags)0);
 
 	// Start drawing
 	WHBGfxBeginRender();
@@ -326,8 +319,8 @@ void RenderBackend_DrawScreen(void)
 	// Bind a few things
 	GX2SetPixelSampler(&sampler, texture_shader.pixelShader->samplerVars[0].location);
 	GX2SetPixelTexture(&framebuffer_surface->texture, texture_shader.pixelShader->samplerVars[0].location);
-	GX2RSetAttributeBuffer(&vertex_position_buffer, 0, vertex_position_buffer.elemSize, 0);
-	GX2RSetAttributeBuffer(&texture_coordinate_buffer, 1, texture_coordinate_buffer.elemSize, 0);
+	GX2RSetAttributeBuffer(&vertex_buffer, 0, sizeof(Vertex), offsetof(Vertex, position));
+	GX2RSetAttributeBuffer(&vertex_buffer, 1, sizeof(Vertex), offsetof(Vertex, texture));
 
 	// Draw
 	GX2DrawEx(GX2_PRIMITIVE_MODE_QUADS, 4, 0, 1);
@@ -355,8 +348,8 @@ void RenderBackend_DrawScreen(void)
 	// Bind a few things
 	GX2SetPixelSampler(&sampler, texture_shader.pixelShader->samplerVars[0].location);
 	GX2SetPixelTexture(&framebuffer_surface->texture, texture_shader.pixelShader->samplerVars[0].location);
-	GX2RSetAttributeBuffer(&vertex_position_buffer, 0, vertex_position_buffer.elemSize, 0);
-	GX2RSetAttributeBuffer(&texture_coordinate_buffer, 1, texture_coordinate_buffer.elemSize, 0);
+	GX2RSetAttributeBuffer(&vertex_buffer, 0, sizeof(Vertex), offsetof(Vertex, position));
+	GX2RSetAttributeBuffer(&vertex_buffer, 1, sizeof(Vertex), offsetof(Vertex, texture));
 
 	// Draw
 	GX2DrawEx(GX2_PRIMITIVE_MODE_QUADS, 4, 0, 1);
@@ -513,46 +506,45 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBacke
 	// Make sure the buffers aren't currently being used before we modify them
 	GX2DrawDone();
 
+	Vertex *vertex_pointer = (Vertex*)GX2RLockBufferEx(&vertex_buffer, (GX2RResourceFlags)0);
+
 	// Set vertex position buffer
 	const float destination_left = x;
 	const float destination_top = y;
 	const float destination_right = x + (rect->right - rect->left);
 	const float destination_bottom = y + (rect->bottom - rect->top);
 
-	float *position_pointer = (float*)GX2RLockBufferEx(&vertex_position_buffer, (GX2RResourceFlags)0);
-	position_pointer[0] = destination_left;
-	position_pointer[1] = destination_top;
-	position_pointer[2] = destination_right;
-	position_pointer[3] = destination_top;
-	position_pointer[4] = destination_right;
-	position_pointer[5] = destination_bottom;
-	position_pointer[6] = destination_left;
-	position_pointer[7] = destination_bottom;
+	vertex_pointer[0].position.x = destination_left;
+	vertex_pointer[0].position.y = destination_top;
+	vertex_pointer[1].position.x = destination_right;
+	vertex_pointer[1].position.y = destination_top;
+	vertex_pointer[2].position.x = destination_right;
+	vertex_pointer[2].position.y = destination_bottom;
+	vertex_pointer[3].position.x = destination_left;
+	vertex_pointer[3].position.y = destination_bottom;
 
-	for (unsigned int i = 0; i < 8; i += 2)
+	for (unsigned int i = 0; i < 4; ++i)
 	{
-		position_pointer[i + 0] /= destination_surface->width;
-		position_pointer[i + 0] *= 2.0f;
-		position_pointer[i + 0] -= 1.0f;
+		vertex_pointer[i].position.x /= destination_surface->width;
+		vertex_pointer[i].position.x *= 2.0f;
+		vertex_pointer[i].position.x -= 1.0f;
 
-		position_pointer[i + 1] /= destination_surface->height;
-		position_pointer[i + 1] *= -2.0f;
-		position_pointer[i + 1] += 1.0f;
+		vertex_pointer[i].position.y /= destination_surface->height;
+		vertex_pointer[i].position.y *= -2.0f;
+		vertex_pointer[i].position.y += 1.0f;
 	}
 
-	GX2RUnlockBufferEx(&vertex_position_buffer, (GX2RResourceFlags)0);
-
 	// Set texture coordinate buffer
-	float *texture_coordinate_pointer = (float*)GX2RLockBufferEx(&texture_coordinate_buffer, (GX2RResourceFlags)0);
-	texture_coordinate_pointer[0] = rect->left / (float)source_surface->width;
-	texture_coordinate_pointer[1] = rect->top / (float)source_surface->height;
-	texture_coordinate_pointer[2] = rect->right / (float)source_surface->width;
-	texture_coordinate_pointer[3] = rect->top / (float)source_surface->height;
-	texture_coordinate_pointer[4] = rect->right / (float)source_surface->width;
-	texture_coordinate_pointer[5] = rect->bottom / (float)source_surface->height;
-	texture_coordinate_pointer[6] = rect->left / (float)source_surface->width;
-	texture_coordinate_pointer[7] = rect->bottom / (float)source_surface->height;
-	GX2RUnlockBufferEx(&texture_coordinate_buffer, (GX2RResourceFlags)0);
+	vertex_pointer[0].texture.x = rect->left / (float)source_surface->width;
+	vertex_pointer[0].texture.y = rect->top / (float)source_surface->height;
+	vertex_pointer[1].texture.x = rect->right / (float)source_surface->width;
+	vertex_pointer[1].texture.y = rect->top / (float)source_surface->height;
+	vertex_pointer[2].texture.x = rect->right / (float)source_surface->width;
+	vertex_pointer[2].texture.y = rect->bottom / (float)source_surface->height;
+	vertex_pointer[3].texture.x = rect->left / (float)source_surface->width;
+	vertex_pointer[3].texture.y = rect->bottom / (float)source_surface->height;
+
+	GX2RUnlockBufferEx(&vertex_buffer, (GX2RResourceFlags)0);
 
 	// Draw to the selected texture, instead of the screen
 	GX2SetColorBuffer(&destination_surface->colour_buffer, GX2_RENDER_TARGET_0);
@@ -570,8 +562,8 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBacke
 	// Bind misc. data
 	GX2SetPixelSampler(&sampler, shader->pixelShader->samplerVars[0].location);
 	GX2SetPixelTexture(&source_surface->texture, shader->pixelShader->samplerVars[0].location);
-	GX2RSetAttributeBuffer(&vertex_position_buffer, 0, vertex_position_buffer.elemSize, 0);
-	GX2RSetAttributeBuffer(&texture_coordinate_buffer, 1, texture_coordinate_buffer.elemSize, 0);
+	GX2RSetAttributeBuffer(&vertex_buffer, 0, sizeof(Vertex), offsetof(Vertex, position));
+	GX2RSetAttributeBuffer(&vertex_buffer, 1, sizeof(Vertex), offsetof(Vertex, texture));
 
 	// Draw
 	GX2DrawEx(GX2_PRIMITIVE_MODE_QUADS, 4, 0, 1);
@@ -585,29 +577,30 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 	// Make sure the buffers aren't currently being used before we modify them
 	GX2DrawDone();
 
+	Vertex *vertex_pointer = (Vertex*)GX2RLockBufferEx(&vertex_buffer, (GX2RResourceFlags)0);
+
 	// Set vertex position buffer
-	float *position_pointer = (float*)GX2RLockBufferEx(&vertex_position_buffer, (GX2RResourceFlags)0);
-	position_pointer[0] = rect->left;
-	position_pointer[1] = rect->top;
-	position_pointer[2] = rect->right;
-	position_pointer[3] = rect->top;
-	position_pointer[4] = rect->right;
-	position_pointer[5] = rect->bottom;
-	position_pointer[6] = rect->left;
-	position_pointer[7] = rect->bottom;
+	vertex_pointer[0].position.x = rect->left;
+	vertex_pointer[0].position.y = rect->top;
+	vertex_pointer[1].position.x = rect->right;
+	vertex_pointer[1].position.y = rect->top;
+	vertex_pointer[2].position.x = rect->right;
+	vertex_pointer[2].position.y = rect->bottom;
+	vertex_pointer[3].position.x = rect->left;
+	vertex_pointer[3].position.y = rect->bottom;
 
-	for (unsigned int i = 0; i < 8; i += 2)
+	for (unsigned int i = 0; i < 4; ++i)
 	{
-		position_pointer[i + 0] /= surface->width;
-		position_pointer[i + 0] *= 2.0f;
-		position_pointer[i + 0] -= 1.0f;
+		vertex_pointer[i].position.x /= surface->width;
+		vertex_pointer[i].position.x *= 2.0f;
+		vertex_pointer[i].position.x -= 1.0f;
 
-		position_pointer[i + 1] /= surface->height;
-		position_pointer[i + 1] *= -2.0f;
-		position_pointer[i + 1] += 1.0f;
+		vertex_pointer[i].position.y /= surface->height;
+		vertex_pointer[i].position.y *= -2.0f;
+		vertex_pointer[i].position.y += 1.0f;
 	}
 
-	GX2RUnlockBufferEx(&vertex_position_buffer, (GX2RResourceFlags)0);
+	GX2RUnlockBufferEx(&vertex_buffer, (GX2RResourceFlags)0);
 
 	// Draw to the selected texture, instead of the screen
 	GX2SetColorBuffer(&surface->colour_buffer, GX2_RENDER_TARGET_0);
@@ -624,7 +617,7 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 	GX2SetPixelShader(colour_fill_shader.pixelShader);
 
 	// Bind misc. data
-	GX2RSetAttributeBuffer(&vertex_position_buffer, 0, vertex_position_buffer.elemSize, 0);
+	GX2RSetAttributeBuffer(&vertex_buffer, 0, sizeof(Vertex), offsetof(Vertex, position));
 
 	// Draw
 	GX2DrawEx(GX2_PRIMITIVE_MODE_QUADS, 4, 0, 1);
@@ -720,46 +713,45 @@ void RenderBackend_DrawGlyph(RenderBackend_Glyph *glyph, long x, long y)
 	// Make sure the buffers aren't currently being used before we modify them
 	GX2DrawDone();
 
+	Vertex *vertex_pointer = (Vertex*)GX2RLockBufferEx(&vertex_buffer, (GX2RResourceFlags)0);
+
 	// Set vertex position buffer
 	const float destination_left = x;
 	const float destination_top = y;
 	const float destination_right = x + glyph->width;
 	const float destination_bottom = y + glyph->height;
 
-	float *position_pointer = (float*)GX2RLockBufferEx(&vertex_position_buffer, (GX2RResourceFlags)0);
-	position_pointer[0] = destination_left;
-	position_pointer[1] = destination_top;
-	position_pointer[2] = destination_right;
-	position_pointer[3] = destination_top;
-	position_pointer[4] = destination_right;
-	position_pointer[5] = destination_bottom;
-	position_pointer[6] = destination_left;
-	position_pointer[7] = destination_bottom;
+	vertex_pointer[0].position.x = destination_left;
+	vertex_pointer[0].position.y = destination_top;
+	vertex_pointer[1].position.x = destination_right;
+	vertex_pointer[1].position.y = destination_top;
+	vertex_pointer[2].position.x = destination_right;
+	vertex_pointer[2].position.y = destination_bottom;
+	vertex_pointer[3].position.x = destination_left;
+	vertex_pointer[3].position.y = destination_bottom;
 
-	for (unsigned int i = 0; i < 8; i += 2)
+	for (unsigned int i = 0; i < 4; ++i)
 	{
-		position_pointer[i + 0] /= glyph_destination_surface->width;
-		position_pointer[i + 0] *= 2.0f;
-		position_pointer[i + 0] -= 1.0f;
+		vertex_pointer[i].position.x /= glyph_destination_surface->width;
+		vertex_pointer[i].position.x *= 2.0f;
+		vertex_pointer[i].position.x -= 1.0f;
 
-		position_pointer[i + 1] /= glyph_destination_surface->height;
-		position_pointer[i + 1] *= -2.0f;
-		position_pointer[i + 1] += 1.0f;
+		vertex_pointer[i].position.y /= glyph_destination_surface->height;
+		vertex_pointer[i].position.y *= -2.0f;
+		vertex_pointer[i].position.y += 1.0f;
 	}
 
-	GX2RUnlockBufferEx(&vertex_position_buffer, (GX2RResourceFlags)0);
-
 	// Set texture coordinate buffer
-	float *texture_coordinate_pointer = (float*)GX2RLockBufferEx(&texture_coordinate_buffer, (GX2RResourceFlags)0);
-	texture_coordinate_pointer[0] = 0.0f;
-	texture_coordinate_pointer[1] = 0.0f;
-	texture_coordinate_pointer[2] = 1.0f;
-	texture_coordinate_pointer[3] = 0.0f;
-	texture_coordinate_pointer[4] = 1.0f;
-	texture_coordinate_pointer[5] = 1.0f;
-	texture_coordinate_pointer[6] = 0.0f;
-	texture_coordinate_pointer[7] = 1.0f;
-	GX2RUnlockBufferEx(&texture_coordinate_buffer, (GX2RResourceFlags)0);
+	vertex_pointer[0].texture.x = 0.0f;
+	vertex_pointer[0].texture.y = 0.0f;
+	vertex_pointer[1].texture.x = 1.0f;
+	vertex_pointer[1].texture.y = 0.0f;
+	vertex_pointer[2].texture.x = 1.0f;
+	vertex_pointer[2].texture.y = 1.0f;
+	vertex_pointer[3].texture.x = 0.0f;
+	vertex_pointer[3].texture.y = 1.0f;
+
+	GX2RUnlockBufferEx(&vertex_buffer, (GX2RResourceFlags)0);
 
 	// Draw to the selected texture, instead of the screen
 	GX2SetColorBuffer(&glyph_destination_surface->colour_buffer, GX2_RENDER_TARGET_0);
@@ -774,8 +766,8 @@ void RenderBackend_DrawGlyph(RenderBackend_Glyph *glyph, long x, long y)
 	// Bind misc. data
 	GX2SetPixelSampler(&sampler, glyph_shader.pixelShader->samplerVars[0].location);
 	GX2SetPixelTexture(&glyph->texture, glyph_shader.pixelShader->samplerVars[0].location);
-	GX2RSetAttributeBuffer(&vertex_position_buffer, 0, vertex_position_buffer.elemSize, 0);
-	GX2RSetAttributeBuffer(&texture_coordinate_buffer, 1, texture_coordinate_buffer.elemSize, 0);
+	GX2RSetAttributeBuffer(&vertex_buffer, 0, sizeof(Vertex), offsetof(Vertex, position));
+	GX2RSetAttributeBuffer(&vertex_buffer, 1, sizeof(Vertex), offsetof(Vertex, texture));
 
 	// Draw
 	GX2DrawEx(GX2_PRIMITIVE_MODE_QUADS, 4, 0, 1);
