@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.8)
 
+if((${CMAKE_VERSION} VERSION_EQUAL 3.9) OR (${CMAKE_VERSION} VERSION_GREATER 3.9))
+	cmake_policy(SET CMP0069 NEW)
+endif()
+
 
 #############
 # Constants #
