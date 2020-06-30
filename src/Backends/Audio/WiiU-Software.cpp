@@ -236,6 +236,8 @@ bool AudioBackend_Init(void)
 		free(stream_buffer_long);
 	}
 
+	AXQuit();
+
 	return false;
 }
 
@@ -246,6 +248,8 @@ void AudioBackend_Deinit(void)
 		AXFreeVoice(voices[i]);
 		free(stream_buffers[i]);
 	}
+
+	free(stream_buffer_long);
 
 	AXQuit();
 }
