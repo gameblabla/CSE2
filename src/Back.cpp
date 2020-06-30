@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 #include <stdio.h>
+#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -25,14 +26,14 @@ BOOL InitBack(const char *fName, int type)
 	color_black = GetCortBoxColor(RGB(0, 0, 0x10));
 
 	// Get width and height
-	char path[MAX_PATH];
+	std::string path;
 
 	FILE *fp = NULL;
 	const char *bmp_file_extensions[] = {"pbm", "bmp"};
 	for (size_t i = 0; i < sizeof(bmp_file_extensions) / sizeof(bmp_file_extensions[0]) && fp == NULL; ++i)
 	{
-		sprintf(path, "%s/%s.%s", gDataPath, fName, bmp_file_extensions[i]);
-		fp = fopen(path, "rb");
+		path = gDataPath + '/' + fName + '.' + bmp_file_extensions[i];
+		fp = fopen(path.c_str(), "rb");
 	}
 
 	if (fp != NULL)
@@ -51,8 +52,8 @@ BOOL InitBack(const char *fName, int type)
 	}
 	else
 	{
-		sprintf(path, "%s/%s.png", gDataPath, fName);
-		fp = fopen(path, "rb");
+		path = gDataPath + '/' + fName + ".png";
+		fp = fopen(path.c_str(), "rb");
 
 		if (fp == NULL)
 			return FALSE;

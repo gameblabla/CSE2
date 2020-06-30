@@ -1,5 +1,7 @@
 #include "Input.h"
 
+#include <stddef.h>
+
 #include "Backends/Controller.h"
 
 #include "WindowsWrapper.h"

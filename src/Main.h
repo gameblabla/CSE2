@@ -1,12 +1,14 @@
 #pragma once
 
+#include <string>
+
 #include "WindowsWrapper.h"
 
 #include "Config.h"
 #include "Input.h"
 
-extern char gModulePath[MAX_PATH];
-extern char gDataPath[MAX_PATH];
+extern std::string gModulePath;
+extern std::string gDataPath;
 
 extern BOOL bFullscreen;
 extern BOOL gbUseJoystick;

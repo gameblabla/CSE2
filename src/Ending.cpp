@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -191,9 +192,10 @@ void PutIllust(void)
 // Load illustration
 void ReloadIllust(int a)
 {
-	char path[MAX_PATH];
-	sprintf(path, "Resource/BITMAP/Credit%02d", a);
-	ReloadBitmap_File(path, SURFACE_ID_CREDITS_IMAGE);
+	char name[16];
+	sprintf(name, "CREDIT%02d", a);
+	std::string path = std::string{"Resource/BITMAP/"} + name;
+	ReloadBitmap_File(path.c_str(), SURFACE_ID_CREDITS_IMAGE);
 }
 
 const char *credit_script = "Credit.tsc";
@@ -220,7 +222,7 @@ void ReleaseCreditScript(void)
 BOOL StartCreditScript(void)
 {
 	FILE *fp;
-	char path[MAX_PATH];
+	std::string path;
 
 	// Clear previously existing credits data
 	if (Credit.pData != NULL)
@@ -230,9 +232,9 @@ BOOL StartCreditScript(void)
 	}
 
 	// Open file
-	sprintf(path, "%s/%s", gDataPath, credit_script);
+	path = gDataPath + '/' + credit_script;
 
-	Credit.size = GetFileSizeLong(path);
+	Credit.size = GetFileSizeLong(path.c_str());
 	if (Credit.size == -1)
 		return FALSE;
 
@@ -241,7 +243,7 @@ BOOL StartCreditScript(void)
 	if (Credit.pData == NULL)
 		return FALSE;
 
-	fp = fopen(path, "rb");
+	fp = fopen(path.c_str(), "rb");
 	if (fp == NULL)
 	{
 		free(Credit.pData);

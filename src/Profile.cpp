@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -30,10 +31,9 @@ const char* const gProfileCodeExtra = "CSE2E   20200304";
 
 BOOL IsProfile(void)
 {
-	char path[MAX_PATH];
-	sprintf(path, "%s/%s", gModulePath, gDefaultName);
+	std::string path = gModulePath + '/' + gDefaultName;
 
-	FILE *file = fopen(path, "rb");
+	FILE *file = fopen(path.c_str(), "rb");
 	if (file == NULL)
 		return FALSE;
 
@@ -47,16 +47,16 @@ BOOL SaveProfile(const char *name)
 	PROFILE profile;
 	const char *FLAG = "FLAG";
 
-	char path[MAX_PATH];
+	std::string path;
 
 	// Get path
 	if (name != NULL)
-		sprintf(path, "%s/%s", gModulePath, name);
+		path = gModulePath + '/' + name;
 	else
-		sprintf(path, "%s/%s", gModulePath, gDefaultName);
+		path = gModulePath + '/' + gDefaultName;
 
 	// Open file
-	fp = fopen(path, "wb");
+	fp = fopen(path.c_str(), "wb");
 	if (fp == NULL)
 		return FALSE;
 
@@ -152,16 +152,16 @@ BOOL LoadProfile(const char *name)
 {
 	FILE *fp;
 	PROFILE profile;
-	char path[MAX_PATH];
+	std::string path;
 
 	// Get path
 	if (name != NULL)
-		sprintf(path, "%s", name);
+		path = name;
 	else
-		sprintf(path, "%s/%s", gModulePath, gDefaultName);
+		path = gModulePath + '/' + gDefaultName;
 
 	// Open file
-	fp = fopen(path, "rb");
+	fp = fopen(path.c_str(), "rb");
 	if (fp == NULL)
 		return FALSE;
 

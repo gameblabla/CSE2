@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -29,8 +30,8 @@
 #include "Sound.h"
 #include "Triangle.h"
 
-char gModulePath[MAX_PATH];
-char gDataPath[MAX_PATH];
+std::string gModulePath;
+std::string gDataPath;
 
 BOOL bFullscreen;
 
@@ -91,24 +92,23 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 
 	// Get executable's path
-	if (!Backend_GetBasePath(gModulePath))
+	if (!Backend_GetBasePath(&gModulePath))
 	{
 		// Fall back on argv[0] if the backend cannot provide a path
-		strcpy(gModulePath, argv[0]);
+		gModulePath = argv[0];
 
-		for (size_t i = strlen(gModulePath);; --i)
+		for (size_t i = gModulePath.length();; --i)
 		{
 			if (i == 0 || gModulePath[i] == '\\' || gModulePath[i] == '/')
 			{
-				gModulePath[i] = '\0';
+				gModulePath.resize(i);
 				break;
 			}
 		}
 	}
 
 	// Get path of the data folder
-	strcpy(gDataPath, gModulePath);
-	strcat(gDataPath, "/data");
+	gDataPath = gModulePath + "/data";
 
 	CONFIG conf;
 	if (!LoadConfigData(&conf))
@@ -181,11 +181,10 @@ int main(int argc, char *argv[])
 #endif
 
 	// Set up the cursor
-	char cursor_path[MAX_PATH];
-	sprintf(cursor_path, "%s/Resource/CURSOR/CURSOR_NORMAL.png", gDataPath);
+	std::string cursor_path = gDataPath + "/Resource/CURSOR/CURSOR_NORMAL.png";
 
 	unsigned int cursor_width, cursor_height;
-	unsigned char *cursor_rgba_pixels = DecodeBitmapWithAlphaFromFile(cursor_path, &cursor_width, &cursor_height, FALSE);
+	unsigned char *cursor_rgba_pixels = DecodeBitmapWithAlphaFromFile(cursor_path.c_str(), &cursor_width, &cursor_height, FALSE);
 
 	if (cursor_rgba_pixels != NULL)
 	{

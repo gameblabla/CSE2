@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -251,15 +252,14 @@ BOOL LoadGenericData(void)
 
 	for (unsigned int i = 0; i < sizeof(ptp_table) / sizeof(ptp_table[0]); ++i)
 	{
-		char path[MAX_PATH];
-		sprintf(path, "%s/%s", gDataPath, ptp_table[i].path);
+		std::string path = gDataPath + '/' + ptp_table[i].path;
 
 		switch (ptp_table[i].type)
 		{
 			case SOUND_TYPE_PIXTONE:
 				PIXTONEPARAMETER pixtone_parameters[4];
 
-				if (LoadPixToneFile(path, pixtone_parameters))
+				if (LoadPixToneFile(path.c_str(), pixtone_parameters))
 				{
 					int ptp_num = 0;
 					while (pixtone_parameters[ptp_num].use && ptp_num < 4)
@@ -272,14 +272,15 @@ BOOL LoadGenericData(void)
 
 #ifdef EXTRA_SOUND_FORMATS
 			case SOUND_TYPE_OTHER:
-				ExtraSound_LoadSFX(path, ptp_table[i].slot);
+				ExtraSound_LoadSFX(path.c_str(), ptp_table[i].slot);
 				break;
 #endif
 		}
 	}
 
-	char str[0x40];
-	sprintf(str, "PixTone = %d byte", pt_size);
+	// Commented-out, since ints *technically* have an undefined length
+	// char str[0x40];
+	// sprintf(str, "PixTone = %d byte", pt_size);
 	// There must have been some kind of console print function here or something
 	return TRUE;
 }

@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -799,10 +800,9 @@ BOOL Game(void)
 
 	PlaySoundObject(7, -1);
 
-	char path[MAX_PATH];
-	sprintf(path, "%s/npc.tbl", gDataPath);
+	std::string path = gDataPath + "/npc.tbl";
 
-	if (!LoadNpcTable(path))
+	if (!LoadNpcTable(path.c_str()))
 	{
 #ifdef JAPANESE
 		Backend_ShowMessageBox("エラー", "NPCテーブルが読めない");
