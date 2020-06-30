@@ -1,6 +1,7 @@
 #include "ArmsItem.h"
 
 #include <string.h>
+#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -414,10 +415,12 @@ void PutCampObject(void)
 
 int CampLoop(void)
 {
+	std::string old_script_path;
+
 	RECT rcView = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
 	// Save the current script path (to restore it when we get out of the inventory)
-	auto old_script_path = GetTextScriptPath();
+	old_script_path = GetTextScriptPath();
 
 	// Load the inventory script
 	LoadTextScript2("ArmsItem.tsc");
@@ -448,10 +451,10 @@ int CampLoop(void)
 			switch (Call_Escape())
 			{
 				case enum_ESCRETURN_exit:
-					return enum_ESCRETURN_exit;
+					return enum_ESCRETURN_exit;	// Quit game
 
 				case enum_ESCRETURN_restart:
-					return enum_ESCRETURN_restart;
+					return enum_ESCRETURN_restart;	// Go to game intro
 			}
 		}
 
@@ -461,10 +464,10 @@ int CampLoop(void)
 		switch (TextScriptProc())
 		{
 			case enum_ESCRETURN_exit:
-				return enum_ESCRETURN_exit;
+				return enum_ESCRETURN_exit;	// Quit game
 
 			case enum_ESCRETURN_restart:
-				return enum_ESCRETURN_restart;
+				return enum_ESCRETURN_restart;	// Go to game intro
 		}
 
 		// Get currently displayed image
@@ -492,13 +495,13 @@ int CampLoop(void)
 		}
 
 		if (!Flip_SystemTask())
-			return enum_ESCRETURN_exit;
+			return enum_ESCRETURN_exit;	// Quit game
 	}
 
 	// Resume original script
 	LoadTextScript_Stage(old_script_path.c_str());
 	gArmsEnergyX = 32; // Displays weapon rotation animation in case the weapon was changed
-	return enum_ESCRETURN_continue;
+	return enum_ESCRETURN_continue;	// Go to game
 }
 
 BOOL CheckItem(long a)
