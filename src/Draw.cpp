@@ -653,6 +653,17 @@ void InitTextObject(const char *name)
 
 	switch (mag)
 	{
+#ifdef JAPANESE
+		case 1:
+			height = 12;
+			width = 12;
+			break;
+
+		case 2:
+			height = 20;
+			width = 20;
+			break;
+#else
 		case 1:
 			height = 10;
 			width = 9;
@@ -660,8 +671,9 @@ void InitTextObject(const char *name)
 
 		case 2:
 			height = 18;
-			width = 16;
+			width = 17;
 			break;
+#endif
 	}
 
 	font = LoadFont(path.c_str(), width, height);
