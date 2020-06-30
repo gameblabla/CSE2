@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 #include <thread>
 
 #include <GLFW/glfw3.h>
@@ -181,7 +182,7 @@ void Backend_PostWindowCreation(void)
 	glfwSetWindowSizeCallback(window, WindowSizeCallback);
 }
 
-bool Backend_GetBasePath(char *string_buffer)
+bool Backend_GetBasePath(std::string *string_buffer)
 {
 	(void)string_buffer;
 

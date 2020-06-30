@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 #include <stdio.h>
+#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -25,10 +26,9 @@ BOOL InitBack(const char *fName, int type)
 	color_black = GetCortBoxColor(RGB(0, 0, 0x10));
 
 	// Get width and height
-	char path[MAX_PATH];
-	sprintf(path, "%s/%s.pbm", gDataPath, fName);
+	std::string path = gDataPath + '/' + fName + ".pbm";
 
-	FILE *fp = fopen(path, "rb");
+	FILE *fp = fopen(path.c_str(), "rb");
 	if (fp == NULL)
 		return FALSE;
 

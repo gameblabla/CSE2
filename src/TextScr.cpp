@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -124,17 +125,17 @@ void EncryptionBinaryData2(unsigned char *pData, long size)
 BOOL LoadTextScript2(const char *name)
 {
 	FILE *fp;
-	char path[MAX_PATH];
+	std::string path;
 
 	// Get path
-	sprintf(path, "%s/%s", gDataPath, name);
+	path = gDataPath + '/' + name;
 
-	gTS.size = GetFileSizeLong(path);
+	gTS.size = GetFileSizeLong(path.c_str());
 	if (gTS.size == -1)
 		return FALSE;
 
 	// Open file
-	fp = fopen(path, "rb");
+	fp = fopen(path.c_str(), "rb");
 	if (fp == NULL)
 		return FALSE;
 
@@ -144,7 +145,7 @@ BOOL LoadTextScript2(const char *name)
 	fclose(fp);
 
 	// Set path
-	strcpy(gTS.path, name);
+	gTS.path = name;
 
 	// Decrypt data
 	EncryptionBinaryData2((unsigned char*)gTS.data, gTS.size);
@@ -156,18 +157,18 @@ BOOL LoadTextScript2(const char *name)
 BOOL LoadTextScript_Stage(const char *name)
 {
 	FILE *fp;
-	char path[MAX_PATH];
+	std::string path;
 	long head_size;
 	long body_size;
 
 	// Open Head.tsc
-	sprintf(path, "%s/%s", gDataPath, "Head.tsc");
+	path = gDataPath + "/Head.tsc";
 
-	head_size = GetFileSizeLong(path);
+	head_size = GetFileSizeLong(path.c_str());
 	if (head_size == -1)
 		return FALSE;
 
-	fp = fopen(path, "rb");
+	fp = fopen(path.c_str(), "rb");
 	if (fp == NULL)
 		return FALSE;
 
@@ -178,13 +179,13 @@ BOOL LoadTextScript_Stage(const char *name)
 	fclose(fp);
 
 	// Open stage's .tsc
-	sprintf(path, "%s/%s", gDataPath, name);
+	path = gDataPath + '/' + name;
 
-	body_size = GetFileSizeLong(path);
+	body_size = GetFileSizeLong(path.c_str());
 	if (body_size == -1)
 		return FALSE;
 
-	fp = fopen(path, "rb");
+	fp = fopen(path.c_str(), "rb");
 	if (fp == NULL)
 		return FALSE;
 
@@ -196,15 +197,15 @@ BOOL LoadTextScript_Stage(const char *name)
 
 	// Set parameters
 	gTS.size = head_size + body_size;
-	strcpy(gTS.path, name);
+	gTS.path = name;
 
 	return TRUE;
 }
 
 // Get current path
-void GetTextScriptPath(char *path)
+std::string GetTextScriptPath(void)
 {
-	strcpy(path, gTS.path);
+	return gTS.path;
 }
 
 // Get 4 digit number from TSC data

@@ -1,5 +1,7 @@
 #include "../Misc.h"
 
+#include <string>
+
 bool Backend_Init(void)
 {
 	return true;
@@ -15,7 +17,7 @@ void Backend_PostWindowCreation(void)
 	
 }
 
-bool Backend_GetBasePath(char *string_buffer)
+bool Backend_GetBasePath(std::string *string_buffer)
 {
 	(void)string_buffer;
 

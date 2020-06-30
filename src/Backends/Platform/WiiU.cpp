@@ -3,6 +3,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
+#include <string>
 
 #include <coreinit/thread.h>
 #include <padscore/kpad.h>
@@ -54,13 +55,13 @@ void Backend_PostWindowCreation(void)
 	
 }
 
-bool Backend_GetBasePath(char *string_buffer)
+bool Backend_GetBasePath(std::string *string_buffer)
 {
-	strcpy(string_buffer, WHBGetSdCardMountPath());
+	*string_buffer = WHBGetSdCardMountPath();
 #ifdef JAPANESE
-	strcat(string_buffer, "/CSE2-portable-jp");
+	*string_buffer += "/CSE2-portable-jp";
 #else
-	strcat(string_buffer, "/CSE2-portable-en");
+	*string_buffer += "/CSE2-portable-en";
 #endif
 
 	return true;

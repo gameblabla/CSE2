@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -250,12 +251,11 @@ BOOL MakeSurface_Resource(const char *name, SurfaceID surf_no)
 // TODO - Inaccurate stack frame
 BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 {
-	char path[MAX_PATH];
-	sprintf(path, "%s/%s.pbm", gDataPath, name);
+	std::string path = gDataPath + '/' + name + ".pbm";
 
-	if (!IsEnableBitmap(path))
+	if (!IsEnableBitmap(path.c_str()))
 	{
-		ErrorLog(path, 0);
+		ErrorLog(path.c_str(), 0);
 		return FALSE;
 	}
 
@@ -276,11 +276,11 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 	}
 
 	unsigned int width, height;
-	unsigned char *image_buffer = DecodeBitmapFromFile(path, &width, &height);
+	unsigned char *image_buffer = DecodeBitmapFromFile(path.c_str(), &width, &height);
 
 	if (image_buffer == NULL)
 	{
-		ErrorLog(path, 1);
+		ErrorLog(path.c_str(), 1);
 		return FALSE;
 	}
 
@@ -341,12 +341,11 @@ BOOL ReloadBitmap_Resource(const char *name, SurfaceID surf_no)
 // TODO - Inaccurate stack frame
 BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 {
-	char path[MAX_PATH];
-	sprintf(path, "%s/%s.pbm", gDataPath, name);
+	std::string path = gDataPath + '/' + name + ".pbm";
 
-	if (!IsEnableBitmap(path))
+	if (!IsEnableBitmap(path.c_str()))
 	{
-		ErrorLog(path, 0);
+		ErrorLog(path.c_str(), 0);
 		return FALSE;
 	}
 
@@ -361,11 +360,11 @@ BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 	}
 
 	unsigned int width, height;
-	unsigned char *image_buffer = DecodeBitmapFromFile(path, &width, &height);
+	unsigned char *image_buffer = DecodeBitmapFromFile(path.c_str(), &width, &height);
 
 	if (image_buffer == NULL)
 	{
-		ErrorLog(path, 1);
+		ErrorLog(path.c_str(), 1);
 		return FALSE;
 	}
 
@@ -647,8 +646,7 @@ void InitTextObject(const char *name)
 {
 	(void)name;	// Unused in this branch
 
-	char path[MAX_PATH];
-	sprintf(path, "%s/Font/font", gDataPath);
+	std::string path = gDataPath + "/Font/font";
 
 	// Get font size
 	unsigned int width, height;
@@ -666,7 +664,7 @@ void InitTextObject(const char *name)
 			break;
 	}
 
-	font = LoadFont(path, width, height);
+	font = LoadFont(path.c_str(), width, height);
 }
 
 void PutText(int x, int y, const char *text, unsigned long color)

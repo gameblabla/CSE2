@@ -1,11 +1,13 @@
 #pragma once
 
+#include <string>
+
 #include "WindowsWrapper.h"
 
 typedef struct TEXT_SCRIPT
 {
 	// Path (reload when exit teleporter menu/inventory)
-	char path[MAX_PATH];
+	std::string path;
 
 	// Script buffer
 	long size;
@@ -62,7 +64,7 @@ void EndTextScript(void);
 void EncryptionBinaryData2(unsigned char *pData, long size);
 BOOL LoadTextScript2(const char *name);
 BOOL LoadTextScript_Stage(const char *name);
-void GetTextScriptPath(char *path);
+std::string GetTextScriptPath(void);
 BOOL StartTextScript(int no);
 void StopTextScript(void);
 void PutTextScript(void);

@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -131,8 +132,8 @@ const STAGE_TABLE gTMT[95] = {
 
 BOOL TransferStage(int no, int w, int x, int y)
 {
-	char path[MAX_PATH];
-	char path_dir[20];
+	std::string path;
+	std::string path_dir;
 	BOOL bError;
 
 	// Move character
@@ -141,47 +142,47 @@ BOOL TransferStage(int no, int w, int x, int y)
 	bError = FALSE;
 
 	// Get path
-	strcpy(path_dir, "Stage");
+	path_dir = "Stage";
 
 	// Load tileset
-	sprintf(path, "%s/Prt%s", path_dir, gTMT[no].parts);
-	if (!ReloadBitmap_File(path, SURFACE_ID_LEVEL_TILESET))
+	path = path_dir + "/Prt" + gTMT[no].parts;
+	if (!ReloadBitmap_File(path.c_str(), SURFACE_ID_LEVEL_TILESET))
 		bError = TRUE;
 
-	sprintf(path, "%s/%s.pxa", path_dir, gTMT[no].parts);
-	if (!LoadAttributeData(path))
+	path = path_dir + '/' + gTMT[no].parts + ".pxa";
+	if (!LoadAttributeData(path.c_str()))
 		bError = TRUE;
 
 	// Load tilemap
-	sprintf(path, "%s/%s.pxm", path_dir, gTMT[no].map);
-	if (!LoadMapData2(path))
+	path = path_dir + '/' + gTMT[no].map + ".pxm";
+	if (!LoadMapData2(path.c_str()))
 		bError = TRUE;
 
 	// Load NPCs
-	sprintf(path, "%s/%s.pxe", path_dir, gTMT[no].map);
-	if (!LoadEvent(path))
+	path = path_dir + '/' + gTMT[no].map + ".pxe";
+	if (!LoadEvent(path.c_str()))
 		bError = TRUE;
 
 	// Load script
-	sprintf(path, "%s/%s.tsc", path_dir, gTMT[no].map);
-	if (!LoadTextScript_Stage(path))
+	path = path_dir + '/' + gTMT[no].map + ".tsc";
+	if (!LoadTextScript_Stage(path.c_str()))
 		bError = TRUE;
 
 	// Load background
-	sprintf(path, "%s", gTMT[no].back);
-	if (!InitBack(path, gTMT[no].bkType))
+	path = gTMT[no].back;
+	if (!InitBack(path.c_str(), gTMT[no].bkType))
 		bError = TRUE;
 
 	// Get path
-	strcpy(path_dir, "Npc");
+	path_dir = "Npc";
 
 	// Load NPC sprite sheets
-	sprintf(path, "%s/Npc%s", path_dir, gTMT[no].npc);
-	if (!ReloadBitmap_File(path, SURFACE_ID_LEVEL_SPRITESET_1))
+	path = path_dir + "/Npc" + gTMT[no].npc;
+	if (!ReloadBitmap_File(path.c_str(), SURFACE_ID_LEVEL_SPRITESET_1))
 		bError = TRUE;
 
-	sprintf(path, "%s/Npc%s", path_dir, gTMT[no].boss);
-	if (!ReloadBitmap_File(path, SURFACE_ID_LEVEL_SPRITESET_2))
+	path = path_dir + "/Npc" + gTMT[no].boss;
+	if (!ReloadBitmap_File(path.c_str(), SURFACE_ID_LEVEL_SPRITESET_2))
 		bError = TRUE;
 
 	if (bError)

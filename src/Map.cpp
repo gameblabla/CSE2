@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -29,13 +30,13 @@ BOOL LoadMapData2(const char *path_map)
 {
 	FILE *fp;
 	char check[3];
-	char path[MAX_PATH];
+	std::string path;
 
 	// Get path
-	sprintf(path, "%s/%s", gDataPath, path_map);
+	path = gDataPath + '/' + path_map;
 
 	// Open file
-	fp = fopen(path, "rb");
+	fp = fopen(path.c_str(), "rb");
 	if (fp == NULL)
 		return FALSE;
 
@@ -69,12 +70,12 @@ BOOL LoadMapData2(const char *path_map)
 BOOL LoadAttributeData(const char *path_atrb)
 {
 	FILE *fp;
-	char path[MAX_PATH];
+	std::string path;
 
 	// Open file
-	sprintf(path, "%s/%s", gDataPath, path_atrb);
+	path = gDataPath + '/' + path_atrb;
 
-	fp = fopen(path, "rb");
+	fp = fopen(path.c_str(), "rb");
 	if (fp == NULL)
 		return FALSE;
 
