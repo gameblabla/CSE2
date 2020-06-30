@@ -1,7 +1,8 @@
 #pragma once
 
-#include "../Attributes.h"
 #include <string>
+
+#include "../Attributes.h"
 
 enum
 {

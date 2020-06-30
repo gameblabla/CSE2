@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -216,6 +217,7 @@ void ReleaseCreditScript(void)
 BOOL StartCreditScript(void)
 {
 	FILE *fp;
+	std::string path;
 
 	// Clear previously existing credits data
 	if (Credit.pData != NULL)
@@ -225,7 +227,8 @@ BOOL StartCreditScript(void)
 	}
 
 	// Open file
-	auto path = gDataPath + '/' + credit_script;
+	path = gDataPath + '/' + credit_script;
+
 	Credit.size = GetFileSizeLong(path.c_str());
 	if (Credit.size == -1)
 		return FALSE;

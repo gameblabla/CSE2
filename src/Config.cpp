@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -17,7 +18,9 @@ BOOL LoadConfigData(CONFIG *conf)
 	memset(conf, 0, sizeof(CONFIG));
 
 	// Open file
-	FILE *fp = fopen((gModulePath + '/' + gConfigName).c_str(), "rb");
+	std::string path = gModulePath + '/' + gConfigName;
+
+	FILE *fp = fopen(path.c_str(), "rb");
 	if (fp == NULL)
 		return FALSE;
 

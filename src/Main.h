@@ -1,7 +1,8 @@
 #pragma once
 
-#include "WindowsWrapper.h"
 #include <string>
+
+#include "WindowsWrapper.h"
 
 extern std::string gModulePath;
 extern std::string gDataPath;

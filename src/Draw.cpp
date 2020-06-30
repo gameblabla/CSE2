@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -250,7 +251,7 @@ BOOL MakeSurface_Resource(const char *name, SurfaceID surf_no)
 // TODO - Inaccurate stack frame
 BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 {
-	auto path = gDataPath + '/' + name + ".pbm";
+	std::string path = gDataPath + '/' + name + ".pbm";
 
 	if (!IsEnableBitmap(path.c_str()))
 	{
@@ -340,7 +341,7 @@ BOOL ReloadBitmap_Resource(const char *name, SurfaceID surf_no)
 // TODO - Inaccurate stack frame
 BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 {
-	auto path = gDataPath + '/' + name + ".pbm";
+	std::string path = gDataPath + '/' + name + ".pbm";
 
 	if (!IsEnableBitmap(path.c_str()))
 	{
@@ -376,6 +377,7 @@ BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 	FreeBitmap(image_buffer);
 	surface_metadata[surf_no].type = SURFACE_SOURCE_FILE;
 	strcpy(surface_metadata[surf_no].name, name);
+
 	return TRUE;
 }
 
@@ -644,6 +646,8 @@ void InitTextObject(const char *name)
 {
 	(void)name;	// Unused in this branch
 
+	std::string path = gDataPath + "/Font/font";
+
 	// Get font size
 	unsigned int width, height;
 
@@ -660,7 +664,7 @@ void InitTextObject(const char *name)
 			break;
 	}
 
-	font = LoadFont((gDataPath + "/Font/font").c_str(), width, height);
+	font = LoadFont(path.c_str(), width, height);
 }
 
 void PutText(int x, int y, const char *text, unsigned long color)

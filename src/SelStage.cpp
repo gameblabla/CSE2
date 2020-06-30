@@ -1,6 +1,7 @@
 #include "SelStage.h"
 
 #include <string.h>
+#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -156,11 +157,13 @@ void PutStageSelectObject(void)
 
 int StageSelectLoop(int *p_event)
 {
+	std::string old_script_path;
+
 	RECT rcView = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
 	gSelectedStage = 0;
 	BackupSurface(SURFACE_ID_SCREEN_GRAB, &grcFull);
-	auto old_script_path = GetTextScriptPath();
+	old_script_path = GetTextScriptPath();
 	LoadTextScript2("StageSelect.tsc");
 	gStageSelectTitleY = (WINDOW_HEIGHT / 2) - 66;
 	StartTextScript(gPermitStage[gSelectedStage].index + 1000);

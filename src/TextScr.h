@@ -1,7 +1,8 @@
 #pragma once
 
-#include "WindowsWrapper.h"
 #include <string>
+
+#include "WindowsWrapper.h"
 
 typedef struct TEXT_SCRIPT
 {
@@ -63,7 +64,7 @@ void EndTextScript(void);
 void EncryptionBinaryData2(unsigned char *pData, long size);
 BOOL LoadTextScript2(const char *name);
 BOOL LoadTextScript_Stage(const char *name);
-std::string GetTextScriptPath();
+std::string GetTextScriptPath(void);
 BOOL StartTextScript(int no);
 void StopTextScript(void);
 void PutTextScript(void);

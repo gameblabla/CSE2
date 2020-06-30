@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -49,12 +50,18 @@ BOOL GetCompileVersion(int *v1, int *v2, int *v3, int *v4)
 
 void DeleteLog(void)
 {
-	remove((gModulePath + "/debug.txt").c_str());
+	std::string path = gModulePath + "/debug.txt";
+	remove(path.c_str());
 }
 
 BOOL WriteLog(const char *string, int value1, int value2, int value3)
 {
-	FILE *fp = fopen((gModulePath + "/debug.txt").c_str(), "a+");
+	std::string path;
+	FILE *fp;
+
+	path = gModulePath + "/debug.txt";
+	fp = fopen(path.c_str(), "a+");
+
 	if (fp == NULL)
 		return FALSE;
 
@@ -65,7 +72,10 @@ BOOL WriteLog(const char *string, int value1, int value2, int value3)
 
 BOOL IsKeyFile(const char *name)
 {
-	FILE *file = fopen((gModulePath + '/' + name).c_str(), "rb");
+	std::string path = gModulePath + '/' + name;
+
+	FILE *file = fopen(path.c_str(), "rb");
+
 	if (file == NULL)
 		return FALSE;
 
@@ -93,12 +103,15 @@ long GetFileSizeLong(const char *path)
 
 BOOL ErrorLog(const char *string, int value)
 {
-	auto path = gModulePath + "/error.log";
+	std::string path;
+	FILE *fp;
+
+	path = gModulePath + "/error.log";
 
 	if (GetFileSizeLong(path.c_str()) > 0x19000)	// Purge the error log if it gets too big, I guess
 		remove(path.c_str());
 
-	FILE *fp = fopen(path.c_str(), "a+");
+	fp = fopen(path.c_str(), "a+");
 	if (fp == NULL)
 		return FALSE;
 

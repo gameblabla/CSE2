@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -124,9 +125,10 @@ void EncryptionBinaryData2(unsigned char *pData, long size)
 BOOL LoadTextScript2(const char *name)
 {
 	FILE *fp;
+	std::string path;
 
 	// Get path
-	auto path = gDataPath + '/' + name;
+	path = gDataPath + '/' + name;
 
 	gTS.size = GetFileSizeLong(path.c_str());
 	if (gTS.size == -1)
@@ -155,11 +157,13 @@ BOOL LoadTextScript2(const char *name)
 BOOL LoadTextScript_Stage(const char *name)
 {
 	FILE *fp;
+	std::string path;
 	long head_size;
 	long body_size;
 
 	// Open Head.tsc
-	auto path = gDataPath + "/Head.tsc";
+	path = gDataPath + "/Head.tsc";
+
 	head_size = GetFileSizeLong(path.c_str());
 	if (head_size == -1)
 		return FALSE;
@@ -176,6 +180,7 @@ BOOL LoadTextScript_Stage(const char *name)
 
 	// Open stage's .tsc
 	path = gDataPath + '/' + name;
+
 	body_size = GetFileSizeLong(path.c_str());
 	if (body_size == -1)
 		return FALSE;
@@ -198,7 +203,7 @@ BOOL LoadTextScript_Stage(const char *name)
 }
 
 // Get current path
-std::string GetTextScriptPath()
+std::string GetTextScriptPath(void)
 {
 	return gTS.path;
 }
@@ -1277,13 +1282,11 @@ int TextScriptProc(void)
 					}
 					else
 					{
-						// The size of str_0 is the size of the format string (includes null terminator so that's the space we'll be using for ours) + the 3 chars from the format string
+						char str_0[0x40];
 						#ifdef JAPANESE
-						char str_0[sizeof("不明のコード:<") + (sizeof(char) * 3)];
 						sprintf(str_0, "不明のコード:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);
 						Backend_ShowMessageBox("エラー", str_0);
 						#else
-						char str_0[sizeof("Unknown code:<%c%c%c") + (sizeof(char) * 3)];
 						sprintf(str_0, "Unknown code:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);
 						Backend_ShowMessageBox("Error", str_0);
 						#endif

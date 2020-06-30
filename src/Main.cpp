@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -327,7 +328,7 @@ int main(int argc, char *argv[])
 	if (!Flip_SystemTask())
 	{
 		Backend_Deinit();
-		return EXIT_FAILURE;
+		return EXIT_SUCCESS;
 	}
 
 	// Initialize sound

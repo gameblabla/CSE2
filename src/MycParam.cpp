@@ -1,6 +1,7 @@
 #include "MycParam.h"
 
 #include <stdio.h>
+#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -435,15 +436,17 @@ BOOL SaveTimeCounter(void)
 	int i;
 	unsigned char p[4];
 	REC rec;
+	FILE *fp;
+	std::string path;
 
 	// Quit if player doesn't have the Nikumaru Counter
 	if (!(gMC.equip & EQUIP_NIKUMARU_COUNTER))
 		return TRUE;
 
 	// Get last time
-	auto path = gModulePath + "/290.rec";
+	path = gModulePath + "/290.rec";
 
-	FILE *fp = fopen(path.c_str(), "rb");
+	fp = fopen(path.c_str(), "rb");
 	if (fp != NULL)
 	{
 		// Read data
@@ -505,9 +508,13 @@ int LoadTimeCounter(void)
 	int i;
 	unsigned char p[4];
 	REC rec;
+	FILE *fp;
+	std::string path;
 
 	// Open file
-	FILE *fp = fopen((gModulePath + "/290.rec").c_str(), "rb");
+	path = gModulePath + "/290.rec";
+
+	fp = fopen(path.c_str(), "rb");
 	if (fp == NULL)
 		return 0;
 

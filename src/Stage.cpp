@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -131,6 +132,8 @@ const STAGE_TABLE gTMT[95] = {
 
 BOOL TransferStage(int no, int w, int x, int y)
 {
+	std::string path;
+	std::string path_dir;
 	BOOL bError;
 
 	// Move character
@@ -138,40 +141,47 @@ BOOL TransferStage(int no, int w, int x, int y)
 
 	bError = FALSE;
 
+	// Get path
+	path_dir = "Stage";
+
 	// Load tileset
-	auto path = std::string{"Stage/Prt"} + gTMT[no].parts;
+	path = path_dir + "/Prt" + gTMT[no].parts;
 	if (!ReloadBitmap_File(path.c_str(), SURFACE_ID_LEVEL_TILESET))
 		bError = TRUE;
 
-	path = std::string{"Stage/"} + gTMT[no].parts + ".pxa";
+	path = path_dir + "Stage/" + gTMT[no].parts + ".pxa";
 	if (!LoadAttributeData(path.c_str()))
 		bError = TRUE;
 
 	// Load tilemap
-	path = std::string{"Stage/"} + gTMT[no].map + ".pxm";
+	path = path_dir + "Stage/" + gTMT[no].map + ".pxm";
 	if (!LoadMapData2(path.c_str()))
 		bError = TRUE;
 
 	// Load NPCs
-	path = std::string{"Stage/"} + gTMT[no].map + ".pxe";
+	path = path_dir + "Stage/" + gTMT[no].map + ".pxe";
 	if (!LoadEvent(path.c_str()))
 		bError = TRUE;
 
 	// Load script
-	path = std::string{"Stage/"} + gTMT[no].map + ".tsc";
+	path = path_dir + "Stage/" + gTMT[no].map + ".tsc";
 	if (!LoadTextScript_Stage(path.c_str()))
 		bError = TRUE;
 
 	// Load background
-	if (!InitBack(gTMT[no].back, gTMT[no].bkType))
+	path = gTMT[no].back;
+	if (!InitBack(path.c_str(), gTMT[no].bkType))
 		bError = TRUE;
 
+	// Get path
+	path_dir = "Npc";
+
 	// Load NPC sprite sheets
-	path = std::string{"Npc/Npc"} + gTMT[no].npc;
+	path = path_dir + "/Npc" + gTMT[no].npc;
 	if (!ReloadBitmap_File(path.c_str(), SURFACE_ID_LEVEL_SPRITESET_1))
 		bError = TRUE;
 
-	path = std::string{"Npc/Npc"} + gTMT[no].boss;
+	path = path_dir + "/Npc" + gTMT[no].boss;
 	if (!ReloadBitmap_File(path.c_str(), SURFACE_ID_LEVEL_SPRITESET_2))
 		bError = TRUE;
 

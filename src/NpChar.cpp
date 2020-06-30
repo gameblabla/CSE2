@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -54,11 +55,14 @@ void InitNpChar(void)
 BOOL LoadEvent(const char *path_event)
 {
 	int i, n;
+	FILE *fp;
 	int count;
 	char code[4];
 	EVENT eve;
 
-	FILE *fp = fopen((gDataPath + '/' + path_event).c_str(), "rb");
+	std::string path = gDataPath + '/' + path_event;
+
+	fp = fopen(path.c_str(), "rb");
 	if (fp == NULL)
 		return FALSE;
 
