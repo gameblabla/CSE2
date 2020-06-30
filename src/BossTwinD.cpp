@@ -1,5 +1,7 @@
 #include "BossTwinD.h"
 
+#include <stddef.h>
+
 #include "WindowsWrapper.h"
 
 #include "Boss.h"
