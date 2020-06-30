@@ -1,7 +1,5 @@
 #pragma once
 
-#include <stddef.h>
-
 #include "WindowsWrapper.h"
 
 #include "Backends/Audio.h"
