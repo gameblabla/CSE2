@@ -207,7 +207,7 @@ void ChangeOrganPan(unsigned char key, unsigned char pan, signed char track)	// 
 	if (!audio_backend_initialised)
 		return;
 
-	if (old_key[track] != PANDUMMY)
+	if (old_key[track] != KEYDUMMY)
 		AudioBackend_SetSoundPan(lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]], (pan_tbl[pan] - 0x100) * 10);
 }
 
@@ -216,7 +216,7 @@ void ChangeOrganVolume(int no, long volume, signed char track)	// 300がMAXで30
 	if (!audio_backend_initialised)
 		return;
 
-	if (old_key[track] != VOLDUMMY)
+	if (old_key[track] != KEYDUMMY)
 		AudioBackend_SetSoundVolume(lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]], (volume - 0xFF) * 8);
 }
 

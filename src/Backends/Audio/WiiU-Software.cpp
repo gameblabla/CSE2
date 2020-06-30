@@ -18,6 +18,8 @@
 
 #include "SoftwareMixer.h"
 
+#define AUDIO_BUFFERS 2	// Double-buffer
+
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define CLAMP(x, y, z) MIN(MAX((x), (y)), (z))
@@ -88,7 +90,7 @@ static void FrameCallback(void)
 	AXVoiceOffsets offsets;
 	AXGetVoiceOffsets(voices[0], &offsets);
 
-	unsigned int current_buffer = offsets.currentOffset > buffer_length ? 1 : 0;	// TODO - should probably be '>='
+	unsigned int current_buffer = offsets.currentOffset / buffer_length;
 
 	static unsigned int last_buffer = 1;
 
@@ -175,11 +177,11 @@ bool AudioBackend_Init(void)
 
 	if (stream_buffer_long != NULL)
 	{
-		stream_buffers[0] = (short*)malloc(buffer_length * sizeof(short) * 2);	// `* 2` because it's a double-buffer
+		stream_buffers[0] = (short*)malloc(buffer_length * sizeof(short) * AUDIO_BUFFERS);
 
 		if (stream_buffers[0] != NULL)
 		{
-			stream_buffers[1] = (short*)malloc(buffer_length * sizeof(short) * 2);	// `* 2` because it's a double-buffer
+			stream_buffers[1] = (short*)malloc(buffer_length * sizeof(short) * AUDIO_BUFFERS);
 
 			if (stream_buffers[1] != NULL)
 			{
@@ -215,7 +217,7 @@ bool AudioBackend_Init(void)
 								.dataType = AX_VOICE_FORMAT_LPCM16,
 								.loopingEnabled = AX_VOICE_LOOP_ENABLED,
 								.loopOffset = 0,
-								.endOffset = buffer_length * 2,
+								.endOffset = (buffer_length * AUDIO_BUFFERS) - 1,	// -1 or else you'll get popping!
 								.currentOffset = 0,
 								.data = stream_buffers[i]
 							};
@@ -246,6 +248,8 @@ bool AudioBackend_Init(void)
 		free(stream_buffer_long);
 	}
 
+	AXQuit();
+
 	return false;
 }
 
@@ -260,6 +264,8 @@ void AudioBackend_Deinit(void)
 		AXFreeVoice(voices[i]);
 		free(stream_buffers[i]);
 	}
+
+	free(stream_buffer_long);
 
 	AXQuit();
 }
