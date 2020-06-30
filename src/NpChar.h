@@ -1,6 +1,5 @@
 #pragma once
 
-#include "CommonDefines.h"
 #include "WindowsWrapper.h"
 
 #include "Draw.h"

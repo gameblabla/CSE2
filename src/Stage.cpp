@@ -134,8 +134,8 @@ const STAGE_TABLE gTMTDefault[95] = {
 	STAGE_ENTRY("Cave", "Pole", 4, "bk0", "Guest", "0", 0, "Hermit Gunsmith", "\x82\xCD\x82\xAE\x82\xEA\x8F\x65\x92\x62\x96\xE8"),	/* はぐれ銃鍛冶 */
 	STAGE_ENTRY("0", "Island", 4, "bk0", "Island", "0", 0, "", ""),
 	STAGE_ENTRY("Hell", "Ballo2", 2, "bkBlue", "Priest", "Bllg", 9, "Seal Chamber", "\x95\x95\x88\xF3\x82\xCC\x8A\xD4"),	/* 封印の間 */
-	STAGE_ENTRY("White", "e_Blcn", 7, "BkFog", "Miza", "0", 9, "", ""),
-	STAGE_ENTRY("Oside", "Clock", 6, "BkMoon", "Moon", "0", 0, "Clock Room", "\x8E\x9E\x8C\x76\x89\xAE"),	/* 時計屋 */
+	STAGE_ENTRY("White", "e_Blcn", 7, "bkFog", "Miza", "0", 9, "", ""),
+	STAGE_ENTRY("Oside", "Clock", 6, "bkMoon", "Moon", "0", 0, "Clock Room", "\x8E\x9E\x8C\x76\x89\xAE"),	/* 時計屋 */
 };
 
 const STAGE_TABLE *gTMT = gTMTDefault;
