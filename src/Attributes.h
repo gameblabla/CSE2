@@ -12,10 +12,6 @@
 
 #ifdef __GNUC__
 
-#define ATTRIBUTE_FORMAT(archetype, formatArgumentIndex, firstToCheck) __attribute__((format(archetype, formatArgumentIndex, firstToCheck)))
-#define ATTRIBUTE_WARN_UNUSED_RESULT __attribute__((warn_unused_result))
-#define ATTRIBUTE_MALLOC __attribute__((malloc))
-#define ATTRIBUTE_NONNULL(...) __attribute__((nonnull(__VA_ARGS__)))
 #define ATTRIBUTE_HOT __attribute__((hot))
 #define LIKELY(condition) __builtin_expect((condition), 1)
 #define UNLIKELY(condition) __builtin_expect((condition), 0)
@@ -23,10 +19,6 @@
 
 #else
 
-#define ATTRIBUTE_FORMAT(archetype, stringIndex, firstToCheck)
-#define ATTRIBUTE_WARN_UNUSED_RESULT
-#define ATTRIBUTE_MALLOC
-#define ATTRIBUTE_NONNULL
 #define ATTRIBUTE_HOT
 #define LIKELY(condition) condition
 #define UNLIKELY(condition) condition
