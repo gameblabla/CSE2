@@ -1,5 +1,6 @@
 #include "NpcAct.h"
 
+#include <stddef.h>
 #include <stdio.h>
 
 #include "WindowsWrapper.h"
