@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -310,10 +311,9 @@ BOOL InitWaveData100(void)
 	if (!audio_backend_initialised)
 		return FALSE;
 
-	char path[MAX_PATH];
-	sprintf(path, "%s/Resource/WAVE/Wave.dat", gDataPath);
+	std::string path = gDataPath + "/Resource/WAVE/Wave.dat";
 
-	FILE *fp = fopen(path, "rb");
+	FILE *fp = fopen(path.c_str(), "rb");
 
 	if (fp == NULL)
 		return FALSE;

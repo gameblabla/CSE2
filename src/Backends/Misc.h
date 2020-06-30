@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "../Attributes.h"
 
 enum
@@ -93,7 +95,7 @@ typedef struct Backend_DisplayMode
 bool Backend_Init(void);
 void Backend_Deinit(void);
 void Backend_PostWindowCreation(void);
-bool Backend_GetBasePath(char *string_buffer);
+bool Backend_GetBasePath(std::string *string_buffer);
 void Backend_HideMouse(void);
 void Backend_SetWindowIcon(const unsigned char *rgb_pixels, unsigned int width, unsigned int height);
 void Backend_SetCursor(const unsigned char *rgba_pixels, unsigned int width, unsigned int height);

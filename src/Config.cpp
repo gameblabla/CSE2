@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -18,11 +19,10 @@ BOOL LoadConfigData(CONFIG *conf)
 	memset(conf, 0, sizeof(CONFIG));
 
 	// Get path
-	char path[MAX_PATH];
-	sprintf(path, "%s/%s", gModulePath, gConfigName);
+	std::string path = gModulePath + '/' + gConfigName;
 
 	// Open file
-	FILE *fp = fopen(path, "rb");
+	FILE *fp = fopen(path.c_str(), "rb");
 	if (fp == NULL)
 		return FALSE;
 
@@ -65,11 +65,10 @@ BOOL LoadConfigData(CONFIG *conf)
 BOOL SaveConfigData(const CONFIG *conf)
 {
 	// Get path
-	char path[MAX_PATH];
-	sprintf(path, "%s/%s", gModulePath, gConfigName);
+	std::string path = gModulePath + '/' + gConfigName;
 
 	// Open file
-	FILE *fp = fopen(path, "wb");
+	FILE *fp = fopen(path.c_str(), "wb");
 	if (fp == NULL)
 		return FALSE;
 

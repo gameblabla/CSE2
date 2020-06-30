@@ -1,6 +1,7 @@
 #include "ArmsItem.h"
 
 #include <string.h>
+#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -415,12 +416,12 @@ void PutCampObject(void)
 
 int CampLoop(void)
 {
-	char old_script_path[MAX_PATH];
+	std::string old_script_path;
 
 	RECT rcView = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
 	// Save the current script path (to restore it when we get out of the inventory)
-	GetTextScriptPath(old_script_path);
+	old_script_path = GetTextScriptPath();
 
 	// Load the inventory script
 	LoadTextScript2("ArmsItem.tsc");
@@ -511,7 +512,7 @@ int CampLoop(void)
 	}
 
 	// Resume original script
-	LoadTextScript_Stage(old_script_path);
+	LoadTextScript_Stage(old_script_path.c_str());
 	gArmsEnergyX = 32; // Displays weapon rotation animation in case the weapon was changed
 	return enum_ESCRETURN_continue;	// Go to game
 }

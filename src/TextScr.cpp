@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -120,12 +121,12 @@ void EncryptionBinaryData2(unsigned char *pData, long size)
 BOOL LoadTextScript2(const char *name)
 {
 	FILE *fp;
-	char path[MAX_PATH];
+	std::string path;
 
 	// Get path
-	sprintf(path, "%s/%s", gDataPath, name);
+	path = gDataPath + '/' + name;
 
-	gTS.size = GetFileSizeLong(path);
+	gTS.size = GetFileSizeLong(path.c_str());
 	if (gTS.size == -1)
 		return FALSE;
 
@@ -135,7 +136,7 @@ BOOL LoadTextScript2(const char *name)
 		return FALSE;
 
 	// Open file
-	fp = fopen(path, "rb");
+	fp = fopen(path.c_str(), "rb");
 	if (fp == NULL)
 		return FALSE;
 
@@ -145,7 +146,7 @@ BOOL LoadTextScript2(const char *name)
 	fclose(fp);
 
 	// Set path
-	strcpy(gTS.path, name);
+	gTS.path = name;
 
 	// Decrypt data
 	EncryptionBinaryData2((unsigned char*)gTS.data, gTS.size);
@@ -157,28 +158,28 @@ BOOL LoadTextScript2(const char *name)
 BOOL LoadTextScript_Stage(const char *name)
 {
 	FILE *fp_head, *fp_body;
-	char path[MAX_PATH];
+	std::string path;
 	long head_size;
 	long body_size;
 
 	// Open Head.tsc and the stage's .tsc
-	sprintf(path, "%s/%s", gDataPath, "Head.tsc");
+	path = gDataPath + "/Head.tsc";
 
-	head_size = GetFileSizeLong(path);
+	head_size = GetFileSizeLong(path.c_str());
 	if (head_size == -1)
 		return FALSE;
 
-	fp_head = fopen(path, "rb");
+	fp_head = fopen(path.c_str(), "rb");
 	if (fp_head == NULL)
 		return FALSE;
 
-	sprintf(path, "%s/%s", gDataPath, name);
+	path = gDataPath + '/' + name;
 
-	body_size = GetFileSizeLong(path);
+	body_size = GetFileSizeLong(path.c_str());
 	if (body_size == -1)
 		return FALSE;
 
-	fp_body = fopen(path, "rb");
+	fp_body = fopen(path.c_str(), "rb");
 	if (fp_body == NULL)
 		return FALSE;
 
@@ -200,15 +201,15 @@ BOOL LoadTextScript_Stage(const char *name)
 
 	// Set parameters
 	gTS.size = head_size + body_size;
-	strcpy(gTS.path, name);
+	gTS.path = name;
 
 	return TRUE;
 }
 
 // Get current path
-void GetTextScriptPath(char *path)
+std::string GetTextScriptPath(void)
 {
-	strcpy(path, gTS.path);
+	return gTS.path;
 }
 
 // Get 4 digit number from TSC data

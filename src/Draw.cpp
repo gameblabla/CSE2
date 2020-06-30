@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -292,7 +293,7 @@ BOOL MakeSurface_Resource(const char *name, SurfaceID surf_no)
 // TODO - Inaccurate stack frame
 BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 {
-	char path[MAX_PATH];
+	std::string path;
 
 #ifdef FIX_BUGS
 	if (surf_no >= SURFACE_ID_MAX)
@@ -316,9 +317,9 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 	const char *file_extensions[] = {"pbm", "bmp", "png"};
 	for (size_t i = 0; i < sizeof(file_extensions) / sizeof(file_extensions[0]); ++i)
 	{
-		sprintf(path, "%s/%s.%s", gDataPath, name, file_extensions[i]);
+		path = gDataPath + '/' + name + '.' + file_extensions[i];
 
-		image_buffer = DecodeBitmapWithAlphaFromFile(path, &width, &height, TRUE);
+		image_buffer = DecodeBitmapWithAlphaFromFile(path.c_str(), &width, &height, TRUE);
 
 		if (image_buffer != NULL)
 			break;
@@ -326,7 +327,7 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 
 	if (image_buffer == NULL)
 	{
-		ErrorLog(path, 1);
+		ErrorLog(path.c_str(), 1);
 		return FALSE;
 	}
 
@@ -391,7 +392,7 @@ BOOL ReloadBitmap_Resource(const char *name, SurfaceID surf_no)
 // TODO - Inaccurate stack frame
 BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 {
-	char path[MAX_PATH];
+	std::string path;
 
 #ifdef FIX_BUGS
 	if (surf_no >= SURFACE_ID_MAX)
@@ -409,9 +410,9 @@ BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 	const char *file_extensions[] = {"pbm", "bmp", "png"};
 	for (size_t i = 0; i < sizeof(file_extensions) / sizeof(file_extensions[0]); ++i)
 	{
-		sprintf(path, "%s/%s.%s", gDataPath, name, file_extensions[i]);
+		path = gDataPath + '/' + name + '.' + file_extensions[i];
 
-		image_buffer = DecodeBitmapWithAlphaFromFile(path, &width, &height, TRUE);
+		image_buffer = DecodeBitmapWithAlphaFromFile(path.c_str(), &width, &height, TRUE);
 
 		if (image_buffer != NULL)
 			break;
@@ -419,7 +420,7 @@ BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 
 	if (image_buffer == NULL)
 	{
-		ErrorLog(path, 1);
+		ErrorLog(path.c_str(), 1);
 		return FALSE;
 	}
 
@@ -712,8 +713,7 @@ void InitTextObject(const char *name)
 {
 	(void)name;	// Unused in this branch
 
-	char path[MAX_PATH];
-	sprintf(path, "%s/Font/font", gDataPath);
+	std::string path = gDataPath + "/Font/font";
 
 	// Get font size
 	unsigned int width, height;
@@ -731,7 +731,7 @@ void InitTextObject(const char *name)
 			break;
 	}
 
-	font = LoadFont(path, width, height);
+	font = LoadFont(path.c_str(), width, height);
 }
 
 void PutText(int x, int y, const char *text, unsigned long color)
