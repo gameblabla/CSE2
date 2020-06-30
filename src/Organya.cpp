@@ -7,7 +7,6 @@
 #include "Organya.h"
 
 #include <stddef.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -256,7 +255,7 @@ void ChangeOrganPan(unsigned char key, unsigned char pan, signed char track)	// 
 	if (lpDS == NULL)
 		return;
 
-	if (old_key[track] != PANDUMMY)
+	if (old_key[track] != KEYDUMMY)
 		lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]]->SetPan((pan_tbl[pan] - 0x100) * 10);
 }
 
@@ -265,7 +264,7 @@ void ChangeOrganVolume(int no, long volume, signed char track)	// 300がMAXで30
 	if (lpDS == NULL)
 		return;
 
-	if (old_key[track] != VOLDUMMY)
+	if (old_key[track] != KEYDUMMY)
 		lpORGANBUFFER[track][old_key[track] / 12][key_twin[track]]->SetVolume((volume - 0xFF) * 8);
 }
 

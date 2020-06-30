@@ -2,7 +2,6 @@
 
 #include <stddef.h>
 #include <stdio.h>
-#include <string.h>
 
 #if defined(_MSC_VER) && _MSC_VER >= 1500	// Newer versions of Visual Studio don't support anything earlier than DirectInput8
 #define DIRECTINPUT_VERSION 0x800

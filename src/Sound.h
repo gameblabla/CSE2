@@ -1,7 +1,5 @@
 #pragma once
 
-#include <stddef.h>
-
 #ifndef DIRECTSOUND_VERSION
 #define DIRECTSOUND_VERSION 0x500
 #endif
