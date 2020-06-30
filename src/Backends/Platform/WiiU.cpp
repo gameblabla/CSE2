@@ -57,10 +57,11 @@ void Backend_PostWindowCreation(void)
 
 bool Backend_GetBasePath(std::string *string_buffer)
 {
+	*string_buffer = WHBGetSdCardMountPath();
 #ifdef JAPANESE
-	*string_buffer = std::string{WHBGetSdCardMountPath()} + "/CSE2-portable-jp";
+	*string_buffer += "/CSE2-portable-jp";
 #else
-	*string_buffer = std::string{WHBGetSdCardMountPath()} + "/CSE2-portable-en";
+	*string_buffer += "/CSE2-portable-en";
 #endif
 
 	return true;

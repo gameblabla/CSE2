@@ -50,7 +50,9 @@ BOOL GetCompileVersion(int *v1, int *v2, int *v3, int *v4)
 
 void DeleteLog(void)
 {
-	std::string path = gModulePath + "/debug.txt";
+	std::string path;
+
+	path = gModulePath + "/debug.txt";
 	remove(path.c_str());
 }
 
@@ -83,7 +85,6 @@ BOOL IsKeyFile(const char *name)
 	return TRUE;
 }
 
-// Some code uses this as CheckFileExists, checking if the return value is -1
 long GetFileSizeLong(const char *path)
 {
 	long len;

@@ -17,9 +17,10 @@ BOOL LoadConfigData(CONFIG *conf)
 	// Clear old configuration data
 	memset(conf, 0, sizeof(CONFIG));
 
-	// Open file
+	// Get path
 	std::string path = gModulePath + '/' + gConfigName;
 
+	// Open file
 	FILE *fp = fopen(path.c_str(), "rb");
 	if (fp == NULL)
 		return FALSE;

@@ -131,7 +131,7 @@ BOOL LoadProfile(const char *name)
 		path = name;
 	else
 		path = gModulePath + '/' + gDefaultName;
-	
+
 	// Open file
 	fp = fopen(path.c_str(), "rb");
 	if (fp == NULL)
