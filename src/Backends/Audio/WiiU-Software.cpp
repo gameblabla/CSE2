@@ -84,7 +84,7 @@ static void FrameCallback(void)
 	AXVoiceOffsets offsets;
 	AXGetVoiceOffsets(voices[0], &offsets);
 
-	unsigned int current_buffer = offsets.currentOffset > buffer_length ? 1 : 0;	// TODO - should probably be '>='
+	unsigned int current_buffer = offsets.currentOffset / buffer_length;
 
 	static unsigned int last_buffer = 1;
 
@@ -203,7 +203,7 @@ bool AudioBackend_Init(void)
 								.dataType = AX_VOICE_FORMAT_LPCM16,
 								.loopingEnabled = AX_VOICE_LOOP_ENABLED,
 								.loopOffset = 0,
-								.endOffset = buffer_length * 2,
+								.endOffset = (buffer_length * 2) - 1,	// -1 or else you'll get popping!
 								.currentOffset = 0,
 								.data = stream_buffers[i]
 							};
