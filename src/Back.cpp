@@ -9,11 +9,7 @@
 #include "CommonDefines.h"
 #include "Draw.h"
 #include "File.h"
-#include "Frame.h"
-#include "Game.h"
 #include "Main.h"
-#include "Map.h"
-#include "Stage.h"
 
 BACK gBack;
 int gWaterY;
