@@ -149,22 +149,22 @@ BOOL TransferStage(int no, int w, int x, int y)
 	if (!ReloadBitmap_File(path.c_str(), SURFACE_ID_LEVEL_TILESET))
 		bError = TRUE;
 
-	path = path_dir + "Stage/" + gTMT[no].parts + ".pxa";
+	path = path_dir + '/' + gTMT[no].parts + ".pxa";
 	if (!LoadAttributeData(path.c_str()))
 		bError = TRUE;
 
 	// Load tilemap
-	path = path_dir + "Stage/" + gTMT[no].map + ".pxm";
+	path = path_dir + '/' + gTMT[no].map + ".pxm";
 	if (!LoadMapData2(path.c_str()))
 		bError = TRUE;
 
 	// Load NPCs
-	path = path_dir + "Stage/" + gTMT[no].map + ".pxe";
+	path = path_dir + '/' + gTMT[no].map + ".pxe";
 	if (!LoadEvent(path.c_str()))
 		bError = TRUE;
 
 	// Load script
-	path = path_dir + "Stage/" + gTMT[no].map + ".tsc";
+	path = path_dir + '/' + gTMT[no].map + ".tsc";
 	if (!LoadTextScript_Stage(path.c_str()))
 		bError = TRUE;
 
