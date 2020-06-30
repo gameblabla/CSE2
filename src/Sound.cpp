@@ -13,7 +13,7 @@ equivalents.
 #include "Sound.h"
 
 #include <stddef.h>
-#include <stdio.h>
+//#include <stdio.h>	// Used by commented-out code
 #include <stdlib.h>
 #include <string.h>
 
