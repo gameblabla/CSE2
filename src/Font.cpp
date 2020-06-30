@@ -1061,10 +1061,6 @@ FontObject* LoadFontFromData(const unsigned char *data, size_t data_size, unsign
 
 				if (FT_New_Memory_Face(font_object->library, font_object->data, (FT_Long)data_size, 0, &font_object->face) == 0)
 				{
-#ifdef JAPANESE
-					cell_width = 0;	// Cheap hack to make the font square
-#endif
-
 					FT_Set_Pixel_Sizes(font_object->face, cell_width, cell_height);
 
 					font_object->glyph_list_head = NULL;
