@@ -20,7 +20,6 @@ equivalents.
 #include "WindowsWrapper.h"
 
 #include "Backends/Audio.h"
-#include "Main.h"
 #include "Organya.h"
 #include "PixTone.h"
 

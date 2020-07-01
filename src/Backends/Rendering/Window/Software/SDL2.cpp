@@ -1,13 +1,14 @@
 #include "../Software.h"
 
 #include <stddef.h>
-#include <stdlib.h>
 #include <string>
 
-#include "SDL.h"
+#include "SDL_error.h"
+#include "SDL_pixels.h"
+#include "SDL_surface.h"
+#include "SDL_video.h"
 
 #include "../../../Misc.h"
-#include "../../../Shared/SDL2.h"
 
 SDL_Window *window;
 

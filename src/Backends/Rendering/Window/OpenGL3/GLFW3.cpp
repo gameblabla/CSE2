@@ -1,17 +1,13 @@
 #include "../OpenGL.h"
 
 #include <stddef.h>
-#include <stdlib.h>
 
-#ifdef USE_OPENGLES2
-#include <GLES2/gl2.h>
-#else
+#ifndef USE_OPENGLES2
 #include <glad/glad.h>
 #endif
 #include <GLFW/glfw3.h>
 
 #include "../../../Misc.h"
-#include "../../../Shared/GLFW3.h"
 
 GLFWwindow *window;
 

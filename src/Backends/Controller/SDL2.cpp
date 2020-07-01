@@ -1,8 +1,12 @@
 #include "../Controller.h"
 
 #include <stddef.h>
+#include <stdlib.h>
 
 #include "SDL.h"
+#include "SDL_error.h"
+#include "SDL_joystick.h"
+#include "SDL_stdinc.h"
 
 #include "../Misc.h"
 #include "../Shared/SDL2.h"

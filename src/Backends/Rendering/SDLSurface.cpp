@@ -5,10 +5,14 @@
 #include <string.h>
 #include <string>
 
-#include "SDL.h"
+#include "SDL_error.h"
+#include "SDL_pixels.h"
+#include "SDL_rect.h"
+#include "SDL_stdinc.h"
+#include "SDL_surface.h"
+#include "SDL_video.h"
 
 #include "../Misc.h"
-#include "../Shared/SDL2.h"
 
 typedef struct RenderBackend_Surface
 {

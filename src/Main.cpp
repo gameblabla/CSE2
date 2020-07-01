@@ -1,7 +1,5 @@
 #include "Main.h"
 
-#include <stddef.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <string>
@@ -9,19 +7,16 @@
 #include "WindowsWrapper.h"
 
 #include "Backends/Misc.h"
-#include "Backends/Rendering.h"
 #include "Bitmap.h"
 #include "CommonDefines.h"
 #include "Config.h"
 #include "Draw.h"
-#include "File.h"
 #include "Game.h"
 #include "Generic.h"
 #include "Input.h"
 #include "KeyControl.h"
 #include "MyChar.h"
 #include "Organya.h"
-#include "Profile.h"
 #include "Resource.h"
 #include "Sound.h"
 #include "Triangle.h"

@@ -1,7 +1,5 @@
 #include "GenericLoad.h"
 
-#include <stdio.h>
-
 #include "WindowsWrapper.h"
 
 #include "CommonDefines.h"

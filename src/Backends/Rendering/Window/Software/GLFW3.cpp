@@ -11,7 +11,6 @@
 #include <GLFW/glfw3.h>
 
 #include "../../../Misc.h"
-#include "../../../Shared/GLFW3.h"
 
 GLFWwindow *window;
 

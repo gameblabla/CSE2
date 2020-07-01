@@ -3,15 +3,13 @@
 #include <stddef.h>
 #include <string>
 
-#ifdef USE_OPENGLES2
-#include <GLES2/gl2.h>
-#else
+#ifndef USE_OPENGLES2
 #include <glad/glad.h>
 #endif
-#include "SDL.h"
+#include "SDL_error.h"
+#include "SDL_video.h"
 
 #include "../../../Misc.h"
-#include "../../../Shared/SDL2.h"
 
 SDL_Window *window;
 

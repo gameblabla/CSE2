@@ -1,11 +1,13 @@
 #include "../Audio.h"
 
 #include <stddef.h>
-#include <stdio.h>
 #include <string.h>
 #include <string>
 
 #include "SDL.h"
+#include "SDL_audio.h"
+#include "SDL_error.h"
+#include "SDL_stdinc.h"
 
 #include "../Misc.h"
 

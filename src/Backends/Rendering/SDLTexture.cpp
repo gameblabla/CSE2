@@ -5,7 +5,15 @@
 #include <string.h>
 #include <string>
 
-#include "SDL.h"
+#include "SDL_blendmode.h"
+#include "SDL_error.h"
+#include "SDL_hints.h"
+#include "SDL_pixels.h"
+#include "SDL_rect.h"
+#include "SDL_render.h"
+#include "SDL_stdinc.h"
+#include "SDL_version.h"
+#include "SDL_video.h"
 
 #define SPRITEBATCH_IMPLEMENTATION
 #include "../../../external/cute_spritebatch.h"
@@ -13,11 +21,6 @@
 #include "../../WindowsWrapper.h"
 
 #include "../Misc.h"
-#include "../Shared/SDL2.h"
-#include "../../Draw.h"
-#include "../../Ending.h"
-#include "../../MapName.h"
-#include "../../TextScr.h"
 
 typedef struct RenderBackend_Surface
 {

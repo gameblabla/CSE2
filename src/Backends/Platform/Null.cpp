@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include "../../Attributes.h"
+
 bool Backend_Init(void)
 {
 	return true;
