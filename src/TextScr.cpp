@@ -167,16 +167,18 @@ BOOL LoadTextScript_Stage(const char *name)
 	if (head_size == INVALID_FILE_SIZE)
 		return FALSE;
 
+#ifdef FIX_BUGS
+	// The original doesn't check for any kind of buffer overflow here, so feeding in a 1 MiB Head.tsc
+	// (assuming an unchanged TSC_BUFFER_SIZE) would be sure to crash the game, for example.
+	if (head_size > TSC_BUFFER_SIZE)
+		return FALSE;
+#endif
+
 	fp = fopen(path, "rb");
 	if (fp == NULL)
 		return FALSE;
 
 	// Read Head.tsc. Note that head_size may exceed the size of 'gTS.data' (TSC_BUFFER_SIZE)
-#ifdef FIX_BUGS
-	if (head_size > TSC_BUFFER_SIZE)	// The original doesn't check for any kind of buffer overflow here, so feeding in a 1 MiB Head.tsc (assuming an unchanged TSC_BUFFER_SIZE) would be sure to crash the game, for example.
-		return FALSE;
-#endif
-
 	fread(gTS.data, 1, head_size, fp);
 	EncryptionBinaryData2((unsigned char*)gTS.data, head_size);
 	gTS.data[head_size] = '\0';
@@ -189,16 +191,17 @@ BOOL LoadTextScript_Stage(const char *name)
 	if (body_size == INVALID_FILE_SIZE)
 		return FALSE;
 
+#ifdef FIX_BUGS
+	// Same as above: the original doesn't bother checking, and may crash on large-enough input
+	if (head_size + body_size > TSC_BUFFER_SIZE)
+		return FALSE;
+#endif
+
 	fp = fopen(path, "rb");
 	if (fp == NULL)
 		return FALSE;
 
 	// Read stage's tsc. Note that head_size + body_size may exceed the size of 'gTS.data' (TSC_BUFFER_SIZE)
-#ifdef FIX_BUGS
-	if ((head_size + body_size) > TSC_BUFFER_SIZE)	// Same as above, the original doesn't bother checking and may crash on large enough input
-		return FALSE;
-#endif
-
 	fread(&gTS.data[head_size], 1, body_size, fp);
 	EncryptionBinaryData2((unsigned char*)&gTS.data[head_size], body_size);
 	gTS.data[head_size + body_size] = '\0';
