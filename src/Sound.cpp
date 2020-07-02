@@ -20,7 +20,7 @@ equivalents.
 #include "WindowsWrapper.h"
 
 #include "Backends/Audio.h"
-//#include "Main.h"	// Was for gModulePath, but this is unneeded in portable since LoadSoundObject is commented out in portable
+//#include "Main.h"	// Was for gModulePath, but this is unneeded in the portable branch since LoadSoundObject is commented-out
 #include "Organya.h"
 #include "PixTone.h"
 
