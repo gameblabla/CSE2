@@ -5,15 +5,7 @@
 #include <string.h>
 #include <string>
 
-#include "SDL_blendmode.h"
-#include "SDL_error.h"
-#include "SDL_hints.h"
-#include "SDL_pixels.h"
-#include "SDL_rect.h"
-#include "SDL_render.h"
-#include "SDL_stdinc.h"
-#include "SDL_version.h"
-#include "SDL_video.h"
+#include "SDL.h"
 
 #define SPRITEBATCH_IMPLEMENTATION
 #include "../../../external/cute_spritebatch.h"

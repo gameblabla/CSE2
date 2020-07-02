@@ -6,8 +6,7 @@
 #ifndef USE_OPENGLES2
 #include <glad/glad.h>
 #endif
-#include "SDL_error.h"
-#include "SDL_video.h"
+#include "SDL.h"
 
 #include "../../../Misc.h"
 #include "../../../Shared/SDL2.h"
