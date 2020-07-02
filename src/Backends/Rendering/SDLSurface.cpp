@@ -13,6 +13,7 @@
 #include "SDL_video.h"
 
 #include "../Misc.h"
+#include "../Shared/SDL2.h"
 
 typedef struct RenderBackend_Surface
 {

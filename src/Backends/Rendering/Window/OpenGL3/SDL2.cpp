@@ -10,6 +10,7 @@
 #include "SDL_video.h"
 
 #include "../../../Misc.h"
+#include "../../../Shared/SDL2.h"
 
 SDL_Window *window;
 
