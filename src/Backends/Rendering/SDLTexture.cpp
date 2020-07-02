@@ -14,10 +14,6 @@
 
 #include "../Misc.h"
 #include "../Shared/SDL2.h"
-#include "../../Draw.h"
-#include "../../Ending.h"
-#include "../../MapName.h"
-#include "../../TextScr.h"
 
 typedef struct RenderBackend_Surface
 {
