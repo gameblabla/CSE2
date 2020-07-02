@@ -1,7 +1,6 @@
 #include "PixTone.h"
 
 #include <math.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include "WindowsWrapper.h"
