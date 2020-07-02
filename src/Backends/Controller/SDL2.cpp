@@ -1,11 +1,8 @@
 #include "../Controller.h"
 
 #include <stddef.h>
-<<<<<<< HEAD
 #include <stdio.h>
-=======
 #include <stdlib.h>
->>>>>>> portable
 
 #include "SDL.h"
 
