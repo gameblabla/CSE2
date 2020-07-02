@@ -1,5 +1,7 @@
 #include "BulHit.h"
 
+#include <stddef.h>
+
 #include "Bullet.h"
 #include "Caret.h"
 #include "Game.h"

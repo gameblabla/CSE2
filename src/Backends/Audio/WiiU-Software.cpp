@@ -204,8 +204,7 @@ bool AudioBackend_Init(void)
 
 							AXVoiceDeviceMixData mix_data[6];
 							memset(mix_data, 0, sizeof(mix_data));
-							mix_data[0].bus[0].volume = i == 0 ? 0x8000 : 0;	// Channel 1 goes on the left speaker
-							mix_data[1].bus[0].volume = i == 1 ? 0x8000 : 0;	// Channel 2 goes on the right speaker
+							mix_data[i].bus[0].volume = 0x8000;	// Voice 1 goes on the left speaker - voice 2 goes on the right speaker
 
 							AXSetVoiceDeviceMix(voices[i], AX_DEVICE_TYPE_DRC, 0, mix_data);
 							AXSetVoiceDeviceMix(voices[i], AX_DEVICE_TYPE_TV, 0, mix_data);
@@ -248,6 +247,10 @@ bool AudioBackend_Init(void)
 		free(stream_buffer_long);
 	}
 
+#ifdef EXTRA_SOUND_FORMATS
+	ExtraSound_Deinit();
+#endif
+
 	AXQuit();
 
 	return false;
@@ -255,17 +258,19 @@ bool AudioBackend_Init(void)
 
 void AudioBackend_Deinit(void)
 {
+	AXRegisterAppFrameCallback(NULL);
+
+	AXFreeVoice(voices[1]);
+	AXFreeVoice(voices[0]);
+
+	free(stream_buffers[1]);
+	free(stream_buffers[0]);
+
+	free(stream_buffer_long);
+
 #ifdef EXTRA_SOUND_FORMATS
 	ExtraSound_Deinit();
 #endif
-
-	for (unsigned int i = 0; i < 2; ++i)
-	{
-		AXFreeVoice(voices[i]);
-		free(stream_buffers[i]);
-	}
-
-	free(stream_buffer_long);
 
 	AXQuit();
 }

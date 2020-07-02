@@ -623,7 +623,7 @@ void CortBox2(const RECT *rect, unsigned long col, SurfaceID surf_no)
 
 // Dummied-out log function
 // According to the Mac port, its name really is just "out".
-static BOOL out(int unknown)
+BOOL out(int unknown)
 {
 	char unknown2[0x100];
 	int unknown3;
