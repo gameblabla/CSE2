@@ -169,6 +169,13 @@ BOOL LoadTextScript_Stage(const char *name)
 	if (head_size == -1)
 		return FALSE;
 
+#ifdef FIX_BUGS
+	// The original doesn't check for any kind of buffer overflow here, so feeding in a 1 MiB Head.tsc
+	// (assuming an unchanged TSC_BUFFER_SIZE) would be sure to crash the game, for example.
+	if (head_size > TSC_BUFFER_SIZE)
+		return FALSE;
+#endif
+
 	fp = fopen(path.c_str(), "rb");
 	if (fp == NULL)
 		return FALSE;
@@ -185,6 +192,12 @@ BOOL LoadTextScript_Stage(const char *name)
 	body_size = GetFileSizeLong(path.c_str());
 	if (body_size == -1)
 		return FALSE;
+
+#ifdef FIX_BUGS
+	// Same as above: the original doesn't bother checking, and may crash on large-enough input
+	if (head_size + body_size > TSC_BUFFER_SIZE)
+		return FALSE;
+#endif
 
 	fp = fopen(path.c_str(), "rb");
 	if (fp == NULL)
