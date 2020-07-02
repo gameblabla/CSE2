@@ -2,6 +2,8 @@
 
 #include <stddef.h>
 
+#include "WindowsWrapper.h"
+
 #include "Bullet.h"
 #include "Caret.h"
 #include "Game.h"
