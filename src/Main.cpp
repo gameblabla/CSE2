@@ -12,15 +12,15 @@
 #include "CommonDefines.h"
 #include "Config.h"
 #include "Draw.h"
+#ifdef EXTRA_SOUND_FORMATS
+#include "ExtraSoundFormats.h"
+#endif
 #include "Game.h"
 #include "Generic.h"
 #include "Input.h"
 #include "KeyControl.h"
 #include "MyChar.h"
 #include "Organya.h"
-#ifdef EXTRA_SOUND_FORMATS
-#include "ExtraSoundFormats.h"
-#endif
 #include "Resource.h"
 #include "Sound.h"
 #include "Triangle.h"
