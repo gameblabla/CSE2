@@ -23,7 +23,7 @@ equivalents.
 #ifdef EXTRA_SOUND_FORMATS
 #include "ExtraSoundFormats.h"
 #endif
-#include "Main.h"
+//#include "Main.h"	// Was for gModulePath, but this is unneeded in the portable branch since LoadSoundObject is commented-out
 #include "Organya.h"
 #include "PixTone.h"
 
