@@ -1,6 +1,7 @@
 #include "../Controller.h"
 
 #include <stddef.h>
+#include <stdlib.h>
 
 #include "SDL.h"
 

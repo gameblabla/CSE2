@@ -1,6 +1,8 @@
 #include "../Misc.h"
 
+#include <stdarg.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <string>
@@ -9,10 +11,10 @@
 
 #include "../Rendering.h"
 #include "../Shared/SDL2.h"
+#include "../../Attributes.h"
 #include "../../Main.h"
 #include "../../Organya.h"
 #include "../../Profile.h"
-#include "../../Resource.h"
 
 #define DO_KEY(SDL_KEY, BACKEND_KEY) \
 	case SDL_KEY: \

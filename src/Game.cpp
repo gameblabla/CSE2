@@ -1,7 +1,6 @@
 #include "Game.h"
 
 #include <stddef.h>
-#include <stdio.h>
 #include <string>
 
 #include "WindowsWrapper.h"

@@ -1,7 +1,6 @@
 #include "../Software.h"
 
 #include <stddef.h>
-#include <stdlib.h>
 #include <string>
 
 #include "SDL.h"
