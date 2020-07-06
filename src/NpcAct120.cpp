@@ -585,11 +585,15 @@ void ActNpc127(NPCHAR *npc)
 	if (++npc->ani_wait > 0)
 	{
 		npc->ani_wait = 0;
-		if (++npc->ani_no > 2)
-			npc->cond = 0;
-	}
 
-	// Note that 'npc->ani_no' can exceed the size of 'rcH' and 'rcV'
+		if (++npc->ani_no > 2)
+		{
+			npc->cond = 0;
+		#ifdef FIX_BUGS
+			return;	// The code below will use 'ani_no' to access 'rcH' and 'rcV', even though it's now too high
+		#endif
+		}
+	}
 
 	if (npc->direct == 0)
 		npc->rect = rcH[npc->ani_no];
@@ -649,9 +653,12 @@ void ActNpc128(NPCHAR *npc)
 	}
 
 	if (++npc->ani_no > 4)
+	{
 		npc->cond = 0;
-
-	// Note that 'npc->ani_no' can exceed the bounds of 'rcLeft', 'rcUp', 'rcRight' and 'rcDown'
+	#ifdef FIX_BUGS
+		return;	// The code below will use 'ani_no' to access 'rcLeft' and co., even though it's now too high
+	#endif
+	}
 
 	switch (npc->direct)
 	{
@@ -680,18 +687,23 @@ void ActNpc129(NPCHAR *npc)
 		{0x80, 0x30, 0x90, 0x40},
 		{0x90, 0x30, 0xA0, 0x40},
 		{0xA0, 0x30, 0xB0, 0x40},
+
 		{0x80, 0x40, 0x90, 0x50},
 		{0x90, 0x40, 0xA0, 0x50},
 		{0xA0, 0x40, 0xB0, 0x50},
+
 		{0x80, 0x50, 0x90, 0x60},
 		{0x90, 0x50, 0xA0, 0x60},
 		{0xA0, 0x50, 0xB0, 0x60},
+
 		{0xB0, 0x30, 0xC0, 0x40},
 		{0xC0, 0x30, 0xD0, 0x40},
 		{0xD0, 0x30, 0xE0, 0x40},
+
 		{0xB0, 0x40, 0xC0, 0x50},
 		{0xC0, 0x40, 0xD0, 0x50},
 		{0xD0, 0x40, 0xE0, 0x50},
+
 		{0xB0, 0x50, 0xC0, 0x60},
 		{0xC0, 0x50, 0xD0, 0x60},
 		{0xD0, 0x50, 0xE0, 0x60},
@@ -702,12 +714,15 @@ void ActNpc129(NPCHAR *npc)
 		npc->ani_wait = 0;
 
 		if (++npc->ani_no > 2)
+		{
 			npc->cond = 0;
+		#ifdef FIX_BUGS
+			return;	// The code below will use 'ani_no' to access 'rect', even though it's now too high
+		#endif
+		}
 	}
 
 	npc->y += npc->ym;
-
-	// Note that '(npc->direct * 3) + npc->ani_no' can exceed the size of 'rect'
 
 	npc->rect = rect[(npc->direct * 3) + npc->ani_no];
 }

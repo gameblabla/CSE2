@@ -270,8 +270,16 @@ void PutArmsEnergy(BOOL flash)
 	RECT rcExpMax = {40, 72, 80, 80};
 	RECT rcExpFlash = {40, 80, 80, 88};
 
-	// Note that this can result in '-1', causing the following array accesses to be out-of-bounds
 	int lv = gArmsData[gSelectedArms].level - 1;
+
+#ifdef FIX_BUGS
+	// When the player has no weapons, the default level is 0, which becomes -1.
+	// Catch it, and set it to 0 instead, so the following array-accesses aren't
+	// out-of-bounds.
+	if (lv < 0)
+		lv = 0;
+#endif
+
 	int arms_code = gArmsData[gSelectedArms].code;
 	int exp_now = gArmsData[gSelectedArms].exp;
 	int exp_next = gArmsLevelTable[arms_code].exp[lv];

@@ -753,12 +753,14 @@ void ActNpc146(NPCHAR *npc)
 			{
 				SetDestroyNpChar(npc->x, npc->y, 0x1000, 8);
 				npc->cond = 0;
+			#ifdef FIX_BUGS
+				return;	// The code below will use 'ani_no' to access 'rect', even though it's now too high
+			#endif
 			}
 
 			break;
 	}
 
-	// Note that 'npc->ani_no' can exceed the size of 'rect'
 	npc->rect = rect[npc->ani_no];
 }
 

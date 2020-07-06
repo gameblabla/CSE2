@@ -1426,11 +1426,15 @@ void ActNpc199(NPCHAR *npc)
 	}
 
 	if (npc->ani_no > 4)
+	{
 		npc->cond = 0;
+	#ifdef FIX_BUGS
+		return;	// The code below will use 'ani_no' to access 'rect', even though it's now too high
+	#endif
+	}
 
 	npc->x += npc->xm;
 	npc->y += npc->ym;
 
-	// Note that 'npc->ani_no' can exceed the size of 'rect'
 	npc->rect = rect[npc->ani_no];
 }

@@ -71,11 +71,15 @@ void ActCaret01(CARET *crt)
 	if (++crt->ani_wait > 5)
 	{
 		crt->ani_wait = 0;
-		if (++crt->ani_no > 3)
-			crt->cond = 0;
-	}
 
-	// Note that 'crt->ani_no' can exceed the size of 'rcLeft' and 'rcRight'
+		if (++crt->ani_no > 3)
+		{
+			crt->cond = 0;
+		#ifdef FIX_BUGS
+			return;	// The code below will use 'ani_no' to access 'rcLeft' and 'rcRight', even though it's now too high
+		#endif
+		}
+	}
 
 	if (crt->direct == 0)
 		crt->rect = rcLeft[crt->ani_no];
@@ -118,9 +122,12 @@ void ActCaret02(CARET *crt)
 			}
 
 			if (crt->ani_no > 3)
+			{
 				crt->cond = 0;
-
-			// Note that 'crt->ani_no' can exceed the size of 'rect_left'
+			#ifdef FIX_BUGS
+				return;	// The code below will use 'ani_no' to access 'rect_left', even though it's now too high
+			#endif
+			}
 
 			crt->rect = rect_left[crt->ani_no];
 			break;
@@ -133,9 +140,12 @@ void ActCaret02(CARET *crt)
 			}
 
 			if (crt->ani_no > 3)
+			{
 				crt->cond = 0;
-
-			// Note that 'crt->ani_no' can exceed the size of 'rect_right'
+			#ifdef FIX_BUGS
+				return;	// The code below will use 'ani_no' to access 'rect_right', even though it's now too high
+			#endif
+			}
 
 			crt->rect = rect_right[crt->ani_no];
 			break;
@@ -162,11 +172,15 @@ void ActCaret03(CARET *crt)
 	if (++crt->ani_wait > 2)
 	{
 		crt->ani_wait = 0;
-		if (++crt->ani_no > 3)
-			crt->cond = 0;
-	}
 
-	// Note that 'crt->ani_no' can exceed the size of 'rect'
+		if (++crt->ani_no > 3)
+		{
+			crt->cond = 0;
+		#ifdef FIX_BUGS
+			return;	// The code below will use 'ani_no' to access 'rect', even though it's now too high
+		#endif
+		}
+	}
 
 	crt->rect = rect[crt->ani_no];
 }
@@ -177,9 +191,11 @@ void ActCaret04(CARET *crt)
 		{64, 32, 80, 48},
 		{80, 32, 96, 48},
 		{96, 32, 112, 48},
+
 		{64, 48, 80, 64},
 		{80, 48, 96, 64},
 		{96, 48, 112, 64},
+
 		{64, 64, 80, 80},
 		{80, 64, 96, 80},
 		{96, 64, 112, 80},
@@ -190,7 +206,12 @@ void ActCaret04(CARET *crt)
 		crt->ani_wait = 0;
 
 		if (++crt->ani_no > 2)
+		{
 			crt->cond = 0;
+		#ifdef FIX_BUGS
+			return;	// The code below will use 'ani_no' to access 'rect', even though it's now too high
+		#endif
+		}
 	}
 
 	crt->rect = rect[(crt->direct * 3) + crt->ani_no];
@@ -215,12 +236,15 @@ void ActCaret05(CARET *crt)
 	}
 
 	if (crt->ani_no > 6)
+	{
 		crt->cond = 0;
+	#ifdef FIX_BUGS
+		return;	// The code below will use 'ani_no' to access 'rect', even though it's now too high
+	#endif
+	}
 
 	crt->x += 0x80;
 	crt->y -= 0x80;
-
-	// Note that 'crt->ani_no' can exceed the size of 'rect'
 
 	crt->rect = rect[crt->ani_no];
 }
@@ -242,10 +266,13 @@ void ActCaret07(CARET *crt)
 		crt->ani_wait = 0;
 
 		if (++crt->ani_no > 6)
+		{
 			crt->cond = 0;
+		#ifdef FIX_BUGS
+			return;	// The code below will use 'ani_no' to access 'rcLeft', even though it's now too high
+		#endif
+		}
 	}
-
-	// Note that 'crt->ani_no' can exceed the size of rcLeft
 
 	crt->rect = rcLeft[crt->ani_no];
 
@@ -359,11 +386,15 @@ void ActCaret11(CARET *crt)
 	if (++crt->ani_wait > 2)
 	{
 		crt->ani_wait = 0;
-		if (++crt->ani_no > 6)
-			crt->cond = 0;
-	}
 
-	// Note that 'crt->ani_no' can exceed the size of 'rcRight'
+		if (++crt->ani_no > 6)
+		{
+			crt->cond = 0;
+		#ifdef FIX_BUGS
+			return;	// The code below will use 'ani_no' to access 'rcRight', even though it's now too high
+		#endif
+		}
+	}
 
 	crt->rect = rcRight[crt->ani_no];
 }
@@ -378,11 +409,15 @@ void ActCaret12(CARET *crt)
 	if (++crt->ani_wait > 2)
 	{
 		crt->ani_wait = 0;
-		if (++crt->ani_no > 1)
-			crt->cond = 0;
-	}
 
-	// Note that 'crt->ani_no' can exceed the size of 'rcLeft'
+		if (++crt->ani_no > 1)
+		{
+			crt->cond = 0;
+		#ifdef FIX_BUGS
+			return;	// The code below will use 'ani_no' to access 'rcLeft', even though it's now too high
+		#endif
+		}
+	}
 
 	crt->rect = rcLeft[crt->ani_no];
 }
@@ -446,10 +481,13 @@ void ActCaret14(CARET *crt)
 		crt->ani_wait = 0;
 
 		if (++crt->ani_no > 4)
+		{
 			crt->cond = 0;
+		#ifdef FIX_BUGS
+			return;	// The code below will use 'ani_no' to access 'rect', even though it's now too high
+		#endif
+		}
 	}
-
-	// Note that 'crt->ani_no' can exceed the size of 'rect'
 
 	crt->rect = rect[crt->ani_no];
 }
@@ -468,10 +506,13 @@ void ActCaret15(CARET *crt)
 		crt->ani_wait = 0;
 
 		if (++crt->ani_no > 3)
+		{
 			crt->cond = 0;
+		#ifdef FIX_BUGS
+			return;	// The code below will use 'ani_no' to access 'rcLeft', even though it's now too high
+		#endif
+		}
 	}
-
-	// Note that 'crt->ani_no' can exceed the size of 'rcLeft'
 
 	crt->rect = rcLeft[crt->ani_no];
 }

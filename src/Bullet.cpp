@@ -1641,7 +1641,12 @@ void ActBullet_Edge(BULLET *bul)
 				bul->damage = 1;
 
 			if (bul->ani_no > 4)
+			{
 				bul->cond = 0;
+			#ifdef FIX_BUGS
+				return;	// The code below will use 'ani_no' to access 'rcLeft' and 'rcRight', even though it's now too high
+			#endif
+			}
 
 			break;
 	}
@@ -1661,8 +1666,6 @@ void ActBullet_Edge(BULLET *bul)
 		{72, 88, 96, 112},
 		{96, 88, 120, 112},
 	};
-
-	// Note that 'bul->ani_no' can exceed the size of 'rcLeft' and 'rcRight'
 
 	if (bul->direct == 0)
 		bul->rect = rcLeft[bul->ani_no];
