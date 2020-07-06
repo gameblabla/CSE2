@@ -145,7 +145,7 @@ void ActNpc302(NPCHAR *npc)
 
 			if (npc->direct != 0)
 			{
-				for (n = 0xAA; n < 0x200; ++n)
+				for (n = 0xAA; n < NPC_MAX; ++n)
 				{
 					if (gNPC[n].cond & 0x80 && gNPC[n].code_event == npc->direct)
 					{
@@ -154,7 +154,7 @@ void ActNpc302(NPCHAR *npc)
 					}
 				}
 
-				if (n == 0x200)
+				if (n == NPC_MAX)
 				{
 					npc->cond = 0;
 					break;
