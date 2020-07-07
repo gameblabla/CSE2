@@ -24,7 +24,7 @@
 
 #include "decoders/common.h"
 
-void* SplitDecoder_Create(DecoderStage *next_stage_intro, DecoderStage *next_stage_loop);
+void* SplitDecoder_Create(DecoderStage *next_stage_intro, DecoderStage *next_stage_loop, unsigned int channel_count);
 void SplitDecoder_Destroy(void *split_decoder);
 void SplitDecoder_Rewind(void *split_decoder);
 size_t SplitDecoder_GetSamples(void *split_decoder, short *buffer, size_t frames_to_do);

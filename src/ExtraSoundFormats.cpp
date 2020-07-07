@@ -282,7 +282,7 @@ void ExtraSound_SetSFXFrequency(int id, unsigned long frequency)
 	if (sfx_list[id].valid)
 	{
 		AudioBackend_Lock();
-		ClownAudio_Mixer_SetSoundSampleRate(mixer, sfx_list[id].sound_id, frequency);
+		ClownAudio_Mixer_SetSoundSampleRate(mixer, sfx_list[id].sound_id, frequency, frequency);
 		AudioBackend_Unlock();
 	}
 }

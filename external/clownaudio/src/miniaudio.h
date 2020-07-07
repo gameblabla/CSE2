@@ -1,6 +1,6 @@
 /*
 Audio playback and capture library. Choice of public domain or MIT-0. See license statements at the end of this file.
-miniaudio - v0.10.10 - TBD
+miniaudio - v0.10.12 - 2020-07-04
 
 David Reid - davidreidsoftware@gmail.com
 
@@ -9,190 +9,13 @@ GitHub:  https://github.com/dr-soft/miniaudio
 */
 
 /*
-RELEASE NOTES - VERSION 0.10.x
-==============================
-Version 0.10 includes major API changes and refactoring, mostly concerned with the data conversion system. Data conversion is performed internally to convert
-audio data between the format requested when initializing the `ma_device` object and the format of the internal device used by the backend. The same applies
-to the `ma_decoder` object. The previous design has several design flaws and missing features which necessitated a complete redesign.
-
-
-Changes to Data Conversion
---------------------------
-The previous data conversion system used callbacks to deliver input data for conversion. This design works well in some specific situations, but in other
-situations it has some major readability and maintenance issues. The decision was made to replace this with a more iterative approach where you just pass in a
-pointer to the input data directly rather than dealing with a callback.
-
-The following are the data conversion APIs that have been removed and their replacements:
-
-  - ma_format_converter -> ma_convert_pcm_frames_format()
-  - ma_channel_router   -> ma_channel_converter
-  - ma_src              -> ma_resampler
-  - ma_pcm_converter    -> ma_data_converter
-
-The previous conversion APIs accepted a callback in their configs. There are no longer any callbacks to deal with. Instead you just pass the data into the
-`*_process_pcm_frames()` function as a pointer to a buffer.
-
-The simplest aspect of data conversion is sample format conversion. To convert between two formats, just call `ma_convert_pcm_frames_format()`. Channel
-conversion is also simple which you can do with `ma_channel_converter` via `ma_channel_converter_process_pcm_frames()`.
-
-Resampling is more complicated because the number of output frames that are processed is different to the number of input frames that are consumed. When you
-call `ma_resampler_process_pcm_frames()` you need to pass in the number of input frames available for processing and the number of output frames you want to
-output. Upon returning they will receive the number of input frames that were consumed and the number of output frames that were generated.
-
-The `ma_data_converter` API is a wrapper around format, channel and sample rate conversion and handles all of the data conversion you'll need which probably
-makes it the best option if you need to do data conversion.
-
-In addition to changes to the API design, a few other changes have been made to the data conversion pipeline:
-
-  - The sinc resampler has been removed. This was completely broken and never actually worked properly.
-  - The linear resampler now uses low-pass filtering to remove aliasing. The quality of the low-pass filter can be controlled via the resampler config with the
-    `lpfOrder` option, which has a maximum value of MA_MAX_FILTER_ORDER.
-  - Data conversion now supports s16 natively which runs through a fixed point pipeline. Previously everything needed to be converted to floating point before
-    processing, whereas now both s16 and f32 are natively supported. Other formats still require conversion to either s16 or f32 prior to processing, however
-    `ma_data_converter` will handle this for you.
-
-
-Custom Memory Allocators
-------------------------
-miniaudio has always supported macro level customization for memory allocation via MA_MALLOC, MA_REALLOC and MA_FREE, however some scenarios require more
-flexibility by allowing a user data pointer to be passed to the custom allocation routines. Support for this has been added to version 0.10 via the
-`ma_allocation_callbacks` structure. Anything making use of heap allocations has been updated to accept this new structure.
-
-The `ma_context_config` structure has been updated with a new member called `allocationCallbacks`. Leaving this set to it's defaults returned by
-`ma_context_config_init()` will cause it to use MA_MALLOC, MA_REALLOC and MA_FREE. Likewise, The `ma_decoder_config` structure has been updated in the same
-way, and leaving everything as-is after `ma_decoder_config_init()` will cause it to use the same defaults.
-
-The following APIs have been updated to take a pointer to a `ma_allocation_callbacks` object. Setting this parameter to NULL will cause it to use defaults.
-Otherwise they will use the relevant callback in the structure.
-
-  - ma_malloc()
-  - ma_realloc()
-  - ma_free()
-  - ma_aligned_malloc()
-  - ma_aligned_free()
-  - ma_rb_init() / ma_rb_init_ex()
-  - ma_pcm_rb_init() / ma_pcm_rb_init_ex()
-
-Note that you can continue to use MA_MALLOC, MA_REALLOC and MA_FREE as per normal. These will continue to be used by default if you do not specify custom
-allocation callbacks.
-
-
-Buffer and Period Configuration Changes
----------------------------------------
-The way in which the size of the internal buffer and periods are specified in the device configuration have changed. In previous versions, the config variables
-`bufferSizeInFrames` and `bufferSizeInMilliseconds` defined the size of the entire buffer, with the size of a period being the size of this variable divided by
-the period count. This became confusing because people would expect the value of `bufferSizeInFrames` or `bufferSizeInMilliseconds` to independantly determine
-latency, when in fact it was that value divided by the period count that determined it. These variables have been removed and replaced with new ones called
-`periodSizeInFrames` and `periodSizeInMilliseconds`.
-
-These new configuration variables work in the same way as their predecessors in that if one is set to 0, the other will be used, but the main difference is
-that you now set these to you desired latency rather than the size of the entire buffer. The benefit of this is that it's much easier and less confusing to
-configure latency.
-
-The following unused APIs have been removed:
-
-    ma_get_default_buffer_size_in_milliseconds()
-    ma_get_default_buffer_size_in_frames()
-
-The following macros have been removed:
-
-    MA_BASE_BUFFER_SIZE_IN_MILLISECONDS_LOW_LATENCY
-    MA_BASE_BUFFER_SIZE_IN_MILLISECONDS_CONSERVATIVE
-
-
-Other API Changes
------------------
-Other less major API changes have also been made in version 0.10.
-
-`ma_device_set_stop_callback()` has been removed. If you require a stop callback, you must now set it via the device config just like the data callback.
-
-The `ma_sine_wave` API has been replaced with a more general API called `ma_waveform`. This supports generation of different types of waveforms, including
-sine, square, triangle and sawtooth. Use `ma_waveform_init()` in place of `ma_sine_wave_init()` to initialize the waveform object. This takes a configuration
-object called `ma_waveform_config` which defines the properties of the waveform. Use `ma_waveform_config_init()` to initialize a `ma_waveform_config` object.
-Use `ma_waveform_read_pcm_frames()` in place of `ma_sine_wave_read_f32()` and `ma_sine_wave_read_f32_ex()`.
-
-`ma_convert_frames()` and `ma_convert_frames_ex()` have been changed. Both of these functions now take a new parameter called `frameCountOut` which specifies
-the size of the output buffer in PCM frames. This has been added for safety. In addition to this, the parameters for `ma_convert_frames_ex()` have changed to
-take a pointer to a `ma_data_converter_config` object to specify the input and output formats to convert between. This was done to make it more flexible, to
-prevent the parameter list getting too long, and to prevent API breakage whenever a new conversion property is added.
-
-`ma_calculate_frame_count_after_src()` has been renamed to `ma_calculate_frame_count_after_resampling()` for consistency with the new `ma_resampler` API.
-
-
-Filters
--------
-The following filters have been added:
-
-    |-------------|-------------------------------------------------------------------|
-    | API         | Description                                                       |
-    |-------------|-------------------------------------------------------------------|
-    | ma_biquad   | Biquad filter (transposed direct form 2)                          |
-    | ma_lpf1     | First order low-pass filter                                       |
-    | ma_lpf2     | Second order low-pass filter                                      |
-    | ma_lpf      | High order low-pass filter (Butterworth)                          |
-    | ma_hpf1     | First order high-pass filter                                      |
-    | ma_hpf2     | Second order high-pass filter                                     |
-    | ma_hpf      | High order high-pass filter (Butterworth)                         |
-    | ma_bpf2     | Second order band-pass filter                                     |
-    | ma_bpf      | High order band-pass filter                                       |
-    | ma_peak2    | Second order peaking filter                                       |
-    | ma_notch2   | Second order notching filter                                      |
-    | ma_loshelf2 | Second order low shelf filter                                     |
-    | ma_hishelf2 | Second order high shelf filter                                    |
-    |-------------|-------------------------------------------------------------------|
-
-These filters all support 32-bit floating point and 16-bit signed integer formats natively. Other formats need to be converted beforehand.
-
-
-Sine, Square, Triangle and Sawtooth Waveforms
----------------------------------------------
-Previously miniaudio supported only sine wave generation. This has now been generalized to support sine, square, triangle and sawtooth waveforms. The old
-`ma_sine_wave` API has been removed and replaced with the `ma_waveform` API. Use `ma_waveform_config_init()` to initialize a config object, and then pass it
-into `ma_waveform_init()`. Then use `ma_waveform_read_pcm_frames()` to read PCM data.
-
-
-Noise Generation
-----------------
-A noise generation API has been added. This is used via the `ma_noise` API. Currently white, pink and Brownian noise is supported. The `ma_noise` API is
-similar to the waveform API. Use `ma_noise_config_init()` to initialize a config object, and then pass it into `ma_noise_init()` to initialize a `ma_noise`
-object. Then use `ma_noise_read_pcm_frames()` to read PCM data.
-
-
-Miscellaneous Changes
----------------------
-The MA_NO_STDIO option has been removed. This would disable file I/O APIs, however this has proven to be too hard to maintain for it's perceived value and was
-therefore removed.
-
-Internal functions have all been made static where possible. If you get warnings about unused functions, please submit a bug report.
-
-The `ma_device` structure is no longer defined as being aligned to MA_SIMD_ALIGNMENT. This resulted in a possible crash when allocating a `ma_device` object on
-the heap, but not aligning it to MA_SIMD_ALIGNMENT. This crash would happen due to the compiler seeing the alignment specified on the structure and assuming it
-was always aligned as such and thinking it was safe to emit alignment-dependant SIMD instructions. Since miniaudio's philosophy is for things to just work,
-this has been removed from all structures.
-
-Results codes have been overhauled. Unnecessary result codes have been removed, and some have been renumbered for organisation purposes. If you are are binding
-maintainer you will need to update your result codes. Support has also been added for retrieving a human readable description of a given result code via the
-`ma_result_description()` API.
-
-ALSA: The automatic format conversion, channel conversion and resampling performed by ALSA is now disabled by default as they were causing some compatibility
-issues with certain devices and configurations. These can be individually enabled via the device config:
-
-    ```c
-    deviceConfig.alsa.noAutoFormat   = MA_TRUE;
-    deviceConfig.alsa.noAutoChannels = MA_TRUE;
-    deviceConfig.alsa.noAutoResample = MA_TRUE;
-    ```
-*/
-
-
-/*
-Introduction
-============
+1. Introduction
+===============
 miniaudio is a single file library for audio playback and capture. To use it, do the following in one .c file:
 
     ```c
     #define MINIAUDIO_IMPLEMENTATION
-    #include "miniaudio.h
+    #include "miniaudio.h"
     ```
 
 You can #include miniaudio.h in other parts of the program just like any other header.
@@ -251,15 +74,15 @@ are added to the `ma_device_config` structure. The example above uses a fairly s
 takes a single parameter, which is whether or not the device is a playback, capture, duplex or loopback device (loopback devices are not supported on all
 backends). The `config.playback.format` member sets the sample format which can be one of the following (all formats are native-endian):
 
-    |---------------|----------------------------------------|---------------------------|
+    +---------------+----------------------------------------+---------------------------+
     | Symbol        | Description                            | Range                     |
-    |---------------|----------------------------------------|---------------------------|
+    +---------------+----------------------------------------+---------------------------+
     | ma_format_f32 | 32-bit floating point                  | [-1, 1]                   |
     | ma_format_s16 | 16-bit signed integer                  | [-32768, 32767]           |
     | ma_format_s24 | 24-bit signed integer (tightly packed) | [-8388608, 8388607]       |
     | ma_format_s32 | 32-bit signed integer                  | [-2147483648, 2147483647] |
     | ma_format_u8  | 8-bit unsigned integer                 | [0, 255]                  |
-    |---------------|----------------------------------------|---------------------------|
+    +---------------+----------------------------------------+---------------------------+
 
 The `config.playback.channels` member sets the number of channels to use with the device. The channel count cannot exceed MA_MAX_CHANNELS. The
 `config.sampleRate` member sets the sample rate (which must be the same for both playback and capture in full-duplex configurations). This is usually set to
@@ -302,14 +125,14 @@ device type is set to `ma_device_type_capture`).
 
 These are the available device types and how you should handle the buffers in the callback:
 
-    |-------------------------|--------------------------------------------------------|
+    +-------------------------+--------------------------------------------------------+
     | Device Type             | Callback Behavior                                      |
-    |-------------------------|--------------------------------------------------------|
+    +-------------------------+--------------------------------------------------------+
     | ma_device_type_playback | Write to output buffer, leave input buffer untouched.  |
     | ma_device_type_capture  | Read from input buffer, leave output buffer untouched. |
     | ma_device_type_duplex   | Read from input buffer, write to output buffer.        |
     | ma_device_type_loopback | Read from input buffer, leave output buffer untouched. |
-    |-------------------------|--------------------------------------------------------|
+    +-------------------------+--------------------------------------------------------+
 
 You will notice in the example above that the sample format and channel count is specified separately for playback and capture. This is to support different
 data formats between the playback and capture devices in a full-duplex system. An example may be that you want to capture audio data as a monaural stream (one
@@ -319,7 +142,7 @@ will need to convert the data yourself. There are functions available to help yo
 The example above did not specify a physical device to connect to which means it will use the operating system's default device. If you have multiple physical
 devices connected and you want to use a specific one you will need to specify the device ID in the configuration, like so:
 
-    ```
+    ```c
     config.playback.pDeviceID = pMyPlaybackDeviceID;    // Only if requesting a playback or duplex device.
     config.capture.pDeviceID = pMyCaptureDeviceID;      // Only if requesting a capture, duplex or loopback device.
     ```
@@ -389,8 +212,8 @@ allocate memory for the context.
 
 
 
-Building
-========
+2. Building
+===========
 miniaudio should work cleanly out of the box without the need to download or install any dependencies. See below for platform-specific details.
 
 
@@ -530,76 +353,79 @@ Build Options
 
 
 
-Definitions
-===========
+3. Definitions
+==============
 This section defines common terms used throughout miniaudio. Unfortunately there is often ambiguity in the use of terms throughout the audio space, so this
 section is intended to clarify how miniaudio uses each term.
 
-Sample
-------
+3.1. Sample
+-----------
 A sample is a single unit of audio data. If the sample format is f32, then one sample is one 32-bit floating point number.
 
-Frame / PCM Frame
------------------
+3.2. Frame / PCM Frame
+----------------------
 A frame is a group of samples equal to the number of channels. For a stereo stream a frame is 2 samples, a mono frame is 1 sample, a 5.1 surround sound frame
 is 6 samples, etc. The terms "frame" and "PCM frame" are the same thing in miniaudio. Note that this is different to a compressed frame. If ever miniaudio
 needs to refer to a compressed frame, such as a FLAC frame, it will always clarify what it's referring to with something like "FLAC frame".
 
-Channel
--------
+3.3. Channel
+------------
 A stream of monaural audio that is emitted from an individual speaker in a speaker system, or received from an individual microphone in a microphone system. A
 stereo stream has two channels (a left channel, and a right channel), a 5.1 surround sound system has 6 channels, etc. Some audio systems refer to a channel as
 a complex audio stream that's mixed with other channels to produce the final mix - this is completely different to miniaudio's use of the term "channel" and
 should not be confused.
 
-Sample Rate
------------
+3.4. Sample Rate
+----------------
 The sample rate in miniaudio is always expressed in Hz, such as 44100, 48000, etc. It's the number of PCM frames that are processed per second.
 
-Formats
--------
+3.5. Formats
+------------
 Throughout miniaudio you will see references to different sample formats:
 
-    |---------------|----------------------------------------|---------------------------|
+    +---------------+----------------------------------------+---------------------------+
     | Symbol        | Description                            | Range                     |
-    |---------------|----------------------------------------|---------------------------|
+    +---------------+----------------------------------------+---------------------------+
     | ma_format_f32 | 32-bit floating point                  | [-1, 1]                   |
     | ma_format_s16 | 16-bit signed integer                  | [-32768, 32767]           |
     | ma_format_s24 | 24-bit signed integer (tightly packed) | [-8388608, 8388607]       |
     | ma_format_s32 | 32-bit signed integer                  | [-2147483648, 2147483647] |
     | ma_format_u8  | 8-bit unsigned integer                 | [0, 255]                  |
-    |---------------|----------------------------------------|---------------------------|
+    +---------------+----------------------------------------+---------------------------+
 
 All formats are native-endian.
 
 
 
-Decoding
-========
-The `ma_decoder` API is used for reading audio files. To enable a decoder you must #include the header of the relevant backend library before the
-implementation of miniaudio. You can find copies of these in the "extras" folder in the miniaudio repository (https://github.com/dr-soft/miniaudio).
-
-The table below are the supported decoding backends:
-
-    |--------|-----------------|
-    | Type   | Backend Library |
-    |--------|-----------------|
-    | WAV    | dr_wav.h        |
-    | FLAC   | dr_flac.h       |
-    | MP3    | dr_mp3.h        |
-    | Vorbis | stb_vorbis.c    |
-    |--------|-----------------|
-
-The code below is an example of how to enable decoding backends:
+4. Decoding
+===========
+The `ma_decoder` API is used for reading audio files. Built in support is included for WAV, FLAC and MP3. Support for Vorbis is enabled via stb_vorbis which
+can be enabled by including the header section before the implementation of miniaudio, like the following:
 
     ```c
-    #include "dr_flac.h"    // Enables FLAC decoding.
-    #include "dr_mp3.h"     // Enables MP3 decoding.
-    #include "dr_wav.h"     // Enables WAV decoding.
+    #define STB_VORBIS_HEADER_ONLY
+    #include "extras/stb_vorbis.c"    // Enables Vorbis decoding.
 
     #define MINIAUDIO_IMPLEMENTATION
     #include "miniaudio.h"
+
+    // The stb_vorbis implementation must come after the implementation of miniaudio.
+    #undef STB_VORBIS_HEADER_ONLY
+    #include "extras/stb_vorbis.c"
     ```
+
+A copy of stb_vorbis is included in the "extras" folder in the miniaudio repository (https://github.com/dr-soft/miniaudio).
+
+Built-in decoders are implemented via dr_wav, dr_flac and dr_mp3. These are amalgamated into the implementation section of miniaudio. You can disable the
+built-in decoders by specifying one or more of the following options before the miniaudio implementation:
+
+    ```c
+    #define MA_NO_WAV
+    #define MA_NO_FLAC
+    #define MA_NO_MP3
+    ```
+
+Disabling built-in versions of dr_wav, dr_flac and dr_mp3 is useful if you use these libraries independantly of the `ma_decoder` API.
 
 A decoder can be initialized from a file with `ma_decoder_init_file()`, a block of memory with `ma_decoder_init_memory()`, or from data delivered via callbacks
 with `ma_decoder_init()`. Here is an example for loading a decoder from a file:
@@ -667,26 +493,13 @@ The `ma_decoder_init_file()` API will try using the file extension to determine 
 
 
 
-Encoding
-========
-The `ma_encoding` API is used for writing audio files. To enable an encoder you must #include the header of the relevant backend library before the
-implementation of miniaudio. You can find copies of these in the "extras" folder in the miniaudio repository (https://github.com/dr-soft/miniaudio).
-
-The table below are the supported encoding backends:
-
-    |--------|-----------------|
-    | Type   | Backend Library |
-    |--------|-----------------|
-    | WAV    | dr_wav.h        |
-    |--------|-----------------|
-
-The code below is an example of how to enable encoding backends:
+5. Encoding
+===========
+The `ma_encoding` API is used for writing audio files. The only supported output format is WAV which is achieved via dr_wav which is amalgamated into the
+implementation section of miniaudio. This can be disabled by specifying the following option before the implementation of miniaudio:
 
     ```c
-    #include "dr_wav.h"     // Enables WAV encoding.
-
-    #define MINIAUDIO_IMPLEMENTATION
-    #include "miniaudio.h"
+    #define MA_NO_WAV
     ```
 
 An encoder can be initialized to write to a file with `ma_encoder_init_file()` or from data delivered via callbacks with `ma_encoder_init()`. Below is an
@@ -708,11 +521,11 @@ example for initializing an encoder to output to a file.
 When initializing an encoder you must specify a config which is initialized with `ma_encoder_config_init()`. Here you must specify the file type, the output
 sample format, output channel count and output sample rate. The following file types are supported:
 
-    |------------------------|-------------|
+    +------------------------+-------------+
     | Enum                   | Description |
-    |------------------------|-------------|
+    +------------------------+-------------+
     | ma_resource_format_wav | WAV         |
-    |------------------------|-------------|
+    +------------------------+-------------+
 
 If the format, channel count or sample rate is not supported by the output file type an error will be returned. The encoder will not perform data conversion so
 you will need to convert it before outputting any audio data. To output audio data, use `ma_encoder_write_pcm_frames()`, like in the example below:
@@ -724,26 +537,32 @@ you will need to convert it before outputting any audio data. To output audio da
 Encoders must be uninitialized with `ma_encoder_uninit()`.
 
 
+6. Data Conversion
+==================
+A data conversion API is included with miniaudio which supports the majority of data conversion requirements. This supports conversion between sample formats,
+channel counts (with channel mapping) and sample rates.
 
-Sample Format Conversion
-========================
+
+6.1. Sample Format Conversion
+-----------------------------
 Conversion between sample formats is achieved with the `ma_pcm_*_to_*()`, `ma_pcm_convert()` and `ma_convert_pcm_frames_format()` APIs. Use `ma_pcm_*_to_*()`
 to convert between two specific formats. Use `ma_pcm_convert()` to convert based on a `ma_format` variable. Use `ma_convert_pcm_frames_format()` to convert
 PCM frames where you want to specify the frame count and channel count as a variable instead of the total sample count.
 
-Dithering
----------
+
+6.1.1. Dithering
+----------------
 Dithering can be set using the ditherMode parameter.
 
 The different dithering modes include the following, in order of efficiency:
 
-    |-----------|--------------------------|
+    +-----------+--------------------------+
     | Type      | Enum Token               |
-    |-----------|--------------------------|
+    +-----------+--------------------------+
     | None      | ma_dither_mode_none      |
     | Rectangle | ma_dither_mode_rectangle |
     | Triangle  | ma_dither_mode_triangle  |
-    |-----------|--------------------------|
+    +-----------+--------------------------+
 
 Note that even if the dither mode is set to something other than `ma_dither_mode_none`, it will be ignored for conversions where dithering is not needed.
 Dithering is available for the following conversions:
@@ -760,8 +579,8 @@ Note that it is not an error to pass something other than ma_dither_mode_none fo
 
 
 
-Channel Conversion
-==================
+6.2. Channel Conversion
+-----------------------
 Channel conversion is used for channel rearrangement and conversion from one channel count to another. The `ma_channel_converter` API is used for channel
 conversion. Below is an example of initializing a simple channel converter which converts from mono to stereo.
 
@@ -790,8 +609,8 @@ The only formats supported are `ma_format_s16` and `ma_format_f32`. If you need 
 Input and output PCM frames are always interleaved. Deinterleaved layouts are not supported.
 
 
-Channel Mapping
----------------
+6.2.1. Channel Mapping
+----------------------
 In addition to converting from one channel count to another, like the example above, The channel converter can also be used to rearrange channels. When
 initializing the channel converter, you can optionally pass in channel maps for both the input and output frames. If the channel counts are the same, and each
 channel map contains the same channel positions with the exception that they're in a different order, a simple shuffling of the channels will be performed. If,
@@ -814,9 +633,9 @@ Finally, the `ma_channel_mix_mode_custom_weights` mode can be used to use custom
 Predefined channel maps can be retrieved with `ma_get_standard_channel_map()`. This takes a `ma_standard_channel_map` enum as it's first parameter, which can
 be one of the following:
 
-    |-----------------------------------|-----------------------------------------------------------|
+    +-----------------------------------+-----------------------------------------------------------+
     | Name                              | Description                                               |
-    |-----------------------------------|-----------------------------------------------------------|
+    +-----------------------------------+-----------------------------------------------------------+
     | ma_standard_channel_map_default   | Default channel map used by miniaudio. See below.         |
     | ma_standard_channel_map_microsoft | Channel map used by Microsoft's bitfield channel maps.    |
     | ma_standard_channel_map_alsa      | Default ALSA channel map.                                 |
@@ -826,40 +645,40 @@ be one of the following:
     | ma_standard_channel_map_sound4    | FreeBSD's sound(4).                                       |
     | ma_standard_channel_map_sndio     | sndio channel map. www.sndio.org/tips.html                |
     | ma_standard_channel_map_webaudio  | https://webaudio.github.io/web-audio-api/#ChannelOrdering | 
-    |-----------------------------------|-----------------------------------------------------------|
+    +-----------------------------------+-----------------------------------------------------------+
 
 Below are the channel maps used by default in miniaudio (ma_standard_channel_map_default):
 
-    |---------------|------------------------------|
+    +---------------+------------------------------+
     | Channel Count | Mapping                      |
-    |---------------|------------------------------|
+    +---------------+------------------------------+
     | 1 (Mono)      | 0: MA_CHANNEL_MONO           |
-    |---------------|------------------------------|
+    +---------------+------------------------------+
     | 2 (Stereo)    | 0: MA_CHANNEL_FRONT_LEFT     |
     |               | 1: MA_CHANNEL_FRONT_RIGHT    |
-    |---------------|------------------------------|
+    +---------------+------------------------------+
     | 3             | 0: MA_CHANNEL_FRONT_LEFT     |
     |               | 1: MA_CHANNEL_FRONT_RIGHT    |
     |               | 2: MA_CHANNEL_FRONT_CENTER   |
-    |---------------|------------------------------|
+    +---------------+------------------------------+
     | 4 (Surround)  | 0: MA_CHANNEL_FRONT_LEFT     |
     |               | 1: MA_CHANNEL_FRONT_RIGHT    |
     |               | 2: MA_CHANNEL_FRONT_CENTER   |
     |               | 3: MA_CHANNEL_BACK_CENTER    |
-    |---------------|------------------------------|
+    +---------------+------------------------------+
     | 5             | 0: MA_CHANNEL_FRONT_LEFT     |
     |               | 1: MA_CHANNEL_FRONT_RIGHT    |
     |               | 2: MA_CHANNEL_FRONT_CENTER   |
     |               | 3: MA_CHANNEL_BACK_LEFT      |
     |               | 4: MA_CHANNEL_BACK_RIGHT     |
-    |---------------|------------------------------|
+    +---------------+------------------------------+
     | 6 (5.1)       | 0: MA_CHANNEL_FRONT_LEFT     |
     |               | 1: MA_CHANNEL_FRONT_RIGHT    |
     |               | 2: MA_CHANNEL_FRONT_CENTER   |
     |               | 3: MA_CHANNEL_LFE            |
     |               | 4: MA_CHANNEL_SIDE_LEFT      |
     |               | 5: MA_CHANNEL_SIDE_RIGHT     |
-    |---------------|------------------------------|
+    +---------------+------------------------------+
     | 7             | 0: MA_CHANNEL_FRONT_LEFT     |
     |               | 1: MA_CHANNEL_FRONT_RIGHT    |
     |               | 2: MA_CHANNEL_FRONT_CENTER   |
@@ -867,7 +686,7 @@ Below are the channel maps used by default in miniaudio (ma_standard_channel_map
     |               | 4: MA_CHANNEL_BACK_CENTER    |
     |               | 4: MA_CHANNEL_SIDE_LEFT      |
     |               | 5: MA_CHANNEL_SIDE_RIGHT     |
-    |---------------|------------------------------|
+    +---------------+------------------------------+
     | 8 (7.1)       | 0: MA_CHANNEL_FRONT_LEFT     |
     |               | 1: MA_CHANNEL_FRONT_RIGHT    |
     |               | 2: MA_CHANNEL_FRONT_CENTER   |
@@ -876,16 +695,16 @@ Below are the channel maps used by default in miniaudio (ma_standard_channel_map
     |               | 5: MA_CHANNEL_BACK_RIGHT     |
     |               | 6: MA_CHANNEL_SIDE_LEFT      |
     |               | 7: MA_CHANNEL_SIDE_RIGHT     |
-    |---------------|------------------------------|
+    +---------------+------------------------------+
     | Other         | All channels set to 0. This  |
     |               | is equivalent to the same    |
     |               | mapping as the device.       |
-    |---------------|------------------------------|
+    +---------------+------------------------------+
 
 
 
-Resampling
-==========
+6.3. Resampling
+---------------
 Resampling is achieved with the `ma_resampler` object. To create a resampler object, do something like the following:
 
     ```c
@@ -929,12 +748,12 @@ only configuration property that can be changed after initialization.
 
 The miniaudio resampler supports multiple algorithms:
 
-    |-----------|------------------------------|
+    +-----------+------------------------------+
     | Algorithm | Enum Token                   |
-    |-----------|------------------------------|
+    +-----------+------------------------------+
     | Linear    | ma_resample_algorithm_linear |
     | Speex     | ma_resample_algorithm_speex  |
-    |-----------|------------------------------|
+    +-----------+------------------------------+
 
 Because Speex is not public domain it is strictly opt-in and the code is stored in separate files. if you opt-in to the Speex backend you will need to consider
 it's license, the text of which can be found in it's source files in "extras/speex_resampler". Details on how to opt-in to the Speex resampler is explained in
@@ -959,15 +778,15 @@ Due to the nature of how resampling works, the resampler introduces some latency
 with `ma_resampler_get_input_latency()` and `ma_resampler_get_output_latency()`.
 
 
-Resampling Algorithms
----------------------
+6.3.1. Resampling Algorithms
+----------------------------
 The choice of resampling algorithm depends on your situation and requirements. The linear resampler is the most efficient and has the least amount of latency,
 but at the expense of poorer quality. The Speex resampler is higher quality, but slower with more latency. It also performs several heap allocations internally
 for memory management.
 
 
-Linear Resampling
------------------
+6.3.1.1. Linear Resampling
+--------------------------
 The linear resampler is the fastest, but comes at the expense of poorer quality. There is, however, some control over the quality of the linear resampler which
 may make it a suitable option depending on your requirements.
 
@@ -984,8 +803,8 @@ and is a purely perceptual configuration.
 The API for the linear resampler is the same as the main resampler API, only it's called `ma_linear_resampler`.
 
 
-Speex Resampling
-----------------
+6.3.1.2. Speex Resampling
+-------------------------
 The Speex resampler is made up of third party code which is released under the BSD license. Because it is licensed differently to miniaudio, which is public
 domain, it is strictly opt-in and all of it's code is stored in separate files. If you opt-in to the Speex resampler you must consider the license text in it's
 source files. To opt-in, you must first #include the following file before the implementation of miniaudio.h:
@@ -1005,8 +824,8 @@ the fastest with the poorest quality and 10 being the slowest with the highest q
 
 
 
-General Data Conversion
-=======================
+6.4. General Data Conversion
+----------------------------
 The `ma_data_converter` API can be used to wrap sample format conversion, channel conversion and resampling into one operation. This is what miniaudio uses
 internally to convert between the format requested when the device was initialized and the format of the backend's native device. The API for general data
 conversion is very similar to the resampling API. Create a `ma_data_converter` object like this:
@@ -1076,11 +895,11 @@ input rate and the output rate with `ma_data_converter_get_input_latency()` and 
 
 
 
-Filtering
-=========
+7. Filtering
+============
 
-Biquad Filtering
-----------------
+7.1. Biquad Filtering
+---------------------
 Biquad filtering is achieved with the `ma_biquad` API. Example:
 
     ```c
@@ -1115,17 +934,17 @@ do a full initialization which involves clearing the registers to 0. Note that c
 result in an error.
 
 
-Low-Pass Filtering
-------------------
+7.2. Low-Pass Filtering
+-----------------------
 Low-pass filtering is achieved with the following APIs:
 
-    |---------|------------------------------------------|
+    +---------+------------------------------------------+
     | API     | Description                              |
-    |---------|------------------------------------------|
+    +---------+------------------------------------------+
     | ma_lpf1 | First order low-pass filter              |
     | ma_lpf2 | Second order low-pass filter             |
     | ma_lpf  | High order low-pass filter (Butterworth) |
-    |---------|------------------------------------------|
+    +---------+------------------------------------------+
 
 Low-pass filter example:
 
@@ -1169,82 +988,82 @@ If an even filter order is specified, a series of second order filters will be p
 will be applied, followed by a series of second order filters in a chain.
 
 
-High-Pass Filtering
--------------------
+7.3. High-Pass Filtering
+------------------------
 High-pass filtering is achieved with the following APIs:
 
-    |---------|-------------------------------------------|
+    +---------+-------------------------------------------+
     | API     | Description                               |
-    |---------|-------------------------------------------|
+    +---------+-------------------------------------------+
     | ma_hpf1 | First order high-pass filter              |
     | ma_hpf2 | Second order high-pass filter             |
     | ma_hpf  | High order high-pass filter (Butterworth) |
-    |---------|-------------------------------------------|
+    +---------+-------------------------------------------+
 
 High-pass filters work exactly the same as low-pass filters, only the APIs are called `ma_hpf1`, `ma_hpf2` and `ma_hpf`. See example code for low-pass filters
 for example usage.
 
 
-Band-Pass Filtering
--------------------
+7.4. Band-Pass Filtering
+------------------------
 Band-pass filtering is achieved with the following APIs:
 
-    |---------|-------------------------------|
+    +---------+-------------------------------+
     | API     | Description                   |
-    |---------|-------------------------------|
+    +---------+-------------------------------+
     | ma_bpf2 | Second order band-pass filter |
     | ma_bpf  | High order band-pass filter   |
-    |---------|-------------------------------|
+    +---------+-------------------------------+
 
 Band-pass filters work exactly the same as low-pass filters, only the APIs are called `ma_bpf2` and `ma_hpf`. See example code for low-pass filters for example
 usage. Note that the order for band-pass filters must be an even number which means there is no first order band-pass filter, unlike low-pass and high-pass
 filters.
 
 
-Notch Filtering
----------------
+7.5. Notch Filtering
+--------------------
 Notch filtering is achieved with the following APIs:
 
-    |-----------|------------------------------------------|
+    +-----------+------------------------------------------+
     | API       | Description                              |
-    |-----------|------------------------------------------|
+    +-----------+------------------------------------------+
     | ma_notch2 | Second order notching filter             |
-    |-----------|------------------------------------------|
+    +-----------+------------------------------------------+
 
 
-Peaking EQ Filtering
---------------------
+7.6. Peaking EQ Filtering
+-------------------------
 Peaking filtering is achieved with the following APIs:
 
-    |----------|------------------------------------------|
+    +----------+------------------------------------------+
     | API      | Description                              |
-    |----------|------------------------------------------|
+    +----------+------------------------------------------+
     | ma_peak2 | Second order peaking filter              |
-    |----------|------------------------------------------|
+    +----------+------------------------------------------+
 
 
-Low Shelf Filtering
--------------------
+7.7. Low Shelf Filtering
+------------------------
 Low shelf filtering is achieved with the following APIs:
 
-    |-------------|------------------------------------------|
+    +-------------+------------------------------------------+
     | API         | Description                              |
-    |-------------|------------------------------------------|
+    +-------------+------------------------------------------+
     | ma_loshelf2 | Second order low shelf filter            |
-    |-------------|------------------------------------------|
+    +-------------+------------------------------------------+
 
 Where a high-pass filter is used to eliminate lower frequencies, a low shelf filter can be used to just turn them down rather than eliminate them entirely.
 
 
-High Shelf Filtering
---------------------
+7.8. High Shelf Filtering
+-------------------------
 High shelf filtering is achieved with the following APIs:
 
-    |-------------|------------------------------------------|
+    +-------------+------------------------------------------+
     | API         | Description                              |
-    |-------------|------------------------------------------|
+    +-------------+------------------------------------------+
     | ma_hishelf2 | Second order high shelf filter           |
-    |-------------|------------------------------------------|
+    +-------------+------------------------------------------+
 
 The high shelf filter has the same API as the low shelf filter, only you would use `ma_hishelf` instead of `ma_loshelf`. Where a low shelf filter is used to
 adjust the volume of low frequencies, the high shelf filter does the same thing for high frequencies.
@@ -1252,11 +1071,11 @@ adjust the volume of low frequencies, the high shelf filter does the same thing 
 
 
 
-Waveform and Noise Generation
-=============================
+8. Waveform and Noise Generation
+================================
 
-Waveforms
----------
+8.1. Waveforms
+--------------
 miniaudio supports generation of sine, square, triangle and sawtooth waveforms. This is achieved with the `ma_waveform` API. Example:
 
     ```c
@@ -1281,19 +1100,19 @@ ramp, for example.
 
 Below are the supported waveform types:
 
-    |---------------------------|
+    +---------------------------+
     | Enum Name                 |
-    |---------------------------|
+    +---------------------------+
     | ma_waveform_type_sine     |
     | ma_waveform_type_square   |
     | ma_waveform_type_triangle |
     | ma_waveform_type_sawtooth |
-    |---------------------------|
+    +---------------------------+
 
 
 
-Noise
------
+8.2. Noise
+----------
 miniaudio supports generation of white, pink and Brownian noise via the `ma_noise` API. Example:
 
     ```c
@@ -1322,18 +1141,18 @@ side. To instead have each channel use the same random value, set the `duplicate
 
 Below are the supported noise types.
 
-    |------------------------|
+    +------------------------+
     | Enum Name              |
-    |------------------------|
+    +------------------------+
     | ma_noise_type_white    |
     | ma_noise_type_pink     |
     | ma_noise_type_brownian |
-    |------------------------|
+    +------------------------+
 
 
 
-Audio Buffers
-=============
+9. Audio Buffers
+================
 miniaudio supports reading from a buffer of raw audio data via the `ma_audio_buffer` API. This can read from both memory that's managed by the application, but
 can also handle the memory management for you internally. The way memory is managed is flexible and should support most use cases.
 
@@ -1407,8 +1226,8 @@ for you. You can determine if the buffer is at the end for the purpose of loopin
 
 
 
-Ring Buffers
-============
+10. Ring Buffers
+================
 miniaudio supports lock free (single producer, single consumer) ring buffers which are exposed via the `ma_rb` and `ma_pcm_rb` APIs. The `ma_rb` API operates
 on bytes, whereas the `ma_pcm_rb` operates on PCM frames. They are otherwise identical as `ma_pcm_rb` is just a wrapper around `ma_rb`.
 
@@ -1458,13 +1277,13 @@ Note that the ring buffer is only thread safe when used by a single consumer thr
 
 
 
-Backends
-========
+11. Backends
+============
 The following backends are supported by miniaudio.
 
-    |-------------|-----------------------|--------------------------------------------------------|
+    +-------------+-----------------------+--------------------------------------------------------+
     | Name        | Enum Name             | Supported Operating Systems                            |
-    |-------------|-----------------------|--------------------------------------------------------|
+    +-------------+-----------------------+--------------------------------------------------------+
     | WASAPI      | ma_backend_wasapi     | Windows Vista+                                         |
     | DirectSound | ma_backend_dsound     | Windows XP+                                            |
     | WinMM       | ma_backend_winmm      | Windows XP+ (may work on older versions, but untested) |
@@ -1479,25 +1298,25 @@ The following backends are supported by miniaudio.
     | OpenSL|ES   | ma_backend_opensl     | Android (API level 16+)                                |
     | Web Audio   | ma_backend_webaudio   | Web (via Emscripten)                                   |
     | Null        | ma_backend_null       | Cross Platform (not used on Web)                       |
-    |-------------|-----------------------|--------------------------------------------------------|
+    +-------------+-----------------------+--------------------------------------------------------+
 
 Some backends have some nuance details you may want to be aware of.
 
-WASAPI
-------
+11.1. WASAPI
+------------
 - Low-latency shared mode will be disabled when using an application-defined sample rate which is different to the device's native sample rate. To work around
   this, set wasapi.noAutoConvertSRC to true in the device config. This is due to IAudioClient3_InitializeSharedAudioStream() failing when the
   AUDCLNT_STREAMFLAGS_AUTOCONVERTPCM flag is specified. Setting wasapi.noAutoConvertSRC will result in miniaudio's internal resampler being used instead which
   will in turn enable the use of low-latency shared mode.
 
-PulseAudio
-----------
+11.2. PulseAudio
+----------------
 - If you experience bad glitching/noise on Arch Linux, consider this fix from the Arch wiki:
     https://wiki.archlinux.org/index.php/PulseAudio/Troubleshooting#Glitches,_skips_or_crackling
   Alternatively, consider using a different backend such as ALSA.
 
-Android
--------
+11.3. Android
+-------------
 - To capture audio on Android, remember to add the RECORD_AUDIO permission to your manifest:
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 - With OpenSL|ES, only a single ma_context can be active at any given time. This is due to a limitation with OpenSL|ES.
@@ -1506,8 +1325,8 @@ Android
 - The backend API will perform resampling where possible. The reason for this as opposed to using miniaudio's built-in resampler is to take advantage of any
   potential device-specific optimizations the driver may implement.
 
-UWP
----
+11.4. UWP
+---------
 - UWP only supports default playback and capture devices.
 - UWP requires the Microphone capability to be enabled in the application's manifest (Package.appxmanifest):
       <Package ...>
@@ -1517,7 +1336,7 @@ UWP
           </Capabilities>
       </Package>
 
-Web Audio / Emscripten
+11.5. Web Audio / Emscripten
 ----------------------
 - You cannot use -std=c* compiler flags, nor -ansi. This only applies to the Emscripten build.
 - The first time a context is initialized it will create a global object called "miniaudio" whose primary purpose is to act as a factory for device objects.
@@ -1528,8 +1347,8 @@ Web Audio / Emscripten
 
 
 
-Miscellaneous Notes
-===================
+12. Miscellaneous Notes
+=======================
 - Automatic stream routing is enabled on a per-backend basis. Support is explicitly enabled for WASAPI and Core Audio, however other backends such as
   PulseAudio may naturally support it, though not all have been tested.
 - The contents of the output buffer passed into the data callback will always be pre-initialized to zero unless the noPreZeroedOutputBuffer config variable in
@@ -1553,7 +1372,7 @@ extern "C" {
 
 #define MA_VERSION_MAJOR    0
 #define MA_VERSION_MINOR    10
-#define MA_VERSION_REVISION 10
+#define MA_VERSION_REVISION 12
 #define MA_VERSION_STRING   MA_XSTRINGIFY(MA_VERSION_MAJOR) "." MA_XSTRINGIFY(MA_VERSION_MINOR) "." MA_XSTRINGIFY(MA_VERSION_REVISION)
 
 #if defined(_MSC_VER) && !defined(__clang__)
@@ -5799,8 +5618,10 @@ IMPLEMENTATION
 #ifdef MA_WIN32
 #include <windows.h>
 #else
-#include <stdlib.h> /* For malloc(), free(), wcstombs(). */
-#include <string.h> /* For memset() */
+#include <stdlib.h>     /* For malloc(), free(), wcstombs(). */
+#include <string.h>     /* For memset() */
+#include <sched.h>
+#include <sys/time.h>   /* select() (used for ma_sleep()). */
 #endif
 
 #include <sys/stat.h>   /* For fstat(), etc. */
@@ -6235,6 +6056,75 @@ static MA_INLINE ma_uint32 ma_swap_endian_uint32(ma_uint32 n)
            ((n & 0x000000FF) << 24);
 #endif
 }
+
+
+#if !defined(MA_EMSCRIPTEN)
+#ifdef MA_WIN32
+static void ma_sleep__win32(ma_uint32 milliseconds)
+{
+    Sleep((DWORD)milliseconds);
+}
+#endif
+#ifdef MA_POSIX
+static void ma_sleep__posix(ma_uint32 milliseconds)
+{
+#ifdef MA_EMSCRIPTEN
+    (void)milliseconds;
+    MA_ASSERT(MA_FALSE);  /* The Emscripten build should never sleep. */
+#else
+    #if _POSIX_C_SOURCE >= 199309L
+        struct timespec ts;
+        ts.tv_sec  = milliseconds / 1000;
+        ts.tv_nsec = milliseconds % 1000 * 1000000;
+        nanosleep(&ts, NULL);
+    #else
+        struct timeval tv;
+        tv.tv_sec  = milliseconds / 1000;
+        tv.tv_usec = milliseconds % 1000 * 1000;
+        select(0, NULL, NULL, NULL, &tv);
+    #endif
+#endif
+}
+#endif
+
+static void ma_sleep(ma_uint32 milliseconds)
+{
+#ifdef MA_WIN32
+    ma_sleep__win32(milliseconds);
+#endif
+#ifdef MA_POSIX
+    ma_sleep__posix(milliseconds);
+#endif
+}
+#endif
+
+#if !defined(MA_EMSCRIPTEN)
+static MA_INLINE void ma_yield()
+{
+#if defined(__i386) || defined(_M_IX86) || defined(__x86_64__) || defined(_M_X64)
+    /* x86/x64 */
+    #if defined(_MSC_VER) && !defined(__clang__)
+        #if _MSC_VER >= 1400
+            _mm_pause();
+        #else
+            __asm pause;
+        #endif
+    #else
+        __asm__ __volatile__ ("pause");
+    #endif
+#elif (defined(__arm__) && defined(__ARM_ARCH) && __ARM_ARCH >= 6) || (defined(_M_ARM) && _M_ARM >= 6)
+    /* ARM */
+    #if defined(_MSC_VER)
+        /* Apparently there is a __yield() intrinsic that's compatible with ARM, but I cannot find documentation for it nor can I find where it's declared. */
+        __yield();
+    #else
+        __asm__ __volatile__ ("yield");
+    #endif
+#else
+    /* Unknown or unsupported architecture. No-op. */
+#endif
+}
+#endif
 
 
 
@@ -8372,6 +8262,51 @@ c89atomic_bool c89atomic_compare_exchange_strong_explicit_64(volatile c89atomic_
 /* c89atomic.h end */
 
 
+typedef unsigned char ma_spinlock;
+
+static MA_INLINE ma_result ma_spinlock_lock_ex(ma_spinlock* pSpinlock, ma_bool32 yield)
+{
+    if (pSpinlock == NULL) {
+        return MA_INVALID_ARGS;
+    }
+
+    for (;;) {
+        if (c89atomic_flag_test_and_set_explicit(pSpinlock, c89atomic_memory_order_acquire) == 0) {
+            break;
+        }
+
+        while (c89atomic_load_explicit_8(pSpinlock, c89atomic_memory_order_relaxed) == 1) {
+            if (yield) {
+                ma_yield();
+            }
+        }
+    }
+
+    return MA_SUCCESS;
+}
+
+static ma_result ma_spinlock_lock(ma_spinlock* pSpinlock)
+{
+    return ma_spinlock_lock_ex(pSpinlock, MA_TRUE);
+}
+
+static ma_result ma_spinlock_lock_noyield(ma_spinlock* pSpinlock)
+{
+    return ma_spinlock_lock_ex(pSpinlock, MA_FALSE);
+}
+
+static ma_result ma_spinlock_unlock(ma_spinlock* pSpinlock)
+{
+    if (pSpinlock == NULL) {
+        return MA_INVALID_ARGS;
+    }
+
+    c89atomic_flag_clear_explicit(pSpinlock, c89atomic_memory_order_release);
+    return MA_SUCCESS;
+}
+
+
+
 static void* ma__malloc_default(size_t sz, void* pUserData)
 {
     (void)pUserData;
@@ -8596,11 +8531,6 @@ static void ma_thread_wait__win32(ma_thread* pThread)
     WaitForSingleObject((HANDLE)*pThread, INFINITE);
 }
 
-static void ma_sleep__win32(ma_uint32 milliseconds)
-{
-    Sleep((DWORD)milliseconds);
-}
-
 
 static ma_result ma_mutex_init__win32(ma_mutex* pMutex)
 {
@@ -8710,9 +8640,6 @@ static ma_result ma_semaphore_release__win32(ma_semaphore* pSemaphore)
 
 
 #ifdef MA_POSIX
-#include <sched.h>
-#include <sys/time.h>
-
 static ma_result ma_thread_create__posix(ma_thread* pThread, ma_thread_priority priority, size_t stackSize, ma_thread_entry_proc entryProc, void* pData)
 {
     int result;
@@ -8788,28 +8715,6 @@ static void ma_thread_wait__posix(ma_thread* pThread)
 {
     pthread_join(*pThread, NULL);
 }
-
-#if !defined(MA_EMSCRIPTEN)
-static void ma_sleep__posix(ma_uint32 milliseconds)
-{
-#ifdef MA_EMSCRIPTEN
-    (void)milliseconds;
-    MA_ASSERT(MA_FALSE);  /* The Emscripten build should never sleep. */
-#else
-    #if _POSIX_C_SOURCE >= 199309L
-        struct timespec ts;
-        ts.tv_sec  = milliseconds / 1000;
-        ts.tv_nsec = milliseconds % 1000 * 1000000;
-        nanosleep(&ts, NULL);
-    #else
-        struct timeval tv;
-        tv.tv_sec  = milliseconds / 1000;
-        tv.tv_usec = milliseconds % 1000 * 1000;
-        select(0, NULL, NULL, NULL, &tv);
-    #endif
-#endif
-}
-#endif  /* MA_EMSCRIPTEN */
 
 
 static ma_result ma_mutex_init__posix(ma_mutex* pMutex)
@@ -8988,46 +8893,6 @@ static void ma_thread_wait(ma_thread* pThread)
     ma_thread_wait__posix(pThread);
 #endif
 }
-
-#if !defined(MA_EMSCRIPTEN)
-static void ma_sleep(ma_uint32 milliseconds)
-{
-#ifdef MA_WIN32
-    ma_sleep__win32(milliseconds);
-#endif
-#ifdef MA_POSIX
-    ma_sleep__posix(milliseconds);
-#endif
-}
-#endif
-
-#if !defined(MA_EMSCRIPTEN)
-static MA_INLINE void ma_yield()
-{
-#if defined(__i386) || defined(_M_IX86) || defined(__x86_64__) || defined(_M_X64)
-    /* x86/x64 */
-    #if defined(_MSC_VER) && !defined(__clang__)
-        #if _MSC_VER >= 1400
-            _mm_pause();
-        #else
-            __asm pause;
-        #endif
-    #else
-        __asm__ __volatile__ ("pause");
-    #endif
-#elif (defined(__arm__) && defined(__ARM_ARCH) && __ARM_ARCH >= 6) || (defined(_M_ARM) && _M_ARM >= 6)
-    /* ARM */
-    #if defined(_MSC_VER)
-        /* Apparently there is a __yield() intrinsic that's compatible with ARM, but I cannot find documentation for it nor can I find where it's declared. */
-        __yield();
-    #else
-        __asm__ __volatile__ ("yield");
-    #endif
-#else
-    /* Unknown or unsupported architecture. No-op. */
-#endif
-}
-#endif
 
 
 MA_API ma_result ma_mutex_init(ma_mutex* pMutex)
@@ -24187,6 +24052,7 @@ static void on_start_stop__coreaudio(void* pUserData, AudioUnit audioUnit, Audio
 }
 
 #if defined(MA_APPLE_DESKTOP)
+static ma_spinlock g_DeviceTrackingInitLock_CoreAudio = 0;  /* A spinlock for mutal exclusion of the init/uninit of the global tracking data. Initialization to 0 is what we need. */
 static ma_uint32   g_DeviceTrackingInitCounter_CoreAudio = 0;
 static ma_mutex    g_DeviceTrackingMutex_CoreAudio;
 static ma_device** g_ppTrackedDevices_CoreAudio = NULL;
@@ -24270,7 +24136,8 @@ static ma_result ma_context__init_device_tracking__coreaudio(ma_context* pContex
 {
     MA_ASSERT(pContext != NULL);
     
-    if (c89atomic_fetch_add_32(&g_DeviceTrackingInitCounter_CoreAudio, 1) == 0) {
+    ma_spinlock_lock(&g_DeviceTrackingInitLock_CoreAudio);
+    {
         AudioObjectPropertyAddress propAddress;
         propAddress.mScope    = kAudioObjectPropertyScopeGlobal;
         propAddress.mElement  = kAudioObjectPropertyElementMaster;
@@ -24283,7 +24150,8 @@ static ma_result ma_context__init_device_tracking__coreaudio(ma_context* pContex
         propAddress.mSelector = kAudioHardwarePropertyDefaultOutputDevice;
         ((ma_AudioObjectAddPropertyListener_proc)pContext->coreaudio.AudioObjectAddPropertyListener)(kAudioObjectSystemObject, &propAddress, &ma_default_device_changed__coreaudio, NULL);
     }
-    
+    ma_spinlock_unlock(&g_DeviceTrackingInitLock_CoreAudio);
+
     return MA_SUCCESS;
 }
 
@@ -24291,7 +24159,8 @@ static ma_result ma_context__uninit_device_tracking__coreaudio(ma_context* pCont
 {
     MA_ASSERT(pContext != NULL);
     
-    if (c89atomic_fetch_sub_32(&g_DeviceTrackingInitCounter_CoreAudio, 1) == 1) {
+    ma_spinlock_lock(&g_DeviceTrackingInitLock_CoreAudio);
+    {
         AudioObjectPropertyAddress propAddress;
         propAddress.mScope    = kAudioObjectPropertyScopeGlobal;
         propAddress.mElement  = kAudioObjectPropertyElementMaster;
@@ -24308,20 +24177,14 @@ static ma_result ma_context__uninit_device_tracking__coreaudio(ma_context* pCont
         
         ma_mutex_uninit(&g_DeviceTrackingMutex_CoreAudio);
     }
+    ma_spinlock_unlock(&g_DeviceTrackingInitLock_CoreAudio);
     
     return MA_SUCCESS;
 }
 
 static ma_result ma_device__track__coreaudio(ma_device* pDevice)
 {
-    ma_result result;
-
     MA_ASSERT(pDevice != NULL);
-    
-    result = ma_context__init_device_tracking__coreaudio(pDevice->pContext);
-    if (result != MA_SUCCESS) {
-        return result;
-    }
     
     ma_mutex_lock(&g_DeviceTrackingMutex_CoreAudio);
     {
@@ -24357,8 +24220,6 @@ static ma_result ma_device__track__coreaudio(ma_device* pDevice)
 
 static ma_result ma_device__untrack__coreaudio(ma_device* pDevice)
 {
-    ma_result result;
-    
     MA_ASSERT(pDevice != NULL);
     
     ma_mutex_lock(&g_DeviceTrackingMutex_CoreAudio);
@@ -24387,11 +24248,6 @@ static ma_result ma_device__untrack__coreaudio(ma_device* pDevice)
     }
     ma_mutex_unlock(&g_DeviceTrackingMutex_CoreAudio);
 
-    result = ma_context__uninit_device_tracking__coreaudio(pDevice->pContext);
-    if (result != MA_SUCCESS) {
-        return result;
-    }
-    
     return MA_SUCCESS;
 }
 #endif
@@ -25234,6 +25090,10 @@ static ma_result ma_context_uninit__coreaudio(ma_context* pContext)
     ma_dlclose(pContext, pContext->coreaudio.hCoreFoundation);
 #endif
 
+#if !defined(MA_APPLE_MOBILE)
+    ma_context__uninit_device_tracking__coreaudio(pContext);
+#endif
+
     (void)pContext;
     return MA_SUCCESS;
 }
@@ -25261,6 +25121,8 @@ static AVAudioSessionCategory ma_to_AVAudioSessionCategory(ma_ios_session_catego
 
 static ma_result ma_context_init__coreaudio(const ma_context_config* pConfig, ma_context* pContext)
 {
+    ma_result result;
+
     MA_ASSERT(pConfig != NULL);
     MA_ASSERT(pContext != NULL);
 
@@ -25407,14 +25269,26 @@ static ma_result ma_context_init__coreaudio(const ma_context_config* pConfig, ma
     
         pContext->coreaudio.component = ((ma_AudioComponentFindNext_proc)pContext->coreaudio.AudioComponentFindNext)(NULL, &desc);
         if (pContext->coreaudio.component == NULL) {
-    #if !defined(MA_NO_RUNTIME_LINKING) && !defined(MA_APPLE_MOBILE)
+        #if !defined(MA_NO_RUNTIME_LINKING) && !defined(MA_APPLE_MOBILE)
             ma_dlclose(pContext, pContext->coreaudio.hAudioUnit);
             ma_dlclose(pContext, pContext->coreaudio.hCoreAudio);
             ma_dlclose(pContext, pContext->coreaudio.hCoreFoundation);
-    #endif
+        #endif
             return MA_FAILED_TO_INIT_BACKEND;
         }
     }
+    
+#if !defined(MA_APPLE_MOBILE)
+    result = ma_context__init_device_tracking__coreaudio(pContext);
+    if (result != MA_SUCCESS) {
+    #if !defined(MA_NO_RUNTIME_LINKING) && !defined(MA_APPLE_MOBILE)
+        ma_dlclose(pContext, pContext->coreaudio.hAudioUnit);
+        ma_dlclose(pContext, pContext->coreaudio.hCoreAudio);
+        ma_dlclose(pContext, pContext->coreaudio.hCoreFoundation);
+    #endif
+        return result;
+    }
+#endif
 
     return MA_SUCCESS;
 }
@@ -61657,15 +61531,191 @@ DRMP3_API void drmp3_free(void* p, const drmp3_allocation_callbacks* pAllocation
 #endif  /* MINIAUDIO_IMPLEMENTATION */
 
 /*
-MAJOR CHANGES IN VERSION 0.9
-============================
-Version 0.9 includes major API changes, centered mostly around full-duplex and the rebrand to "miniaudio". Before I go into
-detail about the major changes I would like to apologize. I know it's annoying dealing with breaking API changes, but I think
-it's best to get these changes out of the way now while the library is still relatively young and unknown.
+RELEASE NOTES - VERSION 0.10.x
+==============================
+Version 0.10 includes major API changes and refactoring, mostly concerned with the data conversion system. Data conversion is performed internally to convert
+audio data between the format requested when initializing the `ma_device` object and the format of the internal device used by the backend. The same applies
+to the `ma_decoder` object. The previous design has several design flaws and missing features which necessitated a complete redesign.
 
-There's been a lot of refactoring with this release so there's a good chance a few bugs have been introduced. I apologize in
-advance for this. You may want to hold off on upgrading for the short term if you're worried. If mini_al v0.8.14 works for
-you, and you don't need full-duplex support, you can avoid upgrading (though you won't be getting future bug fixes).
+
+Changes to Data Conversion
+--------------------------
+The previous data conversion system used callbacks to deliver input data for conversion. This design works well in some specific situations, but in other
+situations it has some major readability and maintenance issues. The decision was made to replace this with a more iterative approach where you just pass in a
+pointer to the input data directly rather than dealing with a callback.
+
+The following are the data conversion APIs that have been removed and their replacements:
+
+  - ma_format_converter -> ma_convert_pcm_frames_format()
+  - ma_channel_router   -> ma_channel_converter
+  - ma_src              -> ma_resampler
+  - ma_pcm_converter    -> ma_data_converter
+
+The previous conversion APIs accepted a callback in their configs. There are no longer any callbacks to deal with. Instead you just pass the data into the
+`*_process_pcm_frames()` function as a pointer to a buffer.
+
+The simplest aspect of data conversion is sample format conversion. To convert between two formats, just call `ma_convert_pcm_frames_format()`. Channel
+conversion is also simple which you can do with `ma_channel_converter` via `ma_channel_converter_process_pcm_frames()`.
+
+Resampling is more complicated because the number of output frames that are processed is different to the number of input frames that are consumed. When you
+call `ma_resampler_process_pcm_frames()` you need to pass in the number of input frames available for processing and the number of output frames you want to
+output. Upon returning they will receive the number of input frames that were consumed and the number of output frames that were generated.
+
+The `ma_data_converter` API is a wrapper around format, channel and sample rate conversion and handles all of the data conversion you'll need which probably
+makes it the best option if you need to do data conversion.
+
+In addition to changes to the API design, a few other changes have been made to the data conversion pipeline:
+
+  - The sinc resampler has been removed. This was completely broken and never actually worked properly.
+  - The linear resampler now uses low-pass filtering to remove aliasing. The quality of the low-pass filter can be controlled via the resampler config with the
+    `lpfOrder` option, which has a maximum value of MA_MAX_FILTER_ORDER.
+  - Data conversion now supports s16 natively which runs through a fixed point pipeline. Previously everything needed to be converted to floating point before
+    processing, whereas now both s16 and f32 are natively supported. Other formats still require conversion to either s16 or f32 prior to processing, however
+    `ma_data_converter` will handle this for you.
+
+
+Custom Memory Allocators
+------------------------
+miniaudio has always supported macro level customization for memory allocation via MA_MALLOC, MA_REALLOC and MA_FREE, however some scenarios require more
+flexibility by allowing a user data pointer to be passed to the custom allocation routines. Support for this has been added to version 0.10 via the
+`ma_allocation_callbacks` structure. Anything making use of heap allocations has been updated to accept this new structure.
+
+The `ma_context_config` structure has been updated with a new member called `allocationCallbacks`. Leaving this set to it's defaults returned by
+`ma_context_config_init()` will cause it to use MA_MALLOC, MA_REALLOC and MA_FREE. Likewise, The `ma_decoder_config` structure has been updated in the same
+way, and leaving everything as-is after `ma_decoder_config_init()` will cause it to use the same defaults.
+
+The following APIs have been updated to take a pointer to a `ma_allocation_callbacks` object. Setting this parameter to NULL will cause it to use defaults.
+Otherwise they will use the relevant callback in the structure.
+
+  - ma_malloc()
+  - ma_realloc()
+  - ma_free()
+  - ma_aligned_malloc()
+  - ma_aligned_free()
+  - ma_rb_init() / ma_rb_init_ex()
+  - ma_pcm_rb_init() / ma_pcm_rb_init_ex()
+
+Note that you can continue to use MA_MALLOC, MA_REALLOC and MA_FREE as per normal. These will continue to be used by default if you do not specify custom
+allocation callbacks.
+
+
+Buffer and Period Configuration Changes
+---------------------------------------
+The way in which the size of the internal buffer and periods are specified in the device configuration have changed. In previous versions, the config variables
+`bufferSizeInFrames` and `bufferSizeInMilliseconds` defined the size of the entire buffer, with the size of a period being the size of this variable divided by
+the period count. This became confusing because people would expect the value of `bufferSizeInFrames` or `bufferSizeInMilliseconds` to independantly determine
+latency, when in fact it was that value divided by the period count that determined it. These variables have been removed and replaced with new ones called
+`periodSizeInFrames` and `periodSizeInMilliseconds`.
+
+These new configuration variables work in the same way as their predecessors in that if one is set to 0, the other will be used, but the main difference is
+that you now set these to you desired latency rather than the size of the entire buffer. The benefit of this is that it's much easier and less confusing to
+configure latency.
+
+The following unused APIs have been removed:
+
+    ma_get_default_buffer_size_in_milliseconds()
+    ma_get_default_buffer_size_in_frames()
+
+The following macros have been removed:
+
+    MA_BASE_BUFFER_SIZE_IN_MILLISECONDS_LOW_LATENCY
+    MA_BASE_BUFFER_SIZE_IN_MILLISECONDS_CONSERVATIVE
+
+
+Other API Changes
+-----------------
+Other less major API changes have also been made in version 0.10.
+
+`ma_device_set_stop_callback()` has been removed. If you require a stop callback, you must now set it via the device config just like the data callback.
+
+The `ma_sine_wave` API has been replaced with a more general API called `ma_waveform`. This supports generation of different types of waveforms, including
+sine, square, triangle and sawtooth. Use `ma_waveform_init()` in place of `ma_sine_wave_init()` to initialize the waveform object. This takes a configuration
+object called `ma_waveform_config` which defines the properties of the waveform. Use `ma_waveform_config_init()` to initialize a `ma_waveform_config` object.
+Use `ma_waveform_read_pcm_frames()` in place of `ma_sine_wave_read_f32()` and `ma_sine_wave_read_f32_ex()`.
+
+`ma_convert_frames()` and `ma_convert_frames_ex()` have been changed. Both of these functions now take a new parameter called `frameCountOut` which specifies
+the size of the output buffer in PCM frames. This has been added for safety. In addition to this, the parameters for `ma_convert_frames_ex()` have changed to
+take a pointer to a `ma_data_converter_config` object to specify the input and output formats to convert between. This was done to make it more flexible, to
+prevent the parameter list getting too long, and to prevent API breakage whenever a new conversion property is added.
+
+`ma_calculate_frame_count_after_src()` has been renamed to `ma_calculate_frame_count_after_resampling()` for consistency with the new `ma_resampler` API.
+
+
+Filters
+-------
+The following filters have been added:
+
+    |-------------|-------------------------------------------------------------------|
+    | API         | Description                                                       |
+    |-------------|-------------------------------------------------------------------|
+    | ma_biquad   | Biquad filter (transposed direct form 2)                          |
+    | ma_lpf1     | First order low-pass filter                                       |
+    | ma_lpf2     | Second order low-pass filter                                      |
+    | ma_lpf      | High order low-pass filter (Butterworth)                          |
+    | ma_hpf1     | First order high-pass filter                                      |
+    | ma_hpf2     | Second order high-pass filter                                     |
+    | ma_hpf      | High order high-pass filter (Butterworth)                         |
+    | ma_bpf2     | Second order band-pass filter                                     |
+    | ma_bpf      | High order band-pass filter                                       |
+    | ma_peak2    | Second order peaking filter                                       |
+    | ma_notch2   | Second order notching filter                                      |
+    | ma_loshelf2 | Second order low shelf filter                                     |
+    | ma_hishelf2 | Second order high shelf filter                                    |
+    |-------------|-------------------------------------------------------------------|
+
+These filters all support 32-bit floating point and 16-bit signed integer formats natively. Other formats need to be converted beforehand.
+
+
+Sine, Square, Triangle and Sawtooth Waveforms
+---------------------------------------------
+Previously miniaudio supported only sine wave generation. This has now been generalized to support sine, square, triangle and sawtooth waveforms. The old
+`ma_sine_wave` API has been removed and replaced with the `ma_waveform` API. Use `ma_waveform_config_init()` to initialize a config object, and then pass it
+into `ma_waveform_init()`. Then use `ma_waveform_read_pcm_frames()` to read PCM data.
+
+
+Noise Generation
+----------------
+A noise generation API has been added. This is used via the `ma_noise` API. Currently white, pink and Brownian noise is supported. The `ma_noise` API is
+similar to the waveform API. Use `ma_noise_config_init()` to initialize a config object, and then pass it into `ma_noise_init()` to initialize a `ma_noise`
+object. Then use `ma_noise_read_pcm_frames()` to read PCM data.
+
+
+Miscellaneous Changes
+---------------------
+The MA_NO_STDIO option has been removed. This would disable file I/O APIs, however this has proven to be too hard to maintain for it's perceived value and was
+therefore removed.
+
+Internal functions have all been made static where possible. If you get warnings about unused functions, please submit a bug report.
+
+The `ma_device` structure is no longer defined as being aligned to MA_SIMD_ALIGNMENT. This resulted in a possible crash when allocating a `ma_device` object on
+the heap, but not aligning it to MA_SIMD_ALIGNMENT. This crash would happen due to the compiler seeing the alignment specified on the structure and assuming it
+was always aligned as such and thinking it was safe to emit alignment-dependant SIMD instructions. Since miniaudio's philosophy is for things to just work,
+this has been removed from all structures.
+
+Results codes have been overhauled. Unnecessary result codes have been removed, and some have been renumbered for organisation purposes. If you are are binding
+maintainer you will need to update your result codes. Support has also been added for retrieving a human readable description of a given result code via the
+`ma_result_description()` API.
+
+ALSA: The automatic format conversion, channel conversion and resampling performed by ALSA is now disabled by default as they were causing some compatibility
+issues with certain devices and configurations. These can be individually enabled via the device config:
+
+    ```c
+    deviceConfig.alsa.noAutoFormat   = MA_TRUE;
+    deviceConfig.alsa.noAutoChannels = MA_TRUE;
+    deviceConfig.alsa.noAutoResample = MA_TRUE;
+    ```
+*/
+
+/*
+RELEASE NOTES - VERSION 0.9.x
+=============================
+Version 0.9 includes major API changes, centered mostly around full-duplex and the rebrand to "miniaudio". Before I go into detail about the major changes I
+would like to apologize. I know it's annoying dealing with breaking API changes, but I think it's best to get these changes out of the way now while the
+library is still relatively young and unknown.
+
+There's been a lot of refactoring with this release so there's a good chance a few bugs have been introduced. I apologize in advance for this. You may want to
+hold off on upgrading for the short term if you're worried. If mini_al v0.8.14 works for you, and you don't need full-duplex support, you can avoid upgrading
+(though you won't be getting future bug fixes).
 
 
 Rebranding to "miniaudio"
@@ -61675,39 +61725,36 @@ The decision was made to rename mini_al to miniaudio. Don't worry, it's the same
 1) Having the word "audio" in the title makes it immediately clear that the library is related to audio; and
 2) I don't like the look of the underscore.
 
-This rebrand has necessitated a change in namespace from "mal" to "ma". I know this is annoying, and I apologize, but it's
-better to get this out of the road now rather than later. Also, since there are necessary API changes for full-duplex support
-I think it's better to just get the namespace change over and done with at the same time as the full-duplex changes. I'm hoping
-this will be the last of the major API changes. Fingers crossed!
+This rebrand has necessitated a change in namespace from "mal" to "ma". I know this is annoying, and I apologize, but it's better to get this out of the road
+now rather than later. Also, since there are necessary API changes for full-duplex support I think it's better to just get the namespace change over and done
+with at the same time as the full-duplex changes. I'm hoping this will be the last of the major API changes. Fingers crossed!
 
-The implementation define is now "#define MINIAUDIO_IMPLEMENTATION". You can also use "#define MA_IMPLEMENTATION" if that's
-your preference.
+The implementation define is now "#define MINIAUDIO_IMPLEMENTATION". You can also use "#define MA_IMPLEMENTATION" if that's your preference.
 
 
 Full-Duplex Support
 -------------------
 The major feature added to version 0.9 is full-duplex. This has necessitated a few API changes.
 
-1) The data callback has now changed. Previously there was one type of callback for playback and another for capture. I wanted
-   to avoid a third callback just for full-duplex so the decision was made to break this API and unify the callbacks. Now,
-   there is just one callback which is the same for all three modes (playback, capture, duplex). The new callback looks like
-   the following:
+1) The data callback has now changed. Previously there was one type of callback for playback and another for capture. I wanted to avoid a third callback just
+   for full-duplex so the decision was made to break this API and unify the callbacks. Now, there is just one callback which is the same for all three modes
+   (playback, capture, duplex). The new callback looks like the following:
 
        void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount);
 
-   This callback allows you to move data straight out of the input buffer and into the output buffer in full-duplex mode. In
-   playback-only mode, pInput will be null. Likewise, pOutput will be null in capture-only mode. The sample count is no longer
-   returned from the callback since it's not necessary for miniaudio anymore.
+   This callback allows you to move data straight out of the input buffer and into the output buffer in full-duplex mode. In playback-only mode, pInput will be
+   null. Likewise, pOutput will be null in capture-only mode. The sample count is no longer returned from the callback since it's not necessary for miniaudio
+   anymore.
 
-2) The device config needed to change in order to support full-duplex. Full-duplex requires the ability to allow the client
-   to choose a different PCM format for the playback and capture sides. The old ma_device_config object simply did not allow
-   this and needed to change. With these changes you now specify the device ID, format, channels, channel map and share mode
-   on a per-playback and per-capture basis (see example below). The sample rate must be the same for playback and capture.
+2) The device config needed to change in order to support full-duplex. Full-duplex requires the ability to allow the client to choose a different PCM format
+   for the playback and capture sides. The old ma_device_config object simply did not allow this and needed to change. With these changes you now specify the
+   device ID, format, channels, channel map and share mode on a per-playback and per-capture basis (see example below). The sample rate must be the same for
+   playback and capture.
 
-   Since the device config API has changed I have also decided to take the opportunity to simplify device initialization. Now,
-   the device ID, device type and callback user data are set in the config. ma_device_init() is now simplified down to taking
-   just the context, device config and a pointer to the device object being initialized. The rationale for this change is that
-   it just makes more sense to me that these are set as part of the config like everything else.
+   Since the device config API has changed I have also decided to take the opportunity to simplify device initialization. Now, the device ID, device type and
+   callback user data are set in the config. ma_device_init() is now simplified down to taking just the context, device config and a pointer to the device
+   object being initialized. The rationale for this change is that it just makes more sense to me that these are set as part of the config like everything
+   else.
 
    Example device initialization:
 
@@ -61727,20 +61774,18 @@ The major feature added to version 0.9 is full-duplex. This has necessitated a f
            ... handle error ...
        }
 
-   Note that the "onDataCallback" member of ma_device_config has been renamed to "dataCallback". Also, "onStopCallback" has
-   been renamed to "stopCallback".
+   Note that the "onDataCallback" member of ma_device_config has been renamed to "dataCallback". Also, "onStopCallback" has been renamed to "stopCallback".
 
-This is the first pass for full-duplex and there is a known bug. You will hear crackling on the following backends when sample
-rate conversion is required for the playback device:
+This is the first pass for full-duplex and there is a known bug. You will hear crackling on the following backends when sample rate conversion is required for
+the playback device:
   - Core Audio
   - JACK
   - AAudio
   - OpenSL
   - WebAudio
 
-In addition to the above, not all platforms have been absolutely thoroughly tested simply because I lack the hardware for such
-thorough testing. If you experience a bug, an issue report on GitHub or an email would be greatly appreciated (and a sample
-program that reproduces the issue if possible).
+In addition to the above, not all platforms have been absolutely thoroughly tested simply because I lack the hardware for such thorough testing. If you
+experience a bug, an issue report on GitHub or an email would be greatly appreciated (and a sample program that reproduces the issue if possible).
 
 
 Other API Changes
@@ -61763,36 +61808,41 @@ In addition to the above, the following API changes have been made:
   - mal_src_set_input_sample_rate()
   - mal_src_set_output_sample_rate()
 - Error codes have been rearranged. If you're a binding maintainer you will need to update.
-- The ma_backend enums have been rearranged to priority order. The rationale for this is to simplify automatic backend selection
-  and to make it easier to see the priority. If you're a binding maintainer you will need to update.
-- ma_dsp has been renamed to ma_pcm_converter. The rationale for this change is that I'm expecting "ma_dsp" to conflict with
-  some future planned high-level APIs.
-- For functions that take a pointer/count combo, such as ma_decoder_read_pcm_frames(), the parameter order has changed so that
-  the pointer comes before the count. The rationale for this is to keep it consistent with things like memcpy().
+- The ma_backend enums have been rearranged to priority order. The rationale for this is to simplify automatic backend selection and to make it easier to see
+  the priority. If you're a binding maintainer you will need to update.
+- ma_dsp has been renamed to ma_pcm_converter. The rationale for this change is that I'm expecting "ma_dsp" to conflict with some future planned high-level
+  APIs.
+- For functions that take a pointer/count combo, such as ma_decoder_read_pcm_frames(), the parameter order has changed so that the pointer comes before the
+  count. The rationale for this is to keep it consistent with things like memcpy().
 
 
 Miscellaneous Changes
 ---------------------
 The following miscellaneous changes have also been made.
 
-- The AAudio backend has been added for Android 8 and above. This is Android's new "High-Performance Audio" API. (For the
-  record, this is one of the nicest audio APIs out there, just behind the BSD audio APIs).
+- The AAudio backend has been added for Android 8 and above. This is Android's new "High-Performance Audio" API. (For the record, this is one of the nicest
+  audio APIs out there, just behind the BSD audio APIs).
 - The WebAudio backend has been added. This is based on ScriptProcessorNode. This removes the need for SDL.
-- The SDL and OpenAL backends have been removed. These were originally implemented to add support for platforms for which miniaudio
-  was not explicitly supported. These are no longer needed and have therefore been removed.
-- Device initialization now fails if the requested share mode is not supported. If you ask for exclusive mode, you either get an
-  exclusive mode device, or an error. The rationale for this change is to give the client more control over how to handle cases
-  when the desired shared mode is unavailable.
-- A lock-free ring buffer API has been added. There are two varients of this. "ma_rb" operates on bytes, whereas "ma_pcm_rb"
-  operates on PCM frames.
-- The library is now licensed as a choice of Public Domain (Unlicense) _or_ MIT-0 (No Attribution) which is the same as MIT, but
-  removes the attribution requirement. The rationale for this is to support countries that don't recognize public domain.
+- The SDL and OpenAL backends have been removed. These were originally implemented to add support for platforms for which miniaudio was not explicitly
+  supported. These are no longer needed and have therefore been removed.
+- Device initialization now fails if the requested share mode is not supported. If you ask for exclusive mode, you either get an exclusive mode device, or an
+  error. The rationale for this change is to give the client more control over how to handle cases when the desired shared mode is unavailable.
+- A lock-free ring buffer API has been added. There are two varients of this. "ma_rb" operates on bytes, whereas "ma_pcm_rb" operates on PCM frames.
+- The library is now licensed as a choice of Public Domain (Unlicense) _or_ MIT-0 (No Attribution) which is the same as MIT, but removes the attribution
+  requirement. The rationale for this is to support countries that don't recognize public domain.
 */
 
 /*
 REVISION HISTORY
 ================
-v0.10.10 - TBD
+v0.10.12 - 2020-07-04
+  - Fix compilation errors on the iOS build.
+
+v0.10.11 - 2020-06-28
+  - Fix some bugs with device tracking on Core Audio.
+  - Updates to documentation.
+
+v0.10.10 - 2020-06-26
   - Add include guard for the implementation section.
   - Mark ma_device_sink_info_callback() as static.
   - Fix compilation errors with MA_NO_DECODING and MA_NO_ENCODING.

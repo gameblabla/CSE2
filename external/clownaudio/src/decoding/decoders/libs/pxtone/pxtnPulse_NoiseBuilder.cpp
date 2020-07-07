@@ -90,7 +90,7 @@ void _set_ocsillator( _OSCILLATOR *p_to, pxNOISEDESIGN_OSCILLATOR *p_from, int32
 void _incriment( _OSCILLATOR *p_osc, double incriment, const short *p_tbl_rand )
 {
 	p_osc->offset += incriment;
-	if( p_osc->offset > _smp_num )
+	if( p_osc->offset >= _smp_num )
 	{
 		p_osc->offset     -= _smp_num;
 		if( p_osc->offset >= _smp_num ) p_osc->offset = 0;

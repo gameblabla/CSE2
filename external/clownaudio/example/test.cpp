@@ -151,7 +151,7 @@ int main(int argc, char *argv[])
 							printf("Setting sample-rate to %uHz\n", param);
 							fflush(stdout);
 
-							ClownAudio_SetSoundSampleRate(instance, param);
+							ClownAudio_SetSoundSampleRate(instance, param, param);
 							break;
 						}
 
