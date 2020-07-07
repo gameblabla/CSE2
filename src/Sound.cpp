@@ -13,14 +13,14 @@ equivalents.
 #include "Sound.h"
 
 #include <stddef.h>
-//#include <stdio.h>	// Used by commented-out code
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 
 #include "WindowsWrapper.h"
 
 #include "Backends/Audio.h"
-//#include "Main.h"	// Was for gModulePath, but this is unneeded in the portable branch since LoadSoundObject is commented-out
+#include "Main.h"
 #include "Resource.h"
 #include "Organya.h"
 #include "PixTone.h"
@@ -103,35 +103,33 @@ BOOL InitSoundObject(const char *resname, int no)
 
 	return TRUE;
 }
-/*
+
 // Completely unused function for loading a .wav file as a sound effect.
 // Some say that sounds heard in CS Beta footage don't sound like PixTone...
-BOOL LoadSoundObject(LPCSTR file_name, int no)
+BOOL LoadSoundObject(const char *file_name, int no)
 {
-	char path[MAX_PATH];
-	DWORD i;
-	DWORD file_size = 0;
+	std::string path;
+	unsigned long i;
+	unsigned long file_size = 0;
 	char check_box[58];
 	FILE *fp;
-	HANDLE hFile;
 
-	sprintf(path, "%s\\%s", gModulePath, file_name);
+	path = gModulePath + '/' + file_name;
 
-	if (lpDS == NULL)
+	if (!audio_backend_initialised)
 		return TRUE;
 
-	hFile = CreateFileA(path, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (hFile == INVALID_HANDLE_VALUE)
+	if ((fp = fopen(path.c_str(), "rb")) == NULL)
 		return FALSE;
 
-	file_size = GetFileSize(hFile, NULL);
-	CloseHandle(hFile);
+	fseek(fp, 0, SEEK_END);
+	file_size = ftell(fp);
+	rewind(fp);
 
-	if ((fp = fopen(path, "rb")) == NULL)
-		return FALSE;
-
-	for (i = 0; i < 58; i++)
-		fread(&check_box[i], sizeof(char), 1, fp);
+	// Let's not throttle disk I/O, shall we...
+	//for (i = 0; i < 58; i++)
+	//	fread(&check_box[i], sizeof(char), 1, fp);
+	fread(check_box, 1, 58, fp);
 
 	if (check_box[0] != 'R')
 		return FALSE;
@@ -142,57 +140,51 @@ BOOL LoadSoundObject(LPCSTR file_name, int no)
 	if (check_box[3] != 'F')
 		return FALSE;
 
-	DWORD *wp;
-	wp = (DWORD*)malloc(file_size);	// ファイルのワークスペースを作る (Create a file workspace)
+	unsigned char *wp;
+	wp = (unsigned char*)malloc(file_size);	// ファイルのワークスペースを作る (Create a file workspace)
 	fseek(fp, 0, SEEK_SET);
 
-	for (i = 0; i < file_size; i++)
-		fread((BYTE*)wp+i, sizeof(BYTE), 1, fp);
+	// Bloody hell, Pixel, come on...
+	//for (i = 0; i < file_size; i++)
+	//	fread((BYTE*)wp+i, sizeof(char), 1, fp);
+	fread(wp, 1, file_size, fp);
 
 	fclose(fp);
 
-	// セカンダリバッファの生成 (Create secondary buffer)
-	DSBUFFERDESC dsbd;
-	ZeroMemory(&dsbd, sizeof(dsbd));
-	dsbd.dwSize = sizeof(dsbd);
-	dsbd.dwFlags = DSBCAPS_STATIC | DSBCAPS_GLOBALFOCUS | DSBCAPS_CTRLPAN | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY;
-	dsbd.dwBufferBytes = *(DWORD*)((BYTE*)wp+0x36);	// WAVEデータのサイズ (WAVE data size)
-	dsbd.lpwfxFormat = (LPWAVEFORMATEX)(wp+5); 
+	// Get sound properties, and check if it's valid
+	unsigned long buffer_size = wp[0x36] | (wp[0x37] << 8) | (wp[0x38] << 16) | (wp[0x39] << 24);
+	unsigned short format = wp[5] | (wp[6] << 8);
+	unsigned short channels = wp[7] | (wp[8] << 8);
+	unsigned long sample_rate = wp[9] | (wp[0xA] << 8) | (wp[0xB] << 16) | (wp[0xC] << 24);
 
-	if (lpDS->CreateSoundBuffer(&dsbd, &lpSECONDARYBUFFER[no], NULL) != DS_OK)
+	if (format != 1)	// 1 is WAVE_FORMAT_PCM
+	{
+		free(wp);
+		return FALSE;
+	}
+
+	if (channels != 1)	// The mixer only supports mono right now
+	{
+		free(wp);
+		return FALSE;
+	}
+
+	// セカンダリバッファの生成 (Create secondary buffer)
+	lpSECONDARYBUFFER[no] = AudioBackend_CreateSound(sample_rate, wp + 0x3A, buffer_size);
+
+	if (lpSECONDARYBUFFER[no] == NULL)
 	{
 #ifdef FIX_BUGS
 		free(wp);	// The updated Organya source code includes this fix
 #endif
 		return FALSE;	
 	}
-
-	LPVOID lpbuf1, lpbuf2;
-	DWORD dwbuf1, dwbuf2;
-
-	HRESULT hr;
-	hr = lpSECONDARYBUFFER[no]->Lock(0, *(DWORD*)((BYTE*)wp+0x36), &lpbuf1, &dwbuf1, &lpbuf2, &dwbuf2, 0);
-
-	if (hr != DS_OK)
-	{
-#ifdef FIX_BUGS
-		free(wp);	// The updated Organya source code includes this fix
-#endif
-		return FALSE;
-	}
-
-	CopyMemory(lpbuf1, (BYTE*)wp+0x3A, dwbuf1);	// +3aはデータの頭 (+ 3a is the head of the data)
-
-	if (dwbuf2 != 0)
-		CopyMemory(lpbuf2, (BYTE*)wp+0x3A+dwbuf1, dwbuf2);
-
-	lpSECONDARYBUFFER[no]->Unlock(lpbuf1, dwbuf1, lpbuf2, dwbuf2); 
 	
 	free(wp);
 
 	return TRUE;
 }
-*/
+
 void PlaySoundObject(int no, int mode)
 {
 	if (!audio_backend_initialised)
