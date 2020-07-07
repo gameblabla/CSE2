@@ -1428,7 +1428,9 @@ void ActNpc199(NPCHAR *npc)
 	if (npc->ani_no > 4)
 	{
 		npc->cond = 0;
-		return;	// Prevent UB at rect[npc->ani_no] when npc->ani_no == 5
+	#ifdef FIX_BUGS
+		return;	// The code below will use 'ani_no' to access 'rect', even though it's now too high
+	#endif
 	}
 
 	npc->x += npc->xm;

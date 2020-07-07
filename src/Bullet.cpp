@@ -1643,7 +1643,9 @@ void ActBullet_Edge(BULLET *bul)
 			if (bul->ani_no > 4)
 			{
 				bul->cond = 0;
-				return;	// Prevent UB at rc[bul->ani_no] when bul->ani_no == 5
+			#ifdef FIX_BUGS
+				return;	// The code below will use 'ani_no' to access 'rcLeft' and 'rcRight', even though it's now too high
+			#endif
 			}
 
 			break;
