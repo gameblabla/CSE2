@@ -1334,7 +1334,7 @@ void ActNpc175(NPCHAR *npc)
 
 	if (npc->act_no < 3 && npc->life < 90)
 	{
-		LoseNpChar(npc, 0);
+		LoseNpChar(npc, FALSE);
 		npc->act_no = 10;
 		npc->ani_no = 1;
 		npc->bits &= ~NPC_SHOOTABLE;
@@ -1384,7 +1384,7 @@ void ActNpc176(NPCHAR *npc)
 
 	if (npc->act_no < 3 && npc->life < 940)
 	{
-		LoseNpChar(npc, 0);
+		LoseNpChar(npc, FALSE);
 		npc->act_no = 10;
 		npc->ani_no = 2;
 		npc->bits &= ~NPC_SHOOTABLE;
