@@ -695,7 +695,7 @@ void ActBossChar_Undead(void)
 	{
 		if (npc->x < 192 * 0x200)
 			npc->direct = 2;
-		if (npc->x > (gMap.width - 4) * 0x2000)	// Pixel is inconsistent: the assembly code indicates he really used '0x2000' instead of '0x200 * 0x10', which he usually uses
+		if (npc->x > (gMap.width - 4) * (0x200 * 0x10))	// Pixel is inconsistent: the assembly code indicates he really used '0x2000' instead of '0x200 * 0x10', which he usually uses
 			npc->direct = 0;
 
 		if (npc->direct == 0)
@@ -715,11 +715,11 @@ void ActBossChar_Undead(void)
 			if (npc->count2 == 150)
 			{
 				npc->count2 = 0;
-				SetNpChar(282, (gMap.width * 0x200 * 0x10) + 0x40, (Random(-1, 3) + 10) * 0x2000, 0, 0, 0, NULL, 0x30);
+				SetNpChar(282, (gMap.width * 0x200 * 0x10) + 0x40, (Random(-1, 3) + 10) * (0x200 * 0x10), 0, 0, 0, NULL, 0x30);
 			}
 			else if (npc->count2 == 75)
 			{
-				SetNpChar(282, (gMap.width * 0x200 * 0x10) + 0x40, (Random(-3, 0) + 3) * 0x2000, 0, 0, 0, NULL, 0x30);
+				SetNpChar(282, (gMap.width * 0x200 * 0x10) + 0x40, (Random(-3, 0) + 3) * (0x200 * 0x10), 0, 0, 0, NULL, 0x30);
 			}
 
 			break;
