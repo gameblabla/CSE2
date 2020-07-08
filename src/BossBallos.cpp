@@ -237,7 +237,7 @@ void ActBossChar_Ballos(void)
 				npc->act_no = 103;
 				npc->act_wait = 0;
 				SetQuake2(30);
-				PlaySoundObject(44, 1);
+				PlaySoundObject(44, SOUND_MODE_PLAY);
 
 				if (gMC.y > npc->y + (48 * 0x200) && gMC.x < npc->x + (24 * 0x200) && gMC.x > npc->x - (24 * 0x200))
 					DamageMyChar(16);
@@ -325,10 +325,10 @@ void ActBossChar_Ballos(void)
 					gMC.ym = -0x200;
 
 				SetQuake2(30);
-				PlaySoundObject(26, 1);
+				PlaySoundObject(26, SOUND_MODE_PLAY);
 				SetNpChar(332, npc->x - (12 * 0x200), npc->y + (52 * 0x200), 0, 0, 0, NULL, 0x100);
 				SetNpChar(332, npc->x + (12 * 0x200), npc->y + (52 * 0x200), 0, 0, 2, NULL, 0x100);
-				PlaySoundObject(44, 1);
+				PlaySoundObject(44, SOUND_MODE_PLAY);
 
 				for (i = 0; i < 0x10; ++i)
 				{
@@ -363,7 +363,7 @@ void ActBossChar_Ballos(void)
 				npc->act_no = 222;
 				npc->act_wait = 0;
 				SetQuake2(30);
-				PlaySoundObject(26, 1);
+				PlaySoundObject(26, SOUND_MODE_PLAY);
 
 				for (i = 0; i < 0x10; ++i)
 				{
@@ -514,7 +514,7 @@ void ActBossChar_Ballos(void)
 			}
 
 			if (npc->act_wait / 3 % 2)
-				PlaySoundObject(26, 1);
+				PlaySoundObject(26, SOUND_MODE_PLAY);
 
 			if (npc->act_wait > 540)
 				npc->act_no = 420;
@@ -526,7 +526,7 @@ void ActBossChar_Ballos(void)
 			npc->act_wait = 0;
 			npc->ani_wait = 0;
 			SetQuake2(30);
-			PlaySoundObject(35, 1);
+			PlaySoundObject(35, SOUND_MODE_PLAY);
 			gBoss[1].act_no = 102;
 			gBoss[2].act_no = 102;
 
@@ -648,7 +648,7 @@ void ActBossChar_Ballos(void)
 			++gBoss[0].act_wait;
 
 			if (gBoss[0].act_wait % 12 == 0)
-				PlaySoundObject(44, 1);
+				PlaySoundObject(44, SOUND_MODE_PLAY);
 
 			SetDestroyNpChar(gBoss[0].x + (Random(-60, 60) * 0x200), gBoss[0].y + (Random(-60, 60) * 0x200), 1, 1);
 
@@ -657,7 +657,7 @@ void ActBossChar_Ballos(void)
 				gBoss[0].act_wait = 0;
 				gBoss[0].act_no = 1002;
 				SetFlash(gBoss[0].x, gBoss[0].y, 1);
-				PlaySoundObject(35, 1);
+				PlaySoundObject(35, SOUND_MODE_PLAY);
 			}
 
 			break;
@@ -718,7 +718,7 @@ void ActBossChar_Ballos(void)
 		if (npc->act_wait == 270 || npc->act_wait == 280 || npc->act_wait == 290)
 		{
 			SetNpChar(353, npc->x, npc->y - (52 * 0x200), 0, 0, 1, NULL, 0x100);
-			PlaySoundObject(39, 1);
+			PlaySoundObject(39, SOUND_MODE_PLAY);
 
 			for (i = 0; i < 4; ++i)
 				SetNpChar(4, npc->x, npc->y - (52 * 0x200), 0, 0, 0, NULL, 0x100);

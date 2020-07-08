@@ -168,7 +168,7 @@ static void ActBossCharT_DragonHead(NPCHAR *npc)
 
 			if (npc->count2 > 10)
 			{
-				PlaySoundObject(51, 1);
+				PlaySoundObject(51, SOUND_MODE_PLAY);
 				SetDestroyNpChar(npc->x, npc->y, npc->view.back, 4);
 				npc->act_no = 300;
 				npc->act_wait = 0;
@@ -193,7 +193,7 @@ static void ActBossCharT_DragonHead(NPCHAR *npc)
 				else
 					SetNpChar(202, npc->x + (8 * 0x200), npc->y, xm, ym, 0, NULL, 0x100);
 
-				PlaySoundObject(33, 1);
+				PlaySoundObject(33, SOUND_MODE_PLAY);
 			}
 
 			if (npc->act_wait > 50)
@@ -242,7 +242,7 @@ static void ActBossCharT_DragonHead(NPCHAR *npc)
 				else
 					SetNpChar(202, npc->x + (8 * 0x200), npc->y, xm, ym, 0, NULL, 0x100);
 
-				PlaySoundObject(33, 1);
+				PlaySoundObject(33, SOUND_MODE_PLAY);
 			}
 
 			break;
@@ -518,7 +518,7 @@ void ActBossChar_Twin(void)
 				npc->act_no = 1020;
 				npc->act_wait = 0;
 				SetFlash(gBoss[0].x, gBoss[0].y, 1);
-				PlaySoundObject(35, 1);
+				PlaySoundObject(35, SOUND_MODE_PLAY);
 			}
 
 			break;

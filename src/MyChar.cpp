@@ -91,7 +91,7 @@ void AnimationMyChar(BOOL bKey)
 				gMC.ani_wait = 0;
 
 				if (++gMC.ani_no == 7 || gMC.ani_no == 9)
-					PlaySoundObject(24, 1);
+					PlaySoundObject(24, SOUND_MODE_PLAY);
 			}
 
 			if (gMC.ani_no > 9 || gMC.ani_no < 6)
@@ -106,7 +106,7 @@ void AnimationMyChar(BOOL bKey)
 				gMC.ani_wait = 0;
 
 				if (++gMC.ani_no == 2 || gMC.ani_no == 4)
-					PlaySoundObject(24, 1);
+					PlaySoundObject(24, SOUND_MODE_PLAY);
 			}
 
 			if (gMC.ani_no > 4 || gMC.ani_no < 1)
@@ -115,7 +115,7 @@ void AnimationMyChar(BOOL bKey)
 		else if (gKey & gKeyUp && bKey)
 		{
 			if (gMC.cond & 4)
-				PlaySoundObject(24, 1);
+				PlaySoundObject(24, SOUND_MODE_PLAY);
 
 			gMC.cond &= ~4;
 			gMC.ani_no = 5;
@@ -123,7 +123,7 @@ void AnimationMyChar(BOOL bKey)
 		else
 		{
 			if (gMC.cond & 4)
-				PlaySoundObject(24, 1);
+				PlaySoundObject(24, SOUND_MODE_PLAY);
 
 			gMC.cond &= ~4;
 			gMC.ani_no = 0;
@@ -452,7 +452,7 @@ void ActMyChar_Normal(BOOL bKey)
 			else
 			{
 				gMC.ym = -jump;
-				PlaySoundObject(15, 1);
+				PlaySoundObject(15, SOUND_MODE_PLAY);
 			}
 		}
 	}
@@ -498,7 +498,7 @@ void ActMyChar_Normal(BOOL bKey)
 				if (gMC.direct == 2)
 					SetCaret(gMC.x - (2 * 0x200), gMC.y + (2 * 0x200), 7, 0);
 
-				PlaySoundObject(113, 1);
+				PlaySoundObject(113, SOUND_MODE_PLAY);
 			}
 		}
 		else if (gMC.boost_sw == 2)
@@ -510,14 +510,14 @@ void ActMyChar_Normal(BOOL bKey)
 			if (gKeyTrg & gKeyJump || gMC.boost_cnt % 3 == 1)
 			{
 				SetCaret(gMC.x, gMC.y + (6 * 0x200), 7, 3);
-				PlaySoundObject(113, 1);
+				PlaySoundObject(113, SOUND_MODE_PLAY);
 			}
 		}
 		else if (gMC.boost_sw == 3 && (gKeyTrg & gKeyJump || gMC.boost_cnt % 3 == 1))
 		{
 			// Boost particles (and sound)
 			SetCaret(gMC.x, gMC.y - (6 * 0x200), 7, 1);
-			PlaySoundObject(113, 1);
+			PlaySoundObject(113, SOUND_MODE_PLAY);
 		}
 	}
 	// Upwards wind/current
@@ -534,7 +534,7 @@ void ActMyChar_Normal(BOOL bKey)
 		if (gMC.boost_cnt % 3 == 0)
 		{
 			SetCaret(gMC.x, gMC.y + (gMC.hit.bottom / 2), 7, 3);
-			PlaySoundObject(113, 1);
+			PlaySoundObject(113, SOUND_MODE_PLAY);
 		}
 
 		// Bounce off of ceiling
@@ -616,7 +616,7 @@ void ActMyChar_Normal(BOOL bKey)
 				SetNpChar(73, x, gMC.y, gMC.xm + Random(-0x200, 0x200), Random(-0x200, 0x80) - (gMC.ym / 2), dir, NULL, 0);
 			}
 
-			PlaySoundObject(56, 1);
+			PlaySoundObject(56, SOUND_MODE_PLAY);
 		}
 		else
 		{
@@ -628,7 +628,7 @@ void ActMyChar_Normal(BOOL bKey)
 					SetNpChar(73, x, gMC.y, gMC.xm + Random(-0x200, 0x200), Random(-0x200, 0x80), dir, NULL, 0);
 				}
 
-				PlaySoundObject(56, 1);
+				PlaySoundObject(56, SOUND_MODE_PLAY);
 			}
 		}
 
@@ -1000,12 +1000,12 @@ void SetNoise(int no, int freq)
 		case 1:
 			ChangeSoundFrequency(40, noise_freq);
 			ChangeSoundFrequency(41, noise_freq + 100);
-			PlaySoundObject(40, -1);
-			PlaySoundObject(41, -1);
+			PlaySoundObject(40, SOUND_MODE_PLAY_LOOP);
+			PlaySoundObject(41, SOUND_MODE_PLAY_LOOP);
 			break;
 
 		case 2:
-			PlaySoundObject(58, -1);
+			PlaySoundObject(58, SOUND_MODE_PLAY_LOOP);
 			break;
 	}
 }
@@ -1013,9 +1013,9 @@ void SetNoise(int no, int freq)
 void CutNoise(void)
 {
 	noise_no = 0;
-	PlaySoundObject(40, 0);
-	PlaySoundObject(41, 0);
-	PlaySoundObject(58, 0);
+	PlaySoundObject(40, SOUND_MODE_STOP);
+	PlaySoundObject(41, SOUND_MODE_STOP);
+	PlaySoundObject(58, SOUND_MODE_STOP);
 }
 
 void ResetNoise(void)
@@ -1025,19 +1025,19 @@ void ResetNoise(void)
 		case 1:
 			ChangeSoundFrequency(40, noise_freq);
 			ChangeSoundFrequency(41, noise_freq + 100);
-			PlaySoundObject(40, -1);
-			PlaySoundObject(41, -1);
+			PlaySoundObject(40, SOUND_MODE_PLAY_LOOP);
+			PlaySoundObject(41, SOUND_MODE_PLAY_LOOP);
 			break;
 
 		case 2:
-			PlaySoundObject(58, -1);
+			PlaySoundObject(58, SOUND_MODE_PLAY_LOOP);
 			break;
 	}
 }
 
 void SleepNoise(void)
 {
-	PlaySoundObject(40, 0);
-	PlaySoundObject(41, 0);
-	PlaySoundObject(58, 0);
+	PlaySoundObject(40, SOUND_MODE_STOP);
+	PlaySoundObject(41, SOUND_MODE_STOP);
+	PlaySoundObject(58, SOUND_MODE_STOP);
 }

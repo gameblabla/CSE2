@@ -168,7 +168,7 @@ void ActNpc321(NPCHAR *npc)
 	{
 		SetBullet(43, npc->pNpc->x, npc->pNpc->y, direct);
 		SetCaret(npc->pNpc->x, npc->pNpc->y, 3, 0);
-		PlaySoundObject(117, 1);
+		PlaySoundObject(117, SOUND_MODE_PLAY);
 	}
 
 	if (gMC.direct == 0)
@@ -192,7 +192,7 @@ void ActNpc322(NPCHAR *npc)
 		npc->act_wait = 0;
 		npc->bits &= ~NPC_SHOOTABLE;
 		npc->bits |= NPC_INVULNERABLE;
-		PlaySoundObject(22, 1);
+		PlaySoundObject(22, SOUND_MODE_PLAY);
 	}
 
 	switch (npc->act_no)
@@ -247,7 +247,7 @@ void ActNpc322(NPCHAR *npc)
 					npc->hit.top = 48 * 0x200;
 					npc->hit.bottom = 48 * 0x200;
 					npc->damage = 12;
-					PlaySoundObject(26, 1);
+					PlaySoundObject(26, SOUND_MODE_PLAY);
 					SetDestroyNpChar(npc->x, npc->y, 0x6000, 40);
 					SetQuake(10);
 
@@ -404,7 +404,7 @@ void ActNpc325(NPCHAR *npc)
 	{
 		case 0:
 			npc->act_no = 1;
-			PlaySoundObject(29, 1);
+			PlaySoundObject(29, SOUND_MODE_PLAY);
 			// Fallthrough
 		case 1:
 			if (++npc->ani_wait > 0)
@@ -424,7 +424,7 @@ void ActNpc325(NPCHAR *npc)
 				npc->damage = 10;
 				npc->view.front = 8 * 0x200;
 				npc->view.top = 12 * 0x200;
-				PlaySoundObject(101, 1);
+				PlaySoundObject(101, SOUND_MODE_PLAY);
 				SetDestroyNpChar(npc->x, npc->y + (84 * 0x200), 0, 3);
 			}
 
@@ -812,7 +812,7 @@ void ActNpc332(NPCHAR *npc)
 	switch (npc->act_no)
 	{
 		case 0:
-			PlaySoundObject(44, 1);
+			PlaySoundObject(44, SOUND_MODE_PLAY);
 			npc->act_no = 1;
 
 			if (npc->direct == 0)
@@ -838,7 +838,7 @@ void ActNpc332(NPCHAR *npc)
 
 				SetNpChar(331, npc->x, npc->y, xm, -0x400, 0, 0, 0x100);
 
-				PlaySoundObject(12, 1);
+				PlaySoundObject(12, SOUND_MODE_PLAY);
 			}
 
 			break;
@@ -868,7 +868,7 @@ void ActNpc333(NPCHAR *npc)
 			npc->act_no = 1;
 			npc->tgt_x = npc->x;
 			npc->tgt_y = npc->y;
-			PlaySoundObject(103, 1);
+			PlaySoundObject(103, SOUND_MODE_PLAY);
 			npc->y = gMC.y;
 			// Fallthrough
 		case 1:

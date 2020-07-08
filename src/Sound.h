@@ -26,6 +26,13 @@ enum SoundEffectNames
 	// To be continued
 };
 
+enum SoundMode
+{
+	SOUND_MODE_PLAY_LOOP = -1,
+	SOUND_MODE_STOP = 0,
+	SOUND_MODE_PLAY = 1
+};
+
 extern BOOL audio_backend_initialised;
 extern AudioBackend_Sound *lpSECONDARYBUFFER[SE_MAX];
 
@@ -33,7 +40,7 @@ BOOL InitDirectSound(void);
 void EndDirectSound(void);
 BOOL InitSoundObject(const char *resname, int no);
 BOOL LoadSoundObject(const char *file_name, int no);
-void PlaySoundObject(int no, int mode);
+void PlaySoundObject(int no, SoundMode mode);
 void ChangeSoundFrequency(int no, unsigned long rate);
 void ChangeSoundVolume(int no, long volume);
 void ChangeSoundPan(int no, long pan);

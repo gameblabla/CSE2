@@ -171,7 +171,7 @@ void ActNpc024(NPCHAR *npc)
 				npc->act_no = 3;
 				npc->ani_no = 2;
 				npc->ym = -0x5FF;
-				PlaySoundObject(108, 1);
+				PlaySoundObject(108, SOUND_MODE_PLAY);
 
 				if (npc->x > gMC.x)
 					npc->direct = 0;
@@ -216,7 +216,7 @@ void ActNpc024(NPCHAR *npc)
 			}
 
 			if (npc->act_wait % 4 == 1)
-				PlaySoundObject(110, 1);
+				PlaySoundObject(110, SOUND_MODE_PLAY);
 
 			if (++npc->ani_wait > 0)
 			{
@@ -237,7 +237,7 @@ void ActNpc024(NPCHAR *npc)
 				npc->act_wait = 0;
 				npc->ani_no = 0;
 				npc->act_no = 1;
-				PlaySoundObject(26, 1);
+				PlaySoundObject(26, SOUND_MODE_PLAY);
 				SetQuake(30);
 			}
 
@@ -604,7 +604,7 @@ void ActNpc028(NPCHAR *npc)
 				npc->act_no = 3;
 				npc->ani_no = 2;
 				npc->ym = -0x4CC;
-				PlaySoundObject(30, 1);
+				PlaySoundObject(30, SOUND_MODE_PLAY);
 
 				if (npc->x > gMC.x)
 					npc->direct = 0;
@@ -649,7 +649,7 @@ void ActNpc028(NPCHAR *npc)
 			}
 
 			if (npc->act_wait % 4 == 1)
-				PlaySoundObject(109, 1);
+				PlaySoundObject(109, SOUND_MODE_PLAY);
 
 			if (npc->flag & 8)
 				npc->ym = -0x200;
@@ -673,7 +673,7 @@ void ActNpc028(NPCHAR *npc)
 				npc->act_wait = 0;
 				npc->ani_no = 0;
 				npc->act_no = 1;
-				PlaySoundObject(23, 1);
+				PlaySoundObject(23, SOUND_MODE_PLAY);
 			}
 
 			break;
@@ -1022,7 +1022,7 @@ void ActNpc035(NPCHAR *npc)
 {
 	if (npc->act_no < 3 && npc->life < 90)
 	{
-		PlaySoundObject(71, 1);
+		PlaySoundObject(71, SOUND_MODE_PLAY);
 		SetDestroyNpChar(npc->x, npc->y, npc->view.back, 8);
 		SetExpObjects(npc->x, npc->y, npc->exp);
 		npc->act_no = 3;
@@ -1128,7 +1128,7 @@ void ActNpc036(NPCHAR *npc)
 				xm = GetCos(deg);
 
 				SetNpChar(11, npc->x, npc->y + 0x800, xm, ym, 0, NULL, 0x100);
-				PlaySoundObject(39, 1);
+				PlaySoundObject(39, SOUND_MODE_PLAY);
 
 				if (npc->count1 == 0)
 				{
@@ -1180,7 +1180,7 @@ void ActNpc036(NPCHAR *npc)
 			if (npc->ani_no > 5)
 			{
 				npc->ani_no = 4;
-				PlaySoundObject(47, 1);
+				PlaySoundObject(47, SOUND_MODE_PLAY);
 			}
 
 			if (++npc->act_wait > 100)
@@ -1212,8 +1212,8 @@ void ActNpc036(NPCHAR *npc)
 				npc->act_no = 7;
 				npc->act_wait = 0;
 				npc->ani_no = 2;
-				PlaySoundObject(26, 1);
-				PlaySoundObject(25, 1);
+				PlaySoundObject(26, SOUND_MODE_PLAY);
+				PlaySoundObject(25, SOUND_MODE_PLAY);
 				SetQuake(30);
 				npc->damage = 0;
 

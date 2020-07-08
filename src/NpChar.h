@@ -2,6 +2,7 @@
 
 #include "WindowsWrapper.h"
 
+#include "CommonDefines.h"
 #include "Draw.h"
 
 #define NPC_MAX 0x200
@@ -81,20 +82,8 @@ typedef struct NPCHAR
 	int count2;
 	int act_no;
 	int act_wait;
-	struct
-	{
-		int front;
-		int top;
-		int back;
-		int bottom;
-	} hit;
-	struct
-	{
-		int front;
-		int top;
-		int back;
-		int bottom;
-	} view;
+	OTHER_RECT hit;
+	OTHER_RECT view;
 	unsigned char shock;
 	int damage_view;
 	int damage;

@@ -139,7 +139,7 @@ void ActBossChar_Ironhead(void)
 
 				if (npc->act_wait == 300 || npc->act_wait == 310 || npc->act_wait == 320)
 				{
-					PlaySoundObject(39, 1);
+					PlaySoundObject(39, SOUND_MODE_PLAY);
 					SetNpChar(198, npc->x + (10 * 0x200), npc->y + (1 * 0x200), Random(-3, 0) * 0x200, Random(-3, 3) * 0x200, 2, NULL, 0x100);
 				}
 			}

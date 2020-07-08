@@ -74,14 +74,17 @@ BOOL WriteLog(const char *string, int value1, int value2, int value3)
 
 BOOL IsKeyFile(const char *name)
 {
-	std::string path = gModulePath + '/' + name;
+	std::string path;
+	FILE *fp;
 
-	FILE *file = fopen(path.c_str(), "rb");
+	path = gModulePath + '/' + name;
 
-	if (file == NULL)
+	fp = fopen(path.c_str(), "rb");
+
+	if (fp == NULL)
 		return FALSE;
 
-	fclose(file);
+	fclose(fp);
 	return TRUE;
 }
 

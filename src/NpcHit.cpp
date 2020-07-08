@@ -463,7 +463,7 @@ void LoseNpChar(NPCHAR *npc, BOOL bVanish)
 	int val;
 
 	// Play death sound
-	PlaySoundObject(npc->destroy_voice, 1);
+	PlaySoundObject(npc->destroy_voice, SOUND_MODE_PLAY);
 
 	// Create smoke
 	switch (npc->size)
@@ -594,7 +594,7 @@ void HitNpCharBullet(void)
 							SetCaret((gBul[b].x + gNPC[n].x) / 2, (gBul[b].y + gNPC[n].y) / 2, 11, 0);
 							SetCaret((gBul[b].x + gNPC[n].x) / 2, (gBul[b].y + gNPC[n].y) / 2, 11, 0);
 							SetCaret((gBul[b].x + gNPC[n].x) / 2, (gBul[b].y + gNPC[n].y) / 2, 11, 0);
-							PlaySoundObject(gNPC[n].hit_voice, 1);
+							PlaySoundObject(gNPC[n].hit_voice, SOUND_MODE_PLAY);
 							gNPC[n].shock = 16;
 						}
 
@@ -615,7 +615,7 @@ void HitNpCharBullet(void)
 				{
 					// Hit invulnerable NPC
 					SetCaret((gBul[b].x + gNPC[n].x) / 2, (gBul[b].y + gNPC[n].y) / 2, 2, 2);
-					PlaySoundObject(31, 1);
+					PlaySoundObject(31, SOUND_MODE_PLAY);
 					gBul[b].life = 0;
 					continue;
 				}

@@ -3,13 +3,6 @@
 #define WINDOW_WIDTH 320
 #define WINDOW_HEIGHT 240
 
-#define TILES_TO_PIXELS(x) ((int)((x) * 0x10))
-#define PIXELS_TO_TILES(x) ((int)((x) / 0x10))
-#define PIXELS_TO_UNITS(x) ((int)((x) * 0x200))
-#define UNITS_TO_PIXELS(x) ((int)((x) / 0x200))
-#define TILES_TO_UNITS(x) ((int)((x) * (0x200 * 0x10)))
-#define UNITS_TO_TILES(x) ((int)((x) / (0x200 * 0x10)))
-
 enum Collisions
 {
 	COLL_LEFT_WALL = 1,     // Touching a left wall
@@ -26,4 +19,12 @@ enum Direction
 	DIR_RIGHT = 2,
 	DIR_DOWN = 3,
 	DIR_AUTO = 4
+};
+
+struct OTHER_RECT	// The original name for this struct is unknown
+{
+	int front;
+	int top;
+	int back;
+	int bottom;
 };
