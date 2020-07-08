@@ -24,9 +24,9 @@ equivalents.
 #include "ExtraSoundFormats.h"
 #endif
 #include "Main.h"
-#include "Resource.h"
 #include "Organya.h"
 #include "PixTone.h"
+#include "Resource.h"
 
 BOOL audio_backend_initialised;
 AudioBackend_Sound *lpSECONDARYBUFFER[SE_MAX];
@@ -88,7 +88,7 @@ BOOL InitSoundObject(const char *resname, int no)
 		return TRUE;
 
 	// リソースの検索 (Search for resources)
-	resource_pointer = FindResource("WAVE100", "WAVE", NULL);
+	resource_pointer = FindResource(resname, "WAVE", NULL);
 
 	if (resource_pointer == NULL)
 		return FALSE;
