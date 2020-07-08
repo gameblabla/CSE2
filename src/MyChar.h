@@ -2,6 +2,8 @@
 
 #include "WindowsWrapper.h"
 
+#include "CommonDefines.h"
+
 // TODO - When I add bitmask constants for gMC.flags...
 // 0x100 is a 'player is underwater' flag
 
@@ -38,20 +40,8 @@ typedef struct MYCHAR
 	int ym;
 	int ani_wait;
 	int ani_no;
-	struct
-	{
-		int front;
-		int top;
-		int back;
-		int bottom;
-	} hit;
-	struct
-	{
-		int front;
-		int top;
-		int back;
-		int bottom;
-	} view;
+	OTHER_RECT hit;
+	OTHER_RECT view;
 	RECT rect;
 	RECT rect_arms;
 	int level;

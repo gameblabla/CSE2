@@ -20,3 +20,11 @@ enum Direction
 	DIR_DOWN = 3,
 	DIR_AUTO = 4
 };
+
+struct OTHER_RECT	// The original name for this struct is unknown
+{
+	int front;
+	int top;
+	int back;
+	int bottom;
+};
