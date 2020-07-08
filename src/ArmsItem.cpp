@@ -282,7 +282,7 @@ void MoveCampCursor(void)
 		if (gCampActive == FALSE)
 		{
 			// Switch to a weapon
-			PlaySoundObject(SND_SWITCH_WEAPON, 1);
+			PlaySoundObject(SND_SWITCH_WEAPON, SOUND_MODE_PLAY);
 
 			if (arms_num != 0)
 				StartTextScript(1000 + gArmsData[gSelectedArms].code);
@@ -292,7 +292,7 @@ void MoveCampCursor(void)
 		else
 		{
 			// Switch to an item
-			PlaySoundObject(SND_YES_NO_CHANGE_CHOICE, 1);
+			PlaySoundObject(SND_YES_NO_CHANGE_CHOICE, SOUND_MODE_PLAY);
 
 			if (item_num != 0)
 				StartTextScript(5000 + gItemData[gSelectedItem].code);
@@ -605,7 +605,7 @@ int RotationArms(void)
 		gSelectedArms = 0;
 
 	gArmsEnergyX = 32;
-	PlaySoundObject(SND_SWITCH_WEAPON, 1);
+	PlaySoundObject(SND_SWITCH_WEAPON, SOUND_MODE_PLAY);
 
 	return gArmsData[gSelectedArms].code;
 }
@@ -637,7 +637,7 @@ int RotationArmsRev(void)
 	}
 
 	gArmsEnergyX = 0;
-	PlaySoundObject(SND_SWITCH_WEAPON, 1);
+	PlaySoundObject(SND_SWITCH_WEAPON, SOUND_MODE_PLAY);
 
 	return gArmsData[gSelectedArms].code;
 }
@@ -646,5 +646,5 @@ void ChangeToFirstArms(void)
 {
 	gSelectedArms = 0;
 	gArmsEnergyX = 32;
-	PlaySoundObject(SND_SWITCH_WEAPON, 1);
+	PlaySoundObject(SND_SWITCH_WEAPON, SOUND_MODE_PLAY);
 }

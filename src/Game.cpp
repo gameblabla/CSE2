@@ -428,7 +428,7 @@ static int ModeTitle(void)
 		{
 			if (gKeyTrg & gKeyOk)
 			{
-				PlaySoundObject(18, 1);
+				PlaySoundObject(18, SOUND_MODE_PLAY);
 				break;
 			}
 		}
@@ -460,7 +460,7 @@ static int ModeTitle(void)
 		// Move cursor
 		if (gKeyTrg & (gKeyUp | gKeyDown))
 		{
-			PlaySoundObject(1, 1);
+			PlaySoundObject(1, SOUND_MODE_PLAY);
 
 			if (bContinue)
 				bContinue = FALSE;
@@ -796,7 +796,7 @@ BOOL Game(void)
 		return FALSE;
 	}
 
-	PlaySoundObject(7, -1);
+	PlaySoundObject(7, SOUND_MODE_PLAY_LOOP);
 
 	std::string path = gDataPath + "/npc.tbl";
 
@@ -829,7 +829,7 @@ BOOL Game(void)
 			mode = ModeAction();
 	}
 
-	PlaySoundObject(7, 0);
+	PlaySoundObject(7, SOUND_MODE_STOP);
 
 	EndMapData();
 	EndTextScript();

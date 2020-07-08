@@ -356,7 +356,7 @@ static int EnterOptionsMenu(OptionsMenu *options_menu, size_t selected_option)
 			if (selected_option > old_selection)
 				scroll = MIN(MAX(0, (int)options_menu->total_options - MAX_OPTIONS), MAX(scroll, (int)selected_option - (MAX_OPTIONS - 2)));
 
-			PlaySoundObject(1, 1);
+			PlaySoundObject(1, SOUND_MODE_PLAY);
 		}
 
 		// Run option callbacks
@@ -488,7 +488,7 @@ static int Callback_ControlsKeyboard_Rebind(OptionsMenu *parent_menu, size_t thi
 			break;
 
 		case ACTION_OK:
-			PlaySoundObject(5, 1);
+			PlaySoundObject(5, SOUND_MODE_PLAY);
 
 			char timeout_string[2];
 			timeout_string[1] = '\0';
@@ -521,7 +521,7 @@ static int Callback_ControlsKeyboard_Rebind(OptionsMenu *parent_menu, size_t thi
 						bindings[controls[this_option].binding_index].keyboard = scancode;
 						strncpy(bound_name_buffers[this_option], key_name, sizeof(bound_name_buffers[0]) - 1);
 
-						PlaySoundObject(18, 1);
+						PlaySoundObject(18, SOUND_MODE_PLAY);
 
 						gKeyTrg = gKey = 0;	// Prevent weird input-ghosting by doing this
 						return CALLBACK_CONTINUE;
@@ -581,11 +581,11 @@ static int Callback_ControlsKeyboard(OptionsMenu *parent_menu, size_t this_optio
 		TRUE
 	};
 
-	PlaySoundObject(5, 1);
+	PlaySoundObject(5, SOUND_MODE_PLAY);
 
 	const int return_value = EnterOptionsMenu(&options_menu, 0);
 
-	PlaySoundObject(5, 1);
+	PlaySoundObject(5, SOUND_MODE_PLAY);
 
 	return return_value;
 }
@@ -607,7 +607,7 @@ static int Callback_ControlsController_Rebind(OptionsMenu *parent_menu, size_t t
 			break;
 
 		case ACTION_OK:
-			PlaySoundObject(5, 1);
+			PlaySoundObject(5, SOUND_MODE_PLAY);
 
 			JOYSTICK_STATUS old_state = gJoystickState;
 
@@ -637,7 +637,7 @@ static int Callback_ControlsController_Rebind(OptionsMenu *parent_menu, size_t t
 						bindings[controls[this_option].binding_index].controller = button;
 						strncpy(bound_name_buffers[this_option], ControllerBackend_GetButtonName(button), sizeof(bound_name_buffers[0]));
 
-						PlaySoundObject(18, 1);
+						PlaySoundObject(18, SOUND_MODE_PLAY);
 
 						gKeyTrg = gKey = 0;	// Prevent weird input-ghosting by doing this
 						return CALLBACK_CONTINUE;
@@ -697,11 +697,11 @@ static int Callback_ControlsController(OptionsMenu *parent_menu, size_t this_opt
 		TRUE
 	};
 
-	PlaySoundObject(5, 1);
+	PlaySoundObject(5, SOUND_MODE_PLAY);
 
 	const int return_value = EnterOptionsMenu(&options_menu, 0);
 
-	PlaySoundObject(5, 1);
+	PlaySoundObject(5, SOUND_MODE_PLAY);
 
 	return return_value;
 }
@@ -769,7 +769,7 @@ static int Callback_Soundtrack(OptionsMenu *parent_menu, size_t this_option, Cal
 		TRUE
 	};
 
-	PlaySoundObject(5, 1);
+	PlaySoundObject(5, SOUND_MODE_PLAY);
 
 	int return_value = EnterOptionsMenu(&options_menu, conf->soundtrack);
 
@@ -778,11 +778,11 @@ static int Callback_Soundtrack(OptionsMenu *parent_menu, size_t this_option, Cal
 	{
 		return_value = CALLBACK_CONTINUE;
 
-		PlaySoundObject(18, 1);
+		PlaySoundObject(18, SOUND_MODE_PLAY);
 	}
 	else
 	{
-		PlaySoundObject(5, 1);
+		PlaySoundObject(5, SOUND_MODE_PLAY);
 	}
 
 	return return_value;
@@ -817,7 +817,7 @@ static int Callback_Framerate(OptionsMenu *parent_menu, size_t this_option, Call
 
 			gb60fps = parent_menu->options[this_option].value;
 
-			PlaySoundObject(SND_SWITCH_WEAPON, 1);
+			PlaySoundObject(SND_SWITCH_WEAPON, SOUND_MODE_PLAY);
 
 			parent_menu->options[this_option].value_string = strings[parent_menu->options[this_option].value];
 			break;
@@ -855,7 +855,7 @@ static int Callback_Vsync(OptionsMenu *parent_menu, size_t this_option, Callback
 			// Increment value (with wrapping)
 			parent_menu->options[this_option].value = (parent_menu->options[this_option].value + 1) % (sizeof(strings) / sizeof(strings[0]));
 
-			PlaySoundObject(SND_SWITCH_WEAPON, 1);
+			PlaySoundObject(SND_SWITCH_WEAPON, SOUND_MODE_PLAY);
 
 			parent_menu->options[this_option].value_string = strings[parent_menu->options[this_option].value];
 			break;
@@ -903,7 +903,7 @@ static int Callback_Resolution(OptionsMenu *parent_menu, size_t this_option, Cal
 					parent_menu->options[this_option].value = 0;
 			}
 
-			PlaySoundObject(SND_SWITCH_WEAPON, 1);
+			PlaySoundObject(SND_SWITCH_WEAPON, SOUND_MODE_PLAY);
 
 			parent_menu->options[this_option].value_string = strings[parent_menu->options[this_option].value];
 			break;
@@ -940,7 +940,7 @@ static int Callback_SmoothScrolling(OptionsMenu *parent_menu, size_t this_option
 
 			gbSmoothScrolling = parent_menu->options[this_option].value;
 
-			PlaySoundObject(SND_SWITCH_WEAPON, 1);
+			PlaySoundObject(SND_SWITCH_WEAPON, SOUND_MODE_PLAY);
 
 			parent_menu->options[this_option].value_string = strings[parent_menu->options[this_option].value];
 			break;
@@ -992,11 +992,11 @@ static int Callback_Options(OptionsMenu *parent_menu, size_t this_option, Callba
 		TRUE
 	};
 
-	PlaySoundObject(5, 1);
+	PlaySoundObject(5, SOUND_MODE_PLAY);
 
 	const int return_value = EnterOptionsMenu(&options_menu, 0);
 
-	PlaySoundObject(5, 1);
+	PlaySoundObject(5, SOUND_MODE_PLAY);
 
 	// Save our changes to the configuration file
 	memcpy(conf.bindings, bindings, sizeof(bindings));
@@ -1051,11 +1051,11 @@ static int PromptAreYouSure(void)
 		TRUE
 	};
 
-	PlaySoundObject(5, 1);
+	PlaySoundObject(5, SOUND_MODE_PLAY);
 
 	int return_value = EnterOptionsMenu(&options_menu, 1);
 
-	PlaySoundObject(18, 1);
+	PlaySoundObject(18, SOUND_MODE_PLAY);
 
 	return return_value;
 }
@@ -1067,7 +1067,7 @@ static int Callback_Resume(OptionsMenu *parent_menu, size_t this_option, Callbac
 	if (action != ACTION_OK)
 		return CALLBACK_CONTINUE;
 
-	PlaySoundObject(18, 1);
+	PlaySoundObject(18, SOUND_MODE_PLAY);
 	return enum_ESCRETURN_continue;
 }
 

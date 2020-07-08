@@ -537,7 +537,7 @@ void ActBullet_FireBall(BULLET *bul, int level)
 	{
 		bul->cond = 0;
 		SetCaret(bul->x, bul->y, 2, 0);
-		PlaySoundObject(28, 1);
+		PlaySoundObject(28, SOUND_MODE_PLAY);
 		return;
 	}
 
@@ -601,7 +601,7 @@ void ActBullet_FireBall(BULLET *bul, int level)
 		bul->y += bul->ym;
 
 		if (bul->flag & 0xD)
-			PlaySoundObject(34, 1);
+			PlaySoundObject(34, SOUND_MODE_PLAY);
 	}
 
 	RECT rect_left1[4] = {
@@ -989,7 +989,7 @@ void ActBullet_Bom(BULLET *bul, int level)
 					break;
 			}
 
-			PlaySoundObject(44, 1);
+			PlaySoundObject(44, SOUND_MODE_PLAY);
 			// Fallthrough
 		case 1:
 			switch (level)
@@ -1192,7 +1192,7 @@ void ActBullet_Bubblin3(BULLET *bul)
 	{
 		bul->cond = 0;
 		SetCaret(bul->x, bul->y, 2, 0);
-		PlaySoundObject(100, 1);
+		PlaySoundObject(100, SOUND_MODE_PLAY);
 
 		if (gMC.up)
 			SetBullet(22, bul->x, bul->y, 1);
@@ -1363,7 +1363,7 @@ void ActBullet_Sword1(BULLET *bul)
 		bul->bbits &= ~4;
 
 	if (bul->count1 % 5 == 1)
-		PlaySoundObject(34, 1);
+		PlaySoundObject(34, SOUND_MODE_PLAY);
 
 	if (bul->act_no == 0)
 	{
@@ -1433,7 +1433,7 @@ void ActBullet_Sword2(BULLET *bul)
 		bul->bbits &= ~4;
 
 	if (bul->count1 % 7 == 1)
-		PlaySoundObject(106, 1);
+		PlaySoundObject(106, SOUND_MODE_PLAY);
 
 	if (bul->act_no == 0)
 	{
@@ -1546,7 +1546,7 @@ void ActBullet_Sword3(BULLET *bul)
 
 			if (++bul->act_wait % 4 == 1)
 			{
-				PlaySoundObject(106, 1);
+				PlaySoundObject(106, SOUND_MODE_PLAY);
 
 				if (++bul->count1 % 2)
 					SetBullet(23, bul->x, bul->y, 0);
@@ -1573,7 +1573,7 @@ void ActBullet_Sword3(BULLET *bul)
 
 			if (Random(-1, 1) == 0)
 			{
-				PlaySoundObject(106, 1);
+				PlaySoundObject(106, SOUND_MODE_PLAY);
 
 				if (Random(0, 1) % 2)
 					SetBullet(23, bul->x + (Random(-0x40, 0x40) * 0x200), bul->y + (Random(-0x40, 0x40) * 0x200), 0);
@@ -1913,7 +1913,7 @@ void ActBullet_SuperBom(BULLET *bul, int level)
 					break;
 			}
 
-			PlaySoundObject(44, 1);
+			PlaySoundObject(44, SOUND_MODE_PLAY);
 			// Fallthrough
 		case 1:
 			switch (level)

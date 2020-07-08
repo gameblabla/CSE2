@@ -608,7 +608,7 @@ void ActNpc231(NPCHAR *npc)
 			for (i = 0; i < 10; ++i)
 			{
 				SetNpChar(4, npc->x + (Random(-16, 16) * 0x200), npc->y + (Random(-8, 8) * 0x200), 0, 0, 0, NULL, 0x100);
-				PlaySoundObject(12, 1);	// Wait, it does this in a loop?
+				PlaySoundObject(12, SOUND_MODE_PLAY);	// Wait, it does this in a loop?
 			}
 			// Fallthrough
 		case 13:
@@ -622,7 +622,7 @@ void ActNpc231(NPCHAR *npc)
 				SetCaret(npc->x + (10 * 0x200), npc->y + (8 * 0x200), 7, 3);
 
 			if (npc->act_wait % 4 == 1)
-				PlaySoundObject(34, 1);
+				PlaySoundObject(34, SOUND_MODE_PLAY);
 
 			if (npc->flag & 2 || gMC.flag & 2 || npc->act_wait > 450)
 			{
@@ -634,7 +634,7 @@ void ActNpc231(NPCHAR *npc)
 				for (i = 0; i < 6; ++i)
 				{
 					SetNpChar(4, npc->x + (Random(-16, 16) * 0x200), npc->y + (Random(-8, 8) * 0x200), 0, 0, 0, NULL, 0x100);
-					PlaySoundObject(12, 1);
+					PlaySoundObject(12, SOUND_MODE_PLAY);	// Here it does it again...
 				}
 			}
 
@@ -653,7 +653,7 @@ void ActNpc231(NPCHAR *npc)
 					SetCaret(npc->x + (10 * 0x200), npc->y + (8 * 0x200), 7, 3);
 
 				if (npc->act_wait % 16 == 1)
-					PlaySoundObject(34, 1);
+					PlaySoundObject(34, SOUND_MODE_PLAY);
 			}
 
 			if (npc->flag & 8)
@@ -1088,7 +1088,7 @@ void ActNpc236(NPCHAR *npc)
 
 			if (npc->act_wait % 10 == 3)
 			{
-				PlaySoundObject(39, 1);
+				PlaySoundObject(39, SOUND_MODE_PLAY);
 
 				if (npc->direct == 0)
 					SetNpChar(237, npc->x - (8 * 0x200), npc->y - (8 * 0x200), -0x400, -0x400, 0, NULL, 0x100);
@@ -1155,7 +1155,7 @@ void ActNpc237(NPCHAR *npc)
 				for (i = 0; i < 5; ++i)
 					SetCaret(npc->x, npc->y, 1, 0);
 
-				PlaySoundObject(21, 1);
+				PlaySoundObject(21, SOUND_MODE_PLAY);
 				npc->cond = 0;
 				return;
 			}
@@ -1226,7 +1226,7 @@ void ActNpc238(NPCHAR *npc)
 				for (i = 0; i < 4; ++i)
 				{
 					SetNpChar(4, npc->x + (Random(-16, 16) * 0x200), npc->y + (Random(-8, 8) * 0x200), 0, 0, 0, NULL, 0x100);
-					PlaySoundObject(12, 1);
+					PlaySoundObject(12, SOUND_MODE_PLAY);
 				}
 			}
 

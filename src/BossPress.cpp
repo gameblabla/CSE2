@@ -85,7 +85,7 @@ void ActBossChar_Press(void)
 				npc->y = 413 * 0x200;
 				npc->ani_no = 0;
 				npc->act_no = 20;
-				PlaySoundObject(44, 1);
+				PlaySoundObject(44, SOUND_MODE_PLAY);
 
 				for (i = 0; i < 5; ++i)
 				{
@@ -129,7 +129,7 @@ void ActBossChar_Press(void)
 				{
 					ChangeMapParts(i + 8, npc->count2, 0);
 					SetDestroyNpChar((i + 8) * 0x200 * 0x10, npc->count2 * 0x200 * 0x10, 0, 4);
-					PlaySoundObject(12, 1);
+					PlaySoundObject(12, SOUND_MODE_PLAY);
 				}
 			}
 
@@ -160,7 +160,7 @@ void ActBossChar_Press(void)
 		case 501:
 			if (++npc->act_wait % 0x10 == 0)
 			{
-				PlaySoundObject(12, 1);
+				PlaySoundObject(12, SOUND_MODE_PLAY);
 				SetDestroyNpChar(npc->x + (Random(-40, 40) * 0x200), npc->y + (Random(-60, 60) * 0x200), 1, 1);
 			}
 
@@ -189,7 +189,7 @@ void ActBossChar_Press(void)
 				{
 					ChangeMapParts(i + 7, 14, 0);
 					SetDestroyNpChar((i + 7) * 0x200 * 0x10, 224 * 0x200, 0, 0);
-					PlaySoundObject(12, 1);
+					PlaySoundObject(12, SOUND_MODE_PLAY);
 				}
 			}
 

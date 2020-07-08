@@ -3,11 +3,6 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-#if defined(__APPLE__)
- #include <OpenGL/gl.h>
-#else
- #include <GL/gl.h>
-#endif
 #include <GLFW/glfw3.h>
 
 #include "../../../Misc.h"
@@ -143,7 +138,7 @@ void WindowBackend_Software_HandleWindowResize(unsigned int width, unsigned int 
 		viewport_y = 0;
 		viewport_height = height;
 
-		viewport_width = framebuffer_width * ((float)height / (float)framebuffer_height);
+		viewport_width = (framebuffer_width * height) / framebuffer_height;
 		viewport_x = (width - viewport_width) / 2;
 	}
 	else
@@ -151,7 +146,7 @@ void WindowBackend_Software_HandleWindowResize(unsigned int width, unsigned int 
 		viewport_x = 0;
 		viewport_width = width;
 
-		viewport_height = framebuffer_height * ((float)width / (float)framebuffer_width);
+		viewport_height = (framebuffer_height * width) / framebuffer_width;
 		viewport_y = (height - viewport_height) / 2;
 	}
 
