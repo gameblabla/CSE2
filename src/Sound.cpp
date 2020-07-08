@@ -85,10 +85,10 @@ BOOL InitSoundObject(const char *resname, int no)
 
 	// Get sound properties, and check if it's valid
 	unsigned long buffer_size = resource_pointer[0x36] | (resource_pointer[0x37] << 8) | (resource_pointer[0x38] << 16) | (resource_pointer[0x39] << 24);
-	unsigned short format = resource_pointer[5] | (resource_pointer[6] << 8);
-	unsigned short channels = resource_pointer[7] | (resource_pointer[8] << 8);
-	unsigned long sample_rate = resource_pointer[9] | (resource_pointer[0xA] << 8) | (resource_pointer[0xB] << 16) | (resource_pointer[0xC] << 24);
-	unsigned short bits_per_sample = resource_pointer[0x13] | (resource_pointer[0x14] << 8);
+	unsigned short format = resource_pointer[0x14] | (resource_pointer[0x15] << 8);
+	unsigned short channels = resource_pointer[0x16] | (resource_pointer[0x17] << 8);
+	unsigned long sample_rate = resource_pointer[0x18] | (resource_pointer[0x19] << 8) | (resource_pointer[0x1A] << 16) | (resource_pointer[0x1B] << 24);
+	unsigned short bits_per_sample = resource_pointer[0x22] | (resource_pointer[0x23] << 8);
 
 	if (format != 1)	// 1 is WAVE_FORMAT_PCM
 		return FALSE;
@@ -157,10 +157,10 @@ BOOL LoadSoundObject(const char *file_name, int no)
 
 	// Get sound properties, and check if it's valid
 	unsigned long buffer_size = wp[0x36] | (wp[0x37] << 8) | (wp[0x38] << 16) | (wp[0x39] << 24);
-	unsigned short format = wp[5] | (wp[6] << 8);
-	unsigned short channels = wp[7] | (wp[8] << 8);
-	unsigned long sample_rate = wp[9] | (wp[0xA] << 8) | (wp[0xB] << 16) | (wp[0xC] << 24);
-	unsigned short bits_per_sample = wp[0x13] | (wp[0x14] << 8);
+	unsigned short format = wp[0x14] | (wp[0x15] << 8);
+	unsigned short channels = wp[0x16] | (wp[0x17] << 8);
+	unsigned long sample_rate = wp[0x18] | (wp[0x19] << 8) | (wp[0x1A] << 16) | (wp[0x1B] << 24);
+	unsigned short bits_per_sample = wp[0x22] | (wp[0x23] << 8);
 
 	if (format != 1)	// 1 is WAVE_FORMAT_PCM
 	{
