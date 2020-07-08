@@ -3,13 +3,6 @@
 #define WINDOW_WIDTH 320
 #define WINDOW_HEIGHT 240
 
-#define TILES_TO_PIXELS(x) ((int)((x) * 0x10))
-#define PIXELS_TO_TILES(x) ((int)((x) / 0x10))
-#define PIXELS_TO_UNITS(x) ((int)((x) * 0x200))
-#define UNITS_TO_PIXELS(x) ((int)((x) / 0x200))
-#define TILES_TO_UNITS(x) ((int)((x) * (0x200 * 0x10)))
-#define UNITS_TO_TILES(x) ((int)((x) / (0x200 * 0x10)))
-
 enum Collisions
 {
 	COLL_LEFT_WALL = 1,     // Touching a left wall

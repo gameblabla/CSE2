@@ -73,33 +73,33 @@ static void ActBossChar02_01(void)
 	{
 		case BALFROG_SPRITE_NOTHING:
 			boss->hit_voice = SND_BEHEMOTH_LARGE_HURT;
-			boss->hit.front = PIXELS_TO_UNITS(16);
-			boss->hit.top = PIXELS_TO_UNITS(16);
-			boss->hit.back = PIXELS_TO_UNITS(16);
-			boss->hit.bottom = PIXELS_TO_UNITS(16);
+			boss->hit.front = 16 * 0x200;
+			boss->hit.top = 16 * 0x200;
+			boss->hit.back = 16 * 0x200;
+			boss->hit.bottom = 16 * 0x200;
 			boss->size = 3;
 			boss->bits = NPC_INVULNERABLE;
 			break;
 
 		case BALFROG_SPRITE_STANDING_STILL:
-			boss->x = gBoss[0].x + PIXELS_TO_UNITS(-24) * minus;
-			boss->y = gBoss[0].y - PIXELS_TO_UNITS(24);
+			boss->x = gBoss[0].x + -24 * 0x200 * minus;
+			boss->y = gBoss[0].y - 24 * 0x200;
 			break;
 
 		case BALFROG_SPRITE_MOUTH_BARELY_OPEN_CROUCHING:
-			boss->x = gBoss[0].x + PIXELS_TO_UNITS(-24) * minus;
-			boss->y = gBoss[0].y - PIXELS_TO_UNITS(20);
+			boss->x = gBoss[0].x + -24 * 0x200 * minus;
+			boss->y = gBoss[0].y - 20 * 0x200;
 			break;
 
 		case BALFROG_SPRITE_MOUTH_OPEN_CROUCHING:
 		case BALFROG_SPRITE_MOUTH_OPEN_CROUCHING_FLASHING:
-			boss->x = gBoss[0].x + PIXELS_TO_UNITS(-24) * minus;
-			boss->y = gBoss[0].y - PIXELS_TO_UNITS(16);
+			boss->x = gBoss[0].x + -24 * 0x200 * minus;
+			boss->y = gBoss[0].y - 16 * 0x200;
 			break;
 
 		case BALFROG_SPRITE_JUMPING:
-			boss->x = gBoss[0].x + PIXELS_TO_UNITS(-24) * minus;
-			boss->y = gBoss[0].y - PIXELS_TO_UNITS(43);
+			boss->x = gBoss[0].x + -24 * 0x200 * minus;
+			boss->y = gBoss[0].y - 43 * 0x200;
 			break;
 	}
 }
@@ -112,10 +112,10 @@ static void ActBossChar02_02(void)
 	{
 		case BALFROG_SPRITE_NOTHING:
 			boss->hit_voice = SND_BEHEMOTH_LARGE_HURT;
-			boss->hit.front = PIXELS_TO_UNITS(24);
-			boss->hit.top = PIXELS_TO_UNITS(16);
-			boss->hit.back = PIXELS_TO_UNITS(24);
-			boss->hit.bottom = PIXELS_TO_UNITS(16);
+			boss->hit.front = 24 * 0x200;
+			boss->hit.top = 16 * 0x200;
+			boss->hit.back = 24 * 0x200;
+			boss->hit.bottom = 16 * 0x200;
 			boss->size = 3;
 			boss->bits = NPC_INVULNERABLE;
 			break;
@@ -169,18 +169,18 @@ void ActBossChar_Frog(void)
 	switch (boss->act_no)
 	{
 		case BALFROG_INITIALIZE:
-			boss->x = TILES_TO_UNITS(6);
-			boss->y = TILES_TO_UNITS(12.5);
+			boss->x = 6 * (0x200 * 0x10);
+			boss->y = 12 * (0x200 * 0x10) + 8 * 0x200;
 			boss->direct = DIR_RIGHT;
-			boss->view.front = PIXELS_TO_UNITS(48);
-			boss->view.top = PIXELS_TO_UNITS(48);
-			boss->view.back = PIXELS_TO_UNITS(32);
-			boss->view.bottom = PIXELS_TO_UNITS(16);
+			boss->view.front = 48 * 0x200;
+			boss->view.top = 48 * 0x200;
+			boss->view.back = 32 * 0x200;
+			boss->view.bottom = 16 * 0x200;
 			boss->hit_voice = SND_BEHEMOTH_LARGE_HURT;
-			boss->hit.front = PIXELS_TO_UNITS(24);
-			boss->hit.top = PIXELS_TO_UNITS(16);
-			boss->hit.back = PIXELS_TO_UNITS(24);
-			boss->hit.bottom = PIXELS_TO_UNITS(16);
+			boss->hit.front = 24 * 0x200;
+			boss->hit.top = 16 * 0x200;
+			boss->hit.back = 24 * 0x200;
+			boss->hit.bottom = 16 * 0x200;
 			boss->size = 3;
 			boss->exp = 1;
 			boss->code_event = 1000;
@@ -202,7 +202,7 @@ void ActBossChar_Frog(void)
 			gBoss[2].damage = 5;
 
 			for (i = 0; i < 8; ++i)
-				SetNpChar(NPC_SMOKE, boss->x + PIXELS_TO_UNITS(Random(-12, 12)), boss->y + PIXELS_TO_UNITS(Random(-12, 12)), Random(-341, 341), Random(PIXELS_TO_UNITS(-3), 0), DIR_LEFT, NULL, 0x100);
+				SetNpChar(NPC_SMOKE, boss->x + Random(-12, 12) * 0x200, boss->y + Random(-12, 12) * 0x200, Random(-341, 341), Random(-3 * 0x200, 0), DIR_LEFT, NULL, 0x100);
 
 			break;
 
@@ -257,16 +257,16 @@ void ActBossChar_Frog(void)
 			{
 				boss->act_no = BALFROG_MIDAIR;
 				boss->ani_no = BALFROG_SPRITE_JUMPING;
-				boss->ym = PIXELS_TO_UNITS(-2);
+				boss->ym = -2 * 0x200;
 				PlaySoundObject(25, SOUND_MODE_PLAY);
 
 				if (boss->direct == DIR_LEFT)
-					boss->xm = PIXELS_TO_UNITS(-1);
+					boss->xm = -1 * 0x200;
 				else
-					boss->xm = PIXELS_TO_UNITS(1);
+					boss->xm = 1 * 0x200;
 
-				boss->view.top = PIXELS_TO_UNITS(64);
-				boss->view.bottom = PIXELS_TO_UNITS(24);
+				boss->view.top = 64 * 0x200;
+				boss->view.bottom = 24 * 0x200;
 			}
 
 			break;
@@ -275,13 +275,13 @@ void ActBossChar_Frog(void)
 			if (boss->direct == DIR_LEFT && boss->flag & COLL_LEFT_WALL)
 			{
 				boss->direct = DIR_RIGHT;
-				boss->xm = PIXELS_TO_UNITS(1);
+				boss->xm = 1 * 0x200;
 			}
 
 			if (boss->direct == DIR_RIGHT && boss->flag & COLL_RIGHT_WALL)
 			{
 				boss->direct = DIR_LEFT;
-				boss->xm = PIXELS_TO_UNITS(-1);
+				boss->xm = -1 * 0x200;
 			}
 
 			if (boss->flag & COLL_GROUND)
@@ -290,8 +290,8 @@ void ActBossChar_Frog(void)
 				SetQuake(30);
 				boss->act_no = BALFROG_WAIT;
 				boss->ani_no = BALFROG_SPRITE_STANDING_STILL;
-				boss->view.top = PIXELS_TO_UNITS(48);
-				boss->view.bottom = PIXELS_TO_UNITS(16);
+				boss->view.top = 48 * 0x200;
+				boss->view.bottom = 16 * 0x200;
 
 				if (boss->direct == DIR_LEFT && boss->x < gMC.x)
 				{
@@ -305,10 +305,10 @@ void ActBossChar_Frog(void)
 					boss->act_no = BALFROG_INITIALIZE_LAND;
 				}
 
-				SetNpChar(110, TILES_TO_UNITS(Random(4, 16)), TILES_TO_UNITS(Random(0, 4)), 0, 0, DIR_AUTO, NULL, 0x80);
+				SetNpChar(110, Random(4, 16) * (0x200 * 0x10), Random(0, 4) * (0x200 * 0x10), 0, 0, DIR_AUTO, NULL, 0x80);
 
 				for (i = 0; i < 4; ++i)
-					SetNpChar(NPC_SMOKE, boss->x + PIXELS_TO_UNITS(Random(-12, 12)), boss->y + boss->hit.bottom, Random(-341, 341), Random(PIXELS_TO_UNITS(-3), 0), DIR_LEFT, NULL, 0x100);
+					SetNpChar(NPC_SMOKE, boss->x + Random(-12, 12) * 0x200, boss->y + boss->hit.bottom, Random(-341, 341), Random(-3 * 0x200, 0), DIR_LEFT, NULL, 0x100);
 			}
 
 			break;
@@ -371,9 +371,9 @@ void ActBossChar_Frog(void)
 				--boss->count1;
 
 				if (boss->direct == DIR_LEFT)
-					deg = GetArktan(boss->x - TILES_TO_UNITS(2) - gMC.x, boss->y - PIXELS_TO_UNITS(8) - gMC.y);
+					deg = GetArktan(boss->x - 2 * (0x200 * 0x10) - gMC.x, boss->y - 8 * 0x200 - gMC.y);
 				else
-					deg = GetArktan(boss->x + TILES_TO_UNITS(2) - gMC.x, boss->y - PIXELS_TO_UNITS(8) - gMC.y);
+					deg = GetArktan(boss->x + 2 * (0x200 * 0x10) - gMC.x, boss->y - 8 * 0x200 - gMC.y);
 
 				deg += (unsigned char)Random(-0x10, 0x10);
 
@@ -381,9 +381,9 @@ void ActBossChar_Frog(void)
 				xm = GetCos(deg);
 
 				if (boss->direct == DIR_LEFT)
-					SetNpChar(NPC_PROJECTILE_BALFROG_SPITBALL, boss->x - TILES_TO_UNITS(2), boss->y - PIXELS_TO_UNITS(8), xm, ym, DIR_LEFT, NULL, 0x100);
+					SetNpChar(NPC_PROJECTILE_BALFROG_SPITBALL, boss->x - 2 * (0x200 * 0x10), boss->y - 8 * 0x200, xm, ym, DIR_LEFT, NULL, 0x100);
 				else
-					SetNpChar(NPC_PROJECTILE_BALFROG_SPITBALL, boss->x + TILES_TO_UNITS(2), boss->y - PIXELS_TO_UNITS(8), xm, ym, DIR_LEFT, NULL, 0x100);
+					SetNpChar(NPC_PROJECTILE_BALFROG_SPITBALL, boss->x + 2 * (0x200 * 0x10), boss->y - 8 * 0x200, xm, ym, DIR_LEFT, NULL, 0x100);
 
 				PlaySoundObject(SND_ENEMY_SHOOT_PROJETILE, SOUND_MODE_PLAY);
 
@@ -457,9 +457,9 @@ void ActBossChar_Frog(void)
 			{
 				boss->act_no = BALFROG_LEAP_MIDAIR;
 				boss->ani_no = BALFROG_SPRITE_JUMPING;
-				boss->ym = PIXELS_TO_UNITS(-5);
-				boss->view.top = PIXELS_TO_UNITS(64);
-				boss->view.bottom = PIXELS_TO_UNITS(24);
+				boss->ym = -5 * 0x200;
+				boss->view.top = 64 * 0x200;
+				boss->view.bottom = 24 * 0x200;
 				PlaySoundObject(SND_SILLY_EXPLOSION, SOUND_MODE_PLAY);
 			}
 
@@ -472,17 +472,17 @@ void ActBossChar_Frog(void)
 				SetQuake(60);
 				boss->act_no = BALFROG_WAIT;
 				boss->ani_no = BALFROG_SPRITE_STANDING_STILL;
-				boss->view.top = PIXELS_TO_UNITS(48);
-				boss->view.bottom = PIXELS_TO_UNITS(16);
+				boss->view.top = 48 * 0x200;
+				boss->view.bottom = 16 * 0x200;
 
 				for (i = 0; i < 2; ++i)
-					SetNpChar(NPC_ENEMY_FROG, TILES_TO_UNITS(Random(4, 16)), TILES_TO_UNITS(Random(0, 4)), 0, 0, DIR_AUTO, NULL, 0x80);
+					SetNpChar(NPC_ENEMY_FROG, Random(4, 16) * (0x200 * 0x10), Random(0, 4) * (0x200 * 0x10), 0, 0, DIR_AUTO, NULL, 0x80);
 
 				for (i = 0; i < 6; ++i)
-					SetNpChar(NPC_ENEMY_PUCHI, TILES_TO_UNITS(Random(4, 16)), TILES_TO_UNITS(Random(0, 4)), 0, 0, DIR_AUTO, NULL, 0x80);
+					SetNpChar(NPC_ENEMY_PUCHI, Random(4, 16) * (0x200 * 0x10), Random(0, 4) * (0x200 * 0x10), 0, 0, DIR_AUTO, NULL, 0x80);
 
 				for (i = 0; i < 8; ++i)
-					SetNpChar(NPC_SMOKE, boss->x + PIXELS_TO_UNITS(Random(-12, 12)), boss->y + boss->hit.bottom, Random(-341, 341), Random(PIXELS_TO_UNITS(-3), 0), DIR_LEFT, NULL, 0x100);
+					SetNpChar(NPC_SMOKE, boss->x + Random(-12, 12) * 0x200, boss->y + boss->hit.bottom, Random(-341, 341), Random(-3 * 0x200, 0), DIR_LEFT, NULL, 0x100);
 
 				if (boss->direct == DIR_LEFT && boss->x < gMC.x)
 				{
@@ -507,7 +507,7 @@ void ActBossChar_Frog(void)
 			PlaySoundObject(SND_EXPLOSION, SOUND_MODE_PLAY);
 
 			for (i = 0; i < 8; ++i)
-				SetNpChar(NPC_SMOKE, boss->x + PIXELS_TO_UNITS(Random(-12, 12)), boss->y + PIXELS_TO_UNITS(Random(-12, 12)), Random(-341, 341), Random(PIXELS_TO_UNITS(-3), 0), DIR_LEFT, NULL, 0x100);
+				SetNpChar(NPC_SMOKE, boss->x + Random(-12, 12) * 0x200, boss->y + Random(-12, 12) * 0x200, Random(-341, 341), Random(-3 * 0x200, 0), DIR_LEFT, NULL, 0x100);
 
 			gBoss[1].cond = 0;
 			gBoss[2].cond = 0;
@@ -516,12 +516,12 @@ void ActBossChar_Frog(void)
 			++boss->act_wait;
 
 			if (boss->act_wait % 5 == 0)
-				SetNpChar(NPC_SMOKE, boss->x + PIXELS_TO_UNITS(Random(-12, 12)), boss->y + PIXELS_TO_UNITS(Random(-12, 12)), Random(-341, 341), Random(PIXELS_TO_UNITS(-3), 0), DIR_LEFT, NULL, 0x100);
+				SetNpChar(NPC_SMOKE, boss->x + Random(-12, 12) * 0x200, boss->y + Random(-12, 12) * 0x200, Random(-341, 341), Random(-3 * 0x200, 0), DIR_LEFT, NULL, 0x100);
 
 			if (boss->act_wait / 2 % 2)
-				boss->x -= PIXELS_TO_UNITS(1);
+				boss->x -= 1 * 0x200;
 			else
-				boss->x += PIXELS_TO_UNITS(1);
+				boss->x += 1 * 0x200;
 
 			if (boss->act_wait > 100)
 			{
@@ -536,28 +536,28 @@ void ActBossChar_Frog(void)
 
 			if (boss->act_wait / 2 % 2)
 			{
-				boss->view.front = PIXELS_TO_UNITS(20);
-				boss->view.top = PIXELS_TO_UNITS(12);
-				boss->view.back = PIXELS_TO_UNITS(20);
-				boss->view.bottom = PIXELS_TO_UNITS(12);
+				boss->view.front = 20 * 0x200;
+				boss->view.top = 12 * 0x200;
+				boss->view.back = 20 * 0x200;
+				boss->view.bottom = 12 * 0x200;
 				boss->ani_no = BALFROG_SPRITE_BALROG_WHITE;
 			}
 			else
 			{
-				boss->view.front = PIXELS_TO_UNITS(48);
-				boss->view.top = PIXELS_TO_UNITS(48);
-				boss->view.back = PIXELS_TO_UNITS(32);
-				boss->view.bottom = PIXELS_TO_UNITS(16);
+				boss->view.front = 48 * 0x200;
+				boss->view.top = 48 * 0x200;
+				boss->view.back = 32 * 0x200;
+				boss->view.bottom = 16 * 0x200;
 				boss->ani_no = BALFROG_SPRITE_MOUTH_OPEN_CROUCHING;
 			}
 
 			if (boss->act_wait % 9 == 0)
-				SetNpChar(NPC_SMOKE, boss->x + PIXELS_TO_UNITS(Random(-12, 12)), boss->y + PIXELS_TO_UNITS(Random(-12, 12)), Random(-341, 341), Random(PIXELS_TO_UNITS(-3), 0), DIR_LEFT, NULL, 0x100);
+				SetNpChar(NPC_SMOKE, boss->x + Random(-12, 12) * 0x200, boss->y + Random(-12, 12) * 0x200, Random(-341, 341), Random(-3 * 0x200, 0), DIR_LEFT, NULL, 0x100);
 
 			if (boss->act_wait > 150)
 			{
 				boss->act_no = BALFROG_NOP_START;
-				boss->hit.bottom = PIXELS_TO_UNITS(12);
+				boss->hit.bottom = 12 * 0x200;
 			}
 
 			break;
@@ -581,7 +581,7 @@ void ActBossChar_Frog(void)
 			if (boss->act_wait > 30)
 			{
 				boss->ani_no = BALFROG_SPRITE_BALROG_JUMPING;
-				boss->ym = PIXELS_TO_UNITS(-5);
+				boss->ym = -5 * 0x200;
 				boss->bits |= NPC_IGNORE_SOLIDITY;
 				boss->act_no = BALFROG_GONE_INTO_CEILING;
 			}
@@ -589,7 +589,7 @@ void ActBossChar_Frog(void)
 			break;
 
 		case BALFROG_GONE_INTO_CEILING:
-			boss->ym = PIXELS_TO_UNITS(-5);
+			boss->ym = -5 * 0x200;
 
 			if (boss->y < 0)
 			{
