@@ -35,6 +35,8 @@ extern LPDIRECTSOUNDBUFFER lpSECONDARYBUFFER[SE_MAX];
 
 BOOL InitDirectSound(HWND hwnd);
 void EndDirectSound(void);
+BOOL InitSoundObject(LPCSTR resname, int no);
+BOOL LoadSoundObject(LPCSTR file_name, int no);
 void PlaySoundObject(int no, int mode);
 void ChangeSoundFrequency(int no, DWORD rate);
 void ChangeSoundVolume(int no, long volume);
