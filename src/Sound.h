@@ -30,6 +30,13 @@ enum SoundEffectNames
 	// To be continued
 };
 
+enum SoundMode
+{
+	SOUND_MODE_PLAY_LOOP = -1,
+	SOUND_MODE_STOP = 0,
+	SOUND_MODE_PLAY = 1
+};
+
 extern LPDIRECTSOUND lpDS;
 extern LPDIRECTSOUNDBUFFER lpSECONDARYBUFFER[SE_MAX];
 
@@ -37,7 +44,7 @@ BOOL InitDirectSound(HWND hwnd);
 void EndDirectSound(void);
 BOOL InitSoundObject(LPCSTR resname, int no);
 BOOL LoadSoundObject(LPCSTR file_name, int no);
-void PlaySoundObject(int no, int mode);
+void PlaySoundObject(int no, SoundMode mode);
 void ChangeSoundFrequency(int no, DWORD rate);
 void ChangeSoundVolume(int no, long volume);
 void ChangeSoundPan(int no, long pan);

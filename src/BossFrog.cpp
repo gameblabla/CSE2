@@ -258,7 +258,7 @@ void ActBossChar_Frog(void)
 				boss->act_no = BALFROG_MIDAIR;
 				boss->ani_no = BALFROG_SPRITE_JUMPING;
 				boss->ym = PIXELS_TO_UNITS(-2);
-				PlaySoundObject(25, 1);
+				PlaySoundObject(25, SOUND_MODE_PLAY);
 
 				if (boss->direct == DIR_LEFT)
 					boss->xm = PIXELS_TO_UNITS(-1);
@@ -286,7 +286,7 @@ void ActBossChar_Frog(void)
 
 			if (boss->flag & COLL_GROUND)
 			{
-				PlaySoundObject(SND_LARGE_OBJECT_HIT_GROUND, 1);
+				PlaySoundObject(SND_LARGE_OBJECT_HIT_GROUND, SOUND_MODE_PLAY);
 				SetQuake(30);
 				boss->act_no = BALFROG_WAIT;
 				boss->ani_no = BALFROG_SPRITE_STANDING_STILL;
@@ -385,7 +385,7 @@ void ActBossChar_Frog(void)
 				else
 					SetNpChar(NPC_PROJECTILE_BALFROG_SPITBALL, boss->x + TILES_TO_UNITS(2), boss->y - PIXELS_TO_UNITS(8), xm, ym, DIR_LEFT, NULL, 0x100);
 
-				PlaySoundObject(SND_ENEMY_SHOOT_PROJETILE, 1);
+				PlaySoundObject(SND_ENEMY_SHOOT_PROJETILE, SOUND_MODE_PLAY);
 
 				if (boss->count1 == 0 || boss->life < boss->tgt_x - 90)
 				{
@@ -460,7 +460,7 @@ void ActBossChar_Frog(void)
 				boss->ym = PIXELS_TO_UNITS(-5);
 				boss->view.top = PIXELS_TO_UNITS(64);
 				boss->view.bottom = PIXELS_TO_UNITS(24);
-				PlaySoundObject(SND_SILLY_EXPLOSION, 1);
+				PlaySoundObject(SND_SILLY_EXPLOSION, SOUND_MODE_PLAY);
 			}
 
 			break;
@@ -468,7 +468,7 @@ void ActBossChar_Frog(void)
 		case BALFROG_LEAP_MIDAIR:
 			if (boss->flag & COLL_GROUND)
 			{
-				PlaySoundObject(SND_LARGE_OBJECT_HIT_GROUND, 1);
+				PlaySoundObject(SND_LARGE_OBJECT_HIT_GROUND, SOUND_MODE_PLAY);
 				SetQuake(60);
 				boss->act_no = BALFROG_WAIT;
 				boss->ani_no = BALFROG_SPRITE_STANDING_STILL;
@@ -504,7 +504,7 @@ void ActBossChar_Frog(void)
 			boss->ani_no = BALFROG_SPRITE_MOUTH_OPEN_CROUCHING;
 			boss->act_wait = 0;
 			boss->xm = 0;
-			PlaySoundObject(SND_EXPLOSION, 1);
+			PlaySoundObject(SND_EXPLOSION, SOUND_MODE_PLAY);
 
 			for (i = 0; i < 8; ++i)
 				SetNpChar(NPC_SMOKE, boss->x + PIXELS_TO_UNITS(Random(-12, 12)), boss->y + PIXELS_TO_UNITS(Random(-12, 12)), Random(-341, 341), Random(PIXELS_TO_UNITS(-3), 0), DIR_LEFT, NULL, 0x100);
@@ -594,7 +594,7 @@ void ActBossChar_Frog(void)
 			if (boss->y < 0)
 			{
 				boss->cond = 0;
-				PlaySoundObject(SND_LARGE_OBJECT_HIT_GROUND, 1);
+				PlaySoundObject(SND_LARGE_OBJECT_HIT_GROUND, SOUND_MODE_PLAY);
 				SetQuake(30);
 			}
 

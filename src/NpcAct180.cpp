@@ -197,7 +197,7 @@ void ActNpc180(NPCHAR *npc)
 		npc->count1 = 0;
 		npc->ym = -0x600;
 		npc->ani_no = 1;
-		PlaySoundObject(15, 1);
+		PlaySoundObject(15, SOUND_MODE_PLAY);
 
 		if (npc->x > npc->tgt_x)
 			npc->act_no = 210;
@@ -251,7 +251,7 @@ void ActNpc180(NPCHAR *npc)
 				npc->ym = -0x600;
 				npc->act_no += 10;
 				npc->ani_no = 1;
-				PlaySoundObject(15, 1);
+				PlaySoundObject(15, SOUND_MODE_PLAY);
 			}
 		}
 		else
@@ -613,7 +613,7 @@ void ActNpc184(NPCHAR *npc)
 			}
 
 			if ((++npc->act_wait % 8) == 0)
-				PlaySoundObject(26, 1);
+				PlaySoundObject(26, SOUND_MODE_PLAY);
 
 			SetQuake(20);
 			break;
@@ -991,7 +991,7 @@ void ActNpc190(NPCHAR *npc)
 			break;
 
 		case 10:
-			PlaySoundObject(72, 1);
+			PlaySoundObject(72, SOUND_MODE_PLAY);
 
 			for (i = 0; i < 8; ++i)
 				SetNpChar(4, npc->x, npc->y + (Random(-8, 8) * 0x200), Random(-8, -2) * 0x200, Random(-3, 3) * 0x200, 0, NULL, 0x100);
@@ -1144,7 +1144,7 @@ void ActNpc192(NPCHAR *npc)
 			npc->xm = -0x800;
 			npc->x = npc->tgt_x;
 			npc->y = npc->tgt_y;
-			PlaySoundObject(44, 1);
+			PlaySoundObject(44, SOUND_MODE_PLAY);
 			// Fallthrough
 		case 31:
 			npc->xm += 0x20;
@@ -1181,7 +1181,7 @@ void ActNpc192(NPCHAR *npc)
 
 	if (npc->act_wait % 4 == 0 && npc->act_no >= 20)
 	{
-		PlaySoundObject(34, 1);
+		PlaySoundObject(34, SOUND_MODE_PLAY);
 
 		if (npc->direct == 0)
 			SetCaret(npc->x + (10 * 0x200), npc->y + (10 * 0x200), 7, 2);
@@ -1375,7 +1375,7 @@ void ActNpc198(NPCHAR *npc)
 		npc->cond = 0;
 
 	if (npc->count1 % 4 == 1)
-		PlaySoundObject(46, 1);
+		PlaySoundObject(46, SOUND_MODE_PLAY);
 }
 
 // Water/wind particles

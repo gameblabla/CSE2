@@ -82,7 +82,7 @@ void ShootBullet_Frontia1(int level)
 				}
 			}
 
-			PlaySoundObject(33, 1);
+			PlaySoundObject(33, SOUND_MODE_PLAY);
 		}
 	}
 }
@@ -113,7 +113,7 @@ void ShootBullet_PoleStar(int level)
 	{
 		if (!UseArmsEnergy(1))
 		{
-			PlaySoundObject(37, 1);
+			PlaySoundObject(37, SOUND_MODE_PLAY);
 		}
 		else
 		{
@@ -158,9 +158,9 @@ void ShootBullet_PoleStar(int level)
 			}
 
 			if (level == 3)
-				PlaySoundObject(49, 1);
+				PlaySoundObject(49, SOUND_MODE_PLAY);
 			else
-				PlaySoundObject(32, 1);
+				PlaySoundObject(32, SOUND_MODE_PLAY);
 		}
 	}
 }
@@ -241,7 +241,7 @@ void ShootBullet_FireBall(int level)
 				}
 			}
 
-			PlaySoundObject(34, 1);
+			PlaySoundObject(34, SOUND_MODE_PLAY);
 		}
 	}
 }
@@ -281,7 +281,7 @@ void ShootBullet_Machinegun1(int level)
 
 		if (!UseArmsEnergy(1))
 		{
-			PlaySoundObject(37, 1);
+			PlaySoundObject(37, SOUND_MODE_PLAY);
 
 			if (empty == 0)
 			{
@@ -349,9 +349,9 @@ void ShootBullet_Machinegun1(int level)
 		}
 
 		if (level == 3)
-			PlaySoundObject(49, 1);
+			PlaySoundObject(49, SOUND_MODE_PLAY);
 		else
-			PlaySoundObject(32, 1);
+			PlaySoundObject(32, SOUND_MODE_PLAY);
 	}
 	else
 	{
@@ -482,7 +482,7 @@ void ShootBullet_Missile(int level, BOOL bSuper)
 		{
 			if (!UseArmsEnergy(1))
 			{
-				PlaySoundObject(37, 1);
+				PlaySoundObject(37, SOUND_MODE_PLAY);
 
 				if (empty == 0)
 				{
@@ -537,7 +537,7 @@ void ShootBullet_Missile(int level, BOOL bSuper)
 		{
 			if (!UseArmsEnergy(1))
 			{
-				PlaySoundObject(37, 1);
+				PlaySoundObject(37, SOUND_MODE_PLAY);
 
 				if (empty == 0)
 				{
@@ -601,7 +601,7 @@ void ShootBullet_Missile(int level, BOOL bSuper)
 			}
 		}
 
-		PlaySoundObject(32, 1);
+		PlaySoundObject(32, SOUND_MODE_PLAY);
 	}
 }
 
@@ -616,7 +616,7 @@ void ShootBullet_Bubblin1(void)
 	{
 		if (!UseArmsEnergy(1))
 		{
-			PlaySoundObject(37, 1);
+			PlaySoundObject(37, SOUND_MODE_PLAY);
 
 			if (empty == 0)
 			{
@@ -667,7 +667,7 @@ void ShootBullet_Bubblin1(void)
 			}
 		}
 
-		PlaySoundObject(48, 1);
+		PlaySoundObject(48, SOUND_MODE_PLAY);
 	}
 	else if (++wait > 20)
 	{
@@ -697,7 +697,7 @@ void ShootBullet_Bubblin2(int level)
 
 		if (!UseArmsEnergy(1))
 		{
-			PlaySoundObject(37, 1);
+			PlaySoundObject(37, SOUND_MODE_PLAY);
 
 			if (empty == 0)
 			{
@@ -748,7 +748,7 @@ void ShootBullet_Bubblin2(int level)
 			}
 		}
 
-		PlaySoundObject(48, 1);
+		PlaySoundObject(48, SOUND_MODE_PLAY);
 	}
 	else if (++wait > 1)
 	{
@@ -803,7 +803,7 @@ void ShootBullet_Sword(int level)
 				SetBullet(bul_no, gMC.x - (6 * 0x200), gMC.y - (3 * 0x200), 2);
 		}
 
-		PlaySoundObject(34, 1);
+		PlaySoundObject(34, SOUND_MODE_PLAY);
 	}
 }
 
@@ -833,7 +833,7 @@ void ShootBullet_Nemesis(int level)
 	{
 		if (!UseArmsEnergy(1))
 		{
-			PlaySoundObject(37, 1);
+			PlaySoundObject(37, SOUND_MODE_PLAY);
 		}
 		else
 		{
@@ -880,15 +880,15 @@ void ShootBullet_Nemesis(int level)
 			switch (level)
 			{
 				case 1:
-					PlaySoundObject(117, 1);
+					PlaySoundObject(117, SOUND_MODE_PLAY);
 					break;
 
 				case 2:
-					PlaySoundObject(49, 1);
+					PlaySoundObject(49, SOUND_MODE_PLAY);
 					break;
 
 				case 3:
-					PlaySoundObject(60, 1);
+					PlaySoundObject(60, SOUND_MODE_PLAY);
 					break;
 			}
 		}
@@ -925,16 +925,16 @@ void ShootBullet_Spur(int level)
 			switch (level)
 			{
 				case 1:
-					PlaySoundObject(59, 1);
+					PlaySoundObject(59, SOUND_MODE_PLAY);
 					break;
 
 				case 2:
-					PlaySoundObject(60, 1);
+					PlaySoundObject(60, SOUND_MODE_PLAY);
 					break;
 
 				case 3:
 					if (!IsMaxExpMyChar())
-						PlaySoundObject(61, 1);
+						PlaySoundObject(61, SOUND_MODE_PLAY);
 
 					break;
 			}
@@ -953,7 +953,7 @@ void ShootBullet_Spur(int level)
 		if (!bMax)
 		{
 			bMax = TRUE;
-			PlaySoundObject(65, 1);
+			PlaySoundObject(65, SOUND_MODE_PLAY);
 		}
 	}
 	else
@@ -991,7 +991,7 @@ void ShootBullet_Spur(int level)
 	{
 		if (!UseArmsEnergy(1))
 		{
-			PlaySoundObject(37, 1);
+			PlaySoundObject(37, SOUND_MODE_PLAY);
 		}
 		else
 		{
@@ -1038,19 +1038,19 @@ void ShootBullet_Spur(int level)
 			switch (bul_no)
 			{
 				case 6:
-					PlaySoundObject(49, 1);
+					PlaySoundObject(49, SOUND_MODE_PLAY);
 					break;
 
 				case 37:
-					PlaySoundObject(62, 1);
+					PlaySoundObject(62, SOUND_MODE_PLAY);
 					break;
 
 				case 38:
-					PlaySoundObject(63, 1);
+					PlaySoundObject(63, SOUND_MODE_PLAY);
 					break;
 
 				case 39:
-					PlaySoundObject(64, 1);
+					PlaySoundObject(64, SOUND_MODE_PLAY);
 					break;
 			}
 		}

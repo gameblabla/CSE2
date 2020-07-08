@@ -110,7 +110,7 @@ void ActNpc001(NPCHAR *npc)
 		// Bounce off floor
 		if (npc->flag & 8)
 		{
-			PlaySoundObject(45, 1);
+			PlaySoundObject(45, SOUND_MODE_PLAY);
 			npc->ym = -0x280;
 			npc->xm = 2 * npc->xm / 3;
 		}
@@ -118,7 +118,7 @@ void ActNpc001(NPCHAR *npc)
 		// Play bounce song (and try to clip out of floor if stuck)
 		if (npc->flag & 0xD)
 		{
-			PlaySoundObject(45, 1);
+			PlaySoundObject(45, SOUND_MODE_PLAY);
 			if (++npc->count2 > 2)
 				npc->y -= 1 * 0x200;
 		}
@@ -309,7 +309,7 @@ void ActNpc002(NPCHAR *npc)
 				npc->ani_no = 5;
 				// These three lines are missing in the Linux port, because it's based on v1.0.0.4:
 				// https://www.cavestory.org/forums/threads/version-1-0-0-5-really-different-than-1-0-0-6.102/#post-3231
-				PlaySoundObject(26, 1);
+				PlaySoundObject(26, SOUND_MODE_PLAY);
 				SetNpChar(4, npc->x, npc->y + (3 * 0x200), 0, 0, 0, NULL, 0x100);
 				SetQuake(8);
 			}
@@ -487,7 +487,7 @@ void ActNpc005(NPCHAR *npc)
 
 				// Jump
 				npc->ym = -0x5FF;
-				PlaySoundObject(30, 1);
+				PlaySoundObject(30, SOUND_MODE_PLAY);
 
 				// Jump in facing direction
 				if (npc->direct == 0)
@@ -506,7 +506,7 @@ void ActNpc005(NPCHAR *npc)
 				npc->act_wait = 0;
 				npc->ani_no = 0;
 				npc->act_no = 1;
-				PlaySoundObject(23, 1);
+				PlaySoundObject(23, SOUND_MODE_PLAY);
 			}
 
 			break;
@@ -870,7 +870,7 @@ void ActNpc009(NPCHAR *npc)
 				npc->act_no = 2;
 				npc->ani_no = 1;
 				npc->act_wait = 0;
-				PlaySoundObject(26, 1);
+				PlaySoundObject(26, SOUND_MODE_PLAY);
 				SetQuake(30);
 			}
 
@@ -947,7 +947,7 @@ void ActNpc010(NPCHAR *npc)
 				xm = GetCos(deg);
 				SetNpChar(11, npc->x, npc->y + (4 * 0x200), xm, ym, 0, NULL, 0x100);
 
-				PlaySoundObject(39, 1);
+				PlaySoundObject(39, SOUND_MODE_PLAY);
 
 				if (npc->count1 == 0)
 				{
@@ -984,7 +984,7 @@ void ActNpc010(NPCHAR *npc)
 				npc->act_no = 5;
 				npc->act_wait = 0;
 				npc->ani_no = 2;
-				PlaySoundObject(26, 1);
+				PlaySoundObject(26, SOUND_MODE_PLAY);
 				SetQuake(30);
 				npc->damage = 0;
 			}
@@ -1142,7 +1142,7 @@ void ActNpc012(NPCHAR *npc)
 			if (npc->y < 0)
 			{
 				npc->code_char = 0;
-				PlaySoundObject(26, 1);
+				PlaySoundObject(26, SOUND_MODE_PLAY);
 				SetQuake(30);
 			}
 
@@ -1165,7 +1165,7 @@ void ActNpc012(NPCHAR *npc)
 			for (i = 0; i < 4; ++i)
 				SetNpChar(4, npc->x + (Random(-12, 12) * 0x200), npc->y + (Random(-12, 12) * 0x200), Random(-341, 341), Random(-0x600, 0), 0, NULL, 0x100);
 
-			PlaySoundObject(72, 1);
+			PlaySoundObject(72, SOUND_MODE_PLAY);
 			// Fallthrough
 		case 21:
 			npc->tgt_x = 1;
@@ -1260,7 +1260,7 @@ void ActNpc012(NPCHAR *npc)
 				npc->ani_wait = 0;
 
 				if (++npc->ani_no == 10 || npc->ani_no == 11)
-					PlaySoundObject(23, 1);
+					PlaySoundObject(23, SOUND_MODE_PLAY);
 			}
 
 			if (npc->ani_no > 12)
@@ -1276,7 +1276,7 @@ void ActNpc012(NPCHAR *npc)
 		case 70:
 			npc->act_no = 71;
 			npc->act_wait = 64;
-			PlaySoundObject(29, 1);
+			PlaySoundObject(29, SOUND_MODE_PLAY);
 			npc->ani_no = 13;
 			// Fallthrough
 		case 71:
@@ -1331,7 +1331,7 @@ void ActNpc012(NPCHAR *npc)
 			{
 				ChangeMapParts(x - 1, y, 0);
 				ChangeMapParts(x + 1, y, 0);
-				PlaySoundObject(44, 1);
+				PlaySoundObject(44, SOUND_MODE_PLAY);
 				SetQuake2(10);
 			}
 
@@ -1704,8 +1704,8 @@ void ActNpc019(NPCHAR *npc)
 			npc->act_no = 1;
 			npc->ani_no = 3;
 			npc->ym = -0x100;
-			PlaySoundObject(12, 1);
-			PlaySoundObject(26, 1);
+			PlaySoundObject(12, SOUND_MODE_PLAY);
+			PlaySoundObject(26, SOUND_MODE_PLAY);
 			SetQuake(30);
 			// Fallthrough
 		case 1:
@@ -1716,7 +1716,7 @@ void ActNpc019(NPCHAR *npc)
 				npc->act_no = 2;
 				npc->ani_no = 2;
 				npc->act_wait = 0;
-				PlaySoundObject(26, 1);
+				PlaySoundObject(26, SOUND_MODE_PLAY);
 				SetQuake(30);
 			}
 

@@ -66,7 +66,7 @@ void AddExpMyChar(int x)
 
 				if (gArmsData[gSelectedArms].code != 13)
 				{
-					PlaySoundObject(27, 1);
+					PlaySoundObject(27, SOUND_MODE_PLAY);
 					SetCaret(gMC.x, gMC.y, 10, 0);
 				}
 			}
@@ -119,7 +119,7 @@ void DamageMyChar(int damage)
 		return;
 
 	// Damage player
-	PlaySoundObject(16, 1);
+	PlaySoundObject(16, SOUND_MODE_PLAY);
 	gMC.cond &= ~1;
 	gMC.shock = 128;
 
@@ -171,7 +171,7 @@ void DamageMyChar(int damage)
 	// Death
 	if (gMC.life <= 0)
 	{
-		PlaySoundObject(17, 1);
+		PlaySoundObject(17, SOUND_MODE_PLAY);
 		gMC.cond = 0;
 		SetDestroyNpChar(gMC.x, gMC.y, 0x1400, 0x40);
 		StartTextScript(40);

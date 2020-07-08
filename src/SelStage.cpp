@@ -100,7 +100,7 @@ void MoveStageSelectCursor(void)
 		StartTextScript(gPermitStage[gSelectedStage].index + 1000);
 
 	if (gKeyTrg & (gKeyLeft | gKeyRight))
-		PlaySoundObject(1, 1);
+		PlaySoundObject(1, SOUND_MODE_PLAY);
 }
 
 void PutStageSelectObject(void)

@@ -147,16 +147,16 @@ static void ActBossCharA_Face(NPCHAR *npc)
 				npc->act_wait = 0;
 
 			if (npc->act_wait > 250 && npc->act_wait % 0x10 == 1)
-				PlaySoundObject(26, 1);
+				PlaySoundObject(26, SOUND_MODE_PLAY);
 
 			if (npc->act_wait > 250 && npc->act_wait % 0x10 == 7)
 			{
 				SetNpChar(293, npc->x, npc->y, 0, 0, 0, NULL, 0x80);
-				PlaySoundObject(101, 1);
+				PlaySoundObject(101, SOUND_MODE_PLAY);
 			}
 
 			if (npc->act_wait == 200)
-				PlaySoundObject(116, 1);
+				PlaySoundObject(116, SOUND_MODE_PLAY);
 
 			if (npc->act_wait > 200 && npc->act_wait % 2 != 0)
 				npc->ani_no = 4;
@@ -414,7 +414,7 @@ void ActBossChar_Undead(void)
 				if (npc->act_wait > 200)
 				{
 					++npc->count1;
-					PlaySoundObject(115, 1);
+					PlaySoundObject(115, SOUND_MODE_PLAY);
 
 					if (npc->life < 200)
 					{
@@ -519,7 +519,7 @@ void ActBossChar_Undead(void)
 						break;
 				}
 
-				PlaySoundObject(25, 1);
+				PlaySoundObject(25, SOUND_MODE_PLAY);
 				SetNpChar(285, x - (16 * 0x200), y, 0, 0, 0, NULL, 0x100);
 				SetNpChar(285, x - (16 * 0x200), y, 0, 0, 0x400, NULL, 0x100);
 			}
@@ -553,7 +553,7 @@ void ActBossChar_Undead(void)
 			gBoss[10].bits |= NPC_INVULNERABLE;
 			gBoss[11].bits |= NPC_SHOOTABLE;
 
-			PlaySoundObject(25, 1);
+			PlaySoundObject(25, SOUND_MODE_PLAY);
 
 			SetNpChar(285, gBoss[3].x - (16 * 0x200), gBoss[3].y, 0, 0, 0, NULL, 0x100);
 			SetNpChar(285, gBoss[3].x - (16 * 0x200), gBoss[3].y, 0, 0, 0x400, NULL, 0x100);
@@ -641,7 +641,7 @@ void ActBossChar_Undead(void)
 			++gBoss[0].act_wait;
 
 			if (gBoss[0].act_wait % 8 == 0)
-				PlaySoundObject(44, 1);
+				PlaySoundObject(44, SOUND_MODE_PLAY);
 
 			SetDestroyNpChar(gBoss[0].x + (Random(-72, 72) * 0x200), gBoss[0].y + (Random(-64, 64) * 0x200), 1, 1);
 
@@ -650,7 +650,7 @@ void ActBossChar_Undead(void)
 				gBoss[0].act_wait = 0;
 				gBoss[0].act_no = 1001;
 				SetFlash(gBoss[0].x, gBoss[0].y, 1);
-				PlaySoundObject(35, 1);
+				PlaySoundObject(35, SOUND_MODE_PLAY);
 			}
 
 			break;
@@ -685,7 +685,7 @@ void ActBossChar_Undead(void)
 		if (npc->act_no == 231)
 			gBoss[1].act_no = gBoss[2].act_no = gBoss[6].act_no = gBoss[7].act_no = 30;
 
-		PlaySoundObject(26, 1);
+		PlaySoundObject(26, SOUND_MODE_PLAY);
 
 		for (i = 0; i < 8; ++i)
 			SetNpChar(4, gBoss[4].x + (Random(-32, 16) * 0x200), gBoss[4].y, Random(-0x200, 0x200), Random(-0x100, 0x100), 0, NULL, 0x100);

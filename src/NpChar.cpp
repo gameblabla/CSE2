@@ -612,7 +612,7 @@ void DeleteNpCharCode(int code, BOOL bSmoke)
 
 			if (bSmoke)
 			{
-				PlaySoundObject(gNPC[n].destroy_voice, 1);
+				PlaySoundObject(gNPC[n].destroy_voice, SOUND_MODE_PLAY);
 
 				switch (gNPC[n].size)
 				{

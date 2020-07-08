@@ -353,7 +353,7 @@ static int ModeTitle(HWND hWnd)
 		{
 			if (gKeyTrg & gKeyOk)
 			{
-				PlaySoundObject(18, 1);
+				PlaySoundObject(18, SOUND_MODE_PLAY);
 				break;
 			}
 		}
@@ -373,7 +373,7 @@ static int ModeTitle(HWND hWnd)
 		// Move cursor
 		if (gKeyTrg & (gKeyUp | gKeyDown))
 		{
-			PlaySoundObject(1, 1);
+			PlaySoundObject(1, SOUND_MODE_PLAY);
 
 			if (bContinue)
 				bContinue = FALSE;
@@ -691,7 +691,7 @@ BOOL Game(HWND hWnd)
 		return FALSE;
 	}
 
-	PlaySoundObject(7, -1);
+	PlaySoundObject(7, SOUND_MODE_PLAY_LOOP);
 
 	char path[MAX_PATH];
 	sprintf(path, "%s\\npc.tbl", gDataPath);
@@ -718,7 +718,7 @@ BOOL Game(HWND hWnd)
 			mode = ModeAction(hWnd);
 	}
 
-	PlaySoundObject(7, 0);
+	PlaySoundObject(7, SOUND_MODE_STOP);
 
 	EndMapData();
 	EndTextScript();

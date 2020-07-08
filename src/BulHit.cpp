@@ -14,7 +14,7 @@
 static void Vanish(BULLET *bul)
 {
 	if (bul->code_bullet != 37 && bul->code_bullet != 38 && bul->code_bullet != 39)
-		PlaySoundObject(28, 1);
+		PlaySoundObject(28, SOUND_MODE_PLAY);
 	else
 		SetCaret(bul->x, bul->y, 2, 1);
 
@@ -38,7 +38,7 @@ int JudgeHitBulletBlock(int x, int y, BULLET *bul)
 			bul->cond = 0;
 
 		SetCaret(bul->x, bul->y, 2, 0);
-		PlaySoundObject(12, 1);
+		PlaySoundObject(12, SOUND_MODE_PLAY);
 
 		for (i = 0; i < 4; ++i)
 			SetNpChar(4, x * 0x200 * 0x10, y * 0x200 * 0x10, Random(-0x200, 0x200), Random(-0x200, 0x200), 0, NULL, 0x100);
