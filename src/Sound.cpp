@@ -13,9 +13,9 @@ equivalents.
 #include "Sound.h"
 
 #include <stddef.h>
-//#include <stdio.h>	// Used by commented-out code
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -23,7 +23,8 @@ equivalents.
 #ifdef EXTRA_SOUND_FORMATS
 #include "ExtraSoundFormats.h"
 #endif
-//#include "Main.h"	// Was for gModulePath, but this is unneeded in the portable branch since LoadSoundObject is commented-out
+#include "Main.h"
+#include "Resource.h"
 #include "Organya.h"
 #include "PixTone.h"
 
@@ -70,81 +71,86 @@ void EndDirectSound(void)
 
 	AudioBackend_Deinit();
 }
-/*
-// サウンドの設定 (Sound settings)
-BOOL InitSoundObject(LPCSTR resname, int no)
-{
-	HRSRC hrscr;
-	DSBUFFERDESC dsbd;
-	DWORD *lpdword;	// リソースのアドレス (Resource address)
 
-	if (lpDS == NULL)
+// Below are two completely unused functions for loading .wav files as sound effects.
+// Some say that sounds heard in CS Beta footage don't sound like PixTone...
+
+// There's a bit of a problem with this code: it hardcodes the offsets of various bits
+// of data in the WAV header - this makes the code only compatible with very specific
+// .wav files. You can check the prototype OrgView EXEs for examples of those.
+
+// サウンドの設定 (Sound settings)
+BOOL InitSoundObject(const char *resname, int no)
+{
+	const unsigned char *resource_pointer;	// リソースのアドレス (Resource address)
+
+	if (!audio_backend_initialised)
 		return TRUE;
 
 	// リソースの検索 (Search for resources)
-	if ((hrscr = FindResourceA(NULL, resname, "WAVE")) == NULL)
+	resource_pointer = FindResource("WAVE100", "WAVE", NULL);
+
+	if (resource_pointer == NULL)
 		return FALSE;
 
-	// リソースのアドレスを取得 (Get resource address)
-	lpdword = (DWORD*)LockResource(LoadResource(NULL, hrscr));
+	// Get sound properties, and check if it's valid
+	unsigned long buffer_size = resource_pointer[0x36] | (resource_pointer[0x37] << 8) | (resource_pointer[0x38] << 16) | (resource_pointer[0x39] << 24);
+	unsigned short format = resource_pointer[0x14] | (resource_pointer[0x15] << 8);
+	unsigned short channels = resource_pointer[0x16] | (resource_pointer[0x17] << 8);
+	unsigned long sample_rate = resource_pointer[0x18] | (resource_pointer[0x19] << 8) | (resource_pointer[0x1A] << 16) | (resource_pointer[0x1B] << 24);
+	unsigned short bits_per_sample = resource_pointer[0x22] | (resource_pointer[0x23] << 8);
+
+	if (format != 1)	// 1 is WAVE_FORMAT_PCM
+		return FALSE;
+
+	if (channels != 1)	// The mixer only supports mono right now
+		return FALSE;
+
+	if (bits_per_sample != 8)	// The mixer only supports unsigned 8-bit samples
+		return FALSE;
 
 	// 二次バッファの生成 (Create secondary buffer)
-	ZeroMemory(&dsbd, sizeof(dsbd));
-	dsbd.dwSize = sizeof(dsbd);
-	dsbd.dwFlags = DSBCAPS_STATIC | DSBCAPS_GLOBALFOCUS | DSBCAPS_CTRLPAN | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY;
-	dsbd.dwBufferBytes = *(DWORD*)((BYTE*)lpdword+0x36);	// WAVEデータのサイズ (WAVE data size)
-	dsbd.lpwfxFormat = (LPWAVEFORMATEX)(lpdword+5); 
+	lpSECONDARYBUFFER[no] = AudioBackend_CreateSound(sample_rate, resource_pointer + 0x3A, buffer_size);
 
-	if (lpDS->CreateSoundBuffer(&dsbd, &lpSECONDARYBUFFER[no], NULL) != DS_OK)
+	if (lpSECONDARYBUFFER[no] == NULL)
 		return FALSE;
-
-	LPVOID lpbuf1, lpbuf2;
-	DWORD dwbuf1, dwbuf2;
-
-	// 二次バッファのロック (Secondary buffer lock)
-	lpSECONDARYBUFFER[no]->Lock(0, *(DWORD*)((BYTE*)lpdword+0x36), &lpbuf1, &dwbuf1, &lpbuf2, &dwbuf2, 0); 
-
-	// 音源データの設定 (Sound source data settings)
-	CopyMemory(lpbuf1, (BYTE*)lpdword+0x3A, dwbuf1);
-
-	if (dwbuf2 != 0)
-		CopyMemory(lpbuf2, (BYTE*)lpdword+0x3A+dwbuf1, dwbuf2);
-
-	// 二次バッファのロック解除 (Unlock secondary buffer)
-	lpSECONDARYBUFFER[no]->Unlock(lpbuf1, dwbuf1, lpbuf2, dwbuf2); 
 
 	return TRUE;
 }
 
-// Completely unused function for loading a .wav file as a sound effect.
-// Some say that sounds heard in CS Beta footage don't sound like PixTone...
-BOOL LoadSoundObject(LPCSTR file_name, int no)
+BOOL LoadSoundObject(const char *file_name, int no)
 {
-	char path[MAX_PATH];
-	DWORD i;
-	DWORD file_size = 0;
+	std::string path;
+	unsigned long i;
+	unsigned long file_size = 0;
 	char check_box[58];
 	FILE *fp;
-	HANDLE hFile;
 
-	sprintf(path, "%s\\%s", gModulePath, file_name);
+	path = gModulePath + '/' + file_name;
 
-	if (lpDS == NULL)
+	if (!audio_backend_initialised)
 		return TRUE;
 
-	hFile = CreateFileA(path, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (hFile == INVALID_HANDLE_VALUE)
+	if ((fp = fopen(path.c_str(), "rb")) == NULL)
 		return FALSE;
 
-	file_size = GetFileSize(hFile, NULL);
-	CloseHandle(hFile);
+	fseek(fp, 0, SEEK_END);
+	file_size = ftell(fp);
+	rewind(fp);
 
-	if ((fp = fopen(path, "rb")) == NULL)
+	// Let's not throttle disk I/O, shall we...
+	//for (i = 0; i < 58; i++)
+	//	fread(&check_box[i], sizeof(char), 1, fp);	// Holy hell, this is inefficient
+	fread(check_box, 1, 58, fp);
+
+#ifdef FIX_BUGS
+	// The original code forgets to close 'fp'
+	if (check_box[0] != 'R' || check_box[1] != 'I' || check_box[2] != 'F' || check_box[3] != 'F')
+	{
+		fclose(fp);
 		return FALSE;
-
-	for (i = 0; i < 58; i++)
-		fread(&check_box[i], sizeof(char), 1, fp);
-
+	}
+#else
 	if (check_box[0] != 'R')
 		return FALSE;
 	if (check_box[1] != 'I')
@@ -153,58 +159,69 @@ BOOL LoadSoundObject(LPCSTR file_name, int no)
 		return FALSE;
 	if (check_box[3] != 'F')
 		return FALSE;
+#endif
 
-	DWORD *wp;
-	wp = (DWORD*)malloc(file_size);	// ファイルのワークスペースを作る (Create a file workspace)
+	unsigned char *wp;
+	wp = (unsigned char*)malloc(file_size);	// ファイルのワークスペースを作る (Create a file workspace)
+
+#ifdef FIX_BUGS
+	if (wp == NULL)
+	{
+		fclose(fp);
+		return FALSE;
+	}
+#endif
+
 	fseek(fp, 0, SEEK_SET);
 
-	for (i = 0; i < file_size; i++)
-		fread((BYTE*)wp+i, sizeof(BYTE), 1, fp);
+	// Bloody hell, Pixel, come on...
+	//for (i = 0; i < file_size; i++)
+	//	fread((BYTE*)wp+i, sizeof(char), 1, fp);	// Pixel, stahp
+	fread(wp, 1, file_size, fp);
 
 	fclose(fp);
 
-	// セカンダリバッファの生成 (Create secondary buffer)
-	DSBUFFERDESC dsbd;
-	ZeroMemory(&dsbd, sizeof(dsbd));
-	dsbd.dwSize = sizeof(dsbd);
-	dsbd.dwFlags = DSBCAPS_STATIC | DSBCAPS_GLOBALFOCUS | DSBCAPS_CTRLPAN | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY;
-	dsbd.dwBufferBytes = *(DWORD*)((BYTE*)wp+0x36);	// WAVEデータのサイズ (WAVE data size)
-	dsbd.lpwfxFormat = (LPWAVEFORMATEX)(wp+5); 
+	// Get sound properties, and check if it's valid
+	unsigned long buffer_size = wp[0x36] | (wp[0x37] << 8) | (wp[0x38] << 16) | (wp[0x39] << 24);
+	unsigned short format = wp[0x14] | (wp[0x15] << 8);
+	unsigned short channels = wp[0x16] | (wp[0x17] << 8);
+	unsigned long sample_rate = wp[0x18] | (wp[0x19] << 8) | (wp[0x1A] << 16) | (wp[0x1B] << 24);
+	unsigned short bits_per_sample = wp[0x22] | (wp[0x23] << 8);
 
-	if (lpDS->CreateSoundBuffer(&dsbd, &lpSECONDARYBUFFER[no], NULL) != DS_OK)
+	if (format != 1)	// 1 is WAVE_FORMAT_PCM
+	{
+		free(wp);
+		return FALSE;
+	}
+
+	if (channels != 1)	// The mixer only supports mono right now
+	{
+		free(wp);
+		return FALSE;
+	}
+
+	if (bits_per_sample != 8)	// The mixer only supports 8-bit unsigned samples
+	{
+		free(wp);
+		return FALSE;
+	}
+
+	// セカンダリバッファの生成 (Create secondary buffer)
+	lpSECONDARYBUFFER[no] = AudioBackend_CreateSound(sample_rate, wp + 0x3A, buffer_size);
+
+	if (lpSECONDARYBUFFER[no] == NULL)
 	{
 #ifdef FIX_BUGS
 		free(wp);	// The updated Organya source code includes this fix
 #endif
 		return FALSE;	
 	}
-
-	LPVOID lpbuf1, lpbuf2;
-	DWORD dwbuf1, dwbuf2;
-
-	HRESULT hr;
-	hr = lpSECONDARYBUFFER[no]->Lock(0, *(DWORD*)((BYTE*)wp+0x36), &lpbuf1, &dwbuf1, &lpbuf2, &dwbuf2, 0);
-
-	if (hr != DS_OK)
-	{
-#ifdef FIX_BUGS
-		free(wp);	// The updated Organya source code includes this fix
-#endif
-		return FALSE;
-	}
-
-	CopyMemory(lpbuf1, (BYTE*)wp+0x3A, dwbuf1);	// +3aはデータの頭 (+ 3a is the head of the data)
-
-	if (dwbuf2 != 0)
-		CopyMemory(lpbuf2, (BYTE*)wp+0x3A+dwbuf1, dwbuf2);
-
-	lpSECONDARYBUFFER[no]->Unlock(lpbuf1, dwbuf1, lpbuf2, dwbuf2); 
 	
 	free(wp);
 
 	return TRUE;
 }
-*/
+
 void PlaySoundObject(int no, int mode)
 {
 	if (!audio_backend_initialised)

@@ -17,10 +17,10 @@ void InitBossLife(void)
 BOOL StartBossLife(int code_event)
 {
 	int i = 0;
-	while (i < 0x200 && gNPC[i].code_event != code_event)
+	while (i < NPC_MAX && gNPC[i].code_event != code_event)
 		++i;
 
-	if (i == 0x200)
+	if (i == NPC_MAX)
 		return FALSE;
 
 	gBL.flag = TRUE;

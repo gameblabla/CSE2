@@ -5,6 +5,7 @@
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
+#define NODRAWTEXT
 #include <windows.h>
 #undef FindResource
 #else
