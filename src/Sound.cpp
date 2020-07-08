@@ -69,6 +69,13 @@ void EndDirectSound(void)
 	AudioBackend_Deinit();
 }
 
+// Below are two completely unused functions for loading .wav files as sound effects.
+// Some say that sounds heard in CS Beta footage don't sound like PixTone...
+
+// There's a bit of a problem with this code: it hardcodes the offsets of various bits
+// of data in the WAV header - this makes the code only compatible with very specific
+// .wav files. You can check the prototype OrgView EXEs for examples of those.
+
 // サウンドの設定 (Sound settings)
 BOOL InitSoundObject(const char *resname, int no)
 {
@@ -96,7 +103,7 @@ BOOL InitSoundObject(const char *resname, int no)
 	if (channels != 1)	// The mixer only supports mono right now
 		return FALSE;
 
-	if (bits_per_sample != 8)	// The mixer only supports 8-bit samples (unsigned ones, at that)
+	if (bits_per_sample != 8)	// The mixer only supports unsigned 8-bit samples
 		return FALSE;
 
 	// 二次バッファの生成 (Create secondary buffer)
@@ -108,8 +115,6 @@ BOOL InitSoundObject(const char *resname, int no)
 	return TRUE;
 }
 
-// Completely unused function for loading a .wav file as a sound effect.
-// Some say that sounds heard in CS Beta footage don't sound like PixTone...
 BOOL LoadSoundObject(const char *file_name, int no)
 {
 	std::string path;
@@ -132,9 +137,17 @@ BOOL LoadSoundObject(const char *file_name, int no)
 
 	// Let's not throttle disk I/O, shall we...
 	//for (i = 0; i < 58; i++)
-	//	fread(&check_box[i], sizeof(char), 1, fp);
+	//	fread(&check_box[i], sizeof(char), 1, fp);	// Holy hell, this is inefficient
 	fread(check_box, 1, 58, fp);
 
+#ifdef FIX_BUGS
+	// The original code forgets to close 'fp'
+	if (check_box[0] != 'R' || check_box[1] != 'I' || check_box[2] != 'F' || check_box[3] != 'F')
+	{
+		fclose(fp);
+		return FALSE;
+	}
+#else
 	if (check_box[0] != 'R')
 		return FALSE;
 	if (check_box[1] != 'I')
@@ -143,14 +156,24 @@ BOOL LoadSoundObject(const char *file_name, int no)
 		return FALSE;
 	if (check_box[3] != 'F')
 		return FALSE;
+#endif
 
 	unsigned char *wp;
 	wp = (unsigned char*)malloc(file_size);	// ファイルのワークスペースを作る (Create a file workspace)
+
+#ifdef FIX_BUGS
+	if (wp == NULL)
+	{
+		fclose(fp);
+		return FALSE;
+	}
+#endif
+
 	fseek(fp, 0, SEEK_SET);
 
 	// Bloody hell, Pixel, come on...
 	//for (i = 0; i < file_size; i++)
-	//	fread((BYTE*)wp+i, sizeof(char), 1, fp);
+	//	fread((BYTE*)wp+i, sizeof(char), 1, fp);	// Pixel, stahp
 	fread(wp, 1, file_size, fp);
 
 	fclose(fp);
@@ -174,7 +197,7 @@ BOOL LoadSoundObject(const char *file_name, int no)
 		return FALSE;
 	}
 
-	if (bits_per_sample != 8)	// The mixer only supports 8-bit samples (unsigned ones, at that)
+	if (bits_per_sample != 8)	// The mixer only supports 8-bit unsigned samples
 	{
 		free(wp);
 		return FALSE;
