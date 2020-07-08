@@ -695,7 +695,7 @@ void ActBossChar_Undead(void)
 	{
 		if (npc->x < 192 * 0x200)
 			npc->direct = 2;
-		if (npc->x > (gMap.width - 4) * (0x200 * 0x10))	// Pixel is inconsistent: the assembly code indicates he really used '0x2000' instead of '0x200 * 0x10', which he usually uses
+		if (npc->x > (gMap.width - 4) * (0x200 * 0x10))
 			npc->direct = 0;
 
 		if (npc->direct == 0)
