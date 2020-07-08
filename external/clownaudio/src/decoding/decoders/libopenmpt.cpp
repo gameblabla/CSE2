@@ -72,6 +72,7 @@ void Decoder_libOpenMPT_Destroy(void *decoder_void)
 	Decoder_libOpenMPT *decoder = (Decoder_libOpenMPT*)decoder_void;
 
 	openmpt_module_destroy(decoder->module);
+	free(decoder);
 }
 
 void Decoder_libOpenMPT_Rewind(void *decoder_void)

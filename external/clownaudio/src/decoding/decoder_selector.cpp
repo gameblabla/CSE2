@@ -186,8 +186,11 @@ DecoderSelectorData* DecoderSelector_LoadData(const unsigned char *file_buffer, 
 				{
 					decoder_type = DECODER_TYPE_PREDECODER;
 					decoder_functions = &predecoder_functions;
+					break;
 				}
 			}
+
+			decoder_function_list[i].Destroy(decoder);
 
 			break;
 		}

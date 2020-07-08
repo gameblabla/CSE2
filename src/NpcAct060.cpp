@@ -831,11 +831,11 @@ void ActNpc066(NPCHAR *npc)
 	{
 		case 0:
 			int a;
-			for (a = 0; a < 0x200; ++a)
+			for (a = 0; a < NPC_MAX; ++a)
 				if (gNPC[a].code_event == 1000)
 					break;
 
-			if (a == 0x200)
+			if (a == NPC_MAX)
 				break;
 
 			npc->tgt_x = gNPC[a].x;

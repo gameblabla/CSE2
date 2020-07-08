@@ -274,11 +274,11 @@ void ActNpc042(NPCHAR *npc)
 			npc->ym = 0;
 			npc->act_no = 14;
 
-			for (n = 0; n < 0x200; ++n)
+			for (n = 0; n < NPC_MAX; ++n)
 				if (gNPC[n].code_event == 501)
 					break;
 
-			if (n == 0x200)
+			if (n == NPC_MAX)
 			{
 				npc->act_no = 0;
 				break;

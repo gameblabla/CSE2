@@ -122,7 +122,7 @@ size_t ResampledDecoder_GetSamples(void *resampled_decoder_void, short *buffer, 
 
 		ma_uint64 frames_in = resampled_decoder->buffer_end - resampled_decoder->buffer_done;
 		ma_uint64 frames_out = frames_to_do - frames_done;
-		ma_data_converter_process_pcm_frames(&resampled_decoder->converter, &resampled_decoder->buffer[resampled_decoder->buffer_done * resampled_decoder->in_channel_count], &frames_in, &buffer[frames_done * resampled_decoder->in_channel_count], &frames_out);
+		ma_data_converter_process_pcm_frames(&resampled_decoder->converter, &resampled_decoder->buffer[resampled_decoder->buffer_done * resampled_decoder->in_channel_count], &frames_in, &buffer[frames_done * resampled_decoder->out_channel_count], &frames_out);
 
 		resampled_decoder->buffer_done += frames_in;
 		frames_done += frames_out;

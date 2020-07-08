@@ -27,16 +27,15 @@
 
 #include "resampled_decoder.h"
 
-#define CHANNEL_COUNT 2
-
 typedef struct SplitDecoder
 {
 	DecoderStage next_stage[2];
+	unsigned int channel_count;
 	unsigned int current_decoder;
 	bool last_decoder;
 } SplitDecoder;
 
-void* SplitDecoder_Create(DecoderStage *next_stage_intro, DecoderStage *next_stage_loop)
+void* SplitDecoder_Create(DecoderStage *next_stage_intro, DecoderStage *next_stage_loop, unsigned int channel_count)
 {
 	if (next_stage_intro != NULL || next_stage_loop != NULL)
 	{
@@ -49,6 +48,7 @@ void* SplitDecoder_Create(DecoderStage *next_stage_intro, DecoderStage *next_sta
 
 			split_decoder->next_stage[0] = *next_stage_intro;
 			split_decoder->next_stage[1] = *next_stage_loop;
+			split_decoder->channel_count = channel_count;
 
 			return split_decoder;
 		}
@@ -86,7 +86,7 @@ size_t SplitDecoder_GetSamples(void *split_decoder_void, short *buffer, size_t f
 
 	for (;;)
 	{
-		frames_done += split_decoder->next_stage[split_decoder->current_decoder].GetSamples(split_decoder->next_stage[split_decoder->current_decoder].decoder, &buffer[frames_done * CHANNEL_COUNT], frames_to_do - frames_done);
+		frames_done += split_decoder->next_stage[split_decoder->current_decoder].GetSamples(split_decoder->next_stage[split_decoder->current_decoder].decoder, &buffer[frames_done * split_decoder->channel_count], frames_to_do - frames_done);
 
 		if (frames_done != frames_to_do && !split_decoder->last_decoder)
 		{
