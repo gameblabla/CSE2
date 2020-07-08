@@ -154,12 +154,12 @@ BOOL MakePixelWaveData(const PIXTONEPARAMETER *ptp, unsigned char *pData)
 		         + 128;
 
 		if (gWaveModelTable[ptp->oPitch.model][b] < 0)
-			dMain = d1 - d1 * 0.5 * -gWaveModelTable[ptp->oPitch.model][b] * ptp->oPitch.top / 64.0 / 64.0 + dMain;
+			dMain += d1 - d1 * 0.5 * -gWaveModelTable[ptp->oPitch.model][b] * ptp->oPitch.top / 64.0 / 64.0;
 		else
-			dMain = d1 + d1 * 2.0 * gWaveModelTable[ptp->oPitch.model][b] * ptp->oPitch.top / 64.0 / 64.0 + dMain;
+			dMain += d1 + d1 * 2.0 * gWaveModelTable[ptp->oPitch.model][b] * ptp->oPitch.top / 64.0 / 64.0;
 
-		dPitch = dPitch + d2;
-		dVolume = dVolume + d3;
+		dPitch += d2;
+		dVolume += d3;
 	}
 
 	return TRUE;
