@@ -183,10 +183,10 @@ static void ActBossChar03_01(NPCHAR *npc)
 	}
 
 	if ((npc->act_no == 101 || npc->act_no == 201 || npc->act_no == 301 || npc->act_no == 401) && npc->act_wait % 2 == 1)
-		PlaySoundObject(112, 1);
+		PlaySoundObject(112, SOUND_MODE_PLAY);
 
 	if ((npc->act_no == 103 || npc->act_no == 203) && npc->act_wait % 4 == 1)
-		PlaySoundObject(111, 1);
+		PlaySoundObject(111, SOUND_MODE_PLAY);
 
 	if (npc->act_no >= 100 && gMC.y < npc->y + (4 * 0x200) && gMC.y > npc->y - (4 * 0x200))
 	{
@@ -262,7 +262,7 @@ static void ActBossChar03_02(NPCHAR *npc)
 			}
 
 			SetNpChar(158, npc->x + x, npc->y + y, 0, 0, direct, NULL, 0x100);
-			PlaySoundObject(39, 1);
+			PlaySoundObject(39, SOUND_MODE_PLAY);
 			npc->act_wait = 120;
 
 			break;
@@ -404,7 +404,7 @@ static void ActBossChar03_04(NPCHAR *npc)
 			xm = GetCos(deg) * 3;
 			SetNpChar(156, npc->x, npc->y, xm, ym, 0, NULL, 0x100);
 
-			PlaySoundObject(39, 1);
+			PlaySoundObject(39, SOUND_MODE_PLAY);
 			npc->act_wait = 40;
 
 			break;
@@ -836,7 +836,7 @@ void ActBossChar_MonstX(void)
 			SetQuake(2);
 
 			if (++npc->act_wait % 8 == 0)
-				PlaySoundObject(52, 1);
+				PlaySoundObject(52, SOUND_MODE_PLAY);
 
 			SetDestroyNpChar(npc->x + (Random(-72, 72) * 0x200), npc->y + (Random(-64, 64) * 0x200), 1, 1);
 
@@ -845,7 +845,7 @@ void ActBossChar_MonstX(void)
 				npc->act_wait = 0;
 				npc->act_no = 1001;
 				SetFlash(npc->x, npc->y, 1);
-				PlaySoundObject(35, 1);
+				PlaySoundObject(35, SOUND_MODE_PLAY);
 			}
 
 			break;

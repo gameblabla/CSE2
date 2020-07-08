@@ -222,7 +222,7 @@ BOOL LoadSoundObject(const char *file_name, int no)
 	return TRUE;
 }
 
-void PlaySoundObject(int no, int mode)
+void PlaySoundObject(int no, SoundMode mode)
 {
 	if (!audio_backend_initialised)
 		return;
@@ -231,17 +231,17 @@ void PlaySoundObject(int no, int mode)
 	{
 		switch (mode)
 		{
-			case 0:	// 停止 (Stop)
+			case SOUND_MODE_STOP:	// 停止 (Stop)
 				AudioBackend_StopSound(lpSECONDARYBUFFER[no]);
 				break;
 
-			case 1:	// 再生 (Playback)
+			case SOUND_MODE_PLAY:	// 再生 (Playback)
 				AudioBackend_StopSound(lpSECONDARYBUFFER[no]);
 				AudioBackend_RewindSound(lpSECONDARYBUFFER[no]);
 				AudioBackend_PlaySound(lpSECONDARYBUFFER[no], FALSE);
 				break;
 
-			case -1:// ループ再生 (Loop playback)
+			case SOUND_MODE_PLAY_LOOP:// ループ再生 (Loop playback)
 				AudioBackend_PlaySound(lpSECONDARYBUFFER[no], TRUE);
 				break;
 		}

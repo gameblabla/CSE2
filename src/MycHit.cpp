@@ -23,7 +23,7 @@ static void PutlittleStar(void)
 {
 	if (!(gMC.cond & 2) && gMC.ym < -0x200)
 	{
-		PlaySoundObject(3, 1);
+		PlaySoundObject(3, SOUND_MODE_PLAY);
 		SetCaret(gMC.x, gMC.y - gMC.hit.top, 13, 0);
 		SetCaret(gMC.x, gMC.y - gMC.hit.top, 13, 0);
 	}
@@ -101,7 +101,7 @@ int JudgeHitMyCharBlock(int x, int y)
 
 		// Halt momentum
 		if (gMC.ym > 0x400)
-			PlaySoundObject(23, 1);
+			PlaySoundObject(23, SOUND_MODE_PLAY);
 		if (gMC.ym > 0)
 			gMC.ym = 0;
 
@@ -228,7 +228,7 @@ int JudgeHitMyCharTriangleE(int x, int y)
 
 		// Halt momentum
 		if (gMC.ym > 0x400)
-			PlaySoundObject(23, 1);
+			PlaySoundObject(23, SOUND_MODE_PLAY);
 		if (gMC.ym > 0)
 			gMC.ym = 0;
 
@@ -255,7 +255,7 @@ int JudgeHitMyCharTriangleF(int x, int y)
 
 		// Halt momentum
 		if (gMC.ym > 0x400)
-			PlaySoundObject(23, 1);
+			PlaySoundObject(23, SOUND_MODE_PLAY);
 		if (gMC.ym > 0)
 			gMC.ym = 0;
 
@@ -282,7 +282,7 @@ int JudgeHitMyCharTriangleG(int x, int y)
 
 		// Halt momentum
 		if (gMC.ym > 0x400)
-			PlaySoundObject(23, 1);
+			PlaySoundObject(23, SOUND_MODE_PLAY);
 		if (gMC.ym > 0)
 			gMC.ym = 0;
 
@@ -309,7 +309,7 @@ int JudgeHitMyCharTriangleH(int x, int y)
 
 		// Halt momentum
 		if (gMC.ym > 0x400)
-			PlaySoundObject(23, 1);
+			PlaySoundObject(23, SOUND_MODE_PLAY);
 		if (gMC.ym > 0)
 			gMC.ym = 0;
 
@@ -715,7 +715,7 @@ int JudgeHitMyCharNPC4(NPCHAR *npc)
 			if (gMC.y + gMC.hit.bottom > npc->y - npc->hit.top && gMC.hit.bottom + gMC.y < npc->y + (3 * 0x200))
 			{
 				if (gMC.ym - npc->ym > 2 * 0x200)
-					PlaySoundObject(23, 1);
+					PlaySoundObject(23, SOUND_MODE_PLAY);
 
 				if (gMC.unit == 1)
 				{
@@ -799,21 +799,21 @@ void HitMyCharNpChar(void)
 		// Special NPCs (pickups)
 		if (hit != 0 && gNPC[i].code_char == 1)
 		{
-			PlaySoundObject(14, 1);
+			PlaySoundObject(14, SOUND_MODE_PLAY);
 			AddExpMyChar(gNPC[i].exp);
 			gNPC[i].cond = 0;
 		}
 
 		if (hit != 0 && gNPC[i].code_char == 86)
 		{
-			PlaySoundObject(42, 1);
+			PlaySoundObject(42, SOUND_MODE_PLAY);
 			AddBulletMyChar(gNPC[i].code_event, gNPC[i].exp);
 			gNPC[i].cond = 0;
 		}
 
 		if (hit != 0 && gNPC[i].code_char == 87)
 		{
-			PlaySoundObject(20, 1);
+			PlaySoundObject(20, SOUND_MODE_PLAY);
 			AddLifeMyChar(gNPC[i].exp);
 			gNPC[i].cond = 0;
 		}

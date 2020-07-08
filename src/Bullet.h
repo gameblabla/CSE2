@@ -2,6 +2,8 @@
 
 #include "WindowsWrapper.h"
 
+#include "CommonDefines.h"
+
 #define BULLET_MAX 0x40
 
 typedef struct BULLET
@@ -31,13 +33,7 @@ typedef struct BULLET
 	int enemyYL;
 	int blockXL;
 	int blockYL;
-	struct
-	{
-		int front;
-		int top;
-		int back;
-		int bottom;
-	} view;
+	OTHER_RECT view;
 } BULLET;
 
 typedef struct BULLET_TABLE
@@ -50,13 +46,7 @@ typedef struct BULLET_TABLE
 	int enemyYL;
 	int blockXL;
 	int blockYL;
-	struct
-	{
-		int front;
-		int top;
-		int back;
-		int bottom;
-	} view;
+	OTHER_RECT view;
 } BULLET_TABLE;
 
 extern BULLET gBul[BULLET_MAX];

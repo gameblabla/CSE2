@@ -136,7 +136,7 @@ void HitBossBullet(void)
 						}
 						else
 						{
-							PlaySoundObject(gBoss[bos_].destroy_voice, 1);
+							PlaySoundObject(gBoss[bos_].destroy_voice, SOUND_MODE_PLAY);
 
 							switch (gBoss[bos_].size)
 							{
@@ -161,7 +161,7 @@ void HitBossBullet(void)
 							SetCaret(gBul[bul].x, gBul[bul].y, 11, 0);
 							SetCaret(gBul[bul].x, gBul[bul].y, 11, 0);
 							SetCaret(gBul[bul].x, gBul[bul].y, 11, 0);
-							PlaySoundObject(gBoss[bos_].hit_voice, 1);
+							PlaySoundObject(gBoss[bos_].hit_voice, SOUND_MODE_PLAY);
 						}
 
 						gBoss[bos].shock = 8;
@@ -188,7 +188,7 @@ void HitBossBullet(void)
 					if (!(gBul[bul].bbits & 0x10))
 					{
 						SetCaret(gBul[bul].x, gBul[bul].y, 2, 2);
-						PlaySoundObject(31, 1);
+						PlaySoundObject(31, SOUND_MODE_PLAY);
 						gBul[bul].cond = 0;
 						continue;
 					}

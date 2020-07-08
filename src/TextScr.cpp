@@ -409,7 +409,7 @@ void SetNumberTextScript(int index)
 	strcat(text[gTS.line % 4], str);
 
 	// Play sound and reset blinking cursor
-	PlaySoundObject(2, 1);
+	PlaySoundObject(2, SOUND_MODE_PLAY);
 	gTS.wait_beam = 0;
 
 	// Check if should move to next line (prevent a memory overflow, come on guys, this isn't a leftover of pixel trying to make text wrapping)
@@ -643,7 +643,7 @@ int TextScriptProc(void)
 					else if (IS_COMMAND('I','T','+'))
 					{
 						x = GetTextScriptNo(gTS.p_read + 4);
-						PlaySoundObject(38, 1);
+						PlaySoundObject(38, SOUND_MODE_PLAY);
 						AddItemData(x);
 						gTS.p_read += 8;
 					}
@@ -676,7 +676,7 @@ int TextScriptProc(void)
 						gNumberTextScript[1] = z;
 					#endif
 
-						PlaySoundObject(38, 1);
+						PlaySoundObject(38, SOUND_MODE_PLAY);
 						AddArmsData(w, x);
 						gTS.p_read += 13;
 					}
@@ -897,7 +897,7 @@ int TextScriptProc(void)
 						gTS.next_event = GetTextScriptNo(gTS.p_read + 4);
 						gTS.p_read += 8;
 						gTS.mode = 6;
-						PlaySoundObject(5, 1);
+						PlaySoundObject(5, SOUND_MODE_PLAY);
 						gTS.wait = 0;
 						gTS.select = 0;
 						bExit = TRUE;
@@ -1058,7 +1058,7 @@ int TextScriptProc(void)
 					else if (IS_COMMAND('S','O','U'))
 					{
 						z = GetTextScriptNo(gTS.p_read + 4);
-						PlaySoundObject(z, 1);
+						PlaySoundObject(z, SOUND_MODE_PLAY);
 						gTS.p_read += 8;
 					}
 					else if (IS_COMMAND('C','M','U'))
@@ -1475,7 +1475,7 @@ int TextScriptProc(void)
 						}
 
 						strcat(text[gTS.line % 4], c);
-						PlaySoundObject(2, 1);
+						PlaySoundObject(2, SOUND_MODE_PLAY);
 						gTS.wait_beam = 0;
 
 						// Offset read and write positions
@@ -1562,7 +1562,7 @@ int TextScriptProc(void)
 				// Select option
 				if (gKeyTrg & gKeyOk)
 				{
-					PlaySoundObject(18, 1);
+					PlaySoundObject(18, SOUND_MODE_PLAY);
 
 					if (gTS.select == 1)
 					{
@@ -1578,13 +1578,13 @@ int TextScriptProc(void)
 				else if (gKeyTrg & gKeyLeft)
 				{
 					gTS.select = 0;
-					PlaySoundObject(1, 1);
+					PlaySoundObject(1, SOUND_MODE_PLAY);
 				}
 				// No
 				else if (gKeyTrg & gKeyRight)
 				{
 					gTS.select = 1;
-					PlaySoundObject(1, 1);
+					PlaySoundObject(1, SOUND_MODE_PLAY);
 				}
 			}
 			break;

@@ -196,7 +196,7 @@ void ActBossChar_Core_Mini(NPCHAR *npc)
 				ym = GetSin(deg) * 2;
 				xm = GetCos(deg) * 2;
 				SetNpChar(178, npc->x, npc->y, xm, ym, 0, NULL, 0x100);
-				PlaySoundObject(39, 1);
+				PlaySoundObject(39, SOUND_MODE_PLAY);
 			}
 
 			break;
@@ -360,7 +360,7 @@ void ActBossChar_Core(void)
 			if (npc->act_wait > 400)
 			{
 				++npc->count1;
-				PlaySoundObject(115, 1);
+				PlaySoundObject(115, SOUND_MODE_PLAY);
 
 				if (npc->count1 > 3)
 				{
@@ -471,7 +471,7 @@ void ActBossChar_Core(void)
 				ym = GetSin(deg) * 3;
 				xm = GetCos(deg) * 3;
 				SetNpChar(218, npc->x - (40 * 0x200), npc->y, xm, ym, 0, NULL, 0x100);
-				PlaySoundObject(101, 1);
+				PlaySoundObject(101, SOUND_MODE_PLAY);
 			}
 
 			if (npc->act_wait > 400)
@@ -561,7 +561,7 @@ void ActBossChar_Core(void)
 		gBoss[6].act_no = 100;
 		gBoss[7].act_no = 100;
 
-		PlaySoundObject(26, 1);
+		PlaySoundObject(26, SOUND_MODE_PLAY);
 
 		for (i = 0; i < 8; ++i)
 			SetNpChar(4, gBoss[4].x + (Random(-32, 16) * 0x200), gBoss[4].y, Random(-0x200, 0x200), Random(-0x100, 0x100), 0, NULL, 0x100);

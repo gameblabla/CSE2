@@ -198,7 +198,7 @@ void ActBossChar_Omega(void)
 			gBoss[0].y -= 1 * 0x200;
 
 			if (++gBoss[0].act_wait % 4 == 0)
-				PlaySoundObject(26, 1);
+				PlaySoundObject(26, SOUND_MODE_PLAY);
 
 			if (gBoss[0].act_wait == 48)
 			{
@@ -231,7 +231,7 @@ void ActBossChar_Omega(void)
 				gBoss[0].act_no = 50;
 				gBoss[0].count1 = 0;
 				gBoss[5].hit.top = 16 * 0x200;
-				PlaySoundObject(102, 1);
+				PlaySoundObject(102, SOUND_MODE_PLAY);
 			}
 
 			break;
@@ -266,14 +266,14 @@ void ActBossChar_Omega(void)
 				else
 					SetNpChar(48, gBoss[0].x, gBoss[0].y - (16 * 0x200), Random(-0x100, 0x100), -0x333, 2, NULL, 0x100);
 
-				PlaySoundObject(39, 1);
+				PlaySoundObject(39, SOUND_MODE_PLAY);
 			}
 
 			if (gBoss[0].act_wait == 200 || CountArmsBullet(6))
 			{
 				gBoss[0].count1 = 0;
 				gBoss[0].act_no = 70;
-				PlaySoundObject(102, 1);
+				PlaySoundObject(102, SOUND_MODE_PLAY);
 			}
 
 			break;
@@ -292,8 +292,8 @@ void ActBossChar_Omega(void)
 
 			if (gBoss[0].count2 == 0)
 			{
-				PlaySoundObject(102, 0);
-				PlaySoundObject(12, 1);
+				PlaySoundObject(102, SOUND_MODE_STOP);
+				PlaySoundObject(12, SOUND_MODE_PLAY);
 
 				gBoss[0].act_no = 80;
 				gBoss[0].act_wait = 0;
@@ -327,7 +327,7 @@ void ActBossChar_Omega(void)
 			++gBoss[0].act_wait;
 
 			if (gBoss[0].act_wait % 4 == 0)
-				PlaySoundObject(26, 1);
+				PlaySoundObject(26, SOUND_MODE_PLAY);
 
 			if (gBoss[0].act_wait == 48)
 			{
@@ -376,7 +376,7 @@ void ActBossChar_Omega(void)
 			if (gBoss[0].act_wait == 50 || CountArmsBullet(6))
 			{
 				gBoss[0].act_no = 130;
-				PlaySoundObject(102, 1);
+				PlaySoundObject(102, SOUND_MODE_PLAY);
 				gBoss[0].act_wait = 0;
 				gBoss[0].count1 = 0;
 			}
@@ -384,7 +384,7 @@ void ActBossChar_Omega(void)
 			if (gBoss[0].act_wait < 30 && gBoss[0].act_wait % 5 == 0)
 			{
 				SetNpChar(48, gBoss[0].x, gBoss[0].y - (16 * 0x200), Random(-341, 341), -0x333, 0, NULL, 0x100);
-				PlaySoundObject(39, 1);
+				PlaySoundObject(39, SOUND_MODE_PLAY);
 			}
 
 			break;
@@ -411,9 +411,9 @@ void ActBossChar_Omega(void)
 
 				gBoss[0].ym = -0x5FF;
 
-				PlaySoundObject(102, 0);
-				PlaySoundObject(12, 1);
-				PlaySoundObject(25, 1);
+				PlaySoundObject(102, SOUND_MODE_STOP);
+				PlaySoundObject(12, SOUND_MODE_PLAY);
+				PlaySoundObject(25, SOUND_MODE_PLAY);
 
 				if (gBoss[0].x < gMC.x)
 					gBoss[0].xm = 0x100;
@@ -448,8 +448,8 @@ void ActBossChar_Omega(void)
 				gBoss[5].hit.top = 16 * 0x200;
 				gBoss[5].damage = 0;
 
-				PlaySoundObject(26, 1);
-				PlaySoundObject(12, 1);
+				PlaySoundObject(26, SOUND_MODE_PLAY);
+				PlaySoundObject(12, SOUND_MODE_PLAY);
 
 				SetQuake(30);
 			}
@@ -462,7 +462,7 @@ void ActBossChar_Omega(void)
 			++gBoss[0].act_wait;
 
 			if (gBoss[0].act_wait % 12 == 0)
-				PlaySoundObject(52, 1);
+				PlaySoundObject(52, SOUND_MODE_PLAY);
 
 			SetDestroyNpChar(gBoss[0].x + (Random(-0x30, 0x30) * 0x200), gBoss[0].y + (Random(-0x30, 0x18) * 0x200), 1, 1);
 
@@ -471,7 +471,7 @@ void ActBossChar_Omega(void)
 				gBoss[0].act_wait = 0;
 				gBoss[0].act_no = 160;
 				SetFlash(gBoss[0].x, gBoss[0].y, 1);
-				PlaySoundObject(35, 1);
+				PlaySoundObject(35, SOUND_MODE_PLAY);
 			}
 
 			break;
