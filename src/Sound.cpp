@@ -86,6 +86,13 @@ void EndDirectSound(void)
 	lpDS = NULL;
 }
 
+// Below are two completely unused functions for loading .wav files as sound effects.
+// Some say that sounds heard in CS Beta footage don't sound like PixTone...
+
+// There's a bit of a problem with this code: it hardcodes the offsets of various bits
+// of data in the WAV header - this makes the code only compatible with very specific
+// .wav files. You can check the prototype OrgView EXEs for examples of those.
+
 // サウンドの設定 (Sound settings)
 BOOL InitSoundObject(LPCSTR resname, int no)
 {
@@ -131,8 +138,6 @@ BOOL InitSoundObject(LPCSTR resname, int no)
 	return TRUE;
 }
 
-// Completely unused function for loading a .wav file as a sound effect.
-// Some say that sounds heard in CS Beta footage don't sound like PixTone...
 BOOL LoadSoundObject(LPCSTR file_name, int no)
 {
 	char path[MAX_PATH];
@@ -158,8 +163,16 @@ BOOL LoadSoundObject(LPCSTR file_name, int no)
 		return FALSE;
 
 	for (i = 0; i < 58; i++)
-		fread(&check_box[i], sizeof(char), 1, fp);
+		fread(&check_box[i], sizeof(char), 1, fp);	// Holy hell, this is inefficient
 
+#ifdef FIX_BUGS
+	// The original code forgets to close 'fp'
+	if (check_box[0] != 'R' || check_box[1] != 'I' || check_box[2] != 'F' || check_box[3] != 'F')
+	{
+		fclose(fp);
+		return FALSE;
+	}
+#else
 	if (check_box[0] != 'R')
 		return FALSE;
 	if (check_box[1] != 'I')
@@ -168,13 +181,23 @@ BOOL LoadSoundObject(LPCSTR file_name, int no)
 		return FALSE;
 	if (check_box[3] != 'F')
 		return FALSE;
+#endif
 
 	DWORD *wp;
 	wp = (DWORD*)malloc(file_size);	// ファイルのワークスペースを作る (Create a file workspace)
+
+#ifdef FIX_BUGS
+	if (wp == NULL)
+	{
+		fclose(fp);
+		return FALSE;
+	}
+#endif
+
 	fseek(fp, 0, SEEK_SET);
 
 	for (i = 0; i < file_size; i++)
-		fread((BYTE*)wp+i, sizeof(BYTE), 1, fp);
+		fread((BYTE*)wp+i, sizeof(BYTE), 1, fp);	// Pixel, stahp
 
 	fclose(fp);
 
