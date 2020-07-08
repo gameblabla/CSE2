@@ -17,7 +17,7 @@
 // Null
 void ActNpc000(NPCHAR *npc)
 {
-	RECT rect = {0x00, 0x00, 0x10, 0x10};
+	RECT rect = {0, 0, 16, 16};
 
 	if (npc->act_no == 0)
 	{
