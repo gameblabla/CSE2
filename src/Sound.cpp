@@ -300,19 +300,19 @@ int MakePixToneObject(const PIXTONEPARAMETER *ptp, int ptp_num, int no)
 	// when it only needs a WAVEFORMATEX
 	typedef struct WavHeader
 	{
-		char riff[4];
-		unsigned long wav_size;
-		char wave[4];
-		char fmt[4];
-		unsigned long fmt_chunk_size;
-		unsigned short audio_format;
-		unsigned short num_channels;
-		unsigned long sample_rate;
-		unsigned long byte_rate;
-		unsigned short sample_alignment;
-		unsigned short bit_depth;
-		char data[4];
-		unsigned long data_bytes;
+		CHAR riff[4];
+		DWORD wav_size;
+		CHAR wave[4];
+		CHAR fmt[4];
+		DWORD fmt_chunk_size;
+		WORD audio_format;
+		WORD num_channels;
+		DWORD sample_rate;
+		DWORD byte_rate;
+		WORD sample_alignment;
+		WORD bit_depth;
+		CHAR data[4];
+		DWORD data_bytes;
 	} WavHeader;
 
 	int sample_count;
