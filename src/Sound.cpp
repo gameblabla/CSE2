@@ -118,7 +118,7 @@ BOOL InitSoundObject(const char *resname, int no)
 BOOL LoadSoundObject(const char *file_name, int no)
 {
 	std::string path;
-	unsigned long i;
+	//unsigned long i;
 	unsigned long file_size = 0;
 	char check_box[58];
 	FILE *fp;
