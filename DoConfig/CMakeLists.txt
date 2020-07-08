@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.8)
 
+option(DOCONFIG_LEGACY_OPENGL "Use OpenGL 2.1 instead of 3.2" OFF)
+
 option(PKG_CONFIG_STATIC_LIBS "On platforms with pkg-config, static-link the dependencies (good for Windows builds, so you don't need to bundle DLL files)" OFF)
 option(MSVC_LINK_STATIC_RUNTIME "Link the static MSVC runtime library (Visual Studio only)" OFF)
 
@@ -17,8 +19,6 @@ add_executable(DoConfig WIN32
 	"imgui/imgui_draw.cpp"
 	"imgui/imgui_impl_glfw.cpp"
 	"imgui/imgui_impl_glfw.h"
-	"imgui/imgui_impl_opengl3.cpp"
-	"imgui/imgui_impl_opengl3.h"
 	"imgui/imgui_internal.h"
 	"imgui/imgui_widgets.cpp"
 	"imgui/imstb_rectpack.h"
@@ -39,6 +39,19 @@ target_link_libraries(DoConfig PRIVATE ${CMAKE_DL_LIBS})
 
 target_include_directories(DoConfig PRIVATE "../external/glad/include")
 target_compile_definitions(DoConfig PRIVATE IMGUI_IMPL_OPENGL_LOADER_GLAD)
+
+if(DOCONFIG_LEGACY_OPENGL)
+	target_compile_definitions(DoConfig PRIVATE LEGACY_OPENGL)
+	target_sources(DoConfig PRIVATE
+		"imgui/imgui_impl_opengl2.cpp"
+		"imgui/imgui_impl_opengl2.h"
+	)
+else()
+	target_sources(DoConfig PRIVATE
+		"imgui/imgui_impl_opengl3.cpp"
+		"imgui/imgui_impl_opengl3.h"
+	)
+endif()
 
 if(PKG_CONFIG_STATIC_LIBS)
 	target_link_options(DoConfig PRIVATE "-static")

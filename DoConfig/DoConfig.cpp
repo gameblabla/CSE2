@@ -7,7 +7,11 @@
 
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw.h"
+#ifdef LEGACY_OPENGL
+#include "imgui/imgui_impl_opengl2.h"
+#else
 #include "imgui/imgui_impl_opengl3.h"
+#endif
 
 #define WINDOW_WIDTH 360
 #define WINDOW_HEIGHT 290
@@ -49,11 +53,16 @@ int main(int argc, char *argv[])
 
 	if (glfwInit())
 	{
+	#ifdef LEGACY_OPENGL
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+	#else
 		const char *glsl_version = "#version 150 core";
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
+	#endif
 
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
@@ -66,8 +75,12 @@ int main(int argc, char *argv[])
 
 			if (gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 			{
-				// Check if the platform supports OpenGL 3.2
+				// Check if the platform supports the version of OpenGL we want
+			#ifdef LEGACY_OPENGL
+				if (GLAD_GL_VERSION_2_1)
+			#else
 				if (GLAD_GL_VERSION_3_2)
+			#endif
 				{
 					///////////////////////////
 					// Initialise Dear ImGui //
@@ -79,7 +92,11 @@ int main(int argc, char *argv[])
 					io.IniFilename = NULL;	// Disable `imgui.ini`
 
 					ImGui_ImplGlfw_InitForOpenGL(window, true);
+				#ifdef LEGACY_OPENGL
+					ImGui_ImplOpenGL2_Init();
+				#else
 					ImGui_ImplOpenGL3_Init(glsl_version);
+				#endif
 
 					/////////////////////
 					// Load Config.dat //
@@ -137,7 +154,11 @@ int main(int argc, char *argv[])
 					{
 						glfwPollEvents();
 
+					#ifdef LEGACY_OPENGL
+						ImGui_ImplOpenGL2_NewFrame();
+					#else
 						ImGui_ImplOpenGL3_NewFrame();
+					#endif
 						ImGui_ImplGlfw_NewFrame();
 						ImGui::NewFrame();
 
@@ -271,14 +292,22 @@ int main(int argc, char *argv[])
 
 						ImGui::Render();
 						glClear(GL_COLOR_BUFFER_BIT);
+					#ifdef LEGACY_OPENGL
+						ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
+					#else
 						ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+					#endif
 						glfwSwapBuffers(window);
 					}
 				}
 			}
 		}
 
+	#ifdef LEGACY_OPENGL
+		ImGui_ImplOpenGL2_Shutdown();
+	#else
 		ImGui_ImplOpenGL3_Shutdown();
+	#endif
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
 
