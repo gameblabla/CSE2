@@ -208,15 +208,16 @@ int GetDateLimit(SYSTEMTIME *system_time_low, SYSTEMTIME *system_time_high)
 BOOL IsKeyFile(const char *name)
 {
 	char path[MAX_PATH];
+	FILE *fp;
 
 	sprintf(path, "%s\\%s", gModulePath, name);
 
-	FILE *file = fopen(path, "rb");
+	fp = fopen(path, "rb");
 
-	if (file == NULL)
+	if (fp == NULL)
 		return FALSE;
 
-	fclose(file);
+	fclose(fp);
 	return TRUE;
 }
 
