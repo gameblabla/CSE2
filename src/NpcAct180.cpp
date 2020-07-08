@@ -1311,7 +1311,7 @@ void ActNpc197(NPCHAR *npc)
 			if (npc->x < 48 * 0x200)
 			{
 				npc->destroy_voice = 0;
-				LoseNpChar(npc, 1);
+				LoseNpChar(npc, TRUE);
 			}
 
 			break;
