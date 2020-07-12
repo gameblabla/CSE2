@@ -706,12 +706,12 @@ void RenderBackend_DrawScreen(void)
 	GLsizei width;
 	GLsizei height;
 
-	if ((float)actual_screen_width / (float)actual_screen_height > (float)framebuffer.width / (float)framebuffer.height)
+	if (actual_screen_width * framebuffer.height > framebuffer.width * actual_screen_height)	// Fancy way to do `if (actual_screen_width / actual_screen_height > framebuffer.width / framebuffer.height)` without floats
 	{
 		y = 0;
 		height = actual_screen_height;
 
-		width = framebuffer.width * ((float)actual_screen_height / (float)framebuffer.height);
+		width = (framebuffer.width * actual_screen_height) / framebuffer.height;
 		x = (actual_screen_width - width) / 2;
 	}
 	else
@@ -719,7 +719,7 @@ void RenderBackend_DrawScreen(void)
 		x = 0;
 		width = actual_screen_width;
 
-		height = framebuffer.height * ((float)actual_screen_width / (float)framebuffer.width);
+		height = (framebuffer.height * actual_screen_width) / framebuffer.width;
 		y = (actual_screen_height - height) / 2;
 	}
 

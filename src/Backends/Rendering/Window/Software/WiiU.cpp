@@ -50,12 +50,12 @@ static Viewport drc_viewport;
 
 static void CalculateViewport(unsigned int actual_screen_width, unsigned int actual_screen_height, Viewport *viewport)
 {
-	if ((float)actual_screen_width / (float)actual_screen_height > (float)fake_framebuffer_width / (float)fake_framebuffer_height)
+	if (actual_screen_width * fake_framebuffer_height > fake_framebuffer_width * actual_screen_height) // Fancy way to do `if (actual_screen_width / actual_screen_height > fake_framebuffer_width / fake_framebuffer_height)` without floats
 	{
 		viewport->y = 0.0f;
 		viewport->height = actual_screen_height;
 
-		viewport->width = fake_framebuffer_width * ((float)actual_screen_height / (float)fake_framebuffer_height);
+		viewport->width = (fake_framebuffer_width * actual_screen_height) / fake_framebuffer_height;
 		viewport->x = (actual_screen_width - viewport->width) / 2;
 	}
 	else
@@ -63,7 +63,7 @@ static void CalculateViewport(unsigned int actual_screen_width, unsigned int act
 		viewport->x = 0.0f;
 		viewport->width = actual_screen_width;
 
-		viewport->height = fake_framebuffer_height * ((float)actual_screen_width / (float)fake_framebuffer_width);
+		viewport->height = (fake_framebuffer_height * actual_screen_width) / fake_framebuffer_width;
 		viewport->y = (actual_screen_height - viewport->height) / 2;
 	}
 }

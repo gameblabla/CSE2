@@ -162,7 +162,7 @@ void PlaybackBackend_EnableDragAndDrop(void)
 
 bool Backend_SystemTask(bool active)
 {
-	if (SDL_PollEvent(NULL) || !active)
+	while (SDL_PollEvent(NULL))
 	{
 		SDL_Event event;
 
