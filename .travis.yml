@@ -9,7 +9,7 @@ dist: bionic
 language: cpp
 
 # Cache compiled object files with ccache
-cache: ccache
+#cache: ccache
 
 osx_image: xcode11.3
 
