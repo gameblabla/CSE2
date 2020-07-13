@@ -8,9 +8,6 @@ dist: bionic
 # Enable C++ language support
 language: cpp
 
-# Cache compiled object files with ccache
-cache: ccache
-
 osx_image: xcode11.3
 
 compiler:
@@ -45,7 +42,6 @@ addons:
         - sdl2
         - glfw
         - freetype
-    update: true
 
 env:
     - PLATFORM=SDL2 AUDIO=SDL2 RENDERER=Software
@@ -114,14 +110,6 @@ install:
 
     # Recommanded build directory
     - CMAKE_BUILD_DIR=build
-
-    # Install ccache on OSX
-    - |
-      if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
-          # This is OSX
-          brew install ccache
-          export PATH="/usr/local/opt/ccache/libexec:$PATH"
-      fi
 
 before_script:
     # Make build directory and generate CMake build files
