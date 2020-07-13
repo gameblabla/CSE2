@@ -18,7 +18,7 @@ compiler:
     - clang
 
 os:
-#    - linux
+    - linux
     - osx
 
 addons:
