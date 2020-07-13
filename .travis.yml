@@ -18,7 +18,7 @@ compiler:
     - clang
 
 os:
-    - linux
+#    - linux
     - osx
 
 addons:
@@ -45,7 +45,6 @@ addons:
         - sdl2
         - glfw
         - freetype
-    update: true
 
 env:
     - PLATFORM=SDL2 AUDIO=SDL2 RENDERER=Software
