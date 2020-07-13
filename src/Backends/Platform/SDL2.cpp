@@ -165,13 +165,14 @@ void PlaybackBackend_EnableDragAndDrop(void)
 
 bool Backend_SystemTask(bool active)
 {
-	while (SDL_PollEvent(NULL))
-	{
-		SDL_Event event;
-
-		if (!SDL_WaitEvent(&event))
+	if (!active)
+		if (!SDL_WaitEvent(NULL))
 			return false;
 
+	SDL_Event event;
+
+	while (SDL_PollEvent(&event))
+	{
 		switch (event.type)
 		{
 			case SDL_KEYUP:
