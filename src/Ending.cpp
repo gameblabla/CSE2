@@ -194,7 +194,7 @@ void PutIllust(void)
 void ReloadIllust(int a)
 {
 	char name[16];
-	sprintf(name, "CREDIT%02d", a);
+	sprintf(name, "Credit%02d", a);
 	std::string path = std::string{"Resource/BITMAP/"} + name;
 	ReloadBitmap_File(path.c_str(), SURFACE_ID_CREDITS_IMAGE);
 }
