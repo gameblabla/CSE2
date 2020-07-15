@@ -2179,7 +2179,12 @@ void ActBullet_SpurTail(BULLET *bul, int level)
 		bul->ani_no = bul->count1 - 20;
 
 	if (bul->ani_no > 2)
+	{
 		bul->cond = 0;
+	#ifdef FIX_BUGS
+		return;	// Avoid accessing the RECT arrays with an out-of-bounds index
+	#endif
+	}
 
 	if (bul->damage && bul->life != 100)
 		bul->damage = 0;
