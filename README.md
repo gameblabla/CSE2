@@ -17,9 +17,11 @@ Branch | Description
 
 CSE2 is a decompilation of Cave Story.
 
-This branch builds upon the `enhanced-lite` branch, adding several enhancements including:
-* Widescreen
+This branch builds upon the `enhanced-lite` branch, adding extra enhancements including:
 * Support for alternate soundtracks
+
+This is in addition to the enhancements inherited from the `enhanced-lite` branch:
+* Widescreen
 * Options menu:
   * Control remapping (keyboard and gamepad)
   * Soundtrack selection
