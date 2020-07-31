@@ -23,6 +23,7 @@
 #define STREAM_SIZE 0x100	// FREQUENCY/200 rounded to the nearest power of 2 (SDL2 *needs* a power-of-2 buffer size)
 #endif
 
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define clamp(x, y, z) (((x) > (z)) ? (z) : ((x) < (y)) ? (y) : (x))
 
 //Audio device
@@ -209,29 +210,47 @@ void AudioCallback(void *userdata, Uint8 *stream, int len)
 	(void)userdata;
 
 	float *buffer = (float*)stream;
-	const size_t frames = len / (sizeof(float) * 2);
-
-	//Update Organya (we can't use threads in Emscripten, so we do it here)
-	if (gOrgWait != -1)
-	{
-		const unsigned int OrgSamplesPerStep = gOrgWait * FREQUENCY / 1000;
-
-		while (gOrgTimer >= OrgSamplesPerStep)
-		{
-			OrganyaPlayData();
-			gOrgTimer -= OrgSamplesPerStep;
-		}
-
-		gOrgTimer += frames;
-	}
+	const size_t frames_total = len / (sizeof(float) * 2);
 
 	//Clear stream
-	for (size_t i = 0; i < frames * 2; ++i)
+	for (size_t i = 0; i < frames_total * 2; ++i)
 		buffer[i] = 0.0f;
 
-	//Mix sounds to primary buffer
-	for (SOUNDBUFFER *sound = soundBuffers; sound != NULL; sound = sound->next)
-		sound->Mix(buffer, frames);
+	if (gOrgWait == -1)
+	{
+		//Mix sounds to primary buffer
+		for (SOUNDBUFFER *sound = soundBuffers; sound != NULL; sound = sound->next)
+			sound->Mix(buffer, frames_total);
+	}
+	else
+	{
+		// Synchronise audio generation with Organya.
+		// In the original game, Organya ran asynchronously in a separate thread,
+		// firing off commands to DirectSound in realtime. To match that, we'd
+		// need a very low-latency buffer, otherwise we'd get mistimed instruments.
+		// Instead, we can just do this.
+		unsigned int frames_done = 0;
+
+		while (frames_done != frames_total)
+		{
+			static unsigned long organya_countdown;
+
+			if (organya_countdown == 0)
+			{
+				organya_countdown = gOrgWait * FREQUENCY / 1000;
+				OrganyaPlayData();
+			}
+
+			const unsigned int frames_to_do = MIN(organya_countdown, frames_total - frames_done);
+
+			//Mix sounds to primary buffer
+			for (SOUNDBUFFER *sound = soundBuffers; sound != NULL; sound = sound->next)
+				sound->Mix(buffer + frames_done * 2, frames_to_do);
+
+			frames_done += frames_to_do;
+			organya_countdown -= frames_to_do;
+		}
+	}
 }
 
 //Sound things
