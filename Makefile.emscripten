@@ -5,11 +5,11 @@ BUILD_DIRECTORY = game
 ASSETS_DIRECTORY = assets
 
 ifeq ($(RELEASE), 1)
-	CXXFLAGS = -O3 -fno-rtti -fno-exceptions --llvm-lto 1
+	CXXFLAGS = -O1 -fno-rtti -fno-exceptions
 	LDFLAGS = -s
 	FILENAME_DEF = CSE2
 else
-	CXXFLAGS = -g4
+	CXXFLAGS = -ggdb3
 	FILENAME_DEF = CSE2_debug
 endif
 
@@ -209,12 +209,12 @@ all: $(BUILD_DIRECTORY)/$(FILENAME).html
 $(BUILD_DIRECTORY)/$(FILENAME).html: $(BUILD_DIRECTORY)/$(FILENAME).bc $(ASSETS_DIRECTORY)/emscripten/shell.html
 	@mkdir -p $(@D)
 	@echo Compiling bytecode
-	@emcc $< $(CXXFLAGS) -s USE_SDL=2 -s USE_FREETYPE=1 --preload-file $(ASSETS_DIRECTORY)/emscripten/fps@/ --preload-file $(DATA_DIRECTORY)@/data --preload-file $(ASSETS_DIRECTORY)/emscripten/Config.dat@/ -o $@ -s ALLOW_MEMORY_GROWTH=1 --no-heap-copy --shell-file $(ASSETS_DIRECTORY)/emscripten/shell.html
+	@emcc $< $(CXXFLAGS) -O0 -lidbfs.js -s USE_SDL=2 -s USE_FREETYPE=1 --preload-file $(ASSETS_DIRECTORY)/emscripten/fps@/ --preload-file $(DATA_DIRECTORY)@/data --preload-file $(ASSETS_DIRECTORY)/emscripten/Config.dat@/ -o $@ -s ALLOW_MEMORY_GROWTH=1 --no-heap-copy --shell-file $(ASSETS_DIRECTORY)/emscripten/shell.html
 
 $(BUILD_DIRECTORY)/$(FILENAME).bc: $(OBJECTS)
 	@mkdir -p $(@D)
 	@echo Linking $@
-	@emcc $(CXXFLAGS) $(LDFLAGS) $^ -o $@ $(LIBS)
+	@emcc $(CXXFLAGS) $(LDFLAGS) $^ -r -o $@ $(LIBS)
 
 obj/$(FILENAME)/%.o: src/%.cpp
 	@mkdir -p $(@D)
