@@ -142,6 +142,8 @@ add_executable(CSE2
 	src/SelStage.h
 	src/Shoot.cpp
 	src/Shoot.h
+	src/SoftwareMixer.cpp
+	src/SoftwareMixer.h
 	src/Sound.cpp
 	src/Sound.h
 	src/Stage.cpp

@@ -125,9 +125,6 @@ BOOL MakeSoundObject8(signed char *wavep, signed char track, signed char pipi)
 			size_t wave_size = oct_wave[j].wave_size;
 			size_t data_size = pipi ? wave_size * oct_wave[j].oct_size : wave_size;
 
-			// Create sound buffer
-			lpORGANBUFFER[track][j][k] = new SOUNDBUFFER(data_size);
-
 			// Get wave data
 			unsigned char *wp = new unsigned char[data_size];
 			unsigned char *wp_sub = wp;
@@ -147,12 +144,8 @@ BOOL MakeSoundObject8(signed char *wavep, signed char track, signed char pipi)
 				wp_sub++;
 			}
 
-			// Copy wave data to sound buffer
-			unsigned char *buf;
-			lpORGANBUFFER[track][j][k]->Lock(&buf, NULL);
-			memcpy(buf, wp, data_size);
-			lpORGANBUFFER[track][j][k]->Unlock();
-			lpORGANBUFFER[track][j][k]->SetCurrentPosition(0);
+			// Create sound buffer
+			lpORGANBUFFER[track][j][k] = new SOUNDBUFFER(22050, wp, data_size);
 			delete[] wp;
 		}
 	}

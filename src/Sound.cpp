@@ -14,17 +14,11 @@
 
 #include "Organya.h"
 #include "PixTone.h"
-
-#define FREQUENCY 44100
-
-#ifdef RASPBERRY_PI
-#define STREAM_SIZE 0x400	// Larger buffer to prevent stutter
-#else
-#define STREAM_SIZE 0x100	// FREQUENCY/200 rounded to the nearest power of 2 (SDL2 *needs* a power-of-2 buffer size)
-#endif
+#include "SoftwareMixer.h"
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
-#define clamp(x, y, z) (((x) > (z)) ? (z) : ((x) < (y)) ? (y) : (x))
+
+unsigned long output_frequency;
 
 //Audio device
 SDL_AudioDeviceID audioDevice;
@@ -33,27 +27,12 @@ SDL_AudioDeviceID audioDevice;
 SOUNDBUFFER *soundBuffers;
 
 //Sound buffer code
-SOUNDBUFFER::SOUNDBUFFER(size_t bufSize)
+SOUNDBUFFER::SOUNDBUFFER(unsigned int frequency, const unsigned char *samples, size_t length)
 {
 	//Lock audio buffer
 	SDL_LockAudioDevice(audioDevice);
 
-	//Set parameters
-	size = bufSize;
-
-	playing = false;
-	looping = false;
-	looped = false;
-
-	frequency = 0.0;
-	volume = 1.0;
-	volume_l = 1.0;
-	volume_r = 1.0;
-	samplePosition = 0.0;
-
-	//Create waveform buffer
-	data = new signed char[bufSize + 1];
-	memset(data, 0, bufSize + 1);
+	mixer_sound = Mixer_CreateSound(frequency, samples, length);
 
 	//Add to buffer list
 	this->next = soundBuffers;
@@ -68,9 +47,8 @@ SOUNDBUFFER::~SOUNDBUFFER()
 	//Lock audio buffer
 	SDL_LockAudioDevice(audioDevice);
 
-	//Free buffer
-	if (data)
-		delete[] data;
+	if (mixer_sound)
+		Mixer_DestroySound(mixer_sound);
 
 	//Remove from buffer list
 	for (SOUNDBUFFER **soundBuffer = &soundBuffers; *soundBuffer != NULL; soundBuffer = &(*soundBuffer)->next)
@@ -92,135 +70,54 @@ void SOUNDBUFFER::Release()
 	delete this;
 }
 
-void SOUNDBUFFER::Lock(unsigned char **outBuffer, size_t *outSize)
-{
-	SDL_LockAudioDevice(audioDevice);
-
-	if (outBuffer != NULL)
-		*outBuffer = (unsigned char*)data;
-
-	if (outSize != NULL)
-		*outSize = size;
-}
-
-void SOUNDBUFFER::Unlock()
-{
-	for (size_t i = 0; i < size; ++i)
-		data[i] -= 0x80;
-
-	SDL_UnlockAudioDevice(audioDevice);
-}
-
 void SOUNDBUFFER::SetCurrentPosition(unsigned long dwNewPosition)
 {
 	SDL_LockAudioDevice(audioDevice);
-	samplePosition = dwNewPosition;
+	Mixer_RewindSound(mixer_sound);	// dwNewPosition is always 0 anyway
 	SDL_UnlockAudioDevice(audioDevice);
 }
 
 void SOUNDBUFFER::SetFrequency(unsigned long dwFrequency)
 {
 	SDL_LockAudioDevice(audioDevice);
-	frequency = (double)dwFrequency;
+	Mixer_SetSoundFrequency(mixer_sound, dwFrequency);
 	SDL_UnlockAudioDevice(audioDevice);
-}
-
-float MillibelToVolume(long lVolume)
-{
-	//Volume is in hundredths of decibels, from 0 to -10000
-	lVolume = clamp(lVolume, (long)-10000, (long)0);
-	return (float)pow(10.0, lVolume / 2000.0);
 }
 
 void SOUNDBUFFER::SetVolume(long lVolume)
 {
 	SDL_LockAudioDevice(audioDevice);
-	volume = MillibelToVolume(lVolume);
+	Mixer_SetSoundVolume(mixer_sound, lVolume);
 	SDL_UnlockAudioDevice(audioDevice);
 }
 
 void SOUNDBUFFER::SetPan(long lPan)
 {
 	SDL_LockAudioDevice(audioDevice);
-	volume_l = MillibelToVolume(-lPan);
-	volume_r = MillibelToVolume(lPan);
+	Mixer_SetSoundPan(mixer_sound, lPan);
 	SDL_UnlockAudioDevice(audioDevice);
 }
 
 void SOUNDBUFFER::Play(bool bLooping)
 {
 	SDL_LockAudioDevice(audioDevice);
-	playing = true;
-	looping = bLooping;
-
-	data[size] = bLooping ? data[0] : 0;
-
+	Mixer_PlaySound(mixer_sound, bLooping);
 	SDL_UnlockAudioDevice(audioDevice);
 }
 
 void SOUNDBUFFER::Stop()
 {
 	SDL_LockAudioDevice(audioDevice);
-	playing = false;
+	Mixer_StopSound(mixer_sound);
 	SDL_UnlockAudioDevice(audioDevice);
 }
 
-void SOUNDBUFFER::Mix(float *buffer, size_t frames)
+static void MixSoundsAndUpdateOrganya(long *stream, size_t frames_total)
 {
-	if (!playing) //This sound buffer isn't playing
-		return;
-
-	for (size_t i = 0; i < frames; ++i)
-	{
-		const double freqPosition = frequency / FREQUENCY; //This is added to position at the end
-
-		//Get the in-between sample this is (linear interpolation)
-		const float sample1 = data[(size_t)samplePosition];
-		const float sample2 = data[((size_t)samplePosition) + 1];
-
-		//Interpolate sample
-		const float subPos = (float)fmod(samplePosition, 1.0);
-		const float sampleA = sample1 + (sample2 - sample1) * subPos;
-
-		//Convert sample to float32
-		const float sampleConvert = sampleA / 128.0f;
-
-		//Mix
-		*buffer++ += (float)(sampleConvert * volume * volume_l);
-		*buffer++ += (float)(sampleConvert * volume * volume_r);
-
-		//Increment position
-		samplePosition += freqPosition;
-
-		if (samplePosition >= size)
-		{
-			if (looping)
-			{
-				samplePosition = fmod(samplePosition, size);
-				looped = true;
-			}
-			else
-			{
-				samplePosition = 0.0;
-				playing = false;
-				looped = false;
-				break;
-			}
-		}
-	}
-}
-
-static void MixSoundsAndUpdateOrganya(float *stream, size_t frames_total)
-{
-	//Clear stream
-	for (size_t i = 0; i < frames_total * 2; ++i)
-		stream[i] = 0.0f;
-
 	if (gOrgWait == -1)
 	{
 		//Mix sounds to primary buffer
-		for (SOUNDBUFFER *sound = soundBuffers; sound != NULL; sound = sound->next)
-			sound->Mix(stream, frames_total);
+		Mixer_MixSounds(stream, frames_total);
 	}
 	else
 	{
@@ -237,15 +134,14 @@ static void MixSoundsAndUpdateOrganya(float *stream, size_t frames_total)
 
 			if (organya_countdown == 0)
 			{
-				organya_countdown = gOrgWait * FREQUENCY / 1000;
+				organya_countdown = gOrgWait * output_frequency / 1000;
 				OrganyaPlayData();
 			}
 
 			const unsigned int frames_to_do = MIN(organya_countdown, frames_total - frames_done);
 
 			//Mix sounds to primary buffer
-			for (SOUNDBUFFER *sound = soundBuffers; sound != NULL; sound = sound->next)
-				sound->Mix(stream + frames_done * 2, frames_to_do);
+			Mixer_MixSounds(stream + frames_done * 2, frames_to_do);
 
 			frames_done += frames_to_do;
 			organya_countdown -= frames_to_do;
@@ -264,22 +160,22 @@ static void Callback(void *user_data, Uint8 *stream_uint8, int len)
 
 	while (frames_done != frames_total)
 	{
-		float mix_buffer[0x800 * 2];	// 2 because stereo
+		long mix_buffer[0x800 * 2];	// 2 because stereo
 
 		size_t subframes = MIN(0x800, frames_total - frames_done);
 
-		memset(mix_buffer, 0, subframes * sizeof(float) * 2);
+		memset(mix_buffer, 0, subframes * sizeof(long) * 2);
 
 		MixSoundsAndUpdateOrganya(mix_buffer, subframes);
 
 		for (size_t i = 0; i < subframes * 2; ++i)
 		{
-			if (mix_buffer[i] > 1.0f)
+			if (mix_buffer[i] > 0x7FFF)
 				*stream++ = 0x7FFF;
-			else if (mix_buffer[i] < -1.0f)
+			else if (mix_buffer[i] < -0x7FFF)
 				*stream++ = -0x7FFF;
 			else
-				*stream++ = mix_buffer[i] * 0x7FFF;
+				*stream++ = mix_buffer[i];
 		}
 
 		frames_done += subframes;
@@ -299,19 +195,22 @@ BOOL InitDirectSound()
 
 	//Set specifications we want
 	SDL_memset(&want, 0, sizeof(want));
-	want.freq = FREQUENCY;
+	want.freq = 48000;
 	want.format = AUDIO_S16;
 	want.channels = 2;
-	want.samples = STREAM_SIZE;
+	want.samples = 0x400;	// Roughly 10 milliseconds for 48000Hz
 	want.callback = Callback;
 
-	audioDevice = SDL_OpenAudioDevice(NULL, 0, &want, &have, 0);
+	audioDevice = SDL_OpenAudioDevice(NULL, 0, &want, &have, SDL_AUDIO_ALLOW_FREQUENCY_CHANGE);
 
 	if (audioDevice == 0)
 	{
 		printf("Failed to open audio device\nSDL Error: %s\n", SDL_GetError());
 		return FALSE;
 	}
+
+	output_frequency = have.freq;
+	Mixer_Init(have.freq);
 
 	//Unpause audio device
 	SDL_PauseAudioDevice(audioDevice, 0);
@@ -409,13 +308,7 @@ int MakePixToneObject(const PIXTONEPARAMETER *ptp, int ptp_num, int no)
 		}
 	}
 
-	lpSECONDARYBUFFER[no] = new SOUNDBUFFER(sample_count);
-
-	unsigned char *buf;
-	lpSECONDARYBUFFER[no]->Lock(&buf, NULL);
-	memcpy(buf, mixed_pcm_buffer, sample_count);
-	lpSECONDARYBUFFER[no]->Unlock();
-	lpSECONDARYBUFFER[no]->SetFrequency(22050);
+	lpSECONDARYBUFFER[no] = new SOUNDBUFFER(22050, mixed_pcm_buffer, sample_count);
 
 	free(pcm_buffer);
 	free(mixed_pcm_buffer);

@@ -117,6 +117,7 @@ SOURCES = \
 	Resource \
 	SelStage \
 	Shoot \
+	SoftwareMixer \
 	Sound \
 	Stage \
 	Star \

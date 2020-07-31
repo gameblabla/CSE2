@@ -5,17 +5,15 @@
 #include "WindowsWrapper.h"
 
 #include "PixTone.h"
+#include "SoftwareMixer.h"
 
 class SOUNDBUFFER
 {
 	public:
-		SOUNDBUFFER(size_t bufSize);
+		SOUNDBUFFER(unsigned int frequency, const unsigned char *samples, size_t length);
 		~SOUNDBUFFER();
 
 		void Release();
-
-		void Lock(unsigned char **buffer, size_t *size);
-		void Unlock();
 
 		void SetCurrentPosition(unsigned long dwNewPosition);
 		void SetFrequency(unsigned long dwFrequency);
@@ -29,18 +27,7 @@ class SOUNDBUFFER
 		SOUNDBUFFER *next;
 
 	private:
-		signed char *data;
-		size_t size;
-
-		bool playing;
-		bool looping;
-		bool looped;
-
-		double frequency;
-		double volume;
-		double volume_l;
-		double volume_r;
-		double samplePosition;
+		Mixer_Sound *mixer_sound;
 };
 
 //Music ID enum
