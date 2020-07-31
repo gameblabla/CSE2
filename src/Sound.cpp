@@ -204,23 +204,17 @@ void SOUNDBUFFER::Mix(float *buffer, size_t frames)
 	}
 }
 
-//Sound mixer
-void AudioCallback(void *userdata, Uint8 *stream, int len)
+static void MixSoundsAndUpdateOrganya(float *stream, size_t frames_total)
 {
-	(void)userdata;
-
-	float *buffer = (float*)stream;
-	const size_t frames_total = len / (sizeof(float) * 2);
-
 	//Clear stream
 	for (size_t i = 0; i < frames_total * 2; ++i)
-		buffer[i] = 0.0f;
+		stream[i] = 0.0f;
 
 	if (gOrgWait == -1)
 	{
 		//Mix sounds to primary buffer
 		for (SOUNDBUFFER *sound = soundBuffers; sound != NULL; sound = sound->next)
-			sound->Mix(buffer, frames_total);
+			sound->Mix(stream, frames_total);
 	}
 	else
 	{
@@ -245,11 +239,44 @@ void AudioCallback(void *userdata, Uint8 *stream, int len)
 
 			//Mix sounds to primary buffer
 			for (SOUNDBUFFER *sound = soundBuffers; sound != NULL; sound = sound->next)
-				sound->Mix(buffer + frames_done * 2, frames_to_do);
+				sound->Mix(stream + frames_done * 2, frames_to_do);
 
 			frames_done += frames_to_do;
 			organya_countdown -= frames_to_do;
 		}
+	}
+}
+
+static void Callback(void *user_data, Uint8 *stream_uint8, int len)
+{
+	(void)user_data;
+
+	short *stream = (short*)stream_uint8;
+	const size_t frames_total = len / sizeof(short) / 2;
+
+	size_t frames_done = 0;
+
+	while (frames_done != frames_total)
+	{
+		float mix_buffer[0x800 * 2];	// 2 because stereo
+
+		size_t subframes = MIN(0x800, frames_total - frames_done);
+
+		memset(mix_buffer, 0, subframes * sizeof(float) * 2);
+
+		MixSoundsAndUpdateOrganya(mix_buffer, subframes);
+
+		for (size_t i = 0; i < subframes * 2; ++i)
+		{
+			if (mix_buffer[i] > 1.0f)
+				*stream++ = 0x7FFF;
+			else if (mix_buffer[i] < -1.0f)
+				*stream++ = -0x7FFF;
+			else
+				*stream++ = mix_buffer[i] * 0x7FFF;
+		}
+
+		frames_done += subframes;
 	}
 }
 
@@ -267,10 +294,10 @@ BOOL InitDirectSound()
 	//Set specifications we want
 	SDL_memset(&want, 0, sizeof(want));
 	want.freq = FREQUENCY;
-	want.format = AUDIO_F32;
+	want.format = AUDIO_S16;
 	want.channels = 2;
 	want.samples = STREAM_SIZE;
-	want.callback = AudioCallback;
+	want.callback = Callback;
 
 	audioDevice = SDL_OpenAudioDevice(NULL, 0, &want, &have, 0);
 
