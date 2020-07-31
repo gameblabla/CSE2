@@ -52,8 +52,8 @@ SOUNDBUFFER::SOUNDBUFFER(size_t bufSize)
 	samplePosition = 0.0;
 
 	//Create waveform buffer
-	data = new unsigned char[bufSize];
-	memset(data, 0x80, bufSize);
+	data = new signed char[bufSize];
+	memset(data, 0, bufSize);
 
 	//Add to buffer list
 	this->next = soundBuffers;
@@ -97,7 +97,7 @@ void SOUNDBUFFER::Lock(unsigned char **outBuffer, size_t *outSize)
 	SDL_LockAudioDevice(audioDevice);
 
 	if (outBuffer != NULL)
-		*outBuffer = data;
+		*outBuffer = (unsigned char*)data;
 
 	if (outSize != NULL)
 		*outSize = size;
@@ -105,6 +105,9 @@ void SOUNDBUFFER::Lock(unsigned char **outBuffer, size_t *outSize)
 
 void SOUNDBUFFER::Unlock()
 {
+	for (size_t i = 0; i < size; ++i)
+		data[i] -= 0x80;
+
 	SDL_UnlockAudioDevice(audioDevice);
 }
 
@@ -177,7 +180,7 @@ void SOUNDBUFFER::Mix(float *buffer, size_t frames)
 		const float sampleA = sample1 + (sample2 - sample1) * subPos;
 
 		//Convert sample to float32
-		const float sampleConvert = (sampleA - 128.0f) / 128.0f;
+		const float sampleConvert = sampleA / 128.0f;
 
 		//Mix
 		*buffer++ += (float)(sampleConvert * volume * volume_l);

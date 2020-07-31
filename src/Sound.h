@@ -29,7 +29,7 @@ class SOUNDBUFFER
 		SOUNDBUFFER *next;
 
 	private:
-		unsigned char *data;
+		signed char *data;
 		size_t size;
 
 		bool playing;
