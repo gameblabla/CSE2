@@ -52,8 +52,8 @@ SOUNDBUFFER::SOUNDBUFFER(size_t bufSize)
 	samplePosition = 0.0;
 
 	//Create waveform buffer
-	data = new signed char[bufSize];
-	memset(data, 0, bufSize);
+	data = new signed char[bufSize + 1];
+	memset(data, 0, bufSize + 1);
 
 	//Add to buffer list
 	this->next = soundBuffers;
@@ -152,6 +152,9 @@ void SOUNDBUFFER::Play(bool bLooping)
 	SDL_LockAudioDevice(audioDevice);
 	playing = true;
 	looping = bLooping;
+
+	data[size] = bLooping ? data[0] : 0;
+
 	SDL_UnlockAudioDevice(audioDevice);
 }
 
@@ -172,8 +175,8 @@ void SOUNDBUFFER::Mix(float *buffer, size_t frames)
 		const double freqPosition = frequency / FREQUENCY; //This is added to position at the end
 
 		//Get the in-between sample this is (linear interpolation)
-		const float sample1 = ((looped || ((size_t)samplePosition) >= 1) ? data[(size_t)samplePosition] : 128.0f);
-		const float sample2 = ((looping || (((size_t)samplePosition) + 1) < size) ? data[(((size_t)samplePosition) + 1) % size] : 128.0f);
+		const float sample1 = data[(size_t)samplePosition];
+		const float sample2 = data[((size_t)samplePosition) + 1];
 
 		//Interpolate sample
 		const float subPos = (float)fmod(samplePosition, 1.0);
