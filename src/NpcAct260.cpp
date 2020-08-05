@@ -5,6 +5,7 @@
 #include "WindowsWrapper.h"
 
 #include "Caret.h"
+#include "CommonDefines.h"
 #include "Frame.h"
 #include "Game.h"
 #include "Map.h"
@@ -1527,15 +1528,15 @@ void ActNpc271(NPCHAR *npc)
 	if (npc->ym < 0 && npc->y - npc->hit.top < 8 * 0x200)
 	{
 		npc->ym *= -1;
-		SetCaret(npc->x, npc->y - (8 * 0x200), 13, 0);
-		SetCaret(npc->x, npc->y - (8 * 0x200), 13, 0);
+		SetCaret(npc->x, npc->y - (8 * 0x200), CARET_TINY_PARTICLES, DIR_LEFT);
+		SetCaret(npc->x, npc->y - (8 * 0x200), CARET_TINY_PARTICLES, DIR_LEFT);
 	}
 
 	if (npc->ym > 0 && npc->y + npc->hit.bottom > 232 * 0x200)
 	{
 		npc->ym *= -1;
-		SetCaret(npc->x, npc->y + (8 * 0x200), 13, 0);
-		SetCaret(npc->x, npc->y + (8 * 0x200), 13, 0);
+		SetCaret(npc->x, npc->y + (8 * 0x200), CARET_TINY_PARTICLES, DIR_LEFT);
+		SetCaret(npc->x, npc->y + (8 * 0x200), CARET_TINY_PARTICLES, DIR_LEFT);
 	}
 
 	npc->x += npc->xm;

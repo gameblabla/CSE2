@@ -6,6 +6,7 @@
 
 #include "Bullet.h"
 #include "Caret.h"
+#include "CommonDefines.h"
 #include "Frame.h"
 #include "Game.h"
 #include "KeyControl.h"
@@ -167,7 +168,7 @@ void ActNpc321(NPCHAR *npc)
 	if (g_GameFlags & 2 && CountBulletNum(43) < 2 && gKeyTrg & gKeyShot)
 	{
 		SetBullet(43, npc->pNpc->x, npc->pNpc->y, direct);
-		SetCaret(npc->pNpc->x, npc->pNpc->y, 3, 0);
+		SetCaret(npc->pNpc->x, npc->pNpc->y, CARET_SHOOT, DIR_LEFT);
 		PlaySoundObject(117, SOUND_MODE_PLAY);
 	}
 
@@ -767,7 +768,7 @@ void ActNpc331(NPCHAR *npc)
 			if (npc->flag & 8)
 			{
 				npc->cond = 0;
-				SetCaret(npc->x, npc->y, 2, 0);
+				SetCaret(npc->x, npc->y, CARET_PROJECTILE_DISSIPATION, DIR_LEFT);
 			}
 
 			break;

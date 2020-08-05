@@ -819,7 +819,7 @@ void ActNpc048(NPCHAR *npc)
 		if (++npc->count1 > 2 || npc->direct == 2)
 		{
 			VanishNpChar(npc);
-			SetCaret(npc->x, npc->y, 2, 0);
+			SetCaret(npc->x, npc->y, CARET_PROJECTILE_DISSIPATION, DIR_LEFT);
 		}
 		else
 		{
@@ -856,7 +856,7 @@ void ActNpc048(NPCHAR *npc)
 
 	if (++npc->act_wait > 750)
 	{
-		SetCaret(npc->x, npc->y, 2, 0);
+		SetCaret(npc->x, npc->y, CARET_PROJECTILE_DISSIPATION, DIR_LEFT);
 		npc->cond = 0;
 	}
 
@@ -1064,7 +1064,7 @@ void ActNpc050(NPCHAR *npc)
 			{
 				if (++npc->count1 > 1)
 				{
-					SetCaret(npc->x, npc->y, 2, 0);
+					SetCaret(npc->x, npc->y, CARET_PROJECTILE_DISSIPATION, DIR_LEFT);
 					npc->cond = 0;
 				}
 			}

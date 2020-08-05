@@ -413,7 +413,7 @@ void ActNpc141(NPCHAR *npc)
 			{
 				npc->act_no = 20;
 				npc->act_wait = 0;
-				SetCaret(npc->x, npc->y, 2, 0);
+				SetCaret(npc->x, npc->y, CARET_PROJECTILE_DISSIPATION, DIR_LEFT);
 				PlaySoundObject(12, SOUND_MODE_PLAY);
 
 				for (i = 0; i < 4; ++i)
@@ -952,7 +952,7 @@ void ActNpc148(NPCHAR *npc)
 {
 	if (npc->flag & 0xFF)
 	{
-		SetCaret(npc->x, npc->y, 2, 0);
+		SetCaret(npc->x, npc->y, CARET_PROJECTILE_DISSIPATION, DIR_LEFT);
 		npc->cond = 0;
 	}
 
@@ -971,7 +971,7 @@ void ActNpc148(NPCHAR *npc)
 
 	if (++npc->count1 > 300)
 	{
-		SetCaret(npc->x, npc->y, 2, 0);
+		SetCaret(npc->x, npc->y, CARET_PROJECTILE_DISSIPATION, DIR_LEFT);
 		npc->cond = 0;
 	}
 }
@@ -1734,7 +1734,7 @@ void ActNpc156(NPCHAR *npc)
 {
 	if (npc->flag & 0xFF)
 	{
-		SetCaret(npc->x, npc->y, 2, 0);
+		SetCaret(npc->x, npc->y, CARET_PROJECTILE_DISSIPATION, DIR_LEFT);
 		npc->cond = 0;
 	}
 
@@ -1754,7 +1754,7 @@ void ActNpc156(NPCHAR *npc)
 
 	if (++npc->count1 > 300)
 	{
-		SetCaret(npc->x, npc->y, 2, 0);
+		SetCaret(npc->x, npc->y, CARET_PROJECTILE_DISSIPATION, DIR_LEFT);
 		npc->cond = 0;
 	}
 }
@@ -1956,7 +1956,7 @@ void ActNpc158(NPCHAR *npc)
 	if (++npc->ani_wait > 2)
 	{
 		npc->ani_wait = 0;
-		SetCaret(npc->x, npc->y, 7, 4);
+		SetCaret(npc->x, npc->y, CARET_EXHAUST, DIR_AUTO);
 	}
 
 	npc->ani_no = (npc->count1 + 0x10) / 0x20;

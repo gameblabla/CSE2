@@ -7,6 +7,7 @@
 #include "Back.h"
 #include "Bullet.h"
 #include "Caret.h"
+#include "CommonDefines.h"
 #include "Flags.h"
 #include "Frame.h"
 #include "Game.h"
@@ -386,12 +387,12 @@ void ActNpc181(NPCHAR *npc)
 					if (npc->direct == 0)
 					{
 						SetBullet(12, npc->x - (4 * 0x200), npc->y + (3 * 0x200), 0);
-						SetCaret(npc->x - (4 * 0x200), npc->y + (3 * 0x200), 3, 0);
+						SetCaret(npc->x - (4 * 0x200), npc->y + (3 * 0x200), CARET_SHOOT, DIR_LEFT);
 					}
 					else
 					{
 						SetBullet(12, npc->x + (4 * 0x200), npc->y + (3 * 0x200), 2);
-						SetCaret(npc->x + (4 * 0x200), npc->y + (3 * 0x200), 3, 0);
+						SetCaret(npc->x + (4 * 0x200), npc->y + (3 * 0x200), CARET_SHOOT, DIR_LEFT);
 					}
 				}
 				else
@@ -399,12 +400,12 @@ void ActNpc181(NPCHAR *npc)
 					if (npc->direct == 0)
 					{
 						SetBullet(12, npc->x - (2 * 0x200), npc->y - (4 * 0x200), 1);
-						SetCaret(npc->x - (2 * 0x200), npc->y - (4 * 0x200), 3, 0);
+						SetCaret(npc->x - (2 * 0x200), npc->y - (4 * 0x200), CARET_SHOOT, DIR_LEFT);
 					}
 					else
 					{
 						SetBullet(12, npc->x + (2 * 0x200), npc->y - (4 * 0x200), 1);
-						SetCaret(npc->x + (2 * 0x200), npc->y - (4 * 0x200), 3, 0);
+						SetCaret(npc->x + (2 * 0x200), npc->y - (4 * 0x200), CARET_SHOOT, DIR_LEFT);
 					}
 				}
 			}
@@ -493,12 +494,12 @@ void ActNpc182(NPCHAR *npc)
 					if (npc->direct == 0)
 					{
 						SetBullet(6, npc->x - (4 * 0x200), npc->y + (3 * 0x200), 0);
-						SetCaret(npc->x - (4 * 0x200), npc->y + (3 * 0x200), 3, 0);
+						SetCaret(npc->x - (4 * 0x200), npc->y + (3 * 0x200), CARET_SHOOT, DIR_LEFT);
 					}
 					else
 					{
 						SetBullet(6, npc->x + (4 * 0x200), npc->y + (3 * 0x200), 2);
-						SetCaret(npc->x + (4 * 0x200), npc->y + (3 * 0x200), 3, 0);
+						SetCaret(npc->x + (4 * 0x200), npc->y + (3 * 0x200), CARET_SHOOT, DIR_LEFT);
 					}
 				}
 				else
@@ -506,12 +507,12 @@ void ActNpc182(NPCHAR *npc)
 					if (npc->direct == 0)
 					{
 						SetBullet(6, npc->x - (2 * 0x200), npc->y - (4 * 0x200), 1);
-						SetCaret(npc->x - (2 * 0x200), npc->y - (4 * 0x200), 3, 0);
+						SetCaret(npc->x - (2 * 0x200), npc->y - (4 * 0x200), CARET_SHOOT, DIR_LEFT);
 					}
 					else
 					{
 						SetBullet(6, npc->x + (2 * 0x200), npc->y - (4 * 0x200), 1);
-						SetCaret(npc->x + (2 * 0x200), npc->y - (4 * 0x200), 3, 0);
+						SetCaret(npc->x + (2 * 0x200), npc->y - (4 * 0x200), CARET_SHOOT, DIR_LEFT);
 					}
 				}
 			}
@@ -1184,9 +1185,9 @@ void ActNpc192(NPCHAR *npc)
 		PlaySoundObject(34, SOUND_MODE_PLAY);
 
 		if (npc->direct == 0)
-			SetCaret(npc->x + (10 * 0x200), npc->y + (10 * 0x200), 7, 2);
+			SetCaret(npc->x + (10 * 0x200), npc->y + (10 * 0x200), CARET_EXHAUST, DIR_RIGHT);
 		else
-			SetCaret(npc->x - (10 * 0x200), npc->y + (10 * 0x200), 7, 0);
+			SetCaret(npc->x - (10 * 0x200), npc->y + (10 * 0x200), CARET_EXHAUST, DIR_LEFT);
 	}
 
 	RECT rcLeft[2] = {

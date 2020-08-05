@@ -7,6 +7,7 @@
 
 #include "Draw.h"
 #include "Caret.h"
+#include "CommonDefines.h"
 #include "Game.h"
 #include "KeyControl.h"
 #include "MyChar.h"
@@ -204,7 +205,7 @@ void ActBullet_Frontia1(BULLET *bul)
 	if (++bul->count1 > bul->life_count)
 	{
 		bul->cond = 0;
-		SetCaret(bul->x, bul->y, 3, 0);
+		SetCaret(bul->x, bul->y, CARET_SHOOT, DIR_LEFT);
 		return;
 	}
 
@@ -271,7 +272,7 @@ void ActBullet_Frontia2(BULLET *bul, int level)
 	if (++bul->count1 > bul->life_count)
 	{
 		bul->cond = 0;
-		SetCaret(bul->x, bul->y, 3, 0);
+		SetCaret(bul->x, bul->y, CARET_SHOOT, DIR_LEFT);
 		return;
 	}
 
@@ -396,7 +397,7 @@ void ActBullet_PoleStar(BULLET *bul, int level)
 	if (++bul->count1 > bul->life_count)
 	{
 		bul->cond = 0;
-		SetCaret(bul->x, bul->y, 3, 0);
+		SetCaret(bul->x, bul->y, CARET_SHOOT, DIR_LEFT);
 		return;
 	}
 
@@ -518,7 +519,7 @@ void ActBullet_FireBall(BULLET *bul, int level)
 	if (++bul->count1 > bul->life_count)
 	{
 		bul->cond = 0;
-		SetCaret(bul->x, bul->y, 3, 0);
+		SetCaret(bul->x, bul->y, CARET_SHOOT, DIR_LEFT);
 		return;
 	}
 
@@ -536,7 +537,7 @@ void ActBullet_FireBall(BULLET *bul, int level)
 	if (bBreak)
 	{
 		bul->cond = 0;
-		SetCaret(bul->x, bul->y, 2, 0);
+		SetCaret(bul->x, bul->y, CARET_PROJECTILE_DISSIPATION, DIR_LEFT);
 		PlaySoundObject(28, SOUND_MODE_PLAY);
 		return;
 	}
@@ -687,7 +688,7 @@ void ActBullet_MachineGun(BULLET *bul, int level)
 	if (++bul->count1 > bul->life_count)
 	{
 		bul->cond = 0;
-		SetCaret(bul->x, bul->y, 3, 0);
+		SetCaret(bul->x, bul->y, CARET_SHOOT, DIR_LEFT);
 		return;
 	}
 
@@ -766,7 +767,7 @@ void ActBullet_Missile(BULLET *bul, int level)
 	if (++bul->count1 > bul->life_count)
 	{
 		bul->cond = 0;
-		SetCaret(bul->x, bul->y, 3, 0);
+		SetCaret(bul->x, bul->y, CARET_SHOOT, DIR_LEFT);
 		return;
 	}
 
@@ -919,17 +920,17 @@ void ActBullet_Missile(BULLET *bul, int level)
 
 		switch (bul->direct)
 		{
-			case 0:
-				SetCaret(bul->x + (8 * 0x200), bul->y, 7, 2);
+			case DIR_LEFT:
+				SetCaret(bul->x + (8 * 0x200), bul->y, CARET_EXHAUST, DIR_RIGHT);
 				break;
-			case 1:
-				SetCaret(bul->x, bul->y + (8 * 0x200), 7, 3);
+			case DIR_UP:
+				SetCaret(bul->x, bul->y + (8 * 0x200), CARET_EXHAUST, DIR_DOWN);
 				break;
-			case 2:
-				SetCaret(bul->x - (8 * 0x200), bul->y, 7, 0);
+			case DIR_RIGHT:
+				SetCaret(bul->x - (8 * 0x200), bul->y, CARET_EXHAUST, DIR_LEFT);
 				break;
-			case 3:
-				SetCaret(bul->x, bul->y - (8 * 0x200), 7, 1);
+			case DIR_DOWN:
+				SetCaret(bul->x, bul->y - (8 * 0x200), CARET_EXHAUST, DIR_UP);
 				break;
 		}
 	}
@@ -1022,7 +1023,7 @@ void ActBullet_Bubblin1(BULLET *bul)
 	if (bul->flag & 0x2FF)
 	{
 		bul->cond = 0;
-		SetCaret(bul->x, bul->y, 2, 0);
+		SetCaret(bul->x, bul->y, CARET_PROJECTILE_DISSIPATION, DIR_LEFT);
 		return;
 	}
 
@@ -1072,7 +1073,7 @@ void ActBullet_Bubblin1(BULLET *bul)
 	if (++bul->act_wait > 40)
 	{
 		bul->cond = 0;
-		SetCaret(bul->x, bul->y, 15, 0);
+		SetCaret(bul->x, bul->y, CARET_PROJECTILE_DISSIPATION_TINY, DIR_LEFT);
 	}
 
 	RECT rect[4] = {
@@ -1110,7 +1111,7 @@ void ActBullet_Bubblin2(BULLET *bul)
 	if (bDelete)
 	{
 		bul->cond = 0;
-		SetCaret(bul->x, bul->y, 2, 0);
+		SetCaret(bul->x, bul->y, CARET_PROJECTILE_DISSIPATION, DIR_LEFT);
 		return;
 	}
 
@@ -1164,7 +1165,7 @@ void ActBullet_Bubblin2(BULLET *bul)
 	if (++bul->act_wait > 60)
 	{
 		bul->cond = 0;
-		SetCaret(bul->x, bul->y, 15, 0);
+		SetCaret(bul->x, bul->y, CARET_PROJECTILE_DISSIPATION_TINY, DIR_LEFT);
 	}
 
 	RECT rect[4] = {
@@ -1191,7 +1192,7 @@ void ActBullet_Bubblin3(BULLET *bul)
 	if (++bul->act_wait > 100 || !(gKey & gKeyShot))
 	{
 		bul->cond = 0;
-		SetCaret(bul->x, bul->y, 2, 0);
+		SetCaret(bul->x, bul->y, CARET_PROJECTILE_DISSIPATION, DIR_LEFT);
 		PlaySoundObject(100, SOUND_MODE_PLAY);
 
 		if (gMC.up)
@@ -1279,7 +1280,7 @@ void ActBullet_Spine(BULLET *bul)
 	if (++bul->count1 > bul->life_count || bul->flag & 8)
 	{
 		bul->cond = 0;
-		SetCaret(bul->x, bul->y, 3, 0);
+		SetCaret(bul->x, bul->y, CARET_SHOOT, DIR_LEFT);
 		return;
 	}
 
@@ -1355,7 +1356,7 @@ void ActBullet_Sword1(BULLET *bul)
 	if (++bul->count1 > bul->life_count)
 	{
 		bul->cond = 0;
-		SetCaret(bul->x, bul->y, 3, 0);
+		SetCaret(bul->x, bul->y, CARET_SHOOT, DIR_LEFT);
 		return;
 	}
 
@@ -1425,7 +1426,7 @@ void ActBullet_Sword2(BULLET *bul)
 	if (++bul->count1 > bul->life_count)
 	{
 		bul->cond = 0;
-		SetCaret(bul->x, bul->y, 3, 0);
+		SetCaret(bul->x, bul->y, CARET_SHOOT, DIR_LEFT);
 		return;
 	}
 
@@ -1560,7 +1561,7 @@ void ActBullet_Sword3(BULLET *bul)
 			if (bul->count1 > bul->life_count)
 			{
 				bul->cond = 0;
-				SetCaret(bul->x, bul->y, 3, 0);
+				SetCaret(bul->x, bul->y, CARET_SHOOT, DIR_LEFT);
 				return;
 			}
 
@@ -1692,7 +1693,7 @@ void ActBullet_SuperMissile(BULLET *bul, int level)
 	if (++bul->count1 > bul->life_count)
 	{
 		bul->cond = 0;
-		SetCaret(bul->x, bul->y, 3, 0);
+		SetCaret(bul->x, bul->y, CARET_SHOOT, DIR_LEFT);
 		return;
 	}
 
@@ -1850,17 +1851,17 @@ void ActBullet_SuperMissile(BULLET *bul, int level)
 
 		switch (bul->direct)
 		{
-			case 0:
-				SetCaret(bul->x + (8 * 0x200), bul->y, 7, 2);
+			case DIR_LEFT:
+				SetCaret(bul->x + (8 * 0x200), bul->y, CARET_EXHAUST, DIR_RIGHT);
 				break;
-			case 1:
-				SetCaret(bul->x, bul->y + (8 * 0x200), 7, 3);
+			case DIR_UP:
+				SetCaret(bul->x, bul->y + (8 * 0x200), CARET_EXHAUST, DIR_DOWN);
 				break;
-			case 2:
-				SetCaret(bul->x - (8 * 0x200), bul->y, 7, 0);
+			case DIR_RIGHT:
+				SetCaret(bul->x - (8 * 0x200), bul->y, CARET_EXHAUST, DIR_LEFT);
 				break;
-			case 3:
-				SetCaret(bul->x, bul->y - (8 * 0x200), 7, 1);
+			case DIR_DOWN:
+				SetCaret(bul->x, bul->y - (8 * 0x200), CARET_EXHAUST, DIR_UP);
 				break;
 		}
 	}
@@ -1944,7 +1945,7 @@ void ActBullet_Nemesis(BULLET *bul, int level)
 	if (++bul->count1 > bul->life_count)
 	{
 		bul->cond = 0;
-		SetCaret(bul->x, bul->y, 3, 0);
+		SetCaret(bul->x, bul->y, CARET_SHOOT, DIR_LEFT);
 		return;
 	}
 
@@ -2052,7 +2053,7 @@ void ActBullet_Spur(BULLET *bul, int level)
 	if (++bul->count1 > bul->life_count)
 	{
 		bul->cond = 0;
-		SetCaret(bul->x, bul->y, 3, 0);
+		SetCaret(bul->x, bul->y, CARET_SHOOT, DIR_LEFT);
 		return;
 	}
 

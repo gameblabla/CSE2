@@ -1917,7 +1917,7 @@ void ActNpc357(NPCHAR *npc)
 	}
 
 	if (npc->act_wait % 8 == 1)
-		SetCaret(npc->x + (Random(-8, 8) * 0x200), npc->y + 0x1000, 13, 1);
+		SetCaret(npc->x + (Random(-8, 8) * 0x200), npc->y + 0x1000, CARET_TINY_PARTICLES, DIR_UP);
 }
 
 // Misery (stood in the wind during the credits)

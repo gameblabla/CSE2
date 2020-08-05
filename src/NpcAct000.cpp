@@ -6,6 +6,7 @@
 
 #include "Back.h"
 #include "Caret.h"
+#include "CommonDefines.h"
 #include "Frame.h"
 #include "Game.h"
 #include "Map.h"
@@ -1051,7 +1052,7 @@ void ActNpc011(NPCHAR *npc)
 	if (npc->flag & 0xFF)
 	{
 		npc->cond = 0;
-		SetCaret(npc->x, npc->y, 2, 0);
+		SetCaret(npc->x, npc->y, CARET_PROJECTILE_DISSIPATION, DIR_LEFT);
 	}
 
 	npc->y += npc->ym;
@@ -1075,7 +1076,7 @@ void ActNpc011(NPCHAR *npc)
 
 	if (++npc->count1 > 150)
 	{
-		SetCaret(npc->x, npc->y, 2, 0);
+		SetCaret(npc->x, npc->y, CARET_PROJECTILE_DISSIPATION, DIR_LEFT);
 		npc->cond = 0;
 	}
 }

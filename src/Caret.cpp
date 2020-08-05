@@ -4,6 +4,7 @@
 
 #include "WindowsWrapper.h"
 
+#include "CommonDefines.h"
 #include "Draw.h"
 #include "Game.h"
 #include "Triangle.h"
@@ -38,24 +39,24 @@ CARET gCrt[CARET_MAX];
 
 // Sprite offsets
 CARET_TABLE gCaretTable[18] = {
-	{0, 0},                   // Null
-	{ 4 * 0x200,  4 * 0x200}, // Bubble
-	{ 8 * 0x200,  8 * 0x200}, // Projectile dissipation
-	{ 8 * 0x200,  8 * 0x200}, // Shoot
-	{ 8 * 0x200,  8 * 0x200}, // Snake after-image? This doesn't seem to be used.
-	{ 4 * 0x200,  4 * 0x200}, // 'Zzz' - snoring
-	{ 8 * 0x200,  8 * 0x200}, // Duplicate of the Snake after-image
-	{ 4 * 0x200,  4 * 0x200}, // Exhaust (used by the Booster and hoverbike)
-	{ 8 * 0x200,  8 * 0x200}, // Drowned Quote
-	{ 8 * 0x200,  8 * 0x200}, // The '?' that appears when you press the down key
-	{28 * 0x200,  8 * 0x200}, // 'Level Up!'
-	{ 4 * 0x200,  4 * 0x200}, // Red hurt particles (used by bosses and invisible hidden pickups)
-	{16 * 0x200, 16 * 0x200}, // Missile Launcher explosion flash
-	{ 4 * 0x200,  4 * 0x200}, // Dust particles (used when Quote jumps into the ceiling)
-	{20 * 0x200, 20 * 0x200}, // Broken (unknown and unused)
-	{ 4 * 0x200,  4 * 0x200}, // Tiny version of the projectile dissipation effect
-	{20 * 0x200,  4 * 0x200}, // 'Empty!'
-	{52 * 0x200,  4 * 0x200}  // 'PUSH JUMP KEY!' (unused)
+	{0, 0},                   // CARET_NULL
+	{ 4 * 0x200,  4 * 0x200}, // CARET_BUBBLE
+	{ 8 * 0x200,  8 * 0x200}, // CARET_PROJECTILE_DISSIPATION
+	{ 8 * 0x200,  8 * 0x200}, // CARET_SHOOT
+	{ 8 * 0x200,  8 * 0x200}, // CARET_SNAKE_AFTERIMAGE
+	{ 4 * 0x200,  4 * 0x200}, // CARET_ZZZ
+	{ 8 * 0x200,  8 * 0x200}, // CARET_SNAKE_AFTERIMAGE_DUPLICATE
+	{ 4 * 0x200,  4 * 0x200}, // CARET_EXHAUST
+	{ 8 * 0x200,  8 * 0x200}, // CARET_DROWNED_QUOTE
+	{ 8 * 0x200,  8 * 0x200}, // CARET_QUESTION_MARK
+	{28 * 0x200,  8 * 0x200}, // CARET_LEVEL_UP
+	{ 4 * 0x200,  4 * 0x200}, // CARET_HURT_PARTICLES
+	{16 * 0x200, 16 * 0x200}, // CARET_EXPLOSION
+	{ 4 * 0x200,  4 * 0x200}, // CARET_TINY_PARTICLES
+	{20 * 0x200, 20 * 0x200}, // CARET_UNKNOWN
+	{ 4 * 0x200,  4 * 0x200}, // CARET_PROJECTILE_DISSIPATION_TINY
+	{20 * 0x200,  4 * 0x200}, // CARET_EMPTY
+	{52 * 0x200,  4 * 0x200}  // CARET_PUSH_JUMP_KEY
 };
 
 void InitCaret(void)
@@ -464,7 +465,7 @@ void ActCaret12(CARET *crt)
 	crt->rect = rcLeft[crt->ani_no];
 }
 
-// Particles used when Quote jumps into the ceiling
+// Particles used when Quote jumps into the ceiling, and also used by the Demon Crown and Ballos's puppy
 void ActCaret13(CARET *crt)
 {
 	RECT rcLeft[2] = {
@@ -478,12 +479,12 @@ void ActCaret13(CARET *crt)
 
 		switch (crt->direct)
 		{
-			case 0:
+			case DIR_LEFT:
 				crt->xm = Random(-0x600, 0x600);
 				crt->ym = Random(-0x200, 0x200);
 				break;
 
-			case 1:
+			case DIR_UP:
 				crt->ym = -0x200 * Random(1, 3);
 				break;
 		}
@@ -491,7 +492,7 @@ void ActCaret13(CARET *crt)
 
 	switch (crt->direct)
 	{
-		case 0:
+		case DIR_LEFT:
 			crt->xm = (crt->xm * 4) / 5;
 			crt->ym = (crt->ym * 4) / 5;
 			break;
@@ -505,7 +506,7 @@ void ActCaret13(CARET *crt)
 
 	crt->rect = rcLeft[crt->ani_wait / 2 % 2];
 
-	if (crt->direct == 5)
+	if (crt->direct == DIR_OTHER)
 		crt->x -= 4 * 0x200;
 }
 
