@@ -111,7 +111,7 @@ void ActCaret01(CARET *crt)
 		}
 	}
 
-	if (crt->direct == 0)
+	if (crt->direct == DIR_LEFT)
 		crt->rect = rcLeft[crt->ani_no];
 	else
 		crt->rect = rcRight[crt->ani_no];
@@ -142,7 +142,7 @@ void ActCaret02(CARET *crt)
 
 	switch (crt->direct)
 	{
-		case 0:
+		case DIR_LEFT:
 			crt->ym -= 0x10;
 			crt->y += crt->ym;
 
@@ -163,7 +163,7 @@ void ActCaret02(CARET *crt)
 			crt->rect = rect_left[crt->ani_no];
 			break;
 
-		case 2:
+		case DIR_RIGHT:
 			if (++crt->ani_wait > 2)
 			{
 				crt->ani_wait = 0;
@@ -181,7 +181,7 @@ void ActCaret02(CARET *crt)
 			crt->rect = rect_right[crt->ani_no];
 			break;
 
-		case 1:
+		case DIR_UP:
 			crt->rect = rect_up[++crt->ani_wait / 2 % 3];
 
 			if (crt->ani_wait > 24)
@@ -316,16 +316,16 @@ void ActCaret07(CARET *crt)
 
 	switch (crt->direct)
 	{
-		case 0:
+		case DIR_LEFT:
 			crt->x -= 2 * 0x200;
 			break;
-		case 1:
+		case DIR_UP:
 			crt->y -= 2 * 0x200;
 			break;
-		case 2:
+		case DIR_RIGHT:
 			crt->x += 2 * 0x200;
 			break;
-		case 3:
+		case DIR_DOWN:
 			crt->y += 2 * 0x200;
 			break;
 	}
@@ -337,7 +337,7 @@ void ActCaret08(CARET *crt)
 	RECT rcLeft = {16, 80, 32, 96};
 	RECT rcRight = {32, 80, 48, 96};
 
-	if (crt->direct == 0)
+	if (crt->direct == DIR_LEFT)
 		crt->rect = rcLeft;
 	else
 		crt->rect = rcRight;
@@ -355,7 +355,7 @@ void ActCaret09(CARET *crt)
 	if (crt->ani_wait == 32)
 		crt->cond = 0;
 
-	if (crt->direct == 0)
+	if (crt->direct == DIR_LEFT)
 		crt->rect = rcLeft;
 	else
 		crt->rect = rcRight;
@@ -376,7 +376,7 @@ void ActCaret10(CARET *crt)
 
 	++crt->ani_wait;
 
-	if (crt->direct == 0)
+	if (crt->direct == DIR_LEFT)
 	{
 		if (crt->ani_wait < 20)
 			crt->y -= 2 * 0x200;
@@ -393,7 +393,7 @@ void ActCaret10(CARET *crt)
 			crt->cond = 0;
 	}
 
-	if (crt->direct == 0)
+	if (crt->direct == DIR_LEFT)
 		crt->rect = rcLeft[crt->ani_wait / 2 % 2];
 	else
 		crt->rect = rcRight[crt->ani_wait / 2 % 2];
