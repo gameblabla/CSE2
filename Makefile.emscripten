@@ -5,7 +5,7 @@ BUILD_DIRECTORY = game
 ASSETS_DIRECTORY = assets
 
 ifeq ($(RELEASE), 1)
-	CXXFLAGS = -O1 -fno-rtti -fno-exceptions
+	CXXFLAGS = -O2 -fno-rtti -fno-exceptions
 	LDFLAGS = -s
 	FILENAME_DEF = CSE2
 else
