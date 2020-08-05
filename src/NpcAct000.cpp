@@ -34,7 +34,7 @@ void ActNpc000(NPCHAR *npc)
 void ActNpc001(NPCHAR *npc)
 {
 	// In wind
-	if (gBack.type == 5 || gBack.type == 6)
+	if (gBack.type == BACKGROUND_TYPE_AUTOSCROLL || gBack.type == BACKGROUND_TYPE_OUTSIDE_WITH_WIND)
 	{
 		if (npc->act_no == 0)
 		{

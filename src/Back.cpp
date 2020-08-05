@@ -16,10 +16,9 @@ static unsigned long color_black;
 // TODO - Another function that has an incorrect stack frame
 BOOL InitBack(const char *fName, int type)
 {
-	// Unused
-	color_black = GetCortBoxColor(RGB(0, 0, 0x10));
+	color_black = GetCortBoxColor(RGB(0, 0, 0x10));	// Unused. This may have once been used by background type 4 (the solid black background)
 
-	// Get width and height
+	// We're not actually loading the bitmap here - we're just reading its width/height and making sure it's really a BMP file
 	char path[MAX_PATH];
 	sprintf(path, "%s\\%s.pbm", gDataPath, fName);
 
@@ -27,15 +26,15 @@ BOOL InitBack(const char *fName, int type)
 	if (fp == NULL)
 		return FALSE;
 
-	// This is ridiculously platform-dependant:
+	// This code is ridiculously platform-dependant:
 	// It should break on big-endian CPUs, and platforms where short isn't 16-bit and long isn't 32-bit.
-	unsigned short bmp_header_buffer[7];	// These names aren't the original. This ruins the stack frame layout.
+	unsigned short bmp_header_buffer[7];	// The original names for these variables are unknown. This ruins the stack frame layout.
 	unsigned long bmp_header_buffer2[10];
 
 	fread(bmp_header_buffer, 14, 1, fp);
 
 	// Check if this is a valid bitmap file
-	if (bmp_header_buffer[0] != 0x4D42)	// 'MB' (we use hex to prevent a compiler warning)
+	if (bmp_header_buffer[0] != 0x4D42)	// 'MB' (we use hex here to prevent a compiler warning)
 	{
 #ifdef FIX_BUGS
 		// The original game forgets to close fp
@@ -47,11 +46,13 @@ BOOL InitBack(const char *fName, int type)
 	fread(bmp_header_buffer2, 40, 1, fp);
 	fclose(fp);
 
+	// Get bitmap width and height
 	gBack.partsW = bmp_header_buffer2[1];
 	gBack.partsH = bmp_header_buffer2[2];
 
-	// Set background stuff and load texture
-	gBack.flag = TRUE;
+	gBack.flag = TRUE;	// This variable is otherwise unused
+
+	// *Now* we actually load the bitmap
 	if (!ReloadBitmap_File(fName, SURFACE_ID_LEVEL_BACKGROUND))
 		return FALSE;
 
@@ -64,12 +65,12 @@ void ActBack(void)
 {
 	switch (gBack.type)
 	{
-		case 5:
+		case BACKGROUND_TYPE_AUTOSCROLL:
 			gBack.fx += 6 * 0x200;
 			break;
 
-		case 6:
-		case 7:
+		case BACKGROUND_TYPE_OUTSIDE_WITH_WIND:
+		case BACKGROUND_TYPE_OUTSIDE:
 			++gBack.fx;
 			gBack.fx %= 640;
 			break;
@@ -83,36 +84,36 @@ void PutBack(int fx, int fy)
 
 	switch (gBack.type)
 	{
-		case 0:
+		case BACKGROUND_TYPE_STATIONARY:
 			for (y = 0; y < WINDOW_HEIGHT; y += gBack.partsH)
 				for (x = 0; x < WINDOW_WIDTH; x += gBack.partsW)
 					PutBitmap4(&grcGame, x, y, &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
 			break;
 
-		case 1:
+		case BACKGROUND_TYPE_MOVE_DISTANT:
 			for (y = -((fy / 2 / 0x200) % gBack.partsH); y < WINDOW_HEIGHT; y += gBack.partsH)
 				for (x = -((fx / 2 / 0x200) % gBack.partsW); x < WINDOW_WIDTH; x += gBack.partsW)
 					PutBitmap4(&grcGame, x, y, &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
 			break;
 
-		case 2:
+		case BACKGROUND_TYPE_MOVE_NEAR:
 			for (y = -((fy / 0x200) % gBack.partsH); y < WINDOW_HEIGHT; y += gBack.partsH)
 				for (x = -((fx / 0x200) % gBack.partsW); x < WINDOW_WIDTH; x += gBack.partsW)
 					PutBitmap4(&grcGame, x, y, &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
 			break;
 
-		case 5:
+		case BACKGROUND_TYPE_AUTOSCROLL:
 			for (y = -gBack.partsH; y < WINDOW_HEIGHT; y += gBack.partsH)
 				for (x = -((gBack.fx / 0x200) % gBack.partsW); x < WINDOW_WIDTH; x += gBack.partsW)
 					PutBitmap4(&grcGame, x, y, &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
 			break;
 
-		case 6:
-		case 7:
+		case BACKGROUND_TYPE_OUTSIDE_WITH_WIND:
+		case BACKGROUND_TYPE_OUTSIDE:
 			rect.top = 0;
 			rect.bottom = 88;
 			rect.left = 0;
@@ -171,7 +172,7 @@ void PutFront(int fx, int fy)
 
 	switch (gBack.type)
 	{
-		case 3:
+		case BACKGROUND_TYPE_WATER:
 			x_1 = fx / (32 * 0x200);
 			x_2 = x_1 + (((WINDOW_WIDTH + (32 - 1)) / 32) + 1);
 			y_1 = 0;
