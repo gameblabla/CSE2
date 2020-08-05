@@ -38,24 +38,24 @@ CARET gCrt[CARET_MAX];
 
 // Sprite offsets
 CARET_TABLE gCaretTable[18] = {
-	{0, 0},
-	{ 4 * 0x200,  4 * 0x200},
-	{ 8 * 0x200,  8 * 0x200},
-	{ 8 * 0x200,  8 * 0x200},
-	{ 8 * 0x200,  8 * 0x200},
-	{ 4 * 0x200,  4 * 0x200},
-	{ 8 * 0x200,  8 * 0x200},
-	{ 4 * 0x200,  4 * 0x200},
-	{ 8 * 0x200,  8 * 0x200},
-	{ 8 * 0x200,  8 * 0x200},
-	{28 * 0x200,  8 * 0x200},
-	{ 4 * 0x200,  4 * 0x200},
-	{16 * 0x200, 16 * 0x200},
-	{ 4 * 0x200,  4 * 0x200},
-	{20 * 0x200, 20 * 0x200},
-	{ 4 * 0x200,  4 * 0x200},
-	{20 * 0x200,  4 * 0x200},
-	{52 * 0x200,  4 * 0x200}
+	{0, 0},                   // Null
+	{ 4 * 0x200,  4 * 0x200}, // Bubble
+	{ 8 * 0x200,  8 * 0x200}, // Projectile dissipation
+	{ 8 * 0x200,  8 * 0x200}, // Shoot
+	{ 8 * 0x200,  8 * 0x200}, // Snake after-image? This doesn't seem to be used.
+	{ 4 * 0x200,  4 * 0x200}, // 'Zzz' - snoring
+	{ 8 * 0x200,  8 * 0x200}, // Duplicate of the Snake after-image
+	{ 4 * 0x200,  4 * 0x200}, // Exhaust (used by the Booster and hoverbike)
+	{ 8 * 0x200,  8 * 0x200}, // Drowned Quote
+	{ 8 * 0x200,  8 * 0x200}, // The '?' that appears when you press the down key
+	{28 * 0x200,  8 * 0x200}, // 'Level Up!'
+	{ 4 * 0x200,  4 * 0x200}, // Red hurt particles (used by bosses and invisible hidden pickups)
+	{16 * 0x200, 16 * 0x200}, // Missile Launcher explosion flash
+	{ 4 * 0x200,  4 * 0x200}, // Dust particles (used when Quote jumps into the ceiling)
+	{20 * 0x200, 20 * 0x200}, // Broken (unknown and unused)
+	{ 4 * 0x200,  4 * 0x200}, // Tiny version of the projectile dissipation effect
+	{20 * 0x200,  4 * 0x200}, // 'Empty!'
+	{52 * 0x200,  4 * 0x200}  // 'PUSH JUMP KEY!' (unused)
 };
 
 void InitCaret(void)
@@ -63,16 +63,18 @@ void InitCaret(void)
 	memset(gCrt, 0, sizeof(gCrt));
 }
 
+// Null
 void ActCaret00(CARET *crt)
 {
 	(void)crt;
 }
 
+// Bubble
 void ActCaret01(CARET *crt)
 {
 	RECT rcLeft[4] = {
-		{0, 64, 8, 72},
-		{8, 64, 16, 72},
+		{ 0, 64,  8, 72},
+		{ 8, 64, 16, 72},
 		{16, 64, 24, 72},
 		{24, 64, 32, 72},
 	};
@@ -114,10 +116,11 @@ void ActCaret01(CARET *crt)
 		crt->rect = rcRight[crt->ani_no];
 }
 
+// Projectile dissipation
 void ActCaret02(CARET *crt)
 {
 	RECT rect_left[4] = {
-		{0, 32, 16, 48},
+		{ 0, 32, 16, 48},
 		{16, 32, 32, 48},
 		{32, 32, 48, 48},
 		{48, 32, 64, 48},
@@ -131,7 +134,7 @@ void ActCaret02(CARET *crt)
 	};
 
 	RECT rect_up[3] = {
-		{0, 32, 16, 48},
+		{ 0, 32, 16, 48},
 		{32, 32, 48, 48},
 		{16, 32, 32, 48},
 	};
@@ -187,10 +190,11 @@ void ActCaret02(CARET *crt)
 	}
 }
 
+// Shoot
 void ActCaret03(CARET *crt)
 {
 	RECT rect[4] = {
-		{0, 48, 16, 64},
+		{ 0, 48, 16, 64},
 		{16, 48, 32, 64},
 		{32, 48, 48, 64},
 		{48, 48, 64, 64},
@@ -212,19 +216,21 @@ void ActCaret03(CARET *crt)
 	crt->rect = rect[crt->ani_no];
 }
 
+// Snake after-image? This doesn't seem to be used.
 void ActCaret04(CARET *crt)
 {
 	RECT rect[9] = {
-		{64, 32, 80, 48},
-		{80, 32, 96, 48},
+		// Left
+		{64, 32,  80, 48},
+		{80, 32,  96, 48},
 		{96, 32, 112, 48},
-
-		{64, 48, 80, 64},
-		{80, 48, 96, 64},
+		// Up
+		{64, 48,  80, 64},
+		{80, 48,  96, 64},
 		{96, 48, 112, 64},
-
-		{64, 64, 80, 80},
-		{80, 64, 96, 80},
+		// Right
+		{64, 64,  80, 80},
+		{80, 64,  96, 80},
 		{96, 64, 112, 80},
 	};
 
@@ -244,6 +250,7 @@ void ActCaret04(CARET *crt)
 	crt->rect = rect[(crt->direct * 3) + crt->ani_no];
 }
 
+// 'Zzz' - snoring
 void ActCaret05(CARET *crt)
 {
 	RECT rect[7] = {
@@ -276,15 +283,18 @@ void ActCaret05(CARET *crt)
 	crt->rect = rect[crt->ani_no];
 }
 
+// No ActCaret06...
+
+// Exhaust (used by the Booster and hoverbike)
 void ActCaret07(CARET *crt)
 {
 	RECT rcLeft[7] = {
-		{56, 0, 64, 8},
-		{64, 0, 72, 8},
-		{72, 0, 80, 8},
-		{80, 0, 88, 8},
-		{88, 0, 96, 8},
-		{96, 0, 104, 8},
+		{ 56, 0,  64, 8},
+		{ 64, 0,  72, 8},
+		{ 72, 0,  80, 8},
+		{ 80, 0,  88, 8},
+		{ 88, 0,  96, 8},
+		{ 96, 0, 104, 8},
 		{104, 0, 112, 8},
 	};
 
@@ -320,6 +330,7 @@ void ActCaret07(CARET *crt)
 	}
 }
 
+// Drowned Quote
 void ActCaret08(CARET *crt)
 {
 	RECT rcLeft = {16, 80, 32, 96};
@@ -331,6 +342,7 @@ void ActCaret08(CARET *crt)
 		crt->rect = rcRight;
 }
 
+// The '?' that appears when you press the down key
 void ActCaret09(CARET *crt)
 {
 	RECT rcLeft = {0, 80, 16, 96};
@@ -348,15 +360,16 @@ void ActCaret09(CARET *crt)
 		crt->rect = rcRight;
 }
 
+// 'Level Up!'
 void ActCaret10(CARET *crt)
 {
 	RECT rcLeft[2] = {
-		{0, 0, 56, 16},
+		{0,  0, 56, 16},
 		{0, 16, 56, 32},
 	};
 
 	RECT rcRight[2] = {
-		{0, 96, 56, 112},
+		{0,  96, 56, 112},
 		{0, 112, 56, 128},
 	};
 
@@ -385,6 +398,7 @@ void ActCaret10(CARET *crt)
 		crt->rect = rcRight[crt->ani_wait / 2 % 2];
 }
 
+// Red hurt particles (used by bosses and invisible hidden pickups)
 void ActCaret11(CARET *crt)
 {
 	unsigned char deg;
@@ -401,12 +415,12 @@ void ActCaret11(CARET *crt)
 	crt->y += crt->ym;
 
 	RECT rcRight[7] = {
-		{56, 8, 64, 16},
-		{64, 8, 72, 16},
-		{72, 8, 80, 16},
-		{80, 8, 88, 16},
-		{88, 8, 96, 16},
-		{96, 8, 104, 16},
+		{ 56, 8,  64, 16},
+		{ 64, 8,  72, 16},
+		{ 72, 8,  80, 16},
+		{ 80, 8,  88, 16},
+		{ 88, 8,  96, 16},
+		{ 96, 8, 104, 16},
 		{104, 8, 112, 16},
 	};
 
@@ -426,6 +440,7 @@ void ActCaret11(CARET *crt)
 	crt->rect = rcRight[crt->ani_no];
 }
 
+// Missile Launcher explosion flash
 void ActCaret12(CARET *crt)
 {
 	RECT rcLeft[2] = {
@@ -449,6 +464,7 @@ void ActCaret12(CARET *crt)
 	crt->rect = rcLeft[crt->ani_no];
 }
 
+// Particles used when Quote jumps into the ceiling
 void ActCaret13(CARET *crt)
 {
 	RECT rcLeft[2] = {
@@ -493,8 +509,12 @@ void ActCaret13(CARET *crt)
 		crt->x -= 4 * 0x200;
 }
 
+// Broken (unknown and unused)
 void ActCaret14(CARET *crt)
 {
+	// These rects are invalid.
+	// However, notably, there are 5 unused 40x40 sprites at the bottom of Caret.pbm.
+	// Perhaps those were originally at these coordinates.
 	RECT rect[5] = {
 		{0, 96, 40, 136},
 		{40, 96, 80, 136},
@@ -519,11 +539,12 @@ void ActCaret14(CARET *crt)
 	crt->rect = rect[crt->ani_no];
 }
 
+// Tiny version of the projectile dissipation effect
 void ActCaret15(CARET *crt)
 {
 	RECT rcLeft[4] = {
-		{0, 72, 8, 80},
-		{8, 72, 16, 80},
+		{ 0, 72,  8, 80},
+		{ 8, 72, 16, 80},
 		{16, 72, 24, 80},
 		{24, 72, 32, 80},
 	};
@@ -544,10 +565,11 @@ void ActCaret15(CARET *crt)
 	crt->rect = rcLeft[crt->ani_no];
 }
 
+// 'Empty!'
 void ActCaret16(CARET *crt)
 {
 	RECT rcLeft[2] = {
-		{104, 96, 144, 104},
+		{104,  96, 144, 104},
 		{104, 104, 144, 112},
 	};
 
@@ -560,6 +582,7 @@ void ActCaret16(CARET *crt)
 	crt->rect = rcLeft[crt->ani_wait / 2 % 2];
 }
 
+// 'PUSH JUMP KEY!' (unused)
 void ActCaret17(CARET *crt)
 {
 	RECT rcLeft[2] = {
@@ -585,7 +608,7 @@ CARETFUNCTION gpCaretFuncTbl[18] =
 	ActCaret03,
 	ActCaret04,
 	ActCaret05,
-	ActCaret04,
+	ActCaret04, // Interestingly, this slot is a duplicate
 	ActCaret07,
 	ActCaret08,
 	ActCaret09,
