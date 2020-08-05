@@ -77,6 +77,7 @@ void ActBack(void)
 	}
 }
 
+/// Draw background background elements
 void PutBack(int fx, int fy)
 {
 	int x, y;
@@ -114,12 +115,14 @@ void PutBack(int fx, int fy)
 
 		case BACKGROUND_TYPE_OUTSIDE_WITH_WIND:
 		case BACKGROUND_TYPE_OUTSIDE:
+			// Draw sky
 			rect.top = 0;
 			rect.bottom = 88;
 			rect.left = 0;
 			rect.right = 320;
 			PutBitmap4(&grcGame, 0, 0, &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
+			// Draw first cloud layer
 			rect.top = 88;
 			rect.bottom = 123;
 			rect.left = gBack.fx / 2;
@@ -129,6 +132,7 @@ void PutBack(int fx, int fy)
 			rect.left = 0;
 			PutBitmap4(&grcGame, 320 - ((gBack.fx / 2) % 320), 88, &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
+			// Draw second cloud layer
 			rect.top = 123;
 			rect.bottom = 146;
 			rect.left = gBack.fx % 320;
@@ -138,6 +142,7 @@ void PutBack(int fx, int fy)
 			rect.left = 0;
 			PutBitmap4(&grcGame, 320 - (gBack.fx % 320), 123, &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
+			// Draw third cloud layer
 			rect.top = 146;
 			rect.bottom = 176;
 			rect.left = 2 * gBack.fx % 320;
@@ -147,6 +152,7 @@ void PutBack(int fx, int fy)
 			rect.left = 0;
 			PutBitmap4(&grcGame, 320 - ((gBack.fx * 2) % 320), 146, &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
+			// Draw fourth cloud layer
 			rect.top = 176;
 			rect.bottom = 240;
 			rect.left = 4 * gBack.fx % 320;
@@ -160,6 +166,7 @@ void PutBack(int fx, int fy)
 	}
 }
 
+/// Draw background foreground elements - only the water background type makes use of this
 void PutFront(int fx, int fy)
 {
 	int xpos, ypos;
