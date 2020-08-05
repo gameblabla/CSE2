@@ -794,7 +794,7 @@ void ActBullet_Missile(BULLET *bul, int level)
 
 	if (bHit)
 	{
-		SetBullet(level + 15, bul->x, bul->y, 0);
+		SetBullet(level + 15, bul->x, bul->y, DIR_LEFT);
 		bul->cond = 0;
 	}
 
@@ -1550,9 +1550,9 @@ void ActBullet_Sword3(BULLET *bul)
 				PlaySoundObject(106, SOUND_MODE_PLAY);
 
 				if (++bul->count1 % 2)
-					SetBullet(23, bul->x, bul->y, 0);
+					SetBullet(23, bul->x, bul->y, DIR_LEFT);
 				else
-					SetBullet(23, bul->x, bul->y, 2);
+					SetBullet(23, bul->x, bul->y, DIR_RIGHT);
 			}
 
 			if (++bul->count1 == 5)
@@ -1577,9 +1577,9 @@ void ActBullet_Sword3(BULLET *bul)
 				PlaySoundObject(106, SOUND_MODE_PLAY);
 
 				if (Random(0, 1) % 2)
-					SetBullet(23, bul->x + (Random(-0x40, 0x40) * 0x200), bul->y + (Random(-0x40, 0x40) * 0x200), 0);
+					SetBullet(23, bul->x + (Random(-0x40, 0x40) * 0x200), bul->y + (Random(-0x40, 0x40) * 0x200), DIR_LEFT);
 				else
-					SetBullet(23, bul->x + (Random(-0x40, 0x40) * 0x200), bul->y + (Random(-0x40, 0x40) * 0x200), 2);
+					SetBullet(23, bul->x + (Random(-0x40, 0x40) * 0x200), bul->y + (Random(-0x40, 0x40) * 0x200), DIR_RIGHT);
 			}
 
 			if (bul->act_wait > 50)
@@ -1720,7 +1720,7 @@ void ActBullet_SuperMissile(BULLET *bul, int level)
 
 	if (bHit)
 	{
-		SetBullet(level + 30, bul->x, bul->y, 0);
+		SetBullet(level + 30, bul->x, bul->y, DIR_LEFT);
 		bul->cond = 0;
 	}
 
@@ -1985,16 +1985,16 @@ void ActBullet_Nemesis(BULLET *bul, int level)
 			switch (bul->direct)
 			{
 				case DIR_LEFT:
-					SetNpChar(4, bul->x, bul->y, -0x200, Random(-0x200, 0x200), 2, NULL, 0x100);
+					SetNpChar(4, bul->x, bul->y, -0x200, Random(-0x200, 0x200), DIR_RIGHT, NULL, 0x100);
 					break;
 				case DIR_UP:
-					SetNpChar(4, bul->x, bul->y, Random(-0x200, 0x200), -0x200, 2, NULL, 0x100);
+					SetNpChar(4, bul->x, bul->y, Random(-0x200, 0x200), -0x200, DIR_RIGHT, NULL, 0x100);
 					break;
 				case DIR_RIGHT:
-					SetNpChar(4, bul->x, bul->y, 0x200, Random(-0x200, 0x200), 2, NULL, 0x100);
+					SetNpChar(4, bul->x, bul->y, 0x200, Random(-0x200, 0x200), DIR_RIGHT, NULL, 0x100);
 					break;
 				case DIR_DOWN:
-					SetNpChar(4, bul->x, bul->y, Random(-0x200, 0x200), 0x200, 2, NULL, 0x100);
+					SetNpChar(4, bul->x, bul->y, Random(-0x200, 0x200), 0x200, DIR_RIGHT, NULL, 0x100);
 					break;
 			}
 		}
