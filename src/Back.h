@@ -11,7 +11,7 @@ enum
 	BACKGROUND_TYPE_BLACK = 4,             // No background - just black
 	BACKGROUND_TYPE_AUTOSCROLL = 5,        // Constantly scrolls to the left (used by Ironhead)
 	BACKGROUND_TYPE_OUTSIDE_WITH_WIND = 6, // Fancy parallax scrolling, items are blown to the left (used by bkMoon)
-	BACKGROUND_TYPE_OUTSIDE = 7,           // Fancy parallax scrolling (used by bkFog)
+	BACKGROUND_TYPE_OUTSIDE = 7           // Fancy parallax scrolling (used by bkFog)
 };
 
 typedef struct BACK

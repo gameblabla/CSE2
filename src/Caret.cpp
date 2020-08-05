@@ -620,7 +620,7 @@ CARETFUNCTION gpCaretFuncTbl[18] =
 	ActCaret14,
 	ActCaret15,
 	ActCaret16,
-	ActCaret17,
+	ActCaret17
 };
 
 void ActCaret(void)
