@@ -1,6 +1,8 @@
 #include "../Misc.h"
 
+#include <stdarg.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <string>
@@ -8,10 +10,10 @@
 #include "SDL.h"
 
 #include "../Rendering.h"
+#include "../../Attributes.h"
 #include "../../Main.h"
 #include "../../Organya.h"
 #include "../../Profile.h"
-#include "../../Resource.h"
 
 #define DO_KEY(SDL_KEY, BACKEND_KEY) \
 	case SDL_KEY: \
@@ -55,8 +57,10 @@ void Backend_PostWindowCreation(void)
 {
 }
 
-bool Backend_GetBasePath(char *string_buffer)
+bool Backend_GetBasePath(std::string *string_buffer)
 {
+	(void)string_buffer;
+
 	return false;
 }
 
@@ -94,13 +98,14 @@ void PlaybackBackend_EnableDragAndDrop(void)
 
 bool Backend_SystemTask(bool active)
 {
-	if (SDL_PollEvent(NULL) || !active)
-	{
-		SDL_Event event;
-
-		if (!SDL_WaitEvent(&event))
+	if (!active)
+		if (!SDL_WaitEvent(NULL))
 			return false;
 
+	SDL_Event event;
+
+	while (SDL_PollEvent(&event))
+	{
 		switch (event.type)
 		{
 			case SDL_KEYUP:
