@@ -6,7 +6,7 @@
 #include "SelStage.h"
 #include "Stage.h"
 
-typedef struct PROFILE
+typedef struct PROFILEDATA
 {
 	char code[8];
 	int stage;
@@ -29,7 +29,7 @@ typedef struct PROFILE
 	signed char permit_mapping[0x80];
 	char FLAG[4];
 	unsigned char flags[1000];
-} PROFILE;
+} PROFILEDATA;
 
 extern const char* const gDefaultName;
 extern const char* const gProfileCode;

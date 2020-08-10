@@ -40,7 +40,7 @@ BOOL IsProfile(void)
 BOOL SaveProfile(const char *name)
 {
 	FILE *fp;
-	PROFILE profile;
+	PROFILEDATA profile;
 	const char *FLAG = "FLAG";
 
 	char path[MAX_PATH];
@@ -57,7 +57,7 @@ BOOL SaveProfile(const char *name)
 		return FALSE;
 
 	// Set up profile
-	memset(&profile, 0, sizeof(PROFILE));
+	memset(&profile, 0, sizeof(PROFILEDATA));
 	memcpy(profile.code, gProfileCode, sizeof(profile.code));
 	memcpy(profile.FLAG, FLAG, sizeof(profile.FLAG));
 	profile.stage = gStageNo;
@@ -80,7 +80,7 @@ BOOL SaveProfile(const char *name)
 	memcpy(profile.flags, gFlagNPC, sizeof(profile.flags));
 
 	// Write to file
-	fwrite(&profile, sizeof(PROFILE), 1, fp);
+	fwrite(&profile, sizeof(PROFILEDATA), 1, fp);
 
 	fclose(fp);
 	return TRUE;
@@ -89,7 +89,7 @@ BOOL SaveProfile(const char *name)
 BOOL LoadProfile(const char *name)
 {
 	FILE *fp;
-	PROFILE profile;
+	PROFILEDATA profile;
 	char path[MAX_PATH];
 
 	// Get path
@@ -115,8 +115,8 @@ BOOL LoadProfile(const char *name)
 
 	// Read data
 	fseek(fp, 0, SEEK_SET);
-	memset(&profile, 0, sizeof(PROFILE));
-	fread(&profile, sizeof(PROFILE), 1, fp);
+	memset(&profile, 0, sizeof(PROFILEDATA));
+	fread(&profile, sizeof(PROFILEDATA), 1, fp);
 	fclose(fp);
 
 	// Set things
