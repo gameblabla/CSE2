@@ -161,7 +161,7 @@ BOOL CALLBACK EnumDevices_Callback(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef)
 	return DIENUM_STOP;
 }
 
-BOOL GetJoystickStatus(JOYSTICK_STATUS *status)
+BOOL GetJoystickStatus(DIRECTINPUTSTATUS *status)
 {
 	DIJOYSTATE joystate;
 

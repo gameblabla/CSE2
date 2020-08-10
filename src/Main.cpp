@@ -775,7 +775,7 @@ BOOL SystemTask(void)
 void JoystickProc(void)
 {
 	int i;
-	JOYSTICK_STATUS status;
+	DIRECTINPUTSTATUS status;
 
 	if (!GetJoystickStatus(&status))
 		return;

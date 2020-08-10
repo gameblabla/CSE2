@@ -2,7 +2,7 @@
 
 #include "WindowsWrapper.h"
 
-struct JOYSTICK_STATUS
+struct DIRECTINPUTSTATUS
 {
 	BOOL bLeft;
 	BOOL bRight;
@@ -13,5 +13,5 @@ struct JOYSTICK_STATUS
 
 void ReleaseDirectInput(void);
 BOOL InitDirectInput(HINSTANCE hinst, HWND hWnd);
-BOOL GetJoystickStatus(JOYSTICK_STATUS *status);
+BOOL GetJoystickStatus(DIRECTINPUTSTATUS *status);
 BOOL ResetJoystickStatus(void);
