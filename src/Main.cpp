@@ -125,7 +125,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	strcpy(gDataPath, gModulePath);
 	strcat(gDataPath, "\\data");
 
-	CONFIG conf;
+	CONFIGDATA conf;
 	if (!LoadConfigData(&conf))
 		DefaultConfigData(&conf);
 

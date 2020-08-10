@@ -10,10 +10,10 @@
 const char* const gConfigName = "Config.dat";
 const char* const gProof = "DOUKUTSU20041206";
 
-BOOL LoadConfigData(CONFIG *conf)
+BOOL LoadConfigData(CONFIGDATA *conf)
 {
 	// Clear old configuration data
-	memset(conf, 0, sizeof(CONFIG));
+	memset(conf, 0, sizeof(CONFIGDATA));
 
 	// Get path
 	char path[MAX_PATH];
@@ -25,7 +25,7 @@ BOOL LoadConfigData(CONFIG *conf)
 		return FALSE;
 
 	// Read data
-	size_t fread_result = fread(conf, sizeof(CONFIG), 1, fp); // Not the original name
+	size_t fread_result = fread(conf, sizeof(CONFIGDATA), 1, fp); // Not the original name
 
 	// Close file
 	fclose(fp);
@@ -33,17 +33,17 @@ BOOL LoadConfigData(CONFIG *conf)
 	// Check if version is not correct, and return if it failed
 	if (fread_result != 1 || strcmp(conf->proof, gProof))
 	{
-		memset(conf, 0, sizeof(CONFIG));
+		memset(conf, 0, sizeof(CONFIGDATA));
 		return FALSE;
 	}
 
 	return TRUE;
 }
 
-void DefaultConfigData(CONFIG *conf)
+void DefaultConfigData(CONFIGDATA *conf)
 {
 	// Clear old configuration data
-	memset(conf, 0, sizeof(CONFIG));
+	memset(conf, 0, sizeof(CONFIGDATA));
 
 	// Fun fact: The Linux port added this line:
 	// conf->display_mode = 1;
