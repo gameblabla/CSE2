@@ -15,8 +15,8 @@ struct Mixer_Sound
 	signed char *samples;
 	size_t frames;
 	size_t position;
-	unsigned long sample_offset_remainder;  // 16.16 fixed-point
-	unsigned long advance_delta;            // 16.16 fixed-point
+	unsigned short position_subsample;
+	unsigned long advance_delta; // 16.16 fixed-point
 	bool playing;
 	bool looping;
 	short volume;    // 8.8 fixed-point
@@ -65,7 +65,7 @@ Mixer_Sound* Mixer_CreateSound(unsigned int frequency, const unsigned char *samp
 	sound->frames = length;
 	sound->playing = false;
 	sound->position = 0;
-	sound->sample_offset_remainder = 0;
+	sound->position_subsample = 0;
 
 	Mixer_SetSoundFrequency(sound, frequency);
 	Mixer_SetSoundVolume(sound, 0);
@@ -107,7 +107,7 @@ void Mixer_StopSound(Mixer_Sound *sound)
 void Mixer_RewindSound(Mixer_Sound *sound)
 {
 	sound->position = 0;
-	sound->sample_offset_remainder = 0;
+	sound->position_subsample = 0;
 }
 
 void Mixer_SetSoundFrequency(Mixer_Sound *sound, unsigned int frequency)
@@ -144,7 +144,7 @@ ATTRIBUTE_HOT void Mixer_MixSounds(long *stream, size_t frames_total)
 			for (size_t frames_done = 0; frames_done < frames_total; ++frames_done)
 			{
 				// Perform linear interpolation
-				const unsigned char subsample = sound->sample_offset_remainder >> 8;
+				const unsigned char subsample = sound->position_subsample >> 8;
 
 				const short interpolated_sample = sound->samples[sound->position] * (0x100 - subsample)
 				                                      + sound->samples[sound->position + 1] * subsample;
@@ -154,9 +154,9 @@ ATTRIBUTE_HOT void Mixer_MixSounds(long *stream, size_t frames_total)
 				*stream_pointer++ += (interpolated_sample * sound->volume_r) >> 8;
 
 				// Increment sample
-				sound->sample_offset_remainder += sound->advance_delta;
-				sound->position += sound->sample_offset_remainder >> 16;
-				sound->sample_offset_remainder &= 0xFFFF;
+				const unsigned long next_position_subsample = sound->position_subsample + sound->advance_delta;
+				sound->position += next_position_subsample >> 16;
+				sound->position_subsample = next_position_subsample & 0xFFFF;
 
 				// Stop or loop sample once it's reached its end
 				if (sound->position >= sound->frames)
@@ -169,7 +169,7 @@ ATTRIBUTE_HOT void Mixer_MixSounds(long *stream, size_t frames_total)
 					{
 						sound->playing = false;
 						sound->position = 0;
-						sound->sample_offset_remainder = 0;
+						sound->position_subsample = 0;
 						break;
 					}
 				}
