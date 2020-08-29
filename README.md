@@ -1,3 +1,14 @@
+# THIS BRANCH HAS BEEN DISCONTINUED
+
+I don't want to work on an enhanced Cave Story anymore, or at least not one
+where I have to cater to such a massive range of people with different
+expectations.
+
+There's a fork coming out soon called 'CuckyCSE2' which will probably be this
+branch's successor, so keep an eye out for that.
+
+The original readme is below:
+
 [![Build Status](https://travis-ci.com/Clownacy/CSE2.svg?branch=enhanced-lite)](https://travis-ci.com/Clownacy/CSE2)
 
 ## Table of Contents
