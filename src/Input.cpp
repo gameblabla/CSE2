@@ -17,7 +17,7 @@ BOOL InitDirectInput(void)
 	return ControllerBackend_Init();
 }
 
-BOOL GetJoystickStatus(JOYSTICK_STATUS *status)
+BOOL GetJoystickStatus(DIRECTINPUTSTATUS *status)
 {
 	bool *buttons;
 	unsigned int button_count;

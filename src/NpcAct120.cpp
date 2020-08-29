@@ -7,6 +7,7 @@
 
 #include "Bullet.h"
 #include "Caret.h"
+#include "CommonDefines.h"
 #include "Frame.h"
 #include "Game.h"
 #include "KeyControl.h"
@@ -75,7 +76,7 @@ void ActNpc121(NPCHAR *npc)
 		if (++npc->act_wait > 100)
 		{
 			npc->act_wait = 0;
-			SetCaret(npc->x, npc->y, 5, 0);
+			SetCaret(npc->x, npc->y, CARET_ZZZ, DIR_LEFT);
 		}
 	}
 }
@@ -285,7 +286,7 @@ void ActNpc123(NPCHAR *npc)
 	{
 		case 0:
 			npc->act_no = 1;
-			SetCaret(npc->x, npc->y, 3, 0);
+			SetCaret(npc->x, npc->y, CARET_SHOOT, DIR_LEFT);
 			PlaySoundObject(32, SOUND_MODE_PLAY);
 
 			switch (npc->direct)
@@ -345,7 +346,7 @@ void ActNpc123(NPCHAR *npc)
 
 	if (bBreak)
 	{
-		SetCaret(npc->x, npc->y, 2, 2);
+		SetCaret(npc->x, npc->y, CARET_PROJECTILE_DISSIPATION, DIR_RIGHT);
 		PlaySoundObject(28, SOUND_MODE_PLAY);
 		npc->cond = 0;
 	}
@@ -819,7 +820,7 @@ void ActNpc131(NPCHAR *npc)
 	if (++npc->act_wait > 100)
 	{
 		npc->act_wait = 0;
-		SetCaret(npc->x, npc->y, 5, 0);
+		SetCaret(npc->x, npc->y, CARET_ZZZ, DIR_LEFT);
 	}
 
 	if (npc->direct == 0)

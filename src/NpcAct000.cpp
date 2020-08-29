@@ -6,6 +6,7 @@
 
 #include "Back.h"
 #include "Caret.h"
+#include "CommonDefines.h"
 #include "Frame.h"
 #include "Game.h"
 #include "Map.h"
@@ -17,7 +18,7 @@
 // Null
 void ActNpc000(NPCHAR *npc)
 {
-	RECT rect = {0x00, 0x00, 0x10, 0x10};
+	RECT rect = {0, 0, 16, 16};
 
 	if (npc->act_no == 0)
 	{
@@ -34,7 +35,7 @@ void ActNpc000(NPCHAR *npc)
 void ActNpc001(NPCHAR *npc)
 {
 	// In wind
-	if (gBack.type == 5 || gBack.type == 6)
+	if (gBack.type == BACKGROUND_TYPE_AUTOSCROLL || gBack.type == BACKGROUND_TYPE_OUTSIDE_WITH_WIND)
 	{
 		if (npc->act_no == 0)
 		{
@@ -144,12 +145,12 @@ void ActNpc001(NPCHAR *npc)
 
 	// Get framerects
 	RECT rect[6] = {
-		{0x00, 0x10, 0x10, 0x20},
-		{0x10, 0x10, 0x20, 0x20},
-		{0x20, 0x10, 0x30, 0x20},
-		{0x30, 0x10, 0x40, 0x20},
-		{0x40, 0x10, 0x50, 0x20},
-		{0x50, 0x10, 0x60, 0x20},
+		{ 0, 16, 16, 32},
+		{16, 16, 32, 32},
+		{32, 16, 48, 32},
+		{48, 16, 64, 32},
+		{64, 16, 80, 32},
+		{80, 16, 96, 32},
 	};
 
 	RECT rcNo = {0, 0, 0, 0};
@@ -214,21 +215,21 @@ void ActNpc002(NPCHAR *npc)
 {
 	// Rects
 	RECT rcLeft[7] = {
-		{32, 0, 64, 24},
-		{0, 0, 32, 24},
-		{32, 0, 64, 24},
-		{64, 0, 96, 24},
-		{96, 0, 128, 24},
+		{ 32, 0,  64, 24},
+		{  0, 0,  32, 24},
+		{ 32, 0,  64, 24},
+		{ 64, 0,  96, 24},
+		{ 96, 0, 128, 24},
 		{128, 0, 160, 24},
 		{160, 0, 192, 24},
 	};
 
 	RECT rcRight[7] = {
-		{32, 24, 64, 48},
-		{0, 24, 32, 48},
-		{32, 24, 64, 48},
-		{64, 24, 96, 48},
-		{96, 24, 128, 48},
+		{ 32, 24,  64, 48},
+		{  0, 24,  32, 48},
+		{ 32, 24,  64, 48},
+		{ 64, 24,  96, 48},
+		{ 96, 24, 128, 48},
 		{128, 24, 160, 48},
 		{160, 24, 192, 48},
 	};
@@ -346,20 +347,20 @@ void ActNpc003(NPCHAR *npc)
 void ActNpc004(NPCHAR *npc)
 {
 	RECT rcLeft[8] = {
-		{16, 0, 17, 1},
-		{16, 0, 32, 16},
-		{32, 0, 48, 16},
-		{48, 0, 64, 16},
-		{64, 0, 80, 16},
-		{80, 0, 96, 16},
-		{96, 0, 112, 16},
+		{ 16, 0,  17,  1},
+		{ 16, 0,  32, 16},
+		{ 32, 0,  48, 16},
+		{ 48, 0,  64, 16},
+		{ 64, 0,  80, 16},
+		{ 80, 0,  96, 16},
+		{ 96, 0, 112, 16},
 		{112, 0, 128, 16},
 	};
 
 	RECT rcUp[8] = {
-		{16, 0, 17, 1},
-		{80, 48, 96, 64},
-		{0, 128, 16, 144},
+		{16,   0, 17,   1},
+		{80,  48, 96,  64},
+		{ 0, 128, 16, 144},
 		{16, 128, 32, 144},
 		{32, 128, 48, 144},
 		{48, 128, 64, 144},
@@ -423,13 +424,13 @@ void ActNpc004(NPCHAR *npc)
 void ActNpc005(NPCHAR *npc)
 {
 	RECT rcLeft[3] = {
-		{0, 48, 16, 64},
+		{ 0, 48, 16, 64},
 		{16, 48, 32, 64},
 		{32, 48, 48, 64},
 	};
 
 	RECT rcRight[3] = {
-		{0, 64, 16, 80},
+		{ 0, 64, 16, 80},
 		{16, 64, 32, 80},
 		{32, 64, 48, 80},
 	};
@@ -532,7 +533,7 @@ void ActNpc005(NPCHAR *npc)
 void ActNpc006(NPCHAR *npc)
 {
 	RECT rcLeft[5] = {
-		{0, 80, 16, 96},
+		{ 0, 80, 16, 96},
 		{16, 80, 32, 96},
 		{32, 80, 48, 96},
 		{48, 80, 64, 96},
@@ -540,7 +541,7 @@ void ActNpc006(NPCHAR *npc)
 	};
 
 	RECT rcRight[5] = {
-		{0, 96, 16, 112},
+		{ 0, 96, 16, 112},
 		{16, 96, 32, 112},
 		{32, 96, 48, 112},
 		{48, 96, 64, 112},
@@ -656,21 +657,21 @@ void ActNpc006(NPCHAR *npc)
 void ActNpc007(NPCHAR *npc)
 {
 	RECT rcLeft[3] = {
-		{256, 64, 288, 80},
-		{256, 80, 288, 96},
+		{256, 64, 288,  80},
+		{256, 80, 288,  96},
 		{256, 96, 288, 112},
 	};
 
 	RECT rcRight[3] = {
-		{288, 64, 320, 80},
-		{288, 80, 320, 96},
+		{288, 64, 320,  80},
+		{288, 80, 320,  96},
 		{288, 96, 320, 112},
 	};
 
 	switch (npc->act_no)
 	{
 		case 0:
-			npc->x = gMC.x;
+			npc->x = gMC.x; // Spawn beneath player
 
 			if (npc->direct == 0)
 				npc->act_no = 1;
@@ -679,12 +680,14 @@ void ActNpc007(NPCHAR *npc)
 
 			break;
 
-		case 1:
+		case 1: // Going left
 			npc->xm -= 0x40;
 
+			// Turn around if far enough away from the player
 			if (npc->x < gMC.x - (192 * 0x200))
 				npc->act_no = 2;
 
+			// Turn around if touching a wall
 			if (npc->flag & 1)
 			{
 				npc->xm = 0;
@@ -693,12 +696,14 @@ void ActNpc007(NPCHAR *npc)
 
 			break;
 
-		case 2:
+		case 2: // Going right
 			npc->xm += 0x40;
 
+			// Turn around if far enough away from the player
 			if (npc->x > gMC.x + (192 * 0x200))
 				npc->act_no = 1;
 
+			// Turn around if touching a wall
 			if (npc->flag & 4)
 			{
 				npc->xm = 0;
@@ -708,27 +713,33 @@ void ActNpc007(NPCHAR *npc)
 			break;
 	}
 
+	// Face direction Bazil is moving
 	if (npc->xm < 0)
 		npc->direct = 0;
 	else
 		npc->direct = 2;
 
+	// Cap speed
 	if (npc->xm > 0x5FF)
 		npc->xm = 0x5FF;
 	if (npc->xm < -0x5FF)
 		npc->xm = -0x5FF;
 
+	// Apply momentum
 	npc->x += npc->xm;
 
+	// Increment animation
 	if (++npc->ani_wait > 1)
 	{
 		npc->ani_wait = 0;
 		++npc->ani_no;
 	}
 
+	// Loop animation
 	if (npc->ani_no > 2)
 		npc->ani_no = 0;
 
+	// Update sprite
 	if (npc->direct == 0)
 		npc->rect = rcLeft[npc->ani_no];
 	else
@@ -739,12 +750,12 @@ void ActNpc007(NPCHAR *npc)
 void ActNpc008(NPCHAR *npc)
 {
 	RECT rcLeft[2] = {
-		{80, 80, 96, 96},
+		{80, 80,  96, 96},
 		{96, 80, 112, 96},
 	};
 
 	RECT rcRight[2] = {
-		{80, 96, 96, 112},
+		{80, 96,  96, 112},
 		{96, 96, 112, 112},
 	};
 
@@ -1041,7 +1052,7 @@ void ActNpc011(NPCHAR *npc)
 	if (npc->flag & 0xFF)
 	{
 		npc->cond = 0;
-		SetCaret(npc->x, npc->y, 2, 0);
+		SetCaret(npc->x, npc->y, CARET_PROJECTILE_DISSIPATION, DIR_LEFT);
 	}
 
 	npc->y += npc->ym;
@@ -1065,7 +1076,7 @@ void ActNpc011(NPCHAR *npc)
 
 	if (++npc->count1 > 150)
 	{
-		SetCaret(npc->x, npc->y, 2, 0);
+		SetCaret(npc->x, npc->y, CARET_PROJECTILE_DISSIPATION, DIR_LEFT);
 		npc->cond = 0;
 	}
 }

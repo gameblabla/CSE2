@@ -2,7 +2,7 @@
 
 #include "WindowsWrapper.h"
 
-struct CONFIG
+struct CONFIGDATA
 {
 	char proof[0x20];
 	char font_name[0x40];
@@ -17,5 +17,5 @@ struct CONFIG
 extern const char* const gConfigName;
 extern const char* const gProof;
 
-BOOL LoadConfigData(CONFIG *conf);
-void DefaultConfigData(CONFIG *conf);
+BOOL LoadConfigData(CONFIGDATA *conf);
+void DefaultConfigData(CONFIGDATA *conf);

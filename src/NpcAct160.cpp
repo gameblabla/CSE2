@@ -896,14 +896,14 @@ void ActNpc170(NPCHAR *npc)
 				npc->xm -= 0x20;
 
 				if (npc->count1 % 3 == 1)
-					SetCaret(npc->x + (8 * 0x200), npc->y, 7, 2);
+					SetCaret(npc->x + (8 * 0x200), npc->y, CARET_EXHAUST, DIR_RIGHT);
 			}
 			else
 			{
 				npc->xm += 0x20;
 
 				if (npc->count1 % 3 == 1)
-					SetCaret(npc->x - (8 * 0x200), npc->y, 7, 0);
+					SetCaret(npc->x - (8 * 0x200), npc->y, CARET_EXHAUST, DIR_LEFT);
 			}
 
 			if (npc->count1 < 50)
@@ -1056,7 +1056,7 @@ void ActNpc172(NPCHAR *npc)
 
 			if (npc->flag & 1 || npc->flag & 4)
 			{
-				SetCaret(npc->x, npc->y, 2, 0);
+				SetCaret(npc->x, npc->y, CARET_PROJECTILE_DISSIPATION, DIR_LEFT);
 				VanishNpChar(npc);
 				return;
 			}
@@ -1294,7 +1294,7 @@ void ActNpc174(NPCHAR *npc)
 			{
 				if (++npc->count1 > 1)
 				{
-					SetCaret(npc->x, npc->y, 2, 0);
+					SetCaret(npc->x, npc->y, CARET_PROJECTILE_DISSIPATION, DIR_LEFT);
 					npc->cond = 0;
 				}
 			}
@@ -1474,7 +1474,7 @@ void ActNpc177(NPCHAR *npc)
 
 	if (npc->flag & 0xFF)
 	{
-		SetCaret(npc->x, npc->y, 3, 0);
+		SetCaret(npc->x, npc->y, CARET_SHOOT, DIR_LEFT);
 		npc->cond = 0;
 		return;
 	}
@@ -1521,7 +1521,7 @@ void ActNpc177(NPCHAR *npc)
 
 			if (++npc->act_wait > 300)
 			{
-				SetCaret(npc->x, npc->y, 3, 0);
+				SetCaret(npc->x, npc->y, CARET_SHOOT, DIR_LEFT);
 				npc->cond = 0;
 				return;
 			}
@@ -1564,7 +1564,7 @@ void ActNpc178(NPCHAR *npc)
 {
 	if (npc->flag & 0xFF)
 	{
-		SetCaret(npc->x, npc->y, 2, 0);
+		SetCaret(npc->x, npc->y, CARET_PROJECTILE_DISSIPATION, DIR_LEFT);
 		npc->cond = 0;
 	}
 
@@ -1599,7 +1599,7 @@ void ActNpc178(NPCHAR *npc)
 	if (++npc->count1 > 150)
 	{
 		VanishNpChar(npc);
-		SetCaret(npc->x, npc->y, 2, 0);
+		SetCaret(npc->x, npc->y, CARET_PROJECTILE_DISSIPATION, DIR_LEFT);
 	}
 }
 
@@ -1609,7 +1609,7 @@ void ActNpc179(NPCHAR *npc)
 	if (npc->flag & 0xFF)
 	{
 		npc->cond = 0;
-		SetCaret(npc->x, npc->y, 2, 0);
+		SetCaret(npc->x, npc->y, CARET_PROJECTILE_DISSIPATION, DIR_LEFT);
 	}
 
 	npc->xm -= 0x20;
@@ -1641,6 +1641,6 @@ void ActNpc179(NPCHAR *npc)
 	if (++npc->count1 > 300)
 	{
 		VanishNpChar(npc);
-		SetCaret(npc->x, npc->y, 2, 0);
+		SetCaret(npc->x, npc->y, CARET_PROJECTILE_DISSIPATION, DIR_LEFT);
 	}
 }

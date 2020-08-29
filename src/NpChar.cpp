@@ -9,6 +9,7 @@
 
 #include "ArmsItem.h"
 #include "Caret.h"
+#include "CommonDefines.h"
 #include "Draw.h"
 #include "File.h"
 #include "Flags.h"
@@ -170,7 +171,7 @@ void SetDestroyNpChar(int x, int y, int w, int num)
 	}
 
 	// Flash effect
-	SetCaret(x, y, 12, 0);
+	SetCaret(x, y, CARET_EXPLOSION, DIR_LEFT);
 }
 
 void SetDestroyNpCharUp(int x, int y, int w, int num)
@@ -189,7 +190,7 @@ void SetDestroyNpCharUp(int x, int y, int w, int num)
 	}
 
 	// Flash effect
-	SetCaret(x, y, 12, 0);
+	SetCaret(x, y, CARET_EXPLOSION, DIR_LEFT);
 }
 
 void SetExpObjects(int x, int y, int exp)

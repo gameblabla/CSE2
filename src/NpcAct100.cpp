@@ -6,6 +6,7 @@
 
 #include "Bullet.h"
 #include "Caret.h"
+#include "CommonDefines.h"
 #include "Frame.h"
 #include "Game.h"
 #include "MyChar.h"
@@ -500,7 +501,7 @@ void ActNpc108(NPCHAR *npc)
 {
 	if (npc->flag & 0xFF)
 	{
-		SetCaret(npc->x, npc->y, 2, 0);
+		SetCaret(npc->x, npc->y, CARET_PROJECTILE_DISSIPATION, DIR_LEFT);
 		npc->cond = 0;
 	}
 
@@ -526,7 +527,7 @@ void ActNpc108(NPCHAR *npc)
 
 	if (++npc->count1 > 300)
 	{
-		SetCaret(npc->x, npc->y, 2, 0);
+		SetCaret(npc->x, npc->y, CARET_PROJECTILE_DISSIPATION, DIR_LEFT);
 		npc->cond = 0;
 	}
 }

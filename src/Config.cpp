@@ -12,10 +12,10 @@
 const char* const gConfigName = "Config.dat";
 const char* const gProof = "DOUKUTSU20041206";
 
-BOOL LoadConfigData(CONFIG *conf)
+BOOL LoadConfigData(CONFIGDATA *conf)
 {
 	// Clear old configuration data
-	memset(conf, 0, sizeof(CONFIG));
+	memset(conf, 0, sizeof(CONFIGDATA));
 
 	// Get path
 	std::string path = gModulePath + '/' + gConfigName;
@@ -48,17 +48,17 @@ BOOL LoadConfigData(CONFIG *conf)
 	// Check if version is not correct, and return if it failed
 	if (strcmp(conf->proof, gProof))
 	{
-		memset(conf, 0, sizeof(CONFIG));
+		memset(conf, 0, sizeof(CONFIGDATA));
 		return FALSE;
 	}
 
 	return TRUE;
 }
 
-void DefaultConfigData(CONFIG *conf)
+void DefaultConfigData(CONFIGDATA *conf)
 {
 	// Clear old configuration data
-	memset(conf, 0, sizeof(CONFIG));
+	memset(conf, 0, sizeof(CONFIGDATA));
 
 	// Fun fact: The Linux port added this line:
 	// conf->display_mode = 1;

@@ -6,6 +6,7 @@
 
 #include "Bullet.h"
 #include "Caret.h"
+#include "CommonDefines.h"
 #include "Game.h"
 #include "Map.h"
 #include "NpChar.h"
@@ -16,10 +17,10 @@ static void Vanish(BULLET *bul)
 	if (bul->code_bullet != 37 && bul->code_bullet != 38 && bul->code_bullet != 39)
 		PlaySoundObject(28, SOUND_MODE_PLAY);
 	else
-		SetCaret(bul->x, bul->y, 2, 1);
+		SetCaret(bul->x, bul->y, CARET_PROJECTILE_DISSIPATION, DIR_UP);
 
 	bul->cond = 0;
-	SetCaret(bul->x, bul->y, 2, 2);
+	SetCaret(bul->x, bul->y, CARET_PROJECTILE_DISSIPATION, DIR_RIGHT);
 }
 
 int JudgeHitBulletBlock(int x, int y, BULLET *bul)
@@ -37,7 +38,7 @@ int JudgeHitBulletBlock(int x, int y, BULLET *bul)
 		if (!(bul->bbits & 0x40))
 			bul->cond = 0;
 
-		SetCaret(bul->x, bul->y, 2, 0);
+		SetCaret(bul->x, bul->y, CARET_PROJECTILE_DISSIPATION, DIR_LEFT);
 		PlaySoundObject(12, SOUND_MODE_PLAY);
 
 		for (i = 0; i < 4; ++i)

@@ -69,7 +69,7 @@ void AddExpMyChar(int x)
 				if (gArmsData[gSelectedArms].code != 13)
 				{
 					PlaySoundObject(27, SOUND_MODE_PLAY);
-					SetCaret(gMC.x, gMC.y, 10, 0);
+					SetCaret(gMC.x, gMC.y, CARET_LEVEL_UP, DIR_LEFT);
 				}
 			}
 		}
@@ -159,7 +159,7 @@ void DamageMyChar(int damage)
 			gArmsData[gSelectedArms].exp = gArmsLevelTable[arms_code].exp[lv] + gArmsData[gSelectedArms].exp;
 
 			if (gMC.life > 0 && gArmsData[gSelectedArms].code != 13)
-				SetCaret(gMC.x, gMC.y, 10, 2);
+				SetCaret(gMC.x, gMC.y, CARET_LEVEL_UP, DIR_RIGHT);
 		}
 		else
 		{

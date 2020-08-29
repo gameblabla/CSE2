@@ -18,10 +18,9 @@ static unsigned long color_black;
 // TODO - Another function that has an incorrect stack frame
 BOOL InitBack(const char *fName, int type)
 {
-	// Unused
-	color_black = GetCortBoxColor(RGB(0, 0, 0x10));
+	color_black = GetCortBoxColor(RGB(0, 0, 0x10));	// Unused. This may have once been used by background type 4 (the solid black background)
 
-	// Get width and height
+	// We're not actually loading the bitmap here - we're just reading its width/height and making sure it's really a BMP file
 	std::string path = gDataPath + '/' + fName + ".pbm";
 
 	FILE *fp = fopen(path.c_str(), "rb");
@@ -39,12 +38,14 @@ BOOL InitBack(const char *fName, int type)
 
 	fseek(fp, 18, SEEK_SET);
 
+	// Get bitmap width and height
 	gBack.partsW = File_ReadLE32(fp);
 	gBack.partsH = File_ReadLE32(fp);
 	fclose(fp);
 
-	// Set background stuff and load texture
-	gBack.flag = TRUE;
+	gBack.flag = TRUE;	// This variable is otherwise unused
+
+	// *Now* we actually load the bitmap
 	if (!ReloadBitmap_File(fName, SURFACE_ID_LEVEL_BACKGROUND))
 		return FALSE;
 
@@ -57,18 +58,19 @@ void ActBack(void)
 {
 	switch (gBack.type)
 	{
-		case 5:
+		case BACKGROUND_TYPE_AUTOSCROLL:
 			gBack.fx += 6 * 0x200;
 			break;
 
-		case 6:
-		case 7:
+		case BACKGROUND_TYPE_OUTSIDE_WITH_WIND:
+		case BACKGROUND_TYPE_OUTSIDE:
 			++gBack.fx;
 			gBack.fx %= 640;
 			break;
 	}
 }
 
+/// Draw background background elements
 void PutBack(int fx, int fy)
 {
 	int x, y;
@@ -76,42 +78,44 @@ void PutBack(int fx, int fy)
 
 	switch (gBack.type)
 	{
-		case 0:
+		case BACKGROUND_TYPE_STATIONARY:
 			for (y = 0; y < WINDOW_HEIGHT; y += gBack.partsH)
 				for (x = 0; x < WINDOW_WIDTH; x += gBack.partsW)
 					PutBitmap4(&grcGame, x, y, &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
 			break;
 
-		case 1:
+		case BACKGROUND_TYPE_MOVE_DISTANT:
 			for (y = -((fy / 2 / 0x200) % gBack.partsH); y < WINDOW_HEIGHT; y += gBack.partsH)
 				for (x = -((fx / 2 / 0x200) % gBack.partsW); x < WINDOW_WIDTH; x += gBack.partsW)
 					PutBitmap4(&grcGame, x, y, &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
 			break;
 
-		case 2:
+		case BACKGROUND_TYPE_MOVE_NEAR:
 			for (y = -((fy / 0x200) % gBack.partsH); y < WINDOW_HEIGHT; y += gBack.partsH)
 				for (x = -((fx / 0x200) % gBack.partsW); x < WINDOW_WIDTH; x += gBack.partsW)
 					PutBitmap4(&grcGame, x, y, &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
 			break;
 
-		case 5:
+		case BACKGROUND_TYPE_AUTOSCROLL:
 			for (y = -gBack.partsH; y < WINDOW_HEIGHT; y += gBack.partsH)
 				for (x = -((gBack.fx / 0x200) % gBack.partsW); x < WINDOW_WIDTH; x += gBack.partsW)
 					PutBitmap4(&grcGame, x, y, &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
 			break;
 
-		case 6:
-		case 7:
+		case BACKGROUND_TYPE_OUTSIDE_WITH_WIND:
+		case BACKGROUND_TYPE_OUTSIDE:
+			// Draw sky
 			rect.top = 0;
 			rect.bottom = 88;
 			rect.left = 0;
 			rect.right = 320;
 			PutBitmap4(&grcGame, 0, 0, &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
+			// Draw first cloud layer
 			rect.top = 88;
 			rect.bottom = 123;
 			rect.left = gBack.fx / 2;
@@ -121,6 +125,7 @@ void PutBack(int fx, int fy)
 			rect.left = 0;
 			PutBitmap4(&grcGame, 320 - ((gBack.fx / 2) % 320), 88, &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
+			// Draw second cloud layer
 			rect.top = 123;
 			rect.bottom = 146;
 			rect.left = gBack.fx % 320;
@@ -130,6 +135,7 @@ void PutBack(int fx, int fy)
 			rect.left = 0;
 			PutBitmap4(&grcGame, 320 - (gBack.fx % 320), 123, &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
+			// Draw third cloud layer
 			rect.top = 146;
 			rect.bottom = 176;
 			rect.left = 2 * gBack.fx % 320;
@@ -139,6 +145,7 @@ void PutBack(int fx, int fy)
 			rect.left = 0;
 			PutBitmap4(&grcGame, 320 - ((gBack.fx * 2) % 320), 146, &rect, SURFACE_ID_LEVEL_BACKGROUND);
 
+			// Draw fourth cloud layer
 			rect.top = 176;
 			rect.bottom = 240;
 			rect.left = 4 * gBack.fx % 320;
@@ -152,6 +159,7 @@ void PutBack(int fx, int fy)
 	}
 }
 
+/// Draw background foreground elements - only the water background type makes use of this
 void PutFront(int fx, int fy)
 {
 	int xpos, ypos;
@@ -164,7 +172,7 @@ void PutFront(int fx, int fy)
 
 	switch (gBack.type)
 	{
-		case 3:
+		case BACKGROUND_TYPE_WATER:
 			x_1 = fx / (32 * 0x200);
 			x_2 = x_1 + (((WINDOW_WIDTH + (32 - 1)) / 32) + 1);
 			y_1 = 0;

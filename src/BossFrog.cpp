@@ -385,7 +385,7 @@ void ActBossChar_Frog(void)
 				else
 					SetNpChar(NPC_PROJECTILE_BALFROG_SPITBALL, boss->x + 2 * (0x200 * 0x10), boss->y - 8 * 0x200, xm, ym, DIR_LEFT, NULL, 0x100);
 
-				PlaySoundObject(SND_ENEMY_SHOOT_PROJETILE, SOUND_MODE_PLAY);
+				PlaySoundObject(SND_ENEMY_SHOOT_PROJECTILE, SOUND_MODE_PLAY);
 
 				if (boss->count1 == 0 || boss->life < boss->tgt_x - 90)
 				{

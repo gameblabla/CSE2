@@ -5,6 +5,7 @@
 #include "Back.h"
 #include "Boss.h"
 #include "Caret.h"
+#include "CommonDefines.h"
 #include "Game.h"
 #include "KeyControl.h"
 #include "Map.h"
@@ -24,8 +25,8 @@ static void PutlittleStar(void)
 	if (!(gMC.cond & 2) && gMC.ym < -0x200)
 	{
 		PlaySoundObject(3, SOUND_MODE_PLAY);
-		SetCaret(gMC.x, gMC.y - gMC.hit.top, 13, 0);
-		SetCaret(gMC.x, gMC.y - gMC.hit.top, 13, 0);
+		SetCaret(gMC.x, gMC.y - gMC.hit.top, CARET_TINY_PARTICLES, DIR_LEFT);
+		SetCaret(gMC.x, gMC.y - gMC.hit.top, CARET_TINY_PARTICLES, DIR_LEFT);
 	}
 }
 
@@ -853,7 +854,7 @@ void HitMyCharNpChar(void)
 
 	// Create question mark when NPC hasn't been interacted with
 	if (gMC.ques)
-		SetCaret(gMC.x, gMC.y, 9, 0);
+		SetCaret(gMC.x, gMC.y, CARET_QUESTION_MARK, DIR_LEFT);
 }
 
 void HitMyCharBoss(void)
@@ -913,5 +914,5 @@ void HitMyCharBoss(void)
 	}
 
 	if (gMC.ques)
-		SetCaret(gMC.x, gMC.y, 9, 0);
+		SetCaret(gMC.x, gMC.y, CARET_QUESTION_MARK, DIR_LEFT);
 }

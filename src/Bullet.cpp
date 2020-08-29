@@ -7,6 +7,7 @@
 
 #include "Draw.h"
 #include "Caret.h"
+#include "CommonDefines.h"
 #include "Game.h"
 #include "KeyControl.h"
 #include "MyChar.h"
@@ -78,19 +79,19 @@ void PutBullet(int fx, int fy)
 		{
 			switch (gBul[i].direct)
 			{
-				case 0:
+				case DIR_LEFT:
 					x = gBul[i].x - gBul[i].view.front;
 					y = gBul[i].y - gBul[i].view.top;
 					break;
-				case 1:
+				case DIR_UP:
 					x = gBul[i].x - gBul[i].view.top;
 					y = gBul[i].y - gBul[i].view.front;
 					break;
-				case 2:
+				case DIR_RIGHT:
 					x = gBul[i].x - gBul[i].view.back;
 					y = gBul[i].y - gBul[i].view.top;
 					break;
-				case 3:
+				case DIR_DOWN:
 					x = gBul[i].x - gBul[i].view.top;
 					y = gBul[i].y - gBul[i].view.back;
 					break;
@@ -204,7 +205,7 @@ void ActBullet_Frontia1(BULLET *bul)
 	if (++bul->count1 > bul->life_count)
 	{
 		bul->cond = 0;
-		SetCaret(bul->x, bul->y, 3, 0);
+		SetCaret(bul->x, bul->y, CARET_SHOOT, DIR_LEFT);
 		return;
 	}
 
@@ -215,16 +216,16 @@ void ActBullet_Frontia1(BULLET *bul)
 
 		switch (bul->direct)
 		{
-			case 0:
+			case DIR_LEFT:
 				bul->xm = -0x600;
 				break;
-			case 1:
+			case DIR_UP:
 				bul->ym = -0x600;
 				break;
-			case 2:
+			case DIR_RIGHT:
 				bul->xm = 0x600;
 				break;
-			case 3:
+			case DIR_DOWN:
 				bul->ym = 0x600;
 				break;
 		}
@@ -258,7 +259,7 @@ void ActBullet_Frontia1(BULLET *bul)
 		{136, 80, 152, 80},
 	};
 
-	if (bul->direct == 0)
+	if (bul->direct == DIR_LEFT)
 		bul->rect = rcLeft[bul->ani_no];
 	else
 		bul->rect = rcRight[bul->ani_no];
@@ -271,7 +272,7 @@ void ActBullet_Frontia2(BULLET *bul, int level)
 	if (++bul->count1 > bul->life_count)
 	{
 		bul->cond = 0;
-		SetCaret(bul->x, bul->y, 3, 0);
+		SetCaret(bul->x, bul->y, CARET_SHOOT, DIR_LEFT);
 		return;
 	}
 
@@ -282,16 +283,16 @@ void ActBullet_Frontia2(BULLET *bul, int level)
 
 		switch (bul->direct)
 		{
-			case 0:
+			case DIR_LEFT:
 				bul->xm = -0x200;
 				break;
-			case 1:
+			case DIR_UP:
 				bul->ym = -0x200;
 				break;
-			case 2:
+			case DIR_RIGHT:
 				bul->xm = 0x200;
 				break;
-			case 3:
+			case DIR_DOWN:
 				bul->ym = 0x200;
 				break;
 		}
@@ -300,8 +301,8 @@ void ActBullet_Frontia2(BULLET *bul, int level)
 
 		switch (bul->direct)
 		{
-			case 0:
-			case 2:
+			case DIR_LEFT:
+			case DIR_RIGHT:
 				if (inc % 2)
 					bul->ym = 0x400;
 				else
@@ -309,8 +310,8 @@ void ActBullet_Frontia2(BULLET *bul, int level)
 
 				break;
 
-			case 1:
-			case 3:
+			case DIR_UP:
+			case DIR_DOWN:
 				if (inc % 2)
 					bul->xm = 0x400;
 				else
@@ -323,24 +324,24 @@ void ActBullet_Frontia2(BULLET *bul, int level)
 	{
 		switch (bul->direct)
 		{
-			case 0:
+			case DIR_LEFT:
 				bul->xm -= 0x80;
 				break;
-			case 1:
+			case DIR_UP:
 				bul->ym -= 0x80;
 				break;
-			case 2:
+			case DIR_RIGHT:
 				bul->xm += 0x80;
 				break;
-			case 3:
+			case DIR_DOWN:
 				bul->ym += 0x80;
 				break;
 		}
 
 		switch (bul->direct)
 		{
-			case 0:
-			case 2:
+			case DIR_LEFT:
+			case DIR_RIGHT:
 				if (bul->count1 % 5 == 2)
 				{
 					if (bul->ym < 0)
@@ -351,8 +352,8 @@ void ActBullet_Frontia2(BULLET *bul, int level)
 
 				break;
 
-			case 1u:
-			case 3u:
+			case DIR_UP:
+			case DIR_DOWN:
 				if (bul->count1 % 5 == 2)
 				{
 					if (bul->xm < 0)
@@ -396,7 +397,7 @@ void ActBullet_PoleStar(BULLET *bul, int level)
 	if (++bul->count1 > bul->life_count)
 	{
 		bul->cond = 0;
-		SetCaret(bul->x, bul->y, 3, 0);
+		SetCaret(bul->x, bul->y, CARET_SHOOT, DIR_LEFT);
 		return;
 	}
 
@@ -407,16 +408,16 @@ void ActBullet_PoleStar(BULLET *bul, int level)
 		// Set speed
 		switch (bul->direct)
 		{
-			case 0:
+			case DIR_LEFT:
 				bul->xm = -0x1000;
 				break;
-			case 1:
+			case DIR_UP:
 				bul->ym = -0x1000;
 				break;
-			case 2:
+			case DIR_RIGHT:
 				bul->xm = 0x1000;
 				break;
-			case 3:
+			case DIR_DOWN:
 				bul->ym = 0x1000;
 				break;
 		}
@@ -427,16 +428,16 @@ void ActBullet_PoleStar(BULLET *bul, int level)
 			case 1:
 				switch (bul->direct)
 				{
-					case 0:
+					case DIR_LEFT:
 						bul->enemyYL = 0x400;
 						break;
-					case 1:
+					case DIR_UP:
 						bul->enemyXL = 0x400;
 						break;
-					case 2:
+					case DIR_RIGHT:
 						bul->enemyYL = 0x400;
 						break;
-					case 3:
+					case DIR_DOWN:
 						bul->enemyXL = 0x400;
 						break;
 				}
@@ -444,16 +445,16 @@ void ActBullet_PoleStar(BULLET *bul, int level)
 			case 2:
 				switch (bul->direct)
 				{
-					case 0:
+					case DIR_LEFT:
 						bul->enemyYL = 0x800;
 						break;
-					case 1:
+					case DIR_UP:
 						bul->enemyXL = 0x800;
 						break;
-					case 2:
+					case DIR_RIGHT:
 						bul->enemyYL = 0x800;
 						break;
-					case 3:
+					case DIR_DOWN:
 						bul->enemyXL = 0x800;
 						break;
 				}
@@ -486,7 +487,7 @@ void ActBullet_PoleStar(BULLET *bul, int level)
 	switch (level)
 	{
 		case 1:
-			if (bul->direct == 1 || bul->direct == 3)
+			if (bul->direct == DIR_UP || bul->direct == DIR_DOWN)
 				bul->rect = rect1[1];
 			else
 				bul->rect = rect1[0];
@@ -494,7 +495,7 @@ void ActBullet_PoleStar(BULLET *bul, int level)
 			break;
 
 		case 2:
-			if (bul->direct == 1 || bul->direct == 3)
+			if (bul->direct == DIR_UP || bul->direct == DIR_DOWN)
 				bul->rect = rect2[1];
 			else
 				bul->rect = rect2[0];
@@ -502,7 +503,7 @@ void ActBullet_PoleStar(BULLET *bul, int level)
 			break;
 
 		case 3:
-			if (bul->direct == 1 || bul->direct == 3)
+			if (bul->direct == DIR_UP || bul->direct == DIR_DOWN)
 				bul->rect = rect3[1];
 			else
 				bul->rect = rect3[0];
@@ -518,7 +519,7 @@ void ActBullet_FireBall(BULLET *bul, int level)
 	if (++bul->count1 > bul->life_count)
 	{
 		bul->cond = 0;
-		SetCaret(bul->x, bul->y, 3, 0);
+		SetCaret(bul->x, bul->y, CARET_SHOOT, DIR_LEFT);
 		return;
 	}
 
@@ -528,15 +529,15 @@ void ActBullet_FireBall(BULLET *bul, int level)
 	if (bul->flag & 1 && bul->flag & 4)
 		bBreak = TRUE;
 
-	if (bul->direct == 0 && bul->flag & 1)
-		bul->direct = 2;
-	if (bul->direct == 2 && bul->flag & 4)
-		bul->direct = 0;
+	if (bul->direct == DIR_LEFT && bul->flag & 1)
+		bul->direct = DIR_RIGHT;
+	if (bul->direct == DIR_RIGHT && bul->flag & 4)
+		bul->direct = DIR_LEFT;
 
 	if (bBreak)
 	{
 		bul->cond = 0;
-		SetCaret(bul->x, bul->y, 2, 0);
+		SetCaret(bul->x, bul->y, CARET_PROJECTILE_DISSIPATION, DIR_LEFT);
 		PlaySoundObject(28, SOUND_MODE_PLAY);
 		return;
 	}
@@ -547,19 +548,19 @@ void ActBullet_FireBall(BULLET *bul, int level)
 
 		switch (bul->direct)
 		{
-			case 0:
+			case DIR_LEFT:
 				bul->xm = -0x400;
 				break;
 
-			case 1:
+			case DIR_UP:
 				bul->xm = gMC.xm;
 
 				if (gMC.xm < 0)
-					bul->direct = 0;
+					bul->direct = DIR_LEFT;
 				else
-					bul->direct = 2;
+					bul->direct = DIR_RIGHT;
 
-				if (gMC.direct == 0)
+				if (gMC.direct == DIR_LEFT)
 					bul->xm -= 0x80;
 				else
 					bul->xm += 0x80;
@@ -567,17 +568,17 @@ void ActBullet_FireBall(BULLET *bul, int level)
 				bul->ym = -0x5FF;
 				break;
 
-			case 2:
+			case DIR_RIGHT:
 				bul->xm = 0x400;
 				break;
 
-			case 3:
+			case DIR_DOWN:
 				bul->xm = gMC.xm;
 
 				if (gMC.xm < 0)
-					bul->direct = 0;
+					bul->direct = DIR_LEFT;
 				else
-					bul->direct = 2;
+					bul->direct = DIR_RIGHT;
 
 				bul->ym = 0x5FF;
 
@@ -637,7 +638,7 @@ void ActBullet_FireBall(BULLET *bul, int level)
 		if (bul->ani_no > 3)
 			bul->ani_no = 0;
 
-		if (bul->direct == 0)
+		if (bul->direct == DIR_LEFT)
 			bul->rect = rect_left1[bul->ani_no];
 		else
 			bul->rect = rect_right1[bul->ani_no];
@@ -647,7 +648,7 @@ void ActBullet_FireBall(BULLET *bul, int level)
 		if (bul->ani_no > 2)
 			bul->ani_no = 0;
 
-		if (bul->direct == 0)
+		if (bul->direct == DIR_LEFT)
 			bul->rect = rect_left2[bul->ani_no];
 		else
 			bul->rect = rect_right2[bul->ani_no];
@@ -687,7 +688,7 @@ void ActBullet_MachineGun(BULLET *bul, int level)
 	if (++bul->count1 > bul->life_count)
 	{
 		bul->cond = 0;
-		SetCaret(bul->x, bul->y, 3, 0);
+		SetCaret(bul->x, bul->y, CARET_SHOOT, DIR_LEFT);
 		return;
 	}
 
@@ -710,19 +711,19 @@ void ActBullet_MachineGun(BULLET *bul, int level)
 
 		switch (bul->direct)
 		{
-			case 0:
+			case DIR_LEFT:
 				bul->xm = -move;
 				bul->ym = Random(-0xAA, 0xAA);
 				break;
-			case 1:
+			case DIR_UP:
 				bul->ym = -move;
 				bul->xm = Random(-0xAA, 0xAA);
 				break;
-			case 2:
+			case DIR_RIGHT:
 				bul->xm = move;
 				bul->ym = Random(-0xAA, 0xAA);
 				break;
-			case 3:
+			case DIR_DOWN:
 				bul->ym = move;
 				bul->xm = Random(-0xAA, 0xAA);
 				break;
@@ -742,10 +743,10 @@ void ActBullet_MachineGun(BULLET *bul, int level)
 			case 2:
 				bul->rect = rect2[bul->direct];
 
-				if (bul->direct == 1 || bul->direct == 3)
-					SetNpChar(127, bul->x, bul->y, 0, 0, 1, NULL, 0x100);
+				if (bul->direct == DIR_UP || bul->direct == DIR_DOWN)
+					SetNpChar(127, bul->x, bul->y, 0, 0, DIR_UP, NULL, 0x100);
 				else
-					SetNpChar(127, bul->x, bul->y, 0, 0, 0, NULL, 0x100);
+					SetNpChar(127, bul->x, bul->y, 0, 0, DIR_LEFT, NULL, 0x100);
 
 				break;
 
@@ -766,7 +767,7 @@ void ActBullet_Missile(BULLET *bul, int level)
 	if (++bul->count1 > bul->life_count)
 	{
 		bul->cond = 0;
-		SetCaret(bul->x, bul->y, 3, 0);
+		SetCaret(bul->x, bul->y, CARET_SHOOT, DIR_LEFT);
 		return;
 	}
 
@@ -774,26 +775,26 @@ void ActBullet_Missile(BULLET *bul, int level)
 
 	if (bul->life != 10)
 		bHit = TRUE;
-	if (bul->direct == 0 && bul->flag & 1)
+	if (bul->direct == DIR_LEFT && bul->flag & 1)
 		bHit = TRUE;
-	if (bul->direct == 2 && bul->flag & 4)
+	if (bul->direct == DIR_RIGHT && bul->flag & 4)
 		bHit = TRUE;
-	if (bul->direct == 1 && bul->flag & 2)
+	if (bul->direct == DIR_UP && bul->flag & 2)
 		bHit = TRUE;
-	if (bul->direct == 3 && bul->flag & 8)
+	if (bul->direct == DIR_DOWN && bul->flag & 8)
 		bHit = TRUE;
-	if (bul->direct == 0 && bul->flag & 0x80)
+	if (bul->direct == DIR_LEFT && bul->flag & 0x80)
 		bHit = TRUE;
-	if (bul->direct == 0 && bul->flag & 0x20)
+	if (bul->direct == DIR_LEFT && bul->flag & 0x20)
 		bHit = TRUE;
-	if (bul->direct == 2 && bul->flag & 0x40)
+	if (bul->direct == DIR_RIGHT && bul->flag & 0x40)
 		bHit = TRUE;
-	if (bul->direct == 2 && bul->flag & 0x10)
+	if (bul->direct == DIR_RIGHT && bul->flag & 0x10)
 		bHit = TRUE;
 
 	if (bHit)
 	{
-		SetBullet(level + 15, bul->x, bul->y, 0);
+		SetBullet(level + 15, bul->x, bul->y, DIR_LEFT);
 		bul->cond = 0;
 	}
 
@@ -804,12 +805,12 @@ void ActBullet_Missile(BULLET *bul, int level)
 
 			switch (bul->direct)
 			{
-				case 0:
-				case 2:
+				case DIR_LEFT:
+				case DIR_RIGHT:
 					bul->tgt_y = bul->y;
 					break;
-				case 1:
-				case 3:
+				case DIR_UP:
+				case DIR_DOWN:
 					bul->tgt_x = bul->x;
 					break;
 			}
@@ -818,8 +819,8 @@ void ActBullet_Missile(BULLET *bul, int level)
 			{
 				switch (bul->direct)
 				{
-					case 0:
-					case 2:
+					case DIR_LEFT:
+					case DIR_RIGHT:
 						if (bul->y > gMC.y)
 							bul->ym = 0x100;
 						else
@@ -828,8 +829,8 @@ void ActBullet_Missile(BULLET *bul, int level)
 						bul->xm = Random(-0x200, 0x200);
 						break;
 
-					case 1:
-					case 3:
+					case DIR_UP:
+					case DIR_DOWN:
 						if (bul->x > gMC.x)
 							bul->xm = 0x100;
 						else
@@ -860,16 +861,16 @@ void ActBullet_Missile(BULLET *bul, int level)
 		case 1:
 			switch (bul->direct)
 			{
-				case 0:
+				case DIR_LEFT:
 					bul->xm += -bul->ani_no;
 					break;
-				case 1:
+				case DIR_UP:
 					bul->ym += -bul->ani_no;
 					break;
-				case 2:
+				case DIR_RIGHT:
 					bul->xm += bul->ani_no;
 					break;
-				case 3:
+				case DIR_DOWN:
 					bul->ym += bul->ani_no;
 					break;
 			}
@@ -878,8 +879,8 @@ void ActBullet_Missile(BULLET *bul, int level)
 			{
 				switch (bul->direct)
 				{
-					case 0:
-					case 2:
+					case DIR_LEFT:
+					case DIR_RIGHT:
 						if (bul->y < bul->tgt_y)
 							bul->ym += 0x20;
 						else
@@ -887,8 +888,8 @@ void ActBullet_Missile(BULLET *bul, int level)
 
 						break;
 
-					case 1:
-					case 3:
+					case DIR_UP:
+					case DIR_DOWN:
 						if (bul->x < bul->tgt_x)
 							bul->xm += 0x20;
 						else
@@ -919,17 +920,17 @@ void ActBullet_Missile(BULLET *bul, int level)
 
 		switch (bul->direct)
 		{
-			case 0:
-				SetCaret(bul->x + (8 * 0x200), bul->y, 7, 2);
+			case DIR_LEFT:
+				SetCaret(bul->x + (8 * 0x200), bul->y, CARET_EXHAUST, DIR_RIGHT);
 				break;
-			case 1:
-				SetCaret(bul->x, bul->y + (8 * 0x200), 7, 3);
+			case DIR_UP:
+				SetCaret(bul->x, bul->y + (8 * 0x200), CARET_EXHAUST, DIR_DOWN);
 				break;
-			case 2:
-				SetCaret(bul->x - (8 * 0x200), bul->y, 7, 0);
+			case DIR_RIGHT:
+				SetCaret(bul->x - (8 * 0x200), bul->y, CARET_EXHAUST, DIR_LEFT);
 				break;
-			case 3:
-				SetCaret(bul->x, bul->y - (8 * 0x200), 7, 1);
+			case DIR_DOWN:
+				SetCaret(bul->x, bul->y - (8 * 0x200), CARET_EXHAUST, DIR_UP);
 				break;
 		}
 	}
@@ -1022,7 +1023,7 @@ void ActBullet_Bubblin1(BULLET *bul)
 	if (bul->flag & 0x2FF)
 	{
 		bul->cond = 0;
-		SetCaret(bul->x, bul->y, 2, 0);
+		SetCaret(bul->x, bul->y, CARET_PROJECTILE_DISSIPATION, DIR_LEFT);
 		return;
 	}
 
@@ -1033,16 +1034,16 @@ void ActBullet_Bubblin1(BULLET *bul)
 
 			switch (bul->direct)
 			{
-				case 0:
+				case DIR_LEFT:
 					bul->xm = -0x600;
 					break;
-				case 2:
+				case DIR_RIGHT:
 					bul->xm = 0x600;
 					break;
-				case 1:
+				case DIR_UP:
 					bul->ym = -0x600;
 					break;
-				case 3:
+				case DIR_DOWN:
 					bul->ym = 0x600;
 					break;
 			}
@@ -1052,16 +1053,16 @@ void ActBullet_Bubblin1(BULLET *bul)
 
 	switch (bul->direct)
 	{
-		case 0:
+		case DIR_LEFT:
 			bul->xm += 0x2A;
 			break;
-		case 2:
+		case DIR_RIGHT:
 			bul->xm -= 0x2A;
 			break;
-		case 1:
+		case DIR_UP:
 			bul->ym += 0x2A;
 			break;
-		case 3:
+		case DIR_DOWN:
 			bul->ym -= 0x2A;
 			break;
 	}
@@ -1072,7 +1073,7 @@ void ActBullet_Bubblin1(BULLET *bul)
 	if (++bul->act_wait > 40)
 	{
 		bul->cond = 0;
-		SetCaret(bul->x, bul->y, 15, 0);
+		SetCaret(bul->x, bul->y, CARET_PROJECTILE_DISSIPATION_TINY, DIR_LEFT);
 	}
 
 	RECT rect[4] = {
@@ -1098,19 +1099,19 @@ void ActBullet_Bubblin2(BULLET *bul)
 {
 	BOOL bDelete = FALSE;
 
-	if (bul->direct == 0 && bul->flag & 1)
+	if (bul->direct == DIR_LEFT && bul->flag & 1)
 		bDelete = TRUE;
-	if (bul->direct == 2 && bul->flag & 4)
+	if (bul->direct == DIR_RIGHT && bul->flag & 4)
 		bDelete = TRUE;
-	if (bul->direct == 1 && bul->flag & 2)
+	if (bul->direct == DIR_UP && bul->flag & 2)
 		bDelete = TRUE;
-	if (bul->direct == 3 && bul->flag & 8)
+	if (bul->direct == DIR_DOWN && bul->flag & 8)
 		bDelete = TRUE;
 
 	if (bDelete)
 	{
 		bul->cond = 0;
-		SetCaret(bul->x, bul->y, 2, 0);
+		SetCaret(bul->x, bul->y, CARET_PROJECTILE_DISSIPATION, DIR_LEFT);
 		return;
 	}
 
@@ -1121,19 +1122,19 @@ void ActBullet_Bubblin2(BULLET *bul)
 
 			switch (bul->direct)
 			{
-				case 0:
+				case DIR_LEFT:
 					bul->xm = -0x600;
 					bul->ym = Random(-0x100, 0x100);
 					break;
-				case 2:
+				case DIR_RIGHT:
 					bul->xm = 0x600;
 					bul->ym = Random(-0x100, 0x100);
 					break;
-				case 1:
+				case DIR_UP:
 					bul->ym = -0x600;
 					bul->xm = Random(-0x100, 0x100);
 					break;
-				case 3:
+				case DIR_DOWN:
 					bul->ym = 0x600;
 					bul->xm = Random(-0x100, 0x100);
 					break;
@@ -1144,16 +1145,16 @@ void ActBullet_Bubblin2(BULLET *bul)
 
 	switch (bul->direct)
 	{
-		case 0:
+		case DIR_LEFT:
 			bul->xm += 0x10;
 			break;
-		case 2:
+		case DIR_RIGHT:
 			bul->xm -= 0x10;
 			break;
-		case 1:
+		case DIR_UP:
 			bul->ym += 0x10;
 			break;
-		case 3:
+		case DIR_DOWN:
 			bul->ym -= 0x10;
 			break;
 	}
@@ -1164,7 +1165,7 @@ void ActBullet_Bubblin2(BULLET *bul)
 	if (++bul->act_wait > 60)
 	{
 		bul->cond = 0;
-		SetCaret(bul->x, bul->y, 15, 0);
+		SetCaret(bul->x, bul->y, CARET_PROJECTILE_DISSIPATION_TINY, DIR_LEFT);
 	}
 
 	RECT rect[4] = {
@@ -1191,13 +1192,13 @@ void ActBullet_Bubblin3(BULLET *bul)
 	if (++bul->act_wait > 100 || !(gKey & gKeyShot))
 	{
 		bul->cond = 0;
-		SetCaret(bul->x, bul->y, 2, 0);
+		SetCaret(bul->x, bul->y, CARET_PROJECTILE_DISSIPATION, DIR_LEFT);
 		PlaySoundObject(100, SOUND_MODE_PLAY);
 
 		if (gMC.up)
-			SetBullet(22, bul->x, bul->y, 1);
+			SetBullet(22, bul->x, bul->y, DIR_UP);
 		else if (gMC.down)
-			SetBullet(22, bul->x, bul->y, 3);
+			SetBullet(22, bul->x, bul->y, DIR_DOWN);
 		else
 			SetBullet(22, bul->x, bul->y, gMC.direct);
 
@@ -1211,19 +1212,19 @@ void ActBullet_Bubblin3(BULLET *bul)
 
 			switch (bul->direct)
 			{
-				case 0:
+				case DIR_LEFT:
 					bul->xm = Random(-0x400, -0x200);
 					bul->ym = (Random(-4, 4) * 0x200) / 2;
 					break;
-				case 2:
+				case DIR_RIGHT:
 					bul->xm = Random(0x200, 0x400);
 					bul->ym = (Random(-4, 4) * 0x200) / 2;
 					break;
-				case 1:
+				case DIR_UP:
 					bul->ym = Random(-0x400, -0x200);
 					bul->xm = (Random(-4, 4) * 0x200) / 2;
 					break;
-				case 3:
+				case DIR_DOWN:
 					bul->ym = Random(0x80, 0x100);
 					bul->xm = (Random(-4, 4) * 0x200) / 2;
 					break;
@@ -1279,7 +1280,7 @@ void ActBullet_Spine(BULLET *bul)
 	if (++bul->count1 > bul->life_count || bul->flag & 8)
 	{
 		bul->cond = 0;
-		SetCaret(bul->x, bul->y, 3, 0);
+		SetCaret(bul->x, bul->y, CARET_SHOOT, DIR_LEFT);
 		return;
 	}
 
@@ -1289,16 +1290,16 @@ void ActBullet_Spine(BULLET *bul)
 
 		switch (bul->direct)
 		{
-			case 0:
+			case DIR_LEFT:
 				bul->xm = (-Random(10, 16) * 0x200) / 2;
 				break;
-			case 1:
+			case DIR_UP:
 				bul->ym = (-Random(10, 16) * 0x200) / 2;
 				break;
-			case 2:
+			case DIR_RIGHT:
 				bul->xm = (Random(10, 16) * 0x200) / 2;
 				break;
-			case 3:
+			case DIR_DOWN:
 				bul->ym = (Random(10, 16) * 0x200) / 2;
 				break;
 		}
@@ -1335,16 +1336,16 @@ void ActBullet_Spine(BULLET *bul)
 
 	switch (bul->direct)
 	{
-		case 0:
+		case DIR_LEFT:
 			bul->rect = rcLeft[bul->ani_no];
 			break;
-		case 1:
+		case DIR_UP:
 			bul->rect = rcDown[bul->ani_no];
 			break;
-		case 2:
+		case DIR_RIGHT:
 			bul->rect = rcRight[bul->ani_no];
 			break;
-		case 3:
+		case DIR_DOWN:
 			bul->rect = rcDown[bul->ani_no];
 			break;
 	}
@@ -1355,7 +1356,7 @@ void ActBullet_Sword1(BULLET *bul)
 	if (++bul->count1 > bul->life_count)
 	{
 		bul->cond = 0;
-		SetCaret(bul->x, bul->y, 3, 0);
+		SetCaret(bul->x, bul->y, CARET_SHOOT, DIR_LEFT);
 		return;
 	}
 
@@ -1371,16 +1372,16 @@ void ActBullet_Sword1(BULLET *bul)
 
 		switch (bul->direct)
 		{
-			case 0:
+			case DIR_LEFT:
 				bul->xm = -0x800;
 				break;
-			case 1:
+			case DIR_UP:
 				bul->ym = -0x800;
 				break;
-			case 2:
+			case DIR_RIGHT:
 				bul->xm = 0x800;
 				break;
-			case 3:
+			case DIR_DOWN:
 				bul->ym = 0x800;
 				break;
 		}
@@ -1414,7 +1415,7 @@ void ActBullet_Sword1(BULLET *bul)
 	if (bul->ani_no > 3)
 		bul->ani_no = 0;
 
-	if (bul->direct == 0)
+	if (bul->direct == DIR_LEFT)
 		bul->rect = rcLeft[bul->ani_no];
 	else
 		bul->rect = rcRight[bul->ani_no];
@@ -1425,7 +1426,7 @@ void ActBullet_Sword2(BULLET *bul)
 	if (++bul->count1 > bul->life_count)
 	{
 		bul->cond = 0;
-		SetCaret(bul->x, bul->y, 3, 0);
+		SetCaret(bul->x, bul->y, CARET_SHOOT, DIR_LEFT);
 		return;
 	}
 
@@ -1441,16 +1442,16 @@ void ActBullet_Sword2(BULLET *bul)
 
 		switch (bul->direct)
 		{
-			case 0:
+			case DIR_LEFT:
 				bul->xm = -0x800;
 				break;
-			case 1:
+			case DIR_UP:
 				bul->ym = -0x800;
 				break;
-			case 2:
+			case DIR_RIGHT:
 				bul->xm = 0x800;
 				break;
-			case 3:
+			case DIR_DOWN:
 				bul->ym = 0x800;
 				break;
 		}
@@ -1484,7 +1485,7 @@ void ActBullet_Sword2(BULLET *bul)
 	if (bul->ani_no > 3)
 		bul->ani_no = 0;
 
-	if (bul->direct == 0)
+	if (bul->direct == DIR_LEFT)
 		bul->rect = rcLeft[bul->ani_no];
 	else
 		bul->rect = rcRight[bul->ani_no];
@@ -1522,16 +1523,16 @@ void ActBullet_Sword3(BULLET *bul)
 		case 1:
 			switch (bul->direct)
 			{
-				case 0:
+				case DIR_LEFT:
 					bul->xm = -0x800;
 					break;
-				case 1:
+				case DIR_UP:
 					bul->ym = -0x800;
 					break;
-				case 2:
+				case DIR_RIGHT:
 					bul->xm = 0x800;
 					break;
-				case 3:
+				case DIR_DOWN:
 					bul->ym = 0x800;
 					break;
 			}
@@ -1549,9 +1550,9 @@ void ActBullet_Sword3(BULLET *bul)
 				PlaySoundObject(106, SOUND_MODE_PLAY);
 
 				if (++bul->count1 % 2)
-					SetBullet(23, bul->x, bul->y, 0);
+					SetBullet(23, bul->x, bul->y, DIR_LEFT);
 				else
-					SetBullet(23, bul->x, bul->y, 2);
+					SetBullet(23, bul->x, bul->y, DIR_RIGHT);
 			}
 
 			if (++bul->count1 == 5)
@@ -1560,7 +1561,7 @@ void ActBullet_Sword3(BULLET *bul)
 			if (bul->count1 > bul->life_count)
 			{
 				bul->cond = 0;
-				SetCaret(bul->x, bul->y, 3, 0);
+				SetCaret(bul->x, bul->y, CARET_SHOOT, DIR_LEFT);
 				return;
 			}
 
@@ -1576,9 +1577,9 @@ void ActBullet_Sword3(BULLET *bul)
 				PlaySoundObject(106, SOUND_MODE_PLAY);
 
 				if (Random(0, 1) % 2)
-					SetBullet(23, bul->x + (Random(-0x40, 0x40) * 0x200), bul->y + (Random(-0x40, 0x40) * 0x200), 0);
+					SetBullet(23, bul->x + (Random(-0x40, 0x40) * 0x200), bul->y + (Random(-0x40, 0x40) * 0x200), DIR_LEFT);
 				else
-					SetBullet(23, bul->x + (Random(-0x40, 0x40) * 0x200), bul->y + (Random(-0x40, 0x40) * 0x200), 2);
+					SetBullet(23, bul->x + (Random(-0x40, 0x40) * 0x200), bul->y + (Random(-0x40, 0x40) * 0x200), DIR_RIGHT);
 			}
 
 			if (bul->act_wait > 50)
@@ -1590,16 +1591,16 @@ void ActBullet_Sword3(BULLET *bul)
 
 	switch (bul->direct)
 	{
-		case 0:
+		case DIR_LEFT:
 			bul->rect = rcLeft[bul->ani_no];
 			break;
-		case 1:
+		case DIR_UP:
 			bul->rect = rcUp[bul->ani_no];
 			break;
-		case 2:
+		case DIR_RIGHT:
 			bul->rect = rcRight[bul->ani_no];
 			break;
-		case 3:
+		case DIR_DOWN:
 			bul->rect = rcDown[bul->ani_no];
 			break;
 	}
@@ -1616,7 +1617,7 @@ void ActBullet_Edge(BULLET *bul)
 			bul->act_no = 1;
 			bul->y -= 12 * 0x200;
 
-			if (bul->direct == 0)
+			if (bul->direct == DIR_LEFT)
 				bul->x += 16 * 0x200;
 			else
 				bul->x -= 16 * 0x200;
@@ -1628,7 +1629,7 @@ void ActBullet_Edge(BULLET *bul)
 				++bul->ani_no;
 			}
 
-			if (bul->direct == 0)
+			if (bul->direct == DIR_LEFT)
 				bul->x -= 2 * 0x200;
 			else
 				bul->x += 2 * 0x200;
@@ -1667,7 +1668,7 @@ void ActBullet_Edge(BULLET *bul)
 		{96, 88, 120, 112},
 	};
 
-	if (bul->direct == 0)
+	if (bul->direct == DIR_LEFT)
 		bul->rect = rcLeft[bul->ani_no];
 	else
 		bul->rect = rcRight[bul->ani_no];
@@ -1692,7 +1693,7 @@ void ActBullet_SuperMissile(BULLET *bul, int level)
 	if (++bul->count1 > bul->life_count)
 	{
 		bul->cond = 0;
-		SetCaret(bul->x, bul->y, 3, 0);
+		SetCaret(bul->x, bul->y, CARET_SHOOT, DIR_LEFT);
 		return;
 	}
 
@@ -1700,26 +1701,26 @@ void ActBullet_SuperMissile(BULLET *bul, int level)
 
 	if (bul->life != 10)
 		bHit = TRUE;
-	if (bul->direct == 0 && bul->flag & 1)
+	if (bul->direct == DIR_LEFT && bul->flag & 1)
 		bHit = TRUE;
-	if (bul->direct == 2 && bul->flag & 4)
+	if (bul->direct == DIR_RIGHT && bul->flag & 4)
 		bHit = TRUE;
-	if (bul->direct == 1 && bul->flag & 2)
+	if (bul->direct == DIR_UP && bul->flag & 2)
 		bHit = TRUE;
-	if (bul->direct == 3 && bul->flag & 8)
+	if (bul->direct == DIR_DOWN && bul->flag & 8)
 		bHit = TRUE;
-	if (bul->direct == 0 && bul->flag & 0x80)
+	if (bul->direct == DIR_LEFT && bul->flag & 0x80)
 		bHit = TRUE;
-	if (bul->direct == 0 && bul->flag & 0x20)
+	if (bul->direct == DIR_LEFT && bul->flag & 0x20)
 		bHit = TRUE;
-	if (bul->direct == 2 && bul->flag & 0x40)
+	if (bul->direct == DIR_RIGHT && bul->flag & 0x40)
 		bHit = TRUE;
-	if (bul->direct == 2 && bul->flag & 0x10)
+	if (bul->direct == DIR_RIGHT && bul->flag & 0x10)
 		bHit = TRUE;
 
 	if (bHit)
 	{
-		SetBullet(level + 30, bul->x, bul->y, 0);
+		SetBullet(level + 30, bul->x, bul->y, DIR_LEFT);
 		bul->cond = 0;
 	}
 
@@ -1730,15 +1731,15 @@ void ActBullet_SuperMissile(BULLET *bul, int level)
 
 			switch (bul->direct)
 			{
-				case 0:
-				case 2:
+				case DIR_LEFT:
+				case DIR_RIGHT:
 					bul->tgt_y = bul->y;
 					bul->enemyXL = 0x1000;
 					bul->blockXL = 0x1000;
 					break;
 
-				case 1:
-				case 3:
+				case DIR_UP:
+				case DIR_DOWN:
 					bul->tgt_x = bul->x;
 					bul->enemyYL = 0x1000;
 					bul->blockYL = 0x1000;
@@ -1749,8 +1750,8 @@ void ActBullet_SuperMissile(BULLET *bul, int level)
 			{
 				switch (bul->direct)
 				{
-					case 0:
-					case 2:
+					case DIR_LEFT:
+					case DIR_RIGHT:
 						if (bul->y > gMC.y)
 							bul->ym = 0x100;
 						else
@@ -1759,8 +1760,8 @@ void ActBullet_SuperMissile(BULLET *bul, int level)
 						bul->xm = Random(-0x200, 0x200);
 						break;
 
-					case 1:
-					case 3:
+					case DIR_UP:
+					case DIR_DOWN:
 						if (bul->x > gMC.x)
 							bul->xm = 0x100;
 						else
@@ -1791,16 +1792,16 @@ void ActBullet_SuperMissile(BULLET *bul, int level)
 		case 1:
 			switch (bul->direct)
 			{
-				case 0:
+				case DIR_LEFT:
 					bul->xm += -bul->ani_no;
 					break;
-				case 1:
+				case DIR_UP:
 					bul->ym += -bul->ani_no;
 					break;
-				case 2:
+				case DIR_RIGHT:
 					bul->xm += bul->ani_no;
 					break;
-				case 3:
+				case DIR_DOWN:
 					bul->ym += bul->ani_no;
 					break;
 			}
@@ -1809,16 +1810,16 @@ void ActBullet_SuperMissile(BULLET *bul, int level)
 			{
 				switch (bul->direct)
 				{
-					case 0:
-					case 2:
+					case DIR_LEFT:
+					case DIR_RIGHT:
 						if (bul->y < bul->tgt_y)
 							bul->ym += 0x40;
 						else
 							bul->ym -= 0x40;
 
 						break;
-					case 1:
-					case 3:
+					case DIR_UP:
+					case DIR_DOWN:
 						if (bul->x < bul->tgt_x)
 							bul->xm += 0x40;
 						else
@@ -1850,17 +1851,17 @@ void ActBullet_SuperMissile(BULLET *bul, int level)
 
 		switch (bul->direct)
 		{
-			case 0:
-				SetCaret(bul->x + (8 * 0x200), bul->y, 7, 2);
+			case DIR_LEFT:
+				SetCaret(bul->x + (8 * 0x200), bul->y, CARET_EXHAUST, DIR_RIGHT);
 				break;
-			case 1:
-				SetCaret(bul->x, bul->y + (8 * 0x200), 7, 3);
+			case DIR_UP:
+				SetCaret(bul->x, bul->y + (8 * 0x200), CARET_EXHAUST, DIR_DOWN);
 				break;
-			case 2:
-				SetCaret(bul->x - (8 * 0x200), bul->y, 7, 0);
+			case DIR_RIGHT:
+				SetCaret(bul->x - (8 * 0x200), bul->y, CARET_EXHAUST, DIR_LEFT);
 				break;
-			case 3:
-				SetCaret(bul->x, bul->y - (8 * 0x200), 7, 1);
+			case DIR_DOWN:
+				SetCaret(bul->x, bul->y - (8 * 0x200), CARET_EXHAUST, DIR_UP);
 				break;
 		}
 	}
@@ -1944,7 +1945,7 @@ void ActBullet_Nemesis(BULLET *bul, int level)
 	if (++bul->count1 > bul->life_count)
 	{
 		bul->cond = 0;
-		SetCaret(bul->x, bul->y, 3, 0);
+		SetCaret(bul->x, bul->y, CARET_SHOOT, DIR_LEFT);
 		return;
 	}
 
@@ -1955,16 +1956,16 @@ void ActBullet_Nemesis(BULLET *bul, int level)
 
 		switch (bul->direct)
 		{
-			case 0:
+			case DIR_LEFT:
 				bul->xm = -0x1000;
 				break;
-			case 1:
+			case DIR_UP:
 				bul->ym = -0x1000;
 				break;
-			case 2:
+			case DIR_RIGHT:
 				bul->xm = 0x1000;
 				break;
-			case 3:
+			case DIR_DOWN:
 				bul->ym = 0x1000;
 				break;
 		}
@@ -1983,17 +1984,17 @@ void ActBullet_Nemesis(BULLET *bul, int level)
 		{
 			switch (bul->direct)
 			{
-				case 0:
-					SetNpChar(4, bul->x, bul->y, -0x200, Random(-0x200, 0x200), 2, NULL, 0x100);
+				case DIR_LEFT:
+					SetNpChar(4, bul->x, bul->y, -0x200, Random(-0x200, 0x200), DIR_RIGHT, NULL, 0x100);
 					break;
-				case 1:
-					SetNpChar(4, bul->x, bul->y, Random(-0x200, 0x200), -0x200, 2, NULL, 0x100);
+				case DIR_UP:
+					SetNpChar(4, bul->x, bul->y, Random(-0x200, 0x200), -0x200, DIR_RIGHT, NULL, 0x100);
 					break;
-				case 2:
-					SetNpChar(4, bul->x, bul->y, 0x200, Random(-0x200, 0x200), 2, NULL, 0x100);
+				case DIR_RIGHT:
+					SetNpChar(4, bul->x, bul->y, 0x200, Random(-0x200, 0x200), DIR_RIGHT, NULL, 0x100);
 					break;
-				case 3:
-					SetNpChar(4, bul->x, bul->y, Random(-0x200, 0x200), 0x200, 2, NULL, 0x100);
+				case DIR_DOWN:
+					SetNpChar(4, bul->x, bul->y, Random(-0x200, 0x200), 0x200, DIR_RIGHT, NULL, 0x100);
 					break;
 			}
 		}
@@ -2027,16 +2028,16 @@ void ActBullet_Nemesis(BULLET *bul, int level)
 
 	switch (bul->direct)
 	{
-		case 0:
+		case DIR_LEFT:
 			bul->rect = rcL[bul->ani_no];
 			break;
-		case 1:
+		case DIR_UP:
 			bul->rect = rcU[bul->ani_no];
 			break;
-		case 2:
+		case DIR_RIGHT:
 			bul->rect = rcR[bul->ani_no];
 			break;
-		case 3:
+		case DIR_DOWN:
 			bul->rect = rcD[bul->ani_no];
 			break;
 	}
@@ -2052,7 +2053,7 @@ void ActBullet_Spur(BULLET *bul, int level)
 	if (++bul->count1 > bul->life_count)
 	{
 		bul->cond = 0;
-		SetCaret(bul->x, bul->y, 3, 0);
+		SetCaret(bul->x, bul->y, CARET_SHOOT, DIR_LEFT);
 		return;
 	}
 
@@ -2065,16 +2066,16 @@ void ActBullet_Spur(BULLET *bul, int level)
 
 		switch (bul->direct)
 		{
-			case 0:
+			case DIR_LEFT:
 				bul->xm = -0x1000;
 				break;
-			case 1:
+			case DIR_UP:
 				bul->ym = -0x1000;
 				break;
-			case 2:
+			case DIR_RIGHT:
 				bul->xm = 0x1000;
 				break;
-			case 3:
+			case DIR_DOWN:
 				bul->ym = 0x1000;
 				break;
 		}
@@ -2084,16 +2085,16 @@ void ActBullet_Spur(BULLET *bul, int level)
 			case 1:
 				switch (bul->direct)
 				{
-					case 0:
+					case DIR_LEFT:
 						bul->enemyYL = 0x400;
 						break;
-					case 1:
+					case DIR_UP:
 						bul->enemyXL = 0x400;
 						break;
-					case 2:
+					case DIR_RIGHT:
 						bul->enemyYL = 0x400;
 						break;
-					case 3:
+					case DIR_DOWN:
 						bul->enemyXL = 0x400;
 						break;
 				}
@@ -2103,16 +2104,16 @@ void ActBullet_Spur(BULLET *bul, int level)
 			case 2:
 				switch (bul->direct)
 				{
-					case 0:
+					case DIR_LEFT:
 						bul->enemyYL = 0x800;
 						break;
-					case 1:
+					case DIR_UP:
 						bul->enemyXL = 0x800;
 						break;
-					case 2:
+					case DIR_RIGHT:
 						bul->enemyYL = 0x800;
 						break;
-					case 3:
+					case DIR_DOWN:
 						bul->enemyXL = 0x800;
 						break;
 				}
@@ -2146,7 +2147,7 @@ void ActBullet_Spur(BULLET *bul, int level)
 	switch (level)
 	{
 		case 1:
-			if (bul->direct == 1 || bul->direct == 3)
+			if (bul->direct == DIR_UP || bul->direct == DIR_DOWN)
 				bul->rect = rect1[1];
 			else
 				bul->rect = rect1[0];
@@ -2154,7 +2155,7 @@ void ActBullet_Spur(BULLET *bul, int level)
 			break;
 
 		case 2:
-			if (bul->direct == 1 || bul->direct == 3)
+			if (bul->direct == DIR_UP || bul->direct == DIR_DOWN)
 				bul->rect = rect2[1];
 			else
 				bul->rect = rect2[0];
@@ -2162,7 +2163,7 @@ void ActBullet_Spur(BULLET *bul, int level)
 			break;
 
 		case 3:
-			if (bul->direct == 1 || bul->direct == 3)
+			if (bul->direct == DIR_UP || bul->direct == DIR_DOWN)
 				bul->rect = rect3[1];
 			else
 				bul->rect = rect3[0];
@@ -2228,7 +2229,7 @@ void ActBullet_SpurTail(BULLET *bul, int level)
 	switch (level)
 	{
 		case 1:
-			if (bul->direct == 0 || bul->direct == 2)
+			if (bul->direct == DIR_LEFT || bul->direct == DIR_RIGHT)
 				bul->rect = rc_h_lv1[bul->ani_no];
 			else
 				bul->rect = rc_v_lv1[bul->ani_no];
@@ -2236,7 +2237,7 @@ void ActBullet_SpurTail(BULLET *bul, int level)
 			break;
 
 		case 2:
-			if (bul->direct == 0 || bul->direct == 2)
+			if (bul->direct == DIR_LEFT || bul->direct == DIR_RIGHT)
 				bul->rect = rc_h_lv2[bul->ani_no];
 			else
 				bul->rect = rc_v_lv2[bul->ani_no];
@@ -2244,7 +2245,7 @@ void ActBullet_SpurTail(BULLET *bul, int level)
 			break;
 
 		case 3:
-			if (bul->direct == 0 || bul->direct == 2)
+			if (bul->direct == DIR_LEFT || bul->direct == DIR_RIGHT)
 				bul->rect = rc_h_lv3[bul->ani_no];
 			else
 				bul->rect = rc_v_lv3[bul->ani_no];

@@ -2,22 +2,19 @@
 
 ## Table of Contents
 
-This repo has multiple branches:
+This repo has two main branches:
 
 Branch | Description
 --------|--------
-[accurate](https://www.github.com/Clownacy/CSE2/tree/accurate) | The main decompilation branch. The code intended to be as close to the original as possible, down to all the bugs and platform-dependencies.
+[accurate](https://www.github.com/Clownacy/CSE2/tree/accurate) | The main decompilation branch. The code is intended to be as close to the original as possible, down to all the bugs and platform-dependencies.
 [portable](https://www.github.com/Clownacy/CSE2/tree/portable) | This branch ports the engine away from WinAPI and DirectX, and addresses numerous portability issues, allowing it to run on other platforms.
-[enhanced-lite](https://www.github.com/Clownacy/CSE2/tree/enhanced-lite) | Based on the `portable` branch, this branch is **intended for modders**, and adds several enhancements and features to the engine.
-[enhanced](https://www.github.com/Clownacy/CSE2/tree/enhanced) | Based on the `enhanced-lite` branch, this branch is **intended for players**, and adds further enhancements and features to the engine.
-[emscripten](https://www.github.com/Clownacy/CSE2/tree/emscripten) | Modifies the engine to build with Emscripten, [allowing it to run in web browsers](http://sonicresearch.org/clownacy/cave.html) (no longer maintained).
-[wii](https://www.github.com/Clownacy/CSE2/tree/wii) | Ports the engine to the Nintendo Wii (no longer maintained).
 
 # CSE2 (Portable)
 
 CSE2 is a decompilation of Cave Story.
 
-This branch migrates the engine away from WinAPI and DirectX, and addresses numerous portability issues, allowing it to run on other platforms.
+This branch migrates the engine away from WinAPI and DirectX, and addresses
+numerous portability issues, allowing it to run on other platforms.
 
 Supported platforms include...
 * Windows
@@ -29,19 +26,39 @@ Supported platforms include...
 
 ## Background
 
-When Pixel made Cave Story, he compiled the original Windows EXE with no optimisations. This left the generated assembly code extremely verbose and easy to read. It also made the code very decompiler-friendly, since the assembly could be mapped directly back to the original C(++) code.
+When Pixel made Cave Story, he compiled the original Windows EXE with no
+optimisations. This left the generated assembly code extremely verbose and easy
+to read. It also made the code very decompiler-friendly, since the assembly
+could be mapped directly back to the original C(++) code.
 
-Technically, this alone made a decompilation feasible, as was the case for [the Super Mario 64 decompilation project](https://github.com/n64decomp/sm64) - however, there was more to be found...
+Technically, this alone made a decompilation feasible, as was the case for [the
+Super Mario 64 decompilation project](https://github.com/n64decomp/sm64) -
+however, there was more to be found...
 
-In 2007, a Linux port of Cave Story was made by Peter Mackay and Simon Parzer. Details about it can be found on [Peter's old blog](https://web.archive.org/web/20070911202919/http://aaiiee.wordpress.com:80/). This port received an update in 2011, including two shiny new executables. What Peter and Simon didn't realise was that they left huge amounts of debugging information in these executables, including the names of every C++ source file, as well as the variables, functions, and structs they contained.
+In 2007, a Linux port of Cave Story was made by Peter Mackay and Simon Parzer.
+Details about it can be found on [Peter's old blog](https://web.archive.org/web/20070911202919/http://aaiiee.wordpress.com:80/).
+This port received an update in 2011, including two shiny new executables. What
+Peter and Simon didn't realise was that they left huge amounts of debugging
+information in these executables, including the names of every C++ source file,
+as well as the variables, functions, and structs they contained.
 
-This was a goldmine of information about not just the game's inner-workings, but its _source code._ This is the same lucky-break [the Diablo decompilation project](https://github.com/diasurgical/devilution) had. With it, much of the game's code was pre-documented and explained _for_ us, saving us the effort of doing it ourselves. In fact, the combination of easy-to-decompile code, and a near-full set of function/variable names, reduced much of the decompilation process to mere copy-paste.
+This was a goldmine of information about not just the game's inner-workings, but
+its _source code._ This is the same lucky-break [the Diablo decompilation project](https://github.com/diasurgical/devilution)
+had. With it, much of the game's code was pre-documented and explained _for_ us,
+saving us the effort of doing it ourselves. In fact, the combination of
+easy-to-decompile code, and a near-full set of function/variable names, reduced
+much of the decompilation process to mere copy-paste.
 
-To top it all off, some of Cave Story's original source code would eventually see the light of day...
+To top it all off, some of Cave Story's original source code would eventually
+see the light of day...
 
-In early 2018, the Organya music engine was [released on GitHub](https://github.com/shbow/organya) by an old friend of Pixel's. On top of providing an insight into Pixel's coding style, this helped with figuring out one of the most complex parts of Cave Story's codebase.
+In early 2018, the Organya music engine was [released on GitHub](https://github.com/shbow/organya)
+by an old friend of Pixel's. On top of providing an insight into Pixel's coding
+style, this helped with figuring out one of the most complex parts of Cave
+Story's codebase.
 
-And... that's it! It's not often that a game this decompilable comes along, so I'm glad that Cave Story was one of them. [Patching a dusty old executable from 2004 has its downsides](https://github.com/Clownacy/Cave-Story-Mod-Loader/blob/master/src/mods/graphics_enhancement/widescreen/patch_camera.c).
+And... that's it! It's not often that a game this decompilable comes along, so
+I'm glad that Cave Story was one of them. [Patching a dusty old executable from 2004 has its downsides](https://github.com/Clownacy/Cave-Story-Mod-Loader/blob/master/src/mods/graphics_enhancement/widescreen/patch_camera.c).
 
 ## Dependencies
 
@@ -59,7 +76,9 @@ A list of dependencies for specific platforms can be found [on the wiki](https:/
 
 This project uses CMake, allowing it to be built with a range of compilers.
 
-Switch to the terminal (Visual Studio users should open the [Developer Command Prompt](https://docs.microsoft.com/en-us/dotnet/framework/tools/developer-command-prompt-for-vs)) and `cd` into this folder. After that, generate the files for your build system with:
+Switch to the terminal (Visual Studio users should open the [Developer Command Prompt](https://docs.microsoft.com/en-us/dotnet/framework/tools/developer-command-prompt-for-vs))
+and `cd` into this folder. After that, generate the files for your build system
+with:
 
 ```
 cmake -B build -DCMAKE_BUILD_TYPE=Release
@@ -104,15 +123,18 @@ You can then compile CSE2 with this command:
 cmake --build build --config Release
 ```
 
-If you're a Visual Studio user, you can open the generated `CSE2.sln` file instead, which can be found in the `build` folder.
+If you're a Visual Studio user, you can open the generated `CSE2.sln` file
+instead, which can be found in the `build` folder.
 
-Once built, the executables can be found in the `game_english`/`game_japanese` folder, depending on the selected language.
+Once built, the executables can be found in the `game_english`/`game_japanese`
+folder, depending on the selected language.
 
 ### Building for the Wii U
 
 To target the Wii U, you'll need devkitPro, and WUT.
 
-First, add the devkitPPC tools directory to your PATH (because WUT's CMake support is broken, as of writing):
+First, add the devkitPPC tools directory to your PATH (because WUT's CMake
+support is broken, as of writing):
 
 ```
 PATH=$PATH:$DEVKITPPC/bin
@@ -130,7 +152,8 @@ Finally, build the game with this command:
 cmake --build buildwiiu
 ```
 
-This will build a binary, but you still need to convert it to an `.rpx` file that can be ran on your Wii U.
+This will build a binary, but you still need to convert it to an `.rpx` file
+that can be ran on your Wii U.
 
 First, we need to strip the binary:
 
@@ -143,8 +166,12 @@ Then, we convert it to an `.rpx`:
 elf2rpl game_english/CSE2 game_english/CSE2.rpx
 ```
 
-`game_english/CSE2.rpx` is now ready to be ran on your Wii U. This port expects the data folder to be in a folder called `CSE2-portable-en`/`CSE2-portable-jp` on the root of your SD card.
+`game_english/CSE2.rpx` is now ready to be ran on your Wii U. This port expects
+the data folder to be in a folder called `CSE2-portable-en`/`CSE2-portable-jp`
+on the root of your SD card.
 
 ## Licensing
 
-Being a decompilation, the majority of the code in this project belongs to Daisuke "Pixel" Amaya - not us. We've yet to agree on a licence for our own code.
+Being a decompilation, the majority of the code in this project belongs to
+Daisuke "Pixel" Amaya - not us. We've yet to agree on a licence for our own
+code.

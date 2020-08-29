@@ -15,6 +15,7 @@
 #include "BossX.h"
 #include "Bullet.h"
 #include "Caret.h"
+#include "CommonDefines.h"
 #include "Draw.h"
 #include "Map.h"
 #include "MyChar.h"
@@ -158,9 +159,9 @@ void HitBossBullet(void)
 					{
 						if (gBoss[bos].shock < 14)
 						{
-							SetCaret(gBul[bul].x, gBul[bul].y, 11, 0);
-							SetCaret(gBul[bul].x, gBul[bul].y, 11, 0);
-							SetCaret(gBul[bul].x, gBul[bul].y, 11, 0);
+							SetCaret(gBul[bul].x, gBul[bul].y, CARET_HURT_PARTICLES, DIR_LEFT);
+							SetCaret(gBul[bul].x, gBul[bul].y, CARET_HURT_PARTICLES, DIR_LEFT);
+							SetCaret(gBul[bul].x, gBul[bul].y, CARET_HURT_PARTICLES, DIR_LEFT);
 							PlaySoundObject(gBoss[bos_].hit_voice, SOUND_MODE_PLAY);
 						}
 
@@ -187,7 +188,7 @@ void HitBossBullet(void)
 				{
 					if (!(gBul[bul].bbits & 0x10))
 					{
-						SetCaret(gBul[bul].x, gBul[bul].y, 2, 2);
+						SetCaret(gBul[bul].x, gBul[bul].y, CARET_PROJECTILE_DISSIPATION, DIR_RIGHT);
 						PlaySoundObject(31, SOUND_MODE_PLAY);
 						gBul[bul].cond = 0;
 						continue;

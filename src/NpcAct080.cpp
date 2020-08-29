@@ -637,7 +637,7 @@ void ActNpc084(NPCHAR *npc)
 {
 	if (npc->flag & 0xFF)
 	{
-		SetCaret(npc->x, npc->y, 2, 0);
+		SetCaret(npc->x, npc->y, CARET_PROJECTILE_DISSIPATION, DIR_LEFT);
 		npc->cond = 0;
 	}
 
@@ -664,7 +664,7 @@ void ActNpc084(NPCHAR *npc)
 
 	if (++npc->count1 > 300)
 	{
-		SetCaret(npc->x, npc->y, 2, 0);
+		SetCaret(npc->x, npc->y, CARET_PROJECTILE_DISSIPATION, DIR_LEFT);
 		npc->cond = 0;
 	}
 }
@@ -737,7 +737,7 @@ void ActNpc086(NPCHAR *npc)
 			npc->ani_no = 0;
 	}
 
-	if (gBack.type == 5 || gBack.type == 6)
+	if (gBack.type == BACKGROUND_TYPE_AUTOSCROLL || gBack.type == BACKGROUND_TYPE_OUTSIDE_WITH_WIND)
 	{
 		if (npc->act_no == 0)
 		{
@@ -818,7 +818,7 @@ void ActNpc087(NPCHAR *npc)
 			npc->ani_no = 0;
 	}
 
-	if (gBack.type == 5 || gBack.type == 6)
+	if (gBack.type == BACKGROUND_TYPE_AUTOSCROLL || gBack.type == BACKGROUND_TYPE_OUTSIDE_WITH_WIND)
 	{
 		if (npc->act_no == 0)
 		{
@@ -1410,7 +1410,7 @@ void ActNpc093(NPCHAR *npc)
 			if (++npc->act_wait > 200)
 			{
 				npc->act_wait = 0;
-				SetCaret(npc->x, npc->y, 5, 0);
+				SetCaret(npc->x, npc->y, CARET_ZZZ, DIR_LEFT);
 			}
 
 			break;

@@ -5,6 +5,7 @@
 #include "Back.h"
 #include "Bullet.h"
 #include "Caret.h"
+#include "CommonDefines.h"
 #include "Flags.h"
 #include "Game.h"
 #include "Map.h"
@@ -591,9 +592,9 @@ void HitNpCharBullet(void)
 					{
 						if (gNPC[n].shock < 14)
 						{
-							SetCaret((gBul[b].x + gNPC[n].x) / 2, (gBul[b].y + gNPC[n].y) / 2, 11, 0);
-							SetCaret((gBul[b].x + gNPC[n].x) / 2, (gBul[b].y + gNPC[n].y) / 2, 11, 0);
-							SetCaret((gBul[b].x + gNPC[n].x) / 2, (gBul[b].y + gNPC[n].y) / 2, 11, 0);
+							SetCaret((gBul[b].x + gNPC[n].x) / 2, (gBul[b].y + gNPC[n].y) / 2, CARET_HURT_PARTICLES, DIR_LEFT);
+							SetCaret((gBul[b].x + gNPC[n].x) / 2, (gBul[b].y + gNPC[n].y) / 2, CARET_HURT_PARTICLES, DIR_LEFT);
+							SetCaret((gBul[b].x + gNPC[n].x) / 2, (gBul[b].y + gNPC[n].y) / 2, CARET_HURT_PARTICLES, DIR_LEFT);
 							PlaySoundObject(gNPC[n].hit_voice, SOUND_MODE_PLAY);
 							gNPC[n].shock = 16;
 						}
@@ -614,7 +615,7 @@ void HitNpCharBullet(void)
 				else if (!(gBul[b].bbits & 0x10))
 				{
 					// Hit invulnerable NPC
-					SetCaret((gBul[b].x + gNPC[n].x) / 2, (gBul[b].y + gNPC[n].y) / 2, 2, 2);
+					SetCaret((gBul[b].x + gNPC[n].x) / 2, (gBul[b].y + gNPC[n].y) / 2, CARET_PROJECTILE_DISSIPATION, DIR_RIGHT);
 					PlaySoundObject(31, SOUND_MODE_PLAY);
 					gBul[b].life = 0;
 					continue;

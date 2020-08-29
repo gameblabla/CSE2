@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
 	// Get path of the data folder
 	gDataPath = gModulePath + "/data";
 
-	CONFIG conf;
+	CONFIGDATA conf;
 	if (!LoadConfigData(&conf))
 		DefaultConfigData(&conf);
 
@@ -578,7 +578,7 @@ BOOL SystemTask(void)
 void JoystickProc(void)
 {
 	int i;
-	JOYSTICK_STATUS status;
+	DIRECTINPUTSTATUS status;
 
 	if (!GetJoystickStatus(&status))
 		return;

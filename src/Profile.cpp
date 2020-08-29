@@ -42,7 +42,7 @@ BOOL IsProfile(void)
 BOOL SaveProfile(const char *name)
 {
 	FILE *fp;
-	PROFILE profile;
+	PROFILEDATA profile;
 	const char *FLAG = "FLAG";
 
 	std::string path;
@@ -59,7 +59,7 @@ BOOL SaveProfile(const char *name)
 		return FALSE;
 
 	// Set up profile
-	memset(&profile, 0, sizeof(PROFILE));
+	memset(&profile, 0, sizeof(PROFILEDATA));
 	memcpy(profile.code, gProfileCode, sizeof(profile.code));
 	memcpy(profile.FLAG, FLAG, sizeof(profile.FLAG));
 	profile.stage = gStageNo;
@@ -123,7 +123,7 @@ BOOL SaveProfile(const char *name)
 BOOL LoadProfile(const char *name)
 {
 	FILE *fp;
-	PROFILE profile;
+	PROFILEDATA profile;
 	std::string path;
 
 	// Get path
@@ -149,7 +149,7 @@ BOOL LoadProfile(const char *name)
 
 	// Read data
 	fseek(fp, 0, SEEK_SET);
-	memset(&profile, 0, sizeof(PROFILE));
+	memset(&profile, 0, sizeof(PROFILEDATA));
 	fread(profile.code, 8, 1, fp);
 	profile.stage = File_ReadLE32(fp);
 	profile.music = (MusicID)File_ReadLE32(fp);

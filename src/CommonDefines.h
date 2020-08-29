@@ -18,7 +18,8 @@ enum Direction
 	DIR_UP = 1,
 	DIR_RIGHT = 2,
 	DIR_DOWN = 3,
-	DIR_AUTO = 4
+	DIR_AUTO = 4,
+	DIR_OTHER = 5
 };
 
 struct OTHER_RECT	// The original name for this struct is unknown
