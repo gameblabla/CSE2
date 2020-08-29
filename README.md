@@ -1,3 +1,14 @@
+# THIS BRANCH HAS BEEN DISCONTINUED
+
+I don't want to work on an enhanced Cave Story anymore, or at least not one
+where I have to cater to such a massive range of people with different
+expectations.
+
+You might be interested in [Cave Story: Tweaked](https://github.com/calvarado194/CSE2-tweaks)
+instead.
+
+The original readme is below:
+
 [![Build Status](https://travis-ci.com/Clownacy/CSE2.svg?branch=enhanced)](https://travis-ci.com/Clownacy/CSE2)
 
 ## Table of Contents
