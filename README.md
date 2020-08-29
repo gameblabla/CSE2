@@ -1,6 +1,13 @@
-# Cave Story Engine 2
+# THIS BRANCH HAS BEEN DISCONTINUED
 
-Cave Story Engine 2 is a decompilation of Cave Story, ported from DirectX to SDL2.
+Emscripten's lack of mainloop support and its goofy build system make it a
+nightmare to support. It will never be mainlined.
+
+The original readme is below:
+
+# CSE2
+
+CSE2 is a decompilation of Cave Story, ported from DirectX to SDL2.
 
 ![Screenshot](screenshot.png)
 
