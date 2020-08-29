@@ -147,7 +147,7 @@ ATTRIBUTE_HOT void Mixer_MixSounds(long *stream, size_t frames_total)
 				const unsigned char subsample = sound->position_subsample >> 8;
 
 				const short interpolated_sample = sound->samples[sound->position] * (0x100 - subsample)
-				                                      + sound->samples[sound->position + 1] * subsample;
+				                                + sound->samples[sound->position + 1] * subsample;
 
 				// Mix, and apply volume
 				*stream_pointer++ += (interpolated_sample * sound->volume_l) >> 8;
