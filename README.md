@@ -1,12 +1,25 @@
-# Cave Story Engine 2
+# THIS BRANCH HAS BEEN DISCONTINUED
 
-Cave Story Engine is a decompilation of Cave Story, ported from DirectX to SDL2.
+This was a branch that ported CSE2 to the Nintendo Wii.
+
+This port was split-off to its own branch because of the extensive modifications
+it required. The modifications were so extreme because early CSE2 was not very
+portable, with a very deep-rooted dependency on SDL2.
+
+Now that modern CSE2 is much more flexible when it comes to swapping out backend
+code, I think it would be nice to someday merge this into the portable branch.
+
+The original readme is below:
+
+# CSE2
+
+CSE2 is a decompilation of Cave Story, ported from DirectX to SDL2.
 
 ![Screenshot](screenshot.png)
 
 ## Disclaimer
 
-Cave Story Engine 2 is based off of the *original freeware release* by Studio Pixel, and is not based off of Nicalis' ports, and contains no extra features included in said ports (graphics, audio, and other changes)
+CSE2 is based off of the *original freeware release* by Studio Pixel, and is not based off of Nicalis' ports, and contains no extra features included in said ports (graphics, audio, and other changes)
 
 ## Dependencies
 
@@ -29,7 +42,7 @@ Project files for Visual Studio 2003 are also available, in the 'msvc2003' direc
 
 ## Running
 
-In order to run Cave Story Engine 2, you have to get the "data" folder from a vanilla copy of Cave Story. Just copy and paste it into the same folder as the executable.
+In order to run CSE2, you have to get the "data" folder from a vanilla copy of Cave Story. Just copy and paste it into the same folder as the executable.
 
 ## Licensing
 
