@@ -29,7 +29,7 @@ struct Config
 	int joystick_button[8];
 };
 
-const char *proof = "DOUKUTSU20041206";
+static const char *proof = "DOUKUTSU20041206";
 
 int main(int argc, char *argv[])
 {
