@@ -39,12 +39,9 @@ int main(int argc, char *argv[])
 
 	for (size_t i = strlen(argv[0]);; --i)
 	{
-		if (i == 0 || argv[0][i] == '\\' || argv[0][i] == '/')
+		if (i == 0 || argv[0][i - 1] == '\\' || argv[0][i - 1] == '/')
 		{
 			const char config_string[] = "Config.dat";
-
-			if (argv[0][i] == '\\' || argv[0][i] == '/')
-				++i;	// Point to after the path separator
 
 			config_path = (char*)malloc(i + sizeof(config_string));
 
