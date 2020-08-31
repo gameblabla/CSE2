@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "glad/glad.h"
@@ -34,15 +35,25 @@ int main(int argc, char *argv[])
 {
 	(void)argc;
 
-	char base_directory[0x400];
+	char *config_path;
 
-	strcpy(base_directory, argv[0]);
-
-	for (size_t i = strlen(base_directory);; --i)
+	for (size_t i = strlen(argv[0]);; --i)
 	{
-		if (i == 0 || base_directory[i] == '\\' || base_directory[i] == '/')
+		if (i == 0 || argv[0][i] == '\\' || argv[0][i] == '/')
 		{
-			base_directory[i] = '\0';
+			const char config_string[] = "Config.dat";
+
+			if (argv[0][i] == '\\' || argv[0][i] == '/')
+				++i;	// Point to after the path separator
+
+			config_path = (char*)malloc(i + sizeof(config_string));
+
+			if (config_path == NULL)
+				return 1;
+
+			memcpy(config_path, argv[0], i);
+			memcpy(config_path + i, config_string, sizeof(config_string));	// Will copy null-character
+
 			break;
 		}
 	}
@@ -103,9 +114,6 @@ int main(int argc, char *argv[])
 					/////////////////////
 
 					Config configuration;
-
-					char config_path[0x400];
-					sprintf(config_path, "%s/Config.dat", base_directory);
 
 					FILE *file = fopen(config_path, "rb");
 
@@ -314,6 +322,8 @@ int main(int argc, char *argv[])
 		glfwDestroyWindow(window);
 		glfwTerminate();
 	}
+
+	free(config_path);
 
 	return 0;
 }
