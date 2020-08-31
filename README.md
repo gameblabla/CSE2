@@ -95,6 +95,7 @@ Name | Function
 `-DDEBUG_SAVE=ON` | Re-enable the ability to drag-and-drop save files onto the window
 `-DDOCONFIG=OFF` | Disable compiling the DoConfig tool (it is not useful for console ports)
 `-DDOCONFIG_LEGACY_OPENGL=ON` | Make DoConfig use OpenGL 2.1 instead of OpenGL 3.2 (useful for older/limited platforms)
+`-DLANCZOS_RESAMPLER=ON` | Use Lanczos filtering for audio resampling instead of linear-interpolation (Lanczos is more performance-intensive, but higher quality)
 `-DBACKEND_RENDERER=OpenGL3` | Render with OpenGL 3.2 (hardware-accelerated)
 `-DBACKEND_RENDERER=OpenGLES2` | Render with OpenGL ES 2.0 (hardware-accelerated)
 `-DBACKEND_RENDERER=SDLTexture` | (Default) Render with SDL2's Texture API (hardware-accelerated) (note: requires `-DBACKEND_PLATFORM=SDL2`)

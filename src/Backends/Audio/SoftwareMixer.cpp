@@ -51,7 +51,11 @@ Mixer_Sound* Mixer_CreateSound(unsigned int frequency, const unsigned char *samp
 	if (sound == NULL)
 		return NULL;
 
-	sound->samples = (signed char*)malloc(length + 1);
+#ifdef LANCZOS_RESAMPLER
+	sound->samples = (signed char*)malloc(length);
+#else
+	sound->samples = (signed char*)malloc(length + 1);	// +1 for the linear-interpolator
+#endif
 
 	if (sound->samples == NULL)
 	{
@@ -96,7 +100,9 @@ void Mixer_PlaySound(Mixer_Sound *sound, bool looping)
 	sound->playing = true;
 	sound->looping = looping;
 
+#ifndef LANCZOS_RESAMPLER
 	sound->samples[sound->frames] = looping ? sound->samples[0] : 0;	// For the linear interpolator
+#endif
 }
 
 void Mixer_StopSound(Mixer_Sound *sound)
@@ -143,15 +149,43 @@ ATTRIBUTE_HOT void Mixer_MixSounds(long *stream, size_t frames_total)
 
 			for (size_t frames_done = 0; frames_done < frames_total; ++frames_done)
 			{
-				// Perform linear interpolation
-				const unsigned char subsample = sound->position_subsample >> 8;
+			#ifdef LANCZOS_RESAMPLER
+				// Perform Lanczos resampling
+				const int kernel_radius = 2;
 
-				const short interpolated_sample = sound->samples[sound->position] * (0x100 - subsample)
-				                                + sound->samples[sound->position + 1] * subsample;
+				double accumulator = 0;
+
+				for (int i = -MIN(kernel_radius - 1, sound->position); i <= kernel_radius; ++i)
+				{
+					const signed char input_sample = sound->samples[(sound->position + i) % sound->frames];
+
+					const double kernel_input = ((double)sound->position_subsample / 0x10000) - i;
+
+					if (kernel_input == 0.0)
+					{
+						accumulator += input_sample;
+					}
+					else
+					{
+						const double nx = 3.14159265358979323846 * kernel_input;
+						const double nxa = nx / kernel_radius;
+
+						accumulator += input_sample * (sin(nx) / nx) * (sin(nxa) / nxa);
+					}
+				}
+
+				const short output_sample = (short)(accumulator * 0x100);
+			#else
+				// Perform linear interpolation
+				const unsigned char interpolation_scale = sound->position_subsample >> 8;
+
+				const short output_sample = sound->samples[sound->position] * (0x100 - interpolation_scale)
+				                          + sound->samples[sound->position + 1] * interpolation_scale;
+			#endif
 
 				// Mix, and apply volume
-				*stream_pointer++ += (interpolated_sample * sound->volume_l) >> 8;
-				*stream_pointer++ += (interpolated_sample * sound->volume_r) >> 8;
+				*stream_pointer++ += (output_sample * sound->volume_l) >> 8;
+				*stream_pointer++ += (output_sample * sound->volume_r) >> 8;
 
 				// Increment sample
 				const unsigned long next_position_subsample = sound->position_subsample + sound->advance_delta;

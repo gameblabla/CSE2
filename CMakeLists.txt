@@ -20,6 +20,7 @@ option(JAPANESE "Enable the Japanese-language build (instead of the unofficial A
 option(FIX_BUGS "Fix various bugs in the game" OFF)
 option(DEBUG_SAVE "Re-enable the ability to drag-and-drop save files onto the window" OFF)
 option(DOCONFIG "Compile a DoConfig clone tool - not useful for console ports" ON)
+option(LANCZOS_RESAMPLER "Use Lanczos filtering for audio resampling instead of linear-interpolation (Lanczos is more performance-intensive, but higher quality)" OFF)
 
 set(BACKEND_RENDERER "SDLTexture" CACHE STRING "Which renderer the game should use: 'OpenGL3' for an OpenGL 3.2 renderer, 'OpenGLES2' for an OpenGL ES 2.0 renderer, 'SDLTexture' for SDL2's hardware-accelerated Texture API, 'SDLSurface' for SDL2's software-rendered Surface API, 'Wii U' for the Wii U's hardware-accelerated GX2 API, or 'Software' for a handwritten software renderer")
 set(BACKEND_AUDIO "SDL2" CACHE STRING "Which audio backend the game should use: 'SDL2', 'miniaudio', 'WiiU-Hardware', 'WiiU-Software', or 'Null'")
@@ -266,6 +267,10 @@ endif()
 
 if(DEBUG_SAVE)
 	target_compile_definitions(CSE2 PRIVATE DEBUG_SAVE)
+endif()
+
+if(LANCZOS_RESAMPLER)
+	target_compile_definitions(CSE2 PRIVATE LANCZOS_RESAMPLER)
 endif()
 
 if(PKG_CONFIG_STATIC_LIBS)
