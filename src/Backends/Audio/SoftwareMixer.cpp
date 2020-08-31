@@ -170,7 +170,7 @@ ATTRIBUTE_HOT void Mixer_MixSounds(long *stream, size_t frames_total)
 						const double nx = 3.14159265358979323846 * kernel_input;
 						const double nxa = nx / kernel_radius;
 
-						accumulator += input_sample * (sin(nx) / nx) * (sin(nxa) / nxa);
+						accumulator += input_sample * (sin(nx) * sin(nxa) / (nx * nxa));
 					}
 				}
 
