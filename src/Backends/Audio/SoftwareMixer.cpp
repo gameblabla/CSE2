@@ -153,22 +153,22 @@ ATTRIBUTE_HOT void Mixer_MixSounds(long *stream, size_t frames_total)
 				// Perform Lanczos resampling
 				const int kernel_radius = 2;
 
-				double accumulator = 0;
+				float accumulator = 0;
 
 				for (int i = -MIN(kernel_radius - 1, sound->position); i <= kernel_radius; ++i)
 				{
 					const signed char input_sample = sound->samples[(sound->position + i) % sound->frames];
 
-					const double kernel_input = ((double)sound->position_subsample / 0x10000) - i;
+					const float kernel_input = ((float)sound->position_subsample / 0x10000) - i;
 
-					if (kernel_input == 0.0)
+					if (kernel_input == 0.0f)
 					{
 						accumulator += input_sample;
 					}
 					else
 					{
-						const double nx = 3.14159265358979323846 * kernel_input;
-						const double nxa = nx / kernel_radius;
+						const float nx = 3.14159265358979323846f * kernel_input;
+						const float nxa = nx / kernel_radius;
 
 						accumulator += input_sample * (sin(nx) * sin(nxa) / (nx * nxa));
 					}
