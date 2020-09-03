@@ -13,7 +13,7 @@ static Uint32 window_flags = SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_ANYFORMAT;
 static SDL_Surface *window_sdlsurface;
 static SDL_Surface *framebuffer_sdlsurface;
 
-bool WindowBackend_Software_CreateWindow(const char *window_title, int screen_width, int screen_height, bool fullscreen)
+bool WindowBackend_Software_CreateWindow(const char *window_title, size_t screen_width, size_t screen_height, bool fullscreen)
 {
 	if (fullscreen)
 		window_flags |= SDL_FULLSCREEN;
@@ -34,6 +34,8 @@ bool WindowBackend_Software_CreateWindow(const char *window_title, int screen_wi
 
 		if (framebuffer_sdlsurface != NULL)
 		{
+			SDL_LockSurface(framebuffer_sdlsurface); // If this errors then oh dear
+
 			Backend_PostWindowCreation();
 
 			return true;
@@ -67,14 +69,18 @@ unsigned char* WindowBackend_Software_GetFramebuffer(size_t *pitch)
 
 void WindowBackend_Software_Display(void)
 {
+	SDL_UnlockSurface(framebuffer_sdlsurface);
+
 	if (SDL_BlitSurface(framebuffer_sdlsurface, NULL, window_sdlsurface, NULL) < 0)
 		Backend_PrintError("Couldn't blit framebuffer surface to window surface: %s", SDL_GetError());
+
+	SDL_LockSurface(framebuffer_sdlsurface); // If this errors then oh dear
 
 	if (SDL_Flip(window_sdlsurface) < 0)
 		Backend_PrintError("Couldn't copy window surface to the screen: %s", SDL_GetError());
 }
 
-void WindowBackend_Software_HandleWindowResize(unsigned int width, unsigned int height)
+void WindowBackend_Software_HandleWindowResize(size_t width, size_t height)
 {
 	window_sdlsurface = SDL_SetVideoMode(width, height, bits_per_pixel, window_flags);
 	if (window_sdlsurface == NULL)

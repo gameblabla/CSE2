@@ -338,9 +338,11 @@ if(BACKEND_AUDIO MATCHES "SDL2")
 	)
 elseif(BACKEND_AUDIO MATCHES "SDL1")
 	target_sources(CSE2 PRIVATE
-		"src/Backends/Audio/SDL1.cpp"
 		"src/Backends/Audio/SoftwareMixer.cpp"
-		"src/Backends/Audio/SoftwareMixer.h"
+		"src/Backends/Audio/SoftwareMixer/Mixer.cpp"
+		"src/Backends/Audio/SoftwareMixer/Mixer.h"
+		"src/Backends/Audio/SoftwareMixer/Backend.h"
+		"src/Backends/Audio/SoftwareMixer/SDL1.cpp"
 	)
 elseif(BACKEND_AUDIO MATCHES "miniaudio")
 	target_sources(CSE2 PRIVATE

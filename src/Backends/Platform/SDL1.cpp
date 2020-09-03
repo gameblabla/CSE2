@@ -11,9 +11,6 @@
 
 #include "../Rendering.h"
 #include "../../Attributes.h"
-#include "../../Main.h"
-#include "../../Organya.h"
-#include "../../Profile.h"
 
 #define DO_KEY(SDL_KEY, BACKEND_KEY) \
 	case SDL_KEY: \
@@ -22,8 +19,12 @@
 
 static bool keyboard_state[BACKEND_KEYBOARD_TOTAL];
 
-bool Backend_Init(void)
+static void (*window_focus_callback)(bool focus);
+
+bool Backend_Init(void (*drag_and_drop_callback_param)(const char *path), void (*window_focus_callback_param)(bool focus))
 {
+	window_focus_callback = window_focus_callback_param;
+
 	if (SDL_Init(SDL_INIT_VIDEO) == 0)
 	{
 		char driver[20];
@@ -57,9 +58,10 @@ void Backend_PostWindowCreation(void)
 {
 }
 
-bool Backend_GetBasePath(std::string *string_buffer)
+bool Backend_GetPaths(std::string *module_path, std::string *data_path)
 {
-	(void)string_buffer;
+	(void)module_path;
+	(void)data_path;
 
 	return false;
 }
@@ -69,7 +71,7 @@ void Backend_HideMouse(void)
 	SDL_ShowCursor(SDL_DISABLE);
 }
 
-void Backend_SetWindowIcon(const unsigned char *rgb_pixels, unsigned int width, unsigned int height)
+void Backend_SetWindowIcon(const unsigned char *rgb_pixels, size_t width, size_t height)
 {
 	SDL_Surface *surface = SDL_CreateRGBSurfaceFrom((void*)rgb_pixels, width, height, 24, width * 3, 0x0000FF, 0x00FF00, 0xFF0000, 0);
 
@@ -84,7 +86,7 @@ void Backend_SetWindowIcon(const unsigned char *rgb_pixels, unsigned int width, 
 	}
 }
 
-void Backend_SetCursor(const unsigned char *rgb_pixels, unsigned int width, unsigned int height)
+void Backend_SetCursor(const unsigned char *rgb_pixels, size_t width, size_t height)
 {
 	(void)rgb_pixels;
 	(void)width;
@@ -92,7 +94,7 @@ void Backend_SetCursor(const unsigned char *rgb_pixels, unsigned int width, unsi
 	// SDL1 only supports black and white cursors
 }
 
-void PlaybackBackend_EnableDragAndDrop(void)
+void Backend_EnableDragAndDrop(void)
 {
 }
 
@@ -197,10 +199,7 @@ bool Backend_SystemTask(bool active)
 			case SDL_ACTIVEEVENT:
 				if (event.active.state & SDL_APPINPUTFOCUS)
 				{
-					if (event.active.gain)
-						ActiveWindow();
-					else
-						InactiveWindow();
+					window_focus_callback(event.active.gain);
 				}
 
 				break;
@@ -210,7 +209,6 @@ bool Backend_SystemTask(bool active)
 				break;
 
 			case SDL_QUIT:
-				StopOrganyaMusic();
 				return false;
 		}
 	}
@@ -225,7 +223,7 @@ void Backend_GetKeyboardState(bool *out_keyboard_state)
 
 void Backend_ShowMessageBox(const char *title, const char *message)
 {
-	fprintf(stderr, "ShowMessageBox - '%s' - '%s'\n", title, message);
+	Backend_PrintInfo("ShowMessageBox - '%s' - '%s'\n", title, message);
 }
 
 ATTRIBUTE_FORMAT_PRINTF(1, 2) void Backend_PrintError(const char *format, ...)
@@ -243,8 +241,8 @@ ATTRIBUTE_FORMAT_PRINTF(1, 2) void Backend_PrintInfo(const char *format, ...)
 	va_list argumentList;
 	va_start(argumentList, format);
 	fputs("INFO: ", stdout);
-	vprintf(format, argumentList);
-	putchar('\n');
+	vfprintf(stdout, format, argumentList);
+	fputc('\n', stdout);
 	va_end(argumentList);
 }
 

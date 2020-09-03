@@ -8,7 +8,7 @@
 
 #include "../../../Misc.h"
 
-bool WindowBackend_OpenGL_CreateWindow(const char *window_title, int *screen_width, int *screen_height, bool fullscreen)
+bool WindowBackend_OpenGL_CreateWindow(const char *window_title, size_t *screen_width, size_t *screen_height, bool fullscreen)
 {
 	if (SDL_SetVideoMode(*screen_width, *screen_height, 0, SDL_RESIZABLE | SDL_OPENGL | (fullscreen ? SDL_FULLSCREEN : 0)) != NULL)
 	{
