@@ -1,4 +1,4 @@
-#include "../Audio.h"
+#include "Backend.h"
 
 #include <math.h>
 #include <stddef.h>
@@ -12,16 +12,13 @@
 #include <sndcore2/voice.h>
 #include <sndcore2/drcvs.h>
 
-#include "SoftwareMixer.h"
-
 #define AUDIO_BUFFERS 2	// Double-buffer
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define CLAMP(x, y, z) MIN(MAX((x), (y)), (z))
 
-static void (*organya_callback)(void);
-static unsigned int organya_callback_milliseconds;
+static void (*parent_callback)(long *stream, size_t frames_total);
 
 static OSMutex sound_list_mutex;
 static OSMutex organya_mutex;
@@ -31,51 +28,6 @@ static AXVoice *voices[2];
 static short *stream_buffers[2];
 static long *stream_buffer_long;
 static size_t buffer_length;
-
-static unsigned long output_frequency;
-
-static void MixSoundsAndUpdateOrganya(long *stream, size_t frames_total)
-{
-	OSLockMutex(&organya_mutex);
-
-	if (organya_callback_milliseconds == 0)
-	{
-		OSLockMutex(&sound_list_mutex);
-		Mixer_MixSounds(stream, frames_total);
-		OSUnlockMutex(&sound_list_mutex);
-	}
-	else
-	{
-		// Synchronise audio generation with Organya.
-		// In the original game, Organya ran asynchronously in a separate thread,
-		// firing off commands to DirectSound in realtime. To match that, we'd
-		// need a very low-latency buffer, otherwise we'd get mistimed instruments.
-		// Instead, we can just do this.
-		unsigned int frames_done = 0;
-
-		while (frames_done != frames_total)
-		{
-			static unsigned long organya_countdown;
-
-			if (organya_countdown == 0)
-			{
-				organya_countdown = (organya_callback_milliseconds * output_frequency) / 1000;	// organya_timer is in milliseconds, so convert it to audio frames
-				organya_callback();
-			}
-
-			const unsigned int frames_to_do = MIN(organya_countdown, frames_total - frames_done);
-
-			OSLockMutex(&sound_list_mutex);
-			Mixer_MixSounds(stream + frames_done * 2, frames_to_do);
-			OSUnlockMutex(&sound_list_mutex);
-
-			frames_done += frames_to_do;
-			organya_countdown -= frames_to_do;
-		}
-	}
-
-	OSUnlockMutex(&organya_mutex);
-}
 
 static void FrameCallback(void)
 {
@@ -96,7 +48,7 @@ static void FrameCallback(void)
 		memset(stream_buffer_long, 0, buffer_length * sizeof(long) * 2);
 
 		// Fill mixer buffer
-		MixSoundsAndUpdateOrganya(stream_buffer_long, buffer_length);
+		parent_callback(stream_buffer_long, buffer_length);
 
 		// Deinterlate samples, convert them to S16, and write them to the double-buffers
 		short *left_output_buffer = &stream_buffers[0][buffer_length * last_buffer];
@@ -135,7 +87,7 @@ static void FrameCallback(void)
 	}
 }
 
-bool AudioBackend_Init(void)
+unsigned long SoftwareMixerBackend_Init(void (*callback)(long *stream, size_t frames_total))
 {
 	if (!AXIsInit())
 	{
@@ -150,9 +102,7 @@ bool AudioBackend_Init(void)
 	OSInitMutex(&sound_list_mutex);
 	OSInitMutex(&organya_mutex);
 
-	output_frequency = AXGetInputSamplesPerSec();
-
-	Mixer_Init(output_frequency);
+	unsigned long output_frequency = AXGetInputSamplesPerSec();
 
 	buffer_length = output_frequency / 100;	// 10ms buffer
 
@@ -210,17 +160,17 @@ bool AudioBackend_Init(void)
 							};
 							AXSetVoiceOffsets(voices[i], &offs);
 
-							AXSetVoiceState(voices[i], AX_VOICE_STATE_PLAYING);
-
 							AXVoiceEnd(voices[i]);
 						}
+
+						parent_callback = callback;
 
 						// Register the frame callback.
 						// Apparently, this fires every 3ms - we will use
 						// it to update the stream buffers when needed.
 						AXRegisterAppFrameCallback(FrameCallback);
 
-						return true;
+						return output_frequency;
 					}
 
 					AXFreeVoice(voices[0]);
@@ -237,10 +187,10 @@ bool AudioBackend_Init(void)
 
 	AXQuit();
 
-	return false;
+	return 0;
 }
 
-void AudioBackend_Deinit(void)
+void SoftwareMixerBackend_Deinit(void)
 {
 	AXRegisterAppFrameCallback(NULL);
 
@@ -255,113 +205,30 @@ void AudioBackend_Deinit(void)
 	AXQuit();
 }
 
-AudioBackend_Sound* AudioBackend_CreateSound(unsigned int frequency, const unsigned char *samples, size_t length)
+bool SoftwareMixerBackend_Start(void)
 {
-	OSLockMutex(&sound_list_mutex);
+	AXSetVoiceState(voices[0], AX_VOICE_STATE_PLAYING);
+	AXSetVoiceState(voices[1], AX_VOICE_STATE_PLAYING);
 
-	Mixer_Sound *sound = Mixer_CreateSound(frequency, samples, length);
-
-	OSUnlockMutex(&sound_list_mutex);
-
-	return (AudioBackend_Sound*)sound;
+	return true;
 }
 
-void AudioBackend_DestroySound(AudioBackend_Sound *sound)
+void SoftwareMixerBackend_LockMixerMutex(void)
 {
-	if (sound == NULL)
-		return;
-
 	OSLockMutex(&sound_list_mutex);
+}
 
-	Mixer_DestroySound((Mixer_Sound*)sound);
-
+void SoftwareMixerBackend_UnlockMixerMutex(void)
+{
 	OSUnlockMutex(&sound_list_mutex);
 }
 
-void AudioBackend_PlaySound(AudioBackend_Sound *sound, bool looping)
-{
-	if (sound == NULL)
-		return;
-
-	OSLockMutex(&sound_list_mutex);
-
-	Mixer_PlaySound((Mixer_Sound*)sound, looping);
-
-	OSUnlockMutex(&sound_list_mutex);
-}
-
-void AudioBackend_StopSound(AudioBackend_Sound *sound)
-{
-	if (sound == NULL)
-		return;
-
-	OSLockMutex(&sound_list_mutex);
-
-	Mixer_StopSound((Mixer_Sound*)sound);
-
-	OSUnlockMutex(&sound_list_mutex);
-}
-
-void AudioBackend_RewindSound(AudioBackend_Sound *sound)
-{
-	if (sound == NULL)
-		return;
-
-	OSLockMutex(&sound_list_mutex);
-
-	Mixer_RewindSound((Mixer_Sound*)sound);
-
-	OSUnlockMutex(&sound_list_mutex);
-}
-
-void AudioBackend_SetSoundFrequency(AudioBackend_Sound *sound, unsigned int frequency)
-{
-	if (sound == NULL)
-		return;
-
-	OSLockMutex(&sound_list_mutex);
-
-	Mixer_SetSoundFrequency((Mixer_Sound*)sound, frequency);
-
-	OSUnlockMutex(&sound_list_mutex);
-}
-
-void AudioBackend_SetSoundVolume(AudioBackend_Sound *sound, long volume)
-{
-	if (sound == NULL)
-		return;
-
-	OSLockMutex(&sound_list_mutex);
-
-	Mixer_SetSoundVolume((Mixer_Sound*)sound, volume);
-
-	OSUnlockMutex(&sound_list_mutex);
-}
-
-void AudioBackend_SetSoundPan(AudioBackend_Sound *sound, long pan)
-{
-	if (sound == NULL)
-		return;
-
-	OSLockMutex(&sound_list_mutex);
-
-	Mixer_SetSoundPan((Mixer_Sound*)sound, pan);
-
-	OSUnlockMutex(&sound_list_mutex);
-}
-
-void AudioBackend_SetOrganyaCallback(void (*callback)(void))
-{
-	// As far as thread-safety goes - this is guarded by
-	// `organya_milliseconds`, which is guarded by `organya_mutex`.
-	organya_callback = callback;
-}
-
-void AudioBackend_SetOrganyaTimer(unsigned int milliseconds)
+void SoftwareMixerBackend_LockOrganyaMutex(void)
 {
 	OSLockMutex(&organya_mutex);
+}
 
-	organya_callback_milliseconds = milliseconds;
-
+void SoftwareMixerBackend_UnlockOrganyaMutex(void)
+{
 	OSUnlockMutex(&organya_mutex);
 }

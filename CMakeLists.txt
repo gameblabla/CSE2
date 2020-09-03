@@ -316,15 +316,19 @@ endif()
 
 if(BACKEND_AUDIO MATCHES "SDL2")
 	target_sources(CSE2 PRIVATE
-		"src/Backends/Audio/SDL2.cpp"
 		"src/Backends/Audio/SoftwareMixer.cpp"
-		"src/Backends/Audio/SoftwareMixer.h"
+		"src/Backends/Audio/SoftwareMixer/Mixer.cpp"
+		"src/Backends/Audio/SoftwareMixer/Mixer.h"
+		"src/Backends/Audio/SoftwareMixer/Backend.h"
+		"src/Backends/Audio/SoftwareMixer/SDL2.cpp"
 	)
 elseif(BACKEND_AUDIO MATCHES "miniaudio")
 	target_sources(CSE2 PRIVATE
-		"src/Backends/Audio/miniaudio.cpp"
 		"src/Backends/Audio/SoftwareMixer.cpp"
-		"src/Backends/Audio/SoftwareMixer.h"
+		"src/Backends/Audio/SoftwareMixer/Mixer.cpp"
+		"src/Backends/Audio/SoftwareMixer/Mixer.h"
+		"src/Backends/Audio/SoftwareMixer/Backend.h"
+		"src/Backends/Audio/SoftwareMixer/miniaudio.cpp"
 	)
 
 	# Link libdl, libm, and libpthread
@@ -347,9 +351,11 @@ elseif(BACKEND_AUDIO MATCHES "WiiU-Hardware")
 	)
 elseif(BACKEND_AUDIO MATCHES "WiiU-Software")
 	target_sources(CSE2 PRIVATE
-		"src/Backends/Audio/WiiU-Software.cpp"
 		"src/Backends/Audio/SoftwareMixer.cpp"
-		"src/Backends/Audio/SoftwareMixer.h"
+		"src/Backends/Audio/SoftwareMixer/Mixer.cpp"
+		"src/Backends/Audio/SoftwareMixer/Mixer.h"
+		"src/Backends/Audio/SoftwareMixer/Backend.h"
+		"src/Backends/Audio/SoftwareMixer/WiiU-Software.cpp"
 	)
 elseif(BACKEND_AUDIO MATCHES "Null")
 	target_sources(CSE2 PRIVATE
