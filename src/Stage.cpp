@@ -30,7 +30,7 @@ MusicID gMusicNo;
 unsigned int gOldPos;
 MusicID gOldNo;
 
-const STAGE_TABLE gTMT[95] = {
+const STAGE_TABLE gTMT[] = {
 	STAGE_ENTRY("0",      "0",      BACKGROUND_TYPE_BLACK,        "bk0",     "Guest",  "0",      0, "Null",                  "\x96\xB3"),	/* 無 */
 	STAGE_ENTRY("Pens",   "Pens1",  BACKGROUND_TYPE_MOVE_DISTANT, "bkBlue",  "Guest",  "0",      0, "Arthur's House",        "\x83\x41\x81\x5B\x83\x54\x81\x5B\x82\xCC\x89\xC6"),	/* アーサーの家 */
 	STAGE_ENTRY("Eggs",   "Eggs",   BACKGROUND_TYPE_MOVE_DISTANT, "bkGreen", "Eggs1",  "Ravil",  0, "Egg Corridor",          "\x83\x5E\x83\x7D\x83\x53\x89\xF1\x98\x4C"),	/* タマゴ回廊 */
@@ -203,7 +203,7 @@ BOOL TransferStage(int no, int w, int x, int y)
 }
 
 // Music
-const char* const gMusicTable[42] = {
+const char* const gMusicTable[] = {
 	"XXXX",
 	"WANPAKU",
 	"ANZEN",
