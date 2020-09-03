@@ -202,12 +202,12 @@ ATTRIBUTE_HOT void Mixer_MixSounds(long *stream, size_t frames_total)
 				// Perform linear interpolation
 				const unsigned char interpolation_scale = sound->position_subsample >> 8;
 
-				const short output_sample = sound->samples[sound->position] * (0x100 - interpolation_scale)
-				                          + sound->samples[sound->position + 1] * interpolation_scale;
+				const signed char output_sample = (sound->samples[sound->position] * (0x100 - interpolation_scale)
+				                                 + sound->samples[sound->position + 1] * interpolation_scale) >> 8;
 
 				// Mix, and apply volume
-				*stream_pointer++ += (output_sample * sound->volume_l) >> 8;
-				*stream_pointer++ += (output_sample * sound->volume_r) >> 8;
+				*stream_pointer++ += output_sample * sound->volume_l;
+				*stream_pointer++ += output_sample * sound->volume_r;
 			#endif
 
 				// Increment sample
