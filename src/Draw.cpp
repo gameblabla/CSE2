@@ -56,8 +56,6 @@ static struct
 static int client_x;
 static int client_y;
 
-#define FRAMERATE 20
-
 void SetClientOffset(int width, int height)
 {
 	client_x = width;
@@ -78,7 +76,7 @@ BOOL Flip_SystemTask(HWND hWnd)
 		// Framerate limiter
 		timeNow = GetTickCount();
 
-		if (timeNow >= timePrev + FRAMERATE)
+		if (timeNow >= timePrev + 20)
 			break;
 
 		Sleep(1);
@@ -87,7 +85,7 @@ BOOL Flip_SystemTask(HWND hWnd)
 	if (timeNow >= timePrev + 100)
 		timePrev = timeNow;	// If the timer is freakishly out of sync, panic and reset it, instead of spamming frames for who-knows how long
 	else
-		timePrev += FRAMERATE;
+		timePrev += 20;
 
 	static RECT dst_rect;	// TODO - Not the original vaiable name
 	GetWindowRect(hWnd, &dst_rect);
