@@ -680,7 +680,7 @@ int TextScriptProc(void)
 						x = GetTextScriptNo(gTS.p_read + 9);
 
 						gNumberTextScript[0] = x;
-					#ifndef FIX_BUGS
+					#ifndef FIX_MAJOR_BUGS
 						// z is uninitialised. Probably a leftover from copypasting this from elsewhere.
 						gNumberTextScript[1] = z;
 					#endif
@@ -905,6 +905,32 @@ int TextScriptProc(void)
 						x = GetTextScriptNo(gTS.p_read + 4);
 						z = GetTextScriptNo(gTS.p_read + 9);
 
+					#ifdef FIX_MAJOR_BUGS
+						// Some versions of the Waterway TSC script contain a bug:
+						//  <FLJ850:0111
+						// This command *should* be...
+						//  <FLJ0850:0111
+						// This bug causes the values to be misread as 8510 and 1075,
+						// leading to an out-of-bounds gFlagNPC access.
+						// As well as this, the out-of-bound read has a random chance
+						// of being true or false. If it's true, then the game will
+						// try to execute script 1075, causing a crash.
+						// To fix this, we manually catch this error and use the
+						// correct values.
+						// This bug is present in...
+						//  Japanese 1.0.0.5 (and presumably earlier versions)
+						//  Aeon Genesis 1.0.0.5
+						//  Aeon Genesis 1.0.0.6
+						//  Cave Story (WiiWare)
+						//  Cave Story+ (Steam)
+						// Gee, I wonder how it snuck into the Nicalis ports. ¬_¬
+						if (!memcmp(&gTS.data[gTS.p_read + 4], "850:0111", 8))
+						{
+							x = 850;
+							z = 111;
+						}
+					#endif
+
 						if (GetNPCFlag(x))
 							JumpTextScript(z);
 						else
@@ -988,7 +1014,7 @@ int TextScriptProc(void)
 					}
 					else if (IS_COMMAND('S','P','S'))
 					{
-					#ifdef FIX_BUGS
+					#ifdef FIX_MAJOR_BUGS
 						SetNoise(2, 0);
 					#else
 						// x is not initialised. This bug isn't too bad, since that parameter's not used when the first one is set to 2, but still.

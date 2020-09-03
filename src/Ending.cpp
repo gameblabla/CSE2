@@ -250,7 +250,7 @@ BOOL StartCreditScript(void)
 	fread(Credit.pData, 1, Credit.size, fp);
 	EncryptionBinaryData2((unsigned char*)Credit.pData, Credit.size);
 
-#ifdef FIX_BUGS
+#ifdef FIX_MAJOR_BUGS
 	// The original game forgot to close the file
 	fclose(fp);
 #endif

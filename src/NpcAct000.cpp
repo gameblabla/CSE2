@@ -59,7 +59,7 @@ void ActNpc001(NPCHAR *npc)
 		if (npc->xm < -0x600)
 			npc->xm = -0x600;
 #else
-		// Limit speed (except pixel applied it to the X position)
+		// Limit speed (except Pixel applied it to the X position)
 		if (npc->x < -0x600)
 			npc->x = -0x600;
 #endif

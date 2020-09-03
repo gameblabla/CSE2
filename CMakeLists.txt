@@ -18,6 +18,7 @@ set(ASSETS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/assets")
 
 option(JAPANESE "Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)" OFF)
 option(FIX_BUGS "Fix various bugs in the game" OFF)
+option(FIX_MAJOR_BUGS "Fix bugs that invoke undefined behaviour or cause memory leaks" ON)
 option(DEBUG_SAVE "Re-enable the ability to drag-and-drop save files onto the window" OFF)
 option(DOCONFIG "Compile a DoConfig clone tool - not useful for console ports" ON)
 option(LANCZOS_RESAMPLER "Use Lanczos filtering for audio resampling instead of linear-interpolation (Lanczos is more performance-intensive, but higher quality)" OFF)
@@ -263,6 +264,10 @@ endif()
 
 if(FIX_BUGS)
 	target_compile_definitions(CSE2 PRIVATE FIX_BUGS)
+endif()
+
+if(FIX_BUGS OR FIX_MAJOR_BUGS)
+	target_compile_definitions(CSE2 PRIVATE FIX_MAJOR_BUGS)
 endif()
 
 if(DEBUG_SAVE)

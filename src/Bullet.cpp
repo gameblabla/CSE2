@@ -1644,7 +1644,7 @@ void ActBullet_Edge(BULLET *bul)
 			if (bul->ani_no > 4)
 			{
 				bul->cond = 0;
-			#ifdef FIX_BUGS
+			#ifdef FIX_MAJOR_BUGS
 				return;	// The code below will use 'ani_no' to access 'rcLeft' and 'rcRight', even though it's now too high
 			#endif
 			}
@@ -2182,7 +2182,7 @@ void ActBullet_SpurTail(BULLET *bul, int level)
 	if (bul->ani_no > 2)
 	{
 		bul->cond = 0;
-	#ifdef FIX_BUGS
+	#ifdef FIX_MAJOR_BUGS
 		return;	// Avoid accessing the RECT arrays with an out-of-bounds index
 	#endif
 	}

@@ -71,7 +71,7 @@ BOOL LoadEvent(const char *path_event)
 	fread(code, 1, 4, fp);
 	if (memcmp(code, gPassPixEve, 3) != 0)
 	{
-#ifdef FIX_BUGS
+#ifdef FIX_MAJOR_BUGS
 		// The original game forgot to close the file here
 		fclose(fp);
 #endif

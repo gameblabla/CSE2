@@ -562,7 +562,7 @@ static int ModeAction(void)
 			ActBullet();
 			ActCaret();
 			MoveFrame3();
-#ifdef FIX_BUGS
+#ifdef FIX_MAJOR_BUGS
 			// ActFlash uses frame_x and frame_y uninitialised
 			GetFramePosition(&frame_x, &frame_y);
 #endif

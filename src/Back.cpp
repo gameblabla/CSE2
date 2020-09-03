@@ -29,7 +29,7 @@ BOOL InitBack(const char *fName, int type)
 
 	if (fgetc(fp) != 'B' || fgetc(fp) != 'M')
 	{
-#ifdef FIX_BUGS
+#ifdef FIX_MAJOR_BUGS
 		// The original game forgets to close fp
 		fclose(fp);
 #endif
