@@ -8,7 +8,7 @@ struct DIRECTINPUTSTATUS
 	BOOL bRight;
 	BOOL bUp;
 	BOOL bDown;
-	BOOL bButton[32];
+	BOOL bButton[32]; // 32 is the number of buttons in DirectInput's `DIJOYSTATE` struct
 };
 
 void ReleaseDirectInput(void);
