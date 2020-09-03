@@ -273,7 +273,7 @@ BOOL MakeSurface_Resource(const char *name, SurfaceID surf_no)
 	surf[surf_no]->SetColorKey(DDCKEY_SRCBLT, &ddcolorkey);
 	surf[surf_no]->SetClipper(clipper);
 
-#ifdef FIX_BUGS
+#ifdef FIX_MAJOR_BUGS
 	DeleteObject(handle);
 #endif
 
@@ -414,7 +414,7 @@ BOOL ReloadBitmap_Resource(const char *name, SurfaceID surf_no)
 	surf[surf_no]->SetColorKey(DDCKEY_SRCBLT, &ddcolorkey);
 	surf[surf_no]->SetClipper(clipper);
 
-#ifdef FIX_BUGS
+#ifdef FIX_MAJOR_BUGS
 	DeleteObject(handle);
 #endif
 

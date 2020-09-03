@@ -590,7 +590,7 @@ void ActNpc127(NPCHAR *npc)
 		if (++npc->ani_no > 2)
 		{
 			npc->cond = 0;
-		#ifdef FIX_BUGS
+		#ifdef FIX_MAJOR_BUGS
 			return;	// The code below will use 'ani_no' to access 'rcH' and 'rcV', even though it's now too high
 		#endif
 		}
@@ -656,7 +656,7 @@ void ActNpc128(NPCHAR *npc)
 	if (++npc->ani_no > 4)
 	{
 		npc->cond = 0;
-	#ifdef FIX_BUGS
+	#ifdef FIX_MAJOR_BUGS
 		return;	// The code below will use 'ani_no' to access 'rcLeft' and co., even though it's now too high
 	#endif
 	}
@@ -717,7 +717,7 @@ void ActNpc129(NPCHAR *npc)
 		if (++npc->ani_no > 2)
 		{
 			npc->cond = 0;
-		#ifdef FIX_BUGS
+		#ifdef FIX_MAJOR_BUGS
 			return;	// The code below will use 'ani_no' to access 'rect', even though it's now too high
 		#endif
 		}

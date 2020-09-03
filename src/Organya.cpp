@@ -212,9 +212,9 @@ BOOL MakeSoundObject8(signed char *wavep, signed char track, signed char pipi)
 
 			if (hr != DS_OK)
 			{
-#ifdef FIX_BUGS
+			#ifdef FIX_MAJOR_BUGS
 				free(wp);	// The updated Organya source code includes this fix
-#endif
+			#endif
 				return FALSE;
 			}
 

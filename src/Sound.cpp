@@ -40,10 +40,10 @@ BOOL InitDirectSound(HWND hwnd)
 	if (DirectSoundCreate(NULL, &lpDS, NULL) != DS_OK)
 	{
 		lpDS = NULL;
-#ifndef FIX_BUGS
+	#ifndef FIX_BUGS
 		// This makes absolutely no sense here
 		StartOrganya(lpDS, "Org\\Wave.dat");
-#endif
+	#endif
 		return FALSE;
 	}
 
@@ -165,7 +165,7 @@ BOOL LoadSoundObject(LPCSTR file_name, int no)
 	for (i = 0; i < 58; i++)
 		fread(&check_box[i], sizeof(char), 1, fp);	// Holy hell, this is inefficient
 
-#ifdef FIX_BUGS
+#ifdef FIX_MAJOR_BUGS
 	// The original code forgets to close 'fp'
 	if (check_box[0] != 'R' || check_box[1] != 'I' || check_box[2] != 'F' || check_box[3] != 'F')
 	{
@@ -186,7 +186,7 @@ BOOL LoadSoundObject(LPCSTR file_name, int no)
 	DWORD *wp;
 	wp = (DWORD*)malloc(file_size);	// ファイルのワークスペースを作る (Create a file workspace)
 
-#ifdef FIX_BUGS
+#ifdef FIX_MAJOR_BUGS
 	if (wp == NULL)
 	{
 		fclose(fp);
@@ -211,7 +211,7 @@ BOOL LoadSoundObject(LPCSTR file_name, int no)
 
 	if (lpDS->CreateSoundBuffer(&dsbd, &lpSECONDARYBUFFER[no], NULL) != DS_OK)
 	{
-#ifdef FIX_BUGS
+#ifdef FIX_MAJOR_BUGS
 		free(wp);	// The updated Organya source code includes this fix
 #endif
 		return FALSE;	
@@ -225,7 +225,7 @@ BOOL LoadSoundObject(LPCSTR file_name, int no)
 
 	if (hr != DS_OK)
 	{
-#ifdef FIX_BUGS
+#ifdef FIX_MAJOR_BUGS
 		free(wp);	// The updated Organya source code includes this fix
 #endif
 		return FALSE;

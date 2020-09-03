@@ -105,7 +105,7 @@ void ActCaret01(CARET *crt)
 		if (++crt->ani_no > 3)
 		{
 			crt->cond = 0;
-		#ifdef FIX_BUGS
+		#ifdef FIX_MAJOR_BUGS
 			return;	// The code below will use 'ani_no' to access 'rcLeft' and 'rcRight', even though it's now too high
 		#endif
 		}
@@ -155,7 +155,7 @@ void ActCaret02(CARET *crt)
 			if (crt->ani_no > 3)
 			{
 				crt->cond = 0;
-			#ifdef FIX_BUGS
+			#ifdef FIX_MAJOR_BUGS
 				return;	// The code below will use 'ani_no' to access 'rect_left', even though it's now too high
 			#endif
 			}
@@ -173,7 +173,7 @@ void ActCaret02(CARET *crt)
 			if (crt->ani_no > 3)
 			{
 				crt->cond = 0;
-			#ifdef FIX_BUGS
+			#ifdef FIX_MAJOR_BUGS
 				return;	// The code below will use 'ani_no' to access 'rect_right', even though it's now too high
 			#endif
 			}
@@ -208,7 +208,7 @@ void ActCaret03(CARET *crt)
 		if (++crt->ani_no > 3)
 		{
 			crt->cond = 0;
-		#ifdef FIX_BUGS
+		#ifdef FIX_MAJOR_BUGS
 			return;	// The code below will use 'ani_no' to access 'rect', even though it's now too high
 		#endif
 		}
@@ -242,7 +242,7 @@ void ActCaret04(CARET *crt)
 		if (++crt->ani_no > 2)
 		{
 			crt->cond = 0;
-		#ifdef FIX_BUGS
+		#ifdef FIX_MAJOR_BUGS
 			return;	// The code below will use 'ani_no' to access 'rect', even though it's now too high
 		#endif
 		}
@@ -273,7 +273,7 @@ void ActCaret05(CARET *crt)
 	if (crt->ani_no > 6)
 	{
 		crt->cond = 0;
-	#ifdef FIX_BUGS
+	#ifdef FIX_MAJOR_BUGS
 		return;	// The code below will use 'ani_no' to access 'rect', even though it's now too high
 	#endif
 	}
@@ -306,7 +306,7 @@ void ActCaret07(CARET *crt)
 		if (++crt->ani_no > 6)
 		{
 			crt->cond = 0;
-		#ifdef FIX_BUGS
+		#ifdef FIX_MAJOR_BUGS
 			return;	// The code below will use 'ani_no' to access 'rcLeft', even though it's now too high
 		#endif
 		}
@@ -432,7 +432,7 @@ void ActCaret11(CARET *crt)
 		if (++crt->ani_no > 6)
 		{
 			crt->cond = 0;
-		#ifdef FIX_BUGS
+		#ifdef FIX_MAJOR_BUGS
 			return;	// The code below will use 'ani_no' to access 'rcRight', even though it's now too high
 		#endif
 		}
@@ -456,7 +456,7 @@ void ActCaret12(CARET *crt)
 		if (++crt->ani_no > 1)
 		{
 			crt->cond = 0;
-		#ifdef FIX_BUGS
+		#ifdef FIX_MAJOR_BUGS
 			return;	// The code below will use 'ani_no' to access 'rcLeft', even though it's now too high
 		#endif
 		}
@@ -531,7 +531,7 @@ void ActCaret14(CARET *crt)
 		if (++crt->ani_no > 4)
 		{
 			crt->cond = 0;
-		#ifdef FIX_BUGS
+		#ifdef FIX_MAJOR_BUGS
 			return;	// The code below will use 'ani_no' to access 'rect', even though it's now too high
 		#endif
 		}
@@ -557,7 +557,7 @@ void ActCaret15(CARET *crt)
 		if (++crt->ani_no > 3)
 		{
 			crt->cond = 0;
-		#ifdef FIX_BUGS
+		#ifdef FIX_MAJOR_BUGS
 			return;	// The code below will use 'ani_no' to access 'rcLeft', even though it's now too high
 		#endif
 		}

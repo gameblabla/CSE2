@@ -26,7 +26,11 @@ endif
 FILENAME ?= $(FILENAME_DEF)
 
 ifeq ($(FIX_BUGS), 1)
-  ALL_CXXFLAGS += -DFIX_BUGS
+  ALL_CXXFLAGS += -DFIX_BUGS -DFIX_MAJOR_BUGS
+else
+  ifeq ($(FIX_MAJOR_BUGS), 1)
+    ALL_CXXFLAGS += -DFIX_MAJOR_BUGS
+  endif
 endif
 
 ifeq ($(DEBUG_SAVE), 1)

@@ -36,7 +36,7 @@ BOOL InitBack(const char *fName, int type)
 	// Check if this is a valid bitmap file
 	if (bmp_header_buffer[0] != 0x4D42)	// 'MB' (we use hex here to prevent a compiler warning)
 	{
-#ifdef FIX_BUGS
+#ifdef FIX_MAJOR_BUGS
 		// The original game forgets to close fp
 		fclose(fp);
 #endif

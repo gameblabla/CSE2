@@ -110,7 +110,7 @@ void DamageMyChar(int damage)
 #ifdef FIX_BUGS
 	if (!(g_GameFlags & 2))
 #else
-	// I'm preeeetty sure this is a typo. The Linux port optimised it out.
+	// I'm preeeetty sure this is a typo. The Linux port optimised this entire check out.
 	if (!(g_GameFlags | 2))
 #endif
 		return;
@@ -272,7 +272,7 @@ void PutArmsEnergy(BOOL flash)
 
 	int lv = gArmsData[gSelectedArms].level - 1;
 
-#ifdef FIX_BUGS
+#ifdef FIX_MAJOR_BUGS
 	// When the player has no weapons, the default level is 0, which becomes -1.
 	// Catch it, and set it to 0 instead, so the following array-accesses aren't
 	// out-of-bounds.

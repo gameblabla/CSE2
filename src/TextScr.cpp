@@ -678,7 +678,7 @@ int TextScriptProc(void)
 						x = GetTextScriptNo(gTS.p_read + 9);
 
 						gNumberTextScript[0] = x;
-					#ifndef FIX_BUGS
+					#ifndef FIX_MAJOR_BUGS
 						// z is uninitialised. Probably a leftover from copypasting this from elsewhere.
 						gNumberTextScript[1] = z;
 					#endif
@@ -898,7 +898,7 @@ int TextScriptProc(void)
 						x = GetTextScriptNo(gTS.p_read + 4);
 						z = GetTextScriptNo(gTS.p_read + 9);
 
-					#ifdef FIX_BUGS
+					#ifdef FIX_MAJOR_BUGS
 						// Some versions of the Waterway TSC script contain a bug:
 						//  <FLJ850:0111
 						// This command *should* be...
@@ -1007,7 +1007,7 @@ int TextScriptProc(void)
 					}
 					else if (IS_COMMAND('S','P','S'))
 					{
-					#ifdef FIX_BUGS
+					#ifdef FIX_MAJOR_BUGS
 						SetNoise(2, 0);
 					#else
 						// x is not initialised. This bug isn't too bad, since that parameter's not used when the first one is set to 2, but still.

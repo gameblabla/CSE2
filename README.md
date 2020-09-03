@@ -82,6 +82,7 @@ Name | Function
 --------|--------
 `-DJAPANESE=ON` | Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
 `-DFIX_BUGS=ON` | Fix various bugs in the game
+`-DFIX_MAJOR_BUGS=ON` | Fix bugs that invoke undefined behaviour or cause memory leaks
 `-DDEBUG_SAVE=ON` | Re-enable [the dummied-out 'Debug Save' option](https://tcrf.net/Cave_Story#Debug_Save), and the ability to drag-and-drop save files onto the window
 `-DLTO=ON` | Enable link-time optimisation
 `-DMSVC_LINK_STATIC_RUNTIME=ON` | Link the static MSVC runtime library, to reduce the number of required DLL files (Visual Studio only)
@@ -108,6 +109,7 @@ Name | Function
 --------|--------
 `JAPANESE=1` | Enable the Japanese-language build (instead of the unofficial Aeon Genesis English translation)
 `FIX_BUGS=1` | Fix various bugs in the game
+`FIX_MAJOR_BUGS=1` | Fix bugs that invoke undefined behaviour or cause memory leaks
 `DEBUG_SAVE=1` | Re-enable [the dummied-out 'Debug Save' option](https://tcrf.net/Cave_Story#Debug_Save), and the ability to drag-and-drop save files onto the window
 `RELEASE=1` | Compile a release build (optimised, stripped, etc.)
 `STATIC=1` | Produce a statically-linked executable (so you don't need to bundle DLL files)
