@@ -128,7 +128,7 @@ const STAGE_TABLE gTMT[95] = {
 	STAGE_ENTRY("0",      "Island", BACKGROUND_TYPE_BLACK,        "bk0",     "Island", "0",      0, "",                      ""),
 	STAGE_ENTRY("Hell",   "Ballo2", BACKGROUND_TYPE_MOVE_NEAR,    "bkBlue",  "Priest", "Bllg",   9, "Seal Chamber",          "\x95\x95\x88\xF3\x82\xCC\x8A\xD4"),	/* 封印の間 */
 	STAGE_ENTRY("White",  "e_Blcn", BACKGROUND_TYPE_CLOUDS,       "BkFog",   "Miza",   "0",      9, "",                      ""),
-	STAGE_ENTRY("Oside",  "Clock",  BACKGROUND_TYPE_CLOUDS_WINDY, "BkMoon",  "Moon",   "0",      0, "Clock Room",            "\x8E\x9E\x8C\x76\x89\xAE"),	/* 時計屋 */
+	STAGE_ENTRY("Oside",  "Clock",  BACKGROUND_TYPE_CLOUDS_WINDY, "BkMoon",  "Moon",   "0",      0, "Clock Room",            "\x8E\x9E\x8C\x76\x89\xAE")	/* 時計屋 */
 };
 
 BOOL TransferStage(int no, int w, int x, int y)
