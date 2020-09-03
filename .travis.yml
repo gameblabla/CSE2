@@ -8,9 +8,6 @@ dist: bionic
 # Enable C++ language support
 language: cpp
 
-# Cache compiled object files with ccache
-cache: ccache
-
 compiler:
     - gcc
 
