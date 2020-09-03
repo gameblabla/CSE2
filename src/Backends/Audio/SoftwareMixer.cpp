@@ -174,7 +174,7 @@ ATTRIBUTE_HOT void Mixer_MixSounds(long *stream, size_t frames_total)
 			{
 			#ifdef LANCZOS_RESAMPLER
 				// Perform Lanczos resampling
-				float accumulator = 0;
+				float output_sample = 0;
 
 				for (int i = -LANCZOS_KERNEL_RADIUS + 1; i <= LANCZOS_KERNEL_RADIUS; ++i)
 				{
@@ -184,20 +184,20 @@ ATTRIBUTE_HOT void Mixer_MixSounds(long *stream, size_t frames_total)
 
 					if (kernel_input == 0.0f)
 					{
-						accumulator += input_sample;
+						output_sample += input_sample;
 					}
 					else
 					{
 						const float nx = 3.14159265358979323846f * kernel_input;
 						const float nxa = nx / LANCZOS_KERNEL_RADIUS;
 
-						accumulator += input_sample * (sin(nx) * sin(nxa) / (nx * nxa));
+						output_sample += input_sample * (sin(nx) * sin(nxa) / (nx * nxa));
 					}
 				}
 
 				// Mix, and apply volume
-				*stream_pointer++ += (short)(accumulator * sound->volume_l);
-				*stream_pointer++ += (short)(accumulator * sound->volume_r);
+				*stream_pointer++ += (short)(output_sample * sound->volume_l);
+				*stream_pointer++ += (short)(output_sample * sound->volume_r);
 			#else
 				// Perform linear interpolation
 				const unsigned char interpolation_scale = sound->position_subsample >> 8;
