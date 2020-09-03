@@ -246,12 +246,11 @@ BOOL InitializeGame(void)
 	InitFlags();
 	if (!TransferStage(13, 200, 10, 8))
 	{
-#ifdef JAPANESE
-		Backend_ShowMessageBox("エラー", "ステージの読み込みに失敗");
-#else
+	#if !defined(JAPANESE) && defined(FIX_BUGS) // The Aeon Genesis translation didn't translate this
 		Backend_ShowMessageBox("Error", "Failed to load stage");
-#endif
-
+	#else
+		Backend_ShowMessageBox("エラー", "ステージの読み込みに失敗");
+	#endif
 		return FALSE;
 	}
 

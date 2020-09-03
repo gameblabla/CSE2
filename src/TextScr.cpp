@@ -741,12 +741,11 @@ int TextScriptProc(void)
 
 						if (!TransferStage(z, w, x, y))
 						{
-							#ifdef JAPANESE
-							Backend_ShowMessageBox("エラー", "ステージの読み込みに失敗");
-							#else
+						#if !defined(JAPANESE) && defined(FIX_BUGS) // The Aeon Genesis translation didn't translate this
 							Backend_ShowMessageBox("Error", "Failed to load stage");
-							#endif
-
+						#else
+							Backend_ShowMessageBox("エラー", "ステージの読み込みに失敗");
+						#endif
 							return enum_ESCRETURN_exit;
 						}
 					}
@@ -1323,14 +1322,13 @@ int TextScriptProc(void)
 					else
 					{
 						char str_0[0x40];
-						#ifdef JAPANESE
-						sprintf(str_0, "不明のコード:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);
-						Backend_ShowMessageBox("エラー", str_0);
-						#else
+					#if !defined(JAPANESE) && defined(FIX_BUGS) // The Aeon Genesis translation didn't translate this
 						sprintf(str_0, "Unknown code:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);
 						Backend_ShowMessageBox("Error", str_0);
-						#endif
-
+					#else
+						sprintf(str_0, "不明のコード:<%c%c%c", gTS.data[gTS.p_read + 1], gTS.data[gTS.p_read + 2], gTS.data[gTS.p_read + 3]);
+						Backend_ShowMessageBox("エラー", str_0);
+					#endif
 						return enum_ESCRETURN_exit;
 					}
 				}

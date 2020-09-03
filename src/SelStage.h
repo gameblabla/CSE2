@@ -2,13 +2,15 @@
 
 #include "WindowsWrapper.h"
 
+#define STAGE_MAX 8 // Note that Cave Story only has 5 stages
+
 typedef struct PERMIT_STAGE
 {
 	int index;
 	int event;
 } PERMIT_STAGE;
 
-extern PERMIT_STAGE gPermitStage[8];
+extern PERMIT_STAGE gPermitStage[STAGE_MAX];
 
 extern int gSelectedStage;
 extern int gStageSelectTitleY;

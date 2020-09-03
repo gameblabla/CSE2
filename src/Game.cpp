@@ -689,12 +689,11 @@ BOOL Game(void)
 
 	if (!LoadGenericData())
 	{
-#ifdef JAPANESE
-		Backend_ShowMessageBox("エラー", "汎用ファイルが読めない");
-#else
+	#if !defined(JAPANESE) && defined(FIX_BUGS) // The Aeon Genesis translation didn't translate this
 		Backend_ShowMessageBox("Error", "Couldn't read general purpose files");
-#endif
-
+	#else
+		Backend_ShowMessageBox("エラー", "汎用ファイルが読めない");
+	#endif
 		return FALSE;
 	}
 
@@ -704,12 +703,11 @@ BOOL Game(void)
 
 	if (!LoadNpcTable(path.c_str()))
 	{
-#ifdef JAPANESE
-		Backend_ShowMessageBox("エラー", "NPCテーブルが読めない");
-#else
+	#if !defined(JAPANESE) && defined(FIX_BUGS) // The Aeon Genesis translation didn't translate this
 		Backend_ShowMessageBox("Error", "Couldn't read the NPC table");
-#endif
-
+	#else
+		Backend_ShowMessageBox("エラー", "NPCテーブルが読めない");
+	#endif
 		return FALSE;
 	}
 
