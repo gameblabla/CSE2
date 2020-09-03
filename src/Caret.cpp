@@ -38,7 +38,7 @@ struct CARET_TABLE
 CARET gCrt[CARET_MAX];
 
 // Sprite offsets
-CARET_TABLE gCaretTable[18] = {
+CARET_TABLE gCaretTable[] = {
 	{0, 0},                   // CARET_NULL
 	{ 4 * 0x200,  4 * 0x200}, // CARET_BUBBLE
 	{ 8 * 0x200,  8 * 0x200}, // CARET_PROJECTILE_DISSIPATION

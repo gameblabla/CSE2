@@ -102,7 +102,7 @@ void PutBullet(int fx, int fy)
 	}
 }
 
-BULLET_TABLE gBulTbl[46] = {
+BULLET_TABLE gBulTbl[] = {
 	// Null
 	{0, 0, 0, 0, 0, 0, 0, 0, {0, 0, 0, 0}},
 	// Snake

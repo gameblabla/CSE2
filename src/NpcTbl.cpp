@@ -10,7 +10,7 @@
 #include "NpcAct.h"
 
 // Npc function table
-const NPCFUNCTION gpNpcFuncTbl[361] = {
+const NPCFUNCTION gpNpcFuncTbl[] = {
 	ActNpc000,
 	ActNpc001,
 	ActNpc002,
