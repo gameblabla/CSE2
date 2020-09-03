@@ -69,3 +69,8 @@ void AudioBackend_SetOrganyaTimer(unsigned int milliseconds)
 {
 	(void)milliseconds;
 }
+
+void AudioBackend_SleepOrganya(unsigned int milliseconds)
+{
+	(void)milliseconds;
+}
