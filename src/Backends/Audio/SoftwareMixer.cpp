@@ -10,14 +10,14 @@
 static unsigned long output_frequency;
 
 static void (*organya_callback)(void);
-static unsigned int organya_callback_milliseconds;
+static unsigned int organya_callback_timer_master;
 static unsigned int organya_sleep_timer;
 
 static void MixSoundsAndUpdateOrganya(long *stream, size_t frames_total)
 {
 	SoftwareMixerBackend_LockOrganyaMutex();
 
-	if (organya_callback_milliseconds == 0)
+	if (organya_callback_timer_master == 0)
 	{
 		SoftwareMixerBackend_LockMixerMutex();
 		Mixer_MixSounds(stream, frames_total);
@@ -47,22 +47,22 @@ static void MixSoundsAndUpdateOrganya(long *stream, size_t frames_total)
 
 		while (frames_done != frames_total)
 		{
-			static unsigned long organya_countdown;
+			static unsigned long organya_callback_timer;
 
-			if (organya_countdown == 0)
+			if (organya_callback_timer == 0)
 			{
-				organya_countdown = (organya_callback_milliseconds * output_frequency) / 1000;	// organya_timer is in milliseconds, so convert it to audio frames
+				organya_callback_timer = organya_callback_timer_master;
 				organya_callback();
 			}
 
-			const unsigned int frames_to_do = MIN(organya_countdown, frames_total - frames_done);
+			const unsigned int frames_to_do = MIN(organya_callback_timer, frames_total - frames_done);
 
 			SoftwareMixerBackend_LockMixerMutex();
 			Mixer_MixSounds(stream + frames_done * 2, frames_to_do);
 			SoftwareMixerBackend_UnlockMixerMutex();
 
 			frames_done += frames_to_do;
-			organya_countdown -= frames_to_do;
+			organya_callback_timer -= frames_to_do;
 		}
 	}
 
@@ -199,7 +199,7 @@ void AudioBackend_SetOrganyaTimer(unsigned int milliseconds)
 {
 	SoftwareMixerBackend_LockOrganyaMutex();
 
-	organya_callback_milliseconds = milliseconds;
+	organya_callback_timer_master = (milliseconds * output_frequency) / 1000; // convert milliseconds to audio frames
 
 	SoftwareMixerBackend_UnlockOrganyaMutex();
 }
@@ -208,7 +208,7 @@ void AudioBackend_SleepOrganya(unsigned int milliseconds)
 {
 	SoftwareMixerBackend_LockOrganyaMutex();
 
-	organya_sleep_timer = (milliseconds * output_frequency) / 1000;
+	organya_sleep_timer = (milliseconds * output_frequency) / 1000; // convert milliseconds to audio frames
 
 	SoftwareMixerBackend_UnlockOrganyaMutex();
 }
