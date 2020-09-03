@@ -69,8 +69,8 @@ void ActBack(void)
 			gBack.fx += 6 * 0x200;
 			break;
 
-		case BACKGROUND_TYPE_OUTSIDE_WITH_WIND:
-		case BACKGROUND_TYPE_OUTSIDE:
+		case BACKGROUND_TYPE_CLOUDS_WINDY:
+		case BACKGROUND_TYPE_CLOUDS:
 			++gBack.fx;
 			gBack.fx %= 640;
 			break;
@@ -113,8 +113,8 @@ void PutBack(int fx, int fy)
 
 			break;
 
-		case BACKGROUND_TYPE_OUTSIDE_WITH_WIND:
-		case BACKGROUND_TYPE_OUTSIDE:
+		case BACKGROUND_TYPE_CLOUDS_WINDY:
+		case BACKGROUND_TYPE_CLOUDS:
 			// Draw sky
 			rect.top = 0;
 			rect.bottom = 88;
