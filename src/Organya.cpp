@@ -868,7 +868,7 @@ void StopOrganyaMusic(void)
 	memset(key_on, 0, sizeof(key_on));
 	memset(key_twin, 0, sizeof(key_twin));
 
-//	Sleep(100);	// TODO - Emulate this
+	AudioBackend_SleepOrganya(100);
 }
 
 void SetOrganyaFadeout(void)

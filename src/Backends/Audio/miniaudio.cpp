@@ -27,6 +27,7 @@ static unsigned long output_frequency;
 
 static void (*organya_callback)(void);
 static unsigned int organya_callback_milliseconds;
+static unsigned int organya_sleep_timer;
 
 static void MixSoundsAndUpdateOrganya(long *stream, size_t frames_total)
 {
@@ -46,6 +47,19 @@ static void MixSoundsAndUpdateOrganya(long *stream, size_t frames_total)
 		// need a very low-latency buffer, otherwise we'd get mistimed instruments.
 		// Instead, we can just do this.
 		unsigned int frames_done = 0;
+
+		// Don't process Organya when it's meant to be sleeping
+		const unsigned int frames_to_do = MIN(organya_sleep_timer, frames_total - frames_done);
+
+		if (frames_to_do != 0)
+		{
+			ma_mutex_lock(&mutex);
+			Mixer_MixSounds(stream, frames_to_do);
+			ma_mutex_unlock(&mutex);
+
+			frames_done += frames_to_do;
+			organya_sleep_timer -= frames_to_do;
+		}
 
 		while (frames_done != frames_total)
 		{
@@ -304,6 +318,15 @@ void AudioBackend_SetOrganyaTimer(unsigned int milliseconds)
 	ma_mutex_lock(&organya_mutex);
 
 	organya_callback_milliseconds = milliseconds;
+
+	ma_mutex_unlock(&organya_mutex);
+}
+
+void AudioBackend_SleepOrganya(unsigned int milliseconds)
+{
+	ma_mutex_lock(&organya_mutex);
+
+	organya_sleep_timer = (milliseconds * output_frequency) / 1000;
 
 	ma_mutex_unlock(&organya_mutex);
 }
