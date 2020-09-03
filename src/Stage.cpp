@@ -31,7 +31,7 @@ MusicID gMusicNo;
 unsigned int gOldPos;
 MusicID gOldNo;
 
-// Note: Pixel made numerous capitalisation errors when making this table.
+// Note: Pixel made numerous capitalisation errors when creating this table.
 // This isn't a problem for Windows, because of its case-insensitive filesystem.
 const STAGE_TABLE gTMT[95] = {
 	STAGE_ENTRY("0",      "0",      4, "bk0",     "Guest",  "0",      0, "Null",                  "\x96\xB3"),	/* 無 */
