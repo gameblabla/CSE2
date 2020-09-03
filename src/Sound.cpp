@@ -13,6 +13,7 @@ equivalents.
 #include "Sound.h"
 
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <string>
@@ -211,7 +212,7 @@ BOOL LoadSoundObject(const char *file_name, int no)
 #ifdef FIX_MAJOR_BUGS
 		free(wp);	// The updated Organya source code includes this fix
 #endif
-		return FALSE;	
+		return FALSE;
 	}
 	
 	free(wp);
