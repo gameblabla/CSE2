@@ -46,6 +46,10 @@
 /game_japanese/save
 /game_japanese/s_reverse
 
+# Exclude error logs
+/game_english/error.log
+/game_japanese/error.log
+
 ###################
 # Accurate branch #
 ###################
@@ -75,19 +79,3 @@
 
 # Exclude converted resource files
 /src/Resource
-
-########################
-# Enhanced-lite branch #
-########################
-
-# Exclude CSE2EL configuration file
-/game_english/ConfigCSE2EL.dat
-/game_japanese/ConfigCSE2EL.dat
-
-###################
-# Enhanced branch #
-###################
-
-# Exclude CSE2E configuration file
-/game_english/ConfigCSE2E.dat
-/game_japanese/ConfigCSE2E.dat
