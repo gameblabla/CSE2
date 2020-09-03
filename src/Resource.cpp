@@ -3,76 +3,267 @@
 #include <stddef.h>
 #include <string.h>
 
-#include "Resource/BITMAP/Credit01.bmp.h"
-#include "Resource/BITMAP/Credit02.bmp.h"
-#include "Resource/BITMAP/Credit03.bmp.h"
-#include "Resource/BITMAP/Credit04.bmp.h"
-#include "Resource/BITMAP/Credit05.bmp.h"
-#include "Resource/BITMAP/Credit06.bmp.h"
-#include "Resource/BITMAP/Credit07.bmp.h"
-#include "Resource/BITMAP/Credit08.bmp.h"
-#include "Resource/BITMAP/Credit09.bmp.h"
-#include "Resource/BITMAP/Credit10.bmp.h"
-#include "Resource/BITMAP/Credit11.bmp.h"
-#include "Resource/BITMAP/Credit12.bmp.h"
-#include "Resource/BITMAP/Credit14.bmp.h"
-#include "Resource/BITMAP/Credit15.bmp.h"
-#include "Resource/BITMAP/Credit16.bmp.h"
-#include "Resource/BITMAP/Credit17.bmp.h"
-#include "Resource/BITMAP/Credit18.bmp.h"
+static const unsigned char rCredit01[] = {
+	#include "Resource/BITMAP/Credit01.bmp.h"
+};
+
+static const unsigned char rCredit02[] = {
+	#include "Resource/BITMAP/Credit02.bmp.h"
+};
+
+static const unsigned char rCredit03[] = {
+	#include "Resource/BITMAP/Credit03.bmp.h"
+};
+
+static const unsigned char rCredit04[] = {
+	#include "Resource/BITMAP/Credit04.bmp.h"
+};
+
+static const unsigned char rCredit05[] = {
+	#include "Resource/BITMAP/Credit05.bmp.h"
+};
+
+static const unsigned char rCredit06[] = {
+	#include "Resource/BITMAP/Credit06.bmp.h"
+};
+
+static const unsigned char rCredit07[] = {
+	#include "Resource/BITMAP/Credit07.bmp.h"
+};
+
+static const unsigned char rCredit08[] = {
+	#include "Resource/BITMAP/Credit08.bmp.h"
+};
+
+static const unsigned char rCredit09[] = {
+	#include "Resource/BITMAP/Credit09.bmp.h"
+};
+
+static const unsigned char rCredit10[] = {
+	#include "Resource/BITMAP/Credit10.bmp.h"
+};
+
+static const unsigned char rCredit11[] = {
+	#include "Resource/BITMAP/Credit11.bmp.h"
+};
+
+static const unsigned char rCredit12[] = {
+	#include "Resource/BITMAP/Credit12.bmp.h"
+};
+
+static const unsigned char rCredit14[] = {
+	#include "Resource/BITMAP/Credit14.bmp.h"
+};
+
+static const unsigned char rCredit15[] = {
+	#include "Resource/BITMAP/Credit15.bmp.h"
+};
+
+static const unsigned char rCredit16[] = {
+	#include "Resource/BITMAP/Credit16.bmp.h"
+};
+
+static const unsigned char rCredit17[] = {
+	#include "Resource/BITMAP/Credit17.bmp.h"
+};
+
+static const unsigned char rCredit18[] = {
+	#include "Resource/BITMAP/Credit18.bmp.h"
+};
+
+static const unsigned char rpixel[] = {
 #ifdef JAPANESE
-#include "Resource/BITMAP/pixel_jp.bmp.h"
+	#include "Resource/BITMAP/pixel_jp.bmp.h"
 #else
-#include "Resource/BITMAP/pixel.bmp.h"
+	#include "Resource/BITMAP/pixel.bmp.h"
 #endif
-#include "Resource/CURSOR/CURSOR_IKA.bmp.h"
-#include "Resource/CURSOR/CURSOR_NORMAL.bmp.h"
+};
+
+static const unsigned char rCURSOR_IKA[] = {
+	#include "Resource/CURSOR/CURSOR_IKA.bmp.h"
+};
+
+static const unsigned char rCURSOR_NORMAL[] = {
+	#include "Resource/CURSOR/CURSOR_NORMAL.bmp.h"
+};
+
 #ifndef _WIN32
-#include "Resource/ICON/ICON_MINI.bmp.h"
+static const unsigned char rICON_MINI[] = {
+	#include "Resource/ICON/ICON_MINI.bmp.h"
+};
 #endif
-#include "Resource/ORG/Access.org.h"
-#include "Resource/ORG/Anzen.org.h"
-#include "Resource/ORG/Balcony.org.h"
-#include "Resource/ORG/Ballos.org.h"
-#include "Resource/ORG/BreakDown.org.h"
-#include "Resource/ORG/Cemetery.org.h"
-#include "Resource/ORG/Curly.org.h"
-#include "Resource/ORG/Dr.org.h"
-#include "Resource/ORG/Ending.org.h"
-#include "Resource/ORG/Escape.org.h"
-#include "Resource/ORG/Fanfale1.org.h"
-#include "Resource/ORG/Fanfale2.org.h"
-#include "Resource/ORG/Fanfale3.org.h"
-#include "Resource/ORG/FireEye.org.h"
-#include "Resource/ORG/Gameover.org.h"
-#include "Resource/ORG/Ginsuke.org.h"
-#include "Resource/ORG/Grand.org.h"
-#include "Resource/ORG/Gravity.org.h"
-#include "Resource/ORG/Hell.org.h"
-#include "Resource/ORG/ironH.org.h"
-#include "Resource/ORG/Jenka.org.h"
-#include "Resource/ORG/Jenka2.org.h"
-#include "Resource/ORG/Kodou.org.h"
-#include "Resource/ORG/LastBtl3.org.h"
-#include "Resource/ORG/LastBtl.org.h"
-#include "Resource/ORG/LastCave.org.h"
-#include "Resource/ORG/Marine.org.h"
-#include "Resource/ORG/Maze.org.h"
-#include "Resource/ORG/MDown2.org.h"
-#include "Resource/ORG/Mura.org.h"
-#include "Resource/ORG/Oside.org.h"
-#include "Resource/ORG/Plant.org.h"
-#include "Resource/ORG/quiet.org.h"
-#include "Resource/ORG/Requiem.org.h"
-#include "Resource/ORG/Toroko.org.h"
-#include "Resource/ORG/Vivi.org.h"
-#include "Resource/ORG/Wanpak2.org.h"
-#include "Resource/ORG/Wanpaku.org.h"
-#include "Resource/ORG/Weed.org.h"
-#include "Resource/ORG/White.org.h"
-#include "Resource/ORG/XXXX.org.h"
-#include "Resource/ORG/Zonbie.org.h"
-#include "Resource/WAVE/Wave.dat.h"
+
+static const unsigned char rAccess[] = {
+	#include "Resource/ORG/Access.org.h"
+};
+
+static const unsigned char rAnzen[] = {
+	#include "Resource/ORG/Anzen.org.h"
+};
+
+static const unsigned char rBalcony[] = {
+	#include "Resource/ORG/Balcony.org.h"
+};
+
+static const unsigned char rBallos[] = {
+	#include "Resource/ORG/Ballos.org.h"
+};
+
+static const unsigned char rBreakDown[] = {
+	#include "Resource/ORG/BreakDown.org.h"
+};
+
+static const unsigned char rCemetery[] = {
+	#include "Resource/ORG/Cemetery.org.h"
+};
+
+static const unsigned char rCurly[] = {
+	#include "Resource/ORG/Curly.org.h"
+};
+
+static const unsigned char rDr[] = {
+	#include "Resource/ORG/Dr.org.h"
+};
+
+static const unsigned char rEnding[] = {
+	#include "Resource/ORG/Ending.org.h"
+};
+
+static const unsigned char rEscape[] = {
+	#include "Resource/ORG/Escape.org.h"
+};
+
+static const unsigned char rFanfale1[] = {
+	#include "Resource/ORG/Fanfale1.org.h"
+};
+
+static const unsigned char rFanfale2[] = {
+	#include "Resource/ORG/Fanfale2.org.h"
+};
+
+static const unsigned char rFanfale3[] = {
+	#include "Resource/ORG/Fanfale3.org.h"
+};
+
+static const unsigned char rFireEye[] = {
+	#include "Resource/ORG/FireEye.org.h"
+};
+
+static const unsigned char rGameover[] = {
+	#include "Resource/ORG/Gameover.org.h"
+};
+
+static const unsigned char rGinsuke[] = {
+	#include "Resource/ORG/Ginsuke.org.h"
+};
+
+static const unsigned char rGrand[] = {
+	#include "Resource/ORG/Grand.org.h"
+};
+
+static const unsigned char rGravity[] = {
+	#include "Resource/ORG/Gravity.org.h"
+};
+
+static const unsigned char rHell[] = {
+	#include "Resource/ORG/Hell.org.h"
+};
+
+static const unsigned char rironH[] = {
+	#include "Resource/ORG/ironH.org.h"
+};
+
+static const unsigned char rJenka[] = {
+	#include "Resource/ORG/Jenka.org.h"
+};
+
+static const unsigned char rJenka2[] = {
+	#include "Resource/ORG/Jenka2.org.h"
+};
+
+static const unsigned char rKodou[] = {
+	#include "Resource/ORG/Kodou.org.h"
+};
+
+static const unsigned char rLastBtl3[] = {
+	#include "Resource/ORG/LastBtl3.org.h"
+};
+
+static const unsigned char rLastBtl[] = {
+	#include "Resource/ORG/LastBtl.org.h"
+};
+
+static const unsigned char rLastCave[] = {
+	#include "Resource/ORG/LastCave.org.h"
+};
+
+static const unsigned char rMarine[] = {
+	#include "Resource/ORG/Marine.org.h"
+};
+
+static const unsigned char rMaze[] = {
+	#include "Resource/ORG/Maze.org.h"
+};
+
+static const unsigned char rMDown2[] = {
+	#include "Resource/ORG/MDown2.org.h"
+};
+
+static const unsigned char rMura[] = {
+	#include "Resource/ORG/Mura.org.h"
+};
+
+static const unsigned char rOside[] = {
+	#include "Resource/ORG/Oside.org.h"
+};
+
+static const unsigned char rPlant[] = {
+	#include "Resource/ORG/Plant.org.h"
+};
+
+static const unsigned char rquiet[] = {
+	#include "Resource/ORG/quiet.org.h"
+};
+
+static const unsigned char rRequiem[] = {
+	#include "Resource/ORG/Requiem.org.h"
+};
+
+static const unsigned char rToroko[] = {
+	#include "Resource/ORG/Toroko.org.h"
+};
+
+static const unsigned char rVivi[] = {
+	#include "Resource/ORG/Vivi.org.h"
+};
+
+static const unsigned char rWanpak2[] = {
+	#include "Resource/ORG/Wanpak2.org.h"
+};
+
+static const unsigned char rWanpaku[] = {
+	#include "Resource/ORG/Wanpaku.org.h"
+};
+
+static const unsigned char rWeed[] = {
+	#include "Resource/ORG/Weed.org.h"
+};
+
+static const unsigned char rWhite[] = {
+	#include "Resource/ORG/White.org.h"
+};
+
+static const unsigned char rXXXX[] = {
+	#include "Resource/ORG/XXXX.org.h"
+};
+
+static const unsigned char rZonbie[] = {
+	#include "Resource/ORG/Zonbie.org.h"
+};
+
+static const unsigned char rWave[] = {
+	#include "Resource/WAVE/Wave.dat.h"
+};
 
 static const struct
 {
@@ -98,11 +289,7 @@ static const struct
 	{"BITMAP", "CREDIT16", rCredit16, sizeof(rCredit16)},
 	{"BITMAP", "CREDIT17", rCredit17, sizeof(rCredit17)},
 	{"BITMAP", "CREDIT18", rCredit18, sizeof(rCredit18)},
-#ifdef JAPANESE
-	{"BITMAP", "PIXEL", rpixel_jp, sizeof(rpixel_jp)},
-#else
 	{"BITMAP", "PIXEL", rpixel, sizeof(rpixel)},
-#endif
 	{"CURSOR", "CURSOR_IKA", rCURSOR_IKA, sizeof(rCURSOR_IKA)},
 	{"CURSOR", "CURSOR_NORMAL", rCURSOR_NORMAL, sizeof(rCURSOR_NORMAL)},
 #ifndef _WIN32

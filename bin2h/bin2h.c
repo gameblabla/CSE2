@@ -1,5 +1,4 @@
-/*Bin2h by -C-u-c-k-y- Clownypants*/
-/*Converts files to the .h's expected by Cave Story Engine for resources.*/
+/* bin2h - converts binary files to C header files */
 
 #include <stddef.h>
 #include <stdio.h>
@@ -8,45 +7,20 @@
 
 int main(int argc, char *argv[])
 {
-	int result = 0;
+	int result = 1;
 
 	if (argc > 2)
 	{
-		char *last_forward_slash;
-		char *last_back_slash;
-		char *last_path_seperator;
-		char *filename_pointer;
-		char *dot;
-		size_t filename_length;
-		char *filename;
-		FILE *in_file;
-		FILE *out_file;
-
-		last_forward_slash = strrchr(argv[1], '/');
-		last_back_slash = strrchr(argv[1], '\\');
-
-		last_path_seperator = last_forward_slash > last_back_slash ? last_forward_slash : last_back_slash;
-
-		filename_pointer = (last_path_seperator == NULL) ? argv[1] : last_path_seperator + 1;
-		dot = strchr(filename_pointer, '.');
-		filename_length = (dot == NULL) ? strlen(filename_pointer) : (size_t)(dot - filename_pointer);
-
-		filename = malloc(filename_length + 1);
-		memcpy(filename, filename_pointer, filename_length);
-		filename[filename_length] = '\0';
-
-		in_file = fopen(argv[1], "rb");
-		out_file = fopen(argv[2], "w");
+		FILE *in_file = fopen(argv[1], "rb");
+		FILE *out_file = fopen(argv[2], "w");
 
 		if (in_file == NULL)
 		{
 			printf("Couldn't open '%s'\n", argv[1]);
-			result = 1;
 		}
 		else if (out_file == NULL)
 		{
 			printf("Couldn't open '%s'\n", argv[2]);
-			result = 1;
 		}
 		else
 		{
@@ -65,27 +39,20 @@ int main(int argc, char *argv[])
 
 			setvbuf(out_file, NULL, _IOFBF, 0x10000);
 
-			fprintf(out_file, "#pragma once\n\nstatic const unsigned char r%s[0x%lX] = {\n\t", filename, in_file_size);
-
 			for (i = 0; i < in_file_size - 1; ++i)
 			{
-				if (i % 32 == 32-1)
-					fprintf(out_file, "%d,\n\t", *in_file_pointer++);
+				if (i % 64 == 64-1)
+					fprintf(out_file, "%d,\n", *in_file_pointer++);
 				else
 					fprintf(out_file, "%d,", *in_file_pointer++);
 			}
 
-			fprintf(out_file, "%d\n};\n", *in_file_pointer++);
+			fprintf(out_file, "%d\n", *in_file_pointer++);
 
 			fclose(out_file);
 			free(in_file_buffer);
+			result = 0;
 		}
-
-		free(filename);
-	}
-	else
-	{
-		result = 1;
 	}
 
 	return result;
