@@ -10,6 +10,8 @@
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define CLAMP(x, y, z) MIN(MAX((x), (y)), (z))
 
+#define LANCZOS_KERNEL_RADIUS 2
+
 struct Mixer_Sound
 {
 	signed char *samples;
@@ -51,10 +53,11 @@ Mixer_Sound* Mixer_CreateSound(unsigned int frequency, const unsigned char *samp
 	if (sound == NULL)
 		return NULL;
 
+	// Both interpolators will read outside the array's bounds, so allocate some extra room
 #ifdef LANCZOS_RESAMPLER
-	sound->samples = (signed char*)malloc(length);
+	sound->samples = (signed char*)malloc(LANCZOS_KERNEL_RADIUS - 1 + length + LANCZOS_KERNEL_RADIUS);
 #else
-	sound->samples = (signed char*)malloc(length + 1);	// +1 for the linear-interpolator
+	sound->samples = (signed char*)malloc(length + 1);
 #endif
 
 	if (sound->samples == NULL)
@@ -62,6 +65,14 @@ Mixer_Sound* Mixer_CreateSound(unsigned int frequency, const unsigned char *samp
 		free(sound);
 		return NULL;
 	}
+
+#ifdef LANCZOS_RESAMPLER
+	// Blank samples outside the array bounds (we'll deal with the other half later)
+	for (size_t i = 0; i < LANCZOS_KERNEL_RADIUS - 1; ++i)
+		sound->samples[i] = 0;
+
+	sound->samples += LANCZOS_KERNEL_RADIUS - 1;
+#endif
 
 	for (size_t i = 0; i < length; ++i)
 		sound->samples[i] = samples[i] - 0x80;	// Convert from unsigned 8-bit PCM to signed
@@ -88,6 +99,9 @@ void Mixer_DestroySound(Mixer_Sound *sound)
 		if (*sound_pointer == sound)
 		{
 			*sound_pointer = sound->next;
+		#ifdef LANCZOS_RESAMPLER
+			sound->samples -= LANCZOS_KERNEL_RADIUS - 1;
+		#endif
 			free(sound->samples);
 			free(sound);
 			break;
@@ -100,8 +114,17 @@ void Mixer_PlaySound(Mixer_Sound *sound, bool looping)
 	sound->playing = true;
 	sound->looping = looping;
 
-#ifndef LANCZOS_RESAMPLER
-	sound->samples[sound->frames] = looping ? sound->samples[0] : 0;	// For the linear interpolator
+	// Fill the out-of-bounds part of the buffer with
+	// either blank samples or repeated samples
+#ifdef LANCZOS_RESAMPLER
+	if (looping)
+		for (size_t i = 0; i < LANCZOS_KERNEL_RADIUS; ++i)
+			sound->samples[sound->frames + i] = sound->samples[i];
+	else
+		for (size_t i = 0; i < LANCZOS_KERNEL_RADIUS; ++i)
+			sound->samples[sound->frames + i] = 0;
+#else
+	sound->samples[sound->frames] = looping ? sound->samples[0] : 0;
 #endif
 }
 
@@ -151,13 +174,11 @@ ATTRIBUTE_HOT void Mixer_MixSounds(long *stream, size_t frames_total)
 			{
 			#ifdef LANCZOS_RESAMPLER
 				// Perform Lanczos resampling
-				const int kernel_radius = 2;
-
 				float accumulator = 0;
 
-				for (int i = -MIN(kernel_radius - 1, sound->position); i <= kernel_radius; ++i)
+				for (int i = -LANCZOS_KERNEL_RADIUS + 1; i <= LANCZOS_KERNEL_RADIUS; ++i)
 				{
-					const signed char input_sample = sound->samples[(sound->position + i) % sound->frames];
+					const signed char input_sample = sound->samples[sound->position + i];
 
 					const float kernel_input = ((float)sound->position_subsample / 0x10000) - i;
 
@@ -168,7 +189,7 @@ ATTRIBUTE_HOT void Mixer_MixSounds(long *stream, size_t frames_total)
 					else
 					{
 						const float nx = 3.14159265358979323846f * kernel_input;
-						const float nxa = nx / kernel_radius;
+						const float nxa = nx / LANCZOS_KERNEL_RADIUS;
 
 						accumulator += input_sample * (sin(nx) * sin(nxa) / (nx * nxa));
 					}
