@@ -601,7 +601,7 @@ void ActCaret17(CARET *crt)
 }
 
 typedef void (*CARETFUNCTION)(CARET*);
-CARETFUNCTION gpCaretFuncTbl[18] =
+CARETFUNCTION gpCaretFuncTbl[] =
 {
 	ActCaret00,
 	ActCaret01,
