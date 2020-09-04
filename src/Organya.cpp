@@ -1041,6 +1041,11 @@ void StopOrganyaMusic(void)
 	memset(key_on, 0, sizeof(key_on));
 	memset(key_twin, 0, sizeof(key_twin));
 
+	// Put the main thread to sleep for 100 milliseconds... but why?
+	// Really, what's the point? All this does is cause an annoying
+	// stutter when a new song loads.
+	// I'd guess it avoids a race-condition with the Organya thread,
+	// but the earlier QuitMMTimer call already disables it.
 	Sleep(100);
 }
 
