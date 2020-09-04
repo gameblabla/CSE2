@@ -13,6 +13,7 @@
 #include "WindowsWrapper.h"
 
 #include "Backends/Audio.h"
+#include "Backends/Misc.h"
 #include "Resource.h"
 #include "Sound.h"
 
@@ -868,7 +869,7 @@ void StopOrganyaMusic(void)
 	memset(key_on, 0, sizeof(key_on));
 	memset(key_twin, 0, sizeof(key_twin));
 
-	//Sleep(100);
+	Backend_Delay(100);
 }
 
 void SetOrganyaFadeout(void)
