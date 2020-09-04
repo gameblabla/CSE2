@@ -20,4 +20,3 @@ void AudioBackend_SetSoundPan(AudioBackend_Sound *sound, long pan);
 
 void AudioBackend_SetOrganyaCallback(void (*callback)(void));
 void AudioBackend_SetOrganyaTimer(unsigned int milliseconds);
-void AudioBackend_SleepOrganya(unsigned int milliseconds);
