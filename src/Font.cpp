@@ -968,7 +968,7 @@ static CachedGlyph* GetGlyphCached(FontObject *font_object, unsigned long unicod
 		{
 			glyph->unicode_value = unicode_value;
 			glyph->x = font_object->face->glyph->bitmap_left;
-			glyph->y = (FT_MulFix(font_object->face->ascender, font_object->face->size->metrics.y_scale) + (64 / 2)) / 64 - font_object->face->glyph->bitmap_top;
+			glyph->y = (font_object->face->size->metrics.ascender + (64 / 2)) / 64 - font_object->face->glyph->bitmap_top;
 			glyph->x_advance = font_object->face->glyph->advance.x / 64;
 
 			FT_Bitmap bitmap;
