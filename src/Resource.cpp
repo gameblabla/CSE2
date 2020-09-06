@@ -343,11 +343,11 @@ static const struct
 
 const unsigned char* FindResource(const char *name, const char *type, size_t *size)
 {
-	for (unsigned int i = 0; i < sizeof(resources) / sizeof(resources[0]); ++i)
+	for (size_t i = 0; i < sizeof(resources) / sizeof(resources[0]); ++i)
 	{
 		if (!strcmp(name, resources[i].name) && !strcmp(type, resources[i].type))
 		{
-			if (size)
+			if (size != NULL)
 				*size = resources[i].size;
 
 			return resources[i].data;
