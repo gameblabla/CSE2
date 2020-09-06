@@ -16,11 +16,10 @@
 // Font anti-aliasing conflicts with the game's colour-keying, causing ugly artifacting around
 // the text in numerous cases.
 // The only way to 'fix' the artifacting is to convert the entire drawing system to use alpha
-// blending instead of colour-keying, which is way out of scope for a simple compile flag, so
-// instead we just disable the anti-aliasing entirely. It's how it was meant to be anyway.
-#ifdef FIX_BUGS
-#define DISABLE_FONT_ANTIALIASING
-#endif
+// blending instead of colour-keying.
+
+// If you'd like the buggy anti-aliasing, then uncomment the following line.
+//#define ENABLE_FONT_ANTIALIASING
 
 typedef struct CachedGlyph
 {
@@ -961,7 +960,7 @@ static CachedGlyph* GetGlyphCached(FontObject *font_object, unsigned long unicod
 	{
 		unsigned int glyph_index = FT_Get_Char_Index(font_object->face, unicode_value);
 
-#ifndef DISABLE_FONT_ANTIALIASING
+#ifdef ENABLE_FONT_ANTIALIASING
 		if (FT_Load_Glyph(font_object->face, glyph_index, FT_LOAD_RENDER) == 0)
 #else
 		if (FT_Load_Glyph(font_object->face, glyph_index, FT_LOAD_RENDER | FT_LOAD_MONOCHROME | FT_LOAD_TARGET_MONO) == 0)
