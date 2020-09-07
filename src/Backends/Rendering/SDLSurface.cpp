@@ -15,10 +15,10 @@ typedef struct RenderBackend_Surface
 	SDL_Surface *sdlsurface;
 } RenderBackend_Surface;
 
-typedef struct RenderBackend_Glyph
+typedef struct RenderBackend_GlyphAtlas
 {
 	SDL_Surface *sdlsurface;
-} RenderBackend_Glyph;
+} RenderBackend_GlyphAtlas;
 
 SDL_Window *window;
 
@@ -26,7 +26,6 @@ static SDL_Surface *window_sdlsurface;
 
 static RenderBackend_Surface framebuffer;
 
-static unsigned char glyph_colour_channels[3];
 static SDL_Surface *glyph_destination_sdlsurface;
 
 static void RectToSDLRect(const RenderBackend_Rect *rect, SDL_Rect *sdl_rect)
@@ -195,28 +194,44 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 		Backend_PrintError("Couldn't fill rectangle with color: %s", SDL_GetError());
 }
 
-RenderBackend_Glyph* RenderBackend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch)
+RenderBackend_GlyphAtlas* RenderBackend_CreateGlyphAtlas(size_t size)
 {
-	RenderBackend_Glyph *glyph = (RenderBackend_Glyph*)malloc(sizeof(RenderBackend_Glyph));
+	RenderBackend_GlyphAtlas *atlas = (RenderBackend_GlyphAtlas*)malloc(sizeof(RenderBackend_GlyphAtlas));
 
-	if (glyph == NULL)
-		return NULL;
-
-	glyph->sdlsurface = SDL_CreateRGBSurfaceWithFormat(0, width, height, 0, SDL_PIXELFORMAT_RGBA32);
-
-	if (glyph->sdlsurface == NULL)
+	if (atlas != NULL)
 	{
-		Backend_PrintError("Couldn't create RBG surface: %s", SDL_GetError());
-		free(glyph);
-		return NULL;
+		atlas->sdlsurface = SDL_CreateRGBSurfaceWithFormat(0, size, size, 0, SDL_PIXELFORMAT_RGBA32);
+
+		if (atlas->sdlsurface != NULL)
+		{
+			return atlas;
+		}
+		else
+		{
+			Backend_PrintError("Couldn't create RBG surface: %s", SDL_GetError());
+		}
+
+		free(atlas);
 	}
 
-	for (unsigned int y = 0; y < height; ++y)
-	{
-		const unsigned char *source_pointer = pixels + y * pitch;
-		unsigned char *destination_pointer = (unsigned char*)glyph->sdlsurface->pixels + y * glyph->sdlsurface->pitch;
+	return NULL;	
+}
 
-		for (unsigned int x = 0; x < width; ++x)
+void RenderBackend_DestroyGlyphAtlas(RenderBackend_GlyphAtlas *atlas)
+{
+	SDL_FreeSurface(atlas->sdlsurface);
+	free(atlas);
+}
+
+void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t y, const unsigned char *pixels, size_t width, size_t height)
+{
+	const unsigned char *source_pointer = pixels;
+
+	for (size_t iy = 0; iy < height; ++iy)
+	{
+		unsigned char *destination_pointer = &((unsigned char*)atlas->sdlsurface->pixels)[(y + iy) * atlas->sdlsurface->pitch + x * 4];
+
+		for (size_t ix = 0; ix < width; ++ix)
 		{
 			*destination_pointer++ = 0xFF;
 			*destination_pointer++ = 0xFF;
@@ -224,44 +239,34 @@ RenderBackend_Glyph* RenderBackend_LoadGlyph(const unsigned char *pixels, unsign
 			*destination_pointer++ = *source_pointer++;
 		}
 	}
-
-	return glyph;
 }
 
-void RenderBackend_UnloadGlyph(RenderBackend_Glyph *glyph)
-{
-	if (glyph == NULL)
-		return;
-
-	SDL_FreeSurface(glyph->sdlsurface);
-	free(glyph);
-}
-
-void RenderBackend_PrepareToDrawGlyphs(RenderBackend_Surface *destination_surface, const unsigned char *colour_channels)
+void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBackend_Surface *destination_surface, const unsigned char *colour_channels)
 {
 	if (destination_surface == NULL)
 		return;
 
 	glyph_destination_sdlsurface = destination_surface->sdlsurface;
 
-	memcpy(glyph_colour_channels, colour_channels, sizeof(glyph_colour_channels));
+	if (SDL_SetSurfaceColorMod(atlas->sdlsurface, colour_channels[0], colour_channels[1], colour_channels[2]) < 0)
+		Backend_PrintError("Couldn't set color value: %s", SDL_GetError());
 }
 
-void RenderBackend_DrawGlyph(RenderBackend_Glyph *glyph, long x, long y)
+void RenderBackend_DrawGlyph(RenderBackend_GlyphAtlas *atlas, long x, long y, size_t glyph_x, size_t glyph_y, size_t glyph_width, size_t glyph_height)
 {
-	if (glyph == NULL)
-		return;
+	SDL_Rect source_rect;
+	source_rect.x = glyph_x;
+	source_rect.y = glyph_y;
+	source_rect.w = glyph_width;
+	source_rect.h = glyph_height;
 
-	SDL_Rect rect;
-	rect.x = x;
-	rect.y = y;
-	rect.w = glyph->sdlsurface->w;
-	rect.h = glyph->sdlsurface->h;
+	SDL_Rect destination_rect;
+	destination_rect.x = x;
+	destination_rect.y = y;
+	destination_rect.w = glyph_width;
+	destination_rect.h = glyph_height;
 
-	if (SDL_SetSurfaceColorMod(glyph->sdlsurface, glyph_colour_channels[0], glyph_colour_channels[1], glyph_colour_channels[2]) < 0)
-		Backend_PrintError("Couldn't set color value: %s", SDL_GetError());
-
-	if (SDL_BlitSurface(glyph->sdlsurface, NULL, glyph_destination_sdlsurface, &rect) < 0)
+	if (SDL_BlitSurface(atlas->sdlsurface, &source_rect, glyph_destination_sdlsurface, &destination_rect) < 0)
 		Backend_PrintError("Couldn't blit glyph indivual surface to final glyph surface: %s", SDL_GetError());
 }
 

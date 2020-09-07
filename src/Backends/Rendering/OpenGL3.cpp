@@ -899,18 +899,12 @@ RenderBackend_GlyphAtlas* RenderBackend_CreateGlyphAtlas(size_t size)
 
 void RenderBackend_DestroyGlyphAtlas(RenderBackend_GlyphAtlas *atlas)
 {
-	if (atlas == NULL)
-		return;
-
 	glDeleteTextures(1, &atlas->texture_id);
 	free(atlas);
 }
 
 void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t y, const unsigned char *pixels, size_t width, size_t height)
 {
-	if (atlas == NULL)
-		return;
-
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glBindTexture(GL_TEXTURE_2D, atlas->texture_id);
 #ifdef USE_OPENGLES2
@@ -922,8 +916,13 @@ void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 }
 
-void RenderBackend_PrepareToDrawGlyphs(RenderBackend_Surface *destination_surface, const unsigned char *colour_channels)
+void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBackend_Surface *destination_surface, const unsigned char *colour_channels)
 {
+	(void)atlas;
+
+	if (destination_surface == NULL)
+		return;
+
 	glyph_destination_surface = destination_surface;
 
 	memcpy(glyph_colour_channels, colour_channels, sizeof(glyph_colour_channels));

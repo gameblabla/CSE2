@@ -27,7 +27,7 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 RenderBackend_GlyphAtlas* RenderBackend_CreateGlyphAtlas(size_t size);
 void RenderBackend_DestroyGlyphAtlas(RenderBackend_GlyphAtlas *atlas);
 void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t y, const unsigned char *pixels, size_t width, size_t height);
-void RenderBackend_PrepareToDrawGlyphs(RenderBackend_Surface *destination_surface, const unsigned char *colour_channels);
+void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBackend_Surface *destination_surface, const unsigned char *colour_channels);
 void RenderBackend_DrawGlyph(RenderBackend_GlyphAtlas *atlas, long x, long y, size_t glyph_x, size_t glyph_y, size_t glyph_width, size_t glyph_height);
 void RenderBackend_FlushGlyphs(void);
 void RenderBackend_HandleRenderTargetLoss(void);
