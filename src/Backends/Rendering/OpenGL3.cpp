@@ -12,9 +12,6 @@
 #include <glad/glad.h>
 #endif
 
-#define SPRITEBATCH_IMPLEMENTATION
-#include "../../../external/cute_spritebatch.h"
-
 #include "../Misc.h"
 #include "Window/OpenGL.h"
 
@@ -40,13 +37,11 @@ typedef struct RenderBackend_Surface
 	unsigned char *pixels;
 } RenderBackend_Surface;
 
-typedef struct RenderBackend_Glyph
+typedef struct RenderBackend_GlyphAtlas
 {
-	unsigned char *pixels;
-	unsigned int width;
-	unsigned int height;
-	unsigned int pitch;
-} RenderBackend_Glyph;
+	GLuint texture_id;
+	size_t size;
+} RenderBackend_GlyphAtlas;
 
 typedef struct Coordinate2D
 {
@@ -91,8 +86,6 @@ static RenderBackend_Surface framebuffer;
 
 static unsigned char glyph_colour_channels[3];
 static RenderBackend_Surface *glyph_destination_surface;
-
-static spritebatch_t glyph_batcher;
 
 static int actual_screen_width;
 static int actual_screen_height;
@@ -375,154 +368,6 @@ static void FlushVertexBuffer(void)
 	current_vertex_buffer_slot = 0;
 }
 
-////////////////////
-// Glyph-batching //
-////////////////////
-
-// Blit the glyphs in the batch
-static void GlyphBatch_Draw(spritebatch_sprite_t *sprites, int count, int texture_w, int texture_h, void *udata)
-{
-	static unsigned char last_red;
-	static unsigned char last_green;
-	static unsigned char last_blue;
-
-	(void)texture_h;
-	(void)udata;
-
-	if (glyph_destination_surface == NULL)
-		return;
-
-	GLuint texture_id = (GLuint)sprites[0].texture_id;
-
-	// Flush vertex data if a context-change is needed
-	if (last_render_mode != MODE_DRAW_GLYPH || last_destination_texture != glyph_destination_surface->texture_id || last_source_texture != texture_id || last_red != glyph_colour_channels[0] || last_green != glyph_colour_channels[1] || last_blue != glyph_colour_channels[2])
-	{
-		FlushVertexBuffer();
-
-		last_render_mode = MODE_DRAW_GLYPH;
-		last_destination_texture = glyph_destination_surface->texture_id;
-		last_source_texture = texture_id;
-		last_red = glyph_colour_channels[0];
-		last_green = glyph_colour_channels[1];
-		last_blue = glyph_colour_channels[2];
-
-		glUseProgram(program_glyph);
-		glUniform4f(program_glyph_uniform_colour, glyph_colour_channels[0] / 255.0f, glyph_colour_channels[1] / 255.0f, glyph_colour_channels[2] / 255.0f, 1.0f);
-
-		// Point our framebuffer to the destination texture
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, glyph_destination_surface->texture_id, 0);
-		glViewport(0, 0, glyph_destination_surface->width, glyph_destination_surface->height);
-
-		glEnable(GL_BLEND);
-
-		// Enable texture coordinates, since this uses textures
-		glEnableVertexAttribArray(ATTRIBUTE_INPUT_TEXTURE_COORDINATES);
-
-		glBindTexture(GL_TEXTURE_2D, texture_id);
-	}
-
-	// Add data to the vertex queue
-	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot(count);
-
-	if (vertex_buffer_slot != NULL)
-	{
-		for (int i = 0; i < count; ++i)
-		{
-			RenderBackend_Glyph *glyph = (RenderBackend_Glyph*)sprites[i].image_id;
-
-			const GLfloat texture_left = sprites[i].minx;
-			const GLfloat texture_right = texture_left + ((GLfloat)glyph->width / (GLfloat)texture_w);	// Account for width not matching pitch
-			const GLfloat texture_top = sprites[i].maxy;
-			const GLfloat texture_bottom = sprites[i].miny;
-
-			const GLfloat vertex_left = (sprites[i].x * (2.0f / glyph_destination_surface->width)) - 1.0f;
-			const GLfloat vertex_right = ((sprites[i].x + glyph->width) * (2.0f / glyph_destination_surface->width)) - 1.0f;
-			const GLfloat vertex_top = (sprites[i].y * (2.0f / glyph_destination_surface->height)) - 1.0f;
-			const GLfloat vertex_bottom = ((sprites[i].y + glyph->height) * (2.0f / glyph_destination_surface->height)) - 1.0f;
-
-			vertex_buffer_slot[i].vertices[0][0].texture.x = texture_left;
-			vertex_buffer_slot[i].vertices[0][0].texture.y = texture_top;
-			vertex_buffer_slot[i].vertices[0][1].texture.x = texture_right;
-			vertex_buffer_slot[i].vertices[0][1].texture.y = texture_top;
-			vertex_buffer_slot[i].vertices[0][2].texture.x = texture_right;
-			vertex_buffer_slot[i].vertices[0][2].texture.y = texture_bottom;
-
-			vertex_buffer_slot[i].vertices[1][0].texture.x = texture_left;
-			vertex_buffer_slot[i].vertices[1][0].texture.y = texture_top;
-			vertex_buffer_slot[i].vertices[1][1].texture.x = texture_right;
-			vertex_buffer_slot[i].vertices[1][1].texture.y = texture_bottom;
-			vertex_buffer_slot[i].vertices[1][2].texture.x = texture_left;
-			vertex_buffer_slot[i].vertices[1][2].texture.y = texture_bottom;
-
-			vertex_buffer_slot[i].vertices[0][0].position.x = vertex_left;
-			vertex_buffer_slot[i].vertices[0][0].position.y = vertex_top;
-			vertex_buffer_slot[i].vertices[0][1].position.x = vertex_right;
-			vertex_buffer_slot[i].vertices[0][1].position.y = vertex_top;
-			vertex_buffer_slot[i].vertices[0][2].position.x = vertex_right;
-			vertex_buffer_slot[i].vertices[0][2].position.y = vertex_bottom;
-
-			vertex_buffer_slot[i].vertices[1][0].position.x = vertex_left;
-			vertex_buffer_slot[i].vertices[1][0].position.y = vertex_top;
-			vertex_buffer_slot[i].vertices[1][1].position.x = vertex_right;
-			vertex_buffer_slot[i].vertices[1][1].position.y = vertex_bottom;
-			vertex_buffer_slot[i].vertices[1][2].position.x = vertex_left;
-			vertex_buffer_slot[i].vertices[1][2].position.y = vertex_bottom;
-		}
-	}
-}
-
-// Upload the glyph's pixels
-static void GlyphBatch_GetPixels(SPRITEBATCH_U64 image_id, void *buffer, int bytes_to_fill, void *udata)
-{
-	(void)udata;
-
-	RenderBackend_Glyph *glyph = (RenderBackend_Glyph*)image_id;
-
-	memcpy(buffer, glyph->pixels, bytes_to_fill);
-}
-
-// Create a texture atlas, and upload pixels to it
-static SPRITEBATCH_U64 GlyphBatch_CreateTexture(void *pixels, int w, int h, void *udata)
-{
-	(void)udata;
-
-	GLuint texture_id;
-	glGenTextures(1, &texture_id);
-	glBindTexture(GL_TEXTURE_2D, texture_id);
-#ifdef USE_OPENGLES2
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, w, h, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels);
-#else
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, w, h, 0, GL_RED, GL_UNSIGNED_BYTE, pixels);
-#endif
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-#ifndef USE_OPENGLES2
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-#endif
-
-	glBindTexture(GL_TEXTURE_2D, last_source_texture);
-
-	return (SPRITEBATCH_U64)texture_id;
-}
-
-// Destroy texture atlas
-static void GlyphBatch_DestroyTexture(SPRITEBATCH_U64 texture_id, void *udata)
-{
-	(void)udata;
-
-	GLuint gl_texture_id = (GLuint)texture_id;
-
-	// Flush the vertex buffer if we're about to destroy its texture
-	// TODO - This leaves `last_source_texture`/`last_destination_texture` dangling
-	if (gl_texture_id == last_source_texture || gl_texture_id == last_destination_texture)
-		FlushVertexBuffer();
-
-	glDeleteTextures(1, &gl_texture_id);
-}
-
 #ifndef USE_OPENGLES2
 
 static const char* GetOpenGLErrorCodeDescription(GLenum error_code)
@@ -656,19 +501,6 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebuffer.texture_id, 0);
 			glViewport(0, 0, framebuffer.width, framebuffer.height);
 
-			// Set-up glyph-batcher
-			spritebatch_config_t config;
-			spritebatch_set_default_config(&config);
-			config.pixel_stride = 1;
-			config.atlas_width_in_pixels = 256;
-			config.atlas_height_in_pixels = 256;
-			config.lonely_buffer_count_till_flush = 4; // Start making atlases immediately
-			config.batch_callback = GlyphBatch_Draw;
-			config.get_pixels_callback = GlyphBatch_GetPixels;
-			config.generate_texture_callback = GlyphBatch_CreateTexture;
-			config.delete_texture_callback = GlyphBatch_DestroyTexture;
-			spritebatch_init(&glyph_batcher, &config, NULL);
-
 			return &framebuffer;
 		}
 
@@ -697,8 +529,6 @@ void RenderBackend_Deinit(void)
 {
 	free(local_vertex_buffer);
 
-	spritebatch_term(&glyph_batcher);
-
 	glDeleteTextures(1, &framebuffer.texture_id);
 	glDeleteFramebuffers(1, &framebuffer_id);
 	glDeleteProgram(program_glyph);
@@ -715,8 +545,6 @@ void RenderBackend_Deinit(void)
 
 void RenderBackend_DrawScreen(void)
 {
-	spritebatch_tick(&glyph_batcher);
-
 	FlushVertexBuffer();
 	last_render_mode = MODE_BLANK;
 	last_source_texture = 0;
@@ -929,20 +757,20 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBacke
 	}
 
 	// Add data to the vertex queue
-	const GLfloat texture_left = (GLfloat)rect->left / (GLfloat)source_surface->width;
-	const GLfloat texture_right = (GLfloat)rect->right / (GLfloat)source_surface->width;
-	const GLfloat texture_top = (GLfloat)rect->top / (GLfloat)source_surface->height;
-	const GLfloat texture_bottom = (GLfloat)rect->bottom / (GLfloat)source_surface->height;
-
-	const GLfloat vertex_left = (x * (2.0f / destination_surface->width)) - 1.0f;
-	const GLfloat vertex_right = ((x + (rect->right - rect->left)) * (2.0f / destination_surface->width)) - 1.0f;
-	const GLfloat vertex_top = (y * (2.0f / destination_surface->height)) - 1.0f;
-	const GLfloat vertex_bottom = ((y + (rect->bottom - rect->top)) * (2.0f / destination_surface->height)) - 1.0f;
-
 	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot(1);
 
 	if (vertex_buffer_slot != NULL)
 	{
+		const GLfloat texture_left = (GLfloat)rect->left / (GLfloat)source_surface->width;
+		const GLfloat texture_right = (GLfloat)rect->right / (GLfloat)source_surface->width;
+		const GLfloat texture_top = (GLfloat)rect->top / (GLfloat)source_surface->height;
+		const GLfloat texture_bottom = (GLfloat)rect->bottom / (GLfloat)source_surface->height;
+
+		const GLfloat vertex_left = (x * (2.0f / destination_surface->width)) - 1.0f;
+		const GLfloat vertex_right = ((x + (rect->right - rect->left)) * (2.0f / destination_surface->width)) - 1.0f;
+		const GLfloat vertex_top = (y * (2.0f / destination_surface->height)) - 1.0f;
+		const GLfloat vertex_bottom = ((y + (rect->bottom - rect->top)) * (2.0f / destination_surface->height)) - 1.0f;
+
 		vertex_buffer_slot->vertices[0][0].texture.x = texture_left;
 		vertex_buffer_slot->vertices[0][0].texture.y = texture_top;
 		vertex_buffer_slot->vertices[0][1].texture.x = texture_right;
@@ -1009,15 +837,15 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 	}
 
 	// Add data to the vertex queue
-	const GLfloat vertex_left = (rect->left * (2.0f / surface->width)) - 1.0f;
-	const GLfloat vertex_right = (rect->right * (2.0f / surface->width)) - 1.0f;
-	const GLfloat vertex_top = (rect->top * (2.0f / surface->height)) - 1.0f;
-	const GLfloat vertex_bottom = (rect->bottom * (2.0f / surface->height)) - 1.0f;
-
 	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot(1);
 
 	if (vertex_buffer_slot != NULL)
 	{
+		const GLfloat vertex_left = (rect->left * (2.0f / surface->width)) - 1.0f;
+		const GLfloat vertex_right = (rect->right * (2.0f / surface->width)) - 1.0f;
+		const GLfloat vertex_top = (rect->top * (2.0f / surface->height)) - 1.0f;
+		const GLfloat vertex_bottom = (rect->bottom * (2.0f / surface->height)) - 1.0f;
+
 		vertex_buffer_slot->vertices[0][0].position.x = vertex_left;
 		vertex_buffer_slot->vertices[0][0].position.y = vertex_top;
 		vertex_buffer_slot->vertices[0][1].position.x = vertex_right;
@@ -1038,44 +866,60 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 // Glyph management //
 //////////////////////
 
-RenderBackend_Glyph* RenderBackend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch)
+RenderBackend_GlyphAtlas* RenderBackend_CreateGlyphAtlas(size_t size)
 {
-	RenderBackend_Glyph *glyph = (RenderBackend_Glyph*)malloc(sizeof(RenderBackend_Glyph));
+	RenderBackend_GlyphAtlas *atlas = (RenderBackend_GlyphAtlas*)malloc(sizeof(RenderBackend_GlyphAtlas));
 
-	if (glyph != NULL)
+	if (atlas != NULL)
 	{
-		glyph->pitch = (width + 3) & ~3;	// Round up to the nearest 4 (OpenGL needs this)
+		atlas->size = size;
 
-		glyph->pixels = (unsigned char*)malloc(glyph->pitch * height);
+		glGenTextures(1, &atlas->texture_id);
+		glBindTexture(GL_TEXTURE_2D, atlas->texture_id);
 
-		if (glyph->pixels != NULL)
-		{
-			for (unsigned int y = 0; y < height; ++y)
-			{
-				const unsigned char *source_pointer = &pixels[y * pitch];
-				unsigned char *destination_pointer = &glyph->pixels[y * glyph->pitch];
-				memcpy(destination_pointer, source_pointer, width);
-			}
+	#ifdef USE_OPENGLES2
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, size, size, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, NULL);
+	#else
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, size, size, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
+	#endif
 
-			glyph->width = width;
-			glyph->height = height;
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	#ifndef USE_OPENGLES2
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	#endif
 
-			return glyph;
-		}
-
-		free(glyph);
+		glBindTexture(GL_TEXTURE_2D, last_source_texture);
 	}
 
-	return NULL;
+	return atlas;
 }
 
-void RenderBackend_UnloadGlyph(RenderBackend_Glyph *glyph)
+void RenderBackend_DestroyGlyphAtlas(RenderBackend_GlyphAtlas *atlas)
 {
-	if (glyph == NULL)
+	if (atlas == NULL)
 		return;
 
-	free(glyph->pixels);
-	free(glyph);
+	glDeleteTextures(1, &atlas->texture_id);
+	free(atlas);
+}
+
+void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t y, const unsigned char *pixels, size_t width, size_t height)
+{
+	if (atlas == NULL)
+		return;
+
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glBindTexture(GL_TEXTURE_2D, atlas->texture_id);
+#ifdef USE_OPENGLES2
+	glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels);
+#else
+	glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_RED, GL_UNSIGNED_BYTE, pixels);
+#endif
+	glBindTexture(GL_TEXTURE_2D, last_source_texture);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 }
 
 void RenderBackend_PrepareToDrawGlyphs(RenderBackend_Surface *destination_surface, const unsigned char *colour_channels)
@@ -1085,15 +929,90 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_Surface *destination_surfac
 	memcpy(glyph_colour_channels, colour_channels, sizeof(glyph_colour_channels));
 }
 
-void RenderBackend_DrawGlyph(RenderBackend_Glyph *glyph, long x, long y)
+void RenderBackend_DrawGlyph(RenderBackend_GlyphAtlas *atlas, long x, long y, size_t glyph_x, size_t glyph_y, size_t glyph_width, size_t glyph_height)
 {
-	spritebatch_push(&glyph_batcher, (SPRITEBATCH_U64)glyph, glyph->pitch, glyph->height, x, y, 1.0f, 1.0f, 0.0f, 0.0f, 0);
+	static unsigned char last_red;
+	static unsigned char last_green;
+	static unsigned char last_blue;
+
+	if (glyph_destination_surface == NULL)
+		return;
+
+	// Flush vertex data if a context-change is needed
+	if (last_render_mode != MODE_DRAW_GLYPH || last_destination_texture != glyph_destination_surface->texture_id || last_source_texture != atlas->texture_id || last_red != glyph_colour_channels[0] || last_green != glyph_colour_channels[1] || last_blue != glyph_colour_channels[2])
+	{
+		FlushVertexBuffer();
+
+		last_render_mode = MODE_DRAW_GLYPH;
+		last_destination_texture = glyph_destination_surface->texture_id;
+		last_source_texture = atlas->texture_id;
+		last_red = glyph_colour_channels[0];
+		last_green = glyph_colour_channels[1];
+		last_blue = glyph_colour_channels[2];
+
+		glUseProgram(program_glyph);
+		glUniform4f(program_glyph_uniform_colour, glyph_colour_channels[0] / 255.0f, glyph_colour_channels[1] / 255.0f, glyph_colour_channels[2] / 255.0f, 1.0f);
+
+		// Point our framebuffer to the destination texture
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, glyph_destination_surface->texture_id, 0);
+		glViewport(0, 0, glyph_destination_surface->width, glyph_destination_surface->height);
+
+		glEnable(GL_BLEND);
+
+		// Enable texture coordinates, since this uses textures
+		glEnableVertexAttribArray(ATTRIBUTE_INPUT_TEXTURE_COORDINATES);
+
+		glBindTexture(GL_TEXTURE_2D, atlas->texture_id);
+	}
+
+	// Add data to the vertex queue
+	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot(1);
+
+	if (vertex_buffer_slot != NULL)
+	{
+		const GLfloat texture_left = glyph_x / (GLfloat)atlas->size;
+		const GLfloat texture_right = (glyph_x + glyph_width) / (GLfloat)atlas->size;
+		const GLfloat texture_top = glyph_y / (GLfloat)atlas->size;
+		const GLfloat texture_bottom = (glyph_y + glyph_height) / (GLfloat)atlas->size;
+
+		const GLfloat vertex_left = (x * (2.0f / glyph_destination_surface->width)) - 1.0f;
+		const GLfloat vertex_right = ((x + glyph_width) * (2.0f / glyph_destination_surface->width)) - 1.0f;
+		const GLfloat vertex_top = (y * (2.0f / glyph_destination_surface->height)) - 1.0f;
+		const GLfloat vertex_bottom = ((y + glyph_height) * (2.0f / glyph_destination_surface->height)) - 1.0f;
+
+		vertex_buffer_slot->vertices[0][0].texture.x = texture_left;
+		vertex_buffer_slot->vertices[0][0].texture.y = texture_top;
+		vertex_buffer_slot->vertices[0][1].texture.x = texture_right;
+		vertex_buffer_slot->vertices[0][1].texture.y = texture_top;
+		vertex_buffer_slot->vertices[0][2].texture.x = texture_right;
+		vertex_buffer_slot->vertices[0][2].texture.y = texture_bottom;
+
+		vertex_buffer_slot->vertices[1][0].texture.x = texture_left;
+		vertex_buffer_slot->vertices[1][0].texture.y = texture_top;
+		vertex_buffer_slot->vertices[1][1].texture.x = texture_right;
+		vertex_buffer_slot->vertices[1][1].texture.y = texture_bottom;
+		vertex_buffer_slot->vertices[1][2].texture.x = texture_left;
+		vertex_buffer_slot->vertices[1][2].texture.y = texture_bottom;
+
+		vertex_buffer_slot->vertices[0][0].position.x = vertex_left;
+		vertex_buffer_slot->vertices[0][0].position.y = vertex_top;
+		vertex_buffer_slot->vertices[0][1].position.x = vertex_right;
+		vertex_buffer_slot->vertices[0][1].position.y = vertex_top;
+		vertex_buffer_slot->vertices[0][2].position.x = vertex_right;
+		vertex_buffer_slot->vertices[0][2].position.y = vertex_bottom;
+
+		vertex_buffer_slot->vertices[1][0].position.x = vertex_left;
+		vertex_buffer_slot->vertices[1][0].position.y = vertex_top;
+		vertex_buffer_slot->vertices[1][1].position.x = vertex_right;
+		vertex_buffer_slot->vertices[1][1].position.y = vertex_bottom;
+		vertex_buffer_slot->vertices[1][2].position.x = vertex_left;
+		vertex_buffer_slot->vertices[1][2].position.y = vertex_bottom;
+	}
 }
 
 void RenderBackend_FlushGlyphs(void)
 {
-	spritebatch_defrag(&glyph_batcher);
-	spritebatch_flush(&glyph_batcher);
+	
 }
 
 ///////////
