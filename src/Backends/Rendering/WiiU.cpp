@@ -46,7 +46,6 @@ typedef struct RenderBackend_Surface
 
 typedef struct RenderBackend_GlyphAtlas
 {
-	size_t size;
 	GX2Texture texture;
 } RenderBackend_GlyphAtlas;
 
@@ -624,40 +623,34 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBacke
 	if (vertex_buffer_slot != NULL)
 	{
 		// Set vertex position buffer
-		const float destination_left = x;
-		const float destination_top = y;
-		const float destination_right = x + (rect->right - rect->left);
-		const float destination_bottom = y + (rect->bottom - rect->top);
+		const float vertex_left = x * 2.0f / destination_surface->width - 1.0f;
+		const float vertex_top = y * -2.0f / destination_surface->height + 1.0f;
+		const float vertex_right = (x + rect->right - rect->left) * 2.0f / destination_surface->width - 1.0f;
+		const float vertex_bottom = (y + rect->bottom - rect->top) * -2.0f / destination_surface->height + 1.0f;
 
-		vertex_buffer_slot->vertices[0].position.x = destination_left;
-		vertex_buffer_slot->vertices[0].position.y = destination_top;
-		vertex_buffer_slot->vertices[1].position.x = destination_right;
-		vertex_buffer_slot->vertices[1].position.y = destination_top;
-		vertex_buffer_slot->vertices[2].position.x = destination_right;
-		vertex_buffer_slot->vertices[2].position.y = destination_bottom;
-		vertex_buffer_slot->vertices[3].position.x = destination_left;
-		vertex_buffer_slot->vertices[3].position.y = destination_bottom;
+		vertex_buffer_slot->vertices[0].position.x = vertex_left;
+		vertex_buffer_slot->vertices[0].position.y = vertex_top;
+		vertex_buffer_slot->vertices[1].position.x = vertex_right;
+		vertex_buffer_slot->vertices[1].position.y = vertex_top;
+		vertex_buffer_slot->vertices[2].position.x = vertex_right;
+		vertex_buffer_slot->vertices[2].position.y = vertex_bottom;
+		vertex_buffer_slot->vertices[3].position.x = vertex_left;
+		vertex_buffer_slot->vertices[3].position.y = vertex_bottom;
 
-		for (unsigned int i = 0; i < 4; ++i)
-		{
-			vertex_buffer_slot->vertices[i].position.x /= destination_surface->width;
-			vertex_buffer_slot->vertices[i].position.x *= 2.0f;
-			vertex_buffer_slot->vertices[i].position.x -= 1.0f;
-
-			vertex_buffer_slot->vertices[i].position.y /= destination_surface->height;
-			vertex_buffer_slot->vertices[i].position.y *= -2.0f;
-			vertex_buffer_slot->vertices[i].position.y += 1.0f;
-		}
+		const float texture_left = rect->left / (float)source_surface->width;
+		const float texture_top = rect->top / (float)source_surface->height;
+		const float texture_right = rect->right / (float)source_surface->width;
+		const float texture_bottom = rect->bottom / (float)source_surface->height;
 
 		// Set texture coordinate buffer
-		vertex_buffer_slot->vertices[0].texture.x = rect->left / (float)source_surface->width;
-		vertex_buffer_slot->vertices[0].texture.y = rect->top / (float)source_surface->height;
-		vertex_buffer_slot->vertices[1].texture.x = rect->right / (float)source_surface->width;
-		vertex_buffer_slot->vertices[1].texture.y = rect->top / (float)source_surface->height;
-		vertex_buffer_slot->vertices[2].texture.x = rect->right / (float)source_surface->width;
-		vertex_buffer_slot->vertices[2].texture.y = rect->bottom / (float)source_surface->height;
-		vertex_buffer_slot->vertices[3].texture.x = rect->left / (float)source_surface->width;
-		vertex_buffer_slot->vertices[3].texture.y = rect->bottom / (float)source_surface->height;
+		vertex_buffer_slot->vertices[0].texture.x = texture_left;
+		vertex_buffer_slot->vertices[0].texture.y = texture_top;
+		vertex_buffer_slot->vertices[1].texture.x = texture_right;
+		vertex_buffer_slot->vertices[1].texture.y = texture_top;
+		vertex_buffer_slot->vertices[2].texture.x = texture_right;
+		vertex_buffer_slot->vertices[2].texture.y = texture_bottom;
+		vertex_buffer_slot->vertices[3].texture.x = texture_left;
+		vertex_buffer_slot->vertices[3].texture.y = texture_bottom;
 	}
 }
 
@@ -705,25 +698,19 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 	if (vertex_buffer_slot != NULL)
 	{
 		// Set vertex position buffer
-		vertex_buffer_slot->vertices[0].position.x = rect->left;
-		vertex_buffer_slot->vertices[0].position.y = rect->top;
-		vertex_buffer_slot->vertices[1].position.x = rect->right;
-		vertex_buffer_slot->vertices[1].position.y = rect->top;
-		vertex_buffer_slot->vertices[2].position.x = rect->right;
-		vertex_buffer_slot->vertices[2].position.y = rect->bottom;
-		vertex_buffer_slot->vertices[3].position.x = rect->left;
-		vertex_buffer_slot->vertices[3].position.y = rect->bottom;
+		const float vertex_left = rect->left * 2.0f / surface->width - 1.0f;
+		const float vertex_top = rect->top * -2.0f / surface->height + 1.0f;
+		const float vertex_right = rect->right * 2.0f / surface->width - 1.0f;
+		const float vertex_bottom = rect->bottom * -2.0f / surface->height + 1.0f;
 
-		for (unsigned int i = 0; i < 4; ++i)
-		{
-			vertex_buffer_slot->vertices[i].position.x /= surface->width;
-			vertex_buffer_slot->vertices[i].position.x *= 2.0f;
-			vertex_buffer_slot->vertices[i].position.x -= 1.0f;
-
-			vertex_buffer_slot->vertices[i].position.y /= surface->height;
-			vertex_buffer_slot->vertices[i].position.y *= -2.0f;
-			vertex_buffer_slot->vertices[i].position.y += 1.0f;
-		}
+		vertex_buffer_slot->vertices[0].position.x = vertex_left;
+		vertex_buffer_slot->vertices[0].position.y = vertex_top;
+		vertex_buffer_slot->vertices[1].position.x = vertex_right;
+		vertex_buffer_slot->vertices[1].position.y = vertex_top;
+		vertex_buffer_slot->vertices[2].position.x = vertex_right;
+		vertex_buffer_slot->vertices[2].position.y = vertex_bottom;
+		vertex_buffer_slot->vertices[3].position.x = vertex_left;
+		vertex_buffer_slot->vertices[3].position.y = vertex_bottom;
 	}
 }
 
@@ -733,7 +720,6 @@ RenderBackend_GlyphAtlas* RenderBackend_CreateGlyphAtlas(size_t size)
 
 	if (atlas != NULL)
 	{
-		atlas->size = size;
 		// Initialise texture
 		memset(&atlas->texture, 0, sizeof(atlas->texture));
 		atlas->texture.surface.width = size;
@@ -821,10 +807,10 @@ void RenderBackend_DrawGlyph(RenderBackend_GlyphAtlas *atlas, long x, long y, si
 	VertexBufferSlot *vertex_buffer_slot = (VertexBufferSlot*)GX2RLockBufferEx(&vertex_buffer, (GX2RResourceFlags)0);
 
 	// Set vertex position buffer
-	const float vertex_left = x;
-	const float vertex_top = y;
-	const float vertex_right = x + glyph_width;
-	const float vertex_bottom = y + glyph_height;
+	const float vertex_left = x * 2.0f / glyph_destination_surface->width - 1.0f;
+	const float vertex_top = y * -2.0f / glyph_destination_surface->height + 1.0f;
+	const float vertex_right = (x + glyph_width) * 2.0f / glyph_destination_surface->width - 1.0f;
+	const float vertex_bottom = (y + glyph_height) * -2.0f / glyph_destination_surface->height + 1.0f;
 
 	vertex_buffer_slot->vertices[0].position.x = vertex_left;
 	vertex_buffer_slot->vertices[0].position.y = vertex_top;
@@ -835,33 +821,12 @@ void RenderBackend_DrawGlyph(RenderBackend_GlyphAtlas *atlas, long x, long y, si
 	vertex_buffer_slot->vertices[3].position.x = vertex_left;
 	vertex_buffer_slot->vertices[3].position.y = vertex_bottom;
 
-	for (unsigned int i = 0; i < 4; ++i)
-	{
-		vertex_buffer_slot->vertices[i].position.x /= glyph_destination_surface->width;
-		vertex_buffer_slot->vertices[i].position.x *= 2.0f;
-		vertex_buffer_slot->vertices[i].position.x -= 1.0f;
-
-		vertex_buffer_slot->vertices[i].position.y /= glyph_destination_surface->height;
-		vertex_buffer_slot->vertices[i].position.y *= -2.0f;
-		vertex_buffer_slot->vertices[i].position.y += 1.0f;
-	}
-
-	const float texture_left = glyph_x / (float)atlas->size;
-	const float texture_top = glyph_y / (float)atlas->size;
-	const float texture_right = (glyph_x + glyph_width) / (float)atlas->size;
-	const float texture_bottom = (glyph_y + glyph_height) / (float)atlas->size;
+	const float texture_left = glyph_x / (float)atlas->texture.surface.width;
+	const float texture_top = glyph_y / (float)atlas->texture.surface.height;
+	const float texture_right = (glyph_x + glyph_width) / (float)atlas->texture.surface.width;
+	const float texture_bottom = (glyph_y + glyph_height) / (float)atlas->texture.surface.height;
 
 	// Set texture coordinate buffer
-#if 0
-	vertex_buffer_slot->vertices[0].texture.x = 0;
-	vertex_buffer_slot->vertices[0].texture.y = 0;
-	vertex_buffer_slot->vertices[1].texture.x = 1;
-	vertex_buffer_slot->vertices[1].texture.y = 0;
-	vertex_buffer_slot->vertices[2].texture.x = 1;
-	vertex_buffer_slot->vertices[2].texture.y = 1;
-	vertex_buffer_slot->vertices[3].texture.x = 0;
-	vertex_buffer_slot->vertices[3].texture.y = 1;
-#else
 	vertex_buffer_slot->vertices[0].texture.x = texture_left;
 	vertex_buffer_slot->vertices[0].texture.y = texture_top;
 	vertex_buffer_slot->vertices[1].texture.x = texture_right;
@@ -870,7 +835,7 @@ void RenderBackend_DrawGlyph(RenderBackend_GlyphAtlas *atlas, long x, long y, si
 	vertex_buffer_slot->vertices[2].texture.y = texture_bottom;
 	vertex_buffer_slot->vertices[3].texture.x = texture_left;
 	vertex_buffer_slot->vertices[3].texture.y = texture_bottom;
-#endif
+
 	GX2RUnlockBufferEx(&vertex_buffer, (GX2RResourceFlags)0);
 
 	// Draw to the selected texture, instead of the screen
