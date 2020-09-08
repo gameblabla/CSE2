@@ -1,13 +1,20 @@
 #include "../Misc.h"
 
-#include <chrono>
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <string>
-#include <thread>
+
+#if __cplusplus >= 201103L
+	#include <chrono>
+	#include <thread>
+#elif defined(_WIN32)
+	#include "windows.h"
+#else
+	#include <unistd.h>
+#endif
 
 #include <GLFW/glfw3.h>
 
@@ -319,6 +326,12 @@ unsigned long Backend_GetTicks(void)
 
 void Backend_Delay(unsigned int ticks)
 {
+#if __cplusplus >= 201103L
 	// GLFW3 doesn't have a delay function, so here's some butt-ugly C++11
 	std::this_thread::sleep_for(std::chrono::milliseconds(ticks));
+#elif defined(_WIN32)
+	Sleep(ticks);
+#else
+	usleep(ticks * 1000);
+#endif
 }
