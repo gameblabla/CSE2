@@ -4,8 +4,11 @@
 
 #include "../../Attributes.h"
 
-bool Backend_Init(void)
+bool Backend_Init(void (*drag_and_drop_callback)(const char *path), void (*window_focus_callback)(bool focus));
 {
+	(void)drag_and_drop_callback;
+	(void)window_focus_callback;
+
 	return true;
 }
 
