@@ -15,7 +15,6 @@
 #include "../Shared/GLFW3.h"
 #include "../../Attributes.h"
 #include "../../Main.h"
-#include "../../Organya.h"
 #include "../../Profile.h"
 
 #define DO_KEY(GLFW_KEY, BACKEND_KEY) \
@@ -271,10 +270,7 @@ void PlaybackBackend_EnableDragAndDrop(void)
 bool Backend_SystemTask(bool active)
 {
 	if (glfwWindowShouldClose(window))
-	{
-		StopOrganyaMusic();
 		return false;
-	}
 
 	if (active)
 		glfwPollEvents();

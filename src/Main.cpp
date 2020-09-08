@@ -388,7 +388,10 @@ BOOL SystemTask(void)
 	do
 	{
 		if (!Backend_SystemTask(bActive))
+		{
+			StopOrganyaMusic();
 			return FALSE;
+		}
 	} while(!bActive);
 
 	bool keyboard_state[BACKEND_KEYBOARD_TOTAL];

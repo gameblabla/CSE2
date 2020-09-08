@@ -13,7 +13,6 @@
 #include "../Shared/SDL2.h"
 #include "../../Attributes.h"
 #include "../../Main.h"
-#include "../../Organya.h"
 #include "../../Profile.h"
 
 #define DO_KEY(SDL_KEY, BACKEND_KEY) \
@@ -294,7 +293,6 @@ bool Backend_SystemTask(bool active)
 				break;
 
 			case SDL_QUIT:
-				StopOrganyaMusic();
 				return false;
 
 			case SDL_RENDER_TARGETS_RESET:
