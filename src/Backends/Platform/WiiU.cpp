@@ -16,7 +16,7 @@
 
 static unsigned long ticks_per_second;
 
-bool Backend_Init(void (*drag_and_drop_callback)(const char *path), void (*window_focus_callback)(bool focus));
+bool Backend_Init(void (*drag_and_drop_callback)(const char *path), void (*window_focus_callback)(bool focus))
 {
 	(void)drag_and_drop_callback;
 	(void)window_focus_callback;
