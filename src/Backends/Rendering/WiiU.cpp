@@ -44,12 +44,11 @@ typedef struct RenderBackend_Surface
 	unsigned char *lock_buffer;	// TODO - Dumb
 } RenderBackend_Surface;
 
-typedef struct RenderBackend_Glyph
+typedef struct RenderBackend_GlyphAtlas
 {
+	size_t size;
 	GX2Texture texture;
-	unsigned int width;
-	unsigned int height;
-} RenderBackend_Glyph;
+} RenderBackend_GlyphAtlas;
 
 typedef struct Viewport
 {
@@ -728,75 +727,74 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 	}
 }
 
-RenderBackend_Glyph* RenderBackend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch)
+RenderBackend_GlyphAtlas* RenderBackend_CreateGlyphAtlas(size_t size)
 {
-	RenderBackend_Glyph *glyph = (RenderBackend_Glyph*)malloc(sizeof(RenderBackend_Glyph));
+	RenderBackend_GlyphAtlas *atlas = (RenderBackend_GlyphAtlas*)malloc(sizeof(RenderBackend_GlyphAtlas));
 
-	if (glyph != NULL)
+	if (atlas != NULL)
 	{
-		glyph->width = width;
-		glyph->height = height;
-
+		atlas->size = size;
 		// Initialise texture
-		memset(&glyph->texture, 0, sizeof(glyph->texture));
-		glyph->texture.surface.width = width;
-		glyph->texture.surface.height = height;
-		glyph->texture.surface.format = GX2_SURFACE_FORMAT_UNORM_R8;
-		glyph->texture.surface.depth = 1;
-		glyph->texture.surface.dim = GX2_SURFACE_DIM_TEXTURE_2D;
-		glyph->texture.surface.tileMode = GX2_TILE_MODE_LINEAR_ALIGNED;
-		glyph->texture.surface.mipLevels = 1;
-		glyph->texture.viewNumMips = 1;
-		glyph->texture.viewNumSlices = 1;
-		glyph->texture.compMap = 0x00000000;
-		GX2CalcSurfaceSizeAndAlignment(&glyph->texture.surface);
-		GX2InitTextureRegs(&glyph->texture);
+		memset(&atlas->texture, 0, sizeof(atlas->texture));
+		atlas->texture.surface.width = size;
+		atlas->texture.surface.height = size;
+		atlas->texture.surface.format = GX2_SURFACE_FORMAT_UNORM_R8;
+		atlas->texture.surface.depth = 1;
+		atlas->texture.surface.dim = GX2_SURFACE_DIM_TEXTURE_2D;
+		atlas->texture.surface.tileMode = GX2_TILE_MODE_LINEAR_ALIGNED;
+		atlas->texture.surface.mipLevels = 1;
+		atlas->texture.viewNumMips = 1;
+		atlas->texture.viewNumSlices = 1;
+		atlas->texture.compMap = 0x00000000;
+		GX2CalcSurfaceSizeAndAlignment(&atlas->texture.surface);
+		GX2InitTextureRegs(&atlas->texture);
 
-		if (GX2RCreateSurface(&glyph->texture.surface, (GX2RResourceFlags)(GX2R_RESOURCE_BIND_TEXTURE |
+		if (GX2RCreateSurface(&atlas->texture.surface, (GX2RResourceFlags)(GX2R_RESOURCE_BIND_TEXTURE |
 		                                                                   GX2R_RESOURCE_USAGE_CPU_WRITE | GX2R_RESOURCE_USAGE_CPU_READ |
 		                                                                   GX2R_RESOURCE_USAGE_GPU_WRITE | GX2R_RESOURCE_USAGE_GPU_READ)))
 		{
-			// Convert from RGB24 to RGBA32, and upload it to the GPU texture
-			unsigned char *framebuffer = (unsigned char*)GX2RLockSurfaceEx(&glyph->texture.surface, 0, (GX2RResourceFlags)0);
-
-			const unsigned char *in_pointer = pixels;
-			unsigned char *out_pointer = framebuffer;
-
-			for (size_t y = 0; y < height; ++y)
-			{
-				memcpy(out_pointer, in_pointer, width);
-
-				in_pointer += pitch;
-				out_pointer += glyph->texture.surface.pitch;
-			}
-
-			GX2RUnlockSurfaceEx(&glyph->texture.surface, 0, (GX2RResourceFlags)0);
-
-			return glyph;
+			return atlas;
 		}
 		else
 		{
-			Backend_PrintError("GX2RCreateSurface failed in RenderBackend_LoadGlyph");
+			Backend_PrintError("GX2RCreateSurface failed in RenderBackend_CreateGlyphAtlas");
 		}
 
-		free(glyph);
+		free(atlas);
 	}
-
 
 	return NULL;
 }
 
-void RenderBackend_UnloadGlyph(RenderBackend_Glyph *glyph)
+void RenderBackend_DestroyGlyphAtlas(RenderBackend_GlyphAtlas *atlas)
 {
-	if (glyph != NULL)
-	{
-		GX2RDestroySurfaceEx(&glyph->texture.surface, (GX2RResourceFlags)0);
-		free(glyph);
-	}
+	GX2RDestroySurfaceEx(&atlas->texture.surface, (GX2RResourceFlags)0);
+	free(atlas);
 }
 
-void RenderBackend_PrepareToDrawGlyphs(RenderBackend_Surface *destination_surface, const unsigned char *colour_channels)
+void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t y, const unsigned char *pixels, size_t width, size_t height)
 {
+	// Convert from RGB24 to RGBA32, and upload it to the GPU texture
+	unsigned char *buffer = (unsigned char*)GX2RLockSurfaceEx(&atlas->texture.surface, 0, (GX2RResourceFlags)0);
+
+	const unsigned char *in_pointer = pixels;
+	unsigned char *out_pointer = &buffer[y * atlas->texture.surface.pitch + x];
+
+	for (size_t iy = 0; iy < height; ++iy)
+	{
+		memcpy(out_pointer, in_pointer, width);
+
+		in_pointer += width;
+		out_pointer += atlas->texture.surface.pitch;
+	}
+
+	GX2RUnlockSurfaceEx(&atlas->texture.surface, 0, (GX2RResourceFlags)0);
+}
+
+void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBackend_Surface *destination_surface, const unsigned char *colour_channels)
+{
+	(void)atlas;
+
 	FlushVertexBuffer();
 	last_render_mode = MODE_BLANK;
 	last_source_surface = NULL;
@@ -815,30 +813,27 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_Surface *destination_surfac
 	GX2SetColorControl(GX2_LOGIC_OP_COPY, 0xFF, FALSE, TRUE);
 }
 
-void RenderBackend_DrawGlyph(RenderBackend_Glyph *glyph, long x, long y)
+void RenderBackend_DrawGlyph(RenderBackend_GlyphAtlas *atlas, long x, long y, size_t glyph_x, size_t glyph_y, size_t glyph_width, size_t glyph_height)
 {
-	if (glyph == NULL)
-		return;
-
 	// Make sure the buffers aren't currently being used before we modify them
 	GX2DrawDone();
 
 	VertexBufferSlot *vertex_buffer_slot = (VertexBufferSlot*)GX2RLockBufferEx(&vertex_buffer, (GX2RResourceFlags)0);
 
 	// Set vertex position buffer
-	const float destination_left = x;
-	const float destination_top = y;
-	const float destination_right = x + glyph->width;
-	const float destination_bottom = y + glyph->height;
+	const float vertex_left = x;
+	const float vertex_top = y;
+	const float vertex_right = x + glyph_width;
+	const float vertex_bottom = y + glyph_height;
 
-	vertex_buffer_slot->vertices[0].position.x = destination_left;
-	vertex_buffer_slot->vertices[0].position.y = destination_top;
-	vertex_buffer_slot->vertices[1].position.x = destination_right;
-	vertex_buffer_slot->vertices[1].position.y = destination_top;
-	vertex_buffer_slot->vertices[2].position.x = destination_right;
-	vertex_buffer_slot->vertices[2].position.y = destination_bottom;
-	vertex_buffer_slot->vertices[3].position.x = destination_left;
-	vertex_buffer_slot->vertices[3].position.y = destination_bottom;
+	vertex_buffer_slot->vertices[0].position.x = vertex_left;
+	vertex_buffer_slot->vertices[0].position.y = vertex_top;
+	vertex_buffer_slot->vertices[1].position.x = vertex_right;
+	vertex_buffer_slot->vertices[1].position.y = vertex_top;
+	vertex_buffer_slot->vertices[2].position.x = vertex_right;
+	vertex_buffer_slot->vertices[2].position.y = vertex_bottom;
+	vertex_buffer_slot->vertices[3].position.x = vertex_left;
+	vertex_buffer_slot->vertices[3].position.y = vertex_bottom;
 
 	for (unsigned int i = 0; i < 4; ++i)
 	{
@@ -851,16 +846,31 @@ void RenderBackend_DrawGlyph(RenderBackend_Glyph *glyph, long x, long y)
 		vertex_buffer_slot->vertices[i].position.y += 1.0f;
 	}
 
-	// Set texture coordinate buffer
-	vertex_buffer_slot->vertices[0].texture.x = 0.0f;
-	vertex_buffer_slot->vertices[0].texture.y = 0.0f;
-	vertex_buffer_slot->vertices[1].texture.x = 1.0f;
-	vertex_buffer_slot->vertices[1].texture.y = 0.0f;
-	vertex_buffer_slot->vertices[2].texture.x = 1.0f;
-	vertex_buffer_slot->vertices[2].texture.y = 1.0f;
-	vertex_buffer_slot->vertices[3].texture.x = 0.0f;
-	vertex_buffer_slot->vertices[3].texture.y = 1.0f;
+	const float texture_left = glyph_x / (float)atlas->size;
+	const float texture_top = glyph_y / (float)atlas->size;
+	const float texture_right = (glyph_x + glyph_width) / (float)atlas->size;
+	const float texture_bottom = (glyph_y + glyph_height) / (float)atlas->size;
 
+	// Set texture coordinate buffer
+#if 0
+	vertex_buffer_slot->vertices[0].texture.x = 0;
+	vertex_buffer_slot->vertices[0].texture.y = 0;
+	vertex_buffer_slot->vertices[1].texture.x = 1;
+	vertex_buffer_slot->vertices[1].texture.y = 0;
+	vertex_buffer_slot->vertices[2].texture.x = 1;
+	vertex_buffer_slot->vertices[2].texture.y = 1;
+	vertex_buffer_slot->vertices[3].texture.x = 0;
+	vertex_buffer_slot->vertices[3].texture.y = 1;
+#else
+	vertex_buffer_slot->vertices[0].texture.x = texture_left;
+	vertex_buffer_slot->vertices[0].texture.y = texture_top;
+	vertex_buffer_slot->vertices[1].texture.x = texture_right;
+	vertex_buffer_slot->vertices[1].texture.y = texture_top;
+	vertex_buffer_slot->vertices[2].texture.x = texture_right;
+	vertex_buffer_slot->vertices[2].texture.y = texture_bottom;
+	vertex_buffer_slot->vertices[3].texture.x = texture_left;
+	vertex_buffer_slot->vertices[3].texture.y = texture_bottom;
+#endif
 	GX2RUnlockBufferEx(&vertex_buffer, (GX2RResourceFlags)0);
 
 	// Draw to the selected texture, instead of the screen
@@ -875,7 +885,7 @@ void RenderBackend_DrawGlyph(RenderBackend_Glyph *glyph, long x, long y)
 
 	// Bind misc. data
 	GX2SetPixelSampler(&sampler, glyph_shader.pixelShader->samplerVars[0].location);
-	GX2SetPixelTexture(&glyph->texture, glyph_shader.pixelShader->samplerVars[0].location);
+	GX2SetPixelTexture(&atlas->texture, glyph_shader.pixelShader->samplerVars[0].location);
 	GX2RSetAttributeBuffer(&vertex_buffer, 0, sizeof(Vertex), offsetof(Vertex, position));
 	GX2RSetAttributeBuffer(&vertex_buffer, 1, sizeof(Vertex), offsetof(Vertex, texture));
 
