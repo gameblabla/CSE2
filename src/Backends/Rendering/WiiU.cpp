@@ -97,8 +97,8 @@ static unsigned long local_vertex_buffer_size;
 static unsigned long current_vertex_buffer_slot;
 
 static RenderMode last_render_mode;
-static RenderBackend_Surface *last_source_surface;
-static RenderBackend_Surface *last_destination_surface;
+static GX2Texture *last_source_texture;
+static GX2Texture *last_destination_texture;
 
 static VertexBufferSlot* GetVertexBufferSlot(void)
 {
@@ -349,8 +349,8 @@ void RenderBackend_DrawScreen(void)
 {
 	FlushVertexBuffer();
 	last_render_mode = MODE_BLANK;
-	last_source_surface = NULL;
-	last_destination_surface = NULL;
+	last_source_texture = NULL;
+	last_destination_texture = NULL;
 
 	// Make sure the buffers aren't currently being used before we modify them
 	GX2DrawDone();
@@ -378,6 +378,9 @@ void RenderBackend_DrawScreen(void)
 	vertex_buffer_slot->vertices[3].texture.y = 0.0f;
 
 	GX2RUnlockBufferEx(&vertex_buffer, (GX2RResourceFlags)0);
+
+	// Disable blending
+	GX2SetColorControl(GX2_LOGIC_OP_COPY, 0, FALSE, TRUE);
 
 	// Start drawing
 	WHBGfxBeginRender();
@@ -590,13 +593,13 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBacke
 	const RenderMode render_mode = (colour_key ? MODE_DRAW_SURFACE_WITH_TRANSPARENCY : MODE_DRAW_SURFACE);
 
 	// Flush vertex data if a context-change is needed
-	if (last_render_mode != render_mode || last_source_surface != source_surface || last_destination_surface != destination_surface)
+	if (last_render_mode != render_mode || last_source_texture != &source_surface->texture || last_destination_texture != &destination_surface->texture)
 	{
 		FlushVertexBuffer();
 
 		last_render_mode = render_mode;
-		last_source_surface = source_surface;
-		last_destination_surface = destination_surface;
+		last_source_texture = &source_surface->texture;
+		last_destination_texture = &destination_surface->texture;
 
 		// Draw to the selected texture, instead of the screen
 		GX2SetColorBuffer(&destination_surface->colour_buffer, GX2_RENDER_TARGET_0);
@@ -616,6 +619,9 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBacke
 		GX2SetPixelTexture(&source_surface->texture, shader->pixelShader->samplerVars[0].location);
 		GX2RSetAttributeBuffer(&vertex_buffer, 0, sizeof(Vertex), offsetof(Vertex, position));
 		GX2RSetAttributeBuffer(&vertex_buffer, 1, sizeof(Vertex), offsetof(Vertex, texture));
+
+		// Disable blending
+		GX2SetColorControl(GX2_LOGIC_OP_COPY, 0, FALSE, TRUE);
 	}
 
 	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot();
@@ -664,13 +670,13 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 		return;
 
 	// Flush vertex data if a context-change is needed
-	if (last_render_mode != MODE_COLOUR_FILL || last_destination_surface != surface || last_red != red || last_green != green || last_blue != blue)
+	if (last_render_mode != MODE_COLOUR_FILL || last_destination_texture != &surface->texture || last_red != red || last_green != green || last_blue != blue)
 	{
 		FlushVertexBuffer();
 
 		last_render_mode = MODE_COLOUR_FILL;
-		last_source_surface = NULL;
-		last_destination_surface = surface;
+		last_source_texture = NULL;
+		last_destination_texture = &surface->texture;
 		last_red = red;
 		last_green = green;
 		last_blue = blue;
@@ -691,6 +697,9 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 
 		// Bind misc. data
 		GX2RSetAttributeBuffer(&vertex_buffer, 0, sizeof(Vertex), offsetof(Vertex, position));
+
+		// Disable blending
+		GX2SetColorControl(GX2_LOGIC_OP_COPY, 0, FALSE, TRUE);
 	}
 
 	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot();
@@ -781,87 +790,93 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBa
 {
 	(void)atlas;
 
-	FlushVertexBuffer();
-	last_render_mode = MODE_BLANK;
-	last_source_surface = NULL;
-	last_destination_surface = NULL;
+	static unsigned char last_red;
+	static unsigned char last_green;
+	static unsigned char last_blue;
 
 	if (destination_surface == NULL)
 		return;
 
 	glyph_destination_surface = destination_surface;
 
-	// Set the colour
-	const float uniform_colours[4] = {colour_channels[0] / 255.0f, colour_channels[1] / 255.0f, colour_channels[2] / 255.0f, 1.0f};
-	GX2SetPixelUniformReg(glyph_shader.pixelShader->uniformVars[0].offset, 4, (uint32_t*)&uniform_colours);
+	// Flush vertex data if a context-change is needed
+	if (last_render_mode != MODE_DRAW_GLYPH || last_destination_texture != &glyph_destination_surface->texture || last_source_texture != &atlas->texture || last_red != colour_channels[0] || last_green != colour_channels[1] || last_blue != colour_channels[2])
+	{
+		FlushVertexBuffer();
 
-	// Enable blending
-	GX2SetColorControl(GX2_LOGIC_OP_COPY, 0xFF, FALSE, TRUE);
+		last_render_mode = MODE_DRAW_GLYPH;
+		last_destination_texture = &glyph_destination_surface->texture;
+		last_source_texture = &atlas->texture;
+		last_red = colour_channels[0];
+		last_green = colour_channels[1];
+		last_blue = colour_channels[2];
+
+		// Draw to the selected texture, instead of the screen
+		GX2SetColorBuffer(&glyph_destination_surface->colour_buffer, GX2_RENDER_TARGET_0);
+		GX2SetViewport(0.0f, 0.0f, (float)glyph_destination_surface->colour_buffer.surface.width, (float)glyph_destination_surface->colour_buffer.surface.height, 0.0f, 1.0f);
+		GX2SetScissor(0, 0, glyph_destination_surface->colour_buffer.surface.width, glyph_destination_surface->colour_buffer.surface.height);
+
+		// Set the colour
+		const float uniform_colours[4] = {colour_channels[0] / 255.0f, colour_channels[1] / 255.0f, colour_channels[2] / 255.0f, 1.0f};
+		GX2SetPixelUniformReg(glyph_shader.pixelShader->uniformVars[0].offset, 4, (uint32_t*)&uniform_colours);
+
+		// Select glyph shader
+		GX2SetFetchShader(&glyph_shader.fetchShader);
+		GX2SetVertexShader(glyph_shader.vertexShader);
+		GX2SetPixelShader(glyph_shader.pixelShader);
+
+		// Bind misc. data
+		GX2SetPixelSampler(&sampler, glyph_shader.pixelShader->samplerVars[0].location);
+		GX2SetPixelTexture(&atlas->texture, glyph_shader.pixelShader->samplerVars[0].location);
+		GX2RSetAttributeBuffer(&vertex_buffer, 0, sizeof(Vertex), offsetof(Vertex, position));
+		GX2RSetAttributeBuffer(&vertex_buffer, 1, sizeof(Vertex), offsetof(Vertex, texture));
+
+		// Enable blending
+		GX2SetColorControl(GX2_LOGIC_OP_COPY, 0xFF, FALSE, TRUE);
+	}
 }
 
 void RenderBackend_DrawGlyph(RenderBackend_GlyphAtlas *atlas, long x, long y, size_t glyph_x, size_t glyph_y, size_t glyph_width, size_t glyph_height)
 {
-	// Make sure the buffers aren't currently being used before we modify them
-	GX2DrawDone();
+	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot();
 
-	VertexBufferSlot *vertex_buffer_slot = (VertexBufferSlot*)GX2RLockBufferEx(&vertex_buffer, (GX2RResourceFlags)0);
+	if (vertex_buffer_slot != NULL)
+	{
+		// Set vertex position buffer
+		const float vertex_left = x * 2.0f / glyph_destination_surface->width - 1.0f;
+		const float vertex_top = y * -2.0f / glyph_destination_surface->height + 1.0f;
+		const float vertex_right = (x + glyph_width) * 2.0f / glyph_destination_surface->width - 1.0f;
+		const float vertex_bottom = (y + glyph_height) * -2.0f / glyph_destination_surface->height + 1.0f;
 
-	// Set vertex position buffer
-	const float vertex_left = x * 2.0f / glyph_destination_surface->width - 1.0f;
-	const float vertex_top = y * -2.0f / glyph_destination_surface->height + 1.0f;
-	const float vertex_right = (x + glyph_width) * 2.0f / glyph_destination_surface->width - 1.0f;
-	const float vertex_bottom = (y + glyph_height) * -2.0f / glyph_destination_surface->height + 1.0f;
+		vertex_buffer_slot->vertices[0].position.x = vertex_left;
+		vertex_buffer_slot->vertices[0].position.y = vertex_top;
+		vertex_buffer_slot->vertices[1].position.x = vertex_right;
+		vertex_buffer_slot->vertices[1].position.y = vertex_top;
+		vertex_buffer_slot->vertices[2].position.x = vertex_right;
+		vertex_buffer_slot->vertices[2].position.y = vertex_bottom;
+		vertex_buffer_slot->vertices[3].position.x = vertex_left;
+		vertex_buffer_slot->vertices[3].position.y = vertex_bottom;
 
-	vertex_buffer_slot->vertices[0].position.x = vertex_left;
-	vertex_buffer_slot->vertices[0].position.y = vertex_top;
-	vertex_buffer_slot->vertices[1].position.x = vertex_right;
-	vertex_buffer_slot->vertices[1].position.y = vertex_top;
-	vertex_buffer_slot->vertices[2].position.x = vertex_right;
-	vertex_buffer_slot->vertices[2].position.y = vertex_bottom;
-	vertex_buffer_slot->vertices[3].position.x = vertex_left;
-	vertex_buffer_slot->vertices[3].position.y = vertex_bottom;
+		const float texture_left = glyph_x / (float)atlas->texture.surface.width;
+		const float texture_top = glyph_y / (float)atlas->texture.surface.height;
+		const float texture_right = (glyph_x + glyph_width) / (float)atlas->texture.surface.width;
+		const float texture_bottom = (glyph_y + glyph_height) / (float)atlas->texture.surface.height;
 
-	const float texture_left = glyph_x / (float)atlas->texture.surface.width;
-	const float texture_top = glyph_y / (float)atlas->texture.surface.height;
-	const float texture_right = (glyph_x + glyph_width) / (float)atlas->texture.surface.width;
-	const float texture_bottom = (glyph_y + glyph_height) / (float)atlas->texture.surface.height;
-
-	// Set texture coordinate buffer
-	vertex_buffer_slot->vertices[0].texture.x = texture_left;
-	vertex_buffer_slot->vertices[0].texture.y = texture_top;
-	vertex_buffer_slot->vertices[1].texture.x = texture_right;
-	vertex_buffer_slot->vertices[1].texture.y = texture_top;
-	vertex_buffer_slot->vertices[2].texture.x = texture_right;
-	vertex_buffer_slot->vertices[2].texture.y = texture_bottom;
-	vertex_buffer_slot->vertices[3].texture.x = texture_left;
-	vertex_buffer_slot->vertices[3].texture.y = texture_bottom;
-
-	GX2RUnlockBufferEx(&vertex_buffer, (GX2RResourceFlags)0);
-
-	// Draw to the selected texture, instead of the screen
-	GX2SetColorBuffer(&glyph_destination_surface->colour_buffer, GX2_RENDER_TARGET_0);
-	GX2SetViewport(0.0f, 0.0f, (float)glyph_destination_surface->colour_buffer.surface.width, (float)glyph_destination_surface->colour_buffer.surface.height, 0.0f, 1.0f);
-	GX2SetScissor(0, 0, glyph_destination_surface->colour_buffer.surface.width, glyph_destination_surface->colour_buffer.surface.height);
-
-	// Select glyph shader
-	GX2SetFetchShader(&glyph_shader.fetchShader);
-	GX2SetVertexShader(glyph_shader.vertexShader);
-	GX2SetPixelShader(glyph_shader.pixelShader);
-
-	// Bind misc. data
-	GX2SetPixelSampler(&sampler, glyph_shader.pixelShader->samplerVars[0].location);
-	GX2SetPixelTexture(&atlas->texture, glyph_shader.pixelShader->samplerVars[0].location);
-	GX2RSetAttributeBuffer(&vertex_buffer, 0, sizeof(Vertex), offsetof(Vertex, position));
-	GX2RSetAttributeBuffer(&vertex_buffer, 1, sizeof(Vertex), offsetof(Vertex, texture));
-
-	// Draw
-	GX2DrawEx(GX2_PRIMITIVE_MODE_QUADS, 4, 0, 1);
+		// Set texture coordinate buffer
+		vertex_buffer_slot->vertices[0].texture.x = texture_left;
+		vertex_buffer_slot->vertices[0].texture.y = texture_top;
+		vertex_buffer_slot->vertices[1].texture.x = texture_right;
+		vertex_buffer_slot->vertices[1].texture.y = texture_top;
+		vertex_buffer_slot->vertices[2].texture.x = texture_right;
+		vertex_buffer_slot->vertices[2].texture.y = texture_bottom;
+		vertex_buffer_slot->vertices[3].texture.x = texture_left;
+		vertex_buffer_slot->vertices[3].texture.y = texture_bottom;
+	}
 }
 
 void RenderBackend_FlushGlyphs(void)
 {
-	// Disable blending
-	GX2SetColorControl(GX2_LOGIC_OP_COPY, 0, FALSE, TRUE);
+	
 }
 
 void RenderBackend_HandleRenderTargetLoss(void)
