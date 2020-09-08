@@ -7,9 +7,6 @@
 
 #include "SDL.h"
 
-#define SPRITEBATCH_IMPLEMENTATION
-#include "../../../external/cute_spritebatch.h"
-
 #include "../../WindowsWrapper.h"
 
 #include "../Misc.h"
@@ -27,12 +24,10 @@ typedef struct RenderBackend_Surface
 	struct RenderBackend_Surface *prev;
 } RenderBackend_Surface;
 
-typedef struct RenderBackend_Glyph
+typedef struct RenderBackend_GlyphAtlas
 {
-	unsigned char *pixels;
-	unsigned int width;
-	unsigned int height;
-} RenderBackend_Glyph;
+	SDL_Texture *texture;
+} RenderBackend_GlyphAtlas;
 
 SDL_Window *window;
 
@@ -41,10 +36,6 @@ static SDL_Renderer *renderer;
 static RenderBackend_Surface framebuffer;
 
 static RenderBackend_Surface *surface_list_head;
-
-static unsigned char glyph_colour_channels[3];
-
-static spritebatch_t glyph_batcher;
 
 static void RectToSDLRect(const RenderBackend_Rect *rect, SDL_Rect *sdl_rect)
 {
@@ -58,67 +49,6 @@ static void RectToSDLRect(const RenderBackend_Rect *rect, SDL_Rect *sdl_rect)
 
 	if (sdl_rect->h < 0)
 		sdl_rect->h = 0;
-}
-
-// Blit the glyphs in the batch
-static void GlyphBatch_Draw(spritebatch_sprite_t *sprites, int count, int texture_w, int texture_h, void *udata)
-{
-	(void)udata;
-
-	SDL_Texture *texture_atlas = (SDL_Texture*)sprites[0].texture_id;
-
-	// The SDL_Texture side of things uses alpha, not a colour-key, so the bug where the font is blended
-	// with the colour key doesn't occur.
-	if (SDL_SetTextureColorMod(texture_atlas, glyph_colour_channels[0], glyph_colour_channels[1], glyph_colour_channels[2]) < 0)
-		Backend_PrintError("Couldn't set additional color value: %s", SDL_GetError());
-
-	if (SDL_SetTextureBlendMode(texture_atlas, SDL_BLENDMODE_BLEND) < 0)
-		Backend_PrintError("Couldn't set texture blend mode: %s", SDL_GetError());
-
-	for (int i = 0; i < count; ++i)
-	{
-		RenderBackend_Glyph *glyph = (RenderBackend_Glyph*)sprites[i].image_id;
-
-		SDL_Rect source_rect = {(int)(texture_w * sprites[i].minx), (int)(texture_h * sprites[i].maxy), (int)glyph->width, (int)glyph->height};
-		SDL_Rect destination_rect = {(int)sprites[i].x, (int)sprites[i].y, (int)glyph->width, (int)glyph->height};
-
-		if (SDL_RenderCopy(renderer, texture_atlas, &source_rect, &destination_rect) < 0)
-			Backend_PrintError("Couldn't copy glyph texture portion to renderer: %s", SDL_GetError());
-	}
-}
-
-// Upload the glyph's pixels
-static void GlyphBatch_GetPixels(SPRITEBATCH_U64 image_id, void *buffer, int bytes_to_fill, void *udata)
-{
-	(void)udata;
-
-	RenderBackend_Glyph *glyph = (RenderBackend_Glyph*)image_id;
-
-	memcpy(buffer, glyph->pixels, bytes_to_fill);
-}
-
-// Create a texture atlas, and upload pixels to it
-static SPRITEBATCH_U64 GlyphBatch_CreateTexture(void *pixels, int w, int h, void *udata)
-{
-	(void)udata;
-
-	SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STATIC, w, h);
-
-	if (texture == NULL)
-		Backend_PrintError("Couldn't create texture for renderer: %s", SDL_GetError());
-
-	if (SDL_UpdateTexture(texture, NULL, pixels, w * 4) < 0)
-		Backend_PrintError("Couldn't update texture: %s", SDL_GetError());
-
-	return (SPRITEBATCH_U64)texture;
-}
-
-// Destroy texture atlas
-static void GlyphBatch_DestroyTexture(SPRITEBATCH_U64 texture_id, void *udata)
-{
-	(void)udata;
-
-	SDL_DestroyTexture((SDL_Texture*)texture_id);
 }
 
 RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, bool fullscreen)
@@ -163,27 +93,9 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 				framebuffer.width = screen_width;
 				framebuffer.height = screen_height;
 
-				// Set-up glyph-batcher
-				spritebatch_config_t config;
-				spritebatch_set_default_config(&config);
-				config.pixel_stride = 4;
-				config.atlas_width_in_pixels = 256;
-				config.atlas_height_in_pixels = 256;
-				config.lonely_buffer_count_till_flush = 4; // Start making atlases immediately
-				config.batch_callback = GlyphBatch_Draw;
-				config.get_pixels_callback = GlyphBatch_GetPixels;
-				config.generate_texture_callback = GlyphBatch_CreateTexture;
-				config.delete_texture_callback = GlyphBatch_DestroyTexture;
-				if (spritebatch_init(&glyph_batcher, &config, NULL) == 0)
-				{
-					Backend_PostWindowCreation();
+				Backend_PostWindowCreation();
 
-					return &framebuffer;
-				}
-				else
-				{
-					Backend_ShowMessageBox("Fatal error (SDLTexture rendering backend)", "Failed to initialize spritebatch");
-				}
+				return &framebuffer;
 			}
 			else
 			{
@@ -213,7 +125,6 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 
 void RenderBackend_Deinit(void)
 {
-	spritebatch_term(&glyph_batcher);
 	SDL_DestroyTexture(framebuffer.texture);
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
@@ -221,8 +132,6 @@ void RenderBackend_Deinit(void)
 
 void RenderBackend_DrawScreen(void)
 {
-	spritebatch_tick(&glyph_batcher);
-
 	if (SDL_SetRenderTarget(renderer, NULL) < 0)
 		Backend_PrintError("Couldn't set default render target as the current rendering target: %s", SDL_GetError());
 
@@ -396,74 +305,107 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 		Backend_PrintError("Couldn't enable alpha blending for drawing operations: %s", SDL_GetError());
 }
 
-RenderBackend_Glyph* RenderBackend_LoadGlyph(const unsigned char *pixels, unsigned int width, unsigned int height, int pitch)
+
+RenderBackend_GlyphAtlas* RenderBackend_CreateGlyphAtlas(size_t size)
 {
-	RenderBackend_Glyph *glyph = (RenderBackend_Glyph*)malloc(sizeof(RenderBackend_Glyph));
+	RenderBackend_GlyphAtlas *atlas = (RenderBackend_GlyphAtlas*)malloc(sizeof(RenderBackend_GlyphAtlas));
 
-	if (glyph == NULL)
-		return NULL;
-
-	glyph->pixels = (unsigned char*)malloc(width * height * 4);
-
-	if (glyph->pixels == NULL)
+	if (atlas != NULL)
 	{
-		free(glyph);
-		return NULL;
+		atlas->texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STATIC, size, size);
+
+		if (atlas->texture != NULL)
+		{
+			return atlas;
+		}
+		else
+		{
+			Backend_PrintError("Couldn't create texture for renderer: %s", SDL_GetError());
+		}
+
+		free(atlas);
 	}
 
-	unsigned char *destination_pointer = glyph->pixels;
+	return NULL;
+}
 
-	for (unsigned int y = 0; y < height; ++y)
+void RenderBackend_DestroyGlyphAtlas(RenderBackend_GlyphAtlas *atlas)
+{
+	SDL_DestroyTexture(atlas->texture);
+	free(atlas);
+}
+
+void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t y, const unsigned char *pixels, size_t width, size_t height)
+{
+	unsigned char *buffer = (unsigned char*)malloc(width * height * 4);
+
+	if (buffer != NULL)
 	{
-		const unsigned char *source_pointer = pixels + y * pitch;
+		unsigned char *destination_pointer = buffer;
+		const unsigned char *source_pointer = pixels;
 
-		for (unsigned int x = 0; x < width; ++x)
+		for (size_t i = 0; i < width * height; ++i)
 		{
 			*destination_pointer++ = 0xFF;
 			*destination_pointer++ = 0xFF;
 			*destination_pointer++ = 0xFF;
 			*destination_pointer++ = *source_pointer++;
 		}
+
+		SDL_Rect rect;
+		rect.x = x;
+		rect.y = y;
+		rect.w = width;
+		rect.h = height;
+
+		if (SDL_UpdateTexture(atlas->texture, &rect, buffer, width * 4) < 0)
+			Backend_PrintError("Couldn't update texture: %s", SDL_GetError());
+
+		free(buffer);
 	}
-
-	glyph->width = width;
-	glyph->height = height;
-
-	return glyph;
 }
 
-void RenderBackend_UnloadGlyph(RenderBackend_Glyph *glyph)
+void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBackend_Surface *destination_surface, const unsigned char *colour_channels)
 {
-	if (glyph == NULL)
-		return;
+	(void)atlas;
 
-	free(glyph->pixels);
-	free(glyph);
-}
-
-void RenderBackend_PrepareToDrawGlyphs(RenderBackend_Surface *destination_surface, const unsigned char *colour_channels)
-{
 	if (destination_surface == NULL)
 		return;
 
 	if (SDL_SetRenderTarget(renderer, destination_surface->texture) < 0)
 		Backend_PrintError("Couldn't set texture as current rendering target: %s", SDL_GetError());
 
-	memcpy(glyph_colour_channels, colour_channels, sizeof(glyph_colour_channels));
+	// The SDL_Texture side of things uses alpha, not a colour-key, so the bug where the font is blended
+	// with the colour key doesn't occur.
+	if (SDL_SetTextureColorMod(atlas->texture, colour_channels[0], colour_channels[1], colour_channels[2]) < 0)
+		Backend_PrintError("Couldn't set additional color value: %s", SDL_GetError());
+
+	if (SDL_SetTextureBlendMode(atlas->texture, SDL_BLENDMODE_BLEND) < 0)
+		Backend_PrintError("Couldn't set texture blend mode: %s", SDL_GetError());
+
 }
 
-void RenderBackend_DrawGlyph(RenderBackend_Glyph *glyph, long x, long y)
+void RenderBackend_DrawGlyph(RenderBackend_GlyphAtlas *atlas, long x, long y, size_t glyph_x, size_t glyph_y, size_t glyph_width, size_t glyph_height)
 {
-	if (spritebatch_push(&glyph_batcher, (SPRITEBATCH_U64)glyph, glyph->width, glyph->height, x, y, 1.0f, 1.0f, 0.0f, 0.0f, 0) != 1)
-		Backend_PrintError("Failed to push glyph to batcher");
+	SDL_Rect source_rect;
+	source_rect.x = glyph_x;
+	source_rect.y = glyph_y;
+	source_rect.w = glyph_width;
+	source_rect.h = glyph_height;
+
+	SDL_Rect destination_rect;
+	destination_rect.x = x;
+	destination_rect.y = y;
+	destination_rect.w = glyph_width;
+	destination_rect.h = glyph_height;
+
+	if (SDL_RenderCopy(renderer, atlas->texture, &source_rect, &destination_rect) < 0)
+		Backend_PrintError("Couldn't copy glyph texture portion to renderer: %s", SDL_GetError());
 }
 
 void RenderBackend_FlushGlyphs(void)
 {
-	if (spritebatch_defrag(&glyph_batcher) != 1)
-		Backend_PrintError("Couldn't defrag textures");
-
-	spritebatch_flush(&glyph_batcher);
+	
 }
 
 void RenderBackend_HandleRenderTargetLoss(void)
