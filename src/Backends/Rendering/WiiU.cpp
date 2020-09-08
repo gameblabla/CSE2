@@ -631,8 +631,8 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBacke
 		// Set vertex position buffer
 		const float vertex_left = x * 2.0f / destination_surface->width - 1.0f;
 		const float vertex_top = y * -2.0f / destination_surface->height + 1.0f;
-		const float vertex_right = (x + rect->right - rect->left) * 2.0f / destination_surface->width - 1.0f;
-		const float vertex_bottom = (y + rect->bottom - rect->top) * -2.0f / destination_surface->height + 1.0f;
+		const float vertex_right = (x + (rect->right - rect->left)) * 2.0f / destination_surface->width - 1.0f;
+		const float vertex_bottom = (y + (rect->bottom - rect->top)) * -2.0f / destination_surface->height + 1.0f;
 
 		vertex_buffer_slot->vertices[0].position.x = vertex_left;
 		vertex_buffer_slot->vertices[0].position.y = vertex_top;

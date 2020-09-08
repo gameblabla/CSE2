@@ -591,6 +591,20 @@ void RenderBackend_DrawScreen(void)
 
 	if (vertex_buffer_slot != NULL)
 	{
+		vertex_buffer_slot->vertices[0][0].position.x = -1.0f;
+		vertex_buffer_slot->vertices[0][0].position.y = -1.0f;
+		vertex_buffer_slot->vertices[0][1].position.x = 1.0f;
+		vertex_buffer_slot->vertices[0][1].position.y = -1.0f;
+		vertex_buffer_slot->vertices[0][2].position.x = 1.0f;
+		vertex_buffer_slot->vertices[0][2].position.y = 1.0f;
+
+		vertex_buffer_slot->vertices[1][0].position.x = -1.0f;
+		vertex_buffer_slot->vertices[1][0].position.y = -1.0f;
+		vertex_buffer_slot->vertices[1][1].position.x = 1.0f;
+		vertex_buffer_slot->vertices[1][1].position.y = 1.0f;
+		vertex_buffer_slot->vertices[1][2].position.x = -1.0f;
+		vertex_buffer_slot->vertices[1][2].position.y = 1.0f;
+
 		vertex_buffer_slot->vertices[0][0].texture.x = 0.0f;
 		vertex_buffer_slot->vertices[0][0].texture.y = 1.0f;
 		vertex_buffer_slot->vertices[0][1].texture.x = 1.0f;
@@ -605,19 +619,6 @@ void RenderBackend_DrawScreen(void)
 		vertex_buffer_slot->vertices[1][2].texture.x = 0.0f;
 		vertex_buffer_slot->vertices[1][2].texture.y = 0.0f;
 
-		vertex_buffer_slot->vertices[0][0].position.x = -1.0f;
-		vertex_buffer_slot->vertices[0][0].position.y = -1.0f;
-		vertex_buffer_slot->vertices[0][1].position.x = 1.0f;
-		vertex_buffer_slot->vertices[0][1].position.y = -1.0f;
-		vertex_buffer_slot->vertices[0][2].position.x = 1.0f;
-		vertex_buffer_slot->vertices[0][2].position.y = 1.0f;
-
-		vertex_buffer_slot->vertices[1][0].position.x = -1.0f;
-		vertex_buffer_slot->vertices[1][0].position.y = -1.0f;
-		vertex_buffer_slot->vertices[1][1].position.x = 1.0f;
-		vertex_buffer_slot->vertices[1][1].position.y = 1.0f;
-		vertex_buffer_slot->vertices[1][2].position.x = -1.0f;
-		vertex_buffer_slot->vertices[1][2].position.y = 1.0f;
 	}
 
 	FlushVertexBuffer();
@@ -760,29 +761,10 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBacke
 
 	if (vertex_buffer_slot != NULL)
 	{
-		const GLfloat texture_left = (GLfloat)rect->left / (GLfloat)source_surface->width;
-		const GLfloat texture_right = (GLfloat)rect->right / (GLfloat)source_surface->width;
-		const GLfloat texture_top = (GLfloat)rect->top / (GLfloat)source_surface->height;
-		const GLfloat texture_bottom = (GLfloat)rect->bottom / (GLfloat)source_surface->height;
-
-		const GLfloat vertex_left = (x * (2.0f / destination_surface->width)) - 1.0f;
-		const GLfloat vertex_right = ((x + (rect->right - rect->left)) * (2.0f / destination_surface->width)) - 1.0f;
-		const GLfloat vertex_top = (y * (2.0f / destination_surface->height)) - 1.0f;
-		const GLfloat vertex_bottom = ((y + (rect->bottom - rect->top)) * (2.0f / destination_surface->height)) - 1.0f;
-
-		vertex_buffer_slot->vertices[0][0].texture.x = texture_left;
-		vertex_buffer_slot->vertices[0][0].texture.y = texture_top;
-		vertex_buffer_slot->vertices[0][1].texture.x = texture_right;
-		vertex_buffer_slot->vertices[0][1].texture.y = texture_top;
-		vertex_buffer_slot->vertices[0][2].texture.x = texture_right;
-		vertex_buffer_slot->vertices[0][2].texture.y = texture_bottom;
-
-		vertex_buffer_slot->vertices[1][0].texture.x = texture_left;
-		vertex_buffer_slot->vertices[1][0].texture.y = texture_top;
-		vertex_buffer_slot->vertices[1][1].texture.x = texture_right;
-		vertex_buffer_slot->vertices[1][1].texture.y = texture_bottom;
-		vertex_buffer_slot->vertices[1][2].texture.x = texture_left;
-		vertex_buffer_slot->vertices[1][2].texture.y = texture_bottom;
+		const GLfloat vertex_left = x * 2.0f / destination_surface->width - 1.0f;
+		const GLfloat vertex_top = y * 2.0f / destination_surface->height - 1.0f;
+		const GLfloat vertex_right = (x + (rect->right - rect->left)) * 2.0f / destination_surface->width - 1.0f;
+		const GLfloat vertex_bottom = (y + (rect->bottom - rect->top)) * 2.0f / destination_surface->height - 1.0f;
 
 		vertex_buffer_slot->vertices[0][0].position.x = vertex_left;
 		vertex_buffer_slot->vertices[0][0].position.y = vertex_top;
@@ -797,6 +779,25 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBacke
 		vertex_buffer_slot->vertices[1][1].position.y = vertex_bottom;
 		vertex_buffer_slot->vertices[1][2].position.x = vertex_left;
 		vertex_buffer_slot->vertices[1][2].position.y = vertex_bottom;
+
+		const GLfloat texture_left = rect->left / (GLfloat)source_surface->width;
+		const GLfloat texture_top = rect->top / (GLfloat)source_surface->height;
+		const GLfloat texture_right = rect->right / (GLfloat)source_surface->width;
+		const GLfloat texture_bottom = rect->bottom / (GLfloat)source_surface->height;
+
+		vertex_buffer_slot->vertices[0][0].texture.x = texture_left;
+		vertex_buffer_slot->vertices[0][0].texture.y = texture_top;
+		vertex_buffer_slot->vertices[0][1].texture.x = texture_right;
+		vertex_buffer_slot->vertices[0][1].texture.y = texture_top;
+		vertex_buffer_slot->vertices[0][2].texture.x = texture_right;
+		vertex_buffer_slot->vertices[0][2].texture.y = texture_bottom;
+
+		vertex_buffer_slot->vertices[1][0].texture.x = texture_left;
+		vertex_buffer_slot->vertices[1][0].texture.y = texture_top;
+		vertex_buffer_slot->vertices[1][1].texture.x = texture_right;
+		vertex_buffer_slot->vertices[1][1].texture.y = texture_bottom;
+		vertex_buffer_slot->vertices[1][2].texture.x = texture_left;
+		vertex_buffer_slot->vertices[1][2].texture.y = texture_bottom;
 	}
 }
 
@@ -840,10 +841,10 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 
 	if (vertex_buffer_slot != NULL)
 	{
-		const GLfloat vertex_left = (rect->left * (2.0f / surface->width)) - 1.0f;
-		const GLfloat vertex_right = (rect->right * (2.0f / surface->width)) - 1.0f;
-		const GLfloat vertex_top = (rect->top * (2.0f / surface->height)) - 1.0f;
-		const GLfloat vertex_bottom = (rect->bottom * (2.0f / surface->height)) - 1.0f;
+		const GLfloat vertex_left = rect->left * 2.0f / surface->width - 1.0f;
+		const GLfloat vertex_top = rect->top * 2.0f / surface->height - 1.0f;
+		const GLfloat vertex_right = rect->right * 2.0f / surface->width - 1.0f;
+		const GLfloat vertex_bottom = rect->bottom * 2.0f / surface->height - 1.0f;
 
 		vertex_buffer_slot->vertices[0][0].position.x = vertex_left;
 		vertex_buffer_slot->vertices[0][0].position.y = vertex_top;
@@ -966,29 +967,10 @@ void RenderBackend_DrawGlyph(RenderBackend_GlyphAtlas *atlas, long x, long y, si
 
 	if (vertex_buffer_slot != NULL)
 	{
-		const GLfloat texture_left = glyph_x / (GLfloat)atlas->size;
-		const GLfloat texture_right = (glyph_x + glyph_width) / (GLfloat)atlas->size;
-		const GLfloat texture_top = glyph_y / (GLfloat)atlas->size;
-		const GLfloat texture_bottom = (glyph_y + glyph_height) / (GLfloat)atlas->size;
-
-		const GLfloat vertex_left = (x * (2.0f / glyph_destination_surface->width)) - 1.0f;
-		const GLfloat vertex_right = ((x + glyph_width) * (2.0f / glyph_destination_surface->width)) - 1.0f;
-		const GLfloat vertex_top = (y * (2.0f / glyph_destination_surface->height)) - 1.0f;
-		const GLfloat vertex_bottom = ((y + glyph_height) * (2.0f / glyph_destination_surface->height)) - 1.0f;
-
-		vertex_buffer_slot->vertices[0][0].texture.x = texture_left;
-		vertex_buffer_slot->vertices[0][0].texture.y = texture_top;
-		vertex_buffer_slot->vertices[0][1].texture.x = texture_right;
-		vertex_buffer_slot->vertices[0][1].texture.y = texture_top;
-		vertex_buffer_slot->vertices[0][2].texture.x = texture_right;
-		vertex_buffer_slot->vertices[0][2].texture.y = texture_bottom;
-
-		vertex_buffer_slot->vertices[1][0].texture.x = texture_left;
-		vertex_buffer_slot->vertices[1][0].texture.y = texture_top;
-		vertex_buffer_slot->vertices[1][1].texture.x = texture_right;
-		vertex_buffer_slot->vertices[1][1].texture.y = texture_bottom;
-		vertex_buffer_slot->vertices[1][2].texture.x = texture_left;
-		vertex_buffer_slot->vertices[1][2].texture.y = texture_bottom;
+		const GLfloat vertex_left = x * 2.0f / glyph_destination_surface->width - 1.0f;
+		const GLfloat vertex_top = y * 2.0f / glyph_destination_surface->height - 1.0f;
+		const GLfloat vertex_right = (x + glyph_width) * 2.0f / glyph_destination_surface->width - 1.0f;
+		const GLfloat vertex_bottom = (y + glyph_height) * 2.0f / glyph_destination_surface->height - 1.0f;
 
 		vertex_buffer_slot->vertices[0][0].position.x = vertex_left;
 		vertex_buffer_slot->vertices[0][0].position.y = vertex_top;
@@ -1003,6 +985,25 @@ void RenderBackend_DrawGlyph(RenderBackend_GlyphAtlas *atlas, long x, long y, si
 		vertex_buffer_slot->vertices[1][1].position.y = vertex_bottom;
 		vertex_buffer_slot->vertices[1][2].position.x = vertex_left;
 		vertex_buffer_slot->vertices[1][2].position.y = vertex_bottom;
+
+		const GLfloat texture_left = glyph_x / (GLfloat)atlas->size;
+		const GLfloat texture_top = glyph_y / (GLfloat)atlas->size;
+		const GLfloat texture_right = (glyph_x + glyph_width) / (GLfloat)atlas->size;
+		const GLfloat texture_bottom = (glyph_y + glyph_height) / (GLfloat)atlas->size;
+
+		vertex_buffer_slot->vertices[0][0].texture.x = texture_left;
+		vertex_buffer_slot->vertices[0][0].texture.y = texture_top;
+		vertex_buffer_slot->vertices[0][1].texture.x = texture_right;
+		vertex_buffer_slot->vertices[0][1].texture.y = texture_top;
+		vertex_buffer_slot->vertices[0][2].texture.x = texture_right;
+		vertex_buffer_slot->vertices[0][2].texture.y = texture_bottom;
+
+		vertex_buffer_slot->vertices[1][0].texture.x = texture_left;
+		vertex_buffer_slot->vertices[1][0].texture.y = texture_top;
+		vertex_buffer_slot->vertices[1][1].texture.x = texture_right;
+		vertex_buffer_slot->vertices[1][1].texture.y = texture_bottom;
+		vertex_buffer_slot->vertices[1][2].texture.x = texture_left;
+		vertex_buffer_slot->vertices[1][2].texture.y = texture_bottom;
 	}
 }
 
