@@ -84,7 +84,6 @@ static GLuint last_destination_texture;
 
 static RenderBackend_Surface framebuffer;
 
-static unsigned char glyph_colour_channels[3];
 static RenderBackend_Surface *glyph_destination_surface;
 
 static int actual_screen_width;
@@ -920,37 +919,29 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBa
 {
 	(void)atlas;
 
+	static unsigned char last_red;
+	static unsigned char last_green;
+	static unsigned char last_blue;
+
 	if (destination_surface == NULL)
 		return;
 
 	glyph_destination_surface = destination_surface;
 
-	memcpy(glyph_colour_channels, colour_channels, sizeof(glyph_colour_channels));
-}
-
-void RenderBackend_DrawGlyph(RenderBackend_GlyphAtlas *atlas, long x, long y, size_t glyph_x, size_t glyph_y, size_t glyph_width, size_t glyph_height)
-{
-	static unsigned char last_red;
-	static unsigned char last_green;
-	static unsigned char last_blue;
-
-	if (glyph_destination_surface == NULL)
-		return;
-
 	// Flush vertex data if a context-change is needed
-	if (last_render_mode != MODE_DRAW_GLYPH || last_destination_texture != glyph_destination_surface->texture_id || last_source_texture != atlas->texture_id || last_red != glyph_colour_channels[0] || last_green != glyph_colour_channels[1] || last_blue != glyph_colour_channels[2])
+	if (last_render_mode != MODE_DRAW_GLYPH || last_destination_texture != glyph_destination_surface->texture_id || last_source_texture != atlas->texture_id || last_red != colour_channels[0] || last_green != colour_channels[1] || last_blue != colour_channels[2])
 	{
 		FlushVertexBuffer();
 
 		last_render_mode = MODE_DRAW_GLYPH;
 		last_destination_texture = glyph_destination_surface->texture_id;
 		last_source_texture = atlas->texture_id;
-		last_red = glyph_colour_channels[0];
-		last_green = glyph_colour_channels[1];
-		last_blue = glyph_colour_channels[2];
+		last_red = colour_channels[0];
+		last_green = colour_channels[1];
+		last_blue = colour_channels[2];
 
 		glUseProgram(program_glyph);
-		glUniform4f(program_glyph_uniform_colour, glyph_colour_channels[0] / 255.0f, glyph_colour_channels[1] / 255.0f, glyph_colour_channels[2] / 255.0f, 1.0f);
+		glUniform4f(program_glyph_uniform_colour, colour_channels[0] / 255.0f, colour_channels[1] / 255.0f, colour_channels[2] / 255.0f, 1.0f);
 
 		// Point our framebuffer to the destination texture
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, glyph_destination_surface->texture_id, 0);
@@ -963,6 +954,12 @@ void RenderBackend_DrawGlyph(RenderBackend_GlyphAtlas *atlas, long x, long y, si
 
 		glBindTexture(GL_TEXTURE_2D, atlas->texture_id);
 	}
+}
+
+void RenderBackend_DrawGlyph(RenderBackend_GlyphAtlas *atlas, long x, long y, size_t glyph_x, size_t glyph_y, size_t glyph_width, size_t glyph_height)
+{
+	if (glyph_destination_surface == NULL)
+		return;
 
 	// Add data to the vertex queue
 	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot(1);
