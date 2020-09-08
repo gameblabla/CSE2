@@ -1363,7 +1363,11 @@ int TextScriptProc(void)
 						memcpy(str, &gTS.data[gTS.p_read], y);
 						str[y] = '\0';
 
-						gTS.p_write = x;
+					#ifdef FIX_BUGS
+						gTS.p_write = y;
+					#else
+						gTS.p_write = x; // This is way out of bounds, causing the blinking cursor to render offscreen
+					#endif
 
 						// Print text
 						PutText2(0, 0, str, RGB(0xFF, 0xFF, 0xFE), (SurfaceID)(SURFACE_ID_TEXT_LINE1 + (gTS.line % 4)));
