@@ -12,8 +12,6 @@
 #include "../Rendering.h"
 #include "../Shared/SDL2.h"
 #include "../../Attributes.h"
-#include "../../Main.h"
-#include "../../Profile.h"
 
 #define DO_KEY(SDL_KEY, BACKEND_KEY) \
 	case SDL_KEY: \
@@ -26,8 +24,14 @@ static unsigned char *cursor_surface_pixels;
 static SDL_Surface *cursor_surface;
 static SDL_Cursor *cursor;
 
-bool Backend_Init(void)
+static void (*drag_and_drop_callback)(const char *path);
+static void (*window_focus_callback)(bool focus);
+
+bool Backend_Init(void (*drag_and_drop_callback_param)(const char *path), void (*window_focus_callback_param)(bool focus))
 {
+	drag_and_drop_callback = drag_and_drop_callback_param;
+	window_focus_callback = window_focus_callback_param;
+
 	if (SDL_Init(SDL_INIT_EVENTS) == 0)
 	{
 		if (SDL_InitSubSystem(SDL_INIT_VIDEO) == 0)
@@ -269,7 +273,7 @@ bool Backend_SystemTask(bool active)
 				break;
 
 			case SDL_DROPFILE:
-				LoadProfile(event.drop.file);
+				drag_and_drop_callback(event.drop.file);
 				SDL_free(event.drop.file);
 				break;
 
@@ -277,11 +281,11 @@ bool Backend_SystemTask(bool active)
 				switch (event.window.event)
 				{
 					case SDL_WINDOWEVENT_FOCUS_LOST:
-						InactiveWindow();
+						window_focus_callback(false);
 						break;
 
 					case SDL_WINDOWEVENT_FOCUS_GAINED:
-						ActiveWindow();
+						window_focus_callback(true);
 						break;
 
 					case SDL_WINDOWEVENT_RESIZED:

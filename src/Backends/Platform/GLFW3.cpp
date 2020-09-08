@@ -14,8 +14,6 @@
 #include "../Rendering.h"
 #include "../Shared/GLFW3.h"
 #include "../../Attributes.h"
-#include "../../Main.h"
-#include "../../Profile.h"
 
 #define DO_KEY(GLFW_KEY, BACKEND_KEY) \
 	case GLFW_KEY: \
@@ -25,6 +23,9 @@
 static bool keyboard_state[BACKEND_KEYBOARD_TOTAL];
 
 static GLFWcursor* cursor;
+
+static void (*drag_and_drop_callback)(const char *path);
+static void (*window_focus_callback)(bool focus);
 
 static void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
@@ -126,10 +127,7 @@ static void WindowFocusCallback(GLFWwindow *window, int focused)
 {
 	(void)window;
 
-	if (focused)
-		ActiveWindow();
-	else
-		InactiveWindow();
+	window_focus_callback(focused);
 }
 
 static void WindowSizeCallback(GLFWwindow *window, int width, int height)
@@ -144,7 +142,7 @@ static void DragAndDropCallback(GLFWwindow *window, int count, const char **path
 	(void)window;
 	(void)count;
 
-	LoadProfile(paths[0]);
+	drag_and_drop_callback(paths[0]);
 }
 
 static void ErrorCallback(int code, const char *description)
@@ -152,8 +150,11 @@ static void ErrorCallback(int code, const char *description)
 	Backend_PrintError("GLFW error received (%d): %s", code, description);
 }
 
-bool Backend_Init(void)
+bool Backend_Init(void (*drag_and_drop_callback_param)(const char *path), void (*window_focus_callback_param)(bool focus))
 {
+	drag_and_drop_callback = drag_and_drop_callback_param;
+	window_focus_callback = window_focus_callback_param;
+
 	glfwSetErrorCallback(ErrorCallback);
 
 	if (glfwInit() == GL_TRUE)

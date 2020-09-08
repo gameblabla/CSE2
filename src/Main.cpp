@@ -18,9 +18,13 @@
 #include "KeyControl.h"
 #include "MyChar.h"
 #include "Organya.h"
+#include "Profile.h"
 #include "Resource.h"
 #include "Sound.h"
 #include "Triangle.h"
+
+void InactiveWindow(void);
+void ActiveWindow(void);
 
 std::string gModulePath;
 std::string gDataPath;
@@ -41,6 +45,19 @@ static const char* const lpWindowName = "洞窟物語";	// "Cave Story"
 #else
 static const char* const lpWindowName = "Cave Story ~ Doukutsu Monogatari";
 #endif
+
+static void DragAndDropCallback(const char *path)
+{
+	LoadProfile(path);
+}
+
+static void WindowFocusCallback(bool focus)
+{
+	if (focus)
+		ActiveWindow();
+	else
+		InactiveWindow();
+}
 
 // Framerate stuff
 static unsigned long CountFramePerSecound(void)
@@ -86,7 +103,7 @@ int main(int argc, char *argv[])
 
 	int i;
 
-	if (!Backend_Init())
+	if (!Backend_Init(DragAndDropCallback, WindowFocusCallback))
 		return EXIT_FAILURE;
 
 	// Get executable's path

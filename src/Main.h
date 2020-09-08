@@ -16,7 +16,4 @@ extern BOOL gbUseJoystick;
 
 void PutFramePerSecound(void);
 
-void InactiveWindow(void);
-void ActiveWindow(void);
-
 BOOL SystemTask(void);
