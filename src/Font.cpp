@@ -1092,8 +1092,7 @@ FontObject* LoadFontFromData(const unsigned char *data, size_t data_size, unsign
 						// Initialise the linked-list
 						for (size_t i = 0; i < TOTAL_GLYPH_SLOTS; ++i)
 						{
-							if (i != 0)
-								font_object->glyphs[i].next = &font_object->glyphs[i - 1];
+							font_object->glyphs[i].next = (i == 0) ? NULL : &font_object->glyphs[i - 1];
 
 							font_object->glyphs[i].x = (i % font_object->atlas_row_length) * atlas_entry_width;
 							font_object->glyphs[i].y = (i / font_object->atlas_row_length) * atlas_entry_height;
