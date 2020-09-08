@@ -29,16 +29,16 @@ typedef struct Glyph
 {
 	unsigned long unicode_value;
 
-	int x;
-	int y;
+	size_t x;
+	size_t y;
 
-	int width;
-	int height;
+	size_t width;
+	size_t height;
 
-	int x_offset;
-	int y_offset;
+	size_t x_offset;
+	size_t y_offset;
 
-	int x_advance;
+	size_t x_advance;
 
 	struct Glyph *next;
 } Glyph;
@@ -1142,7 +1142,7 @@ void DrawText(FontObject *font_object, RenderBackend_Surface *surface, int x, in
 
 		RenderBackend_PrepareToDrawGlyphs(font_object->atlas, surface, colour_channels);
 
-		unsigned int pen_x = 0;
+		size_t pen_x = 0;
 
 		const unsigned char *string_pointer = (unsigned char*)string;
 		const unsigned char *string_end = (unsigned char*)string + strlen(string);
