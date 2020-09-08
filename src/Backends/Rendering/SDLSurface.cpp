@@ -149,15 +149,18 @@ unsigned char* RenderBackend_LockSurface(RenderBackend_Surface *surface, unsigne
 	if (surface == NULL)
 		return NULL;
 
+	SDL_LockSurface(surface->sdlsurface);
+
 	*pitch = surface->sdlsurface->pitch;
 	return (unsigned char*)surface->sdlsurface->pixels;
 }
 
 void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, unsigned int width, unsigned int height)
 {
-	(void)surface;
 	(void)width;
 	(void)height;
+
+	SDL_UnlockSurface(surface->sdlsurface);
 }
 
 void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBackend_Rect *rect, RenderBackend_Surface *destination_surface, long x, long y, bool colour_key)
@@ -225,6 +228,8 @@ void RenderBackend_DestroyGlyphAtlas(RenderBackend_GlyphAtlas *atlas)
 
 void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t y, const unsigned char *pixels, size_t width, size_t height)
 {
+	SDL_LockSurface(atlas->sdlsurface);
+
 	const unsigned char *source_pointer = pixels;
 
 	for (size_t iy = 0; iy < height; ++iy)
@@ -239,6 +244,8 @@ void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t
 			*destination_pointer++ = *source_pointer++;
 		}
 	}
+
+	SDL_UnlockSurface(atlas->sdlsurface);
 }
 
 void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBackend_Surface *destination_surface, const unsigned char *colour_channels)
