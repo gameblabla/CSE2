@@ -261,9 +261,9 @@ static GLuint CompileShader(const char *vertex_shader_source, const char *fragme
 	glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &shader_status);
 	if (shader_status != GL_TRUE)
 	{
-		char buffer[0x200];
+		char buffer[0x400];
 		glGetShaderInfoLog(vertex_shader, sizeof(buffer), NULL, buffer);
-		Backend_ShowMessageBox("Vertex shader error", buffer);
+		Backend_PrintError("Vertex shader error: %s", buffer);
 		return 0;
 	}
 
@@ -279,7 +279,7 @@ static GLuint CompileShader(const char *vertex_shader_source, const char *fragme
 	{
 		char buffer[0x400];
 		glGetShaderInfoLog(fragment_shader, sizeof(buffer), NULL, buffer);
-		Backend_ShowMessageBox("Fragment shader error", buffer);
+		Backend_PrintError("Fragment shader error: %s", buffer);
 		return 0;
 	}
 
@@ -296,7 +296,7 @@ static GLuint CompileShader(const char *vertex_shader_source, const char *fragme
 	{
 		char buffer[0x400];
 		glGetProgramInfoLog(program_id, sizeof(buffer), NULL, buffer);
-		Backend_ShowMessageBox("Shader linker error", buffer);
+		Backend_PrintError("Shader linker error: %s", buffer);
 		return 0;
 	}
 
