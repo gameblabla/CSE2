@@ -964,10 +964,11 @@ static unsigned char GammaCorrect(unsigned char value)
 static Glyph* GetGlyph(FontObject *font_object, unsigned long unicode_value)
 {
 	Glyph **glyph_pointer = &font_object->glyph_list_head;
+	Glyph *glyph;
 
 	for (;;)
 	{
-		Glyph *glyph = *glyph_pointer;
+		glyph = *glyph_pointer;
 
 		if (glyph->unicode_value == unicode_value)
 		{
@@ -984,8 +985,6 @@ static Glyph* GetGlyph(FontObject *font_object, unsigned long unicode_value)
 
 		glyph_pointer = &glyph->next;
 	}
-
-	Glyph *glyph = *glyph_pointer;
 
 	// Couldn't find glyph - overwrite the old at the end.
 	// The one at the end hasn't been used in a while anyway.
