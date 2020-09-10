@@ -296,7 +296,7 @@ void Backend_GetKeyboardState(bool *out_keyboard_state)
 void Backend_ShowMessageBox(const char *title, const char *message)
 {
 	// GLFW3 doesn't have a message box
-	printf("ShowMessageBox - '%s' - '%s'\n", title, message);
+	Backend_PrintInfo("ShowMessageBox - '%s' - '%s'\n", title, message);
 }
 
 ATTRIBUTE_FORMAT_PRINTF(1, 2) void Backend_PrintError(const char *format, ...)
@@ -314,8 +314,8 @@ ATTRIBUTE_FORMAT_PRINTF(1, 2) void Backend_PrintInfo(const char *format, ...)
 	va_list argumentList;
 	va_start(argumentList, format);
 	fputs("INFO: ", stdout);
-	vprintf(format, argumentList);
-	putchar('\n');
+	vfprintf(stdout, format, argumentList);
+	fputc('\n', stdout);
 	va_end(argumentList);
 }
 
