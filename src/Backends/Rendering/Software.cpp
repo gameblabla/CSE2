@@ -14,9 +14,9 @@
 typedef struct RenderBackend_Surface
 {
 	unsigned char *pixels;
-	unsigned int width;
-	unsigned int height;
-	unsigned int pitch;
+	size_t width;
+	size_t height;
+	size_t pitch;
 } RenderBackend_Surface;
 
 typedef struct RenderBackend_GlyphAtlas
@@ -34,11 +34,9 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 {
 	if (WindowBackend_Software_CreateWindow(window_title, screen_width, screen_height, fullscreen))
 	{
-		size_t pitch;
-		framebuffer.pixels = WindowBackend_Software_LockFramebuffer(&pitch);
+		framebuffer.pixels = WindowBackend_Software_LockFramebuffer(&framebuffer.pitch);
 		framebuffer.width = screen_width;
 		framebuffer.height = screen_height;
-		framebuffer.pitch = pitch;
 
 		return &framebuffer;
 	}
@@ -61,9 +59,7 @@ void RenderBackend_DrawScreen(void)
 
 	WindowBackend_Software_Display();
 
-	size_t pitch;
-	framebuffer.pixels = WindowBackend_Software_LockFramebuffer(&pitch);
-	framebuffer.pitch = pitch;
+	framebuffer.pixels = WindowBackend_Software_LockFramebuffer(&framebuffer.pitch);
 }
 
 RenderBackend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned int height, bool render_target)
