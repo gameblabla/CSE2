@@ -206,11 +206,16 @@ void WindowBackend_Software_DestroyWindow(void)
 	free(fake_framebuffer);
 }
 
-unsigned char* WindowBackend_Software_GetFramebuffer(size_t *pitch)
+unsigned char* WindowBackend_Software_LockFramebuffer(size_t *pitch)
 {
 	*pitch = fake_framebuffer_width * 3;
 
 	return fake_framebuffer;
+}
+
+void WindowBackend_Software_UnlockFramebuffer(void)
+{
+	// Nothing to do here
 }
 
 ATTRIBUTE_HOT void WindowBackend_Software_Display(void)

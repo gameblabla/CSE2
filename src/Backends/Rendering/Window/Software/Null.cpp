@@ -28,11 +28,16 @@ void WindowBackend_Software_DestroyWindow(void)
 	free(framebuffer);
 }
 
-unsigned char* WindowBackend_Software_GetFramebuffer(size_t *pitch)
+unsigned char* WindowBackend_Software_LockFramebuffer(size_t *pitch)
 {
 	*pitch = framebuffer_pitch;
 
 	return framebuffer;
+}
+
+void WindowBackend_Software_UnlockFramebuffer(void)
+{
+	// Nothing to do here
 }
 
 void WindowBackend_Software_Display(void)

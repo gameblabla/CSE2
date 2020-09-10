@@ -35,7 +35,7 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_w
 	if (WindowBackend_Software_CreateWindow(window_title, screen_width, screen_height, fullscreen))
 	{
 		size_t pitch;
-		framebuffer.pixels = WindowBackend_Software_GetFramebuffer(&pitch);
+		framebuffer.pixels = WindowBackend_Software_LockFramebuffer(&pitch);
 		framebuffer.width = screen_width;
 		framebuffer.height = screen_height;
 		framebuffer.pitch = pitch;
@@ -57,10 +57,12 @@ void RenderBackend_Deinit(void)
 
 void RenderBackend_DrawScreen(void)
 {
+	WindowBackend_Software_UnlockFramebuffer();
+
 	WindowBackend_Software_Display();
 
 	size_t pitch;
-	framebuffer.pixels = WindowBackend_Software_GetFramebuffer(&pitch);
+	framebuffer.pixels = WindowBackend_Software_LockFramebuffer(&pitch);
 	framebuffer.pitch = pitch;
 }
 
