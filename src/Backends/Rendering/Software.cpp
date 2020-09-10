@@ -157,15 +157,11 @@ ATTRIBUTE_HOT void RenderBackend_Blit(RenderBackend_Surface *source_surface, con
 
 	overflow = (x + (rect_clamped.right - rect_clamped.left)) - destination_surface->width;
 	if (overflow > 0)
-	{
 		rect_clamped.right -= overflow;
-	}
 
 	overflow = (y + (rect_clamped.bottom - rect_clamped.top)) - destination_surface->height;
 	if (overflow > 0)
-	{
 		rect_clamped.bottom -= overflow;
-	}
 
 	if (rect_clamped.bottom - rect_clamped.top <= 0)
 		return;
@@ -229,27 +225,19 @@ ATTRIBUTE_HOT void RenderBackend_ColourFill(RenderBackend_Surface *surface, cons
 
 	overflow = 0 - rect_clamped.left;
 	if (overflow > 0)
-	{
 		rect_clamped.left += overflow;
-	}
 
 	overflow = 0 - rect_clamped.top;
 	if (overflow > 0)
-	{
 		rect_clamped.top += overflow;
-	}
 
 	overflow = rect_clamped.right - surface->width;
 	if (overflow > 0)
-	{
 		rect_clamped.right -= overflow;
-	}
 
 	overflow = rect_clamped.bottom - surface->height;
 	if (overflow > 0)
-	{
 		rect_clamped.bottom -= overflow;
-	}
 
 	if (rect_clamped.bottom - rect_clamped.top <= 0)
 		return;
