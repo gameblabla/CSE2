@@ -236,12 +236,13 @@ BOOL MakeSurface_Resource(const char *name, SurfaceID surf_no)
 		return FALSE;
 	}
 
+	FreeBitmap(image_buffer);
+
 	surface_metadata[surf_no].type = SURFACE_SOURCE_RESOURCE;
 	surface_metadata[surf_no].width = width;
 	surface_metadata[surf_no].height = height;
 	surface_metadata[surf_no].bSystem = FALSE;
 	strcpy(surface_metadata[surf_no].name, name);
-	FreeBitmap(image_buffer);
 
 	return TRUE;
 }
@@ -297,12 +298,13 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 		return FALSE;
 	}
 
+	FreeBitmap(image_buffer);
+
 	surface_metadata[surf_no].type = SURFACE_SOURCE_FILE;
 	surface_metadata[surf_no].width = width;
 	surface_metadata[surf_no].height = height;
 	surface_metadata[surf_no].bSystem = FALSE;
 	strcpy(surface_metadata[surf_no].name, name);
-	FreeBitmap(image_buffer);
 
 	return TRUE;
 }
@@ -373,6 +375,7 @@ BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 	}
 
 	FreeBitmap(image_buffer);
+
 	surface_metadata[surf_no].type = SURFACE_SOURCE_FILE;
 	strcpy(surface_metadata[surf_no].name, name);
 
