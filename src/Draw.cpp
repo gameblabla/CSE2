@@ -635,7 +635,7 @@ void PutBitmap4(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID su
 	backbuffer->Blt(&rcSet, surf[surf_no], &rcWork, DDBLT_WAIT, NULL);
 }
 
-void Surface2Surface(int x, int y, const RECT *rect, int to, int from)
+void Surface2Surface(int x, int y, const RECT *rect, SurfaceID to, SurfaceID from)
 {
 	static RECT rcWork;
 	static RECT rcSet;
