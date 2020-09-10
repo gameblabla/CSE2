@@ -364,7 +364,7 @@ void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t
 	}
 }
 
-void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBackend_Surface *destination_surface, const unsigned char *colour_channels)
+void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBackend_Surface *destination_surface, unsigned char red, unsigned char green, unsigned char blue)
 {
 	(void)atlas;
 
@@ -376,7 +376,7 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBa
 
 	// The SDL_Texture side of things uses alpha, not a colour-key, so the bug where the font is blended
 	// with the colour key doesn't occur.
-	if (SDL_SetTextureColorMod(atlas->texture, colour_channels[0], colour_channels[1], colour_channels[2]) < 0)
+	if (SDL_SetTextureColorMod(atlas->texture, red, green, blue) < 0)
 		Backend_PrintError("Couldn't set additional color value: %s", SDL_GetError());
 
 	if (SDL_SetTextureBlendMode(atlas->texture, SDL_BLENDMODE_BLEND) < 0)

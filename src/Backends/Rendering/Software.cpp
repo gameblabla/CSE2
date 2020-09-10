@@ -291,7 +291,7 @@ void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t
 		memcpy(&atlas->pixels[(y + i) * atlas->size + x], &pixels[i * width], width);
 }
 
-void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBackend_Surface *destination_surface, const unsigned char *colour_channels)
+void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBackend_Surface *destination_surface, unsigned char red, unsigned char green, unsigned char blue)
 {
 	(void)atlas;
 
@@ -300,7 +300,9 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBa
 
 	glyph_destination_surface = destination_surface;
 
-	memcpy(glyph_colour_channels, colour_channels, sizeof(glyph_colour_channels));
+	glyph_colour_channels[0] = red;
+	glyph_colour_channels[1] = green;
+	glyph_colour_channels[2] = blue;
 }
 
 void RenderBackend_DrawGlyph(RenderBackend_GlyphAtlas *atlas, long x, long y, size_t glyph_x, size_t glyph_y, size_t glyph_width, size_t glyph_height)

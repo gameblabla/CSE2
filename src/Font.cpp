@@ -1138,9 +1138,7 @@ void DrawText(FontObject *font_object, RenderBackend_Surface *surface, int x, in
 {
 	if (font_object != NULL && surface != NULL)
 	{
-		const unsigned char colour_channels[3] = {(unsigned char)colour, (unsigned char)(colour >> 8), (unsigned char)(colour >> 16)};
-
-		RenderBackend_PrepareToDrawGlyphs(font_object->atlas, surface, colour_channels);
+		RenderBackend_PrepareToDrawGlyphs(font_object->atlas, surface, (unsigned char)colour, (unsigned char)(colour >> 8), (unsigned char)(colour >> 16));
 
 		size_t pen_x = 0;
 

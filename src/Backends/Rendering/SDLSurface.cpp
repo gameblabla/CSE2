@@ -248,14 +248,14 @@ void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t
 	SDL_UnlockSurface(atlas->sdlsurface);
 }
 
-void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBackend_Surface *destination_surface, const unsigned char *colour_channels)
+void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBackend_Surface *destination_surface, unsigned char red, unsigned char green, unsigned char blue)
 {
 	if (destination_surface == NULL)
 		return;
 
 	glyph_destination_sdlsurface = destination_surface->sdlsurface;
 
-	if (SDL_SetSurfaceColorMod(atlas->sdlsurface, colour_channels[0], colour_channels[1], colour_channels[2]) < 0)
+	if (SDL_SetSurfaceColorMod(atlas->sdlsurface, red, green, blue) < 0)
 		Backend_PrintError("Couldn't set color value: %s", SDL_GetError());
 }
 

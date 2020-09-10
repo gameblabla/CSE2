@@ -196,7 +196,7 @@ static void CalculateViewport(size_t actual_screen_width, size_t actual_screen_h
 	}
 }
 
-RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, bool fullscreen)
+RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t screen_width, size_t screen_height, bool fullscreen)
 {
 	(void)window_title;
 	(void)fullscreen;
@@ -786,7 +786,7 @@ void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t
 	GX2RUnlockSurfaceEx(&atlas->texture.surface, 0, (GX2RResourceFlags)0);
 }
 
-void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBackend_Surface *destination_surface, const unsigned char *colour_channels)
+void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBackend_Surface *destination_surface, unsigned char red, unsigned char green, unsigned char blue)
 {
 	(void)atlas;
 
@@ -800,16 +800,16 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBa
 	glyph_destination_surface = destination_surface;
 
 	// Flush vertex data if a context-change is needed
-	if (last_render_mode != MODE_DRAW_GLYPH || last_destination_texture != &glyph_destination_surface->texture || last_source_texture != &atlas->texture || last_red != colour_channels[0] || last_green != colour_channels[1] || last_blue != colour_channels[2])
+	if (last_render_mode != MODE_DRAW_GLYPH || last_destination_texture != &glyph_destination_surface->texture || last_source_texture != &atlas->texture || last_red != red || last_green != green || last_blue != blue)
 	{
 		FlushVertexBuffer();
 
 		last_render_mode = MODE_DRAW_GLYPH;
 		last_destination_texture = &glyph_destination_surface->texture;
 		last_source_texture = &atlas->texture;
-		last_red = colour_channels[0];
-		last_green = colour_channels[1];
-		last_blue = colour_channels[2];
+		last_red = red;
+		last_green = green;
+		last_blue = blue;
 
 		// Draw to the selected texture, instead of the screen
 		GX2SetColorBuffer(&glyph_destination_surface->colour_buffer, GX2_RENDER_TARGET_0);
@@ -817,7 +817,7 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBa
 		GX2SetScissor(0, 0, glyph_destination_surface->colour_buffer.surface.width, glyph_destination_surface->colour_buffer.surface.height);
 
 		// Set the colour
-		const float uniform_colours[4] = {colour_channels[0] / 255.0f, colour_channels[1] / 255.0f, colour_channels[2] / 255.0f, 1.0f};
+		const float uniform_colours[4] = {red / 255.0f, green / 255.0f, blue / 255.0f, 1.0f};
 		GX2SetPixelUniformReg(glyph_shader.pixelShader->uniformVars[0].offset, 4, (uint32_t*)&uniform_colours);
 
 		// Select glyph shader
