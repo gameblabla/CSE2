@@ -128,7 +128,7 @@ void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, unsigned int wi
 
 ATTRIBUTE_HOT void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBackend_Rect *rect, RenderBackend_Surface *destination_surface, long x, long y, bool colour_key)
 {
-	if (source_surface == NULL || destination_surface == NULL)
+	if (source_surface == NULL || source_surface->pixels == NULL || destination_surface == NULL || destination_surface->pixels == NULL)
 		return;
 
 	RenderBackend_Rect rect_clamped;
@@ -214,7 +214,7 @@ ATTRIBUTE_HOT void RenderBackend_Blit(RenderBackend_Surface *source_surface, con
 
 ATTRIBUTE_HOT void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBackend_Rect *rect, unsigned char red, unsigned char green, unsigned char blue)
 {
-	if (surface == NULL)
+	if (surface == NULL || surface->pixels == NULL)
 		return;
 
 	RenderBackend_Rect rect_clamped;
