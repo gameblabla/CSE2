@@ -66,6 +66,9 @@ void WindowBackend_Software_DestroyWindow(void)
 
 unsigned char* WindowBackend_Software_LockFramebuffer(size_t *pitch)
 {
+	if (SDL_LockSurface(framebuffer_sdlsurface) < 0)
+		return NULL;
+
 	*pitch = framebuffer_sdlsurface->pitch;
 
 	return (unsigned char*)framebuffer_sdlsurface->pixels;
@@ -73,7 +76,7 @@ unsigned char* WindowBackend_Software_LockFramebuffer(size_t *pitch)
 
 void WindowBackend_Software_UnlockFramebuffer(void)
 {
-	// Nothing to do here
+	SDL_UnlockSurface(framebuffer_sdlsurface);
 }
 
 void WindowBackend_Software_Display(void)
