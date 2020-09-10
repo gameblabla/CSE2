@@ -201,7 +201,7 @@ void Backend_HideMouse(void)
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 }
 
-void Backend_SetWindowIcon(const unsigned char *rgb_pixels, unsigned int width, unsigned int height)
+void Backend_SetWindowIcon(const unsigned char *rgb_pixels, size_t width, size_t height)
 {
 	// Convert to RGBA, since that's the only thing GLFW3 accepts
 	unsigned char *rgba_pixels = (unsigned char*)malloc(width * height * 4);
@@ -211,9 +211,9 @@ void Backend_SetWindowIcon(const unsigned char *rgb_pixels, unsigned int width, 
 
 	if (rgba_pixels != NULL)
 	{
-		for (unsigned int y = 0; y < height; ++y)
+		for (size_t y = 0; y < height; ++y)
 		{
-			for (unsigned int x = 0; x < width; ++x)
+			for (size_t x = 0; x < width; ++x)
 			{
 				*rgba_pointer++ = *rgb_pointer++;
 				*rgba_pointer++ = *rgb_pointer++;
@@ -229,7 +229,7 @@ void Backend_SetWindowIcon(const unsigned char *rgb_pixels, unsigned int width, 
 	}
 }
 
-void Backend_SetCursor(const unsigned char *rgb_pixels, unsigned int width, unsigned int height)
+void Backend_SetCursor(const unsigned char *rgb_pixels, size_t width, size_t height)
 {
 	// Convert to RGBA, since that's the only thing GLFW3 accepts
 	unsigned char *rgba_pixels = (unsigned char*)malloc(width * height * 4);
@@ -239,9 +239,9 @@ void Backend_SetCursor(const unsigned char *rgb_pixels, unsigned int width, unsi
 
 	if (rgba_pixels != NULL)
 	{
-		for (unsigned int y = 0; y < height; ++y)
+		for (size_t y = 0; y < height; ++y)
 		{
-			for (unsigned int x = 0; x < width; ++x)
+			for (size_t x = 0; x < width; ++x)
 			{
 				if (rgb_pointer[0] == 0xFF && rgb_pointer[1] == 0 && rgb_pointer[2] == 0xFF)	// Colour-key
 				{

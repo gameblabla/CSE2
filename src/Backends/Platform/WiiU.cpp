@@ -76,14 +76,14 @@ void Backend_HideMouse(void)
 	
 }
 
-void Backend_SetWindowIcon(const unsigned char *rgb_pixels, unsigned int width, unsigned int height)
+void Backend_SetWindowIcon(const unsigned char *rgb_pixels, size_t width, size_t height)
 {
 	(void)rgb_pixels;
 	(void)width;
 	(void)height;
 }
 
-void Backend_SetCursor(const unsigned char *rgb_pixels, unsigned int width, unsigned int height)
+void Backend_SetCursor(const unsigned char *rgb_pixels, size_t width, size_t height)
 {
 	(void)rgb_pixels;
 	(void)width;
