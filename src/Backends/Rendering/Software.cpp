@@ -30,7 +30,7 @@ static RenderBackend_Surface framebuffer;
 static unsigned char glyph_colour_channels[3];
 static RenderBackend_Surface *glyph_destination_surface;
 
-RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, bool fullscreen)
+RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t screen_width, size_t screen_height, bool fullscreen)
 {
 	if (WindowBackend_Software_CreateWindow(window_title, screen_width, screen_height, fullscreen))
 	{
@@ -62,7 +62,7 @@ void RenderBackend_DrawScreen(void)
 	framebuffer.pixels = WindowBackend_Software_LockFramebuffer(&framebuffer.pitch);
 }
 
-RenderBackend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned int height, bool render_target)
+RenderBackend_Surface* RenderBackend_CreateSurface(size_t width, size_t height, bool render_target)
 {
 	(void)render_target;
 
@@ -107,7 +107,7 @@ void RenderBackend_RestoreSurface(RenderBackend_Surface *surface)
 	(void)surface;
 }
 
-unsigned char* RenderBackend_LockSurface(RenderBackend_Surface *surface, unsigned int *pitch, unsigned int width, unsigned int height)
+unsigned char* RenderBackend_LockSurface(RenderBackend_Surface *surface, size_t *pitch, size_t width, size_t height)
 {
 	(void)width;
 	(void)height;
@@ -119,7 +119,7 @@ unsigned char* RenderBackend_LockSurface(RenderBackend_Surface *surface, unsigne
 	return surface->pixels;
 }
 
-void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, unsigned int width, unsigned int height)
+void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, size_t width, size_t height)
 {
 	(void)surface;
 	(void)width;
@@ -334,7 +334,7 @@ void RenderBackend_HandleRenderTargetLoss(void)
 	// No problem for us
 }
 
-void RenderBackend_HandleWindowResize(unsigned int width, unsigned int height)
+void RenderBackend_HandleWindowResize(size_t width, size_t height)
 {
 	WindowBackend_Software_HandleWindowResize(width, height);
 }

@@ -1,5 +1,7 @@
 #pragma once
 
-bool WindowBackend_OpenGL_CreateWindow(const char *window_title, int *screen_width, int *screen_height, bool fullscreen);
+#include <stddef.h>
+
+bool WindowBackend_OpenGL_CreateWindow(const char *window_title, size_t *screen_width, size_t *screen_height, bool fullscreen);
 void WindowBackend_OpenGL_DestroyWindow(void);
 void WindowBackend_OpenGL_Display(void);

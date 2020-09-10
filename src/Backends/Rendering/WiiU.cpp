@@ -38,8 +38,8 @@ typedef struct RenderBackend_Surface
 {
 	GX2Texture texture;
 	GX2ColorBuffer colour_buffer;
-	unsigned int width;
-	unsigned int height;
+	size_t width;
+	size_t height;
 	bool render_target;
 	unsigned char *lock_buffer;	// TODO - Dumb
 } RenderBackend_Surface;
@@ -93,8 +93,8 @@ static Viewport tv_viewport;
 static Viewport drc_viewport;
 
 static VertexBufferSlot *local_vertex_buffer;
-static unsigned long local_vertex_buffer_size;
-static unsigned long current_vertex_buffer_slot;
+static size_t local_vertex_buffer_size;
+static size_t current_vertex_buffer_slot;
 
 static RenderMode last_render_mode;
 static GX2Texture *last_source_texture;
@@ -130,8 +130,8 @@ static VertexBufferSlot* GetVertexBufferSlot(void)
 
 static void FlushVertexBuffer(void)
 {
-	static unsigned long vertex_buffer_size;
-	static unsigned int current_vertex_buffer = 0;
+	static size_t vertex_buffer_size;
+	static size_t current_vertex_buffer = 0;
 
 	if (current_vertex_buffer_slot == 0)
 		return;
@@ -176,7 +176,7 @@ static void FlushVertexBuffer(void)
 	current_vertex_buffer_slot = 0;
 }
 
-static void CalculateViewport(unsigned int actual_screen_width, unsigned int actual_screen_height, Viewport *viewport)
+static void CalculateViewport(size_t actual_screen_width, size_t actual_screen_height, Viewport *viewport)
 {
 	if ((float)actual_screen_width / (float)actual_screen_height > (float)framebuffer_surface->width / (float)framebuffer_surface->height)
 	{
@@ -449,7 +449,7 @@ void RenderBackend_DrawScreen(void)
 	GX2SetContextState(gx2_context);
 }
 
-RenderBackend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned int height, bool render_target)
+RenderBackend_Surface* RenderBackend_CreateSurface(size_t width, size_t height, bool render_target)
 {
 	RenderBackend_Surface *surface = (RenderBackend_Surface*)malloc(sizeof(RenderBackend_Surface));
 
@@ -539,7 +539,7 @@ void RenderBackend_RestoreSurface(RenderBackend_Surface *surface)
 	(void)surface;
 }
 
-unsigned char* RenderBackend_LockSurface(RenderBackend_Surface *surface, unsigned int *pitch, unsigned int width, unsigned int height)
+unsigned char* RenderBackend_LockSurface(RenderBackend_Surface *surface, size_t *pitch, size_t width, size_t height)
 {
 	if (surface != NULL)
 	{
@@ -554,7 +554,7 @@ unsigned char* RenderBackend_LockSurface(RenderBackend_Surface *surface, unsigne
 	return NULL;
 }
 
-void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, unsigned int width, unsigned int height)
+void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, size_t width, size_t height)
 {
 	if (surface != NULL)
 	{
@@ -884,7 +884,7 @@ void RenderBackend_HandleRenderTargetLoss(void)
 	// Doesn't happen on the Wii U
 }
 
-void RenderBackend_HandleWindowResize(unsigned int width, unsigned int height)
+void RenderBackend_HandleWindowResize(size_t width, size_t height)
 {
 	(void)width;
 	(void)height;

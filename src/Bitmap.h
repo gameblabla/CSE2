@@ -2,6 +2,6 @@
 
 #include <stddef.h>
 
-unsigned char* DecodeBitmap(const unsigned char *in_buffer, size_t in_buffer_size, unsigned int *width, unsigned int *height);
-unsigned char* DecodeBitmapFromFile(const char *path, unsigned int *width, unsigned int *height);
+unsigned char* DecodeBitmap(const unsigned char *in_buffer, size_t in_buffer_size, size_t *width, size_t *height);
+unsigned char* DecodeBitmapFromFile(const char *path, size_t *width, size_t *height);
 void FreeBitmap(unsigned char *buffer);

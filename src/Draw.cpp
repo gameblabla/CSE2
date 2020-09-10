@@ -147,10 +147,10 @@ void ReleaseSurface(SurfaceID s)
 	memset(&surface_metadata[s], 0, sizeof(surface_metadata[0]));
 }
 
-static BOOL ScaleAndUploadSurface(const unsigned char *image_buffer, int width, int height, SurfaceID surf_no)
+static BOOL ScaleAndUploadSurface(const unsigned char *image_buffer, size_t width, size_t height, SurfaceID surf_no)
 {
 	// IF YOU WANT TO ADD HD SPRITES, THIS IS THE CODE YOU SHOULD EDIT
-	unsigned int pitch;
+	size_t pitch;
 	unsigned char *pixels = RenderBackend_LockSurface(surf[surf_no], &pitch, width * mag, height * mag);
 
 	if (pixels == NULL)
@@ -159,7 +159,7 @@ static BOOL ScaleAndUploadSurface(const unsigned char *image_buffer, int width, 
 	if (mag == 1)
 	{
 		// Just copy the pixels the way they are
-		for (int y = 0; y < height; ++y)
+		for (size_t y = 0; y < height; ++y)
 		{
 			const unsigned char *src_row = &image_buffer[y * width * 3];
 			unsigned char *dst_row = &pixels[y * pitch];
@@ -170,7 +170,7 @@ static BOOL ScaleAndUploadSurface(const unsigned char *image_buffer, int width, 
 	else
 	{
 		// Upscale the bitmap to the game's internal resolution
-		for (int y = 0; y < height; ++y)
+		for (size_t y = 0; y < height; ++y)
 		{
 			const unsigned char *src_row = &image_buffer[y * width * 3];
 			unsigned char *dst_row = &pixels[y * pitch * mag];
@@ -178,7 +178,7 @@ static BOOL ScaleAndUploadSurface(const unsigned char *image_buffer, int width, 
 			const unsigned char *src_ptr = src_row;
 			unsigned char *dst_ptr = dst_row;
 
-			for (int x = 0; x < width; ++x)
+			for (size_t x = 0; x < width; ++x)
 			{
 				for (int i = 0; i < mag; ++i)
 				{
@@ -215,7 +215,7 @@ BOOL MakeSurface_Resource(const char *name, SurfaceID surf_no)
 	if (data == NULL)
 		return FALSE;
 
-	unsigned int width, height;
+	size_t width, height;
 	unsigned char *image_buffer = DecodeBitmap(data, size, &width, &height);
 
 	if (image_buffer == NULL)
@@ -273,7 +273,7 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 		return FALSE;
 	}
 
-	unsigned int width, height;
+	size_t width, height;
 	unsigned char *image_buffer = DecodeBitmapFromFile(path.c_str(), &width, &height);
 
 	if (image_buffer == NULL)
@@ -319,7 +319,7 @@ BOOL ReloadBitmap_Resource(const char *name, SurfaceID surf_no)
 	if (data == NULL)
 		return FALSE;
 
-	unsigned int width, height;
+	size_t width, height;
 	unsigned char *image_buffer = DecodeBitmap(data, size, &width, &height);
 
 	if (!ScaleAndUploadSurface(image_buffer, width, height, surf_no))
@@ -357,7 +357,7 @@ BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 		return FALSE;
 	}
 
-	unsigned int width, height;
+	size_t width, height;
 	unsigned char *image_buffer = DecodeBitmapFromFile(path.c_str(), &width, &height);
 
 	if (image_buffer == NULL)
@@ -647,7 +647,7 @@ void InitTextObject(const char *name)
 	std::string path = gDataPath + "/Font/font";
 
 	// Get font size
-	unsigned int width, height;
+	size_t width, height;
 
 	switch (mag)
 	{

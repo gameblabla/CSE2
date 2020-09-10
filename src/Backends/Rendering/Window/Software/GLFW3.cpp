@@ -11,15 +11,15 @@
 GLFWwindow *window;
 
 static unsigned char *framebuffer;
-static int framebuffer_width;
-static int framebuffer_height;
+static size_t framebuffer_width;
+static size_t framebuffer_height;
 
 static float framebuffer_x_ratio;
 static float framebuffer_y_ratio;
 
 static GLuint screen_texture_id;
 
-bool WindowBackend_Software_CreateWindow(const char *window_title, int screen_width, int screen_height, bool fullscreen)
+bool WindowBackend_Software_CreateWindow(const char *window_title, size_t screen_width, size_t screen_height, bool fullscreen)
 {
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 1);
@@ -59,11 +59,11 @@ bool WindowBackend_Software_CreateWindow(const char *window_title, int screen_wi
 		glGenTextures(1, &screen_texture_id);
 		glBindTexture(GL_TEXTURE_2D, screen_texture_id);
 
-		int framebuffer_texture_width = 1;
+		size_t framebuffer_texture_width = 1;
 		while (framebuffer_texture_width < framebuffer_width)
 			framebuffer_texture_width <<= 1;
 
-		int framebuffer_texture_height = 1;
+		size_t framebuffer_texture_height = 1;
 		while (framebuffer_texture_height < framebuffer_height)
 			framebuffer_texture_height <<= 1;
 
@@ -127,7 +127,7 @@ void WindowBackend_Software_Display(void)
 	glfwSwapBuffers(window);
 }
 
-void WindowBackend_Software_HandleWindowResize(unsigned int width, unsigned int height)
+void WindowBackend_Software_HandleWindowResize(size_t width, size_t height)
 {
 	// Do some viewport trickery, to fit the framebuffer in the center of the screen
 	GLint viewport_x;

@@ -13,7 +13,7 @@ SDL_Window *window;
 static SDL_Surface *window_sdlsurface;
 static SDL_Surface *framebuffer_sdlsurface;
 
-bool WindowBackend_Software_CreateWindow(const char *window_title, int screen_width, int screen_height, bool fullscreen)
+bool WindowBackend_Software_CreateWindow(const char *window_title, size_t screen_width, size_t screen_height, bool fullscreen)
 {
 	window = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screen_width, screen_height, 0);
 
@@ -88,7 +88,7 @@ void WindowBackend_Software_Display(void)
 		Backend_PrintError("Couldn't copy window surface to the screen: %s", SDL_GetError());
 }
 
-void WindowBackend_Software_HandleWindowResize(unsigned int width, unsigned int height)
+void WindowBackend_Software_HandleWindowResize(size_t width, size_t height)
 {
 	(void)width;
 	(void)height;

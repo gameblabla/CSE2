@@ -32,8 +32,8 @@ typedef enum RenderMode
 typedef struct RenderBackend_Surface
 {
 	GLuint texture_id;
-	unsigned int width;
-	unsigned int height;
+	size_t width;
+	size_t height;
 	unsigned char *pixels;
 } RenderBackend_Surface;
 
@@ -75,8 +75,8 @@ static GLuint vertex_buffer_ids[TOTAL_VBOS];
 static GLuint framebuffer_id;
 
 static VertexBufferSlot *local_vertex_buffer;
-static unsigned long local_vertex_buffer_size;
-static unsigned long current_vertex_buffer_slot;
+static size_t local_vertex_buffer_size;
+static size_t current_vertex_buffer_slot;
 
 static RenderMode last_render_mode;
 static GLuint last_source_texture;
@@ -86,8 +86,8 @@ static RenderBackend_Surface framebuffer;
 
 static RenderBackend_Surface *glyph_destination_surface;
 
-static int actual_screen_width;
-static int actual_screen_height;
+static size_t actual_screen_width;
+static size_t actual_screen_height;
 
 #ifdef USE_OPENGLES2
 static const GLchar *vertex_shader_plain = " \
@@ -337,8 +337,8 @@ static VertexBufferSlot* GetVertexBufferSlot(unsigned int slots_needed)
 
 static void FlushVertexBuffer(void)
 {
-	static unsigned long vertex_buffer_size[TOTAL_VBOS];
-	static unsigned int current_vertex_buffer = 0;
+	static size_t vertex_buffer_size[TOTAL_VBOS];
+	static size_t current_vertex_buffer = 0;
 
 	if (current_vertex_buffer_slot == 0)
 		return;
@@ -425,7 +425,7 @@ static void PostGLCallCallback(const char *name, void *function_pointer, int len
 // Render-backend initialisation //
 ///////////////////////////////////
 
-RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, bool fullscreen)
+RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t screen_width, size_t screen_height, bool fullscreen)
 {
 #ifndef USE_OPENGLES2
 	glad_set_post_callback(PostGLCallCallback);
@@ -637,7 +637,7 @@ void RenderBackend_DrawScreen(void)
 // Surface management //
 ////////////////////////
 
-RenderBackend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned int height, bool render_target)
+RenderBackend_Surface* RenderBackend_CreateSurface(size_t width, size_t height, bool render_target)
 {
 	(void)render_target;
 
@@ -695,7 +695,7 @@ void RenderBackend_RestoreSurface(RenderBackend_Surface *surface)
 	(void)surface;
 }
 
-unsigned char* RenderBackend_LockSurface(RenderBackend_Surface *surface, unsigned int *pitch, unsigned int width, unsigned int height)
+unsigned char* RenderBackend_LockSurface(RenderBackend_Surface *surface, size_t *pitch, size_t width, size_t height)
 {
 	if (surface == NULL)
 		return NULL;
@@ -705,7 +705,7 @@ unsigned char* RenderBackend_LockSurface(RenderBackend_Surface *surface, unsigne
 	return surface->pixels;
 }
 
-void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, unsigned int width, unsigned int height)
+void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, size_t width, size_t height)
 {
 	if (surface == NULL)
 		return;
@@ -1021,7 +1021,7 @@ void RenderBackend_HandleRenderTargetLoss(void)
 	// No problem for us
 }
 
-void RenderBackend_HandleWindowResize(unsigned int width, unsigned int height)
+void RenderBackend_HandleWindowResize(size_t width, size_t height)
 {
 	actual_screen_width = width;
 	actual_screen_height = height;

@@ -16,8 +16,8 @@ typedef struct RenderBackend_Surface
 {
 	SDL_Texture *texture;
 	unsigned char *pixels;
-	unsigned int width;
-	unsigned int height;
+	size_t width;
+	size_t height;
 	bool lost;
 
 	struct RenderBackend_Surface *next;
@@ -51,7 +51,7 @@ static void RectToSDLRect(const RenderBackend_Rect *rect, SDL_Rect *sdl_rect)
 		sdl_rect->h = 0;
 }
 
-RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, bool fullscreen)
+RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t screen_width, size_t screen_height, bool fullscreen)
 {
 	Backend_PrintInfo("Available SDL render drivers:");
 
@@ -141,7 +141,7 @@ void RenderBackend_DrawScreen(void)
 	SDL_RenderPresent(renderer);
 }
 
-RenderBackend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned int height, bool render_target)
+RenderBackend_Surface* RenderBackend_CreateSurface(size_t width, size_t height, bool render_target)
 {
 	RenderBackend_Surface *surface = (RenderBackend_Surface*)malloc(sizeof(RenderBackend_Surface));
 
@@ -196,7 +196,7 @@ void RenderBackend_RestoreSurface(RenderBackend_Surface *surface)
 	surface->lost = false;
 }
 
-unsigned char* RenderBackend_LockSurface(RenderBackend_Surface *surface, unsigned int *pitch, unsigned int width, unsigned int height)
+unsigned char* RenderBackend_LockSurface(RenderBackend_Surface *surface, size_t *pitch, size_t width, size_t height)
 {
 	if (surface == NULL)
 		return NULL;
@@ -208,7 +208,7 @@ unsigned char* RenderBackend_LockSurface(RenderBackend_Surface *surface, unsigne
 	return surface->pixels;
 }
 
-void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, unsigned int width, unsigned int height)
+void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, size_t width, size_t height)
 {
 	if (surface == NULL)
 		return;
@@ -224,11 +224,11 @@ void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, unsigned int wi
 	const unsigned char *src_pixel = surface->pixels;
 
 	// Convert the SDL_Surface's colour-keyed pixels to RGBA32
-	for (unsigned int y = 0; y < height; ++y)
+	for (size_t y = 0; y < height; ++y)
 	{
 		unsigned char *buffer_pointer = &buffer[y * width * 4];
 
-		for (unsigned int x = 0; x < width; ++x)
+		for (size_t x = 0; x < width; ++x)
 		{
 			*buffer_pointer++ = src_pixel[0];
 			*buffer_pointer++ = src_pixel[1];
@@ -413,7 +413,7 @@ void RenderBackend_HandleRenderTargetLoss(void)
 		surface->lost = true;
 }
 
-void RenderBackend_HandleWindowResize(unsigned int width, unsigned int height)
+void RenderBackend_HandleWindowResize(size_t width, size_t height)
 {
 	(void)width;
 	(void)height;

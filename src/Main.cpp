@@ -294,7 +294,7 @@ int main(int argc, char *argv[])
 
 	if (window_icon_resource_data != NULL)
 	{
-		unsigned int window_icon_width, window_icon_height;
+		size_t window_icon_width, window_icon_height;
 		unsigned char *window_icon_rgb_pixels = DecodeBitmap(window_icon_resource_data, window_icon_resource_size, &window_icon_width, &window_icon_height);
 
 		if (window_icon_rgb_pixels != NULL)
@@ -311,7 +311,7 @@ int main(int argc, char *argv[])
 
 	if (cursor_resource_data != NULL)
 	{
-		unsigned int cursor_width, cursor_height;
+		size_t cursor_width, cursor_height;
 		unsigned char *cursor_rgb_pixels = DecodeBitmap(cursor_resource_data, cursor_resource_size, &cursor_width, &cursor_height);
 
 		if (cursor_rgb_pixels != NULL)

@@ -42,7 +42,7 @@ static void RectToSDLRect(const RenderBackend_Rect *rect, SDL_Rect *sdl_rect)
 		sdl_rect->h = 0;
 }
 
-RenderBackend_Surface* RenderBackend_Init(const char *window_title, int screen_width, int screen_height, bool fullscreen)
+RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t screen_width, size_t screen_height, bool fullscreen)
 {
 	window = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screen_width, screen_height, 0);
 
@@ -100,7 +100,7 @@ void RenderBackend_DrawScreen(void)
 		Backend_PrintError("Couldn't put window surface on screen: %s", SDL_GetError());
 }
 
-RenderBackend_Surface* RenderBackend_CreateSurface(unsigned int width, unsigned int height, bool render_target)
+RenderBackend_Surface* RenderBackend_CreateSurface(size_t width, size_t height, bool render_target)
 {
 	(void)render_target;
 
@@ -141,7 +141,7 @@ void RenderBackend_RestoreSurface(RenderBackend_Surface *surface)
 	(void)surface;
 }
 
-unsigned char* RenderBackend_LockSurface(RenderBackend_Surface *surface, unsigned int *pitch, unsigned int width, unsigned int height)
+unsigned char* RenderBackend_LockSurface(RenderBackend_Surface *surface, size_t *pitch, size_t width, size_t height)
 {
 	(void)width;
 	(void)height;
@@ -155,7 +155,7 @@ unsigned char* RenderBackend_LockSurface(RenderBackend_Surface *surface, unsigne
 	return (unsigned char*)surface->sdlsurface->pixels;
 }
 
-void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, unsigned int width, unsigned int height)
+void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, size_t width, size_t height)
 {
 	(void)width;
 	(void)height;
@@ -287,7 +287,7 @@ void RenderBackend_HandleRenderTargetLoss(void)
 	// No problem for us
 }
 
-void RenderBackend_HandleWindowResize(unsigned int width, unsigned int height)
+void RenderBackend_HandleWindowResize(size_t width, size_t height)
 {
 	(void)width;
 	(void)height;

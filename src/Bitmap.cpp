@@ -12,19 +12,25 @@
 
 #include "File.h"
 
-unsigned char* DecodeBitmap(const unsigned char *in_buffer, size_t in_buffer_size, unsigned int *width, unsigned int *height)
+unsigned char* DecodeBitmap(const unsigned char *in_buffer, size_t in_buffer_size, size_t *width, size_t *height)
 {
-	return stbi_load_from_memory(in_buffer, in_buffer_size, (int*)width, (int*)height, NULL, 3);
+	int int_width, int_height;
+	unsigned char *image_buffer = stbi_load_from_memory(in_buffer, in_buffer_size, &int_width, &int_height, NULL, 3);
+
+	*width = int_width;
+	*height = int_height;
+
+	return image_buffer;
 }
 
-unsigned char* DecodeBitmapFromFile(const char *path, unsigned int *width, unsigned int *height)
+unsigned char* DecodeBitmapFromFile(const char *path, size_t *width, size_t *height)
 {
 	size_t file_size;
 	unsigned char *file_buffer = LoadFileToMemory(path, &file_size);
 
 	if (file_buffer != NULL)
 	{
-		unsigned char *image_buffer = stbi_load_from_memory(file_buffer, file_size, (int*)width, (int*)height, NULL, 3);
+		unsigned char *image_buffer = DecodeBitmap(file_buffer, file_size, width, height);
 
 		free(file_buffer);
 

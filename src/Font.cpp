@@ -842,7 +842,7 @@ static const unsigned short shiftjis_to_unicode_lookup[0x3100] = {
 	0x0020, 0x0020, 0x0020, 0x0020, 0x0020, 0x0020, 0x0020, 0x0020, 0x0020, 0x0020, 0x0020, 0x0020, 0x0020, 0x0020, 0x0020, 0x0020
 };
 
-static unsigned short ShiftJISToUnicode(const unsigned char *string, unsigned int *bytes_read)
+static unsigned short ShiftJISToUnicode(const unsigned char *string, size_t *bytes_read)
 {
 	size_t lookup_index;
 
@@ -875,9 +875,9 @@ static unsigned short ShiftJISToUnicode(const unsigned char *string, unsigned in
 
 #else
 
-static unsigned long UTF8ToUnicode(const unsigned char *string, unsigned int *bytes_read)
+static unsigned long UTF8ToUnicode(const unsigned char *string, size_t *bytes_read)
 {
-	unsigned int length;
+	size_t length;
 	unsigned long charcode;
 
 	unsigned int zero_bit = 0;
@@ -1006,11 +1006,11 @@ static Glyph* GetGlyph(FontObject *font_object, unsigned long unicode_value)
 			switch (font_object->face->glyph->bitmap.pixel_mode)
 			{
 				case FT_PIXEL_MODE_GRAY:
-					for (unsigned int y = 0; y < bitmap.rows; ++y)
+					for (size_t y = 0; y < bitmap.rows; ++y)
 					{
 						unsigned char *pixel_pointer = &bitmap.buffer[y * bitmap.pitch];
 
-						for (unsigned int x = 0; x < bitmap.width; ++x)
+						for (size_t x = 0; x < bitmap.width; ++x)
 						{
 							*pixel_pointer = GammaCorrect((*pixel_pointer * 0xFF) / (bitmap.num_grays - 1));
 							++pixel_pointer;
@@ -1020,11 +1020,11 @@ static Glyph* GetGlyph(FontObject *font_object, unsigned long unicode_value)
 					break;
 
 				case FT_PIXEL_MODE_MONO:
-					for (unsigned int y = 0; y < bitmap.rows; ++y)
+					for (size_t y = 0; y < bitmap.rows; ++y)
 					{
 						unsigned char *pixel_pointer = &bitmap.buffer[y * bitmap.pitch];
 
-						for (unsigned int x = 0; x < bitmap.width; ++x)
+						for (size_t x = 0; x < bitmap.width; ++x)
 						{
 							*pixel_pointer = *pixel_pointer ? 0xFF : 0;
 							++pixel_pointer;
@@ -1058,7 +1058,7 @@ static Glyph* GetGlyph(FontObject *font_object, unsigned long unicode_value)
 	return NULL;
 }
 
-FontObject* LoadFontFromData(const unsigned char *data, size_t data_size, unsigned int cell_width, unsigned int cell_height)
+FontObject* LoadFontFromData(const unsigned char *data, size_t data_size, size_t cell_width, size_t cell_height)
 {
 	FontObject *font_object = (FontObject*)malloc(sizeof(FontObject));
 
@@ -1118,7 +1118,7 @@ FontObject* LoadFontFromData(const unsigned char *data, size_t data_size, unsign
 	return NULL;
 }
 
-FontObject* LoadFont(const char *font_filename, unsigned int cell_width, unsigned int cell_height)
+FontObject* LoadFont(const char *font_filename, size_t cell_width, size_t cell_height)
 {
 	FontObject *font_object = NULL;
 
@@ -1149,7 +1149,7 @@ void DrawText(FontObject *font_object, RenderBackend_Surface *surface, int x, in
 
 		while (string_pointer != string_end)
 		{
-			unsigned int bytes_read;
+			size_t bytes_read;
 		#ifdef JAPANESE
 			const unsigned short unicode_value = ShiftJISToUnicode(string_pointer, &bytes_read);
 		#else
