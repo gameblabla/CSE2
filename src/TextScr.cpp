@@ -1363,11 +1363,15 @@ int TextScriptProc(void)
 						memcpy(str, &gTS.data[gTS.p_read], y);
 						str[y] = '\0';
 
-					#ifdef FIX_BUGS
-						gTS.p_write = y;
-					#else
-						gTS.p_write = x; // This is way out of bounds, causing the blinking cursor to render offscreen
-					#endif
+						// This should have been 'y', not 'x'. This mistake causes the blinking
+						// cursor to render offscreen. Even if this were fixed, the broken font
+						// spacing (see InitTextObject in Draw.cpp) would likely cause it to
+						// still appear in the wrong place anyway.
+					//#ifdef FIX_BUGS
+					//	gTS.p_write = y;
+					//#else
+						gTS.p_write = x;
+					//#endif
 
 						// Print text
 						PutText2(0, 0, str, RGB(0xFF, 0xFF, 0xFE), (SurfaceID)(SURFACE_ID_TEXT_LINE1 + (gTS.line % 4)));
