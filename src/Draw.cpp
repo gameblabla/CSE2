@@ -817,6 +817,23 @@ void InitTextObject(const char *name)
 	// Get font size
 	unsigned int width, height;
 
+	// Let me tell you why these font sizes are unfortunate...
+	// 6x12 is a good font size - fonts use high-quality bitmaps at that
+	// size, and it works with Cave Story's internal assumption that
+	// characters are spaced 6 pixels apart.
+	// The sad part is the 10x20 size: you might be wondering why Pixel
+	// didn't use 12x24 instead. Well, that's because fonts don't use
+	// bitmaps at that size - instead you get ugly low-res vector
+	// renders. So, Pixel had to use 10x20 instead. But there's a
+	// problem: this means the characters are spaced 5 pixels apart
+	// instead. This normally isn't a problem because the game usually
+	// hardcodes it, but this isn't the case when either <SAT is used, a
+	// texture is regenerated, or when the game prints the name of the
+	// map. This causes the font to render with incorrect spacing.
+	// There's really not much of a solution to this, especially when
+	// you consider that the English translation was specifically built
+	// around the broken spacing.
+
 	switch (mag)
 	{
 		case 1:
