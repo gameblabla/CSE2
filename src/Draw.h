@@ -53,7 +53,7 @@ BOOL MakeSurface_Generic(int bxsize, int bysize, SurfaceID surf_no, BOOL bSystem
 void BackupSurface(SurfaceID surf_no, const RECT *rect);
 void PutBitmap3(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID surf_no);
 void PutBitmap4(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID surf_no);
-void Surface2Surface(int x, int y, const RECT *rect, int to, int from);
+void Surface2Surface(int x, int y, const RECT *rect, SurfaceID to, SurfaceID from);
 unsigned long GetCortBoxColor(unsigned long col);
 void CortBox(const RECT *rect, unsigned long col);
 void CortBox2(const RECT *rect, unsigned long col, SurfaceID surf_no);
