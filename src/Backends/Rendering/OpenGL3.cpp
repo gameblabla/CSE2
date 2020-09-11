@@ -937,9 +937,9 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBa
 		last_render_mode = MODE_DRAW_GLYPH;
 		last_destination_texture = glyph_destination_surface->texture_id;
 		last_source_texture = atlas->texture_id;
-		last_red = colour_channels[0];
-		last_green = colour_channels[1];
-		last_blue = colour_channels[2];
+		last_red = red;
+		last_green = green;
+		last_blue = blue;
 
 		glUseProgram(program_glyph);
 		glUniform4f(program_glyph_uniform_colour, red / 255.0f, green / 255.0f, blue / 255.0f, 1.0f);
