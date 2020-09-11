@@ -500,7 +500,6 @@ RenderBackend_Surface* RenderBackend_CreateSurface(size_t width, size_t height, 
 				else
 					Backend_PrintError("GX2RCreateSurfaceUserMemory failed in RenderBackend_CreateSurface");
 
-
 				GX2RDestroySurfaceEx(&surface->texture.surface, (GX2RResourceFlags)0);
 			}
 		}
