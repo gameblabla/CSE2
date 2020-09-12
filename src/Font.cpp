@@ -1077,8 +1077,8 @@ FontObject* LoadFontFromData(const unsigned char *data, size_t data_size, size_t
 
 					font_object->glyph_list_head = NULL;
 
-					size_t atlas_entry_width = FT_MulFix(font_object->face->bbox.xMax - font_object->face->bbox.xMin, font_object->face->size->metrics.x_scale) / 64;
-					size_t atlas_entry_height = FT_MulFix(font_object->face->bbox.yMax - font_object->face->bbox.yMin, font_object->face->size->metrics.y_scale) / 64;
+					size_t atlas_entry_width = FT_MulFix(font_object->face->bbox.xMax - font_object->face->bbox.xMin + 1, font_object->face->size->metrics.x_scale) / 64;
+					size_t atlas_entry_height = FT_MulFix(font_object->face->bbox.yMax - font_object->face->bbox.yMin + 1, font_object->face->size->metrics.y_scale) / 64;
 
 					font_object->atlas_row_length = ceil(sqrt(atlas_entry_width * atlas_entry_height * TOTAL_GLYPH_SLOTS) / atlas_entry_width);
 
