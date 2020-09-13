@@ -182,6 +182,9 @@ void RenderBackend_FreeSurface(RenderBackend_Surface *surface)
 	if (surface->prev != NULL)
 		surface->prev->next = surface->next;
 
+	if (surface->prev == NULL)
+		surface_list_head = surface->next;
+
 	SDL_DestroyTexture(surface->texture);
 	free(surface);
 }
