@@ -284,7 +284,7 @@ int main(int argc, char *argv[])
 	}
 
 #ifdef DEBUG_SAVE
-	PlaybackBackend_EnableDragAndDrop();
+	Backend_EnableDragAndDrop();
 #endif
 
 	// Set up window icon

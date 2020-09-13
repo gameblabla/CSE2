@@ -161,7 +161,7 @@ void Backend_SetCursor(const unsigned char *rgb_pixels, size_t width, size_t hei
 	}
 }
 
-void PlaybackBackend_EnableDragAndDrop(void)
+void Backend_EnableDragAndDrop(void)
 {
 	SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
 }

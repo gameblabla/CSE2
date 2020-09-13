@@ -90,7 +90,7 @@ void Backend_SetCursor(const unsigned char *rgb_pixels, size_t width, size_t hei
 	(void)height;
 }
 
-void PlaybackBackend_EnableDragAndDrop(void)
+void Backend_EnableDragAndDrop(void)
 {
 	
 }
