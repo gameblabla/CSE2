@@ -167,7 +167,7 @@ RenderBackend_Surface* RenderBackend_CreateSurface(size_t width, size_t height, 
 	if (surface == NULL)
 		return NULL;
 
-	surface->texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, render_target ? SDL_TEXTUREACCESS_TARGET : 0, width, height);
+	surface->texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, render_target ? SDL_TEXTUREACCESS_TARGET : SDL_TEXTUREACCESS_STATIC, width, height);
 
 	if (surface->texture == NULL)
 	{
