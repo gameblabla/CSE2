@@ -452,6 +452,8 @@ void RenderBackend_HandleWindowResize(size_t width, size_t height)
 	if (upscaled_framebuffer.texture == NULL)
 		Backend_PrintError("Couldn't regenerate upscaled framebuffer");
 
+	SDL_SetTextureBlendMode(upscaled_framebuffer.texture, SDL_BLENDMODE_NONE);
+
 	// Create rect that forces 4:3 no matter what size the window is
 	float window_ratio = (float)width / height;
 	float framebuffer_ratio = (float)upscaled_framebuffer.width / upscaled_framebuffer.height;
