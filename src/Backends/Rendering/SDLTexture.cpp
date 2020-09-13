@@ -12,6 +12,9 @@
 #include "../Misc.h"
 #include "../Shared/SDL2.h"
 
+#define MIN(a,b) ((a) < (b) ? (a) : (b))
+#define MAX(a,b) ((a) > (b) ? (a) : (b))
+
 typedef struct RenderBackend_Surface
 {
 	SDL_Texture *texture;
@@ -34,6 +37,9 @@ SDL_Window *window;
 static SDL_Renderer *renderer;
 
 static RenderBackend_Surface framebuffer;
+static RenderBackend_Surface upscaled_framebuffer;
+
+static SDL_Rect upscaled_framebuffer_rect;
 
 static RenderBackend_Surface *surface_list_head;
 
@@ -64,7 +70,7 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t scree
 			Backend_PrintInfo("%s", info.name);
 	}
 
-	window = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screen_width, screen_height, 0);
+	window = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screen_width, screen_height, SDL_WINDOW_RESIZABLE);
 
 	if (window != NULL)
 	{
@@ -92,6 +98,8 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t scree
 			{
 				framebuffer.width = screen_width;
 				framebuffer.height = screen_height;
+
+				RenderBackend_HandleWindowResize(screen_width, screen_height);
 
 				Backend_PostWindowCreation();
 
@@ -132,11 +140,22 @@ void RenderBackend_Deinit(void)
 
 void RenderBackend_DrawScreen(void)
 {
+	if (SDL_SetRenderTarget(renderer, upscaled_framebuffer.texture) < 0)
+		Backend_PrintError("Couldn't set upscaled framebuffer as the current rendering target: %s", SDL_GetError());
+
+	if (SDL_RenderCopy(renderer, framebuffer.texture, NULL, NULL) < 0)
+		Backend_PrintError("Failed to copy framebuffer texture to upscaled framebuffer: %s", SDL_GetError());
+
 	if (SDL_SetRenderTarget(renderer, NULL) < 0)
 		Backend_PrintError("Couldn't set default render target as the current rendering target: %s", SDL_GetError());
 
-	if (SDL_RenderCopy(renderer, framebuffer.texture, NULL, NULL) < 0)
-		Backend_PrintError("Failed to copy framebuffer texture to default render target: %s", SDL_GetError());
+	if (SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0xFF) < 0)
+		Backend_PrintError("Couldn't set color for drawing operations: %s", SDL_GetError());
+
+	SDL_RenderClear(renderer);
+
+	if (SDL_RenderCopy(renderer, upscaled_framebuffer.texture, NULL, &upscaled_framebuffer_rect) < 0)
+		Backend_PrintError("Failed to copy upscaled framebuffer texture to default render target: %s", SDL_GetError());
 
 	SDL_RenderPresent(renderer);
 }
@@ -418,8 +437,36 @@ void RenderBackend_HandleRenderTargetLoss(void)
 
 void RenderBackend_HandleWindowResize(size_t width, size_t height)
 {
-	(void)width;
-	(void)height;
+	size_t upscale_factor = MAX(1, MIN((width + framebuffer.width / 2) / framebuffer.width, (height + framebuffer.height / 2) / framebuffer.height));
 
-	// No problem for us
+	upscaled_framebuffer.width = framebuffer.width * upscale_factor;
+	upscaled_framebuffer.height = framebuffer.height * upscale_factor;
+
+	if (upscaled_framebuffer.texture != NULL)
+		SDL_DestroyTexture(upscaled_framebuffer.texture);
+
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+	upscaled_framebuffer.texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, upscaled_framebuffer.width, upscaled_framebuffer.height * upscale_factor);
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+
+	if (upscaled_framebuffer.texture == NULL)
+		Backend_PrintError("Couldn't regenerate upscaled framebuffer");
+
+	// Create rect that forces 4:3 no matter what size the window is
+	float window_ratio = (float)width / height;
+	float framebuffer_ratio = (float)upscaled_framebuffer.width / upscaled_framebuffer.height;
+
+	if (window_ratio >= framebuffer_ratio)
+	{
+		upscaled_framebuffer_rect.w = height * framebuffer_ratio;
+		upscaled_framebuffer_rect.h = height;
+	}
+	else
+	{
+		upscaled_framebuffer_rect.w = width;
+		upscaled_framebuffer_rect.h = width / framebuffer_ratio;
+	}
+
+	upscaled_framebuffer_rect.x = (width - upscaled_framebuffer_rect.w) / 2;
+	upscaled_framebuffer_rect.y = (height - upscaled_framebuffer_rect.h) / 2;
 }
