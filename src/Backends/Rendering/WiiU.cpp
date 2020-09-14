@@ -722,7 +722,7 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 	}
 }
 
-RenderBackend_GlyphAtlas* RenderBackend_CreateGlyphAtlas(size_t size)
+RenderBackend_GlyphAtlas* RenderBackend_CreateGlyphAtlas(size_t width, size_t height)
 {
 	RenderBackend_GlyphAtlas *atlas = (RenderBackend_GlyphAtlas*)malloc(sizeof(RenderBackend_GlyphAtlas));
 
@@ -730,8 +730,8 @@ RenderBackend_GlyphAtlas* RenderBackend_CreateGlyphAtlas(size_t size)
 	{
 		// Initialise texture
 		memset(&atlas->texture, 0, sizeof(atlas->texture));
-		atlas->texture.surface.width = size;
-		atlas->texture.surface.height = size;
+		atlas->texture.surface.width = width;
+		atlas->texture.surface.height = height;
 		atlas->texture.surface.format = GX2_SURFACE_FORMAT_UNORM_R8;
 		atlas->texture.surface.depth = 1;
 		atlas->texture.surface.dim = GX2_SURFACE_DIM_TEXTURE_2D;

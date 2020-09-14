@@ -12,8 +12,6 @@
 #include "File.h"
 #include "Backends/Rendering.h"
 
-#define MAX(a,b) ((a) > (b) ? (a) : (b))
-
 // Cave Story wasn't intended to use font anti-aliasing. It's only because Microsoft enabled it
 // by default from Windows Vista onwards that the game started using it.
 // Font anti-aliasing conflicts with the game's colour-keying, causing ugly artifacting around
@@ -1087,7 +1085,7 @@ Font* LoadFontFromData(const unsigned char *data, size_t data_size, size_t cell_
 
 					font->atlas_row_length = atlas_columns;
 
-					font->atlas = RenderBackend_CreateGlyphAtlas(MAX(atlas_columns * atlas_entry_width, atlas_rows * atlas_entry_height));
+					font->atlas = RenderBackend_CreateGlyphAtlas(atlas_columns * atlas_entry_width, atlas_rows * atlas_entry_height);
 
 					if (font->atlas != NULL)
 					{

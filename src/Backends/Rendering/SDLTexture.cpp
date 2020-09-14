@@ -335,13 +335,13 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 		Backend_PrintError("Couldn't enable alpha blending for drawing operations: %s", SDL_GetError());
 }
 
-RenderBackend_GlyphAtlas* RenderBackend_CreateGlyphAtlas(size_t size)
+RenderBackend_GlyphAtlas* RenderBackend_CreateGlyphAtlas(size_t width, size_t height)
 {
 	RenderBackend_GlyphAtlas *atlas = (RenderBackend_GlyphAtlas*)malloc(sizeof(RenderBackend_GlyphAtlas));
 
 	if (atlas != NULL)
 	{
-		atlas->texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STATIC, size, size);
+		atlas->texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STATIC, width, height);
 
 		if (atlas->texture != NULL)
 		{

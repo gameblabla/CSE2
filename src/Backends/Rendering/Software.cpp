@@ -22,7 +22,8 @@ typedef struct RenderBackend_Surface
 typedef struct RenderBackend_GlyphAtlas
 {
 	unsigned char *pixels;
-	size_t size;
+	size_t width;
+	size_t height;
 } RenderBackend_GlyphAtlas;
 
 static RenderBackend_Surface framebuffer;
@@ -258,17 +259,18 @@ ATTRIBUTE_HOT void RenderBackend_ColourFill(RenderBackend_Surface *surface, cons
 	}
 }
 
-RenderBackend_GlyphAtlas* RenderBackend_CreateGlyphAtlas(size_t size)
+RenderBackend_GlyphAtlas* RenderBackend_CreateGlyphAtlas(size_t width, size_t height)
 {
 	RenderBackend_GlyphAtlas *atlas = (RenderBackend_GlyphAtlas*)malloc(sizeof(RenderBackend_GlyphAtlas));
 
 	if (atlas != NULL)
 	{
-		atlas->pixels = (unsigned char*)malloc(size * size);
+		atlas->pixels = (unsigned char*)malloc(width * height);
 
 		if (atlas->pixels != NULL)
 		{
-			atlas->size = size;
+			atlas->width = width;
+			atlas->height = height;
 
 			return atlas;
 		}
@@ -288,7 +290,7 @@ void RenderBackend_DestroyGlyphAtlas(RenderBackend_GlyphAtlas *atlas)
 void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t y, const unsigned char *pixels, size_t width, size_t height)
 {
 	for (size_t i = 0; i < height; ++i)
-		memcpy(&atlas->pixels[(y + i) * atlas->size + x], &pixels[i * width], width);
+		memcpy(&atlas->pixels[(y + i) * atlas->width + x], &pixels[i * width], width);
 }
 
 void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBackend_Surface *destination_surface, unsigned char red, unsigned char green, unsigned char blue)
@@ -311,7 +313,7 @@ void RenderBackend_DrawGlyph(RenderBackend_GlyphAtlas *atlas, long x, long y, si
 	{
 		for (unsigned int ix = MAX(-x, 0); x + ix < MIN(x + glyph_width, glyph_destination_surface->width); ++ix)
 		{
-			const unsigned char alpha_int = atlas->pixels[(glyph_y + iy) * atlas->size + (glyph_x + ix)];
+			const unsigned char alpha_int = atlas->pixels[(glyph_y + iy) * atlas->width + (glyph_x + ix)];
 
 			if (alpha_int != 0)
 			{

@@ -197,13 +197,13 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 		Backend_PrintError("Couldn't fill rectangle with color: %s", SDL_GetError());
 }
 
-RenderBackend_GlyphAtlas* RenderBackend_CreateGlyphAtlas(size_t size)
+RenderBackend_GlyphAtlas* RenderBackend_CreateGlyphAtlas(size_t width, size_t height)
 {
 	RenderBackend_GlyphAtlas *atlas = (RenderBackend_GlyphAtlas*)malloc(sizeof(RenderBackend_GlyphAtlas));
 
 	if (atlas != NULL)
 	{
-		atlas->sdlsurface = SDL_CreateRGBSurfaceWithFormat(0, size, size, 0, SDL_PIXELFORMAT_RGBA32);
+		atlas->sdlsurface = SDL_CreateRGBSurfaceWithFormat(0, width, height, 0, SDL_PIXELFORMAT_RGBA32);
 
 		if (atlas->sdlsurface != NULL)
 		{

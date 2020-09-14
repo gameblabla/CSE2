@@ -40,7 +40,8 @@ typedef struct RenderBackend_Surface
 typedef struct RenderBackend_GlyphAtlas
 {
 	GLuint texture_id;
-	size_t size;
+	size_t width;
+	size_t height;
 } RenderBackend_GlyphAtlas;
 
 typedef struct Coordinate2D
@@ -866,21 +867,22 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 // Glyph management //
 //////////////////////
 
-RenderBackend_GlyphAtlas* RenderBackend_CreateGlyphAtlas(size_t size)
+RenderBackend_GlyphAtlas* RenderBackend_CreateGlyphAtlas(size_t width, size_t height)
 {
 	RenderBackend_GlyphAtlas *atlas = (RenderBackend_GlyphAtlas*)malloc(sizeof(RenderBackend_GlyphAtlas));
 
 	if (atlas != NULL)
 	{
-		atlas->size = size;
+		atlas->width = width;
+		atlas->height = height;
 
 		glGenTextures(1, &atlas->texture_id);
 		glBindTexture(GL_TEXTURE_2D, atlas->texture_id);
 
 	#ifdef USE_OPENGLES2
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, size, size, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, width, height, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, NULL);
 	#else
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, size, size, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
 	#endif
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -986,10 +988,10 @@ void RenderBackend_DrawGlyph(RenderBackend_GlyphAtlas *atlas, long x, long y, si
 		vertex_buffer_slot->vertices[1][2].position.x = vertex_left;
 		vertex_buffer_slot->vertices[1][2].position.y = vertex_bottom;
 
-		const GLfloat texture_left = glyph_x / (GLfloat)atlas->size;
-		const GLfloat texture_top = glyph_y / (GLfloat)atlas->size;
-		const GLfloat texture_right = (glyph_x + glyph_width) / (GLfloat)atlas->size;
-		const GLfloat texture_bottom = (glyph_y + glyph_height) / (GLfloat)atlas->size;
+		const GLfloat texture_left = glyph_x / (GLfloat)atlas->width;
+		const GLfloat texture_top = glyph_y / (GLfloat)atlas->height;
+		const GLfloat texture_right = (glyph_x + glyph_width) / (GLfloat)atlas->width;
+		const GLfloat texture_bottom = (glyph_y + glyph_height) / (GLfloat)atlas->height;
 
 		vertex_buffer_slot->vertices[0][0].texture.x = texture_left;
 		vertex_buffer_slot->vertices[0][0].texture.y = texture_top;

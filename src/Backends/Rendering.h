@@ -24,7 +24,7 @@ unsigned char* RenderBackend_LockSurface(RenderBackend_Surface *surface, size_t 
 void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, size_t width, size_t height);
 void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBackend_Rect *rect, RenderBackend_Surface *destination_surface, long x, long y, bool colour_key);
 void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBackend_Rect *rect, unsigned char red, unsigned char green, unsigned char blue);
-RenderBackend_GlyphAtlas* RenderBackend_CreateGlyphAtlas(size_t size);
+RenderBackend_GlyphAtlas* RenderBackend_CreateGlyphAtlas(size_t width, size_t height);
 void RenderBackend_DestroyGlyphAtlas(RenderBackend_GlyphAtlas *atlas);
 void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t y, const unsigned char *pixels, size_t width, size_t height);
 void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBackend_Surface *destination_surface, unsigned char red, unsigned char green, unsigned char blue);
