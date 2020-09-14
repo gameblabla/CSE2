@@ -40,21 +40,15 @@ This branch takes a different direction to the `accurate` branch, but they still
 share some core philosophies:
 
 ## Goal
-The goal is still to accurately-reproduce Cave Story's original code, but
-modified to the extent that it is easy to port to other platforms. This branch
-is intended for purists that don't want to use Windows or its deprecated APIs.
+While accurately-reproducing Cave Story's original code is still a priority, the
+main focus of this branch is to port the game to other platforms, while also
+preserving the original experience of the game as it was back in 2004.
+
+Essentially, this branch exists to provide a purist Cave Story experience
+without requiring an old Windows XP computer.
 
 Notably, this means bugs should still be left intact. However, bugs and other
 coding errors that affect portability should be fixed.
-
-Unlike the `accurate` branch, the focus of this branch is not to reproduce the
-exact behaviour of the original code, but rather to reproduce the original
-experience of the game, as it was back in 2004. This means changes are allowed
-if they 'de-age' the game: for example, when playing Cave Story on Windows XP,
-the dialogue font will not be anti-aliased - however, when playing on later
-versions of Windows, it will be anti-aliased. This conflicts with the game's
-colour-keying system, creating an ugly black outline around the letters. This
-issue is corrected in this branch, so that the original behaviour is preserved.
 
 For comparison, I believe this branch shares some parallels with the
 Chocolate Doom project, except perhaps more strict. See the link below for their
