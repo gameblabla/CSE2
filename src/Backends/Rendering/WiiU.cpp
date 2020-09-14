@@ -517,6 +517,19 @@ void RenderBackend_FreeSurface(RenderBackend_Surface *surface)
 {
 	if (surface != NULL)
 	{
+		// Flush the vertex buffer if we're about to destroy its texture
+		if (&surface->texture == last_source_texture)
+		{
+			FlushVertexBuffer();
+			last_source_texture = NULL;
+		}
+
+		if (&surface->texture == last_destination_texture)
+		{
+			FlushVertexBuffer();
+			last_destination_texture = NULL;
+		}
+
 		if (surface->render_target)
 			GX2RDestroySurfaceEx(&surface->colour_buffer.surface, (GX2RResourceFlags)0);
 
@@ -539,6 +552,10 @@ void RenderBackend_RestoreSurface(RenderBackend_Surface *surface)
 
 void RenderBackend_UploadSurface(RenderBackend_Surface *surface, const unsigned char *pixels, size_t width, size_t height)
 {
+	// Flush the vertex buffer if we're about to modify its texture
+	if (&surface->texture == last_source_texture || &surface->texture == last_destination_texture)
+		FlushVertexBuffer();
+
 	// Convert from RGB24 to RGBA32, and upload it to the GPU texture
 	unsigned char *buffer = (unsigned char*)GX2RLockSurfaceEx(&surface->texture.surface, 0, (GX2RResourceFlags)0);
 
