@@ -352,7 +352,7 @@ static void FlushVertexBuffer(void)
 	if (local_vertex_buffer_size > vertex_buffer_size[current_vertex_buffer])
 	{
 		vertex_buffer_size[current_vertex_buffer] = local_vertex_buffer_size;
-		glBufferData(GL_ARRAY_BUFFER, vertex_buffer_size[current_vertex_buffer] * sizeof(VertexBufferSlot), local_vertex_buffer, GL_STREAM_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, vertex_buffer_size[current_vertex_buffer] * sizeof(VertexBufferSlot), local_vertex_buffer, GL_DYNAMIC_DRAW);
 	}
 	else
 	{
