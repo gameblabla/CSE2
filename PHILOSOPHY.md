@@ -47,6 +47,15 @@ is intended for purists that don't want to use Windows or its deprecated APIs.
 Notably, this means bugs should still be left intact. However, bugs and other
 coding errors that affect portability should be fixed.
 
+Unlike the `accurate` branch, the focus of this branch is not to reproduce the
+exact behaviour of the original code, but rather to reproduce the original
+experience of the game, as it was back in 2004. This means changes are allowed
+if they 'de-age' the game: for example, when playing Cave Story on Windows XP,
+the dialogue font will not be anti-aliased - however, when playing on later
+versions of Windows, it will be anti-aliased. This conflicts with the game's
+colour-keying system, creating an ugly black outline around the letters. This
+issue is corrected in this branch, so that the original behaviour is preserved.
+
 For comparison, I believe this branch shares some parallels with the
 Chocolate Doom project, except perhaps more strict. See the link below for their
 list of philosophies which may be applicable here:
