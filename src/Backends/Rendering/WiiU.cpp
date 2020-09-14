@@ -41,7 +41,6 @@ typedef struct RenderBackend_Surface
 	size_t width;
 	size_t height;
 	bool render_target;
-	unsigned char *lock_buffer;	// TODO - Dumb
 } RenderBackend_Surface;
 
 typedef struct RenderBackend_GlyphAtlas
@@ -538,49 +537,29 @@ void RenderBackend_RestoreSurface(RenderBackend_Surface *surface)
 	(void)surface;
 }
 
-unsigned char* RenderBackend_LockSurface(RenderBackend_Surface *surface, size_t *pitch, size_t width, size_t height)
+void RenderBackend_UploadSurface(RenderBackend_Surface *surface, const unsigned char *pixels, size_t width, size_t height)
 {
-	if (surface != NULL)
+	// Convert from RGB24 to RGBA32, and upload it to the GPU texture
+	unsigned char *buffer = (unsigned char*)GX2RLockSurfaceEx(&surface->texture.surface, 0, (GX2RResourceFlags)0);
+
+	if (buffer != NULL)
 	{
-		// Create a temporary RGB24 buffer (this backend uses RGBA32
-		// internally, so we can't just use a locked texture)
-		surface->lock_buffer = (unsigned char*)malloc(width * height * 3);
-		*pitch = width * 3;
+		const unsigned char *in_pointer = pixels;
 
-		return surface->lock_buffer;
-	}
-
-	return NULL;
-}
-
-void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, size_t width, size_t height)
-{
-	if (surface != NULL)
-	{
-		if (surface->lock_buffer != NULL)
+		for (size_t y = 0; y < height; ++y)
 		{
-			// Convert from RGB24 to RGBA32, and upload it to the GPU texture
-			unsigned char *buffer = (unsigned char*)GX2RLockSurfaceEx(&surface->texture.surface, 0, (GX2RResourceFlags)0);
+			unsigned char *out_pointer = &buffer[y * surface->texture.surface.pitch * 4];
 
-			const unsigned char *in_pointer = surface->lock_buffer;
-
-			for (size_t y = 0; y < height; ++y)
+			for (size_t x = 0; x < width; ++x)
 			{
-				unsigned char *out_pointer = &buffer[surface->texture.surface.pitch * 4 * y];
-
-				for (size_t x = 0; x < width; ++x)
-				{
-					*out_pointer++ = *in_pointer++;
-					*out_pointer++ = *in_pointer++;
-					*out_pointer++ = *in_pointer++;
-					*out_pointer++ = 0;
-				}
+				*out_pointer++ = *in_pointer++;
+				*out_pointer++ = *in_pointer++;
+				*out_pointer++ = *in_pointer++;
+				*out_pointer++ = 0;
 			}
-
-			free(surface->lock_buffer);
-
-			GX2RUnlockSurfaceEx(&surface->texture.surface, 0, (GX2RResourceFlags)0);
 		}
+
+		GX2RUnlockSurfaceEx(&surface->texture.surface, 0, (GX2RResourceFlags)0);
 	}
 }
 
