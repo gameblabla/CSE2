@@ -141,26 +141,15 @@ void RenderBackend_RestoreSurface(RenderBackend_Surface *surface)
 	(void)surface;
 }
 
-unsigned char* RenderBackend_LockSurface(RenderBackend_Surface *surface, size_t *pitch, size_t width, size_t height)
+void RenderBackend_UploadSurface(RenderBackend_Surface *surface, const unsigned char *pixels, size_t width, size_t height)
 {
-	(void)width;
-	(void)height;
+	if (SDL_LockSurface(surface->sdlsurface) == 0)
+	{
+		for (size_t y = 0; y < height; ++y)
+			memcpy(&((unsigned char*)surface->sdlsurface->pixels)[y * surface->sdlsurface->pitch], &pixels[y * width * 3], width * 3);
 
-	if (surface == NULL)
-		return NULL;
-
-	SDL_LockSurface(surface->sdlsurface);
-
-	*pitch = surface->sdlsurface->pitch;
-	return (unsigned char*)surface->sdlsurface->pixels;
-}
-
-void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, size_t width, size_t height)
-{
-	(void)width;
-	(void)height;
-
-	SDL_UnlockSurface(surface->sdlsurface);
+		SDL_UnlockSurface(surface->sdlsurface);
+	}
 }
 
 void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBackend_Rect *rect, RenderBackend_Surface *destination_surface, long x, long y, bool colour_key)
