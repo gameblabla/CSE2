@@ -696,29 +696,14 @@ void RenderBackend_RestoreSurface(RenderBackend_Surface *surface)
 	(void)surface;
 }
 
-unsigned char* RenderBackend_LockSurface(RenderBackend_Surface *surface, size_t *pitch, size_t width, size_t height)
+void RenderBackend_UploadSurface(RenderBackend_Surface *surface, const unsigned char *pixels, size_t width, size_t height)
 {
-	if (surface == NULL)
-		return NULL;
-
-	surface->pixels = (unsigned char*)malloc(width * height * 3);
-	*pitch = width * 3;
-	return surface->pixels;
-}
-
-void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, size_t width, size_t height)
-{
-	if (surface == NULL)
-		return;
-
 	// Flush the vertex buffer if we're about to modify its texture
 	if (surface->texture_id == last_source_texture || surface->texture_id == last_destination_texture)
 		FlushVertexBuffer();
 
 	glBindTexture(GL_TEXTURE_2D, surface->texture_id);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, surface->pixels);
-	free(surface->pixels);
-
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 	glBindTexture(GL_TEXTURE_2D, last_source_texture);
 }
 
