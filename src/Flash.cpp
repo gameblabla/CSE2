@@ -6,7 +6,7 @@
 
 static struct
 {
-	int mode;
+	FlashMode mode;
 	int act_no;
 	BOOL flag;
 	int cnt;
@@ -24,7 +24,7 @@ void InitFlash(void)
 	gFlashColor = GetCortBoxColor(RGB(0xFF, 0xFF, 0xFE));
 }
 
-void SetFlash(int x, int y, int mode)
+void SetFlash(int x, int y, FlashMode mode)
 {
 	flash.act_no = 0;
 	flash.flag = TRUE;
@@ -41,7 +41,7 @@ void ActFlash_Explosion(int flx, int fly)
 
 	switch (flash.act_no)
 	{
-		case 0:
+		case 0: // Expand
 			flash.cnt += 0x200;
 			flash.width += flash.cnt;
 
@@ -59,26 +59,28 @@ void ActFlash_Explosion(int flx, int fly)
 			if (bottom > WINDOW_HEIGHT)
 				bottom = WINDOW_HEIGHT;
 
+			// The tall part of the explosion
 			flash.rect1.left = left;
 			flash.rect1.right = right;
 			flash.rect1.top = 0;
 			flash.rect1.bottom = WINDOW_HEIGHT;
 
+			// The wide part of the explosion
 			flash.rect2.left = 0;
 			flash.rect2.right = WINDOW_WIDTH;
 			flash.rect2.top = top;
 			flash.rect2.bottom = bottom;
 
-			if (flash.width > (WINDOW_WIDTH * 0x200 * 4))
+			if (flash.width > WINDOW_WIDTH * 0x200 * 4) // I guess in theory this means that the explosion would take longer in widescreen...
 			{
 				flash.act_no = 1;
 				flash.cnt = 0;
-				flash.width = (WINDOW_HEIGHT * 0x200);
+				flash.width = WINDOW_HEIGHT * 0x200;
 			}
 
 			break;
 
-		case 1:
+		case 1: // Shrink
 			flash.width -= flash.width / 8;
 
 			if ((flash.width / 0x100) == 0)
@@ -92,11 +94,13 @@ void ActFlash_Explosion(int flx, int fly)
 			if (bottom > WINDOW_HEIGHT)
 				bottom = WINDOW_HEIGHT;
 
+			// The tall part of the explosion
 			flash.rect1.left = 0;
 			flash.rect1.right = 0;
 			flash.rect1.top = 0;
 			flash.rect1.bottom = 0;
 
+			// The wide part of the explosion
 			flash.rect2.top = top;
 			flash.rect2.bottom = bottom;
 			flash.rect2.left = 0;
@@ -141,10 +145,11 @@ void ActFlash(int flx, int fly)
 
 	switch (flash.mode)
 	{
-		case 1:
+		case FLASH_MODE_EXPLOSION:
 			ActFlash_Explosion(flx, fly);
 			break;
-		case 2:
+
+		case FLASH_MODE_FLASH:
 			ActFlash_Flash();
 			break;
 	}

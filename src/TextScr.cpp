@@ -1032,7 +1032,7 @@ int TextScriptProc(void)
 					}
 					else if (IS_COMMAND('F','L','A'))
 					{
-						SetFlash(0, 0, 2);
+						SetFlash(0, 0, FLASH_MODE_FLASH);
 						gTS.p_read += 4;
 					}
 					else if (IS_COMMAND('F','A','I'))

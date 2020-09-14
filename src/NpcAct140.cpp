@@ -728,7 +728,7 @@ void ActNpc146(NPCHAR *npc)
 			npc->act_no = 1;
 
 			if (npc->direct == 2)
-				SetFlash(0, 0, 2);
+				SetFlash(0, 0, FLASH_MODE_FLASH);
 			// Fallthrough
 		case 1:
 			if (++npc->act_wait > 10)
