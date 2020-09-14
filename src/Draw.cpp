@@ -412,6 +412,9 @@ BOOL MakeSurface_Generic(int bxsize, int bysize, SurfaceID surf_no, BOOL bSystem
 
 void BackupSurface(SurfaceID surf_no, const RECT *rect)
 {
+	if (surf[surf_no] == NULL)
+		return;
+
 	static RenderBackend_Rect rcSet;	// TODO - Not the original variable name
 	rcSet.left = rect->left * mag;
 	rcSet.top = rect->top * mag;
@@ -427,6 +430,9 @@ void BackupSurface(SurfaceID surf_no, const RECT *rect)
 
 void PutBitmap3(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID surf_no) // Transparency
 {
+	if (surf[surf_no] == NULL)
+		return;
+
 	static RenderBackend_Rect rcWork;
 
 	rcWork.left = rect->left;
@@ -466,6 +472,9 @@ void PutBitmap3(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID su
 
 void PutBitmap4(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID surf_no) // No Transparency
 {
+	if (surf[surf_no] == NULL)
+		return;
+
 	static RenderBackend_Rect rcWork;
 
 	rcWork.left = rect->left;
@@ -505,6 +514,9 @@ void PutBitmap4(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID su
 
 void Surface2Surface(int x, int y, const RECT *rect, SurfaceID to, SurfaceID from)
 {
+	if (surf[to] == NULL || surf[from] == NULL)
+		return;
+
 	static RenderBackend_Rect rcWork;
 
 	rcWork.left = rect->left * mag;
@@ -546,6 +558,9 @@ void CortBox(const RECT *rect, unsigned long col)
 
 void CortBox2(const RECT *rect, unsigned long col, SurfaceID surf_no)
 {
+	if (surf[surf_no] == NULL)
+		return;
+
 	static RenderBackend_Rect rcSet;	// TODO - Not the original variable name
 	rcSet.left = rect->left * mag;
 	rcSet.top = rect->top * mag;
@@ -700,6 +715,9 @@ void PutText(int x, int y, const char *text, unsigned long color)
 
 void PutText2(int x, int y, const char *text, unsigned long color, SurfaceID surf_no)
 {
+	if (surf[surf_no] == NULL)
+		return;
+
 	DrawText(font, surf[surf_no], x * mag, y * mag, color, text);
 }
 
