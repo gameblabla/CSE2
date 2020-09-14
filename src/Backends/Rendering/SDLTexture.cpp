@@ -253,7 +253,7 @@ void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, size_t width, s
 
 	const unsigned char *src_pixel = surface->pixels;
 
-	// Convert the SDL_Surface's colour-keyed pixels to RGBA32
+	// Convert the colour-keyed pixels to RGBA32
 	for (size_t y = 0; y < height; ++y)
 	{
 		unsigned char *buffer_pointer = &buffer[y * width * 4];
