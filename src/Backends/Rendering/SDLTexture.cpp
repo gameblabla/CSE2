@@ -133,6 +133,9 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t scree
 
 void RenderBackend_Deinit(void)
 {
+	if (upscaled_framebuffer.texture != NULL)
+		SDL_DestroyTexture(upscaled_framebuffer.texture);
+
 	SDL_DestroyTexture(framebuffer.texture);
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
