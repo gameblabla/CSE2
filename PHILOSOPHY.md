@@ -25,34 +25,36 @@ know from the [Organya source code release](https://github.com/shbow/organya/)
 what Pixel's code-style looked like, and I find it **extremely** hard to read.
 
 ## Language
-Cave Story's developer, Pixel, primarily speaks Japanese, but his code's
+Cave Story's developer (Pixel) primarily speaks Japanese, but his code's
 variable/function names are mostly written in English (with a few rare instances
 of Romanised Japanese).
 
-The Organya source code release indicates Pixel wrote his comments in Japanese,
-however, in this project, I prefer them to be written in English.
+The Organya source code release indicates that Pixel wrote his comments in
+Japanese, however, in this project, I prefer them to be written in English.
 
 The English employed in this project is a mix of American English, Canadian
 English, and British English.
 
+
+
 # `portable` branch
 This branch takes a different direction to the `accurate` branch, but they still
-share some core philosophies:
+share many core philosophies:
 
 ## Goal
 While accurately-reproducing Cave Story's original code is still a priority, the
 main focus of this branch is to port the game to other platforms, while also
-preserving the original experience of the game as it was back in 2004.
+preserving the game the way it was experienced back in 2004.
 
 Essentially, this branch exists to provide a purist Cave Story experience
 without requiring an old Windows XP computer.
 
-Notably, this means bugs should still be left intact. However, bugs and other
-coding errors that affect portability should be fixed.
+Notably, this means that bugs should still be left intact. However, bugs and
+other coding errors that affect portability should be fixed.
 
-For comparison, I believe this branch shares some parallels with the
-Chocolate Doom project, except perhaps more strict. See the link below for their
-list of philosophies which may be applicable here:
+For comparison, I believe this branch shares many parallels with the
+Chocolate Doom project. Follow the link below to see that project's list of
+philosophies, which may be applicable here:
 
 https://github.com/chocolate-doom/chocolate-doom/blob/master/PHILOSOPHY.md
 
