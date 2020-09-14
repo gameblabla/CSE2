@@ -96,6 +96,8 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t scree
 
 			if (framebuffer.texture != NULL)
 			{
+				SDL_SetTextureBlendMode(framebuffer.texture, SDL_BLENDMODE_NONE);
+
 				framebuffer.width = screen_width;
 				framebuffer.height = screen_height;
 
