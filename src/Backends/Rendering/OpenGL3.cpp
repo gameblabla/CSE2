@@ -675,9 +675,17 @@ void RenderBackend_FreeSurface(RenderBackend_Surface *surface)
 		return;
 
 	// Flush the vertex buffer if we're about to destroy its texture
-	// TODO - This leaves `last_source_texture`/`last_destination_texture` dangling
-	if (surface->texture_id == last_source_texture || surface->texture_id == last_destination_texture)
+	if (surface->texture_id == last_source_texture)
+	{
 		FlushVertexBuffer();
+		last_source_texture = 0;
+	}
+
+	if (surface->texture_id == last_destination_texture)
+	{
+		FlushVertexBuffer();
+		last_destination_texture = 0;
+	}
 
 	glDeleteTextures(1, &surface->texture_id);
 	free(surface);
