@@ -39,7 +39,7 @@ static SDL_Renderer *renderer;
 static RenderBackend_Surface framebuffer;
 static RenderBackend_Surface upscaled_framebuffer;
 
-static SDL_Rect upscaled_framebuffer_rect;
+static SDL_Rect window_rect;
 
 static RenderBackend_Surface *surface_list_head;
 
@@ -162,7 +162,7 @@ void RenderBackend_DrawScreen(void)
 
 	SDL_RenderClear(renderer);
 
-	if (SDL_RenderCopy(renderer, upscaled_framebuffer.texture != NULL ? upscaled_framebuffer.texture : framebuffer.texture, NULL, &upscaled_framebuffer_rect) < 0)
+	if (SDL_RenderCopy(renderer, upscaled_framebuffer.texture != NULL ? upscaled_framebuffer.texture : framebuffer.texture, NULL, &window_rect) < 0)
 		Backend_PrintError("Failed to copy upscaled framebuffer texture to default render target: %s", SDL_GetError());
 
 	SDL_RenderPresent(renderer);
@@ -474,15 +474,15 @@ void RenderBackend_HandleWindowResize(size_t width, size_t height)
 
 	if (window_ratio >= framebuffer_ratio)
 	{
-		upscaled_framebuffer_rect.w = height * framebuffer_ratio;
-		upscaled_framebuffer_rect.h = height;
+		window_rect.w = height * framebuffer_ratio;
+		window_rect.h = height;
 	}
 	else
 	{
-		upscaled_framebuffer_rect.w = width;
-		upscaled_framebuffer_rect.h = width / framebuffer_ratio;
+		window_rect.w = width;
+		window_rect.h = width / framebuffer_ratio;
 	}
 
-	upscaled_framebuffer_rect.x = (width - upscaled_framebuffer_rect.w) / 2;
-	upscaled_framebuffer_rect.y = (height - upscaled_framebuffer_rect.h) / 2;
+	window_rect.x = (width - window_rect.w) / 2;
+	window_rect.y = (height - window_rect.h) / 2;
 }
