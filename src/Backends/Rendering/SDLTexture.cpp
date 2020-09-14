@@ -228,32 +228,17 @@ void RenderBackend_RestoreSurface(RenderBackend_Surface *surface)
 	surface->lost = false;
 }
 
-unsigned char* RenderBackend_LockSurface(RenderBackend_Surface *surface, size_t *pitch, size_t width, size_t height)
+void RenderBackend_UploadSurface(RenderBackend_Surface *surface, const unsigned char *pixels, size_t width, size_t height)
 {
-	if (surface == NULL)
-		return NULL;
-
-	*pitch = width * 3;
-
-	surface->pixels = (unsigned char*)malloc(width * height * 3);
-
-	return surface->pixels;
-}
-
-void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, size_t width, size_t height)
-{
-	if (surface == NULL)
-		return;
-
 	unsigned char *buffer = (unsigned char*)malloc(width * height * 4);
 
 	if (buffer == NULL)
 	{
-		Backend_PrintError("Couldn't allocate memory for surface buffer: %s", SDL_GetError());
+		Backend_PrintError("Couldn't allocate memory for surface buffer");
 		return;
 	}
 
-	const unsigned char *src_pixel = surface->pixels;
+	const unsigned char *src_pixel = pixels;
 
 	// Convert the colour-keyed pixels to RGBA32
 	for (size_t y = 0; y < height; ++y)
@@ -274,8 +259,6 @@ void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, size_t width, s
 			src_pixel += 3;
 		}
 	}
-
-	free(surface->pixels);
 
 	SDL_Rect rect = {0, 0, (int)width, (int)height};
 
