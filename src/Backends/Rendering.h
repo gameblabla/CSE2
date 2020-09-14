@@ -20,8 +20,7 @@ RenderBackend_Surface* RenderBackend_CreateSurface(size_t width, size_t height, 
 void RenderBackend_FreeSurface(RenderBackend_Surface *surface);
 bool RenderBackend_IsSurfaceLost(RenderBackend_Surface *surface);
 void RenderBackend_RestoreSurface(RenderBackend_Surface *surface);
-unsigned char* RenderBackend_LockSurface(RenderBackend_Surface *surface, size_t *pitch, size_t width, size_t height);
-void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, size_t width, size_t height);
+void RenderBackend_UploadSurface(RenderBackend_Surface *surface, const unsigned char *pixels, size_t width, size_t height);
 void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBackend_Rect *rect, RenderBackend_Surface *destination_surface, long x, long y, bool colour_key);
 void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBackend_Rect *rect, unsigned char red, unsigned char green, unsigned char blue);
 RenderBackend_GlyphAtlas* RenderBackend_CreateGlyphAtlas(size_t width, size_t height);

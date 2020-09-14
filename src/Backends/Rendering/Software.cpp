@@ -108,23 +108,10 @@ void RenderBackend_RestoreSurface(RenderBackend_Surface *surface)
 	(void)surface;
 }
 
-unsigned char* RenderBackend_LockSurface(RenderBackend_Surface *surface, size_t *pitch, size_t width, size_t height)
+void RenderBackend_UploadSurface(RenderBackend_Surface *surface, const unsigned char *pixels, size_t width, size_t height)
 {
-	(void)width;
-	(void)height;
-
-	if (surface == NULL)
-		return NULL;
-
-	*pitch = surface->pitch;
-	return surface->pixels;
-}
-
-void RenderBackend_UnlockSurface(RenderBackend_Surface *surface, size_t width, size_t height)
-{
-	(void)surface;
-	(void)width;
-	(void)height;
+	for (size_t y = 0; y < height; ++y)
+		memcpy(&surface->pixels[y * surface->pitch], &pixels[y * width * 3], width * 3);
 }
 
 ATTRIBUTE_HOT void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBackend_Rect *rect, RenderBackend_Surface *destination_surface, long x, long y, bool colour_key)

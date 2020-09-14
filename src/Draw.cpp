@@ -1,6 +1,7 @@
 #include "Draw.h"
 
 #include <stddef.h>
+#include <stdlib.h>
 #include <string.h>
 #include <string>
 
@@ -150,30 +151,23 @@ void ReleaseSurface(SurfaceID s)
 static BOOL ScaleAndUploadSurface(const unsigned char *image_buffer, size_t width, size_t height, SurfaceID surf_no)
 {
 	// IF YOU WANT TO ADD HD SPRITES, THIS IS THE CODE YOU SHOULD EDIT
-	size_t pitch;
-	unsigned char *pixels = RenderBackend_LockSurface(surf[surf_no], &pitch, width * mag, height * mag);
-
-	if (pixels == NULL)
-		return FALSE;
-
 	if (mag == 1)
 	{
 		// Just copy the pixels the way they are
-		for (size_t y = 0; y < height; ++y)
-		{
-			const unsigned char *src_row = &image_buffer[y * width * 3];
-			unsigned char *dst_row = &pixels[y * pitch];
-
-			memcpy(dst_row, src_row, width * 3);
-		}
+		RenderBackend_UploadSurface(surf[surf_no], image_buffer, width, height);
 	}
 	else
 	{
+		unsigned char *upscaled_image_buffer = (unsigned char*)malloc(width * mag * height * mag * 3);
+
+		if (upscaled_image_buffer == NULL)
+			return FALSE;
+
 		// Upscale the bitmap to the game's internal resolution
 		for (size_t y = 0; y < height; ++y)
 		{
 			const unsigned char *src_row = &image_buffer[y * width * 3];
-			unsigned char *dst_row = &pixels[y * pitch * mag];
+			unsigned char *dst_row = &upscaled_image_buffer[y * width * 3 * mag];
 
 			const unsigned char *src_ptr = src_row;
 			unsigned char *dst_ptr = dst_row;
@@ -191,11 +185,13 @@ static BOOL ScaleAndUploadSurface(const unsigned char *image_buffer, size_t widt
 			}
 
 			for (int i = 1; i < mag; ++i)
-				memcpy(dst_row + i * pitch, dst_row, width * mag * 3);
+				memcpy(dst_row + i * width * 3, dst_row, width * mag * 3);
 		}
-	}
 
-	RenderBackend_UnlockSurface(surf[surf_no], width * mag, height * mag);
+		RenderBackend_UploadSurface(surf[surf_no], upscaled_image_buffer, width * mag, height * mag);
+
+		free(upscaled_image_buffer);
+	}
 
 	return TRUE;
 }
