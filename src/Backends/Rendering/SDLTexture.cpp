@@ -432,11 +432,6 @@ void RenderBackend_DrawGlyph(RenderBackend_GlyphAtlas *atlas, long x, long y, si
 		Backend_PrintError("Couldn't copy glyph texture portion to renderer: %s", SDL_GetError());
 }
 
-void RenderBackend_FlushGlyphs(void)
-{
-	
-}
-
 void RenderBackend_HandleRenderTargetLoss(void)
 {
 	for (RenderBackend_Surface *surface = surface_list_head; surface != NULL; surface = surface->next)

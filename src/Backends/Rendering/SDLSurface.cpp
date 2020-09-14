@@ -277,11 +277,6 @@ void RenderBackend_DrawGlyph(RenderBackend_GlyphAtlas *atlas, long x, long y, si
 		Backend_PrintError("Couldn't blit glyph indivual surface to final glyph surface: %s", SDL_GetError());
 }
 
-void RenderBackend_FlushGlyphs(void)
-{
-	
-}
-
 void RenderBackend_HandleRenderTargetLoss(void)
 {
 	// No problem for us

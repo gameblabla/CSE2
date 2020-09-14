@@ -1009,11 +1009,6 @@ void RenderBackend_DrawGlyph(RenderBackend_GlyphAtlas *atlas, long x, long y, si
 	}
 }
 
-void RenderBackend_FlushGlyphs(void)
-{
-	
-}
-
 ///////////
 // Misc. //
 ///////////

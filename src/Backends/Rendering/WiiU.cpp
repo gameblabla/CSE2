@@ -873,11 +873,6 @@ void RenderBackend_DrawGlyph(RenderBackend_GlyphAtlas *atlas, long x, long y, si
 	}
 }
 
-void RenderBackend_FlushGlyphs(void)
-{
-	
-}
-
 void RenderBackend_HandleRenderTargetLoss(void)
 {
 	// Doesn't happen on the Wii U
