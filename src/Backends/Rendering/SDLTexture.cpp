@@ -18,7 +18,6 @@
 typedef struct RenderBackend_Surface
 {
 	SDL_Texture *texture;
-	unsigned char *pixels;
 	size_t width;
 	size_t height;
 	bool render_target;

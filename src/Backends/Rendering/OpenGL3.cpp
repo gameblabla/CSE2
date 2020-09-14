@@ -34,7 +34,6 @@ typedef struct RenderBackend_Surface
 	GLuint texture_id;
 	size_t width;
 	size_t height;
-	unsigned char *pixels;
 } RenderBackend_Surface;
 
 typedef struct RenderBackend_GlyphAtlas
