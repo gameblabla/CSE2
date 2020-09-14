@@ -23,7 +23,7 @@
 //#define ENABLE_FONT_ANTIALIASING
 
 // This controls however many glyphs (letters) the game can cache in VRAM at once
-#define TOTAL_GLYPH_SLOTS 128
+#define TOTAL_GLYPH_SLOTS 256
 
 typedef struct Glyph
 {
