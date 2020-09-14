@@ -95,16 +95,11 @@ void WindowBackend_Software_DestroyWindow(void)
 	glfwDestroyWindow(window);
 }
 
-unsigned char* WindowBackend_Software_LockFramebuffer(size_t *pitch)
+unsigned char* WindowBackend_Software_GetFramebuffer(size_t *pitch)
 {
 	*pitch = framebuffer_width * 3;
 
 	return framebuffer;
-}
-
-void WindowBackend_Software_UnlockFramebuffer(void)
-{
-	// Nothing to do here
 }
 
 void WindowBackend_Software_Display(void)

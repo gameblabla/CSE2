@@ -32,6 +32,8 @@ bool WindowBackend_Software_CreateWindow(const char *window_title, size_t screen
 
 			if (framebuffer_sdlsurface != NULL)
 			{
+				SDL_LockSurface(framebuffer_sdlsurface); // If this errors then oh dear
+
 				Backend_PostWindowCreation();
 
 				return true;
@@ -64,25 +66,21 @@ void WindowBackend_Software_DestroyWindow(void)
 	SDL_DestroyWindow(window);
 }
 
-unsigned char* WindowBackend_Software_LockFramebuffer(size_t *pitch)
+unsigned char* WindowBackend_Software_GetFramebuffer(size_t *pitch)
 {
-	if (SDL_LockSurface(framebuffer_sdlsurface) < 0)
-		return NULL;
-
 	*pitch = framebuffer_sdlsurface->pitch;
 
 	return (unsigned char*)framebuffer_sdlsurface->pixels;
 }
 
-void WindowBackend_Software_UnlockFramebuffer(void)
-{
-	SDL_UnlockSurface(framebuffer_sdlsurface);
-}
-
 void WindowBackend_Software_Display(void)
 {
+	SDL_UnlockSurface(framebuffer_sdlsurface);
+
 	if (SDL_BlitSurface(framebuffer_sdlsurface, NULL, window_sdlsurface, NULL) < 0)
 		Backend_PrintError("Couldn't blit framebuffer surface to window surface: %s", SDL_GetError());
+
+	SDL_LockSurface(framebuffer_sdlsurface); // If this errors then oh dear
 
 	if (SDL_UpdateWindowSurface(window) < 0)
 		Backend_PrintError("Couldn't copy window surface to the screen: %s", SDL_GetError());
