@@ -276,7 +276,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 			hMenu = GetMenu(hWnd);
 
-		#ifdef FIX_BUGS
+		#ifdef FIX_MAJOR_BUGS
 			if (conf.display_mode == 1)
 			{
 				if (!StartDirectDraw(hWnd, 0, 0))
@@ -343,7 +343,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 					break;
 			}
 
-		#ifdef FIX_BUGS
+		#ifdef FIX_MAJOR_BUGS
 			if (!StartDirectDraw(hWnd, 2, depth))
 			{
 				ReleaseMutex(hMutex);
