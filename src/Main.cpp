@@ -232,7 +232,7 @@ int main(int argc, char *argv[])
 				windowHeight = WINDOW_HEIGHT * 2;
 			}
 
-		#ifdef FIX_BUGS
+		#ifdef FIX_MAJOR_BUGS
 			if (conf.display_mode == 1)
 			{
 				if (!StartDirectDraw(lpWindowName, windowWidth, windowHeight, 0))
@@ -266,7 +266,7 @@ int main(int argc, char *argv[])
 			windowWidth = WINDOW_WIDTH * 2;
 			windowHeight = WINDOW_HEIGHT * 2;
 
-		#ifdef FIX_BUGS
+		#ifdef FIX_MAJOR_BUGS
 			if (!StartDirectDraw(lpWindowName, windowWidth, windowHeight, 2))
 			{
 				Backend_Deinit();
