@@ -515,27 +515,24 @@ RenderBackend_Surface* RenderBackend_CreateSurface(size_t width, size_t height, 
 
 void RenderBackend_FreeSurface(RenderBackend_Surface *surface)
 {
-	if (surface != NULL)
+	// Flush the vertex buffer if we're about to destroy its texture
+	if (&surface->texture == last_source_texture)
 	{
-		// Flush the vertex buffer if we're about to destroy its texture
-		if (&surface->texture == last_source_texture)
-		{
-			FlushVertexBuffer();
-			last_source_texture = NULL;
-		}
-
-		if (&surface->texture == last_destination_texture)
-		{
-			FlushVertexBuffer();
-			last_destination_texture = NULL;
-		}
-
-		if (surface->render_target)
-			GX2RDestroySurfaceEx(&surface->colour_buffer.surface, (GX2RResourceFlags)0);
-
-		GX2RDestroySurfaceEx(&surface->texture.surface, (GX2RResourceFlags)0);
-		free(surface);
+		FlushVertexBuffer();
+		last_source_texture = NULL;
 	}
+
+	if (&surface->texture == last_destination_texture)
+	{
+		FlushVertexBuffer();
+		last_destination_texture = NULL;
+	}
+
+	if (surface->render_target)
+		GX2RDestroySurfaceEx(&surface->colour_buffer.surface, (GX2RResourceFlags)0);
+
+	GX2RDestroySurfaceEx(&surface->texture.surface, (GX2RResourceFlags)0);
+	free(surface);
 }
 
 bool RenderBackend_IsSurfaceLost(RenderBackend_Surface *surface)
@@ -582,9 +579,6 @@ void RenderBackend_UploadSurface(RenderBackend_Surface *surface, const unsigned 
 
 void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBackend_Rect *rect, RenderBackend_Surface *destination_surface, long x, long y, bool colour_key)
 {
-	if (source_surface == NULL || destination_surface == NULL)
-		return;
-
 	const RenderMode render_mode = (colour_key ? MODE_DRAW_SURFACE_WITH_TRANSPARENCY : MODE_DRAW_SURFACE);
 
 	// Flush vertex data if a context-change is needed
@@ -660,9 +654,6 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 	static unsigned char last_red;
 	static unsigned char last_green;
 	static unsigned char last_blue;
-
-	if (surface == NULL)
-		return;
 
 	// Flush vertex data if a context-change is needed
 	if (last_render_mode != MODE_COLOUR_FILL || last_destination_texture != &surface->texture || last_red != red || last_green != green || last_blue != blue)
@@ -788,9 +779,6 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBa
 	static unsigned char last_red;
 	static unsigned char last_green;
 	static unsigned char last_blue;
-
-	if (destination_surface == NULL)
-		return;
 
 	glyph_destination_surface = destination_surface;
 

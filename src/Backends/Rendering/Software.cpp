@@ -88,9 +88,6 @@ RenderBackend_Surface* RenderBackend_CreateSurface(size_t width, size_t height, 
 
 void RenderBackend_FreeSurface(RenderBackend_Surface *surface)
 {
-	if (surface == NULL)
-		return;
-
 	free(surface->pixels);
 	free(surface);
 }
@@ -115,9 +112,6 @@ void RenderBackend_UploadSurface(RenderBackend_Surface *surface, const unsigned 
 
 ATTRIBUTE_HOT void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBackend_Rect *rect, RenderBackend_Surface *destination_surface, long x, long y, bool colour_key)
 {
-	if (source_surface == NULL || source_surface->pixels == NULL || destination_surface == NULL || destination_surface->pixels == NULL)
-		return;
-
 	RenderBackend_Rect rect_clamped;
 
 	rect_clamped.left = rect->left;
@@ -197,9 +191,6 @@ ATTRIBUTE_HOT void RenderBackend_Blit(RenderBackend_Surface *source_surface, con
 
 ATTRIBUTE_HOT void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBackend_Rect *rect, unsigned char red, unsigned char green, unsigned char blue)
 {
-	if (surface == NULL || surface->pixels == NULL)
-		return;
-
 	RenderBackend_Rect rect_clamped;
 
 	rect_clamped.left = rect->left;
@@ -282,9 +273,6 @@ void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t
 void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBackend_Surface *destination_surface, unsigned char red, unsigned char green, unsigned char blue)
 {
 	(void)atlas;
-
-	if (destination_surface == NULL)
-		return;
 
 	glyph_destination_surface = destination_surface;
 

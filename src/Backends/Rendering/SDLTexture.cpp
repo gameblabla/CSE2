@@ -201,9 +201,6 @@ RenderBackend_Surface* RenderBackend_CreateSurface(size_t width, size_t height, 
 
 void RenderBackend_FreeSurface(RenderBackend_Surface *surface)
 {
-	if (surface == NULL)
-		return;
-
 	// Remove from linked list
 	if (surface->next != NULL)
 		surface->next->prev = surface->prev;
@@ -269,9 +266,6 @@ void RenderBackend_UploadSurface(RenderBackend_Surface *surface, const unsigned 
 
 void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBackend_Rect *rect, RenderBackend_Surface *destination_surface, long x, long y, bool colour_key)
 {
-	if (source_surface == NULL || destination_surface == NULL)
-		return;
-
 	SDL_Rect source_rect;
 	RectToSDLRect(rect, &source_rect);
 
@@ -290,9 +284,6 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBacke
 
 void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBackend_Rect *rect, unsigned char red, unsigned char green, unsigned char blue)
 {
-	if (surface == NULL)
-		return;
-
 	SDL_Rect sdl_rect;
 	RectToSDLRect(rect, &sdl_rect);
 
@@ -381,9 +372,6 @@ void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t
 void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBackend_Surface *destination_surface, unsigned char red, unsigned char green, unsigned char blue)
 {
 	(void)atlas;
-
-	if (destination_surface == NULL)
-		return;
 
 	if (SDL_SetRenderTarget(renderer, destination_surface->texture) < 0)
 		Backend_PrintError("Couldn't set texture as current rendering target: %s", SDL_GetError());
