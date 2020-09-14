@@ -45,7 +45,7 @@ typedef struct Glyph
 	struct Glyph *next;
 } Glyph;
 
-typedef struct FontObject
+typedef struct Font
 {
 	FT_Library library;
 	FT_Face face;
@@ -54,7 +54,7 @@ typedef struct FontObject
 	Glyph *glyph_list_head;
 	RenderBackend_GlyphAtlas *atlas;
 	size_t atlas_row_length;
-} FontObject;
+} Font;
 
 #ifdef JAPANESE
 static const unsigned short shiftjis_to_unicode_lookup[0x3100] = {
@@ -963,9 +963,9 @@ static unsigned char GammaCorrect(unsigned char value)
 }
 
 
-static Glyph* GetGlyph(FontObject *font_object, unsigned long unicode_value)
+static Glyph* GetGlyph(Font *font, unsigned long unicode_value)
 {
-	Glyph **glyph_pointer = &font_object->glyph_list_head;
+	Glyph **glyph_pointer = &font->glyph_list_head;
 	Glyph *glyph;
 
 	for (;;)
@@ -976,8 +976,8 @@ static Glyph* GetGlyph(FontObject *font_object, unsigned long unicode_value)
 		{
 			// Move it to the front of the list
 			*glyph_pointer = glyph->next;
-			glyph->next = font_object->glyph_list_head;
-			font_object->glyph_list_head = glyph;
+			glyph->next = font->glyph_list_head;
+			font->glyph_list_head = glyph;
 
 			return glyph;
 		}
@@ -991,20 +991,20 @@ static Glyph* GetGlyph(FontObject *font_object, unsigned long unicode_value)
 	// Couldn't find glyph - overwrite the old at the end.
 	// The one at the end hasn't been used in a while anyway.
 
-	unsigned int glyph_index = FT_Get_Char_Index(font_object->face, unicode_value);
+	unsigned int glyph_index = FT_Get_Char_Index(font->face, unicode_value);
 
 #ifdef ENABLE_FONT_ANTIALIASING
-	if (FT_Load_Glyph(font_object->face, glyph_index, FT_LOAD_RENDER) == 0)
+	if (FT_Load_Glyph(font->face, glyph_index, FT_LOAD_RENDER) == 0)
 #else
-	if (FT_Load_Glyph(font_object->face, glyph_index, FT_LOAD_RENDER | FT_LOAD_TARGET_MONO) == 0)
+	if (FT_Load_Glyph(font->face, glyph_index, FT_LOAD_RENDER | FT_LOAD_TARGET_MONO) == 0)
 #endif
 	{
 		FT_Bitmap bitmap;
 		FT_Bitmap_New(&bitmap);
 
-		if (FT_Bitmap_Convert(font_object->library, &font_object->face->glyph->bitmap, &bitmap, 1) == 0)
+		if (FT_Bitmap_Convert(font->library, &font->face->glyph->bitmap, &bitmap, 1) == 0)
 		{
-			switch (font_object->face->glyph->bitmap.pixel_mode)
+			switch (font->face->glyph->bitmap.pixel_mode)
 			{
 				case FT_PIXEL_MODE_GRAY:
 					for (size_t y = 0; y < bitmap.rows; ++y)
@@ -1038,109 +1038,109 @@ static Glyph* GetGlyph(FontObject *font_object, unsigned long unicode_value)
 			glyph->unicode_value = unicode_value;
 			glyph->width = bitmap.width;
 			glyph->height = bitmap.rows;
-			glyph->x_offset = font_object->face->glyph->bitmap_left;
-			glyph->y_offset = (font_object->face->size->metrics.ascender + (64 / 2)) / 64 - font_object->face->glyph->bitmap_top;
-			glyph->x_advance = font_object->face->glyph->advance.x / 64;
+			glyph->x_offset = font->face->glyph->bitmap_left;
+			glyph->y_offset = (font->face->size->metrics.ascender + (64 / 2)) / 64 - font->face->glyph->bitmap_top;
+			glyph->x_advance = font->face->glyph->advance.x / 64;
 
-			RenderBackend_UploadGlyph(font_object->atlas, glyph->x, glyph->y, bitmap.buffer, glyph->width, glyph->height);
+			RenderBackend_UploadGlyph(font->atlas, glyph->x, glyph->y, bitmap.buffer, glyph->width, glyph->height);
 
-			FT_Bitmap_Done(font_object->library, &bitmap);
+			FT_Bitmap_Done(font->library, &bitmap);
 
 			*glyph_pointer = glyph->next;
-			glyph->next = font_object->glyph_list_head;
-			font_object->glyph_list_head = glyph;
+			glyph->next = font->glyph_list_head;
+			font->glyph_list_head = glyph;
 
 			return glyph;
 		}
 
-		FT_Bitmap_Done(font_object->library, &bitmap);
+		FT_Bitmap_Done(font->library, &bitmap);
 	}
 
 	return NULL;
 }
 
-FontObject* LoadFontFromData(const unsigned char *data, size_t data_size, size_t cell_width, size_t cell_height)
+Font* LoadFontFromData(const unsigned char *data, size_t data_size, size_t cell_width, size_t cell_height)
 {
-	FontObject *font_object = (FontObject*)malloc(sizeof(FontObject));
+	Font *font = (Font*)malloc(sizeof(Font));
 
-	if (font_object != NULL)
+	if (font != NULL)
 	{
-		if (FT_Init_FreeType(&font_object->library) == 0)
+		if (FT_Init_FreeType(&font->library) == 0)
 		{
-			font_object->data = (unsigned char*)malloc(data_size);
+			font->data = (unsigned char*)malloc(data_size);
 
-			if (font_object->data != NULL)
+			if (font->data != NULL)
 			{
-				memcpy(font_object->data, data, data_size);
+				memcpy(font->data, data, data_size);
 
-				if (FT_New_Memory_Face(font_object->library, font_object->data, (FT_Long)data_size, 0, &font_object->face) == 0)
+				if (FT_New_Memory_Face(font->library, font->data, (FT_Long)data_size, 0, &font->face) == 0)
 				{
-					FT_Set_Pixel_Sizes(font_object->face, cell_width, cell_height);
+					FT_Set_Pixel_Sizes(font->face, cell_width, cell_height);
 
-					font_object->glyph_list_head = NULL;
+					font->glyph_list_head = NULL;
 
-					size_t atlas_entry_width = FT_MulFix(font_object->face->bbox.xMax - font_object->face->bbox.xMin + 1, font_object->face->size->metrics.x_scale) / 64;
-					size_t atlas_entry_height = FT_MulFix(font_object->face->bbox.yMax - font_object->face->bbox.yMin + 1, font_object->face->size->metrics.y_scale) / 64;
+					size_t atlas_entry_width = FT_MulFix(font->face->bbox.xMax - font->face->bbox.xMin + 1, font->face->size->metrics.x_scale) / 64;
+					size_t atlas_entry_height = FT_MulFix(font->face->bbox.yMax - font->face->bbox.yMin + 1, font->face->size->metrics.y_scale) / 64;
 
 					size_t atlas_columns = ceil(sqrt(atlas_entry_width * atlas_entry_height * TOTAL_GLYPH_SLOTS) / atlas_entry_width);
 					size_t atlas_rows = ceil(sqrt(atlas_entry_width * atlas_entry_height * TOTAL_GLYPH_SLOTS) / atlas_entry_height);
 
-					font_object->atlas_row_length = atlas_columns;
+					font->atlas_row_length = atlas_columns;
 
-					font_object->atlas = RenderBackend_CreateGlyphAtlas(MAX(atlas_columns * atlas_entry_width, atlas_rows * atlas_entry_height));
+					font->atlas = RenderBackend_CreateGlyphAtlas(MAX(atlas_columns * atlas_entry_width, atlas_rows * atlas_entry_height));
 
-					if (font_object->atlas != NULL)
+					if (font->atlas != NULL)
 					{
 						// Initialise the linked-list
 						for (size_t i = 0; i < TOTAL_GLYPH_SLOTS; ++i)
 						{
-							font_object->glyphs[i].next = (i == 0) ? NULL : &font_object->glyphs[i - 1];
+							font->glyphs[i].next = (i == 0) ? NULL : &font->glyphs[i - 1];
 
-							font_object->glyphs[i].x = (i % font_object->atlas_row_length) * atlas_entry_width;
-							font_object->glyphs[i].y = (i / font_object->atlas_row_length) * atlas_entry_height;
+							font->glyphs[i].x = (i % font->atlas_row_length) * atlas_entry_width;
+							font->glyphs[i].y = (i / font->atlas_row_length) * atlas_entry_height;
 						}
 
-						font_object->glyph_list_head = &font_object->glyphs[TOTAL_GLYPH_SLOTS - 1];
+						font->glyph_list_head = &font->glyphs[TOTAL_GLYPH_SLOTS - 1];
 
-						return font_object;
+						return font;
 					}
 
-					FT_Done_Face(font_object->face);
+					FT_Done_Face(font->face);
 				}
 
-				free(font_object->data);
+				free(font->data);
 			}
 
-			FT_Done_FreeType(font_object->library);
+			FT_Done_FreeType(font->library);
 		}
 
-		free(font_object);
+		free(font);
 	}
 
 	return NULL;
 }
 
-FontObject* LoadFont(const char *font_filename, size_t cell_width, size_t cell_height)
+Font* LoadFont(const char *font_filename, size_t cell_width, size_t cell_height)
 {
-	FontObject *font_object = NULL;
+	Font *font = NULL;
 
 	size_t file_size;
 	unsigned char *file_buffer = LoadFileToMemory(font_filename, &file_size);
 
 	if (file_buffer != NULL)
 	{
-		font_object = LoadFontFromData(file_buffer, file_size, cell_width, cell_height);
+		font = LoadFontFromData(file_buffer, file_size, cell_width, cell_height);
 		free(file_buffer);
 	}
 
-	return font_object;
+	return font;
 }
 
-void DrawText(FontObject *font_object, RenderBackend_Surface *surface, int x, int y, unsigned long colour, const char *string)
+void DrawText(Font *font, RenderBackend_Surface *surface, int x, int y, unsigned long colour, const char *string)
 {
-	if (font_object != NULL && surface != NULL)
+	if (font != NULL && surface != NULL)
 	{
-		RenderBackend_PrepareToDrawGlyphs(font_object->atlas, surface, (unsigned char)colour, (unsigned char)(colour >> 8), (unsigned char)(colour >> 16));
+		RenderBackend_PrepareToDrawGlyphs(font->atlas, surface, (unsigned char)colour, (unsigned char)(colour >> 8), (unsigned char)(colour >> 16));
 
 		size_t pen_x = 0;
 
@@ -1157,14 +1157,14 @@ void DrawText(FontObject *font_object, RenderBackend_Surface *surface, int x, in
 		#endif
 			string_pointer += bytes_read;
 
-			Glyph *glyph = GetGlyph(font_object, unicode_value);
+			Glyph *glyph = GetGlyph(font, unicode_value);
 
 			if (glyph != NULL)
 			{
 				const long letter_x = x + pen_x + glyph->x_offset;
 				const long letter_y = y + glyph->y_offset;
 
-				RenderBackend_DrawGlyph(font_object->atlas, letter_x, letter_y, glyph->x, glyph->y, glyph->width, glyph->height);
+				RenderBackend_DrawGlyph(font->atlas, letter_x, letter_y, glyph->x, glyph->y, glyph->width, glyph->height);
 
 				pen_x += glyph->x_advance;
 			}
@@ -1174,15 +1174,15 @@ void DrawText(FontObject *font_object, RenderBackend_Surface *surface, int x, in
 	}
 }
 
-void UnloadFont(FontObject *font_object)
+void UnloadFont(Font *font)
 {
-	if (font_object != NULL)
+	if (font != NULL)
 	{
-		RenderBackend_DestroyGlyphAtlas(font_object->atlas);
+		RenderBackend_DestroyGlyphAtlas(font->atlas);
 
-		FT_Done_Face(font_object->face);
-		free(font_object->data);
-		FT_Done_FreeType(font_object->library);
-		free(font_object);
+		FT_Done_Face(font->face);
+		free(font->data);
+		FT_Done_FreeType(font->library);
+		free(font);
 	}
 }

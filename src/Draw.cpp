@@ -35,7 +35,7 @@ static RenderBackend_Surface *framebuffer;	// TODO - Not the original variable n
 
 static RenderBackend_Surface *surf[SURFACE_ID_MAX];
 
-static FontObject *font;	// TODO - Not the original variable name
+static Font *font;	// TODO - Not the original variable name
 
 // This doesn't exist in the Linux port, so none of these symbol names are accurate
 static struct
