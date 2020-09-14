@@ -21,6 +21,7 @@ typedef struct RenderBackend_Surface
 	unsigned char *pixels;
 	size_t width;
 	size_t height;
+	bool render_target;
 	bool lost;
 
 	struct RenderBackend_Surface *next;
@@ -185,6 +186,7 @@ RenderBackend_Surface* RenderBackend_CreateSurface(size_t width, size_t height, 
 
 	surface->width = width;
 	surface->height = height;
+	surface->render_target = render_target;
 	surface->lost = false;
 
 	// Add to linked-list
@@ -435,7 +437,8 @@ void RenderBackend_DrawGlyph(RenderBackend_GlyphAtlas *atlas, long x, long y, si
 void RenderBackend_HandleRenderTargetLoss(void)
 {
 	for (RenderBackend_Surface *surface = surface_list_head; surface != NULL; surface = surface->next)
-		surface->lost = true;
+		if (surface->render_target)
+			surface->lost = true;
 }
 
 void RenderBackend_HandleWindowResize(size_t width, size_t height)
