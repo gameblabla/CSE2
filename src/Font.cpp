@@ -21,7 +21,7 @@
 // The only way to 'fix' the artifacting is to convert the entire drawing system to use alpha
 // blending instead of colour-keying.
 
-// If you'd like the buggy anti-aliasing, then uncomment the following line.
+// If you'd like to enable the buggy anti-aliasing, then uncomment the following line.
 //#define ENABLE_FONT_ANTIALIASING
 
 // This controls however many glyphs (letters) the game can cache in VRAM at once
