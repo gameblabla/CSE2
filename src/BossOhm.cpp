@@ -1,3 +1,4 @@
+
 #include "BossOhm.h"
 
 #include <stddef.h>
@@ -470,7 +471,7 @@ void ActBossChar_Omega(void)
 			{
 				gBoss[0].act_wait = 0;
 				gBoss[0].act_no = 160;
-				SetFlash(gBoss[0].x, gBoss[0].y, 1);
+				SetFlash(gBoss[0].x, gBoss[0].y, FLASH_MODE_EXPLOSION);
 				PlaySoundObject(35, SOUND_MODE_PLAY);
 			}
 
