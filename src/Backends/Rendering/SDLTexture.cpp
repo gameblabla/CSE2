@@ -467,18 +467,15 @@ void RenderBackend_HandleWindowResize(size_t width, size_t height)
 	}
 
 	// Create rect that forces 4:3 no matter what size the window is
-	float window_ratio = (float)width / height;
-	float framebuffer_ratio = (float)upscaled_framebuffer.width / upscaled_framebuffer.height;
-
-	if (window_ratio >= framebuffer_ratio)
+	if (width * upscaled_framebuffer.height >= upscaled_framebuffer.width * height) // Fancy way to do `if (width / height >= upscaled_framebuffer.width / upscaled_framebuffer.height)` without floats
 	{
-		window_rect.w = height * framebuffer_ratio;
+		window_rect.w = (height * upscaled_framebuffer.width) / upscaled_framebuffer.height;
 		window_rect.h = height;
 	}
 	else
 	{
 		window_rect.w = width;
-		window_rect.h = width / framebuffer_ratio;
+		window_rect.h = (width * upscaled_framebuffer.height) / upscaled_framebuffer.width;
 	}
 
 	window_rect.x = (width - window_rect.w) / 2;
