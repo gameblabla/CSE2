@@ -283,9 +283,56 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBa
 
 void RenderBackend_DrawGlyph(long x, long y, size_t glyph_x, size_t glyph_y, size_t glyph_width, size_t glyph_height)
 {
-	for (unsigned int iy = MAX(-y, 0); y + iy < MIN(y + glyph_height, glyph_destination_surface->height); ++iy)
+	size_t surface_x;
+	size_t surface_y;
+
+	// Clamp to within the destination surface's boundaries
+	if (x < 0)
 	{
-		for (unsigned int ix = MAX(-x, 0); x + ix < MIN(x + glyph_width, glyph_destination_surface->width); ++ix)
+		surface_x = -x;
+
+		if (surface_x >= glyph_width)
+			return; // Glyph is offscreen to the left
+
+		glyph_x += surface_x;
+		glyph_width -= surface_x;
+	}
+	else
+	{
+		surface_x = x;
+	}
+
+	if (surface_x >= glyph_destination_surface->width)
+		return; // Glyph is offscreen to the right
+
+	if (glyph_width >= glyph_destination_surface->width - surface_x)
+		glyph_width = glyph_destination_surface->width - surface_x;
+
+	if (y < 0)
+	{
+		surface_y = -y;
+
+		if (surface_y >= glyph_height)
+			return; // Glyph is offscreen to the top
+
+		glyph_y += surface_y;
+		glyph_height -= surface_y;
+	}
+	else
+	{
+		surface_y = y;
+	}
+
+	if (surface_y >= glyph_destination_surface->height)
+		return; // Glyph is offscreen to the bottom
+
+	if (glyph_height >= glyph_destination_surface->height - surface_y)
+		glyph_height = glyph_destination_surface->height - surface_y;
+
+	// Do the actual drawing
+	for (size_t iy = 0; iy < glyph_height; ++iy)
+	{
+		for (size_t ix = 0; ix < glyph_width; ++ix)
 		{
 			const unsigned char alpha_int = glyph_atlas->pixels[(glyph_y + iy) * glyph_atlas->width + (glyph_x + ix)];
 
@@ -293,7 +340,7 @@ void RenderBackend_DrawGlyph(long x, long y, size_t glyph_x, size_t glyph_y, siz
 			{
 				const float alpha = alpha_int / 255.0f;
 
-				unsigned char *bitmap_pixel = glyph_destination_surface->pixels + (y + iy) * glyph_destination_surface->pitch + (x + ix) * 3;
+				unsigned char *bitmap_pixel = &glyph_destination_surface->pixels[(surface_y + iy) * glyph_destination_surface->pitch + (surface_x + ix) * 3];
 
 				for (unsigned int j = 0; j < 3; ++j)
 					bitmap_pixel[j] = (unsigned char)((glyph_colour_channels[j] * alpha) + (bitmap_pixel[j] * (1.0f - alpha)));	// Alpha blending
