@@ -15,6 +15,9 @@
 #include "../Misc.h"
 #include "Window/OpenGL.h"
 
+#define MIN(a,b) ((a) < (b) ? (a) : (b))
+#define MAX(a,b) ((a) > (b) ? (a) : (b))
+
 #define TOTAL_VBOS 8
 
 #define ATTRIBUTE_INPUT_VERTEX_COORDINATES 1
@@ -116,10 +119,11 @@ static RenderMode last_render_mode;
 static GLuint last_source_texture;
 static GLuint last_destination_texture;
 
-static RenderBackend_Surface framebuffer;
+static RenderBackend_Surface *framebuffer_surface;
+static RenderBackend_Surface *upscaled_framebuffer_surface;
+static RenderBackend_Surface window_surface;
 
-static size_t actual_screen_width;
-static size_t actual_screen_height;
+static RenderBackend_Rect window_rect;
 
 #ifdef USE_OPENGLES2
 static const GLchar *vertex_shader_plain = " \
@@ -270,6 +274,10 @@ void main() \
 } \
 ";
 #endif
+
+// A little forward-declaration for some internal functions
+static void Blit(RenderBackend_Surface *source_surface, const RenderBackend_Rect *source_rect, RenderBackend_Surface *destination_surface, const RenderBackend_Rect *destination_rect, bool colour_key);
+static RenderBackend_Surface* CreateSurface(size_t width, size_t height, bool linear_filter);
 
 // This was used back when CSE2 used GLEW instead of glad
 /*
@@ -474,8 +482,8 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t scree
 	glad_set_post_callback(PostGLCallCallback);
 #endif
 
-	actual_screen_width = screen_width;
-	actual_screen_height = screen_height;
+	size_t actual_screen_width = screen_width;
+	size_t actual_screen_height = screen_height;
 
 	if (WindowBackend_OpenGL_CreateWindow(window_title, &actual_screen_width, &actual_screen_height, fullscreen))
 	{
@@ -532,28 +540,14 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t scree
 			glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
 
 			// Set up framebuffer screen texture (used for screen-to-surface blitting)
-			glGenTextures(1, &framebuffer.texture_id);
-			glBindTexture(GL_TEXTURE_2D, framebuffer.texture_id);
-		#ifdef USE_OPENGLES2
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, screen_width, screen_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-		#else
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, screen_width, screen_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-		#endif
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		#ifndef USE_OPENGLES2
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-		#endif
+			framebuffer_surface = RenderBackend_CreateSurface(screen_width, screen_height, true);
 
-			framebuffer.width = screen_width;
-			framebuffer.height = screen_height;
+			// Set up window surface
+			window_surface.texture_id = 0;
 
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebuffer.texture_id, 0);
-			glViewport(0, 0, framebuffer.width, framebuffer.height);
+			RenderBackend_HandleWindowResize(actual_screen_width, actual_screen_height);
 
-			return &framebuffer;
+			return framebuffer_surface;
 		}
 
 		if (program_glyph.id != 0)
@@ -581,7 +575,9 @@ void RenderBackend_Deinit(void)
 {
 	free(local_vertex_buffer);
 
-	glDeleteTextures(1, &framebuffer.texture_id);
+	if (upscaled_framebuffer_surface != NULL)
+		RenderBackend_FreeSurface(upscaled_framebuffer_surface);
+	RenderBackend_FreeSurface(framebuffer_surface);
 	glDeleteFramebuffers(1, &framebuffer_id);
 	glDeleteProgram(program_glyph.id);
 	glDeleteProgram(program_colour_fill.id);
@@ -597,98 +593,32 @@ void RenderBackend_Deinit(void)
 
 void RenderBackend_DrawScreen(void)
 {
-	FlushVertexBuffer();
-	last_render_mode = MODE_BLANK;
-	last_source_texture = 0;
-	last_destination_texture = 0;
+	RenderBackend_Rect framebuffer_rect;
+	framebuffer_rect.left = 0;
+	framebuffer_rect.top = 0;
+	framebuffer_rect.right = framebuffer_surface->width;
+	framebuffer_rect.bottom = framebuffer_surface->height;
 
-	const GLfloat vertex_transform[4 * 4] = {
-		1.0f, 0.0f, 0.0f, 0.0f,
-		0.0f, 1.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 1.0f,
-	};
+	RenderBackend_Rect upscaled_framebuffer_rect;
+	upscaled_framebuffer_rect.left = 0;
+	upscaled_framebuffer_rect.top = 0;
+	upscaled_framebuffer_rect.right = upscaled_framebuffer_surface->width;
+	upscaled_framebuffer_rect.bottom = upscaled_framebuffer_surface->height;
 
-	glUseProgram(program_texture.id);
-	glUniform2f(program_texture.uniforms.texture_coordinate_transform, 1.0f, 1.0f);
-	glUniformMatrix4fv(program_texture.uniforms.vertex_transform, 1, GL_FALSE, vertex_transform);
-
-	glDisable(GL_BLEND);
-
-	// Enable texture coordinates, since this uses textures
-	glEnableVertexAttribArray(ATTRIBUTE_INPUT_TEXTURE_COORDINATES);
+	Blit(framebuffer_surface, &framebuffer_rect, upscaled_framebuffer_surface, &upscaled_framebuffer_rect, false);
+	Blit(upscaled_framebuffer_surface, &upscaled_framebuffer_rect, &window_surface, &window_rect, false);
 
 	// Target actual screen, and not our framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	// Do some viewport trickery, to fit the framebuffer in the center of the screen
-	GLint x;
-	GLint y;
-	GLsizei width;
-	GLsizei height;
-
-	if (actual_screen_width * framebuffer.height > framebuffer.width * actual_screen_height)	// Fancy way to do `if (actual_screen_width / actual_screen_height > framebuffer.width / framebuffer.height)` without floats
-	{
-		y = 0;
-		height = actual_screen_height;
-
-		width = (framebuffer.width * actual_screen_height) / framebuffer.height;
-		x = (actual_screen_width - width) / 2;
-	}
-	else
-	{
-		x = 0;
-		width = actual_screen_width;
-
-		height = (framebuffer.height * actual_screen_width) / framebuffer.width;
-		y = (actual_screen_height - height) / 2;
-	}
-
-	glViewport(x, y, width, height);
-
-	// Draw framebuffer to screen
-	glBindTexture(GL_TEXTURE_2D, framebuffer.texture_id);
-
-	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot();
-
-	if (vertex_buffer_slot != NULL)
-	{
-		vertex_buffer_slot->vertices[0][0].position.x = -1.0f;
-		vertex_buffer_slot->vertices[0][0].position.y = -1.0f;
-		vertex_buffer_slot->vertices[0][1].position.x = 1.0f;
-		vertex_buffer_slot->vertices[0][1].position.y = -1.0f;
-		vertex_buffer_slot->vertices[0][2].position.x = 1.0f;
-		vertex_buffer_slot->vertices[0][2].position.y = 1.0f;
-
-		vertex_buffer_slot->vertices[1][0].position.x = -1.0f;
-		vertex_buffer_slot->vertices[1][0].position.y = -1.0f;
-		vertex_buffer_slot->vertices[1][1].position.x = 1.0f;
-		vertex_buffer_slot->vertices[1][1].position.y = 1.0f;
-		vertex_buffer_slot->vertices[1][2].position.x = -1.0f;
-		vertex_buffer_slot->vertices[1][2].position.y = 1.0f;
-
-		vertex_buffer_slot->vertices[0][0].texture.x = 0.0f;
-		vertex_buffer_slot->vertices[0][0].texture.y = 1.0f;
-		vertex_buffer_slot->vertices[0][1].texture.x = 1.0f;
-		vertex_buffer_slot->vertices[0][1].texture.y = 1.0f;
-		vertex_buffer_slot->vertices[0][2].texture.x = 1.0f;
-		vertex_buffer_slot->vertices[0][2].texture.y = 0.0f;
-
-		vertex_buffer_slot->vertices[1][0].texture.x = 0.0f;
-		vertex_buffer_slot->vertices[1][0].texture.y = 1.0f;
-		vertex_buffer_slot->vertices[1][1].texture.x = 1.0f;
-		vertex_buffer_slot->vertices[1][1].texture.y = 0.0f;
-		vertex_buffer_slot->vertices[1][2].texture.x = 0.0f;
-		vertex_buffer_slot->vertices[1][2].texture.y = 0.0f;
-	}
-
-	FlushVertexBuffer();
-
-	WindowBackend_OpenGL_Display();
-
 	// According to https://www.khronos.org/opengl/wiki/Common_Mistakes#Swap_Buffers
 	// the buffer should always be cleared, even if it seems unnecessary
 	glClear(GL_COLOR_BUFFER_BIT);
+
+	// Flush the vertex buffer, which will render to the screen
+	FlushVertexBuffer();
+
+	WindowBackend_OpenGL_Display();
 
 	// Switch back to our framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
@@ -698,10 +628,8 @@ void RenderBackend_DrawScreen(void)
 // Surface management //
 ////////////////////////
 
-RenderBackend_Surface* RenderBackend_CreateSurface(size_t width, size_t height, bool render_target)
+static RenderBackend_Surface* CreateSurface(size_t width, size_t height, bool linear_filter)
 {
-	(void)render_target;
-
 	RenderBackend_Surface *surface = (RenderBackend_Surface*)malloc(sizeof(RenderBackend_Surface));
 
 	if (surface == NULL)
@@ -714,8 +642,8 @@ RenderBackend_Surface* RenderBackend_CreateSurface(size_t width, size_t height, 
 #else
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 #endif
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, linear_filter ? GL_LINEAR : GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, linear_filter ? GL_LINEAR : GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 #ifndef USE_OPENGLES2
@@ -728,6 +656,13 @@ RenderBackend_Surface* RenderBackend_CreateSurface(size_t width, size_t height, 
 	surface->height = height;
 
 	return surface;
+}
+
+RenderBackend_Surface* RenderBackend_CreateSurface(size_t width, size_t height, bool render_target)
+{
+	(void)render_target;
+
+	return CreateSurface(width, height, false);
 }
 
 void RenderBackend_FreeSurface(RenderBackend_Surface *surface)
@@ -776,7 +711,7 @@ void RenderBackend_UploadSurface(RenderBackend_Surface *surface, const unsigned 
 // Drawing //
 /////////////
 
-void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBackend_Rect *rect, RenderBackend_Surface *destination_surface, long x, long y, bool colour_key)
+static void Blit(RenderBackend_Surface *source_surface, const RenderBackend_Rect *source_rect, RenderBackend_Surface *destination_surface, const RenderBackend_Rect *destination_rect, bool colour_key)
 {
 	const RenderMode render_mode = (colour_key ? MODE_DRAW_SURFACE_WITH_TRANSPARENCY : MODE_DRAW_SURFACE);
 
@@ -791,14 +726,22 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBacke
 
 		// Point our framebuffer to the destination texture
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, destination_surface->texture_id, 0);
+
 		glViewport(0, 0, destination_surface->width, destination_surface->height);
 
-		const GLfloat vertex_transform[4 * 4] = {
+		GLfloat vertex_transform[4 * 4] = {
 			2.0f / destination_surface->width, 0.0f, 0.0f, -1.0f,
 			0.0f, 2.0f / destination_surface->height, 0.0f, -1.0f,
 			0.0f, 0.0f, 0.0f, 0.0f,
 			0.0f, 0.0f, 0.0f, 1.0f,
 		};
+
+		// Invert the Y-axis when drawing to the screen, since everything is upside-down in OpenGL for some reason
+		if (destination_surface->texture_id == 0)
+		{
+			vertex_transform[4 + 1] = -vertex_transform[4 + 1];
+			vertex_transform[4 + 3] = -vertex_transform[4 + 3];
+		}
 
 		// Switch to colour-key shader if we have to
 		glUseProgram(colour_key ? program_texture_colour_key.id : program_texture.id);
@@ -818,10 +761,10 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBacke
 
 	if (vertex_buffer_slot != NULL)
 	{
-		const GLfloat vertex_left = x;
-		const GLfloat vertex_top = y;
-		const GLfloat vertex_right = x + (rect->right - rect->left);
-		const GLfloat vertex_bottom = y + (rect->bottom - rect->top);
+		const GLfloat vertex_left = destination_rect->left;
+		const GLfloat vertex_top = destination_rect->top;
+		const GLfloat vertex_right = destination_rect->right;
+		const GLfloat vertex_bottom = destination_rect->bottom;
 
 		vertex_buffer_slot->vertices[0][0].position.x = vertex_left;
 		vertex_buffer_slot->vertices[0][0].position.y = vertex_top;
@@ -837,10 +780,10 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBacke
 		vertex_buffer_slot->vertices[1][2].position.x = vertex_left;
 		vertex_buffer_slot->vertices[1][2].position.y = vertex_bottom;
 
-		const GLfloat texture_left = rect->left;
-		const GLfloat texture_top = rect->top;
-		const GLfloat texture_right = rect->right;
-		const GLfloat texture_bottom = rect->bottom;
+		const GLfloat texture_left = source_rect->left;
+		const GLfloat texture_top = source_rect->top;
+		const GLfloat texture_right = source_rect->right;
+		const GLfloat texture_bottom = source_rect->bottom;
 
 		vertex_buffer_slot->vertices[0][0].texture.x = texture_left;
 		vertex_buffer_slot->vertices[0][0].texture.y = texture_top;
@@ -856,6 +799,13 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBacke
 		vertex_buffer_slot->vertices[1][2].texture.x = texture_left;
 		vertex_buffer_slot->vertices[1][2].texture.y = texture_bottom;
 	}
+}
+
+void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBackend_Rect *rect, RenderBackend_Surface *destination_surface, long x, long y, bool colour_key)
+{
+	const RenderBackend_Rect destination_rect = {x, y, x + (rect->right - rect->left), y + (rect->bottom - rect->top)};
+
+	Blit(source_surface, rect, destination_surface, &destination_rect, colour_key);
 }
 
 void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBackend_Rect *rect, unsigned char red, unsigned char green, unsigned char blue)
@@ -1080,6 +1030,36 @@ void RenderBackend_HandleRenderTargetLoss(void)
 
 void RenderBackend_HandleWindowResize(size_t width, size_t height)
 {
-	actual_screen_width = width;
-	actual_screen_height = height;
+	size_t upscale_factor = MAX(1, MIN((width + framebuffer_surface->width / 2) / framebuffer_surface->width, (height + framebuffer_surface->height / 2) / framebuffer_surface->height));
+
+	if (upscaled_framebuffer_surface != NULL)
+	{
+		RenderBackend_FreeSurface(upscaled_framebuffer_surface);
+		upscaled_framebuffer_surface = NULL;
+	}
+
+	upscaled_framebuffer_surface = CreateSurface(framebuffer_surface->width * upscale_factor, framebuffer_surface->height * upscale_factor, true);
+
+	if (upscaled_framebuffer_surface == NULL)
+		Backend_PrintError("Couldn't regenerate upscaled framebuffer");
+
+	// Create rect that forces 4:3 no matter what size the window is
+	if (width * upscaled_framebuffer_surface->height >= upscaled_framebuffer_surface->width * height) // Fancy way to do `if (width / height >= upscaled_framebuffer->width / upscaled_framebuffer->height)` without floats
+	{
+		window_rect.right = (height * upscaled_framebuffer_surface->width) / upscaled_framebuffer_surface->height;
+		window_rect.bottom = height;
+	}
+	else
+	{
+		window_rect.right = width;
+		window_rect.bottom = (width * upscaled_framebuffer_surface->height) / upscaled_framebuffer_surface->width;
+	}
+
+	window_rect.left = (width - window_rect.right) / 2;
+	window_rect.top = (height - window_rect.bottom) / 2;
+	window_rect.right += window_rect.left;
+	window_rect.bottom += window_rect.top;
+
+	window_surface.width = width;
+	window_surface.height = height;
 }
