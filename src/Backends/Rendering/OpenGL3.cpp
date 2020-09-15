@@ -85,6 +85,7 @@ static struct
 	GLuint id;
 	struct
 	{
+		GLint vertex_transform;
 		GLint colour;
 	} uniforms;
 } program_colour_fill;
@@ -125,10 +126,11 @@ static size_t actual_screen_height;
 #ifdef USE_OPENGLES2
 static const GLchar *vertex_shader_plain = " \
 #version 100\n \
+uniform mat4 vertex_transform; \
 attribute vec2 input_vertex_coordinates; \
 void main() \
 { \
-	gl_Position = vec4(input_vertex_coordinates.xy, 0.0, 1.0); \
+	gl_Position = vec4(input_vertex_coordinates.xy, 0.0, 1.0) * vertex_transform; \
 } \
 ";
 
@@ -197,10 +199,11 @@ void main() \
 #else
 static const GLchar *vertex_shader_plain = " \
 #version 150 core\n \
+uniform mat4 vertex_transform; \
 in vec2 input_vertex_coordinates; \
 void main() \
 { \
-	gl_Position = vec4(input_vertex_coordinates.xy, 0.0, 1.0); \
+	gl_Position = vec4(input_vertex_coordinates.xy, 0.0, 1.0) * vertex_transform; \
 } \
 ";
 
@@ -514,6 +517,7 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t scree
 			program_texture_colour_key.uniforms.texture_coordinate_transform = glGetUniformLocation(program_texture_colour_key.id, "texture_coordinate_transform");
 			program_texture_colour_key.uniforms.vertex_transform = glGetUniformLocation(program_texture_colour_key.id, "vertex_transform");
 
+			program_colour_fill.uniforms.vertex_transform = glGetUniformLocation(program_colour_fill.id, "vertex_transform");
 			program_colour_fill.uniforms.colour = glGetUniformLocation(program_colour_fill.id, "colour");
 
 			program_glyph.uniforms.texture_coordinate_transform = glGetUniformLocation(program_glyph.id, "texture_coordinate_transform");
@@ -874,7 +878,15 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, surface->texture_id, 0);
 		glViewport(0, 0, surface->width, surface->height);
 
+		const GLfloat vertex_transform[4 * 4] = {
+			2.0f / surface->width, 0.0f, 0.0f, -1.0f,
+			0.0f, 2.0f / surface->height, 0.0f, -1.0f,
+			0.0f, 0.0f, 0.0f, 0.0f,
+			0.0f, 0.0f, 0.0f, 1.0f,
+		};
+
 		glUseProgram(program_colour_fill.id);
+		glUniformMatrix4fv(program_colour_fill.uniforms.vertex_transform, 1, GL_FALSE, vertex_transform);
 
 		glDisable(GL_BLEND);
 
@@ -889,10 +901,10 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 
 	if (vertex_buffer_slot != NULL)
 	{
-		const GLfloat vertex_left = rect->left * 2.0f / surface->width - 1.0f;
-		const GLfloat vertex_top = rect->top * 2.0f / surface->height - 1.0f;
-		const GLfloat vertex_right = rect->right * 2.0f / surface->width - 1.0f;
-		const GLfloat vertex_bottom = rect->bottom * 2.0f / surface->height - 1.0f;
+		const GLfloat vertex_left = rect->left;
+		const GLfloat vertex_top = rect->top;
+		const GLfloat vertex_right = rect->right;
+		const GLfloat vertex_bottom = rect->bottom;
 
 		vertex_buffer_slot->vertices[0][0].position.x = vertex_left;
 		vertex_buffer_slot->vertices[0][0].position.y = vertex_top;
