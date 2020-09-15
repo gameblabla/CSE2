@@ -756,7 +756,6 @@ void RenderBackend_DestroyGlyphAtlas(RenderBackend_GlyphAtlas *atlas)
 
 void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t y, const unsigned char *pixels, size_t width, size_t height)
 {
-	// Convert from RGB24 to RGBA32, and upload it to the GPU texture
 	unsigned char *buffer = (unsigned char*)GX2RLockSurfaceEx(&atlas->texture.surface, 0, (GX2RResourceFlags)0);
 
 	const unsigned char *in_pointer = pixels;
