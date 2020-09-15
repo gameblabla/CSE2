@@ -66,6 +66,7 @@ static struct
 	struct
 	{
 		GLint texture_coordinate_transform;
+		GLint vertex_transform;
 	} uniforms;
 } program_texture;
 
@@ -75,6 +76,7 @@ static struct
 	struct
 	{
 		GLint texture_coordinate_transform;
+		GLint vertex_transform;
 	} uniforms;
 } program_texture_colour_key;
 
@@ -93,6 +95,7 @@ static struct
 	struct
 	{
 		GLint texture_coordinate_transform;
+		GLint vertex_transform;
 		GLint colour;
 	} uniforms;
 } program_glyph;
@@ -131,6 +134,7 @@ void main() \
 
 static const GLchar *vertex_shader_texture = " \
 #version 100\n \
+uniform mat4 vertex_transform; \
 uniform vec2 texture_coordinate_transform; \
 attribute vec2 input_vertex_coordinates; \
 attribute vec2 input_texture_coordinates; \
@@ -138,7 +142,7 @@ varying vec2 texture_coordinates; \
 void main() \
 { \
 	texture_coordinates = input_texture_coordinates * texture_coordinate_transform; \
-	gl_Position = vec4(input_vertex_coordinates.xy, 0.0, 1.0); \
+	gl_Position = vec4(input_vertex_coordinates.xy, 0.0, 1.0) * vertex_transform; \
 } \
 ";
 
@@ -202,6 +206,7 @@ void main() \
 
 static const GLchar *vertex_shader_texture = " \
 #version 150 core\n \
+uniform mat4 vertex_transform; \
 uniform vec2 texture_coordinate_transform; \
 in vec2 input_vertex_coordinates; \
 in vec2 input_texture_coordinates; \
@@ -209,7 +214,7 @@ out vec2 texture_coordinates; \
 void main() \
 { \
 	texture_coordinates = input_texture_coordinates * texture_coordinate_transform; \
-	gl_Position = vec4(input_vertex_coordinates.xy, 0.0, 1.0); \
+	gl_Position = vec4(input_vertex_coordinates.xy, 0.0, 1.0) * vertex_transform; \
 } \
 ";
 
@@ -504,12 +509,15 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t scree
 		{
 			// Get shader uniforms
 			program_texture.uniforms.texture_coordinate_transform = glGetUniformLocation(program_texture.id, "texture_coordinate_transform");
+			program_texture.uniforms.vertex_transform = glGetUniformLocation(program_texture.id, "vertex_transform");
 
 			program_texture_colour_key.uniforms.texture_coordinate_transform = glGetUniformLocation(program_texture_colour_key.id, "texture_coordinate_transform");
+			program_texture_colour_key.uniforms.vertex_transform = glGetUniformLocation(program_texture_colour_key.id, "vertex_transform");
 
 			program_colour_fill.uniforms.colour = glGetUniformLocation(program_colour_fill.id, "colour");
 
 			program_glyph.uniforms.texture_coordinate_transform = glGetUniformLocation(program_glyph.id, "texture_coordinate_transform");
+			program_glyph.uniforms.vertex_transform = glGetUniformLocation(program_glyph.id, "vertex_transform");
 			program_glyph.uniforms.colour = glGetUniformLocation(program_glyph.id, "colour");
 
 			// Set up framebuffer (used for surface-to-surface blitting)
@@ -587,8 +595,16 @@ void RenderBackend_DrawScreen(void)
 	last_source_texture = 0;
 	last_destination_texture = 0;
 
+	const GLfloat vertex_transform[4 * 4] = {
+		1.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 1.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f,
+	};
+
 	glUseProgram(program_texture.id);
 	glUniform2f(program_texture.uniforms.texture_coordinate_transform, 1.0f, 1.0f);
+	glUniformMatrix4fv(program_texture.uniforms.vertex_transform, 1, GL_FALSE, vertex_transform);
 
 	glDisable(GL_BLEND);
 
@@ -771,9 +787,17 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBacke
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, destination_surface->texture_id, 0);
 		glViewport(0, 0, destination_surface->width, destination_surface->height);
 
+		const GLfloat vertex_transform[4 * 4] = {
+			2.0f / destination_surface->width, 0.0f, 0.0f, -1.0f,
+			0.0f, 2.0f / destination_surface->height, 0.0f, -1.0f,
+			0.0f, 0.0f, 0.0f, 0.0f,
+			0.0f, 0.0f, 0.0f, 1.0f,
+		};
+
 		// Switch to colour-key shader if we have to
 		glUseProgram(colour_key ? program_texture_colour_key.id : program_texture.id);
 		glUniform2f(colour_key ? program_texture_colour_key.uniforms.texture_coordinate_transform : program_texture.uniforms.texture_coordinate_transform, 1.0f / source_surface->width, 1.0f / source_surface->height);
+		glUniformMatrix4fv(colour_key ? program_texture_colour_key.uniforms.vertex_transform : program_texture.uniforms.vertex_transform, 1, GL_FALSE, vertex_transform);
 
 		glDisable(GL_BLEND);
 
@@ -788,10 +812,10 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBacke
 
 	if (vertex_buffer_slot != NULL)
 	{
-		const GLfloat vertex_left = x * 2.0f / destination_surface->width - 1.0f;
-		const GLfloat vertex_top = y * 2.0f / destination_surface->height - 1.0f;
-		const GLfloat vertex_right = (x + (rect->right - rect->left)) * 2.0f / destination_surface->width - 1.0f;
-		const GLfloat vertex_bottom = (y + (rect->bottom - rect->top)) * 2.0f / destination_surface->height - 1.0f;
+		const GLfloat vertex_left = x;
+		const GLfloat vertex_top = y;
+		const GLfloat vertex_right = x + (rect->right - rect->left);
+		const GLfloat vertex_bottom = y + (rect->bottom - rect->top);
 
 		vertex_buffer_slot->vertices[0][0].position.x = vertex_left;
 		vertex_buffer_slot->vertices[0][0].position.y = vertex_top;
@@ -963,9 +987,17 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBa
 		last_green = green;
 		last_blue = blue;
 
+		const GLfloat vertex_transform[4 * 4] = {
+			2.0f / glyph_destination_surface->width, 0.0f, 0.0f, -1.0f,
+			0.0f, 2.0f / glyph_destination_surface->height, 0.0f, -1.0f,
+			0.0f, 0.0f, 1.0f, 0.0f,
+			0.0f, 0.0f, 0.0f, 1.0f,
+		};
+
 		glUseProgram(program_glyph.id);
 		glUniform2f(program_glyph.uniforms.texture_coordinate_transform, 1.0f / atlas->width, 1.0f / atlas->height);
 		glUniform4f(program_glyph.uniforms.colour, red / 255.0f, green / 255.0f, blue / 255.0f, 1.0f);
+		glUniformMatrix4fv(program_glyph.uniforms.vertex_transform, 1, GL_FALSE, vertex_transform);
 
 		// Point our framebuffer to the destination texture
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, glyph_destination_surface->texture_id, 0);
@@ -987,10 +1019,10 @@ void RenderBackend_DrawGlyph(RenderBackend_GlyphAtlas *atlas, long x, long y, si
 
 	if (vertex_buffer_slot != NULL)
 	{
-		const GLfloat vertex_left = x * 2.0f / glyph_destination_surface->width - 1.0f;
-		const GLfloat vertex_top = y * 2.0f / glyph_destination_surface->height - 1.0f;
-		const GLfloat vertex_right = (x + glyph_width) * 2.0f / glyph_destination_surface->width - 1.0f;
-		const GLfloat vertex_bottom = (y + glyph_height) * 2.0f / glyph_destination_surface->height - 1.0f;
+		const GLfloat vertex_left = x;
+		const GLfloat vertex_top = y;
+		const GLfloat vertex_right = x + glyph_width;
+		const GLfloat vertex_bottom = y + glyph_height;
 
 		vertex_buffer_slot->vertices[0][0].position.x = vertex_left;
 		vertex_buffer_slot->vertices[0][0].position.y = vertex_top;
