@@ -1138,7 +1138,7 @@ void DrawText(Font *font, RenderBackend_Surface *surface, int x, int y, unsigned
 {
 	if (font != NULL && surface != NULL)
 	{
-		RenderBackend_PrepareToDrawGlyphs(font->atlas, surface, (unsigned char)colour, (unsigned char)(colour >> 8), (unsigned char)(colour >> 16));
+		RenderBackend_PrepareToDrawGlyphs(font->atlas, surface, colour & 0xFF, (colour >> 8) & 0xFF, (colour >> 16) & 0xFF);
 
 		size_t pen_x = 0;
 
