@@ -347,21 +347,23 @@ static GLuint CompileShader(const char *vertex_shader_source, const char *fragme
 // Vertex buffer management //
 //////////////////////////////
 
-static VertexBufferSlot* GetVertexBufferSlot(unsigned int slots_needed)
+static VertexBufferSlot* GetVertexBufferSlot(void)
 {
+	++current_vertex_buffer_slot;
+
 	// Check if buffer needs expanding
-	if (current_vertex_buffer_slot + slots_needed > local_vertex_buffer_size)
+	if (current_vertex_buffer_slot > local_vertex_buffer_size)
 	{
 		local_vertex_buffer_size = 1;
 
-		while (current_vertex_buffer_slot + slots_needed > local_vertex_buffer_size)
+		while (current_vertex_buffer_slot > local_vertex_buffer_size)
 			local_vertex_buffer_size <<= 1;
 
-		VertexBufferSlot *realloc_result = (VertexBufferSlot*)realloc(local_vertex_buffer, local_vertex_buffer_size * sizeof(VertexBufferSlot));
+		VertexBufferSlot *new_vertex_buffer = (VertexBufferSlot*)realloc(local_vertex_buffer, local_vertex_buffer_size * sizeof(VertexBufferSlot));
 
-		if (realloc_result != NULL)
+		if (new_vertex_buffer != NULL)
 		{
-			local_vertex_buffer = realloc_result;
+			local_vertex_buffer = new_vertex_buffer;
 		}
 		else
 		{
@@ -370,9 +372,7 @@ static VertexBufferSlot* GetVertexBufferSlot(unsigned int slots_needed)
 		}
 	}
 
-	current_vertex_buffer_slot += slots_needed;
-
-	return &local_vertex_buffer[current_vertex_buffer_slot - slots_needed];
+	return &local_vertex_buffer[current_vertex_buffer_slot - 1];
 }
 
 static void FlushVertexBuffer(void)
@@ -646,7 +646,7 @@ void RenderBackend_DrawScreen(void)
 	// Draw framebuffer to screen
 	glBindTexture(GL_TEXTURE_2D, framebuffer.texture_id);
 
-	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot(1);
+	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot();
 
 	if (vertex_buffer_slot != NULL)
 	{
@@ -812,7 +812,7 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBacke
 	}
 
 	// Add data to the vertex queue
-	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot(1);
+	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot();
 
 	if (vertex_buffer_slot != NULL)
 	{
@@ -897,7 +897,7 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 	}
 
 	// Add data to the vertex queue
-	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot(1);
+	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot();
 
 	if (vertex_buffer_slot != NULL)
 	{
@@ -1027,7 +1027,7 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBa
 void RenderBackend_DrawGlyph(RenderBackend_GlyphAtlas *atlas, long x, long y, size_t glyph_x, size_t glyph_y, size_t glyph_width, size_t glyph_height)
 {
 	// Add data to the vertex queue
-	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot(1);
+	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot();
 
 	if (vertex_buffer_slot != NULL)
 	{

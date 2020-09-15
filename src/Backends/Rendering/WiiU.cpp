@@ -111,11 +111,11 @@ static VertexBufferSlot* GetVertexBufferSlot(void)
 		while (current_vertex_buffer_slot > local_vertex_buffer_size)
 			local_vertex_buffer_size <<= 1;
 
-		VertexBufferSlot *realloc_result = (VertexBufferSlot*)realloc(local_vertex_buffer, local_vertex_buffer_size * sizeof(VertexBufferSlot));
+		VertexBufferSlot *new_vertex_buffer = (VertexBufferSlot*)realloc(local_vertex_buffer, local_vertex_buffer_size * sizeof(VertexBufferSlot));
 
-		if (realloc_result != NULL)
+		if (new_vertex_buffer != NULL)
 		{
-			local_vertex_buffer = realloc_result;
+			local_vertex_buffer = new_vertex_buffer;
 		}
 		else
 		{
