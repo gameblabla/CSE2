@@ -986,13 +986,13 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBa
 	static unsigned char last_blue;
 
 	// Flush vertex data if a context-change is needed
-	if (last_render_mode != MODE_DRAW_GLYPH || last_destination_texture != destination_surface->texture_id || last_source_texture != atlas->texture_id || last_red != red || last_green != green || last_blue != blue)
+	if (last_render_mode != MODE_DRAW_GLYPH || last_source_texture != atlas->texture_id || last_destination_texture != destination_surface->texture_id || last_red != red || last_green != green || last_blue != blue)
 	{
 		FlushVertexBuffer();
 
 		last_render_mode = MODE_DRAW_GLYPH;
-		last_destination_texture = destination_surface->texture_id;
 		last_source_texture = atlas->texture_id;
+		last_destination_texture = destination_surface->texture_id;
 		last_red = red;
 		last_green = green;
 		last_blue = blue;
