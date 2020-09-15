@@ -60,13 +60,34 @@ typedef struct VertexBufferSlot
 	Vertex vertices[2][3];
 } VertexBufferSlot;
 
-static GLuint program_texture;
-static GLuint program_texture_colour_key;
-static GLuint program_colour_fill;
-static GLuint program_glyph;
+static struct 
+{
+	GLuint id;	
+} program_texture;
 
-static GLint program_colour_fill_uniform_colour;
-static GLint program_glyph_uniform_colour;
+static struct 
+{
+	GLuint id;
+} program_texture_colour_key;
+
+static struct 
+{
+	GLuint id;
+	struct
+	{
+		GLint colour;
+	} uniforms;
+} program_colour_fill;
+
+static struct 
+{
+	GLuint id;
+	struct
+	{
+		GLint colour;
+	} uniforms;
+} program_glyph;
+
 
 #ifndef USE_OPENGLES2
 static GLuint vertex_array_id;
@@ -463,16 +484,16 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t scree
 		glEnableVertexAttribArray(ATTRIBUTE_INPUT_VERTEX_COORDINATES);
 
 		// Set up our shaders
-		program_texture = CompileShader(vertex_shader_texture, fragment_shader_texture);
-		program_texture_colour_key = CompileShader(vertex_shader_texture, fragment_shader_texture_colour_key);
-		program_colour_fill = CompileShader(vertex_shader_plain, fragment_shader_colour_fill);
-		program_glyph = CompileShader(vertex_shader_texture, fragment_shader_glyph);
+		program_texture.id = CompileShader(vertex_shader_texture, fragment_shader_texture);
+		program_texture_colour_key.id = CompileShader(vertex_shader_texture, fragment_shader_texture_colour_key);
+		program_colour_fill.id = CompileShader(vertex_shader_plain, fragment_shader_colour_fill);
+		program_glyph.id = CompileShader(vertex_shader_texture, fragment_shader_glyph);
 
-		if (program_texture != 0 && program_texture_colour_key != 0 && program_colour_fill != 0 && program_glyph != 0)
+		if (program_texture.id != 0 && program_texture_colour_key.id != 0 && program_colour_fill.id != 0 && program_glyph.id != 0)
 		{
 			// Get shader uniforms
-			program_colour_fill_uniform_colour = glGetUniformLocation(program_colour_fill, "colour");
-			program_glyph_uniform_colour = glGetUniformLocation(program_glyph, "colour");
+			program_colour_fill.uniforms.colour = glGetUniformLocation(program_colour_fill.id, "colour");
+			program_glyph.uniforms.colour = glGetUniformLocation(program_glyph.id, "colour");
 
 			// Set up framebuffer (used for surface-to-surface blitting)
 			glGenFramebuffers(1, &framebuffer_id);
@@ -503,17 +524,17 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t scree
 			return &framebuffer;
 		}
 
-		if (program_glyph != 0)
-			glDeleteProgram(program_glyph);
+		if (program_glyph.id != 0)
+			glDeleteProgram(program_glyph.id);
 
-		if (program_colour_fill != 0)
-			glDeleteProgram(program_colour_fill);
+		if (program_colour_fill.id != 0)
+			glDeleteProgram(program_colour_fill.id);
 
-		if (program_texture_colour_key != 0)
-			glDeleteProgram(program_texture_colour_key);
+		if (program_texture_colour_key.id != 0)
+			glDeleteProgram(program_texture_colour_key.id);
 
-		if (program_texture != 0)
-			glDeleteProgram(program_texture);
+		if (program_texture.id != 0)
+			glDeleteProgram(program_texture.id);
 
 		glDeleteBuffers(TOTAL_VBOS, vertex_buffer_ids);
 	#ifndef USE_OPENGLES2
@@ -530,10 +551,10 @@ void RenderBackend_Deinit(void)
 
 	glDeleteTextures(1, &framebuffer.texture_id);
 	glDeleteFramebuffers(1, &framebuffer_id);
-	glDeleteProgram(program_glyph);
-	glDeleteProgram(program_colour_fill);
-	glDeleteProgram(program_texture_colour_key);
-	glDeleteProgram(program_texture);
+	glDeleteProgram(program_glyph.id);
+	glDeleteProgram(program_colour_fill.id);
+	glDeleteProgram(program_texture_colour_key.id);
+	glDeleteProgram(program_texture.id);
 	glDeleteBuffers(TOTAL_VBOS, vertex_buffer_ids);
 #ifndef USE_OPENGLES2
 	glDeleteVertexArrays(1, &vertex_array_id);
@@ -549,7 +570,7 @@ void RenderBackend_DrawScreen(void)
 	last_source_texture = 0;
 	last_destination_texture = 0;
 
-	glUseProgram(program_texture);
+	glUseProgram(program_texture.id);
 
 	glDisable(GL_BLEND);
 
@@ -733,7 +754,7 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBacke
 		glViewport(0, 0, destination_surface->width, destination_surface->height);
 
 		// Switch to colour-key shader if we have to
-		glUseProgram(colour_key ? program_texture_colour_key : program_texture);
+		glUseProgram(colour_key ? program_texture_colour_key.id : program_texture.id);
 
 		glDisable(GL_BLEND);
 
@@ -810,14 +831,14 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, surface->texture_id, 0);
 		glViewport(0, 0, surface->width, surface->height);
 
-		glUseProgram(program_colour_fill);
+		glUseProgram(program_colour_fill.id);
 
 		glDisable(GL_BLEND);
 
 		// Disable texture coordinate array, since this doesn't use textures
 		glDisableVertexAttribArray(ATTRIBUTE_INPUT_TEXTURE_COORDINATES);
 
-		glUniform4f(program_colour_fill_uniform_colour, red / 255.0f, green / 255.0f, blue / 255.0f, 1.0f);
+		glUniform4f(program_colour_fill.uniforms.colour, red / 255.0f, green / 255.0f, blue / 255.0f, 1.0f);
 	}
 
 	// Add data to the vertex queue
@@ -923,8 +944,8 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBa
 		last_green = green;
 		last_blue = blue;
 
-		glUseProgram(program_glyph);
-		glUniform4f(program_glyph_uniform_colour, red / 255.0f, green / 255.0f, blue / 255.0f, 1.0f);
+		glUseProgram(program_glyph.id);
+		glUniform4f(program_glyph.uniforms.colour, red / 255.0f, green / 255.0f, blue / 255.0f, 1.0f);
 
 		// Point our framebuffer to the destination texture
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, glyph_destination_surface->texture_id, 0);
