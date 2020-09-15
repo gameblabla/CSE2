@@ -28,8 +28,9 @@ typedef struct RenderBackend_GlyphAtlas
 
 static RenderBackend_Surface framebuffer;
 
-static unsigned char glyph_colour_channels[3];
+static RenderBackend_GlyphAtlas *glyph_atlas;
 static RenderBackend_Surface *glyph_destination_surface;
+static unsigned char glyph_colour_channels[3];
 
 RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t screen_width, size_t screen_height, bool fullscreen)
 {
@@ -272,8 +273,7 @@ void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t
 
 void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBackend_Surface *destination_surface, unsigned char red, unsigned char green, unsigned char blue)
 {
-	(void)atlas;
-
+	glyph_atlas = atlas;
 	glyph_destination_surface = destination_surface;
 
 	glyph_colour_channels[0] = red;
@@ -281,13 +281,13 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBa
 	glyph_colour_channels[2] = blue;
 }
 
-void RenderBackend_DrawGlyph(RenderBackend_GlyphAtlas *atlas, long x, long y, size_t glyph_x, size_t glyph_y, size_t glyph_width, size_t glyph_height)
+void RenderBackend_DrawGlyph(long x, long y, size_t glyph_x, size_t glyph_y, size_t glyph_width, size_t glyph_height)
 {
 	for (unsigned int iy = MAX(-y, 0); y + iy < MIN(y + glyph_height, glyph_destination_surface->height); ++iy)
 	{
 		for (unsigned int ix = MAX(-x, 0); x + ix < MIN(x + glyph_width, glyph_destination_surface->width); ++ix)
 		{
-			const unsigned char alpha_int = atlas->pixels[(glyph_y + iy) * atlas->width + (glyph_x + ix)];
+			const unsigned char alpha_int = glyph_atlas->pixels[(glyph_y + iy) * glyph_atlas->width + (glyph_x + ix)];
 
 			if (alpha_int != 0)
 			{

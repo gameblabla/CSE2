@@ -1162,7 +1162,7 @@ void DrawText(Font *font, RenderBackend_Surface *surface, int x, int y, unsigned
 				const long letter_x = x + pen_x + glyph->x_offset;
 				const long letter_y = y + glyph->y_offset;
 
-				RenderBackend_DrawGlyph(font->atlas, letter_x, letter_y, glyph->x, glyph->y, glyph->width, glyph->height);
+				RenderBackend_DrawGlyph(letter_x, letter_y, glyph->x, glyph->y, glyph->width, glyph->height);
 
 				pen_x += glyph->x_advance;
 			}

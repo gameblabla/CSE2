@@ -43,6 +43,8 @@ static SDL_Rect window_rect;
 
 static RenderBackend_Surface *surface_list_head;
 
+static RenderBackend_GlyphAtlas *glyph_atlas;
+
 static void RectToSDLRect(const RenderBackend_Rect *rect, SDL_Rect *sdl_rect)
 {
 	sdl_rect->x = (int)rect->left;
@@ -371,7 +373,7 @@ void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t
 
 void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBackend_Surface *destination_surface, unsigned char red, unsigned char green, unsigned char blue)
 {
-	(void)atlas;
+	glyph_atlas = atlas;
 
 	if (SDL_SetRenderTarget(renderer, destination_surface->texture) < 0)
 		Backend_PrintError("Couldn't set texture as current rendering target: %s", SDL_GetError());
@@ -386,7 +388,7 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBa
 
 }
 
-void RenderBackend_DrawGlyph(RenderBackend_GlyphAtlas *atlas, long x, long y, size_t glyph_x, size_t glyph_y, size_t glyph_width, size_t glyph_height)
+void RenderBackend_DrawGlyph(long x, long y, size_t glyph_x, size_t glyph_y, size_t glyph_width, size_t glyph_height)
 {
 	SDL_Rect source_rect;
 	source_rect.x = glyph_x;
@@ -400,7 +402,7 @@ void RenderBackend_DrawGlyph(RenderBackend_GlyphAtlas *atlas, long x, long y, si
 	destination_rect.w = glyph_width;
 	destination_rect.h = glyph_height;
 
-	if (SDL_RenderCopy(renderer, atlas->texture, &source_rect, &destination_rect) < 0)
+	if (SDL_RenderCopy(renderer, glyph_atlas->texture, &source_rect, &destination_rect) < 0)
 		Backend_PrintError("Couldn't copy glyph texture portion to renderer: %s", SDL_GetError());
 }
 

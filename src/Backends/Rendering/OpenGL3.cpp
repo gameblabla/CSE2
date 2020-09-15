@@ -65,8 +65,8 @@ static struct
 	GLuint id;	
 	struct
 	{
-		GLint texture_coordinate_transform;
 		GLint vertex_transform;
+		GLint texture_coordinate_transform;
 	} uniforms;
 } program_texture;
 
@@ -75,8 +75,8 @@ static struct
 	GLuint id;
 	struct
 	{
-		GLint texture_coordinate_transform;
 		GLint vertex_transform;
+		GLint texture_coordinate_transform;
 	} uniforms;
 } program_texture_colour_key;
 
@@ -95,8 +95,8 @@ static struct
 	GLuint id;
 	struct
 	{
-		GLint texture_coordinate_transform;
 		GLint vertex_transform;
+		GLint texture_coordinate_transform;
 		GLint colour;
 	} uniforms;
 } program_glyph;
@@ -117,8 +117,6 @@ static GLuint last_source_texture;
 static GLuint last_destination_texture;
 
 static RenderBackend_Surface framebuffer;
-
-static RenderBackend_Surface *glyph_destination_surface;
 
 static size_t actual_screen_width;
 static size_t actual_screen_height;
@@ -196,7 +194,9 @@ void main() \
 	gl_FragColor = colour * vec4(1.0, 1.0, 1.0, texture2D(tex, texture_coordinates).r); \
 } \
 ";
+
 #else
+
 static const GLchar *vertex_shader_plain = " \
 #version 150 core\n \
 uniform mat4 vertex_transform; \
@@ -270,6 +270,8 @@ void main() \
 } \
 ";
 #endif
+
+// This was used back when CSE2 used GLEW instead of glad
 /*
 static void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void* userParam)
 {
@@ -283,6 +285,7 @@ static void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GL
 		Backend_PrintInfo("OpenGL debug: %s", message);
 }
 */
+
 ////////////////////////
 // Shader compilation //
 ////////////////////////
@@ -677,7 +680,6 @@ void RenderBackend_DrawScreen(void)
 		vertex_buffer_slot->vertices[1][1].texture.y = 0.0f;
 		vertex_buffer_slot->vertices[1][2].texture.x = 0.0f;
 		vertex_buffer_slot->vertices[1][2].texture.y = 0.0f;
-
 	}
 
 	FlushVertexBuffer();
@@ -979,29 +981,25 @@ void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t
 
 void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBackend_Surface *destination_surface, unsigned char red, unsigned char green, unsigned char blue)
 {
-	(void)atlas;
-
 	static unsigned char last_red;
 	static unsigned char last_green;
 	static unsigned char last_blue;
 
-	glyph_destination_surface = destination_surface;
-
 	// Flush vertex data if a context-change is needed
-	if (last_render_mode != MODE_DRAW_GLYPH || last_destination_texture != glyph_destination_surface->texture_id || last_source_texture != atlas->texture_id || last_red != red || last_green != green || last_blue != blue)
+	if (last_render_mode != MODE_DRAW_GLYPH || last_destination_texture != destination_surface->texture_id || last_source_texture != atlas->texture_id || last_red != red || last_green != green || last_blue != blue)
 	{
 		FlushVertexBuffer();
 
 		last_render_mode = MODE_DRAW_GLYPH;
-		last_destination_texture = glyph_destination_surface->texture_id;
+		last_destination_texture = destination_surface->texture_id;
 		last_source_texture = atlas->texture_id;
 		last_red = red;
 		last_green = green;
 		last_blue = blue;
 
 		const GLfloat vertex_transform[4 * 4] = {
-			2.0f / glyph_destination_surface->width, 0.0f, 0.0f, -1.0f,
-			0.0f, 2.0f / glyph_destination_surface->height, 0.0f, -1.0f,
+			2.0f / destination_surface->width, 0.0f, 0.0f, -1.0f,
+			0.0f, 2.0f / destination_surface->height, 0.0f, -1.0f,
 			0.0f, 0.0f, 1.0f, 0.0f,
 			0.0f, 0.0f, 0.0f, 1.0f,
 		};
@@ -1012,8 +1010,8 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBa
 		glUniformMatrix4fv(program_glyph.uniforms.vertex_transform, 1, GL_FALSE, vertex_transform);
 
 		// Point our framebuffer to the destination texture
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, glyph_destination_surface->texture_id, 0);
-		glViewport(0, 0, glyph_destination_surface->width, glyph_destination_surface->height);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, destination_surface->texture_id, 0);
+		glViewport(0, 0, destination_surface->width, destination_surface->height);
 
 		glEnable(GL_BLEND);
 
@@ -1024,7 +1022,7 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBa
 	}
 }
 
-void RenderBackend_DrawGlyph(RenderBackend_GlyphAtlas *atlas, long x, long y, size_t glyph_x, size_t glyph_y, size_t glyph_width, size_t glyph_height)
+void RenderBackend_DrawGlyph(long x, long y, size_t glyph_x, size_t glyph_y, size_t glyph_width, size_t glyph_height)
 {
 	// Add data to the vertex queue
 	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot();
