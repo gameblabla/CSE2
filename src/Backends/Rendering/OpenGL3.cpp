@@ -599,14 +599,21 @@ void RenderBackend_DrawScreen(void)
 	framebuffer_rect.right = framebuffer_surface->width;
 	framebuffer_rect.bottom = framebuffer_surface->height;
 
-	RenderBackend_Rect upscaled_framebuffer_rect;
-	upscaled_framebuffer_rect.left = 0;
-	upscaled_framebuffer_rect.top = 0;
-	upscaled_framebuffer_rect.right = upscaled_framebuffer_surface->width;
-	upscaled_framebuffer_rect.bottom = upscaled_framebuffer_surface->height;
+	if (upscaled_framebuffer_surface == NULL)
+	{
+		Blit(framebuffer_surface, &framebuffer_rect, &window_surface, &window_rect, false);
+	}
+	else
+	{
+		RenderBackend_Rect upscaled_framebuffer_rect;
+		upscaled_framebuffer_rect.left = 0;
+		upscaled_framebuffer_rect.top = 0;
+		upscaled_framebuffer_rect.right = upscaled_framebuffer_surface->width;
+		upscaled_framebuffer_rect.bottom = upscaled_framebuffer_surface->height;
 
-	Blit(framebuffer_surface, &framebuffer_rect, upscaled_framebuffer_surface, &upscaled_framebuffer_rect, false);
-	Blit(upscaled_framebuffer_surface, &upscaled_framebuffer_rect, &window_surface, &window_rect, false);
+		Blit(framebuffer_surface, &framebuffer_rect, upscaled_framebuffer_surface, &upscaled_framebuffer_rect, false);
+		Blit(upscaled_framebuffer_surface, &upscaled_framebuffer_rect, &window_surface, &window_rect, false);
+	}
 
 	// Target actual screen, and not our framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -1032,27 +1039,33 @@ void RenderBackend_HandleWindowResize(size_t width, size_t height)
 {
 	size_t upscale_factor = MAX(1, MIN((width + framebuffer_surface->width / 2) / framebuffer_surface->width, (height + framebuffer_surface->height / 2) / framebuffer_surface->height));
 
+	size_t upscaled_framebuffer_width = framebuffer_surface->width * upscale_factor;
+	size_t upscaled_framebuffer_height = framebuffer_surface->height * upscale_factor;
+
 	if (upscaled_framebuffer_surface != NULL)
 	{
 		RenderBackend_FreeSurface(upscaled_framebuffer_surface);
 		upscaled_framebuffer_surface = NULL;
 	}
 
-	upscaled_framebuffer_surface = CreateSurface(framebuffer_surface->width * upscale_factor, framebuffer_surface->height * upscale_factor, true);
+	if (upscale_factor != 1)
+	{
+		upscaled_framebuffer_surface = CreateSurface(upscaled_framebuffer_width, upscaled_framebuffer_height * upscale_factor, true);
 
-	if (upscaled_framebuffer_surface == NULL)
-		Backend_PrintError("Couldn't regenerate upscaled framebuffer");
+		if (upscaled_framebuffer_surface == NULL)
+			Backend_PrintError("Couldn't regenerate upscaled framebuffer");
+	}
 
 	// Create rect that forces 4:3 no matter what size the window is
-	if (width * upscaled_framebuffer_surface->height >= upscaled_framebuffer_surface->width * height) // Fancy way to do `if (width / height >= upscaled_framebuffer->width / upscaled_framebuffer->height)` without floats
+	if (width * upscaled_framebuffer_height >= upscaled_framebuffer_width * height) // Fancy way to do `if (width / height >= upscaled_framebuffer->width / upscaled_framebuffer->height)` without floats
 	{
-		window_rect.right = (height * upscaled_framebuffer_surface->width) / upscaled_framebuffer_surface->height;
+		window_rect.right = (height * upscaled_framebuffer_width) / upscaled_framebuffer_height;
 		window_rect.bottom = height;
 	}
 	else
 	{
 		window_rect.right = width;
-		window_rect.bottom = (width * upscaled_framebuffer_surface->height) / upscaled_framebuffer_surface->width;
+		window_rect.bottom = (width * upscaled_framebuffer_height) / upscaled_framebuffer_width;
 	}
 
 	window_rect.left = (width - window_rect.right) / 2;
