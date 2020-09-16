@@ -657,7 +657,7 @@ int RestoreSurfaces(void)
 void InitTextObject(const char *name)
 {
 	(void)name;	// Unused in this branch
-
+/*
 	std::string path = gDataPath + "/Font/font";
 
 	// Get font size
@@ -705,10 +705,24 @@ void InitTextObject(const char *name)
 #endif
 	}
 
-//	font = LoadFont(path.c_str(), width, height);
+	font = LoadFont(path.c_str(), width, height);
+*/
+	std::string bitmap_path;
+	std::string metadata_path;
 
-	std::string bitmap_path = gDataPath + "/Font/couriernew2.PNG";
-	std::string metadata_path = gDataPath + "/Font/couriernew2.dat";
+	switch (mag)
+	{
+		case 1:
+			bitmap_path = gDataPath + "/Font/font_bitmap_6x12.png";
+			metadata_path = gDataPath + "/Font/font_bitmap_6x12.dat";
+			break;
+
+		case 2:
+			bitmap_path = gDataPath + "/Font/font_bitmap_10x20.png";
+			metadata_path = gDataPath + "/Font/font_bitmap_10x20.dat";
+			break;
+	}
+
 	font = LoadBitmapFont(bitmap_path.c_str(), metadata_path.c_str());
 }
 
