@@ -1177,8 +1177,6 @@ Font* LoadFont(const char *font_filename, size_t cell_width, size_t cell_height)
 
 Font* LoadBitmapFont(const char *bitmap_path, const char *metadata_path)
 {
-	Font *font = NULL;
-
 	size_t bitmap_width, bitmap_height;
 	unsigned char *image_buffer = DecodeBitmapFromFile(bitmap_path, &bitmap_width, &bitmap_height, 1);
 
@@ -1189,7 +1187,7 @@ Font* LoadBitmapFont(const char *bitmap_path, const char *metadata_path)
 
 		if (metadata_buffer != NULL)
 		{
-			font = (Font*)malloc(sizeof(Font));
+			Font *font = (Font*)malloc(sizeof(Font));
 
 			if (font != NULL)
 			{
@@ -1261,7 +1259,7 @@ Font* LoadBitmapFont(const char *bitmap_path, const char *metadata_path)
 		FreeBitmap(image_buffer);
 	}
 
-	return font;
+	return NULL;
 }
 
 void DrawText(Font *font, RenderBackend_Surface *surface, int x, int y, unsigned long colour, const char *string)
@@ -1305,12 +1303,13 @@ void UnloadFont(Font *font)
 	if (font != NULL)
 	{
 		RenderBackend_DestroyGlyphAtlas(font->atlas);
-
+		free(font->local_glyphs);
 		FreeBitmap(font->image_buffer);
 
 //		FT_Done_Face(font->face);
 //		free(font->data);
 //		FT_Done_FreeType(font->library);
+
 		free(font);
 	}
 }
