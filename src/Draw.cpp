@@ -167,7 +167,7 @@ static BOOL ScaleAndUploadSurface(const unsigned char *image_buffer, size_t widt
 		for (size_t y = 0; y < height; ++y)
 		{
 			const unsigned char *src_row = &image_buffer[y * width * 3];
-			unsigned char *dst_row = &upscaled_image_buffer[y * width * 3 * mag];
+			unsigned char *dst_row = &upscaled_image_buffer[y * mag * width * mag * 3];
 
 			const unsigned char *src_ptr = src_row;
 			unsigned char *dst_ptr = dst_row;
@@ -185,7 +185,7 @@ static BOOL ScaleAndUploadSurface(const unsigned char *image_buffer, size_t widt
 			}
 
 			for (int i = 1; i < mag; ++i)
-				memcpy(dst_row + i * width * 3, dst_row, width * mag * 3);
+				memcpy(dst_row + i * width * mag * 3, dst_row, width * mag * 3);
 		}
 
 		RenderBackend_UploadSurface(surf[surf_no], upscaled_image_buffer, width * mag, height * mag);
