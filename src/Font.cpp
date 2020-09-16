@@ -1081,7 +1081,7 @@ Font* LoadFontFromData(const unsigned char *data, size_t data_size, size_t cell_
 					size_t atlas_entry_height = FT_MulFix(font->face->bbox.yMax - font->face->bbox.yMin + 1, font->face->size->metrics.y_scale) / 64;
 
 					size_t atlas_columns = ceil(sqrt(atlas_entry_width * atlas_entry_height * TOTAL_GLYPH_SLOTS) / atlas_entry_width);
-					size_t atlas_rows = ceil(sqrt(atlas_entry_width * atlas_entry_height * TOTAL_GLYPH_SLOTS) / atlas_entry_height);
+					size_t atlas_rows = (TOTAL_GLYPH_SLOTS + (atlas_columns - 1)) / atlas_columns;
 
 					font->atlas_row_length = atlas_columns;
 
