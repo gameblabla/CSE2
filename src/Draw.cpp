@@ -212,7 +212,7 @@ BOOL MakeSurface_Resource(const char *name, SurfaceID surf_no)
 		return FALSE;
 
 	size_t width, height;
-	unsigned char *image_buffer = DecodeBitmap(data, size, &width, &height);
+	unsigned char *image_buffer = DecodeBitmap(data, size, &width, &height, 3);
 
 	if (image_buffer == NULL)
 		return FALSE;
@@ -271,7 +271,7 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 	}
 
 	size_t width, height;
-	unsigned char *image_buffer = DecodeBitmapFromFile(path.c_str(), &width, &height);
+	unsigned char *image_buffer = DecodeBitmapFromFile(path.c_str(), &width, &height, 3);
 
 	if (image_buffer == NULL)
 	{
@@ -318,7 +318,7 @@ BOOL ReloadBitmap_Resource(const char *name, SurfaceID surf_no)
 		return FALSE;
 
 	size_t width, height;
-	unsigned char *image_buffer = DecodeBitmap(data, size, &width, &height);
+	unsigned char *image_buffer = DecodeBitmap(data, size, &width, &height, 3);
 
 	if (!ScaleAndUploadSurface(image_buffer, width, height, surf_no))
 	{
@@ -356,7 +356,7 @@ BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 	}
 
 	size_t width, height;
-	unsigned char *image_buffer = DecodeBitmapFromFile(path.c_str(), &width, &height);
+	unsigned char *image_buffer = DecodeBitmapFromFile(path.c_str(), &width, &height, 3);
 
 	if (image_buffer == NULL)
 	{
@@ -705,7 +705,11 @@ void InitTextObject(const char *name)
 #endif
 	}
 
-	font = LoadFont(path.c_str(), width, height);
+//	font = LoadFont(path.c_str(), width, height);
+
+	std::string bitmap_path = gDataPath + "/Font/couriernew2.PNG";
+	std::string metadata_path = gDataPath + "/Font/couriernew2.dat";
+	font = LoadBitmapFont(bitmap_path.c_str(), metadata_path.c_str());
 }
 
 void PutText(int x, int y, const char *text, unsigned long color)
