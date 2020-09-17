@@ -87,7 +87,7 @@ BOOL Flip_SystemTask(HWND hWnd)
 	else
 		timePrev += 20;
 
-	static RECT dst_rect;	// TODO - Not the original vaiable name
+	static RECT dst_rect;	// TODO - Not the original variable name
 	GetWindowRect(hWnd, &dst_rect);
 	dst_rect.left += client_x;
 	dst_rect.top += client_y;
