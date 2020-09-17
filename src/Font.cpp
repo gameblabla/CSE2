@@ -23,6 +23,7 @@
 // blending instead of colour-keying.
 
 // If you'd like to enable the buggy anti-aliasing, then uncomment the following line.
+// This only works if 'FREETYPE_FONTS' is enabled!
 //#define ENABLE_FONT_ANTIALIASING
 
 // This controls however many glyphs (letters) the game can cache in VRAM at once
