@@ -16,25 +16,24 @@ static unsigned long color_black;
 // TODO - Another function that has an incorrect stack frame
 BOOL InitBack(const char *fName, int type)
 {
+	char path[MAX_PATH];
+	FILE *fp;
+	BITMAPFILEHEADER file_header; // The original names for these two variables are unknown. This ruins the stack frame layout.
+	BITMAPINFOHEADER info_header;
+
 	color_black = GetCortBoxColor(RGB(0, 0, 0x10));	// Unused. This may have once been used by background type 4 (the solid black background)
 
 	// We're not actually loading the bitmap here - we're just reading its width/height and making sure it's really a BMP file
-	char path[MAX_PATH];
 	sprintf(path, "%s\\%s.pbm", gDataPath, fName);
 
-	FILE *fp = fopen(path, "rb");
+	fp = fopen(path, "rb");
 	if (fp == NULL)
 		return FALSE;
 
-	// This code is ridiculously platform-dependant:
-	// It should break on big-endian CPUs, and platforms where short isn't 16-bit and long isn't 32-bit.
-	unsigned short bmp_header_buffer[7];	// The original names for these variables are unknown. This ruins the stack frame layout.
-	unsigned long bmp_header_buffer2[10];
-
-	fread(bmp_header_buffer, 14, 1, fp);
+	fread(&file_header, sizeof(file_header), 1, fp);
 
 	// Check if this is a valid bitmap file
-	if (bmp_header_buffer[0] != 0x4D42)	// 'MB' (we use hex here to prevent a compiler warning)
+	if (file_header.bfType != 0x4D42)	// 'MB' (we use hex here to prevent a compiler warning)
 	{
 #ifdef FIX_MAJOR_BUGS
 		// The original game forgets to close fp
@@ -43,12 +42,12 @@ BOOL InitBack(const char *fName, int type)
 		return FALSE;
 	}
 
-	fread(bmp_header_buffer2, 40, 1, fp);
+	fread(&info_header, sizeof(info_header), 1, fp);
 	fclose(fp);
 
 	// Get bitmap width and height
-	gBack.partsW = bmp_header_buffer2[1];
-	gBack.partsH = bmp_header_buffer2[2];
+	gBack.partsW = info_header.biWidth;
+	gBack.partsH = info_header.biHeight;
 
 	gBack.flag = TRUE;	// This variable is otherwise unused
 
