@@ -730,13 +730,15 @@ void CortBox2(const RECT *rect, unsigned long col, SurfaceID surf_no)
 
 // Dummied-out log function
 // According to the Mac port, its name really is just "out".
-BOOL out(int surface_identifier)
+BOOL out(char surface_identifier)
 {
-	char str[0x100];
+	// The actual name (and type) of these two variables are unknown
+	char path[MAX_PATH];
+	FILE *fp;
 
-	// The actual name of these two variables are unknown
 	(void)surface_identifier;
-	(void)str;
+	(void)path;
+	(void)fp;
 
 	// There may have been some kind of 'OutputDebugStringA' call here,
 	// like the one in 'EnumDevices_Callback' in 'Input.cpp'.
