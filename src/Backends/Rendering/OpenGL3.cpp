@@ -294,6 +294,13 @@ static void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GL
 }
 */
 
+static void SetTextureUploadAlignment(size_t pitch)
+{
+	const GLint alignments[8] = {8, 1, 2, 1, 4, 1, 2, 1};
+
+	glPixelStorei(GL_UNPACK_ALIGNMENT, alignments[pitch & 7]);
+}
+
 ////////////////////////
 // Shader compilation //
 ////////////////////////
@@ -709,6 +716,7 @@ void RenderBackend_UploadSurface(RenderBackend_Surface *surface, const unsigned 
 	if (surface->texture_id == last_source_texture || surface->texture_id == last_destination_texture)
 		FlushVertexBuffer();
 
+	SetTextureUploadAlignment(width * 3);
 	glBindTexture(GL_TEXTURE_2D, surface->texture_id);
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 	glBindTexture(GL_TEXTURE_2D, last_source_texture);
@@ -932,7 +940,7 @@ void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t
 		for (size_t y = 0; y < height; ++y)
 			memcpy (&buffer[y * width], &pixels[y * pitch], width);
 
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+		SetTextureUploadAlignment(width);
 		glBindTexture(GL_TEXTURE_2D, atlas->texture_id);
 	#ifdef USE_OPENGLES2
 		glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_LUMINANCE, GL_UNSIGNED_BYTE, buffer);
