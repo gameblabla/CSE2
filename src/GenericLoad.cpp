@@ -295,6 +295,8 @@ BOOL LoadGenericData(void)
 
 	char str[0x40];
 	sprintf(str, "PixTone = %d byte", pt_size);
-	// There must have been some kind of console print function here or something
+	// There must have once been a 'OutputDebugStringA' call here or something.
+	// See 'EnumDevices_Callback' in 'Input.cpp' for an example of this.
+
 	return TRUE;
 }

@@ -150,13 +150,20 @@ BOOL CALLBACK EnumDevices_Callback(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef)
 
 	directinput_objects->device = _joystick;
 
-	char string[0x100];
+	// This is interesting: there are at least two places in the game
+	// where it seems like there's meant to be a debug print just like
+	// this one: these are the 'out' function in 'Draw.cpp', and the
+	// 'LoadGenericData' function in 'GenericLoad.cpp'.
+	// Perhaps Pixel kept them wrapped in '#ifdef DEBUG' blocks, and
+	// simply forgot to do the same here.
+
+	char str[0x100];
 #ifdef FIX_MAJOR_BUGS
-	sprintf(string, "DeviceGUID = %08lX-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X\n", lpddi->guidInstance.Data1, lpddi->guidInstance.Data2, lpddi->guidInstance.Data3, lpddi->guidInstance.Data4[0], lpddi->guidInstance.Data4[1], lpddi->guidInstance.Data4[2], lpddi->guidInstance.Data4[3], lpddi->guidInstance.Data4[4], lpddi->guidInstance.Data4[5], lpddi->guidInstance.Data4[6], lpddi->guidInstance.Data4[7]);
+	sprintf(str, "DeviceGUID = %08lX-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X\n", lpddi->guidInstance.Data1, lpddi->guidInstance.Data2, lpddi->guidInstance.Data3, lpddi->guidInstance.Data4[0], lpddi->guidInstance.Data4[1], lpddi->guidInstance.Data4[2], lpddi->guidInstance.Data4[3], lpddi->guidInstance.Data4[4], lpddi->guidInstance.Data4[5], lpddi->guidInstance.Data4[6], lpddi->guidInstance.Data4[7]);
 #else
-	sprintf(string, "DeviceGUID = %x\n", lpddi->guidInstance);	// Tries to print a struct as an int
+	sprintf(str, "DeviceGUID = %x\n", lpddi->guidInstance);	// Tries to print a struct as an int
 #endif
-	OutputDebugStringA(string);
+	OutputDebugStringA(str);
 
 	return DIENUM_STOP;
 }
