@@ -746,7 +746,7 @@ BOOL out(int unknown)
 	return TRUE;
 }
 
-// TODO - Probably not the original variable name (this is an educated guess)
+// TODO - Probably not the original function name (this is an educated guess)
 int RestoreSurfaces(void)
 {
 	int s;
