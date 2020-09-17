@@ -891,6 +891,7 @@ static unsigned short ShiftJISToUTF32(const unsigned char *string, size_t *bytes
 
 static unsigned long UTF8ToUTF32(const unsigned char *string, size_t *bytes_read)
 {
+	// TODO - check for well-formedness
 	size_t length;
 	unsigned long charcode;
 
