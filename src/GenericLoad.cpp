@@ -292,8 +292,12 @@ BOOL LoadGenericData(void)
 	pt_size += MakePixToneObject(&gPtpTable[138], 1, 7);
 
 	// Commented-out, since ints *technically* have an undefined length
-	// char str[0x40];
-	// sprintf(str, "PixTone = %d byte", pt_size);
-	// There must have been some kind of console print function here or something
+/*
+	char str[0x40];
+	sprintf(str, "PixTone = %d byte", pt_size);
+	// There must have once been a 'OutputDebugStringA' call here or something.
+	// See 'EnumDevices_Callback' in 'Input.cpp' for an example of this.
+*/
+
 	return TRUE;
 }

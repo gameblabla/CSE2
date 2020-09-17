@@ -582,23 +582,24 @@ void CortBox2(const RECT *rect, unsigned long col, SurfaceID surf_no)
 
 // Dummied-out log function
 // According to the Mac port, its name really is just "out".
-BOOL out(int unknown)
+BOOL out(char surface_identifier)
 {
-	char unknown2[0x100];
-	int unknown3;
-	int unknown4;
-	int unknown5;
+	// The actual name (and type) of these two variables are unknown
+	std::string path;
+	FILE *fp;
 
-	(void)unknown;
-	(void)unknown2;
-	(void)unknown3;
-	(void)unknown4;
-	(void)unknown5;
+	(void)surface_identifier;
+	(void)path;
+	(void)fp;
+
+	// There may have been some kind of 'OutputDebugStringA' call here,
+	// like the one in 'EnumDevices_Callback' in 'Input.cpp'.
+	// Pixel may have kept them wrapped in '#ifdef DEBUG' blocks.
 
 	return TRUE;
 }
 
-// TODO - Probably not the original variable name (this is an educated guess)
+// TODO - Probably not the original function name (this is an educated guess)
 int RestoreSurfaces(void)
 {
 	int s;

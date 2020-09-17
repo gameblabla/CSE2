@@ -18,12 +18,15 @@ static unsigned long color_black;
 // TODO - Another function that has an incorrect stack frame
 BOOL InitBack(const char *fName, int type)
 {
+	std::string path;
+	FILE *fp;
+
 	color_black = GetCortBoxColor(RGB(0, 0, 0x10));	// Unused. This may have once been used by background type 4 (the solid black background)
 
 	// We're not actually loading the bitmap here - we're just reading its width/height and making sure it's really a BMP file
-	std::string path = gDataPath + '/' + fName + ".pbm";
+	path = gDataPath + '/' + fName + ".pbm";
 
-	FILE *fp = fopen(path.c_str(), "rb");
+	fp = fopen(path.c_str(), "rb");
 	if (fp == NULL)
 		return FALSE;
 
