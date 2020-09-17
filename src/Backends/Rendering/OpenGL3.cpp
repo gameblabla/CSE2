@@ -933,25 +933,34 @@ void RenderBackend_DestroyGlyphAtlas(RenderBackend_GlyphAtlas *atlas)
 
 void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t y, const unsigned char *pixels, size_t width, size_t height, size_t pitch)
 {
+#ifdef USE_OPENGLES2
 	unsigned char *buffer = (unsigned char*)malloc(width * height);
 
-	if (buffer != NULL)
-	{
-		for (size_t y = 0; y < height; ++y)
-			memcpy (&buffer[y * width], &pixels[y * pitch], width);
+	if (buffer == NULL)
+		return;
 
-		SetTextureUploadAlignment(width);
-		glBindTexture(GL_TEXTURE_2D, atlas->texture_id);
-	#ifdef USE_OPENGLES2
-		glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_LUMINANCE, GL_UNSIGNED_BYTE, buffer);
-	#else
-		glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_RED, GL_UNSIGNED_BYTE, buffer);
-	#endif
-		glBindTexture(GL_TEXTURE_2D, last_source_texture);
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+	for (size_t y = 0; y < height; ++y)
+		memcpy (&buffer[y * width], &pixels[y * pitch], width);
+#else
+	const unsigned char *buffer = pixels;
 
-		free(buffer);
-	}
+	glPixelStorei(GL_UNPACK_ROW_LENGTH, pitch);
+#endif
+
+	SetTextureUploadAlignment(width);
+	glBindTexture(GL_TEXTURE_2D, atlas->texture_id);
+#ifdef USE_OPENGLES2
+	glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_LUMINANCE, GL_UNSIGNED_BYTE, buffer);
+#else
+	glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_RED, GL_UNSIGNED_BYTE, buffer);
+#endif
+	glBindTexture(GL_TEXTURE_2D, last_source_texture);
+
+#ifdef USE_OPENGLES2
+	free(buffer);
+#else
+	glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+#endif
 }
 
 void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBackend_Surface *destination_surface, unsigned char red, unsigned char green, unsigned char blue)
