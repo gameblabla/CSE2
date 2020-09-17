@@ -974,7 +974,6 @@ static unsigned char GammaCorrect(unsigned char value)
 	return lookup[value];
 }
 
-
 static Glyph* GetGlyph(Font *font, unsigned long unicode_value)
 {
 	Glyph **glyph_pointer = &font->glyph_list_head;
