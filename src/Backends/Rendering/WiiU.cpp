@@ -754,7 +754,7 @@ void RenderBackend_DestroyGlyphAtlas(RenderBackend_GlyphAtlas *atlas)
 	free(atlas);
 }
 
-void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t y, const unsigned char *pixels, size_t width, size_t height)
+void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t y, const unsigned char *pixels, size_t width, size_t height, size_t pitch)
 {
 	unsigned char *buffer = (unsigned char*)GX2RLockSurfaceEx(&atlas->texture.surface, 0, (GX2RResourceFlags)0);
 
@@ -765,7 +765,7 @@ void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t
 	{
 		memcpy(out_pointer, in_pointer, width);
 
-		in_pointer += width;
+		in_pointer += pitch;
 		out_pointer += atlas->texture.surface.pitch;
 	}
 

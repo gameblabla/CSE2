@@ -265,10 +265,10 @@ void RenderBackend_DestroyGlyphAtlas(RenderBackend_GlyphAtlas *atlas)
 	free(atlas);
 }
 
-void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t y, const unsigned char *pixels, size_t width, size_t height)
+void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t y, const unsigned char *pixels, size_t width, size_t height, size_t pitch)
 {
 	for (size_t i = 0; i < height; ++i)
-		memcpy(&atlas->pixels[(y + i) * atlas->width + x], &pixels[i * width], width);
+		memcpy(&atlas->pixels[(y + i) * atlas->width + x], &pixels[i * pitch], width);
 }
 
 void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBackend_Surface *destination_surface, unsigned char red, unsigned char green, unsigned char blue)

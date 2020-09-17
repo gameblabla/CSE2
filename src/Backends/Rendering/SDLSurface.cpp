@@ -207,14 +207,13 @@ void RenderBackend_DestroyGlyphAtlas(RenderBackend_GlyphAtlas *atlas)
 	free(atlas);
 }
 
-void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t y, const unsigned char *pixels, size_t width, size_t height)
+void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t y, const unsigned char *pixels, size_t width, size_t height, size_t pitch)
 {
 	SDL_LockSurface(atlas->sdlsurface);
 
-	const unsigned char *source_pointer = pixels;
-
 	for (size_t iy = 0; iy < height; ++iy)
 	{
+		const unsigned char *source_pointer = &pixels[iy * pitch];
 		unsigned char *destination_pointer = &((unsigned char*)atlas->sdlsurface->pixels)[(y + iy) * atlas->sdlsurface->pitch + x * 4];
 
 		for (size_t ix = 0; ix < width; ++ix)
