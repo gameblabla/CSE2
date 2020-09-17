@@ -683,27 +683,23 @@ void InitTextObject(const char *name)
 
 	switch (mag)
 	{
-#ifdef JAPANESE
 		case 1:
+		#ifdef JAPANESE
 			height = 12;
-			width = 6 * 2;
+			width = 6;
+		#else
+			// For some weird reason, Windows's 6x12 Courier New is
+			// closer to 5x10, but FreeType renders it as proper 6x12,
+			// so we have to cheat a little.
+			height = 10;
+			width = 5;
+		#endif
 			break;
 
 		case 2:
 			height = 20;
-			width = 10 * 2;
+			width = 10;
 			break;
-#else
-		case 1:
-			height = 10;
-			width = 9;
-			break;
-
-		case 2:
-			height = 18;
-			width = 17;
-			break;
-#endif
 	}
 
 	font = LoadFreeTypeFont(path.c_str(), width, height);
