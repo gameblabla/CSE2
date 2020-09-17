@@ -7,8 +7,8 @@
 typedef struct Font Font;
 
 #ifdef FREETYPE_FONTS
-Font* LoadFontFromData(const unsigned char *data, size_t data_size, size_t cell_width, size_t cell_height);
-Font* LoadFont(const char *font_filename, size_t cell_width, size_t cell_height);
+Font* LoadFreeTypeFontFromData(const unsigned char *data, size_t data_size, size_t cell_width, size_t cell_height);
+Font* LoadFreeTypeFont(const char *font_filename, size_t cell_width, size_t cell_height);
 #else
 Font* LoadBitmapFont(const char *bitmap_path, const char *metadata_path);
 #endif

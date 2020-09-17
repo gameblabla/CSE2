@@ -1094,7 +1094,7 @@ static Glyph* GetGlyph(Font *font, unsigned long unicode_value)
 }
 
 #ifdef FREETYPE_FONTS
-Font* LoadFontFromData(const unsigned char *data, size_t data_size, size_t cell_width, size_t cell_height)
+Font* LoadFreeTypeFontFromData(const unsigned char *data, size_t data_size, size_t cell_width, size_t cell_height)
 {
 	Font *font = (Font*)malloc(sizeof(Font));
 
@@ -1155,7 +1155,7 @@ Font* LoadFontFromData(const unsigned char *data, size_t data_size, size_t cell_
 	return NULL;
 }
 
-Font* LoadFont(const char *font_filename, size_t cell_width, size_t cell_height)
+Font* LoadFreeTypeFont(const char *font_filename, size_t cell_width, size_t cell_height)
 {
 	Font *font = NULL;
 
@@ -1164,7 +1164,7 @@ Font* LoadFont(const char *font_filename, size_t cell_width, size_t cell_height)
 
 	if (file_buffer != NULL)
 	{
-		font = LoadFontFromData(file_buffer, file_size, cell_width, cell_height);
+		font = LoadFreeTypeFontFromData(file_buffer, file_size, cell_width, cell_height);
 		free(file_buffer);
 	}
 

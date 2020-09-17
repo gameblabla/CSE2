@@ -706,7 +706,7 @@ void InitTextObject(const char *name)
 #endif
 	}
 
-	font = LoadFont(path.c_str(), width, height);
+	font = LoadFreeTypeFont(path.c_str(), width, height);
 #else
 	std::string bitmap_path;
 	std::string metadata_path;
