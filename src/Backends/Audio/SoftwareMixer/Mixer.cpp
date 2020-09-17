@@ -67,10 +67,6 @@ Mixer_Sound* Mixer_CreateSound(unsigned int frequency, const unsigned char *samp
 	}
 
 #ifdef LANCZOS_RESAMPLER
-	// Blank samples outside the array bounds (we'll deal with the other half later)
-	for (size_t i = 0; i < LANCZOS_KERNEL_RADIUS - 1; ++i)
-		sound->samples[i] = 0;
-
 	sound->samples += LANCZOS_KERNEL_RADIUS - 1;
 #endif
 
@@ -118,11 +114,21 @@ void Mixer_PlaySound(Mixer_Sound *sound, bool looping)
 	// either blank samples or repeated samples
 #ifdef LANCZOS_RESAMPLER
 	if (looping)
-		for (size_t i = 0; i < LANCZOS_KERNEL_RADIUS; ++i)
+	{
+		for (int i = -LANCZOS_KERNEL_RADIUS + 1; i < 0; ++i)
+			sound->samples[i] = sound->samples[sound->frames + i];
+
+		for (int i = 0; i < LANCZOS_KERNEL_RADIUS; ++i)
 			sound->samples[sound->frames + i] = sound->samples[i];
+	}
 	else
-		for (size_t i = 0; i < LANCZOS_KERNEL_RADIUS; ++i)
+	{
+		for (int i = -LANCZOS_KERNEL_RADIUS + 1; i < 0; ++i)
+			sound->samples[i] = 0;
+
+		for (int i = 0; i < LANCZOS_KERNEL_RADIUS; ++i)
 			sound->samples[sound->frames + i] = 0;
+	}
 #else
 	sound->samples[sound->frames] = looping ? sound->samples[0] : 0;
 #endif
