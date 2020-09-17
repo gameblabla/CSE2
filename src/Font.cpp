@@ -856,7 +856,7 @@ static const unsigned short shiftjis_to_unicode_lookup[0x3100] = {
 	0x0020, 0x0020, 0x0020, 0x0020, 0x0020, 0x0020, 0x0020, 0x0020, 0x0020, 0x0020, 0x0020, 0x0020, 0x0020, 0x0020, 0x0020, 0x0020
 };
 
-static unsigned short ShiftJISToUnicode(const unsigned char *string, size_t *bytes_read)
+static unsigned short ShiftJISToUTF32(const unsigned char *string, size_t *bytes_read)
 {
 	size_t lookup_index;
 
@@ -889,7 +889,7 @@ static unsigned short ShiftJISToUnicode(const unsigned char *string, size_t *byt
 
 #else
 
-static unsigned long UTF8ToUnicode(const unsigned char *string, size_t *bytes_read)
+static unsigned long UTF8ToUTF32(const unsigned char *string, size_t *bytes_read)
 {
 	size_t length;
 	unsigned long charcode;
@@ -1302,9 +1302,9 @@ void DrawText(Font *font, RenderBackend_Surface *surface, int x, int y, unsigned
 		{
 			size_t bytes_read;
 		#ifdef JAPANESE
-			const unsigned short unicode_value = ShiftJISToUnicode(string_pointer, &bytes_read);
+			const unsigned short unicode_value = ShiftJISToUTF32(string_pointer, &bytes_read);
 		#else
-			const unsigned long unicode_value = UTF8ToUnicode(string_pointer, &bytes_read);
+			const unsigned long unicode_value = UTF8ToUTF32(string_pointer, &bytes_read);
 		#endif
 			string_pointer += bytes_read;
 
