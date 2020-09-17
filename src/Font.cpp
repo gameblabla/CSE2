@@ -5,9 +5,11 @@
 #include <string.h>
 #include <math.h>
 
-#include <ft2build.h>
-#include FT_FREETYPE_H
-#include FT_BITMAP_H
+#ifdef FREETYPE_FONTS
+	#include <ft2build.h>
+	#include FT_FREETYPE_H
+	#include FT_BITMAP_H
+#endif
 
 #include "Bitmap.h"
 #include "File.h"
@@ -46,6 +48,11 @@ typedef struct Glyph
 
 typedef struct Font
 {
+#ifdef FREETYPE_FONTS
+	FT_Library library;
+	FT_Face face;
+	unsigned char *data;
+#else
 	unsigned char *image_buffer;
 	size_t image_buffer_width;
 	size_t image_buffer_height;
@@ -53,11 +60,7 @@ typedef struct Font
 	size_t glyph_slot_height;
 	size_t total_local_glyphs;
 	Glyph *local_glyphs;
-/*
-	FT_Library library;
-	FT_Face face;
-	unsigned char *data;
-*/
+#endif
 	Glyph glyphs[TOTAL_GLYPH_SLOTS];
 	Glyph *glyph_list_head;
 	RenderBackend_GlyphAtlas *atlas;
@@ -999,34 +1002,7 @@ static Glyph* GetGlyph(Font *font, unsigned long unicode_value)
 	// Couldn't find glyph - overwrite the old at the end.
 	// The one at the end hasn't been used in a while anyway.
 
-	for (size_t i = 0; i < font->total_local_glyphs; ++i)
-	{
-		if (font->local_glyphs[i].unicode_value == unicode_value)
-		{
-			glyph->unicode_value = font->local_glyphs[i].unicode_value;
-			glyph->width = font->local_glyphs[i].width;
-			glyph->height = font->local_glyphs[i].height;
-			glyph->x_offset = font->local_glyphs[i].x_offset;
-			glyph->y_offset = font->local_glyphs[i].y_offset;
-			glyph->x_advance = font->local_glyphs[i].x_advance;
-
-			RenderBackend_UploadGlyph(font->atlas, glyph->x, glyph->y, &font->image_buffer[font->local_glyphs[i].y * font->image_buffer_width + font->local_glyphs[i].x], glyph->width, glyph->height, font->image_buffer_width);
-
-			*glyph_pointer = glyph->next;
-			glyph->next = font->glyph_list_head;
-			font->glyph_list_head = glyph;
-
-			return glyph;
-		}
-	}
-
-
-
-
-
-
-
-/*
+#ifdef FREETYPE_FONTS
 	unsigned int glyph_index = FT_Get_Char_Index(font->face, unicode_value);
 
 #ifdef ENABLE_FONT_ANTIALIASING
@@ -1078,7 +1054,7 @@ static Glyph* GetGlyph(Font *font, unsigned long unicode_value)
 			glyph->y_offset = (font->face->size->metrics.ascender + (64 / 2)) / 64 - font->face->glyph->bitmap_top;
 			glyph->x_advance = font->face->glyph->advance.x / 64;
 
-			RenderBackend_UploadGlyph(font->atlas, glyph->x, glyph->y, bitmap.buffer, glyph->width, glyph->height);
+			RenderBackend_UploadGlyph(font->atlas, glyph->x, glyph->y, bitmap.buffer, glyph->width, glyph->height, glyph->width);
 
 			FT_Bitmap_Done(font->library, &bitmap);
 
@@ -1091,12 +1067,33 @@ static Glyph* GetGlyph(Font *font, unsigned long unicode_value)
 
 		FT_Bitmap_Done(font->library, &bitmap);
 	}
-*/
+#else
+	for (size_t i = 0; i < font->total_local_glyphs; ++i)
+	{
+		if (font->local_glyphs[i].unicode_value == unicode_value)
+		{
+			glyph->unicode_value = font->local_glyphs[i].unicode_value;
+			glyph->width = font->local_glyphs[i].width;
+			glyph->height = font->local_glyphs[i].height;
+			glyph->x_offset = font->local_glyphs[i].x_offset;
+			glyph->y_offset = font->local_glyphs[i].y_offset;
+			glyph->x_advance = font->local_glyphs[i].x_advance;
+
+			RenderBackend_UploadGlyph(font->atlas, glyph->x, glyph->y, &font->image_buffer[font->local_glyphs[i].y * font->image_buffer_width + font->local_glyphs[i].x], glyph->width, glyph->height, font->image_buffer_width);
+
+			*glyph_pointer = glyph->next;
+			glyph->next = font->glyph_list_head;
+			font->glyph_list_head = glyph;
+
+			return glyph;
+		}
+	}
+#endif
 
 	return NULL;
 }
 
-/*
+#ifdef FREETYPE_FONTS
 Font* LoadFontFromData(const unsigned char *data, size_t data_size, size_t cell_width, size_t cell_height)
 {
 	Font *font = (Font*)malloc(sizeof(Font));
@@ -1173,8 +1170,7 @@ Font* LoadFont(const char *font_filename, size_t cell_width, size_t cell_height)
 
 	return font;
 }
-*/
-
+#else
 Font* LoadBitmapFont(const char *bitmap_path, const char *metadata_path)
 {
 	size_t bitmap_width, bitmap_height;
@@ -1261,6 +1257,7 @@ Font* LoadBitmapFont(const char *bitmap_path, const char *metadata_path)
 
 	return NULL;
 }
+#endif
 
 void DrawText(Font *font, RenderBackend_Surface *surface, int x, int y, unsigned long colour, const char *string)
 {
@@ -1303,12 +1300,15 @@ void UnloadFont(Font *font)
 	if (font != NULL)
 	{
 		RenderBackend_DestroyGlyphAtlas(font->atlas);
+
+	#ifdef FREETYPE_FONTS
+		FT_Done_Face(font->face);
+		free(font->data);
+		FT_Done_FreeType(font->library);
+	#else
 		free(font->local_glyphs);
 		FreeBitmap(font->image_buffer);
-
-//		FT_Done_Face(font->face);
-//		free(font->data);
-//		FT_Done_FreeType(font->library);
+	#endif
 
 		free(font);
 	}

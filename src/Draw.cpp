@@ -657,7 +657,8 @@ int RestoreSurfaces(void)
 void InitTextObject(const char *name)
 {
 	(void)name;	// Unused in this branch
-/*
+
+#ifdef FREETYPE_FONTS
 	std::string path = gDataPath + "/Font/font";
 
 	// Get font size
@@ -706,7 +707,7 @@ void InitTextObject(const char *name)
 	}
 
 	font = LoadFont(path.c_str(), width, height);
-*/
+#else
 	std::string bitmap_path;
 	std::string metadata_path;
 
@@ -724,6 +725,7 @@ void InitTextObject(const char *name)
 	}
 
 	font = LoadBitmapFont(bitmap_path.c_str(), metadata_path.c_str());
+#endif
 }
 
 void PutText(int x, int y, const char *text, unsigned long color)
