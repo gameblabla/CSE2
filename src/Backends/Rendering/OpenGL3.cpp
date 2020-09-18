@@ -1075,14 +1075,6 @@ void RenderBackend_HandleWindowResize(size_t width, size_t height)
 		upscaled_framebuffer_surface = NULL;
 	}
 
-	if (upscale_factor != 1)
-	{
-		upscaled_framebuffer_surface = CreateSurface(upscaled_framebuffer_width, upscaled_framebuffer_height * upscale_factor, true);
-
-		if (upscaled_framebuffer_surface == NULL)
-			Backend_PrintError("Couldn't regenerate upscaled framebuffer");
-	}
-
 	// Create rect that forces 4:3 no matter what size the window is
 	if (width * upscaled_framebuffer_height >= upscaled_framebuffer_width * height) // Fancy way to do `if (width / height >= upscaled_framebuffer->width / upscaled_framebuffer->height)` without floats
 	{
@@ -1102,4 +1094,12 @@ void RenderBackend_HandleWindowResize(size_t width, size_t height)
 
 	window_surface.width = width;
 	window_surface.height = height;
+
+	if ((window_rect.right - window_rect.left) % framebuffer_surface->width != 0 || (window_rect.bottom - window_rect.top) % framebuffer_surface->height != 0)
+	{
+		upscaled_framebuffer_surface = CreateSurface(upscaled_framebuffer_width, upscaled_framebuffer_height * upscale_factor, true);
+
+		if (upscaled_framebuffer_surface == NULL)
+			Backend_PrintError("Couldn't regenerate upscaled framebuffer");
+	}
 }

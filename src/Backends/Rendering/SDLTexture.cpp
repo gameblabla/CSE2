@@ -430,18 +430,6 @@ void RenderBackend_HandleWindowResize(size_t width, size_t height)
 		upscaled_framebuffer.texture = NULL;
 	}
 
-	if (upscale_factor != 1)
-	{
-		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
-		upscaled_framebuffer.texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, upscaled_framebuffer.width, upscaled_framebuffer.height);
-		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
-
-		if (upscaled_framebuffer.texture == NULL)
-			Backend_PrintError("Couldn't regenerate upscaled framebuffer");
-
-		SDL_SetTextureBlendMode(upscaled_framebuffer.texture, SDL_BLENDMODE_NONE);
-	}
-
 	// Create rect that forces 4:3 no matter what size the window is
 	if (width * upscaled_framebuffer.height >= upscaled_framebuffer.width * height) // Fancy way to do `if (width / height >= upscaled_framebuffer.width / upscaled_framebuffer.height)` without floats
 	{
@@ -456,4 +444,16 @@ void RenderBackend_HandleWindowResize(size_t width, size_t height)
 
 	window_rect.x = (width - window_rect.w) / 2;
 	window_rect.y = (height - window_rect.h) / 2;
+
+	if (window_rect.w % framebuffer.width != 0 || window_rect.h % framebuffer.height != 0)
+	{
+		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+		upscaled_framebuffer.texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, upscaled_framebuffer.width, upscaled_framebuffer.height);
+		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+
+		if (upscaled_framebuffer.texture == NULL)
+			Backend_PrintError("Couldn't regenerate upscaled framebuffer");
+
+		SDL_SetTextureBlendMode(upscaled_framebuffer.texture, SDL_BLENDMODE_NONE);
+	}
 }
