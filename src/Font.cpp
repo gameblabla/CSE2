@@ -1082,10 +1082,10 @@ static Glyph* GetGlyph(Font *font, unsigned long unicode_value)
 			const Glyph *local_glyph = &font->local_glyphs[index];
 
 			glyph->unicode_value = local_glyph->unicode_value;
-			glyph->width = local_glyph->width;
-			glyph->height = local_glyph->height;
-			glyph->x_offset = local_glyph->x_offset;
-			glyph->y_offset = local_glyph->y_offset;
+			glyph->width = font->glyph_slot_width;
+			glyph->height = font->glyph_slot_height;
+			glyph->x_offset = 0;
+			glyph->y_offset = 0;
 			glyph->x_advance = local_glyph->x_advance;
 
 			RenderBackend_UploadGlyph(font->atlas, glyph->x, glyph->y, &font->image_buffer[local_glyph->y * font->image_buffer_width + local_glyph->x], glyph->width, glyph->height, font->image_buffer_width);
