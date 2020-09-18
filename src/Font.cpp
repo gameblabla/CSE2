@@ -1073,37 +1073,34 @@ static Glyph* GetGlyph(Font *font, unsigned long unicode_value)
 	size_t left = 0;
 	size_t right = font->total_local_glyphs;
 
-	for (;;)
+	while (right - left >= 2)
 	{
-		size_t index = (left + right) / 2;
+		const size_t index = (left + right) / 2;
 
-		if (font->local_glyphs[index].unicode_value == unicode_value)
-		{
-			const Glyph *local_glyph = &font->local_glyphs[index];
-
-			glyph->unicode_value = local_glyph->unicode_value;
-			glyph->width = font->glyph_slot_width;
-			glyph->height = font->glyph_slot_height;
-			glyph->x_offset = 0;
-			glyph->y_offset = 0;
-			glyph->x_advance = local_glyph->x_advance;
-
-			RenderBackend_UploadGlyph(font->atlas, glyph->x, glyph->y, &font->image_buffer[local_glyph->y * font->image_buffer_width + local_glyph->x], glyph->width, glyph->height, font->image_buffer_width);
-
-			*glyph_pointer = glyph->next;
-			glyph->next = font->glyph_list_head;
-			font->glyph_list_head = glyph;
-
-			return glyph;
-		}
-
-		if (index == left)
-			break;
-
-		if (font->local_glyphs[index].unicode_value < unicode_value)
-			left = index;
-		else //if (font->local_glyphs[index].unicode_value > unicode_value)
+		if (font->local_glyphs[index].unicode_value > unicode_value)
 			right = index;
+		else
+			left = index;
+	}
+
+	if (font->local_glyphs[left].unicode_value == unicode_value)
+	{
+		const Glyph *local_glyph = &font->local_glyphs[left];
+
+		glyph->unicode_value = local_glyph->unicode_value;
+		glyph->width = font->glyph_slot_width;
+		glyph->height = font->glyph_slot_height;
+		glyph->x_offset = 0;
+		glyph->y_offset = 0;
+		glyph->x_advance = local_glyph->x_advance;
+
+		RenderBackend_UploadGlyph(font->atlas, glyph->x, glyph->y, &font->image_buffer[local_glyph->y * font->image_buffer_width + local_glyph->x], glyph->width, glyph->height, font->image_buffer_width);
+
+		*glyph_pointer = glyph->next;
+		glyph->next = font->glyph_list_head;
+		font->glyph_list_head = glyph;
+
+		return glyph;
 	}
 #endif
 
