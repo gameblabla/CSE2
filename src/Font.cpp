@@ -1073,19 +1073,11 @@ static Glyph* GetGlyph(Font *font, unsigned long unicode_value)
 	size_t left = 0;
 	size_t right = font->total_local_glyphs;
 
-	while (right - left >= 2)
+	for (;;)
 	{
-		size_t index = left + (right - left) / 2;
+		size_t index = (left + right) / 2;
 
-		if (font->local_glyphs[index].unicode_value < unicode_value)
-		{
-			left = index;
-		}
-		else if (font->local_glyphs[index].unicode_value > unicode_value)
-		{
-			right = index;
-		}
-		else
+		if (font->local_glyphs[index].unicode_value == unicode_value)
 		{
 			const Glyph *local_glyph = &font->local_glyphs[index];
 
@@ -1104,6 +1096,14 @@ static Glyph* GetGlyph(Font *font, unsigned long unicode_value)
 
 			return glyph;
 		}
+
+		if (index == left)
+			break;
+
+		if (font->local_glyphs[index].unicode_value < unicode_value)
+			left = index;
+		else //if (font->local_glyphs[index].unicode_value > unicode_value)
+			right = index;
 	}
 #endif
 
