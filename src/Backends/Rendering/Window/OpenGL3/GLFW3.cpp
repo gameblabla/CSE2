@@ -34,6 +34,8 @@ bool WindowBackend_OpenGL_CreateWindow(const char *window_title, size_t *screen_
 
 		if (monitor != NULL)
 		{
+			// Use current monitor resolution, because for some reason
+			// 640x480 causes my laptop to completely freeze on Linux.
 			const GLFWvidmode *mode = glfwGetVideoMode(monitor);
 
 			*screen_width = mode->width;
