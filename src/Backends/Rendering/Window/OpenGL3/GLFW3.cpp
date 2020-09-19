@@ -47,28 +47,28 @@ bool WindowBackend_OpenGL_CreateWindow(const char *window_title, size_t *screen_
 	{
 		glfwMakeContextCurrent(window);
 
-			#ifndef USE_OPENGLES2
-				if (gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-				{
-					// Check if the platform supports OpenGL 3.2
-					if (GLAD_GL_VERSION_3_2)
-					{
-			#endif
-						Backend_PostWindowCreation();
+	#ifndef USE_OPENGLES2
+		if (gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+		{
+			// Check if the platform supports OpenGL 3.2
+			if (GLAD_GL_VERSION_3_2)
+			{
+	#endif
+				Backend_PostWindowCreation();
 
-						return true;
-			#ifndef USE_OPENGLES2
-					}
-					else
-					{
-						Backend_ShowMessageBox("Fatal error (OpenGL rendering backend)", "Your system does not support OpenGL 3.2");
-					}
-				}
-				else
-				{
-					Backend_ShowMessageBox("Fatal error (OpenGL rendering backend)", "Could not initialize OpenGL context");
-				}
-			#endif
+				return true;
+	#ifndef USE_OPENGLES2
+			}
+			else
+			{
+				Backend_ShowMessageBox("Fatal error (OpenGL rendering backend)", "Your system does not support OpenGL 3.2");
+			}
+		}
+		else
+		{
+			Backend_ShowMessageBox("Fatal error (OpenGL rendering backend)", "Could not initialize OpenGL context");
+		}
+	#endif
 
 		glfwDestroyWindow(window);
 	}
