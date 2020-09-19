@@ -18,8 +18,6 @@
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
 
-#define TOTAL_VBOS 8
-
 #define ATTRIBUTE_INPUT_VERTEX_COORDINATES 1
 #define ATTRIBUTE_INPUT_TEXTURE_COORDINATES 2
 
@@ -108,7 +106,7 @@ static struct
 #ifndef USE_OPENGLES2
 static GLuint vertex_array_id;
 #endif
-static GLuint vertex_buffer_ids[TOTAL_VBOS];
+static GLuint vertex_buffer_id;
 static GLuint framebuffer_id;
 
 static VertexBufferSlot *local_vertex_buffer;
@@ -395,30 +393,10 @@ static VertexBufferSlot* GetVertexBufferSlot(void)
 
 static void FlushVertexBuffer(void)
 {
-	static size_t vertex_buffer_size[TOTAL_VBOS];
-	static size_t current_vertex_buffer = 0;
-
 	if (current_vertex_buffer_slot == 0)
 		return;
 
-	// Select new VBO
-	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_ids[current_vertex_buffer]);
-	glVertexAttribPointer(ATTRIBUTE_INPUT_VERTEX_COORDINATES, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, position));
-	glVertexAttribPointer(ATTRIBUTE_INPUT_TEXTURE_COORDINATES, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texture));
-
-	// Upload vertex buffer to VBO, growing it if necessary
-	if (local_vertex_buffer_size > vertex_buffer_size[current_vertex_buffer])
-	{
-		vertex_buffer_size[current_vertex_buffer] = local_vertex_buffer_size;
-		glBufferData(GL_ARRAY_BUFFER, vertex_buffer_size[current_vertex_buffer] * sizeof(VertexBufferSlot), local_vertex_buffer, GL_DYNAMIC_DRAW);
-	}
-	else
-	{
-		glBufferSubData(GL_ARRAY_BUFFER, 0, current_vertex_buffer_slot * sizeof(VertexBufferSlot), local_vertex_buffer);
-	}
-
-	if (++current_vertex_buffer >= TOTAL_VBOS)
-		current_vertex_buffer = 0;
+	glBufferData(GL_ARRAY_BUFFER, current_vertex_buffer_slot * sizeof(VertexBufferSlot), local_vertex_buffer, GL_STREAM_DRAW);
 
 	glDrawArrays(GL_TRIANGLES, 0, 6 * current_vertex_buffer_slot);
 
@@ -514,8 +492,11 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t scree
 		glBindVertexArray(vertex_array_id);
 	#endif
 
-		// Set up Vertex Buffer Objects
-		glGenBuffers(TOTAL_VBOS, vertex_buffer_ids);
+		// Set up Vertex Buffer Object
+		glGenBuffers(1, &vertex_buffer_id);
+		glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_id);
+		glVertexAttribPointer(ATTRIBUTE_INPUT_VERTEX_COORDINATES, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, position));
+		glVertexAttribPointer(ATTRIBUTE_INPUT_TEXTURE_COORDINATES, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texture));
 
 		// Set up the vertex attributes
 		glEnableVertexAttribArray(ATTRIBUTE_INPUT_VERTEX_COORDINATES);
@@ -569,7 +550,7 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t scree
 		if (program_texture.id != 0)
 			glDeleteProgram(program_texture.id);
 
-		glDeleteBuffers(TOTAL_VBOS, vertex_buffer_ids);
+		glDeleteBuffers(1, &vertex_buffer_id);
 	#ifndef USE_OPENGLES2
 		glDeleteVertexArrays(1, &vertex_array_id);
 	#endif
@@ -590,7 +571,7 @@ void RenderBackend_Deinit(void)
 	glDeleteProgram(program_colour_fill.id);
 	glDeleteProgram(program_texture_colour_key.id);
 	glDeleteProgram(program_texture.id);
-	glDeleteBuffers(TOTAL_VBOS, vertex_buffer_ids);
+	glDeleteBuffers(1, &vertex_buffer_id);
 #ifndef USE_OPENGLES2
 	glDeleteVertexArrays(1, &vertex_array_id);
 #endif
