@@ -297,22 +297,19 @@ void ChangeSoundPan(int no, long pan)	// 512がMAXで256がﾉｰﾏﾙ (512 is 
 int MakePixToneObject(const PIXTONEPARAMETER *ptp, int ptp_num, int no)
 {
 	// For some reason, this function creates an entire WAV file header,
-	// when it only needs a WAVEFORMATEX
+	// when it only needs a WAVEFORMATEX.
+	// From what I can tell, there's no struct like this in the Windows
+	// headers, so Pixel must have defined it manually, just like this:
 	typedef struct WavHeader
 	{
-		CHAR riff[4];
-		DWORD wav_size;
-		CHAR wave[4];
-		CHAR fmt[4];
-		DWORD fmt_chunk_size;
-		WORD audio_format;
-		WORD num_channels;
-		DWORD sample_rate;
-		DWORD byte_rate;
-		WORD sample_alignment;
-		WORD bit_depth;
-		CHAR data[4];
-		DWORD data_bytes;
+		FOURCC riff_id;
+		DWORD riff_size;
+		FOURCC wave_id;
+		FOURCC fmt_id;
+		DWORD fmt_size;
+		PCMWAVEFORMAT format;
+		FOURCC data_id;
+		DWORD data_size;
 	} WavHeader;
 
 	int sample_count;
@@ -327,23 +324,23 @@ int MakePixToneObject(const PIXTONEPARAMETER *ptp, int ptp_num, int no)
 		return 0;
 
 	const char *riff = "RIFF";
-	const char *fmt = "fmt ";
+	const char *fmt  = "fmt ";
 	const char *wave = "WAVE";
 	const char *data = "data";
 
-	wav_header.bit_depth = 8;
-	wav_header.sample_rate = 22050;
-	wav_header.num_channels = 1;
-	wav_header.audio_format = WAVE_FORMAT_PCM;
-	wav_header.fmt_chunk_size = 16;
-	memcpy(wav_header.riff, riff, 4);
-	memcpy(wav_header.fmt, fmt, 4);
-	memcpy(wav_header.wave, wave, 4);
-	memcpy(wav_header.data, data, 4);
-	wav_header.sample_alignment = (wav_header.bit_depth / 8) * wav_header.num_channels;
-	wav_header.byte_rate = (wav_header.bit_depth / 8) * wav_header.num_channels * wav_header.sample_rate;
-	wav_header.data_bytes = wav_header.sample_alignment * ptp->size;	// Note that this uses ptp->size, not sample_count. If this header were ever used, it would be incorrect.
-	wav_header.wav_size = wav_header.data_bytes + 36;
+	wav_header.format.wBitsPerSample = 8;
+	wav_header.format.wf.nSamplesPerSec = 22050;
+	wav_header.format.wf.nChannels = 1;
+	wav_header.format.wf.wFormatTag = WAVE_FORMAT_PCM;
+	wav_header.fmt_size = sizeof(wav_header.format);
+	memcpy(&wav_header.riff_id, riff, sizeof(FOURCC));
+	memcpy(&wav_header.fmt_id, fmt, sizeof(FOURCC));
+	memcpy(&wav_header.wave_id, wave, sizeof(FOURCC));
+	memcpy(&wav_header.data_id, data, sizeof(FOURCC));
+	wav_header.format.wf.nBlockAlign = (wav_header.format.wBitsPerSample / 8) * wav_header.format.wf.nChannels;
+	wav_header.format.wf.nAvgBytesPerSec = (wav_header.format.wBitsPerSample / 8) * wav_header.format.wf.nChannels * wav_header.format.wf.nSamplesPerSec;
+	wav_header.data_size = wav_header.format.wf.nBlockAlign * ptp->size;	// Note that this uses ptp->size, not sample_count. If this header were ever used, it would be incorrect.
+	wav_header.riff_size = sizeof(wav_header) - 8 + wav_header.data_size;
 
 	ptp_pointer = ptp;
 	sample_count = 0;
@@ -360,7 +357,7 @@ int MakePixToneObject(const PIXTONEPARAMETER *ptp, int ptp_num, int no)
 	dsbd.dwSize = sizeof(dsbd);
 	dsbd.dwFlags = DSBCAPS_STATIC | DSBCAPS_GLOBALFOCUS | DSBCAPS_CTRLPAN | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY;
 	dsbd.dwBufferBytes = sample_count;
-	dsbd.lpwfxFormat = (WAVEFORMATEX*)&wav_header.audio_format;
+	dsbd.lpwfxFormat = (LPWAVEFORMATEX)&wav_header.format;
 
 	if (lpDS->CreateSoundBuffer(&dsbd, &lpSECONDARYBUFFER[no], 0) != DS_OK)
 		return -1;
