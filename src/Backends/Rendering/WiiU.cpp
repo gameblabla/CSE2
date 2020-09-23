@@ -610,7 +610,7 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 
 		// Draw to the selected texture, instead of the screen
 		GX2SetColorBuffer(&surface->colour_buffer, GX2_RENDER_TARGET_0);
-		GX2SetViewport(0, 0, (float)surface->colour_buffer.surface.width, (float)surface->colour_buffer.surface.height, 0.0f, 1.0f);
+		GX2SetViewport(0.0f, 0.0f, (float)surface->colour_buffer.surface.width, (float)surface->colour_buffer.surface.height, 0.0f, 1.0f);
 		GX2SetScissor(0, 0, (float)surface->colour_buffer.surface.width, (float)surface->colour_buffer.surface.height);
 
 		// Set the colour-fill... colour
