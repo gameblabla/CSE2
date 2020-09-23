@@ -48,14 +48,6 @@ typedef struct RenderBackend_GlyphAtlas
 	GX2Texture texture;
 } RenderBackend_GlyphAtlas;
 
-typedef struct Viewport
-{
-	float x;
-	float y;
-	float width;
-	float height;
-} Viewport;
-
 typedef struct Coordinate2D
 {
 	float x;
@@ -88,9 +80,6 @@ static GX2ContextState *gx2_context;
 
 static RenderBackend_GlyphAtlas *glyph_atlas;
 static RenderBackend_Surface *glyph_destination_surface;
-
-static Viewport tv_viewport;
-static Viewport drc_viewport;
 
 static VertexBufferSlot *local_vertex_buffer;
 static size_t local_vertex_buffer_size;
@@ -176,26 +165,6 @@ static void FlushVertexBuffer(void)
 	current_vertex_buffer_slot = 0;
 }
 
-static void CalculateViewport(size_t actual_screen_width, size_t actual_screen_height, Viewport *viewport)
-{
-	if (actual_screen_width * framebuffer_surface->height > framebuffer_surface->width * actual_screen_height)
-	{
-		viewport->y = 0.0f;
-		viewport->height = actual_screen_height;
-
-		viewport->width = (framebuffer_surface->width * actual_screen_height) / framebuffer_surface->height;
-		viewport->x = (actual_screen_width - viewport->width) / 2;
-	}
-	else
-	{
-		viewport->x = 0.0f;
-		viewport->width = actual_screen_width;
-
-		viewport->height = (framebuffer_surface->height * actual_screen_width) / framebuffer_surface->width;
-		viewport->y = (actual_screen_height - viewport->height) / 2;
-	}
-}
-
 RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t screen_width, size_t screen_height, bool fullscreen)
 {
 	(void)window_title;
@@ -253,30 +222,6 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t scree
 
 								// Disable depth-test (enabled by default for some reason)
 								GX2SetDepthOnlyControl(FALSE, FALSE, GX2_COMPARE_FUNC_ALWAYS);
-
-								// Calculate centred viewports
-								switch (GX2GetSystemTVScanMode())
-								{
-									// For now, we have to match WUT's broken behaviour (its `GX2TVScanMode`
-									// enum is missing values, and the rest are off-by-one)
-									//case GX2_TV_SCAN_MODE_576I:
-									case GX2_TV_SCAN_MODE_480I:	// Actually 576i
-									case GX2_TV_SCAN_MODE_480P:	// Actually 480i
-										CalculateViewport(854, 480, &tv_viewport);
-										break;
-
-									case GX2_TV_SCAN_MODE_720P:	// Actually 480p
-									default:	// Funnel the *real* 1080p into this
-										CalculateViewport(1280, 720, &tv_viewport);
-										break;
-
-									case GX2_TV_SCAN_MODE_1080I:	// Actually invalid
-									case GX2_TV_SCAN_MODE_1080P:	// Actually 1080i
-										CalculateViewport(1920, 1080, &tv_viewport);
-										break;
-								}
-
-								CalculateViewport(854, 480, &drc_viewport);
 
 								return framebuffer_surface;
 							}
@@ -359,13 +304,13 @@ void RenderBackend_DrawScreen(void)
 	VertexBufferSlot *vertex_buffer_slot = (VertexBufferSlot*)GX2RLockBufferEx(&vertex_buffer, (GX2RResourceFlags)0);
 
 	// Set buffer to (4:3) full-screen
-	vertex_buffer_slot->vertices[0].position.x = -1.0f;
+	vertex_buffer_slot->vertices[0].position.x = -12.0f / 16.0f;
 	vertex_buffer_slot->vertices[0].position.y = -1.0f;
-	vertex_buffer_slot->vertices[1].position.x =  1.0f;
+	vertex_buffer_slot->vertices[1].position.x =  12.0f / 16.0f;
 	vertex_buffer_slot->vertices[1].position.y = -1.0f;
-	vertex_buffer_slot->vertices[2].position.x =  1.0f;
+	vertex_buffer_slot->vertices[2].position.x =  12.0f / 16.0f;
 	vertex_buffer_slot->vertices[2].position.y =  1.0f;
-	vertex_buffer_slot->vertices[3].position.x = -1.0f;
+	vertex_buffer_slot->vertices[3].position.x = -12.0f / 16.0f;
 	vertex_buffer_slot->vertices[3].position.y =  1.0f;
 
 	// Set buffer to full-texture
@@ -393,9 +338,6 @@ void RenderBackend_DrawScreen(void)
 	WHBGfxBeginRenderTV();
 	WHBGfxClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-	// Set Viewport
-	GX2SetViewport(tv_viewport.x, tv_viewport.y, tv_viewport.width, tv_viewport.height, 0.0f, 1.0f);
-
 	// This might be needed? Not sure.
 //	GX2RInvalidateSurface(&framebuffer_surface->texture.surface, 0, (GX2RResourceFlags)0);
 
@@ -421,9 +363,6 @@ void RenderBackend_DrawScreen(void)
 
 	WHBGfxBeginRenderDRC();
 	WHBGfxClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
-	// Set Viewport
-	GX2SetViewport(drc_viewport.x, drc_viewport.y, drc_viewport.width, drc_viewport.height, 0.0f, 1.0f);
 
 	// This might be needed? Not sure.
 //	GX2RInvalidateSurface(&framebuffer_surface->texture.surface, 0, (GX2RResourceFlags)0);
