@@ -13,10 +13,11 @@
 
 00 TEX: ADDR(48) CNT(1) VALID_PIX 
       0  SAMPLE R0.___x, R0.xy0x, t0, s0
-01 ALU: ADDR(32) CNT(6) 
-      1  x: MUL         R0.x,  C0.x,  1.0f      
-         y: MUL         R0.y,  C0.y,  1.0f      
-         z: MUL         R0.z,  C0.z,  1.0f      
+01 ALU: ADDR(32) CNT(4) 
+      1  x: MOV         R0.x,  C0.x      
+         y: MOV         R0.y,  C0.y      
+         z: MOV         R0.z,  C0.z      
          w: MUL         R0.w,  R0.w,  C0.w      
 02 EXP_DONE: PIX0, R0
 END_OF_PROGRAM
+
