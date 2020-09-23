@@ -20,11 +20,6 @@
 
 #include "../Misc.h"
 
-#include "WiiUShaders/colour_fill.gsh.h"
-#include "WiiUShaders/glyph.gsh.h"
-#include "WiiUShaders/texture.gsh.h"
-#include "WiiUShaders/texture_colour_key.gsh.h"
-
 typedef enum RenderMode
 {
 	MODE_BLANK,
@@ -65,10 +60,10 @@ typedef struct VertexBufferSlot
 	Vertex vertices[4];
 } VertexBufferSlot;
 
-static WHBGfxShaderGroup texture_shader;
-static WHBGfxShaderGroup texture_colour_key_shader;
-static WHBGfxShaderGroup colour_fill_shader;
-static WHBGfxShaderGroup glyph_shader;
+static WHBGfxShaderGroup shader_group_texture;
+static WHBGfxShaderGroup shader_group_texture_colour_key;
+static WHBGfxShaderGroup shader_group_colour_fill;
+static WHBGfxShaderGroup shader_group_glyph;
 
 static GX2RBuffer vertex_buffer;
 
@@ -88,6 +83,22 @@ static size_t current_vertex_buffer_slot;
 static RenderMode last_render_mode;
 static GX2Texture *last_source_texture;
 static GX2Texture *last_destination_texture;
+
+static const unsigned char shader_colour_fill[] = {
+	#include "WiiUShaders/colour_fill.gsh.h"
+};
+
+static const unsigned char shader_glyph[] = {
+	#include "WiiUShaders/glyph.gsh.h"
+};
+
+static const unsigned char shader_texture[] = {
+	#include "WiiUShaders/texture.gsh.h"
+};
+
+static const unsigned char shader_texture_colour_key[] = {
+	#include "WiiUShaders/texture_colour_key.gsh.h"
+};
 
 static VertexBufferSlot* GetVertexBufferSlot(void)
 {
@@ -175,31 +186,31 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t scree
 		// Initialise the shaders
 
 		// Texture shader
-		if (WHBGfxLoadGFDShaderGroup(&texture_shader, 0, rtexture))
+		if (WHBGfxLoadGFDShaderGroup(&shader_group_texture, 0, shader_texture))
 		{
-			WHBGfxInitShaderAttribute(&texture_shader, "input_vertex_coordinates", 0, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
-			WHBGfxInitShaderAttribute(&texture_shader, "input_texture_coordinates", 1, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
-			WHBGfxInitFetchShader(&texture_shader);
+			WHBGfxInitShaderAttribute(&shader_group_texture, "input_vertex_coordinates", 0, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
+			WHBGfxInitShaderAttribute(&shader_group_texture, "input_texture_coordinates", 1, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
+			WHBGfxInitFetchShader(&shader_group_texture);
 
 			// Texture shader (with colour-key)
-			if (WHBGfxLoadGFDShaderGroup(&texture_colour_key_shader, 0, rtexture_colour_key))
+			if (WHBGfxLoadGFDShaderGroup(&shader_group_texture_colour_key, 0, shader_texture_colour_key))
 			{
-				WHBGfxInitShaderAttribute(&texture_colour_key_shader, "input_vertex_coordinates", 0, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
-				WHBGfxInitShaderAttribute(&texture_colour_key_shader, "input_texture_coordinates", 1, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
-				WHBGfxInitFetchShader(&texture_colour_key_shader);
+				WHBGfxInitShaderAttribute(&shader_group_texture_colour_key, "input_vertex_coordinates", 0, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
+				WHBGfxInitShaderAttribute(&shader_group_texture_colour_key, "input_texture_coordinates", 1, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
+				WHBGfxInitFetchShader(&shader_group_texture_colour_key);
 
 				// Colour-fill shader
-				if (WHBGfxLoadGFDShaderGroup(&colour_fill_shader, 0, rcolour_fill))
+				if (WHBGfxLoadGFDShaderGroup(&shader_group_colour_fill, 0, shader_colour_fill))
 				{
-					WHBGfxInitShaderAttribute(&colour_fill_shader, "input_vertex_coordinates", 0, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
-					WHBGfxInitFetchShader(&colour_fill_shader);
+					WHBGfxInitShaderAttribute(&shader_group_colour_fill, "input_vertex_coordinates", 0, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
+					WHBGfxInitFetchShader(&shader_group_colour_fill);
 
 					// Glyph shader
-					if (WHBGfxLoadGFDShaderGroup(&glyph_shader, 0, rglyph))
+					if (WHBGfxLoadGFDShaderGroup(&shader_group_glyph, 0, shader_glyph))
 					{
-						WHBGfxInitShaderAttribute(&glyph_shader, "input_vertex_coordinates", 0, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
-						WHBGfxInitShaderAttribute(&glyph_shader, "input_texture_coordinates", 1, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
-						WHBGfxInitFetchShader(&glyph_shader);
+						WHBGfxInitShaderAttribute(&shader_group_glyph, "input_vertex_coordinates", 0, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
+						WHBGfxInitShaderAttribute(&shader_group_glyph, "input_texture_coordinates", 1, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
+						WHBGfxInitFetchShader(&shader_group_glyph);
 
 						// Initialise sampler
 						GX2InitSampler(&sampler, GX2_TEX_CLAMP_MODE_CLAMP, GX2_TEX_XY_FILTER_MODE_LINEAR);
@@ -237,28 +248,28 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t scree
 							Backend_PrintError("Couldn't create the framebuffer surface");
 						}
 
-						WHBGfxFreeShaderGroup(&glyph_shader);
+						WHBGfxFreeShaderGroup(&shader_group_glyph);
 					}
 					else
 					{
 						Backend_PrintError("Couldn't create the glyph shader");
 					}
 
-					WHBGfxFreeShaderGroup(&colour_fill_shader);
+					WHBGfxFreeShaderGroup(&shader_group_colour_fill);
 				}
 				else
 				{
 					Backend_PrintError("Couldn't create the colour-fill shader");
 				}
 
-				WHBGfxFreeShaderGroup(&texture_colour_key_shader);
+				WHBGfxFreeShaderGroup(&shader_group_texture_colour_key);
 			}
 			else
 			{
 				Backend_PrintError("Couldn't create the texture colour-key shader");
 			}
 
-			WHBGfxFreeShaderGroup(&texture_shader);
+			WHBGfxFreeShaderGroup(&shader_group_texture);
 		}
 		else
 		{
@@ -283,10 +294,10 @@ void RenderBackend_Deinit(void)
 
 	GX2RDestroyBufferEx(&vertex_buffer, (GX2RResourceFlags)0);
 
-	WHBGfxFreeShaderGroup(&glyph_shader);
-	WHBGfxFreeShaderGroup(&colour_fill_shader);
-	WHBGfxFreeShaderGroup(&texture_colour_key_shader);
-	WHBGfxFreeShaderGroup(&texture_shader);
+	WHBGfxFreeShaderGroup(&shader_group_glyph);
+	WHBGfxFreeShaderGroup(&shader_group_colour_fill);
+	WHBGfxFreeShaderGroup(&shader_group_texture_colour_key);
+	WHBGfxFreeShaderGroup(&shader_group_texture);
 
 	WHBGfxShutdown();
 }
@@ -342,13 +353,13 @@ void RenderBackend_DrawScreen(void)
 //	GX2RInvalidateSurface(&framebuffer_surface->texture.surface, 0, (GX2RResourceFlags)0);
 
 	// Select texture shader
-	GX2SetFetchShader(&texture_shader.fetchShader);
-	GX2SetVertexShader(texture_shader.vertexShader);
-	GX2SetPixelShader(texture_shader.pixelShader);
+	GX2SetFetchShader(&shader_group_texture.fetchShader);
+	GX2SetVertexShader(shader_group_texture.vertexShader);
+	GX2SetPixelShader(shader_group_texture.pixelShader);
 
 	// Bind a few things
-	GX2SetPixelSampler(&sampler, texture_shader.pixelShader->samplerVars[0].location);
-	GX2SetPixelTexture(&framebuffer_surface->texture, texture_shader.pixelShader->samplerVars[0].location);
+	GX2SetPixelSampler(&sampler, shader_group_texture.pixelShader->samplerVars[0].location);
+	GX2SetPixelTexture(&framebuffer_surface->texture, shader_group_texture.pixelShader->samplerVars[0].location);
 	GX2RSetAttributeBuffer(&vertex_buffer, 0, sizeof(Vertex), offsetof(Vertex, position));
 	GX2RSetAttributeBuffer(&vertex_buffer, 1, sizeof(Vertex), offsetof(Vertex, texture));
 
@@ -368,13 +379,13 @@ void RenderBackend_DrawScreen(void)
 //	GX2RInvalidateSurface(&framebuffer_surface->texture.surface, 0, (GX2RResourceFlags)0);
 
 	// Select texture shader
-	GX2SetFetchShader(&texture_shader.fetchShader);
-	GX2SetVertexShader(texture_shader.vertexShader);
-	GX2SetPixelShader(texture_shader.pixelShader);
+	GX2SetFetchShader(&shader_group_texture.fetchShader);
+	GX2SetVertexShader(shader_group_texture.vertexShader);
+	GX2SetPixelShader(shader_group_texture.pixelShader);
 
 	// Bind a few things
-	GX2SetPixelSampler(&sampler, texture_shader.pixelShader->samplerVars[0].location);
-	GX2SetPixelTexture(&framebuffer_surface->texture, texture_shader.pixelShader->samplerVars[0].location);
+	GX2SetPixelSampler(&sampler, shader_group_texture.pixelShader->samplerVars[0].location);
+	GX2SetPixelTexture(&framebuffer_surface->texture, shader_group_texture.pixelShader->samplerVars[0].location);
 	GX2RSetAttributeBuffer(&vertex_buffer, 0, sizeof(Vertex), offsetof(Vertex, position));
 	GX2RSetAttributeBuffer(&vertex_buffer, 1, sizeof(Vertex), offsetof(Vertex, texture));
 
@@ -537,7 +548,7 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBacke
 		GX2SetScissor(0, 0, destination_surface->colour_buffer.surface.width, destination_surface->colour_buffer.surface.height);
 
 		// Select shader
-		WHBGfxShaderGroup *shader = colour_key ? &texture_colour_key_shader : &texture_shader;
+		WHBGfxShaderGroup *shader = colour_key ? &shader_group_texture_colour_key : &shader_group_texture;
 
 		// Bind it
 		GX2SetFetchShader(&shader->fetchShader);
@@ -615,12 +626,12 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 
 		// Set the colour-fill... colour
 		const float uniform_colours[4] = {red / 255.0f, green / 255.0f, blue / 255.0f, 1.0f};
-		GX2SetPixelUniformReg(colour_fill_shader.pixelShader->uniformVars[0].offset, 4, (uint32_t*)&uniform_colours);
+		GX2SetPixelUniformReg(shader_group_colour_fill.pixelShader->uniformVars[0].offset, 4, (uint32_t*)&uniform_colours);
 
 		// Bind the colour-fill shader
-		GX2SetFetchShader(&colour_fill_shader.fetchShader);
-		GX2SetVertexShader(colour_fill_shader.vertexShader);
-		GX2SetPixelShader(colour_fill_shader.pixelShader);
+		GX2SetFetchShader(&shader_group_colour_fill.fetchShader);
+		GX2SetVertexShader(shader_group_colour_fill.vertexShader);
+		GX2SetPixelShader(shader_group_colour_fill.pixelShader);
 
 		// Bind misc. data
 		GX2RSetAttributeBuffer(&vertex_buffer, 0, sizeof(Vertex), offsetof(Vertex, position));
@@ -740,16 +751,16 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBa
 
 		// Set the colour
 		const float uniform_colours[4] = {red / 255.0f, green / 255.0f, blue / 255.0f, 1.0f};
-		GX2SetPixelUniformReg(glyph_shader.pixelShader->uniformVars[0].offset, 4, (uint32_t*)&uniform_colours);
+		GX2SetPixelUniformReg(shader_group_glyph.pixelShader->uniformVars[0].offset, 4, (uint32_t*)&uniform_colours);
 
 		// Select glyph shader
-		GX2SetFetchShader(&glyph_shader.fetchShader);
-		GX2SetVertexShader(glyph_shader.vertexShader);
-		GX2SetPixelShader(glyph_shader.pixelShader);
+		GX2SetFetchShader(&shader_group_glyph.fetchShader);
+		GX2SetVertexShader(shader_group_glyph.vertexShader);
+		GX2SetPixelShader(shader_group_glyph.pixelShader);
 
 		// Bind misc. data
-		GX2SetPixelSampler(&sampler, glyph_shader.pixelShader->samplerVars[0].location);
-		GX2SetPixelTexture(&atlas->texture, glyph_shader.pixelShader->samplerVars[0].location);
+		GX2SetPixelSampler(&sampler, shader_group_glyph.pixelShader->samplerVars[0].location);
+		GX2SetPixelTexture(&atlas->texture, shader_group_glyph.pixelShader->samplerVars[0].location);
 		GX2RSetAttributeBuffer(&vertex_buffer, 0, sizeof(Vertex), offsetof(Vertex, position));
 		GX2RSetAttributeBuffer(&vertex_buffer, 1, sizeof(Vertex), offsetof(Vertex, texture));
 
