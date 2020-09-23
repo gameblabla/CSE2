@@ -178,12 +178,12 @@ static void FlushVertexBuffer(void)
 
 static void CalculateViewport(size_t actual_screen_width, size_t actual_screen_height, Viewport *viewport)
 {
-	if ((float)actual_screen_width / (float)actual_screen_height > (float)framebuffer_surface->width / (float)framebuffer_surface->height)
+	if (actual_screen_width * framebuffer_surface->height > framebuffer_surface->width * actual_screen_height)
 	{
 		viewport->y = 0.0f;
 		viewport->height = actual_screen_height;
 
-		viewport->width = framebuffer_surface->width * ((float)actual_screen_height / (float)framebuffer_surface->height);
+		viewport->width = (framebuffer_surface->width * actual_screen_height) / framebuffer_surface->height;
 		viewport->x = (actual_screen_width - viewport->width) / 2;
 	}
 	else
@@ -191,7 +191,7 @@ static void CalculateViewport(size_t actual_screen_width, size_t actual_screen_h
 		viewport->x = 0.0f;
 		viewport->width = actual_screen_width;
 
-		viewport->height = framebuffer_surface->height * ((float)actual_screen_width / (float)framebuffer_surface->width);
+		viewport->height = (framebuffer_surface->height * actual_screen_width) / framebuffer_surface->width;
 		viewport->y = (actual_screen_height - viewport->height) / 2;
 	}
 }
