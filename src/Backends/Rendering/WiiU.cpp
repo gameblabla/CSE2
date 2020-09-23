@@ -240,8 +240,9 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t scree
 
 						if (framebuffer_surface != NULL)
 						{
-							// Create a 'context' (this voodoo magic can be used to undo `GX2SetColorBuffer`,
-							// allowing us to draw to the screen once again)
+							// From what I can tell, there isn't a 'global context' in GX2: instead there are context objects.
+							// wut internally uses (and *switches to*) its own contexts, so we need to maintain one too,
+							// and make sure we're always switching back to it when wut is done doing what it's doing.
 							gx2_context = (GX2ContextState*)aligned_alloc(GX2_CONTEXT_STATE_ALIGNMENT, sizeof(GX2ContextState));
 
 							if (gx2_context != NULL)
@@ -445,7 +446,7 @@ void RenderBackend_DrawScreen(void)
 
 	WHBGfxFinishRender();
 
-	// Do this or else the screen will never update. I wish I understood why.
+	// Switch back to our context
 	GX2SetContextState(gx2_context);
 }
 
