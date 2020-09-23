@@ -33,8 +33,6 @@ typedef struct RenderBackend_Surface
 {
 	GX2Texture texture;
 	GX2ColorBuffer colour_buffer;
-	size_t width;
-	size_t height;
 	bool render_target;
 } RenderBackend_Surface;
 
@@ -339,6 +337,8 @@ void RenderBackend_DrawScreen(void)
 	// Disable blending
 	GX2SetColorControl(GX2_LOGIC_OP_COPY, 0, FALSE, TRUE);
 
+	const float texture_coordinate_transform[2] = {1.0f, 1.0f};
+
 	// Start drawing
 	WHBGfxBeginRender();
 
@@ -356,6 +356,9 @@ void RenderBackend_DrawScreen(void)
 	GX2SetFetchShader(&shader_group_texture.fetchShader);
 	GX2SetVertexShader(shader_group_texture.vertexShader);
 	GX2SetPixelShader(shader_group_texture.pixelShader);
+
+	// Set shader uniforms
+	GX2SetVertexUniformReg(shader_group_texture.vertexShader->uniformVars[0].offset, 2, (uint32_t*)&texture_coordinate_transform);
 
 	// Bind a few things
 	GX2SetPixelSampler(&sampler, shader_group_texture.pixelShader->samplerVars[0].location);
@@ -383,6 +386,9 @@ void RenderBackend_DrawScreen(void)
 	GX2SetVertexShader(shader_group_texture.vertexShader);
 	GX2SetPixelShader(shader_group_texture.pixelShader);
 
+	// Set shader uniforms
+	GX2SetVertexUniformReg(shader_group_texture.vertexShader->uniformVars[0].offset, 2, (uint32_t*)&texture_coordinate_transform);
+
 	// Bind a few things
 	GX2SetPixelSampler(&sampler, shader_group_texture.pixelShader->samplerVars[0].location);
 	GX2SetPixelTexture(&framebuffer_surface->texture, shader_group_texture.pixelShader->samplerVars[0].location);
@@ -406,8 +412,6 @@ RenderBackend_Surface* RenderBackend_CreateSurface(size_t width, size_t height, 
 
 	if (surface != NULL)
 	{
-		surface->width = width;
-		surface->height = height;
 		surface->render_target = render_target;
 
 		// Initialise texture
@@ -555,6 +559,10 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBacke
 		GX2SetVertexShader(shader->vertexShader);
 		GX2SetPixelShader(shader->pixelShader);
 
+		// Set shader uniforms (for some reason this vec2 needs padding to a vec4)
+		const float texture_coordinate_transform[4] = {1.0f / source_surface->texture.surface.width, 1.0f / source_surface->texture.surface.height, 1.0f, 1.0f};
+		GX2SetVertexUniformReg(shader_group_glyph.vertexShader->uniformVars[0].offset, 4, (uint32_t*)texture_coordinate_transform);
+
 		// Bind misc. data
 		GX2SetPixelSampler(&sampler, shader->pixelShader->samplerVars[0].location);
 		GX2SetPixelTexture(&source_surface->texture, shader->pixelShader->samplerVars[0].location);
@@ -570,10 +578,10 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBacke
 	if (vertex_buffer_slot != NULL)
 	{
 		// Set vertex position buffer
-		const float vertex_left = x * 2.0f / destination_surface->width - 1.0f;
-		const float vertex_top = y * -2.0f / destination_surface->height + 1.0f;
-		const float vertex_right = (x + (rect->right - rect->left)) * 2.0f / destination_surface->width - 1.0f;
-		const float vertex_bottom = (y + (rect->bottom - rect->top)) * -2.0f / destination_surface->height + 1.0f;
+		const float vertex_left = x * 2.0f / destination_surface->texture.surface.width - 1.0f;
+		const float vertex_top = y * -2.0f / destination_surface->texture.surface.height + 1.0f;
+		const float vertex_right = (x + (rect->right - rect->left)) * 2.0f / destination_surface->texture.surface.width - 1.0f;
+		const float vertex_bottom = (y + (rect->bottom - rect->top)) * -2.0f / destination_surface->texture.surface.height + 1.0f;
 
 		vertex_buffer_slot->vertices[0].position.x = vertex_left;
 		vertex_buffer_slot->vertices[0].position.y = vertex_top;
@@ -584,10 +592,10 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBacke
 		vertex_buffer_slot->vertices[3].position.x = vertex_left;
 		vertex_buffer_slot->vertices[3].position.y = vertex_bottom;
 
-		const float texture_left = rect->left / (float)source_surface->width;
-		const float texture_top = rect->top / (float)source_surface->height;
-		const float texture_right = rect->right / (float)source_surface->width;
-		const float texture_bottom = rect->bottom / (float)source_surface->height;
+		const float texture_left = rect->left;
+		const float texture_top = rect->top;
+		const float texture_right = rect->right;
+		const float texture_bottom = rect->bottom;
 
 		// Set texture coordinate buffer
 		vertex_buffer_slot->vertices[0].texture.x = texture_left;
@@ -645,10 +653,10 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 	if (vertex_buffer_slot != NULL)
 	{
 		// Set vertex position buffer
-		const float vertex_left = rect->left * 2.0f / surface->width - 1.0f;
-		const float vertex_top = rect->top * -2.0f / surface->height + 1.0f;
-		const float vertex_right = rect->right * 2.0f / surface->width - 1.0f;
-		const float vertex_bottom = rect->bottom * -2.0f / surface->height + 1.0f;
+		const float vertex_left = rect->left * 2.0f / surface->texture.surface.width - 1.0f;
+		const float vertex_top = rect->top * -2.0f / surface->texture.surface.height + 1.0f;
+		const float vertex_right = rect->right * 2.0f / surface->texture.surface.width - 1.0f;
+		const float vertex_bottom = rect->bottom * -2.0f / surface->texture.surface.height + 1.0f;
 
 		vertex_buffer_slot->vertices[0].position.x = vertex_left;
 		vertex_buffer_slot->vertices[0].position.y = vertex_top;
@@ -758,6 +766,10 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBa
 		GX2SetVertexShader(shader_group_glyph.vertexShader);
 		GX2SetPixelShader(shader_group_glyph.pixelShader);
 
+		// Set shader uniforms (for some reason this vec2 needs padding to a vec4)
+		const float texture_coordinate_transform[4] = {1.0f / atlas->texture.surface.width, 1.0f / atlas->texture.surface.height, 1.0f, 1.0f};
+		GX2SetVertexUniformReg(shader_group_glyph.vertexShader->uniformVars[0].offset, 4, (uint32_t*)texture_coordinate_transform);
+
 		// Bind misc. data
 		GX2SetPixelSampler(&sampler, shader_group_glyph.pixelShader->samplerVars[0].location);
 		GX2SetPixelTexture(&atlas->texture, shader_group_glyph.pixelShader->samplerVars[0].location);
@@ -776,10 +788,10 @@ void RenderBackend_DrawGlyph(long x, long y, size_t glyph_x, size_t glyph_y, siz
 	if (vertex_buffer_slot != NULL)
 	{
 		// Set vertex position buffer
-		const float vertex_left = x * 2.0f / glyph_destination_surface->width - 1.0f;
-		const float vertex_top = y * -2.0f / glyph_destination_surface->height + 1.0f;
-		const float vertex_right = (x + glyph_width) * 2.0f / glyph_destination_surface->width - 1.0f;
-		const float vertex_bottom = (y + glyph_height) * -2.0f / glyph_destination_surface->height + 1.0f;
+		const float vertex_left = x * 2.0f / glyph_destination_surface->texture.surface.width - 1.0f;
+		const float vertex_top = y * -2.0f / glyph_destination_surface->texture.surface.height + 1.0f;
+		const float vertex_right = (x + glyph_width) * 2.0f / glyph_destination_surface->texture.surface.width - 1.0f;
+		const float vertex_bottom = (y + glyph_height) * -2.0f / glyph_destination_surface->texture.surface.height + 1.0f;
 
 		vertex_buffer_slot->vertices[0].position.x = vertex_left;
 		vertex_buffer_slot->vertices[0].position.y = vertex_top;
@@ -790,10 +802,10 @@ void RenderBackend_DrawGlyph(long x, long y, size_t glyph_x, size_t glyph_y, siz
 		vertex_buffer_slot->vertices[3].position.x = vertex_left;
 		vertex_buffer_slot->vertices[3].position.y = vertex_bottom;
 
-		const float texture_left = glyph_x / (float)glyph_atlas->texture.surface.width;
-		const float texture_top = glyph_y / (float)glyph_atlas->texture.surface.height;
-		const float texture_right = (glyph_x + glyph_width) / (float)glyph_atlas->texture.surface.width;
-		const float texture_bottom = (glyph_y + glyph_height) / (float)glyph_atlas->texture.surface.height;
+		const float texture_left = glyph_x;
+		const float texture_top = glyph_y;
+		const float texture_right = glyph_x + glyph_width;
+		const float texture_bottom = glyph_y + glyph_height;
 
 		// Set texture coordinate buffer
 		vertex_buffer_slot->vertices[0].texture.x = texture_left;
