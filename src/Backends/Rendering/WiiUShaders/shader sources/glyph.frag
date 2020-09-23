@@ -5,5 +5,5 @@ in vec2 texture_coordinates;
 out vec4 fragment;
 void main()
 {
-	fragment = colour * vec4(1.0, 1.0, 1.0, texture(tex, texture_coordinates).r);
+	fragment = vec4(colour.rgb, colour.a * texture(tex, texture_coordinates).r);
 }
