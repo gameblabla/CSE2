@@ -134,25 +134,22 @@ void Backend_SetWindowIcon(const unsigned char *rgb_pixels, size_t width, size_t
 	}
 }
 
-void Backend_SetCursor(const unsigned char *rgb_pixels, size_t width, size_t height)
+void Backend_SetCursor(const unsigned char *rgba_pixels, size_t width, size_t height)
 {
-	cursor_surface_pixels = (unsigned char*)malloc(width * height * 3);
+	cursor_surface_pixels = (unsigned char*)malloc(width * height * 4);
 
 	if (cursor_surface_pixels != NULL)
 	{
-		memcpy(cursor_surface_pixels, rgb_pixels, width * height * 3);
+		memcpy(cursor_surface_pixels, rgba_pixels, width * height * 4);
 
-		cursor_surface = SDL_CreateRGBSurfaceWithFormatFrom(cursor_surface_pixels, width, height, 0, width * 3, SDL_PIXELFORMAT_RGB24);
+		cursor_surface = SDL_CreateRGBSurfaceWithFormatFrom(cursor_surface_pixels, width, height, 0, width * 4, SDL_PIXELFORMAT_RGBA32);
 
 		if (cursor_surface != NULL)
 		{
-			if (SDL_SetColorKey(cursor_surface, SDL_TRUE, SDL_MapRGB(cursor_surface->format, 0xFF, 0, 0xFF)) == 0)
-			{
-				cursor = SDL_CreateColorCursor(cursor_surface, 0, 0);
+			cursor = SDL_CreateColorCursor(cursor_surface, 0, 0);
 
-				if (cursor != NULL)
-					SDL_SetCursor(cursor);
-			}
+			if (cursor != NULL)
+				SDL_SetCursor(cursor);
 		}
 	}
 	else

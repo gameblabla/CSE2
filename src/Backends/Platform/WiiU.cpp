@@ -83,9 +83,9 @@ void Backend_SetWindowIcon(const unsigned char *rgb_pixels, size_t width, size_t
 	(void)height;
 }
 
-void Backend_SetCursor(const unsigned char *rgb_pixels, size_t width, size_t height)
+void Backend_SetCursor(const unsigned char *rgba_pixels, size_t width, size_t height)
 {
-	(void)rgb_pixels;
+	(void)rgba_pixels;
 	(void)width;
 	(void)height;
 }

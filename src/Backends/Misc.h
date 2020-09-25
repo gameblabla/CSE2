@@ -92,7 +92,7 @@ void Backend_PostWindowCreation(void);
 bool Backend_GetBasePath(std::string *string_buffer);
 void Backend_HideMouse(void);
 void Backend_SetWindowIcon(const unsigned char *rgb_pixels, size_t width, size_t height);
-void Backend_SetCursor(const unsigned char *rgb_pixels, size_t width, size_t height);
+void Backend_SetCursor(const unsigned char *rgba_pixels, size_t width, size_t height);
 void PlaybackBackend_EnableDragAndDrop(void);
 bool Backend_SystemTask(bool active);
 void Backend_GetKeyboardState(bool *keyboard_state);

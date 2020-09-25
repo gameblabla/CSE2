@@ -312,12 +312,12 @@ int main(int argc, char *argv[])
 	if (cursor_resource_data != NULL)
 	{
 		size_t cursor_width, cursor_height;
-		unsigned char *cursor_rgb_pixels = DecodeBitmap(cursor_resource_data, cursor_resource_size, &cursor_width, &cursor_height, 3);
+		unsigned char *cursor_rgba_pixels = DecodeBitmap(cursor_resource_data, cursor_resource_size, &cursor_width, &cursor_height, 4);
 
-		if (cursor_rgb_pixels != NULL)
+		if (cursor_rgba_pixels != NULL)
 		{
-			Backend_SetCursor(cursor_rgb_pixels, cursor_width, cursor_height);
-			FreeBitmap(cursor_rgb_pixels);
+			Backend_SetCursor(cursor_rgba_pixels, cursor_width, cursor_height);
+			FreeBitmap(cursor_rgba_pixels);
 		}
 	}
 

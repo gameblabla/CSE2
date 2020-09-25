@@ -229,45 +229,13 @@ void Backend_SetWindowIcon(const unsigned char *rgb_pixels, size_t width, size_t
 	}
 }
 
-void Backend_SetCursor(const unsigned char *rgb_pixels, size_t width, size_t height)
+void Backend_SetCursor(const unsigned char *rgba_pixels, size_t width, size_t height)
 {
-	// Convert to RGBA, since that's the only thing GLFW3 accepts
-	unsigned char *rgba_pixels = (unsigned char*)malloc(width * height * 4);
+	GLFWimage glfw_image = {(int)width, (int)height, rgba_pixels};
+	cursor = glfwCreateCursor(&glfw_image, 0, 0);
 
-	const unsigned char *rgb_pointer = rgb_pixels;
-	unsigned char *rgba_pointer = rgba_pixels;
-
-	if (rgba_pixels != NULL)
-	{
-		for (size_t y = 0; y < height; ++y)
-		{
-			for (size_t x = 0; x < width; ++x)
-			{
-				if (rgb_pointer[0] == 0xFF && rgb_pointer[1] == 0 && rgb_pointer[2] == 0xFF)	// Colour-key
-				{
-					*rgba_pointer++ = *rgb_pointer++;
-					*rgba_pointer++ = *rgb_pointer++;
-					*rgba_pointer++ = *rgb_pointer++;
-					*rgba_pointer++ = 0;
-				}
-				else
-				{
-					*rgba_pointer++ = *rgb_pointer++;
-					*rgba_pointer++ = *rgb_pointer++;
-					*rgba_pointer++ = *rgb_pointer++;
-					*rgba_pointer++ = 0xFF;
-				}
-			}
-		}
-
-		GLFWimage glfw_image = {(int)width, (int)height, rgba_pixels};
-		cursor = glfwCreateCursor(&glfw_image, 0, 0);
-
-		if (cursor != NULL)
-			glfwSetCursor(window, cursor);
-
-		free(rgba_pixels);
-	}
+	if (cursor != NULL)
+		glfwSetCursor(window, cursor);
 }
 
 void Backend_EnableDragAndDrop(void)
