@@ -337,6 +337,7 @@ void RenderBackend_DrawScreen(void)
 	// Disable blending
 	GX2SetColorControl(GX2_LOGIC_OP_COPY, 0, FALSE, TRUE);
 
+	// For some dumbass reason, despite being a vec2, this needs padding to a vec4
 	const float plain_vec4[4] = {1.0f, 1.0f, 1.0f, 1.0f};
 
 	// Start drawing
@@ -561,10 +562,11 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBacke
 		GX2SetVertexShader(shader->vertexShader);
 		GX2SetPixelShader(shader->pixelShader);
 
-		// Set shader uniforms (for some reason this vec2 needs padding to a vec4)
+		// Set shader uniforms
 		const float vertex_coordinate_transform[4] = {2.0f / destination_surface->texture.surface.width, -2.0f / destination_surface->texture.surface.height, 1.0f, 1.0f};
-		const float texture_coordinate_transform[4] = {1.0f / source_surface->texture.surface.width, 1.0f / source_surface->texture.surface.height, 1.0f, 1.0f};
 		GX2SetVertexUniformReg(shader_group_glyph.vertexShader->uniformVars[0].offset, 4, (uint32_t*)vertex_coordinate_transform);
+
+		const float texture_coordinate_transform[4] = {1.0f / source_surface->texture.surface.width, 1.0f / source_surface->texture.surface.height, 1.0f, 1.0f};
 		GX2SetVertexUniformReg(shader_group_glyph.vertexShader->uniformVars[1].offset, 4, (uint32_t*)texture_coordinate_transform);
 
 		// Bind misc. data
@@ -636,18 +638,17 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 		GX2SetViewport(0.0f, 0.0f, (float)surface->colour_buffer.surface.width, (float)surface->colour_buffer.surface.height, 0.0f, 1.0f);
 		GX2SetScissor(0, 0, (float)surface->colour_buffer.surface.width, (float)surface->colour_buffer.surface.height);
 
-		// Set the colour-fill... colour
-		const float uniform_colours[4] = {red / 255.0f, green / 255.0f, blue / 255.0f, 1.0f};
-		GX2SetPixelUniformReg(shader_group_colour_fill.pixelShader->uniformVars[0].offset, 4, (uint32_t*)&uniform_colours);
-
 		// Bind the colour-fill shader
 		GX2SetFetchShader(&shader_group_colour_fill.fetchShader);
 		GX2SetVertexShader(shader_group_colour_fill.vertexShader);
 		GX2SetPixelShader(shader_group_colour_fill.pixelShader);
 
-		// Set shader uniforms (for some reason this vec2 needs padding to a vec4)
+		// Set shader uniforms
 		const float vertex_coordinate_transform[4] = {2.0f / surface->texture.surface.width, -2.0f / surface->texture.surface.height, 1.0f, 1.0f};
 		GX2SetVertexUniformReg(shader_group_colour_fill.vertexShader->uniformVars[0].offset, 4, (uint32_t*)vertex_coordinate_transform);
+
+		const float uniform_colours[4] = {red / 255.0f, green / 255.0f, blue / 255.0f, 1.0f};
+		GX2SetPixelUniformReg(shader_group_colour_fill.pixelShader->uniformVars[0].offset, 4, (uint32_t*)&uniform_colours);
 
 		// Bind misc. data
 		GX2RSetAttributeBuffer(&vertex_buffer, 0, sizeof(Vertex), offsetof(Vertex, position));
@@ -765,20 +766,20 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBa
 		GX2SetViewport(0.0f, 0.0f, (float)glyph_destination_surface->colour_buffer.surface.width, (float)glyph_destination_surface->colour_buffer.surface.height, 0.0f, 1.0f);
 		GX2SetScissor(0, 0, glyph_destination_surface->colour_buffer.surface.width, glyph_destination_surface->colour_buffer.surface.height);
 
-		// Set the colour
-		const float uniform_colours[4] = {red / 255.0f, green / 255.0f, blue / 255.0f, 1.0f};
-		GX2SetPixelUniformReg(shader_group_glyph.pixelShader->uniformVars[0].offset, 4, (uint32_t*)&uniform_colours);
-
 		// Select glyph shader
 		GX2SetFetchShader(&shader_group_glyph.fetchShader);
 		GX2SetVertexShader(shader_group_glyph.vertexShader);
 		GX2SetPixelShader(shader_group_glyph.pixelShader);
 
-		// Set shader uniforms (for some reason this vec2 needs padding to a vec4)
+		// Set shader uniforms
 		const float vertex_coordinate_transform[4] = {2.0f / glyph_destination_surface->texture.surface.width, -2.0f / glyph_destination_surface->texture.surface.height, 1.0f, 1.0f};
-		const float texture_coordinate_transform[4] = {1.0f / atlas->texture.surface.width, 1.0f / atlas->texture.surface.height, 1.0f, 1.0f};
 		GX2SetVertexUniformReg(shader_group_glyph.vertexShader->uniformVars[0].offset, 4, (uint32_t*)vertex_coordinate_transform);
+
+		const float texture_coordinate_transform[4] = {1.0f / atlas->texture.surface.width, 1.0f / atlas->texture.surface.height, 1.0f, 1.0f};
 		GX2SetVertexUniformReg(shader_group_glyph.vertexShader->uniformVars[1].offset, 4, (uint32_t*)texture_coordinate_transform);
+
+		const float uniform_colours[4] = {red / 255.0f, green / 255.0f, blue / 255.0f, 1.0f};
+		GX2SetPixelUniformReg(shader_group_glyph.pixelShader->uniformVars[0].offset, 4, (uint32_t*)&uniform_colours);
 
 		// Bind misc. data
 		GX2SetPixelSampler(&sampler, shader_group_glyph.pixelShader->samplerVars[0].location);
