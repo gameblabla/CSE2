@@ -199,8 +199,8 @@ set(RESOURCES
 	"BITMAP/Credit16.bmp"
 	"BITMAP/Credit17.bmp"
 	"BITMAP/Credit18.bmp"
-	"CURSOR/CURSOR_IKA.bmp"
-	"CURSOR/CURSOR_NORMAL.bmp"
+	"CURSOR/CURSOR_IKA.png"
+	"CURSOR/CURSOR_NORMAL.png"
 	"ORG/Access.org"
 	"ORG/Anzen.org"
 	"ORG/Balcony.org"
@@ -442,7 +442,7 @@ endif()
 
 # On Windows, we use native icons instead
 if(NOT WIN32)
-	list(APPEND RESOURCES "ICON/ICON_MINI.bmp")
+	list(APPEND RESOURCES "ICON/ICON_MINI.png")
 endif()
 
 

@@ -80,16 +80,16 @@ static const unsigned char rpixel[] = {
 };
 
 static const unsigned char rCURSOR_IKA[] = {
-	#include "Resource/CURSOR/CURSOR_IKA.bmp.h"
+	#include "Resource/CURSOR/CURSOR_IKA.png.h"
 };
 
 static const unsigned char rCURSOR_NORMAL[] = {
-	#include "Resource/CURSOR/CURSOR_NORMAL.bmp.h"
+	#include "Resource/CURSOR/CURSOR_NORMAL.png.h"
 };
 
 #ifndef _WIN32
 static const unsigned char rICON_MINI[] = {
-	#include "Resource/ICON/ICON_MINI.bmp.h"
+	#include "Resource/ICON/ICON_MINI.png.h"
 };
 #endif
 
