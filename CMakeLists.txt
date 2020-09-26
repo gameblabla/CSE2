@@ -43,6 +43,7 @@ project(CSE2 LANGUAGES C CXX)
 
 add_executable(CSE2 WIN32
 	"${ASSETS_DIRECTORY}/resources/CSE2.rc"
+	"${ASSETS_DIRECTORY}/resources/CSE2.manifest"
 	"src/ArmsItem.cpp"
 	"src/ArmsItem.h"
 	"src/Back.cpp"
