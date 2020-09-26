@@ -1078,7 +1078,7 @@ void RenderBackend_HandleWindowResize(size_t width, size_t height)
 
 	if ((window_rect.right - window_rect.left) % framebuffer_surface->width != 0 || (window_rect.bottom - window_rect.top) % framebuffer_surface->height != 0)
 	{
-		upscaled_framebuffer_surface = CreateSurface(upscaled_framebuffer_width, upscaled_framebuffer_height * upscale_factor, true);
+		upscaled_framebuffer_surface = CreateSurface(upscaled_framebuffer_width, upscaled_framebuffer_height, true);
 
 		if (upscaled_framebuffer_surface == NULL)
 			Backend_PrintError("Couldn't regenerate upscaled framebuffer");
