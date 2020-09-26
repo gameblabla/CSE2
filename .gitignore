@@ -26,6 +26,29 @@
 /game_japanese/CSE2_debug.rpx
 /game_japanese/CSE2.rpx
 
+# Exclude MSVC debug data
+/game_english/CSE2_debug.ilk
+/game_english/CSE2_debug.pdb
+/game_english/DoConfig_debug.ilk
+/game_english/DoConfig_debug.pdb
+/game_english/CSE2.ilk
+/game_english/CSE2.pdb
+/game_english/DoConfig.ilk
+/game_english/DoConfig.pdb
+/game_japanese/CSE2_debug.ilk
+/game_japanese/CSE2_debug.pdb
+/game_japanese/DoConfig_debug.ilk
+/game_japanese/DoConfig_debug.pdb
+/game_japanese/CSE2.ilk
+/game_japanese/CSE2.pdb
+/game_japanese/DoConfig.ilk
+/game_japanese/DoConfig.pdb
+
+# Exclude misc. MSVC junk
+/.vs
+/out
+/CMakeSettings.json
+
 # Exclude save data
 /game_english/Config.dat
 /game_english/Profile.dat
