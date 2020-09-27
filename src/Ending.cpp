@@ -283,10 +283,10 @@ BOOL StartCreditScript(void)
 // Get number from text (4 digit)
 static int GetScriptNumber(const char *text)
 {
-	return (text[0] - '0') * 1000 +
-		(text[1] - '0') * 100 +
-		(text[2] - '0') * 10 +
-		text[3] - '0';
+	return (text[0] - '0') * 1000
+	     + (text[1] - '0') * 100
+	     + (text[2] - '0') * 10
+	     + (text[3] - '0') * 1;
 }
 
 // Parse credits
