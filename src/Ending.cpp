@@ -18,6 +18,13 @@
 #include "Stage.h"
 #include "TextScr.h"
 
+enum ILLUSTRATION_ACTION
+{
+	ILLUSTRATION_ACTION_IDLE,
+	ILLUSTRATION_ACTION_SLIDE_IN,
+	ILLUSTRATION_ACTION_SLIDE_OUT
+};
+
 struct CREDIT
 {
 	long size;
@@ -39,7 +46,7 @@ struct STRIP
 
 struct ILLUSTRATION
 {
-	int act_no;
+	ILLUSTRATION_ACTION act_no;
 	int x;
 };
 
@@ -154,18 +161,18 @@ void ActionIllust(void)
 {
 	switch (Illust.act_no)
 	{
-		case 0: // Off-screen to the left
+		case ILLUSTRATION_ACTION_IDLE: // Off-screen to the left
 			Illust.x = -160 * 0x200;
 			break;
 
-		case 1: // Move in from the left
+		case ILLUSTRATION_ACTION_SLIDE_IN: // Move in from the left
 			Illust.x += 40 * 0x200;
 			if (Illust.x > 0)
 				Illust.x = 0;
 			break;
 
-		case 2: // Move out from the right
-			Illust.x -= 0x5000;
+		case ILLUSTRATION_ACTION_SLIDE_OUT: // Move out from the right
+			Illust.x -= 40 * 0x200;
 			if (Illust.x < -160 * 0x200)
 				Illust.x = -160 * 0x200;
 			break;
@@ -260,7 +267,7 @@ BOOL StartCreditScript(void)
 	Credit.wait = 0;
 	Credit.mode = 1;
 	Illust.x = -160 * 0x200;
-	Illust.act_no = 0;
+	Illust.act_no = ILLUSTRATION_ACTION_IDLE;
 
 	// Modify cliprect
 	grcGame.left = WINDOW_WIDTH / 2;
@@ -464,13 +471,13 @@ void ActionCredit(void)
 void SetCreditIllust(int a)
 {
 	ReloadIllust(a);
-	Illust.act_no = 1;
+	Illust.act_no = ILLUSTRATION_ACTION_SLIDE_IN;
 }
 
 // Slide illustration off-screen
 void CutCreditIllust(void)
 {
-	Illust.act_no = 2;
+	Illust.act_no = ILLUSTRATION_ACTION_SLIDE_OUT;
 }
 
 // Scene of the island falling
