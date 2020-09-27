@@ -231,7 +231,7 @@ void Backend_SetWindowIcon(const unsigned char *rgb_pixels, size_t width, size_t
 
 void Backend_SetCursor(const unsigned char *rgba_pixels, size_t width, size_t height)
 {
-	GLFWimage glfw_image = {(int)width, (int)height, rgba_pixels};
+	GLFWimage glfw_image = {(int)width, (int)height, (unsigned char*)rgba_pixels};
 	cursor = glfwCreateCursor(&glfw_image, 0, 0);
 
 	if (cursor != NULL)
