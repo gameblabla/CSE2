@@ -1320,7 +1320,7 @@ void ActNpc268(NPCHAR *npc)
 			break;
 	}
 
-	npc->ym += 0x33;
+	npc->ym += 0x200 / 10;
 	if (npc->ym > 0x5FF)
 		npc->ym = 0x5FF;
 

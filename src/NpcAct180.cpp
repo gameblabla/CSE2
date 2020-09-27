@@ -271,13 +271,13 @@ void ActNpc180(NPCHAR *npc)
 #else
 			if (npc->flag && 5)
 #endif
-				npc->ym += 0x10;
+				npc->ym += 0x200 / 32;
 			else
-				npc->ym += 0x33;
+				npc->ym += 0x200 / 10;
 		}
 		else
 		{
-			npc->ym += 0x33;
+			npc->ym += 0x200 / 10;
 		}
 	}
 

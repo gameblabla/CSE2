@@ -259,14 +259,14 @@ void ActMyChar_Normal(BOOL bKey)
 
 	if (gMC.flag & 0x100)
 	{
-		max_dash = 0x196;
-		max_move = 0x2FF;
-		gravity1 = 0x28;
-		gravity2 = 0x10;
-		jump = 0x280;
-		dash1 = 0x2A;
-		dash2 = 0x10;
-		resist = 0x19;
+		max_dash = 0x32C / 2;
+		max_move = 0x5FF / 2;
+		gravity1 = 0x50 / 2;
+		gravity2 = 0x20 / 2;
+		jump = 0x500 / 2;
+		dash1 = 0x200 / 6 / 2;
+		dash2 = 0x200 / 16 / 2;
+		resist = 0x200 / 10 / 2;
 	}
 	else
 	{
@@ -275,9 +275,9 @@ void ActMyChar_Normal(BOOL bKey)
 		gravity1 = 0x50;
 		gravity2 = 0x20;
 		jump = 0x500;
-		dash1 = 0x55;
-		dash2 = 0x20;
-		resist = 0x33;
+		dash1 = 0x200 / 6;
+		dash2 = 0x200 / 16;
+		resist = 0x200 / 10;
 	}
 
 	// Don't create "?" effect
