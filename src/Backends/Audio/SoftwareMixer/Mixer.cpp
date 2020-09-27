@@ -38,7 +38,7 @@ static unsigned short MillibelToScale(long volume)
 {
 	// Volume is in hundredths of a decibel, from 0 to -10000
 	volume = CLAMP(volume, -10000, 0);
-	return (unsigned short)(pow(10.0, volume / 2000.0) * 256.0f);
+	return (unsigned short)(pow(10.0, volume / 2000.0) * 256.0);
 }
 
 void Mixer_Init(unsigned long frequency)
