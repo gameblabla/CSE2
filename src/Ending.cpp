@@ -304,7 +304,7 @@ static void ActionCredit_Read(void)
 		{
 			case '[': // Create cast
 				// Get the range for the cast text
-				++Credit.offset;
+				Credit.offset += 1;
 
 				a = Credit.offset;
 
@@ -322,26 +322,26 @@ static void ActionCredit_Read(void)
 				memcpy(text, &Credit.pData[Credit.offset], len);
 				text[len] = 0;
 
-				// Get cast id
+				// Get cast ID
 				Credit.offset = a;
 				len = GetScriptNumber(&Credit.pData[++Credit.offset]);
 
 				// Create cast object
-				SetStripper(Credit.start_x, (WINDOW_HEIGHT * 0x200) + (8 * 0x200), text, len);
+				SetStripper(Credit.start_x, (WINDOW_HEIGHT + 8) * 0x200, text, len);
 
 				// Change offset
 				Credit.offset += 4;
 				return;
 
 			case '-': // Wait for X amount of frames
-				++Credit.offset;
+				Credit.offset += 1;
 				Credit.wait = GetScriptNumber(&Credit.pData[Credit.offset]);
 				Credit.offset += 4;
 				Credit.mode = 2;
 				return;
 
 			case '+': // Change casts x-position
-				++Credit.offset;
+				Credit.offset += 1;
 				Credit.start_x = GetScriptNumber(&Credit.pData[Credit.offset]) * 0x200;
 				Credit.offset += 4;
 				return;
@@ -351,19 +351,19 @@ static void ActionCredit_Read(void)
 				return;
 
 			case '!': // Change music
-				++Credit.offset;
+				Credit.offset += 1;
 				a = GetScriptNumber(&Credit.pData[Credit.offset]);
 				Credit.offset += 4;
 				ChangeMusic((MusicID)a);
 				return;
 
 			case '~': // Start fading out music
-				++Credit.offset;
+				Credit.offset += 1;
 				SetOrganyaFadeout();
 				return;
 
 			case 'j': // Jump to label
-				++Credit.offset;
+				Credit.offset += 1;
 
 				// Get number
 				b = GetScriptNumber(&Credit.pData[Credit.offset]);
@@ -372,25 +372,25 @@ static void ActionCredit_Read(void)
 				Credit.offset += 4;
 
 				// Jump to specific label
-				if (1)
+				if (1) // This appears to be a hacked-up duplicate of some code from the below 'f' condition
 				{
 					while (Credit.offset < Credit.size)
 					{
 						if (Credit.pData[Credit.offset] == 'l')
 						{
-							// What is this
-							a = GetScriptNumber(&Credit.pData[++Credit.offset]);
+							Credit.offset += 1;
+							a = GetScriptNumber(&Credit.pData[Credit.offset]);
 							Credit.offset += 4;
+
 							if (b == a)
 								break;
 						}
-						else if (IsShiftJIS(Credit.pData[Credit.offset]))
-						{
-							Credit.offset += 2;
-						}
 						else
 						{
-							++Credit.offset;
+							if (IsShiftJIS(Credit.pData[Credit.offset]))
+								Credit.offset += 2;
+							else
+								Credit.offset += 1;
 						}
 					}
 				}
@@ -398,7 +398,7 @@ static void ActionCredit_Read(void)
 				return;
 
 			case 'f': // Flag jump
-				++Credit.offset;
+				Credit.offset += 1;
 
 				// Read numbers XXXX:YYYY
 				a = GetScriptNumber(&Credit.pData[Credit.offset]);
@@ -414,18 +414,19 @@ static void ActionCredit_Read(void)
 					{
 						if (Credit.pData[Credit.offset] == 'l')
 						{
-							a = GetScriptNumber(&Credit.pData[++Credit.offset]);
+							Credit.offset += 1;
+							a = GetScriptNumber(&Credit.pData[Credit.offset]);
 							Credit.offset += 4;
+
 							if (b == a)
 								break;
 						}
-						else if (IsShiftJIS(Credit.pData[Credit.offset]))
-						{
-							Credit.offset += 2;
-						}
 						else
 						{
-							++Credit.offset;
+							if (IsShiftJIS(Credit.pData[Credit.offset]))
+								Credit.offset += 2;
+							else
+								Credit.offset += 1;
 						}
 					}
 				}
@@ -433,7 +434,7 @@ static void ActionCredit_Read(void)
 
 			default:
 				// Progress through file
-				++Credit.offset;
+				Credit.offset += 1;
 				break;
 		}
 	}
