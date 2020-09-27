@@ -247,12 +247,13 @@ BOOL StartCreditScript(void)
 
 	// Read data
 	fread(Credit.pData, 1, Credit.size, fp);
-	EncryptionBinaryData2((unsigned char*)Credit.pData, Credit.size);
 
 #ifdef FIX_MAJOR_BUGS
 	// The original game forgot to close the file
 	fclose(fp);
 #endif
+
+	EncryptionBinaryData2((unsigned char*)Credit.pData, Credit.size);
 
 	// Reset credits
 	Credit.offset = 0;
@@ -263,7 +264,7 @@ BOOL StartCreditScript(void)
 
 	// Modify cliprect
 	grcGame.left = WINDOW_WIDTH / 2;
-#if WINDOW_WIDTH != 320 || WINDOW_HEIGHT != 240
+#if WINDOW_WIDTH != 320 || WINDOW_HEIGHT != 240 // TODO - Move to CSE2EX
 	// These three are non-vanilla: for wide/tallscreen support
 	grcGame.right = ((WINDOW_WIDTH - 320) / 2) + 320;
 	grcGame.top = (WINDOW_HEIGHT - 240) / 2;
