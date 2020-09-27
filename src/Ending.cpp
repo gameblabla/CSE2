@@ -18,6 +18,13 @@
 #include "Stage.h"
 #include "TextScr.h"
 
+enum CREDIT_MODE
+{
+	CREDIT_MODE_STOP,
+	CREDIT_MODE_SCROLL_READ,
+	CREDIT_MODE_SCROLL_WAIT
+};
+
 enum ILLUSTRATION_ACTION
 {
 	ILLUSTRATION_ACTION_IDLE,
@@ -31,7 +38,7 @@ struct CREDIT
 	char *pData;
 	int offset;
 	int wait;
-	int mode;
+	CREDIT_MODE mode;
 	int start_x;
 };
 
@@ -68,10 +75,10 @@ void ActionStripper(void)
 	for (s = 0; s < MAX_STRIP; ++s)
 	{
 		// Move up
-		if (Strip[s].flag & 0x80 && Credit.mode)
+		if (Strip[s].flag & 0x80 && Credit.mode != CREDIT_MODE_STOP)
 			Strip[s].y -= 0x100;
 		// Get removed when off-screen
-		if (Strip[s].y <= -0x2000)
+		if (Strip[s].y <= -16 * 0x200)
 			Strip[s].flag = 0;
 	}
 }
@@ -265,7 +272,7 @@ BOOL StartCreditScript(void)
 	// Reset credits
 	Credit.offset = 0;
 	Credit.wait = 0;
-	Credit.mode = 1;
+	Credit.mode = CREDIT_MODE_SCROLL_READ;
 	Illust.x = -160 * 0x200;
 	Illust.act_no = ILLUSTRATION_ACTION_IDLE;
 
@@ -327,11 +334,12 @@ static void ActionCredit_Read(void)
 
 				// Copy the text to the cast text
 				memcpy(text, &Credit.pData[Credit.offset], len);
-				text[len] = 0;
+				text[len] = '\0';
 
 				// Get cast ID
 				Credit.offset = a;
-				len = GetScriptNumber(&Credit.pData[++Credit.offset]);
+				Credit.offset += 1;
+				len = GetScriptNumber(&Credit.pData[Credit.offset]);
 
 				// Create cast object
 				SetStripper(Credit.start_x, (WINDOW_HEIGHT + 8) * 0x200, text, len);
@@ -344,7 +352,7 @@ static void ActionCredit_Read(void)
 				Credit.offset += 1;
 				Credit.wait = GetScriptNumber(&Credit.pData[Credit.offset]);
 				Credit.offset += 4;
-				Credit.mode = 2;
+				Credit.mode = CREDIT_MODE_SCROLL_WAIT;
 				return;
 
 			case '+': // Change casts x-position
@@ -354,7 +362,7 @@ static void ActionCredit_Read(void)
 				return;
 
 			case '/': // Stop credits
-				Credit.mode = 0;
+				Credit.mode = CREDIT_MODE_STOP;
 				return;
 
 			case '!': // Change music
@@ -456,13 +464,13 @@ void ActionCredit(void)
 	// Update script, or if waiting, decrement the wait value
 	switch (Credit.mode)
 	{
-		case 1:
+		case CREDIT_MODE_SCROLL_READ:
 			ActionCredit_Read();
 			break;
 
-		case 2:
+		case CREDIT_MODE_SCROLL_WAIT:
 			if (--Credit.wait <= 0)
-				Credit.mode = 1;
+				Credit.mode = CREDIT_MODE_SCROLL_READ;
 			break;
 	}
 }
@@ -519,24 +527,24 @@ int Scene_DownIsland(HWND hWnd, int mode)
 		{
 			case 0:
 				// Move down
-				sprite.y += 0x33;
+				sprite.y += 0x200 / 10;
 				break;
 
 			case 1:
 				if (wait < 350)
 				{
 					// Move down at normal speed
-					sprite.y += 0x33;
+					sprite.y += 0x200 / 10;
 				}
 				else if (wait < 500)
 				{
 					// Move down slower
-					sprite.y += 0x19;
+					sprite.y += 0x200 / 20;
 				}
 				else if (wait < 600)
 				{
 					// Move down slow
-					sprite.y += 0xC;
+					sprite.y += 0x200 / 40;
 				}
 				else if (wait == 750)
 				{
