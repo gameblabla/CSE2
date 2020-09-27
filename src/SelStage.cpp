@@ -211,7 +211,8 @@ int StageSelectLoop(int *p_event)
 			StopTextScript();
 			break;
 		}
-		else if (gKeyTrg & gKeyCancel)
+
+		if (gKeyTrg & gKeyCancel)
 		{
 			StopTextScript();
 			LoadTextScript_Stage(old_script_path);
