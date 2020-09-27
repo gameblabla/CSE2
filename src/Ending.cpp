@@ -176,7 +176,7 @@ void ActionIllust(void)
 void PutIllust(void)
 {
 	RECT rcIllust = {0, 0, 160, 240};
-#if WINDOW_WIDTH != 320 || WINDOW_HEIGHT != 240
+#if WINDOW_WIDTH != 320 || WINDOW_HEIGHT != 240 // TODO - Move this to CSE2EX
 	// Widescreen edit
 	RECT rcClip = {(WINDOW_WIDTH - 320) / 2, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 	PutBitmap3(&rcClip, (Illust.x / 0x200) + ((WINDOW_WIDTH - 320) / 2), (WINDOW_HEIGHT - 240) / 2, &rcIllust, SURFACE_ID_CREDITS_IMAGE);
