@@ -263,9 +263,9 @@ void ActBossChar_Omega(void)
 			if (gBoss[0].act_wait > 20 && gBoss[0].act_wait < 80 && !(gBoss[0].act_wait % 3))
 			{
 				if (Random(0, 9) < 8)
-					SetNpChar(48, gBoss[0].x, gBoss[0].y - (16 * 0x200), Random(-0x100, 0x100), -0x333, 0, NULL, 0x100);
+					SetNpChar(48, gBoss[0].x, gBoss[0].y - (16 * 0x200), Random(-0x100, 0x100), -0x10 * 0x200 / 10, 0, NULL, 0x100);
 				else
-					SetNpChar(48, gBoss[0].x, gBoss[0].y - (16 * 0x200), Random(-0x100, 0x100), -0x333, 2, NULL, 0x100);
+					SetNpChar(48, gBoss[0].x, gBoss[0].y - (16 * 0x200), Random(-0x100, 0x100), -0x10 * 0x200 / 10, 2, NULL, 0x100);
 
 				PlaySoundObject(39, SOUND_MODE_PLAY);
 			}
@@ -384,7 +384,7 @@ void ActBossChar_Omega(void)
 
 			if (gBoss[0].act_wait < 30 && gBoss[0].act_wait % 5 == 0)
 			{
-				SetNpChar(48, gBoss[0].x, gBoss[0].y - (16 * 0x200), Random(-341, 341), -0x333, 0, NULL, 0x100);
+				SetNpChar(48, gBoss[0].x, gBoss[0].y - (16 * 0x200), Random(-341, 341), -0x10 * 0x200 / 10, 0, NULL, 0x100);
 				PlaySoundObject(39, SOUND_MODE_PLAY);
 			}
 

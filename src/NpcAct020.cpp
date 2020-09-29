@@ -1241,7 +1241,7 @@ void ActNpc036(NPCHAR *npc)
 
 	if (npc->act_no != 5)
 	{
-		npc->ym += 0x33;
+		npc->ym += 0x200 / 10;
 
 		if (npc->x < gMC.x)
 			npc->direct = 2;
