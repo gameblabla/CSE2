@@ -21,7 +21,7 @@ bool WindowBackend_Software_CreateWindow(const char *window_title, size_t screen
 	{
 		if (fullscreen)
 			if (SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN) < 0)
-				Backend_PrintError("Couldn't set window to fullscree: %s", SDL_GetError());
+				Backend_PrintError("Couldn't set window to fullscreen: %s", SDL_GetError());
 
 		window_sdlsurface = SDL_GetWindowSurface(window);
 
