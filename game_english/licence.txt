@@ -62,14 +62,6 @@ It might be worth crediting us, just to be safe - I (Clownacy) don't mind, but
 GabrielRavier does.
 
 
-============
-= FreeType =
-============
-
-Portions of this software are copyright © 2006-2020 The FreeType
-Project (www.freetype.org).  All rights reserved.
-
-
 ==============
 = Dear Imgui =
 ==============
