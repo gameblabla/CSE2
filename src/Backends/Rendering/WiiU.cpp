@@ -71,8 +71,6 @@ static RenderBackend_Surface *framebuffer_surface;
 
 static GX2ContextState *gx2_context;
 
-static RenderBackend_GlyphAtlas *glyph_atlas;
-
 static VertexBufferSlot *local_vertex_buffer;
 static size_t local_vertex_buffer_size;
 static size_t current_vertex_buffer_slot;
@@ -744,8 +742,6 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBa
 	static unsigned char last_red;
 	static unsigned char last_green;
 	static unsigned char last_blue;
-
-	glyph_atlas = atlas;
 
 	// Flush vertex data if a context-change is needed
 	if (last_render_mode != MODE_DRAW_GLYPH || last_destination_texture != &destination_surface->texture || last_source_texture != &atlas->texture || last_red != red || last_green != green || last_blue != blue)
