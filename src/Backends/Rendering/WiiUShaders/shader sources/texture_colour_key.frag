@@ -6,7 +6,7 @@ void main()
 {
 	vec4 colour = texture(tex, texture_coordinates);
 
-	if (colour.r + colour.g + colour. b == 0.0)
+	if (colour.r + colour.g + colour. b == 0.0f)
 		discard;
 
 	fragment = colour;

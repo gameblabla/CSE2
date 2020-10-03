@@ -15,7 +15,7 @@
 ; $ATTRIB_VARS[0].type = "vec2"
 ; $ATTRIB_VARS[0].location = 1
 ; $ATTRIB_VARS[1].name = "input_vertex_coordinates"
-; $ATTRIB_VARS[1].type = "vec4"
+; $ATTRIB_VARS[1].type = "vec2"
 ; $ATTRIB_VARS[1].location = 0
 
 ; $NUM_SPI_VS_OUT_ID = 1
