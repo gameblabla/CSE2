@@ -72,7 +72,6 @@ static RenderBackend_Surface *framebuffer_surface;
 static GX2ContextState *gx2_context;
 
 static RenderBackend_GlyphAtlas *glyph_atlas;
-static RenderBackend_Surface *glyph_destination_surface;
 
 static VertexBufferSlot *local_vertex_buffer;
 static size_t local_vertex_buffer_size;
@@ -747,7 +746,6 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBa
 	static unsigned char last_blue;
 
 	glyph_atlas = atlas;
-	glyph_destination_surface = destination_surface;
 
 	// Flush vertex data if a context-change is needed
 	if (last_render_mode != MODE_DRAW_GLYPH || last_destination_texture != &destination_surface->texture || last_source_texture != &atlas->texture || last_red != red || last_green != green || last_blue != blue)
@@ -755,16 +753,16 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBa
 		FlushVertexBuffer();
 
 		last_render_mode = MODE_DRAW_GLYPH;
-		last_destination_texture = &glyph_destination_surface->texture;
+		last_destination_texture = &destination_surface->texture;
 		last_source_texture = &atlas->texture;
 		last_red = red;
 		last_green = green;
 		last_blue = blue;
 
 		// Draw to the selected texture, instead of the screen
-		GX2SetColorBuffer(&glyph_destination_surface->colour_buffer, GX2_RENDER_TARGET_0);
-		GX2SetViewport(0.0f, 0.0f, (float)glyph_destination_surface->colour_buffer.surface.width, (float)glyph_destination_surface->colour_buffer.surface.height, 0.0f, 1.0f);
-		GX2SetScissor(0, 0, glyph_destination_surface->colour_buffer.surface.width, glyph_destination_surface->colour_buffer.surface.height);
+		GX2SetColorBuffer(&destination_surface->colour_buffer, GX2_RENDER_TARGET_0);
+		GX2SetViewport(0.0f, 0.0f, (float)destination_surface->colour_buffer.surface.width, (float)destination_surface->colour_buffer.surface.height, 0.0f, 1.0f);
+		GX2SetScissor(0, 0, destination_surface->colour_buffer.surface.width, destination_surface->colour_buffer.surface.height);
 
 		// Select glyph shader
 		GX2SetFetchShader(&shader_group_glyph.fetchShader);
@@ -772,7 +770,7 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBa
 		GX2SetPixelShader(shader_group_glyph.pixelShader);
 
 		// Set shader uniforms
-		const float vertex_coordinate_transform[4] = {2.0f / glyph_destination_surface->texture.surface.width, -2.0f / glyph_destination_surface->texture.surface.height, 1.0f, 1.0f};
+		const float vertex_coordinate_transform[4] = {2.0f / destination_surface->texture.surface.width, -2.0f / destination_surface->texture.surface.height, 1.0f, 1.0f};
 		GX2SetVertexUniformReg(shader_group_glyph.vertexShader->uniformVars[0].offset, 4, (uint32_t*)vertex_coordinate_transform);
 
 		const float texture_coordinate_transform[4] = {1.0f / atlas->texture.surface.width, 1.0f / atlas->texture.surface.height, 1.0f, 1.0f};
