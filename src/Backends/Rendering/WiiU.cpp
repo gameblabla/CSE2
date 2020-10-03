@@ -144,6 +144,9 @@ static void FlushVertexBuffer(void)
 		vertex_buffer.elemCount = vertex_buffer_size;
 
 		GX2RCreateBuffer(&vertex_buffer);	// We're basically screwed if this fails
+
+		GX2RSetAttributeBuffer(&vertex_buffer, 0, sizeof(Vertex), offsetof(Vertex, position));
+		GX2RSetAttributeBuffer(&vertex_buffer, 1, sizeof(Vertex), offsetof(Vertex, texture));
 	}
 
 	void *vertex_pointer = GX2RLockBufferEx(&vertex_buffer, (GX2RResourceFlags)0);
@@ -224,6 +227,9 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t scree
 
 									// Disable depth-test (enabled by default for some reason)
 									GX2SetDepthOnlyControl(FALSE, FALSE, GX2_COMPARE_FUNC_ALWAYS);
+
+									GX2RSetAttributeBuffer(&vertex_buffer, 0, sizeof(Vertex), offsetof(Vertex, position));
+									GX2RSetAttributeBuffer(&vertex_buffer, 1, sizeof(Vertex), offsetof(Vertex, texture));
 
 									return framebuffer_surface;
 								}
@@ -570,8 +576,6 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBacke
 		// Bind misc. data
 		GX2SetPixelSampler(&sampler, shader->pixelShader->samplerVars[0].location);
 		GX2SetPixelTexture(&source_surface->texture, shader->pixelShader->samplerVars[0].location);
-		GX2RSetAttributeBuffer(&vertex_buffer, 0, sizeof(Vertex), offsetof(Vertex, position));
-		GX2RSetAttributeBuffer(&vertex_buffer, 1, sizeof(Vertex), offsetof(Vertex, texture));
 
 		// Disable blending
 		GX2SetColorControl(GX2_LOGIC_OP_COPY, 0, FALSE, TRUE);
@@ -647,9 +651,6 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 
 		const float uniform_colours[4] = {red / 255.0f, green / 255.0f, blue / 255.0f, 1.0f};
 		GX2SetPixelUniformReg(shader_group_colour_fill.pixelShader->uniformVars[0].offset, 4, (uint32_t*)&uniform_colours);
-
-		// Bind misc. data
-		GX2RSetAttributeBuffer(&vertex_buffer, 0, sizeof(Vertex), offsetof(Vertex, position));
 
 		// Disable blending
 		GX2SetColorControl(GX2_LOGIC_OP_COPY, 0, FALSE, TRUE);
@@ -779,8 +780,6 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBa
 		// Bind misc. data
 		GX2SetPixelSampler(&sampler, shader_group_glyph.pixelShader->samplerVars[0].location);
 		GX2SetPixelTexture(&atlas->texture, shader_group_glyph.pixelShader->samplerVars[0].location);
-		GX2RSetAttributeBuffer(&vertex_buffer, 0, sizeof(Vertex), offsetof(Vertex, position));
-		GX2RSetAttributeBuffer(&vertex_buffer, 1, sizeof(Vertex), offsetof(Vertex, texture));
 
 		// Enable blending
 		GX2SetColorControl(GX2_LOGIC_OP_COPY, 0xFF, FALSE, TRUE);
