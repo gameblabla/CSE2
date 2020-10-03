@@ -143,23 +143,14 @@ static void FlushVertexBuffer(void)
 
 		vertex_buffer.elemCount = vertex_buffer_size;
 
-		if (GX2RCreateBuffer(&vertex_buffer))
-		{
-			void *vertex_pointer = GX2RLockBufferEx(&vertex_buffer, (GX2RResourceFlags)0);
-
-			memcpy(vertex_pointer, local_vertex_buffer, vertex_buffer_size * sizeof(VertexBufferSlot));
-
-			GX2RUnlockBufferEx(&vertex_buffer, (GX2RResourceFlags)0);
-		}
+		GX2RCreateBuffer(&vertex_buffer);	// We're basically screwed if this fails
 	}
-	else
-	{
-		void *vertex_pointer = GX2RLockBufferEx(&vertex_buffer, (GX2RResourceFlags)0);
 
-		memcpy(vertex_pointer, local_vertex_buffer, current_vertex_buffer_slot * sizeof(VertexBufferSlot));
+	void *vertex_pointer = GX2RLockBufferEx(&vertex_buffer, (GX2RResourceFlags)0);
 
-		GX2RUnlockBufferEx(&vertex_buffer, (GX2RResourceFlags)0);
-	}
+	memcpy(vertex_pointer, local_vertex_buffer, current_vertex_buffer_slot * sizeof(VertexBufferSlot));
+
+	GX2RUnlockBufferEx(&vertex_buffer, (GX2RResourceFlags)0);
 
 	GX2DrawEx(GX2_PRIMITIVE_MODE_QUADS, 4 * current_vertex_buffer_slot, 0, 1);
 
