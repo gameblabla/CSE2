@@ -125,7 +125,7 @@ static VertexBufferSlot* GetVertexBufferSlot(void)
 
 static void FlushVertexBuffer(void)
 {
-	static size_t vertex_buffer_size;
+	static size_t vertex_buffer_size = 1;
 	static size_t current_vertex_buffer = 0;
 
 	if (current_vertex_buffer_slot == 0)
@@ -141,11 +141,6 @@ static void FlushVertexBuffer(void)
 
 		GX2RDestroyBufferEx(&vertex_buffer, (GX2RResourceFlags)0);
 
-		vertex_buffer.flags = (GX2RResourceFlags)(GX2R_RESOURCE_BIND_VERTEX_BUFFER |
-		                                          GX2R_RESOURCE_USAGE_CPU_READ |
-		                                          GX2R_RESOURCE_USAGE_CPU_WRITE |
-		                                          GX2R_RESOURCE_USAGE_GPU_READ);
-		vertex_buffer.elemSize = sizeof(VertexBufferSlot);
 		vertex_buffer.elemCount = vertex_buffer_size;
 
 		if (GX2RCreateBuffer(&vertex_buffer))
@@ -210,37 +205,52 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t scree
 						// Initialise sampler
 						GX2InitSampler(&sampler, GX2_TEX_CLAMP_MODE_CLAMP, GX2_TEX_XY_FILTER_MODE_LINEAR);
 
-						// Create framebuffer surface
-						framebuffer_surface = RenderBackend_CreateSurface(screen_width, screen_height, true);
+						// Initialise vertex buffer
+						vertex_buffer.flags = (GX2RResourceFlags)(GX2R_RESOURCE_BIND_VERTEX_BUFFER |
+																  GX2R_RESOURCE_USAGE_CPU_READ |
+																  GX2R_RESOURCE_USAGE_CPU_WRITE |
+																  GX2R_RESOURCE_USAGE_GPU_READ);
+						vertex_buffer.elemSize = sizeof(VertexBufferSlot);
+						vertex_buffer.elemCount = 1;
 
-						if (framebuffer_surface != NULL)
+						if (GX2RCreateBuffer(&vertex_buffer))
 						{
-							// From what I can tell, there isn't a 'global context' in GX2: instead there are context objects.
-							// wut internally uses (and *switches to*) its own contexts, so we need to maintain one too,
-							// and make sure we're always switching back to it when wut is done doing what it's doing.
-							gx2_context = (GX2ContextState*)aligned_alloc(GX2_CONTEXT_STATE_ALIGNMENT, sizeof(GX2ContextState));
+							// Create framebuffer surface
+							framebuffer_surface = RenderBackend_CreateSurface(screen_width, screen_height, true);
 
-							if (gx2_context != NULL)
+							if (framebuffer_surface != NULL)
 							{
-								memset(gx2_context, 0, sizeof(GX2ContextState));
-								GX2SetupContextStateEx(gx2_context, TRUE);
-								GX2SetContextState(gx2_context);
+								// From what I can tell, there isn't a 'global context' in GX2: instead there are context objects.
+								// wut internally uses (and *switches to*) its own contexts, so we need to maintain one too,
+								// and make sure we're always switching back to it when wut is done doing what it's doing.
+								gx2_context = (GX2ContextState*)aligned_alloc(GX2_CONTEXT_STATE_ALIGNMENT, sizeof(GX2ContextState));
 
-								// Disable depth-test (enabled by default for some reason)
-								GX2SetDepthOnlyControl(FALSE, FALSE, GX2_COMPARE_FUNC_ALWAYS);
+								if (gx2_context != NULL)
+								{
+									memset(gx2_context, 0, sizeof(GX2ContextState));
+									GX2SetupContextStateEx(gx2_context, TRUE);
+									GX2SetContextState(gx2_context);
 
-								return framebuffer_surface;
+									// Disable depth-test (enabled by default for some reason)
+									GX2SetDepthOnlyControl(FALSE, FALSE, GX2_COMPARE_FUNC_ALWAYS);
+
+									return framebuffer_surface;
+								}
+								else
+								{
+									Backend_PrintError("Couldn't allocate memory for the GX2 context");
+								}
+
+								RenderBackend_FreeSurface(framebuffer_surface);
 							}
 							else
 							{
-								Backend_PrintError("Couldn't allocate memory for the GX2 context");
+								Backend_PrintError("Couldn't create the framebuffer surface");
 							}
-
-							RenderBackend_FreeSurface(framebuffer_surface);
 						}
 						else
 						{
-							Backend_PrintError("Couldn't create the framebuffer surface");
+							Backend_PrintError("Couldn't create the vertex buffer");
 						}
 
 						WHBGfxFreeShaderGroup(&shader_group_glyph);
