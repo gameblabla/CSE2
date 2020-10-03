@@ -126,7 +126,6 @@ static VertexBufferSlot* GetVertexBufferSlot(void)
 static void FlushVertexBuffer(void)
 {
 	static size_t vertex_buffer_size = 1;
-	static size_t current_vertex_buffer = 0;
 
 	if (current_vertex_buffer_slot == 0)
 		return;
