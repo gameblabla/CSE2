@@ -49,7 +49,7 @@ BOOL MakeSurface_Resource(const char *name, SurfaceID surf_no);
 BOOL MakeSurface_File(const char *name, SurfaceID surf_no);
 BOOL ReloadBitmap_Resource(const char *name, SurfaceID surf_no);
 BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no);
-BOOL MakeSurface_Generic(int bxsize, int bysize, SurfaceID surf_no, BOOL bSystem);
+BOOL MakeSurface_Generic(int bxsize, int bysize, SurfaceID surf_no, BOOL bSystem, BOOL bTarget);
 void BackupSurface(SurfaceID surf_no, const RECT *rect);
 void PutBitmap3(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID surf_no);
 void PutBitmap4(const RECT *rcView, int x, int y, const RECT *rect, SurfaceID surf_no);

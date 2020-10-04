@@ -68,7 +68,7 @@ BOOL InitTextScript2(void)
 
 	// Create line surfaces
 	for (i = 0; i < 4; ++i)
-		MakeSurface_Generic(gRect_line.right, gRect_line.bottom, (SurfaceID)(SURFACE_ID_TEXT_LINE1 + i), FALSE);
+		MakeSurface_Generic(gRect_line.right, gRect_line.bottom, (SurfaceID)(SURFACE_ID_TEXT_LINE1 + i), FALSE, TRUE);
 
 	// Clear text
 	memset(text, 0, sizeof(text));

@@ -379,7 +379,7 @@ BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 }
 
 // TODO - Inaccurate stack frame
-BOOL MakeSurface_Generic(int bxsize, int bysize, SurfaceID surf_no, BOOL bSystem)
+BOOL MakeSurface_Generic(int bxsize, int bysize, SurfaceID surf_no, BOOL bSystem, BOOL bTarget)
 {
 #ifdef FIX_BUGS
 	if (surf_no >= SURFACE_ID_MAX)
@@ -391,7 +391,7 @@ BOOL MakeSurface_Generic(int bxsize, int bysize, SurfaceID surf_no, BOOL bSystem
 	if (surf[surf_no] != NULL)
 		return FALSE;
 
-	surf[surf_no] = RenderBackend_CreateSurface(bxsize * mag, bysize * mag, true);
+	surf[surf_no] = RenderBackend_CreateSurface(bxsize * mag, bysize * mag, bTarget);
 
 	if (surf[surf_no] == NULL)
 		return FALSE;
