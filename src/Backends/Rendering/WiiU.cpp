@@ -20,6 +20,9 @@
 
 #include "../Misc.h"
 
+#define MIN(a,b) ((a) < (b) ? (a) : (b))
+#define MAX(a,b) ((a) > (b) ? (a) : (b))
+
 typedef enum RenderMode
 {
 	MODE_BLANK,
@@ -69,6 +72,8 @@ static GX2Sampler sampler_point;
 static GX2Sampler sampler_linear;
 
 static RenderBackend_Surface *framebuffer_surface;
+static RenderBackend_Surface *upscaled_framebuffer_surface_tv;
+static RenderBackend_Surface *upscaled_framebuffer_surface_drc;
 
 static GX2ContextState *gx2_context;
 
@@ -292,28 +297,82 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t scree
 
 							if (framebuffer_surface != NULL)
 							{
-								// From what I can tell, there isn't a 'global context' in GX2: instead there are context objects.
-								// wut internally uses (and *switches to*) its own contexts, so we need to maintain one too,
-								// and make sure we're always switching back to it when wut is done doing what it's doing.
-								gx2_context = (GX2ContextState*)aligned_alloc(GX2_CONTEXT_STATE_ALIGNMENT, sizeof(GX2ContextState));
+								// Create upscaled framebuffer surface
+								size_t tv_width, tv_height;
 
-								if (gx2_context != NULL)
+								switch (GX2GetSystemTVScanMode())
 								{
-									memset(gx2_context, 0, sizeof(GX2ContextState));
-									GX2SetupContextStateEx(gx2_context, TRUE);
-									GX2SetContextState(gx2_context);
+									case GX2_TV_SCAN_MODE_480I:
+									case GX2_TV_SCAN_MODE_480P:
+										tv_width = 854;
+										tv_height = 480;
+										break;
 
-									// Disable depth-test (enabled by default for some reason)
-									GX2SetDepthOnlyControl(FALSE, FALSE, GX2_COMPARE_FUNC_ALWAYS);
+									case GX2_TV_SCAN_MODE_576I:
+									case GX2_TV_SCAN_MODE_720P:
+										tv_width = 1280;
+										tv_height = 720;
+										break;
 
-									GX2RSetAttributeBuffer(&vertex_buffer, 0, sizeof(Vertex), offsetof(Vertex, position));
-									GX2RSetAttributeBuffer(&vertex_buffer, 1, sizeof(Vertex), offsetof(Vertex, texture));
+									case GX2_TV_SCAN_MODE_1080I:
+									case GX2_TV_SCAN_MODE_1080P:
+										tv_width = 1920;
+										tv_height = 1080;
+										break;
+								}
 
-									return framebuffer_surface;
+								size_t upscale_factor = MAX(1, MIN((tv_width + screen_width / 2) / screen_width, (tv_height + screen_height / 2) / screen_height));
+
+								upscaled_framebuffer_surface_tv = RenderBackend_CreateSurface(screen_width * upscale_factor, screen_height * upscale_factor, true);
+
+								if (upscaled_framebuffer_surface_tv != NULL)
+								{
+									// Create upscaled framebuffer surface
+									size_t drc_width = 854;
+									size_t drc_height = 480;
+
+									size_t upscale_factor = MAX(1, MIN((drc_width + screen_width / 2) / screen_width, (drc_height + screen_height / 2) / screen_height));
+
+									upscaled_framebuffer_surface_drc = RenderBackend_CreateSurface(screen_width * upscale_factor, screen_height * upscale_factor, true);
+
+									if (upscaled_framebuffer_surface_drc != NULL)
+									{
+										// From what I can tell, there isn't a 'global context' in GX2: instead there are context objects.
+										// wut internally uses (and *switches to*) its own contexts, so we need to maintain one too,
+										// and make sure we're always switching back to it when wut is done doing what it's doing.
+										gx2_context = (GX2ContextState*)aligned_alloc(GX2_CONTEXT_STATE_ALIGNMENT, sizeof(GX2ContextState));
+
+										if (gx2_context != NULL)
+										{
+											memset(gx2_context, 0, sizeof(GX2ContextState));
+											GX2SetupContextStateEx(gx2_context, TRUE);
+											GX2SetContextState(gx2_context);
+
+											// Disable depth-test (enabled by default for some reason)
+											GX2SetDepthOnlyControl(FALSE, FALSE, GX2_COMPARE_FUNC_ALWAYS);
+
+											GX2RSetAttributeBuffer(&vertex_buffer, 0, sizeof(Vertex), offsetof(Vertex, position));
+											GX2RSetAttributeBuffer(&vertex_buffer, 1, sizeof(Vertex), offsetof(Vertex, texture));
+
+											return framebuffer_surface;
+										}
+										else
+										{
+											Backend_PrintError("Couldn't allocate memory for the GX2 context");
+										}
+
+										RenderBackend_FreeSurface(upscaled_framebuffer_surface_drc);
+									}
+									else
+									{
+										Backend_PrintError("Couldn't create the DRC upscaled framebuffer surface");
+									}
+
+									RenderBackend_FreeSurface(upscaled_framebuffer_surface_tv);
 								}
 								else
 								{
-									Backend_PrintError("Couldn't allocate memory for the GX2 context");
+									Backend_PrintError("Couldn't create the TV upscaled framebuffer surface");
 								}
 
 								RenderBackend_FreeSurface(framebuffer_surface);
@@ -389,6 +448,26 @@ void RenderBackend_DrawScreen(void)
 	last_source_texture = NULL;
 	last_destination_texture = NULL;
 
+	RenderBackend_Rect source_rect;
+
+	source_rect.left = 0;
+	source_rect.top = 0;
+	source_rect.right = framebuffer_surface->texture.surface.width;
+	source_rect.bottom = framebuffer_surface->texture.surface.height;
+
+	RenderBackend_Rect destination_rect;
+	destination_rect.left = 0;
+	destination_rect.top = 0;
+	destination_rect.right = upscaled_framebuffer_surface_tv->texture.surface.width;
+	destination_rect.bottom = upscaled_framebuffer_surface_tv->texture.surface.height;
+
+	Blit(framebuffer_surface, &source_rect, upscaled_framebuffer_surface_tv, &destination_rect, false, &sampler_point);
+
+	destination_rect.right = upscaled_framebuffer_surface_drc->texture.surface.width;
+	destination_rect.bottom = upscaled_framebuffer_surface_drc->texture.surface.height;
+
+	Blit(framebuffer_surface, &source_rect, upscaled_framebuffer_surface_drc, &destination_rect, false, &sampler_point);
+
 	// Make sure the buffers aren't currently being used before we modify them
 	GX2DrawDone();
 
@@ -445,8 +524,8 @@ void RenderBackend_DrawScreen(void)
 	GX2SetVertexUniformReg(shader_group_texture.vertexShader->uniformVars[1].offset, 4, (uint32_t*)plain_vec4);
 
 	// Bind a few things
-	GX2SetPixelSampler(&sampler_point, shader_group_texture.pixelShader->samplerVars[0].location);
-	GX2SetPixelTexture(&framebuffer_surface->texture, shader_group_texture.pixelShader->samplerVars[0].location);
+	GX2SetPixelSampler(&sampler_linear, shader_group_texture.pixelShader->samplerVars[0].location);
+	GX2SetPixelTexture(&upscaled_framebuffer_surface_tv->texture, shader_group_texture.pixelShader->samplerVars[0].location);
 	GX2RSetAttributeBuffer(&vertex_buffer, 0, sizeof(Vertex), offsetof(Vertex, position));
 	GX2RSetAttributeBuffer(&vertex_buffer, 1, sizeof(Vertex), offsetof(Vertex, texture));
 
@@ -475,8 +554,8 @@ void RenderBackend_DrawScreen(void)
 	GX2SetVertexUniformReg(shader_group_texture.vertexShader->uniformVars[1].offset, 4, (uint32_t*)plain_vec4);
 
 	// Bind a few things
-	GX2SetPixelSampler(&sampler_point, shader_group_texture.pixelShader->samplerVars[0].location);
-	GX2SetPixelTexture(&framebuffer_surface->texture, shader_group_texture.pixelShader->samplerVars[0].location);
+	GX2SetPixelSampler(&sampler_linear, shader_group_texture.pixelShader->samplerVars[0].location);
+	GX2SetPixelTexture(&upscaled_framebuffer_surface_drc->texture, shader_group_texture.pixelShader->samplerVars[0].location);
 	GX2RSetAttributeBuffer(&vertex_buffer, 0, sizeof(Vertex), offsetof(Vertex, position));
 	GX2RSetAttributeBuffer(&vertex_buffer, 1, sizeof(Vertex), offsetof(Vertex, texture));
 
