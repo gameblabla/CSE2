@@ -165,7 +165,7 @@ static void FlushVertexBuffer(void)
 	current_vertex_buffer_slot = 0;
 }
 
-static void Blit(RenderBackend_Surface *source_surface, const RenderBackend_Rect *source_rect, RenderBackend_Surface *destination_surface, const RenderBackend_Rect *destination_rect, bool colour_key, GX2Sampler *sampler)
+static void Blit(RenderBackend_Surface *source_surface, const RenderBackend_Rect *source_rect, RenderBackend_Surface *destination_surface, const RenderBackend_Rect *destination_rect, bool colour_key)
 {
 	const RenderMode render_mode = (colour_key ? MODE_DRAW_SURFACE_WITH_TRANSPARENCY : MODE_DRAW_SURFACE);
 
@@ -199,7 +199,7 @@ static void Blit(RenderBackend_Surface *source_surface, const RenderBackend_Rect
 		GX2SetVertexUniformReg(shader_group_glyph.vertexShader->uniformVars[1].offset, 4, (uint32_t*)texture_coordinate_transform);
 
 		// Bind misc. data
-		GX2SetPixelSampler(sampler, shader->pixelShader->samplerVars[0].location);
+		GX2SetPixelSampler(&sampler_point, shader->pixelShader->samplerVars[0].location);
 		GX2SetPixelTexture(&source_surface->texture, shader->pixelShader->samplerVars[0].location);
 
 		// Disable blending
@@ -461,12 +461,12 @@ void RenderBackend_DrawScreen(void)
 	destination_rect.right = upscaled_framebuffer_surface_tv->texture.surface.width;
 	destination_rect.bottom = upscaled_framebuffer_surface_tv->texture.surface.height;
 
-	Blit(framebuffer_surface, &source_rect, upscaled_framebuffer_surface_tv, &destination_rect, false, &sampler_point);
+	Blit(framebuffer_surface, &source_rect, upscaled_framebuffer_surface_tv, &destination_rect, false);
 
 	destination_rect.right = upscaled_framebuffer_surface_drc->texture.surface.width;
 	destination_rect.bottom = upscaled_framebuffer_surface_drc->texture.surface.height;
 
-	Blit(framebuffer_surface, &source_rect, upscaled_framebuffer_surface_drc, &destination_rect, false, &sampler_point);
+	Blit(framebuffer_surface, &source_rect, upscaled_framebuffer_surface_drc, &destination_rect, false);
 
 	// Make sure the buffers aren't currently being used before we modify them
 	GX2DrawDone();
@@ -701,7 +701,7 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBacke
 {
 	RenderBackend_Rect destination_rect = {x, y, x + (rect->right - rect->left), y + (rect->bottom - rect->top)};
 
-	Blit(source_surface, rect, destination_surface, &destination_rect, colour_key, &sampler_point);
+	Blit(source_surface, rect, destination_surface, &destination_rect, colour_key);
 }
 
 void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBackend_Rect *rect, unsigned char red, unsigned char green, unsigned char blue)
