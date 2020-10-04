@@ -193,10 +193,10 @@ static void Blit(RenderBackend_Surface *source_surface, const RenderBackend_Rect
 
 		// Set shader uniforms
 		const float vertex_coordinate_transform[4] = {2.0f / destination_surface->texture.surface.width, -2.0f / destination_surface->texture.surface.height, 1.0f, 1.0f};
-		GX2SetVertexUniformReg(shader_group_glyph.vertexShader->uniformVars[0].offset, 4, (uint32_t*)vertex_coordinate_transform);
+		GX2SetVertexUniformReg(shader->vertexShader->uniformVars[0].offset, 4, (uint32_t*)vertex_coordinate_transform);
 
 		const float texture_coordinate_transform[4] = {1.0f / source_surface->texture.surface.width, 1.0f / source_surface->texture.surface.height, 1.0f, 1.0f};
-		GX2SetVertexUniformReg(shader_group_glyph.vertexShader->uniformVars[1].offset, 4, (uint32_t*)texture_coordinate_transform);
+		GX2SetVertexUniformReg(shader->vertexShader->uniformVars[1].offset, 4, (uint32_t*)texture_coordinate_transform);
 
 		// Bind misc. data
 		GX2SetPixelSampler(&sampler_point, shader->pixelShader->samplerVars[0].location);
