@@ -65,7 +65,8 @@ static WHBGfxShaderGroup shader_group_glyph;
 
 static GX2RBuffer vertex_buffer;
 
-static GX2Sampler sampler;
+static GX2Sampler sampler_point;
+static GX2Sampler sampler_linear;
 
 static RenderBackend_Surface *framebuffer_surface;
 
@@ -159,6 +160,83 @@ static void FlushVertexBuffer(void)
 	current_vertex_buffer_slot = 0;
 }
 
+static void Blit(RenderBackend_Surface *source_surface, const RenderBackend_Rect *source_rect, RenderBackend_Surface *destination_surface, const RenderBackend_Rect *destination_rect, bool colour_key, GX2Sampler *sampler)
+{
+	const RenderMode render_mode = (colour_key ? MODE_DRAW_SURFACE_WITH_TRANSPARENCY : MODE_DRAW_SURFACE);
+
+	// Flush vertex data if a context-change is needed
+	if (last_render_mode != render_mode || last_source_texture != &source_surface->texture || last_destination_texture != &destination_surface->texture)
+	{
+		FlushVertexBuffer();
+
+		last_render_mode = render_mode;
+		last_source_texture = &source_surface->texture;
+		last_destination_texture = &destination_surface->texture;
+
+		// Draw to the selected texture, instead of the screen
+		GX2SetColorBuffer(&destination_surface->colour_buffer, GX2_RENDER_TARGET_0);
+		GX2SetViewport(0.0f, 0.0f, (float)destination_surface->colour_buffer.surface.width, (float)destination_surface->colour_buffer.surface.height, 0.0f, 1.0f);
+		GX2SetScissor(0, 0, destination_surface->colour_buffer.surface.width, destination_surface->colour_buffer.surface.height);
+
+		// Select shader
+		WHBGfxShaderGroup *shader = colour_key ? &shader_group_texture_colour_key : &shader_group_texture;
+
+		// Bind it
+		GX2SetFetchShader(&shader->fetchShader);
+		GX2SetVertexShader(shader->vertexShader);
+		GX2SetPixelShader(shader->pixelShader);
+
+		// Set shader uniforms
+		const float vertex_coordinate_transform[4] = {2.0f / destination_surface->texture.surface.width, -2.0f / destination_surface->texture.surface.height, 1.0f, 1.0f};
+		GX2SetVertexUniformReg(shader_group_glyph.vertexShader->uniformVars[0].offset, 4, (uint32_t*)vertex_coordinate_transform);
+
+		const float texture_coordinate_transform[4] = {1.0f / source_surface->texture.surface.width, 1.0f / source_surface->texture.surface.height, 1.0f, 1.0f};
+		GX2SetVertexUniformReg(shader_group_glyph.vertexShader->uniformVars[1].offset, 4, (uint32_t*)texture_coordinate_transform);
+
+		// Bind misc. data
+		GX2SetPixelSampler(sampler, shader->pixelShader->samplerVars[0].location);
+		GX2SetPixelTexture(&source_surface->texture, shader->pixelShader->samplerVars[0].location);
+
+		// Disable blending
+		GX2SetColorControl(GX2_LOGIC_OP_COPY, 0, FALSE, TRUE);
+	}
+
+	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot();
+
+	if (vertex_buffer_slot != NULL)
+	{
+		// Set vertex position buffer
+		const float vertex_left = destination_rect->left;
+		const float vertex_top = destination_rect->top;
+		const float vertex_right = destination_rect->right;
+		const float vertex_bottom = destination_rect->bottom;
+
+		vertex_buffer_slot->vertices[0].position.x = vertex_left;
+		vertex_buffer_slot->vertices[0].position.y = vertex_top;
+		vertex_buffer_slot->vertices[1].position.x = vertex_right;
+		vertex_buffer_slot->vertices[1].position.y = vertex_top;
+		vertex_buffer_slot->vertices[2].position.x = vertex_right;
+		vertex_buffer_slot->vertices[2].position.y = vertex_bottom;
+		vertex_buffer_slot->vertices[3].position.x = vertex_left;
+		vertex_buffer_slot->vertices[3].position.y = vertex_bottom;
+
+		const float texture_left = source_rect->left;
+		const float texture_top = source_rect->top;
+		const float texture_right = source_rect->right;
+		const float texture_bottom = source_rect->bottom;
+
+		// Set texture coordinate buffer
+		vertex_buffer_slot->vertices[0].texture.x = texture_left;
+		vertex_buffer_slot->vertices[0].texture.y = texture_top;
+		vertex_buffer_slot->vertices[1].texture.x = texture_right;
+		vertex_buffer_slot->vertices[1].texture.y = texture_top;
+		vertex_buffer_slot->vertices[2].texture.x = texture_right;
+		vertex_buffer_slot->vertices[2].texture.y = texture_bottom;
+		vertex_buffer_slot->vertices[3].texture.x = texture_left;
+		vertex_buffer_slot->vertices[3].texture.y = texture_bottom;
+	}
+}
+
 RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t screen_width, size_t screen_height, bool fullscreen)
 {
 	(void)window_title;
@@ -195,8 +273,9 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t scree
 						WHBGfxInitShaderAttribute(&shader_group_glyph, "input_texture_coordinates", 1, 0, GX2_ATTRIB_FORMAT_FLOAT_32_32);
 						WHBGfxInitFetchShader(&shader_group_glyph);
 
-						// Initialise sampler
-						GX2InitSampler(&sampler, GX2_TEX_CLAMP_MODE_CLAMP, GX2_TEX_XY_FILTER_MODE_LINEAR);
+						// Initialise samplers
+						GX2InitSampler(&sampler_point, GX2_TEX_CLAMP_MODE_CLAMP, GX2_TEX_XY_FILTER_MODE_POINT);
+						GX2InitSampler(&sampler_linear, GX2_TEX_CLAMP_MODE_CLAMP, GX2_TEX_XY_FILTER_MODE_LINEAR);
 
 						// Initialise vertex buffer
 						vertex_buffer.flags = (GX2RResourceFlags)(GX2R_RESOURCE_BIND_VERTEX_BUFFER |
@@ -366,7 +445,7 @@ void RenderBackend_DrawScreen(void)
 	GX2SetVertexUniformReg(shader_group_texture.vertexShader->uniformVars[1].offset, 4, (uint32_t*)plain_vec4);
 
 	// Bind a few things
-	GX2SetPixelSampler(&sampler, shader_group_texture.pixelShader->samplerVars[0].location);
+	GX2SetPixelSampler(&sampler_point, shader_group_texture.pixelShader->samplerVars[0].location);
 	GX2SetPixelTexture(&framebuffer_surface->texture, shader_group_texture.pixelShader->samplerVars[0].location);
 	GX2RSetAttributeBuffer(&vertex_buffer, 0, sizeof(Vertex), offsetof(Vertex, position));
 	GX2RSetAttributeBuffer(&vertex_buffer, 1, sizeof(Vertex), offsetof(Vertex, texture));
@@ -396,7 +475,7 @@ void RenderBackend_DrawScreen(void)
 	GX2SetVertexUniformReg(shader_group_texture.vertexShader->uniformVars[1].offset, 4, (uint32_t*)plain_vec4);
 
 	// Bind a few things
-	GX2SetPixelSampler(&sampler, shader_group_texture.pixelShader->samplerVars[0].location);
+	GX2SetPixelSampler(&sampler_point, shader_group_texture.pixelShader->samplerVars[0].location);
 	GX2SetPixelTexture(&framebuffer_surface->texture, shader_group_texture.pixelShader->samplerVars[0].location);
 	GX2RSetAttributeBuffer(&vertex_buffer, 0, sizeof(Vertex), offsetof(Vertex, position));
 	GX2RSetAttributeBuffer(&vertex_buffer, 1, sizeof(Vertex), offsetof(Vertex, texture));
@@ -541,79 +620,9 @@ void RenderBackend_UploadSurface(RenderBackend_Surface *surface, const unsigned 
 
 void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBackend_Rect *rect, RenderBackend_Surface *destination_surface, long x, long y, bool colour_key)
 {
-	const RenderMode render_mode = (colour_key ? MODE_DRAW_SURFACE_WITH_TRANSPARENCY : MODE_DRAW_SURFACE);
+	RenderBackend_Rect destination_rect = {x, y, x + (rect->right - rect->left), y + (rect->bottom - rect->top)};
 
-	// Flush vertex data if a context-change is needed
-	if (last_render_mode != render_mode || last_source_texture != &source_surface->texture || last_destination_texture != &destination_surface->texture)
-	{
-		FlushVertexBuffer();
-
-		last_render_mode = render_mode;
-		last_source_texture = &source_surface->texture;
-		last_destination_texture = &destination_surface->texture;
-
-		// Draw to the selected texture, instead of the screen
-		GX2SetColorBuffer(&destination_surface->colour_buffer, GX2_RENDER_TARGET_0);
-		GX2SetViewport(0.0f, 0.0f, (float)destination_surface->colour_buffer.surface.width, (float)destination_surface->colour_buffer.surface.height, 0.0f, 1.0f);
-		GX2SetScissor(0, 0, destination_surface->colour_buffer.surface.width, destination_surface->colour_buffer.surface.height);
-
-		// Select shader
-		WHBGfxShaderGroup *shader = colour_key ? &shader_group_texture_colour_key : &shader_group_texture;
-
-		// Bind it
-		GX2SetFetchShader(&shader->fetchShader);
-		GX2SetVertexShader(shader->vertexShader);
-		GX2SetPixelShader(shader->pixelShader);
-
-		// Set shader uniforms
-		const float vertex_coordinate_transform[4] = {2.0f / destination_surface->texture.surface.width, -2.0f / destination_surface->texture.surface.height, 1.0f, 1.0f};
-		GX2SetVertexUniformReg(shader_group_glyph.vertexShader->uniformVars[0].offset, 4, (uint32_t*)vertex_coordinate_transform);
-
-		const float texture_coordinate_transform[4] = {1.0f / source_surface->texture.surface.width, 1.0f / source_surface->texture.surface.height, 1.0f, 1.0f};
-		GX2SetVertexUniformReg(shader_group_glyph.vertexShader->uniformVars[1].offset, 4, (uint32_t*)texture_coordinate_transform);
-
-		// Bind misc. data
-		GX2SetPixelSampler(&sampler, shader->pixelShader->samplerVars[0].location);
-		GX2SetPixelTexture(&source_surface->texture, shader->pixelShader->samplerVars[0].location);
-
-		// Disable blending
-		GX2SetColorControl(GX2_LOGIC_OP_COPY, 0, FALSE, TRUE);
-	}
-
-	VertexBufferSlot *vertex_buffer_slot = GetVertexBufferSlot();
-
-	if (vertex_buffer_slot != NULL)
-	{
-		// Set vertex position buffer
-		const float vertex_left = x;
-		const float vertex_top = y;
-		const float vertex_right = x + (rect->right - rect->left);
-		const float vertex_bottom = y + (rect->bottom - rect->top);
-
-		vertex_buffer_slot->vertices[0].position.x = vertex_left;
-		vertex_buffer_slot->vertices[0].position.y = vertex_top;
-		vertex_buffer_slot->vertices[1].position.x = vertex_right;
-		vertex_buffer_slot->vertices[1].position.y = vertex_top;
-		vertex_buffer_slot->vertices[2].position.x = vertex_right;
-		vertex_buffer_slot->vertices[2].position.y = vertex_bottom;
-		vertex_buffer_slot->vertices[3].position.x = vertex_left;
-		vertex_buffer_slot->vertices[3].position.y = vertex_bottom;
-
-		const float texture_left = rect->left;
-		const float texture_top = rect->top;
-		const float texture_right = rect->right;
-		const float texture_bottom = rect->bottom;
-
-		// Set texture coordinate buffer
-		vertex_buffer_slot->vertices[0].texture.x = texture_left;
-		vertex_buffer_slot->vertices[0].texture.y = texture_top;
-		vertex_buffer_slot->vertices[1].texture.x = texture_right;
-		vertex_buffer_slot->vertices[1].texture.y = texture_top;
-		vertex_buffer_slot->vertices[2].texture.x = texture_right;
-		vertex_buffer_slot->vertices[2].texture.y = texture_bottom;
-		vertex_buffer_slot->vertices[3].texture.x = texture_left;
-		vertex_buffer_slot->vertices[3].texture.y = texture_bottom;
-	}
+	Blit(source_surface, rect, destination_surface, &destination_rect, colour_key, &sampler_point);
 }
 
 void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBackend_Rect *rect, unsigned char red, unsigned char green, unsigned char blue)
@@ -777,7 +786,7 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBa
 		GX2SetPixelUniformReg(shader_group_glyph.pixelShader->uniformVars[0].offset, 4, (uint32_t*)&uniform_colours);
 
 		// Bind misc. data
-		GX2SetPixelSampler(&sampler, shader_group_glyph.pixelShader->samplerVars[0].location);
+		GX2SetPixelSampler(&sampler_point, shader_group_glyph.pixelShader->samplerVars[0].location);
 		GX2SetPixelTexture(&atlas->texture, shader_group_glyph.pixelShader->samplerVars[0].location);
 
 		// Enable blending
