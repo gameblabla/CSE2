@@ -525,7 +525,7 @@ endif()
 
 if(BACKEND_PLATFORM MATCHES "SDL2" OR BACKEND_AUDIO MATCHES "SDL2")
 	if(NOT FORCE_LOCAL_LIBS)
-		find_package(SDL2 2.0.6)
+		find_package(SDL2)
 
 		if (PKG_CONFIG_FOUND)
 			pkg_check_modules(sdl2 QUIET IMPORTED_TARGET sdl2)
