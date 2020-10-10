@@ -26,7 +26,7 @@ option(FREETYPE_FONTS "Use FreeType2 to render the DejaVu Mono (English) or Migu
 
 set(BACKEND_RENDERER "SDLTexture" CACHE STRING "Which renderer the game should use: 'OpenGL3' for an OpenGL 3.2 renderer, 'OpenGLES2' for an OpenGL ES 2.0 renderer, 'SDLTexture' for SDL2's hardware-accelerated Texture API, 'SDLSurface' for SDL2's software-rendered Surface API, 'Wii U' for the Wii U's hardware-accelerated GX2 API, or 'Software' for a handwritten software renderer")
 set(BACKEND_AUDIO "SDL2" CACHE STRING "Which audio backend the game should use: 'SDL2', 'miniaudio', 'WiiU-Hardware', 'WiiU-Software', or 'Null'")
-set(BACKEND_PLATFORM "SDL2" CACHE STRING "Which platform backend the game should use: 'SDL2', 'GLFW3', 'WiiU', or 'Null'")
+set(BACKEND_PLATFORM "SDL2" CACHE STRING "Which platform backend the game should use: 'SDL2', 'GLFW3', 'WiiU', '3DS', or 'Null'")
 
 option(LTO "Enable link-time optimisation" OFF)
 option(PKG_CONFIG_STATIC_LIBS "On platforms with pkg-config, static-link the dependencies (good for Windows builds, so you don't need to bundle DLL files)" OFF)
@@ -393,6 +393,11 @@ elseif(BACKEND_PLATFORM MATCHES "WiiU")
 		"src/Backends/Controller/WiiU.cpp"
 		"src/Backends/Platform/WiiU.cpp"
 	)
+elseif(BACKEND_PLATFORM MATCHES "3DS")
+	target_sources(CSE2 PRIVATE
+		"src/Backends/Controller/Null.cpp"
+		"src/Backends/Platform/3DS.cpp"
+	)
 elseif(BACKEND_PLATFORM MATCHES "Null")
 	target_sources(CSE2 PRIVATE
 		"src/Backends/Controller/Null.cpp"
@@ -417,6 +422,8 @@ elseif(BACKEND_PLATFORM MATCHES "GLFW3" AND BACKEND_RENDERER MATCHES "Software")
 elseif(BACKEND_PLATFORM MATCHES "WiiU" AND BACKEND_RENDERER MATCHES "WiiU")
 elseif(BACKEND_PLATFORM MATCHES "WiiU" AND BACKEND_RENDERER MATCHES "Software")
 	target_sources(CSE2 PRIVATE "src/Backends/Rendering/Window/Software/WiiU.cpp")
+elseif(BACKEND_PLATFORM MATCHES "3DS" AND BACKEND_RENDERER MATCHES "Software")
+	target_sources(CSE2 PRIVATE "src/Backends/Rendering/Window/Software/3DS.cpp")
 elseif(BACKEND_PLATFORM MATCHES "Null" AND BACKEND_RENDERER MATCHES "Software")
 	target_sources(CSE2 PRIVATE "src/Backends/Rendering/Window/Software/Null.cpp")
 else()
