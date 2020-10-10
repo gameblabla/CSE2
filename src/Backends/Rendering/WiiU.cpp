@@ -225,12 +225,12 @@ static void Blit(RenderBackend_Surface *source_surface, const RenderBackend_Rect
 		vertex_buffer_slot->vertices[3].position.x = vertex_left;
 		vertex_buffer_slot->vertices[3].position.y = vertex_bottom;
 
+		// Set texture coordinate buffer
 		const float texture_left = source_rect->left;
 		const float texture_top = source_rect->top;
 		const float texture_right = source_rect->right;
 		const float texture_bottom = source_rect->bottom;
 
-		// Set texture coordinate buffer
 		vertex_buffer_slot->vertices[0].texture.x = texture_left;
 		vertex_buffer_slot->vertices[0].texture.y = texture_top;
 		vertex_buffer_slot->vertices[1].texture.x = texture_right;
@@ -894,12 +894,12 @@ void RenderBackend_DrawGlyph(long x, long y, size_t glyph_x, size_t glyph_y, siz
 		vertex_buffer_slot->vertices[3].position.x = vertex_left;
 		vertex_buffer_slot->vertices[3].position.y = vertex_bottom;
 
+		// Set texture coordinate buffer
 		const float texture_left = glyph_x;
 		const float texture_top = glyph_y;
 		const float texture_right = glyph_x + glyph_width;
 		const float texture_bottom = glyph_y + glyph_height;
 
-		// Set texture coordinate buffer
 		vertex_buffer_slot->vertices[0].texture.x = texture_left;
 		vertex_buffer_slot->vertices[0].texture.y = texture_top;
 		vertex_buffer_slot->vertices[1].texture.x = texture_right;
