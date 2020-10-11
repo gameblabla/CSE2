@@ -89,7 +89,7 @@ enum
 bool Backend_Init(void (*drag_and_drop_callback)(const char *path), void (*window_focus_callback)(bool focus));
 void Backend_Deinit(void);
 void Backend_PostWindowCreation(void);
-bool Backend_GetBasePath(std::string *string_buffer);
+bool Backend_GetPaths(std::string *module_path, std::string *data_path);
 void Backend_HideMouse(void);
 void Backend_SetWindowIcon(const unsigned char *rgb_pixels, size_t width, size_t height);
 void Backend_SetCursor(const unsigned char *rgba_pixels, size_t width, size_t height);

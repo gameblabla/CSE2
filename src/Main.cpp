@@ -106,8 +106,8 @@ int main(int argc, char *argv[])
 	if (!Backend_Init(DragAndDropCallback, WindowFocusCallback))
 		return EXIT_FAILURE;
 
-	// Get executable's path
-	if (!Backend_GetBasePath(&gModulePath))
+	// Get executable's path, and path of the data folder
+	if (!Backend_GetPaths(&gModulePath, &gDataPath))
 	{
 		// Fall back on argv[0] if the backend cannot provide a path
 		gModulePath = argv[0];
@@ -120,10 +120,9 @@ int main(int argc, char *argv[])
 				break;
 			}
 		}
-	}
 
-	// Get path of the data folder
-	gDataPath = gModulePath + "/data";
+		gDataPath = gModulePath + "/data";
+	}
 
 	CONFIGDATA conf;
 	if (!LoadConfigData(&conf))

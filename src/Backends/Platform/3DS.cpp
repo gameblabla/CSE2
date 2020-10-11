@@ -5,6 +5,9 @@
 #include <string.h>
 #include <string>
 
+#include <sys/stat.h>
+#include <sys/types.h>
+
 #include <3ds.h>
 
 bool Backend_Init(void (*drag_and_drop_callback)(const char *path), void (*window_focus_callback)(bool focus))
@@ -45,9 +48,17 @@ void Backend_PostWindowCreation(void)
 	// Nothing to do here
 }
 
-bool Backend_GetBasePath(std::string *string_buffer)
+bool Backend_GetPaths(std::string *module_path, std::string *data_path)
 {
-	*string_buffer = "romfs:";
+	// Create the CSE2 folder if it doesn't already exist
+	mkdir("sdmc:/3ds", 0777);
+	mkdir("sdmc:/3ds/cse2", 0777);
+
+	// Configuration files and save data goes on the read-write SD card
+	*module_path = "sdmc:/3ds/cse2";
+
+	// Data goes in the read-only ROMFS
+	*data_path = "romfs:";
 
 	return true;
 }
