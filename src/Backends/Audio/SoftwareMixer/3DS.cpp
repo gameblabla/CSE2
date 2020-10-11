@@ -27,7 +27,7 @@ static LightEvent audio_thread_event;
 static Thread audio_thread;
 static bool audio_thread_die;
 
-static void FullBuffer(short *stream, size_t frames_total)
+static void FillBuffer(short *stream, size_t frames_total)
 {
 	size_t frames_done = 0;
 
@@ -72,7 +72,7 @@ static void AudioThread(void *user_data)
 	{
 		if (dsp_buffers[current_dsp_buffer].status == NDSP_WBUF_DONE)
 		{
-			FullBuffer(dsp_buffers[current_dsp_buffer].data_pcm16, dsp_buffers[current_dsp_buffer].nsamples);
+			FillBuffer(dsp_buffers[current_dsp_buffer].data_pcm16, dsp_buffers[current_dsp_buffer].nsamples);
 
 			ndspChnWaveBufAdd(0, &dsp_buffers[current_dsp_buffer]);
 
@@ -169,7 +169,7 @@ void SoftwareMixerBackend_Deinit(void)
 
 bool SoftwareMixerBackend_Start(void)
 {
-	FullBuffer(stream_buffer, FRAMES_PER_BUFFER * 2);
+	FillBuffer(stream_buffer, FRAMES_PER_BUFFER * 2);
 
 	ndspChnWaveBufAdd(0, &dsp_buffers[0]);
 	ndspChnWaveBufAdd(0, &dsp_buffers[1]);
