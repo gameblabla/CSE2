@@ -89,14 +89,15 @@ void Backend_PostWindowCreation(void)
 	
 }
 
-bool Backend_GetBasePath(std::string *string_buffer)
+bool Backend_GetPaths(std::string *module_path, std::string *data_path)
 {
 #ifdef _WIN32
 	// SDL_GetBasePath returns a UTF-8 string, but Windows' fopen uses (extended?) ASCII.
 	// This is apparently a problem for accented characters, as they will make fopen fail.
 	// So, instead, we rely on argv[0], as that will put the accented characters in a
 	// format Windows will understand.
-	(void)string_buffer;
+	(void)module_path;
+	(void)data_path;
 
 	return false;
 #else
@@ -107,8 +108,10 @@ bool Backend_GetBasePath(std::string *string_buffer)
 	// Trim the trailing '/'
 	size_t base_path_length = strlen(base_path);
 	base_path[base_path_length - 1] = '\0';
-	*string_buffer = base_path;
+	*module_path = base_path;
 	SDL_free(base_path);
+
+	*data_path = *module_path + "/data";
 
 	return true;
 #endif

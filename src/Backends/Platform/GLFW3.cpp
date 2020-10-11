@@ -188,9 +188,10 @@ void Backend_PostWindowCreation(void)
 	glfwSetWindowSizeCallback(window, WindowSizeCallback);
 }
 
-bool Backend_GetBasePath(std::string *string_buffer)
+bool Backend_GetPaths(std::string *module_path, std::string *data_path)
 {
-	(void)string_buffer;
+	(void)module_path;
+	(void)data_path;
 
 	// GLFW3 doesn't seem to have a mechanism for this
 	return false;

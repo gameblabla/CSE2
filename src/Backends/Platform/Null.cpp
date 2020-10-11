@@ -22,9 +22,10 @@ void Backend_PostWindowCreation(void)
 	
 }
 
-bool Backend_GetBasePath(std::string *string_buffer)
+bool Backend_GetPaths(std::string *module_path, std::string *data_path)
 {
-	(void)string_buffer;
+	(void)module_path;
+	(void)data_path;
 
 	return false;
 }

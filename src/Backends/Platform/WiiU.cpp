@@ -59,14 +59,16 @@ void Backend_PostWindowCreation(void)
 	
 }
 
-bool Backend_GetBasePath(std::string *string_buffer)
+bool Backend_GetPaths(std::string *module_path, std::string *data_path)
 {
-	*string_buffer = WHBGetSdCardMountPath();
+	*module_path = WHBGetSdCardMountPath();
 #ifdef JAPANESE
-	*string_buffer += "/CSE2-portable-jp";
+	*module_path += "/CSE2-portable-jp";
 #else
-	*string_buffer += "/CSE2-portable-en";
+	*module_path += "/CSE2-portable-en";
 #endif
+
+	*data_path = *module_path + "/data";
 
 	return true;
 }
