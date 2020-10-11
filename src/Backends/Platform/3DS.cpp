@@ -15,7 +15,11 @@ bool Backend_Init(void (*drag_and_drop_callback)(const char *path), void (*windo
 	hidInit();
 
 	gfxInitDefault();
-	consoleInit(GFX_TOP, NULL);
+	consoleInit(GFX_BOTTOM, NULL);
+
+//	gspLcdInit();
+
+//	GSPLCD_PowerOffBacklight(GSPLCD_SCREEN_BOTTOM);
 
 	Result rc = romfsInit();
 
@@ -34,6 +38,8 @@ bool Backend_Init(void (*drag_and_drop_callback)(const char *path), void (*windo
 void Backend_Deinit(void)
 {
 	romfsExit();
+
+//	gspLcdExit();
 
 	gfxExit();
 
@@ -111,28 +117,22 @@ void Backend_ShowMessageBox(const char *title, const char *message)
 
 ATTRIBUTE_FORMAT_PRINTF(1, 2) void Backend_PrintError(const char *format, ...)
 {
-	char message_buffer[0x100];
-
-	va_list argument_list;
-	va_start(argument_list, format);
-	vsnprintf(message_buffer, sizeof(message_buffer), format, argument_list);
-	va_end(argument_list);
-
-	printf("ERROR:");
-	printf(message_buffer);
+	va_list argumentList;
+	va_start(argumentList, format);
+	fputs("ERROR: ", stderr);
+	vfprintf(stderr, format, argumentList);
+	fputc('\n', stderr);
+	va_end(argumentList);
 }
 
 ATTRIBUTE_FORMAT_PRINTF(1, 2) void Backend_PrintInfo(const char *format, ...)
 {
-	char message_buffer[0x100];
-
-	va_list argument_list;
-	va_start(argument_list, format);
-	vsnprintf(message_buffer, sizeof(message_buffer), format, argument_list);
-	va_end(argument_list);
-
-	printf("INFO:");
-	printf(message_buffer);
+	va_list argumentList;
+	va_start(argumentList, format);
+	fputs("INFO: ", stderr);
+	vfprintf(stderr, format, argumentList);
+	fputc('\n', stderr);
+	va_end(argumentList);
 }
 
 unsigned long Backend_GetTicks(void)
