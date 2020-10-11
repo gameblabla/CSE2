@@ -17,14 +17,12 @@ bool Backend_Init(void (*drag_and_drop_callback)(const char *path), void (*windo
 	gfxInitDefault();
 	consoleInit(GFX_BOTTOM, NULL);
 
-//	gspLcdInit();
-
-//	GSPLCD_PowerOffBacklight(GSPLCD_SCREEN_BOTTOM);
-
 	Result rc = romfsInit();
 
 	if (rc == 0)
 	{
+		osSetSpeedupEnable(true); // Enable New3DS speedup, since this doesn't run very well on Old3DSs yet
+
 		return true;
 	}
 	else
@@ -38,8 +36,6 @@ bool Backend_Init(void (*drag_and_drop_callback)(const char *path), void (*windo
 void Backend_Deinit(void)
 {
 	romfsExit();
-
-//	gspLcdExit();
 
 	gfxExit();
 
