@@ -19,6 +19,9 @@ static short *stream_buffer;
 static ndspWaveBuf dsp_buffers[2];
 static bool current_dsp_buffer;
 
+static LightLock mixer_mutex;
+static LightLock organya_mutex;
+
 static void FullBuffer(short *stream, size_t frames_total)
 {
 	size_t frames_done = 0;
@@ -104,7 +107,8 @@ unsigned long SoftwareMixerBackend_Init(void (*callback)(long *stream, size_t fr
 			dsp_buffers[1].data_vaddr = &stream_buffer[FRAMES_PER_BUFFER * 2 * 1];
 			dsp_buffers[1].nsamples = FRAMES_PER_BUFFER;
 
-			FullBuffer(stream_buffer, FRAMES_PER_BUFFER * 2);
+			LightLock_Init(&mixer_mutex);
+			LightLock_Init(&organya_mutex);
 
 			return SAMPLE_RATE;
 		}
@@ -132,6 +136,8 @@ void SoftwareMixerBackend_Deinit(void)
 
 bool SoftwareMixerBackend_Start(void)
 {
+	FullBuffer(stream_buffer, FRAMES_PER_BUFFER * 2);
+
 	ndspChnWaveBufAdd(0, &dsp_buffers[0]);
 	ndspChnWaveBufAdd(0, &dsp_buffers[1]);
 
@@ -140,20 +146,20 @@ bool SoftwareMixerBackend_Start(void)
 
 void SoftwareMixerBackend_LockMixerMutex(void)
 {
-//	ma_mutex_lock(&mutex);
+	LightLock_Lock(&mixer_mutex);
 }
 
 void SoftwareMixerBackend_UnlockMixerMutex(void)
 {
-//	ma_mutex_unlock(&mutex);
+	LightLock_Unlock(&mixer_mutex);
 }
 
 void SoftwareMixerBackend_LockOrganyaMutex(void)
 {
-//	ma_mutex_lock(&organya_mutex);
+	LightLock_Lock(&organya_mutex);
 }
 
 void SoftwareMixerBackend_UnlockOrganyaMutex(void)
 {
-//	ma_mutex_unlock(&organya_mutex);
+	LightLock_Unlock(&organya_mutex);
 }
