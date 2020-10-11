@@ -17,9 +17,7 @@ bool Backend_Init(void (*drag_and_drop_callback)(const char *path), void (*windo
 	gfxInitDefault();
 	consoleInit(GFX_BOTTOM, NULL);
 
-	Result rc = romfsInit();
-
-	if (rc == 0)
+	if (R_SUCCEEDED(romfsInit()))
 	{
 		osSetSpeedupEnable(true); // Enable New3DS speedup, since this doesn't run very well on Old3DSs yet
 
@@ -44,7 +42,7 @@ void Backend_Deinit(void)
 
 void Backend_PostWindowCreation(void)
 {
-	
+	// Nothing to do here
 }
 
 bool Backend_GetBasePath(std::string *string_buffer)

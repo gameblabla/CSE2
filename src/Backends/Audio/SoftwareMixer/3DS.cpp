@@ -76,7 +76,7 @@ unsigned long SoftwareMixerBackend_Init(void (*callback)(long *stream, size_t fr
 
 	if (stream_buffer != NULL)
 	{
-		if (ndspInit() == 0)
+		if (R_SUCCEEDED(ndspInit()))
 		{
 			ndspSetCallback(Callback, NULL);
 
