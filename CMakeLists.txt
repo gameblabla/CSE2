@@ -368,6 +368,14 @@ elseif(BACKEND_AUDIO MATCHES "WiiU-Software")
 		"src/Backends/Audio/SoftwareMixer/Backend.h"
 		"src/Backends/Audio/SoftwareMixer/WiiU-Software.cpp"
 	)
+elseif(BACKEND_AUDIO MATCHES "3DS")
+	target_sources(CSE2 PRIVATE
+		"src/Backends/Audio/SoftwareMixer.cpp"
+		"src/Backends/Audio/SoftwareMixer/Mixer.cpp"
+		"src/Backends/Audio/SoftwareMixer/Mixer.h"
+		"src/Backends/Audio/SoftwareMixer/Backend.h"
+		"src/Backends/Audio/SoftwareMixer/3DS.cpp"
+	)
 elseif(BACKEND_AUDIO MATCHES "Null")
 	target_sources(CSE2 PRIVATE
 		"src/Backends/Audio/Null.cpp"
