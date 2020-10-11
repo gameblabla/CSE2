@@ -114,7 +114,6 @@ unsigned long SoftwareMixerBackend_Init(void (*callback)(long *stream, size_t fr
 		Backend_PrintError("Failed to initialize context: %s", ma_result_description(return_value));
 	}
 
-
 	return 0;
 }
 
