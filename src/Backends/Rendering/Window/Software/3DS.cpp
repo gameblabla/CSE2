@@ -15,7 +15,7 @@ bool WindowBackend_Software_CreateWindow(const char *window_title, size_t screen
 	(void)window_title;
 	(void)fullscreen;
 
-	gfxSetDoubleBuffering(GFX_TOP, true);
+//	gfxSetDoubleBuffering(GFX_TOP, true);
 
 	gfxSetScreenFormat(GFX_TOP, GSP_BGR8_OES);
 
@@ -65,7 +65,7 @@ void WindowBackend_Software_Display(void)
 	}
 
 	gfxFlushBuffers();
-	gfxSwapBuffers();
+	gfxScreenSwapBuffers(GFX_TOP, false);
 }
 
 void WindowBackend_Software_HandleWindowResize(size_t width, size_t height)
