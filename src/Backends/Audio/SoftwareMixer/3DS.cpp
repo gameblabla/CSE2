@@ -22,6 +22,11 @@ static bool current_dsp_buffer;
 static LightLock mixer_mutex;
 static LightLock organya_mutex;
 
+static LightEvent audio_thread_event;
+
+static Thread audio_thread;
+static bool audio_thread_die;
+
 static void FullBuffer(short *stream, size_t frames_total)
 {
 	size_t frames_done = 0;
@@ -56,13 +61,25 @@ static void Callback(void *user_data)
 {
 	(void)user_data;
 
-	if (dsp_buffers[current_dsp_buffer].status == NDSP_WBUF_DONE)
+	LightEvent_Signal(&audio_thread_event);
+}
+
+static void AudioThread(void *user_data)
+{
+	(void)user_data;
+
+	while (!audio_thread_die)
 	{
-		FullBuffer(dsp_buffers[current_dsp_buffer].data_pcm16, dsp_buffers[current_dsp_buffer].nsamples);
+		if (dsp_buffers[current_dsp_buffer].status == NDSP_WBUF_DONE)
+		{
+			FullBuffer(dsp_buffers[current_dsp_buffer].data_pcm16, dsp_buffers[current_dsp_buffer].nsamples);
 
-		ndspChnWaveBufAdd(0, &dsp_buffers[current_dsp_buffer]);
+			ndspChnWaveBufAdd(0, &dsp_buffers[current_dsp_buffer]);
 
-		current_dsp_buffer = !current_dsp_buffer;
+			current_dsp_buffer = !current_dsp_buffer;
+		}
+
+		LightEvent_Wait(&audio_thread_event);
 	}
 }
 
@@ -110,6 +127,12 @@ unsigned long SoftwareMixerBackend_Init(void (*callback)(long *stream, size_t fr
 			LightLock_Init(&mixer_mutex);
 			LightLock_Init(&organya_mutex);
 
+			LightEvent_Init(&audio_thread_event, RESET_ONESHOT);
+
+			audio_thread_die = false;
+
+			audio_thread = threadCreate(AudioThread, NULL, 32 * 1024, 0x18, -1, false);
+
 			return SAMPLE_RATE;
 		}
 		else
@@ -129,6 +152,16 @@ unsigned long SoftwareMixerBackend_Init(void (*callback)(long *stream, size_t fr
 
 void SoftwareMixerBackend_Deinit(void)
 {
+	ndspSetCallback(NULL, NULL);
+
+	// Kill audio thread
+	audio_thread_die = true;
+	LightEvent_Signal(&audio_thread_event);
+	threadJoin(audio_thread, UINT64_MAX);
+	threadFree(audio_thread);
+
+	ndspChnReset(0);
+
 	ndspExit();
 
 	linearFree(stream_buffer);
