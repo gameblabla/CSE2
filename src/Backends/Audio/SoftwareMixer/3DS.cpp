@@ -129,7 +129,7 @@ unsigned long SoftwareMixerBackend_Init(void (*callback)(long *stream, size_t fr
 
 void SoftwareMixerBackend_Deinit(void)
 {
-	ndspExit();
+//	ndspExit(); // For some asinine reason, 
 
 	linearFree(stream_buffer);
 }
