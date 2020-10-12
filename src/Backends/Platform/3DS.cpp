@@ -134,9 +134,9 @@ ATTRIBUTE_FORMAT_PRINTF(1, 2) void Backend_PrintInfo(const char *format, ...)
 {
 	va_list argumentList;
 	va_start(argumentList, format);
-	fputs("INFO: ", stderr);
-	vfprintf(stderr, format, argumentList);
-	fputc('\n', stderr);
+	fputs("INFO: ", stdout);
+	vfprintf(stdout, format, argumentList);
+	fputc('\n', stdout);
 	va_end(argumentList);
 }
 
