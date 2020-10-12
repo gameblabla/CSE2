@@ -43,15 +43,24 @@ bool ControllerBackend_GetJoystickStatus(bool **buttons, unsigned int *button_co
 
 	int total_sdl_buttons = SDL_JoystickNumButtons(joystick);
 	if (total_sdl_buttons < 0)
+	{
+		total_sdl_buttons = 0;
 		Backend_PrintError("Failed to get number of buttons on joystick: %s", SDL_GetError());
+	}
 
 	int total_sdl_axes = SDL_JoystickNumAxes(joystick);
 	if (total_sdl_axes < 0)
+	{
+		total_sdl_axes = 0;
 		Backend_PrintError("Failed to get number of general axis controls on joystick: %s", SDL_GetError());
+	}
 
 	int total_sdl_hats = SDL_JoystickNumHats(joystick);
 	if (total_sdl_hats < 0)
+	{
+		total_sdl_hats = 0;
 		Backend_PrintError("Failed to get number of POV hats on joystick: %s", SDL_GetError());
+	}
 
 	*button_count = total_sdl_buttons + total_sdl_axes * 2 + total_sdl_hats * 4;
 	*axis_count = total_sdl_axes;
@@ -60,12 +69,17 @@ bool ControllerBackend_GetJoystickStatus(bool **buttons, unsigned int *button_co
 	static short *axis_buffer = NULL;
 
 	bool *new_button_buffer = (bool*)realloc(button_buffer, *button_count * sizeof(bool));
-	short *new_axis_buffer = (short*)realloc(axis_buffer, *axis_count * sizeof(short));
 
-	if (new_button_buffer == NULL || new_axis_buffer == NULL)
+	if (new_button_buffer == NULL)
 		return false;
 
 	button_buffer = new_button_buffer;
+
+	short *new_axis_buffer = (short*)realloc(axis_buffer, *axis_count * sizeof(short));
+
+	if (new_axis_buffer == NULL)
+		return false;
+
 	axis_buffer = new_axis_buffer;
 
 	//////////////////////////
