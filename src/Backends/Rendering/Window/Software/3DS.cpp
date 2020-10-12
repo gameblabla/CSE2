@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <3ds.h>
 
@@ -23,9 +24,9 @@ bool WindowBackend_Software_CreateWindow(const char *window_title, size_t screen
 
 	if (framebuffer != NULL)
 	{
-		framebuffer_pitch = screen_width * 3;
-		framebuffer_width = screen_width;
-		framebuffer_height = screen_height;
+		framebuffer_pitch = screen_height * 3;
+		framebuffer_width = screen_height;
+		framebuffer_height = screen_width;
 
 		return true;
 	}
@@ -47,22 +48,7 @@ unsigned char* WindowBackend_Software_GetFramebuffer(size_t *pitch)
 
 void WindowBackend_Software_Display(void)
 {
-	// Absolutely disgusting
-	unsigned char *actual_framebuffer = gfxGetFramebuffer(GFX_TOP, GFX_LEFT, NULL, NULL);
-
-	unsigned char *framebuffer_pointer = framebuffer;
-
-	const size_t offset = ((400 - framebuffer_width) / 2) * 240;
-
-	for (unsigned int h = framebuffer_height - 1; h-- != 0;)
-	{
-		for (unsigned int w = 0; w < framebuffer_width * 240; w += 240)
-		{
-			actual_framebuffer[(offset + w + h) * 3 + 2] = *framebuffer_pointer++;
-			actual_framebuffer[(offset + w + h) * 3 + 1] = *framebuffer_pointer++;
-			actual_framebuffer[(offset + w + h) * 3 + 0] = *framebuffer_pointer++;
-		}		
-	}
+	memcpy(gfxGetFramebuffer(GFX_TOP, GFX_LEFT, NULL, NULL) + (400 - framebuffer_height) * 240 * 3 / 2, framebuffer, framebuffer_pitch * framebuffer_height);
 
 	gfxFlushBuffers();
 	gfxScreenSwapBuffers(GFX_TOP, false);

@@ -22,7 +22,7 @@ bool Backend_Init(void (*drag_and_drop_callback)(const char *path), void (*windo
 
 	if (R_SUCCEEDED(romfsInit()))
 	{
-		osSetSpeedupEnable(true); // Enable New3DS speedup, since this doesn't run very well on Old3DSs yet
+//		osSetSpeedupEnable(true); // Enable New3DS speedup, since this doesn't run very well on Old3DSs yet
 
 		return true;
 	}

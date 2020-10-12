@@ -37,8 +37,13 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t scree
 	if (WindowBackend_Software_CreateWindow(window_title, screen_width, screen_height, fullscreen))
 	{
 		framebuffer.pixels = WindowBackend_Software_GetFramebuffer(&framebuffer.pitch);
+	#ifdef _3DS
+		framebuffer.width = screen_height;
+		framebuffer.height = screen_width;
+	#else
 		framebuffer.width = screen_width;
 		framebuffer.height = screen_height;
+	#endif
 
 		return &framebuffer;
 	}
@@ -80,9 +85,15 @@ RenderBackend_Surface* RenderBackend_CreateSurface(size_t width, size_t height, 
 		return NULL;
 	}
 
+#ifdef _3DS
+	surface->width = height;
+	surface->height = width;
+	surface->pitch = height * 3;
+#else
 	surface->width = width;
 	surface->height = height;
 	surface->pitch = width * 3;
+#endif
 
 	return surface;
 }
@@ -107,18 +118,48 @@ void RenderBackend_RestoreSurface(RenderBackend_Surface *surface)
 
 void RenderBackend_UploadSurface(RenderBackend_Surface *surface, const unsigned char *pixels, size_t width, size_t height)
 {
+#ifdef _3DS
+	// Rotate 90 degrees clockwise, and convert from RGB to BGR
+	const unsigned char *source_pointer = pixels;
+
+	for (size_t y = 0; y < height; ++y)
+	{
+		for (size_t x = 0; x < width; ++x)
+		{
+			unsigned char *destination_pixel = &surface->pixels[x * surface->pitch + (surface->width - y - 1) * 3];
+
+			destination_pixel[2] = *source_pointer++;
+			destination_pixel[1] = *source_pointer++;
+			destination_pixel[0] = *source_pointer++;
+		}
+	}
+#else
 	for (size_t y = 0; y < height; ++y)
 		memcpy(&surface->pixels[y * surface->pitch], &pixels[y * width * 3], width * 3);
+#endif
 }
 
 ATTRIBUTE_HOT void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBackend_Rect *rect, RenderBackend_Surface *destination_surface, long x, long y, bool colour_key)
 {
 	RenderBackend_Rect rect_clamped;
 
+#ifdef _3DS
+	// Rotate
+	rect_clamped.left = source_surface->width - rect->bottom;
+	rect_clamped.top = rect->left;
+	rect_clamped.right = source_surface->width - rect->top;
+	rect_clamped.bottom = rect->right;
+
+	const long new_x = (destination_surface->width - y) - (rect_clamped.right - rect_clamped.left);
+	const long new_y = x;
+	x = new_x;
+	y = new_y;
+#else
 	rect_clamped.left = rect->left;
 	rect_clamped.top = rect->top;
 	rect_clamped.right = rect->right;
 	rect_clamped.bottom = rect->bottom;
+#endif
 
 	// Clamp the rect and coordinates so we don't write outside the pixel buffer
 	long overflow;
@@ -194,10 +235,18 @@ ATTRIBUTE_HOT void RenderBackend_ColourFill(RenderBackend_Surface *surface, cons
 {
 	RenderBackend_Rect rect_clamped;
 
+#ifdef _3DS
+	// Rotate
+	rect_clamped.left = surface->width - rect->bottom;
+	rect_clamped.top = rect->left;
+	rect_clamped.right = surface->width - rect->top;
+	rect_clamped.bottom = rect->right;
+#else
 	rect_clamped.left = rect->left;
 	rect_clamped.top = rect->top;
 	rect_clamped.right = rect->right;
 	rect_clamped.bottom = rect->bottom;
+#endif
 
 	// Clamp the rect so it doesn't write outside the pixel buffer
 	long overflow;
@@ -230,9 +279,15 @@ ATTRIBUTE_HOT void RenderBackend_ColourFill(RenderBackend_Surface *surface, cons
 
 		for (long i = 0; i < rect_clamped.right - rect_clamped.left; ++i)
 		{
+		#ifdef _3DS
+			*destination_pointer++ = blue;
+			*destination_pointer++ = green;
+			*destination_pointer++ = red;
+		#else
 			*destination_pointer++ = red;
 			*destination_pointer++ = green;
 			*destination_pointer++ = blue;
+		#endif
 		}
 	}
 }
@@ -247,8 +302,13 @@ RenderBackend_GlyphAtlas* RenderBackend_CreateGlyphAtlas(size_t width, size_t he
 
 		if (atlas->pixels != NULL)
 		{
+		#ifdef _3DS
+			atlas->width = height;
+			atlas->height = width;
+		#else
 			atlas->width = width;
 			atlas->height = height;
+		#endif
 
 			return atlas;
 		}
@@ -267,8 +327,19 @@ void RenderBackend_DestroyGlyphAtlas(RenderBackend_GlyphAtlas *atlas)
 
 void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t y, const unsigned char *pixels, size_t width, size_t height, size_t pitch)
 {
+#ifdef _3DS
+	// Rotate
+	for (size_t h = 0; h < height; ++h)
+	{
+		const unsigned char *source_pointer = &pixels[h * pitch];
+
+		for (size_t w = 0; w < width; ++w)
+			atlas->pixels[(x + w) * atlas->width + (atlas->width - (y + h) - 1)] = *source_pointer++;
+	}
+#else
 	for (size_t i = 0; i < height; ++i)
 		memcpy(&atlas->pixels[(y + i) * atlas->width + x], &pixels[i * pitch], width);
+#endif
 }
 
 void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBackend_Surface *destination_surface, unsigned char red, unsigned char green, unsigned char blue)
@@ -276,13 +347,37 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBa
 	glyph_atlas = atlas;
 	glyph_destination_surface = destination_surface;
 
+#ifdef _3DS
+	glyph_colour_channels[0] = blue;
+	glyph_colour_channels[1] = green;
+	glyph_colour_channels[2] = red;
+#else
 	glyph_colour_channels[0] = red;
 	glyph_colour_channels[1] = green;
 	glyph_colour_channels[2] = blue;
+#endif
 }
 
 void RenderBackend_DrawGlyph(long x, long y, size_t glyph_x, size_t glyph_y, size_t glyph_width, size_t glyph_height)
 {
+#ifdef _3DS
+	// Rotate
+	const size_t new_glyph_width = glyph_height;
+	const size_t new_glyph_height = glyph_width;
+	glyph_width = new_glyph_width;
+	glyph_height = new_glyph_height;
+
+	const long new_x = (glyph_destination_surface->width - y) - glyph_width;
+	const long new_y = x;
+	x = new_x;
+	y = new_y;
+
+	const long new_glyph_x = (glyph_atlas->width - glyph_y) - glyph_width;
+	const long new_glyph_y = glyph_x;
+	glyph_x = new_glyph_x;
+	glyph_y = new_glyph_y;
+#endif
+
 	size_t surface_x;
 	size_t surface_y;
 
