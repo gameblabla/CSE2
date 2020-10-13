@@ -251,30 +251,33 @@ void RenderBackend_UploadSurface(RenderBackend_Surface *surface, const unsigned 
 		frame_started = false;
 	}
 
-	unsigned char *abgr_buffer = (unsigned char*)linearAlloc(width * height * 4);
+	unsigned char *abgr_buffer = (unsigned char*)linearAlloc(surface->texture.width * surface->texture.height * 4);
 
 	if (abgr_buffer != NULL)
 	{
 		const unsigned char *src = pixels;
-		unsigned char *dst = abgr_buffer;
 
 		// Convert from colour-keyed RGB to ABGR
-		for (size_t i = 0; i < width * height; ++i)
+		for (size_t h = 0; h < height; ++h)
 		{
-			unsigned char r = *src++;
-			unsigned char g = *src++;
-			unsigned char b = *src++;
+			unsigned char *dst = &abgr_buffer[h * surface->texture.width * 4];
 
-			*dst++ = r == 0 && g == 0 && b == 0 ? 0 : 0xFF;
-			*dst++ = b;
-			*dst++ = g;
-			*dst++ = r;
+			for (size_t w = 0; w < width; ++w)
+			{
+				unsigned char r = *src++;
+				unsigned char g = *src++;
+				unsigned char b = *src++;
+
+				*dst++ = r == 0 && g == 0 && b == 0 ? 0 : 0xFF;
+				*dst++ = b;
+				*dst++ = g;
+				*dst++ = r;
+			}
 		}
 
-		// ensure data is in physical ram
-		GSPGPU_FlushDataCache(abgr_buffer, width * height * 4);
+		GSPGPU_FlushDataCache(abgr_buffer, surface->texture.width * surface->texture.height * 4);
 
-		C3D_SyncDisplayTransfer((u32*)abgr_buffer, GX_BUFFER_DIM(width, height), (u32*)surface->texture.data, GX_BUFFER_DIM(surface->texture.width, surface->texture.height), TEXTURE_TRANSFER_FLAGS);
+		C3D_SyncDisplayTransfer((u32*)abgr_buffer, GX_BUFFER_DIM(surface->texture.width, surface->texture.height), (u32*)surface->texture.data, GX_BUFFER_DIM(surface->texture.width, surface->texture.height), TEXTURE_TRANSFER_FLAGS);
 
 		linearFree(abgr_buffer);
 	}
