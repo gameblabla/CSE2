@@ -316,7 +316,7 @@ RenderBackend_GlyphAtlas* RenderBackend_CreateGlyphAtlas(size_t width, size_t he
 		free(atlas);
 	}
 
-	return NULL;	
+	return NULL;
 }
 
 void RenderBackend_DestroyGlyphAtlas(RenderBackend_GlyphAtlas *atlas)
