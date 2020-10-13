@@ -9,7 +9,6 @@
 #include <citro2d.h>
 
 #include "../Misc.h"
-#include "../../Attributes.h"
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -286,7 +285,7 @@ void RenderBackend_UploadSurface(RenderBackend_Surface *surface, const unsigned 
 	}
 }
 
-ATTRIBUTE_HOT void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBackend_Rect *rect, RenderBackend_Surface *destination_surface, long x, long y, bool colour_key)
+void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBackend_Rect *rect, RenderBackend_Surface *destination_surface, long x, long y, bool colour_key)
 {
 	EnableAlpha(colour_key);
 
@@ -318,7 +317,7 @@ ATTRIBUTE_HOT void RenderBackend_Blit(RenderBackend_Surface *source_surface, con
 	C2D_DrawImageAt(image, x, y, 0.5f, NULL, 1.0f, 1.0f);
 }
 
-ATTRIBUTE_HOT void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBackend_Rect *rect, unsigned char red, unsigned char green, unsigned char blue)
+void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBackend_Rect *rect, unsigned char red, unsigned char green, unsigned char blue)
 {
 	EnableAlpha(false);
 
