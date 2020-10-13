@@ -102,7 +102,7 @@ void RenderBackend_DrawScreen(void)
 {
 	if (!frame_started)
 	{
-		C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+		C3D_FrameBegin(0);
 		frame_started = true;
 	}
 
@@ -156,7 +156,7 @@ RenderBackend_Surface* RenderBackend_CreateSurface(size_t width, size_t height, 
 			}
 			else
 			{
-				surface->render_target = C3D_RenderTargetCreateFromTex(&surface->texture, GPU_TEXFACE_2D, 0, GPU_RB_DEPTH16);
+				surface->render_target = C3D_RenderTargetCreateFromTex(&surface->texture, GPU_TEXFACE_2D, 0, -1);
 
 				if (surface->render_target != NULL)
 					return surface;
@@ -203,12 +203,12 @@ void RenderBackend_UploadSurface(RenderBackend_Surface *surface, const unsigned 
 {
 	Backend_PrintInfo("RenderBackend_UploadSurface");
 
-	unsigned char *rgba_buffer = (unsigned char*)linearAlloc(width * height * 4);
+	unsigned char *abgr_buffer = (unsigned char*)linearAlloc(width * height * 4);
 
-	if (rgba_buffer != NULL)
+	if (abgr_buffer != NULL)
 	{
 		const unsigned char *src = pixels;
-		unsigned char *dst = rgba_buffer;
+		unsigned char *dst = abgr_buffer;
 
 		// Convert from colour-keyed RGB to ABGR
 		for (size_t i = 0; i < width * height; ++i)
@@ -224,11 +224,11 @@ void RenderBackend_UploadSurface(RenderBackend_Surface *surface, const unsigned 
 		}
 
 		// ensure data is in physical ram
-		GSPGPU_FlushDataCache(rgba_buffer, width * height * 4);
+		GSPGPU_FlushDataCache(abgr_buffer, width * height * 4);
 
-		C3D_SyncDisplayTransfer((u32*)rgba_buffer, GX_BUFFER_DIM(width, height), (u32*)surface->texture.data, GX_BUFFER_DIM(surface->texture.width, surface->texture.height), TEXTURE_TRANSFER_FLAGS);
+		C3D_SyncDisplayTransfer((u32*)abgr_buffer, GX_BUFFER_DIM(width, height), (u32*)surface->texture.data, GX_BUFFER_DIM(surface->texture.width, surface->texture.height), TEXTURE_TRANSFER_FLAGS);
 
-		linearFree(rgba_buffer);
+		linearFree(abgr_buffer);
 	}
 	else
 	{
@@ -240,7 +240,7 @@ ATTRIBUTE_HOT void RenderBackend_Blit(RenderBackend_Surface *source_surface, con
 {
 	if (!frame_started)
 	{
-		C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+		C3D_FrameBegin(0);
 		frame_started = true;
 	}
 
@@ -270,7 +270,7 @@ ATTRIBUTE_HOT void RenderBackend_ColourFill(RenderBackend_Surface *surface, cons
 {
 	if (!frame_started)
 	{
-		C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+		C3D_FrameBegin(0);
 		frame_started = true;
 	}
 
