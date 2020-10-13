@@ -193,9 +193,15 @@ RenderBackend_Surface* RenderBackend_CreateSurface(size_t width, size_t height, 
 				surface->render_target = C3D_RenderTargetCreateFromTex(&surface->texture, GPU_TEXFACE_2D, 0, -1);
 
 				if (surface->render_target != NULL)
+				{
+					C2D_TargetClear(surface->render_target, 0xFF000000);
+
 					return surface;
+				}
 				else
+				{
 					Backend_PrintError("C3D_RenderTargetCreateFromTex failed in RenderBackend_CreateSurface");
+				}
 			}
 
 			C3D_TexDelete(&surface->texture);
