@@ -208,7 +208,7 @@ RenderBackend_Surface* RenderBackend_CreateSurface(size_t width, size_t height, 
 		}
 		else
 		{
-			Backend_PrintError("C3D_TexInitVRAM failed in RenderBackend_CreateSurface");
+			Backend_PrintError("C3D_TexInit/C3D_TexInitVRAM failed in RenderBackend_CreateSurface");
 		}
 
 		free(surface);
