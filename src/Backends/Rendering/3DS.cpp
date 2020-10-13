@@ -180,7 +180,7 @@ RenderBackend_Surface* RenderBackend_CreateSurface(size_t width, size_t height, 
 
 		memset(&surface->texture, 0, sizeof(surface->texture));
 
-		if (render_target ? C3D_TexInitVRAM(&surface->texture, NextPowerOfTwo(width), NextPowerOfTwo(height), GPU_RGBA8) : C3D_TexInit(&surface->texture, NextPowerOfTwo(width), NextPowerOfTwo(height), GPU_RGBA8))
+		if ((render_target ? C3D_TexInitVRAM : C3D_TexInit)(&surface->texture, NextPowerOfTwo(width), NextPowerOfTwo(height), GPU_RGBA8))
 		{
 			C3D_TexSetFilter(&surface->texture, GPU_NEAREST, GPU_NEAREST);
 
