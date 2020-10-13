@@ -6,6 +6,7 @@
 
 #include <3ds.h>
 #include <citro3d.h>
+#include <citro2d.h>
 #include <c3d/renderqueue.h>
 
 #include "../Misc.h"
@@ -14,24 +15,12 @@
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
-// Used to transfer the final rendered display to the framebuffer
-#define DISPLAY_TRANSFER_FLAGS \
-	(GX_TRANSFER_FLIP_VERT(0) | GX_TRANSFER_OUT_TILED(0) | GX_TRANSFER_RAW_COPY(0) | \
-	GX_TRANSFER_IN_FORMAT(GX_TRANSFER_FMT_RGBA8) | GX_TRANSFER_OUT_FORMAT(GX_TRANSFER_FMT_RGB8) | \
-	GX_TRANSFER_SCALING(GX_TRANSFER_SCALE_NO))
-
 // Used to convert textures to 3DS tiled format
-// Note: vertical flip flag set so 0,0 is top left of texture
+// Note: vertical flip flag set so 0,0 is top left of texture (lol no it isn't)
 #define TEXTURE_TRANSFER_FLAGS \
-	(GX_TRANSFER_FLIP_VERT(1) | GX_TRANSFER_OUT_TILED(1) | GX_TRANSFER_RAW_COPY(0) | \
+	(GX_TRANSFER_FLIP_VERT(0) | GX_TRANSFER_OUT_TILED(1) | GX_TRANSFER_RAW_COPY(0) | \
 	GX_TRANSFER_IN_FORMAT(GX_TRANSFER_FMT_RGBA8) | GX_TRANSFER_OUT_FORMAT(GX_TRANSFER_FMT_RGBA8) | \
 	GX_TRANSFER_SCALING(GX_TRANSFER_SCALE_NO))
-
-typedef struct
-{
-	float x, y, z;
-	float u, v;
-} VBOEntry;
 
 typedef struct RenderBackend_Surface
 {
@@ -39,8 +28,6 @@ typedef struct RenderBackend_Surface
 	C3D_RenderTarget *render_target;
 	size_t width;
 	size_t height;
-	size_t padded_width;
-	size_t padded_height;
 } RenderBackend_Surface;
 
 typedef struct RenderBackend_GlyphAtlas
@@ -58,17 +45,7 @@ static C3D_RenderTarget *screen_render_target;
 
 static RenderBackend_Surface *framebuffer_surface;
 
-static DVLB_s *vertex_shader;
-static shaderProgram_s shader_program;
-static int uniform_projection;
-
-static VBOEntry *vbo;
-
-static C3D_Mtx projection_matrix;
-
-static const unsigned char vshader[] = {
-	#include "vshader.h"
-};
+static bool frame_started;
 
 static size_t NextPowerOfTwo(size_t value)
 {
@@ -83,124 +60,78 @@ static size_t NextPowerOfTwo(size_t value)
 RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t screen_width, size_t screen_height, bool fullscreen)
 {
 	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
+    C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
+    C2D_Prepare();
 
 	// Set up screen render target
-	screen_render_target = C3D_RenderTargetCreate(240, 400, GPU_RB_RGBA8, GPU_RB_DEPTH16);
-	C3D_RenderTargetSetOutput(screen_render_target, GFX_TOP, GFX_LEFT, DISPLAY_TRANSFER_FLAGS);
+	screen_render_target = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
 
-	// Set up shader
-	vertex_shader = DVLB_ParseFile((u32*)vshader, sizeof(vshader));
+	if (screen_render_target != NULL)
+	{
+		framebuffer_surface = RenderBackend_CreateSurface(screen_width, screen_height, true);
 
-	shaderProgramInit(&shader_program);
-	shaderProgramSetVsh(&shader_program, &vertex_shader->DVLE[0]);
-	C3D_BindProgram(&shader_program);
+		if (framebuffer_surface != NULL)
+			return framebuffer_surface;
+		else
+			Backend_PrintError("RenderBackend_CreateSurface failed in RenderBackend_Init");
 
-	uniform_projection = shaderInstanceGetUniformLocation(shader_program.vertexShader, "projection");
+		C3D_RenderTargetDelete(screen_render_target);
+	}
+	else
+	{
+		Backend_PrintError("C2D_CreateScreenTarget failed in RenderBackend_Init");
+	}
 
-	// Set up VBO
-	vbo = (VBOEntry*)linearAlloc(sizeof(VBOEntry) * 6);
+	C2D_Fini();
+	C3D_Fini();
 
-	C3D_AttrInfo* attrInfo = C3D_GetAttrInfo();
-	AttrInfo_Init(attrInfo);
-	AttrInfo_AddLoader(attrInfo, 0, GPU_FLOAT, 3); // v0=position
-	AttrInfo_AddLoader(attrInfo, 1, GPU_FLOAT, 2); // v2=texcoord
-
-	// Buffer
-	C3D_BufInfo* bufInfo = C3D_GetBufInfo();
-	BufInfo_Init(bufInfo);
-	BufInfo_Add(bufInfo, vbo, sizeof(VBOEntry), 2, 0x10);
-
-	C3D_TexEnv* env = C3D_GetTexEnv(0);
-	C3D_TexEnvInit(env);
-	C3D_TexEnvSrc(env, C3D_Both, GPU_TEXTURE0, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR);
-	C3D_TexEnvFunc(env, C3D_Both, GPU_REPLACE);
-
-	C3D_DepthTest(false, GPU_GEQUAL, GPU_WRITE_ALL);
-
-	framebuffer_surface = RenderBackend_CreateSurface(screen_width, screen_height, true);
-
-	if (framebuffer_surface == NULL)
-		Backend_PrintError("RenderBackend_CreateSurface failed");
-
-	return framebuffer_surface;
+	return NULL;
 }
 
 void RenderBackend_Deinit(void)
 {
-	shaderProgramFree(&shader_program);
-	DVLB_Free(vertex_shader);
-
-	linearFree(vbo);
+	RenderBackend_FreeSurface(framebuffer_surface);
 
 	C3D_RenderTargetDelete(screen_render_target);
 
+	C2D_Fini();
 	C3D_Fini();
 }
 
 void RenderBackend_DrawScreen(void)
 {
-	Mtx_OrthoTilt(&projection_matrix, 0.0f, 400.0f, 240.0f, 0.0f, 0.0f, 1.0f, true);
-
-	C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, uniform_projection, &projection_matrix);
-
-	C3D_TexBind(0, &framebuffer_surface->texture);
-
-	C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
-
-	C3D_RenderTargetClear(screen_render_target, C3D_CLEAR_COLOR, 0x000000FF, 0);
-	C3D_FrameDrawOn(screen_render_target);
-
-	const float vertex_left = (400 - framebuffer_surface->width) / 2;
-	const float vertex_top = (240 - framebuffer_surface->height) / 2;
-	const float vertex_right = vertex_left + framebuffer_surface->width;
-	const float vertex_bottom = vertex_top + framebuffer_surface->height;
+	if (!frame_started)
+	{
+		C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+		frame_started = true;
+	}
 
 	const float texture_left = 0.0f;
 	const float texture_top = 0.0f;
-	const float texture_right = (float)framebuffer_surface->width / framebuffer_surface->padded_width;
-	const float texture_bottom = (float)framebuffer_surface->height / framebuffer_surface->padded_height;
+	const float texture_right = (float)framebuffer_surface->width / framebuffer_surface->texture.width;
+	const float texture_bottom = (float)framebuffer_surface->height / framebuffer_surface->texture.height;
 
-/*	vbo[0] = (VBOEntry){vertex_left, vertex_top, 0.5f, texture_left, texture_top};
-	vbo[1] = (VBOEntry){vertex_left, vertex_bottom, 0.5f, texture_left, texture_bottom};
-	vbo[2] = (VBOEntry){vertex_right, vertex_top, 0.5f, texture_right, texture_top};
-	vbo[3] = (VBOEntry){vertex_left, vertex_bottom, 0.5f, texture_left, texture_bottom};
-	vbo[4] = (VBOEntry){vertex_right, vertex_bottom, 0.5f, texture_right, texture_bottom};
-	vbo[5] = (VBOEntry){vertex_right, vertex_top, 0.5f, texture_right, texture_top};
+	Tex3DS_SubTexture subtexture;
+	subtexture.width = framebuffer_surface->width;
+	subtexture.height = framebuffer_surface->height;
+	subtexture.left = texture_left;
+	subtexture.top = 1.0f - texture_top;
+	subtexture.right = texture_right;
+	subtexture.bottom = 1.0f - texture_bottom;
 
-	C3D_DrawArrays(GPU_TRIANGLES, 0, 6);
-*/
+	C2D_Image image;
+	image.tex = &framebuffer_surface->texture;
+	image.subtex = &subtexture;
 
-	// Draw a textured quad directly
-	C3D_ImmDrawBegin(GPU_TRIANGLES);
-		C3D_ImmSendAttrib(vertex_left, vertex_top, 0.5f, 0.0f); // v0=position
-		C3D_ImmSendAttrib( texture_left, texture_top, 0.0f, 0.0f);
+	C2D_TargetClear(screen_render_target, 0xFF000000);
 
-		C3D_ImmSendAttrib(vertex_left, vertex_bottom, 0.5f, 0.0f);
-		C3D_ImmSendAttrib( texture_left, texture_bottom, 0.0f, 0.0f);
+	C2D_SceneBegin(screen_render_target);
 
-		C3D_ImmSendAttrib(vertex_right, vertex_top, 0.5f, 0.0f);
-		C3D_ImmSendAttrib( texture_right, texture_top, 0.0f, 0.0f);
-
-		C3D_ImmSendAttrib(vertex_left, vertex_bottom, 0.5f, 0.0f);
-		C3D_ImmSendAttrib( texture_left, texture_bottom, 0.0f, 0.0f);
-
-		C3D_ImmSendAttrib(vertex_right, vertex_bottom, 0.5f, 0.0f);
-		C3D_ImmSendAttrib( texture_right, texture_bottom, 0.0f, 0.0f);
-
-		C3D_ImmSendAttrib(vertex_right, vertex_top, 0.5f, 0.0f);
-		C3D_ImmSendAttrib( texture_right, texture_top, 0.0f, 0.0f);
-	C3D_ImmDrawEnd();
-/*
-	vbo[0] = (VBOEntry){0.0f, 0.0f, 0.5f, 0.0f, 0.0f};
-	vbo[1] = (VBOEntry){framebuffer_surface->width, 0.0f, 0.5f, 1.0f, 0.0f};
-	vbo[2] = (VBOEntry){0.0f, framebuffer_surface->height, 0.5f, 0.0f, 1.0f};
-	vbo[3] = (VBOEntry){0.0f, framebuffer_surface->height, 0.5f, 0.0f, 1.0f};
-	vbo[4] = (VBOEntry){framebuffer_surface->width, 0.0f, 0.5f, 1.0f, 0.0f};
-	vbo[5] = (VBOEntry){framebuffer_surface->width, framebuffer_surface->height, 0.5f, 1.0f, 1.0f};
-*/
-//	C3D_DrawArrays(GPU_TRIANGLES, 0, 6);
+	C2D_DrawImageAt(image, (400 - framebuffer_surface->width) / 2, (240 - framebuffer_surface->height) / 2, 0.5f, NULL, 1.0f, 1.0f);
 
 	C3D_FrameEnd(0);
+
+	frame_started = false;
 }
 
 RenderBackend_Surface* RenderBackend_CreateSurface(size_t width, size_t height, bool render_target)
@@ -211,35 +142,36 @@ RenderBackend_Surface* RenderBackend_CreateSurface(size_t width, size_t height, 
 	{
 		surface->width = width;
 		surface->height = height;
-		surface->padded_width = NextPowerOfTwo(width);
-		surface->padded_height = NextPowerOfTwo(height);
 		surface->render_target = NULL;
 
 		memset(&surface->texture, 0, sizeof(surface->texture));
-		C3D_TexInitVRAM(&surface->texture, surface->padded_width, surface->padded_height, GPU_RGBA8);
-		C3D_TexSetFilter(&surface->texture, GPU_NEAREST, GPU_NEAREST);
 
-		if (!render_target)
+		if (render_target ? C3D_TexInitVRAM(&surface->texture, NextPowerOfTwo(width), NextPowerOfTwo(height), GPU_RGBA8) : C3D_TexInit(&surface->texture, NextPowerOfTwo(width), NextPowerOfTwo(height), GPU_RGBA8))
 		{
-			return surface;
-		}
-		else
-		{
-			surface->render_target = C3D_RenderTargetCreateFromTex(&surface->texture, GPU_TEXFACE_2D, 0, GPU_RB_DEPTH16);
+			C3D_TexSetFilter(&surface->texture, GPU_NEAREST, GPU_NEAREST);
 
-			if (surface->render_target != NULL)
+			if (!render_target)
 			{
 				return surface;
 			}
 			else
 			{
-				Backend_PrintError("C3D_RenderTargetCreateFromTex failed");
+				surface->render_target = C3D_RenderTargetCreateFromTex(&surface->texture, GPU_TEXFACE_2D, 0, GPU_RB_DEPTH16);
+
+				if (surface->render_target != NULL)
+					return surface;
+				else
+					Backend_PrintError("C3D_RenderTargetCreateFromTex failed in RenderBackend_CreateSurface");
 			}
 
 			C3D_TexDelete(&surface->texture);
-
-			free(surface);
 		}
+		else
+		{
+			Backend_PrintError("C3D_TexInitVRAM failed in RenderBackend_CreateSurface");
+		}
+
+		free(surface);
 	}
 
 	return NULL;
@@ -269,94 +201,82 @@ void RenderBackend_RestoreSurface(RenderBackend_Surface *surface)
 
 void RenderBackend_UploadSurface(RenderBackend_Surface *surface, const unsigned char *pixels, size_t width, size_t height)
 {
-	u8 *gpusrc = (u8*)linearAlloc(width * height * 4);
+	Backend_PrintInfo("RenderBackend_UploadSurface");
 
-	// GX_DisplayTransfer needs input buffer in linear RAM
-	const u8* src=pixels; u8 *dst=gpusrc;
+	unsigned char *rgba_buffer = (unsigned char*)linearAlloc(width * height * 4);
 
-	// lodepng outputs big endian rgba so we need to convert
-	for (size_t i = 0; i< width * height; ++i)
+	if (rgba_buffer != NULL)
 	{
-		unsigned char r = *src++;
-		unsigned char g = *src++;
-		unsigned char b = *src++;
+		const unsigned char *src = pixels;
+		unsigned char *dst = rgba_buffer;
 
-		*dst++ = r == 0 && g == 0 && b == 0 ? 0 : 0xFF;
-		*dst++ = b;
-		*dst++ = g;
-		*dst++ = r;
+		// Convert from colour-keyed RGB to ABGR
+		for (size_t i = 0; i < width * height; ++i)
+		{
+			unsigned char r = *src++;
+			unsigned char g = *src++;
+			unsigned char b = *src++;
+
+			*dst++ = r == 0 && g == 0 && b == 0 ? 0 : 0xFF;
+			*dst++ = b;
+			*dst++ = g;
+			*dst++ = r;
+		}
+
+		// ensure data is in physical ram
+		GSPGPU_FlushDataCache(rgba_buffer, width * height * 4);
+
+		C3D_SyncDisplayTransfer((u32*)rgba_buffer, GX_BUFFER_DIM(width, height), (u32*)surface->texture.data, GX_BUFFER_DIM(surface->texture.width, surface->texture.height), TEXTURE_TRANSFER_FLAGS);
+
+		linearFree(rgba_buffer);
 	}
-
-	// ensure data is in physical ram
-	GSPGPU_FlushDataCache(gpusrc, width * height * 4);
-
-	C3D_SyncDisplayTransfer ((u32*)gpusrc, GX_BUFFER_DIM(width, height), (u32*)surface->texture.data, GX_BUFFER_DIM(surface->padded_width, surface->padded_height), TEXTURE_TRANSFER_FLAGS);
-//	C3D_SyncDisplayTransfer ((u32*)gpusrc, GX_BUFFER_DIM(width, height), (u32*)framebuffer_surface->texture.data, GX_BUFFER_DIM(framebuffer_surface->padded_width, framebuffer_surface->padded_height), TEXTURE_TRANSFER_FLAGS);
-
-	linearFree(gpusrc);
+	else
+	{
+		Backend_PrintError("Couldn't allocate memory for RenderBackend_UploadSurface");
+	}
 }
 
 ATTRIBUTE_HOT void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBackend_Rect *rect, RenderBackend_Surface *destination_surface, long x, long y, bool colour_key)
 {
-	Mtx_Ortho(&projection_matrix, 0.0f, destination_surface->padded_width, 0.0f, destination_surface->padded_height, 0.0f, 1.0f, true);
-//	Mtx_OrthoTilt(&projection_matrix, 0.0f, 400.0f, 240.0f, 0.0f, 0.0f, 1.0f, true);
+	if (!frame_started)
+	{
+		C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+		frame_started = true;
+	}
 
-	C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, uniform_projection, &projection_matrix);
+	const float texture_left = (float)rect->left / source_surface->texture.width;
+	const float texture_top = (float)rect->top / source_surface->texture.height;
+	const float texture_right = (float)rect->right / source_surface->texture.width;
+	const float texture_bottom = (float)rect->bottom / source_surface->texture.height;
 
-	C3D_TexBind(0, &source_surface->texture);
+	Tex3DS_SubTexture subtexture;
+	subtexture.width = rect->right - rect->left;
+	subtexture.height = rect->bottom - rect->top;
+	subtexture.left = texture_left;
+	subtexture.top = 1.0f - texture_top;
+	subtexture.right = texture_right;
+	subtexture.bottom = 1.0f - texture_bottom;
 
-	C3D_FrameBegin(0);
+	C2D_Image image;
+	image.tex = &source_surface->texture;
+	image.subtex = &subtexture;
 
-	C3D_FrameDrawOn(destination_surface->render_target);
-//	C3D_FrameDrawOn(screen_render_target);
+	C2D_SceneBegin(destination_surface->render_target);
 
-	const float vertex_left = x;
-	const float vertex_top = y;
-	const float vertex_right = x + (rect->right - rect->left);
-	const float vertex_bottom = y + (rect->bottom - rect->top);
-
-	const float texture_left = (float)rect->left / source_surface->padded_width;
-	const float texture_top = (float)rect->top / source_surface->padded_height;
-	const float texture_right = (float)rect->right / source_surface->padded_width;
-	const float texture_bottom = (float)rect->bottom / source_surface->padded_height;
-
-/*	vbo[0] = (VBOEntry){vertex_left, vertex_top, 0.5f, texture_left, texture_top};
-	vbo[1] = (VBOEntry){vertex_left, vertex_bottom, 0.5f, texture_left, texture_bottom};
-	vbo[2] = (VBOEntry){vertex_right, vertex_top, 0.5f, texture_right, texture_top};
-	vbo[3] = (VBOEntry){vertex_left, vertex_bottom, 0.5f, texture_left, texture_bottom};
-	vbo[4] = (VBOEntry){vertex_right, vertex_bottom, 0.5f, texture_right, texture_bottom};
-	vbo[5] = (VBOEntry){vertex_right, vertex_top, 0.5f, texture_right, texture_top};
-
-	C3D_DrawArrays(GPU_TRIANGLES, 0, 6);
-*/
-
-	// Draw a textured quad directly
-	C3D_ImmDrawBegin(GPU_TRIANGLES);
-		C3D_ImmSendAttrib(vertex_left, vertex_top, 0.5f, 0.0f); // v0=position
-		C3D_ImmSendAttrib( texture_left, texture_top, 0.0f, 0.0f);
-
-		C3D_ImmSendAttrib(vertex_right, vertex_top, 0.5f, 0.0f);
-		C3D_ImmSendAttrib( texture_right, texture_top, 0.0f, 0.0f);
-
-		C3D_ImmSendAttrib(vertex_left, vertex_bottom, 0.5f, 0.0f);
-		C3D_ImmSendAttrib( texture_left, texture_bottom, 0.0f, 0.0f);
-
-		C3D_ImmSendAttrib(vertex_left, vertex_bottom, 0.5f, 0.0f);
-		C3D_ImmSendAttrib( texture_left, texture_bottom, 0.0f, 0.0f);
-
-		C3D_ImmSendAttrib(vertex_right, vertex_top, 0.5f, 0.0f);
-		C3D_ImmSendAttrib( texture_right, texture_top, 0.0f, 0.0f);
-
-		C3D_ImmSendAttrib(vertex_right, vertex_bottom, 0.5f, 0.0f);
-		C3D_ImmSendAttrib( texture_right, texture_bottom, 0.0f, 0.0f);
-	C3D_ImmDrawEnd();
-
-	C3D_FrameEnd(0);
+	C2D_DrawImageAt(image, x, y, 0.5f, NULL, 1.0f, 1.0f);
 }
 
 ATTRIBUTE_HOT void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBackend_Rect *rect, unsigned char red, unsigned char green, unsigned char blue)
 {
-	
+	if (!frame_started)
+	{
+		C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+		frame_started = true;
+	}
+
+	C2D_SceneBegin(surface->render_target);
+
+	C2D_DrawRectSolid(rect->left, rect->top, 0.5f, rect->right - rect->left, rect->bottom - rect->top, C2D_Color32(red, green, blue, 0xFF));
 }
 
 RenderBackend_GlyphAtlas* RenderBackend_CreateGlyphAtlas(size_t width, size_t height)

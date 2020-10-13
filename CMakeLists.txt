@@ -321,7 +321,7 @@ elseif(BACKEND_RENDERER MATCHES "WiiU")
 	target_sources(CSE2 PRIVATE "src/Backends/Rendering/WiiU.cpp")
 elseif(BACKEND_RENDERER MATCHES "3DS")
 	target_sources(CSE2 PRIVATE "src/Backends/Rendering/3DS.cpp")
-	target_link_libraries(CSE2 PRIVATE "${CTRU_ROOT}/lib/libcitro3d.a")
+	target_link_libraries(CSE2 PRIVATE "${CTRU_ROOT}/lib/libcitro2d.a" "${CTRU_ROOT}/lib/libcitro3d.a")
 elseif(BACKEND_RENDERER MATCHES "Software")
 	target_sources(CSE2 PRIVATE "src/Backends/Rendering/Software.cpp")
 else()
@@ -476,7 +476,7 @@ set_target_properties(CSE2 PROPERTIES
 	C_EXTENSIONS OFF
 )
 
-if(NOT BACKEND_PLATFORM MATCHES "WiiU")
+if(NOT BACKEND_PLATFORM MATCHES "WiiU" AND NOT BACKEND_PLATFORM MATCHES "3DS")
 	# Force strict C++98
 	set_target_properties(CSE2 PROPERTIES
 		CXX_STANDARD 98
