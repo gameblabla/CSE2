@@ -57,6 +57,26 @@ static size_t NextPowerOfTwo(size_t value)
 	return accumulator;
 }
 
+static void EnableAlpha(bool enabled)
+{
+	static bool previous_setting = true;
+
+	// Setting will not take effect mid-frame, so
+	// break-up the current frame if we have to.
+	if (frame_started && enabled != previous_setting)
+	{
+		C3D_FrameEnd(0);
+		frame_started = false;
+
+		previous_setting = enabled;
+	}
+
+	if (enabled)
+		C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA);
+	else
+		C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_ONE, GPU_ZERO, GPU_ONE, GPU_ZERO);
+}
+
 RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t screen_width, size_t screen_height, bool fullscreen)
 {
 	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
@@ -90,6 +110,13 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t scree
 
 void RenderBackend_Deinit(void)
 {
+	// Just in case
+	if (frame_started)
+	{
+		C3D_FrameEnd(0);
+		frame_started = false;
+	}
+
 	RenderBackend_FreeSurface(framebuffer_surface);
 
 	C3D_RenderTargetDelete(screen_render_target);
@@ -100,6 +127,8 @@ void RenderBackend_Deinit(void)
 
 void RenderBackend_DrawScreen(void)
 {
+	EnableAlpha(false);
+
 	if (!frame_started)
 	{
 		C3D_FrameBegin(0);
@@ -136,6 +165,13 @@ void RenderBackend_DrawScreen(void)
 
 RenderBackend_Surface* RenderBackend_CreateSurface(size_t width, size_t height, bool render_target)
 {
+	// Just in case
+	if (frame_started)
+	{
+		C3D_FrameEnd(0);
+		frame_started = false;
+	}
+
 	RenderBackend_Surface *surface = (RenderBackend_Surface*)malloc(sizeof(RenderBackend_Surface));
 
 	if (surface != NULL)
@@ -179,6 +215,13 @@ RenderBackend_Surface* RenderBackend_CreateSurface(size_t width, size_t height, 
 
 void RenderBackend_FreeSurface(RenderBackend_Surface *surface)
 {
+	// Just in case
+	if (frame_started)
+	{
+		C3D_FrameEnd(0);
+		frame_started = false;
+	}
+
 	if (surface->render_target != NULL)
 		C3D_RenderTargetDelete(surface->render_target);
 
@@ -201,7 +244,12 @@ void RenderBackend_RestoreSurface(RenderBackend_Surface *surface)
 
 void RenderBackend_UploadSurface(RenderBackend_Surface *surface, const unsigned char *pixels, size_t width, size_t height)
 {
-	Backend_PrintInfo("RenderBackend_UploadSurface");
+	// If we upload while drawing, we get corruption (visible after stage transitions)
+	if (frame_started)
+	{
+		C3D_FrameEnd(0);
+		frame_started = false;
+	}
 
 	unsigned char *abgr_buffer = (unsigned char*)linearAlloc(width * height * 4);
 
@@ -238,6 +286,8 @@ void RenderBackend_UploadSurface(RenderBackend_Surface *surface, const unsigned 
 
 ATTRIBUTE_HOT void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBackend_Rect *rect, RenderBackend_Surface *destination_surface, long x, long y, bool colour_key)
 {
+	EnableAlpha(colour_key);
+
 	if (!frame_started)
 	{
 		C3D_FrameBegin(0);
@@ -245,17 +295,17 @@ ATTRIBUTE_HOT void RenderBackend_Blit(RenderBackend_Surface *source_surface, con
 	}
 
 	const float texture_left = (float)rect->left / source_surface->texture.width;
-	const float texture_top = (float)rect->top / source_surface->texture.height;
+	const float texture_top = (float)(source_surface->texture.height - rect->top) / source_surface->texture.height;
 	const float texture_right = (float)rect->right / source_surface->texture.width;
-	const float texture_bottom = (float)rect->bottom / source_surface->texture.height;
+	const float texture_bottom = (float)(source_surface->texture.height - rect->bottom) / source_surface->texture.height;
 
 	Tex3DS_SubTexture subtexture;
 	subtexture.width = rect->right - rect->left;
 	subtexture.height = rect->bottom - rect->top;
 	subtexture.left = texture_left;
-	subtexture.top = 1.0f - texture_top;
+	subtexture.top = texture_top;
 	subtexture.right = texture_right;
-	subtexture.bottom = 1.0f - texture_bottom;
+	subtexture.bottom = texture_bottom;
 
 	C2D_Image image;
 	image.tex = &source_surface->texture;
@@ -268,6 +318,8 @@ ATTRIBUTE_HOT void RenderBackend_Blit(RenderBackend_Surface *source_surface, con
 
 ATTRIBUTE_HOT void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBackend_Rect *rect, unsigned char red, unsigned char green, unsigned char blue)
 {
+	EnableAlpha(false);
+
 	if (!frame_started)
 	{
 		C3D_FrameBegin(0);
@@ -276,7 +328,7 @@ ATTRIBUTE_HOT void RenderBackend_ColourFill(RenderBackend_Surface *surface, cons
 
 	C2D_SceneBegin(surface->render_target);
 
-	C2D_DrawRectSolid(rect->left, rect->top, 0.5f, rect->right - rect->left, rect->bottom - rect->top, C2D_Color32(red, green, blue, 0xFF));
+	C2D_DrawRectSolid(rect->left, rect->top, 0.5f, rect->right - rect->left, rect->bottom - rect->top, C2D_Color32(red, green, blue, red == 0 && green == 0 && blue == 0 ? 0 : 0xFF));
 }
 
 RenderBackend_GlyphAtlas* RenderBackend_CreateGlyphAtlas(size_t width, size_t height)
