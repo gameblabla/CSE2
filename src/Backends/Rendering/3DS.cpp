@@ -180,7 +180,7 @@ void RenderBackend_DrawScreen(void)
 	image.tex = &framebuffer_surface->texture;
 	image.subtex = &subtexture;
 
-	C2D_TargetClear(screen_render_target, 0xFF000000);
+	C2D_TargetClear(screen_render_target, C2D_Color32(0, 0, 0, 0xFF));
 
 	SelectRenderTarget(screen_render_target);
 
@@ -218,7 +218,7 @@ RenderBackend_Surface* RenderBackend_CreateSurface(size_t width, size_t height, 
 
 				if (surface->render_target != NULL)
 				{
-					C2D_TargetClear(surface->render_target, 0xFF000000);
+					C2D_TargetClear(surface->render_target, C2D_Color32(0, 0, 0, 0xFF));
 
 					return surface;
 				}
