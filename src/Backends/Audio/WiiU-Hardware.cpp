@@ -420,11 +420,3 @@ void AudioBackend_SetOrganyaTimer(unsigned int milliseconds)
 
 	OSUnlockMutex(&organya_mutex);
 }
-
-void AudioBackend_SleepOrganya(unsigned int milliseconds)
-{
-	(void)milliseconds;
-
-	// TODO - Figure out how to do this.
-	// Honestly, I might not bother - this backend has never worked properly.
-}
