@@ -85,6 +85,24 @@ static void SelectRenderTarget(C3D_RenderTarget *render_target)
 	}
 }
 
+static void BeginRendering(void)
+{
+	if (!frame_started)
+	{
+		C3D_FrameBegin(0);
+		frame_started = true;
+	}
+}
+
+static void EndRendering(void)
+{
+	if (frame_started)
+	{
+		C3D_FrameEnd(0);
+		frame_started = false;
+	}
+}
+
 RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t screen_width, size_t screen_height, bool fullscreen)
 {
 	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
@@ -119,11 +137,7 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t scree
 void RenderBackend_Deinit(void)
 {
 	// Just in case
-	if (frame_started)
-	{
-		C3D_FrameEnd(0);
-		frame_started = false;
-	}
+	EndRendering();
 
 	RenderBackend_FreeSurface(framebuffer_surface);
 
@@ -141,11 +155,7 @@ void RenderBackend_DrawScreen(void)
 {
 	EnableAlpha(false);
 
-	if (!frame_started)
-	{
-		C3D_FrameBegin(0);
-		frame_started = true;
-	}
+	BeginRendering();
 
 	const float texture_left = 0.0f;
 	const float texture_top = 0.0f;
@@ -170,19 +180,13 @@ void RenderBackend_DrawScreen(void)
 
 	C2D_DrawImageAt(image, (400 - framebuffer_surface->width) / 2, (240 - framebuffer_surface->height) / 2, 0.5f, NULL, 1.0f, 1.0f);
 
-	C3D_FrameEnd(0);
-
-	frame_started = false;
+	EndRendering();
 }
 
 RenderBackend_Surface* RenderBackend_CreateSurface(size_t width, size_t height, bool render_target)
 {
 	// Just in case
-	if (frame_started)
-	{
-		C3D_FrameEnd(0);
-		frame_started = false;
-	}
+	EndRendering();
 
 	RenderBackend_Surface *surface = (RenderBackend_Surface*)malloc(sizeof(RenderBackend_Surface));
 
@@ -234,11 +238,7 @@ RenderBackend_Surface* RenderBackend_CreateSurface(size_t width, size_t height, 
 void RenderBackend_FreeSurface(RenderBackend_Surface *surface)
 {
 	// Just in case
-	if (frame_started)
-	{
-		C3D_FrameEnd(0);
-		frame_started = false;
-	}
+	EndRendering();
 
 	// For some dumbass reason, all calls to C3D_RenderTargetDelete
 	// causes the game to hang while shutting-down
@@ -265,11 +265,7 @@ void RenderBackend_RestoreSurface(RenderBackend_Surface *surface)
 void RenderBackend_UploadSurface(RenderBackend_Surface *surface, const unsigned char *pixels, size_t width, size_t height)
 {
 	// If we upload while drawing, we get corruption (visible after stage transitions)
-	if (frame_started)
-	{
-		C3D_FrameEnd(0);
-		frame_started = false;
-	}
+	EndRendering();
 
 	unsigned char *abgr_buffer = (unsigned char*)linearAlloc(surface->texture.width * surface->texture.height * 4);
 
@@ -311,11 +307,7 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBacke
 {
 	EnableAlpha(colour_key);
 
-	if (!frame_started)
-	{
-		C3D_FrameBegin(0);
-		frame_started = true;
-	}
+	BeginRendering();
 
 	const float texture_left = (float)rect->left / source_surface->texture.width;
 	const float texture_top = (float)(source_surface->texture.height - rect->top) / source_surface->texture.height;
@@ -343,11 +335,7 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 {
 	EnableAlpha(false);
 
-	if (!frame_started)
-	{
-		C3D_FrameBegin(0);
-		frame_started = true;
-	}
+	BeginRendering();
 
 	SelectRenderTarget(surface->render_target);
 
@@ -356,6 +344,9 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 
 RenderBackend_GlyphAtlas* RenderBackend_CreateGlyphAtlas(size_t width, size_t height)
 {
+	// Just in case
+	EndRendering();
+
 	RenderBackend_GlyphAtlas *atlas = (RenderBackend_GlyphAtlas*)malloc(sizeof(RenderBackend_GlyphAtlas));
 
 	if (atlas != NULL)
@@ -400,6 +391,9 @@ RenderBackend_GlyphAtlas* RenderBackend_CreateGlyphAtlas(size_t width, size_t he
 
 void RenderBackend_DestroyGlyphAtlas(RenderBackend_GlyphAtlas *atlas)
 {
+	// Just in case
+	EndRendering();
+
 	C3D_TexDelete(&atlas->texture);
 	linearFree(atlas->local_texture_buffer);
 	free(atlas);
@@ -408,11 +402,7 @@ void RenderBackend_DestroyGlyphAtlas(RenderBackend_GlyphAtlas *atlas)
 void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t y, const unsigned char *pixels, size_t width, size_t height, size_t pitch)
 {
 	// If we upload while drawing, we get corruption (visible after stage transitions)
-	if (frame_started)
-	{
-		C3D_FrameEnd(0);
-		frame_started = false;
-	}
+	EndRendering();
 
 	for (size_t h = 0; h < height; ++h)
 	{
@@ -437,11 +427,7 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBa
 {
 	EnableAlpha(true);
 
-	if (!frame_started)
-	{
-		C3D_FrameBegin(0);
-		frame_started = true;
-	}
+	BeginRendering();
 
 	SelectRenderTarget(destination_surface->render_target);
 
