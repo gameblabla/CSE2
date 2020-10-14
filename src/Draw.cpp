@@ -6,6 +6,10 @@
 #include <string.h>
 #include <string>
 
+#ifdef _3DS
+ #include <3ds.h>
+#endif
+
 #include "WindowsWrapper.h"
 
 #include "Backends/Misc.h"
@@ -75,6 +79,14 @@ BOOL Flip_SystemTask(void)
 		timePrev += 20;
 
 	RenderBackend_DrawScreen();
+
+#ifdef _3DS
+	// This would go in Backend_SystemTask, but that causes a hang
+	// because of a race condition: aptMainLoop cannot be called
+	// between C3D_FrameBegin and C3D_FrameEnd
+	if (!aptMainLoop())
+		return false;
+#endif
 
 	if (RestoreSurfaces())
 	{

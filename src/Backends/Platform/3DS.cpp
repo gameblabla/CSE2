@@ -91,7 +91,7 @@ bool Backend_SystemTask(bool active)
 {
 	(void)active;
 
-	return aptMainLoop();
+	return true;
 }
 
 void Backend_GetKeyboardState(bool *keyboard_state)
