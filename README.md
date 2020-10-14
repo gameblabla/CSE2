@@ -109,7 +109,8 @@ Name | Function
 `-DBACKEND_AUDIO=miniaudio` | Deliver audio with miniaudio (software-mixer)
 `-DBACKEND_AUDIO=WiiU-Hardware` | Deliver audio with Wii U's AXVoice API (hardware-accelerated) (WARNING - currently broken: voices randomly disappear for unknown reasons)
 `-DBACKEND_AUDIO=WiiU-Software` | Deliver audio with Wii U's AXVoice API (software-mixer)
-`-DBACKEND_AUDIO=3DS` | Deliver audio with 3DS's NDSP API (software-mixer)
+`-DBACKEND_AUDIO=3DS-Hardware` | Deliver audio with 3DS's NDSP API (hardware-accelerated)
+`-DBACKEND_AUDIO=3DS-Software` | Deliver audio with 3DS's NDSP API (software-mixer)
 `-DBACKEND_AUDIO=Null` | Don't deliver audio at all (WARNING - game will have no audio)
 `-DBACKEND_PLATFORM=SDL2` | (Default) Use SDL2 for miscellaneous platform-dependant operations
 `-DBACKEND_PLATFORM=GLFW3` | Use GLFW3 for miscellaneous platform-dependant operations
