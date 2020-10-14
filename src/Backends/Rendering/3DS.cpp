@@ -30,7 +30,7 @@ typedef struct RenderBackend_Surface
 
 typedef struct RenderBackend_GlyphAtlas
 {
-	RenderBackend_Surface *surface;
+	C3D_Tex texture;
 	unsigned char *local_texture_buffer;
 } RenderBackend_GlyphAtlas;
 
@@ -367,12 +367,18 @@ RenderBackend_GlyphAtlas* RenderBackend_CreateGlyphAtlas(size_t width, size_t he
 
 		if (atlas->local_texture_buffer != NULL)
 		{
-			atlas->surface = RenderBackend_CreateSurface(width, height, false);
+			memset(&atlas->texture, 0, sizeof(atlas->texture));
 
-			if (atlas->surface != NULL)
+			if (C3D_TexInit(&atlas->texture, width, height, GPU_RGBA8))
+			{
+				C3D_TexSetFilter(&atlas->texture, GPU_NEAREST, GPU_NEAREST);
+
 				return atlas;
+			}
 			else
-				Backend_PrintError("RenderBackend_CreateSurface failed in RenderBackend_CreateGlyphAtlas");
+			{
+				Backend_PrintError("C3D_TexInit failed in RenderBackend_CreateGlyphAtlas");
+			}
 
 			linearFree(atlas->local_texture_buffer);
 		}
@@ -394,7 +400,7 @@ RenderBackend_GlyphAtlas* RenderBackend_CreateGlyphAtlas(size_t width, size_t he
 
 void RenderBackend_DestroyGlyphAtlas(RenderBackend_GlyphAtlas *atlas)
 {
-	RenderBackend_FreeSurface(atlas->surface);
+	C3D_TexDelete(&atlas->texture);
 	linearFree(atlas->local_texture_buffer);
 	free(atlas);
 }
@@ -411,7 +417,7 @@ void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t
 	for (size_t h = 0; h < height; ++h)
 	{
 		const unsigned char *source_pointer = &pixels[h * pitch];
-		unsigned char *destination_pointer = &atlas->local_texture_buffer[((y + h) * atlas->surface->width + x) * 4];
+		unsigned char *destination_pointer = &atlas->local_texture_buffer[((y + h) * atlas->texture.width + x) * 4];
 
 		for (size_t w = 0; w < width; ++w)
 		{
@@ -422,9 +428,9 @@ void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t
 		}
 	}
 
-	GSPGPU_FlushDataCache(atlas->local_texture_buffer, atlas->surface->width * atlas->surface->height * 4);
+	GSPGPU_FlushDataCache(atlas->local_texture_buffer, atlas->texture.width * atlas->texture.height * 4);
 
-	C3D_SyncDisplayTransfer((u32*)atlas->local_texture_buffer, GX_BUFFER_DIM(atlas->surface->width, atlas->surface->height), (u32*)atlas->surface->texture.data, GX_BUFFER_DIM(atlas->surface->width, atlas->surface->height), TEXTURE_TRANSFER_FLAGS);
+	C3D_SyncDisplayTransfer((u32*)atlas->local_texture_buffer, GX_BUFFER_DIM(atlas->texture.width, atlas->texture.height), (u32*)atlas->texture.data, GX_BUFFER_DIM(atlas->texture.width, atlas->texture.height), TEXTURE_TRANSFER_FLAGS);
 }
 
 void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBackend_Surface *destination_surface, unsigned char red, unsigned char green, unsigned char blue)
@@ -446,10 +452,10 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBa
 
 void RenderBackend_DrawGlyph(long x, long y, size_t glyph_x, size_t glyph_y, size_t glyph_width, size_t glyph_height)
 {
-	const float texture_left = (float)glyph_x / glyph_atlas->surface->texture.width;
-	const float texture_top = (float)(glyph_atlas->surface->texture.height - glyph_y) / glyph_atlas->surface->texture.height;
-	const float texture_right = (float)(glyph_x + glyph_width) / glyph_atlas->surface->texture.width;
-	const float texture_bottom = (float)(glyph_atlas->surface->texture.height - (glyph_y + glyph_height)) / glyph_atlas->surface->texture.height;
+	const float texture_left = (float)glyph_x / glyph_atlas->texture.width;
+	const float texture_top = (float)(glyph_atlas->texture.height - glyph_y) / glyph_atlas->texture.height;
+	const float texture_right = (float)(glyph_x + glyph_width) / glyph_atlas->texture.width;
+	const float texture_bottom = (float)(glyph_atlas->texture.height - (glyph_y + glyph_height)) / glyph_atlas->texture.height;
 
 	Tex3DS_SubTexture subtexture;
 	subtexture.width = glyph_width;
@@ -460,7 +466,7 @@ void RenderBackend_DrawGlyph(long x, long y, size_t glyph_x, size_t glyph_y, siz
 	subtexture.bottom = texture_bottom;
 
 	C2D_Image image;
-	image.tex = &glyph_atlas->surface->texture;
+	image.tex = &glyph_atlas->texture;
 	image.subtex = &subtexture;
 
 	C2D_DrawImageAt(image, x, y, 0.5f, &glyph_tint, 1.0f, 1.0f);
