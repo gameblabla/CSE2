@@ -358,11 +358,11 @@ RenderBackend_GlyphAtlas* RenderBackend_CreateGlyphAtlas(size_t width, size_t he
 {
 	RenderBackend_GlyphAtlas *atlas = (RenderBackend_GlyphAtlas*)malloc(sizeof(RenderBackend_GlyphAtlas));
 
-	width = RoundUpToPowerOfTwo(width);
-	height = RoundUpToPowerOfTwo(height);
-
 	if (atlas != NULL)
 	{
+		width = RoundUpToPowerOfTwo(width);
+		height = RoundUpToPowerOfTwo(height);
+
 		atlas->local_texture_buffer = (unsigned char*)linearAlloc(width * height * 4);
 
 		if (atlas->local_texture_buffer != NULL)
