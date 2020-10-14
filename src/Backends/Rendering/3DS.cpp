@@ -43,7 +43,7 @@ static RenderBackend_Surface *framebuffer_surface;
 
 static bool frame_started;
 
-static size_t NextPowerOfTwo(size_t value)
+static size_t RoundUpToPowerOfTwo(size_t value)
 {
 	size_t accumulator = 1;
 
@@ -57,10 +57,10 @@ static void EnableAlpha(bool enabled)
 {
 	static bool previous_setting = true;
 
-	// Setting will not take effect mid-frame, so
-	// break-up the current frame if we have to.
 	if (enabled != previous_setting)
 	{
+		// Setting will not take effect mid-frame, so
+		// break-up the current frame if we have to.
 		if (frame_started)
 			C2D_Flush();
 
@@ -194,7 +194,7 @@ RenderBackend_Surface* RenderBackend_CreateSurface(size_t width, size_t height, 
 
 		memset(&surface->texture, 0, sizeof(surface->texture));
 
-		if ((render_target ? C3D_TexInitVRAM : C3D_TexInit)(&surface->texture, NextPowerOfTwo(width), NextPowerOfTwo(height), GPU_RGBA8))
+		if ((render_target ? C3D_TexInitVRAM : C3D_TexInit)(&surface->texture, RoundUpToPowerOfTwo(width), RoundUpToPowerOfTwo(height), GPU_RGBA8))
 		{
 			C3D_TexSetFilter(&surface->texture, GPU_NEAREST, GPU_NEAREST);
 
@@ -358,8 +358,8 @@ RenderBackend_GlyphAtlas* RenderBackend_CreateGlyphAtlas(size_t width, size_t he
 {
 	RenderBackend_GlyphAtlas *atlas = (RenderBackend_GlyphAtlas*)malloc(sizeof(RenderBackend_GlyphAtlas));
 
-	width = NextPowerOfTwo(width);
-	height = NextPowerOfTwo(height);
+	width = RoundUpToPowerOfTwo(width);
+	height = RoundUpToPowerOfTwo(height);
 
 	if (atlas != NULL)
 	{
