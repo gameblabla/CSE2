@@ -107,8 +107,8 @@ void Backend_GetKeyboardState(bool *keyboard_state)
 	keyboard_state[BACKEND_KEYBOARD_X] |= buttons & KEY_Y;                               // Shoot
 	keyboard_state[BACKEND_KEYBOARD_Q] |= buttons & (KEY_A | KEY_START);                 // Inventory
 	keyboard_state[BACKEND_KEYBOARD_W] |= buttons & (KEY_X | KEY_SELECT);                // Map
-	keyboard_state[BACKEND_KEYBOARD_A] |= buttons & (KEY_L | KEY_ZL | KEY_CSTICK_LEFT);  // Weapon left
-	keyboard_state[BACKEND_KEYBOARD_S] |= buttons & (KEY_R | KEY_ZR | KEY_CSTICK_RIGHT); // Weapon right
+	keyboard_state[BACKEND_KEYBOARD_A] |= buttons & (KEY_L | KEY_ZR | KEY_CSTICK_LEFT);  // Weapon left
+	keyboard_state[BACKEND_KEYBOARD_S] |= buttons & (KEY_R | KEY_ZL | KEY_CSTICK_RIGHT); // Weapon right
 }
 
 void Backend_ShowMessageBox(const char *title, const char *message)
