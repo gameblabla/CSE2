@@ -13,8 +13,13 @@
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
+// Used to transfer the final rendered display to the framebuffer
+#define DISPLAY_TRANSFER_FLAGS \
+	(GX_TRANSFER_FLIP_VERT(0) | GX_TRANSFER_OUT_TILED(0) | GX_TRANSFER_RAW_COPY(0) | \
+	GX_TRANSFER_IN_FORMAT(GX_TRANSFER_FMT_RGBA8) | GX_TRANSFER_OUT_FORMAT(GX_TRANSFER_FMT_RGB8) | \
+	GX_TRANSFER_SCALING(GX_TRANSFER_SCALE_NO))
+
 // Used to convert textures to 3DS tiled format
-// Note: vertical flip flag set so 0,0 is top left of texture (lol no it isn't)
 #define TEXTURE_TRANSFER_FLAGS \
 	(GX_TRANSFER_FLIP_VERT(0) | GX_TRANSFER_OUT_TILED(1) | GX_TRANSFER_RAW_COPY(0) | \
 	GX_TRANSFER_IN_FORMAT(GX_TRANSFER_FMT_RGBA8) | GX_TRANSFER_OUT_FORMAT(GX_TRANSFER_FMT_RGBA8) | \
@@ -109,11 +114,12 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t scree
 	C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
 	C2D_Prepare();
 
-	// Set up screen render target
-	screen_render_target = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
+	screen_render_target = C3D_RenderTargetCreate(240, 400, GPU_RB_RGBA8, -1);
 
 	if (screen_render_target != NULL)
 	{
+		C3D_RenderTargetSetOutput(screen_render_target, GFX_TOP, GFX_LEFT, DISPLAY_TRANSFER_FLAGS);
+
 		framebuffer_surface = RenderBackend_CreateSurface(screen_width, screen_height, true);
 
 		if (framebuffer_surface != NULL)
