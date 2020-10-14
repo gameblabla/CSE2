@@ -64,10 +64,7 @@ static void EnableAlpha(bool enabled)
 	if (enabled != previous_setting)
 	{
 		if (frame_started)
-		{
-			C3D_FrameEnd(0);
-			frame_started = false;
-		}
+			C2D_Flush();
 
 		if (enabled)
 			C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA);
