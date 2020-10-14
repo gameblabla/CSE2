@@ -147,12 +147,8 @@ void RenderBackend_Deinit(void)
 
 	RenderBackend_FreeSurface(framebuffer_surface);
 
-	// For some dumbass reason, all calls to C3D_RenderTargetDelete
-	// causes the game to hang while shutting-down
 	C3D_RenderTargetDelete(screen_render_target);
 
-	// These probably implicitly call C3D_RenderTargetDelete, also
-	// causing a hang
 	C2D_Fini();
 	C3D_Fini();
 }
@@ -246,8 +242,6 @@ void RenderBackend_FreeSurface(RenderBackend_Surface *surface)
 	// Just in case
 	EndRendering();
 
-	// For some dumbass reason, all calls to C3D_RenderTargetDelete
-	// causes the game to hang while shutting-down
 	if (surface->render_target != NULL)
 		C3D_RenderTargetDelete(surface->render_target);
 
