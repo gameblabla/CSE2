@@ -401,7 +401,7 @@ elseif(BACKEND_PLATFORM MATCHES "GLFW3")
 	)
 elseif(BACKEND_PLATFORM MATCHES "WiiU")
 	target_sources(CSE2 PRIVATE
-		"src/Backends/Controller/WiiU.cpp"
+		"src/Backends/Controller/Null.cpp"
 		"src/Backends/Platform/WiiU.cpp"
 	)
 elseif(BACKEND_PLATFORM MATCHES "3DS")
