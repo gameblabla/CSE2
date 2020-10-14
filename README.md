@@ -185,7 +185,7 @@ and bannertool, along with the `3dstools` and `devkitpro-pkgbuild-helpers` packa
 Open a terminal, and `cd` into the CSE2 directory. Then execute this command:
 
 ```
-cmake -B build3ds -DCMAKE_BUILD_TYPE=Release -DFORCE_LOCAL_LIBS=ON -DBACKEND_PLATFORM=3DS -DBACKEND_RENDERER=3DS -DBACKEND_AUDIO=3DS -DDOCONFIG=OFF -DFREETYPE_FONTS=ON -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/3ds.cmake
+cmake -B build3ds -DCMAKE_BUILD_TYPE=Release -DFORCE_LOCAL_LIBS=ON -DBACKEND_PLATFORM=3DS -DBACKEND_RENDERER=3DS -DBACKEND_AUDIO=3DS-Hardware -DDOCONFIG=OFF -DFREETYPE_FONTS=ON -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/3ds.cmake
 ```
 
 (Note that `FREETYPE_FONTS` is enabled. If you're creating a Japanese build, it's best to disable this, as the FreeType font is unreadable at 320x240).
