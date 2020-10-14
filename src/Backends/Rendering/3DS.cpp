@@ -61,10 +61,13 @@ static void EnableAlpha(bool enabled)
 
 	// Setting will not take effect mid-frame, so
 	// break-up the current frame if we have to.
-	if (frame_started && enabled != previous_setting)
+	if (enabled != previous_setting)
 	{
-		C3D_FrameEnd(0);
-		frame_started = false;
+		if (frame_started)
+		{
+			C3D_FrameEnd(0);
+			frame_started = false;
+		}
 
 		if (enabled)
 			C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA);
