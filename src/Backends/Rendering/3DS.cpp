@@ -73,6 +73,18 @@ static void EnableAlpha(bool enabled)
 	}
 }
 
+static void SelectRenderTarget(C3D_RenderTarget *render_target)
+{
+	static C3D_RenderTarget *previous_render_target = NULL;
+
+	if (render_target != previous_render_target)
+	{
+		previous_render_target = render_target;
+
+		C2D_SceneBegin(render_target);
+	}
+}
+
 RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t screen_width, size_t screen_height, bool fullscreen)
 {
 	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
@@ -154,7 +166,7 @@ void RenderBackend_DrawScreen(void)
 
 	C2D_TargetClear(screen_render_target, 0xFF000000);
 
-	C2D_SceneBegin(screen_render_target);
+	SelectRenderTarget(screen_render_target);
 
 	C2D_DrawImageAt(image, (400 - framebuffer_surface->width) / 2, (240 - framebuffer_surface->height) / 2, 0.5f, NULL, 1.0f, 1.0f);
 
@@ -322,7 +334,7 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBacke
 	image.tex = &source_surface->texture;
 	image.subtex = &subtexture;
 
-	C2D_SceneBegin(destination_surface->render_target);
+	SelectRenderTarget(destination_surface->render_target);
 
 	C2D_DrawImageAt(image, x, y, 0.5f, NULL, 1.0f, 1.0f);
 }
@@ -337,7 +349,7 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 		frame_started = true;
 	}
 
-	C2D_SceneBegin(surface->render_target);
+	SelectRenderTarget(surface->render_target);
 
 	C2D_DrawRectSolid(rect->left, rect->top, 0.5f, rect->right - rect->left, rect->bottom - rect->top, C2D_Color32(red, green, blue, red == 0 && green == 0 && blue == 0 ? 0 : 0xFF));
 }
@@ -425,7 +437,7 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBa
 		frame_started = true;
 	}
 
-	C2D_SceneBegin(destination_surface->render_target);
+	SelectRenderTarget(destination_surface->render_target);
 
 	glyph_atlas = atlas;
 
