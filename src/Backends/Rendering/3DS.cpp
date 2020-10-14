@@ -184,7 +184,7 @@ void RenderBackend_DrawScreen(void)
 
 	SelectRenderTarget(screen_render_target);
 
-	C2D_DrawImageAt(image, (400 - framebuffer_surface->width) / 2, (240 - framebuffer_surface->height) / 2, 0.5f, NULL, 1.0f, 1.0f);
+	C2D_DrawImageAt(image, (400 - framebuffer_surface->width) / 2, (240 - framebuffer_surface->height) / 2, 0.0f, NULL, 1.0f, 1.0f);
 
 	EndRendering();
 }
@@ -334,7 +334,7 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBacke
 
 	SelectRenderTarget(destination_surface->render_target);
 
-	C2D_DrawImageAt(image, x, y, 0.5f, NULL, 1.0f, 1.0f);
+	C2D_DrawImageAt(image, x, y, 0.0f, NULL, 1.0f, 1.0f);
 }
 
 void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBackend_Rect *rect, unsigned char red, unsigned char green, unsigned char blue)
@@ -345,7 +345,7 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 
 	SelectRenderTarget(surface->render_target);
 
-	C2D_DrawRectSolid(rect->left, rect->top, 0.5f, rect->right - rect->left, rect->bottom - rect->top, C2D_Color32(red, green, blue, red == 0 && green == 0 && blue == 0 ? 0 : 0xFF));
+	C2D_DrawRectSolid(rect->left, rect->top, 0.0f, rect->right - rect->left, rect->bottom - rect->top, C2D_Color32(red, green, blue, red == 0 && green == 0 && blue == 0 ? 0 : 0xFF));
 }
 
 RenderBackend_GlyphAtlas* RenderBackend_CreateGlyphAtlas(size_t width, size_t height)
@@ -461,7 +461,7 @@ void RenderBackend_DrawGlyph(long x, long y, size_t glyph_x, size_t glyph_y, siz
 	image.tex = &glyph_atlas->texture;
 	image.subtex = &subtexture;
 
-	C2D_DrawImageAt(image, x, y, 0.5f, &glyph_tint, 1.0f, 1.0f);
+	C2D_DrawImageAt(image, x, y, 0.0f, &glyph_tint, 1.0f, 1.0f);
 }
 
 void RenderBackend_HandleRenderTargetLoss(void)
