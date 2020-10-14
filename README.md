@@ -21,6 +21,7 @@ Supported platforms include...
 * Linux
 * macOS
 * Wii U
+* 3DS
 
 ![Screenshot](screenshot.png)
 
@@ -133,7 +134,7 @@ folder, depending on the selected language.
 
 ### Building for the Wii U
 
-To target the Wii U, you'll need devkitPro, and WUT.
+To target the Wii U, you'll need devkitPro, devkitPPC, and WUT.
 
 First, add the devkitPPC tools directory to your PATH (because WUT's CMake
 support is broken, as of writing):
@@ -171,6 +172,38 @@ elf2rpl game_english/CSE2 game_english/CSE2.rpx
 `game_english/CSE2.rpx` is now ready to be ran on your Wii U. This port expects
 the data folder to be in a folder called `CSE2-portable-en`/`CSE2-portable-jp`
 on the root of your SD card.
+
+### Building for the 3DS
+
+To target the 3DS, you'll need devkitPro, devkitARM, Citro2D, Citro3D, libctru,
+and bannertool, along with the `3dstools` and `devkitpro-pkgbuild-helpers` packages.
+
+Open a terminal, and `cd` into the CSE2 directory. Then execute this command:
+
+```
+cmake -B build3ds -DCMAKE_BUILD_TYPE=Release -DFORCE_LOCAL_LIBS=ON -DBACKEND_PLATFORM=3DS -DBACKEND_RENDERER=3DS -DBACKEND_AUDIO=3DS -DDOCONFIG=OFF -DFREETYPE_FONTS=ON -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/3ds.cmake
+```
+
+(Note that `FREETYPE_FONTS` is enabled. If you're creating a Japanese build, it's best to disable this, as the FreeType font is unreadable at 320x240).
+
+This will create the build files. To build CSE2, run:
+
+```
+cmake --build build3ds
+```
+
+This will create an elf file. Before we can create a `.3dsx` file from it, we
+need to make an `.smdh` file:
+
+```
+bannertool makesmdh -i $DEVKITPRO/libctru/default_icon.png -s "CSE2" -l "Port of Cave Story" -p "Clownacy" -o game_english/smdh.smdh
+```
+
+We can finally generate a `.3dsx` file:
+
+```
+3dsxtool game_english/CSE2 game_english/CSE2.3dsx --romfs=game_english/data --smdh=game_english/smdh.smdh
+```
 
 ## Licensing
 
