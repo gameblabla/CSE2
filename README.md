@@ -103,15 +103,18 @@ Name | Function
 `-DBACKEND_RENDERER=SDLTexture` | (Default) Render with SDL2's Texture API (hardware-accelerated) (note: requires `-DBACKEND_PLATFORM=SDL2`)
 `-DBACKEND_RENDERER=SDLSurface` | Render with SDL2's Surface API (software-rendered) (note: requires `-DBACKEND_PLATFORM=SDL2`)
 `-DBACKEND_RENDERER=WiiU` | Render with the Wii U's GX2 API (hardware-accelerated)
+`-DBACKEND_RENDERER=3DS` | Render with the 3DS's Citro2D/Citro3D API (hardware-accelerated)
 `-DBACKEND_RENDERER=Software` | Render with a handwritten software-renderer
 `-DBACKEND_AUDIO=SDL2` | (Default) Deliver audio with SDL2 (software-mixer)
 `-DBACKEND_AUDIO=miniaudio` | Deliver audio with miniaudio (software-mixer)
 `-DBACKEND_AUDIO=WiiU-Hardware` | Deliver audio with Wii U's AXVoice API (hardware-accelerated) (WARNING - currently broken: voices randomly disappear for unknown reasons)
 `-DBACKEND_AUDIO=WiiU-Software` | Deliver audio with Wii U's AXVoice API (software-mixer)
+`-DBACKEND_AUDIO=3DS` | Deliver audio with 3DS's NDSP API (software-mixer)
 `-DBACKEND_AUDIO=Null` | Don't deliver audio at all (WARNING - game will have no audio)
 `-DBACKEND_PLATFORM=SDL2` | (Default) Use SDL2 for miscellaneous platform-dependant operations
 `-DBACKEND_PLATFORM=GLFW3` | Use GLFW3 for miscellaneous platform-dependant operations
 `-DBACKEND_PLATFORM=WiiU` | Use the Wii U's native APIs for miscellaneous platform-dependant operations
+`-DBACKEND_PLATFORM=3DS` | Use the 3DS's native APIs for miscellaneous platform-dependant operations
 `-DBACKEND_PLATFORM=Null` | Don't do platform-dependant operations at all (WARNING - game will have no video or input)
 `-DLTO=ON` | Enable link-time optimisation
 `-DPKG_CONFIG_STATIC_LIBS=ON` | On platforms with pkg-config, static-link the dependencies (good for Windows builds, so you don't need to bundle DLL files)
