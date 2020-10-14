@@ -30,14 +30,12 @@ typedef struct RenderBackend_Surface
 
 typedef struct RenderBackend_GlyphAtlas
 {
+	RenderBackend_Surface *surface;
+	unsigned char *local_texture_buffer;
 } RenderBackend_GlyphAtlas;
-/*
-static RenderBackend_Surface framebuffer;
 
 static RenderBackend_GlyphAtlas *glyph_atlas;
-static RenderBackend_Surface *glyph_destination_surface;
-static unsigned char glyph_colour_channels[3];
-*/
+static C2D_ImageTint glyph_tint;
 
 static C3D_RenderTarget *screen_render_target;
 
@@ -346,27 +344,114 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 
 RenderBackend_GlyphAtlas* RenderBackend_CreateGlyphAtlas(size_t width, size_t height)
 {
+	RenderBackend_GlyphAtlas *atlas = (RenderBackend_GlyphAtlas*)malloc(sizeof(RenderBackend_GlyphAtlas));
+
+	width = NextPowerOfTwo(width);
+	height = NextPowerOfTwo(height);
+
+	if (atlas != NULL)
+	{
+		atlas->local_texture_buffer = (unsigned char*)linearAlloc(width * height * 4);
+
+		if (atlas->local_texture_buffer != NULL)
+		{
+			atlas->surface = RenderBackend_CreateSurface(width, height, false);
+
+			if (atlas->surface != NULL)
+				return atlas;
+			else
+				Backend_PrintError("RenderBackend_CreateSurface failed in RenderBackend_CreateGlyphAtlas");
+
+			linearFree(atlas->local_texture_buffer);
+		}
+		else
+		{
+			Backend_PrintError("linearAlloc failed in RenderBackend_CreateGlyphAtlas");
+		}
+
+		free(atlas);
+	}
+	else
+	{
+		Backend_PrintError("malloc failed in RenderBackend_CreateGlyphAtlas");
+	}
+
+
 	return NULL;
 }
 
 void RenderBackend_DestroyGlyphAtlas(RenderBackend_GlyphAtlas *atlas)
 {
-	
+	RenderBackend_FreeSurface(atlas->surface);
+	linearFree(atlas->local_texture_buffer);
+	free(atlas);
 }
 
 void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t y, const unsigned char *pixels, size_t width, size_t height, size_t pitch)
 {
-	
+	// If we upload while drawing, we get corruption (visible after stage transitions)
+	if (frame_started)
+	{
+		C3D_FrameEnd(0);
+		frame_started = false;
+	}
+
+	for (size_t h = 0; h < height; ++h)
+	{
+		const unsigned char *source_pointer = &pixels[h * pitch];
+		unsigned char *destination_pointer = &atlas->local_texture_buffer[((y + h) * atlas->surface->width + x) * 4];
+
+		for (size_t w = 0; w < width; ++w)
+		{
+			*destination_pointer++ = *source_pointer++;
+			*destination_pointer++ = 0xFF;
+			*destination_pointer++ = 0xFF;
+			*destination_pointer++ = 0xFF;
+		}
+	}
+
+	GSPGPU_FlushDataCache(atlas->local_texture_buffer, atlas->surface->width * atlas->surface->height * 4);
+
+	C3D_SyncDisplayTransfer((u32*)atlas->local_texture_buffer, GX_BUFFER_DIM(atlas->surface->width, atlas->surface->height), (u32*)atlas->surface->texture.data, GX_BUFFER_DIM(atlas->surface->width, atlas->surface->height), TEXTURE_TRANSFER_FLAGS);
 }
 
 void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBackend_Surface *destination_surface, unsigned char red, unsigned char green, unsigned char blue)
 {
-	
+	EnableAlpha(true);
+
+	if (!frame_started)
+	{
+		C3D_FrameBegin(0);
+		frame_started = true;
+	}
+
+	C2D_SceneBegin(destination_surface->render_target);
+
+	glyph_atlas = atlas;
+
+	C2D_PlainImageTint(&glyph_tint, C2D_Color32(red, green, blue, 0xFF), 1.0f);
 }
 
 void RenderBackend_DrawGlyph(long x, long y, size_t glyph_x, size_t glyph_y, size_t glyph_width, size_t glyph_height)
 {
-	
+	const float texture_left = (float)glyph_x / glyph_atlas->surface->texture.width;
+	const float texture_top = (float)(glyph_atlas->surface->texture.height - glyph_y) / glyph_atlas->surface->texture.height;
+	const float texture_right = (float)(glyph_x + glyph_width) / glyph_atlas->surface->texture.width;
+	const float texture_bottom = (float)(glyph_atlas->surface->texture.height - (glyph_y + glyph_height)) / glyph_atlas->surface->texture.height;
+
+	Tex3DS_SubTexture subtexture;
+	subtexture.width = glyph_width;
+	subtexture.height = glyph_height;
+	subtexture.left = texture_left;
+	subtexture.top = texture_top;
+	subtexture.right = texture_right;
+	subtexture.bottom = texture_bottom;
+
+	C2D_Image image;
+	image.tex = &glyph_atlas->surface->texture;
+	image.subtex = &subtexture;
+
+	C2D_DrawImageAt(image, x, y, 0.5f, &glyph_tint, 1.0f, 1.0f);
 }
 
 void RenderBackend_HandleRenderTargetLoss(void)
@@ -376,5 +461,8 @@ void RenderBackend_HandleRenderTargetLoss(void)
 
 void RenderBackend_HandleWindowResize(size_t width, size_t height)
 {
-	
+	(void)width;
+	(void)height;
+
+	// Will never happen
 }
