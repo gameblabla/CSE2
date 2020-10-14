@@ -15,8 +15,6 @@ bool Backend_Init(void (*drag_and_drop_callback)(const char *path), void (*windo
 	(void)drag_and_drop_callback;
 	(void)window_focus_callback;
 
-	hidInit();
-
 	gfxInitDefault();
 	consoleInit(GFX_BOTTOM, NULL);
 
@@ -39,8 +37,6 @@ void Backend_Deinit(void)
 	romfsExit();
 
 	gfxExit();
-
-	hidExit();
 }
 
 void Backend_PostWindowCreation(void)
