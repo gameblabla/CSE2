@@ -46,7 +46,7 @@ static void OrganyaThread(void *user_data)
 	{
 		if (organya_callback_timer == 0)
 		{
-			// Is Organya isn't currently playing, idle for 10ms and check again
+			// If Organya isn't currently playing, idle for 10ms and check again
 			svcSleepThread(10 * 1000000);
 		}
 		else
