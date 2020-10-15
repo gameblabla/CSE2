@@ -37,14 +37,14 @@ static unsigned int organya_callback_timer;
 
 static LightLock organya_mutex;
 
-static Thread audio_thread;
-static bool audio_thread_die;
+static Thread organya_thread;
+static bool organya_thread_die;
 
 static void OrganyaThread(void *user_data)
 {
 	(void)user_data;
 
-	while (!audio_thread_die)
+	while (!organya_thread_die)
 	{
 		LightLock_Lock(&organya_mutex);
 
@@ -105,17 +105,17 @@ bool AudioBackend_Init(void)
 
 	priority = CLAMP(priority - 1, 0x18, 0x3F);
 
-	audio_thread_die = false;
-	audio_thread = threadCreate(OrganyaThread, NULL, 32 * 1024, priority, -1, false);
+	organya_thread_die = false;
+	organya_thread = threadCreate(OrganyaThread, NULL, 32 * 1024, priority, -1, false);
 
 	return true;
 }
 
 void AudioBackend_Deinit(void)
 {
-	audio_thread_die = true;
-	threadJoin(audio_thread, UINT64_MAX);
-	threadFree(audio_thread);
+	organya_thread_die = true;
+	threadJoin(organya_thread, UINT64_MAX);
+	threadFree(organya_thread);
 
 	ndspExit();
 }
