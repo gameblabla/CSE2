@@ -100,8 +100,18 @@ bool AudioBackend_Init(void)
 
 	LightLock_Init(&organya_mutex);
 
+	s32 priority = 0x30;
+	svcGetThreadPriority(&priority, CUR_THREAD_HANDLE);
+
+	priority -= 1;
+
+	if (priority < 0x18)
+		priority = 0x18;
+	else if (priority > 0x3F)
+		priority = 0x3F;
+
 	audio_thread_die = false;
-	audio_thread = threadCreate(OrganyaThread, NULL, 32 * 1024, 0x18, -1, false);
+	audio_thread = threadCreate(OrganyaThread, NULL, 32 * 1024, priority, -1, false);
 
 	return true;
 }
