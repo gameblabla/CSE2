@@ -29,8 +29,6 @@ typedef struct RenderBackend_Surface
 {
 	C3D_Tex texture;
 	C3D_RenderTarget *render_target;
-	size_t width;
-	size_t height;
 } RenderBackend_Surface;
 
 typedef struct RenderBackend_GlyphAtlas
@@ -45,6 +43,8 @@ static C2D_ImageTint glyph_tint;
 static C3D_RenderTarget *screen_render_target;
 
 static RenderBackend_Surface *framebuffer_surface;
+static size_t framebuffer_surface_width;
+static size_t framebuffer_surface_height;
 
 static bool frame_started;
 
@@ -123,9 +123,16 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t scree
 		framebuffer_surface = RenderBackend_CreateSurface(screen_width, screen_height, true);
 
 		if (framebuffer_surface != NULL)
+		{
+			framebuffer_surface_width = screen_width;
+			framebuffer_surface_height = screen_height;
+
 			return framebuffer_surface;
+		}
 		else
+		{
 			Backend_PrintError("RenderBackend_CreateSurface failed in RenderBackend_Init");
+		}
 
 		C3D_RenderTargetDelete(screen_render_target);
 	}
@@ -161,12 +168,12 @@ void RenderBackend_DrawScreen(void)
 
 	const float texture_left = 0.0f;
 	const float texture_top = 0.0f;
-	const float texture_right = (float)framebuffer_surface->width / framebuffer_surface->texture.width;
-	const float texture_bottom = (float)framebuffer_surface->height / framebuffer_surface->texture.height;
+	const float texture_right = (float)framebuffer_surface_width / framebuffer_surface->texture.width;
+	const float texture_bottom = (float)framebuffer_surface_height / framebuffer_surface->texture.height;
 
 	Tex3DS_SubTexture subtexture;
-	subtexture.width = framebuffer_surface->width;
-	subtexture.height = framebuffer_surface->height;
+	subtexture.width = framebuffer_surface_width;
+	subtexture.height = framebuffer_surface_height;
 	subtexture.left = texture_left;
 	subtexture.top = 1.0f - texture_top;
 	subtexture.right = texture_right;
@@ -180,7 +187,7 @@ void RenderBackend_DrawScreen(void)
 
 	SelectRenderTarget(screen_render_target);
 
-	C2D_DrawImageAt(image, (400 - framebuffer_surface->width) / 2, (240 - framebuffer_surface->height) / 2, 0.0f);
+	C2D_DrawImageAt(image, (400 - framebuffer_surface_width) / 2, (240 - framebuffer_surface_height) / 2, 0.0f);
 
 	EndRendering();
 }
@@ -194,8 +201,6 @@ RenderBackend_Surface* RenderBackend_CreateSurface(size_t width, size_t height, 
 
 	if (surface != NULL)
 	{
-		surface->width = width;
-		surface->height = height;
 		surface->render_target = NULL;
 
 		memset(&surface->texture, 0, sizeof(surface->texture));
