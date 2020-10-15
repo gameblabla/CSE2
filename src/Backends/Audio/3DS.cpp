@@ -35,6 +35,8 @@ static struct
 static void (*organya_callback)(void);
 static unsigned int organya_callback_timer;
 
+static LightLock organya_mutex;
+
 static Thread audio_thread;
 static bool audio_thread_die;
 
@@ -44,17 +46,20 @@ static void OrganyaThread(void *user_data)
 
 	while (!audio_thread_die)
 	{
-		if (organya_callback_timer == 0)
-		{
-			// If Organya isn't currently playing, idle for 10ms and check again
-			svcSleepThread(10 * 1000000);
-		}
-		else
+		LightLock_Lock(&organya_mutex);
+
+		unsigned int sleep_milliseconds = 10;
+
+		if (organya_callback_timer != 0)
 		{
 			organya_callback();
 
-			svcSleepThread(organya_callback_timer * 1000000);
+			sleep_milliseconds = organya_callback_timer;
 		}
+
+		LightLock_Unlock(&organya_mutex);
+
+		svcSleepThread(sleep_milliseconds * 1000000);
 	}
 }
 
@@ -92,6 +97,8 @@ bool AudioBackend_Init(void)
 	ndspInit();
 
 	ndspSetOutputMode(NDSP_OUTPUT_STEREO);
+
+	LightLock_Init(&organya_mutex);
 
 	audio_thread_die = false;
 	audio_thread = threadCreate(OrganyaThread, NULL, 32 * 1024, 0x18, -1, false);
@@ -255,10 +262,18 @@ void AudioBackend_SetSoundPan(AudioBackend_Sound *sound, long pan)
 
 void AudioBackend_SetOrganyaCallback(void (*callback)(void))
 {
+	LightLock_Lock(&organya_mutex);
+
 	organya_callback = callback;
+
+	LightLock_Unlock(&organya_mutex);
 }
 
 void AudioBackend_SetOrganyaTimer(unsigned int milliseconds)
 {
+	LightLock_Lock(&organya_mutex);
+
 	organya_callback_timer = milliseconds;
+
+	LightLock_Unlock(&organya_mutex);
 }
