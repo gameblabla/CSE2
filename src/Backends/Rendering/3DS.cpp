@@ -110,41 +110,54 @@ static void EndRendering(void)
 
 RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t screen_width, size_t screen_height, bool fullscreen)
 {
-	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
-	C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
-	C2D_Prepare();
-
-	C3D_DepthTest(false, GPU_GEQUAL, GPU_WRITE_ALL);
-
-	screen_render_target = C3D_RenderTargetCreate(240, 400, GPU_RB_RGBA8, -1);
-
-	if (screen_render_target != NULL)
+	if (C3D_Init(C3D_DEFAULT_CMDBUF_SIZE))
 	{
-		C3D_RenderTargetSetOutput(screen_render_target, GFX_TOP, GFX_LEFT, DISPLAY_TRANSFER_FLAGS);
-
-		framebuffer_surface = RenderBackend_CreateSurface(screen_width, screen_height, true);
-
-		if (framebuffer_surface != NULL)
+		if (C2D_Init(C2D_DEFAULT_MAX_OBJECTS))
 		{
-			framebuffer_surface_width = screen_width;
-			framebuffer_surface_height = screen_height;
+			C2D_Prepare();
 
-			return framebuffer_surface;
+			C3D_DepthTest(false, GPU_GEQUAL, GPU_WRITE_ALL);
+
+			screen_render_target = C3D_RenderTargetCreate(240, 400, GPU_RB_RGBA8, -1);
+
+			if (screen_render_target != NULL)
+			{
+				C3D_RenderTargetSetOutput(screen_render_target, GFX_TOP, GFX_LEFT, DISPLAY_TRANSFER_FLAGS);
+
+				framebuffer_surface = RenderBackend_CreateSurface(screen_width, screen_height, true);
+
+				if (framebuffer_surface != NULL)
+				{
+					framebuffer_surface_width = screen_width;
+					framebuffer_surface_height = screen_height;
+
+					return framebuffer_surface;
+				}
+				else
+				{
+					Backend_PrintError("RenderBackend_CreateSurface failed in RenderBackend_Init");
+				}
+
+				C3D_RenderTargetDelete(screen_render_target);
+			}
+			else
+			{
+				Backend_PrintError("C2D_CreateScreenTarget failed in RenderBackend_Init");
+			}
+
+			C2D_Fini();
 		}
 		else
 		{
-			Backend_PrintError("RenderBackend_CreateSurface failed in RenderBackend_Init");
+			Backend_PrintError("C2D_Init failed in RenderBackend_Init");
 		}
 
-		C3D_RenderTargetDelete(screen_render_target);
+		C3D_Fini();
 	}
 	else
 	{
-		Backend_PrintError("C2D_CreateScreenTarget failed in RenderBackend_Init");
+		Backend_PrintError("C3D_Init failed in RenderBackend_Init");
 	}
-
-	C2D_Fini();
-	C3D_Fini();
 
 	return NULL;
 }
