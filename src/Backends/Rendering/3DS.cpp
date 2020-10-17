@@ -114,6 +114,8 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t scree
 	C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
 	C2D_Prepare();
 
+	C3D_DepthTest(false, GPU_GEQUAL, GPU_WRITE_ALL);
+
 	screen_render_target = C3D_RenderTargetCreate(240, 400, GPU_RB_RGBA8, -1);
 
 	if (screen_render_target != NULL)
