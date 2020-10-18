@@ -48,10 +48,11 @@ bool Backend_GetPaths(std::string *module_path, std::string *data_path)
 {
 	// Create the CSE2 folder if it doesn't already exist
 	mkdir("sdmc:/3ds", 0777);
-	mkdir("sdmc:/3ds/cse2", 0777);
+	mkdir("sdmc:/3ds/data", 0777);
+	mkdir("sdmc:/3ds/data/cse2", 0777);
 
 	// Configuration files and save data goes on the read-write SD card
-	*module_path = "sdmc:/3ds/cse2";
+	*module_path = "sdmc:/3ds/data/cse2";
 
 	// Data goes in the read-only ROMFS
 	*data_path = "romfs:";
