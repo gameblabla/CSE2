@@ -1149,7 +1149,12 @@ Font* LoadFreeTypeFontFromData(const unsigned char *data, size_t data_size, size
 				if (FT_New_Memory_Face(font->library, font->data, (FT_Long)data_size, 0, &font->face) == 0)
 				{
 					// Select a rough size, for vector glyphs
-					FT_Size_RequestRec request = {FT_SIZE_REQUEST_TYPE_CELL, cell_height << 6, cell_height << 6, 0, 0};	// 'cell_height << 6, cell_height << 6' isn't a typo: it's needed by the Japanese font
+					FT_Size_RequestRec request;
+					request.type = FT_SIZE_REQUEST_TYPE_CELL;
+					request.width = cell_height << 6;	// 'cell_height << 6' isn't a typo: it's needed by the Japanese font
+					request.height = cell_height << 6;
+					request.horiResolution = 0;
+					request.vertResolution = 0;
 					FT_Request_Size(font->face, &request);
 
 					// If an accurate bitmap font is available, however, use that instead
