@@ -94,21 +94,33 @@ static int AllocateChannel(AudioBackend_Sound *sound)
 
 bool AudioBackend_Init(void)
 {
-	ndspInit();
+	Result rc = ndspInit();
 
-	ndspSetOutputMode(NDSP_OUTPUT_STEREO);
+	if (R_SUCCEEDED(rc))
+	{
+		ndspSetOutputMode(NDSP_OUTPUT_STEREO);
 
-	LightLock_Init(&organya_mutex);
+		LightLock_Init(&organya_mutex);
 
-	s32 priority = 0x30;
-	svcGetThreadPriority(&priority, CUR_THREAD_HANDLE);
+		s32 priority = 0x30;
+		svcGetThreadPriority(&priority, CUR_THREAD_HANDLE);
 
-	priority = CLAMP(priority - 1, 0x18, 0x3F);
+		priority = CLAMP(priority - 1, 0x18, 0x3F);
 
-	organya_thread_die = false;
-	organya_thread = threadCreate(OrganyaThread, NULL, 32 * 1024, priority, -1, false);
+		organya_thread_die = false;
+		organya_thread = threadCreate(OrganyaThread, NULL, 32 * 1024, priority, -1, false);
 
-	return true;
+		return true;
+	}
+	else
+	{
+		if (R_SUMMARY(rc) == RS_NOTFOUND && R_MODULE(rc) == RM_DSP)
+			Backend_PrintError("Could not load DSP firmware - you might need to dump yours manually");
+		else
+			Backend_PrintError("ndspInit failed in AudioBackend_Init");
+	}
+
+	return false;
 }
 
 void AudioBackend_Deinit(void)
