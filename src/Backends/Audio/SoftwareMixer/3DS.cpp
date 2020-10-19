@@ -93,7 +93,9 @@ unsigned long SoftwareMixerBackend_Init(void (*callback)(long *stream, size_t fr
 
 	if (stream_buffer != NULL)
 	{
-		if (R_SUCCEEDED(ndspInit()))
+		Result rc = ndspInit();
+
+		if (R_SUCCEEDED(rc))
 		{
 			ndspSetCallback(Callback, NULL);
 
@@ -137,7 +139,10 @@ unsigned long SoftwareMixerBackend_Init(void (*callback)(long *stream, size_t fr
 		}
 		else
 		{
-			Backend_PrintError("ndspInit failed");
+			if (R_SUMMARY(rc) == RS_NOTFOUND && R_MODULE(rc) == RM_DSP)
+				Backend_PrintError("Could not load DSP firmware - you might need to dump yours manually");
+			else
+				Backend_PrintError("ndspInit failed in SoftwareMixerBackend_Init");
 		}
 
 		linearFree(stream_buffer);
