@@ -11,7 +11,7 @@
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
-#define CLAMP(x, y, z) MIN(MAX((x), (y)), (z))
+#define CLAMP(a, min, max) MIN(MAX((a), (min)), (max))
 
 typedef struct AudioBackend_Sound
 {
@@ -105,10 +105,8 @@ bool AudioBackend_Init(void)
 		s32 priority = 0x30;
 		svcGetThreadPriority(&priority, CUR_THREAD_HANDLE);
 
-		priority = CLAMP(priority - 1, 0x18, 0x3F);
-
 		organya_thread_die = false;
-		organya_thread = threadCreate(OrganyaThread, NULL, 32 * 1024, priority, -1, false);
+		organya_thread = threadCreate(OrganyaThread, NULL, 32 * 1024, CLAMP(priority - 1, 0x18, 0x3F), -1, false);
 
 		return true;
 	}
