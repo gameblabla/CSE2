@@ -1,0 +1,2 @@
+Set CSE2$Dir <Obey$Dir>
+Run <CSE2$Dir>.CSE2 ><CSE2$Dir>.Log 2>&1

@@ -65,6 +65,8 @@ void DefaultConfigData(CONFIGDATA *conf)
 
 #ifdef _3DS
 	conf->display_mode = 1;
+#elif defined(__riscos__)
+	conf->display_mode = 2;
 #endif
 
 	// Reset joystick settings (as these can't simply be set to 0)

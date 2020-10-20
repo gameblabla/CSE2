@@ -775,3 +775,7 @@ if(DOCONFIG)
 		RUNTIME_OUTPUT_DIRECTORY_DEBUG ${BUILD_DIRECTORY}
 	)
 endif()
+
+if(RISCOS)
+	include(RISCOSApp)
+endif()
