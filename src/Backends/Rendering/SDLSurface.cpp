@@ -8,7 +8,7 @@
 #include "SDL.h"
 
 #include "../Misc.h"
-#include "../Shared/SDL2.h"
+#include "../Shared/SDL.h"
 
 typedef struct RenderBackend_Surface
 {

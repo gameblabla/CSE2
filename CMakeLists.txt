@@ -25,8 +25,8 @@ option(LANCZOS_RESAMPLER "Use Lanczos filtering for audio resampling instead of 
 option(FREETYPE_FONTS "Use FreeType2 to render the DejaVu Mono (English) or Migu1M (Japanese) fonts, instead of using pre-rendered copies of Courier New (English) and MS Gothic (Japanese)" OFF)
 
 set(BACKEND_RENDERER "SDLTexture" CACHE STRING "Which renderer the game should use: 'OpenGL3' for an OpenGL 3.2 renderer, 'OpenGLES2' for an OpenGL ES 2.0 renderer, 'SDLTexture' for SDL2's hardware-accelerated Texture API, 'SDLSurface' for SDL2's software-rendered Surface API, 'Wii U' for the Wii U's hardware-accelerated GX2 API, '3DS' for the 3DS's hardware accelerated Citro2D/Citro3D API, or 'Software' for a handwritten software renderer")
-set(BACKEND_AUDIO "SDL2" CACHE STRING "Which audio backend the game should use: 'SDL2', 'miniaudio', 'WiiU-Hardware', 'WiiU-Software', '3DS-Hardware', '3DS-Software', or 'Null'")
-set(BACKEND_PLATFORM "SDL2" CACHE STRING "Which platform backend the game should use: 'SDL2', 'GLFW3', 'WiiU', '3DS', or 'Null'")
+set(BACKEND_AUDIO "SDL2" CACHE STRING "Which audio backend the game should use: 'SDL2', 'SDL1', 'miniaudio', 'WiiU-Hardware', 'WiiU-Software', '3DS-Hardware', '3DS-Software', or 'Null'")
+set(BACKEND_PLATFORM "SDL2" CACHE STRING "Which platform backend the game should use: 'SDL2', 'SDL1', 'GLFW3', 'WiiU', '3DS', or 'Null'")
 
 option(LTO "Enable link-time optimisation" OFF)
 option(PKG_CONFIG_STATIC_LIBS "On platforms with pkg-config, static-link the dependencies (good for Windows builds, so you don't need to bundle DLL files)" OFF)
@@ -336,6 +336,14 @@ if(BACKEND_AUDIO MATCHES "SDL2")
 		"src/Backends/Audio/SoftwareMixer/Backend.h"
 		"src/Backends/Audio/SoftwareMixer/SDL2.cpp"
 	)
+elseif(BACKEND_AUDIO MATCHES "SDL1")
+	target_sources(CSE2 PRIVATE
+		"src/Backends/Audio/SoftwareMixer.cpp"
+		"src/Backends/Audio/SoftwareMixer/Mixer.cpp"
+		"src/Backends/Audio/SoftwareMixer/Mixer.h"
+		"src/Backends/Audio/SoftwareMixer/Backend.h"
+		"src/Backends/Audio/SoftwareMixer/SDL1.cpp"
+	)
 elseif(BACKEND_AUDIO MATCHES "miniaudio")
 	target_sources(CSE2 PRIVATE
 		"src/Backends/Audio/SoftwareMixer.cpp"
@@ -393,9 +401,15 @@ endif()
 
 if(BACKEND_PLATFORM MATCHES "SDL2")
 	target_sources(CSE2 PRIVATE
-		"src/Backends/Controller/SDL2.cpp"
+		"src/Backends/Controller/SDL.cpp"
 		"src/Backends/Platform/SDL2.cpp"
-		"src/Backends/Shared/SDL2.h"
+		"src/Backends/Shared/SDL.h"
+	)
+elseif(BACKEND_PLATFORM MATCHES "SDL1")
+	target_sources(CSE2 PRIVATE
+		"src/Backends/Controller/SDL.cpp"
+		"src/Backends/Platform/SDL1.cpp"
+		"src/Backends/Shared/SDL.h"
 	)
 elseif(BACKEND_PLATFORM MATCHES "GLFW3")
 	target_sources(CSE2 PRIVATE
@@ -428,6 +442,10 @@ elseif(BACKEND_PLATFORM MATCHES "SDL2" AND BACKEND_RENDERER MATCHES "SDLTexture"
 elseif(BACKEND_PLATFORM MATCHES "SDL2" AND BACKEND_RENDERER MATCHES "SDLSurface")
 elseif(BACKEND_PLATFORM MATCHES "SDL2" AND BACKEND_RENDERER MATCHES "Software")
 	target_sources(CSE2 PRIVATE "src/Backends/Rendering/Window/Software/SDL2.cpp")
+elseif(BACKEND_PLATFORM MATCHES "SDL1" AND BACKEND_RENDERER MATCHES "OpenGL3")
+	target_sources(CSE2 PRIVATE "src/Backends/Rendering/Window/OpenGL3/SDL1.cpp")
+elseif(BACKEND_PLATFORM MATCHES "SDL1" AND BACKEND_RENDERER MATCHES "Software")
+	target_sources(CSE2 PRIVATE "src/Backends/Rendering/Window/Software/SDL1.cpp")
 elseif(BACKEND_PLATFORM MATCHES "GLFW3" AND BACKEND_RENDERER MATCHES "OpenGL3")
 	target_sources(CSE2 PRIVATE "src/Backends/Rendering/Window/OpenGL3/GLFW3.cpp")
 elseif(BACKEND_PLATFORM MATCHES "GLFW3" AND BACKEND_RENDERER MATCHES "OpenGLES2")
@@ -599,6 +617,45 @@ if(BACKEND_PLATFORM MATCHES "SDL2" OR BACKEND_AUDIO MATCHES "SDL2")
 	endif()
 endif()
 
+if(BACKEND_PLATFORM MATCHES "SDL1" OR BACKEND_AUDIO MATCHES "SDL1")
+	if(BACKEND_PLATFORM MATCHES "SDL2" OR BACKEND_AUDIO MATCHES "SDL2")
+		message(FATAL_ERROR "SDL1 and SDL2 cannot be used simultaneously!")
+	endif()
+
+	find_package(SDL 1.2.15)
+
+	if (PKG_CONFIG_FOUND)
+		pkg_check_modules(sdl QUIET IMPORTED_TARGET sdl)
+	endif()
+
+	if(TARGET PkgConfig::sdl)
+		# pkg-config
+		if (PKG_CONFIG_STATIC_LIBS)
+			message(STATUS "Using system SDL1 (pkg-config, static)")
+			# Do not link libSDLmain.a, otherwise we get weird linker errors about SDL_main not being found.
+			# We don't need SDL's WinMain->main shim anyway, so we can just ignore it.
+			list(REMOVE_ITEM sdl_STATIC_CFLAGS "-Dmain=SDL_main")
+			list(REMOVE_ITEM sdl_STATIC_LDFLAGS "-lSDLmain")
+			target_compile_options(CSE2 PRIVATE ${sdl_STATIC_CFLAGS})
+			target_link_libraries(CSE2 PRIVATE ${sdl_STATIC_LDFLAGS})
+		else()
+			message(STATUS "Using system SDL1 (pkg-config, dynamic)")
+			# Do not link libSDLmain.a, otherwise we get weird linker errors about SDL_main not being found.
+			# We don't need SDL's WinMain->main shim anyway, so we can just ignore it.
+			list(REMOVE_ITEM sdl_CFLAGS "-Dmain=SDL_main")
+			list(REMOVE_ITEM sdl_LDFLAGS "-lSDLmain")
+			target_compile_options(CSE2 PRIVATE ${sdl_CFLAGS})
+			target_link_libraries(CSE2 PRIVATE ${sdl_LDFLAGS})
+		endif()
+	elseif(SDL_FOUND)
+		message(STATUS "Using system SDL1 (CMake)")
+		target_include_directories(CSE2 PRIVATE ${SDL_INCLUDE_DIR})
+		target_link_libraries(CSE2 PRIVATE ${SDL_LIBRARY})
+	else()
+		message(FATAL_ERROR "SDL1 not installed!")
+	endif()
+endif()
+
 if(FREETYPE_FONTS)
 	if(NOT FORCE_LOCAL_LIBS)
 		find_package(Freetype)
@@ -717,4 +774,8 @@ if(DOCONFIG)
 		RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${BUILD_DIRECTORY}
 		RUNTIME_OUTPUT_DIRECTORY_DEBUG ${BUILD_DIRECTORY}
 	)
+endif()
+
+if(RISCOS)
+	include(RISCOSApp)
 endif()

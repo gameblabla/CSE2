@@ -10,7 +10,7 @@
 #include "../../WindowsWrapper.h"
 
 #include "../Misc.h"
-#include "../Shared/SDL2.h"
+#include "../Shared/SDL.h"
 
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
