@@ -30,6 +30,7 @@ addons:
         - gcc-9
         - g++-9
         - clang-9
+        - libsdl1.2-dev
         - libsdl2-dev
         - libglfw3-dev
         - libfreetype6-dev
@@ -39,6 +40,7 @@ addons:
         - cmake
         - gcc@9
         - llvm@9
+        - sdl
         - sdl2
         - glfw
         - freetype
@@ -49,6 +51,8 @@ env:
     - PLATFORM=SDL2 AUDIO=SDL2 RENDERER=SDLTexture
     - PLATFORM=SDL2 AUDIO=SDL2 RENDERER=OpenGL3
     - PLATFORM=SDL2 AUDIO=SDL2 RENDERER=OpenGLES2
+    - PLATFORM=SDL1 AUDIO=SDL1 RENDERER=Software
+    - PLATFORM=SDL1 AUDIO=SDL1 RENDERER=OpenGL3
     - PLATFORM=GLFW3 AUDIO=miniaudio RENDERER=Software
     - PLATFORM=GLFW3 AUDIO=miniaudio RENDERER=OpenGL3
     - PLATFORM=GLFW3 AUDIO=miniaudio RENDERER=OpenGLES2
