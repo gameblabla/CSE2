@@ -1322,8 +1322,8 @@ void DrawText(Font *font, RenderBackend_Surface *surface, int x, int y, unsigned
 
 		size_t pen_x = 0;
 
-		const unsigned char *string_pointer = (unsigned char*)string;
-		const unsigned char *string_end = (unsigned char*)string + strlen(string);
+		const unsigned char *string_pointer = (const unsigned char*)string;
+		const unsigned char *string_end = (const unsigned char*)string + strlen(string);
 
 		while (string_pointer != string_end)
 		{
