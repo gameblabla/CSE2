@@ -113,7 +113,7 @@ bool AudioBackend_Init(void)
 	else
 	{
 		if (R_SUMMARY(rc) == RS_NOTFOUND && R_MODULE(rc) == RM_DSP)
-			Backend_PrintError("Could not load DSP firmware - you might need to dump yours manually");
+			Backend_PrintError("Could not load DSP firmware.\nThe game will not have any audio!\nTo fix this, you need to dump your\n3DS's DSP firmware.\nGoogle it if you're not sure what to do.");
 		else
 			Backend_PrintError("ndspInit failed in AudioBackend_Init");
 	}
