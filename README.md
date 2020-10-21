@@ -86,7 +86,8 @@ with:
 cmake -B build -DCMAKE_BUILD_TYPE=Release
 ```
 
-MSYS2 users should append `-G"MSYS Makefiles" -DPKG_CONFIG_STATIC_LIBS=ON` to this command, also.
+MSYS2 users should append `-G"MSYS Makefiles" -DPKG_CONFIG_STATIC_LIBS=ON` to
+this command, also.
 
 You can also add the following flags:
 
@@ -181,7 +182,8 @@ on the root of your SD card.
 ### Building for the 3DS
 
 To target the 3DS, you'll need devkitPro, devkitARM, Citro2D, Citro3D, libctru,
-and bannertool, along with the `3dstools` and `devkitpro-pkgbuild-helpers` packages.
+and bannertool, along with the `3dstools` and `devkitpro-pkgbuild-helpers`
+packages.
 
 Open a terminal, and `cd` into the CSE2 directory. Then execute this command:
 
@@ -189,7 +191,8 @@ Open a terminal, and `cd` into the CSE2 directory. Then execute this command:
 cmake -B build3ds -DCMAKE_BUILD_TYPE=Release -DFORCE_LOCAL_LIBS=ON -DBACKEND_PLATFORM=3DS -DBACKEND_RENDERER=3DS -DBACKEND_AUDIO=3DS-Hardware -DDOCONFIG=OFF -DFREETYPE_FONTS=ON -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/3ds.cmake
 ```
 
-(Note that `FREETYPE_FONTS` is enabled. If you're creating a Japanese build, it's best to disable this, as the FreeType font is unreadable at 320x240).
+(Note that `FREETYPE_FONTS` is enabled. If you're creating a Japanese build,
+it's best to disable this, as the FreeType font is unreadable at 320x240).
 
 This will create the build files. To build CSE2, run:
 
