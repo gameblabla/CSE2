@@ -38,6 +38,7 @@ typedef struct RenderBackend_GlyphAtlas
 } RenderBackend_GlyphAtlas;
 
 static RenderBackend_GlyphAtlas *glyph_atlas;
+static RenderBackend_Surface *glyph_destination_surface;
 static C2D_ImageTint glyph_tint;
 
 static C3D_RenderTarget *screen_render_target;
@@ -447,17 +448,18 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBa
 {
 	EnableAlpha(true);
 
-	BeginRendering();
-
-	SelectRenderTarget(destination_surface->render_target);
-
 	glyph_atlas = atlas;
+	glyph_destination_surface = destination_surface;
 
 	C2D_PlainImageTint(&glyph_tint, C2D_Color32(red, green, blue, 0xFF), 1.0f);
 }
 
 void RenderBackend_DrawGlyph(long x, long y, size_t glyph_x, size_t glyph_y, size_t glyph_width, size_t glyph_height)
 {
+	BeginRendering();
+
+	SelectRenderTarget(glyph_destination_surface->render_target);
+
 	const float texture_left = (float)glyph_x / glyph_atlas->texture.width;
 	const float texture_top = (float)(glyph_atlas->texture.height - glyph_y) / glyph_atlas->texture.height;
 	const float texture_right = (float)(glyph_x + glyph_width) / glyph_atlas->texture.width;
