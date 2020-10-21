@@ -22,6 +22,7 @@ Supported platforms include...
 * macOS
 * Wii U
 * 3DS
+* RISC OS
 
 ![Screenshot](screenshot.png)
 
