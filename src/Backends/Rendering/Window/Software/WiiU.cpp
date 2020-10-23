@@ -1,3 +1,6 @@
+// Released under the MIT licence.
+// See LICENCE.txt for details.
+
 // Sexy new backend that bounces the software-rendered frame to the GPU,
 // eliminating V-tearing, and gaining support for rendering to the TV for
 // free!

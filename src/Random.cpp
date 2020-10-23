@@ -1,3 +1,6 @@
+// Released under the MIT licence.
+// See LICENCE.txt for details.
+
 #include "Random.h"
 
 // A replication of MSVC's rand algorithm

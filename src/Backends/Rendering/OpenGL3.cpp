@@ -1,3 +1,6 @@
+// Released under the MIT licence.
+// See LICENCE.txt for details.
+
 // Dual OpenGL 3.2 and OpenGL ES 2.0 renderer
 
 #include "../Rendering.h"

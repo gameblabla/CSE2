@@ -1,3 +1,6 @@
+// Released under the MIT licence.
+// See LICENCE.txt for details.
+
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>

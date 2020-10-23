@@ -1,3 +1,6 @@
+// Released under the MIT licence.
+// See LICENCE.txt for details.
+
 // This darned thing doesn't work - sounds just randomly refuse to play,
 // particularly the ones used by Organya.
 
