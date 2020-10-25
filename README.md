@@ -20,7 +20,7 @@ CSE2 is a decompilation of Cave Story.
 When Pixel made Cave Story, he compiled the original Windows EXE with no
 optimisations. This left the generated assembly code extremely verbose and easy
 to read. It also made the code very decompiler-friendly, since the assembly
-could be mapped directly back to the original C(++) code.
+could be mapped directly back to the original C++ code.
 
 Technically, this alone made a decompilation feasible, as was the case for [the
 Super Mario 64 decompilation project](https://github.com/n64decomp/sm64) -
