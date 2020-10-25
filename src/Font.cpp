@@ -1191,6 +1191,8 @@ Font* LoadFreeTypeFontFromData(const unsigned char *data, size_t data_size, size
 
 							font->glyphs[i].x = (i % font->atlas_row_length) * atlas_entry_width;
 							font->glyphs[i].y = (i / font->atlas_row_length) * atlas_entry_height;
+
+							font->glyphs[i].unicode_value = 0;
 						}
 
 						font->glyph_list_head = &font->glyphs[TOTAL_GLYPH_SLOTS - 1];
@@ -1290,6 +1292,8 @@ Font* LoadBitmapFont(const char *bitmap_path, const char *metadata_path)
 
 							font->glyphs[i].x = (i % font->atlas_row_length) * atlas_entry_width;
 							font->glyphs[i].y = (i / font->atlas_row_length) * atlas_entry_height;
+
+							font->glyphs[i].unicode_value = 0;
 						}
 
 						font->glyph_list_head = &font->glyphs[TOTAL_GLYPH_SLOTS - 1];
