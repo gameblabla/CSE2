@@ -26,22 +26,22 @@ Technically, this alone made a decompilation feasible, as was the case for [the
 Super Mario 64 decompilation project](https://github.com/n64decomp/sm64) -
 however, there was more to be found...
 
-In 2007, a Linux port of Cave Story was made by Peter Mackay and Simon Parzer.
+In 2007, a Linux port of Cave Story was made by Simon Parzer and Peter Mackay.
 Details about it can be found on [Peter's old blog](https://web.archive.org/web/20070911202919/http://aaiiee.wordpress.com:80/).
 This port received an update in 2011, including two shiny new executables. What
-Peter and Simon didn't realise was that they left huge amounts of debugging
-information in these executables, including the names of every C++ source file,
-as well as the variables, functions, and structs they contained.
+they didn't realise was that they left huge amounts of debugging information in
+these executables, including the names of every C++ source file, as well as the
+variables, functions, and structs they contained.
 
 This was a goldmine of information about not just the game's inner-workings, but
 its _source code._ This is the same lucky-break [the Diablo decompilation project](https://github.com/diasurgical/devilution)
-had. With it, much of the game's code was pre-documented and explained _for_ us,
-saving us the effort of doing it ourselves. In fact, the combination of
+had. With it, much of the game's code was pre-documented and explained, saving
+us the effort of doing it ourselves. In fact, the combination of
 easy-to-decompile code, and a near-full set of function/variable names, reduced
 much of the decompilation process to mere copy-paste.
 
 To top it all off, some of Cave Story's original source code would eventually
-see the light of day...
+see the light of day:
 
 In early 2018, the Organya music engine was [released on GitHub](https://github.com/shbow/organya)
 by an old friend of Pixel's. On top of providing an insight into Pixel's coding
@@ -49,7 +49,7 @@ style, this helped with figuring out one of the most complex parts of Cave
 Story's codebase.
 
 And... that's it! It's not often that a game this decompilable comes along, so
-I'm glad that Cave Story was one of them. [Patching a dusty old executable from 2004 has its downsides](https://github.com/Clownacy/Cave-Story-Mod-Loader/blob/master/src/mods/graphics_enhancement/widescreen/patch_camera.c).
+I'm glad that Cave Story was one of them. [Patching a dusty old executable from 2005 sucks](https://github.com/Clownacy/Cave-Story-Mod-Loader/blob/master/src/mods/graphics_enhancement/widescreen/patch_camera.c).
 
 ## Building
 
