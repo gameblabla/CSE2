@@ -1027,7 +1027,7 @@ static Glyph* GetGlyph(Font *font, unsigned long unicode_value)
 		glyph_pointer = &glyph->next;
 	}
 
-	// Couldn't find glyph - overwrite the old at the end.
+	// Couldn't find glyph - overwrite the old one at the end.
 	// The one at the end hasn't been used in a while anyway.
 
 #ifdef FREETYPE_FONTS
