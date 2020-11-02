@@ -64,9 +64,9 @@ typedef struct VertexBufferSlot
 	Vertex vertices[2][3];
 } VertexBufferSlot;
 
-static struct 
+static struct
 {
-	GLuint id;	
+	GLuint id;
 	struct
 	{
 		GLint vertex_transform;
@@ -74,7 +74,7 @@ static struct
 	} uniforms;
 } program_texture;
 
-static struct 
+static struct
 {
 	GLuint id;
 	struct
@@ -84,7 +84,7 @@ static struct
 	} uniforms;
 } program_texture_colour_key;
 
-static struct 
+static struct
 {
 	GLuint id;
 	struct
@@ -94,7 +94,7 @@ static struct
 	} uniforms;
 } program_colour_fill;
 
-static struct 
+static struct
 {
 	GLuint id;
 	struct
