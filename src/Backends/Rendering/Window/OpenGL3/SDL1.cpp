@@ -18,7 +18,7 @@ bool WindowBackend_OpenGL_CreateWindow(const char *window_title, size_t *screen_
 		Backend_PrintError("Couldn't set OpenGL swap interval: %s", SDL_GetError());
 #endif
 
-	if (SDL_SetVideoMode(*screen_width, *screen_height, 0, SDL_RESIZABLE | SDL_OPENGL | (fullscreen ? SDL_FULLSCREEN : 0)) != NULL)
+	if (SDL_SetVideoMode(*screen_width, *screen_height, 0, SDL_OPENGL | (fullscreen ? SDL_FULLSCREEN : 0)) != NULL)
 	{
 		SDL_WM_SetCaption(window_title, NULL);
 
