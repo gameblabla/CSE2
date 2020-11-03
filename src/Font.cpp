@@ -1082,7 +1082,8 @@ static Glyph* GetGlyph(Font *font, unsigned long unicode_value)
 			glyph->y_offset = (font->face->size->metrics.ascender + (64 / 2)) / 64 - font->face->glyph->bitmap_top;
 			glyph->x_advance = font->face->glyph->advance.x / 64;
 
-			RenderBackend_UploadGlyph(font->atlas, glyph->x, glyph->y, bitmap.buffer, glyph->width, glyph->height, glyph->width);
+			if (glyph->width != 0 && glyph->height != 0)	// Some glyphs are just plain empty - don't bother trying to upload them
+				RenderBackend_UploadGlyph(font->atlas, glyph->x, glyph->y, bitmap.buffer, glyph->width, glyph->height, glyph->width);
 
 			FT_Bitmap_Done(font->library, &bitmap);
 
@@ -1121,7 +1122,8 @@ static Glyph* GetGlyph(Font *font, unsigned long unicode_value)
 		glyph->y_offset = 0;
 		glyph->x_advance = local_glyph->x_advance;
 
-		RenderBackend_UploadGlyph(font->atlas, glyph->x, glyph->y, &font->image_buffer[local_glyph->y * font->image_buffer_width + local_glyph->x], glyph->width, glyph->height, font->image_buffer_width);
+		if (glyph->width != 0 && glyph->height != 0)	// Some glyphs are just plain empty - don't bother trying to upload them
+			RenderBackend_UploadGlyph(font->atlas, glyph->x, glyph->y, &font->image_buffer[local_glyph->y * font->image_buffer_width + local_glyph->x], glyph->width, glyph->height, font->image_buffer_width);
 
 		*glyph_pointer = glyph->next;
 		glyph->next = font->glyph_list_head;
