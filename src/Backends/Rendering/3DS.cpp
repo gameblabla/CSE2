@@ -425,8 +425,10 @@ void RenderBackend_DestroyGlyphAtlas(RenderBackend_GlyphAtlas *atlas)
 
 void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t y, const unsigned char *pixels, size_t width, size_t height, size_t pitch)
 {
-	// If we upload while drawing, we get corruption (visible after stage transitions)
-	EndRendering();
+	// This might be needed, but right now it actually *causes*
+	// corruption rather than prevent it, so it's been disabled
+	// (it causes the 'Studio Pixel presents' text to appear incomplete).
+//	EndRendering();
 
 	for (size_t h = 0; h < height; ++h)
 	{
