@@ -14,6 +14,8 @@
 #define FRAMES_PER_BUFFER (SAMPLE_RATE / 30) // 33.333 milliseconds
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+#define CLAMP(a, min, max) MIN(MAX((a), (min)), (max))
 
 static void (*parent_callback)(long *stream, size_t frames_total);
 
@@ -134,9 +136,11 @@ unsigned long SoftwareMixerBackend_Init(void (*callback)(long *stream, size_t fr
 
 			LightEvent_Init(&audio_thread_event, RESET_ONESHOT);
 
-			audio_thread_die = false;
+			s32 priority = 0x30;
+			svcGetThreadPriority(&priority, CUR_THREAD_HANDLE);
 
-			audio_thread = threadCreate(AudioThread, NULL, 32 * 1024, 0x18, -1, false);
+			audio_thread_die = false;
+			audio_thread = threadCreate(AudioThread, NULL, 32 * 1024, CLAMP(priority - 1, 0x18, 0x3F), -1, false);
 
 			return SAMPLE_RATE;
 		}
