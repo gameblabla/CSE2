@@ -52,6 +52,8 @@ bool WindowBackend_Software_CreateWindow(const char *window_title, size_t screen
 	{
 		glfwMakeContextCurrent(window);
 
+		glfwSwapInterval(0);	// Disable vsync
+
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 		glEnable(GL_TEXTURE_2D);
