@@ -181,9 +181,9 @@ void RenderBackend_Deinit(void)
 
 void RenderBackend_DrawScreen(void)
 {
-	EnableAlpha(false);
+	EndRendering();
 
-	BeginRendering();
+	EnableAlpha(false);
 
 	const float texture_left = 0.0f;
 	const float texture_top = 0.0f;
@@ -202,13 +202,15 @@ void RenderBackend_DrawScreen(void)
 	image.tex = &framebuffer_surface->texture;
 	image.subtex = &subtexture;
 
+	C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+
 	C2D_TargetClear(screen_render_target, C2D_Color32(0, 0, 0, 0xFF));
 
 	SelectRenderTarget(screen_render_target);
 
 	C2D_DrawImageAt(image, (400 - framebuffer_surface_width) / 2, (240 - framebuffer_surface_height) / 2, 0.0f);
 
-	EndRendering();
+	C3D_FrameEnd(0);
 }
 
 RenderBackend_Surface* RenderBackend_CreateSurface(size_t width, size_t height, bool render_target)
