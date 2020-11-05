@@ -68,7 +68,6 @@ typedef struct Font
 	Glyph glyphs[TOTAL_GLYPH_SLOTS];
 	Glyph *glyph_list_head;
 	RenderBackend_GlyphAtlas *atlas;
-	size_t atlas_row_length;
 } Font;
 
 #ifdef JAPANESE
@@ -1180,8 +1179,6 @@ Font* LoadFreeTypeFontFromData(const unsigned char *data, size_t data_size, size
 					size_t atlas_columns = ceil(sqrt(atlas_entry_width * atlas_entry_height * TOTAL_GLYPH_SLOTS) / atlas_entry_width);
 					size_t atlas_rows = (TOTAL_GLYPH_SLOTS + (atlas_columns - 1)) / atlas_columns;
 
-					font->atlas_row_length = atlas_columns;
-
 					font->atlas = RenderBackend_CreateGlyphAtlas(atlas_columns * atlas_entry_width, atlas_rows * atlas_entry_height);
 
 					if (font->atlas != NULL)
@@ -1191,8 +1188,8 @@ Font* LoadFreeTypeFontFromData(const unsigned char *data, size_t data_size, size
 						{
 							font->glyphs[i].next = (i == 0) ? NULL : &font->glyphs[i - 1];
 
-							font->glyphs[i].x = (i % font->atlas_row_length) * atlas_entry_width;
-							font->glyphs[i].y = (i / font->atlas_row_length) * atlas_entry_height;
+							font->glyphs[i].x = (i % atlas_columns) * atlas_entry_width;
+							font->glyphs[i].y = (i / atlas_columns) * atlas_entry_height;
 
 							font->glyphs[i].unicode_value = 0;
 						}
@@ -1281,8 +1278,6 @@ Font* LoadBitmapFont(const char *bitmap_path, const char *metadata_path)
 					size_t atlas_columns = ceil(sqrt(atlas_entry_width * atlas_entry_height * TOTAL_GLYPH_SLOTS) / atlas_entry_width);
 					size_t atlas_rows = (TOTAL_GLYPH_SLOTS + (atlas_columns - 1)) / atlas_columns;
 
-					font->atlas_row_length = atlas_columns;
-
 					font->atlas = RenderBackend_CreateGlyphAtlas(atlas_columns * atlas_entry_width, atlas_rows * atlas_entry_height);
 
 					if (font->atlas != NULL)
@@ -1292,8 +1287,8 @@ Font* LoadBitmapFont(const char *bitmap_path, const char *metadata_path)
 						{
 							font->glyphs[i].next = (i == 0) ? NULL : &font->glyphs[i - 1];
 
-							font->glyphs[i].x = (i % font->atlas_row_length) * atlas_entry_width;
-							font->glyphs[i].y = (i / font->atlas_row_length) * atlas_entry_height;
+							font->glyphs[i].x = (i % atlas_columns) * atlas_entry_width;
+							font->glyphs[i].y = (i / atlas_columns) * atlas_entry_height;
 
 							font->glyphs[i].unicode_value = 0;
 						}
