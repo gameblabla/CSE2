@@ -15,6 +15,7 @@
 /game_english/DoConfig
 /game_english/CSE2_debug.rpx
 /game_english/CSE2.rpx
+/game_english/CSE2.3dsx
 /game_english/\!CSE2
 /game_japanese/CSE2_debug.exe
 /game_japanese/DoConfig_debug.exe
@@ -26,6 +27,7 @@
 /game_japanese/DoConfig
 /game_japanese/CSE2_debug.rpx
 /game_japanese/CSE2.rpx
+/game_japanese/CSE2.3dsx
 /game_japanese/\!CSE2
 
 # Exclude MSVC debug data
