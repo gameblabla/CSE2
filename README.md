@@ -204,13 +204,13 @@ This will create an elf file. Before we can create a `.3dsx` file from it, we
 need to make an `.smdh` file:
 
 ```
-bannertool makesmdh -i $DEVKITPRO/libctru/default_icon.png -s "CSE2" -l "Port of Cave Story" -p "Clownacy" -o game_english/smdh.smdh
+bannertool makesmdh -i $DEVKITPRO/libctru/default_icon.png -s "CSE2" -l "Port of Cave Story" -p "Clownacy" -o build3ds/smdh.smdh
 ```
 
 We can finally generate a `.3dsx` file:
 
 ```
-3dsxtool game_english/CSE2 game_english/CSE2.3dsx --romfs=game_english/data --smdh=game_english/smdh.smdh
+3dsxtool game_english/CSE2 game_english/CSE2.3dsx --romfs=game_english/data --smdh=build3ds/smdh.smdh
 ```
 
 ## Licensing
