@@ -7,6 +7,10 @@
 
 #include "Main.h"
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
@@ -106,6 +110,9 @@ void PutFramePerSecound(void)
 // TODO - Inaccurate stack frame
 int main(int argc, char *argv[])
 {
+	char homepath[256];
+	struct stat st = {0};
+
 	(void)argc;
 
 	int i;
@@ -113,22 +120,13 @@ int main(int argc, char *argv[])
 	if (!Backend_Init(DragAndDropCallback, WindowFocusCallback))
 		return EXIT_FAILURE;
 
-	// Get executable's path, and path of the data folder
-	if (!Backend_GetPaths(&gModulePath, &gDataPath))
+
+	gDataPath = "./data";
+	snprintf(homepath, sizeof(homepath), "%s/.cse2", getenv("HOME"));
+	gModulePath = homepath;
+	if (stat(homepath, &st) == -1)
 	{
-		// Fall back on argv[0] if the backend cannot provide a path
-		gModulePath = argv[0];
-
-		for (size_t i = gModulePath.length();; --i)
-		{
-			if (i == 0 || gModulePath[i] == '\\' || gModulePath[i] == '/')
-			{
-				gModulePath.resize(i);
-				break;
-			}
-		}
-
-		gDataPath = gModulePath + "/data";
+		mkdir(homepath, 0755);
 	}
 
 	CONFIGDATA conf;

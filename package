@@ -3,8 +3,6 @@
 mkdir -p opk
 cp ./cave opk/cave
 cp -r game_english/data opk
-cp -r doc opk
-cp -r attic opk
 cp ./icon.png opk/icon.png
 cp ./game_english/licence.txt opk/COPYING
 

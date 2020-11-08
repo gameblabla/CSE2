@@ -3,8 +3,6 @@
 mkdir -p opk
 cp ./cave opk/cave
 cp -r game_japanese/data opk
-cp -r doc opk
-cp -r attic opk
 cp ./icon.png opk/icon.png
 cp ./game_english/licence.txt opk/COPYING
 
@@ -21,7 +19,7 @@ esac
 
 print '[Desktop Entry]
 Type=Application
-Name=CSE2
+Name=CSE2 JP
 Comment=Port by Gameblabla
 Exec=cave
 Icon=icon

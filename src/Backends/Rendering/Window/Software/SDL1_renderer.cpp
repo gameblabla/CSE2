@@ -30,7 +30,7 @@ bool WindowBackend_Software_CreateWindow(const char *window_title, size_t screen
 	window_sdlsurface = SDL_SetVideoMode(screen_width, screen_height, bits_per_pixel, window_flags);
 	if (window_sdlsurface == NULL) {
 		Backend_PrintError("Couldn't create 24bpp window: %s", SDL_GetError());
-		bits_per_pixel = 32;
+		bits_per_pixel = 16;
 		window_sdlsurface = SDL_SetVideoMode(screen_width, screen_height, bits_per_pixel, window_flags);
 	}
 

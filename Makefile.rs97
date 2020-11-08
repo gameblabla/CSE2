@@ -2,7 +2,7 @@ PRGNAME     = cave
 CC			= /opt/rs97-toolchain/bin/mipsel-linux-gcc
 CXX			= /opt/rs97-toolchain/bin/mipsel-linux-g++
 STRIP		= /opt/rs97-toolchain/bin/mipsel-linux-strip
-PROFILE = 0
+PROFILE = APPLY
 
 SRCDIR		= ./src ./src/Backends/Controller ./src/Backends/Platform ./src/Backends/Audio/SoftwareMixer ./src/Backends/Audio ./src/Backends/Rendering ./src/Backends/Rendering/Window/Software
 VPATH		= $(SRCDIR)
