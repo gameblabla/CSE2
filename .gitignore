@@ -1,6 +1,8 @@
 # Exclude obj directory (object files for Makefile build)
 /obj
-
+*.gcda
+*.o
+*.opk
 # Exclude the (recommended) CMake build directory
 /build*
 

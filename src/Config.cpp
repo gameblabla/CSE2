@@ -74,6 +74,8 @@ void DefaultConfigData(CONFIGDATA *conf)
 	conf->display_mode = 1;
 #elif defined(__riscos__)
 	conf->display_mode = 2;
+#else
+	conf->display_mode = 1;
 #endif
 
 	// Reset joystick settings (as these can't simply be set to 0)

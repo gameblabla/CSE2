@@ -1,0 +1,46 @@
+PRGNAME     = cave
+CC			= /opt/rs97-toolchain/bin/mipsel-linux-gcc
+CXX			= /opt/rs97-toolchain/bin/mipsel-linux-g++
+STRIP		= /opt/rs97-toolchain/bin/mipsel-linux-strip
+PROFILE = APPLY
+
+SRCDIR		= ./src ./src/Backends/Controller ./src/Backends/Platform ./src/Backends/Audio/SoftwareMixer ./src/Backends/Audio ./src/Backends/Rendering ./src/Backends/Rendering/Window/Software
+VPATH		= $(SRCDIR)
+SRC_C		= $(foreach dir, $(SRCDIR), $(wildcard $(dir)/*.c))
+SRC_CP		= $(foreach dir, $(SRCDIR), $(wildcard $(dir)/*.cpp))
+OBJ_C		= $(notdir $(patsubst %.c, %.o, $(SRC_C)))
+OBJ_CP		= $(notdir $(patsubst %.cpp, %.o, $(SRC_CP)))
+OBJS		= $(OBJ_C) $(OBJ_CP)
+
+CFLAGS		= -Ofast -fdata-sections -ffunction-sections -mno-fp-exceptions -mno-check-zero-division -mframe-header-opt -fno-common -mxgot -mips32 -mno-mips16 -fno-PIC -mno-abicalls -flto
+CFLAGS		+= -DALIGN_DWORD -Wall -Wextra
+CFLAGS		+= -DLSB_FIRST -Isrc/Backends/Shared -Iassets $(shell /opt/rs97-toolchain/mipsel-buildroot-linux-musl/sysroot/usr/bin/sdl-config --cflags)
+CFLAGS		+= -I./src -I./src/Backends/Controller -I./src/Backends/Platform -I./src/Backends/Audio/SoftwareMixer -I./src/Backends/Audio -I./src/Backends/Rendering -I./src/Backends/Rendering/Window/Software
+
+
+ifeq ($(PROFILE), YES)
+CFLAGS 		+= -fprofile-generate=/home/retrofw/cse2
+else ifeq ($(PROFILE), APPLY)
+CFLAGS		+= -fprofile-use
+endif
+
+CXXFLAGS 	= $(CFLAGS) -std=gnu++14
+
+LDFLAGS     = -lc -lgcc -lstdc++ -lrt -ldl -lm $(shell /opt/rs97-toolchain/mipsel-buildroot-linux-musl/sysroot/usr/bin/sdl-config --libs) -Wl,--as-needed -Wl,--gc-sections -flto -s
+
+ifeq ($(PROFILE), YES)
+LDFLAGS 	+= -lgcov
+endif
+
+# Rules to make executable
+$(PRGNAME): $(OBJS)  
+	$(CC) $(CFLAGS) -o $(PRGNAME) $^ $(LDFLAGS)
+
+$(OBJ_C) : %.o : %.c
+	$(CC) $(CFLAGS) -std=gnu99 -c -o $@ $<
+
+$(OBJ_CP) : %.o : %.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+clean:
+	rm -f $(PRGNAME) *.o

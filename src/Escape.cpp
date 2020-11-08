@@ -28,12 +28,12 @@ int Call_Escape(void)
 			gKeyTrg = 0;
 			return enum_ESCRETURN_exit;
 		}
-		if (gKeyTrg & KEY_F1) // F1 is pressed, continue
+		if (gKeyTrg & KEY_F1 || gKeyTrg & KEY_X || gKeyTrg & KEY_Z) // F1 is pressed, continue
 		{
 			gKeyTrg = 0;
 			return enum_ESCRETURN_continue;
 		}
-		if (gKeyTrg & KEY_F2) // F2 is pressed, reset
+		if (gKeyTrg & KEY_F2 || gKeyTrg & KEY_MAP) // F2 is pressed, reset
 		{
 			gKeyTrg = 0;
 			return enum_ESCRETURN_restart;
@@ -41,7 +41,8 @@ int Call_Escape(void)
 
 		// Draw screen
 		CortBox(&grcFull, 0x000000);
-		PutBitmap3(&grcFull, (WINDOW_WIDTH / 2) - 104, (WINDOW_HEIGHT / 2) - 8, &rc, SURFACE_ID_TEXT_BOX);
+		PutText((WINDOW_WIDTH / 2) - 112, (WINDOW_HEIGHT / 2) - 8, "Select : Quit / A/B : Resume / Start : Reset", RGB(0xFF, 0xFF, 0xFF));
+		//PutBitmap3(&grcFull, (WINDOW_WIDTH / 2) - 104, (WINDOW_HEIGHT / 2) - 8, &rc, SURFACE_ID_TEXT_BOX);
 		PutFramePerSecound();
 
 		if (!Flip_SystemTask())

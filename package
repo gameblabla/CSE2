@@ -1,0 +1,35 @@
+#!/bin/sh
+
+mkdir -p opk
+cp ./cave opk/cave
+cp -r game_english/data opk
+cp -r doc opk
+cp -r attic opk
+cp ./icon.png opk/icon.png
+cp ./game_english/licence.txt opk/COPYING
+
+# https://unix.stackexchange.com/questions/219268/how-to-add-new-lines-when-using-echo
+print()
+	case    ${IFS- } in
+	(\ *)   printf  %b\\n "$*";;
+	(*)     IFS=\ $IFS
+	printf  %b\\n "$*"
+	IFS=${IFS#?}
+esac
+
+# Create GmenuNx entry file plus other things
+
+print '[Desktop Entry]
+Type=Application
+Name=CSE2
+Comment=Port by Gameblabla
+Exec=cave
+Icon=icon
+Terminal=false
+Type=Application
+Categories=games;
+X-OD-NeedsDownscaling=false' > opk/default."$1".desktop
+
+mksquashfs ./opk cse2_"$1".opk -all-root -noappend -no-exports -no-xattrs
+
+rm -r opk
