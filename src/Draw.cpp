@@ -13,7 +13,7 @@
 #include <string.h>
 #include <string>
 
-#ifdef _3DS
+#ifdef __3DS__
  #include <3ds.h>
 #endif
 
@@ -87,7 +87,7 @@ BOOL Flip_SystemTask(void)
 
 	RenderBackend_DrawScreen();
 
-#ifdef _3DS
+#ifdef __3DS__
 	// This would go in Backend_SystemTask, but that causes a hang
 	// because of a race condition: aptMainLoop cannot be called
 	// between C3D_FrameBegin and C3D_FrameEnd

@@ -70,7 +70,7 @@ void DefaultConfigData(CONFIGDATA *conf)
 	// Fun fact: The Linux port added this line:
 	// conf->display_mode = 1;
 
-#ifdef _3DS
+#ifdef __3DS__
 	conf->display_mode = 1;
 #elif defined(__riscos__)
 	conf->display_mode = 2;

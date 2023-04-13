@@ -40,7 +40,7 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t scree
 	if (WindowBackend_Software_CreateWindow(window_title, screen_width, screen_height, fullscreen))
 	{
 		framebuffer.pixels = WindowBackend_Software_GetFramebuffer(&framebuffer.pitch);
-	#ifdef _3DS
+	#ifdef __3DS__
 		framebuffer.width = screen_height;
 		framebuffer.height = screen_width;
 	#else
@@ -88,7 +88,7 @@ RenderBackend_Surface* RenderBackend_CreateSurface(size_t width, size_t height, 
 		return NULL;
 	}
 
-#ifdef _3DS
+#ifdef __3DS__
 	surface->width = height;
 	surface->height = width;
 	surface->pitch = height * 3;
@@ -121,7 +121,7 @@ void RenderBackend_RestoreSurface(RenderBackend_Surface *surface)
 
 void RenderBackend_UploadSurface(RenderBackend_Surface *surface, const unsigned char *pixels, size_t width, size_t height)
 {
-#ifdef _3DS
+#ifdef __3DS__
 	// Rotate 90 degrees clockwise, and convert from RGB to BGR
 	const unsigned char *source_pointer = pixels;
 
@@ -146,7 +146,7 @@ ATTRIBUTE_HOT void RenderBackend_Blit(RenderBackend_Surface *source_surface, con
 {
 	RenderBackend_Rect rect_clamped;
 
-#ifdef _3DS
+#ifdef __3DS__
 	// Rotate
 	rect_clamped.left = source_surface->width - rect->bottom;
 	rect_clamped.top = rect->left;
@@ -238,7 +238,7 @@ ATTRIBUTE_HOT void RenderBackend_ColourFill(RenderBackend_Surface *surface, cons
 {
 	RenderBackend_Rect rect_clamped;
 
-#ifdef _3DS
+#ifdef __3DS__
 	// Rotate
 	rect_clamped.left = surface->width - rect->bottom;
 	rect_clamped.top = rect->left;
@@ -282,7 +282,7 @@ ATTRIBUTE_HOT void RenderBackend_ColourFill(RenderBackend_Surface *surface, cons
 
 		for (long i = 0; i < rect_clamped.right - rect_clamped.left; ++i)
 		{
-		#ifdef _3DS
+		#ifdef __3DS__
 			*destination_pointer++ = blue;
 			*destination_pointer++ = green;
 			*destination_pointer++ = red;
@@ -305,7 +305,7 @@ RenderBackend_GlyphAtlas* RenderBackend_CreateGlyphAtlas(size_t width, size_t he
 
 		if (atlas->pixels != NULL)
 		{
-		#ifdef _3DS
+		#ifdef __3DS__
 			atlas->width = height;
 			atlas->height = width;
 		#else
@@ -330,7 +330,7 @@ void RenderBackend_DestroyGlyphAtlas(RenderBackend_GlyphAtlas *atlas)
 
 void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t y, const unsigned char *pixels, size_t width, size_t height, size_t pitch)
 {
-#ifdef _3DS
+#ifdef __3DS__
 	// Rotate
 	for (size_t h = 0; h < height; ++h)
 	{
@@ -350,7 +350,7 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBa
 	glyph_atlas = atlas;
 	glyph_destination_surface = destination_surface;
 
-#ifdef _3DS
+#ifdef __3DS__
 	glyph_colour_channels[0] = blue;
 	glyph_colour_channels[1] = green;
 	glyph_colour_channels[2] = red;
@@ -363,7 +363,7 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBa
 
 void RenderBackend_DrawGlyph(long x, long y, size_t glyph_x, size_t glyph_y, size_t glyph_width, size_t glyph_height)
 {
-#ifdef _3DS
+#ifdef __3DS__
 	// Rotate
 	const size_t new_glyph_width = glyph_height;
 	const size_t new_glyph_height = glyph_width;

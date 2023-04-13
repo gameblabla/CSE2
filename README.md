@@ -188,7 +188,7 @@ packages.
 Open a terminal, and `cd` into the CSE2 directory. Then execute this command:
 
 ```
-cmake -B build3ds -DCMAKE_BUILD_TYPE=Release -DFORCE_LOCAL_LIBS=ON -DBACKEND_PLATFORM=3DS -DBACKEND_RENDERER=3DS -DBACKEND_AUDIO=3DS-Hardware -DDOCONFIG=OFF -DFREETYPE_FONTS=ON -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/3ds.cmake
+cmake -B build3ds -DCMAKE_BUILD_TYPE=Release -DFORCE_LOCAL_LIBS=ON -DBACKEND_PLATFORM=3DS -DBACKEND_RENDERER=3DS -DBACKEND_AUDIO=3DS-Hardware -DDOCONFIG=OFF -DFREETYPE_FONTS=ON -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/cmake/3DS.cmake -DCTRU_ROOT=$DEVKITPRO/libctru
 ```
 
 (Note that `FREETYPE_FONTS` is enabled. If you're creating a Japanese build,
@@ -210,7 +210,7 @@ bannertool makesmdh -i $DEVKITPRO/libctru/default_icon.png -s "CSE2" -l "Port of
 We can finally generate a `.3dsx` file:
 
 ```
-3dsxtool game_english/CSE2 game_english/CSE2.3dsx --romfs=game_english/data --smdh=build3ds/smdh.smdh
+3dsxtool game_english/CSE2.elf game_english/CSE2.3dsx --romfs=game_english/data --smdh=build3ds/smdh.smdh
 ```
 
 ## Licensing
